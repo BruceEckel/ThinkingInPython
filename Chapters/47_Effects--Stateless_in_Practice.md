@@ -204,9 +204,8 @@ print(4_000 < heads < 6_000)
 
 `count_heads()` needs a `Flip` and produces an `int`.
 Its body never calls `random`, and no parameter carries a seed or a source.
-`Flip` carries no data, so it needs no fields,
-whereas `Ask` and `Tell` each carry a payload the request has to deliver.
-`Flip`'s whole content is its type and the `bool` it produces.
+`Ask` and `Tell` each carry a payload the request has to deliver,
+whereas `Flip`'s whole content is its type and the `bool` it produces.
 
 The parentheses in `if (yield from flip()):` are mandatory.
 A `yield` expression can appear on the right side of an assignment,
@@ -306,12 +305,12 @@ print(run(handle(tomorrow)(batch_due)(LAUNCH)))
 `frozen()` reports a single moment over and over,
 so `stamp()` produces a fixed string a test can compare.
 `tomorrow` reports a moment a day later,
-and `batch_due()` returns `True` with no time having passed.
+and `batch_due()` returns `True` at once.
 The schedule logic runs against whatever moment the handler names,
-in microseconds rather than a day.
+in microseconds.
 `batch_due()` holds no `datetime.now()` call,
-so a test has nothing to monkeypatch and nothing to wait for,
-and a production handler that returns `datetime.now()` leaves the function unchanged.
+so a test names the moment outright,
+and a production handler that returns `datetime.now()` runs the same function.
 
 Those three runs are claims about testability, so here they are as tests.
 The handler moves inside each test, and every test names the moment it needs:
@@ -427,7 +426,7 @@ The `Recorder` of [Swapping the Implementation](46_Effects--Stateless.md#swappin
 stood in for a side effect, where the function writes something outward.
 The technique is the same for both.
 Name each contact with the outside as an Ability and bind it at the edge to whatever the context needs.
-What an EMS adds is that you cannot skip the declaration by accident.
+What an EMS adds is that the type checker enforces the declaration.
 
 ## Switching Implementations Mid-Run
 
@@ -616,7 +615,7 @@ and `connected()` brackets the pair.
 `draw()` returns `None` on success,
 so anything else at that binding is the `Drained` that ends the inner loop,
 and the outer loop calls `plug()` again for a replacement.
-The hour does not advance on that path,
+The hour stays put on that path,
 so the replacement supplies the hour the failed source refused.
 
 The first trace is an evening.
@@ -635,13 +634,13 @@ Priority lives in `controller()`,
 thresholds and the outage schedule in the sources themselves,
 and `run_load()` decides when to stop drawing from the source it holds.
 
-The load's declared dependency does not change.
+The load's declared dependency stays fixed.
 `Depend[Outlet, None]` says it needs an `Outlet` from the first hour to the last,
 and that type appears once.
 What changes is the object answering the need, four times, mid-run.
-A dependency bound before the program starts cannot express that change,
-because no single answer stays right for the whole run.
-Here the binding is a function call,
+A dependency bound before the program starts gives one answer for the whole run,
+and here the right answer changes with the hour.
+This binding is a function call,
 so it checks each source's `available()` at each request.
 [Swapping the Implementation](46_Effects--Stateless.md#swapping-the-implementation)
 swapped an implementation between runs.
@@ -660,11 +659,9 @@ One thing stays outside the types.
 `choose()` raises a `Blackout` when no source can supply the hour,
 and that is ordinary code raising an ordinary exception.
 No `@throws` lifts it,
-so it propagates out of `run()` untracked and no signature mentions it.
-`catch()` matches values an Effect yields,
-and a handler is not part of the Effect,
-so no `catch()` around this program intercepts it.
-A handler runs in the driver, not in the Effect.
+so it propagates out of `run()` and no signature mentions it.
+`catch()` matches values an Effect yields, and a handler runs in the driver,
+outside the Effect, so a `catch()` around this program lets the `Blackout` through.
 
 ## State as an Ability
 
@@ -744,8 +741,7 @@ It reads, decides, and writes, and the decision sits between the two requests,
 in code that mentions no cell.
 Its signature declares the shared state.
 `Depend[Get | Put, bool]` tells a caller this function reads or writes something that outlives it.
-`spree()` composes purchases,
-and its signature carries the same union unchanged.
+`spree()` composes purchases, and its signature carries the same union.
 
 The handlers own the cell.
 `ledger()` builds `read()` and `write()` from one `Cell`,
@@ -1144,7 +1140,7 @@ and the `Never` in its type records that.
 The difference between the two ways in is what the type checker verifies.
 If you change `Empty()` to some undeclared exception,
 `ty` flags the `yield from` where it stands,
-because the yielded type no longer fits the declared channel,
+because the yielded type falls outside the declared channel,
 the `invalid-yield` that [Dependencies That Need Dependencies](#dependencies-that-need-dependencies)
 shows in full.
 A `raise` gets no such check.
@@ -1199,7 +1195,7 @@ print(type(missing).__name__)
 with the same upcasting annotations.
 Its result type is the union `report()` builds by naming all three errors,
 and this listing names none of them at the catch.
-Two failures from two different sources come back as values through one `catch_all()` that names no error type.
+Two failures from two different sources come back as values through the one `catch_all()`.
 
 `outcome()` supplies first and catches second, the reverse of `scenarios.py`,
 and both the runtime and the type checker accept either order.
@@ -1385,7 +1381,7 @@ def encounter() -> Depend[
 
 `encounter()` holds all the engine's logic,
 and the only types it mentions are the three Protocols.
-No concrete class appears in it, and it prints nothing.
+It prints nothing itself.
 Output is an Ability like the other two:
 `Narrator` is one of the three requests,
 so the code that supplies it chooses whether a line prints, goes into a list,
@@ -1630,13 +1626,13 @@ with no way to name the ones worth another attempt.
 Retrying `research()` with the `WEATHER` feed of [Composing a Program](#composing-a-program)
 shows the problem: a `WEATHER` headline names no known topic,
 so `topic_of()` raises `NotInteresting` on every attempt, deterministically,
-and `retry()` cannot distinguish that failure from one worth retrying.
+and `retry()` treats that failure like one worth retrying.
 Three attempts fetch the headline three times and collect three identical `NotInteresting` errors in the `RetryError`.
 Retry what can change between attempts,
 and let `catch()` take a deterministic failure out before it reaches `retry()`.
 
-`retry()` decorates the function, not the Effect.
-`retry(three)(save_user("Morty"))` is not available,
+`retry()` decorates the function `save_user`,
+not the Effect `save_user("Morty")`,
 for the reason [An Effect Runs Once](46_Effects--Stateless.md#an-effect-runs-once)
 gives: the Effect is a generator, one `run()` spends it,
 and only the function can build a second description.
@@ -1675,9 +1671,9 @@ and at runtime the failure propagates past the useless `catch()` and out of `run
 `catch()` must name what the channel holds at the point of decoration,
 and after `retry()` that is `RetryError[Crashed]`, not `Crashed`.
 
-One library omission:
-`RetryError` declares an `errors` attribute that `retry()` does not assign,
-so the collected failures are reachable as `outcome.args[0]` and not as `outcome.errors`.
+One library omission: `RetryError` declares an `errors` attribute,
+and `retry()` builds one as `RetryError(tuple(errors))`,
+so the collected failures live in `outcome.args[0]` and `outcome.errors` raises `AttributeError`.
 
 ### `repeat()` and `memoize()`
 
@@ -1823,8 +1819,8 @@ Forking and waiting inside a single loop makes each `wait()` block on the task t
 so the sleeps run one after another and take about five times as long.
 The pool is an Ability, not a global,
 so `squares()` declares `Need[Executor]` and names no pool.
-Supplying a `ProcessPoolExecutor` instead moves the same work into processes,
-with no change to `squares()`.
+Supplying a `ProcessPoolExecutor` moves the same work into processes,
+and `squares()` stays as written.
 `as_type(Executor)` appears for the reason it always does:
 `ThreadPoolExecutor` is the more specific type,
 and `squares()` asked for the general one.
@@ -1854,8 +1850,8 @@ What you cannot express is acquiring a resource in one Effect and releasing it a
 the flat resource management a native Effect system provides.
 Python's own answer to that is `ExitStack` in [Combining Context Managers](15_Techniques--Context_Managers.md#combining-context-managers),
 which holds a set of managers decided at runtime and unwinds them together.
-It flattens the nesting with no reference to Effects,
-so the missing mechanism matters less than it first appears.
+It flattens the nesting in ordinary Python,
+so the gap is smaller than it first appears.
 
 ## The Toolkit
 
@@ -1960,11 +1956,10 @@ print(f"run() at least 50x slower: "
 #: run() at least 50x slower: True
 ```
 
-`run_async()` reuses the loop already running and costs almost nothing beyond the Effect itself.
+`run_async()` reuses the loop already running and costs little beyond the Effect itself.
 `run()` builds and tears down a loop on every call,
 hundreds of times the cost of `run_async()`.
-Synchronous code has no loop to reuse,
-so `run()` is the only option and the cost is unavoidable.
+Synchronous code has no loop to reuse, so it pays that cost on every `run()`.
 From inside one, `run_async()` is both the one that works and the one that is fast.
 
 ## Where the Guarantee Stops
@@ -2338,10 +2333,10 @@ and `yield from` is one operator for joining two Effects.
 `research()` joins five steps of two kinds with that one operator,
 once `@throws` has brought the ordinary functions in at the boundary.
 `Async` is one more Ability in the same channel rather than a second viral annotation.
-Resource lifetime is the one concern the Effect type does not absorb.
+Resource lifetime is the one concern left outside the Effect type.
 Stateless has no scoping mechanism, so `with` blocks stay where they are.
-They need not stay nested, since `ExitStack` flattens them,
-but they remain a separate mechanism from the Effect type.
+`ExitStack` flattens them,
+and they remain a separate mechanism from the Effect type.
 
 That property demands the generator discipline, the description/execution split,
 and a wrapper at the boundary for every library that does neither.
