@@ -15,7 +15,7 @@ It yields a request, suspends, and continues when a caller sends the answer.
 
 This chapter covers the full three-channel annotation,
 the loop that carries such a conversation, and `yield from`,
-which composes generators, none of which names its driver.
+which composes generators that never name their driver.
 The next chapter builds an Effect system on all three,
 and this chapter stands on its own.
 
@@ -58,9 +58,9 @@ print(list(countdown(6)), list(squares(6)))
 ```
 
 `Generator[int]` means `Generator[int, None, None]`.
-`Iterator[int]` describes the same one-way generator and reads better,
-and it says nothing about the other two channels:
-a type checker rejects `send()` on anything annotated `Iterator`.
+`Iterator[int]` describes the same one-way generator and reads better.
+It says nothing about the other two channels,
+so a type checker rejects `send()` on anything annotated `Iterator`.
 The long form is necessary when the other two channels carry something,
 as they do in this chapter.
 
@@ -171,7 +171,8 @@ All three `question` variables receive an `Answer` where their declarations say 
 shows that calling an `async def` function runs nothing.
 The call returns a coroutine: a description of work.
 A coroutine's annotation is `Coroutine[YieldType, SendType, ReturnType]`,
-the same three-part shape as a `Generator`, and the match is deliberate.
+the same three-part shape as a `Generator`.
+The match is deliberate.
 `async def` and generator functions both build descriptions that something else drives.
 Calling `interview()` returns a generator object but runs nothing in the function body.
 `next()` and `send()` do that work, one `yield` at a time.
@@ -234,8 +235,8 @@ and `stop.value` in the `except` clause becomes the `Result` that `drive()` retu
 The `answers` map keys on `Question` and holds `Answer`s.
 Inside the `try`, `StopIteration` means the conversation finished,
 so only the `send()` call sits there.
-Any other code that could raise it, such as an exhausted answer source,
-belongs outside.
+Any other code that could raise it belongs outside,
+such as `next()` on an exhausted answer source.
 
 The type checker verifies two of those three parameters.
 `StopIteration.value`'s type is `Any`,
@@ -407,8 +408,8 @@ That finish completes the first `yield from`, so `both()` starts the second.
 A single `send()` therefore ends one inner generator and produces the first prompt of the next.
 The driver sees `StopIteration` only when `both()` finishes its last delegation.
 
-Writing the loop by hand is the natural first attempt,
-and it silently discards every sent value:
+The natural first attempt is to write the loop by hand.
+That loop silently discards every sent value:
 
 ```python
 # manual_forwarding.py
@@ -440,8 +441,8 @@ Each `send()` delivers its value to `manual()`'s own `yield`, which discards it.
 The `for` loop then resumes `collect()` with `next()`,
 so both of `collect()`'s `yield` expressions produce `None`.
 The type checker reports nothing,
-because `manual()` is a valid `Generator[str, int]`:
-the send channel appears in the declaration and goes unused.
+because `manual()` is a valid `Generator[str, int]`.
+The send channel appears in the declaration and goes unused.
 `yield from` is not shorthand for this loop.
 
 ### All Three Channels
@@ -479,7 +480,7 @@ if __name__ == "__main__":
 ```
 
 `drive()` is the same function as in `two_way_generator.py` and never references `ask()`.
-The generator portion is what changed.
+Only the generator portion changed.
 
 `ask()` uses `Answer` in two of the three positions, for two different reasons.
 As the `SendType` it is the value the driver sends in,
@@ -531,11 +532,11 @@ print(drive(survey(),
 #: Alice of Wonderland, friend Rabbit, color blue
 ```
 
-The listing imports `interview()` unchanged from the previous example.
-It is the generator `drive()` drives.
+The listing imports `interview()` unchanged from the previous example,
+where `drive()` drove it directly.
 Now `survey()` delegates to it.
-Its `Result` arrives as the value of an expression instead of as `stop.value` in the driver,
-and its questions reach `drive()` through three frames rather than two.
+Its `Result` arrives as the value of an expression instead of as `stop.value` in the driver.
+Its questions reach `drive()` through three frames rather than two.
 The driver receives one more question and the same shape of trace.
 `survey()` asks about a color,
 so the call merges one more pair into `ANSWERS` with the dictionary union operator.
@@ -568,9 +569,9 @@ at its outermost edge.
 ### `throw()` and `close()` Reach the Innermost Generator
 
 A driver can `throw()` an exception into a generator or `close()` it,
-and `yield from` relays both:
+and `yield from` relays both.
 `throw()` raises its exception inside the innermost generator rather than in the delegating one,
-and a `close()` unwinds every frame in the chain.
+and `close()` unwinds every frame in the chain.
 [A Basic Context Manager](15_Techniques--Context_Managers.md#a-basic-context-manager)
 shows this already, described from the `with` block's side:
 "Python resumes the generator by raising the block's exception at the `yield`."
@@ -603,7 +604,7 @@ g.close()
 `g.throw(ValueError("bad input"))` raises that exception at the suspended `yield`,
 inside `worker()`'s frame, the same way the `with` block's exception does.
 `worker()` catches it, prints, and yields again,
-so the generator keeps running after a `throw()` whose exception its `except` clause handles.
+so the generator keeps running when its `except` clause handles the thrown exception.
 `g.close()` raises `GeneratorExit` at the `yield` the generator now waits on,
 `yield "recovered"`.
 `worker()` has no matching `except`, so `GeneratorExit` propagates,
@@ -691,9 +692,9 @@ task_runner()
 #: download: checksum
 ```
 
-`@task` calls each generator function once at definition time,
-queues the generator it builds, and hands the function back unchanged,
-the [registering-decorator shape](14_Techniques--Decorators.md#decorating-classes).
+`@task` is the [registering-decorator shape](14_Techniques--Decorators.md#decorating-classes):
+it calls each generator function once at definition time,
+queues the generator it builds, and hands the function back unchanged.
 `task_runner()` gives the front task one `next()` per turn.
 A task that yields moves to the back of the queue.
 One that finishes raises `StopIteration`, and the runner drops it.
@@ -758,10 +759,10 @@ task_runner()
 `to_send` holds what each job's next turn will receive:
 `None` until the runner has answered that job's most recent request.
 `job.send(to_send.pop(job))` primes a fresh job the same way `next(job)` does,
-since `send(None)` and `next()` are equivalent,
-and delivers the runner's answer on every later turn.
+since `send(None)` and `next()` are equivalent.
+On every later turn the same call delivers the runner's answer.
 `Job`'s `SendType` is `str`, not `str | None`,
-so the priming call needs the `# type: ignore` from `send_none_is_next.py` again:
+so the priming call needs the `# type: ignore` from `send_none_is_next.py` again.
 `to_send.pop(job)` returns `str | None`,
 and no annotation ties the `None` to a generator's first turn.
 `download()` reads what it receives, into `reply`.
@@ -779,8 +780,8 @@ The mechanism is the two halves `task_runner_send.py` just combined:
 `task_runner()`'s turn-taking and `drive()`'s question-answering, in one loop.
 A coroutine object offers `send()`, `throw()`, and `close()`,
 as a generator does.
-`await` suspends the coroutine and yields a request to the loop,
-which supplies the answer once it has one and resumes the coroutine by sending it back.
+`await` suspends the coroutine and yields a request to the loop.
+The loop supplies the answer once it has one and resumes the coroutine by sending it back.
 `asyncio.run()` is the single interpreter at the edge of the program.
 That is why an `await` in a function makes every caller `async` in turn:
 the requests must reach the loop.
@@ -821,8 +822,8 @@ That is the question the next chapter puts into the type system.
 7.  [A Vending Machine](31_Patterns--State_Machines.md#a-vending-machine)
     keeps its current state in an attribute and looks up each transition in a table.
     Write a simplified version as a single generator instead: it collects money,
-    takes two digits, then dispenses or refuses,
-    yielding its current state and receiving each event with `send()`,
+    takes two digits, then dispenses or refuses.
+    It yields its current state and receives each event with `send()`,
     so the position in the generator's body carries the state.
     This generator's `yield` reports the state the machine reached rather than requesting something the machine needs,
     the opposite direction from `interview()`.
