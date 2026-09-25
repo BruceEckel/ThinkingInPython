@@ -36,7 +36,7 @@ which `__init_subclass__()` fills automatically,
 and a `create()` method builds an instance from a material name,
 the [dictionary factory](27_Patterns--Factory.md#the-pythonic-factory-a-dictionary):
 
-![Each Trash subclass registers itself, and the bins are keyed by class](_images/trash_sorter)
+![Each Trash subclass registers itself, and each bin takes a class as its key](_images/trash_sorter)
 
 ```python
 # trash.py
@@ -97,7 +97,7 @@ The lookup is safe here because every subclass writes to `Trash.registry` and no
 so `cls.registry` always resolves to that one table.
 Call it as `Trash.create()`.
 
-`@dataclass` builds `__init__()` from the bare `weight: float` annotation alone:
+`@record` builds `__init__()` from the bare `weight: float` annotation alone:
 the two [`ClassVar` attributes](12_Techniques--Data_Classes_as_Types.md#d-a-real-classvar)
 belong to the class, so they stay out of it.
 Each subclass's `value = ...` line creates a class attribute of its own,
@@ -105,7 +105,7 @@ separate from `Trash.value` and from its siblings'.
 The subclasses omit the annotation because the name and its type carry over from the base declaration;
 restating `ClassVar[float]` also keeps [the type checker's guard on the override](09_Foundations--Class_Attributes.md#classvar-and-inheritance).
 
-Adding a new recyclable type is a single class definition.
+A new recyclable type costs one class definition.
 It registers itself, and `create()` builds it.
 `sum_value()` is an ordinary function.
 It reads `t.value` and `t.weight` polymorphically,
@@ -165,9 +165,9 @@ Aluminum:81
 Cardboard:12
 ```
 
-Parsing it into `Trash` objects goes through the registry,
-so the parser never mentions a concrete material.
-If you add a new kind of trash, the parser keeps working unchanged:
+The parser builds `Trash` objects through the registry,
+so it never names a concrete material.
+A new kind of trash leaves the parser unchanged:
 
 ```python
 # parse_trash.py
@@ -186,7 +186,7 @@ def parse(filename: str | Path) -> list[Trash]:
     return items
 ```
 
-The test parses a small temporary file, so it does not depend on `trash.dat`:
+The test parses a small temporary file, so it runs without `trash.dat`:
 
 ```python
 # test_parse_trash.py
@@ -265,8 +265,8 @@ Testing for one type, or a small subset that needs special handling, is fine.
 Testing for all of them means you do dispatch's job by hand.
 A `case _:` wildcard could catch what the named cases miss:
 `case _: raise ValueError(f"unsorted {type(t).__name__}")` turns the silent drop into a crash.
-That is worth doing, but it does not remove the flaw.
-Every new material still means editing this `match`,
+The wildcard is worth adding, and the flaw survives it:
+every new material still means editing this `match`,
 where `bins[type(t)]` needs no edit at all.
 
 That is the argument.
@@ -339,7 +339,7 @@ The `match` alone loses trash silently.
 
 ## Let a Dictionary Do the Sorting
 
-You can use a dictionary keyed by type:
+A dictionary keyed by type replaces the `match`:
 
 ```python
 # recycle_dict.py
@@ -367,11 +367,11 @@ for kind, items in bins.items():
 
 `type(t)` is the perfect key because it adapts to new types,
 including ones added at runtime.
-Nothing needs maintaining, and nothing gets forgotten.
+The loop has no list of materials to maintain and no case to forget.
 The key is the *exact* class.
 That is the same dictionary-probe dispatch as the tables in [State Machines](31_Patterns--State_Machines.md#the-engine)
 and [*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md#one-lookup-in-a-table),
-and it first appeared in [Function Objects](28_Patterns--Function_Objects.md#an-event-bus-handlers-keyed-by-type)'s event bus.
+and it first appeared in the event bus in [Function Objects](28_Patterns--Function_Objects.md#an-event-bus-handlers-keyed-by-type).
 If you derive `CrushedAluminum` from `Aluminum`,
 it sorts into its own bin rather than its parent's: usually what a sorter needs,
 but keep it in mind before you subclass a material.
@@ -503,13 +503,13 @@ you can assign a function onto a class from outside,
 but behavior scattered that way is unmaintainable.
 A plant that buys its material classes from a supplier has no class body to edit.
 
-The method form is not a strawman.
-This hierarchy is small and the book owns every subclass,
-so `note()` on each material is a real option here.
+The method form is a real option, not a strawman:
+this hierarchy is small and the book owns every subclass,
+so `note()` on each material is a fair choice here.
 The method wins while you own the hierarchy and the operations stay few:
 each subclass answers for itself,
 with no separate table to keep in step with the class list.
-It loses once you do not own the hierarchy,
+It loses once the hierarchy belongs to someone else,
 or once operations start to outnumber materials.
 
 ### One `singledispatch` Function per Operation
@@ -600,7 +600,7 @@ print(f"classes edited for one operation: {len(edited)}")
 
 The counter reads zero.
 `hazard()` reaches every material through the registry,
-and `trash.py` is the file that does not change.
+and `trash.py` stays untouched.
 A third question and a fourth cost one more file each,
 where `note_methods.py` charges one edit per material every time.
 Adding a `Plastic` material means defining the class,
@@ -639,7 +639,7 @@ and one `@recycling_note.register` teaches an existing operation about it.
 Neither is a pattern in the GoF sense.
 In Python the lightest construct is often a language feature,
 not a multi-class pattern.
-A pattern is worth keeping only when it is still useful once the language does part of the work.
+Keep a pattern only when it stays useful after the language has done its part.
 
 ## Exercises
 
