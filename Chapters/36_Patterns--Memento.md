@@ -2,7 +2,7 @@
 
 Undo is a feature users expect and programmers dread.
 It requires a program to capture an object's state at one moment and restore it later.
-The *Memento* pattern does this without breaking encapsulation.
+The *Memento* pattern captures and restores that state without breaking encapsulation.
 The *originator* (the object with state) produces a *memento*,
 an opaque snapshot of itself.
 A *caretaker* (the undo machinery) stores mementos and returns one on request,
@@ -86,7 +86,7 @@ so the snapshot is immutable while the originator stays mutable.
 rebuilding a fresh list so the sketch and the memento never share one.
 One level is enough because a stroke is a string.
 An originator holding containers inside containers needs `copy.deepcopy()` in `save()`,
-at the cost the previous section shows:
+and pays the cost described in [A Snapshot Is Not a Reference](#a-snapshot-is-not-a-reference):
 
 ```python
 # sketch.py
@@ -153,8 +153,9 @@ Building a `Memento` takes an import of the class and a call to it,
 so no caretaker makes one by accident.
 `Memento` is a [record](18_Techniques--Performance.md#record),
 so reassigning `checkpoint.strokes` raises `FrozenInstanceError` at runtime.
-Neither guarantee stops code holding a `Memento` from reading `.strokes`,
-unpacking it, or building one by hand; that boundary remains a convention,
+Neither the checker's report nor the frozen field stops code holding a `Memento` from reading `.strokes`,
+unpacking that tuple, or building a `Memento` by hand;
+that boundary remains a convention,
 the one the classic pattern always relied on.
 What changes is the accidental case,
 a caretaker that mixes up a `Memento` with some other tuple:
@@ -275,16 +276,17 @@ if __name__ == "__main__":
 
 `Drawing` is the frozen form of `Sketch`,
 under its own name so a reader always knows which one a listing means.
-Its extra `title` field lets a later section restore one field and keep the other.
+Its extra `title` field lets [a partial restore](#restoring-part-of-a-state)
+later in this chapter rewind one field and keep the other.
 `draw()` returns a new `Drawing`,
 using `dataclasses.replace()` to change one field and copy the rest.
 Since each call returns a `Drawing`, the calls chain.
 Saving means keeping a reference,
 the assignment that aliased in `aliased_snapshot.py`.
-Here it is safe because the object bound to `before` keeps its value for as long as it exists,
+Here that assignment is safe because the object bound to `before` keeps its value for as long as it exists,
 so the `Memento` class, `save()`, `restore()`, and the copying are all gone.
 `after` shares the two original stroke strings with `before`,
-so a history of them stores each stroke once and duplicates only the pointers:
+so a history of `Drawing` states stores each stroke once and duplicates only the pointers:
 
 ```python
 # sharing.py
@@ -307,7 +309,7 @@ The stroke comes from `"".join([...])` because the compiler interns a literal li
 and interning makes the identity check print `True` for a copied string too.
 
 A single `draw()` allocates one tuple.
-A caretaker that keeps every past state, the `History` class below,
+A caretaker that keeps every past state, the `History` class in `history.py`,
 keeps every one of those tuples alive.
 Once a field grows by one element per edit, the way `strokes` does,
 the `n`-th edit builds a tuple of `n` pointers,
@@ -437,7 +439,7 @@ if __name__ == "__main__":
 
 `do()` pushes the present onto the past and clears the future,
 so an edit after an undo discards the undone states.
-Redo can no longer restore them, which is how editors behave.
+Redo can no longer restore them, and editors behave the same way.
 `undo()` and `redo()` each pop one stack, push the present onto the other,
 and make the popped state the present.
 
@@ -457,8 +459,8 @@ as `history_classic.py` shows below.
 `undo()` and `redo()` trust the caller:
 undoing an empty past raises `IndexError` from `pop()`.
 That `pop()` comes first, so an undo that raises leaves the history as it was.
-`can_undo()` and `can_redo()` exist so a caller checks first,
-which is what an editor uses to gray out the menu item.
+`can_undo()` and `can_redo()` exist so a caller checks first;
+an editor calls them to gray out the menu item.
 
 `History` stores whole states and moves them between stacks,
 so it works for any state type, from `int` to a full `Drawing`,
@@ -571,13 +573,13 @@ print(history.undo())
 since the state it names keeps its value.
 The restore takes the strokes from that past state and the title from the present one,
 producing a state new to the history.
-It goes through `apply()` like any other action,
-so the partial restore is undoable, as the last line shows.
+The restore goes through `apply()` like any other action, and so is undoable,
+as the last line shows.
 The edit that `apply()` receives is a lambda here because a partial restore combines two states,
 and every method on `Drawing` works from one.
 
 `copy.replace()` is the general version of `dataclasses.replace()`,
-which [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#the-general-form-of-replace)
+as [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#the-general-form-of-replace)
 describes.
 `copy.replace()` rather than the `dataclasses` one keeps the technique available to whatever state type a `History` holds:
 `NamedTuple`, `datetime`, and any class defining `__replace__()` all accept it.
@@ -612,14 +614,14 @@ which exercise 3 explores.
 
 ### A Class That Changes After the Save
 
-The class can change between the save and the load.
+The class can drift between the save and the load.
 The bytes encode a class by module and name,
 not by the shape that class had at save time.
 If the state class gains, loses, or renames a field before the load,
 `pickle.loads()` still succeeds.
 The error comes later, from whatever reads a field the bytes never carried.
-The listing simulates that drift.
-It puts the class in its own module because in reality a class drifts between two runs of a program:
+`pickle_drift.py` simulates that drift.
+`SketchV1` sits in a module of its own because in reality a class drifts between two runs of a program:
 
 ```python
 # sketch_v1.py
@@ -692,12 +694,12 @@ and every later read succeeds.
 The class declares no such field,
 so `getattr()` finds it while `repr()` omits it and `==` ignores it.
 The loaded object equals one built fresh from `SketchV1` and hashes the same.
-The added-field drift above raises `AttributeError` when something reads the new field.
+The added-field drift in `pickle_drift.py` raises `AttributeError` when something reads the new field.
 This one raises nothing, and the data is wrong.
 Renaming a field is a delete and an add at once, with both effects.
 The old name becomes a ghost, and the new one is missing,
 so `repr()` itself raises `AttributeError`.
-Running the same substitution backwards shows the deleted field:
+Running the same reassignment backwards shows the deleted field:
 
 ```python
 # ghost_field.py
