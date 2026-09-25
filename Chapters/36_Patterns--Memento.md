@@ -143,6 +143,7 @@ including one a caretaker builds or unpacks by hand.
 At runtime it is a function that returns its argument,
 so the caretaker still holds a plain tuple it can index, unpack,
 or build from scratch.
+
 Wrapping the tuple in a one-field data class makes `Memento` a class of its own at runtime.
 A parameter typed `tuple[str, ...]` still accepts any tuple of strings,
 whatever built it.
@@ -280,9 +281,8 @@ using `dataclasses.replace()` to change one field and copy the rest.
 Since each call returns a `Drawing`, the calls chain.
 Saving means keeping a reference,
 the assignment that aliased in `aliased_snapshot.py`.
-Here it is safe because the object bound to `before` keeps its value for as long as it exists.
-The `Memento` class, `save()`, `restore()`, and the copying are all gone,
-because an earlier `Drawing` keeps its value.
+Here it is safe because the object bound to `before` keeps its value for as long as it exists,
+so the `Memento` class, `save()`, `restore()`, and the copying are all gone.
 `after` shares the two original stroke strings with `before`,
 so a history of them stores each stroke once and duplicates only the pointers:
 
@@ -337,8 +337,8 @@ or switch to *Command*-based undo, which stores an edit instead of a state.
 
 [Rethinking Objects](20_Patterns--Rethinking_Objects.md#the-immutability-solution)
 argues that freezing removes what encapsulation protected.
-That section also explains why `strokes` is a tuple rather than a list.
-Freezing blocks assignment to the field,
+That section also explains why `strokes` is a tuple rather than a list:
+freezing blocks assignment to the field,
 not changes to the object the field holds,
 so a record holding a list lets that list change,
 as `frozen_leaky.py` shows there.
@@ -459,6 +459,7 @@ undoing an empty past raises `IndexError` from `pop()`.
 That `pop()` comes first, so an undo that raises leaves the history as it was.
 `can_undo()` and `can_redo()` exist so a caller checks first,
 which is what an editor uses to gray out the menu item.
+
 `History` stores whole states and moves them between stacks,
 so it works for any state type, from `int` to a full `Drawing`,
 with one condition: states must be immutable.
@@ -528,7 +529,7 @@ Each undoable action carries its own inverse,
 the *Command* variation that [Function Objects](28_Patterns--Function_Objects.md#a-callable-object-as-a-command)
 mentions.
 *Command*-based undo saves memory when a snapshot is large,
-and needs an inverse written and tested for every action.
+but needs an inverse written and tested for every action.
 Try snapshot-based undo first,
 since immutable states share every value an edit carries over,
 as `sharing.py` shows.
@@ -665,6 +666,7 @@ with a field added between the save and the load.
 so it carries a `# type: ignore`.
 Pyright lets the reassignment pass.
 No practical annotation declares that `SketchV1` can become a different class.
+
 `pickle.loads()` looks up the class by the name pickle recorded,
 `sketch_v1.SketchV1`.
 That name is now bound to `SketchV2`.
@@ -673,9 +675,9 @@ skipping `__init__()`, and copies in the fields the old bytes had.
 The fields go straight into the object's `__dict__`, past the frozen check:
 `frozen=True` installs a `__setattr__()` that raises `FrozenInstanceError`,
 and pickle writes `__dict__` directly.
-`title` is absent, since the old bytes never had one.
 The same shortcut skips `__post_init__()`,
 so a memento saved before a field gained its validation loads a value that the validation never saw.
+`title` is absent, since the old bytes never had one.
 `restored.strokes` works because both versions agree on that field.
 `restored.title` raises `AttributeError` when anything reads it,
 often far from the line that called `pickle.loads()`.
@@ -695,7 +697,7 @@ This one raises nothing, and the data is wrong.
 Renaming a field is a delete and an add at once, with both effects.
 The old name becomes a ghost, and the new one is missing,
 so `repr()` itself raises `AttributeError`.
-Running the same substitution backwards shows this case:
+Running the same substitution backwards shows the deleted field:
 
 ```python
 # ghost_field.py
