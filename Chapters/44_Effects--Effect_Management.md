@@ -32,7 +32,7 @@ To discover whether a function is impure,
 you must either trust the documentation or examine that function's code.
 
 Reading every callee soon becomes tedious and error-prone.
-A type system that verified purity for you would remove that reading.
+That reading is the work a type system would do for you, if it verified purity.
 A system that does so is an *Effect Management System*.
 
 ## What Is an Effect?
@@ -202,13 +202,13 @@ This works, and it needs no new type.
 But it guards only the exceptions `slope()`'s `try` names.
 `validate()` raises `ValueError` for a negative `run`,
 and the `try` around it catches only `ZeroDivisionError`.
-This listing puts `validate()` directly above `slope()`,
-so the uncaught `ValueError` is easy to spot.
-In a real call stack the `raise` is usually in another file, several calls down.
-Finding it means reading every callee: the tedious,
-error-prone work an Effect Management System replaces.
 Because `slope()` calls `validate()`,
 `validate()`'s Effect becomes `slope()`'s Effect.
+This listing puts `validate()` directly above `slope()`,
+so the uncaught `ValueError` is easy to spot.
+In a real call stack the `raise` is usually in another file, several calls down,
+and finding it means reading every callee: the tedious,
+error-prone work an Effect Management System replaces.
 Catching by hand covers exactly the exceptions you know a callee can raise.
 Knowing every one of them is the tracking problem an Effect Management System solves.
 
@@ -433,11 +433,12 @@ and composition is how programs grow large.
 An Effect Management System (EMS) keeps track of Effects in functions.
 If your function calls an effectful function,
 that Effect belongs in your function's type.
-A native system adds it for you; a library like Stateless has you declare it,
-then verifies the declaration.
 If another function then calls yours,
 the same Effect belongs in that function's type,
 and so on out to the edge of the program.
+A native system adds each Effect for you;
+a library like Stateless has you declare each one,
+then verifies the declaration.
 With an EMS, the function signature tells you whether the function is pure,
 and for an impure function it names the kinds of impurity.
 
@@ -657,7 +658,7 @@ fun main() : <console,exn> ()
 
 The angle brackets in `greet()`'s signature hold the *Effect row*,
 the set of Effects the function performs.
-The row is the second channel.
+The row is the second channel:
 `ask` and `tell` are part of the type without adding a parameter.
 The compiler infers the row from what the body calls,
 so you rarely write one by hand.
@@ -670,6 +671,8 @@ one parameter per signature.
 
 Something must eventually fulfill every Effect,
 and the construct that fulfills one is a *handler*.
+The compiler rejects a program that performs an Effect with no handler in scope,
+so every Effect a running program performs has a handler.
 Think of a handler as a generalized `except` block.
 An `except` block intercepts exceptions and decides what happens next.
 A handler intercepts any Effect operation and decides what it means.
@@ -681,8 +684,6 @@ and the row that remains holds the Effects the handler bodies perform:
 `console` from the printing and reading, `exn` because `readline()` can fail.
 A test installs a different handler, one that returns a fixed name,
 and `greet()` runs unchanged.
-The compiler rejects a program that performs an Effect with no handler in scope,
-so every Effect a running program performs has a handler.
 
 That separation is the core of every Effect system.
 The code that requests an Effect stands apart from the code that performs it,
@@ -834,9 +835,9 @@ rebuilds the `ask`/`tell` pair from [Effects by Hand](#effects-by-hand).
 
 At this writing, experimental languages designed for AI code generation are proliferating.
 Their designers try to balance better code generation for the AI against human verifiability.
-Adoption skips the years a human language spends waiting for people to learn it.
 A language written for an AI can drop the conveniences that help a person read code,
-and an AI can start using that language as soon as it works.
+and an AI can start using that language as soon as it works,
+so adoption skips the years a human language spends waiting for people to learn it.
 
 Most of these are tracking systems,
 in the sense [Effect Management Systems](#tracking-and-management)
@@ -880,12 +881,13 @@ print(asyncio.run(description), ran)
 
 Calling `greet()` builds a coroutine object, a description of work,
 and `ran` stays empty.
-The body runs only when something awaits the description or hands it to `asyncio.run()`.
 [Concurrency](19_Techniques--Concurrency.md#asyncio-mechanics)
 opened with the same demonstration.
-That is the library Effect system model.
-Descriptions compose inside `async def` functions,
+The body runs only when something awaits the description or hands it to `asyncio.run()`.
+That is the library Effect system model:
+descriptions compose inside `async def` functions,
 and `asyncio.run()` is the boundary where description becomes action.
+
 Python enforces the tracking the way an EMS does.
 `await` is a syntax error outside an `async def`,
 so any function that awaits a coroutine must become `async`,
@@ -938,7 +940,7 @@ A type checker must compute the Effect row of every function from the functions 
 across every library on PyPI, almost all of which carry no Effect annotations.
 `async` succeeded because it arrived with the language,
 and its keyword marks each function that carries the Effect.
-An Effect row must reach every library in an ecosystem of untracked code.
+An Effect row must instead reach every library in an ecosystem of untracked code.
 Gradual typing faced the same problem, and took a decade.
 No PEP proposes Effect tracking today.
 If one arrives, it will contain the ideas in this chapter.
