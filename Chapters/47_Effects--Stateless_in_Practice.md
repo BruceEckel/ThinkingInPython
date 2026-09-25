@@ -35,7 +35,7 @@ so the answer can differ at every request.
 
 An Ability subclasses `Ability[T]`, where `T` is the type its handler returns.
 `Ability` declares no `__slots__`,
-so an Ability is written `@dataclass(frozen=True)` rather than [`@record`](18_Techniques--Performance.md#record):
+so an Ability carries `@dataclass(frozen=True)` rather than [`@record`](18_Techniques--Performance.md#record):
 an unslotted base gives every instance its `__dict__` back.
 Here is the Stateless version of `Ask` and `Tell` from [Effect Management](44_Effects--Effect_Management.md#effects-by-hand):
 
@@ -203,7 +203,7 @@ print(4_000 < heads < 6_000)
 ```
 
 `count_heads()` needs a `Flip` and produces an `int`.
-Its body contains no `random` call, no seed, and no parameter for either.
+Its body never calls `random`, and no parameter carries a seed or a source.
 `Flip` carries no data, so it needs no fields,
 whereas `Ask` and `Tell` each carry a payload the request has to deliver.
 `Flip`'s whole content is its type and the `bool` it produces.
@@ -244,7 +244,7 @@ Indexing a list rather than walking an iterator turns the mistake into an `Index
 Reading the current time is another side cause.
 A real clock answers with the present moment,
 so a test cannot ask it what happens at some critical time
-(midnight, tomorrow, etc.).
+(midnight, or tomorrow).
 `stamp()` puts the current time into its output,
 and `batch_due()` decides whether a day has passed since the last run.
 Against a real clock neither is testable.
@@ -447,7 +447,7 @@ Each stops for its own reason,
 and when one stops the building must obtain another.
 
 Sources are ordinary objects.
-Each reports whether it can supply a given hour, and depletes when drawn from:
+Each reports whether it can supply a given hour and depletes when drawn from:
 
 ```python
 # power.py
@@ -980,8 +980,8 @@ A failure ends the remaining steps the way a raised exception does,
 and no step tests for it.
 Where the run stops depends on where the failure arises.
 The fourth run prints no trace,
-since `DeadWire.latest()` raises `Unavailable` before printing,
-while the third reaches the library and fails there.
+since `DeadWire.latest()` raises `Unavailable` before printing;
+the third reaches the library and fails there.
 
 `report()` is where the two channels come apart.
 `catch()` empties the error channel, so `report()` cannot fail.
@@ -1057,8 +1057,7 @@ The by-hand one returns early, and the Effect one abandons the generator.
 The difference is who writes the branch that does it.
 
 The comparison has limits.
-At this size the by-hand version is respectable,
-and a reader who prefers it is not making a mistake.
+At this size the by-hand version is respectable, and a reader may prefer it.
 Two differences outlast the size argument.
 The by-hand signature, `(Feed, Encyclopedia) -> str`,
 mentions none of the three failures,
@@ -1130,7 +1129,7 @@ where the headline is available to inspect.
 No decorator takes part and nothing raises an exception.
 `throw(Empty())` yields the failure the way `Ask(prompt)` yields a request,
 and the driver takes it from there.
-Execution does not come back: a driver that receives a failure stops sending,
+Execution stops there: a driver that receives a failure stops sending,
 so anything after a `yield from throw(...)` is unreachable,
 and the `Never` in its type records that.
 
@@ -1141,7 +1140,7 @@ because the yielded type no longer fits the declared channel,
 the `invalid-yield` that [Dependencies That Need Dependencies](#dependencies-that-need-dependencies)
 shows in full.
 A `raise` gets no such check.
-`@throws` lifts the types it names, anything else escapes untracked,
+`@throws` lifts the types it names and lets anything else escape untracked,
 and no diagnostic connects the decorator's list to what the body raises.
 A failure that enters through `throw()` is in the type system from the moment it exists.
 
@@ -1201,9 +1200,9 @@ so the failures travel through `supply()`'s driver to the catch either way,
 and under `ty` 0.0.82 both orders infer the same result type.
 The Ability channel is where the orders differ.
 `supply(feed, book)(catch_all(research))` comes back with `Never` there,
-and `catch_all(supply(feed, book)(research))` with `Unknown`: the same object,
-read two ways.
-`bound` has a name so that its revealed type can be read on its own,
+and `catch_all(supply(feed, book)(research))` with `Unknown`:
+the same two handlers, and the order changes the reading.
+`bound` has a name so that you can reveal its type on its own,
 and [The type checker decides what survives handling](#the-type-checker-decides-what-survives-handling)
 takes the difference apart.
 
@@ -1375,7 +1374,7 @@ def encounter() -> Depend[
     narrator.say(hero.approach(obstacle.blocks()))
 ```
 
-`encounter()` holds all of the engine's logic,
+`encounter()` holds all the engine's logic,
 and the only types it mentions are the three Protocols.
 No concrete class appears in it, and it prints nothing.
 Output is an Ability like the other two:
@@ -1388,7 +1387,8 @@ the practice [Retrofitting an Effect](46_Effects--Stateless.md#retrofitting-an-e
 recommends.
 
 Each Ability needs a shape of its own.
-`Obstacle.blocks()` could be named `name()`, which `Hero` already declares.
+You could rename `Obstacle.blocks()` to `name()`,
+which `Hero` already declares.
 `Hero` stays distinct even then, since it also declares `approach()`,
 but each actor you add is another chance for a genuine collision.
 Two Protocols with matching methods leave argument order to decide which request each one answers,
@@ -1651,7 +1651,7 @@ The error becomes `RetryError[Crashed]`,
 which is why the third run catches `RetryError` rather than `Crashed`.
 `Async` arrives because waiting between attempts is asynchronous.
 And `Need[Time]` arrives, which is why `supply()` gains a `Time()`.
-Retrying is not free: it needs a clock, and the signature says so.
+Retrying has a price: it needs a clock, and the signature says so.
 If you leave the `Time()` out, `ty` rejects the `run()` call.
 That change is the thesis of both chapters applied to a cross-cutting concern.
 Adding retry to a hundred call sites in a system with untracked Effects changes nothing you can see.
@@ -1745,9 +1745,9 @@ print(db1.attempts, db2.attempts)
 `db2` never runs.
 The second call's answer comes from `db1`'s cache entry,
 because `"Morty"` is the only thing `memoize()` looks at.
-A chapter built on a swappable environment needs this caution stated:
-memoize a function only where the environment is fixed for the memoized call's lifetime,
-the way [State as an Ability](#state-as-an-ability)'s `Cell` is fixed once bound,
+In a chapter built on swapping the environment, the caution matters:
+memoize a function only where one environment serves the memoized call for its whole lifetime,
+the way [State as an Ability](#state-as-an-ability)'s `Cell` does once bound,
 or key the cache on the environment too.
 
 ## Running Effects in Parallel
@@ -1952,7 +1952,7 @@ print(f"run() at least 50x slower: "
 `run_async()` reuses the loop already running and costs almost nothing beyond the Effect itself.
 `run()` pays for a loop's setup and teardown on every call,
 hundreds of times what `run_async()` costs.
-From synchronous code there is no loop to reuse,
+Synchronous code has no loop to reuse,
 so `run()` is the only option and the cost is unavoidable.
 From inside one, `run_async()` is both the one that works and the one that is fast.
 
@@ -2030,8 +2030,8 @@ so the exception leaves `run()` as an ordinary Python exception.
 ### 2. The type checker decides what survives handling
 
 How much of a type survives handling depends on your type checker rather than on the library.
-`nested` and `full` below are the same object,
-built by the same two calls in the same order:
+`nested` and `full` below come from the same two calls in the same order,
+one spelling nesting them and the other naming the intermediate:
 
 ```python
 # nested_handle.py
@@ -2073,7 +2073,7 @@ info[revealed-type]: Revealed type
 
 All three report what the rest of the chapter has been reading:
 `half` still needs an `Ask`, and `full` and `nested` need nothing,
-so a handler left out of either spelling is reported at `run()`.
+so `run()` reports a handler left out of either spelling.
 `ask_tell_stateless.py` still binds `half` and `full` instead of nesting the calls,
 because a named intermediate is where you read the Ability that remains,
 which is the information this library exists to give you.
@@ -2206,18 +2206,17 @@ Stateless has no equivalent, so you write the wiring at the edge by hand,
 and the type checker verifies that a `supply()` call is complete,
 but says nothing about how you assembled the graph.
 The operator set is thin in the same way.
-The library has `retry()` and `repeat()`,
-and `Schedule` offers a fixed interval and a repeat count,
+The library has `retry()` and `repeat()`.
+`Schedule` offers a fixed interval and a repeat count,
 with no exponential backoff and no jitter,
 and `retry()` retries every declared error alike,
 with no way to name the one worth retrying.
-Stateless provides no timeout, no `race`, no fallback combinator,
-and no finalizer, and the missing `race` rules out the hedging strategy that races a delayed second request.
+Stateless provides no timeout, `race`, fallback combinator, or finalizer,
+and the missing `race` rules out the hedging strategy that races a delayed second request.
 Concurrency is `fork()` and `wait()` with no guarded mutable cell.
 Forking two Effects that share the `Cell` of [State as an Ability](#state-as-an-ability)
 produces a race no type reports,
-so shared state between forked Effects is your problem and Python's,
-with no help from the type checker.
+so shared state between forked Effects is your problem and Python's.
 Above that sit the resilience patterns a production system eventually needs
 (rate limiting, bulkheads, and circuit breakers), none of which exist here.
 The library is a working demonstration of Effect tracking in Python's type system,
@@ -2313,7 +2312,7 @@ or the `Result` that [Error Handling](42_Functional--Error_Handling.md#a-result-
 builds.
 Asynchrony is `async def` and `await`.
 A resource's lifetime is a `with` block.
-Each is reasonable alone, and they do not compose with each other.
+Each is reasonable alone, and none composes with another.
 Some pairs allow no conversion.
 An `Awaitable` cannot become a `Result` without blocking and giving up the asynchrony.
 A `with` block's guarantee is lexical,
@@ -2380,7 +2379,7 @@ It is a language that does the encoding for you.
 4.  Write a handler for `Outlet` that ignores `request.hour` and hands out a fixed sequence of sources,
     the way `scripted` handed out a fixed sequence of tosses.
     Use it to test that `run_load()` re-requests after a failure,
-    with no weather, no clock, and no battery model.
+    without modeling weather, a clock, or a battery.
     Then say what such a test cannot tell you about `controller()`.
 5.  Add a fourth failure to `research()`:
     a `TooLong` raised when an article exceeds some length.
