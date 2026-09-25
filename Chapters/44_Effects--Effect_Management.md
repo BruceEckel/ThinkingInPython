@@ -27,8 +27,7 @@ This book has emphasized the benefits of pure functions in numerous places:
 
 In every one of those cases you can settle the question of purity by reading one function.
 That stops working as soon as the function calls others.
-If one or more of those other functions have side effects,
-they make the calling function impure too.
+If any of them has a side effect, the calling function is impure too.
 To discover whether a function is impure,
 you must either trust the documentation or examine that function's code.
 
@@ -76,8 +75,7 @@ what the environment does to the function.
 Suppose your function reads the time of day, or a random number.
 The read changes nothing in the environment,
 yet the result differs from one call to the next.
-Any information a function uses beyond its arguments is a side cause,
-when that information can change between calls.
+Information a function uses beyond its arguments is a side cause whenever it can change between calls.
 The usual sources are I/O: the time of day, a random number,
 a database or network read.
 Reading a global variable that something else can rebind is enough on its own.
@@ -112,19 +110,17 @@ Two schools of thought exist:
     The function reads nothing outside itself and changes nothing outside itself.
     Purity says the outcome depends on the arguments alone.
 
-    Formal computer science theory backs this view.
+    Computer science theory backs this view.
     Pure languages like Haskell treat an unhandled runtime exception or crash as a *bottom* value, denoted ⊥.
-    A bottom value represents a computation that does not terminate normally or result in a standard value.
-    Because ⊥ is a valid theoretical value, raising an error that nothing catches
-    is technically referentially transparent.
-    You can replace the function call with the crash itself, and the program's behavior doesn't change.
+    A bottom value stands for a computation that never produces an ordinary value.
+    Because ⊥ is a value in the theory, raising an error that nothing catches
+    is referentially transparent:
+    you can replace the function call with the crash itself, and the program's behavior doesn't change.
 
 2.  **Functional**: Exceptions bypass normal control flow,
-    which makes code difficult to reason about.
-    To make code easier to reason about,
-    functional programming avoids exceptions altogether.
-    A *Total Function* doesn't raise exceptions,
-    but instead returns errors as data using explicit wrapper types,
+    which makes code difficult to reason about,
+    so functional programming avoids them altogether.
+    A *Total Function* returns errors as data in explicit wrapper types instead of raising them,
     as you saw in [Error Handling](42_Functional--Error_Handling.md).
 
 The argument over purity does not settle the question this chapter asks.
@@ -207,7 +203,7 @@ This works, and it needs no new type.
 But it guards only the exceptions `slope()`'s `try` names.
 `validate()` raises `ValueError` for a negative `run`,
 and the `try` around it catches only `ZeroDivisionError`.
-This listing puts `validate()` four lines from `slope()`,
+This listing puts `validate()` directly above `slope()`,
 so the gap is easy to spot.
 In a real call stack the raise usually sits many files away,
 and finding it means reading every callee: the tedious,
@@ -215,7 +211,7 @@ error-prone work an Effect Management System replaces.
 Because `slope()` calls `validate()`,
 `validate()`'s Effect becomes `slope()`'s Effect.
 Catching by hand covers exactly the exceptions you know a callee can raise,
-and knowing every one of them is the tracking problem an Effect Management System exists to solve.
+and knowing every one of them is the tracking problem an Effect Management System solves.
 
 C++ and Java tried to track exceptions with *exception specifications*,
 a list of exceptions written by hand on each function.
@@ -281,8 +277,7 @@ A `Result` turns it into a value, a `try` consumes it,
 and `NonZero` moves it to the one line that builds the value.
 They differ in how many functions must know about it.
 
-These three are not a menu from which to pick one.
-The standard practice combines the first and third:
+Standard practice combines the first and third:
 parse untrusted input into the restrictive type at the boundary,
 using a `Result` to report a bad value instead of raising one,
 and let every function past that boundary take `NonZero` and stay total:
@@ -332,7 +327,7 @@ It reads nothing from its environment and changes nothing in its environment,
 so its result never reaches a screen, a file, a socket,
 or even the exit code the operating system checks.
 From outside the process,
-that program is indistinguishable from a program that computes nothing.
+that program looks exactly like one that computes nothing.
 
 ```python
 # pure_and_pointless.py
@@ -371,7 +366,7 @@ The first and most obvious reason is parallelism.
 A function with no Effects touches nothing shared,
 so it is safe to run in parallel.
 The same guarantee makes testing trivial.
-A pure function needs no setup, no mocks, and no teardown.
+A pure function needs no setup or teardown, and nothing to mock.
 Call it with arguments and check the result.
 
 ## Two Phases of Effect Analysis
@@ -396,8 +391,8 @@ The next phase produces one benefit per subdivision:
   then inspects the recording.
 
 Each of those benefits is a testing benefit, for one reason.
-A test must run in an environment it completely controls,
-and an untracked Effect is a part of the environment outside that control.
+A test must run in an environment it controls,
+and an untracked Effect is part of the environment outside that control.
 Every Effect you isolate is one your tests can control.
 
 All of this depends on knowing where the Effects are.
@@ -430,15 +425,15 @@ Tracking is the missing piece.
 With it you know what a function does:
 whether it is safe to run in parallel with another,
 and what happens when you call it twice in a row.
-That knowledge is what lets you compose functions,
-which is how programs grow large.
+That knowledge lets you compose functions,
+and composition is how programs grow large.
 
 ### Tracking and Management
 
 An Effect Management System (EMS) keeps track of Effects in functions.
 If your function calls an effectful function,
 that Effect belongs in your function's type: a native system adds it for you,
-while a library like Stateless has you declare it and verifies the declaration.
+and a library like Stateless has you declare it, then verifies the declaration.
 If another function then calls yours,
 the same Effect belongs in that function's type,
 and so on out to the edge of the program.
@@ -482,8 +477,8 @@ and none of the hundred functions change.
 Cross-cutting behavior gets the same treatment.
 To add caching, tracing, or retries to every storage access,
 you insert a layer at the binding point instead of touching every call site.
-The complexity of variation concentrates at the boundary of the program,
-while the interior stays simple and uniform.
+Variation concentrates at the boundary of the program,
+and the interior stays simple and uniform.
 
 ### Effects by Hand
 
@@ -591,7 +586,7 @@ print(captured.messages)
 ```
 
 `session()`, `menu()`, and `main()` never call `ask.ask()` or `tell.tell()`,
-yet each must name both parameters just to pass them to the function below it.
+yet each must name both parameters only to pass them to the function below it.
 Nothing propagates automatically.
 If you add a `Log` Effect three levels down,
 you edit every signature on the path: `greet()`, `session()`, `menu()`,
@@ -600,9 +595,9 @@ Exercise 2 walks through that edit and counts what each signature gains.
 Dependency injection frameworks relocate this bookkeeping into a wiring layer,
 but you still must tell the injector what every function needs,
 and tell it again when that changes.
-Nothing verifies the wiring except a runtime failure.
+Only a runtime failure verifies the wiring.
 
-Python does have a mechanism that propagates on its own.
+Python has one mechanism that propagates on its own.
 A [`ContextVar`](19_Techniques--Concurrency.md#context-that-follows-the-call-chain)
 holds a value for the current task,
 and anything below reads it without receiving it as an argument.
@@ -703,8 +698,9 @@ which behaves like a normal function return.
 It can discard the continuation, which behaves like an exception.
 It can even invoke the continuation several times,
 which is how native systems express retries and backtracking as ordinary handlers.
-This design, operations declared as an interface plus handlers that receive the continuation,
-is called *algebraic effects*.
+The name for this design,
+operations declared as an interface plus handlers that receive the continuation,
+is *algebraic effects*.
 
 A Python generator suspends a computation,
 hands control to whoever is driving it, and resumes it with a value.
@@ -881,7 +877,7 @@ print(asyncio.run(description), ran)
 
 Calling `greet()` builds a coroutine object, a description of work,
 and runs none of it.
-The empty list is the evidence that the body never executed.
+The empty list shows that the body never ran.
 The description executes only when something awaits it or hands it to `asyncio.run()`.
 [Concurrency](19_Techniques--Concurrency.md#asyncio-mechanics)
 opened with the same demonstration.
@@ -953,7 +949,7 @@ the row a native system keeps, without the handlers.
 
 The history of programming is a history of scaling barriers.
 Each time, the pattern is the same.
-Something the programmer tracks by hand works fine in small programs.
+Something the programmer tracks by hand works in small programs.
 Systems grow until hand-tracking fails.
 The solution moves that tracking into the language or the toolchain,
 and a generation later, nobody can imagine doing it by hand.
@@ -974,7 +970,7 @@ The language does the bookkeeping.
 
 The same pattern repeats across the field.
 Version control gave every state of the code a name you can return to,
-so experimentation stopped being risky.
+so experimenting became safe.
 Automated testing moved "does it still work?" from a manual ritual into the build.
 Garbage collection took the tracking of memory ownership out of the programmer's head.
 Each of these met resistance as unnecessary overhead, then won adoption,
@@ -995,7 +991,7 @@ and it has been normal for so long that it goes unnoticed.
 Like every hand-tracked concern before it, this one stops scaling.
 
 An Effect Management System moves the bookkeeping into the type system.
-The function signature answers the questions this chapter raises earlier:
+The function signature answers the questions this chapter raised earlier:
 what does this function depend on, what does it change, what can go wrong.
 Composition stops being a guess,
 because the compiler balances the books at every boundary.
