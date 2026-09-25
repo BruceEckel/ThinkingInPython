@@ -231,7 +231,7 @@ def test_empty_directory() -> None:
 The classic version wins when the set of node types is open.
 If plugins or other packages must add new kinds of entries,
 a method on a base class lets them do that in their own code,
-while a central `match` needs an edit in yours.
+but a central `match` needs an edit in yours.
 The [guidance on when not to match](13_Techniques--Pattern_Matching.md#when-not-to-match)
 applies directly.
 Match over a closed set, use polymorphism for an open one.
@@ -321,7 +321,7 @@ The nodes therefore keep `@dataclass(frozen=True)` instead of becoming [records]
 ### Operators That Build Nodes
 
 Every node inherits `__add__()` and `__mul__()`,
-and those methods do not compute anything.
+and those methods compute nothing.
 They build nodes.
 Annotating `self` as `Expr` lets `Add(self, ...)` type-check.
 An implicit `self` means "some subclass of `Operators`,"
@@ -430,7 +430,7 @@ An unbound variable raises a `KeyError`, naming the variable.
 and that convenience has a memory cost.
 Each recursive call packs a fresh dict from `**env`,
 so at any moment one dict is live per level of recursion,
-holding the tree's depth times the number of bound variables in entries.
+and the live entries total the tree's depth times the number of bound variables.
 The cost matters most on the deep trees this chapter warns about later,
 which can run thousands of levels.
 `**env` is also why the `/` is there.
@@ -583,9 +583,9 @@ Every [alternative](13_Techniques--Pattern_Matching.md#alternatives-and-capture)
 in a `|` must bind the same set of names,
 so binding `left` in one and `right` in the other is a `SyntaxError` when the module compiles rather than an unbound name at runtime.
 `(Num(a), Num(b))` captures two constants for folding.
-The same syntax does two opposite jobs: `Num(0)` after `case` is a pattern,
-and Python never calls `Num` to match it,
-while `Num(0)` after `return` is a constructor call.
+The same syntax does two opposite jobs:
+`Num(0)` after `case` is a pattern that Python matches without calling `Num`,
+and `Num(0)` after `return` is a constructor call.
 
 Matching the pair of simplified children, rather than the original node,
 lets the rules compose.
@@ -675,7 +675,7 @@ built by nesting one `t`-string inside another.
 `+` concatenates `t`-strings into one flat `Template`,
 as the `query` in the listing below shows,
 so nesting is the one way to produce a `Template`-valued interpolation.
-A walker that loops over the top level must therefore also recurse into any value that turns out to be a `Template`.
+A walker that loops over the top level must therefore also recurse into any value that is a `Template`.
 Everything else about walking a `Template` is this chapter's shape.
 
 Iterating a `Template` produces `str | Interpolation`,
@@ -743,8 +743,8 @@ print(values2)
 `to_query()` checks for that case and recurses,
 so `inner`'s pieces flatten into the same `sql` string and `values` list.
 Every entry in `values2` is then a value a database driver accepts.
-Composing `t`-strings this way builds a nested composite,
-while iterating any one `Template` stays flat.
+Composing `t`-strings this way builds a nested composite;
+iterating any one `Template` stays flat.
 
 `to_query()` and `to_shape()` stand in the same relationship as `evaluate()` and `to_infix()`:
 two operations over one structure that names neither of them.
@@ -754,7 +754,7 @@ Adding a third changes nothing that already exists.
 `name` holds an injection attempt,
 and it comes out as a value in the parameter list rather than as text in the query.
 The reason is structural rather than clever:
-`to_query()` receives the literal pieces and the values as separate things,
+`to_query()` receives the literal pieces and the values separately,
 so a value never reaches the `sql` list.
 Written as an f-string,
 the same line is one finished `str` with the attack already inside it.
