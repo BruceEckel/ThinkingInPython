@@ -89,12 +89,13 @@ Python implicitly makes [`__init_subclass__()`](17_Techniques--Metaprogramming.m
 a classmethod, so it needs no `@classmethod` decorator and its first parameter is the new subclass.
 It runs once per subclass, immediately after Python creates that subclass,
 so each one can register itself in `Trash.registry` automatically.
+
 `create()` is a class method reading `cls.registry`.
 [Factory](27_Patterns--Factory.md#hazards-of-self-registration)
 warns that this form can mislead:
 `Aluminum.create("Paper", 1.0)` is legal and returns a `Paper`.
-The lookup is safe here.
-Every subclass writes to `Trash.registry` and none defines a `registry` of its own,
+The lookup is safe here,
+because every subclass writes to `Trash.registry` and none defines a `registry` of its own,
 so `cls.registry` always resolves to that one table.
 Call it as `Trash.create()`.
 
@@ -110,8 +111,8 @@ Restating `ClassVar[float]` on the override [keeps that check](09_Foundations--C
 
 A new recyclable type costs one class definition.
 It registers itself, and `create()` builds it.
-`sum_value()` is an ordinary function.
-It reads `t.value` and `t.weight` polymorphically,
+`sum_value()` needs no edit for it either:
+that ordinary function reads `t.value` and `t.weight` polymorphically,
 and never checks what type a piece is.
 
 Testing confirms that each subclass registers itself,
@@ -254,23 +255,23 @@ It tests for every type in the system.
 When a new material joins the system, say `Plastic`,
 you must find every `case` statement that enumerates specific types.
 Each one you miss silently drops trash on the floor.
+Testing for one type, or a small subset that needs special handling, is fine.
+Testing for all of them means you write the type-to-bin lookup by hand.
+
 Readers of [*Composite* and *Interpreter*](34_Patterns--Composite_and_Interpreter.md)
 may expect `assert_never()` to make the type checker report the missed case.
 Exhaustiveness checking needs a *closed* union to compare the cases against,
-but `Trash` is deliberately open.
-The registry exists to accept new subclasses.
+but `Trash` is deliberately open: the registry exists to accept new subclasses.
 This `match` runs over an open set,
 which [Pattern Matching](13_Techniques--Pattern_Matching.md#when-not-to-match)
 warns against.
-A sorter over an open set must let each piece choose its own bin.
-The next section builds one.
-Testing for one type, or a small subset that needs special handling, is fine.
-Testing for all of them means you write the type-to-bin lookup by hand.
+
 A `case _:` wildcard could catch a new material:
 `case _: raise ValueError(f"unsorted {type(t).__name__}")` turns the silent drop into a `ValueError`.
-The wildcard is worth adding, and the flaw remains.
-Every new material means editing this `match`,
-where the next section's `bins[type(t)]` needs no edit at all.
+The wildcard is worth adding, and the flaw remains:
+every new material means editing this `match`.
+A sorter over an open set must let each piece choose its own bin,
+and the next section's `bins[type(t)]` does that with no edit at all.
 
 That is the argument.
 Here is the requirement that makes it concrete.
@@ -333,11 +334,10 @@ The loop appends two of the four pieces to a bin,
 so the sixty pounds of plastic vanish from the totals the plant uses.
 "Silently drop trash on the floor" means a number that is wrong and looks right,
 not an exception to debug.
-The `match` is the statement that loses them.
-`__init_subclass__()` registers `Plastic` the moment its `class` statement runs.
-Without that `class` statement,
-`create()` raises a `KeyError` at the first `Plastic:` line, loudly,
-at parse time.
+The `match` is the statement that loses the plastic, not the parser:
+`__init_subclass__()` registers `Plastic` the moment its `class` statement runs,
+and without that `class` statement `create()` raises a `KeyError` at the first `Plastic:` line,
+loudly, at parse time.
 The `match` alone loses trash silently.
 
 ## Let a Dictionary Do the Sorting
@@ -371,10 +371,11 @@ for kind, items in bins.items():
 `type(t)` is the right key because every new class is a new key,
 including one defined at runtime.
 The loop has no list of materials to maintain and no case to forget.
-The key is the *exact* class.
 That is the same dictionary-probe dispatch as the tables in [State Machines](31_Patterns--State_Machines.md#the-engine)
 and [*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md#one-lookup-in-a-table).
 It first appeared in the event bus in [Function Objects](28_Patterns--Function_Objects.md#an-event-bus-handlers-keyed-by-type).
+
+The key is the *exact* class.
 If you derive `CrushedAluminum` from `Aluminum`,
 it sorts into its own bin rather than its parent's.
 That is usually what a sorter needs,
@@ -559,9 +560,10 @@ for cls in Trash.registry.values():
 #: Cardboard: flatten and bundle
 ```
 
-Each implementation above takes the name `_`.
-[*Visitor*](33_Patterns--Visitor.md#the-pythonic-visitor-singledispatch)
-explains that placeholder.
+Each implementation above takes the name `_`,
+the placeholder that [*Visitor*](33_Patterns--Visitor.md#the-pythonic-visitor-singledispatch)
+explains.
+
 `recycling_note()` is a new operation defined outside the `Trash` hierarchy.
 Three materials register a note, and `Paper`, the fourth,
 falls through to the base function.
