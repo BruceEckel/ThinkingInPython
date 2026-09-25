@@ -1,10 +1,10 @@
 # exercise_4.py
-from typing import override
+from typing import ClassVar, override
 from robot_world import (Empty, GameBuilder, Item,
                          Robot, Room)
 
 class Coin(Item):
-    symbol = "$"
+    symbol: ClassVar[str] = "$"
 
     @override
     def interact(self, robot: Robot, room: Room) -> Room:
