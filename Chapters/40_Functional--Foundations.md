@@ -119,9 +119,9 @@ Tuples, strings, `frozenset`, and frozen dataclasses are immutable.
 Each freezes only its own top level:
 the tuple `([1], 2)` always holds that same list,
 and anyone can still append to the list.
-Removing shared mutable state is the practical core of the functional style.
 A value that never changes stays what you last read,
-whatever code ran in between.
+whatever code ran in between,
+and that guarantee is why removing shared mutable state is the practical core of the functional style.
 
 Instead of modifying an object, you build a new one from the old:
 
@@ -312,8 +312,8 @@ Supporting a new operator means adding a row to the table,
 whether the literal holds that row or a later line adds it,
 as the `operations["%"]` line does here.
 The dispatch code itself never changes.
-A lookup of a missing key raises a plain `KeyError`.
-An `if`/`elif` chain handles that case with a trailing `else`.
+A lookup of a missing key raises a plain `KeyError`,
+the case an `if`/`elif` chain handles with a trailing `else`.
 The same structure underlies [the dictionary factory](27_Patterns--Factory.md#the-pythonic-factory-a-dictionary)
 and the plugin registries that let a program grow without editing its core.
 
@@ -333,7 +333,7 @@ A *lambda* is an unnamed function written as a single expression,
 introduced in [Functions](05_Foundations--Functions.md#lambdas).
 The higher-order functions in this section take lambdas as inline arguments,
 where they fit best.
-Their value is locality.
+A lambda's value is locality.
 When a transformation is one short expression,
 a lambda keeps it at the call site, where the reader already is,
 instead of defining it as a named function elsewhere.
@@ -386,7 +386,8 @@ the [comprehension](16_Techniques--Comprehensions.md).
 and `[n for n in numbers if n % 2 == 0]` replaces the `filter()` call the same way.
 `map()` and `filter()` are the better choice when the function already exists.
 `map(str.strip, lines)` reads better than `[line.strip() for line in lines]` because the name says what the comprehension repeats.
-The two also return different things.
+
+Beyond how they read, the two forms return different things.
 The comprehension builds a finished list.
 `map()` returns an iterator you can pass to the next stage without building the list.
 A generator expression from that chapter is the comprehension's lazy form,
@@ -402,6 +403,7 @@ and `sorted()` each contain the loop that iterates over the data, written once,
 and you supply only the part that differs from one use to the next.
 You stop rewriting the same loop,
 and with it the off-by-one and accumulator-initialization mistakes a hand-written loop allows.
+
 The idea also applies the other way around.
 A function that takes a function can wrap it with operations like timing,
 retries, or logging.
@@ -492,6 +494,7 @@ so `count += 1` on its own makes `count` a fresh local variable.
 The statement then reads that local before anything has assigned it,
 and the call fails with `UnboundLocalError`.
 `nonlocal count` redirects the assignment to the enclosing function's variable.
+
 Forgetting it is the usual mistake when a closure first assigns to a captured name.
 The runtime message names a local variable instead of the missing declaration:
 "cannot access local variable 'count' where it is not associated with a value".
@@ -526,6 +529,7 @@ The keyword does real work here.
 `partial(power, 2)` binds `base` instead,
 because positional arguments fill from the left.
 `square(5)` would then compute `2 ** 5`.
+
 Partial application turns a general function into the specific one a caller needs.
 `multiplier()` in [Closures](#closures) does the same by hand,
 a factory that fixes one argument and returns a function expecting the rest.
@@ -543,10 +547,10 @@ demonstrates that late-binding trap.
 ### Leaving a Gap with `Placeholder` {#leaving-a-gap-with-placeholder}
 
 Binding `exponent` above works because `power()` accepts it by keyword.
-`partial()` fills positional arguments from the left, so before 3.14,
-fixing the third argument meant fixing the first two as well.
 For a function whose parameters are [positional-only](05_Foundations--Functions.md#positional-only-and-keyword-only-parameters),
-position is the only way to bind an argument.
+position is the only way to bind an argument,
+and `partial()` fills positional arguments from the left, so before 3.14,
+fixing the third argument meant fixing the first two as well.
 `functools.Placeholder` (Python 3.14 and later)
 is a marker that reserves a position for the caller.
 The listing below carries two `# type: ignore` comments,
@@ -576,11 +580,11 @@ so `partial(clamp, 0, Placeholder)` would mean the same as `partial(clamp, 0)`.
 The marker would add nothing.
 
 The `# type: ignore` comments mark a type checker limitation rather than a code problem.
-`ty` checks the three arguments in `partial(clamp, 0, Placeholder, 100)` against `clamp`'s declared parameter types.
+The stub for `partial()` does not yet describe what `Placeholder` does at runtime,
+so `ty` checks the three arguments in `partial(clamp, 0, Placeholder, 100)` against `clamp`'s declared parameter types.
 It therefore reports `Placeholder` as a value of the wrong type,
 and types the resulting callable as one that takes no arguments.
 The runtime behaves correctly.
-The stub for `partial()` does not yet describe what `Placeholder` does at runtime.
 
 ## Composing Functions
 
@@ -621,8 +625,7 @@ The type parameters matter on the second `print()`.
 The type checker verifies that `label` accepts what `increment_then_double` produces,
 and types the composed function `(int) -> str` rather than `(int) -> int`.
 
-You grow a composition by adding a stage.
-Each stage is also testable on its own.
+You grow a composition by adding a stage, and each stage is testable on its own.
 A larger behavior is a new named composition of existing stages.
 When a requirement changes,
 you insert or swap a single stage and the others stay as they were.
