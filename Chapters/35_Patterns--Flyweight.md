@@ -39,13 +39,14 @@ The cache covers a fixed range of values chosen at CPython build time.
 The range usually quoted is `-5` through `256`, but each build picks its own.
 This one caches up to 1024,
 so the example that needs a fresh object uses `100000` rather than `257`.
+
 The listing parses each value from a string for a reason.
 The compiler pools equal constants within one code object, so with literals
 (`low, low2 = 256, 256`) even `100000 is 100000` prints `True`.
 That sharing comes from the pooling, not from the integer cache.
+(That pooling is also why Python warns about `is` on a literal.)
 Parsing at runtime builds the integer after compilation,
 so any sharing that remains comes from the cache.
-(That pooling is also why Python warns about `is` on a literal.)
 
 String *interning* keeps one copy of identifier-like strings.
 `sys.intern()` gives you the string pool directly:
@@ -64,8 +65,8 @@ print(intern(joined) is intern(joined2))
 
 The two `join()` calls build equal but distinct strings,
 and `intern()` maps both to one shared copy.
-Interned strings compare in one step when they are equal.
-Equal means identical,
+Interned strings compare in one step when they are equal,
+because for them equal means identical,
 and CPython's `==` on two strings checks identity before it compares characters.
 
 The small-integer cache and string interning are CPython implementation details,
@@ -142,19 +143,20 @@ if __name__ == "__main__":
 ```
 
 Twenty-four cells, three objects.
+`@cache` returns the same `Tile` for the same symbol every time,
+so the object count stays at the number of tile kinds however large the grid grows.
 `[*row for row in field]` flattens the grid into one list of cells,
 the [comprehension unpacking](16_Techniques--Comprehensions.md#unpacking-in-comprehensions).
-The listing counts `id(t)` rather than `len(set(cells))` on purpose.
+The listing counts `id(t)` rather than `len(set(cells))` on purpose:
 `Tile` is a record, so its generated `__eq__()` compares field values,
 and a set of cells collapses to three with or without sharing.
 Only identity proves sharing.
-`@cache` returns the same `Tile` for the same symbol every time,
-so the object count stays at the number of tile kinds however large the grid grows.
+The listing shows the object count.
+Exercise 2 measures the memory behind it.
+
 The grid itself holds each cell's position.
 Asking "is the cell at row 1, column 5 walkable?" is `field[1][5].walkable`,
 with the asker supplying the coordinates.
-The listing shows the object count.
-Exercise 2 measures the memory behind it.
 
 ### Typing the Symbol Set
 
@@ -166,9 +168,8 @@ the type checker rejects the mismatch.
 so the boundary is `to_symbol()`,
 the one function that takes a `str` and returns a `Symbol`.
 It checks membership in `SPECS` at runtime and raises a `KeyError` for a character outside it.
-The type checker narrows on the same guard.
-`SPECS` has key type `Symbol`,
-so past the guard the checker narrows `char` to `Symbol`,
+The type checker narrows on the same guard: `SPECS` has key type `Symbol`,
+so past the guard `char` is a `Symbol`,
 and `return char` satisfies the declared return type as written.
 The narrowing proves what a [`cast()`](08_Foundations--Static_Types.md#typing-decorators-and-directives)
 asserts.
@@ -261,33 +262,34 @@ if __name__ == "__main__":
 The construction syntax stays the same,
 so a caller sees an ordinary constructor call and receives a shared object.
 CPython's small-integer cache works the same way.
+
 The bookkeeping is by hand, and `__new__()` adds a rule of its own.
 When `__new__()` returns an instance of the class, as it does here,
 Python calls `__init__()` on it,
 so an `__init__()` re-runs on the cached instance at every construction.
-This class therefore leaves `__init__()` to `object`,
-and the call reaches `object.__init__()`.
-`Color` overrides `__new__()` alone,
-so the inherited `__init__()` accepts the three arguments and discards them.
+This class therefore leaves `__init__()` to `object`:
+`Color` overrides `__new__()` alone, so the call reaches `object.__init__()`,
+which accepts the three arguments and discards them.
 A `@dataclass` would generate an `__init__()`, and the re-run with it.
 That re-run re-assigns the same components,
 so with three plain fields the object stays as it was.
 Once a field has a `default_factory` or `__post_init__()` has a side effect,
 the re-run repeats both on an object that is already finished.
+
 `Tile`'s `@record` generates its `__repr__()` and `__eq__()`;
 `Color` keeps `object`'s versions,
 so printing a `Color` shows the default `object.__repr__()`.
-The default `__eq__()` suits a perfectly interned type.
-Equal values are the same object, so the identity comparison answers correctly.
+The default `__eq__()` suits a perfectly interned type:
+equal values are the same object, so the identity comparison answers correctly.
 `@dataclass(init=False)` could restore those two generated methods,
 but each consequence pulls in another.
 The generated `__eq__()` sets `__hash__` to `None`.
 `frozen=True` brings the hash back,
 and then forces `object.__setattr__()` for the by-hand assignment in `__new__()`.
+
 A `defaultdict` calls its `default_factory` with no arguments,
 and building a `Color` needs the three components,
 so `_pool` stays a plain dict with an explicit `get()`.
-
 `_pool` keys on the components alone, and every subclass shares the one dict,
 so the first request for a set of components builds the object and every later one receives it,
 whether `Color` or a subclass asks.
@@ -366,6 +368,7 @@ CPython's reference counting frees the object,
 and the weak reference's callback removes the pool entry.
 The pool guarantees sharing and lets each object's other references decide its lifetime,
 the same design as `sys.intern()`.
+
 If you want a bounded pool instead,
 `functools.lru_cache(maxsize=n)` gives the factory an eviction policy,
 and holds the most recent `n` alive by itself.
@@ -451,10 +454,10 @@ The bare annotation is enough.
 Each member's tuple goes to `__new__()`,
 which stores the walkability and assigns `_value_`,
 so the member's value is its map symbol rather than the tuple.
-`__new__()`, not `__init__()`, must assign `_value_`.
+`__new__()`, not `__init__()`, must assign `_value_`:
 Enum reads `_value_` as soon as `__new__()` returns,
-so an `__init__()` that assigns `_value_` later comes too late.
-The lookup table behind `Tile(".")` stays keyed by the tuples.
+so an `__init__()` that assigns `_value_` later comes too late,
+and the lookup table behind `Tile(".")` stays keyed by the tuples.
 With `_value_` set in `__new__()`, `Tile(".")` is a lookup.
 
 `object.__new__(cls)` builds a bare instance directly,
@@ -502,10 +505,11 @@ error[invalid-return-type]: Function can implicitly return
 
 The function returns `None` implicitly for `Tile.ROCK`,
 the member the `match` leaves out, and adding that case clears the diagnostic.
-The enum gives up loading at runtime.
-`tile()` could load `SPECS` from a file, while `Tile.GRASS` is source code.
+
+The enum gives up loading at runtime: `tile()` could load `SPECS` from a file,
+while `Tile.GRASS` is source code.
 The [table-driven state machine](31_Patterns--State_Machines.md#table-driven-state-machine)
-exploits the same property, using members as shared, comparable states.
+builds on the same fixed set, using its members as shared, comparable states.
 
 ## Which Pool Should You Use?
 
