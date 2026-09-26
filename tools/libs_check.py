@@ -17,8 +17,8 @@ library has a release waiting. This does, and changes nothing:
 
 A library that is behind is upgraded alone with
 `uv lock --upgrade-package NAME` and `uv sync`, so a failure afterward
-has one cause. CLAUDE.md's Stateless-upgrade entry lists what to
-re-check.
+has one cause. The `tool-upgrade` skill's Stateless-upgrade entry
+lists what to re-check.
 
 It always exits 0. It answers a question, and an offline machine or a
 PyPI outage must not fail `make verify-targets`, which runs every
