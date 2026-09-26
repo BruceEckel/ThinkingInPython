@@ -226,7 +226,7 @@ The listeners here are lambdas, but any function or bound method works.
 
 ![One assignment to celsius calls every listener in the list](_images/observer_broadcast)
 
-The dashed `Plot` and `Table` are not in the listing.
+The dashed `plot` listener is not in the listing.
 Any callable of the right shape subscribes the way the two lambdas do,
 and `Thermometer` names no listener type.
 
