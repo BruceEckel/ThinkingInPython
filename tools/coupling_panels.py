@@ -605,7 +605,7 @@ GALLERY: tuple[Cell, ...] = (
           Node("Max", 100, 164, w=70, h=34, size=11),
           Node("Sum", 178, 164, w=70, h=34, size=11)),
          (Edge("Context", "Strategy", "thin"),
-          Edge("Max", "Strategy", "realize", corner=True),
+          Edge("Max", "Strategy", "realize"),
           Edge("Sum", "Strategy", "realize")),
          "heavy edges: 0"),
     Cell("Observer", 1, 0,
