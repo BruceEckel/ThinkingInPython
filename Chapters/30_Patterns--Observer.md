@@ -3,7 +3,7 @@
 > Something changes, and something else is interested in that change.
 > The *Observer* pattern connects the two.
 
-![`Subject` names only `Observer`, `Thermometer` inherits `Subject`, and `Display` satisfies `Observer` while naming `Subject` in its signature](_images/coupling_30)
+![](_images/coupling_30)
 
 *Observer* decouples code that changes state from code that reacts to the state change.
 An *observer* registers interest with a *subject*.
@@ -224,7 +224,7 @@ t.celsius = 150
 
 The listeners here are lambdas, but any function or bound method works.
 
-![One assignment to celsius calls every listener in the list](_images/observer_broadcast)
+![Assigning to celsius calls every listener](_images/observer_broadcast)
 
 The `display` and `alarm` boxes are the listing's two lambdas;
 the dashed `plot` listener is not in the listing.
@@ -405,11 +405,20 @@ with no exception to say a listener was skipped.
 
 ### A Listener That Raises an Exception
 
-A listener that raises an exception stops the loop,
-and the listeners after it are not called.
+If a listener raises an exception,
+the rest of the listeners in the list are not called.
 The exception leaves `announce()` and reaches the code that assigned to `celsius`.
 Decide whether `announce()` should catch, collect, and continue
-(exercise 3 makes this concrete).
+(see exercise 3).
+
+Another option keeps the failure inside the listener.
+The listener catches its own exception and [returns the error as a value](42_Functional--Error_Handling.md#return-the-error-as-a-value),
+and `announce()` collects the returned errors for the caller.
+Every listener runs, and no failure escapes as an exception.
+The cost is the `Listener` type:
+`Callable[[T], None]` becomes a callable that returns a success or an error,
+so a method such as `readings.append()`, which returns `None`,
+no longer fits without a wrapper (see exercise 5).
 
 ### Lapsed Listeners
 
@@ -866,8 +875,7 @@ One click changes up to five boxes, which makes the window a puzzle:
 try to turn every box `palegreen`.
 This is the only color that works; on the 8x8 grid `box_view.py` opens with,
 no sequence of clicks turns every box `skyblue` or every box `khaki`.
-The size decides that, and a 3x3 grid reaches all three colors.
-Exercise 8 works out which sizes reach which colors.
+The size decides that, and a 3x3 grid reaches all three colors (see exercise 9).
 
 ### The Model
 
@@ -1080,7 +1088,7 @@ or a test call drives the model the way a click does.
 
 The model names nothing about views,
 so you can attach a second view to the same model and keep both views in step
-(see Exercise 7).
+(see exercise 8).
 The dependency runs one way, and the view is the end that carries it:
 `box_view.py` imports `BoxModel`, reads `size` and `grid`, and calls `select()`.
 
@@ -1356,24 +1364,31 @@ in place of deciding who needs to hear.
     separate the returned exceptions from the successes,
     and raise them together as an `ExceptionGroup`.
     Write a test in which the first listener raises an exception and the second still records its notification.
-5.  Turn `box_observer.py` into a simple game:
+5.  Redo exercise 3 with each failure returned as a value instead of raised as an exception.
+    Each listener returns a [`Result`](42_Functional--Error_Handling.md#a-result-type)
+    from `utils/result.py`,
+    and `announce()` returns the `Err` values it collects.
+    Write an adapter that lets a listener returning `None`,
+    such as `received.append`, subscribe.
+    Write a test in which the first listener fails and the second still records its notification.
+6.  Turn `box_observer.py` into a simple game:
     you own the contiguous patch of same-colored squares containing the top-left corner,
     and selecting any square recolors your patch to that square's color,
     absorbing neighbors that now match.
     Write the neighbor test yourself, and count diagonal squares as neighbors.
     Track the moves it takes to make the whole field one color.
     For competition, alternate turns between players.
-6.  Change the rule for a selection in `box_observer.py`:
+7.  Change the rule for a selection in `box_observer.py`:
     make `recolored()` advance every box in the selected box's row and column.
     Run `box_view.py` without editing it,
     and explain why the view needed no change.
-7.  Attach a second view to `box_observer.py`'s `BoxModel`.
+8.  Attach a second view to `box_observer.py`'s `BoxModel`.
     Write one view that prints a letter per cell and another that prints how many cells each color holds,
     subscribe both to the same model,
     and show that one `select()` updates the pair.
     Keep both views textual so the example runs without a window,
     and leave the model as `box_observer.py` has it.
-8.  Work out which colors the whole grid can reach from `new_grid(size)` under `box_observer.py`'s rule.
+9.  Work out which colors the whole grid can reach from `new_grid(size)` under `box_observer.py`'s rule.
     Selecting a cell advances up to five cells by one, modulo three,
     and selections commute, so this is a linear system over the integers mod 3:
     the unknowns are how many times you select each cell.
@@ -1381,7 +1396,7 @@ in place of deciding who needs to hear.
     and print the reachable colors for every size from 3 through 8.
     The 8x8 grid reaches `palegreen` alone,
     and one smaller size reaches nothing.
-9.  Write a `Notifying` [descriptor](17_Techniques--Metaprogramming.md#a-descriptor-that-validates)
+10. Write a `Notifying` [descriptor](17_Techniques--Metaprogramming.md#a-descriptor-that-validates)
     that replaces the `@property` and `announce()` pair,
     so one class declares several independently watched attributes:
     `celsius = Notifying[float]()` beside `humidity = Notifying[float]()`.

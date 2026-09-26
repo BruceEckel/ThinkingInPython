@@ -2,7 +2,7 @@
 
 > Whatever you acquire must be released, on every path out,
 > including the one an exception takes.
-> A context manager pairs the acquiring with the releasing so the code between cannot skip it.
+> A context manager pairs acquisition with release so cleanup cannot be skipped.
 
 The `with` statement,
 introduced in [Control Flow](04_Foundations--Control_Flow.md#context-managers),

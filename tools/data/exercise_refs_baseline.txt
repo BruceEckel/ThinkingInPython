@@ -27,8 +27,10 @@ Chapters/Multiple_Dispatching	Multiple_Dispatching	9	A table of callables
 Chapters/Observer	Observer	3	An `announce()` that survives a failing listener
 Chapters/Observer	Observer	3	An `announce()` that survives a failing listener
 Chapters/Observer	Observer	3	An `announce()` that survives a failing listener
-Chapters/Observer	Observer	7	Two views on one model
-Chapters/Observer	Observer	8	Which colors a grid can reach
+Chapters/Observer	Observer	3	An `announce()` that survives a failing listener
+Chapters/Observer	Observer	5	Failures returned as values
+Chapters/Observer	Observer	8	Two views on one model
+Chapters/Observer	Observer	9	Which colors a grid can reach
 Chapters/Performance	Performance	6	A subclass that forgets `__slots__`
 Chapters/Simulation	Factory	9	Recursing through `__subclasses__()`
 Chapters/Simulation	Simulation	3	Breaking `claim()`'s atomicity
@@ -51,6 +53,8 @@ Solutions/Functions	Functions	6	Unpacking both containers at a call site
 Solutions/Modules_and_Packages	Modules_and_Packages	4	Renaming `module.py` to `Module.py`
 Solutions/Multiple_Dispatching	Multiple_Dispatching	7	A business-modeling environment
 Solutions/Multiple_Dispatching	Multiple_Dispatching	8	Weapons, battles, and a full meeting
+Solutions/Observer	Observer	3	An `announce()` that survives a failing listener
+Solutions/Observer	Observer	3	An `announce()` that survives a failing listener
 Solutions/Observer	Observer	3	An `announce()` that survives a failing listener
 Solutions/Simulation	Simulation	4	A `Coin` item
 Solutions/Simulation	Simulation	5	Sending the robot somewhere other than the `!`

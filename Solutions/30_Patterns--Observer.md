@@ -333,10 +333,94 @@ question, and both end in an `ExceptionGroup`. The difference is only
 where the loop lives: written by hand in the synchronous version,
 supplied by `gather()` in the async one.
 
-## 5. Turning `box_observer.py` into a flood-fill game
+## 5. Failures returned as values
 
 ```python
 # exercise_5.py
+from collections.abc import Callable
+from result import Err, Ok, Result
+
+type Listener[T] = Callable[[T], Result[None, str]]
+
+class Broadcaster[T]:
+    def __init__(self) -> None:
+        self._listeners: list[Listener[T]] = []
+
+    def subscribe(self, listener: Listener[T]) -> None:
+        self._listeners.append(listener)
+
+    def announce(self, data: T) -> list[Err[str]]:
+        return [
+            result
+            for listener in list(self._listeners)
+            if isinstance(result := listener(data), Err)
+        ]
+
+def succeeds[T](
+    action: Callable[[T], None],
+) -> Listener[T]:
+    def listener(data: T) -> Result[None, str]:
+        action(data)
+        return Ok(None)
+    return listener
+
+def checked(data: int) -> Result[None, str]:
+    if data < 0:
+        return Err(f"cannot handle {data}")
+    return Ok(None)
+
+received: list[int] = []
+source = Broadcaster[int]()
+source.subscribe(checked)
+source.subscribe(succeeds(received.append))
+print(source.announce(7), received)
+#: [] [7]
+print(source.announce(-1), received)
+#: [Err(error='cannot handle -1')] [7, -1]
+```
+
+```python
+# test_result_announce.py
+from exercise_5 import Broadcaster, succeeds
+from result import Err, Result
+
+def test_later_listener_runs_after_an_err() -> None:
+    received: list[int] = []
+
+    def broken(data: int) -> Result[None, str]:
+        return Err("boom")
+
+    source = Broadcaster[int]()
+    source.subscribe(broken)
+    source.subscribe(succeeds(received.append))
+    assert source.announce(1) == [Err("boom")]
+    assert received == [1]
+```
+
+No listener raises an exception, so `announce()` needs no `try`.
+It calls every listener and keeps each result that is an `Err`.
+The caller receives the failures as an ordinary list
+and decides what to do with them,
+where exercise 3's caller had to catch an `ExceptionGroup`.
+An empty list means every listener succeeded.
+
+The type change reaches every subscriber.
+`received.append` returns `None`,
+so `ty` rejects `source.subscribe(received.append)`:
+a `Listener[int]` must return a `Result`.
+`succeeds()` adapts any `None`-returning callable
+by calling it and returning `Ok(None)`.
+The adapter assumes the wrapped callable cannot fail;
+if it raises an exception anyway,
+that exception leaves `announce()` as it did in the chapter's version.
+Returning errors as values works when you write the listeners.
+For a broadcaster that accepts arbitrary callables,
+exercise 3's catch-and-collect protects the loop from code you did not write.
+
+## 6. Turning `box_observer.py` into a flood-fill game
+
+```python
+# exercise_6.py
 from enum import StrEnum
 
 class Color(StrEnum):
@@ -430,10 +514,10 @@ it names `BoxModel`, and a `FloodGame` is not one. Widening it to a
 Protocol (or to `Broadcaster[Grid]` plus `size`, `grid`, and
 `select()`) lets the same view draw either model.
 
-## 6. A new selection rule, and the same view
+## 7. A new selection rule, and the same view
 
 ```python
-# exercise_6.py
+# exercise_7.py
 from enum import StrEnum
 
 class Color(StrEnum):
@@ -498,10 +582,10 @@ The rule sits in `recolored()`, `BoxModel.select()` calls it, and
 from the other side: it is a second view of a `Grid`, written without
 knowing the rule.
 
-## 7. Two views on one model
+## 8. Two views on one model
 
 ```python
-# exercise_7.py
+# exercise_8.py
 from collections import Counter
 from collections.abc import Callable
 from enum import StrEnum
@@ -604,10 +688,10 @@ already has these two, so the window and the terminal report the same
 grid. Running that combination means `show()` takes over with
 `root.mainloop()`, so start it last.
 
-## 8. Which colors a grid can reach
+## 9. Which colors a grid can reach
 
 ```python
-# exercise_8.py
+# exercise_9.py
 from enum import StrEnum
 from typing import Final
 
@@ -710,10 +794,10 @@ cannot be made one color at all.
 `", ".join(reachable(size))` with no conversion, the same property
 that lets `box_view.py` hand a `Color` to `tkinter`.
 
-## 9. A descriptor per watched attribute
+## 10. A descriptor per watched attribute
 
 ```python
-# exercise_9.py
+# exercise_10.py
 from collections.abc import Callable
 from typing import overload
 
