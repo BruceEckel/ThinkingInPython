@@ -1,5 +1,8 @@
 # Metaprogramming
 
+Most code makes objects, and some code makes the classes that make them.
+Metaprogramming works at that second level.
+
 Every object is created by another, special object.
 These special objects are *classes*,
 and you configure them to produce the objects you want.

@@ -1,11 +1,13 @@
 # Testing
 
+Every change can break code you are not looking at.
+A test states what the code should do and reports the moment that stops being true.
+
 Unit testing is one of the most valuable habits in modern programming.
 You build tests into the code you write and run them on every change.
 A type checker verifies the claims you can write as annotations.
 Tests verify the rest: that a withdrawal reduces the balance,
 that the account refuses an overdraft.
-They state what the code should do, and check it.
 
 Tests give you a safety net.
 With them you can refactor boldly, change designs, and clean up code.

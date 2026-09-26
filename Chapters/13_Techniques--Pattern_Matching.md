@@ -1,9 +1,11 @@
 # Pattern Matching
 
+A value arrives, and what to do depends on its shape as much as its contents.
+`match` tests the shape, takes the value apart,
+and binds the parts in one statement.
+
 The `match` statement compares a value against a series of *patterns* and runs the first one that fits.
-A `match` is far more than a `switch` because a pattern can test a value's shape,
-look inside it, and pull out the parts you need, all in one step.
-No C-style `switch` can express this:
+No C-style `switch` can express this case:
 
 ```python
 match event:

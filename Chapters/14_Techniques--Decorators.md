@@ -1,11 +1,13 @@
 # Decorators
 
+The same few lines of logging or timing belong in many functions,
+and none of those functions is about logging or timing.
+A decorator wraps that behavior around a function from outside.
+
 Logging, timing, retrying, and validating arguments are cross-cutting concerns:
 they show up in unrelated functions, not just one.
 Writing them into each function's own body spreads the same few lines everywhere they apply,
 and a change to that logic means editing every copy.
-A decorator factors that behavior out once and reapplies it wherever needed,
-without changing the function's own code.
 
 A decorator is a callable that you apply to a function or a class.
 The decorator receives the thing it decorates, does something with it,

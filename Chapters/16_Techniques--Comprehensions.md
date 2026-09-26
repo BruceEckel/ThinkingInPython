@@ -1,5 +1,8 @@
 # Comprehensions
 
+A loop says how to build a collection, one step at a time.
+A comprehension says what the collection is, and Python builds it.
+
 *Comprehensions* build one collection from another in a single expression
 ([Control Flow](04_Foundations--Control_Flow.md#comprehensions) introduces them).
 The idea originated in mathematical set-builder notation,
@@ -9,8 +12,6 @@ Haskell had list comprehensions, and Python borrowed them.
 Comprehensions require a mental shift.
 With a loop you describe how to build the result: make an empty list,
 walk the input, test each item, and append the ones you want.
-With a comprehension you describe what the result is, as a single expression,
-and let Python build it.
 A comprehension is shorter.
 It reads like the definition of the result rather than a recipe for it,
 and one line replaces several lines of loop bookkeeping.

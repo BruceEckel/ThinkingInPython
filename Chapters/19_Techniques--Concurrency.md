@@ -1,5 +1,9 @@
 # Concurrency
 
+A program waits for the network, the disk, or the user,
+and while it waits a core sits idle.
+Concurrency puts other work into that wait, on the same core or on another.
+
 [Performance](18_Techniques--Performance.md)
 makes one stream of instructions faster.
 *Concurrency* runs independent tasks so they happen "at the same time" instead of waiting in line.
