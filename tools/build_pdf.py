@@ -112,6 +112,21 @@ PAGEBREAK_TYPST = """\
 }
 """
 
+# A chapter's epigraph, which build_epub.book_markdown() wraps in
+# `#epigraph[...]`: the opening blockquote, indented and set in
+# italics a step above the body, with no bar, so it reads as the
+# chapter's thesis rather than as a quotation. The show rule is
+# scoped to the call, so a blockquote later in a chapter keeps the
+# template's style.
+EPIGRAPH_TYPST = """\
+#let epigraph(body) = {
+  show quote.where(block: true): it => pad(x: 2em,
+    text(style: "italic", size: 1.15em, it.body))
+  body
+  v(0.5em)
+}
+"""
+
 # The running footer: chapter name left, release stamp centered, page
 # number right, nothing on the title page. Setting `footer` explicitly
 # replaces the bare centered number the template's page numbering
@@ -184,7 +199,7 @@ def header_typst(release: str | None) -> str:
     breaks = (PAGEBREAK_TYPST
               .replace("<<moss>>", make_cover.MOSS.lstrip("#"))
               .replace("<<gold>>", make_cover.GOLD.lstrip("#")))
-    return cover + breaks + footer
+    return cover + breaks + EPIGRAPH_TYPST + footer
 
 # Inserted after the title block and before the outline: the support
 # note sits under the release line on the title page (pandoc places
@@ -273,7 +288,8 @@ def build(out_dir: Path, keep_source: bool = False,
     text = build_epub.book_markdown(chapters, missing, unresolved,
                                     hang_code=False,
                                     ornament=False,
-                                    listing_links_on=False)
+                                    listing_links_on=False,
+                                    typst_epigraph=True)
 
     src = src_dir / "book.md"
     meta = src_dir / "metadata.yaml"

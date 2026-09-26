@@ -636,7 +636,8 @@ def book_markdown(chapters: list[Chapter], missing: set[str],
                   img_map: dict[str, str] | None = None,
                   hang_code: bool = True,
                   ornament: bool = True,
-                  listing_links_on: bool = True) -> str:
+                  listing_links_on: bool = True,
+                  typst_epigraph: bool = False) -> str:
     """Every chapter as one Markdown stream, ids namespaced and links rewritten.
 
     `listing_links_on` also turns each `name.py` mention in the prose
@@ -652,6 +653,12 @@ def book_markdown(chapters: list[Chapter], missing: set[str],
     raw-HTML `<pre>` from `hang_listings()`. build_pdf.py needs that:
     pandoc's typst writer drops raw HTML, so the EPUB's hanging-indent
     markup would erase every listing from the PDF.
+
+    A chapter's epigraph (`build_site.split_epigraph()`) is wrapped so
+    the stylesheet can tell it from an ordinary blockquote: in a
+    `.epigraph` div for the EPUB, and with `typst_epigraph` in raw
+    typst calling build_pdf.py's `epigraph()`, since pandoc's typst
+    writer drops a div's class.
     """
     prefixes = {ch.md.stem: chapter_prefix(ch) for ch in chapters}
     if img_map is None:
@@ -698,6 +705,12 @@ def book_markdown(chapters: list[Chapter], missing: set[str],
         text = rewrite_images("\n".join(lines), img_map, missing)
         if hang_code:
             text = hang_listings(text, ids=targets is not None)
+        epigraph, rest = build_site.split_epigraph(text)
+        if epigraph and typst_epigraph:
+            text = ("```{=typst}\n#epigraph[\n```\n\n"
+                    f"{epigraph}\n```{{=typst}}\n]\n```\n{rest}")
+        elif epigraph:
+            text = f"::: epigraph\n{epigraph}:::\n{rest}"
         heading = chapter_heading(ch)
         if ornament:
             # The EPUB mirrors the PDF's chapter opening: the
@@ -882,6 +895,11 @@ def epub_css(variant: str) -> str:
     chapter's eight sections read as its contents, not as eight more
     chapters. `text-decoration: none` asks the reader not to underline
     every entry; a Kindle may keep its own underline anyway.
+
+    `.epigraph` sets a chapter's opening blockquote in italics, the
+    one look this stylesheet adds: without it the chapter's thesis
+    reads as a quotation from somewhere else. The reader's own
+    blockquote indent and margins stay.
     """
     return f"""pre {{
   white-space: pre-wrap; overflow-wrap: break-word;
@@ -895,6 +913,8 @@ figure {{ page-break-inside: avoid; }}
 figure img {{ max-width: 100%; height: auto; }}
 img.chapter-ornament, img.part-art {{ max-width: 100%; }}
 img.chapter-ornament {{ margin: 0.1em 0 1em; }}
+.epigraph blockquote {{ font-style: italic; }}
+.epigraph code {{ font-style: normal; }}
 .chapter-eyebrow {{ display: block; font-size: 0.5em;
   font-weight: normal; letter-spacing: 0.22em; }}
 {eyebrow_color(variant)}

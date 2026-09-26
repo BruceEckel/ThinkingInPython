@@ -107,6 +107,22 @@
       margin: 1.4rem 0 2.5rem;
     }
 
+    /* The chapter's opening blockquote (build_site.split_epigraph),
+       set between the ornament and the contents: larger and in the
+       book's display serif, with no rule, so it reads as the
+       chapter's thesis rather than as a quotation. */
+    .epigraph blockquote {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 1.35rem;
+      line-height: 1.5;
+      color: var(--ink);
+      border: none;
+      margin: -0.5rem 0 2.5rem;
+      padding: 0 2rem;
+    }
+    .epigraph code { font-style: normal; font-size: 0.7em; }
+
     /* Per-chapter table of contents (experimental, behind --chapter-toc) */
     .chapter-toc {
       border: 1px solid var(--rule);
@@ -359,6 +375,11 @@
     <h1>$title$</h1>
     <img class="chapter-ornament" src="chapter-ornament.svg"
          alt="">
+    $if(epigraph)$
+    <div class="epigraph">
+    $epigraph$
+    </div>
+    $endif$
     $if(toc)$
     <nav class="chapter-toc" aria-label="Chapter contents">
       <p class="chapter-toc-title">In This Chapter</p>

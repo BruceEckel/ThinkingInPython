@@ -123,6 +123,32 @@ def load_chapter(md: Path) -> tuple[str, str]:
     return title, "\n".join(lines).lstrip("\n")
 
 
+# A chapter's epigraph: the blockquote its body opens with, the
+# two-sentence statement of the chapter's problem and its answer.
+# Chapter 01 and the appendices open with a paragraph instead, so
+# they have none. A blockquote later in a chapter is an ordinary one.
+EPIGRAPH = re.compile(r"\A(?:>[^\n]*\n)+")
+
+
+def split_epigraph(body: str) -> tuple[str, str]:
+    """(epigraph, rest): the body's opening blockquote, or "" if none."""
+    m = EPIGRAPH.match(body)
+    if m is None:
+        return "", body
+    return m.group(0), body[m.end():]
+
+
+def epigraph_metadata(epigraph: str) -> str:
+    """The epigraph as a YAML metadata block for template.html.
+
+    Pandoc parses a metadata string as Markdown, so `$epigraph$`
+    renders the blockquote, code spans and italics included, above
+    the chapter's table of contents instead of below it.
+    """
+    quoted = "".join(f"  {line}\n" for line in epigraph.splitlines())
+    return f"---\nepigraph: |\n{quoted}---\n\n"
+
+
 def discover() -> list[Chapter]:
     chapters: list[Chapter] = []
     for md in md_files():
@@ -438,6 +464,9 @@ def write_page(ch: Chapter, chapters: list[Chapter], out_dir: Path,
     body = rewrite_md_links(body)
     if targets is not None:
         body = listing_links.site_rewrite(body, targets, ch.md.stem)
+    epigraph, body = split_epigraph(body)
+    if epigraph:
+        body = epigraph_metadata(epigraph) + body
     page = render_chapter(body, ch, prev, nxt, chapter_toc)
     (out_dir / ch.out_name).write_text(page, encoding="utf-8")
     return used

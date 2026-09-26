@@ -229,6 +229,17 @@ def test_hang_code_false_keeps_listings_fenced(tmp_path: Path) -> None:
     assert "```python" in text
     assert "<pre>" not in text
 
+def test_opening_blockquote_is_wrapped_as_the_epigraph(
+        tmp_path: Path) -> None:
+    chapters = chapters_in(tmp_path, {
+        "05_F": "# F\n\n> Thesis one.\n> Thesis two.\n\nbody\n\n> quote\n"})
+    text = book_markdown(chapters, set(), set())
+    assert "::: epigraph\n> Thesis one.\n> Thesis two.\n:::\n" in text
+    assert text.count("::: epigraph") == 1  # a later quote stays plain
+    typst = book_markdown(chapters, set(), set(), typst_epigraph=True)
+    assert "#epigraph[\n```\n\n> Thesis one." in typst
+    assert "::: epigraph" not in typst
+
 def test_missing_image_is_reported(tmp_path: Path) -> None:
     chapters = chapters_in(
         tmp_path, {"05_F": "# F\n\n![d](_images/no_such_image)\n"})
