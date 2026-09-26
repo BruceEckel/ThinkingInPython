@@ -1,7 +1,8 @@
 # State Machines
 
-> A system is always in one of a few states, and each input moves it to the next.
-> A *StateMachine* names the states and the moves between them.
+> Many systems are in one of a fixed set of states at any moment,
+> and each input, together with the current state, decides the next state.
+> A *StateMachine* names the states and the transitions between them.
 
 ![`StateMachine` names only `State`, each state satisfies it, and `MouseTrap` and its states name each other](_images/coupling_31)
 
