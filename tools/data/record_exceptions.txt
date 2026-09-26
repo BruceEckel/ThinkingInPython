@@ -25,11 +25,6 @@ Rethinking_Objects exercise_2.py Immutable
 Data_Transfer_Objects still_a_tuple.py Frozen*
 Data_Transfer_Objects exercise_6.py FrozenColor
 
-# A slotted class cannot be weakly referenced, and record() has no
-# weakref_slot.
-Flyweight weak_pool.py Name
-Flyweight exercise_5.py Color
-
 # The version-skew demos read the instance __dict__ and pickle it,
 # so they are @record(slots=False).
 Memento sketch_v1.py SketchV1

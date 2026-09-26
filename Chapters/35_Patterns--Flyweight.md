@@ -341,7 +341,7 @@ from dataclasses import dataclass
 from typing import Final
 from weakref import WeakValueDictionary
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True, weakref_slot=True)
 class Name:
     text: str
 
@@ -388,10 +388,11 @@ so the two are worth combining once memory is the point.
 `Tile` combines them by being a record.
 The combination has one catch.
 A weak reference needs a `__weakref__` slot,
-and a slotted class gets one only by declaring it,
-so if you slot `Name` as it stands, `_pool[text] = found` raises a `TypeError`.
-`weakref_slot=True` adds that slot.
-`record()` has no such option, so `Name` keeps `@dataclass(frozen=True)`.
+and a slotted class gets one only by declaring it, so with `slots=True` alone,
+`_pool[text] = found` raises a `TypeError`.
+`weakref_slot=True` adds that one slot and no `__dict__`.
+`record()` does not pass it through,
+so `Name` writes the `dataclass` call in full.
 
 ```python
 # test_weak_pool.py

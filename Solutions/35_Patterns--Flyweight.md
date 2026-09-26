@@ -321,7 +321,7 @@ from weakref import WeakValueDictionary
 
 type RGB = tuple[int, int, int]
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True, weakref_slot=True)
 class Color:
     red: int
     green: int

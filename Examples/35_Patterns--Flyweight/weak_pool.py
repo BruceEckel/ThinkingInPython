@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from typing import Final
 from weakref import WeakValueDictionary
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True, weakref_slot=True)
 class Name:
     text: str
 

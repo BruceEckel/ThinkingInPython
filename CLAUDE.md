@@ -300,7 +300,9 @@ Bruce's rulings from 2026-09-17, revised 2026-09-26:
   slots back.
 - **A class that needs an option `record()` lacks keeps `@dataclass`
   written out:** `order=True` (chapter 22), a weak reference
-  (`weak_pool.py`, which should say `weakref_slot=True`), a
+  (`weak_pool.py` and Solutions 35 exercise 5 are
+  `@dataclass(frozen=True, slots=True, weakref_slot=True)`, one
+  `__weakref__` slot and still no `__dict__`, since 2026-09-26), a
   `cached_property`.
 - **Reword a sentence before keeping a listing long-form for its
   sake.** A sentence that names `frozen=True` about a converted class
