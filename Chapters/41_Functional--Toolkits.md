@@ -1,8 +1,12 @@
 # Toolkits
 
+Pure functions are parts,
+and the same few operations on parts recur in every program: fold, cache,
+specialize, chain.
+`functools` and `itertools` supply them, written and tested.
+
 [Foundations](40_Functional--Foundations.md) builds behavior from small, pure,
 composable pieces.
-The standard library supplies two modules of such pieces.
 `functools` operates on functions themselves.
 `itertools` assembles lazy iterators from composable parts.
 This chapter tours both toolkits,

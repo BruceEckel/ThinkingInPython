@@ -1,11 +1,13 @@
 # Error Handling
 
+A call can fail, and nothing in its signature says so.
+Returning the failure as a value puts it in the signature,
+where the caller must deal with it.
+
 [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#a-type-is-a-set-of-values)
 makes a value carry a guarantee.
-This chapter does the same for errors.
-Instead of raising an exception,
-a function returns its error as an ordinary value,
-and the type system tracks it.
+This chapter does the same for errors:
+the return value is either the answer or the failure, and its type says so.
 
 Exceptions are Python's default error mechanism, and they have three drawbacks.
 An exception unwinds the stack, so it discards any work done so far.

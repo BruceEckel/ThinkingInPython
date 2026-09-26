@@ -1,5 +1,8 @@
 # Confidence
 
+A test shows that the code worked on the inputs you tried.
+The functional discipline lets you make claims about the inputs you did not try.
+
 Introductions to functional programming usually call it "programming with functions,"
 and functions really are a central part of the practice.
 But after (slowly) studying it for over ten years,
