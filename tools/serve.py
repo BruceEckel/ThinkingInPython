@@ -5,13 +5,24 @@
 it first, then runs this with `--open --watch`.
 
 With `--watch`, a background thread polls `Chapters/*.md` (and the few
-files the whole site is rendered from: `template.html`, the static
-assets, `build_site.py`, `search_index.py`). A changed chapter takes
-`build_site.rebuild_chapter()`'s incremental path, one pandoc run rather
-than the ~46 of a full build; a changed template or tool rebuilds
-everything. Each served page carries a small script that polls
-`/__reload` and reloads once the rebuild lands, so an edit in the editor
-becomes a refreshed browser page with nothing to press.
+files the whole site is rendered from: `template.html` and the static
+assets). A changed chapter takes `build_site.rebuild_chapter()`'s
+incremental path, one pandoc run rather than the ~46 of a full build; a
+changed template or asset rebuilds everything. Each served page carries
+a small script that polls `/__reload` and reloads once the rebuild
+lands, so an edit in the editor becomes a refreshed browser page with
+nothing to press.
+
+A change to the build code needs more than a rebuild. The server
+imports `build_site` once, so a rebuild after an edit to it, or to any
+module it imports, would render with the code as it was at startup:
+on 2026-09-26 a server started before the epigraph commit went on
+rebuilding edited chapters in the old layout for hours. So `--watch`
+runs the server as a child process under a supervisor, which polls the
+source of every `tools/` module it has itself imported (the same set
+the child uses, `serve.py` included). On a change it stops the child
+and starts a fresh one, which rebuilds the whole site with the new code
+before serving; the open page reloads when the new server answers.
 
 With `--copy-on-select`, each served page also carries a script that
 copies a mouse selection to the clipboard as soon as the button is
@@ -36,6 +47,8 @@ import contextlib
 import functools
 import http.server
 import os
+import subprocess
+import sys
 import threading
 import time
 import webbrowser
@@ -50,14 +63,16 @@ POLL_SECONDS = 1.0
 RELOAD_PATH = "/__reload"
 
 # Changing one of these rebuilds every page, not one: they are inputs to
-# the whole site rather than to a single chapter.
+# the whole site rather than to a single chapter. The build code is not
+# here; a change to it restarts the server (see Supervisor).
 GLOBAL_INPUTS = (
     ROOT / "template.html",
     ROOT / "resources" / "static" / "search.css",
     ROOT / "resources" / "static" / "search.js",
-    ROOT / "tools" / "build_site.py",
-    ROOT / "tools" / "search_index.py",
 )
+# Set in the child the supervisor starts, so the child serves instead of
+# supervising.
+CHILD_ENV = "TIP_SERVE_CHILD"
 
 RELOAD_SCRIPT = """
 <script>
@@ -151,7 +166,9 @@ class Watcher:
         self.out_dir = out_dir
         self.chapter_toc = chapter_toc
         self.lock = threading.RLock()
-        self.token = "0"
+        # The process id makes a restarted server's first token differ
+        # from the last one a page saw, so the page reloads.
+        self.token = f"{os.getpid()}-0"
         self._counter = 0
         self._seen = snapshot()
 
@@ -185,7 +202,7 @@ class Watcher:
                         break
                     print(f"Rebuilt {md.name}")
             self._counter += 1
-            self.token = str(self._counter)
+            self.token = f"{os.getpid()}-{self._counter}"
         # A rebuild's own writes must not look like a new edit.
         self._seen = snapshot()
 
@@ -262,6 +279,71 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             super().log_message(format, *args)
 
 
+def code_files() -> list[Path]:
+    """The source of every `tools/` module this process has imported."""
+    tools_dir = ROOT / "tools"
+    files = set()
+    for module in list(sys.modules.values()):
+        name = getattr(module, "__file__", None)
+        if name and Path(name).resolve().parent == tools_dir.resolve():
+            files.add(Path(name).resolve())
+    return sorted(files)
+
+
+def code_snapshot(files: list[Path]) -> dict[Path, float]:
+    out: dict[Path, float] = {}
+    for path in files:
+        with contextlib.suppress(OSError):
+            out[path] = path.stat().st_mtime
+    return out
+
+
+def stop(child: subprocess.Popen[bytes]) -> None:
+    """Stop the child and anything it started.
+
+    On Windows `.venv/Scripts/python.exe` is a launcher that starts the
+    real interpreter as its own child, so terminating the launcher
+    alone would leave the server running and holding the port.
+    """
+    if child.poll() is not None:
+        return
+    if os.name == "nt":
+        subprocess.run(["taskkill", "/T", "/F", "/PID", str(child.pid)],
+                       capture_output=True)
+    else:
+        child.terminate()
+    with contextlib.suppress(subprocess.TimeoutExpired):
+        child.wait(timeout=10)
+
+
+def supervise(argv: list[str]) -> int:
+    """Run the server as a child, restarting it when the build code changes."""
+    files = code_files()
+    seen = code_snapshot(files)
+    command = [sys.executable, "-m", "tools.serve", *argv]
+    env = {**os.environ, CHILD_ENV: "1"}
+    child = subprocess.Popen(command, env=env)
+    # A restart must not open a second browser window, and its pages
+    # were built by the old code.
+    restart = [a for a in command if a != "--open"] + ["--rebuild"]
+    try:
+        while True:
+            time.sleep(POLL_SECONDS)
+            now = code_snapshot(files)
+            if now == seen:
+                if child.poll() is not None:
+                    return child.returncode
+                continue
+            seen = now
+            print("Build code changed; restarting the server...")
+            stop(child)
+            child = subprocess.Popen(restart, env=env)
+    except KeyboardInterrupt:
+        return 0
+    finally:
+        stop(child)
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(
         description=__doc__,
@@ -279,12 +361,21 @@ def main(argv: list[str] | None = None) -> int:
                     default=build_site.CHAPTER_TOC,
                     help="per-chapter table of contents on a --watch rebuild "
                          f"(default: {build_site.CHAPTER_TOC})")
+    ap.add_argument("--rebuild", action="store_true",
+                    help=argparse.SUPPRESS)  # The supervisor's restart
     args = ap.parse_args(argv)
 
     if not SITE.exists():
         raise SystemExit(
             f"error: {SITE} not found. Build the site first "
             "(tip site, or python -m tools.build_site).")
+
+    if args.watch and CHILD_ENV not in os.environ:
+        return supervise(sys.argv[1:] if argv is None else argv)
+
+    if args.rebuild:
+        print("Rebuilding the whole site with the new build code...")
+        build_site.build(SITE, args.chapter_toc)
 
     if args.watch:
         build_site.check_pandoc()
@@ -299,7 +390,8 @@ def main(argv: list[str] | None = None) -> int:
     url = f"http://localhost:{args.port}/"
     print(f"Serving {SITE} at {url}  (Ctrl+C to stop)")
     if args.watch:
-        print("Watching Chapters/ for edits; pages reload after a rebuild.")
+        print("Watching Chapters/ and the build code; "
+              "pages reload after a rebuild.")
     if args.copy_on_select:
         print("Selecting text with the mouse copies it to the clipboard.")
     if args.open:
