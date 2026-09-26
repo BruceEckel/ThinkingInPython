@@ -86,7 +86,7 @@ that chapter's `Solutions/` file. Each solution is self-contained: it
 repeats whatever it needs from the chapter rather than importing it, so you
 can read or run one on its own.
 
-`make sync` regenerates `Examples/` and `SolutionsCode/` from the Markdown,
+`tip sync` regenerates `Examples/` and `SolutionsCode/` from the Markdown,
 discarding any edits you made there. Experiment in them freely, but keep
 anything you want to save outside those two trees.
 
@@ -108,33 +108,7 @@ You'll need to do this to experiment with the examples and exercises.
    gh repo clone BruceEckel/ThinkingInPython
    ```
 
-2. You need a `make` command. Check for one with:
-
-   ```sh
-   make --version
-   ```
-
-   If it's missing:
-   - Debian, Ubuntu, and Ubuntu on WSL (minimal images do not include it):
-
-     ```sh
-     sudo apt install make
-     ```
-
-   - Fedora:
-
-     ```sh
-     sudo dnf install make
-     ```
-
-   - macOS: install Xcode Command Line Tools.
-   - Windows:
-
-     ```sh
-     winget install ezwinports.make
-     ```
-
-3. Install [uv](https://docs.astral.sh/uv/):
+2. Install [uv](https://docs.astral.sh/uv/):
    - Linux, and macOS without Homebrew:
 
      ```sh
@@ -153,14 +127,33 @@ You'll need to do this to experiment with the examples and exercises.
      winget install --id=astral-sh.uv -e
      ```
 
+3. The book's commands go through `tip`, a task runner written in Python
+   that comes with the repository.
+   From the repository's root directory, put a `tip` command on your PATH:
+
+   ```sh
+   uv tool install --editable .
+   ```
+
+   If your shell cannot find `tip` afterward, `uv tool update-shell` adds
+   uv's tool directory to your PATH.
+   This works the same on Windows, macOS, and Linux.
+   Because the install is editable, a change under `tools/` takes effect
+   immediately.
+
+   The install is optional. Without it, put `uv run` in front of each
+   command, as in `uv run tip tools-check`, which works from anywhere
+   inside the repository. The rest of this README writes the short form,
+   `tip tools-check`.
+
 4. Verify the essential tools:
 
    ```sh
-   make tools-check
+   tip tools-check
    ```
 
-   There is no separate install step.
-   Every `make` target goes through `uv run`,
+   The book's environment needs no separate install step.
+   Every `tip` target goes through `uv run`,
    and the first one you run creates `.venv` and installs the pinned
    Python (3.15+) and the dev tools before it does anything else.
    `uv sync` builds the same environment explicitly,
@@ -172,15 +165,21 @@ You'll need to do this to experiment with the examples and exercises.
    itself and fails when the other side has it open. A clone under
    `/mnt/c` also runs every command through the Windows filesystem
    bridge, which turns a three-second install into a minute and slows
-   `make verify` the same way.
+   `tip verify` the same way.
 
 That is everything you need to run and test the examples and the solutions.
-`make doctor` diagnoses the two common environment problems:
+`tip doctor` diagnoses the two common environment problems:
 a stale `uv` stuck on an old Python prerelease, and (on Windows) a process
 holding `.venv` open.
 
-Type `make` to see every target; it opens a picker where
+Type `tip` to see every target; it opens a picker where
 arrow keys choose, Enter runs, and `?` shows a target's full documentation.
+Piped into another command, `tip` prints the same list by category instead,
+and `tip help style` shows one section of it.
+Targets that take a setting use `NAME=value`, as in `tip check-ch CH=07`.
+`tip` echoes each command before it runs it, and ends with a timing line
+such as `tip verify: 1m 32s`.
+`tools/tasks.py` defines every target.
 
 ### Run and test everything
 
@@ -191,25 +190,25 @@ copy.
 - Execute every example file and report failures:
 
   ```sh
-  make run
+  tip run
   ```
 
 - Run the book's `pytest` examples, the `test_*.py` files:
 
   ```sh
-  make test
+  tip test
   ```
 
 - Type-check every example (must come out clean):
 
   ```sh
-  make ty
+  tip ty
   ```
 
 - PEP8-lint every example with `ruff` (must come out clean):
 
   ```sh
-  make lint
+  tip lint
   ```
 
 - Each of those four covers `build/solutions/`, the extracted exercise
@@ -218,13 +217,13 @@ copy.
 - Run every solutions check at once (exercise numbering, drift, output markers, types, lint, runs, tests):
 
   ```sh
-  make solutions-gate
+  tip solutions-gate
   ```
 
 - Run every check over both trees, before you commit:
 
   ```sh
-  make gate
+  tip gate
   ```
 
 A first run also downloads the pinned Python and the dev tools.
@@ -233,19 +232,19 @@ To run one example instead of all of them, see
 [Run one example by hand](#run-one-example-by-hand) below.
 
 A few examples cannot run unattended because they open a window, wait for
-input, or loop forever. `make run` reports those as "Can't run unattended"
+input, or loop forever. `tip run` reports those as "Can't run unattended"
 rather than as failures. `tools/data/norun.txt` lists them. Run one by hand
 to watch it work, or open all the windowed ones at once:
 
 ```sh
-make by-hand
+tip by-hand
 ```
 
 Try each window and close it. The command prints a line as each one
 closes, and the traceback of any that failed.
 
-`make gate` runs the solutions checks first, as a prerequisite, so a
-failure there hides every `Chapters/` failure behind it. `make sweep` runs
+`tip gate` runs the solutions checks first, as a prerequisite, so a
+failure there hides every `Chapters/` failure behind it. `tip sweep` runs
 everything and reports them all instead of stopping at the first. `gate`
 also refreshes generated content in place: it rewraps prose to one sentence
 per line, and it rewrites any `#:` marker whose listing now prints
@@ -256,32 +255,32 @@ something else. Expect `git diff Chapters/` to show both.
 Run the whole code-example gate against one chapter instead of all 47:
 
 ```sh
-make check-ch CH=07
+tip check-ch CH=07
 ```
 
 The gate extracts the chapter, then checks output markers, listing format,
 types, lint, and tests.
 `CH` takes a number or a filename stem. Make this your edit loop.
-Only `make gate` catches breakage across chapters.
+Only `tip gate` catches breakage across chapters.
 
 ### Run one example by hand
 
-`make run-one` runs any single example from the repo root and shows its
+`tip run-one` runs any single example from the repo root and shows its
 output. Give it the file's name, or as much of its path as you care to
 type:
 
 ```sh
-make run-one deque_timing
+tip run-one deque_timing
 ```
 
 ```sh
-make run-one Examples/07_Foundations--Classes/property_setter.py
+tip run-one Examples/07_Foundations--Classes/property_setter.py
 ```
 
-`make run-one F=deque_timing` is the same command in its older form.
+`tip run-one F=deque_timing` is the same command in its older form.
 
 It sets up what the example expects, and prints the commands it stood in
-for, because those are what you type when `make` is not at hand:
+for, because those are what you type when `tip` is not at hand:
 
 ```sh
 cd Examples/03_Foundations--Containers
@@ -306,20 +305,20 @@ $env:PYTHONPATH = "../utils"
 uv run python deque_timing.py
 ```
 
-`make run-one` prints whichever form fits your shell.
+`tip run-one` prints whichever form fits your shell.
 
 Use `uv run python`, not a bare `python`. A `python` already on your PATH is
 usually an older release, and these examples use Python 3.15 syntax.
 
 ### Optional: Building the Book
 
-Building the book itself needs more. `make site`, `make local`, and
-`make serve` need `pandoc` on your PATH, `make pdf` also needs `typst`, and
-`make prose` needs the standalone `vale` binary.
+Building the book itself needs more. `tip site`, `tip local`, and
+`tip serve` need `pandoc` on your PATH, `tip pdf` also needs `typst`, and
+`tip prose` needs the standalone `vale` binary.
 Check for all of them:
 
 ```sh
-make tools-check-full
+tip tools-check-full
 ```
 
 See

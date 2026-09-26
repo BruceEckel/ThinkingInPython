@@ -9,7 +9,7 @@ Running ruff on the real extracted files (rather than each block in isolation)
 matters: ruff's isort classifies a listing's sibling imports as first-party only
 when it can see those files on disk, so an in-place fix on the tree sorts the way
 the gate expects. This extracts nothing itself; run it after the tree is built
-(``make fix-imports`` depends on ``extract``). For each ```python block that
+(``tip fix-imports`` depends on ``extract``). For each ```python block that
 names an extractable file, it runs ``ruff check --fix-only --select I,F401``
 over the tree (sort the import block and drop unused imports, leaving
 deliberately-unused ones that per-file-ignores exempt), then splices each fixed
@@ -175,7 +175,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.fix:
         print(f"\nOrganized imports in {total} listing(s).")
         return 0
-    print(f"\n{total} listing(s) need organizing. Run `make fix-imports`.")
+    print(f"\n{total} listing(s) need organizing. Run `tip fix-imports`.")
     return 1
 
 

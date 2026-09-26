@@ -41,7 +41,7 @@ The deliberate long-form listings live in
 (`Rethinking_Objects`), so a renumbering or a part rename leaves the
 file alone, and one entry covers the chapter and its Solutions file.
 `listing` is the slug (`immutable.py`), and `Class` is a class name or
-an `fnmatch` pattern (`*`, `Frozen*`). Run standalone (`make records`),
+an `fnmatch` pattern (`*`, `Frozen*`). Run standalone (`tip records`),
 the tool also fails on an entry that matches no class, so the file
 cannot go stale; under `check_all` each document is checked alone and
 that whole-tree test does not run.

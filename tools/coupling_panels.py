@@ -23,14 +23,14 @@ the same notation, is generated here too, from the `Cell` specs in
 
 `--check` regenerates in memory and exits nonzero if any committed SVG
 differs, the way `extract_examples`'s check mode works for `Examples/`;
-`make coupling-panels` runs it in the gate. Every run also checks each
+`tip coupling-panels` runs it in the gate. Every run also checks each
 spec's edges (`edge_problems()`): a head's tip must sit `TIP_PAD` from
 its target's drawn outline, rounded corners included, give or take
 `TIP_SLACK`, and no edge may cross a box other than its own two. `--png` rasterizes every
 `resources/images/coupling_*.svg` (the panels and chapter 21's figures)
 into `build/coupling/` with the same rasterizer and width the EPUB
 uses, since text that fits in a browser can collide once rasterized;
-`make coupling-panels-png` is the one-command form. It needs one of
+`tip coupling-panels-png` is the one-command form. It needs one of
 `build_epub.SVG_TOOLS` on PATH and says so when none is.
 
 The visual vocabulary matches the hand-authored figures: a `viewBox`

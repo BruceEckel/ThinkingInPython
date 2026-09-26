@@ -8,7 +8,7 @@ type, or an overload list the prose quotes, the same way a `ty` upgrade
 can. Stateless is the heavy case: 88 listings import it, and chapters
 46 and 47 describe its API in prose.
 
-`make tools-upgrade` moves the libraries along with the tools
+`tip tools-upgrade` moves the libraries along with the tools
 (`uv lock --upgrade` upgrades everything), but nothing says when a
 library has a release waiting. This does, and changes nothing:
 
@@ -21,7 +21,7 @@ has one cause. The `tool-upgrade` skill's Stateless-upgrade entry
 lists what to re-check.
 
 It always exits 0. It answers a question, and an offline machine or a
-PyPI outage must not fail `make verify-targets`, which runs every
+PyPI outage must not fail `tip verify-targets`, which runs every
 documented target. It belongs to no gate: a gate that reaches the
 network fails for reasons the book did not cause.
 
@@ -96,7 +96,7 @@ def main() -> int:
               if newest is not None and newest != version]
     if behind:
         print("Upgrade one alone: `uv lock --upgrade-package NAME` then "
-              "`uv sync`, then `make sweep`.")
+              "`uv sync`, then `tip sweep`.")
     return 0
 
 

@@ -8,7 +8,7 @@ tools: Read, Edit, Write, Grep, Glob, Bash
 You do a clarity pass on exactly one file of the book, the one named in
 your prompt, from the repo root `C:\git\ThinkingInPython`. Other
 instances of you may be editing other files at the same time, so touch
-only your file and run only file-scoped commands (`make reflow CH=NN`,
+only your file and run only file-scoped commands (`tip reflow CH=NN`,
 never a whole-tree `reflow_prose.py --write`; `vale` on one path).
 
 Read first, in this order:
@@ -65,7 +65,7 @@ editing, keep the edits you are surest of under that budget, and
 report the rest as candidates. The author's phrasing wins every tie.
 
 Chapters: prose is one sentence per line (Semantic Line Breaks); run
-`make reflow CH=NN` after editing. Solutions: prose is hard-wrapped;
+`tip reflow CH=NN` after editing. Solutions: prose is hard-wrapped;
 keep each edited paragraph at its neighbors' width, and never touch a
 `## N. ...` heading (exercise numbering is gated).
 
@@ -78,8 +78,8 @@ prompt names, and at minimum: `uv run python -m tools.check_all`,
 another chapter is the shape it gates), and `vale` on the file; for
 Solutions also `tools/extract_solutions.py` and
 `tools/check_solutions.py`; for Chapters also `tools/extract_examples.py`
-in check mode. Undo any warning you introduced. Never run `make gate`,
-`make verify`, or any git command that changes history; the caller
+in check mode. Undo any warning you introduced. Never run `tip gate`,
+`tip verify`, or any git command that changes history; the caller
 gates and commits.
 
 Return a report in this shape, under 60 lines:

@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
-"""Start every example that needs a human, all at once (`make by-hand`).
+"""Start every example that needs a human, all at once (`tip by-hand`).
 
-`make run` skips the examples in ``tools/data/norun.txt``: they open a
+`tip run` skips the examples in ``tools/data/norun.txt``: they open a
 window, and nothing unattended can close it. No gate ever executes those
 files, so a view that raises an exception on startup, or on the first
 click, fails without anyone seeing it. This tool is the check a human
 runs instead. It starts each one as its own process, from its own
 chapter directory with the tree's ``utils/`` on ``PYTHONPATH`` (the
-setup `make run-one` builds), and waits. Try each window, close it, and
+setup `tip run-one` builds), and waits. Try each window, close it, and
 the tool prints a line as each process ends. When the last one closes it
 prints the traceback of every example that exited nonzero, and exits 1
 if any did.

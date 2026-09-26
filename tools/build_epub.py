@@ -44,7 +44,7 @@ points the EPUB at that instead. The conversion needs one of `resvg`
 (preferred: the renderer typst uses, so the EPUB's diagrams match the
 PDF's), `rsvg-convert`, `magick`, or `inkscape`; with none of them
 installed the build still succeeds and keeps the SVGs, printing a note
-with the install command for this machine (`make tools-check-full`
+with the install command for this machine (`tip tools-check-full`
 prints the same one).
 
 The build produces two EPUBs from one assembly, differing only in
@@ -67,7 +67,7 @@ Usage:
     python -m tools.build_epub --keep-source  # leave build/epub/src/ in place
     python -m tools.build_epub --keep-svg     # skip the PNG conversion
 
-Requires `pandoc` on PATH (`make tools-check-full` verifies it).
+Requires `pandoc` on PATH (`tip tools-check-full` verifies it).
 """
 
 import argparse
@@ -749,7 +749,7 @@ def metadata_yaml(release: str | None = None) -> str:
 
     With `release`, the date field becomes the full release stamp
     ("Release 1.0 · August 23, 2026"), which pandoc renders on both
-    title pages. Without it (an ad-hoc `make epub`/`make pdf`), the
+    title pages. Without it (an ad-hoc `tip epub`/`tip pdf`), the
     date stays the bare copyright year, so a casual build never
     masquerades as a numbered release.
     """
@@ -1106,7 +1106,7 @@ def main(argv: list[str] | None = None) -> int:
                     help="skip converting SVG diagrams to PNG")
     ap.add_argument("--release", metavar="VERSION",
                     help="stamp the title page with this release number "
-                         "and today's date (used by `make release`)")
+                         "and today's date (used by `tip release`)")
     ap.add_argument("--listing-links",
                     action=argparse.BooleanOptionalAction, default=True,
                     help="link each `name.py` mention in the prose to "

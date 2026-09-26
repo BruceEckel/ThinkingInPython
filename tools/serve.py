@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Serve the built site locally, optionally opening a browser.
 
-`make serve` serves the existing `build/site/`. `make local` builds
+`tip serve` serves the existing `build/site/`. `tip local` builds
 it first, then runs this with `--open --watch`.
 
 With `--watch`, a background thread polls `Chapters/*.md` (and the few
@@ -19,7 +19,7 @@ released, for pulling passages out of the rendered book. The copied
 text is wrapped in guillemets and followed by its source, so a pasted
 passage reads `«...» (Function Objects › Strategy: Choosing the
 Algorithm at Runtime)`; neither « nor » occurs in the book, so the
-marks cannot be mistaken for quoted text. `make local` passes it. Both scripts are added to the response as it is served, so
+marks cannot be mistaken for quoted text. `tip local` passes it. Both scripts are added to the response as it is served, so
 the files in `build/site/`, the ones the published site is built from,
 never contain either.
 
@@ -284,7 +284,7 @@ def main(argv: list[str] | None = None) -> int:
     if not SITE.exists():
         raise SystemExit(
             f"error: {SITE} not found. Build the site first "
-            "(make site, or python -m tools.build_site).")
+            "(tip site, or python -m tools.build_site).")
 
     if args.watch:
         build_site.check_pandoc()

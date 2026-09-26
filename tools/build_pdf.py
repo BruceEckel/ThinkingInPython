@@ -30,7 +30,7 @@ Usage:
     python -m tools.build_pdf -o DIR        # build somewhere else
     python -m tools.build_pdf --keep-source # leave build/pdf/src/ in place
 
-Requires `pandoc` and `typst` on PATH (`make tools-check-full`
+Requires `pandoc` and `typst` on PATH (`tip tools-check-full`
 verifies both).
 """
 
@@ -322,7 +322,7 @@ def main(argv: list[str] | None = None) -> int:
                     help="leave the generated pandoc input under <out>/src/")
     ap.add_argument("--release", metavar="VERSION",
                     help="stamp the title page with this release number "
-                         "and today's date (used by `make release`)")
+                         "and today's date (used by `tip release`)")
     args = ap.parse_args(argv)
     return build(args.out, args.keep_source, args.release)
 

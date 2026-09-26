@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Hand a built EPUB to Amazon's Send to Kindle desktop app.
 
-`make kindle` lands here. The app (https://www.amazon.com/sendtokindle)
+`tip kindle` lands here. The app (https://www.amazon.com/sendtokindle)
 takes a file path on its command line, the same call its Explorer
 "Send to Kindle" context-menu entry makes, and opens its dialog with
 the file queued; the device choice and the final Send click are its
@@ -17,9 +17,9 @@ The e-ink variant is the default (a Paperwhite is the target), and
 `VARIANT=color` picks the other. The EPUB is rebuilt first when it
 is missing or older than any of its inputs (Chapters/, resources/,
 the builder modules), the same in-process `build_epub.build()` call
-`make epub` makes, so the file sent is never behind the Markdown;
+`tip epub` makes, so the file sent is never behind the Markdown;
 a current file is sent as-is, and its age is printed either way.
-`make epub` itself always rebuilds; this is the only place the
+`tip epub` itself always rebuilds; this is the only place the
 inputs are compared, since here a stale file would go to a device
 and pass for the current book.
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Publish a GitHub release whose assets are the fresh PDF and EPUBs.
 
-`make release VERSION=1.0` lands here. The release's uploaded assets
+`tip release VERSION=1.0` lands here. The release's uploaded assets
 are the three book files, ThinkingInPython.pdf plus the two EPUB
 variants (ThinkingInPython-color.epub for backlit readers,
 ThinkingInPython-eink.epub with bolding instead of color), all rebuilt
@@ -20,13 +20,13 @@ first so a doomed run dies before the expensive gate:
    branch whose tip matches origin (a release tag must point at a
    commit that is actually on GitHub, holding the book that built the
    assets); and the tag does not already exist, locally or on origin.
-2. `make verify`: the full gate, so a book that fails it can never
+2. `tip verify`: the full gate, so a book that fails it can never
    ship. verify's fixers (line endings, `#:` markers, sync) can
    rewrite tracked files; if that happens the tree is no longer the
    pushed commit, so the run stops and asks for a review-commit-push
    before trying again.
-3. Build the PDF and EPUBs (in-process, the equivalent of `make pdf`
-   and `make epub` plus a `--release` stamp): both builders wipe
+3. Build the PDF and EPUBs (in-process, the equivalent of `tip pdf`
+   and `tip epub` plus a `--release` stamp): both builders wipe
    their output directory and rebuild from the Markdown, which is
    what makes the assets fresh, and both stamp their title page with
    the release number and today's date ("Release 1.0 · August 23,
@@ -51,11 +51,11 @@ as-is), the conventional GitHub form. Deleting a bad release is a
 manual, deliberate act: `gh release delete v1.0 --cleanup-tag`.
 
 Usage:
-    python -m tools.release 1.0     # normally via `make release VERSION=1.0`
+    python -m tools.release 1.0     # normally via `tip release VERSION=1.0`
     python -m tools.release --prune # only delete the old releases
 
 Requires `git` and an authenticated `gh` on PATH, plus everything
-`make verify`, `make pdf`, and `make epub` need.
+`tip verify`, `tip pdf`, and `tip epub` need.
 """
 
 import argparse
@@ -70,6 +70,7 @@ from tools import build_epub
 from tools import build_pdf
 from tools.config import BUILD_EPUB_DIR, BUILD_PDF_DIR, ROOT
 from tools.repo import run_echoed
+from tools.tip import tip_argv
 
 # How many releases stay on GitHub after a publish: the new one and
 # the one before it. Older ones are deleted, their tags kept.
@@ -177,18 +178,18 @@ def preflight(tag: str) -> str:
     return branch
 
 
-def make(target: str) -> None:
-    """Run one make target, aborting the release if it fails."""
-    if not run_echoed(["make", target]):
-        sys.exit(f"error: make {target} failed; nothing was released.")
+def run_task(target: str) -> None:
+    """Run one tip task, aborting the release if it fails."""
+    if not run_echoed(tip_argv(target)):
+        sys.exit(f"error: tip {target} failed; nothing was released.")
 
 
 def build_assets(version: str) -> list[Path]:
     """Rebuild the PDF and both EPUBs fresh, stamped with the release,
     and add the reader guides beside them.
 
-    In-process calls rather than `make pdf`/`make epub`: the make
-    targets have no way to carry the release stamp, and the builders
+    In-process calls rather than `tip pdf`/`tip epub`: the tip
+    tasks have no way to carry the release stamp, and the builders
     are already imported. Each stamps its title page with
     `build_epub.release_line()` ("Release 1.0 · August 23, 2026").
     A nonzero status (a missing image, an unresolved link) aborts the
@@ -308,14 +309,14 @@ def release(version: str) -> int:
     tag = tag_for(version)
     branch = preflight(tag)
 
-    make("verify")
+    run_task("verify")
     dirty = working_tree_dirty()
     if dirty:
-        sys.exit("error: `make verify` rewrote tracked files (its "
+        sys.exit("error: `tip verify` rewrote tracked files (its "
                  "fixers self-heal markers, line endings, and synced "
                  "trees), so the tree no longer matches the pushed "
                  "commit. Review the diff, commit, push, and run "
-                 f"`make release VERSION={version}` again:\n{dirty}")
+                 f"`tip release VERSION={version}` again:\n{dirty}")
 
     assets = build_assets(version.removeprefix("v"))
     publish(tag, version, branch, assets)
@@ -341,7 +342,7 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     if not args.version:
         sys.exit("error: no version given. Run as: "
-                 "make release VERSION=1.0")
+                 "tip release VERSION=1.0")
     return release(args.version)
 
 

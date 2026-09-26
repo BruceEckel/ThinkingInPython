@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Run the AI editing passes over chapters' prose (`make rewrite CH=25`).
+"""Run the AI editing passes over chapters' prose (`tip rewrite CH=25`).
 
 Each pass is one headless `claude -p "/<skill> <chapter>"` run: a skill
 from this repo (`.claude/skills/`) or an installed plugin, applied to the
 chapter file in place with `--permission-mode acceptEdits`, so it needs
 no terminal and no confirmation. `--model` picks the model for every
-pass (`make rewrite MODEL=claude-sonnet-5`); the default is
+pass (`tip rewrite MODEL=claude-sonnet-5`); the default is
 `DEFAULT_MODEL` below, Opus, because the passes' failure mode is
 over-editing and restraint is what the stronger model buys. Each pass
 header prints the model so a diff can be traced to it. After every pass
@@ -13,7 +13,7 @@ the chapter is reflowed (`reflow_prose.py --write`) and the cheap prose
 gates run (`banned_phrases.py` and `heading_links.py` on that chapter,
 then the book-wide `extract_examples.py` drift check), so a pass that
 touched a listing, broke a link, or added a banned phrase fails right
-there, not at the next `make verify`. A chapter's chain stops at its
+there, not at the next `tip verify`. A chapter's chain stops at its
 first failure.
 
 Before anything runs, every selected pass's skill is looked up:
@@ -36,7 +36,7 @@ output streamed as it happens, the mode to use when watching a pass
 work.
 
 The passes live in `PASSES` below, in the order they run. Adding a tool
-is appending an entry. A pass with `default=True` runs on a bare `make
+is appending an entry. A pass with `default=True` runs on a bare `tip
 rewrite`; the rest are opt-in. `--also NAME ...` adds opt-in passes to
 the defaults, `--passes NAME ...` runs only the passes named (replacing
 the default set), and `--all` runs every pass. A pass whose own rules
@@ -47,7 +47,7 @@ This is not a gate. Each run costs tokens and is nondeterministic, so it
 never joins `verify`/`gate`/`ci`, it refuses to run under `CI`, and
 `verify_targets.py` excludes it. Each pass runs once per invocation, by
 design: Strunk's Rule 13 has no floor, and repeated cut-passes sand the
-voice off a chapter. Rerun `make rewrite` by hand for a second lap, and
+voice off a chapter. Rerun `tip rewrite` by hand for a second lap, and
 review the diff before committing.
 
 Usage:
@@ -202,7 +202,7 @@ for the row this produced.
 
 The rule passes (activate, bruce-edit-apply, readability) looked like
 candidates for a cheaper model, but no objective A/B was possible:
-Chapters/ carries zero vale warnings (every make prose warning is in
+Chapters/ carries zero vale warnings (every tip prose warning is in
 Solutions/), so activate's measurable job is done and what remains of
 it is judgment. Until a measured run says otherwise they stay on the
 default. MODEL=claude-sonnet-5 is the cheap lap to try one by hand;
@@ -211,7 +211,7 @@ count, and activate by the metadiscourse it removes and the voice it
 keeps.
 
 2026-09-25: DEFAULT_MODEL moved from Fable 5 to Opus 5.5 at Bruce's
-request, to keep make rewrite from drawing on his Fable usage. This is
+request, to keep tip rewrite from drawing on his Fable usage. This is
 not a new A/B result. The 2026-09-01 comparison was against Opus 5,
 and Opus 5.5 has not been measured on these passes. When reading its
 first runs, look for what Opus 5 did there: added "only"s, figurative
@@ -299,7 +299,7 @@ def missing_skills(
     """One line per selected pass whose skill cannot be found.
 
     Empty means every pass can start. Checked before any headless session
-    runs, so `make rewrite` fails fast on an uninstalled plugin instead of
+    runs, so `tip rewrite` fails fast on an uninstalled plugin instead of
     each chapter's chain stopping at "Unknown command".
     """
     home = Path.home() if home is None else home

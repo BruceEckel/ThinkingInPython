@@ -62,7 +62,7 @@ REPO_URL = "https://github.com/BruceEckel/ThinkingInPython"
 # The newest release's page, listing every published asset (PDF, both
 # EPUBs). `releases/latest` always resolves to the newest published
 # release, so the link never goes stale when a new version ships
-# (`make release`), and adding an asset needs no change here.
+# (`tip release`), and adding an asset needs no change here.
 RELEASE_URL = f"{REPO_URL}/releases/latest"
 # The README section explaining where the examples and solutions
 # live, how the book's listings map onto them, and how to run and
@@ -210,7 +210,7 @@ def check_pandoc(minimum: tuple[int, ...] = (3, 0)) -> None:
     on an option it lacks with "Unknown option", which says nothing
     about what to install. The EPUB and PDF builds pass a higher floor:
     `--syntax-highlighting` and the typst engine arrived in the 3.x
-    line. The install hint is the one `make tools-check-full` prints
+    line. The install hint is the one `tip tools-check-full` prints
     for this machine.
     """
     from tools.check_tools import install_hint

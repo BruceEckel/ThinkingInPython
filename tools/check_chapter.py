@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 """Run the code-example gates for one chapter, and nothing else.
 
-`make gate` checks the whole book and takes tens of seconds, most of it
+`tip gate` checks the whole book and takes tens of seconds, most of it
 spent executing every listing in all 44 chapters. When you are editing the
 listings in a single chapter, almost none of that work is about your edit.
 This runs the same checks a code example must pass, scoped to one chapter:
 
-    make check-ch CH=12          # or CH=12_Techniques--Data_Classes_as_Types
+    tip check-ch CH=12          # or CH=12_Techniques--Data_Classes_as_Types
 
 The steps, in order:
 
@@ -153,7 +153,7 @@ def main(argv: list[str] | None = None) -> int:
     failed = results.count(False)
     print(f"\n{len(results) - failed} passed, {failed} failed")
     if failed:
-        print("Run `make gate` before committing: this checks one chapter,"
+        print("Run `tip gate` before committing: this checks one chapter,"
               " not the book.")
     return 1 if failed else 0
 

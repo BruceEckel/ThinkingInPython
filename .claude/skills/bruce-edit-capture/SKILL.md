@@ -54,7 +54,7 @@ Record the provenance in every sighting.
 
 ## Step 2: get a diff that survives Semantic Line Breaks
 
-`Chapters/*.md` uses Semantic Line Breaks, and `make reflow` re-wraps
+`Chapters/*.md` uses Semantic Line Breaks, and `tip reflow` re-wraps
 paragraphs, so a line-level diff shows changed lines whose words are
 identical. Reading one of those as an edit manufactures rules from
 whitespace. Use a word diff:
@@ -173,5 +173,5 @@ Write `bruce_edit_db.md` only after that.
 A rejected proposal goes to Retired with his reason in his terms.
 A narrowed one is written as narrowed, not as proposed.
 
-Nothing else is written. `Chapters/` stays untouched, no `make` target runs,
+Nothing else is written. `Chapters/` stays untouched, no `tip` target runs,
 and Bruce commits the store himself.

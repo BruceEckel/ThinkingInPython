@@ -12,7 +12,7 @@ markers all point at the same underlying blocker) and doubles as a plain
 `grep -rn "TODO(py315-deps)" Chapters/` search when you only care about
 one of them. This tool is informational, not a gate: it always exits 0,
 and is not part of `verify`/`gate`/`ci`. Run it now and then, the same
-way `make links` is, to see what is still waiting on something outside
+way `tip links` is, to see what is still waiting on something outside
 the book's control.
 
 Usage:

@@ -201,7 +201,7 @@ is recorded without costing a decision.
 
 Any new listing follows the full verify loop in `CLAUDE.md` (fenced
 block with `# slug.py` first line, deterministic markers or wide-margin
-threshold booleans, sync, gates, `make reflow CH=NN` on the new prose).
+threshold booleans, sync, gates, `tip reflow CH=NN` on the new prose).
 
 Accrued notes from the chapters 18-38 review sweep:
 
@@ -323,7 +323,7 @@ When Bruce finishes editing, he hands the file back with an instruction like
 3. Rename the review file to the next name in the completed-review series (see
    Successive reviews), which adds the leading `~` the file's own instruction
    calls for. Use `git mv` when the file is tracked. The `~` marks it done.
-4. Remind Bruce to run `make verify`.
+4. Remind Bruce to run `tip verify`.
 
 **Which variant to apply.** A live block that offers several fixes gets the
 one the block recommends, unless Bruce says otherwise. He annotates a choice

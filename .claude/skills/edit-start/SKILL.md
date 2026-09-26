@@ -74,8 +74,8 @@ Run the chapter's own checks so a red result after the pass is
 attributable to the pass and not to something that was already wrong:
 
 ```
-make check-ch CH=NN
-make reflow-check CH=NN
+tip check-ch CH=NN
+tip reflow-check CH=NN
 uv run python -m tools.extract_examples --write
 uv run python -m tools.validate_output Chapters/NN_*.md
 ```

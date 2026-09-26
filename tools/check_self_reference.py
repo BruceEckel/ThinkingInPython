@@ -43,7 +43,7 @@ Two of them gate. The third reports.
             also finds 31 sentences in the current book whose terms
             belong to the *linking* chapter, which a target has no reason
             to mention, so it cannot gate without teaching everyone to
-            ignore a red check. `--advisory` includes it; `make
+            ignore a red check. `--advisory` includes it; `tip
             self-reference-report` is the standing way to read it.
 
 The rules are deliberately literal, so they under-report, and that is the
@@ -454,7 +454,7 @@ def main(argv: list[str] | None = None) -> int:
     status = report(findings, clean=CHECK.clean, problem=CHECK.problem)
     # Only the gating rules can fail a build. A run that asked for
     # grounding asked for a worklist, and a worklist that exits nonzero
-    # cannot sit in a Makefile beside `claims` and `links`.
+    # cannot sit in tools/tasks.py beside `claims` and `links`.
     return status if keep <= set(GATE_CODES) else 0
 
 

@@ -192,11 +192,11 @@ thing is worse than the muddle it replaced.
 
 ## Verify and report
 
-Touched prose gets `make reflow CH=NN` (Semantic Line Breaks),
-then `make verify`, then read `git diff Chapters/`:
+Touched prose gets `tip reflow CH=NN` (Semantic Line Breaks),
+then `tip verify`, then read `git diff Chapters/`:
 a changed `#:` marker means an edit strayed into code, so investigate it.
 A split sentence can add a `prose` warning (a new sentence opening with
-"There is", a new passive), so run `make prose CH=NN` too,
+"There is", a new passive), so run `tip prose CH=NN` too,
 and compare its warning count against the committed chapter
 (`git show HEAD:Chapters/NN_*.md > scratch.md; vale scratch.md`,
 never `git stash`, which races with any other pass running beside you).

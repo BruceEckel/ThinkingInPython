@@ -1,87 +1,61 @@
 #!/usr/bin/env python
-"""Print categorized help for the Makefile, replacing `grep | awk`.
+"""Print categorized help for `tip`, or open its picker.
 
-Every target line ending in a `## text` comment becomes one help entry, and
-a `##@ Name` line starts a new section. A target with no doc comment is left
-out entirely (most are internal or self-explanatory).
+The tasks and their sections come from tools/tasks.py through
+tools/tip.py's Registry: each `section()` call starts a heading, each
+`@task` becomes a row with its one-line doc, a `secondary=True` task is
+folded out of the listing (still documented and smoke-tested) because
+a sibling's doc text names it, and `also()` repeats tasks from other
+sections at that point. The sections run from the everyday loop down
+to setup and cleanup.
 
-Bare `make` and `make help` both print every section; `make help style`
-prints one. A section's *slug*, the name you pass, is the first word of
-its `##@` heading, lowercased, and each heading in the full listing leads
-with it (`style: Style gates`) so the listing doubles as the index of what
-`make help NAME` takes. No separate list of slugs exists to drift: rename
-the heading and the slug follows.
+Bare `tip` and `tip help` both print every section; `tip help style`
+prints one. A section's *slug*, the name you pass, is the first word
+of its heading, lowercased, and each heading in the full listing leads
+with it (`style: Style gates`) so the listing doubles as the index of
+what `tip help NAME` takes. No separate list of slugs exists to drift:
+rename the heading and the slug follows. check() refuses two sections
+that share a slug.
 
-A target whose comment is `##-` rather than `##` is *secondary*: documented
-and smoke-tested, but folded out of the listing because a sibling's doc text
-names it (`fix-eol` under `eol`). That keeps `make help style` at ten rows
-instead of sixteen without hiding a target from `verify_targets.py`.
+`entries()` is the flat (task, doc) view, used by verify_targets.py
+(to enumerate every task) and sweep_checks.py (to look one up). It
+reports secondary tasks too, so folding a row out of the listing never
+drops it from the smoke test, and leaves out `also()` repeats.
 
-A `##+ name name ...` line repeats targets defined in other sections into
-the section it sits in, at that point in the listing. The sections run
-from the everyday loop down to setup and cleanup, and a target that
-belongs to more than one job (`sync` is both an everyday step and a
-code-examples step) is listed under each; `entries()` reports it once.
-
-Four invariants are enforced rather than assumed, each raising SystemExit
-with a message naming the offender:
-
-  * No two sections share a slug.
-  * No slug equals a target name. The Makefile neutralizes the word after
-    `help` so `make help style` parses as one goal, and that would override
-    a real recipe if a slug ever collided with one.
-  * Every `##+` name is a documented target (parse() checks this).
-  * No `##+` repeats a target inside the section that defines it.
-
-This exists so `make help` has no dependency on `grep`/`awk` being on PATH.
-Every other target already requires Python (via `uv run`), so routing help
-through it too means one less way for `make help` to fail on a machine that
-has GNU Make but not a POSIX toolchain.
-
-`entries()` is the flat (target, doc) view, imported by verify_targets.py
-(to enumerate every target) and sweep_checks.py (to look one up). It
-reports secondary targets too, so folding a row out of the listing never
-drops it from the smoke test.
-
-Doc text wraps to the terminal width, with continuation lines indented under
-the doc column so the target names stay in one scannable column. The width
-comes from the terminal and is capped at MAX_WIDTH, since a doc string run
-across 200 columns is no easier to read than one that overflows 80. A pipe
-or a redirect gets the 80-column fallback.
+Doc text wraps to the terminal width, with continuation lines indented
+under the doc column so the task names stay in one scannable column.
+The width comes from the terminal and is capped at MAX_WIDTH, since a
+doc string run across 200 columns is no easier to read than one that
+overflows 80. A pipe or a redirect gets the 80-column fallback.
 
 In a terminal, both forms open the interactive picker in help_picker.py
-instead of printing: arrow keys or the mouse choose a target, Enter
-runs it, and `?` shows its notes. Those come from the `#` comment block
-directly above the target line (`Target.notes`) and its recipe
-(`Target.recipe`), both captured by `parse()`; a blank line or a `##@`
-heading ends the block, so a target's long-form help is whatever
-comment sits touching it. The static listing below is what a pipe, CI,
-`verify-targets`,
-and `--pick never` get, and what the picker falls back to if
-prompt_toolkit is not installed.
+instead of printing: arrow keys or the mouse choose a task, Enter runs
+it, and `?` shows its notes (the task function's docstring) and its
+recipe (the function's body). The static listing below is what a
+pipe, CI, `verify-targets`, and `--pick never` get, and what the
+picker falls back to if prompt_toolkit is not installed.
 
 A time column sits between the name and the doc: this machine's last
-successful run of the target (build/target_times.json, written by every
-timer in tools/), or, for a target this machine has not run, its tier
-from tools/data/target_tiers.txt, which `make verify-targets` writes.
+successful run of the task (build/target_times.json, written by every
+timer in tools/), or, for a task this machine has not run, its tier
+from tools/data/target_tiers.txt, which `tip verify-targets` writes.
 The column is colored by tier (quick green, long yellow, very long red)
 and a legend closes the listing; target_times.py has the thresholds.
 
-Output is colored when stdout is a terminal: section headings bold with the
-slug highlighted, target names in color. `NO_COLOR` turns it off,
-`FORCE_COLOR` (or `--color always`) turns
-it on for a pipe, and a legacy Windows console has VT processing switched
-on first, since without it the escape codes print as garbage. The render
-functions take a Palette and default to the plain one, so wrapping is
-measured on uncolored text and the tests see no escape codes.
+Output is colored when stdout is a terminal: section headings bold
+with the slug highlighted, task names in color. `NO_COLOR` turns it
+off, `FORCE_COLOR` (or `--color always`) turns it on for a pipe, and a
+legacy Windows console has VT processing switched on first, since
+without it the escape codes print as garbage. The render functions
+take a Palette and default to the plain one, so wrapping is measured
+on uncolored text and the tests see no escape codes.
 
-Usage:
-    python -m tools.make_help                    # every section
-    python -m tools.make_help style              # one section
-    python -m tools.make_help --width 72         # wrap to a fixed width
-    python -m tools.make_help --color never      # plain text on a terminal
-    python -m tools.make_help --pick never       # the static listing, no picker
-    python -m tools.make_help --makefile PATH    # read another Makefile
+Usage (`tip help ARGS` passes ARGS here):
+    python -m tools.tip_help                # every section
+    python -m tools.tip_help style          # one section
+    python -m tools.tip_help --width 72     # wrap to a fixed width
+    python -m tools.tip_help --color never  # plain text on a terminal
+    python -m tools.tip_help --pick never   # the listing, no picker
 """
 import argparse
 import os
@@ -90,14 +64,10 @@ import shutil
 import sys
 import textwrap
 from collections.abc import Callable, Mapping
-from dataclasses import dataclass, field, replace
-from pathlib import Path
+from dataclasses import dataclass, field
 from typing import IO
 
-from tools.config import ROOT
 from tools.target_times import TIERS, Timing
-
-MAKEFILE = ROOT / "Makefile"
 
 # What the time column means, printed once under the listing.
 LEGEND = ("Time: this machine's last run, or the tier from "
@@ -118,10 +88,6 @@ MIN_DOC = 24
 # matches and that includes the non-breaking space U+00A0.
 _KEEP_TOGETHER = re.compile(r"`[^`]+`")
 _JOINER = "\x00"
-
-_TARGET = re.compile(r"^([a-zA-Z_-]+):([^#]*?)##(-?)\s?(.*)$")
-_CATEGORY = re.compile(r"^##@\s?(.*)$")
-_REPEAT = re.compile(r"^##\+\s?(.*)$")
 
 @dataclass(frozen=True)
 class Palette:
@@ -195,20 +161,17 @@ def can_colorize(stream: IO[str] | None = None,
 
 @dataclass(frozen=True)
 class Target:
-    """One documented target. `secondary` hides it from the listing.
+    """One documented task, as the listing and the picker show it.
 
-    `notes` is the `#` comment block sitting directly above the target
-    line, with the `#` marks stripped and a blank line between
-    paragraphs: the long-form help the picker shows on `?`. `recipe` is
-    the target's command lines, tabs stripped, and `prereqs` the targets
-    named on its own line (`verify: fix-eol sync gate`), which is all a
-    prerequisites-only target has. Each is empty when the Makefile has
-    none.
+    `secondary` hides it from the listing. `notes` is the task
+    function's docstring: the long-form help the picker shows on `?`.
+    `recipe` is the function's body, `prereqs` the task's deps, and
+    `defaults` what an unset variable means, for the picker's prompt.
 
-    `repeat` marks a copy listed in a second section by a `##+` line:
-    the same target, shown again where a reader would also look for
-    it. `entries()` leaves the copies out, so a smoke test through it
-    runs each target once.
+    `repeat` marks a copy listed in a second section by `also()`: the
+    same task, shown again where a reader would also look for it.
+    `entries()` leaves the copies out, so a smoke test through it runs
+    each task once.
     """
     name: str
     doc: str
@@ -217,12 +180,13 @@ class Target:
     recipe: tuple[str, ...] = ()
     prereqs: tuple[str, ...] = ()
     repeat: bool = False
+    defaults: tuple[tuple[str, str], ...] = ()
 
 
 @dataclass(frozen=True)
 class Section:
-    """One `##@` heading and the targets under it, in file order, with
-    the targets a `##+` line repeats here at the point of that line."""
+    """One section() heading and the tasks under it, in order, with
+    the tasks an also() repeats here at the point of that call."""
     slug: str
     title: str
     targets: list[Target] = field(default_factory=list)
@@ -231,114 +195,23 @@ class Section:
         return [t for t in self.targets if not t.secondary]
 
 
-_ASSIGNMENT = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*\s*[?:+]?=")
+def load_sections() -> list[Section]:
+    """The listing's sections, from tools/tasks.py."""
+    from tools.tip import load
+    return load().sections()
 
 
-def parse(text: str) -> list[Section]:
-    """Sections in file order. The first holds any pre-heading target.
+def entries(sections: list[Section] | None = None,
+            ) -> list[tuple[str, str] | tuple[None, str]]:
+    """(task, doc) pairs, or (None, title) for a section heading.
 
-    A `##+ name name ...` line repeats targets defined elsewhere into
-    the section it sits in, at that point in the listing, so a target
-    can appear under every heading where someone would look for it
-    (`sync` under both Everyday and Code examples). Each name must be
-    a documented target defined in another section; a name with no
-    definition, or one already defined in this section, raises
-    SystemExit, since either means the Makefile says something the
-    listing cannot show.
-    """
-    sections = [Section("", "")]
-    pending: list[tuple[Section, int, str]] = []   # where each ##+ goes
-    lines = text.splitlines()
-    for i, line in enumerate(lines):
-        category = _CATEGORY.match(line)
-        if category:
-            title = category.group(1)
-            sections.append(Section(title.split()[0].lower(), title))
-            continue
-        repeat = _REPEAT.match(line)
-        if repeat:
-            section = sections[-1]
-            pending += [(section, len(section.targets), name)
-                        for name in repeat.group(1).split()]
-            continue
-        target = _TARGET.match(line)
-        if target:
-            sections[-1].targets.append(Target(
-                target.group(1), target.group(4), target.group(3) == "-",
-                notes=_notes(lines, i), recipe=_recipe(lines, i),
-                prereqs=tuple(target.group(2).split())))
-    _resolve(sections, pending)
-    return [s for s in sections if s.targets]
-
-
-def _resolve(sections: list[Section],
-             pending: list[tuple[Section, int, str]]) -> None:
-    """Insert each `##+` name's Target copy where its line sat.
-
-    Insertions go last-first within a section so an earlier index is
-    still right after a later one has been filled.
-    """
-    defined = {t.name: (s, t) for s in sections for t in s.targets}
-    for section, at, name in reversed(pending):
-        if name not in defined:
-            raise SystemExit(
-                f"make_help: `##+ {name}` under {section.title!r} names "
-                "no documented target. Check the spelling, or give the "
-                "target a `## doc` comment.")
-        home, target = defined[name]
-        if home is section:
-            raise SystemExit(
-                f"make_help: `##+ {name}` repeats a target inside its "
-                f"own section {section.title!r}; it is listed there "
-                "already.")
-        section.targets.insert(at, replace(target, repeat=True))
-
-
-def _notes(lines: list[str], at: int) -> str:
-    """The `#` comment block ending on the line above `lines[at]`.
-
-    A `##@` heading, a `##+` line, or anything that is not a comment
-    ends the block, so a blank line between the comment and the target
-    means no notes. A variable assignment (`WIDTH ?= 60`) between the
-    two is kept as the block's own last paragraph, since it names a
-    default the target honors.
-    """
-    block: list[str] = []
-    j = at - 1
-    while j >= 0:
-        line = lines[j]
-        if (line.startswith("#") and not line.startswith("##@")
-                and not line.startswith("##+")):
-            block.append(line[1:].removeprefix(" "))
-        elif _ASSIGNMENT.match(line) and not block:
-            block += [line.strip(), ""]
-        else:
-            break
-        j -= 1
-    block.reverse()
-    return "\n".join(block).strip("\n")
-
-
-def _recipe(lines: list[str], at: int) -> tuple[str, ...]:
-    """The tab-indented command lines under `lines[at]`, tabs stripped."""
-    recipe: list[str] = []
-    for line in lines[at + 1:]:
-        if not line.startswith("\t"):
-            break
-        recipe.append(line.lstrip("\t"))
-    return tuple(recipe)
-
-
-def entries(text: str) -> list[tuple[str, str] | tuple[None, str]]:
-    """(target, doc) pairs, or (None, title) for a `##@` heading.
-
-    The flat view, kept for verify_targets.py and sweep_checks.py. Includes
-    secondary targets, so hiding a row from the listing never hides it from
-    the smoke test, and leaves out `##+` repeats, so a target listed in
-    two sections is still one target to run.
+    The flat view, kept for verify_targets.py and sweep_checks.py.
+    Includes secondary tasks, so hiding a row from the listing never
+    hides it from the smoke test, and leaves out `also()` repeats, so a
+    task listed in two sections is still one task to run.
     """
     found: list[tuple[str, str] | tuple[None, str]] = []
-    for section in parse(text):
+    for section in load_sections() if sections is None else sections:
         if section.title:
             found.append((None, section.title))
         found.extend((t.name, t.doc) for t in section.targets
@@ -427,28 +300,19 @@ def _heading(section: Section, palette: Palette) -> str:
 
 
 def check(sections: list[Section]) -> None:
-    """Raise SystemExit on a duplicate slug or a slug that shadows a
-    target."""
-    named = [s for s in sections if s.slug]
-    slugs = [s.slug for s in named]
+    """Raise SystemExit when two sections share a slug."""
+    slugs = [s.slug for s in sections if s.slug]
     if duplicate := {s for s in slugs if slugs.count(s) > 1}:
         raise SystemExit(
-            f"make_help: two sections share the slug {sorted(duplicate)}. "
+            f"tip: two sections share the slug {sorted(duplicate)}. "
             "Reword one heading so its first word differs.")
-
-    targets = {t.name for s in sections for t in s.targets}
-    if shadowed := sorted(set(slugs) & targets):
-        raise SystemExit(
-            f"make_help: section slug {shadowed} is also a target name. "
-            "The Makefile's `help` guard would override that recipe; "
-            "reword the heading.")
 
 
 def render_section(section: Section, width: int | None = None,
                    palette: Palette = PLAIN,
                    times: Mapping[str, Timing] | None = None) -> str:
     """The heading line names the slug first (`style: Style gates`), so
-    the full listing doubles as the index of what `make help NAME` takes.
+    the full listing doubles as the index of what `tip help NAME` takes.
     `times` fills the time column; none means no column."""
     rows = _rows(section.listed(), width or terminal_width(), palette,
                  times)
@@ -464,7 +328,7 @@ def legend(width: int, palette: Palette = PLAIN) -> str:
 def render_all(sections: list[Section], width: int | None = None,
                palette: Palette = PLAIN,
                times: Mapping[str, Timing] | None = None) -> str:
-    """Every section expanded, in Makefile order: what `make` prints.
+    """Every section expanded, in tasks.py order: what `tip` prints.
 
     Secondary targets stay folded, as in a single section, since the doc
     text of the sibling that names them is right there above. With
@@ -494,9 +358,6 @@ def main(argv: list[str] | None = None) -> int:
         help="wrap doc text to this many columns (default: the terminal's, "
              f"capped at {MAX_WIDTH})")
     ap.add_argument(
-        "--makefile", type=Path, default=MAKEFILE,
-        help=f"Makefile to read (default: {MAKEFILE.name})")
-    ap.add_argument(
         "--color", choices=("auto", "always", "never"), default="auto",
         help="ANSI color: auto (default) colors only a terminal, and "
              "honors NO_COLOR and FORCE_COLOR")
@@ -506,7 +367,7 @@ def main(argv: list[str] | None = None) -> int:
              "stdin and stdout are a terminal and CI is unset")
     args = ap.parse_args(argv)
 
-    sections = parse(args.makefile.read_text(encoding="utf-8"))
+    sections = load_sections()
     check(sections)
     from tools.target_times import timings
     times = timings()
@@ -535,10 +396,8 @@ def main(argv: list[str] | None = None) -> int:
             rows = (help_picker.section_rows(match, times)
                     if match is not None
                     else help_picker.all_rows(sections, times))
-            # The menu reports a target's failure in its own output and
-            # a "(exited with status N)" line; exiting nonzero here too
-            # would only make the outer make add "*** [help] Error N",
-            # a line that points at the wrong recipe.
+            # The menu reports a task's failure in its own output and a
+            # "(exited with status N)" line, so the menu exits 0.
             help_picker.pick_and_run(rows, color=colored)
             return 0
 

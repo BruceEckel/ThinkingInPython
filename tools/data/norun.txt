@@ -11,8 +11,8 @@
 # or 31_Patterns--State_Machines/*gui*.py).
 # A "# extract: no-run" line inside a file does the same job inline.
 #
-# Both trees read this one file: `make run` matches these patterns against
-# build/examples/, and `make solutions-run` against build/solutions/. The
+# Both trees read this one file: `tip run` matches these patterns against
+# build/examples/, and `tip run` also against build/solutions/. The
 # chapter directories are named the same in both, so a pattern specific to
 # one tree must name a path that exists only there. Today none of them
 # collide.
@@ -23,9 +23,9 @@
 06_Foundations--Modules_and_Packages/a_package/module4.py
 06_Foundations--Modules_and_Packages/a_package/b_package/module6.py
 
-# Everything under the next header is started by `make by-hand`
+# Everything under the next header is started by `tip by-hand`
 # (tools/by_hand.py), all at once, for a human to try and close. The
-# header is a comment, so `make run` still skips these like any other
+# header is a comment, so `tip run` still skips these like any other
 # entry. A section ends at the next `# [name]` header or at the end of
 # the file. Keep entries that are not worth watching above this line.
 # [by-hand]

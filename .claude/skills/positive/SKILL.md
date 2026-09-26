@@ -139,8 +139,8 @@ Let the later passage carry it.
 
 ## Verify and report
 
-Touched prose gets `make reflow CH=NN` (Semantic Line Breaks),
-then `make verify`, then read `git diff Chapters/`:
+Touched prose gets `tip reflow CH=NN` (Semantic Line Breaks),
+then `tip verify`, then read `git diff Chapters/`:
 a changed `#:` marker means an edit strayed into code, so investigate it.
 Report per paragraph: the negation count before and after, and the
 negations kept with the reason each carries its own claim.

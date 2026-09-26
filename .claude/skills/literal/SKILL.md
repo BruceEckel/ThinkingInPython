@@ -170,8 +170,8 @@ The exception is *expect* in its typing sense
 
 ## Verify and report
 
-Touched prose gets `make reflow CH=NN` (Semantic Line Breaks),
-then `make verify`, then read `git diff Chapters/`:
+Touched prose gets `tip reflow CH=NN` (Semantic Line Breaks),
+then `tip verify`, then read `git diff Chapters/`:
 a changed `#:` marker means an edit strayed into code, so investigate it.
 Report the figures you replaced as before/after pairs,
 and separately list any you kept as documented terms

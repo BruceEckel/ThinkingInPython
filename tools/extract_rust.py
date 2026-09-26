@@ -28,8 +28,8 @@ state, not a throwaway tree, and no orphan detection yet either (unlike
 slug leaves its old file behind under ``rust/`` until removed by hand.
 
 Building and running the extracted crates needs cargo/rustc and is never
-done here, nor by the main build: see ``rust/README.md`` and
-``rust/Makefile`` (run ``make`` from inside ``rust/``).
+done here, nor by the main build: see ``rust/README.md`` and the
+``rust-*`` tasks in ``tools/tasks.py`` (``tip rust-all``).
 
 Default mode is ``check``: nothing is written, drift against the
 committed ``rust/`` tree is reported, and a non-zero exit signals

@@ -15,9 +15,9 @@ short of its target circle, as the hand-drawn figures leave a gap.
     uv run python -m tools.state_machine_figure --check    # report drift
 
 `--check` regenerates in memory and exits nonzero if the committed SVG
-differs; `make state-machine-figure` runs it in the gate, the way
-`make coupling-panels` guards the panels. After a spec edit, rasterize
-with `make figures` and look at the PNG in the gallery: nothing here
+differs; `tip state-machine-figure` runs it in the gate, the way
+`tip coupling-panels` guards the panels. After a spec edit, rasterize
+with `tip figures` and look at the PNG in the gallery: nothing here
 detects two labels colliding.
 
 Geometry, for editing the spec. A transition's curve is a quadratic

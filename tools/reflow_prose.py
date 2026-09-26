@@ -477,7 +477,7 @@ def main() -> int:
     if total_changed and not args.write:
         # Check mode is a gate: drift must fail, not just report. --write
         # has already fixed what it found, so it still succeeds.
-        print("Run `make reflow` to apply.")
+        print("Run `tip reflow` to apply.")
         return 1
     return 0
 

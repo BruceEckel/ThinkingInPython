@@ -7,9 +7,9 @@ that fail: connection errors, timeouts, and HTTP status >= 400. A HEAD
 request is tried first; servers that reject HEAD (405/403 or an error)
 get one GET retry, since many sites treat HEAD differently.
 
-This check is advisory and deliberately not part of ``make verify``.
+This check is advisory and deliberately not part of ``tip verify``.
 The network is flaky, sites rate-limit, and a dead external link should
-never block a build. Run it occasionally (``make links``) and prune or
+never block a build. Run it occasionally (``tip links``) and prune or
 update what it reports. Internal cross-references are the job of
 ``heading_links.py``, not this script.
 

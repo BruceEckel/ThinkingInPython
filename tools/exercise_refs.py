@@ -91,8 +91,8 @@ HEADER = (
     "# Solutions heading it points at, as last read by a human.\n"
     "# Tree/Chapter_Name<TAB>target Chapter_Name<TAB>number<TAB>\n"
     "# title, one per reference, sorted. Rewritten by\n"
-    "# `make exercise-refs-accept`; read the delta with\n"
-    "# `make exercise-refs` before accepting.\n"
+    "# `tip exercise-refs-accept`; read the delta with\n"
+    "# `tip exercise-refs` before accepting.\n"
     "# See tools/exercise_refs.py.\n"
 )
 
@@ -357,7 +357,7 @@ def main(argv: list[str] | None = None) -> int:
     if new:
         print("Reread each NEW sentence against the exercise under "
               "that title: fix the number, or "
-              "`make exercise-refs-accept`.")
+              "`tip exercise-refs-accept`.")
     return 1 if new or errors else 0
 
 

@@ -32,10 +32,10 @@ own return-code documentation names a different meaning for this exact
 code, disagreeing with the behavior actually observed, so this trusts
 the test over the docs.
 
-`make` and `git` are left alone: they are outside this project's
-control, and `make tools-check` already treats them as assumed.
+`git` is left alone: it is outside this project's control, and
+`tip tools-check` already treats it as assumed.
 
-For the pinned Python version itself, use `make python-upgrade`
+For the pinned Python version itself, use `tip python-upgrade`
 instead; this script only touches package versions, not the
 interpreter.
 

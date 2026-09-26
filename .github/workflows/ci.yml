@@ -55,7 +55,7 @@ jobs:
       - name: Build the static site
         run: uv run python -m tools.build_site
 
-      # Hovers and taps the built pages' links under jsdom (`make
+      # Hovers and taps the built pages' links under jsdom (`tip
       # preview-check` locally). The previews depend on the HTML this
       # runner's pandoc writes, which is not the pandoc that built the site
       # locally, so this is the one check that has to run here: a link into
@@ -148,7 +148,7 @@ jobs:
   # Prose checks, opt-in only (same trigger as the gates job). codespell fails
   # on spelling errors; Vale fails on em-dashes (an error-level rule) and prints
   # the warning-level house-style findings. These also run locally via
-  # `make spell` and `make prose`.
+  # `tip spell` and `tip prose`.
   prose:
     if: >-
       (github.event_name == 'workflow_dispatch' && inputs.run_gates) ||

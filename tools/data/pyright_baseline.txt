@@ -1,7 +1,7 @@
 # Pyright diagnostics the book accepts as disagreements with
 # ty. path<TAB>rule<TAB>message, one per occurrence, sorted.
-# Rewritten by `make pyright-accept`; read the delta with
-# `make pyright-review` before accepting.
+# Rewritten by `tip pyright-accept`; read the delta with
+# `tip pyright-review` before accepting.
 # See tools/pyright_review.py.
 build/examples/03_Foundations--Containers/frozendict_demo.py	reportCallIssue	No parameter named "theme"
 build/examples/03_Foundations--Containers/frozendict_demo.py	reportCallIssue	No parameter named "theme"

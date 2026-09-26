@@ -250,7 +250,7 @@ CHECK = Check(
     run=find,
     clean="Pattern names are capitalized and italic.",
     problem="{n} pattern name(s) not written as *Name*. "
-            "`make fix-pattern-names` rewrites them.",
+            "`tip fix-pattern-names` rewrites them.",
     fixer=fixed,
 )
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Run the everyday edit-and-check loop: every fixer, then the full gate.
 
-`make verify` is what to run after touching a chapter: every mutating
+`tip verify` is what to run after touching a chapter: every mutating
 fixer (the comment-style fixers, import sorting, blank-line cleanup), a
 refresh of the `#:` output markers, a sync of the committed Examples/ and
 SolutionsCode/ trees, the figure gallery, then the full gate. Each fixer
@@ -17,17 +17,17 @@ their own sync step already ran. Reversing that order (marker rewrite,
 then sync) is what makes a stale marker converge in this single run
 instead of needing the next one to catch up.
 
-VERIFY_TARGETS below is the single list to edit: add or remove a make
-target name there and both the run order and the --help listing update
-themselves, since the doc text is read straight from that target's own
-`## text` comment in the Makefile (the same one `make help` reads).
+VERIFY_TARGETS below is the single list to edit: add or remove a task
+name there and both the run order and the --help listing update
+themselves, since the doc text is read straight from that task's own
+one-line doc in tools/tasks.py (the same one `tip help` reads).
 Nothing else needs to change.
 
-Each target runs as its own `make <target>` subprocess, in order, with
+Each target runs as its own `tip <target>` subprocess, in order, with
 output streamed live rather than captured, so whatever a fixer or the
 gate finds shows up immediately. The run stops at the first failing
-target, matching how a single Makefile recipe's own sequential lines
-already behave.
+target, matching how a single task's own sequential steps already
+behave.
 
 Usage:
     python -m tools.verify            # run every target in VERIFY_TARGETS
@@ -38,13 +38,13 @@ import argparse
 import subprocess
 import time
 
-from tools.make_help import MAKEFILE, entries
+from tools.tip_help import entries
 from tools.config import ROOT
 from tools.target_times import record
-from tools.timed_make import format_seconds
+from tools.tip import format_seconds, nested_env, tip_argv
 
-# The everyday loop, in run order. Add a make target name here to include
-# it; its --help text is read from the Makefile automatically. The gate
+# The everyday loop, in run order. Add a task name here to include it;
+# its --help text is read from tools/tasks.py automatically. The gate
 # reflows prose itself (`reflow_prose --write`), so reflow is not a step.
 VERIFY_TARGETS: list[str] = [
     "fix-eol",
@@ -61,8 +61,7 @@ VERIFY_TARGETS: list[str] = [
 
 
 def _docs() -> dict[str, str]:
-    text = MAKEFILE.read_text(encoding="utf-8")
-    return {name: doc for name, doc in entries(text) if name is not None}
+    return {name: doc for name, doc in entries() if name is not None}
 
 
 def _listing(heading: str, names: list[str],
@@ -83,7 +82,7 @@ def _listing(heading: str, names: list[str],
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(
         description=__doc__,
-        epilog=_listing("make verify runs, in order:", VERIFY_TARGETS),
+        epilog=_listing("tip verify runs, in order:", VERIFY_TARGETS),
         formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.parse_args(argv)
 
@@ -92,7 +91,7 @@ def main(argv: list[str] | None = None) -> int:
     for name in VERIFY_TARGETS:
         print(f"-> {name}")
         start = time.monotonic()
-        proc = subprocess.run(["make", name], cwd=ROOT)
+        proc = subprocess.run(tip_argv(name), cwd=ROOT, env=nested_env())
         took[name] = time.monotonic() - start
         ran.append(name)
         if proc.returncode == 0:
@@ -101,7 +100,7 @@ def main(argv: list[str] | None = None) -> int:
             print(f"\n{name} failed (exit {proc.returncode}); stopping.\n")
             print(_listing("Ran:", ran, took))
             return proc.returncode
-    print("\nmake verify: every target passed.\n")
+    print("\ntip verify: every target passed.\n")
     print(_listing("Ran:", ran, took))
     return 0
 

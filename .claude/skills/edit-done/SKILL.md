@@ -60,14 +60,14 @@ Bruce approves. Do not shortcut its report.
 
 Bruce's edits can leave a stale `#:` marker, a paragraph that needs
 reflow, or a listing that no longer checks. Run the chapter-scoped
-loop, which is the same fixers and gates as `make verify` narrowed to
+loop, which is the same fixers and gates as `tip verify` narrowed to
 this chapter and its Solutions file, in a few seconds:
 
 ```
-make verify-ch CH=NN
+tip verify-ch CH=NN
 ```
 
-Use the whole-book loop instead, `make verify`, when the pass reached
+Use the whole-book loop instead, `tip verify`, when the pass reached
 outside the chapter. Two signs, both read from the diff in Step 2 with
 its path filter removed (`git diff --stat edit-start-NN`): a changed
 file under `Chapters/` or `Solutions/` that is not this chapter's, or

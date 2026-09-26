@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 """Record when the gate last passed, and whether the book changed since.
 
-`make gate` takes tens of seconds, so it is run occasionally rather than
+`tip gate` takes tens of seconds, so it is run occasionally rather than
 constantly, and after an editing session it is easy to lose track of whether
 the current text has ever been through it. This writes a stamp when the gate
 passes and reports on it afterwards:
 
-    make gate-status
+    tip gate-status
 
 The stamp is more than a timestamp. It records a hash of every
 ``Chapters/*.md`` and ``Solutions/*.md`` file, so the report can answer the
@@ -17,7 +17,7 @@ question that actually matters, which is not "when did the gate run" but
     3 files changed since: 23_Patterns--Iterators.md, 24_Patterns--Singleton.md, ...
 
 It lives in ``build/``, which is gitignored, so it never enters a commit or
-a diff. ``make clean-examples`` and friends remove only their own
+a diff. ``tip clean-examples`` and friends remove only their own
 subdirectories and leave it alone; a full ``rm -rf build`` drops it, which
 is correct, since a rebuilt-from-nothing tree deserves a fresh gate.
 
@@ -95,7 +95,7 @@ def changes(recorded: dict[str, str]) -> list[str]:
 def report() -> int:
     """Always succeeds: this answers a question, it does not gate anything."""
     if not STAMP.is_file():
-        print("No gate run recorded. Run `make gate`.")
+        print("No gate run recorded. Run `tip gate`.")
         return 0
     stamp: dict[str, Any] = json.loads(STAMP.read_text(encoding="utf-8"))
     when = datetime.fromisoformat(stamp["when"])

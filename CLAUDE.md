@@ -11,24 +11,25 @@ is a `# path/slug.py` comment is an extractable example. `Examples/` is **genera
 from the Markdown** by `tools/extract_examples.py`, so:
 
 - Edit the code **in the Markdown block**, never in `Examples/` directly.
-- After editing, sync the committed trees: `make sync`
+- After editing, sync the committed trees: `tip sync`
   (= `uv run python -m tools.extract_examples --write -o Examples` and
   the same for `extract_solutions` into `SolutionsCode/`).
 - `Examples/` also holds files with no Markdown block (hand-written helpers,
   `.idea/`, `__pycache__`). `tools/extract_examples.py`'s check mode (part of
-  `make check`/`gate`/`verify`/`ci`) flags these automatically: a stray file
+  `tip check`/`gate`/`verify`/`ci`) flags these automatically: a stray file
   whose name appears nowhere in `Chapters/` is *orphaned* and fails the gate;
   one still mentioned somewhere (a real hand-written helper) is *referenced*
-  and only reported, since deleting it needs a human call. `make prune`
+  and only reported, since deleting it needs a human call. `tip prune`
   deletes exactly the orphaned ones, under `Examples/` and `SolutionsCode/`
   both (a `utils/` helper rename orphans a file in each). A rename or
   deletion of a book example is the usual cause, so run this after either.
 
 ## Rust examples: rust/, isolated from the main build
 
-Chapter 18's Rust section has real PyO3/maturin crates under `rust/`. The root
-`Makefile` never enters `rust/` and never requires a Rust toolchain, so
-`verify`/`gate`/`all`/`ci` work with no Rust installed. Details: `rust/CLAUDE.md`.
+Chapter 18's Rust section has real PyO3/maturin crates under `rust/`. Only
+the `rust-*` tasks in `tools/tasks.py` enter `rust/` or need a Rust
+toolchain, so `verify`/`gate`/`ci` work with no Rust installed. Details:
+`rust/CLAUDE.md`.
 
 ## Cloud sessions: tools/cloud-setup.sh
 
@@ -42,11 +43,11 @@ own copy. It installs uv and Python 3.15, Vale, an SVG rasterizer,
 and pandoc from PyPI, apt, and the Go module proxy, because the
 session's GitHub proxy refuses release downloads from any repository
 not attached to the session, at every network access level, and
-`make tools-check-full`'s Linux lines for pandoc, typst, and Vale
+`tip tools-check-full`'s Linux lines for pandoc, typst, and Vale
 download exactly those. typst and gh stay out; the script's header
-says why. Check a change with `make tools-check-full` in the first new
+says why. Check a change with `tip tools-check-full` in the first new
 session. The VM is Linux, so the seeded-simulation trap below applies
-to any `#:` marker a cloud `make verify` rewrites.
+to any `#:` marker a cloud `tip verify` rewrites.
 
 ## Deep-reviewing a chapter
 
@@ -59,14 +60,14 @@ settling pass, run after a review is applied: it re-runs the same passes
 over the whole chapter but applies the confident findings directly and
 discards the rest unreported, with no review file.
 `/activate` (`.claude/skills/activate/SKILL.md`) is the active-register
-pass: it clears `make prose`'s passive-voice and there-is warnings and
+pass: it clears `tip prose`'s passive-voice and there-is warnings and
 cuts metadiscourse, empty frames, and expletive constructions; new
 passive-feeling phrasings Bruce flags accrue in its "Accrued patterns"
 section.
 `/literal`, `/positive`, `/straighten`, `/cohesion`, and `/antecedents`
 are the other prose passes.
-`make rewrite CH=NN` runs these five plus `elements-of-style` and `bruce-edit-apply` by
-default; `make rewrite ARGS=--list` shows the set and the model each
+`tip rewrite CH=NN` runs these five plus `elements-of-style` and `bruce-edit-apply` by
+default; `tip rewrite ARGS=--list` shows the set and the model each
 pass runs on. Each pass can name its own model in `tools/rewrite.py`'s
 `PASSES`; all resolve to `DEFAULT_MODEL`, Opus 5.5 since 2026-09-25
 (Fable 5 before, moved to spare Bruce's Fable usage, not on a new
@@ -92,7 +93,7 @@ row here when a new agent lands.
 |---|---|---|---|
 | clarity pass, straighten, clear passives, "make X clearer", "obscure/unclear sentences" on named files | `prose-clarity` | Opus | judgment work that edits the author's voice and verifies claims against listings; both Opus and Fable did it well in the 2026-09-01 Solutions sweep, Opus's reports were the more careful about what they left alone |
 | a list, a count, a location, a gate's output, what a listing prints | `repo-lookup` | Sonnet | read-only, no voice at stake, cheap |
-| `make rewrite` passes | (headless `claude -p`) | per pass, `tools/rewrite.py` `PASSES` | see `MODEL_NOTES` there |
+| `tip rewrite` passes | (headless `claude -p`) | per pass, `tools/rewrite.py` `PASSES` | see `MODEL_NOTES` there |
 | verify a chapter's factual claims against its listings and against the chapters it names | a fresh agent per chapter, report-only | Opus | verification fails by under-reading, not by over-editing, so `MODEL_NOTES`' result for the rewrite passes inverts here; in the 2026-09-02 calibration Opus found three real errors Fable read past, with zero false positives from either |
 | deep review of a chapter, thread audits, anything that decides what a chapter claims | the session model, or a `fork` | session | needs the conversation's context; a fresh agent cannot know what Bruce has already ruled on |
 
@@ -105,13 +106,13 @@ that, so forks are for work that needs the session's history.
 
 When Bruce says he is starting to edit a chapter, run `/edit-start NN`
 (`.claude/skills/edit-start/SKILL.md`). It places a local annotated git
-tag `edit-start-NN` on `HEAD`, records the chapter's baseline (`make
-check-ch`, `make reflow-check`, `validate_output`), and reports; it
+tag `edit-start-NN` on `HEAD`, records the chapter's baseline (`tip
+check-ch`, `tip reflow-check`, `validate_output`), and reports; it
 writes nothing under `Chapters/`. When he says he is done, run
 `/edit-done NN` (`.claude/skills/edit-done/SKILL.md`): it diffs from the
 tag to the working tree (so commits he made along the way and
 uncommitted edits are one pass), hands that diff to
-`/bruce-edit-capture`, runs `make verify-ch CH=NN` (or `make verify`
+`/bruce-edit-capture`, runs `tip verify-ch CH=NN` (or `tip verify`
 when the pass reached other chapters), commits what the loop changed,
 and deletes the tag. The tag is the only state: local, never pushed,
 `git tag -l 'edit-start-*'` lists the open passes. A `SessionStart`
@@ -135,18 +136,18 @@ are never re-proposed.
 
 ## The verify loop after editing a chapter
 
-Fastest path for one chapter is `make verify-ch CH=NN`
+Fastest path for one chapter is `tip verify-ch CH=NN`
 (`tools/verify_chapter.py`): the same fixers and gates as `verify`,
 scoped to that chapter and its Solutions file, in a few seconds. It
 reflows the chapter only, since the gate never reflows `Solutions/`,
 and it writes no gate stamp; a change that other chapters depend on
 (a renamed listing, a `utils/` helper, a linked heading) still needs
-the whole-book run. That run is `make verify`: fix line endings, every
+the whole-book run. That run is `tip verify`: fix line endings, every
 mutating fixer (the comment-style fixers, import sorting, blank-line
 cleanup), refresh the `#:` output markers in both trees, sync `Examples/`
 and `SolutionsCode/`, build the figure gallery, then every gate but the
 site build. Its ordered step list lives in `tools/verify.py`
-(`VERIFY_TARGETS`), and `make verify ARGS=--help` lists it without
+(`VERIFY_TARGETS`), and `tip verify ARGS=--help` lists it without
 running anything. Until 2026-09-24 this was two targets, `verify` without
 the fixers and `all` with them; `all` is gone, since every fixer repairs
 something the gate would otherwise fail on. The marker refresh runs
@@ -167,13 +168,13 @@ sequence is:
 
 Prose-only edits still need `heading_links.py` (cross-references),
 `banned_phrases.py`, and `check_self_reference.py` (claims the book makes
-about its own chapters); all three are in `make verify`. So is
+about its own chapters); all three are in `tip verify`. So is
 `check_quoted_diagnostics.py`: every quoted `ty` diagnostic's gutter
 lines are compared with the extracted listing, and the dozen quotes
 the book deliberately makes against an edited copy of a listing live
 in `tools/data/quoted_diagnostics_baseline.txt`. A NEW entry after a
 listing edit is a stale quote to requote, or a fresh deliberate edit
-to accept with `make quoted-diagnostics-accept`; `--all` lists every
+to accept with `tip quoted-diagnostics-accept`; `--all` lists every
 hit. `exercise_refs.py` (in the gate since 2026-09-20) does the same
 for prose that names an exercise by number: each "exercise N", "the
 second exercise", or "the previous exercise" in `Chapters/` and
@@ -182,12 +183,12 @@ and the pairs live in `tools/data/exercise_refs_baseline.txt`.
 Inserting or reordering an exercise changes the title under every
 later number, so every reference to one turns NEW and fails the gate.
 Reread each NEW sentence against the title printed beside it, fix the
-number or `make exercise-refs-accept`, and never accept without that
+number or `tip exercise-refs-accept`, and never accept without that
 read: chapter 30 carried five stale numbers for a day after commit
 a2cc5a98 inserted an exercise at 2, with every gate green. A new
-reference is NEW too, until accepted. `make verify-ch` sees only the
+reference is NEW too, until accepted. `tip verify-ch` sees only the
 references its two files make, so after moving an exercise run
-`make exercise-refs` over the book. `make verify`'s gate also
+`tip exercise-refs` over the book. `tip verify`'s gate also
 runs `validate_output.py --update` over all of `Chapters/` now, so a stale
 `#:` marker anywhere self-heals (rewriting `Chapters/`) instead of failing
 the build, the same way `fix-eol`/`sync` already self-heal other drift.
@@ -201,7 +202,7 @@ as a not-yet-filled-in placeholder and filled in, even without `--update`.
 
 `ty` is the only checker the gates run.
 Pyright's disagreements with `ty` live in `tools/data/pyright_baseline.txt`,
-and `make pyright-review` prints the delta;
+and `tip pyright-review` prints the delta;
 the `tool-upgrade` skill has the workflow and the history.
 Three rules hold everywhere:
 
@@ -232,8 +233,8 @@ A third rule, `grounding`, reports and never gates: a sentence links to a
 chapter that contains *none* of the code terms the sentence names. It
 finds the real thing (it catches chapter 07's case), and it also fires on
 31 sentences whose terms belong to the *linking* chapter, which a target
-has no reason to mention. `make self-reference-report` reads it, the same
-bargain `make claims` strikes. Do not promote it into the gate without
+has no reason to mention. `tip self-reference-report` reads it, the same
+bargain `tip claims` strikes. Do not promote it into the gate without
 first getting that count to zero.
 
 The rules are literal and under-report by design: a claim with no code
@@ -248,8 +249,8 @@ Responsibility*, `[*Template Method*](25_...)`. Names like State, Command,
 Bridge, and Proxy are ordinary words otherwise, so this is the exception
 to the global "italics only to introduce a term" rule. Headings stay
 plain, and the lowercase word keeps its ordinary sense ("an observer
-registers"). `tools/pattern_names.py` checks it (`make pattern-names`)
-and `make fix-pattern-names` rewrites the unambiguous cases; the names
+registers"). `tools/pattern_names.py` checks it (`tip pattern-names`)
+and `tip fix-pattern-names` rewrites the unambiguous cases; the names
 and the excluded phrases (`!State Machines`) are in
 `tools/data/pattern_names.txt`. State/Command/Bridge at a line start
 are listed only with `--sentence-start`, for a human to judge; the
@@ -263,9 +264,9 @@ A figure is an SVG in `resources/images/`, referenced as `![caption](_images/<na
 Never hand-edit a generated one:
 chapter 31's `stateMachine.svg` comes from `tools/state_machine_figure.py`,
 and every `coupling_*.svg` from `tools/coupling_panels.py`;
-edit the spec and run its `make fix-*` target.
+edit the spec and run its `tip fix-*` task.
 Load the `figures` skill (`.claude/skills/figures/SKILL.md`) before drawing or editing any figure.
-It holds the caption rules, the palette, the arrowheads, and what `make figures` checks.
+It holds the caption rules, the palette, the arrowheads, and what `tip figures` checks.
 
 ## `@record`: the book's frozen data class, from chapter 18 on
 
@@ -302,7 +303,7 @@ frozen data class in a listing is written `@record` with
   moves when a class becomes a record. Solutions 35 `exercise_2.py`
   went from a ratio near ten to near six.
 
-`tools/record_check.py` gates both directions (`make records`, in
+`tools/record_check.py` gates both directions (`tip records`, in
 `GATE_CHECKS` and in the Solutions checks since 2026-09-17): a
 `@dataclass(frozen=True)` whose bases are all slotted fails unless
 `tools/data/record_exceptions.txt` lists it, and a `@record` under a
@@ -310,7 +311,7 @@ base with no `__slots__` fails. A base it cannot see (imported from
 another listing) draws no finding, so it under-reports by design. The
 exceptions file is keyed by chapter *name* (`Rethinking_Objects`), not
 number, so a renumbering leaves it alone and a chapter rename does not.
-Run alone, `make records` also fails on an entry that matches nothing.
+Run alone, `tip records` also fails on an entry that matches nothing.
 Its `UNSLOTTED_LIBRARY` names Stateless's `Ability` and `Time`, and
 chapter 47 says in prose that `Ability` declares no `__slots__`; recheck
 both against `.venv/Lib/site-packages/stateless/` on a Stateless
@@ -379,8 +380,8 @@ and how it was measured.
   Markers otherwise sit directly after the statement that produced them, but a
   marker placed after the last import sits *inside* the import block, and ruff's
   `I001` ("Import block is un-sorted or un-formatted") fails the gate.
-  `validate_output.py` accepts either arrangement, so this surfaces at `make
-  lint`/`make verify`, a step after the edit looked correct. Close the import
+  `validate_output.py` accepts either arrangement, so this surfaces at `tip
+  lint`/`tip verify`, a step after the edit looked correct. Close the import
   block with its blank line first, then put the marker below it, directly above
   the code it precedes. Chapter 6's `package_only.py` was annealed into the
   hugging form and broke the build; its neighbors `using_packages.py` and
@@ -409,8 +410,8 @@ and how it was measured.
   marker as a red flag to investigate, not drift to accept.
 - **Chapter 19's `gil_threads.py` boolean flips under machine load, and
   widening its threshold would be wrong.** `thr > seq * 0.9` asserts "threads
-  bought no speedup," and `make verify` runs during back-to-back gates
-  (including inside `make release`, twice in a row) rewrote it to `False`,
+  bought no speedup," and `tip verify` runs during back-to-back gates
+  (including inside `tip release`, twice in a row) rewrote it to `False`,
   contradicting the prose one line below. Do not widen the band to make it
   robust: at `0.7` a genuinely 30%-faster threaded run would still report "no
   faster," hiding the exact regression the listing exists to catch. The fix
@@ -421,7 +422,7 @@ and how it was measured.
   so a flip fails validation loudly instead of rewriting the marker.
   Do not shrink the loop to make the script faster. At 200,000 iterations each timed round is ~0.075 s,
   about five Windows scheduler quanta (~15 ms), so one lost quantum is
-  a 20% error and the boolean flipped inside a quiet `make verify`;
+  a 20% error and the boolean flipped inside a quiet `tip verify`;
   at 1,000,000 a round is ~0.38 s and a quantum is 4%. The ratio
   itself is ~1.02 at either size, so the margin over 0.9 is thin and
   only the long measurement absorbs scheduler noise. The script's
@@ -466,10 +467,10 @@ and how it was measured.
   Orphaned python processes cause the same error: on 2026-09-03,
   worker/load-test processes left behind by subagents (ProcessPool
   workers, synthetic-load loops) held `build/examples/<chapter>` long
-  after their agents finished, and `make verify` died at the extract
+  after their agents finished, and `tip verify` died at the extract
   step. After a multi-agent run that executed listings, check
   `Get-Process python` before a verify and kill strays rooted in this
-  repo's `.venv`. Also: piping make through `tail` swallows its exit
+  repo's `.venv`. Also: piping `tip` through `tail` swallows its exit
   code; capture `$?` or redirect to a log instead.
 - **`run_examples.py` and `validate_output.py`: never pass a relative
   `--tree`.** It goes on `PYTHONPATH` and breaks once an example changes cwd.
@@ -504,21 +505,24 @@ and how it was measured.
 - **Anchors:** pandoc auto-slugs a heading (backticks/punctuation dropped, but `.`
   is kept). Give headings an explicit `{#id}` when the auto-slug would be ugly
   (e.g. anything containing `type[...]` or `__init__`). `heading_links.py` gates it.
-- **`make help` is self-documenting, not hand-written.** A
-  target needs a trailing `## text` comment on its own line (and to sit under the
-  right `##@ Name` heading) or it will not appear in `make help`. Bare `make`
-  and `make help` both list every section; `make help style` lists
-  one section.
-  Keep a target's `#` comment block directly above its line, with no blank line between,
-  since the picker's `?` help shows that block.
-  No section slug (the heading's first word, lowercased) may equal a target name,
-  which is why the sections are "Code examples" and "Writing and spelling"
-  rather than "Examples" and "Prose".
-  A new target goes in the section for its job, with a `##+` in Everyday if it becomes a daily command.
-  `tools/make_help.py`'s docstring covers the picker, `##-`, `##+`, and the time column.
+- **`tip help` is generated from `tools/tasks.py`, not hand-written.** A
+  task is a function under `@task("one-line doc")`, placed after the
+  `section("Name")` call it belongs under; the decorator's doc is the
+  listing row, the docstring is the long-form help the picker's `?`
+  shows, and the body is the recipe shown under it. Bare `tip`
+  and `tip help` both list every section; `tip help style` lists
+  one section (the slug is the heading's first word, lowercased, and
+  two sections may not share one).
+  A task whose Python name would shadow a step helper takes `name=`
+  (the `run` task is `def run_all(...)` with `name="run"`, since
+  `run()` is the helper that runs a command).
+  A new task goes in the section for its job, with an `also()` in Everyday if it becomes a daily command.
+  `secondary=True` folds a task out of the listing when a sibling's doc names it.
+  `tools/tip_help.py`'s docstring covers the listing and the time column,
+  `tools/help_picker.py`'s the picker.
   `tools/README.md`'s own "Commands" section deliberately does not re-list every
   target either (it did once, and went stale); it shows only the everyday few and
-  points to `make help` for the rest. Don't re-expand it into a full manual copy.
+  points to `tip help` for the rest. Don't re-expand it into a full manual copy.
 - **A new third-party dependency may not install on the pinned Python.**
   `requires-python` tracks a bleeding-edge version (currently 3.15, a beta at
   the time this was written), so a package can lack a wheel for it (source
@@ -542,7 +546,7 @@ and how it was measured.
   `built`; the one-word swap to `slots=True` without that died at import
   with "Announce: not an @event". The same goes for any registering
   decorator stacked *under* `@record`: it would see the pre-slots
-  class. None exists in the book, and `make records` would not catch
+  class. None exists in the book, and `tip records` would not catch
   one. Separately, `ty` 0.0.82 mistypes a direct call to a
   `dataclass_transform` function whenever the argument is typed
   `type[...]` rather than being a class literal: `record(Point)` reveals
@@ -577,32 +581,32 @@ and how it was measured.
   upgrade (`stateless-partial-handling-ty-support` in project memory
   has it) before trusting an alias there. Chapter 45 has no Effect
   signature, so this entry does not apply there.
-- **Never auto-run `make tools-upgrade` or `make python-upgrade`.** Both mutate
+- **Never auto-run `tip tools-upgrade` or `tip python-upgrade`.** Both mutate
   tracked files (`uv.lock`, and `.python-version`/`pyproject.toml` with `TO=`) and
   can invoke real system package managers (`winget`/`brew`). Only run them when
   the user explicitly asks for that specific run, not to "verify" a change.
-  `make tools-check[-full]`, `make tools-status`, and `make sweep` are all
+  `tip tools-check[-full]`, `tip tools-status`, and `tip sweep` are all
   safe to run freely (the first two are read-only; `sweep` writes only
   `build/`). The nag that `gate` prints when the tools are stale is a
   reminder for the author, not an instruction to you: never act on it by
   running an upgrade.
-- **`make gate` hides half its failures, and not the half you would guess.**
+- **`tip gate` hides half its failures, and not the half you would guess.**
   `solutions-gate` is a *prerequisite* of `gate`, so the entire Solutions
   half runs before gate's own recipe starts. One red `gate` after a
   wide-reaching change therefore shows the Solutions failures and hides
-  every `Chapters/` one behind them. Use `make sweep` (runs every check
+  every `Chapters/` one behind them. Use `tip sweep` (runs every check
   over both trees, reports all failures, exits nonzero if any failed)
   whenever the first failure is unlikely to be the only one. A tool
   upgrade is the standard case, and `tools-upgrade` now ends with it.
-- **A green `make sweep` does not mean the committed trees are current,
+- **A green `tip sweep` does not mean the committed trees are current,
   and does not mean the `#:` markers are right.** `sweep` runs checks,
   coupling-panels, solutions-numbering, ty, lint, run, and test, each
   over both build trees. It does *not* run `check` (the `Examples/` and
   `SolutionsCode/` drift check) or `output-check`. Editing a listing in
   either Markdown tree therefore leaves its committed copy stale behind
-  a green sweep, and a stale marker survives too. `make verify` covers
+  a green sweep, and a stale marker survives too. `tip verify` covers
   both, through `sync` and `output`. When iterating with `sweep`, run
-  `make check output-check` before believing the tree is clean.
+  `tip check output-check` before believing the tree is clean.
 - **A `#:` marker that measures memory or time is a claim about the
   process the gate runs it in, not about a standalone run.** Chapter
   35's `exercise_2.py` prints a `tracemalloc` peak ratio; standalone its
@@ -639,7 +643,7 @@ and how it was measured.
   endings and `#:` markers do; expect rewrapped lines in `git diff
   Chapters/` after a verify. A paragraph that fails reflow's round-trip
   check is skipped, reported, and still fails the gate, so a rewrite can
-  never silently change rendered output. `make reflow CH=NN` still
+  never silently change rendered output. `tip reflow CH=NN` still
   targets one chapter when iterating.
   Before writing a script to reflow prose across the book, check
   `tools/reflow_prose.py` first: it already masks inline code/links/footnotes,
@@ -681,14 +685,19 @@ and how it was measured.
   to that listing in the site and the EPUB at build time
   (`tools/listing_links.py`). Never write those links by hand in
   `Chapters/`; a plain code span is the source form.
-- The `Makefile` documents every gate and target (`make help`).
-  Every goal named on the command line runs in a child make under
-  `tools/timed_make.py` and ends with `make <goal>: 12.3s`; the
-  real rules sit inside `ifeq ($(TIMED),)`/`else`/`endif`, so a
-  new target goes inside that block, and `TIMED=0` bypasses the
-  wrapper. A tool that runs `make` from Python inherits `TIMED=1`
-  through `MAKEFLAGS` when it was itself started by make, so
-  `verify.py` and `sweep_checks.py` time their own steps.
+- `tip` replaces make (branch `explore-python-runner`, 2026-09-26):
+  `tools/tasks.py` holds every task and documents every gate
+  (`tip help`), and `tools/tip.py` runs them. `uv tool install
+  --editable .` puts `tip` on PATH, in its own environment outside
+  `.venv`; inside the repo `uv run tip ...` works with no install.
+  Variables keep make's form (`tip verify-ch CH=28`), each step runs
+  through `uv run` from the repo root and is echoed first, a task's
+  `deps` run once per invocation, and the first failing step stops the
+  run. Every goal named on the command line ends with
+  `tip <goal>: 12.3s`. Steps run with `TIP_NESTED=1`, and a nested
+  `tip` prints no timing line, so `verify.py` and `sweep_checks.py`
+  (which run each step as `python -m tools.tip NAME`) time their own
+  steps.
 - Detailed conventions and decisions are in project memory (`MEMORY.md` index).
 - `thinking-in-python-skill.md` (repo root) and
   `.claude/skills/thinking-in-python/SKILL.md` are duplicate copies of the

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""The arrow-key and mouse picker behind `make` and `make help`.
+"""The arrow-key and mouse picker behind `tip` and `tip help`.
 
-make_help.py parses the Makefile into sections of documented targets and
+tip_help.py reads tools/tasks.py into sections of documented tasks and
 prints them as text. When it is attached to a terminal it hands the same
 sections here instead, and this module shows them as a full-screen list:
 Up/Down (or PageUp/PageDown, Home/End) move the highlight, Enter runs the
@@ -13,12 +13,12 @@ name match when there is one, Backspace edits the query, and Esc clears
 it. The mouse works too: a click selects a row, a second click on the
 selected row runs it, and the wheel scrolls. `?` opens full help for the highlighted
 target: its doc line, the `#` comment block above it in the
-Makefile, and the recipe it runs, in place of the list. Up/Down (and
+task's function (its docstring), and the recipe it runs, in place of the list. Up/Down (and
 PageUp/PageDown, Home/End, the wheel) scroll the notes, Enter runs the
 target from there, and Esc, `?`, or Backspace returns to the list with
 the highlight where it was.
 
-Plain `make` and `make help` open every section; `make help style` opens
+Plain `tip` and `tip help` open every section; `tip help style` opens
 one. A target whose doc text mentions a variable (`CH=12`, `VERSION=1.0`,
 `ARGS=--help`) gets a one-line prompt for each before it runs, showing
 the doc's example; Enter leaves one out. `VERSION=` comes prefilled
@@ -29,13 +29,13 @@ replaces it.
 
 The picker runs in the terminal's alternate screen, so it vanishes on
 exit and the chosen target's output scrolls in the normal buffer. The
-command is echoed first (`$ make sweep`) and recorded for the shell's
+command is echoed first (`$ tip sweep`) and recorded for the shell's
 history, so Up-arrow can repeat it without the menu. Two routes, since
 a child process cannot add to a shell's live history itself. When
-MAKE_MENU_RECORD names a file, the command is appended there and the
-`make` wrapper in tools/menu_history.ps1 (PowerShell) or
+TIP_MENU_RECORD names a file, the command is appended there and the
+`tip` wrapper in tools/menu_history.ps1 (PowerShell) or
 tools/menu_history.sh (bash, zsh) feeds it to the shell's own history
-API after make returns, which is immediate. Otherwise the command is
+API after tip returns, which is immediate. Otherwise the command is
 appended to every shell history file that exists: PSReadLine's
 `ConsoleHost_history.txt` (merged in when PSReadLine next writes, so
 after your next command), `~/.zsh_history` (extended format when the
@@ -43,26 +43,22 @@ file uses it; SHARE_HISTORY or INC_APPEND_HISTORY sees it at once), and
 `~/.bash_history` (read at startup, so the next session). No history
 file is created, and cmd.exe keeps none. When the target finishes, a
 one-line prompt waits: Return reopens the menu with the highlight where
-it was and Esc quits. A failing target gets a "(make X exited with
-status N)" line first, and Ctrl-C during a run gets "(interrupted: make
+it was and Esc quits. A failing target gets a "(tip X exited with
+status N)" line first, and Ctrl-C during a run gets "(interrupted: tip
 X)" rather than a traceback; the menu itself exits 0 either way, since
-the target's own output has said what happened and a nonzero status
-would only make the outer make add an "Error" line naming the `help`
-recipe. MAKEFLAGS
-and MAKELEVEL are dropped from the child's environment: `make help` is
-itself a make recipe, and a sub-make would otherwise announce "Entering
-directory" around every run.
+the target's own output has said what happened. The target runs as a
+fresh top-level `tip` (this interpreter, `-m tools.tip`), so it prints
+its own timing line and records its time.
 
 Only the interactive loop needs a terminal. `Picker` takes prompt_toolkit's
 input and output objects, so the tests drive it with a pipe input and a
 dummy output and check which target came back.
 
-Usage: not run directly; make_help.py imports it. `python
-tools/make_help.py --pick never` skips it, `--pick always` forces it.
+Usage: not run directly; tip_help.py imports it. `tip help --pick
+never` skips it, `--pick always` forces it.
 """
 import os
 import re
-import shutil
 import subprocess
 import sys
 import time
@@ -85,9 +81,10 @@ from prompt_toolkit.output import Output
 from prompt_toolkit.shortcuts import prompt
 from prompt_toolkit.styles import Style
 
-from tools.make_help import (
+from tools.tip_help import (
     LEGEND, MAX_WIDTH, MIN_DOC, Section, Target, wrap_doc)
 from tools.config import ROOT
+from tools.tip import NESTED
 from tools.target_times import Timing
 
 if TYPE_CHECKING:
@@ -137,7 +134,7 @@ class Row:
 
 def section_rows(section: Section,
                  times: Mapping[str, Timing] | None = None) -> list[Row]:
-    """`make help style`: one section's heading and its listed targets,
+    """`tip help style`: one section's heading and its listed targets,
     each with its time when `times` knows it."""
     known = times or {}
     rows = [Row("heading", f"{section.slug}:", section.title)]
@@ -151,7 +148,7 @@ def section_rows(section: Section,
 
 def all_rows(sections: Sequence[Section],
              times: Mapping[str, Timing] | None = None) -> list[Row]:
-    """`make` and `make help`: every section, a blank line between, and
+    """`tip` and `tip help`: every section, a blank line between, and
     the time column's legend last when there is a column to explain."""
     rows: list[Row] = []
     for section in sections:
@@ -529,10 +526,10 @@ RECIPE_INDENT = "    "
 
 def notes_lines(target: Target, width: int) -> list[tuple[str, str]]:
     """What `?` shows for `target`, as (style, text) lines fitting
-    `width`: the name and doc line, the Makefile's comment block above
-    the target rewrapped paragraph by paragraph (a paragraph with an
+    `width`: the name and doc line, the task function's docstring
+    rewrapped paragraph by paragraph (a paragraph with an
     indented line is kept as written, since its layout is deliberate),
-    the prerequisite targets under "Prerequisites:", and the recipe
+    the task's deps under "Runs first:", and the recipe
     under "Runs:". A target with none of the three says so.
     """
     body = max(MIN_DOC, width - len(NOTES_INDENT))
@@ -551,7 +548,7 @@ def notes_lines(target: Target, width: int) -> list[tuple[str, str]]:
         lines += [("", NOTES_INDENT + text) for text in wrapped]
     if target.prereqs:
         lines.append(("", ""))
-        lines.append(("class:heading", "Prerequisites:"))
+        lines.append(("class:heading", "Runs first:"))
         lines += [("class:recipe", RECIPE_INDENT + text)
                   for text in wrap_doc(" ".join(target.prereqs),
                                        max(MIN_DOC, width - len(RECIPE_INDENT)))]
@@ -563,7 +560,7 @@ def notes_lines(target: Target, width: int) -> list[tuple[str, str]]:
     if not (target.notes or target.prereqs or target.recipe):
         lines.append(("", ""))
         lines.append(("class:dim", NOTES_INDENT
-                      + "(no notes, prerequisites, or recipe in the Makefile)"))
+                      + "(no notes, deps, or recipe in tools/tasks.py)"))
     return lines
 
 
@@ -585,10 +582,9 @@ def split_match(label: str, query: str) -> list[tuple[str, bool]]:
 
 
 _VARIABLE = re.compile(r"\b([A-Z][A-Z_]*)=([^\s,;)]*)")
-_DEFAULT = re.compile(r"^([A-Z][A-Z_]*)\s*[?:+]?=\s*(.*)$")
 
 # Variables a target's doc mentions that the menu should not ask about:
-# `make verify ARGS=--help` only lists what `verify` would run, which is
+# `tip verify ARGS=--help` only lists what `verify` would run, which is
 # not what someone picking `verify` from a menu should be asked every run.
 NO_PROMPT: dict[str, frozenset[str]] = {
     "verify": frozenset({"ARGS"}),
@@ -606,12 +602,11 @@ def variables(target: Target) -> list[tuple[str, str]]:
     return list(found.items())
 
 
-def make_command(target: Target,
-                 values: Mapping[str, str] | None = None) -> list[str]:
-    """The argv that runs `target`, with each non-empty `NAME=value`
-    from `values` appended in order."""
-    exe = shutil.which("make") or "make"
-    argv = [exe, target.name]
+def tip_command(target: Target,
+                values: Mapping[str, str] | None = None) -> list[str]:
+    """The `tip` words that run `target`: its name, then each non-empty
+    `NAME=value` from `values`, in order."""
+    argv = ["tip", target.name]
     for name, value in (values or {}).items():
         if value:
             argv.append(f"{name}={value}")
@@ -619,25 +614,15 @@ def make_command(target: Target,
 
 
 def variable_default(target: Target, name: str) -> str:
-    """The value a `NAME ?= value` (or `=`, `:=`) line in the target's
-    notes gives `name`, or "" when the Makefile sets no default there.
-    make_help keeps such an assignment, sitting between the comment
-    block and the target, as the notes' last paragraph, on its own;
-    only that paragraph is read, so a prose line that starts with
-    `ARGS=--tsv ...` never counts as a default."""
-    last = target.notes.rsplit("\n\n", 1)[-1]
-    if "\n" in last:  # a prose paragraph, not the assignment line
-        return ""
-    m = _DEFAULT.match(last)
-    if m and m.group(1) == name:
-        return m.group(2).strip()
-    return ""
+    """The value the task's `defaults=` gives `name`, or "" when it
+    gives none."""
+    return dict(target.defaults).get(name, "")
 
 
 def ask_variables(target: Target) -> dict[str, str]:
     """Prompt for each variable the target's doc mentions, prefilled
     with a guess where one exists, and saying what Enter does: accept
-    the guess, take the Makefile's default, run the whole book (CH),
+    the guess, take the task's default, run the whole book (CH),
     or leave the variable unset."""
     values: dict[str, str] = {}
     for name, example in variables(target):
@@ -748,12 +733,12 @@ def _zsh_extended(path: Path) -> bool:
     return bool(lines) and lines[-1].startswith(b": ")
 
 
-RECORD_VAR = "MAKE_MENU_RECORD"
+RECORD_VAR = "TIP_MENU_RECORD"
 
 
 def record_command(command: str, env: Mapping[str, str] | None = None,
                    home: Path | None = None) -> list[Path]:
-    """Record `command` for the shell: into the file MAKE_MENU_RECORD
+    """Record `command` for the shell: into the file TIP_MENU_RECORD
     names when a wrapper set it, else into the history files. The
     paths written."""
     settings: Mapping[str, str] = os.environ if env is None else env
@@ -772,11 +757,11 @@ INTERRUPTED = 130       # the conventional exit status after Ctrl-C
 
 
 def run_target(target: Target) -> int:
-    """Echo and run `make <target>` as a fresh top-level make, after
+    """Echo and run `tip <target>` as a fresh top-level tip, after
     recording the command for the shell history.
 
     Ctrl-C reaches every process on the console at once, so the target
-    and its make are already stopping when it lands here as a
+    and its tip are already stopping when it lands here as a
     KeyboardInterrupt; a one-line note replaces the traceback and the
     menu's Return/Esc prompt follows as usual. Ctrl-C at a variable
     prompt cancels the run before it starts.
@@ -786,19 +771,19 @@ def run_target(target: Target) -> int:
     except KeyboardInterrupt:
         print("\n(cancelled)")
         return INTERRUPTED
-    argv = make_command(target, values)
-    command = f"make {' '.join(argv[1:])}"
+    words = tip_command(target, values)
+    command = " ".join(words)
+    argv = [sys.executable, "-m", "tools.tip", *words[1:]]
     record_command(command)
     print(f"$ {command}", flush=True)
-    env = {k: v for k, v in os.environ.items()
-           if k not in ("MAKEFLAGS", "MFLAGS", "MAKELEVEL")}
+    env = {k: v for k, v in os.environ.items() if k != NESTED}
     try:
         status = subprocess.call(argv, cwd=ROOT, env=env)
     except KeyboardInterrupt:
         print(f"\n(interrupted: {command})")
         return INTERRUPTED
     except OSError as e:
-        print(f"could not run make: {e}", file=sys.stderr)
+        print(f"could not run tip: {e}", file=sys.stderr)
         return 1
     if status:
         print(f"({command} exited with status {status})")
@@ -831,7 +816,7 @@ def session(pick: Callable[[int | None], tuple[Target | None, int]],
             run: Callable[[Target], int],
             ask: Callable[[], bool]) -> int:
     """The menu loop, with its three interactions injected so it can be
-    tested without a terminal or a make.
+    tested without a terminal or a tip.
 
     `pick(cursor)` shows the menu highlighted at `cursor` (None for the
     first target) and returns the chosen target (None to quit) and the

@@ -1,10 +1,10 @@
 #!/usr/bin/env python
-"""How long each make target takes, for the help listing to show.
+"""How long each tip task takes, for the help listing to show.
 
 Two sources, the first preferred:
 
 * `build/target_times.json`, this machine's last successful run of each
-  target, written by everything that already times a run: timed_make.py
+  target, written by everything that already times a run: tip.py
   (every goal named on a command line), verify.py and sweep_checks.py
   (each of their steps), and verify_targets.py (every target it runs).
   It is under build/, so gitignored: a fresh clone starts empty.
@@ -30,7 +30,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from tools.config import ROOT
-from tools.timed_make import format_seconds
+from tools.tip import format_seconds
 
 CACHE = ROOT / "build" / "target_times.json"
 BASELINE = ROOT / "tools" / "data" / "target_tiers.txt"
@@ -44,9 +44,9 @@ TIERS: tuple[tuple[str, float], ...] = (
 )
 
 _HEADER = """\
-# How long each make target takes, as a tier: quick (under 5 s),
+# How long each tip task takes, as a tier: quick (under 5 s),
 # normal (under 30 s), long (under 2 min), very long. Written by
-# `make verify-targets` from its own measurements; a line for a target
+# `tip verify-targets` from its own measurements; a line for a target
 # that run never executes is kept as it was. The help listing shows
 # this tier for a target this machine has not run yet, and the
 # measured seconds (build/target_times.json) once it has.
@@ -145,7 +145,7 @@ def short(seconds: float) -> str:
 def main() -> int:
     known = timings()
     if not known:
-        print("No timings yet: run a target, or `make verify-targets`.")
+        print("No timings yet: run a target, or `tip verify-targets`.")
         return 0
     width = max(len(n) for n in known)
     for name in sorted(known):

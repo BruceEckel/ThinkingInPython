@@ -302,7 +302,10 @@ wheels = [
 [[package]]
 name = "thinking-in-python"
 version = "0"
-source = { virtual = "." }
+source = { editable = "." }
+dependencies = [
+    { name = "prompt-toolkit" },
+]
 
 [package.dev-dependencies]
 dev = [
@@ -310,7 +313,6 @@ dev = [
     { name = "hypothesis" },
     { name = "numpy" },
     { name = "pillow" },
-    { name = "prompt-toolkit" },
     { name = "pyright" },
     { name = "pyspellchecker" },
     { name = "pytest" },
@@ -322,6 +324,7 @@ dev = [
 ]
 
 [package.metadata]
+requires-dist = [{ name = "prompt-toolkit", specifier = ">=3.0.53" }]
 
 [package.metadata.requires-dev]
 dev = [
@@ -329,7 +332,6 @@ dev = [
     { name = "hypothesis", specifier = ">=6.155.7" },
     { name = "numpy", specifier = ">=2.5.2" },
     { name = "pillow", specifier = ">=12.3.0" },
-    { name = "prompt-toolkit", specifier = ">=3.0.53" },
     { name = "pyright", specifier = ">=1.1.414" },
     { name = "pyspellchecker" },
     { name = "pytest" },

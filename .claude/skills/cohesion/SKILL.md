@@ -156,7 +156,7 @@ at the head of the next paragraph, whose topic it shares.
 - **Semantic Line Breaks.**
   A rewritten sentence goes on its own line,
   breaking at top-level commas when it is long;
-  `make reflow CH=NN` settles the rest.
+  `tip reflow CH=NN` settles the rest.
 - **Headings stay** unless the section is already being edited;
   a renamed heading changes its anchor.
 - **Check the exemption records first.**
@@ -167,8 +167,8 @@ at the head of the next paragraph, whose topic it shares.
 
 ## Verify and report
 
-Touched prose gets `make reflow CH=NN` (Semantic Line Breaks),
-then `make verify`, then read `git diff Chapters/`:
+Touched prose gets `tip reflow CH=NN` (Semantic Line Breaks),
+then `tip verify`, then read `git diff Chapters/`:
 a changed `#:` marker means an edit strayed into code, so investigate it.
 Report each changed paragraph as its topic string before and after
 (the column of subjects), which is the evidence that the edit helped.

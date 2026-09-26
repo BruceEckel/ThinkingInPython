@@ -63,14 +63,14 @@ class Check:
     """One named check: how to run it, and what to say about the result.
 
     Bundling the messages with the function is what lets a check be run
-    two ways from one definition: as its own command (`make banned`), and
+    two ways from one definition: as its own command (`tip banned`), and
     as one of many inside a single runner that parses each file once.
     Without it the wording would have to be duplicated in both places and
     would drift.
     """
 
     name: str
-    """The command-line name, matching the make target: "comment-periods"."""
+    """The command-line name, matching the tip task: "comment-periods"."""
 
     doc: str
     """One line describing what the check enforces, for --list."""

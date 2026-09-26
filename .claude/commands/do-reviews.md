@@ -26,7 +26,7 @@ finishing each apply before starting the next, so edits cannot collide.
    unprefixed `[[Reviewed]]` file that has not been applied yet, go back
    to step 1 and work through it the same way. Repeat until a full rescan
    of both directories turns up no remaining `[[Reviewed]]` files.
-4. When every file is applied, remind Bruce to run `make verify` once,
+4. When every file is applied, remind Bruce to run `tip verify` once,
    rather than after each file.
 
 If neither directory holds a `[[Reviewed]]` file, say so and stop.

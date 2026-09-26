@@ -71,12 +71,12 @@ so it is the kind of thing a confident annealing pass would "fix" on sight.
 A new listing gets the full treatment
 (fenced block with `# slug.py` first line, deterministic markers
 or wide-margin threshold booleans, sync, gates);
-touched prose gets `make reflow CH=NN`.
-Finish with `make verify` and read `git diff Chapters/` afterward:
+touched prose gets `tip reflow CH=NN`.
+Finish with `tip verify` and read `git diff Chapters/` afterward:
 a timing marker that flipped is a finding to investigate,
 not drift to accept.
 
 **Report.** The final message lists each applied change in a sentence,
-with its reason, plus the `make verify` outcome.
+with its reason, plus the `tip verify` outcome.
 If nothing cleared the bar, say the chapter annealed clean.
 Bruce reviews the diff and commits himself.

@@ -6,7 +6,7 @@ from its position, `font-size`, `text-anchor`, and character count
 without rendering anything. `text_boxes()` estimates each box;
 `clipped()` names the text that crosses the `viewBox` edge, which a
 browser and the EPUB's rasterizer both cut off; `collisions()` names
-pairs of text whose boxes overlap. `make figures`
+pairs of text whose boxes overlap. `tip figures`
 (`tools/figure_gallery.py`) fails on either.
 
 The estimate is deliberately plain: the box runs from 0.75 em above the

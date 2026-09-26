@@ -111,9 +111,9 @@ def main() -> int:
         clean="Listing filenames are unique across chapters.",
         problem=(
             "{n} listing filename collision(s). Rename one side to "
-            "something distinctive, then run `make sync` and delete the "
+            "something distinctive, then run `tip sync` and delete the "
             "stale file under Examples/ (a name still used elsewhere is "
-            "reported as 'referenced', so `make prune` leaves it)."
+            "reported as 'referenced', so `tip prune` leaves it)."
         ),
     )
 

@@ -42,7 +42,7 @@ Usage:
     uv run python -m tools.figure_gallery --open    # and open it
     uv run python -m tools.figure_gallery --no-png  # skip rasterizing
 
-`make figures` is the one-command form and `make verify` runs it, so the
+`tip figures` is the one-command form and `tip verify` runs it, so the
 gallery tracks the working tree. A figure the prose references with no
 file under `resources/images/` fails the build, since the book would
 render nothing there, and so does a nonstandard arrowhead; a file no

@@ -15,10 +15,11 @@ both first-line comments in a fenced block:
   `run_examples.py`), since the compiled module it imports does not exist
   in the main build's environment.
 
-This is deliberate: the root `Makefile` never enters `rust/` and never
-requires a Rust toolchain, so `verify`/`gate`/`all`/`ci` all work with no
-Rust installed. Only `cd rust && make` (a separate `Makefile` there) syncs,
-builds, and runs the crates for real; see `rust/README.md`. A crate
+This is deliberate: only the `rust-*` tasks in `tools/tasks.py` enter
+`rust/` or require a Rust toolchain, so `verify`/`gate`/`ci` all work
+with no Rust installed. `tip rust-all` syncs, builds, and runs the
+crates for real, and `verify-targets` never runs the `rust-*` tasks;
+see `rust/README.md`. A crate
 directory also holds real, hand-maintained project files
 (`Cargo.toml`, `pyproject.toml`, `.python-version`, `.gitignore`,
 scaffolded once by `maturin new --bindings pyo3 <name>`) that

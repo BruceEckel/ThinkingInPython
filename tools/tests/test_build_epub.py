@@ -250,7 +250,7 @@ def test_release_stamp_becomes_the_metadata_date() -> None:
     assert "Release 1.0" in metadata_yaml("1.0")
 
 def test_without_a_release_the_date_stays_the_copyright_year() -> None:
-    # An ad-hoc `make epub`/`make pdf` must not masquerade as a
+    # An ad-hoc `tip epub`/`tip pdf` must not masquerade as a
     # numbered release.
     assert 'date: "2026"' in metadata_yaml()
     assert "Release" not in metadata_yaml()

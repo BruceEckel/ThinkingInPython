@@ -29,7 +29,7 @@ only the opening line of a multi-line HTML comment; this walk tracks the rest of
 the comment the way it tracks a fence.
 
 Exit status is non-zero if any issue is found, so it works as a gate. It is run
-as part of `make spell`.
+as part of `tip spell`.
 
 Usage:
     python -m tools.prose_lint                 # all of Chapters/
@@ -228,7 +228,7 @@ def find(doc: Document) -> Iterator[Finding]:
 
 
 CHECK = Check(
-    # Not "prose": `make prose` already means the Vale house-style lint,
+    # Not "prose": `tip prose` already means the Vale house-style lint,
     # and these are two different tools with two different rule sets.
     name="prose-lint",
     doc="prose has no double spaces, stray whitespace or misplaced punctuation",

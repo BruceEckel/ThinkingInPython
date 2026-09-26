@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 """Run the verify loop for one chapter and its Solutions file.
 
-`make verify` fixes line endings, refreshes every `#:` marker, syncs both
+`tip verify` fixes line endings, refreshes every `#:` marker, syncs both
 generated trees, and runs the whole gate: tens of seconds, nearly all of
 it spent on chapters you did not touch. After editing one chapter this
 runs the same loop scoped to that chapter and its Solutions file:
 
-    make verify-ch CH=28        # or CH=28_Patterns--Function_Objects
+    tip verify-ch CH=28        # or CH=28_Patterns--Function_Objects
 
 The steps, in order, mirror `verify` (fixers first, markers before sync):
 
@@ -26,7 +26,7 @@ The steps, in order, mirror `verify` (fixers first, markers before sync):
 5. Sync ``Examples/`` and ``SolutionsCode/`` from the Markdown, then the
    drift and orphan checks over both.
 6. The Markdown gates: ``check_all`` on the chapter (every gate check, or
-   the ``--checks`` list the Makefile passes from ``GATE_CHECKS``),
+   the ``--checks`` list tools/tasks.py passes from ``GATE_CHECKS``),
    ``anchors`` and ``widths`` on the Solutions file, quoted ``ty``
    diagnostics in both, prose references to numbered exercises in
    both (the ones these two files make; a reference another chapter
@@ -37,7 +37,7 @@ The steps, in order, mirror `verify` (fixers first, markers before sync):
 
 Everything after step 3 runs even when an earlier step fails, so one pass
 reports every problem. It does not write the gate stamp: it checks one
-chapter, not the book, and `make verify` is still the pre-commit run
+chapter, not the book, and `tip verify` is still the pre-commit run
 after a change that could reach other chapters (a renamed listing, a
 shared ``utils/`` helper, a heading another chapter links to).
 """
@@ -54,7 +54,7 @@ NO_TESTS_COLLECTED = 5  # pytest's exit code for an empty directory
 SOLUTIONS_DIR = ROOT / "Solutions"
 SOLUTIONS_TREE = BUILD_DIR / "solutions"
 # The Solutions checks the gate runs through check_all (its `banned` and
-# listing checks stay off Solutions/ for the reasons the Makefile gives).
+# listing checks stay off Solutions/ for the reasons tools/tasks.py gives).
 SOLUTIONS_CHECKS = ["anchors", "widths", "records"]
 
 
@@ -151,7 +151,7 @@ def main(argv: list[str] | None = None) -> int:
     failed = results.count(False)
     print(f"\n{len(results) - failed} passed, {failed} failed")
     if failed:
-        print("Run `make verify` before committing: this checks one"
+        print("Run `tip verify` before committing: this checks one"
               " chapter, not the book.")
     return 1 if failed else 0
 

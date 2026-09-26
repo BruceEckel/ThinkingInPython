@@ -9,7 +9,7 @@ description: Apply the promoted rules in `bruce_edit_db.md` to chapter prose, wi
 stores them in `bruce_edit_db.md`. This pass applies them.
 
 Deducing a rule is cheap and reversible. Applying one across 47 chapters is
-where the damage is, and prose damage here is invisible to tooling: `make
+where the damage is, and prose damage here is invisible to tooling: `tip
 prose`, `banned_phrases.py`, and Vale catch none of "a half-right rule fired
 on 300 sentences", and a book-wide prose diff is too large to read honestly.
 The structure below exists to keep every sweep small enough to review.
@@ -85,7 +85,7 @@ sightings show Bruce making.
   conflict to report, not an edit to make.
 - **Headings have their own rule.** Renaming one changes its pandoc anchor, so
   grep all of `Chapters/` for the old slug and fix every cross-reference.
-  `heading_links.py` in `make verify` catches a missed one.
+  `heading_links.py` in `tip verify` catches a missed one.
 
 ## Firing counts, and when to stop
 
@@ -117,8 +117,8 @@ two examples and the sites are the population it was induced about.
 Prose edits break Semantic Line Breaks, and prose-only changes still touch
 cross-references and banned phrases:
 
-1. `make reflow CH=NN` for each chapter touched.
-2. `make verify`.
+1. `tip reflow CH=NN` for each chapter touched.
+2. `tip verify`.
 3. Read `git diff Chapters/`. A changed `#:` marker means an edit reached
    code; investigate it rather than accepting it.
 

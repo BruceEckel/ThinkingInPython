@@ -1642,8 +1642,8 @@ In this repo, file mode has extra constraints.
 Never touch a fenced ```python block:
 those are extracted to `Examples/` and gated.
 Keep Semantic Line Breaks in `Chapters/*.md`
-(one sentence per line), or `make reflow` will churn the diff.
-After rewriting a chapter, remind Bruce to run `make verify`.
+(one sentence per line), or `tip reflow` will churn the diff.
+After rewriting a chapter, remind Bruce to run `tip verify`.
 
 **Embedded mode.**
 Another task or agent is using this skill as one step of a larger job
@@ -1806,7 +1806,7 @@ When Bruce hands the file back with an instruction like
 3. Rename the review file to the next name in the completed-review series (see
    Successive reviews), which adds the leading `~` the file's own instruction
    calls for. Use `git mv` when the file is tracked. The `~` marks it done.
-4. Remind Bruce to run `make verify`.
+4. Remind Bruce to run `tip verify`.
 
 **Which variant to apply.**
 A live block that offers several fixes gets the one the block recommends,

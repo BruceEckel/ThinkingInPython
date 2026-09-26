@@ -15,7 +15,7 @@ Update, as appropriate:
 Rules:
 
 - Capture only what is durable and non-obvious. Skip anything already recorded, or
-  that the repo, git history, `tools/*.py` docstrings, or the `Makefile` already
+  that the repo, git history, `tools/*.py` docstrings, or `tools/tasks.py` already
   make clear.
 - Prefer updating an existing file over creating a near-duplicate; delete entries
   that turn out to be wrong.

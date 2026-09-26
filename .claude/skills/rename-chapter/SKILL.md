@@ -18,8 +18,8 @@ Moved from `CLAUDE.md`'s Traps. The filename convention itself (`NN_<Part>--<Cha
   trips it the same way),
   `tools/data/record_exceptions.txt` and
   `tools/data/exercise_refs_baseline.txt` (both keyed by chapter name,
-  so a rename only; after one, `make exercise-refs` shows each pair as
-  GONE plus NEW, and `make exercise-refs-accept` settles it), the
+  so a rename only; after one, `tip exercise-refs` shows each pair as
+  GONE plus NEW, and `tip exercise-refs-accept` settles it), the
   `README.md` tracking table,
   `deep_review_db.md`/`readability_db.md`/`bruce_edit_db.md`, and any
   `tools/tests/` fixture naming a chapter. Appendices use letter prefixes

@@ -2,8 +2,8 @@
 # Solutions heading it points at, as last read by a human.
 # Tree/Chapter_Name<TAB>target Chapter_Name<TAB>number<TAB>
 # title, one per reference, sorted. Rewritten by
-# `make exercise-refs-accept`; read the delta with
-# `make exercise-refs` before accepting.
+# `tip exercise-refs-accept`; read the delta with
+# `tip exercise-refs` before accepting.
 # See tools/exercise_refs.py.
 Chapters/Changing_the_Interface	Changing_the_Interface	1	A dict-style lookup over a list of pairs
 Chapters/Composite_and_Interpreter	Composite_and_Interpreter	2	A `Symlink` node

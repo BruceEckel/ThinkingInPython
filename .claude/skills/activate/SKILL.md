@@ -1,6 +1,6 @@
 ---
 name: activate
-description: Rewrite prose into the active, in-the-moment register: clear the passive-voice, there-is, weak-verb, and nominalization warnings from `make prose`, and fix what Vale cannot see (abstract subjects, tense drift, padded verb phrases, metadiscourse, empty frames). Use when asked to activate a chapter (or the whole book). The argument names chapters by number or name; no argument means all of Chapters/.
+description: Rewrite prose into the active, in-the-moment register: clear the passive-voice, there-is, weak-verb, and nominalization warnings from `tip prose`, and fix what Vale cannot see (abstract subjects, tense drift, padded verb phrases, metadiscourse, empty frames). Use when asked to activate a chapter (or the whole book). The argument names chapters by number or name; no argument means all of Chapters/.
 ---
 
 # Activating prose: characters as subjects, actions as verbs
@@ -16,22 +16,22 @@ the action hiding in a noun, the subject an abstraction,
 the tense pushed into a distancing "will."
 This skill is the cleanup pass for the whole register.
 It has two sources of findings:
-the mechanical warnings `make prose` reports,
+the mechanical warnings `tip prose` reports,
 and a read-through for the constructions no linter catches.
 The pass edits `Chapters/NN_*.md` prose only;
 code blocks, `#:` output markers, and quoted material stay untouched.
 
 ## Step 1: collect the mechanical findings
 
-Run `make prose CH=NN` (one chapter) or `make prose` (whole book);
+Run `tip prose CH=NN` (one chapter) or `tip prose` (whole book);
 it needs the standalone `vale` binary.
 Collect the `write-good.Passive` and `write-good.ThereIs` hits,
 plus the three House rules this skill added:
 `House.WeakVerb` (is used to, serves to, is responsible for, acts as),
 `House.Nominalization` (weak verb + article + a curated noun list,
 plus "takes place"), and `House.InOrderTo`.
-`make prose` is not part of any gate,
-so a clean `make verify` says nothing about these warnings.
+`tip prose` is not part of any gate,
+so a clean `tip verify` says nothing about these warnings.
 
 ## Step 2: read for what Vale misses
 
@@ -382,7 +382,7 @@ is a teaching addition for a deep review, not this pass.
   so "A Value You Must Check Everywhere" became "A Value to Check Everywhere".
   A renamed heading changes its pandoc anchor;
   grep all of `Chapters/` for the old slug and update every cross-reference.
-  `heading_links.py` (in `make verify`) catches a missed one.
+  `heading_links.py` (in `tip verify`) catches a missed one.
 - **Meaning outranks activeness.**
   If the active rewrite says more than the original claimed
   (a hedged "can cause" that really is conditional, for example),
@@ -390,10 +390,10 @@ is a teaching addition for a deep review, not this pass.
 
 ## Verify and report
 
-Touched prose gets `make reflow CH=NN` (Semantic Line Breaks),
-then `make verify`, then read `git diff Chapters/`:
+Touched prose gets `tip reflow CH=NN` (Semantic Line Breaks),
+then `tip verify`, then read `git diff Chapters/`:
 a changed `#:` marker means an edit strayed into code, so investigate it.
-Re-run `make prose CH=NN` and confirm the Passive/ThereIs count dropped;
+Re-run `tip prose CH=NN` and confirm the Passive/ThereIs count dropped;
 list any warning deliberately kept, with its reason.
 Bruce reviews the diff and commits himself.
 

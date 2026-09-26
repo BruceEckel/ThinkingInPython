@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Smoke-test every documented `make` target: run it, confirm it exits 0.
+"""Smoke-test every documented `tip` task: run it, confirm it exits 0.
 
-The target list comes straight from the Makefile (via make_help.entries),
+The target list comes straight from tools/tasks.py (via tip_help.entries),
 so a target added there is picked up here automatically, with no separate
 list to keep in sync. A handful of targets never run, regardless of tier:
 
@@ -35,9 +35,9 @@ since they remove build/, which holds this script's own logs. That worktree refl
 commit, not any uncommitted changes, so it tests each target's own wiring
 rather than whether running it right now would leave your draft clean.
 
-An advisory target reports findings by exiting nonzero, and make turns
-every recipe failure into exit 2, so its exit code cannot tell a finding
-from a crash. `links` is one: a site's bad afternoon would otherwise turn
+An advisory target reports findings by exiting nonzero, and a crash
+exits nonzero too, so its exit code cannot tell a finding from a
+crash. `links` is one: a site's bad afternoon would otherwise turn
 this run red. For such a target, ADVISORY names the line its script
 prints once it has run to completion; a nonzero exit with that line in
 the output passes, and the findings are shown as a note in the summary
@@ -70,7 +70,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import cast
 
-from tools.make_help import MAKEFILE, entries
+from tools.tip import tip_argv
+from tools.tip_help import entries
 from tools.config import ROOT
 from tools import target_times
 
@@ -95,6 +96,9 @@ EXCLUDED: dict[str, str] = {
     "verify-ch": "needs a CH= chapter selector this smoke test cannot supply",
     "pyright": "the raw run prints the baseline disagreements with ty and "
                "exits nonzero by design; pyright-review is the check",
+    **{name: "needs a Rust toolchain, which no other task requires"
+       for name in ("rust-all", "rust-sync", "rust-build", "rust-test",
+                    "rust-clean")},
 }
 
 # name -> the completion line an advisory target prints last, whatever
@@ -131,13 +135,15 @@ class Result:
 
 
 def documented_targets() -> list[str]:
-    """Every target with a `## text` doc comment, in Makefile order."""
-    text = MAKEFILE.read_text(encoding="utf-8")
-    return [name for name, _ in entries(text) if name is not None]
+    """Every task in tools/tasks.py, in listing order."""
+    return [name for name, _ in entries() if name is not None]
 
 
 def run_target(name: str, cwd: Path, timeout: float) -> Result:
-    """Run `make <name>` in `cwd`, logging its output. Returns a Result."""
+    """Run `tip <name>` in `cwd`, logging its output. Returns a Result.
+
+    `python -m tools.tip` puts `cwd` first on sys.path, so a run in the
+    disposable worktree uses that checkout's tools/ and tasks."""
     # A parent VIRTUAL_ENV pointing at this repo's .venv makes uv print a
     # harmless but noisy mismatch warning when cwd is a different checkout
     # (the disposable worktree); drop it so uv resolves cwd's own venv.
@@ -145,7 +151,7 @@ def run_target(name: str, cwd: Path, timeout: float) -> Result:
     start = time.monotonic()
     try:
         proc = subprocess.run(
-            ["make", name], cwd=cwd, capture_output=True, text=True,
+            tip_argv(name), cwd=cwd, capture_output=True, text=True,
             timeout=timeout, env=env,
         )
     except subprocess.TimeoutExpired as exc:
@@ -322,7 +328,7 @@ def main(argv: list[str] | None = None) -> int:
             print(f"  (full log: build/target_test_logs/{r.name}.log)")
         return 1
 
-    print("Every make target passed.")
+    print("Every task passed.")
     return 0
 
 

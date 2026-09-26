@@ -1,7 +1,7 @@
 # Design pattern names the book writes capitalized and italic on every
 # mention: *Strategy*, *Chain of Responsibility*. tools/pattern_names.py
-# checks it (`make pattern-names`) and rewrites the unambiguous cases
-# (`make fix-pattern-names`). One name per line; a longer name is matched
+# checks it (`tip pattern-names`) and rewrites the unambiguous cases
+# (`tip fix-pattern-names`). One name per line; a longer name is matched
 # before a shorter one it contains, so "Factory Method" wins over
 # "Factory". Add a name here when the book starts treating it as a
 # pattern; the lowercase word keeps its ordinary sense either way.

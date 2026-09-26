@@ -25,12 +25,12 @@ for real typos.
 
 --add skips that paste step and writes the words into the wordlist file
 directly (merged with what's already there, deduplicated, resorted). It
-also runs codespell over the same paths, the way `make spell` does, and
+also runs codespell over the same paths, the way `tip spell` does, and
 writes every word codespell flags into its own list,
 tools/data/codespell-ignore.txt, since the two checkers keep separate
 lists and a word only codespell objects to (a class name such as
 `OnlyOnce`, which codespell reads in code and this checker skips) would
-otherwise still fail `make spell` after an --add. It exits 0 either way,
+otherwise still fail `tip spell` after an --add. It exits 0 either way,
 since after --add both lists are caught up by definition. It does not
 distinguish a genuine term from a typo, so review both diffs
 (`git diff tools/data/`) before committing, and revert any line that is
@@ -113,7 +113,7 @@ def parse_codespell(output: str) -> set[str]:
 
 
 def codespell_unknown(paths: list[Path]) -> set[str]:
-    """Run codespell over `paths` as `make spell` does and return the
+    """Run codespell over `paths` as `tip spell` does and return the
     words it flags. Same interpreter, same working directory, so it
     reads the same [tool.codespell] config and ignore file."""
     proc = subprocess.run(

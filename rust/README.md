@@ -6,8 +6,8 @@ section shows moving a hot Python function into a compiled
 directory holds real, buildable copies of those examples.
 
 It is deliberately separate from the rest of the book's tooling.
-The repository root's `Makefile` never enters this directory and never
-requires a Rust toolchain: `make verify`, `make gate`, and `make ci`
+Only the `rust-*` tasks enter this directory or require a Rust
+toolchain: `tip verify`, `tip gate`, and `tip ci`
 all work with no Rust installed. Building and running the code
 here is an extra, opt-in step for a reader (or maintainer) who has Rust
 and wants to reproduce the speedup numbers themselves.
@@ -25,19 +25,24 @@ You need:
 
 ## Running it
 
-```
-cd rust
-make            # sync from the book, build every crate, run its demo
-```
-
-`make` runs three steps, also available separately:
+From anywhere in the repository:
 
 ```
-make sync    # regenerate each crate's src/lib.rs and demo.py from ../Chapters/
-make build   # build and install every crate (release mode), without running anything
-make test    # build every crate and run its demo.py against the real extension
-make clean   # remove every crate's target/ and .venv/ (never touches the book)
+tip rust-all      # sync from the book, build every crate, run its demo
 ```
+
+`rust-all` runs `rust-sync` and `rust-test`; each step is also
+available separately:
+
+```
+tip rust-sync    # regenerate each crate's src/lib.rs and demo.py from Chapters/
+tip rust-build   # build and install every crate (release mode), without running anything
+tip rust-test    # build every crate and run its demo.py against the real extension
+tip rust-clean   # remove every crate's target/ and .venv/ (never touches the book)
+```
+
+Without `tip` on PATH, `uv run tip rust-all` does the same from inside
+the repository.
 
 Each crate gets its own isolated `.venv/` (e.g. `fastcount/.venv/`),
 separate from the repository root's `.venv/`, so the compiled extension
@@ -78,7 +83,7 @@ other Rust project, scaffolded once by `maturin new --bindings pyo3
 otherwise touches those files.
 
 If you edit the Rust or demo code directly in `Chapters/18_Techniques--Performance.md`,
-run `make sync` (or `cd .. && python -m tools.extract_rust --write`) to
+run `tip rust-sync` (or `uv run python -m tools.extract_rust --write` from the repository root) to
 pull the change into this tree before rebuilding.
 
 ## Adding another crate
@@ -91,5 +96,5 @@ pull the change into this tree before rebuilding.
 3. In `Chapters/*.md`, add a ` ```rust ` block marked
    `// <name>/src/lib.rs` and a ` ```python ` block marked
    `# rust/<name>/demo.py`.
-4. Add `<name>` to `CRATES` in this directory's `Makefile`.
-5. `make sync && make test`.
+4. Add `<name>` to `CRATES` in `tools/tasks.py`.
+5. `tip rust-sync rust-test`.

@@ -147,8 +147,8 @@ if the paragraph needs its sentences reordered, leave it for `cohesion`.
 
 ## Verify and report
 
-Touched prose gets `make reflow CH=NN` (Semantic Line Breaks),
-then `make verify`, then read `git diff Chapters/`:
+Touched prose gets `tip reflow CH=NN` (Semantic Line Breaks),
+then `tip verify`, then read `git diff Chapters/`:
 a changed `#:` marker means an edit strayed into code, so investigate it.
 Report each change as the pointer, its candidates, and the noun chosen.
 List any pointer you judged ambiguous but left,

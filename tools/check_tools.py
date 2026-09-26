@@ -4,17 +4,17 @@
 Two tiers:
 
 - basic (default): what a reader needs for the everyday commands
-  (`make verify`, `make test`, `make ty`, `make lint`, ...): `uv`
+  (`tip verify`, `tip test`, `tip ty`, `tip lint`, ...): `uv`
   itself, plus the uv-managed dev tools (`ty`, `ruff`, `pytest`) that
-  `uv run` resolves from `uv.lock`. `make` and `git` are checked too
-  but marked "assumed", since you already needed both to get this
-  far; they never fail the check.
+  `uv run` resolves from `uv.lock`. `git` is checked too but marked
+  "assumed", since you already needed it to get this far; it never
+  fails the check.
 - --full: everything above, plus what a book maintainer needs for
-  the rest of `make help`: `pandoc` (`make site`, `make local`,
-  `make epub`, `make pdf`), `typst` (the PDF engine `make pdf`
-  drives pandoc with), the standalone `vale` binary (`make prose`),
-  `gh` (`make release`), pyright (`make pyright-review`), and an SVG
-  rasterizer (the EPUB's figures, `make cover`, `coupling-panels-png`).
+  the rest of `tip help`: `pandoc` (`tip site`, `tip local`,
+  `tip epub`, `tip pdf`), `typst` (the PDF engine `tip pdf`
+  drives pandoc with), the standalone `vale` binary (`tip prose`),
+  `gh` (`tip release`), pyright (`tip pyright-review`), and an SVG
+  rasterizer (the EPUB's figures, `tip cover`, `coupling-panels-png`).
 
 Each row prints ok, MISSING, or OLD (present but below the version the
 builds need, which today is only pandoc), and a failing run ends with the commands
@@ -143,9 +143,6 @@ class Tool:
 
 
 TOOLS: list[Tool] = [
-    Tool("make", ["make", "--version"], "basic",
-         "preinstalled on Linux; macOS: xcode-select --install",
-         {"winget": "ezwinports.make"}, assumed=True),
     Tool("git", ["git", "--version"], "basic",
          "https://git-scm.com/downloads",
          {"winget": "Git.Git", "brew": "git", "apt": "git"}, assumed=True),

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """Run every static check over both trees, reporting all failures instead of the first.
 
-`make gate` stops at its first failing step. That is right when you broke
+`tip gate` stops at its first failing step. That is right when you broke
 one thing and want the shortest path to it. It is wrong right after a
 tool upgrade, when the question is not whether something broke but how
 much did.
@@ -23,22 +23,22 @@ This runs each check to completion and summarizes:
     ...
     2 of 7 checks failed: ty, run
 
-`make tools-upgrade` ends with this, so an upgrade's damage arrives
+`tip tools-upgrade` ends with this, so an upgrade's damage arrives
 attached to the upgrade that caused it. It is worth running on its own
-(`make sweep`) after any change wide enough that the first failure is
+(`tip sweep`) after any change wide enough that the first failure is
 unlikely to be the only one.
 
-Each check runs as its own `make <target>` subprocess with output
+Each check runs as its own `tip <target>` subprocess with output
 streamed live, the arrangement tools/verify.py already uses. Every one
 of those targets covers both build trees and depends on `extract`, so
 both trees are rebuilt before anything reads them; `ty` and `lint` run
 one invocation over both, so a failure in one tree never hides the
 other's.
 
-The `#:` output markers are deliberately not swept. `make verify`
+The `#:` output markers are deliberately not swept. `tip verify`
 rewrites a stale marker rather than failing on it, and a genuinely
 nondeterministic listing would report a difference here on every run.
-A tool upgrade that changes program output is a `make verify` question,
+A tool upgrade that changes program output is a `tip verify` question,
 not a sweep question.
 
 Usage:
@@ -50,10 +50,10 @@ import argparse
 import subprocess
 import time
 
-from tools.make_help import MAKEFILE, entries
+from tools.tip_help import entries
 from tools.config import ROOT
 from tools.target_times import record
-from tools.timed_make import format_seconds
+from tools.tip import format_seconds, nested_env, tip_argv
 
 # Every check a tool upgrade can break, in run order. Cheapest and most
 # likely to move first: ty and ruff are what a checker or linter release
@@ -77,8 +77,7 @@ SWEEP_TARGETS: list[str] = [
 
 
 def _docs() -> dict[str, str]:
-    text = MAKEFILE.read_text(encoding="utf-8")
-    return {name: doc for name, doc in entries(text) if name is not None}
+    return {name: doc for name, doc in entries() if name is not None}
 
 
 def _listing(heading: str, names: list[str]) -> str:
@@ -91,7 +90,7 @@ def _listing(heading: str, names: list[str]) -> str:
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(
         description=__doc__,
-        epilog=_listing("make sweep runs, in order:", SWEEP_TARGETS),
+        epilog=_listing("tip sweep runs, in order:", SWEEP_TARGETS),
         formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.parse_args(argv)
 
@@ -100,7 +99,7 @@ def main(argv: list[str] | None = None) -> int:
     for name in SWEEP_TARGETS:
         print(f"-> {name}")
         start = time.monotonic()
-        proc = subprocess.run(["make", name], cwd=ROOT)
+        proc = subprocess.run(tip_argv(name), cwd=ROOT, env=nested_env())
         took[name] = time.monotonic() - start
         if proc.returncode == 0:
             record(name, took[name])

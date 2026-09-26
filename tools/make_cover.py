@@ -5,7 +5,7 @@ Two modes, chosen by whether `resources/cover-source.jpg` exists:
 
 - **Art mode** (the usual one): composite that image, whatever its
   size, with the book's typography. Drop in a new image and run
-  `make cover` to restyle every distribution at once. The page
+  `tip cover` to restyle every distribution at once. The page
   background is sampled from the image's corners so the art sits
   on its own paper color with no visible seam.
 - **Drawn mode** (fallback, no source image): a parametric serpent
@@ -610,7 +610,7 @@ def ornament_svg() -> str:
     Sits below each chapter title on the site (template.html),
     python skin as pure pattern, in the cover art's tones.
     Swapping the ornament design later means changing only this
-    function and rerunning `make cover`.
+    function and rerunning `tip cover`.
     """
     diamonds = []
     for i in range(11):

@@ -1,12 +1,12 @@
 # Listings that keep @dataclass(frozen=True) although every base is
-# slotted, so tools/record_check.py (`make records`, in GATE_CHECKS)
+# slotted, so tools/record_check.py (`tip records`, in GATE_CHECKS)
 # would otherwise ask for @record. One per line:
 #
 #     <Chapter_Name> <listing> <Class>    # why
 #
 # Chapter_Name is the chapter file's stem after its `NN_Part--` prefix,
 # so an entry survives a renumbering and covers the Solutions file too.
-# Class may be an fnmatch pattern. `make records` fails on an entry that
+# Class may be an fnmatch pattern. `tip records` fails on an entry that
 # matches nothing. A class with an unslotted base needs no entry: the
 # check leaves it alone. CLAUDE.md's @record section has the rules.
 

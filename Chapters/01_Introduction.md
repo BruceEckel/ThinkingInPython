@@ -188,7 +188,7 @@ A listing imports such a helper by its bare module name,
 `from result import Err, Ok`,
 because the example tooling puts `Examples/utils/` on the import path.
 A file run straight from the repository root lacks that path,
-so `make run-one <name>` (`tools/run_one_example.py`)
+so `uv run tip run-one <name>` (`tools/run_one_example.py`)
 runs one example with the working directory and import path the book assumes,
 and prints the equivalent by-hand commands first.
 A filename comment that starts with `rust/`,

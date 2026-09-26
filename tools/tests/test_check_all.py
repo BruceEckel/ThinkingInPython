@@ -4,7 +4,6 @@ from pathlib import Path
 import pytest
 
 from tools.check_all import CHECKS, apply_fixes, by_name, main, run, select
-from tools.config import ROOT
 from tools.markdown import Document
 
 # A listing that trips four checks at once: two blank lines between
@@ -144,11 +143,12 @@ def test_comment_caps_check_names_the_replacement(tmp_path: Path) -> None:
     assert len(findings) == 1
     assert "-> # Lowercase prose comment" in findings[0].message
 
-def test_check_names_match_their_make_targets() -> None:
-    # Each check is also its own `make <name>` target; keeping the names
+def test_check_names_match_their_tip_tasks() -> None:
+    # Each check is also its own `tip <name>` task; keeping the names
     # equal is what lets the runner's output be pasted back as a command.
-    makefile = (ROOT / "Makefile").read_text(encoding="utf-8")
+    from tools.tip import load
+    tasks = load().tasks
     for check in CHECKS:
         if check.name == "prose-lint":
-            continue  # `make prose` is Vale; this one has no target of its own
-        assert f"\n{check.name}:" in makefile, check.name
+            continue  # `tip prose` is Vale; this one has no task of its own
+        assert check.name in tasks, check.name

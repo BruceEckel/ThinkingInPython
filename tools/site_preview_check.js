@@ -6,7 +6,7 @@
 //   node tools/site_preview_check.js            # every page in build/site
 //   node tools/site_preview_check.js 29 index   # pages whose names start so
 //
-// `make preview-check` builds the site first and then runs this, and so
+// `tip preview-check` builds the site first and then runs this, and so
 // does the site job in .github/workflows/ci.yml, ahead of the deploy. No
 // local gate runs it: it needs node, which nothing else in the repo does,
 // and on its first run it needs the network, to install jsdom under
@@ -213,7 +213,7 @@ async function tapOne(w, a, at, problems) {
 
 async function main() {
   if (!fs.existsSync(path.join(SITE, "index.html"))) {
-    console.error(`No built site at ${SITE}; run \`make site\` first.`);
+    console.error(`No built site at ${SITE}; run \`tip site\` first.`);
     process.exit(2);
   }
   const jsdom = loadJsdom();

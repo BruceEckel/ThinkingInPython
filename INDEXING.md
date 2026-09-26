@@ -295,7 +295,7 @@ Leanpub's format becomes one more exporter, written when you need it.
 
 ## Gates {#gates}
 
-An index held as data can be checked the way `make records` checks its exceptions file:
+An index held as data can be checked the way `tip records` checks its exceptions file:
 
 - An entry whose patterns match nothing fails.
   This catches a term the text stopped using.
@@ -306,7 +306,7 @@ An index held as data can be checked the way `make records` checks its exception
   which keeps the definitions index current as chapters change.
 
 None of this belongs in `verify` until the entry list has settled;
-a report target, in the manner of `make claims`, fits the first months.
+a report target, in the manner of `tip claims`, fits the first months.
 
 ## The options as packages
 

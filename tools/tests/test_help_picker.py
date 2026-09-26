@@ -13,11 +13,11 @@ from unittest import mock
 from tools import help_picker
 from tools.help_picker import (
     RECORD_VAR, Picker, all_rows, ask_return_or_esc, filter_rows,
-    history_files, make_command, record_command, record_history,
+    history_files, tip_command, record_command, record_history,
     INTERRUPTED, next_version, notes_lines, run_target, section_rows,
     session,
     split_match, variable_default, variables)
-from tools.make_help import LEGEND, MAKEFILE, Target, parse
+from tools.tip_help import LEGEND, Target, load_sections
 from tools.target_times import Timing
 
 UP, DOWN = "\x1b[A", "\x1b[B"
@@ -27,7 +27,7 @@ PAGEDOWN = "\x1b[6~"
 
 
 def _sections():
-    return parse(MAKEFILE.read_text(encoding="utf-8"))
+    return load_sections()
 
 
 def drive(rows, keys: str):
@@ -40,7 +40,6 @@ def drive(rows, keys: str):
 
 def test_all_rows_fold_secondary_targets_and_skip_the_preamble():
     names = {r.label for r in all_rows(_sections()) if r.kind == "target"}
-    assert "help" not in names   # the preamble: nothing to run there
     for section in _sections():
         if not section.slug:
             continue
@@ -220,54 +219,54 @@ def test_history_files_lists_only_the_ones_that_exist(tmp_path):
 
 def test_record_history_appends_plain_and_zsh_extended_lines(tmp_path):
     plain = tmp_path / "ConsoleHost_history.txt"
-    plain.write_text("make\n")
+    plain.write_text("tip\n")
     zsh = tmp_path / ".zsh_history"
     zsh.write_text(": 1700000000:0;ls\n")
     zsh_plain = tmp_path / "plain" / ".zsh_history"
     zsh_plain.parent.mkdir()
     zsh_plain.write_text("ls\n")
-    written = record_history("make sweep", [plain, zsh, zsh_plain], now=42)
+    written = record_history("tip sweep", [plain, zsh, zsh_plain], now=42)
     assert written == [plain, zsh, zsh_plain]
-    assert plain.read_text().splitlines() == ["make", "make sweep"]
-    assert zsh.read_text().splitlines()[-1] == ": 42:0;make sweep"
-    assert zsh_plain.read_text().splitlines()[-1] == "make sweep"
+    assert plain.read_text().splitlines() == ["tip", "tip sweep"]
+    assert zsh.read_text().splitlines()[-1] == ": 42:0;tip sweep"
+    assert zsh_plain.read_text().splitlines()[-1] == "tip sweep"
 
 
 def test_record_command_prefers_the_wrappers_file(tmp_path):
-    record = tmp_path / "make-menu-abc"        # the wrapper's scratch file
+    record = tmp_path / "tip-menu-abc"        # the wrapper's scratch file
     psrl = (tmp_path / "appdata" / "Microsoft" / "Windows" / "PowerShell"
             / "PSReadLine" / "ConsoleHost_history.txt")
     psrl.parent.mkdir(parents=True)
-    psrl.write_text("make\n")
+    psrl.write_text("tip\n")
     home = tmp_path / "home"
     home.mkdir()
     env = {"APPDATA": str(tmp_path / "appdata"), RECORD_VAR: str(record)}
-    assert record_command("make test", env, home) == [record]
-    assert record.read_text().splitlines() == ["make test"]
-    assert psrl.read_text().splitlines() == ["make"]     # left alone
+    assert record_command("tip test", env, home) == [record]
+    assert record.read_text().splitlines() == ["tip test"]
+    assert psrl.read_text().splitlines() == ["tip"]     # left alone
     # without the variable, the history files get it
     env.pop(RECORD_VAR)
-    assert record_command("make test", env, home) == [psrl]
-    assert psrl.read_text().splitlines() == ["make", "make test"]
+    assert record_command("tip test", env, home) == [psrl]
+    assert psrl.read_text().splitlines() == ["tip", "tip test"]
 
 
 def test_record_history_skips_a_file_it_cannot_write(tmp_path):
     missing = tmp_path / "no" / "such" / "history"
-    assert record_history("make sweep", [missing]) == []
+    assert record_history("tip sweep", [missing]) == []
 
 
 def _target(name):
     return next(t for s in _sections() for t in s.targets if t.name == name)
 
 
-def test_variable_default_reads_the_assignment_above_the_target():
+def test_variable_default_reads_the_tasks_defaults():
     assert variable_default(_target("rewrite"), "MODEL") == ""  # per-pass
     assert variable_default(_target("code-width"), "WIDTH") == "60"
     assert variable_default(_target("code-width"), "ARGS") == ""
     assert variable_default(_target("check-ch"), "CH") == ""
 
 
-def test_prompt_hint_names_the_makefile_default():
+def test_prompt_hint_names_the_tasks_default():
     seen: list[str] = []
 
     def fake_prompt(message, default=""):
@@ -313,8 +312,8 @@ def test_ctrl_c_during_the_run_is_a_note_not_a_traceback(capsys):
             mock.patch("tools.help_picker.record_command", return_value=[]):
         assert run_target(target) == INTERRUPTED
     out = capsys.readouterr().out
-    assert "$ make test" in out
-    assert "(interrupted: make test)" in out
+    assert "$ tip test" in out
+    assert "(interrupted: tip test)" in out
     assert "Traceback" not in out
 
 
@@ -334,17 +333,17 @@ def test_a_failing_target_reports_its_status(capsys):
             mock.patch("tools.help_picker.record_command", return_value=[]), \
             mock.patch("tools.help_picker.ask_variables", return_value={}):
         assert run_target(target) == 2
-    assert "(make test exited with status 2)" in capsys.readouterr().out
+    assert "(tip test exited with status 2)" in capsys.readouterr().out
 
 
-def test_make_command_appends_only_the_variables_given_a_value():
+def test_tip_command_appends_only_the_variables_given_a_value():
     check_ch = _target("check-ch")
-    assert make_command(check_ch)[1:] == ["check-ch"]
-    assert make_command(check_ch, {"CH": ""})[1:] == ["check-ch"]
-    assert make_command(check_ch, {"CH": "12"})[1:] == ["check-ch", "CH=12"]
-    assert make_command(_target("release"), {"VERSION": "1.0"})[1:] == [
+    assert tip_command(check_ch)[1:] == ["check-ch"]
+    assert tip_command(check_ch, {"CH": ""})[1:] == ["check-ch"]
+    assert tip_command(check_ch, {"CH": "12"})[1:] == ["check-ch", "CH=12"]
+    assert tip_command(_target("release"), {"VERSION": "1.0"})[1:] == [
         "release", "VERSION=1.0"]
-    assert make_command(_target("code-width"),
+    assert tip_command(_target("code-width"),
                         {"WIDTH": "", "ARGS": "--tsv"})[1:] == [
         "code-width", "ARGS=--tsv"]
 
@@ -417,14 +416,14 @@ def test_notes_lines_show_the_doc_the_comment_block_and_the_recipe():
     assert texts[1].startswith("  Run every check")
     assert any("first failure" in t for t in texts)      # the comment
     assert "Runs:" in texts
-    assert texts[-1] == "    $(PY) -m tools.sweep_checks"
+    assert texts[-1] == '    py("tools.sweep_checks")'
     assert all(len(t) <= 72 for t in texts)
 
 
-def test_a_prerequisites_only_target_lists_them():
+def test_a_deps_only_task_lists_them():
     ci = next(t for s in _sections() for t in s.targets if t.name == "ci")
     texts = [t for _, t in notes_lines(ci, 72)]
-    at = texts.index("Prerequisites:")
+    at = texts.index("Runs first:")
     assert texts[at + 1] == "    gate site"
     assert "Runs:" not in texts
 
@@ -432,7 +431,7 @@ def test_a_prerequisites_only_target_lists_them():
 def test_notes_lines_without_notes_or_recipe_say_so():
     texts = [t for _, t in notes_lines(Target("x", "Do x"), 60)]
     assert texts == ["x", "  Do x", "",
-                     "  (no notes, prerequisites, or recipe in the Makefile)"]
+                     "  (no notes, deps, or recipe in tools/tasks.py)"]
 
 
 def test_notes_lines_keep_an_indented_paragraph_as_written():

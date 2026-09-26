@@ -1,7 +1,7 @@
 ---
 name: tool-upgrade
 description: >-
-  Procedure and history for a ty, ruff, pyright, or Stateless upgrade in this repo: what breaks in both directions, the version-pinned probes to re-run, the quoted-diagnostic sweep, and reading the pyright delta. Use after make tools-upgrade or a Stateless bump, or when running make pyright-review.
+  Procedure and history for a ty, ruff, pyright, or Stateless upgrade in this repo: what breaks in both directions, the version-pinned probes to re-run, the quoted-diagnostic sweep, and reading the pyright delta. Use after tip tools-upgrade or a Stateless bump, or when running tip pyright-review.
 ---
 
 # Tool and library upgrades
@@ -24,13 +24,13 @@ Moved from `CLAUDE.md`, which keeps the rule that you never start an upgrade you
   `finalize_trap.py` carries the `# type: ignore`), and dict keys inferred
   as literal class objects no longer accepting a `type(e)` lookup (fixed
   by annotating the dict explicitly, `Final[dict[type[Expr], int]]`, in
-  Solutions ch34). After `make tools-upgrade`, run
+  Solutions ch34). After `tip tools-upgrade`, run
   `uv run ty check build/examples` **and** `uv run ty check build/solutions`
-  before assuming the first failure is the only one: `make verify` stops
+  before assuming the first failure is the only one: `tip verify` stops
   at the first failing gate, and `solutions-gate` runs first, as `gate`'s
   prerequisite.
   The 0.0.75 to 0.0.77 upgrade (2026-09-02, alongside Python 3.15.0b3 to
-  3.15.0rc2) was the first with **no fallout at all**: `make sweep` green
+  3.15.0rc2) was the first with **no fallout at all**: `tip sweep` green
   on both trees, no marker or reflow drift, and all four version-pinned
   claims below re-probed unchanged. Record the quiet ones too, so the
   next upgrade knows what a clean one looks like.
@@ -54,7 +54,7 @@ Moved from `CLAUDE.md`, which keeps the rule that you never start an upgrade you
   Protocol types, as the chapter's `outcome()` does, or through
   `as_type()`.
   The 0.0.80 to 0.0.81 upgrade (2026-09-16, with ruff 0.16.7 to
-  0.16.8) was a quiet one: `make sweep` green on both trees, the
+  0.16.8) was a quiet one: `tip sweep` green on both trees, the
   pyright delta empty, all six version-pinned claims re-probed
   unchanged, and all 40 quoted diagnostics matching. The quote recheck
   ran as one `verify-claims` agent (about 130k tokens, seven minutes),
@@ -117,17 +117,17 @@ Moved from `CLAUDE.md`, which keeps the rule that you never start an upgrade you
 - **A Stateless upgrade is a book-wide event too.** The libraries the
   listings import (`libs_check.LIBRARIES`: Stateless, numpy, hypothesis,
   time-machine) sit in the same dev group as the tools, so
-  `make tools-upgrade` moves them along with `ty` (`uv lock --upgrade`
-  upgrades everything), and their constraints are floors. `make
+  `tip tools-upgrade` moves them along with `ty` (`uv lock --upgrade`
+  upgrades everything), and their constraints are floors. `tip
   libs-check` (read-only, no gate) says when a release is waiting;
-  `make tools-status` lists the locked versions and notes one that
+  `tip tools-status` lists the locked versions and notes one that
   moved since the last stamp. Stateless was 0.6.1 on 2026-09-17, the
   newest on PyPI since 2025-11-11; work on its repository that has no
   release is invisible to uv, and the book does not track it, because a
   reader installs the PyPI release.
   Take a Stateless release alone, never alongside a `ty` bump, so a
   failure has one cause: `uv lock --upgrade-package stateless`, then
-  `uv sync`. Then, in this order: `make sweep`; the five version-pinned
+  `uv sync`. Then, in this order: `tip sweep`; the five version-pinned
   probes above, since the revealed types come from Stateless's
   annotations as much as from `ty`'s inference; the two quotes that
   list the library's overloads verbatim (nine for `supply()` in
@@ -146,7 +146,7 @@ Moved from `CLAUDE.md`, which keeps the rule that you never start an upgrade you
   registration, no container, no scoping mechanism, no defect channel,
   no timeout, no `race`, no fallback combinator). Finish by
   updating project memory `stateless-api-surface` with what the release
-  added or removed, and run `make pyright-review`.
+  added or removed, and run `tip pyright-review`.
 - **`ty` narrows `str` to `Literal[...]` as of 0.0.63,** so the `cast()`
   that used to be required at a boundary function is now flagged as a
   `redundant-cast` warning and fails the gate. `if char not in SPECS:
@@ -163,10 +163,10 @@ Moved from `CLAUDE.md`, which keeps the rule that you never start an upgrade you
 `ty` is the only checker the gates run. Pyright is a pinned dev
 dependency with its config in `pyproject.toml` (`[tool.pyright]`), and
 its value is the list of places where it disagrees with `ty`, kept in
-`tools/data/pyright_baseline.txt`. `make pyright-review` runs it over
+`tools/data/pyright_baseline.txt`. `tip pyright-review` runs it over
 both extracted trees and prints only the delta: NEW for a diagnostic
 the baseline lacks, GONE for one that no longer fires. It exits
-nonzero on NEW. `make pyright-accept` rewrites the baseline once every
+nonzero on NEW. `tip pyright-accept` rewrites the baseline once every
 line in the delta has an explanation. `tools/pyright_review.py` has
 the details; `pyright_experiment.md` has the 2026-09-14 measurement
 that led here.
@@ -194,7 +194,7 @@ Three rules, all deliberate:
   listings on its own limitations.
 
 Read the delta at three moments: after editing a chapter's listings
-(a NEW entry is a fresh disagreement worth a sentence), after `make
+(a NEW entry is a fresh disagreement worth a sentence), after `tip
 tools-upgrade` moves pyright (GONE means pyright caught up, NEW means a
 new strictness), and after a `ty` upgrade (a disagreement that
 disappears because `ty` now reports it too is a listing that may need

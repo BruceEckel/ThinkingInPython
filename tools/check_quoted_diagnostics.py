@@ -80,8 +80,8 @@ HEADER = (
     "# Quoted ty diagnostics the book deliberately makes against an\n"
     "# edited copy of a listing, so their gutter lines differ from the\n"
     "# extracted file. markdown path<TAB>message, one per hit, sorted.\n"
-    "# Rewritten by `make quoted-diagnostics-accept`; read the delta\n"
-    "# with `make quoted-diagnostics` before accepting.\n"
+    "# Rewritten by `tip quoted-diagnostics-accept`; read the delta\n"
+    "# with `tip quoted-diagnostics` before accepting.\n"
     "# See tools/check_quoted_diagnostics.py.\n"
 )
 
@@ -367,7 +367,7 @@ def main(argv: list[str] | None = None) -> int:
     )
     if new:
         print("Read each NEW line against its prose: fix a stale quote, "
-              "or `make quoted-diagnostics-accept` a deliberate edit.")
+              "or `tip quoted-diagnostics-accept` a deliberate edit.")
     return 1 if new else 0
 
 

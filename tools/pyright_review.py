@@ -35,8 +35,8 @@ Usage:
     uv run python -m tools.pyright_review            # the delta
     uv run python -m tools.pyright_review --accept   # rewrite it
 
-Both trees must be extracted first (`make pyright-review` does that).
-Pyright is a pinned dev dependency, so `make tools-upgrade` moving it
+Both trees must be extracted first (`tip pyright-review` does that).
+Pyright is a pinned dev dependency, so `tip tools-upgrade` moving it
 is the usual reason for a delta, and reading that delta is the
 review.
 """
@@ -58,8 +58,8 @@ TREES = (EXAMPLES_TREE, SOLUTIONS_TREE)
 HEADER = (
     "# Pyright diagnostics the book accepts as disagreements with\n"
     "# ty. path<TAB>rule<TAB>message, one per occurrence, sorted.\n"
-    "# Rewritten by `make pyright-accept`; read the delta with\n"
-    "# `make pyright-review` before accepting.\n"
+    "# Rewritten by `tip pyright-accept`; read the delta with\n"
+    "# `tip pyright-review` before accepting.\n"
     "# See tools/pyright_review.py.\n"
 )
 
@@ -70,7 +70,7 @@ def run_pyright() -> list[dict[str, object]]:
         if not tree.is_dir():
             sys.exit(
                 f"{tree} is missing; "
-                "run make extract"
+                "run tip extract"
             )
     cmd = [
         sys.executable, "-m", "pyright", "--outputjson",
@@ -154,7 +154,7 @@ def main() -> int:
         f"baseline {sum(before.values())}"
     )
     if new:
-        print("Read each NEW line, then `make pyright-accept`.")
+        print("Read each NEW line, then `tip pyright-accept`.")
     return 1 if new else 0
 
 

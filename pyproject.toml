@@ -1,12 +1,14 @@
 # uv-managed tooling for building and checking the book's examples.
-# This is not a distributable package (package = false); it only pins the
-# Python version and the dev tools the harness and CI use.
+# It pins the Python version and the dev tools the harness and CI use,
+# and packages tools/ only so the `tip` command can be installed; it is
+# never published.
 #
 # Common commands:
 #   uv sync                                  # create .venv with the dev tools
+#   uv tool install --editable .             # put `tip` on PATH (once)
+#   tip                                      # pick a task from the menu
+#   tip ci                                   # the full local gate (uses uv)
 #   uv run python -m tools.run_examples      # run any harness script
-#   uv run ty check build/examples           # type-check
-#   make ci                                  # the full local gate (uses uv)
 #
 # pandoc is a system package (see tools/README.md), not a Python dependency.
 
@@ -15,6 +17,29 @@ name = "thinking-in-python"
 version = "0"
 description = "Build and verification tooling for the book Thinking in Python."
 requires-python = ">=3.15"
+# What `tip` itself needs. `uv tool install --editable .` builds a
+# separate environment from these alone (not the dev group), so the
+# runner lives outside .venv and can rebuild it (`tip python-upgrade`).
+# prompt_toolkit draws the picker; without it `tip` prints the listing.
+dependencies = ["prompt-toolkit>=3.0.53"]
+
+# `tip`, the task runner that replaces make (tools/tip.py, tasks in
+# tools/tasks.py). Installed as a command on PATH by
+# `uv tool install --editable .`, on Windows, macOS, and Linux alike;
+# `uv tool update-shell` adds uv's tool directory to PATH if it is not
+# there. Editable, so an edit under tools/ takes effect at once.
+[project.scripts]
+tip = "tools.tip:main"
+
+# `uv sync` also installs tools/ into .venv, editable, so `uv run tip`
+# works in the repo with no global install (CI, a cloud session).
+[build-system]
+requires = ["uv_build>=0.9,<1"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-name = "tools"
+module-root = ""
 
 [dependency-groups]
 dev = [
@@ -35,15 +60,10 @@ dev = [
     # tools/make_cover.py's art mode: JPEG encoding, grayscale
     # derivation, and resizing for the composited book covers.
     "pillow>=12.3.0",
-    # tools/help_picker.py: the arrow-key and mouse picker that `make`
-    # and `make help` open in a terminal. Pure Python, so it installs on
-    # the pinned Python; without it `make help` prints the static listing.
-    "prompt-toolkit>=3.0.53",
     "pyright>=1.1.414",
 ]
 
 [tool.uv]
-package = false
 # Every clone builds its venv on uv's own CPython, never one found on
 # PATH. On the author's machine C:/Python (the python.org installer) is
 # first on PATH, and uv's default preference picks it for a fresh
@@ -55,7 +75,7 @@ python-preference = "only-managed"
 # Spell checking for the book prose (and code comments). codespell uses a
 # curated misspelling dictionary, so it is low-noise even over code. Words it
 # flags wrongly (design-pattern terms, foreign quotes, deliberate code strings)
-# live in tools/data/codespell-ignore.txt. Run with `make spell`.
+# live in tools/data/codespell-ignore.txt. Run with `tip spell`.
 [tool.codespell]
 ignore-words = "tools/data/codespell-ignore.txt"
 skip = "./.git,./.venv,./build,./resources,./uv.lock,*.gif,*.png"
@@ -158,7 +178,7 @@ pythonpath = ["build/examples/utils"]
 extra-paths = ["build/examples/utils", "build/examples/06_Foundations--Modules_and_Packages"]
 
 # Pyright, run beside ty over the same extracted trees as a periodic
-# review (make pyright-review), never as a gate. extraPaths mirrors
+# review (tip pyright-review), never as a gate. extraPaths mirrors
 # [tool.ty.environment]. Listings pyright cannot parse (PEP 798) and
 # every other disagreement live in tools/data/pyright_baseline.txt.
 # stateless re-exports its API from __init__ without __all__, which

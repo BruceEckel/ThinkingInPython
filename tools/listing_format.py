@@ -14,8 +14,8 @@ inside triple-quoted strings are never touched. Only ```python blocks are
 inspected; prose, indented output blocks, and other fences are left alone.
 
 Default mode reports offending blank lines and exits non-zero, so it works as a
-gate (run by `make listings`, part of the `gate` recipe). Pass --fix to remove
-them (run by `make fix-listings`).
+gate (run by `tip listings`, part of the `gate` recipe). Pass --fix to remove
+them (run by `tip fix-listings`).
 """
 
 import argparse

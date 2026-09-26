@@ -3,7 +3,7 @@
 Every figure draws its arrowheads from this set, so they match across the
 book, and each head is drawn in the color of the line that carries it,
 so a figure with gray and red edges defines one marker per color.
-`make figures` (`tools/figure_gallery.py`) fails on a `<marker>` that is
+`tip figures` (`tools/figure_gallery.py`) fails on a `<marker>` that is
 not one of the set (`marker_kinds()`) or that sits on a line of another
 color (`mismatched_heads()`); `tools/coupling_panels.py` and
 `tools/state_machine_figure.py` write their markers with `marker_def()`.

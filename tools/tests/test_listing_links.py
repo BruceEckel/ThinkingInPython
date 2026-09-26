@@ -184,7 +184,7 @@ def test_contents_page_sets_the_appendices_apart(tmp_path: Path) -> None:
 def test_preview_script_and_template_agree_on_class_names() -> None:
     # The script finds the page's parts, and styles its own panel, by
     # class name. A class renamed on one side leaves the panel unstyled
-    # or previews the navigation links. `make preview-check` would
+    # or previews the navigation links. `tip preview-check` would
     # notice, but it needs node and no gate runs it.
     script = (STATIC_SRC / "link-preview.js").read_text(encoding="utf-8")
     styles = (STATIC_SRC / "link-preview.css").read_text(encoding="utf-8")

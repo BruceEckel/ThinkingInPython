@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """Record when the dev tools were last upgraded, and say so when that was a while ago.
 
-`make tools-upgrade` is deliberately manual. It rewrites the tracked
+`tip tools-upgrade` is deliberately manual. It rewrites the tracked
 uv.lock and can invoke winget or Homebrew, so nothing runs it on a
 schedule and nothing should. The cost of that choice is drifting quietly
 behind for months, then meeting every breaking change at once: one ty
@@ -12,7 +12,7 @@ This is the cheap half of the fix. `tools-upgrade` records a stamp when
 it finishes, and the gate prints one line when that stamp is old:
 
     tools last upgraded 23 days ago (2026-07-04)
-    That is over 14 days. Consider `make tools-upgrade`, then `make
+    That is over 14 days. Consider `tip tools-upgrade`, then `tip
     sweep` to see what moved.
 
 It never fails and never touches a tracked file, so it cannot turn a
@@ -146,11 +146,11 @@ def report(*, nag_only: bool, days: int) -> int:
             libs_check.current(), read_stamp().get("libraries", {}))
         if libraries:
             print("libraries, as locked in uv.lock "
-                  "(`make libs-check` compares them with PyPI):")
+                  "(`tip libs-check` compares them with PyPI):")
             print("\n".join(libraries))
     if stale:
-        print(f"That is over {days} days. Consider `make tools-upgrade`, "
-              "then `make sweep` to see what moved.")
+        print(f"That is over {days} days. Consider `tip tools-upgrade`, "
+              "then `tip sweep` to see what moved.")
     return 0
 
 

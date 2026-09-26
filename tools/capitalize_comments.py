@@ -17,7 +17,7 @@ text in tools/data/comment_caps_allow.txt and skipped. Add a line there when the
 checker is wrong; capitalize the comment when it is right.
 
 Default is a check that lists comments needing capitalization and exits non-zero
-(it is part of the `make ci` gate). Pass --write to apply the changes. After
+(it is part of the `tip ci` gate). Pass --write to apply the changes. After
 applying, regenerate the Examples/ mirror:
     python -m tools.extract_examples --write -o Examples
 """

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Run every Markdown check in one process, parsing each file once.
 
-Each check still has its own script and its own make target, which is
+Each check still has its own script and its own tip task, which is
 what you want when one thing is broken and you are iterating on it. But
 running them one at a time means N interpreter startups and N parses of
 the same 45 chapters, and it means N summaries to read instead of one

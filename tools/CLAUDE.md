@@ -3,7 +3,7 @@
 Loaded when working under `tools/`. Moved from the root `CLAUDE.md`'s Traps.
 
 - **`tools/*.py` is not linted by any gate.** Only `build/examples` is checked by
-  `make lint`/`make ci`, so a `tools/` script can exceed the 70-char limit with
+  `tip lint`/`tip ci`, so a `tools/` script can exceed the 70-char limit with
   nothing catching it (several already do). `ty` still matters there; run it
   directly, e.g. `uv run ty check tools/whatever.py`.
 - **Kindle listings: only the real book is a valid test bed, and

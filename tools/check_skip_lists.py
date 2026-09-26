@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Fail on a pattern in norun.txt or timing.txt that matches no file.
 
-``tools/data/norun.txt`` names the listings `make run` must skip, and
+``tools/data/norun.txt`` names the listings `tip run` must skip, and
 ``tools/data/timing.txt`` names the listings whose `#:` markers are
 wall-clock claims that `validate_output.py` must never rewrite. Both are
 lists of `fnmatch` patterns over a listing's path inside its tree, and
@@ -10,7 +10,7 @@ chapter is renumbered, and its pattern is left behind matching nothing.
 
 A stale pattern fails quietly, and in the wrong direction. A stale
 norun entry means the renamed GUI listing is no longer skipped, which
-`make run` does catch, as a timeout. A stale timing entry means the
+`tip run` does catch, as a timeout. A stale timing entry means the
 renamed listing's timing boolean is no longer a claim: the next flip is
 rewritten into the chapter with the gate green, which is the failure
 timing.txt exists to prevent. Nothing reports either until it bites.

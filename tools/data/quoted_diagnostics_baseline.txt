@@ -1,8 +1,8 @@
 # Quoted ty diagnostics the book deliberately makes against an
 # edited copy of a listing, so their gutter lines differ from the
 # extracted file. markdown path<TAB>message, one per hit, sorted.
-# Rewritten by `make quoted-diagnostics-accept`; read the delta
-# with `make quoted-diagnostics` before accepting.
+# Rewritten by `tip quoted-diagnostics-accept`; read the delta
+# with `tip quoted-diagnostics` before accepting.
 # See tools/check_quoted_diagnostics.py.
 Chapters/46_Effects--Stateless.md	catch_score.py:13 reads 'match value:', quote shows 'console.print(f"{name}: {value + 1}")'
 Chapters/47_Effects--Stateless_in_Practice.md	bakery.py:32 reads 'Need[Dough] | Need[Oven] | Need[Toaster], str', quote shows '|     Need[Toaster], str'

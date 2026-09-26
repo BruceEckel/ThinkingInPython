@@ -7,19 +7,19 @@
 # The script runs as root on Ubuntu 24.04 when a session starts, and
 # the cloud then caches the VM's filesystem, so later sessions skip it
 # until the script changes or about a week passes. Run
-# `make tools-check-full` in the first session after a change.
+# `tip tools-check-full` in the first session after a change.
 #
-# Why not the install lines `make tools-check-full` prints: its pandoc,
+# Why not the install lines `tip tools-check-full` prints: its pandoc,
 # typst, and vale lines download GitHub releases, and the session's
 # GitHub proxy refuses release and API requests for any repository not
 # attached to the session, at every network access level (`uv self
 # update` fails the same way). Every tool here comes from PyPI, apt, or
 # the Go module proxy instead.
 #
-# Left out: typst (`make pdf` only), which no PyPI or apt package
+# Left out: typst (`tip pdf` only), which no PyPI or apt package
 # ships. A crates.io build took 4m27s on a 4-core VM, too close to the
 # setup script's five-minute limit; `cargo install --locked typst-cli`
-# builds it in a session that needs it. gh (`make release` only) is a
+# builds it in a session that needs it. gh (`tip release` only) is a
 # local job.
 #
 # A failed install prints a line and never fails the script, because a
@@ -37,8 +37,8 @@ uv python install 3.15 || fail "python 3.15"
 
 # The rest runs in parallel.
 
-# vale (make prose), built from source through the Go module proxy.
-# make prose runs `vale sync` for its style packages, which works here.
+# vale (tip prose), built from source through the Go module proxy.
+# tip prose runs `vale sync` for its style packages, which works here.
 (GOBIN=/usr/local/bin go install github.com/vale-cli/vale/v3/cmd/vale@latest \
     || fail vale) &
 
