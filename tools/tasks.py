@@ -137,6 +137,11 @@ def sweep(v: Vars) -> None:
     py("tools.sweep_checks")
 
 
+def markers_fresh(v: Vars) -> bool:
+    """True when the caller refreshed the #: markers in this same run."""
+    return v.get("MARKERS") == "fresh"
+
+
 @task("The gate without sync or site (check, reflow, slugs, output, ty,"
       " ruff, run, pytest, solutions-gate)",
       deps=("solutions-gate",))
@@ -157,6 +162,14 @@ def gate(v: Vars) -> None:
     build and forcing a `tip reflow` plus a second full run. The safety valve
     stays: a paragraph that fails reflow's round-trip check is never rewritten,
     and that failure still exits nonzero and stops the gate.
+
+    MARKERS=fresh skips the marker refresh here and in solutions-gate. `tip
+    verify` passes it, because its own `output` step refreshed every marker
+    in both trees moments before, and nothing between that step and this one
+    edits a listing (sync and figures write no Markdown; the reflow here
+    touches prose only). The refresh executes every marked block, about half
+    of `verify`'s gate time, so running it twice cost ~15 s a run for no
+    information. Run alone, the gate always refreshes.
     """
     tool("pytest", *v.words("PYTEST_N"), "tools/tests")
     py("tools.check_line_endings")
@@ -172,7 +185,8 @@ def gate(v: Vars) -> None:
     py("tools.extract_examples")
     py("tools.check_skip_lists")
     py("tools.extract_examples", "--write")
-    py("tools.validate_output", "--update", "Chapters")
+    if not markers_fresh(v):
+        py("tools.validate_output", "--update", "Chapters")
     tool("ty", "check", "build/examples")
     tool("ruff", "check", "build/examples")
     py("tools.run_examples")
@@ -195,13 +209,14 @@ def solutions_gate(v: Vars) -> None:
     missing answer, which no later step here would notice. extract_solutions.py
     also fails on an orphaned stray under SolutionsCode/; `tip prune` deletes
     exactly those. Folded out of the listing: `gate` names it, and `gate` is
-    what you run.
+    what you run. MARKERS=fresh skips the marker refresh, as in `gate`.
     """
     py("tools.check_solutions")
     py("tools.extract_solutions")
     py("tools.extract_solutions", "--write")
-    py("tools.validate_output", "--update", "--tree", SOLUTIONS_TREE,
-       "Solutions")
+    if not markers_fresh(v):
+        py("tools.validate_output", "--update", "--tree", SOLUTIONS_TREE,
+           "Solutions")
     tool("ty", "check", "build/solutions")
     tool("ruff", "check", "build/solutions")
     py("tools.run_examples", "--tree", SOLUTIONS_TREE)

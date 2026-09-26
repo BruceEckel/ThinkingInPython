@@ -23,6 +23,11 @@ themselves, since the doc text is read straight from that task's own
 one-line doc in tools/tasks.py (the same one `tip help` reads).
 Nothing else needs to change.
 
+`gate` runs with MARKERS=fresh, which skips its own marker refresh (and
+solutions-gate's): the `output` step above already refreshed every marker
+in both trees, and no step between them edits a listing. The refresh
+executes every marked block, so running it twice cost ~15 s a run.
+
 Each target runs as its own `tip <target>` subprocess, in order, with
 output streamed live rather than captured, so whatever a fixer or the
 gate finds shows up immediately. The run stops at the first failing
@@ -58,6 +63,8 @@ VERIFY_TARGETS: list[str] = [
     "figures",
     "gate",
 ]
+# Extra words for a target's command line.
+TARGET_ARGS: dict[str, list[str]] = {"gate": ["MARKERS=fresh"]}
 
 
 def _docs() -> dict[str, str]:
@@ -91,7 +98,8 @@ def main(argv: list[str] | None = None) -> int:
     for name in VERIFY_TARGETS:
         print(f"-> {name}")
         start = time.monotonic()
-        proc = subprocess.run(tip_argv(name), cwd=ROOT, env=nested_env())
+        proc = subprocess.run(tip_argv(name, *TARGET_ARGS.get(name, [])),
+                              cwd=ROOT, env=nested_env())
         took[name] = time.monotonic() - start
         ran.append(name)
         if proc.returncode == 0:
