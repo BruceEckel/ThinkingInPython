@@ -5,8 +5,7 @@ An *Iterator* supplies the item and keeps the storage out of sight.
 
 ![`total()` names only `Iterable`, and a `list`, a generator, and `Countdown` satisfy it without naming it](_images/coupling_23)
 
-An *iterator* decouples an algorithm from the container it uses.
-Code written against an iterator does not care whether the data came from a list,
+Code written against an *iterator* does not care whether the data came from a list,
 a file, a database cursor, or a computation.
 It asks only for the next item.
 That is the communication-first design [Design Patterns](21_Patterns--Design_Patterns.md#design-principles)

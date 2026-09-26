@@ -6,9 +6,8 @@ A *Singleton* creates that one instance and shares it.
 
 ![Every importer names `config.py` by its module name, and the import system hands each one the same instance](_images/coupling_24)
 
-A *singleton* is the simplest design pattern: a class with exactly one instance.
-Before using a classic implementation,
-ask whether the language already solves the problem,
+The classic form is a class that refuses a second instance.
+Before writing one, ask whether the language already solves the problem,
 the question [When a Pattern Dissolves](21_Patterns--Design_Patterns.md#when-a-pattern-dissolves)
 poses for every pattern.
 For the singleton, the language already has an answer.

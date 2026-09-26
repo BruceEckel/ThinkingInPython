@@ -7,10 +7,10 @@ and *Interpreter* reads one as a sentence and evaluates it.
 
 ![`disk_usage()` and `walk()` each name both node types, and `Directory` names only the `Node` union](_images/coupling_34)
 
-The *Composite* pattern arranges objects in a tree,
-so you can treat a single object and a group of objects uniformly.
-The *Interpreter* pattern represents sentences in a small language as trees,
-then evaluates them.
+In *Composite*, each node is a leaf or a group of nodes,
+and one call serves both.
+In *Interpreter*, the tree is a sentence in a small language,
+and evaluating the sentence walks the tree.
 *GoF Design Patterns* presents them as separate patterns,
 but *Interpreter* is *Composite* with meaning attached.
 In Python both reduce to one technique:
