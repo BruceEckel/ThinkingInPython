@@ -35,6 +35,18 @@ export PATH="/root/.local/bin:/root/.cargo/bin:/usr/local/go/bin:$PATH"
 python3 -m pip install --user -q -U uv || fail uv
 uv python install 3.15 || fail "python 3.15"
 
+# tip, the task runner every doc names (`tip verify`, `tip gate`),
+# installed editable from the clone into uv's tool directory, which
+# the PATH line above covers. It needs the clone, so it finds the repo
+# from the working directory and says so when there is none. Without
+# it, `uv run tip ...` still works inside the repo.
+repo="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+if [ -f "$repo/tools/tip.py" ]; then
+    uv tool install --editable "$repo" || fail tip
+else
+    fail "tip (no clone at $repo)"
+fi
+
 # The rest runs in parallel.
 
 # vale (tip prose), built from source through the Go module proxy.
@@ -47,7 +59,7 @@ uv python install 3.15 || fail "python 3.15"
     && DEBIAN_FRONTEND=noninteractive apt-get install -y -qq librsvg2-bin \
     || fail rsvg-convert) &
 
-# pandoc >= 3.5 (make site, epub, pdf). apt's is 3.1, so link the
+# pandoc >= 3.5 (tip site, epub, pdf). apt's is 3.1, so link the
 # binary that PyPI's pypandoc_binary bundles.
 bundled_pandoc() {
     python3 -c 'import pathlib, pypandoc
