@@ -1,8 +1,8 @@
 # Cleanup
 
-Python manages memory, so most objects need no explicit cleanup.
-However, when an object owns an external resource (a file, a socket, a lock),
-you must release it.
+Python frees memory on its own, and a file, a socket, or a lock is not memory.
+Cleanup is the code that releases those,
+and when it runs is the whole question of this chapter.
 
 ## Why `__del__()` Is Not Cleanup {#why-del-is-not-cleanup}
 

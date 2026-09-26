@@ -1,5 +1,9 @@
 # Control Flow
 
+A program decides, repeats, and recovers from failure.
+Python's deciding and repeating look familiar,
+and its recovering from failure is where it differs.
+
 In C++ and Java the careful move is to test before you act:
 check that the string parses, that the file is there, that the key exists.
 Python goes the other way.

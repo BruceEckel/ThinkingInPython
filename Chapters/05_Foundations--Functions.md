@@ -1,8 +1,10 @@
 # Functions
 
-Functions package behavior behind a name and a parameter list.
-This chapter covers defining and calling them: default and keyword arguments,
-scope and `global`, `*args`/`**kwargs`,
+A piece of behavior needs a name so other code can call it without knowing how it works.
+A function is that name, with a parameter list that says what to pass.
+
+This chapter covers defining and calling functions:
+default and keyword arguments, scope and `global`, `*args`/`**kwargs`,
 positional-only and keyword-only parameters, and lambdas.
 
 The `def` keyword defines a function.
