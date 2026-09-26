@@ -421,7 +421,9 @@ def test_notes_lines_show_the_doc_the_comment_block_and_the_recipe():
 
 
 def test_a_deps_only_task_lists_them():
-    ci = next(t for s in _sections() for t in s.targets if t.name == "ci")
+    # No real task is deps-only since `ci` gained a body (2026-09-26).
+    ci = Target("ci", "Run the full gate", notes="Mirrors CI.",
+                prereqs=("gate", "site"))
     texts = [t for _, t in notes_lines(ci, 72)]
     at = texts.index("Runs first:")
     assert texts[at + 1] == "    gate site"

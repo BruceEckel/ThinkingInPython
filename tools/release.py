@@ -70,6 +70,7 @@ from tools import build_epub
 from tools import build_pdf
 from tools.config import BUILD_EPUB_DIR, BUILD_PDF_DIR, ROOT
 from tools.repo import run_echoed
+from tools.skip_stamps import FULL_ENV
 from tools.tip import tip_argv
 
 # How many releases stay on GitHub after a publish: the new one and
@@ -309,6 +310,8 @@ def release(version: str) -> int:
     tag = tag_for(version)
     branch = preflight(tag)
 
+    # A release gets the full gate: every tools test, every listing run.
+    os.environ[FULL_ENV] = "1"
     run_task("verify")
     dirty = working_tree_dirty()
     if dirty:

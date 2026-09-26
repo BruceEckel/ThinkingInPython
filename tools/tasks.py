@@ -24,9 +24,11 @@ The steps are `py()` (a `tools.` module), `tool()` (a console script
 from the project environment), and `run()` (any command); tools/tip.py
 has the machinery.
 """
+import os
 import shutil
 
 from tools.config import ROOT
+from tools.skip_stamps import FULL_ENV
 from tools.tip import Vars, also, invoke, py, run, section, task, tool
 
 # The Markdown checks the gate enforces, run together by check_all.py in one
@@ -137,6 +139,13 @@ def sweep(v: Vars) -> None:
     py("tools.sweep_checks")
 
 
+def full_if_asked(v: Vars) -> None:
+    """RUN=full: set TIP_FULL=1 for this process and every step it runs,
+    which turns off both of tools/skip_stamps.py's shortcuts."""
+    if v.get("RUN") == "full":
+        os.environ[FULL_ENV] = "1"
+
+
 def markers_fresh(v: Vars) -> bool:
     """True when the caller refreshed the #: markers in this same run."""
     return v.get("MARKERS") == "fresh"
@@ -163,6 +172,12 @@ def gate(v: Vars) -> None:
     stays: a paragraph that fails reflow's round-trip check is never rewritten,
     and that failure still exits nonzero and stops the gate.
 
+    Two steps skip work that cannot find anything new (tools/skip_stamps.py
+    has the policy): the tools' own tests run only when tools/ changed
+    since they last passed, and `run` executes only the listings without
+    #: markers, since the marker refresh just executed the rest, with a
+    full run once a day. RUN=full turns both shortcuts off for this gate.
+
     MARKERS=fresh skips the marker refresh here and in solutions-gate. `tip
     verify` passes it, because its own `output` step refreshed every marker
     in both trees moments before, and nothing between that step and this one
@@ -171,7 +186,8 @@ def gate(v: Vars) -> None:
     of `verify`'s gate time, so running it twice cost ~15 s a run for no
     information. Run alone, the gate always refreshes.
     """
-    tool("pytest", *v.words("PYTEST_N"), "tools/tests")
+    full_if_asked(v)
+    py("tools.tools_tests", *v.words("PYTEST_N"))
     py("tools.check_line_endings")
     py("tools.check_all", *GATE_CHECKS)
     py("tools.check_all", "anchors", "--paths", *GATE_DOCS)
@@ -189,7 +205,7 @@ def gate(v: Vars) -> None:
         py("tools.validate_output", "--update", "Chapters")
     tool("ty", "check", "build/examples")
     tool("ruff", "check", "build/examples")
-    py("tools.run_examples")
+    py("tools.run_examples", "--quick")
     tool("pytest", *v.words("PYTEST_N"), "build/examples")
     py("tools.gate_stamp", "--write", "gate")
     py("tools.tool_stamp", "--nag")
@@ -209,8 +225,10 @@ def solutions_gate(v: Vars) -> None:
     missing answer, which no later step here would notice. extract_solutions.py
     also fails on an orphaned stray under SolutionsCode/; `tip prune` deletes
     exactly those. Folded out of the listing: `gate` names it, and `gate` is
-    what you run. MARKERS=fresh skips the marker refresh, as in `gate`.
+    what you run. MARKERS=fresh skips the marker refresh, as in `gate`, and
+    `run` is quick here too.
     """
+    full_if_asked(v)
     py("tools.check_solutions")
     py("tools.extract_solutions")
     py("tools.extract_solutions", "--write")
@@ -219,7 +237,7 @@ def solutions_gate(v: Vars) -> None:
            "Solutions")
     tool("ty", "check", "build/solutions")
     tool("ruff", "check", "build/solutions")
-    py("tools.run_examples", "--tree", SOLUTIONS_TREE)
+    py("tools.run_examples", "--quick", "--tree", SOLUTIONS_TREE)
     tool("pytest", *v.words("PYTEST_N"), "build/solutions")
 
 
@@ -702,14 +720,17 @@ def release_prune(v: Vars) -> None:
     py("tools.release", "--prune")
 
 
-@task("Run the full local gate: check, ty, ruff, run, pytest, site",
-      deps=("gate", "site"))
+@task("Run the full local gate: check, ty, ruff, run, pytest, site")
 def ci(v: Vars) -> None:
     """Mirrors the GitHub Actions gates plus a site build, all run locally. The
     default GitHub Actions path only builds and publishes the site; these gates
-    run in CI only on request (see tools/README.md).
+    run in CI only on request (see tools/README.md). Runs with TIP_FULL=1, so
+    the gate skips nothing: every tools test, every listing in its own
+    process.
     """
-    pass
+    os.environ[FULL_ENV] = "1"
+    invoke("gate", v)
+    invoke("site", v)
 
 
 also("kindle", "libs-check", "tools-status")
@@ -1155,9 +1176,11 @@ def tools_test(v: Vars) -> None:
     modules and the pure logic inside the entry points. Distinct from `test`,
     which runs the book's example tests under build/examples/. `gate` runs this
     first: every later step trusts these tools, so a broken one makes the rest
-    of the gate's verdict meaningless.
+    of the gate's verdict meaningless. The gate skips the suite (all but the
+    tests marked `book`) while tools/ is unchanged since it last passed; this
+    task always runs all of it, and refreshes that stamp.
     """
-    tool("pytest", *v.words("PYTEST_N"), "tools/tests")
+    py("tools.tools_tests", "--always", *v.words("PYTEST_N"))
 
 
 @task("Smoke-test every task; mutating ones run in a disposable "

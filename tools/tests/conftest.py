@@ -16,4 +16,13 @@ chapter directory and utils/.
 import sys
 from pathlib import Path
 
+import pytest
+
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
+
+
+def pytest_configure(config: pytest.Config) -> None:
+    # tools/tools_tests.py runs only these when tools/ is unchanged.
+    config.addinivalue_line(
+        "markers", "book: reads the book itself, so a chapter edit can "
+                   "break it; runs even when tools/ is unchanged")

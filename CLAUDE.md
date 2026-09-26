@@ -148,7 +148,16 @@ cleanup), refresh the `#:` output markers in both trees, sync `Examples/`
 and `SolutionsCode/`, build the figure gallery, then every gate but the
 site build. Its ordered step list lives in `tools/verify.py`
 (`VERIFY_TARGETS`), and `tip verify ARGS=--help` lists it without
-running anything. Until 2026-09-24 this was two targets, `verify` without
+running anything. Since 2026-09-26 the gate skips work that cannot
+find anything new (`tools/skip_stamps.py` has the policy): `verify`
+passes `MARKERS=fresh` so the gate does not refresh the markers a
+second time, the tools' own tests run only when `tools/` changed
+since they last passed (tests marked `book` always run), and `run`
+executes only listings without `#:` markers, with a full run of
+every listing once a day. `tip gate RUN=full`, `tip ci`, and `tip
+release` turn the shortcuts off (`TIP_FULL=1`). A new tools test
+that reads a chapter, not a fixture, needs `@pytest.mark.book`.
+Until 2026-09-24 this was two targets, `verify` without
 the fixers and `all` with them; `all` is gone, since every fixer repairs
 something the gate would otherwise fail on. The marker refresh runs
 *before* the sync, not after: `gate`/`solutions-gate` refresh markers

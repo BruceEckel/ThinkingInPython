@@ -29,6 +29,15 @@ so this script also supports a *baseline* of currently-known failures:
 That makes CI green today and red the moment a change breaks something that
 currently works.
 
+``--quick`` is the gate's mode. It skips every listing that carries a
+``#:`` marker, since the gate's marker refresh has already executed those,
+and runs only the unmarked ones (about one in nine). It runs everything
+anyway when the tree's last full run is more than a day old, never
+happened, or ``TIP_FULL=1`` is set; ``tools/skip_stamps.py`` has the
+policy and says what the full run catches that the marker refresh cannot.
+A passing full run over the whole tree records its stamp, whether or not
+``--quick`` was given.
+
 Usage:
     python -m tools.run_examples                 # run everything (all cores)
     python -m tools.run_examples StateMachine    # only that subtree
@@ -36,12 +45,14 @@ Usage:
     python -m tools.run_examples -j 1            # run serially
     python -m tools.run_examples -j 8            # run 8 examples at once
     python -m tools.run_examples --baseline      # fail only on regressions
+    python -m tools.run_examples --quick         # unmarked only, full daily
     python -m tools.run_examples --write-baseline
 """
 
 import argparse
 import fnmatch
 import os
+import re
 import subprocess
 import sys
 from concurrent.futures import ThreadPoolExecutor
@@ -50,8 +61,11 @@ from pathlib import Path
 from tools.config import DATA_DIR, INLINE_NORUN_MARKER, NORUN_FILE
 from tools.config import EXAMPLES_TREE as DEFAULT_TREE, utils_dir
 from tools.repo import jobs_arg, load_glob_list, write_text_lf
+from tools.skip_stamps import full_run_due, record_full_run
 
 BASELINE_FILE = DATA_DIR / "examples_baseline.txt"
+# The same test validate_output.py applies: a marker starts its line.
+MARKER = re.compile(r"^#:", re.MULTILINE)
 
 
 def is_pytest_file(name: str) -> bool:
@@ -131,6 +145,9 @@ def main(argv: list[str] | None = None) -> int:
                     help="fail only on examples not already in the baseline")
     ap.add_argument("--write-baseline", action="store_true",
                     help="record current failures as the baseline and exit 0")
+    ap.add_argument("--quick", action="store_true",
+                    help="skip listings with #: markers (the marker refresh "
+                         "ran them) unless a full run is due")
     args = ap.parse_args(argv)
 
     if not args.tree.exists():
@@ -140,6 +157,11 @@ def main(argv: list[str] | None = None) -> int:
 
     skips = load_glob_list(NORUN_FILE)
     py_files = sorted(args.tree.rglob("*.py"))
+    quick = args.quick
+    if quick and (reason := full_run_due(args.tree)):
+        print(f"Full run ({reason}).")
+        quick = False
+    marked: list[str] = []
     passed: list[str] = []
     failed: list[tuple[str, str]] = []
     pytest_files: list[str] = []
@@ -159,6 +181,9 @@ def main(argv: list[str] | None = None) -> int:
         text = f.read_text(encoding="utf-8", errors="replace")
         if is_skipped(rel, text, skips):
             unattended.append(rel)  # GUI/interactive/infinite-loop: norun.txt
+            continue
+        if quick and MARKER.search(text):
+            marked.append(rel)  # The marker refresh already executed it
             continue
         to_run.append((f, rel))
 
@@ -190,6 +215,7 @@ def main(argv: list[str] | None = None) -> int:
     for label, count in (
         ("Passed:", len(passed)),
         ("Tested via pytest:", len(pytest_files)),
+        ("Marker refresh ran:", len(marked)),
         ("Can't run unattended:", len(unattended)),
         ("Timeout:", len(timed_out)),
         ("Failed:", len(failed)),
@@ -205,6 +231,8 @@ def main(argv: list[str] | None = None) -> int:
             print(f"  F {rel}\n      {tail}")
 
     failing = [rel for rel, _ in failed] + timed_out
+    if not quick and not args.subtree and not failing:
+        record_full_run(args.tree)
 
     if args.write_baseline:
         write_baseline(failing)

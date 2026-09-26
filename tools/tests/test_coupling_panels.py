@@ -3,6 +3,7 @@ their straight edges are straight, every gallery box sits inside its
 cell, and the chapters reference the panels the specs produce."""
 from __future__ import annotations
 import re
+import pytest
 from tools.coupling_panels import (GALLERY, GALLERY_H, GALLERY_W,
                                    PANELS, ROOT, Edge, Node, all_edge_problems,
                                    edge_problems, render_all)
@@ -18,6 +19,7 @@ def test_every_edge_names_two_nodes_of_its_panel() -> None:
             assert e.b in names, (ch, e.b)
 
 
+@pytest.mark.book
 def test_each_pattern_chapter_references_its_panel_once() -> None:
     for ch in PANELS:
         md = next(CHAPTERS.glob(f"{ch}_*.md"))
