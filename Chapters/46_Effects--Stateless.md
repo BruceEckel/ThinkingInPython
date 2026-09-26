@@ -1,5 +1,10 @@
 # Stateless
 
+Two things a function does are the easiest to forget:
+what it needs from outside, and how it can fail.
+Stateless writes both into the function's type,
+and the type checker holds every caller to them.
+
 [Effect Management](44_Effects--Effect_Management.md#library-effect-management)
 introduced library Effect systems.
 [Stateless](https://github.com/suned/stateless)

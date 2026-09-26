@@ -1,5 +1,10 @@
 # Effect Management
 
+A function does more than its signature says: it reads a clock, writes a log,
+opens a connection.
+Effect Management makes the extra visible to a reader, a test,
+and a type checker.
+
 A test you wrote last week starts failing about one run in five.
 The function it calls computes a total price, and the math is right.
 Three calls down, a helper that formats currency reads a configuration service and writes to an audit log.

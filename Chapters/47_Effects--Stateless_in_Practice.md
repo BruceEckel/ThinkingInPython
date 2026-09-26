@@ -1,5 +1,10 @@
 # Stateless in Practice
 
+An Effect states what it needs and how it can fail,
+and something outside it must answer the need and take the failure.
+This chapter writes those answers: Abilities of your own,
+handlers for testing and for production, and the operators that combine them.
+
 [Stateless](46_Effects--Stateless.md)
 established the two channels an `Effect[A, E, R]` carries.
 A dependency is a `Need` that `supply()` answers.
