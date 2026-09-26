@@ -379,7 +379,11 @@ from the same file (`GALLERY`, a `Cell` per pattern, since
 2026-09-25); the section's other three figures are still hand-drawn.
 `make coupling-panels` (in `gate`,
 `verify-ch`, and `sweep`) fails when a committed SVG differs from what
-the spec draws, so a listing rename that misses the spec is loud. The
+the spec draws, so a listing rename that misses the spec is loud. It
+also fails an arrowhead whose tip is not 4 units (within 1) from its
+target's rounded outline, and an edge that crosses a third box
+(2026-09-25); `edge_points()` slides every tip onto that 4-unit line,
+so a new failure usually means two boxes need moving, not a tweak. The
 2026-09-23 verification of all fourteen found two recurring mistakes
 worth checking a new panel for: drawing the GoF shape instead of the
 listing's (chapter 26 had a `Service` protocol no listing declares),

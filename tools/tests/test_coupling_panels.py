@@ -4,7 +4,8 @@ chapters reference the panels the specs produce."""
 from __future__ import annotations
 import re
 from tools.coupling_panels import (CAPTIONS, GALLERY, GALLERY_H, GALLERY_W,
-                                   PANELS, ROOT, Edge, Node, render_all)
+                                   PANELS, ROOT, Edge, Node, all_edge_problems,
+                                   edge_problems, render_all)
 
 CHAPTERS = ROOT / "Chapters"
 
@@ -92,3 +93,21 @@ def test_no_box_covers_its_note() -> None:
                 bad.append(f"{name}: {n.name} reaches {n.y + n.h:g}, "
                            f"the note starts at {top:g}")
     assert bad == []
+
+
+def test_every_tip_meets_its_box_and_no_edge_crosses_one() -> None:
+    assert all_edge_problems() == []
+
+
+def test_edge_problems_reports_a_crossing() -> None:
+    nodes = (Node("a", 0, 0, w=40, h=20), Node("mid", 80, 0, w=40, h=20),
+             Node("b", 160, 0, w=40, h=20))
+    assert edge_problems(nodes, (Edge("a", "b", "thin"),)) == [
+        "a -> b: crosses mid"]
+
+
+def test_a_tip_reaches_a_rounded_box_at_any_angle() -> None:
+    target = Node("t", 100, 100, w=90, h=40, kind="interface")
+    for x, y in ((0, 0), (300, 20), (145, 300), (0, 240)):
+        nodes = (Node("s", x, y, w=40, h=20), target)
+        assert edge_problems(nodes, (Edge("s", "t", "realize"),)) == []

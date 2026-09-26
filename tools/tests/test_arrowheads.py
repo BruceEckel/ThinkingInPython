@@ -83,6 +83,19 @@ def test_a_tip_on_the_border_is_tight_and_one_four_off_is_not() -> None:
     assert tight_tips(svg) == ["tip 100.0,20.0: gap 0.0"]
 
 
+def test_a_tip_off_a_rounded_corner_measures_to_the_curve() -> None:
+    # 2 from the square corner (100, 0), but 4 from the rounded one.
+    box = '<rect x="100" y="0" width="50" height="40" rx="12"/>'
+    reach = HEADS["filled"].trim
+    diag = 1 / 2 ** 0.5
+    tip = 112 - 16 * diag  # 16 = rx + 4, from the corner's center
+    x2, y2 = tip - reach * diag, tip - reach * diag
+    edge = (f'<line x1="{x2 - 20}" y1="{y2 - 20}" x2="{x2}" y2="{y2}" '
+            'marker-end="url(#m)"/>')
+    svg = marker_def("m", "filled", "#1a1612") + box + edge
+    assert tight_tips(svg) == []
+
+
 def test_tight_tips_reads_circles_and_polylines() -> None:
     svg = (marker_def("m", "filled", "#1a1612")
            + '<circle cx="100" cy="0" r="20"/>'

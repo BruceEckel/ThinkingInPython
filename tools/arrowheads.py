@@ -299,7 +299,9 @@ def _shapes(svg: str) -> list[tuple[str, tuple[float, ...]]]:
         if s.group().startswith("<rect"):
             w, h = a.get("width", 0), a.get("height", 0)
             if w < width - 1:
-                out.append(("rect", (a.get("x", 0), a.get("y", 0), w, h)))
+                rx = min(a.get("rx", 0), w / 2, h / 2)
+                out.append(("rect", (a.get("x", 0), a.get("y", 0), w, h,
+                                     rx)))
         else:
             out.append(("circle", (a.get("cx", 0), a.get("cy", 0),
                                    a.get("r", 0))))
@@ -307,15 +309,15 @@ def _shapes(svg: str) -> list[tuple[str, tuple[float, ...]]]:
 
 
 def _gap(p: Point, kind: str, s: tuple[float, ...]) -> float:
-    """From `p` to the shape's border, negative inside it."""
+    """From `p` to the shape's border, negative inside it. A rect's
+    border follows its rounded corners."""
     if kind == "circle":
         return math.dist(p, (s[0], s[1])) - s[2]
-    x, y, w, h = s
-    dx = max(x - p[0], 0, p[0] - (x + w))
-    dy = max(y - p[1], 0, p[1] - (y + h))
-    if dx or dy:
-        return math.hypot(dx, dy)
-    return -min(p[0] - x, x + w - p[0], p[1] - y, y + h - p[1])
+    x, y, w, h, rx = s
+    qx = abs(p[0] - (x + w / 2)) - (w / 2 - rx)
+    qy = abs(p[1] - (y + h / 2)) - (h / 2 - rx)
+    outside = math.hypot(max(qx, 0.0), max(qy, 0.0))
+    return outside + min(max(qx, qy), 0.0) - rx
 
 
 def tight_tips(svg: str, min_gap: float = MIN_GAP) -> list[str]:

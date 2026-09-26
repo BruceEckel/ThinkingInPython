@@ -23,7 +23,10 @@ the same notation, is generated here too, from the `Cell` specs in
 
 `--check` regenerates in memory and exits nonzero if any committed SVG
 differs, the way `extract_examples`'s check mode works for `Examples/`;
-`make coupling-panels` runs it in the gate. `--png` rasterizes every
+`make coupling-panels` runs it in the gate. Every run also checks each
+spec's edges (`edge_problems()`): a head's tip must sit `TIP_PAD` from
+its target's drawn outline, rounded corners included, give or take
+`TIP_SLACK`, and no edge may cross a box other than its own two. `--png` rasterizes every
 `resources/images/coupling_*.svg` (the panels and chapter 21's figures)
 into `build/coupling/` with the same rasterizer and width the EPUB
 uses, since text that fits in a browser can collide once rasterized;
@@ -83,6 +86,37 @@ class Node:
     @property
     def rx(self) -> float:
         return 12 if self.kind == "interface" else 4
+
+    def distance(self, p: tuple[float, float]) -> float:
+        """Signed distance from `p` to the drawn outline, rounded
+        corners included: positive outside, negative inside."""
+        qx = abs(p[0] - self.cx) - (self.w / 2 - self.rx)
+        qy = abs(p[1] - self.cy) - (self.h / 2 - self.rx)
+        outside = math.hypot(max(qx, 0.0), max(qy, 0.0))
+        return outside + min(max(qx, qy), 0.0) - self.rx
+
+    def reach(self, x1: float, y1: float, x2: float, y2: float,
+              pad: float) -> tuple[float, float]:
+        """The first point on the ray from (x1, y1) through (x2, y2)
+        that lies `pad` from the drawn outline, or (x2, y2) if the ray
+        passes wide of it."""
+        dx, dy = x2 - x1, y2 - y1
+        length = math.hypot(dx, dy) or 1
+        dx, dy = dx / length, dy / length
+        step, t = 0.5, 0.0
+        limit = length + self.w + self.h
+        while t < limit:
+            if self.distance((x1 + dx * t, y1 + dy * t)) <= pad:
+                lo, hi = t - step, t
+                for _ in range(30):
+                    mid = (lo + hi) / 2
+                    if self.distance((x1 + dx * mid, y1 + dy * mid)) <= pad:
+                        hi = mid
+                    else:
+                        lo = mid
+                return x1 + dx * hi, y1 + dy * hi
+            t += step
+        return x2, y2
 
     def edge_point(self, tx: float, ty: float, pad: float = 0.0) -> tuple[float, float]:
         """The point on this box's border toward (tx, ty)."""
@@ -167,7 +201,12 @@ MARKERS: dict[str, tuple[str, str]] = {
 }
 
 
-def edge_svg(e: Edge, nodes: dict[str, Node], pid: str) -> str:
+Point = tuple[float, float]
+
+
+def edge_points(e: Edge, nodes: dict[str, Node]) -> list[Point]:
+    """The edge's start, its curve's control point if it bends, and the
+    head's tip, before the line is shortened for the head."""
     a, b = nodes[e.a], nodes[e.b]
     if e.corner:
         # Aim at the target's corner nearest the source, on the padded
@@ -194,16 +233,28 @@ def edge_svg(e: Edge, nodes: dict[str, Node], pid: str) -> str:
         # Shifted sideways, a slanted edge's end slides toward the box;
         # aim it at the padded border again.
         x2, y2 = b.entry(x1, y1, x2, y2, 4)
+    # Aimed at the grown rectangle, a tip near a rounded corner stops
+    # short of it; slide the tip to 4 from the outline the box draws.
+    x2, y2 = b.reach(x1, y1, x2, y2, TIP_PAD)
+    if e.bend:
+        return [(x1, y1), ((x1 + x2) / 2 + nx * e.bend,
+                           (y1 + y2) / 2 + ny * e.bend), (x2, y2)]
+    return [(x1, y1), (x2, y2)]
+
+
+def edge_svg(e: Edge, nodes: dict[str, Node], pid: str) -> str:
+    pts = edge_points(e, nodes)
+    (x1, y1), (x2, y2) = pts[0], pts[-1]
+    dx, dy = x2 - x1, y2 - y1
+    length = math.hypot(dx, dy) or 1
     stroke, width, dash, head = STYLES[e.kind]
     marker = f'marker-end="url(#{pid}-{head})"'
     # The line stops short by the head's length, and the head reaches the box.
     trim = HEADS[MARKERS[head][0]].trim
     if e.bend:
-        mx, my = (x1 + x2) / 2 + nx * e.bend, (y1 + y2) / 2 + ny * e.bend
-        lx = (x1 + x2) / 2 + nx * e.bend / 2
-        ly = (y1 + y2) / 2 + ny * e.bend / 2
-        _, (mx, my), (x2, y2) = shorten_curve(
-            [(x1, y1), (mx, my), (x2, y2)], trim)
+        lx = (x1 + x2) / 2 - dy / length * e.bend / 2
+        ly = (y1 + y2) / 2 + dx / length * e.bend / 2
+        _, (mx, my), (x2, y2) = shorten_curve(pts, trim)
         out = (f'  <path d="M{x1:.1f},{y1:.1f} Q{mx:.1f},{my:.1f} '
                f'{x2:.1f},{y2:.1f}" fill="none" stroke="{stroke}" '
                f'stroke-width="{width}"{dash} {marker}/>\n')
@@ -501,7 +552,7 @@ PANELS: dict[int, Panel] = {
         "disk_usage() and walk() each name both node types, and Directory "
         "names only the Node union",
         (Node("disk_usage()", C1, R1, w=110),
-         Node("walk()", C1, R2, w=110),
+         Node("walk()", C1, R2, w=96),
          Node("File", C3, R1, w=90),
          Node("Directory", C3, R2, w=96),
          Node("Node", C2 + 10, R3 + 6, w=90, kind="interface",
@@ -715,6 +766,54 @@ def render_gallery(pid: str = "gl") -> str:
             f"  <title>{GALLERY_TITLE}</title>\n" + defs(pid) + b + "</svg>\n")
 
 
+# A tip sits on the target's border grown by TIP_PAD, the margin
+# `arrowheads.tight_tips()` requires, and may stray TIP_SLACK from it.
+TIP_PAD, TIP_SLACK = 4.0, 1.0
+
+
+def samples(pts: list[Point], steps: int = 200) -> list[Point]:
+    """Points along the straight or quadratic edge `pts`."""
+    out = []
+    for i in range(steps + 1):
+        t = i / steps
+        if len(pts) == 2:
+            (x1, y1), (x2, y2) = pts
+            out.append((x1 + (x2 - x1) * t, y1 + (y2 - y1) * t))
+        else:
+            (x1, y1), (mx, my), (x2, y2) = pts
+            u = 1 - t
+            out.append((u * u * x1 + 2 * u * t * mx + t * t * x2,
+                        u * u * y1 + 2 * u * t * my + t * t * y2))
+    return out
+
+
+def edge_problems(nodes: tuple[Node, ...],
+                  edges: tuple[Edge, ...]) -> list[str]:
+    """Each edge whose tip strays from its target's padded outline, and
+    each edge that crosses a box other than its own two."""
+    by_name = {n.name: n for n in nodes}
+    out: list[str] = []
+    for e in edges:
+        pts = edge_points(e, by_name)
+        gap = by_name[e.b].distance(pts[-1])
+        if abs(gap - TIP_PAD) > TIP_SLACK:
+            out.append(f"{e.a} -> {e.b}: tip {gap:.1f} from the outline, "
+                       f"not {TIP_PAD:g}")
+        crossed = [n.name for n in nodes if n.name not in (e.a, e.b)
+                   and any(n.distance(q) < 0 for q in samples(pts))]
+        if crossed:
+            out.append(f"{e.a} -> {e.b}: crosses {', '.join(crossed)}")
+    return out
+
+
+def all_edge_problems() -> list[str]:
+    out = [f"coupling_{ch}.svg  {msg}" for ch, p in sorted(PANELS.items())
+           for msg in edge_problems(p.nodes, p.edges)]
+    out += [f"coupling_gallery.svg ({c.title})  {msg}" for c in GALLERY
+            for msg in edge_problems(c.nodes, c.edges)]
+    return out
+
+
 def render_all() -> dict[Path, str]:
     out = {IMAGES / f"coupling_{ch}.svg": p.svg(f"c{ch}")
            for ch, p in sorted(PANELS.items())}
@@ -764,7 +863,12 @@ def main(argv: list[str] | None = None) -> int:
     if args.check:
         print("coupling panels: in sync" if not drift else
               f"coupling panels: {drift} file(s) differ; rerun without --check")
-    return 1 if drift else 0
+    problems = all_edge_problems()
+    for msg in problems:
+        print(f"edge   {msg}")
+    if problems:
+        print(f"coupling panels: {len(problems)} edge problem(s)")
+    return 1 if drift or problems else 0
 
 
 if __name__ == "__main__":
