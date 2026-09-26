@@ -8,6 +8,7 @@ import pytest
 from prompt_toolkit.input import create_pipe_input
 from prompt_toolkit.output import DummyOutput
 
+from pathlib import PureWindowsPath
 from unittest import mock
 
 from tools import help_picker
@@ -248,6 +249,42 @@ def test_record_command_prefers_the_wrappers_file(tmp_path):
     env.pop(RECORD_VAR)
     assert record_command("tip test", env, home) == [psrl]
     assert psrl.read_text().splitlines() == ["tip", "tip test"]
+
+
+@pytest.mark.parametrize("env, platform, profile, script", [
+    ({}, "win32", "$PROFILE", r"C:\repo\tools\menu_history.ps1"),
+    ({"SHELL": "/usr/bin/bash"}, "win32", "~/.bashrc",
+     "/c/repo/tools/menu_history.sh"),                      # Git Bash
+    ({"SHELL": "/bin/bash"}, "linux", "~/.bashrc",
+     "/c/repo/tools/menu_history.sh"),
+    ({"SHELL": "/usr/bin/zsh"}, "linux", "~/.zshrc",
+     "/c/repo/tools/menu_history.sh"),
+])
+def test_history_hint_names_the_wrapper_for_the_shell(env, platform,
+                                                      profile, script):
+    root = PureWindowsPath(r"C:\repo")
+    hint = help_picker.history_hint(env, platform, root)
+    assert hint is not None
+    assert hint.endswith(f"to {profile}: . {script})")
+
+
+def test_history_hint_is_silent_under_the_wrapper():
+    env = {RECORD_VAR: "/tmp/tip-menu-abc", "SHELL": "/bin/bash"}
+    assert help_picker.history_hint(env, "linux") is None
+
+
+def test_the_hint_follows_only_the_first_run(capsys):
+    targets = iter([_target("test"), _target("test"), None])
+    with mock.patch("tools.help_picker.history_hint",
+                    return_value="(hint)"), \
+            mock.patch("tools.help_picker.run_target", return_value=0), \
+            mock.patch("tools.help_picker.ask_return_or_esc",
+                       return_value=True), \
+            mock.patch("tools.help_picker.Picker") as picker:
+        picker.return_value.run.side_effect = lambda: next(targets)
+        picker.return_value.cursor = 0
+        assert help_picker.pick_and_run([]) == 0
+    assert capsys.readouterr().out.count("(hint)") == 1
 
 
 def test_record_history_skips_a_file_it_cannot_write(tmp_path):

@@ -237,7 +237,8 @@ file that exists instead, and the shell picks that up on its own
 schedule: PSReadLine merges other writers' lines when it next writes, so
 after your next command; zsh with `SHARE_HISTORY` or `INC_APPEND_HISTORY`
 at once; bash at its next startup. No history file is created, and
-cmd.exe has none. When it finishes, a one-line
+cmd.exe has none. The first run in a menu session then ends with a
+line naming the wrapper to source and the profile that should load it. When it finishes, a one-line
 prompt waits: Return reopens the menu with the highlight where it was
 and Esc quits. A target that fails gets a "(tip X exited with status
 N)" line before that prompt, and Ctrl-C during a run gets

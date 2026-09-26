@@ -41,7 +41,9 @@ appended to every shell history file that exists: PSReadLine's
 after your next command), `~/.zsh_history` (extended format when the
 file uses it; SHARE_HISTORY or INC_APPEND_HISTORY sees it at once), and
 `~/.bash_history` (read at startup, so the next session). No history
-file is created, and cmd.exe keeps none. When the target finishes, a
+file is created, and cmd.exe keeps none. In that case the first run of
+a menu session ends with a line naming the wrapper to source and the
+profile to add it to. When the target finishes, a
 one-line prompt waits: Return reopens the menu with the highlight where
 it was and Esc quits. A failing target gets a "(tip X exited with
 status N)" line first, and Ctrl-C during a run gets "(interrupted: tip
@@ -64,7 +66,7 @@ import sys
 import time
 from collections.abc import Callable, Iterable, Mapping, Sequence
 from dataclasses import dataclass
-from pathlib import Path
+from pathlib import Path, PurePath
 from typing import TYPE_CHECKING
 
 from prompt_toolkit.application import Application
@@ -753,6 +755,29 @@ def record_command(command: str, env: Mapping[str, str] | None = None,
     return record_history(command, history_files(settings, home))
 
 
+def history_hint(env: Mapping[str, str] | None = None,
+                 platform: str = sys.platform,
+                 root: PurePath = ROOT) -> str | None:
+    """The line telling you to source the `tip` wrapper, or None when
+    a wrapper set TIP_MENU_RECORD. The wrapper and profile named are
+    PowerShell's on Windows unless SHELL says bash or zsh (Git Bash
+    sets it); elsewhere bash's, or zsh's when SHELL names zsh."""
+    settings: Mapping[str, str] = os.environ if env is None else env
+    if settings.get(RECORD_VAR):
+        return None
+    shell = Path(settings.get("SHELL", "")).stem
+    if platform == "win32" and shell not in ("bash", "zsh"):
+        script = str(root / "tools" / "menu_history.ps1")
+        profile = "$PROFILE"
+    else:
+        script = (root / "tools" / "menu_history.sh").as_posix()
+        if match := re.match(r"([A-Za-z]):/", script):
+            script = f"/{match[1].lower()}/{script[3:]}"
+        profile = "~/.zshrc" if shell == "zsh" else "~/.bashrc"
+    return (f"(to put menu commands on Up-arrow at once, add this line"
+            f" to {profile}: . {script})")
+
+
 INTERRUPTED = 130       # the conventional exit status after Ctrl-C
 
 
@@ -837,13 +862,24 @@ def session(pick: Callable[[int | None], tuple[Target | None, int]],
 
 def pick_and_run(rows: list[Row], *, color: bool = True) -> int:
     """Open the picker on `rows` and loop: run the choice, wait for
-    Return or Esc, reopen or quit."""
+    Return or Esc, reopen or quit. Without the `tip` wrapper, the first
+    run ends with `history_hint()`'s line."""
+    hint = history_hint()
+
+    def run(target: Target) -> int:
+        nonlocal hint
+        status = run_target(target)
+        if hint:
+            print(hint)
+            hint = None
+        return status
+
     def pick(cursor: int | None) -> tuple[Target | None, int]:
         picker = Picker(rows, color=color, cursor=cursor)
         return picker.run(), picker.cursor
 
     try:
-        return session(pick, run_target, ask_return_or_esc)
+        return session(pick, run, ask_return_or_esc)
     except KeyboardInterrupt:
         # Inside the picker and the prompts Ctrl-C is a key, handled
         # there; this catches one that lands between them.
