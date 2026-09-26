@@ -1369,7 +1369,8 @@ above it on a narrow screen). In art mode `snake_cutout()` makes it
 from `cover-source.jpg` with Pillow alone: the paper around the
 serpent and inside each loop becomes transparent, and the image is
 cropped to what remains. The EPUBs set it on its own line under each
-chapter title, above the ornament. The index page and the PDF do
+chapter title, above the ornament, and the PDF under the ornament
+band that underlines the title. The index page does
 not use it. `--preview` writes a small `cover-preview.png` for quick
 iteration.
 

@@ -106,6 +106,9 @@ PAGEBREAK_TYPST = """\
     text(size: 28pt,
          underline(stroke: 5pt + orn-band, offset: 13pt,
                    evade: false, background: true, title))
+    // The snake sits under the banded title, as in the EPUBs
+    // (snake_typst() writes nothing when the PNG is missing).
+    <<snake>>
     v(28pt)
   }
   it
@@ -178,17 +181,34 @@ def cover_file() -> Path | None:
     return None
 
 
+def rooted(path: Path) -> str:
+    """`path` as typst's root-relative form: run_pandoc sets the
+    root to this drive's top, so the anchor is stripped."""
+    return "/" + path.relative_to(path.anchor).as_posix()
+
+
+def snake_typst() -> str:
+    """The chapter opening's snake: a line break, then the image
+    on its own line. Empty when chapter-snake.png is missing.
+
+    The top inset clears the ornament band under the title. A v()
+    would split the heading into paragraphs, the same reason the
+    eyebrow uses linebreak()."""
+    snake = ROOT / "resources" / "static" / "chapter-snake.png"
+    if not snake.exists():
+        return ""
+    return ("linebreak()\n"
+            f'    box(inset: (top: 18pt), image("{rooted(snake)}",'
+            " width: 1.4in))")
+
+
 def header_typst(release: str | None) -> str:
     """The typst preamble: cover, page breaks, and the footer."""
     stamp = build_epub.release_line(release) if release else ""
     cover = ""
     cover_path = cover_file()
     if cover_path is not None:
-        # Typst reads "/..." as root-relative; run_pandoc sets the
-        # root to this drive's top, so strip the anchor.
-        rooted = "/" + cover_path.relative_to(
-            cover_path.anchor).as_posix()
-        cover = COVER_TYPST.replace("<<cover>>", rooted)
+        cover = COVER_TYPST.replace("<<cover>>", rooted(cover_path))
     # The footer stays off the title page: physical page 2 when
     # the cover is present, page 1 when it is not.
     footer = (FOOTER_TYPST
@@ -198,7 +218,8 @@ def header_typst(release: str | None) -> str:
     # source for the book's art palette.
     breaks = (PAGEBREAK_TYPST
               .replace("<<moss>>", make_cover.MOSS.lstrip("#"))
-              .replace("<<gold>>", make_cover.GOLD.lstrip("#")))
+              .replace("<<gold>>", make_cover.GOLD.lstrip("#"))
+              .replace("<<snake>>", snake_typst()))
     return cover + breaks + EPIGRAPH_TYPST + footer
 
 # Inserted after the title block and before the outline: the support
