@@ -686,10 +686,10 @@ subclass really does behave differently, as `FirstDigit` and
 `SecondDigit` do in `vending_machine.py`. They exist as separate
 classes so they arrive under different keys.
 
-**Fix 2** stops making a class for something that is a value. A
-nickel is not a new kind of money. It is a `Money` whose `value` is 5.
-`Money("nickel", 5)` needs no table change, no new row, and no new
-class, because it arrives under the key the table already has.
+**Fix 2** stops making a class for something that is a value. A nickel
+is not a new kind of money. It is a `Money` whose `value` is 5.
+`Money("nickel", 5)` arrives under a key the table has, so the table
+and the classes stay as they are.
 
 Keep fix 2. A subclass is worth creating when the machine must treat
 the input differently. A nickel differs from a quarter only in a

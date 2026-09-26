@@ -144,15 +144,15 @@ one about the operation rather than the output. It catches a sort
 that shuffles equal elements on the second pass, where the ordering
 invariant sees nothing wrong.
 
-The oracle closes the gap. `insertion_sort()` is slow and obviously
-correct, so asserting that it agrees with `sorted()` pins down the
-elements, their multiplicities, and their order at once. The oracle
-earns its place because it repeats no part of `sorted()`'s
-implementation. It arrives at the same answer by a different route.
-That independence is what makes an oracle worth having, and what
-makes `assert sorted(xs) == sorted(xs)` worthless. Capping the list
-length keeps the quadratic oracle cheap, since the bugs it catches
-show up on short inputs.
+The oracle closes the gap. `insertion_sort()` is slow and simple
+enough to check by reading, so asserting that it agrees with
+`sorted()` pins down the elements, their multiplicities, and their
+order at once. The oracle earns its place because it repeats no part
+of `sorted()`'s implementation. It arrives at the same answer by a
+different route. That independence is what makes an oracle worth
+having, and what makes `assert sorted(xs) == sorted(xs)` worthless.
+Capping the list length keeps the quadratic oracle cheap, since the
+bugs it catches show up on short inputs.
 
 ## 4. A law that is false
 

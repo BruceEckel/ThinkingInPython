@@ -445,12 +445,13 @@ either the pair is in the table or it is not.
 The tolerant version also loses the failure that makes the exact
 version safe, though only for a subclass of a concrete item. An
 `Origami(Paper)` whose rows you forgot to write no longer raises a
-`KeyError`. It silently inherits `Paper`'s answers and plays as
-paper. A `Lizard(Item)` still fails fast, since no row is keyed on
-`Item` and the MRO walk finds nothing to inherit. Tolerance buys the
+`KeyError`. It silently inherits `Paper`'s answers and plays as paper.
+A `Lizard(Item)` still fails fast, since no row has `Item` in its key
+and the MRO walk finds nothing to inherit. Tolerance buys the
 convenience of skipping rows at the price of the fail-fast policy the
 chapter recommends for a table under construction, and it buys it
-exactly where a new type is most likely to be mistaken for an old one.
+exactly where the table is most likely to mistake a new type for an
+old one.
 
 Which behavior you want depends on whether a subclass is a new
 competitor or a variation on an existing one. `Origami` really is
@@ -511,8 +512,8 @@ and exercise 8 adds that dependence.
 The listing gives each `Inhabitant` kind two of six weapon types,
 ranked around a cycle: each weapon beats the previous two in the
 ranking and loses to the next two. Six is an even number, so one pair
-is left over. Each weapon has an opposite, three steps around the
-circle, which it neither beats nor loses to, and that pair draws.
+remains. Each weapon has an opposite, three steps around the circle,
+which it neither beats nor loses to, and that pair draws.
 `paper_scissors_rock.py` needs no such case because three items leave
 nothing over: with an odd count every weapon beats half the rest and
 loses to the other half. An even count always leaves the opposite pair
@@ -717,10 +718,9 @@ combination and inherit the rest, because the lookup still matches
 types exactly: an `Origami(Paper)` finds no row at all, callable or
 not, and the fix is to write `Origami`'s rows rather than to override
 one. Changing a cell changes it for every `Item`, since `OUTCOME` is
-one shared dictionary. `paper_scissors_rock_subclass.py`'s
-`DampPaper` gets its exception by overriding `compete()` and
-`eval_rock()`, and this version has nothing to override: `compete()`
-is defined once on `Item`.
+one shared dictionary. `paper_scissors_rock_subclass.py`'s `DampPaper`
+gets its exception by overriding `compete()` and `eval_rock()`, and
+this version has nothing to override: `Item` defines `compete()` once.
 
 One cost comes with the change. `paper_vs_rock()` and
 `rock_vs_paper()` take two `Item`s, because every cell must, so each

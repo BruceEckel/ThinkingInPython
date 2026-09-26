@@ -368,7 +368,7 @@ rows share one assertion. A version constructing its own `Material`
 inside `holds()` needs three copies of the function, one per material,
 and a version that also constructs its own `Nailer` needs all six.
 
-## 6. A handler that builds what was requested
+## 6. A handler that builds what the request names
 
 ```python
 # exercise_6.py
@@ -459,7 +459,7 @@ runs to completion and prints:
 ['greeted Alice', 'greeted Bob']
 ```
 
-The greetings are gone. `greet(name)` calls a generator function, so
+No greeting prints. `greet(name)` calls a generator function, so
 it builds an Effect and returns it. Nothing then drives that Effect,
 so its body never runs and never makes the `Need[Console]` request.
 The log entries still appear because the deletion touches only the

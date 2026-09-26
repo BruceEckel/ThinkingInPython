@@ -143,12 +143,12 @@ t.set_celsius(25)
 ```
 
 `Display.update()` now declares `subject: Thermometer` and the call
-type-checks. The cost is at the other end: observers are typed to the
-subject they watch, so a display written for a `Thermometer` cannot
-attach to a different `Subject[float]`. A parameter is contravariant,
-so an observer that declares the wider `Subject[float]` still attaches
-to any of them, and an observer that reads `celsius` is the one that
-gives up that freedom.
+type-checks. The cost is at the other end: each observer's type names
+the subject it watches, so a display written for a `Thermometer`
+cannot attach to a different `Subject[float]`. A parameter is
+contravariant, so an observer that declares the wider `Subject[float]`
+still attaches to any of them, and an observer that reads `celsius` is
+the one that gives up that freedom.
 
 Both versions print the same line, and neither needs `arg`. That is
 pull's bargain: the subject decides nothing about what its observers
@@ -562,14 +562,14 @@ print(initials(recolored(grid, (1, 2)), 4))
 #: s k k s
 ```
 
-`Color` and `new_grid()` are copied from `box_observer.py`
-unchanged, and `recolored()` is the one function that differs. It
-keeps every cell whose column matches the selection's `x` or whose row
-matches its `y`, and advances each one. The cells come from `grid`,
-so none lies outside it and the `in grid` test goes away.
-`initials()` prints each cell's first letter, one row per line. After
-selecting column 1, row 2, that column and that row have moved one
-color along, and the other nine cells are as they were.
+`Color` and `new_grid()` come from `box_observer.py` unchanged, and
+`recolored()` is the one function that differs. It keeps every cell
+whose column matches the selection's `x` or whose row matches its `y`,
+and advances each one. The cells come from `grid`, so none lies
+outside it and the `in grid` test goes away. `initials()` prints each
+cell's first letter, one row per line. After selecting column 1, row
+2, that column and that row have moved one color along, and the other
+nine cells are as they were.
 
 Pasting this `recolored()` over the one in `box_observer.py` changes
 what the window does, and `box_view.py` runs as it stands. The view
@@ -787,8 +787,8 @@ dimensions are combinations of cells that no selection can change, so
 the starting grid must already agree with the target on each of them.
 The 4x4 banded grid agrees for all three colors, and the 8x8 grid for
 `palegreen` alone, which is the puzzle the window poses. At 5x5 three
-dimensions are missing and no color satisfies them, so that board
-cannot be made one color at all.
+dimensions are missing and no color satisfies them, so no sequence of
+selections turns that board one color.
 
 `Color` is a `StrEnum`, so its members go straight into
 `", ".join(reachable(size))` with no conversion, the same property
@@ -855,9 +855,9 @@ print(t.celsius, t.humidity)
 #: 150.0 0.5
 ```
 
-`__set_name__()` receives the name each descriptor was assigned to, so
-`celsius` and `humidity` derive different attribute names: `_celsius`
-and `_listeners_celsius` for one, `_humidity` and
+`__set_name__()` receives the name the class body binds each
+descriptor to, so `celsius` and `humidity` derive different attribute
+names: `_celsius` and `_listeners_celsius` for one, `_humidity` and
 `_listeners_humidity` for the other. Two `Notifying` instances in one
 class therefore share no storage and no listener list, which is what
 makes the two attributes independent. `Broadcaster` keeps one list for

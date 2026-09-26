@@ -211,7 +211,7 @@ print(f.count, g.count, trace_counting.total_calls)
 ```
 
 `__call__()` prints the chapter's arrow lines around the forwarded
-call, so every call is traced as well as counted.
+call, so the decorator traces every call as well as counting it.
 
 Each decorated function gets its own instance of `trace_counting`
 (the same as `count_calls`), so `f.count` and `g.count` track only

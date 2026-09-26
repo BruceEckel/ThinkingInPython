@@ -513,8 +513,8 @@ a list. `typed_skipping()` delivers `[1, 3, 4]` and never mentions
 For a parsed log file, take the skipping version. A log is an
 append-only record that many processes write, so a malformed line is
 an expected event rather than a broken contract. One truncated line
-should not cost you the rest of the file. The raising version
-gives the caller no way to resume: the generator is spent, so
+should not cost you the rest of the file. The raising version gives
+the caller no way to resume: the exception ends the generator, so
 continuing means parsing the file again and somehow starting past the
 line that failed.
 

@@ -331,7 +331,7 @@ expect(Blackout, run, handle(short)(run_load)(17, 6))
 #: [Blackout] 20
 ```
 
-The turbine takes the evening hours the battery covered before it was added, and the battery
+The turbine takes the evening hours the battery covered without it, and the battery
 drops back to one hour at 22:00 once the wind stops.
 `run_load()` needs no change, and could not have needed one: it asks for a
 `Source` at an hour and uses whatever the handler hands back.
@@ -395,8 +395,8 @@ Three requests for two hours of power. The first two hand back a `Dead` source
 that fails immediately, and `run_load()` responds by breaking out of the inner
 loop, leaving the `connected` block, and asking for another source.
 The third request produces a working one, which then covers both hours.
-The test pins down that re-request behavior with no weather, no clock, and no
-battery: the handler answers from a list.
+The test pins down that re-request behavior with a handler that answers from a list
+instead of weather, a clock, or a battery.
 
 What the test cannot tell you is whether `controller()` is right.
 Every question about policy is out of its reach: whether `controller()` prefers
@@ -580,8 +580,8 @@ def research() -> Effect[
 Four edits, and the type checker names one of them.
 
 1. A new exception class, `TooLong`.
-2. A new `@throws(TooLong)` function, `within_limit()`, since a failure has to be
-   lifted before it can travel.
+2. A new `@throws(TooLong)` function, `within_limit()`, since `@throws` lifts a raised
+   `TooLong` into a failure that can travel.
 3. One new line in `research()`, the `yield from within_limit(article)`.
 4. `research()`'s error parameter, widened to include `TooLong`.
 

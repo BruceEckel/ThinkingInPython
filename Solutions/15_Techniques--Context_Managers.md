@@ -79,9 +79,9 @@ print("survived")
 The class is the chapter's `expected` with the `ALL` default left out,
 since the exercise always passes an argument. With no `ALL` to test
 for, the two guards in `__exit__()` merge into one `or` test, and the
-union the chapter names with its `Types` alias is written out in the
-`__init__()` annotation. Everything the exercise asks for happens at
-the call site: `expected` takes one `types` argument that is either an
+`__init__()` annotation writes out the union the chapter names with
+its `Types` alias. Everything the exercise asks for happens at the
+call site: `expected` takes one `types` argument that is either an
 exception class or a tuple of them, and
 `issubclass(exc_type, self.types)` accepts either shape. Passing
 `(ZeroDivisionError, TypeError)` therefore suppresses both, and the

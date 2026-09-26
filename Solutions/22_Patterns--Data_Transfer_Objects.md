@@ -234,12 +234,12 @@ catch a typo in a key name.
 
 **The grid coordinate is a `NamedTuple`.** It must work as a `dict`
 key, so it must hash, and a `NamedTuple` hashes as long as its fields
-do. A `@dataclass` also hashes by value, but only when frozen
-(with the default `eq=True`), so a plain mutable `@dataclass` is
-disqualified outright. Between a frozen dataclass and a `NamedTuple`
-here, the tuple form wins on convenience: unpacking a coordinate as
-`x, y = point` and using it wherever a plain tuple is expected are
-both things the scenario wants and a frozen dataclass refuses.
+do. A `@dataclass` also hashes by value, but only when frozen (with
+the default `eq=True`), which rules out a plain mutable `@dataclass`.
+Between a frozen dataclass and a `NamedTuple` here, the tuple form
+wins on convenience: unpacking a coordinate as `x, y = point` and
+using it wherever code takes a plain tuple are both things the
+scenario wants and a frozen dataclass refuses.
 
 **The JSON record is a `@dataclass`.** JSON's own encoding already
 loses field names when the shape is a `NamedTuple`

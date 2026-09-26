@@ -354,6 +354,6 @@ The unit lives only in the field name. A stage that changes what a
 value means must run after every stage that reads the old meaning.
 
 The last `print()` repeats the chapter's point. Both reports read
-`data` and neither writes it, so the Celsius values are unchanged
+`data` and neither writes it, so the Celsius values stay the same
 after three traversals, and you can run either report again and get
 the same answer.

@@ -225,10 +225,10 @@ The two halves fail differently. In `abstract_factory_abc.py` the base
 class declares `make_obstacle()` as an `@abstractmethod`, so a factory
 that omits it defines without complaint and raises a `TypeError` the
 moment you instantiate it, before the game runs. In
-`abstract_factory_protocol.py` nothing is declared, so the mismatch
-surfaces at the call that needs the protocol, before anything runs at
-all, and the diagnostic names the missing method rather than the
-missing base.
+`abstract_factory_protocol.py` no class declares that it satisfies the
+protocol, so the mismatch surfaces at the call that needs the
+protocol, before anything runs at all, and the diagnostic names the
+missing method rather than the missing base.
 
 ## 4. An Abstract Factory for "thick" and "thin" shapes
 
@@ -763,12 +763,12 @@ print(unregistered(globals()))
 #: ['Hexagon']
 ```
 
-`Hexagon` is a complete `Shape`: `ty` accepts it wherever a `Shape`
-is expected, and `Hexagon().draw()` works. `make("Hexagon")` fails
-with a `KeyError`, because the table never heard of it, and the
-error names the key rather than the class or the missing line. No
-checker reports the omission, since a class that nothing decorates
-is an ordinary class.
+`Hexagon` is a complete `Shape`: `ty` accepts it wherever code takes a
+`Shape`, and `Hexagon().draw()` works. `make("Hexagon")` fails with a
+`KeyError`, because the table never heard of it, and the error names
+the key rather than the class or the missing line. No checker reports
+the omission, since a class that nothing decorates is an ordinary
+class.
 
 `unregistered()` walks a namespace and keeps every class that
 `issubclass()` accepts as a `Shape` and that `REGISTRY` lacks.
@@ -847,7 +847,7 @@ module loads, the same timing the chapter's `registry.py` relies on.
 
 The name is an argument because the builder's own name is not
 available to the type checker. `Builder` is a `Callable`, and a
-`Callable` declares only how it is called, not that it carries a
+`Callable` declares only how you call it, not that it carries a
 `__name__`. Writing `PROTOTYPES[build.__name__] = build()` draws:
 
 ```text
@@ -859,20 +859,19 @@ problem because it receives a class, and `type[S]` has a `__name__`.
 Pyright accepts `build.__name__`, since it gives every function
 object's attributes to a `Callable`; `ty` does not, and the book
 checks with `ty`. Passing the name also frees the key from the
-function's spelling, so the builder can be called `make_goblin()`
-while the key stays `"goblin"`.
+function's spelling, so you can name the builder `make_goblin()` while
+the key stays `"goblin"`.
 
 What the decorated form gains is the same openness the registries
-gain: a prototype can be defined in any module, with its name beside
-its definition, and `PROTOTYPES` needs no edit. The key type widens
-from the chapter's `Kind` to `str` for the same reason: an open table
-cannot list its names in advance. The builder is also a
-function, so `goblin()` still produces a fresh prototype on demand
-when a test wants one that nothing has touched. The costs are the
-table literal becoming a decorator plus a function for each monster,
-the name repeated at every definition, and the two failures the
-chapter attached to registration:
-an undecorated builder is absent from the table,
-with a `KeyError` from `spawn()` that points at nothing, and a
-builder in an unimported module never runs. For two monsters in
-one file, the table literal says the same thing in fewer lines.
+gain: any module can define a prototype, with its name beside its
+definition, and `PROTOTYPES` needs no edit. The key type widens from
+the chapter's `Kind` to `str` for the same reason: an open table
+cannot list its names in advance. The builder is also a function, so
+`goblin()` still produces a fresh prototype on demand when a test
+wants one that nothing has touched. The costs are the table literal
+becoming a decorator plus a function for each monster, the name
+repeated at every definition, and the two failures the chapter
+attached to registration: an undecorated builder is absent from the
+table, with a `KeyError` from `spawn()` that points at nothing, and a
+builder in an unimported module never runs. For two monsters in one
+file, the table literal says the same thing in fewer lines.

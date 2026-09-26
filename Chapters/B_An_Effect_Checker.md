@@ -1073,10 +1073,10 @@ Here, in one place, is what the checker resolves:
 - A bare name, through the module's imports, then its own definitions,
   then `builtins`.
 - A dotted name whose head is an import, such as `time.sleep` or `requests.get`.
-- A method on a receiver whose type is written: an annotated parameter,
-  an annotated assignment, the first parameter of a method,
-  a module-level constant (through `Final[...]`),
-  or a `type` alias defined in the same module.
+- A method on a receiver whose type the source writes out:
+  an annotated parameter, an annotated assignment,
+  the first parameter of a method, a module-level constant
+  (through `Final[...]`), or a `type` alias defined in the same module.
 - A method on a receiver whose type is evident: a string, an f-string, a list,
   dictionary, set, or tuple literal, a list, dictionary, or set comprehension,
   or a local assigned from a call, which takes the callee's name as its type.

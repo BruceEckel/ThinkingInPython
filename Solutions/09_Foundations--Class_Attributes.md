@@ -58,7 +58,7 @@ lookup chain, right up until something assigns to `Left.shared` or
 creates its own separate class attribute the moment its class body
 runs `shared = 100`.
 
-## 3. A second `B()` instance is unaffected by the first
+## 3. Each `B()` instance keeps its own `x`
 
 ```python
 # exercise_3.py

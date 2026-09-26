@@ -128,10 +128,10 @@ print(only_one.val)
 
 The module behaves exactly like `OnlyOne` from
 `singleton_pattern.py`: a shared, one-and-only-one `val` list that
-any part of the program can append to. The design needs no wrapper
-class, no nested private class, no `ClassVar` sentinel, and no
-`__getattr__()` delegation, because the module itself is already
-the single shared object Python caches in `sys.modules`.
+any part of the program can append to. The module is the single
+shared object Python caches in `sys.modules`, so the design drops
+the chapter's machinery: the wrapper class, the nested private
+class, the `ClassVar` sentinel, and the `__getattr__()` delegation.
 
 For real code, prefer the module. It is less code, has no
 indirection to read through, and gets the same guarantee.
@@ -184,12 +184,12 @@ module object rather than a name in your own namespace.
 
 A linter does object, which is why the listing carries
 `# noqa: F811`. Ruff reads the assignment as redefining a name the
-module just imported, and flags it as an unused import followed by
-a shadowing binding. That rule exists because rebinding an imported
+module just imported, and flags it as an unused import followed by a
+shadowing binding. That rule exists because rebinding an imported
 name is far more often a mistake than an intention. Here the
 rebinding is deliberate, so the solution silences the warning, but
 in ordinary code the warning is the one automatic signal you get
-that a shared name has stopped being shared.
+that code has rebound a shared name.
 
 A name and the object it refers to are different things, and every
 singleton built on module state depends on that difference. Mutate
