@@ -1188,9 +1188,10 @@ These render correctly on GitHub; the builder rewrites intra-book `.md` links to
 are left alone.
 
 Requires `pandoc` on PATH. Run `python -m tools.build_site` (or `tip site`);
-use `-o DIR` to build elsewhere. `tip serve` builds nothing and serves the
-existing `build/site/` at <http://localhost:8000>; `tip local` builds, serves,
-watches for edits, and opens a browser at the site.
+use `-o DIR` to build elsewhere. `tip serve` serves the
+existing `build/site/` at <http://localhost:8000>, watching for edits and
+copying selections; `tip local` builds the site first and also opens a
+browser at it.
 
 `rebuild_chapter()` is the incremental entry point `serve.py --watch` uses:
 it re-renders one chapter (a single pandoc run, against the ~46 of a full
@@ -1446,17 +1447,20 @@ resolve to the same heading.
 
 ## serve.py
 
-Serves `build/site/` over HTTP for local preview. `tip serve` runs it as-is;
-`tip local` builds the site first, then runs it with `--open --watch`. Use
+Serves `build/site/` over HTTP for local preview. `tip serve` runs it with
+`--watch --copy-on-select`; `tip local` builds the site first, then adds
+`--open`. Use
 `--port N` for another port. It builds nothing on startup, so run a site build
 first if `build/site/` is missing.
 
 `--watch` turns it into an edit loop. A daemon thread compares modification
 times every second across `Chapters/*.md` and the few files the whole site
-renders from (`template.html`, the static assets, `build_site.py`,
-`search_index.py`). A changed chapter goes through
-`build_site.rebuild_chapter()`, roughly 0.3s here; a changed template or tool
-rebuilds every page, roughly 5s. Served pages carry an injected script that
+renders from (`template.html`, the static assets). A changed chapter goes
+through `build_site.rebuild_chapter()`, roughly 0.3s here; a changed template
+or asset rebuilds every page, roughly 5s. A change to the build code itself
+(any `tools/` module the server imports) restarts the server under its
+supervisor process, and the new server rebuilds every page with the new code;
+the module docstring says why a rebuild alone is not enough. Served pages carry an injected script that
 polls `/__reload` for a token the watcher bumps after each rebuild, so the
 open page refreshes on its own. A rebuild holds a lock the request handler
 also takes, so no request can read `build/site/` while a full build is

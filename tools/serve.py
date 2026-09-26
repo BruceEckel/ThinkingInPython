@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Serve the built site locally, optionally opening a browser.
 
-`tip serve` serves the existing `build/site/`. `tip local` builds
-it first, then runs this with `--open --watch`.
+`tip serve` runs this with `--watch --copy-on-select` on the existing
+`build/site/`. `tip local` builds the site first and adds `--open`.
 
 With `--watch`, a background thread polls `Chapters/*.md` (and the few
 files the whole site is rendered from: `template.html` and the static

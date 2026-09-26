@@ -551,14 +551,21 @@ def local(v: Vars) -> None:
     as «text» (Chapter › Section), for lifting passages out of the
     rendered book. Both scripts are added
     to pages as they are served; build/site/ and the published site never
-    carry them, and `tip serve` gets neither.
+    carry them. `tip serve` is the same server without the build first
+    or the new browser tab.
     """
     py("tools.serve", "--open", "--watch", "--copy-on-select")
 
 
-@task("Serve build/site/ at http://localhost:8000 (no rebuilding)")
+@task("Serve the existing build/site/ at http://localhost:8000 with "
+      "live reload and copy-on-select")
 def serve(v: Vars) -> None:
-    py("tools.serve")
+    """`tip local` without its full site build or its new browser tab,
+    for restarting the server when a tab is already open. The watcher
+    still rebuilds each chapter you edit, and a build-code change
+    restarts the server with a full rebuild. build/site/ must exist.
+    """
+    py("tools.serve", "--watch", "--copy-on-select")
 
 
 @task("Render Chapters/ into build/site/ with pandoc")
