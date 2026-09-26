@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 236"
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 222"
      font-family="'JetBrains Mono', Consolas, monospace">
   <title>Subject names only Observer, Thermometer inherits Subject, and Display satisfies Observer while naming Subject in its signature</title>
   <defs>
@@ -31,7 +31,6 @@
   <line x1="246.0" y1="166.0" x2="246.0" y2="106.4" stroke="#7a6e62" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#c30-hollow-muted)"/>
   <line x1="223.6" y1="166.0" x2="143.0" y2="90.5" stroke="#1a1612" stroke-width="2.8" marker-end="url(#c30-solid)"/>
   <text x="142.8" y="138.0" font-size="10.5" fill="#8b1a1a" text-anchor="middle">update()</text>
-  <text x="10" y="224" font-size="10.5" fill="#7a6e62" text-anchor="start">heavy edges: 1, in Display's signature. The subject side names no observer class.</text>
   <line class="legend" x1="480" y1="60" x2="497.6" y2="60" stroke="#1a1612" stroke-width="2.8" marker-end="url(#c30-solid)"/>
   <text x="518" y="64" font-size="10.5" fill="#7a6e62" text-anchor="start">names a concrete class</text>
   <line class="legend" x1="480" y1="80" x2="497.6" y2="80" stroke="#1a1612" stroke-width="1.3" marker-end="url(#c30-solid)"/>

@@ -1,6 +1,6 @@
 """Tests for tools/coupling_panels.py: the specs are self-consistent,
-their straight edges are straight, no box covers a note, and the
-chapters reference the panels the specs produce."""
+their straight edges are straight, every gallery box sits inside its
+cell, and the chapters reference the panels the specs produce."""
 from __future__ import annotations
 import re
 from tools.coupling_panels import (CAPTIONS, GALLERY, GALLERY_H, GALLERY_W,
@@ -39,20 +39,14 @@ def test_rendered_svg_has_a_title_and_no_size() -> None:
         assert "<title>" in body, path.name
 
 
-# Every drawing in the file, as (name, nodes, edges, note baseline x and
-# y, note text), with the note placed where Panel.svg() and
-# render_gallery() put it.
+# Every drawing in the file, as (name, nodes, edges).
 DRAWINGS = (
-    [(f"chapter {ch}", p.nodes, p.edges, 10, p.height - 12, p.note)
-     for ch, p in PANELS.items()]
-    + [(f"gallery {c.title}", c.nodes, c.edges,
-        18 + GALLERY_W * c.col, GALLERY_H * c.row + 256, c.note)
-       for c in GALLERY])
+    [(f"chapter {ch}", p.nodes, p.edges) for ch, p in PANELS.items()]
+    + [(f"gallery {c.title}", c.nodes, c.edges) for c in GALLERY])
 
 # Edges left a little off straight on purpose, with the reason.
 KNOWN_TILTS: dict[tuple[str, str, str], str] = {}
 NEAR_MISS = 15  # centers closer than this on one axis should be equal
-NOTE_SIZE = 10.5  # the notes' font size; a character is 0.6 of it wide
 
 
 def tilt(e: Edge, a: Node, b: Node) -> float:
@@ -82,17 +76,6 @@ def test_every_known_tilt_still_exists() -> None:
         by_name = {n.name: n for n in nodes}
         e = next(e for e in edges if (e.a, e.b) == (a, b))
         assert tilt(e, by_name[a], by_name[b]), (name, a, b)
-
-
-def test_no_box_covers_its_note() -> None:
-    bad = []
-    for name, nodes, _, x, baseline, note in DRAWINGS:
-        top, right = baseline - NOTE_SIZE, x + len(note) * 0.6 * NOTE_SIZE
-        for n in nodes:
-            if n.y + n.h > top and n.x < right and n.x + n.w > x:
-                bad.append(f"{name}: {n.name} reaches {n.y + n.h:g}, "
-                           f"the note starts at {top:g}")
-    assert bad == []
 
 
 def test_every_tip_meets_its_box_and_no_edge_crosses_one() -> None:
@@ -125,3 +108,13 @@ def test_a_legend_lists_only_what_its_panel_draws() -> None:
             assert (label in svg) == (kind in used), (ch, kind)
         marked = any(n.kind == "mark" for n in panel.nodes)
         assert (">does not change</text>" in svg) == marked, ch
+
+
+def test_every_gallery_box_sits_inside_its_cell() -> None:
+    for c in GALLERY:
+        x0, y0 = 18 + GALLERY_W * c.col, GALLERY_H * c.row
+        for n in c.nodes:
+            assert x0 - 10 <= n.x and n.x + n.w <= x0 + GALLERY_W, (
+                c.title, n.name)
+            assert y0 + 32 < n.y and n.y + n.h <= y0 + GALLERY_H, (
+                c.title, n.name)

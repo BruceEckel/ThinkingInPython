@@ -388,8 +388,10 @@ so a new failure usually means two boxes need moving, not a tweak. The
 worth checking a new panel for: drawing the GoF shape instead of the
 listing's (chapter 26 had a `Service` protocol no listing declares),
 and counting a call through `Any` as naming a class (chapter 32's
-`eval_*()` methods). A panel's note counts the heavy edges drawn and
-says when demo or wiring code is left out.
+`eval_*()` methods). Panels carry no note under the drawing
+(2026-09-25): the Markdown caption says what a panel shows, each
+panel's height follows its lowest box or legend line, and its legend
+lists only the edge kinds it draws.
 
 ## `@record`: the book's frozen data class, from chapter 18 on
 

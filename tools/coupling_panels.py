@@ -10,7 +10,7 @@ way they share a question: which edge does the pattern move, and where
 does it put it?
 
 Every panel is a `Panel` in `PANELS`, keyed by chapter number: its
-nodes, its edges, and the "heavy edges" note under the drawing. The
+nodes and its edges; the figure's Markdown caption says what it shows. The
 names in a panel are the names in that chapter's listings, so a listing
 rename means editing the spec here and regenerating, never editing an
 SVG by hand. Chapter 21's `coupling_gallery.svg`, its six patterns in
@@ -61,7 +61,7 @@ MARK = "#8b1a1a"
 FONT = "font-family=\"'JetBrains Mono', Consolas, monospace\""
 
 WIDTH = 700
-HEIGHT = 236
+LEGEND_Y = 60  # the first legend line's y
 
 
 @dataclass(frozen=True)
@@ -325,9 +325,20 @@ class Panel:
     alt: str
     nodes: tuple[Node, ...]
     edges: tuple[Edge, ...]
-    note: str = ""
-    height: float = HEIGHT
     extra: tuple[str, ...] = field(default_factory=tuple)
+
+    @property
+    def rows(self) -> int:
+        """Lines in the legend: one per edge kind, and the red box."""
+        kinds = {e.kind for e in self.edges}
+        marked = any(n.kind == "mark" for n in self.nodes)
+        return sum(k in kinds for k, _ in LEGEND_ROWS) + marked
+
+    @property
+    def height(self) -> float:
+        """The lowest box or legend line, and a margin under it."""
+        legend_bottom = LEGEND_Y + 20 * (self.rows - 1) + 8
+        return max(max(n.y + n.h for n in self.nodes), legend_bottom) + 16
 
     def svg(self, pid: str) -> str:
         nodes = {n.name: n for n in self.nodes}
@@ -340,9 +351,7 @@ class Panel:
             b += edge_svg(e, nodes, pid)
         for s in self.extra:
             b += s
-        if self.note:
-            b += text(10, self.height - 12, self.note, 10.5, MUTED)
-        b += legend(480, 60, pid, {e.kind for e in self.edges},
+        b += legend(480, LEGEND_Y, pid, {e.kind for e in self.edges},
                     any(n.kind == "mark" for n in self.nodes))
         return (f'<svg xmlns="http://www.w3.org/2000/svg" '
                 f'viewBox="0 0 {WIDTH} {self.height}"\n     {FONT}>\n'
@@ -374,8 +383,6 @@ PANELS: dict[int, Panel] = {
          Edge("list", "Iterable[int]", "realize", corner=True),
          Edge("fibonacci()", "Iterable[int]", "realize"),
          Edge("Countdown", "Iterable[int]", "realize", corner=True)),
-        "heavy edges: 0 in total(). Only the demo that hands it a source "
-        "names that source.",
     ),
     24: Panel(
         "Singleton",
@@ -389,8 +396,6 @@ PANELS: dict[int, Panel] = {
               dx=10, dy=-10, corner=True),
          Edge("shared_config.py", "config.py", "heavy", label="import",
               dx=10, dy=18, corner=True)),
-        "heavy edges: one per importer, all pointing at a name that does not "
-        "change.",
     ),
     25: Panel(
         "Template Method",
@@ -406,10 +411,7 @@ PANELS: dict[int, Panel] = {
               label="overrides two steps", dx=70, dy=4),
          Edge("run_framework()", "Step", "thin"),
          Edge("two lambdas", "Step", "realize")),
-        "left: the inherit edge is the widest rung; right: the same algorithm "
-        "with one thin edge.",
-        height=262,
-        extra=(divider(228, 236),),
+        extra=(divider(228, 230),),
     ),
     26: Panel(
         "Surrogate",
@@ -424,8 +426,6 @@ PANELS: dict[int, Panel] = {
          Edge("Complete", "Service", "inherit"),
          Edge("caller", "Proxy", "heavy", corner=True),
          Edge("caller", "Complete", "heavy", corner=True)),
-        "heavy edges: 2, both in the caller that builds the pair. Proxy "
-        "names only Service.",
     ),
     27: Panel(
         "Factory",
@@ -443,8 +443,6 @@ PANELS: dict[int, Panel] = {
          Edge("make()", "Square", "heavy", corner=True),
          Edge("Circle", "Shape", "inherit"),
          Edge("Square", "Shape", "inherit", bend=-46)),
-        "heavy edges: 3. The two that name a shape sit in one table, and "
-        "self-registration removes them.",
     ),
     28: Panel(
         "Function Objects",
@@ -465,9 +463,6 @@ PANELS: dict[int, Panel] = {
          Edge("ceased()", "Command", "realize"),
          Edge("fjords()", "Command", "realize"),
          Edge("for command in macro", "Command", "thin")),
-        "heavy edges: 3, all in the line that builds the list. The loop "
-        "names none.",
-        height=HEIGHT + 10,
     ),
     29: Panel(
         "Adapter",
@@ -480,8 +475,6 @@ PANELS: dict[int, Panel] = {
         (Edge("WhatIUse", "WhatIWant", "thin"),
          Edge("ProxyAdapter", "WhatIWant", "inherit"),
          Edge("ProxyAdapter", "WhatIHave", "heavy")),
-        "heavy edges: 1 among the classes, inside ProxyAdapter. The demo "
-        "names what it wires.",
     ),
     30: Panel(
         "Observer",
@@ -496,8 +489,6 @@ PANELS: dict[int, Panel] = {
          Edge("Display", "Observer", "realize"),
          Edge("Display", "Subject", "heavy", label="update()", dx=-36,
               dy=14, corner=True)),
-        "heavy edges: 1, in Display's signature. The subject side names no "
-        "observer class.",
     ),
     31: Panel(
         "State Machine",
@@ -518,8 +509,6 @@ PANELS: dict[int, Panel] = {
               dx=30, dy=18),
          Edge("Luring", "MouseTrap", "heavy", shift=5),
          Edge("MouseTrap", "Luring", "heavy", shift=5)),
-        "heavy edges: two per state, a cycle. The table form moves the "
-        "next-state choice into a dict per state.",
     ),
     32: Panel(
         "Multiple Dispatching",
@@ -536,8 +525,6 @@ PANELS: dict[int, Panel] = {
          Edge("Scissors", "eval_*()", "realize", shift=6),
          Edge("Rock", "eval_*()", "thin", shift=6),
          Edge("Rock", "eval_*()", "realize", shift=-6)),
-        "heavy edges: 0. The coupling is in the method names eval_paper(), "
-        "eval_scissors(), and eval_rock().",
     ),
     33: Panel(
         "Visitor",
@@ -554,9 +541,6 @@ PANELS: dict[int, Panel] = {
          Edge("Chrysanthemum", "Flower", "inherit"),
          Edge("Pollinator", "Visitor", "inherit"),
          Edge("Bee", "Pollinator", "inherit")),
-        "heavy edges: 0. Each side names the other's base, and the second "
-        "dispatch is a method on Flower.",
-        height=266,
     ),
     34: Panel(
         "Composite",
@@ -576,8 +560,6 @@ PANELS: dict[int, Panel] = {
          Edge("walk()", "Node", "thin", corner=True),
          Edge("Directory", "Node", "thin", label="entries", dx=38, dy=10,
               corner=True)),
-        "heavy edges: two per function, on purpose: a new node type must "
-        "reach every match, and ty lists them.",
     ),
     35: Panel(
         "Flyweight",
@@ -595,21 +577,18 @@ PANELS: dict[int, Panel] = {
          Edge("tile()", "Tile", "heavy", label="constructs", dy=-10),
          Edge("tile()", "SPECS", "heavy", corner=True),
          Edge("to_symbol()", "SPECS", "heavy")),
-        "heavy edges: 6, and only tile() constructs, so every caller shares "
-        "its instances.",
     ),
     36: Panel(
         "Memento",
         "Sketch names Memento, and History names only a type parameter, so it "
         "holds a Memento without reading it",
         (Node("Sketch", C1, R1, w=100, kind="mark"),
-         Node("Memento", C3, R1, w=96),
+         Node("Memento", 240, R1, w=96),
          Node("History[S]", C1, R3, w=110),
-         Node("S", C3, R3, w=96, kind="interface", sub="any value")),
+         Node("S", 240, R3, w=96, kind="interface", sub="any value")),
         (Edge("Sketch", "Memento", "heavy", label="save, restore", dy=18),
          Edge("History[S]", "S", "thin"),
          Edge("Memento", "S", "realize")),
-        height=218,
     ),
 }
 
@@ -660,14 +639,14 @@ class Cell:
     row: int
     nodes: tuple[Node, ...]
     edges: tuple[Edge, ...]
-    note: str
+
 
 
 # Chapter 21's coupling_gallery.svg: six patterns in the panel notation,
 # three to a row. Nodes carry absolute coordinates; a cell is GALLERY_W
 # wide and GALLERY_H tall, and stacked boxes sit 36 apart so every edge
 # shows a line behind its head.
-GALLERY_W, GALLERY_H = 250, 270
+GALLERY_W, GALLERY_H = 250, 240
 GALLERY_TITLE = ("Six patterns drawn only as coupling: which part names a "
                  "concrete class, which names an interface, and which "
                  "satisfies one")
@@ -679,8 +658,7 @@ GALLERY: tuple[Cell, ...] = (
           Node("Sum", 178, 164, w=70, h=34, size=11)),
          (Edge("Context", "Strategy", "thin"),
           Edge("Max", "Strategy", "realize"),
-          Edge("Sum", "Strategy", "realize")),
-         "heavy edges: 0"),
+          Edge("Sum", "Strategy", "realize"))),
     Cell("Observer", 1, 0,
          (Node("Subject", 272, 64, w=90, h=40, kind="mark"),
           Node("Observer", 412, 64, w=90, h=40, kind="interface"),
@@ -688,8 +666,7 @@ GALLERY: tuple[Cell, ...] = (
          (Edge("Subject", "Observer", "thin", label="notify"),
           Edge("Display", "Observer", "realize"),
           Edge("Display", "Subject", "heavy", label="attach",
-               dx=-30, dy=12, corner=True)),
-         "heavy edges: 1, toward the stable part"),
+               dx=-30, dy=12, corner=True))),
     Cell("Factory Method", 2, 0,
          (Node("Client", 530, 50, w=80, h=36, kind="mark"),
           Node("Creator", 660, 50, w=86, h=36, kind="interface", size=11),
@@ -701,36 +678,33 @@ GALLERY: tuple[Cell, ...] = (
           Edge("PdfCreator", "Creator", "realize"),
           Edge("PdfProduct", "Product", "realize"),
           Edge("PdfCreator", "PdfProduct", "heavy", label="creates",
-               dx=12, dy=18, corner=True)),
-         "heavy edges: 1, moved out of Client"),
+               dx=12, dy=18, corner=True))),
     Cell("Adapter", 0, 1,
-         (Node("Client", 30, 320, w=80, h=40, kind="mark"),
-          Node("Target", 150, 320, w=96, h=40, kind="interface"),
-          Node("Adapter", 150, 396, w=96, h=34, size=11),
-          Node("Adaptee", 150, 466, w=96, h=34, size=11)),
+         (Node("Client", 30, 290, w=80, h=40, kind="mark"),
+          Node("Target", 150, 290, w=96, h=40, kind="interface"),
+          Node("Adapter", 150, 366, w=96, h=34, size=11),
+          Node("Adaptee", 150, 436, w=96, h=34, size=11)),
          (Edge("Client", "Target", "thin"),
           Edge("Adapter", "Target", "realize"),
-          Edge("Adapter", "Adaptee", "heavy")),
-         "heavy edges: 1, inside Adapter"),
+          Edge("Adapter", "Adaptee", "heavy"))),
     Cell("Decorator", 1, 1,
-         (Node("Client", 280, 320, w=80, h=40, kind="mark"),
-          Node("Component", 400, 320, w=96, h=40, kind="interface",
+         (Node("Client", 280, 290, w=80, h=40, kind="mark"),
+          Node("Component", 400, 290, w=96, h=40, kind="interface",
                size=11),
-          Node("Pizza", 280, 440, w=80, h=34, size=11),
-          Node("Topping", 400, 440, w=96, h=34, size=11)),
+          Node("Pizza", 280, 410, w=80, h=34, size=11),
+          Node("Topping", 400, 410, w=96, h=34, size=11)),
          (Edge("Client", "Component", "thin"),
           Edge("Pizza", "Component", "realize", corner=True),
           Edge("Topping", "Component", "realize", shift=-14),
           Edge("Topping", "Component", "thin", label="wraps", shift=14,
-               dx=34, dy=4)),
-         "heavy edges: 0"),
+               dx=34, dy=4))),
     Cell("Visitor", 2, 1,
-         (Node("Element", 530, 316, w=80, h=36, kind="interface", size=11),
-          Node("Visitor", 660, 316, w=86, h=36, kind="interface", size=11),
-          Node("Pricer", 668, 388, w=70, h=36, kind="mark"),
-          Node("Add", 522, 460, w=62, h=30, size=10.5),
-          Node("Mul", 597, 460, w=62, h=30, size=10.5),
-          Node("Num", 672, 460, w=62, h=30, size=10.5)),
+         (Node("Element", 532, 286, w=74, h=36, kind="mark", size=11),
+          Node("Visitor", 660, 286, w=86, h=36, kind="interface", size=11),
+          Node("Pricer", 668, 358, w=70, h=36),
+          Node("Add", 522, 430, w=62, h=30, size=10.5),
+          Node("Mul", 597, 430, w=62, h=30, size=10.5),
+          Node("Num", 672, 430, w=62, h=30, size=10.5)),
          (Edge("Element", "Visitor", "thin", label="accept"),
           Edge("Pricer", "Visitor", "realize"),
           Edge("Add", "Element", "realize"),
@@ -738,8 +712,7 @@ GALLERY: tuple[Cell, ...] = (
           Edge("Mul", "Element", "realize"),
           Edge("Pricer", "Mul", "heavy"),
           Edge("Num", "Element", "realize", corner=True),
-          Edge("Pricer", "Num", "heavy")),
-         "heavy edges: 3, all in Pricer"),
+          Edge("Pricer", "Num", "heavy"))),
 )
 
 
@@ -756,7 +729,6 @@ def render_gallery(pid: str = "gl") -> str:
             b += n.svg()
         for e in cell.edges:
             b += edge_svg(e, nodes, pid)
-        b += text(x0, y0 + 256, cell.note, 10.5, MUTED)
     # The legend runs along the bottom, one sample per edge kind.
     y = 2 * GALLERY_H + 12
     for x, kind, label in ((20, "heavy", "names a concrete class"),

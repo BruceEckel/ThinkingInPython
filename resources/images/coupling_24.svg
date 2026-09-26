@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 236"
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 222"
      font-family="'JetBrains Mono', Consolas, monospace">
   <title>Every importer names config.py by its module name, and the import system hands each one the same instance</title>
   <defs>
@@ -28,7 +28,6 @@
   <text x="181.9" y="90.0" font-size="10.5" fill="#8b1a1a" text-anchor="middle">import</text>
   <line x1="145.7" y1="166.0" x2="186.7" y2="147.2" stroke="#1a1612" stroke-width="2.8" marker-end="url(#c24-solid)"/>
   <text x="181.9" y="172.0" font-size="10.5" fill="#8b1a1a" text-anchor="middle">import</text>
-  <text x="10" y="224" font-size="10.5" fill="#7a6e62" text-anchor="start">heavy edges: one per importer, all pointing at a name that does not change.</text>
   <line class="legend" x1="480" y1="60" x2="497.6" y2="60" stroke="#1a1612" stroke-width="2.8" marker-end="url(#c24-solid)"/>
   <text x="518" y="64" font-size="10.5" fill="#7a6e62" text-anchor="start">names a concrete class</text>
   <rect x="482" y="72" width="26" height="16" fill="none" stroke="#8b1a1a" stroke-width="1.6" rx="3"/>
