@@ -62,7 +62,7 @@
   <rect x="210" y="400" width="124" height="22" fill="none" stroke="#c8bfb0" stroke-width="2" rx="4"/>
   <rect x="214" y="404" width="116" height="14" fill="none" stroke="#7a6e62" stroke-width="1.5" stroke-dasharray="0.1,3" stroke-linecap="round" rx="2"/>
   <rect x="220" y="407" width="64" height="8" fill="#8b1a1a" fill-opacity="0.25" stroke="#8b1a1a" stroke-width="0.8"/>
-  <text x="400" y="442" font-size="10.5" fill="#7a6e62" text-anchor="middle">5x in one step: five GILs run at once, on five cores</text>
+  <text x="400" y="442" font-size="10.5" fill="#7a6e62" text-anchor="middle">5x in one step: the five calls run at once, on five cores</text>
 
   <!-- BAND 4: subinterpreters, five interpreters in one process -->
   <text x="20" y="482" font-size="13" font-weight="bold" fill="#1a1612">InterpreterPoolExecutor</text>
