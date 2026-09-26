@@ -3,8 +3,8 @@
 Chapter 21's Coupling section draws six GoF patterns in one
 notation: a heavy edge names a concrete class, a thin edge names an
 interface, a dashed edge with a hollow head satisfies one, and the red
-box is the part the pattern keeps free of change. This script draws one
-such panel per pattern chapter, 23 through 36, into
+box is the part the pattern protects from change. This script draws
+one such panel per pattern chapter, 23 through 36, into
 `resources/images/coupling_NN.svg`, so the chapters share a figure the
 way they share a question: which edge does the pattern move, and where
 does it put it?
@@ -315,7 +315,7 @@ def legend(x: float, y: float, pid: str, kinds: set[str],
         yy = y + len(rows) * 20
         out += (f'  <rect x="{x + 2}" y="{yy - 8}" width="26" height="16" '
                 f'fill="none" stroke="{MARK}" stroke-width="1.6" rx="3"/>\n')
-        out += text(x + 38, yy + 4, "kept free of change", 10.5, MUTED)
+        out += text(x + 38, yy + 4, "does not change", 10.5, MUTED)
     return out
 
 
@@ -771,7 +771,7 @@ def render_gallery(pid: str = "gl") -> str:
         b += text(x + 42, y + 4, label, 10.5, MUTED)
     b += (f'  <rect x="550" y="{y - 8}" width="26" height="16" fill="none" '
           f'stroke="{MARK}" stroke-width="1.6" rx="3"/>\n')
-    b += text(584, y + 4, "the part kept free of change", 10.5, MUTED)
+    b += text(584, y + 4, "the part that does not change", 10.5, MUTED)
     return (f'<svg xmlns="http://www.w3.org/2000/svg" '
             f'viewBox="0 0 770 {height}"\n     {FONT}>\n'
             f"  <title>{GALLERY_TITLE}</title>\n" + defs(pid) + b + "</svg>\n")

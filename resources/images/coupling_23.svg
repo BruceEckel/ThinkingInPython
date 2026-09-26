@@ -37,5 +37,5 @@
   <line class="legend" x1="480" y1="80" x2="493.6" y2="80" stroke="#7a6e62" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#c23-hollow-muted)"/>
   <text x="518" y="84" font-size="10.5" fill="#7a6e62" text-anchor="start">satisfies it</text>
   <rect x="482" y="92" width="26" height="16" fill="none" stroke="#8b1a1a" stroke-width="1.6" rx="3"/>
-  <text x="518" y="104" font-size="10.5" fill="#7a6e62" text-anchor="start">kept free of change</text>
+  <text x="518" y="104" font-size="10.5" fill="#7a6e62" text-anchor="start">does not change</text>
 </svg>

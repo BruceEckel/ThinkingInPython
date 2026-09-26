@@ -40,5 +40,5 @@
   <line class="legend" x1="480" y1="60" x2="497.6" y2="60" stroke="#1a1612" stroke-width="2.8" marker-end="url(#c35-solid)"/>
   <text x="518" y="64" font-size="10.5" fill="#7a6e62" text-anchor="start">names a concrete class</text>
   <rect x="482" y="72" width="26" height="16" fill="none" stroke="#8b1a1a" stroke-width="1.6" rx="3"/>
-  <text x="518" y="84" font-size="10.5" fill="#7a6e62" text-anchor="start">kept free of change</text>
+  <text x="518" y="84" font-size="10.5" fill="#7a6e62" text-anchor="start">does not change</text>
 </svg>

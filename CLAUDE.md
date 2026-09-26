@@ -368,7 +368,7 @@ Coupling section (merged from Appendix C on 2026-09-24) defines the
 notation: a heavy edge names a
 concrete class, a thin edge names an interface, a dashed hollow-headed
 edge satisfies one, a solid hollow-headed edge inherits, and the red
-box is the part the pattern keeps free of change. `tools/coupling_panels.py`
+box is the part the pattern protects from change. `tools/coupling_panels.py`
 holds a `Panel` spec per chapter, in that chapter's own class and
 function names, plus the `CAPTIONS` dict with the Markdown captions
 (code spans on the identifiers, because the pattern-name gate reads a

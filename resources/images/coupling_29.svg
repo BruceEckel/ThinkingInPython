@@ -36,5 +36,5 @@
   <line class="legend" x1="480" y1="100" x2="493.6" y2="100" stroke="#1a1612" stroke-width="1.3" marker-end="url(#c29-hollow)"/>
   <text x="518" y="104" font-size="10.5" fill="#7a6e62" text-anchor="start">inherits its internals</text>
   <rect x="482" y="112" width="26" height="16" fill="none" stroke="#8b1a1a" stroke-width="1.6" rx="3"/>
-  <text x="518" y="124" font-size="10.5" fill="#7a6e62" text-anchor="start">kept free of change</text>
+  <text x="518" y="124" font-size="10.5" fill="#7a6e62" text-anchor="start">does not change</text>
 </svg>

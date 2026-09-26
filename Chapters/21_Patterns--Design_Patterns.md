@@ -332,7 +332,7 @@ With those three edges alone, six GoF patterns look like this:
 
 ![Six GoF patterns drawn only as coupling](_images/coupling_gallery)
 
-The red box in each panel is the part the pattern keeps free of change.
+The red box in each panel marks the part the pattern protects from change.
 Read the heavy edges first, because they are where a change reaches.
 
 *Strategy* has none.

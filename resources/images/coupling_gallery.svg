@@ -123,5 +123,5 @@
   <line class="legend" x1="410" y1="552" x2="429.6" y2="552" stroke="#7a6e62" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#gl-hollow-muted)"/>
   <text x="452" y="556" font-size="10.5" fill="#7a6e62" text-anchor="start">satisfies it</text>
   <rect x="550" y="544" width="26" height="16" fill="none" stroke="#8b1a1a" stroke-width="1.6" rx="3"/>
-  <text x="584" y="556" font-size="10.5" fill="#7a6e62" text-anchor="start">the part kept free of change</text>
+  <text x="584" y="556" font-size="10.5" fill="#7a6e62" text-anchor="start">the part that does not change</text>
 </svg>

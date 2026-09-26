@@ -124,4 +124,4 @@ def test_a_legend_lists_only_what_its_panel_draws() -> None:
         for kind, label in labels.items():
             assert (label in svg) == (kind in used), (ch, kind)
         marked = any(n.kind == "mark" for n in panel.nodes)
-        assert ("kept free of change" in svg) == marked, ch
+        assert (">does not change</text>" in svg) == marked, ch

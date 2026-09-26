@@ -173,6 +173,8 @@ Which competitor does that result describe?
 `Paper.eval_scissors()` returns `WIN`.
 Scissors cut paper, so that is the outcome for the scissors that started the duel,
 not for the `Paper` whose code is running.
+The listing's first line of output, `Scissors <--> Paper : win`,
+reports it that way.
 Every `eval_*()` method answers for the original caller,
 the type named in the method's own name.
 Read that convention the other way,
