@@ -4,22 +4,32 @@ the wrong way.
 
 From chapter 18's `utils/record.py` on, the book writes a frozen data
 class as `@record`, which is `dataclass(frozen=True, slots=True)` under
-`dataclass_transform(frozen_default=True)`. Nothing else stops a new
-listing from drifting back to `@dataclass(frozen=True)`, and nothing
-stops `@record` from landing on a class whose base takes the slots
-back. This check reports both:
+`dataclass_transform(frozen_default=True)`. Since 2026-09-26 the
+decorator has a called form, `@record(slots=False)`, for the class
+that must keep an instance `__dict__`: one under a base that declares
+no `__slots__` and is not the book's to change (Stateless's `Ability`,
+`Time`), or one whose listing reads the instance dict on purpose
+(chapter 36's version-skew demos). A base the book owns gets an empty
+`__slots__ = ()` instead, so its records stay slotted. Nothing else
+stops a new listing from drifting back to `@dataclass(frozen=True)`,
+from dropping slots without a reason, or from putting a bare `@record`
+on a class whose base takes the slots back. This check reports all
+three:
 
 - **long-form**: a class decorated with exactly `@dataclass(frozen=True)`
   whose bases are all known to be slotted. It could be a record.
-- **unslotted-base**: a class decorated `@record` with a base that is
-  known to declare no `__slots__`. Every instance gets its `__dict__`
-  back, so the book writes `@dataclass(frozen=True)` there instead. The
-  one deliberate exception, chapter 20's `shapes_oo.py`, passes on its
-  own: its base carries `__slots__ = ()`.
+- **needless flag**: a class decorated `@record(slots=False)` whose
+  bases are all known to be slotted. The flag drops slots for nothing,
+  unless `record_exceptions.txt` lists the class with its reason.
+- **unslotted-base**: a class decorated with a bare `@record` and a base
+  that is known to declare no `__slots__`. Every instance gets its
+  `__dict__` back. Give the base `__slots__ = ()` when it is the
+  book's, or write `@record(slots=False)` when it is a library's.
 
-Any other decorator form (`order=True`, an explicit `slots=True`,
-`eq=False`) is left alone: `record()` takes no options, so those classes
-have no other way to be written.
+Any other decorator form (`order=True`, `weakref_slot=True`, an explicit
+`slots=True`, `eq=False`) is left alone: `record()` forwards only
+`slots`, so those classes have no other way to be written. A
+`record(...)` call with any other argument is reported as such.
 
 A base is *known slotted* when it is `Protocol`, `Generic`, `ABC`, or
 `object`, or a class defined in the same Markdown file that carries
@@ -32,7 +42,7 @@ with an unknown base draws no finding either way. The check is a floor:
 it under-reports by design and has no false positives to suppress
 beyond the listed exceptions.
 
-The deliberate long-form listings live in
+The deliberate long-form and `slots=False` listings live in
 `tools/data/record_exceptions.txt`, one per line:
 
     <Chapter_Name> <listing> <Class>    # why
@@ -71,6 +81,7 @@ EXCEPTIONS_FILE = DATA_DIR / "record_exceptions.txt"
 FIRST_CHAPTER = 18
 DEFINING_SLUG = "utils/record.py"
 LONG_FORM = "dataclass(frozen=True)"
+DICT_FORM = "record(slots=False)"
 SLOTTED_BUILTINS = frozenset({"Protocol", "Generic", "ABC", "object"})
 # Library bases the book's frozen classes inherit that declare no
 # __slots__. Stateless's Ability and Time are the ones in use; check
@@ -129,11 +140,27 @@ class ClassInfo:
 
     @property
     def is_record(self) -> bool:
+        """A bare `@record`, the slotted form."""
         return "record" in self.decorators
+
+    @property
+    def is_dict_form(self) -> bool:
+        return DICT_FORM in self.decorators
 
     @property
     def is_long_form(self) -> bool:
         return LONG_FORM in self.decorators
+
+    @property
+    def keeps_dict(self) -> bool:
+        """Frozen by hand or by flag, slots deliberately absent."""
+        return self.is_long_form or self.is_dict_form
+
+    @property
+    def odd_record_call(self) -> str | None:
+        """A `record(...)` call other than `record(slots=False)`."""
+        return next((d for d in self.decorators
+                     if d.startswith("record(") and d != DICT_FORM), None)
 
     @property
     def declares_slots(self) -> bool:
@@ -228,40 +255,51 @@ def survey(doc: Document) -> list[tuple[ClassInfo, list[bool | None]]]:
 def find(doc: Document) -> Iterator[Finding]:
     chapter = chapter_name(doc.path)
     for c, bases in survey(doc):
-        if c.is_long_form and all(v is True for v in bases):
+        if (odd := c.odd_record_call) is not None:
+            yield Finding(
+                doc.path, c.line,
+                f"{c.listing}: {c.name} is @{odd}; record() takes only "
+                "slots=False, so write @record, @record(slots=False), "
+                "or @dataclass(...) in full")
+        elif c.keeps_dict and all(v is True for v in bases):
             if any(e.covers(chapter, c.listing, c.name)
                    for e in exemptions()):
                 continue
+            form = ("@dataclass(frozen=True)" if c.is_long_form
+                    else "@record(slots=False)")
             yield Finding(
                 doc.path, c.line,
-                f"{c.listing}: {c.name} is @dataclass(frozen=True) and "
-                "could be @record (or list it in "
-                "tools/data/record_exceptions.txt with the reason)")
+                f"{c.listing}: {c.name} is {form} and could be @record "
+                "(or list it in tools/data/record_exceptions.txt with "
+                "the reason)")
         elif c.is_record and False in bases:
             bad = [b for b, v in zip(c.bases, bases) if v is False]
             yield Finding(
                 doc.path, c.line,
                 f"{c.listing}: {c.name} is @record but its base "
                 f"{', '.join(bad)} declares no __slots__, so instances "
-                "keep a __dict__; write @dataclass(frozen=True)")
+                "keep a __dict__; give the base __slots__ = () if it is "
+                "the book's, or write @record(slots=False)")
 
 
 def unused_exemptions(docs: list[Document]) -> Iterator[Finding]:
-    """An exception that matches no long-form class in `docs`."""
+    """An exception that matches no dict-keeping class in `docs`."""
     seen = {(chapter_name(d.path), c.listing, c.name)
-            for d in docs for c, _ in survey(d) if c.is_long_form}
+            for d in docs for c, _ in survey(d) if c.keeps_dict}
     for e in exemptions():
         if not any(e.covers(*key) for key in seen):
             yield Finding(
                 EXCEPTIONS_FILE, e.line,
                 f"{e.chapter} {e.listing} {e.cls} matches no "
-                "@dataclass(frozen=True) class; remove the entry")
+                "@dataclass(frozen=True) or @record(slots=False) class; "
+                "remove the entry")
 
 
 CHECK = Check(
     name="records",
-    doc="a frozen data class after chapter 18 is written @record, and "
-        "@record sits only on a class whose bases are slotted",
+    doc="a frozen data class after chapter 18 is written @record, "
+        "slots=False only with a reason, and a bare @record only "
+        "under slotted bases",
     run=find,
     clean="Frozen data classes use @record where they can.",
     problem="{n} class(es) on the wrong decorator. CLAUDE.md's @record "

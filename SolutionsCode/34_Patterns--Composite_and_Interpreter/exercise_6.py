@@ -1,8 +1,10 @@
 # exercise_6.py
-from dataclasses import dataclass
 from exceptions import expected
+from record import record
 
 class Operators:
+    __slots__ = ()
+
     def __add__(self: Expr, other: Expr | int) -> Add:
         if isinstance(other, Operators | int):
             return Add(self, wrap(other))
@@ -23,20 +25,20 @@ class Operators:
             return Mul(Num(other), self)
         return NotImplemented
 
-@dataclass(frozen=True)
+@record
 class Num(Operators):
     value: int
 
-@dataclass(frozen=True)
+@record
 class Var(Operators):
     name: str
 
-@dataclass(frozen=True)
+@record
 class Add(Operators):
     left: Expr
     right: Expr
 
-@dataclass(frozen=True)
+@record
 class Mul(Operators):
     left: Expr
     right: Expr

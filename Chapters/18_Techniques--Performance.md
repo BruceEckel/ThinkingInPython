@@ -1148,17 +1148,36 @@ tells the type checker that the result is a frozen data class:
 
 ```python
 # utils/record.py
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import dataclass_transform
+from typing import dataclass_transform, overload
 
+@overload
+def record[T](cls: type[T], /) -> type[T]: ...
+@overload
+def record[T](
+    *, slots: bool = True
+) -> Callable[[type[T]], type[T]]: ...
 @dataclass_transform(frozen_default=True)
-def record[T](cls: type[T]) -> type[T]:
-    return dataclass(frozen=True, slots=True)(cls)
+def record[T](
+    cls: type[T] | None = None, /, *, slots: bool = True
+) -> type[T] | Callable[[type[T]], type[T]]:
+    def apply(c: type[T]) -> type[T]:
+        return dataclass(frozen=True, slots=slots)(c)
+    return apply if cls is None else apply(cls)
 ```
 
-`record()` is `model()` from `kept_transform.py` with `slots=True` added.
+Written bare, `@record` is `model()` from `kept_transform.py` with `slots=True` added.
 The name follows Java and C#,
 where a *record* is an immutable class defined by its fields.
+The called form, `@record(slots=False)`,
+is for the class that must keep a `__dict__`,
+and dropping the slots takes a visible flag rather than a missing option.
+The two forms follow [Decorators With Optional Parentheses](14_Techniques--Decorators.md#decorators-with-optional-parentheses):
+`cls` is `None` when the decorator is called with arguments,
+and the two `@overload` declarations tell the checker which form it is reading.
+The test is `cls is None` rather than `callable(cls)`,
+since a class is callable.
 A class decorated with `@record` behaves like any frozen data class,
 and its instances carry no `__dict__`:
 
@@ -1190,15 +1209,19 @@ On a frozen class that gap has no effect,
 because the checker rejects every assignment to an instance.
 
 The listings from here on use `@record` for a frozen data class.
-A class that needs what `record()` omits keeps `@dataclass` written out:
-`order=True`, a weak reference, or a `cached_property`.
-The next section shows how slots break the last two.
-A class whose base has no `__slots__` keeps `@dataclass(frozen=True)` as well:
-the base gives every instance its `__dict__` back, so the slots remove nothing.
-When the base is yours to change,
-an empty `__slots__ = ()` on it keeps the record slotted,
+A class whose base declares no `__slots__` writes `@record(slots=False)`:
+the base gives every instance its `__dict__` back,
+so slots on the subclass would remove nothing,
+and the flag says so at the class.
+That form is for a base that is not yours to change, such as a library's,
+and for the rare listing that reads the instance dict on purpose.
+When the base is yours,
+an empty `__slots__ = ()` on it keeps the records under it slotted,
 as `shapes_oo.py` in [Rethinking Objects](20_Patterns--Rethinking_Objects.md#abstract-base-classes)
 does.
+A class that needs an option `record()` lacks keeps `@dataclass` written out:
+`order=True`, or `weakref_slot=True` for a weak reference.
+The next section shows how slots break a weak reference and a `cached_property`.
 
 ### When Slots Does Not Fit {#when-slots-does-not-fit}
 

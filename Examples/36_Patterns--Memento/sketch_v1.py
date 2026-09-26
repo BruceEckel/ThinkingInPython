@@ -1,6 +1,6 @@
 # sketch_v1.py
-from dataclasses import dataclass
+from record import record
 
-@dataclass(frozen=True)
+@record(slots=False)
 class SketchV1:
     strokes: tuple[str, ...]

@@ -130,10 +130,12 @@ loop forever if a link ever pointed back at one of its own ancestors.
 ```python
 # exercise_3.py
 from __future__ import annotations
-from dataclasses import dataclass
 from typing import assert_never
+from record import record
 
 class Operators:
+    __slots__ = ()
+
     def __add__(self: Expr, other: Expr | int) -> Add:
         return Add(self, wrap(other))
 
@@ -155,29 +157,29 @@ class Operators:
     def __rtruediv__(self: Expr, other: int) -> Div:
         return Div(Num(other), self)
 
-@dataclass(frozen=True)
+@record
 class Num(Operators):
     value: int
 
-@dataclass(frozen=True)
+@record
 class Var(Operators):
     name: str
 
-@dataclass(frozen=True)
+@record
 class Add(Operators):
     left: Expr
     right: Expr
 
-@dataclass(frozen=True)
+@record
 class Mul(Operators):
     left: Expr
     right: Expr
 
-@dataclass(frozen=True)
+@record
 class Neg(Operators):
     operand: Expr
 
-@dataclass(frozen=True)
+@record
 class Div(Operators):
     left: Expr
     right: Expr
@@ -292,10 +294,12 @@ than refusing to parse `1 / x` at all.
 ```python
 # exercise_4.py
 from __future__ import annotations
-from dataclasses import dataclass
 from typing import Final, assert_never
+from record import record
 
 class Operators:
+    __slots__ = ()
+
     def __add__(self: Expr, other: Expr | int) -> Add:
         return Add(self, wrap(other))
 
@@ -308,20 +312,20 @@ class Operators:
     def __rmul__(self: Expr, other: int) -> Mul:
         return Mul(Num(other), self)
 
-@dataclass(frozen=True)
+@record
 class Num(Operators):
     value: int
 
-@dataclass(frozen=True)
+@record
 class Var(Operators):
     name: str
 
-@dataclass(frozen=True)
+@record
 class Add(Operators):
     left: Expr
     right: Expr
 
-@dataclass(frozen=True)
+@record
 class Mul(Operators):
     left: Expr
     right: Expr
@@ -379,10 +383,12 @@ guarantee is what matters.
 ```python
 # exercise_5.py
 from __future__ import annotations
-from dataclasses import dataclass
 from typing import assert_never
+from record import record
 
 class Operators:
+    __slots__ = ()
+
     def __add__(self: Expr, other: Expr | int) -> Add:
         return Add(self, wrap(other))
 
@@ -395,20 +401,20 @@ class Operators:
     def __rmul__(self: Expr, other: int) -> Mul:
         return Mul(Num(other), self)
 
-@dataclass(frozen=True)
+@record
 class Num(Operators):
     value: int
 
-@dataclass(frozen=True)
+@record
 class Var(Operators):
     name: str
 
-@dataclass(frozen=True)
+@record
 class Add(Operators):
     left: Expr
     right: Expr
 
-@dataclass(frozen=True)
+@record
 class Mul(Operators):
     left: Expr
     right: Expr
@@ -503,10 +509,12 @@ cases to prose rather than code.
 
 ```python
 # exercise_6.py
-from dataclasses import dataclass
 from exceptions import expected
+from record import record
 
 class Operators:
+    __slots__ = ()
+
     def __add__(self: Expr, other: Expr | int) -> Add:
         if isinstance(other, Operators | int):
             return Add(self, wrap(other))
@@ -527,20 +535,20 @@ class Operators:
             return Mul(Num(other), self)
         return NotImplemented
 
-@dataclass(frozen=True)
+@record
 class Num(Operators):
     value: int
 
-@dataclass(frozen=True)
+@record
 class Var(Operators):
     name: str
 
-@dataclass(frozen=True)
+@record
 class Add(Operators):
     left: Expr
     right: Expr
 
-@dataclass(frozen=True)
+@record
 class Mul(Operators):
     left: Expr
     right: Expr
@@ -642,12 +650,14 @@ renderer can still make.
 
 ```python
 # exercise_8.py
-from dataclasses import dataclass
 from enum import Enum
 from typing import assert_never
 from exceptions import expect
+from record import record
 
 class Operators:
+    __slots__ = ()
+
     def __add__(self: Expr, other: Expr | int) -> Add:
         return Add(self, wrap(other))
 
@@ -660,20 +670,20 @@ class Operators:
     def __rmul__(self: Expr, other: int) -> Mul:
         return Mul(Num(other), self)
 
-@dataclass(frozen=True)
+@record
 class Num(Operators):
     value: int
 
-@dataclass(frozen=True)
+@record
 class Var(Operators):
     name: str
 
-@dataclass(frozen=True)
+@record
 class Add(Operators):
     left: Expr
     right: Expr
 
-@dataclass(frozen=True)
+@record
 class Mul(Operators):
     left: Expr
     right: Expr
@@ -777,16 +787,17 @@ moves the frames onto the heap, where the only limit is memory.
 ```python
 # exercise_9.py
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
 from typing import override
+from record import record
 
 class Entry(ABC):
+    __slots__ = ()
     name: str
 
     @abstractmethod
     def disk_usage(self) -> int: ...
 
-@dataclass(frozen=True)
+@record
 class File(Entry):
     name: str
     size: int
@@ -795,7 +806,7 @@ class File(Entry):
     def disk_usage(self) -> int:
         return self.size
 
-@dataclass(frozen=True)
+@record
 class Directory(Entry):
     name: str
     entries: tuple[Entry, ...]
@@ -805,7 +816,7 @@ class Directory(Entry):
         return sum(e.disk_usage() for e in self.entries)
 
 # A plugin package adds a node type, editing nothing above:
-@dataclass(frozen=True)
+@record
 class Symlink(Entry):
     name: str
     target: str

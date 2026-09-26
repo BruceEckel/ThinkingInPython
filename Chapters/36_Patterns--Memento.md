@@ -631,18 +631,18 @@ The error comes later, from whatever reads a field the bytes never carried.
 
 ```python
 # sketch_v1.py
-from dataclasses import dataclass
+from record import record
 
-@dataclass(frozen=True)
+@record(slots=False)
 class SketchV1:
     strokes: tuple[str, ...]
 ```
 
 ```python
 # sketch_v2.py
-from dataclasses import dataclass
+from record import record
 
-@dataclass(frozen=True)
+@record(slots=False)
 class SketchV2:
     strokes: tuple[str, ...]
     title: str

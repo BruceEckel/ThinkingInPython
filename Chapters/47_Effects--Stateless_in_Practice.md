@@ -40,20 +40,21 @@ so the answer can differ at every request.
 
 An Ability subclasses `Ability[T]`, where `T` is the type its handler returns.
 `Ability` declares no `__slots__`,
-so an Ability carries `@dataclass(frozen=True)` rather than [`@record`](18_Techniques--Performance.md#record):
-an unslotted base gives every instance its `__dict__` back.
+so an Ability is written [`@record(slots=False)`](18_Techniques--Performance.md#record):
+the base gives every instance its `__dict__` back,
+and the flag says so at the class.
 Here is the Stateless version of `Ask` and `Tell` from [Effect Management](44_Effects--Effect_Management.md#effects-by-hand):
 
 ```python
 # ask_tell_stateless.py
-from dataclasses import dataclass
+from record import record
 from stateless import Ability, Depend, handle, run
 
-@dataclass(frozen=True)
+@record(slots=False)
 class Ask(Ability[str]):
     prompt: str
 
-@dataclass(frozen=True)
+@record(slots=False)
 class Tell(Ability[None]):
     message: str
 
@@ -457,6 +458,7 @@ Each reports whether it can supply a given hour and depletes when drawn from:
 # power.py
 from dataclasses import dataclass
 from typing import Protocol
+from record import record
 from stateless import Ability, Depend, throws
 
 class Drained(Exception):
@@ -496,7 +498,7 @@ class Backup:
     def deplete(self) -> None:
         self.fuel -= 1
 
-@dataclass(frozen=True)
+@record(slots=False)
 class Outlet(Ability[Source]):
     hour: int
 
@@ -682,12 +684,13 @@ and writing carries a new value and answers with nothing.
 # wallet.py
 from collections.abc import Callable
 from dataclasses import dataclass
+from record import record
 from stateless import Ability, Depend, handle, run
 
 class Get(Ability[int]):
     pass
 
-@dataclass(frozen=True)
+@record(slots=False)
 class Put(Ability[None]):
     amount: int
 

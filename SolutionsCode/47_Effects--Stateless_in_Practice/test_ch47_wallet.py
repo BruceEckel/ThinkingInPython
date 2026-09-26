@@ -1,12 +1,12 @@
 # test_ch47_wallet.py
 from collections.abc import Callable, Iterator
-from dataclasses import dataclass
+from record import record
 from stateless import Ability, Depend, handle, run
 
 class Get(Ability[int]):
     pass
 
-@dataclass(frozen=True)
+@record(slots=False)
 class Put(Ability[None]):
     amount: int
 

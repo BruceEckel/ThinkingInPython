@@ -1,10 +1,11 @@
 # filesystem_classic.py
 from abc import ABC, abstractmethod
 from collections.abc import Iterator
-from dataclasses import dataclass
 from typing import override
+from record import record
 
 class Node(ABC):
+    __slots__ = ()
     name: str
 
     @abstractmethod
@@ -13,7 +14,7 @@ class Node(ABC):
     @abstractmethod
     def walk(self, prefix: str = "") -> Iterator[str]: ...
 
-@dataclass(frozen=True)
+@record
 class File(Node):
     name: str
     size: int
@@ -26,7 +27,7 @@ class File(Node):
     def walk(self, prefix: str = "") -> Iterator[str]:
         yield prefix + self.name
 
-@dataclass(frozen=True)
+@record
 class Directory(Node):
     name: str
     entries: tuple[Node, ...]

@@ -162,3 +162,35 @@ def test_an_exemption_that_matches_nothing_is_reported(
 def test_the_committed_exceptions_file_parses() -> None:
     entries = REAL_EXEMPTIONS.__wrapped__(EXCEPTIONS_FILE)
     assert entries and all(e.chapter and e.listing for e in entries)
+
+
+DICT_FORM = (RECORD_IMPORT + "\n@record(slots=False)\nclass Point:\n"
+             "    x: int\n")
+
+
+def test_dict_form_under_slotted_bases_is_reported(tmp_path: Path) -> None:
+    [message] = messages(doc(tmp_path, listing("point.py", DICT_FORM)))
+    assert "Point is @record(slots=False) and could be @record" in message
+
+
+def test_dict_form_under_a_library_ability_is_clean(tmp_path: Path) -> None:
+    body = (RECORD_IMPORT + "from stateless import Ability\n\n"
+            "@record(slots=False)\nclass Ask(Ability[str]):\n"
+            "    prompt: str\n")
+    assert messages(doc(tmp_path, listing("ask.py", body))) == []
+
+
+def test_any_other_record_call_is_reported(tmp_path: Path) -> None:
+    body = RECORD_IMPORT + "\n@record(slots=True)\nclass P:\n    x: int\n"
+    [message] = messages(doc(tmp_path, listing("p.py", body)))
+    assert "P is @record(slots=True); record() takes only slots=False" \
+        in message
+
+
+def test_an_exemption_covers_the_dict_form(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(record_check, "exemptions", lambda: (
+        Exemption("Rethinking_Objects", "point.py", "Point", line=1),))
+    d = doc(tmp_path, listing("point.py", DICT_FORM))
+    assert messages(d) == []
+    assert list(unused_exemptions([d])) == []

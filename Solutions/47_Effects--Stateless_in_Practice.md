@@ -178,6 +178,7 @@ from collections.abc import Callable, Iterator
 from contextlib import contextmanager
 from dataclasses import dataclass
 from typing import Protocol
+from record import record
 from stateless import Ability, Depend, catch, throws
 
 class Drained(Exception):
@@ -228,7 +229,7 @@ class Backup:
     def deplete(self) -> None:
         self.fuel -= 1
 
-@dataclass(frozen=True)
+@record(slots=False)
 class Outlet(Ability[Source]):
     hour: int
 
@@ -832,13 +833,13 @@ both chapters, applied to a boundary between threads or processes.
 ```python
 # test_ch47_wallet.py
 from collections.abc import Callable, Iterator
-from dataclasses import dataclass
+from record import record
 from stateless import Ability, Depend, handle, run
 
 class Get(Ability[int]):
     pass
 
-@dataclass(frozen=True)
+@record(slots=False)
 class Put(Ability[None]):
     amount: int
 
@@ -1086,10 +1087,10 @@ type is not a claim.
 # exercise_12.py
 import random
 from collections.abc import Callable, Iterator
-from dataclasses import dataclass
+from record import record
 from stateless import Ability, Depend, handle, run
 
-@dataclass(frozen=True)
+@record(slots=False)
 class Random(Ability[int]):
     low: int
     high: int

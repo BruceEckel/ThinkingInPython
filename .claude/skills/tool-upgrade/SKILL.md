@@ -97,6 +97,14 @@ Moved from `CLAUDE.md`, which keeps the rule that you never start an upgrade you
   upgrade and update those version strings; the alias probe is a
   scratch generator annotated with a `type X = Depend[...]` alias whose
   `yield from need(Undeclared)` must still draw `invalid-yield`. The
+  Since 2026-09-26 `utils/record.py` is a dual-form decorator (two
+  `@overload`s, `cls is None` branch) under `@dataclass_transform`, and
+  `ty` 0.0.82 reads both forms as frozen data classes; re-probe that
+  too: a scratch `@record(slots=False) class Q: x: int` must still
+  draw `invalid-argument-type` on `Q("bad")` and `invalid-assignment`
+  on `q.x = 4`, and a bare `@record` class the same. If the called form
+  loses either, every Stateless Ability in chapters 46-47 and the
+  Memento version-skew listings are unchecked.
   ch47 probes run against `build/examples/47_*/`, inside a function
   with `feed: Feed, book: Encyclopedia` parameters: both
   `supply`/`catch_all` orders must reveal the same result union, with

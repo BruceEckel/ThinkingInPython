@@ -1,15 +1,15 @@
 # exercise_7.py
 import copy
 import pickle
-from dataclasses import dataclass
 import drawing_v1
 from drawing_v1 import Drawing
 from exceptions import expect
+from record import record
 
 blob = pickle.dumps(Drawing("Duck", ("circle",)))
 blank = pickle.dumps(Drawing("", ("circle",)))
 
-@dataclass(frozen=True)
+@record(slots=False)
 class DrawingV2:
     title: str
     strokes: tuple[str, ...] = ()

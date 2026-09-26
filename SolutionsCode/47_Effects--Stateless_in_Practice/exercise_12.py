@@ -1,10 +1,10 @@
 # exercise_12.py
 import random
 from collections.abc import Callable, Iterator
-from dataclasses import dataclass
+from record import record
 from stateless import Ability, Depend, handle, run
 
-@dataclass(frozen=True)
+@record(slots=False)
 class Random(Ability[int]):
     low: int
     high: int

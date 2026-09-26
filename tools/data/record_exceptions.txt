@@ -1,14 +1,16 @@
-# Listings that keep @dataclass(frozen=True) although every base is
-# slotted, so tools/record_check.py (`tip records`, in GATE_CHECKS)
-# would otherwise ask for @record. One per line:
+# Listings that keep an instance __dict__ although every base is
+# slotted: written @dataclass(frozen=True) or @record(slots=False),
+# where tools/record_check.py (`tip records`, in GATE_CHECKS) would
+# otherwise ask for a bare @record. One per line:
 #
 #     <Chapter_Name> <listing> <Class>    # why
 #
 # Chapter_Name is the chapter file's stem after its `NN_Part--` prefix,
 # so an entry survives a renumbering and covers the Solutions file too.
 # Class may be an fnmatch pattern. `tip records` fails on an entry that
-# matches nothing. A class with an unslotted base needs no entry: the
-# check leaves it alone. CLAUDE.md's @record section has the rules.
+# matches nothing. A class under a library base with no __slots__
+# (Stateless's Ability, Time) needs no entry: @record(slots=False) is
+# the rule there. CLAUDE.md's @record section has the rules.
 
 # Chapter 18's slots_dataclass.py needs no entry: it precedes the
 # utils/record.py listing, where the rule starts.
@@ -28,7 +30,8 @@ Data_Transfer_Objects exercise_6.py FrozenColor
 Flyweight weak_pool.py Name
 Flyweight exercise_5.py Color
 
-# The version-skew demos read the instance __dict__ and pickle it.
+# The version-skew demos read the instance __dict__ and pickle it,
+# so they are @record(slots=False).
 Memento sketch_v1.py SketchV1
 Memento sketch_v2.py SketchV2
 Memento drawing_v1.py Drawing

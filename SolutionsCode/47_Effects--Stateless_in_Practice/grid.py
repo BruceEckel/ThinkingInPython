@@ -3,6 +3,7 @@ from collections.abc import Callable, Iterator
 from contextlib import contextmanager
 from dataclasses import dataclass
 from typing import Protocol
+from record import record
 from stateless import Ability, Depend, catch, throws
 
 class Drained(Exception):
@@ -53,7 +54,7 @@ class Backup:
     def deplete(self) -> None:
         self.fuel -= 1
 
-@dataclass(frozen=True)
+@record(slots=False)
 class Outlet(Ability[Source]):
     hour: int
 

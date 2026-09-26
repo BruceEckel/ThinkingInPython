@@ -1,6 +1,6 @@
 # adapter.py
-from dataclasses import dataclass
 from typing import override
+from record import record
 
 class WhatIHave:
     def g(self) -> None:
@@ -9,9 +9,10 @@ class WhatIHave:
         print("WhatIHave.h()")
 
 class WhatIWant:
+    __slots__ = ()
     def f(self) -> None: ...
 
-@dataclass(frozen=True)
+@record
 class ProxyAdapter(WhatIWant):
     what_i_have: WhatIHave
 

@@ -1,12 +1,12 @@
 # ask_tell_stateless.py
-from dataclasses import dataclass
+from record import record
 from stateless import Ability, Depend, handle, run
 
-@dataclass(frozen=True)
+@record(slots=False)
 class Ask(Ability[str]):
     prompt: str
 
-@dataclass(frozen=True)
+@record(slots=False)
 class Tell(Ability[None]):
     message: str
 

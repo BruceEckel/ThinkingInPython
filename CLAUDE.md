@@ -276,20 +276,32 @@ It holds the caption rules, the palette, the arrowheads, and what `tip figures` 
 frozen data class in a listing is written `@record` with
 `from record import record`, and the prose noun is "record". Chapters
 12, 13, and 15 come before the definition and keep
-`@dataclass(frozen=True)`. Bruce's rulings from 2026-09-17:
+`@dataclass(frozen=True)`. Since 2026-09-26 the decorator is
+dual-form (bare or called, two `@overload`s, the `cls is None` test
+from chapter 14's optional-parentheses section): `@record(slots=False)`
+is `dataclass(frozen=True)` without slots, the one option it forwards.
+Bruce's rulings from 2026-09-17, revised 2026-09-26:
 
-- **A class keeps `@dataclass(frozen=True)` when `@record`'s slots
-  would not hold or would break it.** That means `order=True` or any
-  other option `record()` lacks, a weak reference (`weak_pool.py`), a
-  `cached_property`, a listing that reads an instance `__dict__` or
-  pickles across versions (chapter 36's `sketch_v1.py`/`sketch_v2.py`),
-  and any class whose base has no `__slots__` (the `Ability` and `Time`
-  subclasses in chapters 46-47, chapter 34's `expr.py` nodes under
-  `Operators`). Do not put `@record` on a class and then let a base
-  take the slots back.
-- **One listing slots a base for its records, as the teaching
-  example:** chapter 20's `shapes_oo.py` gives `Shape(ABC)` an empty
-  `__slots__ = ()`. Do not add a second.
+- **A base the book owns gets an empty `__slots__ = ()` so its frozen
+  subclasses are records.** Chapter 20's `shapes_oo.py` teaches it;
+  chapter 34's `Node` and `Operators` (and every Solutions copy),
+  Solutions 34's `Entry`, and chapter 29's `WhatIWant` carry it
+  without comment. Until 2026-09-26 `shapes_oo.py` was the one
+  allowed slotted base and those classes stayed long-form with a
+  paragraph each explaining why; the paragraphs are gone.
+- **A class whose base is a library's and declares no `__slots__` is
+  `@record(slots=False)`:** the `Ability` and `Time` subclasses in
+  chapters 46-47. So is a listing that reads the instance `__dict__`
+  or pickles across versions (chapter 36's `sketch_v1.py`/
+  `sketch_v2.py`, Solutions 36's `drawing_v1.py`/`exercise_7.py`),
+  and those four are listed in `record_exceptions.txt` since their
+  bases are slotted. The flag makes dropping slots a visible choice;
+  never put a bare `@record` on a class and let a base take the
+  slots back.
+- **A class that needs an option `record()` lacks keeps `@dataclass`
+  written out:** `order=True` (chapter 22), a weak reference
+  (`weak_pool.py`, which should say `weakref_slot=True`), a
+  `cached_property`.
 - **Reword a sentence before keeping a listing long-form for its
   sake.** A sentence that names `frozen=True` about a converted class
   says "record" instead. The exceptions are listings whose subject is
@@ -303,11 +315,12 @@ frozen data class in a listing is written `@record` with
   moves when a class becomes a record. Solutions 35 `exercise_2.py`
   went from a ratio near ten to near six.
 
-`tools/record_check.py` gates both directions (`tip records`, in
+`tools/record_check.py` gates three shapes (`tip records`, in
 `GATE_CHECKS` and in the Solutions checks since 2026-09-17): a
-`@dataclass(frozen=True)` whose bases are all slotted fails unless
-`tools/data/record_exceptions.txt` lists it, and a `@record` under a
-base with no `__slots__` fails. A base it cannot see (imported from
+`@dataclass(frozen=True)` or `@record(slots=False)` whose bases are all
+slotted fails unless `tools/data/record_exceptions.txt` lists it, a
+bare `@record` under a base with no `__slots__` fails, and a
+`record(...)` call with any argument but `slots=False` fails. A base it cannot see (imported from
 another listing) draws no finding, so it under-reports by design. The
 exceptions file is keyed by chapter *name* (`Rethinking_Objects`), not
 number, so a renumbering leaves it alone and a chapter rename does not.

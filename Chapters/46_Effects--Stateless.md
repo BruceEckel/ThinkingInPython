@@ -1325,13 +1325,14 @@ A test can then supply a clock that never waits:
 ```python
 # test_instant_clock.py
 import time
-from dataclasses import dataclass, field
+from dataclasses import field
 from typing import override
+from record import record
 from sleep_effect import delayed_sum
 from stateless import as_type, run, supply
 from stateless.time import Time
 
-@dataclass(frozen=True)
+@record(slots=False)
 class Instant(Time):
     waited: list[float] = field(default_factory=list)
     @override
@@ -1355,7 +1356,8 @@ and under a few milliseconds here.
 The subclass goes through `as_type(Time)`,
 for the reason in [Supplying an Interface](#supplying-an-interface).
 
-In `Instant`, `waited` is a field because `Time` is a frozen data class and a subclass must carry `frozen=True` too.
+In `Instant`, `waited` is a field because `Time` is a frozen data class and a subclass must be frozen too,
+and the record drops its slots because `Time` declares none.
 Freezing prevents rebinding `waited`, not appending to the list it holds.
 
 ## Where to Call `run()`

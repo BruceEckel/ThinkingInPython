@@ -13,8 +13,7 @@ In *Interpreter*, the tree is a sentence in a small language,
 and evaluating the sentence walks the tree.
 *GoF Design Patterns* presents them as separate patterns,
 but *Interpreter* is *Composite* with meaning attached.
-In Python both reduce to one technique:
-a union of frozen data classes for the nodes,
+In Python both reduce to one technique: a union of records for the nodes,
 and recursive functions that `match` on them.
 This chapter builds each pattern with [exhaustive matching](13_Techniques--Pattern_Matching.md#exhaustive-matching).
 
@@ -41,10 +40,11 @@ under an abstract method on a shared base:
 # filesystem_classic.py
 from abc import ABC, abstractmethod
 from collections.abc import Iterator
-from dataclasses import dataclass
 from typing import override
+from record import record
 
 class Node(ABC):
+    __slots__ = ()
     name: str
 
     @abstractmethod
@@ -53,7 +53,7 @@ class Node(ABC):
     @abstractmethod
     def walk(self, prefix: str = "") -> Iterator[str]: ...
 
-@dataclass(frozen=True)
+@record
 class File(Node):
     name: str
     size: int
@@ -66,7 +66,7 @@ class File(Node):
     def walk(self, prefix: str = "") -> Iterator[str]:
         yield prefix + self.name
 
-@dataclass(frozen=True)
+@record
 class Directory(Node):
     name: str
     entries: tuple[Node, ...]
@@ -98,12 +98,6 @@ for path in root.walk():
 `Directory.disk_usage()` calls `disk_usage()` on each entry without testing whether the entry is a `File` or another `Directory`.
 The demo's first `print()` makes that one call on the whole tree,
 on the `src` subtree, and on a lone file.
-
-`File` and `Directory` use `@dataclass(frozen=True)` rather than `@record`.
-`Node` declares no `__slots__`,
-so it gives every instance a `__dict__` and undoes the slots a record adds.
-[Rethinking Objects](20_Patterns--Rethinking_Objects.md#abstract-base-classes)
-shows the alternative, an empty `__slots__` on the base.
 
 Adding a node type is one class: a plugin writes it and edits nothing above it.
 Adding an *operation* exposes the weakness.
@@ -298,9 +292,11 @@ Here is the complete grammar for a small arithmetic language:
 
 ```python
 # expr.py
-from dataclasses import dataclass
+from record import record
 
 class Operators:
+    __slots__ = ()
+
     def __add__(self: Expr, other: Expr | int) -> Add:
         return Add(self, wrap(other))
 
@@ -313,20 +309,20 @@ class Operators:
     def __rmul__(self: Expr, other: int) -> Mul:
         return Mul(Num(other), self)
 
-@dataclass(frozen=True)
+@record
 class Num(Operators):
     value: int
 
-@dataclass(frozen=True)
+@record
 class Var(Operators):
     name: str
 
-@dataclass(frozen=True)
+@record
 class Add(Operators):
     left: Expr
     right: Expr
 
-@dataclass(frozen=True)
+@record
 class Mul(Operators):
     left: Expr
     right: Expr
@@ -353,10 +349,6 @@ Each walker's `assert_never()` needs the union to verify that its `match` covers
 A base class is an open set that any new subclass silently joins,
 so if you annotate `evaluate()` with `Operators` instead,
 `assert_never()` stops working.
-
-`Operators` declares no `__slots__`,
-so an instance of any subclass carries a `__dict__` whatever its own class declares.
-The nodes therefore keep `@dataclass(frozen=True)` instead of becoming [records](18_Techniques--Performance.md#record).
 
 ### Operators That Build Nodes
 
@@ -637,8 +629,7 @@ Simplifying both children first, then matching the results,
 applies the rule to the `Num(0)` the recursion just produced.
 That order is how the demo's `((1 * x) + (0 * y))` collapses to `x`.
 
-`frozen=True` blocks every field assignment,
-so `simplify()` never edits the input.
+A record blocks every field assignment, so `simplify()` never edits the input.
 `simplify()` returns a new tree that shares unchanged subtrees with the original.
 The `is` guard in each `case _` returns the node it received when both children simplified to themselves.
 The guard tests identity with `is` rather than equality with `==`.
@@ -690,7 +681,7 @@ def test_unchanged_subtrees_are_shared() -> None:
 Three walkers over one set of nodes is the pattern pair in full.
 *Composite* is the data: a union of node types, some holding others.
 *Interpreter* is the behavior: recursive functions that give the tree meaning.
-Python compresses the pair into frozen data classes, a union,
+Python compresses the pair into records, a union,
 operator methods that build nodes, and `match` functions that walk them.
 One practical limit applies.
 Every function here recurses once per level of tree,

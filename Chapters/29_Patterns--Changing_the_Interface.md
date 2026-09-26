@@ -29,8 +29,8 @@ The first version uses a class to perform adaptation:
 
 ```python
 # adapter.py
-from dataclasses import dataclass
 from typing import override
+from record import record
 
 class WhatIHave:
     def g(self) -> None:
@@ -39,9 +39,10 @@ class WhatIHave:
         print("WhatIHave.h()")
 
 class WhatIWant:
+    __slots__ = ()
     def f(self) -> None: ...
 
-@dataclass(frozen=True)
+@record
 class ProxyAdapter(WhatIWant):
     what_i_have: WhatIHave
 
@@ -69,9 +70,9 @@ because this listing is about *where* the adaptation lives,
 not how you declare the target interface.
 [*Surrogate*](26_Patterns--Surrogate.md#proxy)
 compares an ABC with a `Protocol`.
-`WhatIWant` declares no `__slots__`,
-so `ProxyAdapter` is declared with `@dataclass(frozen=True)` and not [`@record`](18_Techniques--Performance.md#record):
-an unslotted base gives each instance its `__dict__` back.
+The empty `__slots__` on `WhatIWant` keeps `ProxyAdapter` a slotted [record](18_Techniques--Performance.md#record),
+as `shapes_oo.py` in [Rethinking Objects](20_Patterns--Rethinking_Objects.md#abstract-base-classes)
+explains.
 The name `ProxyAdapter` uses the term "[*Proxy*](26_Patterns--Surrogate.md#proxy)" loosely:
 *GoF Design Patterns* requires a *Proxy* to have the same interface as the object it forwards to.
 

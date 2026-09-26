@@ -1,12 +1,13 @@
 # test_instant_clock.py
 import time
-from dataclasses import dataclass, field
+from dataclasses import field
 from typing import override
+from record import record
 from sleep_effect import delayed_sum
 from stateless import as_type, run, supply
 from stateless.time import Time
 
-@dataclass(frozen=True)
+@record(slots=False)
 class Instant(Time):
     waited: list[float] = field(default_factory=list)
     @override
