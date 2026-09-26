@@ -46,6 +46,7 @@ from tools import footnote_labels
 from tools import heading_links
 from tools import listing_format
 from tools import listing_width
+from tools import opening_epigraph
 from tools import pattern_names
 from tools import prose_lint
 from tools import record_check
@@ -63,6 +64,7 @@ CHECKS: list[Check] = [
     banned_phrases.CHECK,
     heading_links.CHECK,
     footnote_labels.CHECK,
+    opening_epigraph.CHECK,
     check_self_reference.CHECK,
     prose_lint.CHECK,
     pattern_names.CHECK,

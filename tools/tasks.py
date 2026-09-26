@@ -39,8 +39,8 @@ from tools.tip import Vars, also, invoke, py, run, section, task, tool
 # listings render on the same small screens. records runs there too:
 # most of the book's frozen data classes are in Solutions/.
 GATE_CHECKS = ("listings widths banned comment-periods comment-caps "
-               "comment-spacing anchors footnotes self-reference prose-lint "
-               "pattern-names records").split()
+               "comment-spacing anchors footnotes epigraph self-reference "
+               "prose-lint pattern-names records").split()
 
 # Markdown outside Chapters/ that still carries intra-document links worth
 # gating. Only `anchors` runs over it: `banned` would fire on the tooling
@@ -800,6 +800,16 @@ def footnotes(v: Vars) -> None:
     silently replaced; the site, one page per chapter, never shows it.
     """
     py("tools.footnote_labels")
+
+
+@task("Fail if a chapter does not open with its epigraph")
+def epigraph(v: Vars) -> None:
+    """Fail if a chapter from 02 on does not open with a two-to-four-line
+    `>` blockquote directly under its # heading. The site, EPUB, and PDF
+    style that blockquote as the chapter's epigraph, and a chapter
+    without one builds silently with none.
+    """
+    py("tools.opening_epigraph")
 
 
 @task("Fail if a claim the book makes about its own chapters is false")
