@@ -153,9 +153,16 @@ CODE_HANG_CHARS = 2
 # A monospace character's advance width as a fraction of the em. Only
 # the hang depends on this, never a listing's own indentation, which
 # stays literal spaces the `pre` lays out on the real character grid.
-# So a font whose advance is not quite 0.6em moves a continuation a
-# fraction of a character, and never puts code off its grid.
-CHAR_EM = 0.6
+# So a font whose advance is not quite this moves a continuation a
+# fraction of a character, and never puts code off its grid. Most
+# monospace fonts advance 0.6em, but a Paperwhite measured about
+# 0.71em (6em spanned ~8.4 characters), and at 0.6 a continuation of
+# a four-space line there started at column 4, level with the code it
+# continues. The error is safe in one direction only: a hang that
+# comes out deep still reads as a continuation, and a shallow one
+# reads as the next statement. So this takes the Kindle's figure, and
+# a 0.6em reader sees a deeper hang.
+CHAR_EM = 0.72
 # Indents deeper than this share the deepest hang rule. The book's
 # listings reach 27, and a rule per column past that buys nothing.
 MAX_HANG_INDENT = 28
@@ -877,7 +884,11 @@ def epub_css(variant: str) -> str:
     and inherited by `pre code` rather than repeated, so a nested
     `<code>` inside a `<pre>` does not compound the scale. `pre`'s `white-space: pre-wrap`
     stays load-bearing: without it, a long code line runs off the page
-    instead of wrapping. No fixed colors either: a Kindle in dark mode
+    instead of wrapping. So is its `text-align: left`: a Kindle
+    justifies a `pre` the way it justifies prose, and on a line that
+    wraps, justification stretches every space, including the indent
+    that follows `listing_html()`'s zero-width space, so methods at one
+    level drew at different depths. No fixed colors either: a Kindle in dark mode
     keeps a declared color as given, so a light fill would become a
     glaring panel against black.
 
@@ -919,7 +930,7 @@ def epub_css(variant: str) -> str:
     """
     return f"""pre {{
   white-space: pre-wrap; overflow-wrap: break-word;
-  page-break-inside: avoid;
+  text-align: left; page-break-inside: avoid;
 }}
 pre, code {{ font-family: {CODE_FONT}; font-size: {CODE_FONT_SCALE[variant]}em; }}
 pre code {{ font-size: inherit; }}

@@ -23,3 +23,8 @@ Loaded when working under `tools/`. Moved from the root `CLAUDE.md`'s Traps.
   line with `&#8203;` and keeps plain spaces, and `CODE_FONT` is the
   bare keyword. Project memory `kindle-listing-indentation` has the
   probe script layout.
+  The Kindle also justifies a `pre` like prose, stretching the
+  spaces (indent included) on any line that wraps, so `pre` sets
+  `text-align: left`; and `CHAR_EM` is 0.72, the Paperwhite's
+  figure, since a hang computed at 0.6 came out level with the
+  code it continues (2026-09-26 photo).
