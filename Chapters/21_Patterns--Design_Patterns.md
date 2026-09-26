@@ -1,5 +1,10 @@
 # Design Patterns
 
+The problem in front of you has usually been solved before,
+and the solution has a name.
+A design pattern is that name,
+with the shape of the solution and the reasons it takes that shape.
+
 The "design patterns" movement was an important step forward in object-oriented design.
 The 1994 book *Design Patterns* by Erich Gamma, Richard Helm, Ralph Johnson,
 and John Vlissides carried it into the mainstream.

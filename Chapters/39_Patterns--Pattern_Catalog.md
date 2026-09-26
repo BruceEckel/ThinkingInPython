@@ -1,5 +1,10 @@
 # Pattern Catalog
 
+Most patterns you will encounter first as a name someone uses in a design review,
+not as code.
+This catalog gives each name a one-line intent,
+so you can place it and look it up.
+
 This chapter gathers patterns that the literature documents widely,
 not only the original *Design Patterns* (GoF) set.
 It draws from *Pattern-Oriented Software Architecture* (POSA, Buschmann et al.),
@@ -7,7 +12,6 @@ It draws from *Pattern-Oriented Software Architecture* (POSA, Buschmann et al.),
 *Enterprise Integration Patterns* (Hohpe and Woolf),
 and the common distributed and cloud patterns that emerged later.
 
-Each entry has a one-line intent so you can recognize a pattern by name and look it up in the literature that documents it.
 Listing a pattern here does not recommend it.
 Many overlap, some solve the same problem in different ways,
 and several exist only to work around limits of a particular language.
