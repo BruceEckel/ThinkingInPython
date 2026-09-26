@@ -410,9 +410,10 @@ and write the same dependence three ways.
 With an abstract base class, two edges exist in source:
 the caller names `Shape`, and `Circle` names `Shape` in its `class` line.
 With a `Protocol`, one edge exists in source.
-`Circle` does not mention `Shape`,
-and the dotted edge is one the type checker draws at check time,
-when it compares `Circle`'s members with the protocol's.
+`Circle` does not mention `Shape`.
+A dotted edge in the figure exists only at check time,
+and neither of its ends names the other.
+Here the type checker draws it when it compares `Circle`'s members with the protocol's.
 With a `Callable`, the interface has no name and no file of its own.
 It lives in the caller's signature,
 and any function of the right shape satisfies it.
