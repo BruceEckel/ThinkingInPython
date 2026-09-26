@@ -65,10 +65,19 @@ VERIFY_TARGETS: list[str] = [
 ]
 # Extra words for a target's command line.
 TARGET_ARGS: dict[str, list[str]] = {"gate": ["MARKERS=fresh"]}
+# How a target runs here, where that differs from its own one-line doc:
+# the gate's doc names the marker refresh, which MARKERS=fresh skips.
+DOC_OVERRIDES: dict[str, str] = {
+    "output": "Update the #: output markers of every chapter changed "
+              "since its markers last passed, in both trees",
+    "gate": "The gate, minus the marker refresh `output` just did "
+            "(check, reflow, slugs, ty, ruff, run, pytest, solutions-gate)",
+}
 
 
 def _docs() -> dict[str, str]:
-    return {name: doc for name, doc in entries() if name is not None}
+    docs = {name: doc for name, doc in entries() if name is not None}
+    return docs | DOC_OVERRIDES
 
 
 def _listing(heading: str, names: list[str],
