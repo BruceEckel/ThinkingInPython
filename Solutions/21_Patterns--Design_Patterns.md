@@ -114,8 +114,8 @@ Now cross out what Python supplies:
   without declaring a type.
 - The concrete classes go. Each holds one method and no state, so each
   becomes one function.
-- The context class goes, along with its field and its setter. There
-  is no object left to hold, only an argument to pass.
+- The context class goes, along with its field and its setter. No
+  object is left to hold, only an argument to pass.
 - The `new` goes with the classes. A function needs no instantiation.
 
 One sentence remains: make the varying step a parameter.
