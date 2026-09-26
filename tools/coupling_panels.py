@@ -62,6 +62,7 @@ FONT = "font-family=\"'JetBrains Mono', Consolas, monospace\""
 
 WIDTH = 700
 LEGEND_Y = 60  # the first legend line's y
+LEGEND_GAP = 44  # from the drawing's right edge to the legend
 
 
 @dataclass(frozen=True)
@@ -340,10 +341,17 @@ class Panel:
         legend_bottom = LEGEND_Y + 20 * (self.rows - 1) + 8
         return max(max(n.y + n.h for n in self.nodes), legend_bottom) + 16
 
+    @property
+    def right(self) -> float:
+        """The drawing's right edge: the title rule ends here, and the
+        legend starts LEGEND_GAP after it."""
+        return max(n.x + n.w for n in self.nodes)
+
     def svg(self, pid: str) -> str:
         nodes = {n.name: n for n in self.nodes}
         b = text(10, 20, self.title, 13, INK, bold=True, italic=True)
-        b += (f'  <line x1="10" y1="27" x2="440" y2="27" stroke="{BOX}" '
+        b += (f'  <line x1="10" y1="27" x2="{self.right:g}" y2="27" '
+              f'stroke="{BOX}" '
               f'stroke-width="0.8"/>\n')
         for n in self.nodes:
             b += n.svg()
@@ -351,7 +359,8 @@ class Panel:
             b += edge_svg(e, nodes, pid)
         for s in self.extra:
             b += s
-        b += legend(480, LEGEND_Y, pid, {e.kind for e in self.edges},
+        b += legend(self.right + LEGEND_GAP, LEGEND_Y, pid,
+                    {e.kind for e in self.edges},
                     any(n.kind == "mark" for n in self.nodes))
         return (f'<svg xmlns="http://www.w3.org/2000/svg" '
                 f'viewBox="0 0 {WIDTH} {self.height}"\n     {FONT}>\n'

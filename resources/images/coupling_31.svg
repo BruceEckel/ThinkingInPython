@@ -16,7 +16,7 @@
     </marker>
   </defs>
   <text x="10" y="20" font-size="13" font-weight="bold" font-style="italic" fill="#1a1612" text-anchor="start">State Machine</text>
-  <line x1="10" y1="27" x2="440" y2="27" stroke="#c8bfb0" stroke-width="0.8"/>
+  <line x1="10" y1="27" x2="414" y2="27" stroke="#c8bfb0" stroke-width="0.8"/>
   <rect x="20" y="48" width="110" height="38" fill="none" stroke="#8b1a1a" stroke-width="1.6" rx="4"/>
   <text x="75.0" y="71.2" font-size="12" font-weight="bold" fill="#1a1612" text-anchor="middle">StateMachine</text>
   <rect x="182" y="48" width="90" height="38" fill="none" stroke="#7a6e62" stroke-width="1.3" rx="12"/>
@@ -37,14 +37,14 @@
   <text x="256.9" y="170.9" font-size="10.5" fill="#8b1a1a" text-anchor="middle">builds</text>
   <line x1="322.0" y1="183.7" x2="146.4" y2="182.5" stroke="#1a1612" stroke-width="2.8" marker-end="url(#c31-solid)"/>
   <line x1="132.0" y1="192.4" x2="307.6" y2="193.6" stroke="#1a1612" stroke-width="2.8" marker-end="url(#c31-solid)"/>
-  <line class="legend" x1="480" y1="60" x2="497.6" y2="60" stroke="#1a1612" stroke-width="2.8" marker-end="url(#c31-solid)"/>
-  <text x="518" y="64" font-size="10.5" fill="#7a6e62" text-anchor="start">names a concrete class</text>
-  <line class="legend" x1="480" y1="80" x2="497.6" y2="80" stroke="#1a1612" stroke-width="1.3" marker-end="url(#c31-solid)"/>
-  <text x="518" y="84" font-size="10.5" fill="#7a6e62" text-anchor="start">names an interface</text>
-  <line class="legend" x1="480" y1="100" x2="493.6" y2="100" stroke="#7a6e62" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#c31-hollow-muted)"/>
-  <text x="518" y="104" font-size="10.5" fill="#7a6e62" text-anchor="start">satisfies it</text>
-  <line class="legend" x1="480" y1="120" x2="493.6" y2="120" stroke="#1a1612" stroke-width="1.3" marker-end="url(#c31-hollow)"/>
-  <text x="518" y="124" font-size="10.5" fill="#7a6e62" text-anchor="start">inherits its internals</text>
-  <rect x="482" y="132" width="26" height="16" fill="none" stroke="#8b1a1a" stroke-width="1.6" rx="3"/>
-  <text x="518" y="144" font-size="10.5" fill="#7a6e62" text-anchor="start">does not change</text>
+  <line class="legend" x1="458" y1="60" x2="475.6" y2="60" stroke="#1a1612" stroke-width="2.8" marker-end="url(#c31-solid)"/>
+  <text x="496" y="64" font-size="10.5" fill="#7a6e62" text-anchor="start">names a concrete class</text>
+  <line class="legend" x1="458" y1="80" x2="475.6" y2="80" stroke="#1a1612" stroke-width="1.3" marker-end="url(#c31-solid)"/>
+  <text x="496" y="84" font-size="10.5" fill="#7a6e62" text-anchor="start">names an interface</text>
+  <line class="legend" x1="458" y1="100" x2="471.6" y2="100" stroke="#7a6e62" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#c31-hollow-muted)"/>
+  <text x="496" y="104" font-size="10.5" fill="#7a6e62" text-anchor="start">satisfies it</text>
+  <line class="legend" x1="458" y1="120" x2="471.6" y2="120" stroke="#1a1612" stroke-width="1.3" marker-end="url(#c31-hollow)"/>
+  <text x="496" y="124" font-size="10.5" fill="#7a6e62" text-anchor="start">inherits its internals</text>
+  <rect x="460" y="132" width="26" height="16" fill="none" stroke="#8b1a1a" stroke-width="1.6" rx="3"/>
+  <text x="496" y="144" font-size="10.5" fill="#7a6e62" text-anchor="start">does not change</text>
 </svg>

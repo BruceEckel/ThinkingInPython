@@ -16,7 +16,7 @@
     </marker>
   </defs>
   <text x="10" y="20" font-size="13" font-weight="bold" font-style="italic" fill="#1a1612" text-anchor="start">Singleton</text>
-  <line x1="10" y1="27" x2="440" y2="27" stroke="#c8bfb0" stroke-width="0.8"/>
+  <line x1="10" y1="27" x2="372" y2="27" stroke="#c8bfb0" stroke-width="0.8"/>
   <rect x="202" y="108" width="170" height="38" fill="none" stroke="#8b1a1a" stroke-width="1.6" rx="4"/>
   <text x="287.0" y="124.2" font-size="12" font-weight="bold" fill="#1a1612" text-anchor="middle">config.py</text>
   <text x="287.0" y="139.2" font-size="9" fill="#7a6e62" text-anchor="middle">one instance per interpreter</text>
@@ -28,8 +28,8 @@
   <text x="181.9" y="90.0" font-size="10.5" fill="#8b1a1a" text-anchor="middle">import</text>
   <line x1="145.7" y1="166.0" x2="186.7" y2="147.2" stroke="#1a1612" stroke-width="2.8" marker-end="url(#c24-solid)"/>
   <text x="181.9" y="172.0" font-size="10.5" fill="#8b1a1a" text-anchor="middle">import</text>
-  <line class="legend" x1="480" y1="60" x2="497.6" y2="60" stroke="#1a1612" stroke-width="2.8" marker-end="url(#c24-solid)"/>
-  <text x="518" y="64" font-size="10.5" fill="#7a6e62" text-anchor="start">names a concrete class</text>
-  <rect x="482" y="72" width="26" height="16" fill="none" stroke="#8b1a1a" stroke-width="1.6" rx="3"/>
-  <text x="518" y="84" font-size="10.5" fill="#7a6e62" text-anchor="start">does not change</text>
+  <line class="legend" x1="416" y1="60" x2="433.6" y2="60" stroke="#1a1612" stroke-width="2.8" marker-end="url(#c24-solid)"/>
+  <text x="454" y="64" font-size="10.5" fill="#7a6e62" text-anchor="start">names a concrete class</text>
+  <rect x="418" y="72" width="26" height="16" fill="none" stroke="#8b1a1a" stroke-width="1.6" rx="3"/>
+  <text x="454" y="84" font-size="10.5" fill="#7a6e62" text-anchor="start">does not change</text>
 </svg>

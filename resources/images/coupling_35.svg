@@ -16,7 +16,7 @@
     </marker>
   </defs>
   <text x="10" y="20" font-size="13" font-weight="bold" font-style="italic" fill="#1a1612" text-anchor="start">Flyweight</text>
-  <line x1="10" y1="27" x2="440" y2="27" stroke="#c8bfb0" stroke-width="0.8"/>
+  <line x1="10" y1="27" x2="414" y2="27" stroke="#c8bfb0" stroke-width="0.8"/>
   <rect x="20" y="108" width="110" height="38" fill="none" stroke="#8b1a1a" stroke-width="1.6" rx="4"/>
   <text x="75.0" y="131.2" font-size="12" font-weight="bold" fill="#1a1612" text-anchor="middle">parse_map()</text>
   <rect x="182" y="48" width="90" height="38" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
@@ -36,8 +36,8 @@
   <text x="302.0" y="57.0" font-size="10.5" fill="#8b1a1a" text-anchor="middle">constructs</text>
   <line x1="247.6" y1="88.0" x2="321.3" y2="163.1" stroke="#1a1612" stroke-width="2.8" marker-end="url(#c35-solid)"/>
   <line x1="284.0" y1="187.0" x2="317.6" y2="187.0" stroke="#1a1612" stroke-width="2.8" marker-end="url(#c35-solid)"/>
-  <line class="legend" x1="480" y1="60" x2="497.6" y2="60" stroke="#1a1612" stroke-width="2.8" marker-end="url(#c35-solid)"/>
-  <text x="518" y="64" font-size="10.5" fill="#7a6e62" text-anchor="start">names a concrete class</text>
-  <rect x="482" y="72" width="26" height="16" fill="none" stroke="#8b1a1a" stroke-width="1.6" rx="3"/>
-  <text x="518" y="84" font-size="10.5" fill="#7a6e62" text-anchor="start">does not change</text>
+  <line class="legend" x1="458" y1="60" x2="475.6" y2="60" stroke="#1a1612" stroke-width="2.8" marker-end="url(#c35-solid)"/>
+  <text x="496" y="64" font-size="10.5" fill="#7a6e62" text-anchor="start">names a concrete class</text>
+  <rect x="460" y="72" width="26" height="16" fill="none" stroke="#8b1a1a" stroke-width="1.6" rx="3"/>
+  <text x="496" y="84" font-size="10.5" fill="#7a6e62" text-anchor="start">does not change</text>
 </svg>
