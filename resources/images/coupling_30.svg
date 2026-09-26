@@ -29,8 +29,8 @@
   <text x="162.0" y="59.0" font-size="10.5" fill="#8b1a1a" text-anchor="middle">notify</text>
   <line x1="75.0" y1="166.0" x2="75.0" y2="106.4" stroke="#1a1612" stroke-width="1.3" marker-end="url(#c30-hollow)"/>
   <line x1="246.0" y1="166.0" x2="246.0" y2="106.4" stroke="#7a6e62" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#c30-hollow-muted)"/>
-  <line x1="221.8" y1="166.0" x2="143.4" y2="98.1" stroke="#1a1612" stroke-width="2.8" marker-end="url(#c30-solid)"/>
-  <text x="141.9" y="142.0" font-size="10.5" fill="#8b1a1a" text-anchor="middle">update()</text>
+  <line x1="223.6" y1="166.0" x2="143.0" y2="90.5" stroke="#1a1612" stroke-width="2.8" marker-end="url(#c30-solid)"/>
+  <text x="142.8" y="138.0" font-size="10.5" fill="#8b1a1a" text-anchor="middle">update()</text>
   <text x="10" y="224" font-size="10.5" fill="#7a6e62" text-anchor="start">heavy edges: 1, in Display's signature. The subject side names no observer class.</text>
   <line x1="480" y1="60" x2="497.6" y2="60" stroke="#1a1612" stroke-width="2.8" marker-end="url(#c30-solid)"/>
   <text x="518" y="64" font-size="10.5" fill="#7a6e62" text-anchor="start">names a concrete class</text>

@@ -80,6 +80,10 @@ class Node:
     def cy(self) -> float:
         return self.y + self.h / 2
 
+    @property
+    def rx(self) -> float:
+        return 12 if self.kind == "interface" else 4
+
     def edge_point(self, tx: float, ty: float, pad: float = 0.0) -> tuple[float, float]:
         """The point on this box's border toward (tx, ty)."""
         dx, dy = tx - self.cx, ty - self.cy
@@ -106,13 +110,13 @@ class Node:
         return x1 + (x2 - x1) * t_in, y1 + (y2 - y1) * t_in
 
     def svg(self) -> str:
-        rx = 4
+        rx = self.rx
         stroke, width, dash, fill_text, weight = BOX, 1.3, "", INK, ""
         match self.kind:
             case "mark":
                 stroke, width, weight = MARK, 1.6, ' font-weight="bold"'
             case "interface":
-                stroke, rx, fill_text = MUTED, 12, MUTED
+                stroke, fill_text = MUTED, MUTED
             case "absent":
                 dash, fill_text = ' stroke-dasharray="4,3"', MUTED
         out = (f'  <rect x="{self.x}" y="{self.y}" width="{self.w}" '
@@ -166,9 +170,17 @@ MARKERS: dict[str, tuple[str, str]] = {
 def edge_svg(e: Edge, nodes: dict[str, Node], pid: str) -> str:
     a, b = nodes[e.a], nodes[e.b]
     if e.corner:
-        # Aim at the target's padded corner nearest the source.
-        x2 = b.cx + math.copysign(b.w / 2 + 4, a.cx - b.cx)
-        y2 = b.cy + math.copysign(b.h / 2 + 4, a.cy - b.cy)
+        # Aim at the target's corner nearest the source, on the padded
+        # side facing the source's longer run and inset by the corner's
+        # radius, so the head meets a straight stretch of the border.
+        sx = math.copysign(1, a.cx - b.cx)
+        sy = math.copysign(1, a.cy - b.cy)
+        if abs(a.cy - b.cy) >= abs(a.cx - b.cx):
+            x2 = b.cx + sx * (b.w / 2 - b.rx)
+            y2 = b.cy + sy * (b.h / 2 + 4)
+        else:
+            x2 = b.cx + sx * (b.w / 2 + 4)
+            y2 = b.cy + sy * (b.h / 2 - b.rx)
         x1, y1 = a.edge_point(x2, y2, 2)
     else:
         x1, y1 = a.edge_point(b.cx, b.cy, 2)
@@ -654,7 +666,7 @@ GALLERY: tuple[Cell, ...] = (
     Cell("Visitor", 2, 1,
          (Node("Element", 530, 316, w=80, h=36, kind="interface", size=11),
           Node("Visitor", 660, 316, w=86, h=36, kind="interface", size=11),
-          Node("Pricer", 660, 388, w=86, h=36, kind="mark"),
+          Node("Pricer", 668, 388, w=70, h=36, kind="mark"),
           Node("Add", 522, 460, w=62, h=30, size=10.5),
           Node("Mul", 597, 460, w=62, h=30, size=10.5),
           Node("Num", 672, 460, w=62, h=30, size=10.5)),
