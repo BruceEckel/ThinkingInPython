@@ -925,8 +925,9 @@ def epub_css(variant: str) -> str:
 
     `.epigraph` sets a chapter's opening blockquote in italics, the
     one look this stylesheet adds: without it the chapter's thesis
-    reads as a quotation from somewhere else. The reader's own
-    blockquote indent and margins stay.
+    reads as a quotation from somewhere else. Italic inside it (a
+    pattern name) sets roman, as typst's toggling `emph` does in the
+    PDF. The reader's own blockquote indent and margins stay.
     """
     return f"""pre {{
   white-space: pre-wrap; overflow-wrap: break-word;
@@ -942,7 +943,7 @@ img.chapter-ornament, img.part-art, img.chapter-snake {{
   max-width: 100%; }}
 img.chapter-ornament {{ margin: 0.1em 0 1em; }}
 .epigraph blockquote {{ font-style: italic; }}
-.epigraph code {{ font-style: normal; }}
+.epigraph code, .epigraph em {{ font-style: normal; }}
 .chapter-eyebrow {{ display: block; font-size: 0.5em;
   font-weight: normal; letter-spacing: 0.22em; }}
 {eyebrow_color(variant)}
