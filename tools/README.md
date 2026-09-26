@@ -224,7 +224,8 @@ next Up, source the `tip` wrapper for your shell from your profile:
 
 ```
 . C:\git\ThinkingInPython\tools\menu_history.ps1    # PowerShell, in $PROFILE
-. /c/git/ThinkingInPython/tools/menu_history.sh     # bash or zsh, in ~/.bashrc or ~/.zshrc
+. /c/git/ThinkingInPython/tools/menu_history.sh     # Git Bash, in ~/.bashrc
+. ~/ThinkingInPython/tools/menu_history.sh          # Linux/WSL clone, in ~/.bashrc or ~/.zshrc
 ```
 
 The wrapper names a scratch file in `TIP_MENU_RECORD`, runs the real
