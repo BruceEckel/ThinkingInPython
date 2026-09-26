@@ -873,6 +873,14 @@ def epub_css(variant: str) -> str:
     keeps a declared color as given, so a light fill would become a
     glaring panel against black.
 
+    `figure img` sets `width: 100%`, not `max-width`. A Kindle draws
+    an image at a size it derives from the pixels, so a 1600-pixel
+    diagram PNG came out under half the screen wide with its labels
+    unreadable, and `max-width` only shrinks an image, never grows it.
+    Every figure is landscape (the squarest, `stateMachine.svg`, is
+    0.96 tall per unit of width), so full width still fits a portrait
+    page.
+
     The per-indent rules from `hang_css()` are the hanging indent for
     wrapped code lines. They need a `<span>` per listing line, which
     `listing_html()` emits; the reasoning for paying that markup is in
@@ -910,7 +918,7 @@ pre code {{ font-size: inherit; }}
 {hang_css()}
 {HIGHLIGHT_CSS[variant]}h1, h2, h3, h4 {{ page-break-after: avoid; }}
 figure {{ page-break-inside: avoid; }}
-figure img {{ max-width: 100%; height: auto; }}
+figure img {{ width: 100%; height: auto; }}
 img.chapter-ornament, img.part-art {{ max-width: 100%; }}
 img.chapter-ornament {{ margin: 0.1em 0 1em; }}
 .epigraph blockquote {{ font-style: italic; }}
