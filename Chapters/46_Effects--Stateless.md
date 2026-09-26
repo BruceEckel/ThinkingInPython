@@ -1360,9 +1360,9 @@ Freezing prevents rebinding `waited`, not appending to the list it holds.
 Its entire body is `return asyncio.run(run_async(effect))`.
 Building and tearing down that loop takes time,
 even for an Effect with no `Async` in it.
-One machine measured `run(success(42))` at about 650 microseconds,
-against a few hundredths of a microsecond for the equivalent plain function call,
-roughly four orders of magnitude apart.
+On Windows, `run(success(42))` measured about 650 microseconds
+(about 75 on Linux),
+three to four orders of magnitude above a plain function call.
 That is the cost behind "a synchronous program calls it once,
 at the outermost edge" ([The Simplest Effect](#the-simplest-effect)).
 `test_nailer.py` starts a loop once per parametrized case,
