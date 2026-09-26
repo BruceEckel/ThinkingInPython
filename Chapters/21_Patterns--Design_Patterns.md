@@ -386,7 +386,7 @@ Then a Markdown writer arrives.
 
 ![What adding a Markdown writer changes in two designs of Report](_images/coupling_reach)
 
-The shaded parts are the ones whose source changes,
+The shaded parts are the ones whose source changes when `MdWriter` arrives,
 and the red edges are the ones the change adds.
 On the left, `Report` gains a branch and `main` gains a case.
 On the right, `Report` keeps its source,

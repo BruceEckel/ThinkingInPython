@@ -37,8 +37,9 @@ The visual vocabulary matches the hand-authored figures: a `viewBox`
 with no width or height, JetBrains Mono, the cover palette from
 `make_cover.py`, and a `<title>` for screen readers. The canvas is 700
 wide like the other figures, so the site renders every figure at the
-same scale; the drawing sits on the left and a four-line legend on the
-right.
+same scale; the drawing sits on the left and a legend on the right,
+listing only the edge kinds the drawing uses, and the red box only when
+a node is marked.
 """
 from __future__ import annotations
 import argparse
@@ -286,27 +287,35 @@ def defs(pid: str) -> str:
             + "  </defs>\n")
 
 
-def legend(x: float, y: float, pid: str) -> str:
-    """Three edge samples and the red box, stacked, for the panel's right side."""
-    rows = [
-        ("heavy", "names a concrete class"),
-        ("thin", "names an interface"),
-        ("realize", "satisfies it"),
-        ("inherit", "inherits its internals"),
-    ]
+LEGEND_ROWS: tuple[tuple[str, str], ...] = (
+    ("heavy", "names a concrete class"),
+    ("thin", "names an interface"),
+    ("realize", "satisfies it"),
+    ("inherit", "inherits its internals"),
+)
+
+
+def legend(x: float, y: float, pid: str, kinds: set[str],
+           marked: bool) -> str:
+    """A sample of each edge kind in `kinds`, and the red box if a node
+    is `marked`, stacked for the panel's right side. A legend lists only
+    what its drawing uses."""
+    rows = [(k, label) for k, label in LEGEND_ROWS if k in kinds]
     out = ""
     for i, (kind, label) in enumerate(rows):
         yy = y + i * 20
         stroke, width, dash, head = STYLES[kind]
         end = x + 30 - HEADS[MARKERS[head][0]].trim
-        out += (f'  <line x1="{x}" y1="{yy}" x2="{end:g}" y2="{yy}" '
+        out += (f'  <line class="legend" x1="{x}" y1="{yy}" '
+                f'x2="{end:g}" y2="{yy}" '
                 f'stroke="{stroke}" stroke-width="{width}"{dash} '
                 f'marker-end="url(#{pid}-{head})"/>\n')
         out += text(x + 38, yy + 4, label, 10.5, MUTED)
-    yy = y + len(rows) * 20
-    out += (f'  <rect x="{x + 2}" y="{yy - 8}" width="26" height="16" fill="none" '
-            f'stroke="{MARK}" stroke-width="1.6" rx="3"/>\n')
-    out += text(x + 38, yy + 4, "kept free of change", 10.5, MUTED)
+    if marked:
+        yy = y + len(rows) * 20
+        out += (f'  <rect x="{x + 2}" y="{yy - 8}" width="26" height="16" '
+                f'fill="none" stroke="{MARK}" stroke-width="1.6" rx="3"/>\n')
+        out += text(x + 38, yy + 4, "kept free of change", 10.5, MUTED)
     return out
 
 
@@ -332,7 +341,8 @@ class Panel:
         for s in self.extra:
             b += s
         b += text(10, self.height - 12, self.note, 10.5, MUTED)
-        b += legend(480, 60, pid)
+        b += legend(480, 60, pid, {e.kind for e in self.edges},
+                    any(n.kind == "mark" for n in self.nodes))
         return (f'<svg xmlns="http://www.w3.org/2000/svg" '
                 f'viewBox="0 0 {WIDTH} {self.height}"\n     {FONT}>\n'
                 f'  <title>{self.alt}</title>\n' + defs(pid) + b + '</svg>\n')
@@ -754,7 +764,8 @@ def render_gallery(pid: str = "gl") -> str:
                            (410, "realize", "satisfies it")):
         stroke, width, dash, head = STYLES[kind]
         end = x + 36 - HEADS[MARKERS[head][0]].trim
-        b += (f'  <line x1="{x}" y1="{y}" x2="{end:g}" y2="{y}" '
+        b += (f'  <line class="legend" x1="{x}" y1="{y}" '
+              f'x2="{end:g}" y2="{y}" '
               f'stroke="{stroke}" stroke-width="{width}"{dash} '
               f'marker-end="url(#{pid}-{head})"/>\n')
         b += text(x + 42, y + 4, label, 10.5, MUTED)

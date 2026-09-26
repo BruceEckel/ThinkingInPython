@@ -1,15 +1,16 @@
 """Tests for tools/arrowheads.py: the check knows the four standard heads
 in any color and rejects anything else, a head matches its line's
-color, a tip stops short of its target, and shortening an edge takes off the length asked for while
+color, a tip stops short of its target but not far short, an edge
+passes through no third box, and shortening an edge takes off the length asked for while
 keeping the head on the edge's line."""
 from __future__ import annotations
 import math
 import pytest
-from tools.arrowheads import (HEADS, MIN_GAP, MIN_LINE, marker_def,
-                              marker_kinds, mismatched_heads, reverse_path,
-                              short_edges, shorten_curve, shorten_line,
-                              shorten_path_end, shorten_path_start,
-                              tight_tips)
+from tools.arrowheads import (HEADS, MIN_GAP, MIN_LINE, crossed_boxes,
+                              marker_def, marker_kinds, mismatched_heads,
+                              reverse_path, short_edges, shorten_curve,
+                              shorten_line, shorten_path_end,
+                              shorten_path_start, stray_tips, tight_tips)
 
 
 def test_every_standard_head_is_recognized_in_any_color() -> None:
@@ -119,3 +120,38 @@ def test_a_background_rect_is_not_a_target() -> None:
            + '<line x1="10" y1="50" x2="60" y2="50" marker-end="url(#m)"/>'
            + "</svg>")
     assert MIN_GAP > 0 and tight_tips(svg) == []
+
+
+def test_a_tip_short_of_every_shape_is_stray_and_a_legend_is_not() -> None:
+    box = '<rect x="100" y="0" width="50" height="40"/>'
+    reach = HEADS["filled"].trim
+    near = (f'<line x1="0" y1="20" x2="{96 - reach}" y2="20" '
+            'marker-end="url(#m)"/>')
+    far = (f'<line x1="0" y1="30" x2="{80 - reach}" y2="30" '
+           'marker-end="url(#m)"/>')
+    sample = (f'<line class="legend" x1="0" y1="90" x2="{30 - reach}" '
+              'y2="90" marker-end="url(#m)"/>')
+    svg = marker_def("m", "filled", "#1a1612") + box + near + far + sample
+    assert stray_tips(svg) == ["tip 80.0,30.0: gap 20.0"]
+
+
+def test_an_edge_through_a_third_box_crosses_it() -> None:
+    boxes = ''.join(f'<rect x="{x}" y="0" width="20" height="20"/>'
+                    for x in (0, 50, 100))
+    reach = HEADS["filled"].trim
+    through = (f'<line x1="22" y1="10" x2="{96 - reach}" y2="10" '
+               'marker-end="url(#m)"/>')
+    around = ('<path d="M10,22 Q60,60 110,24" marker-start="url(#m)"/>')
+    svg = marker_def("m", "filled", "#1a1612") + boxes + through + around
+    assert crossed_boxes(svg) == ["22.0,10.0 -> 96.0,10.0 crosses rect 50,0"]
+
+
+def test_an_edge_inside_a_frame_does_not_cross_it() -> None:
+    frame = '<rect x="0" y="0" width="200" height="100"/>'
+    boxes = ('<rect x="10" y="10" width="20" height="20"/>'
+             '<rect x="110" y="10" width="20" height="20"/>')
+    reach = HEADS["filled"].trim
+    edge = (f'<line x1="32" y1="20" x2="{106 - reach}" y2="20" '
+            'marker-end="url(#m)"/>')
+    svg = marker_def("m", "filled", "#1a1612") + frame + boxes + edge
+    assert crossed_boxes(svg) == []

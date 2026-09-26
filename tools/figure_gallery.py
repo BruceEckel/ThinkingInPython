@@ -20,7 +20,11 @@ line is shorter than `arrowheads.MIN_LINE`: two boxes set too close
 leave the head alone between them, with no line to say dashed or heavy.
 And so does a head whose tip comes closer than `arrowheads.MIN_GAP` to
 the box or circle it points at (`tight_tips()`), except in the figures
-`TIP_GAP_EXEMPT` names with the reason.
+`TIP_GAP_EXEMPT` names with the reason; one farther than
+`arrowheads.MAX_GAP` from every shape (`stray_tips()`), which points at
+nothing, except in the figures `STRAY_TIP_EXEMPT` names or on a legend's
+sample edge (`class="legend"`); and an edge that passes through a box
+holding neither of its ends (`crossed_boxes()`).
 
 Text is measured too (`tools/svg_text.py`): text that runs past the
 `viewBox`, where every renderer cuts it off, or into other text fails
@@ -59,8 +63,9 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from tools import build_epub, build_site
-from tools.arrowheads import (MIN_GAP, marker_kinds, mismatched_heads,
-                              short_edges, tight_tips)
+from tools.arrowheads import (MAX_GAP, MIN_GAP, crossed_boxes, marker_kinds,
+                              mismatched_heads, short_edges, stray_tips,
+                              tight_tips)
 from tools.svg_text import clipped, collisions
 from tools.build_site import IMAGES_SRC
 from tools.config import BUILD_DIR, CHAPTERS_DIR, ROOT
@@ -148,6 +153,8 @@ class Style:
     mismatched: list[str] = field(default_factory=list)
     short: list[str] = field(default_factory=list)
     tight: list[str] = field(default_factory=list)
+    stray: list[str] = field(default_factory=list)
+    crossed: list[str] = field(default_factory=list)
     clipped: list[str] = field(default_factory=list)
     collisions: list[tuple[str, str]] = field(default_factory=list)
 
@@ -195,6 +202,9 @@ class Style:
                 for e in self.short]
         out += [f"arrowhead within {MIN_GAP:g} of its target: {t}"
                 for t in self.tight]
+        out += [f"arrowhead more than {MAX_GAP:g} from any shape: {t}"
+                for t in self.stray]
+        out += [f"edge crosses a box: {c}" for c in self.crossed]
         out += self.text_faults
         return out
 
@@ -203,6 +213,13 @@ class Style:
 TIP_GAP_EXEMPT: dict[str, str] = {
     "double_dispatch": "a sequence diagram's messages meet their "
                        "activation bars",
+}
+
+# Figures whose arrowheads may point at no shape, and why.
+STRAY_TIP_EXEMPT: dict[str, str] = {
+    "double_dispatch": "the last return leaves the diagram for the caller",
+    "memento_history": "each arrow is a move along the timeline toward a "
+                       "stack, not an edge to a box",
 }
 
 
@@ -253,6 +270,8 @@ def read_style(text: str, name: str = "") -> Style:
         mismatched=mismatched_heads(text),
         short=short_edges(text),
         tight=[] if name in TIP_GAP_EXEMPT else tight_tips(text),
+        stray=[] if name in STRAY_TIP_EXEMPT else stray_tips(text),
+        crossed=crossed_boxes(text),
         clipped=clipped(text),
         collisions=collisions(text),
     )
@@ -557,6 +576,17 @@ def main(argv: list[str] | None = None) -> int:
         print(f"  ARROWHEAD TOUCHES in {f.name}.svg: "
               + "; ".join(f.style.tight)
               + f" (aim the edge {MIN_GAP + 1:g} short of the border)")
+    stray = [f for f in figures if f.style and f.style.stray]
+    for f in stray:
+        assert f.style
+        print(f"  ARROWHEAD MISSES in {f.name}.svg: "
+              + "; ".join(f.style.stray)
+              + f" (aim the edge {MIN_GAP + 1:g} short of its target)")
+    crossing = [f for f in figures if f.style and f.style.crossed]
+    for f in crossing:
+        assert f.style
+        print(f"  EDGE CROSSES A BOX in {f.name}.svg: "
+              + "; ".join(f.style.crossed))
     crowded = [f for f in figures if f.style and f.style.text_faults]
     for f in crowded:
         assert f.style
@@ -564,7 +594,8 @@ def main(argv: list[str] | None = None) -> int:
             print(f"  TEXT in {f.name}.svg: {fault}")
     if args.open:
         webbrowser.open(index.as_uri())
-    return 1 if missing or odd or clash or stubby or tight or crowded else 0
+    return 1 if (missing or odd or clash or stubby or tight or stray
+                 or crossing or crowded) else 0
 
 
 if __name__ == "__main__":

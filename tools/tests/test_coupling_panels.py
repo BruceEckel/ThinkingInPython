@@ -111,3 +111,17 @@ def test_a_tip_reaches_a_rounded_box_at_any_angle() -> None:
     for x, y in ((0, 0), (300, 20), (145, 300), (0, 240)):
         nodes = (Node("s", x, y, w=40, h=20), target)
         assert edge_problems(nodes, (Edge("s", "t", "realize"),)) == []
+
+
+def test_a_legend_lists_only_what_its_panel_draws() -> None:
+    labels = {"heavy": "names a concrete class",
+              "thin": "names an interface",
+              "realize": "satisfies it",
+              "inherit": "inherits its internals"}
+    for ch, panel in PANELS.items():
+        svg = panel.svg("t")
+        used = {e.kind for e in panel.edges}
+        for kind, label in labels.items():
+            assert (label in svg) == (kind in used), (ch, kind)
+        marked = any(n.kind == "mark" for n in panel.nodes)
+        assert ("kept free of change" in svg) == marked, ch

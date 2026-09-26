@@ -320,23 +320,15 @@ def _gap(p: Point, kind: str, s: tuple[float, ...]) -> float:
     return outside + min(max(qx, qy), 0.0) - rx
 
 
-def tight_tips(svg: str, min_gap: float = MIN_GAP) -> list[str]:
-    """Each end-marker tip closer than `min_gap` to the nearest box or
-    circle, as `tip x,y: gap G`.
-
-    The tip is the line's end plus the head's `TIP_REACH` along the last
-    segment. An edge drawn to its target's border and then trimmed by
-    `trim` puts the tip back on the border; the check catches that.
-    Start markers are not checked, since a start diamond sits on its
-    owner.
-    """
+def _tips(svg: str) -> list[tuple[str, Point]]:
+    """Each edge carrying a standard end marker, with its head's tip:
+    the line's end plus the head's `TIP_REACH` along the last segment."""
     kinds = marker_kinds(svg)
-    shapes = _shapes(svg)
-    out: list[str] = []
+    out: list[tuple[str, Point]] = []
     for m in EDGE_RE.finditer(svg):
         use = END_RE.search(m.group())
         kind = kinds.get(use.group(1)) if use else None
-        if kind is None or not shapes:
+        if kind is None or LEGEND in m.group():
             continue
         pts = _edge_points(m.group())
         if len(pts) < 2:
@@ -345,12 +337,106 @@ def tight_tips(svg: str, min_gap: float = MIN_GAP) -> list[str]:
         back = next((p for p in reversed(pts) if p != end), end)
         length = math.dist(back, end) or 1
         reach = TIP_REACH[kind] / length
-        tip = (end[0] + (end[0] - back[0]) * reach,
-               end[1] + (end[1] - back[1]) * reach)
+        out.append((m.group(), (end[0] + (end[0] - back[0]) * reach,
+                                end[1] + (end[1] - back[1]) * reach)))
+    return out
+
+
+def _fmt_gap(tip: Point, gap: float) -> str:
+    return (f"tip {tip[0]:.1f},{tip[1]:.1f}: "
+            f"gap {round(gap, 1) + 0.0:.1f}")  # no -0.0
+
+
+def tight_tips(svg: str, min_gap: float = MIN_GAP) -> list[str]:
+    """Each end-marker tip closer than `min_gap` to the nearest box or
+    circle, as `tip x,y: gap G`.
+
+    An edge drawn to its target's border and then trimmed by `trim`
+    puts the tip back on the border; the check catches that. Start
+    markers are not checked, since a start diamond sits on its owner.
+    """
+    shapes = _shapes(svg)
+    if not shapes:
+        return []
+    out: list[str] = []
+    for _, tip in _tips(svg):
         gap = min(_gap(tip, k, s) for k, s in shapes)
         if gap < min_gap:
-            out.append(f"tip {tip[0]:.1f},{tip[1]:.1f}: "
-                       f"gap {round(gap, 1) + 0.0:.1f}")  # no -0.0
+            out.append(_fmt_gap(tip, gap))
+    return out
+
+
+# A tip farther than this from every box and circle points at nothing.
+# A legend's sample edges point at nothing on purpose, and carry
+# `class="legend"` so the tip checks pass over them.
+MAX_GAP = 6.0
+LEGEND = 'class="legend"'
+
+
+def stray_tips(svg: str, max_gap: float = MAX_GAP) -> list[str]:
+    """Each end-marker tip farther than `max_gap` from every box and
+    circle, as `tip x,y: gap G`: a head that misses its target."""
+    shapes = _shapes(svg)
+    if not shapes:
+        return []
+    out: list[str] = []
+    for _, tip in _tips(svg):
+        gap = min(_gap(tip, k, s) for k, s in shapes)
+        if gap > max_gap:
+            out.append(_fmt_gap(tip, gap))
+    return out
+
+
+def _samples(edge: str, step: float = 1.0) -> list[Point]:
+    """Points along a `<line>`, `<polyline>`, or `<path>`, about `step`
+    apart, following a path's curves."""
+    tag = TAG_RE.match(edge)
+    if tag and tag.group(1) == "path":
+        m = D_RE.search(edge)
+        pieces: list[list[Point]] = []
+        at: Point | None = None
+        for cmd, pts in _parse_path(m.group(1)) if m else []:
+            if cmd != "M" and at is not None:
+                pieces.append([at, *pts])
+            at = pts[-1]
+    else:
+        pts = _edge_points(edge)
+        pieces = [[a, b] for a, b in zip(pts, pts[1:])]
+    out: list[Point] = []
+    for piece in pieces:
+        n = max(2, int(math.dist(piece[0], piece[-1]) / step) * 2)
+        out += [_bezier(piece, i / n) for i in range(n + 1)]
+    return out
+
+
+def crossed_boxes(svg: str) -> list[str]:
+    """Each marked edge whose path enters a rect that holds neither of
+    its ends, as `x1,y1 -> x2,y2 crosses rect x,y`. An edge may start
+    or end inside a rect (a frame around both boxes), and it may touch
+    a border; it may not pass through a third box."""
+    rects = [s for k, s in _shapes(svg) if k == "rect"]
+    out: list[str] = []
+    # Edges with an end marker end at the tip; the rest (a start
+    # diamond alone) end where their line does.
+    edges: list[tuple[str, Point | None]] = list(_tips(svg))
+    edges += [(m.group(), None) for m in EDGE_RE.finditer(svg)
+              if USE_RE.search(m.group()) and not END_RE.search(m.group())
+              and LEGEND not in m.group()]
+    for edge, tip in edges:
+        pts = _samples(edge)
+        if not pts:
+            continue
+        ends = (pts[0], tip or pts[-1])
+        near = {min(range(len(rects)),
+                    key=lambda i: abs(_gap(p, "rect", rects[i])))
+                for p in ends} if rects else set()
+        for i, r in enumerate(rects):
+            if (i in near or any(_gap(p, "rect", r) < 0 for p in ends)):
+                continue
+            if any(_gap(p, "rect", r) < -1 for p in pts):
+                out.append(f"{pts[0][0]:.1f},{pts[0][1]:.1f} -> "
+                           f"{ends[1][0]:.1f},{ends[1][1]:.1f} crosses "
+                           f"rect {r[0]:g},{r[1]:g}")
     return out
 
 

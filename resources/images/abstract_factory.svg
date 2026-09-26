@@ -13,8 +13,8 @@
   </defs>
 
   <!-- each concrete factory realizes GameElementFactory -->
-  <line x1="115" y1="170" x2="331.4" y2="100.0" stroke="#1a1612" stroke-width="1.2" marker-end="url(#af-tri)"/>
-  <line x1="785" y1="170" x2="568.6" y2="100.0" stroke="#1a1612" stroke-width="1.2" marker-end="url(#af-tri)"/>
+  <line x1="115" y1="170" x2="348.3" y2="100.7" stroke="#1a1612" stroke-width="1.2" marker-end="url(#af-tri)"/>
+  <line x1="785" y1="170" x2="551.7" y2="100.7" stroke="#1a1612" stroke-width="1.2" marker-end="url(#af-tri)"/>
 
   <!-- the two product hierarchies -->
   <line x1="344" y1="171" x2="364.6" y2="171" stroke="#1a1612" stroke-width="1.2" marker-end="url(#af-tri)"/>
@@ -23,13 +23,13 @@
   <line x1="556" y1="273" x2="535.4" y2="273" stroke="#1a1612" stroke-width="1.2" marker-end="url(#af-tri)"/>
 
   <!-- what each factory method returns: one matched pair per factory -->
-  <line x1="189" y1="220" x2="227" y2="195" stroke="#8b1a1a" stroke-width="1.3"
+  <line x1="189" y1="220" x2="240" y2="196" stroke="#8b1a1a" stroke-width="1.3"
         stroke-dasharray="6,4" marker-end="url(#af-open)"/>
-  <line x1="189" y1="238" x2="227" y2="249" stroke="#8b1a1a" stroke-width="1.3"
+  <line x1="189" y1="238" x2="240" y2="248" stroke="#8b1a1a" stroke-width="1.3"
         stroke-dasharray="6,4" marker-end="url(#af-open)"/>
-  <line x1="711" y1="220" x2="673" y2="195" stroke="#8b1a1a" stroke-width="1.3"
+  <line x1="711" y1="220" x2="660" y2="196" stroke="#8b1a1a" stroke-width="1.3"
         stroke-dasharray="6,4" marker-end="url(#af-open)"/>
-  <line x1="711" y1="238" x2="673" y2="249" stroke="#8b1a1a" stroke-width="1.3"
+  <line x1="711" y1="238" x2="660" y2="248" stroke="#8b1a1a" stroke-width="1.3"
         stroke-dasharray="6,4" marker-end="url(#af-open)"/>
 
   <!-- GameElementFactory -->

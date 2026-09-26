@@ -33,14 +33,8 @@
   <line x1="332.0" y1="121.0" x2="302.4" y2="121.0" stroke="#1a1612" stroke-width="1.3" marker-end="url(#c32-solid)"/>
   <line x1="332.0" y1="133.0" x2="306.4" y2="133.0" stroke="#7a6e62" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#c32-hollow-muted)"/>
   <text x="10" y="224" font-size="10.5" fill="#7a6e62" text-anchor="start">heavy edges: 0. The coupling is in the method names eval_paper(), eval_scissors(), and eval_rock().</text>
-  <line x1="480" y1="60" x2="497.6" y2="60" stroke="#1a1612" stroke-width="2.8" marker-end="url(#c32-solid)"/>
-  <text x="518" y="64" font-size="10.5" fill="#7a6e62" text-anchor="start">names a concrete class</text>
-  <line x1="480" y1="80" x2="497.6" y2="80" stroke="#1a1612" stroke-width="1.3" marker-end="url(#c32-solid)"/>
-  <text x="518" y="84" font-size="10.5" fill="#7a6e62" text-anchor="start">names an interface</text>
-  <line x1="480" y1="100" x2="493.6" y2="100" stroke="#7a6e62" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#c32-hollow-muted)"/>
-  <text x="518" y="104" font-size="10.5" fill="#7a6e62" text-anchor="start">satisfies it</text>
-  <line x1="480" y1="120" x2="493.6" y2="120" stroke="#1a1612" stroke-width="1.3" marker-end="url(#c32-hollow)"/>
-  <text x="518" y="124" font-size="10.5" fill="#7a6e62" text-anchor="start">inherits its internals</text>
-  <rect x="482" y="132" width="26" height="16" fill="none" stroke="#8b1a1a" stroke-width="1.6" rx="3"/>
-  <text x="518" y="144" font-size="10.5" fill="#7a6e62" text-anchor="start">kept free of change</text>
+  <line class="legend" x1="480" y1="60" x2="497.6" y2="60" stroke="#1a1612" stroke-width="1.3" marker-end="url(#c32-solid)"/>
+  <text x="518" y="64" font-size="10.5" fill="#7a6e62" text-anchor="start">names an interface</text>
+  <line class="legend" x1="480" y1="80" x2="493.6" y2="80" stroke="#7a6e62" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#c32-hollow-muted)"/>
+  <text x="518" y="84" font-size="10.5" fill="#7a6e62" text-anchor="start">satisfies it</text>
 </svg>
