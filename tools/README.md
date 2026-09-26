@@ -1368,7 +1368,8 @@ template.html sets to the left of each chapter title on the site (and
 above it on a narrow screen). In art mode `snake_cutout()` makes it
 from `cover-source.jpg` with Pillow alone: the paper around the
 serpent and inside each loop becomes transparent, and the image is
-cropped to what remains. The index page, the PDF, and the EPUBs do
+cropped to what remains. The EPUBs set it on its own line under each
+chapter title, above the ornament. The index page and the PDF do
 not use it. `--preview` writes a small `cover-preview.png` for quick
 iteration.
 

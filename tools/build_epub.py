@@ -728,12 +728,20 @@ def book_markdown(chapters: list[Chapter], missing: set[str],
         else:
             head = f"# {heading} {{#{prefix}}}"
         orn = ""
+        if ornament and (STATIC / "chapter-snake.png").exists():
+            # The site sets the snake beside the title. An EPUB
+            # reader cannot float it there, so it gets its own
+            # line under the title. It cannot go above the
+            # heading: pandoc splits chapters at each `#`, so
+            # anything before it ends the previous chapter.
+            orn += ("\n\n![](chapter-snake.png)"
+                    "{.chapter-snake width=1.4in}\\")
         if ornament and (STATIC
                          / "chapter-ornament.png").exists():
             # Inline (trailing backslash), so pandoc does not
             # promote it to a centered implicit figure.
-            orn = ("\n\n![](chapter-ornament.png)"
-                   "{.chapter-ornament width=1.6in}\\")
+            orn += ("\n\n![](chapter-ornament.png)"
+                    "{.chapter-ornament width=1.6in}\\")
         parts.append(f"{head}{orn}\n\n{text.strip()}\n")
     return "\n".join(parts)
 
@@ -919,7 +927,8 @@ pre code {{ font-size: inherit; }}
 {HIGHLIGHT_CSS[variant]}h1, h2, h3, h4 {{ page-break-after: avoid; }}
 figure {{ page-break-inside: avoid; }}
 figure img {{ width: 100%; height: auto; }}
-img.chapter-ornament, img.part-art {{ max-width: 100%; }}
+img.chapter-ornament, img.part-art, img.chapter-snake {{
+  max-width: 100%; }}
 img.chapter-ornament {{ margin: 0.1em 0 1em; }}
 .epigraph blockquote {{ font-style: italic; }}
 .epigraph code {{ font-style: normal; }}
