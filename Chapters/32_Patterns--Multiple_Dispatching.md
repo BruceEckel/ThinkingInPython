@@ -401,7 +401,7 @@ it is an `isinstance()` ladder inside `compete()`,
 testing the opponent's type case by case.
 It works, and it keeps the method version's cost without its benefit.
 The type tests repeat in every class, as in the method version,
-and the programmer resolves by hand what dispatch would resolve for free.
+and the programmer resolves by hand what dispatch would resolve on its own.
 Every new `Item` forces an edit to every ladder.
 Both patterns in this chapter replace the ladder.
 
