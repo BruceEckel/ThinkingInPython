@@ -1,5 +1,8 @@
 # Data Transfer Objects
 
+A function computes several results, and the caller needs all of them.
+A *Data Transfer Object* carries them back under names instead of positions.
+
 The *Messenger*, called a *Data Transfer Object* in Martin Fowler's *Patterns of Enterprise Application Architecture*,
 passes a package of information around.
 Most often it carries a function's return values.

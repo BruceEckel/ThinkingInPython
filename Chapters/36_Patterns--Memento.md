@@ -1,5 +1,10 @@
 # Memento
 
+An object is about to change, and someone may want it back the way it was.
+A *Memento* saves what the object was so the program can restore it.
+
+![`Sketch` names `Memento`, and `History` names only a type parameter, so it holds a `Memento` without reading it](_images/coupling_36)
+
 Undo is a feature users expect and programmers dread.
 It requires a program to capture an object's state at one moment and restore it later.
 The *Memento* pattern captures and restores that state without breaking encapsulation.
@@ -7,8 +12,6 @@ The *originator* (the object with state) produces a *memento*,
 an opaque snapshot of itself.
 A *caretaker* (the undo machinery) stores mementos and returns one on request,
 without reading its contents.
-
-![`Sketch` names `Memento`, and `History` names only a type parameter, so it holds a `Memento` without reading it](_images/coupling_36)
 
 The pattern exists because of mutation.
 An object that changes in place overwrites its earlier state,

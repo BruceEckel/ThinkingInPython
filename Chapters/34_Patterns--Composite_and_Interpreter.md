@@ -1,5 +1,12 @@
 # Composite and Interpreter
 
+An item can hold more items of its own kind,
+and code must treat one item and a whole group the same way.
+*Composite* builds that tree,
+and *Interpreter* reads one as a sentence and evaluates it.
+
+![`disk_usage()` and `walk()` each name both node types, and `Directory` names only the `Node` union](_images/coupling_34)
+
 The *Composite* pattern arranges objects in a tree,
 so you can treat a single object and a group of objects uniformly.
 The *Interpreter* pattern represents sentences in a small language as trees,
@@ -10,8 +17,6 @@ In Python both reduce to one technique:
 a union of frozen data classes for the nodes,
 and recursive functions that `match` on them.
 This chapter builds each pattern with [exhaustive matching](13_Techniques--Pattern_Matching.md#exhaustive-matching).
-
-![`disk_usage()` and `walk()` each name both node types, and `Directory` names only the `Node` union](_images/coupling_34)
 
 ## The Classic Composite
 

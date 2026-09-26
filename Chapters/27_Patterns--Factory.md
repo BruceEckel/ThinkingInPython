@@ -1,5 +1,11 @@
 # Factory
 
+Adding a type should mean writing one class,
+but something in the program must still choose which class to construct.
+A *Factory* puts that choice in one place.
+
+![The caller names `make()`, and `make()` is the one place that names `Shape`, `Circle`, and `Square`](_images/coupling_27)
+
 When a system needs new types,
 start with a base type that gives them a common interface.
 The common interface separates the rest of your code from knowledge of the specific types you add.
@@ -9,8 +15,6 @@ But something must still create an object of the new type,
 and that creation code names the concrete class.
 If object creation is spread throughout your application,
 adding a type means finding and editing every place that names a concrete class.
-
-![The caller names `make()`, and `make()` is the one place that names `Shape`, `Circle`, and `Square`](_images/coupling_27)
 
 Here `Triangle` has just joined the hierarchy.
 Two call sites build shapes by naming `Circle` or `Square` directly,

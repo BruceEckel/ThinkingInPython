@@ -1,13 +1,16 @@
 # Flyweight
 
+Thousands of objects carry the same few values.
+*Flyweight* keeps one object per value and shares it among every use.
+
+![`parse_map()` names `tile()`, `to_symbol()`, and `Tile`, and `tile()` is the one place that constructs a `Tile`](_images/coupling_35)
+
 Some programs need enormous numbers of fine-grained objects:
 the characters in a document, the tiles in a game map,
 the strings in a compiler's symbol table.
 The *Flyweight* pattern supports such programs by sharing.
 Instead of many objects,
 you keep one object per distinct value and reference it many times.
-
-![`parse_map()` names `tile()`, `to_symbol()`, and `Tile`, and `tile()` is the one place that constructs a `Tile`](_images/coupling_35)
 
 Two ideas make sharing work.
 

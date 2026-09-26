@@ -1,5 +1,11 @@
 # Changing the Interface
 
+The code you have does the job,
+and the code that needs it expects a different interface.
+*Adapter* and *Façade* supply that interface without changing either side.
+
+![`WhatIUse` names `WhatIWant`, and `ProxyAdapter` is the one class that names both `WhatIWant` and `WhatIHave`](_images/coupling_29)
+
 Sometimes the problem you're solving is as simple as "I don't have the interface I need."
 Two of the patterns in *GoF Design Patterns* solve this problem.
 *Adapter* takes one type and produces an interface to some other type.
@@ -11,8 +17,6 @@ which puts them adjacent to *Proxy* and *Decorator*.
 Adding an interface leaves the existing one in place, so nothing breaks.
 When the new interface is meant to replace one you own,
 callers keep using the old one until you mark it deprecated.
-
-![`WhatIUse` names `WhatIWant`, and `ProxyAdapter` is the one class that names both `WhatIWant` and `WhatIHave`](_images/coupling_29)
 
 ## Adapter
 

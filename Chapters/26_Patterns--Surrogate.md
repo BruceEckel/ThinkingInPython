@@ -1,12 +1,15 @@
 # Surrogate
 
+The caller talks to one object, and a different object behind it does the work.
+*Proxy* and *State* both put that stand-in, a *Surrogate*, between the two.
+
+![`Proxy` and `Complete` both inherit `Service`, `Proxy` holds one, and only the caller names either class](_images/coupling_26)
+
 Both *Proxy* and *State* provide a surrogate class that changes what happens behind a call without changing the calling code.
 The surrogate hides the implementing class that does the work.
 When you call a method in the surrogate,
 the surrogate calls that method in the implementing class.
 The two patterns are so similar that *Proxy* is a special case of *State*.
-
-![`Proxy` and `Complete` both inherit `Service`, `Proxy` holds one, and only the caller names either class](_images/coupling_26)
 
 From a base class, derive the surrogate along with the class or classes that provide the implementation:
 

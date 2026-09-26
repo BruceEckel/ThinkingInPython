@@ -1,5 +1,10 @@
 # State Machines
 
+A system is always in one of a few states, and each input moves it to the next.
+A *StateMachine* names the states and the moves between them.
+
+![`StateMachine` names only `State`, each state satisfies it, and `MouseTrap` and its states name each other](_images/coupling_31)
+
 Recall [*State*](26_Patterns--Surrogate.md#state):
 a surrogate object that forwards calls to a swappable implementation.
 *State* lets the client programmer swap the implementation.
@@ -7,8 +12,6 @@ a surrogate object that forwards calls to a swappable implementation.
 from one object to the next.
 Each implementation represents one state the system can occupy,
 so the system behaves differently as it moves from state to state.
-
-![`StateMachine` names only `State`, each state satisfies it, and `MouseTrap` and its states name each other](_images/coupling_31)
 
 The code that moves the system from one state to the next is often a [*Template Method*](25_Patterns--Template_Method.md),
 as the following framework for a basic state machine shows.

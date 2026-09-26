@@ -1,13 +1,17 @@
 # Function Objects
 
+One place decides what to do,
+and another place does it later or does it a different way each time.
+A *function object* carries the decision from the first place to the second.
+
+![The list that builds `macro` names three functions, and the loop that runs it names only the `Command` signature](_images/coupling_28)
+
 A *function object* decouples the choice of function to call from the place that calls it.
 That decoupling is the goal of three patterns: *Command*, *Strategy*,
 and *Chain of Responsibility*.
 The call site names the signature it will call and says nothing about where the callable came from.
 [Design Patterns](21_Patterns--Design_Patterns.md#design-principles)
 states that principle as "design the communication, not the parts."
-
-![The list that builds `macro` names three functions, and the loop that runs it names only the `Command` signature](_images/coupling_28)
 
 Each pattern defers something:
 
