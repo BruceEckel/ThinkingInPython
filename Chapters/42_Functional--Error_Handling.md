@@ -1,8 +1,8 @@
 # Error Handling
 
-A call can fail, and nothing in its signature says so.
-Returning the failure as a value puts it in the signature,
-where the caller must deal with it.
+> A call can fail, and nothing in its signature says so.
+> Returning the failure as a value puts it in the signature,
+> where the caller must deal with it.
 
 [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#a-type-is-a-set-of-values)
 makes a value carry a guarantee.

@@ -1,7 +1,7 @@
 # Metaprogramming
 
-Ordinary code makes objects.
-Metaprogramming works one level up, on the classes that make them.
+> Ordinary code makes objects.
+> Metaprogramming works one level up, on the classes that make them.
 
 Every object is created by another, special object.
 These special objects are *classes*,

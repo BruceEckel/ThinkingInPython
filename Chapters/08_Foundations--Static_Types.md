@@ -1,8 +1,8 @@
 # Static Types
 
-A value has a type whether or not you write it down,
-and a mistake about it surfaces when the operation runs.
-Static types let a tool find that mistake before the program does.
+> A value has a type whether or not you write it down,
+> and a mistake about it surfaces when the operation runs.
+> Static types let a tool find that mistake before the program does.
 
 C++ and Java require type declarations,
 and they check those types during compilation.

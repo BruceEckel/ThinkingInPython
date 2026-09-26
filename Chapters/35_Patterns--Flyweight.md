@@ -1,7 +1,7 @@
 # Flyweight
 
-Thousands of objects carry the same few values.
-*Flyweight* keeps one object per value and shares it among every use.
+> Thousands of objects carry the same few values.
+> *Flyweight* keeps one object per value and shares it among every use.
 
 ![`parse_map()` names `tile()`, `to_symbol()`, and `Tile`, and `tile()` is the one place that constructs a `Tile`](_images/coupling_35)
 

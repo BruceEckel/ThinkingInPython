@@ -1,8 +1,8 @@
 # Stateless
 
-The easiest things to forget about a function are what it needs from outside and how it can fail.
-Stateless writes both into the function's type,
-and the type checker holds every caller to them.
+> The easiest things to forget about a function are what it needs from outside and how it can fail.
+> Stateless writes both into the function's type,
+> and the type checker holds every caller to them.
 
 [Effect Management](44_Effects--Effect_Management.md#library-effect-management)
 introduced library Effect systems.

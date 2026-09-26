@@ -1,7 +1,7 @@
 # Comprehensions
 
-A loop says how to build a collection, one step at a time.
-A comprehension says what the collection is, and Python builds it.
+> A loop says how to build a collection, one step at a time.
+> A comprehension says what the collection is, and Python builds it.
 
 *Comprehensions* build one collection from another in a single expression
 ([Control Flow](04_Foundations--Control_Flow.md#comprehensions) introduces them).

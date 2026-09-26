@@ -1,7 +1,7 @@
 # Cleanup
 
-Python frees memory on its own, and a file, a socket, or a lock is not memory.
-Something must release those, and this chapter is about when that release runs.
+> Python frees memory on its own, and a file, a socket, or a lock is not memory.
+> Something must release those, and this chapter is about when that release runs.
 
 ## Why `__del__()` Is Not Cleanup {#why-del-is-not-cleanup}
 

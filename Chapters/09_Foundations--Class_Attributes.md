@@ -1,9 +1,9 @@
 # Class Attributes
 
-A field in the class body looks, to a C++ or Java programmer,
-like storage in each object.
-In Python it is one variable the class holds,
-and an object's own fields come from assignments through `self`.
+> A field in the class body looks, to a C++ or Java programmer,
+> like storage in each object.
+> In Python it is one variable the class holds,
+> and an object's own fields come from assignments through `self`.
 
 ## Class Attributes Are Not Default Values
 

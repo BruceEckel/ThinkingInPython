@@ -1,9 +1,9 @@
 # Tour
 
-You know a language,
-and Python differs from it in a few places that matter more than the syntax.
-This tour covers the syntax and the built-in values,
-and slows down wherever Python chose otherwise.
+> You know a language,
+> and Python differs from it in a few places that matter more than the syntax.
+> This tour covers the syntax and the built-in values,
+> and slows down wherever Python chose otherwise.
 
 This chapter and the ones that follow give a programmer's tour of Python:
 syntax and the built-in numbers, strings, and `None` here, then containers,

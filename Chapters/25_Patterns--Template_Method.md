@@ -1,8 +1,8 @@
 # Template Method
 
-An algorithm runs a fixed sequence of steps,
-and some of those steps differ from one use to the next.
-A *Template Method* fixes the sequence and lets you supply the steps that vary.
+> An algorithm runs a fixed sequence of steps,
+> and some of those steps differ from one use to the next.
+> A *Template Method* fixes the sequence and lets you supply the steps that vary.
 
 ![`MyApp` inherits `ApplicationFramework`'s internals, while `run_framework()` names only the `Step` signature its two functions satisfy](_images/coupling_25)
 

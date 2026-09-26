@@ -1,7 +1,7 @@
 # Functions
 
-A piece of behavior needs a name so other code can call it without knowing how it works.
-A function is that name, with a parameter list that says what to pass.
+> A piece of behavior needs a name so other code can call it without knowing how it works.
+> A function is that name, with a parameter list that says what to pass.
 
 This chapter covers defining and calling functions:
 default and keyword arguments, scope and `global`, `*args`/`**kwargs`,

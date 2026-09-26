@@ -1,9 +1,9 @@
 # Pattern Catalog
 
-Most patterns you will encounter first as a name someone uses in a design review,
-not as code.
-This catalog gives each name a one-line intent,
-so you can place it and look it up.
+> Most patterns you will encounter first as a name someone uses in a design review,
+> not as code.
+> This catalog gives each name a one-line intent,
+> so you can place it and look it up.
 
 This chapter gathers patterns that the literature documents widely,
 not only the original *Design Patterns* (GoF) set.

@@ -1,9 +1,9 @@
 # Composite and Interpreter
 
-An item can hold more items of its own kind,
-and code must treat one item and a whole group the same way.
-*Composite* builds that tree,
-and *Interpreter* reads one as a sentence and evaluates it.
+> An item can hold more items of its own kind,
+> and code must treat one item and a whole group the same way.
+> *Composite* builds that tree,
+> and *Interpreter* reads one as a sentence and evaluates it.
 
 ![`disk_usage()` and `walk()` each name both node types, and `Directory` names only the `Node` union](_images/coupling_34)
 

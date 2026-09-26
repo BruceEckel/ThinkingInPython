@@ -1,7 +1,7 @@
 # Control Flow
 
-Conditionals and loops read the same in Python as in the language you know.
-Recovery from failure is the part that reads differently.
+> Conditionals and loops read the same in Python as in the language you know.
+> Recovery from failure is the part that reads differently.
 
 In C++ and Java the careful move is to test before you act:
 check that the string parses, that the file is there, that the key exists.

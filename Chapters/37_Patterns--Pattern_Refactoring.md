@@ -1,8 +1,8 @@
 # Pattern Refactoring
 
-The first design that works is rarely the one that survives the next requirement.
-This chapter follows one problem through several reshapings and names the pattern each one needs,
-or makes unnecessary.
+> The first design that works is rarely the one that survives the next requirement.
+> This chapter follows one problem through several reshapings and names the pattern each one needs,
+> or makes unnecessary.
 
 A first solution solves the problem,
 then you ask "what will change?" and reshape the design so that kind of change touches one place.

@@ -1,7 +1,7 @@
 # Data Classes as Types
 
-A value can be wrong, and every function that receives it checks again.
-A data class that refuses illegal values moves that check into the type.
+> A value can be wrong, and every function that receives it checks again.
+> A data class that refuses illegal values moves that check into the type.
 
 A *type* is a set of values.
 The type `int` is the set of whole numbers.

@@ -1,7 +1,7 @@
 # Foundations
 
-Some code you can check by reading it, and the rest you must run to find out.
-Functional programming grows the first kind at the expense of the second.
+> Some code you can check by reading it, and the rest you must run to find out.
+> Functional programming grows the first kind at the expense of the second.
 
 This chapter begins the book's exploration of functional programming.
 The ideas are useful before you learn their names.

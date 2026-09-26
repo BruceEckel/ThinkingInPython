@@ -1,8 +1,8 @@
 # Changing the Interface
 
-The code you have does the job,
-and the code that needs it expects a different interface.
-*Adapter* and *Façade* supply that interface without changing either side.
+> The code you have does the job,
+> and the code that needs it expects a different interface.
+> *Adapter* and *Façade* supply that interface without changing either side.
 
 ![`WhatIUse` names `WhatIWant`, and `ProxyAdapter` is the one class that names both `WhatIWant` and `WhatIHave`](_images/coupling_29)
 

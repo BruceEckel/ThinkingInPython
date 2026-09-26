@@ -1,8 +1,8 @@
 # Concurrency
 
-The network, the disk, and the user all take their time,
-and a core sits idle while the program waits.
-Concurrency puts other work into that wait, on the same core or on another.
+> The network, the disk, and the user all take their time,
+> and a core sits idle while the program waits.
+> Concurrency puts other work into that wait, on the same core or on another.
 
 [Performance](18_Techniques--Performance.md)
 makes one stream of instructions faster.

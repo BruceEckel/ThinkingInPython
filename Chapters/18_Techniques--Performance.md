@@ -1,7 +1,7 @@
 # Performance
 
-Most programs are fast enough as written, and the rest are slow in one place.
-Performance work is finding that place before changing anything.
+> Most programs are fast enough as written, and the rest are slow in one place.
+> Performance work is finding that place before changing anything.
 
 Performance means at least two things in computing:
 

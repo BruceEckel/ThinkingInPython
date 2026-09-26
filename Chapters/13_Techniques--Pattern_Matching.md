@@ -1,8 +1,8 @@
 # Pattern Matching
 
-Sometimes the shape of a value matters as much as its contents.
-`match` tests the shape, takes the value apart,
-and binds the parts in one statement.
+> Sometimes the shape of a value matters as much as its contents.
+> `match` tests the shape, takes the value apart,
+> and binds the parts in one statement.
 
 The `match` statement compares a value against a series of *patterns* and runs the first one that fits.
 No C-style `switch` can express this case:

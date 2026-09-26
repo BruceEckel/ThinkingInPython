@@ -1,8 +1,8 @@
 # Classes
 
-Data and the operations on it belong together,
-and a class binds them under one name.
-Python's version is a few lines of syntax and a set of conventions the rest of the book uses.
+> Data and the operations on it belong together,
+> and a class binds them under one name.
+> Python's version is a few lines of syntax and a set of conventions the rest of the book uses.
 
 You start with the `class` keyword followed by the class name and a colon.
 Use `def` to create methods inside the indented class body:

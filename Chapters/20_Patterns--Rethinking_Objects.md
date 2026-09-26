@@ -1,8 +1,8 @@
 # Rethinking Objects
 
-A class bundles data with the code that changes it,
-and inheritance ties classes to each other.
-This chapter separates the parts of that machinery that solve problems from the parts that create them.
+> A class bundles data with the code that changes it,
+> and inheritance ties classes to each other.
+> This chapter separates the parts of that machinery that solve problems from the parts that create them.
 
 I spent much of my career promoting objects.
 I wrote *Thinking in C++* and *Thinking in Java*,

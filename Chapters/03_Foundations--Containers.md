@@ -1,7 +1,7 @@
 # Containers
 
-Every program keeps things in groups: in order, by key, or without duplicates.
-Python gives each grouping a literal and a type of its own.
+> Every program keeps things in groups: in order, by key, or without duplicates.
+> Python gives each grouping a literal and a type of its own.
 
 In C++ and Java a container is a library class you name and construct.
 Python builds its containers into the grammar: `[1, 2]`, `{"a": 1}`,

@@ -1,8 +1,8 @@
 # Modules and Packages
 
-A program outgrows one file, and the pieces must find each other by name.
-`import` connects the pieces,
-and this chapter covers the files and directories it can find.
+> A program outgrows one file, and the pieces must find each other by name.
+> `import` connects the pieces,
+> and this chapter covers the files and directories it can find.
 
 Each Python file is a *module* you can `import` into another Python file.
 If the file is in the same directory,

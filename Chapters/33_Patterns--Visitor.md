@@ -1,7 +1,7 @@
 # Visitor
 
-A family of classes you cannot change needs a new operation.
-*Visitor* adds the operation from outside the family.
+> A family of classes you cannot change needs a new operation.
+> *Visitor* adds the operation from outside the family.
 
 ![`Flower` names only `Visitor` and `Pollinator` names only `Flower`, so no visitor names a concrete flower](_images/coupling_33)
 

@@ -1,8 +1,8 @@
 # Simulation
 
-Each object in a simulation follows a rule of its own and knows nothing of the whole.
-What the rules produce together, as time steps forward,
-can be more than anyone wrote down.
+> Each object in a simulation follows a rule of its own and knows nothing of the whole.
+> What the rules produce together, as time steps forward,
+> can be more than anyone wrote down.
 
 A simulation models a set of objects that act on their own and interact through shared state.
 This chapter builds three,

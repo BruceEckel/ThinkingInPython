@@ -1,7 +1,7 @@
 # Observer
 
-Something changes, and something else is interested in that change.
-The *Observer* pattern connects the two.
+> Something changes, and something else is interested in that change.
+> The *Observer* pattern connects the two.
 
 ![`Subject` names only `Observer`, `Thermometer` inherits `Subject`, and `Display` satisfies `Observer` while naming `Subject` in its signature](_images/coupling_30)
 

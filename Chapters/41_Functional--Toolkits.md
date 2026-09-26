@@ -1,9 +1,9 @@
 # Toolkits
 
-Pure functions are parts,
-and the same few operations on parts recur in every program: fold, cache,
-specialize, chain.
-`functools` and `itertools` supply them, written and tested.
+> Pure functions are parts,
+> and the same few operations on parts recur in every program: fold, cache,
+> specialize, chain.
+> `functools` and `itertools` supply them, written and tested.
 
 [Foundations](40_Functional--Foundations.md) builds behavior from small, pure,
 composable pieces.

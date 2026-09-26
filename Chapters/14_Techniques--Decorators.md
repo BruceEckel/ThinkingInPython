@@ -1,8 +1,8 @@
 # Decorators
 
-The same few lines of logging or timing belong in many functions,
-and none of those functions is about logging or timing.
-A decorator wraps that behavior around a function from outside.
+> The same few lines of logging or timing belong in many functions,
+> and none of those functions is about logging or timing.
+> A decorator wraps that behavior around a function from outside.
 
 Logging, timing, retrying, and validating arguments are cross-cutting concerns:
 they show up in unrelated functions, not just one.

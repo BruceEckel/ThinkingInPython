@@ -1,8 +1,8 @@
 # Singleton
 
-A program has one configuration, one log, one registry of plugins,
-and every part of the program must see the same one.
-A *Singleton* creates that one instance and shares it.
+> A program has one configuration, one log, one registry of plugins,
+> and every part of the program must see the same one.
+> A *Singleton* creates that one instance and shares it.
 
 ![Every importer names `config.py` by its module name, and the import system hands each one the same instance](_images/coupling_24)
 

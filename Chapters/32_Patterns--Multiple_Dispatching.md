@@ -1,7 +1,7 @@
 # Multiple Dispatching
 
-Two objects meet, and the right action depends on the type of each.
-*Multiple Dispatching* chooses the action from both types at once.
+> Two objects meet, and the right action depends on the type of each.
+> *Multiple Dispatching* chooses the action from both types at once.
 
 ![`Paper`, `Scissors`, and `Rock` each define an eval method for every item and call one through `Any`, so a fourth item edits all three](_images/coupling_32)
 
