@@ -11,7 +11,7 @@ VALE = """
  12:3  warning  'is left' may be passive voice.  write-good.Passive
 
  Chapters/32_Patterns--Multiple_Dispatching.md
- 170:36  warning  'are fixed' may be passive voice.  write-good.Passive
+ 170:36  warning  'are fixed' may be passive.  write-good.Passive
  404:65  error    'for free' is a cliche.  proselint.Cliches
 """ + "\n".join(f" {n}:1  warning  filler" for n in range(30))
 
