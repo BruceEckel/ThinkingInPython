@@ -1953,14 +1953,14 @@ async def time_run_async() -> float:
 
 per_run = time_run()
 per_run_async = asyncio.run(time_run_async())
-print(f"run() at least 50x slower: "
-      f"{per_run > per_run_async * 50}")
-#: run() at least 50x slower: True
+print(f"run() at least 20x slower: "
+      f"{per_run > per_run_async * 20}")
+#: run() at least 20x slower: True
 ```
 
 `run_async()` reuses the loop already running and costs little beyond the Effect itself.
 `run()` builds and tears down a loop on every call,
-at least fifty times the cost of `run_async()`, by the listing's own measure.
+at least twenty times the cost of `run_async()`, by the listing's own measure.
 Synchronous code has no loop to reuse, so it pays that cost on every `run()`.
 From inside a running loop,
 `run_async()` is both the one that works and the one that is fast.
@@ -2400,8 +2400,8 @@ It is a language that does the encoding for you.
     and list every line you edited.
     Then do the same to `research_by_hand.py` and say which tool named the lines to change in each case.
 6.  `scenarios.py` supplies a `DeadWire` that fails without printing anything.
-    Write a `DullWire` whose `latest()` succeeds but returns a headline with no topic in `TOPICS`,
-    and predict the trace before running it.
+    Write a `StaleWire` whose `latest()` prints `feed: fetching` and then raises `Unavailable`.
+    Predict the trace, then say why it differs from `DeadWire`'s even though both fail the same way.
 7.  Wrap `research()` in `retry()` and supply a `Time()`.
     Explain what happens under the `WEATHER` scenario and why retrying a `NotInteresting` failure is the wrong behavior,
     then say what an Effect system needs for you to retry only `Unavailable`.

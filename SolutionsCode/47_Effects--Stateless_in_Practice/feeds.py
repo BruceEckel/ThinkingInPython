@@ -14,10 +14,10 @@ class DeadWire:
     def latest(self) -> str:
         raise Unavailable("offline")
 
-class DullWire:
+class StaleWire:
     def latest(self) -> str:
         print("feed: fetching")
-        return "local council approves new roundabout"
+        raise Unavailable("stale connection")
 
 @dataclass
 class Library:

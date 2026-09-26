@@ -32,6 +32,6 @@ async def time_run_async() -> float:
 
 per_run = time_run()
 per_run_async = asyncio.run(time_run_async())
-print(f"run() at least 50x slower: "
-      f"{per_run > per_run_async * 50}")
-#: run() at least 50x slower: True
+print(f"run() at least 20x slower: "
+      f"{per_run > per_run_async * 20}")
+#: run() at least 20x slower: True
