@@ -155,8 +155,9 @@ second time, the tools' own tests run only when `tools/` changed
 since they last passed (tests marked `book` always run), and `run`
 executes only listings without `#:` markers, with a full run of
 every listing once a day, and `tip output` refreshes only chapters
-whose Markdown, `utils/`, or tools changed since their markers last
-passed. `tip gate RUN=full`, `tip ci`, and `tip release` turn the
+whose Markdown or `utils/` changed since their markers last passed,
+or all of them when the checker changed (the `tools` modules it
+loads, `norun.txt`, `timing.txt`, `uv.lock`, `.python-version`). `tip gate RUN=full`, `tip ci`, and `tip release` turn the
 shortcuts off (`TIP_FULL=1`), and `tip everything` does too, then
 adds spell, prose (Vale), site, EPUB, and PDF, keeping going past a
 failure (`tools/everything.py`). A new tools test that reads a

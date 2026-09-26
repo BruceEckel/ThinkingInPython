@@ -27,9 +27,12 @@ that records the last time the work passed:
   15-25 s for the book). ``validate_output --changed-only`` skips a
   Markdown file whose digest matches the one recorded when its markers
   last passed. The digest covers the file, the tree's ``utils/`` helpers
-  (every listing can import them), and ``tools_digest()`` (the checker,
-  ``timing.txt``, ``norun.txt``, the locked dependencies), plus
-  ``.python-version``. Nothing else can change a listing's output: the
+  (every listing can import them), the checker (the source of every
+  ``tools`` module loaded in the process, found at runtime, so a new
+  import joins the digest without a list to update), ``timing.txt`` and
+  ``norun.txt``, ``uv.lock``, and ``.python-version``. An edit to a tool
+  the checker does not load, such as ``verify.py``, leaves every stamp
+  valid. Nothing else can change a listing's output: the
   build trees come from the Markdown alone, and no listing reads another
   chapter's directory. An edit to one chapter then refreshes that
   chapter. A marker the refresh rewrites changes the file, so the next
@@ -45,10 +48,11 @@ Every pass records its stamp, shortcut or not.
 import hashlib
 import json
 import os
+import sys
 from datetime import datetime, timedelta
 from pathlib import Path
 
-from tools.config import BUILD_DIR, ROOT
+from tools.config import BUILD_DIR, NORUN_FILE, ROOT, TIMING_FILE
 
 FULL_ENV = "TIP_FULL"
 FULL_RUN_EVERY = timedelta(hours=24)
@@ -126,12 +130,24 @@ def record_full_run(tree: Path) -> None:
     _write(FULL_RUN_STAMP, stamps)
 
 
+def checker_files() -> list[Path]:
+    """The source of every `tools` module this process has loaded: the
+    marker checker and everything it imports."""
+    tools_dir = (ROOT / "tools").resolve()
+    files = {Path(f).resolve() for m in list(sys.modules.values())
+             if (f := getattr(m, "__file__", None))}
+    return sorted(f for f in files if f.parent == tools_dir)
+
+
 def marker_context(tree: Path, utils: Path) -> str:
     """What every listing in `tree` depends on beyond its own Markdown."""
-    h = hashlib.sha256(tools_digest().encode())
-    version = ROOT / ".python-version"
-    if version.is_file():
-        h.update(version.read_bytes())
+    h = hashlib.sha256()
+    inputs = [*checker_files(), NORUN_FILE, TIMING_FILE,
+              ROOT / "uv.lock", ROOT / ".python-version"]
+    for path in inputs:
+        h.update(path.name.encode() + b"\0")
+        if path.is_file():
+            h.update(path.read_bytes())
     h.update(_tree_key(tree).encode())
     if utils.is_dir():
         for path in sorted(utils.rglob("*.py")):
