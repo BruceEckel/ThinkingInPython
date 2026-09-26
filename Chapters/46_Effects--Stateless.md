@@ -1,7 +1,6 @@
 # Stateless
 
-Two things a function does are the easiest to forget:
-what it needs from outside, and how it can fail.
+The easiest things to forget about a function are what it needs from outside and how it can fail.
 Stateless writes both into the function's type,
 and the type checker holds every caller to them.
 

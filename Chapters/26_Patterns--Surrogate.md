@@ -1,7 +1,8 @@
 # Surrogate
 
 The caller talks to one object, and a different object behind it does the work.
-*Proxy* and *State* both put that stand-in, a *Surrogate*, between the two.
+*Proxy* and *State* are both built on that stand-in,
+which this chapter calls a *Surrogate*.
 
 ![`Proxy` and `Complete` both inherit `Service`, `Proxy` holds one, and only the caller names either class](_images/coupling_26)
 

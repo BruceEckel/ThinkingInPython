@@ -1,8 +1,7 @@
 # Cleanup
 
 Python frees memory on its own, and a file, a socket, or a lock is not memory.
-Cleanup is the code that releases those,
-and when it runs is the whole question of this chapter.
+Something must release those, and this chapter is about when that release runs.
 
 ## Why `__del__()` Is Not Cleanup {#why-del-is-not-cleanup}
 

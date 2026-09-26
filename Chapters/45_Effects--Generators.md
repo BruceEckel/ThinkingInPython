@@ -1,8 +1,8 @@
 # Generators
 
-A function can pause partway, ask for something,
+Some computations pause partway, ask for something,
 and continue when the answer arrives.
-Python's generators do that, and an Effect system is built on it.
+Python's generators can do that, and an Effect system is built on it.
 
 [Iterators](23_Patterns--Iterators.md#generators)
 presented generators as a way to produce values lazily:

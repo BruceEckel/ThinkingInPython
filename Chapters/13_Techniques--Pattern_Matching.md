@@ -1,6 +1,6 @@
 # Pattern Matching
 
-A value arrives, and what to do depends on its shape as much as its contents.
+Sometimes the shape of a value matters as much as its contents.
 `match` tests the shape, takes the value apart,
 and binds the parts in one statement.
 

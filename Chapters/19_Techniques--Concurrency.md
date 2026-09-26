@@ -1,7 +1,7 @@
 # Concurrency
 
-A program waits for the network, the disk, or the user,
-and while it waits a core sits idle.
+The network, the disk, and the user all take their time,
+and a core sits idle while the program waits.
 Concurrency puts other work into that wait, on the same core or on another.
 
 [Performance](18_Techniques--Performance.md)
