@@ -325,7 +325,7 @@ class Panel:
     alt: str
     nodes: tuple[Node, ...]
     edges: tuple[Edge, ...]
-    note: str
+    note: str = ""
     height: float = HEIGHT
     extra: tuple[str, ...] = field(default_factory=tuple)
 
@@ -340,7 +340,8 @@ class Panel:
             b += edge_svg(e, nodes, pid)
         for s in self.extra:
             b += s
-        b += text(10, self.height - 12, self.note, 10.5, MUTED)
+        if self.note:
+            b += text(10, self.height - 12, self.note, 10.5, MUTED)
         b += legend(480, 60, pid, {e.kind for e in self.edges},
                     any(n.kind == "mark" for n in self.nodes))
         return (f'<svg xmlns="http://www.w3.org/2000/svg" '
@@ -602,14 +603,13 @@ PANELS: dict[int, Panel] = {
         "Sketch names Memento, and History names only a type parameter, so it "
         "holds a Memento without reading it",
         (Node("Sketch", C1, R1, w=100, kind="mark"),
-         Node("Memento", C2 + 10, R1, w=96),
+         Node("Memento", C3, R1, w=96),
          Node("History[S]", C1, R3, w=110),
-         Node("S", C2 + 10, R3, w=96, kind="interface", sub="any value")),
+         Node("S", C3, R3, w=96, kind="interface", sub="any value")),
         (Edge("Sketch", "Memento", "heavy", label="save, restore", dy=18),
          Edge("History[S]", "S", "thin"),
          Edge("Memento", "S", "realize")),
-        "heavy edges: 1, inside the originator. The caretaker names no "
-        "memento type.",
+        height=218,
     ),
 }
 
