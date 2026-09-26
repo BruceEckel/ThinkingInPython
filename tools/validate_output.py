@@ -42,6 +42,13 @@ chapter's stdout was being captured. A file that gets its own process
 cannot do either. Use -j 1 to go back to one process for everything,
 which is the right setting when debugging a block that misbehaves.
 
+A Markdown file whose markers pass has its digest recorded in
+build/marker-stamp.json. With --changed-only, a Markdown file whose digest
+still matches is skipped: its text, the utils/ helpers, and the tools are
+all as they were when its markers last passed, so its listings print what
+they printed then. tools/skip_stamps.py says what the digest covers.
+`tip output` passes it; TIP_FULL=1 in the environment overrides it.
+
 Usage:
     python -m tools.validate_output file.py        # check one file
     python -m tools.validate_output Examples/      # check directory
@@ -49,6 +56,7 @@ Usage:
     python -m tools.validate_output --update file.py   # rewrite markers
     python -m tools.validate_output --update Chapters/ # rewrite the book
     python -m tools.validate_output -j 1 Chapters/     # serial, one process
+    python -m tools.validate_output --update --changed-only Chapters/
 """
 
 import argparse
@@ -64,6 +72,8 @@ from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 
 from tools.config import EXAMPLES_TREE as DEFAULT_TREE, utils_dir
+from tools.skip_stamps import (
+    forced_full, marker_context, markers_current, record_markers)
 from tools.config import INLINE_NORUN_MARKER, NORUN_FILE, TIMING_FILE
 from tools.pycode import walk_fenced
 from tools.repo import add_jobs_arg, block_slug, load_glob_list, write_text_lf
@@ -517,6 +527,11 @@ def main(argv: list[str] | None = None) -> int:
         '-v', '--verbose', action='store_true',
         help='print each file as it is processed',
     )
+    ap.add_argument(
+        '--changed-only', action='store_true',
+        help='skip a Markdown file unchanged since its markers last '
+             'passed (see tools/skip_stamps.py)',
+    )
     add_jobs_arg(ap, 'files')
     args = ap.parse_args(argv)
 
@@ -530,6 +545,16 @@ def main(argv: list[str] | None = None) -> int:
     if not files:
         print("No .py or .md files found.")
         return 1
+    context = marker_context(args.tree, utils_dir(args.tree))
+    unchanged: list[Path] = []
+    if args.changed_only and not forced_full():
+        unchanged = [f for f in files
+                     if f.suffix == '.md' and markers_current(f, context)]
+        files = [f for f in files if f not in unchanged]
+        if not files:
+            print(f"All {len(unchanged)} file(s) unchanged since their "
+                  "markers last passed.")
+            return 0
 
     skips = load_glob_list(NORUN_FILE)
     claims = load_glob_list(TIMING_FILE)
@@ -556,6 +581,7 @@ def main(argv: list[str] | None = None) -> int:
             outcomes = list(pool.map(work, files))
 
     n_ok = n_fail = n_skip = 0
+    passed: list[Path] = []
     for path, (result, output) in zip(files, outcomes, strict=True):
         if args.verbose:
             print(path)
@@ -564,16 +590,21 @@ def main(argv: list[str] | None = None) -> int:
         match result:
             case None:
                 n_skip += 1
+                passed.append(path)
             case True:
                 n_ok += 1
+                passed.append(path)
             case False:
                 print(f"FAIL: {path}")
                 n_fail += 1
 
+    record_markers([p for p in passed if p.suffix == '.md'], context)
     action = 'updated' if args.update else 'ok'
+    unchanged_note = (f", {len(unchanged)} unchanged since their last pass"
+                      if unchanged else "")
     print(
         f"\n{n_ok} {action}, {n_fail} failed, "
-        f"{n_skip} skipped (no markers)."
+        f"{n_skip} skipped (no markers){unchanged_note}."
     )
     return 0 if n_fail == 0 else 1
 

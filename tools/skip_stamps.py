@@ -23,11 +23,23 @@ that records the last time the work passed:
   block imported, or that fails only as ``__main__`` in its own cwd.
   Those breaks are rare and slow to appear, which is why once a day
   suffices.
+- **Refreshing the markers of a chapter nothing touched** (``tip output``,
+  15-25 s for the book). ``validate_output --changed-only`` skips a
+  Markdown file whose digest matches the one recorded when its markers
+  last passed. The digest covers the file, the tree's ``utils/`` helpers
+  (every listing can import them), and ``tools_digest()`` (the checker,
+  ``timing.txt``, ``norun.txt``, the locked dependencies), plus
+  ``.python-version``. Nothing else can change a listing's output: the
+  build trees come from the Markdown alone, and no listing reads another
+  chapter's directory. An edit to one chapter then refreshes that
+  chapter. A marker the refresh rewrites changes the file, so the next
+  run refreshes it once more and then settles.
 
-Setting ``TIP_FULL=1`` in the environment disables both shortcuts. ``tip
-ci`` and ``tip release`` set it; ``tip gate RUN=full`` sets it for one
-gate; ``tip run`` and ``tip tools-test`` always do the full work, and a
-passing full run refreshes its stamp.
+Setting ``TIP_FULL=1`` in the environment disables every shortcut. ``tip
+ci``, ``tip release``, and ``tip everything`` set it; ``tip gate
+RUN=full`` sets it for one gate; ``tip run`` and ``tip tools-test``
+always do the full work, and a passing full run refreshes its stamp.
+Every pass records its stamp, shortcut or not.
 """
 
 import hashlib
@@ -42,6 +54,7 @@ FULL_ENV = "TIP_FULL"
 FULL_RUN_EVERY = timedelta(hours=24)
 TOOLS_STAMP = BUILD_DIR / "tools-tests-stamp.json"
 FULL_RUN_STAMP = BUILD_DIR / "full-run-stamp.json"
+MARKER_STAMP = BUILD_DIR / "marker-stamp.json"
 # Beyond tools/: what a tool's behavior also depends on.
 TOOLS_EXTRA = ("pyproject.toml", "uv.lock")
 
@@ -111,3 +124,46 @@ def record_full_run(tree: Path) -> None:
     stamps = _read(FULL_RUN_STAMP)
     stamps[_tree_key(tree)] = datetime.now().isoformat(timespec="seconds")
     _write(FULL_RUN_STAMP, stamps)
+
+
+def marker_context(tree: Path, utils: Path) -> str:
+    """What every listing in `tree` depends on beyond its own Markdown."""
+    h = hashlib.sha256(tools_digest().encode())
+    version = ROOT / ".python-version"
+    if version.is_file():
+        h.update(version.read_bytes())
+    h.update(_tree_key(tree).encode())
+    if utils.is_dir():
+        for path in sorted(utils.rglob("*.py")):
+            h.update(path.name.encode() + b"\0" + path.read_bytes())
+    return h.hexdigest()
+
+
+def marker_digest(md: Path, context: str) -> str:
+    return hashlib.sha256(context.encode() + md.read_bytes()).hexdigest()
+
+
+def _marker_key(md: Path) -> str | None:
+    """The book-relative key, or None for a file outside the repo (a
+    test's temporary Markdown), which is never stamped."""
+    resolved = md.resolve()
+    if not resolved.is_relative_to(ROOT):
+        return None
+    return resolved.relative_to(ROOT).as_posix()
+
+
+def markers_current(md: Path, context: str) -> bool:
+    key = _marker_key(md)
+    return (key is not None
+            and _read(MARKER_STAMP).get(key) == marker_digest(md, context))
+
+
+def record_markers(passed: list[Path], context: str) -> None:
+    keyed = [(key, md) for md in passed
+             if (key := _marker_key(md)) is not None]
+    if not keyed:
+        return
+    stamps = _read(MARKER_STAMP)
+    for key, md in keyed:
+        stamps[key] = marker_digest(md, context)
+    _write(MARKER_STAMP, stamps)

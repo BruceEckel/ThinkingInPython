@@ -124,6 +124,20 @@ def verify(v: Vars) -> None:
     py("tools.verify", *v.words("ARGS"))
 
 
+@task("Do everything with no shortcuts: verify with TIP_FULL=1, spell, "
+      "prose, site, EPUB, PDF (ARGS=--help lists them)")
+def everything(v: Vars) -> None:
+    """The heavyweight run. `verify` skips work that cannot find anything
+    new (tools/skip_stamps.py); this turns every shortcut off with
+    TIP_FULL=1, runs verify, then the spelling and house-style checks no
+    gate runs, then the site, EPUB, and PDF builds. It keeps going after
+    a failure and lists every target's result at the end. Run it before
+    a release, after a tool upgrade, or when a shortcut is in doubt. The
+    list lives in tools/everything.py (EVERYTHING).
+    """
+    py("tools.everything", *v.words("ARGS"))
+
+
 @task("Run every check over both trees, reporting all failures instead "
       "of the first")
 def sweep(v: Vars) -> None:
@@ -445,11 +459,13 @@ def output(v: Vars) -> None:
     --tree for Solutions: a block runs with cwd inside
     build/solutions/<chapter>, and a relative tree argument stops resolving
     once cwd changes (the same gotcha run_examples.py's --tree has; see
-    tools/README.md).
+    tools/README.md). A chapter unchanged since its markers last passed is
+    skipped (--changed-only; tools/skip_stamps.py has what "unchanged"
+    covers), so after a one-chapter edit only that chapter runs.
     """
-    py("tools.validate_output", "--update", "Chapters")
-    py("tools.validate_output", "--update", "--tree", SOLUTIONS_TREE,
-       "Solutions")
+    py("tools.validate_output", "--update", "--changed-only", "Chapters")
+    py("tools.validate_output", "--update", "--changed-only",
+       "--tree", SOLUTIONS_TREE, "Solutions")
 
 
 @task("Verify the #: output markers in Chapters/ and Solutions/ without"

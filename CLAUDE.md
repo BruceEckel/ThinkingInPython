@@ -154,9 +154,15 @@ passes `MARKERS=fresh` so the gate does not refresh the markers a
 second time, the tools' own tests run only when `tools/` changed
 since they last passed (tests marked `book` always run), and `run`
 executes only listings without `#:` markers, with a full run of
-every listing once a day. `tip gate RUN=full`, `tip ci`, and `tip
-release` turn the shortcuts off (`TIP_FULL=1`). A new tools test
-that reads a chapter, not a fixture, needs `@pytest.mark.book`.
+every listing once a day, and `tip output` refreshes only chapters
+whose Markdown, `utils/`, or tools changed since their markers last
+passed. `tip gate RUN=full`, `tip ci`, and `tip release` turn the
+shortcuts off (`TIP_FULL=1`), and `tip everything` does too, then
+adds spell, prose (Vale), site, EPUB, and PDF, keeping going past a
+failure (`tools/everything.py`). A new tools test that reads a
+chapter, not a fixture, needs `@pytest.mark.book`; a listing that
+reads another chapter's directory would break the marker skip,
+whose digest covers only its own Markdown and `utils/`.
 Until 2026-09-24 this was two targets, `verify` without
 the fixers and `all` with them; `all` is gone, since every fixer repairs
 something the gate would otherwise fail on. The marker refresh runs
