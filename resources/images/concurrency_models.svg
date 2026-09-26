@@ -69,14 +69,19 @@
   <text x="20" y="498" font-size="10.5" fill="#7a6e62">5 interpreters, 1 process</text>
   <text x="20" y="514" font-size="10.5" font-style="italic" fill="#8b1a1a">5 GILs, 1 per interpreter</text>
   <rect x="210" y="466" width="380" height="112" fill="none" stroke="#c8bfb0" stroke-width="2" rx="4"/>
+  <line x1="220" y1="481" x2="580" y2="481" stroke="#c8bfb0" stroke-width="0.8"/>
   <rect x="214" y="474" width="116" height="14" fill="none" stroke="#7a6e62" stroke-width="1.5" stroke-dasharray="0.1,3" stroke-linecap="round" rx="2"/>
   <rect x="220" y="477" width="64" height="8" fill="#8b1a1a" fill-opacity="0.25" stroke="#8b1a1a" stroke-width="0.8"/>
+  <line x1="220" y1="501" x2="580" y2="501" stroke="#c8bfb0" stroke-width="0.8"/>
   <rect x="214" y="494" width="116" height="14" fill="none" stroke="#7a6e62" stroke-width="1.5" stroke-dasharray="0.1,3" stroke-linecap="round" rx="2"/>
   <rect x="220" y="497" width="64" height="8" fill="#8b1a1a" fill-opacity="0.25" stroke="#8b1a1a" stroke-width="0.8"/>
+  <line x1="220" y1="521" x2="580" y2="521" stroke="#c8bfb0" stroke-width="0.8"/>
   <rect x="214" y="514" width="116" height="14" fill="none" stroke="#7a6e62" stroke-width="1.5" stroke-dasharray="0.1,3" stroke-linecap="round" rx="2"/>
   <rect x="220" y="517" width="64" height="8" fill="#8b1a1a" fill-opacity="0.25" stroke="#8b1a1a" stroke-width="0.8"/>
+  <line x1="220" y1="541" x2="580" y2="541" stroke="#c8bfb0" stroke-width="0.8"/>
   <rect x="214" y="534" width="116" height="14" fill="none" stroke="#7a6e62" stroke-width="1.5" stroke-dasharray="0.1,3" stroke-linecap="round" rx="2"/>
   <rect x="220" y="537" width="64" height="8" fill="#8b1a1a" fill-opacity="0.25" stroke="#8b1a1a" stroke-width="0.8"/>
+  <line x1="220" y1="561" x2="580" y2="561" stroke="#c8bfb0" stroke-width="0.8"/>
   <rect x="214" y="554" width="116" height="14" fill="none" stroke="#7a6e62" stroke-width="1.5" stroke-dasharray="0.1,3" stroke-linecap="round" rx="2"/>
   <rect x="220" y="557" width="64" height="8" fill="#8b1a1a" fill-opacity="0.25" stroke="#8b1a1a" stroke-width="0.8"/>
   <text x="400" y="596" font-size="10.5" fill="#7a6e62" text-anchor="middle">same 5x: a thread per interpreter, on five cores</text>
