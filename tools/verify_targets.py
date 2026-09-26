@@ -179,9 +179,44 @@ def _write_log(name: str, output: str) -> None:
     (LOG_DIR / f"{name}.log").write_text(output, encoding="utf-8")
 
 
+# A line that names a failure: Vale's and ty's "error", pytest's
+# "FAILED", a Python exception ("KeyError: ..."), or a traceback.
+ERROR_LINE = re.compile(r"\berror\b|\bFAILED\b|\w+Error:|^Traceback")
+# A line that is only a file path, as Vale prints above its findings.
+PATH_HEADER = re.compile(r"^\s*[\w./-]+\.\w+\s*$")
+
+
+def excerpt(text: str, lines: int = 25, max_errors: int = 15) -> str:
+    """The last `lines` lines, preceded by any error lines above them.
+
+    Vale prints its one error among dozens of warnings and ends with a
+    summary, so a failure's cause can sit far above the tail. Each error
+    line comes with the file path Vale printed over it, since the line
+    alone gives only a line and column.
+    """
+    all_lines = text.splitlines()
+    head, tail = all_lines[:-lines], all_lines[-lines:]
+    found: list[str] = []
+    header = shown = ""
+    for line in head:
+        if PATH_HEADER.match(line):
+            header = line
+        elif ERROR_LINE.search(line):
+            if header and header != shown:
+                found.append(header)
+                shown = header
+            found.append(line)
+    if not found:
+        return "\n".join(tail)
+    if len(found) > max_errors:
+        extra = len(found) - max_errors
+        found = found[:max_errors] + [f"  ... {extra} more error line(s)"]
+    return "\n".join(["Error lines:", *found, "", "Last lines:", *tail])
+
+
 def log_tail(name: str, lines: int = 25) -> str:
     text = (LOG_DIR / f"{name}.log").read_text(encoding="utf-8")
-    return "\n".join(text.splitlines()[-lines:])
+    return excerpt(text, lines)
 
 
 @contextlib.contextmanager
