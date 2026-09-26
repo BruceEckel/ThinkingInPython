@@ -3,7 +3,7 @@
 > Two objects meet, and the right action depends on the type of each.
 > *Multiple Dispatching* chooses the action from both types at once.
 
-![`Paper`, `Scissors`, and `Rock` each define an eval method for every item and call one through `Any`, so a fourth item edits all three](_images/coupling_32)
+![](_images/coupling_32)
 
 Code that combines several interacting types can end up testing a type by hand for every combination.
 Consider a system that parses and executes mathematical expressions.

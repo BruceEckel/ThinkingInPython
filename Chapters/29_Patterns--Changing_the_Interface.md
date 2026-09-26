@@ -4,7 +4,7 @@
 > and the code that needs it expects a different interface.
 > *Adapter* and *Façade* supply that interface without changing either side.
 
-![`WhatIUse` names `WhatIWant`, and `ProxyAdapter` is the one class that names both `WhatIWant` and `WhatIHave`](_images/coupling_29)
+![](_images/coupling_29)
 
 Sometimes the problem you're solving is as simple as "I don't have the interface I need."
 Two of the patterns in *GoF Design Patterns* solve this problem.

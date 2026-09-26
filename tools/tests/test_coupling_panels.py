@@ -3,7 +3,7 @@ their straight edges are straight, every gallery box sits inside its
 cell, and the chapters reference the panels the specs produce."""
 from __future__ import annotations
 import re
-from tools.coupling_panels import (CAPTIONS, GALLERY, GALLERY_H, GALLERY_W,
+from tools.coupling_panels import (GALLERY, GALLERY_H, GALLERY_W,
                                    PANELS, ROOT, Edge, Node, all_edge_problems,
                                    edge_problems, render_all)
 
@@ -18,10 +18,6 @@ def test_every_edge_names_two_nodes_of_its_panel() -> None:
             assert e.b in names, (ch, e.b)
 
 
-def test_every_panel_has_a_caption_and_every_caption_a_panel() -> None:
-    assert set(CAPTIONS) == set(PANELS)
-
-
 def test_each_pattern_chapter_references_its_panel_once() -> None:
     for ch in PANELS:
         md = next(CHAPTERS.glob(f"{ch}_*.md"))
@@ -29,7 +25,8 @@ def test_each_pattern_chapter_references_its_panel_once() -> None:
         tags = re.findall(rf"^!\[(.*)\]\(_images/coupling_{ch}\)$", text,
                           flags=re.M)
         assert len(tags) == 1, (md.name, len(tags))
-        assert tags[0] == CAPTIONS[ch], md.name
+        # A panel prints no caption; its SVG <title> is the alt text.
+        assert tags[0] == "", md.name
 
 
 def test_rendered_svg_has_a_title_and_no_size() -> None:

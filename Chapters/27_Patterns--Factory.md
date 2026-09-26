@@ -4,7 +4,7 @@
 > but something in the program must still choose which class to construct.
 > A *Factory* puts that choice in one place.
 
-![The caller names `make()`, and `make()` is the one place that names `Shape`, `Circle`, and `Square`](_images/coupling_27)
+![](_images/coupling_27)
 
 When a system needs new types,
 start with a base type that gives them a common interface.

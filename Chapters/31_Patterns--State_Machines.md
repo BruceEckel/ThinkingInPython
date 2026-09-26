@@ -4,7 +4,7 @@
 > and each input, together with the current state, decides the next state.
 > A *StateMachine* names the states and the transitions between them.
 
-![`StateMachine` names only `State`, each state satisfies it, and `MouseTrap` and its states name each other](_images/coupling_31)
+![](_images/coupling_31)
 
 Recall [*State*](26_Patterns--Surrogate.md#state):
 a surrogate object that forwards calls to a swappable implementation.

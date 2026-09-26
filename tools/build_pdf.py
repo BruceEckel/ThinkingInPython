@@ -261,6 +261,7 @@ def run_pandoc(src: Path, meta: Path, header: Path, before: Path,
         "pandoc",
         "--from", "markdown+smart",
         "--pdf-engine", PDF_ENGINE,
+        "--lua-filter", str(build_site.NOCAPTION_FILTER),
         "--output", str(pdf),
         "--metadata-file", str(meta),
         "--resource-path", os.pathsep.join(

@@ -3,7 +3,7 @@
 > A loop needs the next item and has no reason to care where that item is stored.
 > An *Iterator* supplies the item and keeps the storage out of sight.
 
-![`total()` names only `Iterable`, and a `list`, a generator, and `Countdown` satisfy it without naming it](_images/coupling_23)
+![](_images/coupling_23)
 
 Code written against an *iterator* does not care whether the data came from a list,
 a file, a database cursor, or a computation.

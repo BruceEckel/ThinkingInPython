@@ -82,6 +82,11 @@ COPYRIGHT = (f"© {COPYRIGHT_YEAR} {BOOK_AUTHOR}. "
              "Freely readable online. No reproduction without permission.")
 
 IMG_REF = re.compile(r"(!\[[^\]]*\]\()_images/([^)\s]+)(\))")
+# A figure written `![](_images/name)` prints no caption; see
+# image_ref() and tools/nocaption.lua, which every builder runs.
+NOCAPTION_FILTER = ROOT / "tools" / "nocaption.lua"
+SVG_TITLE = re.compile(r"<title>(.*?)</title>", re.DOTALL)
+ALT_SPECIAL = re.compile(r"([\\`*_\[\]<>])")
 MD_LINK = re.compile(r"(\]\()([\w./-]+)\.md(#[\w-]+)?(\))")
 ATX = re.compile(r"^#\s+(.*?)\s*#*\s*$")
 
@@ -178,6 +183,31 @@ def build_image_map() -> dict[str, str]:
     return out
 
 
+def svg_title(name: str) -> str:
+    """The `<title>` of `resources/images/<name>.svg`, or "" if none."""
+    with_ext = IMAGES_SRC / f"{name}.svg"
+    try:
+        m = SVG_TITLE.search(with_ext.read_text(encoding="utf-8"))
+    except OSError:
+        return ""
+    return " ".join(m.group(1).split()) if m else ""
+
+
+def image_ref(m: re.Match[str], target: str) -> str:
+    """An `IMG_REF` match rewritten to point at `target`.
+
+    An empty caption means the figure prints none. Pandoc builds a
+    figure only from an image with alt text, so the SVG's `<title>`
+    becomes the alt text, which also serves screen readers, and the
+    class `nocaption` tells NOCAPTION_FILTER to drop the caption pandoc
+    copies from it.
+    """
+    if m.group(1) != "![](":
+        return f"{m.group(1)}{target}{m.group(3)}"
+    alt = ALT_SPECIAL.sub(r"\\\1", svg_title(m.group(2))) or m.group(2)
+    return f"![{alt}]({target}){{.nocaption}}"
+
+
 def rewrite_images(text: str, img_map: dict[str, str], missing: set[str]) -> str:
     def repl(m: re.Match[str]) -> str:
         name = m.group(2)
@@ -185,7 +215,7 @@ def rewrite_images(text: str, img_map: dict[str, str], missing: set[str]) -> str
         if not filename:
             missing.add(name)
             filename = f"{name}.png"
-        return f"{m.group(1)}images/{filename}{m.group(3)}"
+        return image_ref(m, f"images/{filename}")
 
     return IMG_REF.sub(repl, text)
 
@@ -276,6 +306,7 @@ def render_chapter(body: str, ch: Chapter,
     toc_opts = ["--toc", f"--toc-depth={CHAPTER_TOC_DEPTH}"] if chapter_toc else []
     proc = subprocess.run(
         ["pandoc", "--template", str(TEMPLATE), "--from", "markdown+smart",
+         "--lua-filter", str(NOCAPTION_FILTER),
          "--highlight-style", "pygments", *toc_opts, *variables],
         input=body, capture_output=True, text=True, encoding="utf-8",
     )

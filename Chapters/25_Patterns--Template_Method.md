@@ -4,7 +4,7 @@
 > and some of those steps differ from one use to the next.
 > A *Template Method* fixes the sequence and lets you supply the steps that vary.
 
-![`MyApp` inherits `ApplicationFramework`'s internals, while `run_framework()` names only the `Step` signature its two functions satisfy](_images/coupling_25)
+![](_images/coupling_25)
 
 An application framework lets you build a new application by reusing its existing classes and overriding methods to customize behavior.
 At the heart of a framework is the *Template Method* of *GoF Design Patterns*:

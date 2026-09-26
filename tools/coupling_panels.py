@@ -10,8 +10,9 @@ way they share a question: which edge does the pattern move, and where
 does it put it?
 
 Every panel is a `Panel` in `PANELS`, keyed by chapter number: its
-nodes and its edges; the figure's Markdown caption says what it shows. The
-names in a panel are the names in that chapter's listings, so a listing
+nodes and its edges. A panel's figure prints no caption (`![](...)`
+in the chapter): its title and legend say what it shows, and its
+SVG `<title>` serves as the alt text. The names in a panel are the names in that chapter's listings, so a listing
 rename means editing the spec here and regenerating, never editing an
 SVG by hand. Chapter 21's `coupling_gallery.svg`, its six patterns in
 the same notation, is generated here too, from the `Cell` specs in
@@ -187,7 +188,7 @@ class Edge:
 
 
 STYLES: dict[str, tuple[str, float, str, str]] = {
-    "heavy": (INK, 2.8, "", "solid"),
+    "heavy": (INK, 3.8, "", "solid"),
     "thin": (INK, 1.3, "", "solid"),
     "realize": (MUTED, 1.2, ' stroke-dasharray="5,4"', "hollow-muted"),
     "inherit": (INK, 1.3, "", "hollow"),
@@ -599,44 +600,6 @@ PANELS: dict[int, Panel] = {
          Edge("History[S]", "S", "thin"),
          Edge("Memento", "S", "realize")),
     ),
-}
-
-
-# The Markdown caption under each figure: the panel's alt text with code
-# spans on its identifiers. The SVG <title> stays plain, since a screen
-# reader has no use for backticks, and the pattern-name gate reads a bare
-# "Proxy" or "Observer" in a caption as an unitalicized pattern name.
-CAPTIONS: dict[int, str] = {
-    23: "`total()` names only `Iterable`, and a `list`, a generator, and "
-        "`Countdown` satisfy it without naming it",
-    24: "Every importer names `config.py` by its module name, and the import "
-        "system hands each one the same instance",
-    25: "`MyApp` inherits `ApplicationFramework`'s internals, while "
-        "`run_framework()` names only the `Step` signature its two functions "
-        "satisfy",
-    26: "`Proxy` and `Complete` both inherit `Service`, `Proxy` holds one, "
-        "and only the caller names either class",
-    27: "The caller names `make()`, and `make()` is the one place that names "
-        "`Shape`, `Circle`, and `Square`",
-    28: "The list that builds `macro` names three functions, and the loop "
-        "that runs it names only the `Command` signature",
-    29: "`WhatIUse` names `WhatIWant`, and `ProxyAdapter` is the one class "
-        "that names both `WhatIWant` and `WhatIHave`",
-    30: "`Subject` names only `Observer`, `Thermometer` inherits `Subject`, "
-        "and `Display` satisfies `Observer` while naming `Subject` in its "
-        "signature",
-    31: "`StateMachine` names only `State`, each state satisfies it, and "
-        "`MouseTrap` and its states name each other",
-    32: "`Paper`, `Scissors`, and `Rock` each define an eval method for every "
-        "item and call one through `Any`, so a fourth item edits all three",
-    33: "`Flower` names only `Visitor` and `Pollinator` names only `Flower`, "
-        "so no visitor names a concrete flower",
-    34: "`disk_usage()` and `walk()` each name both node types, and "
-        "`Directory` names only the `Node` union",
-    35: "`parse_map()` names `tile()`, `to_symbol()`, and `Tile`, and "
-        "`tile()` is the one place that constructs a `Tile`",
-    36: "`Sketch` names `Memento`, and `History` names only a type parameter, "
-        "so it holds a `Memento` without reading it",
 }
 
 

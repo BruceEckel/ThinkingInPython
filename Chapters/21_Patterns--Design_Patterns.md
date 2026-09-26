@@ -410,7 +410,7 @@ One more diagram explains why so many of the pattern chapters subtract code as t
 Take a caller that needs an `area()` from whatever it receives,
 and write the same dependence three ways.
 
-![One dependency written three ways: with an ABC, a Protocol, and a Callable](_images/coupling_edges)
+![One dependency written three ways](_images/coupling_edges)
 
 With an abstract base class, two edges exist in source:
 the caller names `Shape`, and `Circle` names `Shape` in its `class` line.

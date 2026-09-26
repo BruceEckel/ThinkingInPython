@@ -416,7 +416,7 @@ def rewrite_images(text: str, img_map: dict[str, str],
         if not filename:
             missing.add(name)
             filename = f"{name}.png"
-        return f"{m.group(1)}{filename}{m.group(3)}"
+        return build_site.image_ref(m, filename)
 
     return build_site.IMG_REF.sub(repl, text)
 
@@ -1036,6 +1036,7 @@ def run_pandoc(src: Path, css: Path, meta: Path, epub: Path,
         "pandoc",
         "--from", "markdown+smart",
         "--to", "epub3",
+        "--lua-filter", str(build_site.NOCAPTION_FILTER),
         "--output", str(epub),
         "--metadata-file", str(meta),
         "--css", str(css),

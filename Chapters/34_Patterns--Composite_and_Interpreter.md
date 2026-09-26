@@ -5,7 +5,7 @@
 > *Composite* builds that tree,
 > and *Interpreter* reads one as a sentence and evaluates it.
 
-![`disk_usage()` and `walk()` each name both node types, and `Directory` names only the `Node` union](_images/coupling_34)
+![](_images/coupling_34)
 
 In *Composite*, each node is a leaf or a group of nodes,
 and one call serves both.

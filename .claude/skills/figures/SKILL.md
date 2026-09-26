@@ -27,8 +27,17 @@ on chapter 30's `observer_broadcast.svg`:
   already prints the Markdown alt text as a `<figcaption>` under the
   image, so an embedded one shows up twice, in two type sizes.
 - **The Markdown caption is one short sentence** naming what the figure
-  shows. Chapter 30's is "One call to set_celsius() becomes one
-  update() call on every observer in the list."
+  shows, and only when the drawing does not already say it. Chapter
+  30's is "Assigning to celsius calls every listener." A caption that
+  restates the figure's own title or labels is cut down to what they
+  leave unsaid, or removed (Bruce, 2026-09-26, on the coupling panels).
+- **A figure with no caption is written `![](_images/name)`.** Pandoc
+  builds a figure only from an image with alt text, so
+  `build_site.image_ref()` supplies the SVG's `<title>` as the alt
+  text and the class `nocaption`, and `tools/nocaption.lua` (run by the
+  site, EPUB, and PDF builds) drops the caption. The figure keeps its
+  centering and spacing; the `<title>` is what a screen reader reads,
+  so an uncaptioned figure's `<title>` must describe it.
 - **Everything else goes in the prose after the figure**, as ordinary
   sentences with the usual code spans. The second clause cut from
   chapter 30's caption became the paragraph under it: "`Thermometer`
@@ -84,14 +93,13 @@ the top of each pattern chapter, 23 through 36
 (`resources/images/coupling_NN.svg`, merged 2026-09-23). Chapter 21's
 Coupling section (merged from Appendix C on 2026-09-24) defines the
 notation: a heavy edge names a
-concrete class, a thin edge names an interface, a dashed hollow-headed
+concrete class (stroke 3.8, raised from 2.8 on 2026-09-26 so it
+reads apart from the thin 1.3 at a glance), a thin edge names an interface, a dashed hollow-headed
 edge satisfies one, a solid hollow-headed edge inherits, and the red
 box is the part the pattern protects from change. `tools/coupling_panels.py`
 holds a `Panel` spec per chapter, in that chapter's own class and
-function names, plus the `CAPTIONS` dict with the Markdown captions
-(code spans on the identifiers, because the pattern-name gate reads a
-bare "Proxy" or "Observer" in a caption as an unitalicized pattern
-name). Edit the spec and run `tip fix-coupling-panels`; never edit
+function names. A panel prints no caption: its title and legend say
+what it shows, and its `<title>` is the alt text. Edit the spec and run `tip fix-coupling-panels`; never edit
 one of these SVGs by hand. Chapter 21's `coupling_gallery.svg` comes
 from the same file (`GALLERY`, a `Cell` per pattern, since
 2026-09-25); the section's other three figures are still hand-drawn.
@@ -107,6 +115,5 @@ worth checking a new panel for: drawing the GoF shape instead of the
 listing's (chapter 26 had a `Service` protocol no listing declares),
 and counting a call through `Any` as naming a class (chapter 32's
 `eval_*()` methods). Panels carry no note under the drawing
-(2026-09-25): the Markdown caption says what a panel shows, each
-panel's height follows its lowest box or legend line, and its legend
+(2026-09-25) and no caption (2026-09-26): each panel's height follows its lowest box or legend line, and its legend
 lists only the edge kinds it draws.

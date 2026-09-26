@@ -3,7 +3,7 @@
 > Thousands of objects carry the same few values.
 > *Flyweight* keeps one object per value and shares it among every use.
 
-![`parse_map()` names `tile()`, `to_symbol()`, and `Tile`, and `tile()` is the one place that constructs a `Tile`](_images/coupling_35)
+![](_images/coupling_35)
 
 The characters in a document, the tiles in a game map,
 and the strings in a compiler's symbol table are fine-grained objects a program needs in enormous numbers,

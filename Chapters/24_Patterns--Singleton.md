@@ -4,7 +4,7 @@
 > and every part of the program must see the same one.
 > A *Singleton* creates that one instance and shares it.
 
-![Every importer names `config.py` by its module name, and the import system hands each one the same instance](_images/coupling_24)
+![](_images/coupling_24)
 
 The classic form is a class that refuses a second instance.
 Before writing one, ask whether the language already solves the problem,

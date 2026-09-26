@@ -709,7 +709,7 @@ It takes `enter()` like any other room,
 and its `Edge` occupant's `interact()` returns `robot.room`,
 so the robot stays where it was.
 
-![The maze as a graph of rooms, with teleport jumps and one shared EDGE room](_images/maze_graph)
+![The maze as a graph of rooms](_images/maze_graph)
 
 `Doors.connect()` links each room to its neighbors on the grid.
 Teleports add links that cross the grid:
