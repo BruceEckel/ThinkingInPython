@@ -269,8 +269,7 @@ It matches classes exactly, so a subclass of `Paper` needs rows of its own.
 And a missing pair fails at the first duel that needs it,
 the fail-fast policy that suits a table you are still filling in.
 Here the failure is the dictionary's own `KeyError`,
-where the state machine's engine raises `NoTransition`.
-Adding `Lizard` in exercise 1 puts you in that situation.
+where the state machine's engine raises `NoTransition` (see exercise 1).
 
 Exact matching surprises people.
 This listing shows the lookup raising `KeyError` for a subclass.
@@ -416,8 +415,8 @@ It comes from languages where a table keyed by a pair of types is awkward to wri
 There, spreading the table across the classes is the easier form to write.
 A Python `dict` takes a tuple of classes as a key,
 so the table is both shorter and easier to maintain.
-A table cell can hold a function, so even elaborate behavior fits the table;
-exercise 9 builds that version.
+A table cell can hold a function, so even elaborate behavior fits the table
+(see exercise 9).
 
 Use the double-dispatch version when the behavior for a combination belongs to the class rather than to the pairing:
 when it reads the object's own state,

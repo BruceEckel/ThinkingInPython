@@ -438,11 +438,11 @@ you can create it *eagerly* in the class body instead,
 `instance: ClassVar[__OnlyOne] = __OnlyOne()`.
 That removes the sentinel, the guard,
 and the first-call race the cached factory meets under threads,
-at the cost of building the object whether or not anything uses it.
+at the cost of building the object whether or not anything uses it
+(see exercise 1).
 (The bare `__OnlyOne()` works because the nested class exists at that point in the body.
 The qualified `OnlyOne.__OnlyOne()` fails,
 since the name `OnlyOne` stays unbound until its own class body finishes running.)
-Exercise 1 makes that change.
 
 Either way, `OnlyOne` is a lot of code for what a module does on its own.
 

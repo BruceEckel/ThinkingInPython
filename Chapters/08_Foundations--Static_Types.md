@@ -573,8 +573,8 @@ reveal_type(line.top())  # ty: Unknown
 ```
 
 `ty` reports `Unknown`, not an error,
-so `line.top()` and everything built on it go unchecked from here.
-Exercise 5 asks you to remove `Stack`'s default and see the same result.
+so `line.top()` and everything built on it go unchecked from here
+(see exercise 5).
 
 The same applies to a `type` alias, as `Pair` shows:
 

@@ -153,8 +153,7 @@ The listing counts `id(t)` rather than `len(set(cells))` on purpose:
 `Tile` is a record, so its generated `__eq__()` compares field values,
 and a set of cells collapses to three with or without sharing.
 Only identity proves sharing.
-The listing shows the object count.
-Exercise 2 measures the memory behind it.
+The listing shows the object count, not the memory behind it (see exercise 2).
 
 The grid itself holds each cell's position.
 Asking "is the cell at row 1, column 5 walkable?" is `field[1][5].walkable`,

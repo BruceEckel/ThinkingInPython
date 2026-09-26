@@ -199,8 +199,8 @@ the [*expression problem*](13_Techniques--Pattern_Matching.md#the-expression-pro
 works out the same split with shapes,
 including the `assert_never()` in each `case _`.
 Add a `Symlink` to the `Node` union,
-and every function whose `case _` calls `assert_never()` fails type checking until it handles one.
-Exercise 2 asks you to do that here, and to decide what a link should weigh.
+and every function whose `case _` calls `assert_never()` fails type checking until it handles one
+(see exercise 2).
 
 `walk()` is a generator, so traversing a composite is lazy.
 The [`yield from`](23_Patterns--Iterators.md#delegating-with-yield-from)

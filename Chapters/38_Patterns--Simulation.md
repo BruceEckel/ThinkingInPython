@@ -176,8 +176,8 @@ so a single rat gets each cell even when several reach it.
 Its atomicity comes from the absence of that `await` rather than from a lock:
 the [read-modify-write race](19_Techniques--Concurrency.md#a-single-thread-still-races)
 needs a suspension point inside the update,
-and `claim()` runs from its test to its `add()` as one synchronous stretch.
-Exercise 3 inserts a suspension point and counts the cells claimed twice.
+and `claim()` runs from its test to its `add()` as one synchronous stretch
+(see exercise 3).
 `next_number()` hands out rat numbers from `itertools.count()`,
 the [endless counter](23_Patterns--Iterators.md#reusable-algorithms).
 `explore()` claims the entry and creates the first rat's task inside an `asyncio.TaskGroup`:

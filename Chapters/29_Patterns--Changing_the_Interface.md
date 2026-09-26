@@ -234,8 +234,8 @@ written because `distance()` requires `x` and `y` but a `Pair` supplies `a` and 
 The limits [*Surrogate*](26_Patterns--Surrogate.md#forwarding-with-getattr)
 lists for `__getattr__()` apply to this forwarding too.
 [Special methods bypass it](26_Patterns--Surrogate.md#special-methods-bypass-getattr),
-so an adapter that must support `adapter[key]` or `len(adapter)` defines those dunders,
-as exercise 1 does with `__getitem__()`.
+so an adapter that must support `adapter[key]` or `len(adapter)` defines those dunders
+(see exercise 1).
 
 [The recursion trap](26_Patterns--Surrogate.md#the-recursion-trap)
 applies here too.

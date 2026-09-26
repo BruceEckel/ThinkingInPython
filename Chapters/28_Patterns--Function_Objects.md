@@ -193,8 +193,7 @@ for command in macro:
 A callable alone cannot express a second operation, `undo()`.
 `Command` describes one call,
 so an undoable list of commands needs a type with two members,
-`__call__()` and `undo()`, and that type is a `Protocol`.
-Exercise 1 builds that `Protocol`.
+`__call__()` and `undo()`, and that type is a `Protocol` (see exercise 1).
 
 ### The Late-Binding Trap
 

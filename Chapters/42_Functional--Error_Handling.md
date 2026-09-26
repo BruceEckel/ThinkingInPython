@@ -519,9 +519,9 @@ where each step needs the previous step's answer,
 as in `composing_with_bind.py` above.
 `func_a()`, `func_b()`,
 and `func_c()` in `combining.py` take independent inputs,
-so stopping at the first `Err` discards whatever the later steps would have found.
+so stopping at the first `Err` discards whatever the later steps would have found
+(see exercise 3).
 The exception in `exceptions_lose_data.py` causes the same loss.
-Exercise 3 asks you to collect every failure.
 
 Three inputs need three levels of nesting,
 and each input you add nests one level deeper.

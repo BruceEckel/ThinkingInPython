@@ -189,8 +189,8 @@ Inside `shape_name()`,
 `Shape.__subclasses__()` produces a list of `Shape`'s direct subclasses.
 `__subclasses__()` covers only the first level of inheritance,
 so a class inheriting from `_Circle` is not in the list.
-For a deeper hierarchy, recurse through each subclass's own `__subclasses__()`.
-Exercise 9 writes that recursion.
+For a deeper hierarchy, recurse through each subclass's own `__subclasses__()`
+(see exercise 9).
 
 ### Hiding the Concrete Classes
 
@@ -530,8 +530,7 @@ and `make("Polygon")` fails with a `TypeError`.
 The cost is the mirror failure.
 Registration is opt-in,
 so a class that satisfies `Shape` but lacks `@register` is absent from the table,
-and `make()` fails with a `KeyError` that points at nothing.
-Exercise 10 writes a check that finds the missing decorator.
+and `make()` fails with a `KeyError` that points at nothing (see exercise 10).
 Inheriting from the ABC cannot be forgotten that way,
 because the subclass line is the registration.
 The runtime guard is weaker too.

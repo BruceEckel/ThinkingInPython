@@ -241,8 +241,7 @@ def test_drawing_after_restore_spares_memento() -> None:
 ```
 
 The third test checks for the sharing bug.
-If the memento shares a mutable list with the sketch,
-as in the variant that exercise 4 explores,
+If the memento shares a mutable list with the sketch (see exercise 4),
 drawing after a restore appends to the snapshot's list too.
 Both `save()` and `restore()` must copy.
 
@@ -340,8 +339,8 @@ Two thousand edits held in a `History` cost about two million pointers;
 the final `Drawing` alone costs two thousand.
 A field that stays small, or that each edit replaces instead of extends,
 keeps the total proportional to `k`.
-For one that grows with every edit, bound the history's depth
-(exercise 2 asks for exactly this), coalesce edits before `History` stores them,
+For one that grows with every edit, bound the history's depth (see exercise 2),
+coalesce edits before `History` stores them,
 use a persistent structure that shares more than a flat tuple can,
 or switch to *Command*-based undo, which stores an edit instead of a state.
 
@@ -617,8 +616,7 @@ which is all a memento needs, since a data class compares by value.
 
 Only unpickle data you trust, because the format can execute code.
 For untrusted storage or other languages,
-convert the state with `dataclasses.asdict()` and write JSON,
-which exercise 3 explores.
+convert the state with `dataclasses.asdict()` and write JSON (see exercise 3).
 
 ### A Class That Changes After the Save
 

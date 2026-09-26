@@ -599,8 +599,7 @@ yet each must name both parameters only to pass them to the function below it.
 Nothing propagates automatically.
 If a new helper that `greet()` calls needs a `Log` Effect,
 you edit every signature on the path: `greet()`, `session()`, `menu()`,
-and `main()`, plus the new helper, five signatures in all.
-Exercise 2 walks through that edit and counts what each signature gains.
+and `main()`, plus the new helper, five signatures in all (see exercise 2).
 Dependency injection frameworks relocate this bookkeeping into a wiring layer,
 but you must tell the injector what every function needs,
 and tell it again when that changes.
