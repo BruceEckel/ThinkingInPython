@@ -90,8 +90,7 @@ is not.
 
 The third is an exception,
 which propagates from callee to caller the same way and appears in no signature either.
-People argue about whether an exception makes a function *impure*,
-so that argument gets the next section to itself.
+People argue about whether an exception makes a function *impure*.
 
 ## Are Exceptions Impure?
 
@@ -146,7 +145,6 @@ Here are three ways to do it.
 Wrap the answer and the failure in a `Result`,
 the way [Error Handling](42_Functional--Error_Handling.md#turning-exceptions-into-results)
 does.
-This chapter reuses that chapter's `result.py` and `safe.py` helpers.
 If you decorate the original `slope()`, unchanged,
 every exception it raises becomes a value instead of a crash:
 
@@ -406,7 +404,7 @@ Every Effect you isolate is one your tests can control.
 Every one of those benefits depends on knowing where the Effects are.
 In a small program you find them by inspection.
 As programs grow, inspection stops scaling.
-The rest of this chapter is about what replaces it.
+Effect management systems replace it.
 
 ## Effect Management Systems
 
@@ -637,9 +635,6 @@ the same way it tracks whether a value is an integer or a string.
 The examples in this section and the next come from my research,
 in which I build the same small programs in four Effect-managing languages.
 
-Here is the greeting program in [Koka](https://koka-lang.github.io/),
-a research language with native Effects:
-
 ```koka
 // Effect declarations: the interface, not the implementation
 effect ask
@@ -743,8 +738,6 @@ by encoding Effect information into the return type of every function.
 That encoding changes the mechanism.
 Instead of writing a computation and letting the compiler observe its Effects,
 you build a *description* of a computation, and execute the description later.
-
-Here is "Hello, World!" in Scala using the [ZIO](https://zio.dev/) library:
 
 ```scala
 import zio.*
@@ -929,7 +922,6 @@ Declaring a dependency you never bind is a type error.
 Calling an effectful function from one annotated as pure is a type error.
 That is tracking, interface separation, and delayed binding,
 the three properties of a full EMS, inside Python's existing type system.
-That chapter builds those three parts up one step at a time.
 
 The guarantee has a limit.
 Stateless verifies that the Effects you *declare* propagate consistently.
@@ -1017,7 +1009,6 @@ Effect tracking will look obvious in hindsight,
 and future programmers will regard a function with hidden Effects the way you regard a program written in one global namespace.
 
 Python offers no native Effect tracking beyond `async`, and will not soon.
-The next three chapters build the library version:
 [Generators](45_Effects--Generators.md) supplies the mechanism,
 [Stateless](46_Effects--Stateless.md)
 builds a library Effect system on top of it,
