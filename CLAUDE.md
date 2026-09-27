@@ -266,12 +266,16 @@ question of every anchored cross-chapter link: does the linked section
 cover what the sentence credits it with? It reports and never gates,
 and caches in `tools/data/link_support_verdicts.json`. Its first run
 found chapter 42 linking "put the meaning in the type" to annotation
-syntax in chapter 08. `tools/prose_calibration.py` asks three Score
-questions (subject-verb distance, ambiguous pointers, skipped steps) of
+syntax in chapter 08. `tools/prose_calibration.py` asks four questions of
 sentences Bruce rewrote in his editor commits and of neighbors he left
-alone. On 2026-09-27 (885 rewrites, 884 controls) only ambiguous
-pointers separated them at all, AUC 0.60 on restructured rewrites after
-controlling for length; subject-verb distance was chance. Rerun it
+alone: three Scores (subject-verb distance, ambiguous pointers, skipped
+steps) and a Noul, `would_rewrite`, that shows six before/after pairs
+from `bruce_edit_db.md` and asks whether he would rewrite the sentence.
+It reports on the half of the commits the examples did not come from.
+On 2026-09-27 (115 restructured rewrites, 299 controls) `would_rewrite`
+led at AUC 0.66 ± 0.03, unchanged by length banding; pointers and
+skipped steps were near 0.58, subject-verb distance near chance. That
+is enough to rank sentences for a human, not to edit on. Rerun it
 before letting a model score steer a prose pass. All three tools share
 `tools/judgments.py`, and the SDK
 joins only their runs, through `uv run --with typesafe-sdk`: it builds

@@ -65,22 +65,26 @@ def ask(
 ) -> list[dict[str, dict[str, Any]]]:
     """Answer each (state, {question_id: question kwargs}) pair.
 
-    A question's kwargs build a Choice, or a Score when they carry
-    `"type": "score"`. Returns, per request, `{question_id: answer}` in
-    request order, where a Choice answer is `{"choice", "confidence",
-    "probabilities"}` and a Score answer is `{"score", "confidence",
-    "probabilities"}`. The SDK retries rate limits and overloads itself.
+    A question's kwargs build a Choice, or a Score or a Noul when they
+    carry `"type": "score"` or `"type": "noul"`. Returns, per request,
+    `{question_id: answer}` in request order, where a Choice answer is
+    `{"choice", "confidence", "probabilities"}`, a Score answer is
+    `{"score", "confidence", "probabilities"}`, and a Noul answer is
+    `{"noul"}`, the probability of yes. The SDK retries rate limits and
+    overloads itself.
     """
     # Not in .venv; the tip tasks add it (see the docstring).
     from typesafe_sdk import (  # ty: ignore[unresolved-import]
-        AsyncTypeSafeClient, Choice, Score)
+        AsyncTypeSafeClient, Choice, Noul, Score)
 
     def build(q: dict[str, Any]) -> Any:
         fields = {k: v for k, v in q.items() if k != "type"}
-        return Score(**fields) if q.get("type") == "score" else Choice(
-            **fields)
+        kind = {"score": Score, "noul": Noul}.get(q.get("type", ""), Choice)
+        return kind(**fields)
 
     def read(a: Any) -> dict[str, Any]:
+        if a.type == "noul":
+            return {"noul": round(a.noul, 3)}
         probabilities = {o: round(p, 3) for o, p in a.probabilities.items()}
         head = ({"score": round(a.score, 3)} if a.type == "score"
                 else {"choice": a.choice})

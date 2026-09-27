@@ -9,13 +9,21 @@ edits is one he judged worth changing, and the sentences around it that
 he read and left alone are ones he judged fine.
 
 So this collects both groups from his editor commits, asks TypeSafe
-three Score questions about each sentence, and reports how well each
-score separates the groups, as an AUC: the chance a rewritten sentence
-outscores a left-alone one, where 0.5 is no signal. Longer sentences
-get rewritten more and also score higher on every one of these
-questions, so the report also gives the AUC of length alone, and each
-question's AUC within length bands, which is the part length cannot
-explain.
+about each sentence, and reports how well each answer separates the
+groups, as an AUC: the chance a rewritten sentence outscores a
+left-alone one, where 0.5 is no signal. Longer sentences get rewritten
+more and also score higher on every one of these questions, so the
+report also gives the AUC of length alone, and each question's AUC
+within length bands, which is the part length cannot explain.
+
+Four questions. Three are Scores for one named fault each. The fourth,
+`would_rewrite`, is a Noul that asks the author's question directly and
+shows six before/after pairs from `bruce_edit_db.md`'s promoted rules
+(`EXAMPLES`). Examples drawn from the data would inflate its score on
+that data, so the samples split by commit into two halves: the commits
+the examples came from are forced into the first, any sample containing
+an example's phrase is dropped from the second, and the report is
+computed on the second half alone. `would_rewrite` is asked only there.
 
 Which commits count: no Co-Authored-By trailer and a subject of the
 form his editor writes ("Update 30_Patterns--Observer.md", "more ch
@@ -25,11 +33,16 @@ sentence is one in the parent's version of a chapter that no longer
 appears, after collapsing whitespace, in the commit's version. Controls
 come from the same commit and chapter, as many as it rewrote, drawn
 from sentences unchanged there and never rewritten in any collected
-commit.
+commit. List items are left out: the sentence splitter joins a run of
+bullets into one "sentence" until it meets terminal punctuation, and
+the first run's highest subject-verb score was a joined list. So is
+a sentence holding one of Bruce's `[[...]]` draft notes, which is
+certain to change and says so in words a model can read.
 
-Answers are cached in `build/prose_calibration.json`, keyed by the
-sentence, its neighbors, and the questions' wording, so a rerun asks
-only what changed. Nothing here gates or edits a chapter.
+Answers are cached per question in `build/prose_calibration.json`,
+keyed by the sentence and its neighbors and stamped with the question's
+wording, so a rerun asks only a new or reworded question. Nothing here
+gates or edits a chapter.
 
     uv run --with typesafe-sdk python -m tools.prose_calibration
     uv run --with typesafe-sdk python -m tools.prose_calibration --dry-run
@@ -37,11 +50,13 @@ only what changed. Nothing here gates or edits a chapter.
 
 import argparse
 import difflib
+import hashlib
 import json
 import random
 import re
 import subprocess
 import sys
+from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 from statistics import mean
@@ -54,10 +69,43 @@ from tools.markdown import Document
 
 CACHE = BUILD_DIR / "prose_calibration.json"
 SUBJECT = re.compile(r"^(Update \S+\.md|more ch\b.*)$")
+LIST_ITEM = re.compile(r"^(?:[-*+]|\d+\.)\s")
 MIN_CHARS = 40
 RESTRUCTURED = 0.75
 """A rewrite whose before/after similarity is below this changed the
 sentence's shape, not a word or two in it."""
+
+# (rule, commit or "", before, after). One pair per rule, from six
+# different rules, so the examples show kinds of rewrite rather than
+# one habit six times. A commit named here goes into the example half.
+EXAMPLES = [
+    ("R4", "",
+     "Python functions are first-class, so you can also pass the steps",
+     "Because Python functions are first-class, you can also pass the "
+     "steps"),
+    ("R9", "144c546f",
+     "The variations above are Java habits.",
+     "All three approaches carry one Java habit: the adapter inherits "
+     "from `WhatIWant` so that `op()` accepts it."),
+    ("R10", "",
+     "The registry also never forgets:",
+     "The registry also never removes an entry:"),
+    ("R12", "7ec15c2e",
+     "Even without that ambiguity, the class solves a problem Python "
+     "does not have.",
+     "Even without that ambiguity, the builder class solves a problem "
+     "Python does not have."),
+    ("R15", "2b18eed8",
+     "Thus you can isolate, in one place, the effect of changing from "
+     "one GUI to another.",
+     "The change from one GUI to another then touches one place in "
+     "your code."),
+    ("R21", "15f58a2d",
+     "Subscriptions are strong references: an observable that outlives "
+     "its observers keeps alive the instance",
+     "Subscriptions are strong references. An observable that outlives "
+     "its observers keeps alive the instance"),
+]
 
 QUESTIONS: dict[str, dict[str, Any]] = {
     "subject_verb_distance": {
@@ -113,8 +161,39 @@ QUESTIONS: dict[str, dict[str, Any]] = {
             "reader cannot recover from the surrounding text.",
         ],
     },
+    "would_rewrite": {
+        "type": "noul",
+        "instructions": {
+            "task": (
+                "The author of a Python programming book revises the "
+                "draft sentence by sentence. Would this author rewrite "
+                "`sentence` on the next revision? Use `previous_sentence` "
+                "and `next_sentence` as context."),
+            "what_this_author_rewrites": [
+                {"before": before, "after": after}
+                for _, _, before, after in EXAMPLES],
+            "note": (
+                "The examples show kinds of change, not a checklist: a "
+                "buried or missing reason, a vague phrase where a "
+                "concrete one exists, a figure standing in for a "
+                "mechanism, a pointer with a competing antecedent, a "
+                "reader-directed 'you can' where the mechanism could be "
+                "the subject, a colon joining two sentences."),
+        },
+        "criteria": {
+            "true": ("The author would change the sentence's wording or "
+                     "structure, as in the examples."),
+            "false": ("The author would leave the sentence as it is, or "
+                      "change at most its punctuation."),
+        },
+    },
 }
-QUESTIONS_KEY = json.dumps(QUESTIONS, sort_keys=True)
+HELD_OUT_ONLY = {"would_rewrite"}
+
+
+def wording(question: str) -> str:
+    text = json.dumps(QUESTIONS[question], sort_keys=True)
+    return hashlib.sha256(text.encode("utf-8")).hexdigest()[:12]
 
 
 @dataclass(frozen=True)
@@ -132,8 +211,7 @@ class Sample:
 
     @property
     def key(self) -> str:
-        return judgments.key(self.previous, self.sentence, self.following,
-                             QUESTIONS_KEY)
+        return judgments.key(self.previous, self.sentence, self.following)
 
 
 def git(*args: str) -> str:
@@ -152,8 +230,14 @@ def commits() -> list[str]:
 
 def prose(text: str, name: str) -> list[tuple[int, str]]:
     doc = Document.from_text(text, Path(name))
-    return [(line, " ".join(s.split())) for line, s in sentences(doc)
-            if len(s) >= MIN_CHARS and not s.lstrip().startswith("|")]
+    out = []
+    for line, s in sentences(doc):
+        s = " ".join(s.split())
+        if (len(s) < MIN_CHARS or s.startswith("|") or "[[" in s
+                or LIST_ITEM.match(s) or s.count(" - ") > 1):
+            continue
+        out.append((line, s))
+    return out
 
 
 def collect(seed: int) -> list[Sample]:
@@ -196,12 +280,41 @@ def collect(seed: int) -> list[Sample]:
     return list(out.values())
 
 
+def held_out(samples: list[Sample]) -> list[Sample]:
+    """The half no example came from, minus any sample quoting one.
+
+    Commits split by a hash of their id, so the split is stable across
+    runs and unrelated to date or chapter; each example's commit is
+    forced into the other half.
+    """
+    forced = {c for _, c, _, _ in EXAMPLES if c}
+    phrases = [before[:40] for _, _, before, _ in EXAMPLES]
+
+    def second_half(commit: str) -> bool:
+        if any(commit.startswith(f) or f.startswith(commit)
+               for f in forced):
+            return False
+        return hashlib.sha256(commit.encode()).digest()[0] % 2 == 1
+
+    return [s for s in samples if second_half(s.commit)
+            and not any(p in s.sentence for p in phrases)]
+
+
 def auc(high: list[float], low: list[float]) -> float:
     """P(a score from `high` beats one from `low`), ties counting half."""
     if not high or not low:
         return float("nan")
     wins = sum((h > lo) + 0.5 * (h == lo) for h in high for lo in low)
     return wins / (len(high) * len(low))
+
+
+def auc_se(a: float, n_high: int, n_low: int) -> float:
+    """Hanley and McNeil's standard error for an AUC, the width to read
+    a difference between two rows against."""
+    q1, q2 = a / (2 - a), 2 * a * a / (1 + a)
+    var = (a * (1 - a) + (n_high - 1) * (q1 - a * a)
+           + (n_low - 1) * (q2 - a * a)) / (n_high * n_low)
+    return var ** 0.5
 
 
 def banded_auc(rows: list[tuple[Sample, float]], bands: int = 3) -> float:
@@ -222,6 +335,10 @@ def banded_auc(rows: list[tuple[Sample, float]], bands: int = 3) -> float:
     return total / weight if weight else float("nan")
 
 
+def value(answer: dict[str, Any]) -> float:
+    return answer["score"] if "score" in answer else answer["noul"]
+
+
 def progress(done: int, total: int) -> None:
     print(f"\r  {done}/{total}", end="", file=sys.stderr, flush=True)
     if done == total:
@@ -236,18 +353,18 @@ def report(samples: list[Sample], cache: dict[str, dict[str, Any]]) -> None:
              and s.similarity < RESTRUCTURED],
     }
     alone = [s for s in samples if not s.rewritten]
-    print(f"{len(alone)} left alone; "
+    print(f"held-out half: {len(alone)} left alone; "
           + "; ".join(f"{len(v)} {k}" for k, v in groups.items()))
 
-    measures: dict[str, Any] = {
+    measures: dict[str, Callable[[Sample], float]] = {
         "length (chars)": lambda s: float(len(s.sentence))}
     for q in QUESTIONS:
         measures[q] = (lambda q: lambda s:
-                       cache[s.key]["answers"][q]["score"])(q)
+                       value(cache[s.key]["answers"][q]))(q)
 
     for name, rewritten in groups.items():
         print(f"\n{name} vs left alone")
-        print(f"  {'measure':24} {'AUC':>5} {'in bands':>9} "
+        print(f"  {'measure':24} {'AUC':>5} {'±se':>5} {'in bands':>9} "
               f"{'mean rewritten':>15} {'mean alone':>11}")
         for label, f in measures.items():
             rows = [(s, f(s)) for s in rewritten + alone]
@@ -255,16 +372,18 @@ def report(samples: list[Sample], cache: dict[str, dict[str, Any]]) -> None:
             lo = [v for s, v in rows if not s.rewritten]
             banded = ("" if label.startswith("length")
                       else f"{banded_auc(rows):.2f}")
-            print(f"  {label:24} {auc(hi, lo):5.2f} {banded:>9} "
+            a = auc(hi, lo)
+            se = auc_se(a, len(hi), len(lo))
+            print(f"  {label:24} {a:5.2f} {se:5.2f} {banded:>9} "
                   f"{mean(hi):15.2f} {mean(lo):11.2f}")
 
     print("\nHighest-scoring rewrites per question (before -> after):")
     for q in QUESTIONS:
         top = sorted((s for s in samples if s.rewritten),
-                     key=lambda s: -cache[s.key]["answers"][q]["score"])[:3]
+                     key=lambda s: -value(cache[s.key]["answers"][q]))[:3]
         print(f"\n  {q}")
         for s in top:
-            score = cache[s.key]["answers"][q]["score"]
+            score = value(cache[s.key]["answers"][q])
             print(f"    {score:.2f} {s.file[:2]}:{s.line} {s.commit}")
             print(f"      - {s.sentence[:160]}")
             print(f"      + {s.after[:160] or '(deleted)'}")
@@ -280,22 +399,33 @@ def main(argv: list[str] | None = None) -> int:
                     help="seed for choosing the left-alone sentences")
     args = ap.parse_args(argv)
 
-    samples = collect(args.seed)
+    samples = held_out(collect(args.seed))
     cache = judgments.load(CACHE)
-    new = [s for s in samples if s.key not in cache]
+
+    def missing(s: Sample) -> dict[str, dict[str, Any]]:
+        stamped = cache.get(s.key, {}).get("wording", {})
+        return {q: spec for q, spec in QUESTIONS.items()
+                if stamped.get(q) != wording(q)}
+
+    todo = [(s, m) for s in samples if (m := missing(s))]
     if args.dry_run:
         rewritten = sum(s.rewritten for s in samples)
-        print(f"{len(commits())} commits, {rewritten} rewritten, "
-              f"{len(samples) - rewritten} left alone, {len(new)} to ask")
+        asks = sum(len(m) for _, m in todo)
+        print(f"{len(commits())} commits; held-out half: {rewritten} "
+              f"rewritten, {len(samples) - rewritten} left alone; "
+              f"{asks} questions to ask")
         return 0
-    if new:
+    if todo:
         answers = judgments.ask(
             [({"previous_sentence": s.previous, "sentence": s.sentence,
-               "next_sentence": s.following}, QUESTIONS) for s in new],
+               "next_sentence": s.following}, m) for s, m in todo],
             progress)
-        for s, a in zip(new, answers):
-            cache[s.key] = {"file": s.file, "line": s.line,
-                            "sentence": s.sentence, "answers": a}
+        for (s, m), a in zip(todo, answers):
+            entry = cache.setdefault(s.key, {
+                "file": s.file, "line": s.line, "sentence": s.sentence,
+                "answers": {}, "wording": {}})
+            entry["answers"].update(a)
+            entry["wording"].update({q: wording(q) for q in m})
         CACHE.parent.mkdir(exist_ok=True)
         judgments.save(CACHE, cache)
     report(samples, cache)
