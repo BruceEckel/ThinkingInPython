@@ -187,7 +187,6 @@ That original caller arrives in each `eval_*()` method as its `item` argument:
 the same object `compete()` held as `self` before passing it along.
 This game ignores the argument,
 since the outcome depends on the two types alone.
-A richer game reads the caller's state through it.
 
 Those `Any` annotations turn off static checking.
 `Item` declares `__str__()` alone,
@@ -272,7 +271,7 @@ Here the failure is the dictionary's own `KeyError`,
 where the state machine's engine raises `NoTransition` (see exercise 1).
 
 Exact matching surprises people.
-This listing shows the lookup raising `KeyError` for a subclass.
+The lookup raises a `KeyError` for a subclass.
 `Origami` derives from `Paper` and inherits its `compete()`,
 but the table has no row for it:
 
@@ -601,7 +600,6 @@ The last case shows why the sentinel exists.
 and `str` defines no `__radd__()`.
 Python raises the `TypeError` once both sides have declined.
 
-Three details of the fallback deserve a close look.
 Raising a `TypeError` inside `__add__()` ends the expression there,
 since the exception propagates immediately;
 only a returned sentinel makes Python try the right operand's `__radd__()`.
