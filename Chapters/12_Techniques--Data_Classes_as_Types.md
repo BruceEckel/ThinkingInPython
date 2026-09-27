@@ -20,7 +20,6 @@ This material comes from my PyCon 2022 talk,
 
 ## `check()` and `TypeFailure`
 
-The following `check()` function appears throughout the chapter.
 It raises `TypeFailure`,
 a custom exception meaning a value falls outside the type's allowed set:
 
@@ -294,9 +293,6 @@ and `__eq__()`.
 
 `Messenger` shows what `@dataclass` produces,
 but not what adding the decorator changes.
-Four small classes show the difference between a class body that declares fields and one that stores them,
-and go further than [Class Attributes](09_Foundations--Class_Attributes.md)
-does:
 
 - `A` is an ordinary class with bare annotations.
 - `B` adds default values but no constructor.
@@ -560,7 +556,7 @@ A frozen data class equals only another instance of its own class,
 while a `NamedTuple` equals any tuple holding the same values,
 a difference [Data Transfer Objects](22_Patterns--Data_Transfer_Objects.md#a-namedtuple-is-still-a-tuple)
 covers.
-They differ again in what this chapter cares about most,
+They also differ in validation,
 as [A `NamedTuple` Cannot Validate Itself](#namedtuple-cannot-validate) shows.
 
 If nothing about an object can change after construction,
@@ -797,8 +793,7 @@ Make the type guarantee its own values.
 
 ## Enums Are Types Too
 
-When the set of values is small and fixed, the clearest type is an `Enum`,
-which this chapter is the first to use.
+When the set of values is small and fixed, the clearest type is an `Enum`.
 As an example, a `BirthDate` contains a month, day, and year.
 A year has twelve months, so `Month` is an `Enum`.
 Each month carries its length and knows how to check a `Day` against it.
@@ -1357,7 +1352,6 @@ which makes "transform one legal value into a new legal value" a safe thing to s
 ### `copy()` and `deepcopy()` Skip the Constructor {#copy-skips-the-constructor}
 
 `copy.copy()` and `copy.deepcopy()` copy without calling the constructor.
-Printing from `__post_init__()` shows which calls run it:
 
 ```python
 # replace_vs_copy.py
