@@ -20,8 +20,6 @@ Mypy is the original and most widely deployed one,
 and pyright is the one most editors run.
 This book uses [Astral's `ty`](https://docs.astral.sh/ty/) instead,
 from the same group that makes `uv` and `ruff`.
-Every listing passes `ty` before it reaches the page,
-and "the type checker" in this book means `ty` unless a sentence says otherwise.
 Pyright runs over the same listings as a second opinion, outside that gate.
 Where it or mypy disagrees with `ty` on a listing,
 the text says so and names the checker,
@@ -89,7 +87,6 @@ and `uv tool install ty@latest` puts it on your path.
 
 `ty` complains where the hints and the code disagree,
 and stays quiet when they agree.
-This book checks every runnable example this way.
 The build runs `ty` on every change,
 so the code you read here checks as well as runs.
 
@@ -235,8 +232,6 @@ but the object stays mutable.
 
 You can give the type explicitly, as in `GREETING`,
 or let the type checker infer it from the value, as with `MAX_RETRIES`.
-The rest of the book uses the explicit `Final[T]` form,
-and that form declares the intended type instead of accepting whatever the initializer produces.
 The two forms differ when the initializer says less than you mean.
 `CACHE: Final = []` infers `list[Unknown]`,
 so the type checker ignores whatever goes into the list.
@@ -663,7 +658,6 @@ The hints are for the tools and for the reader.
 From here on, this book assumes the type checker runs on everything.
 When a listing says the type checker rejects a line,
 that rejection is the only enforcement.
-The following chapters do not repeat that Python itself would run the line anyway.
 
 ## How Much to Annotate
 
@@ -686,7 +680,6 @@ is worth annotating precisely.
 ## Type Hint Summary
 
 These are the type hints you encounter, in their modern forms.
-The book uses only a handful of these, but the rest turn up in other code.
 Each subsection heading links to the associated [Python documentation](https://docs.python.org/3/library/typing.html).
 [Thinking in Types](https://thinkingintypes.com/) explores types in more depth.
 
