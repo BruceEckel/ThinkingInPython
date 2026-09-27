@@ -9,7 +9,7 @@
 An *observer* registers interest with a *subject*.
 When the subject changes state, it notifies the observer.
 The subject knows each observer only as something to call,
-and it fixes the arguments every call receives.
+and it decides which arguments every call receives.
 That choice follows [the principle of designing the communication rather than the parts](21_Patterns--Design_Patterns.md#design-principles).
 *Observer* is the most dynamic of the callback patterns because observers attach and detach at runtime,
 and the subject does not name their concrete types.
