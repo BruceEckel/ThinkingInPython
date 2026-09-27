@@ -21,7 +21,7 @@ This chapter covers the full three-channel annotation,
 the loop that carries such a conversation, and `yield from`,
 which composes generators that never name their driver.
 [Stateless](46_Effects--Stateless.md) builds an Effect system on all three,
-and this chapter stands on its own.
+but generators are useful without it.
 
 ## Annotating a Generator
 
