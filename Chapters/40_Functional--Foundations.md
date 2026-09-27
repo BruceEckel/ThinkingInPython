@@ -392,7 +392,6 @@ which [Containers](03_Foundations--Containers.md)
 shows reordering the list in place and returning `None`.
 `sorted()` builds a new list and leaves its input as it was.
 
-The lambdas above exist to show the machinery.
 For these cases Python offers a lookalike you should usually prefer,
 the [comprehension](16_Techniques--Comprehensions.md).
 `[n * n for n in numbers]` says more directly what `map()` plus a fresh lambda says,
@@ -569,8 +568,7 @@ and `partial()` fills positional arguments from the left, so before 3.14,
 fixing the third argument meant fixing the first two as well.
 `functools.Placeholder` (Python 3.14 and later)
 is a marker that reserves a position for the caller.
-The listing below carries two `# type: ignore` comments,
-which the paragraph after it explains:
+The listing below carries two `# type: ignore` comments:
 
 ```python
 # placeholder.py
