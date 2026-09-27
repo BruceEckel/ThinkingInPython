@@ -15,7 +15,6 @@ single dispatch, closed classes, and types that are not values.
 Python's classes stay open, its types are values,
 and `functools.singledispatch` adds an operation from outside a class,
 so some of those patterns become unnecessary.
-This chapter names each one where the example would otherwise need it.
 
 The example is a trash sorting simulation, and it evolves across the chapter:
 one design, then a requirement that makes it report wrong totals,
@@ -173,7 +172,7 @@ Cardboard:12
 
 The parser builds `Trash` objects through the registry,
 so it never names a concrete material.
-A new kind of trash leaves the parser unchanged:
+So adding a new kind of trash needs no edit to the parser, and cannot break it:
 
 ```python
 # parse_trash.py
@@ -275,7 +274,6 @@ A sorter over an open set must let each piece choose its own bin,
 and the next section's `bins[type(t)]` does that with no edit at all.
 
 That is the argument.
-Here is the requirement that makes it concrete.
 The plant starts accepting plastic,
 which means a new material class and some new lines in the data:
 
@@ -441,7 +439,6 @@ That trade is the [expression problem](13_Techniques--Pattern_Matching.md#the-ex
 
 ### A Method on Every Material
 
-Here is the requirement that makes the second axis concrete.
 The plant already prints a recycling instruction for each material.
 Now the safety officer wants a disposal hazard printed beside the instruction.
 That is a second operation that varies by material.
