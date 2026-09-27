@@ -780,7 +780,7 @@ The abstract container types come from `collections.abc`.
 | Construct | Meaning |
 |-----------|---------|
 | `Protocol` | A required shape (methods and attributes), satisfied without inheritance, see [Structural Typing with Protocols](#structural-typing-with-protocols) |
-| `@runtime_checkable` | Allows `isinstance()` against a `Protocol`, see [*Surrogate*](26_Patterns--Surrogate.md#proxy) |
+| `@runtime_checkable` | Allows `isinstance()` against a `Protocol`, see [*Surrogate*](26_Patterns--Surrogate.md#what-the-implementation-supplies) |
 
 ### Dictionary and Record Shapes
 
@@ -807,7 +807,7 @@ The abstract container types come from `collections.abc`.
 | Construct | Meaning |
 |-----------|---------|
 | `Self` | The enclosing class type; useful for fluent methods and alternative constructors, see [The `Self` Return Type](#the-self-type) |
-| `"Name"` | A *forward reference* to a not-yet-defined type; quoting is optional under deferred evaluation (PEP 649), see [Simulation](38_Patterns--Simulation.md#rooms-robots-and-the-item-factory) |
+| `"Name"` | A *forward reference* to a not-yet-defined type; quoting is optional under deferred evaluation (PEP 649), see [*Composite* and *Interpreter*](34_Patterns--Composite_and_Interpreter.md#a-composite-of-data-classes) |
 
 ### Typing Decorators and Directives
 

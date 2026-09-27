@@ -185,7 +185,7 @@ any object with an `f()` works and no shared base class takes part.
 A type checker still enforces the annotation,
 so name the requirement with a [`Protocol`](08_Foundations--Static_Types.md#structural-typing-with-protocols)
 that lists `f()`, not with a base class to inherit.
-[*Surrogate*](26_Patterns--Surrogate.md#proxy)
+[*Surrogate*](26_Patterns--Surrogate.md#what-the-implementation-supplies)
 makes the same substitution for a proxy's implementation.
 
 The common adapter need is "forward most calls unchanged,

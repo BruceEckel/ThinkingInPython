@@ -92,7 +92,7 @@ A bare annotation with no value looks most like a C++ or Java field declaration,
 yet it creates neither kind of attribute.
 It records the type.
 [Class Attributes](09_Foundations--Class_Attributes.md#a-bare-annotation-declares-it-does-not-create)
-and [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#data-classes)
+and [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#comparing-ordinary-classes-and-data-classes)
 use bare annotations.
 
 `display_object()` is a small inspection helper built in [Metaprogramming](17_Techniques--Metaprogramming.md#building-display_object).

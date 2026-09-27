@@ -514,7 +514,7 @@ The infinite `count(1)` never runs away.
 `islice()` is also how you slice an iterator.
 A generator defines no `__getitem__()`,
 so the list habit `odd_squares[:5]` raises a `TypeError` instead.
-[Functional Toolkits](41_Functional--Toolkits.md#chain)
+[Functional Toolkits](41_Functional--Toolkits.md#the-itertools-toolkit)
 covers `chain()` and `groupby()` in full,
 including the sorted-input trap `groupby()` sets for an unwary caller.
 
