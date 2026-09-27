@@ -716,9 +716,12 @@ the [per-instance dictionary](18_Techniques--Performance.md#when-slots-does-not-
 that `@record` exists to remove.
 `ABC` declares an empty `__slots__` too,
 so the chain stays slotted from `Circle` up to `object`.
-This is the book's one listing that slots a base class for its records.
-Elsewhere, a class with an unslotted base uses `@dataclass(frozen=True)`,
-which makes no claim about slots.
+The bases in [Changing the Interface](29_Patterns--Changing_the_Interface.md)
+and [*Composite* and *Interpreter*](34_Patterns--Composite_and_Interpreter.md)
+carry the same empty `__slots__` for the same reason.
+When a base comes from a library and declares no `__slots__`,
+its records are written `@record(slots=False)`,
+which gives up slots visibly instead of letting the base take them back.
 
 ### Dynamic Typing
 
