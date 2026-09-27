@@ -2,7 +2,6 @@
 
 > Data and the operations on it belong together,
 > and a class binds them under one name.
-> Python's version is a few lines of syntax and a set of conventions the rest of the book uses.
 
 You start with the `class` keyword followed by the class name and a colon.
 Use `def` to create methods inside the indented class body:
@@ -137,8 +136,6 @@ though [Rethinking Objects](20_Patterns--Rethinking_Objects.md)
 argues against it in favor of protocols.
 `simple_subclass.py` imports and subclasses `Simple` from the `simple_class` module.
 Ignore the `@override` decorator for now.
-[Marking Overrides with `@override`](#marking-overrides-with-override)
-explains it:
 
 ```python
 # simple_subclass.py
@@ -279,8 +276,7 @@ and that bug is easy to miss.
 
 The `@override` decorator from the `typing` module catches it.
 A line starting with `@` above a definition applies a *decorator* to it.
-[Decorators](14_Techniques--Decorators.md) shows how they work,
-and this chapter only applies existing ones.
+[Decorators](14_Techniques--Decorators.md) shows how they work.
 `@override` declares that a method replaces one from a base class:
 
 ```python
@@ -309,7 +305,6 @@ A type checker now verifies that claim.
 If a decorated method matches nothing in a base class,
 whether from a misspelling or from a base method that no longer exists,
 the checker reports an error.
-If you uncomment the decorator on `Typo.shwo`, the checker reports:
 
 ```text
 error[invalid-explicit-override]: Method `shwo` is decorated with
