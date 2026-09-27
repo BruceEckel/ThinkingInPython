@@ -63,15 +63,29 @@ def ask(
     requests: Sequence[tuple[dict[str, Any], dict[str, Any]]],
     progress: Callable[[int, int], None] = lambda done, total: None,
 ) -> list[dict[str, dict[str, Any]]]:
-    """Answer each (state, {question_id: Choice kwargs}) pair.
+    """Answer each (state, {question_id: question kwargs}) pair.
 
-    Returns, per request, `{question_id: {"choice", "confidence",
-    "probabilities"}}`, in request order. The SDK retries rate limits
-    and overloads itself.
+    A question's kwargs build a Choice, or a Score when they carry
+    `"type": "score"`. Returns, per request, `{question_id: answer}` in
+    request order, where a Choice answer is `{"choice", "confidence",
+    "probabilities"}` and a Score answer is `{"score", "confidence",
+    "probabilities"}`. The SDK retries rate limits and overloads itself.
     """
     # Not in .venv; the tip tasks add it (see the docstring).
     from typesafe_sdk import (  # ty: ignore[unresolved-import]
-        AsyncTypeSafeClient, Choice)
+        AsyncTypeSafeClient, Choice, Score)
+
+    def build(q: dict[str, Any]) -> Any:
+        fields = {k: v for k, v in q.items() if k != "type"}
+        return Score(**fields) if q.get("type") == "score" else Choice(
+            **fields)
+
+    def read(a: Any) -> dict[str, Any]:
+        probabilities = {o: round(p, 3) for o, p in a.probabilities.items()}
+        head = ({"score": round(a.score, 3)} if a.type == "score"
+                else {"choice": a.choice})
+        return {**head, "confidence": round(a.confidence, 3),
+                "probabilities": probabilities}
 
     async def run() -> list[dict[str, dict[str, Any]]]:
         gate = asyncio.Semaphore(CONCURRENCY)
@@ -84,15 +98,11 @@ def ask(
                 async with gate:
                     r = await client.system_one(
                         state=state,
-                        questions={k: Choice(**q)
+                        questions={k: build(q)
                                    for k, q in questions.items()})
                 done += 1
                 progress(done, len(requests))
-                return {k: {"choice": a.choice,
-                            "confidence": round(a.confidence, 3),
-                            "probabilities": {o: round(p, 3) for o, p
-                                              in a.probabilities.items()}}
-                        for k, a in r.choices.items()}
+                return {k: read(a) for k, a in r.answers.items()}
             return await asyncio.gather(
                 *(one(s, q) for s, q in requests))
 

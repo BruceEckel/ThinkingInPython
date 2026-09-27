@@ -266,7 +266,14 @@ question of every anchored cross-chapter link: does the linked section
 cover what the sentence credits it with? It reports and never gates,
 and caches in `tools/data/link_support_verdicts.json`. Its first run
 found chapter 42 linking "put the meaning in the type" to annotation
-syntax in chapter 08. Both tools share `tools/judgments.py`, and the SDK
+syntax in chapter 08. `tools/prose_calibration.py` asks three Score
+questions (subject-verb distance, ambiguous pointers, skipped steps) of
+sentences Bruce rewrote in his editor commits and of neighbors he left
+alone. On 2026-09-27 (885 rewrites, 884 controls) only ambiguous
+pointers separated them at all, AUC 0.60 on restructured rewrites after
+controlling for length; subject-verb distance was chance. Rerun it
+before letting a model score steer a prose pass. All three tools share
+`tools/judgments.py`, and the SDK
 joins only their runs, through `uv run --with typesafe-sdk`: it builds
 `pydantic-core` from source on the pinned Python, so it stays out of
 `pyproject.toml`.
