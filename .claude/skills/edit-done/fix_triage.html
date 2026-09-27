@@ -246,10 +246,10 @@ function buildHead(pair) {
   el.innerHTML = `
     <div class="count">${total} hits · from ${esc(f.file || "")}:${esc(f.line ?? "")}</div>
     <div class="text">${esc(f.fault || "")}</div>
-    <div class="example">
+    ${f.before || f.after ? `<div class="example">
       <div><span class="sign">−</span><span>${esc(f.before || "")}</span></div>
       <div><span class="sign">+</span><span>${esc(f.after || "")}</span></div>
-    </div>`;
+    </div>` : ""}`;
   return el;
 }
 
@@ -260,6 +260,7 @@ function buildCard(id, c) {
   el.innerHTML = `
     <div class="where"><span>${esc(c.file)}:${c.line}${c.heading ? " · " + esc(c.heading) : ""}</span><span class="pills"></span></div>
     <p class="para">${paraHtml(c)}</p>
+    ${c.flagged ? `<div class="suggest"><strong>You flagged:</strong> ${esc(c.flagged)}</div>` : ""}
     ${suggestHtml(c)}
     <div><div class="label">Change</div><p class="diff" data-diff></p></div>
     <div><label class="label" for="r-${esc(id)}">Rewrite</label>

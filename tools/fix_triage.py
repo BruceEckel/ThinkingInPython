@@ -123,6 +123,7 @@ def seed() -> int:
                         "not_fault" if prop.get("not_fault") else
                         "rewrite"),
             "note": prop.get("note", ""),
+            "flagged": h.get("flagged", ""),
             "decision": None}
         path = docs / "cards" / f"{h['id']}.json"
         path.write_text(json.dumps(card, ensure_ascii=False),
@@ -190,6 +191,7 @@ def apply(read_dir: Path) -> int:
 
 
 def main(argv: list[str] | None = None) -> int:
+    global OUT
     ap = argparse.ArgumentParser(
         description=__doc__,
         formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -199,7 +201,11 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("seed", help="join hits and proposals into cards")
     a = sub.add_parser("apply", help="edit the chapters from the cards")
     a.add_argument("read_dir", type=Path)
+    ap.add_argument("--dir", type=Path, default=OUT,
+                    help="working directory for this batch (default "
+                         "build/fix_triage)")
     args = ap.parse_args(argv)
+    OUT = args.dir
     if args.command == "export":
         return export(args.pairs)
     if args.command == "seed":
