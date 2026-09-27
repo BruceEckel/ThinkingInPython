@@ -15,7 +15,7 @@ and evaluating the sentence walks the tree.
 but *Interpreter* is *Composite* with meaning attached.
 In Python both reduce to one technique: a union of records for the nodes,
 and recursive functions that `match` on them.
-This chapter builds each pattern with [exhaustive matching](13_Techniques--Pattern_Matching.md#exhaustive-matching).
+Both patterns build on [exhaustive matching](13_Techniques--Pattern_Matching.md#exhaustive-matching).
 
 ## The Classic Composite
 
@@ -707,7 +707,7 @@ built by nesting one `t`-string inside another.
 as the `query` in the listing below shows,
 so nesting is the one way to produce a `Template`-valued interpolation.
 A walker that loops over the top level must therefore also recurse into any value that is a `Template`.
-Everything else about walking a `Template` is this chapter's shape.
+Everything else about walking a `Template` is the recursive `match` over node kinds that *Composite* uses.
 
 Iterating a `Template` produces `str | Interpolation`,
 a closed union like `Node` with two members,
@@ -781,7 +781,7 @@ iterating any one `Template` stays flat.
 two operations over one structure that names neither of them.
 Adding a third changes nothing that already exists.
 
-`to_query()` shows what the walk is for.
+`to_query()` uses the walk to keep user values out of the query text.
 `name` holds an injection attempt,
 and it comes out as a value in the parameter list rather than as text in the query.
 The reason is structural rather than clever:
