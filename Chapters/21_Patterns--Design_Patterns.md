@@ -283,7 +283,7 @@ and *Chain of Responsibility* each decouple a sender from a receiver,
 "but with different trade-offs,"
 and *Observer* "defines a looser sender-receiver binding than *Command*."
 
-This section makes that measure visible.
+A diagram makes that measure visible.
 Once you can see coupling,
 the patterns in the chapters ahead stop being twenty-three shapes to memorize,
 and become a few moves applied to one kind of diagram.
