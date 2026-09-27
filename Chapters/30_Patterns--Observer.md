@@ -33,7 +33,8 @@ The classic design comes from *GoF Design Patterns*:
 - The object that changes is the *subject*
 - Each *observer* implements an interface with one method
 
-The GoF design has three parts: an `Observer` interface every observer implements,
+The GoF design has three parts:
+an `Observer` interface every observer implements,
 a `Subject` base class that keeps the observer list,
 and `Subject.notify()` that broadcasts to every observer:
 
