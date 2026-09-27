@@ -678,7 +678,7 @@ The state change becomes an awaitable method, `set_celsius()`,
 rather than the assignment `t.celsius = value`.
 [Concurrency](19_Techniques--Concurrency.md#asyncio-mechanics)
 covers the `asyncio` mechanics here (`async def`, `await`, `gather()`, `run()`).
-For this example, it is enough to know that a coroutine pauses at `await` while others run:
+A coroutine pauses at `await` while others run:
 
 ```python
 # async_broadcaster.py
