@@ -77,7 +77,7 @@
   "heading": "The Classic Observer: an Interface to Implement",
   "paragraph": "The classic design comes from *GoF Design Patterns*, and this section uses that vocabulary:",
   "floor": 0.65,
-  "floor_basis": "Bruce labeled 10 sampled hits on 2026-09-27, 7 right; 7 of the 9 scoring 0.65 or more were right"
+  "floor_basis": "Bruce labeled 10 sampled hits on 2026-09-27, 7 right; 7 of the 9 scoring 0.65 or more were right; fix triage 2026-09-27: 175 of 183 hits at or above the floor judged the fault (40 rewritten, 91 cut, 44 skipped)"
  },
  "dee1c1056d000be8": {
   "file": "30_Patterns--Observer.md",
@@ -191,7 +191,8 @@
   "check": {
    "before": 0.84,
    "after": 0.13
-  }
+  },
+  "floor_basis": "default floor; fix triage 2026-09-27: 14 of 14 hits at or above the floor judged the fault (9 rewritten, 5 cut, 0 skipped)"
  },
  "5bc1e7edeafc4e8f": {
   "file": "30_Patterns--Observer.md",
