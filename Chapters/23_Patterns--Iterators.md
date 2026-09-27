@@ -459,8 +459,6 @@ and the hand-written loop has no way to forward them.
 [Generators](45_Effects--Generators.md#yield-from-composes-descriptions)
 uses all three channels: the yielded values, the return value, and `send()`.
 
-This tests both a nested list and a flat one:
-
 ```python
 # test_yield_from.py
 from collections.abc import Callable, Iterator, Sequence
@@ -845,7 +843,6 @@ because the answer must differ from every value the source could yield.
 `None` collapses an exhausted source and a source that yields `None` into the same reply.
 The builtin `iter()` uses a sentinel the same way in its two-argument form:
 `iter(callable, DONE)` calls `callable` until it hands back `DONE`.
-`doubled()` shows the other half of the price.
 A `StopIteration` that escapes a generator body becomes a `RuntimeError`
 ([PEP 479](https://peps.python.org/pep-0479/)),
 so an ordinary end of stream reads like a bug somewhere else.
