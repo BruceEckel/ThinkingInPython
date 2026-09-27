@@ -118,7 +118,7 @@ button:disabled { opacity: .5; cursor: default; }
 <div class="wrap">
   <header class="top">
     <h1>Fix Triage</h1>
-    <p class="lede">Each card is a sentence the search flagged with a fault you fixed once. The highlighted sentence sits in its paragraph; below it is my proposed rewrite, which you can edit, with the change shown as a diff. <strong>Apply rewrite</strong> or <strong>Delete sentence</strong> changes the chapter. <strong>Skip</strong> leaves a sentence that does have the fault. <strong>Not this fault</strong> marks a false hit, which also tunes the search.</p>
+    <p class="lede">Each card is a sentence the search flagged with a fault you fixed once. The highlighted sentence sits in its paragraph; below it is my proposed rewrite, which you can edit, with the change shown as a diff. <strong>Apply rewrite</strong> or <strong>Delete sentence</strong> changes the chapter. <strong>Skip</strong> leaves a sentence that does have the fault. <strong>Not this fault</strong> marks a false hit, which also tunes the search. A card you leave undecided is left unchanged, so you only need to act on the sentences you want to edit.</p>
     <div class="controls">
       <span id="count">0 of 0 decided</span>
       <div class="bar"><span id="fill"></span></div>
@@ -181,8 +181,8 @@ function textOf(id, c) { return drafts.has(id) ? drafts.get(id) : (c.rewrite || 
 
 function suggestHtml(c) {
   const what = c.suggest === "delete" ? "I'd delete this sentence."
-    : c.suggest === "not_fault" ? "I don't think this has the fault."
-    : c.proposed ? "" : "";
+    : c.suggest === "not_fault" ? "I think the search flagged this by mistake, so I proposed no rewrite. If you agree, leave it or mark Not this fault; to change it anyway, type the new sentence in the Rewrite box."
+    : "";
   const note = c.note ? esc(c.note) : "";
   if (!what && !note) return "";
   return `<div class="suggest">${what ? `<strong>${what}</strong> ` : ""}${note}</div>`;
