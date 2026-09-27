@@ -27,6 +27,7 @@ nothing but these two commands uses it. Their tip tasks add it with
 import asyncio
 import hashlib
 import json
+import random
 from collections.abc import Callable, Mapping, Sequence
 from pathlib import Path
 from typing import Any
@@ -34,6 +35,7 @@ from typing import Any
 from tools.repo import write_text_lf
 
 CONCURRENCY = 8
+RETRIES = 4
 SECTION_LIMIT = 12_000
 """Characters of a linked section a question sees. A chapter-level
 section with many subsections runs past this, and the tail is cut."""
@@ -75,7 +77,8 @@ def ask(
     """
     # Not in .venv; the tip tasks add it (see the docstring).
     from typesafe_sdk import (  # ty: ignore[unresolved-import]
-        AsyncTypeSafeClient, Choice, Noul, Score)
+        AsyncTypeSafeClient, Choice, Noul, Score, TypeSafeAPIConnectionError,
+        TypeSafeAPITimeoutError, TypeSafeInternalServerError)
 
     def build(q: dict[str, Any]) -> Any:
         fields = {k: v for k, v in q.items() if k != "type"}
@@ -100,10 +103,24 @@ def ask(
                           ) -> dict[str, dict[str, Any]]:
                 nonlocal done
                 async with gate:
-                    r = await client.system_one(
-                        state=state,
-                        questions={k: build(q)
-                                   for k, q in questions.items()})
+                    # The SDK retries 429 and 529 but not a 502 from
+                    # the gateway or a dropped connection, and one
+                    # failure here used to abort a 10,000-question
+                    # batch five minutes in, keeping none of it.
+                    for attempt in range(RETRIES + 1):
+                        try:
+                            r = await client.system_one(
+                                state=state,
+                                questions={k: build(q) for k, q
+                                           in questions.items()})
+                            break
+                        except (TypeSafeInternalServerError,
+                                TypeSafeAPIConnectionError,
+                                TypeSafeAPITimeoutError):
+                            if attempt == RETRIES:
+                                raise
+                            await asyncio.sleep(2 ** attempt
+                                                + random.random())
                 done += 1
                 progress(done, len(requests))
                 return {k: read(a) for k, a in r.answers.items()}

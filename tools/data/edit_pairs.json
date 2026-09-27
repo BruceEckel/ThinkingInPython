@@ -104,11 +104,11 @@
   "similarity": 0.97,
   "source": "edit-start-30",
   "added": "2026-09-27",
-  "fault": "A participle such as 'generated' leaves unsaid which mechanism produces the thing, in a passage whose context does not already name that mechanism.",
+  "fault": "A bare 'generated' where naming what generates it ('dataclass-generated') is more precise, even when the mechanism was named earlier in the sentence.",
   "status": "searchable",
   "check": {
-   "before": 0.8,
-   "after": 0.08
+   "before": 0.86,
+   "after": 0.06
   },
   "heading": "The Pythonic Observer: Callables in a List",
   "paragraph": "`Thermometer`'s constructor is simple and suggests using a `dataclass`. Inheriting does not stop a class from being a `dataclass`, but [a generated `__init__()` does not call the base class's `__init__()`](12_Techniques--Data_Classes_as_Types.md#dataclass-inheritance). A `@dataclass` `Thermometer` would have no list of listeners, and `subscribe()` would raise an `AttributeError`. A `__post_init__()` that calls `super().__init__()` fixes that, but at greater length and complexity than the `__init__()` it replaces."

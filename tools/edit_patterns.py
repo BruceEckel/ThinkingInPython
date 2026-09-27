@@ -78,6 +78,8 @@ REPORT_FILE = BUILD_DIR / "edit_patterns.md"
 CHUNK = 20
 SCREEN = 0.15
 REPORT = 0.7
+"""The default listing floor. A pair whose hits Bruce has labeled carries
+its own `floor` in `edit_pairs.json`, set from those labels."""
 DELETED = 0.3
 """Below this similarity the rewrite's nearest new sentence is not its
 successor, and the pair is treated as a deletion."""
@@ -381,7 +383,7 @@ def report(pairs: dict[str, dict[str, Any]], keys: list[str],
         if p["status"] != "searchable":
             lines.append("")
             continue
-        lines.append(f"- {len(rows)} sentence(s) at or above {REPORT}")
+        lines.append(f"- {len(rows)} sentence(s) at or above {p.get('floor', REPORT)}")
         for f, s, v in rows[:SHOWN]:
             lines.append(f"  - {v:.2f} {CHAPTERS_DIR.name}/{f}:{s.line}: "
                          f"{s.text}")
@@ -485,7 +487,7 @@ def main(argv: list[str] | None = None) -> int:
         rows = []
         for f, s in sentences:
             v = cache.get(confirm_key(pairs[k], s))
-            if v is not None and v >= REPORT:
+            if v is not None and v >= pairs[k].get("floor", REPORT):
                 rows.append((f, s, v))
         found[k] = rows
 
