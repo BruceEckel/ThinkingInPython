@@ -79,7 +79,13 @@ CHUNK = 20
 SCREEN = 0.15
 REPORT = 0.7
 """The default listing floor. A pair whose hits Bruce has labeled carries
-its own `floor` in `edit_pairs.json`, set from those labels."""
+its own `floor` in `edit_pairs.json`, with a `floor_basis` saying which
+labels set it. The rule used on 2026-09-27: the floor that keeps the
+most right-labeled hits while at least 70% of the labeled hits at or
+above it are right, the higher floor on a tie. Ten labels per fault
+moved the floors from 0.62 (R21, nine of ten right) to 0.84 (R2, whose
+0.72-0.74 band was all wrong), and for three faults the score did not
+rank the right hits first at all, so a floor is a rough filter."""
 DELETED = 0.3
 """Below this similarity the rewrite's nearest new sentence is not its
 successor, and the pair is treated as a deletion."""
@@ -452,11 +458,17 @@ def main(argv: list[str] | None = None) -> int:
             rp = best_example(cache, candidates)
             k = judgments.key(rp["rule"], rp["before"], rp["after"])
             keys.append(k)
+            carried = {}
             for old in [o for o, v in pairs.items()
                         if v.get("rule") == rp["rule"] and o != k]:
-                del pairs[old]  # an example this run did not choose
+                # An example this run did not choose. A floor set from
+                # Bruce's labels belongs to the rule, not the example.
+                carried = {f: pairs[old][f] for f in ("floor", "floor_basis")
+                           if f in pairs[old]}
+                del pairs[old]
             entry = pairs.setdefault(k, {**rp, "source": rp["rule"],
                                          "added": today, "status": "new"})
+            entry.update(carried)
             entry["fault"] = rp["fault"]  # the store is the authority
         cache.save()
     else:

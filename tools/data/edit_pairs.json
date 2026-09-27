@@ -16,7 +16,9 @@
    "after": 0.04
   },
   "heading": "Observer",
-  "paragraph": "The *Observer* pattern, a kind of callback, decouples code that changes state from code that reacts to the state change. Something changes, and something else is interested in that change. An *observer* registers interest with a *subject*. When the subject changes state, it notifies the observer. The subject defines only a list of callables and the arguments it passes to them. That choice follows [the principle of designing the communication rather than the parts](21_Patterns--Design_Patterns.md#design-principles). *Observer* is the most dynamic of the callback patterns because observers attach and detach at runtime, and the subject does not name their concrete types."
+  "paragraph": "The *Observer* pattern, a kind of callback, decouples code that changes state from code that reacts to the state change. Something changes, and something else is interested in that change. An *observer* registers interest with a *subject*. When the subject changes state, it notifies the observer. The subject defines only a list of callables and the arguments it passes to them. That choice follows [the principle of designing the communication rather than the parts](21_Patterns--Design_Patterns.md#design-principles). *Observer* is the most dynamic of the callback patterns because observers attach and detach at runtime, and the subject does not name their concrete types.",
+  "floor": 0.65,
+  "floor_basis": "Bruce labeled 10 sampled hits on 2026-09-27, 8 right; 8 of the 10 scoring 0.65 or more were right"
  },
  "3c9e8c696d07aa79": {
   "file": "30_Patterns--Observer.md",
@@ -73,7 +75,9 @@
    "after": 0.06
   },
   "heading": "The Classic Observer: an Interface to Implement",
-  "paragraph": "The classic design comes from *GoF Design Patterns*, and this section uses that vocabulary:"
+  "paragraph": "The classic design comes from *GoF Design Patterns*, and this section uses that vocabulary:",
+  "floor": 0.65,
+  "floor_basis": "Bruce labeled 10 sampled hits on 2026-09-27, 7 right; 7 of the 9 scoring 0.65 or more were right"
  },
  "dee1c1056d000be8": {
   "file": "30_Patterns--Observer.md",
@@ -372,7 +376,9 @@
   "check": {
    "before": 0.88,
    "after": 0.05
-  }
+  },
+  "floor": 0.62,
+  "floor_basis": "Bruce labeled 10 sampled hits on 2026-09-27, 9 right; 9 of the 10 scoring 0.62 or more were right"
  },
  "980ea7daaf13356c": {
   "file": "bruce_edit_db.md",
@@ -444,7 +450,9 @@
   "check": {
    "before": 0.91,
    "after": 0.06
-  }
+  },
+  "floor": 0.84,
+  "floor_basis": "Bruce labeled 10 sampled hits on 2026-09-27, 4 right; 3 of the 3 scoring 0.84 or more were right"
  },
  "b1ab9b0c7636c81e": {
   "file": "bruce_edit_db.md",
@@ -498,7 +506,9 @@
   "check": {
    "before": 0.86,
    "after": 0.06
-  }
+  },
+  "floor": 0.7,
+  "floor_basis": "Bruce labeled 10 sampled hits on 2026-09-27, 6 right; 5 of the 7 scoring 0.70 or more were right"
  },
  "df7445062caaea8e": {
   "file": "bruce_edit_db.md",
@@ -552,7 +562,9 @@
   "check": {
    "before": 0.93,
    "after": 0.05
-  }
+  },
+  "floor": 0.81,
+  "floor_basis": "Bruce labeled 10 sampled hits on 2026-09-27, 6 right; 3 of the 3 scoring 0.81 or more were right"
  },
  "fefdb8a3319d99a8": {
   "file": "bruce_edit_db.md",

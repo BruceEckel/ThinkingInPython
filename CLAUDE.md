@@ -293,18 +293,24 @@ the chapter 12 false alarms a passage-conditioned fault ("in a
 passage that does not already name the mechanism") had drawn, and it
 raised scores generally: the appositive and metadiscourse faults went
 from 69 and 77 hits to 139 and 127, and the chain-to-condition
-fault's list took in sentences already in "If you" form. The 0.7
-floor was read off the neighbor-only run, so recalibrate it against
-hand-labeled hits before trusting a count. `ARGS=--from-rules`
+fault's list took in sentences already in "If you" form. Bruce then
+labeled ten sampled hits for each of six faults on a blind labeling
+page (scores hidden, order shuffled), and each labeled pair now
+carries its own `floor` and a `floor_basis`, 0.62 for R21 up to 0.84
+for R2; `REPORT`'s docstring gives the rule. Reading the hits myself
+had got R21 backward: I called its colon hits the wrong shape, and he
+marked nine of ten right. For three of the six faults the score did
+not put the right hits first, so a floor is a rough filter and a long
+hit list is still a review batch. `ARGS=--from-rules`
 searches for `bruce_edit_db.md`'s promoted rules, each rule's title,
 Test, and Keep-when lines as the fault and, as its example, the
 sighting the pair check separates best (the longest sighting, used
 first, gave R12 its counter-example). With paragraphs, 14 of 19
 rules were searchable; R9 found its own sighting's shape ("sets a
 single attribute that nothing reads"); R5 cannot find its bullets,
-which the scan skips; R21 still matches colons that introduce
-listings. Fixing the R17 hits it listed (commit 7af64701) left one
-hit: chapter 07's gerund-subject sentence, which the rule allows. The search reports; it never edits. All four tools share
+which the scan skips. Fixing the R17 hits it listed (commit 7af64701)
+left one hit: chapter 07's gerund-subject sentence, which the rule
+allows. The search reports; it never edits. All four tools share
 `tools/judgments.py`, and the SDK
 joins only their runs, through `uv run --with typesafe-sdk`: it builds
 `pydantic-core` from source on the pinned Python, so it stays out of
