@@ -139,8 +139,6 @@ shout("hello")
 ```
 
 `functools.Placeholder` reserves a position so you can fix a later positional argument and leave an earlier one for the caller.
-[Leaving a Gap with `Placeholder`](40_Functional--Foundations.md#leaving-a-gap-with-placeholder)
-shows it.
 
 ### `partialmethod`
 
@@ -177,8 +175,6 @@ Use `partialmethod` inside a class body and `partial` everywhere else.
 ### `cached_property`
 
 Runs a property's code once, on first access, then reuses the stored result.
-[Classes](07_Foundations--Classes.md#cached-property)
-covers it alongside `@property`.
 
 ```python
 # functools_cached_property.py
@@ -887,7 +883,7 @@ the call stack tracks the depth.
 
 Pair up participants for an activity across several rounds,
 and avoid repeating a pairing until every possible pairing has occurred once.
-Several of these ideas work together here in one small program:
+A small program solves it by combining several of these ideas:
 an infinite generator for the rounds,
 `islice()` to take as many of them as you want,
 `combinations()` for the pairs inside a group,
