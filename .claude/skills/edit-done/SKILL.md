@@ -101,7 +101,13 @@ docstring has the mechanics). While the tag still exists:
    few hits from `build/edit_patterns.md`, and each `unclear` pair,
    whose fault line needs rewording before it can be searched. The
    hits are a worklist for Bruce; do not apply them. A long list is
-   itself a review batch: offer it as a labeling page.
+   itself a review batch: offer a fix-triage page
+   (`fix_triage.html` beside this file, `tools/fix_triage.py`, whose
+   docstring has the steps). The session proposes a rewrite, a
+   deletion, or "not this fault" for each hit (parallel agents, one per
+   run of chapters, worked for 197 hits), Bruce decides on the page,
+   and `fix_triage apply` edits the chapters; run `tip verify-ch` for
+   each chapter it touched and commit per chapter.
 
 ## Step 4: verify and commit
 

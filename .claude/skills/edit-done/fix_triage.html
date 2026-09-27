@@ -1,0 +1,355 @@
+<title>Fix Triage</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap">
+<style>
+:root {
+  --bg: #f3f5f7;
+  --surface: #ffffff;
+  --ink: #1b2430;
+  --muted: #5d6b7a;
+  --rule: #d9dfe6;
+  --accent: #2f5d8a;
+  --accent-soft: #e3ecf5;
+  --yes: #1f7a5a;
+  --yes-soft: #dff1e9;
+  --cut: #8a3b6b;
+  --cut-soft: #f3e3ed;
+  --skip: #7a5c1f;
+  --skip-soft: #f4ecd8;
+  --no: #b0413e;
+  --no-soft: #f7e3e2;
+  --del: #b0413e;
+  --del-soft: #f7e3e2;
+  --ins: #1f7a5a;
+  --ins-soft: #dff1e9;
+  --mark: #fff1b8;
+  --serif: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12171d; --surface: #1a2129; --ink: #e4e9ef; --muted: #93a1b0;
+    --rule: #2b3541; --accent: #8fb7e0; --accent-soft: #1f2d3c;
+    --yes: #6cc9a4; --yes-soft: #173229; --cut: #e39ac6; --cut-soft: #37202e;
+    --skip: #e0c07a; --skip-soft: #3a3120; --no: #eb8c89; --no-soft: #3a1f1f;
+    --del: #eb8c89; --del-soft: #3a1f1f; --ins: #6cc9a4; --ins-soft: #173229;
+    --mark: #4a4220;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #12171d; --surface: #1a2129; --ink: #e4e9ef; --muted: #93a1b0;
+  --rule: #2b3541; --accent: #8fb7e0; --accent-soft: #1f2d3c;
+  --yes: #6cc9a4; --yes-soft: #173229; --cut: #e39ac6; --cut-soft: #37202e;
+  --skip: #e0c07a; --skip-soft: #3a3120; --no: #eb8c89; --no-soft: #3a1f1f;
+  --del: #eb8c89; --del-soft: #3a1f1f; --ins: #6cc9a4; --ins-soft: #173229;
+  --mark: #4a4220;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink); font-family: var(--sans);
+  font-size: 15px; line-height: 1.5; padding-inline: 16px; padding-block: 0 64px;
+}
+.wrap { max-width: 880px; margin: 0 auto; display: grid; gap: 20px; }
+header.top {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 2;
+  background: var(--bg); padding-block: 16px 12px; border-bottom: 1px solid var(--rule);
+  display: grid; gap: 8px;
+}
+h1 { font-family: var(--serif); font-weight: 600; font-size: 1.6rem; margin: 0; text-wrap: balance; }
+.lede { margin: 0; color: var(--muted); max-width: 74ch; }
+.controls { display: flex; align-items: center; gap: 12px; font-variant-numeric: tabular-nums; font-size: .9rem; color: var(--muted); flex-wrap: wrap; }
+.bar { flex: 1; min-width: 120px; height: 6px; background: var(--rule); border-radius: 3px; overflow: hidden; }
+.bar > span { display: block; height: 100%; width: 0; background: var(--accent); transition: width .2s; }
+.controls label { display: flex; align-items: center; gap: 6px; cursor: pointer; }
+select { font: inherit; font-size: .9rem; color: var(--ink); background: var(--surface); border: 1px solid var(--rule); border-radius: 6px; padding: 3px 6px; }
+.status { font-size: .85rem; color: var(--muted); min-height: 1.2em; }
+main { display: grid; gap: 28px; }
+section.group { display: grid; gap: 12px; }
+.fault-head { background: var(--accent-soft); border-radius: 8px; padding: 14px 16px; display: grid; gap: 8px; }
+.fault-head .count { font-family: var(--mono); font-size: .8rem; letter-spacing: .04em; text-transform: uppercase; color: var(--accent); }
+.fault-head .text { font-weight: 500; }
+.example { display: grid; gap: 4px; font-family: var(--serif); font-size: .95rem; }
+.example div { display: grid; grid-template-columns: 1.4em 1fr; }
+.example .sign { font-family: var(--mono); color: var(--muted); }
+.card { background: var(--surface); border: 1px solid var(--rule); border-radius: 8px; padding: 14px 16px; display: grid; gap: 12px; }
+.card[data-decision="apply"] { border-color: var(--yes); }
+.card[data-decision="delete"] { border-color: var(--cut); }
+.card[data-decision="skip"] { border-color: var(--skip); }
+.card[data-decision="not_fault"] { border-color: var(--no); }
+.where { font-family: var(--mono); font-size: .78rem; color: var(--muted); overflow-wrap: anywhere; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.pill { font-family: var(--sans); font-size: .72rem; letter-spacing: .04em; text-transform: uppercase; padding: 1px 8px; border-radius: 999px; background: var(--bg); color: var(--muted); border: 1px solid var(--rule); }
+.pill.apply { background: var(--yes-soft); color: var(--yes); border-color: transparent; }
+.pill.delete { background: var(--cut-soft); color: var(--cut); border-color: transparent; }
+.pill.skip { background: var(--skip-soft); color: var(--skip); border-color: transparent; }
+.pill.not_fault { background: var(--no-soft); color: var(--no); border-color: transparent; }
+.label { font-size: .78rem; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+.para { font-family: var(--serif); font-size: 1rem; line-height: 1.6; margin: 0; color: var(--muted); }
+.para mark { background: var(--mark); color: var(--ink); border-radius: 2px; padding: 0 1px; }
+.diff { font-family: var(--serif); font-size: 1.05rem; line-height: 1.65; margin: 0; }
+.diff del { background: var(--del-soft); color: var(--del); text-decoration: line-through; text-decoration-thickness: 1px; border-radius: 2px; }
+.diff ins { background: var(--ins-soft); color: var(--ins); text-decoration: none; border-radius: 2px; }
+.diff .gone { color: var(--muted); font-style: italic; font-family: var(--sans); font-size: .85rem; }
+.suggest { font-size: .88rem; color: var(--muted); }
+.suggest strong { color: var(--ink); font-weight: 600; }
+textarea {
+  width: 100%; min-height: 3.6em; resize: vertical; font: inherit; font-family: var(--serif); font-size: 1rem;
+  color: var(--ink); background: var(--bg); border: 1px solid var(--rule); border-radius: 6px; padding: 8px 10px;
+}
+textarea:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.choices { display: flex; gap: 8px; flex-wrap: wrap; }
+button {
+  font: inherit; font-size: .9rem; border-radius: 6px; padding: 6px 14px; cursor: pointer;
+  border: 1px solid var(--rule); background: var(--surface); color: var(--ink);
+}
+button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+button[data-decide="apply"][aria-pressed="true"] { background: var(--yes-soft); border-color: var(--yes); color: var(--yes); font-weight: 600; }
+button[data-decide="delete"][aria-pressed="true"] { background: var(--cut-soft); border-color: var(--cut); color: var(--cut); font-weight: 600; }
+button[data-decide="skip"][aria-pressed="true"] { background: var(--skip-soft); border-color: var(--skip); color: var(--skip); font-weight: 600; }
+button[data-decide="not_fault"][aria-pressed="true"] { background: var(--no-soft); border-color: var(--no); color: var(--no); font-weight: 600; }
+button.clear { color: var(--muted); }
+button:disabled { opacity: .5; cursor: default; }
+.empty { color: var(--muted); font-style: italic; }
+@media (prefers-reduced-motion: reduce) { .bar > span { transition: none; } }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <h1>Fix Triage</h1>
+    <p class="lede">Each card is a sentence the search flagged with a fault you fixed once. The highlighted sentence sits in its paragraph; below it is my proposed rewrite, which you can edit, with the change shown as a diff. <strong>Apply rewrite</strong> or <strong>Delete sentence</strong> changes the chapter. <strong>Skip</strong> leaves a sentence that does have the fault. <strong>Not this fault</strong> marks a false hit, which also tunes the search.</p>
+    <div class="controls">
+      <span id="count">0 of 0 decided</span>
+      <div class="bar"><span id="fill"></span></div>
+      <label><input type="checkbox" id="only-open"> Undecided only</label>
+      <label>Fault <select id="fault-filter"><option value="">All</option></select></label>
+    </div>
+    <div class="status" id="status" role="status">Loading the hits…</div>
+  </header>
+  <main id="groups"></main>
+</div>
+
+<script>
+const $ = (s) => document.querySelector(s);
+const state = { cards: new Map(), faults: new Map(), db: null, readOnly: false, onlyOpen: false, fault: "" };
+const drafts = new Map(), chains = new Map(), timers = new Map();
+const NAMES = { apply: "Apply rewrite", delete: "Delete sentence", skip: "Skip", not_fault: "Not this fault" };
+
+try {
+  state.onlyOpen = localStorage.getItem("fix-triage-only-open") === "1";
+  state.fault = localStorage.getItem("fix-triage-fault") || "";
+} catch (e) {}
+$("#only-open").checked = state.onlyOpen;
+
+function esc(t) {
+  return String(t).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+}
+
+function diffHtml(before, after) {
+  if (!after.trim()) return `<del>${esc(before)}</del> <span class="gone">(sentence removed)</span>`;
+  const a = before.split(/(\s+)/), b = after.split(/(\s+)/);
+  const n = a.length, m = b.length;
+  const L = Array.from({ length: n + 1 }, () => new Uint16Array(m + 1));
+  for (let i = n - 1; i >= 0; i--)
+    for (let j = m - 1; j >= 0; j--)
+      L[i][j] = a[i] === b[j] ? L[i + 1][j + 1] + 1 : Math.max(L[i + 1][j], L[i][j + 1]);
+  const out = [];
+  let i = 0, j = 0;
+  const push = (kind, text) => {
+    const last = out[out.length - 1];
+    if (last && last.kind === kind) last.text += text; else out.push({ kind, text });
+  };
+  while (i < n && j < m) {
+    if (a[i] === b[j]) { push("same", a[i]); i++; j++; }
+    else if (L[i + 1][j] >= L[i][j + 1]) push("del", a[i++]);
+    else push("ins", b[j++]);
+  }
+  while (i < n) push("del", a[i++]);
+  while (j < m) push("ins", b[j++]);
+  return out.map((p) => p.kind === "same" ? esc(p.text) : `<${p.kind}>${esc(p.text)}</${p.kind}>`).join("");
+}
+
+function paraHtml(c) {
+  const para = c.paragraph || c.sentence;
+  const at = para.indexOf(c.sentence);
+  if (at < 0) return `<mark>${esc(c.sentence)}</mark>`;
+  return `${esc(para.slice(0, at))}<mark>${esc(c.sentence)}</mark>${esc(para.slice(at + c.sentence.length))}`;
+}
+
+function textOf(id, c) { return drafts.has(id) ? drafts.get(id) : (c.rewrite || ""); }
+
+function suggestHtml(c) {
+  const what = c.suggest === "delete" ? "I'd delete this sentence."
+    : c.suggest === "not_fault" ? "I don't think this has the fault."
+    : c.proposed ? "" : "";
+  const note = c.note ? esc(c.note) : "";
+  if (!what && !note) return "";
+  return `<div class="suggest">${what ? `<strong>${what}</strong> ` : ""}${note}</div>`;
+}
+
+function cardHtml(id, c) {
+  const text = textOf(id, c);
+  const dis = state.readOnly ? "disabled" : "";
+  return `<article class="card" data-id="${esc(id)}" data-decision="${esc(c.decision || "")}">
+    <div class="where"><span>${esc(c.file)}:${c.line}${c.heading ? " · " + esc(c.heading) : ""}</span>
+      ${c.decision ? `<span class="pill ${esc(c.decision)}">${esc(NAMES[c.decision] || c.decision)}</span>` : ""}</div>
+    <p class="para">${paraHtml(c)}</p>
+    ${suggestHtml(c)}
+    <div><div class="label">Change</div><p class="diff" data-diff>${diffHtml(c.sentence, text)}</p></div>
+    <div><label class="label" for="r-${esc(id)}">Rewrite</label>
+      <textarea id="r-${esc(id)}" ${dis} placeholder="The replacement sentence. Leave empty and choose Delete sentence to cut it.">${esc(text)}</textarea></div>
+    <div class="choices">
+      <button data-decide="apply" aria-pressed="${c.decision === "apply"}" ${dis || (text.trim() ? "" : "disabled")} title="${text.trim() ? "Replace the sentence with this rewrite" : "Write a rewrite first"}">Apply rewrite</button>
+      <button data-decide="delete" aria-pressed="${c.decision === "delete"}" ${dis}>Delete sentence</button>
+      <button data-decide="skip" aria-pressed="${c.decision === "skip"}" ${dis}>Skip</button>
+      <button data-decide="not_fault" aria-pressed="${c.decision === "not_fault"}" ${dis}>Not this fault</button>
+      ${c.decision ? `<button class="clear" data-decide="" ${dis}>Clear</button>` : ""}
+    </div>
+  </article>`;
+}
+
+function render() {
+  const focused = document.activeElement;
+  const focusId = focused && focused.matches("textarea") ? focused.closest(".card").dataset.id : null;
+  const caret = focusId ? [focused.selectionStart, focused.selectionEnd] : null;
+  const scrollY = window.scrollY;
+  const groups = new Map();
+  for (const [id, c] of state.cards) {
+    if (state.fault && c.pair !== state.fault) continue;
+    if (state.onlyOpen && c.decision && id !== focusId) continue;
+    if (!groups.has(c.pair)) groups.set(c.pair, []);
+    groups.get(c.pair).push([id, c]);
+  }
+  const main = $("#groups");
+  if (!state.cards.size) main.innerHTML = `<p class="empty">No hits are loaded yet.</p>`;
+  else if (!groups.size) main.innerHTML = `<p class="empty">Every card here has a decision.</p>`;
+  else main.innerHTML = [...groups.entries()].map(([pair, list]) => {
+    const f = state.faults.get(pair) || {};
+    list.sort((x, y) => x[1].order - y[1].order);
+    const total = [...state.cards.values()].filter((c) => c.pair === pair).length;
+    return `<section class="group">
+      <div class="fault-head">
+        <div class="count">${total} hits · from ${esc(f.file || "")}:${esc(f.line ?? "")}</div>
+        <div class="text">${esc(f.fault || "")}</div>
+        <div class="example">
+          <div><span class="sign">−</span><span>${esc(f.before || "")}</span></div>
+          <div><span class="sign">+</span><span>${esc(f.after || "")}</span></div>
+        </div>
+      </div>
+      ${list.map(([id, c]) => cardHtml(id, c)).join("")}
+    </section>`;
+  }).join("");
+  if (focusId) {
+    const t = document.getElementById("r-" + focusId);
+    if (t) { t.focus({ preventScroll: true }); t.setSelectionRange(caret[0], caret[1]); }
+  }
+  window.scrollTo(0, scrollY);
+  const all = [...state.cards.values()];
+  const done = all.filter((c) => c.decision).length;
+  $("#count").textContent = `${done} of ${all.length} decided`;
+  $("#fill").style.width = all.length ? `${(100 * done) / all.length}%` : "0";
+}
+
+function fillFaultFilter() {
+  const sel = $("#fault-filter");
+  const cur = state.fault;
+  sel.innerHTML = `<option value="">All</option>` + [...state.faults.entries()].map(([k, f]) => {
+    const n = [...state.cards.values()].filter((c) => c.pair === k).length;
+    const short = (f.fault || k).split(/[:.;(]/)[0].slice(0, 48);
+    return `<option value="${esc(k)}">${esc(short)} (${n})</option>`;
+  }).join("");
+  sel.value = state.faults.has(cur) ? cur : "";
+}
+
+function write(id, fields) {
+  const next = (chains.get(id) || Promise.resolve())
+    .then(() => state.db.doc(`cards/${id}`).update(fields))
+    .then(() => { $("#status").textContent = "Saved."; })
+    .catch((e) => {
+      if (e && e.code === "invalid_argument") {
+        state.readOnly = true; render();
+        $("#status").textContent = "You can view these hits but not change them.";
+      } else {
+        $("#status").textContent = "A change didn't save. Try again in a moment.";
+      }
+    });
+  chains.set(id, next);
+  return next;
+}
+
+function flushDraft(id) {
+  clearTimeout(timers.get(id)); timers.delete(id);
+  if (!drafts.has(id)) return Promise.resolve();
+  const text = drafts.get(id); drafts.delete(id);
+  const c = state.cards.get(id);
+  if (!c || (c.rewrite || "") === text) return Promise.resolve();
+  c.rewrite = text;
+  return write(id, { rewrite: text });
+}
+
+document.addEventListener("input", (ev) => {
+  const t = ev.target.closest("textarea");
+  if (!t || state.readOnly) return;
+  const card = t.closest(".card"), id = card.dataset.id;
+  drafts.set(id, t.value);
+  card.querySelector("[data-diff]").innerHTML = diffHtml(state.cards.get(id).sentence, t.value);
+  const apply = card.querySelector('button[data-decide="apply"]');
+  if (apply) apply.disabled = !t.value.trim();
+  clearTimeout(timers.get(id));
+  timers.set(id, setTimeout(() => flushDraft(id), 900));
+});
+
+document.addEventListener("focusout", (ev) => {
+  const t = ev.target.closest && ev.target.closest("textarea");
+  if (t) flushDraft(t.closest(".card").dataset.id);
+});
+
+document.addEventListener("click", async (ev) => {
+  const btn = ev.target.closest("button[data-decide]");
+  if (!btn || !state.db || state.readOnly) return;
+  const id = btn.closest(".card").dataset.id;
+  const c = state.cards.get(id);
+  const decision = btn.dataset.decide || null;
+  await flushDraft(id);
+  if (c.decision === decision) return;
+  c.decision = decision;
+  render();
+  write(id, { decision });
+});
+
+$("#only-open").addEventListener("change", (ev) => {
+  state.onlyOpen = ev.target.checked;
+  try { localStorage.setItem("fix-triage-only-open", state.onlyOpen ? "1" : "0"); } catch (e) {}
+  render();
+});
+$("#fault-filter").addEventListener("change", (ev) => {
+  state.fault = ev.target.value;
+  try { localStorage.setItem("fix-triage-fault", state.fault); } catch (e) {}
+  render();
+});
+
+async function start() {
+  render();
+  const db = await window.claude?.use?.("db");
+  if (!db) { $("#status").textContent = "The triage store isn't available in this view. Open the page in claude.ai to triage."; return; }
+  state.db = db;
+  db.collection("faults").onSnapshot((snap) => {
+    state.faults = new Map(snap.docs.map((d) => [d.id, d.data()]));
+    fillFaultFilter(); render();
+  }, () => {});
+  db.collection("cards").onSnapshot((snap) => {
+    const next = new Map();
+    for (const d of snap.docs) {
+      const body = { ...d.data() };
+      const local = state.cards.get(d.id);
+      if (local && chains.has(d.id) && snap.metadata.hasPendingWrites) Object.assign(body, { decision: local.decision, rewrite: local.rewrite });
+      next.set(d.id, body);
+    }
+    state.cards = next;
+    $("#status").textContent = next.size ? "Changes save as you go." : "No hits are loaded yet.";
+    fillFaultFilter(); render();
+  }, () => { $("#status").textContent = "Lost the connection to the hits."; });
+}
+start();
+</script>
