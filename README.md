@@ -277,8 +277,6 @@ tip run-one deque_timing
 tip run-one Examples/07_Foundations--Classes/property_setter.py
 ```
 
-`tip run-one F=deque_timing` is the same command in its older form.
-
 It sets up what the example expects, and prints the commands it stood in
 for, because those are what you type when `tip` is not at hand:
 
