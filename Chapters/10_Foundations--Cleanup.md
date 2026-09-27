@@ -1,7 +1,7 @@
 # Cleanup
 
-> Python frees memory on its own, and a file, a socket, or a lock is not memory.
-> Something must release those, and this chapter is about when that release runs.
+> Python frees memory on its own,
+> and a file, a socket, or a lock is not memory.
 
 ## Why `__del__()` Is Not Cleanup {#why-del-is-not-cleanup}
 
@@ -492,7 +492,6 @@ The weak reference lets the registry prune itself.
 CPython's reference counting makes the count fall immediately.
 On an implementation with a tracing collector, such as PyPy,
 the entries disappear when its collector runs, so the counts fall late.
-This listing reads the count during normal execution.
 The `__del__()` version in `cleanup.py` waits for interpreter shutdown,
 when the interpreter's bookkeeping is unreliable.
 
