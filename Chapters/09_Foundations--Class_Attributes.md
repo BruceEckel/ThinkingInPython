@@ -81,8 +81,6 @@ has no instance `__dict__` at all.
 A class attribute in such a class cannot be shadowed:
 assigning to that name on an instance raises an `AttributeError`,
 because there is no instance dictionary to write into.
-The rest of this chapter assumes an ordinary class,
-one with an instance `__dict__`.
 
 A method is a class attribute like any other.
 `def show(self):` in a class body stores a function object in the class dictionary,
@@ -98,7 +96,6 @@ A [`@property`](07_Foundations--Classes.md#properties)
 owns its name on the class,
 so reading calls its getter and assigning calls its setter,
 and neither one touches the instance dictionary.
-The rest of this chapter covers ordinary values stored in a class body.
 
 ### The Bug Surfaces Far from Its Cause
 
