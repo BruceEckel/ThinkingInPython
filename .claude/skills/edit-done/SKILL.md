@@ -56,6 +56,26 @@ That skill owns the rest of this step: it classifies the edits,
 proposes at most eight entries, and writes `bruce_edit_db.md` only after
 Bruce approves. Do not shortcut its report.
 
+## Step 3b: search the book for the same faults
+
+Run `tip edit-patterns ARGS=--dry-run` while the tag still exists. It
+lists every sentence Bruce rewrote in the pass (commits with a
+Co-Authored-By trailer are skipped) and records each before/after pair
+in `tools/data/edit_pairs.json` with an empty `fault`. For each edit
+the capture step judged generalizable, propose a one-line `fault`: what
+the before-sentence got wrong, stated so it picks out that fault and
+not a shared word or shared punctuation ("Metadiscourse: a clause
+announces what the text itself is doing", not "ends in a colon"). Add
+the condition under which it is a fault when the same words are fine
+elsewhere ("when the context does not already name the mechanism").
+Leave local edits (an exercise renumbering, a fact correction) empty.
+After Bruce approves the lines, write them and run `tip edit-patterns`
+(needs `TYPESAFE_API_KEY`; about five minutes). Report each searched
+pair's hit count and its strongest few hits from
+`build/edit_patterns.md`, and each `unclear` pair, whose fault line
+needs rewording before it can be searched. The hits are a worklist for
+Bruce; do not apply them.
+
 ## Step 4: verify and commit
 
 Bruce's edits can leave a stale `#:` marker, a paragraph that needs

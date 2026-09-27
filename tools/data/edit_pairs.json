@@ -1,0 +1,207 @@
+{
+ "21d72aa0ad984016": {
+  "file": "30_Patterns--Observer.md",
+  "line": 3,
+  "before": "The *Observer* pattern, a kind of callback, decouples code that changes state from code that reacts to the state change.",
+  "after": "*Observer* decouples code that changes state from code that reacts to the state change.",
+  "previous": "",
+  "following": "Something changes, and something else is interested in that change.",
+  "similarity": 0.841,
+  "source": "edit-start-30",
+  "added": "2026-09-27",
+  "fault": "An appositive or a classifying phrase ('the X pattern, a kind of Y,') sits between the subject and its verb and delays the claim.",
+  "status": "searchable",
+  "check": {
+   "before": 0.94,
+   "after": 0.04
+  }
+ },
+ "3c9e8c696d07aa79": {
+  "file": "30_Patterns--Observer.md",
+  "line": 19,
+  "before": "Document-View folds the controller into the view, so it has two parts where MVC has three, but the part *Observer* explains is the same in both:",
+  "after": "Document-View folds the controller into the view, so it has two parts where MVC has three.",
+  "previous": "The classic example is Smalltalk's MVC (model-view-controller), or the nearly-equivalent Document-View architecture.",
+  "following": "one subject holds a list of views and names no view type.",
+  "similarity": 0.761,
+  "source": "edit-start-30",
+  "added": "2026-09-27",
+  "fault": "After the sentence has made its point, a trailing clause adds a second, vaguer claim that the sentence does not need.",
+  "status": "unclear",
+  "check": {
+   "before": 0.31,
+   "after": 0.23
+  }
+ },
+ "230cf0cbfea5c70a": {
+  "file": "30_Patterns--Observer.md",
+  "line": 25,
+  "before": "A *document* has more than one way to view it, for example a plot and a table.",
+  "after": "A *document* has more than one way to view it, such as a plot and a table.",
+  "previous": "one subject holds a list of views and names no view type.",
+  "following": "When the data changes, every view must refresh.",
+  "similarity": 0.908,
+  "source": "edit-start-30",
+  "added": "2026-09-27",
+  "fault": "'for example' introduces a short list of nouns inside the sentence, where 'such as' joins the examples to the noun they illustrate.",
+  "status": "searchable",
+  "check": {
+   "before": 0.89,
+   "after": 0.05
+  }
+ },
+ "6b940dc7040019dc": {
+  "file": "30_Patterns--Observer.md",
+  "line": 31,
+  "before": "The classic design comes from *GoF Design Patterns*, and this section uses that vocabulary:",
+  "after": "The classic design comes from *GoF Design Patterns*:",
+  "previous": "With *Observer*, a change in the subject's data notifies each interested view.",
+  "following": "The design has three parts: an `Observer` interface every observer implements, a `Subject` base class that keeps the observer list, and `Subject.notify()` that broadcasts to every observer:",
+  "similarity": 0.727,
+  "source": "edit-start-30",
+  "added": "2026-09-27",
+  "fault": "Metadiscourse: a clause announces what the text itself is doing ('and this section uses that vocabulary') instead of saying something about the subject.",
+  "status": "searchable",
+  "check": {
+   "before": 0.94,
+   "after": 0.06
+  }
+ },
+ "dee1c1056d000be8": {
+  "file": "30_Patterns--Observer.md",
+  "line": 37,
+  "before": "The design has three parts: an `Observer` interface every observer implements, a `Subject` base class that keeps the observer list, and `Subject.notify()` that broadcasts to every observer:",
+  "after": "The GoF design has three parts: an `Observer` interface every observer implements, a `Subject` base class that keeps the observer list, and `Subject.notify()` that broadcasts to every observer:",
+  "previous": "The classic design comes from *GoF Design Patterns*, and this section uses that vocabulary:",
+  "following": "`notify()` calls `update()` on every observer in the list, so one change to the subject's state reaches all observers.",
+  "similarity": 0.99,
+  "source": "edit-start-30",
+  "added": "2026-09-27",
+  "fault": "A generic noun ('The design') stands where more than one candidate is in play, and the sentence needs to say which one it means.",
+  "status": "unclear",
+  "check": {
+   "before": 0.52,
+   "after": 0.06
+  }
+ },
+ "76b3127834436d2d": {
+  "file": "30_Patterns--Observer.md",
+  "line": 247,
+  "before": "Inheriting does not stop a class from being a `dataclass`, but [a generated `__init__()` does not call the base class's `__init__()`](12_Techniques--Data_Classes_as_Types.md#dataclass-inheritance).",
+  "after": "Inheriting does not stop a class from being a `dataclass`, but [a `dataclass`-generated `__init__()` does not call the base class's `__init__()`](12_Techniques--Data_Classes_as_Types.md#dataclass-inheritance).",
+  "previous": "`Thermometer`'s constructor is simple and suggests using a `dataclass`.",
+  "following": "A `@dataclass` `Thermometer` would have no list of listeners, and `subscribe()` would raise an `AttributeError`.",
+  "similarity": 0.97,
+  "source": "edit-start-30",
+  "added": "2026-09-27",
+  "fault": "A participle such as 'generated' or 'built' leaves unsaid which mechanism produces the thing, when naming the mechanism ('dataclass-generated') removes the doubt.",
+  "status": "searchable",
+  "check": {
+   "before": 0.92,
+   "after": 0.09
+  }
+ },
+ "75ff7633f3bcdff6": {
+  "file": "30_Patterns--Observer.md",
+  "line": 408,
+  "before": "A listener that raises an exception stops the loop, and the listeners after it are not called.",
+  "after": "If a listener raises an exception, the rest of the listeners in the list are not called.",
+  "previous": "`always` misses the first change, and `seen` ends as `['once: 1', 'always: 2']`, with no exception to say a listener was skipped.",
+  "following": "The exception leaves `announce()` and reaches the code that assigned to `celsius`.",
+  "similarity": 0.78,
+  "source": "edit-start-30",
+  "added": "2026-09-27",
+  "fault": "A consequence is stated as a chain of events ('A stops B, and the Cs are not called') where a condition and its result ('If A, the Cs are not called') says it directly.",
+  "status": "searchable",
+  "check": {
+   "before": 0.83,
+   "after": 0.16
+  }
+ },
+ "e169fb753d09feb3": {
+  "file": "30_Patterns--Observer.md",
+  "line": 411,
+  "before": "Decide whether `announce()` should catch, collect, and continue (exercise 3 makes this concrete).",
+  "after": "Decide whether `announce()` should catch, collect, and continue (see exercise 3).",
+  "previous": "The exception leaves `announce()` and reaches the code that assigned to `celsius`.",
+  "following": "A bound method holds the object it came from, so subscribing `plot.redraw` keeps that `plot` in memory for as long as the broadcaster holds the subscription.",
+  "similarity": 0.865,
+  "source": "edit-start-30",
+  "added": "2026-09-27",
+  "fault": "A parenthetical pointer to an exercise describes what the exercise does ('exercise 3 makes this concrete') instead of the bare '(see exercise 3)'.",
+  "status": "searchable",
+  "check": {
+   "before": 0.94,
+   "after": 0.08
+  }
+ },
+ "8d592038d4359768": {
+  "file": "30_Patterns--Observer.md",
+  "line": 649,
+  "before": "A `Grid` is keyed by coordinate, so `cell in grid` is `True` for a coordinate inside the grid and `False` for one outside it.",
+  "after": "A `Grid` is keyed by coordinate, so `cell in grid` is only `True` for a coordinate inside the grid.",
+  "previous": "A cell on the border has fewer neighbors, so some of the coordinates in `cross` lie outside the grid.",
+  "following": "The comprehension's `if` clause applies that test and skips the outside coordinates, so `recolored()` needs no grid size.",
+  "similarity": 0.839,
+  "source": "edit-start-30",
+  "added": "2026-09-27",
+  "fault": "The sentence spells out both halves of a complementary pair ('True for inside and False for outside') when stating one half implies the other.",
+  "status": "searchable",
+  "check": {
+   "before": 0.87,
+   "after": 0.07
+  }
+ },
+ "9bcee743d5c2424c": {
+  "file": "30_Patterns--Observer.md",
+  "line": 672,
+  "before": "Because the model contains no display code, its tests need no GUI.",
+  "after": "The model contains no display code so it can be tested without the challenges of a GUI.",
+  "previous": "`Color` holds the colors and their order, the functions compute grids, and `BoxModel` holds the current grid and notifies its observers.",
+  "following": "Testing confirms that `recolored()` changes the cross and no other cell, that a click in a corner stays on the grid, and that observers receive the new grid after a click:",
+  "similarity": 0.667,
+  "source": "edit-start-30",
+  "added": "2026-09-27",
+  "fault": "",
+  "status": "needs fault"
+ },
+ "5bc1e7edeafc4e8f": {
+  "file": "30_Patterns--Observer.md",
+  "line": 869,
+  "before": "The size decides that, and a 3x3 grid reaches all three colors.",
+  "after": "The size decides that, and a 3x3 grid reaches all three colors (see exercise 9).",
+  "previous": "This is the only color that works; on the 8x8 grid `box_view.py` opens with, no sequence of clicks turns every box `skyblue` or every box `khaki`.",
+  "following": "Exercise 8 works out which sizes reach which colors.",
+  "similarity": 0.881,
+  "source": "edit-start-30",
+  "added": "2026-09-27",
+  "fault": "",
+  "status": "needs fault"
+ },
+ "24958dff3f9ea045": {
+  "file": "30_Patterns--Observer.md",
+  "line": 870,
+  "before": "Exercise 8 works out which sizes reach which colors.",
+  "after": "Write a test in which the first listener fails and the second still records its notification.",
+  "previous": "The size decides that, and a 3x3 grid reaches all three colors.",
+  "following": "The model reuses `broadcaster.Broadcaster`:",
+  "similarity": 0.372,
+  "source": "edit-start-30",
+  "added": "2026-09-27",
+  "fault": "",
+  "status": "needs fault"
+ },
+ "c934711a2696bc86": {
+  "file": "30_Patterns--Observer.md",
+  "line": 1081,
+  "before": "The model names nothing about views, so you can attach a second view to the same model and keep both views in step (see Exercise 7).",
+  "after": "The model names nothing about views, so you can attach a second view to the same model and keep both views in step (see exercise 8).",
+  "previous": "`select()` takes a cell rather than a mouse event, so a keypress, a touch, or a test call drives the model the way a click does.",
+  "following": "The dependency runs one way, and the view is the end that carries it:",
+  "similarity": 0.985,
+  "source": "edit-start-30",
+  "added": "2026-09-27",
+  "fault": "",
+  "status": "needs fault"
+ }
+}

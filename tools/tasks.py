@@ -1168,6 +1168,22 @@ def link_support(v: Vars) -> None:
     run([*TYPESAFE, "tools.link_support", *v.words("ARGS")])
 
 
+@task("Find the book's sentences with a fault Bruce's rewrites fixed "
+      "(advisory; ARGS=--dry-run, --since REF, --report)")
+def edit_patterns(v: Vars) -> None:
+    """Needs TYPESAFE_API_KEY unless ARGS=--dry-run or --report. Collects
+    the sentences Bruce rewrote in the open edit-start pass (or since
+    REF), skipping commits with a Co-Authored-By trailer, and adds each
+    before/after pair to tools/data/edit_pairs.json. A pair with a
+    `fault` line there is checked against its own before and after, then
+    searched for across Chapters/; the hits go to build/edit_patterns.md.
+    A pair without one waits for `/bruce-edit-capture` to name its
+    fault. About five minutes per pass, most of it one screening
+    question for each of the book's 10,400 sentences.
+    """
+    run([*TYPESAFE, "tools.edit_patterns", *v.words("ARGS")])
+
+
 @task("Show every listing line wider than WIDTH=nn (default 60) in the "
       "browser (ARGS=--tsv for rows)",
       defaults={"WIDTH": "60"})

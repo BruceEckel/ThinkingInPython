@@ -276,7 +276,18 @@ On 2026-09-27 (115 restructured rewrites, 299 controls) `would_rewrite`
 led at AUC 0.66 ± 0.03, unchanged by length banding; pointers and
 skipped steps were near 0.58, subject-verb distance near chance. That
 is enough to rank sentences for a human, not to edit on. Rerun it
-before letting a model score steer a prose pass. All three tools share
+before letting a model score steer a prose pass.
+
+`tip edit-patterns` (`tools/edit_patterns.py`, `/edit-done` step 3b)
+turns each sentence Bruce rewrites into a search: the before/after
+pair joins `tools/data/edit_pairs.json`, and once it carries a one-line
+`fault` it is checked against its own before and after and then
+searched for across `Chapters/`. Without a fault line the search
+matches surface features (chapter 30's metadiscourse cut matched 158
+sentences for ending in a colon); with one, the metadiscourse pair's
+top hits were real metadiscourse. The fault line's wording decides the
+precision, so a loose hit list means rewording the fault, not raising
+the 0.7 floor. The search reports; it never edits. All four tools share
 `tools/judgments.py`, and the SDK
 joins only their runs, through `uv run --with typesafe-sdk`: it builds
 `pydantic-core` from source on the pinned Python, so it stays out of

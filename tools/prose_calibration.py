@@ -49,7 +49,6 @@ gates or edits a chapter.
 """
 
 import argparse
-import difflib
 import hashlib
 import json
 import random
@@ -62,15 +61,11 @@ from pathlib import Path
 from statistics import mean
 from typing import Any
 
-from tools import judgments
-from tools.check_self_reference import sentences
+from tools import judgments, sentence_diff
 from tools.config import BUILD_DIR, ROOT
-from tools.markdown import Document
 
 CACHE = BUILD_DIR / "prose_calibration.json"
 SUBJECT = re.compile(r"^(Update \S+\.md|more ch\b.*)$")
-LIST_ITEM = re.compile(r"^(?:[-*+]|\d+\.)\s")
-MIN_CHARS = 40
 RESTRUCTURED = 0.75
 """A rewrite whose before/after similarity is below this changed the
 sentence's shape, not a word or two in it."""
@@ -228,18 +223,6 @@ def commits() -> list[str]:
             if not trailer and SUBJECT.match(subject)]
 
 
-def prose(text: str, name: str) -> list[tuple[int, str]]:
-    doc = Document.from_text(text, Path(name))
-    out = []
-    for line, s in sentences(doc):
-        s = " ".join(s.split())
-        if (len(s) < MIN_CHARS or s.startswith("|") or "[[" in s
-                or LIST_ITEM.match(s) or s.count(" - ") > 1):
-            continue
-        out.append((line, s))
-    return out
-
-
 def collect(seed: int) -> list[Sample]:
     rng = random.Random(seed)
     per_commit: list[tuple[list[Sample], list[Sample]]] = []
@@ -247,25 +230,16 @@ def collect(seed: int) -> list[Sample]:
         changed = git("show", "--format=", "--name-only", "--diff-filter=M",
                       commit, "--", "Chapters/").split()
         for path in changed:
-            before = prose(git("show", f"{commit}^:{path}"), path)
-            after = prose(git("show", f"{commit}:{path}"), path)
-            kept = {s for _, s in after}
-            added = [s for s in kept if s not in {b for _, b in before}]
-            rewrites, alone = [], []
-            for i, (line, s) in enumerate(before):
-                prev = before[i - 1][1] if i else ""
-                nxt = before[i + 1][1] if i + 1 < len(before) else ""
-                if s in kept:
-                    alone.append(Sample(False, commit, Path(path).name,
-                                        line, prev, s, nxt, "", 1.0))
-                    continue
-                best, ratio = "", 0.0
-                for a in added:
-                    r = difflib.SequenceMatcher(None, s, a).ratio()
-                    if r > ratio:
-                        best, ratio = a, r
-                rewrites.append(Sample(True, commit, Path(path).name, line,
-                                       prev, s, nxt, best, round(ratio, 3)))
+            name = Path(path).name
+            found, left = sentence_diff.diff(
+                git("show", f"{commit}^:{path}"),
+                git("show", f"{commit}:{path}"), path)
+            rewrites = [Sample(True, commit, name, r.before.line,
+                               r.before.previous, r.before.text,
+                               r.before.following, r.after, r.similarity)
+                        for r in found]
+            alone = [Sample(False, commit, name, s.line, s.previous,
+                            s.text, s.following, "", 1.0) for s in left]
             if rewrites:
                 per_commit.append((rewrites, alone))
     ever_rewritten = {s.sentence for r, _ in per_commit for s in r}
