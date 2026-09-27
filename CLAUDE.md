@@ -287,18 +287,24 @@ matches surface features (chapter 30's metadiscourse cut matched 158
 sentences for ending in a colon); with one, the metadiscourse pair's
 top hits were real metadiscourse. The fault line's wording decides the
 precision, so a loose hit list means rewording the fault, not raising
-the 0.7 floor. The question sees one sentence on each side and no more, so a
-condition on the wider passage cannot be judged: rewording chapter 30's
-"generated" fault to "in a passage whose context does not already name
-that mechanism" cut its hits from 34 to 5, and all five are chapter 12,
-whose whole subject is that mechanism. `ARGS=--from-rules` searches
-for `bruce_edit_db.md`'s promoted rules, each rule's title, Test, and
-Keep-when lines as the fault. On 2026-09-27 R2, R11, R14, R16, and
-R17 found real instances (R17: "Uncomment the decorator on
-`Typo.shwo`, and the checker reports:"); R5 cannot, since the scan
-skips list items; R1 and R21 matched mostly the wrong shape; eight
-rules were unclear, R12 because its longest sighting is the
-counter-example. The search reports; it never edits. All four tools share
+the 0.7 floor. Since 2026-09-27 a question sees the sentence's
+paragraph and section heading, not only its neighbors. That cleared
+the chapter 12 false alarms a passage-conditioned fault ("in a
+passage that does not already name the mechanism") had drawn, and it
+raised scores generally: the appositive and metadiscourse faults went
+from 69 and 77 hits to 139 and 127, and the chain-to-condition
+fault's list took in sentences already in "If you" form. The 0.7
+floor was read off the neighbor-only run, so recalibrate it against
+hand-labeled hits before trusting a count. `ARGS=--from-rules`
+searches for `bruce_edit_db.md`'s promoted rules, each rule's title,
+Test, and Keep-when lines as the fault and, as its example, the
+sighting the pair check separates best (the longest sighting, used
+first, gave R12 its counter-example). With paragraphs, 14 of 19
+rules were searchable; R9 found its own sighting's shape ("sets a
+single attribute that nothing reads"); R5 cannot find its bullets,
+which the scan skips; R21 still matches colons that introduce
+listings. Fixing the R17 hits it listed (commit 7af64701) left one
+hit: chapter 07's gerund-subject sentence, which the rule allows. The search reports; it never edits. All four tools share
 `tools/judgments.py`, and the SDK
 joins only their runs, through `uv run --with typesafe-sdk`: it builds
 `pydantic-core` from source on the pinned Python, so it stays out of

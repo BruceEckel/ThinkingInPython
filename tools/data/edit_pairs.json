@@ -14,7 +14,9 @@
   "check": {
    "before": 0.94,
    "after": 0.04
-  }
+  },
+  "heading": "Observer",
+  "paragraph": "The *Observer* pattern, a kind of callback, decouples code that changes state from code that reacts to the state change. Something changes, and something else is interested in that change. An *observer* registers interest with a *subject*. When the subject changes state, it notifies the observer. The subject defines only a list of callables and the arguments it passes to them. That choice follows [the principle of designing the communication rather than the parts](21_Patterns--Design_Patterns.md#design-principles). *Observer* is the most dynamic of the callback patterns because observers attach and detach at runtime, and the subject does not name their concrete types."
  },
  "3c9e8c696d07aa79": {
   "file": "30_Patterns--Observer.md",
@@ -29,9 +31,11 @@
   "fault": "After the sentence has made its point, a trailing clause adds a second, vaguer claim that the sentence does not need.",
   "status": "unclear",
   "check": {
-   "before": 0.31,
-   "after": 0.23
-  }
+   "before": 0.36,
+   "after": 0.09
+  },
+  "heading": "Observer",
+  "paragraph": "The classic example is Smalltalk's MVC (model-view-controller), or the nearly-equivalent Document-View architecture. Document-View folds the controller into the view, so it has two parts where MVC has three, but the part *Observer* explains is the same in both: one subject holds a list of views and names no view type. A *document* has more than one way to view it, for example a plot and a table. When the data changes, every view must refresh. With *Observer*, a change in the subject's data notifies each interested view."
  },
  "230cf0cbfea5c70a": {
   "file": "30_Patterns--Observer.md",
@@ -46,9 +50,11 @@
   "fault": "'for example' introduces a short list of nouns inside the sentence, where 'such as' joins the examples to the noun they illustrate.",
   "status": "searchable",
   "check": {
-   "before": 0.89,
+   "before": 0.92,
    "after": 0.05
-  }
+  },
+  "heading": "Observer",
+  "paragraph": "The classic example is Smalltalk's MVC (model-view-controller), or the nearly-equivalent *Document-View* architecture, which folds the controller into the view. In both, *Observer* connects the data to its views: one subject holds a list of views and names no view type. A *document* has more than one way to view it, for example a plot and a table. When the data changes, every view must refresh. With *Observer*, a change in the subject's data notifies each interested view."
  },
  "6b940dc7040019dc": {
   "file": "30_Patterns--Observer.md",
@@ -65,7 +71,9 @@
   "check": {
    "before": 0.94,
    "after": 0.06
-  }
+  },
+  "heading": "The Classic Observer: an Interface to Implement",
+  "paragraph": "The classic design comes from *GoF Design Patterns*, and this section uses that vocabulary:"
  },
  "dee1c1056d000be8": {
   "file": "30_Patterns--Observer.md",
@@ -78,11 +86,13 @@
   "source": "edit-start-30",
   "added": "2026-09-27",
   "fault": "A generic noun ('The design') stands where more than one candidate is in play, and the sentence needs to say which one it means.",
-  "status": "unclear",
+  "status": "searchable",
   "check": {
-   "before": 0.52,
+   "before": 0.8,
    "after": 0.06
-  }
+  },
+  "heading": "The Classic Observer: an Interface to Implement",
+  "paragraph": "The design has three parts: an `Observer` interface every observer implements, a `Subject` base class that keeps the observer list, and `Subject.notify()` that broadcasts to every observer:"
  },
  "76b3127834436d2d": {
   "file": "30_Patterns--Observer.md",
@@ -98,8 +108,10 @@
   "status": "searchable",
   "check": {
    "before": 0.8,
-   "after": 0.14
-  }
+   "after": 0.08
+  },
+  "heading": "The Pythonic Observer: Callables in a List",
+  "paragraph": "`Thermometer`'s constructor is simple and suggests using a `dataclass`. Inheriting does not stop a class from being a `dataclass`, but [a generated `__init__()` does not call the base class's `__init__()`](12_Techniques--Data_Classes_as_Types.md#dataclass-inheritance). A `@dataclass` `Thermometer` would have no list of listeners, and `subscribe()` would raise an `AttributeError`. A `__post_init__()` that calls `super().__init__()` fixes that, but at greater length and complexity than the `__init__()` it replaces."
  },
  "75ff7633f3bcdff6": {
   "file": "30_Patterns--Observer.md",
@@ -114,9 +126,11 @@
   "fault": "A consequence is stated as a chain of events ('A stops B, and the Cs are not called') where a condition and its result ('If A, the Cs are not called') says it directly.",
   "status": "searchable",
   "check": {
-   "before": 0.83,
-   "after": 0.16
-  }
+   "before": 0.82,
+   "after": 0.1
+  },
+  "heading": "A Listener That Raises an Exception",
+  "paragraph": "A listener that raises an exception stops the loop, and the listeners after it are not called. The exception leaves `announce()` and reaches the code that assigned to `celsius`. Decide whether `announce()` should catch, collect, and continue (exercise 3 makes this concrete)."
  },
  "e169fb753d09feb3": {
   "file": "30_Patterns--Observer.md",
@@ -131,9 +145,11 @@
   "fault": "A parenthetical pointer to an exercise describes what the exercise does ('exercise 3 makes this concrete') instead of the bare '(see exercise 3)'.",
   "status": "searchable",
   "check": {
-   "before": 0.94,
-   "after": 0.08
-  }
+   "before": 0.92,
+   "after": 0.07
+  },
+  "heading": "A Listener That Raises an Exception",
+  "paragraph": "A listener that raises an exception stops the loop, and the listeners after it are not called. The exception leaves `announce()` and reaches the code that assigned to `celsius`. Decide whether `announce()` should catch, collect, and continue (exercise 3 makes this concrete)."
  },
  "8d592038d4359768": {
   "file": "30_Patterns--Observer.md",
@@ -148,9 +164,11 @@
   "fault": "The sentence spells out both halves of a complementary pair ('True for inside and False for outside') when stating one half implies the other.",
   "status": "searchable",
   "check": {
-   "before": 0.87,
-   "after": 0.07
-  }
+   "before": 0.78,
+   "after": 0.1
+  },
+  "heading": "A Visual Example of Observers",
+  "paragraph": "`recolored()` computes the grid that results from a click: values in, values out. `cross` lists the clicked cell and the four cells that share an edge with it. A cell on the border has fewer neighbors, so some of the coordinates in `cross` lie outside the grid. A `Grid` is keyed by coordinate, so `cell in grid` is `True` for a coordinate inside the grid and `False` for one outside it. The comprehension's `if` clause applies that test and skips the outside coordinates, so `recolored()` needs no grid size. The comprehension maps each cell that passes the test to its color's `next()`. The dictionary merge from [Containers](03_Foundations--Containers.md#dictionaries) builds the new grid: `|` produces a new dictionary, and when both operands hold the same key, the right operand's value wins. The result is a copy of `grid` that differs in the cells of the cross, and `grid` is unchanged."
  },
  "9bcee743d5c2424c": {
   "file": "30_Patterns--Observer.md",
@@ -163,7 +181,9 @@
   "source": "edit-start-30",
   "added": "2026-09-27",
   "fault": "",
-  "status": "needs fault"
+  "status": "needs fault",
+  "heading": "A Visual Example of Observers",
+  "paragraph": "Because the model contains no display code, its tests need no GUI. Testing confirms that `recolored()` changes the cross and no other cell, that a click in a corner stays on the grid, and that observers receive the new grid after a click:"
  },
  "5bc1e7edeafc4e8f": {
   "file": "30_Patterns--Observer.md",
@@ -176,7 +196,9 @@
   "source": "edit-start-30",
   "added": "2026-09-27",
   "fault": "",
-  "status": "needs fault"
+  "status": "needs fault",
+  "heading": "A Visual Example: a Model and Its View",
+  "paragraph": "One click changes up to five boxes, which makes the window a puzzle: try to turn every box `palegreen`. This is the only color that works; on the 8x8 grid `box_view.py` opens with, no sequence of clicks turns every box `skyblue` or every box `khaki`. The size decides that, and a 3x3 grid reaches all three colors. Exercise 8 works out which sizes reach which colors."
  },
  "24958dff3f9ea045": {
   "file": "30_Patterns--Observer.md",
@@ -189,7 +211,9 @@
   "source": "edit-start-30",
   "added": "2026-09-27",
   "fault": "",
-  "status": "needs fault"
+  "status": "needs fault",
+  "heading": "A Visual Example: a Model and Its View",
+  "paragraph": "One click changes up to five boxes, which makes the window a puzzle: try to turn every box `palegreen`. This is the only color that works; on the 8x8 grid `box_view.py` opens with, no sequence of clicks turns every box `skyblue` or every box `khaki`. The size decides that, and a 3x3 grid reaches all three colors. Exercise 8 works out which sizes reach which colors."
  },
  "c934711a2696bc86": {
   "file": "30_Patterns--Observer.md",
@@ -202,7 +226,9 @@
   "source": "edit-start-30",
   "added": "2026-09-27",
   "fault": "",
-  "status": "needs fault"
+  "status": "needs fault",
+  "heading": "The View",
+  "paragraph": "The model names nothing about views, so you can attach a second view to the same model and keep both views in step (see Exercise 7). The dependency runs one way, and the view is the end that carries it: `box_view.py` imports `BoxModel`, reads `size` and `grid`, and calls `select()`."
  },
  "063e42300b6e4325": {
   "file": "bruce_edit_db.md",
@@ -218,26 +244,26 @@
   "added": "2026-09-27",
   "status": "searchable",
   "check": {
-   "before": 0.9,
-   "after": 0.05
+   "before": 0.86,
+   "after": 0.06
   }
  },
- "07b7fb43ae91f4d4": {
+ "1d4f794cb382cad4": {
   "file": "bruce_edit_db.md",
   "line": 0,
-  "rule": "R10",
-  "before": "Marking the old interface makes the risk visible on a schedule; without the mark, the risk surfaces when you delete something.",
-  "after": "Marking it deprecated keeps it working while it tells each caller what to use instead; without the mark, nothing tells them.",
+  "rule": "R12",
+  "before": "which is what the generic surrogate exists to avoid",
+  "after": "and that tie is what the generic surrogate exists to avoid",
   "previous": "",
   "following": "",
   "similarity": 0.0,
-  "fault": "Replace a judgment or figure about a mechanism with the mechanism. A phrase that evaluates or characterizes rather than describes (\"costs nothing\", \"satisfies\", \"is the exception\", \"they expect\"), or a scare-quoted idiom, where the sentence can state what actually happens. Ask what the reader would observe; if the phrase does not say, replace it. Not a fault when: The judgment is the claim being made and the mechanism is already stated nearby, as in a summary sentence that closes a section.",
-  "source": "R10",
+  "fault": "Name a pointer's antecedent only where a competitor exists. A pronoun, a clause-level \"which\", a \"there\", or a bare \"the class\" with a competing candidate in reach gets its noun; one whose subject just appeared unopposed keeps the pronoun. A refinement of the `/antecedents` pass rather than a new sweep: that pass fires on ambiguity, not on pronouns. Not a fault when: This *is* the keep-when for `/antecedents`. The reverse sighting from chapter 26 below is the point of the entry: a sweep that reads the others as \"prefer the noun\" will overshoot.",
+  "source": "R12",
   "added": "2026-09-27",
   "status": "unclear",
   "check": {
-   "before": 0.28,
-   "after": 0.12
+   "before": 0.5,
+   "after": 0.21
   }
  },
  "1fd6e295cb0a7979": {
@@ -254,8 +280,26 @@
   "added": "2026-09-27",
   "status": "searchable",
   "check": {
-   "before": 0.87,
+   "before": 0.89,
    "after": 0.12
+  }
+ },
+ "21b75864dbdd0dc3": {
+  "file": "bruce_edit_db.md",
+  "line": 0,
+  "rule": "R15",
+  "before": "The solution is to encapsulate object creation: make a common *factory* create every object",
+  "after": "The solution is to encapsulate object creation. A common *factory* creates every object",
+  "previous": "",
+  "following": "",
+  "similarity": 0.0,
+  "fault": "Make the mechanism the subject where the sentence describes how a design behaves. An imperative (\"make a common factory create every object\") or a \"you can VERB\" (\"you can remove that line by letting each subclass register itself\") whose content is how the design works rather than advice to the reader. Put the mechanism in subject position with an indicative verb: \"A common factory creates every object\"; \"Letting each subclass register itself removes that line\". Not a fault when: The sentence is advice or an exercise instruction (\"Use a `set` for membership tests\"), or \"you can\" where the option's existence is the news (the `activate` skill's existing keep, \"You can supply a different `Console` in a test\").",
+  "source": "R15",
+  "added": "2026-09-27",
+  "status": "searchable",
+  "check": {
+   "before": 0.86,
+   "after": 0.09
   }
  },
  "2dc7d5b1c125383a": {
@@ -273,87 +317,15 @@
   "status": "searchable",
   "check": {
    "before": 0.76,
-   "after": 0.04
-  }
- },
- "47aba2455b84050e": {
-  "file": "bruce_edit_db.md",
-  "line": 0,
-  "rule": "R20",
-  "before": "A function that used to take a string and now takes a `Path` can then warn only the string callers.",
-  "after": "A function that now takes a `Path` in place of a string can then warn only the callers still passing a string.",
-  "previous": "",
-  "following": "",
-  "similarity": 0.0,
-  "fault": "Say when the earlier state held instead of \"used to\". Past-habitual \"used to\" (\"a metaclass used to handle\", \"This used to be a Windows concern\"). Say when the earlier state held (\"before 3.14\", \"before those hooks existed\", \"before the change\") or state the present. The purpose sense (\"is used to preserve\") is a different phrase, and House.WeakVerb reports it.",
-  "source": "R20",
-  "added": "2026-09-27",
-  "status": "unclear",
-  "check": {
-   "before": 0.58,
-   "after": 0.08
-  }
- },
- "54b8fd14b115e2f1": {
-  "file": "bruce_edit_db.md",
-  "line": 0,
-  "rule": "R14",
-  "before": "A test confirms the two forms produce the same pizza, and another shows the single-use hazard:",
-  "after": "Testing confirms that the two forms produce the same pizza, and the single-use hazard:",
-  "previous": "",
-  "following": "",
-  "similarity": 0.0,
-  "fault": "Introduce a test listing with \"Testing confirms that ...\". A sentence introducing a test listing whose subject is \"The tests\", \"The test\", \"Tests\", \"A test\", or \"another\" (\"A test confirms X, and another shows Y:\"). Write \"Testing confirms that X, and Y:\". Not a fault when: The sentence names a specific test function.",
-  "source": "R14",
-  "added": "2026-09-27",
-  "status": "searchable",
-  "check": {
-   "before": 0.92,
-   "after": 0.33
-  }
- },
- "59278c876547cde6": {
-  "file": "bruce_edit_db.md",
-  "line": 0,
-  "rule": "R2",
-  "before": "The type checker, via `@final`: one decorator, and an override of `run()` is reported before the program runs.",
-  "after": "The type checker, via `@final`. Discovers an overridden `run()` before the program executes.",
-  "previous": "",
-  "following": "",
-  "similarity": 0.0,
-  "fault": "Cut the tally of what a technique costs. A clause or sentence whose content is a price/cost accounting of what a mechanism requires: \"the price of\", \"it costs nothing\", \"it costs one decorator\", \"one base-class method, and\", \"it needs nothing added\". Delete the accounting and let the mechanism's own sentence lead. Not a fault when: A measured cost (time, memory, a benchmark) is the subject.",
-  "source": "R2",
-  "added": "2026-09-27",
-  "status": "searchable",
-  "check": {
-   "before": 0.88,
-   "after": 0.05
-  }
- },
- "721ffbb8a046a4f2": {
-  "file": "bruce_edit_db.md",
-  "line": 0,
-  "rule": "R9",
-  "before": "first use polymorphism to create a common interface",
-  "after": "first create a base type as a common interface",
-  "previous": "",
-  "following": "",
-  "similarity": 0.0,
-  "fault": "Name the concrete thing instead of a vague adverb or a negation. \"directly\", \"potentially\", \"possibly\", a description by what does not happen (\"an attribute nothing reads\"), or a vague \"other\" / \"the only other\" whose excluded item can be named, where the concrete means, frequency, kind, or item can be named (\"as arguments\", \"sometimes\", \"a type-checking attribute\", \"apart from the new subclass\"). Not a fault when: The concrete word is unknown or would be wrong; a hedge that is the claim (\"potentially unbounded\") stays.",
-  "source": "R9",
-  "added": "2026-09-27",
-  "status": "unclear",
-  "check": {
-   "before": 0.16,
    "after": 0.07
   }
  },
- "8eba0df224f898f0": {
+ "3808f43817005d92": {
   "file": "bruce_edit_db.md",
   "line": 0,
   "rule": "R16",
-  "before": "`copy.replace()` is the general form of the same operation, working on any object that defines `__replace__()`, shown in [The General Form of `replace()`](...).",
-  "after": "`copy.replace()` is the [general form of the operation](...), and works on any object that defines `__replace__()`.",
+  "before": "I have also used a *generator* (see [Iterators](23_Patterns--Iterators.md#generators)).",
+  "after": "I have also used a [*generator*](23_Patterns--Iterators.md#generators).",
   "previous": "",
   "following": "",
   "similarity": 0.0,
@@ -362,8 +334,26 @@
   "added": "2026-09-27",
   "status": "searchable",
   "check": {
-   "before": 0.91,
-   "after": 0.09
+   "before": 0.93,
+   "after": 0.06
+  }
+ },
+ "82b847dfc327c5aa": {
+  "file": "bruce_edit_db.md",
+  "line": 0,
+  "rule": "R4",
+  "before": "Because the registry keys on `cls.__name__` alone, two classes ... overwrite",
+  "after": "The registry keys on `cls.__name__` alone, so two classes ...",
+  "previous": "",
+  "following": "",
+  "similarity": 0.0,
+  "fault": "Front an already-established cause with \"Because\". \"X, so Y\" where X restates something the reader already has (a fact the chapter established, a listing just shown) and Y is the sentence's claim. Rewrite as \"Because X, Y\". Not a fault when: X is new information. Bruce's own \"no subclass exists, so nothing can replace the loop\" keeps \"so\": the absence of a subclass is the point being made. Chapter 26 confirmed this boundary from the other side. Bruce fronted \"Every assignment after `__init__()` reaches the implementation, so ...\" with \"Because\", then later rewrote the same sentence back to \"so\" once he had added \"Now\" and \"via the new `__setattr__()`\", which turned the clause into new information. The revert is evidence for the exception, not against the rule.",
+  "source": "R4",
+  "added": "2026-09-27",
+  "status": "unclear",
+  "check": {
+   "before": 0.42,
+   "after": 0.17
   }
  },
  "940a4dcd81f00bea": {
@@ -380,8 +370,8 @@
   "added": "2026-09-27",
   "status": "searchable",
   "check": {
-   "before": 0.94,
-   "after": 0.06
+   "before": 0.88,
+   "after": 0.05
   }
  },
  "980ea7daaf13356c": {
@@ -398,8 +388,8 @@
   "added": "2026-09-27",
   "status": "searchable",
   "check": {
-   "before": 0.88,
-   "after": 0.08
+   "before": 0.84,
+   "after": 0.11
   }
  },
  "991b1d7c2e58e21f": {
@@ -416,26 +406,44 @@
   "added": "2026-09-27",
   "status": "unclear",
   "check": {
-   "before": 0.43,
-   "after": 0.06
+   "before": 0.41,
+   "after": 0.08
   }
  },
- "9a5a733b92993b6a": {
+ "9aaf8dfc962ec1f9": {
   "file": "bruce_edit_db.md",
   "line": 0,
-  "rule": "R4",
-  "before": "`interact_with()` dispatches on the character's type, and `obstacle.action()` dispatches again on the obstacle's, so the pair of calls",
-  "after": "Because `interact_with()` dispatches ... the pair of calls",
+  "rule": "R17",
+  "before": "Uncomment the line that passes a `BrokenFactory` to `GameEnvironment`, and the checker reports",
+  "after": "If you uncomment the line ..., the checker reports",
   "previous": "",
   "following": "",
   "similarity": 0.0,
-  "fault": "Front an already-established cause with \"Because\". \"X, so Y\" where X restates something the reader already has (a fact the chapter established, a listing just shown) and Y is the sentence's claim. Rewrite as \"Because X, Y\". Not a fault when: X is new information. Bruce's own \"no subclass exists, so nothing can replace the loop\" keeps \"so\": the absence of a subclass is the point being made. Chapter 26 confirmed this boundary from the other side. Bruce fronted \"Every assignment after `__init__()` reaches the implementation, so ...\" with \"Because\", then later rewrote the same sentence back to \"so\" once he had added \"Now\" and \"via the new `__setattr__()`\", which turned the clause into new information. The revert is evidence for the exception, not against the rule.",
-  "source": "R4",
+  "fault": "A reader's experiment is \"If you X, Y\", not \"X, and Y\". An imperative whose only purpose is to set up a hypothetical for the clause after it (\"Uncomment the line, and the checker reports ...\"; \"Define a factory class and stop there: creating an instance still succeeds\"). Rewrite as \"If you X, Y\". Not a fault when: The imperative is an instruction to follow, as in an exercise.",
+  "source": "R17",
   "added": "2026-09-27",
-  "status": "unclear",
+  "status": "searchable",
   "check": {
-   "before": 0.33,
-   "after": 0.59
+   "before": 0.86,
+   "after": 0.07
+  }
+ },
+ "9b57c09582c86d4c": {
+  "file": "bruce_edit_db.md",
+  "line": 0,
+  "rule": "R2",
+  "before": "It needs nothing added, but it only works when",
+  "after": "This only works when",
+  "previous": "",
+  "following": "",
+  "similarity": 0.0,
+  "fault": "Cut the tally of what a technique costs. A clause or sentence whose content is a price/cost accounting of what a mechanism requires: \"the price of\", \"it costs nothing\", \"it costs one decorator\", \"one base-class method, and\", \"it needs nothing added\". Delete the accounting and let the mechanism's own sentence lead. Not a fault when: A measured cost (time, memory, a benchmark) is the subject.",
+  "source": "R2",
+  "added": "2026-09-27",
+  "status": "searchable",
+  "check": {
+   "before": 0.91,
+   "after": 0.06
   }
  },
  "b1ab9b0c7636c81e": {
@@ -452,52 +460,70 @@
   "added": "2026-09-27",
   "status": "unclear",
   "check": {
-   "before": 0.28,
-   "after": 0.16
+   "before": 0.48,
+   "after": 0.28
   }
  },
- "c28e8164a09aac2f": {
+ "d63ed93ab76a791f": {
   "file": "bruce_edit_db.md",
   "line": 0,
-  "rule": "R17",
-  "before": "Uncomment the commented-out signature in `adapter_variations.py`, `what_i_have: WhatIHave`, and the checker reports:",
-  "after": "If you use that signature in place of the union, a type checker rejects the override",
+  "rule": "R20",
+  "before": "This used to be a Windows and macOS concern only",
+  "after": "Before 3.14 this was a Windows and macOS concern only",
   "previous": "",
   "following": "",
   "similarity": 0.0,
-  "fault": "A reader's experiment is \"If you X, Y\", not \"X, and Y\". An imperative whose only purpose is to set up a hypothetical for the clause after it (\"Uncomment the line, and the checker reports ...\"; \"Define a factory class and stop there: creating an instance still succeeds\"). Rewrite as \"If you X, Y\". Not a fault when: The imperative is an instruction to follow, as in an exercise.",
-  "source": "R17",
+  "fault": "Say when the earlier state held instead of \"used to\". Past-habitual \"used to\" (\"a metaclass used to handle\", \"This used to be a Windows concern\"). Say when the earlier state held (\"before 3.14\", \"before those hooks existed\", \"before the change\") or state the present. The purpose sense (\"is used to preserve\") is a different phrase, and House.WeakVerb reports it.",
+  "source": "R20",
   "added": "2026-09-27",
   "status": "searchable",
   "check": {
-   "before": 0.79,
-   "after": 0.06
+   "before": 0.85,
+   "after": 0.14
   }
  },
- "cbc33d05c4ea3cc7": {
+ "de6526e195578e1f": {
   "file": "bruce_edit_db.md",
   "line": 0,
-  "rule": "R12",
-  "before": "because `Proxy` names no methods in `Implementation`, the proxy keeps working",
-  "after": "because `Proxy` names no methods in `Implementation`, it keeps working",
+  "rule": "R10",
+  "before": "That interface makes a library or bundle of resources more comfortable to use",
+  "after": "The caller sees one entry point and never learns how those classes are built and wired together, so the wiring can change without affecting the caller",
   "previous": "",
   "following": "",
   "similarity": 0.0,
-  "fault": "Name a pointer's antecedent only where a competitor exists. A pronoun, a clause-level \"which\", a \"there\", or a bare \"the class\" with a competing candidate in reach gets its noun; one whose subject just appeared unopposed keeps the pronoun. A refinement of the `/antecedents` pass rather than a new sweep: that pass fires on ambiguity, not on pronouns. Not a fault when: This *is* the keep-when for `/antecedents`. The reverse sighting from chapter 26 below is the point of the entry: a sweep that reads the others as \"prefer the noun\" will overshoot.",
-  "source": "R12",
+  "fault": "Replace a judgment or figure about a mechanism with the mechanism. A phrase that evaluates or characterizes rather than describes (\"costs nothing\", \"satisfies\", \"is the exception\", \"they expect\"), or a scare-quoted idiom, where the sentence can state what actually happens. Ask what the reader would observe; if the phrase does not say, replace it. Not a fault when: The judgment is the claim being made and the mechanism is already stated nearby, as in a summary sentence that closes a section.",
+  "source": "R10",
   "added": "2026-09-27",
-  "status": "unclear",
+  "status": "searchable",
   "check": {
-   "before": 0.34,
-   "after": 0.32
+   "before": 0.86,
+   "after": 0.06
   }
  },
- "d45da5292929582c": {
+ "df7445062caaea8e": {
+  "file": "bruce_edit_db.md",
+  "line": 0,
+  "rule": "R14",
+  "before": "The tests confirm that every subclass registers itself",
+  "after": "Testing confirms that every subclass registers itself",
+  "previous": "",
+  "following": "",
+  "similarity": 0.0,
+  "fault": "Introduce a test listing with \"Testing confirms that ...\". A sentence introducing a test listing whose subject is \"The tests\", \"The test\", \"Tests\", \"A test\", or \"another\" (\"A test confirms X, and another shows Y:\"). Write \"Testing confirms that X, and Y:\". Not a fault when: The sentence names a specific test function.",
+  "source": "R14",
+  "added": "2026-09-27",
+  "status": "searchable",
+  "check": {
+   "before": 0.75,
+   "after": 0.41
+  }
+ },
+ "ee49c3483992c669": {
   "file": "bruce_edit_db.md",
   "line": 0,
   "rule": "R1",
-  "before": "The `class Typo` statement raises instead of finishing",
-  "after": "The `class Typo` statement raises a `TypeError` instead of finishing",
+  "before": "returns or raises.",
+  "after": "returns or raises an exception.",
   "previous": "",
   "following": "",
   "similarity": 0.0,
@@ -506,26 +532,26 @@
   "added": "2026-09-27",
   "status": "searchable",
   "check": {
-   "before": 0.95,
-   "after": 0.03
+   "before": 0.94,
+   "after": 0.05
   }
  },
- "f59de5813aec3acd": {
+ "ee6d0229dbe728a7": {
   "file": "bruce_edit_db.md",
   "line": 0,
-  "rule": "R15",
-  "before": "You can remove that line too, so the factory never needs editing when you add a type, by letting each subclass register itself through `__init_subclass__()`",
-  "after": "Letting each subclass register itself through `__init_subclass__()` removes that line too, so the factory never needs editing when you add a type",
+  "rule": "R9",
+  "before": "an attribute nothing reads",
+  "after": "a type-checking attribute",
   "previous": "",
   "following": "",
   "similarity": 0.0,
-  "fault": "Make the mechanism the subject where the sentence describes how a design behaves. An imperative (\"make a common factory create every object\") or a \"you can VERB\" (\"you can remove that line by letting each subclass register itself\") whose content is how the design works rather than advice to the reader. Put the mechanism in subject position with an indicative verb: \"A common factory creates every object\"; \"Letting each subclass register itself removes that line\". Not a fault when: The sentence is advice or an exercise instruction (\"Use a `set` for membership tests\"), or \"you can\" where the option's existence is the news (the `activate` skill's existing keep, \"You can supply a different `Console` in a test\").",
-  "source": "R15",
+  "fault": "Name the concrete thing instead of a vague adverb or a negation. \"directly\", \"potentially\", \"possibly\", a description by what does not happen (\"an attribute nothing reads\"), or a vague \"other\" / \"the only other\" whose excluded item can be named, where the concrete means, frequency, kind, or item can be named (\"as arguments\", \"sometimes\", \"a type-checking attribute\", \"apart from the new subclass\"). Not a fault when: The concrete word is unknown or would be wrong; a hedge that is the claim (\"potentially unbounded\") stays.",
+  "source": "R9",
   "added": "2026-09-27",
   "status": "searchable",
   "check": {
-   "before": 0.91,
-   "after": 0.06
+   "before": 0.93,
+   "after": 0.05
   }
  },
  "fefdb8a3319d99a8": {
@@ -543,7 +569,7 @@
   "status": "unclear",
   "check": {
    "before": 0.62,
-   "after": 0.29
+   "after": 0.17
   }
  }
 }

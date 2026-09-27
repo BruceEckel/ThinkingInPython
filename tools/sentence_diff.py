@@ -26,16 +26,49 @@ LIST_ITEM = re.compile(r"^(?:[-*+]|\d+\.)\s")
 MIN_CHARS = 40
 
 
+PARAGRAPH_LIMIT = 2_000
+
+
 @dataclass(frozen=True)
 class Sentence:
     line: int
     text: str
     previous: str
     following: str
+    heading: str = ""
+    """The nearest heading above the sentence, `#` marks removed."""
+    paragraph: str = ""
+    """The whole paragraph holding the sentence, whitespace collapsed.
+    A judgment about the passage ("the context does not already name
+    the mechanism") needs more than the neighboring sentences."""
+
+
+def surroundings(doc: Document) -> tuple[list[str], list[str]]:
+    """Per line: the heading above it and the paragraph holding it."""
+    fenced = doc.in_fence()
+    headings: list[str] = []
+    paragraphs: list[str] = [""] * len(doc.lines)
+    heading, start = "", None
+    for i, line in enumerate([*doc.lines, ""]):
+        prose_line = i < len(doc.lines) and not fenced[i] and line.strip()
+        if prose_line and line.startswith("#"):
+            heading = line.lstrip("#").strip()
+            prose_line = ""
+        if prose_line and start is None:
+            start = i
+        if not prose_line and start is not None:
+            text = " ".join(" ".join(doc.lines[start:i]).split())
+            for j in range(start, i):
+                paragraphs[j] = text[:PARAGRAPH_LIMIT]
+            start = None
+        if i < len(doc.lines):
+            headings.append(heading)
+    return headings, paragraphs
 
 
 def prose(text: str, name: str) -> list[Sentence]:
     doc = Document.from_text(text, Path(name))
+    headings, paragraphs = surroundings(doc)
     kept: list[tuple[int, str]] = []
     for line, s in sentences(doc):
         s = " ".join(s.split())
@@ -45,7 +78,8 @@ def prose(text: str, name: str) -> list[Sentence]:
         kept.append((line, s))
     return [Sentence(line, s,
                      kept[i - 1][1] if i else "",
-                     kept[i + 1][1] if i + 1 < len(kept) else "")
+                     kept[i + 1][1] if i + 1 < len(kept) else "",
+                     headings[line - 1], paragraphs[line - 1])
             for i, (line, s) in enumerate(kept)]
 
 

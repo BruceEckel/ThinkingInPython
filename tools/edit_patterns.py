@@ -99,7 +99,10 @@ CONFIRM = {
             "Does `sentence` have that fault, so that the same kind of "
             "rewrite would improve it? Judge the fault as named, not "
             "shared words, shared punctuation, or a shared topic. "
-            "`previous_sentence` and `next_sentence` are context."),
+            "`paragraph` is the paragraph holding `sentence`, and "
+            "`section_heading` names its section; judge any condition "
+            "the fault states about the surrounding passage from "
+            "them."),
     },
     "criteria": {
         "true": ("`sentence` has the fault the example's rewrite fixed, "
@@ -114,8 +117,10 @@ SCREEN_INSTRUCTIONS = (
     "made to one sentence: its `before` became its `after`, fixing the "
     "fault its `fault` names. Which option's fault does `sentence` "
     "also have? Judge the fault as named, not shared words, shared "
-    "punctuation, or a shared topic. `previous_sentence` and "
-    "`next_sentence` are context.")
+    "punctuation, or a shared topic. `paragraph` is the paragraph "
+    "holding `sentence`, and `section_heading` names its section; "
+    "judge any condition a fault states about the surrounding passage "
+    "from them.")
 NONE = ("`sentence` has none of the faults these rewrites fixed.")
 
 
@@ -129,8 +134,13 @@ def pair_key(before: str, after: str) -> str:
 
 
 def context(s: Sentence) -> dict[str, str]:
-    return {"previous_sentence": s.previous, "sentence": s.text,
-            "next_sentence": s.following}
+    """What a question sees of one sentence. The paragraph replaced the
+    neighboring sentences: chapter 30's "generated" fault, conditioned
+    on a passage that does not name the mechanism, still matched five
+    chapter 12 sentences whose neighbors did not say `@dataclass` and
+    whose paragraphs did."""
+    return {"section_heading": s.heading, "paragraph": s.paragraph,
+            "sentence": s.text}
 
 
 def git(*args: str) -> str:
@@ -188,14 +198,19 @@ RULES_FILE = ROOT / "bruce_edit_db.md"
 SIGHTING = re.compile(r'"([^"]{12,}?)"\s*->\s*"([^"]*?)"')
 
 
-def rule_pairs() -> Iterator[dict[str, Any]]:
-    """One pair per promoted rule in `bruce_edit_db.md`.
+SIGHTINGS_TRIED = 8
+
+
+def rule_pairs() -> Iterator[list[dict[str, Any]]]:
+    """Each promoted rule in `bruce_edit_db.md`, as candidate pairs.
 
     A rule already states its fault: the title says what to do, the
     **Test.** line says where it applies, and **Keep when.** says where
-    it does not. Its example is the longest quoted sighting, since a
-    sighting is usually a fragment and the longest carries the most of
-    its sentence.
+    it does not. Every quoted sighting (the `SIGHTINGS_TRIED` longest)
+    is a candidate example, and `best_example()` keeps one. Taking the
+    longest sighting, as the first version did, gave R12 its
+    counter-example: the one sighting where Bruce un-named a pointer,
+    which its own fault line then could not see.
     """
     text = RULES_FILE.read_text(encoding="utf-8")
     promoted = text[text.index("\n## Rules"):text.index("\n## Candidates")]
@@ -207,17 +222,33 @@ def rule_pairs() -> Iterator[dict[str, Any]]:
             m = re.search(rf"\*\*{name}\.\*\*(.*?)(?:\n\n|\Z)", body, re.S)
             return " ".join(m[1].split()) if m else ""
 
-        sightings = SIGHTING.findall(" ".join(body.split()))
+        sightings = sorted(set(SIGHTING.findall(" ".join(body.split()))),
+                           key=lambda p: -len(p[0]))[:SIGHTINGS_TRIED]
         if not sightings:
             continue
-        before, after = max(sightings, key=lambda p: len(p[0]))
         keep = field("Keep when")
         fault = f"{title}. {field('Test')}"
         if keep and not keep.lower().startswith("none"):
             fault += f" Not a fault when: {keep}"
-        yield {"file": RULES_FILE.name, "line": 0, "rule": rule,
-               "before": before, "after": after, "previous": "",
-               "following": "", "similarity": 0.0, "fault": fault}
+        yield [{"file": RULES_FILE.name, "line": 0, "rule": rule,
+                "before": before, "after": after, "previous": "",
+                "following": "", "similarity": 0.0, "fault": fault}
+               for before, after in sightings]
+
+
+def best_example(cache: "Cache", candidates: list[dict[str, Any]]
+                 ) -> dict[str, Any]:
+    """The candidate whose own before shows the fault most and whose
+    after shows it least, by the pair check's two scores."""
+    confirm(cache, [(p, own(p, side)) for p in candidates
+                    for side in ("before", "after") if p[side]])
+
+    def margin(p: dict[str, Any]) -> float:
+        after = (cache.get(confirm_key(p, own(p, "after")))
+                 if p["after"] else 0.0)
+        return cache.get(confirm_key(p, own(p, "before"))) - after
+
+    return max(candidates, key=margin)
 
 
 def book() -> list[tuple[str, Sentence]]:
@@ -253,8 +284,7 @@ class Cache:
 
 def confirm_key(pair: dict[str, Any], s: Sentence) -> str:
     return "confirm:" + judgments.key(
-        digest(example(pair)), s.previous, s.text, s.following,
-        digest(CONFIRM))
+        digest(example(pair)), digest(context(s)), digest(CONFIRM))
 
 
 def confirm(cache: Cache, jobs: list[tuple[dict[str, Any], Sentence]]
@@ -271,8 +301,12 @@ def confirm(cache: Cache, jobs: list[tuple[dict[str, Any], Sentence]]
 
 
 def own(p: dict[str, Any], side: str) -> Sentence:
-    """The pair's before or after, in the before's context."""
-    return Sentence(p["line"], p[side], p["previous"], p["following"])
+    """The pair's before or after, set in the before's paragraph."""
+    paragraph = p.get("paragraph", "")
+    if side == "after":
+        paragraph = paragraph.replace(p["before"], p["after"])
+    return Sentence(p["line"], p[side], p["previous"], p["following"],
+                    p.get("heading", ""), paragraph)
 
 
 def check_pairs(cache: Cache, pairs: dict[str, dict[str, Any]],
@@ -308,8 +342,7 @@ def screen(cache: Cache, pairs: dict[str, dict[str, Any]],
         tag = digest(question)
 
         def key(s: Sentence) -> str:
-            return "screen:" + judgments.key(
-                tag, s.previous, s.text, s.following)
+            return "screen:" + judgments.key(tag, digest(context(s)))
 
         todo = [s for _, s in sentences if cache.get(key(s)) is None]
         if todo:
@@ -380,21 +413,26 @@ def main(argv: list[str] | None = None) -> int:
         keys = list(pairs)
     elif args.from_rules:
         today = datetime.date.today().isoformat()
+        rules = list(rule_pairs())
+        if args.dry_run:
+            for candidates in rules:
+                print(f"{candidates[0]['rule']}: {len(candidates)} "
+                      f"sighting(s); {candidates[0]['fault'][:120]}")
+            print(f"\n{len(rules)} rules, "
+                  f"{sum(len(c) for c in rules) * 2} check questions")
+            return 0
         keys = []
-        for rp in rule_pairs():
+        for candidates in rules:
+            rp = best_example(cache, candidates)
             k = judgments.key(rp["rule"], rp["before"], rp["after"])
             keys.append(k)
+            for old in [o for o, v in pairs.items()
+                        if v.get("rule") == rp["rule"] and o != k]:
+                del pairs[old]  # an example this run did not choose
             entry = pairs.setdefault(k, {**rp, "source": rp["rule"],
                                          "added": today, "status": "new"})
             entry["fault"] = rp["fault"]  # the store is the authority
-        if args.dry_run:
-            for k in keys:
-                p = pairs[k]
-                print(f"{p['rule']}: {p['fault'][:150]}")
-                print(f"  - {p['before']}")
-                print(f"  + {p['after'] or '(deleted)'}")
-            print(f"\n{len(keys)} rules")
-            return 0
+        cache.save()
     else:
         source = args.span or args.since or open_pass()
         today = datetime.date.today().isoformat()
@@ -403,13 +441,17 @@ def main(argv: list[str] | None = None) -> int:
             after = r.after if r.similarity >= DELETED else ""
             k = pair_key(r.before.text, after)
             keys.append(k)
-            pairs.setdefault(k, {
+            entry = pairs.setdefault(k, {
                 "file": f, "line": r.before.line,
                 "before": r.before.text, "after": after,
                 "previous": r.before.previous,
                 "following": r.before.following,
                 "similarity": r.similarity, "source": source,
                 "added": today, "fault": "", "status": "new"})
+            # Refreshed on every run, so a pair stored before these
+            # fields existed gains them.
+            entry["heading"] = r.before.heading
+            entry["paragraph"] = r.before.paragraph
         if args.dry_run:
             for k in keys:
                 p = pairs[k]
