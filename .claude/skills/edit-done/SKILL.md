@@ -108,6 +108,20 @@ docstring has the mechanics). While the tag still exists:
    run of chapters, worked for 197 hits), Bruce decides on the page,
    and `fix_triage apply` edits the chapters; run `tip verify-ch` for
    each chapter it touched and commit per chapter.
+   Tell the proposing agents what Bruce decided on the first page
+   (2026-09-27, the metadiscourse fault): he cut 85 of the 132
+   sentences the agents had marked "not this fault" and treated 175 of
+   183 hits as real. So for metadiscourse, a chapter or section
+   roadmap ("This chapter covers...", "The rest of this chapter..."),
+   a sentence that only introduces the listing below it (his rule R7),
+   and a "the next section..." pointer are the fault, and the usual
+   fix is the cut: propose `{"delete": true}`, not `not_fault`, unless
+   the sentence carries a fact nothing else states. Two cases still
+   need a rewrite, not a cut: a sentence in a chapter's opening
+   blockquote, whose epigraph gate needs two to four lines, and a
+   sentence that is the only lead-in to a bulleted list or a table.
+   Proposing agents are cautious by default; "when unsure, prefer
+   not_fault" was the wrong instruction for this fault.
 
 ## Step 4: verify and commit
 
