@@ -12,13 +12,12 @@ and a change to that logic means editing every copy.
 A decorator is a callable that you apply to a function or a class.
 The decorator receives the thing it decorates, does something with it,
 then returns a result, which Python binds to the original name.
-Most decorators apply to functions, so this chapter starts there.
+Most decorators apply to functions.
 
 ## What `@` Does {#what-at-does}
 
 To apply a decorator,
 put `@` followed by the decorator name on the line above the definition.
-For simplicity, this first example uses an untyped `Callable`:
 
 ```python
 # simple_decoration.py
@@ -37,9 +36,6 @@ def cheese() -> None:
 cheese()
 #: Replacement behavior
 ```
-
-Later, [Maintaining the Wrapped Interface](#maintaining-the-wrapped-interface)
-shows decorators with types.
 
 The `@hijack` above `cheese()` means:
 
@@ -478,7 +474,6 @@ Stacking works because each wrapper preserves the interface of what it wraps:
 every layer looks like the original function,
 so the layers compose to any depth.
 
-`test_stacking.py` confirms both claims:
 the name survives two layers of wrapping,
 and the inner decorator still repeats the body once per outer call:
 
@@ -696,7 +691,6 @@ if __name__ == "__main__":
 in the constructor rather than in the outer function.
 With decorator arguments,
 the class form is typically easier to reason about than the [function form](#decorators-that-take-arguments).
-`test_repeat_class.py` checks the same cases:
 
 ```python
 # test_repeat_class.py
@@ -950,9 +944,8 @@ so those two raise an `AttributeError` at the call,
 while the function and the bound method run.
 
 The return side is equally unconstrained.
-This chapter opened by saying a decorator "returns a result,
-which Python binds to the original name."
-That result need not be callable:
+A decorator "returns a result, which Python binds to the original name,"
+and that result need not be callable:
 
 ```python
 # run_once.py
