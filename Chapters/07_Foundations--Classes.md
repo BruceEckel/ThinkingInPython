@@ -309,7 +309,7 @@ A type checker now verifies that claim.
 If a decorated method matches nothing in a base class,
 whether from a misspelling or from a base method that no longer exists,
 the checker reports an error.
-Uncomment the decorator on `Typo.shwo`, and the checker reports:
+If you uncomment the decorator on `Typo.shwo`, the checker reports:
 
 ```text
 error[invalid-explicit-override]: Method `shwo` is decorated with

@@ -1695,8 +1695,8 @@ give it a `str` and it produces an Effect that needs nothing and cannot fail.
 so `reporter("Alice")` comes first and `run()` second.
 
 Moving the error into the result forces every caller to match on it.
-Drop the `match` and use `value` directly as a number,
-and the type checker reports an error:
+If you drop the `match` and use `value` directly as a number,
+the type checker reports an error:
 
 ```text
 error[unsupported-operator]: Unsupported `+` operation

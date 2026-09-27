@@ -44,10 +44,11 @@ A system that does so is an *Effect Management System*.
 
 An *Effect* is anything a caller takes on by making a call,
 beyond receiving the return value.
-Call a function that writes to an audit log,
-and your function writes to an audit log.
-Call one that reads the time of day, and your result depends on the time of day.
-Call one that raises a `ValueError`, and your function raises a `ValueError`.
+If you call a function that writes to an audit log,
+your function writes to an audit log.
+If you call one that reads the time of day,
+your result depends on the time of day.
+If you call one that raises a `ValueError`, your function raises a `ValueError`.
 You inherit each of these by calling,
 and ordinarily no signature on the path mentions any of them.
 
