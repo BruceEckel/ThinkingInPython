@@ -196,8 +196,6 @@ inherit from `ABC` and declare that step with `@abstractmethod`,
 as shown in [Rethinking Objects](20_Patterns--Rethinking_Objects.md#abstract-base-classes).
 The runtime then refuses to instantiate a subclass that forgot it.
 
-The test supplies a recording subclass and verifies the anchored flow:
-
 ```python
 # test_template_method.py
 from typing import override
