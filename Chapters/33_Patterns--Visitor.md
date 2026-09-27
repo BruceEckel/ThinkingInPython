@@ -433,7 +433,6 @@ so writing `nectar()` rather than `fragrance()` selects it before the program ru
 The flower's type is the one thing left for runtime to resolve,
 and one dispatch covers it.
 
-The chapter opens with the difference in intent.
 *Visitor* adds operations to a hierarchy you cannot edit,
 and its double dispatch is the means.
 *Multiple Dispatching* is the end in itself: two objects must interact,
