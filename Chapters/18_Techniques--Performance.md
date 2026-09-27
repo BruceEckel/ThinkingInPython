@@ -40,9 +40,6 @@ not at the size that is convenient to type.
 If it is too slow, try the simplest remedy first.
 That might be enough, and if it is, you save time and money.
 
-The rest of this chapter works through performance problems,
-starting with the simplest techniques and growing successively more complex.
-
 ## Try a Faster Platform
 
 The cheapest platform change is a newer CPython.
@@ -53,8 +50,7 @@ Moving a project forward two or three releases costs a test run rather than a re
 A speedup that needs neither new code nor new hardware is rare.
 
 Two more speedups need no new code: the tail-calling interpreter,
-and the experimental just-in-time compiler inside CPython,
-the subjects of the next two sections.
+and the experimental just-in-time compiler inside CPython.
 
 Alternative interpreters for Python exist, notably PyPy,
 which claims about a 3x speedup on average.
@@ -216,7 +212,6 @@ a deterministic tracing profiler that arrived in 2006 and records every function
 The second, new in Python 3.15, is a sampling profiler.
 `cProfile`'s numbers are exact, but the instrumentation slows the program,
 sometimes enough to distort the behavior you are measuring.
-Here's how you run `cProfile` on `my_program.py`:
 
     uv run python -m cProfile -s cumulative my_program.py
 
@@ -686,7 +681,6 @@ Under heavy insert traffic consider the heap below instead.
 That leaves three ways to answer the same membership question: scan a `list`,
 binary-search a sorted `list` with `bisect`,
 or hash straight to the answer with a `set`.
-Timing all three together shows the size of each step:
 
 ```python
 # search_comparison.py
@@ -1004,7 +998,6 @@ print(fib_cached(25), fib_cached.cache_info().misses)
 Same answer, from 242,785 calls against 26.
 Every avoided call is work the cached version never does,
 and the gap widens as `n` grows.
-This listing measures the counts, not a stopwatch.
 
 `cache` holds every result forever,
 but `functools.lru_cache(maxsize=n)` bounds the memory by discarding the least recently used entry.
@@ -1208,7 +1201,6 @@ so the checker does not know `Point` is slotted.
 On a frozen class that gap has no effect,
 because the checker rejects every assignment to an instance.
 
-The listings from here on use `@record` for a frozen data class.
 A class whose base declares no `__slots__` writes `@record(slots=False)`:
 the base gives every instance its `__dict__` back,
 so slots on the subclass would remove nothing,
@@ -1595,10 +1587,6 @@ and [maturin](https://www.maturin.rs)
 builds and installs the result as an ordinary Python package.
 `maturin new --bindings pyo3 fastcount` scaffolds the project,
 and one attribute turns a Rust function into a Python function.
-Here is the complete crate,
-reimplementing `count_primes` from [JIT Compilation with Numba](#jit-compilation-with-numba)
-and `collatz_lengths` from [Combine NumPy and Numba](#combine-numpy-and-numba)
-above:
 
 ```rust
 // fastcount/src/lib.rs
