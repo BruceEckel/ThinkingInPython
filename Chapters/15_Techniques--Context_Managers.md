@@ -10,7 +10,7 @@ marks out a span of execution:
 it runs setup before a block and cleanup after it,
 even if the block raises an exception.
 That guarantee is far more reliable than the [`__del__()` approach](10_Foundations--Cleanup.md).
-This chapter shows how to write your own context managers, and how `with` works.
+Writing your own context managers shows how `with` works.
 
 The payoff is a borrower's contract two lines long:
 
@@ -30,7 +30,7 @@ The `contextlib.contextmanager` decorator turns that function into a context man
 The `yield` here works the way it does in a `pytest` fixture that [`yield`s its value](11_Techniques--Testing.md#fixtures-replace-setup-and-teardown):
 everything before it is setup, everything after it is teardown.
 [Iterators](23_Patterns--Iterators.md#generators) covers generators in full.
-This chapter needs nothing beyond that shape.
+A context manager needs nothing beyond that shape.
 
 ```python
 # trace_gen.py
@@ -135,8 +135,6 @@ if __name__ == "__main__":
 #: exit A
 ```
 
-`with Trace("A") as t:` takes these steps:
-
 1. Evaluate `Trace("A")` to produce a manager object.
 2. Call the manager's `__enter__()`.
 3. Bind `__enter__()`'s return value to `t`.
@@ -148,8 +146,6 @@ The return annotation `Self`
 (introduced in [Static Types](08_Foundations--Static_Types.md#the-self-type))
 declares an instance of the class on which the method is called,
 so it adapts to subclasses.
-`__exit__()` takes three arguments describing any exception;
-[The `__exit__()` Arguments](#the-__exit__-arguments) covers them.
 
 In generator terms, `__enter__()` is the portion before the `yield`.
 `__exit__()` is the portion after it.
@@ -316,9 +312,6 @@ print("survived")
 `suppress` is a class named like a function because you use it like one.
 See [Naming Conventions](02_Foundations--Tour.md#naming-conventions)
 for when a class departs from `CapWords`.
-
-Writing your own version as a class shows the suppression directly,
-in the two lines that decide the return value:
 
 ```python
 # expected_one.py
@@ -581,7 +574,6 @@ The machinery applies [`functools.wraps`](14_Techniques--Decorators.md#wraps-kee
 so `report` keeps its name and docstring.
 
 Here's the same `banner` as a class.
-This time it inherits from `ContextDecorator`:
 
 ```python
 # banner_cm.py
