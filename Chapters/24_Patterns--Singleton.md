@@ -356,8 +356,6 @@ override `__new__()`, as `singleton_class_variable.py` does.
 
 Modules and cached factories, primed at import time if threads are in play,
 should cover your singleton needs.
-The rest of this chapter is here for the techniques it demonstrates,
-not because you need these forms.
 
 ## The Classic Implementations
 
@@ -690,7 +688,8 @@ so later calls append to the shared instance instead of overwriting it.
 [Metaprogramming](17_Techniques--Metaprogramming.md)
 also covers `__init_subclass__()` and `__set_name__()`,
 the simpler hooks that replace most metaclasses.
-A singleton needs none of this machinery.
+A singleton needs none of this machinery,
+since a module or a cached factory gives you one instance without intercepting construction.
 
 ## Which Should You Use?
 
@@ -711,7 +710,7 @@ Use the lightest tool that fits:
 
 The elaborate *GoF Design Patterns* singleton is largely a workaround for languages where a module is not a first-class,
 single-instance namespace.
-In Python, most of the ceremony falls away.
+In Python, a module is that single instance, so most of the ceremony falls away.
 
 ## Exercises
 
