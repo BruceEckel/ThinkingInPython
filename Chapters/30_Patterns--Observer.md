@@ -10,19 +10,17 @@ An *observer* registers interest with a *subject*.
 When the subject changes state, it notifies the observer.
 The subject knows each observer only as something to call,
 and it decides which arguments every call receives.
-That choice follows [the principle of designing the communication rather than the parts](21_Patterns--Design_Patterns.md#design-principles).
-*Observer* is the most dynamic of the callback patterns because observers attach and detach at runtime,
-and the subject does not name their concrete types.
+This is [designing the communication rather than the parts](21_Patterns--Design_Patterns.md#design-principles).
 
+*Observer* is the most dynamic of the callback patterns because observers attach and detach at runtime.
 Use *Observer* if a group of objects must update themselves when other objects change state.
-The common use is event handling:
+Event handling is a common use:
 a widget keeps a list of handlers and calls each one when its event arrives.
 
 The classic example is Smalltalk's MVC (model-view-controller),
-or the nearly-equivalent Document-View architecture.
-Document-View folds the controller into the view,
-so it has two parts where MVC has three.
-*Observer* explains the same connection in both:
+or the nearly-equivalent *Document-View* architecture,
+which folds the controller into the view.
+In both, *Observer* connects the data to its views:
 one subject holds a list of views and names no view type.
 A *document* has more than one way to view it, for example a plot and a table.
 When the data changes, every view must refresh.
