@@ -8,8 +8,6 @@ These special objects are *classes*,
 and you configure them to produce the objects you want.
 
 Classes are also objects, and you can modify objects.
-The listings here use `display_object()`,
-the inspection helper this chapter builds in [Building `display_object()`](#building-display_object):
 
 ```python
 # modify_class.py
@@ -92,8 +90,7 @@ but simpler hooks cover almost every case a metaclass handled before those hooks
   transform a class after Python builds it.
 
 Use a metaclass only when these cannot do the job.
-This chapter starts by building classes by hand,
-to show what a `class` statement actually does.
+Building classes by hand shows what a `class` statement does.
 Then come the simpler hooks, and metaclasses for the jobs that still need them.
 The `inspect` module closes the chapter from the other side,
 reading class structure instead of changing it.
@@ -218,9 +215,7 @@ Each generated class is a real type, not a label.
 `LightOn` and `WaterOff` are both `Event` instances,
 so `isinstance(light, Event)` is `True`,
 but `type(light) is type(water)` is `False`: they are distinct subclasses,
-and `isinstance()` tells them apart.
-The greenhouse listing below shows what a distinct subclass gives you:
-behavior of its own.
+and `isinstance()` tells them apart. behavior of its own.
 
 `ty` cannot follow a class built by `type()`.
 It models `new_cls` as unknown, so it checks nothing about the generated class.
@@ -379,8 +374,6 @@ so `EventMakers.__getitem__()` can check a `class_name` against those names befo
 The dict's value type is `EventMaker | NOT_CREATED`,
 naming the sentinel value rather than the generic `sentinel` class,
 so ruling out one member with `maker is NOT_CREATED` leaves `EventMaker` in the other branch.
-[Choosing Which Dunders to Show](#choosing-which-dunders-to-show)
-uses the same idiom.
 
 ## Generating Classes with `exec()`
 
@@ -685,7 +678,7 @@ def test_runtime_non_final_base_can_be_subclassed() -> None:
 
 ## Where Enforcement Lives
 
-The last two sections keep circling one question:
+Each device for constraining a class answers one question:
 who enforces a rule about a class, and when?
 The language devices you have met divide into four families.
 
@@ -1362,7 +1355,6 @@ Use a metaclass when you need to change the class object rather than react to it
   `__init_subclass__()` needs a common base to live on,
   and the shared metaclass is what such a family has instead.
 
-The first bullet has a listing to show for it.
 A metaclass can give the class itself an `__iter__()`,
 the same hook that lets `EnumType` make `for c in Color` work:
 
@@ -1514,7 +1506,6 @@ and `__annotations_cache__` holds the result after the first request.
 `display_object()` combines three of these functions:
 `getmembers_static()` finds the members, `signature()` renders each method,
 and `get_annotations()` supplies the declared types.
-The next section describes what it does with them.
 Its source and its display options are reference material,
 collected in [`display_object()` Reference](#display_object-reference)
 at the end of this chapter.
@@ -1558,7 +1549,6 @@ so it applies whether or not the attribute's declaration uses `typing.ClassVar`.
 ## Which Hook for Which Job
 
 Every hook in this chapter is an ordinary function that Python calls at a known moment during class construction.
-Putting them all in one class shows the sequence:
 
 ```python
 # hook_order.py
@@ -1625,8 +1615,6 @@ because `type.__new__()` calls them as it assembles the class,
 so they are not merely "after the body" but inside the metaclass's own construction step.
 The decorator is last, because it receives a class that is already finished.
 
-Knowing that sequence picks the hook for the job:
-
 - React to each new subclass: `__init_subclass__()`.
 - Let a class attribute learn its own name: `__set_name__()`.
 - Rewrite a finished class: a class decorator.
@@ -1648,8 +1636,6 @@ each time someone calls the finished class.
 
 The rest of `display_object()` is presentation:
 how it formats what `inspect` reports, and which members it shows.
-That belongs to the tool rather than to metaprogramming,
-so this section collects it.
 Read it when a listing's output raises a question, and skip it otherwise.
 
 ### Building `display_object()`
