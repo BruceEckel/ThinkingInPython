@@ -24,7 +24,7 @@ and `yield from`, which composes generators and produces the inner generator's r
 Every Effect in this chapter is such a generator.
 Stateless supplies the vocabulary for the requests and the driver that answers them.
 
-This chapter covers the two channels an Effect declares:
+An Effect declares two channels:
 the dependencies it needs and the ways it can fail.
 Both channels live in the signature,
 and both use the yield channel a generator already carries.
@@ -541,10 +541,8 @@ error[invalid-argument-type]: Argument to function `run` is incorrect
 
 In Stateless, an unsupplied dependency is a type error,
 not a production incident.
-No test needs to exercise the path,
-and no reviewer needs to notice the omission.
-
-The expected type in that message names two things that come later in this chapter:
+The type checker finds the omission,
+so you need no test that exercises the path and no reviewer who happens to notice it.
 
 - `Async` is a built-in Ability for asynchronous work,
   which `run()` handles on its own.
@@ -1440,7 +1438,6 @@ if __name__ == "__main__":
 
 `score()` looks like an ordinary function that raises a `KeyError`,
 but `@throws` changes its type.
-`ty check scores.py` reports what it becomes:
 
 ```text
 info[revealed-type]: Revealed type
@@ -1559,8 +1556,7 @@ so the signature keeps declaring a failure that can no longer escape.
 A `catch()` further out changes the outcome again:
 it matches the yielded value before the driver sees it and returns that value as the result,
 so the inner `except` never runs.
-`catch()` alone moves an error in the type,
-and it is the next section's subject.
+`catch()` alone moves an error in the type.
 One listing shows all three facts:
 
 ```python
@@ -1817,8 +1813,7 @@ They only relocate.
 
 ## Emptying the Channels
 
-The two halves of this chapter taught two vocabularies,
-and a third case that needs none:
+Emptying a channel takes one of two vocabularies, and a third case needs none:
 
 1. A dependency is an object created elsewhere.
    `need()` records the request as a `Need` in the type,
