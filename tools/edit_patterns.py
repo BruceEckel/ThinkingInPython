@@ -196,6 +196,30 @@ def rewrites(since: str | None, span: str | None
                 yield path.split("/")[-1], r
 
 
+def record_pass(pairs: dict[str, dict[str, Any]], since: str | None,
+                span: str | None) -> list[str]:
+    """Add the edit's rewrites to `pairs`; return their keys in order."""
+    source = span or since or open_pass()
+    today = datetime.date.today().isoformat()
+    keys = []
+    for f, r in rewrites(since, span):
+        after = r.after if r.similarity >= DELETED else ""
+        k = pair_key(r.before.text, after)
+        keys.append(k)
+        entry = pairs.setdefault(k, {
+            "file": f, "line": r.before.line,
+            "before": r.before.text, "after": after,
+            "previous": r.before.previous,
+            "following": r.before.following,
+            "similarity": r.similarity, "source": source,
+            "added": today, "fault": "", "status": "new"})
+        # Refreshed on every run, so a pair stored before these fields
+        # existed gains them.
+        entry["heading"] = r.before.heading
+        entry["paragraph"] = r.before.paragraph
+    return keys
+
+
 RULES_FILE = ROOT / "bruce_edit_db.md"
 SIGHTING = re.compile(r'"([^"]{12,}?)"\s*->\s*"([^"]*?)"')
 
@@ -436,25 +460,11 @@ def main(argv: list[str] | None = None) -> int:
             entry["fault"] = rp["fault"]  # the store is the authority
         cache.save()
     else:
-        source = args.span or args.since or open_pass()
-        today = datetime.date.today().isoformat()
-        keys = []
-        for f, r in rewrites(args.since, args.span):
-            after = r.after if r.similarity >= DELETED else ""
-            k = pair_key(r.before.text, after)
-            keys.append(k)
-            entry = pairs.setdefault(k, {
-                "file": f, "line": r.before.line,
-                "before": r.before.text, "after": after,
-                "previous": r.before.previous,
-                "following": r.before.following,
-                "similarity": r.similarity, "source": source,
-                "added": today, "fault": "", "status": "new"})
-            # Refreshed on every run, so a pair stored before these
-            # fields existed gains them.
-            entry["heading"] = r.before.heading
-            entry["paragraph"] = r.before.paragraph
+        keys = record_pass(pairs, args.since, args.span)
         if args.dry_run:
+            # Recording the pairs asks nothing, and `/edit-done` step 3b
+            # seeds its fault-line page from them.
+            judgments.save(PAIRS_FILE, pairs)
             for k in keys:
                 p = pairs[k]
                 print(f"{p['file']}:{p['line']}  {p['similarity']:.2f}")

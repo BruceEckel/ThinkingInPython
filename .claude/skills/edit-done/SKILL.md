@@ -58,23 +58,45 @@ Bruce approves. Do not shortcut its report.
 
 ## Step 3b: search the book for the same faults
 
-Run `tip edit-patterns ARGS=--dry-run` while the tag still exists. It
-lists every sentence Bruce rewrote in the pass (commits with a
-Co-Authored-By trailer are skipped) and records each before/after pair
-in `tools/data/edit_pairs.json` with an empty `fault`. For each edit
-the capture step judged generalizable, propose a one-line `fault`: what
-the before-sentence got wrong, stated so it picks out that fault and
-not a shared word or shared punctuation ("Metadiscourse: a clause
-announces what the text itself is doing", not "ends in a colon"). Add
-the condition under which it is a fault when the same words are fine
-elsewhere ("when the context does not already name the mechanism").
-Leave local edits (an exercise renumbering, a fact correction) empty.
-After Bruce approves the lines, write them and run `tip edit-patterns`
-(needs `TYPESAFE_API_KEY`; about five minutes). Report each searched
-pair's hit count and its strongest few hits from
-`build/edit_patterns.md`, and each `unclear` pair, whose fault line
-needs rewording before it can be searched. The hits are a worklist for
-Bruce; do not apply them.
+Bruce approves fault lines on a page, not in the transcript
+(`fault_review.html` beside this file; `tools/fault_review.py`'s
+docstring has the mechanics). While the tag still exists:
+
+1. Run `tip edit-patterns ARGS=--dry-run`. It lists every sentence
+   Bruce rewrote in the pass (commits with a Co-Authored-By trailer are
+   skipped) and records each before/after pair in
+   `tools/data/edit_pairs.json`.
+2. For each edit the capture step judged generalizable, propose a
+   one-line fault: what the before-sentence got wrong, stated so it
+   picks out that fault and not a shared word or shared punctuation
+   ("Metadiscourse: a clause announces what the text itself is doing",
+   not "ends in a colon"). Name what the edit changed, not a nearby
+   property: chapter 30's "generated" line first said "in a passage
+   that does not name the mechanism" when Bruce's own sentence named
+   it. Leave local edits (an exercise renumbering, a fact correction)
+   out. Write the proposals to `build/fault_review/proposals.json` as
+   a JSON object from pair key to fault line.
+3. Run `uv run python -m tools.fault_review seed --since
+   edit-start-NN --proposals build/fault_review/proposals.json`.
+4. Copy `.claude/skills/edit-done/fault_review.html` to
+   `build/fault_review/fault_review_NN.html` and publish the copy, with
+   no `url`, `capabilities: {"db": {}}`, and icon `edit`. Each pass
+   gets its own page and database this way; republishing a path a
+   session already published would update that earlier page instead.
+   Load each `build/fault_review/batch*.json` with one `ArtifactData`
+   `batch`, give Bruce the link, and wait for him to say he is done.
+5. Read the cards back with `ArtifactData` `list` on `cards`,
+   `query.limit` 1000, `out_dir` `build/fault_review/read`, then run
+   `uv run python -m tools.fault_review apply
+   build/fault_review/read/cards`. It writes each approved line
+   (edited or not) into `edit_pairs.json`, clears the ones marked
+   Local edit, and lists the undecided.
+6. Run `tip edit-patterns` (needs `TYPESAFE_API_KEY`; about five
+   minutes). Report each searched pair's hit count and its strongest
+   few hits from `build/edit_patterns.md`, and each `unclear` pair,
+   whose fault line needs rewording before it can be searched. The
+   hits are a worklist for Bruce; do not apply them. A long list is
+   itself a review batch: offer it as a labeling page.
 
 ## Step 4: verify and commit
 

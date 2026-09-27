@@ -1,0 +1,311 @@
+<title>Fault Line Review</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap">
+<style>
+:root {
+  --bg: #f3f5f7;
+  --surface: #ffffff;
+  --ink: #1b2430;
+  --muted: #5d6b7a;
+  --rule: #d9dfe6;
+  --accent: #2f5d8a;
+  --accent-soft: #e3ecf5;
+  --yes: #1f7a5a;
+  --yes-soft: #dff1e9;
+  --local: #7a5c1f;
+  --local-soft: #f4ecd8;
+  --del: #b0413e;
+  --del-soft: #f7e3e2;
+  --ins: #1f7a5a;
+  --ins-soft: #dff1e9;
+  --mark: #fff1b8;
+  --serif: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12171d; --surface: #1a2129; --ink: #e4e9ef; --muted: #93a1b0;
+    --rule: #2b3541; --accent: #8fb7e0; --accent-soft: #1f2d3c;
+    --yes: #6cc9a4; --yes-soft: #173229; --local: #e0c07a; --local-soft: #3a3120;
+    --del: #eb8c89; --del-soft: #3a1f1f; --ins: #6cc9a4; --ins-soft: #173229;
+    --mark: #4a4220;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #12171d; --surface: #1a2129; --ink: #e4e9ef; --muted: #93a1b0;
+  --rule: #2b3541; --accent: #8fb7e0; --accent-soft: #1f2d3c;
+  --yes: #6cc9a4; --yes-soft: #173229; --local: #e0c07a; --local-soft: #3a3120;
+  --del: #eb8c89; --del-soft: #3a1f1f; --ins: #6cc9a4; --ins-soft: #173229;
+  --mark: #4a4220;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink); font-family: var(--sans);
+  font-size: 15px; line-height: 1.5; padding-inline: 16px; padding-block: 0 64px;
+}
+.wrap { max-width: 860px; margin: 0 auto; display: grid; gap: 20px; }
+header.top {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 2;
+  background: var(--bg); padding-block: 16px 12px; border-bottom: 1px solid var(--rule);
+  display: grid; gap: 8px;
+}
+h1 { font-family: var(--serif); font-weight: 600; font-size: 1.6rem; margin: 0; text-wrap: balance; }
+.lede { margin: 0; color: var(--muted); max-width: 70ch; }
+.progress { display: flex; align-items: center; gap: 12px; font-variant-numeric: tabular-nums; font-size: .9rem; color: var(--muted); flex-wrap: wrap; }
+.bar { flex: 1; min-width: 120px; height: 6px; background: var(--rule); border-radius: 3px; overflow: hidden; }
+.bar > span { display: block; height: 100%; width: 0; background: var(--accent); transition: width .2s; }
+.progress label { display: flex; align-items: center; gap: 6px; cursor: pointer; }
+.status { font-size: .85rem; color: var(--muted); min-height: 1.2em; }
+main { display: grid; gap: 16px; }
+.card {
+  background: var(--surface); border: 1px solid var(--rule); border-radius: 8px;
+  padding: 14px 16px; display: grid; gap: 12px;
+}
+.card[data-decision="approve"] { border-color: var(--yes); }
+.card[data-decision="local"] { border-color: var(--local); }
+.where { font-family: var(--mono); font-size: .78rem; color: var(--muted); overflow-wrap: anywhere; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.pill { font-family: var(--sans); font-size: .72rem; letter-spacing: .04em; text-transform: uppercase; padding: 1px 8px; border-radius: 999px; }
+.pill.approve { background: var(--yes-soft); color: var(--yes); }
+.pill.local { background: var(--local-soft); color: var(--local); }
+.pill.edited { background: var(--accent-soft); color: var(--accent); }
+.diff { font-family: var(--serif); font-size: 1.05rem; line-height: 1.65; margin: 0; }
+.diff del { background: var(--del-soft); color: var(--del); text-decoration: line-through; text-decoration-thickness: 1px; border-radius: 2px; }
+.diff ins { background: var(--ins-soft); color: var(--ins); text-decoration: none; border-radius: 2px; }
+.diff .deleted { color: var(--muted); font-style: italic; font-family: var(--sans); font-size: .85rem; }
+details { font-size: .92rem; }
+details summary { cursor: pointer; color: var(--muted); font-size: .85rem; }
+details p { font-family: var(--serif); margin: 8px 0 0; color: var(--muted); }
+details mark { background: var(--mark); color: var(--ink); border-radius: 2px; }
+.fault label { display: block; font-size: .78rem; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+textarea {
+  width: 100%; min-height: 3.6em; resize: vertical; font: inherit; font-size: .95rem;
+  color: var(--ink); background: var(--bg); border: 1px solid var(--rule); border-radius: 6px; padding: 8px 10px;
+}
+textarea:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.hint { font-size: .8rem; color: var(--muted); margin-top: 4px; }
+.choices { display: flex; gap: 8px; flex-wrap: wrap; }
+button {
+  font: inherit; font-size: .9rem; border-radius: 6px; padding: 6px 14px; cursor: pointer;
+  border: 1px solid var(--rule); background: var(--surface); color: var(--ink);
+}
+button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+button.approve[aria-pressed="true"] { background: var(--yes-soft); border-color: var(--yes); color: var(--yes); font-weight: 600; }
+button.local[aria-pressed="true"] { background: var(--local-soft); border-color: var(--local); color: var(--local); font-weight: 600; }
+button.clear { color: var(--muted); }
+button:disabled { opacity: .5; cursor: default; }
+.empty { color: var(--muted); font-style: italic; }
+@media (prefers-reduced-motion: reduce) { .bar > span { transition: none; } }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <h1>Fault Line Review</h1>
+    <p class="lede" id="lede">Each card is a sentence you rewrote. If the rewrite fixed something that could turn up elsewhere in the book, edit the proposed fault line until it names that fault, then Approve it. If the rewrite was specific to its spot (a renumbered exercise, a corrected fact), mark it Local edit. Approved lines are what the book-wide search looks for.</p>
+    <div class="progress">
+      <span id="count">0 of 0 decided</span>
+      <div class="bar"><span id="fill"></span></div>
+      <label><input type="checkbox" id="only-open"> Undecided only</label>
+    </div>
+    <div class="status" id="status" role="status">Loading the pass…</div>
+  </header>
+  <main id="cards"></main>
+</div>
+
+<script>
+const $ = (s) => document.querySelector(s);
+const state = { cards: new Map(), meta: null, db: null, readOnly: false, onlyOpen: false };
+const drafts = new Map();   // id -> text typed but not yet saved
+const chains = new Map();   // id -> promise, so each card writes one at a time
+const timers = new Map();
+
+try { state.onlyOpen = localStorage.getItem("fault-review-only-open") === "1"; } catch (e) {}
+$("#only-open").checked = state.onlyOpen;
+
+function esc(t) {
+  return String(t).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+}
+
+// Word-level diff by longest common subsequence; spaces stay with words.
+function diffHtml(before, after) {
+  if (!after) return `<del>${esc(before)}</del> <span class="deleted">(deleted)</span>`;
+  const a = before.split(/(\s+)/), b = after.split(/(\s+)/);
+  const n = a.length, m = b.length;
+  const L = Array.from({ length: n + 1 }, () => new Uint16Array(m + 1));
+  for (let i = n - 1; i >= 0; i--)
+    for (let j = m - 1; j >= 0; j--)
+      L[i][j] = a[i] === b[j] ? L[i + 1][j + 1] + 1 : Math.max(L[i + 1][j], L[i][j + 1]);
+  const out = [];
+  let i = 0, j = 0;
+  const push = (kind, text) => {
+    const last = out[out.length - 1];
+    if (last && last.kind === kind) last.text += text; else out.push({ kind, text });
+  };
+  while (i < n && j < m) {
+    if (a[i] === b[j]) { push("same", a[i]); i++; j++; }
+    else if (L[i + 1][j] >= L[i][j + 1]) push("del", a[i++]);
+    else push("ins", b[j++]);
+  }
+  while (i < n) push("del", a[i++]);
+  while (j < m) push("ins", b[j++]);
+  return out.map((p) => p.kind === "same" ? esc(p.text)
+    : `<${p.kind}>${esc(p.text)}</${p.kind}>`).join("");
+}
+
+function contextHtml(card) {
+  const para = card.paragraph || "";
+  const at = para.indexOf(card.before);
+  if (!para || at < 0) return "";
+  return `<details><summary>Paragraph${card.heading ? " in “" + esc(card.heading) + "”" : ""}</summary>
+    <p>${esc(para.slice(0, at))}<mark>${esc(card.before)}</mark>${esc(para.slice(at + card.before.length))}</p></details>`;
+}
+
+function faultText(id, card) {
+  return drafts.has(id) ? drafts.get(id) : (card.fault || "");
+}
+
+function render() {
+  const main = $("#cards");
+  const focused = document.activeElement;
+  const focusId = focused && focused.matches("textarea") ? focused.closest(".card").dataset.id : null;
+  const caret = focusId ? [focused.selectionStart, focused.selectionEnd] : null;
+  const list = [...state.cards.entries()].sort((x, y) => x[1].order - y[1].order)
+    .filter(([id, c]) => !state.onlyOpen || !c.decision || id === focusId);
+  if (!state.cards.size) {
+    main.innerHTML = `<p class="empty">No rewrites are loaded yet.</p>`;
+  } else if (!list.length) {
+    main.innerHTML = `<p class="empty">Every card has a decision.</p>`;
+  } else {
+    main.innerHTML = list.map(([id, c]) => {
+      const text = faultText(id, c);
+      const edited = text.trim() !== (c.proposed || "").trim();
+      const dis = state.readOnly ? "disabled" : "";
+      return `<article class="card" data-id="${esc(id)}" data-decision="${esc(c.decision || "")}">
+        <div class="where"><span>${esc(c.file)}:${c.line}</span>
+          ${c.decision === "approve" ? `<span class="pill approve">Approved</span>` : ""}
+          ${c.decision === "local" ? `<span class="pill local">Local edit</span>` : ""}
+          ${edited && c.proposed ? `<span class="pill edited">Edited</span>` : ""}</div>
+        <p class="diff">${diffHtml(c.before, c.after)}</p>
+        ${contextHtml(c)}
+        <div class="fault">
+          <label for="f-${esc(id)}">Fault line</label>
+          <textarea id="f-${esc(id)}" ${dis} placeholder="What the sentence got wrong, so the search finds that fault and not a shared word">${esc(text)}</textarea>
+          ${c.proposed ? "" : `<div class="hint">No line was proposed for this one.</div>`}
+        </div>
+        <div class="choices">
+          <button class="approve" data-decide="approve" aria-pressed="${c.decision === "approve"}" ${dis || (text.trim() ? "" : "disabled")}>Approve</button>
+          <button class="local" data-decide="local" aria-pressed="${c.decision === "local"}" ${dis}>Local edit</button>
+          ${c.decision ? `<button class="clear" data-decide="" ${dis}>Clear</button>` : ""}
+        </div>
+      </article>`;
+    }).join("");
+  }
+  if (focusId) {
+    const t = document.getElementById("f-" + focusId);
+    if (t) { t.focus(); t.setSelectionRange(caret[0], caret[1]); }
+  }
+  const total = state.cards.size;
+  const done = [...state.cards.values()].filter((c) => c.decision).length;
+  $("#count").textContent = `${done} of ${total} decided`;
+  $("#fill").style.width = total ? `${(100 * done) / total}%` : "0";
+  if (state.meta) {
+    const where = (state.meta.files || []).join(", ");
+    document.title = "Fault Line Review";
+    $("h1").textContent = `Fault Line Review${where ? " · " + where.replace(/\.md$/, "") : ""}`;
+  }
+}
+
+function write(id, fields) {
+  const prev = chains.get(id) || Promise.resolve();
+  const next = prev.then(() => state.db.doc(`cards/${id}`).update(fields))
+    .then(() => { $("#status").textContent = "Saved."; })
+    .catch((e) => {
+      if (e && e.code === "invalid_argument") {
+        state.readOnly = true;
+        $("#status").textContent = "You can view this review but not change it.";
+        render();
+      } else {
+        $("#status").textContent = "A change didn't save. Try again in a moment.";
+      }
+    });
+  chains.set(id, next);
+  return next;
+}
+
+function flushDraft(id) {
+  clearTimeout(timers.get(id));
+  timers.delete(id);
+  if (!drafts.has(id)) return Promise.resolve();
+  const text = drafts.get(id);
+  drafts.delete(id);
+  const card = state.cards.get(id);
+  if (!card || (card.fault || "") === text) return Promise.resolve();
+  card.fault = text;
+  return write(id, { fault: text });
+}
+
+document.addEventListener("input", (ev) => {
+  const t = ev.target.closest("textarea");
+  if (!t || state.readOnly) return;
+  const id = t.closest(".card").dataset.id;
+  drafts.set(id, t.value);
+  const approve = t.closest(".card").querySelector("button.approve");
+  if (approve) approve.disabled = !t.value.trim();
+  clearTimeout(timers.get(id));
+  timers.set(id, setTimeout(() => flushDraft(id), 900));
+});
+
+document.addEventListener("focusout", (ev) => {
+  const t = ev.target.closest && ev.target.closest("textarea");
+  if (t) flushDraft(t.closest(".card").dataset.id);
+});
+
+document.addEventListener("click", async (ev) => {
+  const btn = ev.target.closest("button[data-decide]");
+  if (!btn || !state.db || state.readOnly) return;
+  const id = btn.closest(".card").dataset.id;
+  const card = state.cards.get(id);
+  const decision = btn.dataset.decide || null;
+  await flushDraft(id);
+  if (card.decision === decision) return;
+  card.decision = decision;
+  render();
+  write(id, { decision });
+});
+
+$("#only-open").addEventListener("change", (ev) => {
+  state.onlyOpen = ev.target.checked;
+  try { localStorage.setItem("fault-review-only-open", state.onlyOpen ? "1" : "0"); } catch (e) {}
+  render();
+});
+
+async function start() {
+  render();
+  const db = await window.claude?.use?.("db");
+  if (!db) {
+    $("#status").textContent = "The review store isn't available in this view. Open the page in claude.ai to review.";
+    return;
+  }
+  state.db = db;
+  db.doc("meta/pass").onSnapshot((snap) => {
+    state.meta = snap.exists ? snap.data() : null;
+    render();
+  }, () => {});
+  db.collection("cards").onSnapshot((snap) => {
+    const next = new Map();
+    for (const d of snap.docs) {
+      const local = state.cards.get(d.id);
+      const body = { ...d.data() };
+      // A change made here and not yet confirmed wins over the echo.
+      if (local && chains.has(d.id) && snap.metadata.hasPendingWrites) Object.assign(body, { decision: local.decision, fault: local.fault });
+      next.set(d.id, body);
+    }
+    state.cards = next;
+    $("#status").textContent = next.size ? "Changes save as you go." : "No rewrites are loaded yet.";
+    render();
+  }, () => { $("#status").textContent = "Lost the connection to the review."; });
+}
+start();
+</script>
