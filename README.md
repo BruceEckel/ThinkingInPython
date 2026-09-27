@@ -141,11 +141,6 @@ You'll need to do this to experiment with the examples and exercises.
    Because the install is editable, a change under `tools/` takes effect
    immediately.
 
-   The install is optional. Without it, put `uv run` in front of each
-   command, as in `uv run tip tools-check`, which works from anywhere
-   inside the repository. The rest of this README writes the short form,
-   `tip tools-check`.
-
 4. Verify the essential tools:
 
    ```sh
