@@ -339,24 +339,24 @@
   "confidence": 0.26,
   "asked": "2026-09-27"
  },
- "9a3c0814b05f9af6": {
-  "file": "07_Foundations--Classes.md",
-  "line": 94,
-  "target": "12_Techniques--Data_Classes_as_Types.md",
-  "anchor": "data-classes",
-  "sentence": "[Class Attributes](09_Foundations--Class_Attributes.md#a-bare-annotation-declares-it-does-not-create) and [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#data-classes) use bare annotations.",
-  "verdict": "says_nothing",
-  "confidence": 0.9,
-  "asked": "2026-09-27"
- },
- "e3b33296be2be54d": {
+ "b036ca4431839ceb": {
   "file": "07_Foundations--Classes.md",
   "line": 94,
   "target": "09_Foundations--Class_Attributes.md",
   "anchor": "a-bare-annotation-declares-it-does-not-create",
-  "sentence": "[Class Attributes](09_Foundations--Class_Attributes.md#a-bare-annotation-declares-it-does-not-create) and [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#data-classes) use bare annotations.",
+  "sentence": "[Class Attributes](09_Foundations--Class_Attributes.md#a-bare-annotation-declares-it-does-not-create) and [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#comparing-ordinary-classes-and-data-classes) use bare annotations.",
+  "verdict": "says_nothing",
+  "confidence": 0.23,
+  "asked": "2026-09-27"
+ },
+ "d18f46f2c98a2c40": {
+  "file": "07_Foundations--Classes.md",
+  "line": 94,
+  "target": "12_Techniques--Data_Classes_as_Types.md",
+  "anchor": "comparing-ordinary-classes-and-data-classes",
+  "sentence": "[Class Attributes](09_Foundations--Class_Attributes.md#a-bare-annotation-declares-it-does-not-create) and [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#comparing-ordinary-classes-and-data-classes) use bare annotations.",
   "verdict": "supports",
-  "confidence": 0.37,
+  "confidence": 0.3,
   "asked": "2026-09-27"
  },
  "9ecabf15ed16601a": {
@@ -409,14 +409,14 @@
   "confidence": 0.86,
   "asked": "2026-09-27"
  },
- "337f92943a7c53be": {
+ "b2c0e545532d4c20": {
   "file": "08_Foundations--Static_Types.md",
   "line": 307,
   "target": "26_Patterns--Surrogate.md",
   "anchor": "proxy",
   "sentence": "see [*Surrogate*](26_Patterns--Surrogate.md#proxy).",
   "verdict": "says_nothing",
-  "confidence": 0.46,
+  "confidence": 0.35,
   "asked": "2026-09-27"
  },
  "b6e32b4f4fb9cdd9": {
@@ -489,14 +489,14 @@
   "confidence": 0.61,
   "asked": "2026-09-27"
  },
- "f7d8e6e7930f2422": {
+ "0c04340b2a04ce25": {
   "file": "08_Foundations--Static_Types.md",
   "line": 783,
   "target": "26_Patterns--Surrogate.md",
-  "anchor": "proxy",
-  "sentence": "| `@runtime_checkable` | Allows `isinstance()` against a `Protocol`, see [*Surrogate*](26_Patterns--Surrogate.md#proxy) |",
-  "verdict": "says_nothing",
-  "confidence": 0.61,
+  "anchor": "what-the-implementation-supplies",
+  "sentence": "| `@runtime_checkable` | Allows `isinstance()` against a `Protocol`, see [*Surrogate*](26_Patterns--Surrogate.md#what-the-implementation-supplies) |",
+  "verdict": "supports",
+  "confidence": 0.28,
   "asked": "2026-09-27"
  },
  "d858346cb8199ff0": {
@@ -509,14 +509,14 @@
   "confidence": 0.55,
   "asked": "2026-09-27"
  },
- "43ac802d04907c8c": {
+ "ff06c855c8b3a192": {
   "file": "08_Foundations--Static_Types.md",
   "line": 810,
-  "target": "38_Patterns--Simulation.md",
-  "anchor": "rooms-robots-and-the-item-factory",
-  "sentence": "| `\"Name\"` | A *forward reference* to a not-yet-defined type; quoting is optional under deferred evaluation (PEP 649), see [Simulation](38_Patterns--Simulation.md#rooms-robots-and-the-item-factory) |",
+  "target": "34_Patterns--Composite_and_Interpreter.md",
+  "anchor": "a-composite-of-data-classes",
+  "sentence": "| `\"Name\"` | A *forward reference* to a not-yet-defined type; quoting is optional under deferred evaluation (PEP 649), see [*Composite* and *Interpreter*](34_Patterns--Composite_and_Interpreter.md#a-composite-of-data-classes) |",
   "verdict": "says_nothing",
-  "confidence": 0.61,
+  "confidence": 0.47,
   "asked": "2026-09-27"
  },
  "729bb8e154c25e44": {
@@ -869,6 +869,16 @@
   "confidence": 0.94,
   "asked": "2026-09-27"
  },
+ "2b8c1e2c8272708b": {
+  "file": "13_Techniques--Pattern_Matching.md",
+  "line": 898,
+  "target": "20_Patterns--Rethinking_Objects.md",
+  "anchor": "polymorphism-without-inheritance",
+  "sentence": "[Rethinking Objects](20_Patterns--Rethinking_Objects.md#polymorphism-without-inheritance) works through the same split with shapes, and [*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md#one-type-or-many) and [*Visitor*](33_Patterns--Visitor.md#the-pythonic-visitor-singledispatch) explore it further.",
+  "verdict": "supports",
+  "confidence": 0.36,
+  "asked": "2026-09-27"
+ },
  "597f00b6de68ceb0": {
   "file": "13_Techniques--Pattern_Matching.md",
   "line": 898,
@@ -887,16 +897,6 @@
   "sentence": "[Rethinking Objects](20_Patterns--Rethinking_Objects.md#polymorphism-without-inheritance) works through the same split with shapes, and [*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md#one-type-or-many) and [*Visitor*](33_Patterns--Visitor.md#the-pythonic-visitor-singledispatch) explore it further.",
   "verdict": "supports",
   "confidence": 0.68,
-  "asked": "2026-09-27"
- },
- "bde6bbda40bef7ab": {
-  "file": "13_Techniques--Pattern_Matching.md",
-  "line": 898,
-  "target": "20_Patterns--Rethinking_Objects.md",
-  "anchor": "polymorphism-without-inheritance",
-  "sentence": "[Rethinking Objects](20_Patterns--Rethinking_Objects.md#polymorphism-without-inheritance) works through the same split with shapes, and [*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md#one-type-or-many) and [*Visitor*](33_Patterns--Visitor.md#the-pythonic-visitor-singledispatch) explore it further.",
-  "verdict": "supports",
-  "confidence": 0.35,
   "asked": "2026-09-27"
  },
  "2b515e8c08fc61b9": {
@@ -1379,14 +1379,14 @@
   "confidence": 0.56,
   "asked": "2026-09-27"
  },
- "0e0a33b824cee653": {
+ "605b370a846c9f7d": {
   "file": "18_Techniques--Performance.md",
   "line": 572,
   "target": "23_Patterns--Iterators.md",
   "anchor": "reusable-algorithms",
   "sentence": "- The C-implemented standard library's `itertools`, `collections`, and `functools` are faster than hand-rolled equivalents ([Iterators](23_Patterns--Iterators.md#reusable-algorithms) tours the iterator algorithms).",
   "verdict": "supports",
-  "confidence": 0.28,
+  "confidence": 0.4,
   "asked": "2026-09-27"
  },
  "6a0cfc3f58b069d4": {
@@ -2009,14 +2009,14 @@
   "confidence": 0.73,
   "asked": "2026-09-27"
  },
- "8d3f66ba9fcbf233": {
+ "a84f108d612f3f17": {
   "file": "23_Patterns--Iterators.md",
   "line": 459,
   "target": "45_Effects--Generators.md",
   "anchor": "yield-from-composes-descriptions",
   "sentence": "[Generators](45_Effects--Generators.md#yield-from-composes-descriptions) uses all three channels: the yielded values, the return value, and `send()`.",
   "verdict": "supports",
-  "confidence": 0.82,
+  "confidence": 0.81,
   "asked": "2026-09-27"
  },
  "f4faad1ee99c5482": {
@@ -2029,14 +2029,14 @@
   "confidence": 0.87,
   "asked": "2026-09-27"
  },
- "41f2778630280b8d": {
+ "1fc2c0525289cf90": {
   "file": "23_Patterns--Iterators.md",
   "line": 517,
   "target": "41_Functional--Toolkits.md",
-  "anchor": "chain",
-  "sentence": "[Functional Toolkits](41_Functional--Toolkits.md#chain) covers `chain()` and `groupby()` in full, including the sorted-input trap `groupby()` sets for an unwary caller.",
-  "verdict": "says_nothing",
-  "confidence": 0.88,
+  "anchor": "the-itertools-toolkit",
+  "sentence": "[Functional Toolkits](41_Functional--Toolkits.md#the-itertools-toolkit) covers `chain()` and `groupby()` in full, including the sorted-input trap `groupby()` sets for an unwary caller.",
+  "verdict": "supports",
+  "confidence": 0.56,
   "asked": "2026-09-27"
  },
  "d3b3a35f0049107b": {
@@ -2429,14 +2429,14 @@
   "confidence": 0.75,
   "asked": "2026-09-27"
  },
- "f8acf26e2fe6fecb": {
+ "e29b5e8dc55076d1": {
   "file": "27_Patterns--Factory.md",
   "line": 903,
   "target": "26_Patterns--Surrogate.md",
   "anchor": "proxy",
   "sentence": "That is earlier than the construction-time `TypeError` from the abstract base classes in `abstract_factory_abc.py`, the same failure [*Surrogate*](26_Patterns--Surrogate.md#proxy) shows.",
   "verdict": "supports",
-  "confidence": 0.4,
+  "confidence": 0.45,
   "asked": "2026-09-27"
  },
  "53797590eb9113d9": {
@@ -2479,14 +2479,14 @@
   "confidence": 0.86,
   "asked": "2026-09-27"
  },
- "b5057f09316622ba": {
+ "3621eae4cd333b79": {
   "file": "27_Patterns--Factory.md",
   "line": 1190,
   "target": "38_Patterns--Simulation.md",
   "anchor": "a-robot-in-a-maze",
   "sentence": "`GameBuilder` in [Simulation](38_Patterns--Simulation.md#a-robot-in-a-maze) shows this approach.",
-  "verdict": "supports",
-  "confidence": 0.48,
+  "verdict": "says_nothing",
+  "confidence": 0.19,
   "asked": "2026-09-27"
  },
  "4819c4f9e385ad65": {
@@ -2499,14 +2499,14 @@
   "confidence": 0.99,
   "asked": "2026-09-27"
  },
- "d85334008945605f": {
+ "59a51bd8e525feb5": {
   "file": "27_Patterns--Factory.md",
   "line": 1286,
   "target": "26_Patterns--Surrogate.md",
   "anchor": "proxy",
   "sentence": "`@runtime_checkable`, which [*Surrogate*](26_Patterns--Surrogate.md#proxy) shows with `isinstance()`, also lets `issubclass()` test a class against a Protocol whose members are all methods.",
   "verdict": "says_nothing",
-  "confidence": 0.48,
+  "confidence": 0.19,
   "asked": "2026-09-27"
  },
  "f09864f15e607c8a": {
@@ -2599,14 +2599,14 @@
   "confidence": 0.94,
   "asked": "2026-09-27"
  },
- "27ec59453e3b9529": {
+ "a7f8dea9c30487c0": {
   "file": "28_Patterns--Function_Objects.md",
   "line": 868,
   "target": "30_Patterns--Observer.md",
   "anchor": "the-pythonic-observer-callables-in-a-list",
   "sentence": "The bus is the [*Observer*](30_Patterns--Observer.md#the-pythonic-observer-callables-in-a-list) with one shared subject: instead of every observable holding its own list, one bus holds every list and the event type selects the handlers.",
   "verdict": "contradicts",
-  "confidence": 0.18,
+  "confidence": 0.25,
   "asked": "2026-09-27"
  },
  "6fdf83b24f101e53": {
@@ -2629,14 +2629,14 @@
   "confidence": 0.56,
   "asked": "2026-09-27"
  },
- "eb258b316e743761": {
+ "f40dc9faee7e93c0": {
   "file": "29_Patterns--Changing_the_Interface.md",
   "line": 71,
   "target": "26_Patterns--Surrogate.md",
   "anchor": "proxy",
   "sentence": "[*Surrogate*](26_Patterns--Surrogate.md#proxy) compares an ABC with a `Protocol`.",
   "verdict": "supports",
-  "confidence": 0.21,
+  "confidence": 0.26,
   "asked": "2026-09-27"
  },
  "67351f9c7fe42200": {
@@ -2659,14 +2659,14 @@
   "confidence": 0.77,
   "asked": "2026-09-27"
  },
- "5d520a3874aeec46": {
+ "9ebb583df458ee3f": {
   "file": "29_Patterns--Changing_the_Interface.md",
   "line": 76,
   "target": "26_Patterns--Surrogate.md",
   "anchor": "proxy",
   "sentence": "The name `ProxyAdapter` uses the term \"[*Proxy*](26_Patterns--Surrogate.md#proxy)\" loosely:",
   "verdict": "supports",
-  "confidence": 0.7,
+  "confidence": 0.43,
   "asked": "2026-09-27"
  },
  "d6195f2f101b61e9": {
@@ -2689,14 +2689,14 @@
   "confidence": 0.98,
   "asked": "2026-09-27"
  },
- "6ef95f52b88a31ca": {
+ "4e7ab684b2d09d6a": {
   "file": "29_Patterns--Changing_the_Interface.md",
   "line": 188,
   "target": "26_Patterns--Surrogate.md",
-  "anchor": "proxy",
-  "sentence": "[*Surrogate*](26_Patterns--Surrogate.md#proxy) makes the same substitution for a proxy's implementation.",
+  "anchor": "what-the-implementation-supplies",
+  "sentence": "[*Surrogate*](26_Patterns--Surrogate.md#what-the-implementation-supplies) makes the same substitution for a proxy's implementation.",
   "verdict": "says_nothing",
-  "confidence": 0.68,
+  "confidence": 0.37,
   "asked": "2026-09-27"
  },
  "743b4b6fb5e9c528": {
@@ -2779,14 +2779,14 @@
   "confidence": 0.95,
   "asked": "2026-09-27"
  },
- "9cab56d3015ae5dc": {
+ "bdd205075bc65c12": {
   "file": "29_Patterns--Changing_the_Interface.md",
   "line": 415,
   "target": "26_Patterns--Surrogate.md",
   "anchor": "proxy",
   "sentence": "| [*Proxy*](26_Patterns--Surrogate.md#proxy) | same, by GoF's definition | access control | control over when and whether the call reaches the implementation |",
   "verdict": "supports",
-  "confidence": 0.36,
+  "confidence": 0.23,
   "asked": "2026-09-27"
  },
  "6c973a49e0ebb243": {
@@ -2799,14 +2799,14 @@
   "confidence": 0.76,
   "asked": "2026-09-27"
  },
- "7c8bcdd160f60a05": {
+ "aeed14965f706be1": {
   "file": "29_Patterns--Changing_the_Interface.md",
   "line": 420,
   "target": "26_Patterns--Surrogate.md",
   "anchor": "proxy",
   "sentence": "[*Surrogate*](26_Patterns--Surrogate.md#proxy) takes the looser view of the first row:",
-  "verdict": "supports",
-  "confidence": 0.34,
+  "verdict": "says_nothing",
+  "confidence": 0.25,
   "asked": "2026-09-27"
  },
  "2359ce5b37fc4879": {
@@ -2821,7 +2821,7 @@
  },
  "78c2c8ce51cc8f46": {
   "file": "30_Patterns--Observer.md",
-  "line": 94,
+  "line": 95,
   "target": "07_Foundations--Classes.md",
   "anchor": "calling-the-base-constructor",
   "sentence": "`Subject.__init__()` creates that list, so `Thermometer`'s constructor calls [`super().__init__()`](07_Foundations--Classes.md#calling-the-base-constructor) to run it.",
@@ -2831,7 +2831,7 @@
  },
  "ef0b2dfc038babdc": {
   "file": "30_Patterns--Observer.md",
-  "line": 259,
+  "line": 260,
   "target": "12_Techniques--Data_Classes_as_Types.md",
   "anchor": "dataclass-inheritance",
   "sentence": "Inheriting does not stop a class from being a `dataclass`, but [a `dataclass`-generated `__init__()` does not call the base class's `__init__()`](12_Techniques--Data_Classes_as_Types.md#dataclass-inheritance).",
@@ -2841,7 +2841,7 @@
  },
  "7e1670519bd3c2d4": {
   "file": "30_Patterns--Observer.md",
-  "line": 273,
+  "line": 274,
   "target": "28_Patterns--Function_Objects.md",
   "anchor": "chain-of-responsibility-choosing-the-handler-at-runtime",
   "sentence": "A design that needs an answer uses a different pattern; for example [*Chain of Responsibility*](28_Patterns--Function_Objects.md#chain-of-responsibility-choosing-the-handler-at-runtime) tries its handlers in turn and returns the result from the first one that succeeds.",
@@ -2851,7 +2851,7 @@
  },
  "c43f0a99df40332b": {
   "file": "30_Patterns--Observer.md",
-  "line": 413,
+  "line": 414,
   "target": "42_Functional--Error_Handling.md",
   "anchor": "return-the-error-as-a-value",
   "sentence": "The listener catches its own exception and [returns the error as a value](42_Functional--Error_Handling.md#return-the-error-as-a-value), and `announce()` collects the returned errors for the caller.",
@@ -2861,7 +2861,7 @@
  },
  "eee15307c32368a4": {
   "file": "30_Patterns--Observer.md",
-  "line": 428,
+  "line": 429,
   "target": "10_Foundations--Cleanup.md",
   "anchor": "watching-objects-without-holding-them",
   "sentence": "Long-lived broadcasters need disciplined `unsubscribe()` calls, or [weak references](10_Foundations--Cleanup.md#watching-objects-without-holding-them), which do not keep the listener alive (`weakref.WeakMethod` is the bound-method form).",
@@ -2871,7 +2871,7 @@
  },
  "e91118d6b6a4477d": {
   "file": "30_Patterns--Observer.md",
-  "line": 618,
+  "line": 619,
   "target": "09_Foundations--Class_Attributes.md",
   "anchor": "a-bare-annotation-declares-it-does-not-create",
   "sentence": "In a class body, a name with a type and no initialization value [declares an attribute rather than creating one](09_Foundations--Class_Attributes.md#a-bare-annotation-declares-it-does-not-create).",
@@ -2881,7 +2881,7 @@
  },
  "def2235908d3e730": {
   "file": "30_Patterns--Observer.md",
-  "line": 625,
+  "line": 626,
   "target": "09_Foundations--Class_Attributes.md",
   "anchor": "a-classvar-with-no-value-declares-too",
   "sentence": "[Class Attributes](09_Foundations--Class_Attributes.md#a-classvar-with-no-value-declares-too) covers the difference between declaring an attribute and creating one, for instance attributes and class variables both.",
@@ -2891,7 +2891,7 @@
  },
  "c66a3bd47766a675": {
   "file": "30_Patterns--Observer.md",
-  "line": 678,
+  "line": 679,
   "target": "19_Techniques--Concurrency.md",
   "anchor": "asyncio-mechanics",
   "sentence": "[Concurrency](19_Techniques--Concurrency.md#asyncio-mechanics) covers the `asyncio` mechanics here (`async def`, `await`, `gather()`, `run()`).",
@@ -2901,7 +2901,7 @@
  },
  "d18b7134d7c97733": {
   "file": "30_Patterns--Observer.md",
-  "line": 752,
+  "line": 753,
   "target": "05_Foundations--Functions.md",
   "anchor": "unpacking-arguments",
   "sentence": "`gather()` takes one awaitable per argument rather than an iterable of them, so `announce()` calls the listeners in a generator expression and [unpacks](05_Foundations--Functions.md#unpacking-arguments) that generator with `*`, turning each coroutine into its own argument.",
@@ -2911,7 +2911,7 @@
  },
  "5c9d5873c57a826b": {
   "file": "30_Patterns--Observer.md",
-  "line": 853,
+  "line": 854,
   "target": "19_Techniques--Concurrency.md",
   "anchor": "structured-concurrency-with-taskgroup",
   "sentence": "[Concurrency](19_Techniques--Concurrency.md#structured-concurrency-with-taskgroup)'s `TaskGroup` is the usual choice for concurrent awaits, but not here.",
@@ -2921,7 +2921,7 @@
  },
  "e02957737f2cb69e": {
   "file": "30_Patterns--Observer.md",
-  "line": 923,
+  "line": 924,
   "target": "12_Techniques--Data_Classes_as_Types.md",
   "anchor": "enums-are-types-too",
   "sentence": "`Color` is a `StrEnum`, an [`Enum`](12_Techniques--Data_Classes_as_Types.md#enums-are-types-too) whose members are also strings.",
@@ -2931,7 +2931,7 @@
  },
  "49b9c7fd38cfc078": {
   "file": "30_Patterns--Observer.md",
-  "line": 951,
+  "line": 952,
   "target": "03_Foundations--Containers.md",
   "anchor": "dictionaries",
   "sentence": "The [dictionary merge](03_Foundations--Containers.md#dictionaries) builds the new grid: `|` produces a new dictionary, and when both operands hold the same key, the right operand's value wins.",
@@ -2941,7 +2941,7 @@
  },
  "8bb6c051f4a2aaa2": {
   "file": "30_Patterns--Observer.md",
-  "line": 1239,
+  "line": 1240,
   "target": "21_Patterns--Design_Patterns.md",
   "anchor": "design-principles",
   "sentence": "[Cohesion](21_Patterns--Design_Patterns.md#design-principles) is one job per class, and that is three.",
@@ -2951,7 +2951,7 @@
  },
  "df72011d2ed608c5": {
   "file": "30_Patterns--Observer.md",
-  "line": 1333,
+  "line": 1334,
   "target": "28_Patterns--Function_Objects.md",
   "anchor": "an-event-bus-handlers-keyed-by-type",
   "sentence": "[Function Objects](28_Patterns--Function_Objects.md#an-event-bus-handlers-keyed-by-type) removes it: one list becomes a dictionary of lists keyed by event type, so an announcement carries the kind of thing that happened and each handler subscribes to the kind it cares about.",
@@ -2961,7 +2961,7 @@
  },
  "71cce1baccc26a6a": {
   "file": "30_Patterns--Observer.md",
-  "line": 1355,
+  "line": 1356,
   "target": "19_Techniques--Concurrency.md",
   "anchor": "structured-concurrency-with-taskgroup",
   "sentence": "every other listener is still notified, and `announce()` re-raises the failures afterward, together, as an [`ExceptionGroup`](19_Techniques--Concurrency.md#structured-concurrency-with-taskgroup) (which you build yourself here: `raise ExceptionGroup(\"message\", failures)`).",
@@ -2971,7 +2971,7 @@
  },
  "0365f20aa6471d46": {
   "file": "30_Patterns--Observer.md",
-  "line": 1366,
+  "line": 1367,
   "target": "42_Functional--Error_Handling.md",
   "anchor": "a-result-type",
   "sentence": "Each listener returns a [`Result`](42_Functional--Error_Handling.md#a-result-type) from `utils/result.py`, and `announce()` returns the `Err` values it collects.",
@@ -2981,7 +2981,7 @@
  },
  "44789db7e0fce2c5": {
   "file": "30_Patterns--Observer.md",
-  "line": 1397,
+  "line": 1398,
   "target": "17_Techniques--Metaprogramming.md",
   "anchor": "a-descriptor-that-validates",
   "sentence": "10. Write a `Notifying` [descriptor](17_Techniques--Metaprogramming.md#a-descriptor-that-validates) that replaces the `@property` and `announce()` pair, so one class declares several independently watched attributes:",
@@ -3029,14 +3029,14 @@
   "confidence": 0.99,
   "asked": "2026-09-27"
  },
- "7531143ee3da5818": {
+ "127f35d47b29f7db": {
   "file": "31_Patterns--State_Machines.md",
   "line": 266,
   "target": "26_Patterns--Surrogate.md",
   "anchor": "proxy",
   "sentence": "[*Surrogate*](26_Patterns--Surrogate.md#proxy) shows one more option:",
   "verdict": "says_nothing",
-  "confidence": 0.47,
+  "confidence": 0.39,
   "asked": "2026-09-27"
  },
  "c594e424c6885cf2": {
@@ -3249,14 +3249,14 @@
   "confidence": 0.6,
   "asked": "2026-09-27"
  },
- "9cadc832ab09af29": {
+ "f4000cfa8e54af64": {
   "file": "34_Patterns--Composite_and_Interpreter.md",
   "line": 175,
   "target": "08_Foundations--Static_Types.md",
   "anchor": "self-and-forward-references",
   "sentence": "That works because Python evaluates annotations and `type` aliases lazily, the [deferred evaluation](08_Foundations--Static_Types.md#self-and-forward-references).",
   "verdict": "supports",
-  "confidence": 0.97,
+  "confidence": 0.95,
   "asked": "2026-09-27"
  },
  "07d6b4f11a0e3b64": {
@@ -3269,14 +3269,14 @@
   "confidence": 0.6,
   "asked": "2026-09-27"
  },
- "e0b17ea50527c05b": {
+ "4c9ccfd3f1de2d3e": {
   "file": "34_Patterns--Composite_and_Interpreter.md",
   "line": 192,
   "target": "20_Patterns--Rethinking_Objects.md",
   "anchor": "polymorphism-without-inheritance",
   "sentence": "[Rethinking Objects](20_Patterns--Rethinking_Objects.md#polymorphism-without-inheritance) works out the same split with shapes, including the `assert_never()` in each `case _`.",
-  "verdict": "says_nothing",
-  "confidence": 0.57,
+  "verdict": "supports",
+  "confidence": 0.23,
   "asked": "2026-09-27"
  },
  "cf42d78b0fff82b2": {
@@ -3419,14 +3419,14 @@
   "confidence": 0.89,
   "asked": "2026-09-27"
  },
- "5a804a1918b8bee1": {
+ "51c58e554e544ad1": {
   "file": "35_Patterns--Flyweight.md",
   "line": 227,
   "target": "24_Patterns--Singleton.md",
   "anchor": "the-classic-implementations",
   "sentence": "[*Singleton*](24_Patterns--Singleton.md#the-classic-implementations) keeps its pool in `__new__()` the same way.",
   "verdict": "supports",
-  "confidence": 0.63,
+  "confidence": 0.91,
   "asked": "2026-09-27"
  },
  "5a82a16a4d7e0e96": {
@@ -3469,14 +3469,14 @@
   "confidence": 0.33,
   "asked": "2026-09-27"
  },
- "f4389133848faba0": {
+ "d2a6bc4e5afa9ddd": {
   "file": "35_Patterns--Flyweight.md",
   "line": 515,
   "target": "31_Patterns--State_Machines.md",
   "anchor": "table-driven-state-machine",
   "sentence": "The [table-driven state machine](31_Patterns--State_Machines.md#table-driven-state-machine) builds on an `Enum` the same way, using the enum's members as shared, comparable states.",
   "verdict": "supports",
-  "confidence": 0.88,
+  "confidence": 0.86,
   "asked": "2026-09-27"
  },
  "3a83ac966b13fa4f": {
@@ -3739,7 +3739,7 @@
   "confidence": 0.8,
   "asked": "2026-09-27"
  },
- "08731467cc945f6f": {
+ "5bedf19fde38b5cb": {
   "file": "38_Patterns--Simulation.md",
   "line": 181,
   "target": "23_Patterns--Iterators.md",
@@ -3899,14 +3899,14 @@
   "confidence": 0.63,
   "asked": "2026-09-27"
  },
- "e66ecce0f40af445": {
+ "aa7691c9f4c55127": {
   "file": "39_Patterns--Pattern_Catalog.md",
   "line": 89,
   "target": "29_Patterns--Changing_the_Interface.md",
   "anchor": "adapter",
   "sentence": "| [*Adapter*](29_Patterns--Changing_the_Interface.md#adapter) | Convert one interface into another a client expects. |",
   "verdict": "supports",
-  "confidence": 0.88,
+  "confidence": 0.85,
   "asked": "2026-09-27"
  },
  "6ad618daa7a19a6d": {
@@ -3929,14 +3929,14 @@
   "confidence": 0.95,
   "asked": "2026-09-27"
  },
- "a12e7cd082896677": {
+ "bba4bef36c8fa96b": {
   "file": "39_Patterns--Pattern_Catalog.md",
   "line": 95,
   "target": "26_Patterns--Surrogate.md",
   "anchor": "proxy",
   "sentence": "| [*Proxy*](26_Patterns--Surrogate.md#proxy) | Provide a surrogate that controls access to another object. |",
   "verdict": "supports",
-  "confidence": 0.77,
+  "confidence": 0.49,
   "asked": "2026-09-27"
  },
  "882041ce2f9534c3": {
@@ -4059,14 +4059,14 @@
   "confidence": 0.74,
   "asked": "2026-09-27"
  },
- "9d2c3d7fdff38fbf": {
+ "164b593d4dd74812": {
   "file": "39_Patterns--Pattern_Catalog.md",
   "line": 141,
   "target": "23_Patterns--Iterators.md",
   "anchor": "reusable-algorithms",
   "sentence": "| [*Pipes and Filters*](23_Patterns--Iterators.md#reusable-algorithms) | Process a stream through a chain of independent transforms. |",
   "verdict": "supports",
-  "confidence": 0.96,
+  "confidence": 0.95,
   "asked": "2026-09-27"
  },
  "5dddebe888d50370": {
@@ -4479,14 +4479,14 @@
   "confidence": 0.7,
   "asked": "2026-09-27"
  },
- "41edebfc09818091": {
+ "e6ffa6305bc875dc": {
   "file": "41_Functional--Toolkits.md",
   "line": 92,
   "target": "30_Patterns--Observer.md",
   "anchor": "the-pythonic-observer-callables-in-a-list",
   "sentence": "That is the lapsed-listener leak of [The Pythonic *Observer*](30_Patterns--Observer.md#the-pythonic-observer-callables-in-a-list) in cache form.",
   "verdict": "supports",
-  "confidence": 0.91,
+  "confidence": 0.89,
   "asked": "2026-09-27"
  },
  "01e4e4d8a7c3a0ee": {
@@ -4549,7 +4549,7 @@
   "confidence": 0.77,
   "asked": "2026-09-27"
  },
- "ab5c893e8a4ff524": {
+ "fef3699bac119553": {
   "file": "41_Functional--Toolkits.md",
   "line": 381,
   "target": "23_Patterns--Iterators.md",
@@ -4569,14 +4569,14 @@
   "confidence": 0.86,
   "asked": "2026-09-27"
  },
- "5fd14bd64bea4459": {
+ "7015a0709cd87515": {
   "file": "41_Functional--Toolkits.md",
   "line": 553,
   "target": "23_Patterns--Iterators.md",
   "anchor": "reusable-algorithms",
   "sentence": "[Reusable Algorithms](23_Patterns--Iterators.md#reusable-algorithms) works through that case.",
   "verdict": "supports",
-  "confidence": 0.87,
+  "confidence": 0.84,
   "asked": "2026-09-27"
  },
  "2cadcd4298f5d8fc": {
@@ -4699,14 +4699,14 @@
   "confidence": 0.96,
   "asked": "2026-09-27"
  },
- "1c5a3bd42a6c0dee": {
+ "11b32426fea91702": {
   "file": "43_Functional--Confidence.md",
   "line": 104,
   "target": "41_Functional--Toolkits.md",
-  "anchor": "lru_cache",
-  "sentence": "Referential transparency is what makes [`lru_cache`](41_Functional--Toolkits.md#lru_cache) safe: a memoizer can return a stored result because the call is interchangeable with its value.",
-  "verdict": "says_nothing",
-  "confidence": 0.66,
+  "anchor": "cache",
+  "sentence": "Referential transparency is what makes [`lru_cache`](41_Functional--Toolkits.md#cache) safe: a memoizer can return a stored result because the call is interchangeable with its value.",
+  "verdict": "supports",
+  "confidence": 0.64,
   "asked": "2026-09-27"
  },
  "9560e70c27cea874": {
@@ -4769,14 +4769,14 @@
   "confidence": 0.96,
   "asked": "2026-09-27"
  },
- "bc9a05ceba6ecfa0": {
+ "beb693c6b935a9a5": {
   "file": "44_Effects--Effect_Management.md",
   "line": 21,
   "target": "20_Patterns--Rethinking_Objects.md",
   "anchor": "polymorphism-without-inheritance",
   "sentence": "- [Rethinking Objects](20_Patterns--Rethinking_Objects.md#polymorphism-without-inheritance) turns shapes into immutable data, so one pure function replaces a method on each class.",
-  "verdict": "says_nothing",
-  "confidence": 0.55,
+  "verdict": "supports",
+  "confidence": 0.45,
   "asked": "2026-09-27"
  },
  "1802cac89b2dec7f": {
@@ -4879,14 +4879,14 @@
   "confidence": 0.92,
   "asked": "2026-09-27"
  },
- "1be561b1d3585404": {
+ "3ef8b7a4d8490aab": {
   "file": "44_Effects--Effect_Management.md",
   "line": 1040,
   "target": "30_Patterns--Observer.md",
   "anchor": "the-pythonic-observer-callables-in-a-list",
   "sentence": "3.  Classify every Effect in `slope_catch.py`, `withdraw()` from [Foundations](40_Functional--Foundations.md#pure-functions), and the `Thermometer` that keeps a `_celsius` from [*Observer*](30_Patterns--Observer.md#the-pythonic-observer-callables-in-a-list):",
   "verdict": "supports",
-  "confidence": 0.93,
+  "confidence": 0.89,
   "asked": "2026-09-27"
  },
  "5ce1490b509b0912": {
@@ -4919,7 +4919,7 @@
   "confidence": 0.86,
   "asked": "2026-09-27"
  },
- "c4cf3d18a333a76d": {
+ "eb69540468e9a855": {
   "file": "45_Effects--Generators.md",
   "line": 191,
   "target": "44_Effects--Effect_Management.md",

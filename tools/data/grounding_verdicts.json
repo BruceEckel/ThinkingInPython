@@ -249,7 +249,7 @@
  },
  "404b8df50ff4dc33": {
   "file": "30_Patterns--Observer.md",
-  "line": 413,
+  "line": 414,
   "target": "42_Functional--Error_Handling.md",
   "terms": [
    "announce"
@@ -260,7 +260,7 @@
  },
  "e8e91f728192b79c": {
   "file": "30_Patterns--Observer.md",
-  "line": 1397,
+  "line": 1398,
   "target": "17_Techniques--Metaprogramming.md",
   "terms": [
    "Notifying",

@@ -16,10 +16,10 @@ type" to Static Types' annotation-syntax section, when chapter 12 is
 where the book argues it.
 
 Answers are stored in `tools/data/link_support_verdicts.json`, keyed by
-the sentence, the target, and the section's text, so an edit to either
-end re-asks that link and nothing else. A section is cut at
-`judgments.SECTION_LIMIT` characters; a link to a long chapter-level
-section is judged on its opening.
+the sentence, the target, and the section text the question saw, so an
+edit to either end re-asks that link and nothing else. A section longer
+than `judgments.SECTION_LIMIT` characters is sent as its opening plus
+the subsections that best match the sentence; `excerpt()` says why.
 
     tip link-support                       # ask about new links, report
     tip link-support ARGS=--report         # report from the store only
@@ -28,6 +28,7 @@ section is judged on its opening.
 
 import argparse
 import datetime
+import re
 import sys
 from dataclasses import dataclass
 from typing import Any
@@ -78,6 +79,66 @@ class Link:
                              self.section)
 
 
+WORD = re.compile(r"[a-z_][a-z0-9_]{3,}")
+
+
+def words(text: str) -> set[str]:
+    """Lowercase words of four or more letters, link targets removed."""
+    return set(WORD.findall(re.sub(r"\]\([^)]*\)", "]", text.lower())))
+
+
+def excerpt(section: str, sentence: str) -> str:
+    """The part of a section a question sees.
+
+    A section under the limit goes whole. A longer one used to be cut at
+    the limit, and two of the first run's false alarms came from that
+    cut: chapters 34 and 44 link to chapter 20's 33,000-character
+    "Polymorphism Without Inheritance", whose covering text starts
+    11,934 characters in. Sending only the one subsection that best
+    matched the sentence fixed those two and broke four links into
+    Surrogate's "Proxy", whose opening was what covered them. So a long
+    section sends its opening, then as many subsections as fit, chosen
+    by how many words each shares with the sentence and kept in book
+    order, with `[...]` wherever text was left out.
+    """
+    limit = judgments.SECTION_LIMIT
+    if len(section) <= limit:
+        return section
+    lines = section.split("\n")
+    level = len(lines[0]) - len(lines[0].lstrip("#"))
+    starts: list[int] = []
+    fenced = False
+    for i, line in enumerate(lines[1:], 1):
+        if line.startswith("```"):
+            fenced = not fenced
+        elif not fenced and re.match(rf"#{{{level + 1},}}\s", line):
+            starts.append(i)
+    if not starts:
+        return section[:limit]
+    opening = "\n".join(lines[:starts[0]])[:limit // 3]
+    parts = ["\n".join(lines[a:b])
+             for a, b in zip(starts, [*starts[1:], len(lines)])]
+    wanted = words(sentence)
+    budget = limit - len(opening)
+    chosen: set[int] = set()
+    for i in sorted(range(len(parts)),
+                    key=lambda i: (-len(wanted & words(parts[i])), i)):
+        if len(parts[i]) + 8 <= budget:
+            chosen.add(i)
+            budget -= len(parts[i]) + 8
+    if not chosen:  # even the best subsection is too long: cut it
+        best = max(range(len(parts)),
+                   key=lambda i: len(wanted & words(parts[i])))
+        return f"{opening}\n\n[...]\n\n{parts[best]}"[:limit]
+    out = [opening]
+    for i, part in enumerate(parts):
+        if i in chosen:
+            out.append(part)
+        elif out[-1] != "[...]":
+            out.append("[...]")
+    return "\n\n".join(out)
+
+
 def links() -> list[Link]:
     """Every anchored link into another chapter, once per sentence."""
     book = corpus()
@@ -94,8 +155,7 @@ def links() -> list[Link]:
                 if section is None:  # heading_links.py reports it
                     continue
                 link = Link(path.name, line, previous, text, m.group(1),
-                            target, anchor,
-                            section[:judgments.SECTION_LIMIT])
+                            target, anchor, excerpt(section, text))
                 out.setdefault(link.key, link)
             previous = text
     return list(out.values())
