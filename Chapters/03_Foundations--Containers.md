@@ -335,8 +335,6 @@ print(ages.keys() & other.keys())  # Set algebra on a view
 #: {'Bob'}
 ```
 
-The next section, on sets, names every one of these operators.
-
 A `dict` iterates in insertion order, and the language guarantees that order.
 
 Entries come out as easily as they go in, and two dictionaries combine:
@@ -359,8 +357,7 @@ print(dict(zip("abc", [1, 2, 3])))  # Build from pairs
 
 `|` builds a merged `dict` and `|=` updates in place,
 the same job `update()` does.
-The next section uses `|` for set union,
-where the order of the operands makes no difference.
+For sets, `|` means union, and the order of the operands makes no difference.
 For dictionaries the order matters: when both dictionaries hold the same key,
 the right operand's value wins, so `"y"` comes out as `20`.
 The last line feeds `dict()` an iterable of `(key, value)` pairs,
@@ -728,7 +725,7 @@ completes the trio: a built-in,
 hashable mapping that rejects changes after creation.
 `MappingProxyType`, from the `types` module,
 is a read-only *view* onto a `dict` you still hold, not a container of its own.
-The example below uses it along with tuples and frozensets:
+A tuple, a frozenset, and a `MappingProxyType` each reject changes:
 
 ```python
 # immutable_containers.py
@@ -771,7 +768,6 @@ except TypeError as e:
 Modifying an immutable container is a type error as well as a runtime error,
 so each line that attempts it carries a `# type: ignore`.
 The comment silences the type checker.
-The runtime exception is what the listing exists to show.
 
 ### `frozendict`
 
@@ -844,7 +840,8 @@ except TypeError as e:
 The `tuple` holds the same `list` for its whole life,
 and that `list` stays free to change.
 A container holding an unhashable object is unhashable too.
-Immutability pays off when it goes all the way down.
+Immutability pays off when it goes all the way down,
+because then you can share or hash a value without worrying that something inside it changes.
 [Rethinking Objects](20_Patterns--Rethinking_Objects.md#the-immutability-solution)
 shows the same leak inside a frozen data class.
 
