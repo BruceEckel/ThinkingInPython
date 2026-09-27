@@ -878,8 +878,10 @@ def self_reference(v: Vars) -> None:
     """Fail if the book says something about its own chapters that those
     chapters disprove: an "appears nowhere else" that does appear, or an
     "earlier chapter" link pointing forward. Both are settled by substring
-    search, which is why they gate. The third rule in the tool, grounding,
-    is advisory and lives in `self-reference-report` below.
+    search, which is why they gate. The third rule, grounding, gates only
+    where a verdict stored by `grounding-triage` says the sentence
+    attributes its code names to a chapter that lacks them (SR004); an
+    untriaged finding is listed by `self-reference-report` below.
     """
     py("tools.check_self_reference")
 
@@ -1123,15 +1125,47 @@ def comment_report(v: Vars) -> None:
        *v.words("ARGS"))
 
 
-@task("List sentences attributing terms to a chapter that lacks them "
-      "(advisory)")
+@task("List grounding findings no verdict has settled yet (advisory)")
 def self_reference_report(v: Vars) -> None:
-    """Advisory, like `claims`. Adds the grounding rule: a sentence linking to
-    a chapter that contains none of the code terms the sentence names. It
-    catches real misattributions and also fires on sentences whose terms
-    belong to the linking chapter, so it reports rather than gates.
+    """Advisory, like `claims`. Adds the grounding rule's findings that have
+    no verdict in tools/data/grounding_verdicts.json: a sentence linking to
+    a chapter that contains none of the code terms the sentence names.
+    `grounding-triage` settles them; an empty list means every finding has
+    a verdict.
     """
     py("tools.check_self_reference", "--advisory", *v.words("ARGS"))
+
+
+# The TypeSafe SDK builds pydantic-core from source on the pinned Python,
+# so it stays out of pyproject.toml and joins only these two runs.
+TYPESAFE = ("uv", "run", "--with", "typesafe-sdk", "python", "-m")
+
+
+@task("Ask TypeSafe about new grounding findings; the gate reads the "
+      "stored verdicts (ARGS=--dry-run, --calibrate)")
+def grounding_triage(v: Vars) -> None:
+    """Needs TYPESAFE_API_KEY. The grounding rule cannot tell a sentence
+    that attributes its code names to the chapter it links (a real error)
+    from one that credits that chapter with an idea while the names are
+    its own. This asks, once per new finding, and commits the answer to
+    tools/data/grounding_verdicts.json. The self-reference gate reads that
+    file offline: a misattribution becomes SR004 and fails, an idea drops
+    out, and a finding with no verdict stays in `self-reference-report`.
+    """
+    run([*TYPESAFE, "tools.grounding_triage", *v.words("ARGS")])
+
+
+@task("Ask TypeSafe whether each anchored link's section covers what "
+      "its sentence claims (advisory; ARGS=--report, --all)")
+def link_support(v: Vars) -> None:
+    """Needs TYPESAFE_API_KEY unless ARGS=--report. Asks about each
+    anchored cross-chapter link not yet in
+    tools/data/link_support_verdicts.json, then lists the links whose
+    section says nothing about, or contradicts, what the sentence credits
+    it with. Advisory, like `claims`, which narrows the same question
+    without reading.
+    """
+    run([*TYPESAFE, "tools.link_support", *v.words("ARGS")])
 
 
 @task("Show every listing line wider than WIDTH=nn (default 60) in the "

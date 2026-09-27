@@ -1,0 +1,468 @@
+{
+ "37aaf25bd0d28980": {
+  "file": "02_Foundations--Tour.md",
+  "line": 531,
+  "target": "16_Techniques--Comprehensions.md",
+  "terms": [
+   "piece",
+   "arithmetic.py"
+  ],
+  "sentence": "Collecting every `piece.expression` above uses a list comprehension, which has the same kind of `for` clause as the generator expression in `arithmetic.py` but builds a list; [Comprehensions](16_Techniques--Comprehensions.md#list-comprehensions) covers the general form.",
+  "p_terms": 0.0,
+  "asked": "2026-09-27"
+ },
+ "0817097ab993e16a": {
+  "file": "11_Techniques--Testing.md",
+  "line": 106,
+  "target": "12_Techniques--Data_Classes_as_Types.md",
+  "terms": [
+   "Account"
+  ],
+  "sentence": "Most of this chapter's tests check the following `Account` class, a `@dataclass` ([Data Classes as Types](12_Techniques--Data_Classes_as_Types.md) explains the decorator):",
+  "p_terms": 0.0,
+  "asked": "2026-09-27"
+ },
+ "d4b3ffe75ef39268": {
+  "file": "12_Techniques--Data_Classes_as_Types.md",
+  "line": 231,
+  "target": "09_Foundations--Class_Attributes.md",
+  "terms": [
+   "depth"
+  ],
+  "sentence": "As [Class Attributes](09_Foundations--Class_Attributes.md) explains, of the three fields only `depth` appears as an attribute, because it has an initialization value.",
+  "p_terms": 0.07,
+  "asked": "2026-09-27"
+ },
+ "f1a0d2aa476f42fa": {
+  "file": "12_Techniques--Data_Classes_as_Types.md",
+  "line": 984,
+  "target": "05_Foundations--Functions.md",
+  "terms": [
+   "Months"
+  ],
+  "sentence": "Python evaluates a default value once, at class definition, so every `Months` reads and writes that one list, the trap shown in [Functions](05_Foundations--Functions.md#the-mutable-default-trap).",
+  "p_terms": 0.03,
+  "asked": "2026-09-27"
+ },
+ "fa2f1549160e7e2a": {
+  "file": "14_Techniques--Decorators.md",
+  "line": 1128,
+  "target": "07_Foundations--Classes.md",
+  "terms": [
+   "trace"
+  ],
+  "sentence": "`@property`, `@cached_property`, `@staticmethod`, and `@classmethod` (see [Properties](07_Foundations--Classes.md#properties) and [Static and Class Methods](07_Foundations--Classes.md#static-and-class-methods)) each wrap a function the same way `trace` does, but return a descriptor instead of a plain wrapper.",
+  "p_terms": 0.03,
+  "asked": "2026-09-27"
+ },
+ "a0de1b1b17d13b14": {
+  "file": "19_Techniques--Concurrency.md",
+  "line": 511,
+  "target": "15_Techniques--Context_Managers.md",
+  "terms": [
+   "Meter"
+  ],
+  "sentence": "`Meter` is a [context manager](15_Techniques--Context_Managers.md):",
+  "p_terms": 0.01,
+  "asked": "2026-09-27"
+ },
+ "4754b53da37ff3e9": {
+  "file": "19_Techniques--Concurrency.md",
+  "line": 1276,
+  "target": "22_Patterns--Data_Transfer_Objects.md",
+  "terms": [
+   "Times"
+  ],
+  "sentence": "`Times` names them, as [Data Transfer Objects](22_Patterns--Data_Transfer_Objects.md#returning-multiple-values) describes.",
+  "p_terms": 0.01,
+  "asked": "2026-09-27"
+ },
+ "734b3d881649c1ef": {
+  "file": "21_Patterns--Design_Patterns.md",
+  "line": 498,
+  "target": "20_Patterns--Rethinking_Objects.md",
+  "terms": [
+   "Need"
+  ],
+  "sentence": "[Rethinking Objects](20_Patterns--Rethinking_Objects.md#protocols-generalize-composition-adapts) builds on this, and [Stateless](46_Effects--Stateless.md#declaring-a-dependency) moves the same declaration into a function's signature, where `Need` names what the function requires of its surroundings.",
+  "p_terms": 0.05,
+  "asked": "2026-09-27"
+ },
+ "4925ead030b960dc": {
+  "file": "22_Patterns--Data_Transfer_Objects.md",
+  "line": 340,
+  "target": "09_Foundations--Class_Attributes.md",
+  "terms": [
+   "messenger_idiom.py",
+   "Messenger"
+  ],
+  "sentence": "1.  In `messenger_idiom.py`, create a second `Messenger` with different keyword arguments and confirm the two instances do not share attributes (unlike a [class attribute](09_Foundations--Class_Attributes.md)).",
+  "p_terms": 0.0,
+  "asked": "2026-09-27"
+ },
+ "ebf2d05c88d18b4b": {
+  "file": "23_Patterns--Iterators.md",
+  "line": 772,
+  "target": "20_Patterns--Rethinking_Objects.md",
+  "terms": [
+   "traverse",
+   "GoFIterator"
+  ],
+  "sentence": "`traverse()` is the loop a GoF caller writes, and it drives any type with those four methods, because `GoFIterator` is a [protocol](20_Patterns--Rethinking_Objects.md#protocols) rather than a base class.",
+  "p_terms": 0.0,
+  "asked": "2026-09-27"
+ },
+ "92ea1b2aa8c0d548": {
+  "file": "23_Patterns--Iterators.md",
+  "line": 843,
+  "target": "05_Foundations--Functions.md",
+  "terms": [
+   "DONE"
+  ],
+  "sentence": "`DONE` is a [sentinel](05_Foundations--Functions.md#sentinel-values), because the answer must differ from every value the source could yield.",
+  "p_terms": 0.01,
+  "asked": "2026-09-27"
+ },
+ "02a2236754e35047": {
+  "file": "24_Patterns--Singleton.md",
+  "line": 158,
+  "target": "11_Techniques--Testing.md",
+  "terms": [
+   "__Settings"
+  ],
+  "sentence": "The compiler [mangles](11_Techniques--Testing.md#white-box-and-black-box-tests) names only inside a class body, so at module level `__Settings` is the plain name it looks like.",
+  "p_terms": 0.01,
+  "asked": "2026-09-27"
+ },
+ "9912c8ce605b1548": {
+  "file": "24_Patterns--Singleton.md",
+  "line": 631,
+  "target": "26_Patterns--Surrogate.md",
+  "terms": [
+   "__call__"
+  ],
+  "sentence": "To evaluate `obj(...)`, Python looks up `__call__()` on the *type* of `obj` ([*Surrogate*](26_Patterns--Surrogate.md#special-methods-bypass-getattr) examines this type-based lookup in full).",
+  "p_terms": 0.03,
+  "asked": "2026-09-27"
+ },
+ "f042b4e197f81a9e": {
+  "file": "26_Patterns--Surrogate.md",
+  "line": 202,
+  "target": "11_Techniques--Testing.md",
+  "terms": [
+   "_Proxy__implementation"
+  ],
+  "sentence": "the name [mangles](11_Techniques--Testing.md#white-box-and-black-box-tests) to `_Proxy__implementation`, so it cannot collide with an attribute the implementation defines.",
+  "p_terms": 0.0,
+  "asked": "2026-09-27"
+ },
+ "2e71dc56c76b481b": {
+  "file": "26_Patterns--Surrogate.md",
+  "line": 742,
+  "target": "31_Patterns--State_Machines.md",
+  "terms": [
+   "change_to"
+  ],
+  "sentence": "Here the client programmer calls `change_to()`, but in a [*State Machine*](31_Patterns--State_Machines.md), each implementation chooses its own successor, so the surrogate advances without the client asking.",
+  "p_terms": 0.0,
+  "asked": "2026-09-27"
+ },
+ "04ed39e4b8874f00": {
+  "file": "26_Patterns--Surrogate.md",
+  "line": 747,
+  "target": "19_Techniques--Concurrency.md",
+  "terms": [
+   "change_to"
+  ],
+  "sentence": "While one thread runs a multi-call sequence like `run()`, another thread's `change_to()` can run between two of those calls, splitting the sequence across both implementations; see [Concurrency](19_Techniques--Concurrency.md#the-gil-does-not-prevent-races) for what an unsynchronized swap costs.",
+  "p_terms": 0.0,
+  "asked": "2026-09-27"
+ },
+ "3711bb4c386a5bfa": {
+  "file": "27_Patterns--Factory.md",
+  "line": 177,
+  "target": "23_Patterns--Iterators.md",
+  "terms": [
+   "shape_name"
+  ],
+  "sentence": "`shape_name()` is a [*generator*](23_Patterns--Iterators.md#generators).",
+  "p_terms": 0.0,
+  "asked": "2026-09-27"
+ },
+ "8ef838d56d0840f4": {
+  "file": "28_Patterns--Function_Objects.md",
+  "line": 160,
+  "target": "18_Techniques--Performance.md",
+  "terms": [
+   "Repeat"
+  ],
+  "sentence": "Here, `Repeat` is a [record](18_Techniques--Performance.md#record), so its configuration cannot change after construction:",
+  "p_terms": 0.01,
+  "asked": "2026-09-27"
+ },
+ "87e83a8b57bbc0ae": {
+  "file": "29_Patterns--Changing_the_Interface.md",
+  "line": 76,
+  "target": "26_Patterns--Surrogate.md",
+  "terms": [
+   "ProxyAdapter"
+  ],
+  "sentence": "The name `ProxyAdapter` uses the term \"[*Proxy*](26_Patterns--Surrogate.md#proxy)\" loosely:",
+  "p_terms": 0.0,
+  "asked": "2026-09-27"
+ },
+ "aa5a7959c6d4d7a1": {
+  "file": "29_Patterns--Changing_the_Interface.md",
+  "line": 160,
+  "target": "20_Patterns--Rethinking_Objects.md",
+  "terms": [
+   "WhatIUse2",
+   "WhatIWant",
+   "WhatIUse"
+  ],
+  "sentence": "a `WhatIUse2` refuses the `WhatIWant` that every `WhatIUse` accepts, and that breaks [substitutability](20_Patterns--Rethinking_Objects.md#liskov-substitution).",
+  "p_terms": 0.0,
+  "asked": "2026-09-27"
+ },
+ "12ce46050bf0a689": {
+  "file": "29_Patterns--Changing_the_Interface.md",
+  "line": 232,
+  "target": "18_Techniques--Performance.md",
+  "terms": [
+   "distance",
+   "Pair"
+  ],
+  "sentence": "It is a [record](18_Techniques--Performance.md#record) with two properties, written because `distance()` requires `x` and `y` but a `Pair` supplies `a` and `b`.",
+  "p_terms": 0.01,
+  "asked": "2026-09-27"
+ },
+ "82bb6893784c05ff": {
+  "file": "29_Patterns--Changing_the_Interface.md",
+  "line": 237,
+  "target": "26_Patterns--Surrogate.md",
+  "terms": [
+   "adapter"
+  ],
+  "sentence": "[Special methods bypass it](26_Patterns--Surrogate.md#special-methods-bypass-getattr), so an adapter that must support `adapter[key]` or `len(adapter)` defines those dunders (see exercise 1).",
+  "p_terms": 0.0,
+  "asked": "2026-09-27"
+ },
+ "404b8df50ff4dc33": {
+  "file": "30_Patterns--Observer.md",
+  "line": 413,
+  "target": "42_Functional--Error_Handling.md",
+  "terms": [
+   "announce"
+  ],
+  "sentence": "The listener catches its own exception and [returns the error as a value](42_Functional--Error_Handling.md#return-the-error-as-a-value), and `announce()` collects the returned errors for the caller.",
+  "p_terms": 0.01,
+  "asked": "2026-09-27"
+ },
+ "e8e91f728192b79c": {
+  "file": "30_Patterns--Observer.md",
+  "line": 1397,
+  "target": "17_Techniques--Metaprogramming.md",
+  "terms": [
+   "Notifying",
+   "announce"
+  ],
+  "sentence": "10. Write a `Notifying` [descriptor](17_Techniques--Metaprogramming.md#a-descriptor-that-validates) that replaces the `@property` and `announce()` pair, so one class declares several independently watched attributes:",
+  "p_terms": 0.02,
+  "asked": "2026-09-27"
+ },
+ "299953e2a35786a1": {
+  "file": "31_Patterns--State_Machines.md",
+  "line": 233,
+  "target": "13_Techniques--Pattern_Matching.md",
+  "terms": [
+   "APPEARS"
+  ],
+  "sentence": "A dotted name compares the event with that member, while a bare `APPEARS` would be a capture pattern that matches every event ([Pattern Matching](13_Techniques--Pattern_Matching.md#a-bare-name-captures-a-dotted-name-compares)).",
+  "p_terms": 0.02,
+  "asked": "2026-09-27"
+ },
+ "71a9cbdce79c7ed6": {
+  "file": "31_Patterns--State_Machines.md",
+  "line": 242,
+  "target": "25_Patterns--Template_Method.md",
+  "terms": [
+   "StateMachine"
+  ],
+  "sentence": "`StateMachine`'s constructor runs the initial state, the construction-starts-the-engine choice that [*Template Method* warns against](25_Patterns--Template_Method.md#dont-start-the-engine-in-the-constructor).",
+  "p_terms": 0.0,
+  "asked": "2026-09-27"
+ },
+ "e3c9c99b35195620": {
+  "file": "31_Patterns--State_Machines.md",
+  "line": 478,
+  "target": "06_Foundations--Modules_and_Packages.md",
+  "terms": [
+   "state_machine.py"
+  ],
+  "sentence": "Python [caches each module under its import name](06_Foundations--Modules_and_Packages.md), so a program that imports two files named `state_machine.py` gets the first one both times, with no error.",
+  "p_terms": 0.01,
+  "asked": "2026-09-27"
+ },
+ "e8596ef215d9870a": {
+  "file": "31_Patterns--State_Machines.md",
+  "line": 976,
+  "target": "26_Patterns--Surrogate.md",
+  "terms": [
+   "UnpredictablePerson",
+   "hello",
+   "Mood"
+  ],
+  "sentence": "1.  Using [*State*](26_Patterns--Surrogate.md#state), make a class called `UnpredictablePerson` that changes the kind of response to its `hello()` method depending on its current `Mood`.",
+  "p_terms": 0.01,
+  "asked": "2026-09-27"
+ },
+ "8b236a72729572a5": {
+  "file": "31_Patterns--State_Machines.md",
+  "line": 988,
+  "target": "23_Patterns--Iterators.md",
+  "terms": [
+   "mouse_move_generator",
+   "MouseAction"
+  ],
+  "sentence": "5.  Write a `mouse_move_generator()`, a [generator](23_Patterns--Iterators.md#generators) that yields valid `MouseAction` moves in sequence, where each possible move depends on the previous one (it is another state machine).",
+  "p_terms": 0.0,
+  "asked": "2026-09-27"
+ },
+ "806a7dc7e24cfdff": {
+  "file": "33_Patterns--Visitor.md",
+  "line": 116,
+  "target": "27_Patterns--Factory.md",
+  "terms": [
+   "flower_gen",
+   "Flower"
+  ],
+  "sentence": "`flower_gen()` reads the concrete classes from `Flower.__subclasses__()`, the same registry-free enumeration as [Factory](27_Patterns--Factory.md#simple-factory-method).",
+  "p_terms": 0.01,
+  "asked": "2026-09-27"
+ },
+ "9c56880fd09f0864": {
+  "file": "34_Patterns--Composite_and_Interpreter.md",
+  "line": 173,
+  "target": "08_Foundations--Static_Types.md",
+  "terms": [
+   "Directory",
+   "Node"
+  ],
+  "sentence": "`Directory` mentions `Node` above the [`type` statement](08_Foundations--Static_Types.md#the-type-statement) that defines it.",
+  "p_terms": 0.11,
+  "asked": "2026-09-27"
+ },
+ "f52e1a4cb81fc818": {
+  "file": "34_Patterns--Composite_and_Interpreter.md",
+  "line": 538,
+  "target": "33_Patterns--Visitor.md",
+  "terms": [
+   "to_infix"
+  ],
+  "sentence": "Adding `to_infix()` without editing a node class is the ability [*Visitor*](33_Patterns--Visitor.md) exists to provide: new operations over a fixed hierarchy, defined outside it.",
+  "p_terms": 0.0,
+  "asked": "2026-09-27"
+ },
+ "d8f5d0b90e5ce17a": {
+  "file": "35_Patterns--Flyweight.md",
+  "line": 216,
+  "target": "20_Patterns--Rethinking_Objects.md",
+  "terms": [
+   "Tile"
+  ],
+  "sentence": "A record blocks assignment to a field, not mutation inside one, so a `Tile` holding a `list` hands the same mutable list to every cell that shares the tile, the shallow-freezing trap in [Rethinking Objects](20_Patterns--Rethinking_Objects.md#the-immutability-solution).",
+  "p_terms": 0.03,
+  "asked": "2026-09-27"
+ },
+ "1e7bdfa6c4734885": {
+  "file": "37_Patterns--Pattern_Refactoring.md",
+  "line": 376,
+  "target": "32_Patterns--Multiple_Dispatching.md",
+  "terms": [
+   "bins"
+  ],
+  "sentence": "`bins[type(t)]` is the same dictionary-probe dispatch as the tables in [State Machines](31_Patterns--State_Machines.md#the-engine) and [*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md#one-lookup-in-a-table).",
+  "p_terms": 0.01,
+  "asked": "2026-09-27"
+ },
+ "fc74baefc0b1e835": {
+  "file": "37_Patterns--Pattern_Refactoring.md",
+  "line": 376,
+  "target": "31_Patterns--State_Machines.md",
+  "terms": [
+   "bins"
+  ],
+  "sentence": "`bins[type(t)]` is the same dictionary-probe dispatch as the tables in [State Machines](31_Patterns--State_Machines.md#the-engine) and [*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md#one-lookup-in-a-table).",
+  "p_terms": 0.01,
+  "asked": "2026-09-27"
+ },
+ "ac09f5e8941b7dcd": {
+  "file": "37_Patterns--Pattern_Refactoring.md",
+  "line": 636,
+  "target": "07_Foundations--Classes.md",
+  "terms": [
+   "singledispatch",
+   "recycling_note",
+   "Aluminum"
+  ],
+  "sentence": "`singledispatch` resolves through the [MRO](07_Foundations--Classes.md#method-resolution-order), so `recycling_note()` returns `Aluminum`'s note for that same piece.",
+  "p_terms": 0.01,
+  "asked": "2026-09-27"
+ },
+ "c5af7a4f94d39022": {
+  "file": "40_Functional--Foundations.md",
+  "line": 566,
+  "target": "05_Foundations--Functions.md",
+  "terms": [
+   "partial"
+  ],
+  "sentence": "For a function whose parameters are [positional-only](05_Foundations--Functions.md#positional-only-and-keyword-only-parameters), position is the only way to bind an argument, and `partial()` fills positional arguments from the left, so before 3.14, fixing the third argument meant fixing the first two as well.",
+  "p_terms": 0.01,
+  "asked": "2026-09-27"
+ },
+ "d2b75b2af9d16cb3": {
+  "file": "41_Functional--Toolkits.md",
+  "line": 602,
+  "target": "05_Foundations--Functions.md",
+  "terms": [
+   "fillvalue"
+  ],
+  "sentence": "When `None` is a valid element, pass a distinct [sentinel](05_Foundations--Functions.md#sentinel-values) as the `fillvalue` keyword argument:",
+  "p_terms": 0.01,
+  "asked": "2026-09-27"
+ },
+ "b0dc91a7cce04574": {
+  "file": "42_Functional--Error_Handling.md",
+  "line": 216,
+  "target": "12_Techniques--Data_Classes_as_Types.md",
+  "terms": [
+   "Result"
+  ],
+  "sentence": "`Result` is the same idea as in [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#parse-dont-validate):",
+  "p_terms": 0.03,
+  "asked": "2026-09-27"
+ },
+ "709ba98f5b49d11a": {
+  "file": "46_Effects--Stateless.md",
+  "line": 1321,
+  "target": "44_Effects--Effect_Management.md",
+  "terms": [
+   "Need"
+  ],
+  "sentence": "Reading a clock is a [side cause](44_Effects--Effect_Management.md#what-is-an-effect), and `Need[Time]` moves that into the Ability channel.",
+  "p_terms": 0.0,
+  "asked": "2026-09-27"
+ },
+ "757f33f7028c918e": {
+  "file": "47_Effects--Stateless_in_Practice.md",
+  "line": 1333,
+  "target": "46_Effects--Stateless.md",
+  "terms": [
+   "Oven",
+   "Toaster"
+  ],
+  "sentence": "`Oven` and `Toaster` are distinct types, so the ambiguity of [When Two Implementations Match](46_Effects--Stateless.md#when-two-implementations-match) cannot arise here.",
+  "p_terms": 0.01,
+  "asked": "2026-09-27"
+ }
+}

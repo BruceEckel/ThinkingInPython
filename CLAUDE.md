@@ -245,13 +245,31 @@ English words ("a more complex design" must not disprove a claim about
 ("an earlier chapter") within 80 characters of a link pointing the other
 way.
 
-A third rule, `grounding`, reports and never gates: a sentence links to a
-chapter that contains *none* of the code terms the sentence names. It
-finds the real thing (it catches chapter 07's case), and it also fires on
-31 sentences whose terms belong to the *linking* chapter, which a target
-has no reason to mention. `tip self-reference-report` reads it, the same
-bargain `tip claims` strikes. Do not promote it into the gate without
-first getting that count to zero.
+A third rule, `grounding`, fires when a sentence links to a chapter that
+contains *none* of the code terms the sentence names. It finds the real
+thing (chapter 07's case), and it also fires on sentences whose terms
+belong to the *linking* chapter: all 41 of its findings on 2026-09-27.
+Since that date a model tells the two apart. `tip grounding-triage`
+(`tools/grounding_triage.py`, TypeSafe, needs `TYPESAFE_API_KEY`) asks
+about each finding with no stored verdict and commits the answer to
+`tools/data/grounding_verdicts.json`. The gate reads that file offline: a
+sentence judged to attribute its terms to the target is SR004 and fails,
+one judged to credit only an idea drops out, and one with no verdict yet
+stays SR002, which `tip self-reference-report` lists and the gate does
+not. So a new misattribution passes the gate until someone runs the
+triage; run it after editing a sentence that links another chapter.
+`ARGS=--calibrate` re-asks five planted misattributions and every stored
+case, for a model or wording change.
+
+`tip link-support` (`tools/link_support.py`) asks the neighboring
+question of every anchored cross-chapter link: does the linked section
+cover what the sentence credits it with? It reports and never gates,
+and caches in `tools/data/link_support_verdicts.json`. Its first run
+found chapter 42 linking "put the meaning in the type" to annotation
+syntax in chapter 08. Both tools share `tools/judgments.py`, and the SDK
+joins only their runs, through `uv run --with typesafe-sdk`: it builds
+`pydantic-core` from source on the pinned Python, so it stays out of
+`pyproject.toml`.
 
 The rules are literal and under-report by design: a claim with no code
 term in it is invisible to them. They are a floor, not a substitute for

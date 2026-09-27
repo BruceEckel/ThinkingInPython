@@ -12,7 +12,10 @@ import pytest
 
 from tools.check_self_reference import (
     GATE_CODES,
+    MISATTRIBUTED,
     Chapter,
+    grounding_key,
+    grounding_sites,
     load,
     scan,
     searchable,
@@ -43,7 +46,13 @@ def book(monkeypatch: pytest.MonkeyPatch, tmp_path: Path):
         monkeypatch.setattr(
             "tools.check_self_reference.corpus", lambda: written)
         return written
+    monkeypatch.setattr(
+        "tools.check_self_reference.grounding_verdicts", lambda: VERDICTS)
+    VERDICTS.clear()
     return make
+
+
+VERDICTS: dict[str, dict] = {}
 
 
 # ── searchable ────────────────────────────────────────────────────────────────
@@ -194,6 +203,52 @@ def test_grounding_stays_quiet_when_one_term_lands(book) -> None:
     assert codes(Document.parse(written["07_A--B.md"].path)) == []
 
 
-def test_grounding_is_not_a_gating_rule() -> None:
+SLOTS_CASE = {
+    "07_A--B.md": (
+        "A class declared with `slots=True`\n"
+        "([Rethinking Objects](20_C--D.md) uses it)\n"
+        "has no `__dict__`, so `cached_property` has nowhere to store.\n"),
+    "20_C--D.md": "Composition and protocols.\n",
+}
+
+
+def verdict_for(written: dict[str, Chapter], p_terms: float) -> None:
+    doc = Document.parse(written["07_A--B.md"].path)
+    [site] = grounding_sites(doc, NO_WAIVERS)
+    VERDICTS[grounding_key(site.target, site.sentence)] = {
+        "p_terms": p_terms}
+
+
+def test_a_misattribution_verdict_makes_it_gate(book) -> None:
+    written = book(SLOTS_CASE)
+    verdict_for(written, MISATTRIBUTED + 0.3)
+    assert codes(Document.parse(written["07_A--B.md"].path)) == ["SR004"]
+
+
+def test_an_idea_verdict_retires_the_finding(book) -> None:
+    written = book(SLOTS_CASE)
+    verdict_for(written, MISATTRIBUTED - 0.3)
+    assert codes(Document.parse(written["07_A--B.md"].path)) == []
+
+
+def test_the_verdict_key_ignores_reflowing() -> None:
+    one_line = "A `Tile` from [Rethinking Objects](20_C--D.md) holds it."
+    wrapped = "A `Tile` from\n[Rethinking Objects](20_C--D.md)\nholds it."
+    assert (grounding_key("20_C--D.md", one_line)
+            == grounding_key("20_C--D.md", wrapped))
+
+
+def test_a_sentence_linking_one_target_twice_is_one_site(book) -> None:
+    written = book({
+        "14_A--B.md": (
+            "`@property` ([Properties](07_C--D.md#properties) and\n"
+            "[Methods](07_C--D.md#methods)) wraps like `trace` does.\n"),
+        "07_C--D.md": "## Properties\n\nText.\n\n## Methods\n\nText.\n",
+    })
+    doc = Document.parse(written["14_A--B.md"].path)
+    assert len(list(grounding_sites(doc, NO_WAIVERS))) == 1
+
+
+def test_only_an_untriaged_grounding_finding_reports() -> None:
     assert "SR002" not in GATE_CODES
-    assert {"SR001", "SR003"} == set(GATE_CODES)
+    assert {"SR001", "SR003", "SR004"} == set(GATE_CODES)

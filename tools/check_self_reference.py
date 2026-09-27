@@ -20,7 +20,7 @@ detectable by any gate.
 
 This is that grep. Three rules, each taken from a real error's shape and
 each decidable by substring search rather than by understanding English.
-Two of them gate. The third reports.
+Two of them gate. The third gates only on a stored model verdict.
 
 `absence`   GATES. A sentence claiming something appears nowhere else,
             where it does. Chapter 08's basic-types table said "(`bytes`
@@ -36,15 +36,20 @@ Two of them gate. The third reports.
             introduced `@functools.cache` as coming "from earlier
             chapters"; it is chapter 18.
 
-`grounding` REPORTS, and is left out of the gate. A sentence links to
+`grounding` REPORTS until a verdict settles it. A sentence links to
             another chapter and the target contains *none* of the code
             terms the sentence names. That is the `slots=True` case
             above, and running it against the pre-fix book finds it. It
-            also finds 31 sentences in the current book whose terms
-            belong to the *linking* chapter, which a target has no reason
-            to mention, so it cannot gate without teaching everyone to
-            ignore a red check. `--advisory` includes it; `tip
-            self-reference-report` is the standing way to read it.
+            also finds sentences whose terms belong to the *linking*
+            chapter, which a target has no reason to mention: all 41 of
+            its findings on 2026-09-27. Search cannot tell the two apart,
+            so `grounding_triage.py` asks a model which one each sentence
+            is and commits the answer to `tools/data/
+            grounding_verdicts.json`. A sentence judged to attribute its
+            terms to the target becomes SR004, which GATES; one judged to
+            credit the target only with an idea drops out; one with no
+            verdict yet stays SR002, which reports. The gate reads the
+            committed verdicts and never calls the model.
 
 The rules are deliberately literal, so they under-report, and that is the
 trade for precision. A claim with no code term in it ("makes illegal
@@ -59,7 +64,7 @@ rule is wrong and the prose is right. It is empty today.
 
 Usage:
     python -m tools.check_self_reference              # the gating rules
-    python -m tools.check_self_reference --advisory   # plus grounding
+    python -m tools.check_self_reference --advisory   # plus untriaged grounding
     python -m tools.check_self_reference --rule grounding
     python -m tools.check_self_reference Chapters/07_Foundations--Classes.md
     python -m tools.check_self_reference --list       # the rules
@@ -72,12 +77,19 @@ from dataclasses import dataclass
 from functools import cache
 from pathlib import Path
 
+from tools import judgments
 from tools.config import CHAPTERS_DIR, DATA_DIR
 from tools.markdown import Document
 from tools.repo import add_paths_arg, md_files
 from tools.report import Check, Finding, report
 
 WAIVERS_FILE = DATA_DIR / "self_reference_ok.txt"
+VERDICTS_FILE = DATA_DIR / "grounding_verdicts.json"
+
+# A verdict's probability that the sentence attributes its terms to the
+# linked chapter. On 2026-09-27 the 41 real findings scored 0.00-0.11
+# and five planted misattributions 0.66-0.93, so 0.4 sits in the gap.
+MISATTRIBUTED = 0.4
 
 # A link into another chapter file, with an optional anchor. The filename
 # class must allow "-", which is what the `--` part-name separator needs;
@@ -367,20 +379,86 @@ def scan(doc: Document, waivers: frozenset[str]) -> Iterator[Finding]:
                             message=(f'"{hit}" points {way}: [{label}] is '
                                      f"{place(target)}"))
 
-            # Grounding fires only when the target shares NONE of the
-            # sentence's code vocabulary. Reporting each absent term
-            # separately produced 172 findings, nearly all of them terms
-            # belonging to the *linking* chapter, which a target has no
-            # reason to mention. "Not one of these words is over there"
-            # is the signal that the sentence named the wrong chapter.
-            live = [t for t in terms if not waived(waivers, stem, t)]
-            if live and not any(target.contains(t) for t in live):
-                listed = ", ".join(f"`{t}`" for t in live[:3])
-                more = "" if len(live) <= 3 else f" (+{len(live) - 3} more)"
-                yield Finding(
-                    doc.path, line, code="SR002",
-                    message=(f"{target_file} contains none of {listed}"
-                             f"{more}, which this sentence attributes to it"))
+    for site in grounding_sites(doc, waivers):
+        listed = ", ".join(f"`{t}`" for t in site.terms[:3])
+        extra = len(site.terms) - 3
+        more = "" if extra <= 0 else f" (+{extra} more)"
+        verdict = grounding_verdicts().get(site.key)
+        if verdict is None:
+            yield Finding(
+                doc.path, site.line, code="SR002",
+                message=(f"{site.target} contains none of {listed}{more}; "
+                         "no verdict yet, run `tip grounding-triage`"))
+        elif verdict["p_terms"] >= MISATTRIBUTED:
+            yield Finding(
+                doc.path, site.line, code="SR004",
+                message=(f"{site.target} contains none of {listed}{more}, "
+                         "and this sentence attributes them to it "
+                         f"(p={verdict['p_terms']:.2f})"))
+
+
+@dataclass(frozen=True)
+class Site:
+    """One sentence and one link where the grounding rule fires."""
+
+    line: int
+    sentence: str
+    previous: str
+    target: str
+    anchor: str
+    label: str
+    terms: list[str]
+
+    @property
+    def key(self) -> str:
+        return grounding_key(self.target, self.sentence)
+
+
+def grounding_sites(doc: Document, waivers: frozenset[str]
+                    ) -> Iterator[Site]:
+    """Each (sentence, linked chapter) whose target shares none of the
+    sentence's code terms, once per target even if linked twice.
+
+    Grounding fires only when the target shares NONE of the sentence's
+    code vocabulary. Reporting each absent term separately produced 172
+    findings, nearly all of them terms belonging to the *linking*
+    chapter, which a target has no reason to mention. "Not one of these
+    words is over there" is the signal that the sentence named the wrong
+    chapter.
+    """
+    book = corpus()
+    if doc.path.name not in book:
+        return
+    stem = doc.path.stem
+    previous = ""
+    for line, text in sentences(doc):
+        live = [
+            t for t in dict.fromkeys(
+                t for t in (searchable(c) for c in CODE_SPAN.findall(text))
+                if t)
+            if not waived(waivers, stem, t)]
+        seen: set[str] = set()
+        for match in LINK.finditer(text):
+            target_file = match.group(2)
+            target = book.get(target_file)
+            if (target is None or not live or target_file in seen
+                    or waived(waivers, stem, target_file)
+                    or any(target.contains(t) for t in live)):
+                continue
+            seen.add(target_file)
+            yield Site(line, text, previous, target_file,
+                       match.group(3) or "", match.group(1), live)
+        previous = text
+
+
+def grounding_key(target_file: str, sentence: str) -> str:
+    """The verdict store's key for one grounding finding."""
+    return judgments.key(target_file, sentence)
+
+
+@cache
+def grounding_verdicts() -> dict[str, dict]:
+    return judgments.load(VERDICTS_FILE)
 
 
 @cache
@@ -388,15 +466,13 @@ def default_waivers() -> frozenset[str]:
     return frozenset(load_waivers(WAIVERS_FILE))
 
 
-# What `gate` runs. `grounding` is deliberately outside it: on the book
-# as it stands the rule reports 31 sentences whose terms belong to the
-# *linking* chapter, which a target has no reason to mention, and one
-# check that cries wolf 31 times teaches everyone to skip it. It stays
-# available because it does catch the real thing (it finds chapter 07's
-# `slots=True` attribution to a chapter that never mentions slots), which
-# is the same bargain `check_claims.py` strikes: narrow the question for
-# a human, do not pretend to settle it.
-GATE_CODES = frozenset({"SR001", "SR003"})
+# What `gate` runs. SR002 stays outside it: a grounding finding with no
+# verdict may be either shape, and one check that cries wolf teaches
+# everyone to skip it. SR004 is the same finding after a verdict says the
+# sentence does attribute its terms to the target. It still catches the
+# real thing, chapter 07's `slots=True` attribution to a chapter that
+# never mentions slots, and on 2026-09-27 it had nothing else to catch.
+GATE_CODES = frozenset({"SR001", "SR003", "SR004"})
 
 
 def find(doc: Document) -> Iterator[Finding]:
@@ -416,6 +492,7 @@ CHECK = Check(
 RULES = {
     "absence": "SR001",
     "grounding": "SR002",
+    "misattribution": "SR004",
     "direction": "SR003",
 }
 
@@ -428,7 +505,8 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--rule", choices=sorted(RULES),
                     help="report only this rule")
     ap.add_argument("--advisory", action="store_true",
-                    help="include grounding, which the gate leaves out")
+                    help="include untriaged grounding, which the gate "
+                         "leaves out")
     ap.add_argument("--list", action="store_true",
                     help="describe the rules and exit")
     args = ap.parse_args(argv)
