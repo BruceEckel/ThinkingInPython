@@ -22,19 +22,18 @@ or the nearly-equivalent *Document-View* architecture,
 which folds the controller into the view.
 In both, *Observer* connects the data to its views:
 one subject holds a list of views and names no view type.
-A *document* has more than one way to view it, for example a plot and a table.
+A *document* has more than one way to view it, such as a plot and a table.
 When the data changes, every view must refresh.
 With *Observer*, a change in the subject's data notifies each interested view.
 
 ## The Classic Observer: an Interface to Implement
 
-The classic design comes from *GoF Design Patterns*,
-and this section uses that vocabulary:
+The classic design comes from *GoF Design Patterns*:
 
 - The object that changes is the *subject*
 - Each *observer* implements an interface with one method
 
-The design has three parts: an `Observer` interface every observer implements,
+The GoF design has three parts: an `Observer` interface every observer implements,
 a `Subject` base class that keeps the observer list,
 and `Subject.notify()` that broadcasts to every observer:
 
