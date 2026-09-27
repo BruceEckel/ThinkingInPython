@@ -12,8 +12,7 @@ Science has theories that fit the data, are predictive, and are falsifiable.
 If "computer science" is to live up to its name,
 some of its ideas and practices should fit that definition,
 and perhaps some should even be mathematically provable.
-This seems to me to be the broader challenge that functional programming takes on,
-and what this chapter explores.
+This seems to me to be the broader challenge that functional programming takes on.
 
 The preceding chapters build the machinery.
 [Foundations](40_Functional--Foundations.md)
