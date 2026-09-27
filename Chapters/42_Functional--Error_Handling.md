@@ -213,7 +213,7 @@ reporting that `Err[str]` in the union has no `unwrap`,
 so a reader who writes that line in their own code sees that report first,
 at check time.
 
-`Result` is the same idea as in [Static Types](08_Foundations--Static_Types.md#type-hints):
+`Result` is the same idea as in [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#parse-dont-validate):
 put the meaning in the type.
 Python's simpler form is `int | None`.
 Both force the caller to unpack, but `None` says only "no answer,"
