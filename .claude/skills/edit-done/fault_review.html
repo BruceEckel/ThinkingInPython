@@ -71,6 +71,8 @@ main { display: grid; gap: 16px; }
 .pill.approve { background: var(--yes-soft); color: var(--yes); }
 .pill.local { background: var(--local-soft); color: var(--local); }
 .pill.edited { background: var(--accent-soft); color: var(--accent); }
+.pill.hint { background: var(--bg); color: var(--muted); border: 1px solid var(--rule); }
+.label { font-size: .78rem; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
 .diff { font-family: var(--serif); font-size: 1.05rem; line-height: 1.65; margin: 0; }
 .diff del { background: var(--del-soft); color: var(--del); text-decoration: line-through; text-decoration-thickness: 1px; border-radius: 2px; }
 .diff ins { background: var(--ins-soft); color: var(--ins); text-decoration: none; border-radius: 2px; }
@@ -80,6 +82,7 @@ details summary { cursor: pointer; color: var(--muted); font-size: .85rem; }
 details p { font-family: var(--serif); margin: 8px 0 0; color: var(--muted); }
 details mark { background: var(--mark); color: var(--ink); border-radius: 2px; }
 .fault label { display: block; font-size: .78rem; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+.hint.empty-line { color: var(--local); }
 textarea {
   width: 100%; min-height: 3.6em; resize: vertical; font: inherit; font-size: .95rem;
   color: var(--ink); background: var(--bg); border: 1px solid var(--rule); border-radius: 6px; padding: 8px 10px;
@@ -103,7 +106,7 @@ button:disabled { opacity: .5; cursor: default; }
 <div class="wrap">
   <header class="top">
     <h1>Fault Line Review</h1>
-    <p class="lede" id="lede">Each card is a sentence you rewrote. If the rewrite fixed something that could turn up elsewhere in the book, edit the proposed fault line until it names that fault, then Approve it. If the rewrite was specific to its spot (a renumbered exercise, a corrected fact), mark it Local edit. Approved lines are what the book-wide search looks for.</p>
+    <p class="lede" id="lede">Each card shows a sentence you rewrote, and below it a fault line: my one-line statement of what your rewrite fixed. The book-wide search looks for that fault, so you approve the fault line, not the rewrite. Edit the line until it names the fault, then Approve. If the rewrite was specific to its spot (a renumbered exercise, a corrected fact), mark it Local edit.</p>
     <div class="progress">
       <span id="count">0 of 0 decided</span>
       <div class="bar"><span id="fill"></span></div>
@@ -186,16 +189,18 @@ function render() {
         <div class="where"><span>${esc(c.file)}:${c.line}</span>
           ${c.decision === "approve" ? `<span class="pill approve">Approved</span>` : ""}
           ${c.decision === "local" ? `<span class="pill local">Local edit</span>` : ""}
-          ${edited && c.proposed ? `<span class="pill edited">Edited</span>` : ""}</div>
-        <p class="diff">${diffHtml(c.before, c.after)}</p>
+          ${edited && c.proposed ? `<span class="pill edited">Edited</span>` : ""}
+          ${c.local_hint && !c.decision ? `<span class="pill hint">I'd call this local</span>` : ""}</div>
+        <div><div class="label">Your rewrite</div>
+        <p class="diff">${diffHtml(c.before, c.after)}</p></div>
         ${contextHtml(c)}
         <div class="fault">
-          <label for="f-${esc(id)}">Fault line</label>
+          <label for="f-${esc(id)}">Fault line: what the rewrite fixed</label>
           <textarea id="f-${esc(id)}" ${dis} placeholder="What the sentence got wrong, so the search finds that fault and not a shared word">${esc(text)}</textarea>
-          ${c.proposed ? "" : `<div class="hint">No line was proposed for this one.</div>`}
+          ${text.trim() ? "" : `<div class="hint empty-line">No fault line yet. Write one to approve this card, or mark it Local edit.</div>`}
         </div>
         <div class="choices">
-          <button class="approve" data-decide="approve" aria-pressed="${c.decision === "approve"}" ${dis || (text.trim() ? "" : "disabled")}>Approve</button>
+          <button class="approve" data-decide="approve" aria-pressed="${c.decision === "approve"}" ${dis || (text.trim() ? "" : "disabled")} title="${text.trim() ? "Approve this fault line" : "Write a fault line first"}">Approve</button>
           <button class="local" data-decide="local" aria-pressed="${c.decision === "local"}" ${dis}>Local edit</button>
           ${c.decision ? `<button class="clear" data-decide="" ${dis}>Clear</button>` : ""}
         </div>
@@ -253,6 +258,8 @@ document.addEventListener("input", (ev) => {
   drafts.set(id, t.value);
   const approve = t.closest(".card").querySelector("button.approve");
   if (approve) approve.disabled = !t.value.trim();
+  const hint = t.closest(".card").querySelector(".hint.empty-line");
+  if (hint) hint.hidden = !!t.value.trim();
   clearTimeout(timers.get(id));
   timers.set(id, setTimeout(() => flushDraft(id), 900));
 });

@@ -17,9 +17,14 @@ the page shows and applies what he chose.
 `build/fault_review/docs/` (`meta/pass.json` and `cards/<pair key>.json`)
 and the `ArtifactData` batch lists that load them, 50 writes to a
 batch. A card's proposal comes from the proposals file, a JSON object
-from pair key to fault line, or else from the pair's stored `fault`.
-Proposing a fault is a judgment about Bruce's intent, so the session
-writes that file; this module never invents one.
+from pair key to either a fault line or `{"fault": ..., "local": true}`
+for an edit the session judges local, or else from the pair's stored
+`fault`. Every card should get a line: on chapter 30's first page the
+four cards left blank as local edits had a disabled Approve and read
+as broken, and Bruce wanted all four approved. A `local` card shows
+"I'd call this local" and leaves the decision to him. Proposing a
+fault is a judgment about Bruce's intent, so the session writes that
+file; this module never invents one.
 
 `apply` reads the cards back, as `ArtifactData`'s `list` with
 `out_dir` saves them, and writes each decision into `edit_pairs.json`:
@@ -47,7 +52,7 @@ def seed(since: str | None, span: str | None, proposals: Path | None
     pairs = judgments.load(PAIRS_FILE)
     keys = record_pass(pairs, since, span)
     judgments.save(PAIRS_FILE, pairs)
-    proposed: dict[str, str] = (
+    proposed: dict[str, Any] = (
         json.loads(proposals.read_text(encoding="utf-8"))
         if proposals else {})
     docs = OUT / "docs"
@@ -63,15 +68,19 @@ def seed(since: str | None, span: str | None, proposals: Path | None
         json.dumps(meta, ensure_ascii=False), encoding="utf-8")
     writes = [{"op": "set", "collection": "meta", "doc_id": "pass",
                "file_path": str(docs / "meta" / "pass.json")}]
+    blank = 0
     for order, k in enumerate(keys):
         p = pairs[k]
-        fault = proposed.get(k, p.get("fault", ""))
+        entry = proposed.get(k, p.get("fault", ""))
+        fault = entry["fault"] if isinstance(entry, dict) else entry
+        local = isinstance(entry, dict) and bool(entry.get("local"))
+        blank += not fault.strip()
         card = {
             "order": order, "file": p["file"], "line": p["line"],
             "heading": p.get("heading", ""),
             "paragraph": p.get("paragraph", ""),
             "before": p["before"], "after": p["after"],
-            "proposed": fault, "fault": fault,
+            "proposed": fault, "fault": fault, "local_hint": local,
             "decision": None}
         path = docs / "cards" / f"{k}.json"
         path.write_text(json.dumps(card, ensure_ascii=False),
@@ -81,8 +90,10 @@ def seed(since: str | None, span: str | None, proposals: Path | None
     for i in range(0, len(writes), BATCH):
         (OUT / f"batch{i // BATCH + 1}.json").write_text(
             json.dumps(writes[i:i + BATCH]), encoding="utf-8")
-    blank = sum(1 for k in keys if not proposed.get(
-        k, pairs[k].get("fault")))
+    if blank:
+        print(f"{blank} card(s) have no proposed line; give every card "
+              "one, marking local edits with \"local\": true",
+              file=sys.stderr)
     print(f"{len(keys)} cards ({blank} with no proposed fault), "
           f"{-(-len(writes) // BATCH)} batch file(s) in "
           f"{OUT.relative_to(ROOT)}")

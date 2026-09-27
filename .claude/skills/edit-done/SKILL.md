@@ -73,9 +73,14 @@ docstring has the mechanics). While the tag still exists:
    not "ends in a colon"). Name what the edit changed, not a nearby
    property: chapter 30's "generated" line first said "in a passage
    that does not name the mechanism" when Bruce's own sentence named
-   it. Leave local edits (an exercise renumbering, a fact correction)
-   out. Write the proposals to `build/fault_review/proposals.json` as
-   a JSON object from pair key to fault line.
+   it. Propose a line for every card, including edits you judge local
+   (an exercise renumbering, a fact correction): give those as
+   `{"fault": "...", "local": true}` so the card says "I'd call this
+   local" and Bruce decides. A card with no line cannot be approved,
+   and on chapter 30's first page the four left blank read as broken;
+   he wanted all four approved. Write the proposals to
+   `build/fault_review/proposals.json` as a JSON object from pair key
+   to fault line (or that object).
 3. Run `uv run python -m tools.fault_review seed --since
    edit-start-NN --proposals build/fault_review/proposals.json`.
 4. Copy `.claude/skills/edit-done/fault_review.html` to

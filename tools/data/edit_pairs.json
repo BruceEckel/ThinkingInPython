@@ -184,10 +184,14 @@
   "similarity": 0.667,
   "source": "edit-start-30",
   "added": "2026-09-27",
-  "fault": "",
-  "status": "needs fault",
+  "fault": "A bare consequence ('its tests need no GUI') leaves the reader to work out the benefit; say what the design makes possible and what difficulty it avoids.",
+  "status": "searchable",
   "heading": "A Visual Example of Observers",
-  "paragraph": "Because the model contains no display code, its tests need no GUI. Testing confirms that `recolored()` changes the cross and no other cell, that a click in a corner stays on the grid, and that observers receive the new grid after a click:"
+  "paragraph": "Because the model contains no display code, its tests need no GUI. Testing confirms that `recolored()` changes the cross and no other cell, that a click in a corner stays on the grid, and that observers receive the new grid after a click:",
+  "check": {
+   "before": 0.84,
+   "after": 0.13
+  }
  },
  "5bc1e7edeafc4e8f": {
   "file": "30_Patterns--Observer.md",
@@ -199,10 +203,14 @@
   "similarity": 0.881,
   "source": "edit-start-30",
   "added": "2026-09-27",
-  "fault": "",
-  "status": "needs fault",
+  "fault": "A claim that an exercise develops further carries no pointer to that exercise; a bare '(see exercise n)' belongs on it.",
+  "status": "unclear",
   "heading": "A Visual Example: a Model and Its View",
-  "paragraph": "One click changes up to five boxes, which makes the window a puzzle: try to turn every box `palegreen`. This is the only color that works; on the 8x8 grid `box_view.py` opens with, no sequence of clicks turns every box `skyblue` or every box `khaki`. The size decides that, and a 3x3 grid reaches all three colors. Exercise 8 works out which sizes reach which colors."
+  "paragraph": "One click changes up to five boxes, which makes the window a puzzle: try to turn every box `palegreen`. This is the only color that works; on the 8x8 grid `box_view.py` opens with, no sequence of clicks turns every box `skyblue` or every box `khaki`. The size decides that, and a 3x3 grid reaches all three colors. Exercise 8 works out which sizes reach which colors.",
+  "check": {
+   "before": 0.15,
+   "after": 0.09
+  }
  },
  "24958dff3f9ea045": {
   "file": "30_Patterns--Observer.md",
@@ -214,10 +222,14 @@
   "similarity": 0.372,
   "source": "edit-start-30",
   "added": "2026-09-27",
-  "fault": "",
-  "status": "needs fault",
+  "fault": "A sentence whose only job is to say what an exercise works out ('Exercise 8 works out which sizes reach which colors'), where a bare '(see exercise n)' on the claim it develops does the pointing.",
+  "status": "searchable",
   "heading": "A Visual Example: a Model and Its View",
-  "paragraph": "One click changes up to five boxes, which makes the window a puzzle: try to turn every box `palegreen`. This is the only color that works; on the 8x8 grid `box_view.py` opens with, no sequence of clicks turns every box `skyblue` or every box `khaki`. The size decides that, and a 3x3 grid reaches all three colors. Exercise 8 works out which sizes reach which colors."
+  "paragraph": "One click changes up to five boxes, which makes the window a puzzle: try to turn every box `palegreen`. This is the only color that works; on the 8x8 grid `box_view.py` opens with, no sequence of clicks turns every box `skyblue` or every box `khaki`. The size decides that, and a 3x3 grid reaches all three colors. Exercise 8 works out which sizes reach which colors.",
+  "check": {
+   "before": 0.76,
+   "after": 0.11
+  }
  },
  "c934711a2696bc86": {
   "file": "30_Patterns--Observer.md",
@@ -229,10 +241,14 @@
   "similarity": 0.985,
   "source": "edit-start-30",
   "added": "2026-09-27",
-  "fault": "",
-  "status": "needs fault",
+  "fault": "'Exercise' capitalized in running text ('see Exercise 7'); the book writes 'exercise n' in lowercase.",
+  "status": "searchable",
   "heading": "The View",
-  "paragraph": "The model names nothing about views, so you can attach a second view to the same model and keep both views in step (see Exercise 7). The dependency runs one way, and the view is the end that carries it: `box_view.py` imports `BoxModel`, reads `size` and `grid`, and calls `select()`."
+  "paragraph": "The model names nothing about views, so you can attach a second view to the same model and keep both views in step (see Exercise 7). The dependency runs one way, and the view is the end that carries it: `box_view.py` imports `BoxModel`, reads `size` and `grid`, and calls `select()`.",
+  "check": {
+   "before": 0.93,
+   "after": 0.11
+  }
  },
  "063e42300b6e4325": {
   "file": "bruce_edit_db.md",
