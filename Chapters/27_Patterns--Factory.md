@@ -1024,7 +1024,7 @@ There the table holds classes and `make()` calls one.
 Here the table holds instances and `spawn()` copies one.
 Use the prototype form when the interesting part of an object is its configured state rather than its type.
 
-These tests check the two required properties for a prototype registry.
+A prototype registry has two required properties.
 Each spawn must be independent, and the stored prototype must never change:
 
 ```python
