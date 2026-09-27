@@ -381,7 +381,6 @@ Each comes back `UNRESOLVED`.
 
 The checker needs three facts about a function: the row it declares,
 the Effects it hides, and the names it calls.
-Hiding is this appendix's one addition to Appendix A's notation:
 
 ```python
 # effect_marks.py
@@ -771,8 +770,8 @@ def test_a_declared_row_is_trusted_by_callers() -> None:
 ```
 
 The tests build `Facts` by hand.
-Because nothing in `infer_rows.py` reads source text,
-testing it requires no source text.
+Nothing in `infer_rows.py` reads source text,
+so a test builds its input by hand instead of writing and parsing a program.
 
 ## The Check
 
@@ -823,8 +822,9 @@ def check(
 ```
 
 `check()` takes source text in a dictionary and a table, and returns a `Report`.
-Because it reads no file and prints nothing,
-every test of it is a string in and a value out.
+It reads no file and prints nothing,
+so a test passes it a string and checks the returned value,
+with no files to create or output to capture.
 The `match` on `read_module()`'s result is where a parse failure becomes a finding,
 beside the findings about rows.
 
@@ -1067,7 +1067,6 @@ with types where it needs them.
 
 ## What the Checker Resolves, and What It Cannot See
 
-The resolution rules span three listings.
 Here, in one place, is what the checker resolves:
 
 - A bare name, through the module's imports, then its own definitions,
@@ -1105,7 +1104,7 @@ The checker trusts `hides()` without evidence.
 
 Cleverness removes none of these, because each one is a piece of type inference.
 Appendix A's argument holds: past this point you are writing a type checker.
-This appendix shows how much tracking needs no type inference.
+Much of tracking needs no type inference, though.
 Name resolution, a table of the standard library,
 and a fixed point give every function in a program a row.
 They verified the architecture of the program that computes the rows.
