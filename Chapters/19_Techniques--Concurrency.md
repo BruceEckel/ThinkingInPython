@@ -142,7 +142,6 @@ Each coroutine, upon encountering I/O,
 suspends itself and yields control ... but not to the OS.
 Instead, control goes to the *event loop*,
 which discovers the next available task to run.
-Two keywords and the `asyncio` library capture this:
 
 1. `async def` defines a *coroutine function*.
    Calling it runs nothing and returns a *coroutine object*,
@@ -243,8 +242,6 @@ If one of its coroutines raises an exception,
 `gather()` re-raises that exception into the awaiting code,
 but the other tasks it started keep running.
 Those other tasks become unsupervised, and their results and errors vanish.
-
-The following two examples use common code:
 
 ```python
 # utils/fetch_demo.py
@@ -862,8 +859,6 @@ An over-released `Semaphore` quietly raises its own limit instead,
 so a stray `release()` turns a semaphore of one into a semaphore of two.
 Deliberately choosing a count above one makes the semaphore a throttle on a limited resource,
 such as a fixed number of database connections.
-[Deadlock and Livelock](#deadlock-and-livelock)
-takes up the two ways these primitives fail.
 
 ## Context That Follows the Call Chain {#context-that-follows-the-call-chain}
 
@@ -1481,7 +1476,6 @@ so it is a supported build now rather than a preview,
 still optional and still installed alongside the default one.
 It removes the GIL, so threads run Python bytecode on separate cores at the same time.
 Under a free-threaded interpreter `gil_threads.py`'s boolean flips to `False`.
-Replacing its last line with `print(f"threads speedup: {seq / thr:.1f}x")` reports the size of the win instead of the fact of it:
 
     threads speedup: 3.8x
 
@@ -2433,7 +2427,7 @@ As this chapter has shown,
 concurrency means "operating or occurring at the same time."
 This works for both asynchrony and parallelism.
 
-Also, notice how much this chapter has talked about the OS.
+Concurrency also keeps pulling you down to the OS.
 Concurrency tears through the comfortable abstraction that normal programming provides.
 Sometimes you even need to go beyond the OS-level abstraction,
 all the way to hardware, to understand a particular bug.
