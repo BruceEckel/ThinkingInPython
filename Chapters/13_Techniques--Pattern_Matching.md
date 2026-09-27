@@ -505,8 +505,6 @@ print(handle({"button": 1}))
 #: Unrecognized event: {'button': 1}
 ```
 
-The test checks a matched event and the fall-through:
-
 ```python
 # test_mapping_patterns.py
 from mapping_patterns import handle
@@ -531,7 +529,6 @@ then match on the dataclass: you keep the shape test and gain the field types.
 
 ## Patterns Nest
 
-Each section so far introduces one pattern form on its own.
 A sub-pattern is itself a pattern,
 so any of these forms can sit inside any other:
 
@@ -588,7 +585,6 @@ When you end with `case _: assert_never(value)`,
 the type checker ensures the match is *exhaustive*.
 If you add a type to the union without its `case`,
 the type checker reports an error at `assert_never()` instead of letting the value fall through at runtime.
-That is the benefit of static typing applied to control flow:
 
 ```python
 # exhaustive.py
@@ -649,7 +645,6 @@ A `match` makes the shape of the dispatch explicit.
 [Dynamic Binding vs. Pattern Matching](#dynamic-binding-vs-pattern-matching)
 compares the two approaches directly.
 
-The second test below exercises that runtime backstop.
 The string `"x"` is no `Shape`, so the call carries a `# type: ignore`.
 At runtime `assert_never()` catches it:
 
