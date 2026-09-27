@@ -14,8 +14,6 @@ pattern matching, the `with` statement, and comprehensions.
 
 ## Conditionals
 
-[Tour](02_Foundations--Tour.md#indentation-and-blocks) shows the basic `if`,
-its colon, and its indented block.
 Python's comparison operators chain the way they do in mathematics:
 
 ```python
@@ -304,9 +302,9 @@ Changing a container while a `for` loop walks it is the classic control-flow bug
 hit it while removing from a list.
 Lists and dictionaries are the two containers you are most likely to mutate this way,
 and each one fails differently.
-The fix below uses a list comprehension,
-covered in [Comprehensions](#comprehensions) later in this chapter,
-to build the filtered list directly instead of mutating in place:
+A list comprehension, covered in [Comprehensions](#comprehensions)
+later in this chapter,
+fixes the list case by building the filtered list directly instead of mutating in place:
 
 ```python
 # mutating_while_looping.py
@@ -657,10 +655,6 @@ parities = {n % 2 for n in range(10)}  # Set comprehension
 print(parities)
 #: {0, 1}
 ```
-
-[Comprehensions](16_Techniques--Comprehensions.md#list-comprehensions)
-covers the topic in detail,
-as well as generator expressions and the functional tools `map()` and `filter()`.
 
 ## Exercises
 
