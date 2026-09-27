@@ -2,8 +2,6 @@
 
 > You know a language,
 > and Python differs from it in a few places that matter more than the syntax.
-> This tour covers the syntax and the built-in values,
-> and slows down wherever Python chose otherwise.
 
 This chapter and the ones that follow give a programmer's tour of Python:
 syntax and the built-in numbers, strings, and `None` here, then containers,
@@ -110,9 +108,6 @@ It does not copy.
 You never declare a variable's type,
 and one name can bind to objects of different types over its life.
 That freedom is *dynamic typing*.
-Python also has a full static type system layered on top,
-and this book uses it from [Static Types](08_Foundations--Static_Types.md)
-onward.
 
 ```python
 # references.py
@@ -459,7 +454,7 @@ as in `"val: {}".format(val)`.
 Both still work.
 `str.format()` shares the f-string's format mini-language,
 while the `%` form has its own, inherited from C's `printf()`.
-F-strings replaced them, so this book uses f-strings throughout.
+F-strings replaced them.
 
 ### t-Strings {#t-strings}
 
