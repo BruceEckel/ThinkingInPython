@@ -128,8 +128,7 @@ so a `BoundedStack` handed to it raises an exception on the third item.
 The subclass matches the signature and breaks the contract behind it.
 
 No tool catches this, but a test can.
-This chapter writes such tests twice later on,
-for guarantees no type checker sees:
+Two later tests pin down guarantees no type checker sees:
 `test_plugged.py` pins down that a getter's copy holds,
 and `test_immutable.py` pins down that a frozen field refuses assignment.
 The same pattern covers substitutability:
@@ -140,8 +139,7 @@ Substitutability is one thing OOP promised that no tool can check.
 OOP made four promises: encapsulation,
 behavior bundled into the object as methods, reuse through inheritance,
 and polymorphism.
-The next sections take them one at a time,
-and ask of each what Python delivers and what it costs.
+For each one, the question is what Python delivers and what it costs.
 
 ## Encapsulation Leaks
 
@@ -353,7 +351,7 @@ so `hash(fl)` raises a `TypeError` and a `FrozenLeaky` cannot be a dict key.
 The listing shows all three side by side: `frozen=True` catches the rebinding,
 while the mutation and the failed hash get past it.
 That is why `immutable.py` needs both the `tuple` and the frozen `Bob`.
-Immutability pays off only when it goes all the way down.
+Immutability lets you share an object safely and use it as a dict key only when it goes all the way down.
 
 [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#immutability)
 makes the fuller case for frozen data classes.
@@ -1200,8 +1198,7 @@ if __name__ == "__main__":
 
 `deposit()` and `withdraw()` know where the state lives,
 so no call site can forget to thread it through.
-`account.` also lists every operation the object supports,
-the dot-completion this section opens with.
+`account.` also lists every operation the object supports through dot-completion.
 This is what "bundling behavior with state" buys: one place holds the state,
 and every method that changes it lives next to it.
 OOP is useful, sometimes.
