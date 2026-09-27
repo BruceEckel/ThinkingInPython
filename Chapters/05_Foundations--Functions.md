@@ -3,7 +3,6 @@
 > A piece of behavior needs a name so other code can call it without knowing how it works.
 > A function is that name, with a parameter list that says what to pass.
 
-This chapter covers defining and calling functions:
 default and keyword arguments, scope and `global`, `*args`/`**kwargs`,
 positional-only and keyword-only parameters, and lambdas.
 
@@ -91,8 +90,6 @@ which the caller usually unpacks:
 
 The commas build the tuple.
 The function still returns one object.
-
-Here, the same function applies the `+` operator to integers and strings:
 
 ```python
 # add.py
