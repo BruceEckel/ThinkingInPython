@@ -15,7 +15,6 @@ Every Ability so far came from the library: the `Need` that `supply()` answers,
 and the `Async` that `run()` awaits.
 This chapter opens by writing an Ability from scratch,
 and that Ability turns out to be an ordinary class rather than a special form.
-The rest of the chapter applies the machinery:
 
 - Handlers that make an unpredictable source testable
 - A handler that swaps implementations while a program runs
@@ -27,8 +26,6 @@ The rest of the chapter applies the machinery:
 - Dependency graphs that go deep, and a cast of Abilities that goes wide
 - Decorators that add retry and parallelism to code they do not edit
 - An account of what the guarantee does not cover
-
-The chapter then collects every tool in one place and names what the whole approach demands of a codebase.
 
 ## Abilities Are Not Special
 
@@ -317,7 +314,7 @@ in microseconds.
 so a test names the moment outright,
 and a production handler that returns `datetime.now()` runs the same function.
 
-Those three runs are claims about testability, so here they are as tests.
+Those three runs are claims about testability, so each one becomes a test.
 The handler moves inside each test, and every test names the moment it needs:
 
 ```python
@@ -786,7 +783,7 @@ without a parameter threaded through every signature between them.
 This pattern has a name.
 Treatments of algebraic effects open with the *State effect*,
 `get` and `put` as its two operations.
-This section builds that effect on Stateless's machinery.
+Stateless's machinery is enough to build that effect.
 
 One warning comes with the pattern: nothing guards the cell.
 Forking two Effects that share a `Cell` interleaves their reads and writes,
@@ -794,7 +791,6 @@ and no type reports the race.
 ZIO's `Ref` is this cell with atomic update built in.
 Stateless has no equivalent,
 so under `fork()` the cell is as exposed as any Python global.
-[Where the Guarantee Stops](#where-the-guarantee-stops) returns to the theme.
 
 ## Composing a Program
 
@@ -1001,7 +997,6 @@ If you annotate `report()` as `Success[str]`,
 `ty` names the `yield from` that still carries `Need[Feed] | Need[Encyclopedia]`.
 `supply()` empties that half, and `run()` accepts what remains.
 
-`outcome()`'s parameter annotations also do a job.
 `Wire` and `Library` are structural implementations,
 so `supply(Wire(...), Library(...))` builds handlers for `Need[Wire]` and `Need[Library]`,
 the mismatch that [Supplying an Interface](46_Effects--Stateless.md#supplying-an-interface)
@@ -1244,8 +1239,6 @@ and an unlifted failure propagates past it as it does past `catch()`.
 Nothing needs building before you can supply a `Feed` or an `Encyclopedia`.
 Real graphs nest.
 Toast needs bread and a toaster, and bread needs dough and an oven.
-This example rebuilds the `Bread` sequence from [Effect Oriented Programming](https://effectorientedprogramming.com/),
-where ZIO wires the same graph with `ZLayer`s:
 
 ```python
 # bakery.py
@@ -1527,7 +1520,6 @@ but the type checker no longer verifies the call.
 Two chained handlers keep the checking: `supply()` some of the actors,
 apply that to the Effect, then `supply()` the rest to what remains,
 the layered supply of [Layering Handlers](46_Effects--Stateless.md#layering-handlers).
-The limit also says something about the design.
 An Effect that asks for ten separate things is usually two Effects.
 
 ## Adding Behavior to an Existing Effect
@@ -2088,7 +2080,6 @@ info[revealed-type]: Revealed type
    |                 ^^^^ `() -> Generator[Never, Any, None]`
 ```
 
-All three report what the rest of the chapter has been reading:
 `half` still needs an `Ask`, and `full` and `nested` need nothing,
 so `run()` reports a handler left out of either spelling.
 `ask_tell_stateless.py` still binds `half` and `full` instead of nesting the calls,
