@@ -25,8 +25,6 @@ A list comprehension consists of:
 -   An optional predicate expression.
 -   An output expression that builds one element of the output list from each member that satisfies the predicate.
 
-Several examples in this chapter use the same input list:
-
 ```python
 # a_list.py
 a_list = [1, "4", 9, "a", 0, 4]
@@ -80,8 +78,6 @@ from filtering import ints
 print(list(map(lambda e: e ** 2, ints)))  # type: ignore
 #: [1, 81, 0, 16]
 ```
-
-The two combine into a single expression:
 
 ```python
 # map_and_filter.py
@@ -179,11 +175,6 @@ The colon decides which.
 Python has no empty-set literal, since `{}` is an empty dict.
 Write `set()`.
 
-The following set comprehension normalizes each name
-(capital first letter, the rest lower case),
-keeps the names longer than one character,
-and collapses the duplicates and case variants:
-
 ```python
 # set_comprehension.py
 names = ["Bob", "JOHN", "alice", "bob", "ALICE", "J", "Bob"]
@@ -248,7 +239,6 @@ the same rule any duplicate dictionary key follows.
 An identity matrix of size `n` is an `n` by `n` square matrix with ones on the main diagonal and zeros elsewhere.
 Python represents such a matrix as a list of lists,
 where each sub-list is a row.
-The following comprehension generates an identity matrix:
 
 ```python
 # identity_matrix.py
@@ -349,8 +339,6 @@ print([
 
 `values` has a third element, and `zip()` drops it, as in `zip_pairs.py`.
 
-Here's a two-level list comprehension using `Path.walk()`:
-
 ```python
 # path_walk_comprehension.py
 import tempfile
@@ -418,8 +406,6 @@ A comprehension earns its place when you can read it in one pass.
 You can nest more `for` and `if` clauses,
 or wrap the whole thing in another call,
 but each one you add makes the expression harder to read in one pass.
-Here, filtering, flattening, sorting,
-and formatting all run in a single expression:
 
 ```python
 # dense_comprehension.py
@@ -458,9 +444,6 @@ how the warehouses flatten together, in what order the result arrives,
 and how each line renders.
 A comprehension nested inside `sorted()`,
 itself nested inside the outer comprehension, does four jobs in one expression.
-
-Split into named steps, the logic is all still there,
-and each step now states its own purpose:
 
 ```python
 # comprehension_steps.py
@@ -514,8 +497,6 @@ The comprehension calls `print()` for its side effect.
 a list built and immediately discarded.
 Worse, a reader scanning `[...]` expects a meaningful collection,
 and this comprehension is a loop written with the wrong punctuation.
-
-The idiomatic version says what it does:
 
 ```python
 # for_loop_side_effects.py
