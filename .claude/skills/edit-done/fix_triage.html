@@ -66,7 +66,8 @@ h1 { font-family: var(--serif); font-weight: 600; font-size: 1.6rem; margin: 0; 
 .controls label { display: flex; align-items: center; gap: 6px; cursor: pointer; }
 select { font: inherit; font-size: .9rem; color: var(--ink); background: var(--surface); border: 1px solid var(--rule); border-radius: 6px; padding: 3px 6px; }
 .status { font-size: .85rem; color: var(--muted); min-height: 1.2em; }
-main { display: grid; gap: 28px; }
+main { display: grid; gap: 14px; }
+main .fault-head { margin-top: 18px; }
 section.group { display: grid; gap: 12px; }
 .fault-head { background: var(--accent-soft); border-radius: 8px; padding: 14px 16px; display: grid; gap: 8px; }
 .fault-head .count { font-family: var(--mono); font-size: .8rem; letter-spacing: .04em; text-transform: uppercase; color: var(--accent); }
@@ -95,7 +96,7 @@ section.group { display: grid; gap: 12px; }
 .suggest { font-size: .88rem; color: var(--muted); }
 .suggest strong { color: var(--ink); font-weight: 600; }
 textarea {
-  width: 100%; min-height: 3.6em; resize: vertical; font: inherit; font-family: var(--serif); font-size: 1rem;
+  width: 100%; min-height: 3.6em; resize: none; overflow: hidden; font: inherit; font-family: var(--serif); font-size: 1rem;
   color: var(--ink); background: var(--bg); border: 1px solid var(--rule); border-radius: 6px; padding: 8px 10px;
 }
 textarea:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
@@ -177,6 +178,55 @@ function paraHtml(c) {
   return `${esc(para.slice(0, at))}<mark>${esc(c.sentence)}</mark>${esc(para.slice(at + c.sentence.length))}`;
 }
 
+// Cards are built once and updated in place. Rebuilding every card on
+// each save reset each text box's scroll and size, and restoring the
+// old scroll position after a finished card disappeared left the next
+// card partly above the screen.
+const els = new Map();
+let emptyEl = null;
+
+function autosize(t) {
+  t.style.height = "auto";
+  t.style.height = t.scrollHeight + 2 + "px";
+}
+
+// Bring `main` in step with `items`, an ordered list of
+// {key, card, build, update}; `order` is every card key in book order,
+// hidden ones included, so a vanishing card's successor can take its
+// place on screen.
+function reconcile(main, items, order, emptyText) {
+  const keep = new Set(items.map((i) => i.key));
+  const top = $("header.top").getBoundingClientRect().bottom;
+  let anchorKey = null, anchorTop = 0;
+  for (const el of main.querySelectorAll(".card")) {
+    const r = el.getBoundingClientRect();
+    if (r.bottom > top + 1) { anchorKey = el.dataset.key; anchorTop = r.top; break; }
+  }
+  if (anchorKey && !keep.has(anchorKey)) {
+    anchorKey = order.slice(order.indexOf(anchorKey) + 1).find((k) => keep.has(k)) || null;
+  }
+  for (const el of [...main.children]) {
+    if (el.dataset.key && !keep.has(el.dataset.key)) el.remove();
+  }
+  let prev = null;
+  for (const item of items) {
+    let el = els.get(item.key);
+    if (!el) { el = item.build(); el.dataset.key = item.key; els.set(item.key, el); }
+    const wanted = prev ? prev.nextElementSibling : main.firstElementChild;
+    if (el !== wanted) main.insertBefore(el, wanted);
+    item.update(el);
+    prev = el;
+  }
+  if (!emptyEl) { emptyEl = document.createElement("p"); emptyEl.className = "empty"; }
+  if (items.length) emptyEl.remove();
+  else { emptyEl.textContent = emptyText; main.appendChild(emptyEl); }
+  const anchor = anchorKey && els.get(anchorKey);
+  if (anchor && anchor.isConnected) {
+    const shift = anchor.getBoundingClientRect().top - anchorTop;
+    if (Math.abs(shift) > 0.5) window.scrollBy(0, shift);
+  }
+}
+
 function textOf(id, c) { return drafts.has(id) ? drafts.get(id) : (c.rewrite || ""); }
 
 function suggestHtml(c) {
@@ -188,67 +238,92 @@ function suggestHtml(c) {
   return `<div class="suggest">${what ? `<strong>${what}</strong> ` : ""}${note}</div>`;
 }
 
-function cardHtml(id, c) {
-  const text = textOf(id, c);
-  const dis = state.readOnly ? "disabled" : "";
-  return `<article class="card" data-id="${esc(id)}" data-decision="${esc(c.decision || "")}">
-    <div class="where"><span>${esc(c.file)}:${c.line}${c.heading ? " · " + esc(c.heading) : ""}</span>
-      ${c.decision ? `<span class="pill ${esc(c.decision)}">${esc(NAMES[c.decision] || c.decision)}</span>` : ""}</div>
+function buildHead(pair) {
+  const f = state.faults.get(pair) || {};
+  const total = [...state.cards.values()].filter((c) => c.pair === pair).length;
+  const el = document.createElement("div");
+  el.className = "fault-head";
+  el.innerHTML = `
+    <div class="count">${total} hits · from ${esc(f.file || "")}:${esc(f.line ?? "")}</div>
+    <div class="text">${esc(f.fault || "")}</div>
+    <div class="example">
+      <div><span class="sign">−</span><span>${esc(f.before || "")}</span></div>
+      <div><span class="sign">+</span><span>${esc(f.after || "")}</span></div>
+    </div>`;
+  return el;
+}
+
+function buildCard(id, c) {
+  const el = document.createElement("article");
+  el.className = "card";
+  el.dataset.id = id;
+  el.innerHTML = `
+    <div class="where"><span>${esc(c.file)}:${c.line}${c.heading ? " · " + esc(c.heading) : ""}</span><span class="pills"></span></div>
     <p class="para">${paraHtml(c)}</p>
     ${suggestHtml(c)}
-    <div><div class="label">Change</div><p class="diff" data-diff>${diffHtml(c.sentence, text)}</p></div>
+    <div><div class="label">Change</div><p class="diff" data-diff></p></div>
     <div><label class="label" for="r-${esc(id)}">Rewrite</label>
-      <textarea id="r-${esc(id)}" ${dis} placeholder="The replacement sentence. Leave empty and choose Delete sentence to cut it.">${esc(text)}</textarea></div>
+      <textarea id="r-${esc(id)}" rows="2" placeholder="The replacement sentence. Leave empty and choose Delete sentence to cut it."></textarea></div>
     <div class="choices">
-      <button data-decide="apply" aria-pressed="${c.decision === "apply"}" ${dis || (text.trim() ? "" : "disabled")} title="${text.trim() ? "Replace the sentence with this rewrite" : "Write a rewrite first"}">Apply rewrite</button>
-      <button data-decide="delete" aria-pressed="${c.decision === "delete"}" ${dis}>Delete sentence</button>
-      <button data-decide="skip" aria-pressed="${c.decision === "skip"}" ${dis}>Skip</button>
-      <button data-decide="not_fault" aria-pressed="${c.decision === "not_fault"}" ${dis}>Not this fault</button>
-      ${c.decision ? `<button class="clear" data-decide="" ${dis}>Clear</button>` : ""}
-    </div>
-  </article>`;
+      <button data-decide="apply">Apply rewrite</button>
+      <button data-decide="delete">Delete sentence</button>
+      <button data-decide="skip">Skip</button>
+      <button data-decide="not_fault">Not this fault</button>
+      <button class="clear" data-decide="">Clear</button>
+    </div>`;
+  return el;
+}
+
+function updateCard(el, id, c) {
+  const t = el.querySelector("textarea");
+  if (document.activeElement !== t) {
+    const text = textOf(id, c);
+    if (t.value !== text) t.value = text;
+  }
+  const text = t.value;
+  el.dataset.decision = c.decision || "";
+  el.querySelector(".pills").innerHTML = c.decision
+    ? `<span class="pill ${esc(c.decision)}">${esc(NAMES[c.decision] || c.decision)}</span>` : "";
+  const diff = el.querySelector("[data-diff]");
+  if (diff.dataset.for !== text) { diff.innerHTML = diffHtml(c.sentence, text); diff.dataset.for = text; }
+  const dis = state.readOnly;
+  t.disabled = dis;
+  for (const b of el.querySelectorAll("button[data-decide]")) {
+    const d = b.dataset.decide;
+    b.disabled = dis || (d === "apply" && !text.trim());
+    if (d) b.setAttribute("aria-pressed", String(c.decision === d));
+  }
+  const apply = el.querySelector('button[data-decide="apply"]');
+  apply.title = text.trim() ? "Replace the sentence with this rewrite" : "Write a rewrite first";
+  el.querySelector("button.clear").hidden = !c.decision;
+  autosize(t);
 }
 
 function render() {
   const focused = document.activeElement;
   const focusId = focused && focused.matches("textarea") ? focused.closest(".card").dataset.id : null;
-  const caret = focusId ? [focused.selectionStart, focused.selectionEnd] : null;
-  const scrollY = window.scrollY;
+  const all = [...state.cards.entries()].sort((x, y) => x[1].order - y[1].order);
+  const visible = all.filter(([id, c]) =>
+    (!state.fault || c.pair === state.fault) && (!state.onlyOpen || !c.decision || id === focusId));
+  // Group by fault, in the order each fault's first card appears.
   const groups = new Map();
-  for (const [id, c] of state.cards) {
-    if (state.fault && c.pair !== state.fault) continue;
-    if (state.onlyOpen && c.decision && id !== focusId) continue;
-    if (!groups.has(c.pair)) groups.set(c.pair, []);
-    groups.get(c.pair).push([id, c]);
+  for (const entry of visible) {
+    if (!groups.has(entry[1].pair)) groups.set(entry[1].pair, []);
+    groups.get(entry[1].pair).push(entry);
   }
-  const main = $("#groups");
-  if (!state.cards.size) main.innerHTML = `<p class="empty">No hits are loaded yet.</p>`;
-  else if (!groups.size) main.innerHTML = `<p class="empty">Every card here has a decision.</p>`;
-  else main.innerHTML = [...groups.entries()].map(([pair, list]) => {
-    const f = state.faults.get(pair) || {};
-    list.sort((x, y) => x[1].order - y[1].order);
-    const total = [...state.cards.values()].filter((c) => c.pair === pair).length;
-    return `<section class="group">
-      <div class="fault-head">
-        <div class="count">${total} hits · from ${esc(f.file || "")}:${esc(f.line ?? "")}</div>
-        <div class="text">${esc(f.fault || "")}</div>
-        <div class="example">
-          <div><span class="sign">−</span><span>${esc(f.before || "")}</span></div>
-          <div><span class="sign">+</span><span>${esc(f.after || "")}</span></div>
-        </div>
-      </div>
-      ${list.map(([id, c]) => cardHtml(id, c)).join("")}
-    </section>`;
-  }).join("");
-  if (focusId) {
-    const t = document.getElementById("r-" + focusId);
-    if (t) { t.focus({ preventScroll: true }); t.setSelectionRange(caret[0], caret[1]); }
+  const items = [];
+  for (const [pair, list] of groups) {
+    items.push({ key: "head:" + pair, build: () => buildHead(pair), update: () => {} });
+    for (const [id, c] of list) {
+      items.push({ key: id, build: () => buildCard(id, c), update: (el) => updateCard(el, id, c) });
+    }
   }
-  window.scrollTo(0, scrollY);
-  const all = [...state.cards.values()];
-  const done = all.filter((c) => c.decision).length;
-  $("#count").textContent = `${done} of ${all.length} decided`;
-  $("#fill").style.width = all.length ? `${(100 * done) / all.length}%` : "0";
+  reconcile($("#groups"), items, all.map(([id]) => id),
+    state.cards.size ? "Every card here has a decision." : "No hits are loaded yet.");
+  const values = [...state.cards.values()];
+  const done = values.filter((c) => c.decision).length;
+  $("#count").textContent = `${done} of ${values.length} decided`;
+  $("#fill").style.width = values.length ? `${(100 * done) / values.length}%` : "0";
 }
 
 function fillFaultFilter() {
@@ -293,9 +368,7 @@ document.addEventListener("input", (ev) => {
   if (!t || state.readOnly) return;
   const card = t.closest(".card"), id = card.dataset.id;
   drafts.set(id, t.value);
-  card.querySelector("[data-diff]").innerHTML = diffHtml(state.cards.get(id).sentence, t.value);
-  const apply = card.querySelector('button[data-decide="apply"]');
-  if (apply) apply.disabled = !t.value.trim();
+  updateCard(card, id, state.cards.get(id));
   clearTimeout(timers.get(id));
   timers.set(id, setTimeout(() => flushDraft(id), 900));
 });

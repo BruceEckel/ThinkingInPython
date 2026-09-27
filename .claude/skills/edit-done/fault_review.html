@@ -84,7 +84,7 @@ details mark { background: var(--mark); color: var(--ink); border-radius: 2px; }
 .fault label { display: block; font-size: .78rem; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
 .hint.empty-line { color: var(--local); }
 textarea {
-  width: 100%; min-height: 3.6em; resize: vertical; font: inherit; font-size: .95rem;
+  width: 100%; min-height: 3.6em; resize: none; overflow: hidden; font: inherit; font-size: .95rem;
   color: var(--ink); background: var(--bg); border: 1px solid var(--rule); border-radius: 6px; padding: 8px 10px;
 }
 textarea:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
@@ -165,59 +165,126 @@ function contextHtml(card) {
     <p>${esc(para.slice(0, at))}<mark>${esc(card.before)}</mark>${esc(para.slice(at + card.before.length))}</p></details>`;
 }
 
+// Cards are built once and updated in place. Rebuilding every card on
+// each save reset each text box's scroll and size, and restoring the
+// old scroll position after a finished card disappeared left the next
+// card partly above the screen.
+const els = new Map();
+let emptyEl = null;
+
+function autosize(t) {
+  t.style.height = "auto";
+  t.style.height = t.scrollHeight + 2 + "px";
+}
+
+// Bring `main` in step with `items`, an ordered list of
+// {key, card, build, update}; `order` is every card key in book order,
+// hidden ones included, so a vanishing card's successor can take its
+// place on screen.
+function reconcile(main, items, order, emptyText) {
+  const keep = new Set(items.map((i) => i.key));
+  const top = $("header.top").getBoundingClientRect().bottom;
+  let anchorKey = null, anchorTop = 0;
+  for (const el of main.querySelectorAll(".card")) {
+    const r = el.getBoundingClientRect();
+    if (r.bottom > top + 1) { anchorKey = el.dataset.key; anchorTop = r.top; break; }
+  }
+  if (anchorKey && !keep.has(anchorKey)) {
+    anchorKey = order.slice(order.indexOf(anchorKey) + 1).find((k) => keep.has(k)) || null;
+  }
+  for (const el of [...main.children]) {
+    if (el.dataset.key && !keep.has(el.dataset.key)) el.remove();
+  }
+  let prev = null;
+  for (const item of items) {
+    let el = els.get(item.key);
+    if (!el) { el = item.build(); el.dataset.key = item.key; els.set(item.key, el); }
+    const wanted = prev ? prev.nextElementSibling : main.firstElementChild;
+    if (el !== wanted) main.insertBefore(el, wanted);
+    item.update(el);
+    prev = el;
+  }
+  if (!emptyEl) { emptyEl = document.createElement("p"); emptyEl.className = "empty"; }
+  if (items.length) emptyEl.remove();
+  else { emptyEl.textContent = emptyText; main.appendChild(emptyEl); }
+  const anchor = anchorKey && els.get(anchorKey);
+  if (anchor && anchor.isConnected) {
+    const shift = anchor.getBoundingClientRect().top - anchorTop;
+    if (Math.abs(shift) > 0.5) window.scrollBy(0, shift);
+  }
+}
+
 function faultText(id, card) {
   return drafts.has(id) ? drafts.get(id) : (card.fault || "");
 }
 
+function buildCard(id, c) {
+  const el = document.createElement("article");
+  el.className = "card";
+  el.dataset.id = id;
+  el.innerHTML = `
+    <div class="where"><span>${esc(c.file)}:${c.line}</span><span class="pills"></span></div>
+    <div><div class="label">Your rewrite</div>
+    <p class="diff">${diffHtml(c.before, c.after)}</p></div>
+    ${contextHtml(c)}
+    <div class="fault">
+      <label for="f-${esc(id)}">Fault line: what the rewrite fixed</label>
+      <textarea id="f-${esc(id)}" rows="2" placeholder="What the sentence got wrong, so the search finds that fault and not a shared word"></textarea>
+      <div class="hint empty-line">No fault line yet. Write one to approve this card, or mark it Local edit.</div>
+    </div>
+    <div class="choices">
+      <button class="approve" data-decide="approve">Approve</button>
+      <button class="local" data-decide="local">Local edit</button>
+      <button class="clear" data-decide="">Clear</button>
+    </div>`;
+  return el;
+}
+
+function updateCard(el, id, c) {
+  const t = el.querySelector("textarea");
+  if (document.activeElement !== t) {
+    const text = faultText(id, c);
+    if (t.value !== text) t.value = text;
+  }
+  const text = t.value;
+  const edited = text.trim() !== (c.proposed || "").trim();
+  el.dataset.decision = c.decision || "";
+  el.querySelector(".pills").innerHTML =
+    (c.decision === "approve" ? `<span class="pill approve">Approved</span>` : "") +
+    (c.decision === "local" ? `<span class="pill local">Local edit</span>` : "") +
+    (edited && c.proposed ? `<span class="pill edited">Edited</span>` : "") +
+    (c.local_hint && !c.decision ? `<span class="pill hint">I'd call this local</span>` : "");
+  el.querySelector(".hint.empty-line").hidden = !!text.trim();
+  const dis = state.readOnly;
+  t.disabled = dis;
+  const approve = el.querySelector("button.approve");
+  approve.disabled = dis || !text.trim();
+  approve.title = text.trim() ? "Approve this fault line" : "Write a fault line first";
+  approve.setAttribute("aria-pressed", String(c.decision === "approve"));
+  const local = el.querySelector("button.local");
+  local.disabled = dis;
+  local.setAttribute("aria-pressed", String(c.decision === "local"));
+  const clear = el.querySelector("button.clear");
+  clear.disabled = dis;
+  clear.hidden = !c.decision;
+  autosize(t);
+}
+
 function render() {
-  const main = $("#cards");
   const focused = document.activeElement;
   const focusId = focused && focused.matches("textarea") ? focused.closest(".card").dataset.id : null;
-  const caret = focusId ? [focused.selectionStart, focused.selectionEnd] : null;
-  const list = [...state.cards.entries()].sort((x, y) => x[1].order - y[1].order)
-    .filter(([id, c]) => !state.onlyOpen || !c.decision || id === focusId);
-  if (!state.cards.size) {
-    main.innerHTML = `<p class="empty">No rewrites are loaded yet.</p>`;
-  } else if (!list.length) {
-    main.innerHTML = `<p class="empty">Every card has a decision.</p>`;
-  } else {
-    main.innerHTML = list.map(([id, c]) => {
-      const text = faultText(id, c);
-      const edited = text.trim() !== (c.proposed || "").trim();
-      const dis = state.readOnly ? "disabled" : "";
-      return `<article class="card" data-id="${esc(id)}" data-decision="${esc(c.decision || "")}">
-        <div class="where"><span>${esc(c.file)}:${c.line}</span>
-          ${c.decision === "approve" ? `<span class="pill approve">Approved</span>` : ""}
-          ${c.decision === "local" ? `<span class="pill local">Local edit</span>` : ""}
-          ${edited && c.proposed ? `<span class="pill edited">Edited</span>` : ""}
-          ${c.local_hint && !c.decision ? `<span class="pill hint">I'd call this local</span>` : ""}</div>
-        <div><div class="label">Your rewrite</div>
-        <p class="diff">${diffHtml(c.before, c.after)}</p></div>
-        ${contextHtml(c)}
-        <div class="fault">
-          <label for="f-${esc(id)}">Fault line: what the rewrite fixed</label>
-          <textarea id="f-${esc(id)}" ${dis} placeholder="What the sentence got wrong, so the search finds that fault and not a shared word">${esc(text)}</textarea>
-          ${text.trim() ? "" : `<div class="hint empty-line">No fault line yet. Write one to approve this card, or mark it Local edit.</div>`}
-        </div>
-        <div class="choices">
-          <button class="approve" data-decide="approve" aria-pressed="${c.decision === "approve"}" ${dis || (text.trim() ? "" : "disabled")} title="${text.trim() ? "Approve this fault line" : "Write a fault line first"}">Approve</button>
-          <button class="local" data-decide="local" aria-pressed="${c.decision === "local"}" ${dis}>Local edit</button>
-          ${c.decision ? `<button class="clear" data-decide="" ${dis}>Clear</button>` : ""}
-        </div>
-      </article>`;
-    }).join("");
-  }
-  if (focusId) {
-    const t = document.getElementById("f-" + focusId);
-    if (t) { t.focus(); t.setSelectionRange(caret[0], caret[1]); }
-  }
+  const all = [...state.cards.entries()].sort((x, y) => x[1].order - y[1].order);
+  const visible = all.filter(([id, c]) => !state.onlyOpen || !c.decision || id === focusId);
+  reconcile($("#cards"),
+    visible.map(([id, c]) => ({ key: id, build: () => buildCard(id, c), update: (el) => updateCard(el, id, c) })),
+    all.map(([id]) => id),
+    state.cards.size ? "Every card has a decision." : "No rewrites are loaded yet.");
   const total = state.cards.size;
   const done = [...state.cards.values()].filter((c) => c.decision).length;
   $("#count").textContent = `${done} of ${total} decided`;
   $("#fill").style.width = total ? `${(100 * done) / total}%` : "0";
   if (state.meta) {
     const where = (state.meta.files || []).join(", ");
-    document.title = "Fault Line Review";
     $("h1").textContent = `Fault Line Review${where ? " · " + where.replace(/\.md$/, "") : ""}`;
   }
 }
@@ -256,10 +323,7 @@ document.addEventListener("input", (ev) => {
   if (!t || state.readOnly) return;
   const id = t.closest(".card").dataset.id;
   drafts.set(id, t.value);
-  const approve = t.closest(".card").querySelector("button.approve");
-  if (approve) approve.disabled = !t.value.trim();
-  const hint = t.closest(".card").querySelector(".hint.empty-line");
-  if (hint) hint.hidden = !!t.value.trim();
+  render();
   clearTimeout(timers.get(id));
   timers.set(id, setTimeout(() => flushDraft(id), 900));
 });
