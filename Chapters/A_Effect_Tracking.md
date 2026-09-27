@@ -49,7 +49,6 @@ and handling removes the effect from the row.
 The design has two halves, the row and the handlers.
 *Algebraic effect tracking* is the row half: the rule above,
 computed and checked for every function.
-That half is this appendix's subject, and "tracking" means it from here on.
 
 A system that tracks Effects needs three things:
 
@@ -71,7 +70,7 @@ Every approach in the Effects chapters fills those three roles:
 | Koka | The Effect row | The compiler | The compiler |
 
 As you read down the table, the work moves from you to the compiler.
-The rest of this appendix asks how far `Annotated` can move it.
+How far `Annotated` can move that work toward the compiler is the open question.
 
 ## Why a Native System Tracks Best
 
@@ -434,7 +433,8 @@ The reason is where it puts the row:
 the generator's yield type is a place the type checker examines on every run.
 You declare the row there,
 and `ty` verifies the propagation by checking every `yield from` in the body against it.
-The `Handler` that `supply()` returns subtracts.
+The `Handler` that `supply()` returns subtracts the supplied Abilities from the row,
+so a caller declares only what remains unhandled.
 A type variable gives Effect polymorphism, as `effect_variable.py` shows.
 Stateless requires the generator syntax and the description/execution split that [Library Effect Management](44_Effects--Effect_Management.md#library-effect-management)
 describes.
