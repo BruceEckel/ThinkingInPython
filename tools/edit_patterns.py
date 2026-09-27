@@ -54,6 +54,7 @@ rerun asks only about new pairs and changed sentences.
     tip edit-patterns ARGS="--range a1b2c3d..HEAD"
     tip edit-patterns ARGS=--dry-run
     tip edit-patterns ARGS=--report            # from the cache only
+    tip edit-patterns ARGS=--from-rules        # bruce_edit_db.md's rules
 """
 
 import argparse
@@ -183,6 +184,42 @@ def rewrites(since: str | None, span: str | None
                 yield path.split("/")[-1], r
 
 
+RULES_FILE = ROOT / "bruce_edit_db.md"
+SIGHTING = re.compile(r'"([^"]{12,}?)"\s*->\s*"([^"]*?)"')
+
+
+def rule_pairs() -> Iterator[dict[str, Any]]:
+    """One pair per promoted rule in `bruce_edit_db.md`.
+
+    A rule already states its fault: the title says what to do, the
+    **Test.** line says where it applies, and **Keep when.** says where
+    it does not. Its example is the longest quoted sighting, since a
+    sighting is usually a fragment and the longest carries the most of
+    its sentence.
+    """
+    text = RULES_FILE.read_text(encoding="utf-8")
+    promoted = text[text.index("\n## Rules"):text.index("\n## Candidates")]
+    for block in re.split(r"\n### ", promoted)[1:]:
+        head, _, body = block.partition("\n")
+        rule, _, title = head.partition(". ")
+
+        def field(name: str) -> str:
+            m = re.search(rf"\*\*{name}\.\*\*(.*?)(?:\n\n|\Z)", body, re.S)
+            return " ".join(m[1].split()) if m else ""
+
+        sightings = SIGHTING.findall(" ".join(body.split()))
+        if not sightings:
+            continue
+        before, after = max(sightings, key=lambda p: len(p[0]))
+        keep = field("Keep when")
+        fault = f"{title}. {field('Test')}"
+        if keep and not keep.lower().startswith("none"):
+            fault += f" Not a fault when: {keep}"
+        yield {"file": RULES_FILE.name, "line": 0, "rule": rule,
+               "before": before, "after": after, "previous": "",
+               "following": "", "similarity": 0.0, "fault": fault}
+
+
 def book() -> list[tuple[str, Sentence]]:
     return [(p.name, s) for p in md_files([CHAPTERS_DIR])
             for s in sentence_diff.prose(p.read_text(encoding="utf-8"),
@@ -297,7 +334,9 @@ def report(pairs: dict[str, dict[str, Any]], keys: list[str],
     lines = []
     for k in keys:
         p = pairs[k]
-        lines.append(f"## {p['file']}:{p['line']}")
+        where = (p["rule"] if p.get("rule")
+                 else f"{p['file']}:{p['line']}")
+        lines.append(f"## {where}")
         lines.append(f"- before: {p['before']}")
         lines.append(f"- after:  {p['after'] or '(deleted)'}")
         lines.append(f"- fault:  {p.get('fault') or '(none yet)'}")
@@ -327,6 +366,9 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--range", dest="span", help="compare A..B")
     ap.add_argument("--dry-run", action="store_true",
                     help="list the edit's rewrites and the cost; ask nothing")
+    ap.add_argument("--from-rules", action="store_true",
+                    help="search for every promoted rule in "
+                         "bruce_edit_db.md")
     ap.add_argument("--report", action="store_true",
                     help="report every stored pair from the cache")
     args = ap.parse_args(argv)
@@ -336,6 +378,23 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.report:
         keys = list(pairs)
+    elif args.from_rules:
+        today = datetime.date.today().isoformat()
+        keys = []
+        for rp in rule_pairs():
+            k = judgments.key(rp["rule"], rp["before"], rp["after"])
+            keys.append(k)
+            entry = pairs.setdefault(k, {**rp, "source": rp["rule"],
+                                         "added": today, "status": "new"})
+            entry["fault"] = rp["fault"]  # the store is the authority
+        if args.dry_run:
+            for k in keys:
+                p = pairs[k]
+                print(f"{p['rule']}: {p['fault'][:150]}")
+                print(f"  - {p['before']}")
+                print(f"  + {p['after'] or '(deleted)'}")
+            print(f"\n{len(keys)} rules")
+            return 0
     else:
         source = args.span or args.since or open_pass()
         today = datetime.date.today().isoformat()

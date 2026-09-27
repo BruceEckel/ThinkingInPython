@@ -1169,7 +1169,7 @@ def link_support(v: Vars) -> None:
 
 
 @task("Find the book's sentences with a fault Bruce's rewrites fixed "
-      "(advisory; ARGS=--dry-run, --since REF, --report)")
+      "(advisory; ARGS=--dry-run, --since REF, --from-rules, --report)")
 def edit_patterns(v: Vars) -> None:
     """Needs TYPESAFE_API_KEY unless ARGS=--dry-run or --report. Collects
     the sentences Bruce rewrote in the open edit-start pass (or since

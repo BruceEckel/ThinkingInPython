@@ -287,7 +287,18 @@ matches surface features (chapter 30's metadiscourse cut matched 158
 sentences for ending in a colon); with one, the metadiscourse pair's
 top hits were real metadiscourse. The fault line's wording decides the
 precision, so a loose hit list means rewording the fault, not raising
-the 0.7 floor. The search reports; it never edits. All four tools share
+the 0.7 floor. The question sees one sentence on each side and no more, so a
+condition on the wider passage cannot be judged: rewording chapter 30's
+"generated" fault to "in a passage whose context does not already name
+that mechanism" cut its hits from 34 to 5, and all five are chapter 12,
+whose whole subject is that mechanism. `ARGS=--from-rules` searches
+for `bruce_edit_db.md`'s promoted rules, each rule's title, Test, and
+Keep-when lines as the fault. On 2026-09-27 R2, R11, R14, R16, and
+R17 found real instances (R17: "Uncomment the decorator on
+`Typo.shwo`, and the checker reports:"); R5 cannot, since the scan
+skips list items; R1 and R21 matched mostly the wrong shape; eight
+rules were unclear, R12 because its longest sighting is the
+counter-example. The search reports; it never edits. All four tools share
 `tools/judgments.py`, and the SDK
 joins only their runs, through `uv run --with typesafe-sdk`: it builds
 `pydantic-core` from source on the pinned Python, so it stays out of
