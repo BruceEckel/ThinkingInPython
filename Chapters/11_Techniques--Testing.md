@@ -75,8 +75,6 @@ so running this file fails before a single assertion runs:
 `pytest` cannot import a module that is not there.
 That failure is the point.
 It confirms the test catches a missing implementation, not just a wrong one.
-Only now does the implementation appear,
-sized to make every case in the test pass and nothing more:
 
 ```python
 # palindrome.py
@@ -335,7 +333,7 @@ If a fixture needs cleanup,
 it can `yield` the value and run teardown code after the `yield`.
 A function containing `yield` is a generator.
 [Iterators](23_Patterns--Iterators.md#generators) covers the mechanism,
-and this chapter needs only the shape.
+and a fixture needs only the shape.
 For example:
 
 ```python
@@ -383,7 +381,7 @@ can use a fixture defined there, with no import.
 Place shared setup in `conftest.py`.
 
 A directory has one `conftest.py`, so its fixtures accumulate in that file.
-This one holds two, and they demonstrate different things:
+This one holds a session-scoped fixture and a parametrized one:
 
 ```python
 # conftest.py
@@ -528,8 +526,6 @@ random number generation, clock, or network.
 undoing every change when the test ends.
 
 ### Filesystem and Environment
-
-This example reads an environment variable and touches files:
 
 ```python
 # storage.py
