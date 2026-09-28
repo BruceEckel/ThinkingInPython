@@ -163,3 +163,19 @@ def test_an_edit_can_split_a_paragraph(chapter: Path, tmp_path: Path
     assert after[bid]["source"] == "First half."
     assert any(d["source"] == "Second half." and d["previous"] is None
                for d in after.values())
+
+
+def test_a_reload_pins_each_write_to_the_version_read(chapter: Path,
+                                                      tmp_path: Path) -> None:
+    ce.load("99", force=False)
+    where = ce.OUT / "99"
+    bid = find(where, "Last paragraph")
+    read = where / "read"
+    page_round(where, read, {bid: {"edit": "Changed."}})
+    (read / "versions.json").write_text(
+        json.dumps({f"blocks/{bid}": 7, "meta/chapter": 3}))
+    ce.apply("99", read, force=False)
+    ce.load("99", force=False)
+    batch = json.loads((where / "batch1.json").read_text("utf-8"))
+    pins = {w["doc_id"]: w.get("if_version") for w in batch}
+    assert pins == {bid: 7, "chapter": 3}

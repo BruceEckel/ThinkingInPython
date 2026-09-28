@@ -26,10 +26,15 @@ Every round below uses that URL.
 
 ## Applying a round (Bruce says "apply")
 
-1. Set the page's status to applying: `ArtifactData` `update` on `meta/chapter` with `{"status": "applying"}`.
+1. Set the page's status to applying: `ArtifactData` `update` on `meta/chapter` with `{"status": "applying"}`,
+   pinned with `if_version` from step 2's read (so do step 2's reads first).
    The page then shows that the round is in progress.
-2. Read the round: `ArtifactData` `list` of `blocks` (`query.limit` 1000) and of `meta`, both with
+2. Read the round: `ArtifactData` `list` of `meta` and of `blocks` (`query.limit` 1000), both with
    `out_dir` `build/chapter_editor/NN/read`. Delete the old `read/` first.
+   Do this before step 1's update, which needs the meta version the read returns.
+   Save every version the listings print as `read/versions.json`, `{"blocks/b0004": 4, "meta/chapter": 3}`,
+   with `meta/chapter` at the version step 1's update returned.
+   The store refuses a write to an existing document without its version, and `load` pins each write from this file.
 3. `tip editor-apply CH=NN`. It writes his in-place edits and deletions into the chapter, prints every cut
    with its surroundings, and lists the Rewrite marks and any conflicts.
    Read each cut: a deletion that leaves a broken sentence is flagged to Bruce in the reply, never silently patched.

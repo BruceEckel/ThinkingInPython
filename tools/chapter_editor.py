@@ -238,6 +238,15 @@ def load(chapter: str, force: bool) -> int:
     writes.append({"op": "set", "collection": "meta", "doc_id": "chapter",
                    "file_path": str(meta_file)})
     write_page(path)
+    # The store refuses a write to an existing document unless it names
+    # the version last read. The session saves the versions its round
+    # read listed as `read/versions.json`, {"blocks/b0004": 4, ...}.
+    pins = where / "read" / "versions.json"
+    versions = json.loads(pins.read_text(encoding="utf-8")) if (
+        state and pins.exists()) else {}
+    for w in writes:
+        if v := versions.get(f"{w['collection']}/{w['doc_id']}"):
+            w["if_version"] = v
     for old in where.glob("batch*.json"):
         old.unlink()
     for i in range(0, len(writes), BATCH):
