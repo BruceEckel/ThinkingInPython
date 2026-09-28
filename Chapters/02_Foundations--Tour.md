@@ -85,7 +85,7 @@ except NameError as e:
 
 The `if` never runs, so `val` is never bound.
 Indentation shows where the assignment sits, not whether it runs.
-`ty` sees that nothing ever defines `val` and reports an error on that line,
+`try` sees that nothing ever defines `val` and reports an error on that line,
 so `# type: ignore` tells it the mistake is deliberate.
 
 Indenting can nest as deeply as you like.
