@@ -858,6 +858,10 @@ and the decorator lifts what they raise into the channel.
 `topic_of()` reads nothing from outside and writes nothing,
 so it declares no Ability.
 
+`research()`'s signature is also the only place its dependencies and failures appear.
+Nothing in the body mentions a network, a file, or a print,
+and `research()` performs no work when called.
+
 `fetch()` and `look_up()` take their dependencies as parameters,
 so they are ordinary functions rather than generator functions.
 Taking dependencies as parameters is a choice, not a requirement.
@@ -883,10 +887,7 @@ because a function that only transforms its arguments is easier to test on its o
 and because the split keeps the Ability requests in one place.
 Either shape type-checks and either propagates correctly.
 
-`research()`'s signature is also the only place its dependencies and failures appear.
-Nothing in the body mentions a network, a file, or a print,
-and `research()` performs no work when called.
-Now supply the environment:
+Now supply `research()`'s environment:
 
 ```python
 # scenarios.py
@@ -1608,6 +1609,12 @@ Three attempts against a database that fails twice succeed on the third,
 and three attempts against one that always fails produce a `RetryError` holding every failure.
 `save_user()` stays unchanged through all of it.
 
+`retry()` decorates the function `save_user`,
+not the Effect `save_user("Morty")`,
+for the reason [An Effect Runs Once](46_Effects--Stateless.md#an-effect-runs-once)
+gives: the Effect is a generator, one `run()` spends it,
+and only the function can build a second description.
+
 ### What Retry Cannot Judge
 
 Read the trace before you use `retry()` on real code.
@@ -1629,12 +1636,6 @@ so `topic_of()` raises `NotInteresting` on every attempt, deterministically.
 Three attempts fetch the headline three times and collect three identical `NotInteresting` errors in the `RetryError`.
 Retry what can change between attempts,
 and let `catch()` take a deterministic failure out before it reaches `retry()`.
-
-`retry()` decorates the function `save_user`,
-not the Effect `save_user("Morty")`,
-for the reason [An Effect Runs Once](46_Effects--Stateless.md#an-effect-runs-once)
-gives: the Effect is a generator, one `run()` spends it,
-and only the function can build a second description.
 
 ### What Retry Costs the Signature
 
