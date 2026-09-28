@@ -6,7 +6,7 @@
 ![](_images/coupling_30)
 
 *Observer* decouples code that changes state from code that reacts to that state change.
-An *observer* registers interest with a *subject*.
+An *observer* attaches to a *subject*.
 When the subject changes state, it notifies the observer.
 The subject knows each observer only as something to call,
 and it decides which arguments every call receives.
@@ -22,7 +22,8 @@ or the nearly-equivalent *Document-View* architecture,
 which folds the controller into the view.
 In both, *Observer* connects the state change to its views:
 one subject holds a list of views and names no view type.
-This way, a *document* can have more than one way to view it, such as a plot and a table.
+This way, a *document* can have more than one way to view it,
+such as a plot and a table.
 When the data changes, every view must refresh.
 With *Observer*, a change in the subject's data notifies each interested view.
 
@@ -90,7 +91,8 @@ t.set_celsius(25)
 so one change to the subject's state reaches all observers.
 `Display` prints the new reading, and a `Plot` or a `Table` redraws.
 
-`Thermometer` holds the list and names no observer type,
+`Thermometer`'s list accepts any `Observer[float]`,
+meaning any object with a matching `update()` method,
 so a `Plot` or a `Table` attaches the same way `Display` does.
 `Subject.__init__()` creates that list,
 so `Thermometer`'s constructor calls [`super().__init__()`](07_Foundations--Classes.md#calling-the-base-constructor)
@@ -106,19 +108,20 @@ so an observer works from the value it receives.
 The *pull* model sends only `subject` and lets each observer read what it needs by calling back into the subject,
 here `subject.celsius`.
 With pull, the subject does not decide what its observers need.
-Each observer depends on the subject's interface:
-to read `celsius`, an observer must know it is watching a `Thermometer`.
+Each observer depends on the subject's interface: to read `celsius`,
+an observer must know it is watching a `Thermometer`.
 The type checker enforces that dependency.
 `Subject[float]` has no `celsius`,
 so the observer must declare its `subject` parameter as a `Thermometer`,
 and `Observer[float]` rejects an `update()` with that narrower parameter.
 To use pull, you must add either a runtime `isinstance()` check or a second type parameter on the protocol.
 
-GoF leaves one choice open: who calls `notify()`.
+GoF leaves a second choice open, separate from push or pull:
+who calls `notify()`.
 Here `set_celsius()` calls it, so every change broadcasts at once.
-The alternative leaves that call to the client,
+Otherwise the client calls `notify()` after making its changes,
 so several changes can coalesce into one broadcast,
-but a caller can forget to make the call.
+but a client can forget to make the call.
 
 ### Why `notify()` Copies the List
 
@@ -127,16 +130,18 @@ the copy via `list(self._observers)` appears redundant.
 It is not.
 
 The problem is that an observer may react to a notification by detaching.
-If the loop reads `self._observers` directly,
+If the `for` loop in `notify()` reads `self._observers` directly,
 that `detach()` shifts the remaining observers down one index,
-and the loop skips one of them without raising an exception.
-The copy is a second list,
+and the loop skips the observer after the one that detached,
+without raising an exception.
+With the copy, the `for` loop reads a second list,
 so `detach()` changes `self._observers` while the loop reads a list nobody is modifying.
 The set of observers is therefore fixed when `notify()` begins.
-An observer detached partway through still receives this notification,
-and a newcomer attaching mid-notification receives its first one at the next change.
+An observer detached partway through a `notify()` call still receives that call's notification,
+and a newcomer attached during the call receives its first notification at the next change.
 [Unsubscribing During a Notification](#unsubscribing-during-a-notification)
-traces the failure the copy prevents, one index at a time.
+runs a listener that unsubscribes itself,
+and shows index by index which listener the loop skips without the copy.
 
 ## The Names This Chapter Uses
 
