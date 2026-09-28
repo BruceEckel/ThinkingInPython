@@ -418,14 +418,7 @@ A `@runtime_checkable` `Protocol` does not change that.
 Since Python 3.12 the Protocol check uses `inspect.getattr_static()`,
 which reads the class and instance dictionaries instead of running attribute lookup.
 That function never calls `__getattr__()`,
-so a proxy that supplies every method through `__getattr__()` also fails the `isinstance()` check.
-Because ordinary attribute access still finds those methods,
-`hasattr(p, "f")` is `True` and `p.f()` runs.
-Code that calls the method, or checks with `hasattr()`, works on a surrogate,
-as long as `__getattr__()` raises only `AttributeError` for a name it does not have.
-The protection proxy below raises `PermissionError` instead,
-and `hasattr()` catches only `AttributeError`,
-so `hasattr()` propagates that exception rather than returning `False`.
+so a proxy that supplies every method through `__getattr__()` also fails the `isinstance()` check:
 
 ```python
 # proxy_identity.py
@@ -455,6 +448,14 @@ print(isinstance(p, Implementation), isinstance(p, Service))
 
 The call works and `hasattr()` finds the method,
 yet both `isinstance()` checks return `False`.
+
+Because ordinary attribute access still finds those methods,
+`hasattr(p, "f")` is `True` and `p.f()` runs.
+Code that calls the method, or checks with `hasattr()`, works on a surrogate,
+as long as `__getattr__()` raises only `AttributeError` for a name it does not have.
+The protection proxy below raises `PermissionError` instead,
+and `hasattr()` catches only `AttributeError`,
+so `hasattr()` propagates that exception rather than returning `False`.
 
 Two workarounds make `isinstance()` return `True`,
 and neither verifies anything:
@@ -583,12 +584,7 @@ which never calls `__getattr__()`.
 ### Smart Reference
 
 A *Smart reference* proxy adds behavior around each access.
-With `__getattr__()` you can wrap every method call, for example to count them.
-This proxy names its implementation `_impl`, with one underscore,
-and so gives up the mangling that keeps `proxy_getattr.py`'s attribute from colliding.
-`_impl` and `calls` now share a namespace with the implementation's own attributes:
-reading `calls` from the proxy gives the counter,
-even when the implementation defines a `calls` of its own.
+With `__getattr__()` you can wrap every method call, for example to count them:
 
 ```python
 # counting_proxy.py
@@ -638,6 +634,12 @@ and the wrapper reports its own name rather than the implementation's.
 Building a `counted` increments nothing.
 Only calling performs the increment,
 so the three lookups in the `print()` leave the tally at three.
+
+This proxy names its implementation `_impl`, with one underscore,
+and so gives up the mangling that keeps `proxy_getattr.py`'s attribute from colliding.
+`_impl` and `calls` now share a namespace with the implementation's own attributes:
+reading `calls` from the proxy gives the counter,
+even when the implementation defines a `calls` of its own.
 
 Python calls `__getattr__()` for any name the proxy and its class lack,
 but not for the proxy's own attributes.
