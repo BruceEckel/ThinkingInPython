@@ -684,12 +684,7 @@ along with a way to switch implementations during the surrogate's lifetime:
 
 ```python
 # state_surrogate.py
-from typing import Any, Protocol
-
-class Behavior(Protocol):
-    def f(self) -> None: ...
-    def g(self) -> None: ...
-    def h(self) -> None: ...
+from typing import Any
 
 class Surrogate:
     def __init__(self, implementation: Any) -> None:
@@ -699,6 +694,38 @@ class Surrogate:
     # Delegate calls to the implementation:
     def __getattr__(self, name: str) -> Any:
         return getattr(self.__implementation, name)
+```
+
+The annotations that carry the implementation are all `Any`,
+which the book's typing guidance treats as a last resort.
+
+`Surrogate.__init__()` and `change_to()` are a choice.
+The implementations in `state_demo.py` below would still type-check if both parameters carried `Behavior`,
+the Protocol that listing defines.
+The checker would then verify every implementation that reaches either method.
+That annotation also ties the surrogate to one Protocol,
+and that tie is what the generic surrogate exists to avoid.
+`test_state.py` below passes the same `Surrogate` a two-state stand-in that has a `name()` and none of `Behavior`'s three methods.
+With `Behavior` on those parameters, `ty` rejects that test:
+`type StateA is not assignable to protocol Behavior`.
+Declaring the implementations as `first: Behavior` and `second: Behavior`,
+as `state_demo.py` does,
+puts the check where it does not restrict the surrogate.
+The type checker verifies that `Implementation1` and `Implementation2` supply everything the Protocol declares,
+and reports a missing method.
+That declaration covers the implementations, not the surrogate.
+
+The demo gives the surrogate two implementations of one Protocol and swaps them mid-run:
+
+```python
+# state_demo.py
+from typing import Any, Protocol
+from state_surrogate import Surrogate
+
+class Behavior(Protocol):
+    def f(self) -> None: ...
+    def g(self) -> None: ...
+    def h(self) -> None: ...
 
 class Implementation1:
     def f(self) -> None:
@@ -722,17 +749,16 @@ def run(b: Any) -> None:
     b.h()
     b.g()
 
-if __name__ == "__main__":
-    first: Behavior = Implementation1()
-    second: Behavior = Implementation2()
-    b = Surrogate(first)
-    run(b)
-    b.change_to(second)
-    run(b)
+first: Behavior = Implementation1()
+second: Behavior = Implementation2()
+b = Surrogate(first)
+run(b)
 #: Fiddle de dum, Fiddle de dee,
 #: Eric the half a bee.
 #: Ho ho ho, tee hee hee,
 #: Eric the half a bee.
+b.change_to(second)
+run(b)
 #: We're Knights of the Round Table.
 #: We dance whene'er we're able.
 #: We do routines and chorus scenes
@@ -752,28 +778,11 @@ splitting the sequence across both implementations;
 see [Concurrency](19_Techniques--Concurrency.md#the-gil-does-not-prevent-races)
 for what an unsynchronized swap costs.
 
-The annotations that carry the implementation are all `Any`,
-which the book's typing guidance treats as a last resort,
-and the two uses have different reasons.
-
 `run(b: Any)` has no alternative.
 Annotating `run(b: Behavior)` and passing it `b` is a type error,
 because `Surrogate` defines no `f()` of its own.
 As [Forwarding with `__getattr__()`](#forwarding-with-getattr) explains,
 the checker cannot verify a method that `__getattr__()` supplies.
-
-`Surrogate.__init__()` and `change_to()` are a choice.
-`state_surrogate.py` successfully type-checks when both parameters carry `Behavior`.
-The checker then verifies every implementation that reaches either method.
-That annotation also ties the surrogate to one Protocol,
-and that tie is what the generic surrogate exists to avoid.
-`test_state.py` below passes the same `Surrogate` a two-state stand-in that has a `name()` and none of `Behavior`'s three methods.
-With `Behavior` on those parameters, `ty` rejects that test:
-`type StateA is not assignable to protocol Behavior`.
-Declaring the implementations as `first: Behavior` and `second: Behavior` puts the check where it does not restrict the surrogate.
-The type checker verifies that `Implementation1` and `Implementation2` supply everything the Protocol declares,
-and reports a missing method.
-That declaration covers the implementations, not the surrogate.
 
 The test passes the *State* surrogate a small stand-in and confirms that calls reach the current implementation and that `change_to()` swaps it:
 

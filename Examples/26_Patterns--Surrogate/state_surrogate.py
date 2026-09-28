@@ -1,10 +1,5 @@
 # state_surrogate.py
-from typing import Any, Protocol
-
-class Behavior(Protocol):
-    def f(self) -> None: ...
-    def g(self) -> None: ...
-    def h(self) -> None: ...
+from typing import Any
 
 class Surrogate:
     def __init__(self, implementation: Any) -> None:
@@ -14,41 +9,3 @@ class Surrogate:
     # Delegate calls to the implementation:
     def __getattr__(self, name: str) -> Any:
         return getattr(self.__implementation, name)
-
-class Implementation1:
-    def f(self) -> None:
-        print("Fiddle de dum, Fiddle de dee,")
-    def g(self) -> None:
-        print("Eric the half a bee.")
-    def h(self) -> None:
-        print("Ho ho ho, tee hee hee,")
-
-class Implementation2:
-    def f(self) -> None:
-        print("We're Knights of the Round Table.")
-    def g(self) -> None:
-        print("We dance whene'er we're able.")
-    def h(self) -> None:
-        print("We do routines and chorus scenes")
-
-def run(b: Any) -> None:
-    b.f()
-    b.g()
-    b.h()
-    b.g()
-
-if __name__ == "__main__":
-    first: Behavior = Implementation1()
-    second: Behavior = Implementation2()
-    b = Surrogate(first)
-    run(b)
-    b.change_to(second)
-    run(b)
-#: Fiddle de dum, Fiddle de dee,
-#: Eric the half a bee.
-#: Ho ho ho, tee hee hee,
-#: Eric the half a bee.
-#: We're Knights of the Round Table.
-#: We dance whene'er we're able.
-#: We do routines and chorus scenes
-#: We dance whene'er we're able.
