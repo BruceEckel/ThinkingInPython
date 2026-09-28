@@ -1779,6 +1779,16 @@ Every failure moves into the result, so nothing remains in the error channel.
 `all_handled()` returns `Success[str]`:
 no failure can escape as a thrown exception.
 
+`one` is `(str) -> Try[ValueError, int | KeyError]`.
+The caught error moves to the result and the uncaught one remains.
+`one_unhandled()` leaves `ValueError` in the channel,
+so its signature must declare that failure.
+Calling it on `"Bob"` carries that failure up to the `run()` call at the program's edge,
+which raises it as an ordinary exception,
+like `error_escapes.py` does for a single error.
+
+A test exercises both functions:
+
 ```python
 # test_catch_subset.py
 import pytest
@@ -1799,13 +1809,6 @@ def test_one_unhandled() -> None:
         run(one_unhandled("Bob"))
 ```
 
-`one` is `(str) -> Try[ValueError, int | KeyError]`.
-The caught error moves to the result and the uncaught one remains.
-`one_unhandled()` leaves `ValueError` in the channel,
-so its signature must declare that failure.
-Calling it on `"Bob"` carries that failure up to the `run()` call at the program's edge,
-which raises it as an ordinary exception,
-like `error_escapes.py` does for a single error.
 The test's assertion for Bob is `pytest.raises(ValueError)`:
 the failure the signature declares is the one the caller sees.
 Failures never vanish.
