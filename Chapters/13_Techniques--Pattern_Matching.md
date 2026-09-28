@@ -505,17 +505,6 @@ print(handle({"button": 1}))
 #: Unrecognized event: {'button': 1}
 ```
 
-```python
-# test_mapping_patterns.py
-from mapping_patterns import handle
-
-def test_mapping_patterns() -> None:
-    assert handle(
-        {"type": "key", "key": "Esc"}) == "Key Esc"
-    assert handle(
-        {"nope": 1}) == "Unrecognized event: {'nope': 1}"
-```
-
 Binding through a mapping pattern loses type information a class pattern keeps.
 `handle()`'s parameter is `event: dict[str, object]`,
 so `x` and `y` come out typed `object`,
@@ -526,6 +515,17 @@ The shape test is precise,
 but each binding takes the dictionary's one declared value type.
 When the data has a known shape, parse it into a dataclass first,
 then match on the dataclass: you keep the shape test and gain the field types.
+
+```python
+# test_mapping_patterns.py
+from mapping_patterns import handle
+
+def test_mapping_patterns() -> None:
+    assert handle(
+        {"type": "key", "key": "Esc"}) == "Key Esc"
+    assert handle(
+        {"nope": 1}) == "Unrecognized event: {'nope': 1}"
+```
 
 ## Patterns Nest
 
