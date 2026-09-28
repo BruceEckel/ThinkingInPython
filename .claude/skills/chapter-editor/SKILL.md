@@ -38,17 +38,15 @@ Every round below uses that URL.
 3. `tip editor-apply CH=NN`. It writes his in-place edits and deletions into the chapter, prints every cut
    with its surroundings, and lists the Rewrite marks and any conflicts.
    Read each cut: a deletion that leaves a broken sentence is flagged to Bruce in the reply, never silently patched.
-4. **Commit his changes first**, with no trailer, and with a subject like `Observer: chapter editor round 3, Bruce's edits and cuts`.
-   `/edit-done`'s capture treats a commit without a `Co-Authored-By` trailer as his, and these words are his.
-   Skip this when the round had no edits or cuts.
-5. Do the rewrites. Each is a quote with an optional note: rewrite the quoted text (widening to its sentence when the fault is there) to fix what the note says.
+4. Do the rewrites. Each is a quote with an optional note: rewrite the quoted text (widening to its sentence when the fault is there) to fix what the note says.
    With no note, find the fault the way `bare-pasted-phrase-is-a-review-request` describes: claim first, then clarity, then style.
    The global writing rules apply. Check any claim against the listing it describes.
    Handle each conflict by hand: the block changed in Zed during the round, so apply his intent to the current text.
-6. `tip verify-ch CH=NN`, then commit the rewrites and whatever the gate fixed, with the trailer.
-7. `tip editor-load CH=NN`, then write its batch file(s) as in Opening step 3.
+5. `tip verify-ch CH=NN`, then commit the whole round as one commit, with the trailer.
+   Judge the round by the chapter before and after it; who made which edit does not matter (Bruce, 2026-09-28).
+6. `tip editor-load CH=NN`, then write its batch file(s) as in Opening step 3.
    The meta write reopens the page on the next round, with the changed blocks outlined.
-8. Reply with the counts and each rewrite as before → after, one line each, plus any flagged cut.
+7. Reply with the counts and each changed sentence as before → after, one line each, plus any flagged cut.
    Say what you guessed where a mark had no note.
 
 ## Rules
