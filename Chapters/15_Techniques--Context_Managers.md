@@ -109,7 +109,7 @@ which runs at the start of the block, and `__exit__()`, which runs at the end.
 `@contextmanager` manufactures such an object from a generator function.
 Writing the class by hand shows the machinery directly.
 Every hand-written context manager class in this chapter keeps `__init__()` in longhand rather than becoming a `@dataclass`,
-so nothing between the class statement and the two protocol methods needs decoding:
+so every line between the class statement and the two protocol methods reads as ordinary Python:
 
 ```python
 # trace_cm.py
