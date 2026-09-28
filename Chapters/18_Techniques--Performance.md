@@ -1061,9 +1061,7 @@ A data class can generate the slots.
 
 ```python
 # slots_dataclass.py
-import sys
 from dataclasses import dataclass
-from benchmark import report
 from exceptions import expected
 
 @dataclass(slots=True)
@@ -1079,6 +1077,32 @@ with expected(AttributeError):
     p.z = 3  # type: ignore
 #: [AttributeError] 'Point' object has no attribute 'z' and
 #: no __dict__ for setting new attributes
+```
+
+The failed assignment prints through `expected()`,
+which wraps the long slotted message onto a second line.
+
+If a class can be a data class,
+prefer `slots=True` over a hand-written class with `__slots__`.
+`@dataclass(slots=True)` both shrinks the instances and writes the methods.
+The tradeoff is that instances can no longer grow attributes outside the declared set.
+
+`frozen=True` and `slots=True` are independent.
+Frozen blocks every attribute assignment, new fields included,
+so a frozen instance already cannot grow,
+the same restriction `slots` gives you.
+But frozen enforces that restriction by overriding `__setattr__()`,
+and the instance keeps its `__dict__` underneath.
+`slots=True` removes that `__dict__` entirely,
+so pairing it with `frozen=True` is the natural default,
+giving you the same immutability in a fraction of the space:
+
+```python
+# frozen_vs_slotted.py
+import sys
+from dataclasses import dataclass
+from benchmark import report
+from exceptions import expected
 
 @dataclass(frozen=True)
 class FrozenPoint:
@@ -1106,27 +1130,10 @@ print(f"slots at least 5x smaller: "
 #: slots at least 5x smaller: True
 ```
 
-Both failed assignments print through `expected()`,
-which wraps the longer slotted message onto a second line.
 `expected(AttributeError)` catches the frozen error because `FrozenInstanceError` subclasses `AttributeError`.
-
-If a class can be a data class,
-prefer `slots=True` over a hand-written class with `__slots__`.
-`@dataclass(slots=True)` both shrinks the instances and writes the methods.
-The tradeoff is that instances can no longer grow attributes outside the declared set.
-
-`frozen=True` and `slots=True` are independent.
-Frozen blocks every attribute assignment, new fields included,
-so a frozen instance already cannot grow,
-the same restriction `slots` gives you.
-But frozen enforces that restriction by overriding `__setattr__()`,
-and the instance keeps its `__dict__` underneath.
 `sys.getsizeof()` reports only an object's own size, not what it references,
 so `frozen_bytes` adds the dict's size on top.
-`slots=True` removes that `__dict__` entirely,
-so pairing it with `frozen=True` is the natural default,
-giving you the same immutability in a fraction of the space
-(one machine measured 344 bytes against 48, roughly seven to one).
+One machine measured 344 bytes against 48, roughly seven to one.
 The exact byte counts vary by platform and Python build,
 so the listing prints a comparison that holds anywhere rather than numbers that hold only here.
 

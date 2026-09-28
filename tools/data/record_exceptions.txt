@@ -12,7 +12,7 @@
 # (Stateless's Ability, Time) needs no entry: @record(slots=False) is
 # the rule there. CLAUDE.md's @record section has the rules.
 
-# Chapter 18's slots_dataclass.py needs no entry: it precedes the
+# Chapter 18's frozen_vs_slotted.py needs no entry: it precedes the
 # utils/record.py listing, where the rule starts.
 
 # frozen=True is the subject of the section and of the exercise.
