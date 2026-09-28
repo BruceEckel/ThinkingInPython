@@ -373,14 +373,6 @@ and the weak reference's callback removes the pool entry.
 The pool guarantees sharing and lets each object's other references decide its lifetime,
 the same design as `sys.intern()`.
 
-If you want a bounded pool instead,
-`functools.lru_cache(maxsize=n)` gives the factory an eviction policy and holds the most recent `n` alive by itself.
-An eviction ends the guarantee.
-Requesting an evicted value builds a fresh object,
-equal to any surviving original and distinct from it.
-The weak pool's entry lives exactly as long as something references the object,
-so every request during that life returns the one object.
-
 *Flyweight* cuts the number of objects,
 and [`slots=True`](18_Techniques--Performance.md#slots)
 cuts the size of each one,
@@ -393,6 +385,14 @@ and a slotted class gets one only by declaring it, so with `slots=True` alone,
 `weakref_slot=True` adds that one slot and no `__dict__`.
 `record()` does not pass it through,
 so `Name` writes the `dataclass` call in full.
+
+If you want a bounded pool instead,
+`functools.lru_cache(maxsize=n)` gives the factory an eviction policy and holds the most recent `n` alive by itself.
+An eviction ends the guarantee.
+Requesting an evicted value builds a fresh object,
+equal to any surviving original and distinct from it.
+The weak pool's entry lives exactly as long as something references the object,
+so every request during that life returns the one object.
 
 ```python
 # test_weak_pool.py
