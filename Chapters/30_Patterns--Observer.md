@@ -14,7 +14,7 @@ This is [designing the communication rather than the parts](21_Patterns--Design_
 
 *Observer* is the most dynamic of the callback patterns because observers attach and detach at runtime.
 Use *Observer* if a group of objects must update themselves when other objects change state.
-Event handling is a common use:
+Event handling typically works this way:
 a widget keeps a list of handlers and calls each one when its event arrives.
 
 The classic example is Smalltalk's MVC (model-view-controller),
@@ -111,8 +111,8 @@ to read `celsius`, an observer must know it is watching a `Thermometer`.
 The type checker enforces that dependency.
 `Subject[float]` has no `celsius`,
 so the observer must declare its `subject` parameter as a `Thermometer`,
-and an `update()` narrowed that way no longer satisfies `Observer[float]`.
-Pull therefore costs a runtime `isinstance()` check or a second type parameter on the protocol.
+and `Observer[float]` rejects an `update()` with that narrower parameter.
+To use pull, you therefore add either a runtime `isinstance()` check or a second type parameter on the protocol.
 
 GoF leaves one choice open: who calls `notify()`.
 Here `set_celsius()` calls it, so every change broadcasts at once.
@@ -227,8 +227,8 @@ The listeners here are lambdas, but any function or bound method works.
 
 The `display` and `alarm` boxes are the listing's two lambdas;
 the dashed `plot` listener is not in the listing.
-Any callable of the right shape subscribes the way the two lambdas do,
-and `Thermometer` names no listener type.
+Any callable of the right shape subscribes with the same `subscribe()` call as the two lambdas,
+and `Thermometer` knows its listeners only as callables that take a `float`.
 
 Four things from the classic version disappear: the `Observer` interface,
 its `update()` method, a class per reaction, and the `subject` argument.
@@ -347,12 +347,12 @@ def test_late_subscriber_misses_earlier_changes() -> None:
 ```
 
 The tests subscribe a list's `append` to the broadcaster,
-so the list records what arrived.
+so the list records every announced value.
 `unsubscribe()` matches by equality, and a lambda equals only itself,
-so a listener you mean to remove later needs a named reference,
+so to remove a listener later you need a named reference to it,
 not an inline lambda.
-A bound method needs no stashed reference,
-as `test_unsubscribe_stops_delivery()` shows.
+A bound method is different:
+`test_unsubscribe_stops_delivery()` unsubscribes `received.append` without storing it first.
 Each `received.append` builds a new bound-method object,
 so `received.append is received.append` is `False`.
 Two bound methods compare equal when they wrap the same instance and the same function,
@@ -424,7 +424,8 @@ no longer fits without a wrapper (see exercise 5).
 Subscriptions are strong references.
 A bound method holds the object it came from,
 so subscribing `plot.redraw` keeps that `plot` in memory for as long as the broadcaster holds the subscription.
-A broadcaster that outlives its listeners holds every one of them that way,
+When a broadcaster outlives its listeners,
+its subscriptions keep every one of them in memory:
 the classic *lapsed listener* leak.
 Long-lived broadcasters need disciplined `unsubscribe()` calls,
 or [weak references](10_Foundations--Cleanup.md#watching-objects-without-holding-them),
@@ -629,11 +630,11 @@ for instance attributes and class variables both.
 
 `ty` takes an instance attribute and its type from an assignment like `self.celsius = celsius`,
 which is why `celsius` and `humidity` need no declaration.
-For `_watchers` the constructor writes `self.__dict__["_watchers"] = []`,
-a write to a dictionary rather than an assignment to an attribute,
-and `ty` does not read it as one.
-The bare annotation supplies the attribute and its type instead: without it,
-`ty` reports an `unresolved-attribute` error in each method that reads the list.
+For `_watchers`, the constructor writes `self.__dict__["_watchers"] = []`,
+and `ty` treats that as a write to a dictionary,
+not an assignment to an attribute.
+The bare annotation supplies the attribute and its type instead.
+Without it, `ty` reports an `unresolved-attribute` error in each method that reads the list.
 
 One method for every attribute is less precise than a property per attribute,
 in three ways.
@@ -641,16 +642,16 @@ First, a watcher is a listener with a wider signature:
 it takes the attribute name along with the value,
 and filters by name to act on one attribute.
 `Thermometer` publishes one attribute and is a `Broadcaster[float]`,
-so its listeners take the `float` reading and need no name.
-[Deciding What Matters](#deciding-what-matters) returns to that filter,
-where a watcher sorting its own notifications is the subject declining to decide.
+so each listener takes the `float` reading as its one argument.
+[Deciding What Matters](#deciding-what-matters) revisits that name filter:
+a watcher that sorts its own notifications means the subject has left the decision to its listeners.
 Second, every assignment reaches the watchers, including the internal ones:
 a cached result or a hit counter broadcasts like a published attribute,
 unless the class writes it through `self.__dict__` as the constructor does.
 Third, `__setattr__()` accepts any name,
-so `ty` stops checking assignments and reports nothing for `w.celcius = 25.0`,
+so `ty` stops checking assignments and passes `w.celcius = 25.0`,
 which quietly creates a new attribute.
-The same misspelling on `Thermometer` is an `unresolved-attribute` error.
+Making the same typo on a `Thermometer` produces an `unresolved-attribute` error.
 `Thermometer` defines no `__setattr__()`,
 so `ty` checks each assignment against the attributes the class declares.
 
@@ -670,7 +671,7 @@ so `announce()` returns only after every listener finishes.
 
 An `announce()` that awaits is a coroutine,
 and its caller must `await` it in turn,
-so the setter that calls it must be `async` too.
+so the setter that calls it must also be `async`.
 An `async` setter returns a coroutine instead of running its body,
 and an assignment offers no place to `await` that coroutine.
 The assignment therefore discards the coroutine, and the body never runs.
@@ -844,8 +845,9 @@ asyncio.run(main())
 ```
 
 The failure prints the moment `loud()` raises its `ValueError`.
-`slow` is still sleeping at that point, with nothing left awaiting it,
-and it prints only because `main()` sleeps long enough afterward to let it finish.
+`slow` is still sleeping at that point, with nothing left awaiting it.
+Its line appears because `main()` sleeps for 0.25 seconds afterward,
+long enough for `slow` to finish.
 A real caller rarely adds that wait.
 The program moves on before the orphan finishes,
 and an exception from the orphan is discarded without a report.
@@ -924,10 +926,10 @@ class BoxModel(Broadcaster[Grid]):
 `Color` is a `StrEnum`,
 an [`Enum`](12_Techniques--Data_Classes_as_Types.md#enums-are-types-too)
 whose members are also strings.
-`Color.KHAKI` compares equal to `"khaki"` and goes wherever a `str` goes,
+`Color.KHAKI` compares equal to `"khaki"` and works anywhere a `str` does,
 so the view can pass a `Color` to `tkinter` as a color name.
-Iterating over an enum produces its members in definition order,
-so `list(Color)` is the cycle of colors.
+`list(Color)` is the cycle of colors,
+because iterating over an enum produces its members in definition order.
 `next()` finds the member's position in that list with `index()` and adds one.
 `nxt` is the position of the next color,
 and `nxt % len(colors)` wraps it around,
@@ -1058,8 +1060,8 @@ each cell `cell_px` pixels wide.
 so every change repaints.
 `draw()` is defined inside `show()`,
 so it is a closure that reads `canvas` and `cell_px`.
-It paints one rectangle per cell,
-multiplying the cell's column and row by `cell_px` to get the rectangle's corners in pixels.
+For each cell it paints one rectangle,
+whose pixel corners come from multiplying the cell's column and row by `cell_px`.
 It takes a `Grid` and returns `None`,
 the shape `subscribe()` requires of a listener.
 When the window opens,
@@ -1094,8 +1096,9 @@ The dependency runs one way, and the view is the end that carries it:
 ## Where the Controller Goes
 
 The chapter opened by saying Document-View folds the controller into the view.
-Here is that fold with everything else held still: one model, one notification,
-and the input handling in two places.
+The next two listings isolate that fold:
+both share one model and one notification,
+and they differ only in where the input handling lives.
 The model is a counter, and both versions import this one file:
 
 ```python
@@ -1147,7 +1150,8 @@ for char in "++-x":
 
 `draw()` is the output and `key()` is the input,
 and `View` holds the model because `key()` needs somewhere to send the request.
-`x` matches neither branch, so it changes nothing.
+`x` falls through both branches, so `key()` returns without touching the model,
+and four keystrokes print three counts.
 
 MVC splits that class in two:
 
@@ -1206,23 +1210,24 @@ The MVC `View` holds nothing and defines one method.
 Document-View's `View` does two jobs, and each MVC class does one.
 
 The last four lines show what that move gives you.
-`NoKeys` satisfies `Keys` and does nothing,
-so assigning it stops the input with no edit to `View`,
+`NoKeys` satisfies `Keys` and ignores every key,
+so assigning it to `control` switches the input off and leaves `View` unchanged,
 the example *GoF Design Patterns* gives for the separation.
 `StepKeys` also runs with no view attached,
-so a test drives `key()` and reads `model.count` without drawing anything.
-A third key language is a third class beside these two.
+so a test can call `key()` and read `model.count` without drawing anything.
+Supporting a different set of keys means writing a third class that satisfies `Keys`,
+with `View` and the model unchanged.
 
-The model-to-view coupling is the same in both versions,
-so the separation changes nothing there.
+The separation keeps the model-to-view coupling as it is:
+both versions call `model.subscribe(view.draw)`.
 It separates drawing from input handling,
 two jobs that share one class in `document_view.py`.
-`box_view.py` is the Document-View version at full size: `draw()` paints,
+`box_view.py` is the Document-View version as a working GUI: `draw()` paints,
 the `bind()` lambda interprets the click, and both sit inside `show()`.
 
 ## What Stays Constant
 
-One design serves four jobs in this chapter:
+*Observer* serves four scenarios in this chapter:
 a thermometer whose listeners print a reading,
 the same thermometer whose coroutine listeners run concurrently,
 a grid model whose listener repaints a canvas,
@@ -1234,36 +1239,35 @@ and no class per reaction.
 
 ## Deciding What Matters
 
-A thermometer measures temperature.
 `Thermometer` measures, decides which changes to announce,
 and tells the listeners.
 [Cohesion](21_Patterns--Design_Patterns.md#design-principles)
-is one job per class, and that is three.
-Of the two additions, only the telling moves out of the class.
-`Broadcaster` holds the list and the loop in a base class,
-and `watched.py` drops the base class and announces from `__setattr__()`,
+means one job per class, and that is three.
+Of the two added jobs, telling the listeners can move out of the class.
+`Broadcaster` keeps the listener list and the notification loop in a base class,
+and `watched.py` drops the base class and calls its watchers from `__setattr__()`,
 so one method covers every attribute.
 The job still belongs to the object either way, and its code lives elsewhere.
 
-Deciding which changes to announce is the job that stays.
+The other added job is deciding which changes to announce.
 That decision belongs to the object whose state changes, or to whoever calls it.
 It never belongs to a listener,
-which filters what it receives and cannot recover a change it was never told about.
+whose choice is limited to filtering the changes it receives.
 `Thermometer`'s setter announces every assignment,
 which says that every change matters to everyone.
 [Leaving that call to the client](#push-or-pull)
 instead lets several changes coalesce into one announcement,
-and lets a caller forget to make it.
-Push sends the value the thermometer chose.
+but a caller who forgets the call leaves every listener out of date.
+Push sends the value, so the thermometer decides what each listener receives.
 Pull sends the thermometer,
 so each listener reads the attribute it names and depends on that interface.
-`watched.py` declines to choose: two states, `celsius` and `humidity`,
-share one channel, so every watcher wakes for either and filters by the name it is handed.
+`watched.py` leaves the choice to its watchers: two states,
+`celsius` and `humidity`, share one channel,
+so every watcher receives both kinds of change and filters by the name it is handed.
 
-*Observer* therefore removes one coupling and leaves a second one standing.
-The object that changes names no listener type.
-It still decides what those listeners hear about,
-for objects it has no other awareness of.
+*Observer* therefore removes one coupling and keeps another.
+The object that changes knows its listeners only as callables,
+yet it still decides what they hear.
 A threshold makes that concrete.
 This thermometer announces a reading only when it differs from the reading before it by at least `_delta`:
 
@@ -1309,13 +1313,13 @@ print(log)
 Half a degree is a judgment about what a display needs,
 and `display` prints whatever it receives.
 It is the wrong judgment for `log`, which exists to record every reading,
-and two of the four readings reach neither listener.
-`log` has no way to recover them,
-and nothing in `ThresholdThermometer` says which listener the half degree was for.
+and the thermometer announces only two of the four readings.
+`log` loses the other two for good,
+and nothing in `ThresholdThermometer` says which listener the half degree serves.
 [`reentrant_announce_fixed.py`](#re-entrant-notification)
 makes a smaller version of the same decision:
-its setter returns early when the new value equals the stored one,
-and a listener that counts readings rather than changes needs the announcement it drops.
+its setter returns early when the new value equals the current reading,
+so a listener that counts readings rather than changes misses that repeated reading.
 
 Move the comparison into the listeners and the number sits where the need is.
 `display` then remembers the last value it drew and skips a reading close to it,
@@ -1325,17 +1329,17 @@ and each listener that filters by size repeats the same comparison.
 `async_thermometer.py`'s `alarm` already works this way,
 returning at once for a reading below 100 degrees.
 
-The repetition is correct for a question about *how much*,
-because each listener's threshold is its own number.
-*Which kind* is a different question, and repetition answers it badly,
-because a listener cannot subscribe to a kind of change the announcement never distinguishes.
+Repeating the comparison in each listener suits a question about *how much*,
+because each listener sets its own threshold.
+*Which kind* is a different question, and repetition handles it poorly,
+because every kind of change arrives on one channel and each listener sorts them itself.
 `watched.py` shows that repetition,
 with every watcher taking the attribute name and filtering it.
 [Function Objects](28_Patterns--Function_Objects.md#an-event-bus-handlers-keyed-by-type)
 removes it: one list becomes a dictionary of lists keyed by event type,
 so an announcement carries the kind of thing that happened and each handler subscribes to the kind it cares about.
-The publisher decides which event it is publishing, which it already knows,
-in place of deciding who needs to hear.
+The publisher then decides which event it is publishing, something it knows,
+instead of guessing which listeners need it.
 
 ## Exercises
 
