@@ -167,15 +167,15 @@ def open_pass() -> str:
 
 def rewrites(since: str | None, span: str | None
              ) -> Iterator[tuple[str, Rewrite]]:
-    """(chapter file, rewrite) for each sentence Bruce rewrote.
+    """(chapter file, rewrite) for each sentence the edit rewrote.
 
     `--since REF` covers REF to the working tree, which is what an
     editing pass is: commits along the way and uncommitted edits alike.
-    `--range A..B` covers two commits. Either way the edit is walked
-    commit by commit, and a commit with a Co-Authored-By trailer is
-    skipped: an editing pass's range also holds my verify commits and
-    prose passes, and a diff of the range as a whole would count those
-    as his. An `edit-start-NN` tag narrows the walk to chapter NN.
+    `--range A..B` covers two commits. Either way the edit is one diff,
+    before against after, whoever made each change: a pass is judged by
+    whether the chapter got better (Bruce, 2026-09-28), and until then
+    commits with a Co-Authored-By trailer were skipped. An
+    `edit-start-NN` tag narrows the diff to chapter NN.
     """
     if span:
         start, end = span.split("..")
@@ -184,23 +184,15 @@ def rewrites(since: str | None, span: str | None
         start, end = since or open_pass(), ""
     chapter = re.fullmatch(r"edit-start-(\w+)", start)
     paths = ([f"Chapters/{chapter[1]}_*.md"] if chapter else ["Chapters/"])
-    log = git("log", "--reverse", "--no-merges", "--format=%h%x09"
-              "%(trailers:key=Co-Authored-By,valueonly,separator=;)",
-              f"{start}..{end or 'HEAD'}", "--", *paths)
-    steps = [(f"{h}^", h) for h, trailer in
-             (line.split("\t") for line in log.splitlines()) if not trailer]
-    if not end:
-        steps.append(("HEAD", ""))
-    for old, new in steps:
-        names = git("diff", "--name-only", "--diff-filter=M", old,
-                    *([new] if new else []), "--", *paths).split()
-        for path in names:
-            after = (git("show", f"{new}:{path}") if new
-                     else (ROOT / path).read_text(encoding="utf-8"))
-            found, _ = sentence_diff.diff(
-                git("show", f"{old}:{path}"), after, path)
-            for r in found:
-                yield path.split("/")[-1], r
+    names = git("diff", "--name-only", "--diff-filter=M", start,
+                *([end] if end else []), "--", *paths).split()
+    for path in names:
+        after = (git("show", f"{end}:{path}") if end
+                 else (ROOT / path).read_text(encoding="utf-8"))
+        found, _ = sentence_diff.diff(
+            git("show", f"{start}:{path}"), after, path)
+        for r in found:
+            yield path.split("/")[-1], r
 
 
 def record_pass(pairs: dict[str, dict[str, Any]], since: str | None,

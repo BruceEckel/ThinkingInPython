@@ -35,15 +35,11 @@ One diff covers the whole pass, committed and not:
 git diff --word-diff=porcelain --ignore-all-space edit-start-NN -- Chapters/NN_*.md Solutions/NN_*.md
 ```
 
-For provenance, list the commits inside the range:
-
-```
-git log --format='%h%x09%an%x09%s%x09%(trailers:key=Co-Authored-By,valueonly)' edit-start-NN..HEAD -- Chapters/NN_*.md Solutions/NN_*.md
-```
-
-A commit without a `Co-Authored-By: Claude` trailer is Bruce's own.
-Commits I made inside the range (a verify commit, a marker refresh)
-are not his edits; note them so the capture can set them aside.
+That diff is the pass, whoever made each change: Bruce's editor
+edits, chapter editor rounds, and my rewrites count alike, since a pass
+is judged by whether the chapter got better (Bruce, 2026-09-28). The
+word diff already drops what is not an edit (a reflow's rewrapped
+lines), and the capture skill sets aside code and `#:` markers.
 
 If the diff is empty, say so, delete the tag (Step 5), and stop.
 
@@ -63,8 +59,7 @@ Bruce approves fault lines on a page, not in the transcript
 docstring has the mechanics). While the tag still exists:
 
 1. Run `tip edit-patterns ARGS=--dry-run`. It lists every sentence
-   Bruce rewrote in the pass (commits with a Co-Authored-By trailer are
-   skipped) and records each before/after pair in
+   the pass rewrote, from one before/after diff, and records each pair in
    `tools/data/edit_pairs.json`.
 2. For each edit the capture step judged generalizable, propose a
    one-line fault: what the before-sentence got wrong, stated so it

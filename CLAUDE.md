@@ -126,11 +126,12 @@ from him means run a round of the `chapter-editor` skill
 (`.claude/skills/chapter-editor/SKILL.md`, pages listed in
 `tools/data/chapter_editor.json`).
 
-## Learning from Bruce's own edits
+## Learning from editing passes
 
-`/bruce-edit-capture` (`.claude/skills/bruce-edit-capture/SKILL.md`) reads a
-diff of Bruce's edits to a chapter, separates the generalizable edits from the
-local ones, and proposes editing practices into `bruce_edit_db.md`. It writes
+`/bruce-edit-capture` (`.claude/skills/bruce-edit-capture/SKILL.md`) reads the
+before/after diff of an editing pass on a chapter, whoever made each edit
+(Bruce's rule since 2026-09-28: a pass is judged by whether the chapter got
+better), separates the generalizable edits from the local ones, and proposes editing practices into `bruce_edit_db.md`. It writes
 only that file, never `Chapters/`. `/bruce-edit-apply`
 (`.claude/skills/bruce-edit-apply/SKILL.md`) applies the promoted rules to a
 chapter or the book, reporting per-rule firing counts. The split is deliberate:

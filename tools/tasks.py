@@ -1195,8 +1195,8 @@ def link_support(v: Vars) -> None:
       "(advisory; ARGS=--dry-run, --since REF, --from-rules, --report)")
 def edit_patterns(v: Vars) -> None:
     """Needs TYPESAFE_API_KEY unless ARGS=--dry-run or --report. Collects
-    the sentences Bruce rewrote in the open edit-start pass (or since
-    REF), skipping commits with a Co-Authored-By trailer, and adds each
+    the sentences the open edit-start pass rewrote (or everything since
+    REF), as one before/after diff whoever made each edit, and adds each
     before/after pair to tools/data/edit_pairs.json. A pair with a
     `fault` line there is checked against its own before and after, then
     searched for across Chapters/; the hits go to build/edit_patterns.md.

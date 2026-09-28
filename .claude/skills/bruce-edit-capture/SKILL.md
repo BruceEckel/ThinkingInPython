@@ -1,6 +1,6 @@
 ---
 name: bruce-edit-capture
-description: Mine Bruce's own prose edits to a chapter for generalizable editing practices, and log them as candidates or promoted rules in `bruce_edit_db.md`. Proposes; never edits a chapter. Use after Bruce has edited a chapter and wants the lesson captured. The argument names the chapter by number or name, or gives a commit or range; no argument means the working tree.
+description: Mine an editing pass's prose edits to a chapter (one before/after diff, whoever made each edit) for generalizable editing practices, and log them as candidates or promoted rules in `bruce_edit_db.md`. Proposes; never edits a chapter. Use after Bruce has edited a chapter and wants the lesson captured. The argument names the chapter by number or name, or gives a commit or range; no argument means the working tree.
 ---
 
 # Capturing editing practice from Bruce's edits
@@ -27,30 +27,23 @@ then fires on 300 sentences across the book.
 Every step below exists to hold the generality down to what the evidence
 supports.
 
-## Step 1: establish the diff, and whose it is
+## Step 1: establish the diff
 
 The argument decides the range:
 
-- A chapter number or name: find Bruce's most recent edits to that chapter.
+- A chapter number or name: the open `edit-start` pass on that chapter, or else its most recent editing pass.
 - A commit or range (`HEAD~3..HEAD`, a SHA): use it directly.
 - No argument: the uncommitted working tree.
 
-Provenance matters and git records it.
-Commits I author carry a `Co-Authored-By: Claude` trailer,
-so a commit on `Chapters/` without that trailer is Bruce's own work:
-
-```
-git log --format='%H%x09%s%x09%(trailers:key=Co-Authored-By,valueonly)' -- Chapters/NN_*.md
-```
-
-Two provenances, two weights.
-Where Bruce rewrote prose I had written, the edit says directly how I should
-write, and it is the strong signal.
-Where Bruce rewrote his own older draft, the edit may be the chapter maturing
-rather than a standing preference, so it is weaker.
-Weak-provenance findings can still become candidates; they should rarely be
-proposed as immediate promotions.
-Record the provenance in every sighting.
+The range is one diff, before against after.
+Who made each change does not matter:
+an edit Bruce typed in Zed, one he marked on the chapter editor page, and one I made all count alike,
+since a pass is judged by whether the chapter got better (Bruce, 2026-09-28).
+Weigh an edit by what it shows about the writing:
+whether its before-sentence has a fault a reader would hit,
+and whether the same fault recurs elsewhere.
+Until that date this step weighted edits by provenance and read only commits without a `Co-Authored-By` trailer;
+sightings recorded before then say which provenance they had, and that note is history, not a weight.
 
 ## Step 2: get a diff that survives Semantic Line Breaks
 
@@ -124,7 +117,7 @@ Each proposed entry carries, in the `bruce_edit_db.md` format:
   be answered by looking at one sentence;
 - a **keep when** exception if the evidence shows one, or an honest
   "none seen yet";
-- the verbatim before and after, with chapter and provenance.
+- the verbatim before and after, with the chapter.
 
 A rule with no usable test is not applicable and stays a candidate however
 convincing it sounds. "Cut 'itself'" is not a test. "Cut 'itself' where the
