@@ -6,12 +6,16 @@ class Color(StrEnum):
     PALEGREEN = "palegreen"
     KHAKI = "khaki"
 
+    @classmethod
+    def at(cls, n: int) -> Color:
+        members = list(cls)
+        return members[n % len(members)]
+
 type Coord = tuple[int, int]
 type Grid = dict[Coord, Color]
 
 def new_grid(size: int) -> Grid:
-    colors = list(Color)
-    return {(x, y): colors[(x + y) % len(colors)]
+    return {(x, y): Color.at(x + y)
             for x in range(size) for y in range(size)}
 
 def adjacent(a: Coord, b: Coord) -> bool:

@@ -769,11 +769,8 @@ an `async` function subscribed to the synchronous `Broadcaster`.
 An `announce()` that awaits is a coroutine,
 and its caller must `await` it in turn,
 so the setter that calls it must also be `async`.
-An `async` setter returns a coroutine instead of running its body,
-and an assignment offers no place to `await` that coroutine.
-The assignment therefore discards the coroutine, and the body never runs.
-So the asynchronous `Thermometer` changes `celsius` with an awaitable method,
-`set_celsius()`, rather than the assignment `t.celsius = value`:
+The asynchronous `Thermometer` changes `celsius` with an awaitable method,
+`set_celsius()`, rather than an assignment `t.celsius = value`:
 
 ```python
 # async_thermometer.py
@@ -790,9 +787,7 @@ class Thermometer(Broadcaster[float]):
         await self.announce(value)
 ```
 
-Neither module runs anything,
-so a later listing can import `Broadcaster` without starting a demo.
-The demo lives in its own file, and its responders are coroutines:
+The demo's responders are coroutines:
 
 ```python
 # async_thermometer_demo.py
@@ -826,8 +821,8 @@ yet at 150 degrees the log prints first.
 Awaiting the responders in sequence prints in subscription order, alarm first.
 Concurrent fan-out lets each responder finish as soon as its own wait ends,
 so the faster responder prints first.
-The results `gather()` returns stay in argument order regardless.
-Only the side effects interleave.
+The results `gather()` returns stay in argument order;
+only the side effects interleave.
 
 A responder need not act on every notification.
 Below its threshold, the alarm returns at once.
@@ -870,7 +865,8 @@ print(seen)
 `once` unsubscribes while `gather()` is running it,
 and `always` still receives the change,
 because `gather()` held both coroutines before either ran.
-The next `announce()` builds its tuple from the shortened list and calls `always` alone.
+The next `announce()` builds its tuple from the shortened list,
+so only `always` receives the second change.
 
 ### A Failing Responder Orphans the Rest
 
@@ -907,7 +903,7 @@ long enough for `slow` to finish.
 A real caller rarely adds that wait.
 The program moves on before the orphan finishes,
 and an exception from the orphan is discarded without a report.
-`gather(*coros, return_exceptions=True)` returns the failures as data instead,
+`gather(*coros, return_exceptions=True)` returns the failures as data,
 the async form of exercise 3's catch-collect-continue.
 [Concurrency](19_Techniques--Concurrency.md#structured-concurrency-with-taskgroup)'s `TaskGroup` is the usual choice for concurrent awaits,
 but not here.
@@ -917,7 +913,7 @@ so a single broken responder cancels the others mid-notification.
 Use the async fan-out only when the responders are I/O-bound.
 For in-memory responders the synchronous `Broadcaster` from `broadcaster.py` is simpler and needs no event loop.
 
-## A Visual Example: a Model and Its View
+## A Visual Example
 
 This example emphasizes the model-view split.
 The *model*, `box_observer.py`,
@@ -936,7 +932,8 @@ The size decides that, and a 3x3 grid reaches all three colors (see exercise 9).
 
 ### The Model
 
-The model reuses `broadcaster.Broadcaster`:
+The model imports nothing from `tkinter`.
+Its only tie to a view is the `Broadcaster` it inherits:
 
 ```python
 # box_observer.py
@@ -948,17 +945,19 @@ class Color(StrEnum):
     PALEGREEN = "palegreen"
     KHAKI = "khaki"
 
+    @classmethod
+    def at(cls, n: int) -> Color:
+        members = list(cls)
+        return members[n % len(members)]
+
     def next(self) -> Color:
-        colors = list(Color)
-        nxt = colors.index(self) + 1
-        return colors[nxt % len(colors)]
+        return Color.at(list(Color).index(self) + 1)
 
 type Coord = tuple[int, int]  # (column, row)
 type Grid = dict[Coord, Color]
 
 def new_grid(size: int) -> Grid:
-    colors = list(Color)
-    return {(x, y): colors[(x + y) % len(colors)]
+    return {(x, y): Color.at(x + y)
             for x in range(size) for y in range(size)}
 
 def recolored(grid: Grid, selected: Coord) -> Grid:
@@ -986,16 +985,19 @@ whose members are also strings.
 so the view can pass a `Color` to `tkinter` as a color name.
 `list(Color)` is the cycle of colors,
 because iterating over an enum produces its members in definition order.
-`next()` finds the member's position in that list with `index()` and adds one.
-`nxt` is the position of the next color,
-and `nxt % len(colors)` wraps it around,
+`Color.at(n)` counts `n` places around that cycle,
+and `n % len(members)` wraps a count past the last member back to the start.
+`at()` is a classmethod because it works on the whole set of members rather than on one.
+A class attribute holding the list is not an option,
+because every assignment in an `Enum` body creates another member.
+`next()` finds the member's position with `index()` and asks `at()` for the position after it,
 so `Color.KHAKI.next()` is `Color.SKYBLUE`.
 
 A `Grid` maps each `(column, row)` coordinate to a `Color`.
 `new_grid()` builds a square grid, `size` cells on a side,
 banded into three colors.
-A cell's color is `colors[(x + y) % len(colors)]`,
-so the cells along a diagonal, where `x + y` is constant, share one color.
+A cell's color is `Color.at(x + y)`, so the cells along a diagonal,
+where `x + y` is constant, share one color.
 
 `recolored()` computes the grid that results from selecting a cell: values in,
 values out.

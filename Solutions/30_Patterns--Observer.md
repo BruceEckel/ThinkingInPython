@@ -430,12 +430,16 @@ class Color(StrEnum):
     PALEGREEN = "palegreen"
     KHAKI = "khaki"
 
+    @classmethod
+    def at(cls, n: int) -> Color:
+        members = list(cls)
+        return members[n % len(members)]
+
 type Coord = tuple[int, int]
 type Grid = dict[Coord, Color]
 
 def new_grid(size: int) -> Grid:
-    colors = list(Color)
-    return {(x, y): colors[(x + y) % len(colors)]
+    return {(x, y): Color.at(x + y)
             for x in range(size) for y in range(size)}
 
 def adjacent(a: Coord, b: Coord) -> bool:
@@ -527,17 +531,19 @@ class Color(StrEnum):
     PALEGREEN = "palegreen"
     KHAKI = "khaki"
 
+    @classmethod
+    def at(cls, n: int) -> Color:
+        members = list(cls)
+        return members[n % len(members)]
+
     def next(self) -> Color:
-        colors = list(Color)
-        nxt = colors.index(self) + 1
-        return colors[nxt % len(colors)]
+        return Color.at(list(Color).index(self) + 1)
 
 type Coord = tuple[int, int]
 type Grid = dict[Coord, Color]
 
 def new_grid(size: int) -> Grid:
-    colors = list(Color)
-    return {(x, y): colors[(x + y) % len(colors)]
+    return {(x, y): Color.at(x + y)
             for x in range(size) for y in range(size)}
 
 def recolored(grid: Grid, selected: Coord) -> Grid:
@@ -597,18 +603,20 @@ class Color(StrEnum):
     PALEGREEN = "palegreen"
     KHAKI = "khaki"
 
+    @classmethod
+    def at(cls, n: int) -> Color:
+        members = list(cls)
+        return members[n % len(members)]
+
     def next(self) -> Color:
-        colors = list(Color)
-        nxt = colors.index(self) + 1
-        return colors[nxt % len(colors)]
+        return Color.at(list(Color).index(self) + 1)
 
 type Coord = tuple[int, int]
 type Grid = dict[Coord, Color]
 type Responder[T] = Callable[[T], None]
 
 def new_grid(size: int) -> Grid:
-    colors = list(Color)
-    return {(x, y): colors[(x + y) % len(colors)]
+    return {(x, y): Color.at(x + y)
             for x in range(size) for y in range(size)}
 
 def recolored(grid: Grid, selected: Coord) -> Grid:

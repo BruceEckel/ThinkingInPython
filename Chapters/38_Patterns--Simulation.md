@@ -471,7 +471,7 @@ so you watch the pack move through the maze from the entry outward.
 The view records the order by subclassing `Blackboard` and overriding `claim()`,
 so the model stays as written.
 Each of this chapter's three views is a separate file holding all the display code,
-the model-view split of [*Observer*](30_Patterns--Observer.md#a-visual-example-a-model-and-its-view).
+the model-view split of [*Observer*](30_Patterns--Observer.md#a-visual-example).
 The subscription half of *Observer* is absent.
 No model in this chapter notifies a view,
 so each view drives or replays its model itself.
