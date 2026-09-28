@@ -335,6 +335,16 @@ RingBell 7:00
 LightOn 8:00
 ```
 
+`load_schedule()` reads that file, filtering out blank lines and comments,
+then builds an `Event` from each resulting line.
+`line.replace(":", " ").split()` turns `"LightOn 1:00"` into three strings in a single step,
+replacing the colon with a second space before splitting on whitespace.
+`Event._event_maker[class_name]` gets the class object that builds that `Event`.
+The first time a lookup asks for an event type,
+the maker builds the class and registers it under its name.
+An unknown name raises a `KeyError`,
+which a caller writing `try: ... except KeyError` around a lookup expects.
+
 The schedule names three of the seven declared event types.
 `EventMakers` builds only those three: seven classes declared, three built.
 
@@ -356,16 +366,6 @@ not just a distinct name.
 and the overridden `__getitem__()` decides whether that lookup returns a class or builds one first.
 The alternative, a `make_event()` function,
 pushes that decision into every caller.
-
-`load_schedule()` reads that file, filtering out blank lines and comments,
-then builds an `Event` from each resulting line.
-`line.replace(":", " ").split()` turns `"LightOn 1:00"` into three strings in a single step,
-replacing the colon with a second space before splitting on whitespace.
-`Event._event_maker[class_name]` gets the class object that builds that `Event`.
-The first time a lookup asks for an event type,
-the maker builds the class and registers it under its name.
-An unknown name raises a `KeyError`,
-which a caller writing `try: ... except KeyError` around a lookup expects.
 
 `Event._event_maker` starts out holding the seven legitimate event names,
 each paired with the `NOT_CREATED` sentinel as a placeholder.
@@ -1795,6 +1795,14 @@ it keeps only the ones whose value differs from `object`'s own,
 so a class that overrides none of them shows no dunders.
 `_redefined()` checks membership in `INTERESTING_DUNDERS` before comparing,
 deliberately narrowing the comparison to those four.
+
+Every class, even an empty one, has its own `__module__`, `__dict__`,
+and a handful of other bookkeeping dunders that never match `object`'s,
+so comparing every dunder this way shows that bookkeeping instead of filtering it out.
+The comparison uses `is`, not `==`,
+since a dunder inherited unchanged from `object` is the same function object,
+not merely an equal one.
+
 The two modes side by side,
 on a class that redefines nothing and one that redefines almost everything:
 
@@ -1855,13 +1863,6 @@ so `Point` reports a `__hash__` attribute rather than a method.
 The last call drops that row,
 for the same reason `comparison.py` in [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#comparing-ordinary-classes-and-data-classes)
 passes `exclude=("__hash__",)`.
-
-Every class, even an empty one, has its own `__module__`, `__dict__`,
-and a handful of other bookkeeping dunders that never match `object`'s,
-so comparing every dunder this way shows that bookkeeping instead of filtering it out.
-The comparison uses `is`, not `==`,
-since a dunder inherited unchanged from `object` is the same function object,
-not merely an equal one.
 
 `exclude` drops specific names regardless of what `dunder` otherwise shows,
 and it applies to any member, not just dunders.
