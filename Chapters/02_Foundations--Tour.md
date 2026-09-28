@@ -139,6 +139,12 @@ it duplicates the outer list but not the objects inside it.
 `nested` and `shallow` still share the same inner list,
 so `shallow[1].append(99)` changes what `nested` sees too.
 
+Numbers, strings, and tuples are *immutable*:
+operations produce new objects rather than changing the original.
+Lists, dictionaries, and sets are *mutable*.
+Mutability decides whether another name sees a change,
+as `a` and `b` do in `references.py`.
+
 You can assign several names at once, so a swap needs no temporary:
 
 ```python
@@ -156,12 +162,6 @@ print(first, rest)
 `*rest` collects whatever remains.
 [Containers](03_Foundations--Containers.md#tuples-and-unpacking)
 covers the general form.
-
-Numbers, strings, and tuples are *immutable*:
-operations produce new objects rather than changing the original.
-Lists, dictionaries, and sets are *mutable*.
-Mutability decides whether another name sees a change,
-as `a` and `b` do in `references.py`.
 
 ## Numbers and Arithmetic
 
