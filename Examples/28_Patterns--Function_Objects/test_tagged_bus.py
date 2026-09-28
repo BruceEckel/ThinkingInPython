@@ -1,6 +1,7 @@
 # test_tagged_bus.py
 import pytest
-from tagged_bus import Deposit, EventBus, Withdraw, handler
+from bank_events import Deposit, Withdraw
+from tagged_bus import EventBus, handler
 
 def test_handler_receives_its_event() -> None:
     seen: list[int] = []

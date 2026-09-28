@@ -151,6 +151,7 @@ lines-after-imports = 1
 "**/two_way_generator.py" = ["I001"]
 "**/catch_score.py" = ["I001"]
 "**/casts.py" = ["I001"]
+"**/tagged_bus_demo.py" = ["I001"]
 "**/fetch_guarded.py" = ["I001"]
 "**/itertools_selections.py" = ["I001"]
 "**/38_Patterns--Simulation/exercise_4.py" = ["I001"]

@@ -707,7 +707,6 @@ import inspect
 from collections import defaultdict
 from dataclasses import dataclass
 from typing import Any, Final, Protocol, dataclass_transform
-from exceptions import expect
 
 EVENTS: Final[set[type]] = set()
 HANDLES: Final[dict[type, type]] = {}
@@ -753,6 +752,20 @@ class EventBus:
             raise TypeError(f"{name} is not an @event")
         for handler in self._handlers.get(type(event), []):
             handler(event)
+```
+
+Each decorator registers `built`, the class that `dataclass()` returns,
+and not the `cls` it received.
+A class's slots are fixed when the class is created,
+so `slots=True` makes `dataclass()` build a new class and return it.
+Registering `cls` puts a class in `EVENTS` that no event is an instance of,
+and `@handler` rejects `Announce` because its `Deposit` is not an `@event`.
+
+A bank account's events and handlers are classes under the two decorators:
+
+```python
+# bank_events.py
+from tagged_bus import event, handler
 
 @event
 class Deposit:
@@ -783,6 +796,26 @@ class Audit:
 class OnWithdraw:
     def __call__(self, event: Withdraw) -> None:
         print(f"- withdraw {event.amount}")
+```
+
+[`dataclass_transform`](17_Techniques--Metaprogramming.md#dataclass-transform)
+tells the type checker that a class passing through either decorator comes out a frozen data class.
+`Audit(threshold=50)` therefore has its generated `__init__`,
+and `ty` reports `Audit(50).threshold = 1` as assignment to a read-only property,
+as it does with `@dataclass(frozen=True)` written directly.
+The tags are runtime facts.
+`@handler` reads the annotation on the first parameter after `self` in `__call__`,
+the same annotation the type checker checks, so a handler names its event once.
+
+The demo subscribes each handler with one argument,
+and the bus routes each event by its type:
+
+```python
+# tagged_bus_demo.py
+from bank_events import (Announce, Audit, Closed,
+                         Deposit, OnWithdraw, Withdraw)
+from exceptions import expect
+from tagged_bus import EventBus
 
 bus = EventBus()
 bus.subscribe(Announce("+"))
@@ -800,24 +833,9 @@ expect(TypeError, bus.publish, "Deposit")
 #: [TypeError] str is not an @event
 ```
 
-[`dataclass_transform`](17_Techniques--Metaprogramming.md#dataclass-transform)
-tells the type checker that a class passing through either decorator comes out a frozen data class.
-`Audit(threshold=50)` therefore has its generated `__init__`,
-and `ty` reports `Audit(50).threshold = 1` as assignment to a read-only property,
-as it does with `@dataclass(frozen=True)` written directly.
-The tags are runtime facts.
-`@handler` reads the annotation on the first parameter after `self` in `__call__`,
-the same annotation the type checker checks, so a handler names its event once.
 `publish()` keeps its `object` parameter,
 because no static type means "a class `@event` decorated",
 so a stray string reaches the bus and `EVENTS` rejects it there.
-
-Each decorator registers `built`, the class that `dataclass()` returns,
-and not the `cls` it received.
-A class's slots are fixed when the class is created,
-so `slots=True` makes `dataclass()` build a new class and return it.
-Registering `cls` puts a class in `EVENTS` that no event is an instance of,
-and `@handler` rejects `Announce` because its `Deposit` is not an `@event`.
 
 The price is the registration-time check of the first version.
 `subscribe(Deposit, on_withdraw)` fails under `ty` because no `E` fits both arguments.
@@ -830,7 +848,8 @@ and one whose `__call__` annotates `int` instead of an `@event` class:
 ```python
 # test_tagged_bus.py
 import pytest
-from tagged_bus import Deposit, EventBus, Withdraw, handler
+from bank_events import Deposit, Withdraw
+from tagged_bus import EventBus, handler
 
 def test_handler_receives_its_event() -> None:
     seen: list[int] = []

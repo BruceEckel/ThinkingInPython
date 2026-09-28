@@ -3,7 +3,6 @@ import inspect
 from collections import defaultdict
 from dataclasses import dataclass
 from typing import Any, Final, Protocol, dataclass_transform
-from exceptions import expect
 
 EVENTS: Final[set[type]] = set()
 HANDLES: Final[dict[type, type]] = {}
@@ -49,48 +48,3 @@ class EventBus:
             raise TypeError(f"{name} is not an @event")
         for handler in self._handlers.get(type(event), []):
             handler(event)
-
-@event
-class Deposit:
-    amount: int
-
-@event
-class Withdraw:
-    amount: int
-
-@event
-class Closed:
-    reason: str
-
-@handler
-class Announce:
-    prefix: str
-    def __call__(self, event: Deposit) -> None:
-        print(f"{self.prefix} deposit {event.amount}")
-
-@handler
-class Audit:
-    threshold: int
-    def __call__(self, event: Deposit) -> None:
-        if event.amount > self.threshold:
-            print(f"  audit: large deposit {event.amount}")
-
-@handler
-class OnWithdraw:
-    def __call__(self, event: Withdraw) -> None:
-        print(f"- withdraw {event.amount}")
-
-bus = EventBus()
-bus.subscribe(Announce("+"))
-bus.subscribe(Audit(threshold=50))
-bus.subscribe(OnWithdraw())
-bus.publish(Deposit(100))
-#: + deposit 100
-#:   audit: large deposit 100
-bus.publish(Deposit(10))
-#: + deposit 10
-bus.publish(Withdraw(30))
-#: - withdraw 30
-bus.publish(Closed("inactivity"))  # An event, no handler
-expect(TypeError, bus.publish, "Deposit")
-#: [TypeError] str is not an @event
