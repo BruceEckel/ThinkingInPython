@@ -47,12 +47,6 @@ When you write the tests first, you:
 Testing then becomes a design tool,
 not a verification step you skip when the code looks right to you.
 
-That said, TDD requires that you know what you are creating.
-It assumes you are confident the design is correct,
-so that only implementation remains.
-Often, however, you are still experimenting to find the direction the program will take.
-When you are discovering the design rather than producing code, TDD is wasteful.
-
 For example, here is a test for `is_palindrome()`,
 written before that function exists anywhere in the project:
 
@@ -86,6 +80,12 @@ The test written first stays the same.
 Only the code changes to satisfy it.
 That is TDD working as a design tool:
 the test defines what "done" means before any implementation exists to shape that definition.
+
+That said, TDD requires that you know what you are creating.
+It assumes you are confident the design is correct,
+so that only implementation remains.
+Often, however, you are still experimenting to find the direction the program will take.
+When you are discovering the design rather than producing code, TDD is wasteful.
 
 ## pytest
 
@@ -637,16 +637,6 @@ The `4` here is what `Random(0)` produces first,
 and its match with the stubbed value in `test_dice.py` is a coincidence:
 as with any seed, you record the value it gives you rather than pick one.
 
-Injection is not free.
-The `rng` or `now` parameter must appear on every function between the caller and the code that needs it.
-When that code sits several calls deep in a real codebase,
-you widen every signature along the way,
-or introduce a context object to carry the parameter.
-`monkeypatch` skips that plumbing: it patches the name in place,
-at the cost of a process-wide patch that stands until teardown restores the name.
-Choose injection when the parameter already sits near the boundary.
-Choose `monkeypatch` when threading it through touches more code than the test is worth.
-
 ### The Clock
 
 Code that reads `time.time()` gives a different answer every run:
@@ -698,6 +688,16 @@ def test_elapsed() -> None:
 Both tests check the same arithmetic.
 The injected one runs with no `monkeypatch`,
 and its signature says where the time comes from.
+
+Injection is not free.
+The `rng` or `now` parameter must appear on every function between the caller and the code that needs it.
+When that code sits several calls deep in a real codebase,
+you widen every signature along the way,
+or introduce a context object to carry the parameter.
+`monkeypatch` skips that plumbing: it patches the name in place,
+at the cost of a process-wide patch that stands until teardown restores the name.
+Choose injection when the parameter already sits near the boundary.
+Choose `monkeypatch` when threading it through touches more code than the test is worth.
 
 `datetime.now()` is harder to patch:
 `datetime` is an immutable C type that rejects attribute assignment.
