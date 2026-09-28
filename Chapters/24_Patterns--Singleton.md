@@ -287,6 +287,16 @@ print(len({id(s) for s in built}))
 #: 1
 ```
 
+One thread finds `_instance` empty and builds it.
+The rest wait on the lock, and each finds `_instance` already filled.
+Under the same eight-thread race, the cached version produces eight objects.
+This version produces one, as the printed count confirms.
+The sleep stands in for a constructor that does real work,
+such as opening a file or a connection.
+Without the sleep, the cached version showed no duplicates across twenty trials,
+and that silence is the more dangerous case.
+A window too narrow to reproduce is still a window.
+
 `settings()` declares `global` for `_instance` and leaves `_lock` undeclared.
 The mutate-versus-rebind distinction from [A Module Is Already a *Singleton*](#a-module-is-already-a-singleton)
 reappears here, from inside a function.
@@ -301,16 +311,6 @@ so without the `global` declaration,
 `if _instance is None` reads an unassigned local and raises an `UnboundLocalError`.
 Mutate through any name.
 Declare only what you rebind.
-
-One thread finds `_instance` empty and builds it.
-The rest wait on the lock, and each finds `_instance` already filled.
-Under the same eight-thread race, the cached version produces eight objects.
-This version produces one, as the printed count confirms.
-The sleep stands in for a constructor that does real work,
-such as opening a file or a connection.
-Without the sleep, the cached version showed no duplicates across twenty trials,
-and that silence is the more dangerous case.
-A window too narrow to reproduce is still a window.
 
 ### Double-Checked Locking and Eager Creation
 
