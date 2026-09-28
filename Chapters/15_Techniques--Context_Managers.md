@@ -59,6 +59,15 @@ printing `enter A`.
 The block under the `with` then runs.
 When it finishes, `trace()` resumes just after the `yield` and prints `exit A`.
 
+The manager object `trace("A")` returns is single-use.
+Its generator runs once,
+so reusing the same object in a second `with` fails with a message that names nothing useful:
+`AttributeError: '_GeneratorContextManager' object has no attribute 'args'`.
+Construct a fresh manager for each `with` statement.
+Nor does a loop around the `yield` make the manager reusable.
+`@contextmanager` allows one `yield`,
+and a generator that reaches a second one makes the manager raise `RuntimeError: generator didn't stop` when the block ends.
+
 The `finally` makes the cleanup dependable:
 an exception raised in the block appears at the `yield`,
 and `finally` still runs the cleanup before the exception propagates.
@@ -90,15 +99,6 @@ Python resumes the generator by raising the block's exception at the `yield`,
 so the code after the `yield`, `exit A` included, never runs.
 Nothing warns you: the generator silently skips the cleanup on the one path where it matters most.
 Wrap the `yield` in `try`/`finally` in every `@contextmanager` generator.
-
-The manager object `trace("A")` returns is single-use.
-Its generator runs once,
-so reusing the same object in a second `with` fails with a message that names nothing useful:
-`AttributeError: '_GeneratorContextManager' object has no attribute 'args'`.
-Construct a fresh manager for each `with` statement.
-Nor does a loop around the `yield` make the manager reusable.
-`@contextmanager` allows one `yield`,
-and a generator that reaches a second one makes the manager raise `RuntimeError: generator didn't stop` when the block ends.
 
 ## The Protocol
 
