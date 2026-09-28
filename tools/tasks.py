@@ -300,13 +300,18 @@ def spell_add(v: Vars) -> None:
 
 
 @task("Load chapter CH=NN into the chapter editor page's documents "
-      "(ARGS=--force)")
+      "(ARGS=--refresh to update the open round, --force)")
 def editor_load(v: Vars) -> None:
     """Writes build/chapter_editor/NN/: one JSON file per database
     document, the ArtifactData batch lists that write them, and the page
     copy to publish. After the first load, only the blocks a round changed
     or consumed are written. The session writes the batches to the page;
     the `chapter-editor` skill has the round procedure.
+
+    ARGS=--refresh stays in the open round, for a change made to the
+    chapter while the page waits with no marks on it: the changed blocks
+    are outlined with the round's other changes. A plain load starts the
+    next round, and --force starts it over a round that was never applied.
     """
     py("tools.chapter_editor", "load", *v.words("CH"), *v.words("ARGS"))
 

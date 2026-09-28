@@ -129,6 +129,15 @@ so use this section's table when you know the problem but not the name.
 | [*Thread Pool*](19_Techniques--Concurrency.md#one-executor-interface-three-pools) | Reuse a fixed set of worker threads across many tasks. |
 | [*Thread-Specific Storage*](19_Techniques--Concurrency.md#context-that-follows-the-call-chain) | Give each thread its own copy of a value, as `threading.local` does; `ContextVar` scopes the value to the context instead. |
 
+*Reactor* is a name that hides its job.
+The pattern is a dispatcher:
+one loop waits on many event sources and hands each event to the handler registered for it,
+and its original description lists *Dispatcher* as another name for it.
+"Reactor" survives because the literature and the libraries use it:
+asyncio's `SelectorEventLoop` and Twisted's `reactor` are both Reactors.
+*Proactor* follows the same naming, and asyncio's `ProactorEventLoop`,
+the default on Windows, is one.
+
 ## Architectural (POSA)
 
 | Pattern | Intent |
