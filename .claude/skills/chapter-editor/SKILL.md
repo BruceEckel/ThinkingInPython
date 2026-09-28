@@ -7,7 +7,9 @@ description: Run a round of the chapter editor page, where Bruce reads a whole c
 
 The page (`chapter_editor.html` beside this file) shows a whole chapter, one block per paragraph, heading, list, or listing.
 Bruce selects text and presses R (Rewrite, with an optional note), D (Delete), or E (edit that block's Markdown himself).
-"Send round" sets the page's `meta/chapter` document to `status: "submitted"`, and he types `apply` in the terminal.
+Marks and edits save as he makes them, and he types `apply` in the terminal when he has been through the chapter.
+The page has no send button (removed 2026-09-28, since he typed `apply` every round anyway):
+the `applying` status the session writes in step 1 stops marking until the next load reopens the page.
 `tools/chapter_editor.py` moves the chapter between the Markdown and the page's database; its docstring has the data model.
 The Markdown in `Chapters/` stays the source of truth.
 
@@ -28,7 +30,7 @@ Every round below uses that URL.
 
 1. Set the page's status to applying: `ArtifactData` `update` on `meta/chapter` with `{"status": "applying"}`,
    pinned with `if_version` from step 2's read (so do step 2's reads first).
-   The page then shows that the round is in progress.
+   The page then shows that the round is in progress and stops taking marks.
 2. Read the round, deleting the old `read/` first. `list` `meta` with `out_dir` `build/chapter_editor/NN/read`.
    Then `query` `blocks` twice, with `where` `marks != []` and then `edit != null` (`query.limit` 1000):
    `apply` needs only the marked and edited blocks, and a query result prints each one inline with its version.

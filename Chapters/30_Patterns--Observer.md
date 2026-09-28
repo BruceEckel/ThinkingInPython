@@ -738,6 +738,14 @@ class Broadcaster[T]:
         # Fan out to every responder, then wait for all
         await asyncio.gather(
             *(fn(data) for fn in self._responders))
+```
+
+The asynchronous `Thermometer` reads `celsius` through a property,
+as the synchronous one does, and changes it with the awaitable `set_celsius()`:
+
+```python
+# async_thermometer.py
+from async_broadcaster import Broadcaster
 
 class Thermometer(Broadcaster[float]):
     def __init__(self, celsius: float) -> None:
@@ -754,14 +762,14 @@ class Thermometer(Broadcaster[float]):
         await self.announce(value)
 ```
 
-The module defines classes and runs nothing,
+Neither module runs anything,
 so a later listing can import `Broadcaster` without starting a demo.
-The thermometer demo lives in its own file, and its responders are coroutines:
+The demo lives in its own file, and its responders are coroutines:
 
 ```python
-# async_thermometer.py
+# async_thermometer_demo.py
 import asyncio
-from async_broadcaster import Thermometer
+from async_thermometer import Thermometer
 
 async def alarm(celsius: float) -> None:
     if celsius > 100:
@@ -1360,7 +1368,7 @@ Move the comparison into the responders and the number sits where the need is.
 `log` appends whatever arrives, and the setter announces every assignment again.
 The thermometer knows nothing about tolerance,
 and each responder that filters by size repeats the same comparison.
-`async_thermometer.py`'s `alarm` already works this way,
+`async_thermometer_demo.py`'s `alarm` already works this way,
 returning at once for a reading below 100 degrees.
 
 Repeating the comparison in each responder suits a question about *how much*,

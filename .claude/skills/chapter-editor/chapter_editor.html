@@ -78,7 +78,6 @@ button.quiet:hover:not(:disabled) { color: var(--ink); border-color: var(--rule)
 .status { font-size: .82rem; color: var(--muted); width: 100%; min-height: 1.2em; }
 .banner { background: var(--accent-soft); border-radius: 8px; padding: 12px 16px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
 .banner p { margin: 0; flex: 1; min-width: 16ch; }
-.confirm { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; width: 100%; }
 
 main#doc { background: var(--page); border: 1px solid var(--rule); border-radius: 8px; padding-block: 24px 40px; }
 .blk { display: grid; grid-template-columns: 3.4em minmax(0, 1fr); gap: 0 12px; padding: 4px 24px 4px 8px; position: relative; border-left: 3px solid transparent; }
@@ -142,7 +141,7 @@ mark.flash { outline: 2px solid var(--accent); }
   <section class="intro">
     <div class="eyebrow" id="eyebrow">Chapter editor</div>
     <h1 id="title">Loading the chapter…</h1>
-    <p class="lede">Select text to mark it, then press <kbd>R</kbd> to ask Claude to rewrite it (the note box takes what's wrong, if you want to say), <kbd>D</kbd> to delete it, or <kbd>E</kbd> to edit that paragraph's Markdown yourself. A selection can run across paragraphs. Marks save as you make them. When you've been through the chapter, click <strong>Send round</strong> and type <kbd>apply</kbd> in the Claude Code terminal. The page then reloads with the new text, and each paragraph that changed is outlined in blue, with its previous version one click away.</p>
+    <p class="lede">Select text to mark it, then press <kbd>R</kbd> to ask Claude to rewrite it (the note box takes what's wrong, if you want to say), <kbd>D</kbd> to delete it, or <kbd>E</kbd> to edit that paragraph's Markdown yourself. A selection can run across paragraphs. Marks save as you make them. When you've been through the chapter, type <kbd>apply</kbd> in the Claude Code terminal. Marking pauses while Claude applies the round, and the page then reloads with the new text, and each paragraph that changed is outlined in blue, with its previous version one click away.</p>
   </section>
   <header class="bar">
     <div class="counts" id="counts"></div>
@@ -152,8 +151,6 @@ mark.flash { outline: 2px solid var(--accent); }
     </div>
     <button class="quiet" id="next-change" title="Scroll to the next changed paragraph">Next change ↓</button>
     <span class="spacer"></span>
-    <button class="primary" id="send" disabled>Send round</button>
-    <div class="confirm" id="confirm" hidden></div>
     <div class="status" id="status" role="status">Connecting…</div>
   </header>
   <div class="banner" id="banner" hidden></div>
@@ -170,7 +167,6 @@ const $ = (s) => document.querySelector(s);
 const state = {
   db: null, meta: null, blocks: new Map(), readOnly: false,
   onlyChanged: false, onlyMarked: false, editing: new Set(), showPrev: new Set(),
-  confirming: false,
 };
 const chains = new Map(), noteTimers = new Map(), els = new Map();
 let noted = 0;  // When a message last went to the status line.
@@ -511,21 +507,9 @@ function renderBar() {
     `<span class="pill ed">${t.ed} edit${t.ed === 1 ? "" : "s"}</span>`,
     m.round > 1 ? `<span class="pill chg">${t.chg} changed last round</span>` : "",
   ].join("");
-  const total = t.rw + t.del + t.ed;
-  $("#send").disabled = locked() || !total;
-  $("#send").hidden = m.status !== "open";
   $("#next-change").hidden = !t.chg;
-  const conf = $("#confirm");
-  conf.hidden = !state.confirming || m.status !== "open";
-  if (!conf.hidden) {
-    conf.innerHTML = `<span>Send round ${m.round} (${total} change${total === 1 ? "" : "s"}) to Claude? Marking pauses until the new text loads.</span>
-      <button class="primary" data-act="send-yes">Send</button><button data-act="send-no">Not yet</button>`;
-  }
   const banner = $("#banner");
-  if (m.status === "submitted") {
-    banner.hidden = false;
-    banner.innerHTML = `<p><strong>Round ${m.round} is sent.</strong> Type <kbd>apply</kbd> in the Claude Code terminal. This page reloads with the new text when Claude has applied it.</p><button data-act="unsend">Take it back</button>`;
-  } else if (m.status === "applying") {
+  if (m.status === "applying") {
     banner.hidden = false;
     banner.innerHTML = `<p><strong>Claude is applying round ${m.round}.</strong> The page reloads with the new text when it's done.</p>`;
   } else banner.hidden = true;
@@ -752,7 +736,7 @@ document.addEventListener("click", (ev) => {
       const mid = btn.closest("li").dataset.mid;
       setMarks(id, marksOf(state.blocks.get(id)).filter((m) => m.id !== mid));
       render();
-    } else if (a === "send") { state.confirming = true; renderBar(); }
+    }
     return;
   }
   const mk = ev.target.closest("mark[data-mid]");
@@ -762,26 +746,6 @@ document.addEventListener("click", (ev) => {
       li.classList.add("flash"); setTimeout(() => li.classList.remove("flash"), 800);
       li.querySelector("input")?.focus();
     }
-  }
-});
-
-$("#send").addEventListener("click", () => { state.confirming = true; renderBar(); });
-$("#confirm").addEventListener("click", (ev) => {
-  const a = ev.target.closest("button")?.dataset.act;
-  if (a === "send-no") { state.confirming = false; renderBar(); }
-  if (a === "send-yes") {
-    state.confirming = false;
-    state.editing.clear();
-    state.meta = { ...state.meta, status: "submitted", sent: new Date().toISOString() };
-    write("meta/chapter", { status: "submitted", sent: state.meta.sent });
-    render();
-  }
-});
-$("#banner").addEventListener("click", (ev) => {
-  if (ev.target.closest("button")?.dataset.act === "unsend" && state.meta.status === "submitted") {
-    state.meta = { ...state.meta, status: "open" };
-    write("meta/chapter", { status: "open" });
-    render();
   }
 });
 

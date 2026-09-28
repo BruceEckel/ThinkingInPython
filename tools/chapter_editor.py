@@ -5,8 +5,9 @@ shows a whole chapter, one block per paragraph, heading, list, or
 listing. Bruce reads it and marks what needs work with the mouse: a
 Rewrite mark (with an optional note) asks the session to rewrite the
 selected text, a Delete mark removes it, and Edit opens a block's
-Markdown source for him to change in place. "Send round" hands the
-round over. The session then applies it to the Markdown, rewrites
+Markdown source for him to change in place. Typing `apply` in the
+terminal hands the round over, and the session's first write sets the
+page to `applying`, which stops marking. The session then applies it to the Markdown, rewrites
 what he marked, runs the verify loop, and loads the chapter back, so
 the page shows the new text with the changed blocks highlighted.
 The Markdown stays the source of truth; the page's database mirrors it.
@@ -336,7 +337,7 @@ def context(text: str, at: int, width: int = 70) -> str:
         "…" if at + width < len(text) else "")
 
 
-def apply(chapter: str, read: Path, force: bool) -> int:
+def apply(chapter: str, read: Path) -> int:
     path = chapter_file(chapter)
     where = out_dir(path)
     state = load_state(where)
@@ -347,9 +348,6 @@ def apply(chapter: str, read: Path, force: bool) -> int:
     if meta.get("round") != state["round"]:
         raise SystemExit(f"the page is on round {meta.get('round')}, the "
                          f"last load was round {state['round']}")
-    if meta.get("status") not in ("submitted", "applying") and not force:
-        raise SystemExit("the round has not been sent from the page; "
-                         "pass --force to apply it anyway")
     text = path.read_text(encoding="utf-8")
     blocks = parse(text)
     order: list[str] = state["order"]
@@ -457,13 +455,11 @@ def main(argv: list[str] | None = None) -> int:
     g = sub.add_parser("page", help="rewrite the page copy only, for a "
                        "template change in the middle of a round")
     g.add_argument("chapter")
-    a = sub.add_parser("apply", help="apply a sent round to the chapter")
+    a = sub.add_parser("apply", help="apply a round to the chapter")
     a.add_argument("chapter")
     a.add_argument("read_dir", type=Path, nargs="?",
                    help="the documents as ArtifactData saved them "
                         "(default build/chapter_editor/NN/read)")
-    a.add_argument("--force", action="store_true",
-                   help="apply a round the page has not sent")
     args = ap.parse_args(argv)
     if args.command == "load":
         return load(args.chapter, args.force, args.refresh)
@@ -471,7 +467,7 @@ def main(argv: list[str] | None = None) -> int:
         print(write_page(chapter_file(args.chapter)).relative_to(ROOT))
         return 0
     read = args.read_dir or out_dir(chapter_file(args.chapter)) / "read"
-    return apply(args.chapter, read, args.force)
+    return apply(args.chapter, read)
 
 
 if __name__ == "__main__":

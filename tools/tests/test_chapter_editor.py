@@ -49,7 +49,7 @@ def docs(where: Path) -> dict[str, dict]:
 def page_round(where: Path, read: Path, marks: dict[str, dict]) -> None:
     """Save the documents the way ArtifactData's list does, with marks."""
     meta = json.loads((where / "docs/meta/chapter.json").read_text("utf-8"))
-    meta["status"] = "submitted"
+    meta["status"] = "applying"
     (read / "meta").mkdir(parents=True)
     (read / "blocks").mkdir()
     (read / "meta/chapter.json").write_text(json.dumps({"data": meta}))
@@ -95,7 +95,7 @@ def test_a_round_applies_edits_and_cuts(chapter: Path, tmp_path: Path
             {"kind": "rewrite", "start": 0, "end": 1, "quote": "A",
              "note": "clearer"}]},
         edit_id: {"edit": "The final paragraph."}})
-    assert ce.apply("99", tmp_path / "read", force=False) == 0
+    assert ce.apply("99", tmp_path / "read") == 0
     text = chapter.read_text(encoding="utf-8")
     assert "A `code span` stays whole.\nThe rest stays." in text
     assert "The final paragraph.\n" in text
@@ -117,7 +117,7 @@ def test_a_cut_that_empties_a_block_removes_it(chapter: Path,
     page_round(where, tmp_path / "read", {bid: {"marks": [
         {"kind": "delete", "start": 0, "end": 15,
          "quote": "Last paragraph."}]}})
-    ce.apply("99", tmp_path / "read", force=False)
+    ce.apply("99", tmp_path / "read")
     assert chapter.read_text("utf-8").endswith("- another\n")
     ce.load("99", force=False)
     batch = json.loads((where / "batch1.json").read_text("utf-8"))
@@ -133,7 +133,7 @@ def test_a_block_changed_in_the_file_is_a_conflict(chapter: Path,
     page_round(where, tmp_path / "read", {bid: {"edit": "Mine."}})
     chapter.write_text(CHAPTER.replace("Last paragraph.", "Zed's."),
                        encoding="utf-8")
-    ce.apply("99", tmp_path / "read", force=False)
+    ce.apply("99", tmp_path / "read")
     assert "Zed's." in chapter.read_text("utf-8")
     report = json.loads((where / "round-1.json").read_text("utf-8"))
     assert report["conflicts"][0]["edit"] == "Mine."
@@ -155,7 +155,7 @@ def test_an_edit_can_split_a_paragraph(chapter: Path, tmp_path: Path
     bid = find(where, "Last paragraph")
     page_round(where, tmp_path / "read",
                {bid: {"edit": "First half.\n\nSecond half."}})
-    ce.apply("99", tmp_path / "read", force=False)
+    ce.apply("99", tmp_path / "read")
     assert chapter.read_text("utf-8").endswith(
         "- another\n\nFirst half.\n\nSecond half.\n")
     ce.load("99", force=False)
@@ -174,7 +174,7 @@ def test_a_reload_pins_each_write_to_the_version_read(chapter: Path,
     page_round(where, read, {bid: {"edit": "Changed."}})
     (read / "versions.json").write_text(
         json.dumps({f"blocks/{bid}": 7, "meta/chapter": 3}))
-    ce.apply("99", read, force=False)
+    ce.apply("99", read)
     ce.load("99", force=False)
     batch = json.loads((where / "batch1.json").read_text("utf-8"))
     pins = {w["doc_id"]: w.get("if_version") for w in batch}
@@ -186,7 +186,7 @@ def test_a_refresh_stays_in_the_round(chapter: Path, tmp_path: Path) -> None:
     where = ce.OUT / "99"
     bid = find(where, "Last paragraph")
     page_round(where, tmp_path / "read", {bid: {"edit": "Round one."}})
-    ce.apply("99", tmp_path / "read", force=False)
+    ce.apply("99", tmp_path / "read")
     ce.load("99", force=False)  # Round 2 shows round 1's change.
     chapter.write_text(chapter.read_text("utf-8").replace(
         "Round one.", "Refreshed."), encoding="utf-8")
