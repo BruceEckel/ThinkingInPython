@@ -218,6 +218,18 @@ class Broadcaster[T]:
             responder(data)
 ```
 
+Four things from the classic version disappear: the `Observer` interface,
+its `update()` method, a class per reaction, and the `subject` argument.
+A classic observer is an object,
+so `notify()` calls the method its interface names, `update()`.
+In Python the responder is a callable, so `announce()` calls it directly:
+`responder(data)`, whereas the classic version calls `observer.update(self, arg)`.
+The remaining method names change as well:
+GoF's `attach()` and `detach()` become `subscribe()` and `unsubscribe()`.
+A responder that needs the changed object takes it as part of the payload
+(`announce((self, value))`),
+or is a bound method of an object that holds a reference to the broadcaster.
+
 `Broadcaster` knows nothing about what it announces.
 Its type parameter `T` fixes the type of each notification,
 and a class that inherits `Broadcaster` gets `subscribe()`, `unsubscribe()`,
@@ -274,19 +286,6 @@ The responders here are lambdas, but any function or bound method works.
 The dashed `plot` responder is not part of the example.
 It's in the diagram to show that any callable of the right shape subscribes with the same `subscribe()` call as the two lambdas.
 `Thermometer` knows its responders only as callables that take a `float`.
-
-Four things from the classic version disappear: the `Observer` interface,
-its `update()` method, a class per reaction, and the `subject` argument.
-A classic observer is an object,
-so `notify()` calls the method its interface names, `update()`.
-In Python the responder is the callable, so `announce()` calls it directly:
-`responder(data)`, where the classic version calls `observer.update(self, arg)`.
-The remaining method names change as well:
-GoF's `attach()` and `detach()` become `subscribe()` and `unsubscribe()`,
-as in the reactive libraries.
-A responder that needs the changed object takes it as part of the payload
-(`announce((self, value))`),
-or is a bound method of an object that holds a reference to the broadcaster.
 
 `Thermometer` inherits `Broadcaster` because that is the shortest way to get `subscribe()` and `announce()`,
 not because the pattern requires a base class.
