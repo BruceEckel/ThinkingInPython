@@ -480,7 +480,7 @@ A `History` of lists is a stack of aliases, the bug that opens this chapter.
 The classic `Memento` from `sketch.py` is already immutable,
 so the same generic caretaker holds snapshots of the mutable `Sketch`.
 The surrounding code calls `save()` and `restore()`,
-the two calls a frozen state makes redundant:
+the two calls a frozen state replaces by handing `History` the state directly:
 
 ```python
 # history_classic.py
