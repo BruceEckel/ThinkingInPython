@@ -287,12 +287,7 @@ The rest is the maze.
 ```
 
 The demo awaits `explore()`,
-then prints the first eight log messages and the mapped maze.
-The log shows what the map cannot.
-Rat 1 spawns rat 2 and then dead-ends before rat 2 does:
-`__post_init__` assigns each number at spawn time,
-so the numbers follow spawn order rather than completion order.
-The full log runs to eighteen messages, two per rat.
+then prints the first eight log messages and the mapped maze:
 
 ```python
 # rats_and_mazes/rats_and_mazes.py
@@ -338,6 +333,12 @@ asyncio.run(main())
 #: #####################
 #: 9 rats mapped 139 cells.
 ```
+
+The log shows what the map cannot.
+Rat 1 spawns rat 2 and then dead-ends before rat 2 does:
+`__post_init__` assigns each number at spawn time,
+so the numbers follow spawn order rather than completion order.
+The full log runs to eighteen messages, two per rat.
 
 `amaze.txt` has no loop:
 every open cell connects to the rest of the maze by exactly one path.
