@@ -924,7 +924,7 @@ updated at the end of every round:
 import random
 from collections import Counter
 from collections.abc import Iterator
-from itertools import combinations, islice
+from itertools import combinations
 
 type Group = tuple[str, ...]
 type Round = list[Group]
@@ -964,6 +964,14 @@ def group_rounds(
             for pair in combinations(g, 2):
                 history[frozenset(pair)] += 1
         yield round_result
+```
+
+The first demo schedules seven students in pairs for seven rounds and counts who met whom:
+
+```python
+# pair_rounds.py
+from itertools import combinations, islice
+from student_pairs import group_rounds
 
 students = ["Ana", "Bo", "Cy", "Di", "Eve", "Fi", "Gia"]
 rounds = list(islice(group_rounds(students, 2),
@@ -983,17 +991,6 @@ print(len(distinct), "of", len(possible),
 #: 21 of 21 pairs met at least once
 print(len(meetings) - len(distinct), "repeat meetings")
 #: 14 repeat meetings
-
-trios = list(islice(group_rounds(students, 3), 3))
-for i, grouping in enumerate(trios):
-    print(i, grouping)
-#: 0 [('Gia', 'Eve', 'Cy', 'Fi'), ('Di', 'Bo', 'Ana')]
-#: 1 [('Di', 'Eve', 'Bo', 'Gia'), ('Cy', 'Ana', 'Fi')]
-#: 2 [('Eve', 'Ana', 'Gia'), ('Bo', 'Fi', 'Di', 'Cy')]
-
-# Fewer than `size`
-print(next(group_rounds(["Ana", "Bo"], 5)))
-#: [('Ana', 'Bo')]
 ```
 
 Called with `size=2`,
@@ -1006,11 +1003,37 @@ so each round adds that player to an existing pair.
 A triple holds three meetings where a pair holds one,
 and those two extra meetings a round, over seven rounds, are the `14` repeats.
 
+Trios come from the same seven students:
+
+```python
+# trio_rounds.py
+from itertools import islice
+from student_pairs import group_rounds
+
+students = ["Ana", "Bo", "Cy", "Di", "Eve", "Fi", "Gia"]
+trios = list(islice(group_rounds(students, 3), 3))
+for i, grouping in enumerate(trios):
+    print(i, grouping)
+#: 0 [('Gia', 'Eve', 'Cy', 'Fi'), ('Di', 'Bo', 'Ana')]
+#: 1 [('Di', 'Eve', 'Bo', 'Gia'), ('Cy', 'Ana', 'Fi')]
+#: 2 [('Eve', 'Ana', 'Gia'), ('Bo', 'Fi', 'Di', 'Cy')]
+```
+
 Called with `size=3`, the same function schedules trios instead.
 Seven students make two threes with one left over, so one group grows to four.
-Growing one group is the same join-instead-of-sit-out choice the pair rounds make above.
+Growing one group is the same join-instead-of-sit-out choice `pair_rounds.py` makes.
 
-A roster smaller than one full group is the extreme case of that choice.
+The last case asks for groups of five from a roster of two:
+
+```python
+# small_roster.py
+from student_pairs import group_rounds
+
+print(next(group_rounds(["Ana", "Bo"], 5)))
+#: [('Ana', 'Bo')]
+```
+
+A roster smaller than one full group is the extreme case of joining instead of sitting out.
 The `while len(pool) >= size` loop exits at once and leaves `groups` empty.
 The `if pool and not groups` line then creates the one group the leftovers fold into.
 If you delete that line,

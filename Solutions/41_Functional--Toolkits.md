@@ -235,7 +235,7 @@ print(first)
 What the `rng` parameter preserves is determinism. Two callers who
 pass `random.Random(0)` still get identical schedules, so the function
 remains testable by calling it twice and comparing, exactly as before.
-The first round is the same one `student_pairs.py` prints, because
+The first round is the same one `pair_rounds.py` prints, because
 `random.Random(0)` is what `seed: int = 0` builds internally. Nothing
 about the algorithm reaches outside its arguments for randomness.
 
