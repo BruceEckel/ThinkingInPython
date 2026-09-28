@@ -102,7 +102,7 @@ and `attach()` raises an `AttributeError`.
 
 Passing `arg` is the *push* model.
 The subject (`Thermometer`) supplies what changed (the temperature),
-so an observer needs no reference back into the subject's state.
+so an observer works from the value it receives.
 The *pull* model sends only `subject` and lets each observer read what it needs by calling back into the subject,
 here `subject.celsius`.
 With pull, the subject does not decide what its observers need.
