@@ -136,9 +136,9 @@ and the loop skips the observer after the one that detached,
 without raising an exception.
 With the copy, the `for` loop reads a second list,
 so `detach()` changes `self._observers` while the loop reads a list nobody is modifying.
-The set of observers is therefore fixed when `notify()` begins.
+The copy therefore settles which observers a `notify()` call reaches before its loop starts.
 An observer detached partway through a `notify()` call still receives that call's notification,
-and a newcomer attached during the call receives its first notification at the next change.
+and a newcomer attached during the call receives its first notification from the next `notify()` call.
 [Unsubscribing During a Notification](#unsubscribing-during-a-notification)
 runs a listener that unsubscribes itself,
 and shows index by index which listener the loop skips without the copy.
@@ -155,7 +155,7 @@ The rest of this chapter uses names you can tell apart at a glance:
 | *GoF Design Patterns* | This chapter |
 |---|---|
 | subject | `Broadcaster` |
-| observer | listener, any callable |
+| observer | listener == any callable |
 | `attach()` / `detach()` | `subscribe()` / `unsubscribe()` |
 | `notify()` | `announce()` |
 | `update()` | calling the listener |
@@ -167,10 +167,11 @@ so the table is also your map into that literature.
 
 ## The Pythonic Observer: Callables in a List
 
-In Python a listener is any callable that takes a notification and returns `None`,
-and a broadcaster announces each change to a list of those callables.
-A `@property` setter is the place to send the notification when state changes,
-because a setter runs at every assignment to its attribute:
+In Python, a listener is any callable that takes a notification and returns `None`.
+A broadcaster announces each change to a list of those callables.
+`Thermometer` announces from its `celsius` setter.
+A setter runs at every assignment to its attribute,
+so every assignment to `celsius` reaches the listeners:
 
 ```python
 # broadcaster.py
