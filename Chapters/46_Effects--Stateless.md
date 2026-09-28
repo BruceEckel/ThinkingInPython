@@ -145,7 +145,7 @@ def greet(name: str) -> Depend[Need[Console], None]:
     console.print(f"Hello, {name}!")
 ```
 
-`greet()` needs a `Console`, cannot fail, and produces nothing.
+`greet()` needs a `Console`, cannot fail, and returns `None`.
 `greeter.py` lives in `utils/` because both this chapter and [Stateless in Practice](47_Effects--Stateless_in_Practice.md)
 import it.
 This chapter builds its own `Console` rather than the one Stateless ships;
