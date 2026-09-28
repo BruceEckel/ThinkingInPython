@@ -5,7 +5,7 @@
 
 ![](_images/coupling_30)
 
-*Observer* decouples code that changes state from code that reacts to the state change.
+*Observer* decouples code that changes state from code that reacts to that state change.
 An *observer* registers interest with a *subject*.
 When the subject changes state, it notifies the observer.
 The subject knows each observer only as something to call,
@@ -20,13 +20,13 @@ a widget keeps a list of handlers and calls each one when its event arrives.
 The classic example is Smalltalk's MVC (model-view-controller),
 or the nearly-equivalent *Document-View* architecture,
 which folds the controller into the view.
-In both, *Observer* connects the data to its views:
+In both, *Observer* connects the state change to its views:
 one subject holds a list of views and names no view type.
-A *document* has more than one way to view it, such as a plot and a table.
+This way, a *document* can have more than one way to view it, such as a plot and a table.
 When the data changes, every view must refresh.
 With *Observer*, a change in the subject's data notifies each interested view.
 
-## The Classic Observer: an Interface to Implement
+## The Classic Observer
 
 The classic design comes from *GoF Design Patterns*:
 
@@ -106,13 +106,13 @@ so an observer works from the value it receives.
 The *pull* model sends only `subject` and lets each observer read what it needs by calling back into the subject,
 here `subject.celsius`.
 With pull, the subject does not decide what its observers need.
-In exchange, each observer depends on the subject's interface:
+Each observer depends on the subject's interface:
 to read `celsius`, an observer must know it is watching a `Thermometer`.
 The type checker enforces that dependency.
 `Subject[float]` has no `celsius`,
 so the observer must declare its `subject` parameter as a `Thermometer`,
 and `Observer[float]` rejects an `update()` with that narrower parameter.
-To use pull, you therefore add either a runtime `isinstance()` check or a second type parameter on the protocol.
+To use pull, you must add either a runtime `isinstance()` check or a second type parameter on the protocol.
 
 GoF leaves one choice open: who calls `notify()`.
 Here `set_celsius()` calls it, so every change broadcasts at once.
@@ -123,9 +123,10 @@ but a caller can forget to make the call.
 ### Why `notify()` Copies the List
 
 `_observers` is a list, so inside `notify()`,
-the copy via `list(self._observers)` looks redundant.
+the copy via `list(self._observers)` appears redundant.
 It is not.
-An observer may react to a notification by detaching.
+
+The problem is that an observer may react to a notification by detaching.
 If the loop reads `self._observers` directly,
 that `detach()` shifts the remaining observers down one index,
 and the loop skips one of them without raising an exception.
