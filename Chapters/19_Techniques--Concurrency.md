@@ -1942,17 +1942,6 @@ An `Executor` blocks a worker and hands back a result.
 A coroutine holds no worker:
 it is a suspended function that runs only when the event loop resumes it.
 
-The two models give their result-that-arrives-later the same name,
-and the shared name invites one specific mistake.
-`pool.submit()` hands back a `concurrent.futures.Future`,
-and you wait on it by calling `result()`, which blocks the calling thread.
-Awaiting it raises `TypeError: 'Future' object can't be awaited`.
-`asyncio` has its own `Future`, and `Task` is a subclass of it,
-so both are awaitable and neither blocks anything.
-`loop.run_in_executor()` is the bridge between the two:
-it submits to the executor and returns an `asyncio.Future` that resolves when the executor's own future does.
-That is why `process_price()` below calls it instead of `pool.submit()`.
-
 ### One `await`, Any Backend
 
 The second point of convergence is `await`.
@@ -2012,6 +2001,17 @@ so the printed `[10, 20, 30]` holds one result from each backend.
 The event loop is doing the job it has done all chapter:
 it schedules awaitables, whatever runs underneath, a coroutine, a thread,
 or a process.
+
+An `Executor` and `asyncio` give their result-that-arrives-later the same name,
+and the shared name invites one specific mistake.
+`pool.submit()` hands back a `concurrent.futures.Future`,
+and you wait on it by calling `result()`, which blocks the calling thread.
+Awaiting it raises `TypeError: 'Future' object can't be awaited`.
+`asyncio` has its own `Future`, and `Task` is a subclass of it,
+so both are awaitable and neither blocks anything.
+`loop.run_in_executor()` is the bridge between the two:
+it submits to the executor and returns an `asyncio.Future` that resolves when the executor's own future does.
+That is why `process_price()` calls it instead of `pool.submit()`.
 
 `main()` receives an already-built `pool` instead of creating one itself.
 Creating a `ProcessPoolExecutor` sets up its queues and pipes,
