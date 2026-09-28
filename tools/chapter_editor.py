@@ -195,6 +195,7 @@ def load(chapter: str, force: bool, refresh: bool = False) -> int:
     order: list[str] = []
     writes: list[dict[str, Any]] = []
     changed = 0
+    created: set[str] = set()  # Documents this load's batch creates.
 
     def fresh() -> str:
         nonlocal next_id
@@ -205,6 +206,8 @@ def load(chapter: str, force: bool, refresh: bool = False) -> int:
     def put(bid: str, b: Block, previous: str | None, when: int) -> None:
         doc = {"kind": b.kind, "source": b.text, "changed": when,
                "previous": previous, "marks": [], "edit": None}
+        if bid not in info:
+            created.add(f"blocks/{bid}")
         info[bid] = {"source": b.text, "kind": b.kind, "changed": when,
                      "previous": previous}
         file = docs / f"{bid}.json"
@@ -253,15 +256,9 @@ def load(chapter: str, force: bool, refresh: bool = False) -> int:
     writes.append({"op": "set", "collection": "meta", "doc_id": "chapter",
                    "file_path": str(meta_file)})
     write_page(path)
-    # The store refuses a write to an existing document unless it names
-    # the version last read. The session saves the versions its round
-    # read listed as `read/versions.json`, {"blocks/b0004": 4, ...}.
-    pins = where / "read" / "versions.json"
-    versions = json.loads(pins.read_text(encoding="utf-8")) if (
-        state and pins.exists()) else {}
-    for w in writes:
-        if v := versions.get(f"{w['collection']}/{w['doc_id']}"):
-            w["if_version"] = v
+    if not state:
+        created.add("meta/chapter")
+    pin_writes(where, writes, created, fresh_start=not state)
     for old in where.glob("batch*.json"):
         old.unlink()
     for i in range(0, len(writes), BATCH):
@@ -275,6 +272,82 @@ def load(chapter: str, force: bool, refresh: bool = False) -> int:
           f"{-(-len(writes) // BATCH)} batch file(s) under "
           f"{where.relative_to(ROOT)}")
     return 0
+
+
+def pin_writes(where: Path, writes: list[dict[str, Any]],
+               created: set[str], fresh_start: bool) -> None:
+    """Pin each write to the document's version, and record the next ones.
+
+    The store refuses a write to an existing document unless it names
+    the version last read. `versions.json` beside the batches is a
+    ledger of every version the tool knows: each `set` in a batch moves
+    its document's version up by one, and a document the batch creates
+    starts at 1, so a load records the versions its batch leaves behind
+    and the next load or refresh pins from them. The page's own writes
+    (marks, edits, notes) move versions the ledger cannot see; a round
+    reads those documents, and the session saves the versions it read
+    as `read/versions.json`, {"blocks/b0004": 4, ...}, which override
+    the ledger once and are then folded into it. A document the ledger
+    does not know gets no pin, and `pin` adds one after a `get`.
+    """
+    ledger_path = where / "versions.json"
+    ledger: dict[str, int] = {}
+    if not fresh_start and ledger_path.exists():
+        ledger = json.loads(ledger_path.read_text(encoding="utf-8"))
+    read = where / "read" / "versions.json"
+    if not fresh_start and read.exists():
+        ledger.update(json.loads(read.read_text(encoding="utf-8")))
+        read.unlink()
+    for w in writes:
+        key = f"{w['collection']}/{w['doc_id']}"
+        if w["op"] == "delete":
+            if key in ledger:
+                w["if_version"] = ledger.pop(key)
+        elif key in ledger:
+            w["if_version"] = ledger[key]
+            ledger[key] += 1
+        elif key in created:
+            ledger[key] = 1
+    ledger_path.write_text(json.dumps(ledger, indent=1, sort_keys=True),
+                           encoding="utf-8")
+
+
+def pin(chapter: str, entries: list[str]) -> int:
+    """Pin pending batch writes to versions read with `get`.
+
+    Each entry is `blocks/b0011=4`: the version the store reported. The
+    batch entry for that document gets it as `if_version`, and the
+    ledger records the version the write will leave.
+    """
+    where = out_dir(chapter_file(chapter))
+    ledger_path = where / "versions.json"
+    ledger: dict[str, int] = json.loads(
+        ledger_path.read_text(encoding="utf-8")) if ledger_path.exists() else {}
+    wanted: dict[str, int] = {}
+    for e in entries:
+        key, _, v = e.partition("=")
+        if not v.isdigit():
+            raise SystemExit(f"{e!r}: expected collection/doc_id=version")
+        wanted[key] = int(v)
+    found: set[str] = set()
+    for batch in sorted(where.glob("batch*.json")):
+        writes = json.loads(batch.read_text(encoding="utf-8"))
+        for w in writes:
+            key = f"{w['collection']}/{w['doc_id']}"
+            if key in wanted:
+                w["if_version"] = wanted[key]
+                if w["op"] == "delete":
+                    ledger.pop(key, None)
+                else:
+                    ledger[key] = wanted[key] + 1
+                found.add(key)
+        batch.write_text(json.dumps(writes), encoding="utf-8")
+    ledger_path.write_text(json.dumps(ledger, indent=1, sort_keys=True),
+                           encoding="utf-8")
+    missing = sorted(set(wanted) - found)
+    for key in missing:
+        print(f"{key}: no pending write", file=sys.stderr)
+    return 1 if missing else 0
 
 
 def write_page(chapter: Path) -> Path:
@@ -460,7 +533,14 @@ def main(argv: list[str] | None = None) -> int:
     a.add_argument("read_dir", type=Path, nargs="?",
                    help="the documents as ArtifactData saved them "
                         "(default build/chapter_editor/NN/read)")
+    n = sub.add_parser("pin", help="pin pending batch writes to "
+                       "versions read with get")
+    n.add_argument("chapter")
+    n.add_argument("entries", nargs="+",
+                   help="collection/doc_id=version, e.g. blocks/b0011=4")
     args = ap.parse_args(argv)
+    if args.command == "pin":
+        return pin(args.chapter, args.entries)
     if args.command == "load":
         return load(args.chapter, args.force, args.refresh)
     if args.command == "page":

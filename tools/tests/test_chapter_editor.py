@@ -122,7 +122,7 @@ def test_a_cut_that_empties_a_block_removes_it(chapter: Path,
     ce.load("99", force=False)
     batch = json.loads((where / "batch1.json").read_text("utf-8"))
     assert {"op": "delete", "collection": "blocks",
-            "doc_id": bid} in batch
+            "doc_id": bid, "if_version": 1} in batch
 
 
 def test_a_block_changed_in_the_file_is_a_conflict(chapter: Path,
@@ -179,6 +179,45 @@ def test_a_reload_pins_each_write_to_the_version_read(chapter: Path,
     batch = json.loads((where / "batch1.json").read_text("utf-8"))
     pins = {w["doc_id"]: w.get("if_version") for w in batch}
     assert pins == {bid: 7, "chapter": 3}
+
+
+def test_a_load_pins_the_next_load_from_its_own_batch(
+        chapter: Path, tmp_path: Path) -> None:
+    ce.load("99", force=False)
+    where = ce.OUT / "99"
+    bid = find(where, "Last paragraph")
+    page_round(where, tmp_path / "read", {bid: {"edit": "Round one."}})
+    (where / "read").mkdir()
+    (where / "read" / "versions.json").write_text(
+        json.dumps({f"blocks/{bid}": 5, "meta/chapter": 3}))
+    ce.apply("99", tmp_path / "read")
+    ce.load("99", force=False)  # Pins 5 and 3; leaves 6 and 4.
+    assert not (where / "read" / "versions.json").exists()
+    chapter.write_text(chapter.read_text("utf-8").replace(
+        "Round one.", "Round one, refreshed."), encoding="utf-8")
+    ce.load("99", force=False, refresh=True)
+    batch = json.loads((where / "batch1.json").read_text("utf-8"))
+    pins = {w["doc_id"]: w.get("if_version") for w in batch}
+    assert pins == {bid: 6, "chapter": 4}
+
+
+def test_pin_fills_in_a_version_the_ledger_lacks(chapter: Path) -> None:
+    ce.load("99", force=False)
+    where = ce.OUT / "99"
+    bid = find(where, "Last paragraph")
+    (where / "versions.json").write_text(json.dumps({"meta/chapter": 2}))
+    chapter.write_text(chapter.read_text("utf-8").replace(
+        "Last paragraph", "Final paragraph"), encoding="utf-8")
+    ce.load("99", force=False, refresh=True)
+    batch = json.loads((where / "batch1.json").read_text("utf-8"))
+    assert {w["doc_id"]: w.get("if_version") for w in batch} == {
+        bid: None, "chapter": 2}
+    assert ce.pin("99", [f"blocks/{bid}=4"]) == 0
+    batch = json.loads((where / "batch1.json").read_text("utf-8"))
+    assert {w["doc_id"]: w.get("if_version") for w in batch} == {
+        bid: 4, "chapter": 2}
+    ledger = json.loads((where / "versions.json").read_text("utf-8"))
+    assert ledger == {f"blocks/{bid}": 5, "meta/chapter": 3}
 
 
 def test_a_refresh_stays_in_the_round(chapter: Path, tmp_path: Path) -> None:

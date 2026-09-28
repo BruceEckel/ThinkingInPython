@@ -38,8 +38,12 @@ Every round below uses that URL.
    Do this before step 1's update, which needs the meta version the read returns.
    Save their versions as `read/versions.json`, `{"blocks/b0004": 4, "meta/chapter": 3}`,
    with `meta/chapter` at the version step 1's update returned.
-   The store refuses a write to an existing document without its version, and `load` pins each write from this file.
-   A block a round changed without a mark (a reflow) is not pinned by this; if a batch is refused for one, `get` it and add its version.
+   The store refuses a write to an existing document without its version.
+   `load` pins each write from a ledger, `build/chapter_editor/NN/versions.json`, of the versions its own batches leave behind
+   (a `set` moves a version up by one, a new document starts at 1), with this file's versions overriding it, since the page's own writes move versions the ledger cannot see.
+   So a batch goes through with no hand-fetched versions, a refresh included.
+   The exception is a block the page wrote without leaving a mark or an edit (marked, then unmarked), or one the ledger has never seen:
+   if a batch is refused for one, `get` it and run `tip editor-pin CH=NN ARGS="blocks/b0011=4"` with the version the `get` reported, then write the batch again.
 3. `tip editor-apply CH=NN`. It writes his in-place edits and deletions into the chapter, prints every cut
    with its surroundings, and lists the Rewrite marks and any conflicts.
    Read each cut: a deletion that leaves a broken sentence is flagged to Bruce in the reply, never silently patched.

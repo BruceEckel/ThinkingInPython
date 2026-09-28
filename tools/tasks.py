@@ -316,8 +316,7 @@ def editor_load(v: Vars) -> None:
     py("tools.chapter_editor", "load", *v.words("CH"), *v.words("ARGS"))
 
 
-@task("Apply a sent chapter editor round to chapter CH=NN "
-      "(ARGS=--force)")
+@task("Apply a chapter editor round to chapter CH=NN")
 def editor_apply(v: Vars) -> None:
     """Reads the page's documents from build/chapter_editor/NN/read (saved
     there by ArtifactData's list), writes Bruce's in-place edits and
@@ -325,6 +324,18 @@ def editor_apply(v: Vars) -> None:
     session to do. See the `chapter-editor` skill.
     """
     py("tools.chapter_editor", "apply", *v.words("CH"), *v.words("ARGS"))
+
+
+@task("Pin chapter editor batch writes for CH=NN to versions read with get "
+      "(ARGS=\"blocks/b0011=4 ...\")")
+def editor_pin(v: Vars) -> None:
+    """For a batch write the store refused for a missing or stale pin:
+    after a `get` of that document, this sets the version it reported
+    as the entry's `if_version` in build/chapter_editor/NN/batch*.json
+    and records the version the write leaves in the ledger,
+    build/chapter_editor/NN/versions.json, so the next load pins it.
+    """
+    py("tools.chapter_editor", "pin", *v.words("CH"), *v.words("ARGS"))
 
 
 @task("House-style lint with Vale (CH=29 for one chapter; needs vale binary)")
