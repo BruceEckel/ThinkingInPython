@@ -26,11 +26,11 @@ received: list[int] = []
 def broken(data: int) -> None:
     raise RuntimeError(f"cannot handle {data}")
 
-source = Broadcaster[int]()
-source.subscribe(broken)
-source.subscribe(received.append)
+broadcaster = Broadcaster[int]()
+broadcaster.subscribe(broken)
+broadcaster.subscribe(received.append)
 try:
-    source.announce(7)
+    broadcaster.announce(7)
 except* RuntimeError as group:
     print(len(group.exceptions), received)
 #: 1 [7]

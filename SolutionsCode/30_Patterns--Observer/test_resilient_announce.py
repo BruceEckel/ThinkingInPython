@@ -9,9 +9,9 @@ def test_later_responder_still_runs_after_a_failure(
     def broken(data: int) -> None:
         raise RuntimeError("boom")
 
-    source = Broadcaster[int]()
-    source.subscribe(broken)
-    source.subscribe(received.append)
+    broadcaster = Broadcaster[int]()
+    broadcaster.subscribe(broken)
+    broadcaster.subscribe(received.append)
     with pytest.raises(ExceptionGroup):
-        source.announce(1)
+        broadcaster.announce(1)
     assert received == [1]

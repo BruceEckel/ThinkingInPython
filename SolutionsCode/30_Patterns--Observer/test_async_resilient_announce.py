@@ -15,11 +15,11 @@ def test_later_responder_still_runs_after_a_failure(
         received.append(data)
 
     async def run() -> None:
-        source = Broadcaster[int]()
-        source.subscribe(broken)
-        source.subscribe(record)
+        broadcaster = Broadcaster[int]()
+        broadcaster.subscribe(broken)
+        broadcaster.subscribe(record)
         with pytest.raises(ExceptionGroup):
-            await source.announce(1)
+            await broadcaster.announce(1)
 
     asyncio.run(run())
     assert received == [1]

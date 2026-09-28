@@ -19,10 +19,10 @@ class Broadcaster:
             responder(*args)
 
 calls: list[tuple[str, int]] = []
-source = Broadcaster()
-source.subscribe(lambda v: calls.append(("A", v)))
-source.subscribe(lambda v: calls.append(("B", v)))
-source.announce(42)
+broadcaster = Broadcaster()
+broadcaster.subscribe(lambda v: calls.append(("A", v)))
+broadcaster.subscribe(lambda v: calls.append(("B", v)))
+broadcaster.announce(42)
 print(calls)
 #: [('A', 42), ('B', 42)]
 ```
@@ -185,11 +185,11 @@ received: list[int] = []
 def broken(data: int) -> None:
     raise RuntimeError(f"cannot handle {data}")
 
-source = Broadcaster[int]()
-source.subscribe(broken)
-source.subscribe(received.append)
+broadcaster = Broadcaster[int]()
+broadcaster.subscribe(broken)
+broadcaster.subscribe(received.append)
 try:
-    source.announce(7)
+    broadcaster.announce(7)
 except* RuntimeError as group:
     print(len(group.exceptions), received)
 #: 1 [7]
@@ -207,11 +207,11 @@ def test_later_responder_still_runs_after_a_failure(
     def broken(data: int) -> None:
         raise RuntimeError("boom")
 
-    source = Broadcaster[int]()
-    source.subscribe(broken)
-    source.subscribe(received.append)
+    broadcaster = Broadcaster[int]()
+    broadcaster.subscribe(broken)
+    broadcaster.subscribe(received.append)
     with pytest.raises(ExceptionGroup):
-        source.announce(1)
+        broadcaster.announce(1)
     assert received == [1]
 ```
 
@@ -272,11 +272,11 @@ async def record(data: int) -> None:
     received.append(data)
 
 async def main() -> None:
-    source = Broadcaster[int]()
-    source.subscribe(broken)
-    source.subscribe(record)
+    broadcaster = Broadcaster[int]()
+    broadcaster.subscribe(broken)
+    broadcaster.subscribe(record)
     try:
-        await source.announce(7)
+        await broadcaster.announce(7)
     except* RuntimeError as group:
         print(len(group.exceptions), received)
 
@@ -302,11 +302,11 @@ def test_later_responder_still_runs_after_a_failure(
         received.append(data)
 
     async def run() -> None:
-        source = Broadcaster[int]()
-        source.subscribe(broken)
-        source.subscribe(record)
+        broadcaster = Broadcaster[int]()
+        broadcaster.subscribe(broken)
+        broadcaster.subscribe(record)
         with pytest.raises(ExceptionGroup):
-            await source.announce(1)
+            await broadcaster.announce(1)
 
     asyncio.run(run())
     assert received == [1]
@@ -372,12 +372,12 @@ def checked(data: int) -> Result[None, str]:
     return Ok(None)
 
 received: list[int] = []
-source = Broadcaster[int]()
-source.subscribe(checked)
-source.subscribe(succeeds(received.append))
-print(source.announce(7), received)
+broadcaster = Broadcaster[int]()
+broadcaster.subscribe(checked)
+broadcaster.subscribe(succeeds(received.append))
+print(broadcaster.announce(7), received)
 #: [] [7]
-print(source.announce(-1), received)
+print(broadcaster.announce(-1), received)
 #: [Err(error='cannot handle -1')] [7, -1]
 ```
 
@@ -392,10 +392,10 @@ def test_later_responder_runs_after_an_err() -> None:
     def broken(data: int) -> Result[None, str]:
         return Err("boom")
 
-    source = Broadcaster[int]()
-    source.subscribe(broken)
-    source.subscribe(succeeds(received.append))
-    assert source.announce(1) == [Err("boom")]
+    broadcaster = Broadcaster[int]()
+    broadcaster.subscribe(broken)
+    broadcaster.subscribe(succeeds(received.append))
+    assert broadcaster.announce(1) == [Err("boom")]
     assert received == [1]
 ```
 
@@ -408,7 +408,7 @@ An empty list means every responder succeeded.
 
 The type change reaches every subscriber.
 `received.append` returns `None`,
-so `ty` rejects `source.subscribe(received.append)`:
+so `ty` rejects `broadcaster.subscribe(received.append)`:
 a `Responder[int]` must return a `Result`.
 `succeeds()` adapts any `None`-returning callable
 by calling it and returning `Ok(None)`.

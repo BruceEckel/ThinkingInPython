@@ -335,10 +335,12 @@ from thermometer import Thermometer
 
 def test_announce_calls_every_subscriber() -> None:
     received: list[tuple[str, object]] = []
-    source = Broadcaster[int]()
-    source.subscribe(lambda d: received.append(("a", d)))
-    source.subscribe(lambda d: received.append(("b", d)))
-    source.announce(42)
+    broadcaster = Broadcaster[int]()
+    broadcaster.subscribe(
+        lambda d: received.append(("a", d)))
+    broadcaster.subscribe(
+        lambda d: received.append(("b", d)))
+    broadcaster.announce(42)
     assert received == [("a", 42), ("b", 42)]
 
 def test_no_subscribers_is_a_noop() -> None:
@@ -347,30 +349,30 @@ def test_no_subscribers_is_a_noop() -> None:
 
 def test_unsubscribe_stops_delivery() -> None:
     received: list[object] = []
-    source = Broadcaster[object]()
-    source.subscribe(received.append)
-    source.announce(1)
+    broadcaster = Broadcaster[object]()
+    broadcaster.subscribe(received.append)
+    broadcaster.announce(1)
     # A new bound method: equal, not identical
-    source.unsubscribe(received.append)
-    source.announce(2)
+    broadcaster.unsubscribe(received.append)
+    broadcaster.announce(2)
     assert received == [1]
 
 def test_subscribing_twice_notifies_twice() -> None:
     received: list[object] = []
-    source = Broadcaster[object]()
+    broadcaster = Broadcaster[object]()
     record = received.append
-    source.subscribe(record)
-    source.subscribe(record)
-    source.announce(1)
+    broadcaster.subscribe(record)
+    broadcaster.subscribe(record)
+    broadcaster.announce(1)
     assert received == [1, 1]
-    source.unsubscribe(record)  # Removes one of the two
-    source.announce(2)
+    broadcaster.unsubscribe(record)  # Removes one of two
+    broadcaster.announce(2)
     assert received == [1, 1, 2]
 
 def test_unsubscribe_without_subscribe_raises() -> None:
-    source = Broadcaster[object]()
+    broadcaster = Broadcaster[object]()
     with pytest.raises(ValueError):
-        source.unsubscribe(print)
+        broadcaster.unsubscribe(print)
 
 def test_thermometer_pushes_new_value_on_set() -> None:
     readings: list[float] = []
@@ -491,26 +493,26 @@ class Plot:
     def redraw(self, celsius: float) -> None:
         print(f"plot: {celsius}C")
 
-source = Broadcaster[float]()
+broadcaster = Broadcaster[float]()
 plot = Plot()
 ref = WeakMethod(plot.redraw)
 
 def weak(celsius: float) -> None:
     live = ref()
     if live is None:
-        source.unsubscribe(weak)  # Gone: drop out
+        broadcaster.unsubscribe(weak)  # Gone: drop out
     else:
         live(celsius)
 
-source.subscribe(weak)
-source.announce(25.0)
+broadcaster.subscribe(weak)
+broadcaster.announce(25.0)
 #: plot: 25.0C
 
 del plot  # The only strong reference
-source.announce(30.0)  # Prints nothing
+broadcaster.announce(30.0)  # Prints nothing
 
 with expected(ValueError):
-    source.unsubscribe(weak)
+    broadcaster.unsubscribe(weak)
 #: [ValueError] list.remove(x): x not in list
 ```
 
@@ -852,22 +854,22 @@ an async counterpart to `self_removing_responder.py`:
 import asyncio
 from async_broadcaster import Broadcaster
 
-source = Broadcaster[object]()
+broadcaster = Broadcaster[object]()
 seen: list[str] = []
 
 async def once(data: object) -> None:
     seen.append(f"once: {data}")
     # Unsubscribes mid-notification
-    source.unsubscribe(once)
+    broadcaster.unsubscribe(once)
 
 async def always(data: object) -> None:
     seen.append(f"always: {data}")
 
 async def main() -> None:
-    source.subscribe(once)
-    source.subscribe(always)
-    await source.announce(1)
-    await source.announce(2)
+    broadcaster.subscribe(once)
+    broadcaster.subscribe(always)
+    await broadcaster.announce(1)
+    await broadcaster.announce(2)
 
 asyncio.run(main())
 print(seen)

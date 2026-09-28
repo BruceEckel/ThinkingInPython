@@ -34,11 +34,11 @@ async def record(data: int) -> None:
     received.append(data)
 
 async def main() -> None:
-    source = Broadcaster[int]()
-    source.subscribe(broken)
-    source.subscribe(record)
+    broadcaster = Broadcaster[int]()
+    broadcaster.subscribe(broken)
+    broadcaster.subscribe(record)
     try:
-        await source.announce(7)
+        await broadcaster.announce(7)
     except* RuntimeError as group:
         print(len(group.exceptions), received)
 

@@ -32,10 +32,10 @@ def checked(data: int) -> Result[None, str]:
     return Ok(None)
 
 received: list[int] = []
-source = Broadcaster[int]()
-source.subscribe(checked)
-source.subscribe(succeeds(received.append))
-print(source.announce(7), received)
+broadcaster = Broadcaster[int]()
+broadcaster.subscribe(checked)
+broadcaster.subscribe(succeeds(received.append))
+print(broadcaster.announce(7), received)
 #: [] [7]
-print(source.announce(-1), received)
+print(broadcaster.announce(-1), received)
 #: [Err(error='cannot handle -1')] [7, -1]

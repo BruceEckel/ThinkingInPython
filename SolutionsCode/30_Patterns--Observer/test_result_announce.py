@@ -8,8 +8,8 @@ def test_later_responder_runs_after_an_err() -> None:
     def broken(data: int) -> Result[None, str]:
         return Err("boom")
 
-    source = Broadcaster[int]()
-    source.subscribe(broken)
-    source.subscribe(succeeds(received.append))
-    assert source.announce(1) == [Err("boom")]
+    broadcaster = Broadcaster[int]()
+    broadcaster.subscribe(broken)
+    broadcaster.subscribe(succeeds(received.append))
+    assert broadcaster.announce(1) == [Err("boom")]
     assert received == [1]

@@ -7,24 +7,24 @@ class Plot:
     def redraw(self, celsius: float) -> None:
         print(f"plot: {celsius}C")
 
-source = Broadcaster[float]()
+broadcaster = Broadcaster[float]()
 plot = Plot()
 ref = WeakMethod(plot.redraw)
 
 def weak(celsius: float) -> None:
     live = ref()
     if live is None:
-        source.unsubscribe(weak)  # Gone: drop out
+        broadcaster.unsubscribe(weak)  # Gone: drop out
     else:
         live(celsius)
 
-source.subscribe(weak)
-source.announce(25.0)
+broadcaster.subscribe(weak)
+broadcaster.announce(25.0)
 #: plot: 25.0C
 
 del plot  # The only strong reference
-source.announce(30.0)  # Prints nothing
+broadcaster.announce(30.0)  # Prints nothing
 
 with expected(ValueError):
-    source.unsubscribe(weak)
+    broadcaster.unsubscribe(weak)
 #: [ValueError] list.remove(x): x not in list

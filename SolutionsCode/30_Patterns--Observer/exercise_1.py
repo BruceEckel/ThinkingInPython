@@ -14,9 +14,9 @@ class Broadcaster:
             responder(*args)
 
 calls: list[tuple[str, int]] = []
-source = Broadcaster()
-source.subscribe(lambda v: calls.append(("A", v)))
-source.subscribe(lambda v: calls.append(("B", v)))
-source.announce(42)
+broadcaster = Broadcaster()
+broadcaster.subscribe(lambda v: calls.append(("A", v)))
+broadcaster.subscribe(lambda v: calls.append(("B", v)))
+broadcaster.announce(42)
 print(calls)
 #: [('A', 42), ('B', 42)]
