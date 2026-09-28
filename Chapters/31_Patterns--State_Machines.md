@@ -290,19 +290,12 @@ It is an `ABC`, the alternative the first version set aside,
 because here the base has code to share: every subclass inherits `next()`.
 `TableState`'s `run()` and `next()` have the signatures the `State` Protocol names,
 so the `StateMachine` class from `state_machine.py` drives every `TableState`,
-with no change to that class.
-The subclasses shrink to their `run()` behavior.
-The transitions live in the tables filled in at the bottom of the file:
+with no change to that class:
 
 ```python
-# mouse_trap_tables.py
+# table_state.py
 from abc import ABC, abstractmethod
-from pathlib import Path
-from typing import ClassVar, override
-from exceptions import expect
-from mouse_action import MouseAction
 from state import State
-from state_machine import StateMachine
 
 class TableState(ABC):
     def __init__(self) -> None:
@@ -318,6 +311,26 @@ class TableState(ABC):
             raise RuntimeError(
                 f"{type(self).__name__} has no transition "
                 f"for {event}") from None
+```
+
+`TableState.__init__()` starts every state with an empty dict.
+If you forget to fill one,
+the machine reports `Waiting has no transition for ...` rather than an `AttributeError`.
+
+`next()` raises its `RuntimeError` `from None`,
+because the chained `KeyError` would only repeat the event the message already names.
+
+The subclasses shrink to their `run()` behavior.
+The transitions live in the tables filled in at the bottom of the file:
+
+```python
+# mouse_trap_tables.py
+from pathlib import Path
+from typing import ClassVar, override
+from exceptions import expect
+from mouse_action import MouseAction
+from state_machine import StateMachine
+from table_state import TableState
 
 class Waiting(TableState):
     @override
@@ -401,13 +414,6 @@ expect(RuntimeError, trap2.run_all, [MouseAction.ESCAPES])
 The output matches the first version's, move for move.
 The source is what changed: with many `State` classes to maintain,
 the tables read more easily than the `match` statements.
-
-`TableState.__init__()` starts every state with an empty dict.
-If you forget to fill one,
-the machine reports `Waiting has no transition for ...` rather than an `AttributeError`.
-
-`next()` raises its `RuntimeError` `from None`,
-because the chained `KeyError` would only repeat the event the message already names.
 
 ### An Unexpected Input
 
