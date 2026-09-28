@@ -1434,7 +1434,9 @@ def warriors_and_weapons(narrator: Narrator) -> None:
 
 `play()` is the boundary function of [Composing a Program](#composing-a-program),
 grown from two parameters to three.
-Its annotations do the upcasting, so no actor needs `as_type()`.
+Its annotations do the upcasting,
+so each actor reaches `supply()` as its Protocol type,
+the job `as_type()` does elsewhere.
 Its body is the one place in the program that binds an implementation to an Ability.
 `kitties_and_puzzles()` and `warriors_and_weapons()` are what the two concrete factories became.
 Each was a class with a method per product.
