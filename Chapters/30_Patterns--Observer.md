@@ -159,7 +159,8 @@ The rest of this chapter uses names you can tell apart at a glance:
 | `notify()` | `announce()` |
 | `update()` | calling the responder |
 
-The catalog calls it *Observer* and Java and the reactive libraries use the older nouns,
+The catalog calls it *Observer*,
+and Java and the reactive libraries use the older nouns,
 so the table is also your map into that literature.
 Java and JavaScript call a responder a *listener*,
 as in `ActionListener` and `addEventListener()`.
