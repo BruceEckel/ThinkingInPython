@@ -19,27 +19,3 @@ class Subject[T]:
     def notify(self, arg: T) -> None:
         for observer in list(self._observers):
             observer.update(self, arg)
-
-class Display:
-    def update(
-        self, subject: Subject[float], arg: float
-    ) -> None:
-        print(f"display: {arg}C")
-
-class Thermometer(Subject[float]):
-    def __init__(self, celsius: float) -> None:
-        super().__init__()
-        self._celsius = celsius
-
-    @property
-    def celsius(self) -> float:
-        return self._celsius
-
-    def set_celsius(self, value: float) -> None:
-        self._celsius = value
-        self.notify(value)
-
-t = Thermometer(20.0)
-t.attach(Display())
-t.set_celsius(25)
-#: display: 25C

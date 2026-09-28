@@ -61,12 +61,17 @@ class Subject[T]:
     def notify(self, arg: T) -> None:
         for observer in list(self._observers):
             observer.update(self, arg)
+```
 
-class Display:
-    def update(
-        self, subject: Subject[float], arg: float
-    ) -> None:
-        print(f"display: {arg}C")
+`notify()` calls `update()` on every observer in the list,
+so one change to the subject's state reaches all observers.
+
+`Thermometer` is a `Subject[float]`.
+Its `set_celsius()` stores the new reading and calls `notify()`:
+
+```python
+# classic_thermometer.py
+from classic_observer import Subject
 
 class Thermometer(Subject[float]):
     def __init__(self, celsius: float) -> None:
@@ -80,6 +85,25 @@ class Thermometer(Subject[float]):
     def set_celsius(self, value: float) -> None:
         self._celsius = value
         self.notify(value)
+```
+
+The base class `Subject` creates the observer list in its constructor,
+so `Thermometer`'s constructor must call [`super().__init__()`](07_Foundations--Classes.md#calling-the-base-constructor).
+If you remove that call, a `Thermometer` has no `_observers` attribute,
+and `attach()` raises an `AttributeError`.
+
+`Display` is an observer that prints each new reading:
+
+```python
+# classic_thermometer_demo.py
+from classic_observer import Subject
+from classic_thermometer import Thermometer
+
+class Display:
+    def update(
+        self, subject: Subject[float], arg: float
+    ) -> None:
+        print(f"display: {arg}C")
 
 t = Thermometer(20.0)
 t.attach(Display())
@@ -87,17 +111,9 @@ t.set_celsius(25)
 #: display: 25C
 ```
 
-`notify()` calls `update()` on every observer in the list,
-so one change to the subject's state reaches all observers.
-`Display` prints the new reading, and a `Plot` or a `Table` redraws.
-
 `Thermometer`'s list accepts any `Observer[float]`,
 meaning any object with a matching `update()` method,
-so a `Plot` or a `Table` attaches as easily as `Display` does.
-The base class `Subject` creates the observer list in its constructor,
-so `Thermometer`'s constructor must call [`super().__init__()`](07_Foundations--Classes.md#calling-the-base-constructor).
-If you remove that call, a `Thermometer` has no `_observers` attribute,
-and `attach()` raises an `AttributeError`.
+so a `Plot` or a `Table` that redraws attaches as easily as `Display` does.
 
 ### Push or Pull
 
@@ -1390,7 +1406,7 @@ instead of guessing which responders need it.
     the smallest `Broadcaster` that lets callables subscribe,
     then notifies them.
     Demonstrate it by subscribing several responders and causing one change that updates them all.
-2.  Rewrite `classic_observer.py` to use the pull model:
+2.  Rewrite the classic listings to use the pull model:
     `Display.update()` reads `subject.celsius` instead of `arg`.
     A `Display` that narrows its `subject` parameter to `Thermometer` no longer satisfies `Observer[float]`,
     so make it type-check two ways:
