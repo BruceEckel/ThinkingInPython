@@ -104,6 +104,7 @@ main#doc { background: var(--page); border: 1px solid var(--rule); border-radius
 .content .fig { font-family: var(--sans); font-size: .9rem; color: var(--muted); }
 .content .fig::before { content: "Figure: "; font-weight: 600; }
 mark { color: inherit; border-radius: 2px; }
+.content:not(.pre) .pb { display: block; height: .9em; }
 mark.m-rewrite { background: var(--rw-soft); box-shadow: inset 0 -2px 0 var(--rw); }
 mark.m-delete { background: var(--del-soft); color: var(--del); text-decoration: line-through; text-decoration-thickness: 2px; }
 mark.flash { outline: 2px solid var(--accent); }
@@ -198,11 +199,18 @@ function runs(s, from, to, marks) {
   // Split [from, to) at mark edges and wrap each covered piece.
   const cuts = new Set([from, to]);
   for (const m of marks) for (const x of [m.start, m.end]) if (x > from && x < to) cuts.add(x);
+  // A blank line (a paragraph break an edit made) gets a run of its own,
+  // drawn as a gap between paragraphs.
+  for (const m of s.slice(from, to).matchAll(/\n[ \t]*\n\s*/g)) {
+    cuts.add(from + m.index); cuts.add(from + m.index + m[0].length);
+  }
   const pts = [...cuts].sort((a, b) => a - b);
   let out = "";
   for (let i = 0; i < pts.length - 1; i++) {
     const a = pts[i], b = pts[i + 1];
-    const text = `<span data-o="${a}">${esc(s.slice(a, b))}</span>`;
+    const piece = s.slice(a, b);
+    const pb = /^\n[ \t]*\n\s*$/.test(piece) ? ` class="pb"` : "";
+    const text = `<span data-o="${a}"${pb}>${esc(piece)}</span>`;
     const hit = marks.filter((m) => m.start <= a && m.end >= b);
     if (!hit.length) { out += text; continue; }
     const top = hit.find((m) => m.kind === "delete") || hit[0];
@@ -358,7 +366,7 @@ function updateBlock(el, id, idx) {
       view.innerHTML = `<div class="editbox"><textarea id="e-${esc(id)}" spellcheck="true"></textarea>
         <div class="row"><button class="primary" data-act="save">Save edit</button><button data-act="cancel">Cancel</button>
         ${b.edit != null ? `<button data-act="revert">Discard my edit</button>` : ""}
-        <span><kbd>Ctrl</kbd>+<kbd>Enter</kbd> saves, <kbd>Esc</kbd> cancels. This is the paragraph's Markdown; it goes into the chapter as you leave it.</span></div></div>`;
+        <span><kbd>Ctrl</kbd>+<kbd>Enter</kbd> saves, <kbd>Esc</kbd> cancels. This is the paragraph's Markdown; it goes into the chapter as you leave it. A blank line splits the paragraph in two.</span></div></div>`;
       const t = view.querySelector("textarea");
       t.value = base(b);
       requestAnimationFrame(() => { autosize(t); t.focus(); });
@@ -674,7 +682,7 @@ function saveEdit(id) {
   const el = els.get(id), b = state.blocks.get(id);
   const t = el.querySelector(".view textarea");
   if (!t) return;
-  let text = t.value.replace(/\r/g, "").replace(/\n{2,}/g, "\n").replace(/^\n+|\n+$/g, "");
+  let text = t.value.replace(/\r/g, "").replace(/[ \t]+$/gm, "").replace(/\n{3,}/g, "\n\n").replace(/^\n+|\n+$/g, "");
   const edit = text === b.source ? null : text;
   const marks = reanchor(marksOf(b), text);
   const lost = marksOf(b).length - marks.length;

@@ -51,4 +51,4 @@ Every round below uses that URL.
 - Never run `load` over a round that has not been applied: it would drop his marks. `load` refuses without `--force`.
 - Never write block documents while the page's status is `open`; he may be marking.
 - Listings take Rewrite marks only. A Rewrite mark on a listing is a request to change the code in the Markdown block, then run the full verify loop.
-- The page template is shared across chapters. After editing it, republish each open chapter's copy from a fresh `load` (a copy is regenerated on every load).
+- The page template is shared across chapters. After editing it, run `uv run python -m tools.chapter_editor page NN` for each open chapter and republish that copy to its URL; `load` also regenerates the copy.

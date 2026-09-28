@@ -237,11 +237,7 @@ def load(chapter: str, force: bool) -> int:
     # once every block it lists is in place.
     writes.append({"op": "set", "collection": "meta", "doc_id": "chapter",
                    "file_path": str(meta_file)})
-    number = meta["chapter"]
-    page = PAGE.read_text(encoding="utf-8").replace(
-        "<title>Chapter Editor</title>",
-        f"<title>Chapter {number} Editor</title>", 1)
-    (where / f"chapter_editor_{number}.html").write_text(page, encoding="utf-8")
+    write_page(path)
     for old in where.glob("batch*.json"):
         old.unlink()
     for i in range(0, len(writes), BATCH):
@@ -257,6 +253,18 @@ def load(chapter: str, force: bool) -> int:
     return 0
 
 
+def write_page(chapter: Path) -> Path:
+    """Copy the page template, titled for `chapter`, to publish."""
+    number = chapter.name.split("_", 1)[0]
+    page = PAGE.read_text(encoding="utf-8").replace(
+        "<title>Chapter Editor</title>",
+        f"<title>Chapter {number} Editor</title>", 1)
+    target = out_dir(chapter) / f"chapter_editor_{number}.html"
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text(page, encoding="utf-8")
+    return target
+
+
 def read_doc(path: Path) -> dict[str, Any]:
     """A saved document, whether saved bare or wrapped with its id."""
     doc = json.loads(path.read_text(encoding="utf-8"))
@@ -269,6 +277,8 @@ CLOSERS = ".,;:!?)]"
 def join(left: str, right: str) -> str:
     """Close the gap one cut leaves: one space, or none before a closer."""
     left, right = left.rstrip(" \t"), right.lstrip(" \t")
+    if left.endswith("\n") and right.startswith("\n"):
+        return left + right[1:]  # The cut took a whole line.
     if (not left or not right or left.endswith("\n")
             or right.startswith("\n") or right[0] in CLOSERS
             or left[-1] in "(["):
@@ -279,7 +289,8 @@ def join(left: str, right: str) -> str:
 def cut(text: str, spans: list[tuple[int, int]]) -> tuple[str, list[int]]:
     """Remove `spans` from `text`, returning the text and each cut's place.
 
-    A line the cuts empty is dropped, since a block has no blank lines.
+    A line the cuts empty is dropped. A blank line an in-place edit
+    added (a paragraph split in two) stays, one blank line at most.
     """
     merged: list[list[int]] = []
     for s, e in sorted(spans):
@@ -292,9 +303,8 @@ def cut(text: str, spans: list[tuple[int, int]]) -> tuple[str, list[int]]:
         left = text[:s]
         text = join(left, text[e:])
         places.append(len(left.rstrip(" \t")))
-    lines = text.split("\n")
-    kept = "\n".join(line for line in lines if line.strip())
-    return kept, places[::-1]
+    text = re.sub(r"\n{3,}", "\n\n", text).strip("\n")
+    return text, places[::-1]
 
 
 def context(text: str, at: int, width: int = 70) -> str:
@@ -419,6 +429,9 @@ def main(argv: list[str] | None = None) -> int:
     s.add_argument("chapter", help="chapter number, e.g. 30")
     s.add_argument("--force", action="store_true",
                    help="load over a round that was never applied")
+    g = sub.add_parser("page", help="rewrite the page copy only, for a "
+                       "template change in the middle of a round")
+    g.add_argument("chapter")
     a = sub.add_parser("apply", help="apply a sent round to the chapter")
     a.add_argument("chapter")
     a.add_argument("read_dir", type=Path, nargs="?",
@@ -429,6 +442,9 @@ def main(argv: list[str] | None = None) -> int:
     args = ap.parse_args(argv)
     if args.command == "load":
         return load(args.chapter, args.force)
+    if args.command == "page":
+        print(write_page(chapter_file(args.chapter)).relative_to(ROOT))
+        return 0
     read = args.read_dir or out_dir(chapter_file(args.chapter)) / "read"
     return apply(args.chapter, read, args.force)
 

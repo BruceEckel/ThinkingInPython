@@ -142,3 +142,24 @@ def test_a_block_changed_in_the_file_is_a_conflict(chapter: Path,
 def test_join_closes_gaps() -> None:
     assert ce.cut("One two, three.", [(3, 7)]) == ("One, three.", [3])
     assert ce.cut("Keep (drop) this.", [(6, 10)]) == ("Keep () this.", [6])
+
+
+def test_a_cut_of_a_whole_line_leaves_no_gap() -> None:
+    assert ce.cut("One.\nTwo.\nThree.", [(5, 9)]) == ("One.\nThree.", [5])
+
+
+def test_an_edit_can_split_a_paragraph(chapter: Path, tmp_path: Path
+                                       ) -> None:
+    ce.load("99", force=False)
+    where = ce.OUT / "99"
+    bid = find(where, "Last paragraph")
+    page_round(where, tmp_path / "read",
+               {bid: {"edit": "First half.\n\nSecond half."}})
+    ce.apply("99", tmp_path / "read", force=False)
+    assert chapter.read_text("utf-8").endswith(
+        "- another\n\nFirst half.\n\nSecond half.\n")
+    ce.load("99", force=False)
+    after = docs(where)
+    assert after[bid]["source"] == "First half."
+    assert any(d["source"] == "Second half." and d["previous"] is None
+               for d in after.values())
