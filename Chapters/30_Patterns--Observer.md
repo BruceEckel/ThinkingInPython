@@ -539,7 +539,8 @@ A weak responder earns its extra code only when a long-lived broadcaster holds s
 A responder that writes back to the broadcaster re-enters `announce()` from inside `announce()`.
 Two-way bindings are the usual source.
 The view edits the model, the model notifies the view, the view edits the model.
-Without a guard, a responder that always writes back recurses until Python raises a `RecursionError`:
+The setter announces every assignment,
+so without a guard a responder that writes back on every notification recurses until Python raises a `RecursionError`:
 
 ```python
 # reentrant_announce.py
@@ -619,7 +620,7 @@ which is the behavior you want when a responder counts readings rather than chan
 
 `Thermometer` writes a getter and a setter for each attribute it publishes,
 and inherits `subscribe()` and `announce()` from `Broadcaster`.
-We can simplify all of this using `__setattr__()`.
+We can simplify this using `__setattr__()`.
 Python calls it on every attribute assignment,
 so one method covers every attribute of the class:
 
@@ -666,10 +667,9 @@ so an ordinary `self._watchers = []` raises an `AttributeError`:
 the copy reads an attribute that does not exist yet.
 The constructor therefore writes `_watchers` through `self.__dict__`,
 which bypasses `__setattr__()`.
-The two assignments after that line are ordinary
-(they go through `__setattr__()`).
-Each notifies a list that is still empty;
-because the constructor hasn't returned, no caller can register a watcher.
+The two assignments after that line go through `__setattr__()`.
+Each notifies a list that is still empty.
+Because the constructor hasn't returned, no caller can register a watcher.
 `super().__setattr__()` does the storing,
 because an ordinary assignment inside `__setattr__()` calls `__setattr__()` again.
 
@@ -684,7 +684,7 @@ a single list shared by every `Watched`.
 covers the difference between declaring an attribute and creating one,
 for instance attributes and class variables both.
 
-`ty` takes an instance attribute and its type from an assignment like `self.celsius = celsius`,
+`ty` infers an instance attribute and its type from an assignment like `self.celsius = celsius`,
 which is why `celsius` and `humidity` need no declaration.
 For `_watchers`, the constructor writes `self.__dict__["_watchers"] = []`,
 and `ty` treats that as a write to a dictionary,
@@ -693,23 +693,24 @@ The bare annotation supplies the attribute and its type instead.
 Without it, `ty` reports an `unresolved-attribute` error in each method that reads the list.
 
 One method for every attribute is less precise than a property per attribute,
-in three ways.
-First, a watcher is a responder with a wider signature:
-it takes the attribute name along with the value,
-and filters by name to act on one attribute.
-`Thermometer` publishes one attribute and is a `Broadcaster[float]`,
-so each responder takes the `float` reading as its one argument.
-[Deciding What Matters](#deciding-what-matters) revisits that name filter:
-a watcher that sorts its own notifications means the subject has left the decision to its responders.
-Second, every assignment reaches the watchers, including the internal ones:
-a cached result or a hit counter broadcasts like a published attribute,
-unless the class writes it through `self.__dict__` as the constructor does.
-Third, `__setattr__()` accepts any name,
-so `ty` stops checking assignments and passes `w.celcius = 25.0`,
-which quietly creates a new attribute.
-Making the same typo on a `Thermometer` produces an `unresolved-attribute` error.
-`Thermometer` defines no `__setattr__()`,
-so `ty` checks each assignment against the attributes the class declares.
+in three ways:
+
+1.  A watcher is a responder with a wider signature:
+    it takes the attribute name along with the value,
+    and filters by name to act on one attribute.
+    `Thermometer` publishes one attribute and is a `Broadcaster[float]`,
+    so each responder takes the `float` reading as its one argument.
+    [Deciding What Matters](#deciding-what-matters) revisits that name filter:
+    a watcher that sorts its own notifications means the subject has left the decision to its responders.
+2.  Every assignment reaches the watchers, including the internal ones:
+    a cached result or a hit counter broadcasts like a published attribute,
+    unless the class writes it through `self.__dict__` as the constructor does.
+3.  `__setattr__()` accepts any name, so `ty` stops checking assignments.
+    It passes `w.celcius = 25.0`, a misspelling of `celsius`,
+    which quietly creates a new attribute.
+    The same misspelling on a `Thermometer` produces an `unresolved-attribute` error.
+    `Thermometer` defines no `__setattr__()`,
+    so `ty` checks each assignment against the attributes the class declares.
 
 ## Observer and I/O
 
