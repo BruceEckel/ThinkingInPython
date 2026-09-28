@@ -375,14 +375,6 @@ The filter tests `f.endswith(".py")` on the bare filename rather than building a
 That avoids constructing a `Path` for every file in the tree,
 including the ones the filter skips.
 
-`root.rglob("*.py")` finds the same two files in one line,
-with no explicit walk and no comprehension at all.
-Try `rglob()` first: a glob pattern already says what you want.
-`walk()` earns its place when the filter needs more than a glob pattern can express,
-a file's size or its contents rather than its name, say,
-or when the comprehension needs the directory structure itself,
-not just the files at the bottom of it.
-
 A `with` block, unlike a function body, does not create a new scope.
 The assignment to `py_paths` sits inside the `with`,
 but the name is still visible afterward,
@@ -399,6 +391,14 @@ By then the directory is gone,
 and `Path.walk()` ignores the error unless you pass `on_error`.
 [Generator Expressions](#the-gap-between-creation-and-consumption)
 returns to that gap.
+
+`root.rglob("*.py")` finds the same two files in one line,
+with no explicit walk and no comprehension at all.
+Try `rglob()` first: a glob pattern already says what you want.
+`walk()` earns its place when the filter needs more than a glob pattern can express,
+a file's size or its contents rather than its name, say,
+or when the comprehension needs the directory structure itself,
+not just the files at the bottom of it.
 
 ## Breaking Up a Complex Comprehension
 
