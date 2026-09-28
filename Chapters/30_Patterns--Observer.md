@@ -17,7 +17,7 @@ Use *Observer* if a group of objects must update themselves when other objects c
 Event handling typically works this way:
 a widget keeps a list of handlers and calls each one when its event arrives.
 
-The classic example is Smalltalk's MVC (model-view-controller),
+The classic example is Smalltalk's *Model-View-Controller* (MVC),
 or the nearly-equivalent *Document-View* architecture,
 which folds the controller into the view.
 In both, *Observer* connects the state change to its views:
@@ -93,10 +93,9 @@ so one change to the subject's state reaches all observers.
 
 `Thermometer`'s list accepts any `Observer[float]`,
 meaning any object with a matching `update()` method,
-so a `Plot` or a `Table` attaches the same way `Display` does.
-`Subject.__init__()` creates that list,
-so `Thermometer`'s constructor calls [`super().__init__()`](07_Foundations--Classes.md#calling-the-base-constructor)
-to run it.
+so a `Plot` or a `Table` attaches as easily as `Display` does.
+The base class `Subject` creates the observer list in its constructor,
+so `Thermometer`'s constructor must call [`super().__init__()`](07_Foundations--Classes.md#calling-the-base-constructor).
 If you remove that call, a `Thermometer` has no `_observers` attribute,
 and `attach()` raises an `AttributeError`.
 
