@@ -275,10 +275,7 @@ You decide how far up the spectrum to go.
 ## Property-Based Testing
 
 You can write a property check by hand,
-looping over random inputs and asserting the law.
-A tool like [Hypothesis](https://hypothesis.readthedocs.io/en/latest/)
-does the same thing with inputs it chooses at boundaries and unusual values,
-and shrinks any failure to a minimal counterexample:
+looping over random inputs and asserting the law:
 
 ```python
 # property_check.py
@@ -310,6 +307,9 @@ and a machine that searches for a counterexample.
 A bare `assert` like this one reports a broken law as an `AssertionError`,
 and the traceback shows the assert's source line but not the value that broke it,
 so to find that value you add a `print()` and rerun by hand.
+A tool like [Hypothesis](https://hypothesis.readthedocs.io/en/latest/)
+runs the same search with inputs it chooses at boundaries and unusual values,
+and shrinks any failure to a minimal counterexample.
 
 ### The Same Law in Hypothesis
 
