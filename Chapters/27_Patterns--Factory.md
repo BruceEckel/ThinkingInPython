@@ -515,7 +515,7 @@ That is the case [Self Registration](#self-registration) left to runtime,
 where a subclass that forgot `draw()` registers, fails at construction,
 and no checker sees it.
 `REGISTRY` holds `type[Shape]` values and `ty` accepts calling one,
-so `make()` needs no change.
+so `make()` works as written.
 
 Two hazards from [Hazards of Self Registration](#hazards-of-self-registration)
 disappear with the class attribute.
