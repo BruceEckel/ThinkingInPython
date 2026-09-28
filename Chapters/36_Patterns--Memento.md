@@ -85,13 +85,7 @@ Here the originator is a `Sketch` that accumulates strokes in a list.
 Its memento converts that list to a tuple,
 so the snapshot is immutable while the originator stays mutable.
 `restore()` copies in the other direction,
-rebuilding a fresh list so the sketch and the memento never share one.
-`copy.copy(sketch)` looks like a shortcut for `save()`,
-but it copies only the `Sketch`: the copy's `strokes` is the same list,
-the alias from `aliased_snapshot.py` one level down.
-One level is enough because a stroke is a string.
-An originator holding containers inside containers needs `copy.deepcopy()` in `save()`,
-and pays the cost described in [A Snapshot Is Not a Reference](#a-snapshot-is-not-a-reference):
+rebuilding a fresh list so the sketch and the memento never share one:
 
 ```python
 # sketch.py
@@ -129,6 +123,13 @@ if __name__ == "__main__":
 #: circle beak scribble
 #: circle beak
 ```
+
+`copy.copy(sketch)` looks like a shortcut for `save()`,
+but it copies only the `Sketch`: the copy's `strokes` is the same list,
+the alias from `aliased_snapshot.py` one level down.
+One level is enough because a stroke is a string.
+An originator holding containers inside containers needs `copy.deepcopy()` in `save()`,
+and pays the cost described in [A Snapshot Is Not a Reference](#a-snapshot-is-not-a-reference).
 
 The caretaker's side of the contract is to store `checkpoint` and return it,
 and never to read or assign its `strokes`.
