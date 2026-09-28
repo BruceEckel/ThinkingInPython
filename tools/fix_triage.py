@@ -182,8 +182,9 @@ def apply(read_dir: Path) -> int:
         print(f"{file}: {len(todo)} edit(s)")
     pairs = judgments.load(PAIRS_FILE)
     for k, counts in tally.items():
-        p = pairs.get(k, {})
-        print(f"{p.get('file')}:{p.get('line')}  " + ", ".join(
+        p = pairs.get(k)
+        where = f"{p['file']}:{p['line']}" if p else k
+        print(f"{where}  " + ", ".join(
             f"{n} {d}" for d, n in sorted(counts.items())))
     for where in failed:
         print(f"not found, left alone: {where}")
