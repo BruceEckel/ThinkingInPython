@@ -1691,12 +1691,6 @@ print(f"collatz_lengths Rust speedup: "
 # Sample run: collatz_lengths Rust speedup: 34.3x
 ```
 
-The repository's `rust/README.md` explains how to build and run it yourself.
-`cd rust && make` compiles both functions, installs the module,
-and runs this same comparison, printing your machine's own numbers.
-The main book build never does this and never requires a Rust toolchain.
-Building `rust/` is a separate, opt-in step.
-
 That is one baseline and three ways past it,
 but not a ladder where each step outruns the last.
 The plain Python loop from the Numba example above is the baseline.
@@ -1722,6 +1716,12 @@ which sounds like the thing to avoid.
 But a hundred-odd loop iterations of real work follow each integer,
 so the conversion cost disappears.
 The question is not the object count on its own but the work done per object crossed.
+
+The repository's `rust/README.md` explains how to build and run `fastcount` yourself.
+`cd rust && make` compiles both functions, installs the module,
+and runs the comparison in `demo.py`, printing your machine's own numbers.
+The main book build never does this and never requires a Rust toolchain.
+Building `rust/` is a separate, opt-in step.
 
 <!-- TODO(py315-deps): once Numba is available (NumPy already is), extend
 rust/fastcount/demo.py (and this listing)
