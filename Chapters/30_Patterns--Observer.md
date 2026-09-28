@@ -393,18 +393,22 @@ def test_late_subscriber_misses_earlier_changes() -> None:
 
 The tests subscribe a list's `append` to the broadcaster,
 so the list records every announced value.
-`unsubscribe()` matches by equality, and a lambda equals only itself,
-so to remove a responder later you need a named reference to it,
-not an inline lambda.
+
+You cannot `unsubscribe()` a lambda;
+you need a named reference to the responder.
+`unsubscribe()` matches by equality, and a lambda equals only itself.
+
 A bound method is different:
 `test_unsubscribe_stops_delivery()` unsubscribes `received.append` without storing it first.
 Each `received.append` builds a new bound-method object,
 so `received.append is received.append` is `False`.
 Two bound methods compare equal when they wrap the same instance and the same function,
 so `unsubscribe(received.append)` removes the subscription that `subscribe(received.append)` made.
+
 The same equality rule explains the last two tests.
 Subscribing one callable twice puts two equal entries in the list,
 so each notification calls it twice and each `unsubscribe()` removes one entry.
+
 `list.remove()` raises a `ValueError` when it matches nothing,
 so `unsubscribe()` raises a `ValueError` when its callable never subscribed.
 
@@ -416,51 +420,50 @@ The copy in `announce()` matters when a responder unsubscribes mid-notification:
 # self_removing_responder.py
 from broadcaster import Broadcaster
 
-source = Broadcaster[object]()
+broadcaster = Broadcaster[object]()
 seen: list[str] = []
 
 def once(data: object) -> None:
     seen.append(f"once: {data}")
     # Unsubscribes mid-notification
-    source.unsubscribe(once)
+    broadcaster.unsubscribe(once)
 
 def always(data: object) -> None:
     seen.append(f"always: {data}")
 
-source.subscribe(once)
-source.subscribe(always)
-source.announce(1)
-source.announce(2)
+broadcaster.subscribe(once)
+broadcaster.subscribe(always)
+broadcaster.announce(1)
+broadcaster.announce(2)
 print(seen)
 #: ['once: 1', 'always: 1', 'always: 2']
 ```
 
 `once` receives the first change and unsubscribes.
 That call removes it from the broadcaster's list,
-not from the copy the loop is reading,
-so `once` finishes this notification and receives none after it.
+not from the copy that `announce()`'s loop reads,
+so `once` still gets this notification but no later ones.
 `always` receives both.
-Without the copy, the loop reads the list it changes.
+Without the copy, `announce()`'s `for` loop reads the list that `unsubscribe()` changes.
 `once` is at index 0 and `always` at index 1.
 Removing `once` moves `always` to index 0, which the loop has already visited,
 so the loop looks for index 1, finds the list ended there, and stops.
 `always` misses the first change, and `seen` ends as `['once: 1', 'always: 2']`,
 with no exception to say a responder was skipped.
 
-### A Responder That Raises an Exception
+### Raising an Exception
 
 If a responder raises an exception,
 the rest of the responders in the list are not called.
 The exception leaves `announce()` and reaches the code that assigned to `celsius`.
-Decide whether `announce()` should catch, collect, and continue
+You must decide whether `announce()` should catch, collect, and continue
 (see exercise 3).
 
 Another option keeps the failure inside the responder.
 The responder catches its own exception and [returns the error as a value](42_Functional--Error_Handling.md#return-the-error-as-a-value),
 and `announce()` collects the returned errors for the caller.
 Every responder runs, and no failure escapes as an exception.
-The cost is the `Responder` type:
-`Callable[[T], None]` becomes a callable that returns a success or an error,
+However, the `Responder` type becomes a callable that returns a success or an error,
 so a method such as `readings.append()`, which returns `None`,
 no longer fits without a wrapper (see exercise 5).
 
@@ -523,6 +526,11 @@ Once `plot` is gone, `ref()` returns `None` and `weak` unsubscribes itself,
 which is safe mid-notification because `announce()` loops over a copy.
 The `ValueError` confirms the subscription is gone:
 `unsubscribe()` finds nothing left to remove.
+
+Most programs do not need weak responders.
+A broadcaster that lives no longer than its responders releases them when it goes away,
+and an explicit `unsubscribe()` covers a responder that leaves early.
+A weak responder earns its extra code only when a long-lived broadcaster holds short-lived responders that nothing unsubscribes.
 
 ### Re-entrant Notification
 
