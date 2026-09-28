@@ -312,18 +312,21 @@ class Event:
             prefix = "* " if isinstance(e, bell) else ""
             line = f"{e.hour}:{e.minute:02d}: {e.action}"
             print(prefix + line)
-
-if __name__ == "__main__":
-    Event.load_schedule(Path("schedule.txt"))
-    Event.run_events()
-#: Creating LightOff
-#: Creating LightOn
-#: Creating RingBell
-#: 1:00: LightOn
-#: 2:00: LightOff
-#: * 7:00: RingBell
-#: 8:00: LightOn
 ```
+
+`EventMakers` subclasses `dict` so the laziness is invisible at the call site.
+`Event._event_maker[class_name]` reads as an ordinary lookup,
+and the overridden `__getitem__()` decides whether that lookup returns a class or builds one first.
+The alternative, a `make_event()` function,
+pushes that decision into every caller.
+
+`Event._event_maker` starts out holding the seven legitimate event names,
+each paired with the `NOT_CREATED` sentinel as a placeholder.
+Populating that dict reserves the names and builds nothing yet,
+so `EventMakers.__getitem__()` can check a `class_name` against those names before building anything.
+The dict's value type is `EventMaker | NOT_CREATED`,
+naming the sentinel value rather than the generic `sentinel` class,
+so ruling out one member with `maker is NOT_CREATED` leaves `EventMaker` in the other branch.
 
 Now the end user needs only to write and maintain the schedule file:
 
@@ -345,6 +348,25 @@ the maker builds the class and registers it under its name.
 An unknown name raises a `KeyError`,
 which a caller writing `try: ... except KeyError` around a lookup expects.
 
+Running the schedule prints a line for each class as `EventMakers` builds it,
+then the events in time order:
+
+```python
+# greenhouse_demo.py
+from pathlib import Path
+from greenhouse import Event
+
+Event.load_schedule(Path("schedule.txt"))
+Event.run_events()
+#: Creating LightOff
+#: Creating LightOn
+#: Creating RingBell
+#: 1:00: LightOn
+#: 2:00: LightOff
+#: * 7:00: RingBell
+#: 8:00: LightOn
+```
+
 The schedule names three of the seven declared event types.
 `EventMakers` builds only those three: seven classes declared, three built.
 
@@ -360,20 +382,6 @@ but every entry shares one type,
 and `run_events()` has no class left to check against.
 The `* ` marker depends on `RingBell` being a distinct class,
 not just a distinct name.
-
-`EventMakers` subclasses `dict` so the laziness is invisible at the call site.
-`Event._event_maker[class_name]` reads as an ordinary lookup,
-and the overridden `__getitem__()` decides whether that lookup returns a class or builds one first.
-The alternative, a `make_event()` function,
-pushes that decision into every caller.
-
-`Event._event_maker` starts out holding the seven legitimate event names,
-each paired with the `NOT_CREATED` sentinel as a placeholder.
-Populating that dict reserves the names and builds nothing yet,
-so `EventMakers.__getitem__()` can check a `class_name` against those names before building anything.
-The dict's value type is `EventMaker | NOT_CREATED`,
-naming the sentinel value rather than the generic `sentinel` class,
-so ruling out one member with `maker is NOT_CREATED` leaves `EventMaker` in the other branch.
 
 ## Generating Classes with `exec()`
 

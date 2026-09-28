@@ -68,14 +68,3 @@ class Event:
             prefix = "* " if isinstance(e, bell) else ""
             line = f"{e.hour}:{e.minute:02d}: {e.action}"
             print(prefix + line)
-
-if __name__ == "__main__":
-    Event.load_schedule(Path("schedule.txt"))
-    Event.run_events()
-#: Creating LightOff
-#: Creating LightOn
-#: Creating RingBell
-#: 1:00: LightOn
-#: 2:00: LightOff
-#: * 7:00: RingBell
-#: 8:00: LightOn
