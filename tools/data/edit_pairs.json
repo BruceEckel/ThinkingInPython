@@ -155,6 +155,27 @@
   "heading": "A Listener That Raises an Exception",
   "paragraph": "A listener that raises an exception stops the loop, and the listeners after it are not called. The exception leaves `announce()` and reaches the code that assigned to `celsius`. Decide whether `announce()` should catch, collect, and continue (exercise 3 makes this concrete)."
  },
+ "dd5edd795a17b09d": {
+  "file": "30_Patterns--Observer.md",
+  "line": 643,
+  "before": "`Thermometer` publishes one attribute and is a `Broadcaster[float]`, so its listeners take the `float` reading and need no name.",
+  "after": "`Thermometer` publishes one attribute and is a `Broadcaster[float]`, so each listener takes the `float` reading as its one argument.",
+  "previous": "",
+  "following": "",
+  "heading": "Notifying Without a Base Class",
+  "paragraph": "One method for every attribute is less precise than a property per attribute, in three ways. First, a watcher is a listener with a wider signature: it takes the attribute name along with the value, and filters by name to act on one attribute. `Thermometer` publishes one attribute and is a `Broadcaster[float]`, so its listeners take the `float` reading and need no name. [Deciding What Matters](#deciding-what-matters) returns to that filter, where a watcher sorting its own notifications is the subject declining to decide. Second, every assignment reaches the watchers, including the internal ones: a cached result or a hit counter broadcasts like a published attribute, unless the class writes it through `self.__dict__` as the constructor does. Third, `__setattr__()` accepts any name, so `ty` stops checking assignments and reports nothing for `w.celcius = 25.0`, which quietly creates a new attribute. The same misspelling on `Thermometer` is an `unresolved-attribute` error. `Thermometer` defines no `__setattr__()`, so `ty` checks each assignment against the attributes the class declares.",
+  "similarity": 0.0,
+  "source": "chapter 30 clarity notes",
+  "added": "2026-09-27",
+  "fault": "The sentence ends on what does not happen or is not needed ('and need no name.', 'reports nothing', 'changes nothing there.'), where saying what does happen reads better; not a fault when the negation is itself the claim the sentence exists to make.",
+  "status": "searchable",
+  "check": {
+   "before": 0.74,
+   "after": 0.06
+  },
+  "floor": 0.45,
+  "floor_basis": "set 2026-09-27 from reading the top hits, not from labels: this fault scores low overall (Bruce's own original scored 0.74) and the 0.45-0.57 band holds real negative endings; recalibrate from the fix-triage verdicts"
+ },
  "8d592038d4359768": {
   "file": "30_Patterns--Observer.md",
   "line": 649,

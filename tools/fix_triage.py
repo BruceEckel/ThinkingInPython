@@ -206,7 +206,7 @@ def main(argv: list[str] | None = None) -> int:
                     help="working directory for this batch (default "
                          "build/fix_triage)")
     args = ap.parse_args(argv)
-    OUT = args.dir
+    OUT = args.dir.resolve()
     if args.command == "export":
         return export(args.pairs)
     if args.command == "seed":

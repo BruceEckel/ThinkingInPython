@@ -55,6 +55,7 @@ rerun asks only about new pairs and changed sentences.
     tip edit-patterns ARGS=--dry-run
     tip edit-patterns ARGS=--report            # from the cache only
     tip edit-patterns ARGS=--from-rules        # bruce_edit_db.md's rules
+    tip edit-patterns ARGS="--pair 30_Patterns--Observer.md:643"  # one pair
 """
 
 import argparse
@@ -431,6 +432,9 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--range", dest="span", help="compare A..B")
     ap.add_argument("--dry-run", action="store_true",
                     help="list the edit's rewrites and the cost; ask nothing")
+    ap.add_argument("--pair", action="append", default=[],
+                    help="search for this stored pair (its key, or "
+                         "FILE:LINE); repeatable")
     ap.add_argument("--from-rules", action="store_true",
                     help="search for every promoted rule in "
                          "bruce_edit_db.md")
@@ -443,6 +447,15 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.report:
         keys = list(pairs)
+    elif args.pair:
+        keys = []
+        for name in args.pair:
+            file, _, line = name.rpartition(":")
+            match = [k for k, v in pairs.items() if k == name
+                     or (v["file"] == file and str(v["line"]) == line)]
+            if not match:
+                sys.exit(f"edit_patterns: no stored pair {name}")
+            keys += match
     elif args.from_rules:
         today = datetime.date.today().isoformat()
         rules = list(rule_pairs())
