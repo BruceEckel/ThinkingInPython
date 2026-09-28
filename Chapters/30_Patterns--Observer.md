@@ -66,8 +66,7 @@ class Subject[T]:
 `notify()` calls `update()` on every observer in the list,
 so one change to the subject's state reaches all observers.
 
-`Thermometer` is a `Subject[float]`.
-Its `set_celsius()` stores the new reading and calls `notify()`:
+`Thermometer`'s `set_celsius()` stores the new reading and calls `notify()`:
 
 ```python
 # classic_thermometer.py
@@ -87,7 +86,7 @@ class Thermometer(Subject[float]):
         self.notify(value)
 ```
 
-The base class `Subject` creates the observer list in its constructor,
+`Subject` creates the observer list in its constructor,
 so `Thermometer`'s constructor must call [`super().__init__()`](07_Foundations--Classes.md#calling-the-base-constructor).
 If you remove that call, a `Thermometer` has no `_observers` attribute,
 and `attach()` raises an `AttributeError`.
