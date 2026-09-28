@@ -110,14 +110,6 @@ and `Result` is the union of the two.
 The value's class is now the tag that tells the two cases apart,
 so the union stays unambiguous whatever the two sides carry.
 Other languages call this a *tagged* or *discriminated* union.
-`Ok` and `Err` are both [records](18_Techniques--Performance.md#record),
-`Ok` parameterized over the answer type and `Err` over the error type.
-`@final` states that neither can have subclasses.
-The type checker narrows a `Result` to one of the two classes because `Result` is a union of them.
-`A`, `B`, `E`, and `F` are type parameters
-(introduced in [Static Types](08_Foundations--Static_Types.md#type-parameters)):
-placeholders that take concrete types when you use the class.
-Here they have no bounds or constraints, so any type can fill them.
 `Result` is useful beyond this chapter,
 so it lives in `utils/` and any chapter can import it:
 
@@ -152,6 +144,15 @@ class Err[E]:
 
 type Result[A, E] = Ok[A] | Err[E]
 ```
+
+`Ok` and `Err` are both [records](18_Techniques--Performance.md#record),
+`Ok` parameterized over the answer type and `Err` over the error type.
+`@final` states that neither can have subclasses.
+The type checker narrows a `Result` to one of the two classes because `Result` is a union of them.
+`A`, `B`, `E`, and `F` are type parameters
+(introduced in [Static Types](08_Foundations--Static_Types.md#type-parameters)):
+placeholders that take concrete types when you use the class.
+Here they have no bounds or constraints, so any type can fill them.
 
 Ignore `bind()` for the moment.
 The two records and the `Result` alias are enough to report errors.
