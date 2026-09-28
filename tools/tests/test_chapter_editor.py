@@ -1,0 +1,144 @@
+"""Tests for tools/chapter_editor.py: parse, load, apply, and reload."""
+import json
+from pathlib import Path
+
+import pytest
+
+from tools import chapter_editor as ce
+
+CHAPTER = """\
+# Observer
+
+An opening paragraph
+that runs over two lines.
+
+## Section {#sec}
+
+A `code span` stays whole. Cut this sentence.
+The rest stays.
+
+```python
+# obs/demo.py
+print("hi")
+```
+
+- a list item
+- another
+
+Last paragraph.
+"""
+
+
+@pytest.fixture
+def chapter(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
+    chapters = tmp_path / "Chapters"
+    chapters.mkdir()
+    path = chapters / "99_Patterns--Observer.md"
+    path.write_text(CHAPTER, encoding="utf-8")
+    monkeypatch.setattr(ce, "CHAPTERS_DIR", chapters)
+    monkeypatch.setattr(ce, "OUT", tmp_path / "out")
+    monkeypatch.setattr(ce, "ROOT", tmp_path)
+    return path
+
+
+def docs(where: Path) -> dict[str, dict]:
+    return {p.stem: json.loads(p.read_text(encoding="utf-8"))
+            for p in (where / "docs" / "blocks").glob("*.json")}
+
+
+def page_round(where: Path, read: Path, marks: dict[str, dict]) -> None:
+    """Save the documents the way ArtifactData's list does, with marks."""
+    meta = json.loads((where / "docs/meta/chapter.json").read_text("utf-8"))
+    meta["status"] = "submitted"
+    (read / "meta").mkdir(parents=True)
+    (read / "blocks").mkdir()
+    (read / "meta/chapter.json").write_text(json.dumps({"data": meta}))
+    state = json.loads((where / "state.json").read_text("utf-8"))
+    for bid, rec in state["blocks"].items():
+        doc = {"source": rec["source"], "marks": [], "edit": None,
+               **marks.get(bid, {})}
+        (read / "blocks" / f"{bid}.json").write_text(
+            json.dumps({"id": bid, "data": doc}))
+
+
+def test_parse_keeps_fences_and_headings_whole() -> None:
+    kinds = [b.kind for b in ce.parse(CHAPTER)]
+    assert kinds == ["heading", "prose", "heading", "prose", "code",
+                     "list", "prose"]
+
+
+def test_first_load_writes_every_block_and_meta_last(chapter: Path) -> None:
+    assert ce.load("99", force=False) == 0
+    where = ce.OUT / "99"
+    batch = json.loads((where / "batch1.json").read_text("utf-8"))
+    assert len(batch) == 8
+    assert batch[-1]["collection"] == "meta"
+
+
+def find(where: Path, text: str) -> str:
+    return next(k for k, d in docs(where).items() if text in d["source"])
+
+
+def test_a_round_applies_edits_and_cuts(chapter: Path, tmp_path: Path
+                                        ) -> None:
+    ce.load("99", force=False)
+    where = ce.OUT / "99"
+    cut_id = find(where, "Cut this")
+    edit_id = find(where, "Last paragraph")
+    source = docs(where)[cut_id]["source"]
+    quote = "Cut this sentence."
+    s = source.index(quote)
+    page_round(where, tmp_path / "read", {
+        cut_id: {"marks": [
+            {"kind": "delete", "start": s, "end": s + len(quote),
+             "quote": quote},
+            {"kind": "rewrite", "start": 0, "end": 1, "quote": "A",
+             "note": "clearer"}]},
+        edit_id: {"edit": "The final paragraph."}})
+    assert ce.apply("99", tmp_path / "read", force=False) == 0
+    text = chapter.read_text(encoding="utf-8")
+    assert "A `code span` stays whole.\nThe rest stays." in text
+    assert "The final paragraph.\n" in text
+    report = json.loads((where / "round-1.json").read_text("utf-8"))
+    assert [r["note"] for r in report["rewrites"]] == ["clearer"]
+    # The reload keeps ids, records the old text, and clears the marks.
+    ce.load("99", force=False)
+    after = docs(where)
+    assert set(after) == {cut_id, edit_id}
+    assert after[edit_id]["previous"] == "Last paragraph."
+    assert after[edit_id]["changed"] == 2
+
+
+def test_a_cut_that_empties_a_block_removes_it(chapter: Path,
+                                               tmp_path: Path) -> None:
+    ce.load("99", force=False)
+    where = ce.OUT / "99"
+    bid = find(where, "Last paragraph")
+    page_round(where, tmp_path / "read", {bid: {"marks": [
+        {"kind": "delete", "start": 0, "end": 15,
+         "quote": "Last paragraph."}]}})
+    ce.apply("99", tmp_path / "read", force=False)
+    assert chapter.read_text("utf-8").endswith("- another\n")
+    ce.load("99", force=False)
+    batch = json.loads((where / "batch1.json").read_text("utf-8"))
+    assert {"op": "delete", "collection": "blocks",
+            "doc_id": bid} in batch
+
+
+def test_a_block_changed_in_the_file_is_a_conflict(chapter: Path,
+                                                   tmp_path: Path) -> None:
+    ce.load("99", force=False)
+    where = ce.OUT / "99"
+    bid = find(where, "Last paragraph")
+    page_round(where, tmp_path / "read", {bid: {"edit": "Mine."}})
+    chapter.write_text(CHAPTER.replace("Last paragraph.", "Zed's."),
+                       encoding="utf-8")
+    ce.apply("99", tmp_path / "read", force=False)
+    assert "Zed's." in chapter.read_text("utf-8")
+    report = json.loads((where / "round-1.json").read_text("utf-8"))
+    assert report["conflicts"][0]["edit"] == "Mine."
+
+
+def test_join_closes_gaps() -> None:
+    assert ce.cut("One two, three.", [(3, 7)]) == ("One, three.", [3])
+    assert ce.cut("Keep (drop) this.", [(6, 10)]) == ("Keep () this.", [6])

@@ -120,6 +120,11 @@ hook in `.claude/settings.json` prints the open passes into every new
 session's context, so a request that names no file ("fix that sentence
 about closures") is looked up in the chapter in progress first, and
 its Solutions file second, before asking which chapter he means.
+A pass can also run on the chapter editor page, where he marks
+text to rewrite or delete and edits paragraphs in place; "apply"
+from him means run a round of the `chapter-editor` skill
+(`.claude/skills/chapter-editor/SKILL.md`, pages listed in
+`tools/data/chapter_editor.json`).
 
 ## Learning from Bruce's own edits
 

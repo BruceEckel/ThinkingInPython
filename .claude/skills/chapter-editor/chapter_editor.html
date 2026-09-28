@@ -1,0 +1,847 @@
+<title>Chapter Editor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap">
+<style>
+:root {
+  --bg: #f3f5f7;
+  --page: #ffffff;
+  --ink: #1b2430;
+  --muted: #5d6b7a;
+  --faint: #8a96a3;
+  --rule: #d9dfe6;
+  --accent: #2f5d8a;
+  --accent-soft: #e3ecf5;
+  --code-bg: #eef1f4;
+  --rw: #8a6a12;
+  --rw-soft: #fff1b8;
+  --del: #b0413e;
+  --del-soft: #f7e3e2;
+  --ed: #1f7a5a;
+  --ed-soft: #dff1e9;
+  --chg: #2f5d8a;
+  --chg-soft: #e8f0f8;
+  --serif: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12171d; --page: #1a2129; --ink: #e4e9ef; --muted: #93a1b0; --faint: #6c7a88;
+    --rule: #2b3541; --accent: #8fb7e0; --accent-soft: #1f2d3c; --code-bg: #232c36;
+    --rw: #e8c766; --rw-soft: #4a4220; --del: #eb8c89; --del-soft: #3a1f1f;
+    --ed: #6cc9a4; --ed-soft: #173229; --chg: #8fb7e0; --chg-soft: #1c2735;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #12171d; --page: #1a2129; --ink: #e4e9ef; --muted: #93a1b0; --faint: #6c7a88;
+  --rule: #2b3541; --accent: #8fb7e0; --accent-soft: #1f2d3c; --code-bg: #232c36;
+  --rw: #e8c766; --rw-soft: #4a4220; --del: #eb8c89; --del-soft: #3a1f1f;
+  --ed: #6cc9a4; --ed-soft: #173229; --chg: #8fb7e0; --chg-soft: #1c2735;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink); font-family: var(--sans);
+  font-size: 15px; line-height: 1.5; padding-inline: 16px; padding-block: 0 96px;
+}
+.wrap { max-width: 860px; margin: 0 auto; display: grid; gap: 16px; }
+.intro { padding-block: 20px 0; display: grid; gap: 8px; }
+.eyebrow { font-family: var(--mono); font-size: .78rem; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+h1 { font-family: var(--serif); font-weight: 600; font-size: 1.9rem; margin: 0; text-wrap: balance; }
+.lede { margin: 0; color: var(--muted); max-width: 72ch; }
+kbd { font-family: var(--mono); font-size: .8em; border: 1px solid var(--rule); border-bottom-width: 2px; border-radius: 4px; padding: 0 5px; background: var(--page); color: var(--ink); }
+header.bar {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 3;
+  background: var(--bg); padding-block: 10px; border-bottom: 1px solid var(--rule);
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; font-size: .9rem;
+}
+.counts { display: flex; gap: 6px; flex-wrap: wrap; font-variant-numeric: tabular-nums; }
+.pill { font-size: .75rem; letter-spacing: .03em; padding: 2px 9px; border-radius: 999px; border: 1px solid var(--rule); color: var(--muted); background: var(--page); white-space: nowrap; }
+.pill.rw { background: var(--rw-soft); color: var(--rw); border-color: transparent; }
+.pill.del { background: var(--del-soft); color: var(--del); border-color: transparent; }
+.pill.ed { background: var(--ed-soft); color: var(--ed); border-color: transparent; }
+.pill.chg { background: var(--chg-soft); color: var(--chg); border-color: transparent; }
+.filters { display: flex; gap: 12px; flex-wrap: wrap; color: var(--muted); }
+.filters label { display: flex; align-items: center; gap: 6px; cursor: pointer; }
+.spacer { flex: 1; }
+button {
+  font: inherit; font-size: .88rem; border-radius: 6px; padding: 5px 12px; cursor: pointer;
+  border: 1px solid var(--rule); background: var(--page); color: var(--ink);
+}
+button:hover:not(:disabled) { border-color: var(--accent); }
+button:focus-visible, textarea:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+button:disabled { opacity: .5; cursor: default; }
+button.primary { background: var(--accent); border-color: var(--accent); color: var(--page); font-weight: 600; }
+button.quiet { border-color: transparent; background: transparent; color: var(--muted); padding: 3px 8px; }
+button.quiet:hover:not(:disabled) { color: var(--ink); border-color: var(--rule); }
+.status { font-size: .82rem; color: var(--muted); width: 100%; min-height: 1.2em; }
+.banner { background: var(--accent-soft); border-radius: 8px; padding: 12px 16px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.banner p { margin: 0; flex: 1; min-width: 16ch; }
+.confirm { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; width: 100%; }
+
+main#doc { background: var(--page); border: 1px solid var(--rule); border-radius: 8px; padding-block: 24px 40px; }
+.blk { display: grid; grid-template-columns: 3.4em minmax(0, 1fr); gap: 0 12px; padding: 4px 24px 4px 8px; position: relative; border-left: 3px solid transparent; }
+.blk.changed { border-left-color: var(--chg); background: var(--chg-soft); }
+.blk.edited { border-left-color: var(--ed); }
+.ln { font-family: var(--mono); font-size: .72rem; color: var(--faint); text-align: right; padding-top: .45em; font-variant-numeric: tabular-nums; user-select: none; }
+.body { display: grid; gap: 6px; min-width: 0; }
+.content { font-family: var(--serif); font-size: 1.08rem; line-height: 1.7; max-width: 68ch; margin: 0; }
+.content.pre { white-space: pre-wrap; }
+.blk[data-kind="heading"] .content { font-weight: 600; line-height: 1.3; padding-top: .8em; text-wrap: balance; }
+.blk[data-kind="heading"] .content.h1 { font-size: 1.7rem; }
+.blk[data-kind="heading"] .content.h2 { font-size: 1.4rem; }
+.blk[data-kind="heading"] .content.h3 { font-size: 1.18rem; }
+.blk[data-kind="quote"] .content { font-style: italic; color: var(--muted); }
+.blk[data-kind="table"] .content, .blk[data-kind="html"] .content { font-family: var(--mono); font-size: .85rem; }
+.codebox { overflow-x: auto; background: var(--code-bg); border-radius: 6px; max-width: 100%; }
+.codebox pre { margin: 0; padding: 10px 14px; font-family: var(--mono); font-size: .82rem; line-height: 1.5; }
+.content code { font-family: var(--mono); font-size: .86em; background: var(--code-bg); padding: 1px 4px; border-radius: 3px; }
+.content .lnk { color: var(--accent); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 2px; }
+.content .fn { font-size: .88em; color: var(--muted); }
+.content .fn::before { content: "[note: "; } .content .fn::after { content: "]"; }
+.content sup { color: var(--accent); }
+.content .fig { font-family: var(--sans); font-size: .9rem; color: var(--muted); }
+.content .fig::before { content: "Figure: "; font-weight: 600; }
+mark { color: inherit; border-radius: 2px; }
+mark.m-rewrite { background: var(--rw-soft); box-shadow: inset 0 -2px 0 var(--rw); }
+mark.m-delete { background: var(--del-soft); color: var(--del); text-decoration: line-through; text-decoration-thickness: 2px; }
+mark.flash { outline: 2px solid var(--accent); }
+.tools { position: absolute; top: 2px; right: 6px; display: flex; gap: 4px; opacity: 0; transition: opacity .12s; }
+.blk:hover .tools, .blk:focus-within .tools { opacity: 1; }
+@media (hover: none) { .tools { position: static; opacity: 1; justify-content: flex-end; } }
+.tools button { font-size: .75rem; padding: 2px 8px; background: var(--page); }
+.marks { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; max-width: 68ch; }
+.marks li { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 4px 8px; align-items: start; font-size: .88rem; padding: 6px 8px; border-radius: 6px; background: var(--bg); }
+.marks .q { font-family: var(--serif); color: var(--muted); overflow-wrap: anywhere; }
+.marks input { grid-column: 2 / 4; font: inherit; font-size: .88rem; color: var(--ink); background: var(--page); border: 1px solid var(--rule); border-radius: 5px; padding: 4px 8px; width: 100%; }
+.marks li.flash { outline: 2px solid var(--accent); }
+.editbox { display: grid; gap: 6px; max-width: 72ch; }
+.editbox textarea { width: 100%; resize: none; overflow: hidden; font-family: var(--mono); font-size: .88rem; line-height: 1.55; color: var(--ink); background: var(--bg); border: 1px solid var(--ed); border-radius: 6px; padding: 8px 10px; }
+.editbox .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; font-size: .8rem; color: var(--muted); }
+.prev { font-family: var(--serif); font-size: .98rem; line-height: 1.6; max-width: 68ch; padding: 8px 12px; border-radius: 6px; background: var(--page); border: 1px dashed var(--rule); white-space: pre-wrap; }
+.prev del { background: var(--del-soft); color: var(--del); text-decoration: line-through; }
+.prev ins { background: var(--ed-soft); color: var(--ed); text-decoration: none; }
+.prev .cap { display: block; font-family: var(--sans); font-size: .72rem; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+.gap { font-family: var(--sans); font-size: .82rem; color: var(--faint); font-style: italic; padding: 2px 24px 2px 4.6em; }
+#pop { position: absolute; z-index: 5; display: flex; gap: 4px; padding: 4px; background: var(--ink); border-radius: 8px; box-shadow: 0 4px 16px rgb(0 0 0 / .25); }
+#pop button { background: transparent; border-color: transparent; color: var(--page); font-size: .82rem; padding: 4px 10px; }
+#pop button:hover { border-color: var(--faint); }
+#pop kbd { background: transparent; color: inherit; border-color: var(--faint); }
+.empty { color: var(--muted); font-style: italic; padding: 8px 24px; }
+@media (max-width: 560px) {
+  .blk { grid-template-columns: minmax(0, 1fr); padding-inline: 10px; }
+  .ln { display: none; }
+  .gap { padding-inline: 10px; }
+}
+@media (prefers-reduced-motion: reduce) { .tools { transition: none; } }
+</style>
+
+<div class="wrap">
+  <section class="intro">
+    <div class="eyebrow" id="eyebrow">Chapter editor</div>
+    <h1 id="title">Loading the chapter…</h1>
+    <p class="lede">Select text to mark it, then press <kbd>R</kbd> to ask Claude to rewrite it (the note box takes what's wrong, if you want to say), <kbd>D</kbd> to delete it, or <kbd>E</kbd> to edit that paragraph's Markdown yourself. A selection can run across paragraphs. Marks save as you make them. When you've been through the chapter, click <strong>Send round</strong> and type <kbd>apply</kbd> in the Claude Code terminal. The page then reloads with the new text, and each paragraph that changed is outlined in blue, with its previous version one click away.</p>
+  </section>
+  <header class="bar">
+    <div class="counts" id="counts"></div>
+    <div class="filters">
+      <label><input type="checkbox" id="f-changed"> Changed last round</label>
+      <label><input type="checkbox" id="f-marked"> Marked</label>
+    </div>
+    <button class="quiet" id="next-change" title="Scroll to the next changed paragraph">Next change ↓</button>
+    <span class="spacer"></span>
+    <button class="primary" id="send" disabled>Send round</button>
+    <div class="confirm" id="confirm" hidden></div>
+    <div class="status" id="status" role="status">Connecting…</div>
+  </header>
+  <div class="banner" id="banner" hidden></div>
+  <main id="doc"></main>
+</div>
+<div id="pop" hidden>
+  <button data-act="rewrite">Rewrite <kbd>R</kbd></button>
+  <button data-act="delete">Delete <kbd>D</kbd></button>
+  <button data-act="edit">Edit <kbd>E</kbd></button>
+</div>
+
+<script>
+const $ = (s) => document.querySelector(s);
+const state = {
+  db: null, meta: null, blocks: new Map(), readOnly: false,
+  onlyChanged: false, onlyMarked: false, editing: new Set(), showPrev: new Set(),
+  confirming: false,
+};
+const chains = new Map(), noteTimers = new Map(), els = new Map();
+let noted = 0;  // When a message last went to the status line.
+function say(msg) { noted = Date.now(); $("#status").textContent = msg; }
+try {
+  state.onlyChanged = localStorage.getItem("ce-only-changed") === "1";
+  state.onlyMarked = localStorage.getItem("ce-only-marked") === "1";
+} catch (e) {}
+$("#f-changed").checked = state.onlyChanged;
+$("#f-marked").checked = state.onlyMarked;
+
+function esc(t) {
+  return String(t).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+}
+const locked = () => state.readOnly || !state.meta || state.meta.status !== "open";
+const base = (b) => (b.edit ?? b.source);
+const marksOf = (b) => Array.isArray(b.marks) ? b.marks : [];
+
+// ---- Inline Markdown, with every visible character tied to its source offset.
+// A text run is <span data-o="offset">; a construct (code span, link, emphasis,
+// footnote, figure) is an element carrying its whole source range in
+// data-a/data-b and its visible content's range in data-cs/data-ce, so a
+// selection that reaches a construct's edge can take in its markup too.
+
+function runs(s, from, to, marks) {
+  // Split [from, to) at mark edges and wrap each covered piece.
+  const cuts = new Set([from, to]);
+  for (const m of marks) for (const x of [m.start, m.end]) if (x > from && x < to) cuts.add(x);
+  const pts = [...cuts].sort((a, b) => a - b);
+  let out = "";
+  for (let i = 0; i < pts.length - 1; i++) {
+    const a = pts[i], b = pts[i + 1];
+    const text = `<span data-o="${a}">${esc(s.slice(a, b))}</span>`;
+    const hit = marks.filter((m) => m.start <= a && m.end >= b);
+    if (!hit.length) { out += text; continue; }
+    const top = hit.find((m) => m.kind === "delete") || hit[0];
+    out += `<mark class="m-${top.kind}" data-mid="${esc(top.id)}">${text}</mark>`;
+  }
+  return out;
+}
+
+function closeBracket(s, i, to) {
+  // s[i] is "["; the index of its matching "]" before `to`, or -1.
+  let depth = 0;
+  for (let k = i; k < to; k++) {
+    if (s[k] === "`") { const e = s.indexOf("`", k + 1); if (e < 0 || e >= to) return -1; k = e; continue; }
+    if (s[k] === "[") depth++;
+    else if (s[k] === "]" && --depth === 0) return k;
+  }
+  return -1;
+}
+
+function wrap(tag, cls, a, b, cs, ce, inner) {
+  return `<${tag}${cls ? ` class="${cls}"` : ""} data-a="${a}" data-b="${b}" data-cs="${cs}" data-ce="${ce}">${inner}</${tag}>`;
+}
+
+function inline(s, from, to, marks) {
+  let out = "", i = from, text = from;
+  const flush = (k) => { if (k > text) out += runs(s, text, k, marks); };
+  while (i < to) {
+    const c = s[i];
+    let done = false;
+    if (c === "`") {
+      let n = 1; while (s[i + n] === "`") n++;
+      const tick = "`".repeat(n);
+      const e = s.indexOf(tick, i + n);
+      if (e > 0 && e + n <= to) {
+        flush(i);
+        out += wrap("code", "", i, e + n, i + n, e, runs(s, i + n, e, marks));
+        i = text = e + n; done = true;
+      }
+    } else if (c === "^" && s[i + 1] === "[") {
+      const e = closeBracket(s, i + 1, to);
+      if (e > 0) {
+        flush(i);
+        out += wrap("span", "fn", i, e + 1, i + 2, e, inline(s, i + 2, e, marks));
+        i = text = e + 1; done = true;
+      }
+    } else if (c === "[" && s[i + 1] === "^") {
+      const e = s.indexOf("]", i);
+      if (e > 0 && e < to) {
+        flush(i);
+        out += wrap("sup", "", i, e + 1, i + 2, e, runs(s, i + 2, e, marks));
+        i = text = e + 1; done = true;
+      }
+    } else if (c === "[" || (c === "!" && s[i + 1] === "[")) {
+      const open = c === "!" ? i + 1 : i;
+      const e = closeBracket(s, open, to);
+      if (e > 0 && s[e + 1] === "(") {
+        const close = s.indexOf(")", e + 2);
+        if (close > 0 && close < to) {
+          flush(i);
+          const cls = c === "!" ? "fig" : "lnk";
+          out += wrap("span", cls, i, close + 1, open + 1, e, inline(s, open + 1, e, marks));
+          i = text = close + 1; done = true;
+        }
+      }
+    } else if (c === "*" && s[i + 1] === "*") {
+      const e = s.indexOf("**", i + 2);
+      if (e > i + 2 && e + 2 <= to) {
+        flush(i);
+        out += wrap("strong", "", i, e + 2, i + 2, e, inline(s, i + 2, e, marks));
+        i = text = e + 2; done = true;
+      }
+    } else if (c === "*" && s[i + 1] && s[i + 1] !== " ") {
+      const e = s.indexOf("*", i + 1);
+      if (e > i + 1 && e < to && s[e - 1] !== " ") {
+        flush(i);
+        out += wrap("em", "", i, e + 1, i + 1, e, inline(s, i + 1, e, marks));
+        i = text = e + 1; done = true;
+      }
+    }
+    if (!done) i++;
+  }
+  flush(to);
+  return out;
+}
+
+function contentHtml(b) {
+  const s = base(b), marks = marksOf(b);
+  if (b.kind === "code") {
+    return `<div class="codebox"><pre class="content-code">${runs(s, 0, s.length, marks)}</pre></div>`;
+  }
+  if (b.kind === "heading") {
+    const m = s.match(/^(#{1,6})\s+/);
+    const lead = m ? m[0].length : 0;
+    const anchor = s.match(/\s*\{#[^}]*\}\s*$/);
+    const end = anchor ? anchor.index : s.length;
+    const level = m ? m[1].length : 2;
+    return `<div class="content h${level}">${inline(s, lead, end, marks)}</div>`;
+  }
+  const pre = ["list", "table", "html", "quote"].includes(b.kind);
+  return `<div class="content${pre ? " pre" : ""}">${inline(s, 0, s.length, marks)}</div>`;
+}
+
+// ---- Word diff for "Show previous".
+function diffHtml(before, after) {
+  const a = before.split(/(\s+)/), b = after.split(/(\s+)/);
+  const n = a.length, m = b.length;
+  const L = Array.from({ length: n + 1 }, () => new Uint16Array(m + 1));
+  for (let i = n - 1; i >= 0; i--)
+    for (let j = m - 1; j >= 0; j--)
+      L[i][j] = a[i] === b[j] ? L[i + 1][j + 1] + 1 : Math.max(L[i + 1][j], L[i][j + 1]);
+  const out = [];
+  let i = 0, j = 0;
+  const push = (kind, text) => {
+    const last = out[out.length - 1];
+    if (last && last.kind === kind) last.text += text; else out.push({ kind, text });
+  };
+  while (i < n && j < m) {
+    if (a[i] === b[j]) { push("same", a[i]); i++; j++; }
+    else if (L[i + 1][j] >= L[i][j + 1]) push("del", a[i++]);
+    else push("ins", b[j++]);
+  }
+  while (i < n) push("del", a[i++]);
+  while (j < m) push("ins", b[j++]);
+  return out.map((p) => p.kind === "same" ? esc(p.text) : `<${p.kind}>${esc(p.text)}</${p.kind}>`).join("");
+}
+
+// ---- Blocks: built once, updated in place.
+function lastRound(b) { return state.meta && state.meta.round > 1 && b.changed === state.meta.round - 1; }
+
+function buildBlock(id) {
+  const el = document.createElement("section");
+  el.className = "blk";
+  el.dataset.key = id;
+  el.innerHTML = `<div class="ln"></div><div class="body"><div class="view"></div><div class="prevbox"></div><ul class="marks"></ul></div><div class="tools"></div>`;
+  els.set(id, el);
+  return el;
+}
+
+function updateBlock(el, id, idx) {
+  const b = state.blocks.get(id);
+  if (!b) return;
+  const lk = locked();
+  el.dataset.kind = b.kind;
+  el.classList.toggle("changed", lastRound(b));
+  el.classList.toggle("edited", b.edit != null);
+  el.querySelector(".ln").textContent = state.meta.lines?.[idx] ?? "";
+  const view = el.querySelector(".view");
+  const editing = state.editing.has(id) && !lk;
+  const sig = JSON.stringify([b.kind, b.source, b.edit, b.marks, editing]);
+  if (view.dataset.sig !== sig) {
+    view.dataset.sig = sig;
+    if (editing) {
+      view.innerHTML = `<div class="editbox"><textarea id="e-${esc(id)}" spellcheck="true"></textarea>
+        <div class="row"><button class="primary" data-act="save">Save edit</button><button data-act="cancel">Cancel</button>
+        ${b.edit != null ? `<button data-act="revert">Discard my edit</button>` : ""}
+        <span><kbd>Ctrl</kbd>+<kbd>Enter</kbd> saves, <kbd>Esc</kbd> cancels. This is the paragraph's Markdown; it goes into the chapter as you leave it.</span></div></div>`;
+      const t = view.querySelector("textarea");
+      t.value = base(b);
+      requestAnimationFrame(() => { autosize(t); t.focus(); });
+    } else {
+      view.innerHTML = contentHtml(b);
+    }
+  }
+  // Previous version of a paragraph changed in the last round.
+  const prevbox = el.querySelector(".prevbox");
+  const showPrev = state.showPrev.has(id) && lastRound(b);
+  const psig = showPrev ? JSON.stringify([b.previous, b.source]) : "";
+  if (prevbox.dataset.sig !== psig) {
+    prevbox.dataset.sig = psig;
+    prevbox.innerHTML = !showPrev ? "" : b.previous == null
+      ? `<div class="prev"><span class="cap">New in round ${state.meta.round - 1}</span>This paragraph did not exist before.</div>`
+      : `<div class="prev"><span class="cap">What changed in round ${state.meta.round - 1}</span>${diffHtml(b.previous, b.source)}</div>`;
+  }
+  // Tools.
+  const tools = [];
+  if (b.edit != null) tools.push(`<span class="pill ed">edited</span>`);
+  if (lastRound(b)) tools.push(`<button data-act="prev">${state.showPrev.has(id) ? "Hide previous" : "Show previous"}</button>`);
+  if (!lk && b.kind !== "code" && !editing) tools.push(`<button data-act="edit">Edit</button>`);
+  if (!lk && b.kind !== "code") tools.push(`<button data-act="delblock" title="Mark the whole paragraph for deletion">Delete</button>`);
+  const tsig = tools.join("");
+  const tbox = el.querySelector(".tools");
+  if (tbox.dataset.sig !== tsig) { tbox.dataset.sig = tsig; tbox.innerHTML = tsig; }
+  // Marks list, keyed so a note being typed keeps its box.
+  const ul = el.querySelector(".marks");
+  const marks = marksOf(b);
+  const msig = JSON.stringify(marks.map((m) => [m.id, m.kind, m.quote])) + lk;
+  if (ul.dataset.sig !== msig) {
+    ul.dataset.sig = msig;
+    ul.innerHTML = marks.map((m) => `<li data-mid="${esc(m.id)}">
+      <span class="pill ${m.kind === "delete" ? "del" : "rw"}">${m.kind === "delete" ? "Delete" : "Rewrite"}</span>
+      <span class="q">“${esc(m.quote.length > 220 ? m.quote.slice(0, 220) + "…" : m.quote)}”</span>
+      <button class="quiet" data-act="unmark" title="Remove this mark" ${lk ? "disabled" : ""}>Remove</button>
+      ${m.kind === "rewrite" ? `<input id="n-${esc(m.id)}" placeholder="What's wrong (optional)" ${lk ? "disabled" : ""}>` : ""}
+    </li>`).join("");
+  }
+  for (const m of marks) {
+    const inp = ul.querySelector(`input[id="n-${CSS.escape(m.id)}"]`);
+    if (inp && document.activeElement !== inp && inp.value !== (m.note || "")) inp.value = m.note || "";
+  }
+}
+
+function autosize(t) { t.style.height = "auto"; t.style.height = t.scrollHeight + 2 + "px"; }
+
+function visibleIds() {
+  const order = state.meta?.order || [];
+  return order.filter((id) => {
+    const b = state.blocks.get(id);
+    if (!b) return false;
+    if (state.editing.has(id)) return true;
+    if (state.onlyChanged && !lastRound(b)) return false;
+    if (state.onlyMarked && !(marksOf(b).length || b.edit != null)) return false;
+    return true;
+  });
+}
+
+function render() {
+  const main = $("#doc");
+  if (!state.meta) return;
+  // Anchor on the first block showing below the sticky bar.
+  const top = $("header.bar").getBoundingClientRect().bottom;
+  let anchor = null, anchorTop = 0;
+  for (const el of main.querySelectorAll(".blk")) {
+    const r = el.getBoundingClientRect();
+    if (r.bottom > top + 1) { anchor = el.dataset.key; anchorTop = r.top; break; }
+  }
+  const order = state.meta.order;
+  const ids = visibleIds();
+  const keep = new Set(ids);
+  if (anchor && !keep.has(anchor)) anchor = order.slice(order.indexOf(anchor) + 1).find((k) => keep.has(k)) || null;
+  const filtered = state.onlyChanged || state.onlyMarked;
+  // Reconcile in place: a block moved out of the document loses the focus
+  // of a note box being typed in, and every save brings a snapshot.
+  const wanted = [];
+  let lastIdx = -1;
+  for (const id of ids) {
+    const idx = order.indexOf(id);
+    if (filtered && idx > lastIdx + 1) {
+      const n = idx - lastIdx - 1, key = `gap:${idx}`;
+      let g = els.get(key);
+      if (!g) { g = document.createElement("div"); g.className = "gap"; g.dataset.key = key; els.set(key, g); }
+      g.textContent = `${n} paragraph${n === 1 ? "" : "s"} hidden`;
+      wanted.push(g);
+    }
+    const el = els.get(id) || buildBlock(id);
+    wanted.push(el);
+    lastIdx = idx;
+  }
+  const tail = order.length - 1 - lastIdx;
+  if (filtered && ids.length && tail > 0) {
+    let g = els.get("gap:end");
+    if (!g) { g = document.createElement("div"); g.className = "gap"; g.dataset.key = "gap:end"; els.set("gap:end", g); }
+    g.textContent = `${tail} paragraph${tail === 1 ? "" : "s"} hidden`;
+    wanted.push(g);
+  }
+  if (!ids.length) {
+    let p = els.get("empty");
+    if (!p) { p = document.createElement("p"); p.className = "empty"; els.set("empty", p); }
+    p.textContent = filtered ? "No paragraph matches the filters." : "No paragraphs are loaded yet.";
+    wanted.push(p);
+  }
+  const keepEls = new Set(wanted);
+  for (const el of [...main.children]) if (!keepEls.has(el)) el.remove();
+  let prevEl = null;
+  for (const el of wanted) {
+    const at = prevEl ? prevEl.nextElementSibling : main.firstElementChild;
+    if (el !== at) main.insertBefore(el, at);
+    prevEl = el;
+  }
+  for (const id of ids) updateBlock(els.get(id), id, order.indexOf(id));
+  const a = anchor && els.get(anchor);
+  if (a && a.isConnected) {
+    const shift = a.getBoundingClientRect().top - anchorTop;
+    if (Math.abs(shift) > 0.5) window.scrollBy(0, shift);
+  }
+  renderBar();
+}
+
+function tally() {
+  let rw = 0, del = 0, ed = 0, chg = 0;
+  for (const b of state.blocks.values()) {
+    for (const m of marksOf(b)) m.kind === "delete" ? del++ : rw++;
+    if (b.edit != null) ed++;
+    if (lastRound(b)) chg++;
+  }
+  return { rw, del, ed, chg };
+}
+
+function renderBar() {
+  const m = state.meta;
+  $("#title").textContent = m.title || "Untitled chapter";
+  $("#eyebrow").textContent = `Chapter ${m.chapter} · round ${m.round} · ${m.file}`;
+  const t = tally();
+  $("#counts").innerHTML = [
+    `<span class="pill rw">${t.rw} rewrite${t.rw === 1 ? "" : "s"}</span>`,
+    `<span class="pill del">${t.del} deletion${t.del === 1 ? "" : "s"}</span>`,
+    `<span class="pill ed">${t.ed} edit${t.ed === 1 ? "" : "s"}</span>`,
+    m.round > 1 ? `<span class="pill chg">${t.chg} changed last round</span>` : "",
+  ].join("");
+  const total = t.rw + t.del + t.ed;
+  $("#send").disabled = locked() || !total;
+  $("#send").hidden = m.status !== "open";
+  $("#next-change").hidden = !t.chg;
+  const conf = $("#confirm");
+  conf.hidden = !state.confirming || m.status !== "open";
+  if (!conf.hidden) {
+    conf.innerHTML = `<span>Send round ${m.round} (${total} change${total === 1 ? "" : "s"}) to Claude? Marking pauses until the new text loads.</span>
+      <button class="primary" data-act="send-yes">Send</button><button data-act="send-no">Not yet</button>`;
+  }
+  const banner = $("#banner");
+  if (m.status === "submitted") {
+    banner.hidden = false;
+    banner.innerHTML = `<p><strong>Round ${m.round} is sent.</strong> Type <kbd>apply</kbd> in the Claude Code terminal. This page reloads with the new text when Claude has applied it.</p><button data-act="unsend">Take it back</button>`;
+  } else if (m.status === "applying") {
+    banner.hidden = false;
+    banner.innerHTML = `<p><strong>Claude is applying round ${m.round}.</strong> The page reloads with the new text when it's done.</p>`;
+  } else banner.hidden = true;
+}
+
+// ---- Writes.
+function write(path, fields) {
+  const next = (chains.get(path) || Promise.resolve())
+    .then(() => state.db.doc(path).update(fields))
+    .then(() => { if (Date.now() - noted > 4000) $("#status").textContent = "Saved."; })
+    .catch((e) => {
+      if (e && (e.code === "invalid_argument" || e.code === "revoked")) {
+        state.readOnly = true; render();
+        $("#status").textContent = "You can read this chapter here but not mark it.";
+      } else {
+        $("#status").textContent = "A change didn't save. Try again in a moment.";
+      }
+    });
+  chains.set(path, next);
+  return next;
+}
+
+function setMarks(id, marks, extra = {}) {
+  const b = state.blocks.get(id);
+  b.marks = marks;
+  Object.assign(b, extra);
+  write(`blocks/${id}`, { marks, ...extra });
+}
+
+const newId = () => Math.random().toString(36).slice(2, 10);
+
+// ---- Selection to source offsets.
+function textPoint(node, offset, atStart) {
+  if (node.nodeType === 3) return [node, offset];
+  const kids = node.childNodes;
+  const walker = (n, first) => {
+    const tw = document.createTreeWalker(n, NodeFilter.SHOW_TEXT);
+    let t = tw.nextNode(), last = null;
+    if (first) return t;
+    while (t) { last = t; t = tw.nextNode(); }
+    return last;
+  };
+  if (atStart) {
+    for (let k = offset; k < kids.length; k++) { const t = walker(kids[k], true); if (t) return [t, 0]; }
+  } else {
+    for (let k = offset - 1; k >= 0; k--) { const t = walker(kids[k], false); if (t) return [t, t.length]; }
+  }
+  return null;
+}
+
+function srcOffset(node, offset, atStart) {
+  const p = textPoint(node, offset, atStart);
+  if (!p) return null;
+  const [t, off] = p;
+  const span = t.parentElement?.closest("[data-o]");
+  if (!span) return null;
+  let pos = +span.dataset.o + off;
+  const root = span.closest(".view");
+  // Take in a construct's markup when the selection reaches its edge; a
+  // code span is always taken whole.
+  for (let el = span.parentElement; el && el !== root; el = el.parentElement) {
+    if (!el.dataset.a) continue;
+    if (el.tagName === "CODE") pos = atStart ? +el.dataset.a : +el.dataset.b;
+    else if (atStart && pos <= +el.dataset.cs) pos = +el.dataset.a;
+    else if (!atStart && pos >= +el.dataset.ce) pos = +el.dataset.b;
+  }
+  return pos;
+}
+
+function blockOf(node) {
+  const el = (node.nodeType === 3 ? node.parentElement : node)?.closest?.(".blk");
+  return el && el.closest("#doc") ? el : null;
+}
+
+// The marks a selection makes: one per block it touches.
+function selectionSpans() {
+  const sel = window.getSelection();
+  if (!sel || sel.isCollapsed || !sel.rangeCount) return null;
+  const r = sel.getRangeAt(0);
+  const first = blockOf(r.startContainer), last = blockOf(r.endContainer);
+  if (!first || !last) return null;
+  if (first.querySelector(".view textarea") || last.querySelector(".view textarea")) return null;
+  const ids = [...$("#doc").querySelectorAll(".blk")].map((e) => e.dataset.key);
+  const i0 = ids.indexOf(first.dataset.key), i1 = ids.indexOf(last.dataset.key);
+  const spans = [];
+  for (let i = i0; i <= i1; i++) {
+    const id = ids[i], b = state.blocks.get(id), s = base(b);
+    let start = i === i0 ? srcOffset(r.startContainer, r.startOffset, true) : 0;
+    let end = i === i1 ? srcOffset(r.endContainer, r.endOffset, false) : s.length;
+    if (start == null) start = 0;
+    if (end == null) end = s.length;
+    // Leave the whitespace at a selection's edges out of the mark.
+    while (start < end && /\s/.test(s[start])) start++;
+    while (end > start && /\s/.test(s[end - 1])) end--;
+    if (end > start) spans.push({ id, start, end });
+  }
+  return spans.length ? spans : null;
+}
+
+function showPop() {
+  const pop = $("#pop");
+  if (locked()) { pop.hidden = true; return; }
+  const spans = selectionSpans();
+  if (!spans) { pop.hidden = true; return; }
+  const allCode = spans.every((sp) => state.blocks.get(sp.id).kind === "code");
+  pop.querySelector('[data-act="delete"]').hidden = allCode;
+  pop.querySelector('[data-act="edit"]').hidden = spans.length !== 1 || allCode;
+  const rect = window.getSelection().getRangeAt(0).getBoundingClientRect();
+  pop.hidden = false;
+  const w = pop.offsetWidth;
+  pop.style.top = `${rect.bottom + window.scrollY + 8}px`;
+  pop.style.left = `${Math.max(8, Math.min(rect.left + window.scrollX, window.scrollX + document.documentElement.clientWidth - w - 8))}px`;
+}
+
+function act(kind) {
+  const spans = selectionSpans();
+  $("#pop").hidden = true;
+  if (!spans || locked()) return;
+  if (kind === "edit") { window.getSelection().removeAllRanges(); startEdit(spans[0].id); return; }
+  let focusMark = null, skipped = 0;
+  for (const sp of spans) {
+    const b = state.blocks.get(sp.id);
+    if (kind === "delete" && b.kind === "code") { skipped++; continue; }
+    const s = base(b);
+    const m = { id: newId(), kind, start: sp.start, end: sp.end, quote: s.slice(sp.start, sp.end), note: "" };
+    const kept = marksOf(b).filter((x) => !(x.kind === kind && x.start >= m.start && x.end <= m.end));
+    setMarks(sp.id, [...kept, m].sort((x, y) => x.start - y.start));
+    if (!focusMark && kind === "rewrite") focusMark = m.id;
+  }
+  window.getSelection().removeAllRanges();
+  render();
+  if (skipped) say("Listings take Rewrite marks only; the deletion skipped the code.");
+  if (focusMark) document.getElementById(`n-${focusMark}`)?.focus();
+}
+
+function startEdit(id) {
+  state.editing.add(id);
+  render();
+}
+
+// Re-anchor marks on edited text by their quotes; drop the ones gone.
+function reanchor(marks, text) {
+  const kept = [];
+  for (const m of marks) {
+    let best = -1, at = text.indexOf(m.quote);
+    while (at >= 0) {
+      if (best < 0 || Math.abs(at - m.start) < Math.abs(best - m.start)) best = at;
+      at = text.indexOf(m.quote, at + 1);
+    }
+    if (best >= 0) kept.push({ ...m, start: best, end: best + m.quote.length });
+  }
+  return kept;
+}
+
+function saveEdit(id) {
+  const el = els.get(id), b = state.blocks.get(id);
+  const t = el.querySelector(".view textarea");
+  if (!t) return;
+  let text = t.value.replace(/\r/g, "").replace(/\n{2,}/g, "\n").replace(/^\n+|\n+$/g, "");
+  const edit = text === b.source ? null : text;
+  const marks = reanchor(marksOf(b), text);
+  const lost = marksOf(b).length - marks.length;
+  state.editing.delete(id);
+  setMarks(id, marks, { edit });
+  render();
+  say(lost
+    ? `Saved. ${lost} mark${lost === 1 ? "" : "s"} no longer matched the text and ${lost === 1 ? "was" : "were"} removed.`
+    : edit == null ? "The text matches the chapter again, so there's no edit to apply." : "Edit saved.");
+}
+
+// ---- Events.
+document.addEventListener("mouseup", (ev) => { if (!ev.target.closest?.("#pop")) setTimeout(showPop, 0); });
+document.addEventListener("touchend", () => setTimeout(showPop, 0));
+document.addEventListener("selectionchange", () => {
+  const sel = window.getSelection();
+  if (!sel || sel.isCollapsed) $("#pop").hidden = true;
+});
+
+document.addEventListener("keydown", (ev) => {
+  const inField = ev.target.closest?.("textarea, input");
+  if (inField) {
+    const t = ev.target.closest(".view textarea");
+    if (t) {
+      const id = t.closest(".blk").dataset.key;
+      if (ev.key === "Enter" && (ev.ctrlKey || ev.metaKey)) { ev.preventDefault(); saveEdit(id); }
+      else if (ev.key === "Escape") { state.editing.delete(id); render(); }
+    } else if (ev.key === "Enter" || ev.key === "Escape") ev.target.blur();
+    return;
+  }
+  if ($("#pop").hidden || ev.ctrlKey || ev.metaKey || ev.altKey) return;
+  const k = ev.key.toLowerCase();
+  if (k === "r") { ev.preventDefault(); act("rewrite"); }
+  else if (k === "d") { ev.preventDefault(); act("delete"); }
+  else if (k === "e") { ev.preventDefault(); act("edit"); }
+  else if (k === "escape") $("#pop").hidden = true;
+});
+
+document.addEventListener("mousedown", (ev) => { if (ev.target.closest?.("#pop")) ev.preventDefault(); });
+
+document.addEventListener("click", (ev) => {
+  const btn = ev.target.closest("button[data-act]");
+  if (btn) {
+    const a = btn.dataset.act;
+    const blk = btn.closest(".blk"), id = blk?.dataset.key;
+    if (btn.closest("#pop")) { act(a); return; }
+    if (a === "edit") startEdit(id);
+    else if (a === "save") saveEdit(id);
+    else if (a === "cancel") { state.editing.delete(id); render(); }
+    else if (a === "revert") {
+      const b = state.blocks.get(id);
+      state.editing.delete(id);
+      setMarks(id, reanchor(marksOf(b), b.source), { edit: null });
+      render();
+      say("Your edit is discarded; the paragraph matches the chapter.");
+    } else if (a === "prev") {
+      state.showPrev.has(id) ? state.showPrev.delete(id) : state.showPrev.add(id);
+      render();
+    } else if (a === "delblock") {
+      const b = state.blocks.get(id), s = base(b);
+      if (marksOf(b).some((m) => m.kind === "delete" && m.start === 0 && m.end === s.length)) return;
+      setMarks(id, [{ id: newId(), kind: "delete", start: 0, end: s.length, quote: s, note: "" }]);
+      render();
+    } else if (a === "unmark") {
+      const mid = btn.closest("li").dataset.mid;
+      setMarks(id, marksOf(state.blocks.get(id)).filter((m) => m.id !== mid));
+      render();
+    } else if (a === "send") { state.confirming = true; renderBar(); }
+    return;
+  }
+  const mk = ev.target.closest("mark[data-mid]");
+  if (mk && window.getSelection().isCollapsed) {
+    const li = mk.closest(".blk").querySelector(`li[data-mid="${CSS.escape(mk.dataset.mid)}"]`);
+    if (li) {
+      li.classList.add("flash"); setTimeout(() => li.classList.remove("flash"), 800);
+      li.querySelector("input")?.focus();
+    }
+  }
+});
+
+$("#send").addEventListener("click", () => { state.confirming = true; renderBar(); });
+$("#confirm").addEventListener("click", (ev) => {
+  const a = ev.target.closest("button")?.dataset.act;
+  if (a === "send-no") { state.confirming = false; renderBar(); }
+  if (a === "send-yes") {
+    state.confirming = false;
+    state.editing.clear();
+    state.meta = { ...state.meta, status: "submitted", sent: new Date().toISOString() };
+    write("meta/chapter", { status: "submitted", sent: state.meta.sent });
+    render();
+  }
+});
+$("#banner").addEventListener("click", (ev) => {
+  if (ev.target.closest("button")?.dataset.act === "unsend" && state.meta.status === "submitted") {
+    state.meta = { ...state.meta, status: "open" };
+    write("meta/chapter", { status: "open" });
+    render();
+  }
+});
+
+document.addEventListener("input", (ev) => {
+  const inp = ev.target.closest(".marks input");
+  if (inp) {
+    const id = inp.closest(".blk").dataset.key, mid = inp.closest("li").dataset.mid;
+    clearTimeout(noteTimers.get(mid));
+    noteTimers.set(mid, setTimeout(() => saveNote(id, mid, inp.value), 800));
+  }
+  const t = ev.target.closest(".view textarea");
+  if (t) autosize(t);
+});
+document.addEventListener("focusout", (ev) => {
+  const inp = ev.target.closest && ev.target.closest(".marks input");
+  if (inp) saveNote(inp.closest(".blk").dataset.key, inp.closest("li").dataset.mid, inp.value);
+});
+function saveNote(id, mid, value) {
+  clearTimeout(noteTimers.get(mid));
+  const b = state.blocks.get(id);
+  if (!b) return;
+  const m = marksOf(b).find((x) => x.id === mid);
+  if (!m || (m.note || "") === value) return;
+  setMarks(id, marksOf(b).map((x) => x.id === mid ? { ...x, note: value } : x));
+}
+
+$("#f-changed").addEventListener("change", (ev) => {
+  state.onlyChanged = ev.target.checked;
+  try { localStorage.setItem("ce-only-changed", state.onlyChanged ? "1" : "0"); } catch (e) {}
+  render();
+});
+$("#f-marked").addEventListener("change", (ev) => {
+  state.onlyMarked = ev.target.checked;
+  try { localStorage.setItem("ce-only-marked", state.onlyMarked ? "1" : "0"); } catch (e) {}
+  render();
+});
+$("#next-change").addEventListener("click", () => {
+  const top = $("header.bar").getBoundingClientRect().bottom + 4;
+  const next = [...$("#doc").querySelectorAll(".blk.changed")].find((el) => el.getBoundingClientRect().top > top + 2);
+  const target = next || $("#doc").querySelector(".blk.changed");
+  if (target) window.scrollBy({ top: target.getBoundingClientRect().top - top, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+});
+
+// ---- Start.
+async function start() {
+  const db = await window.claude?.use?.("db");
+  if (!db) { $("#status").textContent = "The chapter store isn't available in this view. Open the page in claude.ai to edit."; $("#title").textContent = "Chapter editor"; return; }
+  state.db = db;
+  db.doc("meta/chapter").onSnapshot((snap) => {
+    if (!snap.exists) { $("#title").textContent = "No chapter is loaded yet"; $("#status").textContent = "Claude loads the chapter from the terminal."; return; }
+    const prev = state.meta;
+    state.meta = { ...snap.data() };
+    if (prev && prev.round !== state.meta.round) {
+      state.showPrev.clear(); state.editing.clear();
+      $("#status").textContent = `Round ${state.meta.round} is loaded.`;
+    }
+    render();
+  }, () => { $("#status").textContent = "Lost the connection to the chapter. Reload the page."; });
+  db.collection("blocks").onSnapshot((snap) => {
+    const next = new Map();
+    for (const d of snap.docs) {
+      const body = { ...d.data() };
+      const local = state.blocks.get(d.id);
+      if (local && chains.has(`blocks/${d.id}`) && snap.metadata.hasPendingWrites) Object.assign(body, { marks: local.marks, edit: local.edit });
+      next.set(d.id, body);
+    }
+    state.blocks = next;
+    if ($("#status").textContent === "Connecting…") $("#status").textContent = "Marks save as you make them.";
+    render();
+  }, () => { $("#status").textContent = "Lost the connection to the chapter. Reload the page."; });
+}
+start();
+</script>

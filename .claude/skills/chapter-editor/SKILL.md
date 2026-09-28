@@ -1,0 +1,54 @@
+---
+name: chapter-editor
+description: Run a round of the chapter editor page, where Bruce reads a whole chapter and marks text to rewrite, delete, or edit in place. Use when Bruce says "apply" (or "apply the round", "I sent it") with a chapter editor open, or asks to open a chapter in the editor. The argument names the chapter by number; with none, use the chapter in tools/data/chapter_editor.json whose page was sent.
+---
+
+# Chapter editor
+
+The page (`chapter_editor.html` beside this file) shows a whole chapter, one block per paragraph, heading, list, or listing.
+Bruce selects text and presses R (Rewrite, with an optional note), D (Delete), or E (edit that block's Markdown himself).
+"Send round" sets the page's `meta/chapter` document to `status: "submitted"`, and he types `apply` in the terminal.
+`tools/chapter_editor.py` moves the chapter between the Markdown and the page's database; its docstring has the data model.
+The Markdown in `Chapters/` stays the source of truth.
+
+`tools/data/chapter_editor.json` maps each chapter number to its page's artifact URL.
+Every round below uses that URL.
+
+## Opening a chapter
+
+1. `tip editor-load CH=NN` (first load: every block).
+2. Publish `build/chapter_editor/NN/chapter_editor_NN.html` with `capabilities: {"db": {}}`, `icon: "edit"`,
+   and add the URL to `tools/data/chapter_editor.json`.
+   A chapter that already has a page keeps its URL; republish with `url` only when the page template changed.
+3. Write each `build/chapter_editor/NN/batch*.json` with one `ArtifactData` `batch` call, passing its entries as `writes`.
+   The meta document comes last, so the page opens only once every block is in place.
+4. Suggest `/edit-start NN` if no pass is open, so `/edit-done` captures the rounds.
+
+## Applying a round (Bruce says "apply")
+
+1. Set the page's status to applying: `ArtifactData` `update` on `meta/chapter` with `{"status": "applying"}`.
+   The page then shows that the round is in progress.
+2. Read the round: `ArtifactData` `list` of `blocks` (`query.limit` 1000) and of `meta`, both with
+   `out_dir` `build/chapter_editor/NN/read`. Delete the old `read/` first.
+3. `tip editor-apply CH=NN`. It writes his in-place edits and deletions into the chapter, prints every cut
+   with its surroundings, and lists the Rewrite marks and any conflicts.
+   Read each cut: a deletion that leaves a broken sentence is flagged to Bruce in the reply, never silently patched.
+4. **Commit his changes first**, with no trailer, and with a subject like `Observer: chapter editor round 3, Bruce's edits and cuts`.
+   `/edit-done`'s capture treats a commit without a `Co-Authored-By` trailer as his, and these words are his.
+   Skip this when the round had no edits or cuts.
+5. Do the rewrites. Each is a quote with an optional note: rewrite the quoted text (widening to its sentence when the fault is there) to fix what the note says.
+   With no note, find the fault the way `bare-pasted-phrase-is-a-review-request` describes: claim first, then clarity, then style.
+   The global writing rules apply. Check any claim against the listing it describes.
+   Handle each conflict by hand: the block changed in Zed during the round, so apply his intent to the current text.
+6. `tip verify-ch CH=NN`, then commit the rewrites and whatever the gate fixed, with the trailer.
+7. `tip editor-load CH=NN`, then write its batch file(s) as in Opening step 3.
+   The meta write reopens the page on the next round, with the changed blocks outlined.
+8. Reply with the counts and each rewrite as before → after, one line each, plus any flagged cut.
+   Say what you guessed where a mark had no note.
+
+## Rules
+
+- Never run `load` over a round that has not been applied: it would drop his marks. `load` refuses without `--force`.
+- Never write block documents while the page's status is `open`; he may be marking.
+- Listings take Rewrite marks only. A Rewrite mark on a listing is a request to change the code in the Markdown block, then run the full verify loop.
+- The page template is shared across chapters. After editing it, republish each open chapter's copy from a fresh `load` (a copy is regenerated on every load).

@@ -299,6 +299,29 @@ def spell_add(v: Vars) -> None:
     py("tools.spellcheck", *prose_files(v), "--add")
 
 
+@task("Load chapter CH=NN into the chapter editor page's documents "
+      "(ARGS=--force)")
+def editor_load(v: Vars) -> None:
+    """Writes build/chapter_editor/NN/: one JSON file per database
+    document, the ArtifactData batch lists that write them, and the page
+    copy to publish. After the first load, only the blocks a round changed
+    or consumed are written. The session writes the batches to the page;
+    the `chapter-editor` skill has the round procedure.
+    """
+    py("tools.chapter_editor", "load", *v.words("CH"), *v.words("ARGS"))
+
+
+@task("Apply a sent chapter editor round to chapter CH=NN "
+      "(ARGS=--force)")
+def editor_apply(v: Vars) -> None:
+    """Reads the page's documents from build/chapter_editor/NN/read (saved
+    there by ArtifactData's list), writes Bruce's in-place edits and
+    deletions into the chapter, and prints the Rewrite marks for the
+    session to do. See the `chapter-editor` skill.
+    """
+    py("tools.chapter_editor", "apply", *v.words("CH"), *v.words("ARGS"))
+
+
 @task("House-style lint with Vale (CH=29 for one chapter; needs vale binary)")
 def prose(v: Vars) -> None:
     """House-style lint with Vale: no em-dashes and no filler phrases. Run one
