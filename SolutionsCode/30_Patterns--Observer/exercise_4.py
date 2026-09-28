@@ -2,25 +2,27 @@
 import asyncio
 from collections.abc import Awaitable, Callable
 
-type AsyncListener[T] = Callable[[T], Awaitable[None]]
+type AsyncResponder[T] = Callable[[T], Awaitable[None]]
 
 class Broadcaster[T]:
     def __init__(self) -> None:
-        self._listeners: list[AsyncListener[T]] = []
+        self._responders: list[AsyncResponder[T]] = []
 
-    def subscribe(self, listener: AsyncListener[T]) -> None:
-        self._listeners.append(listener)
+    def subscribe(
+        self, responder: AsyncResponder[T]
+    ) -> None:
+        self._responders.append(responder)
 
     async def announce(self, data: T) -> None:
         results = await asyncio.gather(
-            *(listener(data)
-              for listener in self._listeners),
+            *(responder(data)
+              for responder in self._responders),
             return_exceptions=True)
         failures = [
             r for r in results if isinstance(r, Exception)]
         if failures:
             raise ExceptionGroup(
-                "listener failures", failures)
+                "responder failures", failures)
 
 received: list[int] = []
 

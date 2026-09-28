@@ -1,6 +1,6 @@
 # Observer: Solutions
 
-## 1. A minimal broadcaster-listener pair
+## 1. A minimal broadcaster-responder pair
 
 ```python
 # exercise_1.py
@@ -9,14 +9,14 @@ from typing import Any
 
 class Broadcaster:
     def __init__(self) -> None:
-        self._listeners: list[Callable] = []
+        self._responders: list[Callable] = []
 
-    def subscribe(self, listener: Callable) -> None:
-        self._listeners.append(listener)
+    def subscribe(self, responder: Callable) -> None:
+        self._responders.append(responder)
 
     def announce(self, *args: Any) -> None:
-        for listener in self._listeners:
-            listener(*args)
+        for responder in self._responders:
+            responder(*args)
 
 calls: list[tuple[str, int]] = []
 source = Broadcaster()
@@ -28,9 +28,9 @@ print(calls)
 ```
 
 Like `broadcaster.py`, this solution has no separate `Observer` class at
-all. Any callable, here two `lambda`s, is a listener. `subscribe()`
+all. Any callable, here two `lambda`s, is a responder. `subscribe()`
 collects them in a list. `announce()` then hands its own arguments to
-each one in turn, so every subscribed listener sees the same update,
+each one in turn, so every subscribed responder sees the same update,
 in subscription order.
 
 ## 2. The pull model, twice
@@ -154,31 +154,31 @@ Both versions print the same line, and neither needs `arg`. That is
 pull's bargain: the subject decides nothing about what its observers
 read, and each observer pays by knowing what it is watching.
 
-## 3. An `announce()` that survives a failing listener
+## 3. An `announce()` that survives a failing responder
 
 ```python
 # exercise_3.py
 from collections.abc import Callable
 
-type Listener[T] = Callable[[T], None]
+type Responder[T] = Callable[[T], None]
 
 class Broadcaster[T]:
     def __init__(self) -> None:
-        self._listeners: list[Listener[T]] = []
+        self._responders: list[Responder[T]] = []
 
-    def subscribe(self, listener: Listener[T]) -> None:
-        self._listeners.append(listener)
+    def subscribe(self, responder: Responder[T]) -> None:
+        self._responders.append(responder)
 
     def announce(self, data: T) -> None:
         failures: list[Exception] = []
-        for listener in list(self._listeners):
+        for responder in list(self._responders):
             try:
-                listener(data)
+                responder(data)
             except Exception as e:
                 failures.append(e)
         if failures:
             raise ExceptionGroup(
-                "listener failures", failures)
+                "responder failures", failures)
 
 received: list[int] = []
 
@@ -200,7 +200,7 @@ except* RuntimeError as group:
 import pytest
 from exercise_3 import Broadcaster
 
-def test_later_listener_still_runs_after_a_failure(
+def test_later_responder_still_runs_after_a_failure(
 ) -> None:
     received: list[int] = []
 
@@ -217,21 +217,21 @@ def test_later_listener_still_runs_after_a_failure(
 
 The loop catches each failure and keeps going, so subscription order
 stops deciding who hears the change. Collecting the exceptions rather
-than discarding them is the other half: a listener that fails silently
+than discarding them is the other half: a responder that fails silently
 is worse than one that stops the loop, because nothing reports the
 failure.
 
-`ExceptionGroup` is the right container because more than one listener
+`ExceptionGroup` is the right container because more than one responder
 can fail on a single notification, and the caller needs every failure,
 not the first. `except*` then lets a caller handle one kind of failure
 and re-raise the rest, something a plain `except` on a single
 re-raised exception cannot do.
 
 Catching bare `Exception` here is deliberate: `announce()` has no idea
-what its listeners do, so it cannot name their failure modes. Catching
+what its responders do, so it cannot name their failure modes. Catching
 `Exception` still lets `BaseException` through, so a
 `KeyboardInterrupt` or an `asyncio.CancelledError` passing through a
-listener stops the notification instead of joining `failures`.
+responder stops the notification instead of joining `failures`.
 
 ## 4. The same rescue, for the async fan-out
 
@@ -240,25 +240,27 @@ listener stops the notification instead of joining `failures`.
 import asyncio
 from collections.abc import Awaitable, Callable
 
-type AsyncListener[T] = Callable[[T], Awaitable[None]]
+type AsyncResponder[T] = Callable[[T], Awaitable[None]]
 
 class Broadcaster[T]:
     def __init__(self) -> None:
-        self._listeners: list[AsyncListener[T]] = []
+        self._responders: list[AsyncResponder[T]] = []
 
-    def subscribe(self, listener: AsyncListener[T]) -> None:
-        self._listeners.append(listener)
+    def subscribe(
+        self, responder: AsyncResponder[T]
+    ) -> None:
+        self._responders.append(responder)
 
     async def announce(self, data: T) -> None:
         results = await asyncio.gather(
-            *(listener(data)
-              for listener in self._listeners),
+            *(responder(data)
+              for responder in self._responders),
             return_exceptions=True)
         failures = [
             r for r in results if isinstance(r, Exception)]
         if failures:
             raise ExceptionGroup(
-                "listener failures", failures)
+                "responder failures", failures)
 
 received: list[int] = []
 
@@ -288,7 +290,7 @@ import asyncio
 import pytest
 from exercise_4 import Broadcaster
 
-def test_later_listener_still_runs_after_a_failure(
+def test_later_responder_still_runs_after_a_failure(
 ) -> None:
     received: list[int] = []
 
@@ -316,16 +318,16 @@ one keyword does what the synchronous version needed a `try` inside a
 loop to do, because `gather()` is already the loop.
 
 The results come back in argument order, so the list is a record of
-which listener produced what. This version needs the failures alone,
+which responder produced what. This version needs the failures alone,
 so its comprehension keeps each result for which
-`isinstance(r, Exception)` is true. A successful listener returned
+`isinstance(r, Exception)` is true. A successful responder returned
 `None`, which fails that test and stays out of `failures`.
 
 The exception filter uses `Exception`, not `BaseException`, for the
 reason exercise 3 gives, and for a second reason here.
 `asyncio.CancelledError` derives from `BaseException`, and
 `return_exceptions=True` still returns a cancellation among the
-results. Treating that result as an ordinary listener failure
+results. Treating that result as an ordinary responder failure
 swallows a cancellation the event loop meant to propagate.
 
 The synchronous and asynchronous versions now answer the same
@@ -340,29 +342,29 @@ supplied by `gather()` in the async one.
 from collections.abc import Callable
 from result import Err, Ok, Result
 
-type Listener[T] = Callable[[T], Result[None, str]]
+type Responder[T] = Callable[[T], Result[None, str]]
 
 class Broadcaster[T]:
     def __init__(self) -> None:
-        self._listeners: list[Listener[T]] = []
+        self._responders: list[Responder[T]] = []
 
-    def subscribe(self, listener: Listener[T]) -> None:
-        self._listeners.append(listener)
+    def subscribe(self, responder: Responder[T]) -> None:
+        self._responders.append(responder)
 
     def announce(self, data: T) -> list[Err[str]]:
         return [
             result
-            for listener in list(self._listeners)
-            if isinstance(result := listener(data), Err)
+            for responder in list(self._responders)
+            if isinstance(result := responder(data), Err)
         ]
 
 def succeeds[T](
     action: Callable[[T], None],
-) -> Listener[T]:
-    def listener(data: T) -> Result[None, str]:
+) -> Responder[T]:
+    def responder(data: T) -> Result[None, str]:
         action(data)
         return Ok(None)
-    return listener
+    return responder
 
 def checked(data: int) -> Result[None, str]:
     if data < 0:
@@ -384,7 +386,7 @@ print(source.announce(-1), received)
 from exercise_5 import Broadcaster, succeeds
 from result import Err, Result
 
-def test_later_listener_runs_after_an_err() -> None:
+def test_later_responder_runs_after_an_err() -> None:
     received: list[int] = []
 
     def broken(data: int) -> Result[None, str]:
@@ -397,23 +399,23 @@ def test_later_listener_runs_after_an_err() -> None:
     assert received == [1]
 ```
 
-No listener raises an exception, so `announce()` needs no `try`.
-It calls every listener and keeps each result that is an `Err`.
+No responder raises an exception, so `announce()` needs no `try`.
+It calls every responder and keeps each result that is an `Err`.
 The caller receives the failures as an ordinary list
 and decides what to do with them,
 where exercise 3's caller had to catch an `ExceptionGroup`.
-An empty list means every listener succeeded.
+An empty list means every responder succeeded.
 
 The type change reaches every subscriber.
 `received.append` returns `None`,
 so `ty` rejects `source.subscribe(received.append)`:
-a `Listener[int]` must return a `Result`.
+a `Responder[int]` must return a `Result`.
 `succeeds()` adapts any `None`-returning callable
 by calling it and returning `Ok(None)`.
 The adapter assumes the wrapped callable cannot fail;
 if it raises an exception anyway,
 that exception leaves `announce()` as it did in the chapter's version.
-Returning errors as values works when you write the listeners.
+Returning errors as values works when you write the responders.
 For a broadcaster that accepts arbitrary callables,
 exercise 3's catch-and-collect protects the loop from code you did not write.
 
@@ -602,7 +604,7 @@ class Color(StrEnum):
 
 type Coord = tuple[int, int]
 type Grid = dict[Coord, Color]
-type Listener[T] = Callable[[T], None]
+type Responder[T] = Callable[[T], None]
 
 def new_grid(size: int) -> Grid:
     colors = list(Color)
@@ -618,14 +620,14 @@ def recolored(grid: Grid, selected: Coord) -> Grid:
 
 class Broadcaster[T]:
     def __init__(self) -> None:
-        self._listeners: list[Listener[T]] = []
+        self._responders: list[Responder[T]] = []
 
-    def subscribe(self, listener: Listener[T]) -> None:
-        self._listeners.append(listener)
+    def subscribe(self, responder: Responder[T]) -> None:
+        self._responders.append(responder)
 
     def announce(self, data: T) -> None:
-        for listener in list(self._listeners):
-            listener(data)
+        for responder in list(self._responders):
+            responder(data)
 
 class BoxModel(Broadcaster[Grid]):
     def __init__(self, size: int) -> None:
@@ -669,7 +671,7 @@ its own: `Color`, `new_grid()`, and `recolored()` unchanged, and a
 
 `letters()` and `tally()` are the two views. Each takes a `Grid` and
 returns `None`, the shape `subscribe()` requires, so each is a
-listener the same way `draw()` is. `letters()` prints the first
+responder the same way `draw()` is. `letters()` prints the first
 character of each color, one row per line, and `tally()` counts the
 colors with a `Counter`.
 Neither one names the other, and neither names the model's rule.
@@ -801,14 +803,14 @@ that lets `box_view.py` hand a `Color` to `tkinter`.
 from collections.abc import Callable
 from typing import overload
 
-type Listener[T] = Callable[[T], None]
+type Responder[T] = Callable[[T], None]
 
 class Notifying[T]:
     def __set_name__(
         self, owner: type, name: str
     ) -> None:
         self.storage = f"_{name}"
-        self.listeners = f"_listeners_{name}"
+        self.responders = f"_responders_{name}"
 
     @overload
     def __get__(self, obj: None,
@@ -824,13 +826,13 @@ class Notifying[T]:
 
     def __set__(self, obj: object, value: T) -> None:
         setattr(obj, self.storage, value)
-        for listener in getattr(obj, self.listeners, ()):
-            listener(value)
+        for responder in getattr(obj, self.responders, ()):
+            responder(value)
 
     def subscribe(self, obj: object,
-                  listener: Listener[T]) -> None:
+                  responder: Responder[T]) -> None:
         obj.__dict__.setdefault(
-            self.listeners, []).append(listener)
+            self.responders, []).append(responder)
 
 class Thermometer:
     celsius = Notifying[float]()
@@ -857,13 +859,13 @@ print(t.celsius, t.humidity)
 
 `__set_name__()` receives the name the class body binds each
 descriptor to, so `celsius` and `humidity` derive different attribute
-names: `_celsius` and `_listeners_celsius` for one, `_humidity` and
-`_listeners_humidity` for the other. Two `Notifying` instances in one
-class therefore share no storage and no listener list, which is what
+names: `_celsius` and `_responders_celsius` for one, `_humidity` and
+`_responders_humidity` for the other. Two `Notifying` instances in one
+class therefore share no storage and no responder list, which is what
 makes the two attributes independent. `Broadcaster` keeps one list for
 the whole object; a descriptor keeps one per attribute.
 
-`__set__()` stores the value and then calls each listener registered
+`__set__()` stores the value and then calls each responder registered
 for that attribute, the work `Thermometer`'s property setter did with
 `self.announce(value)`.
 
@@ -873,7 +875,7 @@ returning the descriptor there puts `subscribe()` within reach. The
 two `@overload` declarations tell `ty` which of the two results it
 gets: `Notifying[T]` from the class, `T` from an instance. Without
 them the declared return type is the union, and `t.celsius * 2` fails
-to check. The overloads also check the listener against the
+to check. The overloads also check the responder against the
 attribute: `Thermometer.celsius.subscribe(t, readings.append)` passes
 only because `readings` is a `list[float]`.
 
@@ -884,6 +886,6 @@ so it types the class access as `Notifying[float] | float` and reports that `flo
 A codebase on Pyright looks the descriptor up in `type(obj).__dict__` instead,
 which draws no complaint from Pyright.
 
-`subscribe()` writes the listener list into the instance's `__dict__`
+`subscribe()` writes the responder list into the instance's `__dict__`
 rather than declaring it on the class, where every instance shares
 one list.

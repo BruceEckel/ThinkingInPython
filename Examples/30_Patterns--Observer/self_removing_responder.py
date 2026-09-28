@@ -1,4 +1,4 @@
-# self_removing_listener.py
+# self_removing_responder.py
 from broadcaster import Broadcaster
 
 source = Broadcaster[object]()

@@ -1,21 +1,21 @@
 # broadcaster.py
 from collections.abc import Callable
 
-type Listener[T] = Callable[[T], None]
+type Responder[T] = Callable[[T], None]
 
 class Broadcaster[T]:
     def __init__(self) -> None:
-        self._listeners: list[Listener[T]] = []
+        self._responders: list[Responder[T]] = []
 
-    def subscribe(self, listener: Listener[T]) -> None:
-        self._listeners.append(listener)
+    def subscribe(self, responder: Responder[T]) -> None:
+        self._responders.append(responder)
 
-    def unsubscribe(self, listener: Listener[T]) -> None:
-        self._listeners.remove(listener)
+    def unsubscribe(self, responder: Responder[T]) -> None:
+        self._responders.remove(responder)
 
     def announce(self, data: T) -> None:
-        for listener in list(self._listeners):
-            listener(data)
+        for responder in list(self._responders):
+            responder(data)
 
 class Thermometer(Broadcaster[float]):
     def __init__(self, celsius: float) -> None:

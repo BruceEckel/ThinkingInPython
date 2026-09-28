@@ -4,14 +4,14 @@ from typing import Any
 
 class Broadcaster:
     def __init__(self) -> None:
-        self._listeners: list[Callable] = []
+        self._responders: list[Callable] = []
 
-    def subscribe(self, listener: Callable) -> None:
-        self._listeners.append(listener)
+    def subscribe(self, responder: Callable) -> None:
+        self._responders.append(responder)
 
     def announce(self, *args: Any) -> None:
-        for listener in self._listeners:
-            listener(*args)
+        for responder in self._responders:
+            responder(*args)
 
 calls: list[tuple[str, int]] = []
 source = Broadcaster()

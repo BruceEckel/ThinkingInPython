@@ -2,7 +2,7 @@
 import pytest
 from exercise_3 import Broadcaster
 
-def test_later_listener_still_runs_after_a_failure(
+def test_later_responder_still_runs_after_a_failure(
 ) -> None:
     received: list[int] = []
 

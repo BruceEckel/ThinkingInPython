@@ -15,7 +15,7 @@ class Color(StrEnum):
 
 type Coord = tuple[int, int]
 type Grid = dict[Coord, Color]
-type Listener[T] = Callable[[T], None]
+type Responder[T] = Callable[[T], None]
 
 def new_grid(size: int) -> Grid:
     colors = list(Color)
@@ -31,14 +31,14 @@ def recolored(grid: Grid, selected: Coord) -> Grid:
 
 class Broadcaster[T]:
     def __init__(self) -> None:
-        self._listeners: list[Listener[T]] = []
+        self._responders: list[Responder[T]] = []
 
-    def subscribe(self, listener: Listener[T]) -> None:
-        self._listeners.append(listener)
+    def subscribe(self, responder: Responder[T]) -> None:
+        self._responders.append(responder)
 
     def announce(self, data: T) -> None:
-        for listener in list(self._listeners):
-            listener(data)
+        for responder in list(self._responders):
+            responder(data)
 
 class BoxModel(Broadcaster[Grid]):
     def __init__(self, size: int) -> None:

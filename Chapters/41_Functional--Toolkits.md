@@ -89,7 +89,7 @@ the branching and the repeated subproblem are what matter, not the arithmetic.
 
 One trap: decorating a method with `@cache` keys every entry on `self`,
 so the cache holds a strong reference to each instance forever.
-That is the lapsed-listener leak of [The Pythonic *Observer*](30_Patterns--Observer.md#the-pythonic-observer-callables-in-a-list)
+That is the *lapsed listener* leak of [The Pythonic *Observer*](30_Patterns--Observer.md#the-pythonic-observer-callables-in-a-list)
 in cache form.
 For the usual case, one expensive value per instance,
 use [`@cached_property`](#cached_property).

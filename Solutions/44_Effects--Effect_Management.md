@@ -158,7 +158,7 @@ while `greet()` stays unchanged.
 | `slope_catch.py` | `rise / 0` raises a `ZeroDivisionError` | Exception | Catch the expected exception, or make the bad value impossible |
 | `withdraw()` | writes the `balance` global | Side effect | Pass the implementation in as a parameter |
 | `withdraw()` | reads the `balance` global | Side cause | Pass the implementation in as a parameter |
-| `Thermometer` | `announce()` calls every subscribed listener | Side effect | Pass the implementation in as a parameter |
+| `Thermometer` | `announce()` calls every subscribed responder | Side effect | Pass the implementation in as a parameter |
 | `Thermometer` | `_celsius` read by `celsius` | Side cause | Pass the implementation in as a parameter |
 
 Neither function in `slope_catch.py` has a side effect or a side
@@ -190,9 +190,9 @@ holds the state.
 `Thermometer` is the same pair wearing a design pattern.
 The `celsius` setter writes `_celsius`, an instance attribute rather
 than a global, and then calls `announce()`, which invokes arbitrary code
-in every subscribed listener. The write is a side effect on the
+in every subscribed responder. The write is a side effect on the
 object. The notification is a side effect on the world, since a
-listener may print, record, or fail. Reading `celsius` is a side cause
+responder may print, record, or fail. Reading `celsius` is a side cause
 for the same reason `withdraw()` reading `balance` is one: the value
 can change between calls, so the answer depends on history rather than
 arguments. The functional conversion returns each reading as a value
@@ -202,7 +202,7 @@ whatever state it keeps. That is what the chapter calls
 
 Notice one thing across all three: the classification is not a property
 of the language feature used. A global, an instance attribute, and a
-listener list are three storage mechanisms for one idea: something
+responder list are three storage mechanisms for one idea: something
 outside the call participates in the result.
 
 ## 4. `PositiveInt` in place of both checks

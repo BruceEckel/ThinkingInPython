@@ -1,25 +1,25 @@
 # exercise_3.py
 from collections.abc import Callable
 
-type Listener[T] = Callable[[T], None]
+type Responder[T] = Callable[[T], None]
 
 class Broadcaster[T]:
     def __init__(self) -> None:
-        self._listeners: list[Listener[T]] = []
+        self._responders: list[Responder[T]] = []
 
-    def subscribe(self, listener: Listener[T]) -> None:
-        self._listeners.append(listener)
+    def subscribe(self, responder: Responder[T]) -> None:
+        self._responders.append(responder)
 
     def announce(self, data: T) -> None:
         failures: list[Exception] = []
-        for listener in list(self._listeners):
+        for responder in list(self._responders):
             try:
-                listener(data)
+                responder(data)
             except Exception as e:
                 failures.append(e)
         if failures:
             raise ExceptionGroup(
-                "listener failures", failures)
+                "responder failures", failures)
 
 received: list[int] = []
 

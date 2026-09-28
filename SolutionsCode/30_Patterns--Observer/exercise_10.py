@@ -2,14 +2,14 @@
 from collections.abc import Callable
 from typing import overload
 
-type Listener[T] = Callable[[T], None]
+type Responder[T] = Callable[[T], None]
 
 class Notifying[T]:
     def __set_name__(
         self, owner: type, name: str
     ) -> None:
         self.storage = f"_{name}"
-        self.listeners = f"_listeners_{name}"
+        self.responders = f"_responders_{name}"
 
     @overload
     def __get__(self, obj: None,
@@ -25,13 +25,13 @@ class Notifying[T]:
 
     def __set__(self, obj: object, value: T) -> None:
         setattr(obj, self.storage, value)
-        for listener in getattr(obj, self.listeners, ()):
-            listener(value)
+        for responder in getattr(obj, self.responders, ()):
+            responder(value)
 
     def subscribe(self, obj: object,
-                  listener: Listener[T]) -> None:
+                  responder: Responder[T]) -> None:
         obj.__dict__.setdefault(
-            self.listeners, []).append(listener)
+            self.responders, []).append(responder)
 
 class Thermometer:
     celsius = Notifying[float]()

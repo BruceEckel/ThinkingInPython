@@ -2,24 +2,26 @@
 import asyncio
 from collections.abc import Awaitable, Callable
 
-type AsyncListener[T] = Callable[[T], Awaitable[None]]
+type AsyncResponder[T] = Callable[[T], Awaitable[None]]
 
 class Broadcaster[T]:
     def __init__(self) -> None:
-        self._listeners: list[AsyncListener[T]] = []
+        self._responders: list[AsyncResponder[T]] = []
 
-    def subscribe(self, listener: AsyncListener[T]) -> None:
-        self._listeners.append(listener)
+    def subscribe(
+        self, responder: AsyncResponder[T]
+    ) -> None:
+        self._responders.append(responder)
 
     def unsubscribe(
-        self, listener: AsyncListener[T]
+        self, responder: AsyncResponder[T]
     ) -> None:
-        self._listeners.remove(listener)
+        self._responders.remove(responder)
 
     async def announce(self, data: T) -> None:
-        # Fan out to every listener, then wait for all
+        # Fan out to every responder, then wait for all
         await asyncio.gather(
-            *(fn(data) for fn in self._listeners))
+            *(fn(data) for fn in self._responders))
 
 class Thermometer(Broadcaster[float]):
     def __init__(self, celsius: float) -> None:

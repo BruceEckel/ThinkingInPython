@@ -140,8 +140,8 @@ The copy therefore settles which observers a `notify()` call reaches before its 
 An observer detached partway through a `notify()` call still receives that call's notification,
 and a newcomer attached during the call receives its first notification from the next `notify()` call.
 [Unsubscribing During a Notification](#unsubscribing-during-a-notification)
-runs a listener that unsubscribes itself,
-and shows index by index which listener the loop skips without the copy.
+runs a responder that unsubscribes itself,
+and shows index by index which responder the loop skips without the copy.
 
 ## The Names This Chapter Uses
 
@@ -155,43 +155,45 @@ The rest of this chapter uses names you can tell apart at a glance:
 | *GoF Design Patterns* | This chapter |
 |---|---|
 | subject | `Broadcaster` |
-| observer | listener == any callable |
+| observer | responder == any callable |
 | `attach()` / `detach()` | `subscribe()` / `unsubscribe()` |
 | `notify()` | `announce()` |
-| `update()` | calling the listener |
+| `update()` | calling the responder |
 
 The pattern keeps its name.
 *Observer* is what the catalogs call it,
 and Java and the reactive libraries use the older nouns,
 so the table is also your map into that literature.
+Java and JavaScript call a responder a listener,
+as in `ActionListener` and `addEventListener()`.
 
 ## The Pythonic Observer: Callables in a List
 
-In Python, a listener is any callable that takes a notification and returns `None`.
+In Python, a responder is any callable that takes a notification and returns `None`.
 A broadcaster announces each change to a list of those callables.
 `Thermometer` announces from its `celsius` setter.
 A setter runs at every assignment to its attribute,
-so every assignment to `celsius` reaches the listeners:
+so every assignment to `celsius` reaches the responders:
 
 ```python
 # broadcaster.py
 from collections.abc import Callable
 
-type Listener[T] = Callable[[T], None]
+type Responder[T] = Callable[[T], None]
 
 class Broadcaster[T]:
     def __init__(self) -> None:
-        self._listeners: list[Listener[T]] = []
+        self._responders: list[Responder[T]] = []
 
-    def subscribe(self, listener: Listener[T]) -> None:
-        self._listeners.append(listener)
+    def subscribe(self, responder: Responder[T]) -> None:
+        self._responders.append(responder)
 
-    def unsubscribe(self, listener: Listener[T]) -> None:
-        self._listeners.remove(listener)
+    def unsubscribe(self, responder: Responder[T]) -> None:
+        self._responders.remove(responder)
 
     def announce(self, data: T) -> None:
-        for listener in list(self._listeners):
-            listener(data)
+        for responder in list(self._responders):
+            responder(data)
 
 class Thermometer(Broadcaster[float]):
     def __init__(self, celsius: float) -> None:
@@ -228,25 +230,25 @@ t.celsius = 150
 #: alarm!
 ```
 
-The listeners here are lambdas, but any function or bound method works.
+The responders here are lambdas, but any function or bound method works.
 
-![Assigning to celsius calls every listener](_images/observer_broadcast)
+![Assigning to celsius calls every responder](_images/observer_broadcast)
 
 The `display` and `alarm` boxes are the listing's two lambdas;
-the dashed `plot` listener is not in the listing.
+the dashed `plot` responder is not in the listing.
 Any callable of the right shape subscribes with the same `subscribe()` call as the two lambdas,
-and `Thermometer` knows its listeners only as callables that take a `float`.
+and `Thermometer` knows its responders only as callables that take a `float`.
 
 Four things from the classic version disappear: the `Observer` interface,
 its `update()` method, a class per reaction, and the `subject` argument.
 A classic observer is an object,
 so `notify()` calls the method its interface names, `update()`.
-In Python the listener is the callable, so `announce()` calls it directly:
-`listener(data)`, where the classic version calls `observer.update(self, arg)`.
+In Python the responder is the callable, so `announce()` calls it directly:
+`responder(data)`, where the classic version calls `observer.update(self, arg)`.
 The remaining method names change as well:
 GoF's `attach()` and `detach()` become `subscribe()` and `unsubscribe()`,
 as in the reactive libraries.
-A listener that needs the changed object takes it as part of the payload
+A responder that needs the changed object takes it as part of the payload
 (`announce((self, value))`),
 or is a bound method of an object that holds a reference to the broadcaster.
 
@@ -266,18 +268,18 @@ but for most cases the *Observer* pattern is only a list of callbacks.
 `Thermometer`'s constructor is simple and suggests using a `dataclass`.
 Inheriting does not stop a class from being a `dataclass`,
 but [a `dataclass`-generated `__init__()` does not call the base class's `__init__()`](12_Techniques--Data_Classes_as_Types.md#dataclass-inheritance).
-A `@dataclass` `Thermometer` has no list of listeners,
+A `@dataclass` `Thermometer` has no list of responders,
 and `subscribe()` raises an `AttributeError`.
 A `__post_init__()` that calls `super().__init__()` fixes that,
 but at greater length and complexity than the `__init__()` it replaces.
 
-A listener returns `None`, as seen in the `Listener` alias.
+A responder returns `None`, as seen in the `Responder` alias.
 The type checker rejects a subscriber that returns a value.
-Notification runs one way, from broadcaster to listeners,
-so `announce()` calls each listener as a statement.
+Notification runs one way, from broadcaster to responders,
+so `announce()` calls each responder as a statement.
 *GoF Design Patterns* gives the reason under broadcast communication.
-A notification names no receiver, and each listener may handle or ignore it,
-so one call with several listeners has no single answer to collect.
+A notification names no receiver, and each responder may handle or ignore it,
+so one call with several responders has no single answer to collect.
 A design that needs an answer uses a different pattern;
 for example [*Chain of Responsibility*](28_Patterns--Function_Objects.md#chain-of-responsibility-choosing-the-handler-at-runtime)
 tries its handlers in turn and returns the result from the first one that succeeds.
@@ -356,7 +358,7 @@ def test_late_subscriber_misses_earlier_changes() -> None:
 The tests subscribe a list's `append` to the broadcaster,
 so the list records every announced value.
 `unsubscribe()` matches by equality, and a lambda equals only itself,
-so to remove a listener later you need a named reference to it,
+so to remove a responder later you need a named reference to it,
 not an inline lambda.
 A bound method is different:
 `test_unsubscribe_stops_delivery()` unsubscribes `received.append` without storing it first.
@@ -372,10 +374,10 @@ so `unsubscribe()` raises a `ValueError` when its callable never subscribed.
 
 ### Unsubscribing During a Notification
 
-The copy in `announce()` matters when a listener unsubscribes mid-notification:
+The copy in `announce()` matters when a responder unsubscribes mid-notification:
 
 ```python
-# self_removing_listener.py
+# self_removing_responder.py
 from broadcaster import Broadcaster
 
 source = Broadcaster[object]()
@@ -407,21 +409,21 @@ Without the copy, the loop reads the list it changes.
 Removing `once` moves `always` to index 0, which the loop has already visited,
 so the loop looks for index 1, finds the list ended there, and stops.
 `always` misses the first change, and `seen` ends as `['once: 1', 'always: 2']`,
-with no exception to say a listener was skipped.
+with no exception to say a responder was skipped.
 
-### A Listener That Raises an Exception
+### A Responder That Raises an Exception
 
-If a listener raises an exception,
-the rest of the listeners in the list are not called.
+If a responder raises an exception,
+the rest of the responders in the list are not called.
 The exception leaves `announce()` and reaches the code that assigned to `celsius`.
 Decide whether `announce()` should catch, collect, and continue
 (see exercise 3).
 
-Another option keeps the failure inside the listener.
-The listener catches its own exception and [returns the error as a value](42_Functional--Error_Handling.md#return-the-error-as-a-value),
+Another option keeps the failure inside the responder.
+The responder catches its own exception and [returns the error as a value](42_Functional--Error_Handling.md#return-the-error-as-a-value),
 and `announce()` collects the returned errors for the caller.
-Every listener runs, and no failure escapes as an exception.
-The cost is the `Listener` type:
+Every responder runs, and no failure escapes as an exception.
+The cost is the `Responder` type:
 `Callable[[T], None]` becomes a callable that returns a success or an error,
 so a method such as `readings.append()`, which returns `None`,
 no longer fits without a wrapper (see exercise 5).
@@ -431,17 +433,17 @@ no longer fits without a wrapper (see exercise 5).
 Subscriptions are strong references.
 A bound method holds the object it came from,
 so subscribing `plot.redraw` keeps that `plot` in memory for as long as the broadcaster holds the subscription.
-When a broadcaster outlives its listeners,
+When a broadcaster outlives its responders,
 its subscriptions keep every one of them in memory:
 the classic *lapsed listener* leak.
 Long-lived broadcasters need disciplined `unsubscribe()` calls,
 or [weak references](10_Foundations--Cleanup.md#watching-objects-without-holding-them),
-which do not keep the listener alive
+which do not keep the responder alive
 (`weakref.WeakMethod` is the bound-method form).
-A weak listener resolves its reference at every call and drops out once its object is gone:
+A weak responder resolves its reference at every call and drops out once its object is gone:
 
 ```python
-# weak_listener.py
+# weak_responder.py
 from weakref import WeakMethod
 from broadcaster import Broadcaster
 from exceptions import expected
@@ -474,7 +476,7 @@ with expected(ValueError):
 ```
 
 A `Broadcaster` holds a strong reference to whatever you subscribe,
-so the weak part lives inside the listener.
+so the weak part lives inside the responder.
 `WeakMethod` stores the instance and the function separately, both weakly,
 and rebuilds the bound method when you call the reference.
 An ordinary `weakref.ref(plot.redraw)` is dead the moment it is created:
@@ -488,10 +490,10 @@ The `ValueError` confirms the subscription is gone:
 
 ### Re-entrant Notification
 
-A listener that writes back to the broadcaster re-enters `announce()` from inside `announce()`.
+A responder that writes back to the broadcaster re-enters `announce()` from inside `announce()`.
 Two-way bindings are the usual source.
 The view edits the model, the model notifies the view, the view edits the model.
-Without a guard, a listener that always writes back recurses until Python raises a `RecursionError`:
+Without a guard, a responder that always writes back recurses until Python raises a `RecursionError`:
 
 ```python
 # reentrant_announce.py
@@ -520,7 +522,8 @@ with expected(RecursionError):
 #: [RecursionError] maximum recursion depth exceeded
 ```
 
-The setter calls `announce()`, the listener writes back through the same setter,
+The setter calls `announce()`,
+the responder writes back through the same setter,
 and each write calls `announce()` again.
 To break the cycle, the setter returns early when the new value equals the stored one:
 
@@ -563,8 +566,8 @@ so the setter returns before it reaches `announce()` a second time.
 The alternative is a re-entry flag, set before `announce()` and cleared after,
 with the setter returning early while the flag is set.
 The flag breaks the cycle without comparing values,
-so a second write of the same reading still reaches the listeners,
-which is the behavior you want when a listener counts readings rather than changes.
+so a second write of the same reading still reaches the responders,
+which is the behavior you want when a responder counts readings rather than changes.
 
 ### Notifying Without a Base Class
 
@@ -645,13 +648,13 @@ Without it, `ty` reports an `unresolved-attribute` error in each method that rea
 
 One method for every attribute is less precise than a property per attribute,
 in three ways.
-First, a watcher is a listener with a wider signature:
+First, a watcher is a responder with a wider signature:
 it takes the attribute name along with the value,
 and filters by name to act on one attribute.
 `Thermometer` publishes one attribute and is a `Broadcaster[float]`,
-so each listener takes the `float` reading as its one argument.
+so each responder takes the `float` reading as its one argument.
 [Deciding What Matters](#deciding-what-matters) revisits that name filter:
-a watcher that sorts its own notifications means the subject has left the decision to its listeners.
+a watcher that sorts its own notifications means the subject has left the decision to its responders.
 Second, every assignment reaches the watchers, including the internal ones:
 a cached result or a hit counter broadcasts like a published attribute,
 unless the class writes it through `self.__dict__` as the constructor does.
@@ -664,17 +667,17 @@ so `ty` checks each assignment against the attributes the class declares.
 
 ## Observer and I/O
 
-So far, no listener has had to wait.
+So far, no responder has had to wait.
 Each prints, appends, or writes back, then returns.
-If a listener calls a network service or writes to a database,
-notifying listeners one at a time delays every listener after that one.
+If a responder calls a network service or writes to a database,
+notifying responders one at a time delays every responder after that one.
 
-If listeners are coroutines,
+If responders are coroutines,
 `announce()` awaits them together with `asyncio.gather()`,
-so one state change notifies every listener concurrently.
-A slow listener no longer delays the others.
+so one state change notifies every responder concurrently.
+A slow responder no longer delays the others.
 `gather()` waits for all of them,
-so `announce()` returns only after every listener finishes.
+so `announce()` returns only after every responder finishes.
 
 An `announce()` that awaits is a coroutine,
 and its caller must `await` it in turn,
@@ -693,24 +696,26 @@ A coroutine pauses at `await` while others run:
 import asyncio
 from collections.abc import Awaitable, Callable
 
-type AsyncListener[T] = Callable[[T], Awaitable[None]]
+type AsyncResponder[T] = Callable[[T], Awaitable[None]]
 
 class Broadcaster[T]:
     def __init__(self) -> None:
-        self._listeners: list[AsyncListener[T]] = []
+        self._responders: list[AsyncResponder[T]] = []
 
-    def subscribe(self, listener: AsyncListener[T]) -> None:
-        self._listeners.append(listener)
+    def subscribe(
+        self, responder: AsyncResponder[T]
+    ) -> None:
+        self._responders.append(responder)
 
     def unsubscribe(
-        self, listener: AsyncListener[T]
+        self, responder: AsyncResponder[T]
     ) -> None:
-        self._listeners.remove(listener)
+        self._responders.remove(responder)
 
     async def announce(self, data: T) -> None:
-        # Fan out to every listener, then wait for all
+        # Fan out to every responder, then wait for all
         await asyncio.gather(
-            *(fn(data) for fn in self._listeners))
+            *(fn(data) for fn in self._responders))
 
 class Thermometer(Broadcaster[float]):
     def __init__(self, celsius: float) -> None:
@@ -729,7 +734,7 @@ class Thermometer(Broadcaster[float]):
 
 The module defines classes and runs nothing,
 so a later listing can import `Broadcaster` without starting a demo.
-The thermometer demo lives in its own file, and its listeners are coroutines:
+The thermometer demo lives in its own file, and its responders are coroutines:
 
 ```python
 # async_thermometer.py
@@ -759,40 +764,40 @@ asyncio.run(main())
 ```
 
 `gather()` takes one awaitable per argument rather than an iterable of them,
-so `announce()` calls the listeners in a generator expression and [unpacks](05_Foundations--Functions.md#unpacking-arguments)
+so `announce()` calls the responders in a generator expression and [unpacks](05_Foundations--Functions.md#unpacking-arguments)
 that generator with `*`, turning each coroutine into its own argument.
 
-The `AsyncListener` alias makes the type checker reject a plain function as a listener.
-A listener must return an awaitable,
+The `AsyncResponder` alias makes the type checker reject a plain function as a responder.
+A responder must return an awaitable,
 and calling an `async` function produces one.
 The type checker also rejects the reverse mistake,
 an `async` function subscribed to the synchronous `Broadcaster`.
 Calling that function returns a coroutine rather than `None`,
 and a coroutine discarded without an `await` does nothing.
-In both aliases the type parameter ties the listener's argument to the broadcaster's payload:
-a `Broadcaster[float]` accepts a listener that takes a `float` and rejects one that takes a `str`.
+In both aliases the type parameter ties the responder's argument to the broadcaster's payload:
+a `Broadcaster[float]` accepts a responder that takes a `float` and rejects one that takes a `str`.
 
 `alarm` subscribes before `log_reading`,
 yet at 150 degrees the log prints first.
-Awaiting the listeners in sequence prints in subscription order, alarm first.
-Concurrent fan-out lets each listener finish as soon as its own wait ends,
-so the faster listener prints first.
+Awaiting the responders in sequence prints in subscription order, alarm first.
+Concurrent fan-out lets each responder finish as soon as its own wait ends,
+so the faster responder prints first.
 The results `gather()` returns stay in argument order regardless.
 Only the side effects interleave.
 
-A listener need not act on every notification.
+A responder need not act on every notification.
 Below its threshold, the alarm returns at once.
 
 ### Unsubscribing During an Async Notification
 
 The async `announce()` needs no `list()` copy.
 The `*` unpacks the generator into a tuple of coroutines before `gather()` runs,
-so an unsubscribe during the fan-out cannot skip a listener.
-The tuple also means a listener that unsubscribes mid-notification still receives this change,
-an async counterpart to `self_removing_listener.py`:
+so an unsubscribe during the fan-out cannot skip a responder.
+The tuple also means a responder that unsubscribes mid-notification still receives this change,
+an async counterpart to `self_removing_responder.py`:
 
 ```python
-# async_self_removing_listener.py
+# async_self_removing_responder.py
 import asyncio
 from async_broadcaster import Broadcaster
 
@@ -823,11 +828,11 @@ and `always` still receives the change,
 because `gather()` held both coroutines before either ran.
 The next `announce()` builds its tuple from the shortened list and calls `always` alone.
 
-### A Failing Listener Orphans the Rest
+### A Failing Responder Orphans the Rest
 
-A failing asynchronous listener behaves differently from a failing synchronous one.
+A failing asynchronous responder behaves differently from a failing synchronous one.
 `gather()` re-raises the first exception to its caller right away,
-and the unfinished listeners keep running with nobody awaiting them:
+and the unfinished responders keep running with nobody awaiting them:
 
 ```python
 # gather_orphan.py
@@ -863,10 +868,10 @@ the async form of exercise 3's catch-collect-continue.
 [Concurrency](19_Techniques--Concurrency.md#structured-concurrency-with-taskgroup)'s `TaskGroup` is the usual choice for concurrent awaits,
 but not here.
 A `TaskGroup` cancels a failing task's siblings,
-so a single broken listener cancels the others mid-notification.
+so a single broken responder cancels the others mid-notification.
 
-Use the async fan-out only when the listeners are I/O-bound.
-For in-memory listeners the synchronous `Broadcaster` from `broadcaster.py` is simpler and needs no event loop.
+Use the async fan-out only when the responders are I/O-bound.
+For in-memory responders the synchronous `Broadcaster` from `broadcaster.py` is simpler and needs no event loop.
 
 ## A Visual Example: a Model and Its View
 
@@ -977,7 +982,7 @@ then builds `grid` from `size`.
 The model contains no display code, so you can test it without a GUI.
 Testing confirms that `recolored()` changes the cross and no other cell,
 that a selection in a corner stays on the grid,
-and that listeners receive the new grid after a selection:
+and that responders receive the new grid after a selection:
 
 ```python
 # test_box_observer.py
@@ -1015,7 +1020,7 @@ def test_model_notifies_with_the_new_grid() -> None:
     model = BoxModel(3)
     before = model.grid[(1, 1)]
     seen: list[Grid] = []
-    # The listener is a callable
+    # The responder is a callable
     model.subscribe(seen.append)
     model.select((1, 1))
     assert seen[-1] is model.grid
@@ -1070,14 +1075,14 @@ so it is a closure that reads `canvas` and `cell_px`.
 For each cell it paints one rectangle,
 whose pixel corners come from multiplying the cell's column and row by `cell_px`.
 It takes a `Grid` and returns `None`,
-the shape `subscribe()` requires of a listener.
+the shape `subscribe()` requires of a responder.
 When the window opens,
 `show()` calls `draw(model.grid)` once to paint the starting grid.
 
 `draw()` clears the canvas before repainting.
 Otherwise, each notification adds another `size * size` rectangles on top of the previous ones.
 The window looks the same but the canvas's list of items grows without limit,
-the same quiet accumulation as a lapsed listener.
+the same quiet accumulation as a *lapsed listener*.
 
 `canvas.bind()` registers the lambda as the handler for `"<Button-1>"`,
 a press of the left mouse button.
@@ -1235,45 +1240,45 @@ the `bind()` lambda interprets the click, and both sit inside `show()`.
 ## What Stays Constant
 
 *Observer* serves four scenarios in this chapter:
-a thermometer whose listeners print a reading,
-the same thermometer whose coroutine listeners run concurrently,
-a grid model whose listener repaints a canvas,
+a thermometer whose responders print a reading,
+the same thermometer whose coroutine responders run concurrently,
+a grid model whose responder repaints a canvas,
 and a counter wired as Document-View and as MVC.
-In every case the listener is a callable,
-and the broadcaster holds listeners and calls each one when its state changes.
+In every case the responder is a callable,
+and the broadcaster holds responders and calls each one when its state changes.
 The pattern requires no interface, no `update()` method,
 and no class per reaction.
 
 ## Deciding What Matters
 
 `Thermometer` measures, decides which changes to announce,
-and tells the listeners.
+and tells the responders.
 [Cohesion](21_Patterns--Design_Patterns.md#design-principles)
 means one job per class, and that is three.
-Of the two added jobs, telling the listeners can move out of the class.
-`Broadcaster` keeps the listener list and the notification loop in a base class,
+Of the two added jobs, telling the responders can move out of the class.
+`Broadcaster` keeps the responder list and the notification loop in a base class,
 and `watched.py` drops the base class and calls its watchers from `__setattr__()`,
 so one method covers every attribute.
 The job still belongs to the object either way, and its code lives elsewhere.
 
 The other added job is deciding which changes to announce.
 That decision belongs to the object whose state changes, or to whoever calls it.
-It never belongs to a listener,
+It never belongs to a responder,
 whose choice is limited to filtering the changes it receives.
 `Thermometer`'s setter announces every assignment,
 which says that every change matters to everyone.
 [Leaving that call to the client](#push-or-pull)
 instead lets several changes coalesce into one announcement,
-but a caller who forgets the call leaves every listener out of date.
-Push sends the value, so the thermometer decides what each listener receives.
+but a caller who forgets the call leaves every responder out of date.
+Push sends the value, so the thermometer decides what each responder receives.
 Pull sends the thermometer,
-so each listener reads the attribute it names and depends on that interface.
+so each responder reads the attribute it names and depends on that interface.
 `watched.py` leaves the choice to its watchers: two states,
 `celsius` and `humidity`, share one channel,
 so every watcher receives both kinds of change and filters by the name it is handed.
 
 *Observer* therefore removes one coupling and keeps another.
-The object that changes knows its listeners only as callables,
+The object that changes knows its responders only as callables,
 yet it still decides what they hear.
 A threshold makes that concrete.
 This thermometer announces a reading only when it differs from the reading before it by at least `_delta`:
@@ -1316,37 +1321,37 @@ print(log)
 #: [20.9, 22.0]
 ```
 
-`_delta` is the thermometer's field and its listeners' business.
+`_delta` is the thermometer's field and its responders' business.
 Half a degree is a judgment about what a display needs,
 and `display` prints whatever it receives.
 It is the wrong judgment for `log`, which exists to record every reading,
 and the thermometer announces only two of the four readings.
 `log` loses the other two for good,
-and nothing in `ThresholdThermometer` says which listener the half degree serves.
+and nothing in `ThresholdThermometer` says which responder the half degree serves.
 [`reentrant_announce_fixed.py`](#re-entrant-notification)
 makes a smaller version of the same decision:
 its setter returns early when the new value equals the current reading,
-so a listener that counts readings rather than changes misses that repeated reading.
+so a responder that counts readings rather than changes misses that repeated reading.
 
-Move the comparison into the listeners and the number sits where the need is.
+Move the comparison into the responders and the number sits where the need is.
 `display` then remembers the last value it drew and skips a reading close to it,
 `log` appends whatever arrives, and the setter announces every assignment again.
 The thermometer knows nothing about tolerance,
-and each listener that filters by size repeats the same comparison.
+and each responder that filters by size repeats the same comparison.
 `async_thermometer.py`'s `alarm` already works this way,
 returning at once for a reading below 100 degrees.
 
-Repeating the comparison in each listener suits a question about *how much*,
-because each listener sets its own threshold.
+Repeating the comparison in each responder suits a question about *how much*,
+because each responder sets its own threshold.
 *Which kind* is a different question, and repetition handles it poorly,
-because every kind of change arrives on one channel and each listener sorts them itself.
+because every kind of change arrives on one channel and each responder sorts them itself.
 `watched.py` shows that repetition,
 with every watcher taking the attribute name and filtering it.
 [Function Objects](28_Patterns--Function_Objects.md#an-event-bus-handlers-keyed-by-type)
 removes it: one list becomes a dictionary of lists keyed by event type,
 so an announcement carries the kind of thing that happened and each handler subscribes to the kind it cares about.
 The publisher then decides which event it is publishing, something it knows,
-instead of guessing which listeners need it.
+instead of guessing which responders need it.
 
 ## Exercises
 
@@ -1354,7 +1359,7 @@ instead of guessing which listeners need it.
     without looking at `broadcaster.py`:
     the smallest `Broadcaster` that lets callables subscribe,
     then notifies them.
-    Demonstrate it by subscribing several listeners and causing one change that updates them all.
+    Demonstrate it by subscribing several responders and causing one change that updates them all.
 2.  Rewrite `classic_observer.py` to use the pull model:
     `Display.update()` reads `subject.celsius` instead of `arg`.
     A `Display` that narrows its `subject` parameter to `Thermometer` no longer satisfies `Observer[float]`,
@@ -1363,24 +1368,24 @@ instead of guessing which listeners need it.
     and once with an `Observer[S, T]` protocol whose first parameter is the subject type,
     which `Subject` supplies as `Self`.
     Say what each version adds.
-3.  Make `Broadcaster.announce()` survive a listener that raises an exception:
-    every other listener is still notified,
+3.  Make `Broadcaster.announce()` survive a responder that raises an exception:
+    every other responder is still notified,
     and `announce()` re-raises the failures afterward, together,
     as an [`ExceptionGroup`](19_Techniques--Concurrency.md#structured-concurrency-with-taskgroup)
     (which you build yourself here: `raise ExceptionGroup("message", failures)`).
-    Write a test in which the first listener raises an exception and the second still records its notification.
+    Write a test in which the first responder raises an exception and the second still records its notification.
 4.  Redo exercise 3 for `async_broadcaster.py`.
     Make `announce()` use `gather(*coros, return_exceptions=True)`,
     separate the returned exceptions from the successes,
     and raise them together as an `ExceptionGroup`.
-    Write a test in which the first listener raises an exception and the second still records its notification.
+    Write a test in which the first responder raises an exception and the second still records its notification.
 5.  Redo exercise 3 with each failure returned as a value instead of raised as an exception.
-    Each listener returns a [`Result`](42_Functional--Error_Handling.md#a-result-type)
+    Each responder returns a [`Result`](42_Functional--Error_Handling.md#a-result-type)
     from `utils/result.py`,
     and `announce()` returns the `Err` values it collects.
-    Write an adapter that lets a listener returning `None`,
+    Write an adapter that lets a responder returning `None`,
     such as `received.append`, subscribe.
-    Write a test in which the first listener fails and the second still records its notification.
+    Write a test in which the first responder fails and the second still records its notification.
 6.  Turn `box_observer.py` into a simple game:
     you own the contiguous patch of same-colored squares containing the top-left corner,
     and selecting any square recolors your patch to that square's color,
@@ -1410,8 +1415,8 @@ instead of guessing which listeners need it.
     that replaces the `@property` and `announce()` pair,
     so one class declares several independently watched attributes:
     `celsius = Notifying[float]()` beside `humidity = Notifying[float]()`.
-    Each attribute keeps its own listeners.
+    Each attribute keeps its own responders.
     Subscribing needs the descriptor, not the value it stores,
     so `__get__()` returns the descriptor for an access through the class,
     and `Thermometer.celsius.subscribe(t, readings.append)` reaches it.
-    Show that an assignment to one attribute calls no listener of the other.
+    Show that an assignment to one attribute calls no responder of the other.

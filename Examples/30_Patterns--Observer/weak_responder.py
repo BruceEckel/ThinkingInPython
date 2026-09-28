@@ -1,4 +1,4 @@
-# weak_listener.py
+# weak_responder.py
 from weakref import WeakMethod
 from broadcaster import Broadcaster
 from exceptions import expected

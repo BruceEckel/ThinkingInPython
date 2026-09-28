@@ -1,4 +1,4 @@
-# async_self_removing_listener.py
+# async_self_removing_responder.py
 import asyncio
 from async_broadcaster import Broadcaster
 
