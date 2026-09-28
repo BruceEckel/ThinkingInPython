@@ -215,7 +215,7 @@ Each generated class is a real type, not a label.
 `LightOn` and `WaterOff` are both `Event` instances,
 so `isinstance(light, Event)` is `True`,
 but `type(light) is type(water)` is `False`: they are distinct subclasses,
-and `isinstance()` tells them apart. behavior of its own.
+and `isinstance()` tells them apart.
 
 `ty` cannot follow a class built by `type()`.
 It models `new_cls` as unknown, so it checks nothing about the generated class.
@@ -1431,7 +1431,8 @@ so an ordinary method receives the class name as its `self` and leaves `bases` u
 producing a `TypeError` that says nothing about the real mistake.
 No other hook can do this: `__init_subclass__()`, `__set_name__()`,
 and a class decorator all run after the body has finished,
-by which time the second definition has overwritten the first. ruff's own report of the same mistake is the static half of the check,
+by which time the second definition has overwritten the first.
+The static half of the check is ruff's report of the same mistake,
 and the `# noqa: F811` suppresses it so the listing can run.
 `__prepare__()` catches it at run time, including on names the body computes.
 

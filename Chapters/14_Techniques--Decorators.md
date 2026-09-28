@@ -474,8 +474,8 @@ Stacking works because each wrapper preserves the interface of what it wraps:
 every layer looks like the original function,
 so the layers compose to any depth.
 
-the name survives two layers of wrapping,
-and the inner decorator still repeats the body once per outer call:
+Testing confirms that the name survives two layers of wrapping,
+and that the inner decorator still repeats the body once per outer call:
 
 ```python
 # test_stacking.py
