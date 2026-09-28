@@ -765,10 +765,6 @@ A responder must return an awaitable,
 and calling an `async` function produces one.
 The type checker also rejects the reverse mistake,
 an `async` function subscribed to the synchronous `Broadcaster`.
-Calling that function returns a coroutine rather than `None`,
-and a coroutine discarded without an `await` does nothing.
-In both aliases the type parameter ties the responder's argument to the broadcaster's payload:
-a `Broadcaster[float]` accepts a responder that takes a `float` and rejects one that takes a `str`.
 
 An `announce()` that awaits is a coroutine,
 and its caller must `await` it in turn,
@@ -777,8 +773,7 @@ An `async` setter returns a coroutine instead of running its body,
 and an assignment offers no place to `await` that coroutine.
 The assignment therefore discards the coroutine, and the body never runs.
 So the asynchronous `Thermometer` changes `celsius` with an awaitable method,
-`set_celsius()`, rather than the assignment `t.celsius = value`,
-and reads it through a property as the synchronous one does:
+`set_celsius()`, rather than the assignment `t.celsius = value`:
 
 ```python
 # async_thermometer.py
@@ -788,10 +783,6 @@ class Thermometer(Broadcaster[float]):
     def __init__(self, celsius: float) -> None:
         super().__init__()
         self._celsius = celsius
-
-    @property
-    def celsius(self) -> float:
-        return self._celsius
 
     async def set_celsius(self, value: float) -> None:
         # A property setter cannot be awaited

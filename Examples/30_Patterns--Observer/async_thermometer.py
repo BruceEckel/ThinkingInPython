@@ -6,10 +6,6 @@ class Thermometer(Broadcaster[float]):
         super().__init__()
         self._celsius = celsius
 
-    @property
-    def celsius(self) -> float:
-        return self._celsius
-
     async def set_celsius(self, value: float) -> None:
         # A property setter cannot be awaited
         self._celsius = value
