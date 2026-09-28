@@ -194,7 +194,7 @@ and each of those behaviors changes how the broadcaster must be written.
 
 ## The Pythonic Observer: Callables in a List
 
-In Python, a responder is any callable that takes a notification and returns `None`.
+A responder is any callable that takes a notification and returns `None`.
 A broadcaster keeps a list of those callables and announces each change to every one:
 
 ```python
@@ -246,8 +246,9 @@ class Thermometer(Broadcaster[float]):
         self.announce(value)
 ```
 
-The constructor assigns its argument to `_celsius` rather than to `celsius`,
-so construction skips the setter and doesn't call `announce()`.
+The constructor assigns its argument directly to `_celsius` rather than to `celsius`,
+which would go through the setter.
+This way, construction skips the setter and doesn't call `announce()`.
 
 Subscribed callables react to every `celsius` assignment:
 
@@ -270,10 +271,9 @@ The responders here are lambdas, but any function or bound method works.
 
 ![Assigning to celsius calls every responder](_images/observer_broadcast)
 
-The `display` and `alarm` boxes are the listing's two lambdas;
-the dashed `plot` responder is not in the listing.
-Any callable of the right shape subscribes with the same `subscribe()` call as the two lambdas,
-and `Thermometer` knows its responders only as callables that take a `float`.
+The dashed `plot` responder is not part of the example.
+It's in the diagram to show that any callable of the right shape subscribes with the same `subscribe()` call as the two lambdas.
+`Thermometer` knows its responders only as callables that take a `float`.
 
 Four things from the classic version disappear: the `Observer` interface,
 its `update()` method, a class per reaction, and the `subject` argument.
