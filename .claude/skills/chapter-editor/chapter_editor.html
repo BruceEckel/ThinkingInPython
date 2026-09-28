@@ -338,7 +338,9 @@ function diffHtml(before, after) {
 }
 
 // ---- Blocks: built once, updated in place.
-function lastRound(b) { return state.meta && state.meta.round > 1 && b.changed === state.meta.round - 1; }
+// A load stamps each block it changed with the round it opens, so the
+// blocks outlined are those stamped with the current round.
+function lastRound(b) { return state.meta && state.meta.round > 1 && b.changed === state.meta.round; }
 
 function buildBlock(id) {
   const el = document.createElement("section");
@@ -381,8 +383,8 @@ function updateBlock(el, id, idx) {
   if (prevbox.dataset.sig !== psig) {
     prevbox.dataset.sig = psig;
     prevbox.innerHTML = !showPrev ? "" : b.previous == null
-      ? `<div class="prev"><span class="cap">New in round ${state.meta.round - 1}</span>This paragraph did not exist before.</div>`
-      : `<div class="prev"><span class="cap">What changed in round ${state.meta.round - 1}</span>${diffHtml(b.previous, b.source)}</div>`;
+      ? `<div class="prev"><span class="cap">New since round ${state.meta.round - 1}</span>This paragraph did not exist before.</div>`
+      : `<div class="prev"><span class="cap">What changed since round ${state.meta.round - 1}</span>${diffHtml(b.previous, b.source)}</div>`;
   }
   // Tools.
   const tools = [];

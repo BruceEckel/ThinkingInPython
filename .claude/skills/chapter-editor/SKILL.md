@@ -55,3 +55,6 @@ Every round below uses that URL.
 - Never write block documents while the page's status is `open`; he may be marking.
 - Listings take Rewrite marks only. A Rewrite mark on a listing is a request to change the code in the Markdown block, then run the full verify loop.
 - The page template is shared across chapters. After editing it, run `uv run python -m tools.chapter_editor page NN` for each open chapter and republish that copy to its URL; `load` also regenerates the copy.
+- A change made to the chapter outside a round (a rename, a paragraph added on request) reaches an open page with `tip editor-load CH=NN ARGS=--refresh`,
+  after checking the page has no marks or edits (`query` with `marks != []`, then `edit != null`).
+  It stays in the round and outlines the change with the round's others; a plain or `--force` load would start the next round and drop the outlines Bruce has not read.

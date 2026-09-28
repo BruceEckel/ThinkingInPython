@@ -167,6 +167,18 @@ so the table is also your map into that literature.
 Java and JavaScript call a responder a listener,
 as in `ActionListener` and `addEventListener()`.
 
+The essential part of *Observer* is the response: something changes,
+and code elsewhere runs because of it.
+The words "observer" and "listener" name a role that waits and watches,
+and neither word says what happens when the change arrives.
+"Responder" names the action,
+so the word points you at the question every design here must answer:
+what does this code do when a change reaches it?
+The rest of the chapter keeps returning to that question.
+A responder can unsubscribe itself mid-notification, raise an exception,
+wait on a slow network call, or write back to its broadcaster,
+and each of those behaviors changes how the broadcaster must be written.
+
 ## The Pythonic Observer: Callables in a List
 
 In Python, a responder is any callable that takes a notification and returns `None`.

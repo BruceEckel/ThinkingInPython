@@ -179,3 +179,19 @@ def test_a_reload_pins_each_write_to_the_version_read(chapter: Path,
     batch = json.loads((where / "batch1.json").read_text("utf-8"))
     pins = {w["doc_id"]: w.get("if_version") for w in batch}
     assert pins == {bid: 7, "chapter": 3}
+
+
+def test_a_refresh_stays_in_the_round(chapter: Path, tmp_path: Path) -> None:
+    ce.load("99", force=False)
+    where = ce.OUT / "99"
+    bid = find(where, "Last paragraph")
+    page_round(where, tmp_path / "read", {bid: {"edit": "Round one."}})
+    ce.apply("99", tmp_path / "read", force=False)
+    ce.load("99", force=False)  # Round 2 shows round 1's change.
+    chapter.write_text(chapter.read_text("utf-8").replace(
+        "Round one.", "Refreshed."), encoding="utf-8")
+    assert ce.load("99", force=False, refresh=True) == 0
+    doc = docs(where)[bid]
+    assert (doc["changed"], doc["previous"]) == (2, "Last paragraph.")
+    state = json.loads((where / "state.json").read_text("utf-8"))
+    assert state["round"] == 2

@@ -160,13 +160,23 @@ def align(old: list[str], new: list[str]):  # noqa: ANN201
     return difflib.SequenceMatcher(None, old, new, autojunk=False).get_opcodes()
 
 
-def load(chapter: str, force: bool) -> int:
+def load(chapter: str, force: bool, refresh: bool = False) -> int:
+    """Write the page's documents for the chapter as it stands.
+
+    A plain load starts the next round. `refresh` stays in the current
+    one, for a change made to the chapter while the page is open with no
+    marks on it: each block that changed is outlined with the changes the
+    round already shows, and keeps the text it had when the round began
+    as its previous version.
+    """
     path = chapter_file(chapter)
     where = out_dir(path)
     text = path.read_text(encoding="utf-8")
     blocks = parse(text)
     state = load_state(where)
-    if state and not state.get("applied") and not force:
+    if refresh and not state:
+        raise SystemExit("nothing loaded yet to refresh")
+    if state and not state.get("applied") and not (force or refresh):
         print("the last round was loaded but never applied; apply it "
               "first, or pass --force to load over its marks",
               file=sys.stderr)
@@ -175,7 +185,8 @@ def load(chapter: str, force: bool) -> int:
     docs.mkdir(parents=True, exist_ok=True)
     for old in docs.glob("*.json"):
         old.unlink()
-    rnd = state["round"] + 1 if state else 1
+    rnd = state["round"] + (0 if refresh else 1) if state else 1
+    stamp = rnd  # The round whose page outlines the change.
     info: dict[str, dict[str, Any]] = state["blocks"] if state else {}
     old_order: list[str] = state["order"] if state else []
     consumed = set(state.get("consumed", [])) if state else set()
@@ -215,10 +226,13 @@ def load(chapter: str, force: bool) -> int:
         for k, b in enumerate(news):
             if k < len(olds):
                 bid = olds[k]
-                put(bid, b, info[bid]["source"], rnd)
+                rec = info[bid]
+                keep = refresh and rec.get("changed") == stamp
+                put(bid, b, rec.get("previous") if keep else rec["source"],
+                    stamp)
             else:
                 bid = fresh()
-                put(bid, b, None, rnd if state else 0)
+                put(bid, b, None, stamp if state else 0)
             order.append(bid)
             changed += 1
         gone.extend(olds[len(news):])
@@ -438,6 +452,8 @@ def main(argv: list[str] | None = None) -> int:
     s.add_argument("chapter", help="chapter number, e.g. 30")
     s.add_argument("--force", action="store_true",
                    help="load over a round that was never applied")
+    s.add_argument("--refresh", action="store_true",
+                   help="update the open round in place (no marks on it)")
     g = sub.add_parser("page", help="rewrite the page copy only, for a "
                        "template change in the middle of a round")
     g.add_argument("chapter")
@@ -450,7 +466,7 @@ def main(argv: list[str] | None = None) -> int:
                    help="apply a round the page has not sent")
     args = ap.parse_args(argv)
     if args.command == "load":
-        return load(args.chapter, args.force)
+        return load(args.chapter, args.force, args.refresh)
     if args.command == "page":
         print(write_page(chapter_file(args.chapter)).relative_to(ROOT))
         return 0
