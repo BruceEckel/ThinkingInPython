@@ -722,13 +722,12 @@ notifying responders one at a time delays every responder after that one.
 If responders are coroutines,
 `announce()` awaits them together with `asyncio.gather()`,
 so one state change notifies every responder concurrently.
-A slow responder no longer delays the others.
+A slow responder doesn't delay the others.
 `gather()` waits for all of them,
 so `announce()` returns only after every responder finishes.
 
 [Concurrency](19_Techniques--Concurrency.md#asyncio-mechanics)
-covers the `asyncio` mechanics here (`async def`, `await`, `gather()`, `run()`).
-A coroutine pauses at `await` while others run:
+covers the `asyncio` mechanics (`async def`, `await`, `gather()`, `run()`):
 
 ```python
 # async_broadcaster.py
