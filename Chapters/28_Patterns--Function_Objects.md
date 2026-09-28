@@ -57,8 +57,8 @@ for command in macro:
 #: It's pining for the fjords.
 ```
 
-`Command` names the signature every entry must have: no arguments,
-nothing returned.
+`Command` names the signature every entry must have:
+it takes no arguments and returns `None`.
 The classic object form turns that name into a base class and wraps each action in a `Command` subclass with an `execute()` method:
 
 ```python
