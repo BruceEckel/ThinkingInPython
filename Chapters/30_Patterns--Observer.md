@@ -21,7 +21,7 @@ The classic example is Smalltalk's MVC (model-view-controller),
 or the nearly-equivalent *Document-View* architecture,
 which folds the controller into the view.
 In both, *Observer* connects the state change to its views:
-one subject holds a list of views and names no view type.
+one subject keeps a list of views and accepts any view that has the update method it calls.
 This way, a *document* can have more than one way to view it,
 such as a plot and a table.
 When the data changes, every view must refresh.
