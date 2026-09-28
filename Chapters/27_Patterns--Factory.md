@@ -353,6 +353,14 @@ and any of those may be a concrete subclass.
 [Explicit Registration with a Protocol](#explicit-registration-with-a-protocol)
 moves that report to the check.
 
+To add a `Triangle` is a single class definition,
+and `make()` builds it with no change to the factory.
+`Shape.__subclasses__()` can build the table instead,
+but it lists only direct subclasses,
+while `__init_subclass__()` runs for every class anywhere below `Shape`.
+[Pattern Refactoring](37_Patterns--Pattern_Refactoring.md#the-trash-hierarchy)
+uses this same self-registration.
+
 Importing `registry` runs its two `class` statements,
 and the key list shows the table they left behind:
 
@@ -378,14 +386,6 @@ The closed `Literal` in `shape_table.py` rejects `"Hexagon"` before the program 
 An open registry cannot do that,
 since a name becomes valid the moment some module defines the class,
 so the check moves to runtime.
-
-To add a `Triangle` is a single class definition,
-and `make()` builds it with no change to the factory.
-`Shape.__subclasses__()` can build the table instead,
-but it lists only direct subclasses,
-while `__init_subclass__()` runs for every class anywhere below `Shape`.
-[Pattern Refactoring](37_Patterns--Pattern_Refactoring.md#the-trash-hierarchy)
-uses this same self-registration.
 
 ### Hazards of Self Registration
 
