@@ -223,7 +223,7 @@ Its type parameter `T` fixes the type of each notification,
 and a class that inherits `Broadcaster` gets `subscribe()`, `unsubscribe()`,
 and `announce()`.
 
-`Thermometer` is a `Broadcaster[float]` that announces from its `celsius` setter.
+`Thermometer` announces from its `celsius` setter.
 A setter runs at every assignment to its attribute,
 so every assignment to `celsius` reaches the responders:
 
