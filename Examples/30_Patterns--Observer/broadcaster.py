@@ -16,17 +16,3 @@ class Broadcaster[T]:
     def announce(self, data: T) -> None:
         for responder in list(self._responders):
             responder(data)
-
-class Thermometer(Broadcaster[float]):
-    def __init__(self, celsius: float) -> None:
-        super().__init__()
-        self._celsius = celsius
-
-    @property
-    def celsius(self) -> float:
-        return self._celsius
-
-    @celsius.setter
-    def celsius(self, value: float) -> None:
-        self._celsius = value
-        self.announce(value)

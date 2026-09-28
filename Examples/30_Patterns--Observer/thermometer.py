@@ -1,12 +1,16 @@
 # thermometer.py
-from broadcaster import Thermometer
+from broadcaster import Broadcaster
 
-t = Thermometer(20.0)
-t.subscribe(lambda c: print(f"display: {c}C"))
-t.subscribe(lambda c: print("alarm!" if c > 100 else "ok"))
-t.celsius = 25
-#: display: 25C
-#: ok
-t.celsius = 150
-#: display: 150C
-#: alarm!
+class Thermometer(Broadcaster[float]):
+    def __init__(self, celsius: float) -> None:
+        super().__init__()
+        self._celsius = celsius
+
+    @property
+    def celsius(self) -> float:
+        return self._celsius
+
+    @celsius.setter
+    def celsius(self, value: float) -> None:
+        self._celsius = value
+        self.announce(value)

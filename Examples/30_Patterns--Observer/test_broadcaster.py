@@ -1,6 +1,7 @@
 # test_broadcaster.py
 import pytest
-from broadcaster import Broadcaster, Thermometer
+from broadcaster import Broadcaster
+from thermometer import Thermometer
 
 def test_announce_calls_every_subscriber() -> None:
     received: list[tuple[str, object]] = []

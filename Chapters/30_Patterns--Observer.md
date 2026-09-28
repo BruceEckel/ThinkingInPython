@@ -180,10 +180,7 @@ and each of those behaviors changes how the broadcaster must be written.
 ## The Pythonic Observer: Callables in a List
 
 In Python, a responder is any callable that takes a notification and returns `None`.
-A broadcaster announces each change to a list of those callables.
-`Thermometer` announces from its `celsius` setter.
-A setter runs at every assignment to its attribute,
-so every assignment to `celsius` reaches the responders:
+A broadcaster keeps a list of those callables and announces each change to every one:
 
 ```python
 # broadcaster.py
@@ -204,6 +201,20 @@ class Broadcaster[T]:
     def announce(self, data: T) -> None:
         for responder in list(self._responders):
             responder(data)
+```
+
+`Broadcaster` knows nothing about what it announces.
+Its type parameter `T` fixes the type of each notification,
+and a class that inherits `Broadcaster` gets `subscribe()`, `unsubscribe()`,
+and `announce()`.
+
+`Thermometer` is a `Broadcaster[float]` that announces from its `celsius` setter.
+A setter runs at every assignment to its attribute,
+so every assignment to `celsius` reaches the responders:
+
+```python
+# thermometer.py
+from broadcaster import Broadcaster
 
 class Thermometer(Broadcaster[float]):
     def __init__(self, celsius: float) -> None:
@@ -226,8 +237,8 @@ so construction skips the setter and doesn't call `announce()`.
 Subscribed callables react to every `celsius` assignment:
 
 ```python
-# thermometer.py
-from broadcaster import Thermometer
+# thermometer_demo.py
+from thermometer import Thermometer
 
 t = Thermometer(20.0)
 t.subscribe(lambda c: print(f"display: {c}C"))
@@ -305,7 +316,8 @@ Two more tests cover a callable subscribed twice and an `unsubscribe()` that mat
 ```python
 # test_broadcaster.py
 import pytest
-from broadcaster import Broadcaster, Thermometer
+from broadcaster import Broadcaster
+from thermometer import Thermometer
 
 def test_announce_calls_every_subscriber() -> None:
     received: list[tuple[str, object]] = []
