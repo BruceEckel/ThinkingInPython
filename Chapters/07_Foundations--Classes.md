@@ -38,6 +38,18 @@ x.show_twice()
 #: Constructor argument
 ```
 
+The first method of `Simple`, `__init__()`, is the *initializer*.
+The double underscores on both ends make it a *dunder*,
+Python's name for a method the language itself calls.
+The `__new__()` method is the *constructor*, which you rarely use
+([*Singleton*](24_Patterns--Singleton.md) shows a case that needs it).
+Most programmers call `__init__()` the constructor,
+since it does the job of constructors in other OOP languages.
+This book follows that practice.
+
+Python calls the constructor automatically during object creation.
+In the demo, creating an object looks like calling a function named after the class.
+
 Ordinary methods require a reference to the current object.
 When you define a method you must explicitly specify the reference as the first parameter.
 Python programmers traditionally name the reference `self`,
@@ -65,18 +77,6 @@ The "1" in the error message counts that reference,
 and a method defined without `self` has no parameter to receive it.
 A type checker sees the mistake before anything runs,
 so the call carries a `# type: ignore` to say the mistake is deliberate.
-
-The first method, `__init__()`, is the *initializer*.
-The double underscores on both ends make it a *dunder*,
-Python's name for a method the language itself calls.
-The `__new__()` method is the *constructor*, which you rarely use
-([*Singleton*](24_Patterns--Singleton.md) shows a case that needs it).
-Most programmers call `__init__()` the constructor,
-since it does the job of constructors in other OOP languages.
-This book follows that practice.
-
-Python calls the constructor automatically during object creation.
-In the demo, creating an object looks like calling a function named after the class.
 
 In C++ or Java you declare object-level fields inside the class body but outside the methods.
 In Python an object attribute comes into being when a method assigns to it through `self`

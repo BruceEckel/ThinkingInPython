@@ -313,6 +313,8 @@ for name, age in ages.items():
 
 Use `dict.get()` instead of `[]` to avoid a `KeyError` when a key might be absent.
 
+A `dict` iterates in insertion order, and the language guarantees that order.
+
 A `dict` has three views: `keys()`, `values()`, and `items()`.
 Iterating the `dict` iterates `keys()`, so `for name in ages` walks the names.
 `items()` alone yields `(key, value)` pairs,
@@ -334,8 +336,6 @@ other = {"Bob": 0, "Dan": 0}
 print(ages.keys() & other.keys())  # Set algebra on a view
 #: {'Bob'}
 ```
-
-A `dict` iterates in insertion order, and the language guarantees that order.
 
 Entries come out as easily as they go in, and two dictionaries combine:
 
@@ -769,6 +769,18 @@ Modifying an immutable container is a type error as well as a runtime error,
 so each line that attempts it carries a `# type: ignore`.
 The comment silences the type checker.
 
+Use the immutable form whenever a container should not change after you build it.
+Neither you nor the code that receives it can add, remove,
+or replace an element by accident,
+so a container of immutable elements needs no defensive copy before you share it.
+An immutable container is safe as a default argument,
+unlike the [mutable default](05_Foundations--Functions.md#the-mutable-default-trap).
+A `MappingProxyType` is the one exception to watch.
+It blocks writes through the view, but it is a window onto the original `dict`,
+so changes to that `dict` still show through.
+In `immutable_containers.py`,
+writing to `settings` changes what `config` reports.
+
 ### `frozendict`
 
 A `MappingProxyType` is a window onto a `dict` that still exists and can change;
@@ -799,18 +811,6 @@ Like a `tuple` or a `frozenset`,
 it can then be a dictionary key or a set member.
 A dictionary key must be hashable, though it need not be immutable.
 Immutability is how a container earns a stable hash.
-
-Use the immutable form whenever a container should not change after you build it.
-Neither you nor the code that receives it can add, remove,
-or replace an element by accident,
-so a container of immutable elements needs no defensive copy before you share it.
-An immutable container is safe as a default argument,
-unlike the [mutable default](05_Foundations--Functions.md#the-mutable-default-trap).
-A `MappingProxyType` is the one exception to watch.
-It blocks writes through the view, but it is a window onto the original `dict`,
-so changes to that `dict` still show through.
-In `immutable_containers.py`,
-writing to `settings` changes what `config` reports.
 
 ### Shallow Immutability
 
