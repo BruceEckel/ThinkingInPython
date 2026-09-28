@@ -235,6 +235,17 @@ Its type parameter `T` fixes the type of each notification,
 and a class that inherits `Broadcaster` gets `subscribe()`, `unsubscribe()`,
 and `announce()`.
 
+A responder returns `None`, as seen in the `Responder` alias.
+The type checker rejects a subscriber that returns a value.
+Notification runs one way, from broadcaster to responders,
+so `announce()` calls each responder as a statement.
+*GoF Design Patterns* gives the reason under broadcast communication.
+A notification names no receiver, and each responder may handle or ignore it,
+so one call with several responders has no single answer to collect.
+A design that needs an answer uses a different pattern;
+for example [*Chain of Responsibility*](28_Patterns--Function_Objects.md#chain-of-responsibility-choosing-the-handler-at-runtime)
+tries its handlers in turn and returns the result from the first one that succeeds.
+
 `Thermometer` announces from its `celsius` setter.
 A setter runs at every assignment to its attribute,
 so every assignment to `celsius` reaches the responders:
@@ -262,6 +273,27 @@ The constructor assigns its argument directly to `_celsius` rather than to `cels
 which would go through the setter.
 This way, construction skips the setter and doesn't call `announce()`.
 
+`Thermometer`'s constructor is simple and suggests using a `dataclass`.
+Inheriting does not stop a class from being a `dataclass`,
+but [a `dataclass`-generated `__init__()` does not call the base class's `__init__()`](12_Techniques--Data_Classes_as_Types.md#dataclass-inheritance).
+A `@dataclass` `Thermometer` has no list of responders,
+and `subscribe()` raises an `AttributeError`.
+A `__post_init__()` that calls `super().__init__()` fixes that,
+but at greater length and complexity than the `__init__()` it replaces.
+
+`Thermometer` inherits `Broadcaster` because that is the shortest way to get `subscribe()` and `announce()`,
+not because the pattern requires a base class.
+A `Thermometer` can hold a `Broadcaster` as an attribute instead
+(`self.temperature_changed = Broadcaster[float]()`),
+and a subscriber then names that attribute:
+`t.temperature_changed.subscribe(display)`.
+One object can hold several such attributes,
+so it can publish more than one kind of change.
+[Notifying Without a Base Class](#notifying-without-a-base-class)
+drops the base class and the properties together.
+Event-heavy programs have mature libraries (signal/slot systems),
+but for most cases the *Observer* pattern is only a list of callbacks.
+
 Subscribed callables react to every `celsius` assignment:
 
 ```python
@@ -286,38 +318,6 @@ The responders here are lambdas, but any function or bound method works.
 The dashed `plot` responder is not part of the example.
 It's in the diagram to show that any callable of the right shape subscribes with the same `subscribe()` call as the two lambdas.
 `Thermometer` knows its responders only as callables that take a `float`.
-
-`Thermometer` inherits `Broadcaster` because that is the shortest way to get `subscribe()` and `announce()`,
-not because the pattern requires a base class.
-A `Thermometer` can hold a `Broadcaster` as an attribute instead
-(`self.temperature_changed = Broadcaster[float]()`),
-and a subscriber then names that attribute:
-`t.temperature_changed.subscribe(display)`.
-One object can hold several such attributes,
-so it can publish more than one kind of change.
-[Notifying Without a Base Class](#notifying-without-a-base-class)
-drops the base class and the properties together.
-Event-heavy programs have mature libraries (signal/slot systems),
-but for most cases the *Observer* pattern is only a list of callbacks.
-
-`Thermometer`'s constructor is simple and suggests using a `dataclass`.
-Inheriting does not stop a class from being a `dataclass`,
-but [a `dataclass`-generated `__init__()` does not call the base class's `__init__()`](12_Techniques--Data_Classes_as_Types.md#dataclass-inheritance).
-A `@dataclass` `Thermometer` has no list of responders,
-and `subscribe()` raises an `AttributeError`.
-A `__post_init__()` that calls `super().__init__()` fixes that,
-but at greater length and complexity than the `__init__()` it replaces.
-
-A responder returns `None`, as seen in the `Responder` alias.
-The type checker rejects a subscriber that returns a value.
-Notification runs one way, from broadcaster to responders,
-so `announce()` calls each responder as a statement.
-*GoF Design Patterns* gives the reason under broadcast communication.
-A notification names no receiver, and each responder may handle or ignore it,
-so one call with several responders has no single answer to collect.
-A design that needs an answer uses a different pattern;
-for example [*Chain of Responsibility*](28_Patterns--Function_Objects.md#chain-of-responsibility-choosing-the-handler-at-runtime)
-tries its handlers in turn and returns the result from the first one that succeeds.
 
 ### Testing the Broadcaster
 
@@ -715,14 +715,6 @@ A slow responder no longer delays the others.
 `gather()` waits for all of them,
 so `announce()` returns only after every responder finishes.
 
-An `announce()` that awaits is a coroutine,
-and its caller must `await` it in turn,
-so the setter that calls it must also be `async`.
-An `async` setter returns a coroutine instead of running its body,
-and an assignment offers no place to `await` that coroutine.
-The assignment therefore discards the coroutine, and the body never runs.
-The state change becomes an awaitable method, `set_celsius()`,
-rather than the assignment `t.celsius = value`.
 [Concurrency](19_Techniques--Concurrency.md#asyncio-mechanics)
 covers the `asyncio` mechanics here (`async def`, `await`, `gather()`, `run()`).
 A coroutine pauses at `await` while others run:
@@ -754,8 +746,29 @@ class Broadcaster[T]:
             *(fn(data) for fn in self._responders))
 ```
 
-The asynchronous `Thermometer` reads `celsius` through a property,
-as the synchronous one does, and changes it with the awaitable `set_celsius()`:
+`gather()` takes one awaitable per argument rather than an iterable of them,
+so `announce()` calls the responders in a generator expression and [unpacks](05_Foundations--Functions.md#unpacking-arguments)
+that generator with `*`, turning each coroutine into its own argument.
+
+The `AsyncResponder` alias makes the type checker reject a plain function as a responder.
+A responder must return an awaitable,
+and calling an `async` function produces one.
+The type checker also rejects the reverse mistake,
+an `async` function subscribed to the synchronous `Broadcaster`.
+Calling that function returns a coroutine rather than `None`,
+and a coroutine discarded without an `await` does nothing.
+In both aliases the type parameter ties the responder's argument to the broadcaster's payload:
+a `Broadcaster[float]` accepts a responder that takes a `float` and rejects one that takes a `str`.
+
+An `announce()` that awaits is a coroutine,
+and its caller must `await` it in turn,
+so the setter that calls it must also be `async`.
+An `async` setter returns a coroutine instead of running its body,
+and an assignment offers no place to `await` that coroutine.
+The assignment therefore discards the coroutine, and the body never runs.
+So the asynchronous `Thermometer` changes `celsius` with an awaitable method,
+`set_celsius()`, rather than the assignment `t.celsius = value`,
+and reads it through a property as the synchronous one does:
 
 ```python
 # async_thermometer.py
@@ -806,20 +819,6 @@ asyncio.run(main())
 #: logged: 150C
 #: alarm sent: 150C
 ```
-
-`gather()` takes one awaitable per argument rather than an iterable of them,
-so `announce()` calls the responders in a generator expression and [unpacks](05_Foundations--Functions.md#unpacking-arguments)
-that generator with `*`, turning each coroutine into its own argument.
-
-The `AsyncResponder` alias makes the type checker reject a plain function as a responder.
-A responder must return an awaitable,
-and calling an `async` function produces one.
-The type checker also rejects the reverse mistake,
-an `async` function subscribed to the synchronous `Broadcaster`.
-Calling that function returns a coroutine rather than `None`,
-and a coroutine discarded without an `await` does nothing.
-In both aliases the type parameter ties the responder's argument to the broadcaster's payload:
-a `Broadcaster[float]` accepts a responder that takes a `float` and rejects one that takes a `str`.
 
 `alarm` subscribes before `log_reading`,
 yet at 150 degrees the log prints first.
