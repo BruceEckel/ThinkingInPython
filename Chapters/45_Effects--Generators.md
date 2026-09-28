@@ -116,6 +116,14 @@ and `Result` the `ReturnType`.
 The distinction exists only for the type checker:
 `Question("name")` produces the plain `str`.
 
+The `NewType` definitions catch a transposed annotation.
+If you mistakenly annotate the generator as `Generator[Answer, Question, Result]`,
+`ty` reports nine errors in three groups of three.
+All three `yield Question(...)` expressions yield a `Question` where the annotation declares an `Answer`.
+All three `send(Answer(...))` calls pass an `Answer` where `send()` expects a `Question`.
+All three `question` variables receive an `Answer` where their declarations say `Question`.
+`Generator[str, str, str]` accepts the reversal without complaint.
+
 Driving the generator by hand sends one `Answer` at a time.
 `next(i)` starts the generator and produces a `Question`.
 `i.send(Answer("Alice"))` provides an answer and produces the next question.
@@ -162,14 +170,6 @@ and `None` is not an `Answer`.
 The type checker rejects the priming `send()` even though the interpreter accepts it,
 because the annotation has no way to make an exception for the first call.
 A driver therefore primes with `next()`.
-
-The `NewType` definitions catch a transposed annotation.
-If you mistakenly annotate the generator as `Generator[Answer, Question, Result]`,
-`ty` reports nine errors in three groups of three.
-All three `yield Question(...)` expressions yield a `Question` where the annotation declares an `Answer`.
-All three `send(Answer(...))` calls pass an `Answer` where `send()` expects a `Question`.
-All three `question` variables receive an `Answer` where their declarations say `Question`.
-`Generator[str, str, str]` accepts the reversal without complaint.
 
 ## A Generator Is a Description
 
