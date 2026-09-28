@@ -202,7 +202,7 @@ expect(ValueError, slope, 10, -1)
 #: [ValueError] run cannot be negative: -1
 ```
 
-Catching the exception works, and it needs no new type.
+Catching the exception works with the types you have.
 But it guards only the exceptions `slope()`'s `try` names.
 `validate()` raises `ValueError` for a negative `run`,
 and the `try` around it catches only `ZeroDivisionError`.
