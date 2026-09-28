@@ -289,7 +289,7 @@ while stack and (item := stack.pop()) != "a":
 
 The `while` loop is where the walrus helps most.
 The header pops a value, names it, and tests it,
-so the body needs no second pop and no separate copy.
+so the body starts with that value in hand.
 The walrus also collapses `while_true.py` into its loop header:
 `while (value := values.pop(0)) != 0:`.
 A comprehension can use `:=` the same way,
