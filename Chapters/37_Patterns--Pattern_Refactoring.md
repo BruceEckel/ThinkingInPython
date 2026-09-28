@@ -576,7 +576,8 @@ the *Visitor* chapter advises making the base function raise `NotImplementedErro
 so a forgotten registration fails at the first call.
 
 Now write the safety officer's question the same way.
-It goes in its own file, and edits no material class:
+It goes in its own file,
+which imports the material classes and leaves them as written:
 
 ```python
 # disposal_hazard.py
