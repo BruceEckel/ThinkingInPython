@@ -174,7 +174,7 @@
    "after": 0.06
   },
   "floor": 0.45,
-  "floor_basis": "set 2026-09-27 from reading the top hits, not from labels: this fault scores low overall (Bruce's own original scored 0.74) and the 0.45-0.57 band holds real negative endings; recalibrate from the fix-triage verdicts"
+  "floor_basis": "set 2026-09-27 from reading the top hits, not from labels: this fault scores low overall (Bruce's own original scored 0.74) and the 0.45-0.57 band holds real negative endings; recalibrate from the fix-triage verdicts; fix triage 2026-09-27: 16 hits at 0.45 or more, Bruce accepted every proposal wholesale (10 rewritten, 6 left as not the fault), so the 6 are the proposing agent's calls, not his"
  },
  "8d592038d4359768": {
   "file": "30_Patterns--Observer.md",
