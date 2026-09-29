@@ -684,10 +684,10 @@ a single list shared by every `Watched`.
 covers the difference between declaring an attribute and creating one,
 for instance attributes and class variables both.
 
-`ty` infers an instance attribute and its type from an assignment like `self.celsius = celsius`,
+The type checker infers an instance attribute and its type from an assignment like `self.celsius = celsius`,
 which is why `celsius` and `humidity` need no declaration.
 For `_watchers`, the constructor writes `self.__dict__["_watchers"] = []`,
-and `ty` treats that as a write to a dictionary,
+and the checker treats that as a write to a dictionary,
 not an assignment to an attribute.
 The bare annotation supplies the attribute and its type instead.
 Without it, `ty` reports an `unresolved-attribute` error in each method that reads the list.
@@ -705,12 +705,13 @@ in three ways:
 2.  Every assignment reaches the watchers, including the internal ones:
     a cached result or a hit counter broadcasts like a published attribute,
     unless the class writes it through `self.__dict__` as the constructor does.
-3.  `__setattr__()` accepts any name, so `ty` stops checking assignments.
+3.  `__setattr__()` accepts any name,
+    so the type checker stops checking assignments.
     It passes `w.celcius = 25.0`, a misspelling of `celsius`,
     which quietly creates a new attribute.
     The same misspelling on a `Thermometer` produces an `unresolved-attribute` error.
     `Thermometer` defines no `__setattr__()`,
-    so `ty` checks each assignment against the attributes the class declares.
+    so the type checker checks each assignment against the attributes the class declares.
 
 ## Observer and I/O
 

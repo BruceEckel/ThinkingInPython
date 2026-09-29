@@ -172,7 +172,7 @@ print(red._asdict(), Color._fields)
 Printing a `NamedTuple` gives the same readable output as a data class.
 A bare tuple prints `(255, 0, 0)` and leaves you counting positions.
 Assigning to a field raises an `AttributeError`,
-and `ty` reports the assignment as well.
+and the type checker reports the assignment as well.
 An attribute bag accepts every write; a `NamedTuple` rejects this one,
 at runtime and in the checker.
 Because no field can change, `_replace()` is the way to change one:

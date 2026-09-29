@@ -192,7 +192,7 @@ One generic pair carries both shapes. The three steps return
 returns `Result[str, list[str]]`, a finished `str` or a list of them.
 `Ok` and `Err` take whatever type parameters each call needs, so the
 error channel widening from `str` to `list[str]` costs no new classes.
-`ty` follows it: `isinstance(r, Err)` narrows the comprehension to
+The type checker follows it: `isinstance(r, Err)` narrows the comprehension to
 `list[str]`, and the three `assert isinstance` lines narrow each
 success to `Ok[int]` so `.answer` is an `int`. The asserts document
 what the `if errors:` return has already established, since a checker

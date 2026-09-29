@@ -324,7 +324,7 @@ When a function iterates more than once, say so in the signature.
 `Collection[T]` and `Sequence[T]` also require `__len__()`,
 which no generator has,
 so the type checker rejects the generator at the call instead of letting it run wrong.
-`twice_collection(gen(3))` is the call `ty` refuses,
+`twice_collection(gen(3))` is the call the checker refuses,
 and that is why the listing leaves it out:
 every chapter listing must type-check.
 `total()` in `iterators.py` stays `Iterable[int]` because it sums once.
@@ -580,7 +580,7 @@ The last two stop on their own and never reach the tripwire.
 Failing at 1,000 values stands in for how a real program fails:
 it stops responding, or it dies when it exhausts memory.
 The toolchain lets it through.
-`ty` accepts `list(count(1))`,
+The type checker accepts `list(count(1))`,
 and so does `ruff` with every one of its rules enabled.
 No type checker can read the code and decide whether an iterator ever ends.
 A generator built from `while True` looks the same as a finite one until it runs.

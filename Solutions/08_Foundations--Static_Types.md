@@ -242,7 +242,7 @@ print(count(circles))
 #: 2
 ```
 
-`ty` accepts the call because `Sequence` is covariant in its element
+The type checker accepts the call because `Sequence` is covariant in its element
 type. A `Sequence[Shape]` declares only that you can read `Shape`s out
 of it, and every `Circle` you read out is a `Shape`, so a
 `list[Circle]` meets that requirement. `list[Shape]` refuses the same
@@ -279,7 +279,7 @@ print(shout(""))  # The empty string is falsy
 #: (nothing)
 ```
 
-`ty` accepts either version, because truthiness narrows too. `None`
+The type checker accepts either version, because truthiness narrows too. `None`
 is falsy, so inside `if text:` the type checker rules out `None` the
 same as `is not None` does, and `.upper()` is safe in both versions.
 

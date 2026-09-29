@@ -318,7 +318,7 @@ OnlyOnce().run()
 
 `run()` calls `customize1()` twice, and `OnlyOnce` prints once.
 The name, the parameters, and the return type all match the base,
-so `@override` is satisfied and `ty` reports nothing.
+so `@override` is satisfied and the type checker reports nothing.
 The base states its algorithm in the loop, not in any type:
 each pass calls the step, so each pass must perform it.
 Each of the three failures corrupts the anchored algorithm.
@@ -425,13 +425,13 @@ Ask how the algorithm might break, and choose the mechanism that protects it.
     Which repair still protects a second subclass author who has never read this chapter?
 3.  Subclass `ApplicationFramework` and override `run()` with a version that calls `customize2()` before `customize1()`.
     Run it, then run `ty` over it.
-    Which of the two, Python or `ty`, objects to the change?
+    Which of the two, Python or the type checker, objects to the change?
     What does that tell you about where the anchored algorithm's guarantee comes from?
 4.  Write two subclasses of `ApplicationFramework` that both type-check but break the anchored algorithm:
     one whose `customize1()` raises an exception the base never raises,
     and one that leaves `customize2()` at its `...` default when the flow depends on it.
-    `ty` reports neither.
-    What must be true of the base class for a type checker to catch either one?
+    The type checker reports neither.
+    What must be true of the base class for it to catch either one?
 5.  In `near_miss.py`, subclass `MyApp` with a class that adds a method named `reports()`.
     Predict what the `class` statement does, then run it.
     Which names does `__init_subclass__()` compare a new method against?

@@ -194,9 +194,9 @@ keeps only the pollinating half of them.
 The two versions report the `Beetle` mistake at different times. Under
 `Any`, the type checker has nothing to compare `Beetle` against, so
 the call type-checks and the program dies at runtime with the
-`AttributeError` above. Under `Visits`, `ty` rejects the argument
+`AttributeError` above. Under `Visits`, the type checker rejects the argument
 before the program runs, because `Beetle` inherits no `visit()` and so
-does not match the protocol. The `# type: ignore` comment keeps `ty`
+does not match the protocol. The `# type: ignore` comment keeps the checker
 quiet about that call so the listing can show the runtime failure;
 without it, `ty` reports an `invalid-argument-type`.
 

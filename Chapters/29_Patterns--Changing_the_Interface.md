@@ -177,7 +177,7 @@ info: parameter `what_i_want` has an incompatible type:
 info: This violates the Liskov Substitution Principle
 ```
 
-`ty` reports a second error at the listing's second call,
+The type checker reports a second error at the listing's second call,
 which passes a `ProxyAdapter` where the narrow signature takes a `WhatIHave`.
 With the narrow signature,
 Approach 2 is a different operation under an inherited name.
@@ -224,7 +224,7 @@ use(ObjectAdapter(WhatIHave()))
 
 `ObjectAdapter` qualifies as a `WhatIWant` because it has an `f()` with the signature the `Protocol` declares.
 The adaptee does not qualify.
-If you call `use(WhatIHave())`, `ty` rejects the argument,
+If you call `use(WhatIHave())`, the type checker rejects the argument,
 because `WhatIHave` defines no `f()`.
 The check that inheritance provided in `adapter.py` is still there,
 and the base class is gone.

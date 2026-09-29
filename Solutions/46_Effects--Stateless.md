@@ -416,7 +416,7 @@ default: `default_console.py` supplies one prepared instance, and
 
 At runtime the handler answered three requests across the two calls,
 two for `Console` and one for `Clock`, even though `default()`
-annotates its parameter `Need[Console]`. `ty` believes the handler
+annotates its parameter `Need[Console]`. The type checker believes the handler
 answers only `Need[Console]`, which is why the second `run()` needs a
 `# type: ignore` and otherwise reports a leftover `Need[Clock]`.
 
@@ -641,7 +641,7 @@ refuses to start an event loop inside a running one, so calling
 `run()` from `main()` fails. `run_async()` is the same driver in
 coroutine form, so the loop already running can await it.
 
-`ty` accepts both because both are correctly typed. `run()` takes an
+The type checker accepts both because both are correctly typed. `run()` takes an
 Effect and returns its result. `run_async()` takes an Effect and returns
 an awaitable of its result. `report_all(["a"])` satisfies either
 signature, and nothing in the type system records that this call site
@@ -699,7 +699,7 @@ for who in ("Alice", "Cyd", "Dana"):
 `@throws(ValueError)` turns `format_score()` from a function that
 raises an exception into an Effect that declares one, so its failure
 travels as a value in the yield channel instead of unwinding the stack.
-Following `ty` until the program builds means one edit: widening
+Following the type checker until the program builds means one edit: widening
 `announce()`'s error parameter from `KeyError` to
 `KeyError | ValueError`. `line: str` and `value: int` carry
 annotations by choice, not by demand: `yield from` on a `@throws`

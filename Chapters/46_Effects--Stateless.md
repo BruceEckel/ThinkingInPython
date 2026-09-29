@@ -670,7 +670,7 @@ The hazard belongs to deferred execution rather than to generators.
 When an Effect appears to do nothing, look for a missing `yield from`.
 
 You declare the Ability by hand, and the type checker verifies the declaration.
-If you annotate `greet_all()` as pure, `ty` reports the mismatch:
+If you annotate `greet_all()` as pure, the checker reports the mismatch:
 
 ```python
 # undeclared_need.py
@@ -996,7 +996,7 @@ Structural matching decides the runtime issue, not the static one.
 `supply(Terminal())` still builds a handler for `Need[Terminal]`,
 which leaves `greet()`'s `Need[Console]` in place.
 The unhandled request stays in the type that reaches `run()`,
-and that call is the line `ty` reports.
+and that call is the line the type checker reports.
 An interface needs the `as_type()` upcast more than a base class does:
 you can instantiate a concrete `Console` and supply it directly,
 but an interface reaches `supply()` only through an implementation.
@@ -1171,7 +1171,7 @@ Having no container has three consequences:
    A DI container reports a missing registration at the moment a lookup runs,
    at startup or much later, on a path no test exercised.
    If you remove the `# type: ignore` from `unsupplied.py`,
-   `ty` reports the unsupplied `Need[Console]`
+   the type checker reports the unsupplied `Need[Console]`
    ([Forgetting to Supply](#forgetting-to-supply)).
 
 2. Stateless bindings are per call rather than per process.
@@ -1518,7 +1518,7 @@ def announce(
 `announce()` uses all three parameters of `Effect[A, E, R]`:
 it needs a `Console`, can fail with `KeyError`, and produces nothing.
 If you drop the `KeyError` from the annotation,
-`ty` points at the `yield from score(name)` line.
+the type checker points at the `yield from score(name)` line.
 Every function on the path has to declare it.
 
 ### Declaring Is Not Handling
@@ -1896,7 +1896,7 @@ and forgetting to declare either is a type error.
     whose `Console` constructs with no arguments,
     and confirm the greeting prints.
     Then declare a second Ability and request that one too,
-    and report which requests your handler answered at runtime and which ones `ty` believes it answered.
+    and report which requests your handler answered at runtime and which ones the type checker believes it answered.
     Account for the difference,
     using `handle()`'s `t = get_origin(t) or t` as the evidence.
 7.  Break `audit_log.py` by removing the `yield from` in front of `greet(name)` in `greet_logged()`.
@@ -1906,7 +1906,7 @@ and forgetting to declare either is a type error.
     Then restore it, and instead remove the `yield from` in front of `need(Console)` in `greeter.py`'s `greet()`.
     This time `ty` produces two diagnostics.
     Explain what each one catches,
-    and why `ty` catches assigning a dropped request but not discarding one.
+    and why the type checker catches assigning a dropped request but not discarding one.
 8.  Build a registry of Effects:
     a `dict[str, Success[None]]` that maps each of two names to `supply(Console())(greet)(name)`.
     Run every entry, then run every entry a second time,
@@ -1920,20 +1920,20 @@ and forgetting to declare either is a type error.
     which calls `stateless_coroutine.py`'s `report()` for three URLs with `yield from` and returns the three results.
     Importing that module runs its own unguarded `print(run(...))`,
     so expect one line of its output before yours.
-    Work out what its annotation must be, and confirm it with `ty`.
+    Work out what its annotation must be, and confirm it with the type checker.
     Then call it from inside an `async def`,
     once with `run()` and once with `await run_async()`,
     and record what each one does.
-    Explain why `ty` accepts both.
+    Explain why the type checker accepts both.
 10. `announce()` declares `Effect[Need[Console], KeyError, None]`.
     Give it a second failure:
     a helper that formats the score and raises a `ValueError` on a negative one,
     lifted with `@throws(ValueError)`.
-    Follow `ty` until the program builds,
+    Follow the type checker until the program builds,
     add a negative score to `scores.py`'s `SCORES` so the new failure can occur,
     then run it on a name that produces each failure and on one that succeeds,
     and say where each failure surfaced.
-    Then delete `ValueError` from `announce()`'s annotation and record what `ty` reports and at which line.
+    Then delete `ValueError` from `announce()`'s annotation and record what the type checker reports and at which line.
 11. `ambiguous_supply.py` picks its `Console` by argument order.
     Add a third implementation and predict, before running it,
     which of the six orderings send Alice's greeting where.

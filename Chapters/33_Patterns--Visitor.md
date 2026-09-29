@@ -167,7 +167,7 @@ which `flower_visitors.py`'s output left implicit.
 One annotation in `flower_visitors.py` looks like a shortcut and is not.
 `accept()` types its visitor as `Any` because the `Visitor` base class declares no `visit()` method.
 If you declare that parameter as `Visitor` instead,
-`ty` reports `visitor.visit` as an unresolved attribute.
+The type checker reports `visitor.visit` as an unresolved attribute.
 The classic pattern declares `visit()` abstract on the visitor base,
 so `visitor.visit` resolves.
 A `Protocol` removes the `Any` at the cost of two new lines:

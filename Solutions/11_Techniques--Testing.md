@@ -324,7 +324,7 @@ A stub that records its calls is a mock written by hand.
 
 The hand-written version has one advantage.
 Its signature is `(message: str) -> None`,
-so `ty` checks it against `Callable[[str], None]`,
+so the type checker checks it against `Callable[[str], None]`,
 and a change to the real signature shows up as a type error.
 A `Mock` accepts any call,
 which is the gap the chapter closes with `create_autospec()`.

@@ -94,7 +94,7 @@ That is the right split: `TextReport` replaces the type, not the
 method. A caller who wants to act on the warning must change where
 the object comes from, not where they call it.
 
-`ty` reports both lines, so both carry `# type: ignore`. The
+The type checker reports both lines, so both carry `# type: ignore`. The
 subclass warning fires at class-creation time, so it arrives on
 import rather than on any call. A library that subclasses a
 deprecated class emits the warning as soon as Python imports that
@@ -290,8 +290,8 @@ info: This violates the Liskov Substitution Principle
 
 The `# type: ignore` silences that report so the listing can show
 what the checker prevents. `run()` accepts any `WhatIUse`, and a
-`Renamed` is one, so `ty` reports nothing about the call inside
-`run()`. At runtime `Renamed.op()` has no parameter named
+`Renamed` is one, so the type checker reports nothing about the call
+inside `run()`. At runtime `Renamed.op()` has no parameter named
 `what_i_want`, and the call raises a `TypeError`. The override broke
 a caller that does not mention `Renamed`.
 

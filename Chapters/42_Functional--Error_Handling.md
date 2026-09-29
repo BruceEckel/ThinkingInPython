@@ -213,7 +213,7 @@ with expected(AttributeError):
 ```
 
 The `# type: ignore` is the point of the listing.
-`ty` rejects the bare line,
+The type checker rejects the bare line,
 reporting that `Err[str]` in the union has no `unwrap`,
 so a reader who writes that line in their own code sees that report first,
 at check time.
@@ -259,7 +259,7 @@ def lies(i: int) -> Result[int, str]:
 
 `func_a(1)` returns a `Result` that the listing discards,
 and `lies()` never returns the `Result` its signature declares.
-`ty` accepts both.
+The type checker accepts both.
 
 ## Composing by Hand
 

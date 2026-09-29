@@ -989,7 +989,7 @@ the third reaches the library and fails there.
 It still declares both Abilities,
 because catching an error does nothing about a dependency.
 If you annotate `report()` as `Success[str]`,
-`ty` names the `yield from` that still carries `Need[Feed] | Need[Encyclopedia]`.
+the type checker names the `yield from` that still carries `Need[Feed] | Need[Encyclopedia]`.
 `supply()` empties that half, and `run()` accepts what remains.
 
 `Wire` and `Library` are structural implementations,
@@ -1198,7 +1198,7 @@ explains the difference.
 The choice between `catch()` and `catch_all()` decides what happens when a new failure appears.
 When `research()` gains a fourth error,
 `report()`'s named `catch()` leaves it in the channel,
-so `report()`'s declared type no longer matches and `ty` points at the `yield from`.
+so `report()`'s declared type no longer matches and the type checker points at the `yield from`.
 You decide whether to catch the newcomer or declare it.
 `catch_all()` absorbs it into the result union instead,
 so the guard must sit downstream, in an annotation that writes the union out,
@@ -1302,7 +1302,8 @@ error[invalid-yield]: Yield expression type does not match annotation
 ```
 
 The type checker checks the other end too.
-If you leave `Oven(220)` out of `supply()`, `ty` rejects the `run()` call,
+If you leave `Oven(220)` out of `supply()`,
+the checker rejects the `run()` call,
 finding a `Generator[Need[Oven], Any, str]` where it expected an empty Ability channel.
 That is the rejection [Forgetting to Supply](46_Effects--Stateless.md#forgetting-to-supply)
 shows, now arising from a dependency two levels down.
@@ -1636,7 +1637,7 @@ which is why the third run catches `RetryError` rather than `Crashed`.
 `Async` appears because waiting between attempts is asynchronous.
 And `Need[Time]` appears, which is why `supply()` gains a `Time()`.
 Retrying needs a clock, and the signature says so.
-If you leave the `Time()` out, `ty` rejects the `run()` call.
+If you leave the `Time()` out, the type checker rejects the `run()` call.
 That `Need[Time]` is the thesis of both chapters applied to a cross-cutting concern.
 In a system with untracked Effects,
 adding retry to a hundred call sites changes no signature.
@@ -1645,7 +1646,7 @@ and every caller that runs it without a `Time` fails the check.
 
 The renamed error allows a mistake the type checker accepts.
 If you write `catch(Crashed)(retried)`, catching the original error,
-`ty` reports nothing.
+the checker reports nothing.
 The result type gains a `Crashed` branch that cannot occur,
 `RetryError[Crashed]` stays in the error channel,
 and at runtime the failure propagates past the useless `catch()` and out of `run()`.
@@ -1804,12 +1805,12 @@ A forked Effect must have nothing left to supply.
 `fork()`'s four overloads accept an Effect whose Ability channel holds `Never`,
 an exception type, or `Async`,
 because `fork()` runs the Effect with `run()` inside the worker.
-If you decorate a function that still declares a `Need`, `ty` rejects it,
+If you decorate a function that still declares a `Need`, the checker rejects it,
 listing the overloads it failed to match.
 Supply first, then fork.
 
-That restriction is the only one `ty` enforces.
-`ty` says nothing about a declared error.
+That restriction is the only one the checker enforces.
+It says nothing about a declared error.
 Two of those same four overloads accept an Effect that declares one,
 and both return a `Task` with no error type on it.
 [Where the Guarantee Stops](#fork-drops-the-error-channel)
@@ -2214,9 +2215,9 @@ and that is different from a platform for building distributed systems.
 ### 6. `fork()` drops the error channel
 
 [Running Effects in Parallel](#running-effects-in-parallel)
-named the one restriction `ty` enforces on a forked function:
+named the one restriction the type checker enforces on a forked function:
 nothing left to supply.
-`ty` enforces nothing about how that function can fail.
+The checker enforces nothing about how that function can fail.
 Two of `fork()`'s four overloads accept an Effect that still declares an error,
 and every one of the four returns a `Task` with no error type on it:
 
@@ -2380,7 +2381,7 @@ It is a language that does the encoding for you.
     so the driver needs the `if __name__ == "__main__":` guard [Concurrency](19_Techniques--Concurrency.md)
     describes; without it the pool breaks before any work starts.
     Then try to fork an Effect that still declares a `Need`,
-    and record what `ty` says.
+    and record what the type checker says.
 9.  `wallet.py` runs `spree()` against a `Cell`.
     Script it instead: write a `Get` handler that answers from a fixed sequence of balances and a `Put` handler that appends every request to a list,
     the way `scripted` fed `Flip`.
@@ -2389,10 +2390,10 @@ It is a language that does the encoding for you.
 10. `fetch_nonempty()` puts `Empty` into the channel with `throw()`.
     Rewrite it to raise `Empty` in the body and lift it with `@throws(Empty)`,
     and confirm the two versions type-check and behave identically.
-    Then make each version fail with an undeclared exception type and compare what `ty` reports for each.
+    Then make each version fail with an undeclared exception type and compare what the type checker reports for each.
 11. Exercise 5 adds a `TooLong` failure to `research()`.
     Repeat it with `catch_everything.py` in the build:
-    predict what `ty` reports in `outcome()`, then confirm.
+    predict what the type checker reports in `outcome()`, then confirm.
     Remove `outcome()`'s return annotation and rerun `ty`,
     and explain what the type checker stopped verifying.
 12. Write a `Random` Ability whose handler returns an `int` in a range carried on the request,

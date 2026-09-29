@@ -122,7 +122,7 @@ expect(OverflowError, fill, BoundedStack(), 5)
 ```
 
 `BoundedStack.push()` takes the same argument and returns the same type,
-so `@override` holds and `ty` reports nothing.
+so `@override` holds and the type checker reports nothing.
 `fill()` takes a `Stack`, which never refuses a `push()`,
 so a `BoundedStack` handed to it raises an exception on the third item.
 The subclass matches the signature and breaks the contract behind it.
@@ -916,9 +916,9 @@ if __name__ == "__main__":
 #: 4.5
 ```
 
-`ty` accepts `package` as a `Priced` argument without complaint,
+The type checker accepts `package` as a `Priced` argument without complaint,
 and `charge()` returns `4.5`, silently treating a weight as a price.
-The type checker matches the shape correctly.
+The checker matches the shape correctly.
 The mismatch lives in what the number means, and no type checker sees that.
 
 A distinct type per concept could close this gap.
@@ -941,8 +941,8 @@ if __name__ == "__main__":
 #: user-42
 ```
 
-Without the `# type: ignore`, `ty` rejects the second call.
-`UserId` and `int` are different types to the type checker.
+Without the `# type: ignore`, the type checker rejects the second call.
+`UserId` and `int` are different types to the checker.
 The same distinction separates `Priced` from `Weighted` in `protocol_collision.py` if `total()` returns a `Price` or a `Weight` instead of a bare `float`.
 
 `NewType` is only an aid during type checking.
@@ -962,7 +962,7 @@ Nothing in that test can fail.
 The `NewType` protection lives in the type checker alone.
 Passing a raw `int` where a signature says `UserId` raises no exception.
 In `newtype_boundary.py`,
-the `# type: ignore` silences `ty`'s diagnostic so the rejected call can run anyway.
+the `# type: ignore` silences the type checker's diagnostic so the rejected call can run anyway.
 [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#composing-types-from-types)
 takes the other route.
 A frozen data class with a validating `__post_init__()` enforces the distinction at runtime too,

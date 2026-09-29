@@ -329,8 +329,8 @@ print(app.pending)
 #: ['work', 'work']
 ```
 
-`ty` reports nothing about either class. Both override with the right
-name, the right parameters, and the right return type, so both satisfy
+The type checker reports nothing about either class. Both override with
+the right name, the right parameters, and the right return type, so both satisfy
 `@override` and every signature rule the base class states.
 
 `Exploder` breaks the algorithm on the first step of the first pass.

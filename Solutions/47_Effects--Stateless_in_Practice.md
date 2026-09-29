@@ -621,7 +621,7 @@ print(research_and_report(
 #: short enough
 ```
 
-In the Effect version, `ty` tells you where to go: it flags the undeclared
+In the Effect version, the type checker tells you where to go: it flags the undeclared
 failure at the delegation that introduces it, then the widened union at every
 caller that claims to handle everything.
 In the by-hand version nothing tells you anything.
@@ -958,15 +958,15 @@ raises, so the `raise` is an ordinary statement and the decorator moves the
 exception into the channel.
 
 Making each version fail with an undeclared type shows the same asymmetry
-exercise 2 finds. If you change `throw(Empty())` to `throw(ValueError())`, `ty`
+exercise 2 finds. If you change `throw(Empty())` to `throw(ValueError())`, the type checker
 reports it at that line: the yielded type is `ValueError` and the annotation
 allows `Need[Ticker] | Unavailable | Empty`. If you change `lifted()`'s
 `raise Empty()` to `raise ValueError()` while its decorator still says
-`@throws(Empty)`, `ty` reports nothing, and the `ValueError` goes past
+`@throws(Empty)`, the checker reports nothing, and the `ValueError` goes past
 `catch(Unavailable, Empty)` and out of `run()` as an ordinary exception.
 The decorator's argument is a claim about the function, not a check on it,
 and no type checker compares a `raise` with a decorator's arguments.
-So `ty` verifies the version whose failure travels through a
+So the type checker verifies the version whose failure travels through a
 `yield`, and trusts the version whose failure starts as a `raise`.
 
 That difference decides between them. Use `throw()` for a failure the Effect
@@ -1096,13 +1096,13 @@ You write `game()` once, and it runs under both handlers unchanged. The scripted
 handler is the testable one, and it is a closure over an iterator rather than a
 class, because a handler is an ordinary function.
 
-Deleting `low: int` from the accessor changes nothing that `ty` reports about
-this file. It changes what `ty` reports about callers. With the annotation,
+Deleting `low: int` from the accessor changes nothing that the type checker reports about
+this file. It changes what the checker reports about callers. With the annotation,
 `roll("a", 6)` is `error[invalid-argument-type]`. Without it, the parameter has
 no type, `roll("a", 6)` type-checks, and the mistake surfaces at runtime inside
 `random.randint()`, which the handler calls from the driver: the traceback
 names `real()` and the library, and neither `roll()` nor `game()`. The accessor
-is the only place where `ty` checks a caller's arguments, since after that they
+is the only place where the type checker checks a caller's arguments, since after that they
 are fields on a request that only the handler reads.
 
 Deleting the annotation on the handler's parameter fails much louder, and

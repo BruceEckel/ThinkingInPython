@@ -248,7 +248,7 @@ so the check passes.
 The first code that reads `label` raises an `AttributeError`.
 
 The annotation on `label` is optional here.
-If you delete it, `ty` still infers `label: str` correctly from `self.label = label`,
+If you delete it, the type checker still infers `label: str` correctly from `self.label = label`,
 because the parameter's own type carries through to the attribute it initializes.
 The annotation stays for symmetry with `total`,
 so both names read together at the top instead of one hiding inside the constructor.
@@ -286,7 +286,8 @@ print(Registry().count)  # Found by fallback
 `count: ClassVar[int]` records that a count belongs to `Registry`,
 and no attribute exists until something assigns one,
 so the first read raises an `AttributeError`.
-`ty` reports nothing here, for the reason it reports nothing for `label`:
+The type checker (`ty`) reports nothing here,
+for the reason it reports nothing for `label`:
 it trusts the declaration rather than tracking which code runs first.
 Pyright agrees, and its optional `reportUninitializedInstanceVariable` covers a bare instance annotation,
 not a `ClassVar`, so neither checker catches this read.
@@ -486,7 +487,7 @@ The first `Sub()` reads through to that `1`, adds one,
 and the assignment creates `Sub.total = 2` on `Sub` alone,
 the same shadowing `Right` demonstrates in `class_var_inheritance.py`.
 The second `Sub()` increments that separate copy to `3`.
-`Base.total` never moves past `1`, and `ty` reports no diagnostic:
+`Base.total` never moves past `1`, and the type checker reports no diagnostic:
 the augmented assignment is a valid `ClassVar[int]` update either way,
 and nothing in the annotation says which class name should receive it.
 Write the increment through the literal class name, as `class_var.py` does,
@@ -621,7 +622,7 @@ a constructor default or a `@dataclass` field for per-object.
     and use them to explain the `1 1 0` output.
     Then fix the class so the shared counter moves,
     without changing the `ClassVar` declaration,
-    and explain what `ty` reports when you remove the `# type: ignore` from the broken version.
+    and explain what the type checker reports when you remove the `# type: ignore` from the broken version.
 8.  Change `class_var_inheritance.py` so `shared` is `ClassVar[list[int]] = []` and `Left` and `Right` both call `.append()` on it.
     Predict what `Base.shared` holds afterwards, then check.
     Give `Right` its own list with `shared = []` in its body and repeat.

@@ -77,7 +77,7 @@ with expected(TypeError):
 The record changed, and nothing objected. `NamedTuple` refuses to
 rebind `toast.steps`. It says nothing about the list that field
 already refers to, so `append()` edits that list through the record.
-Both `ty` and Python stay silent, because `append()` mutates the
+Both the type checker and Python stay silent, because `append()` mutates the
 list instead of assigning to a field.
 
 Using the record as a `dict` key raises a `TypeError`, whose message

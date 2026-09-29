@@ -520,7 +520,7 @@ draws `invalid-argument-type` at its `@register` line before the program runs.
 That is the case [Self Registration](#self-registration) left to runtime,
 where a subclass that forgot `draw()` registers, fails at construction,
 and no checker sees it.
-`REGISTRY` holds `type[Shape]` values and `ty` accepts calling one,
+`REGISTRY` holds `type[Shape]` values and the type checker accepts calling one,
 so `make()` works as written.
 
 Two hazards from [Hazards of Self Registration](#hazards-of-self-registration)

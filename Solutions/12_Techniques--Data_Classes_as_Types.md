@@ -398,7 +398,7 @@ an instance. `Stars.built += 1` assigns to the class instead, so it
 works. `Wrong` writes the same intent a different way, and fails:
 `self.built += 1` reads the class attribute, adds one, and then tries
 to store the result on the instance. That store is the assignment
-`frozen=True` refuses. `ty` rejects the line before it runs,
+`frozen=True` refuses. The type checker rejects the line before it runs,
 reporting `built` as read-only on a frozen instance, so the listing
 carries a `# type: ignore` to demonstrate the runtime failure.
 
@@ -507,9 +507,9 @@ The type test runs first. Comparing `"five"` with `1` raises a
 `TypeError`, so with the range check first a `str` never reaches a
 `TypeFailure`.
 
-`ty` rejects `5.5` and `"five"` as arguments before the program runs,
+The type checker rejects `5.5` and `"five"` as arguments before the program runs,
 and the `# type: ignore` silences it so the listing can show what the
-constructor does with a value the type checker did not see. `ty`
-accepts `Stars(True)`: a `bool` is an `int` to the type checker for
+constructor does with a value the type checker did not see. The type checker
+accepts `Stars(True)`: a `bool` is an `int` to it for
 the same subclass reason, so the runtime test is the one check that
 rejects it.

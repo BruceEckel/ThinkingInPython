@@ -108,7 +108,7 @@ Each subclass's `value` line creates a class attribute of its own,
 separate from `Trash.value` and from its siblings'.
 Each subclass restates `ClassVar[float]`,
 which keeps [the check](09_Foundations--Class_Attributes.md#classvar-and-inheritance)
-that makes `ty` reject `Aluminum(1.0).value = 2.0`.
+that makes the type checker reject `Aluminum(1.0).value = 2.0`.
 
 A new recyclable type costs one class definition.
 It registers itself, and `create()` builds it.
@@ -263,7 +263,7 @@ may expect `assert_never()` to make the type checker report the missed case.
 Exhaustiveness checking needs a *closed* union to compare the cases against,
 but `Trash` is deliberately open: the registry exists to accept new subclasses.
 With `case _: assert_never(t)` added,
-`ty` reports the call although the `match` names all four materials,
+the type checker reports the call although the `match` names all four materials,
 because a `Trash` or a subclass defined later can still reach the wildcard.
 A report that appears whether or not a `case` is missing cannot find the missing one.
 [Pattern Matching](13_Techniques--Pattern_Matching.md#when-not-to-match)

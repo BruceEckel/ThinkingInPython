@@ -238,7 +238,7 @@ writes the same class dictionary, so both instances report `2`.
 `vars(c)` is empty because the constructor writes only to the class,
 and `c.total` is the read falling back to that shared value.
 
-With the `# type: ignore` removed, `ty` reports
+With the `# type: ignore` removed, the type checker (`ty`) reports
 `invalid-attribute-access`, naming the type of `self`. The augmented
 form expands to an assignment through `self`, and the type checker
 treats that assignment the way it treats `a.total = 99`, which reads
@@ -337,13 +337,13 @@ print(vars(t), t.seat)
 #: {'holder': 'Ada', 'seat': '14C'} 14C
 ```
 
-`ty` reports nothing for this file. The annotation `seat: str` states
-that a `Ticket` carries a `seat`, and `ty` trusts the declaration
+The type checker reports nothing for this file. The annotation `seat: str` states
+that a `Ticket` carries a `seat`, and the checker trusts the declaration
 without checking that a method assigns it. At runtime the declaration
 creates nothing: `vars(t)` holds `holder` alone, and reading `t.seat`
 raises an `AttributeError`.
 
-`t.seat = "14C"` creates the attribute on the instance, and `ty`
+`t.seat = "14C"` creates the attribute on the instance, and the type checker
 checks that assignment against the declared `str`. A bare annotation
 is safe when the code that assigns the attribute runs before any code
 that reads it. The type checker cannot confirm that order, so the

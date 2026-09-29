@@ -314,7 +314,7 @@ Calling `greet("Bob")` then passes `"Bob"` where `decorate` expects a function a
 and the only symptom is missing output.
 The annotations catch the mistake either way,
 at the decoration rather than at the call:
-`ty` reports that `repeat` expected an `int` for `times` and got a function.
+The type checker reports that `repeat` expected an `int` for `times` and got a function.
 A second diagnostic follows at `greet("Bob")`,
 but that one is harder to read back to the missing `()`.
 
@@ -813,7 +813,7 @@ its `__call__()` returns `wrapper`, an ordinary function,
 so a method decorated with `@repeat(times=3)` is still a function.
 A fully typed class-based decorator, like `trace_class.trace`,
 gets the type checker involved:
-`ty` reports a missing argument and a type mismatch on a call like `ex.method(5)`,
+it reports a missing argument and a type mismatch on a call like `ex.method(5)`,
 catching the same problem.
 
 ### Function Form or Class Form?

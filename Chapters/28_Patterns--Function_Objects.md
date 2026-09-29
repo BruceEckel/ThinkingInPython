@@ -155,7 +155,7 @@ the state the bound method carries with it.
 The entry is `account.deposit`, without parentheses.
 `account.deposit()` calls the method while the list is being built and stores the result,
 `None`.
-`ty` rejects that list, because `None` is not a `Command`.
+The type checker rejects that list, because `None` is not a `Command`.
 
 ### A Callable Object as a Command
 
@@ -836,7 +836,7 @@ class OnWithdraw:
 [`dataclass_transform`](17_Techniques--Metaprogramming.md#dataclass-transform)
 tells the type checker that a class passing through either decorator comes out a frozen data class.
 `Audit(threshold=50)` therefore has its generated `__init__()`,
-and `ty` reports `Audit(50).threshold = 1` as assignment to a read-only property,
+and the type checker rejects `Audit(50).threshold = 1` as an assignment to a read-only property,
 as it does with `@dataclass(frozen=True)` written directly.
 The tags are runtime facts.
 `@handler` reads the annotation on the first parameter after `self` in `__call__()`,
@@ -873,7 +873,7 @@ because no static type means "a class `@event` decorated",
 so a stray string reaches the bus and `EVENTS` rejects it there.
 
 The price is the registration-time check of the first version.
-`subscribe(Deposit, on_withdraw)` fails under `ty` because no `E` fits both arguments.
+`subscribe(Deposit, on_withdraw)` fails under the type checker because no `E` fits both arguments.
 With one argument there is no pair to compare,
 so a class with the right `__call__()` that skipped `@handler` passes the type checker and fails only when `subscribe()` looks it up.
 Tests cover that refusal and the other three: a non-event published,

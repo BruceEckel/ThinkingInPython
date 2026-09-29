@@ -115,7 +115,7 @@ print(list(walk(tree)))
 
 Adding `Symlink` to the union makes every `match` whose `case _` calls
 `assert_never()` fail type checking, as the chapter says.
-In both `disk_usage()` and `walk()`, `ty` reports that `entry` could
+In both `disk_usage()` and `walk()`, the type checker reports that `entry` could
 be a `Symlink` that no case handles, until you add the case shown
 here. Deciding what a link should do is a judgment call, not
 something the type checker picks for you: `disk_usage()` counts a link
@@ -610,10 +610,10 @@ explains the convention: typeshed gives the sentinel a type
 inheriting `Any`, so returning it satisfies any declared return type.
 The declaration also lets `(2 * x + 1).right` resolve for a caller.
 
-Note what `NotImplemented` does not fix. `ty` already rejects
+Note what `NotImplemented` does not fix. The type checker already rejects
 `"a" + x` in source it can see, which is why the line above carries a
 `# type: ignore` to keep this listing in the build. The runtime hole
-is the gap between what `ty` checks and what runs. Closing it matters
+is the gap between what the checker sees and what runs. Closing it matters
 when a program builds the expression from data the type checker never
 sees, the case an interpreter exists to handle.
 

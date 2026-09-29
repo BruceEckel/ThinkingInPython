@@ -219,8 +219,8 @@ so a codebase could adopt rows one function at a time.
 
 That same rule is the design's weakness.
 `shout()` calls `tell()` and declares nothing.
-Its row reads as empty, and `ty` reports nothing,
-because the PEP instructs `ty` to ignore the one fact that matters here.
+Its row reads as empty, and the type checker reports nothing,
+because the PEP instructs every type checker to ignore the one fact that matters here.
 Compare `undeclared_need.py` in [Stateless](46_Effects--Stateless.md#effects-propagate-and-the-type-checker-verifies-it),
 where the same mistake draws an `invalid-yield` error.
 Until a tool reads it, a row inside `Annotated` is a structured comment.
@@ -259,8 +259,9 @@ An override needs its own rule:
 the overriding method's row must fit inside the row of the method it replaces,
 or a caller holding the base type performs Effects the base row omits.
 
-Working all of that out is type inference, which `ty` performs on every run.
-The tool therefore belongs inside the type checker.
+Working all of that out is type inference,
+which the type checker performs on every run.
+The tool therefore belongs inside the checker.
 Of the three checkers this book names, mypy has a plugin interface;
 `ty` and Pyright have none at this writing.
 A tool that runs outside the checker has two choices.
@@ -327,7 +328,8 @@ run(supply(Console())(hello_twice)())
 `reveal_type(twice(hello))` reports `Generator[Need[Console], Any, None]`.
 `ty` solved `A` as `Need[Console]`,
 with the solver it uses for every other generic.
-`hello_twice()` must then declare that row, or `ty` rejects its `yield from`.
+`hello_twice()` must then declare that row,
+or the checker rejects its `yield from`.
 
 ### Subtract What a Handler Discharges
 
@@ -353,7 +355,7 @@ and the tool cannot check that the library does what the metadata says.
 In Koka one construct installs the handler and subtracts from the row.
 In Stateless the `Handler` that `supply()` returns does the subtracting.
 Its type removes the `Need` from the row of the function it wraps,
-and `ty` verifies the result.
+and the type checker verifies the result.
 
 ### Decide What Untracked Code Performs
 
@@ -405,7 +407,7 @@ Call resolution disappears as a problem, because running a call resolves it.
 The loss is coverage.
 A runtime check covers the paths a run executes,
 so it verifies what your tests exercise and reports nothing about the rest.
-It stands to the static tool as `isinstance()` assertions stand to `ty`.
+It stands to the static tool as `isinstance()` assertions stand to the type checker.
 
 ## Tracking Is Not Management
 
@@ -442,7 +444,7 @@ and delayed binding with no new tool.
 The reason is where it puts the row:
 the generator's yield type is a place the type checker examines on every run.
 You declare the row there,
-and `ty` verifies the propagation by checking every `yield from` in the body against it.
+and the checker verifies the propagation by checking every `yield from` in the body against it.
 The `Handler` that `supply()` returns subtracts the supplied Abilities from the row,
 so a caller declares only what remains unhandled.
 A type variable gives Effect polymorphism, as `effect_variable.py` shows.

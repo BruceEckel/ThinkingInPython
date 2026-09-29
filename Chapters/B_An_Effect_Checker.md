@@ -140,7 +140,7 @@ and `random.random` reports `None` for its module and `Random.random` for its qu
 The checker reads source, and in source the name is `os.remove`.
 
 Because `names()` builds a row from classes,
-a misspelled Effect in the table is an error `ty` reports.
+a misspelled Effect in the table is an error the type checker reports.
 A `Row` is a `frozenset[str]` because the checker never imports the code it reads.
 In source text, `performs(Ask)` is the name `Ask`.
 
@@ -399,7 +399,7 @@ def hides(*effects: type) -> Hides:
 
 `Annotated[str, performs(Ask), hides(Console)]` states that `ask()` is the boundary where `Console` becomes `Ask`.
 The checker removes `Console` from the body's row and checks nothing about the claim,
-as `ty` trusts a `cast()`.
+as the type checker trusts a `cast()`.
 `hides()` is the third line of Appendix A's rule, "the Effects f handles,"
 in the weakest form you can write without handlers.
 The annotation also puts two pieces of metadata in one `Annotated`,

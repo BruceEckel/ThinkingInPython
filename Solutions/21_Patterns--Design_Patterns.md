@@ -187,7 +187,7 @@ print(checkout(6.0, Flat()), checkout(6.0, ByWeight()))
 
 If you remove the abstract base and turn both subclasses into
 functions, you have exercise 2's version. What stops working? Nothing.
-The numbers are identical, `ty` still rejects a wrongly-shaped argument,
+The numbers are identical, the type checker still rejects a wrongly-shaped argument,
 and adding a third rule is still one new definition. Both classes
 carry a single method and no state, so the hierarchy is a container
 for functions that do not need containing. By the rule that a design

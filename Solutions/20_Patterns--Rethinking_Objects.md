@@ -90,7 +90,7 @@ expect(TypeError, hash, immutable)
 #: [TypeError] unhashable type: 'Bob'
 ```
 
-`ty` reports nothing, and Python runs the assignment. `frozen=True` on
+The type checker reports nothing, and Python runs the assignment. `frozen=True` on
 `Immutable` blocks rebinding `immutable.bob`. It says nothing about
 the object `bob` refers to, and that object is now a mutable `Bob`.
 The assignment to `name` assigns to no field of `Immutable`, so none

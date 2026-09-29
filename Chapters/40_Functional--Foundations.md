@@ -748,7 +748,7 @@ The chapters ahead build on that single property.
     so `make_counter(10)` builds a counter that counts 10, 20, 30.
     `increment()` reads `step` without declaring it `nonlocal`:
     explain why `count` needs the declaration and `step` does not.
-    Then delete the `nonlocal` line and compare `ty`'s report with the runtime failure.
+    Then delete the `nonlocal` line and compare the type checker's report with the runtime failure.
 9.  In `pipeline.py`, add `colder_than(limit, r)` beside `warmer_than()`,
     and give `report()` a second `filter()` stage built with `partial()`,
     so only readings between 20.0 and 30.0 Celsius reach the output.

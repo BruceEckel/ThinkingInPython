@@ -408,7 +408,7 @@ An empty list means every responder succeeded.
 
 The type change reaches every subscriber.
 `received.append` returns `None`,
-so `ty` rejects `broadcaster.subscribe(received.append)`:
+so the type checker rejects `broadcaster.subscribe(received.append)`:
 a `Responder[int]` must return a `Result`.
 `succeeds()` adapts any `None`-returning callable
 by calling it and returning `Ok(None)`.
@@ -880,7 +880,7 @@ for that attribute, the work `Thermometer`'s property setter did with
 Class access is the part a validating descriptor never needs.
 `Thermometer.celsius` calls `__get__()` with `obj` set to `None`, and
 returning the descriptor there puts `subscribe()` within reach. The
-two `@overload` declarations tell `ty` which of the two results it
+two `@overload` declarations tell the type checker which of the two results it
 gets: `Notifying[T]` from the class, `T` from an instance. Without
 them the declared return type is the union, and `t.celsius * 2` fails
 to check. The overloads also check the responder against the

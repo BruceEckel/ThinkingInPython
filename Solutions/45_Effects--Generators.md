@@ -165,7 +165,7 @@ exception, reads it as "the conversation finished," and returns
 `None` is the wrong answer twice over. The interview never finished, so
 no `Result` exists, and `None` is not a `Result` in any case. Nothing
 catches the mistake: `StopIteration.value` has type `Any`, so
-`return stop.value` satisfies a declared `Result` and `ty` reports
+`return stop.value` satisfies a declared `Result` and the checker reports
 nothing. The failure is silent at the type checker and silent at
 runtime. It surfaces later as a `None` where the caller expects a
 string, far from the driver that produced it.

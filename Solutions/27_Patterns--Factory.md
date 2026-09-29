@@ -227,8 +227,8 @@ info: └── protocol member `make_obstacle` is not defined on type
 
 The two halves fail at different places. In `abstract_factory_abc.py`
 the base class declares `make_obstacle()` as an `@abstractmethod`, so a
-factory that omits it defines without complaint. `ty` reports the line
-that constructs that factory, and a program that ignores the report
+factory that omits it defines without complaint. The type checker reports
+the line that constructs that factory, and a program that ignores the report
 raises a `TypeError` at the same construction, before the game runs.
 In `abstract_factory_protocol.py` no class declares that it satisfies
 the protocol, so constructing the factory is legal. The report moves
@@ -771,8 +771,8 @@ print(unregistered(globals()))
 #: ['Hexagon']
 ```
 
-`Hexagon` is a complete `Shape`: `ty` accepts it wherever code takes a
-`Shape`, and `Hexagon().draw()` works. `make("Hexagon")` fails with a
+`Hexagon` is a complete `Shape`: the type checker accepts it wherever code
+takes a `Shape`, and `Hexagon().draw()` works. `make("Hexagon")` fails with a
 `KeyError`, because the table never heard of it, and the error names
 the key rather than the class or the missing line. No checker reports
 the omission, since a class that nothing decorates is an ordinary

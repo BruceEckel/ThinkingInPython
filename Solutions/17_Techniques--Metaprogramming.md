@@ -125,8 +125,8 @@ is a separate object.
 
 The `__call__[T]` signature is the chapter's, and it is worth keeping
 here rather than simplifying to `-> Any`. It ties the return type to
-`cls`, so `CSingleton()` type-checks as a `CSingleton`, and `ty` still
-flags a misspelled attribute on the result. Two details follow from
+`cls`, so `CSingleton()` type-checks as a `CSingleton`, and the type
+checker still flags a misspelled attribute on the result. Two details follow from
 that annotation. `cls: type[T]` hides the fact that `cls` is a
 `Singleton`, so the body writes `type.__call__(cls, ...)`, where
 `ty` rejects a zero-argument `super()`. For the same reason

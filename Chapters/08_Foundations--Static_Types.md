@@ -345,7 +345,8 @@ at the cost of a weaker check:
 see [*Surrogate*](26_Patterns--Surrogate.md#what-the-implementation-supplies).
 
 `Drawable` appears in one place, the annotation on `render()`'s parameter.
-If you pass an object without a `draw()` to `render()`, `ty` rejects it.
+If you pass an object without a `draw()` to `render()`,
+the type checker rejects it.
 `Blob` is the case worth watching: it draws, in the everyday sense,
 but the method's name is `paint()`,
 and a protocol matches on names and signatures rather than on intent.
@@ -881,13 +882,13 @@ The forms above are the modern ones.
     Confirm `.bump().bump().report()` still chains correctly on a `LoudTally`.
 5.  Add `reveal_type(words.top())` to `type_defaults.py` and run `ty check` on the file.
     Remove the `= str` default and run it again.
-    `ty` reports no error either way.
+    The type checker reports no error either way.
     Say what that means for a bare `Stack` annotation.
 6.  In `type_aliases.py`,
     call `paint(grid, (2, 3), "purple")` and run `ty check`.
     Read the error, then widen `Color` to admit `"purple"` and confirm the error goes away.
 7.  In `variance.py`, change `add_square()`'s parameter annotation to `Sequence[Shape]` and uncomment the call.
-    Explain why `ty` now accepts the call and why `shapes.append(...)` no longer type-checks.
+    Explain why the type checker now accepts the call and why `shapes.append(...)` no longer type-checks.
 8.  In `narrowing.py`, replace `if text is not None:` with `if text:` and run `ty check`.
     Explain why the empty string now takes the other branch even though the type checker accepts either version.
 9.  In `narrowing_attribute.py`,
