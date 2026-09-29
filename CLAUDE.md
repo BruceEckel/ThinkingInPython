@@ -544,6 +544,21 @@ and how it was measured.
   through `validate_output.py` on the real chapter file (not a standalone
   script run), since only the multi-`asyncio.run()`-per-process path
   reproduces this.
+- **On Windows a listing can hang inside `asyncio.run()` before a line
+  of its own code runs.** The event loop's self-pipe comes from
+  `socket.socketpair()`, which CPython emulates with a loopback TCP
+  connection, and the emulation's `accept()` blocks forever when the
+  connect fails silently. A `faulthandler` dump on 2026-09-29 showed one
+  validator worker inside that `accept()` and the rest idle; two of
+  twelve whole-book runs hung on an idle machine, chapter 47 each time
+  it was identified. Why the connect fails is not known. Since that
+  date `validate_output.py` watches each file's process and reruns one
+  that reports nothing in `--file-timeout` seconds (120; the log says
+  "no result after 120s; rerunning (2/3)"), and `run_examples.py`
+  reruns a timed-out example once. `pytest` has no timeout, so a
+  `pytest` run that goes idle on a test that starts an event loop is
+  this: kill it and rerun. A hang or a timeout on a listing that calls
+  `asyncio.run()` is not evidence against the listing.
 - **`validate_output.py` on the whole tree can leak `__del__` output between
   chapters.** It `exec()`s every block's code against a fresh `namespace` dict
   reused as that block's globals. A class defined there forms a reference
