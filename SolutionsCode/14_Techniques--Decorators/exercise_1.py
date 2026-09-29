@@ -1,5 +1,5 @@
 # exercise_1.py
-def announce[T: type](cls: T) -> T:
+def announce[T](cls: type[T]) -> type[T]:
     print(f"decorating {cls.__name__}")
     return cls
 

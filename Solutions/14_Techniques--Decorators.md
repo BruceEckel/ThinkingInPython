@@ -4,7 +4,7 @@
 
 ```python
 # exercise_1.py
-def announce[T: type](cls: T) -> T:
+def announce[T](cls: type[T]) -> type[T]:
     print(f"decorating {cls.__name__}")
     return cls
 
@@ -30,13 +30,15 @@ class object the `class` statement created. The only effect is the
 side effect.
 
 `register` returns its argument the same way, and the comparison is
-the point. A class decorator that returns its argument can observe
-and record, and that covers most real uses (a registry, a plugin
-table, a validation pass at import time). What it cannot do is change
-the class into something else. `@dataclass` does change it, returning
-a class with generated methods, and `@singleton` replaces the class
-with a callable object that hands back one cached instance. The
-return value decides which kind of decorator you have written.
+the point. A class decorator that returns its argument untouched can
+observe and record, and that covers most real uses (a registry, a
+plugin table, a validation pass at import time). The other two kinds
+change what the name refers to. `@dataclass` returns the class it
+received after adding generated methods to it, and
+[`@singleton`](../Chapters/24_Patterns--Singleton.md#singleton-by-class-decorator)
+returns a different object, a callable that hands back one cached
+instance. What the decorator does to its argument, and what it
+returns, decide which kind you have written.
 
 ## 2. A `timing` decorator stacked with `@trace`
 
@@ -61,9 +63,6 @@ def timing[**P, R](func: Callable[P, R]) -> Callable[P, R]:
         start = time.perf_counter()
         result = func(*args, **kwargs)
         elapsed = time.perf_counter() - start
-        # elapsed differs every run: print a fixed
-        # message plus a deterministic check, not the
-        # raw, ever-changing number.
         ok = elapsed >= 0
         name = func.__name__  # type: ignore
         print(f"{name} timed, non-negative: {ok}")
@@ -217,7 +216,7 @@ Each decorated function gets its own instance of `trace_counting`
 (the same as `count_calls`), so `f.count` and `g.count` track only
 their own function's calls: `2` and `1`. `total_calls` is a class
 attribute, annotated `ClassVar[int]`, so it belongs to the
-`trace_counting` class itself, not to any one instance. Every
+`trace_counting` class, not to any one instance. Every
 `__call__()`, on any decorated function, increments the same shared
 counter through `trace_counting.total_calls += 1`. The counter
 therefore accumulates across every function decorated with
@@ -297,9 +296,9 @@ tells them apart by what arrives in `func`. Used bare, `@memo` calls
 immediately with `decorate(func)`. Used with parentheses,
 `@memo(maxsize=2)` calls `memo(maxsize=2)` first, `func` is `None`,
 and `memo` returns `decorate` for Python to apply to `add`. Making
-`func` the only positional parameter and `maxsize` keyword-only is
-what keeps the two calls unambiguous: a positional argument always
-lands in `func`, never in `maxsize`.
+`func` the only positional parameter and `maxsize` keyword-only
+keeps the two calls unambiguous: a positional argument always
+binds to `func` and cannot bind to `maxsize`.
 
 The two `@overload` declarations are for the type checker, which cannot
 otherwise tell which of the two shapes a given call has. The first
@@ -371,10 +370,11 @@ The loop runs `times - 1` attempts inside a `try`, and the final
 attempt sits outside it, with no handler. That last call satisfies
 both requirements at once. It returns `R` on success, so the function
 has a return value on every path the type checker can see. It also
-lets the last exception propagate untouched rather than re-raising a
-copy. Re-raising from inside the loop with `raise` also works, but
-then the type checker cannot tell that the function always either
-returns or raises an exception.
+lets the last exception propagate with no handler in its way.
+Re-raising from inside the loop with a bare `raise` on the last
+attempt also works at runtime, but then the type checker cannot tell
+that the function always either returns or raises an exception, and
+it reports that `wrapper()` can implicitly return `None`.
 
 `@wraps(func)` keeps the identity: `flaky.__name__` reports the
 wrapped function's name, not `wrapper`. Without it, every retried
@@ -387,3 +387,79 @@ Catching bare `Exception` is deliberate here and worth flagging: a
 real `retry` should take the exception types it retries, since
 retrying a `TypeError` from a bad call signature just fails three
 times more slowly.
+
+## 7. Two class-based decorators on methods
+
+```python
+# decorated_methods.py
+from collections.abc import Callable
+from dataclasses import dataclass
+from functools import wraps
+
+class repeat:
+    def __init__(self, times: int) -> None:
+        if times < 1:
+            raise ValueError(
+                f"times must be >= 1, got {times}")
+        self.times = times
+
+    def __call__[**P, R](
+        self, func: Callable[P, R]) -> Callable[P, R]:
+        @wraps(func)
+        def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
+            result = func(*args, **kwargs)
+            for _ in range(self.times - 1):
+                result = func(*args, **kwargs)
+            return result
+        return wrapper
+
+class logged:
+    def __init__(self, func: Callable) -> None:
+        self.func = func
+
+    def __call__(self, *args: object,
+                 **kwargs: object) -> object:
+        return self.func(*args, **kwargs)
+
+@dataclass
+class Counter:
+    total: int = 0
+
+    @repeat(times=3)
+    def bump(self, by: int) -> int:
+        self.total += by
+        return self.total
+
+    @logged
+    def peek(self) -> int:
+        return self.total
+
+counter = Counter()
+print(counter.bump(2))
+#: 6
+bump = Counter.__dict__["bump"]
+peek = Counter.__dict__["peek"]
+print(type(bump).__name__, hasattr(bump, "__get__"))
+#: function True
+print(type(peek).__name__, hasattr(peek, "__get__"))
+#: logged False
+```
+
+`counter.bump(2)` works: the body runs three times with `counter` as
+`self`, and the total reaches `6`. Reading the two names from
+`Counter.__dict__` skips the attribute lookup that would bind them,
+so each `print()` shows the object the class stores.
+
+Both decorators are classes, and the difference is in what each one
+leaves in the class. `@repeat(times=3)` builds a `repeat` instance
+and then calls it with `bump`, and that `__call__()` returns
+`wrapper`, an ordinary function. A function has `__get__()`, so
+`counter.bump` binds `counter` to it like any other method. The
+`repeat` instance has done its work by then and is not what the name
+refers to. `@logged` stores the `logged` instance in the class. That
+instance has no `__get__()`, so `counter.peek` hands it back unbound
+and `counter.peek()` calls `peek()` with no `self`, the `TypeError`
+`method_decoration.py` shows.
+
+The class form fails on methods only when the instance of the
+decorator class is the object that replaces the method.
