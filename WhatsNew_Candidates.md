@@ -27,6 +27,12 @@ On 2026-09-29 every entry was rechecked against the book:
 the 30 it now covers were removed,
 and each partly covered entry says what is still missing.
 A "not covered" note means the term appears nowhere in the book's prose or listings.
+Later that day Bruce decided the nine remaining **Add** entries:
+seven went into the book, and two were declined and removed.
+The declined ones are module `__getattr__()` for deprecation with `__dir__()`
+(chapter 6 teaches the hook once),
+and `singledispatchmethod()` "dispatching on the second argument" in 3.15,
+which did not reproduce on 3.15.0rc2.
 
 ---
 
@@ -41,21 +47,6 @@ The book's target version, so everything here is available to every listing with
 `frozendict`, lazy imports, comprehension unpacking, `sentinel`, and the `profiling` package
 are all in use in the book already and are not repeated below.
 
-- **`functools.singledispatchmethod()` dispatching on the second argument.** **Add** to chapter 32.
-  Not covered.
-  Chapter 32 is Multiple Dispatching, and its whole subject is that Python dispatches on
-  one argument.
-  Being able to dispatch a method on its second argument changes what the chapter can build,
-  and the chapter should at minimum say the limitation moved rather than disappeared.
-  The same change lets `singledispatchmethod()` wrap non-descriptor callables.
-- **`contextlib.ContextDecorator` keeping the context open across iteration and `await`.**
-  **Add** to chapter 15, and cross-reference from 14.
-  Both chapters cover `ContextDecorator`.
-  Before 3.15, decorating a generator function with a context manager closed the context
-  when the generator first yielded, which is a subtle bug with no visible symptom until
-  the resource was needed later.
-  The fix is worth stating because the old behavior explains code readers will still meet.
-  *Rechecked 2026-09-29: partly covered (Chapters/15_Techniques--Context_Managers.md:549-553; Chapters/14_Techniques--Decorators.md:854); missing: ContextDecorator covered; 3.15 generator/await behavior and old bug not stated.*
 - **`TypeForm[T]` (PEP 747).** **Consider** for chapter 8.
   Not covered.
   It types a parameter that receives a type expression rather than an instance,
@@ -103,13 +94,6 @@ Worth one grep pass over `Chapters/` against the removal list before release.
 
 The release with the most that the book has no equivalent for.
 
-- **PEP 649 and 749 deferred annotations plus `annotationlib`.** **Add** the introspection half.
-  The book already relies on PEP 649 semantics (project memory records this),
-  but `annotationlib.get_annotations()` and its three formats
-  (`VALUE`, `FORWARDREF`, `STRING`) appear nowhere.
-  Chapter 17 reads annotations at runtime and should use the supported API rather than
-  poking at `__annotations__`.
-  *Rechecked 2026-09-29: partly covered (Chapters/17_Techniques--Metaprogramming.md:1523-1555 (PEP 649, inspect.get_annotations); grepped annotationlib, FORWARDREF: none); missing: annotationlib and its three formats absent.*
 - **`concurrent.interpreters`, PEP 734.** **Consider.**
   Chapter 19 mentions `InterpreterPoolExecutor` once.
   The underlying module is now the third real concurrency model in the stdlib,
@@ -148,10 +132,6 @@ The release with the most that the book has no equivalent for.
 
 ## Python 3.12
 
-- **PEP 692, `Unpack[TypedDict]` for `**kwargs`.** **Add** to chapter 8 or 14.
-  Not covered.
-  It is the only way to type a `**kwargs` forwarding wrapper precisely,
-  which is a problem chapter 14's decorators run into directly.
 - **PEP 709, comprehension inlining.** **Mention** in chapter 16.
   Comprehensions no longer create a separate frame, which is roughly a 2x speedup
   and also explains why a comprehension's scope behavior changed.
@@ -197,11 +177,6 @@ The release with the most that the book has no equivalent for.
 
 ## Python 3.9
 
-- **PEP 616, `str.removeprefix()` and `removesuffix()`.** **Add** to chapter 3.
-  Not covered.
-  Small, but they replace the `if s.startswith(p): s = s[len(p):]` idiom that is easy to
-  get subtly wrong, and the book uses string manipulation in several listings.
-  *Rechecked 2026-09-29: partly covered (Chapters/27_Patterns--Factory.md:149, 612 (removeprefix used in listings); grepped removesuffix: none); missing: used but not taught in ch 3; removesuffix absent.*
 - **PEP 614, relaxed decorator grammar.** **Consider** for chapter 14.
   Any expression can now be a decorator, so `@handlers[name]` and `@config.decorator`
   are legal.
@@ -216,10 +191,6 @@ The release with the most that the book has no equivalent for.
 
 ## Python 3.8
 
-- **f-string `=` specifier (`f"{value=}"`).** **Add.** Not covered.
-  This is the fastest debugging idiom in Python and belongs in chapter 2, chapter 11,
-  or both.
-  One line replaces `print("value:", value)`.
 - **`unittest.IsolatedAsyncioTestCase` and `AsyncMock`.** **Consider** for chapter 11.
   The chapter introduces `unittest` before moving to `pytest`,
   so a sentence on testing coroutines fits the `unittest` half;
@@ -233,14 +204,6 @@ The release with the most that the book has no equivalent for.
 
 ## Python 3.7
 
-- **Module `__getattr__()` and `__dir__()` (PEP 562).** **Add** to chapter 6.
-  Not covered.
-  This is how a package deprecates a name, lazily imports a submodule, or presents a
-  curated public surface.
-  Chapter 6 is about modules and packages and currently has no answer to "how do I make
-  `mypkg.Thing` work without importing it eagerly."
-  It also connects to chapter 29's interface-evolution theme.
-  *Rechecked 2026-09-29: partly covered (Chapters/06_Foundations--Modules_and_Packages.md:571-582 (module __getattr__ for lazy submodules, PEP 562)); missing: no deprecation use, no module __dir__(), no listing.*
 - **`__class_getitem__()` (PEP 560).** **Consider** for chapter 17.
   Not covered.
   It explains how `list[int]` works at all, and how a custom class becomes subscriptable
@@ -277,13 +240,6 @@ The release with the most that the book has no equivalent for.
 
 ## Python 3.5
 
-- **PEP 479, `StopIteration` inside a generator becomes `RuntimeError`.** **Add a cross-reference.**
-  Chapter 23 names PEP 479; chapter 45 (Generators) does not,
-  and it is the generator chapter where the rule matters most.
-  A reader who writes `next(it)` inside a generator body needs this.
-- **`math.isclose()` (PEP 485).** **Add** to chapter 11.
-  Not covered.
-  Comparing floats with `==` in a test is a standard mistake and the stdlib has the fix.
 - **PEP 465, the `@` matrix multiplication operator.** **Consider** for chapter 7.
   Not covered.
   It is the clearest case study in the language for "when does a new operator deserve to

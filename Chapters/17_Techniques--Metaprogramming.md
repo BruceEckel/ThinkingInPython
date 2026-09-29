@@ -1574,6 +1574,74 @@ since `@dataclass` assigns every field straight onto the new instance.
 The tag comes from where the value lives,
 so it applies whether or not the attribute's declaration uses `typing.ClassVar`.
 
+### Reading Annotations Before Their Names Exist
+
+Deferred evaluation lets an annotation name a class that does not exist yet.
+Nothing evaluates the annotation until something asks for it,
+so a class can declare a field whose type appears further down the module.
+A metaprogram asks early.
+A decorator, an `__init_subclass__()` hook,
+or a metaclass runs while the class is being created,
+and if it reads the annotations then,
+a name they mention may still be undefined.
+Evaluating them at that moment raises a `NameError`.
+
+The standard library's `annotationlib` module handles this case.
+Its `get_annotations()` takes a `format` argument that chooses how to evaluate the annotations,
+and `inspect.get_annotations()` accepts the same argument.
+There are three formats:
+
+- `Format.VALUE`, the default, evaluates each annotation to a real object,
+  and raises a `NameError` when a name is missing.
+- `Format.FORWARDREF` evaluates what it can,
+  and substitutes an `annotationlib.ForwardRef` for each name it cannot resolve.
+- `Format.STRING` evaluates nothing,
+  and returns each annotation as a string that matches the source as closely as it can.
+
+Here, one forward-referencing annotation is read in all three formats:
+
+```python
+# forward_formats.py
+from annotationlib import Format, get_annotations
+from exceptions import expect
+
+class Order:
+    item: str
+    buyer: Customer
+
+expect(NameError, get_annotations, Order,
+       format=Format.VALUE)
+#: [NameError] name 'Customer' is not defined
+fwd = get_annotations(Order, format=Format.FORWARDREF)
+print(fwd["item"])
+#: <class 'str'>
+ref = fwd["buyer"]
+print(type(ref).__name__, ref.__forward_arg__)
+#: ForwardRef Customer
+print(get_annotations(Order, format=Format.STRING))
+#: {'item': 'str', 'buyer': 'Customer'}
+
+class Customer:
+    pass
+
+print(get_annotations(Order)["buyer"] is Customer)
+#: True
+```
+
+`Order` names `Customer` before `Customer` exists.
+The `VALUE` request fails the same way it would inside a decorator applied to `Order`.
+`FORWARDREF` resolves `item` to the `str` class and puts a `ForwardRef` in place of `buyer`;
+the reference's `__forward_arg__` holds the missing name.
+`STRING` evaluates nothing, so it cannot fail, but it gives up the objects:
+you get the text `'str'` rather than the class `str`.
+Once `Customer` is defined, the default `VALUE` request succeeds,
+because the failed attempt cached nothing.
+
+A tool that reads annotations at definition time therefore asks for `FORWARDREF`.
+It keeps the real objects it gets back,
+and holds on to each `ForwardRef` until the name exists,
+when the reference's `evaluate()` method resolves it to the class.
+
 ## Which Hook for Which Job
 
 Every hook in this chapter is an ordinary function that Python calls at a known moment during class construction.

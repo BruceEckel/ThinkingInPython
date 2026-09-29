@@ -138,6 +138,13 @@ A `for` loop never sees that value,
 because `for` catches the `StopIteration` and discards it along with its `value`.
 To read the `ReturnType`, catch the exception yourself,
 as `interview_generator.py` does.
+Python raises that `StopIteration` for the generator;
+the body finishes with `return`.
+A `StopIteration` that escapes the body,
+such as one from calling `next()` on an exhausted iterator,
+becomes a `RuntimeError` ([PEP 479](https://peps.python.org/pep-0479/)),
+as [Asking Consumes an Item](23_Patterns--Iterators.md#asking-consumes-an-item)
+shows.
 
 A newly created generator pauses at the top of the function body,
 before any code runs, so no `yield` expression is waiting to receive a value.

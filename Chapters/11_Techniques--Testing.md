@@ -252,6 +252,10 @@ Testing floating-point results for exact equality is unreliable.
 `test_interest_uses_approx()` compares with `pytest.approx()`,
 which allows a small tolerance: a relative difference of 1e-6,
 unless you pass `rel=` or `abs=`.
+Code outside a test has no `approx()`;
+its standard-library counterpart is `math.isclose()`,
+whose default relative tolerance is a tighter 1e-9,
+adjustable through its `rel_tol` and `abs_tol` arguments.
 
 That test passes with `==` as well.
 `100.0 + 100.0 * 0.05` is exactly `105.0` on any IEEE double,

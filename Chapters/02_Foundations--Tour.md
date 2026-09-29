@@ -458,6 +458,14 @@ print(s.strip()[0:5])
 
 String methods return new values rather than changing the original.
 
+`strip()` and its one-sided forms `lstrip()` and `rstrip()` take an optional argument,
+but it is a set of characters, not a prefix or suffix.
+`"test_setup".lstrip("test_")` removes every leading `t`, `e`, `s`, and `_`,
+leaving `"up"`.
+To remove one exact piece from an end, use `removeprefix()` or `removesuffix()`:
+`"test_setup".removeprefix("test_")` is `"setup"`,
+and `"notes.txt".removesuffix(".txt")` is `"notes"`.
+
 `+` joins two strings, and it converts nothing:
 
 ```python
@@ -505,6 +513,11 @@ The format spec after a colon controls width, precision, and alignment.
 `>` right-aligns and `<` left-aligns within the given width.
 A `!r` on the expression, as in `{name!r}`,
 formats the value with `repr()` instead of `str()`.
+An `=` after the expression, as in `{total = }`, prints the expression's text,
+the `=` with any spaces you put around it, and then the value.
+With no format spec the value appears as its `repr()`,
+so `f"{name=}"` produces `name='Alice'`.
+Use it to label values in your own exploring and debugging code.
 
 Existing code also carries two older styles: C's `printf()` syntax,
 as in `"val: %d" % val`, and the `str.format()` method,

@@ -686,6 +686,55 @@ Alternative constructors benefit the same way:
 a `@classmethod` that ends with `return cls(...)` returns `Self`,
 so a call on a subclass produces an instance of that subclass, not of the base.
 
+## Typing `**kwargs` with a `TypedDict` {#typed-kwargs}
+
+A `**kwargs` parameter collects keyword arguments into a dictionary.
+Annotating it as `**kwargs: int` says that every value is an `int`,
+but it says nothing about which keywords a caller may pass.
+A `TypedDict` describes a dictionary with specific keys,
+each with its own value type.
+Since Python 3.12 (PEP 692),
+`Unpack[...]` applies that description to `**kwargs`,
+so the type checker treats each key as a named, typed keyword parameter:
+
+```python
+# typed_kwargs.py
+from typing import NotRequired, TypedDict, Unpack
+
+class Style(TypedDict):
+    width: int
+    fill: NotRequired[str]
+
+def label(text: str, **style: Unpack[Style]) -> str:
+    fill = style.get("fill", " ")
+    return f"[{text.center(style['width'], fill)}]"
+
+print(label("ok", width=6))
+#: [  ok  ]
+print(label("ok", width=6, fill="*"))
+#: [**ok**]
+```
+
+Inside `label()`, `style` is a `Style` dictionary.
+`width` is required, so `style['width']` needs no guard.
+`NotRequired` makes `fill` optional,
+so `label()` reads it with `.get()` and a default.
+
+The checking happens at the call.
+A call that passes `width="6"` draws `invalid-argument-type` from `ty`,
+reporting "Expected `int`, found `Literal["6"]`",
+the same diagnostic a wrongly typed ordinary parameter draws.
+A call that leaves out `width` draws `missing-argument`.
+A misspelled keyword is where the checkers disagree.
+Pyright rejects `fill` misspelled as `fil="*"` with `No parameter named "fil"`,
+but `ty` 0.0.84 accepts that call without a diagnostic.
+At runtime `fil` becomes an extra key in `style`, which `label()` never reads,
+so the fill quietly stays a space.
+
+The payoff grows when several functions accept the same options:
+one `TypedDict` declares them once,
+and every signature that unpacks it stays in step.
+
 ## Hints Are Not Enforced at Run Time
 
 Type hints do not change what the program does.
@@ -827,7 +876,7 @@ The abstract container types come from `collections.abc`.
 
 | Construct | Meaning |
 |-----------|---------|
-| `TypedDict` | A dict with specific keys and value types |
+| `TypedDict` | A dict with specific keys and value types; `**kwargs: Unpack[TD]` types keyword arguments with one, see [Typing `**kwargs` with a `TypedDict`](#typed-kwargs) |
 | `Required[...]`, `NotRequired[...]`, `ReadOnly[...]` | Per-key control inside a `TypedDict` |
 | `NamedTuple` | A typed, named tuple class, see [Data Transfer Objects](22_Patterns--Data_Transfer_Objects.md#namedtuple) |
 

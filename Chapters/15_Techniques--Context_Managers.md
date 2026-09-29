@@ -649,6 +649,56 @@ What `banner` offers instead is one definition,
 usable both as a `with` block and as a `@` decorator.
 Use it when setup and cleanup should be identical on every call.
 
+The wrapper treats a generator function differently.
+Before Python 3.15, it wrapped only the call that creates the generator object,
+so the context entered and exited before the generator's body ran,
+and any resource the manager opened was gone by the time the body used it.
+On 3.15 the context opens at the first `next()` and closes after the generator's last `yield`:
+
+```python
+# decorated_generator.py
+from collections.abc import Iterator
+from contextlib import contextmanager
+
+@contextmanager
+def banner(title: str) -> Iterator[None]:
+    print(f"=== {title} ===")
+    try:
+        yield
+    finally:
+        print(f"=== {title} ends ===")
+
+@banner("rows")
+def rows() -> Iterator[int]:
+    for n in range(3):
+        print(f"yield {n}")
+        yield n
+
+gen = rows()
+print("created")
+#: created
+for row in gen:
+    print(f"got {row}")
+#: === rows ===
+#: yield 0
+#: got 0
+#: yield 1
+#: got 1
+#: yield 2
+#: got 2
+#: === rows ends ===
+print("done")
+#: done
+```
+
+`created` prints before the opening banner,
+because calling `rows()` only builds the generator object.
+The banner opens when the `for` loop asks for the first value,
+and it stays open each time the body resumes after a `yield`.
+Before 3.15, both banner lines printed before `created`.
+Code written for those versions leaves the decorator off and puts a `with` inside the generator around its body,
+which works on every version.
+
 ## Combining Context Managers
 
 A single `with` can include several managers, separated by commas.
