@@ -17,21 +17,20 @@ class Ranunculus(Flower):
 class Chrysanthemum(Flower):
     pass
 
-@singledispatch
-def pollinate(flower: Flower, agent: str) -> str:
-    return f"{flower} pollinated by {agent}"
+def pollinate(flower: Flower, pollinator: str) -> str:
+    return f"{flower} pollinated by {pollinator}"
 
 @singledispatch
-def eat(flower: Flower) -> str:
-    return f"{flower} eaten by Worm"
+def eat(flower: Flower, eater: str) -> str:
+    return f"{flower} eaten by {eater}"
 
 @eat.register
-def _(flower: Chrysanthemum) -> str:
-    return f"{flower} is toxic to Worm"
+def _(flower: Chrysanthemum, eater: str) -> str:
+    return f"{flower} is toxic to {eater}"
 
 for flower in (Ranunculus(), Chrysanthemum()):
     print(pollinate(flower, "Bee"))
-    print(eat(flower))
+    print(eat(flower, "Worm"))
 #: Ranunculus pollinated by Bee
 #: Ranunculus eaten by Worm
 #: Chrysanthemum pollinated by Bee
@@ -40,9 +39,15 @@ for flower in (Ranunculus(), Chrysanthemum()):
 
 Everything on the visitor side disappears: the `Visitor` base, `Bug`,
 `Pollinator`, `Predator`, `Bee`, `Fly`, and `Worm`, and the two
-`visit()` methods. So does `accept()` on `Flower`, and with it the
-`Any` annotation the chapter has to explain. Two functions and one
-registration remain.
+`visit()` methods. `Flower` loses `accept()`, and with it the `Any`
+annotation the chapter explains, and it loses `pollinate()` and
+`eat()`, which become functions outside the hierarchy.
+`Chrysanthemum`'s `eat()` override becomes a registration. Two
+functions and one registration remain.
+
+Only `eat()` is a `singledispatch` function, because only `eat()`
+answers differently for one flower type. `pollinate()` does the same
+thing for every flower, so it stays an ordinary function.
 
 The `Bug` classes hold no state. `Pollinator` and `Predator` each
 exist to name one operation, and `Bee`, `Fly`, and `Worm` exist
@@ -52,7 +57,7 @@ function, the call site names it: `pollinate(flower, "Bee")` says what
 
 You lose one thing: holding a visitor in a variable and passing it
 around as an object. When that matters, the function is still a value.
-`op = eat` works, and a `dict[str, Callable[..., str]]` keyed by
+`op = eat` works, and a `dict[str, Callable[[Flower, str], str]]` keyed by
 operation name recovers the "choose an operation at runtime" half of
 what the `Visitor` hierarchy provided, without the classes.
 
@@ -118,10 +123,10 @@ print(thorns(Gladiolus()))
 #: none
 ```
 
-Adding `Rose` costs two lines for the class plus one registration per
-operation that needs a non-default answer, and no existing line
-changes. Adding `thorns()` costs one new function plus one registration
-for the flower that differs, and again no existing line changes.
+Adding `Rose` costs eight lines: two for the class and three for each
+of its two registrations, one per operation whose default is wrong for
+a rose. Adding `thorns()` costs six: three for the function and three
+for the one flower that differs. Neither change edits an existing line.
 
 `@singledispatch` makes adding an *operation* cheaper than adding a
 type, because an operation is a whole function and lives in one place.
@@ -183,19 +188,20 @@ expect(AttributeError, Gladiolus().accept, Beetle())  # type: ignore
 declares what `accept()` needs instead of accepting anything. `Bee`
 neither mentions `Visits` nor inherits from it, because a `Protocol`
 matches on structure: any class with a compatible `visit()` satisfies
-`Visits`. The `Visitor` hierarchy stays as the chapter wrote it.
+`Visits`. The `Visitor` classes keep the chapter's form; the listing
+keeps only the pollinating half of them.
 
 The two versions report the `Beetle` mistake at different times. Under
 `Any`, the type checker has nothing to compare `Beetle` against, so
 the call type-checks and the program dies at runtime with the
 `AttributeError` above. Under `Visits`, `ty` rejects the argument
 before the program runs, because `Beetle` inherits no `visit()` and so
-does not match the protocol. Only the `# type: ignore` comment in the
-listing keeps `ty` quiet about that call. Delete it and `ty` reports
-the mismatch.
+does not match the protocol. The `# type: ignore` comment keeps `ty`
+quiet about that call so the listing can show the runtime failure;
+without it, `ty` reports an `invalid-argument-type`.
 
 That is the price the chapter names for keeping `Any`. The `Any` moves
-an error a type checker can catch into the run. The classic pattern
-pays that price because its `Visitor` base is empty. Either fix buys
-the check back: declaring `visit()` abstract on that base, or writing
-the `Visits` protocol above.
+an error a type checker can catch into the run. The chapter's version
+pays that price because its `Visitor` base is empty. Either fix
+restores the check: declaring `visit()` abstract on that base, as the
+classic pattern does, or writing the `Visits` protocol above.

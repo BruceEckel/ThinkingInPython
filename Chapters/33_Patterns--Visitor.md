@@ -29,8 +29,10 @@ because you cannot add it to a vendor's classes yourself.
 The visitor's type chooses which `visit()` runs.
 A new `Visitor` subclass that reuses an existing operation, such as `Fly`,
 adds no code to the primary hierarchy.
-In this Python version a new operation whose behavior varies by flower type also needs a new method on `Flower`;
-[The Price of the Empty Base](#the-price-of-the-empty-base) below explains why:
+In this Python version a new operation whose behavior varies by flower type also needs a new method on `Flower`,
+for a reason [The Price of the Empty Base](#the-price-of-the-empty-base)
+explains below.
+In the listing, bugs visit flowers:
 
 ```python
 # flower_visitors.py
@@ -132,7 +134,7 @@ That line depends on both unknown types at once:
 the worm's type chooses `eat()`,
 and the flower's type chooses which `eat()` runs.
 If you delete the override, every flower resolves to the same `Flower.eat()`,
-and the output depends on the visitor's type alone.
+and the visitor's type alone decides which method runs.
 
 `flower_visitors.py`'s output shows results, not mechanism.
 To make both dispatches visible,
@@ -177,8 +179,8 @@ A `Protocol` removes the `Any` at the cost of two new lines:
         def accept(self, visitor: Visits) -> None:
             visitor.visit(self)
 
-The chapter keeps `Any` because the empty `Visitor` base is what the classic pattern looks like,
-and showing what the `Any` gives up is part of the point.
+The chapter still keeps the empty `Visitor` base and its `Any`,
+because showing what the `Any` gives up is part of the point.
 What it gives up is every check on the visitor side:
 `Gladiolus().accept(Bug())` passes the type checker and fails at runtime with `AttributeError: 'Bug' object has no attribute 'visit'`.
 In [*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md#two-dispatches-through-methods),
@@ -194,7 +196,7 @@ Python has no method overloading,
 since a second `def visit()` replaces the first.
 [`@overload`](14_Techniques--Decorators.md#decorators-with-optional-parentheses)
 does not change that: it declares extra signatures for the type checker,
-and the one implementation must still branch on the argument's type itself.
+and the one implementation must still branch on the argument's type.
 `flower_visitors.py` therefore puts the type-specific behavior in `pollinate()` and `eat()` on the flowers instead,
 and the visitors choose between them.
 So `flower_visitors.py`'s primary hierarchy holds the operations the pattern exists to keep out of it.
