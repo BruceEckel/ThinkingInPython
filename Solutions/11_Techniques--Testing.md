@@ -278,3 +278,53 @@ Where you can change the signature, injection turns the dependency into
 part of the contract. The function then receives what it needs instead
 of going looking for something no caller handed it, the chapter's
 description of a function that is hard to test.
+
+## 6. The branch that sends nothing
+
+```python
+# test_ch11_silent_notifier.py
+from collections.abc import Callable
+from unittest.mock import Mock
+import pytest
+
+def notify_low_balance(
+    balance: float,
+    send: Callable[[str], None],
+) -> None:
+    if balance < 0:
+        send(f"balance is negative: {balance}")
+
+@pytest.mark.parametrize("balance", [0, 50])
+def test_mock_not_called(balance: float) -> None:
+    send = Mock()
+    notify_low_balance(balance, send)
+    send.assert_not_called()
+
+@pytest.mark.parametrize("balance", [0, 50])
+def test_stub_not_called(balance: float) -> None:
+    sent: list[str] = []
+    def send(message: str) -> None:
+        sent.append(message)
+    notify_low_balance(balance, send)
+    assert sent == []
+```
+
+Zero is the boundary: `notify_low_balance()` tests `balance < 0`,
+so a mistaken `<=` would send at zero and fail the zero case.
+`assert_not_called()` passes only if `send` received no call.
+
+A stub like exercise 5's `fake_fetch()` cannot make this check.
+It records nothing, so the test would pass whether or not `send` ran,
+and a `notify_low_balance()` that always sent would go unnoticed.
+To make the check, the stub must gain a memory of its calls.
+Here that memory is the list `sent`: the stub appends each message to it,
+and the test asserts that the list stays empty.
+A stub that records its calls is a mock written by hand.
+`Mock` builds that recording for you, along with the assertions that read it.
+
+The hand-written version has one advantage.
+Its signature is `(message: str) -> None`,
+so `ty` checks it against `Callable[[str], None]`,
+and a change to the real signature shows up as a type error.
+A `Mock` accepts any call,
+which is the gap the chapter closes with `create_autospec()`.

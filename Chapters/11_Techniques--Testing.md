@@ -884,6 +884,11 @@ a line a test happened to execute is not the same as a line a test checks.
     Write a second function that takes a fetcher as an argument instead,
     and test both: one with `monkeypatch`, one with a plain function passed in.
     Then rename `weather.urlopen` to `weather.fetch` and see which test still passes.
+6.  `test_notifier.py` checks that a negative balance sends a message.
+    Write the test for the other branch:
+    a balance of zero or more sends nothing.
+    Then write the same test with a hand-written stub in place of the `Mock`.
+    What must the stub gain to make the check?
 
 [^parametrize]: Four spellings are in use, all correct.
     The stem is `parametr-` or `parameter-`.
