@@ -14,8 +14,9 @@ This is [designing the communication rather than the parts](21_Patterns--Design_
 
 In its common form, where observers attach and detach at runtime,
 *Observer* is the most dynamic of the callback patterns.
-[Fixing the Responders at Construction](#fixing-the-responders-at-construction)
-shows a form that keeps the decoupling and fixes the observers when you create the subject.
+[Setting the Responders at Construction](#setting-the-responders-at-construction)
+shows a form that keeps the decoupling and sets the observers once,
+when you create the subject.
 Use *Observer* if a group of objects must update themselves when other objects change state.
 Event handling typically works this way:
 a widget keeps a list of handlers and calls each one when its event arrives.
@@ -619,7 +620,7 @@ The flag breaks the cycle without comparing values,
 so a second write of the same reading still reaches the responders,
 which is the behavior you want when a responder counts readings rather than changes.
 
-### Fixing the Responders at Construction
+### Setting the Responders at Construction
 
 `subscribe()` and `unsubscribe()` make `Broadcaster` dynamic:
 its list of responders can change at any moment,
