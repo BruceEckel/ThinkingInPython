@@ -44,36 +44,34 @@ for kind, group in bins.items():
 #: Aluminum 3.34
 ```
 
-That class is the only new Python code. `__init_subclass__()`
-registers `Plastic` in `Trash.registry` automatically, the moment the
+The `Plastic` class is the only new Python code.
+`__init_subclass__()` registers it in `Trash.registry` the moment the
 `class` statement runs, so `Trash.create("Plastic", weight)` works
 with no further wiring. `recycle_dict.py`'s sorting loop needs no
-change because `bins[type(t)].append(t)` keys on whatever type `t`
-actually is. Only the filename it parses has to change, since the
-script hardcodes `parse("trash.dat")`.
-`type(t)` for a piece of `Plastic` is simply `Plastic`, a key the
-dictionary has never seen before, which `defaultdict` handles the same
-way it handles every other new key. `parse_trash.py` needs no change
-because it only calls `Trash.create(name, weight)` with a name
-string read from the file. It never names a concrete material itself.
-Two changes remain: the data files gain `Plastic:NN` lines, and
-`Plastic` gets one `@recycling_note.register` function if it deserves
-special handling.
+change because `bins[type(t)].append(t)` keys on the class of each
+piece. `Plastic` is a key the dictionary has not seen, and
+`defaultdict` creates its bin the way it creates every other. The one
+edit to the script is the filename, since it hardcodes
+`parse("trash.dat")`. `parse_trash.py` needs no change because it
+calls `Trash.create(name, weight)` with a name read from the file and
+names no material. One optional step remains: `Plastic` gets a
+`@recycling_note.register` function if it needs special handling.
 
-The other half is accounting for the plastic that `plastic_dropped.py`
-loses. It parses four pieces and bins two, so the twenty- and
-forty-pound plastic pieces drop out of every total the report prints.
-Its `match` has no `case` for `Plastic` and no `case _`, so those two
-pieces fall through and the loop moves on. The plant gets a report
-that balances against nothing.
+`plastic_dropped.py` parses four pieces and bins two. Its `match` has
+no `case` for `Plastic` and no `case _`, so the twenty-pound and
+forty-pound pieces fall through and the loop moves on. Sixty pounds
+at 0.15 a pound is the `Total value = 9.00` that
+`recycle_dict_plastic.py` prints and `plastic_dropped.py` omits. The
+report shows no sign of the loss: the two totals it prints are correct
+for the pieces they cover.
 
 `test_subclasses_self_register` fails, because it pins the registry to
 exactly `{"Aluminum", "Paper", "Glass", "Cardboard"}` and `Plastic` is
-now a fifth entry. That failure is correct behavior for the test. The
-test exists to prove that defining a subclass registers it, so a new
-material *should* move the assertion. A test that passes here means
-`__init_subclass__()` has stopped doing its job. Update the expected
-set and the test goes back to guarding what it exists to guard.
+now a fifth entry. That failure is correct. The test exists to prove
+that defining a subclass registers it, so a new material changes the
+set the assertion compares. If the test still passed,
+`__init_subclass__()` would have stopped registering subclasses. Once
+you update the expected set, the test guards registration again.
 
 ## 2. `price()` and `heaviest()`
 
@@ -118,15 +116,15 @@ print(type(h).__name__, h.weight)
 #: Plastic 10.0
 ```
 
-Neither `price()` nor `heaviest()` needs `singledispatch`. Both read
-only `t.weight` and `t.value`, attributes every `Trash` subclass
-already carries through ordinary polymorphism, so the same code runs
-unchanged for `Aluminum`, `Glass`, `Plastic`, or any future material.
-Both are in `sum_value()`'s situation: `singledispatch` earns its
-place only when the behavior genuinely differs *by type*, such as
-`recycling_note()` giving `Aluminum` and `Glass` their own wording.
-When a calculation is identical in shape for every type and varies
-only in the numbers each type carries, write a plain function.
+Neither `price()` nor `heaviest()` needs `singledispatch`. `price()`
+reads `t.weight` and `t.value`, and `heaviest()` reads `t.weight`
+alone. Every `Trash` subclass carries both attributes, so the same
+code runs for `Aluminum`, `Plastic`, or any future material. Both are
+in `sum_value()`'s situation: `singledispatch` is for behavior that
+differs by type, such as `recycling_note()` giving `Aluminum` and
+`Glass` their own wording. When a calculation has the same form for
+every type and varies only in the numbers each type carries, write an
+ordinary function.
 
 ## 3. `recycling_note()` as a `singledispatchmethod`
 
@@ -179,9 +177,8 @@ class Sorter:
         return "Cardboard: flatten and bundle"
 
 sorter = Sorter()
-for t in [Aluminum(1), Paper(1), Glass(1),
-          Cardboard(1), Plastic(1)]:
-    print(sorter.recycling_note(t))
+for cls in Trash.registry.values():
+    print(sorter.recycling_note(cls(1.0)))
 #: Aluminum: crush and bale
 #: Paper: no special handling
 #: Glass: sort by color, then crush
@@ -189,17 +186,20 @@ for t in [Aluminum(1), Paper(1), Glass(1),
 #: Plastic: no special handling
 ```
 
-The dispatch logic is identical to the plain-function version.
-`singledispatchmethod` still routes on the type of the first argument
-*after* `self`. What changes is where the operation lives.
-`recycling_note()` is now a method you call as
-`sorter.recycling_note(t)`, so it reads as belonging to `Sorter`
-rather than to nothing in particular. That home matters if `Sorter`
-must hold its own state (a log of notes issued, a configuration,
-statistics) alongside the dispatch. When `Sorter` carries no such
-state, as here, the free-function version from `recycling_note.py` is
-simpler and does the identical job. Use `singledispatchmethod` only
-once the operation needs a home on an object.
+The dispatch is the same as in the function version:
+`singledispatchmethod` routes on the type of the first argument after
+`self`. What changes is where the operation lives. `recycling_note()`
+is now a method you call as `sorter.recycling_note(t)`. That matters
+if `Sorter` holds state of its own (a log of notes issued, a
+configuration, statistics) alongside the dispatch. When `Sorter`
+carries no such state, as here, the function in `recycling_note.py`
+is simpler and does the same job. Use `singledispatchmethod` once the
+operation needs a home on an object.
+
+The method form also brings the trap that *Multiple Dispatching*
+describes. A subclass of `Sorter` shares this one dispatcher, so a
+registration made through the subclass changes `Sorter`'s answers
+too.
 
 ## 4. Exact-type bins against MRO dispatch
 
@@ -226,7 +226,7 @@ class Aluminum(Trash):
 
 class CrushedAluminum(Aluminum):
     value: ClassVar[float] = 1.67
-    bin = Aluminum
+    bin: ClassVar[type[Trash]] = Aluminum
 
 class Glass(Trash):
     value: ClassVar[float] = 0.23
@@ -270,9 +270,78 @@ To share a parent's bin without naming a material in the loop, choose
 your own key instead of accepting `type(t)`. A `bin` class variable
 supplies that key: `__init_subclass__()` defaults each class to
 itself, so a material that stays out keeps a bin of its own.
-`CrushedAluminum` opts in by setting `bin = Aluminum`. The sorting
-loop becomes `shared[t.bin].append(t)` and still names nothing.
+`CrushedAluminum` opts in by setting `bin` to `Aluminum`, and it
+restates the `ClassVar` annotation for the reason the chapter's
+subclasses restate `value`'s. The sorting loop becomes
+`shared[t.bin].append(t)` and still names no material.
 
-The lesson generalizes past this exercise. `type(t)` is a convenient
-key, not an inevitable one. A design that declares its own key can
-express groupings the type hierarchy leaves out.
+`type(t)` is a convenient key, not an inevitable one. A design that
+declares its own key can express groupings the type hierarchy leaves
+out.
+
+## 5. A base function that refuses to answer
+
+```python
+# exercise_5.py
+from functools import singledispatch
+from typing import ClassVar
+from exceptions import expect
+from record import record
+
+@record
+class Trash:
+    weight: float
+    value: ClassVar[float] = 0.0
+
+class Aluminum(Trash):
+    value: ClassVar[float] = 1.67
+
+class Paper(Trash):
+    value: ClassVar[float] = 0.10
+
+class Plastic(Trash):
+    value: ClassVar[float] = 0.15
+
+@singledispatch
+def hazard(t: Trash) -> str:
+    return "none"
+
+@hazard.register
+def _(t: Aluminum) -> str:
+    return "sharp edges"
+
+print(hazard(Plastic(1.0)))
+#: none
+
+@singledispatch
+def strict_hazard(t: Trash) -> str:
+    raise NotImplementedError(
+        f"no hazard rule for {type(t).__name__}")
+
+@strict_hazard.register
+def _(t: Aluminum) -> str:
+    return "sharp edges"
+
+@strict_hazard.register
+def _(t: Paper) -> str:
+    return "none"
+
+print(strict_hazard(Paper(1.0)))
+#: none
+expect(NotImplementedError, strict_hazard, Plastic(1.0))
+#: [NotImplementedError] no hazard rule for Plastic
+```
+
+`hazard()` answers "none" for the plastic, which is wrong and looks
+like every correct "none" beside it. The forgotten registration
+produces no exception and no report from the type checker.
+`strict_hazard()` raises a `NotImplementedError` that names the
+material at the first call.
+
+The strict form costs one registration for every material, including
+each one whose answer is "none": `Paper` needs three lines to say what
+the fallback said with no code. Choose by which mistake costs more. A
+default is right when it is a true answer for most types and a
+forgotten registration does little harm. A base function that raises
+an exception is right when a wrong answer is worse than a stopped
+program, as it is for a safety report.

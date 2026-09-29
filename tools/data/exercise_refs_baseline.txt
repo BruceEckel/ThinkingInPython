@@ -36,6 +36,7 @@ Chapters/Observer	Observer	3	An `announce()` that survives a failing responder
 Chapters/Observer	Observer	5	Failures returned as values
 Chapters/Observer	Observer	8	Two views on one model
 Chapters/Observer	Observer	9	Which colors a grid can reach
+Chapters/Pattern_Refactoring	Pattern_Refactoring	5	A base function that refuses to answer
 Chapters/Performance	Performance	6	A subclass that forgets `__slots__`
 Chapters/Simulation	Factory	9	Recursing through `__subclasses__()`
 Chapters/Simulation	Simulation	3	Breaking `claim()`'s atomicity

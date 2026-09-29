@@ -20,7 +20,7 @@ class Aluminum(Trash):
 
 class CrushedAluminum(Aluminum):
     value: ClassVar[float] = 1.67
-    bin = Aluminum
+    bin: ClassVar[type[Trash]] = Aluminum
 
 class Glass(Trash):
     value: ClassVar[float] = 0.23

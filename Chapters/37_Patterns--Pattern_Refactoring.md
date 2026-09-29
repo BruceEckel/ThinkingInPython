@@ -114,7 +114,7 @@ A new recyclable type costs one class definition.
 It registers itself, and `create()` builds it.
 `sum_value()` needs no edit for it either:
 that ordinary function reads `t.value` and `t.weight` polymorphically,
-and never checks what type a piece is.
+without checking the type of a piece.
 
 Testing confirms that each subclass registers itself,
 `create()` builds one by name,
@@ -170,9 +170,8 @@ Aluminum:81
 Cardboard:12
 ```
 
-The parser builds `Trash` objects through the registry,
-so it never names a concrete material.
-So adding a new kind of trash needs no edit to the parser, and cannot break it:
+The parser builds `Trash` objects through the registry and names no concrete material,
+so adding a new kind of trash needs no edit to the parser, and cannot break it:
 
 ```python
 # parse_trash.py
@@ -254,7 +253,7 @@ for kind, items in bins.items():
 `recycle_rtti.py` satisfies the requirement, but it has a classic flaw.
 It tests for every type in the system.
 When a new material joins the system, say `Plastic`,
-you must find every `case` statement that enumerates specific types.
+you must find every `match` statement that enumerates specific types.
 Each one you miss silently drops trash on the floor.
 Testing for one type, or a small subset that needs special handling, is fine.
 Testing for all of them means you write the type-to-bin lookup by hand.
@@ -263,19 +262,22 @@ Readers of [*Composite* and *Interpreter*](34_Patterns--Composite_and_Interprete
 may expect `assert_never()` to make the type checker report the missed case.
 Exhaustiveness checking needs a *closed* union to compare the cases against,
 but `Trash` is deliberately open: the registry exists to accept new subclasses.
+With `case _: assert_never(t)` added,
+`ty` reports the call although the `match` names all four materials,
+because a `Trash` or a subclass defined later can still reach the wildcard.
+A report that appears whether or not a `case` is missing cannot find the missing one.
 [Pattern Matching](13_Techniques--Pattern_Matching.md#when-not-to-match)
-warns against exactly this shape: a `match` over an open set.
+warns against this shape: a `match` over an open set.
 
 A `case _:` wildcard could catch a new material:
 `case _: raise ValueError(f"unsorted {type(t).__name__}")` turns the silent drop into a `ValueError`.
 The wildcard is worth adding, and the flaw remains:
 every new material means editing this `match`.
 A sorter over an open set must let each piece choose its own bin,
-and the next section's `bins[type(t)]` does that with no edit at all.
+and the next section's `bins[type(t)]` does that with no edit.
 
-That is the argument.
-The plant starts accepting plastic,
-which means a new material class and some new lines in the data:
+Now the plant starts accepting plastic,
+which means some new lines in the data and a new material class:
 
 ```text
 # plastic.dat
@@ -390,9 +392,9 @@ The `defaultdict(list)` creates a bin the first time the loop reads a piece of t
 so a type checker accepts `bins: Bins = {}` too.
 That version raises a `KeyError` on the first piece of trash.
 
-Point this sorter at `plastic.dat`,
-the file whose plastic `plastic_dropped.py` drops.
-The listing defines `Plastic` the same way `plastic_dropped.py` does:
+The next listing points this sorter at `plastic.dat`,
+the file whose plastic `plastic_dropped.py` drops,
+and defines `Plastic` the same way `plastic_dropped.py` does:
 
 ```python
 # recycle_dict_plastic.py
@@ -424,8 +426,9 @@ print(f"parsed {len(pieces)}, binned {binned}")
 ```
 
 The loop bins every piece, plastic included: `parsed 4, binned 4`.
-The program changed in two places:
+Handling plastic takes two changes to `recycle_dict.py`:
 the `Plastic` definition and the data file's name.
+The last two lines count the pieces for the comparison with `plastic_dropped.py`.
 The sorting line, `bins[type(t)].append(t)`,
 reads the same as in `recycle_dict.py`,
 while the `match` in `recycle_rtti.py` and `plastic_dropped.py` would need a new `case`.
@@ -439,7 +442,8 @@ That trade is the [expression problem](13_Techniques--Pattern_Matching.md#the-ex
 
 ### A Method on Every Material
 
-The plant already prints a recycling instruction for each material.
+The plant prints a recycling instruction for each material,
+from a `note()` method on each class.
 Now the safety officer wants a disposal hazard printed beside the instruction.
 That is a second operation that varies by material.
 The obvious place for it is a method on each material class:
@@ -507,7 +511,7 @@ Those edits sit in each class body, as `note_methods.py` shows;
 in the real program they go in `trash.py`.
 A method belongs in the body of its own class by design.
 You can assign a function onto a class from outside,
-but a reader of the class then has to search every module for the behavior assigned onto it.
+but a reader of the class must then search every module for the behavior assigned onto it.
 A plant that buys its material classes from a supplier has no class body to edit.
 
 The method form is a real option, not an example built to fail.
@@ -573,7 +577,7 @@ Here "no special handling" is a genuine answer for `Paper`,
 so the fallback is correct.
 When the default answer would be wrong for an unregistered material,
 the *Visitor* chapter advises making the base function raise `NotImplementedError`,
-so a forgotten registration fails at the first call.
+so a forgotten registration fails at the first call (see exercise 5).
 
 Now write the safety officer's question the same way.
 It goes in its own file,
@@ -641,12 +645,12 @@ draws the same distinction between a table keyed by class and dispatch that foll
 
 Design patterns are about separating things that change from things that stay the same.
 Polymorphism is one way to do that;
-this chapter used a dictionary keyed by type and a `singledispatch` function.
+this chapter uses a dictionary keyed by type and a `singledispatch` function.
 The deeper skill is spotting the [*vector of change*](21_Patterns--Design_Patterns.md#the-vector-of-change)
 and choosing the lightest construct that isolates it.
-This chapter met two vectors through a concrete requirement each:
+This chapter meets two vectors through a concrete requirement each:
 plastic for new types, and the disposal hazard for new operations.
-Each vector now lands in one place: `bins[type(t)]` absorbs a new material,
+Each vector now touches one place: `bins[type(t)]` absorbs a new material,
 one `@recycling_note.register` adds that material's answer to an existing operation,
 and a new operation is one `singledispatch` function in its own file.
 None of the three is a pattern in the GoF sense.
@@ -672,3 +676,10 @@ Keep a pattern where it does more than a language feature does.
     Explain why it gets its own bin but not its own note.
     Then change `recycle_dict.py` so a subclass shares its parent's bin,
     without naming any material in the sorting loop.
+5.  Define `Plastic`, whose disposal hazard is toxic fumes,
+    and leave it out of `disposal_hazard.py`'s registrations.
+    What does `hazard()` answer for a piece of plastic?
+    Then write `strict_hazard()`,
+    whose base function raises `NotImplementedError`,
+    and call it on the same piece.
+    What does the strict form cost the materials whose hazard is "none"?
