@@ -24,7 +24,7 @@ class Meta(type):
         super().__init__(name, bases, nmspc)
         print(f"__init__ {name}")
 
-def tag[T: type](cls: T) -> T:
+def tag[T](cls: type[T]) -> type[T]:
     print(f"decorator {cls.__name__}")
     return cls
 

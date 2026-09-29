@@ -38,7 +38,7 @@ print(sorted(c.__name__ for c in Color.registry))
 
 Creating `Yellow` adds it to the registry. Nothing removes it yet,
 since `Color` (its only base) is never in the registry to begin with.
-Creating `Gold` adds *it* and removes its base, `Yellow`, the
+Creating `Gold` adds it and removes its base, `Yellow`, the
 same pruning `PhthaloBlue` and `CeruleanBlue` do to `Blue` earlier.
 `__init_subclass__()` runs for every new subclass, so each new
 generation adds itself and prunes its parent automatically, with no
@@ -128,8 +128,8 @@ here rather than simplifying to `-> Any`. It ties the return type to
 `cls`, so `CSingleton()` type-checks as a `CSingleton`, and `ty` still
 flags a misspelled attribute on the result. Two details follow from
 that annotation. `cls: type[T]` hides the fact that `cls` is a
-`Singleton`, so the body writes `type.__call__(cls, ...)`, where a
-type checker rejects a zero-argument `super()`. For the same reason
+`Singleton`, so the body writes `type.__call__(cls, ...)`, where
+`ty` rejects a zero-argument `super()`. For the same reason
 the body reads the cache through the class name,
 `Singleton._instances`, rather than through `cls`.
 
@@ -192,13 +192,14 @@ only for a class whose `__mro__` holds one of the classes in
 ```python
 # exercise_5.py
 import inspect
+from types import FunctionType
 
 def greet(name: str, loud: bool = False) -> str:
     "Return a greeting."
     text = f"Hello, {name}"
     return text.upper() if loud else text
 
-def describe(func) -> None:
+def describe(func: FunctionType) -> None:
     doc = inspect.getdoc(func)
     sig = inspect.signature(func)
     print(func.__name__, sig)
@@ -242,6 +243,7 @@ due to incompatible bases
   |           cannot be combined in multiple inheritance
 info: Two classes cannot coexist in a class's MRO if their instances
 have incompatible memory layouts
+ --> metaclass_layout_conflict.py:6:21
   |
 6 |     class Singleton(type, dict[type, Any]):
   |                     ----  --------------- `dict` instances have a
@@ -466,5 +468,5 @@ after its body has finished executing, and by then the body has run
 namespace mapping. The first function has no name pointing at it and
 no reference anywhere, so no later hook has anything to restore.
 `__prepare__()` is the only hook that sees the assignments one at a
-time, while they happen, and that is exactly why the chapter calls it
+time, while they happen, and that is why the chapter calls it
 the one with no simpler substitute.

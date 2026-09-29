@@ -1,12 +1,13 @@
 # exercise_5.py
 import inspect
+from types import FunctionType
 
 def greet(name: str, loud: bool = False) -> str:
     "Return a greeting."
     text = f"Hello, {name}"
     return text.upper() if loud else text
 
-def describe(func) -> None:
+def describe(func: FunctionType) -> None:
     doc = inspect.getdoc(func)
     sig = inspect.signature(func)
     print(func.__name__, sig)

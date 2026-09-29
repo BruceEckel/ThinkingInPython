@@ -95,14 +95,14 @@ Then come the simpler hooks, and metaclasses for the jobs that still need them.
 The `inspect` module closes the chapter from the other side,
 reading class structure instead of changing it.
 
-## Generating Classes with `type`
+## Generating Classes with `type()`
 
 Since metaclasses create classes, you can call the metaclass yourself.
-`type` with one argument gives the type of an existing object.
-`type` with three arguments creates a new class.
+`type()` with one argument gives the type of an existing object.
+`type()` with three arguments creates a new class.
 These arguments are the name, a tuple of base classes,
 and a namespace dictionary of fields and methods.
-A class definition is shorthand for calling `type`:
+A class definition is shorthand for calling `type()`:
 
 ```python
 # class_via_type.py
@@ -168,7 +168,7 @@ Printing the class of the class produces the metaclass.
 
 ### A Family of Generated Classes
 
-Generating classes programmatically with `type` pays off when a family of classes differs only by name.
+Generating classes programmatically with `type()` pays off when a family of classes differs only by name.
 Where you might otherwise write many near-identical subclasses by hand,
 you can instead generate them dynamically.
 A greenhouse controller runs scheduled events, one class per kind of event,
@@ -217,12 +217,16 @@ so `isinstance(light, Event)` is `True`,
 but `type(light) is type(water)` is `False`: they are distinct subclasses,
 and `isinstance()` tells them apart.
 
-`ty` cannot follow a class built by `type()`.
-It models `new_cls` as unknown, so it checks nothing about the generated class.
-Pyright synthesizes the class and checks its constructor,
-and mypy models it as `ty` does.
-`EventMaker` names the two-argument signature the generated classes really have,
-and the `cast()` records it at the one place that creates a class.
+Type checkers follow a `type()` call to different depths.
+`ty` reads the bases and a namespace written as a dict literal.
+It takes the constructor from the `"__init__"` entry,
+so it knows each generated class takes an hour and a minute.
+Pyright builds the class from its bases alone,
+so it gives the class `Event`'s three-argument constructor,
+and mypy models the result as an unknown class and checks nothing.
+`EventMaker` names the two-argument signature the generated classes have,
+and the `cast()` records it at the one place that creates a class,
+so every checker sees that signature.
 
 `make()` exists so that each `init()` closes over its own `name`.
 A lambda written inline in the comprehension closes over the comprehension's variable instead,
@@ -374,18 +378,18 @@ The schedule names three of the seven declared event types.
 It fetches the `RingBell` class through `_event_maker`,
 the same lookup `load_schedule()` uses,
 and marks every event `isinstance()` recognizes as a `RingBell` with a leading `* `.
-That is the behavior a distinct subclass adds:
-a generated class doing something a plain string could not.
+That is what a distinct subclass adds: each event carries its kind as its type,
+where `isinstance()` or a `match` class pattern can test it.
 
 Calling `Event(class_name, hour, minute)` directly still produces the right field values,
 but every entry shares one type,
-and `run_events()` has no class left to check against.
+and `run_events()` has no `RingBell` class for `isinstance()` to test.
 The `* ` marker depends on `RingBell` being a distinct class,
 not just a distinct name.
 
 ## Generating Classes with `exec()`
 
-The `type` approach in the previous section builds a class from a name,
+The `type()` approach in the previous section builds a class from a name,
 a tuple of bases, and a namespace dict.
 A second way is to write an ordinary `class` statement in an f-string,
 then `exec()` that string as code.
@@ -440,7 +444,7 @@ if __name__ == "__main__":
 not the module's namespace,
 and seeds it with `{"Command": Command}` so the generated class can find its base.
 The type checker can't see into the string,
-so `namespace[class_name]` is just `Any` to it.
+so `namespace[class_name]` is `Any` to it.
 `exec()` also drops a `__builtins__` entry into any globals mapping that lacks one,
 and that entry is the second reason `namespace` carries the annotation `dict[str, Any]`.
 `cast(Callable[[], Command], ...)` records the actual no-argument signature at the one place that creates the class,
@@ -448,7 +452,7 @@ the same idiom `greenhouse.py` uses for `EventMaker`.
 Unlike `EventMakers`, `make_class()` caches nothing:
 calling `make_class("Start")` twice builds two distinct classes.
 
-`__init__`'s definition sits textually inside a `class` block.
+`__init__()`'s definition sits textually inside a `class` block.
 The compiler treats a block that arrived as a string the same as one read from a file.
 That is the difference from `greenhouse.py`,
 whose `init()` is a nested function rather than a method in a class body,
@@ -466,7 +470,7 @@ the same way an unescaped value breaks out of a hand-built SQL query.
 The `KNOWN_COMMANDS` check closes that hole:
 only three fixed names ever reach the template.
 `EventMakers` never has this risk,
-because `type(class_name, (Event,), ...)` treats `class_name` as a plain string value,
+because `type(class_name, (Event,), ...)` treats `class_name` as a string value,
 never as source code.
 Treat `exec()` and `eval()` like string-built SQL:
 safe on values you've already validated,
@@ -626,7 +630,7 @@ print(type(b).__name__)
 
 The type checker rejects the commented line.
 
-Type checkers such as ty, mypy, and pyright check `@final` statically.
+Type checkers such as `ty`, mypy, and Pyright check `@final` statically.
 At runtime the decorator only marks the class, setting `__final__ = True`
 (as `test_final.py` below confirms),
 so the interpreter still runs `class C(B): pass`.
@@ -751,14 +755,14 @@ expect(TypeError, User, "Guido", 30)
 ```
 
 The checker synthesizes a `User.__init__()` from the field declarations,
-with `name` required and `age` defaulted, exactly as it does for `@dataclass`.
+with `name` required and `age` defaulted, as it does for `@dataclass`.
 It believes the declaration without ever running `model()`,
 so the call checks clean and fails at runtime: this `model()` generates nothing,
 and `object`'s constructor takes no arguments.
 The declaration is a claim, and this one is false.
 Libraries like attrs and pydantic make the claim true by generating the methods their `@dataclass_transform` declares,
 and that is how their classes get first-class checking without any checker hard-coding them.
-The shortest honest `model()` delegates the generation:
+The shortest `model()` that makes its claim true delegates the generation:
 
 ```python
 # kept_transform.py
@@ -788,8 +792,9 @@ and `frozen_default=True` tells the checker that classes built by `model()` reje
 a decorator that builds a class's methods from its field declarations.
 Anything stranger stays invisible to the checker,
 which never imports or executes your code.
-That is why the classes assembled by `type()` in [Generating Classes with `type`](#generating-classes-with-type)
-use a `cast()` to state their real signature:
+That is why `commander.py` in [Generating Classes with `exec()`](#generating-classes-with-exec),
+whose class exists only as text in a string,
+uses a `cast()` to state the real signature:
 the checker models what it recognizes, believes what you declare,
 and sees nothing else.
 
@@ -848,8 +853,8 @@ not only descriptors,
 passing the freshly created class and the name that holds the attribute.
 `Field` pairs `__set_name__()` with `__get__()` and `__set__()`,
 the descriptor protocol, and uses the delivered name to build its storage key.
-A `print()` at the top of each method traces the descriptor's whole life:
-naming at class creation, then every read and write:
+A `print()` at the top of each method traces the descriptor's whole life,
+from naming at class creation through every read and write:
 
 ```python
 # set_name.py
@@ -910,13 +915,14 @@ Each `Field` stores values under `_x` or `_y` in the instance's `__dict__`.
 The underscore prefix does real work.
 A descriptor that defines `__set__()` is a *data descriptor*,
 and on every lookup a data descriptor outranks the instance's `__dict__`.
-If `__get__()` asks `obj` for plain `"x"`,
-that lookup routes back to the descriptor and calls `__get__()` again, forever.
+If `__get__()` asks `obj` for `"x"`, the attribute's own name,
+that lookup routes back to the descriptor and calls `__get__()` again,
+until Python raises a `RecursionError`.
 No descriptor is assigned to `_x`, so storing the value there breaks the loop.
 
 A descriptor with only `__get__()` is a *non-data descriptor*,
 and the ranking reverses: the instance's `__dict__` wins.
-That is why assigning `p.greet = something` shadows the method on that one instance,
+That is why assigning to `greet` on a `Person` instance shadows the method on that one instance,
 while `p.x = 3` cannot shadow `Field`, because `Field` defines `__set__()`.
 
 `__set_name__()` is metaprogramming with no metaclass in sight.
@@ -999,6 +1005,11 @@ A `property` protects one attribute the same way,
 but `Rectangle` then carries the check twice, once per attribute.
 A descriptor is the reusable form.
 The rule lives in one class, and each attribute that needs it says `Positive()`.
+
+`Positive.__get__()` omits the `obj is None` branch that `Field` has,
+so it works through an instance and fails through the class:
+reading `Rectangle.width` passes `None` as `obj` and raises an `AttributeError`.
+A descriptor meant for wider use returns `self` there, as `Field` does.
 
 ## Writing a Metaclass
 
@@ -1217,7 +1228,7 @@ with `class Singleton[T](type)` and `_instances: ClassVar[dict[type, T]]`.
 That fails twice.
 A `ClassVar` means one shared value for the whole class,
 so it cannot depend on a type parameter that varies per instantiation.
-And a subclass must write `class ASingleton(metaclass=Singleton[ASingleton]):`,
+And each class must write `class ASingleton(metaclass=Singleton[ASingleton]):`,
 naming `ASingleton` before its class body finishes defining it.[^crtp]
 The method-level `[T]` on `__call__()` avoids both problems.
 It binds `T` from `cls` at the call site, `ASingleton()`,
@@ -1251,14 +1262,14 @@ with expected(TypeError):
 ```
 
 The failure has nothing to do with metaclasses.
-`class X(dict, type): pass` fails the same way with no metaclass involved.
-`type` and `dict` each bring an incompatible layout,
-so combining them is impossible in any context.
+`class X(list, dict): pass` fails the same way, and neither base is a metaclass.
+`type`, `list`, and `dict` each bring a layout of their own,
+so no class can combine two of them.
 
 <!-- "the very TypeError" is the intensive adjective, not the hedging adverb
      proselint.Very exists to catch. -->
 <!-- vale proselint.Very = NO -->
-The `# type: ignore` comment appears because ty knows this rule statically.
+The `# type: ignore` comment appears because `ty` knows this rule statically.
 At check time, its `instance-layout-conflict` check reports the very `TypeError` this example exists to demonstrate at run time.
 A type checker that predicts a crash before the program runs is static typing at its best.
 The comment suppresses the diagnostic only because provoking that crash is educational.
@@ -1340,10 +1351,10 @@ print(type(D).__name__)
 
 The result is a metaclass conflict.
 As with the layout conflict just shown,
-ty reports `conflicting-metaclass` and names both `MetaA` and `MetaB`,
+`ty` reports `conflicting-metaclass` and names both `MetaA` and `MetaB`,
 so the line carries a `# type: ignore`.
-`expected` prints the exception through the helper, wrapped so it fits the page;
-the message is Python's, unwrapped.
+The `expected()` helper wraps the message across three lines to fit the page;
+Python reports it as a single line.
 It names the fix: `D`'s metaclass, `MetaC`,
 must be a subclass of every base's metaclass, `MetaA` and `MetaB` both.
 Once `MetaC` exists, `class D(A, B, metaclass=MetaC)` builds cleanly.
@@ -1395,7 +1406,7 @@ iterating the class object itself, not an instance of it.
 It walks `vars(cls)`, the class's own namespace,
 skipping every underscore-prefixed name,
 which for `Color` is the dunder bookkeeping every class carries,
-so it yields the three names the body assigned: `red`, `green`, `blue`.
+so it yields the three values the body assigned: `"red"`, `"green"`, `"blue"`.
 A class decorator cannot do this.
 It can only add methods that instances see,
 never a protocol method the class object itself must answer,
@@ -1460,7 +1471,8 @@ and nothing that runs after the class exists can give it any.
 ## The `inspect` Module
 
 Up to now, you've been modifying classes.
-`type` builds them, and metaclasses and `__init_subclass__()` run code during their creation.
+`type()` builds them,
+and metaclasses and `__init_subclass__()` run code during their creation.
 The `inspect` module is the other half of metaprogramming:
 it reads the structure of live objects.
 It answers questions like which members an object has,
@@ -1512,9 +1524,11 @@ shows that machinery on a class:
 `__annotate_func__` is the code that computes the annotations,
 and `__annotations_cache__` holds the result after the first request.
 
-`display_object()` combines three of these functions:
+`display_object()` is built from `inspect` functions:
 `getmembers_static()` finds the members, `signature()` renders each method,
-and `get_annotations()` supplies the declared types.
+and `get_annotations()`,
+which returns a class's declared annotations in a `dict`,
+supplies the declared types.
 Its source and its display options are reference material,
 collected in [`display_object()` Reference](#display_object-reference)
 at the end of this chapter.
@@ -1586,7 +1600,7 @@ class Meta(type):
         super().__init__(name, bases, nmspc)
         print(f"__init__ {name}")
 
-def tag[T: type](cls: T) -> T:
+def tag[T](cls: type[T]) -> type[T]:
     print(f"decorator {cls.__name__}")
     return cls
 
@@ -2010,7 +2024,7 @@ The rest is the bookkeeping every class carries.
     its `inspect.signature()`, and its docstring
     (or `"(no docstring)"` if `inspect.getdoc()` returns `None`),
     then call it on `greet` and on a lambda.
-6.  Delete the `# type: ignore` comment from `metaclass_layout_conflict.py` and run ty over the file.
+6.  Delete the `# type: ignore` comment from `metaclass_layout_conflict.py` and run `ty` over the file.
     Compare the `instance-layout-conflict` diagnostic it reports with the `TypeError` the program prints:
     the static report and the runtime failure describe the same collision.
 7.  Using `type()` directly, build a class `Celsius` with a base of `float`,
