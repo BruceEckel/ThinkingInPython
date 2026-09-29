@@ -205,6 +205,7 @@ postcondition
 pre
 precompute
 prepends
+proactor
 profiler
 profilers
 programmatically
@@ -263,6 +264,7 @@ subrange
 subscripted
 subscripting
 substitutability
+substring
 subtree
 subtrees
 subtyping
@@ -291,6 +293,7 @@ unawaited
 unboxed
 uncached
 uncomment
+uncommented
 uncommenting
 unconstructable
 undoable
