@@ -1,7 +1,8 @@
 # test_row_check.py
+from typing import Final
 from row_check import Finding, check
 
-HEAD = "from typing import Annotated\n"
+HEAD: Final[str] = "from typing import Annotated\n"
 
 def findings(source: str) -> list[Finding]:
     return check({"m": HEAD + source}).findings

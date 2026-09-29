@@ -1,8 +1,9 @@
 # test_function_facts.py
+from typing import Final
 from function_facts import Facts, read_module
 from result import Err, Ok
 
-SOURCE = '''
+SOURCE: Final[str] = '''
 from pathlib import Path
 from typing import Annotated, Final
 

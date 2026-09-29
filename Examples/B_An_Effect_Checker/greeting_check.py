@@ -1,7 +1,8 @@
 # greeting_check.py
+from typing import Final
 from row_check import check
 
-GREETING = '''
+GREETING: Final[str] = '''
 from typing import Annotated
 from effect_rows import performs
 

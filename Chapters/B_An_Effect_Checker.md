@@ -17,12 +17,15 @@ The final listing runs the checker on its own source to confirm that last point.
 The checker resolves a call by its name and by the written type of its receiver.
 A call it cannot resolve contributes an Effect named `Unknown` to the caller's row.
 The checker treats no unresolved call as pure.
-With that rule the tool's reports stay true while the tool stays small.
+With that rule the tool stays small,
+and every call it fails to resolve shows in a row.
 A row that reads `Unknown` says the checker could not resolve a call, and where.
+[What the Checker Resolves, and What It Cannot See](#what-the-checker-resolves-and-what-it-cannot-see)
+lists the constructs the rule does not cover.
 
 Name resolution covers more calls than you might expect.
-Of the 6,442 calls in this book's chapter listings,
-four in five resolve by name alone: a builtin, an imported name,
+Of the roughly 6,600 calls in this book's chapter listings,
+nearly four in five resolve by name alone: a builtin, an imported name,
 or a function or class defined in the same file.
 The largest remaining group is a method called on a local variable with no annotation,
 and [From a Call to a Name](#from-a-call-to-a-name) recovers part of that group.
@@ -125,8 +128,9 @@ def lookup(name: str, table: Table) -> Row:
     return UNKNOWN
 ```
 
-A key is an `fnmatch` pattern,
-and `lookup()` returns the row of the first pattern that matches.
+A key is an `fnmatch` pattern, the wildcard notation of a shell,
+in which `*` matches any run of characters, dots included.
+`lookup()` returns the row of the first pattern that matches.
 Because a dictionary keeps insertion order,
 a specific name goes above the glob that would otherwise match it.
 `"os.path.join"` is pure, and the `"os.*"` below it is `FileSystem`.
@@ -143,7 +147,7 @@ and `random.random` reports `None` for its module and `Random.random` for its qu
 The checker reads source, and in source the name is `os.remove`.
 
 Because `names()` builds a row from classes,
-a typing mistake in the table is an error `ty` reports.
+a misspelled Effect in the table is an error `ty` reports.
 A `Row` is a `frozenset[str]` because the checker never imports the code it reads.
 In source text, `performs(Ask)` is the name `Ask`.
 
@@ -306,7 +310,8 @@ A `Scope` holds the names the checker has collected at one point in a file.
 `names` maps a local name to its full one, so `rm` becomes `os.remove`.
 `defined` holds the functions and classes the module defines.
 `types` maps a variable to the name of its type.
-`name()` tries those in the order Python does, then `builtins`.
+`name()` searches from the innermost scope outward, as Python does: variables,
+then the module's imports and definitions, then `builtins`.
 A name found in `types` is a variable,
 and calling a variable calls whatever value it holds at runtime.
 The source does not name that value, so `name()` answers `UNRESOLVED`.
@@ -382,6 +387,11 @@ Each comes back `UNRESOLVED`.
 The checker needs three facts about a function: the row it declares,
 the Effects it hides, and the names it calls.
 
+Hiding needs a marker, and `ask()` in Appendix A shows why.
+`ask()` declares `Ask` and calls `input()`, which performs `Console`.
+Both are true, and [The Check](#the-check) shows the checker reporting each.
+A second piece of metadata names the Effects that stop at this function:
+
 ```python
 # effect_marks.py
 from record import record
@@ -394,9 +404,6 @@ def hides(*effects: type) -> Hides:
     return Hides(frozenset(effects))
 ```
 
-`ask()` in Appendix A declares `Ask` and calls `input()`,
-which performs `Console`.
-Both are true, and [The Check](#the-check) shows the checker reporting each.
 `Annotated[str, performs(Ask), hides(Console)]` states that `ask()` is the boundary where `Console` becomes `Ask`.
 The checker removes `Console` from the body's row and checks nothing about the claim,
 as `ty` trusts a `cast()`.
@@ -584,12 +591,19 @@ so a parameter annotated `Table` resolves to `builtins.dict`.
 Because `is_function()` and `is_def()` return [`TypeIs`](08_Foundations--Static_Types.md#type-narrowing),
 a comprehension filtered by one yields nodes whose narrowed type has a `name`.
 
-`facts_of()` records every function, every method under `module.Class.method`,
-and each class under its own name.
+`calls_in()` collects the third fact.
+`ast.walk()` yields a statement and every node beneath it,
+and `callee()` names each `ast.Call` among them.
+The walk descends into a nested function or a `lambda`,
+so the calls inside one count toward the function that contains it.
+
+`facts_of()` records every top-level function,
+every method under `module.Class.method`, and each class under its own name.
 The class's entry holds a call to its `__init__()` when the class defines one,
 so `Log()` performs what `Log.__init__()` performs.
 The module's top-level statements become a function named `module.<module>`.
-It is never checked, because it is the program's edge,
+It is the program's edge and declares no row,
+so the checker has nothing to compare,
 and its inferred row says what running the file performs.
 
 `read_module()` is the one operation here that can fail.
@@ -598,10 +612,11 @@ so a parse failure becomes a value the caller must look at.
 
 ```python
 # test_function_facts.py
+from typing import Final
 from function_facts import Facts, read_module
 from result import Err, Ok
 
-SOURCE = '''
+SOURCE: Final[str] = '''
 from pathlib import Path
 from typing import Annotated, Final
 
@@ -681,7 +696,8 @@ the string by being a constant, `names` through a `type` alias,
 Appendix A's rule is recursive.
 A function's row needs its callees' rows, which need theirs.
 Two functions that call each other make the recursion circular.
-The standard answer is to start every row empty and apply the rule until nothing changes:
+The standard answer is to start every row empty and apply the rule until nothing changes.
+Rows that the rule leaves unchanged are a *fixed point* of the rule:
 
 ```python
 # infer_rows.py
@@ -716,11 +732,15 @@ def infer(known: dict[str, Facts], table: Table) -> Rows:
     return rows
 ```
 
+`call_row()` looks for a call among the functions the checker has read,
+then in the table.
+An unresolved call has the name `"?"`, which matches no pattern,
+so `lookup()` answers `UNKNOWN`.
 `step()` is a pure function from one set of rows to the next.
 A declared row passes through unchanged, which is how callers come to trust it.
 An undeclared row becomes the union of what its calls perform.
 `infer()` is the loop.
-The [walrus operator](04_Foundations--Control_Flow.md)
+The [walrus operator](04_Foundations--Control_Flow.md#the-walrus-operator)
 lets the `while` condition compute the next rows and compare them in one expression.
 Each step can add members to a row and cannot remove one,
 and the vocabulary is finite, so the loop ends.
@@ -769,11 +789,13 @@ def test_a_declared_row_is_trusted_by_callers() -> None:
     assert rows["m.greet"] == {"Ask"}
 ```
 
-The tests build `Facts` by hand.
 Nothing in `infer_rows.py` reads source text,
-so a test builds its input by hand instead of writing and parsing a program.
+so each test builds its `Facts` by hand instead of writing and parsing a program.
 
 ## The Check
+
+A *finding* is an Effect that a function's body performs,
+that the function does not hide, and that its declared row omits:
 
 ```python
 # row_check.py
@@ -832,9 +854,10 @@ Here is the checker on Appendix A's greeting program, with one function added:
 
 ```python
 # greeting_check.py
+from typing import Final
 from row_check import check
 
-GREETING = '''
+GREETING: Final[str] = '''
 from typing import Annotated
 from effect_rows import performs
 
@@ -872,11 +895,12 @@ for finding in report.findings:
 #: greeting.quiet undeclared Tell
 ```
 
+The demo prints each row that is not empty, then each finding.
 Appendix A's `row(shout)` read `[]`, because `shout()` declares nothing.
 The checker infers `['Tell']` from the call to `tell()`.
 `quiet()` declares itself pure and calls `shout()`,
 and the checker reports `quiet()`,
-two calls away from the `print()` that `tell()` makes.
+two calls away from the `tell()` whose declaration supplies the `Tell`.
 That is propagation, the thing Appendix A's `tracked_greeting.py` could not do.
 
 [Facts About a Function](#facts-about-a-function)
@@ -886,9 +910,10 @@ Adding `hides(Console)` to each clears both findings, as this test file shows:
 
 ```python
 # test_row_check.py
+from typing import Final
 from row_check import Finding, check
 
-HEAD = "from typing import Annotated\n"
+HEAD: Final[str] = "from typing import Annotated\n"
 
 def findings(source: str) -> list[Finding]:
     return check({"m": HEAD + source}).findings
@@ -946,9 +971,10 @@ passed to `check()` under the library's module name.
 
 ```python
 # third_party_stub.py
+from typing import Final
 from row_check import check
 
-APP = '''
+APP: Final[str] = '''
 import requests
 from typing import Annotated
 from effect_names import Network
@@ -957,7 +983,7 @@ from effect_rows import performs
 def fetch(url: str) -> Annotated[str, performs(Network)]:
     return requests.get(url).text
 '''
-STUB = '''
+STUB: Final[str] = '''
 from typing import Annotated
 from effect_names import Network
 from effect_rows import performs
@@ -995,7 +1021,7 @@ Each of its functions declares the row it performs:
 ```python
 # check_files.py
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, Final
 from effect_names import Console, FileSystem
 from effect_rows import performs
 from row_check import Report, check
@@ -1019,7 +1045,7 @@ def show(
     for finding in report.findings:
         print("!", finding.where, finding.problem)
 
-FILES = [
+FILES: Final[list[str]] = [
     "effect_table.py",
     "call_names.py",
     "function_facts.py",
@@ -1093,18 +1119,49 @@ so each one appears in a row instead of going unreported:
   or with a `type` alias imported from another module.
 - An inherited method, because the checker reads no class hierarchy.
 
-Four limits produce no `Unknown`, and a production tool must remove them.
-The checker finds `Annotated` and `performs` by those names,
-so a declaration written with `typing.Annotated` or an `as` alias goes unread.
-A decorator that wraps a function changes what calling it performs,
-and the checker reads the undecorated body.
-The first parameter of every method gets the class as its type,
-which is wrong for a `staticmethod`.
-The checker trusts `hides()` without evidence.
+The limits in this second list produce no `Unknown`.
+The checker reports nothing about them,
+and a production tool must remove each one:
 
-Cleverness removes none of these, because each one is a piece of type inference.
+- A function passed as an argument.
+  In `list(map(print, names))` the checker resolves `list()` and `map()`,
+  which the table calls pure, and `print` is the callee of no call.
+- A method that runs without a call expression: an operator, a property,
+  a `with` statement, or a `for` loop.
+- A name bound by a loop, a pattern, or a tuple assignment,
+  when it matches the name of an import, a definition, or a builtin.
+  The checker records no binding for it,
+  so a loop variable named `filter` resolves to `builtins.filter`.
+  A local assigned twice keeps the type of its first assignment.
+- A pure pattern in the table, which matches every name beneath it.
+  A receiver annotated `Any`, `object`,
+  or `type[...]` resolves under `typing` or `builtins`.
+  `p.with_suffix(".bak").write_text(text)` resolves to `pathlib.Path.with_suffix.write_text`,
+  which the `with_*` pattern matches.
+- A call in a class body, in a decorator's arguments,
+  or in a parameter's default value.
+  The checker collects calls from function bodies and from top-level statements,
+  and these sit in neither.
+- A class call that runs `__new__()`, `__post_init__()`,
+  or an inherited `__init__()`.
+- A declaration written with `typing.Annotated` or an `as` alias,
+  because the checker finds `Annotated` and `performs` by those names.
+- A decorator that wraps a function.
+  It changes what calling the function performs,
+  and the checker reads the undecorated body.
+- A `staticmethod`, because the first parameter of every method gets the class as its type.
+- `hides()`, which the checker trusts without evidence.
+
+Some of the second list is bookkeeping, such as recording every binding,
+resolving `Annotated` through the imports,
+and reading the decorator that marks a `staticmethod`.
+Cleverness removes none of the rest, in either list.
+Most are pieces of type inference:
+an operator runs a method that its operands' types select,
+and a method on a call's result needs the type the call returns.
+A callback needs the Effect variable of [Effect Tracking](A_Effect_Tracking.md#propagate-through-callbacks).
 Appendix A's argument holds: past this point you are writing a type checker.
 Much of tracking needs no type inference, though.
 Name resolution, a table of the standard library,
 and a fixed point give every function in a program a row.
-They verified the architecture of the program that computes the rows.
+Here they also verify the architecture of the program that computes the rows.

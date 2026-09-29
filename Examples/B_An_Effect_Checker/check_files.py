@@ -1,6 +1,6 @@
 # check_files.py
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, Final
 from effect_names import Console, FileSystem
 from effect_rows import performs
 from row_check import Report, check
@@ -24,7 +24,7 @@ def show(
     for finding in report.findings:
         print("!", finding.where, finding.problem)
 
-FILES = [
+FILES: Final[list[str]] = [
     "effect_table.py",
     "call_names.py",
     "function_facts.py",

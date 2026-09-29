@@ -1,7 +1,8 @@
 # third_party_stub.py
+from typing import Final
 from row_check import check
 
-APP = '''
+APP: Final[str] = '''
 import requests
 from typing import Annotated
 from effect_names import Network
@@ -10,7 +11,7 @@ from effect_rows import performs
 def fetch(url: str) -> Annotated[str, performs(Network)]:
     return requests.get(url).text
 '''
-STUB = '''
+STUB: Final[str] = '''
 from typing import Annotated
 from effect_names import Network
 from effect_rows import performs
