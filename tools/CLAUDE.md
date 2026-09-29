@@ -128,6 +128,15 @@ joins only their runs, through `uv run --with typesafe-sdk`: it builds
 
 ### Traps
 
+- **A session can start without `TYPESAFE_API_KEY` although it is set.**
+  The key lives in the user's Windows environment (`HKCU\Environment`),
+  and a process inherits the environment its parent held when it started,
+  so a Claude Code session launched from an older shell sees no key.
+  Since 2026-09-29 `judgments.api_key()`, which `ask()` calls first, falls
+  back to that registry value, so every TypeSafe tool finds the key
+  anyway. A "No TYPESAFE_API_KEY found" that names both places means the
+  key is truly unset; don't work around it by pasting it into a command.
+
 - **`validate_output.py` on the whole tree can leak `__del__` output between
   chapters.** It `exec()`s every block's code against a fresh `namespace` dict
   reused as that block's globals. A class defined there forms a reference

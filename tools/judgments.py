@@ -17,7 +17,12 @@ sentence (or, for link support, to the linked section) retires the old
 verdict and leaves that sentence unjudged until someone runs the tool
 again. A reflow changes only line breaks, which the key ignores.
 
-Asking needs `typesafe-sdk` and a `TYPESAFE_API_KEY` in the environment.
+Asking needs `typesafe-sdk` and a `TYPESAFE_API_KEY`. `api_key()` looks
+in the process environment first, then, on Windows, in the user's
+registry environment (`HKCU\\Environment`), where a variable set through
+System Properties lives. A process started from a parent that predates
+the variable inherits no copy of it, so on 2026-09-29 a Claude Code
+session saw the key missing that every earlier session had found.
 The SDK stays out of `pyproject.toml`: it builds `pydantic-core` from
 source on the pinned Python, which a fresh cloud session cannot do, and
 nothing but these two commands uses it. Their tip tasks add it with
@@ -27,7 +32,9 @@ nothing but these two commands uses it. Their tip tasks add it with
 import asyncio
 import hashlib
 import json
+import os
 import random
+import sys
 from collections.abc import Callable, Mapping, Sequence
 from pathlib import Path
 from typing import Any
@@ -39,6 +46,40 @@ RETRIES = 4
 SECTION_LIMIT = 12_000
 """Characters of a linked section a question sees. A chapter-level
 section with many subsections runs past this, and the tail is cut."""
+
+
+API_KEY_ENV = "TYPESAFE_API_KEY"
+
+
+def registry_key() -> str | None:
+    """The user-scope value of `API_KEY_ENV` on Windows, else None."""
+    if sys.platform != "win32":
+        return None
+    import winreg
+    try:
+        with winreg.OpenKey(winreg.HKEY_CURRENT_USER, "Environment") as k:
+            value, kind = winreg.QueryValueEx(k, API_KEY_ENV)
+    except OSError:
+        return None
+    if kind == winreg.REG_EXPAND_SZ:
+        value = winreg.ExpandEnvironmentStrings(value)
+    return value or None
+
+
+def api_key() -> str:
+    """Find the key and put it in the environment, where the SDK reads it.
+
+    Exits naming every place it looked when none has the key.
+    """
+    if value := os.environ.get(API_KEY_ENV):
+        return value
+    if value := registry_key():
+        os.environ[API_KEY_ENV] = value
+        return value
+    places = ["the process environment"]
+    if sys.platform == "win32":
+        places.append(r"the user's registry environment (HKCU\Environment)")
+    sys.exit(f"No {API_KEY_ENV} found. Looked in: {', '.join(places)}.")
 
 
 def key(*parts: str) -> str:
@@ -75,6 +116,7 @@ def ask(
     `{"noul"}`, the probability of yes. The SDK retries rate limits and
     overloads itself.
     """
+    api_key()
     # Not in .venv; the tip tasks add it (see the docstring).
     from typesafe_sdk import (  # ty: ignore[unresolved-import]
         AsyncTypeSafeClient, Choice, Noul, Score, TypeSafeAPIConnectionError,
