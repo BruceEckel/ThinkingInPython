@@ -292,8 +292,8 @@ def defs(pid: str) -> str:
 LEGEND_ROWS: tuple[tuple[str, str], ...] = (
     ("heavy", "names a concrete class"),
     ("thin", "names an interface"),
-    ("realize", "satisfies it"),
-    ("inherit", "inherits its internals"),
+    ("realize", "satisfies an interface"),
+    ("inherit", "inherits from a class"),
 )
 
 
@@ -708,7 +708,7 @@ def render_gallery(pid: str = "gl") -> str:
     y = 2 * GALLERY_H + 12
     for x, kind, label in ((20, "heavy", "names a concrete class"),
                            (230, "thin", "names an interface"),
-                           (410, "realize", "satisfies it")):
+                           (410, "realize", "satisfies an interface")):
         stroke, width, dash, head = STYLES[kind]
         end = x + 36 - HEADS[MARKERS[head][0]].trim
         b += (f'  <line class="legend" x1="{x}" y1="{y}" '
@@ -716,9 +716,9 @@ def render_gallery(pid: str = "gl") -> str:
               f'stroke="{stroke}" stroke-width="{width}"{dash} '
               f'marker-end="url(#{pid}-{head})"/>\n')
         b += text(x + 42, y + 4, label, 10.5, MUTED)
-    b += (f'  <rect x="550" y="{y - 8}" width="26" height="16" fill="none" '
+    b += (f'  <rect x="610" y="{y - 8}" width="26" height="16" fill="none" '
           f'stroke="{MARK}" stroke-width="1.6" rx="3"/>\n')
-    b += text(584, y + 4, "the part that does not change", 10.5, MUTED)
+    b += text(644, y + 4, "does not change", 10.5, MUTED)
     return (f'<svg xmlns="http://www.w3.org/2000/svg" '
             f'viewBox="0 0 770 {height}"\n     {FONT}>\n'
             f"  <title>{GALLERY_TITLE}</title>\n" + defs(pid) + b + "</svg>\n")

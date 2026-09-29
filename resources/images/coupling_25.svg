@@ -37,9 +37,9 @@
   <line class="legend" x1="460" y1="60" x2="477.6" y2="60" stroke="#1a1612" stroke-width="1.3" marker-end="url(#c25-solid)"/>
   <text x="498" y="64" font-size="10.5" fill="#7a6e62" text-anchor="start">names an interface</text>
   <line class="legend" x1="460" y1="80" x2="473.6" y2="80" stroke="#7a6e62" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#c25-hollow-muted)"/>
-  <text x="498" y="84" font-size="10.5" fill="#7a6e62" text-anchor="start">satisfies it</text>
+  <text x="498" y="84" font-size="10.5" fill="#7a6e62" text-anchor="start">satisfies an interface</text>
   <line class="legend" x1="460" y1="100" x2="473.6" y2="100" stroke="#1a1612" stroke-width="1.3" marker-end="url(#c25-hollow)"/>
-  <text x="498" y="104" font-size="10.5" fill="#7a6e62" text-anchor="start">inherits its internals</text>
+  <text x="498" y="104" font-size="10.5" fill="#7a6e62" text-anchor="start">inherits from a class</text>
   <rect x="462" y="112" width="26" height="16" fill="none" stroke="#8b1a1a" stroke-width="1.6" rx="3"/>
   <text x="498" y="124" font-size="10.5" fill="#7a6e62" text-anchor="start">does not change</text>
 </svg>

@@ -98,8 +98,8 @@ def test_a_tip_reaches_a_rounded_box_at_any_angle() -> None:
 def test_a_legend_lists_only_what_its_panel_draws() -> None:
     labels = {"heavy": "names a concrete class",
               "thin": "names an interface",
-              "realize": "satisfies it",
-              "inherit": "inherits its internals"}
+              "realize": "satisfies an interface",
+              "inherit": "inherits from a class"}
     for ch, panel in PANELS.items():
         svg = panel.svg("t")
         used = {e.kind for e in panel.edges}
