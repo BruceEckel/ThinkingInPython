@@ -12,7 +12,7 @@ a single robot walks a maze where each object it meets decides what happens,
 and a plate of vibrating sand runs on grains that hold only a position.
 The first two confirm a design you can predict from the code.
 The third produces a pattern no one wrote down as a picture:
-the formula fixes its shape, and the grains gather on it.
+the formula determines its shape, and the grains gather on it.
 
 The first example, the pack of rats, puts `asyncio` tasks,
 a shared coordination object,
@@ -250,7 +250,7 @@ A `TaskGroup` stays open until every task inside it has finished,
 including tasks created after the block began.
 That matches this problem: each rat can create more rats.
 A single `asyncio.gather(*self.tasks)` would await only the tasks in the list at the moment of the call,
-because `gather()` fixes its argument list then,
+because `*self.tasks` unpacks the list at that moment,
 and most of the rats do not exist yet.
 
 `group` carries `field(init=False)` and no default,
@@ -1166,7 +1166,7 @@ because `claim()` is atomic.
 The robot reaches the goal because polymorphism handles every encounter.
 Both times you know the outcome in advance and run the program to confirm it.
 The third example gives you only half the outcome.
-`amplitude()` fixes the shape the sand will trace:
+`amplitude()` determines the shape the sand will trace:
 the curves are the formula's zero set.
 No line of the code computes how two thousand independent random walks reach that shape and stay there.
 That is simulation's other purpose,

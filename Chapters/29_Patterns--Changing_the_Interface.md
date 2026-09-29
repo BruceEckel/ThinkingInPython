@@ -128,7 +128,7 @@ The approaches differ in where the adaptation lives.
 it holds the adaptee and can wrap any instance passed to it at runtime.
 Approach 2 uses the same object adapter and moves the wrapping into `op()`.
 `WhatIHave2` is a *class adapter*: it inherits from the adaptee.
-That inheritance fixes the adapted class at definition time,
+That inheritance settles the adapted class at definition time,
 and every client of the adapter can call every method of the adaptee,
 `g()` and `h()` included.
 Composition keeps the two interfaces separate.

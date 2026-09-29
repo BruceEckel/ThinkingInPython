@@ -225,7 +225,7 @@ the default on Windows, is one.
 | [*Function Composition*](40_Functional--Foundations.md#composing-functions) | Build a function by passing one function's output to the next. |
 | [*Memoization*](41_Functional--Toolkits.md#cache) | Cache a function's results keyed by its arguments. |
 | [*Monad*](42_Functional--Error_Handling.md#composing-with-bind) | Sequence computations inside a context such as optionality, error, or async. |
-| [*Partial Application*](40_Functional--Foundations.md#partial-application) | Fix some of a function's arguments and get a function expecting the rest. |
+| [*Partial Application*](40_Functional--Foundations.md#partial-application) | Preset some of a function's arguments and get a function expecting the rest. |
 
 ## Dependency Supply
 

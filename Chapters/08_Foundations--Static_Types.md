@@ -510,7 +510,7 @@ print(box.get().upper())
 #: GIFT
 ```
 
-Constructing `Box("gift")` fixes `T` to `str` for that instance,
+Constructing `Box("gift")` binds `T` to `str` for that instance,
 so `get()` returns a `str` and the call to `upper()` checks.
 A *bound* limits the parameter:
 `class Box[T: Shape]` accepts only `Shape` and its subclasses.

@@ -122,7 +122,7 @@ first, which computes `(3 + 1) * 2 = 8`, then feeds that `8` into
 a third stage: wrapping one composed function inside another
 `compose()` call extends the pipeline.
 
-## 5. Fixing a leading argument, and why the trailing one differs
+## 5. Presetting a leading argument, and why the trailing one differs
 
 ```python
 # exercise_5.py
@@ -144,7 +144,7 @@ expect(TypeError, partial(clamp, high=100), 0, 5)  # type: ignore
 and `partial()` already fills positional arguments from the left, so
 the two remaining parameters stay open in order.
 
-Fixing `high` alone is the case that needs a `Placeholder`.
+Presetting `high` alone is the case that needs a `Placeholder`.
 `partial()` does not inspect the signature, so building
 `partial(clamp, high=100)` succeeds. The call is where it fails:
 `high` is positional-only, so it cannot arrive by name. Passing

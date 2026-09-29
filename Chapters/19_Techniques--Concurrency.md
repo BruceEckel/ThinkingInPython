@@ -45,7 +45,7 @@ The heap and the stack grow in opposite ways.
 The heap reserves no space in advance.
 It starts essentially empty and grows only as the program asks for more,
 one allocation at a time.
-A stack is the reverse: creating the thread fixes its maximum size,
+A stack is the reverse: creating the thread sets its maximum size,
 and that size never changes.
 The amount used out of that fixed allotment varies at runtime.
 If a chain of function calls needs more room than the maximum,

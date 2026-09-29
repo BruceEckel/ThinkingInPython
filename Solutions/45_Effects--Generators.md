@@ -312,7 +312,7 @@ print(list(summarize(["red", "green", "blue"])))
 
 `report()`'s annotation changes from `Iterator[str]` to
 `Generator[str, None, int]`, because a generator that returns something
-needs the long form. `Iterator` fixes the `ReturnType` at `None`, so
+needs the long form. `Iterator` sets the `ReturnType` to `None`, so
 `ty` rejects `report()`'s own `return size` with expected `None`, found
 `int`.
 

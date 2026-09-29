@@ -294,7 +294,7 @@ succeeding, and the type checker rejects the line too, which is why it
 carries a `# type: ignore`. The runtime exception is the point of the
 listing.
 
-`nested` shows how far the guarantee reaches. A `frozendict` fixes
+`nested` shows how far the guarantee reaches. A `frozendict` freezes
 which objects it maps its keys to, not what those objects contain, so
 `hash(nested)` must hash a `list` and fails. The immutability is
 shallow, as it is for the `tuple` in `shallow_immutability.py`.

@@ -129,7 +129,7 @@ the cache discards the least recently used entry before it stores a new one.
 
 ### `partial`
 
-Fixes some of a function's arguments and returns a new function that expects the rest.
+Presets some of a function's arguments and returns a new function that expects the rest.
 [Partial Application](40_Functional--Foundations.md#partial-application)
 covers it in depth.
 
@@ -143,7 +143,7 @@ shout("hello")
 ```
 
 [`functools.Placeholder`](40_Functional--Foundations.md#leaving-a-gap-with-placeholder)
-reserves a position so you can fix a later positional argument and leave an earlier one for the caller.
+reserves a position so you can preset a later positional argument and leave an earlier one for the caller.
 
 ### `partialmethod`
 
@@ -921,7 +921,7 @@ and a seeded random source that makes the whole schedule reproducible.
 
 The *circle method* solves the pairs-only version exactly,
 by direct construction.
-Fix one player and arrange the rest in a circle.
+Hold one player in place and arrange the rest in a circle.
 Each round, pair players sitting across from each other,
 then rotate everyone but the fixed player by one seat.
 For an even number of players `n`,

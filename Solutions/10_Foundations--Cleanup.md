@@ -300,7 +300,7 @@ run on its own schedule, triggered by allocation counts rather than by
 your call, so an automatic pass could in principle reclaim the cycle at
 any allocation after `self_link()` returns. This small program still
 prints the same transcript every run, because the explicit
-`gc.collect()` stays in the listing and fixes the moment of collection.
+`gc.collect()` stays in the listing and sets the moment of collection.
 While that call is there, the two `finalized` lines cannot drift past
 it or wait until the interpreter shuts down. The loss is in the
 guarantee, not in what this run prints.

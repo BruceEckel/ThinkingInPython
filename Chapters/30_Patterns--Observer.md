@@ -235,7 +235,7 @@ A responder that needs the changed object takes it as part of the payload
 or is a bound method of an object that holds a reference to the broadcaster.
 
 `Broadcaster` knows nothing about what it announces.
-Its type parameter `T` fixes the type of each notification,
+Its type parameter `T` sets the type of each notification,
 and a class that inherits `Broadcaster` gets `subscribe()`, `unsubscribe()`,
 and `announce()`.
 

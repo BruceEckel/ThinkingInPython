@@ -1338,7 +1338,7 @@ print(f"array at least 3x smaller: "
 #: array at least 3x smaller: True
 ```
 
-The type code fixes one type for every element,
+The type code sets one type for every element,
 so `array` stores them compactly and rejects values of the wrong type.
 The size comparison shows the cost of boxing:
 the `list` holds an 8-byte pointer to a 24-byte `float` object per element,
@@ -1805,7 +1805,7 @@ not just where it sits on that curve:
 
 ## Exercises
 
-1.  `membership.py` fixes `target` at the worst case, the last element.
+1.  `membership.py` sets `target` to the worst case, the last element.
     Measure the average case by timing lookups of many random targets,
     and see whether the conclusion changes.
 2.  Use `timeit` to find the collection size below which the `list` scan beats the `set` lookup on your machine.

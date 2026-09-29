@@ -866,7 +866,7 @@ Immutability keeps a container's hash stable.
 ### Shallow Immutability
 
 Immutability is shallow.
-An immutable container fixes which objects it holds,
+An immutable container freezes which objects it holds,
 not what those objects contain:
 
 ```python

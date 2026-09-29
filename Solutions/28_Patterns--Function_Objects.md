@@ -204,7 +204,7 @@ print(by_score_then_name)
 The key function returns a tuple, `(score, name)`, and Python compares
 tuples element by element. `sorted()` therefore orders by score first,
 and among equal scores (`Bob` and `Cid`, both `85`) it compares names.
-`key` is a *Strategy*: `sorted()` fixes the algorithm (some
+`key` is a *Strategy*: `sorted()` provides the algorithm (some
 comparison-based sort), and the caller supplies the interchangeable
 policy that decides what "in order" means for this call. `sorted()`
 knows nothing about tuples, scores, or names. Passing a different

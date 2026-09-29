@@ -170,7 +170,7 @@ Follow one duel to see which competitor each result describes.
 and calls `paper.eval_scissors(...)`.
 That call is the second dispatch.
 It resolves `paper` and runs `Paper.eval_scissors()`,
-the one method in which both types are fixed:
+the one method in which both types are known:
 its class is `Paper` and its name says `Scissors`.
 Which competitor does that result describe?
 `Paper.eval_scissors()` returns `WIN`.

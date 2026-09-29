@@ -542,8 +542,8 @@ If you delete the `nonlocal` line,
 
 ## Partial Application
 
-*Partial application* fixes some of a function's arguments and produces a new function that expects the rest.
-`functools.partial()` builds that new function from the old one and the fixed arguments:
+*Partial application* presets some of a function's arguments and produces a new function that expects the rest.
+`functools.partial()` builds that new function from the old one and the preset arguments:
 
 ```python
 # partial.py
@@ -570,7 +570,7 @@ because positional arguments fill from the left.
 
 Partial application turns a general function into the specific one a caller needs.
 `multiplier()` in [Closures](#closures) does the same by hand,
-a factory that fixes one argument and returns a function expecting the rest.
+a factory that presets one argument and returns a function expecting the rest.
 When the general function exists, as `power()` does here,
 `partial()` removes the factory.
 
@@ -588,7 +588,7 @@ Binding `exponent` in `partial.py` works because `power()` accepts it by keyword
 For a function whose parameters are [positional-only](05_Foundations--Functions.md#positional-only-and-keyword-only-parameters),
 position is the only way to bind an argument,
 and `partial()` fills positional arguments from the left, so before 3.14,
-fixing the third argument meant fixing the first two as well.
+presetting the third argument meant presetting the first two as well.
 `functools.Placeholder` (Python 3.14 and later)
 is a marker that reserves a position for the caller.
 The type checker does not follow `Placeholder`,
@@ -608,7 +608,7 @@ print(percent.args)
 #: (0, Placeholder, 100)
 ```
 
-`percent` fixes the bounds and leaves the middle argument open.
+`percent` presets the bounds and leaves the middle argument open.
 Before 3.14, a hand-written wrapper supplied that specialization.
 A `Placeholder` reserves the position and leaves the value to the caller:
 calling `percent()` with no argument raises a `TypeError`.
@@ -730,8 +730,8 @@ The chapters ahead build on that single property.
     and build `increment_then_double_then_square = compose(square, increment_then_double)`.
     Predict `increment_then_double_then_square(3)` before running it.
 5.  In `placeholder.py`, build a second partial, `at_least_ten`,
-    that fixes only `low` to 10 and leaves both other arguments to the caller.
-    Then try to fix only `high` without a `Placeholder` and explain why that is impossible.
+    that presets only `low` to 10 and leaves both other arguments to the caller.
+    Then try to preset only `high` without a `Placeholder` and explain why that is impossible.
 6.  In `immutable_types.py`,
     add `CONFIG: Final[list[int]] = [1, 2]` and a line that appends to it.
     Run `ty`, which reports nothing.
