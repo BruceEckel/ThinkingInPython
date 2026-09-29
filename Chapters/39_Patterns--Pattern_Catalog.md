@@ -19,7 +19,7 @@ and several exist only to work around limits of a particular language.
 and [*State Machine*](31_Patterns--State_Machines.md) are one overlapping pair.
 *State* changes an object's behavior when its internal state changes.
 *State Machine* drives an object through a fixed set of states in response to inputs.
-*State Machine* builds on *State*: each state chooses its successor,
+*State Machine* builds on *State*: the machine chooses each successor,
 so the object advances without the client choosing.
 The body of this book argues that several of the patterns written around a language's limits dissolve in Python
 ([Design Patterns](21_Patterns--Design_Patterns.md#when-a-pattern-dissolves) says why).
@@ -64,6 +64,7 @@ so use this section's table when you know the problem but not the name.
 | Reacting to change | *Observer*, *Publish-Subscribe Channel*, *Model-View-Controller* |
 | Coordinating concurrent work | *Thread Pool*, *Producer-Consumer*, *Future/Promise*, *Active Object*, *Reactor* |
 | Keeping a program running when a dependency fails | *Circuit Breaker*, *Retry*, *Bulkhead*, *Timeout*, *Dead Letter Channel* |
+| Returning several named values from one call | *Messenger*, *Data Transfer Object* |
 | Moving data across a boundary | *Data Transfer Object*, *Message Translator*, *Gateway*, *Data Mapper* |
 | Persisting domain objects to a database | *Active Record*, *Repository*, *Table Module*, *Lazy Load*, *Unit of Work*, *Identity Map* |
 | Organizing application logic by request or use case | *Transaction Script*, *Domain Model*, *Service Layer*, *Front Controller* |
@@ -117,7 +118,7 @@ so use this section's table when you know the problem but not the name.
 | *Active Object* | Decouple a method call from its execution by giving the object its own thread. |
 | *Balking* | Refuse an action when the object is in an unsuitable state. |
 | [*Double-Checked Locking*](24_Patterns--Singleton.md#double-checked-locking-and-eager-creation) | Skip the lock once a lazily initialized shared resource exists. |
-| [*Future/Promise*](19_Techniques--Concurrency.md#one-task-many-backends) | Represent a result that becomes available later. |
+| [*Future/Promise*](19_Techniques--Concurrency.md#one-await-any-backend) | Represent a result that becomes available later. |
 | *Guarded Suspension* | Block a call until a precondition becomes true. |
 | *Half-Sync/Half-Async* | Separate synchronous and asynchronous work, joined by a queue. |
 | *Leader/Followers* | Let a pool of threads take turns receiving and handling events. |
@@ -161,7 +162,7 @@ the default on Windows, is one.
 | *Domain Model* | Model business logic as a graph of objects. |
 | *Front Controller* | Route all requests through a single handler. |
 | *Gateway* | Wrap access to an external system in a simple interface. |
-| *Identity Map* | Load each object only once per session. |
+| *Identity Map* | Load each object once per session. |
 | *Lazy Load* | Defer loading a persisted object until something needs it. |
 | *Money* | Represent monetary amounts together with their currency. |
 | *Plugin* | Select an implementation by naming its class in configuration rather than in code. |
@@ -243,11 +244,13 @@ the default on Windows, is one.
 | [*Fluent Interface*](27_Patterns--Factory.md#builder) | Return the receiver from each method so calls chain into one expression. |
 | [*Function Object*](28_Patterns--Function_Objects.md) | Decouple the choice of function to call from the place that calls it. |
 | [*Lazy Initialization*](07_Foundations--Classes.md#cached-property) | Create a value on first use. |
+| [*Messenger*](22_Patterns--Data_Transfer_Objects.md#a-hand-rolled-messenger) | Bundle values into one object with named attributes; the in-process form of *Data Transfer Object*. |
 | [*Multiton*](35_Patterns--Flyweight.md#interning-in-the-constructor) | Manage a pool of singletons, one per key. |
 | [*Null Object*](20_Patterns--Rethinking_Objects.md#null-object) | Use an object with neutral behavior in place of null. |
 | [*Object Pool*](15_Techniques--Context_Managers.md#an-object-pool) | Reuse expensive objects from a managed pool. |
 | *Specification* | Encapsulate a rule as a predicate that combines with others. |
 | [*State Machine*](31_Patterns--State_Machines.md) | Drive an object through a fixed set of states in response to inputs. |
+| [*Surrogate*](26_Patterns--Surrogate.md) | Put a stand-in in front of the object that does the work; *Proxy* and *State* are both forms of it. |
 | *Type Object* | Represent a "kind of" thing as data rather than a subclass. |
 
 ## Patterns Python Absorbed
