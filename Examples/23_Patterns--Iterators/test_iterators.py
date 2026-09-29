@@ -19,7 +19,7 @@ def test_countdown_sequence() -> None:
 def test_countdown_is_reiterable() -> None:
     c = Countdown(3)
     assert list(c) == [3, 2, 1]
-    # __iter__ yields a fresh generator
+    # __iter__() builds a fresh generator
     assert list(c) == [3, 2, 1]
 
 def test_total_over_any_iterable() -> None:

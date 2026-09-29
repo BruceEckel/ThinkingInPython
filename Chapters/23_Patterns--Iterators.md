@@ -72,7 +72,7 @@ A class that defines only `__getitem__()` taking integers from zero is still ite
 `iter()` builds an iterator that indexes it until `IndexError`.
 Such a class works with `for`,
 yet `isinstance(obj, Iterable)` returns `False` and a parameter annotated `Iterable[T]` rejects it.
-That is the one case where the loop and the type checker disagree.
+That is the one case where an object a `for` loop accepts fails an `Iterable` annotation.
 Write `__iter__()` in new code.
 
 ## Generators {#generators}
@@ -160,7 +160,7 @@ def test_countdown_sequence() -> None:
 def test_countdown_is_reiterable() -> None:
     c = Countdown(3)
     assert list(c) == [3, 2, 1]
-    # __iter__ yields a fresh generator
+    # __iter__() builds a fresh generator
     assert list(c) == [3, 2, 1]
 
 def test_total_over_any_iterable() -> None:
@@ -173,7 +173,9 @@ Generators are lazy.
 `fibonacci(1_000_000)` computes nothing until you iterate,
 and produces one value at a time,
 so it works on streams too large to hold in memory.
-Measure it:
+`generator_memory.py` measures the difference.
+Its `squares()` returns a [generator expression](16_Techniques--Comprehensions.md#generator-expressions),
+the one-line form of a generator:
 
 ```python
 # generator_memory.py
@@ -191,12 +193,12 @@ tracemalloc.start()
 total = 0
 for x in squares(N):
     total += x
-lazy_peak, _ = tracemalloc.get_traced_memory()
+_, lazy_peak = tracemalloc.get_traced_memory()
 tracemalloc.stop()
 
 tracemalloc.start()
 collected = list(squares(N))
-eager_peak, _ = tracemalloc.get_traced_memory()
+_, eager_peak = tracemalloc.get_traced_memory()
 tracemalloc.stop()
 
 report(lazy_bytes=lazy_peak, eager_bytes=eager_peak)
@@ -244,8 +246,8 @@ print(list(sq))  # Exhausted: empty, and no error
 ### The Body Waits for the First `next()`
 
 Calling `squares(6)` runs none of its body.
-The `print` at the top fires only when something demands the first value.
-It fires once, not on every value.
+The `print()` at the top runs only when something demands the first value.
+It runs once, not on every value.
 Each later `next()` resumes the body just after the `yield` instead of restarting it.
 Any validation at the top of a generator inherits this delay:
 a check meant to reject a bad argument raises its exception at the first `next()`,
@@ -267,7 +269,7 @@ def squares(n: int) -> Iterator[int]:
             yield i * i
     return produce()
 
-# Raises now, not at first next():
+# The check runs now, not at first next():
 expect(ValueError, squares, -1)
 #: [ValueError] n must not be negative: -1
 ```
@@ -319,8 +321,8 @@ print(twice_collection([0, 1, 2]))
 ```
 
 When a function iterates more than once, say so in the signature.
-`Collection[T]` and `Sequence[T]` ask for more than iteration,
-and no iterator supplies it,
+`Collection[T]` and `Sequence[T]` also require `__len__()`,
+which no generator has,
 so the type checker rejects the generator at the call instead of letting it run wrong.
 `twice_collection(gen(3))` is the call `ty` refuses,
 and that is why the listing leaves it out:
@@ -374,7 +376,7 @@ tracemalloc.start()
 for x, y in zip(first2, second2,
                 strict=True):
     pass
-lockstep, _ = tracemalloc.get_traced_memory()
+_, lockstep = tracemalloc.get_traced_memory()
 tracemalloc.stop()
 report(lockstep_bytes=lockstep)
 print(f"lockstep buffered far less: "
@@ -398,7 +400,7 @@ not when one finishes before the other starts.
 
 `tee` is also single-threaded.
 Its branches share one buffer with no lock,
-so handing them to separate threads corrupts it.
+so two threads advancing them at the same time can raise a `RuntimeError`.
 [Concurrency](19_Techniques--Concurrency.md#sharing-an-iterator-between-threads)
 covers `threading.concurrent_tee()`, the thread-safe version,
 along with what goes wrong when two threads call `next()` on the same iterator.
@@ -507,8 +509,8 @@ print(list(takewhile(lambda s: s < 50,
 ```
 
 Nothing runs until `list()` pulls the values.
-`islice()` and `takewhile()` decide when to stop.
-The infinite `count(1)` never runs away.
+`islice()` and `takewhile()` decide when to stop,
+so the infinite `count(1)` produces no more than they pull.
 `islice()` is also how you slice an iterator.
 A generator defines no `__getitem__()`,
 so the list habit `odd_squares[:5]` raises a `TypeError` instead.
@@ -571,7 +573,7 @@ The first test is `list(count(1))` with a stopping point built into the source.
 so the tripwire fires and no list ever comes back.
 The second test is the `if`-clause lookalike.
 Nothing after `2` satisfies `n < 3`,
-yet `list()` keeps pulling in the hope of another match,
+yet the generator expression keeps pulling from `counter()` to find another match,
 and trips the same wire.
 The last two stop on their own and never reach the tripwire.
 
@@ -633,7 +635,7 @@ so the wrapper can no longer go in a set or serve as a dict key,
 as every other iterator in Python can.
 Field-by-field comparison is also the wrong question to ask about a cursor:
 two wrappers over one source compare equal as soon as their counts agree,
-though each sits at a different point in the stream,
+though each has delivered different items,
 and two wrappers over separate iterators of the same list compare unequal.
 Turning equality off restores the identity comparison an iterator should have.
 
@@ -671,8 +673,8 @@ so it needs an `Iterator[object]`: write `TypedIterator(iter(items), int)`,
 not `TypedIterator(items, int)`.
 The type checker rejects the second form.
 Both take `expected: type[T]`,
-so the type checker carries the element type through.
-So `typed(items, int)` is an `Iterator[int]`, not an `Iterator[Any]`.
+so the type checker carries the element type through:
+`typed(items, int)` is an `Iterator[int]`, not an `Iterator[Any]`.
 
 ```python
 # test_typed.py
@@ -697,6 +699,7 @@ def test_typed_iterator_passes_and_rejects() -> None:
 *GoF Design Patterns* gives *Iterator* a class of its own,
 with separate methods to start a traversal, advance it,
 test whether it has finished, and read the current item.
+It names them `First()`, `Next()`, `IsDone()`, and `CurrentItem()`.
 Nothing in this chapter looks like that.
 Those four methods became two: `__iter__()` and `__next__()`.
 The language calls both on your behalf.
@@ -706,7 +709,9 @@ describes this dissolution.
 ### `first()` and `current_item()` Rebuild the List
 
 Written in Python, the four GoF *Iterator* methods show what `first()` and `current_item()` ask of a source.
-Over a list they are unremarkable.
+The listing names GoF's `Next()` `advance()`,
+so it cannot be mistaken for Python's `next()`.
+Over a list the four are unremarkable.
 `first()` resets an index, `is_done()` compares it to `len()`,
 and `current_item()` reads without consuming.
 Over a generator, you can still write all four,
@@ -827,6 +832,10 @@ print(next(numbers, DONE) is DONE)  # Asking consumes the 2
 #: False
 print(next(numbers, DONE) is DONE)  # No more left
 #: True
+letters = iter("abcd")
+# A membership test consumes too:
+print("c" in letters, list(letters))
+#: True ['d']
 
 expect(RuntimeError, list, doubled(iter([1, 2])))
 #: [RuntimeError] generator raised StopIteration
@@ -838,6 +847,9 @@ Each question costs an item.
 Nothing in the protocol looks ahead without advancing.
 That is why a peekable iterator must buffer,
 and why `tee` buffered a whole stream in `tee.py`.
+A membership test pays the same way:
+`"c" in letters` pulls items until it finds a match,
+and every item it pulled is gone, the match included.
 `DONE` is a [sentinel](05_Foundations--Functions.md#sentinel-values),
 because the answer must differ from every value the source could yield.
 `None` collapses an exhausted source and a source that yields `None` into the same reply.
@@ -866,7 +878,9 @@ The only way to find out whether the body accepts its arguments is to pull a val
 and the only way to find out whether the source has run out is to pull and get nothing back.
 `for` and `list()` catch that second answer and report nothing,
 so an exhausted source and an empty one produce identical output.
-The protocol costs you nothing, and tells you nothing.
+The protocol stores nothing, so it answers nothing in advance.
+Every tool in this chapter that does answer in advance, `tee`, `OverStream`,
+or a peekable wrapper, pays for the answer with a buffer.
 
 ## Exercises
 
@@ -886,7 +900,7 @@ The protocol costs you nothing, and tells you nothing.
     then walk both together so the leading branch stays `k` items ahead.
     Predict how the buffer grows with `k` before you measure it,
     then measure it for two values of `k` with `tee.py`'s `tracemalloc` approach,
-    and explain the result using the rule that closes that section.
+    and explain the result using that section's rule for what `tee` buffers.
 6.  The prose pairs the generator expression's `if` clause with `filter()`,
     but no test covers `filter()`.
     Add one to `test_endless.py`,

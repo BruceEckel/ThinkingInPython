@@ -36,7 +36,7 @@ tracemalloc.start()
 for x, y in zip(first2, second2,
                 strict=True):
     pass
-lockstep, _ = tracemalloc.get_traced_memory()
+_, lockstep = tracemalloc.get_traced_memory()
 tracemalloc.stop()
 report(lockstep_bytes=lockstep)
 print(f"lockstep buffered far less: "

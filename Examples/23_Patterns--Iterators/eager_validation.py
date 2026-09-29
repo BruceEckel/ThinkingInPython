@@ -10,6 +10,6 @@ def squares(n: int) -> Iterator[int]:
             yield i * i
     return produce()
 
-# Raises now, not at first next():
+# The check runs now, not at first next():
 expect(ValueError, squares, -1)
 #: [ValueError] n must not be negative: -1

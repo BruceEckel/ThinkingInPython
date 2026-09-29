@@ -3,11 +3,12 @@ import sys
 import tracemalloc
 from collections.abc import Iterator
 from itertools import islice, tee
+from typing import Final
 
 def squares(n: int) -> Iterator[int]:
     return (i * i for i in range(n))
 
-N = 100_000
+N: Final[int] = 100_000
 
 def peak_at_gap(k: int) -> int:
     ahead, behind = tee(squares(N))

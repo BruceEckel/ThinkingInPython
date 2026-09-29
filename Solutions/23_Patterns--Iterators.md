@@ -55,21 +55,21 @@ print(len(c))  # Still works after iterating
 #: 5
 ```
 
-`Countdown` supports `len()` because it is a reusable *iterable*,
-not the iterator itself. Each `for` loop or `list()` call gets a fresh
+`Countdown` supports `len()` because it is a reusable iterable,
+not an iterator. Each `for` loop or `list()` call gets a fresh
 generator from a fresh call to `__iter__()`, so iterating leaves
 `c.start` alone. `len(c)` computes from `c.start` directly, any number
 of times, before or after.
 
-A plain generator cannot support `len()`. Once you call a generator
-function, you have the iterator itself, and an iterator's whole state
-is "how far through have I gotten." That is what makes counting its
+A generator cannot support `len()`. Once you call a generator
+function, you have the iterator, and an iterator's whole state
+is "how far through have I gotten." That makes counting its
 remaining items expensive: the only way to learn how many values
 remain is to consume them, which uses them up. No `start` field
 remains to inspect, and nothing can ask a paused generator "how many
 more times will you yield?" without running it to exhaustion.
 `Countdown` escapes that expense because it is a container that
-*produces* a generator on demand. The container itself keeps the value
+produces a generator on demand. The container keeps the value
 `len()` reads, and reading it consumes nothing.
 
 ## 3. The first ten values of `fibonacci(1_000_000)`
@@ -96,7 +96,8 @@ as far as the next `yield`, each time something asks it for a value.
 iterations of `fibonacci()`'s loop ever run. The other 999,990 never
 run, the same laziness
 [Comprehensions](../Chapters/16_Techniques--Comprehensions.md#generator-expressions) and
-[Performance](../Chapters/18_Techniques--Performance.md) both rely on.
+[Performance](../Chapters/18_Techniques--Performance.md#lazy-evaluation-with-generators)
+both rely on.
 
 ## 4. Two fixes for a spent generator
 
@@ -154,11 +155,12 @@ import sys
 import tracemalloc
 from collections.abc import Iterator
 from itertools import islice, tee
+from typing import Final
 
 def squares(n: int) -> Iterator[int]:
     return (i * i for i in range(n))
 
-N = 100_000
+N: Final[int] = 100_000
 
 def peak_at_gap(k: int) -> int:
     ahead, behind = tee(squares(N))
@@ -324,8 +326,8 @@ Defining its four methods is enough to satisfy it.
 
 `OverSequence` needs no `seen` list because its `items` sequence
 already holds every value. A caller can index that sequence
-repeatedly, in any order, without consuming it, and the *GoF*
-interface assumes a collection allows exactly that. `OverStream`
+repeatedly, in any order, without consuming it, and the GoF
+interface assumes a collection allows that. `OverStream`
 builds `seen` to fake the same ability.
 
 The endless source shows what the faking costs. After 50,000 steps
@@ -380,9 +382,9 @@ back. The information you want does not exist anywhere you can reach
 without changing the thing you are asking about.
 
 `Peekable` stores what a bare iterator does not: one item, pulled
-early. That one stored item is the difference, and it buys back
-the `current_item()` that *GoF* had and Python dropped. `peek()` is
-now free and repeatable, exactly as the three identical `2`s show,
+early. That one stored item is the difference, and it restores
+the `current_item()` that GoF had and Python dropped. `peek()` is
+now free and repeatable, as the three identical `2`s show,
 because it reads a field rather than the source.
 
 The cost appears in the constructor. `Peekable` pulls from the source
@@ -449,12 +451,14 @@ widens to `Iterator[int | str]` to say so.
 question each version asks, not in the delegation, which is why
 `yield from` neither causes it nor cures it.
 
-The annotation does not help. `Nested` says a leaf is an `int`, so
-the type already claims `"ab"` cannot be there. `ty` accepts the call
-anyway, because it checks a recursive alias of this shape loosely: the
-annotation documents the intent without enforcing it. The failure
-therefore arrives as a `RecursionError` at runtime rather than an
-error at the call.
+The annotation does not help. `Nested` reads as though a leaf must
+be an `int`, and `ty` enforces that much: it rejects a `float` in
+the same list. It accepts `"ab"`, because a `str` is a
+`Sequence[str]`, and each of those strings is again a
+`Sequence[str]`. The string satisfies the alias's second arm by the
+same endless descent that breaks `flatten()`. Pyright rejects the
+string. Under `ty` the failure arrives as a `RecursionError` at
+runtime rather than an error at the assignment.
 
 ## 10. Skipping instead of raising
 
@@ -504,11 +508,11 @@ print(list(SkippingIterator(iter(items), int)))
 ```
 
 `typed()` and `typed_skipping()` ask the same `isinstance()` question
-and part on the answer, and that difference decides what a bad item
-costs. `typed()` ends the stream: the consumer receives the `1` before
-`"two"` and nothing after it. The caller gets an exception instead of
-a list. `typed_skipping()` delivers `[1, 3, 4]` and never mentions
-`"two"` or the `None`.
+and act differently on a no, and that difference decides what a bad
+item costs. `typed()` ends the stream: the consumer receives the `1`
+before `"two"` and nothing after it. The caller gets an exception
+instead of a list. `typed_skipping()` delivers `[1, 3, 4]` and never
+mentions `"two"` or the `None`.
 
 For a parsed log file, take the skipping version. A log is an
 append-only record that many processes write, so a malformed line is
@@ -520,15 +524,15 @@ line that failed.
 
 That choice has a price, and it is the one this chapter keeps
 returning to. Skipping is silent, so a filter that quietly drops every
-line looks exactly like a file with nothing to report. If you take the
+line looks the same as a file with nothing to report. If you take the
 skipping version, count what it drops and report the count.
 
 The class form is harder to write, and the reason is instructive.
 A generator may decline to produce a value: `typed_skipping()` reaches
-an item it does not want and simply does not `yield`, and the `for`
+an item it does not want and does not `yield`, and the `for`
 loop continues. `__next__()` has no such option. Every call must
 return a value or raise `StopIteration`, so `SkippingIterator` needs
 its own loop to keep pulling until a match arrives. A raising
-`__next__()` needs no loop at all, since it acts on the one item it
-just read. Generators
-write the state machine for you, and skipping is where you notice.
+`__next__()` needs no loop, since it acts on the one item it just
+read. Generators write the state machine for you, and skipping is
+where you notice.

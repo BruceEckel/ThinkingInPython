@@ -20,6 +20,10 @@ print(next(numbers, DONE) is DONE)  # Asking consumes the 2
 #: False
 print(next(numbers, DONE) is DONE)  # No more left
 #: True
+letters = iter("abcd")
+# A membership test consumes too:
+print("c" in letters, list(letters))
+#: True ['d']
 
 expect(RuntimeError, list, doubled(iter([1, 2])))
 #: [RuntimeError] generator raised StopIteration

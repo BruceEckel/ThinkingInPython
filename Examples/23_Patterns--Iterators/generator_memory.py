@@ -13,12 +13,12 @@ tracemalloc.start()
 total = 0
 for x in squares(N):
     total += x
-lazy_peak, _ = tracemalloc.get_traced_memory()
+_, lazy_peak = tracemalloc.get_traced_memory()
 tracemalloc.stop()
 
 tracemalloc.start()
 collected = list(squares(N))
-eager_peak, _ = tracemalloc.get_traced_memory()
+_, eager_peak = tracemalloc.get_traced_memory()
 tracemalloc.stop()
 
 report(lazy_bytes=lazy_peak, eager_bytes=eager_peak)
