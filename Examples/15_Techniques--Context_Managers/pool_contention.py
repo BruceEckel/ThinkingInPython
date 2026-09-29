@@ -1,9 +1,10 @@
 # pool_contention.py
 import threading
+from typing import Final
 from object_pool import Connection, Pool
 
-WORKERS = 8
-ROUNDS = 200
+WORKERS: Final[int] = 8
+ROUNDS: Final[int] = 200
 pool = Pool(Connection(1), Connection(2))
 lock = threading.Lock()
 held = 0

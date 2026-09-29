@@ -1,4 +1,4 @@
-# exercise_4.py
+# test_ch15_both_leased.py
 from collections.abc import Iterator
 from contextlib import contextmanager
 from dataclasses import dataclass
@@ -25,11 +25,10 @@ class Pool[R]:
     def available(self) -> int:
         return self._available.qsize()
 
-pool = Pool(Connection(1), Connection(2))
-with pool.lease() as c1:
-    with pool.lease() as c2:
-        print("available while both leased:",
-              pool.available())
-print("available after both returned:", pool.available())
-#: available while both leased: 0
-#: available after both returned: 2
+def test_both_leased_at_once() -> None:
+    pool = Pool(Connection(1), Connection(2))
+    with pool.lease() as first:
+        with pool.lease() as second:
+            assert second is not first
+            assert pool.available() == 0
+    assert pool.available() == 2

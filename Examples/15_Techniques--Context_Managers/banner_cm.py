@@ -8,9 +8,8 @@ class banner(ContextDecorator):
     def __enter__(self) -> None:
         print(f"=== {self.title} ===")
 
-    def __exit__(self, *exc: object) -> bool:
+    def __exit__(self, *exc: object) -> None:
         print(f"=== {self.title} ends ===")
-        return False
 
 @banner("report")
 def report() -> None:

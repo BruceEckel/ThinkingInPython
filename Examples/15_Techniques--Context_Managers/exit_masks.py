@@ -4,7 +4,7 @@ class Careless:
     def __enter__(self) -> None:
         return None
 
-    def __exit__(self, *exc: object) -> bool:
+    def __exit__(self, *exc: object) -> None:
         raise ValueError("cleanup error")
 
 try:

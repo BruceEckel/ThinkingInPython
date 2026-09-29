@@ -135,6 +135,8 @@ if __name__ == "__main__":
 #: exit A
 ```
 
+Python runs `with Trace("A") as t:` in five steps:
+
 1. Evaluate `Trace("A")` to produce a manager object.
 2. Call the manager's `__enter__()`.
 3. Bind `__enter__()`'s return value to `t`.
@@ -146,6 +148,9 @@ The return annotation `Self`
 (introduced in [Static Types](08_Foundations--Static_Types.md#the-self-type))
 declares an instance of the class on which the method is called,
 so it adapts to subclasses.
+
+The three parameters of `__exit__()` describe the exception that ended the block.
+The block in `trace_cm.py` ends normally, so all three are `None`.
 
 In generator terms, `__enter__()` is the portion before the `yield`.
 `__exit__()` is the portion after it.
@@ -192,9 +197,8 @@ class Fragile:
         print("enter fails")
         raise RuntimeError("no resource")
 
-    def __exit__(self, *exc: object) -> bool:
+    def __exit__(self, *exc: object) -> None:
         print("exit runs")
-        return False
 
 try:
     with Fragile():
@@ -215,6 +219,9 @@ A `with` naming several managers applies the same rule per manager:
 the ones that entered still exit,
 and the failing one alone gets no `__exit__()` call.
 
+`Fragile.__exit__(self, *exc: object)` collects the three arguments into a tuple the method never reads,
+the shorter form for a cleanup that ignores why the block ended.
+
 The guarantee has a matching gap on the other side: cleanup itself can fail.
 When `__exit__()` raises, that new exception replaces the block's original one,
 and the original survives only as the new exception's `__context__`:
@@ -226,7 +233,7 @@ class Careless:
     def __enter__(self) -> None:
         return None
 
-    def __exit__(self, *exc: object) -> bool:
+    def __exit__(self, *exc: object) -> None:
         raise ValueError("cleanup error")
 
 try:
@@ -262,6 +269,13 @@ Falsy includes the implicit `None` of a method with no `return`,
 so the exception propagates by default.
 A truthy value *suppresses* it: the `with` statement swallows the exception,
 and execution continues after the block.
+
+Any truthy value suppresses, not `True` alone.
+An `__exit__()` that returns the result of its last cleanup call,
+such as a count or a status string, swallows every exception its block raises.
+Annotate `__exit__()` as `-> None`, the way `Trace` does,
+unless suppressing is the manager's job.
+The type checker then rejects any value the method returns.
 
 A generator manager suppresses by catching:
 
@@ -312,6 +326,10 @@ print("survived")
 `suppress` is a class named like a function because you use it like one.
 See [Naming Conventions](02_Foundations--Tour.md#naming-conventions)
 for when a class departs from `CapWords`.
+
+A class manager suppresses through the return value of `__exit__()`.
+`expected_one` returns `True` for one exception type,
+after printing the exception it caught:
 
 ```python
 # expected_one.py
@@ -431,7 +449,7 @@ The constructor's `types` parameter defaults to the `ALL` [sentinel](05_Foundati
 which makes `expected()` with no argument catch everything.
 `self.types is not ALL` [narrows](08_Foundations--Static_Types.md#narrowing)
 `self.types` from `Types | ALL` down to `Types`,
-and the earlier `if exc_type is None or exc is None: return False` narrowed `exc_type` to a class and `exc` to an exception,
+and the earlier `if exc_type is None or exc is None: return False` narrows `exc_type` to a class and `exc` to an exception,
 so `issubclass(exc_type, self.types)` type-checks.
 `__exit__()` also hands the exception to `report()`,
 which prints it as `[Type] message` through `textwrap.fill()` at `WIDTH`,
@@ -443,7 +461,7 @@ so every demonstrated exception in the book has one form.
 `suppress()` suppresses nothing,
 because a raised exception has no listed type to match.
 An `expected()` that catches everything also catches `KeyboardInterrupt` and `SystemExit`,
-so name the types you expect unless you really want a block that nothing escapes.
+so name the types you expect unless you want a block that nothing escapes.
 
 ```python
 # demo_exceptions.py
@@ -472,7 +490,7 @@ with expected() as x:
 #: x = None
 ```
 
-The `1 / 0` raises an exception, `__exit__()` prints which exception it ignores,
+The `1 / 0` raises an exception, `__exit__()` prints the exception it caught,
 then returns `True`,
 and the `with` statement absorbs the error so `survived` still prints.
 
@@ -586,9 +604,8 @@ class banner(ContextDecorator):
     def __enter__(self) -> None:
         print(f"=== {self.title} ===")
 
-    def __exit__(self, *exc: object) -> bool:
+    def __exit__(self, *exc: object) -> None:
         print(f"=== {self.title} ends ===")
-        return False
 
 @banner("report")
 def report() -> None:
@@ -608,8 +625,9 @@ if __name__ == "__main__":
 
 Like `suppress` and `expected`,
 the class version of `banner` uses a lowercase name because you use it like a function.
-`__exit__(self, *exc: object)` collects the three arguments into a tuple the method never reads,
-the shorter form for a cleanup that ignores why the block ended.
+Its `__exit__()` ignores why the block ended,
+so it takes the `*exc: object` form and returns `None`,
+which lets an exception from `report()` propagate.
 Unlike the generator form,
 the class form re-enters the same instance on every call to `report()`,
 so every call shares any state the instance holds.
@@ -709,7 +727,8 @@ and a comma-separated `with` cannot express that.
 `wrap()` never has a failing entry,
 so it never exercises `ExitStack`'s other guarantee: when a later entry fails,
 the stack unwinds whatever already entered.
-Fail the third manager and watch the first two unwind while the third's `__exit__()` never runs at all:
+In `exit_stack_fails.py` the third manager fails to enter.
+The first two unwind, and the third's cleanup does not run:
 
 ```python
 # exit_stack_fails.py
@@ -943,10 +962,11 @@ eight threads share a pool of two connections and lease and release two hundred 
 ```python
 # pool_contention.py
 import threading
+from typing import Final
 from object_pool import Connection, Pool
 
-WORKERS = 8
-ROUNDS = 200
+WORKERS: Final[int] = 8
+ROUNDS: Final[int] = 200
 pool = Pool(Connection(1), Connection(2))
 lock = threading.Lock()
 held = 0
@@ -1049,8 +1069,14 @@ with pool.lease() as second:
 #: connection 1: late
 ```
 
+The assignment to `stale` stands for any place a borrower stores the reference,
+such as an attribute or a list.
+The name `first` escapes without that assignment: `with` creates no scope,
+so `first` still names the connection after its block ends,
+and `test_objects_reused_not_recreated()` relies on that.
+
 `stale` still points at the `Connection` that `second` now legitimately holds.
-Calling `stale.query()` after the first `with` block ended works exactly as if `second` had called it,
+Calling `stale.query()` after the first `with` block ended works as if `second` had called it,
 because they are the same object.
 For a mutable pooled resource, that is where corruption comes from:
 two borrowers each believe they have exclusive use of one connection.
@@ -1065,9 +1091,9 @@ and everything hard about custody lives on the other side of the `yield`.
 
 ## Choosing a Form
 
-Not every setup and teardown pair needs a context manager at all.
-One used exactly once, in one place,
-is often clearest as a plain `try`/`finally` written inline.
+Not every setup and teardown pair needs a context manager.
+A pair used once, in one place,
+is often clearest as a `try`/`finally` written inline.
 Write a manager once you want the `with` syntax at the call site,
 or once several places need the same setup and teardown.
 
@@ -1108,3 +1134,6 @@ and every change you make later goes inside the manager.
 7.  Rewrite `exit_stack.py` to take its names from `sys.argv[1:]`,
     run it with no arguments and with three,
     and confirm the close order reverses the open order in both cases.
+8.  Wrap the `yield` in `careless()` from `no_finally.py` in `try`/`finally`,
+    with the `exit` line in the `finally`.
+    Before running it, predict where `exit A` appears relative to `caught: boom`.

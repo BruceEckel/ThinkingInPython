@@ -14,7 +14,8 @@ class Trace:
         print(f"enter {self.name}")
         return self
 
-    def __exit__(self, exc_type, exc, tb) -> None:
+    def __exit__(self, exc_type: type[BaseException] | None,
+                 exc: object, tb: object) -> None:
         print(f"exit {self.name}")
 
 with Trace("A") as t:
@@ -41,30 +42,14 @@ comma-separated line.
 
 ```python
 # ch15_expected_types.py
-
-class expected:
-    def __init__(self, types: type[BaseException] |
-                 tuple[type[BaseException], ...]) -> None:
-        self.types = types
-
-    def __enter__(self) -> None:
-        return None
-
-    def __exit__(self, exc_type: type[BaseException] | None,
-                 exc: BaseException | None,
-                 tb: object) -> bool:
-        if (exc_type is None
-            or not issubclass(exc_type, self.types)):
-            return False
-        print(f"{exc!r}")
-        return True
+from exceptions import expected
 
 with expected((ZeroDivisionError, TypeError)):
     print("before")
     raise TypeError("not a number")
 print("survived")
 #: before
-#: TypeError('not a number')
+#: [TypeError] not a number
 #: survived
 
 with expected((ZeroDivisionError, TypeError)):
@@ -72,27 +57,24 @@ with expected((ZeroDivisionError, TypeError)):
     1 / 0
 print("survived")
 #: before
-#: ZeroDivisionError('division by zero')
+#: [ZeroDivisionError] division by zero
 #: survived
 ```
 
-The class is the chapter's `expected` with the `ALL` default left out,
-since the exercise always passes an argument. With no `ALL` to test
-for, the two guards in `__exit__()` merge into one `or` test, and the
-`__init__()` annotation writes out the union the chapter names with
-its `Types` alias. Everything the exercise asks for happens at the
-call site: `expected` takes one `types` argument that is either an
-exception class or a tuple of them, and
-`issubclass(exc_type, self.types)` accepts either shape. Passing
-`(ZeroDivisionError, TypeError)` therefore suppresses both, and the
-`TypeError` block prints a `repr()` line in the same form the
-`ZeroDivisionError` block printed before the change.
+Everything the exercise asks for happens at the call site. `expected`
+takes one `types` argument that is either an exception class or a
+tuple of them, and `issubclass(exc_type, self.types)` accepts either
+shape. Passing `(ZeroDivisionError, TypeError)` therefore suppresses
+both, and the `TypeError` block prints a `[Type] message` line in the
+same form the `ZeroDivisionError` block printed before the change.
+The second block shows that the tuple still covers the original
+exception.
 
 Note the double parentheses. `expected((ZeroDivisionError, TypeError))`
 passes one argument, a tuple. `expected(ZeroDivisionError, TypeError)`
-passes two, and Python raises a `TypeError` at the call itself, since
+passes two, and Python raises a `TypeError` at the call, since
 `expected` declares a single parameter. A version taking `*types`
-accepts the second spelling, and that is the design
+accepts the second form, and that is the design
 `contextlib.suppress` chose.
 
 ## 3. A third manager on one `with` line
@@ -123,14 +105,14 @@ with (tag("ul") as outer, tag("li") as inner1,
 ```
 
 All three managers enter left to right (`ul`, then `li`, then `li`
-again) and exit in the exact reverse order, regardless of how many
-managers appear on the line. The pattern from two managers extends
+again) and exit in reverse order, regardless of how many managers
+appear on the line. The pattern from two managers extends
 unchanged to three, four, or more.
 
 ## 4. Both pool connections leased at once
 
 ```python
-# exercise_4.py
+# test_ch15_both_leased.py
 from collections.abc import Iterator
 from contextlib import contextmanager
 from dataclasses import dataclass
@@ -157,24 +139,30 @@ class Pool[R]:
     def available(self) -> int:
         return self._available.qsize()
 
-pool = Pool(Connection(1), Connection(2))
-with pool.lease() as c1:
-    with pool.lease() as c2:
-        print("available while both leased:",
-              pool.available())
-print("available after both returned:", pool.available())
-#: available while both leased: 0
-#: available after both returned: 2
+def test_both_leased_at_once() -> None:
+    pool = Pool(Connection(1), Connection(2))
+    with pool.lease() as first:
+        with pool.lease() as second:
+            assert second is not first
+            assert pool.available() == 0
+    assert pool.available() == 2
 ```
 
+The solutions tree cannot import the chapter's `object_pool.py`, so
+the file carries its own copy of `Connection` and `Pool`. In the
+chapter's `test_object_pool.py` the test function alone is the
+addition.
+
 The first `lease()` takes one connection out of the queue, and the
-nested second `lease()` takes the other, so `pool.available()` reports
-`0` inside the inner `with`. Exiting the inner `with` returns its
+nested second `lease()` takes the other, so `pool.available()` is `0`
+inside the inner `with`. Exiting the inner `with` returns its
 connection first, then exiting the outer `with` returns the second,
 restoring `pool.available()` to `2`. The `0` confirms the pool has no
-built-in limit of "one lease at a time." The pool holds exactly the
-items you gave its constructor, and it hands out as many concurrent
-leases as it has items.
+built-in limit of "one lease at a time." The pool holds the items you
+gave its constructor, and it hands out as many concurrent leases as
+it has items. A third nested `lease()` would block forever in
+`get()`, since this one thread holds both connections and nothing can
+return one.
 
 ## 5. Two `banner` decorators stacked on one function
 
@@ -213,18 +201,21 @@ which enters the inner manager before running the body. Unwinding
 reverses that order, so the four bracketing lines nest rather than
 interleave.
 
-Each decoration is one `banner(...)` object reused for every call, not
-one per call. Reuse works because each `banner(...)` call returns a
-`ContextDecorator`, whose `__call__()` recreates the generator on each
-invocation. A hand-written class-based manager decorating a function
-re-enters the same instance on every call instead, so every call
-shares any state the instance holds.
+Each `@banner(...)` line builds one manager object, when Python
+defines `report()`. A generator manager is single-use, so the wrapper
+that `ContextDecorator` supplies does not enter that object. On each
+call of `report()` it builds a fresh manager from the same generator
+function and arguments, and enters that one. A hand-written
+class-based manager decorating a function re-enters the same instance
+on every call instead, so every call shares any state the instance
+holds.
 
 ## 6. `ignore_missing`, which suppresses only `KeyError`
 
 ```python
 # ignore_missing.py
 from types import TracebackType
+from exceptions import expected
 
 class ignore_missing:
     def __enter__(self) -> None:
@@ -247,19 +238,18 @@ with ignore_missing():
 print("survived the KeyError")
 #: survived the KeyError
 
-try:
+with expected(ValueError):
     with ignore_missing():
         raise ValueError("not a lookup problem")
-except ValueError as e:
-    print("escaped:", e)
-#: escaped: not a lookup problem
+#: [ValueError] not a lookup problem
 ```
 
 `__exit__()` decides an exception's fate through its return value:
 truthy suppresses, falsy lets the exception continue. Returning
 `issubclass(exc_type, KeyError)` therefore suppresses `KeyError` and
-propagates everything else. The second block confirms the propagation
-by catching the `ValueError` outside the `with`.
+propagates everything else. The second block confirms the
+propagation: the `ValueError` passes through `ignore_missing` and
+reaches the chapter's `expected`, which prints it.
 
 The `exc_type is not None` test keeps the normal path working. When a
 block finishes without an exception, Python still calls `__exit__()`,
@@ -311,7 +301,7 @@ closes, and `with ExitStack() as stack:` still enters and exits
 correctly around a body whose stack stays empty. That degenerate case
 shows why `ExitStack` exists. A fixed `with a, b, c:` line settles its
 count in the source. `ExitStack` accepts a count settled only at
-runtime, zero included, and a command line is exactly where that count
+runtime, zero included, and a command line is one place such a count
 comes from.
 
 The `sys.argv` rewrite stays out of the extracted listings, because
@@ -350,3 +340,40 @@ wrap(["x", "y", "z"])
 #: close y
 #: close x
 ```
+
+## 8. `careless()` with its `try`/`finally` restored
+
+```python
+# exercise_8.py
+from collections.abc import Iterator
+from contextlib import contextmanager
+
+@contextmanager
+def careful(name: str) -> Iterator[str]:
+    print(f"enter {name}")
+    try:
+        yield name
+    finally:
+        print(f"exit {name}")
+
+try:
+    with careful("A"):
+        raise ValueError("boom")
+except ValueError as error:
+    print("caught:", error)
+#: enter A
+#: exit A
+#: caught: boom
+```
+
+`exit A` now prints, and it prints before `caught: boom`. Python
+raises the block's `ValueError` inside the generator, at the `yield`.
+The `finally` runs on the way out of the generator, and only then
+does the exception leave the `with` statement and reach the `except`.
+That is the order `exit_on_error.py` shows for the class form: cleanup
+first, then propagation.
+
+In `no_finally.py` the same exception left the generator from the
+bare `yield`, so the `print()` after it was skipped. The `finally` is
+the only difference between the two listings, apart from the
+function's name.

@@ -5,9 +5,8 @@ class Fragile:
         print("enter fails")
         raise RuntimeError("no resource")
 
-    def __exit__(self, *exc: object) -> bool:
+    def __exit__(self, *exc: object) -> None:
         print("exit runs")
-        return False
 
 try:
     with Fragile():
