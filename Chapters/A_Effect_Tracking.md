@@ -397,8 +397,10 @@ a place [Resolve Every Call](#resolve-every-call) rules out for `ty`.
 
 The second is a separate static tool, run beside `ty` and `ruff`.
 Every problem above applies to it in full.
-[An Effect Checker](B_An_Effect_Checker.md) builds a small one,
-and reports `Unknown` wherever one of those problems stops it.
+[An Effect Checker](B_An_Effect_Checker.md) builds a small one.
+It reports `Unknown` for a call it cannot resolve,
+and its [closing section](B_An_Effect_Checker.md#what-the-checker-resolves-and-what-it-cannot-see)
+lists the cases it passes over with no report.
 
 The third is the runtime.
 A decorator reads each function's row once with `row()`,

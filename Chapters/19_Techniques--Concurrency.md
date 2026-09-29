@@ -1844,7 +1844,8 @@ and `synchronized_iterator()` wraps the callable that makes them.
 Serializing solves the case where the workers divide one stream.
 When each worker needs the whole stream,
 `itertools.tee()` looks like the answer and is not:
-tee'd iterators share an internal buffer with no locking.
+tee'd iterators share an internal buffer with no locking,
+and advancing two of them from different threads at once can raise a `RuntimeError`.
 `threading.concurrent_tee()` is the answer:
 
 ```python
