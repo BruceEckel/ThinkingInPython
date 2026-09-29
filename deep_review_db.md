@@ -157,8 +157,8 @@ end.** Chapter 33's "This `Any` is chosen, unlike the one in Data Transfer
 Objects…" matches chapter 22's "no checker knows your attribute names". Both
 were verified against `ty`: `Messenger` attribute access is
 `unresolved-attribute` without the `Any`, and `SimpleNamespace` attribute
-access reveals `Any`. Chapter 33's link deliberately carries no anchor, because
-chapter 22's `Any` discussion sits in the unheaded intro.
+access reveals `Any`. Chapter 33's link targets `#a-hand-rolled-messenger`
+(since commit d77524e1), the section that holds chapter 22's `Any` discussion.
 
 **08_Foundations--Static_Types: the missing blank line after `# area.py` is
 load-bearing.** House style would add one, but the chapter quotes `ty`'s
