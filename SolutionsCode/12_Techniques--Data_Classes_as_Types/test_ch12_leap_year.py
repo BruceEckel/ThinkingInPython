@@ -1,5 +1,4 @@
 # test_ch12_leap_year.py
-from __future__ import annotations
 from dataclasses import dataclass
 from datetime import date
 from enum import Enum
@@ -7,7 +6,6 @@ import pytest
 
 @dataclass(eq=False)
 class TypeFailure(ValueError):
-    "A value falls outside the type's allowed set."
     subject: str
     reason: str = ""
 
@@ -80,6 +78,10 @@ class BirthDate:
 
 def test_feb_29_allowed_in_leap_year() -> None:
     bd = BirthDate(Month.of(2), Day(29), Year(2020))
+    assert bd.day.n == 29
+
+def test_feb_29_allowed_in_2000() -> None:
+    bd = BirthDate(Month.of(2), Day(29), Year(2000))
     assert bd.day.n == 29
 
 def test_feb_29_rejected_in_non_leap_year() -> None:

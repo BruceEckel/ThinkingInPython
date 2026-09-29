@@ -9,7 +9,6 @@ only when the year is leap:
 
 ```python
 # test_ch12_leap_year.py
-from __future__ import annotations
 from dataclasses import dataclass
 from datetime import date
 from enum import Enum
@@ -17,7 +16,6 @@ import pytest
 
 @dataclass(eq=False)
 class TypeFailure(ValueError):
-    "A value falls outside the type's allowed set."
     subject: str
     reason: str = ""
 
@@ -92,6 +90,10 @@ def test_feb_29_allowed_in_leap_year() -> None:
     bd = BirthDate(Month.of(2), Day(29), Year(2020))
     assert bd.day.n == 29
 
+def test_feb_29_allowed_in_2000() -> None:
+    bd = BirthDate(Month.of(2), Day(29), Year(2000))
+    assert bd.day.n == 29
+
 def test_feb_29_rejected_in_non_leap_year() -> None:
     with pytest.raises(TypeFailure):
         BirthDate(Month.of(2), Day(29), Year(2021))
@@ -102,7 +104,9 @@ def test_feb_30_always_rejected() -> None:
 ```
 
 `BirthDate(Month.of(2), Day(29), Year(2020))` succeeds because 2020 is
-divisible by 4 and not by 100. `Year(2021)` is not leap, so
+divisible by 4 and not by 100. 2000 is divisible by 100 and also by
+400, so it is a leap year too, and it is the one century year `Year`
+accepts. `Year(2021)` is not leap, so
 `check_day()` rejects the same day. `check_day()` rejects February 30
 regardless of the year, because `max_days` is 29 at most, even in a
 leap year.
@@ -116,7 +120,6 @@ from exceptions import expect
 
 @dataclass(eq=False)
 class TypeFailure(ValueError):
-    "A value falls outside the type's allowed set."
     subject: str
     reason: str = ""
 
@@ -171,7 +174,6 @@ from exceptions import expect
 
 @dataclass(eq=False)
 class TypeFailure(ValueError):
-    "A value falls outside the type's allowed set."
     subject: str
     reason: str = ""
 
@@ -210,12 +212,11 @@ The guarantee still leaks. `_replace()` builds the new tuple through
 `tuple.__new__()` rather than through `cls.__new__()`, so the check
 never runs. `copy.replace()` calls `_replace()` and inherits the hole.
 A validated `Stars` therefore produces an unvalidated one, and that is
-worse than no check at all: the type now looks like it guarantees its
-values.
+worse than no check: the type now looks like it guarantees its values.
 
-A frozen data class has no equivalent hole because it has only one
-construction path. `copy.replace()` calls the constructor, the
-constructor calls `__post_init__()`, and the check runs.
+A frozen data class has no equivalent hole because its replacement
+goes through the constructor. `copy.replace()` calls the constructor,
+the constructor calls `__post_init__()`, and the check runs.
 
 ## 4. `from_json()` rejects a bad email
 
@@ -228,7 +229,6 @@ from exceptions import expect
 
 @dataclass(eq=False)
 class TypeFailure(ValueError):
-    "A value falls outside the type's allowed set."
     subject: str
     reason: str = ""
 
@@ -277,12 +277,12 @@ expect(TypeFailure, from_json, bad_json)
 #: [TypeFailure] EmailAddress('no-at-sign') needs an @
 ```
 
-`from_json()` never validates the email string itself. It hands the
-raw JSON value straight to `EmailAddress(...)`, and `EmailAddress`'s
-own `__post_init__()` runs the same check it runs for any other
-caller. One check, inside `EmailAddress`, protects every path that
-constructs a `Person`. The path from untrusted JSON input is one of
-those, with no additional code in `from_json()` itself.
+`from_json()` does not validate the email string. It hands the raw
+JSON value straight to `EmailAddress(...)`, and `EmailAddress`'s own
+`__post_init__()` runs the same check it runs for any other caller.
+One check, inside `EmailAddress`, protects every path that constructs
+a `Person`. The path from untrusted JSON input is one of those, with
+no additional code in `from_json()`.
 
 ## 5. `__replace__()` on an ordinary class
 
@@ -295,7 +295,6 @@ from exceptions import expect
 
 @dataclass(eq=False)
 class TypeFailure(ValueError):
-    "A value falls outside the type's allowed set."
     subject: str
     reason: str = ""
 
@@ -346,7 +345,6 @@ from exceptions import expect
 
 @dataclass(eq=False)
 class TypeFailure(ValueError):
-    "A value falls outside the type's allowed set."
     subject: str
     reason: str = ""
 
@@ -400,7 +398,7 @@ an instance. `Stars.built += 1` assigns to the class instead, so it
 works. `Wrong` writes the same intent a different way, and fails:
 `self.built += 1` reads the class attribute, adds one, and then tries
 to store the result on the instance. That store is the assignment
-`frozen=True` refuses. `ty` rejects the line before it ever runs,
+`frozen=True` refuses. `ty` rejects the line before it runs,
 reporting `built` as read-only on a frozen instance, so the listing
 carries a `# type: ignore` to demonstrate the runtime failure.
 
@@ -448,12 +446,70 @@ default as the decorator runs, finds an unhashable object, and raises
 a `ValueError` naming the fix.
 
 `Bare` and `Subscripted` both work, and they differ in what `ty` can
-see. `dict` is a class whose call returns `dict[Unknown, Unknown]`,
-loose enough to satisfy any `dict` annotation, so `ty` never compares
-the factory against the field. Checkers differ here: Pyright and mypy
+see. For `field(default_factory=dict)` `ty` infers `Unknown`, a type
+that satisfies any annotation, so `ty` never compares the factory
+against the field. Checkers differ here: Pyright and mypy
 both compare the bare factory and reject a mismatched one.
 `dict[str, Month]` is callable too, and its return type is concrete, so
 `field(default_factory=dict[int, int])` on this field draws a type
 error before the program runs. The bare form is fine where a reader
 can see that the factory and the annotation agree. Subscript the
 factory when you want the checker to confirm the agreement.
+
+## 8. A type test in the check
+
+```python
+# exercise_8.py
+from dataclasses import dataclass
+from exceptions import expect
+
+@dataclass(eq=False)
+class TypeFailure(ValueError):
+    subject: str
+    reason: str = ""
+
+    def __str__(self) -> str:
+        return f"{self.subject} {self.reason}".rstrip()
+
+def check(condition: bool, subject: str,
+          reason: str = "") -> None:
+    if not condition:
+        raise TypeFailure(subject, reason)
+
+@dataclass(frozen=True)
+class Stars:
+    number: int
+
+    def __post_init__(self) -> None:
+        check(type(self.number) is int,
+              f"Stars({self.number!r})", "needs an int")
+        check(1 <= self.number <= 10,
+              f"Stars({self.number})")
+
+print(Stars(5))
+#: Stars(number=5)
+for bad in (5.5, True, "five"):
+    expect(TypeFailure, Stars, bad)  # type: ignore
+#: [TypeFailure] Stars(5.5) needs an int
+#: [TypeFailure] Stars(True) needs an int
+#: [TypeFailure] Stars('five') needs an int
+
+print(issubclass(bool, int), isinstance(True, int))
+#: True True
+```
+
+`bool` is a subclass of `int`, so `isinstance(True, int)` is `True`
+and an `isinstance()` test admits `True` as the rating 1.
+`type(self.number) is int` compares the class of the value with `int`
+and rejects a `bool` along with a `float` and a `str`.
+
+The type test runs first. Comparing `"five"` with `1` raises a
+`TypeError`, so with the range check first a `str` never reaches a
+`TypeFailure`.
+
+`ty` rejects `5.5` and `"five"` as arguments before the program runs,
+and the `# type: ignore` silences it so the listing can show what the
+constructor does with a value the type checker did not see. `ty`
+accepts `Stars(True)`: a `bool` is an `int` to the type checker for
+the same subclass reason, so the runtime test is the one check that
+rejects it.

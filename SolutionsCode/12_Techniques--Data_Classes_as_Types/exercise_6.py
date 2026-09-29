@@ -6,7 +6,6 @@ from exceptions import expect
 
 @dataclass(eq=False)
 class TypeFailure(ValueError):
-    "A value falls outside the type's allowed set."
     subject: str
     reason: str = ""
 
