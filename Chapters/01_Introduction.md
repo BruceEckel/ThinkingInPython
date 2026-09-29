@@ -268,5 +268,6 @@ Other resources:
 © 2026 Bruce Eckel.
 This book carries a [CC BY-NC-ND 4.0](https://creativecommons.org/licenses/by-nc-nd/4.0/deed.en)
 license: you may share it unchanged, with attribution, for noncommercial use.
-It is freely readable online; no reproduction without permission.
+It is freely readable online.
+Commercial publication requires a contract with me.
 The source repository's `CONTRIBUTING.md` has the details.

@@ -791,7 +791,8 @@ def metadata_yaml(release: str | None = None) -> str:
         "rights": (f"© {build_site.COPYRIGHT_YEAR} "
                    f"{build_site.BOOK_AUTHOR}. Licensed CC BY-NC-ND 4.0 "
                    f"({build_site.LICENSE_URL}). Freely readable online. "
-                   "No reproduction without permission."),
+                   "Commercial publication requires a "
+                   "contract with the author."),
         "identifier": build_site.REPO_URL,
         # Rendered under the date on the EPUB's title page by the
         # `support` block in resources/static/epub3.template; the

@@ -79,7 +79,8 @@ COPYRIGHT_YEAR = "2026"
 COPYRIGHT = (f"© {COPYRIGHT_YEAR} {BOOK_AUTHOR}. "
              f'<a href="{LICENSE_URL}" target="_blank" '
              f'rel="noopener">Licensed CC BY-NC-ND 4.0</a>.<br>'
-             "Freely readable online. No reproduction without permission.")
+             "Freely readable online. Commercial publication "
+             "requires a contract with the author.")
 
 IMG_REF = re.compile(r"(!\[[^\]]*\]\()_images/([^)\s]+)(\))")
 # A figure written `![](_images/name)` prints no caption; see
