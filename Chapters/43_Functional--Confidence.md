@@ -98,7 +98,7 @@ Each call to `add_item()` returns the same list the caller passed in,
 so replacing the call with that list looks safe.
 It is not.
 The call also appends to `cart`, and the list put in its place appends nothing.
-Substitute the list for either call and `cart` ends with one `'eggs'` fewer.
+If you substitute the list for either call, `cart` ends with one `'eggs'` fewer.
 
 Referential transparency makes [`lru_cache`](41_Functional--Toolkits.md#lru_cache)
 safe: a memoizer can return a stored result because the call is interchangeable with its value.
@@ -193,11 +193,13 @@ because a pure call returns the same answer whichever process runs it,
 and whenever.
 
 The limits above are large enough for the difference to show.
+`report()` comes from [Numbers on Your Machine](18_Techniques--Performance.md#numbers-on-your-machine)
+and prints the two times only when you run the listing with `--numbers`.
 On the machine that built this book,
 the serial run took a few seconds and the parallel run about half that,
 well over the 1.3x margin `faster` checks.
 At smaller limits the serial run finishes before a pool has started its workers,
-so if you shrink the limits back down,
+so if you shrink the limits far enough,
 the parallel run takes longer than the serial one.
 Purity makes parallel safe.
 Whether parallel pays at a given size is a separate question,
@@ -254,7 +256,7 @@ You decide how far up the spectrum to go.
    Python's version of it is partial.
    An `Any`, a `cast()`,
    or data arriving from outside the program leaves a value the type checker takes on trust,
-   so the theorem holds exactly as far as the annotations reach.
+   so the theorem holds only as far as the annotations reach.
    Running `ty` over the examples in this book catches a useful class of mistakes,
    and that is most of what this rung offers.
 4. Above that is [*property-based testing*](#property-based-testing).
@@ -267,7 +269,7 @@ You decide how far up the spectrum to go.
    A property can state a fact about the value's behavior,
    at the cost of checking a sample of inputs instead of every one.
 5. At the top is formal proof.
-   In a dependently-typed language such as Lean, Idris, or Rocq (formerly Coq),
+   In a dependently typed language such as Lean, Idris, or Rocq (formerly Coq),
    you prove a program correct for every possible input,
    and a machine checks the proof.
    Formal proof is real, but rare outside specialized work.
@@ -348,7 +350,7 @@ When a law fails, Hypothesis reports the failing input,
 the first improvement over `property_check.py`'s bare `assert`.
 It also shrinks that input to the smallest example that still fails,
 a second improvement,
-so Hypothesis reports the bug as the smallest case rather than a random one.
+so the report shows the simplest failing case rather than whichever random one failed first.
 The framework automates falsification.
 
 ### Shrinking a Failure
@@ -469,8 +471,9 @@ and the chapters after it build a checked system on that idea.
     Then add the oracle property that `sorted(xs)` agrees with a hand-written insertion sort on short lists.
 4.  State a law that is false and watch Hypothesis falsify it:
     `@given(strategies.text())` with `assert s.upper().lower() == s.lower()`.
-    Report the counterexample Hypothesis shrinks to,
-    run the test a few times to see which characters Hypothesis reports,
+    Report the counterexample Hypothesis shrinks to, run the test a few times,
+    deleting the `.hypothesis/` directory before each run,
+    to see which characters Hypothesis reports,
     and explain what those characters reveal about Unicode case mapping.
 5.  Write a property test for `group_rounds()` from [Toolkits](41_Functional--Toolkits.md#groups-of-any-size):
     for any roster and any group size,

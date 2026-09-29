@@ -13,6 +13,11 @@ def group_rounds(
 ) -> Iterator[Round]:
     history: Counter[frozenset[str]] = Counter()
     rng = random.Random(seed)
+
+    def met(group: list[str], candidate: str) -> int:
+        return sum(history[frozenset((m, candidate))]
+                   for m in group)
+
     while True:
         pool = list(students)
         rng.shuffle(pool)
@@ -21,18 +26,17 @@ def group_rounds(
             leader = pool.pop()
             group = [leader]
             while len(group) < size:
-                stranger = min(pool, key=lambda c: sum(
-                    history[frozenset((m, c))]
-                    for m in group))
+                stranger = min(pool,
+                               key=lambda c: met(group, c))
                 pool.remove(stranger)
                 group.append(stranger)
             groups.append(group)
         # Roster smaller than one group
         if pool and not groups:
             groups.append([])
+        # Too few left for a full group of `size`
         for extra in pool:
-            host = min(groups, key=lambda g: sum(
-                history[frozenset((m, extra))] for m in g))
+            host = min(groups, key=lambda g: met(g, extra))
             host.append(extra)
         round_result: Round = [tuple(g) for g in groups]
         for g in round_result:

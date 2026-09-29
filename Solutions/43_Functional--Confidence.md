@@ -14,7 +14,7 @@ def count_primes(limit: int) -> tuple[int, int]:
     return count, os.getpid()
 
 def main() -> None:
-    limits = [10_000, 20_000, 30_000, 40_000]
+    limits = [200_000, 400_000, 600_000, 800_000]
     serial = list(map(count_primes, limits))
     with ProcessPoolExecutor() as pool:
         parallel = list(pool.map(count_primes, limits))
@@ -35,28 +35,30 @@ that requirement, not a fenced block executed in place.
 
 The assertion compares the counts alone, since the serial run carries
 the parent's process ID and the parallel run carries the workers'.
-The counts stay the same, `[1229, 2262, 3245, 4203]`: the same pure
-function gives the same answers wherever it runs, which is the point
-of the original listing. The interesting number is the second line.
-Three consecutive runs on one 32-core machine reported `2`, `3`, and
-`3` distinct process IDs.
+The counts stay the same, `[17984, 33860, 49098, 63951]`: the same
+pure function gives the same answers wherever it runs, which is the
+point of the original listing. The interesting number is the second
+line. Three consecutive runs on one 32-core machine reported `4`
+distinct process IDs each time.
 
 Two things follow, and neither is the one most people predict. The
-count is greater than one, so the work genuinely left the main
-process. The exercise sets out to show exactly that, and
-`assert parallel == serial` alone could never prove it. But the count
-also sits far below thirty-two, and it moves between runs.
-`ProcessPoolExecutor` allows one worker per core, but it starts
-workers on demand: a submitted task starts a new worker only when no
-existing worker is idle. Four tasks therefore start at most four
-processes, never thirty-two. Starting a process takes longer than
-these tasks run, so the first worker up often finishes its task and
-takes the next one from the queue before the last worker is ready.
-A distinct-ID count shows that the work left the main process, not
-how many processes the pool started.
+count is greater than one, so the work left the main process, which
+`assert parallel == serial` alone could never show. But the count
+also sits far below thirty-two. `ProcessPoolExecutor` allows one
+worker per core, but it starts workers on demand: a submitted task
+starts a new worker only when no existing worker is idle. Four tasks
+therefore start at most four processes, never thirty-two.
 
-The number depends on the core count and on scheduling, so it is
-reproducible on your machine and nowhere else. That is why it does
+The count can also fall below four. With limits twenty times smaller,
+`[10_000, 20_000, 30_000, 40_000]`, the same machine reported `3` on
+each of three runs. Starting a process then takes longer than a task
+runs, so the first worker up finishes its task and takes the next one
+from the queue before the last worker is ready. A distinct-ID count
+shows that the work left the main process, not how many processes the
+pool started.
+
+The number depends on the core count, the task sizes, and scheduling,
+so it is reproducible on your machine and nowhere else. That is why it does
 not belong in a `#:` marker in the book.
 
 ## 2. Which thread ran each call
@@ -141,8 +143,9 @@ being the same ones you handed in.
 Idempotence is weaker still on its own: the same `[]`-returning
 function passes it too. Idempotence buys a different kind of check,
 one about the operation rather than the output. It catches a sort
-that shuffles equal elements on the second pass, where the ordering
-invariant sees nothing wrong.
+that drops the last element. That sort's output is always ordered, so
+the invariant passes, but running it on its own output drops another
+element, so twice and once disagree on every list of two or more.
 
 The oracle closes the gap. `insertion_sort()` is slow and simple
 enough to check by reading, so asserting that it agrees with
@@ -184,6 +187,13 @@ E       )
 The two sides print almost identically, so the failure hides until
 you look at the code points. That is the first lesson.
 
+Most runs shrink to `'µ'`. Now and then a run stops at `'ß'` instead,
+since the shrinker does not always find the smallest failing
+character; `ß` breaks the law for a different reason, covered below.
+Once a run fails, Hypothesis stores the counterexample in
+`.hypothesis/` and replays it first, so later runs report the same
+character until you delete that directory.
+
 ```python
 # test_case_mapping.py
 import unicodedata
@@ -214,9 +224,9 @@ many-to-one mapping in each direction, over a repertoire containing
 characters that are lowercase without being the lowercase of
 anything. `ß` breaks the same law from the other side: `"ß".upper()`
 is `"SS"`, two characters, so uppercasing can change a string's
-length. One rule survives. `str.casefold()`, rather than
-`str.lower()`, is the operation intended for case-insensitive
-comparison, and even `casefold()` promises no reversibility.
+length. For case-insensitive comparison Python provides
+`str.casefold()` rather than `str.lower()`, and `casefold()` cannot
+be reversed either.
 
 A hand-written loop over `"abcde"` never reaches `µ`. The generated
 strings reach the parts of the repertoire nobody thinks to type, and
@@ -240,6 +250,11 @@ def group_rounds(
 ) -> Iterator[Round]:
     history: Counter[frozenset[str]] = Counter()
     rng = random.Random(seed)
+
+    def met(group: list[str], candidate: str) -> int:
+        return sum(history[frozenset((m, candidate))]
+                   for m in group)
+
     while True:
         pool = list(students)
         rng.shuffle(pool)
@@ -248,18 +263,17 @@ def group_rounds(
             leader = pool.pop()
             group = [leader]
             while len(group) < size:
-                stranger = min(pool, key=lambda c: sum(
-                    history[frozenset((m, c))]
-                    for m in group))
+                stranger = min(pool,
+                               key=lambda c: met(group, c))
                 pool.remove(stranger)
                 group.append(stranger)
             groups.append(group)
         # Roster smaller than one group
         if pool and not groups:
             groups.append([])
+        # Too few left for a full group of `size`
         for extra in pool:
-            host = min(groups, key=lambda g: sum(
-                history[frozenset((m, extra))] for m in g))
+            host = min(groups, key=lambda g: met(g, extra))
             host.append(extra)
         round_result: Round = [tuple(g) for g in groups]
         for g in round_result:
@@ -298,13 +312,14 @@ than the group size, the `while len(pool) >= size` loop never runs
 and `groups` stays empty. The leftover loop then asks `min()` for the
 smallest of nothing.
 
-The crash is a real defect rather than an unstated precondition, and
-the distinction is worth drawing. `group_rounds()` already keeps
+The crash is a real defect rather than an unstated precondition.
+`group_rounds()` already keeps
 everyone in a group when a roster divides unevenly, folding the
 leftovers into existing groups, so the answer for a roster of two and
 a size of five is one group of two. Crashing is the one answer
-inconsistent with what the function does everywhere else. The chapter
-carries the fix now, so the test above passes with no `assume()`.
+inconsistent with what the function does everywhere else. The
+chapter's `group_rounds()` includes the guard, so the test above
+passes with no `assume()`.
 
 Finding the defect takes no cleverness and no thought about edge
 cases. The strategy generates small rosters because Hypothesis
@@ -316,9 +331,9 @@ Breaking the function on purpose is the other half of the exercise.
 Delete the loop that places leftovers:
 
 ```python
+        # Too few left for a full group of `size`
         for extra in pool:
-            host = min(groups, key=lambda g: sum(
-                history[frozenset((m, extra))] for m in g))
+            host = min(groups, key=lambda g: met(g, extra))
             host.append(extra)
 ```
 
@@ -432,14 +447,15 @@ class Err[E]:
 
 type Result[A, E] = Ok[A] | Err[E]
 
-def reciprocal(text: str) -> Result[float, Exception]:
+def compute(text: str) -> Result[float, Exception]:
     try:
         return Ok(1 / int(text))
     except (ValueError, ZeroDivisionError) as e:
         return Err(e)
 
-def describe(text: str) -> str:
-    result: Result[float, Exception] = reciprocal(text)
+def describe(
+    text: str, result: Result[float, Exception]
+) -> str:
     if isinstance(result, Ok):
         return f"{text}: {result.answer}"
     if isinstance(result.error, ValueError):
@@ -449,16 +465,16 @@ def describe(text: str) -> str:
     return f"{text}: {type(result.error).__name__}"
 
 for sample in ("4", "0", "OOPS"):
-    print(describe(sample))
+    print(describe(sample, compute(sample)))
 #: 4: 0.25
 #: 0: Cannot divide by zero
 #: OOPS: Not a number
 ```
 
 The two versions produce identical output. Counting lines favors the
-`isinstance()` version: its `describe()` is three lines shorter than
-the `match` version's, and the two listings come out the same length.
-Length is not what separates them. The `match` reads as one
+`isinstance()` version by two: it needs no `match result:` line, and
+its final `return` replaces a `case` line and its body. Length is not
+what separates them. The `match` reads as one
 description of four shapes while the `isinstance()` version reads as
 four separate questions.
 The difference shows in what each version repeats: `result.error`

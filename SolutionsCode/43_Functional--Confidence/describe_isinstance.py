@@ -14,14 +14,15 @@ class Err[E]:
 
 type Result[A, E] = Ok[A] | Err[E]
 
-def reciprocal(text: str) -> Result[float, Exception]:
+def compute(text: str) -> Result[float, Exception]:
     try:
         return Ok(1 / int(text))
     except (ValueError, ZeroDivisionError) as e:
         return Err(e)
 
-def describe(text: str) -> str:
-    result: Result[float, Exception] = reciprocal(text)
+def describe(
+    text: str, result: Result[float, Exception]
+) -> str:
     if isinstance(result, Ok):
         return f"{text}: {result.answer}"
     if isinstance(result.error, ValueError):
@@ -31,7 +32,7 @@ def describe(text: str) -> str:
     return f"{text}: {type(result.error).__name__}"
 
 for sample in ("4", "0", "OOPS"):
-    print(describe(sample))
+    print(describe(sample, compute(sample)))
 #: 4: 0.25
 #: 0: Cannot divide by zero
 #: OOPS: Not a number
