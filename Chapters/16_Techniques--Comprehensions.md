@@ -25,6 +25,8 @@ A list comprehension consists of:
 -   An optional predicate expression.
 -   An output expression that builds one element of the output list from each member that satisfies the predicate.
 
+The first examples take their input from a list that mixes integers and strings:
+
 ```python
 # a_list.py
 a_list = [1, "4", 9, "a", 0, 4]
@@ -49,7 +51,7 @@ In this comprehension:
 -   The iterator walks through each member `e` of the input sequence `a_list`.
 -   The predicate checks if the member is an integer.
 -   If the member is an integer,
-    the output expression squares it and appends it to the output list.
+    the output expression squares it and the result joins the output list.
 
 ### The `map()` and `filter()` Equivalent
 
@@ -79,6 +81,8 @@ print(list(map(lambda e: e ** 2, ints)))  # type: ignore
 #: [1, 81, 0, 16]
 ```
 
+Nesting the `filter()` call inside the `map()` call does both steps in one expression:
+
 ```python
 # map_and_filter.py
 from a_list import a_list
@@ -93,7 +97,7 @@ The `map()`/`filter()` form funnels every element through `lambda` calls,
 and is harder to read.
 The comprehension inlines the test and the expression,
 and its brackets show at a glance that it produces a list.
-`map()` and `filter()` pay off when the function already exists,
+`map()` and `filter()` pay off when the function already exists:
 `map(str.strip, lines)` rather than `[line.strip() for line in lines]`.
 So the `lambda` makes `map_and_filter.py` worse, not `map()`.
 [Functional Foundations](40_Functional--Foundations.md) returns to the choice.
@@ -132,13 +136,22 @@ so the outer `e` survives untouched.
 A `for` loop behaves the opposite way:
 its loop variable stays behind in the enclosing scope after the loop ends.
 
-The walrus operator is the exception to that scope.
+The scope works like a function's, and that matters in a class body.
+Names assigned in a class body are invisible to the scopes nested inside it,
+so a comprehension there cannot read the class's other attributes.
+With `base = 3` in the class body,
+`[n * base for n in range(3)]` raises a `NameError`.
+The outermost iterable is the one part Python evaluates in the enclosing scope,
+so `[n for n in range(base)]` works.
+
+The walrus operator is the exception to the comprehension's scope.
 `total := total + n` assigns in the enclosing scope,
 so `total` holds the running sum after the comprehension finishes.
 That leak is deliberate:
 it lets a comprehension accumulate a value without a separate loop.
-Two uses are a `SyntaxError`:
+Three uses are a `SyntaxError`:
 a walrus that rebinds the comprehension's own iteration variable,
+a walrus inside the iterable expression that follows `in`,
 and a walrus in a comprehension inside a class body.
 
 The running sum is a rare use of the walrus.
@@ -158,7 +171,7 @@ print(cubes)
 #: [0, 8, 64]
 ```
 
-`(y := cube_if_even(x))` calls `cube_if_even` once, binds its result to `y`,
+`(y := cube_if_even(x))` calls `cube_if_even()` once, binds its result to `y`,
 and the `if` tests that same result.
 The output expression then reuses `y`.
 Without the walrus, the filter and the output each need their own call,
@@ -302,6 +315,12 @@ except NameError as e:
 #: name 'row' is not defined
 ```
 
+The `NameError` depends on the enclosing scope having no `row`.
+When an earlier statement binds one,
+as the `for row in matrix:` loop in `identity_matrix.py` does,
+the first clause iterates over that stale `row`,
+and the comprehension produces a wrong list with no exception.
+
 ## Feeding the Iterator Clause
 
 Everything to the right of `in` is an ordinary iterable expression,
@@ -338,6 +357,9 @@ print([
 ```
 
 `values` has a third element, and `zip()` drops it, as in `zip_pairs.py`.
+
+`Path.walk()` produces a `(dirpath, dirnames, filenames)` tuple for each directory in a tree,
+and a second `for` clause walks the names in `filenames`:
 
 ```python
 # path_walk_comprehension.py
@@ -405,7 +427,7 @@ not just the files at the bottom of it.
 A comprehension earns its place when you can read it in one pass.
 You can nest more `for` and `if` clauses,
 or wrap the whole thing in another call,
-but each one you add makes the expression harder to read in one pass.
+but each one you add makes the expression harder to read.
 
 ```python
 # dense_comprehension.py
@@ -444,6 +466,7 @@ how the warehouses flatten together, in what order the result arrives,
 and how each line renders.
 A comprehension nested inside `sorted()`,
 itself nested inside the outer comprehension, does four jobs in one expression.
+Giving each stage a name gives each question its own statement:
 
 ```python
 # comprehension_steps.py
@@ -494,7 +517,7 @@ print(wasted)
 
 The comprehension calls `print()` for its side effect.
 `print()` returns `None`, so `wasted` ends up holding three `None`s,
-a list built and immediately discarded.
+a list that no code can use.
 Worse, a reader scanning `[...]` expects a meaningful collection,
 and this comprehension is a loop written with the wrong punctuation.
 
@@ -535,7 +558,7 @@ print(list(islice(squares, 3)))
 #: [4, 9, 16]
 ```
 
-No computation runs until you pull a value.
+The generator computes no square until you pull a value.
 `next()` produces them one at a time,
 and `itertools.islice()` takes a few without building the million-element list.
 
@@ -592,7 +615,7 @@ and `sum((n * n for n in nums), 0)` is the fix.
 
 ### A Generator Expression Runs Once
 
-`genexp_consumers.py` iterates `nums` three times because `range` is re-iterable:
+`genexp_consumers.py` can iterate `nums` three times because a `range` is re-iterable:
 each `for` over it starts again at zero.
 A generator expression is not re-iterable:
 
@@ -644,6 +667,10 @@ A list comprehension has no such gap: it reads everything at once.
 That gap is also why `path_walk_comprehension.py` uses brackets.
 With parentheses, its outermost iterable, `root.walk()`, is called at creation,
 but the walking and the filtering wait for a consumer that arrives after the directory disappears.
+A `lambda` created in a comprehension reads its variables late for the same reason:
+its body runs when something calls it.
+[Function Objects](28_Patterns--Function_Objects.md#the-late-binding-trap)
+demonstrates that trap.
 [Iterators](23_Patterns--Iterators.md#generators) explores generators further,
 and [Generators](45_Effects--Generators.md)
 covers the values they receive as well as the ones they produce.
@@ -740,3 +767,7 @@ and pays it only for the values the consumer pulls.
 7.  In `spent_generator.py`, move the `any()` line above the `sum()` line.
     Predict all three printed values before running it,
     remembering that `any()` stops when it finds a match.
+8.  In `genexp_timing.py`,
+    turn the generator expression into a list comprehension and name the result `built`.
+    Predict the three printed lines, and their order, before running it.
+    Explain which value of `factor` the result uses.

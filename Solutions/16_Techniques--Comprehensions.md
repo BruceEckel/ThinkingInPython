@@ -180,3 +180,34 @@ drained every value, so `list()` gets nothing. A generator holds a
 position rather than a beginning. Each consumer picks up where the
 previous one stopped, and `any()`'s early exit leaves values behind for
 `sum()` to find.
+
+## 8. Closing the gap with brackets
+
+```python
+# exercise_8.py
+def source() -> list[int]:
+    print("source() called")
+    return [1, 2, 3]
+
+factor = 2
+built = [n * factor for n in source()]
+#: source() called
+print("list created")
+#: list created
+factor = 10
+print(built)
+#: [2, 4, 6]
+```
+
+The lines print in the same order as in `genexp_timing.py`, and the
+last one changes from `[10, 20, 30]` to `[2, 4, 6]`. A list
+comprehension does all its work on the line where it appears: it
+calls `source()`, reads `factor` while `factor` is `2`, and stores
+the three products in `built`. The later `factor = 10` has nothing
+to affect, because `built` holds finished numbers and no code that
+still needs to look `factor` up.
+
+The generator expression calls `source()` at the same point, which
+is why the first line of output does not move. The brackets change
+when the output expression runs, and with it which value of
+`factor` the expression reads.
