@@ -100,7 +100,7 @@ It is not.
 The call also appends to `cart`, and the list put in its place appends nothing.
 Substitute the list for either call and `cart` ends with one `'eggs'` fewer.
 
-Referential transparency is what makes [`lru_cache`](41_Functional--Toolkits.md#cache)
+Referential transparency makes [`lru_cache`](41_Functional--Toolkits.md#lru_cache)
 safe: a memoizer can return a stored result because the call is interchangeable with its value.
 Every optimization that skips or reuses work,
 from a cache to a database query planner, benefits the same way,
