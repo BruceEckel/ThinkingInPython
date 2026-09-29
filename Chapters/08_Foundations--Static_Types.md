@@ -17,7 +17,7 @@ It stores the hint and evaluates it only when something reads the annotations.
 If you want static type checking like you get from a compiler in a typed language,
 you must run a separate type-checking tool.
 Mypy is the original and most widely deployed one,
-and pyright is the one most editors run.
+and Pyright is the one most editors run.
 This book uses [Astral's `ty`](https://docs.astral.sh/ty/) instead,
 from the same group that makes `uv` and `ruff`.
 Pyright checks the same listings as a second opinion,

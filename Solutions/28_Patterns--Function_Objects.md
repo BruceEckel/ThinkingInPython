@@ -183,7 +183,7 @@ bookkeeping to say which handler ran. That name is why `chain` needs a
 `Protocol` here instead of an alias like the chapter's `RootFinder`.
 `Callable[...]` describes only what a handler accepts and returns, and
 says nothing about a name, so `ty` rejects `finder.__name__` on a
-handler annotated that way (pyright allows it, inferring the
+handler annotated that way (Pyright allows it, inferring the
 attributes of a function object). `Finder` declares `__name__`
 alongside `__call__()`, and a function satisfies both. The listing
 copies the finders from `algorithms.py` rather than importing them,
