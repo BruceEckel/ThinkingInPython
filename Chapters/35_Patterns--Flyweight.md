@@ -43,7 +43,7 @@ This build caches up to 1024,
 so the example that needs a fresh object uses `100000` rather than `257`.
 
 The listing parses each value from a string because the compiler pools equal constants within one code object:
-with literals (`low, low2 = 256, 256`) even `100000 is 100000` prints `True`.
+with literals, `high, high2 = 100000, 100000` makes `high is high2` print `True`.
 That sharing comes from the pooling, not from the integer cache.
 Because the result of `is` on a literal depends on details like this pooling,
 Python emits a `SyntaxWarning` for it.
@@ -165,8 +165,13 @@ with the asker supplying the coordinates.
 so `Tile.symbol` and `SPECS` can hold only one of them.
 If you add a kind to `SPECS` without adding it to `Symbol`,
 the type checker rejects the mismatch.
-`tile()` declares its parameter a `Symbol` and trusts the declaration,
-so the boundary is `to_symbol()`,
+`tile()` declares its parameter a `Symbol`,
+but `@cache` hides that declaration from callers.
+The decorated `tile` is a `functools._lru_cache_wrapper`,
+whose call accepts any hashable arguments,
+so the type checker passes `tile("?")`,
+and the mistake surfaces at runtime as a `KeyError` from `SPECS`.
+The boundary is therefore `to_symbol()`,
 the one function that takes a `str` and returns a `Symbol`.
 `to_symbol()` checks membership in `SPECS` at runtime and raises a `KeyError` for a character outside it.
 The type checker narrows on the same guard: `SPECS` has key type `Symbol`,
@@ -222,7 +227,7 @@ Every field here is immutable, so the sharing is safe.
 
 A factory function like `tile()` has a visibly different name and call syntax,
 so a caller can see that construction goes through something other than the class.
-If you want callers to keep writing `Color(...)`,
+If you want callers to construct objects with an ordinary class call such as `Color(...)`,
 hide the pool inside `__new__()` instead.
 [*Singleton*](24_Patterns--Singleton.md#the-classic-implementations)
 keeps its pool in `__new__()` the same way.
@@ -475,8 +480,8 @@ The enum version also brings iteration, exhaustive `match`,
 and a fixed set of members: `Tile("?")` raises a `ValueError`,
 and `Tile.DOOR` raises an `AttributeError`.
 A `match` over `Tile` needs no `case _:` catch-all once every member has a case.
-If you leave one out,
-the type checker reports the missing case before any `Tile` value reaches the code at runtime:
+If you leave one out of a function that declares a return type,
+the type checker reports the gap before the code runs:
 
 ```python
 # tile_enum_match.py

@@ -1,5 +1,6 @@
 # exercise_5.py
 from dataclasses import dataclass
+from typing import Final
 from weakref import WeakValueDictionary
 
 type RGB = tuple[int, int, int]
@@ -10,7 +11,7 @@ class Color:
     green: int
     blue: int
 
-_pool: WeakValueDictionary[RGB, Color] = (
+_pool: Final[WeakValueDictionary[RGB, Color]] = (
     WeakValueDictionary())
 
 def make_color(red: int, green: int, blue: int) -> Color:
@@ -28,6 +29,9 @@ crimson_a = make_color(220, 20, 60)
 crimson_b = make_color(220, 20, 60)
 print(crimson_a is crimson_b)
 #: True
+bypass = Color(220, 20, 60)
+print(bypass == crimson_a, bypass is crimson_a)
+#: True False
 del palette, crimson_a, crimson_b
 print(len(_pool))
 #: 0

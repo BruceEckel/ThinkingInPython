@@ -217,11 +217,11 @@ def test_mutation_without_frozen_leaks_across_cells(
     assert field[1][1].walkable is False  # Bug: cell leaked
 ```
 
-Restoring `@record` turns this same test into a demonstration of
-the fix. `field[0][0].walkable = False` now raises a
-`FrozenInstanceError` immediately, because a record rejects
-assignment to every field. That refusal makes sharing one object
-safe.
+If you restore `@record`, this test stops at its assignment:
+`field[0][0].walkable = False` raises a `FrozenInstanceError`,
+because a record rejects assignment to every field. The assignment
+the bug needs never completes, and that refusal makes sharing one
+object safe.
 
 ## 4. Modeling chess
 
@@ -300,12 +300,12 @@ references. That mapping keeps the extrinsic position separate from
 the intrinsic color-and-kind that `@cache` shares.
 
 Capturing leaves every `Piece` object alive. `board[dst] = ...`
-replaces whatever reference sits at `dst` (the captured piece) with
-the moving piece's reference. The captured piece's *flyweight* stays
-in the cache. Twelve `Piece` objects still exist after captures clear
-the whole board, because those flyweights represent "a white rook" in
-the abstract rather than any particular rook on a square. Capturing
-removes a board *position* and nothing more.
+replaces the reference at `dst`, the captured piece, with the moving
+piece's reference. The captured piece's flyweight stays in the cache,
+because it represents "a black knight" in the abstract rather than any
+particular knight on a square. A capture removes a position from the
+board, and the twelve `Piece` objects remain however many captures
+follow.
 
 `promote()` swaps which flyweight a square points to, because a frozen
 `Piece` cannot change its color or kind. `piece(current.color, kind)`
@@ -317,6 +317,7 @@ at that one instead.
 ```python
 # exercise_5.py
 from dataclasses import dataclass
+from typing import Final
 from weakref import WeakValueDictionary
 
 type RGB = tuple[int, int, int]
@@ -327,7 +328,7 @@ class Color:
     green: int
     blue: int
 
-_pool: WeakValueDictionary[RGB, Color] = (
+_pool: Final[WeakValueDictionary[RGB, Color]] = (
     WeakValueDictionary())
 
 def make_color(red: int, green: int, blue: int) -> Color:
@@ -345,23 +346,32 @@ crimson_a = make_color(220, 20, 60)
 crimson_b = make_color(220, 20, 60)
 print(crimson_a is crimson_b)
 #: True
+bypass = Color(220, 20, 60)
+print(bypass == crimson_a, bypass is crimson_a)
+#: True False
 del palette, crimson_a, crimson_b
 print(len(_pool))
 #: 0
 ```
 
-This listing is `weak_pool.py`'s exact shape applied to colors instead
-of names: a factory function, `make_color()`, replacing the
-`Color(...)` constructor call, and a `WeakValueDictionary` instead of
-a plain `dict`. Because `make_color()` is a plain function rather than
-an overridden `__new__()`, `Color` stays an ordinary frozen
-`@dataclass`, and the decorator generates a real `__repr__()` and
-`__eq__()` for it. `interned_color.py`'s `Color` defines no
-`__init__()`, and that omission rules out `@dataclass`, so it inherits
-`object`'s versions of both. Once `del` drops every reference to the
-fifty-shade palette and both crimson names, nothing keeps those
-`Color` objects alive, so the pool empties itself with no explicit
-cleanup.
+This listing is `weak_pool.py`'s shape applied to colors: a factory
+function, `make_color()`, and a `WeakValueDictionary` for the pool.
+`Color` is an ordinary frozen data class, so it gets a generated
+`__repr__()`, `__eq__()`, and `__hash__()`, which the hand-written
+`Color` in `interned_color.py` goes without. Once `del` drops every
+reference to the fifty-shade palette and both crimson names, nothing
+keeps those `Color` objects alive, and the pool empties itself with no
+explicit cleanup.
+
+The rewrite gave up the constructor syntax and the guarantee that came
+with it. `Color(220, 20, 60)` still runs, but it skips the pool and
+builds a second object equal to the pooled one, the same bypass a
+direct `Tile(...)` makes in the chapter. Weak references did not force
+that trade. `__new__()` can look in a `WeakValueDictionary` as easily
+as in a `dict`, as
+[Which Pool Should You Use?](../Chapters/35_Patterns--Flyweight.md#which-pool-should-you-use)
+says, and `interned_color.py`'s unslotted `Color` already has the
+`__weakref__` slot a weak reference needs.
 
 ## 6. Constraining `interned_color.py`'s components
 
@@ -490,11 +500,22 @@ are the spec table, and `Tile(s)` is the pool lookup. The
 value-to-member table the metaclass builds performs the runtime
 membership check `to_symbol()` does by hand.
 
-The type checker catches nothing new. An unknown symbol is still a
-runtime failure, a `ValueError` from `Tile(s)`. The gain is in the
-declaration: the `Literal` version declares the set twice, in `Symbol`
-and in `SPECS`, with an annotation tying the two together, while the
-enum declares it once and rules out that drift.
+The type checker still catches what the `Literal` version caught
+where that check survives. A `match` over `Tile` that leaves out a
+member draws the same `invalid-return-type` as a `match` over `Symbol`
+that leaves out a symbol. The drift the `SPECS` annotation guarded
+against, a key that `Symbol` does not list, can no longer happen,
+because the enum declares the set once instead of twice.
+
+The enum adds one check. A misspelled or missing member, such as
+`Tile.DOOR`, is an `unresolved-attribute` error. The `Literal` version
+never checked the matching mistake: `@cache` hides `tile()`'s `Symbol`
+parameter from callers, so `tile("+")` passes the type checker and
+fails at runtime with a `KeyError`.
+
+An unknown symbol that arrives as data is a runtime failure in both
+versions. The type checker passes `Tile("?")`, and the call raises a
+`ValueError`.
 
 The enum gives up the moment of failure. `to_symbol()` raises a
 `KeyError` at a named boundary the chapter can point at. `Tile("?")`
