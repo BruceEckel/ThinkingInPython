@@ -1,23 +1,20 @@
 # exercise_1.py
 from typing import Any
 from exceptions import expected
+from record import record
 
+@record
 class PairsAdapter:
-    ("Gives a list of (key, value) pairs"
-     " a dict-style lookup.")
-    def __init__(
-        self, pairs: list[tuple[str, Any]]
-    ) -> None:
-        self._pairs = pairs
+    pairs: list[tuple[str, Any]]
 
     def __getitem__(self, key: str) -> Any:
-        for k, v in self._pairs:
+        for k, v in self.pairs:
             if k == key:
                 return v
         raise KeyError(key)
 
     def __getattr__(self, name: str) -> Any:
-        return getattr(self._pairs, name)
+        return getattr(self.pairs, name)
 
 pairs = [("name", "Alice"), ("age", 30)]
 adapter = PairsAdapter(pairs)
@@ -32,3 +29,6 @@ print(len(pairs))  # The wrapped list itself grew
 with expected(KeyError):
     adapter["missing"]
 #: [KeyError] 'missing'
+with expected(TypeError):
+    len(adapter)  # type: ignore
+#: [TypeError] object of type 'PairsAdapter' has no len()

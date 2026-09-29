@@ -1,4 +1,6 @@
 # test_adapter.py
+import copy
+import pickle
 from getattr_adapter import Adapter, WhatIHave
 
 def test_new_interface_combines_methods() -> None:
@@ -15,3 +17,9 @@ def test_forwarding_targets_the_wrapped_object() -> None:
     a = Adapter(have)
     # __getattr__ delegates to adaptee
     assert a.g.__self__ is have
+
+def test_copy_and_pickle_rebuild_the_adapter() -> None:
+    a = Adapter(WhatIHave())
+    assert copy.copy(a).f(1) == "fgh"
+    restored = pickle.loads(pickle.dumps(a))
+    assert restored.g(2) == "gg"

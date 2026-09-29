@@ -6,23 +6,20 @@
 # exercise_1.py
 from typing import Any
 from exceptions import expected
+from record import record
 
+@record
 class PairsAdapter:
-    ("Gives a list of (key, value) pairs"
-     " a dict-style lookup.")
-    def __init__(
-        self, pairs: list[tuple[str, Any]]
-    ) -> None:
-        self._pairs = pairs
+    pairs: list[tuple[str, Any]]
 
     def __getitem__(self, key: str) -> Any:
-        for k, v in self._pairs:
+        for k, v in self.pairs:
             if k == key:
                 return v
         raise KeyError(key)
 
     def __getattr__(self, name: str) -> Any:
-        return getattr(self._pairs, name)
+        return getattr(self.pairs, name)
 
 pairs = [("name", "Alice"), ("age", 30)]
 adapter = PairsAdapter(pairs)
@@ -37,6 +34,9 @@ print(len(pairs))  # The wrapped list itself grew
 with expected(KeyError):
     adapter["missing"]
 #: [KeyError] 'missing'
+with expected(TypeError):
+    len(adapter)  # type: ignore
+#: [TypeError] object of type 'PairsAdapter' has no len()
 ```
 
 The adapter adds the one method the caller wants, `__getitem__()`,
@@ -45,6 +45,17 @@ and forwards everything else to the wrapped list through
 The adapter defines no `append()`, so the lookup falls through to
 the list, and both the adapter and the original `pairs` name see
 the new entry.
+The record is frozen, and the list it holds is not: `append()`
+changes the list and assigns nothing to the adapter.
+
+`len(adapter)` fails although the list has a `__len__()`.
+Python looks up a special method on the class, not on the instance,
+so the lookup skips `__getattr__()` and finds no `__len__()` on
+`PairsAdapter`.
+`adapter[key]` works because the class defines `__getitem__()`.
+An adapter that must support `len()` defines `__len__()` and forwards
+it by hand.
+
 The lookup is a linear scan.
 If the pairs are many and the lookups frequent, convert to a real
 `dict` once (`dict(pairs)` does it) and adapt only when the object
@@ -77,7 +88,8 @@ for entry in caught:
 Decorating the class moves the warning to the two places where a
 caller commits to the type: constructing an instance and subclassing.
 `render()` runs outside the recording block and adds nothing to
-`caught`, so code that already holds a `Report` runs without a word.
+`caught`, so code that already holds a `Report` runs without a
+warning.
 That is the right split: `TextReport` replaces the type, not the
 method. A caller who wants to act on the warning must change where
 the object comes from, not where they call it.
@@ -193,3 +205,102 @@ the classification never turns on the code: all three could be the
 same `__getattr__()` forwarder. What separates them is the answer to
 "what breaks if I delete this," and a name chosen from that answer
 tells the next reader why the wrapper is there.
+
+## 5. Renaming a keyword-capable parameter
+
+```python
+# exercise_5.py
+from typing import override
+from exceptions import expect
+from record import record
+
+class WhatIHave:
+    def g(self) -> None:
+        print("WhatIHave.g()")
+    def h(self) -> None:
+        print("WhatIHave.h()")
+
+class WhatIWant:
+    __slots__ = ()
+    def f(self) -> None: ...
+
+@record
+class ProxyAdapter(WhatIWant):
+    what_i_have: WhatIHave
+
+    @override
+    def f(self) -> None:
+        self.what_i_have.g()
+        self.what_i_have.h()
+
+class WhatIUse:
+    def op(self, what_i_want: WhatIWant) -> None:
+        what_i_want.f()
+
+class Renamed(WhatIUse):
+    @override
+    def op(  # type: ignore
+        self, item: WhatIWant | WhatIHave
+    ) -> None:
+        match item:
+            case WhatIWant():
+                super().op(item)
+            case WhatIHave():
+                ProxyAdapter(item).f()
+
+class WhatIUse2(WhatIUse):
+    @override
+    def op(
+        self, what_i_want: WhatIWant | WhatIHave
+    ) -> None:
+        match what_i_want:
+            case WhatIWant():
+                super().op(what_i_want)
+            case WhatIHave():
+                ProxyAdapter(what_i_want).f()
+
+def run(user: WhatIUse) -> None:
+    user.op(what_i_want=ProxyAdapter(WhatIHave()))
+
+run(WhatIUse())
+#: WhatIHave.g()
+#: WhatIHave.h()
+expect(TypeError, run, Renamed())
+#: [TypeError] Renamed.op() got an unexpected keyword
+#: argument 'what_i_want'
+run(WhatIUse2())
+#: WhatIHave.g()
+#: WhatIHave.h()
+WhatIUse2().op(what_i_want=WhatIHave())
+#: WhatIHave.g()
+#: WhatIHave.h()
+```
+
+`Renamed` is `WhatIUse2` from `adapter_variations.py`, unchanged.
+Without the `/`, `what_i_want` is a name callers can pass by keyword,
+and `run()` does. `ty` rejects the override:
+
+```text
+error[invalid-method-override]: Invalid override of
+method `op`
+info: the parameter named `item` does not match
+`what_i_want` (and can be used as a keyword parameter)
+info: This violates the Liskov Substitution Principle
+```
+
+The `# type: ignore` silences that report so the listing can show
+what the checker prevents. `run()` accepts any `WhatIUse`, and a
+`Renamed` is one, so `ty` reports nothing about the call inside
+`run()`. At runtime `Renamed.op()` has no parameter named
+`what_i_want`, and the call raises a `TypeError`. The override broke
+a caller that does not mention `Renamed`.
+
+The fix keeps the base class's name. `WhatIUse2.op()` still widens
+the type to the union, which an override may do, and it accepts the
+keyword every `WhatIUse` caller uses. The last call passes a
+`WhatIHave` by that keyword and reaches the adapter.
+
+With the `/` in place, as in `adapter.py`, no caller can pass the
+parameter by name, so the override is free to call it `item`.
+A positional-only parameter keeps its name out of the interface,
+and an override can then change the name.
