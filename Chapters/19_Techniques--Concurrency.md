@@ -1654,7 +1654,7 @@ and it wakes the instant `put()` adds an item, with no polling in between.
 This listing's queue already holds every job by the time `consume()` starts,
 so its first `get()` returns immediately,
 but the same code runs unchanged whether the queue is empty or already stocked.
-The [Object Pool](15_Techniques--Context_Managers.md#an-empty-pool-blocks-the-caller)
+The [*Object Pool*](15_Techniques--Context_Managers.md#an-empty-pool-blocks-the-caller)
 in Context Managers uses the same `Queue` as a throttle.
 
 A consumer parked in `get()` still needs a way to stop.
