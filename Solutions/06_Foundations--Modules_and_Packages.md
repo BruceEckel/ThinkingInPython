@@ -2,8 +2,17 @@
 
 ## 1. A fourth module, imported three ways
 
+The package's `__init__.py` is the chapter's:
+
+```python
+# a_package/__init__.py
+
+print("initializing a_package")
+```
+
 ```python
 # a_package/module5.py
+
 print("importing module5 in a_package")
 
 def function5():
@@ -16,29 +25,33 @@ import a_package.module5
 from a_package import module5
 from a_package.module5 import function5
 
-print(a_package.module5.function5())
-print(module5.function5())
-print(function5())
+#: initializing a_package
 #: importing module5 in a_package
+print(a_package.module5.function5())
 #: function5 in module5 in a_package
+print(module5.function5())
 #: function5 in module5 in a_package
+print(function5())
 #: function5 in module5 in a_package
 ```
 
 The `"importing module5..."` message prints only once, no matter how
 many of the three import styles you combine. Python caches every
 module in `sys.modules` on its first import, keyed by the module's
-full dotted name. A later `import` of the same module, by any
-of these spellings, finds the cached module and skips running its
-top-level code again. It only binds a name to the module already in
-the cache.
-
-These markers come from an `a_package` with no `__init__.py`, which
-makes it a namespace package. The chapter's `a_package` carries one
-that prints `initializing a_package`, so that line arrives first when
-you add `module5.py` to the package you built there.
+full dotted name. A later `import` of the same module, in any of
+these forms, finds the cached module and skips running its top-level
+code again. It only binds a name to the module in the cache. The
+package's `__init__.py` runs once for the same reason.
 
 ## 2. A nested module, and a badly named package
+
+`b_package` keeps the chapter's `__init__.py` too:
+
+```python
+# a_package/b_package/__init__.py
+
+print("initializing b_package")
+```
 
 ```python
 # a_package/b_package/module6.py
@@ -54,32 +67,31 @@ def function6():
 # use_module6.py
 from a_package.b_package.module6 import function6
 
-print(function6())
+#: initializing a_package
+#: initializing b_package
 #: importing module5 in a_package
 #: importing module6 in b_package
+print(function6())
 #: function6 calls function5 in module5 in a_package
 ```
 
-`module5` loads before `module6` finishes loading, because `module6`'s
-own import runs while its body is executing. Both loading messages
+Python initializes both packages before it runs `module6`. `module5`
+then loads before `module6` finishes loading, because `module6`'s
+own import runs while its body is executing. All four messages
 therefore print before the script's own `print()` runs.
 The import crosses a package boundary, from `b_package` up to
 `a_package`, so the absolute form is the right choice here. The
 relative equivalent, `from ..module5 import function5`, works too.
 Prefer that form only for siblings within one package.
 
-These markers again come from packages with no `__init__.py`. Against
-the chapter's packages, the `initializing a_package` and
-`initializing b_package` lines print ahead of the two loading
-messages.
-
 After you rename the directory to `bPackage` and update the import to
 `a_package.bPackage.module6`, the script still runs. Python accepts
-any valid identifier as a package name. The rename costs everything
-the convention buys.
+any valid identifier as a package name. The rename gives up what
+the convention provides.
 [File Names](../Chapters/06_Foundations--Modules_and_Packages.md#file-names) calls
-for short, all-lowercase package names, so `bPackage` reads as a class
-to anyone scanning an import line. Its capital letter also adds a
+for short, all-lowercase package names, so `bPackage` stands out as
+something other than a package to anyone scanning an import line.
+Its capital letter also adds a
 spelling to get wrong: on a case-insensitive filesystem the shell and
 the editor accept `bpackage` as well, and only Python's case-sensitive
 import check, the one exercise 4 examines, rejects that spelling.
@@ -88,6 +100,7 @@ import check, the one exercise 4 examines, rejects that spelling.
 
 ```python
 # noisy.py
+
 print("noisy module loaded")
 
 def announce():
@@ -96,6 +109,7 @@ def announce():
 
 ```python
 # noisy2.py
+
 print("noisy2 module loaded")
 
 def announce():
@@ -108,23 +122,23 @@ lazy import noisy
 lazy import noisy2
 
 print("before any use")
-noisy2.announce()
-print("between")
-noisy.announce()
-print("after both")
 #: before any use
+noisy2.announce()
 #: noisy2 module loaded
 #: noisy2.announce() called
+print("between")
 #: between
+noisy.announce()
 #: noisy module loaded
 #: noisy.announce() called
+print("after both")
 #: after both
 ```
 
 Even though the `lazy import noisy` line comes first, `noisy`'s body
 does not run until `noisy.announce()` executes, and that call comes
 after `noisy2.announce()`. Each `lazy import` only reserves the name.
-The module's top-level code runs at the first genuine use of that
+The module's top-level code runs at the first use of that
 name, so use order, not declaration order, decides which module loads
 first.
 
@@ -134,13 +148,15 @@ The `import Module` statement resolves, because the name and the file
 agree, and the call in the body becomes `Module.useful_function()` to
 match; left as `module.useful_function()`, it raises a `NameError`.
 Changing the import back to `import module` while the file is still
-`Module.py` raises `ModuleNotFoundError: No module named 'module'`,
-and it does so on every platform, Windows and macOS included.
+`Module.py` raises
+`ModuleNotFoundError: No module named 'module'. Did you mean: 'Module'?`,
+and it does so on every platform, Windows and macOS included. The
+suggestion shows that Python found the file and declined it.
 
 The failure on Windows and macOS is the surprising part. Windows's
 NTFS and macOS's default filesystem both open `module.py` and
-`Module.py` as the same file, so the filesystem would happily hand
-Python the file under either spelling. Python declines to accept it.
+`Module.py` as the same file, so the filesystem would hand Python
+the file under either spelling. Python declines to accept it.
 Its import machinery reads the directory listing and compares the
 module name against the name on disk case-sensitively, so
 `"module" + ".py"` does not match the stored `Module.py` and the
@@ -157,7 +173,7 @@ own machine.
 Setting `PYTHONCASEOK` in the environment turns the check off on a
 case-insensitive platform, and `import module` then finds `Module.py`.
 The variable exists for legacy code. New code should leave it unset.
-That the switch exists at all confirms the check is Python's rather
+The existence of the switch confirms the check is Python's rather
 than the filesystem's.
 
 None of this arises if you follow the convention.
@@ -169,7 +185,7 @@ only one spelling for the check to match.
 
 Changing `a_package/module4.py` to
 `from a_package.module1 import function1` leaves `use_module4.py`
-working exactly as before. Both forms find the same function. They
+working as before. Both forms find the same function. They
 differ only in how they name it.
 
 Running the module directly fails either way, with different errors.
@@ -240,3 +256,40 @@ surface back to the two listed names. The two rules compose in one
 direction only: `__all__` can export an underscored name, but without
 `__all__` an underscore is the only way to keep a name out of a star
 import.
+
+## 7. A `from` import shares the object, not the name
+
+```python
+# plugin_list.py
+
+plugins = []
+```
+
+```python
+# exercise_7.py
+import plugin_list
+from plugin_list import plugins
+
+plugin_list.plugins.append("spell check")
+print(plugins)
+#: ['spell check']
+print(plugins is plugin_list.plugins)
+#: True
+plugin_list.plugins = []
+plugin_list.plugins.append("word count")
+print(plugins, plugin_list.plugins)
+#: ['spell check'] ['word count']
+print(plugins is plugin_list.plugins)
+#: False
+```
+
+`from plugin_list import plugins` binds the script's `plugins` to the
+list the module's name refers to, so at first the two names share one
+object. Appending changes that object, and both names show the new
+item. The assignment `plugin_list.plugins = []` rebinds the module's
+name to a second list and leaves the script's name on the first, so
+the second `append()` reaches a list the script's `plugins` does not
+refer to. This is `from_snapshot.py` with a mutable value: the
+`from` import takes no copy, and it does not follow the module's
+name when that name moves. When a module's list or dict can be
+replaced, import the module and read `plugin_list.plugins` each time.

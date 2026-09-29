@@ -3,14 +3,14 @@ lazy import noisy
 lazy import noisy2
 
 print("before any use")
-noisy2.announce()
-print("between")
-noisy.announce()
-print("after both")
 #: before any use
+noisy2.announce()
 #: noisy2 module loaded
 #: noisy2.announce() called
+print("between")
 #: between
+noisy.announce()
 #: noisy module loaded
 #: noisy.announce() called
+print("after both")
 #: after both

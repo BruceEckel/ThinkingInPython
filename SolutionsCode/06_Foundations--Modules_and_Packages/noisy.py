@@ -1,4 +1,5 @@
 # noisy.py
+
 print("noisy module loaded")
 
 def announce():

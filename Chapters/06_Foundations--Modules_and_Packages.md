@@ -4,8 +4,8 @@
 > and the pieces must find each other by name.
 
 Each Python file is a *module* you can `import` into another Python file.
-If the file is in the same directory,
-you can use an unqualified `import` statement:
+If the file is in the same directory, you import it by its file name,
+without the `.py` ([`PYTHONPATH`](#pythonpath) covers where else Python looks):
 
 ```python
 # module.py
@@ -26,8 +26,8 @@ if __name__ == "__main__":
 #: I'm being useful!
 ```
 
-Importing a module makes its *namespace* reachable in the importing file,
-under the module's name.
+Importing a module makes its *namespace*, the set of names the module defines,
+reachable in the importing file under the module's name.
 Reaching those names through the module's name keeps them from clashing with the local ones.
 To call `useful_function()`, you must *qualify* it with the name of the module:
 `module.useful_function()`.
@@ -101,8 +101,10 @@ if __name__ == "__main__":
 #: I'm being useful!
 ```
 
-`from` copies the name's current value into this file rather than linking to it.
-Rebinding the name in the module afterward does not reach the copy:
+`from` works like an assignment:
+it binds a name in this file to the object the module's name refers to at that moment.
+The two names are separate,
+so rebinding the module's name afterward leaves this file's name as it was:
 
 ```python
 # app_settings.py
@@ -147,8 +149,8 @@ if __name__ == "__main__":
 ## The Module Namespace
 
 A module's namespace is an ordinary dict you can read and write.
-`globals()` returns it as a mutable `dict`,
-the same dict Python already searches when it looks up a top-level name.
+`globals()` returns it,
+the same dict Python searches when it looks up a top-level name.
 A dotted name reads that same dict:
 `module.__dict__` from outside is the same object `globals()` returns inside `module`,
 so `module.useful_function()` and a top-level lookup inside `module.py` find the same function.
@@ -242,7 +244,7 @@ Loading `module1` also stores that submodule as an attribute of `a_package`,
 so `a_package.module1.function1()` resolves.
 The shorter `module1.function1()` fails here,
 since nothing binds `module1` in this file; it works in `from_packages.py`,
-where `from` binds `module1` directly.
+below, where `from` binds `module1` directly.
 
 Importing the package alone does not import what is inside it:
 
@@ -294,7 +296,7 @@ print(function2())
 
 `no_qualification.py`, `from_packages.py`,
 and `using_packages.py` print the same loading messages,
-because `from` loads exactly what `import` loads.
+because `from` loads what `import` loads.
 The whole module runs either way.
 The statement decides only which names this file binds.
 
@@ -374,20 +376,25 @@ so a `from` import in the second finds a partially initialized module and fails 
 A plain `import` of that same module succeeds at this point,
 since it only needs the module to exist in `sys.modules`,
 not to have finished running.
-That wording appears when the module's file comes from anywhere but the directory of the script you ran.
+The failure then surfaces later, as an `AttributeError`,
+wherever the code first uses a name the module has not defined yet.
+
+The "circular import" wording appears when the module's file comes from anywhere but the directory of the script you ran,
+which includes every module inside a package.
 When the file sits in that directory (`sys.path[0]`),
 the usual case for two modules beside your script,
 Python suspects a name collision with a library instead of a cycle:
 `ImportError: cannot import name 'f' from 'modx' (consider renaming '.../modx.py' if it has the same name as a library you intended to import)`.
 Python names the offending file by its full path, abbreviated here as `...`.
-With a plain `import`, the failure surfaces later,
-wherever the code first uses a name the module has not defined yet.
 
 A cycle is a design signal:
 move the shared piece into a third module both can import.
 When the cycle exists only in annotations,
-an `if TYPE_CHECKING:` import breaks it,
-because Python does not evaluate annotations at import time.
+an `if TYPE_CHECKING:` import breaks it.
+`typing.TYPE_CHECKING` is `False` at runtime,
+so the import under it runs for the type checker alone.
+The annotations still work at runtime,
+because Python does not evaluate them at import time.
 [A robot in a maze](38_Patterns--Simulation.md#rooms-robots-and-the-item-factory)
 imports `Room` that way, and every use of the name is an annotation.
 
@@ -399,6 +406,7 @@ A module states its boundary by convention and by one optional list.
 
 A leading underscore marks a name as internal.
 It is a signal to a reader rather than a barrier.
+For a module `accounting` that defines `_Engine`,
 `accounting._Engine` still resolves,
 and `from accounting import _Engine` still works.
 The underscore changes one mechanical thing:
@@ -408,7 +416,7 @@ The underscore changes one mechanical thing:
 You assign it at module level as a list of strings naming the public names,
 and `from module import *` then imports those names and no others.
 A name listed in `__all__` arrives even when it begins with an underscore.
-An `__all__` also gathers the intended surface into one readable place,
+An `__all__` also gathers the public names into one readable place,
 and documentation tools read it to report what a module offers.
 
 ```python
@@ -441,6 +449,11 @@ Without `__all__`, the star import binds `public`, `helper`, and `undeclared`:
 everything not underscored.
 With it, only the listed names arrive,
 and the star import skips `_internal` either way.
+
+The `# noqa: F403` silences the linter's objection to the star import,
+which hides where each name comes from, from a reader and from the tools.
+Name what you import,
+and keep the star for experiments at the interactive prompt.
 
 Neither the underscore nor `__all__` stops `module._name`.
 Both say which names a caller should use,
@@ -506,9 +519,10 @@ so a local `random.py` can no longer shadow the standard library.
 What if your module or package isn't in the same directory as the Python file that imports it?
 The original solution was the `PYTHONPATH` environment variable,
 which tells Python where to look for modules and packages.
-`PYTHONPATH` takes multiple paths.
-Python searches them in order and uses the first one that holds your module or package,
-and raises a `ModuleNotFoundError` when none of them does.
+`PYTHONPATH` takes multiple paths,
+which Python adds to `sys.path` in the order given.
+Python searches `sys.path` from the front and uses the first directory that holds your module or package.
+It raises a `ModuleNotFoundError` when no directory does.
 
 `PYTHONPATH` still works,
 but today you install your package into the environment you use,
@@ -545,7 +559,7 @@ print(Path("report/data.txt").suffix)
 
 A `lazy import` looks like an ordinary one, with `lazy` in front,
 and once loaded the names behave like eagerly imported ones.
-`json` and `pathlib` load at the `json.dumps` and `Path(...)` calls.
+`json` and `pathlib` load at the `json.dumps()` and `Path(...)` calls.
 The output is the same either way, so this listing cannot show the deferral;
 the next one does.
 
@@ -562,7 +576,7 @@ Packages deferred submodule loading before `lazy import` existed,
 by giving `__init__.py` a module-level `__getattr__`
 ([PEP 562](https://peps.python.org/pep-0562/))
 that imports and returns a submodule the first time a caller asks for it by name.
-The pandas and numpy packages use that technique to keep import time low.
+NumPy and SciPy use that technique to keep import time low.
 `lazy import` needs no hand-written `__getattr__`, and defers any imported name,
 not only a package's submodules.
 The `__getattr__` pattern still matters for code that must run on a Python older than 3.15.
@@ -599,7 +613,7 @@ so `noisy module loaded` prints after `before first use`.
 If a lazily imported module is missing or broken,
 the error surfaces at that first use rather than at the import line.
 `sys.lazy_modules` holds the names still waiting to load,
-but CPython's own interpreter startup adds lazy imports of its own to that set before your code marks anything lazy:
+but the standard-library modules CPython loads at startup put lazy imports of their own into that set before your code runs:
 
 ```python
 # lazy_modules_check.py
@@ -617,7 +631,7 @@ print("noisy" in sys.lazy_modules)
 #: False
 ```
 
-The set already holds more than one name before this script marks `noisy` lazy,
+This script marks one import lazy and the set holds more than one name,
 so `sys.lazy_modules` is not a clean "what my program deferred" list.
 `noisy` leaves the set once `noisy.announce()` loads it,
 so the set tracks only names still waiting,
@@ -629,7 +643,7 @@ Check it for a specific name you marked lazy, rather than reading the whole set.
 `lazy` works with both `import` and `from ... import`, but only at module scope.
 Using it inside a function, a class body, or a `try` block is a `SyntaxError`,
 and Python likewise rejects `lazy from module import *` and a `lazy from __future__` import.
-To change the setting for a whole run without editing source,
+To change which imports are lazy for a whole run without editing source,
 run with `-X lazy_imports=MODE` or set `PYTHON_LAZY_IMPORTS=MODE`.
 Both accept one of two values.
 `normal`, the default, defers only the imports you marked `lazy`.
@@ -684,3 +698,9 @@ including the ones whose only purpose is to run the module.
 6.  Remove the `__all__` line from `exporting.py`.
     Predict what `star_import.py` prints without it, run it to check,
     then restore the line.
+7.  Give a module a top-level list, `plugins = []`,
+    and bring the list into a script with `from ... import plugins`.
+    Append to the list through the module's name,
+    then print the script's `plugins`.
+    Rebind the module's name to a new list, append to that one, and print both.
+    Explain why the first change reaches the script's name and the second does not.
