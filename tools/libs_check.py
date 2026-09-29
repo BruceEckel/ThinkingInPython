@@ -1,5 +1,4 @@
-#!/usr/bin/env python
-"""Compare the book's libraries, as locked, with the latest on PyPI.
+"""Read locked versions from uv.lock and the latest releases from PyPI.
 
 The dev group holds two kinds of package. The tools (`ty`, `ruff`,
 `pytest`) check the listings. The libraries are what the listings
@@ -9,24 +8,18 @@ can. Stateless is the heavy case: 88 listings import it, and chapters
 46 and 47 describe its API in prose.
 
 `tip tools-upgrade` moves the libraries along with the tools
-(`uv lock --upgrade` upgrades everything), but nothing says when a
-library has a release waiting. This does, and changes nothing:
+(`uv lock --upgrade` upgrades everything). `tip tools-status`
+(`tool_stamp.py`) uses this module to say when a release is waiting,
+for the libraries and for the tools. A library that is behind is
+upgraded alone with `uv lock --upgrade-package NAME` and `uv sync`, so
+a failure afterward has one cause. The `tool-upgrade` skill's
+Stateless-upgrade entry lists what to re-check.
 
-    stateless      0.6.1     latest 0.7.0   behind
-    numpy          2.5.3     latest 2.5.3
-
-A library that is behind is upgraded alone with
-`uv lock --upgrade-package NAME` and `uv sync`, so a failure afterward
-has one cause. The `tool-upgrade` skill's Stateless-upgrade entry
-lists what to re-check.
-
-It always exits 0. It answers a question, and an offline machine or a
-PyPI outage must not fail `tip verify-targets`, which runs every
-documented target. It belongs to no gate: a gate that reaches the
-network fails for reasons the book did not cause.
-
-Usage:
-    python -m tools.libs_check
+Nothing here raises an exception when PyPI is unreachable: a lookup
+returns None, and the report says "latest unknown". An offline
+machine must not fail `tip verify-targets`, which runs every
+documented target, and no gate uses this module, since a gate that
+reaches the network fails for reasons the book did not cause.
 """
 import json
 import tomllib
@@ -95,23 +88,3 @@ def note(version: str, newest: str | None) -> str:
     if newest == version:
         return f"latest {newest}"
     return f"latest {newest}   behind"
-
-
-def main() -> int:
-    locked = current()
-    if not locked:
-        print(f"No libraries found in {LOCK.name}.")
-        return 0
-    found = rows(locked)
-    for name, version, newest in found:
-        print(f"{name:<14} {version:<9} {note(version, newest)}")
-    behind = [name for name, version, newest in found
-              if newest is not None and newest != version]
-    if behind:
-        print("Upgrade one alone: `uv lock --upgrade-package NAME` then "
-              "`uv sync`, then `tip sweep`.")
-    return 0
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())

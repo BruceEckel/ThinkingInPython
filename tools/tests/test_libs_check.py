@@ -1,8 +1,10 @@
-"""Tests for tools/libs_check.py and the library half of tool_stamp.py.
+"""Tests for tools/libs_check.py and the PyPI half of tool_stamp.py.
 
-`libs_check` reads uv.lock and asks PyPI for each library's latest
-release. These tests never reach the network: `rows()` takes the lookup
-as an argument, and the one test of `pypi_latest()` stubs `urlopen`.
+`libs_check` reads uv.lock and asks PyPI for each package's latest
+release; `tip tools-status` reports the comparison. These tests never
+reach the network: `rows()` takes the lookup as an argument, the tests
+of `pypi_latest()` stub `urlopen`, and the report's test stubs
+`pypi_latest()` and `uv_version()`.
 """
 import io
 import urllib.error
@@ -59,23 +61,6 @@ def test_pypi_latest_is_none_when_pypi_is_unreachable(
         raise urllib.error.URLError("no route")
     monkeypatch.setattr(libs_check.urllib.request, "urlopen", offline)
     assert libs_check.pypi_latest("stateless") is None
-
-
-def test_main_reports_behind_and_unknown_and_still_exits_zero(
-        monkeypatch: pytest.MonkeyPatch,
-        capsys: pytest.CaptureFixture[str]) -> None:
-    monkeypatch.setattr(
-        libs_check, "current", lambda: libs_check.locked_versions(LOCK))
-    latest = {"stateless": "0.7.0"}
-    monkeypatch.setattr(libs_check, "pypi_latest", latest.get)
-    monkeypatch.setattr(
-        libs_check, "rows",
-        lambda locked: [(n, v, latest.get(n)) for n, v in locked.items()])
-    assert libs_check.main() == 0
-    out = capsys.readouterr().out
-    assert "stateless" in out and "latest 0.7.0   behind" in out
-    assert "latest unknown" in out
-    assert "--upgrade-package" in out
 
 
 def test_locked_versions_reads_any_named_package() -> None:

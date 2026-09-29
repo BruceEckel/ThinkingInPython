@@ -127,9 +127,9 @@ Moved from `CLAUDE.md`, which keeps the rule that you never start an upgrade you
   time-machine) sit in the same dev group as the tools, so
   `tip tools-upgrade` moves them along with `ty` (`uv lock --upgrade`
   upgrades everything), and their constraints are floors. `tip
-  libs-check` (read-only, no gate) says when a release is waiting;
-  `tip tools-status` does the same for uv and the tools too, and notes
-  a library that moved since the last stamp. Stateless was 0.6.1 on 2026-09-17, the
+  tools-status` (read-only, no gate) says when a release is waiting,
+  for them and for uv and the tools, and notes a library that moved
+  since the last stamp. Stateless was 0.6.1 on 2026-09-17, the
   newest on PyPI since 2025-11-11; work on its repository that has no
   release is invisible to uv, and the book does not track it, because a
   reader installs the PyPI release.

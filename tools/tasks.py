@@ -793,7 +793,7 @@ def ci(v: Vars) -> None:
     invoke("site", v)
 
 
-also("kindle", "libs-check", "tools-status")
+also("kindle", "tools-status")
 
 
 section("Style gates")
@@ -1246,7 +1246,7 @@ def code_width(v: Vars) -> None:
        *v.words("ARGS"), "Chapters", "Solutions")
 
 
-also("pyright-review", "libs-check", "gate-status", "tools-status")
+also("pyright-review", "gate-status", "tools-status")
 
 
 section("Setup and upgrades")
@@ -1323,21 +1323,6 @@ def tools_status(v: Vars) -> None:
     treated as current.
     """
     py("tools.tool_stamp")
-
-
-@task("Compare the locked library versions (Stateless, numpy, ...) with"
-      " the latest on PyPI")
-def libs_check(v: Vars) -> None:
-    """Is a release waiting for a library the listings import (Stateless,
-    numpy, hypothesis, time-machine)? Reads uv.lock, asks PyPI for each
-    one's latest version, and prints the ones that are behind. It changes
-    nothing and always exits 0, offline included, and it joins no gate: a
-    gate that reaches the network fails for reasons the book did not
-    cause. Upgrade one library alone with `uv lock --upgrade-package NAME`
-    and `uv sync`; CLAUDE.md's Stateless-upgrade entry says what to
-    re-check afterward.
-    """
-    py("tools.libs_check")
 
 
 @task("Update uv, the uv-managed dev tools, and (best-effort) global "

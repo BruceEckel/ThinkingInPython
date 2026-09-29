@@ -45,7 +45,6 @@ fix-state-machine-figure	quick
 footnotes	quick
 gate	long
 gate-status	quick
-libs-check	quick
 lint	quick
 listings	quick
 output	normal
