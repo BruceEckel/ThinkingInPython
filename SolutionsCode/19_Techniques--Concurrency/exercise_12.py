@@ -1,8 +1,8 @@
 # exercise_12.py
 import os
-import sys
 import timeit
 from concurrent.futures import ThreadPoolExecutor
+from benchmark import report
 
 def cpu_price(order: int) -> int:
     total = 0
@@ -24,9 +24,7 @@ with ThreadPoolExecutor() as pool:
     )
 
 cores = os.cpu_count() or 1
-# The chapter's scaled target
-target = min(1.5, cores * 0.7)
-if "--numbers" in sys.argv:  # Exact times on your machine
-    print(f"sequential {t_seq:.6f}, threaded {t_thr:.6f}")
+target = min(1.5, cores * 0.7)  # Two cores cannot give 1.5x
+report(sequential=t_seq, threads=t_thr, cores=cores)
 print(f"threads run in parallel: {t_seq > t_thr * target}")
 #: threads run in parallel: False

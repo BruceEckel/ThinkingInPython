@@ -2,13 +2,13 @@
 import asyncio
 import time
 
-async def fetch(item, delay):
+async def fetch(item: str, delay: float) -> str:
     print(f"{item}: started")
     await asyncio.sleep(delay)
     print(f"{item}: resumed")
     return item.upper()
 
-async def main():
+async def main() -> None:
     coroutines = [fetch("a", 0.03), fetch("b", 0.02),
                   fetch("c", 0.01)]
     start = time.perf_counter()

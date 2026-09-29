@@ -6,13 +6,13 @@
 # exercise_1.py
 import asyncio
 
-async def fetch(item, delay):
+async def fetch(item: str, delay: float) -> str:
     print(f"{item}: started")
     await asyncio.sleep(delay)
     print(f"{item}: resumed")
     return item.upper()
 
-async def main():
+async def main() -> None:
     results = await asyncio.gather(
         fetch("a", 0.03), fetch("b", 0.02),
         fetch("c", 0.01), fetch("d", 0.005))
@@ -46,13 +46,13 @@ in the list even though `d` finished first.
 import asyncio
 import time
 
-async def fetch(item, delay):
+async def fetch(item: str, delay: float) -> str:
     print(f"{item}: started")
     await asyncio.sleep(delay)
     print(f"{item}: resumed")
     return item.upper()
 
-async def main():
+async def main() -> None:
     coroutines = [fetch("a", 0.03), fetch("b", 0.02),
                   fetch("c", 0.01)]
     start = time.perf_counter()
@@ -91,6 +91,7 @@ builds a coroutine object and starts nothing. Only `gather()` or a
 ```python
 # exercise_3.py
 import asyncio
+from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
 
 @dataclass
@@ -98,14 +99,15 @@ class Meter:
     active: int = 0
     peak: int = 0
 
-    def __enter__(self):
+    def __enter__(self) -> None:
         self.active += 1
         self.peak = max(self.peak, self.active)
 
-    def __exit__(self, exc_type, exc, tb):
+    def __exit__(self, exc_type: object, exc: object,
+                 tb: object) -> None:
         self.active -= 1
 
-async def mixed_price(order, meter):
+async def mixed_price(order: int, meter: Meter) -> int:
     with meter:
         # Waiting, off the processor
         await asyncio.sleep(0.05)
@@ -115,13 +117,16 @@ async def mixed_price(order, meter):
             total += 1
     return order * 10
 
-async def run(price_task, orders):
+type PriceTask = Callable[[int, Meter], Awaitable[int]]
+
+async def run(price_task: PriceTask,
+              orders: list[int]) -> tuple[list[int], int]:
     meter = Meter()
     coroutines = [price_task(o, meter) for o in orders]
     prices = await asyncio.gather(*coroutines)
     return prices, meter.peak
 
-async def main():
+async def main() -> None:
     prices, peak = await run(mixed_price, [1, 2, 3, 4, 5])
     print(f"mixed peak={peak}, prices={prices}")
 
@@ -147,6 +152,7 @@ span, not on where it sits relative to the computation.
 # exercise_4.py
 import asyncio
 import time
+from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
 
 @dataclass
@@ -154,25 +160,29 @@ class Meter:
     active: int = 0
     peak: int = 0
 
-    def __enter__(self):
+    def __enter__(self) -> None:
         self.active += 1
         self.peak = max(self.peak, self.active)
 
-    def __exit__(self, exc_type, exc, tb):
+    def __exit__(self, exc_type: object, exc: object,
+                 tb: object) -> None:
         self.active -= 1
 
-async def io_price(order, meter):
+async def io_price(order: int, meter: Meter) -> int:
     with meter:
         time.sleep(0.05)  # Blocking, and never awaited
     return order * 10
 
-async def run(price_task, orders):
+type PriceTask = Callable[[int, Meter], Awaitable[int]]
+
+async def run(price_task: PriceTask,
+              orders: list[int]) -> tuple[list[int], int]:
     meter = Meter()
     coroutines = [price_task(o, meter) for o in orders]
     prices = await asyncio.gather(*coroutines)
     return prices, meter.peak
 
-async def main():
+async def main() -> None:
     prices, peak = await run(io_price, [1, 2, 3, 4, 5])
     print(f"blocking peak={peak}, prices={prices}")
 
@@ -181,9 +191,9 @@ asyncio.run(main())
 ```
 
 The peak falls from `5` to `1`, the same figure the CPU-bound version
-produced. `time.sleep()` is where `blocking_the_loop.py`'s lesson lands:
-it stops the thread instead of suspending the task, and the event loop
-runs on that thread. A coroutine that never awaits never gives the loop
+produced. `time.sleep()` does here what it does in
+`blocking_the_loop.py`: it stops the thread instead of suspending the
+task, and the event loop runs on that thread. A coroutine that never awaits never gives the loop
 a chance to start another task, so each task runs start to finish
 before the next begins.
 
@@ -203,7 +213,7 @@ import asyncio
 counter = 0
 semaphore = asyncio.Semaphore(1)
 
-async def increment(count):
+async def increment(count: int) -> None:
     global counter
     for _ in range(count):
         async with semaphore:
@@ -211,7 +221,7 @@ async def increment(count):
             await asyncio.sleep(0)
             counter = value + 1
 
-async def main():
+async def main() -> None:
     await asyncio.gather(*(increment(50) for _ in range(8)))
     print(counter)
 
@@ -223,8 +233,8 @@ A semaphore holds a count of how many holders it admits at once, and
 `async with` decrements that count on the way in and restores it on the
 way out. With the count initialized to `1`, the first task through
 exhausts it, so every other task suspends at `async with` until that
-task leaves. Only one read-modify-write runs at a time, exactly as with
-`asyncio.Lock`, and all 400 increments land.
+task leaves. Only one read-modify-write runs at a time, as with
+`asyncio.Lock`, and all 400 increments survive.
 
 The equivalence is only as good as the count. If you add one stray
 release before the tasks start, the semaphore admits two holders
@@ -237,7 +247,7 @@ import asyncio
 counter = 0
 semaphore = asyncio.Semaphore(1)
 
-async def increment(count):
+async def increment(count: int) -> None:
     global counter
     for _ in range(count):
         async with semaphore:
@@ -245,7 +255,7 @@ async def increment(count):
             await asyncio.sleep(0)
             counter = value + 1
 
-async def main():
+async def main() -> None:
     semaphore.release()  # Nothing was acquired
     await asyncio.gather(*(increment(50) for _ in range(8)))
     print(counter)
@@ -257,13 +267,16 @@ asyncio.run(main())
 Exactly half the increments survive. Two tasks now sit inside the
 critical section together, both reading `counter` before either writes,
 so each pair of increments collapses into one. The semaphore reports
-no error, because raising the limit is exactly what `release()` does.
+no error, because `release()` adds one to the count whether or not an
+`acquire()` came first.
 
 That silence is the difference between the two objects. `asyncio.Lock`
 refuses a release it never granted, raising `RuntimeError: Lock is not
-acquired.` A semaphore has no such notion of ownership, so the same
-mistake silently widens the gate and reintroduces the race the lock is
-there to prevent.
+acquired.` A semaphore does not track what it granted, so the same
+mistake silently admits a second holder and reintroduces the race the
+lock is there to prevent. `asyncio.BoundedSemaphore(1)` is the
+semaphore that objects: the stray `release()` raises
+`ValueError: BoundedSemaphore released too many times`.
 
 ## 6. Removing the `__main__` guard
 
@@ -304,9 +317,9 @@ The error is a guard rail rather than the real failure. Python detects
 that a child process is spawning children during its own bootstrap and
 refuses to start them, instead of letting the recursion consume the
 machine. The `if __name__ == "__main__"` line prevents that recursion.
-A spawned worker imports the module under its real name,
-`parallel_cpu`, rather than `"__main__"`, so the child skips the
-pool-building code and only the process you launched runs it.
+A worker runs the module under the name `"__mp_main__"` rather
+than `"__main__"`, so the child skips the pool-building code and only
+the process you launched runs it.
 
 The whole failure is a start-method problem. On a platform using
 `fork`, the child inherits the parent's memory instead of importing the
@@ -318,71 +331,76 @@ platform's default therefore requires the guard.
 ## 7. Removing the `sleep` from `gil_race.py`
 
 ```python
-import threading
+# exercise_7.py
+from concurrent.futures import ThreadPoolExecutor
 
 counter = 0
 
-def increment(count):
+def increment(count: int) -> None:
     global counter
     for _ in range(count):
-        value = counter   # Read
+        value = counter  # Read
         # Write back, with nothing in between
         counter = value + 1
 
-threads = [threading.Thread(target=increment, args=(50,))
-           for _ in range(8)]
-for t in threads:
-    t.start()
-for t in threads:
-    t.join()
-print(counter, counter == 400)
+with ThreadPoolExecutor(max_workers=8) as pool:
+    list(pool.map(increment, [50] * 8))
+print(f"lost updates: {counter < 8 * 50}")
+#: lost updates: False
 ```
 
-Running this repeatedly on CPython 3.10 or later prints `400 True`
-every time. Since 3.10, the interpreter only considers switching
-threads at a function call or at the jump that closes a loop
-iteration. With the `time.sleep()` call removed, the read and the
+Running this repeatedly on the standard build prints
+`lost updates: False` every time. Since 3.10, the interpreter
+considers switching threads only at a function call or at the jump
+that closes a loop iteration. With the `time.sleep()` call removed, the read and the
 write run back to back, with no function call between them, so the
 interpreter finds no scheduling point at which to hand the GIL to
 another thread mid-sequence. That reliability is luck rather than a
 guarantee: the race stays invisible only because this interpreter
-happens to place its switch points elsewhere. Put any function call
-back between the read and the write, a blocking I/O call, a `print()`,
-even an innocuous-looking helper, and the same gap reopens, because
-`counter += 1`'s underlying bytecode sequence never became atomic. The
-fix is still a lock, not the absence of an explicit sleep.
+places its switch points elsewhere. Any function call put back
+between the read and the write, a blocking I/O call, a `print()`, or
+an innocuous-looking helper, reopens the same gap, because the
+read-modify-write sequence never became atomic. A free-threaded
+interpreter has no GIL to hold through the sequence, so there the race
+needs no function call. The fix is still a lock, not the absence of
+an explicit sleep.
 
 ## 8. A third thread submitting jobs
 
 ```python
 # exercise_8.py
-import threading
-from queue import PriorityQueue
+from concurrent.futures import ThreadPoolExecutor
+from queue import PriorityQueue, ShutDown
 
-tasks: PriorityQueue = PriorityQueue()
+type Job = tuple[int, str]  # (priority, description)
 
-def submit(jobs):
+tasks: PriorityQueue[Job] = PriorityQueue()
+
+def enqueue(jobs: list[Job]) -> None:
     for job in jobs:
         tasks.put(job)
 
-threads = [
-    threading.Thread(
-        target=submit,
-        args=([(3, "backup"), (1, "page oncall")],)),
-    threading.Thread(
-        target=submit,
-        args=([(2, "rotate logs"), (1, "alert")],)),
-    threading.Thread(
-        target=submit,
-        args=([(1, "zzz"), (3, "aaa")],)),
-]
-for t in threads:
-    t.start()
-for t in threads:
-    t.join()
+def consume() -> None:
+    while True:
+        try:
+            print(tasks.get())
+        except ShutDown:
+            return
 
-while not tasks.empty():
-    print(tasks.get())
+with ThreadPoolExecutor(max_workers=4) as pool:
+    producers = [
+        pool.submit(enqueue,
+                    [(3, "backup"), (1, "page oncall")]),
+        pool.submit(enqueue,
+                    [(2, "rotate logs"), (1, "alert")]),
+        pool.submit(enqueue,  # The third producer
+                    [(1, "zzz"), (3, "aaa")]),
+    ]
+    for p in producers:
+        p.result()  # Surface any producer failure
+    consumer = pool.submit(consume)
+    tasks.shutdown()
+    consumer.result()
 #: (1, 'alert')
 #: (1, 'page oncall')
 #: (1, 'zzz')
@@ -391,13 +409,16 @@ while not tasks.empty():
 #: (3, 'backup')
 ```
 
-The six jobs still arrive in an unpredictable interleaving from three
-racing threads, but `PriorityQueue` sorts strictly by the tuple's
-value. The drain order is therefore always priority first, `1` before
-`2` before `3`, then alphabetically by the description within a
-priority (the tuple's second field): `"alert"` before `"page oncall"`
-before `"zzz"`, and `"aaa"` before `"backup"`. Which thread happened to
-submit a job first never affects the final order.
+The changes are the third `pool.submit(enqueue, ...)` and
+`max_workers=4`, which gives the third producer a thread of its own.
+The six jobs arrive in an unpredictable interleaving from three racing
+threads, but `PriorityQueue` orders its items by comparing the tuples.
+The drain order is therefore always priority first, `1` before `2`
+before `3`, then alphabetically by the description within a priority
+(the tuple's second field): `"alert"` before `"page oncall"` before
+`"zzz"`, and `"aaa"` before `"backup"`. The thread that submits a job
+first has no effect on the final order, because `consume()` starts
+after all three producers finish.
 
 ## 9. A task that finishes before the failures land
 
@@ -497,30 +518,14 @@ that undoes it, so "already finished" still means "still reversible."
 ```python
 # exercise_10.py
 import asyncio
-from typing import Final
-
-PAIRS: Final[list[tuple[str, float]]] = [
-    ("a", 0.01),
-    ("b", 0.02),
-    ("c", 0.03),
-    ("d", 0.03),
-    ("e", 0.2),
-    ("f", 0.3),
-]
-
-async def fetch(item: str, delay: float) -> str:
-    print(f"{item}: started")
-    await asyncio.sleep(delay)
-    if item in ("c", "d"):
-        raise ValueError(f"fetch({item!r}) failed")
-    print(f"{item}: fetched")
-    return item.upper()
+from fetch_demo import PAIRS, fetch
 
 async def main() -> None:
+    t0 = asyncio.get_running_loop().time()
     try:
-        results = await asyncio.gather(
-            *(fetch(item, delay) for item, delay in PAIRS),
-        )
+        results = await asyncio.gather(*(
+            fetch(item, delay, t0)
+            for item, delay in PAIRS))
     except ValueError as e:
         print(f"gather raised {e!r}")
         return
@@ -540,8 +545,8 @@ asyncio.run(main())
 
 Two `fetched` lines print, `a` and `b`, the two whose timers fire
 before `c` fails at `0.03`. `e` and `f` never print one, and
-`print(results)` never runs, because the `await` raises instead of
-returning a value.
+`print(results)` never runs, because the `await` raises the
+`ValueError` instead of returning a value.
 
 Without `return_exceptions=True`, the first child exception propagates
 out of the `await` immediately, and `gather()` reports that one
@@ -607,25 +612,25 @@ and the original version's per-request identity disappears.
 The `after:` line changes too. In the chapter's version it prints
 `context -`, the default, because each `set()` happens inside a task's
 own copy and none of them can reach `main()`'s context. Here the
-`set()` is in `main()`, so it lands in `main()`'s own context and is
-still there once the group finishes. Copying runs one way: a child sees
+`set()` is in `main()`, so it writes to `main()`'s own context and the
+value is still there once the group finishes. Copying runs one way: a child sees
 what the parent had at creation, and the parent sees nothing a child
 did.
 
 `current` behaves as before, reaching `req-3` everywhere, which is the
 contrast the example exists to draw. A `global` is one cell shared by
 every task, so the last writer wins and the other two tasks read a
-value meant for someone else. A `ContextVar` is per-task storage that
-happens to be reachable by one name.
+value meant for someone else. A `ContextVar` is per-task storage
+reachable by one name.
 
 ## 12. Threads in place of subinterpreters
 
 ```python
 # exercise_12.py
 import os
-import sys
 import timeit
 from concurrent.futures import ThreadPoolExecutor
+from benchmark import report
 
 def cpu_price(order: int) -> int:
     total = 0
@@ -647,10 +652,8 @@ with ThreadPoolExecutor() as pool:
     )
 
 cores = os.cpu_count() or 1
-# The chapter's scaled target
-target = min(1.5, cores * 0.7)
-if "--numbers" in sys.argv:  # Exact times on your machine
-    print(f"sequential {t_seq:.6f}, threaded {t_thr:.6f}")
+target = min(1.5, cores * 0.7)  # Two cores cannot give 1.5x
+report(sequential=t_seq, threads=t_thr, cores=cores)
 print(f"threads run in parallel: {t_seq > t_thr * target}")
 #: threads run in parallel: False
 ```
@@ -667,7 +670,7 @@ The boolean flips because threads in one interpreter share one GIL.
 holds the GIL except at the interpreter's periodic switch points. Five
 such threads take turns on one processor and finish in about the time
 five sequential calls take, so `t_seq` and `t_thr` come out close
-together and `t_seq > t_thr * 1.5` is `False`.
+together and `t_seq > t_thr * target` is `False`.
 
 `InterpreterPoolExecutor` wins the same benchmark because each
 subinterpreter has its own GIL. The work spreads across processors
@@ -736,15 +739,14 @@ indented block. The `with lock:` inside the body therefore starts
 *after* `next()` has already returned a number, and ends before the
 next `next()` begins. Two threads can be inside `__next__()` at the
 same moment, read the same `next_number`, and come away with the same
-ticket, exactly as they do without the lock.
+ticket, as they do without the lock.
 
 The lock does cover `out.append(item)`, which never needs covering:
 `out` is a local list, one per worker, so no other thread can touch
 it.
 
 Serializing an iterator means putting the lock where the mutation is,
-inside `__next__()`, exactly where `threading.serialize_iterator()`
-puts it. The lesson generalizes past iterators: a lock protects the
+inside `__next__()`, where `threading.serialize_iterator()` puts it. The lesson generalizes past iterators: a lock protects the
 statements it encloses, and a `for` loop's own call to `next()` is not
 one of them.
 
@@ -788,14 +790,14 @@ twenty milliseconds rather than waiting out the half-second timeout.
 Follow who waits for whom. The first task takes `lock_a`, sleeps, then
 takes `lock_b`, which nobody holds. Meanwhile the second task reaches
 `async with lock_a` and suspends, because the first task has it. That
-is a wait, but a wait on a task that is not itself waiting on anything
-the second task holds. The first task finishes, releases both locks,
-and the second task walks the same path through an empty field.
+is a wait, but a wait on a task that is waiting on nothing the second
+task holds. The first task finishes and releases both locks, and the
+second task then takes each lock with no other task holding it.
 
 The deadlock version makes the waiting circular: task one holds
 `lock_a` and wants `lock_b`, task two holds `lock_b` and wants
 `lock_a`, so each task's progress depends on the other task's
-progress. A deadlock is exactly that cycle. Ordering the
+progress. A deadlock is that cycle. Ordering the
 acquisitions globally makes such a cycle impossible. A task can only
 ever wait on a lock that comes later in the order than every lock it
 already holds, and "later" never loops back to "earlier."
@@ -815,7 +817,7 @@ async def process_price(
 
     error[invalid-await]: `Future[int]` is not awaitable
 
-Running it anyway raises before any price comes back:
+Running it anyway raises a `TypeError` before any price comes back:
 
     + Exception Group Traceback (most recent call last):
       ...

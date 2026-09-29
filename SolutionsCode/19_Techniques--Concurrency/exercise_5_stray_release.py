@@ -4,7 +4,7 @@ import asyncio
 counter = 0
 semaphore = asyncio.Semaphore(1)
 
-async def increment(count):
+async def increment(count: int) -> None:
     global counter
     for _ in range(count):
         async with semaphore:
@@ -12,7 +12,7 @@ async def increment(count):
             await asyncio.sleep(0)
             counter = value + 1
 
-async def main():
+async def main() -> None:
     semaphore.release()  # Nothing was acquired
     await asyncio.gather(*(increment(50) for _ in range(8)))
     print(counter)

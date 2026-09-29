@@ -1,29 +1,13 @@
 # exercise_10.py
 import asyncio
-from typing import Final
-
-PAIRS: Final[list[tuple[str, float]]] = [
-    ("a", 0.01),
-    ("b", 0.02),
-    ("c", 0.03),
-    ("d", 0.03),
-    ("e", 0.2),
-    ("f", 0.3),
-]
-
-async def fetch(item: str, delay: float) -> str:
-    print(f"{item}: started")
-    await asyncio.sleep(delay)
-    if item in ("c", "d"):
-        raise ValueError(f"fetch({item!r}) failed")
-    print(f"{item}: fetched")
-    return item.upper()
+from fetch_demo import PAIRS, fetch
 
 async def main() -> None:
+    t0 = asyncio.get_running_loop().time()
     try:
-        results = await asyncio.gather(
-            *(fetch(item, delay) for item, delay in PAIRS),
-        )
+        results = await asyncio.gather(*(
+            fetch(item, delay, t0)
+            for item, delay in PAIRS))
     except ValueError as e:
         print(f"gather raised {e!r}")
         return

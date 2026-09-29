@@ -154,7 +154,9 @@ which discovers the next available task to run.
    and shuts the loop down.
    This is the entry point, called once to run the program.
    Calling it from inside a coroutine raises `RuntimeError: asyncio.run() cannot be called from a running event loop`.
-   Inside an `async def`, `await` the coroutine directly:
+   Inside an `async def`, `await` the coroutine directly.
+
+This listing uses all four:
 
 ```python
 # async_mechanics.py
@@ -229,8 +231,9 @@ so nothing overlaps and the delays add.
 `gather()` is concurrent because it wraps and schedules every coroutine as a task before it waits for any of them.
 
 Scheduling does not mean running.
-The task bodies execute only after `gather()` suspends
-(the event loop drives `gather()` too).
+`gather()` returns an awaitable without running any task body.
+The bodies execute after `main()` suspends at its `await`,
+which returns control to the event loop.
 Each runs until its first `await`, which the trace's `started` lines record.
 The comprehension never has more than one coroutine in flight:
 it starts the next coroutine only after the previous one has finished.
@@ -242,6 +245,8 @@ If one of its coroutines raises an exception,
 `gather()` re-raises that exception into the awaiting code,
 but the other tasks it started keep running.
 Those other tasks become unsupervised, and their results and errors vanish.
+
+The next two listings run the same six fetches, which a shared module defines:
 
 ```python
 # utils/fetch_demo.py
@@ -345,7 +350,7 @@ which are still suspended with far more sleep to go,
 so neither ever reaches its `fetched` print.
 The shared deadline puts both failures in the group.
 The loop runs every timer due at one instant in the same turn,
-so `c` and `d` both raise before the group's own callback runs and starts cancelling.
+so `c` and `d` both raise their exceptions before the group's own callback runs and starts cancelling.
 If each calls `asyncio.sleep(0.03)`,
 the two timers are set a few microseconds apart,
 since each call reads the clock when it runs,
@@ -454,7 +459,7 @@ Keeping siblings alive past a failure means catching exceptions inside each task
 
 ### Bounding a Wait with `asyncio.timeout()` {#bounding-a-wait-with-asynciotimeout}
 
-Every delay in this chapter so far is a fixed `asyncio.sleep()`,
+Every delay in this chapter so far has a fixed length,
 so nothing has needed a time limit.
 A real network call carries no such guarantee.
 `asyncio.timeout()` (3.11) bounds how long a block of code may run,
@@ -485,7 +490,8 @@ The group holds a fast task and a slow one.
 `asyncio.timeout()`'s deadline passes well before the slow task's sleep ends,
 so the timeout cancels the task running `main()`.
 The resulting `asyncio.CancelledError` reaches the `TaskGroup`,
-which cancels both children and re-raises as it exits.
+which cancels the slow task, its one child still running,
+and re-raises the cancellation as it exits.
 Because the cancellation traces back to its own deadline,
 `asyncio.timeout()` converts that `CancelledError` into a `TimeoutError` on its way out,
 so the caller sees an ordinary exception instead of a bare cancellation.
@@ -576,9 +582,9 @@ The event loop overlaps waiting, not computing.
 
 ### `time.sleep()` Stops the Loop
 
-`asyncio.sleep()` in `io_price` is not `time.sleep()`.
+`asyncio.sleep()` in `io_price()` is not `time.sleep()`.
 Awaiting `asyncio.sleep()` suspends only the current task and hands control to the event loop,
-which lets all five `io_price` tasks overlap.
+which lets all five `io_price()` tasks overlap.
 `time.sleep()` is a blocking call: it stops the whole thread,
 so a coroutine that calls it freezes every task in the program, not just itself:
 
@@ -629,7 +635,7 @@ another sign that `time.sleep()` is the wrong function here.
 
 Every listing so far stands in for network I/O with `asyncio.sleep()`.
 [`async def`, `await`, and the Event Loop](#asyncio-mechanics)
-claimed that a real request "asks the loop to watch a socket for the reply,"
+claims that a real request "asks the loop to watch a socket for the reply,"
 and every example since has left that claim untested.
 `asyncio.start_server()` and `asyncio.open_connection()` are the real thing,
 a listening socket and a client connecting to it, both on `localhost`:
@@ -675,7 +681,7 @@ asyncio.run(main())
 (port `0` asks the OS to choose one)
 and hands each new connection to `handle_client()`.
 `open_connection()` opens the client side of that same socket.
-Both awaits suspend their task exactly the way `asyncio.sleep()` does,
+Both awaits suspend their task the way `asyncio.sleep()` does,
 except the wake-up condition is now "the socket has bytes to read," not a timer.
 Two clients connect at once,
 and `gather()` returns their replies in argument order, `a` then `b`,
@@ -716,7 +722,7 @@ asyncio.run(main())
 `offloaded_wait()` calls the same `time.sleep()` that stalled `blocking_the_loop.py`'s `blocking_wait()`,
 but through `asyncio.to_thread()`,
 which hands the call to a worker thread and awaits its completion.
-`time.sleep()` itself still blocks, but it blocks a worker thread,
+`time.sleep()` still blocks, but it blocks a worker thread,
 not the one running the event loop,
 so the loop stays free to run the other four tasks while each sleep finishes.
 Five offloaded sleeps overlap and finish together,
@@ -793,7 +799,7 @@ async def increment(count: int) -> None:
     for _ in range(count):
         async with lock:
             value = counter  # Read
-            # Yield to the event loop
+            # Release control to the event loop
             await asyncio.sleep(0)
             counter = value + 1  # Write
 
@@ -805,7 +811,7 @@ asyncio.run(main())
 #: 400
 ```
 
-The only change from `async_race.py` is `async with lock`.
+The change from `async_race.py` is the module-level `lock` and the `async with lock:` block.
 The block protects the read, the yielding `await`, and the write.
 If a task reaches `async with lock` while another task already holds the lock,
 it suspends itself until that lock becomes available.
@@ -857,6 +863,8 @@ A `Lock` refuses a release it never granted,
 raising `RuntimeError: Lock is not acquired`.
 An over-released `Semaphore` quietly raises its own limit instead,
 so a stray `release()` turns a semaphore of one into a semaphore of two.
+`asyncio.BoundedSemaphore` closes that gap:
+a `release()` beyond its starting count raises a `ValueError`.
 Deliberately choosing a count above one makes the semaphore a throttle on a limited resource,
 such as a fixed number of database connections.
 
@@ -918,8 +926,8 @@ so their contexts are copies of `main()`'s,
 and nothing they set flows back to it.
 `request_id` returns to its default while the global stays clobbered.
 
-Deleting the global and writing `handle(name)`'s value into a parameter works here,
-and keeps working until a logging helper four calls down needs the value.
+Passing the value as a parameter, with no global and no `ContextVar`,
+works here, and keeps working until a logging helper four calls down needs the value.
 That is the problem a `ContextVar` solves.
 
 You often set a variable for part of a call and restore it afterward,
@@ -976,10 +984,10 @@ Everything so far has overlapped waiting on one thread.
 Computing is the other half, and it needs a second mechanism.
 A CPU-bound task cannot overlap if only a single core is available.
 With several cores, it can.
-`ProcessPoolExecutor` runs each call in its own process,
+`ProcessPoolExecutor` runs each call in one of its worker processes,
 each with its own interpreter and its own *Global Interpreter Lock* (GIL),
 the interpreter-wide lock that lets only one thread run Python bytecode at a time.
-[The GIL and Free Threading](#the-gil-and-free-threading) takes the lock apart.
+[The GIL and Free Threading](#the-gil-and-free-threading) explains the lock.
 Here, each interpreter has its own,
 so the operating system can place these processes on different cores and run them at the same time:
 
@@ -1158,7 +1166,7 @@ if __name__ == "__main__":
 The only difference between one run and another is how finely the listing splits the total work.
 
 The listing creates the pool once and warms it up with a throwaway call before any measurement starts,
-so process startup never lands in a timed result.
+so no timed result includes process startup.
 Each later call reuses that same pool,
 so only the split changes from one line of output to the next.
 
@@ -1302,7 +1310,7 @@ That overlap is `blocking_the_loop.py` turned inside out:
 a blocking call freezes an event loop,
 but a pool of threads absorbs blocking calls.
 That absorption is why `asyncio.to_thread()` hands its blocking work to this kind of pool.
-Use a thread pool for I/O when the blocking calls already exist and rewriting them as coroutines is not worth the surgery.
+Use a thread pool for I/O when the blocking calls already exist and rewriting them as coroutines is not worth the effort.
 `asyncio` pays off when you have thousands of waits,
 since tasks are far lighter than threads.
 
@@ -1476,6 +1484,7 @@ so it is a supported build now rather than a preview,
 still optional and still installed alongside the default one.
 It removes the GIL, so threads run Python bytecode on separate cores at the same time.
 Under a free-threaded interpreter `gil_threads.py`'s boolean flips to `False`.
+Replacing its last line with `print(f"threads speedup: {seq / thr:.1f}x")` reports the size of the gain:
 
     threads speedup: 3.8x
 
@@ -1497,9 +1506,9 @@ Immortality arrived in 3.12 for every build but pays off most here,
 since it removes the one atomic operation every thread otherwise contests.
 Mutable containers like dictionaries and lists carry individual locks,
 so two threads contend only when they touch the same container.
-Single-threaded code pays a small penalty for this machinery,
-roughly five to fifteen percent depending on the workload,
-but this should improve in future releases.
+Single-threaded code pays a small penalty for this machinery.
+On the `pyperformance` benchmark suite the average overhead runs from about one percent to about eight,
+depending on the platform.
 
 Removing the lock also removes three decades of accidental protection for C extensions,
 whose authors assumed that only one thread runs at a time.
@@ -1695,10 +1704,10 @@ asyncio.run(main())
 #: consumed data
 ```
 
-`consumer` starts first and finds the queue empty,
+`consumer()` starts first and finds the queue empty,
 so `get()` suspends it rather than blocking the thread underneath it.
-`producer` then runs, sleeps to stand in for slow work, and puts an item,
-which wakes the waiting `consumer`.
+`producer()` then runs, sleeps to stand in for slow work, and puts an item,
+which wakes the waiting consumer.
 `asyncio.Queue` needs no locks,
 since the event loop lets only one coroutine touch it at a time.
 That guarantee holds within the event loop's own thread alone:
@@ -1765,8 +1774,9 @@ report("serialized",
 ```
 
 With one thread, `Tickets` hands out each number once: read, pause, write back.
-`Tickets.__next__()` is `gil_race.py` wearing a different hat.
-Read the counter, do something that releases the GIL, write the counter back.
+`Tickets.__next__()` follows the same sequence as `gil_race.py`:
+it reads the counter, does something that releases the GIL,
+and writes the counter back.
 Eight threads read the same number and all eight receive it,
 so a ticket meant to go to one worker goes to several.
 The count of distinct values is still 200, which makes this dangerous:
@@ -2090,7 +2100,8 @@ It does not change `asyncio`'s.
 ### Measuring the Memory
 
 You can support the claim that a thread costs far more memory than a task.
-`threading.stack_size()` reports and sets the stack CPython reserves for each new thread.
+`threading.stack_size()` sets the stack CPython reserves for each new thread and reports the size last set,
+or `0` while the platform's default is in effect.
 A common default across platforms is on the order of one mebibyte.^[A mebibyte (MiB) is 2<sup>20</sup> while a megabyte (MB) is 10<sup>6</sup>.]
 `tracemalloc` measures a task's actual heap footprint directly,
 since a task consists of ordinary Python objects.
@@ -2127,7 +2138,7 @@ async def bytes_per_task() -> float:
     for t in tasks:
         t.cancel()
     # Without "return_exceptions=True", the first
-    # CancelledError raises and exits the function:
+    # CancelledError propagates and exits the function:
     await asyncio.gather(*tasks, return_exceptions=True)
     tracemalloc.stop()
     return grown / TASKS
@@ -2288,8 +2299,11 @@ asyncio.run(main())
 The first task takes `lock_a` then tries to acquire `lock_b`.
 The second takes `lock_b` then tries to acquire `lock_a`.
 The `sleep(0.01)` gives each task time to grab its first lock before either asks for its second.
-Tasks, unlike threads, run one at a time,
-so no OS scheduler can interleave the two tasks' first lines in an unlucky order.
+The deadlock depends on that `await`.
+Tasks run one at a time and switch only at an `await`,
+and acquiring a free lock does not suspend the task.
+Without the sleep, the first task takes both locks and releases them before the second task starts,
+and the program prints nothing.
 
 Once both hold their first lock,
 each task's `async with second:` suspends on a lock the other holds and never releases.
@@ -2303,7 +2317,8 @@ so the example reports the deadlock instead of hanging.
 The fix is the same one that works for threads:
 have every task acquire shared locks in the same global order.
 If both tasks acquire `lock_a` first,
-whichever gets there first finishes and releases that lock before the other waits.
+the second task waits for `lock_a` while holding nothing,
+so the first task takes `lock_b`, finishes, and releases both.
 
 ### Livelock
 
@@ -2369,7 +2384,7 @@ for example letting only the task with the lower ID give.
   `asyncio` pays off once you have multiple waits that overlap.
 - **A comprehension that awaits is not concurrent.**
   `[await c for c in coroutines]` runs one coroutine at a time.
-  Only `gather()` or `TaskGroup` schedule every coroutine as a task before waiting on any of them.
+  Only `gather()` or `TaskGroup` schedules every coroutine as a task before waiting on any of them.
 - **Choose `TaskGroup` when a failure should stop the batch,
   `gather(return_exceptions=True)` when it shouldn't.**
   `TaskGroup`'s contract is all-or-cancel.
@@ -2417,13 +2432,13 @@ for example letting only the task with the lower ID give.
   When two units keep yielding to each other instead,
   break the symmetry so only one of them gives way.
 
-## Concurrency is Not Easy
+## Concurrency Is Not Easy
 
 People still argue about what the term means.
-Rob Pike, creator of the Go language, famously muddied the waters by declaring,
-"concurrency is not parallelism"
+Rob Pike, co-creator of the Go language,
+famously muddied the waters by declaring, "concurrency is not parallelism"
 (I'm hoping he meant to say "concurrency is not **only** parallelism").[^concurrency-def]
-As this chapter has shown,
+As this chapter shows,
 concurrency means "operating or occurring at the same time."
 This works for both asynchrony and parallelism.
 

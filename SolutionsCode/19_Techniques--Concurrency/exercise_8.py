@@ -1,31 +1,36 @@
 # exercise_8.py
-import threading
-from queue import PriorityQueue
+from concurrent.futures import ThreadPoolExecutor
+from queue import PriorityQueue, ShutDown
 
-tasks: PriorityQueue = PriorityQueue()
+type Job = tuple[int, str]  # (priority, description)
 
-def submit(jobs):
+tasks: PriorityQueue[Job] = PriorityQueue()
+
+def enqueue(jobs: list[Job]) -> None:
     for job in jobs:
         tasks.put(job)
 
-threads = [
-    threading.Thread(
-        target=submit,
-        args=([(3, "backup"), (1, "page oncall")],)),
-    threading.Thread(
-        target=submit,
-        args=([(2, "rotate logs"), (1, "alert")],)),
-    threading.Thread(
-        target=submit,
-        args=([(1, "zzz"), (3, "aaa")],)),
-]
-for t in threads:
-    t.start()
-for t in threads:
-    t.join()
+def consume() -> None:
+    while True:
+        try:
+            print(tasks.get())
+        except ShutDown:
+            return
 
-while not tasks.empty():
-    print(tasks.get())
+with ThreadPoolExecutor(max_workers=4) as pool:
+    producers = [
+        pool.submit(enqueue,
+                    [(3, "backup"), (1, "page oncall")]),
+        pool.submit(enqueue,
+                    [(2, "rotate logs"), (1, "alert")]),
+        pool.submit(enqueue,  # The third producer
+                    [(1, "zzz"), (3, "aaa")]),
+    ]
+    for p in producers:
+        p.result()  # Surface any producer failure
+    consumer = pool.submit(consume)
+    tasks.shutdown()
+    consumer.result()
 #: (1, 'alert')
 #: (1, 'page oncall')
 #: (1, 'zzz')
