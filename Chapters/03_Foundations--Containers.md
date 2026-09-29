@@ -258,6 +258,41 @@ so `*_` discards a run of elements.
 [Pattern Matching](13_Techniques--Pattern_Matching.md)
 matches `case` patterns against the same shapes.
 
+The star also works in the other direction.
+Inside a list or tuple display, `*` spreads an iterable into the new container,
+element by element:
+
+```python
+# unpacking_displays.py
+
+evens = [0, 2, 4]
+odds = (1, 3)
+print([*evens, *odds])  # A list from a list and a tuple
+#: [0, 2, 4, 1, 3]
+print((*odds, 5))  # A tuple display takes stars too
+#: (1, 3, 5)
+print([*"ab", *range(2)])  # Any iterable spreads
+#: ['a', 'b', 0, 1]
+print([*sorted("cab"), "d"])  # So does a call's result
+#: ['a', 'b', 'c', 'd']
+first, *rest = evens
+print([*rest, first])  # Collect, then spread
+#: [2, 4, 0]
+```
+
+A starred operand can be any expression that produces an iterable: a list,
+a tuple, a string, a `range`, or the value a call returns,
+as with `*sorted("cab")`.
+Unlike a starred target, any number of operands can carry a star,
+and they mix freely with ordinary elements.
+The last two lines use both directions:
+`*rest` collects on the left of the assignment and spreads inside the display,
+so the pair rotates `evens` by one place.
+`+` joins two lists as well, but both operands must be lists,
+and `[0, 2] + (1, 3)` raises a `TypeError`.
+[Functions](05_Foundations--Functions.md#unpacking-arguments)
+uses the same star to spread an iterable into a call's arguments.
+
 Tuples are often heterogeneous, with each position a different type:
 
 ```python
@@ -353,6 +388,8 @@ a = {"x": 1, "y": 2}
 b = {"y": 20, "z": 3}
 print(a | b)  # Merge; the right side wins a collision
 #: {'x': 1, 'y': 20, 'z': 3}
+print({**a, **b})  # The same merge by unpacking
+#: {'x': 1, 'y': 20, 'z': 3}
 print(a.pop("x"), a)  # Remove and return
 #: 1 {'y': 2}
 del b["z"]
@@ -367,6 +404,11 @@ the same job `update()` does.
 For sets, `|` means union, and the order of the operands makes no difference.
 For dictionaries the order matters: when both dictionaries hold the same key,
 the right operand's value wins, so `"y"` comes out as `20`.
+`{**a, **b}` builds the same merged `dict`,
+with `**` spreading each dictionary's entries the way `*` spreads a list's elements,
+and the later entry wins a collision.
+Like the list display, it accepts any number of starred operands,
+with ordinary `key: value` entries among them.
 The last line feeds `dict()` an iterable of `(key, value)` pairs,
 and any iterable that yields such pairs will do.
 `zip()` pairs up two sequences element by element.

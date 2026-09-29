@@ -683,9 +683,11 @@ adds a more direct way to flatten.
 The unpacking operators `*` and `**` may appear in the output expression of a comprehension or generator expression,
 splicing each iterable or mapping into the result.
 PEP 798 extends the [PEP 448](https://peps.python.org/pep-0448/)
-unpacking from `[*a, *b]` and `{**d1, **d2}` to the comprehension form,
-and replaces many uses of two-`for` comprehensions, `itertools.chain()`,
-and `itertools.chain.from_iterable()`:
+unpacking in displays, `[*a, *b]` and `{**d1, **d2}`
+([Containers](03_Foundations--Containers.md#tuples-and-unpacking)),
+to the comprehension form.
+The new form replaces many uses of two-`for` comprehensions,
+`itertools.chain()`, and `itertools.chain.from_iterable()`:
 
 ```python
 # unpacking_comprehensions.py
