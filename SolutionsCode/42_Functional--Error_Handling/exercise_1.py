@@ -1,33 +1,5 @@
 # exercise_1.py
-from __future__ import annotations
-from collections.abc import Callable
-from typing import final
-from record import record
-
-@final
-@record
-class Ok[A]:
-    answer: A
-
-    def unwrap(self) -> A:
-        return self.answer
-
-    def bind[B, E](
-        self, func: Callable[[A], Result[B, E]]
-    ) -> Result[B, E]:
-        return func(self.answer)
-
-@final
-@record
-class Err[E]:
-    error: E
-
-    def bind[B, F](
-        self, func: Callable[..., Result[B, F]]
-    ) -> Err[E]:
-        return self  # Pass the failure forward unchanged
-
-type Result[A, E] = Ok[A] | Err[E]
+from result import Err, Ok, Result
 
 def func_a(i: int) -> Result[int, str]:
     if i == 1:
@@ -40,6 +12,7 @@ def func_b(i: int) -> Result[int, str]:
     return Ok(i)
 
 def func_c(i: int) -> Result[int, str]:
+    print(f"func_c({i}) runs")
     try:
         1 / (i - 3)
     except ZeroDivisionError as e:
@@ -56,8 +29,10 @@ def composed(i: int) -> Result[int, str]:
 
 for i in range(5):
     print(i, composed(i))
+#: func_c(0) runs
 #: 0 Ok(answer=0)
 #: 1 Err(error='func_a(1)')
 #: 2 Err(error='func_b(2)')
+#: func_c(3) runs
 #: 3 Err(error='func_c(3): division by zero')
 #: 4 Err(error='func_d(4)')

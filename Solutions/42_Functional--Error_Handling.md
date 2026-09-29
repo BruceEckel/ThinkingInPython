@@ -4,35 +4,7 @@
 
 ```python
 # exercise_1.py
-from __future__ import annotations
-from collections.abc import Callable
-from typing import final
-from record import record
-
-@final
-@record
-class Ok[A]:
-    answer: A
-
-    def unwrap(self) -> A:
-        return self.answer
-
-    def bind[B, E](
-        self, func: Callable[[A], Result[B, E]]
-    ) -> Result[B, E]:
-        return func(self.answer)
-
-@final
-@record
-class Err[E]:
-    error: E
-
-    def bind[B, F](
-        self, func: Callable[..., Result[B, F]]
-    ) -> Err[E]:
-        return self  # Pass the failure forward unchanged
-
-type Result[A, E] = Ok[A] | Err[E]
+from result import Err, Ok, Result
 
 def func_a(i: int) -> Result[int, str]:
     if i == 1:
@@ -45,6 +17,7 @@ def func_b(i: int) -> Result[int, str]:
     return Ok(i)
 
 def func_c(i: int) -> Result[int, str]:
+    print(f"func_c({i}) runs")
     try:
         1 / (i - 3)
     except ZeroDivisionError as e:
@@ -61,30 +34,34 @@ def composed(i: int) -> Result[int, str]:
 
 for i in range(5):
     print(i, composed(i))
+#: func_c(0) runs
 #: 0 Ok(answer=0)
 #: 1 Err(error='func_a(1)')
 #: 2 Err(error='func_b(2)')
+#: func_c(3) runs
 #: 3 Err(error='func_c(3): division by zero')
 #: 4 Err(error='func_d(4)')
 ```
 
-Adding a fourth `.bind(func_d)` needs no change to `Result`, `Ok`,
-or `Err`. `func_d()` sits before `func_c()` in the chain, so an
-`Err` from it has a later step to skip. `4` reaches `func_d()`
-because it survives `func_a()` and `func_b()`, and the `Err` that
-comes back travels to the end of the chain untouched: `Err.bind()`
-returns `self` without calling `func_c()`. `1` and `2` fail earlier
-and stop the chain before `func_d()` sees them, and `3` passes
-through `func_d()` unchanged to fail in `func_c()`, so each of the
-four inputs still fails at a different step. A chain short-circuits
-at its first failure, wherever that falls, and the order of the
-steps decides where the chain stops.
+`Result` comes from the chapter's `utils/result.py`: adding a fourth
+`.bind(func_d)` needs no change to `Result`, `Ok`, or `Err`.
+`func_d()` sits before `func_c()` in the chain, so an `Err` from it
+has a later step to skip. `func_c()` prints a line when it runs, and
+that line is the confirmation: it appears for `0` and `3` and is
+missing for `4`. `4` reaches `func_d()` because it survives
+`func_a()` and `func_b()`, and the `Err` that comes back travels to
+the end of the chain untouched: `Err.bind()` returns `self` without
+calling `func_c()`. `1` and `2` fail earlier and stop the chain
+before `func_d()` sees them, and `3` passes through `func_d()`
+unchanged to fail in `func_c()`, so inputs `1` through `4` each fail
+at a different step. A chain short-circuits at its first failure,
+wherever that falls, and the order of the steps decides where the
+chain stops.
 
 ## 2. `Err.map_error()`
 
 ```python
 # exercise_2.py
-from __future__ import annotations
 from collections.abc import Callable
 from typing import final
 from record import record
@@ -133,12 +110,17 @@ print(Err("boom").map_error(prefix))
 #: Err(error='error: boom')
 ```
 
-`map_error()` is `bind()`'s mirror image: `bind()` transforms the
-success value and leaves a failure alone, while `map_error()`
-transforms the failure value and leaves a success alone. `Ok`'s
-version is a no-op, since there is no error to touch. `Err`'s
-version applies `func` to `self.error` and wraps the result in a new
-`Err`. Adding a prefix to every error in a chain is then one call,
+This exercise changes `Ok` and `Err`, so the listing defines its own
+pair and does not import the chapter's. `map_error()` works on the
+side `bind()` skips: `bind()` passes a success to the next step and
+leaves a failure alone, while `map_error()` transforms the failure
+and leaves a success alone. It differs from `bind()` in what it asks
+of `func`. `bind()`'s function returns a `Result`; `map_error()`'s
+function returns the new error, and `map_error()` wraps it, the way
+the chapter's `map()` wraps a new answer. The `returns` library names
+this method `alt()`. `Ok`'s version is a no-op, since there is no
+error to touch. `Err`'s version applies `func` to `self.error` and
+wraps the result in a new `Err`. Adding a prefix to every error in a chain is then one call,
 `result.map_error(prefix)`, applied once at the boundary where you
 report the error, rather than threading the prefix through every
 function that might produce one.
@@ -147,22 +129,7 @@ function that might produce one.
 
 ```python
 # test_ch42_combined.py
-from typing import final
-from record import record
-
-# The chapter's Result, reduced to what this answer uses:
-# the generic pair and the alias, without bind().
-@final
-@record
-class Ok[A]:
-    answer: A
-
-@final
-@record
-class Err[E]:
-    error: E
-
-type Result[A, E] = Ok[A] | Err[E]
+from result import Err, Ok, Result
 
 def func_a(i: int) -> Result[int, str]:
     if i == 1:
@@ -237,20 +204,9 @@ cannot see that an empty error list means all three succeeded.
 # exercise_4.py
 from collections.abc import Callable
 from functools import wraps
-from typing import Protocol, final
-from record import record
-
-@final
-@record
-class Ok[A]:
-    answer: A
-
-@final
-@record
-class Err[E]:
-    error: E
-
-type Result[A, E] = Ok[A] | Err[E]
+from typing import Protocol
+from exceptions import expect
+from result import Err, Ok, Result
 
 class SafeDecorator(Protocol):
     def __call__[**P, A](
@@ -280,11 +236,8 @@ def parse(text: str) -> int:
 
 print(parse("42"))
 #: Ok(answer=42)
-try:
-    parse("oops")
-except TypeError as e:
-    print(f"escaped: {type(e).__name__}: {e}")
-#: escaped: TypeError: 'oops' is not digits
+expect(TypeError, parse, "oops")
+#: [TypeError] 'oops' is not digits
 ```
 
 `safe()` gains a layer: it now takes the exception types and returns
@@ -294,48 +247,25 @@ one word.
 
 `parse("42")` still comes back as an `Ok`. `parse("oops")` raises a
 `TypeError`, which `@safe(ValueError)` never catches, so the
-`TypeError` propagates through `wrapper` untouched and the caller
-sees an ordinary traceback. Under the chapter's `@safe` that same
+`TypeError` propagates through `wrapper` untouched. `expect()`
+catches it outside `parse()` and prints it; without that catch the
+caller sees an ordinary traceback. Under the chapter's `@safe` that same
 `TypeError` arrives as `Err(TypeError(...))`, indistinguishable from
 a bad-input failure.
 
-The `SafeDecorator` protocol keeps the types honest. `safe()`
-returns a function that is itself generic over the function it
+The `SafeDecorator` protocol keeps the types precise. `safe()`
+returns a function that is generic over the function it
 decorates. A plain `Callable[...]` annotation cannot say that,
 because the type parameters belong to the returned callable, not
-to `safe()`. A protocol with a generic `__call__` says exactly
-that, so `parse` keeps the signature
+to `safe()`. A protocol with a generic `__call__` does say it, so
+`parse` keeps the signature
 `(str) -> Result[int, Exception]` rather than degrading to `Any`.
 
 ## 5. Notes that survive as data
 
 ```python
 # exercise_5.py
-from collections.abc import Callable
-from typing import final
-from record import record
-
-@final
-@record
-class Ok[A]:
-    answer: A
-
-    def bind[B, E](
-        self, func: Callable[[A], Result[B, E]]
-    ) -> Result[B, E]:
-        return func(self.answer)
-
-@final
-@record
-class Err[E]:
-    error: E
-
-    def bind[B, F](
-        self, func: Callable[..., Result[B, F]]
-    ) -> Err[E]:
-        return self
-
-type Result[A, E] = Ok[A] | Err[E]
+from result import Err, Ok, Result
 
 def load_setting(name: str,
                  text: str) -> Result[int, Exception]:
@@ -371,8 +301,9 @@ Each failure reports the setting that caused it, and the second and
 third runs differ only in which name appears in the note. The note
 travels inside the `Err` as ordinary data, so `report()` can print
 it long after the frame that knew the setting name has returned.
-`report()` reconstructs nothing from a traceback, because there is
-no traceback.
+`report()` reconstructs nothing from a traceback, because nothing
+prints one: the exception still holds its `__traceback__`, and it
+does not propagate to a handler that would show it.
 
 The successful call has no note to lose. A successful
 `load_setting()` returns from inside the `try` block, so it never
@@ -381,11 +312,11 @@ note on. Notes attach to exceptions, so only the failing path
 carries one, and only the failing path has anything to explain.
 
 The lambdas ignore their parameter, since the second setting does not
-depend on the first one's value. `bind()` reads worst in exactly
-that case: it exists to thread an answer forward, and here it
-threads an ordering instead of an answer. The do-notation mentioned
+depend on the first one's value. `bind()` reads worst in that case:
+it exists to pass an answer forward, and here it passes an ordering
+and the lambda discards the answer. The do-notation mentioned
 in [The returns Library](../Chapters/42_Functional--Error_Handling.md#the-returns-library)
-reads better than nested binds here.
+reads better here.
 
 ## 6. `int | None` collapses the three failures into one
 

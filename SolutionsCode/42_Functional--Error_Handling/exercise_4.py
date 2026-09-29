@@ -1,20 +1,9 @@
 # exercise_4.py
 from collections.abc import Callable
 from functools import wraps
-from typing import Protocol, final
-from record import record
-
-@final
-@record
-class Ok[A]:
-    answer: A
-
-@final
-@record
-class Err[E]:
-    error: E
-
-type Result[A, E] = Ok[A] | Err[E]
+from typing import Protocol
+from exceptions import expect
+from result import Err, Ok, Result
 
 class SafeDecorator(Protocol):
     def __call__[**P, A](
@@ -44,8 +33,5 @@ def parse(text: str) -> int:
 
 print(parse("42"))
 #: Ok(answer=42)
-try:
-    parse("oops")
-except TypeError as e:
-    print(f"escaped: {type(e).__name__}: {e}")
-#: escaped: TypeError: 'oops' is not digits
+expect(TypeError, parse, "oops")
+#: [TypeError] 'oops' is not digits

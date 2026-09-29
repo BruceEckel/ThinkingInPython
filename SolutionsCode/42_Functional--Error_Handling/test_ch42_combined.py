@@ -1,20 +1,5 @@
 # test_ch42_combined.py
-from typing import final
-from record import record
-
-# The chapter's Result, reduced to what this answer uses:
-# the generic pair and the alias, without bind().
-@final
-@record
-class Ok[A]:
-    answer: A
-
-@final
-@record
-class Err[E]:
-    error: E
-
-type Result[A, E] = Ok[A] | Err[E]
+from result import Err, Ok, Result
 
 def func_a(i: int) -> Result[int, str]:
     if i == 1:

@@ -57,8 +57,9 @@ Function calls 0-2 produce correct values,
 but the exception ends the comprehension before it produces the list,
 so `results` is never assigned.
 To keep the good results you must wrap each call in its own `try`.
-[Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#a-value-to-check-everywhere)
-flags that scattering as a problem.
+That repeats the handling at every call,
+the way [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#a-value-to-check-everywhere)
+repeats a range check in every function.
 
 ## Return the Error as a Value
 
@@ -147,8 +148,10 @@ type Result[A, E] = Ok[A] | Err[E]
 
 `Ok` and `Err` are both [records](18_Techniques--Performance.md#record),
 `Ok` parameterized over the answer type and `Err` over the error type.
-`@final` states that neither can have subclasses.
-The type checker narrows a `Result` to one of the two classes because `Result` is a union of them.
+`@final` states that neither can have subclasses,
+so no class can inherit from both.
+An object the type checker finds to be an `Err` therefore cannot also be an `Ok`,
+and a check against one class narrows a `Result` to one side of the union.
 `A`, `B`, `E`, and `F` are type parameters
 (introduced in [Static Types](08_Foundations--Static_Types.md#type-parameters)):
 placeholders that take concrete types when you use the class.
@@ -191,21 +194,22 @@ Reading the `answer` field directly works the same way;
 use whichever name reads better in your own code.
 Both exist on `Ok` alone, so the type checker rejects `func_a(i).unwrap()`,
 as it rejects using the `Result` as if it were a number.
-The only way to the answer is narrowing to one of the two classes.
+The only way to the answer is narrowing to one of the two classes,
+with `isinstance()` as in `composing.py` below,
+or with `match` as in `safe_demo.py`.
 `Err` lacks `unwrap()` at runtime as well as under the type checker:
 
 ```python
 # must_unwrap.py
+from exceptions import expected
 from result import Err, Ok
 from returning_result import func_a
 
 print(hasattr(Ok(1), "unwrap"), hasattr(Err("x"), "unwrap"))
 #: True False
-try:
+with expected(AttributeError):
     func_a(1).unwrap()  # type: ignore
-except AttributeError as e:
-    print(e)
-#: 'Err' object has no attribute 'unwrap'
+#: [AttributeError] 'Err' object has no attribute 'unwrap'
 ```
 
 The `# type: ignore` is the point of the listing.
@@ -238,7 +242,7 @@ so totality is a discipline the function's author keeps.
 The caller's side has the same limit.
 A statement that calls the function and discards the `Result` passes the checker.
 The type checker catches a misread of a `Result`; ignoring one is up to you.
-Both type-check clean:
+The listing holds one gap of each kind:
 
 ```python
 # totality_gap.py
@@ -348,10 +352,10 @@ if __name__ == "__main__":
 #: 4 4
 ```
 
-The two `composed()` functions agree on every input,
-and the exception version is shorter, but it says less:
-it reports a failure as a message to parse,
-and the failure disappears when the `except` clause ends,
+The two `composed()` functions succeed and fail on the same inputs,
+and the exception version is shorter, but its signature says less:
+`-> int` names no failure, where `-> Result[int, str]` names one.
+The failure also disappears when the `except` clause ends,
 whereas `sum_type.py` at the start of this chapter keeps every result in a list.
 
 ## Composing With bind
@@ -510,7 +514,6 @@ if __name__ == "__main__":
 #: (7, 5) Ok(answer='add(7 + 5 + 12): 24')
 ```
 
-Each nested bind keeps the earlier answers in scope.
 An `Err` anywhere short-circuits to the end.
 Of the four inputs, only `(7, 5)` passes all three steps,
 so `add()` runs for that input alone.
@@ -522,7 +525,8 @@ as in `composing_with_bind.py` above.
 and `func_c()` in `combining.py` take independent inputs,
 so stopping at the first `Err` discards whatever the later steps would have found
 (see exercise 3).
-The exception in `exceptions_lose_data.py` causes the same loss.
+The exception in `exceptions_lose_data.py` does the same to `func_a(4)`,
+which does not run.
 
 Three inputs need three levels of nesting,
 and each input you add nests one level deeper.
@@ -579,7 +583,7 @@ def safe[**P, A](
     return wrapper
 ```
 
-Decorating a function that raises an exception is all it takes:
+`@safe` goes on any function that can raise an exception:
 
 ```python
 # safe_demo.py
@@ -604,14 +608,15 @@ if __name__ == "__main__":
 `parse()` still reads like a normal function that returns an `int`,
 but `@safe` has changed its return type to `Result[int, Exception]`,
 so the caller must unpack the `Result` to reach the number.
-That error type, `Exception`, is the base of the ordinary exception hierarchy.
-`returning_result.py`'s `Result[int, str]` names exactly what could go wrong;
-`Result[int, Exception]` says that something did,
+That error type, `Exception`, is the base of the ordinary exception hierarchy,
+so the signature says that something can go wrong and not what,
 which is all a bare `except Exception` says.
 `@safe` names `Exception` because it writes one `try`/`except` for every function it wraps,
 and the base class is the one type that covers whatever those functions raise.
-Write the `Ok`/`Err` wrapper yourself, as `func_c()` does in `composing.py`,
-when the narrower type matters more than the convenience.
+A wrapper written by hand can be narrower.
+`func_c()` in `composing.py` catches `ZeroDivisionError` alone,
+and a `parse()` that catches `ValueError` the same way can return `Result[int, ValueError]`.
+Write the wrapper yourself when the narrower type matters more than the convenience.
 
 `@safe` catches `Exception`,
 which is every ordinary failure the wrapped function can produce,
@@ -702,6 +707,13 @@ A `ValueError` from a bad number and a `ZeroDivisionError` from dividing by zero
 so the comprehension computes all three results before `describe()` matches any of them.
 A raised exception would have ended the comprehension at the first failure.
 
+The parentheses in `Err(ValueError())` do the type test.
+Without them, `case Err(ValueError):` is a capture
+([Pattern Matching](13_Techniques--Pattern_Matching.md#a-bare-name-captures-a-dotted-name-compares)):
+it matches every `Err` and binds the error to a new local named `ValueError`.
+Python compiles that `case` and the type checker accepts it,
+so `describe()` would answer "Not a number" for a `ZeroDivisionError`.
+
 ## Attaching Context to an Exception {#attaching-context-to-an-exception}
 
 An exception's message says what went wrong but not where.
@@ -752,8 +764,9 @@ each `except` clause on the way out can add a line built from its own frame's lo
 which the raiser's frame does not have.
 `add_note()` appends each note to a list, `__notes__`,
 which the first call creates.
-The type checker treats `__notes__` as always present,
-because typeshed declares it on `BaseException`.
+The type checker treats `__notes__` as always present, because typeshed,
+the collection of type declarations for the standard library that every checker reads,
+declares it on `BaseException`.
 Reading `__notes__` before any `add_note()` call therefore type-checks,
 and then raises an `AttributeError` at runtime.
 
@@ -812,6 +825,8 @@ The [returns](https://github.com/dry-python/returns)
 library provides a `Result` type whose two cases are `Success` and `Failure`,
 the same `@safe` decorator you built in `safe.py`,
 and do-notation that makes combining multiple results read more directly than nested binds.
+Its `@safe` takes an `exceptions` argument naming the types to catch,
+the production form that exercise 4 builds.
 
 ## Which Failures Get a Result
 
@@ -819,7 +834,8 @@ A `Result` does not replace every exception.
 Exceptions remain the right tool for truly exceptional conditions:
 running out of memory, a programming bug,
 anything a caller cannot reasonably handle.
-Some languages call these errors *panics* and separate them from regular exceptions.
+Rust and Go call these errors *panics*,
+and keep them apart from the errors a function returns as values.
 
 Use a `Result` for the failures that are part of a function's normal job:
 bad input, a missing file, a value out of range.

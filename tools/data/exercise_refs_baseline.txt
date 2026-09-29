@@ -14,6 +14,7 @@ Chapters/Confidence	Confidence	1	Which process ran each call
 Chapters/Effect_Management	Effect_Management	2	Threading a `Log` Effect through by hand
 Chapters/Error_Handling	Error_Handling	2	`Err.map_error()`
 Chapters/Error_Handling	Error_Handling	3	`combined()` that collects every failure
+Chapters/Error_Handling	Error_Handling	4	`@safe(ValueError)`, catching only what you name
 Chapters/Factory	Factory	10	Finding the class that forgot `@register`
 Chapters/Factory	Factory	9	Recursing through `__subclasses__()`
 Chapters/Flyweight	Flyweight	2	`tracemalloc`, cached vs. uncached `tile()`
