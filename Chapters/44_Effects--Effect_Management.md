@@ -910,8 +910,9 @@ rather than letting you declare your own.
 
 Third-party libraries supply pieces of the rest.
 The [returns](https://github.com/dry-python/returns)
-library provides `Result` and `Maybe` containers like those in [Error Handling](42_Functional--Error_Handling.md),
-plus an `IO` container that marks a value as having come from input/output,
+library provides a `Result` container like the one in [Error Handling](42_Functional--Error_Handling.md),
+a `Maybe` container for a value that might be absent,
+an `IO` container that marks a value as having come from input/output,
 and a `RequiresContext` container for delayed binding of dependencies.
 The [effect](https://pypi.org/project/effect/)
 library ports the description/execution split to Python;
