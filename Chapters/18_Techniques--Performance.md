@@ -37,169 +37,6 @@ that only a realistic load reveals.
 So "try it out" means try it at the size you expect in production,
 not at the size that is convenient to type.
 
-If it is too slow, try the simplest remedy first.
-That might be enough, and if it is, you save time and money.
-
-## Try a Faster Platform
-
-The cheapest platform change is a newer CPython.
-3.11 alone measured 1.25x faster than 3.10 across the `pyperformance` suite,
-a range of 10-60% depending on the workload,
-and later releases have continued that work.
-Moving a project forward two or three releases costs a test run rather than a rewrite.
-A speedup that needs neither new code nor new hardware is rare.
-
-Two more speedups need no new code: the tail-calling interpreter,
-and the experimental just-in-time compiler inside CPython.
-
-Alternative interpreters for Python exist, notably PyPy,
-which claims about a 3x speedup on average.
-PyPy typically trails CPython's newest language version,
-so confirm it supports the features and third-party packages you need.
-
-For a parallel, CPU-bound workload,
-the [free-threaded build](19_Techniques--Concurrency.md#free-threading)
-is the largest platform-level speedup available in 3.15,
-since it removes the lock that otherwise serializes Python bytecode across threads.
-
-How much does a hardware upgrade cost compared to paying programmers to solve the performance problem?
-If it's noticeably less, buying new hardware might be a quick win.
-
-## The Tail-Calling Interpreter
-
-The tail-calling interpreter is chosen when CPython is built,
-and nothing at run time turns it on or off.
-Since 3.14, CPython can be built so that each bytecode instruction is a small C function that ends by calling the function for the next instruction,
-in place of one large C `switch` that dispatches every instruction.
-The C compiler turns each of those calls into a jump,
-and the loop that runs Python bytecode gets faster.
-The tail call is in C, inside the interpreter.
-It is unrelated to tail-call optimization of Python functions,
-which CPython does not do, as [Recursion](41_Functional--Toolkits.md#recursion)
-notes.
-
-Nothing in your program changes, and nothing in your program can tell.
-No `sys` function reports it, and the documentation calls it an internal detail.
-The python.org Windows 64-bit binaries for 3.15 use it,
-as do the python-build-standalone 3.15 builds that `uv` installs,
-including the interpreter that runs this book's listings.
-A source build needs `--with-tail-call-interp` and a compiler with the `preserve_none` calling convention:
-Clang 19 or newer, or Visual Studio 2026.
-
-The payoff is a percentage, not a multiple.
-On Windows x86-64, 3.15 measures 15-20% faster on the `pyperformance` geometric mean than the same source built with the `switch`,
-with individual programs from 14% to 40%.
-The 3.14 figure, with Clang 19,
-is 3-5%.^[The 3.14 announcement said 10-15%. Nelson Elhage's [March 2025 analysis](https://blog.nelhage.com/post/cpython-tail-call/)
-traced most of that to the baseline:
-LLVM 19 had capped its tail-duplication pass,
-which collapsed the old interpreter's 332 dispatch jumps into 3,
-so the comparison was against a compiler regression rather than a fast interpreter.
-With LLVM fixed, the gain was 1-5%, and the What's New now says 3-5%.
-The advice under [Numbers on Your Machine](#numbers-on-your-machine)
-applies to CPython's own developers too.]
-The JIT in the next section stacks on top of this speedup.
-The JIT compiles the hot paths,
-the tail-calling interpreter runs everything else faster,
-and the macOS figure in that section is measured against a tail-calling build.
-
-## The CPython JIT
-
-CPython includes an experimental just-in-time compiler.
-[PEP 744](https://peps.python.org/pep-0744/) added it in 3.13,
-and 3.15 rebuilt much of it.
-The JIT watches the bytecode a program executes,
-and once a path runs often enough, it compiles that path to machine code.
-You change nothing.
-The same file runs, and the interpreter stops re-interpreting its busiest paths.
-
-Three switches stand between your program and that machine code:
-
-1. The interpreter must be *built* with the JIT,
-   through the `--enable-experimental-jit` configuration option.
-   Building it needs LLVM.
-   Running the result does not.
-2. The process must *enable* it, through the `PYTHON_JIT` environment variable.
-3. The code must get *hot*.
-   A script that runs briefly and exits never reaches the threshold,
-   so it pays the compiler's warm-up and collects nothing.
-
-Since 3.14, the official python.org Windows and macOS binaries use `--enable-experimental-jit=yes-off`,
-which compiles the JIT in and leaves it switched off,
-so `PYTHON_JIT=1` turns it on.
-Plain `yes` builds start with the JIT running,
-and there `PYTHON_JIT=0` turns it off.
-Other distributions decide for themselves,
-so the first question is not "is the JIT on?" but "which build am I running?"
-`sys._jit` answers it:
-
-```python
-# jit_status.py
-import sys
-
-def jit_state() -> str:
-    if not sys._jit.is_available():
-        return "no JIT in this build"
-    if not sys._jit.is_enabled():
-        return "JIT built in, switched off"
-    return "JIT enabled"
-
-print(sys._jit.is_available() or not sys._jit.is_enabled())
-#: True
-print(jit_state())
-```
-
-`is_enabled()` implies `is_available()`,
-so testing `is_available()` first and `is_enabled()` second names the three states a build can be in.
-The first `print()` tests that implication, and it shows `True` on every build.
-
-Most listings in this book print the same line on every machine.
-The second `print()` here changes with your interpreter,
-so it carries no `#:` line.
-The book's build has no JIT compiled in, and a run on it shows the first state:
-
-    $ uv run python jit_status.py
-    True
-    no JIT in this build
-
-A python.org binary prints `JIT built in, switched off` until you set `PYTHON_JIT=1`.
-
-A third function, `sys._jit.is_active()`,
-reports whether the frame that called it is running compiled code.
-The documentation warns against branching on its result,
-since a tracing compiler can give different answers to the same call.
-
-The payoff is again a percentage,
-and a smaller one than the tail-calling interpreter's on Windows.
-On the `pyperformance` suite,
-3.15 measures 7-8% faster on x86-64 Linux against the standard optimized build,
-and 11-12% faster on AArch64 macOS against the tail-calling interpreter.
-Those are geometric means over dozens of benchmarks,
-and the What's New that reports them is still marked as a draft.
-The report sets aside one microbenchmark, `unpack_sequence`,
-and the rest range from roughly 15% slower to more than twice as fast,
-so the mean predicts your program poorly.
-Measuring your own program costs two runs:
-time the workload with `PYTHON_JIT` set to `1` and to `0`,
-and change nothing else.
-
-Numba's `@njit`, later in this chapter, is also a just-in-time compiler,
-and the two make opposite trades.
-The CPython JIT asks nothing of you,
-applies to whatever code turns out to be hot, and pays in percentages.
-`@njit` applies only to numeric functions,
-costs a decorator and a compilation pause on the first call,
-and pays in multiples.
-Neither one rescues a quadratic algorithm.
-
-[PEP 836](https://peps.python.org/pep-0836/) sets the bar the JIT must clear:
-5% over the interpreter alone for 3.16,
-then 20% for the JIT combined with [free threading](19_Techniques--Concurrency.md#free-threading)
-by 3.17.
-The PEP calls that the minimum for continuing to develop the JIT inside CPython.
-Meeting it does not turn the JIT on by default:
-that step needs separate approval from the release manager.
-
 ## Profilers
 
 A *profiler* looks for the slow spots in your code, so you know where to focus.
@@ -533,6 +370,169 @@ The names are the keyword arguments at the call site,
 so each listing labels its own measurements.
 Your ratio differs from the one above;
 seeing your own number is the point of running it.
+
+## Try a Faster Platform
+
+If your program is too slow, try the simplest remedy first.
+That might be enough, and if it is, you save time and money.
+
+The cheapest platform change is a newer CPython.
+3.11 alone measured 1.25x faster than 3.10 across the `pyperformance` suite,
+a range of 10-60% depending on the workload,
+and later releases have continued that work.
+Moving a project forward two or three releases costs a test run rather than a rewrite.
+A speedup that needs neither new code nor new hardware is rare.
+
+Two more speedups need no new code: the tail-calling interpreter,
+and the experimental just-in-time compiler inside CPython.
+
+Alternative interpreters for Python exist, notably PyPy,
+which claims about a 3x speedup on average.
+PyPy typically trails CPython's newest language version,
+so confirm it supports the features and third-party packages you need.
+
+For a parallel, CPU-bound workload,
+the [free-threaded build](19_Techniques--Concurrency.md#free-threading)
+is the largest platform-level speedup available in 3.15,
+since it removes the lock that otherwise serializes Python bytecode across threads.
+
+How much does a hardware upgrade cost compared to paying programmers to solve the performance problem?
+If it's noticeably less, buying new hardware might be a quick win.
+
+## The Tail-Calling Interpreter
+
+The tail-calling interpreter is chosen when CPython is built,
+and nothing at run time turns it on or off.
+Since 3.14, CPython can be built so that each bytecode instruction is a small C function that ends by calling the function for the next instruction,
+in place of one large C `switch` that dispatches every instruction.
+The C compiler turns each of those calls into a jump,
+and the loop that runs Python bytecode gets faster.
+The tail call is in C, inside the interpreter.
+It is unrelated to tail-call optimization of Python functions,
+which CPython does not do, as [Recursion](41_Functional--Toolkits.md#recursion)
+notes.
+
+Nothing in your program changes, and nothing in your program can tell.
+No `sys` function reports it, and the documentation calls it an internal detail.
+The python.org Windows 64-bit binaries for 3.15 use it,
+as do the python-build-standalone 3.15 builds that `uv` installs,
+including the interpreter that runs this book's listings.
+A source build needs `--with-tail-call-interp` and a compiler with the `preserve_none` calling convention:
+Clang 19 or newer, or Visual Studio 2026.
+
+The payoff is a percentage, not a multiple.
+On Windows x86-64, 3.15 measures 15-20% faster on the `pyperformance` geometric mean than the same source built with the `switch`,
+with individual programs from 14% to 40%.
+The 3.14 figure, with Clang 19,
+is 3-5%.^[The 3.14 announcement said 10-15%. Nelson Elhage's [March 2025 analysis](https://blog.nelhage.com/post/cpython-tail-call/)
+traced most of that to the baseline:
+LLVM 19 had capped its tail-duplication pass,
+which collapsed the old interpreter's 332 dispatch jumps into 3,
+so the comparison was against a compiler regression rather than a fast interpreter.
+With LLVM fixed, the gain was 1-5%, and the What's New now says 3-5%.
+The advice under [Numbers on Your Machine](#numbers-on-your-machine)
+applies to CPython's own developers too.]
+The JIT in the next section stacks on top of this speedup.
+The JIT compiles the hot paths,
+the tail-calling interpreter runs everything else faster,
+and the macOS figure in that section is measured against a tail-calling build.
+
+## The CPython JIT
+
+CPython includes an experimental just-in-time compiler.
+[PEP 744](https://peps.python.org/pep-0744/) added it in 3.13,
+and 3.15 rebuilt much of it.
+The JIT watches the bytecode a program executes,
+and once a path runs often enough, it compiles that path to machine code.
+You change nothing.
+The same file runs, and the interpreter stops re-interpreting its busiest paths.
+
+Three switches stand between your program and that machine code:
+
+1. The interpreter must be *built* with the JIT,
+   through the `--enable-experimental-jit` configuration option.
+   Building it needs LLVM.
+   Running the result does not.
+2. The process must *enable* it, through the `PYTHON_JIT` environment variable.
+3. The code must get *hot*.
+   A script that runs briefly and exits never reaches the threshold,
+   so it pays the compiler's warm-up and collects nothing.
+
+Since 3.14, the official python.org Windows and macOS binaries use `--enable-experimental-jit=yes-off`,
+which compiles the JIT in and leaves it switched off,
+so `PYTHON_JIT=1` turns it on.
+Plain `yes` builds start with the JIT running,
+and there `PYTHON_JIT=0` turns it off.
+Other distributions decide for themselves,
+so the first question is not "is the JIT on?" but "which build am I running?"
+`sys._jit` answers it:
+
+```python
+# jit_status.py
+import sys
+
+def jit_state() -> str:
+    if not sys._jit.is_available():
+        return "no JIT in this build"
+    if not sys._jit.is_enabled():
+        return "JIT built in, switched off"
+    return "JIT enabled"
+
+print(sys._jit.is_available() or not sys._jit.is_enabled())
+#: True
+print(jit_state())
+```
+
+`is_enabled()` implies `is_available()`,
+so testing `is_available()` first and `is_enabled()` second names the three states a build can be in.
+The first `print()` tests that implication, and it shows `True` on every build.
+
+Most listings in this book print the same line on every machine.
+The second `print()` here changes with your interpreter,
+so it carries no `#:` line.
+The book's build has no JIT compiled in, and a run on it shows the first state:
+
+    $ uv run python jit_status.py
+    True
+    no JIT in this build
+
+A python.org binary prints `JIT built in, switched off` until you set `PYTHON_JIT=1`.
+
+A third function, `sys._jit.is_active()`,
+reports whether the frame that called it is running compiled code.
+The documentation warns against branching on its result,
+since a tracing compiler can give different answers to the same call.
+
+The payoff is again a percentage,
+and a smaller one than the tail-calling interpreter's on Windows.
+On the `pyperformance` suite,
+3.15 measures 7-8% faster on x86-64 Linux against the standard optimized build,
+and 11-12% faster on AArch64 macOS against the tail-calling interpreter.
+Those are geometric means over dozens of benchmarks,
+and the What's New that reports them is still marked as a draft.
+The report sets aside one microbenchmark, `unpack_sequence`,
+and the rest range from roughly 15% slower to more than twice as fast,
+so the mean predicts your program poorly.
+Measuring your own program costs two runs:
+time the workload with `PYTHON_JIT` set to `1` and to `0`,
+and change nothing else.
+
+Numba's `@njit`, later in this chapter, is also a just-in-time compiler,
+and the two make opposite trades.
+The CPython JIT asks nothing of you,
+applies to whatever code turns out to be hot, and pays in percentages.
+`@njit` applies only to numeric functions,
+costs a decorator and a compilation pause on the first call,
+and pays in multiples.
+Neither one rescues a quadratic algorithm.
+
+[PEP 836](https://peps.python.org/pep-0836/) sets the bar the JIT must clear:
+5% over the interpreter alone for 3.16,
+then 20% for the JIT combined with [free threading](19_Techniques--Concurrency.md#free-threading)
+by 3.17.
+The PEP calls that the minimum for continuing to develop the JIT inside CPython.
+Meeting it does not turn the JIT on by default:
+that step needs separate approval from the release manager.
 
 ## Write Idiomatic Python
 
