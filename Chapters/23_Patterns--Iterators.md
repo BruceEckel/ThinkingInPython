@@ -853,7 +853,7 @@ and every item it pulled is gone, the match included.
 `DONE` is a [sentinel](05_Foundations--Functions.md#sentinel-values),
 because the answer must differ from every value the source could yield.
 `None` collapses an exhausted source and a source that yields `None` into the same reply.
-The builtin `iter()` uses a sentinel the same way in its two-argument form:
+The built-in `iter()` uses a sentinel the same way in its two-argument form:
 `iter(callable, DONE)` calls `callable` until it hands back `DONE`.
 A `StopIteration` that escapes a generator body becomes a `RuntimeError`
 ([PEP 479](https://peps.python.org/pep-0479/)),

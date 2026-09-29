@@ -269,7 +269,7 @@ Test the parameter with `is None` rather than truthiness:
 `None` works there because no caller would pass `None` as a real `target`.
 When `None` is a valid argument, you need a distinct marker.
 Python 3.15 ([PEP 661](https://peps.python.org/pep-0661/))
-adds a `sentinel` builtin that creates a unique self-describing value for this purpose:
+adds a `sentinel` built-in that creates a unique self-describing value for this purpose:
 
 ```python
 # sentinel_default.py

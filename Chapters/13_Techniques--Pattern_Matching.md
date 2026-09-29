@@ -375,7 +375,7 @@ def test_keyword_patterns(point: Point,
     assert describe(point) == expected
 ```
 
-### Builtin Types and Subclasses
+### Built-in Types and Subclasses {#builtin-types-and-subclasses}
 
 The type test is `isinstance()`, so a subclass matches its base's pattern:
 

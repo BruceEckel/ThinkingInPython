@@ -383,7 +383,7 @@ Passing `Circle` works because `Circle` is a subclass of `Shape`.
 Calling `kind()` then produces an instance.
 The word `type` plays two roles in this listing:
 the annotation `type[Shape]` names the class to the type checker,
-while the builtin call `type(shape)` in the demo retrieves an object's class at runtime.
+while the built-in call `type(shape)` in the demo retrieves an object's class at runtime.
 
 ## Naming Types: The `type` Statement {#the-type-statement}
 
@@ -411,7 +411,7 @@ print(grid)
 
 Like `match`, `type` is a [soft keyword](04_Foundations--Control_Flow.md#pattern-matching):
 it is a keyword only at the start of this statement.
-Everywhere else, `type` is still the builtin `type()` function,
+Everywhere else, `type` is still the built-in `type()` function,
 so `type(grid)` in the same file returns `dict` as it always has.
 
 A `type` alias is a new name, not a new type.
@@ -419,7 +419,7 @@ A `type` alias is a new name, not a new type.
 so the type checker accepts any pair of ints as a `Coord`.
 (For a type the type checker keeps separate from its base, use `NewType`, listed under [Aliases and distinct types](#aliases-and-distinct-types).)
 Because an alias creates no new type,
-save it for a compound shape instead of using it to rename a builtin:
+save it for a compound shape instead of using it to rename a built-in:
 `type UserId = int` looks like a new type in a signature while behaving like `int`.
 
 `Color` names a union of literal values instead of a union of types.
@@ -785,7 +785,7 @@ The abstract container types come from `collections.abc`.
 | Construct | Meaning |
 |-----------|---------|
 | `type Name = ...` | A type alias for a longer type, e.g. `type Grid = dict[tuple[int, int], str]`, see [The `type` Statement](#the-type-statement) |
-| `NewType("Id", int)` | A distinct type, `int` at runtime but separate to the type checker; the base can be any class, not just a builtin |
+| `NewType("Id", int)` | A distinct type, `int` at runtime but separate to the type checker; the base can be any class, not just a built-in |
 | `Annotated[T, meta]` | `T` carrying extra metadata for libraries and tools |
 
 ### Constants and Class Variables

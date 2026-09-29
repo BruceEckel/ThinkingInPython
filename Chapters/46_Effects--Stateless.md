@@ -149,7 +149,7 @@ def greet(name: str) -> Depend[Need[Console], None]:
 `greeter.py` lives in `utils/` because both this chapter and [Stateless in Practice](47_Effects--Stateless_in_Practice.md)
 import it.
 This chapter builds its own `Console` rather than using the one Stateless provides;
-[Builtin Dependencies](#builtin-dependencies), below, says why.
+[Built-in Dependencies](#builtin-dependencies), below, says why.
 Compare `greeter.py`'s `greet()` to the version that calls `print()` directly:
 
 ```python
@@ -247,7 +247,7 @@ Taking the type from the `ReturnType` is why every request in this chapter uses 
 and why the custom abilities of [Abilities Are Not Special](47_Effects--Stateless_in_Practice.md#abilities-are-not-special)
 get a small function of their own.
 
-## Builtin Dependencies
+## Built-in Dependencies {#builtin-dependencies}
 
 The `Console` in `greeter.py` is one this chapter defines.
 Stateless also provides three dependencies of its own:
@@ -285,7 +285,7 @@ print(type(greet("Alice")))
 
 `greet("Alice")` builds a description of a greeting.
 This is the [description/execution split](44_Effects--Effect_Management.md#library-effect-management).
-A language with builtin Effects intercepts an Effect where it runs.
+A language with built-in Effects intercepts an Effect where it runs.
 Stateless is ordinary Python, so when a function body calls `console.print()`,
 the call goes straight to `console` and no library code runs.
 A library acts only on objects handed to it,
@@ -545,7 +545,7 @@ so you need no test that exercises the path and no reviewer who happens to notic
 
 The expected type in that message names `Async` and `Exception`:
 
-- `Async` is a builtin Ability for asynchronous work,
+- `Async` is a built-in Ability for asynchronous work,
   which `run()` handles on its own.
   [Waiting on a Coroutine](#waiting-on-a-coroutine) takes it up.
 - `Exception` is the error channel,
@@ -922,7 +922,7 @@ No check reports it.
 
 ### An Interface Instead of a Base Class
 
-Stateless's own `Console` is the concrete class [Builtin Dependencies](#builtin-dependencies)
+Stateless's own `Console` is the concrete class [Built-in Dependencies](#builtin-dependencies)
 named, and only a subclass can replace it.
 Its accessors name that class,
 so `isinstance()` accepts an instance of the class or a subclass.
@@ -931,7 +931,7 @@ A structurally identical double fails twice.
 because the type checker compares a concrete class by name.
 If a `cast()` forces the static type,
 the run fails with a `MissingAbilityError`.
-A double for the builtin `Console` must therefore inherit from it.
+A double for the built-in `Console` must therefore inherit from it.
 That `Console` implements `input()` as well as `print()`,
 so a double that overrides only `print()` reads live stdin.
 An interface has no implementation to inherit by accident:
