@@ -478,10 +478,14 @@ waiting for `PYTHON_JIT=1`. `True True` means the JIT is already
 running, and `PYTHON_JIT=0` switches it back off.
 
 On a `True False` build, the comparison is two runs of the same file
-with nothing else changed:
+with nothing else changed. `tip` and `uv run` use the project's own
+interpreter, which has no JIT, so run the file with that build's
+`python`, from the chapter directory with `utils/` on the import path
+(`tip membership` prints those commands in your shell's syntax):
 
-    $ PYTHON_JIT=0 uv run python membership.py --numbers
-    $ PYTHON_JIT=1 uv run python membership.py --numbers
+    $ cd Examples/18_Techniques--Performance
+    $ PYTHON_JIT=0 PYTHONPATH=../utils python membership.py --numbers
+    $ PYTHON_JIT=1 PYTHONPATH=../utils python membership.py --numbers
 
 `membership.py` is a poor subject for that comparison, for three
 reasons.

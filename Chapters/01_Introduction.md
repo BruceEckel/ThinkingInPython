@@ -197,6 +197,11 @@ has a command for running one example.
 `tip run-one <name>` (`tools/run_one_example.py`)
 supplies the working directory and import path the book assumes,
 and prints the equivalent by-hand commands first.
+The short form is the listing's name alone:
+`tip membership` runs `membership.py`,
+and words after the name go to the program,
+so `tip membership --numbers` passes it the `--numbers` flag.
+When the book says to run a listing, this is the command to use.
 A filename comment that starts with `rust/`,
 like the `# rust/fastcount/demo.py` listing in [Performance](18_Techniques--Performance.md),
 names a file in the repository's `rust/` directory, outside the Python build.

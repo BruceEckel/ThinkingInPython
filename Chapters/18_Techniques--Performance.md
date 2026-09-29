@@ -358,9 +358,9 @@ def report(**measured: float) -> None:
 
 `report()` prints when the flag is present and stays silent otherwise,
 so the listing's own output, the line the book shows, never changes.
-Running `membership.py` with the flag adds the measurements above it:
+Running `membership.py` with the flag, as `tip membership --numbers`,
+adds the measurements above that line:
 
-    $ uv run python membership.py --numbers
       list_scan  0.041807
       set_lookup 0.000003
       ratio      13,935.560574
@@ -490,9 +490,9 @@ The first `print()` tests that implication, and it shows `True` on every build.
 Most listings in this book print the same line on every machine.
 The second `print()` here changes with your interpreter,
 so it carries no `#:` line.
-The book's build has no JIT compiled in, and a run on it shows the first state:
+The book's build has no JIT compiled in, and a run on it (`tip jit_status`)
+shows the first state:
 
-    $ uv run python jit_status.py
     True
     no JIT in this build
 
