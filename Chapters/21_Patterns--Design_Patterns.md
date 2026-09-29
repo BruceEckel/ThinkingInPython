@@ -114,10 +114,10 @@ A pattern arrives in stages, each more general than the last:
 2.  **Specific Design**:
     the solution that arose to solve this particular problem.
     This might be a clever design, but it doesn't try to be general.
-3.  **Standard Design**: a way to solve every problem of that kind,
-    not just the one in front of you.
-    A design that has become more general, typically through reuse.
-4.  **Design Pattern**: how to solve an entire class of similar problems.
+3.  **Standard Design**: a specific design made general through reuse,
+    so it solves this kind of problem wherever it appears in your own programs.
+4.  **Design Pattern**: the shape several standard designs share,
+    stated apart from any one program or language.
     This usually appears only after you apply a standard design several times,
     and then see a common pattern across those uses.
 
