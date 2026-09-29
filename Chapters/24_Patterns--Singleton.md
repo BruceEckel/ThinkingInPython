@@ -10,15 +10,16 @@ The classic form is a class that refuses a second instance.
 Before writing one, ask whether the language already solves the problem,
 the question [When a Pattern Dissolves](21_Patterns--Design_Patterns.md#when-a-pattern-dissolves)
 poses for every pattern.
-For the singleton, the language already has an answer.
+For *Singleton*, the language already has an answer.
 
 ## A Module Is Already a Singleton
 
 Python imports each module once and caches it in `sys.modules`,
 as [Modules and Packages](06_Foundations--Modules_and_Packages.md) shows.
 Every `import` after the first produces the same module object.
-A module is a singleton, and everyone shares anything defined at module level,
-with one copy for the whole interpreter.
+A module is a singleton:
+whatever it defines at module level exists once per interpreter,
+and every importer shares it.
 One interpreter, not one machine.
 A process pool or an [`InterpreterPoolExecutor`](19_Techniques--Concurrency.md#subinterpreters)
 gives each worker its own `sys.modules`,
@@ -48,7 +49,7 @@ Two `import` statements, one printed line.
 The first one runs `config.py` top to bottom and files the resulting module object in `sys.modules` under the name `config`.
 The second finds it there and skips the work,
 so the body runs once and builds one `settings` dict.
-That is the singleton: not a rule the class enforces,
+That is the singleton: not a rule a class enforces,
 but a lookup the import system performs.
 
 Every import of `settings`, from anywhere, hands back that same `dict`.
@@ -90,7 +91,10 @@ Keep singleton state in a module you import, not in the script you run.
 
 ## When You Want a Class, Cache the Instance
 
-The goal is that every construction returns the same object.
+A module's state is a set of loose names.
+When the shared thing has fields and methods that belong together,
+or other code needs a type to name in an annotation, it is a class.
+The goal is then that every construction returns the same object.
 The simplest approach hides construction behind a cached factory:
 `functools.cache` applied to a *constructor function*,
 an ordinary function that builds and returns an instance of a class.
@@ -146,6 +150,10 @@ print(settings("prod") is settings("dev"))
 ```
 
 One parameter turns "one singleton" into one singleton per argument value.
+A default does not help.
+The cache keys on the arguments as the call writes them and does not fill in a default,
+so `settings()`, `settings("prod")`,
+and `settings(env="prod")` build three objects for one environment.
 Keep the constructor function's signature empty,
 or accept that you built a cache, not a singleton.
 
@@ -157,11 +165,15 @@ and that marking is as far as Python goes.
 A second underscore adds no strength.
 The compiler [mangles](11_Techniques--Testing.md#white-box-and-black-box-tests)
 names only inside a class body,
-so at module level `__Settings` is the plain name it looks like.
-Inside a class body the compiler rewrites `m.__Settings` into a lookup for `_TheClass__Settings`,
+so at module level `__Settings` is stored under that name,
+as reachable as any other.
+Its one effect is a trap.
+In code inside a class body,
+the compiler rewrites a reference to `m.__Settings` into a lookup for `m._TheClass__Settings`,
 and that lookup fails.
 
-This listing keeps the bare name for a reason that outlasts the convention.
+The listings above name the class `Settings`, with no underscore,
+because the name is public.
 `settings()` returns a `Settings`,
 so the class already appears in the module's public signature.
 A caller who annotates the result must write that name,
@@ -199,7 +211,7 @@ uncached `Settings`.
 Three implementation notes:
 
 1. A singleton holds shared state, and shared state leaks between tests.
-   The cached factory has an escape hatch the classic forms lack:
+   The cached factory offers a reset the classic forms lack:
    `settings.cache_clear()` discards the instance, so each test can start fresh.
 
 2. Every lazy singleton has a first-call race under threads.
@@ -253,8 +265,13 @@ Every thread checks the cache before any of them has filled it,
 so each runs the constructor and hands its caller a different object.
 Only the last one to finish stays in the cache.
 The other seven are already in the hands of their callers.
+The listing prints a comparison instead of the count because the count depends on timing:
+it is eight when every thread misses the cache,
+and the sleep makes that the usual result without guaranteeing it.
 
-`@cache` disappears below, because it no longer makes the object single:
+The fix puts the check inside a lock.
+`@cache` keeps its check out of reach,
+so the version below drops `@cache` and writes the check by hand:
 
 ```python
 # singleton_locked_settings.py
@@ -300,7 +317,9 @@ A window too narrow to reproduce is still a window.
 `settings()` declares `global` for `_instance` and leaves `_lock` undeclared.
 The mutate-versus-rebind distinction from [A Module Is Already a *Singleton*](#a-module-is-already-a-singleton)
 reappears here, from inside a function.
-`global` governs rebinding, not use.
+`global` governs rebinding, not use,
+as [Names Inside a Function](05_Foundations--Functions.md#names-inside-a-function)
+shows.
 `with _lock:` reads the name,
 even though acquiring and releasing changes that lock's state,
 from unlocked to locked and back.
@@ -320,11 +339,50 @@ That is the price of laziness under threads.
 
 The classic escape is *double-checked locking*:
 test `_instance` before taking the lock,
-take it when the test finds the object missing, then test again inside.
-The second test is the one note 3 requires.
-The first exists to skip the lock once the object is there.
-Double-checked locking works, but both checks must be exactly right,
-and a subtle mistake reintroduces the race the lock exists to close.
+take it when the test finds the object missing, then test again inside:
+
+```python
+# singleton_double_checked.py
+import threading
+import time
+from concurrent.futures import ThreadPoolExecutor
+from dataclasses import dataclass, field
+from typing import Final
+
+@dataclass
+class Settings:
+    data: dict[str, str] = field(default_factory=dict)
+
+    def __post_init__(self) -> None:
+        time.sleep(0.05)  # Widen the first-call window
+
+_lock: Final[threading.Lock] = threading.Lock()
+_instance: Settings | None = None
+
+def settings() -> Settings:
+    global _instance
+    if _instance is None:
+        with _lock:
+            if _instance is None:
+                _instance = Settings()
+    return _instance
+
+with ThreadPoolExecutor(max_workers=8) as pool:
+    built = list(pool.map(lambda _: settings(), range(8)))
+print(len({id(s) for s in built}))
+#: 1
+```
+
+The inner test is the one note 3 requires.
+The outer test exists to skip the lock once the object is there.
+Double-checked locking works, but it depends on two details.
+If you drop the inner test,
+every thread that passed the outer test before the first assignment builds its own object,
+one after another.
+And the assignment to `_instance` must be the last step of construction.
+The outer test runs without the lock,
+so a thread can read `_instance` while another thread is still inside the `with` block.
+A version that assigns `_instance = Settings()` and then fills in `data` hands that reader a half-built object.
 That is a bad trade for saving one lock acquisition.
 Eager creation is a better answer when you can build the object at import time:
 
@@ -359,13 +417,20 @@ should cover your singleton needs.
 
 ## The Classic Implementations
 
-To address languages like C++ and Java,
-*GoF Design Patterns* builds the singleton with more apparatus.
-Each variation shown here does more work than the module or the cached factory above.
+*GoF Design Patterns* writes its examples in C++ and Smalltalk,
+and it builds the singleton with more apparatus.
+Its class blocks direct construction and hands out the sole instance through a class operation,
+`Instance()`, which builds the object on the first call.
+The cached factory's `settings()` is that operation written as a function.
+Python cannot block construction,
+as [Nothing Keeps the Class Private](#nothing-keeps-the-class-private) shows,
+so the class-based forms here keep the constructor public and route every construction to the same shared state.
+Each does more work than the module or the cached factory above.
 
-The first controls creation by delegating to a single instance of a private nested class.
-The rest reach it by other means: a class variable and a decorator,
-while *Borg* trades one object for one shared set of state.
+The first wraps a single instance of a private nested class.
+The second keeps the instance in a class variable.
+*Borg* trades one object for one shared set of state,
+and the last form is a class decorator.
 
 ### Lazy Creation
 
@@ -480,18 +545,19 @@ Python honors whatever object `__new__()` returns,
 and that return value decides whether `__init__()` runs.
 When `__new__()` returns an instance of the class under construction,
 Python runs `__init__()` on it,
-so a singleton `__new__()` triggers `__init__()` on the shared instance after *every* construction.
+so a singleton `__new__()` triggers `__init__()` on the shared instance after *every* construction
+(see exercise 7).
 `SingletonClassVar` defines no `__init__()`, so `__new__()` does all the work.
 A `__new__()` that returns some other object skips `__init__()` and fails `isinstance()` as well.
 
-### Borg: Singleton By Inheritance
+### Borg: Singleton by Inheritance
 
 [Alex Martelli observes](http://www.aleax.it/Python/5ep.html)
 that what you usually want is not one object but one shared set of state.
 People can create as many objects as they like,
 as long as they all share the same data.
 He called that design the *Borg*.^[From the television show *Star Trek: The Next Generation*. The Borg are a hive-mind collective: "we are all one."]
-A Borg points every instance's `__dict__` at the same storage:
+A *Borg* points every instance's `__dict__` at the same storage:
 
 ![Three distinct instances share one `__dict__`](_images/borg_shared_state)
 
@@ -524,15 +590,15 @@ print(x.val, x is y, x.__dict__ is y.__dict__ is z.__dict__)
 #: spam False True
 ```
 
-The nested class above is a `@dataclass`; `Singleton` cannot be one.
-The sharing depends on `super().__init__` rebinding `self.__dict__` to `_shared_state`,
-and a dataclass generates its own `__init__` that assigns the fields and [never calls the base `__init__`](12_Techniques--Data_Classes_as_Types.md#dataclass-inheritance),
+`Singleton` writes its `__init__()` by hand, and it cannot be a `@dataclass`.
+The sharing depends on `super().__init__()` rebinding `self.__dict__` to `_shared_state`,
+and a dataclass generates its own `__init__()` that assigns the fields and [never calls the base `__init__()`](12_Techniques--Data_Classes_as_Types.md#dataclass-inheritance),
 so each instance keeps its own `__dict__`.
 The code still runs; the class has quietly stopped being a `Borg`.
-A `__post_init__` that does the rebinding fails differently:
-it runs after `__init__` has assigned the fields,
-so the rebinding discards them.
-The hand-written `__init__` makes the sharing work,
+A `__post_init__()` that does the rebinding fails differently:
+it runs after `__init__()` has assigned the fields,
+so the rebinding discards them, and reading `val` raises an `AttributeError`.
+The hand-written `__init__()` makes the sharing work,
 and silently losing the sharing is worse than failing outright.
 
 The sharing also reaches further than it looks.
@@ -542,9 +608,11 @@ A second subclass alongside `Singleton` writes into the same dict,
 so constructing one of each leaves both objects reading the value set last.
 A subclass that needs storage of its own declares it:
 `class Singleton(Borg): _shared_state: ClassVar[dict[str, Any]] = {}`.
+The lookup through `self` finds the subclass's dict first,
+and Martelli wrote `self._shared_state` instead of `Borg._shared_state` to allow that override.
 
 Testing confirms that the objects differ but share one set of state.
-Borg has no `cache_clear()`:
+*Borg* has no `cache_clear()`:
 whatever one test leaves in `_shared_state` is still there for the next.
 A pytest fixture closes that gap by clearing the dict before each test:
 
@@ -624,7 +692,8 @@ print(first is second, second.name,
 ```
 
 `@singleton` on `Registry` runs `Registry = singleton(Registry)`.
-The name `Registry` now refers to the decorated instance rather than to the class.
+The name `Registry` now refers to a `singleton` object that holds the class,
+not to the class.
 Why does `__call__()` intercept the constructor for a `Registry`?
 To evaluate `obj(...)`, Python looks up `__call__()` on the *type* of `obj`
 ([*Surrogate*](26_Patterns--Surrogate.md#special-methods-bypass-getattr) examines this type-based lookup in full).
@@ -642,7 +711,7 @@ Every later constructor call returns the cached instance and discards the constr
 so `Registry("secondary", limit=99)` creates no new object.
 A caller who believes those arguments took effect holds an object configured by someone else.
 
-`isinstance(first, Registry)` and `class Sub(Registry)` both raise:
+`isinstance(first, Registry)` and `class Sub(Registry)` both raise a `TypeError`:
 
 ```python
 # test_singleton_class.py
@@ -672,6 +741,14 @@ and Python takes that metaclass from the type of the base, which is `singleton`.
 Nothing in `class Sub(Registry)` mentions `singleton`,
 so the error names a class that does not appear in the failing line.
 That is the confusion a class decorator costs you.
+
+The decorator costs static checking as well.
+Under `ty` and Pyright,
+`Registry("primary", limit=3)` is a call to `singleton.__call__()`,
+which accepts any arguments and returns `Any`.
+A wrong argument type passes the check,
+and so does a misspelled attribute on the result.
+Under mypy the name is still the class, so both are checked.
 `singleton_class_variable.py` keeps the name pointing at a real class,
 and that is the reason to prefer it.
 
@@ -683,7 +760,7 @@ so the first call's arguments win.
 In a class that overrides `__new__()` instead,
 as `singleton_class_variable.py` does, `__new__()` still runs on every call,
 unlike the metaclass form above.
-That listing puts its work inside `__new__()` itself,
+That listing puts its work inside `__new__()`,
 so later calls append to the shared instance instead of overwriting it.
 [Metaprogramming](17_Techniques--Metaprogramming.md)
 also covers `__init_subclass__()` and `__set_name__()`,
@@ -704,7 +781,7 @@ Use the lightest tool that fits:
   but only when something needs those handles to be objects:
   an existing class-based interface, an `isinstance()` check, or subclassing.
   A module already shares that state with every importer and needs no class,
-  so shared data alone is no reason to use Borg.
+  so shared data alone is no reason to use *Borg*.
 - The decorator and metaclass forms work,
   but they are more machinery than the problem usually justifies.
 
@@ -739,3 +816,9 @@ In Python, a module is that single instance, so most of the ceremony falls away.
 6.  Give `singleton_borg.py` a second `Borg` subclass and construct one of each.
     Explain the value you get back,
     and change the code so the two subclasses keep separate shared state.
+7.  In `singleton_class_variable.py`,
+    remove the two lines of `__new__()` that use `val`.
+    Add an `__init__()` that takes `arg`, prints it,
+    and sets `self.val = [arg]`.
+    Predict what `x.val` holds after the three constructions, then run it.
+    Explain the result using what `__new__()` returns.

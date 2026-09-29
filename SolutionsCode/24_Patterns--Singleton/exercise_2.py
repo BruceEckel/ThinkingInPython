@@ -9,8 +9,8 @@ class Connection:
 
 class ConnectionPool:
     def __init__(self, size: int) -> None:
-        self._all = [Connection(i) for i in range(size)]
-        self._available = list(self._all)
+        self._available = [
+            Connection(i) for i in range(size)]
         self._leased: set[Connection] = set()
 
     def acquire(self) -> Connection:
@@ -21,7 +21,7 @@ class ConnectionPool:
         return conn
 
     def release(self, conn: Connection) -> None:
-        self._leased.discard(conn)
+        self._leased.remove(conn)
         self._available.append(conn)
 
 @cache
@@ -40,6 +40,8 @@ print(c1 != c2)
 expect(RuntimeError, p1.acquire)
 #: [RuntimeError] pool exhausted
 p1.release(c1)
+expect(KeyError, p1.release, c1)
+#: [KeyError] Connection(number=1)
 c3 = p1.acquire()
 print(c3 == c1)
 #: True

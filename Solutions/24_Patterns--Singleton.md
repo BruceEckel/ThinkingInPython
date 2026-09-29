@@ -58,8 +58,8 @@ class Connection:
 
 class ConnectionPool:
     def __init__(self, size: int) -> None:
-        self._all = [Connection(i) for i in range(size)]
-        self._available = list(self._all)
+        self._available = [
+            Connection(i) for i in range(size)]
         self._leased: set[Connection] = set()
 
     def acquire(self) -> Connection:
@@ -70,7 +70,7 @@ class ConnectionPool:
         return conn
 
     def release(self, conn: Connection) -> None:
-        self._leased.discard(conn)
+        self._leased.remove(conn)
         self._available.append(conn)
 
 @cache
@@ -89,14 +89,16 @@ print(c1 != c2)
 expect(RuntimeError, p1.acquire)
 #: [RuntimeError] pool exhausted
 p1.release(c1)
+expect(KeyError, p1.release, c1)
+#: [KeyError] Connection(number=1)
 c3 = p1.acquire()
 print(c3 == c1)
 #: True
 ```
 
 `@cache` on the zero-argument `pool()` constructor function still
-guarantees exactly one `ConnectionPool` object exists (`p1 is p2`),
-the same trick `singleton_cached_factory.py` uses for `Settings`.
+yields one `ConnectionPool` object (`p1 is p2`), the same technique
+`singleton_cached_factory.py` uses for `Settings`.
 The change is what that one object *is*: instead of holding a
 single value, it holds a fixed collection of `Connection`s and
 tracks which ones it has handed out. `acquire()` and `release()`
@@ -104,7 +106,12 @@ replace the "get the instance" idea with "borrow one member of a
 pool and give it back,"
 similar in spirit to [Context Managers](../Chapters/15_Techniques--Context_Managers.md#an-object-pool)'s
 `Pool.lease()`, but without the automatic return a context manager
-guarantees. Here a caller must remember to call `release()`.
+guarantees. Here a caller must remember to call `release()`, and
+to call it once. `release()` removes the connection from `_leased`
+with `remove()`, which raises a `KeyError` for a connection that is
+not on lease. With `discard()` there, a second `release()` would
+put the same connection into `_available` twice, and the pool would
+hand one connection to two callers.
 
 ## 3. A class-based singleton rewritten as a module
 
@@ -126,7 +133,7 @@ print(only_one.val)
 #: ['sausage', 'eggs']
 ```
 
-The module behaves exactly like `OnlyOne` from
+The module behaves like `OnlyOne` from
 `singleton_pattern.py`: a shared, one-and-only-one `val` list that
 any part of the program can append to. The module is the single
 shared object Python caches in `sys.modules`, so the design drops
@@ -137,11 +144,10 @@ For real code, prefer the module. It is less code, has no
 indirection to read through, and gets the same guarantee.
 [A Module Is Already a *Singleton*](../Chapters/24_Patterns--Singleton.md#a-module-is-already-a-singleton)
 makes that argument at the top of the chapter. The class-based
-versions only earn their complexity when something genuinely needs
-the shape of a class, such as participating in an interface other
-code expects, or needing `__new__()`-level control over
-construction. Absent that requirement, a module is the simpler tool
-that already does the job.
+versions are worth their complexity when something needs the shape
+of a class, such as participating in an interface other code
+expects, or needing `__new__()`-level control over construction.
+Absent that requirement, a module is the simpler tool.
 
 ## 4. Rebinding instead of mutating
 
@@ -249,10 +255,9 @@ The lock changes the timing, not the outcome. Without it the eight
 constructors overlap and the whole run takes about 50 milliseconds.
 With it they queue, and the run takes about 400. Each thread still
 builds its own `Settings` and still returns the one it built.
-`@cache` keeps whichever finished last, so seven callers walk away
-holding objects the cache has never heard of. The lock makes the
-program slower and fixes nothing, the worst outcome a lock can
-produce.
+`@cache` keeps whichever finished last, so seven callers hold
+objects the cache no longer holds. The lock makes the program
+slower and fixes nothing.
 
 You cannot move the lock to the right place either. The right place
 is inside `functools.cache`, where the check and the store live,
@@ -268,13 +273,13 @@ before any worker thread starts, and by the time the pool exists
 every call is a cache hit. The count is `1`. Priming the cache this
 way is `singleton_eager_factory.py` from the chapter, and it works
 for the same reason the module form does: the import system runs a
-module body exactly once, so import time is single-threaded by
-guarantee rather than by hope.
+module body once, and a thread that imports the module while the
+body is running waits for it to finish.
 
 The trade is that the module body builds the object whether or not
 anything uses it. For settings that cost is nothing. For a database
 connection it may be real, and then the hand-written lock is the
-honest answer.
+answer.
 
 ## 6. Two Borg subclasses share one namespace
 
@@ -325,10 +330,9 @@ nothing reports it.
 `_shared_state` is one dict, and it lives on `Borg`. `Singleton` and
 `Other` do not declare their own, so `self._shared_state` resolves
 to `Borg`'s dict from both, and `Borg.__init__()` points both
-instances' `__dict__` at that one dict. The sharing the pattern
-promises is per-`Borg`, not per-subclass. The class hierarchy hides
-that sharing: `Singleton` and `Other` have no visible connection to
-each other.
+instances' `__dict__` at that one dict. The sharing is per-`Borg`,
+not per-subclass. The class hierarchy hides that sharing:
+`Singleton` and `Other` have no visible connection to each other.
 
 The fix is one line per subclass. `Separate` declares its own
 `_shared_state`, so the lookup stops there instead of reaching `Borg`,
@@ -342,3 +346,56 @@ every subclass inherits that same one. A subclass that assigns to
 it instead of mutating it gets a private copy, while the others
 keep sharing. *Borg* sharpens the trap: mutation is its
 design, so every version of the pattern carries the trap.
+
+## 7. `__init__()` runs on every construction
+
+```python
+# exercise_7.py
+from typing import ClassVar
+
+class SingletonClassVar:
+    val: list[str]
+    __instance: ClassVar[SingletonClassVar | None] = None
+
+    def __new__(cls, arg: str) -> SingletonClassVar:
+        if SingletonClassVar.__instance is None:
+            SingletonClassVar.__instance = (
+                object.__new__(cls))
+        return SingletonClassVar.__instance
+
+    def __init__(self, arg: str) -> None:
+        print(f"__init__({arg})")
+        self.val = [arg]
+
+x = SingletonClassVar("sausage")
+#: __init__(sausage)
+y = SingletonClassVar("eggs")
+#: __init__(eggs)
+z = SingletonClassVar("spam")
+#: __init__(spam)
+print(x.val, x is y is z)
+#: ['spam'] True
+```
+
+`x.val` is `['spam']`. The three names refer to one object, and
+that object holds the value from the last construction.
+
+`__new__()` returns the shared instance every time. That instance
+is a `SingletonClassVar`, the class under construction, so Python
+runs `__init__()` on it after every call to `__new__()`. The trace
+shows three runs. Each one rebinds `val` to a new one-item list,
+and the lists from the first two constructions are gone. The
+object is single, and its state is reset by every caller who
+constructs it.
+
+The chapter's listing avoids the reset by defining no `__init__()`.
+Its `__new__()` does the work, and the `None` test there separates
+the first construction, which creates `val`, from the later ones,
+which append to it. A singleton that keeps an `__init__()` has to
+make it safe to run repeatedly, for example by returning at once
+when `hasattr(self, "val")` is true.
+
+The metaclass form in
+[Metaprogramming](../Chapters/17_Techniques--Metaprogramming.md#intercepting-instance-creation)
+has no such problem. Its `__call__()` runs before `__new__()` and
+`__init__()`, and after the first construction it calls neither.

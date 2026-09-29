@@ -38,6 +38,7 @@ Chapters/Simulation	Simulation	3	Breaking `claim()`'s atomicity
 Chapters/Simulation	Simulation	3	Breaking `claim()`'s atomicity
 Chapters/Simulation	Simulation	7	Changing the physics
 Chapters/Singleton	Singleton	1	`singleton_pattern.py` rewritten to eager initialization
+Chapters/Singleton	Singleton	7	`__init__()` runs on every construction
 Chapters/State_Machines	State_Machines	1	`UnpredictablePerson` with a `Prozac` mood
 Chapters/State_Machines	State_Machines	3	A word-driven state machine with per-state transition tables
 Chapters/Stateless	Effect_Management	2	Threading a `Log` Effect through by hand
