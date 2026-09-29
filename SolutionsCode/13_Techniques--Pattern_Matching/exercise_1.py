@@ -1,12 +1,12 @@
 # exercise_1.py
 from dataclasses import dataclass
 
-@dataclass
+@dataclass(frozen=True)
 class Point:
     x: int
     y: int
 
-def classify(value):
+def classify(value: object) -> str:
     match value:
         case []:
             return "empty list"
@@ -29,3 +29,5 @@ print(classify(Point(1, 2)))
 #: point
 print(classify("hi"))
 #: other
+print(classify((1,)))
+#: singleton

@@ -1,4 +1,5 @@
 # exercise_3.py
+
 def handle(event: dict[str, object]) -> str:
     match event:
         case {"type": "click", "at": {"x": x, "y": y}}:

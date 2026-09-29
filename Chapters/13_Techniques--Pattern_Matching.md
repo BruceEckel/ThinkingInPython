@@ -68,8 +68,8 @@ For a value-to-value lookup like this, a dictionary is often shorter
 
 ## Alternatives and Capture
 
-An alternative combines several patterns in one `case` with `|`.
-Each alternative joined by `|` must bind the same set of names.
+`|` joins several patterns in one `case`,
+and the case matches when any one of them fits.
 
 A bare name is a *capture pattern*.
 Like `_`, it matches any value unconditionally.
@@ -95,6 +95,12 @@ print(step("d"))
 print(step("jump"))
 #: unknown command: jump
 ```
+
+The alternatives in `step()` are literals, which bind nothing.
+When alternatives do capture, each one must bind the same set of names,
+so the body can use those names whichever alternative matched.
+`nested_patterns.py` in [Patterns Nest](#patterns-nest)
+has a `case` of that kind.
 
 ## A Bare Name Captures, a Dotted Name Compares
 
@@ -143,10 +149,8 @@ rebinds `DEFAULT` as a local name inside `broken()`,
 and leaves the module-level constant untouched.
 Python catches the mistake when a later `case` follows a bare-name capture,
 refusing to compile with `SyntaxError: name capture 'DEFAULT' makes remaining patterns unreachable`.
-When the capture is the last `case`, as here, Python does not warn you,
-and neither `ty` nor `ruff` catches it either:
-the `case` binds a new local named `DEFAULT` instead of comparing against the module constant,
-and nothing in the toolchain says so.
+When the capture is the last `case`, as here,
+Python compiles it without a warning, and neither `ty` nor `ruff` reports it.
 
 `act()` also shows why an enum is worth the trouble: `Signal` is a closed set,
 so the type checker sees that the cases cover both members and accepts the function with no trailing `return`.
@@ -193,7 +197,7 @@ print(last_of([1, 2, 3, 4]))
 
 `summarize()` shows the structural part of "structural pattern matching."
 The pattern `[first, second]` matches only a two-element sequence and pulls both out at once.
-The last `case _` never runs:
+The last `case _` is unreachable:
 `[first, *rest]` catches every nonempty list and `[]` the empty one.
 The type checker cannot prove that,
 so the wildcard stays to satisfy the declared return type.
@@ -220,12 +224,14 @@ The subject must be a sequence, though, not merely iterable:
 `case [a, b]` matches a `range` but not a generator and not a `set`.
 
 The brackets are optional in a sequence pattern,
-so `case 0, 0:` and `case [0, 0]` are the same pattern.
+so `case 0, 0:` and `case [0, 0]:` are the same pattern.
 The subject is any expression, not only a parameter,
-and a comma builds a tuple there too,
-so `match sign(x), sign(y):` matches on a pair computed inline.
+and a comma builds a tuple there too.
+Given a `sign()` helper that returns `-1`, `0`, or `1`,
+`match sign(x), sign(y):` matches on a pair computed inline.
 Transforming the subject this way turns a set of comparisons into literal patterns,
-and that usually reads better than the guards you would write otherwise.
+and that usually reads better than the [guards](#guards)
+you would write otherwise.
 
 ```python
 # test_sequence_patterns.py
@@ -298,6 +304,22 @@ A positional pattern raises a `TypeError` when `__match_args__` is too short to 
 For an ordinary class `R` that lacks one,
 `case R(1)` reports `TypeError: R() accepts 0 positional sub-patterns (1 given)`.
 
+```python
+# test_class_patterns.py
+import pytest
+from class_patterns import locate
+from point import Point
+
+@pytest.mark.parametrize("point, expected", [
+    (Point(0, 0), "The origin"),
+    (Point(3, 0), "On the x-axis at x=3"),
+    (Point(3, 4), "At (3, 4)"),
+])
+def test_class_patterns(point: Point,
+                        expected: str) -> None:
+    assert locate(point) == expected
+```
+
 ### Keyword Patterns
 
 A keyword pattern such as `Point(x=0, y=y)` matches by attribute name,
@@ -337,6 +359,22 @@ so every positional pattern silently starts matching a different field.
 matches any `Point` instance.
 Use it as a type-only check or a final catch-all.
 
+```python
+# test_keyword_patterns.py
+import pytest
+from keyword_patterns import describe
+from point import Point
+
+@pytest.mark.parametrize("point, expected", [
+    (Point(0, 5), "Somewhere on the y-axis"),
+    (Point(3, 0), "Somewhere on the x-axis"),
+    (Point(3, 4), "Just some point"),
+])
+def test_keyword_patterns(point: Point,
+                          expected: str) -> None:
+    assert describe(point) == expected
+```
+
 ### Builtin Types and Subclasses
 
 The type test is `isinstance()`, so a subclass matches its base's pattern:
@@ -372,44 +410,19 @@ so moving `case bool(b)` below `case int(n)` makes it unreachable:
 
 In `int(n)`, the positional sub-pattern binds the whole value rather than an attribute.
 Python special-cases a handful of builtins this way
-(`bool`, `int`, `float`, `str`, `bytes`, `bytearray`, `list`, `tuple`, `dict`, `set`, `frozenset`),
+(`bool`, `int`, `float`, `str`, `bytes`, `bytearray`, `list`, `tuple`, `dict`, `frozendict`, `set`, `frozenset`),
 so `case str(s)` reads as "a string, call it `s`."
 
-Dropping the parentheses flips the meaning: `case str:` is a bare-name capture,
-not a type test, matching any value and binding it to a local named `str`.
+Dropping the parentheses changes the meaning:
+`case str:` is a bare-name capture, not a type test,
+matching any value and binding it to a local named `str`.
 `case str:` repeats the `DEFAULT` mistake from `value_patterns.py`,
 and Python catches it the same way, by refusing to compile any `case` after it:
 `SyntaxError: name capture 'str' makes remaining patterns unreachable`.
 
 Matching on `isinstance()` is the opposite of the exact-type dispatch that a `dict` keyed on `type(value)` performs.
 [*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md#one-lookup-in-a-table)
-relies on that dispatch, and there a subclass finds no entry at all.
-
-```python
-# test_class_patterns.py
-import pytest
-from class_patterns import locate
-from keyword_patterns import describe
-from point import Point
-
-@pytest.mark.parametrize("point, expected", [
-    (Point(0, 0), "The origin"),
-    (Point(3, 0), "On the x-axis at x=3"),
-    (Point(3, 4), "At (3, 4)"),
-])
-def test_class_patterns(point: Point,
-                        expected: str) -> None:
-    assert locate(point) == expected
-
-@pytest.mark.parametrize("point, expected", [
-    (Point(0, 5), "Somewhere on the y-axis"),
-    (Point(3, 0), "Somewhere on the x-axis"),
-    (Point(3, 4), "Just some point"),
-])
-def test_keyword_patterns(point: Point,
-                          expected: str) -> None:
-    assert describe(point) == expected
-```
+relies on that dispatch, and there a subclass finds no entry.
 
 ## Guards
 
@@ -461,6 +474,11 @@ Once `case Point(x, y) if x > 0 and y > 0` has failed,
 left over from the failed guard in the case above it.
 A case that does not rebind a name inherits whatever an earlier,
 failed case left behind.
+That holds for a failed guard, where the pattern matched and made its bindings.
+A pattern that fails partway is different:
+the language reference leaves it to the implementation whether the captures made before the failure stay bound.
+Use a captured name only in the `case` that captured it.
+
 A pattern tests shape and equality,
 so everything beyond that belongs in the guard: an ordering test like `x > 0`,
 a relation between two captures like `x == y`,
@@ -469,6 +487,10 @@ Repeating a name does not express equality.
 `case [x, x]:` fails with `SyntaxError: multiple assignments to name 'x' in pattern`,
 so an equal-elements test is also a guard, `case [x, y] if x == y:`.
 A guard that merely compares one capture to a constant is a literal pattern written the long way.
+The exception is a constant with a bare name,
+such as `DEFAULT` in `value_patterns.py`.
+A pattern cannot compare against that name,
+so `case s if s == DEFAULT:` is how a `case` tests for it.
 
 ## Mapping Patterns
 
@@ -529,8 +551,7 @@ def test_mapping_patterns() -> None:
 
 ## Patterns Nest
 
-A sub-pattern is itself a pattern,
-so any of these forms can sit inside any other:
+A sub-pattern is a pattern, so any of these forms can sit inside any other:
 
 ```python
 # nested_patterns.py
@@ -570,11 +591,12 @@ The compiler enforces the same-names rule from [Alternatives and Capture](#alter
 Adding a third alternative `| Point(1, 1)`, which binds nothing,
 fails with `SyntaxError: alternative patterns bind different names`.
 
-A pattern can also nest inside a copy of its own case,
-matching a self-referential type such as a tree.
+Nesting has a fixed depth, the depth you write into the pattern.
+A self-referential type such as a tree needs recursion instead:
+a function whose `match` takes one level apart and calls the function again on the parts.
 [*Composite* and *Interpreter*](34_Patterns--Composite_and_Interpreter.md#evaluation-is-a-tree-walk)
-walks an expression tree this way:
-each `case` matches one node type and recurses into that node's own children.
+walks an expression tree this way: each `case` matches one node type,
+and its body recurses into that node's children.
 
 ## Exhaustive Matching
 
@@ -617,12 +639,21 @@ print(area(Square(2.0)))
 #: 4.0
 ```
 
-If you add a `Triangle` to `Shape` without adding the appropriate `case`,
-the type checker flags `assert_never(shape)`.
 `assert_never()` acts at runtime as well as at check time.
-If a value that lied about its type reaches `assert_never()`,
-the call raises `AssertionError: Expected code to be unreachable, but got: 'x'`,
+If a caller ignores the annotation and passes the string `"x"`,
+that value reaches `assert_never()`,
+which raises `AssertionError: Expected code to be unreachable, but got: 'x'`,
 naming the value it received.
+
+`act()` in `value_patterns.py` has no `assert_never()`,
+and the type checker still confirms that its cases cover `Signal`.
+That check comes from the return type:
+a missing `case` would let the function run off its end and return `None`,
+which is not a `str`.
+A `match` whose cases return nothing gets no such check,
+so there a missing `case` passes unnoticed.
+`assert_never()` covers both kinds of `match`,
+and it reports the error at the `match` instead of at the function's signature.
 
 A `switch` in C, JavaScript, or traditional Java has no such check:
 nothing forces you to add a case, and an unhandled value falls through silently.
@@ -657,7 +688,7 @@ def test_exhaustive_area() -> None:
     assert round(area(Circle(1.0)), 4) == 3.1416
     assert area(Square(2.0)) == 4.0
 
-def test_assert_never_rejects_a_lying_value() -> None:
+def test_assert_never_rejects_a_non_shape() -> None:
     with pytest.raises(AssertionError):
         area("x")  # type: ignore
 ```
@@ -707,6 +738,7 @@ The enum hands the type checker the closed set,
 so `assert_never()` works without a `type` union.
 
 ## Dynamic Binding vs. Pattern Matching {#dynamic-binding-vs-pattern-matching}
+
 An alerting system sends a notification through one of three channels: email,
 SMS, or push.
 Every channel renders the notification into a message string for a recipient.
@@ -902,7 +934,7 @@ explore it further.
     `"singleton"`, or `"longer list"` for lists, `"point"` for a `Point`,
     and `"other"` for anything else.
 2.  Add a `Rectangle` type to `exhaustive.py`'s `Shape` union without adding its `case`.
-    Run `ty` and read the error it reports at `assert_never`.
+    Run `ty` and read the error it reports at `assert_never()`.
 3.  Rewrite `mapping_patterns.handle()` to also accept a nested shape,
     such as `{"type": "click", "at": {"x": x, "y": y}}`,
     binding `x` and `y` from the inner dictionary.

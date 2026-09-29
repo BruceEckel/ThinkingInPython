@@ -6,12 +6,12 @@
 # exercise_1.py
 from dataclasses import dataclass
 
-@dataclass
+@dataclass(frozen=True)
 class Point:
     x: int
     y: int
 
-def classify(value):
+def classify(value: object) -> str:
     match value:
         case []:
             return "empty list"
@@ -34,16 +34,26 @@ print(classify(Point(1, 2)))
 #: point
 print(classify("hi"))
 #: other
+print(classify((1,)))
+#: singleton
 ```
 
 `[]` matches only an empty sequence. `[_]` matches a list with exactly
 one element (the `_` throws the value away without a name). `[_, *_]`
 matches one or more elements: the first `_` matches the first element,
-and `*_` collects the rest, even when the rest is empty. So
+and `*_` collects the rest, including an empty rest. So
 `[_, *_]` also fits a singleton, and order matters: `[_]` must come
 before `[_, *_]`, or the general pattern claims `[1]` first and
-"singleton" never runs. `Point()` matches any `Point` instance without
-binding its fields at all, since `classify()` doesn't need `x` or `y`.
+the "singleton" case is unreachable. `Point()` matches any `Point`
+instance without binding its fields, since `classify()` doesn't need
+`x` or `y`.
+
+The string `"hi"` is a sequence of two characters, and it still lands
+in "other": a sequence pattern excludes `str`. The tuple `(1,)` goes
+the other way. A sequence pattern tests the shape, not the type, so a
+one-element tuple is a "singleton" here. When the answer must hold for
+a `list` alone, wrap the pattern in a class pattern: `case list([_]):`
+first tests for a `list`, then matches the one-element shape.
 
 ## 2. Adding `Rectangle` without its `case`
 
@@ -83,15 +93,16 @@ Once `Rectangle` joins the `Shape` union, the type checker can prove that a
 `assert_never()` demands an argument of type `Never`, meaning "this
 code is unreachable." The type checker now knows `shape` can be a
 `Rectangle` at that point, so the two types disagree and the checker
-reports an error. That error is the safety net the chapter describes:
+reports an error. That error is the check the chapter describes:
 the missing case becomes a type error at check time instead of a
-silent gap that shows up only when an actual `Rectangle` reaches
-`area()` at runtime.
+silent gap that shows up only when a `Rectangle` reaches `area()` at
+runtime.
 
 ## 3. Matching a nested shape
 
 ```python
 # exercise_3.py
+
 def handle(event: dict[str, object]) -> str:
     match event:
         case {"type": "click", "at": {"x": x, "y": y}}:
@@ -118,7 +129,7 @@ The new `case` nests a mapping pattern inside a mapping pattern:
 that itself has `"x"` and `"y"` keys, binding both in one step. The
 nested case and the flat `{"type": "click", "x": x, "y": y}` case
 each describe one shape of click event, and both return the same
-string. The two cases never compete: a flat event has no `"at"` key
+string. The two cases do not compete: a flat event has no `"at"` key
 and a nested one has no top-level `"x"`, so each event fits only one
 of them. Order matters for `{"type": kind}`, which any event with a
 `"type"` key satisfies. `match` tries cases top to bottom and stops
@@ -215,7 +226,7 @@ chapter describes: adding a type touches every operation.
 # exercise_5.py
 from dataclasses import dataclass
 
-@dataclass
+@dataclass(frozen=True)
 class Point:
     x: int
     y: int
@@ -248,7 +259,7 @@ matching on the pair of signs rather than on the point:
 # exercise_5_signs.py
 from dataclasses import dataclass
 
-@dataclass
+@dataclass(frozen=True)
 class Point:
     x: int
     y: int
@@ -279,19 +290,23 @@ print(quadrant(Point(0, 7)))
 #: On an axis
 ```
 
-The second version reads better, and the reason is worth naming. A
-guard hides the shape of the dispatch: you have to read five nearly
-identical `if` clauses one at a time to see that they enumerate sign
-combinations. Once the subject is `sign(p.x), sign(p.y)`, the cases
-are literals in a two-column table, and a missing combination is
-visible at a glance. The `|` alternation then handles both axis cases
-in one line, which no guard arrangement does as briefly.
+The second version reads better. A guard hides the shape of the
+dispatch: you have to read four nearly identical `if` clauses one at a
+time to see that they enumerate sign combinations. Once the subject is
+`sign(p.x), sign(p.y)`, the cases are literals in a two-column table,
+and a missing combination is visible at a glance. The `|` alternation
+then handles both axis cases in one line, which no guard arrangement
+does as briefly.
 
 The cost is the `sign()` helper and one extra layer of indirection:
-the `match` no longer mentions `Point` at all. That trade is usually
-worth it when the guards are all testing the same handful of
-derived facts, and not worth it when each guard asks a different
-question.
+the `match` no longer mentions `Point`. That trade is usually worth it
+when the guards are all testing the same handful of derived facts, and
+not worth it when each guard asks a different question.
+
+The final `case _` is unreachable, since the six cases above it cover
+all nine pairs of signs. The type checker sees only that `sign()`
+returns an `int`, so without that case it reports that `quadrant()`
+can return `None`.
 
 ## 6. A constant that captures, and two ways to fix it
 
@@ -349,7 +364,7 @@ print(guarded(Signal.STOP), guarded(Signal.CAUTION))
 `act()` answers "fallback" for `Signal.STOP`, which is not the
 fallback value. `case FALLBACK:` is a bare name, so it captures: it
 matches `Signal.STOP`, binds it to a local named `FALLBACK` inside
-`act()`, and never compares anything. The module-level constant
+`act()`, and compares nothing. The module-level constant
 still holds `Signal.CAUTION` afterward, which is why the mistake is
 easy to miss. Python accepts `case FALLBACK:` only because it is the
 last case. Another case after it fails to compile.
@@ -357,8 +372,10 @@ last case. Another case after it fails to compile.
 The first fix gives the constant a dotted name by putting it in a
 namespace. `Defaults.FALLBACK` is a value pattern, so `dotted()`
 compares against it and answers "brake" for `Signal.STOP`. Any dotted
-name works, including `Signal.CAUTION` itself. Moving the constant
-into a class keeps one definition for the rest of the program to use.
+name works, including `Signal.CAUTION`. In a program the constant
+would live in the class alone, one definition for every use. The
+listing keeps the module-level copy because `act()` and `guarded()`
+need the bare name.
 
 The second fix keeps the bare constant and moves the comparison into a
 guard, where `FALLBACK` is an ordinary expression rather than a
