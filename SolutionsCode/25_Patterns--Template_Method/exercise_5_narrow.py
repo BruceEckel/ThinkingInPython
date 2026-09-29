@@ -1,4 +1,4 @@
-# near_miss.py
+# exercise_5_narrow.py
 from difflib import get_close_matches
 from typing import final, override
 from exceptions import expected
@@ -15,10 +15,9 @@ class ApplicationFramework:
 
     def __init_subclass__(cls) -> None:
         super().__init_subclass__()
-        inherited = {
+        declared = {
             name
-            for base in cls.__mro__[1:]
-            for name in vars(base)
+            for name in vars(ApplicationFramework)
             if not name.startswith("__")
         }
         for name in vars(cls):
@@ -29,9 +28,9 @@ class ApplicationFramework:
                     f"{cls.__name__}.run "
                     "overrides the anchor"
                 )
-            if name in inherited:
+            if name in declared:
                 continue
-            if near := get_close_matches(name, inherited):
+            if near := get_close_matches(name, declared):
                 raise TypeError(
                     f"{cls.__name__}.{name}: "
                     f"did you mean {near[0]}?"
@@ -44,20 +43,13 @@ class MyApp(ApplicationFramework):
 
     def report(self) -> None: ...
 
-with expected(TypeError):
-    class Typo(ApplicationFramework):
-        def customise1(self) -> None:
-            print("never runs")
-#: [TypeError] Typo.customise1: did you mean customize1?
+class Audited(MyApp):
+    def reports(self) -> None: ...
+
+print(Audited.reports.__qualname__)
+#: Audited.reports
 
 with expected(TypeError):
-    class Hijack(ApplicationFramework):
-        def run(self) -> None:  # type: ignore
-            print("never runs")
-#: [TypeError] Hijack.run overrides the anchor
-
-with expected(TypeError):
-    class Weird(ApplicationFramework):
-        def customized_report(self) -> None: ...
-#: [TypeError] Weird.customized_report: did you mean
-#: customize2?
+    class Typo(MyApp):
+        def customise2(self) -> None: ...
+#: [TypeError] Typo.customise2: did you mean customize2?

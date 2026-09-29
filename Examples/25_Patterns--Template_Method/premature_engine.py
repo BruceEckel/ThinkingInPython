@@ -14,7 +14,7 @@ class Framework:
 
 class Greeter(Framework):
     def __init__(self, name: str) -> None:
-        # With the usual style, the engine calls run()
+        # In the usual order, this call runs the engine
         super().__init__()
         self.name = name  # ...before this line runs
 

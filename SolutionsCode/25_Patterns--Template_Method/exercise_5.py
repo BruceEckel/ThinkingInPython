@@ -1,4 +1,4 @@
-# near_miss.py
+# exercise_5.py
 from difflib import get_close_matches
 from typing import final, override
 from exceptions import expected
@@ -45,19 +45,6 @@ class MyApp(ApplicationFramework):
     def report(self) -> None: ...
 
 with expected(TypeError):
-    class Typo(ApplicationFramework):
-        def customise1(self) -> None:
-            print("never runs")
-#: [TypeError] Typo.customise1: did you mean customize1?
-
-with expected(TypeError):
-    class Hijack(ApplicationFramework):
-        def run(self) -> None:  # type: ignore
-            print("never runs")
-#: [TypeError] Hijack.run overrides the anchor
-
-with expected(TypeError):
-    class Weird(ApplicationFramework):
-        def customized_report(self) -> None: ...
-#: [TypeError] Weird.customized_report: did you mean
-#: customize2?
+    class Audited(MyApp):
+        def reports(self) -> None: ...
+#: [TypeError] Audited.reports: did you mean report?

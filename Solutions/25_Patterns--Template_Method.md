@@ -4,34 +4,31 @@
 
 The framework anchors the shape: read every file but the last, run the
 varying `process()` step over each one's text, and write the combined
-result to the last file.
+result to the last file. It appears twice, as a base class whose
+`run()` is the template method and as a function that takes the step
+as an argument. Every customization must supply `process()`, so the
+base class declares it with `@abstractmethod`:
 
 ```python
 # exercise_1.py
-import tempfile
+from abc import ABC, abstractmethod
 from collections.abc import Callable
 from pathlib import Path
-from typing import final, override
+from typing import final
 
-class FileFramework:
-    def __init__(self, filenames: list[str]) -> None:
-        self.filenames = filenames
+class FileFramework(ABC):
+    __slots__ = ()
 
     @final
-    def run(self) -> None:
-        *inputs, output = self.filenames
+    def run(self, filenames: list[str]) -> None:
+        *inputs, output = filenames
         pieces = [
             self.process(Path(name).read_text())
             for name in inputs]
         Path(output).write_text("".join(pieces))
 
-    def process(self, text: str) -> str:
-        raise NotImplementedError
-
-class UppercaseFramework(FileFramework):
-    @override
-    def process(self, text: str) -> str:
-        return text.upper()
+    @abstractmethod
+    def process(self, text: str) -> str: ...
 
 def run_file_framework(
     filenames: list[str], process: Callable[[str], str]
@@ -40,50 +37,114 @@ def run_file_framework(
     pieces = [process(Path(name).read_text())
               for name in inputs]
     Path(output).write_text("".join(pieces))
+```
+
+The empty `__slots__` lets a subclass that carries data be a record,
+as
+[Rethinking Objects](../Chapters/20_Patterns--Rethinking_Objects.md#abstract-base-classes)
+explains.
+
+The uppercase policy needs no data. The subclass overrides
+`process()`, and the function form passes `str.upper`, which has the
+signature the framework calls:
+
+```python
+# exercise_1_upper.py
+import tempfile
+from pathlib import Path
+from typing import override
+from exercise_1 import FileFramework, run_file_framework
+
+class Uppercase(FileFramework):
+    @override
+    def process(self, text: str) -> str:
+        return text.upper()
 
 def demo() -> None:
     with tempfile.TemporaryDirectory() as tmp:
         root = Path(tmp)
         (root / "a.txt").write_text("hello\n")
         (root / "b.txt").write_text("world\n")
+        inputs = [str(root / "a.txt"), str(root / "b.txt")]
 
         # Subclassing customization:
-        UppercaseFramework([
-            str(root / "a.txt"), str(root / "b.txt"),
-            str(root / "out1.txt"),
-        ]).run()
-        print(repr((root / "out1.txt").read_text()))
+        out1 = root / "out1.txt"
+        Uppercase().run([*inputs, str(out1)])
+        print(repr(out1.read_text()))
 
         # Function-passing customization:
-        run_file_framework(
-            [str(root / "a.txt"), str(root / "b.txt"),
-             str(root / "out2.txt")],
-            lambda text: text.upper(),
-        )
-        print(repr((root / "out2.txt").read_text()))
+        out2 = root / "out2.txt"
+        run_file_framework([*inputs, str(out2)], str.upper)
+        print(repr(out2.read_text()))
 
 demo()
 #: 'HELLO\nWORLD\n'
 #: 'HELLO\nWORLD\n'
 ```
 
-Both produce identical output, `'HELLO\nWORLD\n'`, because both
-express the same `process()` step, an uppercase conversion, through
-two different mechanisms for supplying that step. The anchored
-algorithm, "read every input, transform it, concatenate into the
-output," lives in exactly one place either way: the base class's
-`run()`, or the free function `run_file_framework()`.
+Both produce `'HELLO\nWORLD\n'`, because both supply the same step
+through two different mechanisms. The anchored algorithm, "read every
+input, transform it, concatenate into the output," lives in one place
+either way: the base class's `run()`, or the function
+`run_file_framework()`.
 
-The second customization idea, searching every input file for words
-listed in the first, fits the same shape with a different `process()`
-step. That version reads the word list once from the first input file,
-before the loop starts. Its `process(text)` then checks each text
-against that list and returns a report of the words it found, rather
-than a transformed text. `run()` feeds every input to `process()`,
-including the word-list file, so the step must skip its first call, or
-the caller must split the word list off from `filenames` before
-`run()` sees it. The anchored algorithm in `run()` and
-`run_file_framework()` stays unchanged, as the pattern intends.
+The search policy needs the word list while it processes each file.
+The framework treats every input alike, so the client reads the word
+list from the first file and hands the framework the rest:
+
+```python
+# exercise_1_search.py
+import tempfile
+from pathlib import Path
+from typing import override
+from exercise_1 import FileFramework, run_file_framework
+from record import record
+
+def found(words: list[str], text: str) -> str:
+    present = [w for w in words if w in text.split()]
+    return f"{' '.join(present)}\n"
+
+@record
+class Search(FileFramework):
+    words: list[str]
+
+    @override
+    def process(self, text: str) -> str:
+        return found(self.words, text)
+
+def demo() -> None:
+    with tempfile.TemporaryDirectory() as tmp:
+        root = Path(tmp)
+        wordfile = root / "words.txt"
+        wordfile.write_text("spam\neggs\nham\n")
+        (root / "a.txt").write_text("spam and eggs\n")
+        (root / "b.txt").write_text("green eggs and ham\n")
+        inputs = [str(root / "a.txt"), str(root / "b.txt")]
+        words = wordfile.read_text().split()
+
+        # Subclassing customization:
+        out1 = root / "out1.txt"
+        Search(words).run([*inputs, str(out1)])
+        print(repr(out1.read_text()))
+
+        # Function-passing customization:
+        out2 = root / "out2.txt"
+        run_file_framework(
+            [*inputs, str(out2)],
+            lambda text: found(words, text))
+        print(repr(out2.read_text()))
+
+demo()
+#: 'spam eggs\neggs ham\n'
+#: 'spam eggs\neggs ham\n'
+```
+
+The report has one line for each input file, naming the search words
+that file contains. The two forms differ in where the word list
+lives. `Search` stores it in a field, and the lambda closes over the
+local variable `words`. In both, `run()` and `run_file_framework()`
+stay unchanged: a new policy is a new step, and the algorithm that
+calls the step belongs to the framework.
 
 ## 2. Two fixes for the premature engine
 
@@ -158,11 +219,10 @@ having read this chapter, is not a repair.
 Separating construction from starting makes the mistake unavailable.
 No window exists in which the engine runs against half-built state,
 because construction runs no engine. The extra line at every call
-site, `greeter.run()`, moves the decision about *when* the algorithm
-starts out of the base class and into the hands of the code that
-knows the object is ready. The same reasoning drives eager versus
-lazy construction in
-[*Singleton*](../Chapters/24_Patterns--Singleton.md#when-you-want-a-class-cache-the-instance),
+site, `greeter.run()`, moves the decision about when the algorithm
+starts from the base class to the code that knows the object is
+ready. The same reasoning drives eager versus lazy construction in
+[*Singleton*](../Chapters/24_Patterns--Singleton.md#double-checked-locking-and-eager-creation),
 where the timing of a hidden step makes the difference.
 
 ## 3. Who objects to a replaced `run()`
@@ -207,8 +267,8 @@ Python objects to nothing. The program runs, and the steps come out
 in the reversed order the subclass chose. The anchored algorithm is
 no longer anchored.
 
-`ty` is the one that complains. The override carries a `# type: ignore`
-so this listing stays in the book's build:
+`ty` objects. The override carries a `# type: ignore` so this listing
+stays in the book's build:
 
 ```
 error[override-of-final-method]: Cannot override `ApplicationFramework.run`
@@ -216,18 +276,18 @@ info: `ApplicationFramework.run` is decorated with `@final`, forbidding override
 ```
 
 The guarantee comes from the type checker, not the language. `@final`
-sets `__final__ = True` on the function and does nothing else. No
-runtime check consults it. That missing check places the Template
-Method's central promise in the same category as every other
-annotation in this book: enforced before the program executes, by a
-tool you have to actually invoke.
+sets `__final__ = True` on the function, and no runtime check
+consults that attribute. The *Template Method*'s central guarantee is
+therefore in the same category as every other annotation in this
+book: a tool enforces it before the program executes, and only when
+you run that tool.
 
-`@final` therefore protects a codebase whose build runs a type
-checker, and protects nothing in a codebase that does not. When the
-interpreter itself must refuse the override, use the
-`__init_subclass__()` technique the chapter points at, which raises a
-`TypeError` at the subclass's `class` statement, as soon as the class
-body has run, long before anyone constructs an instance.
+`@final` protects a codebase whose build runs a type checker, and
+protects nothing in a codebase that does not. When the interpreter
+must refuse the override, use the `__init_subclass__()` check from
+the chapter's `near_miss.py`. It raises a `TypeError` at the
+subclass's `class` statement, as soon as the class body has run, long
+before anyone constructs an instance.
 
 ## 4. Two faithless substitutes the type checker accepts
 
@@ -283,7 +343,7 @@ exception out of a method that never advertised one.
 worse of the two. `customize1()` accumulates work for `customize2()`
 to consume, so the pair is a two-step flow. Leaving `customize2()` at
 its default breaks the second half, and the program neither raises an
-exception nor prints anything wrong. `pending` simply grows forever.
+exception nor prints anything wrong. `pending` grows on every pass.
 Nothing shows from outside until whatever `pending` feeds runs out of
 memory or reports stale data.
 
@@ -294,9 +354,9 @@ and only one of those things exists.
 optional, and that is the base class's decision: it declares that a
 subclass may skip this step. Declare instead that a subclass may not,
 by inheriting from `ABC` and marking `customize2()` with
-`@abstractmethod`, and Python refuses to construct `HalfDone` at
-all. The type checker reports the construction too, before the
-program runs. No checker could catch the omission before, because
+`@abstractmethod`, and Python refuses to construct `HalfDone`. The
+type checker reports the construction too, before the program runs.
+No checker could catch the omission before, because
 "deliberately empty" and "forgotten" were the same code, and only
 the base class could have recorded that difference.
 
@@ -311,6 +371,145 @@ catches `Exploder`.
 That split is the chapter's point stated from the other side. `@final`
 protects the shape of the algorithm, and `@abstractmethod` protects the
 presence of a step, because both are properties of the class structure
-that a base class can declare. What a step *does* once called is
+that a base class can declare. What a step does once called is
 behavior, and Liskov substitution is a rule about behavior, so
 enforcing it stays where the chapter leaves it: with you.
+
+## 5. Which names the misspelling check compares
+
+The chapter's `__init_subclass__()` builds its set of names from every
+base class, so the set grows as the hierarchy does. `MyApp` adds
+`report()`, and a subclass of `MyApp` inherits that name along with
+the framework's own:
+
+```python
+# exercise_5.py
+from difflib import get_close_matches
+from typing import final, override
+from exceptions import expected
+
+class ApplicationFramework:
+    @final
+    def run(self) -> None:
+        for _ in range(2):
+            self.customize1()
+            self.customize2()
+
+    def customize1(self) -> None: ...
+    def customize2(self) -> None: ...
+
+    def __init_subclass__(cls) -> None:
+        super().__init_subclass__()
+        inherited = {
+            name
+            for base in cls.__mro__[1:]
+            for name in vars(base)
+            if not name.startswith("__")
+        }
+        for name in vars(cls):
+            if name.startswith("__"):
+                continue
+            if name == "run":
+                raise TypeError(
+                    f"{cls.__name__}.run "
+                    "overrides the anchor"
+                )
+            if name in inherited:
+                continue
+            if near := get_close_matches(name, inherited):
+                raise TypeError(
+                    f"{cls.__name__}.{name}: "
+                    f"did you mean {near[0]}?"
+                )
+
+class MyApp(ApplicationFramework):
+    @override
+    def customize1(self) -> None:
+        print("one")
+
+    def report(self) -> None: ...
+
+with expected(TypeError):
+    class Audited(MyApp):
+        def reports(self) -> None: ...
+#: [TypeError] Audited.reports: did you mean report?
+```
+
+The `class Audited` statement raises a `TypeError`. The check
+compares a new method against every non-dunder name in every base,
+and `report` is one of them, although `report()` is a helper that
+`MyApp` added and no step of the framework. The framework enforces a
+rule about a name it did not define.
+
+The narrower check reads its names from `ApplicationFramework` alone:
+
+```python
+# exercise_5_narrow.py
+from difflib import get_close_matches
+from typing import final, override
+from exceptions import expected
+
+class ApplicationFramework:
+    @final
+    def run(self) -> None:
+        for _ in range(2):
+            self.customize1()
+            self.customize2()
+
+    def customize1(self) -> None: ...
+    def customize2(self) -> None: ...
+
+    def __init_subclass__(cls) -> None:
+        super().__init_subclass__()
+        declared = {
+            name
+            for name in vars(ApplicationFramework)
+            if not name.startswith("__")
+        }
+        for name in vars(cls):
+            if name.startswith("__"):
+                continue
+            if name == "run":
+                raise TypeError(
+                    f"{cls.__name__}.run "
+                    "overrides the anchor"
+                )
+            if name in declared:
+                continue
+            if near := get_close_matches(name, declared):
+                raise TypeError(
+                    f"{cls.__name__}.{name}: "
+                    f"did you mean {near[0]}?"
+                )
+
+class MyApp(ApplicationFramework):
+    @override
+    def customize1(self) -> None:
+        print("one")
+
+    def report(self) -> None: ...
+
+class Audited(MyApp):
+    def reports(self) -> None: ...
+
+print(Audited.reports.__qualname__)
+#: Audited.reports
+
+with expected(TypeError):
+    class Typo(MyApp):
+        def customise2(self) -> None: ...
+#: [TypeError] Typo.customise2: did you mean customize2?
+```
+
+`ApplicationFramework` exists by the time any subclass's `class`
+statement runs, so `__init_subclass__()` can name it. `Audited` now
+finishes, and a misspelled step still fails at any depth of the
+hierarchy, because the check compares every subclass against the
+framework's three names.
+
+The narrower check no longer catches a misspelling of a name that a
+subclass introduced. If `Audited` meant to override `report()`, its
+`reports()` is a new method that nothing calls, and the framework
+reports nothing. That override is the responsibility of `MyApp`'s
+author, who can use the protection the chapter recommends for steps:
+`@override` on the method, and a type checker in the build.

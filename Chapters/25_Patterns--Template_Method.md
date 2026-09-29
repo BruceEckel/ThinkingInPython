@@ -27,8 +27,8 @@ Subclasses provide the individual steps.
 The `typing.final` decorator,
 used on a class in [Making a Class Final](17_Techniques--Metaprogramming.md#making-a-class-final),
 also works on a single method.
-It locks the template method so a subclass cannot change the flow.
-Here, `@final` on `run()` rejects any subclass that overrides it:
+It declares that no subclass may override the template method.
+Here, `@final` on `run()` makes the type checker reject any subclass that overrides it:
 
 ```python
 # template_method.py
@@ -64,6 +64,31 @@ MyApp().run()
 The client supplies `customize1()` and `customize2()` in the derived class.
 `run()` starts the engine that drives the application.
 
+A test supplies steps that record their calls,
+then checks the order in which `run()` makes them:
+
+```python
+# test_template_method.py
+from typing import override
+from template_method import ApplicationFramework
+
+def test_template_method_runs_steps_in_order() -> None:
+    calls: list[str] = []
+
+    class Recorder(ApplicationFramework):
+        @override
+        def customize1(self) -> None:
+            calls.append("one")
+
+        @override
+        def customize2(self) -> None:
+            calls.append("two")
+
+    Recorder().run()  # The client starts the engine
+    # Loop runs twice
+    assert calls == ["one", "two", "one", "two"]
+```
+
 The base class calls code written later, sometimes years later.
 Framework authors call this the *Hollywood Principle*: "don't call us,
 we'll call you."
@@ -72,11 +97,13 @@ the framework defines the flow of control and calls your code,
 rather than your code calling into a library.
 
 Only the type checker enforces `@final`.
-At runtime the decorator only sets `__final__ = True` on the function,
+At runtime the decorator sets `__final__ = True` on the function,
 and nothing in the interpreter reads that attribute.
 If you want the interpreter to refuse an override,
 the [`__init_subclass__()` technique](17_Techniques--Metaprogramming.md#making-a-class-final)
-also works with methods, and raises an exception when `"run" in cls.__dict__`.
+also works with methods.
+It raises an exception when `"run" in cls.__dict__`,
+and `near_miss.py` in the next section includes that check.
 
 ### Hooks and the Misspelled Override
 
@@ -93,7 +120,7 @@ adds a new method and leaves the base's do-nothing version in place.
 That is why every step override in these listings carries `@override`.
 The type checker then rejects a method that overrides nothing.
 
-The checker sees only the decorator.
+That check depends on the decorator.
 If you leave `@override` off the misspelled method,
 the checker accepts it as a new method.
 No typing construct forbids a subclass from adding methods,
@@ -120,7 +147,7 @@ class ApplicationFramework:
 
     def __init_subclass__(cls) -> None:
         super().__init_subclass__()
-        hooks = {
+        inherited = {
             name
             for base in cls.__mro__[1:]
             for name in vars(base)
@@ -134,9 +161,9 @@ class ApplicationFramework:
                     f"{cls.__name__}.run "
                     "overrides the anchor"
                 )
-            if name in hooks:
+            if name in inherited:
                 continue
-            if near := get_close_matches(name, hooks):
+            if near := get_close_matches(name, inherited):
                 raise TypeError(
                     f"{cls.__name__}.{name}: "
                     f"did you mean {near[0]}?"
@@ -168,8 +195,8 @@ with expected(TypeError):
 #: customize2?
 ```
 
-`hooks` collects every non-dunder name the base classes define,
-including `run` itself.
+`inherited` collects every non-dunder name the base classes define,
+including `run`.
 `__init_subclass__()` rejects a name that matches `run` exactly:
 `class Hijack` never finishes,
 because a subclass that replaces the anchor moves the algorithm out of the base class,
@@ -178,50 +205,31 @@ A name that matches a step, `customize1` or `customize2`,
 is an ordinary override, and a name that resembles none of them,
 like `report()`, is an ordinary new method.
 Both of those pass.
-Among the remaining names, only a near miss produces a `TypeError`,
+Among the remaining names,
+only one that nearly matches an inherited name produces a `TypeError`,
 and the message names the method the author probably meant.
-The `class Typo` statement raises a `TypeError` instead of finishing too,
+The `class Typo` statement also raises a `TypeError`,
 so the misspelling fails at import time,
 not later when the framework runs and the step silently does nothing.
 Rejecting every new method catches the typo too, but it also forbids `report()`,
 and a framework that bans helper methods in its subclasses is too restrictive.
-The heuristic cuts the other way too: `class Weird` never finishes either,
-because `customized_report()` shares enough letters with `customize2` for `get_close_matches` to flag it,
-even though it is not a typo.
+The heuristic also rejects legitimate names:
+`class Weird` never finishes either,
+because `customized_report()` shares enough letters with `customize2` for `get_close_matches()` to flag it,
+although it is not a typo.
 A team that adopts this check should expect to rename an occasional legitimate method,
 not only to catch misspellings.
 
 If every subclass must supply a step,
 inherit from `ABC` and declare that step with `@abstractmethod`,
 as shown in [Rethinking Objects](20_Patterns--Rethinking_Objects.md#abstract-base-classes).
-The runtime then refuses to instantiate a subclass that forgot it.
-
-```python
-# test_template_method.py
-from typing import override
-from template_method import ApplicationFramework
-
-def test_template_method_runs_steps_in_order() -> None:
-    calls: list[str] = []
-
-    class Recorder(ApplicationFramework):
-        @override
-        def customize1(self) -> None:
-            calls.append("one")
-
-        @override
-        def customize2(self) -> None:
-            calls.append("two")
-
-    Recorder().run()  # The client starts the engine
-    # Loop runs twice
-    assert calls == ["one", "two", "one", "two"]
-```
+The interpreter then refuses to instantiate a subclass that forgot it,
+and the type checker reports the attempt.
 
 ### Don't Start the Engine in the Constructor {#dont-start-the-engine-in-the-constructor}
 
 The client starts the engine, not `ApplicationFramework`.
-A framework *can* call `run()` from its own constructor,
+A framework can call `run()` from its own constructor,
 but then a subclass with its own `__init__()` falls into a trap.
 Because `run()` calls methods the subclass supplies,
 the subclass must finish its own setup before it calls `super().__init__()`.
@@ -245,7 +253,7 @@ class Framework:
 
 class Greeter(Framework):
     def __init__(self, name: str) -> None:
-        # With the usual style, the engine calls run()
+        # In the usual order, this call runs the engine
         super().__init__()
         self.name = name  # ...before this line runs
 
@@ -270,12 +278,12 @@ That is why `ApplicationFramework` has no `__init__()` and the client calls `MyA
 
 ### Substitutability
 
-This pattern leans on the [Liskov Substitution Principle](20_Patterns--Rethinking_Objects.md#liskov-substitution):
+This pattern depends on the [Liskov Substitution Principle](20_Patterns--Rethinking_Objects.md#liskov-substitution):
 when code expects a base-class instance,
 an instance of a subclass must work in its place.
 The base `run()` calls `customize1()` and `customize2()`,
 trusting that what the subclass supplies fits the algorithm's shape.
-An override can break that trust and still type-check.
+A subclass can break that trust and still type-check.
 It raises an exception where the base does not,
 leaves a step empty when the flow depends on it,
 or performs the step on one pass and skips the next:
@@ -295,7 +303,8 @@ class ApplicationFramework:
     def customize2(self) -> None: ...
 
 class OnlyOnce(ApplicationFramework):
-    ran = False
+    def __init__(self) -> None:
+        self.ran = False
 
     @override
     def customize1(self) -> None:
@@ -312,7 +321,7 @@ The name, the parameters, and the return type all match the base,
 so `@override` is satisfied and `ty` reports nothing.
 The base states its algorithm in the loop, not in any type:
 each pass calls the step, so each pass must perform it.
-Each of these failures corrupts the anchored algorithm.
+Each of the three failures corrupts the anchored algorithm.
 The `...` defaults make a step optional,
 and nothing distinguishes "deliberately empty" from "forgotten."
 The *Template Method* works only when every subclass is a faithful substitute for its base.
@@ -359,6 +368,7 @@ The subclass form also gets optional steps without extra work,
 since the base supplies the `...` default.
 The function form must give each parameter a default of its own:
 omitting `customize2` above raises a `TypeError` instead.
+A do-nothing default such as `lambda: None` makes a step optional and keeps the loop free of `None` tests.
 
 The function version also needs no `@final`.
 That decorator stops an override only when the type checker runs.
@@ -390,8 +400,9 @@ Each guards against a different way of breaking the flow:
   whether the subclass overrides `run()` or misspells a hook.
   This holds at runtime, whereas `@final` is only a type-checking attribute.
 - Discipline, via the Liskov Substitution Principle.
-  This governs whether each step is a faithful substitute,
-  but no tool checks it.
+  This governs whether each step is a faithful substitute.
+  `@abstractmethod` checks that a required step exists,
+  and no tool checks what the step does.
 
 Ask how the algorithm might break, and choose the mechanism that protects it.
 
@@ -401,7 +412,8 @@ Ask how the algorithm might break, and choose the mechanism that protects it.
     It opens every file but the last for reading, and the last one for writing.
     It processes each input file by a policy the customization supplies,
     and writes the output to the last file.
-    Customize it two ways, once by subclassing and once by passing a function:
+    Supply each of these policies twice,
+    once by subclassing and once by passing a function:
 
     1.  Convert all the letters in each file to uppercase.
     2.  Treat the first file as a list of search words, one per line,
@@ -420,3 +432,8 @@ Ask how the algorithm might break, and choose the mechanism that protects it.
     and one that leaves `customize2()` at its `...` default when the flow depends on it.
     `ty` reports neither.
     What must be true of the base class for a type checker to catch either one?
+5.  In `near_miss.py`, subclass `MyApp` with a class that adds a method named `reports()`.
+    Predict what the `class` statement does, then run it.
+    Which names does `__init_subclass__()` compare a new method against?
+    Change the check so it compares a new method only against the names `ApplicationFramework` defines.
+    What does the narrower check no longer catch?

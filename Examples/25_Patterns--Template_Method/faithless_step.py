@@ -12,7 +12,8 @@ class ApplicationFramework:
     def customize2(self) -> None: ...
 
 class OnlyOnce(ApplicationFramework):
-    ran = False
+    def __init__(self) -> None:
+        self.ran = False
 
     @override
     def customize1(self) -> None:
