@@ -15,7 +15,7 @@ This is [designing the communication rather than the parts](21_Patterns--Design_
 In its common form, where observers attach and detach at runtime,
 *Observer* is the most dynamic of the callback patterns.
 [Fixing the Responders at Construction](#fixing-the-responders-at-construction)
-shows a form that gives up that dynamism and keeps the decoupling.
+shows a form that keeps the decoupling and fixes the observers when you create the subject.
 Use *Observer* if a group of objects must update themselves when other objects change state.
 Event handling typically works this way:
 a widget keeps a list of handlers and calls each one when its event arrives.
