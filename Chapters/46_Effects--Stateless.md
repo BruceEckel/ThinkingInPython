@@ -63,7 +63,7 @@ explains why that request must be a value of its own.
 
 Although you can write the full `Effect` signature each time,
 the library provides three aliases for the most common cases.
-Each one fills in `Never` for an unused type parameter:
+Each one fills in `Never` for the type parameters it leaves out:
 
 | Alias | Meaning |
 |---|---|
@@ -145,10 +145,10 @@ def greet(name: str) -> Depend[Need[Console], None]:
     console.print(f"Hello, {name}!")
 ```
 
-`greet()` needs a `Console`, cannot fail, and returns `None`.
+`greet()` needs a `Console`, cannot fail, and produces `None`.
 `greeter.py` lives in `utils/` because both this chapter and [Stateless in Practice](47_Effects--Stateless_in_Practice.md)
 import it.
-This chapter builds its own `Console` rather than the one Stateless ships;
+This chapter builds its own `Console` rather than using the one Stateless provides;
 [Builtin Dependencies](#builtin-dependencies), below, says why.
 Compare `greeter.py`'s `greet()` to the version that calls `print()` directly:
 
@@ -250,7 +250,7 @@ get a small function of their own.
 ## Builtin Dependencies
 
 The `Console` in `greeter.py` is one this chapter defines.
-Stateless also ships three dependencies of its own:
+Stateless also provides three dependencies of its own:
 
 - `Console` in `stateless.console`,
   whose `print_line()` and `read_line()` accessors call its `print()` and `input()` methods,
@@ -515,15 +515,14 @@ Give `run()` an Effect that still needs a `Console`:
 
 ```python
 # unsupplied.py
+from exceptions import expected
 from greeter import greet
 from stateless import run
 from stateless.errors import MissingAbilityError
 
-try:
+with expected(MissingAbilityError):
     run(greet("Alice"))  # type: ignore
-except MissingAbilityError as e:
-    print(e)
-#: Need(t=<class 'greeter.Console'>)
+#: [MissingAbilityError] Need(t=<class 'greeter.Console'>)
 ```
 
 Running it raises a `MissingAbilityError`.
@@ -531,9 +530,9 @@ If you remove the `# type: ignore`, `ty` rejects the program before it runs:
 
 ```text
 error[invalid-argument-type]: Argument to function `run` is incorrect
- --> unsupplied.py:7:9
+ --> unsupplied.py:8:9
   |
-7 |     run(greet("Alice"))
+8 |     run(greet("Alice"))
   |         ^^^^^^^^^^^^^^ Expected
   |         `Generator[Async | Exception, Any, Unknown]`, found
   |         `Generator[Need[Console], Any, None]`
@@ -544,7 +543,9 @@ not a production incident.
 The type checker finds the omission,
 so you need no test that exercises the path and no reviewer who happens to notice it.
 
-- `Async` is a built-in Ability for asynchronous work,
+The expected type in that message names `Async` and `Exception`:
+
+- `Async` is a builtin Ability for asynchronous work,
   which `run()` handles on its own.
   [Waiting on a Coroutine](#waiting-on-a-coroutine) takes it up.
 - `Exception` is the error channel,
@@ -772,7 +773,7 @@ so `supply()` must provide a `Console` and a `Log`.
 
 The repeated union is the shape a `type` alias normally shortens,
 and the book normally writes one.
-Under `ty` 0.0.82 the alias checks the same as the written-out signature:
+Under `ty` 0.0.84 the alias checks the same as the written-out signature:
 an undeclared Ability behind `type Greeting = Depend[...]` draws the same `invalid-yield`.
 This book still writes Effect signatures out in full,
 because the union is the information:
@@ -925,8 +926,12 @@ Stateless's own `Console` is the concrete class [Builtin Dependencies](#builtin-
 named, and only a subclass can replace it.
 Its accessors name that class,
 so `isinstance()` accepts an instance of the class or a subclass.
-A structurally identical double fails with a `MissingAbilityError` whatever static type `as_type()` gives it,
-so a double for the builtin `Console` must inherit from it.
+A structurally identical double fails twice.
+`as_type(Console)` rejects it,
+because the type checker compares a concrete class by name.
+If a `cast()` forces the static type,
+the run fails with a `MissingAbilityError`.
+A double for the builtin `Console` must therefore inherit from it.
 That `Console` implements `input()` as well as `print()`,
 so a double that overrides only `print()` reads live stdin.
 An interface has no implementation to inherit by accident:
@@ -1202,9 +1207,10 @@ compares the propagation to `async`.
 
 ## Waiting on a Coroutine
 
-`Async` has appeared so far only inside error messages,
-where `run()` answers it though no listing requested it.
-`wait()` puts it into a signature deliberately.
+`Async` has appeared so far only in the type `run()` expects,
+which names `Async` because `run()` answers that request.
+No listing has made one.
+`wait()` puts `Async` into a signature deliberately.
 `yield from wait()` accepts any awaitable and produces the value that awaitable produces:
 
 ```python
@@ -1408,7 +1414,7 @@ A synchronous program calls `run()` once at its outermost edge.
 A program that is already asynchronous, a web service or a bot,
 awaits `run_async()` at the edge of each request.
 Calling `run()` inside a coroutine is a runtime error rather than a type error,
-one of the few mistakes in this chapter that the type checker cannot report.
+because no type records whether an event loop is running.
 The opposite mistake, calling `run_async()` without `await` in synchronous code,
 draws `ty`'s `unused-awaitable` warning.
 
@@ -1437,7 +1443,7 @@ if __name__ == "__main__":
 ```
 
 `score()` looks like an ordinary function that raises a `KeyError`,
-but `@throws` changes its type.
+but `@throws` changes its type, as `ty check scores.py` shows:
 
 ```text
 info[revealed-type]: Revealed type
@@ -1454,7 +1460,7 @@ The `Generator`'s first parameter carries `A | E`
 ([The Effect Definition](#the-effect-definition)).
 `Try` fills `A` with `Never`, so `Never | KeyError` reduces to `KeyError`.
 
-`Try` carries the same idea as the [`Result` type](42_Functional--Error_Handling.md#turning-exceptions-into-results),
+`Try` carries the same idea as the [`Result` type](42_Functional--Error_Handling.md#a-result-type),
 built differently.
 A `Result` is a wrapper the function returns at once,
 and the caller matches on it.
@@ -1464,7 +1470,8 @@ A `Result`-shaped value appears in Stateless only after `stateless.catch()`
 ([Turning an Error Into a Value](#turning-an-error-into-a-value)),
 and even then it is the bare union `int | KeyError` rather than a wrapper object.
 For `Result`, you either rewrite the body to return an `Ok` or an `Err`,
-or wrap the function in `@safe`, which turns every exception into an `Err`.
+or wrap the function in [`@safe`](42_Functional--Error_Handling.md#turning-exceptions-into-results),
+which turns every exception into an `Err`.
 `@throws` likewise leaves the body alone,
 but it names the exception types it lifts and puts them in the signature rather than in a returned wrapper.
 
@@ -1538,7 +1545,10 @@ and leaves handling them to you.
 `run()` turns any that reach it back into normal Python exceptions.
 
 The channel carries only the failures `@throws` lifted into it.
-An exception raised from a body without `@throws` stays outside the type,
+`@throws` lifts the exception types it names.
+An exception of any other type passes through the decorator as an ordinary raised exception:
+no signature declares it, and the type checker reports nothing.
+An exception raised from a body without `@throws` stays outside the type the same way,
 a limit that [Nothing stops an undeclared Effect](47_Effects--Stateless_in_Practice.md#nothing-stops-an-undeclared-effect)
 examines.
 
@@ -1548,9 +1558,12 @@ The driver throws a failure back into the generator,
 so an ordinary `try`/`except` around a `yield from` catches it,
 provided `run()` drives that Effect directly.
 The generator yields the exception as a value,
-`run()` receives it and calls `throw()`,
-and that `throw()` raises the exception in the innermost suspended frame,
-where the `except` clause runs.
+`run()` receives it and calls the generator's `throw()` method,
+and `throw()` raises the exception at the innermost suspended `yield`
+([`throw()` and `close()` Reach the Innermost Generator](45_Effects--Generators.md#throw-and-close-reach-the-innermost-generator)).
+That `yield` belongs to the Effect the `yield from` delegates to.
+The exception propagates out of that Effect as any raised exception does,
+and the `except` clause around the `yield from` catches it.
 Catching is different from handling: the `KeyError` stays in the channel,
 so the signature keeps declaring a failure that can no longer escape.
 A `catch()` further out changes the outcome again:

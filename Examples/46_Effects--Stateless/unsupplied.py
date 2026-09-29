@@ -1,10 +1,9 @@
 # unsupplied.py
+from exceptions import expected
 from greeter import greet
 from stateless import run
 from stateless.errors import MissingAbilityError
 
-try:
+with expected(MissingAbilityError):
     run(greet("Alice"))  # type: ignore
-except MissingAbilityError as e:
-    print(e)
-#: Need(t=<class 'greeter.Console'>)
+#: [MissingAbilityError] Need(t=<class 'greeter.Console'>)

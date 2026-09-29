@@ -372,15 +372,12 @@ and a version that also constructs its own `Nailer` needs all six.
 
 ```python
 # exercise_6.py
-from dataclasses import dataclass
 from stateless import Depend, Need, handle, need, run
 
-@dataclass
 class Console:
     def print(self, message: str) -> None:
         print(message)
 
-@dataclass
 class Clock:
     def now(self) -> str:
         return "noon"
@@ -568,7 +565,7 @@ nothing at all, and `run()` returns `None` for each entry without
 raising an exception. An Effect is a generator, and a generator runs
 once. Resuming a finished generator raises `StopIteration` immediately,
 which `run()` reads as "already returned, with no value."
-So a spent Effect looks exactly like one that succeeded and returned
+So a spent Effect looks the same as one that succeeded and returned
 `None`, and nothing reports the difference.
 
 The dictionary of builders behaves as a reader expects. Each pass
@@ -576,15 +573,18 @@ calls each entry, each call builds a new generator, and each generator
 runs its body once. The stored value goes from a description `run()`
 consumes once to a recipe a caller can follow as often as it likes.
 
-That difference is why `retry()`'s type is
+That difference is why `retry()` takes a schedule and returns a
+decorator of type
 `Callable[P, Effect[...]] -> Callable[P, Effect[...]]` rather than
-`Effect[...] -> Effect[...]`. Retrying means running the same work
-more than once, and an Effect cannot supply the second run: by the
-time the first attempt fails, that attempt has already run the
+one of type `Effect[...] -> Effect[...]`. Retrying means running the
+same work more than once, and an Effect cannot supply the second run:
+by the time the first attempt fails, that attempt has already run the
 generator to its end, leaving nothing to resume. `retry()` needs to
 build a fresh Effect per attempt, and only the function can do that.
 So `retry()` decorates the function, calls it once per attempt, and
-hands back a function of the same signature.
+hands back a function that takes the same arguments. The Effect that
+function builds has a wider type: `retry()` adds the clock it sleeps
+on and replaces the error with a `RetryError`.
 
 The same reasoning explains `repeat()` and `memoize()`. It also
 explains why storing Effects in a registry, a queue, or a cache is a
@@ -647,8 +647,8 @@ an awaitable of its result. `report_all(["a"])` satisfies either
 signature, and nothing in the type system records that this call site
 sits inside a coroutine. Whether an event loop is running is a fact
 about the moment of the call, not about the types involved, so calling
-`run()` inside a coroutine is one of the few mistakes in the chapter a
-type checker cannot catch. The rule is positional rather than
+`run()` inside a coroutine is a mistake the type checker cannot
+report. The rule is positional rather than
 type-based: `run()` at the outermost edge of a synchronous program,
 `run_async()` anywhere inside an asynchronous one.
 
@@ -793,8 +793,9 @@ print(capture.messages)
 
 The fix renames `Capture.print()` to `record()`, gives each method its
 own `Protocol`, `Screen` and `Recorder`, and splits `greet()` into one
-Effect per `Protocol`. The two `Protocol`s no longer overlap, so no
-object satisfies both, and each Effect names the one it needs.
+Effect per `Protocol`. The two `Protocol`s no longer overlap, so
+neither implementation satisfies both, and each Effect names the one
+it needs.
 
 That change turns the coin flip into a diagnostic. Add one
 more line to the end of the listing, handing `to_log` the object that
@@ -816,7 +817,7 @@ names the missing method rather than the missing type, and that is
 what structural typing means: `Terminal` fails not because of what it
 is but because of what it does not do.
 
-One honest limit. Distinct method names remove the ambiguity *between*
+One limit remains. Distinct method names remove the ambiguity *between*
 abilities. They do nothing about two implementations of the *same*
 ability. Add a second recorder, an `Audit` that also defines
 `record()`, and `supply(capture, audit)` is ambiguous again by argument
@@ -826,5 +827,5 @@ gives its advice in two halves for that reason. No type can enforce
 the second half, "supply one implementation per Ability." Stateless
 resolves a request by scanning its arguments at runtime, so a
 duplicate is a fact about the call rather than about the types. ZIO's
-compile-time rejection of exactly this case is the difference that
-section names.
+compile-time rejection of this case is the difference that section
+names.

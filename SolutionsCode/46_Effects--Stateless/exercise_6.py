@@ -1,13 +1,10 @@
 # exercise_6.py
-from dataclasses import dataclass
 from stateless import Depend, Need, handle, need, run
 
-@dataclass
 class Console:
     def print(self, message: str) -> None:
         print(message)
 
-@dataclass
 class Clock:
     def now(self) -> str:
         return "noon"
