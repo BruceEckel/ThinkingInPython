@@ -1,5 +1,7 @@
 """Tests for tools/validate_output.py."""
+import os
 import sys
+import time
 from pathlib import Path
 
 import pytest
@@ -17,6 +19,7 @@ from tools.validate_output import (
     process_file,
     process_markdown,
     process_one,
+    run_watched,
     strip_trailing,
 )
 
@@ -782,3 +785,55 @@ def test_parallel_and_serial_agree(
 
     assert serial == parallel
     assert "1 ok, 1 failed, 1 skipped (no markers)." in serial
+
+
+# ── run_watched ───────────────────────────────────────────────────────────────
+# The work functions sit at module level because a spawned process has
+# to import them by name. Each takes the file it is given as its only
+# state, since nothing else crosses the process boundary.
+
+def work_reports(path: Path) -> tuple[bool | None, str]:
+    return True, f"ran {path.name}"
+
+def work_hangs(path: Path) -> tuple[bool | None, str]:
+    time.sleep(600)
+    return True, "unreachable"
+
+def work_hangs_once(path: Path) -> tuple[bool | None, str]:
+    # The first run leaves a flag behind and hangs; the rerun finds it.
+    flag = path.with_suffix(".ran")
+    if flag.exists():
+        return True, "second run"
+    flag.write_text("", encoding="utf-8")
+    time.sleep(600)
+    return True, "unreachable"
+
+def work_dies(path: Path) -> tuple[bool | None, str]:
+    os._exit(3)
+
+def test_run_watched_returns_the_outcome(tmp_path: Path) -> None:
+    p = write(tmp_path, "ch.md", "")
+    assert run_watched(p, work=work_reports) == (True, "ran ch.md")
+
+def test_run_watched_reruns_a_file_that_hangs(tmp_path: Path) -> None:
+    p = write(tmp_path, "ch.md", "")
+    result, output = run_watched(p, work=work_hangs_once, timeout=3)
+    assert result is True
+    assert "no result after 3s; rerunning (2/3)" in output
+    assert output.endswith("second run")
+
+def test_run_watched_fails_a_file_that_hangs_every_run(
+    tmp_path: Path,
+) -> None:
+    p = write(tmp_path, "ch.md", "")
+    result, output = run_watched(
+        p, work=work_hangs, timeout=1, attempts=2)
+    assert result is False
+    assert "rerunning (2/2)" in output
+    assert output.endswith("hung in all 2 runs\n")
+
+def test_run_watched_fails_a_process_that_dies(tmp_path: Path) -> None:
+    p = write(tmp_path, "ch.md", "")
+    result, output = run_watched(p, work=work_dies)
+    assert result is False
+    assert "exited with code 3 before reporting" in output

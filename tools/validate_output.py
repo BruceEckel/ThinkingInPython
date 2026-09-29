@@ -42,6 +42,17 @@ chapter's stdout was being captured. A file that gets its own process
 cannot do either. Use -j 1 to go back to one process for everything,
 which is the right setting when debugging a block that misbehaves.
 
+Each of those processes is watched. A file that reports nothing within
+--file-timeout seconds has its process killed and is run again, up to
+FILE_ATTEMPTS times in all, because a listing can hang before it runs a
+line of its own code: on Windows asyncio.run() builds the event loop's
+self-pipe with socket.socketpair(), CPython emulates that with a
+loopback TCP connection, and the emulation's accept() blocks forever
+when the connect fails silently. On 2026-09-29 that hung two of twelve
+whole-book runs on an idle machine, with one worker inside accept() and
+the rest of the pool waiting for it. -j 1 runs in this process and has
+no watchdog.
+
 A Markdown file whose markers pass has its digest recorded in
 build/marker-stamp.json. With --changed-only, a Markdown file whose digest
 still matches is skipped: its text, the utils/ helpers, and the tools are
@@ -65,10 +76,13 @@ import fnmatch
 import functools
 import gc
 import io
+import multiprocessing
 import os
 import re
 import sys
-from concurrent.futures import ProcessPoolExecutor
+from collections.abc import Callable
+from concurrent.futures import ThreadPoolExecutor
+from multiprocessing.connection import Connection
 from pathlib import Path
 
 from tools.config import EXAMPLES_TREE as DEFAULT_TREE, utils_dir
@@ -86,6 +100,17 @@ MARKER_RE = re.compile(r'^#:(?: (.*))?$')
 # change misses every time, and each run already takes a min over
 # repeats internally.
 CLAIM_ATTEMPTS = 3
+
+# Seconds a file's process gets to report before it is killed and the
+# file run again. A chapter takes under ten seconds with the machine to
+# itself, so this passes only for a process that is stuck.
+FILE_TIMEOUT = 120.0
+
+# Total runs a file gets before a hang counts as a failure.
+FILE_ATTEMPTS = 3
+
+type Outcome = tuple[bool | None, str]
+type Work = Callable[[Path], Outcome]
 
 
 def is_claim(rel: str | None, claims: list[str]) -> bool:
@@ -490,6 +515,53 @@ def process_one(
     return result, buf.getvalue()
 
 
+def report_to(send: Connection, work: Work, path: Path) -> None:
+    """What a file's process runs: do the work, send back the outcome."""
+    try:
+        send.send(work(path))
+    finally:
+        send.close()
+
+
+def run_watched(
+    path: Path, *, work: Work, timeout: float = FILE_TIMEOUT,
+    attempts: int = FILE_ATTEMPTS,
+) -> Outcome:
+    """Run `work(path)` in a process of its own, rerunning one that hangs.
+
+    The process is spawned, so it starts with a fresh interpreter, and it
+    is killed when it reports nothing within `timeout` seconds. A hung
+    run wrote nothing: a Markdown file's markers are rewritten only
+    after every block in it has run.
+    """
+    ctx = multiprocessing.get_context('spawn')
+    notes = ''
+    for attempt in range(1, attempts + 1):
+        recv, send = ctx.Pipe(duplex=False)
+        proc = ctx.Process(target=report_to, args=(send, work, path))
+        proc.start()
+        send.close()  # The child holds the only writing end now
+        try:
+            if recv.poll(timeout):
+                result, output = recv.recv()
+                proc.join()
+                return result, notes + output
+        except EOFError:
+            # The pipe closed with nothing in it: the process died.
+            proc.join()
+            return False, notes + (
+                f"  {path}: its process exited with code "
+                f"{proc.exitcode} before reporting\n")
+        finally:
+            recv.close()
+        proc.kill()
+        proc.join()
+        notes += f"  {path}: no result after {timeout:g}s"
+        if attempt < attempts:
+            notes += f"; rerunning ({attempt + 1}/{attempts})\n"
+    return False, notes + f"; hung in all {attempts} runs\n"
+
+
 def collect_files(targets: list[Path]) -> list[Path]:
     files: list[Path] = []
     for t in targets:
@@ -532,6 +604,11 @@ def main(argv: list[str] | None = None) -> int:
         help='skip a Markdown file unchanged since its markers last '
              'passed (see tools/skip_stamps.py)',
     )
+    ap.add_argument(
+        '--file-timeout', type=float, default=FILE_TIMEOUT, metavar='SEC',
+        help='seconds a file gets before its process is killed and the '
+             f'file rerun (default: {FILE_TIMEOUT:g}); unused with -j 1',
+    )
     add_jobs_arg(ap, 'files')
     args = ap.parse_args(argv)
 
@@ -569,16 +646,18 @@ def main(argv: list[str] | None = None) -> int:
     # asyncio.run(), and a class caught in a reference cycle can have its
     # __del__ fire while an unrelated file's stdout is captured. Both are
     # documented traps of the old single-process run, and both stop
-    # existing when a file gets an interpreter to itself.
+    # existing when a file gets an interpreter to itself. The threads
+    # here only wait: each starts a file's process and watches it.
     jobs = min(max(1, args.jobs), len(files))
     if jobs == 1:
         outcomes = map(work, files)
     else:
-        pool = ProcessPoolExecutor(max_workers=jobs, max_tasks_per_child=1)
-        with pool:
+        watched = functools.partial(
+            run_watched, work=work, timeout=args.file_timeout)
+        with ThreadPoolExecutor(max_workers=jobs) as pool:
             # map() yields in submission order, so output stays in file
             # order and the run is reproducible.
-            outcomes = list(pool.map(work, files))
+            outcomes = list(pool.map(watched, files))
 
     n_ok = n_fail = n_skip = 0
     passed: list[Path] = []
