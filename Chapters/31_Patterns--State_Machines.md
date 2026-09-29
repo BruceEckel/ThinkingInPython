@@ -254,14 +254,14 @@ A base class could also give the annotations a type to name:
 
     class State: pass
 
-With that base, the type checker rejects the engine itself,
-since `State` declares no `next()` for `run_all()` to call.
+With that base, the type checker rejects the engine,
+since `State` declares neither the `run()` nor the `next()` the engine calls.
 At runtime, Python builds a derived class that defines `run()` alone without complaint,
 and the machine runs it.
 The error waits until something calls its `next()`,
 which raises an `AttributeError`.
-A base whose methods `raise NotImplementedError` satisfies the checker,
-and raises from the base's method instead,
+A base whose methods `raise NotImplementedError` satisfies the checker.
+The call to the missing method then raises that `NotImplementedError` from the base,
 with whatever message you write there.
 [*Surrogate*](26_Patterns--Surrogate.md#proxy) shows one more option:
 make `State` an `ABC` with `@abstractmethod` on both methods,
@@ -314,8 +314,8 @@ class TableState(ABC):
 ```
 
 `TableState.__init__()` starts every state with an empty dict.
-If you forget to fill one,
-the machine reports `Waiting has no transition for ...` rather than an `AttributeError`.
+If you forget to fill a state's table,
+the machine reports `Waiting has no transition for ...` rather than the `AttributeError` a missing `transitions` attribute would produce.
 
 `next()` raises its `RuntimeError` `from None`,
 because the chained `KeyError` would only repeat the event the message already names.
@@ -411,7 +411,7 @@ expect(RuntimeError, trap2.run_all, [MouseAction.ESCAPES])
 #: escapes
 ```
 
-The output matches the first version's, move for move.
+The nine moves produce the first version's output, line for line.
 The source is what changed: with many `State` classes to maintain,
 the tables read more easily than the `match` statements.
 
@@ -562,7 +562,7 @@ and a second digit moves it to one of three states, decided by price and stock.
 The states are an `Enum`,
 so the type checker reports a misspelled state name before the program runs.
 A misspelled string would pass every check and surface as a `NoTransition` at runtime.
-`MouseAction` is a `StrEnum` because its values have to match lines of the input file.
+`MouseAction` is a `StrEnum` because its values must match lines of the input file.
 These states stay inside the program, so a plain `Enum` with `auto()` serves:
 
 ```python
@@ -951,7 +951,7 @@ or whose transitions need conditions.
 Everything is in one place, in the same order as the diagram.
 Adding a state or an input is an entry in the table and a method or two.
 The states shrink to `Enum` members, bare names,
-so an action that runs on every entry into one state has to live in the table.
+so an action that runs on every entry into one state must live in the table.
 The action repeats on every row that leads to that state,
 or routes through a helper you write yourself.
 

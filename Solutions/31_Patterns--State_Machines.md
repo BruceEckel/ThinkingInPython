@@ -162,8 +162,8 @@ Each state decides its own successor. `Happy.next()` answers `Annoy`
 with a `Grumpy`, `Grumpy.next()` answers `Calm` with a `Happy`, and
 both answer `TakePill` with a `Prozac` that returns itself for
 everything after. Nothing outside the states holds the transition
-rules, which is exactly what distinguishes this design from the
-table-driven one exercise 7 uses: there the rules live in a dictionary
+rules, which distinguishes this design from the chapter's
+table-driven one: there the rules live in a dictionary
 a reader can audit in one place, and here they live in the `next()`
 method of whichever state is current.
 
@@ -225,7 +225,8 @@ again. Each state subclass carries its own transition table as a class
 attribute. `next_state()` looks the word up in that table with
 `.get(word, ...["*"])`, so `Controller` never branches on the current
 state or word. It asks the current state object what comes next, the
-same delegation `state.py`'s `next()` method uses. Reading the words
+same delegation `state_machine.py`'s `run_all()` performs when it
+calls `next()`. Reading the words
 from a file, one per line, takes one line of code:
 `words = Path("moves.txt").read_text().split()`.
 
@@ -606,7 +607,7 @@ still outside the band keeps the system running, and one inside the
 band falls through to the unconditional row back to `IDLE`. Every
 decision in the machine is a condition on the one event type. Every
 action slot here holds `None`, and the fall-through rows leave the
-condition slot `None` too, so both slots really are optional per row.
+condition slot `None` too, so both slots are optional per row.
 
 ## 9. A `Nickel` the table has never heard of
 
