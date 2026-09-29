@@ -25,3 +25,10 @@ through yet.
   sweep fixed, grouped by error shape, and a later review should read it
   before re-proposing anything in that list. The sweep's own commits are
   `7583395d` through `e2e5ba75`.
+- `~adversarial_undecided.md` — the author-level queue from the
+  2026-09-03 adversarial review. 37 of 38 calls were performed that day;
+  the last (a chapter 01 AI anecdote) was declined on 2026-09-29 and is a
+  standing rejection in `deep_review_db.md`.
+- `~RECOMMENDATIONS.md` — the "what to work on next" list as of
+  2026-09-03. Archived 2026-09-29, when every item in it was settled; its
+  two GoF attributions were checked against the GoF text and hold.

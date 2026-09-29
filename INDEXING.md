@@ -328,14 +328,17 @@ Keep Leanpub as an exporter from that data,
 and decide upload mode against generated mode separately,
 since that choice determines whether Leanpub's index feature applies to this book.
 
-## Questions for you
+## Decisions (Bruce, 2026-09-29)
 
-1. Is the PDF meant to be printed?
-   If readers use it on screen, section-level locators are nearly as good
-   as paragraph-level ones, since each is a link.
-2. One index or two (general, and Python names)?
-3. For Leanpub, upload mode or generated mode?
-4. Should the Solutions files be indexed?
-   None of the three outputs includes them today; readers reach them on GitHub.
-5. Is the definitions harvest trustworthy enough to gate,
-   that is, do you want a new italic term with no index entry to be reported?
+Indexing is not started yet; these settle the questions this survey asked.
+
+1. **The PDF will be printed.** Some readers print it, as they did
+   *Thinking in Java*, and say they learn better that way.
+   So the PDF needs page-accurate locators:
+   paragraph-level before release, even if section-level comes first.
+2. **One index**, with Python names in code font in the same alphabet.
+3. **Leanpub upload mode for now**, keeping generated mode open.
+   Nothing built for the index should rule out a later `build_leanpub.py`.
+4. **The Solutions files are not indexed.**
+5. **A new italic term with no entry is reported, not gated**,
+   through a `tip` target outside `verify`, at least for the first months.

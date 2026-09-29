@@ -34,6 +34,11 @@ promoted into `CLAUDE.md` and project memory.
 
 Bruce declined these. Do not propose them again, in any wording.
 
+**01_Introduction: the AI section's last sentence needs no example.**
+"The knowledge in this book has helped me guide AIs toward better solutions"
+is an assertion from personal experience, and it stays one. The 2026-09-03
+adversarial review asked for a supporting anecdote; declined 2026-09-29.
+
 **01_Introduction: "wrote a message" stays vague.** The review flagged
 "Eventually I even wrote a message confirming I was not going to complete it"
 for not saying where (a blog post, a repository note, a mailing list).
