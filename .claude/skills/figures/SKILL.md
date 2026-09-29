@@ -80,17 +80,22 @@ names a figure by its number there or its file stem; it fails on a
 reference with no file and only reports a file no chapter references.
 
 Three figure sources are generated, and their SVGs are never edited by
-hand. Chapter 30's `observer_story.svg` comes from
-`tools/observer_story_figure.py` (since 2026-09-29), a four-frame
-storyboard that replaced the chapter's coupling panel: Bruce found the
-class-diagram panel told the reader too little and asked for a figure
-built for understanding the pattern, with no notation or precedent to
-follow. Its frames share one layout so only the changes stand out,
-and a shaded region marks what `Thermometer` cannot see. Its outer
-shapes are paths, since `tight_tips()` would read a tip on a slot
-inside the thermometer box as buried in the box. `tip
-observer-story-figure` (in `gate`, `verify-ch`, and `sweep`) fails on
-drift; `tip fix-observer-story-figure` regenerates.
+hand. The pattern chapters' opening figures come from
+`tools/story_figures/` (since 2026-09-29), one module per chapter
+(`chNN_<pattern>.py`, defining `STEM` and `render()`), with the shared
+palette, text, boxes, and arrows in the package's `__init__.py`.
+Chapter 30's four-frame Observer storyboard came first and replaced
+that chapter's coupling panel: Bruce found the class-diagram panel
+told the reader too little, called the storyboard "a much more
+accessible story," and asked for the same in every pattern chapter,
+with no notation or precedent to follow, a coupling-panel variation
+included where that suits a pattern. The goal is the picture that best
+helps the reader. An outer shape enclosing an arrow's target is a
+`region()` path, since `tight_tips()` would read a tip on an inner box
+as buried in the outer rect. `tip story-figures` (in `gate`,
+`verify-ch`, and `sweep`) fails on drift or on any per-figure check
+`tip figures` makes; `tip fix-story-figures` regenerates, and
+`python -m tools.story_figures --only NN --png DIR` rasterizes one.
 Chapter 31's `stateMachine.svg` comes from
 `tools/state_machine_figure.py` (since 2026-09-24): each transition
 names its two states, how far its curve bows, and where along the curve
