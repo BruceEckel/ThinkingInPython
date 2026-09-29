@@ -10,7 +10,9 @@ module holds the machinery they use and the command line:
     tip verify-ch CH=28        NAME=value sets a variable, as with make
     tip check output-check     several tasks, in order
     tip run-one box_view       a task's positional word (here, F)
-    tip box_view.py --flag     run one listing; the words after it are its own
+    tip box_view --flag        run one listing (.py optional; 18/exercise_1
+                               picks a Solutions answer); the words after
+                               it are the program's own
 
 `tip` on PATH comes from `uv tool install --editable .` at the repo
 root: uv builds a small environment holding prompt_toolkit and this
@@ -330,8 +332,25 @@ def unknown(goal: str) -> str:
     return f"tip: no task named {goal!r}.{hint} `tip help` lists them."
 
 
+def is_listing(word: str) -> bool:
+    """Whether the first word names a listing to run, not a task.
+
+    A task name always wins, so `tip run` is the task even if a listing
+    is named run.py; `tip run.py` reaches the listing. A word ending in
+    .py is always a listing (a miss says no example matches it). A bare
+    word or a path is a listing only when it names one exactly, so a
+    mistyped task still gets tip's "no task named" message.
+    """
+    if word in load().tasks or _ASSIGN.match(word):
+        return False
+    if word.endswith(".py"):
+        return True
+    from tools.run_one_example import names_a_listing
+    return names_a_listing(word)
+
+
 def run_listing(name: str, extra: Sequence[str]) -> int:
-    """`tip maze_view.py [args...]`: run one listing, as `run-one` does.
+    """`tip maze_view [args...]`: run one listing, as `run-one` does.
 
     Every word after the name goes to the program untouched, so
     `tip membership.py --numbers` passes the flag, and `N=v` words are
@@ -352,7 +371,7 @@ def main(argv: list[str] | None = None) -> int:
     if not args or args[0] in ("help", "-h", "--help"):
         from tools.tip_help import main as help_main
         return help_main(args[1:])
-    if args[0].endswith(".py") and args[0] not in load().tasks:
+    if is_listing(args[0]):
         return run_listing(args[0], args[1:])
     goals, values = parse_argv(args)
     if not goals:

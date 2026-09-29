@@ -549,14 +549,24 @@ wants and not what a reader wants. `run_one_example.py` runs a single example
 and streams its output:
 
 ```
+tip deque_timing
 tip run-one deque_timing
 python -m tools.run_one_example Examples/03_Foundations--Containers/deque_timing.py
 ```
 
-The argument is a path, a bare file name, or any substring of the path; a
-substring matching several files lists them and exits 2. It reads `Examples/`
-first, the committed tree, so it needs no extract step, and falls back to
-`build/examples/`.
+The argument is a path, a file name (`.py` optional), or pieces of the
+path: each piece before the last is found, in order, inside a directory
+name, the tree's included, so `18/exercise_1` and
+`Solutions/47/research_by_hand` each pick one file. A spec matching several
+files lists them and exits 2. It reads `Examples/` and `SolutionsCode/`, the
+committed trees, so it needs no extract step, and falls back to
+`build/examples/` and `build/solutions/`. A Solutions answer gets
+`Examples/utils` on its path, since its own tree has no `utils/`.
+
+`tip NAME` reaches it directly when `NAME` is no task: a word ending in `.py`
+always, and a bare word or path when it names a listing exactly, so a
+mistyped task still gets tip's "no task named" message. Every word after the
+name goes to the program.
 
 It supplies the same two things `run_one()` above does, the example's own
 directory as the working directory and the tree's `utils/` on `PYTHONPATH`,

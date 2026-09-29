@@ -260,17 +260,29 @@ Only `tip gate` catches breakage across chapters.
 
 ### Run one example by hand
 
-`tip run-one` runs any single example from the repo root and shows its
-output. Give it the file's name, or as much of its path as you care to
-type:
+`tip` runs any single example from the repo root and shows its output.
+Give it the file's name, with or without `.py`:
 
 ```sh
-tip run-one deque_timing
+tip deque_timing
+```
+
+Words after the name go to the program, so `tip membership --numbers`
+prints the measurements.
+Solutions answers are found the same way.
+When a name fits several files, `tip` lists them,
+and a piece of the path picks one out:
+the chapter number, or `Solutions` for an answer.
+
+```sh
+tip 18/exercise_1
 ```
 
 ```sh
-tip run-one Examples/07_Foundations--Classes/property_setter.py
+tip Solutions/47/research_by_hand
 ```
+
+`tip run-one deque_timing` is the long form of the same command.
 
 It sets up what the example expects, and prints the commands it stood in
 for, because those are what you type when `tip` is not at hand:

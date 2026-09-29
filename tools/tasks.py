@@ -450,9 +450,11 @@ def run_one(v: Vars) -> None:
     the equivalent cd + PYTHONPATH commands before running: that is what you
     type when this target is not at hand. `tip run-one deque_timing` is the
     same as F=deque_timing (`positional="F"` binds the word to F).
-    `tip deque_timing.py` is the short form: a first word ending in .py
-    that names no task runs that listing, and every word after it goes
-    to the program (`tip membership.py --numbers`).
+    `tip deque_timing` is the short form: a first word that names no task
+    and names a listing runs it, with or without .py, and every word after
+    it goes to the program (`tip membership --numbers`). Solutions answers
+    are searched too; pieces of the path pick one out (`tip 18/exercise_1`,
+    `tip Solutions/47/research_by_hand`).
     """
     py("tools.run_one_example", *v.words("F"))
 

@@ -124,6 +124,33 @@ def test_a_py_name_runs_that_listing_with_the_words_after_it() -> None:
     run.assert_not_called()
 
 
+def test_a_bare_word_naming_a_listing_runs_it() -> None:
+    with mock.patch.object(tip, "py") as py, \
+            mock.patch("tools.run_one_example.names_a_listing",
+                       return_value=True):
+        assert main(["maze_view", "--numbers"]) == 0
+    py.assert_called_once_with(
+        "tools.run_one_example", "maze_view", "--numbers")
+
+
+def test_a_task_name_beats_a_listing_of_the_same_name() -> None:
+    with mock.patch.object(tip, "py") as py, \
+            mock.patch.object(tip.Runner, "run") as run, \
+            mock.patch.dict("os.environ", {NESTED: "1"}), \
+            mock.patch("tools.run_one_example.names_a_listing",
+                       return_value=True):
+        assert main(["gate-status"]) == 0
+    py.assert_not_called()
+    run.assert_called_once()
+
+
+def test_a_word_naming_nothing_is_still_an_unknown_task(capsys) -> None:
+    with mock.patch("tools.run_one_example.names_a_listing",
+                    return_value=False):
+        assert main(["verfy"]) == 2
+    assert "no task named 'verfy'" in capsys.readouterr().err
+
+
 def test_a_py_listing_that_fails_returns_its_exit_code() -> None:
     with mock.patch.object(tip, "py", side_effect=tip.StepFailed(3)):
         assert main(["broken.py"]) == 3
