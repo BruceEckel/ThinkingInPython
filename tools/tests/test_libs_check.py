@@ -78,10 +78,37 @@ def test_main_reports_behind_and_unknown_and_still_exits_zero(
     assert "--upgrade-package" in out
 
 
-def test_library_lines_note_a_move_the_stamp_missed() -> None:
-    lines = tool_stamp.library_lines(
-        {"stateless": "0.7.0", "numpy": "2.5.3"},
+def test_locked_versions_reads_any_named_package() -> None:
+    assert libs_check.locked_versions(LOCK, ("ruff", "ty")) == {
+        "ruff": "0.16.8"}
+
+
+def test_package_lines_note_behind_and_a_move_the_stamp_missed() -> None:
+    lines = tool_stamp.package_lines(
+        [("stateless", "0.7.0", "0.7.0"), ("numpy", "2.5.3", "2.5.4"),
+         ("uv", "0.9.30", None)],
         {"stateless": "0.6.1", "numpy": "2.5.3"})
     assert lines == [
-        "  stateless: 0.7.0 (was 0.6.1 at the last tools-upgrade)",
-        "  numpy: 2.5.3"]
+        "  stateless      0.7.0     latest 0.7.0"
+        "   (was 0.6.1 at the last tools-upgrade)",
+        "  numpy          2.5.3     latest 2.5.4   behind",
+        "  uv             0.9.30    latest unknown (PyPI unreachable)"]
+
+
+def test_upgrade_report_names_the_fix_for_each_kind_behind(
+        monkeypatch: pytest.MonkeyPatch,
+        capsys: pytest.CaptureFixture[str]) -> None:
+    monkeypatch.setattr(tool_stamp, "uv_version", lambda: "0.9.30")
+    monkeypatch.setattr(
+        libs_check, "current",
+        lambda names=libs_check.LIBRARIES:
+            libs_check.locked_versions(LOCK, names))
+    latest = {"uv": "0.9.31", "ruff": "0.16.8", "stateless": "0.7.0",
+              "numpy": "2.5.3"}
+    monkeypatch.setattr(libs_check, "pypi_latest", latest.get)
+    tool_stamp.upgrade_report({})
+    out = capsys.readouterr().out
+    assert "uv             0.9.30    latest 0.9.31   behind" in out
+    assert "ruff           0.16.8    latest 0.16.8\n" in out
+    assert "`tip tools-upgrade`" in out
+    assert "--upgrade-package" in out

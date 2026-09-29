@@ -32,7 +32,8 @@ import json
 import tomllib
 import urllib.error
 import urllib.request
-from collections.abc import Callable
+from collections.abc import Callable, Iterable
+from concurrent.futures import ThreadPoolExecutor
 
 from tools.config import ROOT
 
@@ -46,18 +47,19 @@ LIBRARIES: tuple[str, ...] = (
     "stateless", "numpy", "hypothesis", "time-machine")
 
 
-def locked_versions(lock_text: str) -> dict[str, str]:
-    """Each library's version in a uv.lock, skipping any it does not hold."""
+def locked_versions(lock_text: str,
+                    names: Iterable[str] = LIBRARIES) -> dict[str, str]:
+    """Each named package's version in a uv.lock, skipping any it lacks."""
     packages = tomllib.loads(lock_text).get("package", [])
     by_name = {p["name"]: p["version"] for p in packages if "version" in p}
-    return {name: by_name[name] for name in LIBRARIES if name in by_name}
+    return {name: by_name[name] for name in names if name in by_name}
 
 
-def current() -> dict[str, str]:
-    """The libraries as locked right now; empty with no uv.lock."""
+def current(names: Iterable[str] = LIBRARIES) -> dict[str, str]:
+    """The named packages as locked right now; empty with no uv.lock."""
     if not LOCK.is_file():
         return {}
-    return locked_versions(LOCK.read_text(encoding="utf-8"))
+    return locked_versions(LOCK.read_text(encoding="utf-8"), names)
 
 
 def pypi_latest(name: str) -> str | None:
@@ -71,11 +73,28 @@ def pypi_latest(name: str) -> str | None:
 
 
 def rows(locked: dict[str, str],
-         latest: Callable[[str], str | None] = pypi_latest,
+         latest: Callable[[str], str | None] | None = None,
          ) -> list[tuple[str, str, str | None]]:
-    """(name, locked version, latest version or None) per library."""
-    return [(name, version, latest(name))
-            for name, version in locked.items()]
+    """(name, locked version, latest version or None) per package.
+
+    The lookups run concurrently, so an offline machine waits one
+    timeout rather than one per package.
+    """
+    lookup = latest or pypi_latest
+    names = list(locked)
+    with ThreadPoolExecutor(max_workers=max(1, len(names))) as pool:
+        newest = list(pool.map(lookup, names))
+    return [(name, locked[name], found)
+            for name, found in zip(names, newest)]
+
+
+def note(version: str, newest: str | None) -> str:
+    """How a locked version compares with PyPI's latest, for a report line."""
+    if newest is None:
+        return "latest unknown (PyPI unreachable)"
+    if newest == version:
+        return f"latest {newest}"
+    return f"latest {newest}   behind"
 
 
 def main() -> int:
@@ -85,13 +104,7 @@ def main() -> int:
         return 0
     found = rows(locked)
     for name, version, newest in found:
-        if newest is None:
-            note = "latest unknown (PyPI unreachable)"
-        elif newest == version:
-            note = f"latest {newest}"
-        else:
-            note = f"latest {newest}   behind"
-        print(f"{name:<14} {version:<9} {note}")
+        print(f"{name:<14} {version:<9} {note(version, newest)}")
     behind = [name for name, version, newest in found
               if newest is not None and newest != version]
     if behind:

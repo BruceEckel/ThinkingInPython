@@ -1309,13 +1309,18 @@ def verify_targets(v: Vars) -> None:
     py("tools.verify_targets")
 
 
-@task("Report when the dev tools were last upgraded, and to what")
+@task("Report when the dev tools were last upgraded, and whether PyPI has"
+      " newer releases")
 def tools_status(v: Vars) -> None:
-    """When were the dev tools last upgraded, and to what? `tools-upgrade`
-    writes this stamp; `gate` reads it and prints one line (nothing more,
-    and never a failure) once it is older than tool_stamp.py's threshold.
-    With no stamp yet, uv.lock's mtime stands in, so a fresh clone is
-    correctly treated as current.
+    """When were the dev tools last upgraded, and is an upgrade waiting?
+    Compares uv, the locked tools (ty, ruff, pytest, pyright), and the
+    libraries the listings import with the latest on PyPI, marking each
+    one that is behind. Offline, each reads "latest unknown" and the
+    task still exits 0. `tools-upgrade` writes the stamp; `gate` reads
+    it and prints one line (nothing more, never a failure, and no
+    network) once it is older than tool_stamp.py's threshold. With no
+    stamp yet, uv.lock's mtime stands in, so a fresh clone is correctly
+    treated as current.
     """
     py("tools.tool_stamp")
 

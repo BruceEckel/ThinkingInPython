@@ -26,15 +26,27 @@ git sets it to checkout time. That is the honest answer there: the
 toolchain is as new as the resolve that produced it, so a fresh clone
 gets no nag.
 
-The full report also lists the libraries the listings import
-(`libs_check.LIBRARIES`: Stateless, numpy, and so on), read live from
-uv.lock, and says when one has moved since the stamp. A library can
+The full report also says whether an upgrade is waiting. It compares
+uv, the tools uv.lock pins (`LOCKED_TOOLS`: ty, ruff, pytest,
+pyright), and the libraries the listings import
+(`libs_check.LIBRARIES`: Stateless, numpy, and so on) with the latest
+release on PyPI:
+
+    uv             0.9.30    latest 0.9.31   behind
+    ty             0.0.84    latest 0.0.84
+    stateless      0.6.1     latest 0.6.1
+
+It also notes a library that has moved since the stamp. A library can
 move without a stamp, through `uv lock --upgrade-package`, and a
 Stateless release is as much a book-wide event as a `ty` one.
+Only the full report reaches the network. Its lookups run
+concurrently, so an offline machine waits one timeout and reads
+"latest unknown". `--nag`, which `gate` runs, reads the stamp alone,
+since a gate must not reach the network.
 
 Usage:
     python -m tools.tool_stamp --write   # record an upgrade
-    python -m tools.tool_stamp           # report, always
+    python -m tools.tool_stamp           # report, with PyPI's latest
     python -m tools.tool_stamp --nag     # report only when stale
 """
 
@@ -59,6 +71,10 @@ VERSIONED: tuple[tuple[str, list[str]], ...] = (
     ("ruff", ["uv", "run", "ruff", "--version"]),
     ("pytest", ["uv", "run", "pytest", "--version"]),
 )
+
+# The dev tools whose versions uv.lock pins, compared with PyPI in the
+# full report. uv itself is not in the lock; `uv_version()` asks it.
+LOCKED_TOOLS: tuple[str, ...] = ("ty", "ruff", "pytest", "pyright")
 
 
 def versions() -> dict[str, str]:
@@ -105,22 +121,54 @@ def last_upgrade() -> tuple[datetime, dict[str, str], str] | None:
     return None
 
 
-def library_lines(locked: dict[str, str],
-                  stamped: dict[str, str]) -> list[str]:
-    """The libraries as locked now, noting any that moved since the stamp.
+def uv_version() -> str | None:
+    """The running uv's version number, or None if uv will not answer."""
+    result = run_capture(["uv", "--version"])
+    if result is None or result[1] != 0:
+        return None
+    words = result[0].split()
+    return words[1] if len(words) > 1 else None
 
-    The tools' versions come from the stamp, since asking each tool costs
-    a subprocess. A library's version is one read of uv.lock, so it is
-    reported live, and a move the stamp missed (an
-    `uv lock --upgrade-package`, which writes no stamp) shows up here.
+
+def package_lines(found: list[tuple[str, str, str | None]],
+                  stamped: dict[str, str]) -> list[str]:
+    """One line per package: its version, PyPI's latest, and any move.
+
+    The versions are read live (uv.lock, and `uv --version`), so a
+    library upgraded with `uv lock --upgrade-package`, which writes no
+    stamp, shows here as moved since the last tools-upgrade.
     """
     lines: list[str] = []
-    for name, version in locked.items():
+    for name, version, newest in found:
         was = stamped.get(name)
-        moved = f" (was {was} at the last tools-upgrade)" \
+        moved = f"   (was {was} at the last tools-upgrade)" \
             if was and was != version else ""
-        lines.append(f"  {name}: {version}{moved}")
+        lines.append(f"  {name:<14} {version:<9} "
+                     f"{libs_check.note(version, newest)}{moved}")
     return lines
+
+
+def upgrade_report(stamped: dict[str, str]) -> None:
+    """Compare uv, the locked tools, and the libraries with PyPI."""
+    installed: dict[str, str] = {}
+    if uv := uv_version():
+        installed["uv"] = uv
+    installed |= libs_check.current(LOCKED_TOOLS)
+    libraries = set(libs_check.current())
+    installed |= libs_check.current()
+    if not installed:
+        return
+    found = libs_check.rows(installed)
+    print("installed, against the latest on PyPI:")
+    print("\n".join(package_lines(found, stamped)))
+    behind = {name for name, version, newest in found
+              if newest is not None and newest != version}
+    if behind - libraries:
+        print("`tip tools-upgrade` upgrades uv and the tools "
+              "(and the libraries with them).")
+    if behind & libraries:
+        print("To upgrade one library alone: "
+              "`uv lock --upgrade-package NAME`, `uv sync`, `tip sweep`.")
 
 
 def report(*, nag_only: bool, days: int) -> int:
@@ -131,23 +179,15 @@ def report(*, nag_only: bool, days: int) -> int:
             print("No tool upgrade recorded, and no uv.lock to date.")
         return 0
 
-    when, recorded, source = found
+    when, _, source = found
     stale = (datetime.now() - when).days >= days
     if nag_only and not stale:
         return 0
 
     dated = "" if source == "tools-upgrade" else f", dated from {source}"
     print(f"tools last upgraded {ago(when)} ({when:%Y-%m-%d}){dated}")
-    if recorded and not nag_only:
-        for name, version in recorded.items():
-            print(f"  {name}: {version}")
     if not nag_only:
-        libraries = library_lines(
-            libs_check.current(), read_stamp().get("libraries", {}))
-        if libraries:
-            print("libraries, as locked in uv.lock "
-                  "(`tip libs-check` compares them with PyPI):")
-            print("\n".join(libraries))
+        upgrade_report(read_stamp().get("libraries", {}))
     if stale:
         print(f"That is over {days} days. Consider `tip tools-upgrade`, "
               "then `tip sweep` to see what moved.")

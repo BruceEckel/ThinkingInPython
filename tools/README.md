@@ -390,6 +390,9 @@ drifting quietly for months and then meeting every breaking change at once.
 So the gate prints one line when the stamp is old. It never fails and never
 touches a tracked file, so it cannot turn a green gate red. That line is a
 reminder for the author; nothing should act on it automatically.
+Run by hand, `tip tools-status` also compares uv, the locked tools, and
+the listings' libraries with the latest release on PyPI and marks each
+one that is behind; the gate's one line never reaches the network.
 
 ## check_tools.py
 
