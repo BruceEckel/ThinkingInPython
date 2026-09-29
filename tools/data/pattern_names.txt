@@ -44,6 +44,8 @@ Multiple Dispatching
 Event Bus
 State Machine
 Blackboard
+Borg
+Messenger
 
 # Phrases that contain a name without naming the pattern (chapter and
 # section titles quoted as link text, mostly). Skipped wherever found.
@@ -51,3 +53,4 @@ Blackboard
 !State as an Ability
 !Sharing an Iterator Between Threads
 !Command Query Responsibility Segregation
+!The Borg are a hive-mind

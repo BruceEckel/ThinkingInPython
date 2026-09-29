@@ -1214,7 +1214,7 @@ If you delete `__post_init__()`, the same line raises an `AttributeError`.
 
 If a base `__init__()` instead replaces `self.__dict__`,
 calling it from `__post_init__()` discards the fields the data class just assigned.
-The [Borg singleton](24_Patterns--Singleton.md#borg-singleton-by-inheritance)
+The [*Borg* singleton](24_Patterns--Singleton.md#borg-singleton-by-inheritance)
 is that case.
 
 When the base class is also a data class, you do not need this.
