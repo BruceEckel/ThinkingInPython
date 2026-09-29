@@ -260,7 +260,7 @@ and it takes the answers as a parameter.
 Swapping the dictionary for a database changes a single argument.
 
 That is an EMS in miniature.
-The generator declares Effects, the driver interprets them.
+The generator declares Effects, and the driver interprets them.
 
 One generator, one driver.
 No annotation states that pairing, but the runtime enforces it:
@@ -312,8 +312,7 @@ print(list(top()))
 Each `yield from` runs its target until that generator finishes,
 so the line delegating to `one()` contributes one value and the line delegating to `three()` contributes three:
 the target decides how many values each delegation contributes.
-The `from` is what delegates;
-a bare `yield one()` yields the generator object itself as a single value.
+Without `from`, a bare `yield one()` yields the generator object as a single value.
 "Exhausted" describes where the delegation ends; in between,
 the inner generator yields each value one at a time, as the driver requests it.
 
@@ -328,7 +327,7 @@ A `yield from` expression evaluates to the inner generator's return value,
 not its yielded values.
 The yielded values pass through to the driver.
 Here, `report()` captures the return value from `yield from emit(items)` into `size`.
-`report()` itself is a one-way generator,
+`report()` is a one-way generator,
 annotated with the short `Iterator[str]` form:
 
 ```python
@@ -513,7 +512,8 @@ A single loop at the edge of the program interprets Effects yielded anywhere ins
 
 `drive()` and `yield from` both step a generator and both finish at `StopIteration`,
 so they are easy to confuse.
-Delegation can take over the job `yield_from_delegates.py` gives to `drive()`:
+`yield from` can take over one of the jobs `yield_from_delegates.py` gives to `drive()`,
+receiving `interview()`'s `Result`:
 
 ```python
 # yield_from_nested.py
@@ -581,7 +581,7 @@ and `yield from` relays both.
 `throw()` raises its exception inside the innermost generator rather than in the delegating one,
 and `close()` unwinds every frame in the chain.
 [A Basic Context Manager](15_Techniques--Context_Managers.md#a-basic-context-manager)
-already shows an exception raised at a generator's `yield`,
+shows an exception raised at a generator's `yield`,
 described from the `with` block's side:
 "Python resumes the generator by raising the block's exception at the `yield`."
 `throw()` is that same resumption, called directly instead of by a `with` block:
@@ -663,7 +663,7 @@ and the cleanup lines print from the inside out.
 A driver holding only the outermost generator can still stop and clean up every frame beneath it.
 
 A generator can catch `GeneratorExit` and yield again instead of letting it end the frame.
-Doing so makes `close()` raise:
+Doing so makes `close()` raise a `RuntimeError`:
 
 ```python
 # throw_and_close_gotcha.py
@@ -691,7 +691,7 @@ so a generator written for others to drive must let `GeneratorExit` end it.
 
 ## The Driver You Already Use
 
-[Stateless](46_Effects--Stateless.md) builds on three ideas from this one.
+[Stateless](46_Effects--Stateless.md) builds on three ideas from this chapter.
 A generator function builds a description instead of doing work.
 `yield` makes that description two-way,
 so the description can ask for something.

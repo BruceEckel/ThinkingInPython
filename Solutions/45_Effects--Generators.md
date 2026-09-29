@@ -36,7 +36,7 @@ print(total)
 The three-parameter annotation names all three channels:
 `Generator[Prompt, Amount, Total]` says this generator yields a
 `Prompt`, receives an `Amount`, and finally returns a `Total`. Three
-`NewType` aliases over `str`, `int`, and `int` keep the two integer
+`NewType` definitions over `str`, `int`, and `int` keep the two integer
 channels apart, so transposing the `SendType` and the `ReturnType`
 is a type checker error rather than a bug that shows up in arithmetic.
 
@@ -324,9 +324,10 @@ delivers it into `report()`'s `size`, `report()` returns it again, and
 the second `yield from` delivers it into `summarize()`'s `counted`. The
 `SendType` is `None` throughout, since nobody sends anything in.
 
-`12` therefore crosses two frames without appearing in the output
-sequence, and `'(12 characters)'` appears in the sequence without ever
-crossing a frame boundary as a value. The same number can travel either
+`12` therefore reaches `summarize()` through two returns and is never
+yielded on its own. `'(12 characters)'` takes the other route:
+`report()` yields it, the `yield from` in `summarize()` relays it,
+and the driver receives it. No generator binds it to a name. The same number can travel either
 way, and the choice decides who can see it: a yielded value goes to the
 driver, a returned value goes to the delegating generator.
 
@@ -443,11 +444,11 @@ generator pauses is the state: paused in the coin loop means
 COLLECTING, paused after `yield "SELECTING"` means a first digit has
 arrived and the machine waits for a second. `amount`, `row`, and
 `stock` are locals that survive because the frame does. This version
-has no counterpart for two lines of the table-driven version: the state
+has no counterpart for two parts of the table-driven version: the state
 attribute and the transition lookup.
 
 The `yield` runs the opposite direction from `interview()`, and the
-signature does not say so. Both are `Generator[str, X, ...]`, but
+signature does not say so. Both yield strings, but
 `interview()` yields a request the driver must satisfy, while
 `machine()` yields a report the driver may ignore. The driver's event
 and the machine's report travel independently: `send(Coin(25))` answers
@@ -457,7 +458,7 @@ annotation.
 
 For another state, take the table. The generator's compactness comes
 from the states forming a line, so control flow can express the
-sequence. The two states here that break the line already cost
+sequence. The two states here that break the line cost
 something: an `if` chain reaches `UNAVAILABLE` and `WANT_MORE`, and
 each one returns by looping back to the top, a `goto` written as a
 `while True`. Now add a state reachable from three others, the way the
