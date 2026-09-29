@@ -126,7 +126,7 @@ or the loop `else` technique that `nested_break.py` shows below.
 and a bare `print()` emits the missing newline afterward.
 
 Python has no `do`/`while` statement.
-When the test belongs at the bottom of the body rather than the top,
+When the test belongs in the middle or at the bottom of the body,
 write `while True:` and `break` out:
 
 ```python
@@ -142,6 +142,9 @@ while True:
 print(total)
 #: 8
 ```
+
+The loop must fetch a value before it can test it,
+so the test sits between the `pop()` and the addition.
 
 ### The Loop `else` Clause
 
@@ -205,6 +208,11 @@ There the `3` matches, the inner `break` skips the `else`,
 and the outer `break` runs right after.
 `locate(9)` breaks neither loop,
 so the inner `else` continues on each row and the outer `else` prints `"not found"`.
+
+`locate()` is a function so the listing can run two searches.
+Inside a function, a `return` at the match leaves both loops in one step.
+The `else` form serves loops at the top level of a module,
+and a function with more work to do after the search.
 
 ### `range()`, `enumerate()`, and `zip()`
 
@@ -287,6 +295,11 @@ while stack and (item := stack.pop()) != "a":
 #: processing b
 ```
 
+Each walrus expression here needs its parentheses.
+`:=` binds more loosely than a comparison,
+so `if n := len(text) > 3:` gives `n` the result of the comparison, `True`,
+and not the length.
+
 The `while` loop is where the walrus helps most.
 The header pops a value, names it, and tests it,
 so the body starts with that value in hand.
@@ -299,7 +312,8 @@ and [Comprehensions](16_Techniques--Comprehensions.md) covers that use.
 
 Changing a container while a `for` loop walks it is the classic control-flow bug.
 [Containers](03_Foundations--Containers.md#two-list-traps)
-hit it while removing from a list.
+shows a `list` skipping items as the loop removes them,
+and a `dict` raising a `RuntimeError` under the same treatment.
 Lists and dictionaries are the two containers you are most likely to mutate this way,
 and each one fails differently.
 A list comprehension, covered in [Comprehensions](#comprehensions)
@@ -426,6 +440,8 @@ Raise your own exception that way when the caller should hear about the bad argu
 
 The optional `else` runs when the `try` block raises no exception,
 the same shape as the loop `else` that runs when the loop hits no `break`.
+Code in the `else` is outside the reach of the `except` clauses,
+so an exception from the follow-up work is not mistaken for the failure the handler expects.
 The optional `finally` always runs, and that makes it the place for cleanup.
 A `return`, `break`,
 or `continue` inside `finally` swallows any exception in flight,
@@ -588,6 +604,8 @@ and only the EAFP form is safe against that.
 
 A `with` block guarantees that setup and cleanup run as a pair,
 even if the body raises an exception.
+It does the work of a `try`/`finally` whose `finally` holds the cleanup.
+The object that `with` manages supplies the cleanup, so you cannot leave it out.
 Opening a file is the canonical case.
 The `with` block always closes the file on exit:
 
@@ -628,13 +646,14 @@ Anything that acquires a resource (a file, a lock, a network connection)
 can be a context manager.
 [Context Managers](15_Techniques--Context_Managers.md)
 shows how to write your own.
-For reading or writing a file,
-`pathlib` provides methods like `read_text()` and `write_text()` that open and close the file.
+For reading or writing a whole file in one call,
+`pathlib` provides `read_text()` and `write_text()`,
+which open the file and close it again.
 
 ## Comprehensions
 
 A *comprehension* builds a list, dictionary,
-or set from another sequence in one expression,
+or set from an iterable in one expression,
 replacing a loop that builds up a result:
 
 ```python
@@ -655,6 +674,14 @@ parities = {n % 2 for n in range(10)}  # Set comprehension
 print(parities)
 #: {0, 1}
 ```
+
+Every form has the same order: the expression that produces each item,
+the `for` clause that supplies the values,
+and an optional `if` that filters them.
+The delimiters choose the container: brackets build a list, braces build a set,
+and braces around a `key: value` expression build a dictionary.
+[Comprehensions](16_Techniques--Comprehensions.md) covers nesting,
+generator expressions, and when to write a loop instead.
 
 ## Exercises
 

@@ -16,9 +16,9 @@ find_factor(97)
 #: 97 is prime
 ```
 
-The loop tries every `d` from 2 up to 96 and never finds a factor, so
-it never hits `break`. The `for`'s `else` clause runs exactly when the
-loop finishes without a `break`, so it prints `97 is prime`.
+The loop tries every `d` from 2 up to 96 and finds no factor, so it
+does not reach `break`. The `for`'s `else` clause runs when the loop
+finishes without a `break`, so it prints `97 is prime`.
 
 ## 2. Counting odd steps in the Collatz sequence
 
@@ -134,11 +134,11 @@ print(run("go north"))
 
 Before the new `case` exists, `run("go north 3")` returns `unknown
 command`. A list pattern matches on length as well as content, so
-`["go", direction]` matches a two-item list and nothing else. The
-three-item split falls through to `case _`. Adding the longer pattern
-gives that length somewhere to land. Order matters only between
-patterns that could both match the same value. These two cannot, so
-either arrangement works here.
+`["go", direction]` matches only a list of two items. The three-item
+split matches neither of the original patterns and reaches `case _`.
+The longer pattern gives a three-item list a `case` of its own. Order
+matters only between patterns that could both match the same value.
+These two cannot, so either arrangement works here.
 
 ## 6. The comprehension written as a loop
 
@@ -152,10 +152,11 @@ print(evens)
 #: [0, 2, 4, 6, 8]
 ```
 
-The loop takes four lines instead of one, and for three of them the
-name `evens` holds an empty list. The comprehension says what the list
-*is*. The loop says how to build it, and the reader has to run the
-loop in their head to find out. The loop version wins when the body
+The loop takes four lines instead of one, and until it finishes the
+name `evens` holds a partial result. The comprehension states the
+contents of the list. The loop says how to build it, and the reader
+runs the loop in their head to learn the contents. The loop version
+wins when the body
 grows past one condition and one expression, since a comprehension
 with two filters and a nested loop is harder to read than the code it
 replaced.
@@ -198,10 +199,11 @@ except BadNumber as e:
 ```
 
 The prediction is the "direct cause" line, the same one `explicit()`
-produces. `from` sets `__cause__` to whatever object follows it.
-`joining_line()` looks at nothing else, so an exception constructed on
-the spot joins the report the same way a caught one does. `from` takes
-an expression, not a name bound by `except`.
+produces. `from` sets `__cause__` to whatever object follows it, and
+Python builds the traceback that `joining_line()` searches from
+`__cause__`. An exception constructed on the spot joins the report the
+same way a caught one does. `from` takes an expression, not a name
+bound by `except`.
 
 The second `print()` shows what makes this case worth writing. Both
 attributes hold an exception, and different ones: `__cause__` is the
@@ -250,12 +252,11 @@ lets several operations share one open file, while each `read_text()`
 call opens and closes the file again.
 
 That control matters when the file is large enough that holding it
-costs something, when you are reading a stream that has no end, or
-when you are writing rather than reading and the failure case matters.
-In that last case the `with` form closes the file even when the body
-raises an exception, and that guarantee is what the section is about.
-For a configuration file of a few kilobytes read once at startup, none
-of it matters, and `read_text()` is the honest answer.
+costs something, or when you are reading a stream that has no end.
+The closing guarantee is not the difference: `read_text()` opens the
+file in a `with` block of its own, so it closes the file too, whether
+or not the read succeeds. For a configuration file of a few kilobytes
+read once at startup, `read_text()` is the better choice.
 
 ## 9. Adjacent `2`s in `mutating_while_looping.py`
 
@@ -273,12 +274,12 @@ One `2` survives again, but this time at the front. At position 0 the
 loop sees `2` and `remove()` deletes the first equal item, which is
 that same position-0 element. The second `2` slides down into slot 0,
 which the loop has already passed, so the next iteration looks at
-position 1 and finds `1`. The loop never sees the survivor at all.
+position 1 and finds `1`. The loop does not visit the survivor.
 
-The prediction to make is not just "one survives" but *which* one and
-*where*: the survivor is whatever slid into an already-visited slot,
-so its final position depends on the data. In the chapter's
-`[1, 2, 2, 3]` the survivor sits mid-list. Here it sits first. A bug
-whose symptom moves around with the input is exactly why the chapter
-says to build a new container instead of reasoning your way around
-the mutation.
+The prediction covers more than "one survives": it says which item
+and where. The survivor is whatever slid into a slot the loop had
+passed, so its final position depends on the data. In the chapter's
+`[1, 2, 2, 3]` the survivor sits mid-list. Here it sits first. The
+symptom moves with the input, and for that reason the chapter says to
+build a new container instead of reasoning your way around the
+mutation.
