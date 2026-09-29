@@ -14,11 +14,11 @@ as_set = set(as_list)
 random.seed(1)
 targets = [random.randrange(n) for _ in range(200)]
 
-def list_lookups():
+def list_lookups() -> None:
     for t in targets:
         t in as_list
 
-def set_lookups():
+def set_lookups() -> None:
     for t in targets:
         t in as_set
 
@@ -63,7 +63,7 @@ for size in (1, 2, 5, 10, 20, 50, 100, 200, 500):
 
 On this machine, the `set` already wins starting at size `2`. Only at
 size `1` does the `list` edge ahead, and even then barely. The
-`set`'s advantage grows steadily as `size` increases, exactly as the
+`set`'s advantage grows steadily as `size` increases, as the
 different growth rates (`O(1)` vs. `O(n)`) predict. The crossover
 point is not a fixed number. It depends on the machine, the Python
 build, and even which values you store, because the race is between
@@ -78,44 +78,53 @@ look similar.
 ```python
 # exercise_3.py
 import tracemalloc
+from collections.abc import Callable
+from itertools import islice
 
-N = 1_000_000
+n = 1_000_000
 
-def eager_first_evens():  # The original, two lists
-    squares = [x * x for x in range(N)]
+def two_lists() -> list[int]:  # The original
+    squares = [x * x for x in range(n)]
     evens = [s for s in squares if s % 2 == 0]
     return evens[:5]
 
-def eager_first_evens_comprehension():
-    return [x * x for x in range(N) if (x * x) % 2 == 0][:5]
+def one_list() -> list[int]:
+    return [x * x for x in range(n) if (x * x) % 2 == 0][:5]
 
-def peak_of(func) -> int:
+def lazy() -> list[int]:  # The chapter's lazy version
+    squares = (x * x for x in range(n))
+    evens = (s for s in squares if s % 2 == 0)
+    return list(islice(evens, 5))
+
+def peak_of(func: Callable[[], list[int]]) -> int:
     tracemalloc.start()
     func()
     _, peak = tracemalloc.get_traced_memory()
     tracemalloc.stop()
     return peak
 
-print(eager_first_evens_comprehension())
-#: [0, 4, 16, 36, 64]
-two, one = peak_of(eager_first_evens), peak_of(
-    eager_first_evens_comprehension)
+result = one_list()
+print(result, result == two_lists() == lazy())
+#: [0, 4, 16, 36, 64] True
+two, one = peak_of(two_lists), peak_of(one_list)
 print("peak ratio, one list to two:", round(one / two, 1))
 #: peak ratio, one list to two: 0.5
+print(f"lazy peak under 1% of one list: "
+      f"{peak_of(lazy) * 100 < one}")
+#: lazy peak under 1% of one list: True
 ```
 
-The single comprehension filters `x * x` directly instead of first
-building a `squares` list and then an `evens` list from it, so it
-removes one of the two million-element intermediate lists. Peak
-memory drops accordingly, to half of the original two-list version as
-the measurement above reports, but it is still enormously larger than
-the lazy version's
-peak: this comprehension still must build and hold the whole list of
-even squares before slicing `[:5]` can throw almost all of it away.
-No amount of restructuring the eager version closes that gap, because
-the eager style, by its nature, computes every value up front. The
-lazy generator pipeline stops the moment `islice()` has its five
-values, so it alone never builds the large intermediate collection.
+`one_list()` filters `x * x` directly instead of first building a
+`squares` list and then an `evens` list from it, so the
+million-element `squares` list is gone. Peak memory drops to about
+half of the two-list version's. That is as close as an eager version
+gets, and the last line shows how far away it still is: the lazy
+peak is under one percent of it. The comprehension must build and
+hold the whole list of half a million even squares before `[:5]`
+discards nearly all of them. Restructuring the eager version cannot
+close that gap, because an eager version computes every value up
+front. The lazy generator pipeline stops when `islice()` has its
+five values, so it builds no large collection.
 
 ## 4. Caching a function with a side effect
 
@@ -124,7 +133,7 @@ values, so it alone never builds the large intermediate collection.
 from functools import cache
 
 @cache
-def noisy(n):
+def noisy(n: int) -> int:
     print(f"computing noisy({n})")
     return n * n
 
@@ -141,15 +150,14 @@ The `"computing noisy(3)"` message prints only once, on the first
 call. Every later call with the same argument returns the cached
 result directly, without running the function body again, so the
 print statement (and any other side effect) never happens a second
-time. Skipping the body is exactly why you should cache only pure
-functions. A cache is a promise that calling the function again is
-unnecessary, because the answer cannot have changed and nothing
-observable happens during the call besides computing that answer.
-Caching an impure function silently breaks that promise. Any side
-effect the function performs, printing, writing a file, incrementing
-a counter, happens only on the first call with a given argument, and
-the cache silently skips it on every repeat, which is rarely what you
-want.
+time. Skipping the body is the reason to cache only pure functions.
+A cache assumes that calling the function again is unnecessary,
+because the answer cannot have changed and nothing observable
+happens during the call besides computing that answer. An impure
+function breaks that assumption. Any side effect the function
+performs, such as printing, writing a file, or incrementing a
+counter, takes place on the first call with a given argument, and
+the cache silently skips it on every repeat.
 
 ## 5. Popping a heap correctly
 
@@ -175,21 +183,20 @@ then `5`. After every pop, `heap[0]` is still the minimum. Compare
 `heap.pop(0)` in the original, which returns the right value once and
 then leaves a list that is no longer a heap.
 
-The list still looks unsorted because a heap never promises sorted
-order. A heap guarantees only that every element is smaller than its
-two children at positions `2i + 1` and `2i + 2`, which puts the
-smallest element at index 0 and says nothing about the order of the
-rest. `heappop()` maintains that weaker property, and maintaining it
+The list still looks unsorted because a heap does not guarantee
+sorted order. A heap guarantees that the element at position `i` is
+no larger than its two children at positions `2i + 1` and `2i + 2`,
+which puts the smallest element at index 0 and says nothing about
+the order of the rest. `heappop()` maintains that weaker property, and maintaining it
 is cheap: the last element moves to the front and sinks back down
 through O(log n) comparisons. Sorting the whole list on every pop
-costs far more and buys nothing, since callers only ever read the
-front element.
+costs far more and gains nothing, since callers read only the front
+element.
 
 ## 6. A subclass that forgets `__slots__`
 
 ```python
 # exercise_6.py
-
 class Point:
     __slots__ = ("x", "y")
     def __init__(self, x: int, y: int) -> None:
@@ -222,13 +229,14 @@ alongside it. The last line shows the trap: `Point3D.__slots__` reads
 the subclass look slotted while it still carries a `__dict__`.
 
 The memory saving is quietly lost. Every `Point3D` pays for both the
-slot descriptors and a dictionary. A subclass of a slotted class must
+two slots and a dictionary. A subclass of a slotted class must
 declare `__slots__` itself, using an empty tuple when it adds no
 fields of its own.
 
 ## 7. Global monitoring versus two local attachments
 
 ```python
+# exercise_7.py
 import sys
 from collections import Counter
 from types import CodeType
@@ -277,7 +285,7 @@ program `set_events()` reports every Python function the process
 runs, including library code you did not write and never wanted
 counted, and it pays the callback cost on all of it. Local
 attachment names the code objects you care about and leaves the rest
-specialized and full speed. Global monitoring answers "what ran."
+running at full speed. Global monitoring answers "what ran."
 Local monitoring answers "how often did *this* run," which is the
 question you already had when you opened `sys.monitoring` instead of
 a profiler.
@@ -298,7 +306,8 @@ print(outer() > 0)
 #: True
 ```
 
-Run `python -m cProfile -s cumulative exercise_8.py`. The largest
+Run `uv run python -m cProfile -s cumulative exercise_8.py`. The
+largest
 `cumtime` belongs to `exec`, then `<module>`, then `outer`. The
 largest `tottime` belongs to `{built-in method builtins.sum}`, with
 the generator expression inside `inner()` second: the largest of the
@@ -309,7 +318,7 @@ They differ because the two columns measure different things.
 including everything it called, so a caller can never show a smaller
 `cumtime` than the work beneath it. Every caller on the path
 accumulates the same time. `tottime` excludes the callees, so it
-attributes time to the frame that is actually executing.
+attributes time to the frame that is executing.
 
 A function high on `cumtime` and near zero on `tottime` is a
 pass-through: it is slow only because of what it calls, and rewriting
@@ -324,13 +333,14 @@ where the two lists finally meet.
 import sys
 import timeit
 from array import array
+from collections.abc import Callable
 
 n = 200_000
 as_list = [float(i) for i in range(n)]
 as_array = array("d", as_list)
 
-def best(f: object) -> float:
-    return min(timeit.repeat(f, number=20, repeat=5))  # type: ignore
+def best(f: Callable[[], float]) -> float:
+    return min(timeit.repeat(f, number=20, repeat=5))
 
 t_list = best(lambda: sum(as_list))
 t_array = best(lambda: sum(as_array))
@@ -340,7 +350,7 @@ print(f"array is slower to iterate: {t_array > t_list}")
 #: array is slower to iterate: True
 ```
 
-Not faster: on one machine the `array` took about 1.3 times as long
+Not faster: on one machine the `array` took about 1.4 times as long
 as the `list`. The memory saving is real (the chapter measures
 325,176 bytes against 80,080). The speed saving does not exist.
 
@@ -354,7 +364,7 @@ tighter layout.
 That cost is the chapter's NumPy lesson arriving early: a compact
 layout pays off when the loop over it leaves Python. `sum()` over an
 `array` stays in Python and boxes every element. A NumPy `sum` over
-the same bytes never creates a Python object at all, which is why
+the same bytes creates no Python object per element, which is why
 vectorizing wins where `array` alone does not.
 
 ## 10. `"".join()` against `+=`, at two sizes
@@ -497,8 +507,8 @@ machine code earns the cost back.
 The listing prints a ratio, not a duration. `set at least 100x
 faster` compares the two lookups against each other, so anything
 that speeds up or slows down both of them equally leaves that ratio
-alone. The `--numbers` output makes that visible: the two runs
-differ in the individual timings and agree on the ratio.
+alone. On a python.org 3.15 build, the `--numbers` lines from the
+two runs differ by no more than two runs under the same setting do.
 
 A better subject runs a Python-level loop over Python objects, long
 enough to cross the compiler's threshold and keep going:

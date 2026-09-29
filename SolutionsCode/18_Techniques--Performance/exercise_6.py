@@ -1,5 +1,4 @@
 # exercise_6.py
-
 class Point:
     __slots__ = ("x", "y")
     def __init__(self, x: int, y: int) -> None:

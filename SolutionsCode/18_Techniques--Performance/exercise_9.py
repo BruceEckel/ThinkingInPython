@@ -2,13 +2,14 @@
 import sys
 import timeit
 from array import array
+from collections.abc import Callable
 
 n = 200_000
 as_list = [float(i) for i in range(n)]
 as_array = array("d", as_list)
 
-def best(f: object) -> float:
-    return min(timeit.repeat(f, number=20, repeat=5))  # type: ignore
+def best(f: Callable[[], float]) -> float:
+    return min(timeit.repeat(f, number=20, repeat=5))
 
 t_list = best(lambda: sum(as_list))
 t_array = best(lambda: sum(as_array))

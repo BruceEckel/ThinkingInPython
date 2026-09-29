@@ -2,7 +2,7 @@
 from functools import cache
 
 @cache
-def noisy(n):
+def noisy(n: int) -> int:
     print(f"computing noisy({n})")
     return n * n
 

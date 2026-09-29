@@ -14,9 +14,10 @@
 03_Foundations--Containers/deque_timing.py
 18_Techniques--Performance/membership.py
 18_Techniques--Performance/builtin_sum.py
+18_Techniques--Performance/hoist_attribute_lookup.py
 18_Techniques--Performance/search_comparison.py
 18_Techniques--Performance/vectorize_numpy.py
-18_Techniques--Performance/heap_vs_hash.py
+18_Techniques--Performance/heap_vs_sort.py
 19_Techniques--Concurrency/blocking_the_loop.py
 19_Techniques--Concurrency/to_thread.py
 19_Techniques--Concurrency/io_threads.py
@@ -29,6 +30,8 @@
 
 # Solutions (run against build/solutions/)
 03_Foundations--Containers/exercise_1.py
+18_Techniques--Performance/exercise_1.py
 18_Techniques--Performance/exercise_9.py
+18_Techniques--Performance/ch18_join_vs_concat.py
 19_Techniques--Concurrency/exercise_2.py
 19_Techniques--Concurrency/exercise_12.py

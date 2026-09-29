@@ -1,4 +1,4 @@
-# heap_vs_hash.py
+# heap_vs_sort.py
 import heapq
 import random
 import timeit

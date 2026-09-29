@@ -9,11 +9,11 @@ as_set = set(as_list)
 random.seed(1)
 targets = [random.randrange(n) for _ in range(200)]
 
-def list_lookups():
+def list_lookups() -> None:
     for t in targets:
         t in as_list
 
-def set_lookups():
+def set_lookups() -> None:
     for t in targets:
         t in as_set
 
