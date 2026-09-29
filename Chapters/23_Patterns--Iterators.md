@@ -878,7 +878,7 @@ The only way to find out whether the body accepts its arguments is to pull a val
 and the only way to find out whether the source has run out is to pull and get nothing back.
 `for` and `list()` catch that second answer and report nothing,
 so an exhausted source and an empty one produce identical output.
-The protocol stores nothing, so it answers nothing in advance.
+The protocol costs you nothing, and tells you nothing.
 Every tool in this chapter that does answer in advance, `tee`, `OverStream`,
 or a peekable wrapper, pays for the answer with a buffer.
 
