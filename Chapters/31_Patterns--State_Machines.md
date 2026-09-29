@@ -2,14 +2,14 @@
 
 > Many systems are in one of a fixed set of states at any moment,
 > and each input, together with the current state, decides the next state.
-> A *StateMachine* names the states and the transitions between them.
+> A *State Machine* names the states and the transitions between them.
 
 ![](_images/coupling_31)
 
 Recall [*State*](26_Patterns--Surrogate.md#state):
 a surrogate object that forwards calls to a swappable implementation.
 *State* lets the client programmer swap the implementation.
-*StateMachine* adds a structure that swaps it automatically,
+*State Machine* adds a structure that swaps it automatically,
 from one object to the next.
 Each implementation represents one state the system can occupy,
 so the system behaves differently as it moves from state to state.
@@ -75,7 +75,7 @@ while the varying behavior lives in each `State`'s `run()` and `next()`.
 puts the varying steps in a subclass.
 Here they come from the `State` objects the machine holds.
 
-In this style of *StateMachine*, each state decides the next state.
+In this style of *State Machine*, each state decides the next state.
 As an example, here's a fancy mousetrap that can move through several states while trapping a mouse.
 The possible moves a mouse can make are the inputs to the state machine:
 
@@ -975,7 +975,7 @@ Choose a library once the machine needs more than a page of code.
     Add another kind of `Mood` called `Prozac`.
 2.  Turn exercise 1's `UnpredictablePerson` into a state machine using `state_machine.py`,
     the first design, where each state decides the next one.
-3.  Create a *StateMachine* system in which the current state and the input together determine the next state.
+3.  Create a *State Machine* system in which the current state and the input together determine the next state.
     Use a `dict` to map a `str` naming a state to its state object.
     Give each state subclass its own transition table,
     which its `next_state()` method consults.
