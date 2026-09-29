@@ -4,9 +4,9 @@
 
 ```python
 # exercise_1.py
-import sys
 from collections import deque
 from timeit import timeit
+from benchmark import report
 
 n = 2_000  # then 200_000
 
@@ -26,8 +26,7 @@ def deque_left_ops():
 
 list_time = timeit(list_left_ops, number=1)
 deque_time = timeit(deque_left_ops, number=1)
-if "--numbers" in sys.argv:  # Exact times on your machine
-    print(f"list {list_time:.6f}, deque {deque_time:.6f}")
+report(list=list_time, deque=deque_time)
 print(deque_time < list_time)
 #: True
 ```
@@ -40,10 +39,6 @@ dozen items the constant-factor overhead of a `deque` nearly closes the
 gap, though by `n = 2_000` the `deque` finishes several times faster.
 At large `n` the quadratic cost of the list dominates and the `deque`
 wins by a wide and growing margin.
-
-This script differs from the chapter's `deque_timing.py` in how it
-shows the numbers: it prints the two times under `--numbers` instead of
-calling the book's `report()` helper.
 
 ## 2. `defaultdict(int)` for counting
 

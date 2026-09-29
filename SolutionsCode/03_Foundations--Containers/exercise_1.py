@@ -1,7 +1,7 @@
 # exercise_1.py
-import sys
 from collections import deque
 from timeit import timeit
+from benchmark import report
 
 n = 2_000  # then 200_000
 
@@ -21,7 +21,6 @@ def deque_left_ops():
 
 list_time = timeit(list_left_ops, number=1)
 deque_time = timeit(deque_left_ops, number=1)
-if "--numbers" in sys.argv:  # Exact times on your machine
-    print(f"list {list_time:.6f}, deque {deque_time:.6f}")
+report(list=list_time, deque=deque_time)
 print(deque_time < list_time)
 #: True

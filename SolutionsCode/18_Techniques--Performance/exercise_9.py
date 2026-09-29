@@ -1,8 +1,8 @@
 # exercise_9.py
-import sys
 import timeit
 from array import array
 from collections.abc import Callable
+from benchmark import report
 
 n = 200_000
 as_list = [float(i) for i in range(n)]
@@ -13,7 +13,6 @@ def best(f: Callable[[], float]) -> float:
 
 t_list = best(lambda: sum(as_list))
 t_array = best(lambda: sum(as_array))
-if "--numbers" in sys.argv:  # Exact times on your machine
-    print(f"list {t_list:.6f}, array {t_array:.6f}")
+report(list=t_list, array=t_array)
 print(f"array is slower to iterate: {t_array > t_list}")
 #: array is slower to iterate: True

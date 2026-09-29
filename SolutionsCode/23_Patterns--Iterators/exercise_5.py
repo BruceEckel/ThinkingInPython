@@ -1,9 +1,9 @@
 # exercise_5.py
-import sys
 import tracemalloc
 from collections.abc import Iterator
 from itertools import islice, tee
 from typing import Final
+from benchmark import report
 
 def squares(n: int) -> Iterator[int]:
     return (i * i for i in range(n))
@@ -23,7 +23,6 @@ def peak_at_gap(k: int) -> int:
 
 near = peak_at_gap(100)
 far = peak_at_gap(10_000)
-if "--numbers" in sys.argv:  # Sizes on your machine
-    print(f"k=100 {near:,}, k=10,000 {far:,}")
+report(gap_100=near, gap_10_000=far)
 print(f"the wider gap buffers more: {far > near}")
 #: the wider gap buffers more: True
