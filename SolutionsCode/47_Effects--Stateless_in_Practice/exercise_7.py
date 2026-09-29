@@ -7,13 +7,13 @@ from stateless.functions import RetryError
 from stateless.schedule import recurs, spaced
 from stateless.time import Time
 
-THREE = recurs(3, spaced(timedelta(milliseconds=1)))
+three = recurs(3, spaced(timedelta(milliseconds=1)))
 
 def attempt(
     feed: Feed, book: Encyclopedia
 ) -> str | RetryError:
     # Named, so ty follows it
-    retried = retry(THREE)(research)
+    retried = retry(three)(research)
     caught = catch(RetryError)(retried)
     return run(supply(feed, book, Time())(caught)())
 

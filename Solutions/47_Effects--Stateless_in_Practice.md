@@ -58,8 +58,8 @@ It stores a moment.
 The handler answers each request with the current value,
 then advances the stored moment by `step`.
 `nonlocal` makes the handler stateful.
-Without it, `moment += step` binds a local name,
-and every request answers the same instant.
+Without it, `moment += step` makes `moment` a local name,
+so `current = moment` raises an `UnboundLocalError` at the first request.
 `crossing` in `midnight.py` walks a two-element list and stops there,
 while `ticking()` answers any number of requests,
 so the same handler serves an Effect that reads the clock three times or thirty.
@@ -83,23 +83,23 @@ It is in a function that asks twice and treats the answers as one.
 That is the general shape of a clock bug.
 Reading a clock twice reads a changing value twice,
 and two readings are two facts rather than one.
-Naming the clock as an ability makes the failure reproducible.
+Naming the clock as an Ability makes the failure reproducible.
 Deriving both strings from a single reading removes it.
 
 ## 2. A leak the type checker cannot see
 
 The rule that catches `leaky_effect.py` is a reading rule about one line:
 a function whose return type is an `Effect` and whose body is not a generator
-must contain nothing but the expression it returns.
+must contain only the expression it returns.
 
 ```python
 def double(n: int) -> Success[int]:
     return success(n * 2)  # Nothing above this line
 ```
 
-Put a `print()`, an `open()`, a mutation, or a call to any function that does one
-of those above the `return`, and it runs while the caller builds the description
-rather than while `run()` executes it,
+If you put a `print()`, an `open()`, a mutation, or a call to any function that
+does one of those above the `return`, it runs while the caller builds the
+description rather than while `run()` executes it,
 the opposite of what the signature advertises.
 A linter can enforce a conservative version of that rule:
 flag any function annotated `Effect[...]`, `Depend[...]`, `Success[...]`, or `Try[...]`
@@ -113,9 +113,9 @@ and Python's type system says what values a function accepts and produces,
 not what its body touches on the way.
 The annotation `Success[int]` describes the returned object,
 and `success(n * 2)` genuinely produces one, so nothing is inconsistent.
-An effect-tracking language puts the side effect in the signature.
+A language that tracks Effects puts the side effect in the signature.
 These two chapters simulate that by hand,
-so the guarantee holds only for effects that go through `yield`.
+so the guarantee holds only for Effects that go through `yield`.
 
 The error side has the same hole:
 
@@ -406,8 +406,8 @@ draws power for. The scripted handler ignores `request.hour` entirely, and that
 omission is the source of both its convenience and its blindness.
 It tests the consumer of the Ability while saying nothing about the producer.
 `controller()` needs its own test, and that test can be an ordinary one:
-`controller()` builds a plain function from an `Outlet` to a `Source`, with no
-Effect in sight.
+`controller()` builds an ordinary function from an `Outlet` to a `Source`, and
+no Effect takes part.
 
 ## Shared code: the research pipeline
 
@@ -540,6 +540,7 @@ def report() -> Depend[
 
 ```python
 # research_long.py
+from typing import Final
 from research import (
     Encyclopedia,
     Feed,
@@ -555,7 +556,7 @@ from stateless import Effect, Need, need, throws
 class TooLong(Exception):
     pass
 
-LIMIT: int = 100
+LIMIT: Final[int] = 100
 
 @throws(TooLong)
 def within_limit(article: str) -> str:
@@ -590,9 +591,9 @@ at the signature: `expression of type 'TooLong', expected 'Need[Feed] |
 Need[Encyclopedia] | Unavailable | NotInteresting | NoArticle'`.
 Fixing that then breaks every caller that names the old set. `report()` stops at
 its own `yield from` with the same `invalid-yield`, now carrying `TooLong` in the
-type it did not expect. Widen `catch()` and the `found:` annotation to match, and
-`assert_never()` reports `TooLong` as an unhandled branch. Every one of these is a
-compile-time stop rather than a surprise in production.
+type it did not expect. Once you widen `catch()` and the `found:` annotation to
+match, `assert_never()` reports `TooLong` as an unhandled branch. Every one of
+these stops the type check rather than surprising you in production.
 The type checker walks the change through the program, one edit at a time.
 
 The by-hand version takes a comparable edit and reports none of it:
@@ -652,7 +653,7 @@ failure at the delegation that introduces it, then the widened union at every
 caller that claims to handle everything.
 In the by-hand version nothing tells you anything.
 Adding `except TooLong` to the third `try` is a choice you make by reading the
-code. Forget it, and a `TooLong` escapes `research_and_report()`, whose
+code. If you forget it, a `TooLong` escapes `research_and_report()`, whose
 signature still says it returns a `str` no matter what.
 Both versions run. Only one of them has a tool that knows the set of failures
 changed.
@@ -681,9 +682,9 @@ Each `latest()` raises `Unavailable`, `@throws` on `fetch()` sends it into the
 error channel, `research()` stops there, and `report()` matches it and returns
 `"no headline today"`.
 The difference is where inside `latest()` the failure arises.
-`StaleWire.latest()` prints its trace line before it raises, so
-`feed: fetching` appears; `DeadWire.latest()` raises on its first line, so the
-run prints only the message.
+`StaleWire.latest()` prints its trace line before it raises the exception, so
+`feed: fetching` appears; `DeadWire.latest()` raises the exception on its first
+line, so the run prints only the message.
 The trace shows how far each supplied implementation got before it failed,
 which the value `report()` returns cannot show.
 Neither run reaches `need(Encyclopedia)`, so no `library:` line prints in
@@ -701,13 +702,13 @@ from stateless.functions import RetryError
 from stateless.schedule import recurs, spaced
 from stateless.time import Time
 
-THREE = recurs(3, spaced(timedelta(milliseconds=1)))
+three = recurs(3, spaced(timedelta(milliseconds=1)))
 
 def attempt(
     feed: Feed, book: Encyclopedia
 ) -> str | RetryError:
     # Named, so ty follows it
-    retried = retry(THREE)(research)
+    retried = retry(three)(research)
     caught = catch(RetryError)(retried)
     return run(supply(feed, book, Time())(caught)())
 
@@ -732,9 +733,10 @@ three identical failures.
 Retrying is the wrong behavior because this failure is deterministic.
 `WEATHER`'s headline is the same on every attempt, and `TOPICS` holds the same
 two topics, so `topic_of()` returns the same answer however many times it runs.
-The retry costs three fetches and two sleeps to arrive at the answer the first
-attempt already had, and it turns a clear `NotInteresting` into a `RetryError`
-that the caller has to unwrap. `Unavailable` is the failure worth retrying: a
+The retry costs three fetches and three sleeps to arrive at the answer the first
+attempt had, since `retry()` sleeps after every failed attempt, the last
+included. It also turns a clear `NotInteresting` into a `RetryError`
+that the caller must unwrap. `Unavailable` is the failure worth retrying: a
 feed that is offline now may be online in a moment, so another attempt can
 succeed.
 
@@ -742,22 +744,21 @@ Distinguishing them needs something the library does not offer:
 a retry that selects on the error type.
 `retry()` here applies to the whole error channel, treating every declared
 failure as transient, because its schedule decides *when* to try again and
-nothing decides *whether* to. ZIO spells the missing piece `retryWhile`, a
+nothing decides *whether* to. ZIO provides the missing piece as `retryWhile`, a
 retry taking a predicate on the error. Without it, selective behavior means
 narrowing the channel first: `catch()` the failures that retrying cannot help,
 so they leave the error channel and become values, then apply `retry()` to what
 remains. That is more machinery than a predicate, and it changes the result
-type. Both are the honest cost of a missing operator.
+type. Both are the cost of a missing operator.
 
 ## 8. Processes instead of threads
 
 ```python
 import time
 from concurrent.futures import Executor, ProcessPoolExecutor
-from stateless import (
-    Async, Depend, Need, Success, Task, as_type, fork, run,
-    success, supply, wait,
-)
+from stateless import (Async, Depend, Need, Success, Task,
+                       as_type, fork, run, success, supply,
+                       wait)
 
 @fork
 def slow_square(n: int) -> Success[int]:
@@ -961,18 +962,12 @@ def thrown() -> Effect[
     return headline
 
 @throws(Empty)
-def nonempty(headline: str) -> str:
+def lifted() -> Effect[Need[Ticker], Unavailable, str]:
+    feed = yield from need(Ticker)
+    headline = yield from fetch(feed)
     if not headline:
         raise Empty()
     return headline
-
-def lifted() -> Effect[
-    Need[Ticker], Unavailable | Empty, str
-]:
-    feed = yield from need(Ticker)
-    headline = yield from fetch(feed)
-    checked = yield from nonempty(headline)
-    return checked
 
 for version in (thrown, lifted):
     guarded = catch(Unavailable, Empty)(version)
@@ -985,26 +980,33 @@ for version in (thrown, lifted):
 #: lifted: Empty()
 ```
 
-The two versions have the same signature and produce the same results, as the
-loop demonstrates: identical types, identical behavior on both inputs.
+The two versions produce the same results, as the loop demonstrates, and
+`reveal_type()` reports the same return type for both:
+`Generator[Need[Ticker] | Unavailable | Empty, Any, str]`.
+`thrown()` writes that union in its annotation. `lifted()` annotates the
+undecorated shape, `Effect[Need[Ticker], Unavailable, str]`, and
+`@throws(Empty)` adds `Empty` to it, the way the chapter's `fetch_effectful.py`
+adds `Unavailable`.
 They differ in where you write the failure. `throw()` puts an exception into
-the channel at the point of the `yield from`, inside the Effect. `@throws` lifts
-a function that raises an exception, so the `raise` sits in an ordinary function
-and the decorator does the moving.
-
-Prefer `@throws` when the check is reusable or belongs to the value rather than
-the pipeline, as `nonempty()` does. Prefer `throw()` for a condition that only
-makes sense at that point in the Effect.
+the channel at the point of the `yield from`. `@throws` lifts what the body
+raises, so the `raise` is an ordinary statement and the decorator moves the
+exception into the channel.
 
 Making each version fail with an undeclared type shows the same asymmetry
-exercise 2 finds. Change `throw(Empty())` to `throw(ValueError())` and `ty`
+exercise 2 finds. If you change `throw(Empty())` to `throw(ValueError())`, `ty`
 reports it at that line: the yielded type is `ValueError` and the annotation
-allows `Need[Ticker] | Unavailable | Empty`. Change `nonempty()`'s body to
-`raise ValueError()` while its decorator still says `@throws(Empty)`, and `ty`
-reports nothing at all. The decorator's argument is a claim about the function,
-not a check on it, and a `raise` inside a function body is invisible to a type
-checker in Python. So `ty` verifies the version whose failure travels through a
+allows `Need[Ticker] | Unavailable | Empty`. If you change `lifted()`'s
+`raise Empty()` to `raise ValueError()` while its decorator still says
+`@throws(Empty)`, `ty` reports nothing, and the `ValueError` goes past
+`catch(Unavailable, Empty)` and out of `run()` as an ordinary exception.
+The decorator's argument is a claim about the function, not a check on it,
+and no type checker compares a `raise` with a decorator's arguments.
+So `ty` verifies the version whose failure travels through a
 `yield`, and trusts the version whose failure starts as a `raise`.
+
+That difference decides between them. Use `throw()` for a failure the Effect
+decides on, where the type checker then verifies it. Keep `@throws` for
+ordinary code that raises exceptions, such as `latest()`.
 
 ## 11. A fourth failure, with `catch_all()`
 
@@ -1064,18 +1066,20 @@ and the declared
 fixes it, and the third `print()` above exercises the new branch.
 
 Removing `outcome()`'s return annotation makes the error disappear, and that is
-the interesting half. With no declared return type, `ty` infers one from the
-body, and the inferred type is whatever `catch_all()` produces, so there is
-nothing left to contradict. The function silently changes its type every time
-`research()`'s error set changes.
+the interesting half. `ty` infers no return type from the body:
+`reveal_type(outcome)` reports `-> Unknown`, and `Unknown` is compatible with
+every type, so the returned value contradicts nothing.
+Pyright does infer the union from the body, and under it the function
+changes its type every time `research()`'s error set changes.
 
 What `ty` stops checking is the correspondence between the annotation and the
 Effect. The annotation is where a human writes down which failures this program
 expects, and `ty`'s job is to confirm that the Effect agrees.
-Delete the annotation and the type checker has one description instead of two,
-so it can no longer notice a disagreement. Callers still see a union, but they
-see whatever union the implementation happens to produce, and the new member
-propagates outward until it reaches something with an annotation.
+Once the annotation is deleted, the type checker has one description instead of
+two, so it can no longer notice a disagreement. Callers lose their check too:
+under `ty` the result is `Unknown`, so a caller that treats it as a `str`
+type-checks, and under Pyright the new member propagates outward until it
+reaches something with an annotation.
 That is the same reason exercise 4 of
 [Generators](../Chapters/45_Effects--Generators.md) needs a declared type to
 catch a missing `yield from`: a type checker verifies claims, and an inferred
@@ -1096,7 +1100,8 @@ class Random(Ability[int]):
     high: int
 
 def roll(low: int, high: int) -> Depend[Random, int]:
-    return (yield Random(low, high))
+    value: int = yield from Random(low, high)
+    return value
 
 def game() -> Depend[Random, str]:
     first = yield from roll(1, 6)
@@ -1121,10 +1126,11 @@ print(run(handle(scripted_from(iter([3, 4])))(game)()))
 ```
 
 The request carries the range, which is the difference from a `Need`.
-`Need[T]` asks for an instance of `T` and there is nothing else to say.
+`Need[T]` asks for an instance of `T`, and the type is the whole request.
 `Random(1, 6)` asks a question with arguments, and the handler reads them off
-the request. That is why an Ability is a dataclass rather than a marker: its
-fields are the parameters of the question.
+the request. That is why this Ability is a record with fields, where the
+chapter's `Flip` is an empty class: the fields are the parameters of the
+question.
 
 You write `game()` once, and it runs under both handlers unchanged. The scripted
 handler is the testable one, and it is a closure over an iterator rather than a
@@ -1134,9 +1140,10 @@ Deleting `low: int` from the accessor changes nothing that `ty` reports about
 this file. It changes what `ty` reports about callers. With the annotation,
 `roll("a", 6)` is `error[invalid-argument-type]`. Without it, the parameter has
 no type, `roll("a", 6)` type-checks, and the mistake surfaces at runtime inside
-`random.randint()`, one frame away from the code that made it. The accessor is
-the only place where `ty` checks a caller's arguments, since after that they are
-fields on a dataclass that nobody inspects.
+`random.randint()`, which the handler calls from the driver: the traceback
+names `real()` and the library, and neither `roll()` nor `game()`. The accessor
+is the only place where `ty` checks a caller's arguments, since after that they
+are fields on a request that only the handler reads.
 
 Deleting the annotation on the handler's parameter fails much louder, and
 earlier:
@@ -1250,10 +1257,10 @@ error[invalid-yield]: Yield expression type does not match annotation
 
 The diagnostic points at the `yield from`, not at the signature, and it prints
 the whole union that arrived. That union is the answer to "what does
-`buttered()` actually need," and the fix is to write it down. `buttered()` names
+`buttered()` need," and the fix is to write it down. `buttered()` names
 `Dough` and `Oven` in its type without mentioning either in its body, which is
 the propagation the chapter describes: a caller inherits every requirement of
-everything it delegates to.
+every Effect to which it delegates.
 
 Removing `Toaster(3)` from `supply()` produces the second diagnostic, and it is
 a different shape:
@@ -1281,7 +1288,7 @@ one requires a comment or a docstring to say what depends on what.
 ## 14. A shared signature for a cast
 
 The two factories in `casts.py` already have the same signature. The exercise
-is to name it and see what naming it buys. Here is the chapter's cast, with
+is to name it and see what naming it gains. Here is the chapter's cast, with
 each actor trimmed to one method so the whole thing fits in one listing:
 
 ```python
@@ -1362,7 +1369,7 @@ about the actors inside agreeing with each other. The last line is the proof,
 and the chapter runs the same line in `two_games.py`: `play()` accepts a
 `Kitty` facing a `Weapon`, both satisfy their `Protocol`s, and nothing
 objects. An *Abstract Factory* in a language with a family type expresses "these
-come from one world" in the type itself. Here the matching lives inside
+come from one world" in the type. Here the matching lives inside
 `kitties()`'s body, a fact about how someone wrote that function, and nothing
 checks it.
 
@@ -1372,16 +1379,17 @@ never sees the actors. `play()` is still there and still accepts any of them.
 
 Adding a fourth actor to the chapter's three-actor version shows where the
 cost falls. `quest.py` gains a `Protocol`, a member in `encounter()`'s `Need[...]`
-union, and a `yield from`, so four edits. `casts.py` gains a parameter on
+union, a `yield from`, and a line that uses the new actor, so four edits.
+`casts.py` gains a name in its `from quest import` line, a parameter on
 `play()`, an argument in the `supply()` call, a class for each family, and an
 argument in each of the two factory calls, so seven. `two_games.py` needs two
-edits, its direct `play()` call and the `from casts import` list it draws the
-new actor from, and none for its two factory calls. The
-`Cast` alias does not change at all, because the new actor never reaches the
+edits, its direct `play()` call and the `from casts import` list that supplies
+the new actor, and none for its two factory calls. The
+`Cast` alias does not change, because the new actor never reaches the
 caller.
 
 That distribution is the argument for the factory. The functions that name a
-whole cast absorb the change, and the code that only wants a scene does not
-notice. It is also why the chapter uses a factory function rather than more
+whole cast absorb the change, and the code that only stages a scene does not
+change. It is also why the chapter uses a factory function rather than more
 `supply()` arguments: `supply()` tops out at nine overloads, and a wide cast is
 what a positional interface handles worst.

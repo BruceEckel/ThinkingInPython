@@ -1,18 +1,8 @@
 # fork_leak.py
 from concurrent.futures import Executor, ThreadPoolExecutor
 from exceptions import expect
-from stateless import (
-    Async,
-    Depend,
-    Need,
-    Try,
-    as_type,
-    fork,
-    run,
-    supply,
-    throw,
-    wait,
-)
+from stateless import (Async, Depend, Need, Try, as_type,
+                       fork, run, supply, throw, wait)
 
 class Boom(Exception):
     pass

@@ -10,7 +10,8 @@ class Random(Ability[int]):
     high: int
 
 def roll(low: int, high: int) -> Depend[Random, int]:
-    return (yield Random(low, high))
+    value: int = yield from Random(low, high)
+    return value
 
 def game() -> Depend[Random, str]:
     first = yield from roll(1, 6)

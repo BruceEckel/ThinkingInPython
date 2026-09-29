@@ -15,6 +15,7 @@ Every Ability so far came from the library: the `Need` that `supply()` answers,
 and the `Async` that `run()` awaits.
 This chapter opens by writing an Ability from scratch,
 and that Ability turns out to be an ordinary class rather than a special form.
+The rest of the chapter adds:
 
 - Handlers that make an unpredictable source testable
 - A handler that swaps implementations while a program runs
@@ -108,9 +109,14 @@ small functions that each wrap one Ability and declare its answer type.
 and the ZIO listing in [Effect Management](44_Effects--Effect_Management.md#library-effect-management)
 has an accessor object doing the same job.
 The declared `Depend[Ask, str]` types `name` as `str` inside `greet()`.
-You can skip the accessor and yield the Ability directly,
+You can skip the accessor and write `yield from Ask(...)` inside `greet()`,
 and both the program and the type checker still work,
 because `ty` reads the answer type from `Ask`'s base, `Ability[str]`.
+A bare `yield Ask(...)` also runs, since the handler receives the same request,
+but the answer then has the type `Any`:
+a generator's send type is all the checker knows about a bare `yield`,
+and an Effect's send type is `Any`.
+With `name` typed `Any`, a mistake such as `name + 1` passes the check.
 The accessor adds a name for the request and one place to state that answer type:
 the `answer: str` binding inside `ask()`,
 one line above the `Depend[Ask, str]` that repeats it to callers.
@@ -140,14 +146,14 @@ The by-hand version puts two objects in every signature.
 This one threads nothing.
 `greet()` takes no arguments,
 and the two Effects live in the return type where a type checker verifies them.
-That second channel in the signature is the one [Effect Management](44_Effects--Effect_Management.md#tracking-and-management)
+That second channel in the signature is the one [Effect Management](44_Effects--Effect_Management.md#effects-by-hand)
 says an EMS needs.
 
 The whole library is visible in `two_way_generator.py` from [Generators](45_Effects--Generators.md#a-generator-is-a-description).
 An Effect is a generator, so you can drive one yourself,
 as `hand_driven.py` in [Nothing Runs Yet](46_Effects--Stateless.md#nothing-runs-yet)
-does.
-`next()` on `greet("Alice")` produces a `Need` object carrying the requested type,
+does with that chapter's `greet("Alice")`.
+`next()` on that Effect produces a `Need` object carrying the requested type,
 the way `interview()` yields `"name"`.
 `send(Console())` then answers that request and resumes the body,
 which prints the greeting and finishes.
@@ -207,7 +213,7 @@ print(4_000 < heads < 6_000)
 
 `count_heads()` needs a `Flip` and produces an `int`.
 Its body never calls `random`, and no parameter carries a seed or a source.
-`Ask` and `Tell` each carry a payload the request has to deliver,
+`Ask` and `Tell` each carry a payload the request delivers,
 whereas `Flip`'s whole content is its type and the `bool` it produces.
 
 The parentheses in `if (yield from flip()):` are mandatory.
@@ -233,7 +239,7 @@ That state has one trap, and it is silent.
 `next(script)` raises `StopIteration` once the sequence runs out.
 `StopIteration` is how a driver learns that an Effect has finished,
 so `handle()` reads the exhausted script as the end of the program:
-every other exception a handler raises propagates out of `run()` as itself,
+every other exception a handler raises propagates out of `run()` unchanged,
 and this one never propagates.
 If you ask `count_heads()` for six tosses from this five-value script,
 `run()` produces `None` instead of a count, with no exception.
@@ -449,7 +455,8 @@ Each stops for its own reason,
 and when one stops the building must obtain another.
 
 Sources are ordinary objects.
-Each reports whether it can supply a given hour and depletes when drawn from:
+Each reports whether it can supply a given hour,
+and drawing from a source depletes it:
 
 ```python
 # power.py
@@ -643,7 +650,7 @@ and that type appears once.
 What changes is the object answering the need, four times, mid-run.
 A dependency bound before the program starts gives one answer for the whole run,
 and here the right answer changes with the hour.
-Here the binding is a call to `choose()`,
+In `microgrid.py` the binding is a call to `choose()`,
 which checks each source's `available()` at each request.
 [Swapping the Implementation](46_Effects--Stateless.md#swapping-the-implementation)
 swapped an implementation between runs.
@@ -654,7 +661,7 @@ The consumer names no source, so nothing in it changes.
 and its `with` block sits inside the generator body.
 Acquiring and releasing within one Effect works,
 since the block opens and closes between two `yield from` expressions in the same function.
-You cannot write code that acquires a resource in one Effect and releases it after a later Effect finishes;
+Stateless provides no way to acquire a resource in one Effect and release it after a later Effect finishes;
 [Running Effects in Parallel](#running-effects-in-parallel) revisits that limit.
 
 One thing stays outside the types.
@@ -770,7 +777,7 @@ def test_spree_spends_from_its_own_cell() -> None:
     assert cell.amount == 10
 ```
 
-The test asserts on the cell it built itself,
+The test asserts on the cell it built,
 so nothing needs resetting between tests and two tests can run in either order.
 `spree()` and `purchase()` are the same functions the run above used.
 
@@ -850,7 +857,7 @@ def research() -> Effect[
     return article
 ```
 
-The `research()` signature declares everything the program depends on.
+The `research()` signature declares what the program needs and how it can fail.
 `research()` reads two things from outside and can fail three ways.
 The three `@throws` functions are the pattern for bringing ordinary code in:
 `fetch()` and `look_up()` call ordinary methods rather than Effects,
@@ -858,14 +865,15 @@ and the decorator lifts what they raise into the channel.
 `topic_of()` reads nothing from outside and writes nothing,
 so it declares no Ability.
 
-`research()`'s signature is also the only place its dependencies and failures appear.
+`research()`'s signature is also the only place its failures appear,
+and the body requests each dependency by its type.
 Nothing in the body mentions a network, a file, or a print,
 and `research()` performs no work when called.
 
 `fetch()` and `look_up()` take their dependencies as parameters,
 so they are ordinary functions rather than generator functions.
 Taking dependencies as parameters is a choice, not a requirement.
-`@throws` decorates a function returning an Effect,
+`@throws` also decorates a generator function,
 so the request and the failure can live in one function:
 
 ```python
@@ -970,7 +978,8 @@ The first finds its article.
 The second exercises `NotInteresting`, the third `NoArticle`,
 and the fourth `Unavailable`,
 so the runs cover every failure the signature declares.
-A full Effect system calls each pair of bindings a *scenario*,
+[Effect Oriented Programming](https://effectorientedprogramming.com/)
+calls each such set of bindings a *scenario*,
 and here a scenario is nothing more than arguments to `supply()`.
 
 Every printed line in that trace comes from a supplied implementation,
@@ -1002,7 +1011,7 @@ If you annotate `report()` as `Success[str]`,
 so `supply(Wire(...), Library(...))` builds handlers for `Need[Wire]` and `Need[Library]`,
 the mismatch that [Supplying an Interface](46_Effects--Stateless.md#supplying-an-interface)
 fixed with `as_type()`.
-Declaring the parameters as `Feed` and `Encyclopedia` does the same job at the boundary,
+Declaring `outcome()`'s parameters as `Feed` and `Encyclopedia` does the same job at the boundary,
 without a cast.
 
 ## The Success Path
@@ -1204,7 +1213,7 @@ Two failures from two different sources come back as values through the one `cat
 and both the runtime and the type checker accept either order.
 A handler passes error values upward untouched,
 so `supply()`'s driver relays the failures to the catch either way.
-Under `ty` 0.0.82 both orders infer the same result type.
+Under `ty` 0.0.84 both orders infer the same result type.
 The Ability channel is where the orders differ.
 `supply(feed, book)(catch_all(research))` comes back with `Never` there,
 and `catch_all(supply(feed, book)(research))` with `Unknown`:
@@ -1219,7 +1228,7 @@ When `research()` gains a fourth error,
 so `report()`'s declared type no longer matches and `ty` points at the `yield from`.
 You decide whether to catch the newcomer or declare it.
 `catch_all()` absorbs it into the result union instead,
-so the guard must sit downstream, in an annotation that spells the union out,
+so the guard must sit downstream, in an annotation that writes the union out,
 as `outcome()`'s return type does,
 or in a `match` that ends with `assert_never()`.
 Without such a guard,
@@ -1327,10 +1336,13 @@ shows, now arising from a dependency two levels down.
 `Oven` and `Toaster` are distinct types,
 so the ambiguity of [When Two Implementations Match](46_Effects--Stateless.md#when-two-implementations-match)
 cannot arise here.
-ZIO makes both of them a `HeatSource` and must report the clash.
+[Effect Oriented Programming](https://effectorientedprogramming.com/)
+builds this same toast in ZIO,
+where both appliances are a `HeatSource` and ZIO must report the clash.
 
 Here is what ZIO does that Stateless cannot.
-`Bread.homeMade` is a `ZLayer`: a constructor that is an Effect.
+In that book's version, `Bread.homeMade` is a `ZLayer`:
+a constructor that is an Effect.
 It can print, it can fail, and you can retry it.
 The compiler resolves it into a tree with `Oven` and `Dough` beneath it.
 You provide that layer rather than a finished loaf.
@@ -1664,7 +1676,7 @@ Here it changes a type,
 and every caller that runs it without a `Time` fails the check.
 
 The renamed error allows a mistake the type checker accepts.
-If you write `catch(Crashed)(retried)`, catching the error you started with,
+If you write `catch(Crashed)(retried)`, catching the original error,
 `ty` reports nothing.
 The result type gains a `Crashed` branch that cannot occur,
 `RetryError[Crashed]` stays in the error channel,
@@ -1730,7 +1742,7 @@ That wrapper exists because a generator cannot run twice,
 which is the same fact that makes `retry()` decorate the function.
 
 That cache key is only the argument, not the environment.
-`memoize()` wraps `save_user()` before `supply()` ever runs,
+`memoize()` wraps `save_user()` before `supply()` runs,
 so a different `Database` supplied to the same memoized call changes nothing in the cache:
 
 ```python
@@ -1752,7 +1764,7 @@ print(db1.attempts, db2.attempts)
 
 `db2` never runs.
 The second call's answer comes from `db1`'s cache entry,
-because `"Morty"` is the only thing `memoize()` keys on.
+because `memoize()` keys on `"Morty"` alone.
 In a chapter built on swapping the environment, the caution matters:
 memoize a function only where one environment serves the memoized call for its whole lifetime,
 the way [State as an Ability](#state-as-an-ability)'s `Cell` does once bound,
@@ -1770,19 +1782,9 @@ It accepts a `Task` as readily as an awaitable:
 import time
 from concurrent.futures import Executor, ThreadPoolExecutor
 from benchmark import report
-from stateless import (
-    Async,
-    Depend,
-    Need,
-    Success,
-    Task,
-    as_type,
-    fork,
-    run,
-    success,
-    supply,
-    wait,
-)
+from stateless import (Async, Depend, Need, Success, Task,
+                       as_type, fork, run, success, supply,
+                       wait)
 
 @fork
 def slow_square(n: int) -> Success[int]:
@@ -1851,7 +1853,7 @@ Stateless has no scoping mechanism of its own,
 so either a resource lives in a `with` block outside the Effect,
 as the pool does here, or the supplied object owns it:
 the library's own `Files` class opens and closes a file inside a single `read_file()` call.
-You cannot acquire a resource in one Effect and release it after a later one finishes,
+The library gives you no way to acquire a resource in one Effect and release it after a later one finishes,
 the flat resource management a native Effect system provides.
 Python's own answer to that is `ExitStack` in [Combining Context Managers](15_Techniques--Context_Managers.md#combining-context-managers),
 which holds a set of managers decided at runtime and unwinds them together.
@@ -1865,6 +1867,9 @@ each one builds a description, rewrites a description's type, or executes one.
 Three sit outside the tables.
 `as_type()` relabels a value for the type checker and does nothing at runtime.
 `spaced()` and `recurs()` build the `Schedule` that `retry()` and `repeat()` consume.
+The accessors for the library's own dependencies
+(`print_line()`, `read_line()`, and `read_file()`)
+each call `need()` for one class, so `need()`'s row covers them.
 
 Five build a description:
 
@@ -1925,6 +1930,7 @@ If you call it from inside a loop already running
 # run_cost.py
 import asyncio
 import time
+from benchmark import report
 from stateless import Success, run, run_async, success
 
 def bound(n: int) -> Success[int]:
@@ -1956,14 +1962,17 @@ async def time_run_async() -> float:
 
 per_run = time_run()
 per_run_async = asyncio.run(time_run_async())
+report(per_run=per_run, per_run_async=per_run_async)
 print(f"run() at least 20x slower: "
       f"{per_run > per_run_async * 20}")
 #: run() at least 20x slower: True
 ```
 
-`run_async()` reuses the loop already running and costs little beyond the Effect itself.
+`run_async()` reuses the loop already running and costs little beyond the Effect.
 `run()` builds and tears down a loop on every call,
 at least twenty times the cost of `run_async()`, by the listing's own measure.
+Running the listing with `--numbers` prints both per-call costs
+([Numbers on Your Machine](18_Techniques--Performance.md#numbers-on-your-machine)).
 Synchronous code has no loop to reuse, so it pays that cost on every `run()`.
 From inside a running loop,
 `run_async()` is both the one that works and the one that is fast.
@@ -2023,7 +2032,7 @@ so the `ZeroDivisionError` propagates as an ordinary raised exception,
 untracked.
 `catch()` matches the values an Effect yields, not exceptions the body raises,
 so a failure `@throws` never lifted goes past `catch()` untouched.
-A failure going past `catch()` is the version of this limit to watch for,
+Watch for a failure going past `catch()`,
 because `catch(ZeroDivisionError)` type-checks and then does nothing:
 the protection appears to be there.
 The channel carries only what you put into it.
@@ -2043,7 +2052,7 @@ so the exception leaves `run()` as an ordinary Python exception.
 
 How much of a type survives handling depends on your type checker rather than on the library.
 `nested` and `full` below come from the same two calls in the same order,
-one spelling nesting them and the other naming the intermediate:
+one form nesting them and the other naming the intermediate:
 
 ```python
 # nested_handle.py
@@ -2061,7 +2070,7 @@ if __name__ == "__main__":
     reveal_type(full)
 ```
 
-Under `ty` 0.0.82, `ty check nested_handle.py` reads the two spellings the same way:
+Under `ty` 0.0.84, `ty check nested_handle.py` reads the two forms the same way:
 
 ```text
 info[revealed-type]: Revealed type
@@ -2084,8 +2093,8 @@ info[revealed-type]: Revealed type
 ```
 
 `half` still needs an `Ask`, and `full` and `nested` need nothing,
-so `run()` reports a handler left out of either spelling.
-`ask_tell_stateless.py` still binds `half` and `full` instead of nesting the calls,
+so `run()` reports a handler left out of either form.
+`ask_tell_stateless.py` binds `half` and `full` instead of nesting the calls,
 because a named intermediate is where you read the Ability that remains.
 That is the information this library exists to give you.
 
@@ -2096,10 +2105,10 @@ with every Ability supplied and every error caught,
 the channel that should read `Never` reads `Unknown` instead.
 Catching first and supplying second, `supply(feed, book)(catch_all(research))`,
 reads `Never`.
-That `Unknown` loses no unsupplied `Need`.
+That `Unknown` hides no unsupplied `Need`.
 A `Need` left unsupplied stays named through `catch_all()`,
 `run()` rejects the Effect with an `invalid-argument-type`,
-and running it anyway raises a `MissingAbilityError` naming the same `Need`.
+and a run raises a `MissingAbilityError` naming the same `Need`.
 `Unknown` in a revealed type is still `ty` not finishing the subtraction,
 and `reveal_type()` on the intermediate shows which channel it left unfinished.
 
@@ -2200,7 +2209,7 @@ Every effectful function becomes a generator function,
 so it cannot also be a plain function.
 Calling it returns a description that somebody must run.
 Type errors from a library this generic are long and mention internals.
-And a third-party function that returns a value or raises needs a `@throws` wrapper or a `need()` route before it can participate.
+And a third-party function that returns a value or raises an exception needs a `@throws` wrapper or a `need()` route before it can participate.
 An EMS is a decision about a whole codebase,
 not a utility you import for one module.
 
@@ -2239,7 +2248,7 @@ and that is different from a platform for building distributed systems.
 [Running Effects in Parallel](#running-effects-in-parallel)
 named the one restriction `ty` enforces on a forked function:
 nothing left to supply.
-`ty` enforces nothing on what that function can fail with.
+`ty` enforces nothing about how that function can fail.
 Two of `fork()`'s four overloads accept an Effect that still declares an error,
 and every one of the four returns a `Task` with no error type on it:
 
@@ -2247,18 +2256,8 @@ and every one of the four returns a `Task` with no error type on it:
 # fork_leak.py
 from concurrent.futures import Executor, ThreadPoolExecutor
 from exceptions import expect
-from stateless import (
-    Async,
-    Depend,
-    Need,
-    Try,
-    as_type,
-    fork,
-    run,
-    supply,
-    throw,
-    wait,
-)
+from stateless import (Async, Depend, Need, Try, as_type,
+                       fork, run, supply, throw, wait)
 
 class Boom(Exception):
     pass
@@ -2285,13 +2284,13 @@ so a raised failure crosses the thread boundary as an ordinary exception.
 `wait()` raises it again when it awaits the `Task`'s future,
 past any `catch()` the caller wraps around the result.
 The type agrees with the runtime.
-`reveal_type(bad)` under `ty` 0.0.82 reports `(n: int) -> Generator[Need[Executor], Any, Task[int]]`,
+`reveal_type(bad)` under `ty` 0.0.84 reports `(n: int) -> Generator[Need[Executor], Any, Task[int]]`,
 with `Boom` nowhere in it.
 The fix is the discipline `catch()` and `catch_all` already teach:
 move the failure into the result before you fork.
 Apply `catch_all()` before `@fork`: with `bad` left undecorated,
 `fork(catch_all(bad))` matches the overload for an Effect with no declared error,
-and `wait()` returns `Boom | int` instead of raising.
+and `wait()` returns `Boom | int` instead of raising the `Boom`.
 
 ## What Survives the Library
 

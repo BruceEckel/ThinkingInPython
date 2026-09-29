@@ -1,6 +1,7 @@
 # run_cost.py
 import asyncio
 import time
+from benchmark import report
 from stateless import Success, run, run_async, success
 
 def bound(n: int) -> Success[int]:
@@ -32,6 +33,7 @@ async def time_run_async() -> float:
 
 per_run = time_run()
 per_run_async = asyncio.run(time_run_async())
+report(per_run=per_run, per_run_async=per_run_async)
 print(f"run() at least 20x slower: "
       f"{per_run > per_run_async * 20}")
 #: run() at least 20x slower: True

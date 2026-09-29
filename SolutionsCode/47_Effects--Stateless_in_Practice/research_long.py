@@ -1,4 +1,5 @@
 # research_long.py
+from typing import Final
 from research import (
     Encyclopedia,
     Feed,
@@ -14,7 +15,7 @@ from stateless import Effect, Need, need, throws
 class TooLong(Exception):
     pass
 
-LIMIT: int = 100
+LIMIT: Final[int] = 100
 
 @throws(TooLong)
 def within_limit(article: str) -> str:

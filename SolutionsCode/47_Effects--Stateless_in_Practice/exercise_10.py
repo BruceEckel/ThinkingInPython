@@ -37,18 +37,12 @@ def thrown() -> Effect[
     return headline
 
 @throws(Empty)
-def nonempty(headline: str) -> str:
+def lifted() -> Effect[Need[Ticker], Unavailable, str]:
+    feed = yield from need(Ticker)
+    headline = yield from fetch(feed)
     if not headline:
         raise Empty()
     return headline
-
-def lifted() -> Effect[
-    Need[Ticker], Unavailable | Empty, str
-]:
-    feed = yield from need(Ticker)
-    headline = yield from fetch(feed)
-    checked = yield from nonempty(headline)
-    return checked
 
 for version in (thrown, lifted):
     guarded = catch(Unavailable, Empty)(version)

@@ -2,19 +2,9 @@
 import time
 from concurrent.futures import Executor, ThreadPoolExecutor
 from benchmark import report
-from stateless import (
-    Async,
-    Depend,
-    Need,
-    Success,
-    Task,
-    as_type,
-    fork,
-    run,
-    success,
-    supply,
-    wait,
-)
+from stateless import (Async, Depend, Need, Success, Task,
+                       as_type, fork, run, success, supply,
+                       wait)
 
 @fork
 def slow_square(n: int) -> Success[int]:
