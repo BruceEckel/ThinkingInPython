@@ -1,4 +1,4 @@
-# threshold.py
+# threshold_thermometer.py
 from broadcaster import Broadcaster
 
 class ThresholdThermometer(Broadcaster[float]):

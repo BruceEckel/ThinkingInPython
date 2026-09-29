@@ -192,7 +192,7 @@ A responder can unsubscribe itself mid-notification, raise an exception,
 wait on a slow network call, or write back to its broadcaster,
 and each of those behaviors changes how the broadcaster must be written.
 
-## The Pythonic Observer: Callables in a List
+## The Pythonic Observer
 
 A responder is any callable that takes a notification and returns `None`.
 A broadcaster keeps a list of those callables and announces each change to every one:
@@ -988,10 +988,8 @@ because iterating over an enum produces its members in definition order.
 `Color.at(n)` counts `n` places around that cycle,
 and `n % len(members)` wraps a count past the last member back to the start.
 `at()` is a classmethod because it works on the whole set rather than a single member.
-A class attribute holding the list is not an option,
-because every assignment in an `Enum` body creates another member.
-If you call `next()` on a member,
-it finds that member's position with `index()` and asks `at()` for the position after it,
+(A class attribute holding the list is not an option, because every assignment in an `Enum` body creates another member).
+Calling `next()` on a member finds that member's position with `index()` then asks `at()` for the position after it,
 so `Color.KHAKI.next()` is `Color.SKYBLUE`.
 
 A `Grid` maps each `(column, row)` coordinate to a `Color`.
@@ -1000,33 +998,28 @@ banded into three colors.
 A cell's color is `Color.at(x + y)`, so the cells along a diagonal,
 where `x + y` is constant, share one color.
 
-`recolored()` computes the grid that results from selecting a cell: values in,
-values out.
+`recolored()` computes the grid that results from selecting a cell.
 `cross` holds the selected cell and the four cells that share an edge with it.
 A cell on the border has fewer neighbors,
-so some of the coordinates in `cross` lie outside the grid.
+so some of the coordinates in its `cross` lie outside the grid.
 A `Grid` is keyed by coordinate,
 so `cell in grid` is `True` only for a coordinate inside the grid.
-The comprehension's `if` clause applies that test and skips the outside coordinates,
+The comprehension's `if` clause applies that test and skips any outside coordinates,
 so `recolored()` needs no grid size.
 The comprehension maps each cell that passes the test to its color's `next()`.
 The [dictionary merge](03_Foundations--Containers.md#dictionaries)
-builds the new grid: `|` produces a new dictionary,
-and when both operands hold the same key, the right operand's value wins.
-The result is a copy of `grid` that differs in the cells of the cross,
-and `grid` is unchanged.
+builds the new grid:
+`|` produces a new dictionary holding the keys of both operands.
+Every key on the right is also in `grid`, and for a key in both,
+the result takes the right operand's value.
+The result is a copy of `grid` that differs in the cells of the cross.
 
-Neither function needs a `BoxModel`,
-so both are defined at module level and not inside the class.
-A test calls them directly, and a second model can reuse them.
-`BoxModel` is a `Broadcaster[Grid]`.
-Its `__init__()` calls `Broadcaster.__init__()` as `Thermometer`'s does,
-then builds `grid` from `size`.
-`BoxModel.select()` makes the next grid with `recolored()` and passes it to `announce()`.
+`BoxModel` is a `Broadcaster[Grid]`,
+and `select()` announces each new grid that `recolored()` produces.
 
 ### Testing the Model
 
-The model contains no display code, so you can test it without a GUI.
+The model is testable without a GUI.
 Testing confirms that `recolored()` changes the cross and no other cell,
 that a selection in a corner stays on the grid,
 and that responders receive the new grid after a selection:
@@ -1076,8 +1069,8 @@ def test_model_notifies_with_the_new_grid() -> None:
 
 ### The View
 
-The view is the only code that draws to the screen.
-Run `box_view.py` to play.
+The view is the only code that displays on the screen.
+Run `tip box_view` to play.
 Because it opens a window, the example harness skips it
 (see `tools/data/norun.txt`).
 
@@ -1126,39 +1119,43 @@ the shape `subscribe()` requires of a responder.
 When the window opens,
 `show()` calls `draw(model.grid)` once to paint the starting grid.
 
-`draw()` clears the canvas before repainting.
+`draw()` starts with `canvas.delete("all")`,
+which clears the canvas before repainting.
 Otherwise, each notification adds another `size * size` rectangles on top of the previous ones.
 The window looks the same but the canvas's list of items grows without limit,
-the same quiet accumulation as a *lapsed listener*.
+the same quiet accumulation as a [lapsed listener](#lapsed-listeners).
 
 `canvas.bind()` registers the lambda as the handler for `"<Button-1>"`,
 a press of the left mouse button.
-`tkinter` calls the handler with an event `e`,
-and `e.x` and `e.y` give the click's position in pixels,
+When you press the left button over the canvas,
+`tkinter` calls the handler with an event `e`.
+`e.x` and `e.y` give the click's position in pixels,
 measured from the canvas's top-left corner.
 Floor division by `cell_px` converts that position to a cell:
 with 60-pixel cells, a click at `e.x == 130` is in column `130 // 60`,
 which is `2`.
 A click on the canvas becomes a `select()` on the model,
 and the resulting notification repaints the view.
-The handler calls the model and draws nothing.
-The mouse belongs to the view.
+The handler only calls the model; `draw()`, run by that notification,
+does all the painting.
+So the view handles the mouse as well as the screen,
+the controller's job folded into the view, which the next section takes apart.
 `select()` takes a cell rather than a mouse event, so a keypress, a touch,
 or a test call drives the model the way a click does.
 
-The model names nothing about views,
+The model reaches a view only through the responders it calls,
 so you can attach a second view to the same model and keep both views in step
 (see exercise 8).
-The dependency runs one way, and the view is the end that carries it:
-`box_view.py` imports `BoxModel`, reads `size` and `grid`, and calls `select()`.
+Only the view uses the other side's names: `box_view.py` imports `BoxModel`,
+reads `size` and `grid`, and calls `select()`.
 
 ## Where the Controller Goes
 
-The chapter opened by saying Document-View folds the controller into the view.
+This chapter opened by saying Document-View folds the controller into the view.
 The next two listings isolate that fold:
 both share one model and one notification,
 and they differ only in where the input handling lives.
-The model is a counter, and both versions import this one file:
+The model is a counter:
 
 ```python
 # counter_model.py
@@ -1183,19 +1180,20 @@ In Document-View, one class draws and interprets input:
 ```python
 # document_view.py
 from counter_model import Counter
+from record import record
 
+@record
 class View:
-    def __init__(self, model: Counter) -> None:
-        self._model = model
+    model: Counter
 
     def draw(self, count: int) -> None:
         print(f"count: {count}")
 
     def key(self, char: str) -> None:
         if char == "+":
-            self._model.add(1)
+            self.model.add(1)
         elif char == "-":
-            self._model.add(-1)
+            self.model.add(-1)
 
 model = Counter()
 view = View(model)
@@ -1209,8 +1207,9 @@ for char in "++-x":
 
 `draw()` is the output and `key()` is the input,
 and `View` holds the model because `key()` needs somewhere to send the request.
+`draw()` uses the count the model pushes to it, so only `key()` needs `model`.
 `x` falls through both branches, so `key()` returns without touching the model,
-and four keystrokes print three counts.
+and the four characters of `"++-x"` print three counts.
 
 MVC splits that class in two:
 
@@ -1218,6 +1217,7 @@ MVC splits that class in two:
 # model_view_controller.py
 from typing import Protocol
 from counter_model import Counter
+from record import record
 
 class Keys(Protocol):
     def key(self, char: str) -> None: ...
@@ -1226,15 +1226,15 @@ class View:  # Draws, and holds no model
     def draw(self, count: int) -> None:
         print(f"count: {count}")
 
+@record
 class StepKeys:  # Interprets, and holds the model
-    def __init__(self, model: Counter) -> None:
-        self._model = model
+    model: Counter
 
     def key(self, char: str) -> None:
         if char == "+":
-            self._model.add(1)
+            self.model.add(1)
         elif char == "-":
-            self._model.add(-1)
+            self.model.add(-1)
 
 class NoKeys:  # Reads input and changes nothing
     def key(self, char: str) -> None: ...
@@ -1255,38 +1255,35 @@ print(model.count)
 #: 1
 ```
 
-Three things are the same in the two versions.
-The model file, imported by both.
-The line that connects the model to the view, `model.subscribe(view.draw)`.
-And the printed output for the same four keystrokes.
+The two versions share three things: the `Counter` model,
+the `model.subscribe(view.draw)` call that connects the model to the view,
+and the printed output for the same input, `"++-x"`.
 *Observer* does the same work either way,
 which is why the chapter's opening calls the two architectures nearly equivalent.
 
 One thing moves.
-`key()` leaves `View` and becomes `StepKeys`,
-and the model reference goes with it.
-The MVC `View` holds nothing and defines one method.
-Document-View's `View` does two jobs, and each MVC class does one.
+`key()` leaves `View` for `StepKeys`, and the model reference goes with it.
+The MVC `View` keeps `draw()` and `StepKeys` gets `key()`, one job each.
 
 The last four lines show what that move gives you.
 `NoKeys` satisfies `Keys` and ignores every key,
-so assigning it to `control` switches the input off and leaves `View` unchanged,
-the example *GoF Design Patterns* gives for the separation.
-`StepKeys` also runs with no view attached,
-so a test can call `key()` and read `model.count` without drawing anything.
+so assigning it to `control` makes the program ignore input while `View` and the model work as before.
+*GoF Design Patterns* gives this example for the separation:
+a controller that ignores input disables a view's input.
+`StepKeys` needs only a `Counter`, so a test can build one, call `key()`,
+and read `model.count`.
 Supporting a different set of keys means writing a third class that satisfies `Keys`,
 with `View` and the model unchanged.
 
-The separation keeps the model-to-view coupling as it is:
-both versions call `model.subscribe(view.draw)`.
-It separates drawing from input handling,
-two jobs that share one class in `document_view.py`.
-`box_view.py` is the Document-View version as a working GUI: `draw()` paints,
-the `bind()` lambda interprets the click, and both sit inside `show()`.
+MVC separates drawing from input handling,
+the two jobs `document_view.py` gives one class,
+and the `subscribe()` call stays the same.
+`box_view.py` has the Document-View shape: its `draw()` paints,
+its `bind()` lambda handles the click, and both are defined inside `show()`.
 
 ## What Stays Constant
 
-*Observer* serves four scenarios in this chapter:
+*Observer* appears in four scenarios in this chapter:
 a thermometer whose responders print a reading,
 the same thermometer whose coroutine responders run concurrently,
 a grid model whose responder repaints a canvas,
@@ -1298,31 +1295,36 @@ and no class per reaction.
 
 ## Deciding What Matters
 
-`Thermometer` measures, decides which changes to announce,
-and tells the responders.
+`Thermometer` has three jobs: it measures, it decides which changes to announce,
+and it notifies the responders.
 [Cohesion](21_Patterns--Design_Patterns.md#design-principles)
-means one job per class, and that is three.
-Of the two added jobs, telling the responders can move out of the class.
-`Broadcaster` keeps the responder list and the notification loop in a base class,
-and `watched.py` drops the base class and calls its watchers from `__setattr__()`,
+means one job per class.
+Measuring is the thermometer's own job, and *Observer* adds the other two.
+The code for notifying can leave the class.
+`Broadcaster` holds the responder list and the notification loop,
+and `Thermometer` inherits them.
+`watched.py` uses no base class and calls its watchers from `__setattr__()`,
 so one method covers every attribute.
-The job still belongs to the object either way, and its code lives elsewhere.
+Either way the object still notifies its responders,
+but the loop that calls them is written once,
+in `Broadcaster` or in `__setattr__()`, apart from the code that measures.
 
-The other added job is deciding which changes to announce.
+The second job *Observer* adds is deciding which changes to announce.
 That decision belongs to the object whose state changes, or to whoever calls it.
 It never belongs to a responder,
 whose choice is limited to filtering the changes it receives.
 `Thermometer`'s setter announces every assignment,
 which says that every change matters to everyone.
 [Leaving that call to the client](#push-or-pull)
-instead lets several changes coalesce into one announcement,
+lets several changes coalesce into one announcement,
 but a caller who forgets the call leaves every responder out of date.
 Push sends the value, so the thermometer decides what each responder receives.
 Pull sends the thermometer,
-so each responder reads the attribute it names and depends on that interface.
+so each responder reads the attributes it needs from the thermometer and depends on the thermometer's interface.
 `watched.py` leaves the choice to its watchers: two states,
 `celsius` and `humidity`, share one channel,
-so every watcher receives both kinds of change and filters by the name it is handed.
+so every watcher receives both kinds of change,
+along with the attribute name to filter by.
 
 *Observer* therefore removes one coupling and keeps another.
 The object that changes knows its responders only as callables,
@@ -1331,7 +1333,7 @@ A threshold makes that concrete.
 This thermometer announces a reading only when it differs from the reading before it by at least `_delta`:
 
 ```python
-# threshold.py
+# threshold_thermometer.py
 from broadcaster import Broadcaster
 
 class ThresholdThermometer(Broadcaster[float]):
@@ -1380,7 +1382,8 @@ makes a smaller version of the same decision:
 its setter returns early when the new value equals the current reading,
 so a responder that counts readings rather than changes misses that repeated reading.
 
-Move the comparison into the responders and the number sits where the need is.
+If the comparison moves into the responders,
+each threshold sits with the responder that needs it.
 `display` then remembers the last value it drew and skips a reading close to it,
 `log` appends whatever arrives, and the setter announces every assignment again.
 The thermometer knows nothing about tolerance,
@@ -1388,15 +1391,16 @@ and each responder that filters by size repeats the same comparison.
 `async_thermometer_demo.py`'s `alarm` already works this way,
 returning at once for a reading below 100 degrees.
 
-Repeating the comparison in each responder suits a question about *how much*,
+Repeating the comparison in each responder works for a question about *how much*,
 because each responder sets its own threshold.
 *Which kind* is a different question, and repetition handles it poorly,
 because every kind of change arrives on one channel and each responder sorts them itself.
-`watched.py` shows that repetition,
-with every watcher taking the attribute name and filtering it.
+A watcher in `watched.py` receives every attribute's changes,
+so each watcher that cares about one attribute repeats the same filter by name.
 [Function Objects](28_Patterns--Function_Objects.md#an-event-bus-handlers-keyed-by-type)
-removes it: one list becomes a dictionary of lists keyed by event type,
-so an announcement carries the kind of thing that happened and each handler subscribes to the kind it cares about.
+removes that repetition:
+one list becomes a dictionary of lists keyed by event type,
+so an announcement carries the type of thing that happened and each handler subscribes to the type it cares about.
 The publisher then decides which event it is publishing, something it knows,
 instead of guessing which responders need it.
 

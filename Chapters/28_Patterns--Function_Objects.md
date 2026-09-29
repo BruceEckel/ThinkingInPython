@@ -919,7 +919,7 @@ def test_handler_needs_a_call_on_an_event() -> None:
             def __call__(self, event: int) -> None: ...
 ```
 
-The bus is the [*Observer*](30_Patterns--Observer.md#the-pythonic-observer-callables-in-a-list)
+The bus is the [*Observer*](30_Patterns--Observer.md#the-pythonic-observer)
 with one shared subject: instead of every subject holding its own list,
 one bus holds every list and the event type selects the handlers.
 Here a type may have many handlers.
