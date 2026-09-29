@@ -23,6 +23,9 @@ Verdicts:
 - **Mention** means one sentence or a footnote, not a section or a listing.
 
 Coverage claims come from grepping `Chapters/`.
+On 2026-09-29 every entry was rechecked against the book:
+the 30 it now covers were removed,
+and each partly covered entry says what is still missing.
 A "not covered" note means the term appears nowhere in the book's prose or listings.
 
 ---
@@ -38,15 +41,6 @@ The book's target version, so everything here is available to every listing with
 `frozendict`, lazy imports, comprehension unpacking, `sentinel`, and the `profiling` package
 are all in use in the book already and are not repeated below.
 
-- **`threading.synchronized_iterator()`, `serialize_iterator()`, and `concurrent_tee()`.** **Add.**
-  Not covered.
-  Iterators have never been thread-safe, and the standard advice was a hand-rolled lock
-  wrapper that most people get wrong.
-  `synchronized_iterator()` wraps one so concurrent `next()` calls are serialized,
-  and `concurrent_tee()` is the thread-safe `itertools.tee()`.
-  Chapter 23 teaches iterators, chapter 45 teaches generators, and chapter 19 teaches
-  threads; the intersection currently has no answer.
-  Chapter 19 is the natural home, with a pointer from 23 or 45.
 - **`functools.singledispatchmethod()` dispatching on the second argument.** **Add** to chapter 32.
   Not covered.
   Chapter 32 is Multiple Dispatching, and its whole subject is that Python dispatches on
@@ -61,6 +55,7 @@ are all in use in the book already and are not repeated below.
   when the generator first yielded, which is a subtle bug with no visible symptom until
   the resource was needed later.
   The fix is worth stating because the old behavior explains code readers will still meet.
+  *Rechecked 2026-09-29: partly covered (Chapters/15_Techniques--Context_Managers.md:549-553; Chapters/14_Techniques--Decorators.md:854); missing: ContextDecorator covered; 3.15 generator/await behavior and old bug not stated.*
 - **`TypeForm[T]` (PEP 747).** **Consider** for chapter 8.
   Not covered.
   It types a parameter that receives a type expression rather than an instance,
@@ -70,9 +65,6 @@ are all in use in the book already and are not repeated below.
 - **Closed `TypedDict` with `closed=` and `extra_items=` (PEP 728).** **Consider** for chapter 8,
   next to the existing `Required`/`NotRequired`/`ReadOnly` material.
   A closed `TypedDict` rejects unknown keys, which is what most people assume the default does.
-- **`asyncio.TaskGroup.cancel()`.** **Consider** for chapter 19.
-  Cancelling a whole group from outside was previously awkward,
-  and the chapter's structured-concurrency argument is stronger with it.
 - **`@disjoint_base` (PEP 800).** **Mention** in chapter 17 or 8.
   It tells a type checker that two classes cannot have a common subclass,
   which is what makes exhaustive narrowing work on class hierarchies.
@@ -89,6 +81,7 @@ are all in use in the book already and are not repeated below.
 - **`__slots__` relaxations: `__dict__` and `__weakref__` allowed in any class,
   and any `__slots__` on `tuple` subclasses.** **Mention** in chapter 18,
   where `slots=True` is discussed, or chapter 9.
+  *Rechecked 2026-09-29: partly covered (Chapters/18_Techniques--Performance.md:1273-1295; Chapters/10_Foundations--Cleanup.md:418-444); missing: older slots/__weakref__/__dict__ rules shown; 3.15 relaxation and tuple subclasses not stated.*
 - **`slice` is now subscriptable as a generic type.** **Mention** in chapter 8 or 23 if
   a slice-taking signature comes up.
 - **UTF-8 as the default encoding (PEP 686).** **Mention** in chapter 6 or 11.
@@ -96,12 +89,6 @@ are all in use in the book already and are not repeated below.
   works-on-my-machine failures that older code guards against with explicit `encoding=`.
   The book should say whether to keep writing `encoding="utf-8"` anyway.
 - **`timeit --target-time`.** **Mention** in chapter 18 if any benchmark listing tunes its run count.
-- **JIT improvements and the tail-calling interpreter on 64-bit Windows.** **Mention** in
-  chapter 18 as a measurement caveat.
-  The book's numbers are produced on Windows, so this changes the baseline.
-- **`sys.monitoring` per-code-object control and `DISABLE`.** Fold into the 3.12 `sys.monitoring`
-  item rather than treating it separately.
-  If that item is adopted, write it against the 3.15 API.
 
 One task rather than a candidate:
 **3.15 removes a batch of long-deprecated APIs** across `ast`, `collections.abc`, `ctypes`,
@@ -116,35 +103,23 @@ Worth one grep pass over `Chapters/` against the removal list before release.
 
 The release with the most that the book has no equivalent for.
 
-- **Template strings, PEP 750** (`t"..."`, `string.templatelib.Template`). **Add.**
-  A `t`-string evaluates to a `Template` holding the literal parts and the
-  `Interpolation` objects separately, so the consumer decides how each value is rendered.
-  Two placements, and they reinforce each other:
-  a short introduction beside f-strings early (chapter 2 or 3),
-  then a real use in chapter 34, where the Interpreter pattern already builds structure from text.
-  It also gives chapter 29 a clean example of changing an interface without changing the call site.
 - **PEP 649 and 749 deferred annotations plus `annotationlib`.** **Add** the introspection half.
   The book already relies on PEP 649 semantics (project memory records this),
   but `annotationlib.get_annotations()` and its three formats
   (`VALUE`, `FORWARDREF`, `STRING`) appear nowhere.
   Chapter 17 reads annotations at runtime and should use the supported API rather than
   poking at `__annotations__`.
-- **`functools.Placeholder` for `partial()`.** **Add.**
-  `partial(f, Placeholder, 3)` fixes the second argument and leaves the first open.
-  Chapter 28 (Function Objects) and chapter 41 (Functional Toolkits) both discuss partial
-  application; without `Placeholder` the only honest statement is "you can bind leading
-  arguments," which is no longer true.
+  *Rechecked 2026-09-29: partly covered (Chapters/17_Techniques--Metaprogramming.md:1523-1555 (PEP 649, inspect.get_annotations); grepped annotationlib, FORWARDREF: none); missing: annotationlib and its three formats absent.*
 - **`concurrent.interpreters`, PEP 734.** **Consider.**
   Chapter 19 mentions `InterpreterPoolExecutor` once.
   The underlying module is now the third real concurrency model in the stdlib,
   alongside threads and processes, and the chapter's comparison table is incomplete without it.
   A short section contrasting its isolation with a process pool's cost would fit the existing structure.
   The 3.12 per-interpreter GIL (PEP 684) is the groundwork for this and belongs in the same passage.
+  *Rechecked 2026-09-29: partly covered (Chapters/19_Techniques--Concurrency.md:1533-1576 (Subinterpreters section, InterpreterPoolExecutor, PEP 684 at 1541)); missing: concurrent.interpreters module and PEP 734 not covered.*
 - **`map(strict=True)`.** **Consider**, paired with `zip(strict=)` from 3.10 (below).
   Teaching both together in chapter 16 makes the point once: silent truncation is a bug source.
-- **PEP 765: `SyntaxWarning` for `return`/`break`/`continue` leaving a `finally`.** **Consider.**
-  This is a genuine trap with a now-visible warning, and chapter 15 or chapter 4 is the place to name it.
-  Worth a short listing showing the swallowed exception.
+  *Rechecked 2026-09-29: partly covered (zip strict: Chapters/16_Techniques--Comprehensions.md:340; 04_Foundations--Control_Flow.md:259; 41:645; grepped map(strict: none); missing: map(strict=) absent.*
 - **`functools.reduce(initial=...)` keyword.** **Mention** in chapter 41, next to `reduce()`.
 - **`operator.is_none()` and `is_not_none()`.** **Mention** in chapter 41.
   They exist so a filter predicate need not be a lambda, which is a point that chapter already makes.
@@ -158,21 +133,6 @@ The release with the most that the book has no equivalent for.
 
 ## Python 3.13
 
-- **PEP 696, type parameter defaults.** **Add** to chapter 8.
-  `class Box[T = int]` and the `type` alias form both matter for library-facing generics,
-  and chapter 8 already enumerates every other type-parameter kind.
-- **`warnings.deprecated()`, PEP 702.** **Add** to chapter 29.
-  One decorator marks a function, class, or overload as deprecated for a type checker
-  and optionally at runtime.
-  Chapter 29's whole subject is evolving an interface without breaking callers.
-- **`copy.replace()` and the `__replace__()` protocol.** **Add.**
-  Chapter 12 teaches frozen dataclasses and currently points at `dataclasses.replace()`.
-  `copy.replace()` is the generic version, works on `namedtuple`, `datetime`,
-  `SimpleNamespace`, and anything defining `__replace__()`, and is the natural
-  operation for chapter 36's Memento (restore with one field changed).
-  Defining `__replace__()` on a custom immutable class is a good short exercise.
-- **Free threading, PEP 703.** Covered in chapter 19, but **update** the status:
-  3.13 was experimental, and 3.14 made it officially supported (PEP 779).
 - **PEP 667, `locals()` returns an independent snapshot.** **Consider** for chapter 17.
   The old behavior (mutating the dict sometimes worked, sometimes not) was a classic
   source of confusion, and the new rule is short enough to state precisely.
@@ -181,6 +141,7 @@ The release with the most that the book has no equivalent for.
   Chapter 21 uses `Protocol` heavily; introspecting one at runtime currently has no shown API.
 - **`ReadOnly` for `TypedDict`, PEP 705.** **Consider** for chapter 8,
   beside the existing `Required`/`NotRequired` material.
+  *Rechecked 2026-09-29: partly covered (Chapters/08_Foundations--Static_Types.md:831 (table row)); missing: only a one-line table row; no explanation or listing.*
 - **The new REPL** (multiline editing, history, paste mode, color). **Mention** in chapter 1 or 2
   if you describe the interactive interpreter at all.
   It changes what a reader sees on first launch.
@@ -191,13 +152,6 @@ The release with the most that the book has no equivalent for.
   Not covered.
   It is the only way to type a `**kwargs` forwarding wrapper precisely,
   which is a problem chapter 14's decorators run into directly.
-- **PEP 669, `sys.monitoring`.** **Add** to chapter 18, or chapter 17 if you prefer the
-  introspection angle.
-  The book measures with timers; this is the mechanism profilers use, with near-zero cost
-  when no callback is registered.
-  A small listing that counts calls to one function without touching its source would sit well
-  next to the decorator material.
-  Write it against the 3.15 API, which adds per-code-object control.
 - **PEP 709, comprehension inlining.** **Mention** in chapter 16.
   Comprehensions no longer create a separate frame, which is roughly a 2x speedup
   and also explains why a comprehension's scope behavior changed.
@@ -205,32 +159,18 @@ The release with the most that the book has no equivalent for.
 - **PEP 701, f-string formalization.** **Mention** in chapter 2 or 3.
   Quote reuse (`f"{d["key"]}"`), backslashes, and multi-line expressions are all legal now.
   Worth one sentence because the old restrictions still shape how people write f-strings.
-- **PEP 695 type parameter syntax.** Used throughout the book already.
-  **Mention** in chapter 8 that the older `TypeVar` form is what a reader will meet
-  in existing code.
 - **`types.get_original_bases()`.** **Mention** in chapter 17 if generic introspection comes up.
 
 ## Python 3.11
 
-- **PEP 678, `BaseException.add_note()`.** **Add.**
-  Not covered anywhere.
-  Best placement is chapter 42, which argues about carrying error information through a
-  computation; `add_note()` is the answer for the exception-based half of that argument.
-  Chapter 10 is a second option.
-- **`asyncio.timeout()`.** **Add** to chapter 19. Not covered.
-  It replaces `wait_for()` for most uses and composes as a context manager,
-  which fits the chapter's structured-concurrency framing.
 - **PEP 654, exception groups and `except*`.** Partially covered
   (`ExceptionGroup` in chapter 30, `except*` in chapter 19).
   **Consider** giving it a proper introduction in one place rather than two partial ones,
   since `TaskGroup` is the reason most readers meet it,
   and the "one handler runs per matching type, and may run more than once" rule is not obvious.
+  *Rechecked 2026-09-29: partly covered (Chapters/19_Techniques--Concurrency.md:540, 596-602; Chapters/30_Patterns--Observer.md:1421-1427); missing: no single full introduction; rule that a handler runs per matching type (and may run more than once) not stated.*
 - **`contextlib.chdir()`.** **Consider** for chapter 15.
   A short, real context manager from the stdlib, useful as a contrast with a hand-written one.
-- **PEP 681, `@dataclass_transform`.** **Consider** for chapter 17.
-  This is how a decorator or metaclass tells a type checker "instances of this behave like a
-  dataclass," and chapter 17 builds that kind of machinery.
-  It is advanced, so a footnote-scale treatment may be right.
 - **`enum` additions: `verify()`, `member()`, `nonmember()`, `ReprEnum`, `enum.property`.**
   **Consider** `verify()` (catching duplicate or non-contiguous values) and
   `nonmember()` (the fix for "my constant became an enum member by accident"),
@@ -241,22 +181,15 @@ The release with the most that the book has no equivalent for.
   Pair it with the 3.10/3.12/3.13/3.14 error-message improvements as one short passage
   rather than five separate notes.
 - **`asyncio.Runner` and `asyncio.Barrier`.** **Mention** in chapter 19.
+  *Rechecked 2026-09-29: partly covered (Chapters/19_Techniques--Concurrency.md:2468 (generic Barriers pattern bullet); grepped Runner: none); missing: asyncio.Runner and asyncio.Barrier not named.*
 - **`operator.call()`.** **Mention** in chapter 41.
 
 ## Python 3.10
 
-- **PEP 618, `zip(strict=True)`.** **Add** to chapter 16 or 3.
-  Not covered.
-  Silent truncation when zipping unequal sequences is a bug the book should name,
-  and teaching it with `map(strict=)` from 3.14 makes one lesson instead of two.
 - **Parenthesized context managers.** **Consider** for chapter 15.
   Multi-line `with (A() as a, B() as b):` is the readable form for several managers,
   and the chapter shows `ExitStack` for the dynamic case already.
   Fold in the 3.1 change that allowed several managers in one `with` at all.
-- **`dataclasses`: `slots=True`, `KW_ONLY`, keyword-only fields.**
-  `kw_only` and `KW_ONLY` appear in chapter 12, `slots=True` in chapter 18.
-  **Consider** consolidating: chapter 12 is where a reader decides which options to use,
-  and project memory already records the frozen-plus-slots interaction.
 - **PEP 613, `TypeAlias`.** Superseded by PEP 695 `type`.
   **Mention** only as history, since older code uses it.
 - **`contextlib.aclosing()` and `AsyncContextDecorator`.** **Mention** in chapter 15
@@ -264,14 +197,11 @@ The release with the most that the book has no equivalent for.
 
 ## Python 3.9
 
-- **PEP 584, `dict | dict` and `|=`.** **Add** to chapter 3. Not covered.
-  Chapter 3 teaches dictionaries and should show the merge operator next to `update()`,
-  including the "right side wins" rule and the fact that `|` produces a new dict
-  while `|=` mutates.
 - **PEP 616, `str.removeprefix()` and `removesuffix()`.** **Add** to chapter 3.
   Not covered.
   Small, but they replace the `if s.startswith(p): s = s[len(p):]` idiom that is easy to
   get subtly wrong, and the book uses string manipulation in several listings.
+  *Rechecked 2026-09-29: partly covered (Chapters/27_Patterns--Factory.md:149, 612 (removeprefix used in listings); grepped removesuffix: none); missing: used but not taught in ch 3; removesuffix absent.*
 - **PEP 614, relaxed decorator grammar.** **Consider** for chapter 14.
   Any expression can now be a decorator, so `@handlers[name]` and `@config.decorator`
   are legal.
@@ -282,6 +212,7 @@ The release with the most that the book has no equivalent for.
   It would give the Composite chapter a non-toy task, or the Simulation chapter a scheduler.
 - **`ast.unparse()`.** **Mention** in chapter 17 if the metaprogramming chapter builds or
   inspects an AST; it makes generated code printable.
+  *Rechecked 2026-09-29: partly covered (Chapters/B_An_Effect_Checker.md:281 (used in listing)); missing: not mentioned in ch 17 or explained.*
 
 ## Python 3.8
 
@@ -295,21 +226,13 @@ The release with the most that the book has no equivalent for.
   the `pytest` equivalent is `pytest-asyncio`, which is a dependency, not a language feature.
 - **`itertools.accumulate(initial=)`.** **Mention** in chapter 41 next to the existing
   `accumulate()` material.
+  *Rechecked 2026-09-29: partly covered (Chapters/41_Functional--Toolkits.md:521-528 (accumulate section); grepped initial=: none); missing: initial= not shown.*
 - **Reversed dict iteration (`reversed(d)`).** **Mention** in chapter 3.
 - **`math.isqrt()`, `comb()`, `perm()`, `dist()`.** **Mention** in chapter 41 if a numeric
   example needs one. `math.prod()` already appears once.
 
 ## Python 3.7
 
-- **`contextvars` (PEP 567).** **Add.** The largest single gap found in this pass.
-  Not covered anywhere.
-  A `ContextVar` is state that follows a logical call chain, including across `await`,
-  without threading a parameter through every function.
-  It belongs in chapter 19 as the async-correct alternative to `threading.local`,
-  and it should be referenced from Part V, where "how does context get to the effect handler"
-  is the recurring question.
-  The 3.14 addition of the `Token` context manager protocol makes reset-on-exit clean,
-  so the example can be short.
 - **Module `__getattr__()` and `__dir__()` (PEP 562).** **Add** to chapter 6.
   Not covered.
   This is how a package deprecates a name, lazily imports a submodule, or presents a
@@ -317,6 +240,7 @@ The release with the most that the book has no equivalent for.
   Chapter 6 is about modules and packages and currently has no answer to "how do I make
   `mypkg.Thing` work without importing it eagerly."
   It also connects to chapter 29's interface-evolution theme.
+  *Rechecked 2026-09-29: partly covered (Chapters/06_Foundations--Modules_and_Packages.md:571-582 (module __getattr__ for lazy submodules, PEP 562)); missing: no deprecation use, no module __dir__(), no listing.*
 - **`__class_getitem__()` (PEP 560).** **Consider** for chapter 17.
   Not covered.
   It explains how `list[int]` works at all, and how a custom class becomes subscriptable
@@ -324,6 +248,7 @@ The release with the most that the book has no equivalent for.
 - **Dict insertion order guaranteed.** **Mention** in chapter 3, with the 3.6/3.7 history,
   because it explains why `OrderedDict` still exists and when you would still use it
   (equality that respects order, `move_to_end()`).
+  *Rechecked 2026-09-29: partly covered (Chapters/03_Foundations--Containers.md:322; grepped OrderedDict: none); missing: OrderedDict and when to still use it not covered.*
 - **PEP 563, postponed annotation evaluation (`from __future__ import annotations`).**
   **Mention** as history in chapter 8 or 17.
   Readers will see the future import in existing code and should know PEP 649 replaced it,
@@ -339,19 +264,16 @@ The release with the most that the book has no equivalent for.
   chapter 45 or 19, depending on where async iteration is taught.
   Chapter 45 is a generators chapter, and async generators are the piece most readers
   never learn.
+  *Rechecked 2026-09-29: partly covered (Chapters/16_Techniques--Comprehensions.md:726 (async generator unpacking form); 19:228; 15:839 (asynccontextmanager)); missing: async generators/comprehensions not taught.*
 - **PEP 519, `os.PathLike` and `__fspath__()`.** **Consider** for chapter 29 or 7.
   Not covered.
   It is a compact, real example of retrofitting a protocol onto a type so existing
   functions accept it, which is chapter 29's subject stated in one dunder.
 - **`enum.Flag` and `IntFlag`.** **Consider** where bit-set state comes up,
   such as chapter 31's state machines.
-- **PEP 515, underscores in numeric literals (`1_000_000`).** **Mention** in chapter 2 or 3.
-  Trivial to teach and it improves several existing listings that use large constants.
 - **PEP 520, class attribute definition order.** **Mention** in chapter 17.
   It is why a metaclass or `__init_subclass__` can see fields in source order,
   which several patterns depend on.
-- **f-strings (PEP 498).** Used everywhere, but the term "f-string" appears in only two chapters.
-  **Verify** that whichever chapter introduces string formatting names it.
 
 ## Python 3.5
 
@@ -373,6 +295,7 @@ The release with the most that the book has no equivalent for.
   (`[*a, *b]`, `{**d1, **d2}`, multiple `*args` in a call).** **Consider** for chapter 5 or 3.
   Partially implied by existing listings but not taught directly.
   `{**d1, **d2}` also pairs with the 3.9 `|` merge operator: same result, different history.
+  *Rechecked 2026-09-29: partly covered (Chapters/16_Techniques--Comprehensions.md:686 (names [*a, *b] and {**d1, **d2}); 17:1689 uses {**...}); missing: not taught directly in ch 3 or 5.*
 - **PEP 484, type hints and the `typing` module.** Covered in chapter 8.
   **Mention** the history: annotations existed from 3.0 (PEP 3107) with no meaning,
   and 3.5 gave them one.
@@ -383,24 +306,17 @@ The release with the most that the book has no equivalent for.
 - **`contextlib.redirect_stdout()`.** **Consider** for chapter 11 or 15.
   Not covered, though `suppress()` from the same release is covered in four chapters.
   Capturing output is a real testing need and a compact context-manager example.
-- **`tracemalloc` (PEP 454).** **Consider** for chapter 18, which measures performance.
-  It answers "where did the memory go" the way timers answer "where did the time go."
 - **`min()`/`max()` with `default=`.** **Mention** in chapter 5 or 16.
   Not covered.
   It removes a `try`/`except ValueError` around an empty-sequence case,
   which fits the book's preference for expressing intent directly.
-- **`functools.partialmethod()`.** **Mention** in chapter 28 beside `partial`.
+  *Rechecked 2026-09-29: partly covered (Chapters/38_Patterns--Simulation.md:138 (max(..., default=0) in listing)); missing: used, not taught in ch 5/16.*
 - **`functools.singledispatch()` (PEP 443).** Covered in eight chapters.
   **Mention** in chapter 32 or 41 that it arrived in 3.4 and the method form
   (`singledispatchmethod`) only in 3.8.
 
 ## Python 3.3
 
-- **`raise ... from None` (PEP 409).** Chapter 4 mentions it.
-  **Consider** expanding wherever exception chaining is taught,
-  since `__cause__` versus `__context__` is a distinction most readers never learn
-  and it changes what a traceback says.
-  Fold in the 3.0 origin of chaining (PEP 3134) so it is one passage.
 - **`collections.ChainMap`.** **Consider** for chapter 3 or 17.
   Not covered.
   It is the data structure that models scope lookup, so it pairs well with any discussion
@@ -408,23 +324,18 @@ The release with the most that the book has no equivalent for.
 - **`__qualname__` (PEP 3155).** **Consider** for chapter 17.
   Not covered.
   Decorators and registries that key on a function's name usually need the qualified one.
+  *Rechecked 2026-09-29: partly covered (Chapters/27_Patterns--Factory.md:415; 33_Patterns--Visitor.md:149 (used)); missing: not explained in ch 17.*
 - **PEP 3151, the `OSError` exception hierarchy.** **Consider** a short note wherever
   exception handling is taught.
   Catching `FileNotFoundError` rather than checking `errno` is the modern form
   and readers still write the old one.
-- **`unittest.mock`.** **Consider** for chapter 11 if mocking is discussed at all.
 - **Implicit namespace packages (PEP 420).** Chapter 6 mentions namespace packages.
   **Verify** it says why they exist and what goes wrong when a directory silently becomes one,
   which is a common confusion.
-- **`inspect.signature()` (PEP 362).** **Verify** coverage.
-  Chapters 14 and 17 both benefit from it, and it is the supported alternative to
-  reading `__code__` attributes.
+  *Rechecked 2026-09-29: partly covered (Chapters/06_Foundations--Modules_and_Packages.md:191-193); missing: says a directory can be imported; does not say why they exist or what goes wrong.*
 
 ## Python 3.2
 
-- **`@functools.total_ordering`.** **Consider** giving it a real place in chapter 7 or 12.
-  It appears in only one chapter, and defining `__eq__` and `__lt__` to get the rest
-  is a decision readers face.
 - **`str.format_map()`.** **Mention** if t-strings or formatting get a section;
   it is the mechanism that makes a custom mapping drive `format()`.
 - **`abc.abstractclassmethod` and `abstractstaticmethod`.** **Mention** one clause
@@ -438,6 +349,7 @@ The release with the most that the book has no equivalent for.
   The interesting question now is when it is still the right choice.
 - **Thousands separator in format specs (PEP 378, `f"{n:,}"`).** **Mention** in chapter 2 or 3.
   3.14 extended separators to the fractional part, so the two notes can be one.
+  *Rechecked 2026-09-29: partly covered (Chapters/18_Techniques--Performance.md:353-355, 19:2156 (comma format used in listings)); missing: no prose; 3.14 fractional-part extension not mentioned.*
 
 ## Python 3.0
 
@@ -448,11 +360,6 @@ The value is historical framing on three items:
   and got one in 3.5 (PEP 484), then lazy evaluation in 3.14 (PEP 649).
   That arc is a good opening for chapter 8:
   the syntax was deliberately left undefined for seven years.
-- **Exception chaining (PEP 3134, `raise ... from`, `__cause__`, `__context__`).**
-  See the 3.3 `raise ... from None` item; these belong in one passage.
-- **Extended unpacking (PEP 3132, `a, *rest, b`).** **Verify** it is shown somewhere.
-  Chapter 5 covers keyword-only parameters (PEP 3102) already,
-  and extended unpacking is used casually in modern code.
 
 ---
 
