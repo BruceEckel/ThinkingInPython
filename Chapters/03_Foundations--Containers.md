@@ -11,6 +11,7 @@ Lists, tuples, dictionaries, and sets are fundamental data types.
 
 ## Lists
 
+A `list` holds objects, of any kind, in an ordered, mutable sequence.
 The `for` statement iterates through a list directly rather than counting through a sequence of numbers:
 
 ```python
@@ -39,7 +40,6 @@ so `x` takes on each value in the `list`.
 
 ### Indexing and Slicing
 
-A `list` holds objects, of any kind, in an ordered, mutable sequence.
 Indexing starts at zero, and negative indices count from the end.
 A *slice* `[start:stop:step]` copies a subrange, with `stop` excluded:
 
@@ -158,8 +158,17 @@ print(grid)
 
 The grid is [Variables and References](02_Foundations--Tour.md#variables-and-references)
 again: `*` binds the same object into every slot, and assignment never copies.
+The second `grid` comes from a *comprehension*:
+a single expression that produces a new list,
+in place of a loop with `append()`.
+The comprehension evaluates `[0]` three times,
+once for each value from `range(3)`, so the rows are three separate lists.
+[Control Flow](04_Foundations--Control_Flow.md#comprehensions)
+introduces comprehensions,
+and [Comprehensions](16_Techniques--Comprehensions.md)
+explores every form in depth.
 
-Removing items from a `list` while iterating over it is the same kind of surprise:
+Removing items from a `list` while iterating over it is the second surprise:
 
 ```python
 # remove_while_iterating.py
@@ -176,14 +185,8 @@ and the loop then advances its index,
 so it steps over the element that moved into the vacated slot.
 Skipping every other element leaves half of `xs`,
 and no exception reports the skip.
-Build a new list instead, or iterate over a copy with `for x in xs[:]`.
-
-The usual way to build a list from another one is a *comprehension*:
-a single expression that produces the new list,
-in place of a loop with `append()`.
-[Control Flow](04_Foundations--Control_Flow.md#comprehensions) introduces it,
-and [Comprehensions](16_Techniques--Comprehensions.md)
-explores every form in depth.
+Build a new list instead, with a comprehension that keeps the items you need,
+or iterate over a copy with `for x in xs[:]`.
 
 ## Tuples and Unpacking
 
@@ -217,6 +220,7 @@ print(low, high)
 #: 1 9
 ```
 
+Without its comma, `(42)` is the integer `42` inside parentheses.
 The empty tuple `()` is the exception to the comma rule,
 because it has nothing to separate.
 
@@ -245,11 +249,11 @@ except ValueError as e:
 ```
 
 At most one target can carry the star,
-and the starred target always receives a `list`,
-even when the source is a tuple or a string.
+and the starred target always receives a `list`, whether the source is a list,
+a tuple, or a string.
 Without a star the number of names must equal the number of elements,
 or the assignment raises a `ValueError`.
-By convention, a value you never read gets the name `_`,
+By convention, an unused value gets the name `_`,
 so `*_` discards a run of elements.
 [Pattern Matching](13_Techniques--Pattern_Matching.md)
 matches `case` patterns against the same shapes.
@@ -281,10 +285,12 @@ A dictionary (`dict`) maps keys to values, with fast lookup.
 Lookup computes a *hash* from each key:
 an integer derived from the key's contents.
 Python reduces that integer to the slot where the entry lives.
-So keys must be *hashable*.
-Strings, numbers, and tuples of hashable values are hashable;
-the mutable built-in containers (`list`, `dict`, `set`) are not,
-so they cannot be keys.
+A key whose hash changed after insertion would send the next lookup to a different slot,
+and the lookup would miss the entry.
+So keys must be *hashable*: able to produce a hash that stays the same.
+Strings, numbers, and tuples of hashable values are hashable.
+The mutable built-in containers (`list`, `dict`, `set`) are not,
+because their contents can change, so they cannot be keys.
 
 ```python
 # dictionaries.py
@@ -327,6 +333,7 @@ A two-character key such as `"Bo"` unpacks into its letters and the loop finishe
 `keys()` is also set-like, and so is `items()` when every value is hashable:
 each supports `&`, `|`, `-`,
 and `^` against another dict's view or against any set.
+[Sets](#sets) covers those operators.
 
 ```python
 # dict_views.py
@@ -366,8 +373,8 @@ and any iterable that yields such pairs will do.
 [Control Flow](04_Foundations--Control_Flow.md#range-enumerate-and-zip)
 covers it with the other loop tools.
 
-Changing a `dict`'s size while iterating it raises a `RuntimeError` instead of quietly skipping elements,
-as `remove_while_iterating.py`'s `list` does:
+The `list` in `remove_while_iterating.py` skips elements and reports nothing.
+Changing a `dict`'s size while iterating it raises a `RuntimeError`:
 
 ```python
 # dict_iteration_trap.py
@@ -383,12 +390,13 @@ except RuntimeError as e:
 
 A `set` raises the same exception,
 with the message `Set changed size during iteration`.
-Only the `list` hides the mistake; the `dict` and the `set` both shout it.
+Only the `list` hides the mistake; the `dict` and the `set` both report it.
 
 ## Sets
 
 A set is an unordered collection of unique items.
-Like the `dict`, it has fast membership tests.
+Like the `dict`, it finds an item by its hash,
+so membership tests are fast and every item must be hashable.
 Sets also provide the expected set algebra:
 
 ```python
@@ -477,7 +485,7 @@ The `lambda:` prefix wraps an expression into the callable `timeit()` needs
 from timeit import timeit
 from benchmark import report
 
-def scan_gap(n: int) -> float:
+def scan_gap(n):
     items = list(range(n))
     lookup = set(items)
     missing = -1
@@ -577,13 +585,14 @@ print("fish" in by_kind)  # Reading it added the key
 
 The `defaultdict` constructor argument is a *factory*,
 a callable that builds the default.
-The factory runs on the *read*, and its result goes into the dictionary,
-so touching a missing key grows it.
-Use `in` or `dict.get()` when you only want to look.
 Here, `list` produces a fresh empty list for each new key.
+Reading a missing key runs the factory and stores its result,
+so the lookup of `"fish"` adds that key to the dictionary.
+Use `in` or `dict.get()` when you only want to look.
 
 A plain `dict` has a second option, `setdefault()`.
-`plain.setdefault(kind, []).append(name)` returns the list already stored under `kind`;
+In `plain.setdefault(kind, []).append(name)`,
+`setdefault()` returns the list already stored under `kind`;
 when `kind` is missing, it stores the new `[]` and returns that instead.
 The `[]` argument builds an empty list on every call, used or not.
 Every place that touches the dictionary must also repeat the whole expression.
@@ -617,7 +626,7 @@ print(window)
 #: deque([2, 3, 4], maxlen=3)
 ```
 
-A `list` has an operation for each of those four:
+A `list` can also add and remove at either end:
 
 ```python
 # list_as_deque.py
@@ -676,8 +685,8 @@ A `deque(maxlen=n)` also caps its length,
 discarding from the other end when a new item overflows it.
 That is a sliding window, and a `list` has no equivalent.
 For a queue shared between threads,
-use [`queue.Queue`](19_Techniques--Concurrency.md), and for a priority queue,
-`heapq`.
+use [`queue.Queue`](19_Techniques--Concurrency.md#coordinating-threads-with-queues),
+and for a priority queue, `heapq`.
 
 ### `namedtuple`
 
@@ -784,7 +793,7 @@ writing to `settings` changes what `config` reports.
 ### `frozendict`
 
 A `MappingProxyType` is a window onto a `dict` that still exists and can change;
-a `frozendict` owns its contents outright.
+a `frozendict` owns its contents.
 This listing requires Python 3.15:
 
 ```python
@@ -810,7 +819,7 @@ Because a `frozendict` cannot change, it is hashable when its values are.
 Like a `tuple` or a `frozenset`,
 it can then be a dictionary key or a set member.
 A dictionary key must be hashable, though it need not be immutable.
-Immutability is how a container earns a stable hash.
+Immutability keeps a container's hash stable.
 
 ### Shallow Immutability
 
@@ -864,7 +873,6 @@ and freeze whichever you pick as soon as it stops changing.
     Change `n` to `200_000` and try again.
     The list version takes several seconds at that size,
     and much longer on a slow machine.
-    That is the point.
     Explain what changes about the comparison as `n` grows.
 2.  In `defaultdict.py`, replace `defaultdict(list)` with `defaultdict(int)`,
     change the loop to count occurrences of each `kind` instead of collecting names,

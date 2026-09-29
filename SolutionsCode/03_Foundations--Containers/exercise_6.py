@@ -2,7 +2,7 @@
 from collections import defaultdict
 
 words = "a cat sat on a mat a cat".split()
-counts: defaultdict[str, int] = defaultdict(int)
+counts = defaultdict(int)
 for word in words:
     counts[word] += 1
 print(dict(counts))

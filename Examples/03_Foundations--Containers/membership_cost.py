@@ -2,7 +2,7 @@
 from timeit import timeit
 from benchmark import report
 
-def scan_gap(n: int) -> float:
+def scan_gap(n):
     items = list(range(n))
     lookup = set(items)
     missing = -1

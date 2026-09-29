@@ -33,7 +33,7 @@ print(deque_time < list_time)
 ```
 
 `deque_time < list_time` holds at `n = 2_000`, `20_000`, and `200_000`.
-But the *margin* grows with `n`: each `list.insert(0, x)` or
+But the margin grows with `n`: each `list.insert(0, x)` or
 `list.pop(0)` shifts every remaining element, so the whole loop costs
 O(n²). Each `deque` operation is O(1), so its loop costs O(n). At a few
 dozen items the constant-factor overhead of a `deque` nearly closes the
@@ -79,7 +79,7 @@ print(a.intersection(b, d))
 ```
 
 `union()` and `intersection()` accept any number of arguments, unlike
-the `|` and `&` operators, which only take two operands at a time.
+the `|` and `&` operators, which take two operands at a time.
 The three-way intersection is empty because no single value is a
 member of all three sets.
 
@@ -100,8 +100,8 @@ except TypeError as e:
 A `set` hashes each element once, at insertion, so every element must
 be hashable. `frozenset` is hashable because it is immutable: its
 contents stay fixed after creation, so its hash stays valid. A `list`
-is mutable, so Python refuses to hash it at all, which is exactly why
-it cannot be a set member or a dictionary key.
+is mutable, so Python refuses to hash it, and an object with no hash
+cannot be a set member or a dictionary key.
 
 ## 5. Four slices of one list
 
@@ -120,10 +120,10 @@ print(xs[3:0:-1])  # The same three, in one slice
 
 A negative `start` counts from the end, so `xs[-2:]` needs no length.
 `xs[1:-1]` trims one from each end. The reversed middle has two
-spellings: slice, then reverse the copy, or walk backwards with a
+forms: slice, then reverse the copy, or walk backwards with a
 negative `step`. The one-slice form is harder to read because the
 bounds swap roles: `3` is now the first index visited and `0` is the
-excluded stop, so the element at index `0` never appears.
+excluded stop, so the element at index `0` does not appear.
 
 ## 6. `defaultdict(int)` in place of `Counter`
 
@@ -132,7 +132,7 @@ excluded stop, so the element at index `0` never appears.
 from collections import defaultdict
 
 words = "a cat sat on a mat a cat".split()
-counts: defaultdict[str, int] = defaultdict(int)
+counts = defaultdict(int)
 for word in words:
     counts[word] += 1
 print(dict(counts))
@@ -143,9 +143,10 @@ print(sorted(counts.items(), key=lambda kv: -kv[1])[:2])
 #: [('a', 3), ('cat', 2)]
 ```
 
-The tally loop is the same length either way, since `defaultdict(int)`
-removes the same "does this key exist yet" check that `Counter` does.
-What you write by hand is everything else `Counter` supplies:
+The first thing you write yourself is the loop. `Counter(words)`
+counts an iterable inside its constructor, while `defaultdict(int)`
+removes the "does this key exist yet" check and leaves the counting to
+you. The rest is what `Counter` supplies after the tally:
 `most_common()` becomes a `sorted()` call with a key function and a
 slice, and the `Counter({...})` repr becomes a `dict()` conversion.
 A read of a missing key also leaves a `Counter` alone, while
@@ -199,15 +200,15 @@ becomes a dictionary with no loop. `dict(zip(names, values))` is the
 same constructor fed from two parallel sequences.
 
 `30` ends up under `"c"`, because `|` resolves a collision in favor of
-the right operand. The rule follows from what a merge has to be: the
+the right operand. The rule follows from what a merge must be: the
 result is one value per key, and the two dictionaries disagree about
-`"c"`, so one of them has to lose. The right intuition for `a | b` is
+`"c"`, so one of them must lose. The right intuition for `a | b` is
 "start from `a`, then apply `b`", and that reading matches
 `a.update(b)`, which has always worked that way.
 
 Letting the right operand win makes `|` on dictionaries asymmetric,
 unlike `|` on sets, where `a | b` and `b | a` are the same set. The
-two uses share one spelling because both mean "combine," but only the
+two uses share one operator because both mean "combine," but only the
 set version commutes. `|=` updates the left dictionary in place, while
 `|` builds a new one and leaves the left operand alone, as the last
 `print(counts)` above confirms.
@@ -242,8 +243,8 @@ rest, however many that is.
 
 `a, b = row` fails because an unstarred target list states an exact
 count, two, and `row` holds five. Python raises a `ValueError` rather
-than dropping the extras, since silently discarding data is never the
-intent. The same error appears in the other direction, as
+than dropping the extras, since a silent drop would hide the mismatch.
+The same error appears in the other direction, as
 `not enough values to unpack`, when the list is shorter than the
 target.
 
@@ -287,11 +288,11 @@ builds the same object `frozendict(host="localhost", port=8080)`
 would.
 
 The lookup with `same` succeeds because a dictionary finds a key by
-hash and equality, never by identity. `config` and `same` are separate
-objects built in different entry orders, but they hold the same pairs,
-so they compare equal and hash the same. That is the property a
-`frozendict` key buys: any equal configuration reaches the same entry,
-whoever built it and whenever.
+hash and equality, so an equal key need not be the same object.
+`config` and `same` are separate objects built in different entry
+orders, but they hold the same pairs, so they compare equal and hash
+the same. A `frozendict` key gives you that property: any equal
+configuration reaches the same entry, whoever built it and whenever.
 
 Assigning to an entry raises a `TypeError` rather than quietly
 succeeding, and the type checker rejects the line too, which is why it
@@ -300,8 +301,8 @@ listing.
 
 `nested` shows how far the guarantee reaches. A `frozendict` fixes
 which objects it maps its keys to, not what those objects contain, so
-`hash(nested)` has to hash a `list` and fails. The immutability is
-shallow, exactly as it is for the `tuple` in `shallow_immutability.py`.
+`hash(nested)` must hash a `list` and fails. The immutability is
+shallow, as it is for the `tuple` in `shallow_immutability.py`.
 `frozendict` is hashable *when its values are*, so keep values
 immutable, a `tuple` here instead of a `list`, whenever the mapping has
 to serve as a key.
