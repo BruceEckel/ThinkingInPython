@@ -91,7 +91,7 @@ TRANSITIONS: tuple[Transition, ...] = (
                at=0.72),
     Transition("COLLECTING", "QUIESCENT", 22, ("Quit", "/ refund"), at=0.78),
     Transition("COLLECTING", "SELECTING", -20,
-               ("FirstDigit", "/ choose_row"), 0.3, at=0.62),
+               ("FirstDigit", "/ choose_row"), 0.3, at=0.85),
     Transition("SELECTING", "COLLECTING", -20,
                ("SecondDigit", "[too_expensive]", "/ clear"), 0.3,
                nudge=(0, -40)),

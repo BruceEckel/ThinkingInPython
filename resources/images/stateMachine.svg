@@ -34,8 +34,8 @@
   <text x="213" y="329" font-size="11" fill="#7a6e62" text-anchor="start">/ refund</text>
   <!-- COLLECTING -> SELECTING -->
   <path d="M372.2,201.4 Q341.5,247.1 374.5,285.3" fill="none" stroke="#7a6e62" stroke-width="1.2" marker-end="url(#sm-muted)"/>
-  <text x="353" y="258" font-size="11.5" fill="#8b1a1a" text-anchor="end">FirstDigit</text>
-  <text x="353" y="271" font-size="11" fill="#7a6e62" text-anchor="end">/ choose_row</text>
+  <text x="365" y="299" font-size="11.5" fill="#8b1a1a" text-anchor="end">FirstDigit</text>
+  <text x="365" y="313" font-size="11" fill="#7a6e62" text-anchor="end">/ choose_row</text>
   <!-- SELECTING -> COLLECTING -->
   <path d="M418.7,292.7 Q447.6,245.9 413.3,209.0" fill="none" stroke="#7a6e62" stroke-width="1.2" marker-end="url(#sm-muted)"/>
   <text x="439" y="193" font-size="11.5" fill="#8b1a1a" text-anchor="start">SecondDigit</text>
