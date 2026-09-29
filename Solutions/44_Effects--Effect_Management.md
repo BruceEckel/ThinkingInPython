@@ -17,7 +17,6 @@ def greet(ask: Ask, tell: Tell) -> None:
     tell.tell(f"Hello, {name}!")
 
 class Console:
-    "The production binding: real input, real output."
     def ask(self, prompt: str) -> str:
         return input(prompt)
 
@@ -32,8 +31,8 @@ greet(Scripted(), Console())  # Real tell, scripted ask
 #: Hello, Alice!
 ```
 
-Run `greet(Console(), Console())` interactively, and the session
-looks like this:
+An interactive run of `greet(Console(), Console())` looks like
+this:
 
 ```text
 What is your name? Alice
@@ -57,9 +56,10 @@ test can choose differently from production.
 Notice what the type checker still enforces after the choice moves.
 `Console` inherits from nothing and declares no relationship to `Ask`
 or `Tell`, but it has the two methods with the right signatures, so it
-satisfies both protocols structurally. Give `Console` a `tell()` that
-returns a `str`, and the checker reports the error at the `greet(...)`
-call, not at the class definition.
+satisfies both protocols structurally. If you give `Console` a
+`tell()` that returns a `str`, `ty` reports `invalid-argument-type`
+at the `greet(...)` call, not at the class definition, because the
+class never says which protocol it means to satisfy.
 
 ## 2. Threading a `Log` Effect through by hand
 
@@ -125,7 +125,7 @@ helper that uses the `Log`. You must edit four existing signatures.
 `format_greeting()`. Then `session()`, `menu()`, and `main()` each
 gain a `log` parameter that they only hand to the next function.
 
-Three of five is the number worth sitting with. The functions that pay
+Three of the five never use the `Log` they name. Those functions
 sit between the Effect's user and the call site that binds it, and
 they pay for an Effect they never mention again. Their signatures now
 describe a capability they do not exercise, so a reader of `menu()`
@@ -167,11 +167,13 @@ themselves. The two Effects are both exceptions, and the chapter
 demonstrates both conversions the table names for them: `slope()`
 already catches the `ZeroDivisionError`, and `slope_nonzero.py` shows
 the version where a restrictive type makes that value unconstructable.
+The third conversion, a `Result`, applies to both as well:
+`slope_result.py` returns the `ZeroDivisionError` as an `Err`, and
+`@safe` on this `slope()` does the same for the `ValueError`.
 The `ValueError` from `validate()` is the one still escaping, and
 exercise 4 moves it out of `slope()`.
 
-`withdraw()` is both a side cause and a side effect in three lines, and
-that pairing is what makes it interesting. `balance -= amount` reads
+`withdraw()` is both a side cause and a side effect in three lines. `balance -= amount` reads
 the global and writes it back, so the function's result depends on the
 global `balance` rather than on its arguments, and the call changes
 `balance` where no caller can see it. Reading and rewriting the global
@@ -187,7 +189,7 @@ take the balance as a parameter and return the new one. The same
 inputs then give the same answer, and the caller
 holds the state.
 
-`Thermometer` is the same pair wearing a design pattern.
+`Thermometer` has the same pair inside a design pattern.
 The `celsius` setter writes `_celsius`, an instance attribute rather
 than a global, and then calls `announce()`, which invokes arbitrary code
 in every subscribed responder. The write is a side effect on the
@@ -237,8 +239,7 @@ Both checks disappear from `slope()`, and so does everything they
 brought with them. A `PositiveInt` cannot hold zero, so the
 `try`/`except ZeroDivisionError` goes. It cannot hold a negative
 either, so the call to `validate()` goes, and `validate()` along with
-it. The division remains, and that is the whole of what `slope()` is
-ever supposed to do.
+it. Only the division remains.
 
 The original `slope_catch.py` splits the guarding in a way that is
 easy to miss. `validate()` rejects negatives but lets zero through,
@@ -293,20 +294,24 @@ description.close()  # Never awaited, so close it explicitly
 
 Making the helper `async` forces four changes, and none of them is
 optional. `price_of_async("apple")` now returns a coroutine instead of
-a `float`, as the last `print()` shows. `total_price()` therefore
-cannot sum the results, so every call needs `await`. Only an
-`async def` may contain `await`, so `total_price()` becomes
-`total_price_async()`. Its callers then face the same choice, and the
-propagation stops only at `asyncio.run()`, the boundary that
-discharges the Effect.
+a `float`, as the last `print()` shows, so `total_price()` cannot sum
+the results until each call has an `await`. Only an `async def` may
+contain `await`, so `total_price()` becomes `total_price_async()`.
+The argument to `sum()` gains brackets. A generator expression with
+an `await` inside it is an asynchronous generator, which `sum()`
+cannot iterate: `ty` reports `no-matching-overload`, and the call
+raises a `TypeError`. The list comprehension awaits each price and
+hands `sum()` a list. The callers of `total_price_async()` then face
+the same choice, and the propagation stops only at `asyncio.run()`,
+the boundary that discharges the Effect.
 
 That propagation is Effect tracking, and it is worth naming as such.
 The Effect appears in the type: `ty` reports `price_of_async`'s return
 as `CoroutineType[Any, Any, float]`, not `float`. A caller that
 forgets `await` then gets a type error rather than a mysterious value.
-The Effect travels outward automatically, exactly as the chapter says
-an EMS should propagate. It reaches the edge of the program, where a
-single call binds it. `async` satisfies property 1 of the three-item
+The Effect travels outward one caller at a time, as the chapter says
+an Effect propagates, and you cannot leave a caller out. It reaches
+the edge of the program, where a single call runs it. `async` satisfies property 1 of the three-item
 list without anyone calling it an Effect system.
 
 It satisfies neither of the other two.
@@ -332,7 +337,7 @@ So `async` is an Effect-tracking system rather than a full EMS, in the
 same sense as most of the AI languages in
 [Custom AI Languages with Effects](../Chapters/44_Effects--Effect_Management.md#custom-ai-languages-with-effects).
 It tracks one fixed Effect, chosen by the language, with the
-implementation welded to the call site. That is also why the
+implementation fixed at the call site. That is also why the
 propagation feels like a nuisance rather than a benefit: you
 get the bookkeeping cost of Effect tracking without the delayed
 binding that would repay it.

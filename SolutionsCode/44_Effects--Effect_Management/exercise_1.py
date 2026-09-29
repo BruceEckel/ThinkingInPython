@@ -12,7 +12,6 @@ def greet(ask: Ask, tell: Tell) -> None:
     tell.tell(f"Hello, {name}!")
 
 class Console:
-    "The production binding: real input, real output."
     def ask(self, prompt: str) -> str:
         return input(prompt)
 

@@ -145,7 +145,7 @@ Here are three ways to do it.
 Wrap the answer and the failure in a `Result`,
 the way [Error Handling](42_Functional--Error_Handling.md#turning-exceptions-into-results)
 does.
-If you decorate the original `slope()`, unchanged,
+If you decorate the original `slope()`, unchanged, with that chapter's `@safe`,
 every exception it raises becomes a value instead of a crash:
 
 ```python
@@ -404,11 +404,11 @@ Every Effect you isolate is one your tests can control.
 Every one of those benefits depends on knowing where the Effects are.
 In a small program you find them by inspection.
 As programs grow, inspection stops scaling.
-Effect management systems replace it.
+An Effect Management System replaces it.
 
 ## Effect Management Systems
 
-Return to the failing test from the chapter's opening.
+The helper behind the failing test in the chapter's opening is the ordinary case.
 Most functions in most programs perform Effects their signatures leave out,
 and that makes code hard to understand:
 
@@ -634,6 +634,9 @@ the same way it tracks whether a value is an integer or a string.
 
 The examples in this section and the next come from my research,
 in which I build the same small programs in four Effect-managing languages.
+The first is [Koka](https://koka-lang.github.io/),
+a research language with native Effects.
+Its greeting program has the same `ask` and `tell` as `ask_tell.py`:
 
 ```koka
 // Effect declarations: the interface, not the implementation
@@ -738,6 +741,8 @@ by encoding Effect information into the return type of every function.
 That encoding changes the mechanism.
 Instead of writing a computation and letting the compiler observe its Effects,
 you build a *description* of a computation, and execute the description later.
+[ZIO](https://zio.dev/) is such a library, for Scala.
+In ZIO, "Hello, World!" is a description first and a run second:
 
 ```scala
 import zio.*
@@ -885,7 +890,7 @@ print(asyncio.run(description), ran)
 Calling `greet()` builds a coroutine object, a description of work,
 and `ran` stays empty.
 [Concurrency](19_Techniques--Concurrency.md#asyncio-mechanics)
-opened with the same demonstration.
+gives the same demonstration.
 The body runs only when something awaits the description or hands it to `asyncio.run()`.
 That is the library Effect system model:
 descriptions compose inside `async def` functions,
@@ -928,7 +933,7 @@ Stateless verifies that the Effects you *declare* propagate consistently.
 A function can still call `print()` directly,
 next to its carefully declared Effects.
 In Koka, that call changes the function's Effect row, and every caller's row.
-In Python, no tool reports the call.
+In Python, neither Stateless nor the type checker reports it.
 A library checks the Effects you wrote down;
 checking the ones you left out takes the language.
 
@@ -939,7 +944,8 @@ imagine a signature that declares its Effects the way `async def` already declar
 The hard part is propagation, not syntax.
 A type checker must compute the Effect row of every function from the functions it calls,
 across every library on PyPI, almost all of which carry no Effect annotations.
-`async` succeeded because it arrived with the language,
+`async` succeeded because it arrived as part of the language:
+the interpreter enforces it,
 and its keyword marks each function that carries the Effect.
 An Effect row must instead reach every library in an ecosystem of untracked code.
 Gradual typing faced the same problem, and took a decade.
@@ -950,6 +956,8 @@ an Effect row carried in `typing.Annotated` metadata,
 and an analysis of the tool that would propagate and check it.
 The appendix calls the result *algebraic effect tracking*:
 the row a native system keeps, without the handlers.
+[An Effect Checker](B_An_Effect_Checker.md)
+builds the part of that tool that needs no type inference.
 
 ## Effects Are the Next Barrier
 
@@ -1009,7 +1017,7 @@ Effect tracking will look obvious in hindsight,
 and future programmers will regard a function with hidden Effects the way you regard a program written in one global namespace.
 
 Python offers no native Effect tracking beyond `async`, and will not soon.
-[Generators](45_Effects--Generators.md) supplies the mechanism,
+[Generators](45_Effects--Generators.md) supplies the mechanism a library needs,
 [Stateless](46_Effects--Stateless.md)
 builds a library Effect system on top of it,
 and [Stateless in Practice](47_Effects--Stateless_in_Practice.md)
