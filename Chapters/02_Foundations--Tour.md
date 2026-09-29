@@ -86,7 +86,7 @@ except NameError as e:
 
 The body of the `if` never runs, so `val` is never bound.
 Indentation shows where the assignment sits, not whether it runs.
-`ty` sees that nothing ever defines `val` and reports an error on that line,
+The type checker sees that nothing ever defines `val` and reports an error on that line,
 so `# type: ignore` tells it the mistake is deliberate.
 The `try` and `except` catch the exception so the script can print its message and finish;
 [Control Flow](04_Foundations--Control_Flow.md#errors-and-exceptions)
@@ -620,7 +620,7 @@ For example: `ThisIsMyClass`.
 When users call a class the way they call a function,
 that class may use `snake_case` instead.
 The standard library names `contextlib.suppress`, `functools.partial`,
-and the builtins `property` and `staticmethod` that way.
+and the built-ins `property` and `staticmethod` that way.
 Name every other class `CapWords`.
 
 [PEP 8](https://peps.python.org/pep-0008/#naming-conventions)

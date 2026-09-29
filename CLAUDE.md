@@ -181,6 +181,12 @@ Three rules hold everywhere:
   An accepted disagreement is a baseline entry instead.
 - **"The type checker" in prose means `ty`.**
   A sentence that holds for `ty` alone names `ty` and says what the other checkers do.
+- **Name `ty` only where the sentence needs that checker** (Bruce, 2026-09-29,
+  after PR #15 read `` `ty` sees `` as a typo for `try`): a contrast with
+  Pyright or mypy, a version pin, a `ty` command or setting, a diagnostic
+  name, or behavior known to be `ty`'s own. Everywhere else write "the type
+  checker". In Part I (chapters 02-10) the first `ty` a chapter keeps reads
+  "the type checker (`ty`)"; from chapter 11 on, a bare `ty` is fine.
 
 ## What the book says about itself
 

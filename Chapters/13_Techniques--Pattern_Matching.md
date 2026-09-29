@@ -409,7 +409,7 @@ so moving `case bool(b)` below `case int(n)` makes it unreachable:
 `describe(True)` answers `int True`.
 
 In `int(n)`, the positional sub-pattern binds the whole value rather than an attribute.
-Python special-cases a handful of builtins this way
+Python special-cases a handful of built-ins this way
 (`bool`, `int`, `float`, `str`, `bytes`, `bytearray`, `list`, `tuple`, `dict`, `frozendict`, `set`, `frozenset`),
 so `case str(s)` reads as "a string, call it `s`."
 
