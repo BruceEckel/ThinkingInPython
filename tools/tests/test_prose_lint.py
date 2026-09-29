@@ -4,6 +4,8 @@ The other four checks are single regexes; QUOTE-PUNCT is the one that has
 to tell quoted prose from a quoted literal, so it carries the cases.
 """
 
+import pytest
+
 from tools.prose_lint import lint_text
 
 
@@ -84,3 +86,60 @@ def test_ellipsis_is_not_a_misplaced_period() -> None:
 
 def test_code_span_is_skipped() -> None:
     assert codes('Write `x = "a".` and move on.') == []
+
+
+# ── SET-FIX: "fix" meaning "set" reads as "repair" ────────────────────────────
+
+SET_SENSE = [
+    'Constructing `Box("gift")` fixes `T` to `str` for that instance.',
+    "`membership.py` fixes `target` at the worst case.",
+    "`Iterator` fixes the `ReturnType` at `None`.",
+    "A *Template Method* fixes the sequence.",
+    "It fixes the flow and leaves the steps open.",
+    "The formula fixes its shape.",
+    "Creating the thread fixes its maximum size.",
+    "The type code fixes one type for every element.",
+    "Its type parameter fixes the type of each notification.",
+    "Fixing the third argument meant more work.",
+    "Partial application fixes some of a function's arguments.",
+    "A factory that fixes one argument returns a function.",
+    "`percent` fixes the bounds and leaves the middle open.",
+    "The call fixes the moment of collection.",
+    "Because `gather()` fixes its argument list then.",
+    "It lets you fix a later positional argument.",
+]
+
+REPAIR_SENSE = [
+    "Fix the algorithm and the data structures.",
+    "Step 4, fixing the algorithm, is usually the biggest win.",
+    "Then fix the class so the shared counter moves.",
+    "Fix the loop three ways.",
+    "Fix the caller two ways.",
+    "The weak reference fixes the leak.",
+    "A `__post_init__()` fixes that.",
+    "One change fixes both problems at once.",
+    "Then fix `flatten()` so a `str` yields as one item.",
+    "Then fix `WhatIUse2.op()` without restoring the `/`.",
+    "It reads a fixed-length record.",
+    "A machine has a fixed set of states.",
+    "## Rows to a Fixed Point",
+    "The fix is a lock.",
+    "Two fixes for a spent generator.",
+    "Three fixes for late binding.",
+]
+
+@pytest.mark.parametrize("text", SET_SENSE)
+def test_set_sense_is_reported(text: str) -> None:
+    assert codes(text).count("SET-FIX") == 1
+
+@pytest.mark.parametrize("text", REPAIR_SENSE)
+def test_repair_sense_and_adjective_are_clean(text: str) -> None:
+    assert "SET-FIX" not in codes(text)
+
+def test_set_fix_column_points_at_the_verb() -> None:
+    [(_, col, _, _)] = lint_text("- It fixes the sequence.")
+    assert col == len("- It ") + 1
+
+def test_set_fix_in_a_fenced_block_is_skipped() -> None:
+    text = "```python\n# This fixes the type of `x` to `int`.\n```\n"
+    assert codes(text) == []

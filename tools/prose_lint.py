@@ -8,6 +8,7 @@ Checks the prose in `Chapters/*.md` for:
   BLANK-RUN      more than one blank line in a row
   QUOTE-PUNCT    a period or comma after a closing " (it belongs inside)
   TRAILING-WS    trailing whitespace (a two-space hard break is allowed)
+  SET-FIX        "fix" meaning "set" or "determine", which reads as "repair"
 
 QUOTE-PUNCT applies to quoted prose, where the book puts the mark inside the
 quote ("easier to ask forgiveness than permission,"). A quoted *literal* is the
@@ -20,6 +21,16 @@ as "overdraft" does next to `pytest -k overdraft`. A single quoted word with
 no such code span nearby is prose ("this", "forgotten") and is reported.
 Quote a literal that is neither, like a multi-word message, as an inline code
 span instead of prose.
+
+SET-FIX catches the verb "fix" used to mean "set", "pin down", or
+"determine". A reader takes "fixes the type" as repairing the type, so the
+book says "sets", "binds", "defines", "determines", or "presets" instead.
+Two shapes are flagged: the verb followed by an inline code span and then
+"to", "at", or "as" ("fixes `T` to `str`"), and the verb followed within a
+few words by a noun the book used it with in that sense ("fixes the
+sequence", "fixes its maximum size"). The repair sense stays legal ("fix the
+loop", "fixes the leak", "Fix the algorithm"), and so do the adjective
+"fixed" and the noun ("the fix", "two fixes for").
 
 Code is skipped through the shared classifier in `tools.prose`: fenced code,
 indented code, tables, blockquotes, HTML, and rules are ignored, and inline code
@@ -53,6 +64,22 @@ _MULTI_SPACE = re.compile(r"(?<=\S) {2,}(?=\S)")
 _SPACE_BEFORE = re.compile(r" +([.,;!?])")
 _QUOTE_PUNCT = re.compile(r'"([.,])')
 _TRAILING_WS = re.compile(r"[ \t]+$")
+# "fix" as a verb: never "fixed", and never the noun after an article or a
+# count ("the fix", "Two fixes for").
+_FIX_VERB = (r"(?<!\bthe )(?<!\ba )(?<!\bone )(?<!\btwo )(?<!\bthree )"
+             r"\bfix(?:es|ing)?\b(?!\s+for\b)")
+# The verb, an optional "the" or "only", a code span, then to/at/as.
+_SET_FIX_SPAN = re.compile(
+    _FIX_VERB + r"\s+(?:(?:the|only)\s+)?`[^`]+`\s+(?:to|at|as)\b",
+    re.IGNORECASE)
+# The verb, up to four words (no code, no punctuation), then a noun the
+# book used it with in the "set" sense. "algorithm" is deliberately absent.
+_SET_FIX_NOUN = re.compile(
+    _FIX_VERB + r"(?:\s+[\w'’]+){0,4}?\s+(?:types?|order|sequence|flow"
+    r"|shape|size|arguments?|bounds|moment)\b",
+    re.IGNORECASE)
+_SET_FIX_MESSAGE = ('"fix" in the sense of "set" reads as "repair"; use '
+                    "sets, binds, defines, determines, or presets")
 
 Issue = tuple[int, int, str, str]  # line, column, code, message
 
@@ -207,6 +234,15 @@ def lint_text(text: str) -> list[Issue]:
             findings.append((lineno, offset + m.start() + 1, "QUOTE-PUNCT",
                              f"'{m.group(1)}' after a closing quote; "
                              "put it inside"))
+
+        flagged: set[int] = set()
+        for pattern in (_SET_FIX_SPAN, _SET_FIX_NOUN):
+            for m in pattern.finditer(body):
+                if m.start() in flagged or _in_span(m.start(), spans):
+                    continue
+                flagged.add(m.start())
+                findings.append((lineno, offset + m.start() + 1, "SET-FIX",
+                                 _SET_FIX_MESSAGE))
 
     findings.sort()
     return findings
