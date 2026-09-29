@@ -20,7 +20,8 @@ Mypy is the original and most widely deployed one,
 and pyright is the one most editors run.
 This book uses [Astral's `ty`](https://docs.astral.sh/ty/) instead,
 from the same group that makes `uv` and `ruff`.
-Pyright runs over the same listings as a second opinion, outside that gate.
+Pyright checks the same listings as a second opinion,
+and the book's build does not depend on its verdict.
 Where it or mypy disagrees with `ty` on a listing,
 the text says so and names the checker,
 because a verdict on a hard case is a fact about one checker, not about Python.
@@ -72,6 +73,9 @@ print(total)
 Containers and optional types read the way you say them: `list[int]`,
 `dict[str, float]`, `tuple[int, ...]`,
 and `str | None` for "a string or nothing."
+A tuple annotation names one type per position,
+so `tuple[int, str]` is a pair and `tuple[int]` is a tuple of one `int`.
+The `...` in `tuple[int, ...]` means any number of `int`s.
 A function that returns nothing declares `-> None`,
 and that is why every `__init__()` in this chapter's listings carries that annotation.
 
@@ -137,6 +141,15 @@ A neighboring `# ty:` comment summarizes what the type checker reports for a lin
 the diagnostic for a line that would fail the check,
 whether commented out or suppressed with `# type: ignore`,
 or the type a `reveal_type()` call produces.
+`reveal_type()`, imported from `typing`,
+asks the type checker which type it inferred for an expression,
+and `ty check` prints the answer as a diagnostic.
+
+The `# ty:` summary is for you, not for the tool.
+`ty` acts on a comment that has the form `# type: ignore`,
+which silences every diagnostic on its line,
+or `# ty: ignore[invalid-argument-type]`, which silences the one rule it names.
+The first form is the one every type checker honors.
 
 ## Narrowing {#narrowing}
 
@@ -163,6 +176,32 @@ so `.upper()` needs no cast.
 Outside the `if`, `text` is still the full `str | None`.
 The same narrowing follows an `isinstance()` check, an equality test,
 or an identity test against a specific value such as `is not SOME_SENTINEL`.
+
+An `object` parameter depends on narrowing.
+[Gradual Typing](#gradual-typing)
+says the type checker rejects every operation on an `object` beyond `object`'s own,
+so the function needs an `isinstance()` test before it can do more with the value:
+
+```python
+# object_narrowing.py
+
+def describe(value: object) -> str:
+    # ty: "object" has no attribute "upper":
+    # return value.upper()
+    if isinstance(value, str):
+        return value.upper()
+    return repr(value)
+
+print(describe("hi"))
+#: HI
+print(describe(42))
+#: 42
+```
+
+Inside the `if`, `value` is a `str`, so `upper()` checks.
+`repr()` accepts every object, so the last line needs no test.
+With `Any` in place of `object`, the commented-out line checks too,
+and `describe(42)` then fails at runtime with an `AttributeError`.
 
 Narrowing an attribute is riskier than narrowing a local variable.
 A call between the check and the use can reset that attribute,
@@ -194,9 +233,12 @@ expect(AttributeError, show, Box("hi"))
 The `if` narrows `b.val` to `str`,
 and nothing in the checker's model connects `reset()` to that narrowing,
 so the checker never widens `b.val` back to `str | None`.
-The crash proves the narrowing was already stale by the time `.upper()` ran.
+The `AttributeError` shows the narrowing was stale by the time `upper()` ran.
 A narrowing on a local variable holds; a narrowing on an attribute can go stale,
 so recheck it after any call that might touch the object.
+Copying the attribute into a local variable before the test avoids the recheck,
+because a called function cannot rebind its caller's local variable
+(see exercise 9).
 
 ## Constants with Final
 
@@ -237,6 +279,7 @@ The two forms differ when the initializer says less than you mean.
 so the type checker ignores whatever goes into the list.
 `CACHE: Final[list[str]] = []` says what the list holds,
 and the type checker enforces it.
+The listings in this book write the type out on every `Final`.
 
 ## Structural Typing with Protocols
 
@@ -299,9 +342,9 @@ A `Protocol` is a checking-time construct,
 so `isinstance(Circle(), Drawable)` raises a `TypeError` instead of answering.
 Decorating the Protocol with `@runtime_checkable` allows the call,
 at the cost of a weaker check:
-see [*Surrogate*](26_Patterns--Surrogate.md#proxy).
+see [*Surrogate*](26_Patterns--Surrogate.md#what-the-implementation-supplies).
 
-`Drawable` annotates `render()`'s parameter alone.
+`Drawable` appears in one place, the annotation on `render()`'s parameter.
 If you pass an object without a `draw()` to `render()`, `ty` rejects it.
 `Blob` is the case worth watching: it draws, in the everyday sense,
 but the method's name is `paint()`,
@@ -427,7 +470,6 @@ with expected(AttributeError):
 `ty check` passes this file with no complaint.
 `n` is `Any`, so every attribute access on it type-checks,
 including one that runs and fails.
-A type parameter closes this hole.
 
 A *type parameter* expresses the connection.
 Declare the parameter in square brackets after the function name:
@@ -469,8 +511,9 @@ print(box.get().upper())
 
 Constructing `Box("gift")` fixes `T` to `str` for that instance,
 so `get()` returns a `str` and the call to `upper()` checks.
-A *bound* constrains the parameter:
+A *bound* limits the parameter:
 `class Box[T: Shape]` accepts only `Shape` and its subclasses.
+A *constraint* lists the choices: with `[T: (int, str)]`, `T` is `int` or `str`.
 
 ### Variance {#variance}
 
@@ -487,11 +530,14 @@ class Shape:
 class Circle(Shape):
     pass
 
+class Square(Shape):
+    pass
+
 def count(shapes: Sequence[Shape]) -> int:
     return len(shapes)
 
 def add_square(shapes: list[Shape]) -> None:
-    shapes.append(Shape())
+    shapes.append(Square())
 
 circles: list[Circle] = [Circle(), Circle()]
 print(count(circles))
@@ -502,7 +548,7 @@ print(count(circles))
 
 A `list` accepts writes.
 If you pass `circles`,
-`add_square()` appends a `Shape` to a list its caller believes holds only circles.
+`add_square()` appends a `Square` to a list its caller believes holds only circles.
 The type checker refuses the call to prevent that.
 A read-only container has no such problem,
 so `Sequence[Shape]` accepts a `list[Circle]`.
@@ -538,15 +584,14 @@ print(counts.top() + 1)
 #: 3
 ```
 
-Without the default,
-`words: Stack` leaves `T` unsolved and the type checker falls back to `Unknown`,
-so `words.top().upper()` goes unchecked.
-The default gives the bare form a meaning,
-which matters most for a class whose type parameter is usually the same type:
+`words: Stack` names the class without its brackets,
+and the default makes that annotation mean `Stack[str]`,
+so `words.top()` is a `str` and `upper()` checks.
+A default matters most for a class whose type parameter is usually the same type:
 callers who want that type omit the brackets, and the annotation stays precise.
 
-If you drop the default, that meaning goes with it.
-`Queue[T]` carries none, so a bare `Queue` annotation leaves `T` unsolved:
+`Queue` is the same class without the default,
+so a bare `Queue` annotation leaves `T` unsolved:
 
 ```python
 # type_defaults_bare.py
@@ -571,7 +616,7 @@ reveal_type(line.top())  # ty: Unknown
 so `line.top()` and everything built on it go unchecked from here
 (see exercise 5).
 
-The same applies to a `type` alias, as `Pair` shows:
+A `type` alias takes a default the same way, as `Pair` shows:
 
 ```python
 # alias_default.py
@@ -680,7 +725,7 @@ is worth annotating precisely.
 ## Type Hint Summary
 
 These are the type hints you encounter, in their modern forms.
-Each subsection heading links to the associated [Python documentation](https://docs.python.org/3/library/typing.html).
+Each subsection opens with a link to the associated [Python documentation](https://docs.python.org/3/library/typing.html).
 [Thinking in Types](https://thinkingintypes.com/) explores types in more depth.
 
 Annotations go in three places: a parameter (`x: int`), a return value
@@ -760,15 +805,15 @@ The abstract container types come from `collections.abc`.
 |-----------|---------|
 | `def f[T](x: T) -> T` | A generic function (the type parameter varies per call), see [Generic Functions and Classes](#generic-functions-and-classes) |
 | `class Box[T]` | A generic class, see [Generic Functions and Classes](#generic-functions-and-classes) |
-| `[T: Base]`, `[T: (int, str)]` | A bounded or constrained type parameter, see [Generic Functions and Classes](#generic-functions-and-classes) |
+| `[T: Base]`, `[T: (int, str)]` | A bounded or constrained type parameter, see [Type Parameters](#type-parameters) |
 | `[T = str]` | A type parameter default, used when you omit the brackets, see [Type Parameter Defaults](#type-parameter-defaults) |
-| `TypeVar`, `Generic[T]` | The pre-3.12 way to write type parameters, see [Generic Functions and Classes](#generic-functions-and-classes) |
+| `TypeVar`, `Generic[T]` | The pre-3.12 way to write type parameters, see [`**P` and the Older `TypeVar` Syntax](#paramspec-and-typevar) |
 | `**P` (`ParamSpec`) | Captures a callable's parameter list including types, for decorators, see [Decorators](14_Techniques--Decorators.md#p-and-r-keep-the-static-interface) |
 | `*Ts` (`TypeVarTuple`), `Unpack`, `Concatenate` | Variadic generics and parameter manipulation |
 
 ### Structural Typing
 
-<a href="https://docs.python.org/3/library/typing.html#protocols" target="_blank" rel="noopener">Python documentation: structural typing</a>
+<a href="https://docs.python.org/3/library/typing.html#nominal-vs-structural-subtyping" target="_blank" rel="noopener">Python documentation: structural typing</a>
 
 | Construct | Meaning |
 |-----------|---------|
@@ -783,7 +828,7 @@ The abstract container types come from `collections.abc`.
 |-----------|---------|
 | `TypedDict` | A dict with specific keys and value types |
 | `Required[...]`, `NotRequired[...]`, `ReadOnly[...]` | Per-key control inside a `TypedDict` |
-| `NamedTuple` | A typed, named tuple class, see [Data Transfer Objects](22_Patterns--Data_Transfer_Objects.md#the-standard-library-versions) |
+| `NamedTuple` | A typed, named tuple class, see [Data Transfer Objects](22_Patterns--Data_Transfer_Objects.md#namedtuple) |
 
 ### Type Narrowing
 
@@ -845,3 +890,8 @@ The forms above are the modern ones.
     Explain why `ty` now accepts the call and why `shapes.append(...)` no longer type-checks.
 8.  In `narrowing.py`, replace `if text is not None:` with `if text:` and run `ty check`.
     Explain why the empty string now takes the other branch even though the type checker accepts either version.
+9.  In `narrowing_attribute.py`,
+    copy `b.val` into a local variable before the `if` and use the local inside it.
+    Replace the `expect()` call with `print(show(box))` for a `Box` named `box`,
+    then print `box.val`.
+    Explain why the `AttributeError` is gone although `reset()` still runs.

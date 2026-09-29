@@ -48,6 +48,7 @@ Chapters/State_Machines	State_Machines	3	A word-driven state machine with per-st
 Chapters/Stateless	Effect_Management	2	Threading a `Log` Effect through by hand
 Chapters/Stateless_in_Practice	Stateless_in_Practice	5	A fourth failure
 Chapters/Static_Types	Static_Types	5	What a missing type parameter default costs
+Chapters/Static_Types	Static_Types	9	Narrowing a local copy of an attribute
 Solutions/Class_Attributes	Class_Attributes	2	A third subclass with no override
 Solutions/Composite_and_Interpreter	Composite_and_Interpreter	3	`Neg` and `Div`
 Solutions/Composite_and_Interpreter	Composite_and_Interpreter	3	`Neg` and `Div`

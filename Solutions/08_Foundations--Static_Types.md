@@ -33,9 +33,9 @@ print(render(Triangle()))
 ```
 
 `Triangle` never mentions `Drawable`, the same as `Circle` and
-`Square`. It qualifies purely because it has a `draw() -> str` method,
-which is the whole of `Drawable`'s required shape. Neither `Drawable`
-nor `render()` needs to change to accept it.
+`Square`. It qualifies because it has a `draw() -> str` method, and
+`Drawable` requires no more than that. Neither `Drawable` nor
+`render()` needs to change to accept it.
 
 ## 2. Removing `# type: ignore` from `area.py`
 
@@ -67,9 +67,8 @@ The type checker pinpoints the mistake the chapter describes: `"3"`
 is a `str`, not an `int`, so it violates `width: int`. The call still
 runs without error at runtime, because `"3" * 4` is valid string
 repetition. In the book, the `# type: ignore` comment on this line
-exists only to let this deliberately-wrong example pass the book's
-own build. Removing the comment restores the error `ty` exists to
-catch.
+lets a deliberately wrong example pass the book's build. Removing
+the comment restores the error.
 
 ## 3. A second generic function, `last()`
 
@@ -90,7 +89,7 @@ print(last(["a", "b", "c"]))
 `last()` mirrors `first()`: one type parameter `T`, inferred from
 whatever `list[T]` the caller passes. Calling `last()` on a `list[int]`
 makes `T` `int` for that call, and on a `list[str]` makes `T` `str`,
-exactly as `first()` does. The type checker therefore knows that
+the same as `first()` does. The type checker therefore knows that
 `last([10, 20, 30])` returns an `int` and `last(["a", "b", "c"])`
 returns a `str`.
 
@@ -126,14 +125,14 @@ print(t.bump().bump().report())
 ```
 
 `Tally` declares `bump()` with return type `Self`, which the type
-checker resolves to whatever class `bump()` is actually called on. On
+checker resolves to the class on which the call is made. On
 a `LoudTally`, `Self` means `LoudTally`, so `t.bump().bump()`
 type-checks as a `LoudTally` and `.report()` is available on the
 result. That call resolves to `LoudTally.report()`, because Python
-always starts method lookup from the actual (most derived) class. If
-`bump()`'s return annotation is the fixed type `Tally` instead of
-`Self`, the type checker rejects `.report()` on the chained result,
-since plain `Tally` has no `report()` method.
+starts method lookup at the object's own class. If `bump()`'s return
+annotation is the fixed type `Tally` instead of `Self`, the type
+checker rejects `.report()` on the chained result, since `Tally` has
+no `report()` method.
 
 ## 5. What a missing type parameter default costs
 
@@ -159,15 +158,14 @@ print(words.top().upper())
 ```
 
 With `= str` in place, `ty check` reports `str` for
-`reveal_type(words.top())`. Remove the default and `ty` reports
-`Unknown` while still finding no errors in the file. That is the
-lesson: an unsolved type parameter does not fail the check, it
-switches the check off for every expression downstream of it.
-`words.top().upper()` passes either way. Without the default, so
-does `words.top().no_such_method()`. A default converts a silently
-unchecked annotation into a checked one. That conversion is why a
-default earns its place on a class whose parameter has one common
-answer.
+`reveal_type(words.top())`. Without the default, `ty` reports
+`Unknown` and still finds no errors in the file. An unsolved type
+parameter does not fail the check. It switches the check off for
+every expression built on it. `words.top().upper()` passes either
+way. Without the default, so does `words.top().no_such_method()`.
+A default turns a bare annotation that checks nothing into one that
+checks, and that is the reason to give one to a class whose
+parameter is usually the same type.
 
 ## 6. A `Literal` that does not admit `"purple"`
 
@@ -199,15 +197,20 @@ error[invalid-argument-type]: Argument to function `paint` is incorrect
    |
 12 | paint(grid, (2, 3), "purple")
    |                     ^^^^^^^^ Expected `Color`, found `Literal["purple"]`
+info: Function defined here
+ --> type_aliases.py:8:5
+  |
+8 | def paint(grid: Grid, cell: Coord, color: Color) -> None:
+  |     ^^^^^                          ------------ Parameter declared here
 ```
 
 The diagnostic names the alias rather than the union behind it, so
-`Color` is what you read and the four permitted strings stay one hop
-away, in the `type` statement. That is the trade an alias makes: a
-short message and one place to change the allowed set, against having
-to follow the name to see what that set is. Adding `"purple"` to the
-alias silences the error everywhere. `grid[cell] = color` needs no
-change, since `Grid`'s values are plain `str` and every `Color` is one.
+you read `Color` and find the four permitted strings in the `type`
+statement. An alias makes that trade: a short message and one place
+to change the allowed set, against following the name to see what
+the set is. Adding `"purple"` to the alias removes the error at every
+call. `grid[cell] = color` needs no change, since `Grid`'s values are
+`str` and every `Color` is a `str`.
 
 ## 7. Widening `add_square()` to `Sequence[Shape]`
 
@@ -221,12 +224,15 @@ class Shape:
 class Circle(Shape):
     pass
 
+class Square(Shape):
+    pass
+
 def count(shapes: Sequence[Shape]) -> int:
     return len(shapes)
 
 def add_square(shapes: Sequence[Shape]) -> None:
     # ty: "Sequence[Shape]" has no attribute "append":
-    # shapes.append(Shape())
+    # shapes.append(Square())
     print("would add a square to", len(shapes), "shapes")
 
 circles: list[Circle] = [Circle(), Circle()]
@@ -237,23 +243,23 @@ print(count(circles))
 ```
 
 `ty` accepts the call because `Sequence` is covariant in its element
-type. A `Sequence[Shape]` promises only that you can read `Shape`s out
+type. A `Sequence[Shape]` declares only that you can read `Shape`s out
 of it, and every `Circle` you read out is a `Shape`, so a
-`list[Circle]` satisfies that promise. `list[Shape]` refuses the same
+`list[Circle]` meets that requirement. `list[Shape]` refuses the same
 argument because `list` is invariant.
 
 `shapes.append(...)` stops type-checking for the reason the widening
-works. `Sequence` has no `append()` at all: it is the read-only
-abstract shape, so the diagnostic is `unresolved-attribute` rather
-than an argument-type error. The type checker is not saying "you may not
-append a `Shape` here," it is saying there is no such operation on
-what you declared.
+works. `Sequence` has no `append()`: it is the read-only abstract
+shape, so the diagnostic is `unresolved-attribute` rather than an
+argument-type error. The type checker is not saying "you may not
+append a `Square` here." It is saying the type you declared has no
+such operation.
 
-That pairing is the whole of variance in one edit. Invariance is the
-price of being able to write. Covariance is what you get when you give
-that up. The practical rule follows: annotate a parameter with the
-weakest shape the body actually needs, because every capability you
-declare is a caller you turn away.
+The one edit shows both sides of variance. A container you can write
+to is invariant, and giving up the writes makes it covariant. The
+practical rule follows: annotate a parameter with the weakest shape
+the body needs, because each capability you declare rejects the
+callers whose argument lacks it.
 
 ## 8. Truthiness in place of `is not None`
 
@@ -273,22 +279,54 @@ print(shout(""))  # The empty string is falsy
 #: (nothing)
 ```
 
-`ty` accepts either version, and for a good reason: truthiness
-narrows too. `None` is falsy, so inside `if text:` the type checker
-rules out `None` exactly as `is not None` does, and `.upper()` is safe
-under both spellings.
+`ty` accepts either version, because truthiness narrows too. `None`
+is falsy, so inside `if text:` the type checker rules out `None` the
+same as `is not None` does, and `.upper()` is safe in both versions.
 
-What changed is which values reach which branch. `is not None` asks
+The change is in which values reach which branch. `is not None` asks
 one question, whether the value is missing. `if text:` asks a
-different one, whether the value is missing *or* empty, and answers
-both with `"(nothing)"`. An empty string that a caller passed on
-purpose is now indistinguishable from no string at all.
+different one, whether the value is missing or empty, and answers
+both with `"(nothing)"`. The function can no longer tell an empty
+string a caller passed on purpose from no string.
 
-Whether that matters depends on the caller, and that is the point of
-the exercise: the type checker cannot tell you, because both versions are
-type-correct. The truthiness test is the same trap as `if not target:`
-on a mutable default in
+Whether that matters depends on the caller. The type checker cannot
+tell you, because both versions are type-correct. The truthiness test
+is the same trap as `if not target:` on a mutable default in
 [Functions](../Chapters/05_Foundations--Functions.md), and the same
 answer applies. Test for the condition you mean. Use `is None` when
-you mean "was anything supplied," and truthiness only when an empty
-value genuinely belongs with the missing one.
+you mean "was anything supplied," and truthiness when an empty value
+belongs with the missing one.
+
+## 9. Narrowing a local copy of an attribute
+
+```python
+# exercise_9.py
+
+class Box:
+    def __init__(self, val: str | None) -> None:
+        self.val = val
+
+    def reset(self) -> None:
+        self.val = None
+
+def show(b: Box) -> str:
+    val = b.val
+    if val is not None:
+        b.reset()
+        return val.upper()
+    return "(nothing)"
+
+box = Box("hi")
+print(show(box))
+#: HI
+print(box.val)
+#: None
+```
+
+`reset()` still runs and still sets the attribute to `None`, as the
+second line of output shows. The call cannot change `val`, though.
+`val` is a second name for the string `"hi"`, and `reset()` rebinds
+`b.val`, not the local. The narrowing of `val` to `str` therefore
+holds through the call, and the type checker's verdict matches what
+the program does. In the chapter's version the verdict concerns
+`b.val`, which the call changes after the test.

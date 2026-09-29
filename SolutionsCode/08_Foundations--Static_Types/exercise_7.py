@@ -7,12 +7,15 @@ class Shape:
 class Circle(Shape):
     pass
 
+class Square(Shape):
+    pass
+
 def count(shapes: Sequence[Shape]) -> int:
     return len(shapes)
 
 def add_square(shapes: Sequence[Shape]) -> None:
     # ty: "Sequence[Shape]" has no attribute "append":
-    # shapes.append(Shape())
+    # shapes.append(Square())
     print("would add a square to", len(shapes), "shapes")
 
 circles: list[Circle] = [Circle(), Circle()]
