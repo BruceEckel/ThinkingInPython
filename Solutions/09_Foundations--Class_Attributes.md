@@ -9,8 +9,8 @@ class Stars:
 
 a = Stars()
 b = Stars()
-a.rating = 1       # Shadows the class attribute on 'a' only
-Stars.rating = 9   # Changes the shared class attribute
+a.rating = 1  # Shadows the class attribute on 'a' only
+Stars.rating = 9  # Changes the shared class attribute
 c = Stars()
 print(c.rating)
 #: 9
@@ -51,10 +51,9 @@ print(Base.shared, Left.shared, Middle.shared, Right.shared)
 #: 9 5 9 100
 ```
 
-`Middle` behaves exactly like `Left`: neither declares its own
-`shared`, so both track `Base.shared` through the normal attribute
-lookup chain, right up until something assigns to `Left.shared` or
-`Middle.shared` directly. `Right` holds `100` throughout, because it
+`Middle` behaves like `Left`: neither declares its own `shared`, so
+both track `Base.shared` through the normal attribute lookup chain,
+until something assigns to `Left.shared` or `Middle.shared` directly. `Right` holds `100` throughout, because it
 creates its own separate class attribute the moment its class body
 runs `shared = 100`.
 
@@ -99,7 +98,7 @@ a = Tally("a")
 b = Tally("b")
 print(Tally.total)
 #: 2
-a.total = 99  # This does NOT touch Tally.total
+a.total = 99  # Does not touch Tally.total
 print(vars(a))
 #: {'label': 'a', 'total': 99}
 print(Tally.total)
@@ -112,11 +111,11 @@ the class. That assignment creates a brand-new instance attribute
 named `total` on `a`, which then shadows `Tally.total` for `a`
 specifically. `vars(a)` shows the shadow directly: `a` now has its
 own `total` entry. `Tally.total`, read through the class, still
-reports `2`, because nothing wrote to the class. This shadow is
-precisely the bug `ClassVar` exists to catch. Declare `total:
-ClassVar[int] = 0` instead, and the type checker flags `a.total = 99`
-as an error before the line ever runs, because it can see the
-assignment creates this shadow.
+reports `2`, because nothing wrote to the class. This shadow is the
+bug `ClassVar` exists to catch. With `total: ClassVar[int] = 0`
+declared instead, the type checker flags `a.total = 99` as an error
+before the line runs, because the assignment writes to a `ClassVar`
+through an instance.
 
 ## 5. A per-instance list, via `default_factory`
 
@@ -306,9 +305,106 @@ while `Left2` still shares `Base2`'s list. The result, `[1] [1] [2]`,
 follows the same rule the integer `shared` in exercise 2 shows: one
 value per class that declares it.
 
-The real bug this listing models is a registry on a base class. Every
-subclass appends its own entry, and the entries all land in one list
-nobody meant to share. The fix is the chapter's: build the mutable
-value per owner rather than once in the class body. A
-`default_factory` field gives each instance its own list, and
-`__init_subclass__()` gives each subclass its own.
+The bug this listing models is a list each subclass treats as its
+own, declared once on the base class. Every subclass appends its
+entries, and they all arrive in the one list. When one shared table is
+the intent, as in a registry of subclasses, the same code is correct.
+When each owner needs its own list, build the mutable value per owner
+rather than once in the class body. A `default_factory` field gives
+each instance its own list, and `__init_subclass__()` gives each
+subclass its own.
+
+## 9. A declared attribute that no method assigns
+
+```python
+# exercise_9.py
+from exceptions import expected
+
+class Ticket:
+    seat: str  # Declared, assigned by no method
+
+    def __init__(self, holder: str) -> None:
+        self.holder = holder
+
+t = Ticket("Ada")
+print(vars(t))
+#: {'holder': 'Ada'}
+with expected(AttributeError):
+    print(t.seat)
+#: [AttributeError] 'Ticket' object has no attribute 'seat'
+t.seat = "14C"
+print(vars(t), t.seat)
+#: {'holder': 'Ada', 'seat': '14C'} 14C
+```
+
+`ty` reports nothing for this file. The annotation `seat: str` states
+that a `Ticket` carries a `seat`, and `ty` trusts the declaration
+without checking that a method assigns it. At runtime the declaration
+creates nothing: `vars(t)` holds `holder` alone, and reading `t.seat`
+raises an `AttributeError`.
+
+`t.seat = "14C"` creates the attribute on the instance, and `ty`
+checks that assignment against the declared `str`. A bare annotation
+is safe when the code that assigns the attribute runs before any code
+that reads it. The type checker cannot confirm that order, so the
+class depends on its callers to keep it.
+
+## 10. Watching `Sub` get its own counter
+
+```python
+# exercise_10.py
+from typing import ClassVar
+
+class Base:
+    total: ClassVar[int] = 0
+
+    def __init__(self) -> None:
+        type(self).total += 1
+
+class Sub(Base):
+    pass
+
+Base()
+print(vars(Sub).get("total"))
+#: None
+Sub()
+print(vars(Sub).get("total"))
+#: 2
+Sub()
+print(vars(Sub).get("total"))
+#: 3
+print(Base.total, Sub.total)
+#: 1 3
+
+class Counted:
+    total: ClassVar[int] = 0
+
+    def __init__(self) -> None:
+        Counted.total += 1  # Name the class
+
+class SubCounted(Counted):
+    pass
+
+Counted()
+print(vars(SubCounted).get("total"))
+#: None
+SubCounted()
+print(vars(SubCounted).get("total"))
+#: None
+SubCounted()
+print(vars(SubCounted).get("total"))
+#: None
+print(Counted.total, SubCounted.total)
+#: 3 3
+```
+
+Before the first `Sub()`, `vars(Sub)` has no `total`: `Sub` reads
+`Base`'s. The first `Sub()` runs `type(self).total += 1` with
+`type(self)` as `Sub`. The read falls back to `Base.total`, which is
+`1`, and the write stores `2` in `Sub`'s own dictionary. From then on
+`Sub` has its own counter, and the second `Sub()` moves it to `3`
+while `Base.total` stays at `1`.
+
+`Counted` names the class on the left, so every construction reads
+and writes `Counted`'s dictionary. `vars(SubCounted)` holds no `total`
+at any point, and both names report the one shared count of `3`.

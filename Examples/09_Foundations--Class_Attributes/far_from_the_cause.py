@@ -6,12 +6,16 @@ class Stars:
 def sell(star: Stars) -> None:
     star.rating = 1  # Shadows, buried in a helper
 
+def rerate(rating: int) -> None:
+    Stars.rating = rating  # Meant for every Stars
+
 def show(star: Stars) -> None:
     print(star.rating)  # Reads far from where it shadowed
 
 a, b = Stars(), Stars()
 sell(a)
-show(a)
+rerate(9)
+show(a)  # The new rating does not reach a
 #: 1
-show(b)  # sell() never touched b
-#: 5
+show(b)
+#: 9

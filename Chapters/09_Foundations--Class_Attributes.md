@@ -18,7 +18,7 @@ that instance attribute *shadows* the class attribute.
 In C++ or Java, the language allocates storage for such a field in each object before the constructor runs,
 so a programmer from those languages expects per-object storage here too.
 A Python class attribute corresponds to a C++ or Java `static` field.
-Python has no syntax for declaring a per-object field in the class body.
+No syntax in a Python class body allocates a per-object field.
 Assigning through `self` inside a method creates that storage instead.
 
 The next listing shows the confusion:
@@ -75,9 +75,9 @@ because a class's dictionary is a read-only `mappingproxy` that carries the comp
 The instance dictionary is a plain `dict` holding only what the code assigned.
 
 That instance dictionary is not guaranteed.
-A class declared with `slots=True`
-([Performance](18_Techniques--Performance.md#slots) shows the trade-off)
-has no instance `__dict__` at all.
+A class that declares `__slots__`, or a data class built with `slots=True`
+([Performance](18_Techniques--Performance.md#slots) shows the trade-off),
+has no instance `__dict__`.
 A class attribute in such a class cannot be shadowed:
 assigning to that name on an instance raises an `AttributeError`,
 because there is no instance dictionary to write into.
@@ -114,21 +114,28 @@ class Stars:
 def sell(star: Stars) -> None:
     star.rating = 1  # Shadows, buried in a helper
 
+def rerate(rating: int) -> None:
+    Stars.rating = rating  # Meant for every Stars
+
 def show(star: Stars) -> None:
     print(star.rating)  # Reads far from where it shadowed
 
 a, b = Stars(), Stars()
 sell(a)
-show(a)
+rerate(9)
+show(a)  # The new rating does not reach a
 #: 1
-show(b)  # sell() never touched b
-#: 5
+show(b)
+#: 9
 ```
 
-`sell()` and `show()` share no line of source between them.
-A reader debugging `show(b)`'s surprising `5` has to trace back through every earlier call that touched a `Stars` instance,
-because the shadowing happens inside `sell()`,
-a function `show()` never calls and does not import.
+`rerate(9)` changes the rating for every `Stars`,
+and `show(a)` still prints `1`.
+Someone debugging that stale `1` finds nothing wrong in `rerate()` or in `show()`.
+The cause is the assignment inside `sell()`,
+which gave `a` its own `rating` before the class attribute changed.
+Neither `rerate()` nor `show()` calls `sell()`,
+so finding it means tracing every earlier call that touched a `Stars` instance.
 
 ### A Shared Mutable Value
 
@@ -210,12 +217,11 @@ as `class_attribute_confusion.py` shows.
 so it exists on `Tally` before any instance exists.
 `label: str` has no `=`, so the class stores nothing under that name.
 The annotation records, in `Tally.__annotations__`,
-that a `Tally` will carry a `label`, and nothing more.
+that a `Tally` will carry a `label`.
 `display_object()` reports attributes that exist,
 so the declaration stays out of its report.
 
-`display_object(a)` tells a different story once an instance exists.
-Both `label` and `total` appear:
+Once an instance exists, `display_object(a)` reports both names:
 `label: str = 'a'` and `total: typing.ClassVar[int] = 1`.
 Constructing `a` runs `self.label = label`,
 which creates a real `label` attribute on `a`, not on `Tally`.
@@ -254,7 +260,7 @@ and the bare annotation is the type checker's one source for its type.
 ### A `ClassVar` With No Value Declares Too
 
 `ClassVar` says where an attribute lives, not that it exists.
-Leave the value off and the class stores nothing,
+Without a value the class stores nothing,
 the same as for `label` in `class_var.py`:
 
 ```python
@@ -283,7 +289,7 @@ so the first read raises an `AttributeError`.
 `ty` reports nothing here, for the reason it reports nothing for `label`:
 it trusts the declaration rather than tracking which code runs first.
 Pyright agrees, and its optional `reportUninitializedInstanceVariable` covers a bare instance annotation,
-not a `ClassVar`, so no checker catches this read.
+not a `ClassVar`, so neither checker catches this read.
 `Registry.count = 0` creates the attribute on the class,
 and an instance finds it by fallback.
 
@@ -322,20 +328,21 @@ with expected(AttributeError):
 
 `Shape` states that every shape carries a `sides`, `Square` supplies one,
 and `Blob` forgets.
-Stubs and *Protocols* use the same form throughout,
-since neither carries values.
+A [`Protocol`](08_Foundations--Static_Types.md#structural-typing-with-protocols)
+declares its attributes in the same form, an annotation with no value,
+since it describes what a class must have and leaves the value to the class.
 
-The declaration promises more than `ty` 0.0.82 delivers.
+`ty` 0.0.84 enforces less than the declaration states.
 Nothing requires `Blob` to supply a `sides`,
-and a subclass writing `sides = "four"` draws no report:
+and a subclass `Bad` that writes `sides = "four"` draws no report:
 `ty` reads that assignment as a fresh declaration and types `Bad.sides` as `str`,
-so the error surfaces later, wherever an `int` was expected.
+so the error surfaces later, wherever the code requires an `int`.
 Pyright rejects the assignment where it sits,
 and the typing specification agrees with Pyright:
 a mutable attribute's type is [invariant](08_Foundations--Static_Types.md#variance),
 so a subclass may neither widen nor narrow it.
 The gap is `ty`'s, and a known one:
-it tracks the check under enforcing the Liskov Substitution Principle for attributes
+it tracks the check under "Enforce the Liskov Substitution Principle for non-methods"
 (`astral-sh/ty` issue 2158).
 Treat the base declaration as documentation that a checker reads,
 not as a guarantee that the attribute exists.
@@ -346,8 +353,8 @@ not as a guarantee that the attribute exists.
 It records that `total` belongs to the class,
 and turns the accidental shadowing from `class_attribute_confusion.py` into a check-time error.
 Python's own attribute lookup ignores the hint.
-One library does read it at runtime:
-`@dataclass` leaves a `ClassVar` field out of the constructor it generates,
+`@dataclass` does read it at runtime:
+it leaves a `ClassVar` field out of the constructor it generates,
 as [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#d-a-real-classvar)
 shows.
 
@@ -388,7 +395,7 @@ and each reads better when you declare the sharing.
 For the third, a class-level constant,
 `Final[int]` from [Static Types](08_Foundations--Static_Types.md#constants-with-final)
 says more than `ClassVar[int]`:
-it declares the value shared *and* not reassignable.
+it declares the value both shared and not reassignable.
 Use `ClassVar` when you intend the shared value to change,
 as `Tally.total` does.
 The bug is not the class attribute.
@@ -439,13 +446,14 @@ one level up: `Left` reads through to `Base` until an assignment gives `Left` it
 the way `a` reads through to `Stars` until `a.rating = 1`.
 A subclass stands to its base class as an instance stands to its class.
 `Right` writes `shared = 100` without repeating the annotation.
-A subclass overriding a `ClassVar` inherits the name but not the type checker's guard.
-`ty` rejects `Left().shared = 5` and accepts `Right().shared = 5`,
-so restating `ClassVar[int]` on an override keeps that check.
+Under `ty`, that bare override loses the guard against instance assignment:
+`ty` rejects `Left().shared = 5` and accepts `Right().shared = 5`.
+Pyright carries the base's declaration to the override and rejects both.
+Restating `ClassVar[int]` on an override keeps the check under either checker.
 
 ### `type(self)` Forks the Counter
 
-"A subclass stands to its base class as an instance stands to its class" cuts both ways.
+The mistake in `counter_near_miss.py` has a subclass form.
 `class_var.py` increments `Tally.total` through the literal class name.
 Writing that same increment through `type(self)`,
 a common idiom for reaching "my own class" from a method,
@@ -483,6 +491,9 @@ the augmented assignment is a valid `ClassVar[int]` update either way,
 and nothing in the annotation says which class name should receive it.
 Write the increment through the literal class name, as `class_var.py` does,
 whenever a `ClassVar` must count across every subclass rather than fork one counter per subclass.
+A [`@classmethod`](07_Foundations--Classes.md#static-and-class-methods)
+that writes `cls.total += 1` forks the same way,
+because `cls` is the class that received the call.
 [Pattern Refactoring](37_Patterns--Pattern_Refactoring.md#the-trash-hierarchy)'s registry sidesteps this by mutating `Trash.registry` in place,
 never reassigning it through `cls`.
 
@@ -524,7 +535,7 @@ giving each object its own storage before anything can read it.
 The difference is not the value but where you write it.
 Python still builds the [default value](05_Foundations--Functions.md#the-mutable-default-trap)
 once, at definition time,
-so a *mutable* default argument brings the sharing straight back.
+so a mutable default argument brings the sharing straight back.
 `100` is immutable, so this default is safe.
 
 A `@dataclass` reads the annotated class-body declarations as a template and generates a constructor from them.
@@ -590,8 +601,7 @@ a constructor default or a `@dataclass` field for per-object.
     Then create a second instance, `b2 = B()`,
     and confirm `b2.x` is still `100`.
 4.  Rewrite `Tally` from `class_var.py` so `total` is a plain (non-`ClassVar`)
-    class attribute instead,
-    then have an instance assign to `self.total` directly.
+    class attribute instead, then assign `a.total = 99` through an instance.
     Using `vars()` as in `inside_objects.py`,
     explain what that assignment creates, and where.
 5.  Rewrite `Cart` from `shared_mutable.py` as a `@dataclass` with `items: list[str] = field(default_factory=list)`,
@@ -615,3 +625,10 @@ a constructor default or a `@dataclass` field for per-object.
 8.  Change `class_var_inheritance.py` so `shared` is `ClassVar[list[int]] = []` and `Left` and `Right` both call `.append()` on it.
     Predict what `Base.shared` holds afterwards, then check.
     Give `Right` its own list with `shared = []` in its body and repeat.
+9.  Write a class `Ticket` with a bare annotation `seat: str` and an `__init__()` that stores a `holder` and leaves `seat` unassigned.
+    Run `ty` on it, then read `seat` on an instance inside `expected(AttributeError)`.
+    Assign `seat` from outside the class and print `vars()` of the instance before and after.
+10. In `classvar_fork.py`,
+    print `vars(Sub).get("total")` before the first `Sub()` call and after each one,
+    and use the three values to explain the `1 3` output.
+    Then change the increment to `Base.total += 1` and predict all four lines before running.

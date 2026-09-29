@@ -11,7 +11,7 @@ a = Tally("a")
 b = Tally("b")
 print(Tally.total)
 #: 2
-a.total = 99  # This does NOT touch Tally.total
+a.total = 99  # Does not touch Tally.total
 print(vars(a))
 #: {'label': 'a', 'total': 99}
 print(Tally.total)
