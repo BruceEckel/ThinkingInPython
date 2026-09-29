@@ -14,15 +14,8 @@ print(10 ** 30)  # A 31-digit int, no overflow
 #: 1000000000000000000000000000000
 print(abs(-5), round(3.14159, 2))
 #: 5 3.14
-total = 0
-total += 5  # Augmented assignment, like other languages
-print(total)
-#: 5
+print(round(0.5), round(1.5), round(2.5))  # Ties go to even
+#: 0 2 2
 scores = [90, 0, 71, 0, 55]
 print(sum(s > 60 for s in scores))  # True counts as 1
 #: 2
-items = [1, 2]
-alias = items
-items += [3]  # In place, so alias sees it
-print(alias)
-#: [1, 2, 3]

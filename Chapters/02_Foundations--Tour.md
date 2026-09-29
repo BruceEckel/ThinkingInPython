@@ -29,7 +29,7 @@ shell scripts, and simple programs with Python scripts.
 The `#` denotes a comment that goes until the end of the line,
 just like C++ and Java `//` comments.
 [The Examples](01_Introduction.md#the-examples)
-explains the filename first line and the `#:` output markers.
+explains the filename comment on a listing's first line and the `#:` output markers.
 
 ## Indentation and Blocks
 
@@ -57,7 +57,8 @@ Python makes them optional.
 
 The conditional clause ends with a colon.
 A group of indented statements follows: the "then" part of the `if` statement.
-The `print()` function sends its argument to standard output.
+The `print()` function sends its arguments to standard output,
+separated by spaces and followed by a newline.
 The next line assigns to a variable named `val`.
 The next statement returns to the left margin, and that return ends the `if`.
 
@@ -83,10 +84,13 @@ except NameError as e:
 #: name 'val' is not defined
 ```
 
-The `if` never runs, so `val` is never bound.
+The body of the `if` never runs, so `val` is never bound.
 Indentation shows where the assignment sits, not whether it runs.
 `ty` sees that nothing ever defines `val` and reports an error on that line,
 so `# type: ignore` tells it the mistake is deliberate.
+The `try` and `except` catch the exception so the script can print its message and finish;
+[Control Flow](04_Foundations--Control_Flow.md#errors-and-exceptions)
+covers them.
 
 Indenting can nest as deeply as you like.
 Four spaces per level is the convention,
@@ -99,13 +103,17 @@ and that sameness is one of the main reasons for Python's consistent readability
 
 A statement ends with its line, so it needs no terminating semicolon.
 A semicolon's one job is to separate two statements that share a line.
+An open parenthesis, bracket,
+or brace keeps the statement going across lines until it closes,
+and the indentation of those continued lines is yours to choose.
+The longer calls in `tstrings.py` wrap that way.
 
 ## Variables and References
 
 A variable in Python is a name bound to an object, not a box that holds a value.
 Assignment binds a name.
 It does not copy.
-You never declare a variable's type,
+Python does not require you to declare a variable's type,
 and one name can bind to objects of different types over its life.
 That freedom is *dynamic typing*.
 
@@ -138,12 +146,13 @@ Reserve `is` for `None` and other singletons.
 it duplicates the outer list but not the objects inside it.
 `nested` and `shallow` still share the same inner list,
 so `shallow[1].append(99)` changes what `nested` sees too.
+The standard library's `copy.deepcopy()` duplicates the inner objects as well.
 
 Numbers, strings, and tuples are *immutable*:
 operations produce new objects rather than changing the original.
 Lists, dictionaries, and sets are *mutable*.
 Mutability decides whether another name sees a change,
-as `a` and `b` do in `references.py`.
+as `a` sees the `4` appended through `b` in `references.py`.
 
 You can assign several names at once, so a swap needs no temporary:
 
@@ -195,35 +204,17 @@ print(10 ** 30)  # A 31-digit int, no overflow
 #: 1000000000000000000000000000000
 print(abs(-5), round(3.14159, 2))
 #: 5 3.14
-total = 0
-total += 5  # Augmented assignment, like other languages
-print(total)
-#: 5
+print(round(0.5), round(1.5), round(2.5))  # Ties go to even
+#: 0 2 2
 scores = [90, 0, 71, 0, 55]
 print(sum(s > 60 for s in scores))  # True counts as 1
 #: 2
-items = [1, 2]
-alias = items
-items += [3]  # In place, so alias sees it
-print(alias)
-#: [1, 2, 3]
 ```
 
-Augmented assignment on a mutable object changes it in place,
-so every other name for it sees the change.
-`items = items + [3]` instead builds a new list and leaves `alias` alone.
-For an `int`, both forms rebind the name,
-so `total += 5` above behaves the way `+=` does in any other language.
-
 `round()` breaks a tie to the nearest even value,
-so `round(0.5)` is `0` and `round(1.5)` is `2`,
-rather than rounding half away from zero as C does.
+so `round(0.5)` is `0` and both `round(1.5)` and `round(2.5)` are `2`,
+rather than rounding half away from zero as C's `round()` does.
 An f-string's format spec rounds the same way.
-
-Python has no `++` or `--`.
-Use `+= 1` and `-= 1`.
-Each arithmetic operator has an augmented-assignment form: `+=`, `-=`, `*=`,
-`/=`, `//=`, `%=`, and `**=`.
 
 A `bool` is a subtype of `int`, so `True` equals `1` and `False` equals `0`.
 Summing a sequence of comparisons therefore counts how many are true.
@@ -231,6 +222,35 @@ The argument to `sum()` is a *generator expression*,
 which hands over one value at a time instead of building a list first.
 [Comprehensions](16_Techniques--Comprehensions.md#generator-expressions)
 covers the form.
+
+Python has no `++` or `--`.
+Use `+= 1` and `-= 1`.
+Each arithmetic operator has an augmented-assignment form: `+=`, `-=`, `*=`,
+`/=`, `//=`, `%=`, and `**=`.
+
+```python
+# augmented.py
+
+total = 0
+total += 5  # Augmented assignment, like other languages
+print(total)
+#: 5
+items = [1, 2]
+alias = items
+items += [3]  # In place, so alias sees it
+print(alias)
+#: [1, 2, 3]
+items = items + [4]  # A new list, alias keeps the old one
+print(alias, items)
+#: [1, 2, 3] [1, 2, 3, 4]
+```
+
+Augmented assignment on a mutable object changes it in place,
+so every other name for it sees the change.
+`items = items + [4]` instead builds a new list and rebinds `items` to it,
+which leaves `alias` bound to the old one.
+For an `int`, both forms rebind the name,
+so `total += 5` behaves the way `+=` does in any other language.
 
 Integers also support the bitwise and shift operators,
 each with a matching augmented form (`&=`, `|=`, `^=`, `<<=`, `>>=`).
@@ -316,29 +336,46 @@ print(bool(Bucket(0)), bool(Bucket(3)))
 if not []:
     print("empty")  # An empty list is falsy
 #: empty
-
-# 'or' returns the first truthy operand
-name = "" or "default"
-print(name)
-#: default
-count = 0
-print(count or 10)  # 0 is falsy, so the fallback wins
-#: 10
 ```
 
 `repr()` returns a value's unambiguous representation,
 so the empty string shows as `''` and not as blank.
 `Bucket` defines no `__bool__()`, so `bool()` falls back to its `__len__()`:
 `Bucket(0)` is false and `Bucket(3)` is true.
+`Bucket` is a small class, and [Classes](07_Foundations--Classes.md)
+covers the syntax.
+Its `count: int` and `-> int` are type hints.
+They state the types for the reader and the type checker and change nothing about how the code runs;
+[Static Types](08_Foundations--Static_Types.md#type-hints) covers them.
 
 `and` and `or` short-circuit and return one of their operands,
-not a coerced boolean.
+not a coerced boolean:
+
+```python
+# or_fallback.py
+
+# 'or' returns the first truthy operand
+name = "" or "default"
+print(name)
+#: default
+items = []
+print(items and items[0])  # Stops at the falsy operand
+#: []
+count = 0
+print(count or 10)  # 0 is falsy, so the fallback wins
+#: 10
+print(10 if count is None else count)  # Keeps the 0
+#: 0
+```
+
+`and` stops at its first falsy operand and returns it,
+so `items[0]` is never evaluated on the empty list.
 `x or default` is a common way to supply a fallback,
 and it replaces every falsy `x`:
 a legitimate `0` or `""` gets the fallback just as a missing value does.
 When zero or an empty string is a legal value, test for `None` instead:
 `default if x is None else x`.
-That is a [conditional expression](04_Foundations--Control_Flow.md).
+That is a [conditional expression](04_Foundations--Control_Flow.md#conditionals).
 
 ## Strings
 
@@ -387,15 +424,17 @@ In an ordinary string, a backslash starts an escape sequence, as in C and Java:
 `\n` is a newline and `\t` is a tab.
 The `r` right before a string means "raw":
 Python takes each backslash literally, as a single character.
+Without the `r`, the last literal in `strings.py` is a syntax error:
+`\u` starts a Unicode escape, and `tils` is not the four hex digits it requires.
 One limit remains.
-A raw string cannot end with a backslash,
+A raw string cannot end with a single backslash,
 because even there the backslash escapes the closing quote.
 
 ### Common String Operations
 
 Strings are immutable sequences with a large set of methods.
 [Slicing](03_Foundations--Containers.md#indexing-and-slicing)
-also selects a range of characters, and `in` tests membership:
+selects a range of characters, and `in` tests for a substring:
 
 ```python
 # string_methods.py
@@ -418,6 +457,25 @@ print(s.strip()[0:5])
 ```
 
 String methods return new values rather than changing the original.
+
+`+` joins two strings, and it converts nothing:
+
+```python
+# concatenate.py
+
+total = 7
+try:
+    print("total: " + total)  # type: ignore
+except TypeError as e:
+    print(e)
+#: can only concatenate str (not "int") to str
+print("total: " + str(total))
+#: total: 7
+```
+
+Java and JavaScript turn the `7` into text and join it.
+Python requires two strings, so you write the conversion,
+either with `str()` or inside an f-string.
 
 ### f-Strings
 
@@ -565,7 +623,7 @@ The standard library names `contextlib.suppress`, `functools.partial`,
 and the builtins `property` and `staticmethod` that way.
 Name every other class `CapWords`.
 
-[PEP 8](https://www.python.org/dev/peps/pep-0008/#naming-conventions)
+[PEP 8](https://peps.python.org/pep-0008/#naming-conventions)
 covers style issues.
 Tools such as ruff point out violations and fix many of them automatically.
 
@@ -581,7 +639,7 @@ Tools such as ruff point out violations and fix many of them automatically.
 3.  In `fstrings.py`, add a line that formats `score` with two decimal places instead of zero,
     using `{score:.2f}` in place of `{score:.0f}%`,
     and a second line using the debug specifier, `f"{score = }"`.
-4.  `arithmetic.py` defines `total` and `bitwise.py` defines `flags`.
+4.  `augmented.py` defines `total` and `bitwise.py` defines `flags`.
     Rename them to `totalSum` and `flagBits`,
     then to `TOTAL_SUM` and `FLAG_BITS`.
     Every version runs.

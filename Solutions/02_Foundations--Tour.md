@@ -5,9 +5,9 @@
 ```python
 # exercise_1.py
 a = [1, 2, 3]
-b = a           # b is another name for the same list
+b = a  # b is another name for the same list
 b.append(4)
-c = a[:]        # A shallow copy: a new list, same values
+c = a[:]  # A shallow copy: a new list, same values
 c.append(99)
 print(a, c)
 #: [1, 2, 3, 4] [1, 2, 3, 4, 99]
@@ -73,18 +73,21 @@ And the all-uppercase versions:
 
 ```python
 # exercise_4_constants.py
-TOTAL_SUM = 5
-FLAG_BITS = 0b1010
+TOTAL_SUM = 0
+TOTAL_SUM += 5
+FLAG_BITS = 0b0010
+FLAG_BITS |= 0b1000
 print(TOTAL_SUM, bin(FLAG_BITS))
 #: 5 0b1010
 ```
 
 All three forms run, since Python does not enforce a naming convention
 at the language level. What differs is what a reader infers.
-`total_sum` and `flag_bits` say "an ordinary variable that changes,"
+`total` and `flags` say "an ordinary variable that changes,"
 which is what both of these are. `TOTAL_SUM` and `FLAG_BITS` say "a
-constant, fixed for the life of the program," so using that form for a
-running total misleads anyone who later tries to reuse the name.
+constant, fixed for the life of the program," and the second line of
+the listing changes one anyway. Neither Python nor the linter objects,
+so the name misleads every reader who trusts it.
 `totalSum` and `flagBits` say nothing about the value. They only say the
 author came from Java or JavaScript.
 
@@ -131,9 +134,9 @@ the single string `Alice scored 92%`, and nothing in that string records
 that `Alice` came from a variable and ` scored ` came from the source.
 A post-processor has only the characters, so it must guess
 which spans to quote by matching them against the values. The guess
-fails as soon as a literal happens to look like a value: with
+fails as soon as a literal looks like a value: with
 `name = "scored"`, the finished string reads `scored scored 92%`, and
-no rule can tell the first word from the second.
+nothing in it says which of the two words is the value.
 
 That failed guess is the argument for `Template` in one example.
 Quoting is a harmless demonstration, but the same reasoning covers

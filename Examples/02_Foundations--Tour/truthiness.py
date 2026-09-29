@@ -23,11 +23,3 @@ print(bool(Bucket(0)), bool(Bucket(3)))
 if not []:
     print("empty")  # An empty list is falsy
 #: empty
-
-# 'or' returns the first truthy operand
-name = "" or "default"
-print(name)
-#: default
-count = 0
-print(count or 10)  # 0 is falsy, so the fallback wins
-#: 10
