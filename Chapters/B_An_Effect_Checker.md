@@ -25,7 +25,7 @@ lists the constructs the rule does not cover.
 
 Name resolution covers more calls than you might expect.
 Of the roughly 6,600 calls in this book's chapter listings,
-nearly four in five resolve by name alone: a builtin, an imported name,
+nearly four in five resolve by name alone: a built-in, an imported name,
 or a function or class defined in the same file.
 The largest remaining group is a method called on a local variable with no annotation,
 and [From a Call to a Name](#from-a-call-to-a-name) recovers part of that group.
@@ -64,7 +64,7 @@ because the first two are wrong for `print()`.
 It writes to the console,
 and calling it `Unknown` puts `Unknown` in nearly every row.
 The declaration cannot go on the function.
-A builtin has no `__annotations__` and no `__dict__` in which to store one,
+A built-in has no `__annotations__` and no `__dict__` in which to store one,
 so `print.__annotations__ = {}` raises an `AttributeError`.
 The declarations therefore live in a table:
 
@@ -1169,7 +1169,7 @@ so each one appears in a row instead of going unreported:
 - An inherited method, because the checker reads no class hierarchy.
 
 A name bound in one of those ways is a variable of no known type,
-even when it matches the name of a builtin.
+even when it matches the name of a built-in.
 Both functions here perform `FileSystem`:
 
 ```python
