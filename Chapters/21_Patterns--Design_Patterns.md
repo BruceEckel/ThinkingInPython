@@ -63,11 +63,10 @@ so a caller that turns out to need an erased detail cannot work around the inter
 Someone must reopen the interface.
 The art of design lies in guessing well about which details you can hide and which you must expose.
 
-Erased details are also where scaling limits come from.
-Every abstraction discards something
-(a copy, an ordering, a lookup behind an attribute)
+Erased details are also the source of scaling limits.
+Every abstraction hides some work (a copy, a sort, a lookup behind an attribute)
 that costs nothing at the size you built it.
-A growing system eventually reaches the size where one discarded detail dominates,
+A growing system eventually reaches the size where one hidden cost dominates,
 and the layer that made the code simple now stands between you and the fix.
 This is one reason [Performance](18_Techniques--Performance.md)
 tells you to measure at a realistic size rather than trust a small trial.
@@ -277,14 +276,14 @@ not an implementation" says stop naming concrete classes.
 a class that holds a reference to an abstract class "refers to a *type* of object,
 not a concrete object."
 Read this way, the catalog is one idea applied twenty-three times.
-GoF's own discussion of the behavioral patterns ranks four of them by it:
+GoF's own discussion of the behavioral patterns compares four of them by their coupling:
 *Command*, *Observer*, *Mediator*,
 and *Chain of Responsibility* each decouple a sender from a receiver,
 "but with different trade-offs,"
 and *Observer* "defines a looser sender-receiver binding than *Command*."
 
-A diagram makes that measure visible.
-Once you can see coupling,
+A diagram makes coupling visible.
+Once you can see it,
 the patterns in the chapters ahead stop being twenty-three shapes to memorize,
 and become a few moves applied to one kind of diagram.
 
@@ -301,13 +300,13 @@ Each rung is something the dependent part knows.
 A subclass knows its parent's internals: which methods call which,
 the attributes' names, what a `super()` call expects to find.
 A change to any of that can reach the subclass,
-which is why *GoF Design Patterns* says inheritance "breaks encapsulation."
+which is why *GoF Design Patterns* repeats the saying that "inheritance breaks encapsulation."
 A caller that writes `Circle(2)` knows a name and a constructor signature,
-and a caller that writes `isinstance(s, Circle)` knows the name and reads its type.
+and a caller that writes `isinstance(s, Circle)` knows the name and tests an object's type against it.
 A caller written against an abstract base class knows a set of method names and signatures,
-and every class that joins that set says so in its own `class` line.
+and every class that implements them says so in its own `class` line.
 A caller written against a `Protocol` knows the same set of names,
-but nothing joins; the type checker matches shapes.
+but no class declares that it implements them; the type checker matches shapes.
 A caller that takes a `Callable` knows one signature.
 A caller that takes a value knows the value's type and nothing about who produced it.
 
@@ -315,16 +314,19 @@ The rung a dependence sits on decides how far a change travels.
 If you rename a method on a class that other code subclasses,
 the subclasses break.
 If you rename it on a class that other code reaches through a `Protocol`,
-the callers keep working while the protocol keeps its name,
-and when the protocol changes too,
-the type checker names each place that stopped matching.
+no caller's source changes, because each caller names the protocol's method.
+The renamed class stops matching the protocol,
+and the type checker reports each place that passes it to a caller.
 
 Two rungs come free in Python.
 An abstract base class is a class you write and every implementer inherits.
 A `Protocol` is a class you write and nothing inherits,
-and a `Callable` annotation is not a class at all.
-That is the mechanism behind [When a Pattern Dissolves](#when-a-pattern-dissolves):
-a pattern that exists to build the third rung in a language that has only the first two has nothing left to build in a language that supplies the fourth and fifth.
+and a `Callable` annotation is not a class.
+That is the mechanism behind [When a Pattern Dissolves](#when-a-pattern-dissolves).
+In a language that has only the first two rungs,
+a pattern exists to build the third.
+In a language that supplies the fourth and fifth,
+that pattern has nothing left to build.
 
 ### A Pattern Moves an Edge
 
@@ -362,7 +364,7 @@ The client sees the target interface,
 and the one class that knows the adaptee's real name is the adapter,
 so a change to the adaptee reaches one file.
 
-*Decorator* has no heavy edge at all.
+*Decorator*, like *Strategy*, has no heavy edge.
 A topping satisfies the component interface and also holds one,
 so it can wrap a pizza or another topping without naming either.
 
@@ -427,7 +429,7 @@ The edge a `Protocol` deletes is the one that in C++ or Java is mandatory:
 the implementer must name the interface.
 That edge makes an interface a thing on which every implementer depends,
 so that renaming it or moving it touches every file that names it.
-[Rethinking Objects](20_Patterns--Rethinking_Objects.md#protocols-generalize-composition-adapts)
+[Rethinking Objects](20_Patterns--Rethinking_Objects.md#protocols)
 makes the same point about types "in libraries you cannot edit,"
 and this is its general form: the fewer edges in source,
 the fewer files a change can reach.
@@ -511,7 +513,7 @@ and the rest are here for your own designs.
     The best route to generality is through understanding well-defined specific examples.
     This principle acts as the tie breaker between otherwise equally viable design alternatives.
     The simpler solution may also turn out to be the more general one.
-    [Pattern Refactoring](37_Patterns--Pattern_Refactoring.md#choosing-the-lightest-construct)
+    [Pattern Refactoring](37_Patterns--Pattern_Refactoring.md)
     works through a case of this, one requirement at a time.
 -   *Reflexivity*.
     One abstraction per class, one class per abstraction.
@@ -551,7 +553,7 @@ opens with a figure in the notation of [A Pattern Moves an Edge](#a-pattern-move
 drawn from that chapter's own listings, with one more edge:
 a solid edge with a hollow head is a subclass naming its parent,
 the top rung of the ladder.
-A note under each figure counts the heavy edges and says which way they point.
+In each figure, count the heavy edges and note which way they point.
 
 Part III closes with a [Pattern Catalog](39_Patterns--Pattern_Catalog.md),
 a name-and-intent index of the wider literature,
@@ -571,3 +573,9 @@ with a link to this book's coverage wherever it exists.
     Remove one class, one interface, or one level of inheritance,
     and say what stopped working.
     If nothing did, leave it out.
+4.  Write the `Report` design from [The Reach of a Change](#the-reach-of-a-change)
+    twice, with a PDF writer and an HTML writer:
+    once where `Report` names each writer class,
+    and once where `Report` names a `Writer` protocol.
+    Add a Markdown writer to both versions.
+    For each version, list the existing classes and functions you edited.

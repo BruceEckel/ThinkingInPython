@@ -1,9 +1,11 @@
 # Design Patterns: Solutions
 
-All three exercises ask about your own experience, so no answer here
-can be the answer. Each one works a single example through instead.
-The method is the transferable part: name the axis, subtract Python's
-share, then take away one more thing and see whether anything breaks.
+The first three exercises ask about your own experience, so no answer
+here can be the answer. Each one works a single example through
+instead. The method is the transferable part: name the axis, subtract
+Python's share, then take away one more thing and see whether anything
+breaks. The last one has an answer you can check against the chapter's
+figure.
 
 ## 1. Naming a vector of change
 
@@ -44,8 +46,8 @@ print(render(rows, "csv"))
 Nothing absorbs the change. Each new format means opening `render()`
 and adding a `case`, so the third request edits the same function the
 first two did. The `match` reads well and hides the cost, which is why
-this shape survives as long as it does: it is not wrong, it just makes
-you the one who changes.
+this shape survives as long as it does. It is not wrong, but every new
+format is an edit you make by hand.
 
 Naming the axis says what to do about it. If the format is what varies,
 the format has to become a value the program can hold, rather than a
@@ -183,21 +185,21 @@ print(checkout(6.0, Flat()), checkout(6.0, ByWeight()))
 #: 25.0 23.0
 ```
 
-Remove the abstract base and turn both subclasses into functions, and
-you have exercise 2's version. What stops working? Nothing. The
-numbers are identical, `ty` still rejects a wrongly-shaped argument,
+If you remove the abstract base and turn both subclasses into
+functions, you have exercise 2's version. What stops working? Nothing.
+The numbers are identical, `ty` still rejects a wrongly-shaped argument,
 and adding a third rule is still one new definition. Both classes
 carry a single method and no state, so the hierarchy is a container
 for functions that do not need containing. By the rule that a design
 is complete when you cannot take anything else away, the class version
 is not complete.
 
-Take away one more thing and the answer changes. Remove `checkout()`'s
-`shipping` parameter, inlining `5.0` where the call was, and the
-program still runs and still prints a number. What stops working is the
-requirement: there is now no way to charge by weight without editing
-`checkout()`. That is the floor, the point where subtraction stops.
-The parameter is the last piece that carries the design's actual
+Taking away one more thing changes the answer. If you remove
+`checkout()`'s `shipping` parameter, inlining `5.0` where the call was,
+the program still runs and still prints a number. What stops working is
+the requirement: there is now no way to charge by weight without
+editing `checkout()`. That is the floor, the point where subtraction
+stops. The parameter is the last piece that carries the design's
 intent, so removing it removes the design rather than its scaffolding.
 
 Both outcomes are the exercise working correctly. Subtraction is a test
@@ -205,3 +207,128 @@ you run rather than a direction you push in: take something away, run
 the program, and read the result. Nothing broke means the piece was
 scaffolding. Something broke means you found the floor, and the thing
 you removed is worth keeping and worth naming.
+
+## 4. Measuring the reach of a change
+
+The first version gives each writer its own method name, which is the
+usual reason a class like `Report` ends up naming every writer: it
+has to know which method to call on which class.
+
+```python
+# exercise_4a.py
+from record import record
+
+class PdfWriter:
+    def pdf(self, text: str) -> str:
+        return f"%PDF {text}"
+
+class HtmlWriter:
+    def html(self, text: str) -> str:
+        return f"<p>{text}</p>"
+
+class MdWriter:
+    def markdown(self, text: str) -> str:
+        return f"**{text}**"
+
+type AnyWriter = PdfWriter | HtmlWriter | MdWriter
+
+@record
+class Report:
+    text: str
+
+    def render(self, writer: AnyWriter) -> str:
+        match writer:
+            case PdfWriter():
+                return writer.pdf(self.text)
+            case HtmlWriter():
+                return writer.html(self.text)
+            case MdWriter():
+                return writer.markdown(self.text)
+
+def main(kind: str) -> None:
+    writer: AnyWriter
+    match kind:
+        case "pdf":
+            writer = PdfWriter()
+        case "html":
+            writer = HtmlWriter()
+        case "md":
+            writer = MdWriter()
+        case _:
+            raise ValueError(f"unknown kind {kind!r}")
+    print(Report("Q3 sales").render(writer))
+
+main("pdf")
+#: %PDF Q3 sales
+main("md")
+#: **Q3 sales**
+```
+
+`MdWriter` is new code, so it does not count. Its arrival edits three
+existing things: the `AnyWriter` alias gains a member, `Report.render()`
+gains a `case`, and `main()` gains a `case`. The alias and `render()`
+both belong to `Report`, so the change reaches two parts, `Report` and
+`main`, as the left half of the chapter's figure shows.
+
+The second version gives every writer the same method and lets
+`Report` name that method through a protocol:
+
+```python
+# exercise_4b.py
+from typing import Protocol
+from record import record
+
+class Writer(Protocol):
+    def write(self, text: str) -> str: ...
+
+class PdfWriter:
+    def write(self, text: str) -> str:
+        return f"%PDF {text}"
+
+class HtmlWriter:
+    def write(self, text: str) -> str:
+        return f"<p>{text}</p>"
+
+class MdWriter:
+    def write(self, text: str) -> str:
+        return f"**{text}**"
+
+@record
+class Report:
+    text: str
+
+    def render(self, writer: Writer) -> str:
+        return writer.write(self.text)
+
+def main(kind: str) -> None:
+    writer: Writer
+    match kind:
+        case "pdf":
+            writer = PdfWriter()
+        case "html":
+            writer = HtmlWriter()
+        case "md":
+            writer = MdWriter()
+        case _:
+            raise ValueError(f"unknown kind {kind!r}")
+    print(Report("Q3 sales").render(writer))
+
+main("pdf")
+#: %PDF Q3 sales
+main("md")
+#: **Q3 sales**
+```
+
+Here `MdWriter` edits one existing thing, the `case` that `main()`
+gains. `Report` and `Writer` keep their source, and no writer names
+`Writer`: the type checker matches each class to the protocol when
+`main()` assigns it to `writer`.
+
+The count is the answer, three edits in two parts against one edit in
+one part, but the places matter more than the number. In the first
+version a new format sends you into `Report`, a class whose subject is
+the report's content. In the second, the one edit sits in `main()`,
+the part whose job is to assemble the pieces. The `match` in `main()`
+is the heavy edge that remains, and a registry
+([Self Registration](../Chapters/27_Patterns--Factory.md#self-registration))
+moves it out of `main()` as well.
