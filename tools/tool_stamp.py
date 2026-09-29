@@ -44,14 +44,24 @@ concurrently, so an offline machine waits one timeout and reads
 "latest unknown". `--nag`, which `gate` runs, reads the stamp alone,
 since a gate must not reach the network.
 
+With `--offer`, which `tip tools-status` passes, a report that finds
+anything behind asks whether to run `tip tools-upgrade`. It asks only
+a person at a terminal (stdin and stdout both a TTY, and no `CI`), so
+a captured run, `tip verify-targets`, or an agent's shell never sees
+the question, and the upgrade, which rewrites uv.lock, never starts
+unattended. Anything but "y" or "yes" declines.
+
 Usage:
     python -m tools.tool_stamp --write   # record an upgrade
     python -m tools.tool_stamp           # report, with PyPI's latest
+    python -m tools.tool_stamp --offer   # the same, offering an upgrade
     python -m tools.tool_stamp --nag     # report only when stale
 """
 
 import argparse
 import json
+import os
+import sys
 from datetime import datetime
 from typing import Any
 
@@ -75,6 +85,11 @@ VERSIONED: tuple[tuple[str, list[str]], ...] = (
 # The dev tools whose versions uv.lock pins, compared with PyPI in the
 # full report. uv itself is not in the lock; `uv_version()` asks it.
 LOCKED_TOOLS: tuple[str, ...] = ("ty", "ruff", "pytest", "pyright")
+
+# The exit status of `--offer` when the person accepts the upgrade.
+# The tools-status task catches it and runs tools-upgrade in the same
+# `tip` run, so the upgrade's steps are timed and echoed like any other.
+UPGRADE_REQUESTED = 10
 
 
 def versions() -> dict[str, str]:
@@ -148,8 +163,11 @@ def package_lines(found: list[tuple[str, str, str | None]],
     return lines
 
 
-def upgrade_report(stamped: dict[str, str]) -> None:
-    """Compare uv, the locked tools, and the libraries with PyPI."""
+def upgrade_report(stamped: dict[str, str]) -> set[str]:
+    """Compare uv, the locked tools, and the libraries with PyPI.
+
+    Returns the names of the packages that are behind.
+    """
     installed: dict[str, str] = {}
     if uv := uv_version():
         installed["uv"] = uv
@@ -157,7 +175,7 @@ def upgrade_report(stamped: dict[str, str]) -> None:
     libraries = set(libs_check.current())
     installed |= libs_check.current()
     if not installed:
-        return
+        return set()
     found = libs_check.rows(installed)
     print("installed, against the latest on PyPI:")
     print("\n".join(package_lines(found, stamped)))
@@ -169,10 +187,33 @@ def upgrade_report(stamped: dict[str, str]) -> None:
     if behind & libraries:
         print("To upgrade one library alone: "
               "`uv lock --upgrade-package NAME`, `uv sync`, `tip sweep`.")
+    return behind
 
 
-def report(*, nag_only: bool, days: int) -> int:
-    """Always succeeds: this answers a question, it does not gate anything."""
+def interactive() -> bool:
+    """True when a person is at the terminal: never in CI or a pipe."""
+    return (not os.environ.get("CI")
+            and sys.stdin.isatty() and sys.stdout.isatty())
+
+
+def wants_upgrade() -> bool:
+    """Ask whether to run tools-upgrade now; anything but yes is no."""
+    try:
+        answer = input("Run `tip tools-upgrade` now? It rewrites uv.lock "
+                       "and ends with `tip sweep`. [y/N] ")
+    except EOFError:
+        return False
+    return answer.strip().lower() in {"y", "yes"}
+
+
+def report(*, nag_only: bool, days: int, offer: bool = False) -> int:
+    """Succeeds unless an offered upgrade is accepted.
+
+    This answers a question and gates nothing, so it exits 0, except
+    that with `offer`, a person at the terminal who accepts the upgrade
+    gets UPGRADE_REQUESTED, which the tools-status task turns into a
+    run of tools-upgrade.
+    """
     found = last_upgrade()
     if found is None:
         if not nag_only:
@@ -186,11 +227,14 @@ def report(*, nag_only: bool, days: int) -> int:
 
     dated = "" if source == "tools-upgrade" else f", dated from {source}"
     print(f"tools last upgraded {ago(when)} ({when:%Y-%m-%d}){dated}")
+    behind: set[str] = set()
     if not nag_only:
-        upgrade_report(read_stamp().get("libraries", {}))
+        behind = upgrade_report(read_stamp().get("libraries", {}))
     if stale:
         print(f"That is over {days} days. Consider `tip tools-upgrade`, "
               "then `tip sweep` to see what moved.")
+    if offer and behind and interactive() and wants_upgrade():
+        return UPGRADE_REQUESTED
     return 0
 
 
@@ -200,13 +244,17 @@ def main(argv: list[str] | None = None) -> int:
                     help="record an upgrade as happening now")
     ap.add_argument("--nag", action="store_true",
                     help="print only when the stamp is stale")
+    ap.add_argument("--offer", action="store_true",
+                    help="ask a person at the terminal whether to "
+                         f"upgrade; yes exits {UPGRADE_REQUESTED}")
     ap.add_argument("--days", type=int, default=STALE_AFTER_DAYS,
                     help=f"days before stale (default {STALE_AFTER_DAYS})")
     args = ap.parse_args(argv)
     if args.write:
         write()
         return 0
-    return report(nag_only=args.nag, days=args.days)
+    return report(nag_only=args.nag, days=args.days,
+                  offer=args.offer and not args.nag)
 
 
 if __name__ == "__main__":

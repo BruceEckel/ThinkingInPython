@@ -29,7 +29,9 @@ import shutil
 
 from tools.config import ROOT
 from tools.skip_stamps import FULL_ENV
-from tools.tip import Vars, also, invoke, py, run, section, task, tool
+from tools.tip import (
+    StepFailed, Vars, also, invoke, py, run, section, task, tool)
+from tools.tool_stamp import UPGRADE_REQUESTED
 
 # The Markdown checks the gate enforces, run together by check_all.py in one
 # process with one parse per file, rather than as separate scripts. Names
@@ -1320,9 +1322,16 @@ def tools_status(v: Vars) -> None:
     it and prints one line (nothing more, never a failure, and no
     network) once it is older than tool_stamp.py's threshold. With no
     stamp yet, uv.lock's mtime stands in, so a fresh clone is correctly
-    treated as current.
+    treated as current. When something is behind and a person is at the
+    terminal, it asks whether to run `tools-upgrade`, and a yes runs it
+    here; a captured or CI run is never asked.
     """
-    py("tools.tool_stamp")
+    try:
+        py("tools.tool_stamp", "--offer")
+    except StepFailed as failed:
+        if failed.code != UPGRADE_REQUESTED:
+            raise
+        invoke("tools-upgrade", v)
 
 
 @task("Update uv, the uv-managed dev tools, and (best-effort) global "

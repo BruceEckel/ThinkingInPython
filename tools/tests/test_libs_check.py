@@ -11,7 +11,8 @@ import urllib.error
 
 import pytest
 
-from tools import libs_check, tool_stamp
+from tools import libs_check, tasks, tool_stamp
+from tools.tip import StepFailed, Vars
 
 LOCK = '''
 version = 1
@@ -97,3 +98,75 @@ def test_upgrade_report_names_the_fix_for_each_kind_behind(
     assert "ruff           0.16.8    latest 0.16.8\n" in out
     assert "`tip tools-upgrade`" in out
     assert "--upgrade-package" in out
+
+
+def stub_report(monkeypatch: pytest.MonkeyPatch, *, behind: bool,
+                tty: bool, answer: str) -> list[str]:
+    """Stub the stamp, PyPI, the terminal, and the reply to the offer."""
+    asked: list[str] = []
+    monkeypatch.setattr(tool_stamp, "read_stamp", lambda: {})
+    monkeypatch.setattr(
+        tool_stamp, "last_upgrade",
+        lambda: (tool_stamp.datetime.now(), {}, "tools-upgrade"))
+    monkeypatch.setattr(
+        tool_stamp, "upgrade_report",
+        lambda stamped: {"ty"} if behind else set())
+    monkeypatch.setattr(tool_stamp, "interactive", lambda: tty)
+
+    def reply(prompt: str) -> str:
+        asked.append(prompt)
+        return answer
+    monkeypatch.setattr("builtins.input", reply)
+    return asked
+
+
+@pytest.mark.parametrize(("behind", "tty", "answer", "status", "asks"), [
+    (True, True, "y", tool_stamp.UPGRADE_REQUESTED, True),
+    (True, True, "", 0, True),
+    (True, False, "y", 0, False),
+    (False, True, "y", 0, False),
+])
+def test_offer_asks_only_a_person_and_only_when_behind(
+        monkeypatch: pytest.MonkeyPatch, behind: bool, tty: bool,
+        answer: str, status: int, asks: bool) -> None:
+    asked = stub_report(monkeypatch, behind=behind, tty=tty, answer=answer)
+    assert tool_stamp.report(
+        nag_only=False, days=14, offer=True) == status
+    assert bool(asked) == asks
+
+
+def test_no_offer_without_the_flag(monkeypatch: pytest.MonkeyPatch) -> None:
+    asked = stub_report(monkeypatch, behind=True, tty=True, answer="y")
+    assert tool_stamp.report(nag_only=False, days=14) == 0
+    assert not asked
+
+
+def test_interactive_is_false_in_ci(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("CI", "1")
+    assert not tool_stamp.interactive()
+
+
+@pytest.mark.parametrize(("code", "upgrades"), [
+    (tool_stamp.UPGRADE_REQUESTED, True), (None, False)])
+def test_tools_status_task_runs_the_upgrade_only_on_yes(
+        monkeypatch: pytest.MonkeyPatch, code: int | None,
+        upgrades: bool) -> None:
+    ran: list[str] = []
+
+    def step(module: str, *args: str) -> None:
+        assert args == ("--offer",)
+        if code is not None:
+            raise StepFailed(code)
+    monkeypatch.setattr(tasks, "py", step)
+    monkeypatch.setattr(tasks, "invoke", lambda name, v: ran.append(name))
+    tasks.tools_status(Vars())
+    assert ran == (["tools-upgrade"] if upgrades else [])
+
+
+def test_tools_status_task_passes_other_failures_on(
+        monkeypatch: pytest.MonkeyPatch) -> None:
+    def step(module: str, *args: str) -> None:
+        raise StepFailed(1)
+    monkeypatch.setattr(tasks, "py", step)
+    with pytest.raises(StepFailed):
+        tasks.tools_status(Vars())

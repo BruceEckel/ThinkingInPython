@@ -393,6 +393,9 @@ reminder for the author; nothing should act on it automatically.
 Run by hand, `tip tools-status` also compares uv, the locked tools, and
 the listings' libraries with the latest release on PyPI and marks each
 one that is behind; the gate's one line never reaches the network.
+When something is behind, it asks whether to run `tip tools-upgrade`,
+but only a person at a terminal: a captured, piped, or CI run is never
+asked, so nothing starts the upgrade unattended.
 
 ## check_tools.py
 
