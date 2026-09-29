@@ -72,16 +72,9 @@ The declarations therefore live in a table:
 # effect_table.py
 from fnmatch import fnmatchcase
 from typing import Final
-from effect_names import (
-    Clock,
-    Console,
-    Environment,
-    FileSystem,
-    Network,
-    Process,
-    Random,
-    Unknown,
-)
+from effect_names import (Clock, Console, Environment,
+                          FileSystem, Network, Process,
+                          Random, Unknown)
 
 type Row = frozenset[str]
 type Table = dict[str, Row]

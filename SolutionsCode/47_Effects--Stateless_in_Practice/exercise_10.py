@@ -1,15 +1,7 @@
 # exercise_10.py
 from dataclasses import dataclass
-from stateless import (
-    Effect,
-    Need,
-    catch,
-    need,
-    run,
-    supply,
-    throw,
-    throws,
-)
+from stateless import (Effect, Need, catch, need, run,
+                       supply, throw, throws)
 
 class Unavailable(Exception):
     pass

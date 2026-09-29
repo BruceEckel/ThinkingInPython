@@ -298,14 +298,8 @@ because its row is an ordinary type:
 # effect_variable.py
 from collections.abc import Callable
 from typing import Any
-from stateless import (
-    Ability,
-    Depend,
-    Need,
-    need,
-    run,
-    supply,
-)
+from stateless import (Ability, Depend, Need, need, run,
+                       supply)
 
 class Console:
     def print(self, message: str) -> None:

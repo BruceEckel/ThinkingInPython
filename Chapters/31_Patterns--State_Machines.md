@@ -782,14 +782,9 @@ and the error when no transition matches:
 # tabledriven/test_vending.py
 import pytest
 from table_machine import NoTransition
-from vending_machine import (
-    FirstDigit,
-    Money,
-    Quit,
-    SecondDigit,
-    State,
-    VendingMachine,
-)
+from vending_machine import (FirstDigit, Money, Quit,
+                             SecondDigit, State,
+                             VendingMachine)
 
 def feed(vm: VendingMachine, *events: object) -> None:
     for event in events:
@@ -860,13 +855,8 @@ Because this listing requires user interaction, the harness skips it
 import tkinter as tk
 from functools import partial
 from table_machine import NoTransition
-from vending_machine import (
-    FirstDigit,
-    Money,
-    Quit,
-    SecondDigit,
-    VendingMachine,
-)
+from vending_machine import (FirstDigit, Money, Quit,
+                             SecondDigit, VendingMachine)
 
 def show() -> None:
     vm = VendingMachine()

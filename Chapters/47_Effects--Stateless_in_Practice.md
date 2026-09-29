@@ -534,17 +534,8 @@ Here is the consumer and the handler that feeds it:
 # microgrid.py
 from collections.abc import Callable, Iterator
 from contextlib import contextmanager
-from power import (
-    Backup,
-    Battery,
-    Drained,
-    Grid,
-    Outlet,
-    Solar,
-    Source,
-    draw,
-    plug,
-)
+from power import (Backup, Battery, Drained, Grid, Outlet,
+                   Solar, Source, draw, plug)
 from stateless import Depend, catch, handle, run
 
 class Blackout(Exception):
@@ -901,14 +892,8 @@ Now supply `research()`'s environment:
 # scenarios.py
 from dataclasses import dataclass
 from typing import Final, assert_never
-from research import (
-    Encyclopedia,
-    Feed,
-    NoArticle,
-    NotInteresting,
-    Unavailable,
-    research,
-)
+from research import (Encyclopedia, Feed, NoArticle,
+                      NotInteresting, Unavailable, research)
 from stateless import Depend, Need, catch, run, supply
 
 @dataclass
@@ -1024,14 +1009,8 @@ Here is the same pipeline with the failures handled where they arise:
 
 ```python
 # research_by_hand.py
-from research import (
-    TOPICS,
-    Encyclopedia,
-    Feed,
-    NoArticle,
-    NotInteresting,
-    Unavailable,
-)
+from research import (TOPICS, Encyclopedia, Feed, NoArticle,
+                      NotInteresting, Unavailable)
 
 def topic_of(headline: str) -> str:
     for candidate in TOPICS:
@@ -1168,14 +1147,8 @@ A failure that enters through `throw()` is in the type system from the moment it
 ```python
 # catch_everything.py
 from dataclasses import dataclass
-from research import (
-    Encyclopedia,
-    Feed,
-    NoArticle,
-    NotInteresting,
-    Unavailable,
-    research,
-)
+from research import (Encyclopedia, Feed, NoArticle,
+                      NotInteresting, Unavailable, research)
 from stateless import run, supply
 from stateless.effect import catch_all
 
@@ -1462,13 +1435,8 @@ and the engine names no class:
 ```python
 # two_games.py
 from dataclasses import dataclass, field
-from casts import (
-    Kitty,
-    Weapon,
-    kitties_and_puzzles,
-    play,
-    warriors_and_weapons,
-)
+from casts import (Kitty, Weapon, kitties_and_puzzles, play,
+                   warriors_and_weapons)
 
 class Loud:
     def say(self, line: str) -> None: print(line)

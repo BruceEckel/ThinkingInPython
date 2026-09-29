@@ -1,13 +1,7 @@
 # catch_everything.py
 from dataclasses import dataclass
-from research import (
-    Encyclopedia,
-    Feed,
-    NoArticle,
-    NotInteresting,
-    Unavailable,
-    research,
-)
+from research import (Encyclopedia, Feed, NoArticle,
+                      NotInteresting, Unavailable, research)
 from stateless import run, supply
 from stateless.effect import catch_all
 

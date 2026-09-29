@@ -1,12 +1,7 @@
 # exercise_11.py
 from dataclasses import dataclass
-from research import (
-    Encyclopedia,
-    Feed,
-    NoArticle,
-    NotInteresting,
-    Unavailable,
-)
+from research import (Encyclopedia, Feed, NoArticle,
+                      NotInteresting, Unavailable)
 from research_long import TooLong, research
 from stateless import run, supply
 from stateless.effect import catch_all

@@ -1,14 +1,8 @@
 # scenarios.py
 from dataclasses import dataclass
 from typing import Final, assert_never
-from research import (
-    Encyclopedia,
-    Feed,
-    NoArticle,
-    NotInteresting,
-    Unavailable,
-    research,
-)
+from research import (Encyclopedia, Feed, NoArticle,
+                      NotInteresting, Unavailable, research)
 from stateless import Depend, Need, catch, run, supply
 
 @dataclass

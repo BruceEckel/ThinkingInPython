@@ -1,17 +1,8 @@
 # microgrid.py
 from collections.abc import Callable, Iterator
 from contextlib import contextmanager
-from power import (
-    Backup,
-    Battery,
-    Drained,
-    Grid,
-    Outlet,
-    Solar,
-    Source,
-    draw,
-    plug,
-)
+from power import (Backup, Battery, Drained, Grid, Outlet,
+                   Solar, Source, draw, plug)
 from stateless import Depend, catch, handle, run
 
 class Blackout(Exception):

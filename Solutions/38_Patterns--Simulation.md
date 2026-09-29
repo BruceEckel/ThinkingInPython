@@ -598,16 +598,8 @@ the factory's search and silently substitutes a different `Item`.
 from collections import deque
 from collections.abc import Callable
 from typing import Final
-from robot_world import (
-    Edge,
-    EndGame,
-    Food,
-    GameBuilder,
-    Room,
-    Teleport,
-    Urge,
-    Wall,
-)
+from robot_world import (Edge, EndGame, Food, GameBuilder,
+                         Room, Teleport, Urge, Wall)
 
 MOVES: Final[dict[Urge, str]] = {
     Urge.NORTH: "n", Urge.SOUTH: "s",

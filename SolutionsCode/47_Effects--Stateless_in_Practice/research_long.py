@@ -1,15 +1,8 @@
 # research_long.py
 from typing import Final
-from research import (
-    Encyclopedia,
-    Feed,
-    NoArticle,
-    NotInteresting,
-    Unavailable,
-    fetch,
-    look_up,
-    topic_of,
-)
+from research import (Encyclopedia, Feed, NoArticle,
+                      NotInteresting, Unavailable, fetch,
+                      look_up, topic_of)
 from stateless import Effect, Need, need, throws
 
 class TooLong(Exception):

@@ -292,15 +292,8 @@ Plastic:40
 from collections import defaultdict
 from typing import ClassVar
 from parse_trash import parse
-from trash import (
-    Aluminum,
-    Bins,
-    Cardboard,
-    Glass,
-    Paper,
-    Trash,
-    sum_value,
-)
+from trash import (Aluminum, Bins, Cardboard, Glass, Paper,
+                   Trash, sum_value)
 
 class Plastic(Trash):
     value: ClassVar[float] = 0.15

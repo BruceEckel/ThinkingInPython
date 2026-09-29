@@ -1,15 +1,7 @@
 # exercise_3.py
 from exceptions import expect
-from grid import (
-    Backup,
-    Battery,
-    Blackout,
-    Grid,
-    Solar,
-    Turbine,
-    controller,
-    run_load,
-)
+from grid import (Backup, Battery, Blackout, Grid, Solar,
+                  Turbine, controller, run_load)
 from stateless import handle, run
 
 full = controller((Solar(), Turbine(range(19, 22)),

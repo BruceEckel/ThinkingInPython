@@ -1,10 +1,7 @@
 # dunder_modes.py
 from dataclasses import dataclass
-from display import (
-    INTERESTING_DUNDERS,
-    REDEFINED_DUNDERS,
-    display_object,
-)
+from display import (INTERESTING_DUNDERS, REDEFINED_DUNDERS,
+                     display_object)
 
 class Plain:
     pass

@@ -1,13 +1,7 @@
 # report.py
 from typing import assert_never
-from research import (
-    Encyclopedia,
-    Feed,
-    NoArticle,
-    NotInteresting,
-    Unavailable,
-    research,
-)
+from research import (Encyclopedia, Feed, NoArticle,
+                      NotInteresting, Unavailable, research)
 from stateless import Depend, Need, catch
 
 def report() -> Depend[

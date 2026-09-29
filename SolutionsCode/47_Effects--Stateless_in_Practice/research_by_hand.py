@@ -1,13 +1,7 @@
 # research_by_hand.py
 from feeds import Library, Wire
-from research import (
-    TOPICS,
-    Encyclopedia,
-    Feed,
-    NoArticle,
-    NotInteresting,
-    Unavailable,
-)
+from research import (TOPICS, Encyclopedia, Feed, NoArticle,
+                      NotInteresting, Unavailable)
 from research_long import LIMIT, TooLong
 
 def topic_of(headline: str) -> str:

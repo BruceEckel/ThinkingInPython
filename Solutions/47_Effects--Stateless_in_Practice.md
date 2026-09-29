@@ -288,16 +288,8 @@ depleting nothing, since wind costs no fuel.
 ```python
 # exercise_3.py
 from exceptions import expect
-from grid import (
-    Backup,
-    Battery,
-    Blackout,
-    Grid,
-    Solar,
-    Turbine,
-    controller,
-    run_load,
-)
+from grid import (Backup, Battery, Blackout, Grid, Solar,
+                  Turbine, controller, run_load)
 from stateless import handle, run
 
 full = controller((Solar(), Turbine(range(19, 22)),
@@ -507,14 +499,8 @@ LONG: Final[Library] = Library({"genome": "chapter " * 40})
 ```python
 # report.py
 from typing import assert_never
-from research import (
-    Encyclopedia,
-    Feed,
-    NoArticle,
-    NotInteresting,
-    Unavailable,
-    research,
-)
+from research import (Encyclopedia, Feed, NoArticle,
+                      NotInteresting, Unavailable, research)
 from stateless import Depend, Need, catch
 
 def report() -> Depend[
@@ -541,16 +527,9 @@ def report() -> Depend[
 ```python
 # research_long.py
 from typing import Final
-from research import (
-    Encyclopedia,
-    Feed,
-    NoArticle,
-    NotInteresting,
-    Unavailable,
-    fetch,
-    look_up,
-    topic_of,
-)
+from research import (Encyclopedia, Feed, NoArticle,
+                      NotInteresting, Unavailable, fetch,
+                      look_up, topic_of)
 from stateless import Effect, Need, need, throws
 
 class TooLong(Exception):
@@ -601,14 +580,8 @@ The by-hand version takes a comparable edit and reports none of it:
 ```python
 # research_by_hand.py
 from feeds import Library, Wire
-from research import (
-    TOPICS,
-    Encyclopedia,
-    Feed,
-    NoArticle,
-    NotInteresting,
-    Unavailable,
-)
+from research import (TOPICS, Encyclopedia, Feed, NoArticle,
+                      NotInteresting, Unavailable)
 from research_long import LIMIT, TooLong
 
 def topic_of(headline: str) -> str:
@@ -925,16 +898,8 @@ Both are worth having, and each one's blind spot is the other's subject.
 ```python
 # exercise_10.py
 from dataclasses import dataclass
-from stateless import (
-    Effect,
-    Need,
-    catch,
-    need,
-    run,
-    supply,
-    throw,
-    throws,
-)
+from stateless import (Effect, Need, catch, need, run,
+                       supply, throw, throws)
 
 class Unavailable(Exception):
     pass
@@ -1013,13 +978,8 @@ ordinary code that raises exceptions, such as `latest()`.
 ```python
 # exercise_11.py
 from dataclasses import dataclass
-from research import (
-    Encyclopedia,
-    Feed,
-    NoArticle,
-    NotInteresting,
-    Unavailable,
-)
+from research import (Encyclopedia, Feed, NoArticle,
+                      NotInteresting, Unavailable)
 from research_long import TooLong, research
 from stateless import run, supply
 from stateless.effect import catch_all

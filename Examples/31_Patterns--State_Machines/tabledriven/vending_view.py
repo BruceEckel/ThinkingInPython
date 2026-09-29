@@ -2,13 +2,8 @@
 import tkinter as tk
 from functools import partial
 from table_machine import NoTransition
-from vending_machine import (
-    FirstDigit,
-    Money,
-    Quit,
-    SecondDigit,
-    VendingMachine,
-)
+from vending_machine import (FirstDigit, Money, Quit,
+                             SecondDigit, VendingMachine)
 
 def show() -> None:
     vm = VendingMachine()

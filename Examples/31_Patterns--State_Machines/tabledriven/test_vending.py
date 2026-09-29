@@ -1,14 +1,9 @@
 # tabledriven/test_vending.py
 import pytest
 from table_machine import NoTransition
-from vending_machine import (
-    FirstDigit,
-    Money,
-    Quit,
-    SecondDigit,
-    State,
-    VendingMachine,
-)
+from vending_machine import (FirstDigit, Money, Quit,
+                             SecondDigit, State,
+                             VendingMachine)
 
 def feed(vm: VendingMachine, *events: object) -> None:
     for event in events:

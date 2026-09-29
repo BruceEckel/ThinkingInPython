@@ -1,12 +1,7 @@
 # two_games.py
 from dataclasses import dataclass, field
-from casts import (
-    Kitty,
-    Weapon,
-    kitties_and_puzzles,
-    play,
-    warriors_and_weapons,
-)
+from casts import (Kitty, Weapon, kitties_and_puzzles, play,
+                   warriors_and_weapons)
 
 class Loud:
     def say(self, line: str) -> None: print(line)

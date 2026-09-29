@@ -1,12 +1,6 @@
 # research_by_hand.py
-from research import (
-    TOPICS,
-    Encyclopedia,
-    Feed,
-    NoArticle,
-    NotInteresting,
-    Unavailable,
-)
+from research import (TOPICS, Encyclopedia, Feed, NoArticle,
+                      NotInteresting, Unavailable)
 
 def topic_of(headline: str) -> str:
     for candidate in TOPICS:

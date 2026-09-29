@@ -336,14 +336,9 @@ and a subclass that resolves to its nearest registered ancestor:
 ```python
 # test_visitor.py
 import pytest
-from visitor_singledispatch import (
-    Chrysanthemum,
-    Flower,
-    Gladiolus,
-    Ranunculus,
-    fragrance,
-    nectar,
-)
+from visitor_singledispatch import (Chrysanthemum, Flower,
+                                    Gladiolus, Ranunculus,
+                                    fragrance, nectar)
 
 @pytest.mark.parametrize("flower, expected", [
     (Gladiolus(), "Gladiolus: abundant nectar"),
