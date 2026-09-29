@@ -1,10 +1,11 @@
 # exercise_3.py
 from collections.abc import Sequence
+from dataclasses import dataclass
 
+@dataclass
 class Box:
-    def __init__(self, data: list[object]) -> None:
-        self.data = data
-        self.owners = 1
+    data: list[object]
+    owners: int = 1
 
 class CowList:
     def __init__(self, data: Sequence[object] | None = None,

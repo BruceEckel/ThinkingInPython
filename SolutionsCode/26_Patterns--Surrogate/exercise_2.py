@@ -22,10 +22,10 @@ class CountingProxy:
 
 p = CountingProxy(Implementation())
 p.f()
+#: f()
 p.g()
-p.f()
-print(p.calls["f"], p.calls["g"])
-#: f()
 #: g()
+p.f()
 #: f()
+print(p.calls["f"], p.calls["g"])
 #: 2 1

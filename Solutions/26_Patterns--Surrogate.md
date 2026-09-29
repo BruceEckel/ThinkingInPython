@@ -6,19 +6,18 @@
 # exercise_1.py
 from typing import Any
 
-class ExpensiveResource:
+class Expensive:
     def __init__(self) -> None:
-        print("creating ExpensiveResource (slow!)")
-        self.data = [1, 2, 3]
+        print("Expensive built")
 
-    def query(self) -> list[int]:
-        return self.data
+    def query(self) -> str:
+        return "result"
 
-class LazyProxy:
+class Lazy:
     def __init__(self, description: str) -> None:
         self._description = description
         self._answered = 0
-        self._real: ExpensiveResource | None = None
+        self._real: Expensive | None = None
 
     @property
     def description(self) -> str:
@@ -28,21 +27,21 @@ class LazyProxy:
     def __getattr__(self, name: str) -> Any:
         if self._real is None:
             print(f"{self._answered} answered before build")
-            self._real = ExpensiveResource()
+            self._real = Expensive()
         return getattr(self._real, name)
 
-p = LazyProxy("three small integers")
+p = Lazy("a slow query")
 for _ in range(3):
     print(p.description)
-#: three small integers
-#: three small integers
-#: three small integers
+#: a slow query
+#: a slow query
+#: a slow query
 print(p.query())
 #: 3 answered before build
-#: creating ExpensiveResource (slow!)
-#: [1, 2, 3]
+#: Expensive built
+#: result
 print(p.query())
-#: [1, 2, 3]
+#: result
 ```
 
 `description` is a property on the proxy, so Python finds it without
@@ -83,12 +82,12 @@ class CountingProxy:
 
 p = CountingProxy(Implementation())
 p.f()
+#: f()
 p.g()
-p.f()
-print(p.calls["f"], p.calls["g"])
-#: f()
 #: g()
+p.f()
 #: f()
+print(p.calls["f"], p.calls["g"])
 #: 2 1
 ```
 
@@ -103,11 +102,12 @@ forwarding. The single `calls` integer becomes a `Counter`. The final
 ```python
 # exercise_3.py
 from collections.abc import Sequence
+from dataclasses import dataclass
 
+@dataclass
 class Box:
-    def __init__(self, data: list[object]) -> None:
-        self.data = data
-        self.owners = 1
+    data: list[object]
+    owners: int = 1
 
 class CowList:
     def __init__(self, data: Sequence[object] | None = None,
@@ -153,8 +153,8 @@ detaches `b` into its own private `Box` holding a fresh copy of the
 data, decrements the shared `Box`'s count (since `b` is no longer one
 of its owners), then appends to that private copy. Since no one called
 `a.append()`, `a` still points at the original, untouched `Box`. The
-copy waits for a write and falls only on the list that writes, exactly
-what "copy-on-write" means.
+copy happens at the first write, and only the list that writes pays
+for it.
 
 ## 4. Why the typo reports as `RecursionError`
 
@@ -207,6 +207,7 @@ its first attribute access.
 ```python
 # exercise_5.py
 from typing import Any, Final, Self
+from exceptions import expect
 
 POOL_SIZE: Final[int] = 2
 
@@ -261,18 +262,21 @@ with pool.acquire() as c1:
     print(c1.query("select 1"))
     with pool.acquire() as c2:
         print(c2.query("select 2"))
-        try:
-            pool.acquire()
-        except PoolExhausted as e:
-            print(type(e).__name__, e, pool.available())
+        print("free:", pool.available())
+        expect(PoolExhausted, pool.acquire)
     print("inner released:", pool.available())
 print("outer released:", pool.available())
 #: connection 0: select 1
 #: connection 1: select 2
-#: PoolExhausted all 2 in use 0
+#: free: 0
+#: [PoolExhausted] all 2 in use
 #: inner released: 1
 #: outer released: 2
 ```
+
+`Pool` builds every `Connection` in its constructor, and nothing else
+creates one. That is *Singleton*'s control over creation, with the
+limit raised from one object to `POOL_SIZE`.
 
 The client never holds a `Connection`. `acquire()` hands back a
 `ConnectionProxy`, which forwards `query()` through `__getattr__()`
@@ -303,8 +307,8 @@ class Words:
         return len(self.items)
 
 class Proxy:
-    def __init__(self) -> None:
-        self.__implementation = Words()
+    def __init__(self, impl: Any) -> None:
+        self.__implementation = impl
 
     def __getattr__(self, name: str) -> Any:
         return getattr(self.__implementation, name)
@@ -312,17 +316,18 @@ class Proxy:
     def __len__(self) -> int:
         return len(self.__implementation)
 
-p = Proxy()
+p = Proxy(Words())
 print(len(p))
 #: 2
 ```
 
 `__getattr__()` could not have supplied `__len__()` because `len()`
 never looks the name up on the instance. `len()` asks `type(p)` for
-`__len__()` and calls what it finds there, skipping the instance
-dictionary and therefore skipping `__getattr__()`, which only runs when
-an instance lookup fails. Python looks up every implicitly invoked
-special method this way, so the method must exist on the proxy's class.
+`__len__()` and calls what it finds there. That lookup skips the
+instance, so no instance lookup fails, and a failed instance lookup is
+the one event that calls `__getattr__()`. Python looks up every
+implicitly invoked special method this way, so the method must exist on
+the proxy's class.
 
 `__len__()` here delegates with `len(self.__implementation)` rather
 than `self.__implementation.__len__()`. Both give the same answer, and
@@ -382,9 +387,9 @@ replacement drops a name the current implementation answers. The
 surrogate keeps what it had, so `s.g()` still works after the
 rejected swap.
 
-The type checker cannot make this decision. It must compare the type
-of the value the surrogate holds right now against the type of the
-argument. The surrogate's attribute is `Any`, because
+The type checker cannot make this decision. The decision compares
+the type of the value the surrogate holds right now with the type of
+the argument, and the checker knows neither: both are `Any`, because
 `__getattr__()` delegation deliberately leaves the implementation's
 type untracked. Annotating both against a `Protocol` states a fixed
 shape that every implementation must meet, a different guarantee. A

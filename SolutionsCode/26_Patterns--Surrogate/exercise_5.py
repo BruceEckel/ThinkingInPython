@@ -1,5 +1,6 @@
 # exercise_5.py
 from typing import Any, Final, Self
+from exceptions import expect
 
 POOL_SIZE: Final[int] = 2
 
@@ -54,14 +55,13 @@ with pool.acquire() as c1:
     print(c1.query("select 1"))
     with pool.acquire() as c2:
         print(c2.query("select 2"))
-        try:
-            pool.acquire()
-        except PoolExhausted as e:
-            print(type(e).__name__, e, pool.available())
+        print("free:", pool.available())
+        expect(PoolExhausted, pool.acquire)
     print("inner released:", pool.available())
 print("outer released:", pool.available())
 #: connection 0: select 1
 #: connection 1: select 2
-#: PoolExhausted all 2 in use 0
+#: free: 0
+#: [PoolExhausted] all 2 in use
 #: inner released: 1
 #: outer released: 2

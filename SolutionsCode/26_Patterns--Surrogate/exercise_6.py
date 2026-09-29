@@ -9,8 +9,8 @@ class Words:
         return len(self.items)
 
 class Proxy:
-    def __init__(self) -> None:
-        self.__implementation = Words()
+    def __init__(self, impl: Any) -> None:
+        self.__implementation = impl
 
     def __getattr__(self, name: str) -> Any:
         return getattr(self.__implementation, name)
@@ -18,6 +18,6 @@ class Proxy:
     def __len__(self) -> int:
         return len(self.__implementation)
 
-p = Proxy()
+p = Proxy(Words())
 print(len(p))
 #: 2

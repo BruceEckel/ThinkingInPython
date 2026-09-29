@@ -16,7 +16,7 @@ From a base class, derive the surrogate along with the class or classes that pro
 
 ![*Surrogate* and each Implementation realize the same Interface](_images/surrogate)
 
-This is the shape in *GoF Design Patterns*.
+This is the shape *GoF Design Patterns* gives *Proxy*.
 Python does not need the shared base,
 but the base is the clearest way to see what a surrogate is.
 
@@ -28,7 +28,7 @@ or swap the implementation for another.
 
 Structurally, *Proxy* and *State* differ in one respect.
 A *Proxy* forwards to one implementation for its whole life.
-*State* holds several and switches among them.
+*State* switches among several.
 
 ## Proxy
 
@@ -222,6 +222,8 @@ and `proxy_protocol.py`'s `isinstance()` is the runtime half of that check.
 Calls on the proxy get no such check.
 Because `__getattr__()` resolves `p.f()` and returns `Any`,
 the checker cannot verify that call.
+A misspelled `p.ff()` passes the checker the same way,
+and fails at runtime with the implementation's `AttributeError`.
 With explicit forwarding, as in `proxy_forwarding.py`,
 `p.f()` reaches a declared method with a declared return type,
 and the checker verifies the call.
@@ -360,10 +362,13 @@ so the proxy and the implementation report the same value.
 `WriteProxy` needs no `# type: ignore`,
 because a declared `__setattr__()` makes the type checker accept assignment to any attribute name.
 
-The implementation attribute no longer needs a double underscore.
+`WriteProxy` names its attribute `_implementation`, with one underscore.
 Mangling rewrites identifiers, not string literals,
 so storing a double-underscore name through `object.__setattr__()` means writing the mangled form,
 `"_WriteProxy__implementation"`, by hand.
+The single underscore costs the protection that mangling gave:
+if the implementation has an `_implementation` of its own,
+`p._implementation` finds the proxy's and the implementation's is out of reach.
 
 ### The Recursion Trap
 
@@ -403,7 +408,7 @@ with expected(AttributeError):
 Without the guard, the misspelled `self._imp` produces a `RecursionError` that names nothing.
 With the guard, the second call to `__getattr__()` reports the typo by name.
 The guard also makes the proxy work with `copy` and `pickle`,
-which look up `__setstate__()` before `__init__()` has run.
+which look up `__setstate__()` on an instance whose `__init__()` has not run.
 Both get an `AttributeError`, which those modules handle, instead of recursing.
 
 This chapter's other `__getattr__()` proxies do not include the guard,
@@ -446,16 +451,14 @@ print(isinstance(p, Implementation), isinstance(p, Service))
 #: False False
 ```
 
-The call works and `hasattr()` finds the method,
-yet both `isinstance()` checks return `False`.
+Ordinary attribute access falls back to `__getattr__()`,
+so `p.f()` runs and `hasattr(p, "f")` is `True`.
+Both `isinstance()` checks return `False`.
 
-Because ordinary attribute access still finds those methods,
-`hasattr(p, "f")` is `True` and `p.f()` runs.
 Code that calls the method, or checks with `hasattr()`, works on a surrogate,
 as long as `__getattr__()` raises only `AttributeError` for a name it does not have.
-The protection proxy below raises `PermissionError` instead,
-and `hasattr()` catches only `AttributeError`,
-so `hasattr()` propagates that exception rather than returning `False`.
+The [protection proxy](#protection-proxy) below raises a different exception,
+and its section shows what `hasattr()` does with it.
 
 Two workarounds make `isinstance()` return `True`,
 and neither verifies anything:
@@ -489,18 +492,20 @@ and code that checks with `isinstance()` should check for the method instead.
     Adds actions when code accesses the proxied object.
     For example, a smart reference can log the calls to a particular method.
     It can also count the references to an object,
-    implementing the *copy-on-write* idiom and preventing aliasing.
+    which makes *copy-on-write* possible:
+    copies share one object until one of them writes,
+    and the writer then gets a copy of its own.
 
-The standard library's own `weakref.proxy()` is a transparent forwarding wrapper too,
+The standard library's `weakref.proxy()` is a transparent forwarding wrapper too,
 but it solves none of these four:
 it forwards to a weakly referenced object and raises `ReferenceError` once nothing else holds a strong reference to that object.
 [Cleanup](10_Foundations--Cleanup.md#reliable-alternatives)
-uses `weakref.ref()`, and a `WeakValueDictionary` in the section that follows,
-both from the same module and neither needing this one.
+uses `weakref.ref()`, and a `WeakValueDictionary` in the section that follows.
+Both come from the same module, and neither needs `weakref.proxy()`.
 
 ### Virtual Proxy
 
-A *Virtual proxy* delays building an expensive object until something asks for it:
+A *virtual proxy* delays building an expensive object until something asks for it:
 
 ```python
 # virtual_proxy.py
@@ -534,7 +539,7 @@ and every later access reuses that same instance.
 
 ### Protection Proxy
 
-A *Protection proxy* decides whether a call reaches the implementation.
+A *protection proxy* decides whether a call reaches the implementation.
 Because `__getattr__()` receives the requested name, the check is one condition:
 
 ```python
@@ -570,11 +575,16 @@ Guarded(Document(), admin=True).erase()
 #: erased
 ```
 
-`Guarded` requires `admin` privileges to call `erase()`.
+A guest reaches only the names in `READ_ONLY`, so `erase()` requires `admin`.
+The protection is a convention, like the underscore on `_doc`:
+`guest._doc.erase()` reaches the document without asking the proxy.
+A protection proxy guards against mistakes,
+not against a caller who goes around it.
+
 `hasattr()` catches only `AttributeError`.
 `guest.__getattr__()` raises `PermissionError` instead,
-so `hasattr(guest, "erase")` does not return `False`,
-it raises `PermissionError` too.
+so `hasattr(guest, "erase")` raises `PermissionError` too,
+where a missing name returns `False`.
 A surrogate whose `__getattr__()` can raise something other than `AttributeError` breaks `hasattr()`.
 It fails `isinstance()` for a different reason:
 as [A *Surrogate* Is Not Its Implementation](#a-surrogate-is-not-its-implementation)
@@ -583,7 +593,7 @@ which never calls `__getattr__()`.
 
 ### Smart Reference
 
-A *Smart reference* proxy adds behavior around each access.
+A *smart reference* proxy adds behavior around each access.
 With `__getattr__()` you can wrap every method call, for example to count them:
 
 ```python
@@ -696,25 +706,6 @@ class Surrogate:
         return getattr(self.__implementation, name)
 ```
 
-The annotations that carry the implementation are all `Any`,
-which the book's typing guidance treats as a last resort.
-
-`Surrogate.__init__()` and `change_to()` are a choice.
-The implementations in `state_demo.py` below would still type-check if both parameters carried `Behavior`,
-the Protocol that listing defines.
-The checker would then verify every implementation that reaches either method.
-That annotation also ties the surrogate to one Protocol,
-and that tie is what the generic surrogate exists to avoid.
-`test_state.py` below passes the same `Surrogate` a two-state stand-in that has a `name()` and none of `Behavior`'s three methods.
-With `Behavior` on those parameters, `ty` rejects that test:
-`type StateA is not assignable to protocol Behavior`.
-Declaring the implementations as `first: Behavior` and `second: Behavior`,
-as `state_demo.py` does,
-puts the check where it does not restrict the surrogate.
-The type checker verifies that `Implementation1` and `Implementation2` supply everything the Protocol declares,
-and reports a missing method.
-That declaration covers the implementations, not the surrogate.
-
 The demo gives the surrogate two implementations of one Protocol and swaps them mid-run:
 
 ```python
@@ -805,6 +796,24 @@ def test_state_delegates_and_change_swaps() -> None:
     assert s.name() == "B"
 ```
 
+Every annotation in `state_surrogate.py` that carries the implementation is `Any`,
+which the book's typing guidance treats as a last resort.
+`__getattr__()` returns `Any` because it answers for whatever name the caller asks.
+The `Any` on the parameters of `__init__()` and `change_to()` is a choice.
+`state_demo.py` would still type-check if both parameters carried `Behavior`,
+and the checker would then verify every implementation that reaches either method.
+That annotation also ties the surrogate to one Protocol,
+and the generic surrogate exists to avoid that tie.
+`test_state.py` passes the same `Surrogate` a two-state stand-in that has a `name()` and none of `Behavior`'s three methods.
+With `Behavior` on those parameters, `ty` rejects that test:
+`type StateA is not assignable to protocol Behavior`.
+Declaring the implementations as `first: Behavior` and `second: Behavior`,
+as `state_demo.py` does,
+puts the check where it does not restrict the surrogate.
+The type checker verifies that `Implementation1` and `Implementation2` supply everything the Protocol declares,
+and reports a missing method.
+That declaration covers the implementations, not the surrogate.
+
 ## One Surrogate, Two Intents
 
 Because *GoF Design Patterns* gives *Proxy* and *State* different structures,
@@ -829,7 +838,11 @@ the single generic surrogate in `state_surrogate.py` is simpler and just as flex
     and that the first `query()` reports the count.
 2.  Change `CountingProxy` in `counting_proxy.py` to keep a per-method tally in a `collections.Counter` instead of a single total.
     Confirm the tally reports `f` called twice and `g` called once.
-3.  Create a simple copy-on-write implementation.
+3.  Create a simple copy-on-write list.
+    Its `share()` returns a second list over the same data,
+    at the cost of incrementing a reference count,
+    and the first `append()` through a shared list copies the data before changing it.
+    Confirm that the two lists share their data before the write and not after.
 4.  In `counting_proxy.py`,
     misspell `self._impl` as `self._imp` inside `__getattr__()` and run it.
     Use the fallback-hook behavior this chapter describes to explain why the failure reports as `RecursionError` rather than an `AttributeError` naming the typo.

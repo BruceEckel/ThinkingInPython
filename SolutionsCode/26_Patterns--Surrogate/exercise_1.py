@@ -1,19 +1,18 @@
 # exercise_1.py
 from typing import Any
 
-class ExpensiveResource:
+class Expensive:
     def __init__(self) -> None:
-        print("creating ExpensiveResource (slow!)")
-        self.data = [1, 2, 3]
+        print("Expensive built")
 
-    def query(self) -> list[int]:
-        return self.data
+    def query(self) -> str:
+        return "result"
 
-class LazyProxy:
+class Lazy:
     def __init__(self, description: str) -> None:
         self._description = description
         self._answered = 0
-        self._real: ExpensiveResource | None = None
+        self._real: Expensive | None = None
 
     @property
     def description(self) -> str:
@@ -23,18 +22,18 @@ class LazyProxy:
     def __getattr__(self, name: str) -> Any:
         if self._real is None:
             print(f"{self._answered} answered before build")
-            self._real = ExpensiveResource()
+            self._real = Expensive()
         return getattr(self._real, name)
 
-p = LazyProxy("three small integers")
+p = Lazy("a slow query")
 for _ in range(3):
     print(p.description)
-#: three small integers
-#: three small integers
-#: three small integers
+#: a slow query
+#: a slow query
+#: a slow query
 print(p.query())
 #: 3 answered before build
-#: creating ExpensiveResource (slow!)
-#: [1, 2, 3]
+#: Expensive built
+#: result
 print(p.query())
-#: [1, 2, 3]
+#: result
