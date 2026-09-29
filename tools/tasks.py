@@ -439,8 +439,8 @@ def check_ch(v: Vars) -> None:
     py("tools.check_chapter", *v.words("CH"))
 
 
-@task("Run one example and show its output "
-      "(`tip run-one deque_timing`, or F=)", positional="F")
+@task("Run one example or Solutions answer and show its output "
+      "(`tip deque_timing`, `tip 18/exercise_1`)", positional="F")
 def run_one(v: Vars) -> None:
     """Run one example the way the book assumes: from inside its own chapter
     directory, with the tree's utils/ on PYTHONPATH, so its sibling imports and
