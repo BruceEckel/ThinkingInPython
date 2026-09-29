@@ -9,7 +9,7 @@ class Monster:
     hp: int
     powers: list[str] = field(default_factory=list)
 
-Kind = Literal["goblin", "troll"]
+type Kind = Literal["goblin", "troll"]
 
 PROTOTYPES: Final[dict[Kind, Monster]] = {
     "goblin": Monster("Goblin", hp=10, powers=["bite"]),

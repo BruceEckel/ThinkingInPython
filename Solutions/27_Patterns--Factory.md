@@ -26,8 +26,7 @@ class Shape(ABC):
             case "Triangle":
                 return _Triangle()
             case _:
-                raise ValueError(
-                    f"Bad shape creation: {kind}")
+                raise ValueError(f"Bad shape: {kind}")
 
 class _Circle(Shape):
     @override
@@ -63,7 +62,7 @@ s.erase()
 #: Triangle.erase
 ```
 
-`shape_factory_objects.py`'s factory-object version instead needs a `Triangle`
+`shape_factory_objects.py`'s factory-object version instead needs a `_Triangle`
 that carries its own nested `Factory`, plus one `FACTORIES` entry
 mapping the name to an instance of that `Factory`. The listing below
 shows the new shape alone; in the chapter file its entry joins
@@ -101,10 +100,10 @@ create_shape("Triangle").draw()
 #: Triangle.draw
 ```
 
-Both versions add the `Triangle` class itself. Beyond that, the first
+Both versions add the `_Triangle` class. Beyond that, the first
 edits one function, `Shape.factory()`, where the new `case` sits inside
 logic you must re-read. The second adds a nested `Factory` to
-`Triangle` and one data line to `FACTORIES`. That is the trade-off the
+`_Triangle` and one data line to `FACTORIES`. That is the trade-off the
 chapter draws between the two versions: more ceremony up front (a
 nested `Factory` per shape) in exchange for a dispatcher that changes
 by table entry rather than by code. The chapter's `registry.py` goes
@@ -146,10 +145,10 @@ class Gnome(Character):
     def interact_with(self, obstacle: Obstacle) -> None:
         print("Gnome discovers a", obstacle.description())
 
-class Riddle(Obstacle):
+class Fairy(Obstacle):
     @override
     def description(self) -> str:
-        return "Riddle"
+        return "Fairy"
 
 class GnomesAndFairies(GameElementFactory):
     @override
@@ -158,17 +157,17 @@ class GnomesAndFairies(GameElementFactory):
 
     @override
     def make_obstacle(self) -> Obstacle:
-        return Riddle()
+        return Fairy()
 
 GameEnvironment(GnomesAndFairies()).play()
-#: Gnome discovers a Riddle
+#: Gnome discovers a Fairy
 ```
 
 `GameEnvironment` never names `Kitty`, `Warrior`, `Puzzle`, or
 `Weapon` directly. It only calls `make_character()` and
 `make_obstacle()` on whatever `GameElementFactory` it receives. A
 third concrete factory slots in beside `KittiesAndPuzzles` and
-`WarriorsAndWeapons` with no change to `GameEnvironment` at all.
+`WarriorsAndWeapons` with no change to `GameEnvironment`.
 
 `abstract_factory_protocol.py` asks for the same factory without a base class. Leaving
 `make_obstacle()` out at first is the point of the second half:
@@ -187,48 +186,56 @@ class GameElementFactory(Protocol):
     def make_character(self) -> Character: ...
     def make_obstacle(self) -> Obstacle: ...
 
+class GameEnvironment:
+    def __init__(self, factory: GameElementFactory) -> None:
+        self.character = factory.make_character()
+        self.obstacle = factory.make_obstacle()
+    def play(self) -> None:
+        self.character.interact_with(self.obstacle)
+
 class Gnome:
     def interact_with(self, obstacle: Obstacle) -> None:
         print("Gnome discovers a", obstacle.description())
 
-class Riddle:
-    def description(self) -> str: return "Riddle"
+class Fairy:
+    def description(self) -> str: return "Fairy"
 
 class GnomesAndFairies:  # Declares no base class
     def make_character(self) -> Gnome: return Gnome()
-    def make_obstacle(self) -> Riddle: return Riddle()
+    def make_obstacle(self) -> Fairy: return Fairy()
 
-def play(factory: GameElementFactory) -> None:
-    factory.make_character().interact_with(
-        factory.make_obstacle())
-
-play(GnomesAndFairies())
-#: Gnome discovers a Riddle
+GameEnvironment(GnomesAndFairies()).play()
+#: Gnome discovers a Fairy
 ```
 
 With `make_obstacle()` deleted, `ty` reports:
 
 ```text
-error[invalid-argument-type]: Argument to function `play` is incorrect
-  --> exercise_3_protocol.py:28:6
+error[invalid-argument-type]: Argument to
+`GameEnvironment.__init__` is incorrect
+  --> exercise_3_protocol.py:31:17
    |
-28 | play(GnomesAndFairies())
-   |      ^^^^^^^^^^^^^^^^^^ Expected `GameElementFactory`,
-   |                         found `GnomesAndFairies`
+31 | GameEnvironment(GnomesAndFairies()).play()
+   |                 ^^^^^^^^^^^^^^^^^^ Expected
+   |                 `GameElementFactory`, found
+   |                 `GnomesAndFairies`
 info: type `GnomesAndFairies` is not assignable to protocol
 `GameElementFactory`
 info: └── protocol member `make_obstacle` is not defined on type
 `GnomesAndFairies`
 ```
 
-The two halves fail differently. In `abstract_factory_abc.py` the base
-class declares `make_obstacle()` as an `@abstractmethod`, so a factory
-that omits it defines without complaint and raises a `TypeError` the
-moment you instantiate it, before the game runs. In
-`abstract_factory_protocol.py` no class declares that it satisfies the
-protocol, so the mismatch surfaces at the call that needs the
-protocol, before anything runs at all, and the diagnostic names the
-missing method rather than the missing base.
+The two halves fail at different places. In `abstract_factory_abc.py`
+the base class declares `make_obstacle()` as an `@abstractmethod`, so a
+factory that omits it defines without complaint. `ty` reports the line
+that constructs that factory, and a program that ignores the report
+raises a `TypeError` at the same construction, before the game runs.
+In `abstract_factory_protocol.py` no class declares that it satisfies
+the protocol, so constructing the factory is legal. The report moves
+to the call that needs the protocol, and the diagnostic names the
+missing method. Nothing guards that version at runtime:
+`GameEnvironment.__init__()` raises an `AttributeError` when it calls
+`make_obstacle()`.
 
 ## 4. An Abstract Factory for "thick" and "thin" shapes
 
@@ -309,7 +316,7 @@ from record import record
 
 @record
 class Pizza:
-    size: int = 9
+    size: int = 12
     cheese: bool = True
     toppings: tuple[str, ...] = ()
 
@@ -324,7 +331,7 @@ expect(ValueError, Pizza,
 
 class PizzaBuilder:
     def __init__(self) -> None:
-        self._size = 9
+        self._size = 12
         self._toppings: list[str] = []
 
     def topping(self, name: str) -> Self:
@@ -344,8 +351,8 @@ pb = (
 )
 expect(ValueError, pb.topping, "e")
 #: [ValueError] a pizza may carry at most four toppings
-print(pb.build())
-#: Pizza(size=9, cheese=True, toppings=('a', 'b', 'c', 'd'))
+print(pb.build().toppings)
+#: ('a', 'b', 'c', 'd')
 ```
 
 In `pizza_direct.py`, an invalid `Pizza` can never exist, not even
@@ -358,7 +365,7 @@ again: illegal values are unrepresentable.
 
 Placing the check in `topping()`, as above, gives `PizzaBuilder` the
 same guarantee: the fifth `.topping()` call raises a `ValueError`
-before appending, so `self._toppings` itself never grows past four.
+before appending, so `self._toppings` never grows past four.
 Placing the check in `build()` instead gives up that guarantee. The
 builder then accepts a fifth, sixth, or tenth `.topping()` call without
 complaint, silently accumulating an already-too-long list, and
@@ -366,9 +373,15 @@ discovers the problem only when `build()` finally runs, leaving a
 window between the fifth `.topping()` call and that `build()` call.
 During that window the builder's own internal state violates the rule
 the finished `Pizza` must guarantee, though no `Pizza` object ever
-violates it. Checking in `topping()` closes that window entirely.
+violates it. Checking in `topping()` closes that window.
 Checking only in `build()` leaves it open for as long as the caller
 keeps adding toppings.
+
+That window is the hazard `stars_class.py` shows. A mutable object
+that checks its rule after the change keeps the illegal value when the
+check fails: `damaged` still prints `Stars(13)` after `f1()` raises a
+`TypeFailure`. A builder that checks in `build()` raises its
+`ValueError` and still holds five toppings.
 
 ## 6. A registry whose classes live somewhere else
 
@@ -441,7 +454,7 @@ importing the plugin package explicitly at startup, by walking a
 directory with `importlib`, or by declaring entry points that the
 packaging system imports for them.
 
-`registry_demo.py` is the same program in miniature. It imports
+`registry_demo.py` has the same dependency. It imports
 `Shape` and `make` from `registry`, which no longer defines a single
 subclass, so without a change it prints `[]` and the first `make()`
 call raises a `KeyError`. One added import restores the output:
@@ -516,7 +529,7 @@ object.
 
 The split between those two assertions carries the lesson. A shallow
 copy duplicates the top object and shares everything it refers to, so
-the fields that break are exactly the mutable ones, and only when
+the fields that break are the mutable ones, and only when
 something mutates them in place. Assignment to a field is always safe.
 `append()`, `[k] = v`, and `.update()` are not.
 
@@ -549,22 +562,23 @@ def test_nested_dict_is_copied() -> None:
 ```
 
 The second assertion is the one worth writing. Checking that the
-prototype survived is good. Checking that the *next* spawn is still
-correct is what a user of the registry actually depends on, and that
-assertion fails loudly under `copy.copy()`.
+prototype survived is good. A user of the registry depends on the next
+spawn being correct, and that assertion fails under `copy.copy()`.
 
 ## 8. What the `eval()` dispatcher accepts
 
 ```python
 # exercise_8.py
-from typing import ClassVar, Final, Protocol, override
+from abc import ABC, abstractmethod
+from typing import Final, Protocol, override
 from exceptions import expect
-
-class Shape:
-    def draw(self) -> None: ...
 
 class ShapeMaker(Protocol):
     def create(self) -> Shape: ...
+
+class Shape(ABC):
+    @abstractmethod
+    def draw(self) -> None: ...
 
 class _Circle(Shape):
     @override
@@ -572,55 +586,49 @@ class _Circle(Shape):
     class Factory:
         def create(self) -> _Circle: return _Circle()
 
-class EvalFactory:
-    factories: ClassVar[dict[str, ShapeMaker]] = {}
-
-    @classmethod
-    def create_shape(cls, kind: str) -> Shape:
-        if kind not in cls.factories:
-            cls.factories[kind] = eval(f"_{kind}.Factory()")
-        return cls.factories[kind].create()
+def eval_shape(kind: str) -> Shape:
+    maker: ShapeMaker = eval(f"_{kind}.Factory()")
+    return maker.create()
 
 # A shape "name" that is really an expression:
 ATTACK: Final[str] = (
     "Circle.Factory() if print('side effect!')"
     " else _Circle")
-EvalFactory.create_shape(ATTACK).draw()
+eval_shape(ATTACK).draw()
 #: side effect!
 #: Circle.draw
 
-class TableFactory:
-    factories: ClassVar[dict[str, ShapeMaker]] = {
-        "Circle": _Circle.Factory(),
-    }
+FACTORIES: Final[dict[str, ShapeMaker]] = {
+    "Circle": _Circle.Factory(),
+}
 
-    @classmethod
-    def create_shape(cls, kind: str) -> Shape:
-        return cls.factories[kind].create()
+def create_shape(kind: str) -> Shape:
+    return FACTORIES[kind].create()
 
-TableFactory.create_shape("Circle").draw()
+create_shape("Circle").draw()
 #: Circle.draw
-expect(KeyError, TableFactory.create_shape, ATTACK)
+expect(KeyError, create_shape, ATTACK)
 #: [KeyError] "Circle.Factory() if print('side effect!')
 #: else _Circle"
 ```
 
-`create_shape()` prepends the underscore and appends `.Factory()`, so
+`eval_shape()` prepends the underscore and appends `.Factory()`, so
 the string it hands to `eval()` is `_Circle.Factory() if
 print('side effect!') else _Circle.Factory()`. Python evaluates the
 condition first, which is the injected side effect. `print()` returns
-`None`, so the `else` branch runs and produces a perfectly good
-factory, and `create_shape()` returns a working `_Circle` while the
-caller sees no error at all. That string can reach anything in the module's
-namespace, and anything `__import__()` can reach.
+`None`, so the `else` branch runs and produces a working factory, and
+`eval_shape()` returns a `_Circle` while the caller sees no error.
+That string can reach anything in the module's namespace, and anything
+`__import__()` can reach.
 
-`TableFactory` keys a dictionary on the same names. Looking up a `kind`
-that is not a key raises a `KeyError` naming the string, and nothing
-evaluates that string. `TableFactory.create_shape()` is also shorter,
-needs no `Factory` lookup by name, and lets a type checker see that
-every value is a `ShapeMaker`. Whenever `kind` can come from a
-configuration file, a request, or a command line, `TableFactory` is the
-only acceptable version of the two.
+`create_shape()` is the chapter's version, a dictionary keyed on the
+same names. Looking up a `kind` that is not a key raises a `KeyError`
+naming the string, and nothing evaluates that string. The table also
+lets the type checker see that every value is a `ShapeMaker`, where
+`eval()` returns `Any` and the annotation on `maker` is a claim nothing
+verifies. Whenever `kind` can come from a configuration file, a
+request, or a command line, the table is the only acceptable version
+of the two.
 
 ## 9. Recursing through `__subclasses__()`
 
@@ -772,7 +780,7 @@ class.
 
 `unregistered()` walks a namespace and keeps every class that
 `issubclass()` accepts as a `Shape` and that `REGISTRY` lacks.
-`@runtime_checkable` is what allows the `issubclass()` call; without
+`@runtime_checkable` allows the `issubclass()` call; without
 it, testing a class against a Protocol raises a `TypeError`. The
 `obj is not Shape` guard drops the Protocol, which passes its own
 test. Calling `unregistered(globals())` at the end of the module, or
@@ -859,7 +867,7 @@ problem because it receives a class, and `type[S]` has a `__name__`.
 Pyright accepts `build.__name__`, since it gives every function
 object's attributes to a `Callable`; `ty` does not, and the book
 checks with `ty`. Passing the name also frees the key from the
-function's spelling, so you can name the builder `make_goblin()` while
+function's name, so you can call the builder `make_goblin()` while
 the key stays `"goblin"`.
 
 What the decorated form gains is the same openness the registries
@@ -868,10 +876,10 @@ definition, and `PROTOTYPES` needs no edit. The key type widens from
 the chapter's `Kind` to `str` for the same reason: an open table
 cannot list its names in advance. The builder is also a function, so
 `goblin()` still produces a fresh prototype on demand when a test
-wants one that nothing has touched. The costs are the table literal
+needs one that nothing has touched. The costs are the table literal
 becoming a decorator plus a function for each monster, the name
 repeated at every definition, and the two failures the chapter
 attached to registration: an undecorated builder is absent from the
-table, with a `KeyError` from `spawn()` that points at nothing, and a
-builder in an unimported module never runs. For two monsters in one
+table, with a `KeyError` from `spawn()` that names the key and not
+the builder, and a builder in an unimported module never runs. For two monsters in one
 file, the table literal says the same thing in fewer lines.

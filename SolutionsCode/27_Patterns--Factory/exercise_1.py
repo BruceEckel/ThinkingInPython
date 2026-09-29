@@ -19,8 +19,7 @@ class Shape(ABC):
             case "Triangle":
                 return _Triangle()
             case _:
-                raise ValueError(
-                    f"Bad shape creation: {kind}")
+                raise ValueError(f"Bad shape: {kind}")
 
 class _Circle(Shape):
     @override

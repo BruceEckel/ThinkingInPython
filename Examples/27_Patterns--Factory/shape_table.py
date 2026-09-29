@@ -14,7 +14,7 @@ class Square(Shape):
     @override
     def draw(self) -> None: print("Square.draw")
 
-Kind = Literal["Circle", "Square"]
+type Kind = Literal["Circle", "Square"]
 
 SHAPES: Final[dict[Kind, type[Shape]]] = {
     "Circle": Circle,
@@ -28,6 +28,5 @@ make("Circle").draw()
 #: Circle.draw
 make("Square").draw()
 #: Square.draw
-# ty: expected Literal["Circle", "Square"],
-# found Literal["Hexagon"]:
+# ty: expected Kind, found Literal["Hexagon"]:
 # make("Hexagon").draw()

@@ -168,6 +168,9 @@ The `factory()` argument indicates the type of `Shape` to create.
 Here that argument is a string, but it could be any kind of data.
 Apart from the new subclass,
 `factory()` is the only code that changes when you add a new type of `Shape`.
+`factory()` names `_Circle` and `_Square` above the point where the file defines either class.
+Python looks up a name in a function body when the function runs,
+and both classes exist before anything calls `factory()`.
 *GoF Design Patterns* defines *Factory Method* as a creation method that subclasses override to choose the concrete type.
 This `factory()` is the smallest version of that idea: one class, one method,
 and a `match` where the overrides would be.
@@ -214,6 +217,7 @@ Two shapes from different calls then share behavior but not a class,
 failing `type(a) is type(b)` and `isinstance()` alike.
 `Shape.__subclasses__()` is empty until the first call,
 then gains a duplicate `Circle` and `Square` on every call after that.
+Each duplicate stays in the list until the garbage collector finds that no object uses it.
 
 ### Alternative Constructors Are Factories
 
@@ -230,9 +234,9 @@ a number outside one through twelve.
 `of()` needs no `match`.
 The `Enum` already holds every member it could return,
 so `of()` indexes `list(Month)` instead of naming a class.
-A factory over a closed set of products collapses to a lookup,
-the form the next section builds by hand,
-and then lets the classes fill for an open set.
+A factory over a closed set of products reduces to a lookup.
+The next section writes that lookup table by hand,
+and then lets the classes fill it for an open set.
 
 [`from_fahrenheit()`](07_Foundations--Classes.md#static-and-class-methods)
 is the usual form of alternative constructor:
@@ -273,7 +277,7 @@ class Square(Shape):
     @override
     def draw(self) -> None: print("Square.draw")
 
-Kind = Literal["Circle", "Square"]
+type Kind = Literal["Circle", "Square"]
 
 SHAPES: Final[dict[Kind, type[Shape]]] = {
     "Circle": Circle,
@@ -287,8 +291,7 @@ make("Circle").draw()
 #: Circle.draw
 make("Square").draw()
 #: Square.draw
-# ty: expected Literal["Circle", "Square"],
-# found Literal["Hexagon"]:
+# ty: expected Kind, found Literal["Hexagon"]:
 # make("Hexagon").draw()
 ```
 
@@ -297,8 +300,8 @@ and calling one constructs an instance.
 Adding a `Triangle` means one new class and one new line in `SHAPES`,
 and one new member in `Kind`.
 Typing `kind` as the closed `Literal` instead of `str` moves a bad name from a runtime `KeyError` to a check-time error,
-the same trade [Abstract Factories](#abstract-factories)
-makes with a `Protocol`.
+the same trade [Explicit Registration with a Protocol](#explicit-registration-with-a-protocol)
+makes for a class that forgets `draw()`.
 `Kind` names the two members `SHAPES` already has,
 and the checker rejects a key that `Kind` does not list,
 so `SHAPES` cannot gain a shape name without adding it to the `Literal` first.
@@ -344,12 +347,15 @@ This is why `Shape` is an abstract base class rather than a `Protocol`.
 `__init_subclass__()` runs only for classes that inherit from `Shape`,
 so a class that merely matches a Protocol's shape never registers.
 Inheritance is the mechanism, and `ABC` adds one guard on top of that.
-Registration runs as its `class` statement executes,
+A subclass registers as its `class` statement executes,
 so a subclass that forgets `draw()` still registers.
-`make()` then fails at construction with a `TypeError` rather than at the first `draw()` call.
-No type checker reports that case,
-because `Shape.registry[name]()` calls a `type[Shape]`,
-and any of those may be a concrete subclass.
+The guard acts when `make()` constructs that class:
+the call fails with a `TypeError`,
+where a base class without `ABC` waits for the first `draw()` call.
+The type checker reports a line that constructs such a class by name,
+but `make()` contains no such line.
+`Shape.registry[name]()` calls a `type[Shape]`,
+and any of those may be a concrete subclass, so the checker accepts it.
 [Explicit Registration with a Protocol](#explicit-registration-with-a-protocol)
 moves that report to the check.
 
@@ -416,7 +422,7 @@ and the strong reference keeps it alive for the rest of the process.
 so a subclass that defines its own `registry` creates a second table that `make()` never reads,
 with no error to signal it.
 
-`make()` stays a module-level function for two reasons.
+`make()` stays a module-level function for three reasons.
 A `@classmethod` looks up `cls.registry`,
 so a subclass with its own `registry` sends `Triangle.make()` to that second table,
 the one `__init_subclass__()` avoids by naming `Shape.registry`.
@@ -527,10 +533,11 @@ Under `__init_subclass__()`,
 an abstract `Polygon` between `Shape` and `Triangle` registers as well,
 and `make("Polygon")` fails with a `TypeError`.
 
-The cost is the mirror failure.
+The cost is the opposite failure.
 Registration is opt-in,
 so a class that satisfies `Shape` but lacks `@register` is absent from the table,
-and `make()` fails with a `KeyError` that points at nothing (see exercise 10).
+and `make()` fails with a `KeyError` that names the key,
+not the class that lacks the decorator (see exercise 10).
 Inheriting from the ABC cannot be forgotten that way,
 because the subclass line is the registration.
 The runtime guard is weaker too.
@@ -830,7 +837,8 @@ Suppose you write a factory subclass and forget `make_obstacle()`.
 Python defines the class,
 and the `TypeError` appears when you create an instance,
 before `GameEnvironment.__init__()` calls anything,
-the same way `Shape` fails in this chapter's earlier listings and `Partial()` does in [*Surrogate*](26_Patterns--Surrogate.md).
+the same way `Shape` fails in this chapter's earlier listings and `Partial()` does in [*Surrogate*](26_Patterns--Surrogate.md#proxy).
+The type checker reports that construction before the program runs.
 A *Protocol* names the required methods and needs no base class,
 which simplifies the *Abstract Factory*:
 
@@ -899,9 +907,15 @@ and an `Obstacle` must supply `description()`.
 If you uncomment the line that passes a `BrokenFactory` to `GameEnvironment`,
 the checker reports `protocol member make_obstacle is not defined on type BrokenFactory`.
 
-With the Protocol, the checker reports the omission before the program runs.
-That is earlier than the construction-time `TypeError` from the abstract base classes in `abstract_factory_abc.py`,
-the same failure [*Surrogate*](26_Patterns--Surrogate.md#proxy) shows.
+Both versions report the omission before the program runs, at different places.
+With the abstract base classes in `abstract_factory_abc.py`,
+the checker reports the line that constructs the incomplete factory.
+With the Protocol, constructing a `BrokenFactory` is legal,
+and the checker reports the line that passes it to `GameEnvironment`.
+The two differ more at runtime.
+The abstract base class refuses to construct the factory,
+while the Protocol has no runtime guard:
+a program that ignores the report fails with an `AttributeError` when `GameEnvironment.__init__()` calls `make_obstacle()`.
 Checking against a Protocol is [structural typing](08_Foundations--Static_Types.md#structural-typing-with-protocols).
 Structural typing preserves the purpose of the interfaces,
 without the coupling a shared base class imposes.
@@ -976,7 +990,9 @@ Pass a fresh list for that field when the variant must own one.
 
 `deepcopy()` copies everything it can reach,
 and it has no way to copy an open file, a socket, or a lock,
-so a prototype holding one makes `deepcopy()` raise `TypeError: cannot pickle '_thread.lock' object`.
+so a prototype holding one makes `deepcopy()` raise a `TypeError`.
+For a lock the message is `cannot pickle '_thread.lock' object`.
+The message names pickling because `deepcopy()` copies a type it has no rule for through the pickle protocol.
 Give such a class a `__deepcopy__()` that says what the copy holds instead:
 a fresh connection, or an empty slot the clone fills when it first needs one.
 
@@ -996,7 +1012,7 @@ class Monster:
     hp: int
     powers: list[str] = field(default_factory=list)
 
-Kind = Literal["goblin", "troll"]
+type Kind = Literal["goblin", "troll"]
 
 PROTOTYPES: Final[dict[Kind, Monster]] = {
     "goblin": Monster("Goblin", hp=10, powers=["bite"]),
@@ -1052,12 +1068,19 @@ def test_prototype_untouched() -> None:
 *Builder* is the last of the creational patterns.
 It builds a complex object in steps,
 keeping the step-by-step assembly separate from the finished object.
+In *GoF Design Patterns* a *director* issues the steps to a builder through an abstract interface,
+so one construction process can produce different representations.
+The book's example is a document reader that hands each token to a converter,
+and the converter decides whether the result is ASCII text or TeX.
+
+The builder most programmers meet is narrower,
+the one Joshua Bloch's *Effective Java* recommends.
 In Java and C++, a class with many optional settings needs a constructor for every useful combination,
 because those languages have no keyword arguments.
 That pile of constructors is the *telescoping constructor*,
-and *Builder* is the workaround,
+and this builder is the workaround,
 a companion class that collects settings one method call at a time.
-The *GoF Design Patterns* structure looks like this:
+Translated to Python, it looks like this:
 
 ```python
 # pizza_builder.py
@@ -1144,8 +1167,7 @@ The call site names each option just as the chain does, and the fields,
 not a second class, declare the defaults.
 
 A second use for builder chains is to vary an existing configuration.
-For a frozen data class,
-`replace()` is *Prototype* and *Builder* in one function,
+For a record, `replace()` is *Prototype* and *Builder* in one function,
 copying the configured state and changing the chosen fields in the copy.
 `copy.replace()` is the [general form of the operation](12_Techniques--Data_Classes_as_Types.md#the-general-form-of-replace),
 and works on any object that defines `__replace__()`.
@@ -1187,12 +1209,13 @@ modeling toppings as wrapper objects instead of builder-collected fields.
 *Builder* remains useful in Python when construction is genuinely a process.
 The steps must come in order, later steps depend on earlier ones,
 and some rules apply across several steps.
-`GameBuilder` in [Simulation](38_Patterns--Simulation.md#a-robot-in-a-maze)
+`GameBuilder` in [Simulation](38_Patterns--Simulation.md#building-the-maze-in-stages)
 shows this approach.
-It assembles a maze in three stages: creating rooms, connecting doors,
+It assembles a maze in three stages: creating rooms,
+connecting each room to its neighbors,
 then pairing the teleports that share a target letter.
 Each stage relies on the previous stage.
-No single constructor call can express that.
+No list of keyword arguments can express that.
 The standard library's `argparse.ArgumentParser` has the same shape.
 `add_argument()` calls accumulate a specification,
 and `parse_args()` is the `build()`.
@@ -1229,7 +1252,7 @@ Match the machinery to what varies:
   use *Abstract Factory*, expressed as a `Protocol` rather than a base class.
 - When the interesting part of an object is its configured state rather than its type,
   keep a prototype and copy it.
-  For a frozen data class, `replace()` is that copy.
+  For a record, `replace()` is that copy.
 - When construction is a genuine process with ordered steps and rules spanning them,
   use *Builder*.
   When the "steps" are optional values, keyword arguments are the builder.

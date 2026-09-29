@@ -5,7 +5,7 @@ from record import record
 
 @record
 class Pizza:
-    size: int = 9
+    size: int = 12
     cheese: bool = True
     toppings: tuple[str, ...] = ()
 
@@ -20,7 +20,7 @@ expect(ValueError, Pizza,
 
 class PizzaBuilder:
     def __init__(self) -> None:
-        self._size = 9
+        self._size = 12
         self._toppings: list[str] = []
 
     def topping(self, name: str) -> Self:
@@ -40,5 +40,5 @@ pb = (
 )
 expect(ValueError, pb.topping, "e")
 #: [ValueError] a pizza may carry at most four toppings
-print(pb.build())
-#: Pizza(size=9, cheese=True, toppings=('a', 'b', 'c', 'd'))
+print(pb.build().toppings)
+#: ('a', 'b', 'c', 'd')

@@ -30,10 +30,10 @@ class Gnome(Character):
     def interact_with(self, obstacle: Obstacle) -> None:
         print("Gnome discovers a", obstacle.description())
 
-class Riddle(Obstacle):
+class Fairy(Obstacle):
     @override
     def description(self) -> str:
-        return "Riddle"
+        return "Fairy"
 
 class GnomesAndFairies(GameElementFactory):
     @override
@@ -42,7 +42,7 @@ class GnomesAndFairies(GameElementFactory):
 
     @override
     def make_obstacle(self) -> Obstacle:
-        return Riddle()
+        return Fairy()
 
 GameEnvironment(GnomesAndFairies()).play()
-#: Gnome discovers a Riddle
+#: Gnome discovers a Fairy
