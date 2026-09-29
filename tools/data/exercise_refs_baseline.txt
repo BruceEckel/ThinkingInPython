@@ -6,6 +6,7 @@
 # `tip exercise-refs` before accepting.
 # See tools/exercise_refs.py.
 Chapters/Changing_the_Interface	Changing_the_Interface	1	A dict-style lookup over a list of pairs
+Chapters/Cleanup	Cleanup	7	An `__enter__()` that fails, unguarded and guarded
 Chapters/Composite_and_Interpreter	Composite_and_Interpreter	2	A `Symlink` node
 Chapters/Composite_and_Interpreter	Composite_and_Interpreter	6	Declining with `NotImplemented`
 Chapters/Confidence	Confidence	1	Which process ran each call

@@ -113,7 +113,7 @@ The Python documentation warns:
      gate checks: it is prose, not a `#:` marker, because it arrives after
      the program's last statement. If CPython changes the order
      list_dealloc drops its items, this block goes stale silently. Verified
-     against 3.15.0rc1. -->
+     against 3.15.0rc2. -->
 
 In the direct run, shutdown destroys the objects,
 and shutdown is the precarious moment the warning describes.
@@ -141,13 +141,13 @@ print("still running")
 
 The release fails, and stdout says nothing about it.
 A traceback goes to `sys.stderr` labeled `Exception ignored`,
-but nothing propagates: no caller can catch it, no `finally` runs,
-the exit status is still `0`, and a test asserting on stdout passes.
+but nothing propagates: no caller can catch it, the exit status is still `0`,
+and a test asserting on stdout passes.
 A `close()` call in a `with` block fails loudly instead.
 
 ## Reference Cycles Delay Destruction
 
-Unpredictable timing is one of two problems with `__del__()`.
+A reference cycle postpones `__del__()` too.
 An object that refers to itself, directly or through another object,
 outlives the moment it becomes unreachable:
 
@@ -186,13 +186,14 @@ when the last reference to an object goes away, the object goes with it.
 A reference cycle defeats that count.
 `self_link()` returns and its local `node` disappears,
 but the object still refers to itself, so its count never reaches zero.
-With the collector disabled, `self_link()` calls `gc.get_referrers(node)`,
-which lists the objects the collector tracks that directly refer to `node` without collecting or destroying anything.
+Inside `self_link()`,
+`gc.get_referrers(node)` returns the objects that refer directly to `node`,
+and the call destroys nothing.
 The only referrer is `node` itself, which confirms the self-reference.
 When a real object won't disappear and you don't know why,
 `gc.get_referrers()` is how you find what still holds it,
 the same way this listing uses it to show its own cycle.
-Freeing it takes the cyclic garbage collector,
+Freeing the node takes the cyclic garbage collector,
 a separate mechanism that runs on allocation counts rather than when the object becomes unreachable.
 `gc.disable()` above keeps that collector from running on its own,
 and `gc.collect()` then forces a run,
@@ -203,7 +204,7 @@ leaving the objects in `gc.garbage`.
 [PEP 442](https://peps.python.org/pep-0442/) removed that restriction,
 so a cycle now costs only the delay.
 
-Cycles are a second reason not to put cleanup in `__del__()`:
+Cycles are one more reason to keep cleanup out of `__del__()`:
 one back-reference between two objects is enough to postpone it,
 and the code that creates the cycle often lives far from the code that owns the resource.
 
@@ -215,7 +216,10 @@ Two approaches are more reliable:
 
 The first is an explicit cleanup method,
 such as the `close()` that file objects provide, which a `with` block calls.
-The method runs whether or not an error interrupts the code:
+[Control Flow](04_Foundations--Control_Flow.md#context-managers)
+uses `with` on a file.
+Here a class supplies the two methods that `with` calls,
+and `close()` runs whether or not an error interrupts the block:
 
 ```python
 # closable.py
@@ -254,7 +258,9 @@ except RuntimeError as e:
 #: caught boom
 ```
 
-`close()` runs at the end of the `with` block, at a line you can point at,
+`with` calls `__enter__()` at the top of the block and `__exit__()` on the way out,
+and `__exit__()` calls `close()`.
+So `close()` runs at the end of the `with` block, at a line you can point at,
 and the second half shows it running when the body raises an exception.
 Compare `cleanup.py`,
 where the cleanup runs at an unknowable moment after the program's last statement.
@@ -271,7 +277,7 @@ nothing stops your own code from calling it again,
 so a real `close()` must guard itself against being called more than once,
 the way a file object's `close()` does.
 
-### A Raising `__init__()` Leaks the Resource {#raising-init-leaks}
+### An `__init__()` That Fails Leaks the Resource {#raising-init-leaks}
 
 `Socket.__init__()` prints "opened" before `__enter__()` runs.
 That ordering hides a trap:
@@ -304,15 +310,18 @@ except RuntimeError as e:
 ```
 
 `C opened` has no matching `closed`:
-`__init__()` raises an exception before the `with` statement receives a context manager,
-so `__enter__()` and `__exit__()` never run,
-and nothing releases what `__init__()` had already acquired.
-Acquire the resource in `__enter__()` instead of `__init__()` when construction itself can fail,
-or wrap the acquisition in its own `try`/`except` and release what you already opened before re-raising.
+nothing releases what `__init__()` acquired before it failed.
+One fix keeps `__init__()` free of resources and acquires them in `__enter__()`,
+so a failed construction has nothing to leak.
+`__enter__()` has the same exposure, though:
+`__exit__()` runs only after `__enter__()` returns (see exercise 7).
+Whichever method acquires the resource,
+a step that can fail after the acquisition needs its own `try`/`except`,
+which releases the resource before re-raising the exception.
 
 ### `weakref.finalize()` as a Backstop
 
-The second is `weakref.finalize()`,
+The second reliable approach is `weakref.finalize()`,
 which registers a cleanup callback for an object without giving that callback a reference to the object:
 
 ```python
@@ -343,7 +352,7 @@ print("End of program")
 #: End of program
 ```
 
-`finalize()` registers `print(name, "closed")` to run at `a`'s destruction.
+`finalize()` registers `print(name, "closed")` to run when the `Connection` is destroyed.
 The callback receives `name`, not the `Connection`,
 so registering the cleanup does not keep the object alive.
 `finalize(self, self.close)` looks tidier and defeats that separation:
@@ -395,15 +404,24 @@ and it reports `None` once the object disappears.
 So `False True` says the interpreter reclaimed `Safe` and kept `Leaky`.
 `Safe` printed `S closed` at the `ref()` line:
 reference counting reclaimed it there, before `gc.collect()` ran.
+`gc.collect()` cannot reclaim `Leaky`,
+because `Leaky` is not part of an unreachable cycle.
+`finalize()` keeps every callback in a registry,
+and the callback `self.close` leads back to the object,
+so the program can still reach it.
 `Leaky` printed nothing, because its callback never ran and nothing failed.
+With `atexit` left on, the callback runs as the program exits,
+and a late `L closed` is the one sign of the leak.
 The listing turns `atexit` off on `Leaky`'s finalizer,
-so `False True` answers whether the collector reclaimed each object,
-rather than whether a callback eventually ran at exit.
+so its output ends at `False True`.
 
 ### A Slotted Class Needs `__weakref__` {#slotted-class-needs-weakref}
 
 `finalize()` needs a target that supports weak references,
 and so does the `WeakValueDictionary` in the next section.
+A class that declares `__slots__` lists its instance attributes ahead of time,
+and its instances store those attributes without a per-instance `__dict__`
+([Performance](18_Techniques--Performance.md#slots) introduces `__slots__`).
 A class with `__slots__` that omits `__weakref__` cannot be weakly referenced:
 
 ```python
@@ -474,7 +492,9 @@ You need the dictionary as soon as you look instances up rather than count them,
 and [*Flyweight*](35_Patterns--Flyweight.md)
 looks its shared objects up in a pool keyed by the values that define them.
 `id(self)` is the key here because the registry needs one entry per object,
-not per name: two counters could share a name, and one then displaces the other.
+not per name.
+Keyed by name, two counters that share a name collide,
+and the second displaces the first.
 Reused `id()` values are harmless,
 since the dictionary holds only live objects and no two live objects share an id.
 `live_count()` returns the size of that registry,
@@ -492,8 +512,10 @@ The weak reference lets the registry prune itself.
 CPython's reference counting makes the count fall immediately.
 On an implementation with a tracing collector, such as PyPy,
 the entries disappear when its collector runs, so the counts fall late.
-The `__del__()` version in `cleanup.py` waits for interpreter shutdown,
-when the interpreter's bookkeeping is unreliable.
+`cleanup.py` keeps its count inside `__del__()`,
+so that count is correct only if `__del__()` runs and succeeds,
+and the first section lists the ways it can fail.
+The weak registry runs none of your code when an object goes away.
 
 ## The Rule
 
@@ -527,6 +549,8 @@ path.unlink()
 Losing the last reference to an open file finalizes it,
 and its `__del__()` closes the file and reports the leak,
 at the same unpredictable moment as any other `__del__()`.
+On CPython `del f` is that moment;
+the `gc.collect()` call covers an implementation that waits for its collector.
 That backstop exists to catch the mistake, not to be the plan:
 it still depends on the collector reclaiming the object,
 and a reference cycle defers that collection until the cyclic collector runs,
@@ -555,7 +579,7 @@ so the registry cannot become the leak it exists to catch.
     Report what `live_count()` prints after each `pop()`,
     and explain the difference in terms of what each container holds.
 5.  In `finalizer.py`, change the `finalize()` call to `finalize(self, self.close)`,
-    make `close()` print `name, "closed"` instead of invoking the finalizer,
+    make `close()` print `self.name, "closed"` instead of invoking the finalizer,
     and call `a.closer()` where the file now calls `a.close()`.
     Run it again.
     Report when `B closed` now prints relative to `End of program`,
@@ -565,3 +589,9 @@ so the registry cannot become the leak it exists to catch.
     Confirm both finalizers run at `gc.collect()`,
     then remove the `gc.disable()`/`gc.enable()` pair and explain why the language no longer guarantees when the two `finalized` lines appear,
     even though this small program still prints them in the same place every run.
+7.  In `faulty_init.py`,
+    move the `print()` and the `raise` from `__init__()` into `__enter__()`,
+    in place of its `return self`.
+    Run it and report whether `C closed` prints.
+    Then wrap the `raise` in a `try`/`except` that prints the `closed` line before re-raising the exception,
+    and confirm `C opened` now has its matching `closed`.

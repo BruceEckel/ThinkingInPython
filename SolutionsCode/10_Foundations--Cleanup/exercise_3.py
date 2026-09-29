@@ -23,15 +23,15 @@ class Counter:
 
 counters = [Counter(name)
             for name in ["First", "Second", "Third"]]
+#: First created
+#: Second created
+#: Third created
 
 for c in counters:
     print(c)
     del c
-print("End of delete loop")
-#: First created
-#: Second created
-#: Third created
 #: Counter('First' 3)
 #: Counter('Second' 3)
 #: Counter('Third' 3)
+print("End of delete loop")
 #: End of delete loop

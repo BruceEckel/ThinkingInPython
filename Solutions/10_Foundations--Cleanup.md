@@ -36,9 +36,9 @@ references to all three `Counter` objects. `counters = []` does
 something different: it points the name `counters` at a brand-new,
 empty list and abandons the old one. Here nothing else refers to that
 old list, so it (and every reference it held) becomes collectible
-immediately, and both spellings reach `live_count() == 0`.
+immediately, and both forms reach `live_count() == 0`.
 
-They stop agreeing the moment a second name enters the picture:
+They stop agreeing once a second name refers to the list:
 
 ```python
 # exercise_1_alias.py
@@ -121,17 +121,17 @@ class Counter:
 
 counters = [Counter(name)
             for name in ["First", "Second", "Third"]]
+#: First created
+#: Second created
+#: Third created
 
 for c in counters:
     print(c)
     del c
-print("End of delete loop")
-#: First created
-#: Second created
-#: Third created
 #: Counter('First' 3)
 #: Counter('Second' 3)
 #: Counter('Third' 3)
+print("End of delete loop")
 #: End of delete loop
 ```
 
@@ -183,8 +183,8 @@ keeps another, so the object's reference count stays above zero and
 the object survives.
 
 The registry has become the leak it exists to catch: `live_count()`
-now reports how many `Counter` objects the program ever created,
-because the registry itself is what keeps them all alive. A
+now reports how many `Counter` objects the program has created,
+because the registry keeps them all alive. A
 `WeakValueDictionary` holds its values weakly, so it can answer the
 question without changing the answer.
 
@@ -233,8 +233,8 @@ version prints it at the `del b`. The listing has no marker for it
 because the line arrives during interpreter shutdown, after the book's
 output checker has stopped capturing. That late arrival demonstrates
 the point in its own right. The rest of the output matches the
-chapter's exactly, so the mistake is hard to see: the callback still
-runs, just at a different time and for a different reason.
+chapter's, so the mistake is hard to see: the callback still
+runs, at a different time and for a different reason.
 
 What keeps the `Connection` alive is the callback itself. `self.close`
 is a bound method, and a bound method holds a strong reference to
@@ -245,7 +245,7 @@ has, but not the last reference that exists, so the object survives.
 
 `B closed` prints only because `finalize()`'s `atexit` backstop runs
 every still-alive finalizer as the interpreter shuts down. That
-backstop is the fallback the chapter describes, doing exactly its job,
+backstop is the fallback the chapter describes, doing its job
 on an object that `del b` should have destroyed.
 
 The chapter's `finalize(self, print, name, "closed")` avoids the trap
@@ -291,8 +291,8 @@ Both finalizers run at `gc.collect()`, in creation order. The
 principle is the same as before. Reference counting cannot reclaim
 either object, because each holds the other. The cycle collector
 reclaims both together when it runs. A cycle through two objects
-behaves exactly like a cycle through one. The self-reference in
-`cycle.py` is only the smallest case.
+behaves like a cycle through one. The self-reference in
+`cycle.py` is the smallest case.
 
 Removing the `gc.disable()`/`gc.enable()` pair takes away the
 guarantee about when the finalizers run. The collector is then free to
@@ -309,3 +309,69 @@ guarantee, not in what this run prints.
 predictable. It is not advice. It buys a deterministic transcript for
 a demonstration whose entire subject is the absence of determinism, so
 the listing turns the collector back on immediately afterward.
+
+## 7. An `__enter__()` that fails, unguarded and guarded
+
+```python
+# exercise_7.py
+
+class Faulty:
+    def __init__(self, name: str) -> None:
+        self.name = name
+
+    def __enter__(self) -> Faulty:
+        print(self.name, "opened")
+        raise RuntimeError("boom")
+
+    def __exit__(self, *exc: object) -> None:
+        print(self.name, "closed")
+
+class Guarded:
+    def __init__(self, name: str) -> None:
+        self.name = name
+
+    def __enter__(self) -> Guarded:
+        print(self.name, "opened")
+        try:
+            raise RuntimeError("boom")
+        except RuntimeError:
+            print(self.name, "closed")
+            raise
+
+    def __exit__(self, *exc: object) -> None:
+        print(self.name, "closed")
+
+try:
+    with Faulty("C"):
+        pass
+except RuntimeError as e:
+    print("caught", e)
+#: C opened
+#: caught boom
+try:
+    with Guarded("C"):
+        pass
+except RuntimeError as e:
+    print("caught", e)
+#: C opened
+#: C closed
+#: caught boom
+```
+
+`C closed` does not print for `Faulty`. Moving the acquisition from
+`__init__()` to `__enter__()` moves the leak with it. The `with`
+statement calls `__exit__()` only for a block it has entered, and it
+enters the block only after `__enter__()` returns. An `__enter__()`
+that fails has not returned, so `__exit__()` never runs.
+
+`Guarded` releases the resource in the method that acquired it. Its
+`except` clause prints the `closed` line and then re-raises the
+exception with a bare `raise`, so the caller still sees `boom`.
+`__exit__()` runs in neither class, and in `Guarded` the resource is
+released anyway.
+
+Acquiring in `__enter__()` still helps: a `Guarded` whose `__init__()`
+fails for some other reason holds no resource at that point. It does
+not remove the need for the guard. Whichever method acquires a
+resource, a step that can fail after the acquisition releases the
+resource before it lets the exception go.
