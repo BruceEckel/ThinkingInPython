@@ -1374,8 +1374,12 @@ a grid model whose responder repaints a canvas,
 and a counter wired as Document-View and as MVC.
 In every case the responder is a callable,
 and the broadcaster holds responders and calls each one when its state changes.
-The pattern requires no interface, no `update()` method,
-and no class per reaction.
+The point at which the broadcaster receives its responders varies.
+All four scenarios subscribe at runtime,
+`FixedBroadcaster` takes its responders at construction,
+and exercise 11's registry collects them as Python imports a module.
+The pattern requires no interface, no `update()` method, no class per reaction,
+and no `unsubscribe()`.
 
 ## Deciding What Matters
 
