@@ -137,13 +137,13 @@ Many of these chapters came from presentations I've given, mostly at PyCon.
 
 Part III, *Patterns*, opens by stepping back to question object orientation,
 because several of the patterns that follow exist to manage problems that objects create.
-A short chapter then introduces the design-patterns movement itself,
+The next chapter introduces the design-patterns movement,
 and the question I keep asking through the rest of the part:
 what problem are you solving,
 and does the language already do the pattern's job?
+Learning to ask those questions is one of the most useful things this book can give you.
 The part then works through the classic design patterns,
 reframing each for Python and weighing it against the language.
-Learning to ask those questions is one of the most useful things this book can give you.
 The part ends by refactoring one problem through several designs,
 building simulations out of the pieces,
 and cataloging the classic patterns together with the ones the literature added later.
@@ -156,13 +156,17 @@ and a spectrum of confidence that runs from local reasoning up to machine-checke
 Part V, *Effects*, closes the book by covering everything a program does that a pure function cannot.
 One chapter surveys the languages that track Effects in a function's type,
 and asks what Python could adopt.
-Another develops the full generator protocol on which such tracking depends.
-The last two put that idea to work with `stateless`,
-a library that brings Effect tracking to Python today.
+Another develops the full generator protocol.
+The last two put both to work with Stateless,
+a library that builds Effect tracking on generators and brings it to Python today.
 Read these four chapters in order:
 the last two build on the chapters before them.
-An appendix, [Effect Tracking](A_Effect_Tracking.md),
-asks how far Python's `Annotated` type could carry Effect tracking without a library.
+Two appendices follow.
+[Effect Tracking](A_Effect_Tracking.md)
+asks how far Python's `Annotated` type could carry Effect tracking without a library,
+and [An Effect Checker](B_An_Effect_Checker.md)
+builds a checker for those annotations,
+as far as one can go without type inference.
 
 ## The Examples
 
@@ -187,9 +191,11 @@ and lives in `Examples/utils/` rather than in a chapter folder.
 A listing imports such a helper by its bare module name,
 `from result import Err, Ok`,
 because the example tooling puts `Examples/utils/` on the import path.
-A file run straight from the repository root lacks that path,
-so `tip run-one <name>` (`tools/run_one_example.py`)
-runs one example with the working directory and import path the book assumes,
+A file run straight from the repository root lacks that path, so `tip`,
+the task runner that comes with the repository,
+has a command for running one example.
+`tip run-one <name>` (`tools/run_one_example.py`)
+supplies the working directory and import path the book assumes,
 and prints the equivalent by-hand commands first.
 A filename comment that starts with `rust/`,
 like the `# rust/fastcount/demo.py` listing in [Performance](18_Techniques--Performance.md),
@@ -197,7 +203,7 @@ names a file in the repository's `rust/` directory, outside the Python build.
 
 `uv` and other tools make setup short.
 The repository's [README](https://github.com/BruceEckel/ThinkingInPython#setup)
-has the instructions,
+has the instructions, including how to install `tip`,
 and `tools/README.md` explains how to build the book and run the examples yourself.
 
 The book's build system extracts the examples, then type-checks
