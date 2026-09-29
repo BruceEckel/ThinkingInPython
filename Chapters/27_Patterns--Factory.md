@@ -1288,7 +1288,9 @@ Both exist to work around languages where a class is not an object you can put i
     Then make `registry_demo.py` print the same key list it printed before the move.
 7.  Give `Monster` in `prototype_registry.py` a `parts: dict[str, int]` field and add a prototype that uses it.
     Change `spawn()` to use `copy.copy()` instead of `copy.deepcopy()`,
-    run `test_prototype.py`, and explain which assertion fails and why.
+    run `test_prototype.py` with `pytest`
+    (`uv run pytest Examples/27_Patterns--Factory/test_prototype.py` from the repository root),
+    and explain which assertion fails and why.
     Then restore `deepcopy()` and add a test that would have caught the bug through `parts` rather than `powers`.
 8.  Recreate the `eval()` dispatcher described after `shape_factory_objects.py`'s listing:
     a `create_shape()` that builds each factory with `eval(f"_{kind}.Factory()")` instead of consulting `FACTORIES`.

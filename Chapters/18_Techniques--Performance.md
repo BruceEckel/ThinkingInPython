@@ -490,8 +490,8 @@ The first `print()` tests that implication, and it shows `True` on every build.
 Most listings in this book print the same line on every machine.
 The second `print()` here changes with your interpreter,
 so it carries no `#:` line.
-The book's build has no JIT compiled in, and a run on it (`tip jit_status`)
-shows the first state:
+The book's build has no JIT compiled in,
+so `tip jit_status` reports the first state:
 
     True
     no JIT in this build
