@@ -5,8 +5,8 @@
 `build/site/`. `tip local` builds the site first and adds `--open`.
 
 With `--watch`, a background thread polls `Chapters/*.md` (and the few
-files the whole site is rendered from: `template.html` and the static
-assets). A changed chapter takes `build_site.rebuild_chapter()`'s
+files the whole site is rendered from: `template.html`, the static
+assets, and the figures in `resources/images/`). A changed chapter takes `build_site.rebuild_chapter()`'s
 incremental path, one pandoc run rather than the ~46 of a full build; a
 changed template or asset rebuilds everything. Each served page carries
 a small script that polls `/__reload` and reloads once the rebuild
@@ -70,6 +70,9 @@ GLOBAL_INPUTS = (
     ROOT / "resources" / "static" / "search.css",
     ROOT / "resources" / "static" / "search.js",
 )
+# `rebuild_chapter()` copies a figure only when the site lacks it, so a
+# changed one (a regenerated coupling panel, say) rebuilds every page.
+IMAGES = ROOT / "resources" / "images"
 # Set in the child the supervisor starts, so the child serves instead of
 # supervising.
 CHILD_ENV = "TIP_SERVE_CHILD"
@@ -147,7 +150,7 @@ COPY_SCRIPT = """
 
 def snapshot() -> dict[Path, float]:
     """Modification times of every file a built page depends on."""
-    watched = [*md_files(), *GLOBAL_INPUTS]
+    watched = [*md_files(), *GLOBAL_INPUTS, *IMAGES.iterdir()]
     out: dict[Path, float] = {}
     for path in watched:
         with contextlib.suppress(OSError):
