@@ -178,7 +178,7 @@ and a dict comprehension builds all of them:
 # eager_event_classes.py
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Final, cast
+from typing import Final
 
 @dataclass
 class Event:
@@ -196,7 +196,7 @@ def make(name: str) -> EventMaker:
     def init(self: Event, hour: int, minute: int) -> None:
         Event.__init__(self, name, hour, minute)
     new_cls = type(name, (Event,), {"__init__": init})
-    return cast(EventMaker, new_cls)
+    return new_cls
 
 makers = {name: make(name) for name in NAMES}
 print(len(makers))
@@ -220,13 +220,19 @@ and `isinstance()` tells them apart.
 Type checkers follow a `type()` call to different depths.
 `ty` reads the bases and a namespace written as a dict literal.
 It takes the constructor from the `"__init__"` entry,
-so it knows each generated class takes an hour and a minute.
+so it knows each generated class takes an hour and a minute,
+and it checks `return new_cls` against `EventMaker`,
+the two-argument signature `make()` declares.
+If `init()` gains a third parameter,
+`ty` reports an `invalid-return-type` that names the extra parameter.
 Pyright builds the class from its bases alone,
-so it gives the class `Event`'s three-argument constructor,
-and mypy models the result as an unknown class and checks nothing.
-`EventMaker` names the two-argument signature the generated classes have,
-and the `cast()` records it at the one place that creates a class,
-so every checker sees that signature.
+so it gives the class `Event`'s three-argument constructor and rejects `return new_cls`.
+Under Pyright the listing needs `cast(EventMaker, new_cls)`.
+Under mypy the result is an unknown class,
+so mypy checks nothing and accepts either form.
+Under `ty` a cast would replace a check with a claim,
+the distinction [Where Enforcement Lives](#where-enforcement-lives) draws:
+the cast states the signature, and nothing confirms it.
 
 `make()` exists so that each `init()` closes over its own `name`.
 A lambda written inline in the comprehension closes over the comprehension's variable instead,
@@ -270,7 +276,7 @@ class EventMakers(dict[str, EventMaker | NOT_CREATED]):
                     self, class_name, hour, minute)
             new_cls = type(class_name, (Event,),
                            {"__init__": init})
-            maker = cast(EventMaker, new_cls)
+            maker = new_cls
             self[class_name] = maker
         return maker
 
@@ -447,8 +453,7 @@ The type checker can't see into the string,
 so `namespace[class_name]` is `Any` to it.
 `exec()` also drops a `__builtins__` entry into any globals mapping that lacks one,
 and that entry is the second reason `namespace` carries the annotation `dict[str, Any]`.
-`cast(Callable[[], Command], ...)` records the actual no-argument signature at the one place that creates the class,
-the same idiom `greenhouse.py` uses for `EventMaker`.
+`cast(Callable[[], Command], ...)` records the actual no-argument signature at the one place that creates the class.
 Unlike `EventMakers`, `make_class()` caches nothing:
 calling `make_class("Start")` twice builds two distinct classes.
 

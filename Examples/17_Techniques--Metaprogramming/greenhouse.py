@@ -22,7 +22,7 @@ class EventMakers(dict[str, EventMaker | NOT_CREATED]):
                     self, class_name, hour, minute)
             new_cls = type(class_name, (Event,),
                            {"__init__": init})
-            maker = cast(EventMaker, new_cls)
+            maker = new_cls
             self[class_name] = maker
         return maker
 

@@ -1,7 +1,7 @@
 # eager_event_classes.py
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Final, cast
+from typing import Final
 
 @dataclass
 class Event:
@@ -19,7 +19,7 @@ def make(name: str) -> EventMaker:
     def init(self: Event, hour: int, minute: int) -> None:
         Event.__init__(self, name, hour, minute)
     new_cls = type(name, (Event,), {"__init__": init})
-    return cast(EventMaker, new_cls)
+    return new_cls
 
 makers = {name: make(name) for name in NAMES}
 print(len(makers))
