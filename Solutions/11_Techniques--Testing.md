@@ -4,6 +4,7 @@
 
 ```python
 # test_ch11_transfer.py
+from dataclasses import dataclass
 import pytest
 
 class InsufficientFunds(Exception):
@@ -12,9 +13,9 @@ class InsufficientFunds(Exception):
         super().__init__(
             f"balance {balance} is less than {amount}")
 
+@dataclass
 class Account:
-    def __init__(self, balance: float = 0.0) -> None:
-        self.balance = balance
+    balance: float = 0.0
 
     def deposit(self, amount: float) -> None:
         if amount <= 0:
@@ -54,9 +55,9 @@ def test_transfer_overdraft_leaves_both_unchanged(
 ```
 
 `transfer()` calls `self.withdraw(amount)` before `other.deposit(amount)`.
-`withdraw()` checks the balance and raises `InsufficientFunds` *before*
+`withdraw()` checks the balance and raises `InsufficientFunds` before
 touching `self.balance`, so an overdrafting transfer never reaches the
-`deposit()` call at all. Both accounts keep the balances they had.
+`deposit()` call. Both accounts keep the balances they had.
 Writing the overdraft test first makes this ordering a
 deliberate decision rather than an accident. A version that deposits
 first and withdraws second leaves `other` credited even when the
@@ -66,11 +67,12 @@ transfer as a whole should fail.
 
 ```python
 # test_ch11_interest_rates.py
+from dataclasses import dataclass
 import pytest
 
+@dataclass
 class Account:
-    def __init__(self, balance: float = 0.0) -> None:
-        self.balance = balance
+    balance: float = 0.0
 
     def deposit(self, amount: float) -> None:
         if amount <= 0:
@@ -108,6 +110,8 @@ tolerance.
 
 ```python
 # test_ch11_invariant.py
+from collections.abc import Iterator
+from dataclasses import dataclass
 import pytest
 
 class InsufficientFunds(Exception):
@@ -116,9 +120,9 @@ class InsufficientFunds(Exception):
         super().__init__(
             f"balance {balance} is less than {amount}")
 
+@dataclass
 class Account:
-    def __init__(self, balance: float = 0.0) -> None:
-        self.balance = balance
+    balance: float = 0.0
 
     def deposit(self, amount: float) -> None:
         if amount <= 0:
@@ -131,7 +135,7 @@ class Account:
         self.balance -= amount
 
 @pytest.fixture
-def never_negative():
+def never_negative() -> Iterator[Account]:
     account = Account()
     account.deposit(50)
     yield account
@@ -149,12 +153,12 @@ def test_never_negative_after_deposit(
 ```
 
 Code after a fixture's `yield` runs as teardown, once the test function
-that uses the fixture finishes, whether it passes or raises. Here that
-teardown is itself an assertion, so it doubles as a check: no matter
-what either test does to the account, `never_negative`'s balance must
-still be non-negative once the test body returns control to the
-fixture. Both tests pass the same invariant check, with no assertion
-duplicated in either test body.
+that uses the fixture finishes, whether it passes or raises an
+exception. Here that teardown is an assertion, so it doubles as a
+check: no matter what either test does to the account,
+`never_negative`'s balance must still be non-negative once the test
+body returns control to the fixture. Both tests pass the same
+invariant check, with no assertion duplicated in either test body.
 
 ## 4. The environment variable, patched and then injected
 
@@ -195,9 +199,9 @@ function reads an environment variable, and that the variable's name is
 `APP_CONFIG`. Renaming the variable to `APP_SETTINGS_DIR` breaks the
 test even though the function still behaves the same. The failure is a
 `KeyError` from inside the function rather than a message about the
-name. The second test knows only what the function promises: give it a
-directory, get the settings file inside it. That test survives the
-rename, and it survives dropping the environment variable entirely.
+name. The second test knows only what the function does: given a
+directory, it returns the settings file inside it. That test survives
+the rename, and it survives dropping the environment variable.
 
 `tmp_path` is still worth taking in the second test, even though
 nothing touches the disk, because it supplies a real, valid path
@@ -221,7 +225,8 @@ def current_temp(city: str) -> str:
         return response.read().decode()
 
 def current_temp_with(
-    city: str, fetch: Callable[[str], io.IOBase]
+    city: str,
+    fetch: Callable[[str], io.BufferedIOBase],
 ) -> str:
     with fetch(f"https://example.com/{city}") as response:
         return response.read().decode()
@@ -263,9 +268,9 @@ That separation is the same lesson exercise 4 draws from the environment
 variable, applied to a different kind of dependency. A patched test
 depends on the *name* of the thing it replaces, in the module where that
 name lives. An injected test depends only on the shape of what it
-passes. Rename the import, move the call into a helper module, or import
-`urlopen` a different way, and the patched test breaks while the code
-still works.
+passes. Renaming the import, moving the call into a helper module, or
+importing `urlopen` a different way breaks the patched test while the
+code still works.
 
 `monkeypatch` earns its place where you cannot change the code:
 someone else's library, or a function you are not ready to refactor.

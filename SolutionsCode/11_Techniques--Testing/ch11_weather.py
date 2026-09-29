@@ -8,7 +8,8 @@ def current_temp(city: str) -> str:
         return response.read().decode()
 
 def current_temp_with(
-    city: str, fetch: Callable[[str], io.IOBase]
+    city: str,
+    fetch: Callable[[str], io.BufferedIOBase],
 ) -> str:
     with fetch(f"https://example.com/{city}") as response:
         return response.read().decode()

@@ -1,4 +1,5 @@
 # test_ch11_transfer.py
+from dataclasses import dataclass
 import pytest
 
 class InsufficientFunds(Exception):
@@ -7,9 +8,9 @@ class InsufficientFunds(Exception):
         super().__init__(
             f"balance {balance} is less than {amount}")
 
+@dataclass
 class Account:
-    def __init__(self, balance: float = 0.0) -> None:
-        self.balance = balance
+    balance: float = 0.0
 
     def deposit(self, amount: float) -> None:
         if amount <= 0:

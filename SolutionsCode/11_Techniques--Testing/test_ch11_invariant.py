@@ -1,4 +1,6 @@
 # test_ch11_invariant.py
+from collections.abc import Iterator
+from dataclasses import dataclass
 import pytest
 
 class InsufficientFunds(Exception):
@@ -7,9 +9,9 @@ class InsufficientFunds(Exception):
         super().__init__(
             f"balance {balance} is less than {amount}")
 
+@dataclass
 class Account:
-    def __init__(self, balance: float = 0.0) -> None:
-        self.balance = balance
+    balance: float = 0.0
 
     def deposit(self, amount: float) -> None:
         if amount <= 0:
@@ -22,7 +24,7 @@ class Account:
         self.balance -= amount
 
 @pytest.fixture
-def never_negative():
+def never_negative() -> Iterator[Account]:
     account = Account()
     account.deposit(50)
     yield account

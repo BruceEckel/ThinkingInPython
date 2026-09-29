@@ -1,9 +1,10 @@
 # test_ch11_interest_rates.py
+from dataclasses import dataclass
 import pytest
 
+@dataclass
 class Account:
-    def __init__(self, balance: float = 0.0) -> None:
-        self.balance = balance
+    balance: float = 0.0
 
     def deposit(self, amount: float) -> None:
         if amount <= 0:

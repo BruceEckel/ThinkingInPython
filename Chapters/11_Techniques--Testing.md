@@ -255,7 +255,7 @@ unless you pass `rel=` or `abs=`.
 
 That test passes with `==` as well.
 `100.0 + 100.0 * 0.05` is exactly `105.0` on any IEEE double,
-and so is every other whole-percent rate on this starting balance.
+and every other whole-percent rate on this starting balance gives an exact result too.
 The trouble starts once error accumulates:
 
 ```python
@@ -435,8 +435,10 @@ or to a resource with its own reset,
 and leave anything a test mutates at the default per-test scope.
 
 `preloaded` shows the other feature: you can parametrize a fixture.
-Every test that requests it runs once for each parameter value,
-with `request.param` holding the value for that run.
+Every test that requests it runs once for each parameter value.
+`request` is a built-in fixture,
+which `preloaded` receives by naming it as a parameter,
+and `request.param` holds the value for that run.
 `pytest` rebuilds `preloaded` for each parameter,
 so a test that uses it automatically runs at every starting balance:
 
@@ -472,7 +474,7 @@ In a language with access control, the compiler enforces the difference.
 Python has no access control, so every attribute is reachable.
 A single leading underscore, as in `self._balance`,
 changes nothing at the language level.
-Python stores it under that exact name, reachable like any other attribute.
+Python stores it under that name, reachable like any other attribute.
 Only convention says, "this is private, do not rely on it."
 
 A leading double underscore changes the name Python stores,
@@ -480,7 +482,7 @@ though it is still not access control.
 Python's compiler rewrites `self.__pin`, written inside a class body,
 into `self._ClassName__pin`, a transformation called *name mangling*.
 `ty` does not model this rewriting,
-so its report on the code below disagrees with what actually runs:
+so its report on the code below disagrees with what runs:
 
 ```python
 # name_mangling.py
@@ -500,7 +502,7 @@ print(v._Vault__pin)  # type: ignore
 #: 1234
 ```
 
-`vars(v)` shows what Python actually stored: `_balance` under its own name,
+`vars(v)` shows what Python stored: `_balance` under its own name,
 and `__pin` rewritten to `_Vault__pin` the moment the class body compiled.
 The rewritten name is a real attribute like any other,
 so `v._Vault__pin` reads it successfully.
@@ -527,6 +529,8 @@ undoing every change when the test ends.
 
 ### Filesystem and Environment
 
+`storage.py` saves and loads files in the directory that the `APP_DATA` environment variable names:
+
 ```python
 # storage.py
 import os
@@ -542,7 +546,7 @@ def load(name: str) -> str:
     return (data_dir() / name).read_text(encoding="utf-8")
 ```
 
-The tests point it at a throwaway directory,
+The tests point `APP_DATA` at a throwaway directory,
 so they never touch real data and never collide with each other:
 
 ```python
@@ -633,6 +637,10 @@ def test_roll_with_seeded_rng() -> None:
 The function takes its source of randomness as an argument,
 so production code hands it a fresh `random.Random()` while the test hands it a seeded one.
 The randomness is now an input, not a hidden dependency.
+This technique is *dependency injection*:
+the caller hands the function what it depends on,
+and the function fetches nothing on its own.
+
 The `4` here is what `Random(0)` produces first,
 and its match with the stubbed value in `test_dice.py` is a coincidence:
 as with any seed, you record the value it gives you rather than pick one.
@@ -734,7 +742,8 @@ and `tick=False` holds it there so every reading is identical,
 as the test's second assertion shows.
 `time.monotonic()` and `time.perf_counter()` keep running,
 because they measure elapsed intervals rather than dates.
-Unlike `monkeypatch`, `time-machine` is a third-party dependency,
+Unlike `monkeypatch`, which comes with `pytest`,
+`time-machine` is a separate dependency,
 but it is the standard answer for code built around `datetime`.
 
 ### Network Calls
@@ -785,11 +794,10 @@ Replace the boundary function with a stand-in and assert against its result.
 
 A stand-in like `fake_urlopen()` is a *stub*:
 it answers with a canned value and records nothing.
-The standard library's `unittest.mock` builds stubs for you,
-along with *mocks* that also record the calls they receive,
-and it turns up in most existing code.
+The standard library's `unittest.mock` turns up in most existing code.
+It builds stubs for you, and it builds *mocks*.
 A `Mock` goes further than a stub: it remembers every call it received,
-so a test can check the call itself, not just what it returned.
+so a test can check the call, not just what the call returned.
 
 ```python
 # notifier.py
@@ -818,9 +826,16 @@ def test_negative_balance_sends_message() -> None:
 `Mock()` accepts any call and returns another `Mock` unless told otherwise,
 recording every call as it goes.
 `assert_called_once_with()` checks two things at once:
-that `send` ran exactly once, and that it ran with this exact argument.
+that `send` ran exactly once, and that it ran with this argument.
 A plain stub cannot make that check.
 `fake_urlopen()` has no memory of how it was called.
+
+Accepting any call has a cost.
+A `Mock` accepts a call the real function would reject,
+so a test keeps passing after the real signature changes.
+`create_autospec()`, also in `unittest.mock`,
+builds a mock from the real function and rejects a call that does not fit its signature.
+
 This book patches with `monkeypatch` and prefers injection where you can change the code,
 because a function that takes its clock or its fetcher as an argument needs no patching library.
 
