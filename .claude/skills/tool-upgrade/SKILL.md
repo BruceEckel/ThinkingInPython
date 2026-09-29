@@ -217,6 +217,24 @@ Added 2026-09-29, when chapter 17 dropped its two `cast(EventMaker, ...)` calls.
   `pyright_baseline.txt` entries (one in `eager_event_classes.py`, two
   in `greenhouse.py`).
 
+## Probe: a misspelled keyword through `Unpack[TypedDict]`
+
+Added 2026-09-29, with chapter 08's "Typing `**kwargs` with a `TypedDict`".
+
+  `ty` 0.0.84 does not check a keyword's name against an unpacked
+  `TypedDict` when the key is optional. In a scratch file in
+  `build/examples/08_*/`: `class TD(TypedDict): fill: NotRequired[str]`,
+  `def f(**kw: Unpack[TD]) -> None: ...`, and the call `f(fil="*")`.
+  `ty` reports nothing; Pyright reports `No parameter named "fil"`
+  (`reportCallIssue`). Keep `fill` optional in the probe: with a
+  required `fill`, `ty` reports the missing argument, which hides the
+  question. Chapter 08's `#typed-kwargs` section says, pinned to
+  `ty` 0.0.84, that `ty` accepts the misspelled call. The day `ty`
+  reports it, rewrite that paragraph (the checkers then agree, and the
+  sentence about `fil` becoming an extra key in `style` at run time is
+  the part that stays) and drop the version string.
+  If `ty` keeps accepting it, bump the version string to the new release.
+
 ## Pyright: a periodic review, never a gate
 
 `ty` is the only checker the gates run. Pyright is a pinned dev

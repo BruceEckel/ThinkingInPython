@@ -1,7 +1,18 @@
 {
+ "43149ef1fb95c029": {
+  "file": "02_Foundations--Tour.md",
+  "line": 345,
+  "target": "07_Foundations--Classes.md",
+  "terms": [
+   "Bucket"
+  ],
+  "sentence": "`Bucket` is a small class, and [Classes](07_Foundations--Classes.md) covers the syntax.",
+  "p_terms": 0.0,
+  "asked": "2026-09-29"
+ },
  "37aaf25bd0d28980": {
   "file": "02_Foundations--Tour.md",
-  "line": 531,
+  "line": 597,
   "target": "16_Techniques--Comprehensions.md",
   "terms": [
    "piece",
@@ -13,7 +24,7 @@
  },
  "0817097ab993e16a": {
   "file": "11_Techniques--Testing.md",
-  "line": 106,
+  "line": 104,
   "target": "12_Techniques--Data_Classes_as_Types.md",
   "terms": [
    "Account"
@@ -24,7 +35,7 @@
  },
  "d4b3ffe75ef39268": {
   "file": "12_Techniques--Data_Classes_as_Types.md",
-  "line": 231,
+  "line": 232,
   "target": "09_Foundations--Class_Attributes.md",
   "terms": [
    "depth"
@@ -33,20 +44,20 @@
   "p_terms": 0.07,
   "asked": "2026-09-27"
  },
- "f1a0d2aa476f42fa": {
+ "c7218299e47237e2": {
   "file": "12_Techniques--Data_Classes_as_Types.md",
-  "line": 984,
+  "line": 1018,
   "target": "05_Foundations--Functions.md",
   "terms": [
    "Months"
   ],
-  "sentence": "Python evaluates a default value once, at class definition, so every `Months` reads and writes that one list, the trap shown in [Functions](05_Foundations--Functions.md#the-mutable-default-trap).",
-  "p_terms": 0.03,
-  "asked": "2026-09-27"
+  "sentence": "Python evaluates a default value once, at class definition, so with that default every `Months` reads and writes one list, the trap shown in [Functions](05_Foundations--Functions.md#the-mutable-default-trap).",
+  "p_terms": 0.01,
+  "asked": "2026-09-29"
  },
  "fa2f1549160e7e2a": {
   "file": "14_Techniques--Decorators.md",
-  "line": 1128,
+  "line": 1142,
   "target": "07_Foundations--Classes.md",
   "terms": [
    "trace"
@@ -57,7 +68,7 @@
  },
  "a0de1b1b17d13b14": {
   "file": "19_Techniques--Concurrency.md",
-  "line": 511,
+  "line": 249,
   "target": "15_Techniques--Context_Managers.md",
   "terms": [
    "Meter"
@@ -68,7 +79,7 @@
  },
  "4754b53da37ff3e9": {
   "file": "19_Techniques--Concurrency.md",
-  "line": 1276,
+  "line": 1278,
   "target": "22_Patterns--Data_Transfer_Objects.md",
   "terms": [
    "Times"
@@ -79,7 +90,7 @@
  },
  "734b3d881649c1ef": {
   "file": "21_Patterns--Design_Patterns.md",
-  "line": 498,
+  "line": 500,
   "target": "20_Patterns--Rethinking_Objects.md",
   "terms": [
    "Need"
@@ -88,9 +99,20 @@
   "p_terms": 0.05,
   "asked": "2026-09-27"
  },
+ "3d7c06bedd459686": {
+  "file": "22_Patterns--Data_Transfer_Objects.md",
+  "line": 132,
+  "target": "18_Techniques--Performance.md",
+  "terms": [
+   "NamedTuple"
+  ],
+  "sentence": "[A NamedTuple Is Still a Tuple](#a-namedtuple-is-still-a-tuple) compares the frozen form, which this book's listings write as [`@record`](18_Techniques--Performance.md#record), with a `NamedTuple`.",
+  "p_terms": 0.06,
+  "asked": "2026-09-29"
+ },
  "4925ead030b960dc": {
   "file": "22_Patterns--Data_Transfer_Objects.md",
-  "line": 340,
+  "line": 359,
   "target": "09_Foundations--Class_Attributes.md",
   "terms": [
    "messenger_idiom.py",
@@ -102,7 +124,7 @@
  },
  "ebf2d05c88d18b4b": {
   "file": "23_Patterns--Iterators.md",
-  "line": 772,
+  "line": 775,
   "target": "20_Patterns--Rethinking_Objects.md",
   "terms": [
    "traverse",
@@ -114,7 +136,7 @@
  },
  "92ea1b2aa8c0d548": {
   "file": "23_Patterns--Iterators.md",
-  "line": 843,
+  "line": 853,
   "target": "05_Foundations--Functions.md",
   "terms": [
    "DONE"
@@ -123,20 +145,20 @@
   "p_terms": 0.01,
   "asked": "2026-09-27"
  },
- "02a2236754e35047": {
+ "3d2ba10d42a8a605": {
   "file": "24_Patterns--Singleton.md",
-  "line": 158,
+  "line": 166,
   "target": "11_Techniques--Testing.md",
   "terms": [
    "__Settings"
   ],
-  "sentence": "The compiler [mangles](11_Techniques--Testing.md#white-box-and-black-box-tests) names only inside a class body, so at module level `__Settings` is the plain name it looks like.",
+  "sentence": "The compiler [mangles](11_Techniques--Testing.md#white-box-and-black-box-tests) names only inside a class body, so at module level `__Settings` is stored under that name, as reachable as any other.",
   "p_terms": 0.01,
-  "asked": "2026-09-27"
+  "asked": "2026-09-29"
  },
  "9912c8ce605b1548": {
   "file": "24_Patterns--Singleton.md",
-  "line": 631,
+  "line": 698,
   "target": "26_Patterns--Surrogate.md",
   "terms": [
    "__call__"
@@ -158,7 +180,7 @@
  },
  "2e71dc56c76b481b": {
   "file": "26_Patterns--Surrogate.md",
-  "line": 742,
+  "line": 761,
   "target": "31_Patterns--State_Machines.md",
   "terms": [
    "change_to"
@@ -169,7 +191,7 @@
  },
  "04ed39e4b8874f00": {
   "file": "26_Patterns--Surrogate.md",
-  "line": 747,
+  "line": 766,
   "target": "19_Techniques--Concurrency.md",
   "terms": [
    "change_to"
@@ -180,7 +202,7 @@
  },
  "3711bb4c386a5bfa": {
   "file": "27_Patterns--Factory.md",
-  "line": 177,
+  "line": 180,
   "target": "23_Patterns--Iterators.md",
   "terms": [
    "shape_name"
@@ -191,7 +213,7 @@
  },
  "8ef838d56d0840f4": {
   "file": "28_Patterns--Function_Objects.md",
-  "line": 160,
+  "line": 166,
   "target": "18_Techniques--Performance.md",
   "terms": [
    "Repeat"
@@ -213,7 +235,7 @@
  },
  "aa5a7959c6d4d7a1": {
   "file": "29_Patterns--Changing_the_Interface.md",
-  "line": 160,
+  "line": 168,
   "target": "20_Patterns--Rethinking_Objects.md",
   "terms": [
    "WhatIUse2",
@@ -226,7 +248,7 @@
  },
  "12ce46050bf0a689": {
   "file": "29_Patterns--Changing_the_Interface.md",
-  "line": 232,
+  "line": 273,
   "target": "18_Techniques--Performance.md",
   "terms": [
    "distance",
@@ -238,7 +260,7 @@
  },
  "82bb6893784c05ff": {
   "file": "29_Patterns--Changing_the_Interface.md",
-  "line": 237,
+  "line": 278,
   "target": "26_Patterns--Surrogate.md",
   "terms": [
    "adapter"
@@ -247,20 +269,20 @@
   "p_terms": 0.0,
   "asked": "2026-09-27"
  },
- "404b8df50ff4dc33": {
+ "1f2521c2404fcd22": {
   "file": "30_Patterns--Observer.md",
-  "line": 414,
+  "line": 465,
   "target": "42_Functional--Error_Handling.md",
   "terms": [
    "announce"
   ],
-  "sentence": "The listener catches its own exception and [returns the error as a value](42_Functional--Error_Handling.md#return-the-error-as-a-value), and `announce()` collects the returned errors for the caller.",
+  "sentence": "The responder catches its own exception and [returns the error as a value](42_Functional--Error_Handling.md#return-the-error-as-a-value), and `announce()` collects the returned errors for the caller.",
   "p_terms": 0.01,
-  "asked": "2026-09-27"
+  "asked": "2026-09-29"
  },
  "e8e91f728192b79c": {
   "file": "30_Patterns--Observer.md",
-  "line": 1398,
+  "line": 1461,
   "target": "17_Techniques--Metaprogramming.md",
   "terms": [
    "Notifying",
@@ -294,7 +316,7 @@
  },
  "e3c9c99b35195620": {
   "file": "31_Patterns--State_Machines.md",
-  "line": 478,
+  "line": 485,
   "target": "06_Foundations--Modules_and_Packages.md",
   "terms": [
    "state_machine.py"
@@ -305,7 +327,7 @@
  },
  "e8596ef215d9870a": {
   "file": "31_Patterns--State_Machines.md",
-  "line": 976,
+  "line": 973,
   "target": "26_Patterns--Surrogate.md",
   "terms": [
    "UnpredictablePerson",
@@ -318,7 +340,7 @@
  },
  "8b236a72729572a5": {
   "file": "31_Patterns--State_Machines.md",
-  "line": 988,
+  "line": 985,
   "target": "23_Patterns--Iterators.md",
   "terms": [
    "mouse_move_generator",
@@ -330,7 +352,7 @@
  },
  "806a7dc7e24cfdff": {
   "file": "33_Patterns--Visitor.md",
-  "line": 116,
+  "line": 118,
   "target": "27_Patterns--Factory.md",
   "terms": [
    "flower_gen",
@@ -342,7 +364,7 @@
  },
  "9c56880fd09f0864": {
   "file": "34_Patterns--Composite_and_Interpreter.md",
-  "line": 173,
+  "line": 174,
   "target": "08_Foundations--Static_Types.md",
   "terms": [
    "Directory",
@@ -354,7 +376,7 @@
  },
  "f52e1a4cb81fc818": {
   "file": "34_Patterns--Composite_and_Interpreter.md",
-  "line": 538,
+  "line": 539,
   "target": "33_Patterns--Visitor.md",
   "terms": [
    "to_infix"
@@ -365,7 +387,7 @@
  },
  "d8f5d0b90e5ce17a": {
   "file": "35_Patterns--Flyweight.md",
-  "line": 216,
+  "line": 221,
   "target": "20_Patterns--Rethinking_Objects.md",
   "terms": [
    "Tile"
@@ -376,7 +398,7 @@
  },
  "1e7bdfa6c4734885": {
   "file": "37_Patterns--Pattern_Refactoring.md",
-  "line": 376,
+  "line": 369,
   "target": "32_Patterns--Multiple_Dispatching.md",
   "terms": [
    "bins"
@@ -387,7 +409,7 @@
  },
  "fc74baefc0b1e835": {
   "file": "37_Patterns--Pattern_Refactoring.md",
-  "line": 376,
+  "line": 369,
   "target": "31_Patterns--State_Machines.md",
   "terms": [
    "bins"
@@ -398,7 +420,7 @@
  },
  "ac09f5e8941b7dcd": {
   "file": "37_Patterns--Pattern_Refactoring.md",
-  "line": 636,
+  "line": 631,
   "target": "07_Foundations--Classes.md",
   "terms": [
    "singledispatch",
@@ -411,7 +433,7 @@
  },
  "c5af7a4f94d39022": {
   "file": "40_Functional--Foundations.md",
-  "line": 566,
+  "line": 588,
   "target": "05_Foundations--Functions.md",
   "terms": [
    "partial"
@@ -422,7 +444,7 @@
  },
  "d2b75b2af9d16cb3": {
   "file": "41_Functional--Toolkits.md",
-  "line": 602,
+  "line": 624,
   "target": "05_Foundations--Functions.md",
   "terms": [
    "fillvalue"
@@ -433,7 +455,7 @@
  },
  "b0dc91a7cce04574": {
   "file": "42_Functional--Error_Handling.md",
-  "line": 216,
+  "line": 221,
   "target": "12_Techniques--Data_Classes_as_Types.md",
   "terms": [
    "Result"
@@ -444,7 +466,7 @@
  },
  "709ba98f5b49d11a": {
   "file": "46_Effects--Stateless.md",
-  "line": 1321,
+  "line": 1325,
   "target": "44_Effects--Effect_Management.md",
   "terms": [
    "Need"
@@ -455,7 +477,7 @@
  },
  "757f33f7028c918e": {
   "file": "47_Effects--Stateless_in_Practice.md",
-  "line": 1333,
+  "line": 1310,
   "target": "46_Effects--Stateless.md",
   "terms": [
    "Oven",
