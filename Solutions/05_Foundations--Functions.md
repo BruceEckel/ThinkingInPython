@@ -4,6 +4,8 @@
 
 ```python
 # exercise_1.py
+from exceptions import expect
+
 def bad_append(item, target=[]):
     target.append(item)
     return target
@@ -14,25 +16,34 @@ print(bad_append(2))
 #: [1, 2]
 print(bad_append(3))
 #: [1, 2, 3]
+
+def tuple_append(item, target=()):
+    target.append(item)  # type: ignore
+    return target
+
+expect(AttributeError, tuple_append, 1)
+#: [AttributeError] 'tuple' object has no attribute 'append'
 ```
 
 Each call keeps appending to the same list. Python creates the
 default once, when it defines the function, and every call that
 omits `target` reuses that same object.
 
-Changing the default to `()` does not fix anything, because the bug
-is not really about mutability by itself. It is about calling a
-method that mutates the default *in place*. A tuple has no
-`append()`, so `target.append(item)` immediately raises
-`AttributeError: 'tuple' object has no attribute 'append'`. The real
-fix, shown in `good_append()`, is the `None` sentinel: check for
-`None` and build a fresh, genuinely mutable container inside the
-function body on every call.
+Changing the default to `()` trades one failure for another. The
+function's job is to append, and a tuple has no `append()`, so the
+first call that omits `target` raises an `AttributeError`.
+`tuple_append()` is `bad_append()` with that one change. An immutable
+default suits a parameter the function reads, as in
+`immutable_default.py`. A function that mutates the parameter needs
+the `None` sentinel that `good_append()` uses: test for `None` and
+build a new list inside the function body on every call.
 
-## 2. A stored `None` next to a missing key
+## 2. A `get()` that re-raises, and why `None` cannot be its sentinel
 
 ```python
 # exercise_2.py
+from exceptions import expect
+
 MISSING = sentinel("MISSING")
 
 def get(data, key, default=MISSING):
@@ -40,20 +51,26 @@ def get(data, key, default=MISSING):
         return data[key]
     except KeyError:
         if default is MISSING:
-            return MISSING  # Normally re-raises here
+            raise
         return default
 
-prefs = {"volume": 3, "mute": None, "volume2": None}
-print(get(prefs, "volume2"))
+prefs = {"volume": 3, "mute": None}
+expect(KeyError, get, prefs, "theme")
+#: [KeyError] 'theme'
+print(get(prefs, "theme", None))
 #: None
 ```
 
-`volume2` is a real key whose stored value happens to be `None`. The
-subscript finds it and raises nothing, so `get()` returns the stored
-`None` directly, without ever consulting `default`. The `MISSING` sentinel only matters
-when the key is genuinely absent. Here it never comes into play,
-which is the point: a present `None` and an absent key are
-different situations, and the sentinel exists to tell them apart.
+The two calls ask for different things. The first supplies no
+default, so a missing key is an error. The second supplies `None` as
+the default, so a missing key produces `None`. With `default=None` as
+the sentinel, `get()` receives the same `None` in both calls and
+cannot tell them apart: it must raise an exception for both or return
+`None` for both. `MISSING` is an object no caller passes as data, so
+`default is MISSING` is true only when the caller supplied no default.
+The built-in `getattr()` draws the same line: `getattr(obj, "x")`
+raises an `AttributeError` when `obj` has no `x`, and
+`getattr(obj, "x", None)` returns `None`.
 
 ## 3. A keyword-only `label` parameter
 
@@ -73,12 +90,12 @@ expect(TypeError, divide, 10, 2, "half")  # type: ignore
 ```
 
 `a` and `b` stay positional-only (from the original `/`), and the new
-`*` marks everything after it, here just `label`, as keyword-only.
-Calling `divide(10, 2, "half")` tries to pass three positional
-arguments to a function that only accepts two positionally, so Python
-raises `TypeError` before the function body ever runs.
+`*` marks everything after it, here `label` alone, as keyword-only.
+Calling `divide(10, 2, "half")` passes three positional arguments to
+a function that accepts two, so Python raises a `TypeError` before
+the function body runs.
 
-## 4. `report()` with an optional running total
+## 4. `report()` with an optional total
 
 ```python
 # exercise_4.py
@@ -95,8 +112,8 @@ report("nums", 1, 2, 3, total=True)
 `total` sits between `*values` and `**options` in the parameter list,
 so it is keyword-only. Callers must write `total=True`, and neither
 `values` nor `options` can swallow it by accident. Adding the flag
-needs no change to how `report()` already collects its positional
-and keyword arguments.
+needs no change to how `report()` collects its positional and
+keyword arguments.
 
 ## 5. `apply_twice()` with a lambda
 
@@ -133,7 +150,7 @@ report(*args, **opts)
 ```
 
 One `*` and one `**` do the whole job. `*args` spreads the tuple into
-three positional arguments, so `"point"` lands on `label` and the
+three positional arguments, so `"point"` fills `label` and the
 remaining two collect into `values`. `**opts` spreads the dictionary
 into keyword arguments, which `**options` collects again. The first
 element of `args` is not special to the caller: it becomes `label`
@@ -163,14 +180,14 @@ The `/` causes the `TypeError`. `name` is positional-only, so
 `name="Bob"` cannot reach it. Where the argument goes instead is the
 part worth tracing. `**facts` accepts any keyword the parameters do
 not claim, and after the `/` no parameter claims `name`. So `"Bob"`
-lands in `facts`, and the positional `name` stays unfilled. The message
+goes into `facts`, and the positional `name` stays unfilled. The message
 is therefore `describe() missing 1 required positional argument: 'name'`,
 which points at the parameter the caller thought they were filling.
 The mistake is visible without running the code, so the call carries a
 `# type: ignore` telling the type checker the misuse is deliberate,
 the same way `param_markers.py` marks its two bad calls.
 
-Take the `**facts` away and Python reports the mismatch directly:
+Without `**facts`, Python reports the mismatch directly:
 `describe() got some positional-only arguments passed as keyword
 arguments: 'name'`, the same error `divide(a=10, b=2)` raises in
 `param_markers.py`. Catch-all keywords hide that message, because
@@ -187,9 +204,10 @@ unchanged.
 
 The two markers are also worth using together. `/` hides the
 parameter name `name` from callers, so a later rename breaks no
-caller, while `**facts` accepts names the function has never heard
-of. One parameter refuses the caller's vocabulary and the rest accept
-it.
+caller, while `**facts` accepts any name a caller writes. The `/`
+also frees the word `name` for the caller's use:
+`describe("Bob", name="Robert")` stores a fact called `name`, where
+without the `/` the same call fails with two values for `name`.
 
 ## 8. `UnboundLocalError` from both directions
 
@@ -223,10 +241,40 @@ the assignment in `count += 1` makes `count` local to
 has no value yet. `rebinds()` fails for the same reason even though
 its `print` comes first in time. Python decides which names are local
 when it compiles the function body, so the `count = 99` below the
-`print` already makes `count` local throughout. The first `print`
-therefore reads the unassigned local, never the module-level name.
-The second `print`, after the assignment, never runs. Both mistakes
+`print` makes `count` local throughout. The first `print`
+therefore reads the unassigned local, not the module-level name,
+and the second `print` does not run. Both mistakes
 are visible without running the code. The type checker and the linter
 each flag them, so the offending lines carry `# type: ignore` and
 `# noqa` markers saying the misuse is deliberate, the way
 `param_markers.py` marks its two bad calls.
+
+## 9. Rebinding a parameter against mutating it
+
+```python
+# exercise_9.py
+def clear_by_assignment(target):
+    target = []  # Rebinds the local name
+    print(target)
+
+def clear_by_method(target):
+    target.clear()  # Changes the caller's list
+
+mine = [1, 2, 3]
+clear_by_assignment(mine)
+#: []
+print(mine)
+#: [1, 2, 3]
+clear_by_method(mine)
+print(mine)
+#: []
+```
+
+Only `clear_by_method()` empties the caller's list. When a call
+begins, `target` and `mine` are two names for one list. The
+assignment in `clear_by_assignment()` binds `target` to a new empty
+list, which the function prints, and `mine` still names the original.
+`target.clear()` rebinds nothing. It calls a method on the one list
+both names share, so the caller sees the list empty. These are
+`rebind()` and `append_all()` from `mutating_arguments.py` with the
+same operation, emptying a list, written both ways.

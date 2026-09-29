@@ -1,4 +1,6 @@
 # exercise_2.py
+from exceptions import expect
+
 MISSING = sentinel("MISSING")
 
 def get(data, key, default=MISSING):
@@ -6,9 +8,11 @@ def get(data, key, default=MISSING):
         return data[key]
     except KeyError:
         if default is MISSING:
-            return MISSING  # Normally re-raises here
+            raise
         return default
 
-prefs = {"volume": 3, "mute": None, "volume2": None}
-print(get(prefs, "volume2"))
+prefs = {"volume": 3, "mute": None}
+expect(KeyError, get, prefs, "theme")
+#: [KeyError] 'theme'
+print(get(prefs, "theme", None))
 #: None

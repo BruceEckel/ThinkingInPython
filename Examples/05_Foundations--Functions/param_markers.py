@@ -23,11 +23,9 @@ tally("nums", 1, 2, True)
 tally("nums", 1, 2, total=True)
 #: nums (1, 2) True
 
-try:
-    divide(a=10, b=2)  # type: ignore
-except TypeError as e:
-    print(str(e).partition("some ")[2].partition(":")[0])
-#: positional-only arguments passed as keyword arguments
+expect(TypeError, divide, a=10, b=2)  # type: ignore
+#: [TypeError] divide() got some positional-only arguments
+#: passed as keyword arguments: 'a, b'
 expect(TypeError, make_user, "Sue", True)  # type: ignore
 #: [TypeError] make_user() takes 1 positional argument but 2
 #: were given

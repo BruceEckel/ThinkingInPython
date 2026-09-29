@@ -3,9 +3,6 @@
 > A piece of behavior needs a name so other code can call it without knowing how it works.
 > A function is that name, with a parameter list that says what to pass.
 
-default and keyword arguments, scope and `global`, `*args`/`**kwargs`,
-positional-only and keyword-only parameters, and lambdas.
-
 The `def` keyword defines a function.
 After `def` come the function name, the parameter list,
 and a colon that begins the function body:
@@ -29,6 +26,9 @@ print(a_function("yes"))
 #: continuing...
 #: 1
 ```
+
+`response` is a *parameter*, the name the function gives to what it receives.
+The value a call passes, `"no"` or `"yes"`, is an *argument*.
 
 A string literal directly under `def`, before any other statement,
 becomes the function's *docstring*, stored on `__doc__`:
@@ -55,8 +55,35 @@ The signatures so far give only the function name and the parameter names,
 with no argument types or return types
 ([Static Types](08_Foundations--Static_Types.md#type-hints) covers these).
 Python is dynamically typed,
-so type errors surface at runtime rather than at compile time.
-The same function can therefore accept and return different types:
+so type errors surface at runtime rather than at compile time:
+
+```python
+# add.py
+from exceptions import expect
+
+def add(arg1, arg2):
+    return arg1 + arg2
+
+print(add(42, 47))
+#: 89
+print(add("spam ", "eggs"))
+#: spam eggs
+expect(TypeError, add, 42, "spam")
+#: [TypeError] unsupported operand type(s) for +: 'int' and
+#: 'str'
+```
+
+A function argument works as long as the function can apply its operations to it.
+The failure comes from `+` inside the function body,
+not from the call that passed the arguments.
+Nothing checks the arguments on the way in.
+
+[`expect()`](15_Techniques--Context_Managers.md#the-expect-function)
+is a helper that many of this book's listings import.
+It calls its second argument, passing along the arguments that follow,
+and prints the exception that call raises.
+
+A function can also return a different type from one call to the next:
 
 ```python
 # flexible_args_and_returns.py
@@ -90,27 +117,6 @@ which the caller usually unpacks:
 
 The commas build the tuple.
 The function still returns one object.
-
-```python
-# add.py
-from exceptions import expect
-
-def add(arg1, arg2):
-    return arg1 + arg2
-
-print(add(42, 47))
-#: 89
-print(add("spam ", "eggs"))
-#: spam eggs
-expect(TypeError, add, 42, "spam")
-#: [TypeError] unsupported operand type(s) for +: 'int' and
-#: 'str'
-```
-
-A function argument works as long as the function can apply its operations to it.
-The failure comes from `+` inside the function body,
-not from the call that passed the arguments.
-Nothing checks the arguments on the way in.
 
 ## Default Arguments
 
@@ -248,7 +254,7 @@ show(["a", "b"])
 #: (2 items)
 ```
 
-With the [type hints](08_Foundations--Static_Types.md#type-hints),
+With [type hints](08_Foundations--Static_Types.md#type-hints),
 such a parameter reads:
 
     items: Sequence[str] = ()
@@ -333,7 +339,7 @@ print(count)
 #: 1
 ```
 
-`rebinds()` never touches the module-level `count`.
+`rebinds()` leaves the module-level `count` alone.
 If you drop the `global` from `writes_global()`,
 `count += 1` reads a local before assigning it,
 so the call raises an `UnboundLocalError`.
@@ -343,9 +349,10 @@ and that is why `read_only()` needs no declaration.
 which rebinds a name in an enclosing function the way `global` rebinds a module-level name.
 A function that rebinds a global couples every caller to that shared,
 mutable state.
-[Closures](40_Functional--Foundations.md#closures)
-and [Effect Management](44_Effects--Effect_Management.md#what-is-an-effect)
-both treat a mutable global as an anti-pattern.
+[Pure Functions](40_Functional--Foundations.md#pure-functions) shows the cost:
+to understand one call, you must trace every call before it.
+[Effect Management](44_Effects--Effect_Management.md#what-is-an-effect)
+classifies the write as a side effect and the read as a side cause.
 
 ## Variable Argument Lists
 
@@ -371,7 +378,7 @@ so `*values` and `**options` behave identically.
 ## Unpacking Arguments
 
 `*` and `**` also work in the other direction.
-At a call site, `*` unpacks a sequence into separate positional arguments,
+At a call site, `*` unpacks any iterable into separate positional arguments,
 and `**` unpacks a dictionary into keyword arguments.
 
 ```python
@@ -413,10 +420,12 @@ and that is the standard shape of a wrapper.
 A function is an [object like any other](40_Functional--Foundations.md#functions-as-first-class-objects),
 so you can pass `report` to `trace()` as an argument,
 and `func.__name__` reads the name of whatever function arrived.
+`expect()` has the same shape: it receives a function and the arguments for it,
+and makes the call.
 [Decorators](14_Techniques--Decorators.md) builds on that forwarding.
 
-Forwarding an arbitrary `**kwargs` can still collide with a name the wrapped function already receives.
-If the unpacked dictionary has a key matching a parameter supplied another way,
+A forwarded `**kwargs` can collide with an argument the wrapped function receives another way.
+When a key in the unpacked dictionary names a parameter that a positional argument fills,
 Python raises a `TypeError`:
 
 ```python
@@ -442,16 +451,16 @@ expect(TypeError, trace, report, *nums, **opts)
 The same `func(*args, **kwargs)` call spreads `nums` positionally,
 so `report()`'s first parameter, `label`, also receives `1`,
 and no parameter can take two values.
-The error arrives one level down, when `trace()` calls `report()`, so `trace()`,
-which knows nothing about the signature of the function it calls,
-has no way to see the clash coming.
+`trace()` knows nothing about the signature of the function it calls,
+so it cannot detect the clash.
+The error arrives one level down, when `trace()` calls `report()`.
 
 ## Positional-Only and Keyword-Only Parameters
 
 Two markers in a parameter list control how callers may pass arguments.
 That control also decides how much of a signature you commit to keeping:
-a parameter a caller can name is part of the contract,
-and a parameter a caller must pass by position stays outside it.
+a parameter's name is part of the contract when a caller can write it,
+and stays outside the contract when the caller must pass by position.
 A `/` ends the *positional-only* parameters.
 You must pass every parameter before it by position, not by name.
 A `*` begins the *keyword-only* parameters.
@@ -486,11 +495,9 @@ tally("nums", 1, 2, True)
 tally("nums", 1, 2, total=True)
 #: nums (1, 2) True
 
-try:
-    divide(a=10, b=2)  # type: ignore
-except TypeError as e:
-    print(str(e).partition("some ")[2].partition(":")[0])
-#: positional-only arguments passed as keyword arguments
+expect(TypeError, divide, a=10, b=2)  # type: ignore
+#: [TypeError] divide() got some positional-only arguments
+#: passed as keyword arguments: 'a, b'
 expect(TypeError, make_user, "Sue", True)  # type: ignore
 #: [TypeError] make_user() takes 1 positional argument but 2
 #: were given
@@ -501,8 +508,6 @@ Only the named form, `total=True`, reaches `total`.
 
 Calling `divide(a=10, b=2)` is an error,
 because `a` and `b` are positional-only.
-The full message ends by naming the offenders, `'a, b'`.
-The listing's two `partition()` calls trim the front and that tail to keep the printed line short.
 Calling `make_user("Sue", True)` is an error, because `admin` is keyword-only.
 The type checker catches both mistakes without running the code,
 so each line carries a `# type: ignore` saying the misuse is deliberate.
@@ -536,7 +541,7 @@ A `lambda` is a small anonymous function you write as a single expression.
 Use one to pass behavior to functions such as `sorted()`,
 which accepts a `key` function, calls it on each element,
 and orders by the results.
-When an existing function already computes the key, pass the function itself:
+When an existing function computes the key, pass that function:
 `key=len` needs no lambda.
 Write a lambda when no existing function computes the key you want,
 such as ordering by a word's last letter:
@@ -560,8 +565,8 @@ Unlike the body of an anonymous function in many other languages,
 a lambda body must be a single expression.
 For anything more complicated, write a separate function.
 
-For a key that just reads an index or an attribute,
-`operator.itemgetter`/`attrgetter` name the same operation without a lambda:
+For a key that reads an index or an attribute,
+`operator.itemgetter()` and `operator.attrgetter()` name the same operation without a lambda:
 `sorted(words, key=operator.itemgetter(-1))` replaces `key=lambda w: w[-1]` above.
 Write a lambda when the key needs an expression that neither getter builds.
 
@@ -569,10 +574,12 @@ Write a lambda when the key needs an expression that neither getter builds.
 
 1.  In `mutable_default.py`,
     call `bad_append(3)` a third time and predict the result before checking it.
-    Then change `bad_append`'s default from `[]` to `()` and explain why that alone does not fix it
+    Then change `bad_append()`'s default from `[]` to `()` and explain why that alone does not fix it
     (hint: `target.append(item)` on a tuple).
-2.  In `sentinel_default.py`, add a third key to `prefs`, `"volume2": None`,
-    and call `get(prefs, "volume2")` to confirm the sentinel still tells `None`-as-value apart from missing.
+2.  In `sentinel_default.py`, replace `return MISSING` with a bare `raise`,
+    so a missing key with no default re-raises the `KeyError`.
+    Confirm that `get(prefs, "theme")` raises a `KeyError` and that `get(prefs, "theme", None)` returns `None`.
+    Explain why `default=None` could not serve as the sentinel in this function.
 3.  In `param_markers.py`, add a parameter `label="result"` to `divide()`,
     keyword-only, so `print(divide(10, 2, label="half"))` shows `half: 5.0`.
     Confirm that `divide(10, 2, "half")`, passing `label` positionally,
@@ -595,3 +602,7 @@ Write a lambda when the key needs an expression that neither getter builds.
     Then restore it, and instead add `print(count)` as the first line of `rebinds()`.
     Explain why that also raises an `UnboundLocalError`,
     even though the assignment to `count` comes after the `print`.
+9.  Write `clear_by_assignment(target)`, which assigns `target = []`,
+    and `clear_by_method(target)`, which calls `target.clear()`.
+    Pass the same list to each,
+    and predict which call empties the caller's list before running them.
