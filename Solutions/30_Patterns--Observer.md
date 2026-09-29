@@ -897,3 +897,88 @@ which draws no complaint from Pyright.
 `subscribe()` writes the responder list into the instance's `__dict__`
 rather than declaring it on the class, where every instance shares
 one list.
+
+## 11. Responders registered at load time
+
+```python
+# exercise_11.py
+from collections.abc import Callable
+from typing import Final
+
+type Responder = Callable[[float], None]
+
+RESPONDERS: Final[list[Responder]] = []
+
+def responds(fn: Responder) -> Responder:
+    RESPONDERS.append(fn)
+    return fn
+
+class Thermometer:
+    def __init__(self, celsius: float) -> None:
+        self._celsius = celsius
+
+    @property
+    def celsius(self) -> float:
+        return self._celsius
+
+    @celsius.setter
+    def celsius(self, value: float) -> None:
+        self._celsius = value
+        for responder in RESPONDERS:
+            responder(value)
+
+@responds
+def display(celsius: float) -> None:
+    print(f"display: {celsius}C")
+
+@responds
+def alarm(celsius: float) -> None:
+    if celsius > 100:
+        print("alarm!")
+
+room = Thermometer(20.0)
+oven = Thermometer(180.0)
+room.celsius = 21.0
+#: display: 21.0C
+oven.celsius = 200.0
+#: display: 200.0C
+#: alarm!
+```
+
+Python calls `responds()` once for each decorated `def`, when it runs that statement.
+For a module-level function, that is while Python imports the module,
+so the registry is complete before any thermometer exists.
+`responds()` returns `fn` unchanged,
+so `display` is still a function you can call directly.
+
+The load-time form removes three of the runtime problems:
+
+- `Broadcaster.announce()` copies its list because a responder can unsubscribe mid-notification.
+  The registry has no `unsubscribe()`, so the setter loops over `RESPONDERS` directly.
+- A lambda cannot be unsubscribed, a question that disappears along with `unsubscribe()`.
+  The `@` form also needs a `def`, so every decorated responder has a name.
+- A lapsed listener is an object kept alive by its subscription.
+  The registry holds module-level functions,
+  which their module keeps alive for the whole program,
+  so the strong references keep nothing alive that Python would otherwise collect.
+
+Two problems remain.
+A responder that raises an exception stops the loop,
+and the exception reaches the assignment to `celsius`.
+A responder that assigns to `celsius` re-enters the setter.
+
+The load-time form also costs three things that `Broadcaster` does not:
+
+- The registry is global.
+  `room` and `oven` announce to the same two responders,
+  and `alarm` cannot tell which thermometer changed.
+  `Broadcaster` keeps one list per instance.
+  Sending the thermometer along with the reading tells the responders the source,
+  but every responder still receives every thermometer's changes.
+- A responder registers only if Python imports its module.
+  A handler in a module that nothing imports does not run, and nothing reports its absence.
+  Django's documentation meets this by importing an app's signal handlers from its `AppConfig.ready()` method,
+  which Django calls at startup.
+- Tests share the registry.
+  A test that decorates a responder leaves it registered for every test that runs after it,
+  unless the test removes it from `RESPONDERS`.

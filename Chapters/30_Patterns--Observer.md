@@ -687,7 +687,7 @@ A program can settle its responders at any of four points:
     Each handler registers itself with a decorator as Python imports its module.
     Django's `@receiver` decorator and `atexit.register()` work this way.
     Registration runs at runtime,
-    but the set is normally complete once the imports finish.
+    but the set is normally complete once the imports finish (see exercise 11).
 3.  **Construction time.**
     The subject receives its responders when you create it,
     as `FixedBroadcaster` does.
@@ -1555,3 +1555,11 @@ instead of guessing which responders need it.
     so `__get__()` returns the descriptor for an access through the class,
     and `Thermometer.celsius.subscribe(t, readings.append)` reaches it.
     Show that an assignment to one attribute calls no responder of the other.
+11. Write a load-time version of `Broadcaster`:
+    a module-level list of responders and a `@responds` decorator that appends a function to it and returns the function unchanged.
+    Each responder then registers when Python runs its `def` statement,
+    and for a module-level function Python runs that statement while it imports the module.
+    Give a `Thermometer` a `celsius` setter that announces to that list,
+    and create two thermometers.
+    Say which of the problems in this chapter's runtime sections the load-time form keeps,
+    which it removes, and what it costs that `Broadcaster` does not.
