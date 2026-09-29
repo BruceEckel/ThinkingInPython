@@ -367,8 +367,8 @@ that fails has not returned, so `__exit__()` never runs.
 `Guarded` releases the resource in the method that acquired it. Its
 `except` clause prints the `closed` line and then re-raises the
 exception with a bare `raise`, so the caller still sees `boom`.
-`__exit__()` runs in neither class, and in `Guarded` the resource is
-released anyway.
+`__exit__()` runs in neither class, and `Guarded` releases the
+resource anyway.
 
 Acquiring in `__enter__()` still helps: a `Guarded` whose `__init__()`
 fails for some other reason holds no resource at that point. It does

@@ -201,8 +201,8 @@ except BadNumber as e:
 The prediction is the "direct cause" line, the same one `explicit()`
 produces. `from` sets `__cause__` to whatever object follows it, and
 Python builds the traceback that `joining_line()` searches from
-`__cause__`. An exception constructed on the spot joins the report the
-same way a caught one does. `from` takes an expression, not a name
+`__cause__`. An exception constructed in the `raise` statement joins the
+report the same way a caught one does. `from` takes an expression, not a name
 bound by `except`.
 
 The second `print()` shows what makes this case worth writing. Both

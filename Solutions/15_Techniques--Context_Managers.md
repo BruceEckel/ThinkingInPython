@@ -374,6 +374,6 @@ That is the order `exit_on_error.py` shows for the class form: cleanup
 first, then propagation.
 
 In `no_finally.py` the same exception left the generator from the
-bare `yield`, so the `print()` after it was skipped. The `finally` is
+bare `yield`, so the `print()` after it never ran. The `finally` is
 the only difference between the two listings, apart from the
 function's name.

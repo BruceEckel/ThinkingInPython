@@ -167,8 +167,8 @@ that reports its reason needs a failure value with room for one.
 `Failed` is that value, a record with one field, and each finder now
 returns `float | Failed`. A finder has more than one way to fail:
 `bisection()` gives up at once when the interval holds no sign change,
-and it can also run out of iterations, so the reason is written at
-the `return` that knows it. `solve()` tells the two results apart
+and it can also run out of iterations, so each failing `return`
+states its own reason. `solve()` tells the two results apart
 with `match`. `case Failed(reason)` prints the reason and lets the
 loop continue, and any other value is the root.
 
@@ -509,7 +509,7 @@ The listing copies the two decorators, with the change made and the
 checks the question does not reach left out, and applies `handler()`
 as a call so that `expect()` can report the failure.
 
-The three `@event` classes in `bank_events.py` are created without
+Python creates the three `@event` classes in `bank_events.py` without
 complaint, which makes the mistake easy to miss. `EVENTS` holds one
 class for each, and none of them is the class the module's names refer
 to. `dataclass()` with `slots=True` builds a new class, `event()`
@@ -521,6 +521,6 @@ The import stops at the first `@handler`, on `Announce`.
 `handler()` reads the annotation on `event`, which is `Deposit`, the
 class `dataclass()` returned, and does not find it in `EVENTS`. It
 raises `TypeError: Announce: not an @event`, although `Deposit` went
-through `@event` a few lines earlier. If the handlers were created
-some other way, `publish()` would refuse every event for the same
+through `@event` a few lines earlier. If something else created
+the handlers, `publish()` would refuse every event for the same
 reason, since `type(event)` is the returned class too.

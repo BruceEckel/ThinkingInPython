@@ -155,7 +155,7 @@ because the answer cannot have changed and nothing observable
 happens during the call besides computing that answer. An impure
 function breaks that assumption. Any side effect the function
 performs, such as printing, writing a file, or incrementing a
-counter, takes place on the first call with a given argument, and
+counter, occurs on the first call with a given argument, and
 the cache silently skips it on every repeat.
 
 ## 5. Popping a heap correctly

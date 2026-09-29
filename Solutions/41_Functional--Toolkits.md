@@ -162,8 +162,9 @@ its contents can change after the cache stores it, and a mutated key
 no longer hashes to the slot holding its entry. The call fails
 before `deep_sum()`'s body runs.
 
-`ty` reports the same problem before the program runs. A cached
-function's parameters are declared `Hashable`, so both calls draw
+`ty` reports the same problem before the program runs. The standard
+library's type declarations give a cached function's parameters the
+type `Hashable`, so both calls draw
 `invalid-argument-type`: "Expected `Hashable`, found `list[Nested]`"
 on the recursive call, and the same diagnostic, naming the literal's
 inferred type, on the list passed through `expect()`. The two

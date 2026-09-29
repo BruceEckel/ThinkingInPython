@@ -1035,7 +1035,7 @@ changes its type every time `research()`'s error set changes.
 What `ty` stops checking is the correspondence between the annotation and the
 Effect. The annotation is where a human writes down which failures this program
 expects, and `ty`'s job is to confirm that the Effect agrees.
-Once the annotation is deleted, the type checker has one description instead of
+Once you delete the annotation, the type checker has one description instead of
 two, so it can no longer notice a disagreement. Callers lose their check too:
 under `ty` the result is `Unknown`, so a caller that treats it as a `str`
 type-checks, and under Pyright the new member propagates outward until it
@@ -1086,7 +1086,7 @@ print(run(handle(scripted_from(iter([3, 4])))(game)()))
 ```
 
 The request carries the range, which is the difference from a `Need`.
-`Need[T]` asks for an instance of `T`, and the type is the whole request.
+`Need[T]` asks for an instance of `T`, so its request consists of the type alone.
 `Random(1, 6)` asks a question with arguments, and the handler reads them off
 the request. That is why this Ability is a record with fields, where the
 chapter's `Flip` is an empty class: the fields are the parameters of the
