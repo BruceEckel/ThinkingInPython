@@ -238,276 +238,11 @@ Each runs until its first `await`, which the trace's `started` lines record.
 The comprehension never has more than one coroutine in flight:
 it starts the next coroutine only after the previous one has finished.
 
-## Structured Concurrency with `TaskGroup`
-
-What happens if `gather()` encounters a failure?
-If one of its coroutines raises an exception,
-`gather()` re-raises that exception into the awaiting code,
-but the other tasks it started keep running.
-Those other tasks become unsupervised, and their results and errors vanish.
-
-The next two listings run the same six fetches, which a shared module defines:
-
-```python
-# utils/fetch_demo.py
-import asyncio
-from typing import Final
-
-PAIRS: Final[list[tuple[str, float]]] = [
-    ("a", 0.01),
-    ("b", 0.02),
-    ("c", 0.03),
-    ("d", 0.03),
-    ("e", 0.2),
-    ("f", 0.3),
-]
-
-async def sleep_until(when: float) -> None:
-    loop = asyncio.get_running_loop()
-    woken: asyncio.Future[None] = loop.create_future()
-    timer = loop.call_at(when, woken.set_result, None)
-    try:
-        await woken
-    finally:
-        timer.cancel()
-
-async def fetch(item: str, delay: float, t0: float) -> str:
-    print(f"{item}: started")
-    await sleep_until(t0 + delay)
-    if item in ("c", "d"):
-        raise ValueError(f"fetch({item!r}) failed")
-    print(f"{item}: fetched")
-    return item.upper()
-```
-
-Each delay is an offset from `t0`,
-one reading of the event loop's clock that the caller takes before it starts any task,
-and `sleep_until()` hands that absolute time to `loop.call_at()`.
-`a` and `b` have the shortest delays and succeed.
-`c` and `d` share one deadline, so they fail together.
-`e` and `f` are still sleeping when that happens,
-with a wide gap to their own deadlines.
-The gap gives cancellation time to arrive first on any platform's timer,
-and that margin keeps the trace deterministic.
-
-`asyncio.TaskGroup` (added in 3.11) is the structured alternative.
-An `async with` block owns every task started inside it and exits only after it has accounted for every one:
-
-```python
-# task_group.py
-import asyncio
-from fetch_demo import PAIRS, fetch
-
-async def main() -> None:
-    t0 = asyncio.get_running_loop().time()
-    try:
-        async with asyncio.TaskGroup() as tg:
-            tasks = {
-                item: tg.create_task(fetch(item, delay, t0))
-                for item, delay in PAIRS
-            }
-    except* ValueError as group:
-        for exc in group.exceptions:
-            print(f"caught: {exc}")
-    for item, task in tasks.items():
-        if task.cancelled():
-            print(f"{item}: cancelled")
-        elif (exc := task.exception()) is not None:
-            print(f"{item}: raised {exc!r}")
-        else:
-            print(f"{item}: {task.result()}")
-
-asyncio.run(main())
-#: a: started
-#: b: started
-#: c: started
-#: d: started
-#: e: started
-#: f: started
-#: a: fetched
-#: b: fetched
-#: caught: fetch('c') failed
-#: caught: fetch('d') failed
-#: a: A
-#: b: B
-#: c: raised ValueError("fetch('c') failed")
-#: d: raised ValueError("fetch('d') failed")
-#: e: cancelled
-#: f: cancelled
-```
-
-`tg.create_task()` schedules a task immediately,
-so all six are in flight together.
-Holding the task objects is essential bookkeeping.
-The event loop keeps only weak references to its tasks,
-so a task that loses its last strong reference can disappear mid-execution,
-printing nothing and raising no exception.
-A `TaskGroup` holds its own references until the block exits.
-Outside one, keep the returned task in a variable or a set that outlives it.
-`c` and `d` raise exceptions at the same 0.03-second mark,
-and the `TaskGroup` responds by cancelling `e` and `f`,
-which are still suspended with far more sleep to go,
-so neither ever reaches its `fetched` print.
-The shared deadline puts both failures in the group.
-The loop runs every timer due at one instant in the same turn,
-so `c` and `d` both raise their exceptions before the group's own callback runs and starts cancelling.
-If each calls `asyncio.sleep(0.03)`,
-the two timers are set a few microseconds apart,
-since each call reads the clock when it runs,
-and a loop that wakes between them runs `c`'s failure,
-cancels `d` while its timer is still pending,
-and delivers a group holding one exception.
-
-The block exits once every task has either finished or ended in cancellation.
-As it exits, it re-raises both failures wrapped in an *exception group*,
-a container for simultaneous failures,
-since more than one task can fail at once.
-The `except*` form catches members of a group by type,
-and iterating through `group.exceptions` reaches every member.
-
-The `except*` form matters.
-A `TaskGroup` always wraps what it re-raises, even when exactly one task failed,
-so a plain `except ValueError:` around the `async with` block catches nothing,
-and the `ExceptionGroup` propagates uncaught.
-
-Keeping the task objects pays off even after a partial failure.
-`a` and `b` already succeeded, and their results stay untouched:
-`task.result()` returns `'A'` and `'B'`, as if nothing else had gone wrong.
-`c` and `d` each completed with their own exception,
-so `task.exception()` returns the `ValueError` instead of raising it.
-`e` and `f` never reach their `fetched` print because the group cancels them,
-so `task.cancelled()` is `True` for both.
-A partial failure cancels whatever was still in flight.
-It does not erase what already succeeded.
-
-Cancellation reaches a task by raising `asyncio.CancelledError` inside it,
-at whichever `await` currently suspends it.
-That exception derives from `BaseException` rather than `Exception`,
-and the choice is deliberate.
-A `try`/`except Exception` written inside a task to log and continue does not catch cancellation,
-so the task still stops the way the group intended.
-The real mistake is catching too much:
-a bare `except:` or an `except BaseException:` around an `await` catches the cancellation and keeps the task running,
-so the `TaskGroup` block waits on a task it ordered to stop.
-If a task must clean up as it stops, catch `asyncio.CancelledError` by name,
-do the cleanup, and re-raise it.
-
-You can also stop a `TaskGroup` deliberately.
-`tg.cancel()` (3.15) cancels every task in the group,
-for the case where the answer arrives before the batch finishes and the remaining work has lost its value.
-
-### Failures as Values with `gather()`
-
-When one task's failure should not stop the others,
-`gather(..., return_exceptions=True)` handles the situation differently:
-
-```python
-# gather_with_exceptions.py
-import asyncio
-from typing import assert_never
-from fetch_demo import PAIRS, fetch
-
-async def main() -> None:
-    t0 = asyncio.get_running_loop().time()
-    results = await asyncio.gather(
-        *(fetch(item, delay, t0) for item, delay in PAIRS),
-        return_exceptions=True,
-    )
-    for (item, _), result in zip(PAIRS, results):
-        match result:
-            case BaseException():
-                print(f"{item}: raised {result!r}")
-            case str():
-                print(f"{item}: {result}")
-            case _:
-                assert_never(result)
-
-asyncio.run(main())
-#: a: started
-#: b: started
-#: c: started
-#: d: started
-#: e: started
-#: f: started
-#: a: fetched
-#: b: fetched
-#: e: fetched
-#: f: fetched
-#: a: A
-#: b: B
-#: c: raised ValueError("fetch('c') failed")
-#: d: raised ValueError("fetch('d') failed")
-#: e: E
-#: f: F
-```
-
-Again, `c` and `d` fail at the 0.03-second mark,
-but this time the rest continue.
-`gather()` leaves its siblings unsupervised, where `TaskGroup` cancels them,
-so `e` and `f` keep sleeping and eventually print their `fetched` line.
-`return_exceptions=True` catches both `ValueError`s and places them in the result list,
-in argument order, alongside the successful results.
-Nothing propagates, so the call site needs no `try`/`except*`.
-
-That behavior is the trade `gather()` offers in place of `TaskGroup`'s all-or-cancel contract.
-For a batch where partial failure is data to examine rather than a reason to stop,
-`return_exceptions=True` collects failures as values instead of cancelling whatever is still in flight.
-A health check across ten services needs all the answers including the errors,
-not a cancelled remainder of the batch.
-`TaskGroup` has no such mode.
-Keeping siblings alive past a failure means catching exceptions inside each task yourself.
-
-### Bounding a Wait with `asyncio.timeout()` {#bounding-a-wait-with-asynciotimeout}
-
-Every delay in this chapter so far has a fixed length,
-so nothing has needed a time limit.
-A real network call carries no such guarantee.
-`asyncio.timeout()` (3.11) bounds how long a block of code may run,
-and it composes with `TaskGroup` the way a `with` block composes with anything inside it:
-
-```python
-# async_timeout.py
-import asyncio
-
-async def slow(delay: float) -> str:
-    await asyncio.sleep(delay)
-    return "done"
-
-async def main() -> None:
-    try:
-        async with asyncio.timeout(0.05):
-            async with asyncio.TaskGroup() as tg:
-                tg.create_task(slow(0.01))
-                tg.create_task(slow(0.5))
-    except TimeoutError:
-        print("timed out")
-
-asyncio.run(main())
-#: timed out
-```
-
-The group holds a fast task and a slow one.
-`asyncio.timeout()`'s deadline passes well before the slow task's sleep ends,
-so the timeout cancels the task running `main()`.
-The resulting `asyncio.CancelledError` reaches the `TaskGroup`,
-which cancels the slow task, its one child still running,
-and re-raises the cancellation as it exits.
-Because the cancellation traces back to its own deadline,
-`asyncio.timeout()` converts that `CancelledError` into a `TimeoutError` on its way out,
-so the caller sees an ordinary exception instead of a bare cancellation.
-`asyncio.wait_for()` bounds one awaitable the same way;
-[`async_deadlock.py`](#deadlock)
-uses it as an escape hatch so that demo doesn't hang forever.
-`asyncio.timeout()` is the newer, composable form,
-scoping the deadline over an entire block, `TaskGroup` included,
-instead of one call.
-
 ## Overlapping the Waits
 
-`asyncio` runs many tasks on one thread by switching between them at each `await`.
-When a task awaits, the event loop finds another task to run in the meantime.
-
-In the following example, the same price lookup appears twice.
+Every task in `async_mechanics.py` spends its time suspended at an `await`.
+The following example compares a task that waits with one that computes,
+writing the same price lookup twice.
 `io_price()` awaits `asyncio.sleep()` as a stand-in for a network call.
 `cpu_price()` counts through a million iterations as a stand-in for heavy computing.
 A `Meter` records the peak number of tasks in flight at once.
@@ -733,6 +468,270 @@ builds a full program on these mechanics:
 a pack of rats exploring a maze as cooperating tasks,
 and [*Observer*](30_Patterns--Observer.md#observer-and-io)
 uses `gather()` to notify slow observers together instead of one at a time.
+
+## Structured Concurrency with `TaskGroup`
+
+What happens if `gather()` encounters a failure?
+If one of its coroutines raises an exception,
+`gather()` re-raises that exception into the awaiting code,
+but the other tasks it started keep running.
+Those other tasks become unsupervised, and their results and errors vanish.
+
+The next two listings run the same six fetches, which a shared module defines:
+
+```python
+# utils/fetch_demo.py
+import asyncio
+from typing import Final
+
+PAIRS: Final[list[tuple[str, float]]] = [
+    ("a", 0.01),
+    ("b", 0.02),
+    ("c", 0.03),
+    ("d", 0.03),
+    ("e", 0.2),
+    ("f", 0.3),
+]
+
+async def sleep_until(when: float) -> None:
+    loop = asyncio.get_running_loop()
+    woken: asyncio.Future[None] = loop.create_future()
+    timer = loop.call_at(when, woken.set_result, None)
+    try:
+        await woken
+    finally:
+        timer.cancel()
+
+async def fetch(item: str, delay: float, t0: float) -> str:
+    print(f"{item}: started")
+    await sleep_until(t0 + delay)
+    if item in ("c", "d"):
+        raise ValueError(f"fetch({item!r}) failed")
+    print(f"{item}: fetched")
+    return item.upper()
+```
+
+Each delay is an offset from `t0`,
+one reading of the event loop's clock that the caller takes before it starts any task,
+and `sleep_until()` hands that absolute time to `loop.call_at()`.
+`a` and `b` have the shortest delays and succeed.
+`c` and `d` share one deadline, so they fail together.
+`e` and `f` are still sleeping when that happens,
+with a wide gap to their own deadlines.
+The gap gives cancellation time to arrive first on any platform's timer,
+and that margin keeps the trace deterministic.
+
+`asyncio.TaskGroup` (added in 3.11) is the structured alternative.
+An `async with` block owns every task started inside it and exits only after it has accounted for every one:
+
+```python
+# task_group.py
+import asyncio
+from fetch_demo import PAIRS, fetch
+
+async def main() -> None:
+    t0 = asyncio.get_running_loop().time()
+    try:
+        async with asyncio.TaskGroup() as tg:
+            tasks = {
+                item: tg.create_task(fetch(item, delay, t0))
+                for item, delay in PAIRS
+            }
+    except* ValueError as group:
+        for exc in group.exceptions:
+            print(f"caught: {exc}")
+    for item, task in tasks.items():
+        if task.cancelled():
+            print(f"{item}: cancelled")
+        elif (exc := task.exception()) is not None:
+            print(f"{item}: raised {exc!r}")
+        else:
+            print(f"{item}: {task.result()}")
+
+asyncio.run(main())
+#: a: started
+#: b: started
+#: c: started
+#: d: started
+#: e: started
+#: f: started
+#: a: fetched
+#: b: fetched
+#: caught: fetch('c') failed
+#: caught: fetch('d') failed
+#: a: A
+#: b: B
+#: c: raised ValueError("fetch('c') failed")
+#: d: raised ValueError("fetch('d') failed")
+#: e: cancelled
+#: f: cancelled
+```
+
+`tg.create_task()` schedules a task immediately,
+so all six are in flight together.
+Holding the task objects is essential bookkeeping.
+The event loop keeps only weak references to its tasks,
+so a task that loses its last strong reference can disappear mid-execution,
+printing nothing and raising no exception.
+A `TaskGroup` holds its own references until the block exits.
+Outside one, keep the returned task in a variable or a set that outlives it.
+`c` and `d` raise exceptions at the same 0.03-second mark,
+and the `TaskGroup` responds by cancelling `e` and `f`,
+which are still suspended with far more sleep to go,
+so neither ever reaches its `fetched` print.
+The shared deadline puts both failures in the group.
+The loop runs every timer due at one instant in the same turn,
+so `c` and `d` both raise their exceptions before the group's own callback runs and starts cancelling.
+If each calls `asyncio.sleep(0.03)`,
+the two timers are set a few microseconds apart,
+since each call reads the clock when it runs,
+and a loop that wakes between them runs `c`'s failure,
+cancels `d` while its timer is still pending,
+and delivers a group holding one exception.
+
+The block exits once every task has either finished or ended in cancellation.
+As it exits, it re-raises both failures wrapped in an *exception group*,
+a container for simultaneous failures,
+since more than one task can fail at once.
+The `except*` form catches members of a group by type,
+and iterating through `group.exceptions` reaches every member.
+
+The `except*` form matters.
+A `TaskGroup` always wraps what it re-raises, even when exactly one task failed,
+so a plain `except ValueError:` around the `async with` block catches nothing,
+and the `ExceptionGroup` propagates uncaught.
+
+Keeping the task objects pays off even after a partial failure.
+`a` and `b` already succeeded, and their results stay untouched:
+`task.result()` returns `'A'` and `'B'`, as if nothing else had gone wrong.
+`c` and `d` each completed with their own exception,
+so `task.exception()` returns the `ValueError` instead of raising it.
+`e` and `f` never reach their `fetched` print because the group cancels them,
+so `task.cancelled()` is `True` for both.
+A partial failure cancels whatever was still in flight.
+It does not erase what already succeeded.
+
+Cancellation reaches a task by raising `asyncio.CancelledError` inside it,
+at whichever `await` currently suspends it.
+That exception derives from `BaseException` rather than `Exception`,
+and the choice is deliberate.
+A `try`/`except Exception` written inside a task to log and continue does not catch cancellation,
+so the task still stops the way the group intended.
+The real mistake is catching too much:
+a bare `except:` or an `except BaseException:` around an `await` catches the cancellation and keeps the task running,
+so the `TaskGroup` block waits on a task it ordered to stop.
+If a task must clean up as it stops, catch `asyncio.CancelledError` by name,
+do the cleanup, and re-raise it.
+
+You can also stop a `TaskGroup` deliberately.
+`tg.cancel()` (3.15) cancels every task in the group,
+for the case where the answer arrives before the batch finishes and the remaining work has lost its value.
+
+### Failures as Values with `gather()`
+
+When one task's failure should not stop the others,
+`gather(..., return_exceptions=True)` handles the situation differently:
+
+```python
+# gather_with_exceptions.py
+import asyncio
+from typing import assert_never
+from fetch_demo import PAIRS, fetch
+
+async def main() -> None:
+    t0 = asyncio.get_running_loop().time()
+    results = await asyncio.gather(
+        *(fetch(item, delay, t0) for item, delay in PAIRS),
+        return_exceptions=True,
+    )
+    for (item, _), result in zip(PAIRS, results):
+        match result:
+            case BaseException():
+                print(f"{item}: raised {result!r}")
+            case str():
+                print(f"{item}: {result}")
+            case _:
+                assert_never(result)
+
+asyncio.run(main())
+#: a: started
+#: b: started
+#: c: started
+#: d: started
+#: e: started
+#: f: started
+#: a: fetched
+#: b: fetched
+#: e: fetched
+#: f: fetched
+#: a: A
+#: b: B
+#: c: raised ValueError("fetch('c') failed")
+#: d: raised ValueError("fetch('d') failed")
+#: e: E
+#: f: F
+```
+
+Again, `c` and `d` fail at the 0.03-second mark,
+but this time the rest continue.
+`gather()` leaves its siblings unsupervised, where `TaskGroup` cancels them,
+so `e` and `f` keep sleeping and eventually print their `fetched` line.
+`return_exceptions=True` catches both `ValueError`s and places them in the result list,
+in argument order, alongside the successful results.
+Nothing propagates, so the call site needs no `try`/`except*`.
+
+That behavior is the trade `gather()` offers in place of `TaskGroup`'s all-or-cancel contract.
+For a batch where partial failure is data to examine rather than a reason to stop,
+`return_exceptions=True` collects failures as values instead of cancelling whatever is still in flight.
+A health check across ten services needs all the answers including the errors,
+not a cancelled remainder of the batch.
+`TaskGroup` has no such mode.
+Keeping siblings alive past a failure means catching exceptions inside each task yourself.
+
+### Bounding a Wait with `asyncio.timeout()` {#bounding-a-wait-with-asynciotimeout}
+
+Every delay in this chapter so far has a fixed length or, in `network_io.py`,
+waits on a server in the same process, so nothing has needed a time limit.
+A call to a remote server carries no such guarantee.
+`asyncio.timeout()` (3.11) bounds how long a block of code may run,
+and it composes with `TaskGroup` the way a `with` block composes with anything inside it:
+
+```python
+# async_timeout.py
+import asyncio
+
+async def slow(delay: float) -> str:
+    await asyncio.sleep(delay)
+    return "done"
+
+async def main() -> None:
+    try:
+        async with asyncio.timeout(0.05):
+            async with asyncio.TaskGroup() as tg:
+                tg.create_task(slow(0.01))
+                tg.create_task(slow(0.5))
+    except TimeoutError:
+        print("timed out")
+
+asyncio.run(main())
+#: timed out
+```
+
+The group holds a fast task and a slow one.
+`asyncio.timeout()`'s deadline passes well before the slow task's sleep ends,
+so the timeout cancels the task running `main()`.
+The resulting `asyncio.CancelledError` reaches the `TaskGroup`,
+which cancels the slow task, its one child still running,
+and re-raises the cancellation as it exits.
+Because the cancellation traces back to its own deadline,
+`asyncio.timeout()` converts that `CancelledError` into a `TimeoutError` on its way out,
+so the caller sees an ordinary exception instead of a bare cancellation.
+`asyncio.wait_for()` bounds one awaitable the same way;
+[`async_deadlock.py`](#deadlock)
+uses it as an escape hatch so that demo doesn't hang forever.
+`asyncio.timeout()` is the newer, composable form,
+scoping the deadline over an entire block, `TaskGroup` included,
+instead of one call.
 
 ## A Single Thread Still Races
 
