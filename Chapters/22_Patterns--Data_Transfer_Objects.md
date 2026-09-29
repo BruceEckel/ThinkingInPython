@@ -109,7 +109,7 @@ so `m.inof` passes the type checker here too.
 
 When you want the fields named and checked, declare them.
 A `@dataclass` generates `__init__()`, `__repr__()`,
-and equality from those declarations, and produces a mutable record:
+and equality from those declarations, and its fields stay assignable:
 
 ```python
 # point_dataclass.py
@@ -331,11 +331,11 @@ because the array version drops the names silently.
 ## Which Should You Use?
 
 Use `SimpleNamespace` for an ad-hoc bag of attributes,
-a `@dataclass` for a typed mutable record,
-and a `NamedTuple` for a typed immutable one.
+a `@dataclass` for typed fields you reassign,
+and a `NamedTuple` for typed fields you cannot.
 The hand-rolled `Messenger` is worth writing only to show how `SimpleNamespace` works underneath.
 
-The frozen data class is the second typed immutable record.
+The frozen data class is the other typed immutable record.
 Between it and a `NamedTuple`,
 the deciding question is whether tuple behavior is a feature.
 Choose `NamedTuple` when it is: unpacking, multiple return values,
