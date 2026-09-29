@@ -97,6 +97,10 @@ def write_baseline(failing: list[str]) -> None:
 
 
 
+# Total runs an example gets before a timeout counts.
+TIMEOUT_ATTEMPTS = 2
+
+
 def run_one(
     path: Path, rel: str, timeout: float, utils_dir: Path
 ) -> tuple[str, str, str]:
@@ -106,23 +110,32 @@ def run_one(
     subprocesses with their own cwd, so this is safe to call concurrently. The
     tree's utils/ directory is put on PYTHONPATH so examples can import
     shared helpers (such as display.py) that live there.
+
+    An example that times out is run once more before it counts. On
+    Windows a listing can hang while asyncio.run() builds its event
+    loop, before any of its own code runs (validate_output.py's
+    docstring has the mechanism), and a second run of the same file
+    passes. A listing that hangs on its own account times out twice.
     """
     existing = os.environ.get("PYTHONPATH")
     pythonpath = (str(utils_dir) if not existing
                   else f"{utils_dir}{os.pathsep}{existing}")
     env = {**os.environ, "PYTHONPATH": pythonpath}
-    try:
-        proc = subprocess.run(
-            [sys.executable, path.name],
-            cwd=path.parent,
-            env=env,
-            stdin=subprocess.DEVNULL,
-            capture_output=True,
-            text=True,
-            timeout=timeout,
-        )
-    except subprocess.TimeoutExpired:
-        return ("timeout", rel, "")
+    for attempt in range(1, TIMEOUT_ATTEMPTS + 1):
+        try:
+            proc = subprocess.run(
+                [sys.executable, path.name],
+                cwd=path.parent,
+                env=env,
+                stdin=subprocess.DEVNULL,
+                capture_output=True,
+                text=True,
+                timeout=timeout,
+            )
+            break
+        except subprocess.TimeoutExpired:
+            if attempt == TIMEOUT_ATTEMPTS:
+                return ("timeout", rel, "")
     if proc.returncode == 0:
         return ("passed", rel, "")
     tail = (proc.stderr.strip().splitlines() or ["(no stderr)"])[-1]
