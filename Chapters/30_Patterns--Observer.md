@@ -933,8 +933,7 @@ The size decides that, and a 3x3 grid reaches all three colors (see exercise 9).
 
 ### The Model
 
-The model imports nothing from `tkinter`.
-Its only tie to a view is the `Broadcaster` it inherits:
+The model knows nothing about how it is displayed:
 
 ```python
 # box_observer.py
@@ -988,10 +987,11 @@ so the view can pass a `Color` to `tkinter` as a color name.
 because iterating over an enum produces its members in definition order.
 `Color.at(n)` counts `n` places around that cycle,
 and `n % len(members)` wraps a count past the last member back to the start.
-`at()` is a classmethod because it works on the whole set of members rather than on one.
+`at()` is a classmethod because it works on the whole set rather than a single member.
 A class attribute holding the list is not an option,
 because every assignment in an `Enum` body creates another member.
-`next()` finds the member's position with `index()` and asks `at()` for the position after it,
+If you call `next()` on a member,
+it finds that member's position with `index()` and asks `at()` for the position after it,
 so `Color.KHAKI.next()` is `Color.SKYBLUE`.
 
 A `Grid` maps each `(column, row)` coordinate to a `Color`.
