@@ -166,6 +166,30 @@ Moved from `CLAUDE.md`, which keeps the rule that you never start an upgrade you
   it went away. Project memory (`typing-construct-hierarchy`) has the
   fuller case study.
 
+## Probe: `record(cls)` on a `type[E]` parameter
+
+Moved from the root `CLAUDE.md` (2026-09-29).
+
+  Separately, `ty` 0.0.82 mistypes a direct call to a
+  `dataclass_transform` function whenever the argument is typed
+  `type[...]` rather than being a class literal: `record(Point)` reveals
+  `<class 'Point'>`, but `record(cls)` with `cls: type[E]`,
+  `type[Point]`, or bare `type` reveals `<decorator produced by
+  dataclass-like function>`, not the declared `type[T]`. The same
+  signature without `@dataclass_transform` reveals `type[E]`, so the
+  marker is the cause. Inside `event()`, `built = record(cls)` therefore
+  draws `invalid-argument-type` on `EVENTS.add(built)` and
+  `invalid-return-type` on `return built`. Pyright reveals
+  `type[E@event]` for the same call and accepts it. ty's
+  `dataclass_transform` tracking issue (astral-sh/ty#1327) did not list
+  this on 2026-09-17. Hence
+  `tagged_bus.py` calls `dataclass(frozen=True, slots=True)(cls)`
+  directly. No sentence in the book states this, so there is no version
+  string to bump; re-probe on a `ty` upgrade anyway (a scratch
+  `event()` in `build/examples` whose body is `built = record(cls)`,
+  `EVENTS.add(built)`, `return built`), and the day it passes,
+  `tagged_bus.py` can use `record(cls)`.
+
 ## Pyright: a periodic review, never a gate
 
 `ty` is the only checker the gates run. Pyright is a pinned dev
