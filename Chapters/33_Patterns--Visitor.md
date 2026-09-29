@@ -3,7 +3,7 @@
 > A family of classes you cannot change needs a new operation.
 > *Visitor* adds the operation from outside the family.
 
-![](_images/coupling_33)
+![](_images/visitor_story)
 
 The *Visitor* pattern uses [*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md).
 People can confuse the two by looking at the implementation rather than the intent.

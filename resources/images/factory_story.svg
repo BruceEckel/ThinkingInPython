@@ -1,0 +1,124 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 725 730"
+     font-family="'JetBrains Mono', Consolas, monospace">
+  <title>Four steps of Factory: two call sites that each name Circle and Square miss a new Triangle, class statements fill Shape.registry, make() looks a name up and calls its class, and a new Triangle registers itself with no edit to make()</title>
+  <defs>
+    <marker id="fs-ink" viewBox="0 0 18 12" refX="5" refY="6"
+            markerWidth="18" markerHeight="12" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0.5,0.5 L17.4,6 L0.5,11.5 L5,6 Z" fill="#1a1612" stroke="#1a1612" stroke-width="0.8" stroke-linejoin="round"/>
+    </marker>
+    <marker id="fs-red" viewBox="0 0 18 12" refX="5" refY="6"
+            markerWidth="18" markerHeight="12" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0.5,0.5 L17.4,6 L0.5,11.5 L5,6 Z" fill="#8b1a1a" stroke="#8b1a1a" stroke-width="0.8" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+  <text x="22" y="54" font-size="30" fill="#8b1a1a" font-weight="bold" text-anchor="start">1</text>
+  <text x="22" y="76" font-size="13" fill="#1a1612" font-weight="bold" text-anchor="start">scatter</text>
+  <text x="22" y="96" font-size="10.5" fill="#7a6e62" text-anchor="start">each call site</text>
+  <text x="22" y="111" font-size="10.5" fill="#7a6e62" text-anchor="start">names each class;</text>
+  <text x="22" y="126" font-size="10.5" fill="#7a6e62" text-anchor="start">Triangle needs</text>
+  <text x="22" y="141" font-size="10.5" fill="#7a6e62" text-anchor="start">two edits</text>
+  <rect x="140" y="22" width="150" height="70" fill="none" stroke="#1a1612" stroke-width="1.3" rx="4"/>
+  <text x="152" y="42" font-size="12" fill="#1a1612" font-weight="bold" text-anchor="start">render()</text>
+  <text x="152" y="62" font-size="10" fill="#7a6e62" text-anchor="start">render("Triangle")</text>
+  <text x="152" y="78" font-size="10.5" fill="#8b1a1a" text-anchor="start">draws nothing</text>
+  <rect x="140" y="104" width="150" height="70" fill="none" stroke="#1a1612" stroke-width="1.3" rx="4"/>
+  <text x="152" y="124" font-size="12" fill="#1a1612" font-weight="bold" text-anchor="start">export_svg()</text>
+  <text x="152" y="144" font-size="10" fill="#7a6e62" text-anchor="start">export_svg("Triangle")</text>
+  <text x="152" y="160" font-size="10.5" fill="#8b1a1a" text-anchor="start">raises ValueError</text>
+  <rect x="585" y="67" width="120" height="28" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
+  <text x="645" y="86" font-size="12.5" fill="#1a1612" text-anchor="middle">Circle</text>
+  <rect x="585" y="101" width="120" height="28" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
+  <text x="645" y="120" font-size="12.5" fill="#1a1612" text-anchor="middle">Square</text>
+  <rect x="585" y="135" width="120" height="28" fill="none" stroke="#8b1a1a" stroke-width="1.6" rx="4"/>
+  <text x="645" y="154" font-size="12.5" fill="#1a1612" text-anchor="middle">Triangle</text>
+  <line x1="290" y1="48" x2="568.7" y2="73.5" stroke="#1a1612" stroke-width="1.3" marker-end="url(#fs-ink)"/>
+  <line x1="290" y1="60" x2="568.8" y2="106.3" stroke="#1a1612" stroke-width="1.3" marker-end="url(#fs-ink)"/>
+  <line x1="290" y1="130" x2="568.8" y2="89.4" stroke="#1a1612" stroke-width="1.3" marker-end="url(#fs-ink)"/>
+  <line x1="290" y1="142" x2="568.6" y2="122.2" stroke="#1a1612" stroke-width="1.3" marker-end="url(#fs-ink)"/>
+  <line x1="16" y1="186" x2="709" y2="186" stroke="#c8bfb0" stroke-width="0.8"/>
+  <text x="22" y="234" font-size="30" fill="#8b1a1a" font-weight="bold" text-anchor="start">2</text>
+  <text x="22" y="256" font-size="13" fill="#1a1612" font-weight="bold" text-anchor="start">register</text>
+  <text x="22" y="276" font-size="10.5" fill="#7a6e62" text-anchor="start">each class</text>
+  <text x="22" y="291" font-size="10.5" fill="#7a6e62" text-anchor="start">statement adds</text>
+  <text x="22" y="306" font-size="10.5" fill="#7a6e62" text-anchor="start">its class</text>
+  <text x="22" y="321" font-size="10.5" fill="#7a6e62" text-anchor="start">to the table</text>
+  <rect x="140" y="202" width="150" height="152" fill="none" stroke="#1a1612" stroke-width="1.3" rx="4"/>
+  <text x="152" y="222" font-size="12" fill="#1a1612" font-weight="bold" text-anchor="start">caller</text>
+  <text x="152" y="265" font-size="10" fill="#1a1612" text-anchor="start">sorted(Shape.registry)</text>
+  <text x="152" y="281" font-size="10" fill="#8b1a1a" text-anchor="start">['Circle', 'Square']</text>
+  <path d="M339,202 H496 Q500,202 500,206 V350 Q500,354 496,354 H339 Q335,354 335,350 V206 Q335,202 339,202 Z" fill="none" stroke="#1a1612" stroke-width="1.6"/>
+  <text x="347" y="222" font-size="12" fill="#1a1612" font-weight="bold" text-anchor="start">make(name)</text>
+  <text x="347" y="238" font-size="10" fill="#7a6e62" text-anchor="start">Shape.registry[name]()</text>
+  <rect x="355" y="248" width="125" height="26" fill="none" stroke="#1a1612" stroke-width="1.1" rx="3"/>
+  <text x="417.5" y="265" font-size="10.5" fill="#1a1612" text-anchor="middle">'Circle'</text>
+  <rect x="355" y="282" width="125" height="26" fill="none" stroke="#1a1612" stroke-width="1.1" rx="3"/>
+  <text x="417.5" y="299" font-size="10.5" fill="#1a1612" text-anchor="middle">'Square'</text>
+  <rect x="355" y="316" width="125" height="26" fill="none" stroke="#c8bfb0" stroke-width="1.1" rx="3" stroke-dasharray="4,3"/>
+  <rect x="585" y="247" width="120" height="28" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
+  <text x="645" y="266" font-size="12.5" fill="#1a1612" text-anchor="middle">Circle</text>
+  <rect x="585" y="281" width="120" height="28" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
+  <text x="645" y="300" font-size="12.5" fill="#1a1612" text-anchor="middle">Square</text>
+  <line x1="585" y1="261" x2="496.4" y2="261.0" stroke="#1a1612" stroke-width="1.3" marker-end="url(#fs-ink)"/>
+  <text x="540.5" y="255" font-size="10" fill="#1a1612" text-anchor="middle">registers</text>
+  <line x1="585" y1="295" x2="496.4" y2="295.0" stroke="#1a1612" stroke-width="1.3" marker-end="url(#fs-ink)"/>
+  <text x="540.5" y="289" font-size="10" fill="#1a1612" text-anchor="middle">registers</text>
+  <line x1="16" y1="366" x2="709" y2="366" stroke="#c8bfb0" stroke-width="0.8"/>
+  <text x="22" y="414" font-size="30" fill="#8b1a1a" font-weight="bold" text-anchor="start">3</text>
+  <text x="22" y="436" font-size="13" fill="#1a1612" font-weight="bold" text-anchor="start">make</text>
+  <text x="22" y="456" font-size="10.5" fill="#7a6e62" text-anchor="start">make() looks up</text>
+  <text x="22" y="471" font-size="10.5" fill="#7a6e62" text-anchor="start">the name and</text>
+  <text x="22" y="486" font-size="10.5" fill="#7a6e62" text-anchor="start">calls the</text>
+  <text x="22" y="501" font-size="10.5" fill="#7a6e62" text-anchor="start">class it finds</text>
+  <rect x="140" y="382" width="150" height="152" fill="none" stroke="#1a1612" stroke-width="1.3" rx="4"/>
+  <text x="152" y="402" font-size="12" fill="#1a1612" font-weight="bold" text-anchor="start">caller</text>
+  <text x="152" y="445" font-size="10" fill="#8b1a1a" text-anchor="start">make("Circle").draw()</text>
+  <text x="152" y="461" font-size="10.5" fill="#8b1a1a" text-anchor="start">Circle.draw</text>
+  <text x="152" y="495" font-size="10" fill="#1a1612" text-anchor="start">make("Triangle")</text>
+  <text x="152" y="511" font-size="10" fill="#8b1a1a" text-anchor="start">[KeyError] 'Triangle'</text>
+  <path d="M339,382 H496 Q500,382 500,386 V530 Q500,534 496,534 H339 Q335,534 335,530 V386 Q335,382 339,382 Z" fill="none" stroke="#1a1612" stroke-width="1.6"/>
+  <text x="347" y="402" font-size="12" fill="#1a1612" font-weight="bold" text-anchor="start">make(name)</text>
+  <text x="347" y="418" font-size="10" fill="#7a6e62" text-anchor="start">Shape.registry[name]()</text>
+  <rect x="355" y="428" width="125" height="26" fill="none" stroke="#1a1612" stroke-width="1.1" rx="3"/>
+  <text x="417.5" y="445" font-size="10.5" fill="#1a1612" text-anchor="middle">'Circle'</text>
+  <rect x="355" y="462" width="125" height="26" fill="none" stroke="#1a1612" stroke-width="1.1" rx="3"/>
+  <text x="417.5" y="479" font-size="10.5" fill="#1a1612" text-anchor="middle">'Square'</text>
+  <rect x="355" y="496" width="125" height="26" fill="none" stroke="#c8bfb0" stroke-width="1.1" rx="3" stroke-dasharray="4,3"/>
+  <rect x="585" y="427" width="120" height="28" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
+  <text x="645" y="446" font-size="12.5" fill="#1a1612" text-anchor="middle">Circle</text>
+  <rect x="585" y="461" width="120" height="28" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
+  <text x="645" y="480" font-size="12.5" fill="#1a1612" text-anchor="middle">Square</text>
+  <line x1="290" y1="441" x2="338.6" y2="441.0" stroke="#8b1a1a" stroke-width="1.6" marker-end="url(#fs-red)"/>
+  <line x1="480" y1="441" x2="568.6" y2="441.0" stroke="#8b1a1a" stroke-width="1.6" marker-end="url(#fs-red)"/>
+  <text x="532.5" y="435" font-size="10" fill="#8b1a1a" text-anchor="middle">calls</text>
+  <line x1="290" y1="491" x2="335" y2="491" stroke="#7a6e62" stroke-width="1.3" stroke-dasharray="4,3"/>
+  <path d="M306.5,485 L318.5,497 M306.5,497 L318.5,485" stroke="#8b1a1a" stroke-width="2" fill="none"/>
+  <line x1="16" y1="546" x2="709" y2="546" stroke="#c8bfb0" stroke-width="0.8"/>
+  <text x="22" y="594" font-size="30" fill="#8b1a1a" font-weight="bold" text-anchor="start">4</text>
+  <text x="22" y="616" font-size="13" fill="#1a1612" font-weight="bold" text-anchor="start">extend</text>
+  <text x="22" y="636" font-size="10.5" fill="#7a6e62" text-anchor="start">a new subclass</text>
+  <text x="22" y="651" font-size="10.5" fill="#7a6e62" text-anchor="start">registers itself;</text>
+  <text x="22" y="666" font-size="10.5" fill="#7a6e62" text-anchor="start">make() builds it</text>
+  <rect x="140" y="562" width="150" height="152" fill="none" stroke="#1a1612" stroke-width="1.3" rx="4"/>
+  <text x="152" y="582" font-size="12" fill="#1a1612" font-weight="bold" text-anchor="start">caller</text>
+  <text x="152" y="625" font-size="11" fill="#8b1a1a" text-anchor="start">no edit to make()</text>
+  <text x="152" y="640" font-size="11" fill="#8b1a1a" text-anchor="start">or the caller</text>
+  <text x="152" y="693" font-size="10" fill="#1a1612" text-anchor="start">make("Triangle")</text>
+  <path d="M339,562 H496 Q500,562 500,566 V710 Q500,714 496,714 H339 Q335,714 335,710 V566 Q335,562 339,562 Z" fill="none" stroke="#8b1a1a" stroke-width="1.6"/>
+  <text x="347" y="582" font-size="12" fill="#1a1612" font-weight="bold" text-anchor="start">make(name)</text>
+  <text x="347" y="598" font-size="10" fill="#7a6e62" text-anchor="start">Shape.registry[name]()</text>
+  <rect x="355" y="608" width="125" height="26" fill="none" stroke="#1a1612" stroke-width="1.1" rx="3"/>
+  <text x="417.5" y="625" font-size="10.5" fill="#1a1612" text-anchor="middle">'Circle'</text>
+  <rect x="355" y="642" width="125" height="26" fill="none" stroke="#1a1612" stroke-width="1.1" rx="3"/>
+  <text x="417.5" y="659" font-size="10.5" fill="#1a1612" text-anchor="middle">'Square'</text>
+  <rect x="355" y="676" width="125" height="26" fill="none" stroke="#1a1612" stroke-width="1.1" rx="3"/>
+  <text x="417.5" y="693" font-size="10.5" fill="#1a1612" text-anchor="middle">'Triangle'</text>
+  <rect x="585" y="607" width="120" height="28" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
+  <text x="645" y="626" font-size="12.5" fill="#1a1612" text-anchor="middle">Circle</text>
+  <rect x="585" y="641" width="120" height="28" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
+  <text x="645" y="660" font-size="12.5" fill="#1a1612" text-anchor="middle">Square</text>
+  <rect x="585" y="675" width="120" height="28" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
+  <text x="645" y="694" font-size="12.5" fill="#1a1612" text-anchor="middle">Triangle</text>
+  <line x1="585" y1="689" x2="496.4" y2="689.0" stroke="#1a1612" stroke-width="1.3" marker-end="url(#fs-ink)"/>
+  <text x="540.5" y="683" font-size="10" fill="#1a1612" text-anchor="middle">registers</text>
+  <line x1="290" y1="689" x2="338.6" y2="689.0" stroke="#1a1612" stroke-width="1.3" marker-end="url(#fs-ink)"/>
+</svg>

@@ -1,7 +1,7 @@
 ---
 name: figures
 description: >-
-  Rules for drawing or editing a figure in this book: where text goes (labels, caption, prose), the palette and arrowheads, the generated state-machine and coupling-panel SVGs, and what tip figures checks. Use before creating or changing any SVG in resources/images/ or a figure spec in tools/.
+  Rules for drawing or editing a figure in this book: where text goes (labels, caption, prose), the palette and arrowheads, the generated story, state-machine, and coupling-gallery SVGs, and what tip figures checks. Use before creating or changing any SVG in resources/images/ or a figure spec in tools/.
 ---
 
 # Figures
@@ -80,7 +80,9 @@ names a figure by its number there or its file stem; it fails on a
 reference with no file and only reports a file no chapter references.
 
 Three figure sources are generated, and their SVGs are never edited by
-hand. The pattern chapters' opening figures come from
+hand. Before changing a pattern chapter's figure, read its module in
+`tools/story_figures/`: the docstring says which listings its names
+come from. The pattern chapters' opening figures come from
 `tools/story_figures/` (since 2026-09-29), one module per chapter
 (`chNN_<pattern>.py`, defining `STEM` and `render()`), with the shared
 palette, text, boxes, and arrows in the package's `__init__.py`.
@@ -90,7 +92,16 @@ told the reader too little, called the storyboard "a much more
 accessible story," and asked for the same in every pattern chapter,
 with no notation or precedent to follow, a coupling-panel variation
 included where that suits a pattern. The goal is the picture that best
-helps the reader. An outer shape enclosing an arrow's target is a
+helps the reader. The same day, one agent per chapter drew the other
+thirteen, each choosing its own form: storyboards for most, a trace of
+one run for State, parallel lanes for Function Objects, a before/after
+table for Multiple Dispatching. What the good ones share: the chapter's
+own names, values, and `#:` output; the pattern's key insight made
+visible (a shaded region for what one part cannot see); and a payoff
+frame, outlined in red, showing what does not have to change. A shaded
+region is filled with `SHADE` (`#eeeeee`), never a translucent color:
+the EPUB's PNG8 conversion cuts each channel to a multiple of 17 and
+turned every pale warm tint yellow. An outer shape enclosing an arrow's target is a
 `region()` path, since `tight_tips()` would read a tip on an inner box
 as buried in the outer rect. `tip story-figures` (in `gate`,
 `verify-ch`, and `sweep`) fails on drift or on any per-figure check
@@ -104,32 +115,18 @@ its label sits, and the script computes the rest. Edit the spec, run
 since nothing detects two labels colliding; `tip state-machine-figure`
 (in `gate`, `verify-ch`, and `sweep`) fails on drift.
 
-The larger family of generated figures is the coupling-notation panel at
-the top of each pattern chapter, 23 through 36 except 30
-(`resources/images/coupling_NN.svg`, merged 2026-09-23). Chapter 21's
-Coupling section (merged from Appendix C on 2026-09-24) defines the
-notation: a heavy edge names a
-concrete class (stroke 3.8, raised from 2.8 on 2026-09-26 so it
-reads apart from the thin 1.3 at a glance), a thin edge names an interface, a dashed hollow-headed
-edge satisfies one, a solid hollow-headed edge inherits, and the red
-box is the part the pattern protects from change. `tools/coupling_panels.py`
-holds a `Panel` spec per chapter, in that chapter's own class and
-function names. A panel prints no caption: its title and legend say
-what it shows, and its `<title>` is the alt text. Edit the spec and run `tip fix-coupling-panels`; never edit
-one of these SVGs by hand. Chapter 21's `coupling_gallery.svg` comes
-from the same file (`GALLERY`, a `Cell` per pattern, since
-2026-09-25); the section's other three figures are still hand-drawn.
-`tip coupling-panels` (in `gate`,
-`verify-ch`, and `sweep`) fails when a committed SVG differs from what
-the spec draws, so a listing rename that misses the spec is loud. It
-also fails an arrowhead whose tip is not 4 units (within 1) from its
-target's rounded outline, and an edge that crosses a third box
-(2026-09-25); `edge_points()` slides every tip onto that 4-unit line,
-so a new failure usually means two boxes need moving, not a tweak. The
-2026-09-23 verification of all fourteen found two recurring mistakes
-worth checking a new panel for: drawing the GoF shape instead of the
-listing's (chapter 26 had a `Service` protocol no listing declares),
-and counting a call through `Any` as naming a class (chapter 32's
-`eval_*()` methods). Panels carry no note under the drawing
-(2026-09-25) and no caption (2026-09-26): each panel's height follows its lowest box or legend line, and its legend
-lists only the edge kinds it draws.
+Chapter 21's `coupling_gallery.svg` comes from `tools/coupling_panels.py`
+(`GALLERY`, a `Cell` per pattern, since 2026-09-25), in the notation
+chapter 21's Coupling section defines: a heavy edge names a concrete
+class (stroke 3.8, so it reads apart from the thin 1.3 at a glance), a
+thin edge names an interface, a dashed hollow-headed edge satisfies
+one, and the red box is the part the pattern protects from change. The
+section's other three figures are hand-drawn. Edit a `Cell` and run
+`tip fix-coupling-panels`; never edit the SVG by hand. `tip
+coupling-panels` (in `gate`, `verify-ch`, and `sweep`) fails when the
+committed SVG differs from what the spec draws, on an arrowhead whose
+tip is not 4 units (within 1) from its target's rounded outline, and on
+an edge that crosses a third box; `edge_points()` slides every tip onto
+that 4-unit line, so a new failure usually means two boxes need moving.
+From 2026-09-23 to 2026-09-29 the same file also drew a coupling panel
+at the top of each pattern chapter; the story figures replaced them.

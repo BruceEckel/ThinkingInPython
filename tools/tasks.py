@@ -1047,23 +1047,21 @@ def records(v: Vars) -> None:
     py("tools.record_check")
 
 
-@task("Fail if a chapter's coupling panel SVG differs from its spec in "
+@task("Fail if chapter 21's coupling_gallery.svg differs from its spec in "
       "tools/coupling_panels.py; `tip fix-coupling-panels` regenerates,"
       " `tip coupling-panels-png` rasterizes to look")
 def coupling_panels(v: Vars) -> None:
-    """The coupling-notation panel at the top of each pattern chapter (23-36,
-    except those whose opening figure now comes from tools/story_figures/)
-    is generated from a per-chapter spec in tools/coupling_panels.py into
-    resources/images/coupling_NN.svg. The spec names that chapter's classes and
-    functions, so a listing rename means editing the spec and regenerating;
-    this fails when a committed SVG differs from what the spec draws, so a
-    stale panel cannot ride through the gate. In `gate` since 2026-09-23, the
-    day the panels merged.
+    """Chapter 21's gallery of six patterns in the coupling notation is
+    generated from the `Cell` specs in tools/coupling_panels.py; this fails
+    when the committed SVG differs from what the specs draw, or an edge
+    misses its box. In `gate` since 2026-09-23. Until 2026-09-29 the same
+    file drew a panel at the top of each pattern chapter; the story figures
+    in tools/story_figures/ replaced them.
     """
     py("tools.coupling_panels", "--check")
 
 
-@task("Regenerate resources/images/coupling_NN.svg from the specs",
+@task("Regenerate chapter 21's coupling_gallery.svg from its spec",
       secondary=True)
 def fix_coupling_panels(v: Vars) -> None:
     py("tools.coupling_panels")

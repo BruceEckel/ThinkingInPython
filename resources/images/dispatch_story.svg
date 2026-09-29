@@ -1,0 +1,99 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 740 346"
+     font-family="'JetBrains Mono', Consolas, monospace">
+  <title>The nine paper, scissors, rock answers drawn as a grid twice: the method version spreads them across the classes and picks a cell with two dispatches, the table version keeps them in OUTCOME and picks the same cell with one lookup</title>
+  <text x="14" y="20" font-size="13" fill="#1a1612" font-weight="bold" text-anchor="start">two dispatches</text>
+  <text x="14" y="36" font-size="10.5" fill="#7a6e62" text-anchor="start">paper_scissors_rock.py</text>
+  <text x="114" y="52" font-size="10" fill="#7a6e62" text-anchor="start">each column is one class</text>
+  <path d="M118,60 H170 Q174,60 174,64 V186 Q174,190 170,190 H118 Q114,190 114,186 V64 Q114,60 118,60 Z" fill="none" stroke="#1a1612" stroke-width="1.2"/>
+  <path d="M178,60 H230 Q234,60 234,64 V186 Q234,190 230,190 H178 Q174,190 174,186 V64 Q174,60 178,60 Z" fill="none" stroke="#1a1612" stroke-width="1.2"/>
+  <path d="M238,60 H290 Q294,60 294,64 V186 Q294,190 290,190 H238 Q234,190 234,186 V64 Q234,60 238,60 Z" fill="none" stroke="#1a1612" stroke-width="1.2"/>
+  <path d="M298,60 H350 Q354,60 354,64 V186 Q354,190 350,190 H298 Q294,190 294,186 V64 Q294,60 298,60 Z" fill="none" stroke="#7a6e62" stroke-width="1.2" stroke-dasharray="4,3"/>
+  <text x="144" y="77" font-size="10.5" fill="#8b1a1a" font-weight="bold" text-anchor="middle">Paper</text>
+  <text x="204" y="77" font-size="10.5" fill="#1a1612" font-weight="bold" text-anchor="middle">Scissors</text>
+  <text x="264" y="77" font-size="10.5" fill="#1a1612" font-weight="bold" text-anchor="middle">Rock</text>
+  <text x="324" y="77" font-size="10.5" fill="#7a6e62" text-anchor="middle">new</text>
+  <text x="108" y="103" font-size="10.5" fill="#1a1612" text-anchor="end">eval_paper()</text>
+  <rect x="117" y="89" width="54" height="20" fill="none" stroke="#c8bfb0" stroke-width="1" rx="3"/>
+  <text x="144" y="103" font-size="10.5" fill="#1a1612" text-anchor="middle">draw</text>
+  <rect x="177" y="89" width="54" height="20" fill="none" stroke="#c8bfb0" stroke-width="1" rx="3"/>
+  <text x="204" y="103" font-size="10.5" fill="#1a1612" text-anchor="middle">lose</text>
+  <rect x="237" y="89" width="54" height="20" fill="none" stroke="#c8bfb0" stroke-width="1" rx="3"/>
+  <text x="264" y="103" font-size="10.5" fill="#1a1612" text-anchor="middle">win</text>
+  <text x="108" y="129" font-size="10.5" fill="#8b1a1a" text-anchor="end">eval_scissors()</text>
+  <rect x="117" y="115" width="54" height="20" fill="none" stroke="#8b1a1a" stroke-width="1.6" rx="3"/>
+  <text x="144" y="129" font-size="10.5" fill="#8b1a1a" font-weight="bold" text-anchor="middle">win</text>
+  <rect x="177" y="115" width="54" height="20" fill="none" stroke="#c8bfb0" stroke-width="1" rx="3"/>
+  <text x="204" y="129" font-size="10.5" fill="#1a1612" text-anchor="middle">draw</text>
+  <rect x="237" y="115" width="54" height="20" fill="none" stroke="#c8bfb0" stroke-width="1" rx="3"/>
+  <text x="264" y="129" font-size="10.5" fill="#1a1612" text-anchor="middle">lose</text>
+  <text x="108" y="155" font-size="10.5" fill="#1a1612" text-anchor="end">eval_rock()</text>
+  <rect x="117" y="141" width="54" height="20" fill="none" stroke="#c8bfb0" stroke-width="1" rx="3"/>
+  <text x="144" y="155" font-size="10.5" fill="#1a1612" text-anchor="middle">lose</text>
+  <rect x="177" y="141" width="54" height="20" fill="none" stroke="#c8bfb0" stroke-width="1" rx="3"/>
+  <text x="204" y="155" font-size="10.5" fill="#1a1612" text-anchor="middle">win</text>
+  <rect x="237" y="141" width="54" height="20" fill="none" stroke="#c8bfb0" stroke-width="1" rx="3"/>
+  <text x="264" y="155" font-size="10.5" fill="#1a1612" text-anchor="middle">draw</text>
+  <text x="108" y="181" font-size="10.5" fill="#7a6e62" text-anchor="end">new</text>
+  <rect x="297" y="89" width="54" height="20" fill="none" stroke="#c8bfb0" stroke-width="1" rx="3" stroke-dasharray="4,3"/>
+  <rect x="297" y="115" width="54" height="20" fill="none" stroke="#c8bfb0" stroke-width="1" rx="3" stroke-dasharray="4,3"/>
+  <rect x="297" y="141" width="54" height="20" fill="none" stroke="#c8bfb0" stroke-width="1" rx="3" stroke-dasharray="4,3"/>
+  <rect x="297" y="167" width="54" height="20" fill="none" stroke="#c8bfb0" stroke-width="1" rx="3" stroke-dasharray="4,3"/>
+  <rect x="117" y="167" width="54" height="20" fill="none" stroke="#8b1a1a" stroke-width="1.3" rx="3" stroke-dasharray="4,3"/>
+  <rect x="177" y="167" width="54" height="20" fill="none" stroke="#8b1a1a" stroke-width="1.3" rx="3" stroke-dasharray="4,3"/>
+  <rect x="237" y="167" width="54" height="20" fill="none" stroke="#8b1a1a" stroke-width="1.3" rx="3" stroke-dasharray="4,3"/>
+  <text x="14" y="212" font-size="13" fill="#8b1a1a" font-weight="bold" text-anchor="start">1</text>
+  <text x="30" y="212" font-size="10.5" fill="#1a1612" text-anchor="start">scissors.compete(paper)</text>
+  <text x="30" y="226" font-size="10.5" fill="#7a6e62" text-anchor="start">resolves self: the row</text>
+  <text x="14" y="248" font-size="13" fill="#8b1a1a" font-weight="bold" text-anchor="start">2</text>
+  <text x="30" y="248" font-size="10.5" fill="#1a1612" text-anchor="start">paper.eval_scissors(...)</text>
+  <text x="30" y="262" font-size="10.5" fill="#7a6e62" text-anchor="start">resolves paper: the column</text>
+  <text x="14" y="288" font-size="10.5" fill="#8b1a1a" text-anchor="start">a new item adds an eval method</text>
+  <text x="14" y="302" font-size="10.5" fill="#8b1a1a" text-anchor="start">to Paper, Scissors, and Rock</text>
+  <line x1="364" y1="10" x2="364" y2="308" stroke="#c8bfb0" stroke-width="0.8"/>
+  <text x="386" y="20" font-size="13" fill="#1a1612" font-weight="bold" text-anchor="start">one lookup</text>
+  <text x="386" y="36" font-size="10.5" fill="#7a6e62" text-anchor="start">paper_scissors_rock_table.py</text>
+  <text x="486" y="52" font-size="10" fill="#7a6e62" text-anchor="start">keys (type(self), type(item))</text>
+  <text x="480" y="77" font-size="11" fill="#1a1612" font-weight="bold" text-anchor="end">OUTCOME</text>
+  <path d="M488,84 H724 Q728,84 728,88 V188 Q728,192 724,192 H488 Q484,192 484,188 V88 Q484,84 488,84 Z" fill="none" stroke="#1a1612" stroke-width="1.2"/>
+  <text x="516" y="77" font-size="10.5" fill="#8b1a1a" font-weight="bold" text-anchor="middle">Paper</text>
+  <text x="576" y="77" font-size="10.5" fill="#1a1612" font-weight="bold" text-anchor="middle">Scissors</text>
+  <text x="636" y="77" font-size="10.5" fill="#1a1612" font-weight="bold" text-anchor="middle">Rock</text>
+  <text x="696" y="77" font-size="10.5" fill="#7a6e62" text-anchor="middle">new</text>
+  <text x="480" y="103" font-size="10.5" fill="#1a1612" text-anchor="end">Paper</text>
+  <rect x="489" y="89" width="54" height="20" fill="none" stroke="#c8bfb0" stroke-width="1" rx="3"/>
+  <text x="516" y="103" font-size="10.5" fill="#1a1612" text-anchor="middle">draw</text>
+  <rect x="549" y="89" width="54" height="20" fill="none" stroke="#c8bfb0" stroke-width="1" rx="3"/>
+  <text x="576" y="103" font-size="10.5" fill="#1a1612" text-anchor="middle">lose</text>
+  <rect x="609" y="89" width="54" height="20" fill="none" stroke="#c8bfb0" stroke-width="1" rx="3"/>
+  <text x="636" y="103" font-size="10.5" fill="#1a1612" text-anchor="middle">win</text>
+  <text x="480" y="129" font-size="10.5" fill="#8b1a1a" text-anchor="end">Scissors</text>
+  <rect x="489" y="115" width="54" height="20" fill="none" stroke="#8b1a1a" stroke-width="1.6" rx="3"/>
+  <text x="516" y="129" font-size="10.5" fill="#8b1a1a" font-weight="bold" text-anchor="middle">win</text>
+  <rect x="549" y="115" width="54" height="20" fill="none" stroke="#c8bfb0" stroke-width="1" rx="3"/>
+  <text x="576" y="129" font-size="10.5" fill="#1a1612" text-anchor="middle">draw</text>
+  <rect x="609" y="115" width="54" height="20" fill="none" stroke="#c8bfb0" stroke-width="1" rx="3"/>
+  <text x="636" y="129" font-size="10.5" fill="#1a1612" text-anchor="middle">lose</text>
+  <text x="480" y="155" font-size="10.5" fill="#1a1612" text-anchor="end">Rock</text>
+  <rect x="489" y="141" width="54" height="20" fill="none" stroke="#c8bfb0" stroke-width="1" rx="3"/>
+  <text x="516" y="155" font-size="10.5" fill="#1a1612" text-anchor="middle">lose</text>
+  <rect x="549" y="141" width="54" height="20" fill="none" stroke="#c8bfb0" stroke-width="1" rx="3"/>
+  <text x="576" y="155" font-size="10.5" fill="#1a1612" text-anchor="middle">win</text>
+  <rect x="609" y="141" width="54" height="20" fill="none" stroke="#c8bfb0" stroke-width="1" rx="3"/>
+  <text x="636" y="155" font-size="10.5" fill="#1a1612" text-anchor="middle">draw</text>
+  <text x="480" y="181" font-size="10.5" fill="#7a6e62" text-anchor="end">new</text>
+  <rect x="669" y="89" width="54" height="20" fill="none" stroke="#c8bfb0" stroke-width="1" rx="3" stroke-dasharray="4,3"/>
+  <rect x="669" y="115" width="54" height="20" fill="none" stroke="#c8bfb0" stroke-width="1" rx="3" stroke-dasharray="4,3"/>
+  <rect x="669" y="141" width="54" height="20" fill="none" stroke="#c8bfb0" stroke-width="1" rx="3" stroke-dasharray="4,3"/>
+  <rect x="669" y="167" width="54" height="20" fill="none" stroke="#c8bfb0" stroke-width="1" rx="3" stroke-dasharray="4,3"/>
+  <rect x="489" y="167" width="54" height="20" fill="none" stroke="#c8bfb0" stroke-width="1" rx="3" stroke-dasharray="4,3"/>
+  <rect x="549" y="167" width="54" height="20" fill="none" stroke="#c8bfb0" stroke-width="1" rx="3" stroke-dasharray="4,3"/>
+  <rect x="609" y="167" width="54" height="20" fill="none" stroke="#c8bfb0" stroke-width="1" rx="3" stroke-dasharray="4,3"/>
+  <text x="386" y="212" font-size="13" fill="#8b1a1a" font-weight="bold" text-anchor="start">1</text>
+  <text x="402" y="212" font-size="10.5" fill="#1a1612" text-anchor="start">OUTCOME[type(self), type(item)]</text>
+  <text x="402" y="226" font-size="10.5" fill="#7a6e62" text-anchor="start">picks the row and the column</text>
+  <text x="402" y="240" font-size="10.5" fill="#7a6e62" text-anchor="start">in one step</text>
+  <text x="386" y="288" font-size="10.5" fill="#8b1a1a" text-anchor="start">a new item adds 7 rows to</text>
+  <text x="386" y="302" font-size="10.5" fill="#8b1a1a" text-anchor="start">OUTCOME, with no methods to edit</text>
+  <text x="366" y="334" font-size="10.5" fill="#7a6e62" text-anchor="end">both print</text>
+  <text x="374" y="334" font-size="11" fill="#1a1612" text-anchor="start">Scissors &lt;--&gt; Paper : win</text>
+</svg>

@@ -1,0 +1,129 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 730 650"
+     font-family="'JetBrains Mono', Consolas, monospace">
+  <title>Four steps of a module singleton: the first import runs config.py and files it in sys.modules, a second import gets the same module, a mutation through one name reaches every importer, and rebinding the name leaves config.settings unchanged</title>
+  <defs>
+    <marker id="ss-ink" viewBox="0 0 18 12" refX="5" refY="6"
+            markerWidth="18" markerHeight="12" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0.5,0.5 L17.4,6 L0.5,11.5 L5,6 Z" fill="#1a1612" stroke="#1a1612" stroke-width="0.8" stroke-linejoin="round"/>
+    </marker>
+    <marker id="ss-red" viewBox="0 0 18 12" refX="5" refY="6"
+            markerWidth="18" markerHeight="12" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0.5,0.5 L17.4,6 L0.5,11.5 L5,6 Z" fill="#8b1a1a" stroke="#8b1a1a" stroke-width="0.8" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+  <text x="22" y="54" font-size="30" fill="#8b1a1a" font-weight="bold" text-anchor="start">1</text>
+  <text x="22" y="76" font-size="13" fill="#1a1612" font-weight="bold" text-anchor="start">import</text>
+  <text x="22" y="96" font-size="10.5" fill="#7a6e62" text-anchor="start">no entry yet,</text>
+  <text x="22" y="111" font-size="10.5" fill="#7a6e62" text-anchor="start">so config.py</text>
+  <text x="22" y="126" font-size="10.5" fill="#7a6e62" text-anchor="start">runs and is filed</text>
+  <path d="M144,24 H346 Q350,24 350,28 V150 Q350,154 346,154 H144 Q140,154 140,150 V28 Q140,24 144,24 Z" fill="none" stroke="#1a1612" stroke-width="1.6"/>
+  <text x="150" y="42" font-size="11" fill="#1a1612" font-weight="bold" text-anchor="start">module_singleton.py</text>
+  <text x="150" y="60" font-size="10.5" fill="#8b1a1a" text-anchor="start">import config</text>
+  <path d="M384,32 H476 Q480,32 480,36 V82 Q480,86 476,86 H384 Q380,86 380,82 V36 Q380,32 384,32 Z" fill="none" stroke="#c8bfb0" stroke-width="1.6"/>
+  <text x="388" y="47" font-size="11" fill="#7a6e62" text-anchor="start">sys.modules</text>
+  <rect x="390" y="54" width="80" height="24" fill="none" stroke="#8b1a1a" stroke-width="1.1" rx="3"/>
+  <text x="430" y="70" font-size="10.5" fill="#8b1a1a" text-anchor="middle">'config'</text>
+  <path d="M524,24 H711 Q715,24 715,28 V150 Q715,154 711,154 H524 Q520,154 520,150 V28 Q520,24 524,24 Z" fill="none" stroke="#8b1a1a" stroke-width="1.6"/>
+  <rect x="520" y="24" width="195" height="76" fill="none" stroke="none" stroke-width="1.3" rx="4"/>
+  <text x="532" y="44" font-size="13" fill="#8b1a1a" font-weight="bold" text-anchor="start">config</text>
+  <text x="705" y="44" font-size="10" fill="#7a6e62" text-anchor="end">module object</text>
+  <line x1="470" y1="66" x2="503.6" y2="66.0" stroke="#8b1a1a" stroke-width="1.3" marker-end="url(#ss-red)"/>
+  <text x="150" y="102" font-size="10" fill="#7a6e62" text-anchor="start">prints</text>
+  <text x="150" y="118" font-size="10.5" fill="#8b1a1a" text-anchor="start">config body runs</text>
+  <text x="532" y="74" font-size="10.5" fill="#8b1a1a" text-anchor="start">body runs once</text>
+  <text x="532" y="106" font-size="10" fill="#7a6e62" text-anchor="start">settings</text>
+  <rect x="532" y="112" width="171" height="28" fill="none" stroke="#1a1612" stroke-width="1.1" rx="3"/>
+  <text x="617.5" y="130" font-size="10.5" fill="#1a1612" text-anchor="middle">{}</text>
+  <rect x="268" y="94" width="72" height="24" fill="none" stroke="#8b1a1a" stroke-width="1.1" rx="3"/>
+  <text x="304" y="110" font-size="10.5" fill="#8b1a1a" text-anchor="middle">config</text>
+  <line x1="340" y1="106" x2="503.6" y2="95.1" stroke="#8b1a1a" stroke-width="1.3" marker-end="url(#ss-red)"/>
+  <line x1="16" y1="166" x2="714" y2="166" stroke="#c8bfb0" stroke-width="0.8"/>
+  <text x="22" y="214" font-size="30" fill="#8b1a1a" font-weight="bold" text-anchor="start">2</text>
+  <text x="22" y="236" font-size="13" fill="#1a1612" font-weight="bold" text-anchor="start">reuse</text>
+  <text x="22" y="256" font-size="10.5" fill="#7a6e62" text-anchor="start">the entry is</text>
+  <text x="22" y="271" font-size="10.5" fill="#7a6e62" text-anchor="start">found, so both</text>
+  <text x="22" y="286" font-size="10.5" fill="#7a6e62" text-anchor="start">names get the</text>
+  <text x="22" y="301" font-size="10.5" fill="#7a6e62" text-anchor="start">same module</text>
+  <path d="M144,184 H346 Q350,184 350,188 V310 Q350,314 346,314 H144 Q140,314 140,310 V188 Q140,184 144,184 Z" fill="none" stroke="#1a1612" stroke-width="1.6"/>
+  <text x="150" y="202" font-size="11" fill="#1a1612" font-weight="bold" text-anchor="start">module_singleton.py</text>
+  <text x="150" y="220" font-size="10.5" fill="#1a1612" text-anchor="start">import config</text>
+  <text x="150" y="236" font-size="10.5" fill="#8b1a1a" text-anchor="start">import config as again</text>
+  <path d="M384,192 H476 Q480,192 480,196 V242 Q480,246 476,246 H384 Q380,246 380,242 V196 Q380,192 384,192 Z" fill="none" stroke="#c8bfb0" stroke-width="1.6"/>
+  <text x="388" y="207" font-size="11" fill="#7a6e62" text-anchor="start">sys.modules</text>
+  <rect x="390" y="214" width="80" height="24" fill="none" stroke="#1a1612" stroke-width="1.1" rx="3"/>
+  <text x="430" y="230" font-size="10.5" fill="#1a1612" text-anchor="middle">'config'</text>
+  <path d="M524,184 H711 Q715,184 715,188 V310 Q715,314 711,314 H524 Q520,314 520,310 V188 Q520,184 524,184 Z" fill="none" stroke="#1a1612" stroke-width="1.6"/>
+  <rect x="520" y="184" width="195" height="76" fill="none" stroke="none" stroke-width="1.3" rx="4"/>
+  <text x="532" y="204" font-size="13" fill="#1a1612" font-weight="bold" text-anchor="start">config</text>
+  <text x="705" y="204" font-size="10" fill="#7a6e62" text-anchor="end">module object</text>
+  <line x1="470" y1="226" x2="503.6" y2="226.0" stroke="#1a1612" stroke-width="1.3" marker-end="url(#ss-ink)"/>
+  <text x="150" y="262" font-size="10" fill="#7a6e62" text-anchor="start">prints</text>
+  <text x="150" y="278" font-size="10.5" fill="#8b1a1a" text-anchor="start">True True</text>
+  <text x="532" y="234" font-size="10.5" fill="#7a6e62" text-anchor="start">body not run again</text>
+  <text x="532" y="266" font-size="10" fill="#7a6e62" text-anchor="start">settings</text>
+  <rect x="532" y="272" width="171" height="28" fill="none" stroke="#1a1612" stroke-width="1.1" rx="3"/>
+  <text x="617.5" y="290" font-size="10.5" fill="#1a1612" text-anchor="middle">{}</text>
+  <rect x="268" y="254" width="72" height="24" fill="none" stroke="#1a1612" stroke-width="1.1" rx="3"/>
+  <text x="304" y="270" font-size="10.5" fill="#1a1612" text-anchor="middle">config</text>
+  <rect x="268" y="282" width="72" height="24" fill="none" stroke="#8b1a1a" stroke-width="1.1" rx="3"/>
+  <text x="304" y="298" font-size="10.5" fill="#8b1a1a" text-anchor="middle">again</text>
+  <line x1="340" y1="266" x2="503.7" y2="246.0" stroke="#1a1612" stroke-width="1.3" marker-end="url(#ss-ink)"/>
+  <line x1="340" y1="294" x2="503.9" y2="261.2" stroke="#8b1a1a" stroke-width="1.3" marker-end="url(#ss-red)"/>
+  <line x1="16" y1="326" x2="714" y2="326" stroke="#c8bfb0" stroke-width="0.8"/>
+  <text x="22" y="374" font-size="30" fill="#8b1a1a" font-weight="bold" text-anchor="start">3</text>
+  <text x="22" y="396" font-size="13" fill="#1a1612" font-weight="bold" text-anchor="start">mutate</text>
+  <text x="22" y="416" font-size="10.5" fill="#7a6e62" text-anchor="start">a change through</text>
+  <text x="22" y="431" font-size="10.5" fill="#7a6e62" text-anchor="start">your own name</text>
+  <text x="22" y="446" font-size="10.5" fill="#7a6e62" text-anchor="start">reaches every</text>
+  <text x="22" y="461" font-size="10.5" fill="#7a6e62" text-anchor="start">importer</text>
+  <path d="M144,344 H346 Q350,344 350,348 V470 Q350,474 346,474 H144 Q140,474 140,470 V348 Q140,344 144,344 Z" fill="none" stroke="#1a1612" stroke-width="1.6"/>
+  <text x="150" y="362" font-size="11" fill="#1a1612" font-weight="bold" text-anchor="start">shared_config.py</text>
+  <text x="150" y="380" font-size="10.5" fill="#1a1612" text-anchor="start">from config import settings</text>
+  <text x="150" y="396" font-size="10.5" fill="#8b1a1a" text-anchor="start">settings["theme"] = "dark"</text>
+  <path d="M384,352 H476 Q480,352 480,356 V402 Q480,406 476,406 H384 Q380,406 380,402 V356 Q380,352 384,352 Z" fill="none" stroke="#c8bfb0" stroke-width="1.6"/>
+  <text x="388" y="367" font-size="11" fill="#7a6e62" text-anchor="start">sys.modules</text>
+  <rect x="390" y="374" width="80" height="24" fill="none" stroke="#1a1612" stroke-width="1.1" rx="3"/>
+  <text x="430" y="390" font-size="10.5" fill="#1a1612" text-anchor="middle">'config'</text>
+  <path d="M524,344 H711 Q715,344 715,348 V470 Q715,474 711,474 H524 Q520,474 520,470 V348 Q520,344 524,344 Z" fill="none" stroke="#1a1612" stroke-width="1.6"/>
+  <rect x="520" y="344" width="195" height="76" fill="none" stroke="none" stroke-width="1.3" rx="4"/>
+  <text x="532" y="364" font-size="13" fill="#1a1612" font-weight="bold" text-anchor="start">config</text>
+  <text x="705" y="364" font-size="10" fill="#7a6e62" text-anchor="end">module object</text>
+  <line x1="470" y1="386" x2="503.6" y2="386.0" stroke="#1a1612" stroke-width="1.3" marker-end="url(#ss-ink)"/>
+  <text x="150" y="422" font-size="10" fill="#7a6e62" text-anchor="start">prints</text>
+  <text x="150" y="438" font-size="10.5" fill="#8b1a1a" text-anchor="start">config body runs</text>
+  <text x="150" y="454" font-size="10.5" fill="#8b1a1a" text-anchor="start">{'theme': 'dark'}</text>
+  <text x="532" y="426" font-size="10" fill="#7a6e62" text-anchor="start">settings</text>
+  <rect x="532" y="432" width="171" height="28" fill="none" stroke="#1a1612" stroke-width="1.1" rx="3"/>
+  <text x="617.5" y="450" font-size="10.5" fill="#8b1a1a" text-anchor="middle">{'theme': 'dark'}</text>
+  <rect x="268" y="442" width="72" height="24" fill="none" stroke="#1a1612" stroke-width="1.1" rx="3"/>
+  <text x="304" y="458" font-size="10.5" fill="#1a1612" text-anchor="middle">settings</text>
+  <line x1="340" y1="454" x2="515.6" y2="446.7" stroke="#1a1612" stroke-width="1.3" marker-end="url(#ss-ink)"/>
+  <line x1="16" y1="486" x2="714" y2="486" stroke="#c8bfb0" stroke-width="0.8"/>
+  <text x="22" y="534" font-size="30" fill="#8b1a1a" font-weight="bold" text-anchor="start">4</text>
+  <text x="22" y="556" font-size="13" fill="#1a1612" font-weight="bold" text-anchor="start">rebind</text>
+  <text x="22" y="576" font-size="10.5" fill="#7a6e62" text-anchor="start">a new binding</text>
+  <text x="22" y="591" font-size="10.5" fill="#7a6e62" text-anchor="start">moves only your</text>
+  <text x="22" y="606" font-size="10.5" fill="#7a6e62" text-anchor="start">name; the module</text>
+  <text x="22" y="621" font-size="10.5" fill="#7a6e62" text-anchor="start">keeps its dict</text>
+  <path d="M144,504 H346 Q350,504 350,508 V630 Q350,634 346,634 H144 Q140,634 140,630 V508 Q140,504 144,504 Z" fill="none" stroke="#1a1612" stroke-width="1.6"/>
+  <text x="150" y="522" font-size="11" fill="#1a1612" font-weight="bold" text-anchor="start">shared_config.py</text>
+  <text x="150" y="540" font-size="10.5" fill="#7a6e62" text-anchor="start">settings["theme"] = "dark"</text>
+  <text x="150" y="556" font-size="10.5" fill="#8b1a1a" text-anchor="start">settings = {}</text>
+  <path d="M384,512 H476 Q480,512 480,516 V562 Q480,566 476,566 H384 Q380,566 380,562 V516 Q380,512 384,512 Z" fill="none" stroke="#c8bfb0" stroke-width="1.6"/>
+  <text x="388" y="527" font-size="11" fill="#7a6e62" text-anchor="start">sys.modules</text>
+  <rect x="390" y="534" width="80" height="24" fill="none" stroke="#1a1612" stroke-width="1.1" rx="3"/>
+  <text x="430" y="550" font-size="10.5" fill="#1a1612" text-anchor="middle">'config'</text>
+  <path d="M524,504 H711 Q715,504 715,508 V630 Q715,634 711,634 H524 Q520,634 520,630 V508 Q520,504 524,504 Z" fill="none" stroke="#1a1612" stroke-width="1.6"/>
+  <rect x="520" y="504" width="195" height="76" fill="none" stroke="none" stroke-width="1.3" rx="4"/>
+  <text x="532" y="524" font-size="13" fill="#1a1612" font-weight="bold" text-anchor="start">config</text>
+  <text x="705" y="524" font-size="10" fill="#7a6e62" text-anchor="end">module object</text>
+  <line x1="470" y1="546" x2="503.6" y2="546.0" stroke="#1a1612" stroke-width="1.3" marker-end="url(#ss-ink)"/>
+  <text x="532" y="586" font-size="10" fill="#8b1a1a" text-anchor="start">config.settings: unchanged</text>
+  <rect x="532" y="592" width="171" height="28" fill="none" stroke="#1a1612" stroke-width="1.1" rx="3"/>
+  <text x="617.5" y="610" font-size="10.5" fill="#1a1612" text-anchor="middle">{'theme': 'dark'}</text>
+  <rect x="390" y="594" width="80" height="26" fill="none" stroke="#8b1a1a" stroke-width="1.3" rx="3" stroke-dasharray="4,3"/>
+  <text x="430" y="611" font-size="10.5" fill="#8b1a1a" text-anchor="middle">{}</text>
+  <rect x="268" y="602" width="72" height="24" fill="none" stroke="#8b1a1a" stroke-width="1.1" rx="3"/>
+  <text x="304" y="618" font-size="10.5" fill="#8b1a1a" text-anchor="middle">settings</text>
+  <line x1="340" y1="614" x2="373.8" y2="609.3" stroke="#8b1a1a" stroke-width="1.3" marker-end="url(#ss-red)"/>
+</svg>

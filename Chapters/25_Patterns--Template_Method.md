@@ -4,7 +4,7 @@
 > and some of those steps differ from one use to the next.
 > A *Template Method* sets the sequence and lets you supply the steps that vary.
 
-![](_images/coupling_25)
+![](_images/template_method_story)
 
 An application framework lets you build a new application by reusing its existing classes and overriding methods to customize behavior.
 At the heart of a framework is the *Template Method* of *GoF Design Patterns*:

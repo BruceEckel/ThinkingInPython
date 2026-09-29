@@ -4,7 +4,7 @@
 > and another place does it later or does it a different way each time.
 > A *function object* carries the decision from the first place to the second.
 
-![](_images/coupling_28)
+![](_images/function_objects_story)
 
 A *function object* decouples the choice of function to call from the place that calls it.
 That decoupling is the goal of three patterns: *Command*, *Strategy*,

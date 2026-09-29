@@ -4,7 +4,7 @@
 > but something in the program must still choose which class to construct.
 > A *Factory* puts that choice in one place.
 
-![](_images/coupling_27)
+![](_images/factory_story)
 
 When a system needs new types,
 start with a base type that gives them a common interface.

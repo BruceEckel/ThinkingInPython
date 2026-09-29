@@ -1,0 +1,105 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 730 676"
+     font-family="'JetBrains Mono', Consolas, monospace">
+  <title>Three steps of Template Method: ApplicationFramework.run() sets the order of two steps, MyApp overrides them and run() calls each one twice, and run_framework() runs the same loop on two lambdas</title>
+  <defs>
+    <marker id="tms-ink" viewBox="0 0 18 12" refX="5" refY="6"
+            markerWidth="18" markerHeight="12" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0.5,0.5 L17.4,6 L0.5,11.5 L5,6 Z" fill="#1a1612" stroke="#1a1612" stroke-width="0.8" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+  <text x="22" y="54" font-size="30" fill="#8b1a1a" font-weight="bold" text-anchor="start">1</text>
+  <text x="22" y="76" font-size="13" fill="#1a1612" font-weight="bold" text-anchor="start">anchor</text>
+  <text x="22" y="96" font-size="10.5" fill="#7a6e62" text-anchor="start">run() sets the</text>
+  <text x="22" y="111" font-size="10.5" fill="#7a6e62" text-anchor="start">order; each</text>
+  <text x="22" y="126" font-size="10.5" fill="#7a6e62" text-anchor="start">step is a hook</text>
+  <text x="22" y="141" font-size="10.5" fill="#7a6e62" text-anchor="start">that does nothing</text>
+  <path d="M149,24 H536 Q540,24 540,28 V120 Q540,124 536,124 H149 Q145,124 145,120 V28 Q145,24 149,24 Z" fill="none" stroke="#8b1a1a" stroke-width="1.6"/>
+  <text x="157" y="46" font-size="13" fill="#1a1612" font-weight="bold" text-anchor="start">ApplicationFramework</text>
+  <text x="157" y="68" font-size="11" fill="#1a1612" text-anchor="start">for _ in range(2):</text>
+  <rect x="165" y="80" width="170" height="30" fill="none" stroke="#1a1612" stroke-width="1.1" rx="3"/>
+  <text x="250" y="99" font-size="11" fill="#1a1612" text-anchor="middle">customize1()</text>
+  <rect x="355" y="80" width="170" height="30" fill="none" stroke="#1a1612" stroke-width="1.1" rx="3"/>
+  <text x="440" y="99" font-size="11" fill="#1a1612" text-anchor="middle">customize2()</text>
+  <text x="528" y="46" font-size="11" fill="#8b1a1a" text-anchor="end">@final run()</text>
+  <path d="M149,148 H536 Q540,148 540,152 V220 Q540,224 536,224 H149 Q145,224 145,220 V152 Q145,148 149,148 Z" fill="none" stroke="#1a1612" stroke-width="1.6"/>
+  <text x="157" y="164" font-size="11" fill="#1a1612" font-weight="bold" text-anchor="start">hooks</text>
+  <rect x="165" y="170" width="170" height="42" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
+  <text x="250" y="186" font-size="11" fill="#1a1612" text-anchor="middle">customize1()</text>
+  <text x="250" y="202" font-size="10" fill="#7a6e62" text-anchor="middle">...</text>
+  <line x1="250" y1="110" x2="250.0" y2="153.6" stroke="#1a1612" stroke-width="1.3" marker-end="url(#tms-ink)"/>
+  <text x="256" y="138" font-size="10" fill="#1a1612" text-anchor="start">self.customize1()</text>
+  <rect x="355" y="170" width="170" height="42" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
+  <text x="440" y="186" font-size="11" fill="#1a1612" text-anchor="middle">customize2()</text>
+  <text x="440" y="202" font-size="10" fill="#7a6e62" text-anchor="middle">...</text>
+  <line x1="440" y1="110" x2="440.0" y2="153.6" stroke="#1a1612" stroke-width="1.3" marker-end="url(#tms-ink)"/>
+  <text x="446" y="138" font-size="10" fill="#1a1612" text-anchor="start">self.customize2()</text>
+  <text x="562" y="46" font-size="11" fill="#1a1612" text-anchor="start">@final:</text>
+  <text x="562" y="64" font-size="10" fill="#7a6e62" text-anchor="start">no subclass may</text>
+  <text x="562" y="78" font-size="10" fill="#7a6e62" text-anchor="start">override run()</text>
+  <line x1="16" y1="228" x2="714" y2="228" stroke="#c8bfb0" stroke-width="0.8"/>
+  <text x="22" y="276" font-size="30" fill="#8b1a1a" font-weight="bold" text-anchor="start">2</text>
+  <text x="22" y="298" font-size="13" fill="#1a1612" font-weight="bold" text-anchor="start">fill in</text>
+  <text x="22" y="318" font-size="10.5" fill="#7a6e62" text-anchor="start">MyApp overrides</text>
+  <text x="22" y="333" font-size="10.5" fill="#7a6e62" text-anchor="start">the steps;</text>
+  <text x="22" y="348" font-size="10.5" fill="#7a6e62" text-anchor="start">run() calls</text>
+  <text x="22" y="363" font-size="10.5" fill="#7a6e62" text-anchor="start">down into them</text>
+  <path d="M149,246 H536 Q540,246 540,250 V342 Q540,346 536,346 H149 Q145,346 145,342 V250 Q145,246 149,246 Z" fill="none" stroke="#8b1a1a" stroke-width="1.6"/>
+  <text x="157" y="268" font-size="13" fill="#1a1612" font-weight="bold" text-anchor="start">ApplicationFramework</text>
+  <text x="157" y="290" font-size="11" fill="#1a1612" text-anchor="start">for _ in range(2):</text>
+  <rect x="165" y="302" width="170" height="30" fill="none" stroke="#1a1612" stroke-width="1.1" rx="3"/>
+  <text x="250" y="321" font-size="11" fill="#1a1612" text-anchor="middle">customize1()</text>
+  <rect x="355" y="302" width="170" height="30" fill="none" stroke="#1a1612" stroke-width="1.1" rx="3"/>
+  <text x="440" y="321" font-size="11" fill="#1a1612" text-anchor="middle">customize2()</text>
+  <text x="528" y="268" font-size="11" fill="#8b1a1a" text-anchor="end">@final run()</text>
+  <path d="M149,370 H536 Q540,370 540,374 V442 Q540,446 536,446 H149 Q145,446 145,442 V374 Q145,370 149,370 Z" fill="none" stroke="#1a1612" stroke-width="1.6"/>
+  <text x="157" y="386" font-size="11" fill="#1a1612" font-weight="bold" text-anchor="start">MyApp</text>
+  <rect x="165" y="392" width="170" height="42" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
+  <text x="250" y="408" font-size="11" fill="#1a1612" text-anchor="middle">customize1()</text>
+  <text x="250" y="424" font-size="10" fill="#7a6e62" text-anchor="middle">"Nudge, nudge, wink, wink!"</text>
+  <line x1="250" y1="332" x2="250.0" y2="375.6" stroke="#1a1612" stroke-width="1.3" marker-end="url(#tms-ink)"/>
+  <text x="256" y="360" font-size="10" fill="#1a1612" text-anchor="start">self.customize1()</text>
+  <rect x="355" y="392" width="170" height="42" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
+  <text x="440" y="408" font-size="11" fill="#1a1612" text-anchor="middle">customize2()</text>
+  <text x="440" y="424" font-size="10" fill="#7a6e62" text-anchor="middle">"Say no more, say no more!"</text>
+  <line x1="440" y1="332" x2="440.0" y2="375.6" stroke="#1a1612" stroke-width="1.3" marker-end="url(#tms-ink)"/>
+  <text x="446" y="360" font-size="10" fill="#1a1612" text-anchor="start">self.customize2()</text>
+  <text x="562" y="268" font-size="11" fill="#8b1a1a" text-anchor="start">MyApp().run()</text>
+  <text x="562" y="286" font-size="10" fill="#7a6e62" text-anchor="start">prints</text>
+  <text x="562" y="308" font-size="10" fill="#1a1612" text-anchor="start">Nudge, nudge, wink, wink!</text>
+  <text x="562" y="325" font-size="10" fill="#1a1612" text-anchor="start">Say no more, say no more!</text>
+  <text x="562" y="342" font-size="10" fill="#1a1612" text-anchor="start">Nudge, nudge, wink, wink!</text>
+  <text x="562" y="359" font-size="10" fill="#1a1612" text-anchor="start">Say no more, say no more!</text>
+  <line x1="16" y1="450" x2="714" y2="450" stroke="#c8bfb0" stroke-width="0.8"/>
+  <text x="22" y="498" font-size="30" fill="#8b1a1a" font-weight="bold" text-anchor="start">3</text>
+  <text x="22" y="520" font-size="13" fill="#1a1612" font-weight="bold" text-anchor="start">pass</text>
+  <text x="22" y="540" font-size="10.5" fill="#7a6e62" text-anchor="start">the same loop</text>
+  <text x="22" y="555" font-size="10.5" fill="#7a6e62" text-anchor="start">in a function;</text>
+  <text x="22" y="570" font-size="10.5" fill="#7a6e62" text-anchor="start">the steps come</text>
+  <text x="22" y="585" font-size="10.5" fill="#7a6e62" text-anchor="start">in as arguments</text>
+  <path d="M149,468 H536 Q540,468 540,472 V564 Q540,568 536,568 H149 Q145,568 145,564 V472 Q145,468 149,468 Z" fill="none" stroke="#8b1a1a" stroke-width="1.6"/>
+  <text x="157" y="490" font-size="13" fill="#1a1612" font-weight="bold" text-anchor="start">run_framework()</text>
+  <text x="157" y="512" font-size="11" fill="#1a1612" text-anchor="start">for _ in range(2):</text>
+  <rect x="165" y="524" width="170" height="30" fill="none" stroke="#1a1612" stroke-width="1.1" rx="3"/>
+  <text x="250" y="543" font-size="11" fill="#1a1612" text-anchor="middle">customize1()</text>
+  <rect x="355" y="524" width="170" height="30" fill="none" stroke="#1a1612" stroke-width="1.1" rx="3"/>
+  <text x="440" y="543" font-size="11" fill="#1a1612" text-anchor="middle">customize2()</text>
+  <text x="528" y="490" font-size="11" fill="#7a6e62" text-anchor="end">no @final</text>
+  <path d="M149,592 H536 Q540,592 540,596 V664 Q540,668 536,668 H149 Q145,668 145,664 V596 Q145,592 149,592 Z" fill="none" stroke="#1a1612" stroke-width="1.6"/>
+  <text x="157" y="608" font-size="11" fill="#1a1612" font-weight="bold" text-anchor="start">two lambdas</text>
+  <rect x="165" y="614" width="170" height="42" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
+  <text x="250" y="630" font-size="11" fill="#1a1612" text-anchor="middle">lambda</text>
+  <text x="250" y="646" font-size="10" fill="#7a6e62" text-anchor="middle">"Nudge, nudge, wink, wink!"</text>
+  <line x1="250" y1="554" x2="250.0" y2="597.6" stroke="#1a1612" stroke-width="1.3" marker-end="url(#tms-ink)"/>
+  <text x="256" y="582" font-size="10" fill="#1a1612" text-anchor="start">customize1()</text>
+  <rect x="355" y="614" width="170" height="42" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
+  <text x="440" y="630" font-size="11" fill="#1a1612" text-anchor="middle">lambda</text>
+  <text x="440" y="646" font-size="10" fill="#7a6e62" text-anchor="middle">"Say no more, say no more!"</text>
+  <line x1="440" y1="554" x2="440.0" y2="597.6" stroke="#1a1612" stroke-width="1.3" marker-end="url(#tms-ink)"/>
+  <text x="446" y="582" font-size="10" fill="#1a1612" text-anchor="start">customize2()</text>
+  <text x="562" y="490" font-size="11" fill="#8b1a1a" text-anchor="start">run_framework()</text>
+  <text x="562" y="508" font-size="10" fill="#7a6e62" text-anchor="start">prints</text>
+  <text x="562" y="530" font-size="10" fill="#1a1612" text-anchor="start">Nudge, nudge, wink, wink!</text>
+  <text x="562" y="547" font-size="10" fill="#1a1612" text-anchor="start">Say no more, say no more!</text>
+  <text x="562" y="564" font-size="10" fill="#1a1612" text-anchor="start">Nudge, nudge, wink, wink!</text>
+  <text x="562" y="581" font-size="10" fill="#1a1612" text-anchor="start">Say no more, say no more!</text>
+</svg>

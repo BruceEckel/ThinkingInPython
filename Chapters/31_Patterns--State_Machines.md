@@ -4,7 +4,7 @@
 > and each input, together with the current state, decides the next state.
 > A *State Machine* names the states and the transitions between them.
 
-![](_images/coupling_31)
+![](_images/state_story)
 
 Recall [*State*](26_Patterns--Surrogate.md#state):
 a surrogate object that forwards calls to a swappable implementation.

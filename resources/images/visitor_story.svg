@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 730 580"
+     font-family="'JetBrains Mono', Consolas, monospace">
+  <title>Visitor's two dispatches and singledispatch's one: flower.accept(worm) calls Predator.visit, which calls back into Chrysanthemum.eat or the inherited Flower.eat, while nectar(f) looks the flower's type up in one table with no method on Flower</title>
+  <defs>
+    <marker id="vs-ink" viewBox="0 0 18 12" refX="5" refY="6"
+            markerWidth="18" markerHeight="12" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0.5,0.5 L17.4,6 L0.5,11.5 L5,6 Z" fill="#1a1612" stroke="#1a1612" stroke-width="0.8" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+  <path d="M140,16 H340 V188 H140 Z" fill="#eeeeee" stroke="none" stroke-width="1.6"/>
+  <text x="148" y="32" font-size="10" fill="#7a6e62" text-anchor="start">Flower: cannot change</text>
+  <text x="712" y="32" font-size="10" fill="#7a6e62" text-anchor="end">outside Flower</text>
+  <text x="22" y="54" font-size="30" fill="#8b1a1a" font-weight="bold" text-anchor="start">1</text>
+  <text x="22" y="76" font-size="13" fill="#1a1612" font-weight="bold" text-anchor="start">override</text>
+  <text x="22" y="96" font-size="10.5" fill="#7a6e62" text-anchor="start">a worm visits a</text>
+  <text x="22" y="111" font-size="10.5" fill="#7a6e62" text-anchor="start">Chrysanthemum;</text>
+  <text x="22" y="126" font-size="10.5" fill="#7a6e62" text-anchor="start">two dispatches</text>
+  <text x="230" y="52" font-size="10" fill="#1a1612" text-anchor="middle">flower.accept(worm)</text>
+  <rect x="160" y="58" width="140" height="30" fill="none" stroke="#1a1612" stroke-width="1.3" rx="4"/>
+  <text x="230" y="78" font-size="12" fill="#1a1612" text-anchor="middle">Flower.accept</text>
+  <rect x="540" y="98" width="140" height="30" fill="none" stroke="#8b1a1a" stroke-width="1.3" rx="4"/>
+  <text x="610" y="118" font-size="12" fill="#1a1612" text-anchor="middle">Predator.visit</text>
+  <rect x="160" y="138" width="140" height="30" fill="none" stroke="#8b1a1a" stroke-width="1.3" rx="4"/>
+  <text x="230" y="158" font-size="12" fill="#1a1612" text-anchor="middle">Chrysanthemum.eat</text>
+  <text x="610" y="92" font-size="10" fill="#8b1a1a" text-anchor="middle">dispatch 1: worm's type</text>
+  <text x="610" y="142" font-size="10" fill="#7a6e62" text-anchor="middle">Worm inherits it</text>
+  <text x="230" y="182" font-size="10" fill="#8b1a1a" text-anchor="middle">dispatch 2: flower's type</text>
+  <line x1="300" y1="73" x2="523.8" y2="110.3" stroke="#1a1612" stroke-width="1.3" marker-end="url(#vs-ink)"/>
+  <text x="432" y="77" font-size="10" fill="#1a1612" text-anchor="middle">visitor.visit(self)</text>
+  <line x1="540" y1="113" x2="316.2" y2="150.3" stroke="#1a1612" stroke-width="1.3" marker-end="url(#vs-ink)"/>
+  <text x="432" y="157" font-size="10" fill="#1a1612" text-anchor="middle">flower.eat(self)</text>
+  <text x="368" y="180" font-size="11" fill="#8b1a1a" text-anchor="start">Chrysanthemum is toxic to Worm</text>
+  <line x1="16" y1="196" x2="714" y2="196" stroke="#c8bfb0" stroke-width="0.8"/>
+  <path d="M140,206 H340 V378 H140 Z" fill="#eeeeee" stroke="none" stroke-width="1.6"/>
+  <text x="148" y="222" font-size="10" fill="#7a6e62" text-anchor="start">Flower: cannot change</text>
+  <text x="712" y="222" font-size="10" fill="#7a6e62" text-anchor="end">outside Flower</text>
+  <text x="22" y="244" font-size="30" fill="#8b1a1a" font-weight="bold" text-anchor="start">2</text>
+  <text x="22" y="266" font-size="13" fill="#1a1612" font-weight="bold" text-anchor="start">inherit</text>
+  <text x="22" y="286" font-size="10.5" fill="#7a6e62" text-anchor="start">the same worm</text>
+  <text x="22" y="301" font-size="10.5" fill="#7a6e62" text-anchor="start">visits a Gladiolus;</text>
+  <text x="22" y="316" font-size="10.5" fill="#7a6e62" text-anchor="start">dispatch 2 differs</text>
+  <text x="230" y="242" font-size="10" fill="#1a1612" text-anchor="middle">flower.accept(worm)</text>
+  <rect x="160" y="248" width="140" height="30" fill="none" stroke="#1a1612" stroke-width="1.3" rx="4"/>
+  <text x="230" y="268" font-size="12" fill="#1a1612" text-anchor="middle">Flower.accept</text>
+  <rect x="540" y="288" width="140" height="30" fill="none" stroke="#8b1a1a" stroke-width="1.3" rx="4"/>
+  <text x="610" y="308" font-size="12" fill="#1a1612" text-anchor="middle">Predator.visit</text>
+  <rect x="160" y="328" width="140" height="30" fill="none" stroke="#8b1a1a" stroke-width="1.3" rx="4"/>
+  <text x="230" y="348" font-size="12" fill="#1a1612" text-anchor="middle">Flower.eat</text>
+  <text x="610" y="282" font-size="10" fill="#8b1a1a" text-anchor="middle">dispatch 1: worm's type</text>
+  <text x="610" y="332" font-size="10" fill="#7a6e62" text-anchor="middle">Worm inherits it</text>
+  <text x="230" y="372" font-size="10" fill="#8b1a1a" text-anchor="middle">dispatch 2: flower's type</text>
+  <line x1="300" y1="263" x2="523.8" y2="300.3" stroke="#1a1612" stroke-width="1.3" marker-end="url(#vs-ink)"/>
+  <text x="432" y="267" font-size="10" fill="#1a1612" text-anchor="middle">visitor.visit(self)</text>
+  <line x1="540" y1="303" x2="316.2" y2="340.3" stroke="#1a1612" stroke-width="1.3" marker-end="url(#vs-ink)"/>
+  <text x="432" y="347" font-size="10" fill="#1a1612" text-anchor="middle">flower.eat(self)</text>
+  <text x="368" y="370" font-size="11" fill="#8b1a1a" text-anchor="start">Gladiolus eaten by Worm</text>
+  <line x1="16" y1="386" x2="714" y2="386" stroke="#c8bfb0" stroke-width="0.8"/>
+  <path d="M140,396 H340 V568 H140 Z" fill="#eeeeee" stroke="none" stroke-width="1.6"/>
+  <text x="148" y="412" font-size="10" fill="#7a6e62" text-anchor="start">Flower: cannot change</text>
+  <text x="712" y="412" font-size="10" fill="#7a6e62" text-anchor="end">outside Flower</text>
+  <text x="22" y="434" font-size="30" fill="#8b1a1a" font-weight="bold" text-anchor="start">3</text>
+  <text x="22" y="456" font-size="13" fill="#1a1612" font-weight="bold" text-anchor="start">one dispatch</text>
+  <text x="22" y="476" font-size="10.5" fill="#7a6e62" text-anchor="start">singledispatch:</text>
+  <text x="22" y="491" font-size="10.5" fill="#7a6e62" text-anchor="start">no accept(),</text>
+  <text x="22" y="506" font-size="10.5" fill="#7a6e62" text-anchor="start">no Visitor class</text>
+  <text x="438" y="428" font-size="10" fill="#7a6e62" text-anchor="middle">nectar.registry</text>
+  <path d="M384,434 H492 Q496,434 496,438 V544 Q496,548 492,548 H384 Q380,548 380,544 V438 Q380,434 384,434 Z" fill="none" stroke="#1a1612" stroke-width="1.3"/>
+  <rect x="160" y="438" width="140" height="30" fill="none" stroke="#1a1612" stroke-width="1.3" rx="4"/>
+  <text x="230" y="458" font-size="12" fill="#1a1612" text-anchor="middle">Gladiolus</text>
+  <rect x="388" y="442" width="100" height="22" fill="none" stroke="#8b1a1a" stroke-width="1.3" rx="3"/>
+  <text x="438" y="457" font-size="11" fill="#1a1612" text-anchor="middle">Gladiolus</text>
+  <line x1="300" y1="453" x2="371.6" y2="453.0" stroke="#1a1612" stroke-width="1.3" marker-end="url(#vs-ink)"/>
+  <text x="506" y="457" font-size="10.5" fill="#8b1a1a" text-anchor="start">Gladiolus: abundant nectar</text>
+  <rect x="160" y="476" width="140" height="30" fill="none" stroke="#1a1612" stroke-width="1.3" rx="4"/>
+  <text x="230" y="496" font-size="12" fill="#1a1612" text-anchor="middle">Ranunculus</text>
+  <rect x="388" y="480" width="100" height="22" fill="none" stroke="#7a6e62" stroke-width="1.3" rx="3"/>
+  <text x="438" y="495" font-size="11" fill="#7a6e62" text-anchor="middle">object</text>
+  <line x1="300" y1="491" x2="371.6" y2="491.0" stroke="#1a1612" stroke-width="1.3" marker-end="url(#vs-ink)"/>
+  <text x="506" y="495" font-size="10.5" fill="#8b1a1a" text-anchor="start">Ranunculus: no nectar</text>
+  <rect x="160" y="514" width="140" height="30" fill="none" stroke="#1a1612" stroke-width="1.3" rx="4"/>
+  <text x="230" y="534" font-size="12" fill="#1a1612" text-anchor="middle">Chrysanthemum</text>
+  <rect x="388" y="518" width="100" height="22" fill="none" stroke="#8b1a1a" stroke-width="1.3" rx="3"/>
+  <text x="438" y="533" font-size="11" fill="#1a1612" text-anchor="middle">Chrysanthemum</text>
+  <line x1="300" y1="529" x2="371.6" y2="529.0" stroke="#1a1612" stroke-width="1.3" marker-end="url(#vs-ink)"/>
+  <text x="506" y="533" font-size="10.5" fill="#8b1a1a" text-anchor="start">Chrysanthemum: a little nectar</text>
+  <text x="334" y="446" font-size="10" fill="#1a1612" text-anchor="middle">nectar(f)</text>
+  <text x="230" y="562" font-size="10.5" fill="#8b1a1a" text-anchor="middle">nothing edits Flower</text>
+  <text x="438" y="562" font-size="10" fill="#8b1a1a" text-anchor="middle">dispatch: flower's type</text>
+</svg>

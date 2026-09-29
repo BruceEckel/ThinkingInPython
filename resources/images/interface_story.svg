@@ -1,0 +1,138 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 730 774"
+     font-family="'JetBrains Mono', Consolas, monospace">
+  <title>Adapter and Façade in two before-and-after pairs: ProxyAdapter turns WhatIUse's f() call into WhatIHave's g() and h(), and Facade.start_car() takes over building Ignition, FuelPump, and Engine, so neither the caller nor the existing classes change</title>
+  <defs>
+    <marker id="is-ink" viewBox="0 0 18 12" refX="5" refY="6"
+            markerWidth="18" markerHeight="12" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0.5,0.5 L17.4,6 L0.5,11.5 L5,6 Z" fill="#1a1612" stroke="#1a1612" stroke-width="0.8" stroke-linejoin="round"/>
+    </marker>
+    <marker id="is-red" viewBox="0 0 18 12" refX="5" refY="6"
+            markerWidth="18" markerHeight="12" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0.5,0.5 L17.4,6 L0.5,11.5 L5,6 Z" fill="#8b1a1a" stroke="#8b1a1a" stroke-width="0.8" stroke-linejoin="round"/>
+    </marker>
+    <marker id="is-muted" viewBox="0 0 18 12" refX="5" refY="6"
+            markerWidth="18" markerHeight="12" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0.5,0.5 L17.4,6 L0.5,11.5 L5,6 Z" fill="#7a6e62" stroke="#7a6e62" stroke-width="0.8" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+  <text x="225" y="18" font-size="10.5" fill="#7a6e62" text-anchor="middle">the caller</text>
+  <text x="225" y="32" font-size="10" fill="#7a6e62" text-anchor="middle">unchanged</text>
+  <text x="415" y="18" font-size="10.5" fill="#7a6e62" text-anchor="middle">the new interface</text>
+  <text x="635" y="18" font-size="10.5" fill="#7a6e62" text-anchor="middle">the code you have</text>
+  <text x="635" y="32" font-size="10" fill="#7a6e62" text-anchor="middle">unchanged</text>
+  <text x="22" y="82" font-size="30" fill="#8b1a1a" font-weight="bold" text-anchor="start">1</text>
+  <text x="22" y="104" font-size="13" fill="#1a1612" font-weight="bold" text-anchor="start">mismatch</text>
+  <text x="22" y="124" font-size="10.5" fill="#7a6e62" text-anchor="start">op() calls f();</text>
+  <text x="22" y="139" font-size="10.5" fill="#7a6e62" text-anchor="start">WhatIHave has</text>
+  <text x="22" y="154" font-size="10.5" fill="#7a6e62" text-anchor="start">g() and h()</text>
+  <rect x="150" y="80" width="130" height="64" fill="none" stroke="#1a1612" stroke-width="1.3" rx="4"/>
+  <text x="162" y="102" font-size="12" fill="#1a1612" font-weight="bold" text-anchor="start">WhatIUse</text>
+  <text x="162" y="128" font-size="11" fill="#1a1612" text-anchor="start">op()</text>
+  <rect x="560" y="58" width="150" height="104" fill="none" stroke="#1a1612" stroke-width="1.3" rx="4"/>
+  <text x="572" y="78" font-size="12" fill="#1a1612" font-weight="bold" text-anchor="start">WhatIHave</text>
+  <rect x="574" y="94" width="122" height="24" fill="none" stroke="#1a1612" stroke-width="1.1" rx="3"/>
+  <text x="635" y="110" font-size="11" fill="#1a1612" text-anchor="middle">g()</text>
+  <rect x="574" y="128" width="122" height="24" fill="none" stroke="#1a1612" stroke-width="1.1" rx="3"/>
+  <text x="635" y="144" font-size="11" fill="#1a1612" text-anchor="middle">h()</text>
+  <line x1="280" y1="124" x2="543.6" y2="124.0" stroke="#1a1612" stroke-width="1.3" marker-end="url(#is-ink)"/>
+  <text x="306" y="118" font-size="11" fill="#1a1612" text-anchor="middle">f()</text>
+  <path d="M409,118 L421,130 M409,130 L421,118" stroke="#8b1a1a" stroke-width="2" fill="none"/>
+  <text x="415" y="148" font-size="10" fill="#8b1a1a" text-anchor="middle">WhatIHave has</text>
+  <text x="415" y="161" font-size="10" fill="#8b1a1a" text-anchor="middle">no f()</text>
+  <line x1="16" y1="180" x2="714" y2="180" stroke="#c8bfb0" stroke-width="0.8"/>
+  <text x="22" y="222" font-size="30" fill="#8b1a1a" font-weight="bold" text-anchor="start">2</text>
+  <text x="22" y="244" font-size="13" fill="#1a1612" font-weight="bold" text-anchor="start">Adapter</text>
+  <text x="22" y="264" font-size="10.5" fill="#7a6e62" text-anchor="start">ProxyAdapter</text>
+  <text x="22" y="279" font-size="10.5" fill="#7a6e62" text-anchor="start">turns each f()</text>
+  <text x="22" y="294" font-size="10.5" fill="#7a6e62" text-anchor="start">into g() and h()</text>
+  <rect x="150" y="220" width="130" height="64" fill="none" stroke="#1a1612" stroke-width="1.3" rx="4"/>
+  <text x="162" y="242" font-size="12" fill="#1a1612" font-weight="bold" text-anchor="start">WhatIUse</text>
+  <text x="162" y="268" font-size="11" fill="#1a1612" text-anchor="start">op()</text>
+  <path d="M564,198 H706 Q710,198 710,202 V298 Q710,302 706,302 H564 Q560,302 560,298 V202 Q560,198 564,198 Z" fill="none" stroke="#1a1612" stroke-width="1.6"/>
+  <text x="572" y="218" font-size="12" fill="#1a1612" font-weight="bold" text-anchor="start">WhatIHave</text>
+  <rect x="574" y="234" width="122" height="24" fill="none" stroke="#1a1612" stroke-width="1.1" rx="3"/>
+  <text x="635" y="250" font-size="11" fill="#1a1612" text-anchor="middle">g()</text>
+  <rect x="574" y="268" width="122" height="24" fill="none" stroke="#1a1612" stroke-width="1.1" rx="3"/>
+  <text x="635" y="284" font-size="11" fill="#1a1612" text-anchor="middle">h()</text>
+  <text x="150" y="208" font-size="10" fill="#7a6e62" text-anchor="start">WhatIUse().op(adapt)</text>
+  <rect x="340" y="220" width="150" height="64" fill="none" stroke="#8b1a1a" stroke-width="1.6" rx="4"/>
+  <text x="352" y="242" font-size="12" fill="#1a1612" font-weight="bold" text-anchor="start">ProxyAdapter</text>
+  <text x="352" y="260" font-size="10" fill="#7a6e62" text-anchor="start">a WhatIWant</text>
+  <text x="352" y="276" font-size="11" fill="#1a1612" text-anchor="start">f()</text>
+  <line x1="280" y1="264" x2="323.6" y2="264.0" stroke="#1a1612" stroke-width="1.3" marker-end="url(#is-ink)"/>
+  <text x="298" y="258" font-size="11" fill="#1a1612" text-anchor="middle">f()</text>
+  <line x1="490" y1="246" x2="557.6" y2="246.0" stroke="#8b1a1a" stroke-width="1.6" marker-end="url(#is-red)"/>
+  <text x="508" y="241" font-size="10" fill="#8b1a1a" text-anchor="middle">g()</text>
+  <line x1="490" y1="280" x2="557.6" y2="280.0" stroke="#8b1a1a" stroke-width="1.6" marker-end="url(#is-red)"/>
+  <text x="508" y="275" font-size="10" fill="#8b1a1a" text-anchor="middle">h()</text>
+  <text x="574" y="322" font-size="10.5" fill="#8b1a1a" text-anchor="start">WhatIHave.g()</text>
+  <text x="574" y="337" font-size="10.5" fill="#8b1a1a" text-anchor="start">WhatIHave.h()</text>
+  <line x1="16" y1="350" x2="714" y2="350" stroke="#c8bfb0" stroke-width="0.8"/>
+  <text x="22" y="392" font-size="30" fill="#8b1a1a" font-weight="bold" text-anchor="start">3</text>
+  <text x="22" y="414" font-size="13" fill="#1a1612" font-weight="bold" text-anchor="start">assembly</text>
+  <text x="22" y="434" font-size="10.5" fill="#7a6e62" text-anchor="start">the caller</text>
+  <text x="22" y="449" font-size="10.5" fill="#7a6e62" text-anchor="start">builds all three</text>
+  <text x="22" y="464" font-size="10.5" fill="#7a6e62" text-anchor="start">inside out,</text>
+  <text x="22" y="479" font-size="10.5" fill="#7a6e62" text-anchor="start">then calls</text>
+  <text x="22" y="494" font-size="10.5" fill="#7a6e62" text-anchor="start">turn_key()</text>
+  <rect x="150" y="368" width="150" height="176" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="4" stroke-dasharray="4,3"/>
+  <text x="162" y="390" font-size="12" fill="#7a6e62" font-weight="bold" text-anchor="start">caller</text>
+  <text x="162" y="418" font-size="11" fill="#1a1612" text-anchor="start">Ignition(</text>
+  <text x="175.2" y="434" font-size="11" fill="#1a1612" text-anchor="start">FuelPump(</text>
+  <text x="188.4" y="450" font-size="11" fill="#1a1612" text-anchor="start">Engine()))</text>
+  <text x="162" y="466" font-size="11" fill="#1a1612" text-anchor="start">.turn_key()</text>
+  <line x1="300" y1="386" x2="543.6" y2="386.0" stroke="#1a1612" stroke-width="1.3" marker-end="url(#is-ink)"/>
+  <text x="310" y="380" font-size="10" fill="#1a1612" text-anchor="start">turn_key()</text>
+  <line x1="300" y1="456" x2="543.6" y2="456.0" stroke="#7a6e62" stroke-width="1.3" marker-end="url(#is-muted)"/>
+  <text x="310" y="450" font-size="10" fill="#7a6e62" text-anchor="start">builds</text>
+  <line x1="300" y1="526" x2="543.6" y2="526.0" stroke="#7a6e62" stroke-width="1.3" marker-end="url(#is-muted)"/>
+  <text x="310" y="520" font-size="10" fill="#7a6e62" text-anchor="start">builds</text>
+  <rect x="560" y="368" width="150" height="36" fill="none" stroke="#1a1612" stroke-width="1.3" rx="4"/>
+  <text x="635" y="391" font-size="12" fill="#1a1612" text-anchor="middle">Ignition</text>
+  <rect x="560" y="438" width="150" height="36" fill="none" stroke="#1a1612" stroke-width="1.3" rx="4"/>
+  <text x="635" y="461" font-size="12" fill="#1a1612" text-anchor="middle">FuelPump</text>
+  <line x1="594" y1="404" x2="594.0" y2="421.6" stroke="#1a1612" stroke-width="1.3" marker-end="url(#is-ink)"/>
+  <text x="604" y="425" font-size="10" fill="#1a1612" text-anchor="start">prime()</text>
+  <rect x="560" y="508" width="150" height="36" fill="none" stroke="#1a1612" stroke-width="1.3" rx="4"/>
+  <text x="635" y="531" font-size="12" fill="#1a1612" text-anchor="middle">Engine</text>
+  <line x1="594" y1="474" x2="594.0" y2="491.6" stroke="#1a1612" stroke-width="1.3" marker-end="url(#is-ink)"/>
+  <text x="604" y="495" font-size="10" fill="#1a1612" text-anchor="start">start()</text>
+  <line x1="16" y1="560" x2="714" y2="560" stroke="#c8bfb0" stroke-width="0.8"/>
+  <text x="22" y="602" font-size="30" fill="#8b1a1a" font-weight="bold" text-anchor="start">4</text>
+  <text x="22" y="624" font-size="13" fill="#1a1612" font-weight="bold" text-anchor="start">Façade</text>
+  <text x="22" y="644" font-size="10.5" fill="#7a6e62" text-anchor="start">one call</text>
+  <text x="22" y="659" font-size="10.5" fill="#7a6e62" text-anchor="start">builds and</text>
+  <text x="22" y="674" font-size="10.5" fill="#7a6e62" text-anchor="start">starts the car;</text>
+  <text x="22" y="689" font-size="10.5" fill="#7a6e62" text-anchor="start">the caller</text>
+  <text x="22" y="704" font-size="10.5" fill="#7a6e62" text-anchor="start">names Facade</text>
+  <rect x="150" y="578" width="150" height="60" fill="none" stroke="#1a1612" stroke-width="1.3" rx="4"/>
+  <text x="162" y="600" font-size="12" fill="#7a6e62" font-weight="bold" text-anchor="start">caller</text>
+  <text x="162" y="622" font-size="10.5" fill="#1a1612" text-anchor="start">Facade.start_car()</text>
+  <rect x="340" y="578" width="120" height="176" fill="none" stroke="#8b1a1a" stroke-width="1.6" rx="4"/>
+  <text x="352" y="600" font-size="12" fill="#1a1612" font-weight="bold" text-anchor="start">Facade</text>
+  <text x="352" y="620" font-size="11" fill="#1a1612" text-anchor="start">start_car()</text>
+  <text x="352" y="650" font-size="11" fill="#1a1612" text-anchor="start">Ignition(</text>
+  <text x="365.2" y="666" font-size="11" fill="#1a1612" text-anchor="start">FuelPump(</text>
+  <text x="378.4" y="682" font-size="11" fill="#1a1612" text-anchor="start">Engine()))</text>
+  <text x="352" y="698" font-size="11" fill="#1a1612" text-anchor="start">.turn_key()</text>
+  <line x1="300" y1="608" x2="323.6" y2="608.0" stroke="#1a1612" stroke-width="1.3" marker-end="url(#is-ink)"/>
+  <line x1="460" y1="596" x2="543.6" y2="596.0" stroke="#1a1612" stroke-width="1.3" marker-end="url(#is-ink)"/>
+  <text x="470" y="590" font-size="10" fill="#1a1612" text-anchor="start">turn_key()</text>
+  <line x1="460" y1="666" x2="543.6" y2="666.0" stroke="#7a6e62" stroke-width="1.3" marker-end="url(#is-muted)"/>
+  <text x="470" y="660" font-size="10" fill="#7a6e62" text-anchor="start">builds</text>
+  <line x1="460" y1="736" x2="543.6" y2="736.0" stroke="#7a6e62" stroke-width="1.3" marker-end="url(#is-muted)"/>
+  <text x="470" y="730" font-size="10" fill="#7a6e62" text-anchor="start">builds</text>
+  <rect x="560" y="578" width="150" height="36" fill="none" stroke="#1a1612" stroke-width="1.3" rx="4"/>
+  <text x="635" y="593" font-size="12" fill="#1a1612" text-anchor="middle">Ignition</text>
+  <text x="635" y="608" font-size="10" fill="#8b1a1a" text-anchor="middle">Ignition.turn_key()</text>
+  <rect x="560" y="648" width="150" height="36" fill="none" stroke="#1a1612" stroke-width="1.3" rx="4"/>
+  <text x="635" y="663" font-size="12" fill="#1a1612" text-anchor="middle">FuelPump</text>
+  <text x="635" y="678" font-size="10" fill="#8b1a1a" text-anchor="middle">FuelPump.prime()</text>
+  <line x1="594" y1="614" x2="594.0" y2="631.6" stroke="#1a1612" stroke-width="1.3" marker-end="url(#is-ink)"/>
+  <text x="604" y="635" font-size="10" fill="#1a1612" text-anchor="start">prime()</text>
+  <rect x="560" y="718" width="150" height="36" fill="none" stroke="#1a1612" stroke-width="1.3" rx="4"/>
+  <text x="635" y="733" font-size="12" fill="#1a1612" text-anchor="middle">Engine</text>
+  <text x="635" y="748" font-size="10" fill="#8b1a1a" text-anchor="middle">Engine.start()</text>
+  <line x1="594" y1="684" x2="594.0" y2="701.6" stroke="#1a1612" stroke-width="1.3" marker-end="url(#is-ink)"/>
+  <text x="604" y="705" font-size="10" fill="#1a1612" text-anchor="start">start()</text>
+</svg>

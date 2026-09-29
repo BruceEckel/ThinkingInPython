@@ -42,6 +42,10 @@ from tools.config import ROOT
 
 IMAGES = ROOT / "resources" / "images"
 INK, BOX, MUTED, RED = "#1a1612", "#c8bfb0", "#7a6e62", "#8b1a1a"
+# The fill for a shaded region. The EPUB's PNG8 conversion cuts each
+# channel to a multiple of 17, which turned a translucent BOX over white,
+# and every pale warm tint tried, yellow or pink; a neutral 0xEE survives.
+SHADE = "#eeeeee"
 TIP_GAP = 4
 FONT = "font-family=\"'JetBrains Mono', Consolas, monospace\""
 

@@ -3,7 +3,7 @@
 > An object is about to change, and someone may want it back the way it was.
 > A *Memento* saves what the object was so the program can restore it.
 
-![](_images/coupling_36)
+![](_images/memento_story)
 
 Undo is a feature users expect and programmers dread.
 *Memento* is an undo mechanism that keeps encapsulation intact.

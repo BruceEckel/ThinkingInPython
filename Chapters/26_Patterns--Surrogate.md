@@ -4,7 +4,7 @@
 > *Proxy* and *State* are both built on that stand-in,
 > which this chapter calls a *Surrogate*.
 
-![](_images/coupling_26)
+![](_images/surrogate_story)
 
 Both *Proxy* and *State* provide a surrogate class that changes what happens behind a call without changing the calling code.
 The surrogate hides the implementing class that does the work.

@@ -239,7 +239,7 @@ A figure is an SVG in `resources/images/`, referenced as `![caption](_images/<na
 Never hand-edit a generated one:
 chapter 31's `stateMachine.svg` comes from `tools/state_machine_figure.py`,
 each pattern chapter's opening story figure from its module in `tools/story_figures/`,
-and every `coupling_*.svg` from `tools/coupling_panels.py`;
+and chapter 21's `coupling_gallery.svg` from `tools/coupling_panels.py`;
 edit the spec and run its `tip fix-*` task.
 Load the `figures` skill (`.claude/skills/figures/SKILL.md`) before drawing or editing any figure.
 It holds the caption rules, the palette, the arrowheads, and what `tip figures` checks.

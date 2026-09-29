@@ -1,34 +1,30 @@
-"""Generate the coupling-notation panel at the top of each pattern chapter.
+"""Generate chapter 21's coupling gallery, `coupling_gallery.svg`.
 
-Chapter 21's Coupling section draws six GoF patterns in one
-notation: a heavy edge names a concrete class, a thin edge names an
-interface, a dashed edge with a hollow head satisfies one, and the red
-box is the part the pattern protects from change. This script draws
-one such panel per pattern chapter, 23 through 36 except 30, into
-`resources/images/coupling_NN.svg`, so the chapters share a figure the
-way they share a question: which edge does the pattern move, and where
-does it put it?
+Chapter 21's Coupling section defines a notation for coupling: a heavy
+edge names a concrete class, a thin edge names an interface, a dashed
+edge with a hollow head satisfies one, and the red box is the part the
+pattern protects from change. Its `coupling_gallery.svg` draws six GoF
+patterns in that notation, three to a row, and this script generates
+it from the `Cell` specs in `GALLERY`: each cell's title, position,
+nodes, and edges. A change to the figure means editing the spec here
+and regenerating, never editing the SVG by hand:
 
-Every panel is a `Panel` in `PANELS`, keyed by chapter number: its
-nodes and its edges. A panel's figure prints no caption (`![](...)`
-in the chapter): its title and legend say what it shows, and its
-SVG `<title>` serves as the alt text. The names in a panel are the names in that chapter's listings, so a listing
-rename means editing the spec here and regenerating, never editing an
-SVG by hand. Chapter 21's `coupling_gallery.svg`, its six patterns in
-the same notation, is generated here too, from the `Cell` specs in
-`GALLERY`:
-
-    uv run python -m tools.coupling_panels            # write all
+    uv run python -m tools.coupling_panels            # write it
     uv run python -m tools.coupling_panels --check    # report drift
     uv run python -m tools.coupling_panels --png      # rasterize to look
 
-`--check` regenerates in memory and exits nonzero if any committed SVG
+Until 2026-09-29 the script also drew a coupling panel at the top of
+each pattern chapter, 23 through 36, into `coupling_NN.svg`. Bruce
+found the panels gave the reader little, and each pattern chapter now
+opens with a story figure from `tools/story_figures/` instead.
+
+`--check` regenerates in memory and exits nonzero if the committed SVG
 differs, the way `extract_examples`'s check mode works for `Examples/`;
 `tip coupling-panels` runs it in the gate. Every run also checks each
-spec's edges (`edge_problems()`): a head's tip must sit `TIP_PAD` from
+cell's edges (`edge_problems()`): a head's tip must sit `TIP_PAD` from
 its target's drawn outline, rounded corners included, give or take
 `TIP_SLACK`, and no edge may cross a box other than its own two. `--png` rasterizes every
-`resources/images/coupling_*.svg` (the panels and chapter 21's figures)
+`resources/images/coupling_*.svg` (chapter 21's figures)
 into `build/coupling/` with the same rasterizer and width the EPUB
 uses, since text that fits in a browser can collide once rasterized;
 `tip coupling-panels-png` is the one-command form. It needs one of
@@ -36,18 +32,15 @@ uses, since text that fits in a browser can collide once rasterized;
 
 The visual vocabulary matches the hand-authored figures: a `viewBox`
 with no width or height, JetBrains Mono, the cover palette from
-`make_cover.py`, and a `<title>` for screen readers. The canvas is 700
-wide like the other figures, so the site renders every figure at the
-same scale; the drawing sits on the left and a legend on the right,
-listing only the edge kinds the drawing uses, and the red box only when
-a node is marked.
+`make_cover.py`, and a `<title>` for screen readers. A legend along the
+bottom shows each of the three edge kinds and the red box.
 """
 from __future__ import annotations
 import argparse
 import math
 import subprocess
 import sys
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
 
 from tools.arrowheads import HEADS, marker_def, shorten_curve
@@ -60,10 +53,6 @@ BOX = "#c8bfb0"
 MUTED = "#7a6e62"
 MARK = "#8b1a1a"
 FONT = "font-family=\"'JetBrains Mono', Consolas, monospace\""
-
-WIDTH = 700
-LEGEND_Y = 60  # the first legend line's y
-LEGEND_GAP = 44  # from the drawing's right edge to the legend
 
 
 @dataclass(frozen=True)
@@ -289,313 +278,6 @@ def defs(pid: str) -> str:
             + "  </defs>\n")
 
 
-LEGEND_ROWS: tuple[tuple[str, str], ...] = (
-    ("heavy", "names a concrete class"),
-    ("thin", "names an interface"),
-    ("realize", "satisfies an interface"),
-    ("inherit", "inherits from a class"),
-)
-
-
-def legend(x: float, y: float, pid: str, kinds: set[str],
-           marked: bool) -> str:
-    """A sample of each edge kind in `kinds`, and the red box if a node
-    is `marked`, stacked for the panel's right side. A legend lists only
-    what its drawing uses."""
-    rows = [(k, label) for k, label in LEGEND_ROWS if k in kinds]
-    out = ""
-    for i, (kind, label) in enumerate(rows):
-        yy = y + i * 20
-        stroke, width, dash, head = STYLES[kind]
-        end = x + 30 - HEADS[MARKERS[head][0]].trim
-        out += (f'  <line class="legend" x1="{x}" y1="{yy}" '
-                f'x2="{end:g}" y2="{yy}" '
-                f'stroke="{stroke}" stroke-width="{width}"{dash} '
-                f'marker-end="url(#{pid}-{head})"/>\n')
-        out += text(x + 38, yy + 4, label, 10.5, MUTED)
-    if marked:
-        yy = y + len(rows) * 20
-        out += (f'  <rect x="{x + 2}" y="{yy - 8}" width="26" height="16" '
-                f'fill="none" stroke="{MARK}" stroke-width="1.6" rx="3"/>\n')
-        out += text(x + 38, yy + 4, "does not change", 10.5, MUTED)
-    return out
-
-
-@dataclass(frozen=True)
-class Panel:
-    title: str
-    alt: str
-    nodes: tuple[Node, ...]
-    edges: tuple[Edge, ...]
-    extra: tuple[str, ...] = field(default_factory=tuple)
-
-    @property
-    def rows(self) -> int:
-        """Lines in the legend: one per edge kind, and the red box."""
-        kinds = {e.kind for e in self.edges}
-        marked = any(n.kind == "mark" for n in self.nodes)
-        return sum(k in kinds for k, _ in LEGEND_ROWS) + marked
-
-    @property
-    def height(self) -> float:
-        """The lowest box or legend line, and a margin under it."""
-        legend_bottom = LEGEND_Y + 20 * (self.rows - 1) + 8
-        return max(max(n.y + n.h for n in self.nodes), legend_bottom) + 16
-
-    @property
-    def right(self) -> float:
-        """The drawing's right edge: the title rule ends here, and the
-        legend starts LEGEND_GAP after it."""
-        return max(n.x + n.w for n in self.nodes)
-
-    def svg(self, pid: str) -> str:
-        nodes = {n.name: n for n in self.nodes}
-        b = text(10, 20, self.title, 13, INK, bold=True, italic=True)
-        b += (f'  <line x1="10" y1="27" x2="{self.right:g}" y2="27" '
-              f'stroke="{BOX}" '
-              f'stroke-width="0.8"/>\n')
-        for n in self.nodes:
-            b += n.svg()
-        for e in self.edges:
-            b += edge_svg(e, nodes, pid)
-        for s in self.extra:
-            b += s
-        b += legend(self.right + LEGEND_GAP, LEGEND_Y, pid,
-                    {e.kind for e in self.edges},
-                    any(n.kind == "mark" for n in self.nodes))
-        return (f'<svg xmlns="http://www.w3.org/2000/svg" '
-                f'viewBox="0 0 {WIDTH} {self.height}"\n     {FONT}>\n'
-                f'  <title>{self.alt}</title>\n' + defs(pid) + b + '</svg>\n')
-
-
-# The per-chapter specs. Columns C1..C3 and rows R1..R3 are the usual
-# positions; a panel moves a box when its edges would otherwise cross.
-C1, C2, C3 = 20, 172, 324
-R1, R2, R3 = 48, 108, 168
-
-
-def divider(x: float, bottom: float = 212) -> str:
-    return (f'  <line x1="{x}" y1="40" x2="{x}" y2="{bottom:g}" stroke="{BOX}" '
-            f'stroke-width="1" stroke-dasharray="4,4"/>\n')
-
-
-PANELS: dict[int, Panel] = {
-    23: Panel(
-        "Iterator",
-        "total() names only Iterable, and a list, a generator, and "
-        "Countdown satisfy it without naming it",
-        (Node("total()", C1, R2, kind="mark"),
-         Node("Iterable[int]", C2 - 6, R2, w=118, kind="interface"),
-         Node("list", C3, R1, w=90),
-         Node("fibonacci()", C3, R2, w=100),
-         Node("Countdown", C3, R3, w=100)),
-        (Edge("total()", "Iterable[int]", "thin"),
-         Edge("list", "Iterable[int]", "realize", corner=True),
-         Edge("fibonacci()", "Iterable[int]", "realize"),
-         Edge("Countdown", "Iterable[int]", "realize", corner=True)),
-    ),
-    24: Panel(
-        "Singleton",
-        "Every importer names config.py by its module name, and the import "
-        "system hands each one the same instance",
-        (Node("config.py", C2 + 30, R2, w=170, kind="mark",
-              sub="one instance per interpreter"),
-         Node("module_singleton.py", C1, R1, w=160),
-         Node("shared_config.py", C1, R3, w=160)),
-        (Edge("module_singleton.py", "config.py", "heavy", label="import",
-              dx=10, dy=-10, corner=True),
-         Edge("shared_config.py", "config.py", "heavy", label="import",
-              dx=10, dy=18, corner=True)),
-    ),
-    25: Panel(
-        "Template Method",
-        "MyApp inherits ApplicationFramework's internals, while "
-        "run_framework() names only the Step signature its two functions satisfy",
-        (Node("ApplicationFramework", C1, 44, w=180, kind="mark", sub="run()"),
-         Node("MyApp", C1, 192, w=180),
-         Node("run_framework()", 256, 44, w=160, kind="mark"),
-         Node("Step", 271, 118, w=130, kind="interface",
-              sub="Callable[[], None]"),
-         Node("two lambdas", 256, 192, w=160)),
-        (Edge("MyApp", "ApplicationFramework", "inherit",
-              label="overrides two steps", dx=70, dy=4),
-         Edge("run_framework()", "Step", "thin"),
-         Edge("two lambdas", "Step", "realize")),
-        extra=(divider(228, 230),),
-    ),
-    26: Panel(
-        "Surrogate",
-        "Proxy and Complete both inherit Service, Proxy holds one, and only "
-        "the caller names either class",
-        (Node("Proxy", C1, R1, w=90, kind="mark"),
-         Node("Service", C2 + 10, R1, kind="interface", sub="ABC"),
-         Node("Complete", C3 + 10, R1, w=96),
-         Node("caller", C2 + 10, R3, w=96)),
-        (Edge("Proxy", "Service", "inherit", shift=-8),
-         Edge("Proxy", "Service", "thin", shift=8, label="holds", dy=18),
-         Edge("Complete", "Service", "inherit"),
-         Edge("caller", "Proxy", "heavy", corner=True),
-         Edge("caller", "Complete", "heavy", corner=True)),
-    ),
-    27: Panel(
-        "Factory",
-        "The caller names make(), and make() is the one place that names "
-        "Shape, Circle, and Square",
-        (Node("caller", C1, R1, w=80, kind="mark"),
-         Node("make()", C2, R1, w=90),
-         Node("Shape", C1, R3, w=80, kind="interface"),
-         Node("Circle", C2 + 5, R3, w=80),
-         Node("Square", C3, R3, w=80)),
-        (Edge("caller", "make()", "heavy"),
-         Edge("make()", "Shape", "thin", label="returns", dx=-30, dy=-4,
-              corner=True),
-         Edge("make()", "Circle", "heavy", label="SHAPES", dx=30, dy=4),
-         Edge("make()", "Square", "heavy", corner=True),
-         Edge("Circle", "Shape", "inherit"),
-         Edge("Square", "Shape", "inherit", bend=-46)),
-    ),
-    28: Panel(
-        "Function Objects",
-        "The list that builds macro names three functions, and the loop that "
-        "runs it names only the Command signature",
-        (Node("macro", C1, R1, w=100, sub="list[Command]"),
-         Node("no_more()", C2, R1, w=96),
-         Node("ceased()", C2, R2, w=96),
-         Node("fjords()", C2, R3, w=96),
-         Node("Command", C3, R2, w=120, kind="interface",
-              sub="Callable[[], None]"),
-         Node("for command in macro", C3 - 20, R3 + 14, w=160, kind="mark",
-              sub="command()")),
-        (Edge("macro", "no_more()", "heavy"),
-         Edge("macro", "ceased()", "heavy"),
-         Edge("macro", "fjords()", "heavy", corner=True),
-         Edge("no_more()", "Command", "realize"),
-         Edge("ceased()", "Command", "realize"),
-         Edge("fjords()", "Command", "realize"),
-         Edge("for command in macro", "Command", "thin")),
-    ),
-    29: Panel(
-        "Adapter",
-        "WhatIUse names WhatIWant, and ProxyAdapter is the one class that "
-        "names both WhatIWant and WhatIHave",
-        (Node("WhatIUse", C1, R1, kind="mark"),
-         Node("WhatIWant", C2 + 5, R1, w=100, kind="interface"),
-         Node("ProxyAdapter", C2, R3, w=110),
-         Node("WhatIHave", C3 + 6, R3, w=96)),
-        (Edge("WhatIUse", "WhatIWant", "thin"),
-         Edge("ProxyAdapter", "WhatIWant", "inherit"),
-         Edge("ProxyAdapter", "WhatIHave", "heavy")),
-    ),
-    # Chapter 30 opens with a storyboard instead
-    # (tools/observer_story_figure.py): Bruce, 2026-09-29, found the
-    # static panel told the reader too little about a pattern whose
-    # point is what happens over time.
-    31: Panel(
-        "State Machine",
-        "StateMachine names only State, each state satisfies it, and "
-        "MouseTrap and its states name each other",
-        (Node("StateMachine", C1, R1, w=110, kind="mark"),
-         Node("State", C2 + 10, R1, w=90, kind="interface"),
-         Node("MouseTrap", C1, R3, w=110),
-         Node("Waiting", C3, 92, w=90),
-         Node("Luring", C3, 170, w=90)),
-        (Edge("StateMachine", "State", "thin"),
-         Edge("MouseTrap", "StateMachine", "inherit"),
-         Edge("Waiting", "State", "realize", corner=True),
-         Edge("Luring", "State", "realize", bend=-44),
-         Edge("Waiting", "MouseTrap", "heavy", shift=5,
-              label="MouseTrap.luring",
-              dx=-30, dy=-10),
-         Edge("MouseTrap", "Waiting", "heavy", shift=5, label="builds",
-              dx=30, dy=5),
-         Edge("Luring", "MouseTrap", "heavy", shift=5),
-         Edge("MouseTrap", "Luring", "heavy", shift=5)),
-    ),
-    32: Panel(
-        "Multiple Dispatching",
-        "Paper, Scissors, and Rock each define an eval method for every item "
-        "and call one through Any, so a fourth item edits all three",
-        (Node("Paper", C1, R1, w=90),
-         Node("Scissors", C1, R3, w=90),
-         Node("Rock", C3 + 10, R2, w=90),
-         Node("eval_*()", C2 - 4, R2, w=118, kind="absent",
-              sub="undeclared")),
-        (Edge("Paper", "eval_*()", "thin", shift=6),
-         Edge("Paper", "eval_*()", "realize", shift=-6),
-         Edge("Scissors", "eval_*()", "thin", shift=-6),
-         Edge("Scissors", "eval_*()", "realize", shift=6),
-         Edge("Rock", "eval_*()", "thin", shift=6),
-         Edge("Rock", "eval_*()", "realize", shift=-6)),
-    ),
-    33: Panel(
-        "Visitor",
-        "Flower names only Visitor and Pollinator names only Flower, so no "
-        "visitor names a concrete flower",
-        (Node("Flower", C1 + 10, 44, w=110, kind="mark", sub="cannot change"),
-         Node("Visitor", C3, 44, w=96, kind="interface"),
-         Node("Chrysanthemum", C1, 196, w=130),
-         Node("Pollinator", C3, 120, w=96),
-         Node("Bee", C3, 196, w=96)),
-        (Edge("Flower", "Visitor", "thin",
-              label="pollinator, eater: Visitor", dx=-4, dy=-12),
-         Edge("Pollinator", "Flower", "thin", label="flower: Flower",
-              dx=-24, dy=14,
-              corner=True),
-         Edge("Chrysanthemum", "Flower", "inherit"),
-         Edge("Pollinator", "Visitor", "inherit"),
-         Edge("Bee", "Pollinator", "inherit")),
-    ),
-    34: Panel(
-        "Composite",
-        "disk_usage() and walk() each name both node types, and Directory "
-        "names only the Node union",
-        (Node("disk_usage()", C1, R1, w=110),
-         Node("walk()", C1, R2, w=96),
-         Node("File", C3, R1, w=90),
-         Node("Directory", C3, R2, w=96),
-         Node("Node", C2 + 10, R3 + 6, w=90, kind="interface",
-              sub="File | Directory")),
-        (Edge("disk_usage()", "File", "heavy"),
-         Edge("disk_usage()", "Directory", "heavy", corner=True),
-         Edge("walk()", "File", "heavy", corner=True),
-         Edge("walk()", "Directory", "heavy"),
-         Edge("disk_usage()", "Node", "thin"),
-         Edge("walk()", "Node", "thin", corner=True),
-         Edge("Directory", "Node", "thin", label="entries", dx=38, dy=10,
-              corner=True)),
-    ),
-    35: Panel(
-        "Flyweight",
-        "parse_map() names tile(), to_symbol(), and Tile, and tile() is the "
-        "one place that constructs a Tile",
-        (Node("parse_map()", C1, R2, w=110, kind="mark"),
-         Node("tile()", C2 + 10, R1, w=90, sub="@cache"),
-         Node("Tile", C3 + 10, R1, w=80),
-         Node("to_symbol()", C2 + 10, R3, w=100),
-         Node("SPECS", C3 + 10, R3, w=80)),
-        (Edge("parse_map()", "tile()", "heavy", corner=True),
-         Edge("parse_map()", "to_symbol()", "heavy", corner=True),
-         Edge("parse_map()", "Tile", "heavy", bend=30, label="returns",
-              dx=0, dy=16),
-         Edge("tile()", "Tile", "heavy", label="constructs", dy=-10),
-         Edge("tile()", "SPECS", "heavy", corner=True),
-         Edge("to_symbol()", "SPECS", "heavy")),
-    ),
-    36: Panel(
-        "Memento",
-        "Sketch names Memento, and History names only a type parameter, so it "
-        "holds a Memento without reading it",
-        (Node("Sketch", C1, R1, w=100, kind="mark"),
-         Node("Memento", 240, R1, w=96),
-         Node("History[S]", C1, R3, w=110),
-         Node("S", 240, R3, w=96, kind="interface", sub="any value")),
-        (Edge("Sketch", "Memento", "heavy", label="save, restore", dy=18),
-         Edge("History[S]", "S", "thin"),
-         Edge("Memento", "S", "realize")),
-    ),
-}
-
-
 @dataclass(frozen=True)
 class Cell:
     """One pattern in chapter 21's gallery, at column `col` and row `row`."""
@@ -607,7 +289,7 @@ class Cell:
 
 
 
-# Chapter 21's coupling_gallery.svg: six patterns in the panel notation,
+# Chapter 21's coupling_gallery.svg: six patterns in the coupling notation,
 # three to a row. Nodes carry absolute coordinates; a cell is GALLERY_W
 # wide and GALLERY_H tall, and stacked boxes sit 36 apart so every edge
 # shows a line behind its head.
@@ -755,18 +437,12 @@ def edge_problems(nodes: tuple[Node, ...],
 
 
 def all_edge_problems() -> list[str]:
-    out = [f"coupling_{ch}.svg  {msg}" for ch, p in sorted(PANELS.items())
-           for msg in edge_problems(p.nodes, p.edges)]
-    out += [f"coupling_gallery.svg ({c.title})  {msg}" for c in GALLERY
+    return [f"coupling_gallery.svg ({c.title})  {msg}" for c in GALLERY
             for msg in edge_problems(c.nodes, c.edges)]
-    return out
 
 
 def render_all() -> dict[Path, str]:
-    out = {IMAGES / f"coupling_{ch}.svg": p.svg(f"c{ch}")
-           for ch, p in sorted(PANELS.items())}
-    out[IMAGES / "coupling_gallery.svg"] = render_gallery()
-    return out
+    return {IMAGES / "coupling_gallery.svg": render_gallery()}
 
 
 def rasterize(out_dir: Path) -> int:

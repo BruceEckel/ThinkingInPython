@@ -104,6 +104,10 @@ PALETTE: dict[str, str] = {
     "#7a6e62": "muted",
     "#8b1a1a": "mark",
     "#f5f0e8": "paper",
+    # A solid fill for a shaded region. The EPUB's PNG8 conversion cuts
+    # each channel to a multiple of 17, which turned a translucent BOX,
+    # and any other pale warm tint, yellow; 0xEE on all three survives.
+    "#eeeeee": "shade",
 }
 NEUTRAL = {"none", "white", "#fff", "#ffffff", "transparent", "currentcolor"}
 BOOK_FONT = "JetBrains Mono"

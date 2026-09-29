@@ -9,8 +9,22 @@ cannot see; its list holds only callables. The names are the ones in
 that demo's two lambdas; `plot` is dashed because no listing has it).
 """
 
-from tools.story_figures import (BOX, INK, MUTED, RED, Point, arrow, cross,
-                                 line, markers, rect, region, svg, text)
+from tools.story_figures import (
+    BOX,
+    INK,
+    MUTED,
+    RED,
+    SHADE,
+    Point,
+    arrow,
+    cross,
+    line,
+    markers,
+    rect,
+    region,
+    svg,
+    text,
+)
 
 STEM = "observer_story"
 W = 730
@@ -44,8 +58,7 @@ def frame(i: int, y0: float, slots: int, name: str,
     out = ""
     if i:
         out += line((16, y0 - 4), (W - 16, y0 - 4))
-    out += region(HIDE_X, y0 + 6, W - HIDE_X - 10, FH - 18, fill=BOX,
-                  opacity=0.22, r=0)
+    out += region(HIDE_X, y0 + 6, W - HIDE_X - 10, FH - 18, fill=SHADE, r=0)
     out += region(TX, y0 + 14, TW, FH - 30, stroke=RED if i == 3 else INK)
     out += text(TX + 12, y0 + 34, "Thermometer", 13, bold=True)
     out += text(SX, y0 + 44, "_responders", 10, MUTED)

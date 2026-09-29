@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 740 515"
+     font-family="'JetBrains Mono', Consolas, monospace">
+  <title>The mousetrap's nine inputs as a trace: in each row the current state's next(event) picks the next of four state objects, whose run() prints a line; below, an input Waiting does not name keeps the match version in Waiting and makes the table version raise a RuntimeError</title>
+  <defs>
+    <marker id="ss-red" viewBox="0 0 18 12" refX="5" refY="6"
+            markerWidth="18" markerHeight="12" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0.5,0.5 L17.4,6 L0.5,11.5 L5,6 Z" fill="#8b1a1a" stroke="#8b1a1a" stroke-width="0.8" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+  <text x="20" y="22" font-size="12" fill="#1a1612" font-weight="bold" text-anchor="start">MouseTrap().run_all(moves)</text>
+  <text x="20" y="38" font-size="10" fill="#7a6e62" text-anchor="start">each row: current_state.next(event) returns the next state (red), and run() on it prints</text>
+  <text x="20" y="68" font-size="11" fill="#7a6e62" text-anchor="start">event</text>
+  <text x="510" y="68" font-size="11" fill="#7a6e62" text-anchor="start">run() prints</text>
+  <line x1="212" y1="76" x2="212" y2="339" stroke="#c8bfb0" stroke-width="0.8"/>
+  <rect x="176" y="50" width="72" height="26" fill="none" stroke="#1a1612" stroke-width="1.3" rx="4"/>
+  <text x="212" y="67" font-size="11.5" fill="#1a1612" font-weight="bold" text-anchor="middle">Waiting</text>
+  <line x1="294" y1="76" x2="294" y2="339" stroke="#c8bfb0" stroke-width="0.8"/>
+  <rect x="258" y="50" width="72" height="26" fill="none" stroke="#1a1612" stroke-width="1.3" rx="4"/>
+  <text x="294" y="67" font-size="11.5" fill="#1a1612" font-weight="bold" text-anchor="middle">Luring</text>
+  <line x1="376" y1="76" x2="376" y2="339" stroke="#c8bfb0" stroke-width="0.8"/>
+  <rect x="340" y="50" width="72" height="26" fill="none" stroke="#1a1612" stroke-width="1.3" rx="4"/>
+  <text x="376" y="67" font-size="11.5" fill="#1a1612" font-weight="bold" text-anchor="middle">Trapping</text>
+  <line x1="458" y1="76" x2="458" y2="339" stroke="#c8bfb0" stroke-width="0.8"/>
+  <rect x="422" y="50" width="72" height="26" fill="none" stroke="#1a1612" stroke-width="1.3" rx="4"/>
+  <text x="458" y="67" font-size="11.5" fill="#1a1612" font-weight="bold" text-anchor="middle">Holding</text>
+  <text x="20" y="108" font-size="10.5" fill="#7a6e62" text-anchor="start">MouseTrap()</text>
+  <circle cx="212" cy="104" r="5" fill="#1a1612"/>
+  <text x="510" y="108" font-size="10" fill="#1a1612" text-anchor="start">Waiting: Broadcasting cheese smell</text>
+  <text x="20" y="133" font-size="10.5" fill="#1a1612" text-anchor="start">mouse appears</text>
+  <line x1="216.783" y1="105.458" x2="273.5" y2="122.8" stroke="#8b1a1a" stroke-width="1.5" marker-end="url(#ss-red)"/>
+  <circle cx="294" cy="129" r="5" fill="#1a1612"/>
+  <text x="510" y="133" font-size="10" fill="#1a1612" text-anchor="start">Luring: Presenting Cheese, door open</text>
+  <text x="20" y="158" font-size="10.5" fill="#1a1612" text-anchor="start">mouse runs away</text>
+  <line x1="289.217" y1="130.458" x2="232.5" y2="147.8" stroke="#8b1a1a" stroke-width="1.5" marker-end="url(#ss-red)"/>
+  <circle cx="212" cy="154" r="5" fill="#1a1612"/>
+  <text x="510" y="158" font-size="10" fill="#1a1612" text-anchor="start">Waiting: Broadcasting cheese smell</text>
+  <text x="20" y="183" font-size="10.5" fill="#1a1612" text-anchor="start">mouse appears</text>
+  <line x1="216.783" y1="155.458" x2="273.5" y2="172.8" stroke="#8b1a1a" stroke-width="1.5" marker-end="url(#ss-red)"/>
+  <circle cx="294" cy="179" r="5" fill="#1a1612"/>
+  <text x="510" y="183" font-size="10" fill="#1a1612" text-anchor="start">Luring: Presenting Cheese, door open</text>
+  <text x="20" y="208" font-size="10.5" fill="#1a1612" text-anchor="start">mouse enters trap</text>
+  <line x1="298.783" y1="180.458" x2="355.5" y2="197.8" stroke="#8b1a1a" stroke-width="1.5" marker-end="url(#ss-red)"/>
+  <circle cx="376" cy="204" r="5" fill="#1a1612"/>
+  <text x="510" y="208" font-size="10" fill="#1a1612" text-anchor="start">Trapping: Closing door</text>
+  <text x="20" y="233" font-size="10.5" fill="#1a1612" text-anchor="start">mouse escapes</text>
+  <line x1="371.057" y1="204.753" x2="233.2" y2="225.8" stroke="#8b1a1a" stroke-width="1.5" marker-end="url(#ss-red)"/>
+  <circle cx="212" cy="229" r="5" fill="#1a1612"/>
+  <text x="510" y="233" font-size="10" fill="#1a1612" text-anchor="start">Waiting: Broadcasting cheese smell</text>
+  <text x="20" y="258" font-size="10.5" fill="#1a1612" text-anchor="start">mouse appears</text>
+  <line x1="216.783" y1="230.458" x2="273.5" y2="247.8" stroke="#8b1a1a" stroke-width="1.5" marker-end="url(#ss-red)"/>
+  <circle cx="294" cy="254" r="5" fill="#1a1612"/>
+  <text x="510" y="258" font-size="10" fill="#1a1612" text-anchor="start">Luring: Presenting Cheese, door open</text>
+  <text x="20" y="283" font-size="10.5" fill="#1a1612" text-anchor="start">mouse enters trap</text>
+  <line x1="298.783" y1="255.458" x2="355.5" y2="272.8" stroke="#8b1a1a" stroke-width="1.5" marker-end="url(#ss-red)"/>
+  <circle cx="376" cy="279" r="5" fill="#1a1612"/>
+  <text x="510" y="283" font-size="10" fill="#1a1612" text-anchor="start">Trapping: Closing door</text>
+  <text x="20" y="308" font-size="10.5" fill="#1a1612" text-anchor="start">mouse trapped</text>
+  <line x1="380.783" y1="280.458" x2="437.5" y2="297.8" stroke="#8b1a1a" stroke-width="1.5" marker-end="url(#ss-red)"/>
+  <circle cx="458" cy="304" r="5" fill="#1a1612"/>
+  <text x="510" y="308" font-size="10" fill="#1a1612" text-anchor="start">Holding: Mouse caught</text>
+  <text x="20" y="333" font-size="10.5" fill="#1a1612" text-anchor="start">mouse removed</text>
+  <line x1="453.026" y1="304.506" x2="233.3" y2="326.8" stroke="#8b1a1a" stroke-width="1.5" marker-end="url(#ss-red)"/>
+  <circle cx="212" cy="329" r="5" fill="#1a1612"/>
+  <text x="510" y="333" font-size="10" fill="#1a1612" text-anchor="start">Waiting: Broadcasting cheese smell</text>
+  <line x1="16" y1="355" x2="724" y2="355" stroke="#c8bfb0" stroke-width="0.8"/>
+  <text x="20" y="377" font-size="11" fill="#7a6e62" text-anchor="start">an input the current state does not name</text>
+  <text x="20" y="403" font-size="11.5" fill="#1a1612" font-weight="bold" text-anchor="start">match version</text>
+  <text x="20" y="418" font-size="10" fill="#7a6e62" text-anchor="start">mouse_trap_states.py</text>
+  <rect x="20" y="433" width="72" height="26" fill="none" stroke="#1a1612" stroke-width="1.3" rx="4"/>
+  <text x="56" y="450" font-size="11.5" fill="#1a1612" font-weight="bold" text-anchor="middle">Waiting</text>
+  <text x="157" y="440" font-size="10" fill="#1a1612" text-anchor="middle">mouse escapes</text>
+  <line x1="92" y1="446" x2="205.6" y2="446.0" stroke="#8b1a1a" stroke-width="1.5" marker-end="url(#ss-red)"/>
+  <rect x="222" y="433" width="72" height="26" fill="none" stroke="#1a1612" stroke-width="1.3" rx="4"/>
+  <text x="258" y="450" font-size="11.5" fill="#1a1612" font-weight="bold" text-anchor="middle">Waiting</text>
+  <text x="20" y="481" font-size="10" fill="#7a6e62" text-anchor="start">case _ returns the current state,</text>
+  <text x="20" y="495" font-size="10" fill="#7a6e62" text-anchor="start">so run() prints its line again</text>
+  <text x="390" y="403" font-size="11.5" fill="#1a1612" font-weight="bold" text-anchor="start">table version</text>
+  <text x="390" y="418" font-size="10" fill="#7a6e62" text-anchor="start">mouse_trap_tables.py</text>
+  <rect x="390" y="433" width="72" height="26" fill="none" stroke="#1a1612" stroke-width="1.3" rx="4"/>
+  <text x="426" y="450" font-size="11.5" fill="#1a1612" font-weight="bold" text-anchor="middle">Waiting</text>
+  <text x="527" y="440" font-size="10" fill="#1a1612" text-anchor="middle">mouse escapes</text>
+  <line x1="462" y1="446" x2="592" y2="446" stroke="#8b1a1a" stroke-width="1.5"/>
+  <path d="M596,440 L608,452 M596,452 L608,440" stroke="#8b1a1a" stroke-width="2" fill="none"/>
+  <text x="390" y="481" font-size="10" fill="#8b1a1a" text-anchor="start">RuntimeError: Waiting has no</text>
+  <text x="390" y="495" font-size="10" fill="#8b1a1a" text-anchor="start">transition for mouse escapes</text>
+</svg>

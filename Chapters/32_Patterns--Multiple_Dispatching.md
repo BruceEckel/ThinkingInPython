@@ -3,7 +3,7 @@
 > Two objects meet, and the right action depends on the type of each.
 > *Multiple Dispatching* chooses the action from both types at once.
 
-![](_images/coupling_32)
+![](_images/dispatch_story)
 
 Code that combines several interacting types can end up testing a type by hand for every combination.
 Consider a system that parses and executes mathematical expressions.

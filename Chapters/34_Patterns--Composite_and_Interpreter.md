@@ -5,7 +5,7 @@
 > *Composite* builds that tree,
 > and *Interpreter* reads one as a sentence and evaluates it.
 
-![](_images/coupling_34)
+![](_images/composite_story)
 
 In *Composite*, each node is a leaf or a group of nodes,
 and one call serves both.

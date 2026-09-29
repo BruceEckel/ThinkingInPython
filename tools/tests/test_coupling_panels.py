@@ -1,34 +1,10 @@
-"""Tests for tools/coupling_panels.py: the specs are self-consistent,
-their straight edges are straight, every gallery box sits inside its
-cell, and the chapters reference the panels the specs produce."""
+"""Tests for tools/coupling_panels.py: the gallery renders with a title
+and no fixed size, its straight edges are straight, every tip meets its
+box, and every box sits inside its cell."""
 from __future__ import annotations
-import re
-import pytest
-from tools.coupling_panels import (GALLERY, GALLERY_H, GALLERY_W,
-                                   PANELS, ROOT, Edge, Node, all_edge_problems,
-                                   edge_problems, render_all)
-
-CHAPTERS = ROOT / "Chapters"
-
-
-def test_every_edge_names_two_nodes_of_its_panel() -> None:
-    for ch, panel in PANELS.items():
-        names = {n.name for n in panel.nodes}
-        for e in panel.edges:
-            assert e.a in names, (ch, e.a)
-            assert e.b in names, (ch, e.b)
-
-
-@pytest.mark.book
-def test_each_pattern_chapter_references_its_panel_once() -> None:
-    for ch in PANELS:
-        md = next(CHAPTERS.glob(f"{ch}_*.md"))
-        text = md.read_text(encoding="utf-8")
-        tags = re.findall(rf"^!\[(.*)\]\(_images/coupling_{ch}\)$", text,
-                          flags=re.M)
-        assert len(tags) == 1, (md.name, len(tags))
-        # A panel prints no caption; its SVG <title> is the alt text.
-        assert tags[0] == "", md.name
+from tools.coupling_panels import (GALLERY, GALLERY_H, GALLERY_W, Edge,
+                                   Node, all_edge_problems, edge_problems,
+                                   render_all)
 
 
 def test_rendered_svg_has_a_title_and_no_size() -> None:
@@ -38,10 +14,8 @@ def test_rendered_svg_has_a_title_and_no_size() -> None:
         assert "<title>" in body, path.name
 
 
-# Every drawing in the file, as (name, nodes, edges).
-DRAWINGS = (
-    [(f"chapter {ch}", p.nodes, p.edges) for ch, p in PANELS.items()]
-    + [(f"gallery {c.title}", c.nodes, c.edges) for c in GALLERY])
+# Every gallery cell, as (name, nodes, edges).
+DRAWINGS = [(f"gallery {c.title}", c.nodes, c.edges) for c in GALLERY]
 
 # Edges left a little off straight on purpose, with the reason.
 KNOWN_TILTS: dict[tuple[str, str, str], str] = {}
@@ -93,20 +67,6 @@ def test_a_tip_reaches_a_rounded_box_at_any_angle() -> None:
     for x, y in ((0, 0), (300, 20), (145, 300), (0, 240)):
         nodes = (Node("s", x, y, w=40, h=20), target)
         assert edge_problems(nodes, (Edge("s", "t", "realize"),)) == []
-
-
-def test_a_legend_lists_only_what_its_panel_draws() -> None:
-    labels = {"heavy": "names a concrete class",
-              "thin": "names an interface",
-              "realize": "satisfies an interface",
-              "inherit": "inherits from a class"}
-    for ch, panel in PANELS.items():
-        svg = panel.svg("t")
-        used = {e.kind for e in panel.edges}
-        for kind, label in labels.items():
-            assert (label in svg) == (kind in used), (ch, kind)
-        marked = any(n.kind == "mark" for n in panel.nodes)
-        assert (">does not change</text>" in svg) == marked, ch
 
 
 def test_every_gallery_box_sits_inside_its_cell() -> None:

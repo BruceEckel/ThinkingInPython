@@ -550,14 +550,11 @@ It is the right answer for a language missing the piece Python has.
 
 Each pattern chapter from [*Iterator*](23_Patterns--Iterators.md)
 through [*Memento*](36_Patterns--Memento.md)
-opens with a figure in the notation of [A Pattern Moves an Edge](#a-pattern-moves-an-edge),
-drawn from that chapter's own listings, with one more edge:
-a solid edge with a hollow head is a subclass naming its parent,
-the top rung of the ladder.
-In each figure, count the heavy edges and note which way they point.
-The exception is [*Observer*](30_Patterns--Observer.md),
-whose point is what happens over time,
-so its chapter opens with the steps of one notification instead.
+opens with a figure of its pattern at work,
+drawn from that chapter's own listings.
+The gallery in [A Pattern Moves an Edge](#a-pattern-moves-an-edge)
+shows which way each dependency points; those figures show what happens,
+in what order, and which part knows about which.
 
 Part III closes with a [Pattern Catalog](39_Patterns--Pattern_Catalog.md),
 a name-and-intent index of the wider literature,

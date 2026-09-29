@@ -1,0 +1,108 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 730 594"
+     font-family="'JetBrains Mono', Consolas, monospace">
+  <title>Four steps of Memento: save() copies the sketch's list into a frozen Memento, drawing again leaves the memento unchanged, restore() copies it back into a new list, and a frozen Drawing kept by reference is its own memento</title>
+  <defs>
+    <marker id="ms-red" viewBox="0 0 18 12" refX="17" refY="6"
+            markerWidth="18" markerHeight="12" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M1.5,1.5 L17,6 L1.5,10.5" fill="none" stroke="#8b1a1a" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+    <marker id="ms-red-call" viewBox="0 0 18 12" refX="5" refY="6"
+            markerWidth="18" markerHeight="12" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0.5,0.5 L17.4,6 L0.5,11.5 L5,6 Z" fill="#8b1a1a" stroke="#8b1a1a" stroke-width="0.8" stroke-linejoin="round"/>
+    </marker>
+    <marker id="ms-ink" viewBox="0 0 18 12" refX="17" refY="6"
+            markerWidth="18" markerHeight="12" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M1.5,1.5 L17,6 L1.5,10.5" fill="none" stroke="#1a1612" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+  <path d="M480,16 H720 V146 H480 Z" fill="#eeeeee" stroke="none" stroke-width="1.6"/>
+  <text x="712" y="30" font-size="10" fill="#7a6e62" text-anchor="end">caretaker: holds it, never reads it</text>
+  <rect x="140" y="24" width="240" height="116" fill="none" stroke="#1a1612" stroke-width="1.3" rx="4"/>
+  <text x="152" y="44" font-size="13" fill="#1a1612" font-weight="bold" text-anchor="start">sketch: Sketch</text>
+  <text x="152" y="62" font-size="10" fill="#7a6e62" text-anchor="start">strokes</text>
+  <rect x="515" y="38" width="195" height="100" fill="none" stroke="#1a1612" stroke-width="1.3" rx="4"/>
+  <text x="527" y="58" font-size="12" fill="#1a1612" font-weight="bold" text-anchor="start">checkpoint: Memento</text>
+  <text x="527" y="74" font-size="10" fill="#7a6e62" text-anchor="start">strokes</text>
+  <text x="22" y="54" font-size="30" fill="#8b1a1a" font-weight="bold" text-anchor="start">1</text>
+  <text x="22" y="76" font-size="13" fill="#1a1612" font-weight="bold" text-anchor="start">save</text>
+  <text x="22" y="96" font-size="10.5" fill="#7a6e62" text-anchor="start">the list is</text>
+  <text x="22" y="111" font-size="10.5" fill="#7a6e62" text-anchor="start">copied into a</text>
+  <text x="22" y="126" font-size="10.5" fill="#7a6e62" text-anchor="start">frozen tuple</text>
+  <rect x="150" y="68" width="70" height="24" fill="none" stroke="#1a1612" stroke-width="1.1" rx="3"/>
+  <text x="185" y="84" font-size="10.5" fill="#1a1612" text-anchor="middle">circle</text>
+  <rect x="226" y="68" width="70" height="24" fill="none" stroke="#1a1612" stroke-width="1.1" rx="3"/>
+  <text x="261" y="84" font-size="10.5" fill="#1a1612" text-anchor="middle">beak</text>
+  <text x="527" y="94" font-size="11" fill="#8b1a1a" text-anchor="start">('circle', 'beak')</text>
+  <line x1="380" y1="79" x2="511.0" y2="79.0" stroke="#8b1a1a" stroke-width="1.6" marker-end="url(#ms-red)"/>
+  <text x="447.5" y="72" font-size="10" fill="#8b1a1a" text-anchor="middle">save()</text>
+  <text x="447.5" y="95" font-size="10" fill="#7a6e62" text-anchor="middle">list -&gt; tuple</text>
+  <line x1="16" y1="152" x2="714" y2="152" stroke="#c8bfb0" stroke-width="0.8"/>
+  <path d="M480,162 H720 V292 H480 Z" fill="#eeeeee" stroke="none" stroke-width="1.6"/>
+  <text x="712" y="176" font-size="10" fill="#7a6e62" text-anchor="end">caretaker: holds it, never reads it</text>
+  <rect x="140" y="170" width="240" height="116" fill="none" stroke="#1a1612" stroke-width="1.3" rx="4"/>
+  <text x="152" y="190" font-size="13" fill="#1a1612" font-weight="bold" text-anchor="start">sketch: Sketch</text>
+  <text x="152" y="208" font-size="10" fill="#7a6e62" text-anchor="start">strokes</text>
+  <rect x="515" y="184" width="195" height="100" fill="none" stroke="#1a1612" stroke-width="1.3" rx="4"/>
+  <text x="527" y="204" font-size="12" fill="#1a1612" font-weight="bold" text-anchor="start">checkpoint: Memento</text>
+  <text x="527" y="220" font-size="10" fill="#7a6e62" text-anchor="start">strokes</text>
+  <text x="22" y="200" font-size="30" fill="#8b1a1a" font-weight="bold" text-anchor="start">2</text>
+  <text x="22" y="222" font-size="13" fill="#1a1612" font-weight="bold" text-anchor="start">draw</text>
+  <text x="22" y="242" font-size="10.5" fill="#7a6e62" text-anchor="start">the sketch</text>
+  <text x="22" y="257" font-size="10.5" fill="#7a6e62" text-anchor="start">changes; the</text>
+  <text x="22" y="272" font-size="10.5" fill="#7a6e62" text-anchor="start">memento does not</text>
+  <text x="370" y="190" font-size="10" fill="#8b1a1a" text-anchor="end">draw("scribble")</text>
+  <rect x="150" y="214" width="70" height="24" fill="none" stroke="#1a1612" stroke-width="1.1" rx="3"/>
+  <text x="185" y="230" font-size="10.5" fill="#1a1612" text-anchor="middle">circle</text>
+  <rect x="226" y="214" width="70" height="24" fill="none" stroke="#1a1612" stroke-width="1.1" rx="3"/>
+  <text x="261" y="230" font-size="10.5" fill="#1a1612" text-anchor="middle">beak</text>
+  <rect x="302" y="214" width="70" height="24" fill="none" stroke="#8b1a1a" stroke-width="1.1" rx="3"/>
+  <text x="337" y="230" font-size="10.5" fill="#8b1a1a" text-anchor="middle">scribble</text>
+  <text x="152" y="260" font-size="10.5" fill="#8b1a1a" text-anchor="start">#: circle beak scribble</text>
+  <text x="527" y="240" font-size="11" fill="#1a1612" text-anchor="start">('circle', 'beak')</text>
+  <text x="527" y="260" font-size="10" fill="#7a6e62" text-anchor="start">unchanged</text>
+  <line x1="16" y1="298" x2="714" y2="298" stroke="#c8bfb0" stroke-width="0.8"/>
+  <path d="M480,308 H720 V438 H480 Z" fill="#eeeeee" stroke="none" stroke-width="1.6"/>
+  <text x="712" y="322" font-size="10" fill="#7a6e62" text-anchor="end">caretaker: holds it, never reads it</text>
+  <rect x="140" y="316" width="240" height="116" fill="none" stroke="#1a1612" stroke-width="1.3" rx="4"/>
+  <text x="152" y="336" font-size="13" fill="#1a1612" font-weight="bold" text-anchor="start">sketch: Sketch</text>
+  <text x="152" y="354" font-size="10" fill="#7a6e62" text-anchor="start">strokes</text>
+  <rect x="515" y="330" width="195" height="100" fill="none" stroke="#1a1612" stroke-width="1.3" rx="4"/>
+  <text x="527" y="350" font-size="12" fill="#1a1612" font-weight="bold" text-anchor="start">checkpoint: Memento</text>
+  <text x="527" y="366" font-size="10" fill="#7a6e62" text-anchor="start">strokes</text>
+  <text x="22" y="346" font-size="30" fill="#8b1a1a" font-weight="bold" text-anchor="start">3</text>
+  <text x="22" y="368" font-size="13" fill="#1a1612" font-weight="bold" text-anchor="start">restore</text>
+  <text x="22" y="388" font-size="10.5" fill="#7a6e62" text-anchor="start">the tuple is</text>
+  <text x="22" y="403" font-size="10.5" fill="#7a6e62" text-anchor="start">copied back</text>
+  <text x="22" y="418" font-size="10.5" fill="#7a6e62" text-anchor="start">into a new list</text>
+  <rect x="150" y="360" width="70" height="24" fill="none" stroke="#1a1612" stroke-width="1.1" rx="3"/>
+  <text x="185" y="376" font-size="10.5" fill="#1a1612" text-anchor="middle">circle</text>
+  <rect x="226" y="360" width="70" height="24" fill="none" stroke="#1a1612" stroke-width="1.1" rx="3"/>
+  <text x="261" y="376" font-size="10.5" fill="#1a1612" text-anchor="middle">beak</text>
+  <text x="304" y="376" font-size="10" fill="#8b1a1a" text-anchor="start">new list</text>
+  <text x="152" y="406" font-size="10.5" fill="#8b1a1a" text-anchor="start">#: circle beak</text>
+  <text x="527" y="386" font-size="11" fill="#1a1612" text-anchor="start">('circle', 'beak')</text>
+  <line x1="515" y1="371" x2="396.4" y2="371.0" stroke="#8b1a1a" stroke-width="1.6" marker-end="url(#ms-red-call)"/>
+  <text x="447.5" y="364" font-size="10" fill="#8b1a1a" text-anchor="middle">restore(checkpoint)</text>
+  <text x="447.5" y="387" font-size="10" fill="#7a6e62" text-anchor="middle">tuple -&gt; list</text>
+  <line x1="16" y1="444" x2="714" y2="444" stroke="#c8bfb0" stroke-width="0.8"/>
+  <path d="M480,454 H720 V584 H480 Z" fill="#eeeeee" stroke="none" stroke-width="1.6"/>
+  <text x="712" y="468" font-size="10" fill="#7a6e62" text-anchor="end">caretaker: keeps a reference</text>
+  <rect x="140" y="462" width="240" height="116" fill="none" stroke="#1a1612" stroke-width="1.3" rx="4"/>
+  <text x="152" y="482" font-size="13" fill="#1a1612" font-weight="bold" text-anchor="start">after: Drawing</text>
+  <text x="152" y="500" font-size="10" fill="#7a6e62" text-anchor="start">strokes</text>
+  <rect x="515" y="476" width="195" height="100" fill="none" stroke="#8b1a1a" stroke-width="1.3" rx="4"/>
+  <text x="527" y="496" font-size="12" fill="#1a1612" font-weight="bold" text-anchor="start">before: Drawing</text>
+  <text x="527" y="512" font-size="10" fill="#7a6e62" text-anchor="start">strokes</text>
+  <text x="22" y="492" font-size="30" fill="#8b1a1a" font-weight="bold" text-anchor="start">4</text>
+  <text x="22" y="514" font-size="13" fill="#1a1612" font-weight="bold" text-anchor="start">freeze</text>
+  <text x="22" y="534" font-size="10.5" fill="#7a6e62" text-anchor="start">a frozen state</text>
+  <text x="22" y="549" font-size="10.5" fill="#7a6e62" text-anchor="start">is its own</text>
+  <text x="22" y="564" font-size="10.5" fill="#7a6e62" text-anchor="start">memento</text>
+  <text x="152" y="522" font-size="10.5" fill="#1a1612" text-anchor="start">('circle', 'beak', 'scribble')</text>
+  <text x="152" y="552" font-size="10.5" fill="#1a1612" text-anchor="start">#: Duck: circle beak scribble</text>
+  <text x="527" y="532" font-size="11" fill="#1a1612" text-anchor="start">('circle', 'beak')</text>
+  <text x="527" y="552" font-size="10.5" fill="#1a1612" text-anchor="start">#: Duck: circle beak</text>
+  <line x1="515" y1="517" x2="384.0" y2="517.0" stroke="#1a1612" stroke-width="1.6" marker-end="url(#ms-ink)"/>
+  <text x="447.5" y="510" font-size="10" fill="#1a1612" text-anchor="middle">draw("scribble")</text>
+  <text x="447.5" y="533" font-size="10" fill="#7a6e62" text-anchor="middle">returns new</text>
+</svg>
