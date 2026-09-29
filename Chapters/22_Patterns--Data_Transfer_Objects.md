@@ -3,7 +3,8 @@
 > A function computes several results, and the caller needs all of them.
 > A *Data Transfer Object* carries them back under names instead of positions.
 
-The *Messenger*, called a *Data Transfer Object* in Martin Fowler's *Patterns of Enterprise Application Architecture*,
+The *Messenger*, called a *Data Transfer Object* (DTO)
+in Martin Fowler's *Patterns of Enterprise Application Architecture*,
 passes a package of information around.
 Most often it carries a function's return values.
 You use tuples and dictionaries for that, but both rely on indexing.
@@ -12,16 +13,16 @@ A `dict` requires the clumsier `d["name"]` syntax.
 
 Fowler's DTO crosses a process or network boundary,
 batching several values into one object to cut round trips.
-The object shape below is the same one,
-whether or not it ever leaves the process:
-[Parallelism](19_Techniques--Concurrency.md#what-a-process-pool-requires)
-pickles arguments and return values across a process boundary the same way,
+The objects in this chapter have the same shape,
+whether or not they leave the process.
+When one does leave, a process pool pickles it across the process boundary
+([Parallelism](19_Techniques--Concurrency.md#what-a-process-pool-requires)),
 and [Serializing to JSON](12_Techniques--Data_Classes_as_Types.md#serializing-to-json)
-turns one into the wire format for a network call.
+turns a data class into the wire format for a network call.
 
 ## A Hand-Rolled Messenger
 
-A Messenger is an object with attributes corresponding to the names of the data you pass or return:
+A *Messenger* is an object with attributes corresponding to the names of the data you pass or return:
 
 ```python
 # messenger_idiom.py
@@ -63,7 +64,7 @@ by declaring a `__getattr__()` that returns `Any` and a `__setattr__()` that acc
 ([*Surrogate*](26_Patterns--Surrogate.md#forwarding-with-getattr) explains the `__getattr__()` fallback hook).
 With `__getattr__()` alone, the type checker still rejects the write,
 `m.more = 11`.
-The standard library's stub for `SimpleNamespace` declares such a pair
+The standard library's type declaration for `SimpleNamespace` has such a pair
 (its read half is `__getattribute__()`, which intercepts every attribute access),
 so the next listing needs no annotation.
 The price of an ad-hoc attribute bag is that no type checker knows your attribute names.
@@ -74,7 +75,7 @@ A typo like `m.inof` is a runtime `AttributeError`, not a static error.
 ### `SimpleNamespace`
 
 In the standard Python library,
-`types.SimpleNamespace` is a ready-made Messenger.
+`types.SimpleNamespace` is a ready-made *Messenger*.
 Here, too, keyword arguments become attributes in the instance's `__dict__`:
 
 ```python
@@ -127,6 +128,12 @@ print(p)
 #: Point(x=3.5, y=2.0)
 ```
 
+`p.x = 3.5` succeeds because a data class is mutable unless you freeze it.
+[A NamedTuple Is Still a Tuple](#a-namedtuple-is-still-a-tuple)
+compares the frozen form,
+which this book's listings write as [`@record`](18_Techniques--Performance.md#record),
+with a `NamedTuple`.
+
 ### `NamedTuple`
 
 A `NamedTuple` declares its fields the same way but produces an immutable record.
@@ -166,12 +173,13 @@ Printing a `NamedTuple` gives the same readable output as a data class.
 A bare tuple prints `(255, 0, 0)` and leaves you counting positions.
 Assigning to a field raises an `AttributeError`,
 and `ty` reports the assignment as well.
-An attribute bag accepts every write; a declared field rejects this one,
+An attribute bag accepts every write; a `NamedTuple` rejects this one,
 at runtime and in the checker.
 Because no field can change, `_replace()` is the way to change one:
 it produces an updated copy.
 [`copy.replace()`](12_Techniques--Data_Classes_as_Types.md#the-general-form-of-replace)
-does the same job for any immutable record, including a frozen data class.
+does the same job for a `NamedTuple`, a frozen data class,
+and any other type that defines `__replace__()`.
 Immutability also makes the record hashable,
 so a `Color` can key a `dict` or join a `set`.
 
@@ -202,8 +210,11 @@ class Stats(NamedTuple):
 def summarize(data: list[float]) -> Stats:
     return Stats(sum(data) / len(data), len(data))
 
-print(summarize([2.0, 4.0, 6.0]))
+result = summarize([2.0, 4.0, 6.0])
+print(result)
 #: Stats(mean=4.0, count=3)
+print(result.mean, result.count)
+#: 4.0 3
 mean, count = summarize([1.0, 3.0])  # Unpacks like a tuple
 print(mean, count)
 #: 2.0 2
@@ -214,6 +225,10 @@ Every caller must then remember that position 0 is the mean and position 1 is th
 a fact the code states nowhere.
 `Stats` names the fields and documents itself at each call site,
 and because a `NamedTuple` is a tuple, you can unpack it.
+Unpacking goes by position, so it brings the bare tuple's hazard back:
+`count, mean = summarize(data)` runs, passes the type checker,
+and binds each name to the other's value.
+Reading `result.mean` has no order to get wrong.
 
 Unpacking is the part a data class lacks.
 `mean, count = summarize(data)` against a `@dataclass` version of `Stats` raises a `TypeError`,
@@ -226,7 +241,7 @@ covers its recursive, copying behavior.
 
 A `NamedTuple` inherits its equality from `tuple`: positional and type-blind.
 Any tuple-shaped value with the same contents compares equal,
-including a different record type that happens to have the same shape:
+including a different record type with the same shape:
 
 ```python
 # still_a_tuple.py
@@ -290,8 +305,9 @@ with expected(TypeError):
 
 `Color` and `Dimensions` mean different things,
 yet `Color(1, 2, 3) == Dimensions(1, 2, 3)` is `True`.
+Equal tuples hash alike, so the two are also the same `dict` key.
 The frozen data classes tell the two apart,
-because a dataclass's generated `__eq__()` checks the class before the fields.
+because a data class's generated `__eq__()` checks the class before the fields.
 
 A `NamedTuple` inherits ordering from `tuple` the same way,
 and that ordering is as type-blind as equality.
@@ -300,12 +316,14 @@ with nothing in the code declaring that intent.
 A frozen data class refuses the comparison instead.
 `<` between two `FrozenColor`s raises a `TypeError` unless the decorator receives `order=True`,
 and a comparison between two different frozen types raises one even then.
+The listing writes `@dataclass(frozen=True)` in full instead of `@record`,
+so that `order=True` is the one difference between each `Frozen` class and its `Ordered` twin.
 
 Tuple behavior shows up in serialization too.
 `json.dumps(Color(1, 2, 3))` writes the array `[1, 2, 3]`,
 since `json` sees a sequence and the field names never reach the output.
-Convert first, `json.dumps(Color(1, 2, 3)._asdict())`,
-and the output is `{"r": 1, "g": 2, "b": 3}`.
+Converting first, with `json.dumps(Color(1, 2, 3)._asdict())`,
+writes `{"r": 1, "g": 2, "b": 3}`.
 `json.dumps()` on a data class raises a `TypeError` instead.
 That is the safer failure of the two,
 because the array version drops the names silently.
@@ -317,19 +335,21 @@ a `@dataclass` for a typed mutable record,
 and a `NamedTuple` for a typed immutable one.
 The hand-rolled `Messenger` is worth writing only to show how `SimpleNamespace` works underneath.
 
-Between the two typed records,
+The frozen data class is the second typed immutable record.
+Between it and a `NamedTuple`,
 the deciding question is whether tuple behavior is a feature.
 Choose `NamedTuple` when it is: unpacking, multiple return values,
 compatibility with code that expects a tuple.
-Choose a [frozen dataclass](12_Techniques--Data_Classes_as_Types.md#immutability)
-when a record should be a distinct type that equals only its own kind,
+Choose a [frozen data class](12_Techniques--Data_Classes_as_Types.md#immutability),
+which this book writes as `@record`,
+when the value should be a distinct type that equals only its own kind,
 and when inherited ordering and array-shaped JSON are wrong rather than convenient.
 
 When the data must stay a dict,
 because it arrives as JSON or goes back out as JSON,
 a [`TypedDict`](08_Foundations--Static_Types.md#dictionary-and-record-shapes)
 names the keys and their types for the type checker while the value stays a real dict.
-When the data need only *become* a dict on the way out,
+When the data need only become a dict on the way out,
 `_asdict()` on a `NamedTuple` and `dataclasses.asdict()` on a data class each produce one.
 To make a `@dataclass` guarantee that its values are legal, not merely typed,
 see [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#a-type-is-a-set-of-values).
@@ -340,7 +360,7 @@ see [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#a-type-is-a-
     create a second `Messenger` with different keyword arguments and confirm the two instances do not share attributes
     (unlike a [class attribute](09_Foundations--Class_Attributes.md)).
 2.  In `point_dataclass.py`, add a third field, `z: float`,
-    to the `Point` dataclass,
+    to the `Point` data class,
     and update the `Point(...)` call to pass three arguments.
 3.  Add a `NamedTuple` called `Recipe` with fields `name: str` and `steps: list[str]` to `color_namedtuple.py`.
     Mutate the `steps` list of an instance and print the record.
@@ -351,8 +371,8 @@ see [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#a-type-is-a-
     Confirm `vars(m)` reports the same four attributes either way,
     and note whether they come out in the same order.
 5.  In `fetch_stats.py`,
-    change `summarize()` to return a bare `tuple[float, int]`.
-    Every caller still runs.
+    change `summarize()` to return a bare `tuple[float, int]`,
+    and repair the one line that stops working.
     What do the call sites lose,
     and which mistakes does the type checker still catch?
 6.  In `still_a_tuple.py`, add `class Point3(NamedTuple)` with fields `x`, `y`,

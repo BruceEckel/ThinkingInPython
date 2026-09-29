@@ -95,35 +95,40 @@ both at once: the contents stop being editable and the record becomes
 hashable. One declaration fixing both is the clue that they were
 never two problems.
 
-## 4. A fourth attribute supplied at construction
+## 4. A fourth attribute, by keyword and by assignment
 
 ```python
 # exercise_4.py
 from types import SimpleNamespace
+from typing import Final
 
-TAGS = ["urgent", "todo"]
+TAGS: Final[list[str]] = ["urgent", "todo"]
 
-built = SimpleNamespace(
-    info="Spam", tags=TAGS, more=11, note=12)
+built = SimpleNamespace(info="Spam", tags=TAGS, note=12)
+built.more = 11
 print(list(vars(built)))
-#: ['info', 'tags', 'more', 'note']
+#: ['info', 'tags', 'note', 'more']
 
-assigned = SimpleNamespace(
-    info="Spam", tags=TAGS, more=11)
+assigned = SimpleNamespace(info="Spam", tags=TAGS)
+assigned.more = 11
 assigned.note = 12
 print(list(vars(assigned)))
 #: ['info', 'tags', 'more', 'note']
 
-print(vars(built) == vars(assigned))
-#: True
+print(vars(built) == vars(assigned), built == assigned)
+#: True True
 ```
 
 A keyword argument and a later assignment both add one entry to the
-instance's `__dict__`. `vars()` reads that dict, and the two
-namespaces are indistinguishable afterward. Even the order matches,
-because a dict keeps insertion order and both routes add `note` last.
-If you assign the attributes in a different sequence, the dicts still
-compare equal, since dict equality ignores order.
+instance's `__dict__`, and `vars()` reads that dict. Both namespaces
+end with the same four attributes, so the two dicts compare equal and
+so do the namespaces, since dict equality ignores order.
+
+The order differs. A dict keeps insertion order, and the two versions
+insert `note` at different moments. The constructor adds it to
+`built` before `built.more = 11` runs, so `note` comes third there.
+In `assigned` the assignment to `note` follows `assigned.more = 11`,
+so `note` comes last.
 
 ## 5. Returning a bare `tuple[float, int]`
 
@@ -132,18 +137,23 @@ compare equal, since dict equality ignores order.
 def summarize(data: list[float]) -> tuple[float, int]:
     return (sum(data) / len(data), len(data))
 
-print(summarize([2.0, 4.0, 6.0]))
+result = summarize([2.0, 4.0, 6.0])
+print(result)
 #: (4.0, 3)
+print(result[0], result[1])
+#: 4.0 3
 mean, count = summarize([1.0, 3.0])
 print(mean, count)
 #: 2.0 2
 ```
 
-Every caller still runs, because a `NamedTuple` was a tuple all along.
-Unpacking works, indexing works, and printing works. What changes is
-everything above the mechanics.
+Printing and unpacking still run, because a `NamedTuple` was a tuple
+all along. The line that reads `result.mean` and `result.count` stops
+working: a bare tuple has neither attribute, so the type checker
+reports both reads and Python raises an `AttributeError` at the first.
+The repair is `result[0]` and `result[1]`.
 
-The call sites lose the names. `summarize([2.0, 4.0, 6.0])` now prints
+The call sites lose the names. `print(result)` now writes
 `(4.0, 3)` instead of `Stats(mean=4.0, count=3)`, so the repr no longer
 says which number is which. A reader of the call site has to open
 `summarize()` to find out. They also lose attribute access:
@@ -164,8 +174,9 @@ swapping `mean` and `count`. `mean, count = summarize(data)` and
 `count, mean = summarize(data)` destructure the same
 `tuple[float, int]` into two names. The second type-checks cleanly and
 misnames both values. With `Stats` you write `result.count`, so the
-order never enters the code. A function annotated `Stats` also rejects
-a reversed `tuple[int, float]`, because the two are different types.
+order never enters the code. A parameter annotated `Stats` also rejects
+a hand-built tuple in either order, because a `tuple[float, int]` is
+not a `Stats`.
 Position is something the type checker can verify and a reader cannot.
 A name is something both can.
 
@@ -207,18 +218,18 @@ equal to the other two, so the family of things that equal `(1, 2, 3)`
 grows with every three-integer `NamedTuple` in the program. The field names
 are for you, not for `==`.
 
-`FrozenColor(1, 2, 3) == (1, 2, 3)` is `False`. A frozen dataclass's
+`FrozenColor(1, 2, 3) == (1, 2, 3)` is `False`. A frozen data class's
 generated `__eq__()` checks `other.__class__ is self.__class__` before
-comparing fields, and returns `NotImplemented` for a plain tuple.
+comparing fields, and returns `NotImplemented` for a tuple.
 Python then tries the tuple's own comparison, which also returns
 `NotImplemented`. With both sides declining, `==` falls back to
-identity, which is `False` for two distinct objects. A dataclass is
-not a tuple and never pretends to be one.
+identity, which is `False` for two distinct objects. A data class is
+not a tuple, and no tuple compares equal to one.
 
-`NamedTuple` and the frozen dataclass offer a choice. A `NamedTuple`
+`NamedTuple` and the frozen data class offer a choice. A `NamedTuple`
 is a tuple with labels, so it interoperates with everything expecting
 a tuple and accepts equality with anything of the same shape. A frozen
-dataclass is a distinct type, so it refuses those comparisons and
+data class is a distinct type, so it refuses those comparisons and
 catches the mismatch instead. Which one is right depends on whether
 you want your three numbers to travel as data or to mean something.
 
@@ -228,26 +239,26 @@ you want your three numbers to travel as data or to mean something.
 runtime, so no fixed set of fields exists to declare. A `@dataclass`
 or `NamedTuple` needs every field named in the class body before any
 instance exists, which this scenario cannot supply. `SimpleNamespace`
-accepts any name at construction or later, which is exactly the
-looseness the scenario needs, at the cost of a type checker unable to
-catch a typo in a key name.
+accepts any name at construction or later, which is the looseness the
+scenario needs. The cost is a type checker that cannot catch a typo
+in a key name.
 
 **The grid coordinate is a `NamedTuple`.** It must work as a `dict`
 key, so it must hash, and a `NamedTuple` hashes as long as its fields
 do. A `@dataclass` also hashes by value, but only when frozen (with
-the default `eq=True`), which rules out a plain mutable `@dataclass`.
-Between a frozen dataclass and a `NamedTuple` here, the tuple form
+the default `eq=True`), which rules out the mutable `@dataclass`.
+Between a frozen data class and a `NamedTuple` here, the tuple form
 wins on convenience: unpacking a coordinate as `x, y = point` and
-using it wherever code takes a plain tuple are both things the
-scenario wants and a frozen dataclass refuses.
+passing it to code that takes a tuple are both things the scenario
+needs and a frozen data class refuses.
 
-**The JSON record is a `@dataclass`.** JSON's own encoding already
-loses field names when the shape is a `NamedTuple`
-(`json.dumps()` writes it as a bare array), which defeats the point of
-decoding into named fields in the first place. A `@dataclass` raises
-instead of silently dropping names, and its fields, being distinct
-from a tuple's positions, are also where the validation this scenario
-wants belongs: [Data Classes as
+**The JSON record is a `@dataclass`.** `json.dumps()` writes a
+`NamedTuple` as a bare array, so the names you decoded into are gone
+when the record goes back out. A `@dataclass` raises a `TypeError`
+instead of dropping the names silently. It also has a place for the
+validation this scenario requires: [Data Classes as
 Types](../Chapters/12_Techniques--Data_Classes_as_Types.md#a-type-is-a-set-of-values)
-makes a `@dataclass`'s `__post_init__()` the place to reject a
-value the JSON decoder otherwise accepts unchecked.
+makes `__post_init__()` the method that rejects a value the JSON
+decoder otherwise accepts unchecked. A `TypedDict` matches the shape
+JSON arrives in and names the keys for the type checker, but it is a
+dict at runtime and runs no code, so it cannot validate.
