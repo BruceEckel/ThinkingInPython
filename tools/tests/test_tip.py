@@ -115,6 +115,20 @@ def test_an_explicit_assignment_beats_the_positional_word() -> None:
     assert seen["F"] == "other"
 
 
+def test_a_py_name_runs_that_listing_with_the_words_after_it() -> None:
+    with mock.patch.object(tip, "py") as py, \
+            mock.patch.object(tip.Runner, "run") as run:
+        assert main(["maze_view.py", "--numbers", "N=3"]) == 0
+    py.assert_called_once_with(
+        "tools.run_one_example", "maze_view.py", "--numbers", "N=3")
+    run.assert_not_called()
+
+
+def test_a_py_listing_that_fails_returns_its_exit_code() -> None:
+    with mock.patch.object(tip, "py", side_effect=tip.StepFailed(3)):
+        assert main(["broken.py"]) == 3
+
+
 def test_a_top_level_goal_prints_and_records_its_time(capsys) -> None:
     env = {k: v for k, v in __import__("os").environ.items() if k != NESTED}
     with mock.patch.object(tip.Runner, "run"), \

@@ -10,6 +10,7 @@ module holds the machinery they use and the command line:
     tip verify-ch CH=28        NAME=value sets a variable, as with make
     tip check output-check     several tasks, in order
     tip run-one box_view       a task's positional word (here, F)
+    tip box_view.py --flag     run one listing; the words after it are its own
 
 `tip` on PATH comes from `uv tool install --editable .` at the repo
 root: uv builds a small environment holding prompt_toolkit and this
@@ -329,11 +330,30 @@ def unknown(goal: str) -> str:
     return f"tip: no task named {goal!r}.{hint} `tip help` lists them."
 
 
+def run_listing(name: str, extra: Sequence[str]) -> int:
+    """`tip maze_view.py [args...]`: run one listing, as `run-one` does.
+
+    Every word after the name goes to the program untouched, so
+    `tip membership.py --numbers` passes the flag, and `N=v` words are
+    the program's own arguments here, not tip variables. No timing line
+    follows: the program's output is the point.
+    """
+    try:
+        py("tools.run_one_example", name, *extra)
+    except StepFailed as e:
+        return e.code
+    except KeyboardInterrupt:
+        return INTERRUPTED
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     args = sys.argv[1:] if argv is None else argv
     if not args or args[0] in ("help", "-h", "--help"):
         from tools.tip_help import main as help_main
         return help_main(args[1:])
+    if args[0].endswith(".py") and args[0] not in load().tasks:
+        return run_listing(args[0], args[1:])
     goals, values = parse_argv(args)
     if not goals:
         from tools.tip_help import main as help_main
