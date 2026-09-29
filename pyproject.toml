@@ -46,6 +46,7 @@ dev = [
     "ty",
     "pytest",
     "pytest-xdist",
+    "pytest-timeout",
     "ruff",
     "codespell>=2.4.2",
     "time-machine",
@@ -189,6 +190,10 @@ lines-after-imports = 1
 # utils/ is otherwise invisible to it.
 [tool.pytest.ini_options]
 pythonpath = ["build/examples/utils"]
+# On Windows asyncio.run() can hang building its event loop before a
+# test runs (CLAUDE.md, "Traps"). The limit turns that hang into a
+# failure with a stack dump; 120 s matches validate_output.py.
+timeout = 120
 
 # The second ty path is chapter 6's own directory. Its a_package/module4.py
 # uses a relative import (`from .module1 import ...`), which needs a_package

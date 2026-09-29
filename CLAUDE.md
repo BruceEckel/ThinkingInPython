@@ -437,9 +437,10 @@ and how it was measured.
   date `validate_output.py` watches each file's process and reruns one
   that reports nothing in `--file-timeout` seconds (120; the log says
   "no result after 120s; rerunning (2/3)"), and `run_examples.py`
-  reruns a timed-out example once. `pytest` has no timeout, so a
-  `pytest` run that goes idle on a test that starts an event loop is
-  this: kill it and rerun. A hang or a timeout on a listing that calls
+  reruns a timed-out example once. `pytest` fails a test after 120
+  seconds (`pytest-timeout`, `timeout` in `pyproject.toml`, since
+  2026-09-29) and prints every thread's stack; a timeout on a test
+  that starts an event loop is this, so rerun it. A hang or a timeout on a listing that calls
   `asyncio.run()` is not evidence against the listing.
 - **`build/` is derived and gitignored.** `extract_examples.py --write` now wipes
   the target under `build/` first, so a fresh sync is the fix for weird drift or a
