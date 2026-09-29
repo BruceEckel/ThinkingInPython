@@ -1,11 +1,12 @@
 # exercise_4.py
 from collections.abc import Callable
 from functools import partial
+from typing import Final
 
 type Fn = Callable[[float], float]
 type RootFinder = Callable[[Fn, float, float], float | None]
 
-MAX_ITER = 200
+MAX_ITER: Final[int] = 200
 
 def newton(f: Fn, a: float, b: float,
            tolerance: float = 1e-12) -> float | None:
@@ -37,8 +38,8 @@ def solve(f: Fn, a: float, b: float,
 def f(x: float) -> float:
     return x * x - 2
 
-coarse_closure = newton_within(0.5)
-coarse_partial: RootFinder = partial(newton, tolerance=0.5)
+coarse_closure = newton_within(0.6)
+coarse_partial: RootFinder = partial(newton, tolerance=0.6)
 fine_closure = newton_within(1e-12)
 
 for finder in (coarse_closure, coarse_partial,

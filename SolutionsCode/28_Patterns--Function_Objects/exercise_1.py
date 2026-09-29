@@ -1,14 +1,15 @@
 # exercise_1.py
 from typing import Protocol
+from record import record
 
 class UndoableCommand(Protocol):
     def __call__(self) -> None: ...
     def undo(self) -> None: ...
 
+@record
 class Deposit:
-    def __init__(self, account: dict, amount: int) -> None:
-        self.account = account
-        self.amount = amount
+    account: dict[str, int]
+    amount: int
 
     def __call__(self) -> None:
         self.account["balance"] += self.amount

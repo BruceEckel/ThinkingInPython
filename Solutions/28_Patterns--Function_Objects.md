@@ -5,15 +5,16 @@
 ```python
 # exercise_1.py
 from typing import Protocol
+from record import record
 
 class UndoableCommand(Protocol):
     def __call__(self) -> None: ...
     def undo(self) -> None: ...
 
+@record
 class Deposit:
-    def __init__(self, account: dict, amount: int) -> None:
-        self.account = account
-        self.amount = amount
+    account: dict[str, int]
+    amount: int
 
     def __call__(self) -> None:
         self.account["balance"] += self.amount
@@ -56,7 +57,10 @@ callable. Undo does, because a command now answers two requests,
 
 `Deposit` also has to remember what it did, here the account and the
 amount, so it can reverse that action later: a fresh call to the same
-function cannot know what a previous call changed.
+function cannot know what a previous call changed. It is a record,
+like `Repeat`, because neither field changes after construction. The
+record is frozen and the dictionary it refers to is not, so
+`__call__()` and `undo()` can still update the balance.
 
 The second operation costs a type rather than a hierarchy.
 `Command`, the chapter's `Callable[[], None]`, has room for one call,
@@ -75,20 +79,27 @@ the commands share implementation, and these commands share none.
 # exercise_2.py
 from collections.abc import Callable
 from typing import Final, Protocol
+from record import record
 
 type Fn = Callable[[float], float]
+
+@record
+class Failed:
+    reason: str
 
 class Finder(Protocol):
     __name__: str
     def __call__(self, f: Fn, a: float,
-                 b: float) -> float | None: ...
+                 b: float) -> float | Failed: ...
 
 TOLERANCE: Final[float] = 1e-12
 MAX_ITER: Final[int] = 200
+NO_CONVERGENCE: Final[Failed] = Failed(
+    f"no convergence in {MAX_ITER} steps")
 
-def bisection(f: Fn, a: float, b: float) -> float | None:
+def bisection(f: Fn, a: float, b: float) -> float | Failed:
     if f(a) * f(b) > 0:
-        return None
+        return Failed(f"no root bracketed by [{a}, {b}]")
     for _ in range(MAX_ITER):
         mid = (a + b) / 2
         if abs(f(mid)) < TOLERANCE:
@@ -97,71 +108,86 @@ def bisection(f: Fn, a: float, b: float) -> float | None:
             b = mid
         else:
             a = mid
-    return None
+    return NO_CONVERGENCE
 
-def secant(f: Fn, a: float, b: float) -> float | None:
+def secant(f: Fn, a: float, b: float) -> float | Failed:
     x0, x1 = a, b
     for _ in range(MAX_ITER):
         f0, f1 = f(x0), f(x1)
         if f1 == f0:
-            return None
+            return Failed(f"flat step at {x1}")
         x2 = x1 - f1 * (x1 - x0) / (f1 - f0)
         if abs(x2 - x1) < TOLERANCE:
             return x2
         x0, x1 = x1, x2
-    return None
+    return NO_CONVERGENCE
 
-def newton(f: Fn, a: float, b: float) -> float | None:
+def newton(f: Fn, a: float, b: float) -> float | Failed:
     x = (a + b) / 2
     h = 1e-7
     for _ in range(MAX_ITER):
         slope = (f(x + h) - f(x - h)) / (2 * h)
         if slope == 0:
-            return None
+            return Failed(f"zero slope at {x}")
         step = f(x) / slope
         x -= step
         if abs(step) < TOLERANCE:
             return x
-    return None
+    return NO_CONVERGENCE
 
 def solve(f: Fn, a: float, b: float,
           chain: list[Finder]) -> float | None:
     for finder in chain:
-        root = finder(f, a, b)
-        if root is not None:
-            print(
-                f"{finder.__name__} succeeded: {root:.6f}")
-            return root
-        print(
-            f"{finder.__name__} failed: could not converge")
-    print("all finders failed")
+        match finder(f, a, b):
+            case Failed(reason):
+                print(f"{finder.__name__}: {reason}")
+            case root:
+                print(f"{finder.__name__}: {root:.6f}")
+                return root
+    print("every finder failed")
     return None
 
 def f(x: float) -> float:
     return x * x - 2
 
 solve(f, 1.0, 1.3, [bisection, secant, newton])
-#: bisection failed: could not converge
-#: secant succeeded: 1.414214
+#: bisection: no root bracketed by [1.0, 1.3]
+#: secant: 1.414214
+
+def g(x: float) -> float:
+    return x * x + 1  # No real root
+
+solve(g, 0.0, 2.0, [bisection])
+#: bisection: no root bracketed by [0.0, 2.0]
+#: every finder failed
 ```
 
-Each handler function already reports its own outcome through its
-return value, `None` for failure, a number for success, so `solve()`
-prints that outcome as it checks each return value, rather than
-asking each handler for a separate explanation. `finder.__name__`
-reads the function's own name, since every ordinary Python function
-carries its name as an attribute. The report therefore needs no extra
-bookkeeping to say *which* handler just ran.
+`None` says that a handler failed and cannot say why, so a handler
+that reports its reason needs a failure value with room for one.
+`Failed` is that value, a record with one field, and each finder now
+returns `float | Failed`. A finder has more than one way to fail:
+`bisection()` gives up at once when the interval holds no sign change,
+and it can also run out of iterations, so the reason is written at
+the `return` that knows it. `solve()` tells the two results apart
+with `match`. `case Failed(reason)` prints the reason and lets the
+loop continue, and any other value is the root.
 
-That report is why `chain` needs a `Protocol` here instead of the
-chapter's `RootFinder` alias. `Callable[...]` describes only what a
-handler accepts and returns, and says nothing about a name, so `ty`
-rejects `finder.__name__` on a handler annotated that way (pyright
-allows it, inferring the attributes of a function object). `Finder`
-declares `__name__` alongside `__call__()`, and a plain function
-satisfies both. The finders themselves need no change, and the
-annotation stops lying. The listing copies them from `algorithms.py`
-rather than importing them, because each solution runs on its own.
+The chapter's advice about the failure value still holds. A `Failed`
+is never a root, so `float | Failed` says which result is which, and
+the test is a comparison against the failure type, never the
+truthiness of the result.
+
+`finder.__name__` reads the function's own name, since every function
+carries its name as an attribute, so the report needs no extra
+bookkeeping to say which handler ran. That name is why `chain` needs a
+`Protocol` here instead of an alias like the chapter's `RootFinder`.
+`Callable[...]` describes only what a handler accepts and returns, and
+says nothing about a name, so `ty` rejects `finder.__name__` on a
+handler annotated that way (pyright allows it, inferring the
+attributes of a function object). `Finder` declares `__name__`
+alongside `__call__()`, and a function satisfies both. The listing
+copies the finders from `algorithms.py` rather than importing them,
+because each solution runs on its own.
 
 ## 3. `sorted()` with a compound key, and why `key` is *Strategy*
 
@@ -178,14 +204,13 @@ print(by_score_then_name)
 The key function returns a tuple, `(score, name)`, and Python compares
 tuples element by element. `sorted()` therefore orders by score first,
 and among equal scores (`Bob` and `Cid`, both `85`) it compares names.
-`key` is exactly a *Strategy*: `sorted()` fixes the *algorithm* (some
+`key` is a *Strategy*: `sorted()` fixes the algorithm (some
 comparison-based sort), and the caller supplies the interchangeable
-*policy* that decides what "in order" means for this particular call.
-`sorted()` itself knows nothing about tuples, scores, or names.
-Passing a different `key` swaps the
-ordering strategy the same way the chapter's classic *Strategy* form
-swaps the algorithm its Context holds, except here the "context"
-holding the current strategy is just the call to `sorted()` itself.
+policy that decides what "in order" means for this call. `sorted()`
+knows nothing about tuples, scores, or names. Passing a different
+`key` swaps the ordering strategy the same way the chapter's classic
+*Strategy* form swaps the algorithm its Context holds. Here the
+Context holding the current strategy is the call to `sorted()`.
 
 ## 4. A configurable `newton()`, closed over and partially applied
 
@@ -193,11 +218,12 @@ holding the current strategy is just the call to `sorted()` itself.
 # exercise_4.py
 from collections.abc import Callable
 from functools import partial
+from typing import Final
 
 type Fn = Callable[[float], float]
 type RootFinder = Callable[[Fn, float, float], float | None]
 
-MAX_ITER = 200
+MAX_ITER: Final[int] = 200
 
 def newton(f: Fn, a: float, b: float,
            tolerance: float = 1e-12) -> float | None:
@@ -229,8 +255,8 @@ def solve(f: Fn, a: float, b: float,
 def f(x: float) -> float:
     return x * x - 2
 
-coarse_closure = newton_within(0.5)
-coarse_partial: RootFinder = partial(newton, tolerance=0.5)
+coarse_closure = newton_within(0.6)
+coarse_partial: RootFinder = partial(newton, tolerance=0.6)
 fine_closure = newton_within(1e-12)
 
 for finder in (coarse_closure, coarse_partial,
@@ -247,21 +273,21 @@ for finder in (coarse_closure, coarse_partial,
 to `newton(f, a, b)` keeps working. The closure and the `partial` then
 reach the same configured strategy from two directions. `newton_within()`
 writes a new function whose body supplies the argument.
-`partial(newton, tolerance=0.5)` stores the argument and supplies it at
+`partial(newton, tolerance=0.6)` stores the argument and supplies it at
 the call. Both produce something matching `RootFinder`, so `solve()`
 accepts either with no change.
 
 The two coarse finders print the same wrong-looking answer, `1.500000`,
 and that answer is how you can tell the tolerance took effect.
-Newton's method starting at `1.0` reaches `1.5` on its first step, and
-a tolerance of `0.5` accepts a step that size as close enough, so the
-loop stops right there. The fine finder runs the same code to `1e-12`
-and agrees with the true root to six places.
+Newton's method starting at `1.0` moves by `0.5` on its first step, to
+`1.5`, and a tolerance of `0.6` accepts a step that size, so the loop
+stops there. The fine finder runs the same code to `1e-12` and agrees
+with the true root to six places.
 
 `partial` is the shorter of the two ways to configure the finder, and
 it works here because the caller can supply `tolerance` by keyword.
-You need a closure when the setting is not a parameter of the function
-at all, the way `bisection_within()` writes the tolerance into its
+You need a closure when the setting is not a parameter of the
+function, the way `bisection_within()` writes the tolerance into its
 `while` condition.
 
 ## 5. An event bus that walks the MRO, and can unsubscribe
@@ -333,7 +359,7 @@ indexing a `defaultdict` on a read inserts an empty list for every
 class in every published event's MRO, `object` included.
 
 Adding `unsubscribe()` cannot break an existing caller, since code that
-never calls it behaves exactly as before. The MRO walk can.
+never calls it behaves as before. The MRO walk can.
 A handler subscribed to `Deposit` starts receiving every subclass of
 `Deposit`, including subclasses written after the handler, so a
 `BigDeposit` that reached only `on_big` before the change now reaches
@@ -419,8 +445,14 @@ its own `n` in its own function scope, and only that fix keeps the
 value private. `lambda n=n:` exposes the value as a parameter a caller
 can override, and `partial(print, n)` can only feed it to one call.
 
-None of the three preserves late lookup, and that is the point of the
-exercise's closing question. If the command must compute the value
+A value computed from the frozen `n` separates the fixes. The two
+lambda forms run their body at the call, so
+`lambda n=n: print(n * rate())` and the factory's lambda both read
+`rate()` when the command runs. `partial(print, n * rate())`
+evaluates the product while the loop builds the command.
+
+None of the three preserves late lookup of `n`, and that is the point
+of the exercise's closing question. If the command must read `n`
 when it runs, all three fixes are wrong: they freeze the value when the
 loop builds the command. You then want the original behavior, aimed at
 something that outlives the loop, as `report()` does by reading
@@ -428,3 +460,67 @@ something that outlives the loop, as `report()` does by reading
 feature are the same mechanism. Which one you have depends on whether
 the name you close over still means what you wanted when the call
 finally happens.
+
+## 7. `event()` registering `cls`
+
+```python
+# exercise_7.py
+import inspect
+from dataclasses import dataclass
+from typing import Final, dataclass_transform
+from exceptions import expect
+
+EVENTS: Final[set[type]] = set()
+
+@dataclass_transform(frozen_default=True)
+def event[E](cls: type[E]) -> type[E]:
+    built = dataclass(frozen=True, slots=True)(cls)
+    EVENTS.add(cls)  # The change: cls, not built
+    return built
+
+@dataclass_transform(frozen_default=True)
+def handler[H](cls: type[H]) -> type[H]:
+    call = vars(cls)["__call__"]
+    sig = inspect.signature(call)
+    handled = list(sig.parameters.values())[1].annotation
+    if handled not in EVENTS:
+        raise TypeError(f"{cls.__name__}: not an @event")
+    return dataclass(frozen=True, slots=True)(cls)
+
+@event
+class Deposit:
+    amount: int
+
+print(len(EVENTS), Deposit in EVENTS)
+#: 1 False
+print(type(Deposit(5)) in EVENTS)
+#: False
+
+class Announce:
+    prefix: str
+    def __call__(self, event: Deposit) -> None:
+        print(f"{self.prefix} deposit {event.amount}")
+
+expect(TypeError, handler, Announce)
+#: [TypeError] Announce: not an @event
+```
+
+The listing copies the two decorators, with the change made and the
+checks the question does not reach left out, and applies `handler()`
+as a call so that `expect()` can report the failure.
+
+The three `@event` classes in `bank_events.py` are created without
+complaint, which makes the mistake easy to miss. `EVENTS` holds one
+class for each, and none of them is the class the module's names refer
+to. `dataclass()` with `slots=True` builds a new class, `event()`
+returns that new class, and the `class` statement binds `Deposit` to
+what `event()` returns. The set holds the class that `dataclass()`
+started from, which no name refers to and no event is an instance of.
+
+The import stops at the first `@handler`, on `Announce`.
+`handler()` reads the annotation on `event`, which is `Deposit`, the
+class `dataclass()` returned, and does not find it in `EVENTS`. It
+raises `TypeError: Announce: not an @event`, although `Deposit` went
+through `@event` a few lines earlier. If the handlers were created
+some other way, `publish()` would refuse every event for the same
+reason, since `type(event)` is the returned class too.

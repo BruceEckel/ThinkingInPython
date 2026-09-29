@@ -1,11 +1,12 @@
 # bound_method.py
 from collections.abc import Callable
+from dataclasses import dataclass
 
 type Command = Callable[[], None]
 
+@dataclass
 class Account:
-    def __init__(self, balance: int) -> None:
-        self.balance = balance
+    balance: int
     def deposit(self) -> None:
         self.balance += 50
         print(f"balance: {self.balance}")

@@ -21,7 +21,7 @@ Each pattern defers something:
 - *Chain of Responsibility* defers *which* handler takes the job,
   trying candidates until one accepts.
 
-In Python a function is already an object.
+In Python a function is an object.
 You can name it, store it in a list, pass it as an argument, and return it.
 That makes all three patterns largely unnecessary.
 Where *GoF Design Patterns* builds a hierarchy, Python uses a function,
@@ -122,12 +122,13 @@ The method keeps its state without any `Command` class:
 ```python
 # bound_method.py
 from collections.abc import Callable
+from dataclasses import dataclass
 
 type Command = Callable[[], None]
 
+@dataclass
 class Account:
-    def __init__(self, balance: int) -> None:
-        self.balance = balance
+    balance: int
     def deposit(self) -> None:
         self.balance += 50
         print(f"balance: {self.balance}")
@@ -150,6 +151,11 @@ for command in macro:
 with no `Command` class.
 Each call still reads and updates `account.balance`,
 the state the bound method carries with it.
+
+The entry is `account.deposit`, without parentheses.
+`account.deposit()` calls the method while the list is being built and stores the result,
+`None`.
+`ty` rejects that list, because `None` is not a `Command`.
 
 ### A Callable Object as a Command
 
@@ -229,7 +235,7 @@ The two comprehensions differ in when they read `n`.
 A lambda's body runs when you call the command, not when you create it,
 and all three lambdas close over the same loop variable,
 which holds 2 by the time anything calls them.
-The argument to [`functools.partial`](40_Functional--Foundations.md#partial-application)
+The argument to [`functools.partial()`](40_Functional--Foundations.md#partial-application)
 is an ordinary expression that Python evaluates where you write it,
 so each command stores the string built from its own iteration's `n` and has nothing left to look up later.
 The older fix, `lambda n=n: print(f"step {n}")`,
@@ -250,7 +256,9 @@ an interval whose ends straddle the root.
 The secant method reads them as two starting points,
 and Newton's method averages them into one.
 The secant and Newton methods are *open*: they need somewhere to start,
-not a bracket, so the chain in `chain.py` can fall back on them.
+not a bracket.
+`chain.py`, under *Chain of Responsibility*,
+falls back on them when bisection has no bracket.
 All three share one signature, so they are interchangeable,
 and `solve()` runs whichever one it is given:
 
@@ -347,8 +355,9 @@ and a controller that ignores input events disables the view.
 where a model notifies its views.
 
 Python uses strategies-as-functions constantly without calling them a pattern.
-The `key` argument passed to `sorted()`, `min()`, and `max()` is a strategy.
-That argument determines how comparison works.
+The `key` argument passed to `sorted()`, `min()`, and `max()` is a strategy:
+it chooses the value by which each item is compared,
+and the algorithm that does the comparing stays the same (see exercise 3).
 
 When a strategy needs configuration,
 use a [*closure*](40_Functional--Foundations.md#closures).
@@ -390,17 +399,19 @@ Because both satisfy `RootFinder`, `solve()` accepts either unchanged,
 and so does the chain in `chain.py`.
 
 When the algorithm takes the setting as an ordinary parameter,
-`functools.partial` replaces the closure.
-`partial` fills positional parameters from the left,
+`functools.partial()` replaces the closure.
+`partial()` fills positional parameters from the left,
 so bind a trailing setting by keyword:
 
 ```python
 # partial_bisection.py
 from functools import partial
-from algorithms import Fn
+from algorithms import Fn, solve
 
 def bisection_tol(f: Fn, a: float, b: float,
                   tolerance: float) -> float | None:
+    if f(a) * f(b) > 0:  # Endpoints must bracket a root
+        return None
     while abs(b - a) > tolerance:
         mid = (a + b) / 2
         if f(a) * f(mid) <= 0:
@@ -414,15 +425,17 @@ def f(x: float) -> float:
 
 coarse = partial(bisection_tol, tolerance=0.1)
 fine = partial(bisection_tol, tolerance=1e-9)
-print(f"{coarse(f, 0.0, 2.0):.6f}")
+for finder in (coarse, fine):
+    print(f"{solve(f, 0.0, 2.0, finder):.6f}")
 #: 1.406250
-print(f"{fine(f, 0.0, 2.0):.6f}")
 #: 1.414214
 ```
 
-Because `bisection_tol` takes `tolerance` as an ordinary parameter,
-`partial` binds it by keyword, once per strategy,
-in place of `bisection_within`'s closure.
+Because `bisection_tol()` takes `tolerance` as an ordinary parameter,
+`partial()` binds it by keyword, once per strategy,
+in place of `bisection_within()`'s closure.
+Each `partial` object satisfies `RootFinder`,
+so `solve()` runs it as it runs the closures.
 A positional-only parameter takes no keyword,
 so binding one means passing a [`Placeholder`](40_Functional--Foundations.md#leaving-a-gap-with-placeholder)
 in each position the caller will fill.
@@ -435,7 +448,7 @@ Configuration alone is a closure's job.
 *Chain of Responsibility* tries a sequence of handlers until one succeeds.
 *GoF Design Patterns* implements the chain as a linked structure,
 each handler holding a reference to the next and deciding whether to pass the request along.
-In Python that chain is simply a list of functions.
+In Python that chain is a list of functions.
 
 Bisection needs the interval to bracket a root.
 The open methods do not:
@@ -548,7 +561,14 @@ def test_all_fail_returns_none() -> None:
 
 The first two tests wrap each finder in `watched()`,
 which records the finder's name as it runs.
-The tests can then assert not just the root but *which* finders ran.
+The tests can then assert not only the root but also which finders ran.
+
+`watched()` carries a `# type: ignore` because `RootFinder` is a `Callable`,
+and a `Callable` declares no `__name__`.
+`ty` is right about the type: a `partial` object is a `RootFinder`,
+and it has no `__name__`.
+The three finders here are functions, and every function has one.
+A `Protocol` that declares `__name__` beside `__call__()` states that requirement in the type and needs no comment.
 
 ## An Event Bus: Handlers Keyed by Type
 
@@ -560,6 +580,8 @@ Each key maps to a list of handlers,
 and `subscribe()` appends a handler to the list under the event type it handles.
 The events are values, written as records.
 Publishing an event looks up its type and calls every handler registered for that type.
+That is the second difference from the chain,
+which stops at the first handler that succeeds.
 The handlers are ordinary functions, so they need no base class.
 Registering one is a single `subscribe()` call.
 Here, `Handler` names their signature, not an interface:
@@ -623,7 +645,8 @@ bus.publish(Withdraw(30))
 bus.publish(Closed("inactivity"))
 ```
 
-`subscribe` is generic on the event type `E`, which appears in both parameters.
+`subscribe()` is generic on the event type `E`,
+which appears in both parameters.
 The type checker must therefore find one `E` that satisfies the event type and the handler together.
 No such `E` exists for `subscribe(Deposit, on_withdraw)`,
 so the type checker reports a type error.
@@ -633,19 +656,19 @@ mixes handlers for every event type in one structure.
 Its lists cannot name a single event class,
 so their element type is `Handler[Any]`.
 
-`subscribe` indexes `self._handlers` directly,
+`subscribe()` indexes `self._handlers` directly,
 letting the `defaultdict` build each event type's list on first use.
-`publish` reads with `.get(type(event), [])` instead of indexing,
+`publish()` reads with `.get(type(event), [])` instead of indexing,
 because indexing a `defaultdict` inserts an empty list as a side effect.
 Every published event type with no subscriber, such as `Closed`,
 otherwise leaves a stray entry behind.
 
 The lookup uses `type(event)`, which matches the class and no ancestor.
 A subclass of `Deposit` published to this bus matches no handler,
-so `publish()` calls nothing, exactly as it does for `Closed`.
+so `publish()` calls nothing, as it does for `Closed`.
 Walking `type(event).__mro__` and calling every handler along it gives a subclass event its parent's handlers.
 An event then runs every handler registered anywhere in its ancestry,
-not only the ones registered for its own type.
+not only the ones registered for its own type (see exercise 5).
 
 Testing confirms that publishing calls every handler registered for a type,
 a handler receives only its own event type,
@@ -691,13 +714,15 @@ def test_get_leaves_no_stray_handler_list() -> None:
 
 In `event_bus.py`, the events are records, the handlers are functions,
 and the bus is a `dict`.
-A second version gives each side a decorator, both producing records.
+Each `subscribe()` call repeats the event type that the handler's annotation names.
+A second version reads the annotation, so a handler names its event once.
+It gives each side a decorator, both producing records.
 `@event` records its class in `EVENTS`.
 `@handler` makes a function object whose fields are its configuration,
-and records in `HANDLES` which event its `__call__` accepts.
+and records in `HANDLES` which event its `__call__()` accepts.
 `Handler` becomes a `Protocol` whose one method is `__call__()`,
 because the handlers are now objects rather than functions;
-it still names their signature and nothing more.
+it still names their signature.
 `subscribe()` then takes one argument, since the handler says what it handles,
 and `publish()` refuses an object that no `@event` class produced:
 
@@ -754,12 +779,22 @@ class EventBus:
             handler(event)
 ```
 
+`handler()` looks for `__call__()` in `vars(cls)`, the class's own namespace.
+`hasattr(cls, "__call__")` cannot make that test,
+because it is true of every class: a class is callable,
+and calling it builds an instance.
+The `/` in `Handler` makes `event` positional-only,
+so a handler may give that parameter any name.
+
 Each decorator registers `built`, the class that `dataclass()` returns,
 and not the `cls` it received.
 A class's slots are fixed when the class is created,
 so `slots=True` makes `dataclass()` build a new class and return it.
-Registering `cls` puts a class in `EVENTS` that no event is an instance of,
-and `@handler` rejects `Announce` because its `Deposit` is not an `@event`.
+Registering `cls` puts a class in `EVENTS` that no event is an instance of.
+`publish()` then refuses every event,
+and `@handler` refuses every handler class,
+because the annotation it reads names the class that `dataclass()` returned
+(see exercise 7).
 
 A bank account's events and handlers are classes under the two decorators:
 
@@ -800,11 +835,11 @@ class OnWithdraw:
 
 [`dataclass_transform`](17_Techniques--Metaprogramming.md#dataclass-transform)
 tells the type checker that a class passing through either decorator comes out a frozen data class.
-`Audit(threshold=50)` therefore has its generated `__init__`,
+`Audit(threshold=50)` therefore has its generated `__init__()`,
 and `ty` reports `Audit(50).threshold = 1` as assignment to a read-only property,
 as it does with `@dataclass(frozen=True)` written directly.
 The tags are runtime facts.
-`@handler` reads the annotation on the first parameter after `self` in `__call__`,
+`@handler` reads the annotation on the first parameter after `self` in `__call__()`,
 the same annotation the type checker checks, so a handler names its event once.
 
 The demo subscribes each handler with one argument,
@@ -840,10 +875,10 @@ so a stray string reaches the bus and `EVENTS` rejects it there.
 The price is the registration-time check of the first version.
 `subscribe(Deposit, on_withdraw)` fails under `ty` because no `E` fits both arguments.
 With one argument there is no pair to compare,
-so a class with the right `__call__` that skipped `@handler` passes the type checker and fails only when `subscribe()` looks it up.
+so a class with the right `__call__()` that skipped `@handler` passes the type checker and fails only when `subscribe()` looks it up.
 Tests cover that refusal and the other three: a non-event published,
-a `@handler` class with no `__call__`,
-and one whose `__call__` annotates `int` instead of an `@event` class:
+a `@handler` class with no `__call__()`,
+and one whose `__call__()` annotates `int` instead of an `@event` class:
 
 ```python
 # test_tagged_bus.py
@@ -885,7 +920,7 @@ def test_handler_needs_a_call_on_an_event() -> None:
 ```
 
 The bus is the [*Observer*](30_Patterns--Observer.md#the-pythonic-observer-callables-in-a-list)
-with one shared subject: instead of every observable holding its own list,
+with one shared subject: instead of every subject holding its own list,
 one bus holds every list and the event type selects the handlers.
 Here a type may have many handlers.
 When each type needs exactly one,
@@ -901,10 +936,12 @@ Stop at the first form that supports what you need:
 
 1.  A plain function, when the behavior needs no state of its own
     (`command.py`, `strategy.py`).
-2.  A bound method, when the state already belongs to an object.
-    `account.deposit` is a command with its instance attached.
-3.  A closure or a `functools.partial`, when the state is a fixed configuration
-    (`configured_strategy.py`).
+2.  A bound method, when the state belongs to an existing object.
+    `account.deposit` is a command with its instance attached
+    (`bound_method.py`).
+3.  A closure or a `functools.partial()`,
+    when the state is a fixed configuration
+    (`configured_strategy.py`, `partial_bisection.py`).
 4.  A callable object, when that configuration needs a name and a `repr`
     (`callable_command.py`).
 5.  A class, when one call is not enough: a second operation such as `undo()`,
@@ -945,3 +982,6 @@ rather than a call, which is entry 5 rather than entry 4.
     Fix the loop three ways: with a default argument, with `functools.partial`,
     and with a factory function that takes `n` and returns the command.
     Which one still works if you must compute the value at call time rather than at build time?
+7.  In `tagged_bus.py`, change `event()` to register `cls` in place of `built`.
+    Predict what importing `bank_events.py` then does, and which line stops it.
+    Run it to check.

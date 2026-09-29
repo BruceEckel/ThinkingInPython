@@ -18,6 +18,9 @@ Chapters/Factory	Factory	10	Finding the class that forgot `@register`
 Chapters/Factory	Factory	9	Recursing through `__subclasses__()`
 Chapters/Flyweight	Flyweight	2	`tracemalloc`, cached vs. uncached `tile()`
 Chapters/Function_Objects	Function_Objects	1	Undo, added to `command.py`
+Chapters/Function_Objects	Function_Objects	3	`sorted()` with a compound key, and why `key` is *Strategy*
+Chapters/Function_Objects	Function_Objects	5	An event bus that walks the MRO, and can unsubscribe
+Chapters/Function_Objects	Function_Objects	7	`event()` registering `cls`
 Chapters/Memento	Memento	2	A bounded `History`
 Chapters/Memento	Memento	3	Serializing a `Drawing` to JSON
 Chapters/Memento	Memento	4	`Memento` holding the list itself
