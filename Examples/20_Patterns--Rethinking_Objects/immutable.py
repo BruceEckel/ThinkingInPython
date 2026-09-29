@@ -13,6 +13,6 @@ class Immutable:
 if __name__ == "__main__":
     immutable = Immutable((1, 2), Bob())
     print(immutable)
-    # immutable.numbers is a tuple, so it has no append.
+    # immutable.numbers is a tuple, so it has no append,
     # and .bob.name = "Ralph" raises FrozenInstanceError.
 #: Immutable(numbers=(1, 2), bob=Bob(name='Bob'))

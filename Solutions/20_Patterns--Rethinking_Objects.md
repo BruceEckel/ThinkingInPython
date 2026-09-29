@@ -11,13 +11,15 @@ class Bob:
     name: str = "Bob"
 
 class Leaky:
-    def __init__(self, numbers, tags):
+    def __init__(
+        self, numbers: list[int], tags: list[str]
+    ) -> None:
         self._numbers = numbers
         self._bob = Bob()
         self._tags = tags
 
     @property
-    def tags(self):
+    def tags(self) -> list[str]:
         return self._tags
 
 leaky = Leaky([1, 2], ["a", "b"])
@@ -39,13 +41,15 @@ class Bob:
     name: str = "Bob"
 
 class Plugged:
-    def __init__(self, numbers, tags):
+    def __init__(
+        self, numbers: list[int], tags: list[str]
+    ) -> None:
         self._numbers = numbers
         self._bob = Bob()
         self._tags = tags
 
     @property
-    def tags(self):
+    def tags(self) -> list[str]:
         return self._tags.copy()
 
 plugged = Plugged([1, 2], ["a", "b"])
@@ -60,42 +64,47 @@ keeps the items it had. Every new mutable field needs its own
 defensive copy. That repetition is the tedium that motivates freezing
 the data instead.
 
-## 2. A mutable field in a frozen data class
+## 2. A mutable `Bob` in a frozen data class
 
 ```python
 # exercise_2.py
-from dataclasses import FrozenInstanceError, dataclass
-from exceptions import expect, expected
+from dataclasses import dataclass
+from exceptions import expect
+
+@dataclass
+class Bob:
+    name: str = "Bob"
 
 @dataclass(frozen=True)
 class Immutable:
-    numbers: list[int]
+    numbers: tuple[int, ...]
+    bob: Bob
 
-data = Immutable([1, 2])
-data.numbers.append(999)  # No error, from ty or from Python
-print(data)
-#: Immutable(numbers=[1, 2, 999])
-with expected(FrozenInstanceError):
-    data.numbers = [3]  # type: ignore
-#: [FrozenInstanceError] cannot assign to field 'numbers'
-# The list field makes the instance unhashable
-expect(TypeError, hash, data)
-#: [TypeError] unhashable type: 'list'
+immutable = Immutable((1, 2), Bob())
+# No error, from ty or from Python:
+immutable.bob.name = "Ralph"
+print(immutable)
+#: Immutable(numbers=(1, 2), bob=Bob(name='Ralph'))
+# The mutable Bob makes the instance unhashable
+expect(TypeError, hash, immutable)
+#: [TypeError] unhashable type: 'Bob'
 ```
 
-`ty` reports nothing. `frozen=True` blocks rebinding a field, which is
-why the assignment raises `FrozenInstanceError`. That block says
-nothing about what the field refers to. The `append()` never assigns
-to `data.numbers`, so none of the code the decorator generated runs.
+`ty` reports nothing, and Python runs the assignment. `frozen=True` on
+`Immutable` blocks rebinding `immutable.bob`. It says nothing about
+the object `bob` refers to, and that object is now a mutable `Bob`.
+The assignment to `name` assigns to no field of `Immutable`, so none
+of the code that `frozen=True` generated runs.
 
 The `hash()` failure shows the same shallowness from another side.
 `frozen=True` generates a `__hash__()` that hashes the tuple of field
-values, so hashing an `Immutable` hashes its `list`, and a `list` has no
-hash. The decorator promises an instance usable as a dict key and
-delivers one that raises a `TypeError` at the first `hash()`. Declare
-the field a `tuple` and both the mutation and the hash failure go away
-together, the clue that they are one problem: a frozen wrapper around
-a mutable value.
+values, so hashing an `Immutable` hashes its `Bob`. A data class that
+compares by value and is not frozen has its `__hash__` set to `None`:
+a hash computed from fields that can change would lose the object
+inside a dict. Restoring `frozen=True` on `Bob` removes the mutation
+and the hash failure together, the clue that they are one problem: a
+frozen wrapper around a mutable value. `frozen_leaky.py` shows the same
+two symptoms for a `list` field.
 
 Nothing enforces deep immutability, and that is the answer: taking
 immutability all the way down is the author's job, one field at a time.
@@ -157,8 +166,8 @@ arguments and still returns a float at runtime. The two `NewType`
 declarations add a distinction the shapes never carry, so the type
 checker can finally see that a weight is not a price.
 
-Delete the annotations and the program behaves exactly as it does now.
-It prints `4.5` and charges the customer for a number of kilograms.
+If someone deletes the annotations, the program behaves as it does
+now. It prints `4.5` and charges the customer for a number of kilograms.
 `NewType` exists only for the type checker: `Weight(2.5)` returns the
 `float` `2.5`, and no wrapper survives to run time. The distinction is
 real in the source and absent in the process, and that split is the
@@ -206,10 +215,9 @@ print(distance(TripleCoord(Triple(3, 0, 99)),
 
 `Triple` has fields `a`, `b`, `c`, none named `x` or `y`, and `c` is
 irrelevant to a 2D distance. `TripleCoord` wraps a `Triple` and exposes
-only the two properties `distance()` actually needs, ignoring `c`
-entirely. `distance()` itself never changes: it only ever asks for
-`.x` and `.y`. `TripleCoord` supplies that shape, the same way
-`PairCoord` adapts `Pair`.
+the two properties `distance()` reads, ignoring `c`. `distance()` stays
+as it is, because it asks for `.x` and `.y` alone. `TripleCoord`
+supplies that shape, the same way `PairCoord` adapts `Pair`.
 
 ## 5. Adding `Square` to the closed `Shape` union
 
@@ -255,14 +263,26 @@ for shape in shapes:
 ```
 
 `ty check` passes because every member of the `Shape` union now has a
-matching `case`. Commenting out the `Square` case makes the `match`
-non-exhaustive: the type checker can prove that a `Square` argument
-falls through every `case` to `case _`, which calls `assert_never(shape)`.
-Since `shape` could genuinely be a `Square` at that point, the type
-checker reports that `assert_never()`'s argument is not the `Never`
-type it requires. That report is exactly the exhaustiveness check the
-closed union delivers, turning a missed case into a caught type error
-instead of a silent `None` or a runtime crash.
+matching `case`. With the two lines of the `Square` case commented
+out, `ty` reports:
+
+```
+error[type-assertion-failure]: Argument does not have asserted type `Never`
+  --> exercise_5.py:30:13
+   |
+30 |             assert_never(shape)
+   |             ^^^^^^^^^^^^^-----^
+   |                          |
+   |                          Inferred type of argument is `Square & ~Rectangle & ~Circle`
+info: `Never` and `Square & ~Rectangle & ~Circle` are not equivalent types
+```
+
+The inferred type names the missing case. The first two `case` lines
+rule out `Rectangle` and `Circle`, so the value that arrives at
+`case _` is a `Square` that is neither of them, and `assert_never()`
+requires `Never`, the type with no values. That report is the
+exhaustiveness check the closed union delivers. A missed case becomes
+a type error instead of a runtime failure.
 
 ## 6. A `NullCache`, following `NullLogger`'s shape
 
@@ -271,18 +291,18 @@ instead of a silent `None` or a runtime crash.
 from typing import Protocol
 
 class Cache(Protocol):
-    def get(self, key: str) -> object | None: ...
-    def set(self, key: str, value: object) -> None: ...
+    def get(self, key: str) -> str | None: ...
+    def set(self, key: str, value: str) -> None: ...
 
 class NullCache:
-    def get(self, key: str) -> object | None:
+    def get(self, key: str) -> str | None:
         return None
 
-    def set(self, key: str, value: object) -> None:
+    def set(self, key: str, value: str) -> None:
         pass
 
 nc = NullCache()
-nc.set("a", 1)
+nc.set("a", "apple")
 print(nc.get("a"))
 #: None
 ```
@@ -291,7 +311,9 @@ print(nc.get("a"))
 nothing, and `get()` always reports "not found." A function that takes
 an optional cache can take a required `Cache` instead, defaulting to a
 shared `NullCache()` instance, so no code that uses the cache needs an
-`is None` branch.
+`is None` branch on the cache. The `None` that `get()` returns is a
+different matter. A miss is information the caller acts on, so it stays
+in the return type.
 
 ## 7. Counting every route into the list
 
@@ -354,8 +376,10 @@ The subclass counts one append out of three and misses `insert()`
 entirely. `extend()` and `insert()` both add elements through `list`'s
 own C implementation, which never calls the Python-level `append()` or
 `__setitem__()` you overrode. Other routes past the counters include
-`+=` and `list.__init__` with an iterable. A future CPython could add
-another.
+`+=` and `*=`. A future CPython could add another. The override of
+`__setitem__()` leaves its parameters unannotated because `list`
+overloads that method, once for an index and once for a slice, and the
+counter treats both alike.
 
 `CountingBox` reports `3 3 1` because no inherited route into the
 list exists. The class holds a list rather than being one, so every
@@ -416,23 +440,25 @@ print(bounded.full(), bounded.items)
 ```
 
 `fill()` assumes a `Stack` whose `push()` always succeeds, so the fix
-keeps that promise. `BoundedStack.push()` accepts every item and
+keeps that guarantee. `BoundedStack.push()` accepts every item and
 discards the oldest to stay inside the limit. Callers who care about
 the limit ask `full()` before pushing. `fill()` now runs on both
-classes, and that is what substitutability means.
+classes without an exception.
 
 You gave up the refusal. The original `BoundedStack` guarantees that
 it never accepts more than two items. This one guarantees only that it
 never *keeps* more than two. A caller who pushes five items loses three
-of them silently. That loss is the right behavior for a ring buffer of
+of them silently, and `fill()` returns 2 where a caller counting on
+`Stack` expects 5. That loss is the right behavior for a ring buffer of
 recent events and the wrong behavior for a queue of work that must keep
-every item.
+every item. If `Stack`'s contract includes "every pushed item stays,"
+this version still breaks it.
 
 Should `BoundedStack` have been a subclass at all? Probably not. The
 two versions of this exercise are the two ways out of the same bind:
 either weaken the guarantee until it fits the base contract, or admit
-that "a stack that can refuse" is a different type. A separate class is
-honest about that, with its own `push()` returning `bool` or raising an
-exception. Nothing then hands that class to a `fill()` written for a
-different contract. Inheritance is a claim about substitutability, and
-this class makes a claim it cannot keep.
+that "a stack that can refuse" is a different type. A separate class
+states that difference, with its own `push()` returning `bool` or
+raising an exception. Nothing then hands that class to a `fill()`
+written for a different contract. Inheritance is a claim about
+substitutability, and this class makes a claim it cannot keep.

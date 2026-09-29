@@ -128,7 +128,7 @@ so a `BoundedStack` handed to it raises an exception on the third item.
 The subclass matches the signature and breaks the contract behind it.
 
 No tool catches this, but a test can.
-Two later tests pin down guarantees no type checker sees:
+Two later tests pin down runtime guarantees:
 `test_plugged.py` pins down that a getter's copy holds,
 and `test_immutable.py` pins down that a frozen field refuses assignment.
 The same pattern covers substitutability:
@@ -244,8 +244,9 @@ That sharing is safe here because the elements are immutable `int`s.
 `Bob` gets `deepcopy()`,
 which recursively copies everything the object references,
 the conservative choice when a field's own fields might be mutable.
-A shallow copy of a list of `Bob`s plugs nothing:
-the caller's copy of the list still holds your actual `Bob`s.
+A shallow copy of a list of `Bob`s protects the list and not the `Bob`s:
+the caller's copy holds the same `Bob` objects yours does,
+and can change each one.
 
 Testing confirms that the defensive copy holds.
 Mutating the returned list leaves the original untouched:
@@ -262,15 +263,9 @@ def test_defensive_copy_prevents_the_leak() -> None:
 
 ## The Immutability Solution
 
-Encapsulation exists only because of mutability.
+Encapsulation exists mainly because of mutability.
 If the data cannot change, you have nothing to protect.
 If you freeze it, the whole apparatus disappears.
-That argument covers only the mutation reason for encapsulation.
-A second reason survives freezing: representation hiding,
-so the internal type can change later without breaking callers.
-A public frozen field skips that protection too.
-If you later swap `numbers` from a `tuple` to some other sequence,
-every caller that named `tuple` breaks.
 The fields are public, with no getters and no copies:
 
 ```python
@@ -289,7 +284,7 @@ class Immutable:
 if __name__ == "__main__":
     immutable = Immutable((1, 2), Bob())
     print(immutable)
-    # immutable.numbers is a tuple, so it has no append.
+    # immutable.numbers is a tuple, so it has no append,
     # and .bob.name = "Ralph" raises FrozenInstanceError.
 #: Immutable(numbers=(1, 2), bob=Bob(name='Bob'))
 ```
@@ -316,8 +311,8 @@ against code the type checker never sees.
 Two quiet changes in the listing do as much work as `frozen=True`:
 `numbers` is a `tuple`, not a `list`, and `Bob` carries `frozen=True` too.
 `frozen=True` is shallow.
-It stops assignment to the fields of `Immutable` itself,
-but it cannot stop mutation inside a field that is itself mutable.
+It stops assignment to the fields of `Immutable`,
+but it cannot stop mutation inside a field whose value is mutable.
 If you declare the field as a `list` instead, the leak reopens:
 
 ```python
@@ -352,6 +347,13 @@ The listing shows all three side by side: `frozen=True` catches the rebinding,
 while the mutation and the failed hash get past it.
 That is why `immutable.py` needs both the `tuple` and the frozen `Bob`.
 Immutability lets you share an object safely and use it as a dict key only when it goes all the way down.
+
+Freezing answers the mutation reason for encapsulation.
+A second reason survives freezing: representation hiding,
+so the internal type can change later without breaking callers.
+A public frozen field gives up that protection.
+If you later swap `numbers` from a `tuple` to some other sequence,
+every caller that named `tuple` breaks.
 
 [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#immutability)
 makes the fuller case for frozen data classes.
@@ -439,8 +441,8 @@ class Pair:  # Suppose you are handed this, with no x or y
     a: float
     b: float
 
-@record
 # Adapter: uses composition, not inheritance
+@record
 class PairCoord:
     pair: Pair
 
@@ -497,7 +499,7 @@ print(len(counted), counted.appends)
 ```
 
 `list.extend()` appends its items without calling `append()`,
-so the count is wrong the moment anyone uses the base class's other method.
+so the count is wrong the moment anyone adds items through another of the base class's methods.
 The subclass is correct line by line.
 It inherits an implementation and now depends on that implementation's details,
 a dependence no signature records and no type checker reports.
@@ -533,8 +535,9 @@ print(len(box.items), box.appends)
 
 Nothing arrives from a base class,
 so no inherited method slips past the counter.
-`CountingBox` forwards every operation by hand.
-`CountingList` inherits dozens it didn't write, and gets one wrong.
+`CountingBox` forwards each operation it offers by hand.
+`CountingList` inherits dozens it didn't write,
+and more than one of them skips the counter.
 Composition still allows the counting bug.
 If you write `extend()` as `self.items.extend(more)` instead of going through `append()`,
 the count is wrong again.
@@ -628,7 +631,7 @@ The type checker infers the concrete type behind `T` at each call site.
 With *ad-hoc polymorphism* (typically *function overloading*),
 a different implementation handles each type,
 and the argument's type selects which one runs.
-Python's version of ad-hoc polymorphism is `@overload`,
+Python's form of function overloading is `@overload`,
 which lets one function name have multiple typed signatures over a single implementation that branches at runtime:
 
 ```python
@@ -662,7 +665,7 @@ even though both calls run the same branching body.
 
 [`singledispatch`](33_Patterns--Visitor.md#the-pythonic-visitor-singledispatch)
 is ad-hoc polymorphism's other Python form.
-It uses genuinely separate functions per type,
+It registers a separate function for each type,
 instead of one function branching internally.
 
 ### Abstract Base Classes
@@ -706,9 +709,9 @@ if __name__ == "__main__":
 #: 12.0
 ```
 
-Inheriting from `ABC` makes `Shape` abstract.
+Inheriting from `ABC` and marking `area()` with `@abstractmethod` makes `Shape` abstract.
 You cannot instantiate it,
-and `@abstractmethod` forces every subclass to define `area()`.
+and you cannot instantiate a subclass until that subclass defines `area()`.
 
 The empty `__slots__` on `Shape` is there for the records below it.
 A base class with no `__slots__` gives every instance of its subclasses a `__dict__`,
@@ -877,7 +880,8 @@ if __name__ == "__main__":
 ```
 
 `Invoice` inherits from `object` alone, yet `charge()`, `persist()`,
-and `audit()` each accept it, because each only checks the one method it needs.
+and `audit()` each accept it,
+because each function's parameter names only the one method it needs.
 
 #### What the Shape Does Not Say
 
@@ -958,10 +962,10 @@ Nothing in that test can fail.
 The `NewType` protection lives in the type checker alone.
 Passing a raw `int` where a signature says `UserId` raises no exception.
 In `newtype_boundary.py`,
-the `# type: ignore` silences that diagnostic so the rejected call can run anyway.
+the `# type: ignore` silences `ty`'s diagnostic so the rejected call can run anyway.
 [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#composing-types-from-types)
 takes the other route.
-A frozen dataclass with a validating `__post_init__` enforces the distinction at runtime too,
+A frozen data class with a validating `__post_init__()` enforces the distinction at runtime too,
 at the cost of a constructor call instead of a bare literal.
 
 A protocol also sharpens what [the Liskov Substitution Principle](#liskov-substitution)
@@ -1202,7 +1206,7 @@ if __name__ == "__main__":
 `deposit()` and `withdraw()` know where the state lives,
 so no call site can forget to thread it through.
 `account.` also lists every operation the object supports through dot-completion.
-This is what "bundling behavior with state" buys: one place holds the state,
+"Bundling behavior with state" gives you this: one place holds the state,
 and every method that changes it lives next to it.
 OOP is useful, sometimes.
 But not everywhere, all the time.
@@ -1218,7 +1222,7 @@ But not everywhere, all the time.
 Many of the design patterns in this part of the book arose to work around limitations of older object-oriented languages.
 Read them through the lens of this chapter.
 For each pattern, ask whether you need the objects and the inheritance,
-or whether immutable data, a function, and a protocol already solve the problem.
+or whether immutable data, a function, and a protocol solve the problem.
 
 ## Exercises
 
@@ -1226,12 +1230,12 @@ or whether immutable data, a function, and a protocol already solve the problem.
     exposed through a `@property` the same way `numbers` is,
     and demonstrate the same leak by mutating the list you get back.
     Then plug the leak the way `plugged.py` plugs `numbers` and `bob`.
-2.  In `immutable.py`, change `numbers: tuple[int, ...]` to `list[int]`,
-    and the construction to `Immutable([1, 2], Bob())`.
-    Show that `ty check` still passes, that `append()` works,
+2.  In `immutable.py`, remove `frozen=True` from `Bob` and leave it on `Immutable`.
+    Show that `ty check` still passes,
+    that `immutable.bob.name = "Ralph"` now succeeds,
     and that `hash(immutable)` now raises a `TypeError`,
     so the frozen instance can no longer be a dict key.
-    Restore the `tuple`.
+    Restore the `frozen=True`.
     Who, then, must make immutability go all the way down?
 3.  In `protocol_collision.py`,
     define `Price = NewType("Price", float)` and `Weight = NewType("Weight", float)`,
@@ -1244,7 +1248,7 @@ or whether immutable data, a function, and a protocol already solve the problem.
     `b`, `c` (no `x` or `y`),
     and an adapter `TripleCoord` that exposes `x` as `a` and `y` as `b`,
     ignoring `c`.
-    Confirm `distance()` works on a `TripleCoord` with no change to `distance()` itself.
+    Confirm `distance()` works on a `TripleCoord` with no change to `distance()`.
 5.  In `shapes_match.py`, add a new shape, `Square(side: float)`,
     to the `Shape` union, add its `case` to `area()`,
     and confirm `ty check` still passes.

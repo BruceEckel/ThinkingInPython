@@ -22,8 +22,8 @@ class Pair:  # Suppose you are handed this, with no x or y
     a: float
     b: float
 
-@record
 # Adapter: uses composition, not inheritance
+@record
 class PairCoord:
     pair: Pair
 
