@@ -1,5 +1,8 @@
 # test_function_facts.py
+from textwrap import indent
 from typing import Final
+import pytest
+from call_names import UNRESOLVED
 from function_facts import Facts, read_module
 from result import Err, Ok
 
@@ -66,6 +69,29 @@ def test_both_markers_are_read() -> None:
     save = facts()["m.save"]
     assert save.declared == {"FileSystem"}
     assert save.hidden == {"Console"}
+
+@pytest.mark.parametrize(
+    "binding",
+    [
+        "for str in xs: pass",
+        "with open(xs) as str: pass",
+        "if str := xs.pop(): pass",
+        "str, n = xs",
+        "match xs:\n  case [str]: pass",
+        "match xs:\n  case [*str]: pass",
+        "try: pass\nexcept OSError as str: pass",
+        "str = 'text'\nstr = list(xs)",
+    ],
+)
+def test_a_binding_shadows_the_builtin(
+    binding: str,
+) -> None:
+    body = indent(f"{binding}\nstr.upper()", "    ")
+    match read_module("m", f"def f(xs):\n{body}\n"):
+        case Ok(found):
+            assert found[0].calls[-1] == UNRESOLVED
+        case Err(problem):
+            raise AssertionError(problem)
 
 def test_a_syntax_error_comes_back_as_a_value() -> None:
     result = read_module("bad", "def f(:\n")

@@ -446,18 +446,27 @@ def assigned(
     body: list[ast.stmt], scope: Scope
 ) -> dict[str, str]:
     types: dict[str, str] = {}
+    written: dict[str, str] = {}
+    values: dict[ast.AST, str] = {}
     nodes = (n for stmt in body for n in ast.walk(stmt))
     for node in nodes:
         match node:
             case ast.AnnAssign(
                 target=ast.Name(id=name), annotation=note
             ):
-                types[name] = scope.annotation(note)
-            case ast.Assign(
-                targets=[ast.Name(id=name)], value=value
+                written[name] = scope.annotation(note)
+            case ast.Assign(targets=[target], value=value):
+                values[target] = scope.type_of(value)
+            case (
+                ast.Name(id=name, ctx=ast.Store())
+                | ast.MatchAs(name=str(name))
+                | ast.MatchStar(name=str(name))
+                | ast.ExceptHandler(name=str(name))
             ):
-                types.setdefault(name, scope.type_of(value))
-    return types
+                found = values.get(node, UNRESOLVED)
+                if types.setdefault(name, found) != found:
+                    types[name] = UNRESOLVED
+    return types | written
 
 def parameters(
     func: Def, scope: Scope, owner: str
@@ -524,7 +533,12 @@ def module_scope(module: str, tree: ast.Module) -> Scope:
         if isinstance(node, ast.TypeAlias)
     }
     named = Scope(module, bare.names | aliases, defined, {})
-    top = [node for node in tree.body if not is_def(node)]
+    top = [
+        node
+        for node in tree.body
+        if not is_def(node)
+        and not isinstance(node, ast.TypeAlias)
+    ]
     types = assigned(top, named)
     return Scope(module, named.names, defined, types)
 
@@ -578,9 +592,21 @@ An empty row means "pure," so the two must differ.
 `parameters()` and `assigned()` fill a scope's `types`: an annotated parameter,
 the first parameter of a method (the class), an annotated assignment,
 and a plain assignment whose right side has an evident type.
-`module_scope()` does the same for a module's top level,
-and also reads each `type` statement,
-so a parameter annotated `Table` resolves to `builtins.dict`.
+`assigned()` also records every other name a body binds: a loop variable,
+a `with` or `except` target, a walrus target, a name inside a tuple target,
+and a name a pattern captures.
+Each alternative of the or-pattern binds `name`, as an or-pattern requires.
+Such a name gets `UNRESOLVED`,
+and so does a name that two assignments give different types.
+An annotation overrides both.
+`ast.walk()` visits an assignment before its target,
+so `values` holds the type of the right side by the time the target's `Name` arrives.
+
+`module_scope()` does the same for a module's top level.
+It reads each `type` statement separately,
+so a parameter annotated `Table` resolves to `builtins.dict`,
+and it keeps those statements out of `assigned()`,
+which would otherwise record an alias's name as a variable.
 Because `is_function()` and `is_def()` return [`TypeIs`](08_Foundations--Static_Types.md#type-narrowing),
 a comprehension filtered by one yields nodes whose narrowed type has a `name`.
 
@@ -605,7 +631,10 @@ so a parse failure becomes a value the caller must look at.
 
 ```python
 # test_function_facts.py
+from textwrap import indent
 from typing import Final
+import pytest
+from call_names import UNRESOLVED
 from function_facts import Facts, read_module
 from result import Err, Ok
 
@@ -673,6 +702,29 @@ def test_both_markers_are_read() -> None:
     assert save.declared == {"FileSystem"}
     assert save.hidden == {"Console"}
 
+@pytest.mark.parametrize(
+    "binding",
+    [
+        "for str in xs: pass",
+        "with open(xs) as str: pass",
+        "if str := xs.pop(): pass",
+        "str, n = xs",
+        "match xs:\n  case [str]: pass",
+        "match xs:\n  case [*str]: pass",
+        "try: pass\nexcept OSError as str: pass",
+        "str = 'text'\nstr = list(xs)",
+    ],
+)
+def test_a_binding_shadows_the_builtin(
+    binding: str,
+) -> None:
+    body = indent(f"{binding}\nstr.upper()", "    ")
+    match read_module("m", f"def f(xs):\n{body}\n"):
+        case Ok(found):
+            assert found[0].calls[-1] == UNRESOLVED
+        case Err(problem):
+            raise AssertionError(problem)
+
 def test_a_syntax_error_comes_back_as_a_value() -> None:
     result = read_module("bad", "def f(:\n")
     assert isinstance(result, Err)
@@ -683,6 +735,8 @@ def test_a_syntax_error_comes_back_as_a_value() -> None:
 In `save()`, `log` gets its type from a constructor call,
 the string by being a constant, `names` through a `type` alias,
 `LIMIT` through `Final[...]`, and `p` by its annotation.
+`test_a_binding_shadows_the_builtin()` binds the name `str` in eight ways.
+Each time, `str.upper()` comes back `UNRESOLVED` instead of resolving to `builtins.str.upper`.
 
 ## Rows to a Fixed Point
 
@@ -1106,11 +1160,49 @@ so each one appears in a row instead of going unreported:
 
 - A call of a parameter, or of a local that holds a function.
 - A call of a call's result, as in `dataclass(frozen=True)(cls)`.
-- A method on a loop variable, on a name captured by a pattern,
-  or on a record's field.
+- A method on a record's field,
+  or on a name bound by anything but an assignment: a loop, a `with`,
+  an `except`, a walrus, a tuple target, or a pattern.
+- A method on a local that two assignments give different types.
 - A receiver annotated with a union,
   or with a `type` alias imported from another module.
 - An inherited method, because the checker reads no class hierarchy.
+
+A name bound in one of those ways is a variable of no known type,
+even when it matches the name of a builtin.
+Both functions here perform `FileSystem`:
+
+```python
+# binding_check.py
+from typing import Final
+from row_check import check
+
+SOURCE: Final[str] = '''
+from pathlib import Path
+
+def clear(paths: list[Path]) -> None:
+    for dir in paths:
+        dir.rmdir()
+
+def load() -> str:
+    path = "settings.toml"
+    path = Path(path)
+    return path.read_text()
+'''
+report = check({"m": SOURCE})
+for name, row in report.rows.items():
+    if row:
+        print(name, sorted(row))
+#: m.clear ['Unknown']
+#: m.load ['Unknown']
+```
+
+The checker cannot see that `FileSystem`, so each row reads `Unknown`.
+If `assigned()` recorded no binding for the loop variable,
+`dir.rmdir()` would resolve to `builtins.dir.rmdir`.
+If it kept the first assignment's type,
+`path.read_text()` would resolve to `builtins.str.read_text`.
+The `builtins.*` pattern calls both pure, so both rows would be empty.
 
 The limits in this second list produce no `Unknown`.
 The checker reports nothing about them,
@@ -1121,11 +1213,6 @@ and a production tool must remove each one:
   which the table calls pure, and `print` is the callee of no call.
 - A method that runs without a call expression: an operator, a property,
   a `with` statement, or a `for` loop.
-- A name bound by a loop, a pattern, or a tuple assignment,
-  when it matches the name of an import, a definition, or a builtin.
-  The checker records no binding for it,
-  so a loop variable named `filter` resolves to `builtins.filter`.
-  A local assigned twice keeps the type of its first assignment.
 - A pure pattern in the table, which matches every name beneath it.
   A receiver annotated `Any`, `object`,
   or `type[...]` resolves under `typing` or `builtins`.
@@ -1145,9 +1232,8 @@ and a production tool must remove each one:
 - A `staticmethod`, because the first parameter of every method gets the class as its type.
 - `hides()`, which the checker trusts without evidence.
 
-Some of the second list is bookkeeping, such as recording every binding,
-resolving `Annotated` through the imports,
-and reading the decorator that marks a `staticmethod`.
+Some of the second list is bookkeeping,
+such as resolving `Annotated` through the imports and reading the decorator that marks a `staticmethod`.
 Cleverness removes none of the rest, in either list.
 Most are pieces of type inference:
 an operator runs a method that its operands' types select,

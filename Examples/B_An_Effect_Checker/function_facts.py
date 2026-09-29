@@ -37,18 +37,27 @@ def assigned(
     body: list[ast.stmt], scope: Scope
 ) -> dict[str, str]:
     types: dict[str, str] = {}
+    written: dict[str, str] = {}
+    values: dict[ast.AST, str] = {}
     nodes = (n for stmt in body for n in ast.walk(stmt))
     for node in nodes:
         match node:
             case ast.AnnAssign(
                 target=ast.Name(id=name), annotation=note
             ):
-                types[name] = scope.annotation(note)
-            case ast.Assign(
-                targets=[ast.Name(id=name)], value=value
+                written[name] = scope.annotation(note)
+            case ast.Assign(targets=[target], value=value):
+                values[target] = scope.type_of(value)
+            case (
+                ast.Name(id=name, ctx=ast.Store())
+                | ast.MatchAs(name=str(name))
+                | ast.MatchStar(name=str(name))
+                | ast.ExceptHandler(name=str(name))
             ):
-                types.setdefault(name, scope.type_of(value))
-    return types
+                found = values.get(node, UNRESOLVED)
+                if types.setdefault(name, found) != found:
+                    types[name] = UNRESOLVED
+    return types | written
 
 def parameters(
     func: Def, scope: Scope, owner: str
@@ -115,7 +124,12 @@ def module_scope(module: str, tree: ast.Module) -> Scope:
         if isinstance(node, ast.TypeAlias)
     }
     named = Scope(module, bare.names | aliases, defined, {})
-    top = [node for node in tree.body if not is_def(node)]
+    top = [
+        node
+        for node in tree.body
+        if not is_def(node)
+        and not isinstance(node, ast.TypeAlias)
+    ]
     types = assigned(top, named)
     return Scope(module, named.names, defined, types)
 
