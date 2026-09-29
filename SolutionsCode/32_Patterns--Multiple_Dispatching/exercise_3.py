@@ -1,11 +1,9 @@
 # exercise_3.py
-from enum import StrEnum
+from types import ModuleType
 from typing import Final
-
-class Outcome(StrEnum):
-    WIN = "win"
-    LOSE = "lose"
-    DRAW = "draw"
+import exercise_1 as table
+import exercise_2 as methods
+from exercise_1 import Outcome
 
 EXPECTED: Final[dict[tuple[str, str], Outcome]] = {
     ("Paper", "Rock"): Outcome.WIN,
@@ -26,5 +24,15 @@ EXPECTED: Final[dict[tuple[str, str], Outcome]] = {
     ("Lizard", "Lizard"): Outcome.DRAW,
 }
 
-print(len(EXPECTED))
-#: 16
+def compete(module: ModuleType, player: str,
+            opponent: str) -> str:
+    return getattr(module, player)().compete(
+        getattr(module, opponent)())
+
+for module in (table, methods):
+    wrong = [pair for pair, result in EXPECTED.items()
+             if compete(module, *pair) != result]
+    print(module.__name__, len(EXPECTED), "agree:",
+          not wrong)
+#: exercise_1 16 agree: True
+#: exercise_2 16 agree: True

@@ -75,7 +75,9 @@ class Lizard(Item):
     def eval_lizard(self, item: Any) -> Outcome:
         return Outcome.DRAW
 
-print(Lizard().compete(Paper()),
-      Lizard().compete(Scissors()),
-      Lizard().compete(Rock()), Lizard().compete(Lizard()))
+if __name__ == "__main__":
+    print(Lizard().compete(Paper()),
+          Lizard().compete(Scissors()),
+          Lizard().compete(Rock()),
+          Lizard().compete(Lizard()))
 #: win win lose draw

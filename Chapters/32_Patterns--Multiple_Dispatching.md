@@ -185,6 +185,7 @@ and every result in the class appears reversed.
 
 That original caller arrives in each `eval_*()` method as its `item` argument:
 the same object `compete()` held as `self` before passing it along.
+A game whose outcome depends on the caller's state reads that state through `item`.
 This game ignores the argument,
 since the outcome depends on the two types alone.
 
@@ -266,9 +267,10 @@ the same as a single object.
 The lookup shares two properties with the [table-driven state machine](31_Patterns--State_Machines.md#the-engine).
 It matches classes exactly, so a subclass of `Paper` needs rows of its own.
 And a missing pair fails at the first duel that needs it,
-the fail-fast policy that suits a table you are still filling in.
+the fail-fast policy that suits a table you are still filling in
+(see exercise 1).
 Here the failure is the dictionary's own `KeyError`,
-where the state machine's engine raises `NoTransition` (see exercise 1).
+where the state machine's engine raises `NoTransition`.
 
 Exact matching surprises people.
 The lookup raises a `KeyError` for a subclass.
@@ -316,8 +318,8 @@ not just how many types it considers.
 ### `match` with Class Patterns
 
 A `match` statement with class patterns is a third option for a two-type decision.
-Like `singledispatch`, it matches subclasses:
-a class pattern tests with `isinstance()`,
+Like `singledispatch`, it matches subclasses.
+A class pattern tests with `isinstance()`,
 so a subclass matches the pattern its base would:
 
 ```python
@@ -342,7 +344,7 @@ print(compete(Origami(), Rock()))
 ```
 
 `Origami()` matches the `Paper()` pattern,
-though the table lookup in `exact_match.py` raised `KeyError` for the same subclass.
+though the table lookup in `exact_match.py` raises a `KeyError` for the same subclass.
 Unlike `singledispatch`, every case sits together in one block,
 closed the way the table is: adding an `Item` means adding cases,
 not registering a function elsewhere.
@@ -403,7 +405,8 @@ The version most programmers write first is neither the methods nor the table:
 it is an `isinstance()` ladder inside `compete()`,
 testing the opponent's type case by case.
 It works, and it keeps the method version's cost without its benefit.
-The type tests repeat in every class, as in the method version,
+The type tests repeat in every class,
+as the `eval_*()` methods do in the method version,
 and the programmer resolves by hand what dispatch would resolve on its own.
 Every new `Item` forces an edit to every ladder.
 Both patterns in this chapter replace the ladder.
@@ -411,7 +414,7 @@ Both patterns in this chapter replace the ladder.
 The double-dispatch version puts `eval_paper()`, `eval_scissors()`,
 and `eval_rock()` on every class.
 It comes from languages where a table keyed by a pair of types is awkward to write.
-There, spreading the table across the classes is the easier form to write.
+There, spreading the table across the classes is the easier form.
 A Python `dict` takes a tuple of classes as a key,
 so the table is both shorter and easier to maintain.
 A table cell can hold a function, so even elaborate behavior fits the table
@@ -577,7 +580,7 @@ print(Meters(3) + Meters(4))
 print(Meters(3) + 4)  # The left operand handles it
 #: __add__(Meters(n=3), 4)
 #: Meters(n=7)
-# Int declines; the right operand handles it
+# int.__add__() declines; Meters.__radd__() handles it
 print(4 + Meters(3))
 #: __radd__(Meters(n=3), 4)
 #: Meters(n=7)

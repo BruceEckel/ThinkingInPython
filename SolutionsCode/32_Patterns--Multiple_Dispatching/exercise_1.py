@@ -44,5 +44,7 @@ OUTCOME: Final[Table] = {
   (Lizard, Lizard): Outcome.DRAW,
 }
 
-print(Lizard().compete(Paper()), Rock().compete(Lizard()))
+if __name__ == "__main__":
+    print(Lizard().compete(Paper()),
+          Rock().compete(Lizard()))
 #: win win

@@ -60,6 +60,11 @@ Solutions/Effect_Management	Effect_Management	2	Threading a `Log` Effect through
 Solutions/Effect_Management	Effect_Management	4	`PositiveInt` in place of both checks
 Solutions/Functions	Functions	6	Unpacking both containers at a call site
 Solutions/Modules_and_Packages	Modules_and_Packages	4	Renaming `module.py` to `Module.py`
+Solutions/Multiple_Dispatching	Multiple_Dispatching	1	Adding `Lizard` to the table version
+Solutions/Multiple_Dispatching	Multiple_Dispatching	1	Adding `Lizard` to the table version
+Solutions/Multiple_Dispatching	Multiple_Dispatching	2	Adding `Lizard` to the double-dispatch version
+Solutions/Multiple_Dispatching	Multiple_Dispatching	3	Sixteen matchups in `EXPECTED`
+Solutions/Multiple_Dispatching	Multiple_Dispatching	3	Sixteen matchups in `EXPECTED`
 Solutions/Multiple_Dispatching	Multiple_Dispatching	7	A business-modeling environment
 Solutions/Multiple_Dispatching	Multiple_Dispatching	8	Weapons, battles, and a full meeting
 Solutions/Observer	Observer	3	An `announce()` that survives a failing responder

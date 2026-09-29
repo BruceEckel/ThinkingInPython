@@ -29,10 +29,12 @@ class Project:
         kinds = [Dwarf, Elf, Troll]
         return [self.rng.choice(kinds)() for _ in range(n)]
 
-project = Project(seed=1)
-team = project.gather(4)
-for a, b in zip(team, team[1:]):
-    print(a.interact(b))
+    def meet(self, n: int) -> None:
+        team = self.gather(n)
+        for a, b in zip(team, team[1:]):
+            print(a.interact(b))
+
+Project(seed=1).meet(4)
 #: Dwarf (engineer) negotiates with Troll
 #: Troll (manager) directs Dwarf
 #: Dwarf (engineer) negotiates with Elf

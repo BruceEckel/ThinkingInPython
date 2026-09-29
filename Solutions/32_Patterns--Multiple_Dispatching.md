@@ -52,7 +52,9 @@ OUTCOME: Final[Table] = {
   (Lizard, Lizard): Outcome.DRAW,
 }
 
-print(Lizard().compete(Paper()), Rock().compete(Lizard()))
+if __name__ == "__main__":
+    print(Lizard().compete(Paper()),
+          Rock().compete(Lizard()))
 #: win win
 ```
 
@@ -60,7 +62,9 @@ Sixteen entries cover the four types against each other (4 × 4), the
 same shape as the original nine (3 × 3). Adding a fourth `Item` costs
 one class declaration and seven new dictionary rows (the six new
 ordered pairs `Lizard` forms with the other three, plus
-`(Lizard, Lizard)`). `compete()` itself needs no change.
+`(Lizard, Lizard)`). `compete()` needs no change.
+The `__main__` guard lets exercise 3 import this module without
+running its demonstration, as the chapter's own two versions do.
 
 ## 2. Adding `Lizard` to the double-dispatch version
 
@@ -142,15 +146,17 @@ class Lizard(Item):
     def eval_lizard(self, item: Any) -> Outcome:
         return Outcome.DRAW
 
-print(Lizard().compete(Paper()),
-      Lizard().compete(Scissors()),
-      Lizard().compete(Rock()), Lizard().compete(Lizard()))
+if __name__ == "__main__":
+    print(Lizard().compete(Paper()),
+          Lizard().compete(Scissors()),
+          Lizard().compete(Rock()),
+          Lizard().compete(Lizard()))
 #: win win lose draw
 ```
 
-This version costs far more to extend. Every *existing* class
-(`Paper`, `Scissors`, `Rock`) needs a brand-new `eval_lizard()` method,
-one line each. The new `Lizard` class needs a `compete()` plus four
+This version costs far more to extend. Every existing class
+(`Paper`, `Scissors`, `Rock`) needs a new `eval_lizard()` method.
+The `__main__` guard serves exercise 3, as in exercise 1. The new `Lizard` class needs a `compete()` plus four
 `eval_*()` methods, one per opponent type including its own. Those
 methods encode the same sixteen answers already sitting in the table
 version's `OUTCOME` dictionary, spread across four classes instead of
@@ -161,21 +167,20 @@ The comparison makes the chapter's point concrete. The table costs one
 class and seven dictionary rows to extend. The method version costs
 one class and five new methods, plus retrofitting a method onto every
 class that already exists. That cost only grows as you add more item
-types. The chapter therefore recommends the table for data that is
-mostly pure lookup, and reserves the method version for combinations
-that need real, type-specific logic too large for one table cell.
+types. The chapter therefore recommends the table by default, and
+reserves the method version for behavior that belongs to the class: a
+combination that reads the object's own state, or one a subclass
+should override while inheriting the rest.
 
 ## 3. Sixteen matchups in `EXPECTED`
 
 ```python
 # exercise_3.py
-from enum import StrEnum
+from types import ModuleType
 from typing import Final
-
-class Outcome(StrEnum):
-    WIN = "win"
-    LOSE = "lose"
-    DRAW = "draw"
+import exercise_1 as table
+import exercise_2 as methods
+from exercise_1 import Outcome
 
 EXPECTED: Final[dict[tuple[str, str], Outcome]] = {
     ("Paper", "Rock"): Outcome.WIN,
@@ -196,16 +201,33 @@ EXPECTED: Final[dict[tuple[str, str], Outcome]] = {
     ("Lizard", "Lizard"): Outcome.DRAW,
 }
 
-print(len(EXPECTED))
-#: 16
+def compete(module: ModuleType, player: str,
+            opponent: str) -> str:
+    return getattr(module, player)().compete(
+        getattr(module, opponent)())
+
+for module in (table, methods):
+    wrong = [pair for pair, result in EXPECTED.items()
+             if compete(module, *pair) != result]
+    print(module.__name__, len(EXPECTED), "agree:",
+          not wrong)
+#: exercise_1 16 agree: True
+#: exercise_2 16 agree: True
 ```
 
-With this `EXPECTED` in place, `test_matches_expected()` passes
-unchanged over both modules: it hardcodes no number of item types.
-`pytest` parametrizes it from `MATCHUPS`, which a comprehension builds
-from `EXPECTED`, so growing `EXPECTED` from nine entries to sixteen
-produces sixteen independently reported cases per module with no
-change to the test function itself.
+The two modules are exercise 1's table and exercise 2's methods, the
+two versions that know `Lizard`. `compete()` is the test's helper:
+it looks each class up by name on whichever module it receives, so one
+`EXPECTED` drives both sets of classes. Each module defines its own
+`Outcome`, and the comparison still works, since a `StrEnum` member
+equals its string value.
+
+In `test_paper_scissors.py`, the sixteen-entry `EXPECTED` is the one
+change to the test, once its two imports name modules that include
+`Lizard`. `test_matches_expected()` hardcodes no
+number of item types. `pytest` parametrizes it from `MATCHUPS`, which a
+comprehension builds from `EXPECTED`, so the test reports sixteen
+cases per module where it reported nine.
 
 ## 4. Counting how often each item type appears
 
@@ -492,19 +514,22 @@ class Project:
         kinds = [Dwarf, Elf, Troll]
         return [self.rng.choice(kinds)() for _ in range(n)]
 
-project = Project(seed=1)
-team = project.gather(4)
-for a, b in zip(team, team[1:]):
-    print(a.interact(b))
+    def meet(self, n: int) -> None:
+        team = self.gather(n)
+        for a, b in zip(team, team[1:]):
+            print(a.interact(b))
+
+Project(seed=1).meet(4)
 #: Dwarf (engineer) negotiates with Troll
 #: Troll (manager) directs Dwarf
 #: Dwarf (engineer) negotiates with Elf
 ```
 
-Exercise 7 uses single dispatch, not double: `a.interact(b)` resolves
-on `a`'s type only, and `interact()` interpolates `other` generically
-instead of inspecting its type. The design becomes genuinely *double*
-dispatch once `interact()`'s behavior must vary by `other`'s type too,
+`Project` creates the inhabitants in `gather()` and makes neighbors
+interact in `meet()`. Exercise 7 uses single dispatch, not double:
+`a.interact(b)` resolves on `a`'s type only, and `interact()`
+interpolates `other` without inspecting its type. The design becomes
+double dispatch once `interact()`'s behavior must vary by `other`'s type too,
 and exercise 8 adds that dependence.
 
 ## 8. Weapons, battles, and a full meeting
@@ -694,10 +719,9 @@ for item1, item2 in [
 `compete()` changes by one pair of parentheses. It still finds the
 cell with a single probe keyed on both types, and now calls what it
 finds instead of returning it. The call site never learns any of
-this: `item1.compete(item2)` reads exactly as it does in
+this: `item1.compete(item2)` reads as it does in
 `paper_scissors_rock.py`, where four method definitions per class
-stand behind it. That answers the part of the question about keeping
-the syntax of a method call over a table.
+stand behind it. A table of callables keeps the method-call syntax.
 
 `always()` is what keeps the table readable. It returns a closure
 over one `Outcome` that ignores both operands, so the seven
@@ -706,10 +730,10 @@ a table of answers. Only the cells that need code look like code.
 
 The `(Paper, Rock)` cell receives both items, so it can consult
 `item1.wet`. The `(Rock, Paper)` cell consults `item2.wet`, because
-one duel has two orders and each order has its own cell; without it,
-a rock that calls `compete()` would still beat wet paper. That is the first of the two reasons the chapter gives
-for preferring the double-dispatch version: behavior that reads the
-object's own state. A cell holding a function answers it. Whatever
+one duel has two orders and each order has its own cell. Without it,
+a rock that calls `compete()` would still beat wet paper. That is the
+first of the two reasons the chapter gives for preferring the
+double-dispatch version: behavior that reads the object's own state. A cell holding a function answers it. Whatever
 `Paper.eval_rock()` can read, `paper_vs_rock()` can read too,
 from the same two objects.
 
@@ -724,8 +748,9 @@ this version has nothing to override: `Item` defines `compete()` once.
 
 One cost comes with the change. `paper_vs_rock()` and
 `rock_vs_paper()` take two `Item`s, because every cell must, so each
-recovers `Paper` with an `isinstance()` test. That is the type test the chapter warns about in
-the ladder version, and here it sits inside one cell rather than
+recovers `Paper` with an `isinstance()` test. That is the type test
+the chapter warns about in the ladder version, and here it sits inside
+one cell rather than
 running through every class, which is the difference between a test
 you write once and a test every new `Item` forces you to edit.
 
@@ -798,8 +823,8 @@ print(len(OUTCOME_TABLE), "entries, agrees with formula:",
 
 rng = random.Random(5)
 winner = battle_table(Dwarf2(rng), Elf2(rng))
-print(isinstance(winner, (Inhabitant2, type(None))))
-#: True
+print(type(winner).__name__)
+#: Elf2
 ```
 
 `OUTCOME_TABLE` holds the same 36 answers `weapon_outcome()` computes
@@ -808,7 +833,6 @@ Generating the table from the formula, rather than writing all 36
 entries by hand, makes the two agree by construction while keeping the
 lookup itself trivial: `battle_table()` no longer calls any per-weapon
 logic, only indexes into a dictionary.
-[One Type or Many](../Chapters/32_Patterns--Multiple_Dispatching.md#one-type-or-many)
-reaches the same conclusion: the table is both shorter to write and
-easier to audit for a ruleset that is fundamentally a fixed set of
-answers.
+[Methods or Table](../Chapters/32_Patterns--Multiple_Dispatching.md#methods-or-table)
+reaches the same conclusion: for a ruleset that is a fixed set of
+answers, the table is shorter and easier to maintain.

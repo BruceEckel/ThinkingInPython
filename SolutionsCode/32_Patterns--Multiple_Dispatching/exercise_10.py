@@ -64,5 +64,5 @@ print(len(OUTCOME_TABLE), "entries, agrees with formula:",
 
 rng = random.Random(5)
 winner = battle_table(Dwarf2(rng), Elf2(rng))
-print(isinstance(winner, (Inhabitant2, type(None))))
-#: True
+print(type(winner).__name__)
+#: Elf2
