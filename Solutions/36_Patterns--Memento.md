@@ -90,7 +90,7 @@ def test_erase_leaves_history_states_untouched() -> None:
     assert history.past[0].strokes == ("a",)
 ```
 
-`erase()` mutates `self.strokes` in place, exactly like `draw()`
+`erase()` mutates `self.strokes` in place, as `draw()`
 does, so it needs no special handling. `save()` copies the strokes
 into an immutable `Memento` the moment it runs, so nothing later,
 erase included, can reach back and change a memento already taken.
@@ -202,7 +202,7 @@ class History[S]:
 h = History(0, max_depth=2)
 h.do(1)
 h.do(2)
-# Past would be [0, 1, 2]; 0 is discarded, keeping only 2
+# Past would be [0, 1, 2]; the bound discards 0
 h.do(3)
 print(h._past)
 #: [1, 2]
@@ -213,12 +213,12 @@ print(h.can_undo())
 ```
 
 `can_undo()` needs no change: it already asks whether `_past` still
-holds a state. A bounded history empties `_past` sooner (after
-`max_depth` undos rather than after every `do()` the program ever
-made), so `can_undo()` reports `False` as soon as the only earlier
-state left is one the bound discarded. Once the bound discards state
-`0`, nothing can bring it back, and `can_undo()` reporting `False`
-there is the honest answer, not a bug.
+holds a state. A bounded history empties `_past` sooner: after at
+most `max_depth` undos, rather than one undo per `do()` the program
+made. So `can_undo()` reports `False` while earlier states exist that
+the bound discarded. Once the bound discards state `0`, nothing can
+bring it back, and `can_undo()` reporting `False` there is the
+correct answer, not a bug.
 
 ## 3. Serializing a `Drawing` to JSON
 
@@ -249,7 +249,7 @@ print(reconstructed == drawing)
 ```
 
 JSON has no tuple type, only arrays, so `strokes` comes back from
-`json.loads()` as a plain `list`, where the dataclass declares it
+`json.loads()` as a `list`, where the record declares it
 `tuple[str, ...]`. `pickle` preserves the exact Python type, tuple
 in, tuple out, because it serializes Python's own object
 representations rather than translating into a shared,
@@ -257,11 +257,11 @@ language-neutral format. The reconstruction compensates for what
 JSON loses: it wraps `data["strokes"]` back in `tuple(...)` before
 passing it to `Drawing`. A type checker cannot catch the omission
 here, because `json.loads()` returns `Any`, and an `Any` satisfies the
-declared `tuple[str, ...]`. Drop the `tuple(...)` and `ty check` still
+declared `tuple[str, ...]`. Without the `tuple(...)`, `ty check` still
 passes. The mismatch surfaces only when the program runs:
 `reconstructed == drawing` becomes `False`, since a `list` never
 equals a `tuple`, and the `list` costs the `Drawing` the hashability a
-frozen dataclass otherwise supplies (`hash()` raises a `TypeError`,
+record otherwise supplies (`hash()` raises a `TypeError`,
 `unhashable type: 'list'`).
 
 ## 4. `Memento` holding the list itself
@@ -299,14 +299,14 @@ out. `sketch.strokes == ["a"]` then fails immediately, before the
 test reaches the scenario
 `test_drawing_after_restore_spares_memento` catches. Making
 `Memento` a record prevents
-reassigning `strokes` after construction, but the list *inside* stays
+reassigning `strokes` after construction, but the list inside stays
 mutable, and every later `draw()` changes it. That is why `save()`
 must copy into a `tuple`, an immutable container, instead of wrapping
-a mutable list in a frozen dataclass.
+a mutable list in a record.
 
 Two of those failures prove less than they seem. The second and third
 tests compare `checkpoint.strokes` with a tuple, and a `list` never
-equals a `tuple`, so a `Memento` holding a *copied* list fails them
+equals a `tuple`, so a `Memento` holding a copied list fails them
 too, with no sharing at all. The test that exposes the corruption
 compares contents only, so the type change alone cannot fail it:
 
@@ -327,6 +327,8 @@ both objects hold.
 
 ```python
 # exercise_5.py
+from exceptions import expect
+
 class History[S]:
     def __init__(self, initial: S) -> None:
         self._present = initial
@@ -355,6 +357,8 @@ class History[S]:
         return self._present
 
     def goto(self, steps_back: int) -> S:
+        if not 0 <= steps_back <= len(self._past):
+            raise IndexError(f"cannot go back {steps_back}")
         for _ in range(steps_back):
             self.undo()
         return self._present
@@ -367,6 +371,10 @@ print(h.goto(2))
 #: 1
 print(h.redo(), h.redo())
 #: 2 3
+expect(IndexError, h.goto, 4)
+#: [IndexError] cannot go back 4
+print(h.present)
+#: 3
 ```
 
 `goto()` adds no new mechanism. It calls the existing `undo()`
@@ -374,8 +382,12 @@ repeatedly, and each `undo()` pushes the state it leaves onto
 `_future`. Redo therefore works exactly as if you had called `undo()`
 twice: `h.redo()` after `goto(2)` returns `2`, then `3`, retracing
 the same path forward. Jumping several states back
-"in one call" is a convenience for the caller. The underlying stacks
-stay in the same consistent state either way.
+"in one call" is a convenience for the caller, with one difference
+from a loop of `undo()` calls. A loop that runs out of past states
+raises an `IndexError` partway, after moving some states to
+`_future`. `goto()` checks the distance before it moves anything, so
+a jump that raises an `IndexError` leaves the history where it was,
+as the chapter's `undo()` does.
 
 ## 6. Restoring one named field
 
@@ -445,7 +457,7 @@ through `do()`. The rename to `"Goose"` survives the restore because
 `restore_field()` takes a `History[Drawing]` rather than a generic
 `History[S]`, and that is a typing constraint rather than a design
 choice. `copy.replace()` requires a `__replace__()` method, and a bare
-type variable `S` promises no such method, so a generic version needs
+type variable `S` has no such method, so a generic version needs
 a `Protocol` declaring `__replace__()` as the type variable's bound.
 Worth doing in a library; noise in a solution.
 
@@ -509,22 +521,22 @@ expect(ValueError, copy.replace, empty, strokes=())
 ```
 
 The default appears, and not because pickle supplied it. A dataclass
-field with a simple default stores that default as a *class* attribute,
+field with a simple default stores that default as a class attribute,
 so `restored.layer` finds `DrawingV2.layer` by ordinary attribute
-lookup while `restored.__dict__` has no `layer` at all. Change the
-field to `layer: list[str] = field(default_factory=list)` and the
-illusion collapses: a `default_factory` leaves no class attribute, so
-the loaded object raises an `AttributeError` the first time anything
+lookup while `restored.__dict__` has no `layer`. With the field
+written `layer: list[str] = field(default_factory=list)`, the default
+disappears: a `default_factory` leaves no class attribute, so the
+loaded object raises an `AttributeError` the first time anything
 reads `layer`.
 
 What pickle skips is every line of code the class runs at
 construction. `pickle.loads()` builds a bare instance and writes the
 saved `__dict__` into it, so `__init__()` never runs and neither does
-`__post_init__()`. The empty title sails through a class written to
+`__post_init__()`. The empty title loads into a class written to
 reject it.
 
-`copy.replace()` is the contrast the chapter's partial restore relies
-on. It goes through `__replace__()`, which constructs a real instance
+`copy.replace()`, which the chapter's partial restore uses, behaves
+differently. It goes through `__replace__()`, which constructs a real instance
 and therefore runs `__post_init__()`, so `__post_init__()` catches the
 invalid state the moment anything derives a new state from it. That is
 the general shape: a constructor validates the value that enters your

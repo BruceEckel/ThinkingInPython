@@ -6,7 +6,7 @@
 ![](_images/coupling_36)
 
 Undo is a feature users expect and programmers dread.
-*Memento* is the undo mechanism that keeps encapsulation intact.
+*Memento* is an undo mechanism that keeps encapsulation intact.
 The *originator* (the object with state) produces a *memento*,
 an opaque snapshot of itself.
 A *caretaker* (the undo machinery) stores mementos and returns one on request,
@@ -127,7 +127,7 @@ if __name__ == "__main__":
 `copy.copy(sketch)` looks like a shortcut for `save()`,
 but it copies only the `Sketch`: the copy's `strokes` is the same list,
 the alias from `aliased_snapshot.py` one level down.
-One level is enough because a stroke is a string.
+`save()`'s one-level copy is enough because a stroke is a string.
 An originator holding containers inside containers needs `copy.deepcopy()` in `save()`,
 and pays the cost described in [A Snapshot Is Not a Reference](#a-snapshot-is-not-a-reference).
 
@@ -153,7 +153,7 @@ or build from scratch.
 Wrapping the tuple in a one-field data class makes `Memento` a class of its own at runtime.
 A parameter typed `tuple[str, ...]` still accepts any tuple of strings,
 whatever built it.
-A parameter typed `Memento` accepts the class alone,
+A parameter typed `Memento` accepts only a `Memento`,
 so the type checker reports a caretaker that passes some other tuple by mistake.
 Building a `Memento` takes an import of the class and a call to it,
 so no caretaker makes one by accident.
@@ -208,7 +208,8 @@ If you run the program anyway,
 it raises `AttributeError` at the first line that reads `.strokes`.
 The checker rejects the assignment to `checkpoint.strokes` too,
 and the runtime raises `FrozenInstanceError`.
-A record freezes the attribute, not just the tuple inside it.
+The tuple is immutable on its own;
+the record makes the attribute that holds it read-only too.
 
 ### Testing the Sketch
 
@@ -362,6 +363,8 @@ so a state too large to copy per keystroke needs a mutable originator and an exp
 So does a state whose class belongs to someone else: a widget tree,
 a database row, or any object whose class is theirs to design.
 Everywhere else, prefer the frozen value.
+
+Two tests check that `draw()` leaves the old `Drawing` as it was and that `replace()` carries the fields it does not name:
 
 ```python
 # test_frozen_sketch.py
@@ -552,8 +555,8 @@ An editor's undo is often narrower.
 Undo the drawing, but keep the rename.
 `History` cannot express that,
 because it stores and returns whole states and reads no field of them.
-The answer has to come from the state itself,
-and for a state that defines `__replace__()`, `copy.replace()` supplies it:
+The state must supply the answer,
+and a state that defines `__replace__()` supplies it through `copy.replace()`:
 
 ```python
 # partial_restore.py
@@ -613,7 +616,7 @@ print(restored == drawing, restored is drawing)
 You can write the bytes from `pickle.dumps()` to a file and load them in a different process,
 days later.
 The round trip produces a different object with the same value,
-which is all a memento needs, since a data class compares by value.
+which is all a memento needs, since a record compares by value.
 
 Only unpickle data you trust, because the format can execute code.
 For untrusted storage or other languages,
@@ -682,7 +685,7 @@ That name is now bound to `SketchV2`.
 `pickle.loads()` builds a bare `SketchV2` with `__new__()`,
 skipping `__init__()`, and copies in the fields the old bytes had.
 The fields go straight into the object's `__dict__`, past the frozen check:
-`frozen=True` installs a `__setattr__()` that raises `FrozenInstanceError`,
+a record's generated `__setattr__()` raises `FrozenInstanceError`,
 and pickle writes `__dict__` directly.
 The same shortcut skips `__post_init__()`,
 so a memento saved before a field gained its validation loads a value that the validation never saw.
@@ -705,7 +708,7 @@ The added-field drift in `pickle_drift.py` raises `AttributeError` when somethin
 This one raises nothing, and the data is wrong.
 Renaming a field is a delete and an add at once, with both effects.
 The old name becomes a ghost, and the new one is missing,
-so `repr()` itself raises `AttributeError`.
+so the generated `repr()` raises `AttributeError`.
 Running the same reassignment backwards shows the deleted field:
 
 ```python
@@ -739,7 +742,7 @@ a versioned step that changes the table shape and its data together,
 instead of letting a query discover the mismatch.
 
 When drift or the security risk is too much to accept,
-other libraries handle the two separately.
+other libraries address both.
 `msgspec` and `pydantic` both validate on load.
 A shape mismatch raises a clear error at the boundary,
 instead of the delayed `AttributeError` from `pickle_drift.py`.
