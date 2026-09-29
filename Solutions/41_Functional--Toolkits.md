@@ -121,7 +121,7 @@ failure `groupby()` has on unsorted input cannot occur. The two `"b"`
 entries land in the same list no matter how far apart they arrive, and
 the caller needs no `sorted()` call to make that happen.
 
-The cost is everything `groupby()` is buying. `grouped()` reads the
+The cost is the streaming `groupby()` provides. `grouped()` reads the
 whole input before returning anything, so an infinite source makes it
 loop forever, and a finite one sits entirely in memory. `groupby()`
 yields each group as it arrives and keeps only the current one, which
@@ -160,7 +160,15 @@ expect(TypeError, deep_sum,
 every argument has to be hashable. A `list` is not hashable, because
 its contents can change after the cache stores it, and a mutated key
 no longer hashes to the slot holding its entry. The call fails
-before `deep_sum()`'s body runs at all.
+before `deep_sum()`'s body runs.
+
+`ty` reports the same problem before the program runs. A cached
+function's parameters are declared `Hashable`, so both calls draw
+`invalid-argument-type`: "Expected `Hashable`, found `list[Nested]`"
+on the recursive call, and the same diagnostic, naming the literal's
+inferred type, on the list passed through `expect()`. The two
+`# type: ignore` comments silence those diagnostics so the listing
+can run and show the exception.
 
 For caching to be possible, `Nested` must describe an
 immutable structure: `type Nested = int | tuple[Nested, ...]`, with
@@ -234,7 +242,7 @@ print(first)
 
 What the `rng` parameter preserves is determinism. Two callers who
 pass `random.Random(0)` still get identical schedules, so the function
-remains testable by calling it twice and comparing, exactly as before.
+remains testable by calling it twice and comparing, as before.
 The first round is the same one `pair_rounds.py` prints, because
 `random.Random(0)` is what `seed: int = 0` builds internally. Nothing
 about the algorithm reaches outside its arguments for randomness.

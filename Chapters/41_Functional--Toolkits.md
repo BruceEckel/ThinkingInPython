@@ -12,7 +12,7 @@ composable pieces.
 This chapter tours both toolkits,
 then turns to two techniques that pair naturally with them:
 lazy evaluation and recursion.
-A case study closes it, putting several of the pieces to work on one problem.
+A case study then puts several of the pieces to work on one problem.
 
 ## The `functools` Toolkit
 
@@ -56,7 +56,11 @@ so `reduce(add, [], 0)` returns `0`.
 Remembers every result forever,
 so a repeated call with the same arguments returns the stored result without running the body.
 `@cache` works correctly only for pure functions.
-A cached function with side effects runs those effects on the first call and never again.
+A cached function with side effects runs those effects on the first call with each set of arguments,
+and skips them on every repeat.
+The cache is a dictionary keyed on the arguments,
+so every argument must be hashable:
+passing a `list` raises `TypeError: unhashable type: 'list'`.
 
 ```python
 # functools_cache.py
@@ -89,7 +93,7 @@ the branching and the repeated subproblem are what matter, not the arithmetic.
 
 One trap: decorating a method with `@cache` keys every entry on `self`,
 so the cache holds a strong reference to each instance forever.
-That is the *lapsed listener* leak of [The Pythonic *Observer*](30_Patterns--Observer.md#the-pythonic-observer-callables-in-a-list)
+That is the *lapsed listener* leak of [*Observer*](30_Patterns--Observer.md#lapsed-listeners)
 in cache form.
 For the usual case, one expensive value per instance,
 use [`@cached_property`](#cached_property).
@@ -138,7 +142,8 @@ shout("hello")
 #: hello!
 ```
 
-`functools.Placeholder` reserves a position so you can fix a later positional argument and leave an earlier one for the caller.
+[`functools.Placeholder`](40_Functional--Foundations.md#leaving-a-gap-with-placeholder)
+reserves a position so you can fix a later positional argument and leave an earlier one for the caller.
 
 ### `partialmethod`
 
@@ -147,10 +152,10 @@ The descriptor binds `self` automatically when you access it on an instance.
 
 ```python
 # functools_partialmethod.py
-from dataclasses import dataclass
 from functools import partialmethod
+from record import record
 
-@dataclass
+@record
 class Text:
     value: str
 
@@ -209,7 +214,14 @@ and the next access recomputes it from the current state.
 
 A first access from two threads at once is a race.
 `cached_property` takes no lock,
-so both threads can find an empty slot and both run the property's code.
+so both threads can find no stored value and both run the property's code.
+
+The stored value goes in the instance's `__dict__`, so the class must have one.
+A record is slotted and has none:
+the first access to a `cached_property` on a `@record` raises a `TypeError`,
+as `slots_limits.py` in [When Slots Does Not Fit](18_Techniques--Performance.md#when-slots-does-not-fit)
+shows.
+`Lazy` is a `@dataclass` for that reason, and because the demo assigns to `x.n`.
 
 ### `wraps`
 
@@ -245,9 +257,9 @@ that same `print()` reports `wrapper - None`,
 and every tool that reports a function by its name or docstring,
 `help()` among them, reports the wrapper too.
 The name `greet` refers to `wrapper` either way;
-`wraps()` is what copies the original's name and docstring onto it.
+`wraps()` copies the original's name and docstring onto it.
 `wraps()` also sets `greet.__wrapped__` to the original function,
-so a tool that wants the original, such as `inspect.signature()`, can reach it.
+so a tool that needs the original, such as `inspect.signature()`, can reach it.
 
 ### `cmp_to_key`
 
@@ -265,6 +277,13 @@ words = ["a", "ccc", "bb"]
 print(sorted(words, key=cmp_to_key(by_length_desc)))
 #: ['ccc', 'bb', 'a']
 ```
+
+This ordering has a key:
+`sorted(words, key=len, reverse=True)` gives the same list,
+and a key function is the better choice whenever one exists.
+`cmp_to_key()` is for a comparator that arrives from older code,
+and for an ordering with no per-element key,
+where the rule is a comparison between two elements.
 
 ### `total_ordering`
 
@@ -329,7 +348,8 @@ print(describe("hi"), "|", describe(5))
 
 `singledispatch()` dispatches on the first argument alone,
 so a rule that depends on two types needs [*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md).
-A keyword-only argument cannot select the implementation either.
+That argument must be passed by position:
+`describe(value=5)` raises `TypeError: describe requires at least 1 positional argument`.
 
 ### `singledispatchmethod`
 
@@ -360,8 +380,9 @@ print(d.describe("hi"), "|", d.describe(5))
 never on `self`, so the type of `value` selects the implementation,
 just as it does for the plain `describe()` in `functools_singledispatch.py`.
 
-`itertools` does the same for iteration: ready-made pieces you compose,
-instead of loops you write and test again.
+`itertools` does for iteration what `functools` does for functions:
+it supplies ready-made pieces you compose,
+in place of loops you write and test again.
 
 ## The `itertools` Toolkit
 
@@ -416,7 +437,7 @@ Two differences from a list slice.
 `islice()` rejects negative indices with a `ValueError`,
 since a negative index counts from an end the iterable may never reach.
 And it consumes what it passes over.
-Give it an iterator, and that iterator resumes where the slice stopped;
+An iterator you pass to `islice()` resumes where the slice stopped;
 a list slice leaves the list as it was.
 
 ### `count`
@@ -590,6 +611,11 @@ print(list(starmap(pow, [(2, 5), (3, 2)])))
 #: [32, 9]
 ```
 
+`map(pow, [2, 3], [5, 2])` gives the same answer from two parallel iterables,
+one per parameter.
+`starmap()` is for arguments that arrive paired,
+as the tuples `zip()` produces or the rows of a file.
+
 ### `zip_longest`
 
 Zips iterables of different lengths,
@@ -616,8 +642,9 @@ Python offers three ways to zip inputs of different lengths,
 and the choice says what a mismatch means.
 Plain `zip()` stops at the shortest and raises no error,
 the right choice when the extra elements are genuinely surplus.
-`zip(a, b, strict=True)` raises `ValueError: zip() argument 2 is shorter than argument 1`,
-the right choice when equal lengths are an invariant you want checked.
+`zip(a, b, strict=True)` raises a `ValueError`,
+which for the two lists above reads `zip() argument 2 is shorter than argument 1`.
+It is the right choice when equal lengths are an invariant you want checked.
 `zip_longest()` pads,
 the right choice when the missing elements are data in their own right.
 
@@ -640,8 +667,10 @@ print([(k, list(g)) for k, g in groupby(["b", "a", "b"])])
 
 The second line shows what unsorted input does:
 `"b"` comes back as two separate groups, and no error reports it.
-`sorted(data, key=keyfunc)` before `groupby(data, key=keyfunc)` is the fix,
+`groupby(sorted(data, key=keyfunc), key=keyfunc)` is the fix,
 with the same key function both times.
+`sorted()` returns a new list and leaves `data` as it was,
+so `groupby()` must receive what `sorted()` returns.
 
 The comprehension's `list(g)` is necessary.
 Each group is a view onto the one underlying iterator,
@@ -677,7 +706,7 @@ When one consumer runs far ahead of the other,
 [Iterators](23_Patterns--Iterators.md#what-tee-buffers)
 measures that buffering and adds a third caution:
 `tee()` shares one unlocked buffer between its branches,
-so handing them to separate threads corrupts it.
+so two threads advancing them at the same time can raise a `RuntimeError`.
 
 ### `product`
 
@@ -754,7 +783,7 @@ because `takewhile()` pulls one more total,
 the 590 from the batch `(169, 196, 225)`, finds it over the limit,
 and discards it.
 A pull-based pipeline reads one value further than it keeps,
-and here that one value was a batch of three squares.
+and here that one value is a batch of three squares.
 
 ## Lazy Evaluation
 
@@ -831,7 +860,8 @@ print(sys.getrecursionlimit())
 ```
 
 A `for` loop computes this same factorial in about the same number of lines and stays in one frame at any `n`.
-Python pushes a frame for every recursive call, including one in tail position.
+Python pushes a frame for every recursive call, including one in tail position,
+where a language with *tail-call optimization* reuses the caller's frame.
 The stack has a cap, so deep recursion raises a `RecursionError`.
 `sys.setrecursionlimit()` raises that limit when the depth is genuine;
 a long flat sequence calls for a loop or one of the `itertools` tools.
@@ -883,7 +913,7 @@ the call stack tracks the depth.
 
 Pair up participants for an activity across several rounds,
 and avoid repeating a pairing until every possible pairing has occurred once.
-A small program solves it by combining several of these ideas:
+A small program solves this scheduling problem by combining several of the chapter's tools:
 an infinite generator for the rounds,
 `islice()` to take as many of them as you want,
 `combinations()` for the pairs inside a group,
@@ -1021,7 +1051,7 @@ for i, grouping in enumerate(trios):
 
 Called with `size=3`, the same function schedules trios instead.
 Seven students make two threes with one left over, so one group grows to four.
-Growing one group is the same join-instead-of-sit-out choice `pair_rounds.py` makes.
+Growing one group is the join-instead-of-sit-out choice `pair_rounds.py` shows for pairs.
 
 The last case asks for groups of five from a roster of two:
 
@@ -1034,7 +1064,8 @@ print(next(group_rounds(["Ana", "Bo"], 5)))
 ```
 
 A roster smaller than one full group is the extreme case of joining instead of sitting out.
-The `while len(pool) >= size` loop exits at once and leaves `groups` empty.
+In `group_rounds()`,
+the `while len(pool) >= size` loop exits at once and leaves `groups` empty.
 The `if pool and not groups` line then creates the one group the leftovers fold into.
 If you delete that line,
 `min()` receives an empty sequence and raises a `ValueError`.
@@ -1055,7 +1086,7 @@ The `cache` entry's rule, pure functions only, is the reason:
 a function that reads mutable state is impure, however simple its body looks.
 
 The general version needs memory, where the circle method needs a round number:
-which pair sits where in round `r` follows from `r` alone.
+in the circle method, which pair sits where in round `r` follows from `r` alone.
 `group_rounds()` needs the `history` `Counter`,
 because no formula takes a round number and returns the grouping of arbitrary size that keeps every pair's meeting count lowest.
 To reach round `100`,

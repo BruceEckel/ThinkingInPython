@@ -1,8 +1,8 @@
 # functools_partialmethod.py
-from dataclasses import dataclass
 from functools import partialmethod
+from record import record
 
-@dataclass
+@record
 class Text:
     value: str
 
