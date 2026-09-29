@@ -40,7 +40,7 @@
   <text x="386.0" y="78.0" font-size="10.5" fill="#8b1a1a" text-anchor="middle">notify</text>
   <line x1="457.0" y1="162.0" x2="457.0" y2="124.4" stroke="#7a6e62" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#gl-hollow-muted)"/>
   <line x1="435.7" y1="162.0" x2="375.3" y2="108.2" stroke="#1a1612" stroke-width="3.8" marker-end="url(#gl-solid)"/>
-  <text x="370.8" y="143.0" font-size="10.5" fill="#8b1a1a" text-anchor="middle">attach</text>
+  <text x="348.8" y="149.0" font-size="10.5" fill="#8b1a1a" text-anchor="middle">subject: Subject</text>
   <text x="518" y="26" font-size="13" font-weight="bold" font-style="italic" fill="#1a1612" text-anchor="start">Factory Method</text>
   <line x1="518" y1="32" x2="748" y2="32" stroke="#c8bfb0" stroke-width="0.8"/>
   <rect x="530" y="50" width="80" height="36" fill="none" stroke="#8b1a1a" stroke-width="1.6" rx="4"/>

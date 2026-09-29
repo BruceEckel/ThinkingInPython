@@ -347,7 +347,8 @@ The context names an interface and each algorithm satisfies it,
 so adding an algorithm changes nothing that exists.
 
 *Observer* has one, and it points from the observer to the subject.
-An observer must know its subject to attach to it.
+An observer names its subject's class in `update()`,
+whose `subject` parameter receives the subject that changed.
 The subject knows no observer:
 "All a subject knows is that it has a list of observers,
 each conforming to the simple interface of the abstract `Observer` class."
