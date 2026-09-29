@@ -547,50 +547,143 @@ to define.
 ```python
 # exercise_8.py
 import random
-from enum import Enum, StrEnum, auto
-from typing import ClassVar
+from enum import StrEnum
+from typing import Any, ClassVar, override
 
 class Outcome(StrEnum):
     WIN = "win"
     LOSE = "lose"
     DRAW = "draw"
 
-class Weapon(Enum):
-    # Definition order is the ranking cycle
-    JARGON = auto()
-    PLAY = auto()
-    INVENT_FEATURE = auto()
-    SELL_IMAGINARY_PRODUCT = auto()
-    EDICT = auto()
-    SCHEDULE = auto()
+class Weapon:
+    def compete(self, item: Any) -> Outcome:
+        raise NotImplementedError
+    def __str__(self) -> str:
+        return type(self).__name__
 
-def weapon_outcome(a: Weapon, b: Weapon) -> Outcome:
-    "A weapon beats the previous two in the cycle."
-    diff = (a.value - b.value) % len(Weapon)
-    if diff == 0:
+class Jargon(Weapon):
+    @override
+    def compete(self, item: Any) -> Outcome:
+        return item.eval_jargon(self)
+    def eval_jargon(self, item: Any) -> Outcome:
         return Outcome.DRAW
-    if diff in (1, 2):
+    def eval_play(self, item: Any) -> Outcome:
         return Outcome.WIN
-    if diff == 3:  # Opposite: neither beats the other
+    def eval_invent_feature(self, item: Any) -> Outcome:
+        return Outcome.WIN
+    def eval_sell_imaginary_product(self,
+                                    item: Any) -> Outcome:
         return Outcome.DRAW
-    return Outcome.LOSE
+    def eval_edict(self, item: Any) -> Outcome:
+        return Outcome.LOSE
+    def eval_schedule(self, item: Any) -> Outcome:
+        return Outcome.LOSE
+
+class Play(Weapon):
+    @override
+    def compete(self, item: Any) -> Outcome:
+        return item.eval_play(self)
+    def eval_jargon(self, item: Any) -> Outcome:
+        return Outcome.LOSE
+    def eval_play(self, item: Any) -> Outcome:
+        return Outcome.DRAW
+    def eval_invent_feature(self, item: Any) -> Outcome:
+        return Outcome.WIN
+    def eval_sell_imaginary_product(self,
+                                    item: Any) -> Outcome:
+        return Outcome.WIN
+    def eval_edict(self, item: Any) -> Outcome:
+        return Outcome.DRAW
+    def eval_schedule(self, item: Any) -> Outcome:
+        return Outcome.LOSE
+
+class InventFeature(Weapon):
+    @override
+    def compete(self, item: Any) -> Outcome:
+        return item.eval_invent_feature(self)
+    def eval_jargon(self, item: Any) -> Outcome:
+        return Outcome.LOSE
+    def eval_play(self, item: Any) -> Outcome:
+        return Outcome.LOSE
+    def eval_invent_feature(self, item: Any) -> Outcome:
+        return Outcome.DRAW
+    def eval_sell_imaginary_product(self,
+                                    item: Any) -> Outcome:
+        return Outcome.WIN
+    def eval_edict(self, item: Any) -> Outcome:
+        return Outcome.WIN
+    def eval_schedule(self, item: Any) -> Outcome:
+        return Outcome.DRAW
+
+class SellImaginaryProduct(Weapon):
+    @override
+    def compete(self, item: Any) -> Outcome:
+        return item.eval_sell_imaginary_product(self)
+    def eval_jargon(self, item: Any) -> Outcome:
+        return Outcome.DRAW
+    def eval_play(self, item: Any) -> Outcome:
+        return Outcome.LOSE
+    def eval_invent_feature(self, item: Any) -> Outcome:
+        return Outcome.LOSE
+    def eval_sell_imaginary_product(self,
+                                    item: Any) -> Outcome:
+        return Outcome.DRAW
+    def eval_edict(self, item: Any) -> Outcome:
+        return Outcome.WIN
+    def eval_schedule(self, item: Any) -> Outcome:
+        return Outcome.WIN
+
+class Edict(Weapon):
+    @override
+    def compete(self, item: Any) -> Outcome:
+        return item.eval_edict(self)
+    def eval_jargon(self, item: Any) -> Outcome:
+        return Outcome.WIN
+    def eval_play(self, item: Any) -> Outcome:
+        return Outcome.DRAW
+    def eval_invent_feature(self, item: Any) -> Outcome:
+        return Outcome.LOSE
+    def eval_sell_imaginary_product(self,
+                                    item: Any) -> Outcome:
+        return Outcome.LOSE
+    def eval_edict(self, item: Any) -> Outcome:
+        return Outcome.DRAW
+    def eval_schedule(self, item: Any) -> Outcome:
+        return Outcome.WIN
+
+class Schedule(Weapon):
+    @override
+    def compete(self, item: Any) -> Outcome:
+        return item.eval_schedule(self)
+    def eval_jargon(self, item: Any) -> Outcome:
+        return Outcome.WIN
+    def eval_play(self, item: Any) -> Outcome:
+        return Outcome.WIN
+    def eval_invent_feature(self, item: Any) -> Outcome:
+        return Outcome.DRAW
+    def eval_sell_imaginary_product(self,
+                                    item: Any) -> Outcome:
+        return Outcome.LOSE
+    def eval_edict(self, item: Any) -> Outcome:
+        return Outcome.LOSE
+    def eval_schedule(self, item: Any) -> Outcome:
+        return Outcome.DRAW
 
 class Inhabitant2:
-    WEAPONS: ClassVar[tuple[Weapon, ...]]
+    WEAPONS: ClassVar[tuple[type[Weapon], ...]]
 
     def __init__(self, rng: random.Random) -> None:
         self.rng = rng
 
     def get_weapon(self) -> Weapon:
-        return self.rng.choice(self.WEAPONS)
+        return self.rng.choice(self.WEAPONS)()
 
 class Dwarf2(Inhabitant2):
-    WEAPONS = (Weapon.JARGON, Weapon.PLAY)
+    WEAPONS = (Jargon, Play)
 class Elf2(Inhabitant2):
-    WEAPONS = (Weapon.INVENT_FEATURE,
-               Weapon.SELL_IMAGINARY_PRODUCT)
+    WEAPONS = (InventFeature, SellImaginaryProduct)
 class Troll2(Inhabitant2):
-    WEAPONS = (Weapon.EDICT, Weapon.SCHEDULE)
+    WEAPONS = (Edict, Schedule)
 
 class Project2:
     def __init__(self, seed: int = 0) -> None:
@@ -599,8 +692,7 @@ class Project2:
     def battle(
         self, a: Inhabitant2, b: Inhabitant2
     ) -> Inhabitant2 | None:
-        outcome = weapon_outcome(
-            a.get_weapon(), b.get_weapon())
+        outcome = a.get_weapon().compete(b.get_weapon())
         if outcome is Outcome.WIN:
             return a
         if outcome is Outcome.LOSE:
@@ -629,10 +721,36 @@ class Project2:
         survivors = [n for n, g in groups.items() if g]
         return survivors[0]
 
-p2 = Project2(seed=3)
-print(p2.meeting(group_size=5))
+if __name__ == "__main__":
+    print(Play().compete(Jargon()),
+          Jargon().compete(Play()),
+          Jargon().compete(SellImaginaryProduct()))
+    print(Project2(seed=3).meeting(group_size=5))
+#: win lose draw
 #: Troll
 ```
+
+`battle()` starts the two dispatches.
+`a.get_weapon().compete(...)` resolves the first weapon's type,
+and that class's `compete()` calls the `eval_*()` method named for it on the second weapon,
+which resolves the second type.
+As in `paper_scissors_rock.py`,
+each `eval_*()` method answers for the caller its name identifies,
+so `Jargon.eval_play()` returns `WIN` because play beats jargon.
+`Weapon` declares `compete()` so that `battle()` can call it on the `Weapon` that `get_weapon()` returns.
+The `eval_*()` methods stay undeclared,
+and their `item` parameters take `Any`, as the chapter's do.
+
+Six weapons take 42 methods,
+a `compete()` and six `eval_*()` methods in each class,
+and more than a hundred lines hold 36 answers.
+That length is the cost
+[Methods or Table](../Chapters/32_Patterns--Multiple_Dispatching.md#methods-or-table)
+weighs, at four times the chapter's nine answers.
+The answers grow with the square of the number of weapons.
+A seventh weapon would add an `eval_*()` method to each of the six classes,
+plus a new class of eight methods.
+Exercise 10 collects the same 36 answers in one place.
 
 The weapon ranking is a genuine cycle: nothing dominates everything,
 so no group can count on winning. At the group level the same cycle
@@ -759,80 +877,141 @@ you write once and a test every new `Item` forces you to edit.
 ```python
 # exercise_10.py
 import random
-from enum import Enum, StrEnum, auto
-from typing import ClassVar
+from typing import ClassVar, Final
+import exercise_8 as methods
+from exercise_8 import Outcome
 
-class Outcome(StrEnum):
-    WIN = "win"
-    LOSE = "lose"
-    DRAW = "draw"
+class Weapon:
+    def compete(self, item: Weapon) -> Outcome:
+        return OUTCOME[type(self), type(item)]
+    def __str__(self) -> str:
+        return type(self).__name__
 
-class Weapon(Enum):
-    # Definition order is the ranking cycle
-    JARGON = auto()
-    PLAY = auto()
-    INVENT_FEATURE = auto()
-    SELL_IMAGINARY_PRODUCT = auto()
-    EDICT = auto()
-    SCHEDULE = auto()
+class Jargon(Weapon):
+    pass
+class Play(Weapon):
+    pass
+class InventFeature(Weapon):
+    pass
+class SellImaginaryProduct(Weapon):
+    pass
+class Edict(Weapon):
+    pass
+class Schedule(Weapon):
+    pass
 
-def weapon_outcome(a: Weapon, b: Weapon) -> Outcome:
-    diff = (a.value - b.value) % len(Weapon)
-    if diff in (0, 3):  # Same or opposite: no winner
-        return Outcome.DRAW
-    return Outcome.WIN if diff in (1, 2) else Outcome.LOSE
+type Table = dict[
+    tuple[type[Weapon], type[Weapon]], Outcome]
 
-OUTCOME_TABLE: dict[tuple[Weapon, Weapon], Outcome] = {
-    (wa, wb): weapon_outcome(wa, wb)
-    for wa in Weapon for wb in Weapon
+W: Final[Outcome] = Outcome.WIN
+L: Final[Outcome] = Outcome.LOSE
+D: Final[Outcome] = Outcome.DRAW
+ORDER: Final[tuple[type[Weapon], ...]] = (
+    Jargon, Play, InventFeature,
+    SellImaginaryProduct, Edict, Schedule)
+GRID: Final[tuple[tuple[Outcome, ...], ...]] = (
+    (D, L, L, D, W, W),  # Jargon
+    (W, D, L, L, D, W),  # Play
+    (W, W, D, L, L, D),  # InventFeature
+    (D, W, W, D, L, L),  # SellImaginaryProduct
+    (L, D, W, W, D, L),  # Edict
+    (L, L, D, W, W, D),  # Schedule
+)
+OUTCOME: Final[Table] = {
+    (a, b): cell
+    for a, row in zip(ORDER, GRID, strict=True)
+    for b, cell in zip(ORDER, row, strict=True)
 }
 
 class Inhabitant2:
-    WEAPONS: ClassVar[tuple[Weapon, ...]]
+    WEAPONS: ClassVar[tuple[type[Weapon], ...]]
 
     def __init__(self, rng: random.Random) -> None:
         self.rng = rng
 
     def get_weapon(self) -> Weapon:
-        return self.rng.choice(self.WEAPONS)
+        return self.rng.choice(self.WEAPONS)()
 
 class Dwarf2(Inhabitant2):
-    WEAPONS = (Weapon.JARGON, Weapon.PLAY)
+    WEAPONS = (Jargon, Play)
 class Elf2(Inhabitant2):
-    WEAPONS = (Weapon.INVENT_FEATURE,
-               Weapon.SELL_IMAGINARY_PRODUCT)
+    WEAPONS = (InventFeature, SellImaginaryProduct)
+class Troll2(Inhabitant2):
+    WEAPONS = (Edict, Schedule)
 
-def battle_table(
-    a: Inhabitant2, b: Inhabitant2
-) -> Inhabitant2 | None:
-    outcome = OUTCOME_TABLE[a.get_weapon(), b.get_weapon()]
-    if outcome is Outcome.WIN:
-        return a
-    if outcome is Outcome.LOSE:
-        return b
-    return None
+class Project2:
+    def __init__(self, seed: int = 0) -> None:
+        self.rng = random.Random(seed)
 
-# Confirm table and formula agree on every combination:
-mismatches = [
-    (wa, wb) for wa in Weapon for wb in Weapon
-    if OUTCOME_TABLE[wa, wb] != weapon_outcome(wa, wb)
-]
-print(len(OUTCOME_TABLE), "entries, agrees with formula:",
-      not mismatches)
-#: 36 entries, agrees with formula: True
+    def battle(
+        self, a: Inhabitant2, b: Inhabitant2
+    ) -> Inhabitant2 | None:
+        outcome = a.get_weapon().compete(b.get_weapon())
+        if outcome is Outcome.WIN:
+            return a
+        if outcome is Outcome.LOSE:
+            return b
+        return None  # Draw: no winner this round
 
-rng = random.Random(5)
-winner = battle_table(Dwarf2(rng), Elf2(rng))
-print(type(winner).__name__)
-#: Elf2
+    def meeting(self, group_size: int) -> str:
+        kinds = {"Dwarf": Dwarf2, "Elf": Elf2,
+                 "Troll": Troll2}
+        groups = {
+            name: [cls(self.rng) for _ in range(group_size)]
+            for name, cls in kinds.items()}
+        while sum(1 for g in groups.values() if g) > 1:
+            names = [n for n, g in groups.items() if g]
+            for i in range(len(names)):
+                for j in range(i + 1, len(names)):
+                    n1, n2 = names[i], names[j]
+                    if not groups[n1] or not groups[n2]:
+                        continue
+                    winner = self.battle(
+                        groups[n1][0], groups[n2][0])
+                    if winner is groups[n1][0]:
+                        groups[n2].pop(0)
+                    elif winner is groups[n2][0]:
+                        groups[n1].pop(0)
+        survivors = [n for n, g in groups.items() if g]
+        return survivors[0]
+
+def by_methods(a: type[Weapon],
+               b: type[Weapon]) -> Outcome:
+    return getattr(methods, a.__name__)().compete(
+        getattr(methods, b.__name__)())
+
+wrong = [pair for pair, result in OUTCOME.items()
+         if by_methods(*pair) != result]
+print(len(OUTCOME), "pairs agree with exercise 8:",
+      not wrong)
+#: 36 pairs agree with exercise 8: True
+print(Project2(seed=3).meeting(group_size=5))
+#: Troll
 ```
 
-`OUTCOME_TABLE` holds the same 36 answers `weapon_outcome()` computes
-on the fly, one entry per ordered pair of the six `Weapon` members.
-Generating the table from the formula, rather than writing all 36
-entries by hand, makes the two agree by construction while keeping the
-lookup itself trivial: `battle_table()` no longer calls any per-weapon
-logic, only indexes into a dictionary.
+The weapons shrink to six empty classes,
+and `Weapon.compete()` makes one lookup keyed on both types,
+as in `paper_scissors_rock_table.py`.
+The listing writes the 36 answers by hand,
+as a grid rather than as 36 dictionary rows.
+Each row of `GRID` holds one weapon's results as the caller,
+against the weapons in `ORDER`,
+and the comprehension turns the grid into the `(caller, opponent)` keys that `compete()` looks up.
+A cell holds what one of exercise 8's `eval_*()` methods returns:
+row `Jargon`, column `Play`, holds the `LOSE` that `Play.eval_jargon()` returns.
+`by_methods()` plays each pair through exercise 8's classes,
+finding them by name as exercise 3 does,
+and all 36 answers agree.
+`Troll2`, `battle()`, and `meeting()` repeat exercise 8's code,
+so the seeded meeting draws the same weapons and `Troll` wins again.
+
+The grid holds in six lines the answers that exercise 8 spreads across 42 methods.
+A seventh weapon adds an empty class, a row, and a column,
+where exercise 8 needs a method in every existing class and an eight-method class.
 [Methods or Table](../Chapters/32_Patterns--Multiple_Dispatching.md#methods-or-table)
 reaches the same conclusion: for a ruleset that is a fixed set of
 answers, the table is shorter and easier to maintain.
+Exercise 8's version keeps one advantage.
+Its `eval_*()` methods receive the competing objects,
+so a weapon whose result depends on its own state fits there,
+while this grid would need exercise 9's callable cells.

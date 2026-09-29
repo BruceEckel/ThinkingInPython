@@ -53,7 +53,6 @@ Chapters/Static_Types	Static_Types	5	What a missing type parameter default costs
 Chapters/Static_Types	Static_Types	9	Narrowing a local copy of an attribute
 Solutions/Class_Attributes	Class_Attributes	2	A third subclass with no override
 Solutions/Composite_and_Interpreter	Composite_and_Interpreter	3	`Neg` and `Div`
-Solutions/Composite_and_Interpreter	Composite_and_Interpreter	3	`Neg` and `Div`
 Solutions/Confidence	Confidence	1	Which process ran each call
 Solutions/Design_Patterns	Design_Patterns	2	Subtracting a pattern
 Solutions/Effect_Management	Effect_Management	2	Threading a `Log` Effect through by hand
@@ -62,11 +61,20 @@ Solutions/Functions	Functions	6	Unpacking both containers at a call site
 Solutions/Modules_and_Packages	Modules_and_Packages	4	Renaming `module.py` to `Module.py`
 Solutions/Multiple_Dispatching	Multiple_Dispatching	1	Adding `Lizard` to the table version
 Solutions/Multiple_Dispatching	Multiple_Dispatching	1	Adding `Lizard` to the table version
+Solutions/Multiple_Dispatching	Multiple_Dispatching	10	Exercise 8, rebuilt on a table
 Solutions/Multiple_Dispatching	Multiple_Dispatching	2	Adding `Lizard` to the double-dispatch version
+Solutions/Multiple_Dispatching	Multiple_Dispatching	3	Sixteen matchups in `EXPECTED`
 Solutions/Multiple_Dispatching	Multiple_Dispatching	3	Sixteen matchups in `EXPECTED`
 Solutions/Multiple_Dispatching	Multiple_Dispatching	3	Sixteen matchups in `EXPECTED`
 Solutions/Multiple_Dispatching	Multiple_Dispatching	7	A business-modeling environment
 Solutions/Multiple_Dispatching	Multiple_Dispatching	8	Weapons, battles, and a full meeting
+Solutions/Multiple_Dispatching	Multiple_Dispatching	8	Weapons, battles, and a full meeting
+Solutions/Multiple_Dispatching	Multiple_Dispatching	8	Weapons, battles, and a full meeting
+Solutions/Multiple_Dispatching	Multiple_Dispatching	8	Weapons, battles, and a full meeting
+Solutions/Multiple_Dispatching	Multiple_Dispatching	8	Weapons, battles, and a full meeting
+Solutions/Multiple_Dispatching	Multiple_Dispatching	8	Weapons, battles, and a full meeting
+Solutions/Multiple_Dispatching	Multiple_Dispatching	8	Weapons, battles, and a full meeting
+Solutions/Multiple_Dispatching	Multiple_Dispatching	9	A table of callables
 Solutions/Observer	Observer	3	An `announce()` that survives a failing responder
 Solutions/Observer	Observer	3	An `announce()` that survives a failing responder
 Solutions/Observer	Observer	3	An `announce()` that survives a failing responder
