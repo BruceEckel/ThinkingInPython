@@ -46,15 +46,15 @@ print(list(find(root, "src")))
 #: ['root/src', 'root/src']
 ```
 
-`find()` follows `walk()`'s shape exactly: a `match` with one case per
+`find()` follows `walk()`'s shape: a `match` with one case per
 `Node` type, recursing with `yield from` into each `Directory`'s
 entries. The difference is that a `Directory` can itself match `name`,
 where `walk()` only ever yields file paths. Matching also continues
 *into* a matched directory rather than stopping there, so a directory
 named `"src"` and a file beneath it named `"src"` can both appear in
-the results. The second call shows the same duplication in its
-simplest form: `root` holds two separate directories named `"src"`,
-and both come back as `root/src`.
+the results. The second call shows a simpler duplication: `root`
+holds two separate directories named `"src"`, and both come back as
+`root/src`, so a path alone does not say which one matched.
 
 ## 2. A `Symlink` node
 
@@ -114,7 +114,7 @@ print(list(walk(tree)))
 ```
 
 Adding `Symlink` to the union makes every `match` whose `case _` calls
-`assert_never()` fail type checking, exactly as the chapter predicts.
+`assert_never()` fail type checking, as the chapter says.
 In both `disk_usage()` and `walk()`, `ty` reports that `entry` could
 be a `Symlink` that no case handles, until you add the case shown
 here. Deciding what a link should do is a judgment call, not
@@ -129,7 +129,6 @@ loop forever if a link ever pointed back at one of its own ancestors.
 
 ```python
 # exercise_3.py
-from __future__ import annotations
 from typing import assert_never
 from record import record
 
@@ -189,7 +188,7 @@ type Expr = Num | Var | Add | Mul | Neg | Div
 def wrap(value: Expr | int) -> Expr:
     return Num(value) if isinstance(value, int) else value
 
-def evaluate(e: Expr, **env: int) -> float:
+def evaluate(e: Expr, /, **env: int) -> float:
     match e:
         case Num(value):
             return value
@@ -238,6 +237,8 @@ def simplify(e: Expr) -> Expr:
                 case (Num(a), Num(b)):
                     return Num(a + b)
                 case _:
+                    if lhs is left and rhs is right:
+                        return e
                     return Add(lhs, rhs)
         case Mul(left, right):
             lhs, rhs = simplify(left), simplify(right)
@@ -249,6 +250,8 @@ def simplify(e: Expr) -> Expr:
                 case (Num(a), Num(b)):
                     return Num(a * b)
                 case _:
+                    if lhs is left and rhs is right:
+                        return e
                     return Mul(lhs, rhs)
         case Neg(operand):
             match simplify(operand):
@@ -256,11 +259,16 @@ def simplify(e: Expr) -> Expr:
                     return Num(-a)
                 case Neg(deeper):
                     return deeper  # Double negation
+                case inner if inner is operand:
+                    return e
                 case inner:
                     return Neg(inner)
         case Div(left, right):
-            # Division by Num(0) is deliberately left alone:
-            return Div(simplify(left), simplify(right))
+            # Folds nothing, even over Num(0)
+            lhs, rhs = simplify(left), simplify(right)
+            if lhs is left and rhs is right:
+                return e
+            return Div(lhs, rhs)
         case _:
             assert_never(e)
 
@@ -274,26 +282,28 @@ print(to_infix(simplify(Neg(Neg(x)) + Num(0))))
 #: x
 ```
 
-`to_infix()` needs a case for each too. `simplify()` is the
-interesting one: for `Neg`, a constant operand folds
-(`Neg(Num(a))` → `Num(-a)`), and a double negation cancels
-(`Neg(Neg(inner))` → `inner`). For `Div`, division by `Num(0)` should
-*not* fold to anything, not even an error. `simplify()` is a static
-rewrite that runs before the caller binds any variable to a number.
-It cannot know whether a symbolic expression dividing by zero will
-ever actually execute with that zero denominator. The division might
-sit inside a branch that never runs, or the "zero" might really be a
-variable that later never happens to equal zero. The honest move is
-to leave `Div(lhs, Num(0))` exactly as it is and let the eventual
-`evaluate()` call raise `ZeroDivisionError` if the division ever
-runs, the same way Python itself defers that error to runtime rather
-than refusing to parse `1 / x` at all.
+`evaluate()` and `to_infix()` gain one case per new node, and
+`evaluate()` now returns a `float`, since `/` produces one.
+`simplify()` is the interesting one. For `Neg`, a constant operand
+folds (`Neg(Num(a))` → `Num(-a)`), and a double negation cancels
+(`Neg(Neg(inner))` → `inner`). Every case keeps the chapter's `is`
+guard, so an unchanged subtree is still shared.
+
+For `Div`, `simplify()` folds nothing. A quotient of two `int`s is
+usually not an `int`, so it does not fit in a `Num`, and division by
+`Num(0)` has no value to fold to. Nor should `simplify()` raise the
+`ZeroDivisionError` itself. It rewrites a tree without evaluating it,
+and a caller can simplify an expression it never evaluates, so an
+exception raised there would report an error in a computation that
+never runs. Leaving `Div(lhs, Num(0))` in the tree lets `evaluate()`
+raise `ZeroDivisionError` when the division runs, and not before.
+Python treats `1 / 0` in source the same way: the compiler accepts
+it, and the error arrives when the line executes.
 
 ## 4. Precedence-aware `to_infix()`
 
 ```python
 # exercise_4.py
-from __future__ import annotations
 from typing import Final, assert_never
 from record import record
 
@@ -375,14 +385,12 @@ need parens around another `Add`. Passing `prec + 1` (rather than
 occasionally print one redundant pair of parentheses around a
 right-hand child at the *same* precedence as its parent
 (`x + (x + 1)` instead of the fully terse `x + x + 1`), but it never
-omits a pair that changes the expression's meaning, and that
-guarantee is what matters.
+omits a pair that changes the expression's meaning.
 
 ## 5. `derivative(e, name)`
 
 ```python
 # exercise_5.py
-from __future__ import annotations
 from typing import assert_never
 from record import record
 
@@ -449,6 +457,8 @@ def simplify(e: Expr) -> Expr:
                 case (Num(a), Num(b)):
                     return Num(a + b)
                 case _:
+                    if lhs is left and rhs is right:
+                        return e
                     return Add(lhs, rhs)
         case Mul(left, right):
             lhs, rhs = simplify(left), simplify(right)
@@ -460,7 +470,11 @@ def simplify(e: Expr) -> Expr:
                 case (Num(a), Num(b)):
                     return Num(a * b)
                 case _:
+                    if lhs is left and rhs is right:
+                        return e
                     return Mul(lhs, rhs)
+        case _:
+            assert_never(e)
 
 def derivative(e: Expr, name: str) -> Expr:
     match e:
@@ -487,23 +501,22 @@ print(to_infix(simplify(d)))
 #: (x + x)
 ```
 
-`derivative()` walks the tree exactly like `evaluate()` and
+`derivative()` walks the tree like `evaluate()` and
 `to_infix()`, one case per node type, but produces another `Expr`
 instead of a number or a string. A `Num` never changes, so its
 derivative is always `0`. The derivative of `Var(n)` is `1` with
 respect to itself and `0` with respect to every other variable.
 `Add`'s case is the sum rule. `Mul`'s case is the product rule, which
-must keep both the derivative *and* the original, undifferentiated
-subtree on each side, because the product rule genuinely needs both.
+keeps both the derivative *and* the original, undifferentiated
+subtree on each side, because the rule multiplies one by the other.
 Running the raw result through `simplify()` turns `((1 * x) + (x * 1))`
 into the much more readable `(x + x)` (reaching `2 * x` takes a further
 rule, "combine like terms," that this `simplify()` does not
 implement). A full `Expr` that also includes `Neg` and `Div`
 (exercise 3's additions) needs a quotient rule for `Div`, which
 produces a squared denominator beyond what `simplify()`'s current
-rules handle. This solution leaves that rule for a further exercise,
-the same way exercise 3 leaves `to_infix()`'s and `simplify()`'s new
-cases to prose rather than code.
+rules handle, so this solution leaves that rule for a further
+exercise.
 
 ## 6. Declining with `NotImplemented`
 
@@ -774,13 +787,17 @@ language adds.
 case, so `assert_never()` still type-checks. A string marker leaves
 `case _` reachable and the guarantee gone.
 
-`sys.setrecursionlimit()` is the other escape, and it is a worse one.
-The limit is a guard rather than a budget, because each Python frame
-consumes C stack. Raise it past what the thread's stack can hold and
-a catchable `RecursionError` becomes a segmentation fault with no
-traceback. The limit is also global, so a library that raises it
-changes the failure mode of code that never asked. The iterative walk
-moves the frames onto the heap, where the only limit is memory.
+`sys.setrecursionlimit()` avoids the error for `evaluate()`, and it
+costs more than it appears to. A call from one Python function to
+another uses no C stack, so with the limit raised to `10**9`,
+`evaluate()` walks a million-level tree. Anything that recurses
+through C still stops: `repr()` or `hash()` on that same tree raises
+a `RecursionError` that reports a stack overflow, whatever the limit
+says. Each pending level also holds a frame and a fresh `env` dict,
+so memory grows with depth. The limit is global too, so a library
+that raises it changes the behavior of code that never asked. The
+iterative walk keeps its pending work in one list and changes no
+setting that other code can see.
 
 ## 9. Reopening the set of node types
 

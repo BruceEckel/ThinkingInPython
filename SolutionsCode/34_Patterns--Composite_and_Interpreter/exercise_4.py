@@ -1,5 +1,4 @@
 # exercise_4.py
-from __future__ import annotations
 from typing import Final, assert_never
 from record import record
 

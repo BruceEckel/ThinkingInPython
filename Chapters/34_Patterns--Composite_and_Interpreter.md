@@ -15,7 +15,8 @@ and evaluating the sentence walks the tree.
 but *Interpreter* is *Composite* with meaning attached.
 In Python both reduce to one technique: a union of records for the nodes,
 and recursive functions that `match` on them.
-Both patterns build on [exhaustive matching](13_Techniques--Pattern_Matching.md#exhaustive-matching).
+Each of those `match` statements is [exhaustive](13_Techniques--Pattern_Matching.md#exhaustive-matching),
+so the type checker reports a node kind that no case handles.
 
 ## The Classic Composite
 
@@ -192,8 +193,8 @@ the [*expression problem*](13_Techniques--Pattern_Matching.md#the-expression-pro
 [Rethinking Objects](20_Patterns--Rethinking_Objects.md#polymorphism-without-inheritance)
 works out the same split with shapes,
 including the `assert_never()` in each `case _`.
-Add a `Symlink` to the `Node` union,
-and every function whose `case _` calls `assert_never()` fails type checking until it handles one
+If you add a `Symlink` to the `Node` union,
+every function whose `case _` calls `assert_never()` fails type checking until it handles one
 (see exercise 2).
 
 `walk()` is a generator, so traversing a composite is lazy.
@@ -257,7 +258,7 @@ It lacks the structure.
 A `Path` is an immutable value that names a location and holds no entries.
 The tree lives in the operating system's filesystem,
 and `iterdir()` asks the OS for the children each time you call it.
-No `Path` method recurses through that tree the way `disk_usage()` does.
+No `Path` method adds up a result over that tree the way `disk_usage()` does.
 On a directory, `stat().st_size` reports the size of the directory entry rather than the size of its contents,
 so the recursion falls to you:
 
@@ -348,7 +349,7 @@ Each walker's `assert_never()` needs the union to verify that its `match` covers
 `Expr` is the contract.
 A base class is an open set that any new subclass silently joins,
 so if you annotate `evaluate()` with `Operators` instead,
-`assert_never()` stops working.
+`assert_never()` fails type checking even with a case for every node.
 
 ### Operators That Build Nodes
 
@@ -629,7 +630,7 @@ Simplifying both children first, then matching the results,
 applies the rule to the `Num(0)` the recursion just produced.
 That order is how the demo's `((1 * x) + (0 * y))` collapses to `x`.
 
-A record blocks every field assignment, so `simplify()` never edits the input.
+A record blocks every field assignment, so `simplify()` cannot edit its input.
 `simplify()` returns a new tree that shares unchanged subtrees with the original.
 The `is` guard in each `case _` returns the node it received when both children simplified to themselves.
 The guard tests identity with `is` rather than equality with `==`.
@@ -707,7 +708,8 @@ built by nesting one `t`-string inside another.
 as the `query` in the listing below shows,
 so nesting is the one way to produce a `Template`-valued interpolation.
 A walker that loops over the top level must therefore also recurse into any value that is a `Template`.
-Everything else about walking a `Template` is the recursive `match` over node kinds that *Composite* uses.
+Everything else follows this chapter's walkers: one branch per node kind,
+and a recursive call where a node holds more nodes.
 
 Iterating a `Template` produces `str | Interpolation`,
 a closed union like `Node` with two members,
@@ -789,12 +791,12 @@ The reason is structural rather than clever:
 so a value never reaches the `sql` list.
 Written as an f-string,
 the same line is one finished `str` with the attack already inside it.
-The only remaining defense is inspecting the result to guess which characters the program wrote and which a user did.
+Any defense then has to inspect that string and guess where the user's text begins.
 
 That separation is the general argument for handing a consumer the structure instead of the answer.
 A finished string no longer records which characters the program wrote and which a user did,
 and the safety decision depends on that distinction.
-Textbooks usually present the *Interpreter* pattern as a way to add operations to a language.
+Textbooks usually present the *Interpreter* pattern as a way to evaluate sentences in a small language.
 Here it keeps a decision available to whoever should make it.
 
 ## Exercises
@@ -831,7 +833,7 @@ Here it keeps a decision available to whoever should make it.
     Then write `evaluate_iterative()`,
     which walks the same tree with an explicit stack and no recursion,
     and check that the two agree on a small expression.
-    Raising the limit with `sys.setrecursionlimit()` is another way out.
+    Raising the limit with `sys.setrecursionlimit()` also avoids the error.
     Say what it costs.
 9.  A plugin package needs to add its own entry types to `filesystem.py` without editing your code.
     Sketch what breaks, then write the version of `disk_usage()` that supports it.

@@ -1,5 +1,4 @@
 # exercise_5.py
-from __future__ import annotations
 from typing import assert_never
 from record import record
 
@@ -66,6 +65,8 @@ def simplify(e: Expr) -> Expr:
                 case (Num(a), Num(b)):
                     return Num(a + b)
                 case _:
+                    if lhs is left and rhs is right:
+                        return e
                     return Add(lhs, rhs)
         case Mul(left, right):
             lhs, rhs = simplify(left), simplify(right)
@@ -77,7 +78,11 @@ def simplify(e: Expr) -> Expr:
                 case (Num(a), Num(b)):
                     return Num(a * b)
                 case _:
+                    if lhs is left and rhs is right:
+                        return e
                     return Mul(lhs, rhs)
+        case _:
+            assert_never(e)
 
 def derivative(e: Expr, name: str) -> Expr:
     match e:

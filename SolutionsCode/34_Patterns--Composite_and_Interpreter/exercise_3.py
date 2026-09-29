@@ -1,5 +1,4 @@
 # exercise_3.py
-from __future__ import annotations
 from typing import assert_never
 from record import record
 
@@ -59,7 +58,7 @@ type Expr = Num | Var | Add | Mul | Neg | Div
 def wrap(value: Expr | int) -> Expr:
     return Num(value) if isinstance(value, int) else value
 
-def evaluate(e: Expr, **env: int) -> float:
+def evaluate(e: Expr, /, **env: int) -> float:
     match e:
         case Num(value):
             return value
@@ -108,6 +107,8 @@ def simplify(e: Expr) -> Expr:
                 case (Num(a), Num(b)):
                     return Num(a + b)
                 case _:
+                    if lhs is left and rhs is right:
+                        return e
                     return Add(lhs, rhs)
         case Mul(left, right):
             lhs, rhs = simplify(left), simplify(right)
@@ -119,6 +120,8 @@ def simplify(e: Expr) -> Expr:
                 case (Num(a), Num(b)):
                     return Num(a * b)
                 case _:
+                    if lhs is left and rhs is right:
+                        return e
                     return Mul(lhs, rhs)
         case Neg(operand):
             match simplify(operand):
@@ -126,11 +129,16 @@ def simplify(e: Expr) -> Expr:
                     return Num(-a)
                 case Neg(deeper):
                     return deeper  # Double negation
+                case inner if inner is operand:
+                    return e
                 case inner:
                     return Neg(inner)
         case Div(left, right):
-            # Division by Num(0) is deliberately left alone:
-            return Div(simplify(left), simplify(right))
+            # Folds nothing, even over Num(0)
+            lhs, rhs = simplify(left), simplify(right)
+            if lhs is left and rhs is right:
+                return e
+            return Div(lhs, rhs)
         case _:
             assert_never(e)
 
