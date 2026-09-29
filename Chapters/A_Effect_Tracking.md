@@ -17,7 +17,7 @@ builds the part of it that needs no type inference.
 
 ## The Tracking Problem
 
-[Effect Management Systems](44_Effects--Effect_Management.md#tracking-and-management)
+[Tracking and Management](44_Effects--Effect_Management.md#tracking-and-management)
 separates tracking from management.
 Tracking tells you which Effects a function can perform,
 and management lets you replace what those Effects do.
@@ -40,13 +40,15 @@ The second line makes the rule recursive,
 and that recursion is the propagation [Effect Management](44_Effects--Effect_Management.md#native-effect-management)
 describes.
 
-Koka and the other native systems follow this rule because they implement algebraic effects,
+Koka and the other native systems compute this rule as part of algebraic effects,
 the design [Native Effect Management](44_Effects--Effect_Management.md#native-effect-management)
 names.
 An algebraic effect is a set of operations declared as an interface.
 A handler gives those operations their meaning,
 and handling removes the effect from the row.
-The design has two halves, the row and the handlers.
+The design has two halves, the row and the handlers,
+and a language can have one without the other:
+OCaml 5 has handlers and records no row in a function's type.
 *Algebraic effect tracking* is the row half: the rule above,
 computed and checked for every function.
 
@@ -74,8 +76,10 @@ How far `Annotated` can move that work toward the compiler is the open question.
 
 ## Why a Native System Tracks Best
 
-Native algebraic effect tracking has four properties,
-and each later section finds one of them missing from the `Annotated` design.
+Native algebraic effect tracking has four properties.
+The `Annotated` design has none of them,
+and the first four problems in [What a Checker for the Row Must Do](#what-a-checker-for-the-row-must-do)
+take them in the same order.
 
 **The compiler infers the row.**
 Koka computes a function's row from its body,
@@ -83,7 +87,7 @@ so most functions need no written row.
 You write a row when you want a constraint,
 such as requiring that a function stay pure.
 [Effects by Hand](44_Effects--Effect_Management.md#effects-by-hand)
-counts five signatures to edit when a `Log` Effect appears three levels down.
+counts five signatures to edit when a helper four calls below `main()` needs a `Log` Effect.
 In Koka the same change edits no signature you left to inference.
 
 **A row can contain a variable.**
@@ -104,7 +108,8 @@ Programmers wrap the exception in an unchecked one, which the compiler accepts.
 
 **Handling subtracts.**
 In the Koka greeting program of [Native Effect Management](44_Effects--Effect_Management.md#native-effect-management),
-`main()` handles `ask` and `tell`, so its row is `<console,exn>`.
+`main()` handles `ask` and `tell`, so neither appears in its row,
+`<console,exn>`.
 The handler syntax and the subtraction are one construct,
 so they cannot disagree.
 
@@ -221,6 +226,13 @@ where the same mistake draws an `invalid-yield` error.
 Until a tool reads it, a row inside `Annotated` is a structured comment.
 `greet()`'s row is right because I typed it correctly.
 
+`shout()`'s empty row has a second reading.
+A function that declares `performs()` with no arguments states that it is pure,
+and `row()` returns the same empty list for it.
+The list alone does not separate a function declared pure from one that declares nothing.
+[Decide What Untracked Code Performs](#decide-what-untracked-code-performs)
+weighs what a checker can assume about the second kind.
+
 Notice also that `ask()` calls `input()` directly.
 `Ask` is a label here.
 It has no methods, and nothing can substitute another implementation for it.
@@ -249,7 +261,7 @@ or a caller holding the base type performs Effects the base row omits.
 
 Working all of that out is type inference, which `ty` performs on every run.
 The tool therefore belongs inside the type checker.
-Of the three checkers, mypy has a plugin interface;
+Of the three checkers this book names, mypy has a plugin interface;
 `ty` and Pyright have none at this writing.
 A tool that runs outside the checker has two choices.
 It can repeat the checker's inference,
@@ -335,6 +347,8 @@ with handling(Ask, Scripted()):
     greet()
 ```
 
+`Scripted` is the test stand-in from `ask_tell.py`,
+which answers every prompt with a fixed name.
 Inside that block the tool would remove `Ask` from the row.
 The subtraction is sound if the handler intercepts the Effect,
 and that interception requires `ask()` to consult the installed handler instead of calling `input()`.
@@ -379,7 +393,7 @@ The Effect tool would give the same answer, with the same loss.
 
 The tool could run in three places.
 The first is inside the type checker,
-a place [Resolve Every Call](#resolve-every-call) ruled out for `ty`.
+a place [Resolve Every Call](#resolve-every-call) rules out for `ty`.
 
 The second is a separate static tool, run beside `ty` and `ruff`.
 Every problem above applies to it in full.
@@ -418,7 +432,7 @@ Nothing connects the two readers.
 No check confirms that the row one tool verified is the set of dependencies the other one binds.
 
 [The Tracking Problem](#the-tracking-problem)
-divided algebraic effects into a row half and a handler half.
+divides algebraic effects into a row half and a handler half.
 `Annotated` can carry the row, and no metadata can supply a handler.
 A native handler receives the continuation and decides what to do with it.
 [Stateless in Practice](47_Effects--Stateless_in_Practice.md#handlers-cannot-capture-the-continuation)
