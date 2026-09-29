@@ -12,3 +12,6 @@ def make_counter() -> Callable[[], int]:
 tally = make_counter()
 print(tally(), tally(), tally())
 #: 1 2 3
+fresh = make_counter()
+print(fresh())
+#: 1

@@ -11,7 +11,7 @@ and the function needs no mock or fixture to test.
 A cache from `functools`, or a sliding window from `itertools`,
 is code the library wrote for you,
 already correct on the edge case you would otherwise miss.
-A function that shares no state is already safe to run in parallel.
+A function that shares no state is safe to run in parallel.
 And you can reason about code built from small,
 checkable pieces by substitution, the same way you check a line of algebra.
 The functional style lets you keep loops, classes, and mutation.
@@ -109,7 +109,9 @@ print("ok")
 #: ok
 ```
 
-If you delete the second `total = 0`, the second assertion fails.
+If you delete the last `total = 0`,
+the second `running_total()` assertion fails:
+`total` is still 5 from the first call, so the second call returns 10.
 That line is the fixture the impure version needs, and purity removes it.
 `slope()` appears again later in the book:
 [Are Exceptions Impure?](44_Effects--Effect_Management.md#are-exceptions-impure)
@@ -153,6 +155,11 @@ The type checker rejects the direct form `p.x = 5` before the program runs.
 To show that the runtime rejects the assignment too,
 the listing writes it as `setattr(p, "x", 5)`, which the type checker accepts.
 The original `p` stays untouched, and `moved` is a separate value.
+Restating every field works for a two-field `Point`.
+For a record with many fields,
+[`copy.replace()`](12_Techniques--Data_Classes_as_Types.md#the-general-form-of-replace)
+builds the new value from the old one and the fields that change,
+as in `copy.replace(p, x=p.x + 10)`.
 When a value never changes after creation,
 two parts of a program can share one without coordinating,
 and concurrent code needs no lock to read it.
@@ -252,6 +259,10 @@ Python therefore sets their `__hash__` to `None`.
 Freezing a dataclass lets it keep contents-based equality and a hash at the same time.
 [`@record`](18_Techniques--Performance.md#record) freezes `Point`,
 so `Point(3, 4)` can key `distances`.
+Python computes that hash from the fields, so every field must be hashable too.
+A record that holds a `list` is frozen and still raises a `TypeError` when hashed.
+`frozen_leaky.py` in [Rethinking Objects](20_Patterns--Rethinking_Objects.md#the-immutability-solution)
+demonstrates that failure.
 Contents-based equality together with a stable hash is why a dictionary key,
 a cache entry, or a value shared across threads is normally a tuple or a record.
 
@@ -311,7 +322,7 @@ operations["%"] = mod
 print(operations["+"](6, 4), operations["-"](6, 4),
       operations["//"](6, 4), operations["%"](6, 4))
 #: 10 2 1 2
-# A missing key is a plain KeyError, no else branch:
+# A missing key is a KeyError, no else branch:
 with expected(KeyError):
     operations["^"](6, 4)
 #: [KeyError] '^'
@@ -320,8 +331,8 @@ with expected(KeyError):
 Supporting a new operator means adding a row to the table,
 whether the literal holds that row or a later line adds it,
 as the `operations["%"]` line does here.
-The dispatch code itself never changes.
-A lookup of a missing key raises a plain `KeyError`,
+The dispatch code stays the same.
+A lookup of a missing key raises a `KeyError`,
 the case an `if`/`elif` chain handles with a trailing `else`.
 The same structure underlies [the dictionary factory](27_Patterns--Factory.md#the-pythonic-factory-a-dictionary)
 and the plugin registries that let a program grow without editing its core.
@@ -346,7 +357,8 @@ A lambda's value is locality.
 When a transformation is one short expression,
 a lambda keeps it at the call site, where the reader already is,
 instead of defining it as a named function elsewhere.
-`sorted(words, key=lambda w: w.lower())` states the sort order right where the code sorts.
+`sorted(words, key=lambda w: (len(w), w))` states the sort order,
+by length and then alphabetically, right where the code sorts.
 Naming that one-liner adds a line, a name to invent,
 and a definition to look up, and changes nothing about the sort.
 For anything larger, write a `def`.
@@ -392,7 +404,8 @@ which [Containers](03_Foundations--Containers.md)
 shows reordering the list in place and returning `None`.
 `sorted()` builds a new list and leaves its input as it was.
 
-For these cases Python offers a lookalike you should usually prefer,
+When you would write a fresh lambda for `map()` or `filter()`,
+Python offers a lookalike you should usually prefer,
 the [comprehension](16_Techniques--Comprehensions.md).
 `[n * n for n in numbers]` says more directly what `map()` plus a fresh lambda says,
 and `[n for n in numbers if n % 2 == 0]` replaces the `filter()` call the same way.
@@ -485,9 +498,13 @@ def make_counter() -> Callable[[], int]:
 tally = make_counter()
 print(tally(), tally(), tally())
 #: 1 2 3
+fresh = make_counter()
+print(fresh())
+#: 1
 ```
 
-Each call to `make_counter()` builds an independent counter with its own `count`.
+Each call to `make_counter()` builds an independent counter with its own `count`:
+`fresh` starts at 1 after `tally` has reached 3.
 
 `increment()` is impure on purpose, to contrast with `withdraw()`.
 `withdraw()` mutates a module-level name that any code can assign.
@@ -508,12 +525,18 @@ so without a declaration, `count += 1` makes `count` a fresh local variable,
 reads that local before anything has assigned it,
 and fails with `UnboundLocalError`.
 `nonlocal count` redirects the assignment to the enclosing function's variable.
+`global` does the same for a module-level name,
+as [Names Inside a Function](05_Foundations--Functions.md#names-inside-a-function)
+shows, and the two are not interchangeable.
+With `global count` in its place,
+`increment()` looks for a module-level `count`, finds none,
+and raises a `NameError`.
 
 Forgetting the declaration is the usual mistake when a closure first assigns to a captured name.
 The runtime message,
 "cannot access local variable 'count' where it is not associated with a value,"
 names a local variable instead of the missing declaration.
-The type checker's report is the more useful one.
+The type checker finds the same mistake before the program runs.
 If you delete the `nonlocal` line,
 `ty` reports `Name 'count' used when not defined` on the `count += 1` line.
 
@@ -568,7 +591,8 @@ and `partial()` fills positional arguments from the left, so before 3.14,
 fixing the third argument meant fixing the first two as well.
 `functools.Placeholder` (Python 3.14 and later)
 is a marker that reserves a position for the caller.
-The listing below carries two `# type: ignore` comments:
+The type checker does not follow `Placeholder`,
+so the listing carries two `# type: ignore` comments:
 
 ```python
 # placeholder.py

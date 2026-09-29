@@ -58,12 +58,11 @@ with expected(KeyError):
 #: [KeyError] '^'
 ```
 
-You call `operations["*"](6, 4)` exactly the way you call the other
-four entries, and the calling code stays as it was. Supporting a new
-operator really is just adding one row to the table, as the chapter
-claims. `expected()` from the shared `exceptions` helper catches the
-missing-key `KeyError`, the same way it does in the chapter's
-`dispatch.py`.
+You call `operations["*"](6, 4)` the way you call the other four
+entries, and the calling code stays as it was. Supporting the new
+operator takes one function and one row in the table. `expected()`
+from the shared `exceptions` helper catches the missing-key
+`KeyError`, as it does in the chapter's `dispatch.py`.
 
 ## 3. A fourth independent closure
 
@@ -153,6 +152,11 @@ Fixing `high` alone is the case that needs a `Placeholder`.
 the opposite of leaving them to the caller.
 `partial(clamp, Placeholder, Placeholder, 100)` is the version that
 works, and it is what `Placeholder` exists for.
+
+The `# type: ignore` is there because `ty` finds the mistake earlier
+than the runtime does. It reports `positional-only-parameter-as-kwarg`
+on `partial(clamp, high=100)`, the line that builds the partial, where
+the runtime waits for the call.
 
 ## 6. `Final` locks the name, not the object
 
@@ -248,8 +252,9 @@ print(list(raw))
 ```
 
 Printing `raw` directly shows `<map object at 0x...>` rather than any
-values, because `map()` returns a lazy iterator and its `__repr__` has
-nothing to report. The second `list(raw)` is the more dangerous half:
+values, because `map()` returns a lazy iterator that has computed
+nothing yet, so its `repr()` shows only the type and an address. The
+second `list(raw)` is the more dangerous half:
 it returns `[]` and raises no error. The first `list(raw)` consumed
 the iterator, and nothing rewinds it, so any later pass sees an
 exhausted object and silently produces nothing. A comprehension hands
@@ -337,7 +342,7 @@ print([r.celsius for r in data])
 ```
 
 `colder_than()` mirrors `warmer_than()`, and `partial()` turns each
-into the one-argument callable `filter()` wants. Chaining the two
+into the one-argument callable `filter()` requires. Chaining the two
 filters leaves only `b`, whose 25.0 Celsius sits inside the band:
 `a` is too cold and `c` is too warm. The two filters commute, because
 each one tests the same untouched Celsius value, so swapping the

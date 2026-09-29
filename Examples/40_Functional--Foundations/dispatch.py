@@ -21,7 +21,7 @@ operations["%"] = mod
 print(operations["+"](6, 4), operations["-"](6, 4),
       operations["//"](6, 4), operations["%"](6, 4))
 #: 10 2 1 2
-# A missing key is a plain KeyError, no else branch:
+# A missing key is a KeyError, no else branch:
 with expected(KeyError):
     operations["^"](6, 4)
 #: [KeyError] '^'
