@@ -3,7 +3,7 @@
 > Something changes, and something else is interested in that change.
 > The *Observer* pattern connects the two.
 
-![](_images/coupling_30)
+![](_images/observer_story)
 
 *Observer* decouples code that changes state from code that reacts to that state change.
 An *observer* attaches to a *subject*.
@@ -529,7 +529,7 @@ An ordinary `weakref.ref(plot.redraw)` is dead the moment it is created:
 so Python collects it at once and the reference returns `None`.
 While `plot` is alive, `weak` forwards the reading to it.
 Once `plot` is gone, `ref()` returns `None` and `weak` unsubscribes itself,
-which is safe mid-notification because `announce()` loops over a copy.
+which is safe mid-notification because `announce()` iterates through a copy.
 The `ValueError` confirms the subscription is gone:
 `unsubscribe()` finds nothing left to remove.
 
@@ -665,7 +665,7 @@ print(log)
 `FixedBroadcaster` is a record, so nothing can rebind its `responders` field,
 and the tuple in that field cannot change.
 The constructor settles the set of responders.
-`announce()` loops over the tuple with no copy,
+`announce()` iterates through the tuple with no copy,
 because no responder can unsubscribe mid-notification.
 The lambda needs no named reference,
 since there is no `unsubscribe()` to match it.

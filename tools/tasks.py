@@ -210,6 +210,7 @@ def gate(v: Vars) -> None:
     py("tools.check_all", "widths", "records", "--paths", "Solutions")
     py("tools.coupling_panels", "--check")
     py("tools.state_machine_figure", "--check")
+    py("tools.observer_story_figure", "--check")
     py("tools.check_quoted_diagnostics")
     py("tools.exercise_refs")
     py("tools.reflow_prose", "--write")
@@ -1050,7 +1051,8 @@ def records(v: Vars) -> None:
       "tools/coupling_panels.py; `tip fix-coupling-panels` regenerates,"
       " `tip coupling-panels-png` rasterizes to look")
 def coupling_panels(v: Vars) -> None:
-    """The coupling-notation panel at the top of each pattern chapter (23-36)
+    """The coupling-notation panel at the top of each pattern chapter (23-36,
+    except 30, which opens with tools/observer_story_figure.py's storyboard)
     is generated from a per-chapter spec in tools/coupling_panels.py into
     resources/images/coupling_NN.svg. The spec names that chapter's classes and
     functions, so a listing rename means editing the spec and regenerating;
@@ -1093,6 +1095,24 @@ def state_machine_figure(v: Vars) -> None:
       secondary=True)
 def fix_state_machine_figure(v: Vars) -> None:
     py("tools.state_machine_figure")
+
+
+@task("Fail if resources/images/observer_story.svg differs from its spec "
+      "in tools/observer_story_figure.py; `tip fix-observer-story-figure`"
+      " regenerates")
+def observer_story_figure(v: Vars) -> None:
+    """Chapter 30 opens with a four-frame storyboard in place of a coupling
+    panel, drawn by tools/observer_story_figure.py; this fails when the
+    committed SVG differs from what the script draws. In `gate` since
+    2026-09-29.
+    """
+    py("tools.observer_story_figure", "--check")
+
+
+@task("Regenerate resources/images/observer_story.svg from its spec",
+      secondary=True)
+def fix_observer_story_figure(v: Vars) -> None:
+    py("tools.observer_story_figure")
 
 
 @task("Run every Markdown check the gate enforces (ARGS=--list lists "

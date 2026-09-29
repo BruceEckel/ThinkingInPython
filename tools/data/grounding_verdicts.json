@@ -90,7 +90,7 @@
  },
  "734b3d881649c1ef": {
   "file": "21_Patterns--Design_Patterns.md",
-  "line": 500,
+  "line": 501,
   "target": "20_Patterns--Rethinking_Objects.md",
   "terms": [
    "Need"
@@ -271,7 +271,7 @@
  },
  "1f2521c2404fcd22": {
   "file": "30_Patterns--Observer.md",
-  "line": 465,
+  "line": 469,
   "target": "42_Functional--Error_Handling.md",
   "terms": [
    "announce"
@@ -282,7 +282,7 @@
  },
  "e8e91f728192b79c": {
   "file": "30_Patterns--Observer.md",
-  "line": 1461,
+  "line": 1553,
   "target": "17_Techniques--Metaprogramming.md",
   "terms": [
    "Notifying",

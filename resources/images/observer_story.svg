@@ -1,0 +1,122 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 730 770"
+     font-family="'JetBrains Mono', Consolas, monospace">
+  <title>Four steps of Observer: responders subscribe as callables, an assignment to celsius calls each one, none replies, and a new responder subscribes with no change to Thermometer</title>
+  <defs>
+    <marker id="os-ink" viewBox="0 0 18 12" refX="5" refY="6"
+            markerWidth="18" markerHeight="12" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0.5,0.5 L17.4,6 L0.5,11.5 L5,6 Z" fill="#1a1612" stroke="#1a1612" stroke-width="0.8" stroke-linejoin="round"/>
+    </marker>
+    <marker id="os-red" viewBox="0 0 18 12" refX="5" refY="6"
+            markerWidth="18" markerHeight="12" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0.5,0.5 L17.4,6 L0.5,11.5 L5,6 Z" fill="#8b1a1a" stroke="#8b1a1a" stroke-width="0.8" stroke-linejoin="round"/>
+    </marker>
+    <marker id="os-muted" viewBox="0 0 18 12" refX="17" refY="6"
+            markerWidth="18" markerHeight="12" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M1.5,1.5 L17,6 L1.5,10.5" fill="none" stroke="#7a6e62" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+  <path d="M452,16 H720 Q720,16 720,16 V188 Q720,188 720,188 H452 Q452,188 452,188 V16 Q452,16 452,16 Z" fill="#c8bfb0" fill-opacity="0.22" stroke="none"/>
+  <path d="M144,24 H386 Q390,24 390,28 V180 Q390,184 386,184 H144 Q140,184 140,180 V28 Q140,24 144,24 Z" fill="none" stroke="#1a1612" stroke-width="1.6"/>
+  <text x="152" y="44" font-size="13" fill="#1a1612" font-weight="bold" text-anchor="start">Thermometer</text>
+  <text x="285" y="54" font-size="10" fill="#7a6e62" text-anchor="start">_responders</text>
+  <rect x="285" y="60" width="95" height="26" fill="none" stroke="#1a1612" stroke-width="1.1" rx="3"/>
+  <text x="332.5" y="77" font-size="10.5" fill="#7a6e62" text-anchor="middle">callable</text>
+  <rect x="285" y="104" width="95" height="26" fill="none" stroke="#1a1612" stroke-width="1.1" rx="3"/>
+  <text x="332.5" y="121" font-size="10.5" fill="#7a6e62" text-anchor="middle">callable</text>
+  <rect x="285" y="148" width="95" height="26" fill="none" stroke="#c8bfb0" stroke-width="1.1" rx="3" stroke-dasharray="4,3"/>
+  <rect x="530" y="55" width="170" height="36" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
+  <rect x="530" y="99" width="170" height="36" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
+  <text x="22" y="54" font-size="30" fill="#8b1a1a" font-weight="bold" text-anchor="start">1</text>
+  <text x="22" y="76" font-size="13" fill="#1a1612" font-weight="bold" text-anchor="start">subscribe</text>
+  <text x="22" y="96" font-size="10.5" fill="#7a6e62" text-anchor="start">each responder</text>
+  <text x="22" y="111" font-size="10.5" fill="#7a6e62" text-anchor="start">is stored as</text>
+  <text x="22" y="126" font-size="10.5" fill="#7a6e62" text-anchor="start">a callable</text>
+  <text x="712" y="34" font-size="10" fill="#7a6e62" text-anchor="end">hidden from Thermometer</text>
+  <text x="152" y="80" font-size="11" fill="#1a1612" text-anchor="start">celsius: 20.0</text>
+  <text x="615" y="78" font-size="12.5" fill="#1a1612" text-anchor="middle">display</text>
+  <line x1="530" y1="73" x2="396.4" y2="73.0" stroke="#1a1612" stroke-width="1.3" marker-end="url(#os-ink)"/>
+  <text x="465" y="67" font-size="10" fill="#1a1612" text-anchor="middle">t.subscribe(display)</text>
+  <text x="615" y="122" font-size="12.5" fill="#1a1612" text-anchor="middle">alarm</text>
+  <line x1="530" y1="117" x2="396.4" y2="117.0" stroke="#1a1612" stroke-width="1.3" marker-end="url(#os-ink)"/>
+  <text x="465" y="111" font-size="10" fill="#1a1612" text-anchor="middle">t.subscribe(alarm)</text>
+  <line x1="16" y1="196" x2="714" y2="196" stroke="#c8bfb0" stroke-width="0.8"/>
+  <path d="M452,206 H720 Q720,206 720,206 V378 Q720,378 720,378 H452 Q452,378 452,378 V206 Q452,206 452,206 Z" fill="#c8bfb0" fill-opacity="0.22" stroke="none"/>
+  <path d="M144,214 H386 Q390,214 390,218 V370 Q390,374 386,374 H144 Q140,374 140,370 V218 Q140,214 144,214 Z" fill="none" stroke="#1a1612" stroke-width="1.6"/>
+  <text x="152" y="234" font-size="13" fill="#1a1612" font-weight="bold" text-anchor="start">Thermometer</text>
+  <text x="285" y="244" font-size="10" fill="#7a6e62" text-anchor="start">_responders</text>
+  <rect x="285" y="250" width="95" height="26" fill="none" stroke="#1a1612" stroke-width="1.1" rx="3"/>
+  <text x="332.5" y="267" font-size="10.5" fill="#7a6e62" text-anchor="middle">callable</text>
+  <rect x="285" y="294" width="95" height="26" fill="none" stroke="#1a1612" stroke-width="1.1" rx="3"/>
+  <text x="332.5" y="311" font-size="10.5" fill="#7a6e62" text-anchor="middle">callable</text>
+  <rect x="285" y="338" width="95" height="26" fill="none" stroke="#c8bfb0" stroke-width="1.1" rx="3" stroke-dasharray="4,3"/>
+  <rect x="530" y="245" width="170" height="36" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
+  <rect x="530" y="289" width="170" height="36" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
+  <text x="22" y="244" font-size="30" fill="#8b1a1a" font-weight="bold" text-anchor="start">2</text>
+  <text x="22" y="266" font-size="13" fill="#1a1612" font-weight="bold" text-anchor="start">change</text>
+  <text x="22" y="286" font-size="10.5" fill="#7a6e62" text-anchor="start">t.celsius = 150</text>
+  <text x="22" y="301" font-size="10.5" fill="#7a6e62" text-anchor="start">runs the setter,</text>
+  <text x="22" y="316" font-size="10.5" fill="#7a6e62" text-anchor="start">which announces</text>
+  <text x="152" y="270" font-size="11" fill="#8b1a1a" text-anchor="start">celsius: 150</text>
+  <text x="152" y="292" font-size="11" fill="#8b1a1a" text-anchor="start">announce(150)</text>
+  <text x="152" y="310" font-size="10" fill="#7a6e62" text-anchor="start">iterates</text>
+  <text x="152" y="324" font-size="10" fill="#7a6e62" text-anchor="start">through the list</text>
+  <text x="615" y="268" font-size="12.5" fill="#1a1612" text-anchor="middle">display</text>
+  <line x1="380" y1="263" x2="513.6" y2="263.0" stroke="#8b1a1a" stroke-width="1.6" marker-end="url(#os-red)"/>
+  <text x="455" y="257" font-size="10" fill="#8b1a1a" text-anchor="middle">responder(150)</text>
+  <text x="615" y="312" font-size="12.5" fill="#1a1612" text-anchor="middle">alarm</text>
+  <line x1="380" y1="307" x2="513.6" y2="307.0" stroke="#8b1a1a" stroke-width="1.6" marker-end="url(#os-red)"/>
+  <text x="455" y="301" font-size="10" fill="#8b1a1a" text-anchor="middle">responder(150)</text>
+  <line x1="16" y1="386" x2="714" y2="386" stroke="#c8bfb0" stroke-width="0.8"/>
+  <path d="M452,396 H720 Q720,396 720,396 V568 Q720,568 720,568 H452 Q452,568 452,568 V396 Q452,396 452,396 Z" fill="#c8bfb0" fill-opacity="0.22" stroke="none"/>
+  <path d="M144,404 H386 Q390,404 390,408 V560 Q390,564 386,564 H144 Q140,564 140,560 V408 Q140,404 144,404 Z" fill="none" stroke="#1a1612" stroke-width="1.6"/>
+  <text x="152" y="424" font-size="13" fill="#1a1612" font-weight="bold" text-anchor="start">Thermometer</text>
+  <text x="285" y="434" font-size="10" fill="#7a6e62" text-anchor="start">_responders</text>
+  <rect x="285" y="440" width="95" height="26" fill="none" stroke="#1a1612" stroke-width="1.1" rx="3"/>
+  <text x="332.5" y="457" font-size="10.5" fill="#7a6e62" text-anchor="middle">callable</text>
+  <rect x="285" y="484" width="95" height="26" fill="none" stroke="#1a1612" stroke-width="1.1" rx="3"/>
+  <text x="332.5" y="501" font-size="10.5" fill="#7a6e62" text-anchor="middle">callable</text>
+  <rect x="285" y="528" width="95" height="26" fill="none" stroke="#c8bfb0" stroke-width="1.1" rx="3" stroke-dasharray="4,3"/>
+  <rect x="530" y="435" width="170" height="36" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
+  <rect x="530" y="479" width="170" height="36" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
+  <text x="22" y="434" font-size="30" fill="#8b1a1a" font-weight="bold" text-anchor="start">3</text>
+  <text x="22" y="456" font-size="13" fill="#1a1612" font-weight="bold" text-anchor="start">respond</text>
+  <text x="22" y="476" font-size="10.5" fill="#7a6e62" text-anchor="start">each reacts in</text>
+  <text x="22" y="491" font-size="10.5" fill="#7a6e62" text-anchor="start">its own way;</text>
+  <text x="22" y="506" font-size="10.5" fill="#7a6e62" text-anchor="start">none replies</text>
+  <text x="152" y="460" font-size="11" fill="#1a1612" text-anchor="start">celsius: 150</text>
+  <text x="152" y="482" font-size="11" fill="#1a1612" text-anchor="start">announce()</text>
+  <text x="152" y="496" font-size="11" fill="#1a1612" text-anchor="start">returns</text>
+  <text x="615" y="458" font-size="12.5" fill="#8b1a1a" text-anchor="middle">display: 150C</text>
+  <line x1="530" y1="453" x2="384.0" y2="453.0" stroke="#7a6e62" stroke-width="1.3" stroke-dasharray="4,3" marker-end="url(#os-muted)"/>
+  <path d="M449,447 L461,459 M449,459 L461,447" stroke="#8b1a1a" stroke-width="2" fill="none"/>
+  <text x="615" y="502" font-size="12.5" fill="#8b1a1a" text-anchor="middle">alarm!</text>
+  <line x1="530" y1="497" x2="384.0" y2="497.0" stroke="#7a6e62" stroke-width="1.3" stroke-dasharray="4,3" marker-end="url(#os-muted)"/>
+  <path d="M449,491 L461,503 M449,503 L461,491" stroke="#8b1a1a" stroke-width="2" fill="none"/>
+  <text x="455" y="443" font-size="10" fill="#7a6e62" text-anchor="middle">returns None</text>
+  <line x1="16" y1="576" x2="714" y2="576" stroke="#c8bfb0" stroke-width="0.8"/>
+  <path d="M452,586 H720 Q720,586 720,586 V758 Q720,758 720,758 H452 Q452,758 452,758 V586 Q452,586 452,586 Z" fill="#c8bfb0" fill-opacity="0.22" stroke="none"/>
+  <path d="M144,594 H386 Q390,594 390,598 V750 Q390,754 386,754 H144 Q140,754 140,750 V598 Q140,594 144,594 Z" fill="none" stroke="#8b1a1a" stroke-width="1.6"/>
+  <text x="152" y="614" font-size="13" fill="#1a1612" font-weight="bold" text-anchor="start">Thermometer</text>
+  <text x="285" y="624" font-size="10" fill="#7a6e62" text-anchor="start">_responders</text>
+  <rect x="285" y="630" width="95" height="26" fill="none" stroke="#1a1612" stroke-width="1.1" rx="3"/>
+  <text x="332.5" y="647" font-size="10.5" fill="#7a6e62" text-anchor="middle">callable</text>
+  <rect x="285" y="674" width="95" height="26" fill="none" stroke="#1a1612" stroke-width="1.1" rx="3"/>
+  <text x="332.5" y="691" font-size="10.5" fill="#7a6e62" text-anchor="middle">callable</text>
+  <rect x="285" y="718" width="95" height="26" fill="none" stroke="#1a1612" stroke-width="1.1" rx="3"/>
+  <text x="332.5" y="735" font-size="10.5" fill="#7a6e62" text-anchor="middle">callable</text>
+  <rect x="530" y="625" width="170" height="36" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
+  <rect x="530" y="669" width="170" height="36" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
+  <rect x="530" y="713" width="170" height="36" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="4" stroke-dasharray="4,3"/>
+  <text x="22" y="624" font-size="30" fill="#8b1a1a" font-weight="bold" text-anchor="start">4</text>
+  <text x="22" y="646" font-size="13" fill="#1a1612" font-weight="bold" text-anchor="start">extend</text>
+  <text x="22" y="666" font-size="10.5" fill="#7a6e62" text-anchor="start">a new responder</text>
+  <text x="22" y="681" font-size="10.5" fill="#7a6e62" text-anchor="start">subscribes the</text>
+  <text x="22" y="696" font-size="10.5" fill="#7a6e62" text-anchor="start">same way</text>
+  <text x="152" y="650" font-size="11" fill="#8b1a1a" text-anchor="start">no edit to</text>
+  <text x="152" y="665" font-size="11" fill="#8b1a1a" text-anchor="start">Thermometer</text>
+  <text x="615" y="648" font-size="12.5" fill="#1a1612" text-anchor="middle">display</text>
+  <text x="615" y="692" font-size="12.5" fill="#1a1612" text-anchor="middle">alarm</text>
+  <text x="615" y="736" font-size="12.5" fill="#7a6e62" text-anchor="middle">plot</text>
+  <line x1="530" y1="731" x2="396.4" y2="731.0" stroke="#1a1612" stroke-width="1.3" marker-end="url(#os-ink)"/>
+  <text x="465" y="725" font-size="10" fill="#1a1612" text-anchor="middle">t.subscribe(plot)</text>
+</svg>

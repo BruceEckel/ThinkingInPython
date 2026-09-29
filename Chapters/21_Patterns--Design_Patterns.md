@@ -555,6 +555,9 @@ drawn from that chapter's own listings, with one more edge:
 a solid edge with a hollow head is a subclass naming its parent,
 the top rung of the ladder.
 In each figure, count the heavy edges and note which way they point.
+The exception is [*Observer*](30_Patterns--Observer.md),
+whose point is what happens over time,
+so its chapter opens with the steps of one notification instead.
 
 Part III closes with a [Pattern Catalog](39_Patterns--Pattern_Catalog.md),
 a name-and-intent index of the wider literature,

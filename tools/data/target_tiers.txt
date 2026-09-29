@@ -41,12 +41,14 @@ fix-eol	quick
 fix-imports	quick
 fix-listings	quick
 fix-pattern-names	quick
+fix-observer-story-figure	quick
 fix-state-machine-figure	quick
 footnotes	quick
 gate	long
 gate-status	quick
 lint	quick
 listings	quick
+observer-story-figure	quick
 output	normal
 output-check	normal
 pattern-names	quick

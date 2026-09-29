@@ -79,8 +79,19 @@ arrowhead markers) that marks anything outside the palette. Bruce
 names a figure by its number there or its file stem; it fails on a
 reference with no file and only reports a file no chapter references.
 
-Two figure sources are generated, and their SVGs are never edited by
-hand. Chapter 31's `stateMachine.svg` comes from
+Three figure sources are generated, and their SVGs are never edited by
+hand. Chapter 30's `observer_story.svg` comes from
+`tools/observer_story_figure.py` (since 2026-09-29), a four-frame
+storyboard that replaced the chapter's coupling panel: Bruce found the
+class-diagram panel told the reader too little and asked for a figure
+built for understanding the pattern, with no notation or precedent to
+follow. Its frames share one layout so only the changes stand out,
+and a shaded region marks what `Thermometer` cannot see. Its outer
+shapes are paths, since `tight_tips()` would read a tip on a slot
+inside the thermometer box as buried in the box. `tip
+observer-story-figure` (in `gate`, `verify-ch`, and `sweep`) fails on
+drift; `tip fix-observer-story-figure` regenerates.
+Chapter 31's `stateMachine.svg` comes from
 `tools/state_machine_figure.py` (since 2026-09-24): each transition
 names its two states, how far its curve bows, and where along the curve
 its label sits, and the script computes the rest. Edit the spec, run
@@ -89,7 +100,7 @@ since nothing detects two labels colliding; `tip state-machine-figure`
 (in `gate`, `verify-ch`, and `sweep`) fails on drift.
 
 The larger family of generated figures is the coupling-notation panel at
-the top of each pattern chapter, 23 through 36
+the top of each pattern chapter, 23 through 36 except 30
 (`resources/images/coupling_NN.svg`, merged 2026-09-23). Chapter 21's
 Coupling section (merged from Appendix C on 2026-09-24) defines the
 notation: a heavy edge names a

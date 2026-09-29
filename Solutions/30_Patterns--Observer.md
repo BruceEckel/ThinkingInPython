@@ -954,7 +954,7 @@ so `display` is still a function you can call directly.
 The load-time form removes three of the runtime problems:
 
 - `Broadcaster.announce()` copies its list because a responder can unsubscribe mid-notification.
-  The registry has no `unsubscribe()`, so the setter loops over `RESPONDERS` directly.
+  The registry has no `unsubscribe()`, so the setter iterates through `RESPONDERS` directly.
 - A lambda cannot be unsubscribed, a question that disappears along with `unsubscribe()`.
   The `@` form also needs a `def`, so every decorated responder has a name.
 - A lapsed listener is an object kept alive by its subscription.

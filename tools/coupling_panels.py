@@ -4,7 +4,7 @@ Chapter 21's Coupling section draws six GoF patterns in one
 notation: a heavy edge names a concrete class, a thin edge names an
 interface, a dashed edge with a hollow head satisfies one, and the red
 box is the part the pattern protects from change. This script draws
-one such panel per pattern chapter, 23 through 36, into
+one such panel per pattern chapter, 23 through 36 except 30, into
 `resources/images/coupling_NN.svg`, so the chapters share a figure the
 way they share a question: which edge does the pattern move, and where
 does it put it?
@@ -486,20 +486,10 @@ PANELS: dict[int, Panel] = {
          Edge("ProxyAdapter", "WhatIWant", "inherit"),
          Edge("ProxyAdapter", "WhatIHave", "heavy")),
     ),
-    30: Panel(
-        "Observer",
-        "Subject names only Observer, Thermometer inherits Subject, and "
-        "Display satisfies Observer while naming Subject in its signature",
-        (Node("Subject", C1, R1, w=110, kind="mark"),
-         Node("Observer", C2 + 24, R1, w=100, kind="interface"),
-         Node("Thermometer", C1, R3, w=110),
-         Node("Display", C2 + 24, R3, w=100)),
-        (Edge("Subject", "Observer", "thin", label="notify", dy=-8),
-         Edge("Thermometer", "Subject", "inherit"),
-         Edge("Display", "Observer", "realize"),
-         Edge("Display", "Subject", "heavy", label="subject: Subject", dx=-34,
-              dy=32, corner=True)),
-    ),
+    # Chapter 30 opens with a storyboard instead
+    # (tools/observer_story_figure.py): Bruce, 2026-09-29, found the
+    # static panel told the reader too little about a pattern whose
+    # point is what happens over time.
     31: Panel(
         "State Machine",
         "StateMachine names only State, each state satisfies it, and "

@@ -68,6 +68,7 @@ SWEEP_TARGETS: list[str] = [
     "checks",
     "coupling-panels",
     "state-machine-figure",
+    "observer-story-figure",
     "solutions-numbering",
     "ty",
     "lint",
