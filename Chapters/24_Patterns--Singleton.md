@@ -224,8 +224,8 @@ Three implementation notes:
    create it eagerly instead: call `settings()` once at import time,
    or use the module form, which the import system builds exactly once.
 
-3. A [lock](19_Techniques--Concurrency.md#the-gil-does-not-prevent-races) is the other fix for that race,
-   but not in the obvious place.
+3. A [lock](19_Techniques--Concurrency.md#the-gil-does-not-prevent-races)
+   is the other fix for that race, but not in the obvious place.
    A `threading.Lock` around the cached function's body changes nothing,
    because every thread has already missed the cache before reaching the lock.
    They serialize, each still builds an object,
