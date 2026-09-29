@@ -3,7 +3,7 @@
 ## 1. Testing a `Rat` with a fake blackboard
 
 ```python
-# exercise_1.py
+# test_ch38_fake_blackboard.py
 import asyncio
 from dataclasses import dataclass, field
 from typing import Final, Protocol
@@ -64,28 +64,32 @@ class FakeBlackboard:
     def next_number(self) -> int:
         return 1
 
-# DIRECTIONS checks (0,1), (0,-1), (-1,0), (1,0) in that
-# order. Script the 2nd and 4th as open, the 1st and 3rd
-# as walls/visited:
-fake = FakeBlackboard([False, True, False, True])
-rat = Rat(fake, 0, 0)
-asyncio.run(rat.run())
-print(rat.x, rat.y)     # Kept the first successful claim
-#: 0 -1
-# Spawned down every claim after that
-print(fake.spawned)
-#: [(1, 0)]
+def test_rat_keeps_one_claim_and_spawns_the_rest() -> None:
+    # DIRECTIONS tests (0,1), (0,-1), (-1,0), (1,0) in that
+    # order. Script the 2nd and 4th as open, the 1st and
+    # 3rd as walls or visited:
+    fake = FakeBlackboard([False, True, False, True])
+    rat = Rat(fake, 0, 0)
+    asyncio.run(rat.run())
+    # Kept the first successful claim
+    assert (rat.x, rat.y) == (0, -1)
+    # Spawned a rat at every claim after that
+    assert fake.spawned == [(1, 0)]
+    assert fake.messages == [
+        "Rat 1 starts at (0, 0).",
+        "Rat 1 dead-ends at (0, -1)."]
 ```
 
-`Rat` never imports `Blackboard`, only the `Recorder` `Protocol`, so
-`FakeBlackboard` satisfies that `Protocol` purely by shape: it defines
+`Rat` imports only the `Recorder` `Protocol`, never `Blackboard`, so
+`FakeBlackboard` satisfies that `Protocol` by shape: it defines
 `claim()`, `spawn()`, `log()`, and `next_number()`, and none of the
 four touches a real `Maze` or `asyncio.create_task()`. Scripting
-`claim()`'s return values in a fixed sequence pins down exactly which
-neighbor the rat keeps for itself and which cells it spawns new rats
-into: the first cell the loop finds open, `(0, -1)`, and every open
-one after that, here just `(1, 0)`. The test needs no randomness and
-no real maze.
+`claim()`'s return values in a fixed sequence decides which neighbor
+the rat keeps for itself and which cells it spawns new rats into: the
+first cell the loop finds open, `(0, -1)`, and every open one after
+that, here `(1, 0)` alone. Once the script runs out, `claim()` answers
+`False` to everything, so the rat dead-ends on its second turn and
+`run()` returns. The test needs no randomness and no real maze.
 
 ## 2. Reporting unreached cells
 
@@ -424,7 +428,7 @@ class Food(Item):
         return room
 
 class Teleport(Item):
-    symbol: ClassVar[str] = ""  # Set per target letter
+    symbol: ClassVar[str] = ""  # Shown as its target letter
     target_room: Room  # Paired up by the builder
 
     def __init__(self, target: str) -> None:
@@ -564,7 +568,7 @@ print(game.robot.coins)
 `Robot.__init__()` needs only one new line, `self.coins = 0`, to have
 somewhere to count (folded into `robot_world.py` above so this
 exercise's file stays a single, runnable unit). `item_factory()` needs
-no change at all. It already searches `Item.__subclasses__()` for a
+no change. It searches `Item.__subclasses__()` for a
 class whose `symbol` matches the character it receives, and
 `__subclasses__()` reports the subclasses that exist right now, so
 `class Coin(Item)` in `exercise_4.py` puts `Coin` on the list the
@@ -575,9 +579,9 @@ Neither one has ever needed to know which concrete `Item` subclasses
 exist.
 
 Deriving `Coin` from `Food` instead breaks the maze, and the reason is
-the search order rather than the inheritance. `item_factory()` walks
-`Item.__subclasses__()`, which lists only the *direct* subclasses of
-`Item`, so a `Coin(Food)` never appears there at all. No entry matches
+where the factory searches, not what `Coin` inherits. `item_factory()`
+walks `Item.__subclasses__()`, which lists only the *direct* subclasses
+of `Item`, so a `Coin(Food)` is absent from that list. No entry matches
 `$`, and the loop falls through to the factory's last line, which
 treats any unrecognized symbol as a teleport target. So
 `item_factory("$")` returns `Teleport("$")`. The two `$` cells become
@@ -695,22 +699,22 @@ so `solve()` returns `None` and the walrus in the `while` reads it as
 The search has to run again after every meal because both of its ends
 move. `Food.interact()` replaces the food with an `Empty()`, so the
 room the robot just arrived at stops being a goal, and the robot's
-own room is now the new start. A single search at the start plans a
-route to a piece of food and then eats, on the way, some of the food
-it is going to visit later. Re-searching costs almost nothing: each
-search touches at most a few hundred rooms.
+own room is now the new start. A path planned from the entry is no
+use from any other room, so one search at the start yields the first
+leg and no more. Searching again costs little: each search touches at
+most the maze's 299 rooms that hold no wall.
 
 <!-- vale proselint.GenderBias = NO -->
 Nearest-first does not give the shortest tour that eats everything.
 Choosing the closest food each time is a greedy choice made with no
-view of what comes after it, and the maze punishes that. Two pieces
+view of what comes after it, and the maze makes that costly. Two pieces
 of food can sit close together down one dead-end corridor while a
 third sits one step nearer in the opposite direction. Taking the
 single near one first means walking the corridor twice. The shortest
 complete tour is a travelling-salesman problem over the food rooms,
 and its first leg is often not the shortest leg available. What the
-greedy tour does guarantee is that every leg is itself a shortest
-path, which is all breadth-first search promises.
+greedy tour does guarantee is that every leg is a shortest path,
+which is all breadth-first search guarantees.
 <!-- vale proselint.GenderBias = YES -->
 
 ## 6, 7, and 8: the Chladni plate
@@ -826,7 +830,7 @@ so the difference is exactly `0.0` at every point on the plate.
 A zero field means a zero kick. `step()` scales each grain's random
 displacement by the amplitude under that grain, so
 `uniform(-kick, kick) * 0.0` moves nothing, and 1200 steps leave every
-grain exactly where the constructor scattered it. The result is
+grain where the constructor scattered it. The result is
 neither chaos nor a figure because no grain ever moves: what you see
 is the initial random scatter, frozen. Agitation reads `0.000` from
 the first step, the same number a perfectly settled plate reports, so
@@ -937,22 +941,26 @@ nodal line. After 1200 steps agitation has fallen from `0.58` to
 `0.38`, roughly a third of the way, while the default kick was
 already down to `0.00` by step 400. Rendered, this run still looks
 like noise with a faint trace of structure in it. Nothing is wrong
-with the physics. The run is simply not finished, and finishing it
+with the physics. The run is not finished, and finishing it
 means more steps than anyone wants to watch.
 
-`kick=0.5` fails differently, and the agitation column is what makes
-that failure interesting: agitation collapses to `0.00` as
-convincingly as it does at the default kick. The figure never appears
-anyway. A kick of up to half the plate, and the full width where the
-amplitude peaks at 2, can throw a grain across the plate in one step,
-so a grain never traces a descent toward the nearest nodal line. The grain jumps somewhere unrelated and stays only if that spot
-happens to be quiet. Grains accumulate in whichever quiet regions they
-land in first, mostly the corners, and the lines between them stay
-empty. The plate reports settled sand in the wrong places.
+`kick=0.5` fails differently, and the agitation column hides the
+failure: agitation collapses to `0.00` as convincingly as it does at
+the default kick, and the figure does not appear. A kick of up to
+half the plate, and the full width where the amplitude peaks at 2,
+can throw a grain across the plate in one step, so a grain does not
+walk toward the nearest nodal line. It jumps somewhere unrelated
+and stays only if that spot is quiet. The spots that hold a grain
+best are the two corners where the main diagonal ends. At `(0, 0)`
+and `(1, 1)` the field is zero and also flat, so it stays weak over
+a whole patch, where along a nodal line it is weak only in a thin
+strip. Rendered, the run shows nearly every grain in those two
+corners and the nodal lines between them empty. The plate reports
+settled sand in the wrong places.
 
 That failure is worth keeping in mind. Agitation measures whether the
 grains are sitting where the field is weak, not whether the figure is
-right, so one number cannot distinguish a sharp pattern from three
+right, so one number cannot distinguish a sharp pattern from two
 blobs. The render is the check the number cannot perform.
 
 An intermediate kick avoids both failures because the amplitude scaling

@@ -1,10 +1,10 @@
 # rats_and_mazes/ring_contention.py
 import asyncio
-from typing import override
+from typing import Final, override
 from blackboard import Blackboard
 from maze import Maze
 
-RING = """\
+RING: Final[str] = """\
 *****
 *   *
 * * *

@@ -47,7 +47,7 @@ class Food(Item):
         return room
 
 class Teleport(Item):
-    symbol: ClassVar[str] = ""  # Set per target letter
+    symbol: ClassVar[str] = ""  # Shown as its target letter
     target_room: Room  # Paired up by the builder
 
     def __init__(self, target: str) -> None:

@@ -1,4 +1,4 @@
-# exercise_1.py
+# test_ch38_fake_blackboard.py
 import asyncio
 from dataclasses import dataclass, field
 from typing import Final, Protocol
@@ -59,14 +59,17 @@ class FakeBlackboard:
     def next_number(self) -> int:
         return 1
 
-# DIRECTIONS checks (0,1), (0,-1), (-1,0), (1,0) in that
-# order. Script the 2nd and 4th as open, the 1st and 3rd
-# as walls/visited:
-fake = FakeBlackboard([False, True, False, True])
-rat = Rat(fake, 0, 0)
-asyncio.run(rat.run())
-print(rat.x, rat.y)     # Kept the first successful claim
-#: 0 -1
-# Spawned down every claim after that
-print(fake.spawned)
-#: [(1, 0)]
+def test_rat_keeps_one_claim_and_spawns_the_rest() -> None:
+    # DIRECTIONS tests (0,1), (0,-1), (-1,0), (1,0) in that
+    # order. Script the 2nd and 4th as open, the 1st and
+    # 3rd as walls or visited:
+    fake = FakeBlackboard([False, True, False, True])
+    rat = Rat(fake, 0, 0)
+    asyncio.run(rat.run())
+    # Kept the first successful claim
+    assert (rat.x, rat.y) == (0, -1)
+    # Spawned a rat at every claim after that
+    assert fake.spawned == [(1, 0)]
+    assert fake.messages == [
+        "Rat 1 starts at (0, 0).",
+        "Rat 1 dead-ends at (0, -1)."]

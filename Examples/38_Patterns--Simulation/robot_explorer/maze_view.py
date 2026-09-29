@@ -37,12 +37,13 @@ def show(maze: str = string_maze,
                 fill=FILL.get(symbol, "palegreen"),
                 outline="gray")
 
-    queue = list("".join(moves.split()))
+    route = iter(moves)
 
     def step() -> None:
         draw()
-        if queue:
-            game.robot.move(MOVES[queue.pop(0)])
+        move = next(route, None)
+        if move is not None:
+            game.robot.move(MOVES[move])
             root.after(step_ms, step)
 
     step()
