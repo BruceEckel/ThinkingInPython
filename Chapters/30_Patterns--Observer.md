@@ -12,7 +12,11 @@ The subject knows each observer only as something to call,
 and it decides which arguments every call receives.
 This is [designing the communication rather than the parts](21_Patterns--Design_Patterns.md#design-principles).
 
-*Observer* is the most dynamic of the callback patterns because observers attach and detach at runtime.
+*Observer* is usually the most dynamic of the callback patterns,
+because observers attach and detach at runtime.
+The pattern does not require that,
+as [Fixing the Responders at Construction](#fixing-the-responders-at-construction)
+shows.
 Use *Observer* if a group of objects must update themselves when other objects change state.
 Event handling typically works this way:
 a widget keeps a list of handlers and calls each one when its event arrives.
@@ -615,6 +619,86 @@ with the setter returning early while the flag is set.
 The flag breaks the cycle without comparing values,
 so a second write of the same reading still reaches the responders,
 which is the behavior you want when a responder counts readings rather than changes.
+
+### Fixing the Responders at Construction
+
+`subscribe()` and `unsubscribe()` make `Broadcaster` dynamic:
+its list of responders can change at any moment,
+including in the middle of an `announce()`.
+Several of the preceding sections exist because of that.
+The copy in `announce()` guards against an unsubscribe during the loop,
+a lambda cannot be unsubscribed,
+and a lapsed listener is a subscription that nobody removed.
+
+Decoupling and dynamism are separate properties.
+A subject is decoupled when it knows its observers only as callables,
+and it is dynamic when that set can change after the subject exists.
+A broadcaster that receives its responders when you create it, and keeps them,
+is decoupled but not dynamic:
+
+```python
+# fixed_broadcaster.py
+from broadcaster import Responder
+from record import record
+
+@record
+class FixedBroadcaster[T]:
+    responders: tuple[Responder[T], ...]
+
+    def announce(self, data: T) -> None:
+        for responder in self.responders:
+            responder(data)
+
+log: list[float] = []
+broadcaster = FixedBroadcaster[float]((
+    log.append,
+    lambda c: print("alarm!" if c > 100 else "ok"),
+))
+broadcaster.announce(25.0)
+#: ok
+broadcaster.announce(150.0)
+#: alarm!
+print(log)
+#: [25.0, 150.0]
+```
+
+`FixedBroadcaster` is a record, so nothing can rebind its `responders` field,
+and the tuple in that field cannot change.
+The constructor settles the set of responders.
+`announce()` loops over the tuple with no copy,
+because no responder can unsubscribe mid-notification.
+The lambda needs no named reference,
+since there is no `unsubscribe()` to match it.
+The broadcaster still holds strong references to its responders,
+but they exist before it does and none can join later,
+so the set it keeps alive cannot grow into a lapsed-listener leak.
+Two problems remain:
+a responder that raises an exception still stops `announce()`,
+and a responder that writes back to its subject still re-enters it.
+
+A program can settle its responders at any of four points:
+
+1.  **Source time.**
+    The subject's code calls each reaction by name,
+    as a setter that calls `display.update()` and then `alarm.update()`.
+    The subject knows every observer,
+    so this is the coupling *Observer* removes rather than a form of the pattern.
+2.  **Load time.**
+    Each handler registers itself with a decorator as Python imports its module.
+    Django's `@receiver` decorator and `atexit.register()` work this way.
+    Registration runs at runtime,
+    but the set is normally complete once the imports finish.
+3.  **Construction time.**
+    The subject receives its responders when you create it,
+    as `FixedBroadcaster` does.
+4.  **Runtime.**
+    Responders subscribe and unsubscribe at any moment, as with `Broadcaster`.
+
+Each later point adds flexibility,
+along with some of the problems this chapter covers.
+Use the runtime form when responders come and go,
+as views do when windows open and close.
+When you know the responders by the time the subject exists, pass them in.
 
 ### Notifying Without a Base Class
 
