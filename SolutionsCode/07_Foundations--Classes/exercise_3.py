@@ -7,7 +7,7 @@ class Simple:
 
     def show(self, msg=""):
         if msg:
-            print(msg + ":", self.s)
+            print(f"{msg}:", self.s)
         else:
             print(self.s)
 

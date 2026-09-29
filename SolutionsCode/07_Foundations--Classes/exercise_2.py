@@ -1,4 +1,5 @@
 # exercise_2.py
+
 class Temperature:
     def __init__(self, celsius):
         self.celsius = celsius

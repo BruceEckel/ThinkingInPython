@@ -31,18 +31,18 @@ expect(ValueError, c.shrink, -2)
 #: [ValueError] radius cannot be negative
 ```
 
-`shrink()` never touches `self._radius` directly. It assigns to
-`self.radius`, which still goes through `@radius.setter`, so the
-existing validation applies automatically to every new way of changing
-the radius, present or future. `shrink(-2)` runs after `shrink(2)` has already
-brought the radius to `5.0`, so it computes `5.0 / -2 == -2.5` and the
-setter rejects that, exactly as if you had written `c.radius = -2.5` by
-hand.
+`shrink()` does not touch `self._radius`. It assigns to
+`self.radius`, which goes through `@radius.setter`, so the
+existing validation applies to every method that changes the radius
+this way. `shrink(-2)` runs after `shrink(2)` has brought the radius
+to `5.0`, so it computes `5.0 / -2 == -2.5` and the setter rejects
+that, the same as it rejects `c.radius = -2.5` written by hand.
 
 ## 2. A second alternative constructor, `from_kelvin()`
 
 ```python
 # exercise_2.py
+
 class Temperature:
     def __init__(self, celsius):
         self.celsius = celsius
@@ -69,9 +69,9 @@ print(round(t1.celsius, 2), round(t2.celsius, 2))
 point), so both alternative constructors produce `100.0`. The exercise
 asks for agreement within rounding, so the `print()` call passes each
 `celsius` through `round()` to guard against floating-point noise in
-the arithmetic. Both classmethods end with `return cls(...)`, so
-`Temperature.from_kelvin` builds a `Temperature` exactly like
-`from_fahrenheit` does, only with a different formula for `celsius`.
+the arithmetic. Both class methods end with `return cls(...)`, so
+`from_kelvin()` builds a `Temperature` the way `from_fahrenheit()`
+does, with a different formula for `celsius`.
 
 ## 3. A third override in the chain, `MoreDerived`
 
@@ -85,7 +85,7 @@ class Simple:
 
     def show(self, msg=""):
         if msg:
-            print(msg + ":", self.s)
+            print(f"{msg}:", self.s)
         else:
             print(self.s)
 
@@ -114,15 +114,15 @@ MoreDerived("x").show_twice()
 #: x
 ```
 
-This solution strips the constructor `print()` calls from
-`simple_subclass.py`, so the trace shows only the `show()` chain. If you add
-`MoreDerived` to `simple_subclass.py` itself, the two constructor lines print
-first.
+This solution copies `Simple` and `Derived` without their constructor
+`print()` calls, so the trace shows only the `show()` chain. If you add
+`MoreDerived` to `simple_subclass.py`, as the exercise says, the two
+constructor lines print first.
 
 `MoreDerived` inherits `show_twice()` unchanged from `Simple`, and
 `show_twice()` calls `self.show()` twice. Because `self` is a
-`MoreDerived`, each call resolves to `MoreDerived.show()` first (Python always
-starts from the most derived class). `MoreDerived.show()` prints its own
+`MoreDerived`, each call resolves to `MoreDerived.show()` first (the lookup
+starts at the class of the object). `MoreDerived.show()` prints its own
 message, then calls `super().show(msg)`, which runs `Derived.show()`.
 `Derived.show()` prints its message and calls `super().show(msg)`
 again, which runs `Simple.show()`, and `Simple.show()` finally prints
@@ -170,6 +170,7 @@ just on first use instead of in advance.
 
 ```python
 # exercise_5.py
+
 class Temperature:
     def __init__(self, celsius):
         self.celsius = celsius
@@ -221,13 +222,13 @@ Derived().show()
 ```
 
 The program prints `Base.show`. Nothing overrides anything: `shwo()` is
-a new method that happens to sit in a subclass, and `show()` resolves
-up the chain to `Base` as it always does. Python has no opinion about
-whether you meant a subclass method to replace a base-class method, so
-the misspelling is not an error, it is a second method nobody calls.
+a new method in the subclass, and `show()` resolves up the chain to
+`Base`. Python does not check whether a subclass method was meant to
+replace a base-class method, so the misspelling is not an error. It is
+a second method that nothing calls.
 
-Add `from typing import override`, uncomment the decorator,
-and the program still prints `Base.show`,
+With `from typing import override` added and the decorator
+uncommented, the program still prints `Base.show`,
 because the decorator adds no wrapper and changes no behavior. The
 type checker is where the difference shows:
 
@@ -237,14 +238,14 @@ error[invalid-explicit-override]: Method `shwo` is decorated with
 info: No `shwo` definitions were found on any superclasses of `Derived`
 ```
 
-Remove the decorator again and the type checker goes quiet, while the
-program's behavior never changed at any point in the exercise. The
-feature has three parts: `@override` states an intention, the type
-checker verifies it, and the runtime is indifferent.
+Without the decorator the type checker goes quiet, and the program's
+behavior is the same at every step of the exercise. The feature has
+three parts: `@override` states an intention, the type checker
+verifies it, and the running program ignores it.
 
 The value of `@override` is in what the type checker catches later.
 The typo is easy to spot in a listing this short. The same failure
-arrives silently when someone renames or deletes `Base.show` a year
+arrives silently when someone renames or deletes `Base.show()` a year
 from now. With `@override` on every overriding method in the codebase,
-that rename becomes a list of exact locations to fix. A decorator that
-does nothing at runtime is worth writing when a tool reads it.
+that rename becomes a list of locations to fix. A decorator that
+does nothing at run time is worth writing when a tool reads it.

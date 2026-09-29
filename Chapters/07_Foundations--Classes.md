@@ -40,7 +40,7 @@ x.show_twice()
 
 The first method of `Simple`, `__init__()`, is the *initializer*.
 The double underscores on both ends make it a *dunder*,
-Python's name for a method the language itself calls.
+Python's name for a method the language calls for you.
 The `__new__()` method is the *constructor*, which you rarely use
 ([*Singleton*](24_Patterns--Singleton.md) shows a case that needs it).
 Most programmers call `__init__()` the constructor,
@@ -56,6 +56,7 @@ Python programmers traditionally name the reference `self`,
 but you can use any identifier (though anything else probably confuses people).
 To refer to the object's attributes or its other methods,
 you must go through `self`.
+`forgot_self.py` leaves the parameter out:
 
 ```python
 # forgot_self.py
@@ -126,16 +127,18 @@ you often inherit only to establish a common interface.
 Python is different.
 You inherit an implementation, to reuse the code from the base class.
 Python can still name an interface without inheritance:
-a [`Protocol`](08_Foundations--Static_Types.md)
+a [`Protocol`](08_Foundations--Static_Types.md#structural-typing-with-protocols)
 describes the shape a function needs, with no base class to inherit.
 
 First import the base class the same way you import [any name from a module](06_Foundations--Modules_and_Packages.md#importing-names-with-from-and-as).
 Then inherit by listing the base class in parentheses after the name of the inheriting class.
 Python supports multiple inheritance, so you can list several classes,
-though [Rethinking Objects](20_Patterns--Rethinking_Objects.md)
+though [Rethinking Objects](20_Patterns--Rethinking_Objects.md#one-class-many-protocols)
 argues against it in favor of protocols.
 `simple_subclass.py` imports and subclasses `Simple` from the `simple_class` module.
-Ignore the `@override` decorator for now.
+Ignore the `@override` decorator for now;
+[Marking Overrides with `@override`](#marking-overrides-with-override)
+explains it.
 
 ```python
 # simple_subclass.py
@@ -192,7 +195,13 @@ f(Different())
 In the constructor, `super().__init__()` calls the base-class constructor.
 In `display()`, you can call `show()` as a method of `self`.
 When you override a method but still want the base-class version,
-call it through `super()`, as the overridden `show()` does.
+call it through `super()`, as `Derived`'s `show()` does.
+
+`Derived` inherits `show_twice()` from `Simple` unchanged,
+yet each `self.show()` inside it runs `Derived`'s override.
+The lookup starts at the class of the object,
+not at the class that defines the calling method,
+so base-class code reaches a method the subclass replaced.
 
 The class `Different` also has a method named `show()`,
 but does not derive from `Simple`.
@@ -205,14 +214,14 @@ so importing a module-level function there attaches it to the class as a method,
 `self` and all.
 More than one unrelated class can pick up the same function this way,
 but that import trick is a curiosity more than a technique:
-a helper object or a plain module-level function is almost always clearer.
+a helper object or a module-level function is almost always clearer.
 
 ### Method Resolution Order
 
 `super()` and ordinary attribute lookup both follow one list,
 the class's *method resolution order* (MRO).
 The MRO names the classes Python searches for a name,
-starting with the class itself and ending at `object`.
+starting with the class and ending at `object`.
 `Derived.__mro__` is `(Derived, Simple, object)`.
 With a single base class the order is obvious.
 When two base classes define the same name,
@@ -240,6 +249,9 @@ C().show()  # A comes first in the MRO
 ```
 
 `C.__mro__` lists `A` before `B`, so `C().show()` runs `A`'s version, not `B`'s.
+The bases appear in the order the `class` statement lists them.
+Writing `class C(B, A)` puts `B` first,
+and `C().show()` then runs `B`'s version.
 
 ### Calling the Base Constructor
 
@@ -263,7 +275,6 @@ expect(AttributeError, Broken("ignored").show)
 ```
 
 A derived class that defines no constructor of its own inherits and runs the base version.
-`Derived` also inherits `show_twice()` unchanged.
 
 ## Marking Overrides with `@override`
 
@@ -305,6 +316,7 @@ A type checker now verifies that claim.
 If a decorated method matches nothing in a base class,
 whether from a misspelling or from a base method that no longer exists,
 the checker reports an error.
+With the decorator above `shwo()` uncommented, `ty` reports:
 
 ```text
 error[invalid-explicit-override]: Method `shwo` is decorated with
@@ -313,7 +325,8 @@ error[invalid-explicit-override]: Method `shwo` is decorated with
 
 Python runs the program either way.
 Catching the mistake takes a separate tool,
-and [Static Types](08_Foundations--Static_Types.md) sets that tool up.
+and [Static Types](08_Foundations--Static_Types.md#the-type-checker-ty)
+sets that tool up.
 
 At run time `@override` returns the same function object it received,
 with no wrapper.
@@ -324,7 +337,7 @@ On some callables that assignment raises an exception,
 which the decorator catches and ignores.
 
 Apply `@override` to any method that replaces an inherited method.
-Two kinds stay undecorated by convention: constructors,
+This book leaves two kinds undecorated: constructors,
 and dunders such as `__repr__()` and `__str__()` that replace a default inherited from `object`.
 
 ## Properties
@@ -352,6 +365,8 @@ print(c.area)  # Properties don't use parentheses
 
 `radius` is a plain attribute here and `area` a computation,
 and the call site reads both the same way.
+Writing `c.area()` reads the property and then calls the `float` it produced,
+which raises a `TypeError`.
 
 ### Adding a Setter
 
@@ -435,7 +450,7 @@ expect(RecursionError, Circle, 10)
 The getter and setter are independent,
 so you choose the access you want by defining one or both.
 A write-only property is possible but rare;
-a plain method expresses that intent better.
+a method expresses that intent better.
 
 ### Caching with `cached_property` {#cached-property}
 
@@ -477,10 +492,13 @@ The first access runs the method.
 The second access produces the same result from the stored value.
 The attribute is *lazily initialized*, created on first use,
 so it costs nothing until something reads it.
-The stored value lives in the instance's `__dict__`.
-A class declared with `slots=True`
-([Performance](18_Techniques--Performance.md#slots) uses it) has no `__dict__`,
-so `cached_property` has nowhere to store the value.
+The stored value lives in the instance's `__dict__`,
+the dictionary that holds the instance's attributes
+([Class Attributes](09_Foundations--Class_Attributes.md#two-dictionaries-one-lookup) looks inside it).
+An instance of a class that declares `__slots__` has no `__dict__`,
+so `cached_property` has nowhere to store the value,
+and the first access raises a `TypeError`
+([Performance](18_Techniques--Performance.md#when-slots-does-not-fit) shows the failure).
 
 `cached_property` trades freshness for speed, so if `n.values` changes,
 `total` becomes stale, as the appended `20` in `cached_property_demo.py` shows.
@@ -629,6 +647,6 @@ and a subclass can replace it the way it replaces any other method.
     keeping the `@override` decorator.
     Run the program and confirm it now prints `Base.show`,
     then run the type checker
-    ([Static Types](08_Foundations--Static_Types.md) sets one up)
+    ([Static Types](08_Foundations--Static_Types.md#the-type-checker-ty) sets one up)
     and read what it says.
     Remove `@override` and confirm the type checker goes quiet while the program's behavior does not change.
