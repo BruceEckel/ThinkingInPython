@@ -23,10 +23,11 @@ class ApplicationFramework:
         for name in vars(cls):
             if name.startswith("__"):
                 continue
-            if name == "run":
+            replaced = getattr(super(cls, cls), name, None)
+            if getattr(replaced, "__final__", False):
                 raise TypeError(
-                    f"{cls.__name__}.run "
-                    "overrides the anchor"
+                    f"{cls.__name__}.{name} "
+                    "overrides a @final method"
                 )
             if name in declared:
                 continue

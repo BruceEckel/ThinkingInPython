@@ -99,11 +99,12 @@ rather than your code calling into a library.
 Only the type checker enforces `@final`.
 At runtime the decorator sets `__final__ = True` on the function,
 and nothing in the interpreter reads that attribute.
+Your own code can read it.
 If you want the interpreter to refuse an override,
 the [`__init_subclass__()` technique](17_Techniques--Metaprogramming.md#making-a-class-final)
 also works with methods.
-It raises an exception when `"run" in cls.__dict__`,
-and `near_miss.py` in the next section includes that check.
+`near_miss.py` in the next section includes that check:
+it raises an exception when a subclass replaces a function that carries `__final__`.
 
 ### Hooks and the Misspelled Override
 
@@ -156,10 +157,11 @@ class ApplicationFramework:
         for name in vars(cls):
             if name.startswith("__"):
                 continue
-            if name == "run":
+            replaced = getattr(super(cls, cls), name, None)
+            if getattr(replaced, "__final__", False):
                 raise TypeError(
-                    f"{cls.__name__}.run "
-                    "overrides the anchor"
+                    f"{cls.__name__}.{name} "
+                    "overrides a @final method"
                 )
             if name in inherited:
                 continue
@@ -186,7 +188,7 @@ with expected(TypeError):
     class Hijack(ApplicationFramework):
         def run(self) -> None:  # type: ignore
             print("never runs")
-#: [TypeError] Hijack.run overrides the anchor
+#: [TypeError] Hijack.run overrides a @final method
 
 with expected(TypeError):
     class Weird(ApplicationFramework):
@@ -197,10 +199,19 @@ with expected(TypeError):
 
 `inherited` collects every non-dunder name the base classes define,
 including `run`.
-`__init_subclass__()` rejects a name that matches `run` exactly:
-`class Hijack` never finishes,
+For each name the subclass defines,
+`getattr(super(cls, cls), name, None)` finds the attribute that the name replaces,
+searching the classes that follow `cls` in its method resolution order.
+If that attribute carries `__final__`,
+`__init_subclass__()` raises a `TypeError`: `class Hijack` never finishes,
 because a subclass that replaces the anchor moves the algorithm out of the base class,
 and `@final` stops that replacement only for the type checker.
+The check names no method,
+so a second `@final` method in `ApplicationFramework` gets the same protection with no change to `__init_subclass__()`.
+Reading the attribute through `getattr()` also keeps the type checker quiet.
+A function's type declares no `__final__`,
+so `ty` reports `ApplicationFramework.run.__final__` as an unresolved attribute,
+while `getattr()` with a default accepts any name.
 A name that matches a step, `customize1` or `customize2`,
 is an ordinary override, and a name that resembles none of them,
 like `report()`, is an ordinary new method.

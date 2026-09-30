@@ -24,10 +24,11 @@ class ApplicationFramework:
         for name in vars(cls):
             if name.startswith("__"):
                 continue
-            if name == "run":
+            replaced = getattr(super(cls, cls), name, None)
+            if getattr(replaced, "__final__", False):
                 raise TypeError(
-                    f"{cls.__name__}.run "
-                    "overrides the anchor"
+                    f"{cls.__name__}.{name} "
+                    "overrides a @final method"
                 )
             if name in inherited:
                 continue
@@ -54,7 +55,7 @@ with expected(TypeError):
     class Hijack(ApplicationFramework):
         def run(self) -> None:  # type: ignore
             print("never runs")
-#: [TypeError] Hijack.run overrides the anchor
+#: [TypeError] Hijack.run overrides a @final method
 
 with expected(TypeError):
     class Weird(ApplicationFramework):

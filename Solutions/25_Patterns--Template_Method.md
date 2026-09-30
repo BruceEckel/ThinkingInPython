@@ -276,16 +276,17 @@ info: `ApplicationFramework.run` is decorated with `@final`, forbidding override
 ```
 
 The guarantee comes from the type checker, not the language. `@final`
-sets `__final__ = True` on the function, and no runtime check
-consults that attribute. The *Template Method*'s central guarantee is
-therefore in the same category as every other annotation in this
-book: a tool enforces it before the program executes, and only when
-you run that tool.
+sets `__final__ = True` on the function, and nothing in the
+interpreter consults that attribute. The *Template Method*'s central
+guarantee is therefore in the same category as every other annotation
+in this book: a tool enforces it before the program executes, and
+only when you run that tool.
 
 `@final` protects a codebase whose build runs a type checker, and
 protects nothing in a codebase that does not. When the interpreter
 must refuse the override, use the `__init_subclass__()` check from
-the chapter's `near_miss.py`. It raises a `TypeError` at the
+the chapter's `near_miss.py`, which reads `__final__` from each
+method a subclass replaces. It raises a `TypeError` at the
 subclass's `class` statement, as soon as the class body has run, long
 before anyone constructs an instance.
 
@@ -409,10 +410,11 @@ class ApplicationFramework:
         for name in vars(cls):
             if name.startswith("__"):
                 continue
-            if name == "run":
+            replaced = getattr(super(cls, cls), name, None)
+            if getattr(replaced, "__final__", False):
                 raise TypeError(
-                    f"{cls.__name__}.run "
-                    "overrides the anchor"
+                    f"{cls.__name__}.{name} "
+                    "overrides a @final method"
                 )
             if name in inherited:
                 continue
@@ -469,10 +471,11 @@ class ApplicationFramework:
         for name in vars(cls):
             if name.startswith("__"):
                 continue
-            if name == "run":
+            replaced = getattr(super(cls, cls), name, None)
+            if getattr(replaced, "__final__", False):
                 raise TypeError(
-                    f"{cls.__name__}.run "
-                    "overrides the anchor"
+                    f"{cls.__name__}.{name} "
+                    "overrides a @final method"
                 )
             if name in declared:
                 continue
