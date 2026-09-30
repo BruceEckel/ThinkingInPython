@@ -581,7 +581,7 @@ nine cells are as they were.
 
 Pasting this `recolored()` over the one in `box_observer.py` changes
 what the window does, and `box_view.py` runs as it stands. The view
-has two connections to the model. Its mouse handler calls
+touches the model in two places. Its mouse handler calls
 `model.select()` with a coordinate, and its `draw()` receives a whole
 `Grid` and paints every cell. Neither one says which cells a selection
 changes, so the view holds nothing that a new rule could make wrong.
@@ -693,7 +693,7 @@ The corner selection that follows has three cells inside the grid
 rather than five.
 
 Adding a third view means one more `connect()` call. `box_view.py`'s
-`draw()` is such a view, and `show(model)` attaches it to a model that
+`draw()` is such a view, and `show(model)` connects it to a model that
 already has these two, so the window and the terminal report the same
 grid. Running that combination means `show()` takes over with
 `root.mainloop()`, so start it last.
@@ -873,8 +873,8 @@ class therefore share no storage and no responder list, which is what
 makes the two attributes independent. `Broadcaster` keeps one list for
 the whole object; a descriptor keeps one per attribute.
 
-`__set__()` stores the value and then calls each responder registered
-for that attribute, the work `Thermometer`'s property setter did with
+`__set__()` stores the value and then calls each responder connected
+to that attribute, the work `Thermometer`'s property setter did with
 `self.announce(value)`.
 
 Class access is the part a validating descriptor never needs.
@@ -953,7 +953,7 @@ so `display` is still a function you can call directly.
 
 The load-time form removes three of the runtime problems:
 
-- `Broadcaster.announce()` copies its list because a responder can disconnect mid-notification.
+- `Broadcaster.announce()` copies its list because a responder can disconnect itself mid-notification.
   The registry has no `disconnect()`, so the setter iterates through `RESPONDERS` directly.
 - A lambda cannot be disconnected, a question that disappears along with `disconnect()`.
   The `@` form also needs a `def`, so every decorated responder has a name.
@@ -976,7 +976,7 @@ The load-time form also costs three things that `Broadcaster` does not:
   Sending the thermometer along with the reading tells the responders the source,
   but every responder still receives every thermometer's changes.
 - A responder registers only if Python imports its module.
-  A handler in a module that nothing imports does not run, and nothing reports its absence.
+  A responder in a module that nothing imports does not run, and nothing reports its absence.
   Django's documentation meets this by importing an app's signal handlers from its `AppConfig.ready()` method,
   which Django calls at startup.
 - Tests share the registry.

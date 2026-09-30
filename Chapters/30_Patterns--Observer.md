@@ -678,7 +678,7 @@ A program can choose its responders at any of four points:
     The subject knows every observer,
     so this is the coupling *Observer* removes rather than a form of the pattern.
 2.  **Load time.**
-    Each handler registers itself with a decorator as Python imports its module.
+    Each responder registers itself with a decorator as Python imports its module.
     Django's `@receiver` decorator and `atexit.register()` work this way.
     Registration runs at runtime,
     but the set is normally complete once the imports finish (see exercise 11).
@@ -1222,7 +1222,7 @@ the controller's job folded into the view, which the next section takes apart.
 or a test call drives the model the way a click does.
 
 The model reaches a view only through the responders it calls,
-so you can attach a second view to the same model and keep both views in step
+so you can connect a second view to the same model and keep both views in step
 (see exercise 8).
 Only the view uses the other side's names: `box_view.py` imports `BoxModel`,
 reads `size` and `grid`, and calls `select()`.
@@ -1530,7 +1530,7 @@ instead of guessing which responders need it.
     make `recolored()` advance every box in the selected box's row and column.
     Run `box_view.py` without editing it,
     and explain why the view needed no change.
-8.  Attach a second view to `box_observer.py`'s `BoxModel`.
+8.  Add a second view to `box_observer.py`'s `BoxModel`.
     Write one view that prints a letter per cell and another that prints how many cells each color holds,
     connect both to the same model,
     and show that one `select()` updates the pair.
