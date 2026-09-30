@@ -706,30 +706,30 @@ so one method covers every attribute of the class:
 # watched.py
 from collections.abc import Callable
 
-type Watcher = Callable[[str, object], None]
+type AttrResponder = Callable[[str, object], None]
 
 class Watched:
-    _watchers: list[Watcher]  # Bare annotation
+    _responders: list[AttrResponder]  # Bare annotation
 
     def __init__(
         self, celsius: float, humidity: float
     ) -> None:
-        # __setattr__() reads _watchers before it
+        # __setattr__() reads _responders before it
         # stores, so no assignment can create it
-        self.__dict__["_watchers"] = []
+        self.__dict__["_responders"] = []
         self.celsius = celsius
         self.humidity = humidity
 
-    def connect(self, watcher: Watcher) -> None:
-        self._watchers.append(watcher)
+    def connect(self, responder: AttrResponder) -> None:
+        self._responders.append(responder)
 
     def __setattr__(
         self, name: str, value: object
     ) -> None:
-        watchers = list(self._watchers)
+        responders = list(self._responders)
         super().__setattr__(name, value)
-        for watcher in watchers:
-            watcher(name, value)
+        for responder in responders:
+            responder(name, value)
 
 w = Watched(20.0, 0.4)
 changes: list[tuple[str, object]] = []
@@ -740,22 +740,22 @@ print(changes)
 #: [('celsius', 25.0), ('humidity', 0.5)]
 ```
 
-`__setattr__()` copies `_watchers` before it stores the new value,
-so an ordinary `self._watchers = []` raises an `AttributeError`:
+`__setattr__()` copies `_responders` before it stores the new value,
+so an ordinary `self._responders = []` raises an `AttributeError`:
 the copy reads an attribute that does not exist yet.
-The constructor therefore writes `_watchers` through `self.__dict__`,
+The constructor therefore writes `_responders` through `self.__dict__`,
 which bypasses `__setattr__()`.
 The two assignments after that line go through `__setattr__()`.
 Each notifies a list that is still empty.
-Because the constructor hasn't returned, no caller can register a watcher.
+Because the constructor hasn't returned, no caller can connect a responder.
 `super().__setattr__()` does the storing,
 because an ordinary assignment inside `__setattr__()` calls `__setattr__()` again.
 
 In a class body, a name with a type and no initialization value [declares an attribute rather than creating one](09_Foundations--Class_Attributes.md#a-bare-annotation-declares-it-does-not-create).
 Such a name is a *bare annotation*.
 It looks like a class variable but is not, because it is not assigned a value.
-`_watchers` creates no attribute anywhere,
-and the constructor gives each `Watched` its own `_watchers` list.
+`_responders` creates no attribute anywhere,
+and the constructor gives each `Watched` its own `_responders` list.
 The same line with `= []` creates a class attribute,
 a single list shared by every `Watched`.
 [Class Attributes](09_Foundations--Class_Attributes.md#a-classvar-with-no-value-declares-too)
@@ -764,7 +764,7 @@ for instance attributes and class variables both.
 
 The type checker infers an instance attribute and its type from an assignment like `self.celsius = celsius`,
 which is why `celsius` and `humidity` need no declaration.
-For `_watchers`, the constructor writes `self.__dict__["_watchers"] = []`,
+For `_responders`, the constructor writes `self.__dict__["_responders"] = []`,
 and the checker treats that as a write to a dictionary,
 not an assignment to an attribute.
 The bare annotation supplies the attribute and its type instead.
@@ -773,14 +773,14 @@ Without it, `ty` reports an `unresolved-attribute` error in each method that rea
 One method for every attribute is less precise than a property per attribute,
 in three ways:
 
-1.  A watcher is a responder with a wider signature:
-    it takes the attribute name along with the value,
+1.  `Watched`'s responders have a wider signature:
+    each takes the attribute name along with the value,
     and filters by name to act on one attribute.
     `Thermometer` publishes one attribute and is a `Broadcaster[float]`,
     so each responder takes the `float` reading as its one argument.
     [Deciding What Matters](#deciding-what-matters) revisits that name filter:
-    a watcher that sorts its own notifications means the subject has left the decision to its responders.
-2.  Every assignment reaches the watchers, including the internal ones:
+    a responder that sorts its own notifications means the subject has left the decision to its responders.
+2.  Every assignment reaches the responders, including the internal ones:
     a cached result or a hit counter broadcasts like a published attribute,
     unless the class writes it through `self.__dict__` as the constructor does.
 3.  `__setattr__()` accepts any name,
@@ -1385,7 +1385,7 @@ Measuring is the thermometer's own job, and *Observer* adds the other two.
 The code for notifying can leave the class.
 `Broadcaster` holds the responder list and the notification loop,
 and `Thermometer` inherits them.
-`watched.py` uses no base class and calls its watchers from `__setattr__()`,
+`watched.py` uses no base class and calls its responders from `__setattr__()`,
 so one method covers every attribute.
 Either way the object still notifies its responders,
 but the loop that calls them is written once,
@@ -1403,9 +1403,9 @@ but a caller who forgets the call leaves every responder out of date.
 Push sends the value, so the thermometer decides what each responder receives.
 Pull sends the thermometer,
 so each responder reads the attributes it needs from the thermometer and depends on the thermometer's interface.
-`watched.py` leaves the choice to its watchers: two states,
+`watched.py` leaves the choice to its responders: two states,
 `celsius` and `humidity`, share one channel,
-so every watcher receives both kinds of change,
+so every responder receives both kinds of change,
 along with the attribute name to filter by.
 
 *Observer* therefore removes one coupling and keeps another.
@@ -1477,8 +1477,8 @@ Repeating the comparison in each responder works for a question about *how much*
 because each responder sets its own threshold.
 *Which kind* is a different question, and repetition handles it poorly,
 because every kind of change arrives on one channel and each responder sorts them itself.
-A watcher in `watched.py` receives every attribute's changes,
-so each watcher that cares about one attribute repeats the same filter by name.
+A responder in `watched.py` receives every attribute's changes,
+so each responder that cares about one attribute repeats the same filter by name.
 [Function Objects](28_Patterns--Function_Objects.md#an-event-bus-handlers-keyed-by-type)
 removes that repetition:
 one list becomes a dictionary of lists keyed by event type,
