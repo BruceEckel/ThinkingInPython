@@ -557,7 +557,7 @@ def test_combined(
 
 ## Turning Exceptions into Results
 
-In `composing.py`, `func_c()` puts a `try`/`except` around a call that can raise and returns an `Err` by hand.
+In `composing.py`, `func_c()` puts a `try`/`except` around a division that can raise a `ZeroDivisionError` and returns an `Err` by hand.
 A decorator can capture that pattern.
 `@safe` takes a function that raises an exception and produces one that returns a `Result`,
 with the exception as the `Err` value.
