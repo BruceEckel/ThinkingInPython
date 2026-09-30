@@ -1382,12 +1382,15 @@ a band of diamond scales that sits under every chapter title, the SVG
 on the site (template.html) and the PNG in the PDF and EPUBs
 (injected by build_epub.py's shared assembly, which also places the
 cover art on each Part divider page). And `chapter-snake.png`: the
-serpent alone on a transparent ground, 320 px wide, which
-template.html sets to the left of each chapter title on the site (and
-above it on a narrow screen). In art mode `snake_cutout()` makes it
-from `cover-source.jpg` with Pillow alone: the paper around the
-serpent and inside each loop becomes transparent, and the image is
-cropped to what remains. The EPUBs set it on its own line under each
+line-drawn serpent from `resources/chapter-snake-source.png`, 320 px
+wide, which template.html sets to the left of each chapter title on
+the site (and above it on a narrow screen). `snake_from_drawing()`
+makes it in either mode with Pillow alone: each pixel's darkness
+becomes its opacity and its color the site's ink, so the paper drops
+out and the drawing's anti-aliased edges survive, and the image is
+cropped to what remains; `--snake` writes it alone. It replaced a
+cutout of the cover art's serpent on 2026-09-30, which read too dark
+beside a title. The EPUBs set it on its own line under each
 chapter title, above the ornament, and the PDF under the ornament
 band that underlines the title. The index page does
 not use it. `--preview` writes a small `cover-preview.png` for quick

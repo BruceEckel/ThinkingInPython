@@ -30,8 +30,10 @@ either family:
               green, in the cover art's palette),
               chapter-ornament.svg/.png (the band of scales
               under each chapter title), chapter-snake.png (the
-              serpent alone on a transparent ground, which the
-              site sets to the left of each chapter title)
+              line-drawn serpent from
+              resources/chapter-snake-source.png, its ink in the
+              site's INK on a transparent ground, which the site
+              sets to the left of each chapter title)
 
 Text is set in Palatino Linotype, which ships with Windows and
 macOS; regenerate on a machine that has it.
@@ -39,6 +41,7 @@ macOS; regenerate on a machine that has it.
 Usage:
     uv run python -m tools.make_cover            # everything
     uv run python -m tools.make_cover --preview  # small PNG only
+    uv run python -m tools.make_cover --snake    # chapter-snake.png only
 """
 
 import argparse
@@ -85,8 +88,11 @@ DRAWN_FILES = ("cover.svg", "cover-eink.svg", "cover-letter.svg",
 ART_FILES = ("cover-color.jpg", "cover-eink.jpg",
              "cover-letter.jpg", "cover-art.jpg",
              "social-preview.jpg")
-# The serpent beside each chapter title on the site. Drawn at
-# about 100 CSS px wide, so 320 covers a 3x display.
+# The serpent beside each chapter title on the site: a hand
+# drawing, black ink on white, that becomes INK on a transparent
+# ground. Set at about 100 CSS px wide, so 320 covers a 3x
+# display.
+SNAKE_SOURCE = ROOT / "resources" / "chapter-snake-source.png"
 SNAKE_FILE = "chapter-snake.png"
 SNAKE_WIDTH = 320
 
@@ -249,49 +255,34 @@ def art_outputs(preview: bool) -> None:
     site.thumbnail((1100, 1100))
     site.save(STATIC / "cover-art.jpg", quality=84,
               optimize=True)
-    save_snake(snake_cutout(img, bg))
     social(img, bg)
     for stale in DRAWN_FILES:
         (STATIC / stale).unlink(missing_ok=True)
 
 
-def snake_cutout(img, bg: str, tolerance: int = 24):
-    """The serpent alone, cropped tight, its paper transparent.
+def snake_from_drawing():
+    """The chapter-title serpent from its drawing: every pixel's
+    darkness becomes its opacity, its color the site's INK, and
+    the paper drops out.
 
-    Paper is any pixel within `tolerance` of the sampled
-    background on every channel. A paper region counts as the
-    page only when it is large: the ground around the serpent
-    and the hole inside each loop qualify, while a pale scale
-    does not, so highlights stay opaque. The serpent is then
-    whatever connects to the image's center, where the loops
-    cross, which drops any stray mark that does not touch it.
+    The drawing is black ink on white, so luminance alone
+    separates ink from paper: a pixel lighter than PAPER_FLOOR
+    is paper and turns transparent, and a darker one keeps an
+    opacity proportional to its darkness, which preserves the
+    drawing's anti-aliased edges. The result is cropped tight,
+    as the cover cutout it replaced was, so template.html's
+    background-size sets its ratio.
     """
-    from PIL import Image, ImageChops, ImageDraw
+    from PIL import Image
 
-    rgb = img.convert("RGB")
-    w, h = rgb.size
-    flat = Image.new("RGB", rgb.size, bg)
-    r, g, b = ImageChops.difference(rgb, flat).split()
-    worst = ImageChops.lighter(ImageChops.lighter(r, g), b)
-    # 255 is unvisited paper, 0 is art; PAGE and SMALL mark the
-    # paper regions already measured.
-    PAGE, SMALL, PROBE = 200, 50, 128
-    regions = worst.point(
-        lambda v: 255 if v < tolerance else 0)
-    for y in range(4, h, 16):
-        for x in range(4, w, 16):
-            if regions.getpixel((x, y)) != 255:
-                continue
-            ImageDraw.floodfill(regions, (x, y), PROBE)
-            area = regions.histogram()[PROBE]
-            mark = PAGE if area > w * h // 200 else SMALL
-            regions = regions.point(
-                lambda v: mark if v == PROBE else v)
-    solid = regions.point(lambda v: 0 if v == PAGE else 255)
-    ImageDraw.floodfill(solid, (w // 2, h // 2), PROBE)
-    alpha = solid.point(lambda v: 255 if v == PROBE else 0)
-    rgb.putalpha(alpha)
-    return rgb.crop(alpha.getbbox())
+    PAPER_FLOOR = 240
+    lum = Image.open(SNAKE_SOURCE).convert("L")
+    alpha = lum.point(
+        lambda v: 0 if v >= PAPER_FLOOR
+        else min(255, round((PAPER_FLOOR - v) * 255 / 220)))
+    snake = Image.new("RGB", lum.size, INK)
+    snake.putalpha(alpha)
+    return snake.crop(alpha.getbbox())
 
 
 def save_snake(snake) -> None:
@@ -547,8 +538,6 @@ def eink(svg: str) -> str:
 
 
 def drawn_outputs(preview: bool) -> None:
-    from PIL import Image
-
     master = cover_svg()
     (STATIC / "cover.svg").write_text(master, encoding="utf-8", newline="\n")
     if preview:
@@ -570,14 +559,6 @@ def drawn_outputs(preview: bool) -> None:
     # of the art (Kindle will not draw SVG).
     rasterize(STATIC / "cover-art.svg",
               STATIC / "cover-art.png", 900)
-    # art_svg() has no background, so its raster is the serpent
-    # on a transparent ground as it stands.
-    snake_png = TEMP / "snake.png"
-    TEMP.mkdir(parents=True, exist_ok=True)
-    rasterize(STATIC / "cover-art.svg", snake_png,
-              SNAKE_WIDTH * 2)
-    snake = Image.open(snake_png).convert("RGBA")
-    save_snake(snake.crop(snake.getbbox()))
     for stale in ART_FILES:
         (STATIC / stale).unlink(missing_ok=True)
 
@@ -627,9 +608,16 @@ def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--preview", action="store_true",
                     help="write a small preview PNG only")
+    ap.add_argument("--snake", action="store_true",
+                    help="write chapter-snake.png only")
     args = ap.parse_args(argv)
 
     STATIC.mkdir(parents=True, exist_ok=True)
+    if args.snake:
+        save_snake(snake_from_drawing())
+        size = (STATIC / SNAKE_FILE).stat().st_size
+        print(f"{SNAKE_FILE}: {size / 1024:.0f} KB")
+        return 0
     if ART_SOURCE.exists():
         print(f"art mode: {ART_SOURCE.relative_to(ROOT)}")
         art_outputs(args.preview)
@@ -648,6 +636,7 @@ def main(argv: list[str] | None = None) -> int:
     # ornament (Kindle will not draw SVG).
     rasterize(STATIC / "chapter-ornament.svg",
               STATIC / "chapter-ornament.png", 500)
+    save_snake(snake_from_drawing())
     for name in (*made, "favicon.svg", "chapter-ornament.svg",
                  "chapter-ornament.png", SNAKE_FILE):
         size = (STATIC / name).stat().st_size
