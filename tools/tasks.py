@@ -1105,6 +1105,19 @@ def fix_state_machine_figure(v: Vars) -> None:
     py("tools.state_machine_figure")
 
 
+@task("Fail if resources/static/chapter-snake.svg differs from its spec "
+      "in tools/chapter_snake.py")
+def chapter_snake(v: Vars) -> None:
+    py("tools.chapter_snake", "--check")
+
+
+@task("Regenerate chapter-snake.svg from its spec, then its PNG",
+      secondary=True)
+def fix_chapter_snake(v: Vars) -> None:
+    py("tools.chapter_snake")
+    py("tools.make_cover", "--snake")
+
+
 @task("Fail if a pattern chapter's opening figure differs from its module "
       "in tools/story_figures/ or fails a figure check; "
       "`tip fix-story-figures` regenerates")
