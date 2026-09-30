@@ -11,7 +11,7 @@ class Broadcaster:
     def __init__(self) -> None:
         self._responders: list[Callable] = []
 
-    def subscribe(self, responder: Callable) -> None:
+    def connect(self, responder: Callable) -> None:
         self._responders.append(responder)
 
     def announce(self, *args: Any) -> None:
@@ -20,18 +20,18 @@ class Broadcaster:
 
 calls: list[tuple[str, int]] = []
 broadcaster = Broadcaster()
-broadcaster.subscribe(lambda v: calls.append(("A", v)))
-broadcaster.subscribe(lambda v: calls.append(("B", v)))
+broadcaster.connect(lambda v: calls.append(("A", v)))
+broadcaster.connect(lambda v: calls.append(("B", v)))
 broadcaster.announce(42)
 print(calls)
 #: [('A', 42), ('B', 42)]
 ```
 
 Like `broadcaster.py`, this solution has no separate `Observer` class at
-all. Any callable, here two `lambda`s, is a responder. `subscribe()`
+all. Any callable, here two `lambda`s, is a responder. `connect()`
 collects them in a list. `announce()` then hands its own arguments to
-each one in turn, so every subscribed responder sees the same update,
-in subscription order.
+each one in turn, so every connected responder sees the same update,
+in connection order.
 
 ## 2. The pull model, twice
 
@@ -166,7 +166,7 @@ class Broadcaster[T]:
     def __init__(self) -> None:
         self._responders: list[Responder[T]] = []
 
-    def subscribe(self, responder: Responder[T]) -> None:
+    def connect(self, responder: Responder[T]) -> None:
         self._responders.append(responder)
 
     def announce(self, data: T) -> None:
@@ -186,8 +186,8 @@ def broken(data: int) -> None:
     raise RuntimeError(f"cannot handle {data}")
 
 broadcaster = Broadcaster[int]()
-broadcaster.subscribe(broken)
-broadcaster.subscribe(received.append)
+broadcaster.connect(broken)
+broadcaster.connect(received.append)
 try:
     broadcaster.announce(7)
 except* RuntimeError as group:
@@ -208,14 +208,14 @@ def test_later_responder_still_runs_after_a_failure(
         raise RuntimeError("boom")
 
     broadcaster = Broadcaster[int]()
-    broadcaster.subscribe(broken)
-    broadcaster.subscribe(received.append)
+    broadcaster.connect(broken)
+    broadcaster.connect(received.append)
     with pytest.raises(ExceptionGroup):
         broadcaster.announce(1)
     assert received == [1]
 ```
 
-The loop catches each failure and keeps going, so subscription order
+The loop catches each failure and keeps going, so connection order
 stops deciding who hears the change. Collecting the exceptions rather
 than discarding them is the other half: a responder that fails silently
 is worse than one that stops the loop, because nothing reports the
@@ -246,7 +246,7 @@ class Broadcaster[T]:
     def __init__(self) -> None:
         self._responders: list[AsyncResponder[T]] = []
 
-    def subscribe(
+    def connect(
         self, responder: AsyncResponder[T]
     ) -> None:
         self._responders.append(responder)
@@ -273,8 +273,8 @@ async def record(data: int) -> None:
 
 async def main() -> None:
     broadcaster = Broadcaster[int]()
-    broadcaster.subscribe(broken)
-    broadcaster.subscribe(record)
+    broadcaster.connect(broken)
+    broadcaster.connect(record)
     try:
         await broadcaster.announce(7)
     except* RuntimeError as group:
@@ -303,8 +303,8 @@ def test_later_responder_still_runs_after_a_failure(
 
     async def run() -> None:
         broadcaster = Broadcaster[int]()
-        broadcaster.subscribe(broken)
-        broadcaster.subscribe(record)
+        broadcaster.connect(broken)
+        broadcaster.connect(record)
         with pytest.raises(ExceptionGroup):
             await broadcaster.announce(1)
 
@@ -348,7 +348,7 @@ class Broadcaster[T]:
     def __init__(self) -> None:
         self._responders: list[Responder[T]] = []
 
-    def subscribe(self, responder: Responder[T]) -> None:
+    def connect(self, responder: Responder[T]) -> None:
         self._responders.append(responder)
 
     def announce(self, data: T) -> list[Err[str]]:
@@ -373,8 +373,8 @@ def checked(data: int) -> Result[None, str]:
 
 received: list[int] = []
 broadcaster = Broadcaster[int]()
-broadcaster.subscribe(checked)
-broadcaster.subscribe(succeeds(received.append))
+broadcaster.connect(checked)
+broadcaster.connect(succeeds(received.append))
 print(broadcaster.announce(7), received)
 #: [] [7]
 print(broadcaster.announce(-1), received)
@@ -393,8 +393,8 @@ def test_later_responder_runs_after_an_err() -> None:
         return Err("boom")
 
     broadcaster = Broadcaster[int]()
-    broadcaster.subscribe(broken)
-    broadcaster.subscribe(succeeds(received.append))
+    broadcaster.connect(broken)
+    broadcaster.connect(succeeds(received.append))
     assert broadcaster.announce(1) == [Err("boom")]
     assert received == [1]
 ```
@@ -406,9 +406,9 @@ and decides what to do with them,
 where exercise 3's caller had to catch an `ExceptionGroup`.
 An empty list means every responder succeeded.
 
-The type change reaches every subscriber.
+The type change reaches every responder.
 `received.append` returns `None`,
-so the type checker rejects `broadcaster.subscribe(received.append)`:
+so the type checker rejects `broadcaster.connect(received.append)`:
 a `Responder[int]` must return a `Result`.
 `succeeds()` adapts any `None`-returning callable
 by calling it and returning `Ok(None)`.
@@ -630,7 +630,7 @@ class Broadcaster[T]:
     def __init__(self) -> None:
         self._responders: list[Responder[T]] = []
 
-    def subscribe(self, responder: Responder[T]) -> None:
+    def connect(self, responder: Responder[T]) -> None:
         self._responders.append(responder)
 
     def announce(self, data: T) -> None:
@@ -658,8 +658,8 @@ def tally(grid: Grid) -> None:
     counts = Counter(grid.values())
     print(" ".join(f"{c[0]}:{counts[c]}" for c in Color))
 
-model.subscribe(letters)
-model.subscribe(tally)
+model.connect(letters)
+model.connect(tally)
 model.select((1, 1))
 #: s k k
 #: k s p
@@ -678,21 +678,21 @@ its own: `Color`, `new_grid()`, and `recolored()` unchanged, and a
 `BoxModel` is the chapter's, and the exercise adds nothing to it.
 
 `letters()` and `tally()` are the two views. Each takes a `Grid` and
-returns `None`, the shape `subscribe()` requires, so each is a
+returns `None`, the shape `connect()` requires, so each is a
 responder the same way `draw()` is. `letters()` prints the first
 character of each color, one row per line, and `tally()` counts the
 colors with a `Counter`.
 Neither one names the other, and neither names the model's rule.
 
 `model.select((1, 1))` calls `recolored()` once and `announce()` once,
-and `announce()` calls both views in subscription order. They read the
+and `announce()` calls both views in connection order. They read the
 same `Grid` object, so the letters and the counts describe one state
 of the model: the first selection advances the five cells of the
 cross, which moves two cells out of `skyblue` and two into `khaki`.
 The corner selection that follows has three cells inside the grid
 rather than five.
 
-Adding a third view means one more `subscribe()` call. `box_view.py`'s
+Adding a third view means one more `connect()` call. `box_view.py`'s
 `draw()` is such a view, and `show(model)` attaches it to a model that
 already has these two, so the window and the terminal report the same
 grid. Running that combination means `show()` takes over with
@@ -837,8 +837,8 @@ class Notifying[T]:
         for responder in getattr(obj, self.responders, ()):
             responder(value)
 
-    def subscribe(self, obj: object,
-                  responder: Responder[T]) -> None:
+    def connect(self, obj: object,
+                responder: Responder[T]) -> None:
         obj.__dict__.setdefault(
             self.responders, []).append(responder)
 
@@ -854,8 +854,8 @@ class Thermometer:
 t = Thermometer(20.0, 0.4)
 readings: list[float] = []
 humidities: list[float] = []
-Thermometer.celsius.subscribe(t, readings.append)
-Thermometer.humidity.subscribe(t, humidities.append)
+Thermometer.celsius.connect(t, readings.append)
+Thermometer.humidity.connect(t, humidities.append)
 t.celsius = 25.0
 t.humidity = 0.5
 t.celsius = 150.0
@@ -879,22 +879,22 @@ for that attribute, the work `Thermometer`'s property setter did with
 
 Class access is the part a validating descriptor never needs.
 `Thermometer.celsius` calls `__get__()` with `obj` set to `None`, and
-returning the descriptor there puts `subscribe()` within reach. The
+returning the descriptor there puts `connect()` within reach. The
 two `@overload` declarations tell the type checker which of the two results it
 gets: `Notifying[T]` from the class, `T` from an instance. Without
 them the declared return type is the union, and `t.celsius * 2` fails
 to check. The overloads also check the responder against the
-attribute: `Thermometer.celsius.subscribe(t, readings.append)` passes
+attribute: `Thermometer.celsius.connect(t, readings.append)` passes
 only because `readings` is a `list[float]`.
 
-Pyright rejects `Thermometer.celsius.subscribe`.
+Pyright rejects `Thermometer.celsius.connect`.
 It reads the constructor's `self.celsius = celsius` as declaring an instance attribute of type `float` beside the descriptor,
-so it types the class access as `Notifying[float] | float` and reports that `float` has no `subscribe`.
+so it types the class access as `Notifying[float] | float` and reports that `float` has no `connect`.
 `ty` types the class access from the `__get__()` overload alone.
 A codebase on Pyright looks the descriptor up in `type(obj).__dict__` instead,
 which draws no complaint from Pyright.
 
-`subscribe()` writes the responder list into the instance's `__dict__`
+`connect()` writes the responder list into the instance's `__dict__`
 rather than declaring it on the class, where every instance shares
 one list.
 
@@ -953,11 +953,11 @@ so `display` is still a function you can call directly.
 
 The load-time form removes three of the runtime problems:
 
-- `Broadcaster.announce()` copies its list because a responder can unsubscribe mid-notification.
-  The registry has no `unsubscribe()`, so the setter iterates through `RESPONDERS` directly.
-- A lambda cannot be unsubscribed, a question that disappears along with `unsubscribe()`.
+- `Broadcaster.announce()` copies its list because a responder can disconnect mid-notification.
+  The registry has no `disconnect()`, so the setter iterates through `RESPONDERS` directly.
+- A lambda cannot be disconnected, a question that disappears along with `disconnect()`.
   The `@` form also needs a `def`, so every decorated responder has a name.
-- A lapsed listener is an object kept alive by its subscription.
+- A lapsed listener is an object kept alive by its connection.
   The registry holds module-level functions,
   which their module keeps alive for the whole program,
   so the strong references keep nothing alive that Python would otherwise collect.

@@ -157,11 +157,11 @@ so `detach()` changes `self._observers` while the loop reads a list nobody is mo
 The copy therefore settles which observers a `notify()` call reaches before its loop starts.
 An observer detached partway through a `notify()` call still receives that call's notification,
 and a newcomer attached during the call receives its first notification from the next `notify()` call.
-[Unsubscribing During a Notification](#unsubscribing-during-a-notification)
-runs a responder that unsubscribes itself,
+[Disconnecting During a Notification](#disconnecting-during-a-notification)
+runs a responder that disconnects itself,
 and shows index by index which responder the loop skips without the copy.
 
-## The Names This Chapter Uses
+## Easier Names
 
 The pattern's traditional names are hard to hold in your head.
 `java.util.Observable` and the reactive libraries call the subject an `Observable`.
@@ -174,7 +174,7 @@ The rest of this chapter uses names you can tell apart at a glance:
 |---|---|
 | subject | `Broadcaster` |
 | observer | responder == any callable |
-| `attach()` / `detach()` | `subscribe()` / `unsubscribe()` |
+| `attach()` / `detach()` | `connect()` / `disconnect()` |
 | `notify()` | `announce()` |
 | `update()` | calling the responder |
 
@@ -192,7 +192,7 @@ and neither word says what happens when the change arrives.
 so the word points you at the question every design here must answer:
 what does this code do when a change reaches it?
 The rest of the chapter keeps returning to that question.
-A responder can unsubscribe itself mid-notification, raise an exception,
+A responder can disconnect itself mid-notification, raise an exception,
 wait on a slow network call, or write back to its broadcaster,
 and each of those behaviors changes how the broadcaster must be written.
 
@@ -211,10 +211,10 @@ class Broadcaster[T]:
     def __init__(self) -> None:
         self._responders: list[Responder[T]] = []
 
-    def subscribe(self, responder: Responder[T]) -> None:
+    def connect(self, responder: Responder[T]) -> None:
         self._responders.append(responder)
 
-    def unsubscribe(self, responder: Responder[T]) -> None:
+    def disconnect(self, responder: Responder[T]) -> None:
         self._responders.remove(responder)
 
     def announce(self, data: T) -> None:
@@ -229,18 +229,18 @@ so `notify()` calls the method its interface names, `update()`.
 In Python the responder is a callable, so `announce()` calls it directly:
 `responder(data)`, whereas the classic version calls `observer.update(self, arg)`.
 The remaining method names change as well:
-GoF's `attach()` and `detach()` become `subscribe()` and `unsubscribe()`.
+GoF's `attach()` and `detach()` become `connect()` and `disconnect()`.
 A responder that needs the changed object takes it as part of the payload
 (`announce((self, value))`),
 or is a bound method of an object that holds a reference to the broadcaster.
 
 `Broadcaster` knows nothing about what it announces.
 Its type parameter `T` sets the type of each notification,
-and a class that inherits `Broadcaster` gets `subscribe()`, `unsubscribe()`,
+and a class that inherits `Broadcaster` gets `connect()`, `disconnect()`,
 and `announce()`.
 
 A responder returns `None`, as seen in the `Responder` alias.
-The type checker rejects a subscriber that returns a value.
+The type checker rejects a responder that returns a value.
 Notification runs one way, from broadcaster to responders,
 so `announce()` calls each responder as a statement.
 *GoF Design Patterns* gives the reason under broadcast communication.
@@ -281,16 +281,16 @@ This way, construction skips the setter and doesn't call `announce()`.
 Inheriting does not stop a class from being a `dataclass`,
 but [a `dataclass`-generated `__init__()` does not call the base class's `__init__()`](12_Techniques--Data_Classes_as_Types.md#dataclass-inheritance).
 A `@dataclass` `Thermometer` has no list of responders,
-and `subscribe()` raises an `AttributeError`.
+and `connect()` raises an `AttributeError`.
 A `__post_init__()` that calls `super().__init__()` fixes that,
 but at greater length and complexity than the `__init__()` it replaces.
 
-`Thermometer` inherits `Broadcaster` because that is the shortest way to get `subscribe()` and `announce()`,
+`Thermometer` inherits `Broadcaster` because that is the shortest way to get `connect()` and `announce()`,
 not because the pattern requires a base class.
 A `Thermometer` can hold a `Broadcaster` as an attribute instead
 (`self.temperature_changed = Broadcaster[float]()`),
-and a subscriber then names that attribute:
-`t.temperature_changed.subscribe(display)`.
+and code that connects a responder then names that attribute:
+`t.temperature_changed.connect(display)`.
 One object can hold several such attributes,
 so it can publish more than one kind of change.
 [Notifying Without a Base Class](#notifying-without-a-base-class)
@@ -298,15 +298,15 @@ drops the base class and the properties together.
 Event-heavy programs have mature libraries (signal/slot systems),
 but for most cases the *Observer* pattern is only a list of callbacks.
 
-Subscribed callables react to every `celsius` assignment:
+Connected callables react to every `celsius` assignment:
 
 ```python
 # thermometer_demo.py
 from thermometer import Thermometer
 
 t = Thermometer(20.0)
-t.subscribe(lambda c: print(f"display: {c}C"))
-t.subscribe(lambda c: print("alarm!" if c > 100 else "ok"))
+t.connect(lambda c: print(f"display: {c}C"))
+t.connect(lambda c: print("alarm!" if c > 100 else "ok"))
 t.celsius = 25
 #: display: 25C
 #: ok
@@ -321,10 +321,10 @@ The responders here are lambdas, but any function or bound method works.
 ### Testing the Broadcaster
 
 Testing confirms that `celsius` reports the value given to the constructor,
-that every subscriber receives the new value in subscription order,
-that a subscriber receives only the changes made after it subscribes,
-and that delivery stops after `unsubscribe()`.
-Two more tests cover a callable subscribed twice and an `unsubscribe()` that matches no subscription:
+that every responder receives the new value in connection order,
+that a responder receives only the changes made after it is connected,
+and that delivery stops after `disconnect()`.
+Two more tests cover a callable connected twice and a `disconnect()` that matches no connection:
 
 ```python
 # test_broadcaster.py
@@ -332,90 +332,89 @@ import pytest
 from broadcaster import Broadcaster
 from thermometer import Thermometer
 
-def test_announce_calls_every_subscriber() -> None:
+def test_announce_calls_every_responder() -> None:
     received: list[tuple[str, object]] = []
     broadcaster = Broadcaster[int]()
-    broadcaster.subscribe(
+    broadcaster.connect(
         lambda d: received.append(("a", d)))
-    broadcaster.subscribe(
+    broadcaster.connect(
         lambda d: received.append(("b", d)))
     broadcaster.announce(42)
     assert received == [("a", 42), ("b", 42)]
 
-def test_no_subscribers_is_a_noop() -> None:
+def test_no_responders_is_a_noop() -> None:
     # Must not raise anything
     Broadcaster[str]().announce("anything")
 
-def test_unsubscribe_stops_delivery() -> None:
+def test_disconnect_stops_delivery() -> None:
     received: list[object] = []
     broadcaster = Broadcaster[object]()
-    broadcaster.subscribe(received.append)
+    broadcaster.connect(received.append)
     broadcaster.announce(1)
     # A new bound method: equal, not identical
-    broadcaster.unsubscribe(received.append)
+    broadcaster.disconnect(received.append)
     broadcaster.announce(2)
     assert received == [1]
 
-def test_subscribing_twice_notifies_twice() -> None:
+def test_connecting_twice_notifies_twice() -> None:
     received: list[object] = []
     broadcaster = Broadcaster[object]()
     record = received.append
-    broadcaster.subscribe(record)
-    broadcaster.subscribe(record)
+    broadcaster.connect(record)
+    broadcaster.connect(record)
     broadcaster.announce(1)
     assert received == [1, 1]
-    broadcaster.unsubscribe(record)  # Removes one of two
+    broadcaster.disconnect(record)  # Removes one of two
     broadcaster.announce(2)
     assert received == [1, 1, 2]
 
-def test_unsubscribe_without_subscribe_raises() -> None:
+def test_disconnect_without_connect_raises() -> None:
     broadcaster = Broadcaster[object]()
     with pytest.raises(ValueError):
-        broadcaster.unsubscribe(print)
+        broadcaster.disconnect(print)
 
 def test_thermometer_pushes_new_value_on_set() -> None:
     readings: list[float] = []
     t = Thermometer(20.0)
     assert t.celsius == 20.0  # The starting reading
-    t.subscribe(readings.append)
+    t.connect(readings.append)
     t.celsius = 25.0
     t.celsius = 150.0
     assert readings == [25.0, 150.0]
     assert t.celsius == 150.0
 
-def test_late_subscriber_misses_earlier_changes() -> None:
+def test_late_responder_misses_earlier_changes() -> None:
     readings: list[float] = []
     t = Thermometer(0.0)
-    t.celsius = 10.0  # No subscriber yet
-    t.subscribe(readings.append)
+    t.celsius = 10.0  # No responder yet
+    t.connect(readings.append)
     t.celsius = 20.0
     assert readings == [20.0]
 ```
 
-The tests subscribe a list's `append` to the broadcaster,
+The tests connect a list's `append` to the broadcaster,
 so the list records every announced value.
 
-You cannot `unsubscribe()` a lambda;
-you need a named reference to the responder.
-`unsubscribe()` matches by equality, and a lambda equals only itself.
+You cannot `disconnect()` a lambda; you need a named reference to the responder.
+`disconnect()` matches by equality, and a lambda equals only itself.
 
 A bound method is different:
-`test_unsubscribe_stops_delivery()` unsubscribes `received.append` without storing it first.
+`test_disconnect_stops_delivery()` disconnects `received.append` without storing it first.
 Each `received.append` builds a new bound-method object,
 so `received.append is received.append` is `False`.
 Two bound methods compare equal when they wrap the same instance and the same function,
-so `unsubscribe(received.append)` removes the subscription that `subscribe(received.append)` made.
+so `disconnect(received.append)` removes the connection that `connect(received.append)` made.
 
 The same equality rule explains the last two tests.
-Subscribing one callable twice puts two equal entries in the list,
-so each notification calls it twice and each `unsubscribe()` removes one entry.
+Connecting one callable twice puts two equal entries in the list,
+so each notification calls it twice and each `disconnect()` removes one entry.
 
 `list.remove()` raises a `ValueError` when it matches nothing,
-so `unsubscribe()` raises a `ValueError` when its callable never subscribed.
+so `disconnect()` raises a `ValueError` when its callable is not connected.
 
-### Unsubscribing During a Notification
+### Disconnecting During a Notification
 
-The copy in `announce()` matters when a responder unsubscribes mid-notification:
+The copy in `announce()` matters when a responder disconnects itself mid-notification:
 
 ```python
 # self_removing_responder.py
@@ -426,26 +425,26 @@ seen: list[str] = []
 
 def once(data: object) -> None:
     seen.append(f"once: {data}")
-    # Unsubscribes mid-notification
-    broadcaster.unsubscribe(once)
+    # Disconnects mid-notification
+    broadcaster.disconnect(once)
 
 def always(data: object) -> None:
     seen.append(f"always: {data}")
 
-broadcaster.subscribe(once)
-broadcaster.subscribe(always)
+broadcaster.connect(once)
+broadcaster.connect(always)
 broadcaster.announce(1)
 broadcaster.announce(2)
 print(seen)
 #: ['once: 1', 'always: 1', 'always: 2']
 ```
 
-`once` receives the first change and unsubscribes.
+`once` receives the first change and disconnects itself.
 That call removes it from the broadcaster's list,
 not from the copy that `announce()`'s loop reads,
 so `once` still gets this notification but no later ones.
 `always` receives both.
-Without the copy, `announce()`'s `for` loop reads the list that `unsubscribe()` changes.
+Without the copy, `announce()`'s `for` loop reads the list that `disconnect()` changes.
 `once` is at index 0 and `always` at index 1.
 Removing `once` moves `always` to index 0, which the loop has already visited,
 so the loop looks for index 1, finds the list ended there, and stops.
@@ -470,13 +469,13 @@ no longer fits without a wrapper (see exercise 5).
 
 ### Lapsed Listeners
 
-Subscriptions are strong references.
+Connections are strong references.
 A bound method holds the object it came from,
-so subscribing `plot.redraw` keeps that `plot` in memory for as long as the broadcaster holds the subscription.
+so connecting `plot.redraw` keeps that `plot` in memory for as long as the broadcaster holds the connection.
 When a broadcaster outlives its responders,
-its subscriptions keep every one of them in memory:
+its connections keep every one of them in memory:
 the classic *lapsed listener* leak.
-Long-lived broadcasters need disciplined `unsubscribe()` calls,
+Long-lived broadcasters need disciplined `disconnect()` calls,
 or [weak references](10_Foundations--Cleanup.md#watching-objects-without-holding-them),
 which do not keep the responder alive
 (`weakref.WeakMethod` is the bound-method form).
@@ -499,11 +498,11 @@ ref = WeakMethod(plot.redraw)
 def weak(celsius: float) -> None:
     live = ref()
     if live is None:
-        broadcaster.unsubscribe(weak)  # Gone: drop out
+        broadcaster.disconnect(weak)  # Gone: drop out
     else:
         live(celsius)
 
-broadcaster.subscribe(weak)
+broadcaster.connect(weak)
 broadcaster.announce(25.0)
 #: plot: 25.0C
 
@@ -511,11 +510,11 @@ del plot  # The only strong reference
 broadcaster.announce(30.0)  # Prints nothing
 
 with expected(ValueError):
-    broadcaster.unsubscribe(weak)
+    broadcaster.disconnect(weak)
 #: [ValueError] list.remove(x): x not in list
 ```
 
-A `Broadcaster` holds a strong reference to whatever you subscribe,
+A `Broadcaster` holds a strong reference to whatever you connect,
 so the weak part lives inside the responder.
 `WeakMethod` stores the instance and the function separately, both weakly,
 and rebuilds the bound method when you call the reference.
@@ -523,15 +522,15 @@ An ordinary `weakref.ref(plot.redraw)` is dead the moment it is created:
 `plot.redraw` builds a new bound-method object that nothing else holds,
 so Python collects it at once and the reference returns `None`.
 While `plot` is alive, `weak` forwards the reading to it.
-Once `plot` is gone, `ref()` returns `None` and `weak` unsubscribes itself,
+Once `plot` is gone, `ref()` returns `None` and `weak` disconnects itself,
 which is safe mid-notification because `announce()` iterates through a copy.
-The `ValueError` confirms the subscription is gone:
-`unsubscribe()` finds nothing left to remove.
+The `ValueError` confirms the connection is gone:
+`disconnect()` finds nothing left to remove.
 
 Most programs do not need weak responders.
 A broadcaster that lives no longer than its responders releases them when it goes away,
-and an explicit `unsubscribe()` covers a responder that leaves early.
-A weak responder earns its extra code only when a long-lived broadcaster holds short-lived responders that nothing unsubscribes.
+and an explicit `disconnect()` covers a responder that leaves early.
+A weak responder earns its extra code only when a long-lived broadcaster holds short-lived responders that nothing disconnects.
 
 ### Re-entrant Notification
 
@@ -561,7 +560,7 @@ class TwoWay(Broadcaster[int]):
         self.announce(new)  # Re-enters if written back
 
 model = TwoWay()
-model.subscribe(
+model.connect(
     lambda v: setattr(model, "value", v))
 with expected(RecursionError):
     model.value = 1
@@ -600,7 +599,7 @@ def echo(v: int) -> None:
     seen.append(v)
     model.value = v  # Now a no-op
 
-model.subscribe(echo)
+model.connect(echo)
 model.value = 1
 print(seen)
 #: [1]
@@ -617,13 +616,13 @@ which is the behavior you want when a responder counts readings rather than chan
 
 ### Setting the Responders at Construction
 
-`subscribe()` and `unsubscribe()` make `Broadcaster` dynamic:
+`connect()` and `disconnect()` make `Broadcaster` dynamic:
 its list of responders can change at any moment,
 including in the middle of an `announce()`.
 Several of the preceding sections exist because of that.
-The copy in `announce()` guards against an unsubscribe during the loop,
-a lambda cannot be unsubscribed,
-and a lapsed listener is a subscription that nobody removed.
+The copy in `announce()` guards against a `disconnect()` call during the loop,
+a lambda cannot be disconnected,
+and a lapsed listener is a connection that nobody removed.
 
 Decoupling and dynamism are separate properties.
 A subject is decoupled when it knows its observers only as callables,
@@ -661,9 +660,9 @@ print(log)
 and the tuple in that field cannot change.
 The constructor settles the set of responders.
 `announce()` iterates through the tuple with no copy,
-because no responder can unsubscribe mid-notification.
+because no responder can be disconnected mid-notification.
 The lambda needs no named reference,
-since there is no `unsubscribe()` to match it.
+since there is no `disconnect()` to match it.
 The broadcaster still holds strong references to its responders,
 but they exist before it does and none can join later,
 so the set it keeps alive cannot grow into a lapsed-listener leak.
@@ -687,7 +686,7 @@ A program can settle its responders at any of four points:
     The subject receives its responders when you create it,
     as `FixedBroadcaster` does.
 4.  **Runtime.**
-    Responders subscribe and unsubscribe at any moment, as with `Broadcaster`.
+    Responders connect and disconnect at any moment, as with `Broadcaster`.
 
 Each later point adds flexibility,
 along with some of the problems this chapter covers.
@@ -698,7 +697,7 @@ When you know the responders by the time the subject exists, pass them in.
 ### Notifying Without a Base Class
 
 `Thermometer` writes a getter and a setter for each attribute it publishes,
-and inherits `subscribe()` and `announce()` from `Broadcaster`.
+and inherits `connect()` and `announce()` from `Broadcaster`.
 We can simplify this using `__setattr__()`.
 Python calls it on every attribute assignment,
 so one method covers every attribute of the class:
@@ -820,12 +819,12 @@ class Broadcaster[T]:
     def __init__(self) -> None:
         self._responders: list[AsyncResponder[T]] = []
 
-    def subscribe(
+    def connect(
         self, responder: AsyncResponder[T]
     ) -> None:
         self._responders.append(responder)
 
-    def unsubscribe(
+    def disconnect(
         self, responder: AsyncResponder[T]
     ) -> None:
         self._responders.remove(responder)
@@ -844,7 +843,7 @@ The `AsyncResponder` alias makes the type checker reject a plain function as a r
 A responder must return an awaitable,
 and calling an `async` function produces one.
 The type checker also rejects the reverse mistake,
-an `async` function subscribed to the synchronous `Broadcaster`.
+an `async` function connected to the synchronous `Broadcaster`.
 
 An `announce()` that awaits is a coroutine,
 and its caller must `await` it in turn,
@@ -885,8 +884,8 @@ async def log_reading(celsius: float) -> None:
 
 async def main() -> None:
     t = Thermometer(15.0)
-    t.subscribe(alarm)
-    t.subscribe(log_reading)
+    t.connect(alarm)
+    t.connect(log_reading)
     await t.set_celsius(20)  # Below the alarm threshold
     await t.set_celsius(150)  # Triggers the alarm too
 
@@ -896,9 +895,9 @@ asyncio.run(main())
 #: alarm sent: 150C
 ```
 
-`alarm` subscribes before `log_reading`,
+`alarm` is connected before `log_reading`,
 yet at 150 degrees the log prints first.
-Awaiting the responders in sequence prints in subscription order, alarm first.
+Awaiting the responders in sequence prints in connection order, alarm first.
 Concurrent fan-out lets each responder finish as soon as its own wait ends,
 so the faster responder prints first.
 The results `gather()` returns stay in argument order;
@@ -907,12 +906,12 @@ only the side effects interleave.
 A responder need not act on every notification.
 Below its threshold, the alarm returns at once.
 
-### Unsubscribing During an Async Notification
+### Disconnecting During an Async Notification
 
 The async `announce()` needs no `list()` copy.
 The `*` unpacks the generator into a tuple of coroutines before `gather()` runs,
-so an unsubscribe during the fan-out cannot skip a responder.
-The tuple also means a responder that unsubscribes mid-notification still receives this change,
+so a `disconnect()` call during the fan-out cannot skip a responder.
+The tuple also means a responder that disconnects itself mid-notification still receives this change,
 an async counterpart to `self_removing_responder.py`:
 
 ```python
@@ -925,15 +924,15 @@ seen: list[str] = []
 
 async def once(data: object) -> None:
     seen.append(f"once: {data}")
-    # Unsubscribes mid-notification
-    broadcaster.unsubscribe(once)
+    # Disconnects mid-notification
+    broadcaster.disconnect(once)
 
 async def always(data: object) -> None:
     seen.append(f"always: {data}")
 
 async def main() -> None:
-    broadcaster.subscribe(once)
-    broadcaster.subscribe(always)
+    broadcaster.connect(once)
+    broadcaster.connect(always)
     await broadcaster.announce(1)
     await broadcaster.announce(2)
 
@@ -942,7 +941,7 @@ print(seen)
 #: ['once: 1', 'always: 1', 'always: 2']
 ```
 
-`once` unsubscribes while `gather()` is running it,
+`once` disconnects itself while `gather()` is running it,
 and `always` still receives the change,
 because `gather()` held both coroutines before either ran.
 The next `announce()` builds its tuple from the shortened list,
@@ -1140,7 +1139,7 @@ def test_model_notifies_with_the_new_grid() -> None:
     before = model.grid[(1, 1)]
     seen: list[Grid] = []
     # The responder is a callable
-    model.subscribe(seen.append)
+    model.connect(seen.append)
     model.select((1, 1))
     assert seen[-1] is model.grid
     assert model.grid[(1, 1)] != before
@@ -1174,7 +1173,7 @@ def show(model: BoxModel, cell_px: int = 60) -> None:
                 (x + 1) * cell_px, (y + 1) * cell_px,
                 fill=color, outline="white")
 
-    model.subscribe(draw)  # Repaint on every model change
+    model.connect(draw)  # Repaint on every model change
     canvas.bind("<Button-1>",
                 lambda e: model.select(
                     (e.x // cell_px, e.y // cell_px)))
@@ -1187,14 +1186,14 @@ if __name__ == "__main__":
 
 `show()` makes a square canvas, `model.size` cells on a side,
 each cell `cell_px` pixels wide.
-`draw()` paints the grid, and the view subscribes `draw()` to the model,
+`draw()` paints the grid, and the view connects `draw()` to the model,
 so every change repaints.
 `draw()` is defined inside `show()`,
 so it is a closure that reads `canvas` and `cell_px`.
 For each cell it paints one rectangle,
 whose pixel corners come from multiplying the cell's column and row by `cell_px`.
 It takes a `Grid` and returns `None`,
-the shape `subscribe()` requires of a responder.
+the shape `connect()` requires of a responder.
 When the window opens,
 `show()` calls `draw(model.grid)` once to paint the starting grid.
 
@@ -1276,7 +1275,7 @@ class View:
 
 model = Counter()
 view = View(model)
-model.subscribe(view.draw)
+model.connect(view.draw)
 for char in "++-x":
     view.key(char)
 #: count: 1
@@ -1320,7 +1319,7 @@ class NoKeys:  # Reads input and changes nothing
 
 model = Counter()
 view = View()
-model.subscribe(view.draw)
+model.connect(view.draw)
 control: Keys = StepKeys(model)
 for char in "++-x":
     control.key(char)
@@ -1335,7 +1334,7 @@ print(model.count)
 ```
 
 The two versions share three things: the `Counter` model,
-the `model.subscribe(view.draw)` call that connects the model to the view,
+the `model.connect(view.draw)` call that registers the view with the model,
 and the printed output for the same input, `"++-x"`.
 *Observer* does the same work either way,
 which is why the chapter's opening calls the two architectures nearly equivalent.
@@ -1356,7 +1355,7 @@ with `View` and the model unchanged.
 
 MVC separates drawing from input handling,
 the two jobs `document_view.py` gives one class,
-and the `subscribe()` call stays the same.
+and the `connect()` call stays the same.
 `box_view.py` has the Document-View shape: its `draw()` paints,
 its `bind()` lambda handles the click, and both are defined inside `show()`.
 
@@ -1370,11 +1369,11 @@ and a counter wired as Document-View and as MVC.
 In every case the responder is a callable,
 and the broadcaster holds responders and calls each one when its state changes.
 The point at which the broadcaster receives its responders varies.
-All four scenarios subscribe at runtime,
+All four scenarios connect their responders at runtime,
 `FixedBroadcaster` takes its responders at construction,
 and exercise 11's registry collects them as Python imports a module.
 The pattern requires no interface, no `update()` method, no class per reaction,
-and no `unsubscribe()`.
+and no `disconnect()`.
 
 ## Deciding What Matters
 
@@ -1443,8 +1442,8 @@ def display(celsius: float) -> None:
 
 log: list[float] = []
 t = ThresholdThermometer(20.0, 0.5)
-t.subscribe(log.append)
-t.subscribe(display)
+t.connect(log.append)
+t.connect(display)
 for reading in [20.2, 20.9, 21.0, 22.0]:
     t.celsius = reading
 #: display: 20.9C
@@ -1491,9 +1490,9 @@ instead of guessing which responders need it.
 
 1.  Create a minimal *Observer* design of your own,
     without looking at `broadcaster.py`:
-    the smallest `Broadcaster` that lets callables subscribe,
+    the smallest `Broadcaster` that lets you connect callables,
     then notifies them.
-    Demonstrate it by subscribing several responders and causing one change that updates them all.
+    Demonstrate it by connecting several responders and causing one change that updates them all.
 2.  Rewrite the classic listings to use the pull model:
     `Display.update()` reads `subject.celsius` instead of `arg`.
     A `Display` that narrows its `subject` parameter to `Thermometer` no longer satisfies `Observer[float]`,
@@ -1518,7 +1517,7 @@ instead of guessing which responders need it.
     from `utils/result.py`,
     and `announce()` returns the `Err` values it collects.
     Write an adapter that lets a responder returning `None`,
-    such as `received.append`, subscribe.
+    such as `received.append`, be connected.
     Write a test in which the first responder fails and the second still records its notification.
 6.  Turn `box_observer.py` into a simple game:
     you own the contiguous patch of same-colored squares containing the top-left corner,
@@ -1533,7 +1532,7 @@ instead of guessing which responders need it.
     and explain why the view needed no change.
 8.  Attach a second view to `box_observer.py`'s `BoxModel`.
     Write one view that prints a letter per cell and another that prints how many cells each color holds,
-    subscribe both to the same model,
+    connect both to the same model,
     and show that one `select()` updates the pair.
     Keep both views textual so the example runs without a window,
     and leave the model as `box_observer.py` has it.
@@ -1550,9 +1549,9 @@ instead of guessing which responders need it.
     so one class declares several independently watched attributes:
     `celsius = Notifying[float]()` beside `humidity = Notifying[float]()`.
     Each attribute keeps its own responders.
-    Subscribing needs the descriptor, not the value it stores,
+    Connecting needs the descriptor, not the value it stores,
     so `__get__()` returns the descriptor for an access through the class,
-    and `Thermometer.celsius.subscribe(t, readings.append)` reaches it.
+    and `Thermometer.celsius.connect(t, readings.append)` reaches it.
     Show that an assignment to one attribute calls no responder of the other.
 11. Write a load-time version of `Broadcaster`:
     a module-level list of responders and a `@responds` decorator that appends a function to it and returns the function unchanged.

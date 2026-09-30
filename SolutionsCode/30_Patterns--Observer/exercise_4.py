@@ -8,7 +8,7 @@ class Broadcaster[T]:
     def __init__(self) -> None:
         self._responders: list[AsyncResponder[T]] = []
 
-    def subscribe(
+    def connect(
         self, responder: AsyncResponder[T]
     ) -> None:
         self._responders.append(responder)
@@ -35,8 +35,8 @@ async def record(data: int) -> None:
 
 async def main() -> None:
     broadcaster = Broadcaster[int]()
-    broadcaster.subscribe(broken)
-    broadcaster.subscribe(record)
+    broadcaster.connect(broken)
+    broadcaster.connect(record)
     try:
         await broadcaster.announce(7)
     except* RuntimeError as group:

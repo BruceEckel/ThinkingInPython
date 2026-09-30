@@ -18,7 +18,7 @@ def show(model: BoxModel, cell_px: int = 60) -> None:
                 (x + 1) * cell_px, (y + 1) * cell_px,
                 fill=color, outline="white")
 
-    model.subscribe(draw)  # Repaint on every model change
+    model.connect(draw)  # Repaint on every model change
     canvas.bind("<Button-1>",
                 lambda e: model.select(
                     (e.x // cell_px, e.y // cell_px)))

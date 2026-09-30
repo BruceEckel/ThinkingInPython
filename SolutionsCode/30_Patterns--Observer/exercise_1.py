@@ -6,7 +6,7 @@ class Broadcaster:
     def __init__(self) -> None:
         self._responders: list[Callable] = []
 
-    def subscribe(self, responder: Callable) -> None:
+    def connect(self, responder: Callable) -> None:
         self._responders.append(responder)
 
     def announce(self, *args: Any) -> None:
@@ -15,8 +15,8 @@ class Broadcaster:
 
 calls: list[tuple[str, int]] = []
 broadcaster = Broadcaster()
-broadcaster.subscribe(lambda v: calls.append(("A", v)))
-broadcaster.subscribe(lambda v: calls.append(("B", v)))
+broadcaster.connect(lambda v: calls.append(("A", v)))
+broadcaster.connect(lambda v: calls.append(("B", v)))
 broadcaster.announce(42)
 print(calls)
 #: [('A', 42), ('B', 42)]

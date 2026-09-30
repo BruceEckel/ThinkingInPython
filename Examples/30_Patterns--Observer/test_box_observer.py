@@ -34,7 +34,7 @@ def test_model_notifies_with_the_new_grid() -> None:
     before = model.grid[(1, 1)]
     seen: list[Grid] = []
     # The responder is a callable
-    model.subscribe(seen.append)
+    model.connect(seen.append)
     model.select((1, 1))
     assert seen[-1] is model.grid
     assert model.grid[(1, 1)] != before

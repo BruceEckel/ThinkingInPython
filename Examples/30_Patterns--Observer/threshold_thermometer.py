@@ -25,8 +25,8 @@ def display(celsius: float) -> None:
 
 log: list[float] = []
 t = ThresholdThermometer(20.0, 0.5)
-t.subscribe(log.append)
-t.subscribe(display)
+t.connect(log.append)
+t.connect(display)
 for reading in [20.2, 20.9, 21.0, 22.0]:
     t.celsius = reading
 #: display: 20.9C

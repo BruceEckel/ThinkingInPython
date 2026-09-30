@@ -7,7 +7,7 @@ class Broadcaster[T]:
     def __init__(self) -> None:
         self._responders: list[Responder[T]] = []
 
-    def subscribe(self, responder: Responder[T]) -> None:
+    def connect(self, responder: Responder[T]) -> None:
         self._responders.append(responder)
 
     def announce(self, data: T) -> None:
@@ -27,8 +27,8 @@ def broken(data: int) -> None:
     raise RuntimeError(f"cannot handle {data}")
 
 broadcaster = Broadcaster[int]()
-broadcaster.subscribe(broken)
-broadcaster.subscribe(received.append)
+broadcaster.connect(broken)
+broadcaster.connect(received.append)
 try:
     broadcaster.announce(7)
 except* RuntimeError as group:

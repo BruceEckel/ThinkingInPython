@@ -8,12 +8,12 @@ class Broadcaster[T]:
     def __init__(self) -> None:
         self._responders: list[AsyncResponder[T]] = []
 
-    def subscribe(
+    def connect(
         self, responder: AsyncResponder[T]
     ) -> None:
         self._responders.append(responder)
 
-    def unsubscribe(
+    def disconnect(
         self, responder: AsyncResponder[T]
     ) -> None:
         self._responders.remove(responder)

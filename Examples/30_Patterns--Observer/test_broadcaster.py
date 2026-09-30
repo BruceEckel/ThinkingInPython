@@ -3,61 +3,61 @@ import pytest
 from broadcaster import Broadcaster
 from thermometer import Thermometer
 
-def test_announce_calls_every_subscriber() -> None:
+def test_announce_calls_every_responder() -> None:
     received: list[tuple[str, object]] = []
     broadcaster = Broadcaster[int]()
-    broadcaster.subscribe(
+    broadcaster.connect(
         lambda d: received.append(("a", d)))
-    broadcaster.subscribe(
+    broadcaster.connect(
         lambda d: received.append(("b", d)))
     broadcaster.announce(42)
     assert received == [("a", 42), ("b", 42)]
 
-def test_no_subscribers_is_a_noop() -> None:
+def test_no_responders_is_a_noop() -> None:
     # Must not raise anything
     Broadcaster[str]().announce("anything")
 
-def test_unsubscribe_stops_delivery() -> None:
+def test_disconnect_stops_delivery() -> None:
     received: list[object] = []
     broadcaster = Broadcaster[object]()
-    broadcaster.subscribe(received.append)
+    broadcaster.connect(received.append)
     broadcaster.announce(1)
     # A new bound method: equal, not identical
-    broadcaster.unsubscribe(received.append)
+    broadcaster.disconnect(received.append)
     broadcaster.announce(2)
     assert received == [1]
 
-def test_subscribing_twice_notifies_twice() -> None:
+def test_connecting_twice_notifies_twice() -> None:
     received: list[object] = []
     broadcaster = Broadcaster[object]()
     record = received.append
-    broadcaster.subscribe(record)
-    broadcaster.subscribe(record)
+    broadcaster.connect(record)
+    broadcaster.connect(record)
     broadcaster.announce(1)
     assert received == [1, 1]
-    broadcaster.unsubscribe(record)  # Removes one of two
+    broadcaster.disconnect(record)  # Removes one of two
     broadcaster.announce(2)
     assert received == [1, 1, 2]
 
-def test_unsubscribe_without_subscribe_raises() -> None:
+def test_disconnect_without_connect_raises() -> None:
     broadcaster = Broadcaster[object]()
     with pytest.raises(ValueError):
-        broadcaster.unsubscribe(print)
+        broadcaster.disconnect(print)
 
 def test_thermometer_pushes_new_value_on_set() -> None:
     readings: list[float] = []
     t = Thermometer(20.0)
     assert t.celsius == 20.0  # The starting reading
-    t.subscribe(readings.append)
+    t.connect(readings.append)
     t.celsius = 25.0
     t.celsius = 150.0
     assert readings == [25.0, 150.0]
     assert t.celsius == 150.0
 
-def test_late_subscriber_misses_earlier_changes() -> None:
+def test_late_responder_misses_earlier_changes() -> None:
     readings: list[float] = []
     t = Thermometer(0.0)
-    t.celsius = 10.0  # No subscriber yet
-    t.subscribe(readings.append)
+    t.celsius = 10.0  # No responder yet
+    t.connect(readings.append)
     t.celsius = 20.0
     assert readings == [20.0]

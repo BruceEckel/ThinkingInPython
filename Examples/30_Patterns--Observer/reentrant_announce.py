@@ -17,7 +17,7 @@ class TwoWay(Broadcaster[int]):
         self.announce(new)  # Re-enters if written back
 
 model = TwoWay()
-model.subscribe(
+model.connect(
     lambda v: setattr(model, "value", v))
 with expected(RecursionError):
     model.value = 1

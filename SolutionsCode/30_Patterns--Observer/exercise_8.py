@@ -35,7 +35,7 @@ class Broadcaster[T]:
     def __init__(self) -> None:
         self._responders: list[Responder[T]] = []
 
-    def subscribe(self, responder: Responder[T]) -> None:
+    def connect(self, responder: Responder[T]) -> None:
         self._responders.append(responder)
 
     def announce(self, data: T) -> None:
@@ -63,8 +63,8 @@ def tally(grid: Grid) -> None:
     counts = Counter(grid.values())
     print(" ".join(f"{c[0]}:{counts[c]}" for c in Color))
 
-model.subscribe(letters)
-model.subscribe(tally)
+model.connect(letters)
+model.connect(tally)
 model.select((1, 1))
 #: s k k
 #: k s p

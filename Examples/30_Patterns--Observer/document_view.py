@@ -17,7 +17,7 @@ class View:
 
 model = Counter()
 view = View(model)
-model.subscribe(view.draw)
+model.connect(view.draw)
 for char in "++-x":
     view.key(char)
 #: count: 1

@@ -14,11 +14,11 @@ ref = WeakMethod(plot.redraw)
 def weak(celsius: float) -> None:
     live = ref()
     if live is None:
-        broadcaster.unsubscribe(weak)  # Gone: drop out
+        broadcaster.disconnect(weak)  # Gone: drop out
     else:
         live(celsius)
 
-broadcaster.subscribe(weak)
+broadcaster.connect(weak)
 broadcaster.announce(25.0)
 #: plot: 25.0C
 
@@ -26,5 +26,5 @@ del plot  # The only strong reference
 broadcaster.announce(30.0)  # Prints nothing
 
 with expected(ValueError):
-    broadcaster.unsubscribe(weak)
+    broadcaster.disconnect(weak)
 #: [ValueError] list.remove(x): x not in list

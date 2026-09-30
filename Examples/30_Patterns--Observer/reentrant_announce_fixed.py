@@ -24,7 +24,7 @@ def echo(v: int) -> None:
     seen.append(v)
     model.value = v  # Now a no-op
 
-model.subscribe(echo)
+model.connect(echo)
 model.value = 1
 print(seen)
 #: [1]

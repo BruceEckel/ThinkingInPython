@@ -16,8 +16,8 @@ def test_later_responder_still_runs_after_a_failure(
 
     async def run() -> None:
         broadcaster = Broadcaster[int]()
-        broadcaster.subscribe(broken)
-        broadcaster.subscribe(record)
+        broadcaster.connect(broken)
+        broadcaster.connect(record)
         with pytest.raises(ExceptionGroup):
             await broadcaster.announce(1)
 

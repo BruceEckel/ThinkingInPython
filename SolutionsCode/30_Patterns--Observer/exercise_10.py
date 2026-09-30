@@ -28,8 +28,8 @@ class Notifying[T]:
         for responder in getattr(obj, self.responders, ()):
             responder(value)
 
-    def subscribe(self, obj: object,
-                  responder: Responder[T]) -> None:
+    def connect(self, obj: object,
+                responder: Responder[T]) -> None:
         obj.__dict__.setdefault(
             self.responders, []).append(responder)
 
@@ -45,8 +45,8 @@ class Thermometer:
 t = Thermometer(20.0, 0.4)
 readings: list[float] = []
 humidities: list[float] = []
-Thermometer.celsius.subscribe(t, readings.append)
-Thermometer.humidity.subscribe(t, humidities.append)
+Thermometer.celsius.connect(t, readings.append)
+Thermometer.humidity.connect(t, humidities.append)
 t.celsius = 25.0
 t.humidity = 0.5
 t.celsius = 150.0

@@ -8,7 +8,7 @@ class Broadcaster[T]:
     def __init__(self) -> None:
         self._responders: list[Responder[T]] = []
 
-    def subscribe(self, responder: Responder[T]) -> None:
+    def connect(self, responder: Responder[T]) -> None:
         self._responders.append(responder)
 
     def announce(self, data: T) -> list[Err[str]]:
@@ -33,8 +33,8 @@ def checked(data: int) -> Result[None, str]:
 
 received: list[int] = []
 broadcaster = Broadcaster[int]()
-broadcaster.subscribe(checked)
-broadcaster.subscribe(succeeds(received.append))
+broadcaster.connect(checked)
+broadcaster.connect(succeeds(received.append))
 print(broadcaster.announce(7), received)
 #: [] [7]
 print(broadcaster.announce(-1), received)

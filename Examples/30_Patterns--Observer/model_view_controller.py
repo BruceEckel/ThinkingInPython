@@ -25,7 +25,7 @@ class NoKeys:  # Reads input and changes nothing
 
 model = Counter()
 view = View()
-model.subscribe(view.draw)
+model.connect(view.draw)
 control: Keys = StepKeys(model)
 for char in "++-x":
     control.key(char)

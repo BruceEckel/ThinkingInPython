@@ -13,8 +13,8 @@ async def log_reading(celsius: float) -> None:
 
 async def main() -> None:
     t = Thermometer(15.0)
-    t.subscribe(alarm)
-    t.subscribe(log_reading)
+    t.connect(alarm)
+    t.connect(log_reading)
     await t.set_celsius(20)  # Below the alarm threshold
     await t.set_celsius(150)  # Triggers the alarm too
 

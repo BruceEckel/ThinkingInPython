@@ -9,7 +9,7 @@ def test_later_responder_runs_after_an_err() -> None:
         return Err("boom")
 
     broadcaster = Broadcaster[int]()
-    broadcaster.subscribe(broken)
-    broadcaster.subscribe(succeeds(received.append))
+    broadcaster.connect(broken)
+    broadcaster.connect(succeeds(received.append))
     assert broadcaster.announce(1) == [Err("boom")]
     assert received == [1]
