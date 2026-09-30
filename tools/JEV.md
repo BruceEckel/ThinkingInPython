@@ -178,10 +178,15 @@ and `skills list` prints the skills Jev chooses among for the current project.
 
 For each prompt that does not start with `/`,
 the hook sends the prompt to Jev with a `choice` question for each mode that is on.
+The state also carries the opening and ending of the previous reply,
+600 characters read from the session transcript,
+so a follow-up like "do that" is judged by the work it accepts.
 With both on, one request asks both questions.
 The answers come back as context lines on the prompt,
 with the pick, its confidence, and the top four probabilities:
 `Jev routing: Jev picked **haiku** (confidence 0.89; ...)`.
+A pick below confidence 0.5 (`FLOOR` in `jev.py`) comes back marked to be ignored,
+and Claude handles that prompt as if the mode were off.
 If the call fails, the context line says so,
 and Claude handles the prompt normally.
 
@@ -204,38 +209,27 @@ Claude loads the picked skill before any other step,
 except when the user named a skill,
 or when the skill's description limits it to explicit requests.
 
-### The prompts that built it
+### The prompts that build it
 
-These two prompts, pasted into Claude Code, produced the skills this section describes.
+These two prompts describe the skills as this section documents them.
+They replace the first prompts, which left the builder to decide the mechanism,
+the question to ask Jev, a `none` option, and when to ignore a pick.
+In the session of 2026-09-30, those gaps showed as overrides:
+Claude set aside the model pick for 8 of 11 prompts,
+most of them short follow-ups that Jev judged without the reply they answered.
 
 Model routing (`/jev`):
 
 ```
-Create a skill command called /jev on to enable automated model routing. /jev turns it on, '/jev off' turns it off.
-
-When active, do not use the default model immediately. Instead, process every user task in two steps:
-
-1. System 1 Routing (Jev): Send the user's prompt to Jev. Ask Jev to evaluate the task's complexity and select the most efficient model from this menu of options:
-
-- Haiku: For simple tasks, quick file path searches, basic local file manipulations, or executing standard uv package manager commands.
-
-- Sonnet: For standard Python development, intermediate coding tasks, and moderate reasoning.
-
-- Opus: Only for highly complex tasks, deep reasoning, or major architectural decisions.
-
-- Fable: For the most difficult tasks
-
-2. System 2 Execution: Once Jev outputs its selection, automatically route the user's original task to that specific model to execute the work and provide the final output.
+Build /jev [on|off|status], a machine-wide switch (a flag file) for model routing in Claude Code.
+While on, a UserPromptSubmit hook sends TypeSafe's Jev (TYPESAFE_API_KEY; env, then HKCU\Environment) a Choice question: which is the cheapest of haiku, sonnet, opus, fable that will still do this task well? Give each model a "for" and a "not for" description. The state is the prompt plus the opening and ending of the previous assistant reply (600 characters, read from the hook's transcript_path), since short follow-ups like "do that" depend on it. Skip prompts starting with "/".
+The hook adds the pick, its confidence, and the top probabilities as context. Rules for Claude: below confidence 0.5, or when the pick is the session's model, do the task directly. Otherwise delegate the whole task to one Agent call with model set to the pick, carrying the user's words and every fact from earlier turns the task needs, and check the result before relaying it. Override when a project CLAUDE.md routing table pins that kind of work, and say why in one line. If the Jev call fails, say so and proceed normally.
 ```
 
 Skill selection (`/jev-skills`):
 
 ```
-Create a command called /jev-skills on to enable automated skill selection for this session.
-
-When I assign a task that requires an external skill or tool, do not search through the workspace or skill library yourself. Instead, use the following two-step process:
-
-1. System 1 Skill Classification (Jev): Send my task description and the complete list of available skills in my workspace to Jev. Instruct Jev to evaluate the task and output only the exact name of the single most relevant skill required to complete the task.
-
-2. System 2 Execution (Claude): Once Jev outputs the skill name, immediately load that specific skill and proceed to execute my original task.
+Build /jev-skills [on|off|status], a machine-wide switch for skill selection, independent of /jev (one Jev call answers both when both are on).
+The hook sends Jev the prompt, the same previous-reply excerpt, and every skill Claude could load for the current project, each with its description cut to 600 characters, plus a "none" option. Leave out skills marked disable-model-invocation or switched off in skillOverrides. Ask for a Choice.
+Rules for Claude: load the pick before any other step only when its confidence is at least 0.5. The user's named skill or command wins. Skip a pick whose description restricts it to explicit requests unless the prompt makes one. Say nothing when the pick is "none".
 ```
