@@ -485,7 +485,7 @@ print(f"{r2:.6f}" if r2 is not None else "no root")
 Each handler is a *Strategy* function, `chain` is the list of strategies,
 and success is a non-`None` return.
 This `solve()` reuses the name from `algorithms.py` with the opposite failure contract:
-an exhausted chain returns `None` rather than raising,
+an exhausted chain returns `None` rather than raising an exception,
 and the caller decides what an empty result means.
 The second `solve()` call shows the fall-through:
 because the interval `[1.0, 1.3]` does not straddle the root,

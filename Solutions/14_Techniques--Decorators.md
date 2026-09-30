@@ -371,7 +371,7 @@ attempt sits outside it, with no handler. That last call satisfies
 both requirements at once. It returns `R` on success, so the function
 has a return value on every path the type checker can see. It also
 lets the last exception propagate with no handler in its way.
-Re-raising from inside the loop with a bare `raise` on the last
+Re-raising the exception from inside the loop with a bare `raise` on the last
 attempt also works at runtime, but then the type checker cannot tell
 that the function always either returns or raises an exception, and
 it reports that `wrapper()` can implicitly return `None`.

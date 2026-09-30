@@ -726,7 +726,7 @@ Most code catches the exception and raises a new one with a better message.
 The new exception replaces the original type,
 so a caller who wants the original must read it from the new exception's `__cause__`
 (set by `raise New(...) from e`) or `__context__`
-(set when a handler raises without `from`).
+(set when a handler raises an exception without `from`).
 `BaseException.add_note()`, added in Python 3.11,
 improves the message and keeps the exception.
 It appends a line to the one you already have, and the traceback prints it:

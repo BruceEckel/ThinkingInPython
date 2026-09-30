@@ -857,7 +857,7 @@ passed to `disk_usage()`, or placed in a `Directory`'s entries, as
 `invalid-argument-type`. The warning leaves the plugin nothing to fix,
 because the union it would have to extend is yours. Code the checker
 never sees fares worse: its `Symlink` falls through every case to
-`assert_never()`, which raises at runtime. The plugin's alternatives
+`assert_never()`, which raises an `AssertionError` at runtime. The plugin's alternatives
 are to vendor a patched copy of your module or to persuade you to add
 the case. The open design removes that coupling.
 

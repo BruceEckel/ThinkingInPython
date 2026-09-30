@@ -1612,7 +1612,7 @@ because `catch()` matches the yielded value before the driver gets it and never 
 ([Supplying the Dependency](#supplying-the-dependency)),
 and that `Handler` breaks the condition that `run()` drives the Effect directly.
 Its loop passes an error outward instead of throwing that error back into the Effect it wraps,
-so the driver's `throw()` raises in the `Handler`'s own frame,
+so the driver's `throw()` raises the `KeyError` in the `Handler`'s own frame,
 not `guarded()`'s.
 The error escapes before the inner `except` runs:
 

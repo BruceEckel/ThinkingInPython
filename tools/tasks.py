@@ -848,6 +848,16 @@ def banned(v: Vars) -> None:
     py("tools.banned_phrases")
 
 
+@task("Report prose \"raise\" words with no object (advisory)")
+def bare_raise(v: Vars) -> None:
+    """Report prose where "raise" or "raises" has no object, per the
+    writing-style rule. It reports and never gates; false alarms are
+    clauses with the object before the verb and non-exception senses
+    such as raising a question or a limit.
+    """
+    py("tools.bare_raise", *v.words("ARGS"))
+
+
 @task("Fail if a one-line comment ends with a period; `tip "
       "fix-comment-periods` strips them")
 def comment_periods(v: Vars) -> None:

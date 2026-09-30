@@ -223,7 +223,8 @@ and the failing one alone gets no `__exit__()` call.
 the shorter form for a cleanup that ignores why the block ended.
 
 The guarantee has a matching gap on the other side: cleanup itself can fail.
-When `__exit__()` raises, that new exception replaces the block's original one,
+When `__exit__()` raises an exception,
+that new exception replaces the block's original one,
 and the original survives only as the new exception's `__context__`:
 
 ```python
@@ -376,7 +377,7 @@ You can still write `as`, but it binds `None`.
 
 `expected` is a fuller version of `expected_one`:
 it takes several types at once, and with no argument it catches everything.
-Its name says how the book uses it: the block is expected to raise,
+Its name says how the book uses it: the block is expected to raise an exception,
 and the manager shows what it raised.
 It is useful enough to reuse elsewhere in the book, so it lives in `utils/`,
 where any chapter can import it:
