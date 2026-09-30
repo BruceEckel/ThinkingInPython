@@ -206,7 +206,7 @@ or when the skill's description limits it to explicit requests.
 
 ### The prompts that built it
 
-Each of these, pasted into Claude Code, produced one of the two skills and its half of `jev.py`.
+These two prompts, pasted into Claude Code, produced the skills this section describes.
 
 Model routing (`/jev`):
 
