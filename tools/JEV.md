@@ -78,48 +78,73 @@ Two follow-ups, each a prompt to paste:
    Using the typesafe:typesafe-ai skill, prototype a report-only tool in tools/ that asks Jev one Boolean per sentence for three of my style rules (imperative-plus-consequence, stranded preposition, ambiguous sentence-opening "This"), threshold 0.7 with a 0.4-0.6 no-judgment band like Sniff Test. Run it on chapter 30 and show me the hits before wiring it into anything.
    ```
 
-## Basic
+## Routing with Jev
 
-### `/jev`: model routing
+Two personal skills route each prompt through Jev before Claude acts on it:
+`/jev` picks the model, and `/jev-skills` picks the skill.
+Both live outside this repo, in `~/.claude/skills/`,
+so they apply to every project on this machine.
 
-Create a skill command, `/jev on`, to enable automated model routing.
-`/jev on` turns it on, `/jev off` turns it off.
+### Where it lives
 
-When active, do not use the default model immediately.
-Instead, process every user task in two steps:
+- `~/.claude/skills/jev/jev.py`: the one script behind both.
+  It toggles each mode, lists the skills Jev chooses among,
+  and runs as the hook.
+  It uses the standard library alone
+  and reads the key from `TYPESAFE_API_KEY`,
+  falling back to the Windows registry (`HKCU\Environment`).
+- `~/.claude/skills/jev/SKILL.md` and `~/.claude/skills/jev-skills/SKILL.md`:
+  the two commands, plus the rules Claude follows when a pick arrives.
+- `~/.claude/settings.json`: a `UserPromptSubmit` hook
+  runs `python "$HOME/.claude/skills/jev/jev.py" hook` on each prompt,
+  with a 12-second timeout.
 
-1. System 1 Routing (Jev):
-   Send the user's prompt to Jev.
-   Ask Jev to evaluate the task's complexity
-   and select the most efficient model from this menu of options:
-   - Haiku: for simple tasks, quick file path searches,
-     basic local file manipulations,
-     or executing standard uv package manager commands.
-   - Sonnet: for standard Python development, intermediate coding tasks,
-     and moderate reasoning.
-   - Opus: only for highly complex tasks, deep reasoning,
-     or major architectural decisions.
-   - Fable: for the most difficult tasks.
-2. System 2 Execution:
-   Once Jev outputs its selection,
-   automatically route the user's original task to that specific model
-   to execute the work and provide the final output.
+### On and off
 
-### `/jev-skills`: skill selection
+Each mode is a flag file beside `jev.py`
+(`routing_on` and `skills_on`),
+so a switch holds for every session on the machine, not only the current one.
 
-Create a command, `/jev-skills on`, to enable automated skill selection for this session.
+| Command | Effect |
+|---|---|
+| `/jev` or `/jev on` | turn model routing on |
+| `/jev off` | turn it off |
+| `/jev status` | report whether it is on and whether the key is set |
+| `/jev-skills` or `/jev-skills on` | turn skill selection on |
+| `/jev-skills off` | turn it off |
+| `/jev-skills status` | report it |
 
-When I assign a task that requires an external skill or tool,
-do not search through the workspace or skill library yourself.
-Instead, use the following two-step process:
+The script runs directly too:
+`python ~/.claude/skills/jev/jev.py route "task"` or `skill "task"`
+prints Jev's answer for one task,
+and `skills list` prints the skills Jev chooses among for the current project.
 
-1. System 1 Skill Classification (Jev):
-   Send my task description and the complete list of available skills
-   in my workspace to Jev.
-   Instruct Jev to evaluate the task
-   and output only the exact name of the single most relevant skill
-   required to complete the task.
-2. System 2 Execution (Claude):
-   Once Jev outputs the skill name,
-   immediately load that specific skill
-   and proceed to execute my original task.
+### What the hook does
+
+For each prompt that does not start with `/`,
+the hook sends the prompt to Jev with a `choice` question for each mode that is on.
+With both on, one request asks both questions.
+The answers come back as context lines on the prompt,
+with the pick, its confidence, and the top four probabilities:
+`Jev routing: Jev picked **haiku** (confidence 0.89; ...)`.
+If the call fails, the context line says so,
+and Claude handles the prompt normally.
+
+Model routing chooses among Haiku, Sonnet, Opus, and Fable,
+each described in `MODELS` in `jev.py` by what it is for and what it is not for.
+The question tells Jev to prefer the cheaper model when two would both succeed.
+When the pick differs from the session's model,
+Claude delegates the whole task to one `Agent` call on the picked model.
+It overrides the pick only when the task depends on conversation context
+that no prompt could carry,
+or when a project's `CLAUDE.md` routing table pins that work to a model,
+and says why in one line.
+
+Skill selection offers Jev every skill Claude could load for the project,
+plus `none`, with each description cut to 600 characters.
+Skills marked `disable-model-invocation` or switched off in `skillOverrides`
+are left out.
+Claude Code's built-in skills have no file on disk, so Jev never picks one.
+Claude loads the picked skill before any other step,
+except when the user named a skill,
+or when the skill's description limits it to explicit requests.
