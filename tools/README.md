@@ -1381,19 +1381,19 @@ both light and dark browser chrome). And `chapter-ornament.{svg,png}`:
 a band of diamond scales that sits under every chapter title, the SVG
 on the site (template.html) and the PNG in the PDF and EPUBs
 (injected by build_epub.py's shared assembly, which also places the
-cover art on each Part divider page). And `chapter-snake.svg`: the
-line-drawn serpent, which `tools/chapter_snake.py` draws as a
-geometric trace of Bruce's hand drawing
-`resources/chapter-snake-source.png` (a stroked lemniscate tube with
-a head and a weave at the crossing; `--check` fails on drift from
-its spec). template.html sets the SVG to the left of each chapter
-title on the site (and above it on a narrow screen).
-`chapter-snake.png` is its 320 px raster from `make_cover.py`
-(`--snake` writes it alone), for the EPUBs, which set it on its own
-line under each chapter title above the ornament, and for the PDF,
-under the ornament band. It replaced a cutout of the cover art's
-serpent on 2026-09-30, which read too dark beside a title. The index
-page does not use it. `--preview` writes a small `cover-preview.png` for quick
+cover art on each Part divider page). And `chapter-snake.png`: the
+line-drawn serpent from `resources/chapter-snake-source.png`, 320 px
+wide, which template.html sets to the left of each chapter title on
+the site (and above it on a narrow screen). `snake_from_drawing()`
+makes it in either mode with Pillow alone: each pixel's darkness
+becomes its opacity and its color the site's ink, so the paper drops
+out and the drawing's anti-aliased edges survive, and the image is
+cropped to what remains; `--snake` writes it alone. It replaced a
+cutout of the cover art's serpent on 2026-09-30, which read too dark
+beside a title. The EPUBs set it on its own line under each
+chapter title, above the ornament, and the PDF under the ornament
+band that underlines the title. The index page does
+not use it. `--preview` writes a small `cover-preview.png` for quick
 iteration.
 
 ## build_pdf.py

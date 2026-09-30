@@ -29,11 +29,11 @@ either family:
 - always:     favicon.svg (a serpent's eye, gold iris on deep
               green, in the cover art's palette),
               chapter-ornament.svg/.png (the band of scales
-              under each chapter title), chapter-snake.png (a
-              raster of chapter-snake.svg, which
-              tools/chapter_snake.py draws as a trace of
-              resources/chapter-snake-source.png; the site uses
-              the SVG, the EPUBs and PDF this PNG)
+              under each chapter title), chapter-snake.png (the
+              line-drawn serpent from
+              resources/chapter-snake-source.png, its ink in the
+              site's INK on a transparent ground, which the site
+              sets to the left of each chapter title)
 
 Text is set in Palatino Linotype, which ships with Windows and
 macOS; regenerate on a machine that has it.
@@ -88,10 +88,11 @@ DRAWN_FILES = ("cover.svg", "cover-eink.svg", "cover-letter.svg",
 ART_FILES = ("cover-color.jpg", "cover-eink.jpg",
              "cover-letter.jpg", "cover-art.jpg",
              "social-preview.jpg")
-# The serpent under each chapter title in the EPUBs and PDF: a
-# raster of chapter-snake.svg (tools/chapter_snake.py), on a
-# transparent ground, since Kindle will not draw SVG. The site
-# uses the SVG. 320 px covers a 3x display at about 100 CSS px.
+# The serpent beside each chapter title on the site: a hand
+# drawing, black ink on white, that becomes INK on a transparent
+# ground. Set at about 100 CSS px wide, so 320 covers a 3x
+# display.
+SNAKE_SOURCE = ROOT / "resources" / "chapter-snake-source.png"
 SNAKE_FILE = "chapter-snake.png"
 SNAKE_WIDTH = 320
 
@@ -259,33 +260,29 @@ def art_outputs(preview: bool) -> None:
         (STATIC / stale).unlink(missing_ok=True)
 
 
-def snake_png() -> None:
-    """Rasterize chapter-snake.svg to SNAKE_FILE at SNAKE_WIDTH,
-    on a transparent ground, then palettize it.
+def snake_from_drawing():
+    """The chapter-title serpent from its drawing: every pixel's
+    darkness becomes its opacity, its color the site's INK, and
+    the paper drops out.
 
-    ImageMagick paints an SVG's empty canvas white even with no
-    background given, so the raster is flattened onto white and
-    each pixel's darkness becomes its opacity in INK, whichever
-    rasterizer drew it.
+    The drawing is black ink on white, so luminance alone
+    separates ink from paper: a pixel lighter than PAPER_FLOOR
+    is paper and turns transparent, and a darker one keeps an
+    opacity proportional to its darkness, which preserves the
+    drawing's anti-aliased edges. The result is cropped tight,
+    as the cover cutout it replaced was, so template.html's
+    background-size sets its ratio.
     """
     from PIL import Image
 
-    svg = STATIC / "chapter-snake.svg"
-    if not svg.exists():
-        raise SystemExit(
-            f"{svg.name} is missing; run "
-            "uv run python -m tools.chapter_snake")
-    png = STATIC / SNAKE_FILE
-    rasterize(svg, png, SNAKE_WIDTH)
-    with Image.open(png) as img:
-        drawn = img.convert("RGBA")
-    paper = Image.new("RGBA", drawn.size, "white")
-    lum = Image.alpha_composite(paper, drawn).convert("L")
+    PAPER_FLOOR = 240
+    lum = Image.open(SNAKE_SOURCE).convert("L")
+    alpha = lum.point(
+        lambda v: 0 if v >= PAPER_FLOOR
+        else min(255, round((PAPER_FLOOR - v) * 255 / 220)))
     snake = Image.new("RGB", lum.size, INK)
-    # INK has luminance 22, so it maps to full opacity.
-    snake.putalpha(lum.point(
-        lambda v: min(255, round((255 - v) * 255 / 233))))
-    save_snake(snake)
+    snake.putalpha(alpha)
+    return snake.crop(alpha.getbbox())
 
 
 def save_snake(snake) -> None:
@@ -617,7 +614,7 @@ def main(argv: list[str] | None = None) -> int:
 
     STATIC.mkdir(parents=True, exist_ok=True)
     if args.snake:
-        snake_png()
+        save_snake(snake_from_drawing())
         size = (STATIC / SNAKE_FILE).stat().st_size
         print(f"{SNAKE_FILE}: {size / 1024:.0f} KB")
         return 0
@@ -639,7 +636,7 @@ def main(argv: list[str] | None = None) -> int:
     # ornament (Kindle will not draw SVG).
     rasterize(STATIC / "chapter-ornament.svg",
               STATIC / "chapter-ornament.png", 500)
-    snake_png()
+    save_snake(snake_from_drawing())
     for name in (*made, "favicon.svg", "chapter-ornament.svg",
                  "chapter-ornament.png", SNAKE_FILE):
         size = (STATIC / name).stat().st_size
