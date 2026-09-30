@@ -722,36 +722,40 @@ the deeper classes without removing the intermediate ones, and a
 factory that should build only leaf classes needs a further filter,
 `not cls.__subclasses__()`.
 
-## 10. Finding the class that forgot `@register`
+## 10. Finding the class that forgot `@make.register`
 
 ```python
 # exercise_10.py
-from typing import Final, Protocol, runtime_checkable
+from typing import Protocol, runtime_checkable
 from exceptions import expect
 
 @runtime_checkable
 class Shape(Protocol):
     def draw(self) -> None: ...
 
-REGISTRY: Final[dict[str, type[Shape]]] = {}
+class ShapeFactory:
+    def __init__(self) -> None:
+        self.registry: dict[str, type[Shape]] = {}
 
-def register[S: Shape](cls: type[S]) -> type[S]:
-    REGISTRY[cls.__name__] = cls
-    return cls
+    def register[S: Shape](self, cls: type[S]) -> type[S]:
+        self.registry[cls.__name__] = cls
+        return cls
 
-@register
+    def __call__(self, name: str) -> Shape:
+        return self.registry[name]()
+
+make = ShapeFactory()
+
+@make.register
 class Circle:
     def draw(self) -> None: print("Circle.draw")
 
-@register
+@make.register
 class Square:
     def draw(self) -> None: print("Square.draw")
 
 class Hexagon:
     def draw(self) -> None: print("Hexagon.draw")
-
-def make(name: str) -> Shape:
-    return REGISTRY[name]()
 
 def unregistered(namespace: dict[str, object]) -> list[str]:
     return sorted(
@@ -760,7 +764,7 @@ def unregistered(namespace: dict[str, object]) -> list[str]:
         if isinstance(obj, type)
         and obj is not Shape
         and issubclass(obj, Shape)
-        and obj not in REGISTRY.values()
+        and obj not in make.registry.values()
     )
 
 Hexagon().draw()
@@ -779,7 +783,7 @@ the omission, since a class that nothing decorates is an ordinary
 class.
 
 `unregistered()` walks a namespace and keeps every class that
-`issubclass()` accepts as a `Shape` and that `REGISTRY` lacks.
+`issubclass()` accepts as a `Shape` and that `make.registry` lacks.
 `@runtime_checkable` allows the `issubclass()` call; without
 it, testing a class against a Protocol raises a `TypeError`. The
 `obj is not Shape` guard drops the Protocol, which passes its own
@@ -789,7 +793,7 @@ from a test, turns a silent absence into a printed name.
 The runtime test is weaker than the checker's. `issubclass()` looks
 for an attribute named `draw` and nothing about its signature, so a
 class whose `draw()` takes an extra parameter passes here and fails
-at `@register`. The two checks cover each other: the checker
+at `@make.register`. The two checks cover each other: the checker
 rejects a decorated class that does not fit, and `unregistered()`
 reports a fitting class that is not decorated. `issubclass()`
 against a Protocol also works only when every member is a method;
@@ -862,7 +866,7 @@ available to the type checker. `Builder` is a `Callable`, and a
 error[unresolved-attribute]: Object of type `Builder` has no attribute `__name__`
 ```
 
-The chapter's `register()` in `protocol_registry.py` has no such
+The chapter's `ShapeFactory.register()` in `shape_registry.py` has no such
 problem because it receives a class, and `type[S]` has a `__name__`.
 Pyright accepts `build.__name__`, since it gives every function
 object's attributes to a `Callable`; `ty` does not, and the book

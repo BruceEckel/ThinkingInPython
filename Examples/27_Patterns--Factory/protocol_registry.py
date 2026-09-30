@@ -1,32 +1,22 @@
 # protocol_registry.py
-from typing import Final, Protocol
+from shape_registry import ShapeFactory
 
-class Shape(Protocol):
-    def draw(self) -> None: ...
+make = ShapeFactory()
 
-REGISTRY: Final[dict[str, type[Shape]]] = {}
-
-def register[S: Shape](cls: type[S]) -> type[S]:
-    REGISTRY[cls.__name__] = cls
-    return cls
-
-@register
+@make.register
 class Circle:
     def draw(self) -> None: print("Circle.draw")
 
-@register
+@make.register
 class Square:
     def draw(self) -> None: print("Square.draw")
 
-def make(name: str) -> Shape:
-    return REGISTRY[name]()
-
-print(sorted(REGISTRY))
+print(sorted(make.registry))
 #: ['Circle', 'Square']
 make("Circle").draw()
 #: Circle.draw
 # ty: Argument type `Blob` does not satisfy
 # upper bound `Shape` of type variable `S`:
-# @register
+# @make.register
 # class Blob:
 #     pass

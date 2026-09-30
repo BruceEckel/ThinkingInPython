@@ -1,30 +1,34 @@
 # exercise_10.py
-from typing import Final, Protocol, runtime_checkable
+from typing import Protocol, runtime_checkable
 from exceptions import expect
 
 @runtime_checkable
 class Shape(Protocol):
     def draw(self) -> None: ...
 
-REGISTRY: Final[dict[str, type[Shape]]] = {}
+class ShapeFactory:
+    def __init__(self) -> None:
+        self.registry: dict[str, type[Shape]] = {}
 
-def register[S: Shape](cls: type[S]) -> type[S]:
-    REGISTRY[cls.__name__] = cls
-    return cls
+    def register[S: Shape](self, cls: type[S]) -> type[S]:
+        self.registry[cls.__name__] = cls
+        return cls
 
-@register
+    def __call__(self, name: str) -> Shape:
+        return self.registry[name]()
+
+make = ShapeFactory()
+
+@make.register
 class Circle:
     def draw(self) -> None: print("Circle.draw")
 
-@register
+@make.register
 class Square:
     def draw(self) -> None: print("Square.draw")
 
 class Hexagon:
     def draw(self) -> None: print("Hexagon.draw")
-
-def make(name: str) -> Shape:
-    return REGISTRY[name]()
 
 def unregistered(namespace: dict[str, object]) -> list[str]:
     return sorted(
@@ -33,7 +37,7 @@ def unregistered(namespace: dict[str, object]) -> list[str]:
         if isinstance(obj, type)
         and obj is not Shape
         and issubclass(obj, Shape)
-        and obj not in REGISTRY.values()
+        and obj not in make.registry.values()
     )
 
 Hexagon().draw()

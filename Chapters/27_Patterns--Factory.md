@@ -474,60 +474,90 @@ because the registry keeps every entry it has taken.
 
 The ABC in `registry.py` exists so that `__init_subclass__()` has a class to run from.
 If registration is explicit instead, `Shape` can be a Protocol,
-with a class decorator doing the registering:
+with a class decorator doing the registering.
+The table then needs no class to live on,
+and its natural owner is the factory that reads it.
+Python lets you set an attribute on a function,
+but the type checker reports every access to one,
+so the factory becomes a small callable object that holds the table:
 
 ```python
-# protocol_registry.py
-from typing import Final, Protocol
+# shape_registry.py
+from typing import Protocol
 
 class Shape(Protocol):
     def draw(self) -> None: ...
 
-REGISTRY: Final[dict[str, type[Shape]]] = {}
+class ShapeFactory:
+    def __init__(self) -> None:
+        self.registry: dict[str, type[Shape]] = {}
 
-def register[S: Shape](cls: type[S]) -> type[S]:
-    REGISTRY[cls.__name__] = cls
-    return cls
+    def register[S: Shape](self, cls: type[S]) -> type[S]:
+        self.registry[cls.__name__] = cls
+        return cls
 
-@register
+    def __call__(self, name: str) -> Shape:
+        return self.registry[name]()
+```
+
+`register()` stores a class under its name and returns the class unchanged,
+so it works as a [class decorator](14_Techniques--Decorators.md#decorating-classes).
+`__call__()` makes a `ShapeFactory` instance callable,
+so the factory is called the way `make()` is in `registry.py`;
+[A Callable Object as a *Command*](28_Patterns--Function_Objects.md#a-callable-object-as-a-command)
+covers `__call__()`.
+Each class registers with the factory that will build it:
+
+```python
+# protocol_registry.py
+from shape_registry import ShapeFactory
+
+make = ShapeFactory()
+
+@make.register
 class Circle:
     def draw(self) -> None: print("Circle.draw")
 
-@register
+@make.register
 class Square:
     def draw(self) -> None: print("Square.draw")
 
-def make(name: str) -> Shape:
-    return REGISTRY[name]()
-
-print(sorted(REGISTRY))
+print(sorted(make.registry))
 #: ['Circle', 'Square']
 make("Circle").draw()
 #: Circle.draw
 # ty: Argument type `Blob` does not satisfy
 # upper bound `Shape` of type variable `S`:
-# @register
+# @make.register
 # class Blob:
 #     pass
 ```
 
-`register()` is the [class decorator](14_Techniques--Decorators.md#decorating-classes)
-with one change: its type parameter is bounded to `Shape`.
-The bound turns the decorator into a check.
+`@make.register` has the same form as `@nectar.register` in [*Visitor*](33_Patterns--Visitor.md#the-pythonic-visitor-singledispatch),
+where `functools.singledispatch` keeps a function's table beside it.
+`singledispatch` cannot serve as this factory,
+because it picks an implementation by the type of its first argument,
+and `make()` receives a name.
+
+The type parameter of `register()` is bounded to `Shape`,
+and the bound turns the decorator into a check.
 A decorated class must satisfy the Protocol, so a class without `draw()`,
 or with a `draw()` that takes an extra parameter,
-draws `invalid-argument-type` at its `@register` line before the program runs.
+draws `invalid-argument-type` at its `@make.register` line before the program runs.
 That is the case [Self Registration](#self-registration) left to runtime,
 where a subclass that forgot `draw()` registers, fails at construction,
 and no checker sees it.
-`REGISTRY` holds `type[Shape]` values and the type checker accepts calling one,
-so `make()` works as written.
+`register()` returns `type[S]`, the decorated class's own type,
+so after the decorator runs the checker still knows `Circle` as `Circle`,
+not as `Shape`.
+The bound is also why the factory names `Shape` instead of taking a type parameter.
+A generic factory would need `register()`'s bound to name the factory's own type parameter,
+and `ty` rejects a type variable's bound that is itself generic.
 
-Two hazards from [Hazards of Self Registration](#hazards-of-self-registration)
-disappear with the class attribute.
+Keeping the table in the factory removes two hazards from [Hazards of Self Registration](#hazards-of-self-registration).
 No `cls.registry` lookup walks the MRO,
 and no `@classmethod` needs a class to sit on,
-since the table is a module-level name that `make()` reads directly.
+since the table belongs to `make` rather than to a class in the hierarchy.
 An intermediate class also stays out of the table unless something decorates it.
 Under `__init_subclass__()`,
 an abstract `Polygon` between `Shape` and `Triangle` registers as well,
@@ -535,7 +565,7 @@ and `make("Polygon")` fails with a `TypeError`.
 
 The cost is the opposite failure.
 Registration is opt-in,
-so a class that satisfies `Shape` but lacks `@register` is absent from the table,
+so a class that satisfies `Shape` but lacks `@make.register` is absent from the table,
 and `make()` fails with a `KeyError` that names the key,
 not the class that lacks the decorator (see exercise 10).
 Inheriting from the ABC cannot be forgotten that way,
@@ -547,9 +577,41 @@ Choose the failure you prefer:
 the ABC catches the incomplete class when it is built,
 the Protocol when it is checked.
 
+A factory that is an object also gives each test its own table:
+
+```python
+# test_protocol_registry.py
+import pytest
+from shape_registry import ShapeFactory
+
+class Triangle:
+    def draw(self) -> None: ...
+
+def test_register_returns_the_class() -> None:
+    make = ShapeFactory()
+    assert make.register(Triangle) is Triangle
+    assert make.registry == {"Triangle": Triangle}
+
+def test_make_builds_a_registered_class() -> None:
+    make = ShapeFactory()
+    make.register(Triangle)
+    assert isinstance(make("Triangle"), Triangle)
+
+def test_each_factory_starts_empty() -> None:
+    make = ShapeFactory()
+    with pytest.raises(KeyError):
+        make("Triangle")
+```
+
+The last test passes although the test before it registered `Triangle`,
+because each test registers with a `ShapeFactory` of its own.
+`test_registry.py` cannot do that:
+`Shape.registry` is one table for the whole process,
+which is why its last test asks for `"Hexagon"`.
+
 The ordinary Python factory is a dictionary of classes,
 whether you fill it by hand, the classes fill it themselves,
-or a decorator fills it for them.
+or the factory's own decorator fills it.
 That is the dissolution [Design Patterns](21_Patterns--Design_Patterns.md#when-a-pattern-dissolves)
 describes: the pattern remains,
 but no longer needs a class hierarchy to express it.
@@ -1241,7 +1303,7 @@ Match the machinery to what varies:
   When the set is open-ended or spread across modules,
   let the classes fill the table:
   `__init_subclass__()` on an ABC if a subclass must register by existing,
-  a bounded `@register` decorator on a Protocol if the checker should reject an incomplete class.
+  a factory object whose bounded `@make.register` takes Protocol classes if the checker should reject an incomplete class.
 - When the choice is which arguments to pass, not which class,
   write an alternative constructor,
   a `@classmethod` that ends with `return cls(...)`.
@@ -1304,9 +1366,9 @@ Both exist to work around languages where a class is not an object you can put i
     Write a recursive generator `all_subclasses()` that yields a class's direct subclasses and,
     through each one's own `__subclasses__()`, every class below them.
     Use it in `shape_name()` and confirm that `Oval` now appears.
-10. Add a `Hexagon` to `protocol_registry.py` that satisfies `Shape` but carries no `@register`,
+10. Add a `Hexagon` to `protocol_registry.py` that satisfies `Shape` but carries no `@make.register`,
     and show what `make("Hexagon")` does.
-    Then write a check that reports every class in the module that satisfies `Shape` and is missing from `REGISTRY`,
+    Then write a check that reports every class in the module that satisfies `Shape` and is missing from `make.registry`,
     so the forgotten decorator is found before any `make()` call.
     `@runtime_checkable`, which [*Surrogate*](26_Patterns--Surrogate.md#proxy)
     shows with `isinstance()`,
