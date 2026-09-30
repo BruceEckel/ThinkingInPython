@@ -163,7 +163,7 @@ if __name__ == "__main__":
 #: Scissors <--> Scissors : draw
 ```
 
-![Scissors.compete(paper) makes the second call, Paper.eval_scissors()](_images/double_dispatch)
+![](_images/double_dispatch)
 
 Follow one duel to see which competitor each result describes.
 `scissors.compete(paper)` resolves `self` to `Scissors`, the first dispatch,

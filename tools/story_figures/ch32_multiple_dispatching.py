@@ -13,8 +13,9 @@ print `Scissors <--> Paper : win` first. A dashed fourth item shows the
 cost of growth: on the left its row adds a method to every existing
 class, on the right it adds rows to `OUTCOME` alone.
 
-The chapter's `double_dispatch.svg` already draws the call sequence of
-that one duel, so this figure draws the answers, not the calls. Cell
+The chapter's `double_dispatch.svg` (`ch32_double_dispatch.py`) draws
+the two calls of that one duel, so this figure draws the answers, not
+the calls. Cell
 values are the `eval_*()` returns and the `OUTCOME` rows, printed the
 way the `StrEnum` prints them. No listing has a fourth item, so its
 cells are dashed and unnamed.

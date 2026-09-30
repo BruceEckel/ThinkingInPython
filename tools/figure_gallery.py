@@ -214,14 +214,10 @@ class Style:
 
 
 # Figures whose arrowheads may come closer than MIN_GAP to a shape, and why.
-TIP_GAP_EXEMPT: dict[str, str] = {
-    "double_dispatch": "a sequence diagram's messages meet their "
-                       "activation bars",
-}
+TIP_GAP_EXEMPT: dict[str, str] = {}
 
 # Figures whose arrowheads may point at no shape, and why.
 STRAY_TIP_EXEMPT: dict[str, str] = {
-    "double_dispatch": "the last return leaves the diagram for the caller",
     "memento_history": "each arrow is a move along the timeline toward a "
                        "stack, not an edge to a box",
 }
