@@ -66,6 +66,7 @@ inevitably rewriting and asking for clarification,
 often creating more examples to answer further questions.
 One pass would often change the book enough that it needed another pass.
 It was much faster than without Claude, but it still took time and effort.
+Claude provided excellent support, but did not replace my own work.
 
 I can't predict the future of books.
 The internet and eBooks have been changing the print book industry for decades.
