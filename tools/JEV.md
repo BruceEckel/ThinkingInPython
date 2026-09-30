@@ -104,6 +104,35 @@ Asking Jev about the global writing rules follows the same approach:
 Using the typesafe:typesafe-ai skill, prototype a report-only tool in tools/ that asks Jev one Boolean per sentence for three of my style rules (imperative-plus-consequence, stranded preposition, ambiguous sentence-opening "This"), threshold 0.7 with a 0.4-0.6 no-judgment band like Sniff Test. Run it on chapter 30 and show me the hits before wiring it into anything.
 ```
 
+### Checking prose claims against listings (2026-09-30)
+
+A prototype, `tools/listing_claims.py`,
+paired each sentence that names a listing,
+or a name a listing uses,
+with that listing,
+and asked Jev whether the listing supports, contradicts, or says nothing about the sentence.
+The test set was the correctness sweep of 2026-09-02,
+which fixed 30 false claims in chapters 29-47.
+Three versions ran:
+
+| Version | Sweep errors reached / flagged | Flags in chapters 30-47 | Real among flags checked |
+|---|---|---|---|
+| Listings in the sentence's section | 11 / 2 | 36 | 0 of 16 |
+| Plus the listing that defines each name | 15 / 2 | 45 | not checked; the same false alarms returned |
+| Location and named-file claims only | 4 / 1 | 12 | 1 of 12 |
+
+Half the sweep's errors are claims about runtime or type-checker behavior, or about another chapter,
+so no reading of a listing can settle them.
+The false alarms were true sentences that take one or two steps of reasoning about code:
+an inherited method, a loop that never runs, a library class the listing subclasses.
+Jev reads each pair in one pass and does not take those steps.
+The one real find was a wording slip in chapter 42,
+and the tool was deleted.
+An Opus agent per chapter, which found all 30 of the sweep's errors,
+stays the way to check claims.
+Jev fits this book where the question is local and needs no reasoning about code,
+as in `grounding_triage` and `link_support`.
+
 ## Routing with Jev
 
 Two personal skills route each prompt through Jev before Claude acts on it:
