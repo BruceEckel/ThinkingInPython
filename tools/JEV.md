@@ -63,20 +63,46 @@ or a "that" whose referent is ambiguous.
 Sniff Test's rules for stacked hedges and restating closers
 overlap with the book's own list.
 
-Two follow-ups, each a prompt to paste:
+### Sniff Test on this book (2026-09-30)
 
-1. Compare Sniff Test's catch rate with what `tip prose` already reports on a chapter:
+Sniff Test 0.1.0, installed from npm, ran twice.
+Neither run found a fault worth fixing.
 
-   ```
-   Clone DanRWilloughby/snifftest into the scratchpad, run it in dry-run and full mode on Chapters/30_Patterns--Observer.md, and compare what it flags with what `tip prose CH=30` flags. Report overlap, new catches, and false positives; change nothing in the repo.
-   ```
+- **Chapter 30, all default rules:**
+  it flagged 10 paragraphs, and `tip prose CH=30` flagged none,
+  so the two tools share no flags.
+  Eight flags came from `sentence_rhythm`,
+  which fired on paragraphs whose sentences run 10 to 28 words,
+  the varied length the book's style asks for.
+  One came from `colon_heavy`: a dense paragraph
+  whose colons each introduce a list or a code span.
+  The one judgment flag, `not_x_but_y`,
+  fell on "declares an attribute rather than creating one,"
+  where the contrast is the claim.
+  The run cost $0.007.
+- **The whole book, `tricolon` and `stacked_hedging` only:**
+  49 chapters, 3,263 paragraphs, $0.12, 8 minutes.
+  Two flags, both false positives.
+  `stacked_hedging` fired on "Other examples:",
+  a lead-in line with no hedge in it.
+  Sniff Test splits paragraphs at blank lines with no minimum length,
+  so all five of this rule's highest readings in the book were fragments like that one.
+  `tricolon` fired on three distinct events in chapter 38.
+  Of the six readings between 0.6 and 0.7,
+  none was a fault on a second read.
 
-2. Build a small checker for the global writing rules,
-   most of which only judgment can answer:
+Generic prose rules do not fit this book.
+The faults Sniff Test hunts are ones the book's prose passes clear,
+and the constructions it matches are mostly deliberate.
+A Jev question earns its place when it asks about a fault this book commits,
+which is how `tools/edit_patterns.py` works:
+each of its questions comes from a sentence Bruce rewrote,
+and the ones he has labeled carry a floor calibrated against those labels.
+Asking Jev about the global writing rules follows the same approach:
 
-   ```
-   Using the typesafe:typesafe-ai skill, prototype a report-only tool in tools/ that asks Jev one Boolean per sentence for three of my style rules (imperative-plus-consequence, stranded preposition, ambiguous sentence-opening "This"), threshold 0.7 with a 0.4-0.6 no-judgment band like Sniff Test. Run it on chapter 30 and show me the hits before wiring it into anything.
-   ```
+```
+Using the typesafe:typesafe-ai skill, prototype a report-only tool in tools/ that asks Jev one Boolean per sentence for three of my style rules (imperative-plus-consequence, stranded preposition, ambiguous sentence-opening "This"), threshold 0.7 with a 0.4-0.6 no-judgment band like Sniff Test. Run it on chapter 30 and show me the hits before wiring it into anything.
+```
 
 ## Routing with Jev
 
