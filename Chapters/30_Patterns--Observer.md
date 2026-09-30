@@ -720,7 +720,7 @@ class Watched:
         self.celsius = celsius
         self.humidity = humidity
 
-    def watch(self, watcher: Watcher) -> None:
+    def connect(self, watcher: Watcher) -> None:
         self._watchers.append(watcher)
 
     def __setattr__(
@@ -733,7 +733,7 @@ class Watched:
 
 w = Watched(20.0, 0.4)
 changes: list[tuple[str, object]] = []
-w.watch(lambda n, v: changes.append((n, v)))
+w.connect(lambda n, v: changes.append((n, v)))
 w.celsius = 25.0
 w.humidity = 0.5
 print(changes)
