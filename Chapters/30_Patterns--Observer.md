@@ -658,7 +658,7 @@ print(log)
 
 `FixedBroadcaster` is a record, so nothing can rebind its `responders` field,
 and the tuple in that field cannot change.
-The constructor settles the set of responders.
+The constructor fixes the set of responders.
 `announce()` iterates through the tuple with no copy,
 because no responder can be disconnected mid-notification.
 The lambda needs no named reference,
@@ -670,7 +670,7 @@ Two problems remain:
 a responder that raises an exception still stops `announce()`,
 and a responder that writes back to its subject still re-enters it.
 
-A program can settle its responders at any of four points:
+A program can choose its responders at any of four points:
 
 1.  **Source time.**
     The subject's code calls each reaction by name,
