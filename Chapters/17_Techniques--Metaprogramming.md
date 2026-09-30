@@ -613,6 +613,106 @@ The registries built on it fail in two ways that have nothing to do with `__init
 a class in a module nobody imports never registers,
 and keying on `cls.__name__` lets two same-named classes overwrite each other.
 
+## Attributes on a Function
+
+A function is an object, and like most objects it carries a `__dict__`.
+Assigning `f.x = 1` stores `1` in `f.__dict__` under the key `"x"`,
+and the entry stays for as long as the function exists.
+A decorator can use that storage to mark a method.
+A method decorator runs as Python executes the class body,
+before the class object exists, so it cannot register the method with its class.
+It can leave a mark on the function instead,
+and `__init_subclass__()` collects the marks once the class is built:
+
+```python
+# marked_methods.py
+from collections.abc import Callable
+from typing import Any, ClassVar
+
+def on[F: Callable[..., object]](
+        event: str
+) -> Callable[[F], F]:
+    def mark(func: F) -> F:
+        func.__dict__["event"] = event
+        return func
+    return mark
+
+class Widget:
+    handlers: ClassVar[dict[str, Callable[..., Any]]]
+
+    def __init_subclass__(cls, **kwargs: object) -> None:
+        super().__init_subclass__(**kwargs)
+        cls.handlers = {
+            attr.__dict__["event"]: attr
+            for attr in vars(cls).values()
+            if "event" in getattr(attr, "__dict__", {})
+        }
+
+    def dispatch(self, event: str) -> None:
+        self.handlers[event](self)
+
+class Button(Widget):
+    @on("click")
+    def press(self) -> None:
+        print("pressed")
+
+    @on("hover")
+    def glow(self) -> None:
+        print("glowing")
+
+    def label(self) -> str:
+        return "OK"
+
+print(sorted(Button.handlers))
+#: ['click', 'hover']
+Button().dispatch("click")
+#: pressed
+print(Button.press.__dict__)
+#: {'event': 'click'}
+# ty: Function `press` has no attribute `event`:
+# print(Button.press.event)
+```
+
+`on()` takes the event name and returns `mark()`,
+the decorator that does the work.
+Its type parameter `F` has the bound `Callable[..., object]`,
+which any function satisfies, and `mark()` returns the same `F` it receives,
+so `press()` keeps its own signature through the decoration.
+`@on("click")` stores `"click"` under the key `"event"` in the `__dict__` of `press()`,
+then returns `press()` unchanged.
+When the `class Button` statement finishes,
+`__init_subclass__()` walks `vars(cls)`, the new class's own namespace,
+and files each function that carries an `"event"` key under its event.
+`label()` carries no mark, so `handlers` leaves it out.
+The namespace also holds the bookkeeping entries every class carries,
+such as `__module__`, a string with no `__dict__`,
+and the `{}` default in `getattr()` passes over them.
+`handlers` holds the functions the class body defined, not bound methods,
+so `dispatch()` passes `self` to the one it finds.
+
+The listing writes `func.__dict__["event"]` rather than `func.event`,
+and the difference matters to the type checker.
+A function's type declares a fixed set of attributes,
+so `ty` reports `Button.press.event` as an unresolved attribute,
+and it reports the assignment `func.event = event` the same way.
+Every object's type declares `__dict__` as a `dict[str, Any]`,
+so indexing it type-checks.
+
+The standard library marks functions the same way.
+`@abstractmethod` sets `__isabstractmethod__ = True` on the function,
+and `ABCMeta` collects the marked names into the class's `__abstractmethods__`,
+which is how an abstract class knows to refuse instantiation.
+`@final` sets `__final__`, and `@override` sets `__override__`.
+[*Template Method*](25_Patterns--Template_Method.md#hooks-and-the-misspelled-override)'s `near_miss.py` reads `__final__` through `getattr()` to refuse an override at runtime.
+`functools.wraps()` copies the wrapped function's `__dict__` onto the wrapper,
+so a mark applied beneath a decorator written with `@wraps` survives it.
+
+A mark suits data that describes the function and that other code reads later,
+as `handlers` does here.
+State that changes with each call, such as a call count,
+belongs in a closure variable or on a [callable object](14_Techniques--Decorators.md#a-class-decorator-with-state),
+where the type checker can see it.
+
 ## Making a Class Final
 
 Sometimes you need to forbid inheritance.

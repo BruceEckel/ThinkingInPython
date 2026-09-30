@@ -57,7 +57,7 @@
  },
  "fa2f1549160e7e2a": {
   "file": "14_Techniques--Decorators.md",
-  "line": 1142,
+  "line": 1147,
   "target": "07_Foundations--Classes.md",
   "terms": [
    "trace"
@@ -271,7 +271,7 @@
  },
  "1f2521c2404fcd22": {
   "file": "30_Patterns--Observer.md",
-  "line": 469,
+  "line": 464,
   "target": "42_Functional--Error_Handling.md",
   "terms": [
    "announce"
@@ -282,7 +282,7 @@
  },
  "e8e91f728192b79c": {
   "file": "30_Patterns--Observer.md",
-  "line": 1553,
+  "line": 1548,
   "target": "17_Techniques--Metaprogramming.md",
   "terms": [
    "Notifying",
@@ -364,7 +364,7 @@
  },
  "9c56880fd09f0864": {
   "file": "34_Patterns--Composite_and_Interpreter.md",
-  "line": 174,
+  "line": 170,
   "target": "08_Foundations--Static_Types.md",
   "terms": [
    "Directory",
@@ -376,7 +376,7 @@
  },
  "f52e1a4cb81fc818": {
   "file": "34_Patterns--Composite_and_Interpreter.md",
-  "line": 539,
+  "line": 535,
   "target": "33_Patterns--Visitor.md",
   "terms": [
    "to_infix"
@@ -431,16 +431,16 @@
   "p_terms": 0.01,
   "asked": "2026-09-27"
  },
- "c5af7a4f94d39022": {
+ "5a1e947901d88713": {
   "file": "40_Functional--Foundations.md",
   "line": 588,
   "target": "05_Foundations--Functions.md",
   "terms": [
    "partial"
   ],
-  "sentence": "For a function whose parameters are [positional-only](05_Foundations--Functions.md#positional-only-and-keyword-only-parameters), position is the only way to bind an argument, and `partial()` fills positional arguments from the left, so before 3.14, fixing the third argument meant fixing the first two as well.",
+  "sentence": "For a function whose parameters are [positional-only](05_Foundations--Functions.md#positional-only-and-keyword-only-parameters), position is the only way to bind an argument, and `partial()` fills positional arguments from the left, so before 3.14, presetting the third argument meant presetting the first two as well.",
   "p_terms": 0.01,
-  "asked": "2026-09-27"
+  "asked": "2026-09-30"
  },
  "d2b75b2af9d16cb3": {
   "file": "41_Functional--Toolkits.md",

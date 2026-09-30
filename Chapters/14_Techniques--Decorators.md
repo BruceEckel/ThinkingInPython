@@ -662,6 +662,11 @@ in a variable of the decorator's body that `wrapper()` updates
 ([Closures](40_Functional--Foundations.md#closures) shows how, with `nonlocal`).
 That variable is visible only inside the closure,
 while `hello.count` is an attribute any caller can read.
+The wrapper's own `__dict__` could hold the count as well,
+but the type checker reports every dotted access to an attribute stored there,
+so call state goes in a closure or an instance.
+[Attributes on a Function](17_Techniques--Metaprogramming.md#attributes-on-a-function)
+shows what a function's `__dict__` does suit.
 
 ### A Class Decorator with Arguments
 

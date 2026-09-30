@@ -947,6 +947,12 @@ Stop at the first form that supports what you need:
 5.  A class, when one call is not enough: a second operation such as `undo()`,
     or the several related methods and mutable state the *Strategy* section describes.
 
+A function that carries data in its `__dict__` would sit between entries 1 and 3,
+and the list leaves it out:
+the type checker reports each dotted access to such an attribute
+([Attributes on a Function](17_Techniques--Metaprogramming.md#attributes-on-a-function)),
+so configuration goes in a closure or a callable object instead.
+
 The *GoF Design Patterns* forms of *Command*, *Strategy*,
 and *Chain of Responsibility* all start at number 5.
 The C++ of that book had no lighter form that could carry state:

@@ -477,8 +477,8 @@ If registration is explicit instead, `Shape` can be a Protocol,
 with a class decorator doing the registering.
 The table then needs no class to live on,
 and its natural owner is the factory that reads it.
-Python lets you set an attribute on a function,
-but the type checker reports every access to one,
+Python lets you [set an attribute on a function](17_Techniques--Metaprogramming.md#attributes-on-a-function),
+but the type checker reports every dotted access to one,
 so the factory becomes a small callable object that holds the table:
 
 ```python
