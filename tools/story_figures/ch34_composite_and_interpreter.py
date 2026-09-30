@@ -11,8 +11,8 @@ as strings, with no edit to `expr.py`. The chapter's claim is that
 is data while the meaning lives in the walkers; a storyboard over one
 fixed tree shows that directly, where the coupling panel it replaces
 showed only which functions name which classes. The chapter's
-`composite_tree.svg` draws the static shape of both trees, so this
-figure draws the walks instead. The names come from `expr.py` (`Num`,
+`composite_tree.svg` (`ch34_composite_tree.py`) walks the filesystem
+tree, so this figure walks the expression tree. The names come from `expr.py` (`Num`,
 `Var`, `Add`, `Mul`, `__rmul__()`, `__add__()`, `wrap()`),
 `evaluate.py` (`x = Var("x")`, `expr = 2 * x + 1`, the `expr.left`
 repr, `evaluate(expr, x=3)` and its `7`, `x=10` and its `21`), and

@@ -1,56 +1,97 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 452"
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 730 510"
      font-family="'JetBrains Mono', Consolas, monospace">
-  <title>Three lanes holding state: do() pushes present into _past and clears _future; undo() shuttles present into _future and pops _past; redo() shuttles present into _past and pops _future</title>
+  <title>History's stacks after each call: apply() pushes the present onto _past, undo() and redo() move one state between the stacks and the present, and a new edit after an undo clears _future</title>
   <defs>
-    <marker id="mh-tri" viewBox="0 0 18 12" refX="5" refY="6"
-            markerWidth="18" markerHeight="12" orient="auto" markerUnits="userSpaceOnUse">
-      <path d="M0.5,0.5 L17.4,6 L0.5,11.5 L5,6 Z" fill="#1a1612" stroke="#1a1612" stroke-width="0.8" stroke-linejoin="round"/>
-    </marker>
-    <marker id="mh-tri-muted" viewBox="0 0 18 12" refX="5" refY="6"
-            markerWidth="18" markerHeight="12" orient="auto" markerUnits="userSpaceOnUse">
-      <path d="M0.5,0.5 L17.4,6 L0.5,11.5 L5,6 Z" fill="#7a6e62" stroke="#7a6e62" stroke-width="0.8" stroke-linejoin="round"/>
-    </marker>
-    <marker id="mh-tri-red" viewBox="0 0 18 12" refX="5" refY="6"
+    <marker id="mh-red" viewBox="0 0 18 12" refX="5" refY="6"
             markerWidth="18" markerHeight="12" orient="auto" markerUnits="userSpaceOnUse">
       <path d="M0.5,0.5 L17.4,6 L0.5,11.5 L5,6 Z" fill="#8b1a1a" stroke="#8b1a1a" stroke-width="0.8" stroke-linejoin="round"/>
     </marker>
   </defs>
-
-  <!-- new_state arriving from outside -->
-  <line x1="430" y1="20" x2="430" y2="348" stroke="#7a6e62" stroke-width="1" stroke-dasharray="2,3"/>
-  <text x="430" y="14" font-size="11" fill="#7a6e62" text-anchor="middle">new_state</text>
-
-  <!-- do(): push present, then clear future -->
-  <line x1="442" y1="90" x2="700" y2="90" stroke="#8b1a1a" stroke-width="1.3"/>
-  <text x="712" y="94" font-size="14" fill="#8b1a1a" text-anchor="middle">&#8709;</text>
-  <line x1="418" y1="140" x2="162.4" y2="140" stroke="#8b1a1a" stroke-width="1.3" marker-end="url(#mh-tri-red)"/>
-  <text x="565" y="82" font-size="10.5" fill="#8b1a1a" text-anchor="middle">do(): _future.clear()</text>
-  <text x="285" y="132" font-size="10.5" fill="#8b1a1a" text-anchor="middle">do(): push present -&gt; _past</text>
-
-  <!-- undo(): pop past into present, push present into future -->
-  <line x1="152" y1="195" x2="405.6" y2="195" stroke="#1a1612" stroke-width="1.3" marker-end="url(#mh-tri)"/>
-  <line x1="442" y1="210" x2="695.6" y2="210" stroke="#1a1612" stroke-width="1.3" marker-end="url(#mh-tri)"/>
-  <text x="285" y="188" font-size="10.5" fill="#1a1612" text-anchor="middle">undo(): pop _past -&gt; present</text>
-  <text x="575" y="225" font-size="10.5" fill="#1a1612" text-anchor="middle">undo(): push present -&gt; _future</text>
-
-  <!-- redo(): pop future into present, push present into past -->
-  <line x1="708" y1="255" x2="454.4" y2="255" stroke="#7a6e62" stroke-width="1.3" stroke-dasharray="1,4" marker-end="url(#mh-tri-muted)"/>
-  <line x1="418" y1="270" x2="164.4" y2="270" stroke="#7a6e62" stroke-width="1.3" stroke-dasharray="1,4" marker-end="url(#mh-tri-muted)"/>
-  <text x="575" y="248" font-size="10.5" fill="#7a6e62" text-anchor="middle">redo(): pop _future -&gt; present</text>
-  <text x="285" y="286" font-size="10.5" fill="#7a6e62" text-anchor="middle">redo(): push present -&gt; _past</text>
-
-  <!-- lanes -->
-  <rect x="40" y="320" width="220" height="120" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="6"/>
-  <text x="150" y="345" font-size="15" font-weight="bold" fill="#1a1612" text-anchor="middle">_past</text>
-  <text x="150" y="363" font-size="11" fill="#7a6e62" text-anchor="middle">list[S]</text>
-  <text x="150" y="380" font-size="10.5" fill="#7a6e62" text-anchor="middle">right end = top of stack</text>
-
-  <rect x="320" y="350" width="220" height="70" fill="none" stroke="#c8bfb0" stroke-width="1.5" rx="6"/>
-  <text x="430" y="378" font-size="15" font-weight="bold" fill="#1a1612" text-anchor="middle">_present</text>
-  <text x="430" y="396" font-size="11" fill="#7a6e62" text-anchor="middle">S</text>
-
-  <rect x="600" y="320" width="220" height="120" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="6"/>
-  <text x="710" y="345" font-size="15" font-weight="bold" fill="#1a1612" text-anchor="middle">_future</text>
-  <text x="710" y="363" font-size="11" fill="#7a6e62" text-anchor="middle">list[S]</text>
-  <text x="710" y="380" font-size="10.5" fill="#7a6e62" text-anchor="middle">left end = top of stack</text>
+  <text x="316" y="22" font-size="13" fill="#1a1612" font-weight="bold" text-anchor="middle">_past</text>
+  <text x="316" y="38" font-size="10" fill="#7a6e62" text-anchor="middle">list, top at right</text>
+  <text x="510" y="22" font-size="13" fill="#1a1612" font-weight="bold" text-anchor="middle">_present</text>
+  <text x="510" y="38" font-size="10" fill="#7a6e62" text-anchor="middle">one state</text>
+  <text x="658" y="22" font-size="13" fill="#1a1612" font-weight="bold" text-anchor="middle">_future</text>
+  <text x="658" y="38" font-size="10" fill="#7a6e62" text-anchor="middle">list, top at left</text>
+  <text x="20" y="22" font-size="10" fill="#7a6e62" text-anchor="start">Drawing("Duck") states,</text>
+  <text x="20" y="38" font-size="10" fill="#7a6e62" text-anchor="start">shown by their strokes</text>
+  <text x="20" y="88" font-size="24" fill="#8b1a1a" font-weight="bold" text-anchor="start">0</text>
+  <text x="48" y="76" font-size="12" fill="#1a1612" font-weight="bold" text-anchor="start">start</text>
+  <text x="48" y="94" font-size="10" fill="#7a6e62" text-anchor="start">History(Drawing("Duck"))</text>
+  <text x="396" y="97" font-size="10.5" fill="#7a6e62" text-anchor="end">[]</text>
+  <rect x="448" y="76" width="124" height="34" fill="none" stroke="#1a1612" stroke-width="1.6" rx="4"/>
+  <text x="510" y="97" font-size="11.5" fill="#1a1612" font-weight="bold" text-anchor="middle">(blank)</text>
+  <text x="624" y="97" font-size="10.5" fill="#7a6e62" text-anchor="start">[]</text>
+  <line x1="16" y1="130" x2="714" y2="130" stroke="#c8bfb0" stroke-width="0.8"/>
+  <text x="20" y="162" font-size="24" fill="#8b1a1a" font-weight="bold" text-anchor="start">1</text>
+  <text x="48" y="150" font-size="12" fill="#1a1612" font-weight="bold" text-anchor="start">apply()</text>
+  <text x="48" y="168" font-size="10" fill="#7a6e62" text-anchor="start">d.draw("circle")</text>
+  <rect x="316" y="154" width="92" height="26" fill="none" stroke="#1a1612" stroke-width="1.1" rx="3"/>
+  <text x="362" y="171" font-size="10.5" fill="#1a1612" text-anchor="middle">(blank)</text>
+  <rect x="448" y="150" width="124" height="34" fill="none" stroke="#1a1612" stroke-width="1.6" rx="4"/>
+  <text x="510" y="171" font-size="11.5" fill="#1a1612" font-weight="bold" text-anchor="middle">circle</text>
+  <text x="624" y="171" font-size="10.5" fill="#7a6e62" text-anchor="start">[]</text>
+  <line x1="448" y1="167" x2="424.4" y2="167.0" stroke="#8b1a1a" stroke-width="1.6" marker-end="url(#mh-red)"/>
+  <text x="428" y="149" font-size="10" fill="#8b1a1a" text-anchor="middle">push</text>
+  <line x1="16" y1="204" x2="714" y2="204" stroke="#c8bfb0" stroke-width="0.8"/>
+  <text x="20" y="236" font-size="24" fill="#8b1a1a" font-weight="bold" text-anchor="start">2</text>
+  <text x="48" y="224" font-size="12" fill="#1a1612" font-weight="bold" text-anchor="start">apply()</text>
+  <text x="48" y="242" font-size="10" fill="#7a6e62" text-anchor="start">d.draw("beak")</text>
+  <text x="48" y="260" font-size="10" fill="#8b1a1a" text-anchor="start">#: Duck: circle beak</text>
+  <rect x="316" y="228" width="92" height="26" fill="none" stroke="#1a1612" stroke-width="1.1" rx="3"/>
+  <text x="362" y="245" font-size="10.5" fill="#1a1612" text-anchor="middle">circle</text>
+  <rect x="218" y="228" width="92" height="26" fill="none" stroke="#1a1612" stroke-width="1.1" rx="3"/>
+  <text x="264" y="245" font-size="10.5" fill="#1a1612" text-anchor="middle">(blank)</text>
+  <rect x="448" y="224" width="124" height="34" fill="none" stroke="#1a1612" stroke-width="1.6" rx="4"/>
+  <text x="510" y="245" font-size="11.5" fill="#1a1612" font-weight="bold" text-anchor="middle">circle beak</text>
+  <text x="624" y="245" font-size="10.5" fill="#7a6e62" text-anchor="start">[]</text>
+  <line x1="448" y1="241" x2="424.4" y2="241.0" stroke="#8b1a1a" stroke-width="1.6" marker-end="url(#mh-red)"/>
+  <text x="428" y="223" font-size="10" fill="#8b1a1a" text-anchor="middle">push</text>
+  <line x1="16" y1="278" x2="714" y2="278" stroke="#c8bfb0" stroke-width="0.8"/>
+  <text x="20" y="310" font-size="24" fill="#8b1a1a" font-weight="bold" text-anchor="start">3</text>
+  <text x="48" y="298" font-size="12" fill="#1a1612" font-weight="bold" text-anchor="start">undo()</text>
+  <text x="48" y="316" font-size="10" fill="#7a6e62" text-anchor="start">history.undo()</text>
+  <text x="48" y="334" font-size="10" fill="#8b1a1a" text-anchor="start">#: Duck: circle</text>
+  <rect x="316" y="302" width="92" height="26" fill="none" stroke="#1a1612" stroke-width="1.1" rx="3"/>
+  <text x="362" y="319" font-size="10.5" fill="#1a1612" text-anchor="middle">(blank)</text>
+  <rect x="448" y="298" width="124" height="34" fill="none" stroke="#1a1612" stroke-width="1.6" rx="4"/>
+  <text x="510" y="319" font-size="11.5" fill="#1a1612" font-weight="bold" text-anchor="middle">circle</text>
+  <rect x="612" y="302" width="92" height="26" fill="none" stroke="#1a1612" stroke-width="1.1" rx="3"/>
+  <text x="658" y="319" font-size="10.5" fill="#1a1612" text-anchor="middle">circle beak</text>
+  <line x1="408" y1="315" x2="431.6" y2="315.0" stroke="#8b1a1a" stroke-width="1.6" marker-end="url(#mh-red)"/>
+  <text x="428" y="297" font-size="10" fill="#8b1a1a" text-anchor="middle">pop</text>
+  <line x1="572" y1="315" x2="595.6" y2="315.0" stroke="#8b1a1a" stroke-width="1.6" marker-end="url(#mh-red)"/>
+  <text x="592" y="297" font-size="10" fill="#8b1a1a" text-anchor="middle">push</text>
+  <line x1="16" y1="352" x2="714" y2="352" stroke="#c8bfb0" stroke-width="0.8"/>
+  <text x="20" y="384" font-size="24" fill="#8b1a1a" font-weight="bold" text-anchor="start">4</text>
+  <text x="48" y="372" font-size="12" fill="#1a1612" font-weight="bold" text-anchor="start">redo()</text>
+  <text x="48" y="390" font-size="10" fill="#7a6e62" text-anchor="start">history.redo()</text>
+  <text x="48" y="408" font-size="10" fill="#8b1a1a" text-anchor="start">#: Duck: circle beak</text>
+  <rect x="316" y="376" width="92" height="26" fill="none" stroke="#1a1612" stroke-width="1.1" rx="3"/>
+  <text x="362" y="393" font-size="10.5" fill="#1a1612" text-anchor="middle">circle</text>
+  <rect x="218" y="376" width="92" height="26" fill="none" stroke="#1a1612" stroke-width="1.1" rx="3"/>
+  <text x="264" y="393" font-size="10.5" fill="#1a1612" text-anchor="middle">(blank)</text>
+  <rect x="448" y="372" width="124" height="34" fill="none" stroke="#1a1612" stroke-width="1.6" rx="4"/>
+  <text x="510" y="393" font-size="11.5" fill="#1a1612" font-weight="bold" text-anchor="middle">circle beak</text>
+  <text x="624" y="393" font-size="10.5" fill="#7a6e62" text-anchor="start">[]</text>
+  <line x1="612" y1="389" x2="588.4" y2="389.0" stroke="#8b1a1a" stroke-width="1.6" marker-end="url(#mh-red)"/>
+  <text x="592" y="371" font-size="10" fill="#8b1a1a" text-anchor="middle">pop</text>
+  <line x1="448" y1="389" x2="424.4" y2="389.0" stroke="#8b1a1a" stroke-width="1.6" marker-end="url(#mh-red)"/>
+  <text x="428" y="371" font-size="10" fill="#8b1a1a" text-anchor="middle">push</text>
+  <line x1="16" y1="426" x2="714" y2="426" stroke="#c8bfb0" stroke-width="0.8"/>
+  <text x="20" y="458" font-size="24" fill="#8b1a1a" font-weight="bold" text-anchor="start">5</text>
+  <text x="48" y="446" font-size="12" fill="#1a1612" font-weight="bold" text-anchor="start">undo(), apply()</text>
+  <text x="48" y="464" font-size="10" fill="#7a6e62" text-anchor="start">d.draw("scribble")</text>
+  <rect x="316" y="450" width="92" height="26" fill="none" stroke="#1a1612" stroke-width="1.1" rx="3"/>
+  <text x="362" y="467" font-size="10.5" fill="#1a1612" text-anchor="middle">circle</text>
+  <rect x="218" y="450" width="92" height="26" fill="none" stroke="#1a1612" stroke-width="1.1" rx="3"/>
+  <text x="264" y="467" font-size="10.5" fill="#1a1612" text-anchor="middle">(blank)</text>
+  <rect x="448" y="446" width="124" height="34" fill="none" stroke="#1a1612" stroke-width="1.6" rx="4" stroke-dasharray="4,3"/>
+  <text x="510" y="467" font-size="11.5" fill="#1a1612" font-weight="bold" text-anchor="middle">circle scribble</text>
+  <line x1="448" y1="463" x2="424.4" y2="463.0" stroke="#8b1a1a" stroke-width="1.6" marker-end="url(#mh-red)"/>
+  <text x="428" y="445" font-size="10" fill="#8b1a1a" text-anchor="middle">push</text>
+  <rect x="612" y="450" width="92" height="26" fill="none" stroke="#7a6e62" stroke-width="1.1" rx="3"/>
+  <text x="658" y="467" font-size="10.5" fill="#7a6e62" text-anchor="middle">circle beak</text>
+  <path d="M710,457 L722,469 M710,469 L722,457" stroke="#8b1a1a" stroke-width="2" fill="none"/>
+  <text x="664" y="494" font-size="10" fill="#8b1a1a" text-anchor="middle">_future.clear()</text>
 </svg>

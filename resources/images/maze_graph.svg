@@ -1,61 +1,213 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360"
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 560"
      font-family="'JetBrains Mono', Consolas, monospace">
-  <title>A room graph: local grid adjacency from Doors.connect(), non-local jumps between rooms that share a Teleport target letter, and every off-map door converging on one shared EDGE room</title>
+  <title>Rows 0 to 5, columns 19 to 23 of the robot's maze text and the graph GameBuilder makes of it: a room for every character, walls included, doors between grid neighbors, a link between the two b teleports, and every north door on row 0 opening the shared EDGE room</title>
   <defs>
-    <marker id="mz-tri-muted" viewBox="0 0 18 12" refX="5" refY="6"
+    <marker id="mz-muted" viewBox="0 0 18 12" refX="5" refY="6"
             markerWidth="18" markerHeight="12" orient="auto" markerUnits="userSpaceOnUse">
       <path d="M0.5,0.5 L17.4,6 L0.5,11.5 L5,6 Z" fill="#7a6e62" stroke="#7a6e62" stroke-width="0.8" stroke-linejoin="round"/>
     </marker>
   </defs>
-
-  <!-- grid: Rooms connected through Doors -->
-  <rect x="40" y="50" width="384" height="280" fill="none" stroke="#c8bfb0" stroke-width="1.3"/>
-  <line x1="104" y1="50" x2="104" y2="330" stroke="#c8bfb0" stroke-width="1"/>
-  <line x1="168" y1="50" x2="168" y2="330" stroke="#c8bfb0" stroke-width="1"/>
-  <line x1="232" y1="50" x2="232" y2="330" stroke="#c8bfb0" stroke-width="1"/>
-  <line x1="296" y1="50" x2="296" y2="330" stroke="#c8bfb0" stroke-width="1"/>
-  <line x1="360" y1="50" x2="360" y2="330" stroke="#c8bfb0" stroke-width="1"/>
-  <line x1="40" y1="106" x2="424" y2="106" stroke="#c8bfb0" stroke-width="1"/>
-  <line x1="40" y1="162" x2="424" y2="162" stroke="#c8bfb0" stroke-width="1"/>
-  <line x1="40" y1="218" x2="424" y2="218" stroke="#c8bfb0" stroke-width="1"/>
-  <line x1="40" y1="274" x2="424" y2="274" stroke="#c8bfb0" stroke-width="1"/>
-
-  <!-- non-local teleport jumps, overlaid on the grid -->
-  <path d="M200,134 Q264,95 328,246" fill="none" stroke="#8b1a1a" stroke-width="1.4" stroke-dasharray="6,4"/>
-  <text x="300" y="215" font-size="11" fill="#8b1a1a" text-anchor="end">Teleport target="a"</text>
-
-  <path d="M328,78 Q232,40 136,190" fill="none" stroke="#7a6e62" stroke-width="1.4" stroke-dasharray="2,4"/>
-  <text x="268" y="45" font-size="11" fill="#7a6e62" text-anchor="middle">Teleport target="b"</text>
-
-  <!-- off-map doors converge on the single shared EDGE room -->
-  <polyline points="200,78 200,20 436,20 436,167 443.6,167" fill="none" stroke="#7a6e62"
-            stroke-width="1.1" marker-end="url(#mz-tri-muted)"/>
-  <polyline points="392,134 436,134 436,192 443.6,192" fill="none" stroke="#7a6e62"
-            stroke-width="1.1" marker-end="url(#mz-tri-muted)"/>
-  <polyline points="72,302 72,345 436,345 436,217 443.6,217" fill="none" stroke="#7a6e62"
-            stroke-width="1.1" marker-end="url(#mz-tri-muted)"/>
-
-  <!-- room markers -->
-  <circle cx="72" cy="78" r="15" fill="none" stroke="#1a1612" stroke-width="1.3"/>
-  <text x="72" y="83" font-size="13" font-weight="bold" fill="#1a1612" text-anchor="middle">R</text>
-
-  <circle cx="392" cy="302" r="15" fill="none" stroke="#1a1612" stroke-width="1.3"/>
-  <text x="392" y="307" font-size="13" font-weight="bold" fill="#1a1612" text-anchor="middle">!</text>
-
-  <circle cx="200" cy="134" r="15" fill="none" stroke="#8b1a1a" stroke-width="1.5"/>
-  <text x="200" y="139" font-size="13" font-weight="bold" fill="#1a1612" text-anchor="middle">a</text>
-
-  <circle cx="328" cy="246" r="15" fill="none" stroke="#8b1a1a" stroke-width="1.5"/>
-  <text x="328" y="251" font-size="13" font-weight="bold" fill="#1a1612" text-anchor="middle">a</text>
-
-  <circle cx="328" cy="78" r="15" fill="none" stroke="#7a6e62" stroke-width="1.5" stroke-dasharray="2,3"/>
-  <text x="328" y="83" font-size="13" font-weight="bold" fill="#1a1612" text-anchor="middle">b</text>
-
-  <circle cx="136" cy="190" r="15" fill="none" stroke="#7a6e62" stroke-width="1.5" stroke-dasharray="2,3"/>
-  <text x="136" y="195" font-size="13" font-weight="bold" fill="#1a1612" text-anchor="middle">b</text>
-
-  <!-- shared EDGE sentinel -->
-  <rect x="460" y="150" width="150" height="80" fill="none" stroke="#8b1a1a" stroke-width="1.5" rx="6"/>
-  <text x="535" y="187" font-size="14" font-weight="bold" fill="#1a1612" text-anchor="middle">EDGE</text>
-  <text x="535" y="205" font-size="10.5" fill="#7a6e62" text-anchor="middle">every off-map door</text>
+  <text x="44" y="182" font-size="12" fill="#1a1612" font-weight="bold" text-anchor="start">string_maze</text>
+  <text x="70" y="204" font-size="10" fill="#7a6e62" text-anchor="middle">19</text>
+  <text x="94" y="204" font-size="10" fill="#7a6e62" text-anchor="middle">20</text>
+  <text x="118" y="204" font-size="10" fill="#7a6e62" text-anchor="middle">21</text>
+  <text x="142" y="204" font-size="10" fill="#7a6e62" text-anchor="middle">22</text>
+  <text x="166" y="204" font-size="10" fill="#7a6e62" text-anchor="middle">23</text>
+  <text x="44" y="226" font-size="10" fill="#7a6e62" text-anchor="middle">0</text>
+  <text x="70" y="226" font-size="14" fill="#1a1612" text-anchor="middle">#</text>
+  <text x="94" y="226" font-size="14" fill="#1a1612" text-anchor="middle">#</text>
+  <text x="118" y="226" font-size="14" fill="#1a1612" text-anchor="middle">#</text>
+  <text x="142" y="226" font-size="14" fill="#1a1612" text-anchor="middle">#</text>
+  <text x="166" y="226" font-size="14" fill="#1a1612" text-anchor="middle">#</text>
+  <text x="44" y="250" font-size="10" fill="#7a6e62" text-anchor="middle">1</text>
+  <text x="70" y="250" font-size="14" fill="#1a1612" text-anchor="middle">_</text>
+  <text x="94" y="250" font-size="14" fill="#1a1612" text-anchor="middle">_</text>
+  <text x="118" y="250" font-size="14" fill="#1a1612" text-anchor="middle">_</text>
+  <text x="142" y="250" font-size="14" fill="#1a1612" text-anchor="middle">#</text>
+  <text x="166" y="250" font-size="14" fill="#1a1612" text-anchor="middle">_</text>
+  <text x="44" y="274" font-size="10" fill="#7a6e62" text-anchor="middle">2</text>
+  <text x="70" y="274" font-size="14" fill="#1a1612" text-anchor="middle">#</text>
+  <text x="94" y="274" font-size="14" fill="#1a1612" text-anchor="middle">#</text>
+  <text x="118" y="274" font-size="14" fill="#1a1612" text-anchor="middle">#</text>
+  <text x="142" y="274" font-size="14" fill="#1a1612" text-anchor="middle">#</text>
+  <text x="166" y="274" font-size="14" fill="#1a1612" text-anchor="middle">_</text>
+  <text x="44" y="298" font-size="10" fill="#7a6e62" text-anchor="middle">3</text>
+  <text x="70" y="298" font-size="14" fill="#1a1612" text-anchor="middle">_</text>
+  <text x="94" y="298" font-size="14" fill="#1a1612" text-anchor="middle">_</text>
+  <text x="118" y="298" font-size="14" fill="#8b1a1a" font-weight="bold" text-anchor="middle">b</text>
+  <text x="142" y="298" font-size="14" fill="#1a1612" text-anchor="middle">_</text>
+  <text x="166" y="298" font-size="14" fill="#1a1612" text-anchor="middle">_</text>
+  <text x="44" y="322" font-size="10" fill="#7a6e62" text-anchor="middle">4</text>
+  <text x="70" y="322" font-size="14" fill="#1a1612" text-anchor="middle">_</text>
+  <text x="94" y="322" font-size="14" fill="#1a1612" text-anchor="middle">#</text>
+  <text x="118" y="322" font-size="14" fill="#1a1612" text-anchor="middle">#</text>
+  <text x="142" y="322" font-size="14" fill="#1a1612" text-anchor="middle">#</text>
+  <text x="166" y="322" font-size="14" fill="#1a1612" text-anchor="middle">#</text>
+  <text x="44" y="346" font-size="10" fill="#7a6e62" text-anchor="middle">5</text>
+  <text x="70" y="346" font-size="14" fill="#1a1612" text-anchor="middle">_</text>
+  <text x="94" y="346" font-size="14" fill="#1a1612" text-anchor="middle">_</text>
+  <text x="118" y="346" font-size="14" fill="#8b1a1a" font-weight="bold" text-anchor="middle">b</text>
+  <text x="142" y="346" font-size="14" fill="#1a1612" text-anchor="middle">_</text>
+  <text x="166" y="346" font-size="14" fill="#1a1612" text-anchor="middle">_</text>
+  <text x="44" y="400" font-size="11" fill="#1a1612" text-anchor="start">GameBuilder, in stages:</text>
+  <text x="44" y="420" font-size="10.5" fill="#7a6e62" text-anchor="start">1 a Room per character</text>
+  <text x="44" y="437" font-size="10.5" fill="#7a6e62" text-anchor="start">2 doors to grid neighbors</text>
+  <text x="44" y="454" font-size="10.5" fill="#7a6e62" text-anchor="start">3 pair teleports by letter</text>
+  <line x1="365" y1="138" x2="397" y2="138" stroke="#c8bfb0" stroke-width="1.1"/>
+  <line x1="352" y1="151" x2="352" y2="183" stroke="#c8bfb0" stroke-width="1.1"/>
+  <line x1="423" y1="138" x2="455" y2="138" stroke="#c8bfb0" stroke-width="1.1"/>
+  <line x1="410" y1="151" x2="410" y2="183" stroke="#c8bfb0" stroke-width="1.1"/>
+  <line x1="481" y1="138" x2="513" y2="138" stroke="#c8bfb0" stroke-width="1.1"/>
+  <line x1="468" y1="151" x2="468" y2="183" stroke="#c8bfb0" stroke-width="1.1"/>
+  <line x1="539" y1="138" x2="571" y2="138" stroke="#c8bfb0" stroke-width="1.1"/>
+  <line x1="526" y1="151" x2="526" y2="183" stroke="#c8bfb0" stroke-width="1.1"/>
+  <line x1="584" y1="151" x2="584" y2="183" stroke="#c8bfb0" stroke-width="1.1"/>
+  <line x1="365" y1="196" x2="397" y2="196" stroke="#1a1612" stroke-width="1.6"/>
+  <line x1="352" y1="209" x2="352" y2="241" stroke="#c8bfb0" stroke-width="1.1"/>
+  <line x1="423" y1="196" x2="455" y2="196" stroke="#1a1612" stroke-width="1.6"/>
+  <line x1="410" y1="209" x2="410" y2="241" stroke="#c8bfb0" stroke-width="1.1"/>
+  <line x1="481" y1="196" x2="513" y2="196" stroke="#c8bfb0" stroke-width="1.1"/>
+  <line x1="468" y1="209" x2="468" y2="241" stroke="#c8bfb0" stroke-width="1.1"/>
+  <line x1="539" y1="196" x2="571" y2="196" stroke="#c8bfb0" stroke-width="1.1"/>
+  <line x1="526" y1="209" x2="526" y2="241" stroke="#c8bfb0" stroke-width="1.1"/>
+  <line x1="584" y1="209" x2="584" y2="241" stroke="#1a1612" stroke-width="1.6"/>
+  <line x1="365" y1="254" x2="397" y2="254" stroke="#c8bfb0" stroke-width="1.1"/>
+  <line x1="352" y1="267" x2="352" y2="299" stroke="#c8bfb0" stroke-width="1.1"/>
+  <line x1="423" y1="254" x2="455" y2="254" stroke="#c8bfb0" stroke-width="1.1"/>
+  <line x1="410" y1="267" x2="410" y2="299" stroke="#c8bfb0" stroke-width="1.1"/>
+  <line x1="481" y1="254" x2="513" y2="254" stroke="#c8bfb0" stroke-width="1.1"/>
+  <line x1="468" y1="267" x2="468" y2="299" stroke="#c8bfb0" stroke-width="1.1"/>
+  <line x1="539" y1="254" x2="571" y2="254" stroke="#c8bfb0" stroke-width="1.1"/>
+  <line x1="526" y1="267" x2="526" y2="299" stroke="#c8bfb0" stroke-width="1.1"/>
+  <line x1="584" y1="267" x2="584" y2="299" stroke="#1a1612" stroke-width="1.6"/>
+  <line x1="365" y1="312" x2="397" y2="312" stroke="#1a1612" stroke-width="1.6"/>
+  <line x1="352" y1="325" x2="352" y2="357" stroke="#1a1612" stroke-width="1.6"/>
+  <line x1="423" y1="312" x2="455" y2="312" stroke="#1a1612" stroke-width="1.6"/>
+  <line x1="410" y1="325" x2="410" y2="357" stroke="#c8bfb0" stroke-width="1.1"/>
+  <line x1="481" y1="312" x2="513" y2="312" stroke="#1a1612" stroke-width="1.6"/>
+  <line x1="468" y1="325" x2="468" y2="357" stroke="#c8bfb0" stroke-width="1.1"/>
+  <line x1="539" y1="312" x2="571" y2="312" stroke="#1a1612" stroke-width="1.6"/>
+  <line x1="526" y1="325" x2="526" y2="357" stroke="#c8bfb0" stroke-width="1.1"/>
+  <line x1="584" y1="325" x2="584" y2="357" stroke="#c8bfb0" stroke-width="1.1"/>
+  <line x1="365" y1="370" x2="397" y2="370" stroke="#c8bfb0" stroke-width="1.1"/>
+  <line x1="352" y1="383" x2="352" y2="415" stroke="#1a1612" stroke-width="1.6"/>
+  <line x1="423" y1="370" x2="455" y2="370" stroke="#c8bfb0" stroke-width="1.1"/>
+  <line x1="410" y1="383" x2="410" y2="415" stroke="#c8bfb0" stroke-width="1.1"/>
+  <line x1="481" y1="370" x2="513" y2="370" stroke="#c8bfb0" stroke-width="1.1"/>
+  <line x1="468" y1="383" x2="468" y2="415" stroke="#c8bfb0" stroke-width="1.1"/>
+  <line x1="539" y1="370" x2="571" y2="370" stroke="#c8bfb0" stroke-width="1.1"/>
+  <line x1="526" y1="383" x2="526" y2="415" stroke="#c8bfb0" stroke-width="1.1"/>
+  <line x1="584" y1="383" x2="584" y2="415" stroke="#c8bfb0" stroke-width="1.1"/>
+  <line x1="365" y1="428" x2="397" y2="428" stroke="#1a1612" stroke-width="1.6"/>
+  <line x1="423" y1="428" x2="455" y2="428" stroke="#1a1612" stroke-width="1.6"/>
+  <line x1="481" y1="428" x2="513" y2="428" stroke="#1a1612" stroke-width="1.6"/>
+  <line x1="539" y1="428" x2="571" y2="428" stroke="#1a1612" stroke-width="1.6"/>
+  <line x1="339" y1="138" x2="311" y2="138" stroke="#c8bfb0" stroke-width="1.1"/>
+  <line x1="597" y1="138" x2="625" y2="138" stroke="#c8bfb0" stroke-width="1.1"/>
+  <line x1="339" y1="196" x2="311" y2="196" stroke="#1a1612" stroke-width="1.6"/>
+  <line x1="597" y1="196" x2="625" y2="196" stroke="#1a1612" stroke-width="1.6"/>
+  <line x1="339" y1="254" x2="311" y2="254" stroke="#c8bfb0" stroke-width="1.1"/>
+  <line x1="597" y1="254" x2="625" y2="254" stroke="#c8bfb0" stroke-width="1.1"/>
+  <line x1="339" y1="312" x2="311" y2="312" stroke="#c8bfb0" stroke-width="1.1"/>
+  <line x1="597" y1="312" x2="625" y2="312" stroke="#c8bfb0" stroke-width="1.1"/>
+  <line x1="339" y1="370" x2="311" y2="370" stroke="#c8bfb0" stroke-width="1.1"/>
+  <line x1="597" y1="370" x2="625" y2="370" stroke="#c8bfb0" stroke-width="1.1"/>
+  <line x1="339" y1="428" x2="311" y2="428" stroke="#c8bfb0" stroke-width="1.1"/>
+  <line x1="597" y1="428" x2="625" y2="428" stroke="#c8bfb0" stroke-width="1.1"/>
+  <line x1="352" y1="441" x2="352" y2="469" stroke="#c8bfb0" stroke-width="1.1"/>
+  <line x1="410" y1="441" x2="410" y2="469" stroke="#c8bfb0" stroke-width="1.1"/>
+  <line x1="468" y1="441" x2="468" y2="469" stroke="#c8bfb0" stroke-width="1.1"/>
+  <line x1="526" y1="441" x2="526" y2="469" stroke="#c8bfb0" stroke-width="1.1"/>
+  <line x1="584" y1="441" x2="584" y2="469" stroke="#1a1612" stroke-width="1.6"/>
+  <path d="M477.1,321.1 Q511.5,370 477.1,418.9" fill="none" stroke="#8b1a1a" stroke-width="2"/>
+  <circle cx="352" cy="138" r="13" fill="#eeeeee" stroke="#c8bfb0" stroke-width="1.1"/>
+  <text x="352" y="142" font-size="11" fill="#7a6e62" text-anchor="middle">#</text>
+  <circle cx="410" cy="138" r="13" fill="#eeeeee" stroke="#c8bfb0" stroke-width="1.1"/>
+  <text x="410" y="142" font-size="11" fill="#7a6e62" text-anchor="middle">#</text>
+  <circle cx="468" cy="138" r="13" fill="#eeeeee" stroke="#c8bfb0" stroke-width="1.1"/>
+  <text x="468" y="142" font-size="11" fill="#7a6e62" text-anchor="middle">#</text>
+  <circle cx="526" cy="138" r="13" fill="#eeeeee" stroke="#c8bfb0" stroke-width="1.1"/>
+  <text x="526" y="142" font-size="11" fill="#7a6e62" text-anchor="middle">#</text>
+  <circle cx="584" cy="138" r="13" fill="#eeeeee" stroke="#c8bfb0" stroke-width="1.1"/>
+  <text x="584" y="142" font-size="11" fill="#7a6e62" text-anchor="middle">#</text>
+  <circle cx="352" cy="196" r="13" fill="none" stroke="#1a1612" stroke-width="1.3"/>
+  <text x="352" y="200" font-size="12" fill="#1a1612" text-anchor="middle">_</text>
+  <circle cx="410" cy="196" r="13" fill="none" stroke="#1a1612" stroke-width="1.3"/>
+  <text x="410" y="200" font-size="12" fill="#1a1612" text-anchor="middle">_</text>
+  <circle cx="468" cy="196" r="13" fill="none" stroke="#1a1612" stroke-width="1.3"/>
+  <text x="468" y="200" font-size="12" fill="#1a1612" text-anchor="middle">_</text>
+  <circle cx="526" cy="196" r="13" fill="#eeeeee" stroke="#c8bfb0" stroke-width="1.1"/>
+  <text x="526" y="200" font-size="11" fill="#7a6e62" text-anchor="middle">#</text>
+  <circle cx="584" cy="196" r="13" fill="none" stroke="#1a1612" stroke-width="1.3"/>
+  <text x="584" y="200" font-size="12" fill="#1a1612" text-anchor="middle">_</text>
+  <circle cx="352" cy="254" r="13" fill="#eeeeee" stroke="#c8bfb0" stroke-width="1.1"/>
+  <text x="352" y="258" font-size="11" fill="#7a6e62" text-anchor="middle">#</text>
+  <circle cx="410" cy="254" r="13" fill="#eeeeee" stroke="#c8bfb0" stroke-width="1.1"/>
+  <text x="410" y="258" font-size="11" fill="#7a6e62" text-anchor="middle">#</text>
+  <circle cx="468" cy="254" r="13" fill="#eeeeee" stroke="#c8bfb0" stroke-width="1.1"/>
+  <text x="468" y="258" font-size="11" fill="#7a6e62" text-anchor="middle">#</text>
+  <circle cx="526" cy="254" r="13" fill="#eeeeee" stroke="#c8bfb0" stroke-width="1.1"/>
+  <text x="526" y="258" font-size="11" fill="#7a6e62" text-anchor="middle">#</text>
+  <circle cx="584" cy="254" r="13" fill="none" stroke="#1a1612" stroke-width="1.3"/>
+  <text x="584" y="258" font-size="12" fill="#1a1612" text-anchor="middle">_</text>
+  <circle cx="352" cy="312" r="13" fill="none" stroke="#1a1612" stroke-width="1.3"/>
+  <text x="352" y="316" font-size="12" fill="#1a1612" text-anchor="middle">_</text>
+  <circle cx="410" cy="312" r="13" fill="none" stroke="#1a1612" stroke-width="1.3"/>
+  <text x="410" y="316" font-size="12" fill="#1a1612" text-anchor="middle">_</text>
+  <circle cx="468" cy="312" r="13" fill="none" stroke="#8b1a1a" stroke-width="1.8"/>
+  <text x="468" y="316" font-size="12" fill="#8b1a1a" font-weight="bold" text-anchor="middle">b</text>
+  <circle cx="526" cy="312" r="13" fill="none" stroke="#1a1612" stroke-width="1.3"/>
+  <text x="526" y="316" font-size="12" fill="#1a1612" text-anchor="middle">_</text>
+  <circle cx="584" cy="312" r="13" fill="none" stroke="#1a1612" stroke-width="1.3"/>
+  <text x="584" y="316" font-size="12" fill="#1a1612" text-anchor="middle">_</text>
+  <circle cx="352" cy="370" r="13" fill="none" stroke="#1a1612" stroke-width="1.3"/>
+  <text x="352" y="374" font-size="12" fill="#1a1612" text-anchor="middle">_</text>
+  <circle cx="410" cy="370" r="13" fill="#eeeeee" stroke="#c8bfb0" stroke-width="1.1"/>
+  <text x="410" y="374" font-size="11" fill="#7a6e62" text-anchor="middle">#</text>
+  <circle cx="468" cy="370" r="13" fill="#eeeeee" stroke="#c8bfb0" stroke-width="1.1"/>
+  <text x="468" y="374" font-size="11" fill="#7a6e62" text-anchor="middle">#</text>
+  <circle cx="526" cy="370" r="13" fill="#eeeeee" stroke="#c8bfb0" stroke-width="1.1"/>
+  <text x="526" y="374" font-size="11" fill="#7a6e62" text-anchor="middle">#</text>
+  <circle cx="584" cy="370" r="13" fill="#eeeeee" stroke="#c8bfb0" stroke-width="1.1"/>
+  <text x="584" y="374" font-size="11" fill="#7a6e62" text-anchor="middle">#</text>
+  <circle cx="352" cy="428" r="13" fill="none" stroke="#1a1612" stroke-width="1.3"/>
+  <text x="352" y="432" font-size="12" fill="#1a1612" text-anchor="middle">_</text>
+  <circle cx="410" cy="428" r="13" fill="none" stroke="#1a1612" stroke-width="1.3"/>
+  <text x="410" y="432" font-size="12" fill="#1a1612" text-anchor="middle">_</text>
+  <circle cx="468" cy="428" r="13" fill="none" stroke="#8b1a1a" stroke-width="1.8"/>
+  <text x="468" y="432" font-size="12" fill="#8b1a1a" font-weight="bold" text-anchor="middle">b</text>
+  <circle cx="526" cy="428" r="13" fill="none" stroke="#1a1612" stroke-width="1.3"/>
+  <text x="526" y="432" font-size="12" fill="#1a1612" text-anchor="middle">_</text>
+  <circle cx="584" cy="428" r="13" fill="none" stroke="#1a1612" stroke-width="1.3"/>
+  <text x="584" y="432" font-size="12" fill="#1a1612" text-anchor="middle">_</text>
+  <rect x="312" y="36" width="312" height="44" fill="none" stroke="#1a1612" stroke-width="1.6" rx="4"/>
+  <text x="468" y="55" font-size="12.5" fill="#1a1612" font-weight="bold" text-anchor="middle">EDGE = Room(Edge())</text>
+  <text x="468" y="71" font-size="10.5" fill="#7a6e62" text-anchor="middle">Edge.interact() returns robot.room</text>
+  <line x1="352" y1="125" x2="352.0" y2="96.4" stroke="#7a6e62" stroke-width="1.3" marker-end="url(#mz-muted)"/>
+  <line x1="410" y1="125" x2="410.0" y2="96.4" stroke="#7a6e62" stroke-width="1.3" marker-end="url(#mz-muted)"/>
+  <line x1="468" y1="125" x2="468.0" y2="96.4" stroke="#7a6e62" stroke-width="1.3" marker-end="url(#mz-muted)"/>
+  <line x1="526" y1="125" x2="526.0" y2="96.4" stroke="#7a6e62" stroke-width="1.3" marker-end="url(#mz-muted)"/>
+  <line x1="584" y1="125" x2="584.0" y2="96.4" stroke="#7a6e62" stroke-width="1.3" marker-end="url(#mz-muted)"/>
+  <text x="302" y="102" font-size="10.5" fill="#7a6e62" text-anchor="end">open(Urge.NORTH)</text>
+  <text x="302" y="116" font-size="10.5" fill="#7a6e62" text-anchor="end">on row 0</text>
+  <text x="352" y="485" font-size="10" fill="#7a6e62" text-anchor="middle">19</text>
+  <text x="410" y="485" font-size="10" fill="#7a6e62" text-anchor="middle">20</text>
+  <text x="468" y="485" font-size="10" fill="#7a6e62" text-anchor="middle">21</text>
+  <text x="526" y="485" font-size="10" fill="#7a6e62" text-anchor="middle">22</text>
+  <text x="584" y="485" font-size="10" fill="#7a6e62" text-anchor="middle">23</text>
+  <text x="303" y="142" font-size="10" fill="#7a6e62" text-anchor="end">0</text>
+  <text x="303" y="200" font-size="10" fill="#7a6e62" text-anchor="end">1</text>
+  <text x="303" y="258" font-size="10" fill="#7a6e62" text-anchor="end">2</text>
+  <text x="303" y="316" font-size="10" fill="#7a6e62" text-anchor="end">3</text>
+  <text x="303" y="374" font-size="10" fill="#7a6e62" text-anchor="end">4</text>
+  <text x="303" y="432" font-size="10" fill="#7a6e62" text-anchor="end">5</text>
+  <circle cx="44" cy="514" r="9" fill="#eeeeee" stroke="#c8bfb0" stroke-width="1.1"/>
+  <text x="44" y="518" font-size="10" fill="#7a6e62" text-anchor="middle">#</text>
+  <text x="64" y="518" font-size="10.5" fill="#1a1612" text-anchor="start">Room(Wall()): returns robot.room</text>
+  <line x1="34" y1="542" x2="54" y2="542" stroke="#c8bfb0" stroke-width="1.1"/>
+  <text x="64" y="546" font-size="10.5" fill="#1a1612" text-anchor="start">door into a wall room</text>
+  <line x1="382" y1="514" x2="402" y2="514" stroke="#1a1612" stroke-width="1.6"/>
+  <text x="412" y="518" font-size="10.5" fill="#1a1612" text-anchor="start">door between enterable rooms</text>
+  <line x1="382" y1="542" x2="402" y2="542" stroke="#8b1a1a" stroke-width="2"/>
+  <text x="412" y="546" font-size="10.5" fill="#1a1612" text-anchor="start">Teleport: enter one b, land on the other</text>
 </svg>

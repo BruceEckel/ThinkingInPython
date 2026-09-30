@@ -44,7 +44,7 @@ print(squared_ints)
 #: [1, 81, 0, 16]
 ```
 
-![The parts of a list comprehension](_images/listComprehensions)
+![The parts of a list comprehension, numbered in the order Python evaluates them](_images/listComprehensions)
 
 In this comprehension:
 

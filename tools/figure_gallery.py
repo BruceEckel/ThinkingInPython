@@ -217,10 +217,7 @@ class Style:
 TIP_GAP_EXEMPT: dict[str, str] = {}
 
 # Figures whose arrowheads may point at no shape, and why.
-STRAY_TIP_EXEMPT: dict[str, str] = {
-    "memento_history": "each arrow is a move along the timeline toward a "
-                       "stack, not an edge to a box",
-}
+STRAY_TIP_EXEMPT: dict[str, str] = {}
 
 
 @dataclass

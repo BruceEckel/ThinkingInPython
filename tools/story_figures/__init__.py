@@ -1,4 +1,10 @@
-"""The pattern chapters' opening figures, one module per chapter.
+"""The book's generated figures that tell a story, one module per figure.
+
+The pattern chapters' opening figures came first; since 2026-09-29 the
+package also draws figures inside chapters that replaced UML or
+hand-drawn diagrams (chapter 14's decorator, 16's comprehension, 27's
+abstract factory, 32's double dispatch, 34's filesystem, 36's history,
+37's trash sorter, 38's maze). A chapter may have several modules.
 
 Each pattern chapter opens with a figure that tells the pattern's story:
 what happens, in what order, and who knows what. Chapter 30's Observer
@@ -8,7 +14,7 @@ same for every pattern chapter, with no notation or precedent to follow:
 whatever picture best helps the reader, a variation of the coupling panel
 included when that works for a pattern.
 
-A figure is a module here named `chNN_<pattern>.py` that defines:
+A figure is a module here named `chNN_<name>.py` that defines:
 
     STEM     the SVG's name in resources/images/, without `.svg`
     render() the SVG source, as a string

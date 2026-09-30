@@ -87,4 +87,4 @@ def test_render_lists_each_figure_once_under_its_number(
 def test_every_figure_the_book_references_has_a_file() -> None:
     figs = scan()
     assert [f.name for f in figs if f.path is None] == []
-    assert any(f.name == "observer_broadcast" for f in figs)
+    assert any(f.name == "observer_story" for f in figs)

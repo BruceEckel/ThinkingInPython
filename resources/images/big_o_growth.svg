@@ -52,7 +52,8 @@
   <circle cx="435.4" cy="40.0" r="4" fill="#c0392b"/>
 
   <text x="435.4" y="14" font-size="12" font-weight="bold"
-        fill="#c0392b" text-anchor="middle">O(2&#8319;)</text>
+        fill="#c0392b" text-anchor="middle">O(2<tspan dy="-5"
+        font-size="10">n</tspan><tspan dy="5">)</tspan></text>
   <text x="628" y="44" font-size="12" font-weight="bold"
         fill="#8859a3">O(n&#178;)</text>
   <text x="628" y="284" font-size="12" font-weight="bold"

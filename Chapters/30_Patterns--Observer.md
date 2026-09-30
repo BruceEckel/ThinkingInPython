@@ -316,11 +316,6 @@ t.celsius = 150
 ```
 
 The responders here are lambdas, but any function or bound method works.
-
-![Assigning to celsius calls every responder](_images/observer_broadcast)
-
-The dashed `plot` responder is not part of the example.
-It's in the diagram to show that any callable of the right shape subscribes with the same `subscribe()` call as the two lambdas.
 `Thermometer` knows its responders only as callables that take a `float`.
 
 ### Testing the Broadcaster

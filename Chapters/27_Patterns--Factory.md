@@ -738,7 +738,7 @@ most likely via startup configuration.
 As another example, suppose you are creating a general-purpose gaming environment that supports different types of games.
 Here's how it might look using an abstract factory:
 
-![Two concrete factories and the two product hierarchies they build from](_images/abstract_factory)
+![](_images/abstract_factory)
 
 `Character` and `Obstacle` are parallel hierarchies,
 and each concrete factory declares one method per hierarchy.

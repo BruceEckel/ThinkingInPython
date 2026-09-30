@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 470"
+     font-family="'JetBrains Mono', Consolas, monospace">
+  <title>The vending machine's states: Money moves QUIESCENT to COLLECTING, FirstDigit moves any of three states to SELECTING, SELECTING's SecondDigit rows lead to three states in table order, and Quit returns every shaded state to QUIESCENT</title>
+  <defs>
+    <marker id="vs-ink" viewBox="0 0 18 12" refX="5" refY="6"
+            markerWidth="18" markerHeight="12" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0.5,0.5 L17.4,6 L0.5,11.5 L5,6 Z" fill="#1a1612" stroke="#1a1612" stroke-width="0.8" stroke-linejoin="round"/>
+    </marker>
+    <marker id="vs-red" viewBox="0 0 18 12" refX="5" refY="6"
+            markerWidth="18" markerHeight="12" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0.5,0.5 L17.4,6 L0.5,11.5 L5,6 Z" fill="#8b1a1a" stroke="#8b1a1a" stroke-width="0.8" stroke-linejoin="round"/>
+    </marker>
+    <marker id="vs-muted" viewBox="0 0 18 12" refX="5" refY="6"
+            markerWidth="18" markerHeight="12" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0.5,0.5 L17.4,6 L0.5,11.5 L5,6 Z" fill="#7a6e62" stroke="#7a6e62" stroke-width="0.8" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+  <path d="M36,100 H700 Q704,100 704,104 V450 Q704,454 700,454 H36 Q32,454 32,450 V104 Q32,100 36,100 Z" fill="#eeeeee" stroke="none" stroke-width="1.6"/>
+  <rect x="60" y="26" width="124" height="36" fill="none" stroke="#1a1612" stroke-width="1.6" rx="4"/>
+  <text x="122" y="48.5" font-size="12" fill="#1a1612" font-weight="bold" text-anchor="middle">QUIESCENT</text>
+  <text x="244" y="48" font-size="11" fill="#7a6e62" text-anchor="start">VendingMachine()</text>
+  <line x1="238" y1="44" x2="200.4" y2="44.0" stroke="#7a6e62" stroke-width="1.3" marker-end="url(#vs-muted)"/>
+  <text x="704" y="26" font-size="10" fill="#7a6e62" text-anchor="end">each edge:</text>
+  <text x="704" y="40" font-size="10" fill="#7a6e62" text-anchor="end">event [condition] / action</text>
+  <line x1="144" y1="100" x2="144.0" y2="78.4" stroke="#1a1612" stroke-width="1.3" marker-end="url(#vs-ink)"/>
+  <text x="152" y="80" font-size="11" fill="#1a1612" text-anchor="start">Quit / refund</text>
+  <text x="253.8" y="80" font-size="10.5" fill="#7a6e62" text-anchor="start">from every shaded state</text>
+  <line x1="100" y1="62" x2="100.0" y2="245.6" stroke="#1a1612" stroke-width="1.3" marker-end="url(#vs-ink)"/>
+  <text x="92" y="190" font-size="11" fill="#1a1612" text-anchor="end">Money</text>
+  <text x="92" y="204" font-size="10.5" fill="#7a6e62" text-anchor="end">/ add_money</text>
+  <line x1="92" y1="298" x2="92" y2="324" stroke="#1a1612" stroke-width="1.3"/>
+  <line x1="92" y1="324" x2="152" y2="324" stroke="#1a1612" stroke-width="1.3"/>
+  <line x1="152" y1="324" x2="152.0" y2="314.4" stroke="#1a1612" stroke-width="1.3" marker-end="url(#vs-ink)"/>
+  <text x="122" y="342" font-size="11" fill="#1a1612" text-anchor="middle">Money</text>
+  <text x="122" y="356" font-size="10.5" fill="#7a6e62" text-anchor="middle">/ add_money</text>
+  <rect x="60" y="262" width="124" height="36" fill="none" stroke="#1a1612" stroke-width="1.6" rx="4"/>
+  <text x="122" y="284.5" font-size="12" fill="#1a1612" font-weight="bold" text-anchor="middle">COLLECTING</text>
+  <rect x="378" y="262" width="124" height="36" fill="none" stroke="#8b1a1a" stroke-width="1.6" rx="4"/>
+  <text x="440" y="284.5" font-size="12" fill="#1a1612" font-weight="bold" text-anchor="middle">SELECTING</text>
+  <rect x="378" y="132" width="124" height="36" fill="none" stroke="#1a1612" stroke-width="1.6" rx="4"/>
+  <text x="440" y="154.5" font-size="12" fill="#1a1612" font-weight="bold" text-anchor="middle">UNAVAILABLE</text>
+  <rect x="378" y="392" width="124" height="36" fill="none" stroke="#1a1612" stroke-width="1.6" rx="4"/>
+  <text x="440" y="414.5" font-size="12" fill="#1a1612" font-weight="bold" text-anchor="middle">WANT_MORE</text>
+  <line x1="184" y1="269" x2="361.6" y2="269.0" stroke="#1a1612" stroke-width="1.3" marker-end="url(#vs-ink)"/>
+  <text x="281" y="247" font-size="11" fill="#1a1612" text-anchor="middle">FirstDigit</text>
+  <text x="281" y="261" font-size="10.5" fill="#7a6e62" text-anchor="middle">/ choose_row</text>
+  <line x1="378" y1="291" x2="200.4" y2="291.0" stroke="#8b1a1a" stroke-width="1.3" marker-end="url(#vs-red)"/>
+  <text x="281" y="309" font-size="11" fill="#8b1a1a" text-anchor="middle">1 SecondDigit</text>
+  <text x="281" y="323" font-size="11" fill="#8b1a1a" text-anchor="middle">[too_expensive]</text>
+  <text x="281" y="337" font-size="10.5" fill="#7a6e62" text-anchor="middle">/ clear</text>
+  <line x1="429" y1="168" x2="429.0" y2="245.6" stroke="#1a1612" stroke-width="1.3" marker-end="url(#vs-ink)"/>
+  <text x="421" y="212" font-size="11" fill="#1a1612" text-anchor="end">FirstDigit</text>
+  <text x="421" y="226" font-size="10.5" fill="#7a6e62" text-anchor="end">/ choose_row</text>
+  <line x1="451" y1="262" x2="451.0" y2="184.4" stroke="#8b1a1a" stroke-width="1.3" marker-end="url(#vs-red)"/>
+  <text x="459" y="205" font-size="11" fill="#8b1a1a" text-anchor="start">2 SecondDigit</text>
+  <text x="459" y="219" font-size="11" fill="#8b1a1a" text-anchor="start">[sold_out]</text>
+  <text x="459" y="233" font-size="10.5" fill="#7a6e62" text-anchor="start">/ clear</text>
+  <line x1="429" y1="392" x2="429.0" y2="314.4" stroke="#1a1612" stroke-width="1.3" marker-end="url(#vs-ink)"/>
+  <text x="421" y="342" font-size="11" fill="#1a1612" text-anchor="end">FirstDigit</text>
+  <text x="421" y="356" font-size="10.5" fill="#7a6e62" text-anchor="end">/ choose_row</text>
+  <line x1="451" y1="298" x2="451.0" y2="375.6" stroke="#8b1a1a" stroke-width="1.3" marker-end="url(#vs-red)"/>
+  <text x="459" y="342" font-size="11" fill="#8b1a1a" text-anchor="start">3 SecondDigit</text>
+  <text x="459" y="356" font-size="10.5" fill="#7a6e62" text-anchor="start">/ dispense</text>
+  <text x="516" y="276" font-size="10.5" fill="#8b1a1a" text-anchor="start">SecondDigit tries</text>
+  <text x="516" y="290" font-size="10.5" fill="#8b1a1a" text-anchor="start">rows 1, 2, 3 in order;</text>
+  <text x="516" y="304" font-size="10.5" fill="#8b1a1a" text-anchor="start">the first that passes wins</text>
+</svg>
