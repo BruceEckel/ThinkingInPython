@@ -1,8 +1,3 @@
-https://claude.ai/artifact/E8yVkhDf8ePM11jwA3sR4j -- would it be possible to make an entire chapter appear on a page like this, and I could just go through and use the mouse to mark things that need work, then you could do the rewrite based on that?
-I don't think I need a separate "fix" page; your rewrites would just automatically be incorporated. Then I could go through the chapter again, do the same thing, until I had no more fixes. It would become a kind of interactive editor environment.
-- I'd probably need a way to delete sentences or fragments rather than submitting them for change, for those kinds of edits.
-- It might also be useful to be able to edit in place for things that I could just fix rather than submitting them.
-
 Implementation is Friction
 
 How can I improve the process on this book?
