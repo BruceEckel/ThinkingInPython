@@ -198,6 +198,9 @@ A callable alone cannot express a second operation, `undo()`.
 `Command` describes one call,
 so an undoable list of commands needs a type with two members,
 `__call__()` and `undo()`, and that type is a `Protocol` (see exercise 1).
+[*Memento*](36_Patterns--Memento.md#the-caretaker-a-generic-history)
+undoes the other way, by saving snapshots of the state,
+so no action needs an inverse.
 
 ### The Late-Binding Trap
 
