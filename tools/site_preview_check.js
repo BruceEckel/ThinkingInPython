@@ -75,6 +75,7 @@ function kindOf(a) {
   if (a.closest(".chapter-nav")) return "previous/next";
   if (a.closest(".chapter-toc")) return "chapter contents";
   if (a.classList.contains("toc-toggle")) return "Contents";
+  if (a.closest(".toc-drop")) return "Contents list";
   if (a.classList.contains("footnote-back")) return "footnote back-link";
   if (a.getAttribute("aria-hidden") === "true") return "code line";
   if (a.classList.contains("footnote-ref")) return "footnote";

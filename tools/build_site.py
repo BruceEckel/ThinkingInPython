@@ -4,7 +4,9 @@
 Pandoc converts each chapter through `template.html`: a single readable column
 on a warm "paper" background, a small fixed "Contents" link to the index, a
 chapter label and title rule, and previous/next navigation. There is no
-persistent sidebar. The index page is the table of contents.
+persistent sidebar. The index page is the table of contents; hovering over
+the Contents link drops down the same list of chapters (`render_toc_menu()`),
+so a reader can go from one chapter to any other in one click.
 
 This adapts the OOPology build to this book: the chapter title comes from the
 first `#` heading (not YAML front matter), images referenced as `_images/<name>`
@@ -282,9 +284,30 @@ def check_pandoc(minimum: tuple[int, ...] = (3, 0)) -> None:
                  f"build needs. Install a current one: {install_hint('pandoc')}")
 
 
+def render_toc_menu(chapters: list[Chapter], current: Chapter) -> str:
+    """The Contents link's drop-down: the index page's list, on one line.
+
+    Pandoc inserts a variable's value as given, so this is HTML; it
+    carries no newline, since it travels as a command-line argument. The
+    current chapter is marked `aria-current`, and template.html scrolls
+    the list to it when the menu opens.
+    """
+    items: list[str] = []
+    for ch in chapters:
+        part = PARTS.get(ch.number)
+        if part is not None:
+            items.append('<li class="toc-drop-part">'
+                         f'{part_label(*part, "&middot;")}</li>')
+        here = ' aria-current="page"' if ch is current else ""
+        items.append(f'<li><a href="{ch.out_name}"{here}>'
+                     f'<span class="toc-drop-num">{ch.number}</span>'
+                     f'{ch.title}</a></li>')
+    return f'<ul>{"".join(items)}</ul>'
+
+
 def render_chapter(body: str, ch: Chapter,
                    prev: Chapter | None, nxt: Chapter | None,
-                   chapter_toc: bool = False) -> str:
+                   chapter_toc: bool = False, toc_menu: str = "") -> str:
     variables = [
         f"--variable=title:{ch.title}",
         f"--variable=chapter-label:{ch.label}",
@@ -304,6 +327,8 @@ def render_chapter(body: str, ch: Chapter,
     if nxt is not None:
         variables += [f"--variable=next-url:{nxt.out_name}",
                       f"--variable=next-title:{nxt.title}"]
+    if toc_menu:
+        variables.append(f"--variable=toc-menu:{toc_menu}")
     toc_opts = ["--toc", f"--toc-depth={CHAPTER_TOC_DEPTH}"] if chapter_toc else []
     proc = subprocess.run(
         ["pandoc", "--template", str(TEMPLATE), "--from", "markdown+smart",
@@ -499,7 +524,8 @@ def write_page(ch: Chapter, chapters: list[Chapter], out_dir: Path,
     epigraph, body = split_epigraph(body)
     if epigraph:
         body = epigraph_metadata(epigraph) + body
-    page = render_chapter(body, ch, prev, nxt, chapter_toc)
+    page = render_chapter(body, ch, prev, nxt, chapter_toc,
+                          render_toc_menu(chapters, ch))
     (out_dir / ch.out_name).write_text(page, encoding="utf-8")
     return used
 

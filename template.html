@@ -45,11 +45,15 @@
       padding: 4rem 0 6rem;
     }
 
-    /* TOC toggle */
-    .toc-toggle {
+    /* TOC toggle, and the chapter list it drops down on hover */
+    .toc-menu {
       position: fixed;
       top: 1.5rem;
       right: 1.5rem;
+      z-index: 100;
+    }
+    .toc-toggle {
+      display: block;
       font-family: 'Cormorant SC', serif;
       font-size: 0.75rem;
       letter-spacing: 0.12em;
@@ -60,9 +64,63 @@
       line-height: 1;
       padding-bottom: 1px;
       transition: color 0.2s;
-      z-index: 100;
     }
     .toc-toggle:hover { color: var(--accent); border-color: var(--accent); }
+    /* The padding bridges the gap below the link, so the pointer can
+       travel down into the list without the hover ending. */
+    .toc-drop {
+      display: none;
+      position: absolute;
+      top: 100%;
+      right: 0;
+      padding-top: 0.6rem;
+    }
+    .toc-menu:hover .toc-drop,
+    .toc-menu:focus-within .toc-drop { display: block; }
+    .toc-drop ul {
+      position: relative;
+      list-style: none;
+      width: 22rem;
+      max-height: calc(100vh - 4rem);
+      overflow-y: auto;
+      padding: 0.5rem 0;
+      text-align: left;
+      background: var(--paper);
+      border: 1px solid var(--rule);
+      box-shadow: 0 6px 24px rgba(26, 22, 18, 0.12);
+    }
+    .toc-drop a {
+      display: flex;
+      align-items: baseline;
+      padding: 0.15rem 1rem;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1rem;
+      line-height: 1.35;
+      color: var(--ink);
+      border: none;
+      text-decoration: none;
+    }
+    .toc-drop a:hover { color: var(--accent); }
+    .toc-drop a[aria-current] { color: var(--accent); font-weight: 600; }
+    .toc-drop-num {
+      font-family: 'Cormorant SC', serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      min-width: 1.8rem;
+      flex: none;
+    }
+    .toc-drop-part {
+      padding: 0.6rem 1rem 0.1rem;
+      font-family: 'Cormorant SC', serif;
+      font-size: 0.8rem;
+      letter-spacing: 0.12em;
+      color: var(--accent);
+    }
+    /* A touch screen has no hover: a tap on Contents opens the index. */
+    @media (hover: none) {
+      .toc-drop { display: none !important; }
+    }
 
     /* Chapter header */
     .chapter-label {
@@ -364,7 +422,12 @@
   </style>
 </head>
 <body>
-  <a class="toc-toggle" href="index.html">Contents</a>
+  <div class="toc-menu">
+    <a class="toc-toggle" href="index.html">Contents</a>
+    $if(toc-menu)$
+    <nav class="toc-drop" aria-label="Book contents">$toc-menu$</nav>
+    $endif$
+  </div>
   <div class="page">
     <nav class="chapter-nav chapter-nav-top">
       $if(prev-url)$<a href="$prev-url$">← $prev-title$</a>$else$<span></span>$endif$
@@ -395,5 +458,17 @@
       $if(next-url)$<a href="$next-url$">$next-title$ →</a>$endif$
     </nav>
   </div>
+  <script>
+    // Open the Contents list scrolled to the chapter you are reading.
+    (function () {
+      var menu = document.querySelector(".toc-menu");
+      var list = menu && menu.querySelector(".toc-drop ul");
+      var here = list && list.querySelector("[aria-current]");
+      if (!here) return;
+      menu.addEventListener("mouseenter", function () {
+        list.scrollTop = here.parentNode.offsetTop - list.clientHeight / 2;
+      });
+    })();
+  </script>
 </body>
 </html>

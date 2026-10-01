@@ -49,7 +49,7 @@
   // ── which links get a panel ─────────────────────────────────────────────
 
   var EXTERNAL = /^([a-z][a-z0-9+.-]*:|\/\/)/i;
-  var NAVIGATION = ".link-preview, .chapter-toc, .chapter-nav";
+  var NAVIGATION = ".link-preview, .chapter-toc, .chapter-nav, .toc-drop";
 
   function previewable(link) {
     if (!link.closest(".page") || link.closest(NAVIGATION)) return false;
