@@ -997,6 +997,34 @@ This idiom pays off for a value that needs one-time setup logic but stays consta
 For anything simpler,
 a module-level constant computed the ordinary way reads better.
 
+Since Python 3.9 (PEP 614), the expression after `@` can be any expression,
+so you can write `run_once` inline as `@lambda`:
+
+```python
+# lambda_decorator.py
+@lambda f: f()
+def fib_table() -> list[int]:
+    table = [0, 1]
+    while len(table) < 10:
+        table.append(table[-1] + table[-2])
+    return table
+
+print(fib_table)
+#: [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]
+```
+
+This is the most common real use of `@lambda`.
+The practical reason for it is scope: the loop needs a working variable,
+`table`, and building the list inside a function keeps `table` local.
+The module gains one name, `fib_table`, holding the finished list.
+
+Treat `@lambda` as a curiosity and avoid it.
+A reader who sees `def fib_table()` expects a function and finds a list.
+The type checker loses track too: the lambda's parameter has no annotation,
+so `ty` reports `fib_table` as `Unknown`,
+where the generic `run_once` carries `T` through to `str`.
+If you want the run-once idiom, use the named decorator.
+
 A decorator can replace a class the same way.
 [*Singleton*](24_Patterns--Singleton.md#singleton-by-class-decorator)
 replaces a class with a callable object that stands in for it:
