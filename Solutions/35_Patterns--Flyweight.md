@@ -356,9 +356,11 @@ print(len(_pool))
 
 This listing is `weak_pool.py`'s shape applied to colors: a factory
 function, `make_color()`, and a `WeakValueDictionary` for the pool.
-`Color` is an ordinary frozen data class, so it gets a generated
-`__repr__()`, `__eq__()`, and `__hash__()`, which the hand-written
-`Color` in `interned_color.py` goes without. Once `del` drops every
+`Color` is a frozen data class, so it gets a generated `__repr__()`,
+`__eq__()`, and `__hash__()`, as the record `Color` in
+`interned_color.py` does. It writes the `dataclass` call in full for
+the reason `weak_pool.py`'s `Name` does: a weak reference needs
+`weakref_slot=True`, which `record()` does not pass through. Once `del` drops every
 reference to the fifty-shade palette and both crimson names, nothing
 keeps those `Color` objects alive, and the pool empties itself with no
 explicit cleanup.
@@ -369,9 +371,9 @@ builds a second object equal to the pooled one, the same bypass a
 direct `Tile(...)` makes in the chapter. Weak references did not force
 that trade. `__new__()` can look in a `WeakValueDictionary` as easily
 as in a `dict`, as
-[Which Pool Should You Use?](../Chapters/35_Patterns--Flyweight.md#which-pool-should-you-use)
-says, and `interned_color.py`'s unslotted `Color` already has the
-`__weakref__` slot a weak reference needs.
+[Choosing a Flyweight and Its Pool](../Chapters/35_Patterns--Flyweight.md#choosing-a-flyweight-and-its-pool)
+says, on a `Color` declared with the same
+`@dataclass(frozen=True, slots=True, weakref_slot=True)` line.
 
 ## 6. Constraining `interned_color.py`'s components
 
@@ -379,9 +381,11 @@ says, and `interned_color.py`'s unslotted `Color` already has the
 # exercise_6.py
 from typing import ClassVar
 from exceptions import expect
+from record import record
 
 type RGB = tuple[int, int, int]
 
+@record
 class Color:
     _pool: ClassVar[dict[RGB, Color]] = {}
     red: int
@@ -398,13 +402,9 @@ class Color:
                 raise ValueError(
                     f"{name}={value} out of range 0-255")
         key: RGB = (red, green, blue)
-        cached = cls._pool.get(key)
-        if cached is not None:
-            return cached
-        self = super().__new__(cls)
-        self.red, self.green, self.blue = red, green, blue
-        cls._pool[key] = self
-        return self
+        if key not in cls._pool:
+            cls._pool[key] = super().__new__(cls)
+        return cls._pool[key]
 
 expect(ValueError, Color, 300, 0, 0)
 #: [ValueError] red=300 out of range 0-255
@@ -414,9 +414,11 @@ expect(ValueError, Color, 300, 0, 0)
 # test_ch35_out_of_range.py
 from typing import ClassVar
 import pytest
+from record import record
 
 type RGB = tuple[int, int, int]
 
+@record
 class Color:
     _pool: ClassVar[dict[RGB, Color]] = {}
     red: int
@@ -433,13 +435,9 @@ class Color:
                 raise ValueError(
                     f"{name}={value} out of range 0-255")
         key: RGB = (red, green, blue)
-        cached = cls._pool.get(key)
-        if cached is not None:
-            return cached
-        self = super().__new__(cls)
-        self.red, self.green, self.blue = red, green, blue
-        cls._pool[key] = self
-        return self
+        if key not in cls._pool:
+            cls._pool[key] = super().__new__(cls)
+        return cls._pool[key]
 
 def test_out_of_range_component_raises() -> None:
     with pytest.raises(ValueError):
@@ -450,7 +448,7 @@ def test_out_of_range_component_raises() -> None:
 
 The check runs first in `__new__()`, before the pool lookup, so an
 out-of-range component raises a `ValueError` before `__new__()` can
-find a cached instance or build a new one. No invalid `Color` is ever
+find a pooled instance or build a new one. No invalid `Color` is ever
 pooled or returned. That check is the same *parse, don't validate* move
 [Data Classes as Types](../Chapters/12_Techniques--Data_Classes_as_Types.md#parse-dont-validate)
 makes with `__post_init__()`. Here the class validates in `__new__()`

@@ -1,9 +1,11 @@
 # exercise_6.py
 from typing import ClassVar
 from exceptions import expect
+from record import record
 
 type RGB = tuple[int, int, int]
 
+@record
 class Color:
     _pool: ClassVar[dict[RGB, Color]] = {}
     red: int
@@ -20,13 +22,9 @@ class Color:
                 raise ValueError(
                     f"{name}={value} out of range 0-255")
         key: RGB = (red, green, blue)
-        cached = cls._pool.get(key)
-        if cached is not None:
-            return cached
-        self = super().__new__(cls)
-        self.red, self.green, self.blue = red, green, blue
-        cls._pool[key] = self
-        return self
+        if key not in cls._pool:
+            cls._pool[key] = super().__new__(cls)
+        return cls._pool[key]
 
 expect(ValueError, Color, 300, 0, 0)
 #: [ValueError] red=300 out of range 0-255

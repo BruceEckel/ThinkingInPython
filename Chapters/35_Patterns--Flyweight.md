@@ -79,19 +79,45 @@ Do not write code that depends on them, but notice the technique.
 
 A map can hold millions of cells, but only a handful of tile kinds.
 Here, the handful is grass, water, and rock.
+A first design gives each cell everything it knows about itself,
+its position included:
 
-The tile's symbol, name, and walkability are intrinsic,
+```python
+# unshared_cells.py
+from record import record
+
+@record
+class Cell:
+    symbol: str
+    name: str
+    walkable: bool
+    row: int
+    col: int
+
+left = Cell(".", "grass", True, 0, 0)
+right = Cell(".", "grass", True, 0, 1)
+print(left == right)
+#: False
+```
+
+The two grass cells differ in `col` alone,
+and that difference makes them different values.
+No factory can hand one object to both cells,
+because no single object holds both positions.
+Every cell in the grid is a distinct value,
+so the map needs one object per cell.
+
+Sharing starts by moving the position out.
+The tile's symbol, name, and walkability are intrinsic:
+every grass cell agrees on them,
 so they go in a [record](18_Techniques--Performance.md#record).
-
 The tile's position is extrinsic.
-It is the cell's coordinates in the grid, so the `Tile` object never stores it.
+It is the cell's coordinates in the grid, so the `Tile` object never stores it,
+and an operation that needs the position takes it as an argument.
 
-The factory pairs `functools.cache` with a constructor function,
-the same pairing behind [*Singleton*](24_Patterns--Singleton.md#when-you-want-a-class-cache-the-instance)'s cached factory.
-There the function takes no arguments,
-so caching produces one shared instance overall.
-Here `tile()` takes a symbol,
-so caching produces one shared instance per distinct symbol instead.
+The factory is `tile()`, a constructor function under `functools.cache`.
+`@cache` stores each result under its argument,
+so every call with the same symbol returns the object the first call built.
 
 ![Every water cell in the grid is the same Tile object](_images/flyweight_tiles)
 
@@ -109,6 +135,9 @@ class Tile:
     symbol: Symbol
     name: str
     walkable: bool
+
+    def label(self, row: int, col: int) -> str:
+        return f"{self.name} at ({row}, {col})"
 
 SPECS: Final[dict[Symbol, TileSpec]] = {
     ".": ("grass", True),
@@ -140,8 +169,12 @@ if __name__ == "__main__":
     cells = [*row for row in field]
     print(len(cells), len({id(t) for t in cells}))
     print(field[0][2] is field[3][5])
+    print(field[0][2].label(0, 2))
+    print(field[3][5].label(3, 5))
 #: 24 3
 #: True
+#: water at (0, 2)
+#: water at (3, 5)
 ```
 
 Twenty-four cells, three objects.
@@ -155,7 +188,11 @@ and a set of cells collapses to three with or without sharing.
 Only identity proves sharing.
 The listing shows the object count, not the memory behind it (see exercise 2).
 
-The grid itself holds each cell's position.
+The last two lines call `label()` on one object, the shared water tile,
+and get two answers, because each caller passes in the position.
+The shared object holds what every use agrees on,
+and an operation that depends on the use takes that use's context as an argument.
+The grid holds each cell's position by where it stores the reference.
 Asking "is the cell at row 1, column 5 walkable?" is `field[1][5].walkable`,
 with the asker supplying the coordinates.
 
@@ -223,6 +260,23 @@ so a `Tile` holding a `list` hands the same mutable list to every cell that shar
 the shallow-freezing trap in [Rethinking Objects](20_Patterns--Rethinking_Objects.md#the-immutability-solution).
 Every field here is immutable, so the sharing is safe.
 
+## Sharing, Not Caching
+
+`@cache` is a caching decorator, but `tile()` uses it for a different job.
+A cache saves recomputation.
+It returns a stored result instead of computing that result again,
+and it can forget any entry without changing what the program computes,
+because the next call rebuilds an equal result at the cost of some time.
+Building a `Tile` costs almost nothing, so `@cache` makes `tile()` no faster.
+What `tile()` gets from it is identity:
+every call for a symbol returns the same object.
+A flyweight's factory exists for that sameness.
+The memory saving and every `is` comparison depend on it,
+so a factory that forgets an entry and builds a replacement breaks the pattern,
+where a cache that forgets an entry runs slower and stays correct.
+The sections that follow change how the factory keeps its objects,
+and each one either keeps the identity guarantee or says where it ends.
+
 ## Interning in the Constructor
 
 A factory function like `tile()` has a visibly different name and call syntax,
@@ -232,14 +286,18 @@ hide the pool inside `__new__()` instead.
 [*Singleton*](24_Patterns--Singleton.md#the-classic-implementations)
 keeps its pool in `__new__()` the same way.
 Here the cache keys on the constructor arguments instead of a single fixed key.
-A pool of singletons keyed this way is sometimes called *Multiton*:
+A pool of singletons keyed this way is sometimes called *Multiton*.
+A *Multiton*'s objects can be mutable, and a flyweight's cannot,
+so `Color` is a record:
 
 ```python
 # interned_color.py
 from typing import ClassVar
+from record import record
 
 type RGB = tuple[int, int, int]
 
+@record
 class Color:
     _pool: ClassVar[dict[RGB, Color]] = {}
     red: int
@@ -249,13 +307,9 @@ class Color:
     def __new__(cls, red: int, green: int,
                 blue: int) -> Color:
         key: RGB = (red, green, blue)
-        cached: Color | None = cls._pool.get(key)
-        if cached is not None:
-            return cached
-        self = super().__new__(cls)
-        self.red, self.green, self.blue = red, green, blue
-        cls._pool[key] = self
-        return self
+        if key not in cls._pool:
+            cls._pool[key] = super().__new__(cls)
+        return cls._pool[key]
 
 if __name__ == "__main__":
     crimson = Color(220, 20, 60)
@@ -273,31 +327,25 @@ an ordinary constructor call returns a cached object.
 You write the bookkeeping yourself, and `__new__()` brings a rule of its own.
 When `__new__()` returns an instance of the class, as it does here,
 Python calls `__init__()` on it,
-so an `__init__()` re-runs on the cached instance at every construction.
-This class therefore leaves `__init__()` to `object`:
-`Color` overrides `__new__()` alone, so the call reaches `object.__init__()`,
-which accepts the three arguments and discards them.
-A `@dataclass` would generate an `__init__()` and bring the re-run back with it.
-That re-run re-assigns the same components,
-so with three plain fields the object stays as it was.
+so the record's generated `__init__()` runs at every construction,
+including the ones that return a pooled instance.
+`__new__()` therefore builds a bare instance and leaves the fields to `__init__()`.
+On a pooled instance the re-run assigns the same three components again,
+through the `object.__setattr__()` calls a frozen record's `__init__()` makes,
+so the object stays as it was.
 Once a field has a `default_factory` or `__post_init__()` has a side effect,
 the re-run repeats that factory call or that side effect on an object that is already finished.
 
-`Tile`'s `@record` generates its `__repr__()` and `__eq__()`;
-`Color` keeps `object`'s versions,
-so printing a `Color` shows the default `object.__repr__()`.
-The default `__eq__()` suits a perfectly interned type:
-equal values are the same object, so the identity comparison answers correctly.
-`@dataclass(init=False)` could restore those two generated methods,
-but each fix forces the next.
-The generated `__eq__()` sets `__hash__` to `None`,
-so a `Color` could no longer be a dict key or a set member.
-`frozen=True` brings the hash back,
-and then the by-hand assignment in `__new__()` must go through `object.__setattr__()`.
+Every caller that asks for the same components receives the same `Color`,
+so a caller that set `crimson.red` would change every crimson in the program.
+The record's frozen fields reject that assignment,
+which makes sharing safe here for the reason it is safe for `Tile`.
+The record also generates `__repr__()`, `__eq__()`, and `__hash__()`,
+so a `Color` prints its components and works as a dict key.
 
 A `defaultdict` calls its `default_factory` with no arguments,
 and building a `Color` needs the three components,
-so `_pool` stays a plain dict with an explicit `get()`.
+so `_pool` stays a plain dict with an explicit membership test.
 `_pool` keys on the components alone, and every subclass shares the one dict,
 so the first request for a set of components builds the object and every later one receives it,
 whether `Color` or a subclass asks.
@@ -317,7 +365,10 @@ One more property carries over from [*Singleton*](24_Patterns--Singleton.md#the-
 every lazy check-then-insert pool races under threads.
 Two threads asking for the same new color can each build "the" shared object.
 The second store overwrites the first,
-and the two threads hold distinct objects.
+and the two threads can end up holding distinct objects.
+`interned_color.py` adds a second hazard:
+`__new__()` pools the object before `__init__()` fills in its fields,
+so another thread can receive a `Color` that has no components yet.
 `@cache` races the same way.
 Its C implementation runs the lookup, the call to your function,
 and the store as three separate steps,
@@ -391,12 +442,17 @@ and a slotted class gets one only by declaring it, so with `slots=True` alone,
 `record()` does not pass it through,
 so `Name` writes the `dataclass` call in full.
 
-If you want a bounded pool instead,
-`functools.lru_cache(maxsize=n)` gives the factory an eviction policy and holds the most recent `n` alive by itself.
-An eviction ends the guarantee.
+`functools.lru_cache(maxsize=n)` bounds a pool a different way:
+once it holds `n` entries, it evicts the least recently used one.
+That eviction turns the factory back into a cache.
 Requesting an evicted value builds a fresh object,
-equal to any surviving original and distinct from it.
-The weak pool's entry lives exactly as long as something references the object,
+equal to any surviving original and distinct from it,
+so two uses of one value can hold two objects,
+and an `is` comparison between them answers `False`.
+Use `lru_cache` where a stored result saves recomputation,
+not as a flyweight factory.
+The weak pool never makes that trade.
+Its entry lives exactly as long as something references the object,
 so every request during that life returns the one object.
 
 ```python
@@ -521,10 +577,22 @@ The [table-driven state machine](31_Patterns--State_Machines.md#table-driven-sta
 builds on an `Enum` the same way, using the enum's members as shared,
 comparable states.
 
-## Which Pool Should You Use?
+## Choosing a Flyweight and Its Pool
 
-The chapter shows four mechanisms,
-and the question that decides between them is how much you know about the set of values.
+Three questions decide whether a type is a candidate for *Flyweight*.
+First, do uses far outnumber distinct values?
+A map with millions of cells and three kinds of tile qualifies.
+A list of customer records, each one different, does not.
+Second, can everything that varies per use move out of the object?
+If a position, an owner, or a count must live inside,
+every object is unique and nothing can be shared, as `unshared_cells.py` shows.
+Third, can what remains be frozen?
+Sharing a mutable object lets one use's change appear in every use
+(see exercise 3).
+
+When all three answers are yes, the remaining choice is the pool,
+and the chapter shows four.
+The question that decides between them is how much you know about the set of values.
 If you know it as you write the program,
 use an `Enum` and let the language hold the pool.
 If callers must keep writing `C(...)`,

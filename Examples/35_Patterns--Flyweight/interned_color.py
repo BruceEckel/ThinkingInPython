@@ -1,8 +1,10 @@
 # interned_color.py
 from typing import ClassVar
+from record import record
 
 type RGB = tuple[int, int, int]
 
+@record
 class Color:
     _pool: ClassVar[dict[RGB, Color]] = {}
     red: int
@@ -12,13 +14,9 @@ class Color:
     def __new__(cls, red: int, green: int,
                 blue: int) -> Color:
         key: RGB = (red, green, blue)
-        cached: Color | None = cls._pool.get(key)
-        if cached is not None:
-            return cached
-        self = super().__new__(cls)
-        self.red, self.green, self.blue = red, green, blue
-        cls._pool[key] = self
-        return self
+        if key not in cls._pool:
+            cls._pool[key] = super().__new__(cls)
+        return cls._pool[key]
 
 if __name__ == "__main__":
     crimson = Color(220, 20, 60)

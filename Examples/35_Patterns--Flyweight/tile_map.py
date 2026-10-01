@@ -12,6 +12,9 @@ class Tile:
     name: str
     walkable: bool
 
+    def label(self, row: int, col: int) -> str:
+        return f"{self.name} at ({row}, {col})"
+
 SPECS: Final[dict[Symbol, TileSpec]] = {
     ".": ("grass", True),
     "~": ("water", False),
@@ -42,5 +45,9 @@ if __name__ == "__main__":
     cells = [*row for row in field]
     print(len(cells), len({id(t) for t in cells}))
     print(field[0][2] is field[3][5])
+    print(field[0][2].label(0, 2))
+    print(field[3][5].label(3, 5))
 #: 24 3
 #: True
+#: water at (0, 2)
+#: water at (3, 5)
