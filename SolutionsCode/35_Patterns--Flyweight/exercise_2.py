@@ -20,11 +20,11 @@ SPECS: Final[dict[Symbol, TileSpec]] = {
 }
 
 @cache
-def cached_tile(symbol: Symbol) -> Tile:
+def shared_tile(symbol: Symbol) -> Tile:
     name, walkable = SPECS[symbol]
     return Tile(symbol, name, walkable)
 
-def uncached_tile(symbol: Symbol) -> Tile:
+def unshared_tile(symbol: Symbol) -> Tile:
     name, walkable = SPECS[symbol]
     return Tile(symbol, name, walkable)
 
@@ -40,21 +40,21 @@ def make_map(size: int) -> str:
 for size in (50, 100, 200):
     text = make_map(size)
     tracemalloc.start()
-    cached_field = [[cached_tile(to_symbol(s))
+    shared_field = [[shared_tile(to_symbol(s))
                      for s in line]
                     for line in text.split()]
-    _, cached_peak = tracemalloc.get_traced_memory()
+    _, shared_peak = tracemalloc.get_traced_memory()
     tracemalloc.stop()
 
     tracemalloc.start()
-    uncached_field = [[uncached_tile(to_symbol(s))
+    unshared_field = [[unshared_tile(to_symbol(s))
                        for s in line]
                       for line in text.split()]
-    _, uncached_peak = tracemalloc.get_traced_memory()
+    _, unshared_peak = tracemalloc.get_traced_memory()
     tracemalloc.stop()
 
-    ratio = round(uncached_peak / cached_peak, 1)
-    print(size, "ratio uncached/cached:", ratio)
-#: 50 ratio uncached/cached: 6.2
-#: 100 ratio uncached/cached: 6.2
-#: 200 ratio uncached/cached: 6.9
+    ratio = round(unshared_peak / shared_peak, 1)
+    print(size, "ratio unshared/shared:", ratio)
+#: 50 ratio unshared/shared: 6.2
+#: 100 ratio unshared/shared: 6.2
+#: 200 ratio unshared/shared: 6.9

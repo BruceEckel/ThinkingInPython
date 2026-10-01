@@ -69,7 +69,7 @@ distinct objects, one per kind (`grass`, `water`, `rock`, `door`,
 `tree`), and that count stays at five however large the map grows,
 because `@cache` keys on the symbol alone.
 
-## 2. `tracemalloc`, cached vs. uncached `tile()`
+## 2. `tracemalloc`, shared vs. unshared tiles
 
 ```python
 # exercise_2.py
@@ -94,11 +94,11 @@ SPECS: Final[dict[Symbol, TileSpec]] = {
 }
 
 @cache
-def cached_tile(symbol: Symbol) -> Tile:
+def shared_tile(symbol: Symbol) -> Tile:
     name, walkable = SPECS[symbol]
     return Tile(symbol, name, walkable)
 
-def uncached_tile(symbol: Symbol) -> Tile:
+def unshared_tile(symbol: Symbol) -> Tile:
     name, walkable = SPECS[symbol]
     return Tile(symbol, name, walkable)
 
@@ -114,37 +114,37 @@ def make_map(size: int) -> str:
 for size in (50, 100, 200):
     text = make_map(size)
     tracemalloc.start()
-    cached_field = [[cached_tile(to_symbol(s))
+    shared_field = [[shared_tile(to_symbol(s))
                      for s in line]
                     for line in text.split()]
-    _, cached_peak = tracemalloc.get_traced_memory()
+    _, shared_peak = tracemalloc.get_traced_memory()
     tracemalloc.stop()
 
     tracemalloc.start()
-    uncached_field = [[uncached_tile(to_symbol(s))
+    unshared_field = [[unshared_tile(to_symbol(s))
                        for s in line]
                       for line in text.split()]
-    _, uncached_peak = tracemalloc.get_traced_memory()
+    _, unshared_peak = tracemalloc.get_traced_memory()
     tracemalloc.stop()
 
-    ratio = round(uncached_peak / cached_peak, 1)
-    print(size, "ratio uncached/cached:", ratio)
-#: 50 ratio uncached/cached: 6.2
-#: 100 ratio uncached/cached: 6.2
-#: 200 ratio uncached/cached: 6.9
+    ratio = round(unshared_peak / shared_peak, 1)
+    print(size, "ratio unshared/shared:", ratio)
+#: 50 ratio unshared/shared: 6.2
+#: 100 ratio unshared/shared: 6.2
+#: 200 ratio unshared/shared: 6.9
 ```
 
 The ratio holds near six at every size: about 6x at a 50x50 map,
 close to 7x at 200x200. Both peaks grow with the number of
 cells, because both versions build the same nested list of references.
-The two differ in what one cell costs. A cell in the cached field
+The two differ in what one cell costs. A cell in the shared field
 costs one reference into a pool of three `Tile` objects, while a cell
-in the uncached field costs a brand-new `Tile`, roughly six times as
+in the unshared field costs a brand-new `Tile`, roughly six times as
 much memory. The flyweight's saving is therefore per cell: the
 multiplier stays near six, and the bytes saved grow with the map.
-`Tile` is a record, so each uncached `Tile` is a slotted instance
+`Tile` is a record, so each unshared `Tile` is a slotted instance
 with no `__dict__`. With `@dataclass(frozen=True)` in its place the
-same run reports a ratio near ten, because every uncached `Tile`
+same run reports a ratio near ten, because every unshared `Tile`
 then carries a dictionary too.
 
 ## 3. Replacing `@record` with `@dataclass` exposes the sharing bug

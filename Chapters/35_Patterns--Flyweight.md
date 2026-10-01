@@ -628,7 +628,8 @@ you can write its equality checks as `is`.
     then write `walkable_neighbors(field, row, col)` returning the count of adjacent walkable cells.
     Confirm the tile pool size still equals the number of kinds,
     however large the map.
-2.  Use `tracemalloc` to compare `parse_map()` on a large map against a version whose `tile()` has no `@cache`.
+2.  Use `tracemalloc` to compare the memory `parse_map()` uses on a large map when every cell shares its `Tile` against when each cell gets a new one,
+    by removing `@cache` from `tile()`.
     How does the ratio change as the map grows?
 3.  Replace `@record` on `Tile` with `@dataclass` and set `field[0][0].walkable = False` on a parsed map.
     Write a test that exposes the resulting bug, then restore `@record`.
