@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 730 770"
      font-family="'JetBrains Mono', Consolas, monospace">
-  <title>Four steps of Observer: responders subscribe as callables, an assignment to celsius calls each one, none replies, and a new responder subscribes with no change to Thermometer</title>
+  <title>Four steps of Observer: responders connect as callables, an assignment to celsius calls each one, none replies, and a new responder connects with no change to Thermometer</title>
   <defs>
     <marker id="os-ink" viewBox="0 0 18 12" refX="5" refY="6"
             markerWidth="18" markerHeight="12" orient="auto" markerUnits="userSpaceOnUse">
@@ -27,7 +27,7 @@
   <rect x="530" y="55" width="170" height="36" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
   <rect x="530" y="99" width="170" height="36" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
   <text x="22" y="54" font-size="30" fill="#8b1a1a" font-weight="bold" text-anchor="start">1</text>
-  <text x="22" y="76" font-size="13" fill="#1a1612" font-weight="bold" text-anchor="start">subscribe</text>
+  <text x="22" y="76" font-size="13" fill="#1a1612" font-weight="bold" text-anchor="start">connect</text>
   <text x="22" y="96" font-size="10.5" fill="#7a6e62" text-anchor="start">each responder</text>
   <text x="22" y="111" font-size="10.5" fill="#7a6e62" text-anchor="start">is stored as</text>
   <text x="22" y="126" font-size="10.5" fill="#7a6e62" text-anchor="start">a callable</text>
@@ -35,10 +35,10 @@
   <text x="152" y="80" font-size="11" fill="#1a1612" text-anchor="start">celsius: 20.0</text>
   <text x="615" y="78" font-size="12.5" fill="#1a1612" text-anchor="middle">display</text>
   <line x1="530" y1="73" x2="396.4" y2="73.0" stroke="#1a1612" stroke-width="1.3" marker-end="url(#os-ink)"/>
-  <text x="465" y="67" font-size="10" fill="#1a1612" text-anchor="middle">t.subscribe(display)</text>
+  <text x="465" y="67" font-size="10" fill="#1a1612" text-anchor="middle">t.connect(display)</text>
   <text x="615" y="122" font-size="12.5" fill="#1a1612" text-anchor="middle">alarm</text>
   <line x1="530" y1="117" x2="396.4" y2="117.0" stroke="#1a1612" stroke-width="1.3" marker-end="url(#os-ink)"/>
-  <text x="465" y="111" font-size="10" fill="#1a1612" text-anchor="middle">t.subscribe(alarm)</text>
+  <text x="465" y="111" font-size="10" fill="#1a1612" text-anchor="middle">t.connect(alarm)</text>
   <line x1="16" y1="196" x2="714" y2="196" stroke="#c8bfb0" stroke-width="0.8"/>
   <path d="M452,206 H720 V378 H452 Z" fill="#eeeeee" stroke="none" stroke-width="1.6"/>
   <path d="M144,214 H386 Q390,214 390,218 V370 Q390,374 386,374 H144 Q140,374 140,370 V218 Q140,214 144,214 Z" fill="none" stroke="#1a1612" stroke-width="1.6"/>
@@ -110,7 +110,7 @@
   <text x="22" y="624" font-size="30" fill="#8b1a1a" font-weight="bold" text-anchor="start">4</text>
   <text x="22" y="646" font-size="13" fill="#1a1612" font-weight="bold" text-anchor="start">extend</text>
   <text x="22" y="666" font-size="10.5" fill="#7a6e62" text-anchor="start">a new responder</text>
-  <text x="22" y="681" font-size="10.5" fill="#7a6e62" text-anchor="start">subscribes the</text>
+  <text x="22" y="681" font-size="10.5" fill="#7a6e62" text-anchor="start">connects the</text>
   <text x="22" y="696" font-size="10.5" fill="#7a6e62" text-anchor="start">same way</text>
   <text x="152" y="650" font-size="11" fill="#8b1a1a" text-anchor="start">no edit to</text>
   <text x="152" y="665" font-size="11" fill="#8b1a1a" text-anchor="start">Thermometer</text>
@@ -118,5 +118,5 @@
   <text x="615" y="692" font-size="12.5" fill="#1a1612" text-anchor="middle">alarm</text>
   <text x="615" y="736" font-size="12.5" fill="#7a6e62" text-anchor="middle">plot</text>
   <line x1="530" y1="731" x2="396.4" y2="731.0" stroke="#1a1612" stroke-width="1.3" marker-end="url(#os-ink)"/>
-  <text x="465" y="725" font-size="10" fill="#1a1612" text-anchor="middle">t.subscribe(plot)</text>
+  <text x="465" y="725" font-size="10" fill="#1a1612" text-anchor="middle">t.connect(plot)</text>
 </svg>

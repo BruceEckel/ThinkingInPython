@@ -11,7 +11,7 @@ prints. Below the trace, one unexpected input (`mouse escapes` in
 version's `case _` keeps the state and runs it again, and the table
 version's `next()` raises a `RuntimeError`.
 
-This complements the chapter's other figure, `stateMachine.svg`, which
+This complements the chapter's other figure, `vending_story.svg`, which
 draws the vending machine's states and transitions as a static graph.
 The names, inputs, and printed lines come from `mouse_action.py`,
 `mouse_moves.txt`, `mouse_trap_states.py`, and `mouse_trap_tables.py`

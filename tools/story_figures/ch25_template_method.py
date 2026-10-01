@@ -6,7 +6,7 @@ never changes: a loop that runs twice and calls two steps in order.
 Frame 1 shows the base alone: `run()` calls its own hooks, which
 default to `...` and do nothing.
 Frame 2 fills them with `MyApp`'s overrides: the client calls
-`MyApp().run()`, the base calls down into the subclass (the Hollywood
+`MyApp().run()`, the base calls the subclass's methods (the Hollywood
 Principle), and the output column shows the four lines the loop
 produces. Frame 3 keeps the loop and drops the class: `run_framework()`
 takes the steps as two lambdas and prints the same four lines.
@@ -94,8 +94,7 @@ def render() -> str:
 
     y0 = y[0]
     b += frame(0, y0, "anchor", "ApplicationFramework",
-               ("run() sets the", "order; each", "step is a hook",
-                "that does nothing"))
+               ("run() sets the", "order; each", "step is a hook"))
     b += text(AX + AW - 12, y0 + 36, "@final run()", 11, RED, "end")
     b += supplier(y0, "hooks", STEPS,
                   ("...", "..."), calls)
@@ -105,8 +104,7 @@ def render() -> str:
 
     y0 = y[1]
     b += frame(1, y0, "fill in", "ApplicationFramework",
-               ("MyApp overrides", "the steps;", "run() calls",
-                "down into them"))
+               ("MyApp overrides", "the steps;", "run() calls them"))
     b += text(AX + AW - 12, y0 + 36, "@final run()", 11, RED, "end")
     b += supplier(y0, "MyApp", STEPS, said, calls)
     b += output(y0, "MyApp().run()")

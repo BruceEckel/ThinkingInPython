@@ -1,8 +1,8 @@
 """Chapter 30, Observer: four frames of one notification.
 
 Four frames of one layout, so only the changes stand out: responders
-subscribe, an assignment to `celsius` calls each one, each reacts and
-none replies, and a new responder subscribes with no edit to
+connect, an assignment to `celsius` calls each one, each reacts and
+none replies, and a new responder connects with no edit to
 `Thermometer`. The shaded region on the right is what `Thermometer`
 cannot see; its list holds only callables. The names are the ones in
 `thermometer_demo.py` and `broadcaster.py` (`display` and `alarm` are
@@ -35,9 +35,9 @@ RX, RW, RH = 530, 170, 36  # The responders
 HIDE_X = 452  # Where the region Thermometer cannot see begins
 SLOT_Y = (50, 94, 138)
 RESP_Y = (45, 89, 133)
-TITLE = ("Four steps of Observer: responders subscribe as callables, "
+TITLE = ("Four steps of Observer: responders connect as callables, "
          "an assignment to celsius calls each one, none replies, "
-         "and a new responder subscribes with no change to Thermometer")
+         "and a new responder connects with no change to Thermometer")
 
 
 def slot_mid(y0: float, k: int) -> Point:
@@ -78,10 +78,10 @@ def frame(i: int, y0: float, slots: int, name: str,
     return out
 
 
-def subscribe(y0: float, k: int, s: str) -> str:
+def connect(y0: float, k: int, s: str) -> str:
     a, t = resp_mid(y0, k), slot_mid(y0, k)
     return (arrow(a, t, INK, "os-ink")
-            + text((a[0] + t[0]) / 2 + 10, t[1] - 6, f"t.subscribe({s})", 10,
+            + text((a[0] + t[0]) / 2 + 10, t[1] - 6, f"t.connect({s})", 10,
                    INK, "middle"))
 
 
@@ -90,12 +90,12 @@ def render() -> str:
     b = ""
 
     y0 = y[0]
-    b += frame(0, y0, 2, "subscribe",
+    b += frame(0, y0, 2, "connect",
                ("each responder", "is stored as", "a callable"))
     b += text(W - 18, y0 + 24, "hidden from Thermometer", 10, MUTED, "end")
     b += text(TX + 12, y0 + 70, "celsius: 20.0", 11)
     for k, s in enumerate(("display", "alarm")):
-        b += resp_label(y0, k, s) + subscribe(y0, k, s)
+        b += resp_label(y0, k, s) + connect(y0, k, s)
 
     y0 = y[1]
     b += frame(1, y0, 2, "change",
@@ -127,12 +127,12 @@ def render() -> str:
 
     y0 = y[3]
     b += frame(3, y0, 3, "extend",
-               ("a new responder", "subscribes the", "same way"))
+               ("a new responder", "connects the", "same way"))
     b += text(TX + 12, y0 + 70, "no edit to", 11, RED)
     b += text(TX + 12, y0 + 85, "Thermometer", 11, RED)
     for k, s in enumerate(("display", "alarm", "plot")):
         b += resp_label(y0, k, s, MUTED if k == 2 else INK)
-    b += subscribe(y0, 2, "plot")
+    b += connect(y0, 2, "plot")
 
     defs = markers(**{"os-ink": ("filled", INK), "os-red": ("filled", RED),
                       "os-muted": ("open", MUTED)})

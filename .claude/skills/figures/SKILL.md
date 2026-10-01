@@ -1,7 +1,7 @@
 ---
 name: figures
 description: >-
-  Rules for drawing or editing a figure in this book: where text goes (labels, caption, prose), the palette and arrowheads, the generated story, state-machine, and coupling-gallery SVGs, and what tip figures checks. Use before creating or changing any SVG in resources/images/ or a figure spec in tools/.
+  Rules for drawing or editing a figure in this book: where text goes (labels, caption, prose), the palette and arrowheads, the generated story and coupling-gallery SVGs, where a figure goes in its chapter, and what tip figures checks. Use before creating or changing any SVG in resources/images/ or a figure spec in tools/.
 ---
 
 # Figures
@@ -79,12 +79,12 @@ arrowhead markers) that marks anything outside the palette. Bruce
 names a figure by its number there or its file stem; it fails on a
 reference with no file and only reports a file no chapter references.
 
-Three figure sources are generated, and their SVGs are never edited by
+Two figure sources are generated, and their SVGs are never edited by
 hand. Before changing a pattern chapter's figure, read its module in
 `tools/story_figures/`: the docstring says which listings its names
-come from. The pattern chapters' opening figures come from
-`tools/story_figures/` (since 2026-09-29), one module per chapter
-(`chNN_<pattern>.py`, defining `STEM` and `render()`), with the shared
+come from. The pattern chapters' story figures come from
+`tools/story_figures/` (since 2026-09-29), one module per figure
+(`chNN_<name>.py`, defining `STEM` and `render()`), with the shared
 palette, text, boxes, and arrows in the package's `__init__.py`.
 Chapter 30's four-frame Observer storyboard came first and replaced
 that chapter's coupling panel: Bruce found the class-diagram panel
@@ -107,13 +107,21 @@ as buried in the outer rect. `tip story-figures` (in `gate`,
 `verify-ch`, and `sweep`) fails on drift or on any per-figure check
 `tip figures` makes; `tip fix-story-figures` regenerates, and
 `python -m tools.story_figures --only NN --png DIR` rasterizes one.
-Chapter 31's `stateMachine.svg` comes from
-`tools/state_machine_figure.py` (since 2026-09-24): each transition
-names its two states, how far its curve bows, and where along the curve
-its label sits, and the script computes the rest. Edit the spec, run
-`tip fix-state-machine-figure`, and look at the PNG in `tip figures`,
-since nothing detects two labels colliding; `tip state-machine-figure`
-(in `gate`, `verify-ch`, and `sweep`) fails on drift.
+Chapter 31's vending-machine diagram is `vending_story.svg` from
+`ch31_vending.py` since 2026-10-01, when Bruce picked it on the Figure
+Review page; it replaced `stateMachine.svg` and retired
+`tools/state_machine_figure.py` and its two `tip` tasks.
+
+## Placement: where the figure fits, not the chapter's top
+
+A figure goes where it fits best, not at the start of the chapter
+(Bruce, 2026-10-01, after the Figure Review). The story figures were
+first placed under each pattern chapter's epigraph; place one beside
+the text that sets up what its frames show, usually the section that
+introduces the listing whose names the figure uses, so the reader has
+met those names before the figure. Adjust the prose around it: the
+sentences before should lead into it, and the paragraph after should
+say what the figure adds, without restating its labels.
 
 Chapter 21's `coupling_gallery.svg` comes from `tools/coupling_panels.py`
 (`GALLERY`, a `Cell` per pattern, since 2026-09-25), in the notation

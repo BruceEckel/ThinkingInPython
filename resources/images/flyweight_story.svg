@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 730 716"
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 730 696"
      font-family="'JetBrains Mono', Consolas, monospace">
-  <title>Four steps of Flyweight: tile() builds a Tile on the first request for a symbol and caches it, returns that same Tile on every later request, the grid supplies each cell's position, and a direct Tile() call builds a second, equal object</title>
+  <title>Four steps of Flyweight: tile() builds a Tile on the first request for a symbol and keeps it, returns that same Tile on every later request, two cells pass their own positions to the one shared water Tile and get two answers, and a direct Tile() call builds a second, equal object</title>
   <defs>
     <marker id="fs-red" viewBox="0 0 18 12" refX="5" refY="6"
             markerWidth="18" markerHeight="12" orient="auto" markerUnits="userSpaceOnUse">
@@ -20,11 +20,11 @@
   <text x="471" y="90" font-size="11" fill="#8b1a1a" text-anchor="middle">"~"</text>
   <rect x="446" y="112" width="50" height="28" fill="none" stroke="#c8bfb0" stroke-width="1.1" rx="3" stroke-dasharray="4,3"/>
   <text x="22" y="54" font-size="30" fill="#8b1a1a" font-weight="bold" text-anchor="start">1</text>
-  <text x="22" y="76" font-size="13" fill="#1a1612" font-weight="bold" text-anchor="start">miss</text>
+  <text x="22" y="76" font-size="13" fill="#1a1612" font-weight="bold" text-anchor="start">first call</text>
   <text x="22" y="96" font-size="10.5" fill="#7a6e62" text-anchor="start">no "~" entry,</text>
   <text x="22" y="111" font-size="10.5" fill="#7a6e62" text-anchor="start">so tile()</text>
   <text x="22" y="126" font-size="10.5" fill="#7a6e62" text-anchor="start">builds a Tile</text>
-  <text x="22" y="141" font-size="10.5" fill="#7a6e62" text-anchor="start">and caches it</text>
+  <text x="22" y="141" font-size="10.5" fill="#7a6e62" text-anchor="start">and keeps it</text>
   <text x="150" y="36" font-size="10" fill="#7a6e62" text-anchor="start">field</text>
   <path d="M150,44 H172 V66 H150 Z" fill="#eeeeee" stroke="#c8bfb0" stroke-width="0.8"/>
   <text x="161" y="59" font-size="12" fill="#1a1612" text-anchor="middle">.</text>
@@ -97,10 +97,10 @@
   <text x="471" y="244" font-size="11" fill="#8b1a1a" text-anchor="middle">"~"</text>
   <rect x="446" y="266" width="50" height="28" fill="none" stroke="#c8bfb0" stroke-width="1.1" rx="3" stroke-dasharray="4,3"/>
   <text x="22" y="208" font-size="30" fill="#8b1a1a" font-weight="bold" text-anchor="start">2</text>
-  <text x="22" y="230" font-size="13" fill="#1a1612" font-weight="bold" text-anchor="start">hit</text>
+  <text x="22" y="230" font-size="13" fill="#1a1612" font-weight="bold" text-anchor="start">again</text>
   <text x="22" y="250" font-size="10.5" fill="#7a6e62" text-anchor="start">the entry</text>
-  <text x="22" y="265" font-size="10.5" fill="#7a6e62" text-anchor="start">exists, so the</text>
-  <text x="22" y="280" font-size="10.5" fill="#7a6e62" text-anchor="start">cache returns</text>
+  <text x="22" y="265" font-size="10.5" fill="#7a6e62" text-anchor="start">exists, so</text>
+  <text x="22" y="280" font-size="10.5" fill="#7a6e62" text-anchor="start">tile() returns</text>
   <text x="22" y="295" font-size="10.5" fill="#7a6e62" text-anchor="start">the same Tile</text>
   <text x="150" y="190" font-size="10" fill="#7a6e62" text-anchor="start">field</text>
   <path d="M150,198 H172 V220 H150 Z" fill="#eeeeee" stroke="#c8bfb0" stroke-width="0.8"/>
@@ -165,21 +165,12 @@
   <line x1="496" y1="240" x2="523.6" y2="240.0" stroke="#8b1a1a" stroke-width="1.6" marker-end="url(#fs-red)"/>
   <text x="625" y="268" font-size="10" fill="#8b1a1a" text-anchor="middle">the object from step 1</text>
   <line x1="16" y1="314" x2="714" y2="314" stroke="#c8bfb0" stroke-width="0.8"/>
-  <rect x="336" y="332" width="170" height="118" fill="none" stroke="#1a1612" stroke-width="1.3" rx="4"/>
-  <text x="346" y="352" font-size="13" fill="#1a1612" font-weight="bold" text-anchor="start">tile()</text>
-  <text x="346" y="368" font-size="10" fill="#7a6e62" text-anchor="start">@cache</text>
-  <rect x="446" y="340" width="50" height="28" fill="none" stroke="#1a1612" stroke-width="1.1" rx="3"/>
-  <text x="471" y="358" font-size="11" fill="#1a1612" text-anchor="middle">"."</text>
-  <rect x="446" y="380" width="50" height="28" fill="none" stroke="#1a1612" stroke-width="1.1" rx="3"/>
-  <text x="471" y="398" font-size="11" fill="#1a1612" text-anchor="middle">"~"</text>
-  <rect x="446" y="420" width="50" height="28" fill="none" stroke="#1a1612" stroke-width="1.1" rx="3"/>
-  <text x="471" y="438" font-size="11" fill="#1a1612" text-anchor="middle">"#"</text>
   <text x="22" y="362" font-size="30" fill="#8b1a1a" font-weight="bold" text-anchor="start">3</text>
   <text x="22" y="384" font-size="13" fill="#1a1612" font-weight="bold" text-anchor="start">context</text>
-  <text x="22" y="404" font-size="10.5" fill="#7a6e62" text-anchor="start">the grid holds</text>
-  <text x="22" y="419" font-size="10.5" fill="#7a6e62" text-anchor="start">the position;</text>
-  <text x="22" y="434" font-size="10.5" fill="#7a6e62" text-anchor="start">the Tile holds</text>
-  <text x="22" y="449" font-size="10.5" fill="#7a6e62" text-anchor="start">the rest</text>
+  <text x="22" y="404" font-size="10.5" fill="#7a6e62" text-anchor="start">each caller</text>
+  <text x="22" y="419" font-size="10.5" fill="#7a6e62" text-anchor="start">passes its</text>
+  <text x="22" y="434" font-size="10.5" fill="#7a6e62" text-anchor="start">position to</text>
+  <text x="22" y="449" font-size="10.5" fill="#7a6e62" text-anchor="start">the one Tile</text>
   <text x="150" y="344" font-size="10" fill="#7a6e62" text-anchor="start">field</text>
   <path d="M150,352 H172 V374 H150 Z" fill="#eeeeee" stroke="#c8bfb0" stroke-width="0.8"/>
   <text x="161" y="367" font-size="12" fill="#1a1612" text-anchor="middle">.</text>
@@ -229,101 +220,100 @@
   <text x="249" y="433" font-size="12" fill="#1a1612" text-anchor="middle">~</text>
   <path d="M260,418 H282 V440 H260 Z" fill="#eeeeee" stroke="#c8bfb0" stroke-width="0.8"/>
   <text x="271" y="433" font-size="12" fill="#1a1612" text-anchor="middle">~</text>
-  <path d="M260,374 H282 V396 H260 Z" fill="none" stroke="#8b1a1a" stroke-width="2"/>
-  <rect x="540" y="340" width="170" height="28" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
-  <text x="625" y="358" font-size="10.5" fill="#1a1612" text-anchor="middle">Tile(".", "grass", True)</text>
-  <line x1="496" y1="354" x2="523.6" y2="354.0" stroke="#7a6e62" stroke-width="1.1" marker-end="url(#fs-muted)"/>
-  <rect x="540" y="380" width="170" height="28" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
-  <text x="625" y="398" font-size="10.5" fill="#1a1612" text-anchor="middle">Tile("~", "water", False)</text>
-  <line x1="496" y1="394" x2="523.6" y2="394.0" stroke="#7a6e62" stroke-width="1.1" marker-end="url(#fs-muted)"/>
-  <rect x="540" y="420" width="170" height="28" fill="none" stroke="#8b1a1a" stroke-width="1.6" rx="4"/>
-  <text x="625" y="438" font-size="10.5" fill="#1a1612" text-anchor="middle">Tile("#", "rock", False)</text>
-  <line x1="496" y1="434" x2="523.6" y2="434.0" stroke="#7a6e62" stroke-width="1.1" marker-end="url(#fs-muted)"/>
-  <line x1="282" y1="385" x2="298" y2="385" stroke="#8b1a1a" stroke-width="1.6"/>
-  <line x1="298" y1="385" x2="298" y2="474" stroke="#8b1a1a" stroke-width="1.6"/>
-  <line x1="298" y1="474" x2="580" y2="474" stroke="#8b1a1a" stroke-width="1.6"/>
-  <line x1="580" y1="474" x2="580.0" y2="464.4" stroke="#8b1a1a" stroke-width="1.6" marker-end="url(#fs-red)"/>
-  <text x="308" y="468" font-size="10.5" fill="#8b1a1a" text-anchor="start">field[1][5].walkable</text>
-  <text x="150" y="494" font-size="10" fill="#7a6e62" text-anchor="start">extrinsic: row 1, column 5</text>
-  <text x="710" y="494" font-size="10" fill="#7a6e62" text-anchor="end">intrinsic: symbol, name, walkable</text>
-  <line x1="16" y1="506" x2="714" y2="506" stroke="#c8bfb0" stroke-width="0.8"/>
-  <rect x="336" y="524" width="170" height="118" fill="none" stroke="#1a1612" stroke-width="1.3" rx="4"/>
-  <text x="346" y="544" font-size="13" fill="#1a1612" font-weight="bold" text-anchor="start">tile()</text>
-  <text x="346" y="560" font-size="10" fill="#7a6e62" text-anchor="start">@cache</text>
-  <rect x="446" y="532" width="50" height="28" fill="none" stroke="#1a1612" stroke-width="1.1" rx="3"/>
-  <text x="471" y="550" font-size="11" fill="#1a1612" text-anchor="middle">"."</text>
-  <rect x="446" y="572" width="50" height="28" fill="none" stroke="#1a1612" stroke-width="1.1" rx="3"/>
-  <text x="471" y="590" font-size="11" fill="#1a1612" text-anchor="middle">"~"</text>
-  <rect x="446" y="612" width="50" height="28" fill="none" stroke="#1a1612" stroke-width="1.1" rx="3"/>
-  <text x="471" y="630" font-size="11" fill="#1a1612" text-anchor="middle">"#"</text>
-  <text x="22" y="554" font-size="30" fill="#8b1a1a" font-weight="bold" text-anchor="start">4</text>
-  <text x="22" y="576" font-size="13" fill="#1a1612" font-weight="bold" text-anchor="start">bypass</text>
-  <text x="22" y="596" font-size="10.5" fill="#7a6e62" text-anchor="start">a direct Tile()</text>
-  <text x="22" y="611" font-size="10.5" fill="#7a6e62" text-anchor="start">call skips the</text>
-  <text x="22" y="626" font-size="10.5" fill="#7a6e62" text-anchor="start">cache and builds</text>
-  <text x="22" y="641" font-size="10.5" fill="#7a6e62" text-anchor="start">a second object</text>
-  <text x="150" y="536" font-size="10" fill="#7a6e62" text-anchor="start">field</text>
-  <path d="M150,544 H172 V566 H150 Z" fill="#eeeeee" stroke="#c8bfb0" stroke-width="0.8"/>
-  <text x="161" y="559" font-size="12" fill="#1a1612" text-anchor="middle">.</text>
-  <path d="M172,544 H194 V566 H172 Z" fill="#eeeeee" stroke="#c8bfb0" stroke-width="0.8"/>
-  <text x="183" y="559" font-size="12" fill="#1a1612" text-anchor="middle">.</text>
-  <path d="M194,544 H216 V566 H194 Z" fill="#eeeeee" stroke="#c8bfb0" stroke-width="0.8"/>
-  <text x="205" y="559" font-size="12" fill="#1a1612" text-anchor="middle">~</text>
-  <path d="M216,544 H238 V566 H216 Z" fill="#eeeeee" stroke="#c8bfb0" stroke-width="0.8"/>
-  <text x="227" y="559" font-size="12" fill="#1a1612" text-anchor="middle">~</text>
-  <path d="M238,544 H260 V566 H238 Z" fill="#eeeeee" stroke="#c8bfb0" stroke-width="0.8"/>
-  <text x="249" y="559" font-size="12" fill="#1a1612" text-anchor="middle">.</text>
-  <path d="M260,544 H282 V566 H260 Z" fill="#eeeeee" stroke="#c8bfb0" stroke-width="0.8"/>
-  <text x="271" y="559" font-size="12" fill="#1a1612" text-anchor="middle">.</text>
-  <path d="M150,566 H172 V588 H150 Z" fill="#eeeeee" stroke="#c8bfb0" stroke-width="0.8"/>
-  <text x="161" y="581" font-size="12" fill="#1a1612" text-anchor="middle">.</text>
-  <path d="M172,566 H194 V588 H172 Z" fill="#eeeeee" stroke="#c8bfb0" stroke-width="0.8"/>
-  <text x="183" y="581" font-size="12" fill="#1a1612" text-anchor="middle">.</text>
-  <path d="M194,566 H216 V588 H194 Z" fill="#eeeeee" stroke="#c8bfb0" stroke-width="0.8"/>
-  <text x="205" y="581" font-size="12" fill="#1a1612" text-anchor="middle">~</text>
-  <path d="M216,566 H238 V588 H216 Z" fill="#eeeeee" stroke="#c8bfb0" stroke-width="0.8"/>
-  <text x="227" y="581" font-size="12" fill="#1a1612" text-anchor="middle">~</text>
-  <path d="M238,566 H260 V588 H238 Z" fill="#eeeeee" stroke="#c8bfb0" stroke-width="0.8"/>
-  <text x="249" y="581" font-size="12" fill="#1a1612" text-anchor="middle">.</text>
-  <path d="M260,566 H282 V588 H260 Z" fill="#eeeeee" stroke="#c8bfb0" stroke-width="0.8"/>
-  <text x="271" y="581" font-size="12" fill="#1a1612" text-anchor="middle">#</text>
-  <path d="M150,588 H172 V610 H150 Z" fill="#eeeeee" stroke="#c8bfb0" stroke-width="0.8"/>
-  <text x="161" y="603" font-size="12" fill="#1a1612" text-anchor="middle">.</text>
-  <path d="M172,588 H194 V610 H172 Z" fill="#eeeeee" stroke="#c8bfb0" stroke-width="0.8"/>
-  <text x="183" y="603" font-size="12" fill="#1a1612" text-anchor="middle">.</text>
-  <path d="M194,588 H216 V610 H194 Z" fill="#eeeeee" stroke="#c8bfb0" stroke-width="0.8"/>
-  <text x="205" y="603" font-size="12" fill="#1a1612" text-anchor="middle">.</text>
-  <path d="M216,588 H238 V610 H216 Z" fill="#eeeeee" stroke="#c8bfb0" stroke-width="0.8"/>
-  <text x="227" y="603" font-size="12" fill="#1a1612" text-anchor="middle">.</text>
-  <path d="M238,588 H260 V610 H238 Z" fill="#eeeeee" stroke="#c8bfb0" stroke-width="0.8"/>
-  <text x="249" y="603" font-size="12" fill="#1a1612" text-anchor="middle">.</text>
-  <path d="M260,588 H282 V610 H260 Z" fill="#eeeeee" stroke="#c8bfb0" stroke-width="0.8"/>
-  <text x="271" y="603" font-size="12" fill="#1a1612" text-anchor="middle">.</text>
-  <path d="M150,610 H172 V632 H150 Z" fill="#eeeeee" stroke="#c8bfb0" stroke-width="0.8"/>
-  <text x="161" y="625" font-size="12" fill="#1a1612" text-anchor="middle">#</text>
-  <path d="M172,610 H194 V632 H172 Z" fill="#eeeeee" stroke="#c8bfb0" stroke-width="0.8"/>
-  <text x="183" y="625" font-size="12" fill="#1a1612" text-anchor="middle">#</text>
-  <path d="M194,610 H216 V632 H194 Z" fill="#eeeeee" stroke="#c8bfb0" stroke-width="0.8"/>
-  <text x="205" y="625" font-size="12" fill="#1a1612" text-anchor="middle">.</text>
-  <path d="M216,610 H238 V632 H216 Z" fill="#eeeeee" stroke="#c8bfb0" stroke-width="0.8"/>
-  <text x="227" y="625" font-size="12" fill="#1a1612" text-anchor="middle">.</text>
-  <path d="M238,610 H260 V632 H238 Z" fill="#eeeeee" stroke="#c8bfb0" stroke-width="0.8"/>
-  <text x="249" y="625" font-size="12" fill="#1a1612" text-anchor="middle">~</text>
-  <path d="M260,610 H282 V632 H260 Z" fill="#eeeeee" stroke="#c8bfb0" stroke-width="0.8"/>
-  <text x="271" y="625" font-size="12" fill="#1a1612" text-anchor="middle">~</text>
-  <rect x="540" y="532" width="170" height="28" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
-  <text x="625" y="550" font-size="10.5" fill="#1a1612" text-anchor="middle">Tile(".", "grass", True)</text>
-  <line x1="496" y1="546" x2="523.6" y2="546.0" stroke="#7a6e62" stroke-width="1.1" marker-end="url(#fs-muted)"/>
-  <rect x="540" y="572" width="170" height="28" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
-  <text x="625" y="590" font-size="10.5" fill="#1a1612" text-anchor="middle">Tile("~", "water", False)</text>
-  <line x1="496" y1="586" x2="523.6" y2="586.0" stroke="#7a6e62" stroke-width="1.1" marker-end="url(#fs-muted)"/>
-  <rect x="540" y="612" width="170" height="28" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
-  <text x="625" y="630" font-size="10.5" fill="#1a1612" text-anchor="middle">Tile("#", "rock", False)</text>
-  <line x1="496" y1="626" x2="523.6" y2="626.0" stroke="#7a6e62" stroke-width="1.1" marker-end="url(#fs-muted)"/>
-  <rect x="540" y="656" width="170" height="28" fill="none" stroke="#8b1a1a" stroke-width="1.6" rx="4"/>
-  <text x="625" y="674" font-size="10.5" fill="#1a1612" text-anchor="middle">Tile("~", "water", False)</text>
-  <text x="150" y="674" font-size="10" fill="#1a1612" text-anchor="start">bypassed = Tile("~", "water", False)</text>
-  <text x="150" y="694" font-size="10" fill="#1a1612" text-anchor="start">assert bypassed == tile("~")</text>
-  <text x="150" y="709" font-size="10" fill="#8b1a1a" text-anchor="start">assert bypassed is not tile("~")</text>
-  <line x1="376" y1="670" x2="523.6" y2="670.0" stroke="#8b1a1a" stroke-width="1.6" marker-end="url(#fs-red)"/>
+  <path d="M194,352 H216 V374 H194 Z" fill="none" stroke="#8b1a1a" stroke-width="2"/>
+  <path d="M260,418 H282 V440 H260 Z" fill="none" stroke="#8b1a1a" stroke-width="2"/>
+  <rect x="540" y="370" width="170" height="28" fill="none" stroke="#8b1a1a" stroke-width="1.6" rx="4"/>
+  <text x="625" y="388" font-size="10.5" fill="#1a1612" text-anchor="middle">Tile("~", "water", False)</text>
+  <text x="710" y="414" font-size="10" fill="#7a6e62" text-anchor="end">one shared object</text>
+  <line x1="205" y1="352" x2="205" y2="336" stroke="#8b1a1a" stroke-width="1.6"/>
+  <line x1="205" y1="336" x2="570" y2="336" stroke="#8b1a1a" stroke-width="1.6"/>
+  <line x1="570" y1="336" x2="570.0" y2="353.6" stroke="#8b1a1a" stroke-width="1.6" marker-end="url(#fs-red)"/>
+  <text x="300" y="330" font-size="10.5" fill="#8b1a1a" text-anchor="start">field[0][2].label(0, 2)</text>
+  <text x="300" y="352" font-size="10.5" fill="#1a1612" text-anchor="start">water at (0, 2)</text>
+  <line x1="282" y1="429" x2="570" y2="429" stroke="#8b1a1a" stroke-width="1.6"/>
+  <line x1="570" y1="429" x2="570.0" y2="414.4" stroke="#8b1a1a" stroke-width="1.6" marker-end="url(#fs-red)"/>
+  <text x="300" y="423" font-size="10.5" fill="#8b1a1a" text-anchor="start">field[3][5].label(3, 5)</text>
+  <text x="300" y="445" font-size="10.5" fill="#1a1612" text-anchor="start">water at (3, 5)</text>
+  <text x="150" y="478" font-size="10" fill="#7a6e62" text-anchor="start">extrinsic: row and column, from the caller</text>
+  <text x="710" y="478" font-size="10" fill="#7a6e62" text-anchor="end">intrinsic: in the Tile</text>
+  <line x1="16" y1="486" x2="714" y2="486" stroke="#c8bfb0" stroke-width="0.8"/>
+  <rect x="336" y="504" width="170" height="118" fill="none" stroke="#1a1612" stroke-width="1.3" rx="4"/>
+  <text x="346" y="524" font-size="13" fill="#1a1612" font-weight="bold" text-anchor="start">tile()</text>
+  <text x="346" y="540" font-size="10" fill="#7a6e62" text-anchor="start">@cache</text>
+  <rect x="446" y="512" width="50" height="28" fill="none" stroke="#1a1612" stroke-width="1.1" rx="3"/>
+  <text x="471" y="530" font-size="11" fill="#1a1612" text-anchor="middle">"."</text>
+  <rect x="446" y="552" width="50" height="28" fill="none" stroke="#1a1612" stroke-width="1.1" rx="3"/>
+  <text x="471" y="570" font-size="11" fill="#1a1612" text-anchor="middle">"~"</text>
+  <rect x="446" y="592" width="50" height="28" fill="none" stroke="#1a1612" stroke-width="1.1" rx="3"/>
+  <text x="471" y="610" font-size="11" fill="#1a1612" text-anchor="middle">"#"</text>
+  <text x="22" y="534" font-size="30" fill="#8b1a1a" font-weight="bold" text-anchor="start">4</text>
+  <text x="22" y="556" font-size="13" fill="#1a1612" font-weight="bold" text-anchor="start">bypass</text>
+  <text x="22" y="576" font-size="10.5" fill="#7a6e62" text-anchor="start">a direct Tile()</text>
+  <text x="22" y="591" font-size="10.5" fill="#7a6e62" text-anchor="start">call skips</text>
+  <text x="22" y="606" font-size="10.5" fill="#7a6e62" text-anchor="start">tile() and builds</text>
+  <text x="22" y="621" font-size="10.5" fill="#7a6e62" text-anchor="start">a second object</text>
+  <text x="150" y="516" font-size="10" fill="#7a6e62" text-anchor="start">field</text>
+  <path d="M150,524 H172 V546 H150 Z" fill="#eeeeee" stroke="#c8bfb0" stroke-width="0.8"/>
+  <text x="161" y="539" font-size="12" fill="#1a1612" text-anchor="middle">.</text>
+  <path d="M172,524 H194 V546 H172 Z" fill="#eeeeee" stroke="#c8bfb0" stroke-width="0.8"/>
+  <text x="183" y="539" font-size="12" fill="#1a1612" text-anchor="middle">.</text>
+  <path d="M194,524 H216 V546 H194 Z" fill="#eeeeee" stroke="#c8bfb0" stroke-width="0.8"/>
+  <text x="205" y="539" font-size="12" fill="#1a1612" text-anchor="middle">~</text>
+  <path d="M216,524 H238 V546 H216 Z" fill="#eeeeee" stroke="#c8bfb0" stroke-width="0.8"/>
+  <text x="227" y="539" font-size="12" fill="#1a1612" text-anchor="middle">~</text>
+  <path d="M238,524 H260 V546 H238 Z" fill="#eeeeee" stroke="#c8bfb0" stroke-width="0.8"/>
+  <text x="249" y="539" font-size="12" fill="#1a1612" text-anchor="middle">.</text>
+  <path d="M260,524 H282 V546 H260 Z" fill="#eeeeee" stroke="#c8bfb0" stroke-width="0.8"/>
+  <text x="271" y="539" font-size="12" fill="#1a1612" text-anchor="middle">.</text>
+  <path d="M150,546 H172 V568 H150 Z" fill="#eeeeee" stroke="#c8bfb0" stroke-width="0.8"/>
+  <text x="161" y="561" font-size="12" fill="#1a1612" text-anchor="middle">.</text>
+  <path d="M172,546 H194 V568 H172 Z" fill="#eeeeee" stroke="#c8bfb0" stroke-width="0.8"/>
+  <text x="183" y="561" font-size="12" fill="#1a1612" text-anchor="middle">.</text>
+  <path d="M194,546 H216 V568 H194 Z" fill="#eeeeee" stroke="#c8bfb0" stroke-width="0.8"/>
+  <text x="205" y="561" font-size="12" fill="#1a1612" text-anchor="middle">~</text>
+  <path d="M216,546 H238 V568 H216 Z" fill="#eeeeee" stroke="#c8bfb0" stroke-width="0.8"/>
+  <text x="227" y="561" font-size="12" fill="#1a1612" text-anchor="middle">~</text>
+  <path d="M238,546 H260 V568 H238 Z" fill="#eeeeee" stroke="#c8bfb0" stroke-width="0.8"/>
+  <text x="249" y="561" font-size="12" fill="#1a1612" text-anchor="middle">.</text>
+  <path d="M260,546 H282 V568 H260 Z" fill="#eeeeee" stroke="#c8bfb0" stroke-width="0.8"/>
+  <text x="271" y="561" font-size="12" fill="#1a1612" text-anchor="middle">#</text>
+  <path d="M150,568 H172 V590 H150 Z" fill="#eeeeee" stroke="#c8bfb0" stroke-width="0.8"/>
+  <text x="161" y="583" font-size="12" fill="#1a1612" text-anchor="middle">.</text>
+  <path d="M172,568 H194 V590 H172 Z" fill="#eeeeee" stroke="#c8bfb0" stroke-width="0.8"/>
+  <text x="183" y="583" font-size="12" fill="#1a1612" text-anchor="middle">.</text>
+  <path d="M194,568 H216 V590 H194 Z" fill="#eeeeee" stroke="#c8bfb0" stroke-width="0.8"/>
+  <text x="205" y="583" font-size="12" fill="#1a1612" text-anchor="middle">.</text>
+  <path d="M216,568 H238 V590 H216 Z" fill="#eeeeee" stroke="#c8bfb0" stroke-width="0.8"/>
+  <text x="227" y="583" font-size="12" fill="#1a1612" text-anchor="middle">.</text>
+  <path d="M238,568 H260 V590 H238 Z" fill="#eeeeee" stroke="#c8bfb0" stroke-width="0.8"/>
+  <text x="249" y="583" font-size="12" fill="#1a1612" text-anchor="middle">.</text>
+  <path d="M260,568 H282 V590 H260 Z" fill="#eeeeee" stroke="#c8bfb0" stroke-width="0.8"/>
+  <text x="271" y="583" font-size="12" fill="#1a1612" text-anchor="middle">.</text>
+  <path d="M150,590 H172 V612 H150 Z" fill="#eeeeee" stroke="#c8bfb0" stroke-width="0.8"/>
+  <text x="161" y="605" font-size="12" fill="#1a1612" text-anchor="middle">#</text>
+  <path d="M172,590 H194 V612 H172 Z" fill="#eeeeee" stroke="#c8bfb0" stroke-width="0.8"/>
+  <text x="183" y="605" font-size="12" fill="#1a1612" text-anchor="middle">#</text>
+  <path d="M194,590 H216 V612 H194 Z" fill="#eeeeee" stroke="#c8bfb0" stroke-width="0.8"/>
+  <text x="205" y="605" font-size="12" fill="#1a1612" text-anchor="middle">.</text>
+  <path d="M216,590 H238 V612 H216 Z" fill="#eeeeee" stroke="#c8bfb0" stroke-width="0.8"/>
+  <text x="227" y="605" font-size="12" fill="#1a1612" text-anchor="middle">.</text>
+  <path d="M238,590 H260 V612 H238 Z" fill="#eeeeee" stroke="#c8bfb0" stroke-width="0.8"/>
+  <text x="249" y="605" font-size="12" fill="#1a1612" text-anchor="middle">~</text>
+  <path d="M260,590 H282 V612 H260 Z" fill="#eeeeee" stroke="#c8bfb0" stroke-width="0.8"/>
+  <text x="271" y="605" font-size="12" fill="#1a1612" text-anchor="middle">~</text>
+  <rect x="540" y="512" width="170" height="28" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
+  <text x="625" y="530" font-size="10.5" fill="#1a1612" text-anchor="middle">Tile(".", "grass", True)</text>
+  <line x1="496" y1="526" x2="523.6" y2="526.0" stroke="#7a6e62" stroke-width="1.1" marker-end="url(#fs-muted)"/>
+  <rect x="540" y="552" width="170" height="28" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
+  <text x="625" y="570" font-size="10.5" fill="#1a1612" text-anchor="middle">Tile("~", "water", False)</text>
+  <line x1="496" y1="566" x2="523.6" y2="566.0" stroke="#7a6e62" stroke-width="1.1" marker-end="url(#fs-muted)"/>
+  <rect x="540" y="592" width="170" height="28" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
+  <text x="625" y="610" font-size="10.5" fill="#1a1612" text-anchor="middle">Tile("#", "rock", False)</text>
+  <line x1="496" y1="606" x2="523.6" y2="606.0" stroke="#7a6e62" stroke-width="1.1" marker-end="url(#fs-muted)"/>
+  <rect x="540" y="636" width="170" height="28" fill="none" stroke="#8b1a1a" stroke-width="1.6" rx="4"/>
+  <text x="625" y="654" font-size="10.5" fill="#1a1612" text-anchor="middle">Tile("~", "water", False)</text>
+  <text x="150" y="654" font-size="10" fill="#1a1612" text-anchor="start">bypassed = Tile("~", "water", False)</text>
+  <text x="150" y="674" font-size="10" fill="#1a1612" text-anchor="start">assert bypassed == tile("~")</text>
+  <text x="150" y="689" font-size="10" fill="#8b1a1a" text-anchor="start">assert bypassed is not tile("~")</text>
+  <line x1="376" y1="650" x2="523.6" y2="650.0" stroke="#8b1a1a" stroke-width="1.6" marker-end="url(#fs-red)"/>
 </svg>

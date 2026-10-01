@@ -6,7 +6,7 @@ so a figure with gray and red edges defines one marker per color.
 `tip figures` (`tools/figure_gallery.py`) fails on a `<marker>` that is
 not one of the set (`marker_kinds()`) or that sits on a line of another
 color (`mismatched_heads()`); `tools/coupling_panels.py` and
-`tools/state_machine_figure.py` write their markers with `marker_def()`.
+`tools/story_figures/` write their markers with `marker_def()`.
 
     filled   a swept head with a notched back: a call, a reference, a
              transition, anything that points

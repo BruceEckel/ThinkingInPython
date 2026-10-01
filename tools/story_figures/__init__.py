@@ -1,6 +1,6 @@
 """The book's generated figures that tell a story, one module per figure.
 
-The pattern chapters' opening figures came first; since 2026-09-29 the
+Each pattern chapter's story figure came first; since 2026-09-29 the
 package also draws figures inside chapters that replaced UML or
 hand-drawn diagrams (chapter 14's decorator, 16's comprehension, 27's
 abstract factory, 32's double dispatch, 34's filesystem, 36's history,

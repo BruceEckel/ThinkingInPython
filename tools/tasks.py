@@ -209,7 +209,6 @@ def gate(v: Vars) -> None:
     py("tools.check_all", "anchors", "--paths", *GATE_DOCS)
     py("tools.check_all", "widths", "records", "--paths", "Solutions")
     py("tools.coupling_panels", "--check")
-    py("tools.state_machine_figure", "--check")
     py("tools.story_figures", "--check")
     py("tools.check_quoted_diagnostics")
     py("tools.exercise_refs")
@@ -1085,24 +1084,6 @@ def coupling_panels_png(v: Vars) -> None:
     spec edit the way the EPUB will render it. Writes only build/coupling/.
     """
     py("tools.coupling_panels", "--png")
-
-
-@task("Fail if resources/images/stateMachine.svg differs from its spec "
-      "in tools/state_machine_figure.py; `tip fix-state-machine-figure`"
-      " regenerates")
-def state_machine_figure(v: Vars) -> None:
-    """Chapter 31's vending-machine diagram is drawn from the spec in
-    tools/state_machine_figure.py, since its labels have to sit beside
-    thirteen curved transitions; this fails when the committed SVG differs
-    from what the spec draws. In `gate` since 2026-09-24.
-    """
-    py("tools.state_machine_figure", "--check")
-
-
-@task("Regenerate resources/images/stateMachine.svg from its spec",
-      secondary=True)
-def fix_state_machine_figure(v: Vars) -> None:
-    py("tools.state_machine_figure")
 
 
 @task("Fail if a pattern chapter's opening figure differs from its module "

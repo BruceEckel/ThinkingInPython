@@ -67,7 +67,6 @@ from tools.tip import format_seconds, nested_env, tip_argv
 SWEEP_TARGETS: list[str] = [
     "checks",
     "coupling-panels",
-    "state-machine-figure",
     "story-figures",
     "solutions-numbering",
     "ty",

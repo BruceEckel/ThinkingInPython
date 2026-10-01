@@ -3,25 +3,30 @@
 The chapter's opening names two ideas: split each object's state into an
 intrinsic part the shared object holds and an extrinsic part the context
 supplies, and construct every object through a factory that returns the
-existing instance for a value. The coupling panel showed who names whom;
-this figure shows the factory's cache filling and answering, one layout
-per frame: the parsed grid on the left, `tile()` and its `@cache` entries
-in the middle, the shared `Tile` objects on the right.
+existing instance for a value. The figure shows the sharing, not the
+caching: `@cache` is how `tile()` keeps its objects, and the chapter's
+"Sharing, Not Caching" section says why identity is the point. Frames 1,
+2, and 4 share one layout: the parsed grid on the left, `tile()` and its
+`@cache` entries in the middle, the shared `Tile` objects on the right.
 
-1. `parse_map()` reaches `field[0][2]` and calls `tile("~")`. The cache
-   has no `"~"` entry, so `tile()` builds a `Tile` and caches it.
-2. `field[0][3]` calls `tile("~")` again, and the cache returns the same
-   `Tile` without running the body.
-3. `field[1][5].walkable` reads the rock tile through the grid: the grid
-   holds the position, the `Tile` holds the rest.
-4. `test_tile_map.py`'s direct `Tile("~", "water", False)` skips the
-   cache and builds a second object, equal to the cached one and not the
-   same one: the reason every construction must go through the factory.
+1. `parse_map()` reaches `field[0][2]` and calls `tile("~")`. `tile()`
+   has no `"~"` entry, so it builds a `Tile` and keeps it.
+2. `field[0][3]` calls `tile("~")` again, and `tile()` returns the same
+   `Tile` without running its body.
+3. The demo's two `label()` calls, `field[0][2].label(0, 2)` and
+   `field[3][5].label(3, 5)`, reach the one water `Tile` and print two
+   answers, because each caller passes in its own position: the grid
+   holds the extrinsic state, the `Tile` the intrinsic.
+4. `test_tile_map.py`'s direct `Tile("~", "water", False)` skips
+   `tile()` and builds a second object, equal to the shared one and not
+   the same one: the reason every construction must go through the
+   factory.
 
 Chapter 35's `flyweight_tiles.svg` already shows the whole grid resolving
 to three objects, so this figure shows how the factory gets there. The
 names come from `tile_map.py` (`parse_map`, `tile`, `SPECS`, `Tile`, the
-map text) and frame 4's lines from `test_tile_map.py`.
+map text, `label()` and its `#:` output) and frame 4's lines from
+`test_tile_map.py`.
 """
 
 from tools.story_figures import (BOX, INK, MUTED, RED, SHADE, arrow, line,
@@ -29,7 +34,7 @@ from tools.story_figures import (BOX, INK, MUTED, RED, SHADE, arrow, line,
 
 STEM = "flyweight_story"
 W = 730
-FH = (154, 154, 192, 206)  # Each frame's height
+FH = (154, 154, 172, 206)  # Each frame's height
 GX, GY, CELL = 150, 34, 22  # The grid of parsed cells
 MAP = ("..~~..", "..~~.#", "......", "##..~~")
 FX, FW, FTOP, FBOT = 336, 170, 14, 132  # The tile() box
@@ -40,8 +45,9 @@ ROW_Y = (22, 62, 102, 146)  # Tile rows; the fourth is frame 4's bypass
 TILES = ('Tile(".", "grass", True)', 'Tile("~", "water", False)',
          'Tile("#", "rock", False)', 'Tile("~", "water", False)')
 TITLE = ("Four steps of Flyweight: tile() builds a Tile on the first "
-         "request for a symbol and caches it, returns that same Tile on "
-         "every later request, the grid supplies each cell's position, "
+         "request for a symbol and keeps it, returns that same Tile on "
+         "every later request, two cells pass their own positions to the "
+         "one shared water Tile and get two answers, "
          "and a direct Tile() call builds a second, equal object")
 
 
@@ -119,8 +125,8 @@ def render() -> str:
     b = ""
 
     y0 = y[0]
-    b += frame(0, y0, 2, 1, "miss",
-               ('no "~" entry,', "so tile()", "builds a Tile", "and caches it"))
+    b += frame(0, y0, 2, 1, "first call",
+               ('no "~" entry,', "so tile()", "builds a Tile", "and keeps it"))
     b += grid(y0, 2, (0, 2))
     b += call(y0, 2, 'tile("~")')
     b += text(FX + 10, y0 + 90, 'SPECS["~"]', 10.5, RED)
@@ -130,8 +136,8 @@ def render() -> str:
     b += tile_box(y0, 1, RED, RED) + link(y0, 1, RED)
 
     y0 = y[1]
-    b += frame(1, y0, 2, 1, "hit",
-               ("the entry", "exists, so the", "cache returns",
+    b += frame(1, y0, 2, 1, "again",
+               ("the entry", "exists, so", "tile() returns",
                 "the same Tile"))
     b += grid(y0, 3, (0, 3))
     b += call(y0, 3, 'tile("~")')
@@ -143,29 +149,38 @@ def render() -> str:
               10, RED, "middle")
 
     y0 = y[2]
-    b += frame(2, y0, 3, None, "context",
-               ("the grid holds", "the position;", "the Tile holds",
-                "the rest"))
-    b += grid(y0, 24, (1, 5))
-    for k in range(3):
-        b += tile_box(y0, k, RED if k == 2 else BOX) + link(y0, k)
-    cy = y0 + GY + CELL * 1.5
-    turn_y = y0 + 156
-    end_x = RX + 40
-    side = GX + 6 * CELL + 16
-    b += line((GX + 6 * CELL, cy), (side, cy), RED, 1.6)
-    b += line((side, cy), (side, turn_y), RED, 1.6)
-    b += line((side, turn_y), (end_x, turn_y), RED, 1.6)
-    b += arrow((end_x, turn_y), (end_x, y0 + ROW_Y[2] + RH), RED, "fs-red",
-               width=1.6)
-    b += text(side + 10, turn_y - 6, "field[1][5].walkable", 10.5, RED)
-    b += text(GX, turn_y + 20, "extrinsic: row 1, column 5", 10, MUTED)
-    b += text(W - 20, turn_y + 20, "intrinsic: symbol, name, walkable", 10,
-              MUTED, "end")
+    b += line((16, y0 - 4), (W - 16, y0 - 4))
+    b += text(22, y0 + 44, "3", 30, RED, bold=True)
+    b += text(22, y0 + 66, "context", 13, bold=True)
+    for j, t in enumerate(("each caller", "passes its", "position to",
+                           "the one Tile")):
+        b += text(22, y0 + 86 + j * 15, t, 10.5, MUTED)
+    b += grid(y0, 24, (0, 2))
+    b += region(GX + 5 * CELL, y0 + GY + 3 * CELL, CELL, CELL, stroke=RED,
+                width=2, r=0)
+    water_y, ex = y0 + 52, RX + 30
+    b += rect(RX, water_y, RW, RH, stroke=RED, width=1.6)
+    b += text(RX + RW / 2, water_y + 18, TILES[1], 10.5, INK, "middle")
+    b += text(RX + RW, water_y + RH + 16, "one shared object", 10, MUTED,
+              "end")
+    top_x, lane_a = GX + 2 * CELL + CELL / 2, y0 + 18
+    b += line((top_x, y0 + GY), (top_x, lane_a), RED, 1.6)
+    b += line((top_x, lane_a), (ex, lane_a), RED, 1.6)
+    b += arrow((ex, lane_a), (ex, water_y), RED, "fs-red", width=1.6)
+    b += text(300, lane_a - 6, "field[0][2].label(0, 2)", 10.5, RED)
+    b += text(300, lane_a + 16, "water at (0, 2)", 10.5, INK)
+    lane_b = y0 + GY + 3 * CELL + CELL / 2
+    b += line((GX + 6 * CELL, lane_b), (ex, lane_b), RED, 1.6)
+    b += arrow((ex, lane_b), (ex, water_y + RH), RED, "fs-red", width=1.6)
+    b += text(300, lane_b - 6, "field[3][5].label(3, 5)", 10.5, RED)
+    b += text(300, lane_b + 16, "water at (3, 5)", 10.5, INK)
+    b += text(GX, y0 + 160, "extrinsic: row and column, from the caller",
+              10, MUTED)
+    b += text(W - 20, y0 + 160, "intrinsic: in the Tile", 10, MUTED, "end")
 
     y0 = y[3]
     b += frame(3, y0, 3, None, "bypass",
-               ("a direct Tile()", "call skips the", "cache and builds",
+               ("a direct Tile()", "call skips", "tile() and builds",
                 "a second object"))
     b += grid(y0, 24, None)
     for k in range(3):

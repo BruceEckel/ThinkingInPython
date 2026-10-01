@@ -1,9 +1,9 @@
 """Chapter 31, State Machines: the vending machine's table as a hub.
 
-A state diagram, redrawn for legibility. The older `stateMachine.svg`
-(from `tools/state_machine_figure.py`) draws all thirteen transitions as
-curves, four of them `Quit / refund` arcs, and its labels crowd
-each other. Here every edge is straight and every state sits on one of
+A state diagram, redrawn for legibility. The `stateMachine.svg` it
+replaced (from the retired `tools/state_machine_figure.py`) drew all
+thirteen transitions as curves, four of them `Quit / refund` arcs, and
+its labels crowded each other. Here every edge is straight and every state sits on one of
 two columns. `SELECTING` is the hub: each of the other three states in
 the shaded region is one spoke, with `FirstDigit / choose_row` running
 in and a `SecondDigit` row running out. The four `Quit / refund` rows

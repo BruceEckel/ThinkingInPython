@@ -897,9 +897,8 @@ def epub_css(variant: str) -> str:
     an image at a size it derives from the pixels, so a 1600-pixel
     diagram PNG came out under half the screen wide with its labels
     unreadable, and `max-width` only shrinks an image, never grows it.
-    Every figure is landscape (the squarest, `stateMachine.svg`, is
-    0.96 tall per unit of width), so full width still fits a portrait
-    page.
+    The tallest figure, `interface_story.svg`, is 1.06 tall per unit
+    of width, so full width still fits a portrait page.
 
     The per-indent rules from `hang_css()` are the hanging indent for
     wrapped code lines. They need a `<span>` per listing line, which

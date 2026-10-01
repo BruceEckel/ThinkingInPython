@@ -1,4 +1,4 @@
-"""Write, check, or rasterize the pattern chapters' opening figures.
+"""Write, check, or rasterize the book's story figures.
 
     uv run python -m tools.story_figures                  # write every SVG
     uv run python -m tools.story_figures --check          # drift + lint
