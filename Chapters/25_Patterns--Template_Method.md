@@ -4,8 +4,6 @@
 > and some of those steps differ from one use to the next.
 > A *Template Method* sets the sequence and lets you supply the steps that vary.
 
-![](_images/template_method_story)
-
 An application framework lets you build a new application by reusing its existing classes and overriding methods to customize behavior.
 At the heart of a framework is the *Template Method* of *GoF Design Patterns*:
 a method, defined in the base class,
@@ -370,6 +368,18 @@ expect(TypeError, run_framework, lambda: print("one"))  # type: ignore
 #: argument: 'customize2'
 ```
 
+The figure lays the two forms side by side,
+starting from the base class with its empty hooks:
+
+![](_images/template_method_story)
+
+The loop box stays the same in all three frames;
+only the box beneath it changes.
+In the second frame each arrow is a call through `self`,
+so the base calls the subclass's methods.
+In the third the arrows lose `self`: `run_framework()` calls its own parameters,
+and the output column shows that the lambdas print the same four lines as `MyApp`.
+
 Both the *Template Method* and the function version have an anchored algorithm and varying steps.
 If the steps share state, build on each other, or come as a coherent group,
 the subclass is clearer.
@@ -378,7 +388,7 @@ passing functions is lighter and avoids a class hierarchy.
 The subclass form also gets optional steps without extra work,
 since the base supplies the `...` default.
 The function form must give each parameter a default of its own:
-omitting `customize2` above raises a `TypeError` instead.
+omitting `customize2` in `template_function.py` raises a `TypeError` instead.
 A do-nothing default such as `lambda: None` makes a step optional and keeps the loop free of `None` tests.
 
 The function version also needs no `@final`.

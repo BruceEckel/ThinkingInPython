@@ -5,8 +5,6 @@
 > *Composite* builds that tree,
 > and *Interpreter* reads one as a sentence and evaluates it.
 
-![](_images/composite_story)
-
 In *Composite*, each node is a leaf or a group of nodes,
 and one call serves both.
 In *Interpreter*, the tree is a sentence in a small language,
@@ -531,6 +529,18 @@ if __name__ == "__main__":
 #: ((2 * x) + 1)
 #: ((x + 1) * (x + 2))
 ```
+
+`to_infix()` walks the same tree that `evaluate()` walks,
+from the same `2 * x + 1`:
+
+![](_images/composite_story)
+
+Side by side, the two walks share their shape.
+Each makes one call per node, leaf or group,
+and each node's result flows up to its parent.
+Only the value a node returns differs,
+an `int` in one walk and a `str` in the other.
+The tree carries no meaning of its own, so a new operation is one more walker.
 
 Adding `to_infix()` without editing a node class is the ability [*Visitor*](33_Patterns--Visitor.md)
 exists to provide: new operations over a fixed hierarchy, defined outside it.

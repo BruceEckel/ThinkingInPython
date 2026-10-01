@@ -3,8 +3,6 @@
 > Thousands of objects carry the same few values.
 > *Flyweight* keeps one object per value and shares it among every use.
 
-![](_images/flyweight_story)
-
 The characters in a document, the tiles in a game map,
 and the strings in a compiler's symbol table are fine-grained objects a program needs in enormous numbers,
 and each has far fewer distinct values than uses.
@@ -271,7 +269,17 @@ Building a `Tile` costs almost nothing, so `@cache` makes `tile()` no faster.
 What `tile()` gets from it is identity:
 every call for a symbol returns the same object.
 A flyweight's factory exists for that sameness.
-The memory saving and every `is` comparison depend on it,
+The figure follows `tile()` through the demo in `tile_map.py` and through the last test in `test_tile_map.py`:
+
+![](_images/flyweight_story)
+
+Steps 1 and 2 show the sameness as two requests arriving at one object,
+and step 3 shows why one object can serve every water cell:
+the position travels with the call, not with the tile.
+Step 4 marks where the guarantee ends:
+a `Tile` built without `tile()` equals the shared tile but is a separate object.
+
+The memory saving and every `is` comparison depend on that sameness,
 so a factory that forgets an entry and builds a replacement breaks the pattern,
 where a cache that forgets an entry runs slower and stays correct.
 The sections that follow change how the factory keeps its objects,

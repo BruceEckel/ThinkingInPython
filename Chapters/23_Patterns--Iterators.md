@@ -3,8 +3,6 @@
 > A loop needs the next item and has no reason to care where that item is stored.
 > An *Iterator* supplies the item and keeps the storage out of sight.
 
-![](_images/iterator_story)
-
 Code written against an *iterator* does not care whether the data came from a list,
 a file, a database cursor, or a computation.
 It asks only for the next item.
@@ -129,6 +127,16 @@ print(total(Countdown(5)))  # and a custom iterable
 
 `total()` takes an `Iterable`, so it works equally well on the generator,
 the list, and the custom `Countdown`.
+The figure follows one loop over `nums` through the protocol,
+then puts `total()` in the loop's place:
+
+![](_images/iterator_story)
+
+The shaded region in each frame holds what the caller cannot see.
+Inside `total()`, `sum()` makes the same `iter()` and `next()` calls as the written-out `for` loop,
+so a new source needs no change to `total()`.
+The third frame shows a limit of the protocol:
+a caller learns that the items have run out by asking for one more.
 
 `fibonacci(8)` returns an iterator, which one pass exhausts.
 `Countdown(5)` is an iterable whose `__iter__()` builds a fresh generator for every pass,

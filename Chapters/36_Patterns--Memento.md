@@ -3,8 +3,6 @@
 > An object is about to change, and someone may want it back the way it was.
 > A *Memento* saves what the object was so the program can restore it.
 
-![](_images/memento_story)
-
 Undo is a feature users expect and programmers dread.
 *Memento* is an undo mechanism that keeps encapsulation intact.
 The *originator* (the object with state) produces a *memento*,
@@ -291,6 +289,15 @@ Saving means keeping a reference,
 the assignment that aliased in `aliased_snapshot.py`.
 Here that assignment is safe because the object bound to `before` keeps its value as long as it exists,
 so the `Memento` class, `save()`, `restore()`, and the copying are all gone.
+The figure sets the two forms side by side:
+
+![](_images/memento_story)
+
+Frames 1 to 3 trace `sketch.py`'s demo,
+with a copy at each crossing between the sketch and the caretaker.
+Frame 4 has no copy: the caretaker keeps `before`,
+and `draw()` returns `after` as a new object beside it.
+
 `after` shares the two original stroke strings with `before`,
 so a history of `Drawing` states stores each stroke once and duplicates only the pointers:
 

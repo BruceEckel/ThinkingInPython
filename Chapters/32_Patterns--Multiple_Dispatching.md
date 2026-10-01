@@ -3,8 +3,6 @@
 > Two objects meet, and the right action depends on the type of each.
 > *Multiple Dispatching* chooses the action from both types at once.
 
-![](_images/dispatch_story)
-
 Code that combines several interacting types can end up testing a type by hand for every combination.
 Consider a system that parses and executes mathematical expressions.
 You want to say `Number + Number`, `Number * Number`, etc.,
@@ -263,6 +261,19 @@ if __name__ == "__main__":
 
 Dictionary keys are flexible: a tuple works as a key,
 the same as a single object.
+
+Both versions now hold the same nine answers, one for each pair of types:
+
+![](_images/dispatch_story)
+
+Drawn as a grid, the difference between the versions is where each one keeps that grid.
+The method version cuts it into columns and gives one to each class,
+so finding a cell takes two dispatches.
+The table version keeps the grid whole in `OUTCOME`,
+and one lookup finds the same cell.
+The dashed fourth item shows what growth costs each version.
+A new class forces a new `eval_*()` method into every existing class,
+while the table takes new rows and leaves the classes untouched.
 
 The lookup shares two properties with the [table-driven state machine](31_Patterns--State_Machines.md#the-engine).
 It matches classes exactly, so a subclass of `Paper` needs rows of its own.

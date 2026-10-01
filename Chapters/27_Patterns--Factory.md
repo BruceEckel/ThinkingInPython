@@ -4,8 +4,6 @@
 > but something in the program must still choose which class to construct.
 > A *Factory* puts that choice in one place.
 
-![](_images/factory_story)
-
 When a system needs new types,
 start with a base type that gives them a common interface.
 The common interface separates the rest of your code from knowledge of the specific types you add.
@@ -392,6 +390,17 @@ The closed `Literal` in `shape_table.py` rejects `"Hexagon"` before the program 
 An open registry cannot do that,
 since a name becomes valid the moment some module defines the class,
 so the check moves to runtime.
+
+The figure sets the opening problem from `shapes_naive.py` beside the registry,
+so you can compare what adding `Triangle` costs before and after the factory:
+
+![](_images/factory_story)
+
+In the first frame, each call site holds its own arrow to every class,
+so a new class needs a new arrow, and an edit, at each call site.
+In the registry frames the arrows run the other way.
+Each class points at the table, and the callers point at `make()` alone.
+`Triangle` adds one arrow, from its own `class` statement.
 
 ### Hazards of Self Registration
 

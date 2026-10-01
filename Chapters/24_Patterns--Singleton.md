@@ -4,8 +4,6 @@
 > and every part of the program must see the same one.
 > A *Singleton* creates that one instance and shares it.
 
-![](_images/singleton_story)
-
 The classic form is a class that refuses a second instance.
 Before writing one, ask whether the language already solves the problem,
 the question [When a Pattern Dissolves](21_Patterns--Design_Patterns.md#when-a-pattern-dissolves)
@@ -67,6 +65,16 @@ print(settings)
 
 No class, no ceremony.
 For most singleton needs, a module solves the problem.
+
+The three listings come down to three steps through `sys.modules`,
+and a fourth step shows the mistake that undoes the sharing:
+
+![](_images/singleton_story)
+
+Steps 3 and 4 look alike in code but differ in where the arrow points.
+A mutation follows the name's arrow into the dict that `config` holds,
+so every importer sees the change.
+A rebinding moves the arrow to a new dict and leaves the module's dict as it was.
 
 Mutation makes the sharing work.
 Rebinding is the mistake that quietly ends it.

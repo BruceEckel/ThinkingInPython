@@ -4,8 +4,6 @@
 > and another place does it later or does it a different way each time.
 > A *function object* carries the decision from the first place to the second.
 
-![](_images/function_objects_story)
-
 A *function object* decouples the choice of function to call from the place that calls it.
 That decoupling is the goal of three patterns: *Command*, *Strategy*,
 and *Chain of Responsibility*.
@@ -492,6 +490,16 @@ because the interval `[1.0, 1.3]` does not straddle the root,
 bisection fails by returning `None`.
 The loop continues to a method that needs no bracket.
 To add, remove, or reorder the handlers you edit the `chain` list.
+You have now seen all three patterns, and they share one shape:
+
+![](_images/function_objects_story)
+
+In every lane the call site stays the same short loop or call,
+and it depends on the signature alone.
+The patterns differ in how many of the chosen callables the call site runs:
+all of them in turn, one per call, or the first that succeeds.
+That count, rather than a class structure, separates *Command*, *Strategy*,
+and *Chain of Responsibility* in Python.
 
 The test is `root is not None`, not `if root`.
 A finder returns `0.0` for a function whose root is at zero, and `0.0` is falsy,

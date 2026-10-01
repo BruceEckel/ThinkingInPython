@@ -3,8 +3,6 @@
 > A family of classes you cannot change needs a new operation.
 > *Visitor* adds the operation from outside the family.
 
-![](_images/visitor_story)
-
 The *Visitor* pattern uses [*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md).
 People can confuse the two by looking at the implementation rather than the intent.
 
@@ -419,6 +417,16 @@ the situation where the classic pattern still fits.
 ## One Dispatch Is Enough
 
 *Visitor* dispatches twice, and `singledispatch` dispatches once.
+The figure sets the two side by side,
+with the worm from `dispatch_trace.py` and the `nectar()` operation from `visitor_singledispatch.py`:
+
+![](_images/visitor_story)
+
+In the first two frames the call crosses the boundary of `Flower` twice,
+out to the visitor and back again,
+and the frames differ only in the method the return trip reaches.
+In the third frame no method on `Flower` takes part.
+One lookup in `nectar()`'s table, keyed by the flower's type, finds the answer.
 The one dispatch resolves everything the two did.
 The second dispatch in the classic pattern exists not because two types are unknown,
 but because the operation must be a method on some class.

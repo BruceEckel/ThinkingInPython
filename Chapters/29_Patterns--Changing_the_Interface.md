@@ -4,8 +4,6 @@
 > and the code that needs it expects a different interface.
 > *Adapter* and *Façade* supply that interface without changing either side.
 
-![](_images/interface_story)
-
 Sometimes the problem you're solving is as simple as "I don't have the interface I need."
 Two of the patterns in *GoF Design Patterns* solve this problem.
 *Adapter* takes one type and produces an interface to some other type.
@@ -386,6 +384,17 @@ In real code, constructing three or thirty classes in the right order is knowled
 `Facade.start_car()` is the static factory method:
 one call runs the constructors in the right order, starts the car,
 and returns the assembled `Ignition`.
+
+With both patterns in hand, you can compare them as two before-and-after pairs:
+
+![](_images/interface_story)
+
+In both pairs, the code you have on the right stays the same,
+and the difference sits in the middle column.
+*Adapter* puts a class there that turns one call into others,
+so the caller keeps calling `f()`.
+*Façade* puts a class there that takes over construction,
+so the caller stops naming `Engine` and `FuelPump`.
 
 The cleaner Python façade is a module.
 A module already presents a curated set of names over any confusing collection of classes behind it.

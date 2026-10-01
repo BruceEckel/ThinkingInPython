@@ -4,8 +4,6 @@
 > and each input, together with the current state, decides the next state.
 > A *State Machine* names the states and the transitions between them.
 
-![](_images/state_story)
-
 Recall [*State*](26_Patterns--Surrogate.md#state):
 a surrogate object that forwards calls to a swappable implementation.
 *State* lets the client programmer swap the implementation.
@@ -425,6 +423,15 @@ feeding `MouseAction.ESCAPES` to a fresh trap in `Waiting`,
 where neither the `match` nor the table names that input.
 Version 1 prints `Waiting: Broadcasting cheese smell` a second time.
 Version 2 raises `RuntimeError: Waiting has no transition for mouse escapes`.
+The figure traces the run both versions share, then this one input:
+
+![](_images/state_story)
+
+The trace at the top covers the nine shared moves.
+In each row the current state's `next()` picks the successor,
+so the machine moves from object to object without deciding anything.
+Below the trace, the one input that splits the versions appears twice,
+once under each policy.
 
 Version 1's `case _` arms return the current state,
 so an unrecognized input keeps the machine where it is.
@@ -552,7 +559,7 @@ then either dispenses the item, reports it sold out,
 or clears a selection that costs more than the money inserted.
 The conditions and actions are ordinary methods, stored directly in the table.
 
-![The vending machine's five states and the inputs that move it between them](_images/stateMachine)
+![The vending machine's five states and the inputs that move it between them](_images/vending_story)
 
 `Money` moves the machine to `COLLECTING` and keeps it there,
 a first digit moves it to `SELECTING`,

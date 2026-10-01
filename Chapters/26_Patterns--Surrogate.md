@@ -4,8 +4,6 @@
 > *Proxy* and *State* are both built on that stand-in,
 > which this chapter calls a *Surrogate*.
 
-![](_images/surrogate_story)
-
 Both *Proxy* and *State* provide a surrogate class that changes what happens behind a call without changing the calling code.
 The surrogate hides the implementing class that does the work.
 When you call a method in the surrogate,
@@ -756,7 +754,16 @@ run(b)
 #: We dance whene'er we're able.
 ```
 
-`run()` never changes and neither does `b`.
+The two calls to `run(b)` print different verses,
+though neither `run()` nor `b` changes between them.
+The figure follows `b.f()` through each step:
+
+![](_images/surrogate_story)
+
+The first frame alone is a *Proxy*.
+The second and third show what *State* adds:
+one assignment inside `change_to()` moves the arrow out of `__implementation`,
+and the same `__getattr__()` forwarding then reaches the other implementation.
 Only the surrogate's current implementation changes.
 Here the client programmer calls `change_to()`,
 but in a [*State Machine*](31_Patterns--State_Machines.md),

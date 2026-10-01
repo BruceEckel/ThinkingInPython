@@ -3,8 +3,6 @@
 > Something changes, and something else is interested in that change.
 > The *Observer* pattern connects the two.
 
-![](_images/observer_story)
-
 *Observer* decouples code that changes state from code that reacts to that state change.
 An *observer* attaches to a *subject*.
 When the subject changes state, it notifies the observer.
@@ -317,6 +315,17 @@ t.celsius = 150
 
 The responders here are lambdas, but any function or bound method works.
 `Thermometer` knows its responders only as callables that take a `float`.
+The figure follows this demo through one notification,
+naming the two lambdas `display` and `alarm` after what they print:
+
+![](_images/observer_story)
+
+The shaded side holds what `Thermometer` cannot see.
+Two kinds of arrow cross into it: `connect()` stores a responder in the list,
+and `announce()` calls each stored responder in turn.
+No result crosses back, so `Thermometer` has nothing to wait for or interpret.
+A new responder such as `plot` connects through the same call,
+and the class that announces to it stays as written.
 
 ### Testing the Broadcaster
 
