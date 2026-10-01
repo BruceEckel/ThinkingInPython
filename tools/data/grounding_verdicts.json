@@ -57,7 +57,7 @@
  },
  "fa2f1549160e7e2a": {
   "file": "14_Techniques--Decorators.md",
-  "line": 1147,
+  "line": 1175,
   "target": "07_Foundations--Classes.md",
   "terms": [
    "trace"
@@ -124,7 +124,7 @@
  },
  "ebf2d05c88d18b4b": {
   "file": "23_Patterns--Iterators.md",
-  "line": 775,
+  "line": 783,
   "target": "20_Patterns--Rethinking_Objects.md",
   "terms": [
    "traverse",
@@ -136,7 +136,7 @@
  },
  "92ea1b2aa8c0d548": {
   "file": "23_Patterns--Iterators.md",
-  "line": 853,
+  "line": 861,
   "target": "05_Foundations--Functions.md",
   "terms": [
    "DONE"
@@ -147,7 +147,7 @@
  },
  "3d2ba10d42a8a605": {
   "file": "24_Patterns--Singleton.md",
-  "line": 166,
+  "line": 174,
   "target": "11_Techniques--Testing.md",
   "terms": [
    "__Settings"
@@ -158,7 +158,7 @@
  },
  "9912c8ce605b1548": {
   "file": "24_Patterns--Singleton.md",
-  "line": 698,
+  "line": 706,
   "target": "26_Patterns--Surrogate.md",
   "terms": [
    "__call__"
@@ -169,7 +169,7 @@
  },
  "f042b4e197f81a9e": {
   "file": "26_Patterns--Surrogate.md",
-  "line": 202,
+  "line": 200,
   "target": "11_Techniques--Testing.md",
   "terms": [
    "_Proxy__implementation"
@@ -180,7 +180,7 @@
  },
  "2e71dc56c76b481b": {
   "file": "26_Patterns--Surrogate.md",
-  "line": 761,
+  "line": 768,
   "target": "31_Patterns--State_Machines.md",
   "terms": [
    "change_to"
@@ -191,7 +191,7 @@
  },
  "04ed39e4b8874f00": {
   "file": "26_Patterns--Surrogate.md",
-  "line": 766,
+  "line": 773,
   "target": "19_Techniques--Concurrency.md",
   "terms": [
    "change_to"
@@ -202,7 +202,7 @@
  },
  "3711bb4c386a5bfa": {
   "file": "27_Patterns--Factory.md",
-  "line": 180,
+  "line": 178,
   "target": "23_Patterns--Iterators.md",
   "terms": [
    "shape_name"
@@ -213,7 +213,7 @@
  },
  "8ef838d56d0840f4": {
   "file": "28_Patterns--Function_Objects.md",
-  "line": 166,
+  "line": 164,
   "target": "18_Techniques--Performance.md",
   "terms": [
    "Repeat"
@@ -224,7 +224,7 @@
  },
  "87e83a8b57bbc0ae": {
   "file": "29_Patterns--Changing_the_Interface.md",
-  "line": 76,
+  "line": 74,
   "target": "26_Patterns--Surrogate.md",
   "terms": [
    "ProxyAdapter"
@@ -235,7 +235,7 @@
  },
  "aa5a7959c6d4d7a1": {
   "file": "29_Patterns--Changing_the_Interface.md",
-  "line": 168,
+  "line": 166,
   "target": "20_Patterns--Rethinking_Objects.md",
   "terms": [
    "WhatIUse2",
@@ -248,7 +248,7 @@
  },
  "12ce46050bf0a689": {
   "file": "29_Patterns--Changing_the_Interface.md",
-  "line": 273,
+  "line": 271,
   "target": "18_Techniques--Performance.md",
   "terms": [
    "distance",
@@ -260,7 +260,7 @@
  },
  "82bb6893784c05ff": {
   "file": "29_Patterns--Changing_the_Interface.md",
-  "line": 278,
+  "line": 276,
   "target": "26_Patterns--Surrogate.md",
   "terms": [
    "adapter"
@@ -271,7 +271,7 @@
  },
  "1f2521c2404fcd22": {
   "file": "30_Patterns--Observer.md",
-  "line": 464,
+  "line": 472,
   "target": "42_Functional--Error_Handling.md",
   "terms": [
    "announce"
@@ -282,7 +282,7 @@
  },
  "e8e91f728192b79c": {
   "file": "30_Patterns--Observer.md",
-  "line": 1548,
+  "line": 1556,
   "target": "17_Techniques--Metaprogramming.md",
   "terms": [
    "Notifying",
@@ -294,7 +294,7 @@
  },
  "299953e2a35786a1": {
   "file": "31_Patterns--State_Machines.md",
-  "line": 233,
+  "line": 231,
   "target": "13_Techniques--Pattern_Matching.md",
   "terms": [
    "APPEARS"
@@ -305,7 +305,7 @@
  },
  "71a9cbdce79c7ed6": {
   "file": "31_Patterns--State_Machines.md",
-  "line": 242,
+  "line": 240,
   "target": "25_Patterns--Template_Method.md",
   "terms": [
    "StateMachine"
@@ -316,7 +316,7 @@
  },
  "e3c9c99b35195620": {
   "file": "31_Patterns--State_Machines.md",
-  "line": 485,
+  "line": 492,
   "target": "06_Foundations--Modules_and_Packages.md",
   "terms": [
    "state_machine.py"
@@ -327,7 +327,7 @@
  },
  "e8596ef215d9870a": {
   "file": "31_Patterns--State_Machines.md",
-  "line": 973,
+  "line": 980,
   "target": "26_Patterns--Surrogate.md",
   "terms": [
    "UnpredictablePerson",
@@ -340,7 +340,7 @@
  },
  "8b236a72729572a5": {
   "file": "31_Patterns--State_Machines.md",
-  "line": 985,
+  "line": 992,
   "target": "23_Patterns--Iterators.md",
   "terms": [
    "mouse_move_generator",
@@ -352,7 +352,7 @@
  },
  "806a7dc7e24cfdff": {
   "file": "33_Patterns--Visitor.md",
-  "line": 118,
+  "line": 116,
   "target": "27_Patterns--Factory.md",
   "terms": [
    "flower_gen",
@@ -364,7 +364,7 @@
  },
  "9c56880fd09f0864": {
   "file": "34_Patterns--Composite_and_Interpreter.md",
-  "line": 170,
+  "line": 168,
   "target": "08_Foundations--Static_Types.md",
   "terms": [
    "Directory",
@@ -376,7 +376,7 @@
  },
  "f52e1a4cb81fc818": {
   "file": "34_Patterns--Composite_and_Interpreter.md",
-  "line": 535,
+  "line": 545,
   "target": "33_Patterns--Visitor.md",
   "terms": [
    "to_infix"
@@ -387,7 +387,7 @@
  },
  "d8f5d0b90e5ce17a": {
   "file": "35_Patterns--Flyweight.md",
-  "line": 221,
+  "line": 256,
   "target": "20_Patterns--Rethinking_Objects.md",
   "terms": [
    "Tile"
