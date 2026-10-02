@@ -173,7 +173,17 @@ The pattern's traditional names are hard to hold in your head.
 `java.util.Observable` and the reactive libraries call the subject an `Observable`.
 `Observer` and `Observable` share a stem and name opposite roles,
 so every listing asks you to decode which end you are looking at.
-GoF's `notify()` and `update()` name one event from two sides.
+GoF's method names are a second obstacle.
+When the subject changes, it calls its own `notify()`,
+and `notify()` calls `update()` on each observer.
+Those two names describe one event.
+`notify()` is the subject sending a change,
+and `update()` is an observer receiving that change.
+Nothing in the two words pairs them,
+so you must remember that `update()` is the receiving end of `notify()`.
+The word "update" also fits the subject better than the observer.
+`Thermometer`'s setter updates the reading,
+while `Display.update()` only prints it.
 The rest of this chapter uses names you can tell apart at a glance:
 
 | *GoF Design Patterns* | This chapter |
