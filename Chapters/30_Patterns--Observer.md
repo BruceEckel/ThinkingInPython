@@ -95,10 +95,9 @@ class Thermometer(Subject[float]):
 
 `Subject` creates the observer list in its constructor,
 so `Thermometer`'s constructor must call [`super().__init__()`](07_Foundations--Classes.md#calling-the-base-constructor).
-If you remove that call, a `Thermometer` has no `_observers` attribute,
-and `attach()` raises an `AttributeError`.
+Without that call, a `Thermometer` has no `_observers` attribute.
 
-`Display` is an observer that prints each new reading:
+The `Display` observer prints each new reading:
 
 ```python
 # classic_thermometer_demo.py
@@ -133,16 +132,19 @@ Each observer depends on the subject's interface: to read `celsius`,
 an observer must know it is watching a `Thermometer`.
 The type checker enforces that dependency.
 `Subject[float]` has no `celsius`,
-so the observer must declare its `subject` parameter as a `Thermometer`,
-and `Observer[float]` rejects an `update()` with that narrower parameter.
+so the observer must declare its `subject` parameter as a `Thermometer`.
 To use pull, you must add either a runtime `isinstance()` check or a second type parameter on the protocol.
 
-GoF leaves a second choice open, separate from push or pull:
-who calls `notify()`.
-Here the `celsius` setter calls it, so every change broadcasts at once.
-Otherwise the client calls `notify()` after making its changes,
-so several changes can coalesce into one broadcast,
-but a client can forget to make the call.
+GoF also leaves open a second choice, independent of push or pull:
+which code calls `notify()`.
+In `Thermometer`, the `celsius` setter calls it,
+so each assignment notifies the observers immediately.
+Three assignments in a row produce three notifications.
+The alternative leaves the call to the client,
+the code that changes the subject.
+The client makes all its changes and then calls `notify()` once,
+so the observers receive one notification for the whole batch.
+The cost is that a client that forgets the call leaves every observer with stale data.
 
 ### Why `notify()` Copies the List
 
