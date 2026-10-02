@@ -244,14 +244,12 @@ class Broadcaster[T]:
 
 `Broadcaster` keeps `Subject`'s three methods under new names: GoF's `attach()`,
 `detach()`, and `notify()` become `connect()`, `disconnect()`, and `announce()`.
-Four things from the classic version disappear: the `Observer` interface,
-its `update()` method, a class per reaction, and the `subject` argument.
-A classic observer is an object, so `notify()` calls a method on it:
-`observer.update(self, arg)`.
-A responder is a callable, so `announce()` calls it directly: `responder(data)`.
-A responder that needs the changed object takes it as part of the payload
-(`announce((self, value))`),
-or is a bound method of an object that holds a reference to the broadcaster.
+The call inside the loop changes as well.
+`notify()` calls `observer.update(self, arg)`,
+so every observer is an object with an `update()` method.
+That takes a class for each reaction and an `Observer` interface to declare the method.
+`announce()` calls `responder(data)`, so a function serves as a responder.
+`announce()` passes the data alone, which is the push model.
 
 `Broadcaster` knows nothing about what it announces.
 Its type parameter `T` sets the type of each notification,
