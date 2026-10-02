@@ -294,13 +294,13 @@ reports it as the terse "instance lay-out conflict." `ty` reaches the
 same conclusion from the class header alone, before anything runs, and
 points at both bases to say which pair is at fault.
 
-That is the difference worth taking from this exercise. The runtime
-message tells you something collided. The static one tells you which
-two things collided and why, at the moment you type the header rather
-than the moment the module is first imported. The `# type: ignore` is
-in the chapter's version because this listing exists to show the
-`TypeError`, and a suppressed diagnostic is the cost of demonstrating a
-crash on purpose.
+The difference between the two messages is worth taking from this
+exercise. The runtime message tells you something collided. The static
+one tells you which two bases collided and why, at the moment you type
+the header rather than the moment the module is first imported. The
+chapter's `metaclass_layout_conflict.py` carries the `# type: ignore`
+because that listing exists to show the `TypeError`, and a suppressed
+diagnostic is the cost of demonstrating a crash on purpose.
 
 ## 7. Building a `float` subclass with `type()`
 
@@ -344,7 +344,7 @@ wants to keep its own type.
 
 `describe()` annotates `self` as `Any` because the type checker cannot
 know that this loose function ends up on a class carrying a `unit`
-attribute. That is the cost of building a class from data
+attribute. The `Any` annotation is the cost of building a class from data
 rather than from a `class` statement.
 
 ## 8. Moving `bases += (Tag,)` into `__init__()`
@@ -383,15 +383,15 @@ By the time `__init__()` runs, the class object is complete. `type`
 built it inside `__new__()`, using the bases the class header supplied
 there, and laid out its `__mro__` from them. The `bases` parameter of
 `__init__()` reports the tuple `__new__()` already used rather than
-choosing a new one, so `bases += (Tag,)` rebinds a local name and
-throws it away. Passing the longer tuple on to `type.__init__()`
+choosing a new one, so `bases += (Tag,)` rebinds a local name, and
+`Demo.__bases__` never changes. Passing the longer tuple on to `type.__init__()`
 changes nothing either, since `type.__init__()` only validates its
 arguments.
 
 `new_vs_init.py` makes the same point from the other side, with its
 `added_in_init` key. `__new__()` has to make every decision about
 *what the class is*: its name, its bases, and the namespace `type`
-builds it from. `__init__()` can only modify the object that already
+builds it from. `__init__()` can only modify the class object that already
 exists, which is why `setattr(cls, ...)` still works there.
 
 ## 9. Removing the `KNOWN_COMMANDS` check
@@ -458,7 +458,8 @@ second lands inside the `super().__init__("...")` string literal, where
 a bare newline is a `SyntaxError` before anything runs. So the
 payload's last line opens a triple-quoted string, `Y = """`. That
 string swallows the second splice, and the trailing `#` comments out
-the `")` left over after it closes. The result compiles, and the
+the `")` left over after the string closes. The spliced source
+compiles, and the
 injected `print()` runs at module level inside `exec()`, after the
 class body has finished.
 

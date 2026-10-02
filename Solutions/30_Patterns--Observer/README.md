@@ -109,7 +109,7 @@ of the first notification rather than at the `attach()` call the type
 checker reads.
 
 The second version moves the subject's type into the protocol.
-`Observer[S, T]` takes it as a parameter, and `Subject` supplies its
+`Observer[S, T]` takes the subject's type as a parameter, and `Subject` supplies its
 own type with `Self`, so `Thermometer.attach()` asks for an
 `Observer[Thermometer, float]`:
 
@@ -159,12 +159,12 @@ t.celsius = 25
 #: display: 25C
 ```
 
-`Display.update()` now declares `subject: Thermometer` and the call
-type-checks. The cost is at the other end: each observer's type names
+`Display.update()` now declares `subject: Thermometer` and
+`t.attach(Display())` type-checks. The cost is at the other end: each observer's type names
 the subject it watches, so a display written for a `Thermometer`
 cannot attach to a different `Subject[float]`. A parameter is
 contravariant, so an observer that declares the wider `Subject[float]`
-still attaches to any of them, and an observer that reads `celsius` is
+still attaches to any `Subject[float]`, and an observer that reads `celsius` is
 the one that gives up that freedom.
 
 Both versions print the same line, and neither needs `arg`. That is
@@ -451,7 +451,7 @@ a `Responder[int]` must return a `Result`.
 `succeeds()` adapts any `None`-returning callable
 by calling it and returning `Ok(None)`.
 The adapter assumes the wrapped callable cannot fail;
-if it raises an exception anyway,
+if the callable raises an exception anyway,
 that exception leaves `announce()` as it did in the chapter's version.
 Returning errors as values works when you write the responders.
 For a broadcaster that accepts arbitrary callables,
@@ -545,8 +545,8 @@ print("solved in", game.moves, "moves")
 ```
 
 `_flood()` is a plain graph search (depth-first, using a stack)
-starting from `origin`, walking to every neighbor `adjacent()` says it
-touches, as long as that neighbor is still the same color.
+starting from `origin` and walking from each cell to every neighbor
+`adjacent()` reports, as long as that neighbor is still the same color.
 `FloodGame` reuses `new_grid()` from `box_observer.py` unchanged and
 adds the `adjacent()` the exercise asks for. `select()` is the game
 move: it repaints
@@ -752,9 +752,9 @@ rather than five.
 
 Adding a third view means one more `connect()` call. `box_view.py`'s
 `draw()` is such a view, and `show(model)` connects it to a model that
-already has these two, so the window and the terminal report the same
-grid. Running that combination means `show()` takes over with
-`root.mainloop()`, so start it last.
+already has `letters()` and `tally()`, so the window and the terminal
+report the same grid. Running that combination means `show()` takes
+over with `root.mainloop()`, so call `show()` last.
 
 ## 9. Which colors a grid can reach
 
@@ -844,7 +844,7 @@ of the selections makes no difference, so a whole sequence of them is
 a count per cell, and the puzzle becomes one linear system: `M v = b`,
 over the integers mod 3. `M` records which cells each selection
 advances, `v` counts the selections, and `b` is how far each cell must
-advance to reach the target color. `system()` builds the two together,
+advance to reach the target color. `system()` builds `M` and `b` together,
 one row per cell, with `b` in the last column.
 
 `solvable()` answers whether that system has a solution, and never
@@ -946,8 +946,8 @@ print(t.celsius, t.humidity)
 descriptor to, so `celsius` and `humidity` derive different attribute
 names: `_celsius` and `_responders_celsius` for one, `_humidity` and
 `_responders_humidity` for the other. Two `Notifying` instances in one
-class therefore share no storage and no responder list, which is what
-makes the two attributes independent. `Broadcaster` keeps one list for
+class therefore share no storage and no responder list, so the two
+attributes are independent. `Broadcaster` keeps one list for
 the whole object; a descriptor keeps one per attribute.
 
 `__set__()` stores the value and then calls each responder connected
@@ -957,8 +957,8 @@ to that attribute, the work `Thermometer`'s property setter did with
 Class access is the part a validating descriptor never needs.
 `Thermometer.celsius` calls `__get__()` with `obj` set to `None`, and
 returning the descriptor there puts `connect()` within reach. The
-two `@overload` declarations tell the type checker which of the two results it
-gets: `Notifying[T]` from the class, `T` from an instance. Without
+two `@overload` declarations tell the type checker which result each
+access gets: `Notifying[T]` from the class, `T` from an instance. Without
 them the declared return type is the union, and `t.celsius * 2` fails
 to check. The overloads also check the responder against the
 attribute: `Thermometer.celsius.connect(t, readings.append)` passes

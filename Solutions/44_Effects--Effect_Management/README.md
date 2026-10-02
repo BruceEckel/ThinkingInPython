@@ -132,7 +132,7 @@ for line in captured.messages:
 #: Hello, Alice!
 ```
 
-Five signatures name the new Effect, and only two of them want to.
+Five signatures name the new Effect, and only two of them use it.
 One of the five is new rather than edited: `format_greeting()`, the
 helper that uses the `Log`. You must edit four existing signatures.
 `greet()` both uses a `Log` and accepts one, to hand down to
@@ -149,8 +149,8 @@ The cost also scales the wrong way. Adding a fourth Effect later means
 walking the same chain again, and the chain is longer in a real
 program than in this one. The alternative most codebases pick, a
 module-level logger, removes the parameter by removing the choice: the
-function no longer says it logs, and a test can no longer bind it
-differently.
+function no longer says it logs, and a test can no longer bind the
+logger differently.
 
 An Effect Management System collapses the parameter lists and the call
 sites, not the signatures. `format_greeting()` declares in its return
@@ -189,10 +189,10 @@ cause. Both read only their arguments and change nothing outside
 themselves. The two Effects are both exceptions, and the chapter
 demonstrates both conversions the table names for them: `slope()`
 already catches the `ZeroDivisionError`, and `slope_nonzero.py` shows
-the version where a restrictive type makes that value unconstructable.
-The third conversion, a `Result`, applies to both as well:
+the version where a restrictive type makes a zero `run` unconstructable.
+The third conversion, a `Result`, applies to both exceptions as well:
 `slope_result.py` returns the `ZeroDivisionError` as an `Err`, and
-`@safe` on this `slope()` does the same for the `ValueError`.
+`@safe` on `slope_catch.py`'s `slope()` does the same for the `ValueError`.
 The `ValueError` from `validate()` is the one still escaping, and
 exercise 4 moves it out of `slope()`.
 
@@ -207,8 +207,10 @@ chapter uses to show purity failing;
 reuses `withdraw()` to show referential transparency failing. The three
 conversions in [Converting Effectful to Pure](../../Chapters/44_Effects--Effect_Management.md#converting-effectful-to-pure)
 all manage the exception Effect, so none of them applies here. The
-by-hand technique for a side cause and a side effect is the other one:
-take the balance as a parameter and return the new one. The same
+by-hand technique for a side cause and a side effect comes from
+[Effects by Hand](../../Chapters/44_Effects--Effect_Management.md#effects-by-hand) instead:
+pass in what the function would otherwise read or write.
+For `withdraw()`, that means taking the balance as a parameter and returning the new one. The same
 inputs then give the same answer, and the caller
 holds the state.
 
@@ -225,7 +227,8 @@ from the temperature source, and the caller folds new readings into
 whatever state it keeps. That is what the chapter calls
 [pushing the Effects to the edges](../../Chapters/44_Effects--Effect_Management.md#a-program-can-never-be-pure).
 
-Notice one thing across all three: the classification is not a property
+Notice one thing across `withdraw()` and
+`Thermometer`: the classification is not a property
 of the language feature used. A global, an instance attribute, and a
 responder list are three storage mechanisms for one idea: something
 outside the call participates in the result.
@@ -337,8 +340,8 @@ The argument to `sum()` gains brackets. A generator expression with
 an `await` inside it is an asynchronous generator, which `sum()`
 cannot iterate: `ty` reports `no-matching-overload`, and the call
 raises a `TypeError`. The list comprehension awaits each price and
-hands `sum()` a list. The callers of `total_price_async()` then face
-the same choice, and the propagation stops only at `asyncio.run()`,
+hands `sum()` a list. The callers of `total_price_async()` then must
+become `async` in turn, and the propagation stops only at `asyncio.run()`,
 the boundary that discharges the Effect.
 
 That propagation is Effect tracking, and it is worth naming as such.
@@ -356,7 +359,7 @@ It does not **separate the interface from the implementation**.
 `await price_of_async(item)` names no capability. It says "run this
 particular coroutine," and the coroutine's body decides what awaiting
 means. Compare `Ask` in `ask_tell.py`, where `greet()` names the
-capability and stays silent about where the name comes from. `async`
+capability and stays silent about where the implementation comes from. `async`
 has no equivalent of writing a function against "something awaitable
 that yields a price" and choosing the implementation later.
 

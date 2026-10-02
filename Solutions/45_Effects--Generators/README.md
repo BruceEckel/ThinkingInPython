@@ -402,7 +402,7 @@ An annotation cannot express "`None` for the first call, `Answer`
 afterward," because a single `SendType` covers every call. Widening the
 `SendType` to `Answer | None` states the exception in the type, and
 every `yield` expression whose value the generator uses as an `Answer`
-must then handle a `None` that arrives only once. This generator only
+must then handle a `None` that arrives only once. `interview()` only
 formats what it receives, so it passes the check either way. Priming
 with `next()` sidesteps the whole question: the one call that cannot
 carry a value comes from the one function that cannot pass one.
@@ -491,14 +491,14 @@ arrived and the machine waits for a second. `amount`, `row`, and
 has no counterpart for two parts of the table-driven version: the state
 attribute and the transition lookup.
 
-The `yield` runs the opposite direction from `interview()`, and the
-signature does not say so. Both yield strings, but
+The `yield` in `machine()` runs the opposite direction from the one in
+`interview()`, and neither signature says so. Both yield strings, but
 `interview()` yields a request the driver must satisfy, while
 `machine()` yields a report the driver may ignore. The driver's event
 and the machine's report travel independently: `send(Coin(25))` answers
 no question, it delivers an event. A generator's type describes the
 traffic, not who is in charge. Both arrangements fit the same
-annotation.
+`Generator` annotation.
 
 For another state, take the table. The generator's compactness comes
 from the states forming a line, so control flow can express the
@@ -506,7 +506,7 @@ sequence. The two states here that break the line cost
 something: an `if` chain reaches `UNAVAILABLE` and `WANT_MORE`, and
 each one returns by looping back to the top, a `goto` written as a
 `while True`. Now add a state reachable from three others, the way the
-table handles `Quit` from every state. No position in the body
+table handles `Quit` from every state but `QUIESCENT`. No position in the body
 corresponds to it. The new state becomes a flag, or a check repeated at
 several `yield`s, and either one breaks the correspondence between
 position and state, the one thing that makes this version readable.

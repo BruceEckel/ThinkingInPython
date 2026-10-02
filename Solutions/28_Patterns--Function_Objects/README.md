@@ -61,7 +61,7 @@ callable. Undo does, because a command now answers two requests,
 
 `Deposit` also has to remember what it did, here the account and the
 amount, so it can reverse that action later: a fresh call to the same
-function cannot know what a previous call changed. It is a record,
+function cannot know what a previous call changed. `Deposit` is a record,
 like `Repeat`, because neither field changes after construction. The
 record is frozen and the dictionary it refers to is not, so
 `__call__()` and `undo()` can still update the balance.
@@ -170,12 +170,12 @@ solve(g, 0.0, 2.0, [bisection])
 ```
 
 `None` says that a handler failed and cannot say why, so a handler
-that reports its reason needs a failure value with room for one.
+that reports its reason needs a failure value with room for the reason.
 `Failed` is that value, a record with one field, and each finder now
 returns `float | Failed`. A finder has more than one way to fail:
 `bisection()` gives up at once when the interval holds no sign change,
 and it can also run out of iterations, so each failing `return`
-states its own reason. `solve()` tells the two results apart
+states its own reason. `solve()` tells a root from a `Failed`
 with `match`. `case Failed(reason)` prints the reason and lets the
 loop continue, and any other value is the root.
 
@@ -291,7 +291,7 @@ to `newton(f, a, b)` keeps working. The closure and the `partial` then
 reach the same configured strategy from two directions. `newton_within()`
 writes a new function whose body supplies the argument.
 `partial(newton, tolerance=0.6)` stores the argument and supplies it at
-the call. Both produce something matching `RootFinder`, so `solve()`
+the call. Both produce a finder matching `RootFinder`, so `solve()`
 accepts either with no change.
 
 The two coarse finders print the same wrong-looking answer, `1.500000`,
@@ -554,8 +554,8 @@ started from, which no name refers to and no event is an instance of.
 
 The import stops at the first `@handler`, on `Announce`.
 `handler()` reads the annotation on `event`, which is `Deposit`, the
-class `dataclass()` returned, and does not find it in `EVENTS`. It
-raises `TypeError: Announce: not an @event`, although `Deposit` went
+class `dataclass()` returned, and does not find it in `EVENTS`.
+`handler()` then raises `TypeError: Announce: not an @event`, although `Deposit` went
 through `@event` a few lines earlier. If something else created
 the handlers, `publish()` would refuse every event for the same
 reason, since `type(event)` is the returned class too.

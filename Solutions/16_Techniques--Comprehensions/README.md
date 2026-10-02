@@ -115,7 +115,7 @@ string transformation, not a truncation: `"J"` becomes `"J"` and
 empty string, so the concatenation adds nothing to the capital. `"J"`
 and `"John"` are distinct strings, so the set keeps both.
 
-The filter exists to drop the initial `"J"` as noise. Removing it
+The filter exists to drop the initial `"J"` as noise. Removing the filter
 shows what the set is doing on its own: it collapses only exact
 duplicates of the normalized form, and it has no notion that `"J"`
 might be an abbreviation of `"John"`.
@@ -155,8 +155,8 @@ the three strings a caller can assert on, write to a file, or join.
 
 Which shape is right depends on whether you want the list. Here the
 comprehension is correct, because `lines` is the point and the printing
-is incidental. The `for` loop at the end is the right shape for the
-original code, where printing is the purpose. The rule from the
+is incidental. The `for` loop at the end is the right shape for
+`comprehension_side_effects.py`, where printing is the purpose. The rule from the
 chapter decides it: use a comprehension when you want the collection it
 produces, and a loop when you want the side effect.
 
@@ -180,7 +180,7 @@ print({**d for d in dicts})
 
 `**` merges the dictionaries in iteration order. When the same key
 appears more than once, the value from the *later* dictionary
-overwrites the earlier one. The key `"a"` appears in the first, third,
+overwrites the earlier value. The key `"a"` appears in the first, third,
 and fourth dictionaries (`1`, then `3`, then `5`), so the final value
 is `5`, the last one written. The result orders keys by first
 insertion, which is why `"a"` still prints first even though its value

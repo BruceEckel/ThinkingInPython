@@ -298,7 +298,7 @@ so each pair of increments collapses into one. The semaphore reports
 no error, because `release()` adds one to the count whether or not an
 `acquire()` came first.
 
-That silence is the difference between the two objects. `asyncio.Lock`
+That silence is the difference between a semaphore and a lock. `asyncio.Lock`
 refuses a release it never granted, raising `RuntimeError: Lock is not
 acquired.` A semaphore does not track what it granted, so the same
 mistake silently admits a second holder and reintroduces the race the
@@ -549,7 +549,8 @@ returns `"E"`, and has finished by the time the group starts
 cancelling. `f` still sleeps for `0.3`, so cancellation reaches it
 during that sleep and its task ends cancelled.
 
-That is the line between what a `TaskGroup` can and cannot undo. A
+The difference between `e` and `f` is the line between what a
+`TaskGroup` can and cannot undo. A
 `TaskGroup` cancels what is still running, which is why the original
 `PAIRS` has both `e` and `f` cancelled. It cannot reach into a task
 that already returned, and it cannot unprint `e: fetched` or undo
@@ -559,9 +560,9 @@ that no task had an effect before the failure.
 
 The distinction matters when the tasks do more than sleep. A group of
 six writes where two fail leaves the successful writes in place, so
-recovery is your problem, not the `TaskGroup`'s. That is what
+recovery is your problem, not the `TaskGroup`'s.
 [Context Managers](../../Chapters/15_Techniques--Context_Managers.md) and the Effect chapters
-address from different directions: pairing an action with the cleanup
+address that recovery from different directions: pairing an action with the cleanup
 that undoes it, so "already finished" still means "still reversible."
 
 ## 10. `gather()` without `return_exceptions`
@@ -612,7 +613,7 @@ tick, but the `gather()` future has already resolved by then, so
 it. The call loses the four results it was collecting, including `a`
 and `b`, which had already succeeded.
 
-The other tasks are the interesting part. `gather()` does not cancel
+The unfinished tasks, `e` and `f`, are the interesting part. `gather()` does not cancel
 them when the exception propagates, unlike a `TaskGroup`, so `e` and
 `f` are still sleeping when `main()` returns. `asyncio.run()` then
 cancels whatever tasks remain as it shuts the loop down, which is why
@@ -727,7 +728,7 @@ print(f"threads run in parallel: {t_seq > t_thr * target}")
 
 The assertion passes because correctness never depends on the
 executor. `cpu_price()` reads its argument and returns a number,
-touching nothing shared, so five of them produce the same five results
+touching nothing shared, so five calls produce the same five results
 whether they run one after another, in five threads, or in five
 subinterpreters. Swapping the executor changes when the work runs, not
 what it computes.
@@ -871,7 +872,7 @@ twenty milliseconds rather than waiting out the half-second timeout.
 Follow who waits for whom. The first task takes `lock_a`, sleeps, then
 takes `lock_b`, which nobody holds. Meanwhile the second task reaches
 `async with lock_a` and suspends, because the first task has it. That
-is a wait, but a wait on a task that is waiting on nothing the second
+suspension is a wait, but a wait on a task that is waiting on nothing the second
 task holds. The first task finishes and releases both locks, and the
 second task then takes each lock with no other task holding it.
 
@@ -926,13 +927,13 @@ cooperates with an event loop, and it defines no `__await__`, so
 submits the call to the executor the same way `submit()` does, but
 returns an `asyncio.Future` bound to the running loop, an awaitable
 that resolves when the executor's own future completes. The task
-suspends on it like any other `await`, and the loop keeps running the
+suspends on the `asyncio.Future` like any other `await`, and the loop keeps running the
 other two tasks in the meantime.
 
 The wrapper around the `TypeError` is the `TaskGroup` keeping its
 contract. `process_price()` fails as a task inside the group, so the
-group cancels its two siblings, waits for them to end, and re-raises
+group cancels that task's two siblings, waits for them to end, and re-raises
 the failure wrapped in an `ExceptionGroup`, the same packaging
 `task_group.py` catches with `except*`. `main()` has no
-`except*`, so the group propagates out of `asyncio.run()` and prints
+`except*`, so the `ExceptionGroup` propagates out of `asyncio.run()` and prints
 as the grouped traceback above.

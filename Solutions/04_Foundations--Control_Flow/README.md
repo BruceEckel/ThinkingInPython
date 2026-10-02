@@ -123,8 +123,8 @@ passes it by. The `finally` block runs anyway: `finally` runs
 whatever kind of exception is in flight. The `TypeError` keeps
 propagating up past `divide_and_report()`, so this listing wraps the
 call in its own `try`/`except TypeError` to show the exception
-escaping. An interactive session or an outer caller sees the same
-thing. The `else` clause never runs here: it belongs to the case
+escaping. An interactive session or an outer caller sees the
+`TypeError` escape the same way. The `else` clause never runs here: it belongs to the case
 where the `try` block finishes cleanly.
 
 ## 5. A three-item `case` in `pattern_matching.py`
@@ -158,7 +158,7 @@ command`. A list pattern matches on length as well as content, so
 split matches neither of the original patterns and reaches `case _`.
 The longer pattern gives a three-item list a `case` of its own. Order
 matters only between patterns that could both match the same value.
-These two cannot, so either arrangement works here.
+The two `go` patterns cannot, so either arrangement works here.
 
 ## 6. The comprehension written as a loop
 
@@ -181,8 +181,8 @@ contents of the list. The loop says how to build it, and the reader
 runs the loop in their head to learn the contents. The loop version
 wins when the body
 grows past one condition and one expression, since a comprehension
-with two filters and a nested loop is harder to read than the code it
-replaced.
+with two filters and a nested loop is harder to read than the nested `for`
+loops it replaces.
 
 ## 7. Chaining from an exception you build yourself
 
@@ -271,7 +271,7 @@ path.unlink()
 
 `read_text()` opens the file, reads all of it, and closes it, so the
 one-liner is shorter and has no block. For a small file read in one
-go, it is the better choice, and the chapter names `read_text()` and
+go, the one-liner is the better choice, and the chapter names `read_text()` and
 `write_text()` for that case.
 
 The `with` form gives you control over what happens between the open

@@ -225,8 +225,8 @@ The chapter's factory function could only advise against that call.
 The guarantee still leaks. `_replace()` builds the new tuple through
 `tuple.__new__()` rather than through `cls.__new__()`, so the check
 never runs. `copy.replace()` calls `_replace()` and inherits the hole.
-A validated `Stars` therefore produces an unvalidated one, and that is
-worse than no check: the type now looks like it guarantees its values.
+A validated `Stars` therefore produces an unvalidated one.
+That leak is worse than no check: the type now looks like it guarantees its values.
 
 A frozen data class has no equivalent hole because its replacement
 goes through the constructor. `copy.replace()` calls the constructor,
@@ -351,8 +351,8 @@ expect(TypeFailure, copy.replace, s, number=99)
 
 `copy.replace()` looks for `__replace__()` and calls it with the
 keyword changes. This implementation recovers the constructor
-arguments (`{"number": self.number}`), overrides the named ones with
-`|`, and rebuilds through `type(self)(...)`. The validation runs
+arguments (`{"number": self.number}`), uses `|` to override the
+arguments the changes name, and rebuilds through `type(self)(...)`. The validation runs
 because the rebuild goes through `__init__()`. A frozen data class
 stays validated across a replacement for the same reason. Any
 `__replace__()` that restores the state directly, the way
@@ -429,7 +429,7 @@ an instance. `Stars.built += 1` assigns to the class instead, so it
 works. `Wrong` writes the same intent a different way, and fails:
 `self.built += 1` reads the class attribute, adds one, and then tries
 to store the result on the instance. That store is the assignment
-`frozen=True` refuses. The type checker rejects the line before it runs,
+`frozen=True` refuses. The type checker rejects the line before the program runs,
 reporting `built` as read-only on a frozen instance, so the listing
 carries a `# type: ignore` to demonstrate the runtime failure.
 
@@ -552,8 +552,8 @@ The type test runs first. Comparing `"five"` with `1` raises a
 `TypeFailure`.
 
 The type checker rejects `5.5` and `"five"` as arguments before the program runs,
-and the `# type: ignore` silences it so the listing can show what the
+and the `# type: ignore` silences the type checker so the listing can show what the
 constructor does with a value the type checker did not see. The type checker
 accepts `Stars(True)`: a `bool` is an `int` to it for
 the same subclass reason, so the runtime test is the one check that
-rejects it.
+rejects `True`.

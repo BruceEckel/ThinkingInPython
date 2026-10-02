@@ -1,7 +1,7 @@
 # State Machines: Solutions
 
 Several exercises below reuse the book's generic table-driven engine,
-so it appears once here, in its own file that the others import:
+so it appears once here, in its own file that those exercises import:
 
 ```python
 # table_machine.py
@@ -233,12 +233,12 @@ print(" ".join(history))
 #: locked locked unlocked locked unlocked unlocked locked
 ```
 
-This is the classic turnstile: `push` while locked does nothing (the
+The machine is the classic turnstile: `push` while locked does nothing (the
 `"*"` fallback), `coin` unlocks it, and `push` while unlocked locks it
 again. Each state subclass carries its own transition table as a class
 attribute. `next_state()` looks the word up in that table with
 `.get(word, ...["*"])`, so `Controller` never branches on the current
-state or word. It asks the current state object what comes next, the
+state or word. `Controller` asks the current state object what comes next, the
 same delegation `state_machine.py`'s `run_all()` performs when it
 calls `next()`. Reading the words
 from a file, one per line, takes one line of code:
@@ -284,9 +284,9 @@ print(" ".join(history))
 ```
 
 Both versions produce the same history. The per-state design (exercise
-3) puts each state's rules with that state, which reads well when a
+3) puts each state's rules with that state, and reads well when a
 state does more than look a word up. The single-table design puts
-every rule for the whole machine in one dictionary, which is easier to
+every rule for the whole machine in one dictionary, and is easier to
 audit and edit as a unit. The chapter's own
 [table-driven state machine](../../Chapters/31_Patterns--State_Machines.md#table-driven-state-machine)
 makes the same trade-off over the per-state `mouse_trap_states.py`.
@@ -352,7 +352,7 @@ here made by `list()`, picks a legal successor and remembers it for
 the following call. `NEXT_ACTIONS` constrains every choice, so every
 sequence this generator produces is legal by construction.
 `mouse_trap_states.py` accepts any move in any state and lets each
-`case _` absorb the ones that make no sense there, so the generator's
+`case _` absorb the moves that make no sense there, so the generator's
 table is the stricter of the two.
 
 ## 6. A washing machine, table-driven

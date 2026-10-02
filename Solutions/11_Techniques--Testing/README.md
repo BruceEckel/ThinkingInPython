@@ -290,8 +290,8 @@ variable, applied to a different kind of dependency. A patched test
 depends on the *name* of the thing it replaces, in the module where that
 name lives. An injected test depends only on the shape of what it
 passes. Renaming the import, moving the call into a helper module, or
-importing `urlopen` a different way breaks the patched test while the
-code still works.
+importing `urlopen` a different way breaks the patched test while
+`current_temp()` still works.
 
 `monkeypatch` earns its place where you cannot change the code:
 someone else's library, or a function you are not ready to refactor.
@@ -354,4 +354,4 @@ Its signature is `(message: str) -> None`,
 so the type checker checks it against `Callable[[str], None]`,
 and a change to the real signature shows up as a type error.
 A `Mock` accepts any call,
-which is the gap the chapter closes with `create_autospec()`.
+and the chapter closes that gap with `create_autospec()`.

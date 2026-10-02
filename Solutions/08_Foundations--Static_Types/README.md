@@ -38,7 +38,7 @@ print(render(Triangle()))
 `Triangle` never mentions `Drawable`, the same as `Circle` and
 `Square`. It qualifies because it has a `draw() -> str` method, and
 `Drawable` requires no more than that. Neither `Drawable` nor
-`render()` needs to change to accept it.
+`render()` needs to change to accept a `Triangle`.
 
 ## 2. Removing `# type: ignore` from `area.py`
 
@@ -72,8 +72,8 @@ info: Function defined here
 The type checker pinpoints the mistake the chapter describes: `"3"`
 is a `str`, not an `int`, so it violates `width: int`. The call still
 runs without error at runtime, because `"3" * 4` is valid string
-repetition. In the book, the `# type: ignore` comment on this line
-lets a deliberately wrong example pass the book's build. Removing
+repetition. In the book, the `# type: ignore` comment on the
+`area("3", 4)` line lets a deliberately wrong example pass the book's build. Removing
 the comment restores the error.
 
 ## 3. A second generic function, `last()`
@@ -142,7 +142,7 @@ print(t.bump().bump().report())
 checker resolves to the class on which the call is made. On
 a `LoudTally`, `Self` means `LoudTally`, so `t.bump().bump()`
 type-checks as a `LoudTally` and `.report()` is available on the
-result. That call resolves to `LoudTally.report()`, because Python
+result. The `.report()` call resolves to `LoudTally.report()`, because Python
 starts method lookup at the object's own class. If `bump()`'s return
 annotation is the fixed type `Tally` instead of `Self`, the type
 checker rejects `.report()` on the chained result, since `Tally` has
@@ -183,7 +183,7 @@ parameter does not fail the check. It switches the check off for
 every expression built on it. `words.top().upper()` passes either
 way. Without the default, so does `words.top().no_such_method()`.
 A default turns a bare annotation that checks nothing into one that
-checks, and that is the reason to give one to a class whose
+checks, and that is the reason to give a default to a class whose
 parameter is usually the same type.
 
 ## 6. A `Literal` that does not admit `"purple"`

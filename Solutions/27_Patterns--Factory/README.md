@@ -104,9 +104,9 @@ create_shape("Triangle").draw()
 #: Triangle.draw
 ```
 
-Both versions add the `_Triangle` class. Beyond that, the first
-edits one function, `Shape.factory()`, where the new `case` sits inside
-logic you must re-read. The second adds a nested `Factory` to
+Both versions add the `_Triangle` class. Beyond that,
+`shape_factory_method.py` edits one function, `Shape.factory()`, where the new `case` sits inside
+logic you must re-read. `shape_factory_objects.py` adds a nested `Factory` to
 `_Triangle` and one data line to `FACTORIES`. That is the trade-off the
 chapter draws between the two versions: more ceremony up front (a
 nested `Factory` per shape) in exchange for a dispatcher that changes
@@ -569,7 +569,7 @@ the fields that break are the mutable ones, and only when
 something mutates them in place. Assignment to a field is always safe.
 `append()`, `[k] = v`, and `.update()` are not.
 
-A test through `parts` would have caught it either way:
+A test through `parts` would have caught the bug as well:
 
 ```python
 # test_prototype_parts.py
@@ -599,7 +599,8 @@ def test_nested_dict_is_copied() -> None:
 
 The second assertion is the one worth writing. Checking that the
 prototype survived is good. A user of the registry depends on the next
-spawn being correct, and that assertion fails under `copy.copy()`.
+spawn being correct, and the second assertion tests that spawn,
+which `copy.copy()` corrupts.
 
 ## 8. What the `eval()` dispatcher accepts
 
@@ -755,19 +756,19 @@ for shape in [Shape.factory(s) for s in shape_name(6)]:
 `Shape.__subclasses__()` lists `_Circle` and `_Square` and stops. The
 original `shape_name()` draws only from that list, so no seed
 produces `"Oval"`, and the new `case` in `factory()` is unreachable
-from the demo even though it works when called directly.
+from the demo even though `Shape.factory("Oval")` works when called directly.
 
 `all_subclasses()` yields each direct subclass and then, before moving
 to the next one, recurses into that subclass: depth first, so `Oval`
 comes out between `Circle` and `Square`. The generic `T` keeps the
-result typed as `type[Shape]` when the argument is `Shape`, which is
-what `names()` and `factory()` need. `random.choice()` takes a
+yielded classes typed as `type[Shape]` when the argument is `Shape`,
+and `names()` requires that type. `random.choice()` takes a
 sequence, so `shape_name()` materializes the generator with `list()`.
 With the same seed the sequence differs from the chapter's, because
 `choice()` now picks from three classes instead of two.
 
 `_Oval` overrides only `draw()`, so an `Oval` still erases as a
-`Circle`. That is also why `Circle` stays in the list: recursion adds
+`Circle`. `Circle` stays in the list as well, because recursion adds
 the deeper classes without removing the intermediate ones, and a
 factory that should build only leaf classes needs a further filter,
 `not cls.__subclasses__()`.
@@ -857,7 +858,7 @@ reports a fitting class that is not decorated. `issubclass()`
 against a Protocol also works only when every member is a method;
 a Protocol with a data attribute raises a `TypeError` from
 `issubclass()`, and `isinstance()` on an instance is the fallback.
-The check also sees one namespace at a time, so a plugin module
+`unregistered()` also sees one namespace at a time, so a plugin module
 must run it over its own `globals()`.
 
 ## 11. Prototypes registered by decoration

@@ -57,7 +57,7 @@ print(scripted.printed)
 #: ['Hello, Bob!']
 ```
 
-Supplying the real one is the same call with `Terminal()` in place of
+Supplying a real `Console` is the same call with `Terminal()` in place of
 `Scripted(...)`, and the session reads:
 
 ```text
@@ -72,7 +72,7 @@ either way, and neither binding requires a change to
 `ask_and_greet()`, which is character-for-character the same function
 under both.
 
-It could not have required one. `ask_and_greet()` names a capability
+No binding could have required a change. `ask_and_greet()` names a capability
 in its return type and calls two methods on whatever answers.
 `Terminal`, `Scripted`, and any third implementation are
 interchangeable because none of them appears in the Effect. Adding
@@ -143,15 +143,15 @@ run(supply(Console())(greet_all)(["Alice", "Bob"]))
 The body never changes. `greet_all()` was already doing the right
 thing. Its signature was describing a different function.
 
-What its callers must now declare is the point of the exercise. Before,
+What `greet_all()`'s callers must now declare is the point of the exercise. Before,
 `greet_all()` claimed to need nothing, so a caller could run it with no
 environment: `run(greet_all(names))`. Now every caller has two
 options, the same two `greet()`'s callers have. Supply a `Console`,
 ending the requirement, or declare `Need[Console]` in its own return
 type and pass the requirement further up. No third option exists,
 which is what makes the dependency visible. The requirement appears in
-the signature of every function between the one that uses it and the
-one that supplies it, and the type checker refuses to let any of them
+the signature of every function between the one that uses the `Console`
+and the one that supplies it, and the type checker refuses to let any of them
 stay silent.
 
 ## 3. Catching an error that is already handled
@@ -210,7 +210,7 @@ info[revealed-type]: Revealed type
 ```
 
 `all_handled()` is `Success[str]`, which expands to
-`Generator[Never, Any, str]`. The revealed type and that one both
+`Generator[Never, Any, str]`. The revealed type and `all_handled()`'s type both
 carry `Never` in the yield channel, so both agree that nothing can
 fail from here on. They differ in the return channel: `str` for
 `all_handled()`, `str | ValueError` for the wrapped `one_unhandled()`.
@@ -224,7 +224,7 @@ function.
 `one_unhandled()` catches only the `KeyError` and consumes that one.
 The `ValueError` stays declared, as `Try[ValueError, str]` says, so it
 is still in the yield channel when `catch(ValueError)` wraps
-`one_unhandled()`. `catch()` does not delete an error. It moves it
+`one_unhandled()`. `catch()` does not delete an error. It moves the error
 from the yield channel to the return channel, as a value. So the
 `ValueError` leaves the failure channel and reappears beside the
 `str`, and a caller needing a bare `str` has one case left to handle.
@@ -377,10 +377,10 @@ The test function body needs no change because it never mentions a
 material or a nailer. It receives two objects and an expectation,
 builds an environment from them with `supply()`, and asks whether the
 answer matches. The `parametrize` table decides which two objects
-those are, and adding a row adds a case without touching the code that
+those are, and adding a row adds a case without touching the function body that
 runs it.
 
-That separation is the same one running through the whole chapter, seen
+That split between the table and the body is the same one running through the whole chapter, seen
 from the testing side. `holds()` declares two requirements and never
 names an instance, so every combination of instances is a valid
 environment for it. The parametrize table is a list of environments,
@@ -445,16 +445,17 @@ run(defaults(stamped)("Bob"))  # type: ignore
 ```
 
 `default()` never names `Console` in its body. It reads `ability.t`,
-the class the request carries, and calls it, so it answers a request
-by constructing the class asked for. That is the other kind of
+the class the request carries, and calls that class, so `default()`
+answers a request by constructing the class asked for. That is the other kind of
 default: `default_console.py` supplies one prepared instance, and
 `default()` builds whatever the request names, on demand.
 
 At runtime the handler answered three requests across the two calls,
 two for `Console` and one for `Clock`, even though `default()`
 annotates its parameter `Need[Console]`. The type checker believes the handler
-answers only `Need[Console]`, which is why the second `run()` needs a
-`# type: ignore` and otherwise reports a leftover `Need[Clock]`.
+answers only `Need[Console]`, so the second `run()` needs a
+`# type: ignore`. Without that pragma, the type checker reports a
+leftover `Need[Clock]`.
 
 `handle()`'s `t = get_origin(t) or t` is the evidence. `handle()`
 reads the annotation, reduces `Need[Console]` to its origin, `Need`,
@@ -466,8 +467,8 @@ subtracts only `Need[Console]` from the requirements.
 Neither view is wrong about what it describes. `isinstance()` cannot
 test a type argument: `Need[Clock]` and `Need[Console]` are the same
 runtime class, so no runtime check tells the two apart. The annotation
-is the only place the distinction exists, and `handle()` uses it for
-matching but cannot enforce it. The gap is real. A handler like
+is the only place the distinction exists, and `handle()` uses the annotation
+for matching but cannot enforce the distinction. The gap is real. A handler like
 `default()` genuinely handles more than its type says, and one that
 assumes `ability.t` is a `Console` receives a `Clock` with
 nothing to stop it.
@@ -483,7 +484,7 @@ nothing to stop it.
 > Explain what each one catches,
 > and why the type checker catches assigning a dropped request but not discarding one.
 
-Removing it from `greet(name)` in `greet_logged()`:
+Removing the `yield from` in front of `greet(name)` in `greet_logged()`:
 
 ```python
 def greet_logged(
@@ -505,7 +506,7 @@ No greeting prints. `greet(name)` calls a generator function, so
 it builds an Effect and returns it. Nothing then drives that Effect,
 so its body never runs and never makes the `Need[Console]` request.
 The log entries still appear because the deletion touches only the
-greeting half of the function. That makes the failure quieter still:
+greeting half of the function. The surviving entries make the failure quieter still:
 the program looks like it worked and produced most of its output.
 
 No tool objects because the code breaks no rule. Building a value and
@@ -515,7 +516,7 @@ type still holds, since a declaration says what the function may
 request, not what it must. Those two deleted words are the chapter's
 own caveat about the limits of the guarantee.
 
-Removing it from `need(Console)` in `greet()` draws two diagnostics:
+Removing the `yield from` in front of `need(Console)` in `greet()` draws two diagnostics:
 
 ```python
 def greet(name: str) -> Depend[Need[Console], None]:
@@ -635,10 +636,11 @@ one of type `Effect[...] -> Effect[...]`. Retrying means running the
 same work more than once, and an Effect cannot supply the second run:
 by the time the first attempt fails, that attempt has already run the
 generator to its end, leaving nothing to resume. `retry()` needs to
-build a fresh Effect per attempt, and only the function can do that.
+build a fresh Effect per attempt, and only the function that builds
+the Effect can do that.
 So `retry()` decorates the function, calls it once per attempt, and
-hands back a function that takes the same arguments. The Effect that
-function builds has a wider type: `retry()` adds the clock it sleeps
+hands back a function that takes the same arguments. The Effect the
+returned function builds has a wider type: `retry()` adds the clock it sleeps
 on and replaces the error with a `RetryError`.
 
 The same reasoning explains `repeat()` and `memoize()`. It also
@@ -706,7 +708,7 @@ refuses to start an event loop inside a running one, so calling
 `run()` from `main()` fails. `run_async()` is the same driver in
 coroutine form, so the loop already running can await it.
 
-The type checker accepts both because both are correctly typed. `run()` takes an
+The type checker accepts both calls because both are correctly typed. `run()` takes an
 Effect and returns its result. `run_async()` takes an Effect and returns
 an awaitable of its result. `report_all(["a"])` satisfies either
 signature, and nothing in the type system records that this call site
@@ -809,9 +811,9 @@ error[invalid-yield]: Yield expression type does not match annotation
 
 The error appears on line 29, the `yield from` that introduces the
 undeclared failure, not on the signature and not at the call site. That
-is the useful place for it. The diagnostic names both the failure that
-escaped and the delegation it escaped through, so the fix is either to
-declare it or to catch it, right there.
+line is the useful place for the diagnostic. The diagnostic names both
+the failure that escaped and the delegation it escaped through, so the
+fix is either to declare the failure or to catch it, right there.
 
 ## 11. Making the ambiguity a type error
 
@@ -829,7 +831,8 @@ Three implementations have six orderings, and the prediction is short.
 `supply()` scans its arguments and takes the first that satisfies the
 request, so whichever implementation comes first answers it. Two of
 the six orderings put `Terminal` first and send the greeting to the
-screen, and the remaining four split evenly between the two recorders.
+screen, and the remaining four split evenly between `Capture` and the
+third implementation.
 No ordering produces an error, and no ordering produces a warning.
 
 The fix is to stop letting one structural check match three objects:
@@ -879,8 +882,8 @@ print(capture.messages)
 The fix renames `Capture.print()` to `record()`, gives each method its
 own `Protocol`, `Screen` and `Recorder`, and splits `greet()` into one
 Effect per `Protocol`. The two `Protocol`s no longer overlap, so
-neither implementation satisfies both, and each Effect names the one
-it needs.
+neither implementation satisfies both, and each Effect names the
+`Protocol` it needs.
 
 That change turns the coin flip into a diagnostic. Add one
 more line to the end of the listing, handing `to_log` the object that

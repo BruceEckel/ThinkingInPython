@@ -122,14 +122,14 @@ that contains no `yield` and whose body is more than a single `return` statement
 That rule has false positives, since a pure local computation above the `return` is harmless,
 but the shape it looks for is the shape a leak takes.
 
-A type checker cannot do this because purity is not a type.
+A type checker cannot catch that leak because purity is not a type.
 `print()` is a call returning `None`, legal in any function,
 and Python's type system says what values a function accepts and produces,
 not what its body touches on the way.
 The annotation `Success[int]` describes the returned object,
-and `success(n * 2)` genuinely produces one, so nothing is inconsistent.
+and `success(n * 2)` genuinely produces a `Success[int]`, so nothing is inconsistent.
 A language that tracks Effects puts the side effect in the signature.
-These two chapters simulate that by hand,
+These two chapters simulate that tracking by hand,
 so the guarantee holds only for Effects that go through `yield`.
 
 The error side has the same hole:
@@ -358,8 +358,8 @@ With every source shortened, hour 20 has no supplier, and the `Blackout`
 surfaces out of `run()`, not out of the Effect.
 `catch(Blackout)` around `run_load()` does not intercept it because `catch()`
 watches the error channel, and this exception never enters that channel.
-`choose()`, the handler, raises the `Blackout`, and a handler runs inside the
-driver while it answers a request.
+`choose()`, the handler, raises the `Blackout`, and a handler answers each
+request from inside the driver.
 No `yield` sits between the `raise` and `run()`'s own stack frame,
 so the exception unwinds the driver in the ordinary Python way,
 past the suspended Effect rather than through it.
@@ -424,7 +424,7 @@ solar before the battery, whether the battery reports itself unavailable once
 exhausted, whether the hour `controller()` asks about is the hour `run_load()`
 draws power for. The scripted handler ignores `request.hour` entirely, and that
 omission is the source of both its convenience and its blindness.
-It tests the consumer of the Ability while saying nothing about the producer.
+The scripted test checks the consumer of the Ability while saying nothing about the producer.
 `controller()` needs its own test, and that test can be an ordinary one:
 `controller()` builds an ordinary function from an `Outlet` to a `Source`, and
 no Effect takes part.
@@ -599,10 +599,10 @@ Four edits, and the type checker names one of them.
 3. One new line in `research()`, the `yield from within_limit(article)`.
 4. `research()`'s error parameter, widened to include `TooLong`.
 
-Adding line 3 without line 4 is the one `ty` reports, at the new line rather than
-at the signature: `expression of type 'TooLong', expected 'Need[Feed] |
+Adding line 3 without line 4 is the one `ty` reports, as an `invalid-yield` at the
+new line rather than at the signature: `expression of type 'TooLong', expected 'Need[Feed] |
 Need[Encyclopedia] | Unavailable | NotInteresting | NoArticle'`.
-Fixing that then breaks every caller that names the old set. `report()` stops at
+Widening the signature then breaks every caller that names the old set. `report()` stops at
 its own `yield from` with the same `invalid-yield`, now carrying `TooLong` in the
 type it did not expect. Once you widen `catch()` and the `found:` annotation to
 match, `assert_never()` reports `TooLong` as an unhandled branch. Every one of
@@ -755,7 +755,7 @@ that the caller must unwrap. `Unavailable` is the failure worth retrying: a
 feed that is offline now may be online in a moment, so another attempt can
 succeed.
 
-Distinguishing them needs something the library does not offer:
+Distinguishing `Unavailable` from `NotInteresting` needs something the library does not offer:
 a retry that selects on the error type.
 `retry()` here applies to the whole error channel, treating every declared
 failure as transient, because its schedule decides *when* to try again and
@@ -763,7 +763,7 @@ nothing decides *whether* to. ZIO provides the missing piece as `retryWhile`, a
 retry taking a predicate on the error. Without it, selective behavior means
 narrowing the channel first: `catch()` the failures that retrying cannot help,
 so they leave the error channel and become values, then apply `retry()` to what
-remains. That is more machinery than a predicate, and it changes the result
+remains. That narrowing takes more machinery than a predicate, and it changes the result
 type. Both are the cost of a missing operator.
 
 ## 8. Processes instead of threads
@@ -849,7 +849,7 @@ nothing, and none accepts one that still holds a `Need`. The forked work leaves
 the driver: it runs in a worker with no access to the handler stack that would
 answer a request. So you must remove the requirement before the fork: supply it
 first and fork the bound function. The type system enforces a rule about where a
-handler can answer a request, and that is the same guarantee running through
+handler can answer a request, and that rule is the same guarantee running through
 both chapters, applied to a boundary between threads or processes.
 
 ## 9. A scripted wallet
@@ -937,7 +937,7 @@ assertion catches that by checking that the iterator has nothing left.
 assertions together say that `spree()` tries every price and writes only the
 affordable ones.
 
-What this test cannot check is whether the two handlers agree. The `Cell`
+What this test cannot check is whether the `Get` and `Put` handlers agree. The `Cell`
 version has one piece of state, so the next `Get` returns whatever the last
 `Put` wrote. Here the test scripts the balances independently of the writes, so
 nothing in it checks that a balance read is the amount the last `Put` wrote.
@@ -1177,8 +1177,8 @@ this file. It changes what the checker reports about callers. With the annotatio
 no type, `roll("a", 6)` type-checks, and the mistake surfaces at runtime inside
 `random.randint()`, which the handler calls from the driver: the traceback
 names `real()` and the library, and neither `roll()` nor `game()`. The accessor
-is the only place where the type checker checks a caller's arguments, since after that they
-are fields on a request that only the handler reads.
+is the only place where the type checker checks a caller's arguments, since past the accessor
+the arguments are fields on a request that only the handler reads.
 
 Deleting the annotation on the handler's parameter fails much louder, and
 earlier:
@@ -1336,7 +1336,7 @@ one requires a comment or a docstring to say what depends on what.
 
 The two factories in `casts.py` already have the same signature. The exercise
 is to name it and see what naming it gains. Here is the chapter's cast, with
-each actor trimmed to one method so the whole thing fits in one listing:
+each actor trimmed to one method so the whole cast fits in one listing:
 
 ```python
 # exercise_14.py
@@ -1412,7 +1412,8 @@ type: saying so takes no abstract factory class.
 
 What it does not recover is the guarantee that makes the pattern worth naming.
 `Cast` says "give me a narrator and I will stage something." It says nothing
-about the actors inside agreeing with each other. The last line is the proof,
+about the actors inside agreeing with each other.
+The listing's last call, `play(Loud(), Kitty(), Weapon())`, is the proof,
 and the chapter runs the same line in `two_games.py`: `play()` accepts a
 `Kitty` facing a `Weapon`, both satisfy their `Protocol`s, and nothing
 objects. An *Abstract Factory* in a language with a family type expresses "these
@@ -1437,6 +1438,6 @@ caller.
 
 That distribution is the argument for the factory. The functions that name a
 whole cast absorb the change, and the code that only stages a scene does not
-change. It is also why the chapter uses a factory function rather than more
+change. The same distribution is why the chapter uses a factory function rather than more
 `supply()` arguments: `supply()` tops out at nine overloads, and a wide cast is
 what a positional interface handles worst.

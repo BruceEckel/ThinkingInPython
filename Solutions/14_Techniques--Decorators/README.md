@@ -36,8 +36,8 @@ side effect.
 `register` returns its argument the same way, and the comparison is
 the point. A class decorator that returns its argument untouched can
 observe and record, and that covers most real uses (a registry, a
-plugin table, a validation pass at import time). The other two kinds
-change what the name refers to. `@dataclass` returns the class it
+plugin table, a validation pass at import time). Two other kinds of
+class decorator change the class or replace it. `@dataclass` returns the class it
 received after adding generated methods to it, and
 [`@singleton`](../../Chapters/24_Patterns--Singleton.md#singleton-by-class-decorator)
 returns a different object, a callable that hands back one cached
@@ -166,8 +166,8 @@ one `Drink` and forwards through the same interface. Nothing inherits
 from `Drink`, and nothing needs to. The type checker matches the
 `Protocol` structurally.
 
-`Decaf` is worth noticing. Its `add_cost` is `0.0`, so it changes the
-description and leaves the price alone. A class-per-combination
+`Decaf` is worth noticing. Its `add_cost` is `0.0`, so `Decaf` changes
+the description and leaves the price alone. A class-per-combination
 design still needs a separate class for every decaf variant. Adding a
 fourth extra means one class with one number in it, and the extras
 compose in any order, since each layer knows only about the drink
@@ -328,7 +328,7 @@ The two `@overload` declarations are for the type checker, which cannot
 otherwise tell which of the two shapes a given call has. The first
 says "given a function, return a function of the same signature." The
 second says "given only `maxsize`, return a decorator." The
-implementation returns `Any` because it satisfies both. The overloads
+implementation returns `Any` because `Any` satisfies both overloads. The overloads
 are what callers see: `square(4)` type-checks as an `int`, and
 `memo(maxsize=2)` type-checks as something you can apply to a
 function.
@@ -337,7 +337,7 @@ The cache key pairs the positional arguments with the keyword items,
 since `add(1, 2)` and `add(a=1, b=2)` are different keys and both are
 legal calls. Eviction relies on a dictionary preserving insertion
 order, so `next(iter(cache))` is the oldest key. Evicting the oldest
-key makes this a first-in-first-out cache rather than the
+key makes `memo` a first-in-first-out cache rather than the
 least-recently-used cache `functools.lru_cache` gives you. A real
 implementation must reconsider that trade.
 
@@ -396,12 +396,12 @@ expect(RuntimeError, always_fails)
 
 The loop runs `times - 1` attempts inside a `try`, and the final
 attempt sits outside it, with no handler. That last call satisfies
-both requirements at once. It returns `R` on success, so the function
+both requirements at once. It returns `R` on success, so `wrapper()`
 has a return value on every path the type checker can see. It also
 lets the last exception propagate with no handler in its way.
 Re-raising the exception from inside the loop with a bare `raise` on the last
 attempt also works at runtime, but then the type checker cannot tell
-that the function always either returns or raises an exception, and
+that `wrapper()` always either returns or raises an exception, so
 it reports that `wrapper()` can implicitly return `None`.
 
 `@wraps(func)` keeps the identity: `flaky.__name__` reports the
@@ -488,7 +488,7 @@ Both decorators are classes, and the difference is in what each one
 leaves in the class. `@repeat(times=3)` builds a `repeat` instance
 and then calls it with `bump`, and that `__call__()` returns
 `wrapper`, an ordinary function. A function has `__get__()`, so
-`counter.bump` binds `counter` to it like any other method. The
+`counter.bump` binds `counter` to `wrapper` like any other method. The
 `repeat` instance has done its work by then and is not what the name
 refers to. `@logged` stores the `logged` instance in the class. That
 instance has no `__get__()`, so `counter.peek` hands it back unbound

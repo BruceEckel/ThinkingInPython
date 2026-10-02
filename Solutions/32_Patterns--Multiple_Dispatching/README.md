@@ -511,8 +511,8 @@ version safe, though only for a subclass of a concrete item. An
 A `Lizard(Item)` still fails fast, since no row has `Item` in its key
 and the MRO walk finds nothing to inherit. Tolerance buys the
 convenience of skipping rows at the price of the fail-fast policy the
-chapter recommends for a table under construction, and it buys it
-exactly where the table is most likely to mistake a new type for an
+chapter recommends for a table under construction, and it pays that
+price where the table is most likely to mistake a new type for an
 old one.
 
 Which behavior you want depends on whether a subclass is a new
@@ -594,9 +594,9 @@ and exercise 8 adds that dependence.
 
 The listing gives each `Inhabitant` kind two of six weapon types,
 ranked around a cycle: each weapon beats the previous two in the
-ranking and loses to the next two. Six is an even number, so one pair
-remains. Each weapon has an opposite, three steps around the circle,
-which it neither beats nor loses to, and that pair draws.
+ranking and loses to the next two. Six is an even number, so each
+weapon has one opponent left over: its opposite, three steps around
+the circle, which it neither beats nor loses to. That pair draws.
 `paper_scissors_rock.py` needs no such case because three items leave
 nothing over: with an odd count every weapon beats half the rest and
 loses to the other half. An even count always leaves the opposite pair
@@ -791,7 +791,7 @@ if __name__ == "__main__":
 `battle()` starts the two dispatches.
 `a.get_weapon().compete(...)` resolves the first weapon's type,
 and that class's `compete()` calls the `eval_*()` method named for it on the second weapon,
-which resolves the second type.
+and that second call resolves the second type.
 As in `paper_scissors_rock.py`,
 each `eval_*()` method answers for the caller its name identifies,
 so `Jargon.eval_play()` returns `WIN` because play beats jargon.
@@ -922,10 +922,12 @@ a table of answers. Only the cells that need code look like code.
 
 The `(Paper, Rock)` cell receives both items, so it can consult
 `item1.wet`. The `(Rock, Paper)` cell consults `item2.wet`, because
-one duel has two orders and each order has its own cell. Without it,
-a rock that calls `compete()` would still beat wet paper. That is the
-first of the two reasons the chapter gives for preferring the
-double-dispatch version: behavior that reads the object's own state. A cell holding a function answers it. Whatever
+one duel has two orders and each order has its own cell. If the
+`(Rock, Paper)` cell ignored `item2.wet`, a rock that calls
+`compete()` would still beat wet paper. Behavior that reads the
+object's own state is the first of the two reasons the chapter gives
+for preferring the double-dispatch version, and a cell holding a
+function answers that reason. Whatever
 `Paper.eval_rock()` can read, `paper_vs_rock()` can read too,
 from the same two objects.
 
@@ -933,7 +935,7 @@ The second reason survives. A subclass still cannot override one
 combination and inherit the rest, because the lookup still matches
 types exactly: an `Origami(Paper)` finds no row at all, callable or
 not, and the fix is to write `Origami`'s rows rather than to override
-one. Changing a cell changes it for every `Item`, since `OUTCOME` is
+one combination. Changing a cell changes it for every `Item`, since `OUTCOME` is
 one shared dictionary. `paper_scissors_rock_subclass.py`'s `DampPaper`
 gets its exception by overriding `compete()` and `eval_rock()`, and
 this version has nothing to override: `Item` defines `compete()` once.
@@ -941,10 +943,9 @@ this version has nothing to override: `Item` defines `compete()` once.
 One cost comes with the change. `paper_vs_rock()` and
 `rock_vs_paper()` take two `Item`s, because every cell must, so each
 recovers `Paper` with an `isinstance()` test. That is the type test
-the chapter warns about in the ladder version, and here it sits inside
-one cell rather than
-running through every class, which is the difference between a test
-you write once and a test every new `Item` forces you to edit.
+the chapter warns about in the ladder version. Here the test sits
+inside one cell rather than running through every class, so you write
+it once instead of editing it for every new `Item`.
 
 ## 10. Exercise 8, rebuilt on a table
 

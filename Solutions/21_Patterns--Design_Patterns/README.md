@@ -1,10 +1,10 @@
 # Design Patterns: Solutions
 
 The first three exercises ask about your own experience, so no answer
-here can be the answer. Each one works a single example through
+here can be the answer. Each solution works a single example through
 instead. The method is the transferable part: name the axis, subtract
 Python's share, then take away one more thing and see whether anything
-breaks. The last one has an answer you can check against the chapter's
+breaks. The last exercise has an answer you can check against the chapter's
 figure.
 
 ## 1. Naming a vector of change
@@ -88,7 +88,7 @@ print(render(rows, "json"))
 ```
 
 The third format arrives without touching `render()`. The part worth
-noticing is where the assignment that adds it can sit: in any module
+noticing is where the assignment that adds the format can sit: in any module
 that imports `STYLES`. `STYLES` absorbs the change because a format is
 now data. Everything the axis does not cover still needs hand edits.
 Adding a field to `Row` touches every entry in `STYLES`, because a
@@ -97,7 +97,7 @@ about.
 
 Two things generalize from the example. First, the axis is visible in
 the history rather than in the code: the same function appearing in
-three consecutive commits names it for you. Second, absorbing one
+three consecutive commits names the axis for you. Second, absorbing one
 vector says nothing about the others. A design that makes formats
 pluggable and fields painful is the right answer only if formats are
 what keep changing.
@@ -116,7 +116,7 @@ form requires:
 - a concrete class per algorithm, `FlatRate` and `ByWeight`, each
   implementing that interface
 - a context class, `Checkout`, holding a `ShippingStrategy` field
-- a constructor argument or setter on the context to install one
+- a constructor argument or setter on the context to install a `ShippingStrategy`
 - at the call site, a `new FlatRate()` to pass in
 
 Now cross out what Python supplies:
@@ -203,18 +203,18 @@ print(checkout(6.0, Flat()), checkout(6.0, ByWeight()))
 If you remove the abstract base and turn both subclasses into
 functions, you have exercise 2's version. What stops working? Nothing.
 The numbers are identical, the type checker still rejects a wrongly-shaped argument,
-and adding a third rule is still one new definition. Both classes
-carry a single method and no state, so the hierarchy is a container
+and adding a third rule is still one new definition. `Flat` and
+`ByWeight` each carry a single method and no state, so the hierarchy is a container
 for functions that do not need containing. By the rule that a design
 is complete when you cannot take anything else away, the class version
 is not complete.
 
 Taking away one more thing changes the answer. If you remove
-`checkout()`'s `shipping` parameter, inlining `5.0` where the call was,
+`checkout()`'s `shipping` parameter, inlining `5.0` where the call through `shipping` was,
 the program still runs and still prints a number. What stops working is
 the requirement: there is now no way to charge by weight without
-editing `checkout()`. That is the floor, the point where subtraction
-stops. The parameter is the last piece that carries the design's
+editing `checkout()`. Removing the parameter reaches the floor, the
+point where subtraction stops. The parameter is the last piece that carries the design's
 intent, so removing it removes the design rather than its scaffolding.
 
 Both outcomes are the exercise working correctly. Subtraction is a test
@@ -344,7 +344,7 @@ main("md")
 Here `MdWriter` edits one existing thing, the `case` that `main()`
 gains. `Report` and `Writer` keep their source, and no writer names
 `Writer`: the type checker matches each class to the protocol when
-`main()` assigns it to `writer`.
+`main()` assigns an instance to `writer`.
 
 The count is the answer, three edits in two parts against one edit in
 one part, but the places matter more than the number. In the first

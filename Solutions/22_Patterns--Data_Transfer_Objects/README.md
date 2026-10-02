@@ -98,7 +98,7 @@ names the cause: `cannot use 'Recipe' as a dict key (unhashable type:
 hashable only when every field is. The `list` has no hash, so the
 record has none either.
 
-The two results are one fact seen twice. The immutability a
+The silent `append()` and the `TypeError` are one fact seen twice. The immutability a
 `NamedTuple` gives you stops at the field, and a field pointing at a
 mutable object hands that object's mutability back. `frozen=True` in
 [Rethinking Objects](../../Chapters/20_Patterns--Rethinking_Objects.md#the-immutability-solution)
@@ -138,7 +138,7 @@ print(vars(built) == vars(assigned), built == assigned)
 ```
 
 A keyword argument and a later assignment both add one entry to the
-instance's `__dict__`, and `vars()` reads that dict. Both namespaces
+instance's `__dict__`, and `vars()` reads that dict. `built` and `assigned`
 end with the same four attributes, so the two dicts compare equal and
 so do the namespaces, since dict equality ignores order.
 
@@ -180,7 +180,7 @@ The repair is `result[0]` and `result[1]`.
 The call sites lose the names. `print(result)` now writes
 `(4.0, 3)` instead of `Stats(mean=4.0, count=3)`, so the repr no longer
 says which number is which. A reader of the call site has to open
-`summarize()` to find out. They also lose attribute access:
+`summarize()` to find out. The call sites also lose attribute access:
 `result.mean` becomes `result[0]`, which holds the same value and no
 longer says what it is. And they lose the type as a name. Nothing can
 carry a `Stats` annotation anymore, so a function accepting a summary
@@ -243,7 +243,7 @@ print(FrozenColor(1, 2, 3) == (1, 2, 3))
 `Dimensions` gives, and for the same reason: a `NamedTuple` inherits
 `tuple.__eq__`, which compares length and elements and consults neither
 class. Adding a third `NamedTuple` adds a third type that compares
-equal to the other two, so the family of things that equal `(1, 2, 3)`
+equal to `Color` and `Dimensions`, so the family of things that equal `(1, 2, 3)`
 grows with every three-integer `NamedTuple` in the program. The field names
 are for you, not for `==`.
 
@@ -289,8 +289,8 @@ needs and a frozen data class refuses.
 
 **The JSON record is a `@dataclass`.** `json.dumps()` writes a
 `NamedTuple` as a bare array, so the names you decoded into are gone
-when the record goes back out. A `@dataclass` raises a `TypeError`
-instead of dropping the names silently. It also has a place for the
+when the record goes back out. Given a `@dataclass`, `json.dumps()` raises a `TypeError`
+instead of dropping the names silently. A `@dataclass` also has a place for the
 validation this scenario requires: [Data Classes as
 Types](../../Chapters/12_Techniques--Data_Classes_as_Types.md#a-type-is-a-set-of-values)
 makes `__post_init__()` the method that rejects a value the JSON

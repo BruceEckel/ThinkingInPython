@@ -57,3 +57,4 @@ Object Pool
 !Command Query Responsibility Segregation
 !The Borg are a hive-mind
 !An Object Pool
+!Restoring Part of a State

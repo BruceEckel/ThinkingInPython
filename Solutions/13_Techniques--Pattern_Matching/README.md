@@ -43,7 +43,7 @@ print(classify((1,)))
 ```
 
 `[]` matches only an empty sequence. `[_]` matches a list with exactly
-one element (the `_` throws the value away without a name). `[_, *_]`
+one element (the `_` throws the element away without a name). `[_, *_]`
 matches one or more elements: the first `_` matches the first element,
 and `*_` collects the rest, including an empty rest. So
 `[_, *_]` also fits a singleton, and order matters: `[_]` must come
@@ -99,7 +99,7 @@ Once `Rectangle` joins the `Shape` union, the type checker can prove that a
 `Rectangle` value falls through both `case`s and reaches `case _`.
 `assert_never()` demands an argument of type `Never`, meaning "this
 code is unreachable." The type checker now knows `shape` can be a
-`Rectangle` at that point, so the two types disagree and the checker
+`Rectangle` at that point, so `Never` and the argument's type disagree and the checker
 reports an error. That error is the check the chapter describes:
 the missing case becomes a type error at check time instead of a
 silent gap that shows up only when a `Rectangle` reaches `area()` at
@@ -144,7 +144,7 @@ string. The two cases do not compete: a flat event has no `"at"` key
 and a nested one has no top-level `"x"`, so each event fits only one
 of them. Order matters for `{"type": kind}`, which any event with a
 `"type"` key satisfies. `match` tries cases top to bottom and stops
-at the first one that fits, so that catchall sits after the specific
+at the first one that fits, so `{"type": kind}` sits after the specific
 click and key cases.
 
 ## 4. A `Webhook` channel added to the union
@@ -226,15 +226,15 @@ error[type-assertion-failure]: Argument does not have asserted type `Never`
 info: `Never` and `Webhook & ~Email & ~Sms & ~Push` are not equivalent types
 ```
 
-The fence shows the first, in `render()`. The second is identical, at
+The fence shows the first diagnostic, in `render()`. The second is identical, at
 line 43 in `cost()`.
 
 `assert_never()` declares its parameter as `Never`, the type with no
 values, so the call checks only when the cases above it have already
 eliminated every member of the union. The inferred type spells out
 what survived those cases: a `Webhook` that is none of the three
-handled types. That is the value which can reach the line, so the
-check fails. Two diagnostics for one new channel is the cost the
+handled types. A `Webhook` can still reach the `assert_never()` call,
+so the check fails. Two diagnostics for one new channel is the cost the
 chapter describes: adding a type touches every operation.
 
 ## 5. Quadrants with guards, and without them
@@ -391,7 +391,7 @@ print(guarded(Signal.STOP), guarded(Signal.CAUTION))
 fallback value. `case FALLBACK:` is a bare name, so it captures: it
 matches `Signal.STOP`, binds it to a local named `FALLBACK` inside
 `act()`, and compares nothing. The module-level constant
-still holds `Signal.CAUTION` afterward, which is why the mistake is
+still holds `Signal.CAUTION` afterward, so the mistake is
 easy to miss. Python accepts `case FALLBACK:` only because it is the
 last case. Another case after it fails to compile.
 
@@ -399,7 +399,7 @@ The first fix gives the constant a dotted name by putting it in a
 namespace. `Defaults.FALLBACK` is a value pattern, so `dotted()`
 compares against it and answers "brake" for `Signal.STOP`. Any dotted
 name works, including `Signal.CAUTION`. In a program the constant
-would live in the class alone, one definition for every use. The
+would live in `Defaults` alone, one definition for every use. The
 listing keeps the module-level copy because `act()` and `guarded()`
 need the bare name.
 

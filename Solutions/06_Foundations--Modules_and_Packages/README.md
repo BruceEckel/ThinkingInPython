@@ -95,7 +95,7 @@ therefore print before the script's own `print()` runs.
 The import crosses a package boundary, from `b_package` up to
 `a_package`, so the absolute form is the right choice here. The
 relative equivalent, `from ..module5 import function5`, works too.
-Prefer that form only for siblings within one package.
+Prefer the relative form only for siblings within one package.
 
 After you rename the directory to `bPackage` and update the import to
 `a_package.bPackage.module6`, the script still runs. Python accepts
@@ -176,7 +176,7 @@ first.
 
 The `import Module` statement resolves, because the name and the file
 agree, and the call in the body becomes `Module.useful_function()` to
-match; left as `module.useful_function()`, it raises a `NameError`.
+match; left as `module.useful_function()`, the call raises a `NameError`.
 Changing the import back to `import module` while the file is still
 `Module.py` raises
 `ModuleNotFoundError: No module named 'module'. Did you mean: 'Module'?`,
@@ -291,9 +291,10 @@ print(sorted(n for n in dir() if not n.startswith("__")))
 Without `__all__`, the star import falls back to the underscore
 convention: every top-level name that does not start with an
 underscore arrives. `undeclared` therefore joins `public` and
-`helper`, and `_internal` stays out. Restoring the line shrinks the
-surface back to the two listed names. The two rules compose in one
-direction only: `__all__` can export an underscored name, but without
+`helper`, and `_internal` stays out. Restoring the `__all__` line
+shrinks the surface back to `public` and `helper`. `__all__` and the
+underscore convention compose in one direction only:
+`__all__` can export an underscored name, but without
 `__all__` an underscore is the only way to keep a name out of a star
 import.
 
@@ -336,7 +337,7 @@ object. Appending changes that object, and both names show the new
 item. The assignment `plugin_list.plugins = []` rebinds the module's
 name to a second list and leaves the script's name on the first, so
 the second `append()` reaches a list the script's `plugins` does not
-refer to. This is `from_snapshot.py` with a mutable value: the
+refer to. `exercise_7.py` is `from_snapshot.py` with a mutable value: the
 `from` import takes no copy, and it does not follow the module's
 name when that name moves. When a module's list or dict can be
 replaced, import the module and read `plugin_list.plugins` each time.

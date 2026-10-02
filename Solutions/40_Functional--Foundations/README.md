@@ -164,7 +164,7 @@ the two remaining parameters stay open in order.
 
 Presetting `high` alone is the case that needs a `Placeholder`.
 `partial()` does not inspect the signature, so building
-`partial(clamp, high=100)` succeeds. The call is where it fails:
+`partial(clamp, high=100)` succeeds. The call is where the partial fails:
 `high` is positional-only, so it cannot arrive by name. Passing
 `high` positionally means passing `low` and `value` first, which is
 the opposite of leaving them to the caller.
@@ -172,7 +172,7 @@ the opposite of leaving them to the caller.
 works, and it is what `Placeholder` exists for.
 
 The `# type: ignore` is there because `ty` finds the mistake earlier
-than the runtime does. It reports `positional-only-parameter-as-kwarg`
+than the runtime does. `ty` reports `positional-only-parameter-as-kwarg`
 on `partial(clamp, high=100)`, the line that builds the partial, where
 the runtime waits for the call.
 
@@ -331,7 +331,7 @@ line before the program runs. Running anyway raises an
 `UnboundLocalError` at the first `tally()` call: "cannot access local
 variable 'count' where it is not associated with a value." The type
 checker points at the assignment that went wrong. The runtime message
-complains about a local variable the code never meant to create.
+complains about a local variable `increment()` never meant to create.
 
 ## 9. A second filter, and why the stages are not interchangeable
 
@@ -392,17 +392,18 @@ filters leaves only `b`, whose 25.0 Celsius sits inside the band:
 each one tests the same untouched Celsius value, so swapping the
 `warm` and `band` lines reports the same reading.
 
-`converted_first()` shows that the `map()` does not commute with
-them. It returns an empty list. Once `to_fahrenheit()` has run, every
+The empty list from `converted_first()` shows that the `map()` does
+not commute with the filters. Once `to_fahrenheit()` has run, every
 reading carries a Fahrenheit number, and 64.4, 77.0, and 86.9 all pass
 `warmer_than(20.0)` and all fail `colder_than(30.0)`. The predicates
 still read `r.celsius`, so they now compare a Fahrenheit number
 against a Celsius limit and quietly answer the wrong question. Nothing
-raises an exception, because both stages are correct on their own.
+raises an exception, because `to_fahrenheit()` and each predicate are
+correct on their own.
 The unit lives only in the field name. A stage that changes what a
 value means must run after every stage that reads the old meaning.
 
-The last `print()` repeats the chapter's point. Both reports read
-`data` and neither writes it, so the Celsius values stay the same
-after three traversals, and you can run either report again and get
-the same answer.
+The last `print()` repeats the chapter's point. `report()` and
+`converted_first()` both read `data` and neither writes it, so the
+Celsius values stay the same after three traversals, and you can run
+either function again and get the same answer.

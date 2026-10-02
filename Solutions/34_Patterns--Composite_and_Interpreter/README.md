@@ -129,7 +129,7 @@ be a `Symlink` that no case handles, until you add the case shown
 here. Deciding what a link should do is a judgment call, not
 something the type checker picks for you: `disk_usage()` counts a link
 as free, since the bytes it references already get counted wherever
-the real file lives. Adding the target's size again double-counts it.
+the real file lives. Adding the target's size again double-counts those bytes.
 `walk()` reports the link as its own entry, `name -> target`, rather
 than following it into the target's subtree, since following it could
 loop forever if a link ever pointed back at one of its own ancestors.
@@ -308,7 +308,7 @@ usually not an `int`, so it does not fit in a `Num`, and division by
 `Num(0)` has no value to fold to. Nor should `simplify()` raise the
 `ZeroDivisionError` itself. It rewrites a tree without evaluating it,
 and a caller can simplify an expression it never evaluates, so an
-exception raised there would report an error in a computation that
+exception raised in `simplify()` would report an error in a computation that
 never runs. Leaving `Div(lhs, Num(0))` in the tree lets `evaluate()`
 raise `ZeroDivisionError` when the division runs, and not before.
 Python treats `1 / 0` in source the same way: the compiler accepts
@@ -629,8 +629,8 @@ The forward methods need the same guard for the same reason. Without
 it `x + "a"` wraps the string in a `Num` and builds the ill-typed tree
 from the other direction, so all four methods decline what they cannot
 use. The two messages differ because a different object gets the last
-word: `str` reports the first case, and Python's own fallback reports
-the second, once both operands have declined.
+word: `str` reports `"a" + x`, and Python's own fallback reports
+`x + "a"`, once both operands have declined.
 
 Each method declares the type it really returns, `Add` or `Mul`,
 even though it can also return `NotImplemented`.
@@ -640,8 +640,8 @@ inheriting `Any`, so returning it satisfies any declared return type.
 The declaration also lets `(2 * x + 1).right` resolve for a caller.
 
 Note what `NotImplemented` does not fix. The type checker already rejects
-`"a" + x` in source it can see, which is why the line above carries a
-`# type: ignore` to keep this listing in the build. The runtime hole
+`"a" + x` in source it can see, which is why the listing's `"a" + x`
+line carries a `# type: ignore` to keep `exercise_6.py` in the build. The runtime hole
 is the gap between what the checker sees and what runs. Closing it matters
 when a program builds the expression from data the type checker never
 sees, the case an interpreter exists to handle.
@@ -821,7 +821,7 @@ have produced them. The fix is to stack the pending operation behind
 its own children: `work += [Op.ADD, right, left]` puts `Op.ADD`
 deepest, so it comes off last, by which point the two values it needs
 are on `values`. Pushing `right` before `left` makes `left` pop
-first, which matters for the subtraction and division a fuller
+first, and that order matters for the subtraction and division a fuller
 language adds.
 
 `Op` is an enum rather than a string so the `match` stays exhaustive.

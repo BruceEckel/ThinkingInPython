@@ -60,13 +60,13 @@ Python looks up a special method on the class, not on the instance,
 so the lookup skips `__getattr__()` and finds no `__len__()` on
 `PairsAdapter`.
 `adapter[key]` works because the class defines `__getitem__()`.
-An adapter that must support `len()` defines `__len__()` and forwards
-it by hand.
+An adapter that must support `len()` defines a `__len__()` that
+returns `len(self.pairs)`.
 
 The lookup is a linear scan.
 If the pairs are many and the lookups frequent, convert to a real
-`dict` once (`dict(pairs)` does it) and adapt only when the object
-must keep being a list to someone else.
+`dict` once with `dict(pairs)`, and adapt only when the list must
+stay a list for some other caller.
 
 ## 2. Deprecating the class instead of the method
 
@@ -103,9 +103,10 @@ caller commits to the type: constructing an instance and subclassing.
 warning.
 That is the right split: `TextReport` replaces the type, not the
 method. A caller who wants to act on the warning must change where
-the object comes from, not where they call it.
+the `Report` comes from, not where they call `render()`.
 
-The type checker reports both lines, so both carry `# type: ignore`. The
+The type checker reports both the construction and the subclass, so
+both lines carry `# type: ignore`. The
 subclass warning fires at class-creation time, so it arrives on
 import rather than on any call. A library that subclasses a
 deprecated class emits the warning as soon as Python imports that
@@ -168,7 +169,7 @@ order, `_Ignition(_FuelPump(_Engine()))`, inside the module.
 `shop._Engine` and `shop._FuelPump` still reach the classes, because
 Python enforces nothing. The underscore marks them as private, and
 `from shop import *` skips them. The listing prints the module's
-public names to make that concrete. `record` appears because an
+public names, the ones `from shop import *` binds. `record` appears because an
 import binds a name in the module too. A real module therefore
 either sets
 [`__all__`](../../Chapters/06_Foundations--Modules_and_Packages.md#what-a-module-exports)
@@ -211,8 +212,8 @@ object offers only `next_chunk()`, so the wrapper exists to make one
 type fit a caller that expects another. Remove it and you lose only
 the fit, which is enough: the call no longer resolves. An *Adapter*
 adds no behavior, and that is the test that separates the *Adapter*
-from the *Decorator*. Both wrappers forward, and only this one changes
-the name the caller uses.
+from the *Decorator*. Both wrappers forward, and only the *Adapter*
+changes the name the caller uses.
 
 **The flag-checking wrapper is a *Proxy*.** Its interface is the wrapped
 object's, and it adds no behavior to a call that goes through. What it
@@ -324,7 +325,8 @@ inside `run()`. At runtime `Renamed.op()` has no parameter named
 `what_i_want`, and the call raises a `TypeError`. The override broke
 a caller that does not mention `Renamed`.
 
-The fix keeps the base class's name. `WhatIUse2.op()` still widens
+The fix keeps the base class's parameter name, `what_i_want`.
+`WhatIUse2.op()` still widens
 the type to the union, which an override may do, and it accepts the
 keyword every `WhatIUse` caller uses. The last call passes a
 `WhatIHave` by that keyword and reaches the adapter.

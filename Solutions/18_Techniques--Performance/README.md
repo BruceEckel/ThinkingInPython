@@ -37,7 +37,7 @@ print(f"set faster on average-case targets too: "
 The conclusion does not change. `target = n - 1` in the original
 measures the single worst case for a `list` scan: the element the
 scan reaches only after walking past every other one. Random targets
-land in every position instead, including ones near the front that a
+land in every position instead, including targets near the front that a
 `list` finds quickly. The `set`'s O(1) hash lookup still beats the
 `list`'s O(n) scan by a wide margin (thousands of times faster in
 this run), because the scan for an average target still walks about
@@ -126,8 +126,8 @@ print(f"lazy peak under 1% of one list: "
 `squares` list and then an `evens` list from it, so the
 million-element `squares` list is gone. Peak memory drops to about
 half of the two-list version's. That is as close as an eager version
-gets, and the last line shows how far away it still is: the lazy
-peak is under one percent of it. The comprehension must build and
+gets, and the last line shows how far away the eager version still is:
+the lazy peak is under one percent of the one-list peak. The comprehension must build and
 hold the whole list of half a million even squares before `[:5]`
 discards nearly all of them. Restructuring the eager version cannot
 close that gap, because an eager version computes every value up
@@ -243,7 +243,7 @@ accepts it, and `vars(p)` shows where the value went: an instance
 `__dict__` that the base class does not have.
 
 Declaring `__slots__` does not disable the instance dictionary for a
-whole hierarchy. It only omits one from the class that declares it.
+whole hierarchy. It omits the `__dict__` from the declaring class alone.
 Any subclass that does not declare its own `__slots__` gets the
 default behavior, a `__dict__`, and inherits the parent's slots
 alongside it. The last line shows the trap: `Point3D.__slots__` reads
@@ -310,7 +310,7 @@ The two local attachments above produce the identical `Counter`, and
 that agreement is an artifact of the example's size. In a real
 program `set_events()` reports every Python function the process
 runs, including library code you did not write and never wanted
-counted, and it pays the callback cost on all of it. Local
+counted, and it pays the callback cost on every one of those functions. Local
 attachment names the code objects you care about and leaves the rest
 running at full speed. Global monitoring answers "what ran."
 Local monitoring answers "how often did *this* run," which is the
@@ -344,7 +344,7 @@ largest `tottime` belongs to `{built-in method builtins.sum}`, with
 the generator expression inside `inner()` second: the largest of the
 script's own Python frames, where the arithmetic happens.
 
-They differ because the two columns measure different things.
+The two columns pick different functions because they measure different things.
 `cumtime` is the time from entering a function to leaving it,
 including everything it called, so a caller can never show a smaller
 `cumtime` than the work beneath it. Every caller on the path
@@ -353,9 +353,9 @@ attributes time to the frame that is executing.
 
 A function high on `cumtime` and near zero on `tottime` is a
 pass-through: it is slow only because of what it calls, and rewriting
-it changes nothing. The two coincide only for a leaf function, one
-that calls nothing else, which is why the bottom of a call chain is
-where the two lists finally meet.
+it changes nothing. The two columns coincide only for a leaf function, one
+that calls nothing else, which is why the two rankings can name
+the same function only at the bottom of a call chain.
 
 ## 9. A compact `array` is not a faster `array`
 
@@ -390,8 +390,8 @@ as the `list`. The memory saving is real (the chapter measures
 325,176 bytes against 80,080). The speed saving does not exist.
 
 A `list` of floats stores pointers to `float` objects that already
-exist, so reading one hands back a reference. An `array` stores raw
-eight-byte doubles with no objects at all, so reading one has to
+exist, so reading an element hands back a reference. An `array` stores raw
+eight-byte doubles with no objects at all, so reading an element has to
 build a fresh `float` object to hand to Python. That allocation, on
 every single element, is the cost that eats the advantage of the
 tighter layout.
@@ -449,8 +449,8 @@ goes away is the amount at stake: at 100 short strings both versions
 finish in a couple of microseconds, so the loop must run thousands
 of times before the choice shows up in a profile.
 
-That is the answer to "at which size does it stop mattering": not at
-a size where the two become equally fast, but at a size where both
+The answer to "at which size does it stop mattering" is therefore not
+a size where the two versions become equally fast, but a size where both
 are fast enough that the difference is below anything you would
 measure.
 
@@ -532,8 +532,8 @@ running, and `PYTHON_JIT=0` switches it back off.
 
 On a `True False` build, the comparison is two runs of the same file
 with nothing else changed. `tip` and `uv run` use the project's own
-interpreter, which has no JIT, so run the file with that build's
-`python`, from the chapter directory with `utils/` on the import path
+interpreter, which has no JIT, so run the file with the `True False`
+build's `python`, from the chapter directory with `utils/` on the import path
 (`tip membership` prints those commands in your shell's syntax):
 
     $ cd Examples/18_Techniques--Performance

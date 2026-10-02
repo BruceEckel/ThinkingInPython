@@ -391,7 +391,7 @@ from the shared cell and duplicate each other's work from there, while
 `visited` stays correct, because adding the same cell twice to a set
 changes nothing. That correctness is why `test_rats_and_mazes.py`
 passes on the broken version every time: the test asserts the set of
-cells reached. The extra success costs the rats wasted effort, two
+cells reached. The extra `True` costs the rats wasted effort, two
 tasks tracing overlapping paths. Comparing the count of `True` returns
 with the size of `visited` exposes the collision.
 
@@ -400,7 +400,7 @@ between the test and the add. A coroutine yields control only at an
 `await`, so the two statements run as one uninterruptible unit: the
 event loop can hand control to another rat before the test or after
 the add, but never between them. Adding the `await` opens exactly that
-gap in the middle, and the whole guarantee depends on its absence.
+gap in the middle, and the whole guarantee depends on the gap's absence.
 
 Exercises 4 and 5 both build on the same `robot_explorer` world,
 so `robot_world.py` holds that shared apparatus once (`Item` and its
@@ -884,13 +884,13 @@ so the difference is exactly `0.0` at every point on the plate.
 A zero field means a zero kick. `step()` scales each grain's random
 displacement by the amplitude under that grain, so
 `uniform(-kick, kick) * 0.0` moves nothing, and 1200 steps leave every
-grain where the constructor scattered it. The result is
+grain where the constructor scattered it. The view shows
 neither chaos nor a figure because no grain ever moves: what you see
 is the initial random scatter, frozen. Agitation reads `0.000` from
 the first step, the same number a perfectly settled plate reports, so
 the summary statistic cannot tell "finished" from "never started."
 
-The main diagonal in every figure follows from the same symmetry.
+The main diagonal in every figure follows from the same two terms.
 Swapping `x` and `y` turns the first term into the second and the
 second into the first, so the swap reverses the subtraction inside
 `amplitude()`'s `abs()`. On the line `x == y` the swap changes
@@ -1026,7 +1026,7 @@ strip. Rendered, the run shows nearly every grain in those two
 corners and the nodal lines between them empty. The plate reports
 settled sand in the wrong places.
 
-That failure is worth keeping in mind. Agitation measures whether the
+The failure at `kick=0.5` is worth keeping in mind. Agitation measures whether the
 grains are sitting where the field is weak, not whether the figure is
 right, so one number cannot distinguish a sharp pattern from two
 blobs. The render is the check the number cannot perform.

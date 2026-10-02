@@ -223,8 +223,8 @@ Without `**facts`, Python reports the mismatch directly:
 `describe() got some positional-only arguments passed as keyword
 arguments: 'name'`, the same error `divide(a=10, b=2)` raises in
 `param_markers.py`. Catch-all keywords hide that message, because
-the stray name now has somewhere to go. Without the `/`, the call
-succeeds and `facts` stays empty.
+the stray name now has somewhere to go. Without the `/`,
+`describe(name="Bob")` succeeds and `facts` stays empty.
 
 `**facts` is the opposite direction from exercise 6. There, `**opts`
 at the call site spread a dictionary into separate keyword arguments.
@@ -234,7 +234,7 @@ are inverses of each other, and that inversion is why a function
 declaring `**kwargs` can forward them to another call as `**kwargs`
 unchanged.
 
-The two markers are also worth using together. `/` hides the
+The `/` and `**facts` are also worth using together. `/` hides the
 parameter name `name` from callers, so a later rename breaks no
 caller, while `**facts` accepts any name a caller writes. The `/`
 also frees the word `name` for the caller's use:
@@ -318,6 +318,7 @@ begins, `target` and `mine` are two names for one list. The
 assignment in `clear_by_assignment()` binds `target` to a new empty
 list, which the function prints, and `mine` still names the original.
 `target.clear()` rebinds nothing. It calls a method on the one list
-both names share, so the caller sees the list empty. These are
-`rebind()` and `append_all()` from `mutating_arguments.py` with the
-same operation, emptying a list, written both ways.
+both names share, so the caller sees the list empty.
+`clear_by_assignment()` and `clear_by_method()` are `rebind()` and
+`append_all()` from `mutating_arguments.py` with the same operation,
+emptying a list, written both ways.

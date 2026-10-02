@@ -310,7 +310,7 @@ info: `Never` and `Square & ~Rectangle & ~Circle` are not equivalent types
 ```
 
 The inferred type names the missing case. The first two `case` lines
-rule out `Rectangle` and `Circle`, so the value that arrives at
+rule out `Rectangle` and `Circle`, so the `shape` that arrives at
 `case _` is a `Square` that is neither of them, and `assert_never()`
 requires `Never`, the type with no values. That report is the
 exhaustiveness check the closed union delivers. A missed case becomes
@@ -348,7 +348,7 @@ nothing, and `get()` always reports "not found." A function that takes
 an optional cache can take a required `Cache` instead, defaulting to a
 shared `NullCache()` instance, so no code that uses the cache needs an
 `is None` branch on the cache. The `None` that `get()` returns is a
-different matter. A miss is information the caller acts on, so it stays
+different matter. A miss is information the caller acts on, so `None` stays
 in the return type.
 
 ## 7. Counting every route into the list
@@ -430,7 +430,7 @@ bypass a counter that nothing inherited knows about.
 The trade is explicit. `CountingList` gets `sort()`, `index()`,
 `__len__()`, slicing, and everything else `list` offers, and gets the
 counting wrong. `CountingBox` gets only the methods you write for it,
-and a caller who wants `sort()` waits until you write one. That is the
+and a caller who wants `sort()` waits until you write one. The trade is the
 choice composition asks you to make on purpose, instead of discovering
 later that inheritance made it for you.
 
@@ -494,7 +494,7 @@ the limit ask `full()` before pushing. `fill()` now runs on both
 classes without an exception.
 
 You gave up the refusal. The original `BoundedStack` guarantees that
-it never accepts more than two items. This one guarantees only that it
+it never accepts more than two items. This version guarantees only that it
 never *keeps* more than two. A caller who pushes five items loses three
 of them silently, and `fill()` returns 2 where a caller counting on
 `Stack` expects 5. That loss is the right behavior for a ring buffer of
@@ -503,10 +503,10 @@ every item. If `Stack`'s contract includes "every pushed item stays,"
 this version still breaks it.
 
 Should `BoundedStack` have been a subclass at all? Probably not. The
-two versions of this exercise are the two ways out of the same bind:
+exercise has two answers to the same bind:
 either weaken the guarantee until it fits the base contract, or admit
 that "a stack that can refuse" is a different type. A separate class
 states that difference, with its own `push()` returning `bool` or
 raising an exception. Nothing then hands that class to a `fill()`
 written for a different contract. Inheritance is a claim about
-substitutability, and this class makes a claim it cannot keep.
+substitutability, and `BoundedStack` makes a claim it cannot keep.

@@ -148,13 +148,13 @@ for size in (50, 100, 200):
 The ratio holds near six at every size: about 6x at a 50x50 map,
 close to 7x at 200x200. Both peaks grow with the number of
 cells, because both versions build the same nested list of references.
-The two differ in what one cell costs. A cell in the shared field
+The two versions differ in what one cell costs. A cell in the shared field
 costs one reference into a pool of three `Tile` objects, while a cell
 in the unshared field costs a brand-new `Tile`, roughly six times as
 much memory. The flyweight's saving is therefore per cell: the
 multiplier stays near six, and the bytes saved grow with the map.
 `Tile` is a record, so each unshared `Tile` is a slotted instance
-with no `__dict__`. With `@dataclass(frozen=True)` in its place the
+with no `__dict__`. With `@dataclass(frozen=True)` in place of `@record` the
 same run reports a ratio near ten, because every unshared `Tile`
 then carries a dictionary too.
 
@@ -382,7 +382,7 @@ This listing is `weak_pool.py`'s shape applied to colors: a factory
 function, `make_color()`, and a `WeakValueDictionary` for the pool.
 `Color` is a frozen data class, so it gets a generated `__repr__()`,
 `__eq__()`, and `__hash__()`, as the record `Color` in
-`interned_color.py` does. It writes the `dataclass` call in full for
+`interned_color.py` does. This `Color` writes the `dataclass` call in full for
 the reason `weak_pool.py`'s `Name` does: a weak reference needs
 `weakref_slot=True`, which `record()` does not pass through. Once `del` drops every
 reference to the fifty-shade palette and both crimson names, nothing
@@ -395,7 +395,7 @@ builds a second object equal to the pooled one, the same bypass a
 direct `Tile(...)` makes in the chapter. Weak references did not force
 that trade. `__new__()` can look in a `WeakValueDictionary` as easily
 as in a `dict`, as
-[Choosing a Flyweight and Its Pool](../../Chapters/35_Patterns--Flyweight.md#choosing-a-flyweight-and-its-pool)
+[Choosing a *Flyweight* and Its Pool](../../Chapters/35_Patterns--Flyweight.md#choosing-a-flyweight-and-its-pool)
 says, on a `Color` declared with the same
 `@dataclass(frozen=True, slots=True, weakref_slot=True)` line.
 
@@ -532,7 +532,7 @@ value-to-member table the metaclass builds performs the runtime
 membership check `to_symbol()` does by hand.
 
 The type checker still catches what the `Literal` version caught
-where that check survives. A `match` over `Tile` that leaves out a
+where the mistake can still occur. A `match` over `Tile` that leaves out a
 member draws the same `invalid-return-type` as a `match` over `Symbol`
 that leaves out a symbol. The drift the `SPECS` annotation guarded
 against, a key that `Symbol` does not list, can no longer happen,
@@ -655,11 +655,11 @@ computation, a duplicate build costs time but not correctness.
 The eager fix builds every value before any thread exists, so no miss
 remains to race on. It is the better answer whenever the whole value
 set fits in one small table, the same condition that makes an `Enum`
-work. It costs nothing at runtime.
+work. The eager fix costs nothing at runtime.
 
 The lock fix handles an unbounded value set, and its cost is real.
 Every lookup now serializes, including the hits, which are the
-overwhelming majority once the pool is warm. If that matters, lock
+overwhelming majority once the pool is warm. If that serialization matters, lock
 only on the miss path with a hand-written pool, checking the key again
 inside the lock, since another thread may have filled that entry while
 this one waited.

@@ -77,7 +77,7 @@ The difference from the chapter's `maxsize=2` run is the second
 computing `square(3)` has pushed `1` out to make room. One extra slot
 converts that miss into a hit, and that conversion is the whole of
 what `maxsize` controls. With three slots the cache never evicts
-anything, so the chapter listing's comment, "Evicts 1, the least
+anything, so `functools_lru_cache.py`'s comment, "Evicts 1, the least
 recently used," stops being true here.
 
 ## 3. `batch_totals()` stays lazy
@@ -277,7 +277,7 @@ about the algorithm reaches outside its arguments for randomness.
 What the `rng` parameter hands to the caller is control of the seed,
 and with it the responsibility for reproducibility. The
 `seed: int = 0` version accepts only an integer. A caller who wants
-two different schedules has to pass a different one, and a caller who
+two different schedules has to pass a different integer, and a caller who
 wants this function to share a program-wide random stream has no way
 to say so. The `rng` version allows both. In exchange, a caller can
 now pass `random.Random()` with no seed and get schedules that differ

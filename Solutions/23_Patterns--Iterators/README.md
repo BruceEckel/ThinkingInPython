@@ -146,7 +146,7 @@ print(list(sq))
 #: [0, 1, 4, 9, 16]
 ```
 
-Both survive a second pass, and they pay differently. The list holds
+Both fixes survive a second pass, and they pay differently. The list holds
 every value for as long as the name lives, so a million items is a
 million items in memory, and the second pass costs nothing. `Squares`
 holds only `n`, and each pass recomputes from scratch.
@@ -215,7 +215,7 @@ nor shrinks through the rest of the run. One machine measured about
 9,400 bytes at `k` of 100 and about 416,000 at `k` of 10,000. A
 hundredfold wider gap costs roughly forty times the memory rather than
 a hundred, because the smaller figure is mostly the fixed cost of the
-two branches. The difference between the two, about 41 bytes per
+two branches. The difference between the two figures, about 41 bytes per
 buffered item, is the part that tracks `k`.
 
 The script prints a boolean rather than the byte counts, since the
@@ -417,8 +417,8 @@ print(it.peek() is DONE)
 
 You cannot write a bare `peek(it)` function. Reading a value requires
 `next()`, `next()` advances, and nothing in the protocol puts a value
-back. The information you want does not exist anywhere you can reach
-without changing the thing you are asking about.
+back. The next value does not exist anywhere you can reach
+without advancing the iterator.
 
 `Peekable` stores what a bare iterator does not: one item, pulled
 early. That one stored item is the difference, and it restores
@@ -429,7 +429,7 @@ because it reads a field rather than the source.
 The cost appears in the constructor. `Peekable` pulls from the source
 before any caller asks for a value, so the constructor computes an
 expensive first item whether or not anything uses it. A source that
-blocks on its first read blocks at construction. That is the same
+blocks on its first read blocks at construction. The early pull is the same
 eagerness `tee`, `OverStream`, and this chapter's other lookahead all
 pay: answering a question about the future means fetching the future.
 
@@ -494,7 +494,7 @@ widens to `Iterator[int | str]` to say so.
 `if isinstance(item, int | str)` test in the same place, with the
 `for x in flatten_loop(item)` branch left alone. The bug is in the
 question each version asks, not in the delegation, which is why
-`yield from` neither causes it nor cures it.
+`yield from` neither causes the bug nor cures it.
 
 The annotation does not help. `Nested` reads as though a leaf must
 be an `int`, and `ty` enforces that much: it rejects a `float` in
@@ -579,7 +579,7 @@ returning to. Skipping is silent, so a filter that quietly drops every
 line looks the same as a file with nothing to report. If you take the
 skipping version, count what it drops and report the count.
 
-The class form is harder to write, and the reason is instructive.
+The skipping version is harder to write as a class, and the reason is instructive.
 A generator may decline to produce a value: `typed_skipping()` reaches
 an item it does not want and does not `yield`, and the `for`
 loop continues. `__next__()` has no such option. Every call must

@@ -43,7 +43,7 @@ print(deque_time < list_time)
 `deque_time < list_time` holds at `n = 2_000`, `20_000`, and `200_000`.
 But the margin grows with `n`: each `list.insert(0, x)` or
 `list.pop(0)` shifts every remaining element, so the whole loop costs
-O(n²). Each `deque` operation is O(1), so its loop costs O(n). At a few
+O(n²). Each `deque` operation is O(1), so the `deque` loop costs O(n). At a few
 dozen items the constant-factor overhead of a `deque` nearly closes the
 gap, though by `n = 2_000` the `deque` finishes several times faster.
 At large `n` the quadratic cost of the list dominates and the `deque`
@@ -282,7 +282,7 @@ count, two, and `row` holds five. Python raises a `ValueError` rather
 than dropping the extras, since a silent drop would hide the mismatch.
 The same error appears in the other direction, as
 `not enough values to unpack`, when the list is shorter than the
-target.
+target list.
 
 `a, *b = row` states a minimum instead: at least one item for `a`, and
 the rest, possibly none, for `b`. So the assignment accepts a
@@ -339,11 +339,11 @@ the same. A `frozendict` key gives you that property: any equal
 configuration reaches the same entry, whoever built it and whenever.
 
 Assigning to an entry raises a `TypeError` rather than quietly
-succeeding, and the type checker rejects the line too, which is why it
-carries a `# type: ignore`. The runtime exception is the point of the
+succeeding, and the type checker rejects the assignment too, so the
+line carries a `# type: ignore`. The runtime exception is the point of the
 listing.
 
-`nested` shows how far the guarantee reaches. A `frozendict` freezes
+`nested` shows how far that immutability reaches. A `frozendict` freezes
 which objects it maps its keys to, not what those objects contain, so
 `hash(nested)` must hash a `list` and fails. The immutability is
 shallow, as it is for the `tuple` in `shallow_immutability.py`.

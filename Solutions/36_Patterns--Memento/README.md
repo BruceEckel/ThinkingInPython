@@ -269,8 +269,8 @@ in, tuple out, because it serializes Python's own object
 representations rather than translating into a shared,
 language-neutral format. The reconstruction compensates for what
 JSON loses: it wraps `data["strokes"]` back in `tuple(...)` before
-passing it to `Drawing`. A type checker cannot catch the omission
-here, because `json.loads()` returns `Any`, and an `Any` satisfies the
+passing it to `Drawing`. A type checker cannot catch a missing
+`tuple(...)` here, because `json.loads()` returns `Any`, and an `Any` satisfies the
 declared `tuple[str, ...]`. Without the `tuple(...)`, `ty check` still
 passes. The mismatch surfaces only when the program runs:
 `reconstructed == drawing` becomes `False`, since a `list` never
@@ -320,7 +320,7 @@ test reaches the scenario
 `test_drawing_after_restore_spares_memento` catches. Making
 `Memento` a record prevents
 reassigning `strokes` after construction, but the list inside stays
-mutable, and every later `draw()` changes it. That is why `save()`
+mutable, and every later `draw()` changes it. So `save()`
 must copy into a `tuple`, an immutable container, instead of wrapping
 a mutable list in a record.
 
@@ -341,7 +341,7 @@ def test_memento_is_a_snapshot() -> None:
 
 Against the shared-list version, `checkpoint.strokes` is `["a", "b"]`
 when the assertion runs, because `draw("b")` appended to the one list
-both objects hold.
+`sketch` and `checkpoint` share.
 
 ## 5. `goto(steps_back)`
 
@@ -489,7 +489,8 @@ type variable `S` has no such method, so a generic version needs
 a `Protocol` declaring `__replace__()` as the type variable's bound.
 Worth doing in a library; noise in a solution.
 
-`restore_field()` must go through `do()` for the reason the section
+`restore_field()` must go through `do()` for the reason
+[Restoring Part of a State](../../Chapters/36_Patterns--Memento.md#restoring-part-of-a-state)
 gives, and the listing's last line proves it: the partial restore is
 itself an action, so it belongs on the timeline. Editing `_past`
 directly rewrites history rather than extending it, leaving the user

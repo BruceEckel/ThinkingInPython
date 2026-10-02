@@ -308,7 +308,7 @@ only when you run that tool.
 protects nothing in a codebase that does not. When the interpreter
 must refuse the override, use the `__init_subclass__()` check from
 the chapter's `near_miss.py`, which reads `__final__` from each
-method a subclass replaces. It raises a `TypeError` at the
+method a subclass replaces. The check raises a `TypeError` at the
 subclass's `class` statement, as soon as the class body has run, long
 before anyone constructs an instance.
 
@@ -389,10 +389,10 @@ No checker could catch the omission before, because
 "deliberately empty" and "forgotten" were the same code, and only
 the base class could have recorded that difference.
 
-`Exploder`'s exception is not repairable this way. Catching it
-requires the base class to state which exceptions a step may raise,
-and the type checker to hold every override to that list, which is
-Java's `throws` clause. Python has no such declaration, and no
+`Exploder`'s exception is not repairable this way. For a type
+checker to catch `Exploder`, the base class must state which
+exceptions a step may raise, and the checker must hold every
+override to that list, the mechanism Java's `throws` clause provides. Python has no such declaration, and no
 annotation expresses "this raises nothing." An exception type in a
 docstring is a note to a human. Only discipline, review, or a test
 catches `Exploder`.
@@ -547,6 +547,6 @@ framework's three names.
 The narrower check no longer catches a misspelling of a name that a
 subclass introduced. If `Audited` meant to override `report()`, its
 `reports()` is a new method that nothing calls, and the framework
-reports nothing. That override is the responsibility of `MyApp`'s
+reports nothing. Catching that misspelling falls to `Audited`'s
 author, who can use the protection the chapter recommends for steps:
 `@override` on the method, and a type checker in the build.

@@ -199,7 +199,7 @@ one dict. Mutating through either name, as the original
 `settings["theme"] = "dark"` does, changes the object both names
 refer to, so both see the change. Assigning to `settings` changes
 only which object this module's name refers to. The name in
-`config` still points at the original empty dict, which is why the
+`config` still points at the original empty dict, so the
 second print shows `{}`.
 
 Nothing warns you at runtime. The module still imports, the
@@ -288,7 +288,7 @@ slower and fixes nothing.
 
 You cannot move the lock to the right place either. The right place
 is inside `functools.cache`, where the check and the store live,
-and you do not own that code. That is why the chapter's
+and you do not own that code, so the chapter's
 `singleton_locked_settings.py` drops `@cache` and hand-writes the
 check: once you need the test and the construction inside one lock,
 you need to own both.
@@ -301,7 +301,7 @@ every call is a cache hit. The count is `1`. Priming the cache this
 way is `singleton_eager_factory.py` from the chapter, and it works
 for the same reason the module form does: the import system runs a
 module body once, and a thread that imports the module while the
-body is running waits for it to finish.
+body is running waits for the body to finish.
 
 The trade is that the module body builds the object whether or not
 anything uses it. For settings that cost is nothing. For a database
@@ -356,7 +356,7 @@ print(a.val, b.val, a.__dict__ is b.__dict__)
 
 `x.val` is `"eggs"`, the value `Other` set. Constructing an
 unrelated subclass overwrites a value belonging to `Singleton`, and
-nothing reports it.
+nothing reports the overwrite.
 
 `_shared_state` is one dict, and it lives on `Borg`. `Singleton` and
 `Other` do not declare their own, so `self._shared_state` resolves
@@ -373,9 +373,9 @@ needs state of its own says so.
 
 The trap is the general shape of a mutable `ClassVar` on a base
 class, not a quirk of *Borg*. The base declares one object, and
-every subclass inherits that same one. A subclass that assigns to
-it instead of mutating it gets a private copy, while the others
-keep sharing. *Borg* sharpens the trap: mutation is its
+every subclass inherits that same one. A subclass that binds its own
+`_shared_state` in its class body, instead of mutating the inherited one,
+gets storage of its own, while the others keep sharing. *Borg* sharpens the trap: mutation is its
 design, so every version of the pattern carries the trap.
 
 ## 7. `__init__()` runs on every construction

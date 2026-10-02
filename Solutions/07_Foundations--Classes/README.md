@@ -43,7 +43,7 @@ expect(ValueError, c.shrink, -2)
 existing validation applies to every method that changes the radius
 this way. `shrink(-2)` runs after `shrink(2)` has brought the radius
 to `5.0`, so it computes `5.0 / -2 == -2.5` and the setter rejects
-that, the same as it rejects `c.radius = -2.5` written by hand.
+`-2.5`, the same as it rejects `c.radius = -2.5` written by hand.
 
 ## 2. A second alternative constructor, `from_kelvin()`
 
@@ -181,8 +181,8 @@ print(n.average)
 ```
 
 Accessing `n.total` first runs its body once, prints the `"summing"`
-message, and stores `30` on the instance. When `average`'s body then
-reads `self.total`, it hits that stored value directly. No second
+message, and stores `30` on the instance. `average`'s body then
+reads `self.total` and gets that stored value directly. No second
 `"summing"` message appears, because `total` is already computed and
 cached before `average` asks for it. If you access `average`
 first, its own body triggers `total`'s computation the same way,
@@ -219,15 +219,15 @@ print(f"{t} is {t!r}")
 
 With only `__repr__()` defined, `print(t)` and the printed list both
 show `Temperature(21.0)`: `print()` finds no `__str__()` and falls
-back to `__repr__()`. Adding `__str__()` splits the two lines.
+back to `__repr__()`. Adding `__str__()` makes the two outputs differ.
 `print(t)` and `f"{t}"` take the readable form, while the list keeps
 showing `Temperature(21.0)` for each element, because a container
 formats its elements with `repr()` and never with `str()`. `{t!r}`
 asks for the same `Temperature(21.0)` form inside an f-string.
 
 The two forms answer different questions. `Temperature(21.0)` says
-what rebuilds this object, which is what you want in a traceback or a
-debugger. `21.0C` says what the value means, which is what you want
+what rebuilds this object, the form you want in a traceback or a
+debugger. `21.0C` says what the value means, the form you want
 in output a user reads.
 
 ## 6. A misspelled override, with and without the decorator
@@ -259,8 +259,8 @@ Derived().show()
 The program prints `Base.show`. Nothing overrides anything: `shwo()` is
 a new method in the subclass, and `show()` resolves up the chain to
 `Base`. Python does not check whether a subclass method was meant to
-replace a base-class method, so the misspelling is not an error. It is
-a second method that nothing calls.
+replace a base-class method, so the misspelling is not an error.
+`shwo()` is a second method that nothing calls.
 
 With `from typing import override` added and the decorator
 uncommented, the program still prints `Base.show`,

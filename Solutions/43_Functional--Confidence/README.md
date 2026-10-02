@@ -43,13 +43,13 @@ The assertion compares the counts alone, since the serial run carries
 the parent's process ID and the parallel run carries the workers'.
 The counts stay the same, `[17984, 33860, 49098, 63951]`: the same
 pure function gives the same answers wherever it runs, which is the
-point of the original listing. The interesting number is the second
+point of `parallel_pure.py`. The interesting number is the second
 line. Three consecutive runs on one 32-core machine reported `4`
 distinct process IDs each time.
 
 Two things follow, and neither is the one most people predict. The
-count is greater than one, so the work left the main process, which
-`assert parallel == serial` alone could never show. But the count
+count is greater than one, so the work left the main process, and
+`assert parallel == serial` alone could never show where the work ran. But the count
 also sits far below thirty-two. `ProcessPoolExecutor` allows one
 worker per core, but it starts workers on demand: a submitted task
 starts a new worker only when no existing worker is idle. Four tasks
@@ -98,7 +98,8 @@ The thread pool reports exactly `1`. Threads share their process, so
 `os.getpid()` returns the same value in every one of them. Counting
 distinct process IDs revealed process parallelism in the previous
 exercise, and it says nothing at all about thread parallelism.
-`threading.get_ident()` is the equivalent for threads. The two pools
+`threading.get_ident()` is the equivalent for threads.
+`ProcessPoolExecutor` and `ThreadPoolExecutor`
 present the identical `map()` interface and differ this fundamentally
 underneath. That contrast is the substitutable-backend point from
 [Concurrency](../../Chapters/19_Techniques--Concurrency.md#one-executor-interface-three-pools).
@@ -326,10 +327,10 @@ The `unique=True` on the roster strategy is doing real work.
 `group_rounds()` keys its history by `frozenset` of names, so two
 students sharing a name are one student to the algorithm. The
 property still passes on such a roster, because every name lands in
-one group, but the schedule it checks counts the two as one student
-when it avoids repeat meetings.
-Generating distinct names states that precondition where the test can
-see it.
+one group, but the schedule the property checks counts the two as one
+student when `group_rounds()` avoids repeat meetings.
+Generating distinct names states `group_rounds()`'s precondition where
+the test can see it.
 
 The two lines guarding an empty `groups` are the interesting part,
 because the property test finds the need for them. Against the
@@ -346,8 +347,8 @@ everyone in a group when a roster divides unevenly, folding the
 leftovers into existing groups, so the answer for a roster of two and
 a size of five is one group of two. Crashing is the one answer
 inconsistent with what the function does everywhere else. The
-chapter's `group_rounds()` includes the guard, so the test above
-passes with no `assume()`.
+`group_rounds()` in [Toolkits](../../Chapters/41_Functional--Toolkits.md#groups-of-any-size) includes the guard, so
+`test_group_rounds.py` passes with no `assume()`.
 
 Finding the defect takes no cleverness and no thought about edge
 cases. The strategy generates small rosters because Hypothesis
@@ -531,7 +532,8 @@ and `Err` carry `@final`, in the listing above and in
 `utils/result.py`. Without that decorator `ty` 0.0.84 allows for a
 class inheriting from both, so the intersection of the two stays
 alive and the value in the `Ok` comes back as `float | Unknown`
-rather than plain `float`. Both forms lose that precision together:
+rather than plain `float`. The `match` and the `isinstance()` tests
+lose that precision together:
 `result.answer` after a positive `isinstance()` and `answer` in
 `case Ok(answer)` read `float | Unknown` alike. Pyright and mypy do
 not build that intersection and report `float` with or without the

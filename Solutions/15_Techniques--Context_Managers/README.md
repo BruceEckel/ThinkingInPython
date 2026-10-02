@@ -172,8 +172,8 @@ addition.
 
 The first `lease()` takes one connection out of the queue, and the
 nested second `lease()` takes the other, so `pool.available()` is `0`
-inside the inner `with`. Exiting the inner `with` returns its
-connection first, then exiting the outer `with` returns the second,
+inside the inner `with`. Exiting the inner `with` puts `second`
+back, then exiting the outer `with` puts `first` back,
 restoring `pool.available()` to `2`. The `0` confirms the pool has no
 built-in limit of "one lease at a time." The pool holds the items you
 gave its constructor, and it hands out as many concurrent leases as
@@ -214,7 +214,7 @@ report()
 The prediction is the same one stacking produces anywhere. Python reads
 the stack as `report = banner("outer")(banner("inner")(report))`.
 `@banner("inner")` is nearest the `def`, so it wraps `report()` first,
-and `@banner("outer")` then wraps that result. Calling `report()`
+and `@banner("outer")` then wraps the inner wrapper. Calling `report()`
 therefore enters the outer manager, which calls the inner wrapper,
 which enters the inner manager before running the body. Unwinding
 reverses that order, so the four bracketing lines nest rather than
@@ -223,7 +223,7 @@ interleave.
 Each `@banner(...)` line builds one manager object, when Python
 defines `report()`. A generator manager is single-use, so the wrapper
 that `ContextDecorator` supplies does not enter that object. On each
-call of `report()` it builds a fresh manager from the same generator
+call of `report()` the wrapper builds a fresh manager from the same generator
 function and arguments, and enters that one. A hand-written
 class-based manager decorating a function re-enters the same instance
 on every call instead, so every call shares any state the instance

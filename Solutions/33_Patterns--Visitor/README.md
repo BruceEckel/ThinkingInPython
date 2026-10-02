@@ -45,7 +45,7 @@ for flower in (Ranunculus(), Chrysanthemum()):
 Everything on the visitor side disappears: the `Visitor` base, `Bug`,
 `Pollinator`, `Predator`, `Bee`, `Fly`, and `Worm`, and the two
 `visit()` methods. `Flower` loses `accept()`, and with it the `Any`
-annotation the chapter explains, and it loses `pollinate()` and
+annotation the chapter explains. `Flower` also loses `pollinate()` and
 `eat()`, which become functions outside the hierarchy.
 `Chrysanthemum`'s `eat()` override becomes a registration. Two
 functions and one registration remain.
@@ -143,7 +143,7 @@ type, because an operation is a whole function and lives in one place.
 Adding `thorns()` is cheap because three of the four flowers accept
 its default. `Rose` needs a distinct answer from every operation, so
 it costs one registration per operation, scattered across the file.
-That is the expression problem from
+That difference in cost is the expression problem from
 [Pattern Matching](../../Chapters/13_Techniques--Pattern_Matching.md#the-expression-problem):
 methods on a class make adding a type cheap, functions over a hierarchy
 make adding an operation cheap, and no arrangement makes both cheap at
@@ -215,7 +215,8 @@ does not match the protocol. The `# type: ignore` comment keeps the checker
 quiet about that call so the listing can show the runtime failure;
 without it, `ty` reports an `invalid-argument-type`.
 
-That is the price the chapter names for keeping `Any`. The `Any` moves
+Losing the check on the visitor side is the price the chapter names
+for keeping `Any`. The `Any` moves
 an error a type checker can catch into the run. The chapter's version
 pays that price because its `Visitor` base is empty. Either fix
 restores the check: declaring `visit()` abstract on that base, as the

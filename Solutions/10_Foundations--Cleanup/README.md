@@ -44,7 +44,7 @@ empty list and abandons the old one. Here nothing else refers to that
 old list, so it (and every reference it held) becomes collectible
 immediately, and both forms reach `live_count() == 0`.
 
-They stop agreeing once a second name refers to the list:
+The two forms stop agreeing once a second name refers to the list:
 
 ```python
 # exercise_1_alias.py
@@ -263,8 +263,8 @@ runs, at a different time and for a different reason.
 What keeps the `Connection` alive is the callback itself. `self.close`
 is a bound method, and a bound method holds a strong reference to
 its instance. `finalize()` stores the callback, so the finalizer
-registry now holds a reference to the object whose death it is
-waiting for. `del b` drops the last reference the program
+registry now holds a reference to the `Connection` for whose death
+the finalizer waits. `del b` drops the last reference the program
 has, but not the last reference that exists, so the object survives.
 
 `B closed` prints only because `finalize()`'s `atexit` backstop runs
@@ -275,7 +275,7 @@ on an object that `del b` should have destroyed.
 The chapter's `finalize(self, print, name, "closed")` avoids the trap
 by passing the pieces the callback needs rather than the object that
 has them. `name` is a `str` the `Connection` also happens to hold. The
-finalizer's reference to it keeps a string alive, not a connection.
+finalizer's reference to `name` keeps a string alive, not a connection.
 The rule generalizes: a finalizer may capture anything except a path
 back to its own object.
 
@@ -318,7 +318,7 @@ print("after collect")
 ```
 
 Both finalizers run at `gc.collect()`, in creation order. The
-principle is the same as before. Reference counting cannot reclaim
+principle is the same as in `cycle.py`. Reference counting cannot reclaim
 either object, because each holds the other. The cycle collector
 reclaims both together when it runs. A cycle through two objects
 behaves like a cycle through one. The self-reference in
@@ -408,7 +408,7 @@ exception with a bare `raise`, so the caller still sees `boom`.
 resource anyway.
 
 Acquiring in `__enter__()` still helps: a `Guarded` whose `__init__()`
-fails for some other reason holds no resource at that point. It does
-not remove the need for the guard. Whichever method acquires a
+fails for some other reason holds no resource at that point. That move
+does not remove the need for the guard. Whichever method acquires a
 resource, a step that can fail after the acquisition releases the
 resource before it lets the exception go.

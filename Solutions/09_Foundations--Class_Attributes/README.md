@@ -187,7 +187,7 @@ The error arrives at class-definition time, not at first use, and
 the full message ends with the remedy: `use default_factory`.
 `@dataclass` can detect the mistake because it inspects every default
 before generating the constructor. Nobody inspects a plain class body,
-which is why `shared_mutable.py`'s `Cart` builds without complaint.
+so `shared_mutable.py`'s `Cart` builds without complaint.
 
 ## 6. `del` unshadows, once
 
@@ -282,12 +282,14 @@ and `c.total` is the read falling back to that shared value.
 With the `# type: ignore` removed, the type checker (`ty`) reports
 `invalid-attribute-access`, naming the type of `self`. The augmented
 form expands to an assignment through `self`, and the type checker
-treats that assignment the way it treats `a.total = 99`, which reads
-"Cannot assign to ClassVar `total` from an instance of type `Tally`":
-a write to a `ClassVar` through an instance. The `ClassVar`
-declaration catches the mistake at check time. The listing
-suppresses the report so it can demonstrate
-what the write does when it runs.
+treats that assignment the way it treats a write like `a.total = 99`
+(the commented-out line in `class_var.py`):
+a write to a `ClassVar` through an instance.
+For such a write it reports
+"Cannot assign to ClassVar `total` from an instance of type `Tally`".
+The `ClassVar` declaration catches the mistake at check time.
+The listing suppresses the report so it can demonstrate
+what the write does at runtime.
 
 ## 8. A mutable `ClassVar` shared down the hierarchy
 
@@ -343,7 +345,7 @@ can change it in place, and a mutable one in a single class keeps the
 sharing visible. Together they produce a base-class list that every
 subclass writes to and none of them declares.
 
-Giving `Right2` its own `shared = []` splits it off, and only it. The
+Giving `Right2` its own `shared = []` splits off `Right2` alone. The
 assignment in the class body creates a new entry in `Right2`'s own
 dictionary, so `Right2.shared` stops reading through to `Base2`,
 while `Left2` still shares `Base2`'s list. The result, `[1] [1] [2]`,
@@ -388,7 +390,7 @@ print(vars(t), t.seat)
 
 The type checker reports nothing for this file. The annotation `seat: str` states
 that a `Ticket` carries a `seat`, and the checker trusts the declaration
-without checking that a method assigns it. At runtime the declaration
+without checking that a method assigns `seat`. At runtime the declaration
 creates nothing: `vars(t)` holds `holder` alone, and reading `t.seat`
 raises an `AttributeError`.
 

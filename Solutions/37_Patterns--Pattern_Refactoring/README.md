@@ -57,7 +57,7 @@ with no further wiring. `recycle_dict.py`'s sorting loop needs no
 change because `bins[type(t)].append(t)` keys on the class of each
 piece. `Plastic` is a key the dictionary has not seen, and
 `defaultdict` creates its bin the way it creates every other. The one
-edit to the script is the filename, since it hardcodes
+edit to `recycle_dict.py` is the filename, since the script hardcodes
 `parse("trash.dat")`. `parse_trash.py` needs no change because it
 calls `Trash.create(name, weight)` with a name read from the file and
 names no material. One optional step remains: `Plastic` gets a
@@ -289,7 +289,7 @@ anyone has written.
 To share a parent's bin without naming a material in the loop, choose
 your own key instead of accepting `type(t)`. A `bin` class variable
 supplies that key: `__init_subclass__()` defaults each class to
-itself, so a material that stays out keeps a bin of its own.
+itself, so a material that sets no `bin` keeps a bin of its own.
 `CrushedAluminum` opts in by setting `bin` to `Aluminum`, and it
 restates the `ClassVar` annotation for the reason the chapter's
 subclasses restate `value`'s. The sorting loop becomes
@@ -360,15 +360,15 @@ expect(NotImplementedError, strict_hazard, Plastic(1.0))
 #: [NotImplementedError] no hazard rule for Plastic
 ```
 
-`hazard()` answers "none" for the plastic, which is wrong and looks
-like every correct "none" beside it. The forgotten registration
+`hazard()` answers "none" for the plastic. That answer is wrong and
+looks like every correct "none" beside it. The forgotten registration
 produces no exception and no report from the type checker.
 `strict_hazard()` raises a `NotImplementedError` that names the
 material at the first call.
 
 The strict form costs one registration for every material, including
 each one whose answer is "none": `Paper` needs three lines to say what
-the fallback said with no code. Choose by which mistake costs more. A
+`hazard()`'s base function answered without a registration. Choose by which mistake costs more. A
 default is right when it is a true answer for most types and a
 forgotten registration does little harm. A base function that raises
 an exception is right when a wrong answer is worse than a stopped

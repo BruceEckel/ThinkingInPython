@@ -56,7 +56,7 @@ calling `__getattr__()`, and the three reads build nothing. Each one
 increments `_answered`. The first `query()` is the first name the proxy
 lacks, so `__getattr__()` runs, reports the count, and builds the real
 object; the second `query()` finds `_real` set and forwards without
-either. The counter records how much work the proxy saved: three
+reporting or building. The counter records how much work the proxy saved: three
 requests served from a string the proxy held from the start, with the
 slow construction pushed past all of them. GoF's image proxy is the
 same design, answering an image's size from stored numbers while the
@@ -217,7 +217,7 @@ The trap is specific to the fallback hook. `__getattr__()` runs only
 when normal lookup fails, so any missing name it touches sends Python
 straight back into `__getattr__()`. Reading `self._impl`, which
 `__init__()` did assign, resolves normally and never reaches
-`__getattr__()`. That is why the chapter's working version is safe and
+`__getattr__()`. That normal lookup is why the chapter's working version is safe and
 `BrokenProxy` is not. A proxy whose `__init__()` never ran (an instance
 built through `object.__new__()`, for example) fails the same way on
 its first attribute access.
@@ -303,7 +303,8 @@ print("outer released:", pool.available())
 ```
 
 `Pool` builds every `Connection` in its constructor, and nothing else
-creates one. That is *Singleton*'s control over creation, with the
+creates one. Letting only `Pool` create connections is
+*Singleton*'s control over creation, with the
 limit raised from one object to `POOL_SIZE`.
 
 The client never holds a `Connection`. `acquire()` hands back a
@@ -312,14 +313,14 @@ and owns the one job the connection cannot do for itself: returning
 that connection to the pool. The proxy is also a context manager
 ([Context Managers](../../Chapters/15_Techniques--Context_Managers.md)).
 `__exit__()` runs whether the block ends normally or raises an
-exception, so "must check it back in" becomes a guarantee.
+exception, so "must check that connection back in" becomes a guarantee.
 
 `__exit__()` also drops the proxy's reference to the connection, so a
 released proxy cannot keep using a connection that now belongs to
 someone else. The check in `__getattr__()` reports that misuse instead
 of letting two clients share one connection. `ConnectionProxy` is a
 *protection proxy* and a *smart reference* at once: it controls access,
-and it adds an action (the check-in) around the object's lifetime.
+and it adds an action (the check-in) around each loan of the connection.
 
 ## 6. Forwarding `__len__()` explicitly
 
@@ -420,11 +421,11 @@ s.g()  # The old implementation is still in place
 caller can reach through the surrogate's `__getattr__()`.
 `change_to()` compares the two sets and refuses the swap when the
 replacement drops a name the current implementation answers. The
-surrogate keeps what it had, so `s.g()` still works after the
-rejected swap.
+surrogate keeps its current implementation, so `s.g()` still works
+after the rejected swap.
 
 The type checker cannot make this decision. The decision compares
-the type of the value the surrogate holds right now with the type of
+the type of the implementation the surrogate holds right now with the type of
 the argument, and the checker knows neither: both are `Any`, because
 `__getattr__()` delegation deliberately leaves the implementation's
 type untracked. Annotating both against a `Protocol` states a fixed
