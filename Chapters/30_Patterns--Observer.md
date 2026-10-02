@@ -169,8 +169,8 @@ and shows index by index which responder the loop skips without the copy.
 
 ## Easier Names
 
-The pattern's traditional names are hard to hold in your head.
-`java.util.Observable` and the reactive libraries call the subject an `Observable`.
+The traditional names are hard to hold in your head.
+Both `java.util.Observable` and the reactive libraries call the subject an `Observable`.
 `Observer` and `Observable` share a stem and name opposite roles,
 so every listing asks you to decode which end you are looking at.
 GoF's method names are a second obstacle.
