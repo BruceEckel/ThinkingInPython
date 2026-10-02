@@ -176,7 +176,7 @@ so every listing asks you to decode which end you are looking at.
 GoF's method names are a second obstacle.
 When the subject changes, it calls its own `notify()`,
 and `notify()` calls `update()` on each observer.
-Those two names describe one event.
+Those two names describe one change from its two ends.
 `notify()` is the subject sending a change,
 and `update()` is an observer receiving that change.
 Nothing in the two words pairs them,
