@@ -20,6 +20,12 @@ because a paragraph that repeats its nouns in every sentence
 reads as if written for a machine.
 It edits `Chapters/NN_*.md` prose only;
 code blocks, `#:` output markers, and quoted material stay untouched.
+Given a `Solutions/<chapter>/README.md`, it edits that file's prose the same way,
+with one more exclusion:
+the block quote under each `## N.` heading is the chapter's exercise statement,
+copied there by `tip statements`,
+so an edit to it is overwritten on the next verify.
+A pointer that needs fixing in a quoted statement gets fixed in the chapter's exercise instead.
 
 ## The test
 
@@ -180,8 +186,9 @@ if the paragraph needs its sentences reordered, leave it for `cohesion`.
 
 ## Verify and report
 
-Touched prose gets `tip reflow CH=NN` (Semantic Line Breaks),
-then `tip verify`, then read `git diff Chapters/`:
+Touched chapter prose gets `tip reflow CH=NN` (Semantic Line Breaks);
+a Solutions file is never reflowed.
+Then run `tip verify`, and read `git diff Chapters/ Solutions/`:
 a changed `#:` marker means an edit strayed into code, so investigate it.
 Report each change as the pointer, its candidates, and the noun chosen.
 List any pointer you judged ambiguous but left,

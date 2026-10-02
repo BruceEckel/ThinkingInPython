@@ -61,6 +61,10 @@ Usage:
     python -m tools.rewrite 25 --passes activate  # activate only
     python -m tools.rewrite 25 --model claude-sonnet-5
     python -m tools.rewrite Chapters/25_Patterns--Template_Method.md --all
+    python -m tools.rewrite Solutions/25_Patterns--Template_Method/README.md
+
+A Solutions file named by its path runs the same passes, minus the
+reflow, which the gate never applies to `Solutions/`.
 """
 
 import argparse
@@ -343,7 +347,11 @@ def claude_argv(
 
 
 def chapter_tag(chapter: Path) -> str:
-    """`[25]` from `Chapters/25_Patterns--Template_Method.md`, for parallel output."""
+    """`[25]` from `Chapters/25_Patterns--Template_Method.md`, and `[S25]`
+    from `Solutions/25_Patterns--Template_Method/README.md`, for parallel
+    output."""
+    if chapter.parts[0] == "Solutions":
+        return f"[S{chapter.parent.name.split('_', 1)[0]}]"
     return f"[{chapter.stem.split('_', 1)[0]}]"
 
 
@@ -389,6 +397,9 @@ def changed_lines(chapter: Path) -> str:
 def checks_after(chapter: Path, python: list[str], out: Reporter) -> bool:
     """Reflow the chapter and run the prose gates; False on the first failure."""
     for label, argv, scoped in CHECKS:
+        # The gate never reflows Solutions/, so a pass must not either.
+        if label == "reflow" and chapter.parts[0] == "Solutions":
+            continue
         full = [*python, *argv]
         if scoped:
             full.append(chapter.as_posix())
