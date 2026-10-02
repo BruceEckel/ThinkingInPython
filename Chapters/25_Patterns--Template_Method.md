@@ -113,7 +113,7 @@ This kind of optional step is a *hook*.
 The `setUp()` and `tearDown()` in the opening example are hooks.
 `TestCase` supplies do-nothing versions,
 so a test class that needs no setup skips them.
-This silence hides a misspelling.
+The do-nothing default also hides a misspelling.
 `def customise1()` ('s' instead of 'z')
 adds a new method and leaves the base's do-nothing version in place.
 That is why every step override in these listings carries `@override`.
@@ -204,7 +204,7 @@ If that attribute carries `__final__`,
 `__init_subclass__()` raises a `TypeError`: `class Hijack` never finishes,
 because a subclass that replaces the anchor moves the algorithm out of the base class,
 and `@final` stops that replacement only for the type checker.
-The check names no method,
+The `__final__` check names no method,
 so a second `@final` method in `ApplicationFramework` gets the same protection with no change to `__init_subclass__()`.
 Reading the attribute through `getattr()` also keeps the type checker quiet.
 A function's type declares no `__final__`,
@@ -222,7 +222,7 @@ so the misspelling fails at import time,
 not later when the framework runs and the step silently does nothing.
 Rejecting every new method catches the typo too, but it also forbids `report()`,
 and a framework that bans helper methods in its subclasses is too restrictive.
-The heuristic also rejects legitimate names:
+The close-match check also rejects legitimate names:
 `class Weird` never finishes either,
 because `customized_report()` shares enough letters with `customize2` for `get_close_matches()` to flag it,
 although it is not a typo.
@@ -330,7 +330,8 @@ The name, the parameters, and the return type all match the base,
 so `@override` is satisfied and the type checker reports nothing.
 The base states its algorithm in the loop, not in any type:
 each pass calls the step, so each pass must perform it.
-Each of the three failures corrupts the anchored algorithm.
+An unexpected exception, an empty step,
+and a skipped pass each corrupt the anchored algorithm.
 The `...` defaults make a step optional,
 and nothing distinguishes "deliberately empty" from "forgotten."
 The *Template Method* works only when every subclass is a faithful substitute for its base.
@@ -368,7 +369,7 @@ expect(TypeError, run_framework, lambda: print("one"))  # type: ignore
 #: argument: 'customize2'
 ```
 
-The figure lays the two forms side by side,
+The figure lays the subclass form and the function form side by side,
 starting from the base class with its empty hooks:
 
 ![](_images/template_method_story)
@@ -401,7 +402,8 @@ with no help from a decorator the runtime ignores.
 Passing functions is not the *Strategy* pattern,
 although the two look alike at the call site.
 A *Strategy* swaps out a whole algorithm behind a single interface.
-Here the algorithm stays put, and only its steps come from outside.
+In `template_function.py` the algorithm stays put,
+and only its steps come from outside.
 The choice between a class and a function is the same trade-off as in [Function Objects](28_Patterns--Function_Objects.md#strategy-choosing-the-algorithm-at-runtime).
 A stateless hook is usually better as a function than as an overridden method.
 
@@ -454,7 +456,7 @@ Each exercise is answered in this chapter's [solutions](../Solutions/25_Patterns
     one whose `customize1()` raises an exception the base never raises,
     and one that leaves `customize2()` at its `...` default when the flow depends on it.
     The type checker reports neither.
-    What must be true of the base class for it to catch either one?
+    What must be true of the base class for the type checker to catch either one?
 5.  In `near_miss.py`, subclass `MyApp` with a class that adds a method named `reports()`.
     Predict what the `class` statement does, then run it.
     Which names does `__init_subclass__()` compare a new method against?

@@ -89,7 +89,8 @@ so the alias can name `Trash` several lines before the `class` statement that de
 
 Python implicitly makes [`__init_subclass__()`](17_Techniques--Metaprogramming.md#self-registration-of-subclasses)
 a classmethod, so it needs no `@classmethod` decorator and its first parameter is the new subclass.
-It runs once per subclass, immediately after Python creates that subclass,
+`__init_subclass__()` runs once per subclass,
+immediately after Python creates that subclass,
 so each one can register itself in `Trash.registry` automatically.
 
 `create()` is a class method reading `cls.registry`.
@@ -99,7 +100,7 @@ warns that this form can mislead:
 The lookup is safe here,
 because every subclass writes to `Trash.registry` and none defines a `registry` of its own,
 so `cls.registry` always resolves to that one table.
-Call it as `Trash.create()`.
+Call `create()` as `Trash.create()`.
 
 `@record` builds `__init__()` from the bare `weight: float` annotation alone:
 the two [`ClassVar` attributes](12_Techniques--Data_Classes_as_Types.md#d-a-real-classvar)
@@ -274,10 +275,12 @@ A `case _:` wildcard could catch a new material:
 The wildcard is worth adding, and the flaw remains:
 every new material means editing this `match`.
 A sorter over an open set must let each piece choose its own bin,
-and the next section's `bins[type(t)]` does that with no edit.
+and `bins[type(t)]`,
+in [Let a Dictionary Do the Sorting](#let-a-dictionary-do-the-sorting),
+does that with no edit.
 
 Now the plant starts accepting plastic,
-which means some new lines in the data and a new material class:
+so the data gains some new lines and the program gains a new material class:
 
 ```text
 # plastic.dat
@@ -372,7 +375,7 @@ That dispatch first appeared in the event bus in [Function Objects](28_Patterns-
 
 The key is the *exact* class.
 If you derive `CrushedAluminum` from `Aluminum`,
-it sorts into its own bin rather than its parent's.
+a `CrushedAluminum` sorts into its own bin rather than its parent's.
 A bin per exact class is usually what a sorter needs,
 but keep that key in mind before you subclass a material.
 Subclasses are another place where `recycle_rtti.py` and `recycle_dict.py` differ:
@@ -380,7 +383,7 @@ Subclasses are another place where `recycle_rtti.py` and `recycle_dict.py` diffe
 so `recycle_rtti.py` puts a `CrushedAluminum` in the `Aluminum` bin.
 Swapping the `match` for the dictionary is a redesign, not a rename.
 
-The `defaultdict(list)` creates a bin the first time the loop reads a piece of that material.
+The `defaultdict(list)` creates a material's bin the first time the loop reads a piece of that material.
 `Bins` is an alias for a plain `dict`,
 so a type checker accepts `bins: Bins = {}` too.
 That version raises a `KeyError` on the first piece of trash.
@@ -438,7 +441,7 @@ That trade is the [expression problem](13_Techniques--Pattern_Matching.md#the-ex
 The plant prints a recycling instruction for each material,
 from a `note()` method on each class.
 Now the safety officer wants a disposal hazard printed beside the instruction.
-That is a second operation that varies by material.
+Printing the hazard is a second operation that varies by material.
 The obvious place for it is a method on each material class:
 
 ```python
@@ -622,7 +625,7 @@ For an operation that belongs on an object and still varies by type,
 [`functools.singledispatchmethod`](41_Functional--Toolkits.md#singledispatchmethod)
 provides the same dispatch in method form.
 [*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md#the-singledispatchmethod-trap)
-shows it in use, along with the one mistake it makes easy:
+shows `singledispatchmethod` in use, along with the one mistake it makes easy:
 a `@singledispatchmethod` on a shared base gives every subclass the same dispatcher.
 
 The chapter now holds two kinds of dispatch that treat subclasses differently.
@@ -668,7 +671,7 @@ Each exercise is answered in this chapter's [solutions](../Solutions/37_Patterns
 4.  Derive `CrushedAluminum` from `Aluminum`,
     add it to the data `recycle_dict.py` reads,
     then run `recycle_dict.py` and `recycling_note.py`.
-    Explain why it gets its own bin but not its own note.
+    Explain why `CrushedAluminum` gets its own bin but not its own note.
     Then change `recycle_dict.py` so a subclass shares its parent's bin,
     without naming any material in the sorting loop.
 5.  Define `Plastic`, whose disposal hazard is toxic fumes,

@@ -60,7 +60,7 @@ p.g()
 ### What the Implementation Supplies
 
 `Implementation` need not have the same interface as `Proxy`.
-`Proxy` qualifies as long as code calls it where it would otherwise call the implementation.
+`Proxy` qualifies as long as code calls it in place of the implementation.
 That is a looser definition than in *GoF Design Patterns*,
 and relies only on intent.
 Under GoF's stricter definition, the interface separates *Proxy* from *Adapter*.
@@ -194,7 +194,7 @@ p.h()
 because `Proxy` names no methods in `Implementation`,
 it keeps working when you add a method to the implementation.
 `Implementation` here has an `h()` that `proxy_forwarding.py`'s lacks,
-and `p.h()` forwards it without changing `Proxy`.
+and the proxy forwards `p.h()` with no change to `Proxy`.
 
 The double underscore on `self.__implementation` matters:
 the name [mangles](11_Techniques--Testing.md#white-box-and-black-box-tests)
@@ -208,14 +208,14 @@ Normal lookup finds `self.__implementation`,
 so reading that name in the hook's body does not call the hook again.
 `__getattribute__()` intercepts every attribute access,
 including each `self.` access in its own body,
-so the naive version calls itself forever.
+so a `__getattribute__()` that reads `self.__implementation` calls itself forever.
 Writing a `__getattribute__()` means calling `object.__getattribute__()` for every internal access,
 machinery a surrogate rarely needs.
 
 `proxy_interface.py`'s abstract base class still guards the implementation side:
 its `Proxy` takes a `Service` parameter,
 so the type checker verifies that whatever you provide has the necessary methods.
-A `Protocol` on that parameter guards it structurally,
+A `Protocol` on that parameter guards the implementation side structurally,
 and `proxy_protocol.py`'s `isinstance()` is the runtime half of that check.
 Calls on the proxy get no such check.
 Because `__getattr__()` resolves `p.f()` and returns `Any`,
@@ -271,7 +271,7 @@ print("__main__.Proxy object" in str(p))
 #: True
 ```
 
-The two calls look interchangeable and are not.
+`p.__len__()` and `len(p)` look interchangeable and are not.
 `p.__len__()` is ordinary attribute access,
 so the failed instance lookup falls through to `__getattr__()`, which delegates.
 `len(p)` looks up `__len__()` on `type(p)`, skips the instance, finds none,
@@ -373,7 +373,7 @@ if the implementation has an `_implementation` of its own,
 The fallback hook `__getattr__()` can recurse.
 If `__getattr__()`'s body reads a proxy attribute that does not exist,
 the failed lookup calls `__getattr__()` again.
-Python reports this as a `RecursionError`,
+Python reports the recursion as a `RecursionError`,
 not the `AttributeError` that names the cause.
 
 A misspelled `self._implementation` is one cause.
@@ -498,7 +498,9 @@ The standard library's `weakref.proxy()` is a transparent forwarding wrapper too
 but it solves none of these four:
 it forwards to a weakly referenced object and raises `ReferenceError` once nothing else holds a strong reference to that object.
 [Cleanup](10_Foundations--Cleanup.md#reliable-alternatives)
-uses `weakref.ref()`, and a `WeakValueDictionary` in the section that follows.
+uses `weakref.ref()`,
+and its [Watching Objects Without Holding Them](10_Foundations--Cleanup.md#watching-objects-without-holding-them)
+section uses a `WeakValueDictionary`.
 Both come from the same module, and neither needs `weakref.proxy()`.
 
 ### Virtual Proxy
@@ -584,7 +586,7 @@ not against a caller who goes around it.
 so `hasattr(guest, "erase")` raises `PermissionError` too,
 where a missing name returns `False`.
 A surrogate whose `__getattr__()` can raise something other than `AttributeError` breaks `hasattr()`.
-It fails `isinstance()` for a different reason:
+The surrogate fails `isinstance()` for a different reason:
 as [A *Surrogate* Is Not Its Implementation](#a-surrogate-is-not-its-implementation)
 explains, the Protocol check uses `inspect.getattr_static()`,
 which never calls `__getattr__()`.
@@ -638,9 +640,9 @@ so reading a data attribute counts nothing.
 
 Lookup fails on every `p.f`, so every access builds another `counted`.
 Two lookups of the same name therefore produce two different objects,
-and the wrapper reports its own name rather than the implementation's.
+and the wrapper reports its own name, `counted`, rather than `f`.
 Building a `counted` increments nothing.
-Only calling performs the increment,
+Only a call to `counted` performs the increment,
 so the three lookups in the `print()` leave the tally at three.
 
 This proxy names its implementation `_impl`, with one underscore,

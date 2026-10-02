@@ -261,7 +261,7 @@ so write `__exit__()` methods that fail only for reasons worse than the original
 When the block finishes normally, all three are `None`.
 When it raises an exception, they hold the exception's class, its instance,
 and its traceback object.
-`Trace.__exit__()` above types `exc` and `tb` as `object`,
+`Trace.__exit__()` in `trace_cm.py` types `exc` and `tb` as `object`,
 the most general type, since it never inspects either one.
 
 The return value decides that exception's fate.
@@ -378,7 +378,7 @@ You can still write `as`, but it binds `None`.
 `expected` is a fuller version of `expected_one`:
 it takes several types at once, and with no argument it catches everything.
 Its name says how the book uses it: the block is expected to raise an exception,
-and the manager shows what it raised.
+and the manager shows what the block raised.
 It is useful enough to reuse elsewhere in the book, so it lives in `utils/`,
 where any chapter can import it:
 
@@ -455,7 +455,7 @@ so `issubclass(exc_type, self.types)` type-checks.
 `__exit__()` also hands the exception to `report()`,
 which prints it as `[Type] message` through `textwrap.fill()` at `WIDTH`,
 so a long message wraps instead of overrunning the listing width.
-`expect()` below prints through the same function,
+`expect()`, in the same file, prints through `report()` too,
 so every demonstrated exception in the book has one form.
 
 `suppress` treats the no-argument call the opposite way:
@@ -495,7 +495,7 @@ The `1 / 0` raises an exception, `__exit__()` prints the exception it caught,
 then returns `True`,
 and the `with` statement absorbs the error so `survived` still prints.
 
-In the last example, `x` receives the return value of `__enter__()`,
+In the third `with`, `x` receives the return value of `__enter__()`,
 which for `expected()` is `None`.
 
 ### The `expect()` Function
@@ -504,7 +504,7 @@ Many listings in this book call something to show the exception it raises.
 `expect()` is the function form of that demonstration.
 It names the types it expects, calls `fn` with the remaining arguments,
 and prints the exception as `[Type] message`,
-wrapped by `textwrap.fill()` when it is wider than `WIDTH`.
+wrapped by `textwrap.fill()` when that line is wider than `WIDTH`.
 `WIDTH` is 57 because this book's listings are 60 columns wide and a `#:` output line spends three of them on its prefix.
 An exception of another type propagates,
 and a call that raises nothing fails with an `AssertionError`,
@@ -551,7 +551,7 @@ brackets a function call the same way.
 A subclass works both as a context manager and as a decorator.
 Every manager `@contextmanager` produces already inherits from `ContextDecorator`,
 so `banner` works as a decorator,
-even though `ContextDecorator` never appears in it:
+even though `ContextDecorator` never appears in `context_decorator.py`:
 
 ```python
 # context_decorator.py
@@ -648,7 +648,7 @@ returns a replacement that runs instead of the original function,
 skipping its call.
 What `banner` offers instead is one definition,
 usable both as a `with` block and as a `@` decorator.
-Use it when setup and cleanup should be identical on every call.
+Use `ContextDecorator` when setup and cleanup should be identical on every call.
 
 The wrapper treats a generator function differently.
 Before Python 3.15, it wrapped only the call that creates the generator object,
@@ -821,13 +821,14 @@ The `contextlib` module provides ready-made managers.
 Choose these before writing `__enter__()` and `__exit__()` by hand.
 
 - `suppress(*exceptions)` ignores the listed exceptions,
-  covering the case the `expected` class above handles,
+  covering the case the `expected` class handles,
   without `expected`'s printing or its catch-everything default.
 - `closing(obj)` calls `obj.close()` on exit,
   for objects that have `close()` but are not context managers themselves.
-- `ExitStack` manages a dynamic or conditional set of managers, as shown above.
+- `ExitStack` manages a dynamic or conditional set of managers,
+  as [Combining Context Managers](#combining-context-managers) shows.
 - `ContextDecorator` lets a context manager double as a decorator,
-  as shown above.
+  as `banner` shows.
 - `nullcontext(value)` is a do-nothing manager whose `__enter__()` returns `value`,
   useful when a `with` is optional and one code path should cover it.
 
@@ -887,7 +888,7 @@ and `sys.stdout`, open, as the caller expects.
 `with` calls `__enter__()` and `__exit__()`.
 `async with` calls `__aenter__()` and `__aexit__()`, which are coroutines,
 so the setup and the cleanup can both await.
-`contextlib.asynccontextmanager` builds one from an async generator,
+`contextlib.asynccontextmanager` builds such a manager from an async generator,
 the same way `@contextmanager` builds the synchronous form,
 and `AsyncExitStack` is the `ExitStack` equivalent:
 
@@ -1007,7 +1008,7 @@ so a borrower waits until someone else's `with` block ends and a return makes an
 When several threads share one pool,
 the queue becomes the throttle that limits concurrent use,
 the way a real database connection pool does.
-Here it is under real contention:
+`pool_contention.py` puts the pool under real contention:
 eight threads share a pool of two connections and lease and release two hundred times each.
 
 ```python
@@ -1132,7 +1133,7 @@ because they are the same object.
 For a mutable pooled resource, that is where corruption comes from:
 two borrowers each believe they have exclusive use of one connection.
 Guarding against it takes a wrapper that invalidates the borrower's handle on exit,
-one more refinement the skeleton above leaves out.
+one more refinement the `Pool` skeleton leaves out.
 
 Each of those refinements is a change inside `lease()`,
 invisible to every `with pool.lease()` in the codebase.

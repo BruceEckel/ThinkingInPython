@@ -104,7 +104,7 @@ the smallest amount of data to include in the context switch.
 The programmer minimizes context switches by deciding when they happen.
 Moving that control into the program simplifies both writing the program and reasoning about it.
 
-That was the first big shift.
+Moving the context switch into the program was the first big shift.
 The second changed who schedules parallel work.
 Mapping every parallel task onto its own OS thread worked,
 but it pushed all scheduling decisions onto the OS and needed extra machinery
@@ -574,7 +574,8 @@ The event loop keeps only weak references to its tasks,
 so a task that loses its last strong reference can disappear mid-execution,
 printing nothing and raising no exception.
 A `TaskGroup` holds its own references until the block exits.
-Outside one, keep the returned task in a variable or a set that outlives it.
+Outside a `TaskGroup`,
+keep the returned task in a variable or a set that outlives the task.
 `c` and `d` raise exceptions at the same 0.03-second mark,
 and the `TaskGroup` responds by cancelling `e` and `f`,
 which are still suspended with far more sleep to go,
@@ -777,7 +778,8 @@ shows the identical failure with threads.
 A thread switch is preemptive,
 occurring at points the interpreter picks and you do not choose,
 while a coroutine yields only at an `await` you chose to write.
-That makes the gap easier to find, not safer to leave unguarded.
+Yielding only at a written `await` makes the gap easier to find,
+not safer to leave unguarded.
 A read-modify-write that spans an `await` needs `asyncio.Lock`,
 just as the same race between threads needs a `threading.Lock`.
 
@@ -812,8 +814,7 @@ asyncio.run(main())
 
 The change from `async_race.py` is the module-level `lock` and the `async with lock:` block.
 The block protects the read, the yielding `await`, and the write.
-If a task reaches `async with lock` while another task already holds the lock,
-it suspends itself until that lock becomes available.
+A task that reaches `async with lock` while another task already holds the lock suspends itself until the lock becomes available.
 This way, only one task runs its read-modify-write at a time,
 no matter how many times the event loop switches to another task in between.
 The counter now reaches 400, the same fix `threading.Lock` produces for threads.
@@ -960,10 +961,10 @@ asyncio.run(handle("req-7"))
 ```
 
 Leaving the `with` block calls `reset()` on the token,
-which puts back whatever the variable held before, not the default.
+and `reset()` puts back whatever the variable held before, not the default.
 That distinction matters when scopes nest.
-Before 3.14 you wrote `token = var.set(x)` and a matching `var.reset(token)` in a `finally`,
-which is the same code the context manager now writes for you.
+Before 3.14 you wrote `token = var.set(x)` and a matching `var.reset(token)` in a `finally`.
+The context manager now writes that same pair for you.
 
 The `offloaded` line is the reason `ContextVar`, rather than `threading.local`,
 is the modern answer.
@@ -1009,7 +1010,7 @@ if __name__ == "__main__":
 
 `pool.map()` sends each order to a worker process and gathers the results in order,
 printing `[10, 20, 30, 40, 50]`, the same answer as the other versions.
-The computation is the same `cpu_price()` as before.
+The computation is the same loop as `cpu_price()` in `peak_concurrency.py`.
 The work now spreads across multiple interpreters, each on its own core,
 instead of one interpreter on one core.
 With enough cores the wall-clock time falls toward the time of a single task.
@@ -1024,12 +1025,12 @@ and all three surface in `parallel_cpu.py`:
    and that interpreter *imports* this module to find `cpu_price()`.
    During the import the module's name is not `"__main__"`,
    so the guarded block stays skipped.
-   If you leave it out, each worker re-runs the block,
+   If you leave out the guard, each worker re-runs the block,
    tries to build a pool of its own,
    and dies with `RuntimeError: An attempt has been made to start a new process before the current process has finished its bootstrapping phase`.
    The parent sees the worker's death as `BrokenProcessPool`,
    with the worker's own `RuntimeError` traceback printed above it by the failing child process.
-   Before 3.14 this was a Windows and macOS concern only,
+   Before 3.14 the guard was a Windows and macOS concern only,
    because Linux forked the parent process instead of importing anything.
    Since 3.14 no platform forks by default,
    so every platform requires the guard.
@@ -1225,7 +1226,7 @@ a scaling strategy.
 
 ## The GIL and Free Threading
 
-Threads don't help with the previous section's CPU-bound work.
+Threads don't help with the CPU-bound work in [Parallelism](#parallelism).
 The standard CPython build has one GIL for the whole process,
 so only one thread runs Python bytecode at a time,
 no matter how many cores sit idle.
@@ -1349,7 +1350,7 @@ Each was reasonable on its own.
 In 1990, Python adopted *reference counting* for memory management.
 Every object carries a count of the references to it.
 When the count reaches zero, the interpreter frees the object immediately.
-This gave Python deterministic cleanup with no collector pauses.
+Reference counting gave Python deterministic cleanup with no collector pauses.
 
 It also added a cost.
 Every count update is a read-modify-write sequence,
@@ -1434,7 +1435,7 @@ so all eight threads read the same value,
 and their eight writes store the same result.
 
 At full speed, with no deliberate sleep, the GIL makes this race rare.
-But it never makes it impossible.
+But it never makes the race impossible.
 Threads that share mutable state need a lock,
 or a queue like the one in [Coordinating Threads with Queues](#coordinating-threads-with-queues).
 The fix mirrors `async_locks.py`'s: wrap the read, the sleep,
@@ -1481,7 +1482,8 @@ tracked by [PEP 703](https://peps.python.org/pep-0703/) and installed separately
 removed its "experimental" label in 3.14,
 so it is a supported build now rather than a preview,
 still optional and still installed alongside the default one.
-It removes the GIL, so threads run Python bytecode on separate cores at the same time.
+The free-threaded build removes the GIL,
+so threads run Python bytecode on separate cores at the same time.
 Under a free-threaded interpreter `gil_threads.py`'s boolean flips to `False`.
 Replacing its last line with `print(f"threads speedup: {seq / thr:.1f}x")` reports the size of the gain:
 
@@ -1501,7 +1503,7 @@ non-atomic arithmetic.
 Only other threads pay for an atomic operation.
 Permanent objects like `None`, `True`, and small integers become *immortal*.
 Their counts never change.
-Immortality arrived in 3.12 for every build but pays off most here,
+Immortality arrived in 3.12 for every build but pays off most in the free-threaded one,
 since it removes the one atomic operation every thread otherwise contests.
 Mutable containers like dictionaries and lists carry individual locks,
 so two threads contend only when they touch the same container.
@@ -1705,8 +1707,8 @@ asyncio.run(main())
 
 `consumer()` starts first and finds the queue empty,
 so `get()` suspends it rather than blocking the thread underneath it.
-`producer()` then runs, sleeps to stand in for slow work, and puts an item,
-which wakes the waiting consumer.
+`producer()` then runs, sleeps to stand in for slow work, and puts an item.
+That `put()` wakes the waiting consumer.
 `asyncio.Queue` needs no locks,
 since the event loop lets only one coroutine touch it at a time.
 That guarantee holds within the event loop's own thread alone:
@@ -1778,8 +1780,9 @@ it reads the counter, does something that releases the GIL,
 and writes the counter back.
 Eight threads read the same number and all eight receive it,
 so a ticket meant to go to one worker goes to several.
-The count of distinct values is still 200, which makes this dangerous:
-nothing is missing, so nothing looks wrong until you notice the same work ran eight times.
+The count of distinct values is still 200,
+and that full count makes the duplication dangerous: nothing is missing,
+so nothing looks wrong until you notice the same work ran eight times.
 
 `threading.serialize_iterator()` wraps an iterator so that `__next__()` runs under a lock,
 one thread at a time.
@@ -1828,13 +1831,13 @@ print("synchronized:", outcome(guarded(LIMIT)))
 
 A generator refuses to resume while already running,
 so the second thread through gets `ValueError: generator already executing`.
-A typical run loses seven of the eight workers to it while the first drains the whole sequence.
+A typical run loses seven of the eight workers to that `ValueError` while the first drains the whole sequence.
 That is better than silent duplication,
 but only in the way a crash is better than corruption.
 
 `threading.synchronized_iterator()` takes the generator *function*,
 not a generator, and returns a function that serializes every generator it creates.
-It also works as a decorator on the `def`,
+`synchronized_iterator()` also works as a decorator on the `def`,
 the right form when the serializing belongs to the function rather than to each caller.
 Keep the pairing straight:
 `serialize_iterator()` wraps one iterator you already have,
@@ -1875,7 +1878,8 @@ a `concurrent_tee()` iterator is safe to hand to one thread,
 and that is why the listing makes four of them.
 Sharing a single one across several threads needs `serialize_iterator()` on top.
 
-These three arrived in 3.15.
+`serialize_iterator()`, `synchronized_iterator()`,
+and `concurrent_tee()` arrived in 3.15.
 Before that, you wrote the lock wrapper yourself,
 and that wrapper is easy to get subtly wrong.
 The tempting fix is a lock inside the loop:
@@ -1886,7 +1890,7 @@ for item in shared:       # next() runs here, unguarded
         process(item)
 ```
 
-That guards the work and leaves the race untouched,
+That lock guards the work and leaves the race untouched,
 because the `for` statement calls `next()`, outside the block the lock protects.
 Serializing an iterator means putting the lock inside `__next__()`,
 and that is where these three wrappers put it.
@@ -1944,8 +1948,8 @@ if __name__ == "__main__":
 `run_on()` accepts the base type `Executor`, so it takes all three subtypes,
 whose workers could not be more different: an OS thread, an OS process,
 a subinterpreter.
-It prints `[10, 20, 30, 40, 50]` and `True`: three unrelated kinds of worker,
-one set of answers.
+The listing prints `[10, 20, 30, 40, 50]` and `True`:
+three unrelated kinds of worker, one set of answers.
 
 `asyncio` does not fit here.
 An `Executor` blocks a worker and hands back a result.
@@ -2002,7 +2006,7 @@ if __name__ == "__main__":
 ```
 
 Three different backends run inside one `TaskGroup`.
-`io_price()` suspends and resumes on the event loop the way `fetch()` does in this chapter's first listing.
+`io_price()` suspends and resumes on the event loop the way `fetch()` does in `async_mechanics.py`.
 `to_thread()` hands `blocking_price()` to a worker thread the way it does in `to_thread.py`.
 `process_price()` hands `cpu_price()` to a worker process the way `parallel_cpu.py` does,
 wrapped in one `async def` so `TaskGroup` can hold it alongside the others.
@@ -2016,12 +2020,12 @@ An `Executor` and `asyncio` give their result-that-arrives-later the same name,
 and the shared name invites one specific mistake.
 `pool.submit()` hands back a `concurrent.futures.Future`,
 and you wait on it by calling `result()`, which blocks the calling thread.
-Awaiting it raises `TypeError: 'Future' object can't be awaited`.
+Awaiting that `Future` raises `TypeError: 'Future' object can't be awaited`.
 `asyncio` has its own `Future`, and `Task` is a subclass of it,
 so both are awaitable and neither blocks anything.
 `loop.run_in_executor()` is the bridge between the two:
 it submits to the executor and returns an `asyncio.Future` that resolves when the executor's own future does.
-That is why `process_price()` calls it instead of `pool.submit()`.
+That bridge is why `process_price()` calls `loop.run_in_executor()` instead of `pool.submit()`.
 
 `main()` receives an already-built `pool` instead of creating one itself.
 Creating a `ProcessPoolExecutor` sets up its queues and pipes,
@@ -2074,7 +2078,7 @@ because the libraries it calls still block.
 Free threading leaves I/O-bound work as it was and solves a narrower problem:
 without the GIL, a thread can genuinely parallelize CPU-bound work from inside one process while sharing memory directly,
 paying no pickling cost.
-This is something neither a GIL-bound thread nor a process pool offers.
+Neither a GIL-bound thread nor a process pool offers that.
 
 Under the standard build, then, a thread no longer structures your concurrency.
 `asyncio` does that.
@@ -2105,7 +2109,7 @@ or `0` while the platform's default is in effect.
 A common default across platforms is on the order of one mebibyte.^[A mebibyte (MiB) is 2<sup>20</sup> while a megabyte (MB) is 10<sup>6</sup>.]
 `tracemalloc` measures a task's actual heap footprint directly,
 since a task consists of ordinary Python objects.
-You can calculate the ratio between the two:
+You can calculate the ratio between a thread's stack and a task's footprint:
 
 ```python
 # task_vs_thread_memory.py
@@ -2225,7 +2229,8 @@ print(f"tasks at least 5x faster to spawn: "
 ```
 
 Starting and joining 3,000 threads does OS-level work for each one,
-allocating a stack, registering with the scheduler, tearing it down again.
+allocating a stack, registering with the scheduler,
+tearing the thread down again.
 Scheduling 3,000 tasks skips all of that.
 `gather()` only builds Python objects and steps the event loop through them.
 
@@ -2440,7 +2445,7 @@ famously muddied the waters by declaring, "concurrency is not parallelism"
 (I'm hoping he meant to say "concurrency is not **only** parallelism").[^concurrency-def]
 As this chapter shows,
 concurrency means "operating or occurring at the same time."
-This works for both asynchrony and parallelism.
+That definition covers both asynchrony and parallelism.
 
 Concurrency also keeps pulling you down to the OS.
 Concurrency tears through the comfortable abstraction that normal programming provides.

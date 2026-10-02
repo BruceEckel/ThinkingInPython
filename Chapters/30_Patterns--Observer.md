@@ -160,7 +160,8 @@ without raising an exception.
 With the copy, `detach()` changes `self._observers` while the loop reads the copied list.
 A `notify()` call therefore reaches every observer in `_observers` at the moment the call begins.
 If `detach()` removes an observer from `_observers` partway through a `notify()` call,
-the copy still holds that observer, so it receives the call's notification.
+the copy still holds that observer,
+so the observer receives the call's notification.
 Attaching an observer during the call does not attach to the copy,
 so the new observer isn't part of the `notify()` on the copy.
 [Disconnecting During a Notification](#disconnecting-during-a-notification)
@@ -248,10 +249,11 @@ and `announce()`.
 The call inside the loop changes as well.
 `Subject.notify()` calls `observer.update(self, arg)`,
 so every observer is an object with an `update()` method.
-That takes a class for each reaction and an `Observer` interface to declare the method.
+Each reaction then needs its own class,
+plus an `Observer` interface to declare the method.
 `Broadcaster.announce()` calls `responder(data)`,
 so a function serves as a responder.
-`announce()` passes the data alone, which is the push model.
+`announce()` passes the data alone, so `Broadcaster` uses the push model.
 
 `Broadcaster` knows nothing about what it announces.
 Its type parameter `T` sets the type of each notification,
@@ -442,7 +444,7 @@ so `received.append is received.append` is `False`.
 Two bound methods compare equal when they wrap the same instance and the same function,
 so `disconnect(received.append)` removes the connection that `connect(received.append)` made.
 
-The same equality rule explains the last two tests.
+The same equality rule explains `test_connecting_twice_notifies_twice()` and `test_disconnect_without_connect_raises()`.
 Connecting one callable twice puts two equal entries in the list,
 so each notification calls it twice and each `disconnect()` removes one entry.
 
@@ -705,7 +707,7 @@ but the set is complete at construction,
 so the broadcaster keeps alive only the responders it started with.
 Two problems remain:
 a responder that raises an exception still stops `announce()`,
-and a responder that writes back to its subject still re-enters it.
+and a responder that writes back to its subject still re-enters `announce()`.
 
 A program can choose its responders at any of four points:
 
@@ -822,7 +824,7 @@ in three ways:
     unless the class writes it through `self.__dict__` as the constructor does.
 3.  `__setattr__()` accepts any name,
     so the type checker stops checking assignments.
-    It passes `w.celcius = 25.0`, a misspelling of `celsius`,
+    The type checker passes `w.celcius = 25.0`, a misspelling of `celsius`,
     which quietly creates a new attribute.
     The same misspelling on a `Thermometer` produces an `unresolved-attribute` error.
     `Thermometer` defines no `__setattr__()`,
@@ -1042,7 +1044,7 @@ left, and right of it.
 
 One click changes up to five boxes, which makes the window a puzzle:
 try to turn every box `palegreen`.
-This is the only color that works; on the 8x8 grid `box_view.py` opens with,
+Only `palegreen` works; on the 8x8 grid that `box_view.py` opens,
 no sequence of clicks turns every box `skyblue` or every box `khaki`.
 The size decides that, and a 3x3 grid reaches all three colors (see exercise 9).
 
@@ -1127,7 +1129,7 @@ builds the new grid:
 `|` produces a new dictionary holding the keys of both operands.
 Every key on the right is also in `grid`, and for a key in both,
 the result takes the right operand's value.
-The result is a copy of `grid` that differs in the cells of the cross.
+The new grid is a copy of `grid` that differs in the cells of the cross.
 
 `BoxModel` is a `Broadcaster[Grid]`,
 and `select()` announces each new grid that `recolored()` produces.
@@ -1186,7 +1188,7 @@ def test_model_notifies_with_the_new_grid() -> None:
 
 The view is the only code that displays on the screen.
 Run `tip box_view` to play.
-Because it opens a window, the example harness skips it
+Because `box_view.py` opens a window, the example harness skips it
 (see `tools/data/norun.txt`).
 
 ```python
@@ -1254,7 +1256,8 @@ and the resulting notification repaints the view.
 The handler calls the model, and `draw()`, run by that notification,
 does all the painting.
 So the view handles the mouse as well as the screen,
-the controller's job folded into the view, which the next section takes apart.
+folding the controller's job into the view.
+[Where the Controller Goes](#where-the-controller-goes) takes that fold apart.
 `select()` takes a cell rather than a mouse event, so a keypress, a touch,
 or a test call drives the model the way a click does.
 
@@ -1380,13 +1383,13 @@ One thing moves.
 `key()` leaves `View` for `StepKeys`, and the model reference goes with it.
 The MVC `View` keeps `draw()` and `StepKeys` gets `key()`, one job each.
 
-The last four lines show what that move gives you.
+The last four lines of `model_view_controller.py` show what that move gives you.
 `NoKeys` satisfies `Keys` and ignores every key,
 so assigning it to `control` makes the program ignore input while `View` and the model work as before.
 *GoF Design Patterns* gives this example for the separation:
 a controller that ignores input disables a view's input.
-`StepKeys` needs only a `Counter`, so a test can build one, call `key()`,
-and read `model.count`.
+`StepKeys` needs only a `Counter`, so a test can build a `StepKeys`,
+call `key()`, and read `model.count`.
 Supporting a different set of keys means writing a third class that satisfies `Keys`,
 with `View` and the model unchanged.
 
@@ -1493,7 +1496,8 @@ print(log)
 `_delta` is the thermometer's field and its responders' business.
 Half a degree is a judgment about what a display needs,
 and `display` prints whatever it receives.
-It is the wrong judgment for `log`, which exists to record every reading,
+Half a degree is the wrong judgment for `log`,
+which exists to record every reading,
 and the thermometer announces only two of the four readings.
 `log` loses the other two for good,
 and nothing in `ThresholdThermometer` says which responder the half degree serves.
@@ -1522,7 +1526,7 @@ removes that repetition:
 one list becomes a dictionary of lists keyed by event type,
 so an announcement carries the type of thing that happened and each handler subscribes to the type it cares about.
 The publisher then decides which event it is publishing, something it knows,
-instead of guessing which responders need it.
+instead of guessing which responders need the event.
 
 ## Exercises
 

@@ -87,7 +87,7 @@ If you assign to a name in the class body, C++/Java style,
 that name becomes a class-level attribute instead
 (similar to a static field in C++/Java).
 [Class Attributes](09_Foundations--Class_Attributes.md)
-shows what that shared storage does when you assign to it.
+shows how a class-level attribute behaves when you assign to it.
 A bare annotation with no value looks most like a C++ or Java field declaration,
 yet it creates neither kind of attribute.
 It records the type.
@@ -285,7 +285,7 @@ and Python reports nothing.
 Renaming or removing the base method later has the same effect,
 and that bug is easy to miss.
 
-The `@override` decorator from the `typing` module catches it.
+The `@override` decorator from the `typing` module catches that bug.
 A line starting with `@` above a definition applies a *decorator* to it.
 [Decorators](14_Techniques--Decorators.md) shows how they work.
 `@override` declares that a method replaces one from a base class:
@@ -425,7 +425,7 @@ The separate name matters.
 Inside the getter, `self.radius` calls the getter again; inside the setter,
 `self.radius = value` calls the setter again.
 Either loop repeats until the interpreter raises a `RecursionError`.
-Naming both the property and the backing attribute `radius` reproduces it:
+Naming both the property and the backing attribute `radius` reproduces the `RecursionError`:
 
 ```python
 # property_recursion.py
@@ -617,7 +617,7 @@ hard-codes `Temperature` into every subclass, including `Reading`.
 
 `is_freezing()` also works as a module-level function.
 Inside the class it sits where a reader looks for it,
-and a subclass can replace it the way it replaces any other method.
+and a subclass can replace it like any other method.
 
 ## Exercises
 

@@ -105,7 +105,7 @@ print(sorted(words, reverse=True))
 #: ['pear', 'apple', 'Fig']
 ```
 
-`sorted(x)` returns the result while `x.sort()` returns `None`,
+`sorted(x)` returns the new list while `x.sort()` returns `None`,
 so `x = x.sort()` binds `None` and loses the list.
 Uppercase sorts before lowercase because Python compares strings by code point.
 [Functions](05_Foundations--Functions.md#lambdas)
@@ -407,7 +407,7 @@ the right operand's value wins, so `"y"` comes out as `20`.
 `{**a, **b}` builds the same merged `dict`,
 with `**` spreading each dictionary's entries the way `*` spreads a list's elements,
 and the later entry wins a collision.
-Like the list display, it accepts any number of starred operands,
+Like a list display, a `dict` display accepts any number of starred operands,
 with ordinary `key: value` entries among them.
 The last line feeds `dict()` an iterable of `(key, value)` pairs,
 and any iterable that yields such pairs will do.
@@ -553,9 +553,9 @@ since the scan compares all `n` elements before reporting `False`.
 A timing depends on the machine that took it,
 so every measured listing in this book prints a comparison rather than a number.
 `report()` comes from a small helper the book supplies.
-By default the listing prints the comparison alone.
-Running it with [`--numbers`](18_Techniques--Performance.md#numbers-on-your-machine)
-adds the two numbers it compares.
+By default a measured listing prints the comparison alone.
+Running one with [`--numbers`](18_Techniques--Performance.md#numbers-on-your-machine)
+also prints the measurements behind the comparison.
 
 ## Specialized Containers
 
@@ -597,7 +597,7 @@ A fourth operator, `+`, sums the counts of both counters.
 ### `defaultdict`
 
 A `defaultdict` supplies a value the first time you touch a missing key,
-and that removes the setup-on-first-use boilerplate:
+and so removes the setup-on-first-use boilerplate:
 
 ```python
 # defaultdict.py
@@ -689,7 +689,7 @@ print(lst)
 A `list` can stand in for a `deque`,
 but `insert(0, x)` and `pop(0)` must shift every remaining element,
 so both are O(n) instead of O(1).
-Timing the two at the left end shows the difference:
+Timing a `list` and a `deque` at the left end shows the difference:
 
 ```python
 # deque_timing.py
@@ -759,7 +759,7 @@ so a type checker knows what each one holds.
 For a record that must be mutable,
 use a [data class](12_Techniques--Data_Classes_as_Types.md#data-classes).
 [Data Transfer Objects](22_Patterns--Data_Transfer_Objects.md#the-standard-library-versions)
-compares all three.
+compares `typing.NamedTuple` with a data class.
 
 The standard library has more specialized containers.
 [Performance](18_Techniques--Performance.md) covers compact homogeneous storage
@@ -894,7 +894,7 @@ A container holding an unhashable object is unhashable too.
 Immutability pays off when it goes all the way down,
 because then you can share or hash a value without worrying that something inside it changes.
 [Rethinking Objects](20_Patterns--Rethinking_Objects.md#the-immutability-solution)
-shows the same leak inside a frozen data class.
+shows the same shallow immutability inside a frozen data class.
 
 ## Choosing a Container
 
@@ -944,7 +944,8 @@ Each exercise is answered in this chapter's [solutions](../Solutions/03_Foundati
     Then explain why `a, b = row` raises a `ValueError` while `a, *b = row` does not.
 10. Build a `frozendict` from the pairs `[("host", "localhost"), ("port", 8080)]`,
     then use it as a key in a `dict` that maps a configuration to a connection name.
-    Look that value up again with a separately built, equal `frozendict`.
+    Look the connection name up again with a separately built,
+    equal `frozendict`.
     Catch the `TypeError` that assigning to one of its entries raises.
     Finally, build a `frozendict` whose value is a `list`, try to hash it,
     and explain the result in terms of shallow immutability.

@@ -8,7 +8,7 @@
 presented generators as a way to produce values lazily:
 a function containing `yield`,
 driven by a `for` loop that takes one value at a time.
-That is half of what a generator does.
+Producing values is half of what a generator does.
 
 The other half is the return path.
 `yield` is an expression,
@@ -20,8 +20,8 @@ It yields a request, suspends, and continues when a caller sends the answer.
 This chapter covers the full three-channel annotation,
 the loop that carries such a conversation, and `yield from`,
 which composes generators that never name their driver.
-[Stateless](46_Effects--Stateless.md) builds an Effect system on all three,
-but generators are useful without it.
+[Stateless](46_Effects--Stateless.md) builds an Effect system on the annotation,
+the loop, and `yield from`, but generators are useful without it.
 
 ## Annotating a Generator
 
@@ -266,7 +266,7 @@ It yields each question and suspends until `send()` supplies the answer.
 and it takes the answers as a parameter.
 Swapping the dictionary for a database changes a single argument.
 
-That is an EMS in miniature.
+`interview()` and `drive()` form an EMS in miniature.
 The generator declares Effects, and the driver interprets them.
 
 One generator, one driver.
@@ -549,11 +549,11 @@ print(drive(survey(),
 
 The listing imports `interview()` unchanged from `yield_from_delegates.py`,
 where `drive()` drove it directly.
-Now `survey()` delegates to it.
+Now `survey()` delegates to `interview()`.
 `interview()`'s `Result` arrives as the value of an expression instead of as `stop.value` in the driver.
 Its questions reach `drive()` through three frames rather than two,
 and `survey()` asks about a color,
-so the call merges one more pair into `ANSWERS` with the dictionary union operator.
+so the argument to `drive()` uses the dictionary union operator to add one more pair to a copy of `ANSWERS`.
 The driver receives one more question and the same shape of trace.
 
 `yield from` replaces `drive()` as the consumer of `interview()`,

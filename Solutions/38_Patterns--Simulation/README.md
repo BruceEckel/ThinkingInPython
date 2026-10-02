@@ -575,7 +575,9 @@ class GameBuilder:
 
 > Add a new kind of `Item` to the robot maze.
 > Define a `Coin` subclass of `Item` with the symbol `$`.
-> Its `interact()` removes itself the way `Food` does and adds one to a coin count carried by the `Robot`.
+> Its `interact()` removes the coin from its room,
+> as `Food`'s does for the food,
+> and adds one to a coin count carried by the `Robot`.
 > Place a few `$` characters in the maze and report how many the robot collects.
 > `item_factory()`, `Room`, and `GameBuilder` stay as they are.
 > Explain why the factory finds your new item on its own,
@@ -639,7 +641,8 @@ the factory's search and silently substitutes a different `Item`.
 > beyond letting `solve()` return `None` when no room matches.
 > Then use the new parameter to feed the robot:
 > search for the nearest room holding a `Food`, walk there,
-> and repeat until no `Food` remains, then search for the `!` and walk that.
+> and repeat until no `Food` remains,
+> then search for the `!` and walk the route the search finds.
 > Report how many pieces of food the robot ate and how many moves the whole tour took.
 > The run answers two questions for you.
 > Why does the search have to run again after every meal instead of once at the start?
@@ -850,7 +853,7 @@ class Plate:
 > Freeze the plate.
 > Run the Chladni view with `MODES` starting at `(2, 2)`.
 > Work out what `amplitude()` returns whenever `m == n`,
-> and explain why the result is neither chaos nor a figure.
+> and explain why the view shows neither chaos nor a figure.
 > Then explain why the main diagonal shows up in every figure this plate makes.
 > Swapping `x` and `y` in the two terms of `amplitude()` is the clue.
 

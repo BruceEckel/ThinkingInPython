@@ -166,7 +166,7 @@ and concurrent code needs no lock to read it.
 
 That safety has a cost, and the cost is copying.
 Python's immutable types share no structure.
-`moved = Point(p.x + 10, p.y)` above builds a new `Point`,
+`moved = Point(p.x + 10, p.y)` in `immutability.py` builds a new `Point`,
 and changing one field of a large tuple or frozen dataclass means rebuilding the whole value,
 not patching one slot in place.
 Copying a two-field `Point` takes so little time that you can ignore it.
@@ -203,12 +203,12 @@ print(MAX_SIZE, total([1, 2, 3]))
 #: 100 6
 ```
 
-The annotation is a constraint the type checker enforces,
-even when the caller passes a mutable `list`.
+Each annotation is a constraint the type checker enforces,
+and `Sequence[int]` holds even when the caller passes a mutable `list`.
 The type checker rejects `MAX_SIZE = 200` written later in the module,
 and rejects `values.append(4)` inside `total()`.
-The constraint covers only `total()`'s side.
-`Sequence[int]` declares that `total()` only reads its argument.
+The `Sequence[int]` constraint covers only `total()`'s side.
+It declares that `total()` only reads its argument.
 The caller keeps its `list` and can append to it at any time,
 including from another thread while `total()` is running.
 `Final` freezes the binding, and only the binding:
@@ -431,8 +431,8 @@ You stop rewriting the same loop,
 and with it the off-by-one and accumulator-initialization mistakes a hand-written loop allows.
 
 A higher-order function can also return a function:
-it wraps the one it receives with operations like timing, retries, or logging,
-and returns the wrapper.
+it wraps the function it receives with operations like timing, retries,
+or logging, and returns the wrapper.
 A decorator does that wrapping, as [Decorators](14_Techniques--Decorators.md)
 shows.
 
@@ -478,7 +478,7 @@ nothing changes `factor` after capture.
 
 A closure fits when you want to configure behavior once, reuse it,
 and keep its configuration private.
-Once the factory returns,
+Once the enclosing function returns,
 the inner function's scope is the one place the captured variable has a name,
 so the inner function alone can read or rebind it.
 That privacy gives you encapsulation without declaring a class:
@@ -528,7 +528,7 @@ and fails with `UnboundLocalError`.
 `global` does the same for a module-level name,
 as [Names Inside a Function](05_Foundations--Functions.md#names-inside-a-function)
 shows, and the two are not interchangeable.
-With `global count` in its place,
+With `global count` in place of `nonlocal count`,
 `increment()` looks for a module-level `count`, finds none,
 and raises a `NameError`.
 
@@ -543,7 +543,7 @@ If you delete the `nonlocal` line,
 ## Partial Application
 
 *Partial application* presets some of a function's arguments and produces a new function that expects the rest.
-`functools.partial()` builds that new function from the old one and the preset arguments:
+`functools.partial()` builds that new function from the original function and the preset arguments:
 
 ```python
 # partial.py
@@ -713,7 +713,7 @@ The second `print()` shows what the discipline gives you.
 The input list stays unchanged, so you can recompute the whole report, cache it,
 or run it on another core with no coordination.
 
-All of it is ordinary Python,
+`pipeline.py` is ordinary Python,
 written so that each piece depends on its arguments alone.
 The chapters ahead build on that single property.
 

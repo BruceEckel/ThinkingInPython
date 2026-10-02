@@ -103,7 +103,7 @@ which no rating may be.
 `f3()` is what forgetting looks like.
 `11` is not a legal rating, and nothing objects: not the annotation,
 not the type checker, not the running program.
-The result is a number that no rating can produce,
+`f3(11)` returns 1100, a number that no rating can produce,
 passed along as if it were fine.
 
 ## A Class Is Not a Type
@@ -184,7 +184,7 @@ Some values must change in place over their lifetime: a counter,
 a connection's open-or-closed state, a running total.
 You cannot always replace one with a fresh instance on every change.
 The accepted answer for those is a validating setter that checks before assigning,
-the fix `f1()` skips above: pay DbC's scattering cost,
+the fix that `stars_class.py`'s `f1()` skips: pay DbC's scattering cost,
 because the value must stay mutable.
 [Immutability](#immutability) covers the case the rest of this chapter prefers,
 where a fresh, validated instance replacing the old one is cheap enough.
@@ -416,20 +416,20 @@ Neither `x` nor `s` carries `[CV]` this time.
 Because `C` is a `@dataclass`,
 its generated `__init__(self, x: int, s: str) -> None` runs `self.x = x` and `self.s = s` for every new `C`.
 Each `C` instance owns its own copies from the moment of construction.
-`B` runs nothing like that.
+`B` runs no such assignments.
 With no `__init__()`, `show(B())` keeps finding `x` and `s` on the class,
 tagged `[CV]`, no matter how many `B` instances exist.
 
 `C` starts from the same bare annotations as `A`.
 `@dataclass` reads them to learn what fields exist and in what order,
 then uses that to write the parameter list of `__init__()` and the assignments inside it.
-`dataclasses.fields()` reports the field list it recorded.
+`dataclasses.fields()` reports the field list `@dataclass` recorded.
 `@dataclass` stores no value for a field on the class:
 `x` is still absent from `C.__dict__` after decoration, as it was before.
 The generated `__init__()` fulfills the declaration when it runs,
 once per instance.
 That is the difference from `A`: not that `@dataclass` changes the annotations,
-but that it builds something to act on them.
+but that it builds an `__init__()` to act on them.
 
 ### `D`: A Real `ClassVar`
 
@@ -531,7 +531,7 @@ print(cache[m])
 
 Two defenses guard a frozen field.
 The type checker rejects `m.name = "hermes"` before the program runs,
-which is why the listing goes through `setattr()` to reach the second one.
+which is why the listing goes through `setattr()` to reach the runtime defense.
 `frozen=True` holds at runtime, against code the type checker did not see.
 
 `frozen=True` guards the binding, not the object behind it.
@@ -647,7 +647,7 @@ so a type built at that boundary tests the field's type in the check as well:
 `__post_init__()` can check a field but cannot change one.
 `frozen=True` works by installing a `__setattr__()` that rejects every assignment,
 including the ones arriving from inside the class,
-so normalizing a value there raises `FrozenInstanceError`:
+so normalizing a field in `__post_init__()` raises `FrozenInstanceError`:
 
 ```python
 # post_init_normalize.py
@@ -787,8 +787,8 @@ if __name__ == "__main__":
 `Person` declares no checks of its own.
 Its annotations require a `FullName` and an `EmailAddress`,
 which the type checker enforces, and neither can exist holding an illegal value.
-The first test builds one from legal parts and reads them back.
-The other two show you cannot build it from an illegal name or an illegal email,
+The first test builds a `Person` from legal parts and reads them back.
+The other two show you cannot build a `Person` from an illegal name or an illegal email,
 because those values cannot exist:
 
 ```python
@@ -1077,7 +1077,7 @@ Subscripting makes the factory's return type concrete,
 and `field(default_factory=dict[int, int])` on this field then draws a type error.
 Use the bare form when the factory and the annotation agree,
 which is most of the time.
-Subscript it when you want that agreement checked.
+Subscript the factory when you want that agreement checked.
 
 ## A `NamedTuple` Cannot Validate Itself {#namedtuple-cannot-validate}
 
@@ -1131,7 +1131,8 @@ The third test shows why the check cannot move inside the type.
 `NamedTuple` refuses `__new__()`, refuses `__init__()` the same way,
 and the class never comes into existence:
 the error arrives while Python is still executing the `class` statement.
-`ty` reports it as `invalid-named-tuple`, which the `# type: ignore` silences.
+`ty` reports the `__new__()` override as `invalid-named-tuple`,
+which the `# type: ignore` silences.
 Pyright accepts the `__new__()` without comment.
 
 A subclass of the `NamedTuple` may define `__new__()`.
@@ -1208,8 +1209,8 @@ print(c.url, c.name)
 ```
 
 No field declaration produces `url`.
-`__post_init__()` derives it,
-so printing it proves that `Connection.__init__()` ran.
+`Connection.__init__()` derives it from `host`,
+so printing `url` proves that `__post_init__()` called the base initializer.
 If you delete `__post_init__()`, the same line raises an `AttributeError`.
 
 If a base `__init__()` instead replaces `self.__dict__`,
@@ -1217,7 +1218,7 @@ calling it from `__post_init__()` discards the fields the data class just assign
 The [*Borg* singleton](24_Patterns--Singleton.md#borg-singleton-by-inheritance)
 is that case.
 
-When the base class is also a data class, you do not need this.
+When the base class is also a data class, you need no `__post_init__()`.
 The subclass generates one `__init__()` covering the inherited fields and the new ones,
 in order:
 
@@ -1483,8 +1484,8 @@ because the caller can assign to the attribute.
 ## Serializing to JSON
 
 A data class has no built-in JSON support.
-If you hand one to `json.dumps()`,
-it raises `TypeError: Object of type Person is not JSON serializable`.
+Handed a data class instance,
+`json.dumps()` raises `TypeError: Object of type Person is not JSON serializable`.
 
 `asdict()` turns the object into a nested dictionary,
 and `json.dumps()` knows how to serialize dictionaries.
@@ -1576,7 +1577,7 @@ print(json.dumps(people, cls=DataClassEncoder, indent=2))
 
 `json.dumps()` calls `default()` for any object it cannot serialize on its own.
 The encoder converts each data class to a dictionary,
-and the base encoder handles it from there,
+and the base encoder handles the dictionary from there,
 recursing through lists and nested objects.
 `is_dataclass()` answers `True` for the class object as well as for an instance,
 and `asdict()` accepts only instances,

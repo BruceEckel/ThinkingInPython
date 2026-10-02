@@ -89,7 +89,8 @@ nothing on the instance, so look at the class.
 `display_object()`, the inspection helper first used in [Classes](07_Foundations--Classes.md),
 reports attributes and methods separately,
 but both live in the same class dictionary.
-That is why assigning `a.show = something` shadows the method for `a` alone.
+Because the method lives in the class dictionary,
+assigning `a.show = something` shadows the method for `a` alone.
 
 One kind of class attribute follows a different rule.
 A [`@property`](07_Foundations--Classes.md#properties)
@@ -135,7 +136,7 @@ Someone debugging that stale `1` finds nothing wrong in `rerate()` or in `show()
 The cause is the assignment inside `sell()`,
 which gave `a` its own `rating` before the class attribute changed.
 Neither `rerate()` nor `show()` calls `sell()`,
-so finding it means tracing every earlier call that touched a `Stars` instance.
+so finding the assignment means tracing every earlier call that touched a `Stars` instance.
 
 ### A Shared Mutable Value
 
@@ -298,7 +299,7 @@ The value does the creating in every case.
 An annotation states the type, and `ClassVar` adds where the attribute belongs,
 while the `= 0` brings it into existence.
 That holds for `label: str`, for `total: ClassVar[int] = 0`,
-and for the `count` above.
+and for the `count` in `declared_classvar.py`.
 
 ### A Base Class Declares, a Subclass Supplies
 
@@ -343,7 +344,7 @@ and the typing specification agrees with Pyright:
 a mutable attribute's type is [invariant](08_Foundations--Static_Types.md#variance),
 so a subclass may neither widen nor narrow it.
 The gap is `ty`'s, and a known one:
-it tracks the check under "Enforce the Liskov Substitution Principle for non-methods"
+`ty` tracks the check under "Enforce the Liskov Substitution Principle for non-methods"
 (`astral-sh/ty` issue 2158).
 Treat the base declaration as documentation that a checker reads,
 not as a guarantee that the attribute exists.
@@ -380,7 +381,7 @@ print(a.total, b.total, Tally.total)
 The read falls back to the class and finds `0`.
 The write creates a fresh `total` on the instance.
 Every `Tally` counts itself once and the shared counter never moves.
-That is why `class_var.py` increments through the class name,
+The write through `self` is why `class_var.py` increments through the class name,
 `Tally.total += 1`.
 `ClassVar` does save you here, at check time:
 `ty` rejects the augmented form as it rejects a direct `self.total = 5`,
@@ -495,7 +496,7 @@ whenever a `ClassVar` must count across every subclass rather than fork one coun
 A [`@classmethod`](07_Foundations--Classes.md#static-and-class-methods)
 that writes `cls.total += 1` forks the same way,
 because `cls` is the class that received the call.
-[Pattern Refactoring](37_Patterns--Pattern_Refactoring.md#the-trash-hierarchy)'s registry sidesteps this by mutating `Trash.registry` in place,
+[Pattern Refactoring](37_Patterns--Pattern_Refactoring.md#the-trash-hierarchy)'s registry sidesteps the fork by mutating `Trash.registry` in place,
 never reassigning it through `cls`.
 
 ## Real Per-Object Defaults

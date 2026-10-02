@@ -166,13 +166,13 @@ if __name__ == "__main__":
 so the alias names itself through one of its own members,
 and that self-reference makes the tree a tree.
 `Directory` mentions `Node` above the [`type` statement](08_Foundations--Static_Types.md#the-type-statement)
-that defines it.
+that defines `Node`.
 That works because Python evaluates annotations and `type` aliases lazily,
 the [deferred evaluation](08_Foundations--Static_Types.md#self-and-forward-references).
 The alias can therefore sit below the classes it unites,
 where it reads as a summary of them rather than as a forward declaration.
 
-Every function over the type repeats its recursion.
+Every function over `Node` repeats the union's recursion.
 `Directory` contains `Node`s,
 so `disk_usage()` and `walk()` call themselves on each entry.
 Each `match` needs one case per member of the union and no more.
@@ -188,7 +188,7 @@ the [*expression problem*](13_Techniques--Pattern_Matching.md#the-expression-pro
 works out the same split with shapes,
 including the `assert_never()` in each `case _`.
 If you add a `Symlink` to the `Node` union,
-every function whose `case _` calls `assert_never()` fails type checking until it handles one
+every function whose `case _` calls `assert_never()` fails type checking until it handles `Symlink`
 (see exercise 2).
 
 `walk()` is a generator, so traversing a composite is lazy.
@@ -245,10 +245,10 @@ Match over a closed set, use polymorphism for an open one.
 
 A file and a directory are both a `Path`,
 which makes `pathlib` look like a *Composite*.
-It has the uniform interface: `name`, `exists()`,
+`pathlib` has the uniform interface: `name`, `exists()`,
 and `stat()` work on either kind of entry,
 and `iterdir()` and `rglob()` walk the tree without asking which kind they hold.
-It lacks the structure.
+`pathlib` lacks the structure.
 A `Path` is an immutable value that names a location and holds no entries.
 The tree lives in the operating system's filesystem,
 and `iterdir()` asks the OS for the children each time you call it.
@@ -720,7 +720,7 @@ and a recursive call where a node holds more nodes.
 Iterating a `Template` produces `str | Interpolation`,
 a closed union like `Node` with two members,
 so an `isinstance` test narrows it as well as a `match` does.
-The `else` branch is the `str` case.
+The `else` paired with `isinstance(piece, Interpolation)` is the `str` case.
 Iteration skips the empty literal pieces,
 so `t"{a}{b}"` yields two `Interpolation` objects and no strings;
 `template.strings` keeps the empty slots when the alternation matters.
@@ -844,6 +844,8 @@ Each exercise is answered in this chapter's [solutions](../Solutions/34_Patterns
     Raising the limit with `sys.setrecursionlimit()` also avoids the error.
     Say what it costs.
 9.  A plugin package needs to add its own entry types to `filesystem.py` without editing your code.
-    Sketch what breaks, then write the version of `disk_usage()` that supports it.
-    Which of the two designs would you use for a file system,
+    Sketch what breaks, then write the version of `disk_usage()` that supports the plugin's entry types.
+    Which of the two designs,
+    a `match` over a union or a method on a base class,
+    would you use for a file system,
     and which for the expression language in `expr.py`?

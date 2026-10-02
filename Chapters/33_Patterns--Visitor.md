@@ -165,7 +165,7 @@ which `flower_visitors.py`'s output left implicit.
 One annotation in `flower_visitors.py` looks like a shortcut and is not.
 `accept()` types its visitor as `Any` because the `Visitor` base class declares no `visit()` method.
 If you declare that parameter as `Visitor` instead,
-The type checker reports `visitor.visit` as an unresolved attribute.
+the type checker reports `visitor.visit` as an unresolved attribute.
 The classic pattern declares `visit()` abstract on the visitor base,
 so `visitor.visit` resolves.
 A `Protocol` removes the `Any` at the cost of two new lines:
@@ -177,7 +177,7 @@ A `Protocol` removes the `Any` at the cost of two new lines:
         def accept(self, visitor: Visits) -> None:
             visitor.visit(self)
 
-The chapter still keeps the empty `Visitor` base and its `Any`,
+The chapter still keeps the empty `Visitor` base and the `Any` in `accept()`,
 because showing what the `Any` gives up is part of the point.
 What it gives up is every check on the visitor side:
 `Gladiolus().accept(Bug())` passes the type checker and fails at runtime with `AttributeError: 'Bug' object has no attribute 'visit'`.
@@ -323,7 +323,7 @@ plus one registration for each operation that needs more than the default.
 When the operation should read like a method,
 use [`functools.singledispatchmethod`](41_Functional--Toolkits.md#singledispatchmethod)
 instead.
-It dispatches on the first argument after `self`.
+`singledispatchmethod` dispatches on the first argument after `self`.
 
 ### Testing the Operations
 
@@ -417,7 +417,7 @@ the situation where the classic pattern still fits.
 ## One Dispatch Is Enough
 
 *Visitor* dispatches twice, and `singledispatch` dispatches once.
-The figure sets the two side by side,
+The figure sets *Visitor* and `singledispatch` side by side,
 with the worm from `dispatch_trace.py` and the `nectar()` operation from `visitor_singledispatch.py`:
 
 ![](_images/visitor_story)
@@ -427,7 +427,7 @@ out to the visitor and back again,
 and the frames differ only in the method the return trip reaches.
 In the third frame no method on `Flower` takes part.
 One lookup in `nectar()`'s table, keyed by the flower's type, finds the answer.
-The one dispatch resolves everything the two did.
+That one dispatch resolves everything *Visitor*'s two dispatches did.
 The second dispatch in the classic pattern exists not because two types are unknown,
 but because the operation must be a method on some class.
 The visitor's type stands in for the operation,

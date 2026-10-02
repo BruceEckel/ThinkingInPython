@@ -10,7 +10,7 @@ Two of the patterns in *GoF Design Patterns* solve this problem.
 *Façade* creates an interface to a set of classes.
 The caller sees one entry point and never learns how those classes are built and wired together,
 so the wiring can change without affecting the caller.
-Both wrap something that already exists,
+*Adapter* and *Façade* both wrap something that already exists,
 which puts them adjacent to *Proxy* and *Decorator*.
 Adding an interface leaves the existing one in place, so nothing breaks.
 When the new interface is meant to replace one you own,
@@ -264,11 +264,13 @@ if __name__ == "__main__":
 
 Because `__getattr__()` runs only for attributes Python does not find normally,
 `f()` uses the adapter's own version while everything else falls through to the adaptee.
-This is the idiomatic Python adapter: a thin wrapper, not a hierarchy.
+`getattr_adapter.py` shows the idiomatic Python adapter: a thin wrapper,
+not a hierarchy.
 With no base class above it, `Adapter` is a record.
 [Rethinking Objects](20_Patterns--Rethinking_Objects.md#protocols-generalize-composition-adapts)
 has a real one: `PairCoord` adapts a `Pair` to the `Coord` protocol.
-It is a [record](18_Techniques--Performance.md#record) with two properties,
+`PairCoord` is a [record](18_Techniques--Performance.md#record)
+with two properties,
 written because `distance()` requires `x` and `y` but a `Pair` supplies `a` and `b`.
 
 The limits [*Surrogate*](26_Patterns--Surrogate.md#forwarding-with-getattr)
@@ -334,7 +336,7 @@ A *Façade* is often a [*Singleton*](24_Patterns--Singleton.md)
 GoF supplies both halves of that combination:
 one *Façade* object is usually enough, which makes it a *Singleton*,
 and an *Abstract Factory* creates the subsystem's objects for it.
-A class containing static factory methods gets that effect:
+A class containing static factory methods covers both halves:
 
 ```python
 # facade.py
@@ -378,7 +380,7 @@ Turning the key primes the pump, and priming starts the engine.
 Each constructor takes the object its method calls:
 `Ignition` takes a `FuelPump`, and `FuelPump` takes an `Engine`,
 so a caller has to build the three from the inside out.
-That is the "confusing collection of classes and interactions,"
+These three classes are the "confusing collection of classes and interactions,"
 small enough to read in one glance here.
 In real code, constructing three or thirty classes in the right order is knowledge a caller should never need.
 `Facade.start_car()` is the static factory method:
@@ -399,7 +401,7 @@ so the caller stops naming `Engine` and `FuelPump`.
 The cleaner Python façade is a module.
 A module already presents a curated set of names over any confusing collection of classes behind it.
 As [*Singleton*](24_Patterns--Singleton.md#a-module-is-already-a-singleton)
-notes, it loads once, and every importer shares the same module.
+notes, a module loads once, and every importer shares the same module.
 At module level, put the convenient functions and the few classes to expose.
 If you keep the messy internals private
 (using a leading underscore, by convention), the `import` is the façade:
@@ -457,7 +459,7 @@ with more ceremony.
 one level up.
 A package's `__init__.py` re-exports a curated set of names from private submodules,
 the same underscore convention, applied to modules instead of classes.
-That is the idiomatic place for a façade that fronts a whole subsystem several modules deep,
+That `__init__.py` is the idiomatic place for a façade that fronts a whole subsystem several modules deep,
 GoF's usual case for the pattern.
 
 *Façade* has a failure mode.
@@ -488,7 +490,7 @@ ask what breaks if you remove it:
 takes the looser view of the first row:
 a surrogate forwarding to its implementation is a *Proxy* whether or not the interfaces match.
 Under that reading the same-interface rule no longer separates a *Proxy* from an *Adapter*,
-which is why the `ProxyAdapter` in `adapter.py` answers to both names.
+so the `ProxyAdapter` in `adapter.py` answers to both names.
 That leaves the "What it adds" column to separate them:
 a *Proxy* controls access to one implementation,
 an *Adapter* makes one type fit a caller that expects another.
@@ -542,7 +544,8 @@ The `# type: ignore` silences that diagnostic here,
 since this listing calls the deprecated method on purpose.
 The runtime half is a `DeprecationWarning`.
 Python ignores those by default outside `__main__` and test runners,
-which is the trap: the caller who most needs the warning is the least likely to see it.
+and that default is the trap:
+the caller who most needs the warning is the least likely to see it.
 Run with `-W default::DeprecationWarning` to see them all,
 or `-W error::DeprecationWarning` in continuous integration to fail on one.
 A warning also goes to standard error, where a `#:` marker cannot capture it,
@@ -568,7 +571,7 @@ An *Adapter* and a *Façade* both add an interface and leave what is already the
 which is why they are safe moves.
 Replacing an interface you own is the unsafe move,
 because every caller was written against the old one.
-Marking it deprecated keeps it working while it tells each caller what to use instead;
+Marking the old interface deprecated keeps it working and tells each caller what to use instead;
 without the mark, nothing tells them.
 
 ## Exercises

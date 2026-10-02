@@ -143,7 +143,7 @@ shows.
 
 Now compare this listing to `ask_tell.py` again.
 The by-hand version puts two objects in every signature.
-This one threads nothing.
+The Stateless version threads nothing.
 `greet()` takes no arguments,
 and the two Effects live in the return type where a type checker verifies them.
 That second channel in the signature is the one [Effect Management](44_Effects--Effect_Management.md#effects-by-hand)
@@ -233,7 +233,8 @@ The scripted handler holds state.
 `next(script)` produces a different value at each request,
 which one supplied instance cannot do.
 Every scripted test double has this shape: a queue handing out canned responses,
-a network stub that fails twice and then succeeds, or the clock below.
+a network stub that fails twice and then succeeds,
+or the clock in [A Clock That Crosses Midnight](#a-clock-that-crosses-midnight).
 
 That state has one trap, and it is silent.
 `next(script)` raises `StopIteration` once the sequence runs out.
@@ -256,8 +257,8 @@ so a test cannot ask it what happens at some critical time
 `stamp()` puts the current time into its output,
 and `batch_due()` decides whether a day has passed since the last run.
 Against a real clock neither is testable.
-One produces a different string every minute,
-and the other needs you to wait a day to watch it return `True`.
+`stamp()` produces a different string every minute,
+and `batch_due()` needs you to wait a day to watch it return `True`.
 Both sit in one file with the Ability and its accessor,
 because two more listings and a test ask the same clock different questions:
 
@@ -427,7 +428,7 @@ but every function between the caller and the `random.Random` call must declare 
 Here the return type names the source instead,
 and no signature between `handle()` and the request mentions it.
 
-Both Abilities in this section are side causes,
+`Flip` and `Now` are both side causes,
 in the vocabulary of [Effect Management](44_Effects--Effect_Management.md#what-is-an-effect):
 the function reads something from outside.
 The `Recorder` of [Swapping the Implementation](46_Effects--Stateless.md#swapping-the-implementation)
@@ -614,7 +615,7 @@ Read `run_load()` from the outside in.
 The outer loop obtains a source, the inner one draws from it hour after hour,
 and `connected()` brackets the pair.
 `draw()` returns `None` on success,
-so anything else at that binding is the `Drained` that ends the inner loop.
+so anything else in `failure` is the `Drained` that ends the inner loop.
 The outer loop then calls `plug()` again for a replacement.
 The hour stays put on that path,
 so the replacement supplies the hour the failed source refused.
@@ -630,7 +631,8 @@ Four implementations, one Ability, one running program.
 and that is why the second run prints a different trace from the same code.
 `battery_first` puts the battery ahead of the sun,
 so the charge drains first and the grid supplies the load from 19:00.
-The order of that tuple is the one difference between the two runs.
+Besides the shorter run,
+the order of the tuple passed to `controller()` is the one difference between the two runs.
 Priority lives in `controller()`,
 thresholds and the outage schedule in the sources themselves,
 and `run_load()` decides when to stop drawing from the source it holds.
@@ -770,7 +772,7 @@ def test_spree_spends_from_its_own_cell() -> None:
 
 The test asserts on the cell it built,
 so nothing needs resetting between tests and two tests can run in either order.
-`spree()` and `purchase()` are the same functions the run above used.
+`spree()` and `purchase()` are the same functions `wallet.py`'s run used.
 
 When one function owns a number, a local variable is the right tool,
 and `count_heads()` keeps its count in one.
@@ -849,7 +851,7 @@ def research() -> Effect[
 ```
 
 The `research()` signature declares what the program needs and how it can fail.
-`research()` reads two things from outside and can fail three ways.
+`research()` reads a `Feed` and an `Encyclopedia` from outside and can fail three ways.
 The three `@throws` functions are the pattern for bringing ordinary code in:
 `fetch()` and `look_up()` call ordinary methods rather than Effects,
 and the decorator lifts what they raise into the channel.
@@ -986,7 +988,7 @@ the third reaches the library and fails there.
 
 `report()` handles the two channels differently.
 `catch()` empties the error channel, so `report()` cannot fail.
-It still declares both Abilities,
+`report()` still declares both Abilities,
 because catching an error does nothing about a dependency.
 If you annotate `report()` as `Success[str]`,
 the type checker names the `yield from` that still carries `Need[Feed] | Need[Encyclopedia]`.
@@ -1049,7 +1051,7 @@ The name `research_and_report()` records the merge the by-hand version forces:
 Both versions short-circuit.
 The by-hand one returns early.
 The Effect one stops at the failure, and the driver never resumes the generator.
-The difference is who writes the branch that does it.
+The difference is who writes the branch that short-circuits.
 
 The comparison has limits.
 At this size the by-hand version is respectable, and a reader may prefer it.
@@ -1502,7 +1504,7 @@ matches arguments
 The call still runs correctly, since the implementation is variadic,
 but the type checker no longer verifies the call.
 Two chained handlers keep the checking: `supply()` some of the actors,
-apply that to the Effect, then `supply()` the rest to what remains,
+apply that handler to the Effect, then `supply()` the rest to what remains,
 the layered supply of [Layering Handlers](46_Effects--Stateless.md#layering-handlers).
 An Effect that asks for ten separate things is usually two Effects.
 
@@ -1641,8 +1643,8 @@ If you leave the `Time()` out, the type checker rejects the `run()` call.
 That `Need[Time]` is the thesis of both chapters applied to a cross-cutting concern.
 In a system with untracked Effects,
 adding retry to a hundred call sites changes no signature.
-Here it changes a type,
-and every caller that runs it without a `Time` fails the check.
+Here adding retry changes a type,
+and every caller that runs the retried function without a `Time` fails the check.
 
 The renamed error allows a mistake the type checker accepts.
 If you write `catch(Crashed)(retried)`, catching the original error,
@@ -1810,11 +1812,11 @@ listing the overloads it failed to match.
 Supply first, then fork.
 
 That restriction is the only one the checker enforces.
-It says nothing about a declared error.
+The restriction says nothing about a declared error.
 Two of those same four overloads accept an Effect that declares one,
 and both return a `Task` with no error type on it.
 [Where the Guarantee Stops](#fork-drops-the-error-channel)
-explains what that drops.
+explains what `fork()` drops.
 
 Notice who manages the pool's lifetime.
 The `with` block sits outside `run()`, at the edge, in ordinary Python.
@@ -2359,7 +2361,8 @@ Each exercise is answered in this chapter's [solutions](../Solutions/47_Effects-
 3.  Add a wind turbine to `power.py` that is available only during a fixed windy stretch of the evening,
     put it between solar and the battery in the `sun_first` order,
     and confirm `run_load()` needs no change.
-    Then shorten every source until some hour has no supplier, run it,
+    Then shorten every source until some hour has no supplier,
+    run `run_load()` again,
     and say where the `Blackout` propagates to and why `catch(Blackout)` around `run_load()` does not intercept it.
 4.  Write a handler for `Outlet` that ignores `request.hour` and hands out a fixed sequence of sources,
     the way `scripted` handed out a fixed sequence of tosses.

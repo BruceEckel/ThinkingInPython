@@ -303,7 +303,8 @@ depleting nothing, since wind costs no fuel.
 > Add a wind turbine to `power.py` that is available only during a fixed windy stretch of the evening,
 > put it between solar and the battery in the `sun_first` order,
 > and confirm `run_load()` needs no change.
-> Then shorten every source until some hour has no supplier, run it,
+> Then shorten every source until some hour has no supplier,
+> run `run_load()` again,
 > and say where the `Blackout` propagates to and why `catch(Blackout)` around `run_load()` does not intercept it.
 
 ```python

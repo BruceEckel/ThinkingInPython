@@ -192,7 +192,7 @@ The `assert` passes on every run,
 because a pure call returns the same answer whichever process runs it,
 and whenever.
 
-The limits above are large enough for the difference to show.
+The limits in `parallel_pure.py` are large enough for the difference to show.
 `report()` comes from [Numbers on Your Machine](18_Techniques--Performance.md#numbers-on-your-machine)
 and prints the two times only when you run the listing with `--numbers`.
 On the machine that built this book,
@@ -248,7 +248,7 @@ You decide how far up the spectrum to go.
    Most code needs no more.
 2. Next are tests over chosen examples,
    the subject of [Testing](11_Techniques--Testing.md).
-   Each one checks a single input against a single answer,
+   Each test checks a single input against a single answer,
    so the examples you invent bound what you learn.
 3. Next is type checking.
    A type signature is a small theorem, and the function body is its proof.
@@ -393,7 +393,7 @@ Every string its loop builds decodes the same way under both,
 so all thousand cases pass.
 Hypothesis draws from every character UTF-8 can encode.
 It shrinks its failure down to the smallest code point outside that agreement,
-`'\x80'`, the first character UTF-8 needs more than one byte to encode.
+`'\x80'`, the first character UTF-8 encodes in two bytes instead of one.
 Decoding those two bytes as Latin-1 returns two characters where one went in,
 so the round trip returns a different string.
 That code point is the unusual Unicode the hand-written loop's alphabet kept out of reach.

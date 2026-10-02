@@ -219,7 +219,7 @@ too.
 > Derive `CrushedAluminum` from `Aluminum`,
 > add it to the data `recycle_dict.py` reads,
 > then run `recycle_dict.py` and `recycling_note.py`.
-> Explain why it gets its own bin but not its own note.
+> Explain why `CrushedAluminum` gets its own bin but not its own note.
 > Then change `recycle_dict.py` so a subclass shares its parent's bin,
 > without naming any material in the sorting loop.
 

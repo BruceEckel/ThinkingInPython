@@ -4,7 +4,7 @@
 
 > In `mutable_default.py`,
 > call `bad_append(3)` a third time and predict the result before checking it.
-> Then change `bad_append()`'s default from `[]` to `()` and explain why that alone does not fix it
+> Then change `bad_append()`'s default from `[]` to `()` and explain why that change alone does not fix `bad_append()`
 > (hint: `target.append(item)` on a tuple).
 
 ```python

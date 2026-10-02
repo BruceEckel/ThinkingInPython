@@ -318,7 +318,7 @@ before anyone constructs an instance.
 > one whose `customize1()` raises an exception the base never raises,
 > and one that leaves `customize2()` at its `...` default when the flow depends on it.
 > The type checker reports neither.
-> What must be true of the base class for it to catch either one?
+> What must be true of the base class for the type checker to catch either one?
 
 ```python
 # exercise_4.py

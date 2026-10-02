@@ -176,7 +176,7 @@ and the `if` tests that same result.
 The output expression then reuses `y`.
 Without the walrus, the filter and the output each need their own call,
 `cube_if_even(x) is not None` and `cube_if_even(x)`,
-computing it twice for every element that passes.
+calling `cube_if_even()` twice for every element that passes.
 
 ## Set Comprehensions
 
@@ -286,8 +286,8 @@ An `if` after the `for`, as in `[e ** 2 for e in a_list if isinstance(e, int)]`,
 decides *whether* the comprehension produces an element at all.
 The positions are not interchangeable:
 `[x for x in xs if a else b]` is a `SyntaxError`.
-When you need both, write each in its own position:
-`[x if a else b for x in xs if c]`.
+When you need both a conditional expression and a filter,
+write each in its own position: `[x if a else b for x in xs if c]`.
 
 Nesting one comprehension inside another builds a list of lists.
 Writing two `for` clauses in one comprehension flattens instead,
@@ -387,14 +387,14 @@ for path in sorted(py_paths):  # Sorted for stable output
 `tempfile.TemporaryDirectory()` is a [context manager](15_Techniques--Context_Managers.md#a-basic-context-manager)
 that creates a scratch directory and deletes it, and everything in it,
 when the `with` block exits.
-That gives the example a throwaway file tree to walk,
+The scratch directory gives the example a throwaway file tree to walk,
 without touching any real files or leaving anything behind.
 
 In the `py_paths` comprehension,
 the first `for` walks the directories and the second `for` walks the files in each,
 flattening the tree into one list of paths.
 The filter tests `f.endswith(".py")` on the bare filename rather than building a `Path` and reading its `.suffix`.
-That avoids constructing a `Path` for every file in the tree,
+Testing the bare filename avoids constructing a `Path` for every file in the tree,
 including the ones the filter skips.
 
 A `with` block, unlike a function body, does not create a new scope.
@@ -405,7 +405,7 @@ The comprehension finishes building `py_paths`, as strings,
 while the directory still exists.
 The `for` loop runs after the directory disappears,
 and by then nothing needs the files.
-If you turn those brackets into parentheses,
+If you turn the comprehension's brackets into parentheses,
 the program prints nothing and raises no exception.
 A generator expression does not start walking until `sorted()` pulls on it,
 and that pull comes outside the `with`.
@@ -426,7 +426,7 @@ not just the files at the bottom of it.
 
 A comprehension earns its place when you can read it in one pass.
 You can nest more `for` and `if` clauses,
-or wrap the whole thing in another call,
+or wrap the whole comprehension in another call,
 but each one you add makes the expression harder to read.
 
 ```python
@@ -461,9 +461,9 @@ if __name__ == "__main__":
 #: West: wrench ($4.75)
 ```
 
-Reading this means untangling several questions at once: which items qualify,
-how the warehouses flatten together, in what order the result arrives,
-and how each line renders.
+Reading the `report` comprehension means untangling several questions at once:
+which items qualify, how the warehouses flatten together,
+in what order the result arrives, and how each line renders.
 A comprehension nested inside `sorted()`,
 itself nested inside the outer comprehension, does four jobs in one expression.
 Giving each stage a name gives each question its own statement:
@@ -531,7 +531,8 @@ for n in [1, 2, 3]:
 ```
 
 The `for` loop prints the same values without building a wasted list.
-The brackets no longer suggest a collection the code never uses.
+With the comprehension's brackets gone,
+nothing suggests a collection the code never uses.
 Use a comprehension when you want the collection it produces,
 and a `for` loop when you want the side effect.
 If nothing assigns or uses a comprehension's result, write it as a loop instead.
@@ -562,7 +563,7 @@ The generator computes no square until you pull a value.
 `next()` produces them one at a time,
 and `itertools.islice()` takes a few without building the million-element list.
 
-The parentheses do not make it a tuple comprehension.
+The parentheses do not make a generator expression a tuple comprehension.
 No such form exists.
 When you need a tuple, pass the generator expression to `tuple()`.
 
@@ -630,7 +631,8 @@ print(list(nums))
 #: []
 ```
 
-It runs once, and after something consumes its values it is empty.
+A generator expression runs once,
+and after something consumes its values it is empty.
 `sum()` drains `nums`,
 so `any()` sees no elements and reports `False` instead of `True`,
 with no exception to say the question was never asked.
@@ -640,7 +642,7 @@ either materialize it with `list()` or write the generator expression again.
 ### The Gap Between Creation and Consumption
 
 A generator expression defers everything but one thing.
-Creating one evaluates the outermost iterable immediately:
+Creating a generator expression evaluates its outermost iterable immediately:
 
 ```python
 # genexp_timing.py
@@ -659,9 +661,9 @@ print(list(gen))
 ```
 
 `source()` runs as Python builds the generator expression,
-before the line below it prints.
+before the `generator created` line prints.
 The output expression waits,
-so the code reads `factor` when `list()` pulls the values rather than at the generator's creation.
+so it reads `factor` when `list()` pulls the values rather than at the generator's creation.
 The answer is `[10, 20, 30]` instead of `[2, 4, 6]`.
 A list comprehension has no such gap: it reads everything at once.
 That gap is also why `path_walk_comprehension.py` uses brackets.

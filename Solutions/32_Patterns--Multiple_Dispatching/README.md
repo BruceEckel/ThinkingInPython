@@ -414,7 +414,8 @@ Python's account of which pair of types has no defined subtraction.
 > as `exact_match.py` does.
 > Explain the `KeyError` in terms of how the lookup matches.
 > Then make the table match subclasses by walking both operands' `__mro__` for the first pair that has a row,
-> and say what becomes of each of the two properties the lookup shares with the table-driven state machine.
+> and say what becomes of each of the two properties the lookup shares with the table-driven state machine:
+> exact matching, and failure at the first duel that needs a missing pair.
 
 ```python
 # exercise_6.py

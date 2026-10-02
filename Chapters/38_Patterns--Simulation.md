@@ -350,7 +350,7 @@ So every `claim()` the run above rejects on an open cell is a rat testing a cell
 its own previous cell,
 or the parent's cell when a newly spawned rat tests its neighbors.
 Only a maze with a loop lets two rats try to claim the same new cell,
-the race the atomicity resolves.
+the race that `claim()`'s atomicity resolves.
 
 ### Contention on a Loop
 
@@ -466,14 +466,14 @@ def test_rats_map_every_reachable_cell() -> None:
 
 ### Watching the Pack
 
-The same model drives a GUI demonstration.
+The same `Blackboard` and `Rat` classes drive a GUI demonstration.
 `rats_view.py` lets the rats finish exploring,
 records the order in which they claimed cells,
 and replays that order on a `tkinter` canvas.
 The canvas shows the walls in gray, then each claimed cell turns green in turn,
 so you watch the pack move through the maze from the entry outward.
 The view records the order by subclassing `Blackboard` and overriding `claim()`,
-so the model stays as written.
+so `blackboard.py` stays as written.
 Each of this chapter's three views is a separate file holding all the display code,
 the model-view split of [*Observer*](30_Patterns--Observer.md#a-visual-example).
 The subscription half of *Observer* is absent.
@@ -889,7 +889,7 @@ each narrows the occupant to `Teleport` before the code assigns `target_room`.
 
 Stage 1 does test types,
 with `isinstance(occupant, Robot)` and `isinstance(occupant, Teleport)`.
-That is not the type switch that polymorphism removes.
+Those tests are not the type switch that polymorphism removes.
 `GameBuilder` still must tell the kinds of item apart, once,
 and the movement code that runs afterward never tests a type again.
 
@@ -915,8 +915,9 @@ It makes the same `doors.open(urge)` calls `Robot.move()` makes,
 so it works entirely in rooms and the moves between them.
 `landing()` decides whether a door is passable by testing the occupant's type with `isinstance()`,
 and that test reproduces what `Room.enter()` gets from `interact()`.
-For a `Wall` or an `Edge` it returns `None`, for a `Teleport` the target room,
-and for anything else the room itself:
+For a `Wall` or an `Edge`, `landing()` returns `None`,
+for a `Teleport` the target room,
+and for anything else the room beyond the door:
 
 ```python
 # robot_explorer/solver.py
@@ -1439,7 +1440,7 @@ global order arising from local rules that never mention it.
 The less each agent's rule uses, the more the run can tell you,
 because the outcome comes from the interactions rather than from the instructions.
 
-The model has one limit.
+The Chladni model has one limit.
 If you run it longer, agitation keeps falling.
 A grain moves roughly five orders of magnitude less per step at 20,000 steps than it does at 100.
 The nodal lines keep thinning as long as `step()` keeps running,
@@ -1484,7 +1485,9 @@ Each exercise is answered in this chapter's [solutions](../Solutions/38_Patterns
     need no lock?
 4.  Add a new kind of `Item` to the robot maze.
     Define a `Coin` subclass of `Item` with the symbol `$`.
-    Its `interact()` removes itself the way `Food` does and adds one to a coin count carried by the `Robot`.
+    Its `interact()` removes the coin from its room,
+    as `Food`'s does for the food,
+    and adds one to a coin count carried by the `Robot`.
     Place a few `$` characters in the maze and report how many the robot collects.
     `item_factory()`, `Room`, and `GameBuilder` stay as they are.
     Explain why the factory finds your new item on its own,
@@ -1498,7 +1501,8 @@ Each exercise is answered in this chapter's [solutions](../Solutions/38_Patterns
     beyond letting `solve()` return `None` when no room matches.
     Then use the new parameter to feed the robot:
     search for the nearest room holding a `Food`, walk there,
-    and repeat until no `Food` remains, then search for the `!` and walk that.
+    and repeat until no `Food` remains,
+    then search for the `!` and walk the route the search finds.
     Report how many pieces of food the robot ate and how many moves the whole tour took.
     The run answers two questions for you.
     Why does the search have to run again after every meal instead of once at the start?
@@ -1506,7 +1510,7 @@ Each exercise is answered in this chapter's [solutions](../Solutions/38_Patterns
 6.  Freeze the plate.
     Run the Chladni view with `MODES` starting at `(2, 2)`.
     Work out what `amplitude()` returns whenever `m == n`,
-    and explain why the result is neither chaos nor a figure.
+    and explain why the view shows neither chaos nor a figure.
     Then explain why the main diagonal shows up in every figure this plate makes.
     Swapping `x` and `y` in the two terms of `amplitude()` is the clue.
 7.  Change the physics.

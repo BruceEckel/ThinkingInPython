@@ -288,11 +288,11 @@ so `[Callable[P, R]]` is a parameter list of length one,
 not a list of callables.
 That single parameter type is `Callable[P, R]`, the wrapped function's type.
 So the whole annotation reads as "a callable that takes a `Callable[P, R]` and returns a `Callable[P, R]`."
-That describes `decorate`, which takes `func` and returns `wrapper`,
+The annotation describes `decorate`, which takes `func` and returns `wrapper`,
 both typed `Callable[P, R]`.
 
 `@repeat(times=3)` first evaluates `repeat(times=3)`.
-That returns `decorate`, the real decorator,
+`repeat(times=3)` returns `decorate`, the real decorator,
 and Python then calls `decorate(greet)`.
 Only now does `decorate`'s own body run, including its `@wraps(func)` line.
 `@wraps(func)` is the same two-step pattern one level down:
@@ -305,7 +305,7 @@ The nesting stops at two levels, matching the two nested `def`s in the source.
 Forgetting the parentheses is the common mistake here.
 `@repeat` without them calls `repeat(greet)`,
 passing the function where `repeat` expects `times`.
-The `times < 1` check turns that into a `TypeError` at decoration,
+The `times < 1` check turns that mistake into a `TypeError` at decoration,
 since a function does not support `< 1`,
 though the message says nothing about parentheses.
 A `repeat` without that comparison fails silently.
@@ -747,7 +747,7 @@ def test_repeat_rejects_times_below_one(times: int) -> None:
 The class form has one limitation:
 a method decorated this way becomes an instance rather than a function,
 and the call then fails.
-`trace` and `count_calls` above decorated bare functions on purpose:
+`trace_class.py` and `count_calls.py` decorate bare functions on purpose:
 
 ```python
 # method_decoration.py
@@ -774,10 +774,10 @@ expect(TypeError, ex.method, 5)
 ```
 
 `Ex.method` is a `logged` instance, stored as a class attribute.
-Python binds a class attribute to the instance only when that attribute is a *descriptor*,
+Python binds a class attribute to an instance only when that attribute is a *descriptor*,
 an object with a `__get__()` method, and every ordinary function is one.
 A `logged` instance has no `__get__()`,
-so `ex.method` hands back the instance unbound,
+so `ex.method` hands back the `logged` instance unbound,
 and `ex.method(5)` really calls `logged.__call__(logged_instance, 5)`.
 `self.func` runs with `5` as its only argument,
 so `5` fills `method`'s own `self` parameter and leaves nothing for `x`.
@@ -816,9 +816,8 @@ so the same decoration that failed as a class works here with no descriptor of y
 For the same reason, `repeat_class.repeat` escapes the limitation:
 its `__call__()` returns `wrapper`, an ordinary function,
 so a method decorated with `@repeat(times=3)` is still a function.
-A fully typed class-based decorator, like `trace_class.trace`,
-gets the type checker involved:
-it reports a missing argument and a type mismatch on a call like `ex.method(5)`,
+With a fully typed class-based decorator, like `trace_class.trace`,
+the type checker reports a missing argument and a type mismatch on a call like `ex.method(5)`,
 catching the same problem.
 
 ### Function Form or Class Form?
@@ -867,7 +866,7 @@ Decorating a class differs from [Decorators as Classes](#decorators-as-classes),
 where the class is the decorator.
 Here the decorator is an ordinary function,
 and the class is the thing decorated.
-This one registers every class it decorates in `registry`:
+The `register()` decorator records every class it decorates in `registry`:
 
 ```python
 # register.py
@@ -895,7 +894,8 @@ if __name__ == "__main__":
 `register()` exists for the side effect of recording the class.
 The type parameter `T` does for a class decorator what `**P` and `R` do for a function decorator.
 If `register`'s annotation is `(cls: type) -> type`,
-it hands back a bare `type`, and `ty` and Pyright see `Espresso()` as an `Any`.
+`register()` hands back a bare `type`,
+and `ty` and Pyright see `Espresso()` as an `Any`.
 A class decorator can also return a replacement class,
 just as a function decorator returns a replacement function.
 
@@ -956,7 +956,8 @@ if __name__ == "__main__":
 ```
 
 `report` requires a callable; where `func` came from does not matter.
-Calling it directly, instead of through `@`, decorates the `lambda` in place.
+Calling `report` directly, instead of through `@`,
+decorates the `lambda` in place.
 `@` is convenient sugar for the common case of decorating a fresh `def`,
 not a requirement.
 The same call decorates a `functools.partial`, a bound method,
@@ -1013,7 +1014,7 @@ print(fib_table)
 #: [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]
 ```
 
-This is the most common real use of `@lambda`.
+The run-once idiom is the most common real use of `@lambda`.
 The practical reason for it is scope: the loop needs a working variable,
 `table`, and building the list inside a function keeps `table` local.
 The module gains one name, `fib_table`, holding the finished list.
@@ -1114,7 +1115,7 @@ The `Pizza` `Protocol` describes that interface.
 Both the plain pizzas and the toppings satisfy it structurally,
 with no shared base class required.
 This is [structural typing](08_Foundations--Static_Types.md#structural-typing-with-protocols).
-A read-only `@property` in a `Protocol` requires that reading the name produce that type,
+A read-only `@property` in a `Protocol` requires that reading the name produce the property's return type,
 and says nothing about how.
 `Margherita` supplies `cost` as a class attribute and `Topping` computes it in a property.
 Both read as a `float`, so both match.
@@ -1135,7 +1136,7 @@ solves the same combinatorial problem, with no wrapping and no `Protocol`.
 Here, where a topping only contributes a number and a name,
 that list is the simpler design.
 The *Decorator* pattern earns its structure when a topping needs behavior,
-not just data: one that changes how `cost` rounds,
+not just data: a topping that changes how `cost` rounds,
 adds a description only under some condition,
 or must itself be handed elsewhere as a `Pizza`.
 A list of toppings is data that a pizza holds.
@@ -1190,7 +1191,8 @@ in a wrapper that holds `func` and calls it,
 storing results in a memo dictionary instead of printing around the call.
 Understanding any of these needs no new syntax.
 They are ordinary decorators.
-The one piece of machinery left for later is the descriptor protocol those first four implement;
+The one piece of machinery left for later is the descriptor protocol that `@property`,
+`@cached_property`, `@staticmethod`, and `@classmethod` implement;
 [Metaprogramming](17_Techniques--Metaprogramming.md#learning-a-name-with-__set_name__)
 takes it up.
 

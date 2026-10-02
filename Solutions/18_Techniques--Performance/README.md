@@ -215,7 +215,7 @@ element.
 > In `slots.py`, add `class Point3D(Point)` that declares no `__slots__` of its own.
 > Confirm that an instance accepts `p.z = 3`,
 > which `Point` rejects with an `AttributeError`,
-> and find where the storage for it came from.
+> and find where the storage for `z` came from.
 
 ```python
 # exercise_6.py

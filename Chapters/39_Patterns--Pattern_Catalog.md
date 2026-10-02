@@ -133,7 +133,7 @@ so use this section's table when you know the problem but not the name.
 *Reactor* is a name that hides its job.
 The pattern is a dispatcher:
 one loop waits on many event sources and hands each event to the handler registered for it,
-and its original description lists *Dispatcher* as another name for it.
+and the original description of *Reactor* lists *Dispatcher* as another name for it.
 "Reactor" survives because the literature and the libraries use it:
 asyncio's `SelectorEventLoop` and Twisted's `reactor` are both Reactors.
 *Proactor* follows the same naming, and asyncio's `ProactorEventLoop`,
@@ -232,7 +232,7 @@ the default on Windows, is one.
 | Pattern | Intent |
 |---------|--------|
 | [*Dependency Injection*](11_Techniques--Testing.md#isolating-tests-from-the-world) | Supply an object's collaborators from outside it. |
-| [*Inversion of Control*](25_Patterns--Template_Method.md#the-anchored-algorithm) | Let a framework call your code rather than the reverse. *Dependency Injection* and *Service Locator* each implement it. |
+| [*Inversion of Control*](25_Patterns--Template_Method.md#the-anchored-algorithm) | Let a framework call your code rather than the reverse. *Dependency Injection* and *Service Locator* each implement *Inversion of Control*. |
 | [*Service Locator*](46_Effects--Stateless.md#dependency-injection) | Look up dependencies through a central registry. |
 
 ## Other Patterns and Idioms
@@ -250,7 +250,7 @@ the default on Windows, is one.
 | [*Object Pool*](15_Techniques--Context_Managers.md#an-object-pool) | Reuse expensive objects from a managed pool. |
 | *Specification* | Encapsulate a rule as a predicate that combines with others. |
 | [*State Machine*](31_Patterns--State_Machines.md) | Drive an object through a fixed set of states in response to inputs. |
-| [*Surrogate*](26_Patterns--Surrogate.md) | Put a stand-in in front of the object that does the work; *Proxy* and *State* are both forms of it. |
+| [*Surrogate*](26_Patterns--Surrogate.md) | Put a stand-in in front of the object that does the work; *Proxy* and *State* are both forms of *Surrogate*. |
 | *Type Object* | Represent a "kind of" thing as data rather than a subclass. |
 
 ## Patterns Python Absorbed
@@ -272,4 +272,4 @@ Python includes the piece their inventors set out to supply.
 | [*Flyweight*](35_Patterns--Flyweight.md#python-uses-flyweights) | Interned strings and cached small integers |
 
 Subtracting Python's share leaves the intent, not the structure.
-Each linked chapter shows one case.
+Each link leads to the section that makes that subtraction for its pattern.

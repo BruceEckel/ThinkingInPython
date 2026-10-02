@@ -121,7 +121,7 @@ disappears.
 > In `abstract_factory_protocol.py`, leave out `make_obstacle()` at first,
 > pass the factory to `GameEnvironment`,
 > and confirm the error your type checker reports.
-> Then add it.
+> Then add `make_obstacle()`.
 
 ```python
 # exercise_3.py

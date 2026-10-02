@@ -68,7 +68,7 @@ Every abstraction hides some work (a copy, a sort, a lookup behind an attribute)
 that costs nothing at the size you built it.
 A growing system eventually reaches the size where one hidden cost dominates,
 and the layer that made the code simple now stands between you and the fix.
-This is one reason [Performance](18_Techniques--Performance.md)
+That hidden cost is one reason [Performance](18_Techniques--Performance.md)
 tells you to measure at a realistic size rather than trust a small trial.
 
 ### The Vector of Change
@@ -92,8 +92,9 @@ Design patterns isolate changes in your code.
 You have seen some design patterns in this book.
 For example, you can think of [inheritance](07_Foundations--Classes.md)
 as a design pattern (albeit one the language builds in).
-It lets you express differences in behavior (that's the thing that changes)
-in objects that all have the same interface (that's what stays the same).
+Inheritance lets you express differences in behavior
+(that's the thing that changes) in objects that all have the same interface
+(that's what stays the same).
 [Composition](20_Patterns--Rethinking_Objects.md#prefer-composition-to-inheritance)
 also qualifies as a pattern, since it lets you change,
 dynamically or statically, the objects that implement your class,
@@ -178,7 +179,8 @@ print(apply([3, 1, 2], max), apply([3, 1, 2], sum))
 ```
 
 The classic form declares a `Strategy` interface,
-writes one class per algorithm, and adds a context class to hold the chosen one.
+writes one class per algorithm,
+and adds a context class to hold the chosen algorithm.
 The `how` parameter replaces all three.
 
 This listing shows only the shape.
@@ -186,7 +188,8 @@ Nobody designs a `Strategy` class hierarchy around calling `max` or `sum`;
 [Function Objects](28_Patterns--Function_Objects.md#strategy-choosing-the-algorithm-at-runtime)
 works through a case with a real motivation.
 
-That replacement is why the chapters ahead keep asking the question [Rethinking Objects](20_Patterns--Rethinking_Objects.md#guidelines)
+Because one parameter can replace a pattern's interface and classes,
+the chapters ahead keep asking the question [Rethinking Objects](20_Patterns--Rethinking_Objects.md#guidelines)
 posed: how much of each pattern's machinery does Python still need,
 and how much of it becomes functions, data, and protocols?
 
@@ -261,7 +264,7 @@ and the remaining difference is intent.
 
 Every pattern in *GoF Design Patterns* answers one question:
 what does one part of a program know about another?
-Its first chapter lists eight "common causes of redesign" and names the patterns that address each one.
+GoF's first chapter lists eight "common causes of redesign" and names the patterns that address each one.
 Six of the eight are a dependence of one part on another: on a class name,
 on a specific operation, on a platform, on an object's representation,
 on an algorithm, or on each other, which the list calls *tight coupling*.
@@ -283,7 +286,7 @@ and *Chain of Responsibility* each decouple a sender from a receiver,
 and *Observer* "defines a looser sender-receiver binding than *Command*."
 
 A diagram makes coupling visible.
-Once you can see it,
+Once you can see coupling,
 the patterns in the chapters ahead stop being twenty-three shapes to memorize,
 and become a few moves applied to one kind of diagram.
 
@@ -299,8 +302,8 @@ but how much of the other part the dependence reaches.
 Each rung is something the dependent part knows.
 A subclass knows its parent's internals: which methods call which,
 the attributes' names, what a `super()` call expects to find.
-A change to any of that can reach the subclass,
-which is why *GoF Design Patterns* repeats the saying that "inheritance breaks encapsulation."
+A change to any of that can reach the subclass.
+That reach is why *GoF Design Patterns* repeats the saying that "inheritance breaks encapsulation."
 A caller that writes `Circle(2)` knows a name and a constructor signature,
 and a caller that writes `isinstance(s, Circle)` knows the name and tests an object's type against it.
 A caller written against an abstract base class knows a set of method names and signatures,
@@ -318,14 +321,14 @@ no caller's source changes, because each caller names the protocol's method.
 The renamed class stops matching the protocol,
 and the type checker reports each place that passes it to a caller.
 
-Two rungs come free in Python.
+The `Protocol` and `Callable` rungs come free in Python.
 An abstract base class is a class you write and every implementer inherits.
 A `Protocol` is a class you write and nothing inherits,
 and a `Callable` annotation is not a class.
-That is the mechanism behind [When a Pattern Dissolves](#when-a-pattern-dissolves).
-In a language that has only the first two rungs,
-a pattern exists to build the third.
-In a language that supplies the fourth and fifth,
+Those two free rungs are the mechanism behind [When a Pattern Dissolves](#when-a-pattern-dissolves).
+In a language whose only rungs are a part's internals and its name,
+a pattern exists to build a declared interface.
+In a language that supplies the `Protocol` and `Callable` rungs,
 that pattern has nothing left to build.
 
 ### A Pattern Moves an Edge
@@ -366,7 +369,7 @@ and the one class that knows the adaptee's real name is the adapter,
 so a change to the adaptee reaches one file.
 
 *Decorator*, like *Strategy*, has no heavy edge.
-A topping satisfies the component interface and also holds one,
+A topping satisfies the component interface and also holds a component,
 so it can wrap a pizza or another topping without naming either.
 
 *Visitor* is the reverse of the others.
@@ -428,8 +431,8 @@ and any function of the right shape satisfies it.
 
 The edge a `Protocol` deletes is the one that in C++ or Java is mandatory:
 the implementer must name the interface.
-That edge makes an interface a thing on which every implementer depends,
-so that renaming it or moving it touches every file that names it.
+That edge makes every implementer depend on the interface,
+so renaming or moving the interface touches every file that names it.
 [Rethinking Objects](20_Patterns--Rethinking_Objects.md#protocols)
 makes the same point about types "in libraries you cannot edit,"
 and this is its general form: the fewer edges in source,
@@ -502,8 +505,8 @@ and the rest are here for your own designs.
     builds on this, and [Stateless](46_Effects--Stateless.md#declaring-a-dependency)
     moves the same declaration into a function's signature,
     where `Need` names what the function requires of its surroundings.
-    This gives Managed Coupling its target: not the least coupling,
-    but coupling you can read.
+    Designing the communication gives Managed Coupling its target:
+    not the least coupling, but coupling you can read.
 -   *Subtraction*: a design is complete when you cannot take anything else away^[Antoine de Saint-Exupéry, *Wind, Sand and Stars*: "perfection is reached not when there's nothing left to add, but when there's nothing left to remove". The English wording varies by translation.].
 -   *Simplicity before generality*^[From an email from Kevlin Henney.].
     A common problem we find in frameworks is that they aim to be general purpose without reference to actual systems.

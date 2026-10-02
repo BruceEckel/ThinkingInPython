@@ -445,7 +445,7 @@ so an exception from the follow-up work is not mistaken for the failure the hand
 The optional `finally` always runs, and that makes it the place for cleanup.
 A `return`, `break`,
 or `continue` inside `finally` swallows any exception in flight,
-so cleanup code must never contain one:
+so cleanup code must never contain any of the three:
 
 ```python
 # finally_swallows.py
@@ -463,7 +463,7 @@ print(risky())
 `risky()` raises a `ValueError`,
 but the `return` in `finally` discards it before it reaches the caller,
 so the caller sees only `"swallowed"` with no trace of the exception.
-Python also flags this at compile time:
+Python also flags the `return` in `finally` at compile time:
 running the listing prints `SyntaxWarning: 'return' in a 'finally' block` to standard error before `swallowed`.
 
 Catch an exception only when you can do something about it.
@@ -482,7 +482,7 @@ To log an exception and still let it propagate, re-raise it with a bare `raise`.
 
 ### Exception Chaining
 
-Raising an exception while handling another attaches the first exception to the new one.
+Raising an exception while handling another attaches the handled exception to the new one.
 Python reports both, and `from` decides how the two connect:
 
 | Form | What Python prints above the new exception |
@@ -593,8 +593,8 @@ print(forgiving("\N{SUPERSCRIPT TWO}"))
 ```
 
 `isdigit()` and `int()` disagree in both directions.
-`isdigit()` rejects `"-5"`, which `int()` converts fine, and it accepts `"²"`,
-which `int()` refuses.
+`isdigit()` rejects `"-5"`, which `int()` converts fine,
+and `isdigit()` accepts `"²"`, which `int()` refuses.
 The `try` block asks the only question that matters: does this conversion work?
 The world can also change between the test and the operation:
 a file that exists at the `if` can disappear before the `open()`,

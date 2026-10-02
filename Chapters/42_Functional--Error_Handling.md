@@ -397,7 +397,7 @@ then `func_c()`.
 
 Functional programmers have a name for a type with a way to wrap a plain value
 (`Ok()` here) and this chaining operation: a *monad*.
-You can use `bind()` without the word, which names a reusable shape:
+You can use `bind()` without the word, but the word names a reusable shape:
 `Maybe` chains a value that might be absent,
 `Result` chains one that might have failed,
 and an async container chains one whose computation has not finished yet,
@@ -626,15 +626,15 @@ If you misspell a name inside the wrapped function,
 which looks the same as bad input.
 The version in `safe.py` is deliberately small.
 A production version takes the exception types to catch as an argument and lets the rest propagate.
-Letting the rest propagate keeps the distinction the chapter ends on:
-a failure the caller can handle versus a bug the caller cannot.
+Letting the rest propagate keeps the distinction that [Which Failures Get a Result](#which-failures-get-a-result)
+draws: a failure the caller can handle versus a bug the caller cannot.
 
 `@safe` changes the return type and keeps what the function accepts:
 the `**P` parameter carries the wrapped function's whole parameter list through,
 so `parse("42")` type-checks and the checker rejects `parse(42)`.
 `**P` is the technique for [maintaining the wrapped interface](14_Techniques--Decorators.md#p-and-r-keep-the-static-interface),
-and that chapter explains how to write decorators like `@safe`,
-including `functools.wraps`.
+and [Decorators](14_Techniques--Decorators.md)
+explains how to write decorators like `@safe`, including `functools.wraps`.
 
 The tests for `@safe` check that a good input becomes an `Ok`,
 and that a raised exception becomes an `Err` holding that exception:
@@ -729,7 +729,8 @@ so a caller who wants the original must read it from the new exception's `__caus
 (set when a handler raises an exception without `from`).
 `BaseException.add_note()`, added in Python 3.11,
 improves the message and keeps the exception.
-It appends a line to the one you already have, and the traceback prints it:
+It appends a line to the message you already have,
+and the traceback prints that line:
 
 ```python
 # add_note.py
@@ -753,8 +754,8 @@ except ValueError as e:
 #: expected a whole number of seconds
 ```
 
-The bare `raise` re-raises the same object, so it keeps its type, `ValueError`,
-and its original traceback.
+The bare `raise` re-raises the same object, so the exception keeps its type,
+`ValueError`, and its original traceback.
 The listing prints with `traceback.format_exception_only()`,
 which renders the message and the notes and leaves out the file paths a full traceback carries.
 
@@ -775,7 +776,7 @@ because the `Result` keeps the exception as a value rather than propagating it.
 Nothing prints a traceback for an `Err` stored in a list.
 The exception inside still holds its `__traceback__`,
 but the `except` clause that caught it returned it as a value,
-so it reaches no handler.
+so the exception reaches no handler.
 The exception must carry whatever context it needs:
 
 ```python
@@ -816,7 +817,7 @@ The narrowing works because `Result` is a union of exactly two classes,
 and it works the same way with `isinstance()`.
 Reading `error.__notes__` directly is safe here only because `parse_field()` adds a note on every failure.
 An exception that arrives from code you did not write may carry no notes,
-so read it with `getattr(error, "__notes__", [])`.
+so read `__notes__` with `getattr(error, "__notes__", [])`.
 
 ## The returns Library
 

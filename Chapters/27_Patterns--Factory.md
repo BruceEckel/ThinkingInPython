@@ -83,7 +83,7 @@ when someone first asks it for a triangle.
 Nothing at edit time points at the missing case,
 and the type checker cannot know which strings `export_svg()` is meant to handle.
 An `Enum` for `kind` and an `assert_never()` wildcard [moves that report to check time](13_Techniques--Pattern_Matching.md#exhaustive-matching),
-though an if-chain like `render()` still slips past it.
+though an if-chain like `render()` still slips past the check.
 Either way, adding a type means editing every call site.
 
 The solution is to encapsulate object creation.
@@ -199,7 +199,7 @@ The concrete shapes carry a leading underscore because no caller needs their nam
 `factory()` returns `Shape`,
 so a caller only works with `Shape`s and never writes `_Circle`.
 The underscore discourages direct construction,
-but this is a convention rather than concealment.
+but it is a convention rather than concealment.
 [*Singleton*](24_Patterns--Singleton.md#nothing-keeps-the-class-private)
 makes the same case,
 and keeps its bare `Settings` name because `settings()` returns that type,
@@ -224,16 +224,17 @@ is an alternative constructor,
 a method on the type that builds an instance from data the constructor rejects.
 There, `Month(7)` raises a `ValueError` because no member has the value `7`,
 while `Month.of(7)` returns `JULY`.
-This is also a factory, of the same form as `factory()`.
+`Month.of()` is also a factory, of the same form as `factory()`.
 Both are static methods within the type.
 Each takes data and returns an instance,
 and each raises an exception for data it does not recognize; for `Month`,
 a number outside one through twelve.
 `of()` needs no `match`.
-The `Enum` already holds every member it could return,
-so `of()` indexes `list(Month)` instead of naming a class.
+The `Enum` already holds every member `of()` could return,
+so the method indexes `list(Month)` instead of naming a class.
 A factory over a closed set of products reduces to a lookup.
-The next section writes that lookup table by hand,
+[The Pythonic Factory: a Dictionary](#the-pythonic-factory-a-dictionary)
+writes that lookup table by hand,
 and then lets the classes fill it for an open set.
 
 [`from_fahrenheit()`](07_Foundations--Classes.md#static-and-class-methods)
@@ -241,7 +242,7 @@ is the usual form of alternative constructor:
 a `@classmethod` that computes the constructor's arguments and ends with `return cls(...)`.
 That form is the most common factory in Python code,
 and `dict.fromkeys()` and `datetime.fromisoformat()` are two from the standard library.
-It chooses arguments rather than a class,
+The `@classmethod` form chooses arguments rather than a class,
 so a subclass that calls it gets an instance of the subclass with no override.
 
 ## The Pythonic Factory: a Dictionary
@@ -341,7 +342,7 @@ def make(name: str) -> Shape:
 lets each subclass register itself.
 Nothing in the listing calls a register function;
 the two `class` statements fill `Shape.registry` on their own.
-This is why `Shape` is an abstract base class rather than a `Protocol`.
+Registering through `__init_subclass__()` is why `Shape` is an abstract base class rather than a `Protocol`.
 `__init_subclass__()` runs only for classes that inherit from `Shape`,
 so a class that merely matches a Protocol's shape never registers.
 Inheritance is the mechanism, and `ABC` adds one guard on top of that.
@@ -424,7 +425,7 @@ from different modules, silently overwrite each other.
 Key on `f"{cls.__module__}.{cls.__qualname__}"` when a collision is possible.
 The registry also never removes an entry:
 a class defined inside a function or a test stays in the table,
-and the strong reference keeps it alive for the rest of the process.
+and the strong reference keeps the class alive for the rest of the process.
 
 `__init_subclass__()` names `Shape.registry` rather than `cls.registry` on purpose:
 `cls.registry` resolves through the [MRO](07_Foundations--Classes.md#method-resolution-order),
@@ -487,7 +488,7 @@ with a class decorator doing the registering.
 The table then needs no class to live on,
 and its natural owner is the factory that reads it.
 Python lets you [set an attribute on a function](17_Techniques--Metaprogramming.md#attributes-on-a-function),
-but the type checker reports every dotted access to one,
+but the type checker reports every dotted access to such an attribute,
 so the factory becomes a small callable object that holds the table:
 
 ```python
@@ -616,7 +617,7 @@ The last test passes although the test before it registered `Triangle`,
 because each test registers with a `ShapeFactory` of its own.
 `test_registry.py` cannot do that:
 `Shape.registry` is one table for the whole process,
-which is why its last test asks for `"Hexagon"`.
+so its last test asks for `"Hexagon"`.
 
 The ordinary Python factory is a dictionary of classes,
 whether you fill it by hand, the classes fill it themselves,
@@ -717,7 +718,7 @@ Use a separate factory class when object creation needs work beyond calling a co
 such as pooling, caching, or consulting external configuration.
 
 You could eliminate `FACTORIES` by dispatching through `eval(f"_{kind}.Factory()")`.
-That is unnecessary and it makes things worse.
+Dispatching through `eval()` is unnecessary, and it makes things worse.
 `create_shape()` then compiles and runs any string it receives,
 so a configuration file, a request,
 or a command line can hand it arbitrary code instead of a shape name.
@@ -775,10 +776,10 @@ for sketch in (CircleSketch(), SquareSketch()):
 
 `render()` uses a `Shape` without naming one.
 `new_shape()` is the factory method,
-and the only thing `CircleSketch` and `SquareSketch` change.
+and the only method `CircleSketch` and `SquareSketch` override.
 Adding a `Triangle` means one new `Shape` subclass and one new `Sketch` subclass,
 with no edit to code that already works.
-This is the form *GoF Design Patterns* describes,
+Overriding a creation method in a subclass is the form *GoF Design Patterns* describes,
 and the reason the pattern is named for a method rather than for a class.
 
 The price is a second hierarchy.
@@ -802,7 +803,7 @@ The example in *GoF Design Patterns* makes one program work across several graph
 (GUIs).
 You create a factory object for the GUI you're working with,
 and from then on when you ask that factory for a menu, button, or slider,
-it creates the version of that item suited to that GUI.
+the factory creates the version of that item suited to that GUI.
 The change from one GUI to another then touches only a single place in the code,
 most likely via startup configuration.
 
@@ -911,7 +912,7 @@ before `GameEnvironment.__init__()` calls anything,
 the same way `Shape` fails in this chapter's earlier listings and `Partial()` does in [*Surrogate*](26_Patterns--Surrogate.md#proxy).
 The type checker reports that construction before the program runs.
 A *Protocol* names the required methods and needs no base class,
-which simplifies the *Abstract Factory*:
+so a Protocol simplifies the *Abstract Factory*:
 
 ```python
 # abstract_factory_protocol.py
@@ -1044,7 +1045,7 @@ and appending to it leaves `goblin.powers` unchanged.
 The `shallow` lines are a warning, not an example to follow:
 `copy.copy()` duplicates the `Monster` and shares its `powers` list,
 so changing that list through one object changes it for the other,
-with no error to signal it.
+with no error to signal the sharing.
 
 `deepcopy()` restores the clone's state without running the constructor,
 so a `__post_init__()` check never sees the clone
@@ -1055,8 +1056,7 @@ When the variant differs only in field values,
 `copy.replace()` builds it through the constructor, as `knight` shows,
 so a `__post_init__()` check runs on the result.
 Every field you do not name is passed by reference,
-which is why `knight` shares `goblin`'s `powers` list,
-the same sharing `shallow` shows.
+so `knight` shares `goblin`'s `powers` list, the same sharing `shallow` shows.
 Pass a fresh list for that field when the variant must own one.
 
 `deepcopy()` copies everything it can reach,
@@ -1141,7 +1141,7 @@ It builds a complex object in steps,
 keeping the step-by-step assembly separate from the finished object.
 In *GoF Design Patterns* a *director* issues the steps to a builder through an abstract interface,
 so one construction process can produce different representations.
-The book's example is a document reader that hands each token to a converter,
+The example in *GoF Design Patterns* is a document reader that hands each token to a converter,
 and the converter decides whether the result is ASCII text or TeX.
 
 The builder most programmers meet is narrower,
@@ -1201,7 +1201,7 @@ Calls can be chained because each setter returns `self`.
 
 The builder is quietly single-use.
 `build()` reads `self._toppings` without clearing it,
-so a second `build()` on the same builder returns a pizza carrying the first one's toppings,
+so a second `build()` on the same builder returns a pizza carrying the first pizza's toppings,
 and every `.topping()` call in between adds to that same list.
 The chained call in `__main__` never shows the problem,
 because it keeps no reference to the builder after `build()` returns.
@@ -1209,7 +1209,7 @@ Making the builder reusable means resetting the fields in `build()`,
 and that reset removes the other reasonable use:
 configuring a builder once and building from it twice.
 
-Even without that ambiguity,
+Even without the single-use hazard,
 the builder class solves a problem Python does not have.
 Keyword arguments with defaults are Python's built-in builder:
 
@@ -1281,7 +1281,7 @@ modeling toppings as wrapper objects instead of builder-collected fields.
 The steps must come in order, later steps depend on earlier ones,
 and some rules apply across several steps.
 `GameBuilder` in [Simulation](38_Patterns--Simulation.md#building-the-maze-in-stages)
-shows this approach.
+is such a builder.
 It assembles a maze in three stages: creating rooms,
 connecting each room to its neighbors,
 then pairing the teleports that share a target letter.
@@ -1295,7 +1295,7 @@ The smallest builder in Python is easy to overlook.
 Appending parts to a list and finishing with `"".join(parts)` builds an immutable string through a mutable intermediate.
 `PizzaBuilder` has the same shape:
 it collects toppings in a list and freezes them into a tuple at `build()`.
-The structure is everywhere,
+That shape is everywhere,
 so save the name *Builder* for construction that is a process in its own right,
 with intermediate state and rules that span the steps.
 When the "steps" are optional values,
@@ -1343,7 +1343,7 @@ Each exercise is answered in this chapter's [solutions](../Solutions/27_Patterns
     In `abstract_factory_protocol.py`, leave out `make_obstacle()` at first,
     pass the factory to `GameEnvironment`,
     and confirm the error your type checker reports.
-    Then add it.
+    Then add `make_obstacle()`.
 4.  Modify `shape_factory_objects.py` to use an *Abstract Factory* to create different sets of shapes
     (for example, one type of factory object creates "thick shapes," another creates "thin shapes," but each factory object can create all the shapes: circles, squares, triangles, etc.).
 5.  Add a rule to both pizza examples: a pizza may carry at most four toppings.

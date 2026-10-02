@@ -169,7 +169,7 @@ the source, as with a network response.
 > then walk both together so the leading branch stays `k` items ahead.
 > Predict how the buffer grows with `k` before you measure it,
 > then measure it for two values of `k` with `tee.py`'s `tracemalloc` approach,
-> and explain the result using that section's rule for what `tee` buffers.
+> and explain the result using the rule in [What `tee()` Buffers](../../Chapters/23_Patterns--Iterators.md#what-tee-buffers).
 
 ```python
 # exercise_5.py

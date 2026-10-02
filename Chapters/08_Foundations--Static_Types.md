@@ -22,7 +22,7 @@ This book uses [Astral's `ty`](https://docs.astral.sh/ty/) instead,
 from the same group that makes `uv` and `ruff`.
 Pyright checks the same listings as a second opinion,
 and the book's build does not depend on its verdict.
-Where it or mypy disagrees with `ty` on a listing,
+Where Pyright or mypy disagrees with `ty` on a listing,
 the text says so and names the checker,
 because a verdict on a hard case is a fact about one checker, not about Python.
 
@@ -149,7 +149,7 @@ The `# ty:` summary is for you, not for the tool.
 `ty` acts on a comment that has the form `# type: ignore`,
 which silences every diagnostic on its line,
 or `# ty: ignore[invalid-argument-type]`, which silences the one rule it names.
-The first form is the one every type checker honors.
+`# type: ignore` is the form every type checker honors.
 
 ## Narrowing {#narrowing}
 
@@ -235,7 +235,7 @@ and nothing in the checker's model connects `reset()` to that narrowing,
 so the checker never widens `b.val` back to `str | None`.
 The `AttributeError` shows the narrowing was stale by the time `upper()` ran.
 A narrowing on a local variable holds; a narrowing on an attribute can go stale,
-so recheck it after any call that might touch the object.
+so recheck the attribute after any call that might touch the object.
 Copying the attribute into a local variable before the test avoids the recheck,
 because a called function cannot rebind its caller's local variable
 (see exercise 9).
@@ -346,7 +346,7 @@ see [*Surrogate*](26_Patterns--Surrogate.md#what-the-implementation-supplies).
 
 `Drawable` appears in one place, the annotation on `render()`'s parameter.
 If you pass an object without a `draw()` to `render()`,
-the type checker rejects it.
+the type checker rejects the call.
 `Blob` is the case worth watching: it draws, in the everyday sense,
 but the method's name is `paint()`,
 and a protocol matches on names and signatures rather than on intent.
@@ -450,7 +450,7 @@ This function works on a list holding any type.
 A useful annotation makes the return type match the list's element type,
 whatever that type is.
 
-`Any` loses that connection: it accepts any list,
+`Any` loses that connection: `first_any()` accepts any list,
 and the return type then says nothing about what the list holds:
 
 ```python

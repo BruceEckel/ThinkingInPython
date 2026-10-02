@@ -16,7 +16,7 @@ Python dispatches on one type at a time.
 When two objects of unknown type interact,
 a method call resolves the type of only one of them, its receiver.
 You end up testing the other type by hand,
-writing out the dispatch the language performed for the first one.
+writing out the dispatch the language performed for the receiver.
 
 That dispatch is one form of [polymorphism](20_Patterns--Rethinking_Objects.md#what-is-polymorphism),
 which broadly means that a function accepts arguments of more than one type.
@@ -33,7 +33,8 @@ The solution is *Multiple Dispatching*: to dispatch on two unknown types,
 you need two method calls.
 The first resolves the first type, and the second resolves the second.
 Two unknown types means two dispatches, which is *double dispatching*.
-In the example below, both interacting objects come from a single hierarchy,
+In `paper_scissors_rock.py`,
+both interacting objects come from a single hierarchy,
 and the two dispatches go through methods named `compete()` and `eval_*()`.
 If two different type hierarchies interact,
 you need a dispatching method call for each hierarchy.
@@ -170,7 +171,7 @@ That call is the second dispatch.
 It resolves `paper` and runs `Paper.eval_scissors()`,
 the one method in which both types are known:
 its class is `Paper` and its name says `Scissors`.
-Which competitor does that result describe?
+Which competitor does that method's result describe?
 `Paper.eval_scissors()` returns `WIN`.
 Scissors cut paper, so that is the outcome for the scissors that started the duel,
 not for the `Paper` whose code is running.
@@ -178,8 +179,8 @@ The listing's first line of output, `Scissors <--> Paper : win`,
 reports it that way.
 Every `eval_*()` method answers for the original caller,
 the type named in the method's own name.
-Read that convention the other way,
-and every result in the class appears reversed.
+If you read that convention the other way,
+every `eval_*()` result appears reversed.
 
 That original caller arrives in each `eval_*()` method as its `item` argument:
 the same object `compete()` held as `self` before passing it along.
@@ -266,7 +267,8 @@ Both versions now hold the same nine answers, one for each pair of types:
 
 ![](_images/dispatch_story)
 
-Drawn as a grid, the difference between the versions is where each one keeps that grid.
+With the nine answers drawn as a grid,
+the versions differ in where each one keeps the grid.
 The method version cuts it into columns and gives one to each class,
 so finding a cell takes two dispatches.
 The table version keeps the grid whole in `OUTCOME`,
@@ -372,7 +374,7 @@ One mistake raises no error and prints a plausible answer:
 a `@singledispatchmethod` declared on a shared base gives every subclass one dispatcher,
 and the resolution on `self` then reaches that same dispatcher for every subclass,
 so each class needs its own `@singledispatchmethod`.
-Here is the overwrite:
+Here is the mistake:
 
 ```python
 # singledispatch_trap.py
@@ -697,7 +699,8 @@ Each exercise is answered in this chapter's [solutions](../Solutions/32_Patterns
     as `exact_match.py` does.
     Explain the `KeyError` in terms of how the lookup matches.
     Then make the table match subclasses by walking both operands' `__mro__` for the first pair that has a row,
-    and say what becomes of each of the two properties the lookup shares with the table-driven state machine.
+    and say what becomes of each of the two properties the lookup shares with the table-driven state machine:
+    exact matching, and failure at the first duel that needs a missing pair.
 7.  Create a business-modeling environment with three types of `Inhabitant`:
     `Dwarf` (for engineers), `Elf` (for marketers), and `Troll` (for managers).
     Now create a class called `Project` that creates the different inhabitants and causes them to `interact()` with each other.

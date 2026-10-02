@@ -8,7 +8,7 @@ Undo is a feature users expect and programmers dread.
 The *originator* (the object with state) produces a *memento*,
 an opaque snapshot of itself.
 A *caretaker* (the undo machinery) stores mementos and returns one on request,
-without reading its contents.
+without reading their contents.
 
 The pattern exists because of mutation.
 An object that changes in place overwrites its earlier state,
@@ -123,7 +123,8 @@ if __name__ == "__main__":
 ```
 
 `copy.copy(sketch)` looks like a shortcut for `save()`,
-but it copies only the `Sketch`: the copy's `strokes` is the same list,
+but it copies only the `Sketch`:
+the copy's `strokes` is the same list as `sketch.strokes`,
 the alias from `aliased_snapshot.py` one level down.
 `save()`'s one-level copy is enough because a stroke is a string.
 An originator holding containers inside containers needs `copy.deepcopy()` in `save()`,
@@ -159,7 +160,7 @@ so no caretaker makes one by accident.
 so reassigning `checkpoint.strokes` raises `FrozenInstanceError` at runtime.
 Neither the checker's report nor the frozen field stops code holding a `Memento` from reading `.strokes`,
 unpacking that tuple, or building a `Memento` by hand;
-that boundary remains a convention,
+the caretaker's side of the contract remains a convention,
 the one the classic pattern always relied on.
 What changes is the accidental case,
 a caretaker that mixes up a `Memento` with some other tuple:
@@ -206,7 +207,7 @@ If you run the program anyway,
 it raises `AttributeError` at the first line that reads `.strokes`.
 The checker rejects the assignment to `checkpoint.strokes` too,
 and the runtime raises `FrozenInstanceError`.
-The tuple is immutable on its own;
+The `strokes` tuple is immutable on its own;
 the record makes the attribute that holds it read-only too.
 
 ### Testing the Sketch
@@ -348,8 +349,8 @@ Two thousand edits held in a `History` cost about two million pointers;
 the final `Drawing` alone costs two thousand.
 A field that stays small, or that each edit replaces instead of extends,
 keeps the total proportional to `k`.
-For one that grows with every edit, bound the history's depth (see exercise 2),
-coalesce edits before `History` stores them,
+For a field that grows with every edit, bound the history's depth
+(see exercise 2), coalesce edits before `History` stores them,
 use a persistent structure that shares more than a flat tuple can,
 or switch to *Command*-based undo, which stores an edit instead of a state.
 
@@ -476,7 +477,7 @@ such as the `Sketch` mementos that `history_classic.py` passes to it below.
 
 `undo()` and `redo()` trust the caller:
 undoing an empty past raises `IndexError` from `pop()`.
-That `pop()` comes first, so an undo that raises leaves the history as it was.
+That `pop()` comes first, so a failed undo leaves the history as it was.
 `can_undo()` and `can_redo()` exist so a caller checks first;
 an editor calls them to gray out the menu item.
 
@@ -485,7 +486,7 @@ so it works for any state type, from `int` to a full `Drawing`,
 with one condition: states must be immutable.
 `History` keeps a reference, not a copy,
 so a list mutated in place changes in the past too.
-A `History` of lists is a stack of aliases, the bug that opens this chapter.
+A `History` of lists is a stack of aliases, the bug in `aliased_snapshot.py`.
 
 `History` holds the classic form as well.
 The classic `Memento` from `sketch.py` is already immutable,
@@ -599,7 +600,7 @@ and every method on `Drawing` works from one.
 `copy.replace()` is the general version of `dataclasses.replace()`,
 as [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#the-general-form-of-replace)
 describes.
-Choosing `copy.replace()` over the `dataclasses` one keeps the technique available to whatever state type a `History` holds:
+Choosing `copy.replace()` over `dataclasses.replace()` keeps the technique available to whatever state type a `History` holds:
 `NamedTuple`, `datetime`, and any class defining `__replace__()` all accept it.
 
 ## Mementos That Outlive the Process
@@ -712,7 +713,7 @@ The class declares no such field, so `getattr()` finds it, `repr()` omits it,
 and `==` ignores it.
 The loaded object equals one built fresh from `SketchV1` and hashes the same.
 The added-field drift in `pickle_drift.py` raises `AttributeError` when something reads the new field.
-This one raises nothing, and the data is wrong.
+The deleted-field drift raises nothing, and the data is wrong.
 Renaming a field is a delete and an add at once, with both effects.
 The old name becomes a ghost, and the new one is missing,
 so the generated `repr()` raises `AttributeError`.

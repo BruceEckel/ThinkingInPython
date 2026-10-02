@@ -34,14 +34,14 @@ so the discipline later named the Liskov Substitution Principle (LSP)
 fit naturally.
 
 *Smalltalk* took the other path: everything is an object,
-and you act on them only by sending messages, always late-bound.
+and you act on objects only by sending messages, always late-bound.
 Smalltalk was emphatically dynamic:
 you built a program at runtime by finding the closest existing object and inheriting from it to add behavior.
 That style guarantees nothing about substitutability.
 
 *C++* drew from Simula.
 Objects were optional,
-and it brought object-oriented programming and exceptions into the mainstream.
+and C++ brought object-oriented programming and exceptions into the mainstream.
 
 *Java* drew from Smalltalk.
 Everything lives inside a class, even when all you need is a function.
@@ -55,7 +55,7 @@ They favor immutability.
 Rust makes bindings immutable by default.
 Swift and Kotlin encourage immutability through `let` and `val`
 (Go has no general immutability).
-They compose data structures instead of inheriting implementation.
+The newer languages compose data structures instead of inheriting implementation.
 They let code live outside classes,
 so one function can serve many types instead of becoming a method on each.
 The industry has been quietly walking back from "everything is an object" and from implementation inheritance.
@@ -68,7 +68,7 @@ A subclass may add behavior, but it must honor the base class contract.
 An override may accept more than the base does but never less.
 It returns a result the caller can use where it expects the base's result,
 and raises no surprising exceptions.
-When subclasses obey it,
+When subclasses obey the principle,
 code you write against the base class works unchanged on any of them.
 That obedience makes polymorphism,
 and patterns like the [*Template Method*](25_Patterns--Template_Method.md),
@@ -85,7 +85,7 @@ marks the intent.
 No tool reads the behavior behind the signature,
 so a subclass can break the base class contract while matching its signature perfectly.
 The interpreter runs such code without objection,
-and it may or may not fail at runtime:
+and the code may or may not fail at runtime:
 
 ```python
 # lsp_violation.py
@@ -308,7 +308,7 @@ The test goes through `setattr()` because the type checker rejects `immutable.bo
 `frozen=True` is the defense that holds at runtime,
 against code the type checker never sees.
 
-Two quiet changes in the listing do as much work as `frozen=True`:
+Two quiet changes in `immutable.py` do as much work as `frozen=True`:
 `numbers` is a `tuple`, not a `list`, and `Bob` carries `frozen=True` too.
 `frozen=True` is shallow.
 It stops assignment to the fields of `Immutable`,
@@ -401,7 +401,7 @@ When you fetch it from the class instead of from an instance,
 and the call passes `p1` as the first argument.
 `p1.distance_to(p2)` is shorthand for that call.
 The dot fills in `self`.
-The function reads the same and computes the same, and it has one advantage:
+`distance()` reads the same and computes the same, and it has one advantage:
 it can live outside `Point`.
 The method keeps one advantage of its own:
 `p1.` shows every operation `Point` supports,
@@ -506,7 +506,7 @@ a dependence no signature records and no type checker reports.
 That dependence is the *fragile base class* problem:
 a base class cannot change its own internals without risking every subclass that came to depend on them.
 
-Composition answers it by delegation.
+Composition answers that problem by delegation.
 Hold a list instead of being one, and expose only what you meant to expose:
 
 ```python
@@ -805,7 +805,7 @@ A protocol is *structural*, so it works with any type that has matching members,
 including types in libraries you cannot edit.
 The type's author need not hear that your protocol exists.
 That independence is why this chapter emphasizes protocols.
-It has a cost.
+The independence has a cost.
 Nothing in a class's own source names the protocols it satisfies,
 so you cannot grep a codebase for every type that implements one,
 the way you can search for subclasses of a base class.
@@ -1154,7 +1154,7 @@ Start with functions and data.
 When a program truly needs an object, it tells you:
 you are passing the same data into every function,
 or bundling behavior with state.
-Compare the two on a running balance:
+Compare functions and an object on a running balance:
 
 ```python
 # balance_functions.py

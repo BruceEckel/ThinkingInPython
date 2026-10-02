@@ -255,9 +255,8 @@ A base class could also give the annotations a type to name:
 With that base, the type checker rejects the engine,
 since `State` declares neither the `run()` nor the `next()` the engine calls.
 At runtime, Python builds a derived class that defines `run()` alone without complaint,
-and the machine runs it.
-The error waits until something calls its `next()`,
-which raises an `AttributeError`.
+and the machine runs an instance of it.
+The error waits until `run_all()` calls the missing `next()` and Python raises an `AttributeError`.
 A base whose methods `raise NotImplementedError` satisfies the checker.
 The call to the missing method then raises that `NotImplementedError` from the base,
 with whatever message you write there.
@@ -267,7 +266,7 @@ and the error moves to the constructor,
 which raises a `TypeError` for a subclass that defines `run()` alone.
 The type checker reports that construction too,
 so the `ABC` and the Protocol both report the missing method before the program runs;
-the two plain bases report it at the call.
+the empty base and the `NotImplementedError` base report it at the call.
 
 ### A Table Inside Each State
 
@@ -441,7 +440,7 @@ so returning the current state runs that state's action a second time.
 Version 2's table holds the explicit transitions alone,
 and its `next()` raises an exception on every other input.
 
-Either answer can be right, so choose it on purpose.
+Either policy can be right, so choose one on purpose.
 Staying in the same state suits a machine fed from a source that includes events meant for something else.
 Raising an exception suits a table you are still building,
 where a missing entry is a bug the exception reports.
@@ -488,7 +487,7 @@ and `State` is now an `Enum` of names rather than a `Protocol` the state classes
 The states in this design do nothing.
 The table holds all the behavior.
 
-The file's name differs from the first engine's `state_machine.py` on purpose.
+The name `table_machine.py` differs from the first engine's `state_machine.py` on purpose.
 Python [caches each module under its import name](06_Foundations--Modules_and_Packages.md),
 so a program that imports two files named `state_machine.py` gets the first one both times,
 with no error.
@@ -740,9 +739,9 @@ the message alone leaves you inferring the condition from the quantity.
 The last three events insert a dime and pick the same sold-out slot again,
 this time with too little money for it as well.
 Both conditions are now true,
-and `too_expensive` comes first in that row's list,
-so the engine takes that row.
-The machine reports `COLLECTING`, as though more money would sell it,
+and `too_expensive` comes first in the `(State.SELECTING, SecondDigit)` list,
+so the engine takes the `too_expensive` row.
+The machine reports `COLLECTING`, as though more money would sell the item,
 although the slot is empty and no amount of money would.
 If you swap the row order, the same input reports `UNAVAILABLE` instead.
 Both results follow from the ordering rule stated in [The Engine](#the-engine):

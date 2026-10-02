@@ -107,7 +107,8 @@ The class version is four classes and a wrapper to say what one list of function
 Because in Python a callback is a function, the replacement is unnecessary.
 A `Command` base class is worthwhile when the commands share implementation.
 A second operation alone does not call for one;
-the undo discussion below needs only a type.
+the undo discussion in [A Callable Object as a *Command*](#a-callable-object-as-a-command)
+needs only a type.
 
 ### A Bound Method as a Command
 
@@ -504,7 +505,7 @@ all of them in turn, one per call, or the first that succeeds.
 That count, rather than a class structure, separates *Command*, *Strategy*,
 and *Chain of Responsibility* in Python.
 
-The test is `root is not None`, not `if root`.
+The test in `solve()` is `root is not None`, not `if root`.
 A finder returns `0.0` for a function whose root is at zero, and `0.0` is falsy,
 so a truthiness test discards a correct answer and calls the next finder.
 The hazard is the truthiness test, not the choice of failure value.
@@ -591,7 +592,7 @@ Each key maps to a list of handlers,
 and `subscribe()` appends a handler to the list under the event type it handles.
 The events are values, written as records.
 Publishing an event looks up its type and calls every handler registered for that type.
-That is the second difference from the chain,
+Calling every handler is the second difference from the chain,
 which stops at the first handler that succeeds.
 The handlers are ordinary functions, so they need no base class.
 Registering one is a single `subscribe()` call.
@@ -849,7 +850,7 @@ tells the type checker that a class passing through either decorator comes out a
 `Audit(threshold=50)` therefore has its generated `__init__()`,
 and the type checker rejects `Audit(50).threshold = 1` as an assignment to a read-only property,
 as it does with `@dataclass(frozen=True)` written directly.
-The tags are runtime facts.
+The entries in `EVENTS` and `HANDLES` are runtime facts.
 `@handler` reads the annotation on the first parameter after `self` in `__call__()`,
 the same annotation the type checker checks, so a handler names its event once.
 
@@ -970,7 +971,8 @@ The C++ of that book had no lighter form that could carry state:
 a function pointer carried none, and closures did not exist yet,
 so a class was the only form available.
 The GoF form then gives that class a named operation, `execute()`,
-rather than a call, which is entry 5 rather than entry 4.
+rather than a call.
+The named operation puts the GoF form at entry 5 rather than entry 4.
 
 ## Exercises
 

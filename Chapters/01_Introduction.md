@@ -40,7 +40,7 @@ rewriting, and adding.
 I know some people don't like AI.
 Without it, this book wouldn't exist.
 The book is free, so if AI bothers you more than the book might benefit you,
-please ignore it.
+please ignore the book.
 
 Using Claude made me realize how many compromises I've made on books in the past.
 I would get a good idea about something
@@ -65,7 +65,8 @@ I went through line by line and concept by concept,
 inevitably rewriting and asking for clarification,
 often creating more examples to answer further questions.
 One pass would often change the book enough that it needed another pass.
-It was much faster than without Claude, but it still took time and effort.
+The process was much faster than without Claude,
+but it still took time and effort.
 Claude provided excellent support, but did not replace my own work.
 
 I can't predict the future of books.
@@ -158,7 +159,7 @@ Part V, *Effects*, closes the book by covering everything a program does that a 
 One chapter surveys the languages that track Effects in a function's type,
 and asks what Python could adopt.
 Another develops the full generator protocol.
-The last two put both to work with Stateless,
+The last two put Effect tracking and generators to work with Stateless,
 a library that builds Effect tracking on generators and brings it to Python today.
 Read these four chapters in order:
 the last two build on the chapters before them.
@@ -202,7 +203,7 @@ The short form is the listing's name alone:
 `tip membership` runs `membership.py`,
 and words after the name go to the program,
 so `tip membership --numbers` passes it the `--numbers` flag.
-When the book says to run a listing, this is the command to use.
+When the book says to run a listing, the short form is the command to use.
 A filename comment that starts with `rust/`,
 like the `# rust/fastcount/demo.py` listing in [Performance](18_Techniques--Performance.md),
 names a file in the repository's `rust/` directory, outside the Python build.
@@ -219,7 +220,7 @@ and the output you see is the output it produces.
 A few early listings carry a `# type: ignore` comment.
 [Static Types](08_Foundations--Static_Types.md) defines it,
 along with the `# ty:` comments that appear from that chapter on;
-until then it only marks a line a type checker would flag.
+until then the comment only marks a line a type checker would flag.
 
 Output appears inside the listings as comments beginning with `#:`,
 one line of output per marker.

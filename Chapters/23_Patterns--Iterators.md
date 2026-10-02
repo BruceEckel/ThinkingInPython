@@ -23,7 +23,7 @@ An iterator has `__next__()`,
 which returns the next item or raises `StopIteration`.
 An iterator is also iterable: its `__iter__()` returns itself,
 so an iterator works anywhere code expects an iterable.
-The `for` loop calls these, so you almost never call them directly.
+The `for` loop calls these methods, so you almost never call them directly.
 Every container uses this protocol,
 so a function written against an iterable stays decoupled from the container.
 
@@ -51,7 +51,7 @@ The first `is` shows that calling `iter()` on a list creates a new iterator each
 The second `is` shows that calling `iter()` on an iterator returns that iterator.
 The tempting call is `next(nums)`: `next()` accepts only an iterator,
 and a list has no `__next__()`, so that call raises a `TypeError` at runtime.
-The type checker rejects it before that.
+The type checker rejects `next(nums)` before the program runs.
 
 Written out, `for x in nums:` is this loop:
 
@@ -67,7 +67,8 @@ while True:
 
 One legacy path bypasses `__iter__()`.
 A class that defines only `__getitem__()` taking integers from zero is still iterable:
-`iter()` builds an iterator that indexes it until `IndexError`.
+`iter()` builds an iterator that calls `__getitem__()` with 0, 1, 2, and so on,
+until `IndexError`.
 Such a class works with `for`,
 yet `isinstance(obj, Iterable)` returns `False` and a parameter annotated `Iterable[T]` rejects it.
 That is the one case where an object a `for` loop accepts fails an `Iterable` annotation.
@@ -142,7 +143,7 @@ a caller learns that the items have run out by asking for one more.
 `Countdown(5)` is an iterable whose `__iter__()` builds a fresh generator for every pass,
 so you can iterate it repeatedly, as the tests below confirm.
 
-These tests collect each iterator into a list and compare them,
+These tests collect each source into a list and compare that list with the expected one,
 covering the sequences and their empty edge cases,
 and check that `total()` works on every source:
 
@@ -181,7 +182,7 @@ Generators are lazy.
 `fibonacci(1_000_000)` computes nothing until you iterate,
 and produces one value at a time,
 so it works on streams too large to hold in memory.
-`generator_memory.py` measures the difference.
+`generator_memory.py` compares the generator's memory with a list holding the same values.
 Its `squares()` returns a [generator expression](16_Techniques--Comprehensions.md#generator-expressions),
 the one-line form of a generator:
 
@@ -583,12 +584,12 @@ The second test is the `if`-clause lookalike.
 Nothing after `2` satisfies `n < 3`,
 yet the generator expression keeps pulling from `counter()` to find another match,
 and trips the same wire.
-The last two stop on their own and never reach the tripwire.
+The `takewhile()` and `islice()` tests stop on their own and never reach the tripwire.
 
 Failing at 1,000 values stands in for how a real program fails:
 it stops responding, or it dies when it exhausts memory.
-The toolchain lets it through.
-The type checker accepts `list(count(1))`,
+The toolchain lets `list(count(1))` through.
+The type checker accepts it,
 and so does `ruff` with every one of its rules enabled.
 No type checker can read the code and decide whether an iterator ever ends.
 A generator built from `while True` looks the same as a finite one until it runs.
@@ -669,10 +670,10 @@ if __name__ == "__main__":
 ```
 
 Use the class when the wrapper needs its own state or extra methods,
-such as `accepted` above: a caller reads it mid-stream,
+such as `accepted` in `typed_iterator.py`: a caller reads it mid-stream,
 while a generator's local variables have no name a caller can use.
 Use the generator when it does not.
-Either way, the result plugs into every place that accepts an iterator,
+Either way, the wrapper plugs into every place that accepts an iterator,
 because every such place uses the same protocol.
 The two wrappers' inputs differ, though.
 `typed()` takes an `Iterable[object]`, so a list is fine.
@@ -718,7 +719,7 @@ describes this dissolution.
 
 Written in Python, the four GoF *Iterator* methods show what `first()` and `current_item()` ask of a source.
 The listing names GoF's `Next()` `advance()`,
-so it cannot be mistaken for Python's `next()`.
+so `advance()` cannot be mistaken for Python's `next()`.
 Over a list the four are unremarkable.
 `first()` resets an index, `is_done()` compares it to `len()`,
 and `current_item()` reads without consuming.
@@ -867,9 +868,9 @@ A `StopIteration` that escapes a generator body becomes a `RuntimeError`
 ([PEP 479](https://peps.python.org/pep-0479/)),
 so an ordinary end of stream reads like a bug somewhere else.
 
-Only a bare `next()` hands you that exception.
-With a default it returns the default,
-and every other construct here absorbs it.
+Only a bare `next()` hands you a `StopIteration`.
+With a default, `next()` returns the default,
+and every other construct here absorbs the exception.
 `yield from source` ends its delegation when the source runs out.
 It passes each value through unchanged, though,
 so per-item work such as doubling needs a loop.
@@ -910,7 +911,7 @@ Each exercise is answered in this chapter's [solutions](../Solutions/23_Patterns
     then walk both together so the leading branch stays `k` items ahead.
     Predict how the buffer grows with `k` before you measure it,
     then measure it for two values of `k` with `tee.py`'s `tracemalloc` approach,
-    and explain the result using that section's rule for what `tee` buffers.
+    and explain the result using the rule in [What `tee()` Buffers](#what-tee-buffers).
 6.  The prose pairs the generator expression's `if` clause with `filter()`,
     but no test covers `filter()`.
     Add one to `test_endless.py`,

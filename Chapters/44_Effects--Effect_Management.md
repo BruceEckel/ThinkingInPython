@@ -34,7 +34,7 @@ In every one of those cases you can settle the question of purity by reading one
 That stops working as soon as the function calls others.
 If any of them has a side effect, the calling function is impure too.
 To discover whether a function is impure,
-you must either trust the documentation or examine that function's code.
+you must either trust the documentation or examine the code of every function it calls.
 
 Reading every callee soon becomes tedious and error-prone.
 That reading is the work a type system would do for you, if it verified purity.
@@ -284,7 +284,7 @@ They differ in how many functions must know about it.
 Standard practice combines the first and third,
 the `Result` and the restrictive type:
 parse untrusted input into the restrictive type at the boundary,
-using a `Result` to report a bad value instead of raising one,
+using a `Result` to report a bad value instead of raising an exception,
 and let every function past that boundary take `NonZero` and stay total:
 
 ```python
@@ -620,7 +620,7 @@ The bookkeeping stays, and the type checker can no longer verify it.
 An EMS moves the bookkeeping into the type system,
 where a native system maintains it for you, or, with a library like Stateless,
 the type checker verifies every declaration you write.
-That takes a second channel in the signature,
+Moving the bookkeeping into the type system takes a second channel in the signature,
 one that carries Effect information without occupying the argument list.
 
 ### Native Effect Management
@@ -705,9 +705,9 @@ An `except` block has two options, catch or propagate,
 and both discard the continuation.
 A handler can resume the continuation once,
 and the operation then behaves like a normal function return.
-It can discard the continuation,
+A handler can discard the continuation,
 and the operation then behaves like an exception.
-It can even invoke the continuation several times,
+A handler can even invoke the continuation several times,
 which is how native systems express retries and backtracking as ordinary handlers.
 *Algebraic effects* is the name for this design:
 operations declared as an interface,
@@ -849,7 +849,7 @@ A language written for an AI can drop the conveniences that help a person read c
 and an AI can start using that language as soon as it works,
 so adoption skips the years a human language spends waiting for people to learn it.
 
-Most of these are tracking systems,
+Most of these languages are tracking systems,
 in the sense [Tracking and Management](#tracking-and-management) gives the term:
 they provide the first part of a full EMS and stop there.
 For their purpose the other two parts, interface separation and delayed binding,
@@ -924,7 +924,7 @@ Each of these supplies part of an EMS, and none supplies all three parts.
 
 One library supplies all three parts.
 [Stateless](46_Effects--Stateless.md)
-encodes an Effect's dependencies and failures into the return type of every function that performs them,
+encodes each Effect's dependencies and failures into the return type of every function that performs that Effect,
 and a type checker verifies that each caller carries them forward.
 Declaring a dependency you never bind is a type error.
 Calling an effectful function from one annotated as pure is a type error.
@@ -1022,9 +1022,9 @@ and future programmers will regard a function with hidden Effects the way you re
 Python offers no native Effect tracking beyond `async`, and will not soon.
 [Generators](45_Effects--Generators.md) supplies the mechanism a library needs,
 [Stateless](46_Effects--Stateless.md)
-builds a library Effect system on top of it,
+builds a library Effect system on that mechanism,
 and [Stateless in Practice](47_Effects--Stateless_in_Practice.md)
-puts it to work.
+puts the library to work.
 
 ## Exercises
 

@@ -844,8 +844,10 @@ setting that other code can see.
 ## 9. Reopening the set of node types
 
 > A plugin package needs to add its own entry types to `filesystem.py` without editing your code.
-> Sketch what breaks, then write the version of `disk_usage()` that supports it.
-> Which of the two designs would you use for a file system,
+> Sketch what breaks, then write the version of `disk_usage()` that supports the plugin's entry types.
+> Which of the two designs,
+> a `match` over a union or a method on a base class,
+> would you use for a file system,
 > and which for the expression language in `expr.py`?
 
 ```python

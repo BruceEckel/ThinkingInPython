@@ -208,7 +208,7 @@ so the type checker passes `tile("?")`,
 and the mistake surfaces at runtime as a `KeyError` from `SPECS`.
 The boundary is therefore `to_symbol()`,
 the one function that takes a `str` and returns a `Symbol`.
-`to_symbol()` checks membership in `SPECS` at runtime and raises a `KeyError` for a character outside it.
+`to_symbol()` guards on membership in `SPECS` at runtime and raises a `KeyError` for a character outside it.
 The type checker narrows on the same guard: `SPECS` has key type `Symbol`,
 so past the guard `char` is a `Symbol`,
 and `return char` satisfies the declared return type as written.
@@ -293,7 +293,7 @@ If you want callers to construct objects with an ordinary class call such as `Co
 hide the pool inside `__new__()` instead.
 [*Singleton*](24_Patterns--Singleton.md#the-classic-implementations)
 keeps its pool in `__new__()` the same way.
-Here the cache keys on the constructor arguments instead of a single fixed key.
+Here the pool keys on the constructor arguments instead of a single fixed key.
 A pool of singletons keyed this way is sometimes called *Multiton*.
 A *Multiton*'s objects can be mutable, and a flyweight's cannot,
 so `Color` is a record:
@@ -347,7 +347,7 @@ the re-run repeats that factory call or that side effect on an object that is al
 Every caller that asks for the same components receives the same `Color`,
 so a caller that set `crimson.red` would change every crimson in the program.
 The record's frozen fields reject that assignment,
-which makes sharing safe here for the reason it is safe for `Tile`.
+and that rejection makes sharing safe here for the reason it is safe for `Tile`.
 The record also generates `__repr__()`, `__eq__()`, and `__hash__()`,
 so a `Color` prints its components and works as a dict key.
 
@@ -397,7 +397,7 @@ the pool becomes a memory leak.
 the [live-instance registry](10_Foundations--Cleanup.md#watching-objects-without-holding-them),
 fixes the leak.
 It holds its values weakly,
-so it removes an entry the moment the object's last other reference goes away:
+so it removes an entry the moment that value's last other reference goes away:
 
 ```python
 # weak_pool.py
@@ -447,7 +447,7 @@ A weak reference needs a `__weakref__` slot,
 and a slotted class gets one only by declaring it, so with `slots=True` alone,
 `_pool[text] = found` raises a `TypeError`.
 `weakref_slot=True` adds that one slot and no `__dict__`.
-`record()` does not pass it through,
+`record()` does not pass `weakref_slot` through,
 so `Name` writes the `dataclass` call in full.
 
 `functools.lru_cache(maxsize=n)` bounds a pool a different way:
@@ -544,7 +544,7 @@ The enum version also brings iteration, exhaustive `match`,
 and a fixed set of members: `Tile("?")` raises a `ValueError`,
 and `Tile.DOOR` raises an `AttributeError`.
 A `match` over `Tile` needs no `case _:` catch-all once every member has a case.
-If you leave one out of a function that declares a return type,
+If you leave a member out of a function that declares a return type,
 the type checker reports the gap before the code runs:
 
 ```python

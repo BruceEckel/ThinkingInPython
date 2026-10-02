@@ -169,7 +169,8 @@ print(y)  # type: ignore  # noqa: F821
 
 The two directives on the `print(y)` line silence the type checker and the linter,
 neither of which can see a name that appears only as a dict key.
-That is the cost of creating names this way, and a reason to keep it rare.
+Losing both checks on that name is the cost of creating names this way,
+and a reason to keep it rare.
 Assigning into `globals()` matters whenever code needs to define a module-level name known only at runtime,
 such as a class built dynamically under a computed name.
 [Metaprogramming](17_Techniques--Metaprogramming.md) builds classes that way,
@@ -185,14 +186,15 @@ To make a directory a package, you put a special file named `__init__.py` in it.
 `__init__.py` runs once, before any module inside the package loads.
 An empty `__init__.py`, the common case,
 only flags the directory as a package.^[The name `__init__.py` often confuses people. In hindsight, it might have been better to name the file `__package__.py`.]
-One with content usually re-exports the package's public names:
+An `__init__.py` with content usually re-exports the package's public names:
 if `a_package/__init__.py` re-exports `function1`,
 `from a_package import function1` works and callers never learn which submodule defines `function1`.
 You can still import a directory without `__init__.py` as a *namespace package*,
 but an explicit `__init__.py` makes the package's identity and boundary clear,
 so this book uses one by default.
 
-To explore this, create a directory called `a_package` whose `__init__.py` announces itself,
+To explore packages,
+create a directory called `a_package` whose `__init__.py` announces itself,
 so the markers below show when it runs:
 
 ```python
@@ -243,8 +245,9 @@ print(a_package.module2.function2())
 Loading `module1` also stores that submodule as an attribute of `a_package`,
 so `a_package.module1.function1()` resolves.
 The shorter `module1.function1()` fails here,
-since nothing binds `module1` in this file; it works in `from_packages.py`,
-below, where `from` binds `module1` directly.
+since nothing binds `module1` in this file;
+`module1.function1()` works in `from_packages.py`, below,
+where `from` binds `module1` directly.
 
 Importing the package alone does not import what is inside it:
 
@@ -377,7 +380,7 @@ A plain `import` of that same module succeeds at this point,
 since it only needs the module to exist in `sys.modules`,
 not to have finished running.
 The failure then surfaces later, as an `AttributeError`,
-wherever the code first uses a name the module has not defined yet.
+wherever the second module first uses a name the first module has not defined yet.
 
 The "circular import" wording appears when the module's file comes from anywhere but the directory of the script you ran,
 which includes every module inside a package.
@@ -561,7 +564,7 @@ A `lazy import` looks like an ordinary one, with `lazy` in front,
 and once loaded the names behave like eagerly imported ones.
 `json` and `pathlib` load at the `json.dumps()` and `Path(...)` calls.
 The output is the same either way, so this listing cannot show the deferral;
-the next one does.
+`lazy_noisy.py`, in [Watching the Deferral](#watching-the-deferral), does.
 
 ### Deferring an Import Before 3.15
 
@@ -648,7 +651,8 @@ run with `-X lazy_imports=MODE` or set `PYTHON_LAZY_IMPORTS=MODE`.
 Both accept one of two values.
 `normal`, the default, defers only the imports you marked `lazy`.
 `all` defers every module-level import the keyword can mark,
-so the imports it cannot mark, such as one inside a `try` block, stay eager.
+so the imports the keyword cannot mark, such as one inside a `try` block,
+stay eager.
 The PEP also describes a third value, `none`, a global off switch.
 CPython removed it before the 3.15 release.
 
@@ -658,7 +662,7 @@ installs a codec, or fills a table does that work as it loads.
 If nothing touches the lazily imported name,
 the module stays unloaded and its registration is missing.
 The failure is silent: no error, just a table with a row missing.
-That is also why `all` is an experiment to run rather than a setting to leave on,
+That silent failure is also why `all` is an experiment to run rather than a setting to leave on,
 since it defers ordinary `import` statements too,
 including the ones whose only purpose is to run the module.
 

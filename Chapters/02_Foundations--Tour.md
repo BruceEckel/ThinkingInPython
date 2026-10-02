@@ -7,7 +7,7 @@ This chapter and the ones that follow give a programmer's tour of Python:
 syntax and the built-in numbers, strings, and `None` here, then containers,
 control flow, functions, modules, classes, static typing, class attributes,
 and object cleanup.
-It assumes you have programming experience.
+The tour assumes you have programming experience.
 Find supplementary information in [the official language documentation](https://www.python.org/doc/).
 
 ## Scripting vs. Programming
@@ -86,9 +86,9 @@ except NameError as e:
 
 The body of the `if` never runs, so `val` is never bound.
 Indentation shows where the assignment sits, not whether it runs.
-The type checker sees that nothing ever defines `val` and reports an error on that line,
+The type checker sees that nothing ever defines `val` and reports an error on `print(val)`,
 so `# type: ignore` tells it the mistake is deliberate.
-The `try` and `except` catch the exception so the script can print its message and finish;
+The `try` and `except` catch the exception so the script can print the exception's message and finish;
 [Control Flow](04_Foundations--Control_Flow.md#errors-and-exceptions)
 covers them.
 
@@ -489,7 +489,7 @@ either with `str()` or inside an f-string.
 
 Modern Python uses *f-strings*.
 Prefix the string with `f` and put expressions in curly braces.
-The result is readable and fast:
+F-strings are readable and fast:
 
 ```python
 # fstrings.py
@@ -517,7 +517,7 @@ An `=` after the expression, as in `{total = }`, prints the expression's text,
 the `=` with any spaces you put around it, and then the value.
 With no format spec the value appears as its `repr()`,
 so `f"{name=}"` produces `name='Alice'`.
-Use it to label values in your own exploring and debugging code.
+Use `=` to label values in your own exploring and debugging code.
 
 Existing code also carries two older styles: C's `printf()` syntax,
 as in `"val: %d" % val`, and the `str.format()` method,

@@ -352,7 +352,7 @@ mutable state.
 [Pure Functions](40_Functional--Foundations.md#pure-functions) shows the cost:
 to understand one call, you must trace every call before it.
 [Effect Management](44_Effects--Effect_Management.md#what-is-an-effect)
-classifies the write as a side effect and the read as a side cause.
+classifies rebinding a global as a side effect and reading one as a side cause.
 
 ## Variable Argument Lists
 
@@ -567,7 +567,7 @@ For anything more complicated, write a separate function.
 
 For a key that reads an index or an attribute,
 `operator.itemgetter()` and `operator.attrgetter()` name the same operation without a lambda:
-`sorted(words, key=operator.itemgetter(-1))` replaces `key=lambda w: w[-1]` above.
+`sorted(words, key=operator.itemgetter(-1))` replaces `key=lambda w: w[-1]` in `lambdas.py`.
 Write a lambda when the key needs an expression that neither getter builds.
 
 ## Exercises
@@ -576,7 +576,7 @@ Each exercise is answered in this chapter's [solutions](../Solutions/05_Foundati
 
 1.  In `mutable_default.py`,
     call `bad_append(3)` a third time and predict the result before checking it.
-    Then change `bad_append()`'s default from `[]` to `()` and explain why that alone does not fix it
+    Then change `bad_append()`'s default from `[]` to `()` and explain why that change alone does not fix `bad_append()`
     (hint: `target.append(item)` on a tuple).
 2.  In `sentinel_default.py`, replace `return MISSING` with a bare `raise`,
     so a missing key with no default re-raises the `KeyError`.

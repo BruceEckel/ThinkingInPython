@@ -115,7 +115,7 @@ The annotation describes the object `double()` returns rather than how its body 
 a small class implementing that protocol directly:
 its `send()` raises `StopIteration` carrying the value,
 so `run()` gets the result on its first step.
-`success()` exists for yield-free functions like this one.
+`success()` exists for yield-free functions like `double()`.
 In a generator function, `return value` sets the Effect's `R` directly.
 `return success(value)` there produces a `Success[R]` where the signature expects an `R`,
 so the type checker rejects it.
@@ -259,7 +259,7 @@ Stateless also provides three dependencies of its own:
   supplies to `retry()`.
 
 All three are concrete classes rather than interfaces.
-That constrains what a test double for one of them can be;
+Being concrete constrains what a test double for one of them can be;
 [Supplying an Interface](#supplying-an-interface) works through the limit.
 
 `read_file()` is also the library's own example of both channels at once:
@@ -406,7 +406,7 @@ with the type recording what each layer left behind.
 
 A dependency injection container often lets you register a fallback for a type nobody else provides.
 Stateless has no such registration, and `need()` takes no default argument.
-Layering handlers produces one all the same.
+Layering handlers produces a fallback all the same.
 This `Console` carries a tag so the output says which handler answered:
 
 ```python
@@ -446,7 +446,7 @@ so `fallback(chosen)` keeps that type.
 A default removes the check that makes `Need` worth declaring.
 An Effect that would fail the type check for a missing `Console` now passes it and runs.
 A forgotten binding then shows up as a wrong-looking result rather than an error.
-Use one for a genuine default, a null logger or a no-op console,
+Use a fallback for a genuine default, a null logger or a no-op console,
 not to silence a type error that reports a missing binding.
 
 ## An Effect Runs Once
@@ -708,7 +708,7 @@ Here, the signature and the body must agree.
 
 The second exercise in [Effect Management](44_Effects--Effect_Management.md#exercises)
 has you add a `Log` Effect alongside `greet()` and count how many of the edited signatures use it.
-Here it is in Stateless:
+Here is that exercise in Stateless:
 
 ```python
 # audit_log.py
@@ -768,7 +768,7 @@ at `supply()`.
 Multiple Abilities combine with `|` because the union describes one request at a time.
 Each `yield` in `greet_all()` produces either a `Need[Console]` or a `Need[Log]`,
 not both at once.
-Over the whole run it makes both kinds of request,
+Over the whole run, `greet_all()` makes both kinds of request,
 so `supply()` must provide a `Console` and a `Log`.
 
 The repeated union is the shape a `type` alias normally shortens,
@@ -812,7 +812,7 @@ def holds() -> Depend[Need[Material] | Need[Nailer], bool]:
 so `supply()` matches each request to one of them.
 [When Two Implementations Match](#when-two-implementations-match)
 picks up the case where two supplied objects fit one Ability.
-Here the test varies both:
+Here the test varies both the `Material` and the `Nailer`:
 
 ```python
 # test_nailer.py
@@ -1116,7 +1116,7 @@ so `register(Console, Recorder())` binds an implementation to the type the calle
 A dictionary matches the key exactly,
 so `get(Console)` never returns a subclass registered under its own name.
 `supply()` takes bare instances and matches a request with `isinstance()` instead,
-which is why two instances that satisfy one `Need` are ambiguous
+so two instances that satisfy one `Need` are ambiguous
 ([When Two Implementations Match](#when-two-implementations-match)).
 The DI registration key also does the work `as_type(Console)` does for `supply()`.
 `supply()` reads each Ability from its argument's static type,
@@ -1570,7 +1570,8 @@ A `catch()` further out changes the outcome again:
 it matches the yielded value before the driver sees it and returns that value as the result,
 so the inner `except` never runs.
 `catch()` alone moves an error in the type.
-One listing shows all three facts:
+One listing shows an `except`, a `catch()`,
+and a `catch()` wrapped around an `except`:
 
 ```python
 # except_vs_catch.py
@@ -1800,7 +1801,7 @@ Calling it on `"Bob"` carries that failure up to the `run()` call at the program
 which raises it as an ordinary exception,
 like `error_escapes.py` does for a single error.
 
-A test exercises both functions:
+A test exercises `all_handled()` and `one_unhandled()`:
 
 ```python
 # test_catch_subset.py

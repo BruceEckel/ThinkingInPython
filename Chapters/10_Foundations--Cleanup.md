@@ -65,7 +65,7 @@ the objects it holds go with it.
 The listing ends at `End of delete loop`, the program's last statement,
 and each `__del__()` prints only afterward.
 If you run `cleanup.py` directly,
-three more pairs of lines follow the last one above:
+three more pairs of lines follow `End of delete loop`:
 
     Third deleted
     2 Counter objects remaining
@@ -141,8 +141,8 @@ print("still running")
 
 The release fails, and stdout says nothing about it.
 A traceback goes to `sys.stderr` labeled `Exception ignored`,
-but nothing propagates: no caller can catch it, the exit status is still `0`,
-and a test asserting on stdout passes.
+but nothing propagates: no caller can catch the `RuntimeError`,
+the exit status is still `0`, and a test asserting on stdout passes.
 A `close()` call in a `with` block fails loudly instead.
 
 ## Reference Cycles Delay Destruction
@@ -205,7 +205,7 @@ leaving the objects in `gc.garbage`.
 so a cycle now costs only the delay.
 
 Cycles are one more reason to keep cleanup out of `__del__()`:
-one back-reference between two objects is enough to postpone it,
+one back-reference between two objects is enough to postpone `__del__()`,
 and the code that creates the cycle often lives far from the code that owns the resource.
 
 ## Reliable Alternatives
@@ -261,13 +261,13 @@ except RuntimeError as e:
 `with` calls `__enter__()` at the top of the block and `__exit__()` on the way out,
 and `__exit__()` calls `close()`.
 So `close()` runs at the end of the `with` block, at a line you can point at,
-and the second half shows it running when the body raises an exception.
+and the `Socket("B")` block shows `close()` running when the body raises an exception.
 Compare `cleanup.py`,
 where the cleanup runs at an unknowable moment after the program's last statement.
 [Context Managers](15_Techniques--Context_Managers.md) covers the protocol,
 the `@contextmanager` shorthand, and what `__exit__`'s arguments mean.
 This chapter shows the shape.
-That one explains it.
+That chapter explains it.
 
 `close()` also guards against a second call:
 the explicit `sock.close()` after the `with` block prints nothing,
@@ -407,8 +407,8 @@ reference counting reclaimed it there, before `gc.collect()` ran.
 `gc.collect()` cannot reclaim `Leaky`,
 because `Leaky` is not part of an unreachable cycle.
 `finalize()` keeps every callback in a registry,
-and the callback `self.close` leads back to the object,
-so the program can still reach it.
+and the callback `self.close` holds the object,
+so the registry keeps `Leaky` reachable.
 `Leaky` printed nothing, because its callback never ran and nothing failed.
 With `atexit` left on, the callback runs as the program exits,
 and a late `L closed` is the one sign of the leak.
@@ -514,7 +514,8 @@ On an implementation with a tracing collector, such as PyPy,
 the entries disappear when its collector runs, so the counts fall late.
 `cleanup.py` keeps its count inside `__del__()`,
 so that count is correct only if `__del__()` runs and succeeds,
-and the first section lists the ways it can fail.
+and [Why `__del__()` Is Not Cleanup](#why-del-is-not-cleanup)
+lists the ways it can fail.
 The weak registry runs none of your code when an object goes away.
 
 ## The Rule

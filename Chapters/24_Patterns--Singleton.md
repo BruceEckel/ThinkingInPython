@@ -43,8 +43,8 @@ print(config is again, config.settings is again.settings)
 #: True True
 ```
 
-Two `import` statements, one printed line.
-The first one runs `config.py` top to bottom and files the resulting module object in `sys.modules` under the name `config`.
+Two `import` statements, but `config body runs` prints once.
+The first `import` runs `config.py` top to bottom and files the resulting module object in `sys.modules` under the name `config`.
 The second finds it there and skips the work,
 so the body runs once and builds one `settings` dict.
 That is the singleton: not a rule a class enforces,
@@ -175,12 +175,12 @@ The compiler [mangles](11_Techniques--Testing.md#white-box-and-black-box-tests)
 names only inside a class body,
 so at module level `__Settings` is stored under that name,
 as reachable as any other.
-Its one effect is a trap.
+The second underscore's one effect is a trap.
 In code inside a class body,
 the compiler rewrites a reference to `m.__Settings` into a lookup for `m._TheClass__Settings`,
 and that lookup fails.
 
-The listings above name the class `Settings`, with no underscore,
+The cached-factory listings name the class `Settings`, with no underscore,
 because the name is public.
 `settings()` returns a `Settings`,
 so the class already appears in the module's public signature.
@@ -271,7 +271,7 @@ print(len({id(s) for s in built}) > 1)
 Eight threads, more than one object.
 Every thread checks the cache before any of them has filled it,
 so each runs the constructor and hands its caller a different object.
-Only the last one to finish stays in the cache.
+Only the object from the last thread to finish stays in the cache.
 The other seven are already in the hands of their callers.
 The listing prints a comparison instead of the count because the count depends on timing:
 it is eight when every thread misses the cache,
@@ -315,7 +315,7 @@ print(len({id(s) for s in built}))
 One thread finds `_instance` empty and builds it.
 The rest wait on the lock, and each finds `_instance` already filled.
 Under the same eight-thread race, the cached version produces eight objects.
-This version produces one, as the printed count confirms.
+The locked version produces one, as the printed count confirms.
 The sleep stands in for a constructor that does real work,
 such as opening a file or a connection.
 Without the sleep, the cached version showed no duplicates across twenty trials,
@@ -391,7 +391,7 @@ And the assignment to `_instance` must be the last step of construction.
 The outer test runs without the lock,
 so a thread can read `_instance` while another thread is still inside the `with` block.
 A version that assigns `_instance = Settings()` and then fills in `data` hands that reader a half-built object.
-That is a bad trade for saving one lock acquisition.
+Depending on two such details is a bad trade for saving one lock acquisition.
 Eager creation is a better answer when you can build the object at import time:
 
 ```python
@@ -435,8 +435,8 @@ as [Nothing Keeps the Class Private](#nothing-keeps-the-class-private) shows,
 so the class-based forms here keep the constructor public and route every construction to the same shared state.
 Each does more work than the module or the cached factory above.
 
-The first wraps a single instance of a private nested class.
-The second keeps the instance in a class variable.
+The first form wraps a single instance of a private nested class.
+The second form keeps the instance in a class variable.
 *Borg* trades one object for one shared set of state,
 and the last form is a class decorator.
 
@@ -507,7 +507,7 @@ The laziness is a choice.
 When the inner object needs nothing from that first call,
 you can create it *eagerly* in the class body instead,
 `instance: ClassVar[__OnlyOne] = __OnlyOne()`.
-That removes the sentinel, the guard,
+Eager creation removes the sentinel, the guard,
 and the first-call race the cached factory meets under threads,
 at the cost of building the object whether or not anything uses it
 (see exercise 1).
@@ -602,7 +602,7 @@ print(x.val, x is y, x.__dict__ is y.__dict__ is z.__dict__)
 The sharing depends on `super().__init__()` rebinding `self.__dict__` to `_shared_state`,
 and a dataclass generates its own `__init__()` that assigns the fields and [never calls the base `__init__()`](12_Techniques--Data_Classes_as_Types.md#dataclass-inheritance),
 so each instance keeps its own `__dict__`.
-The code still runs; the class has quietly stopped being a `Borg`.
+The dataclass version still runs; the class has quietly stopped being a `Borg`.
 A `__post_init__()` that does the rebinding fails differently:
 it runs after `__init__()` has assigned the fields,
 so the rebinding discards them, and reading `val` raises an `AttributeError`.
@@ -767,7 +767,7 @@ and that override skips `__init__()` on every later construction,
 so the first call's arguments win.
 In a class that overrides `__new__()` instead,
 as `singleton_class_variable.py` does, `__new__()` still runs on every call,
-unlike the metaclass form above.
+unlike the metaclass form.
 That listing puts its work inside `__new__()`,
 so later calls append to the shared instance instead of overwriting it.
 [Metaprogramming](17_Techniques--Metaprogramming.md)

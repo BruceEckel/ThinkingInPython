@@ -91,7 +91,7 @@ When you are discovering the design rather than producing code, TDD is wasteful.
 
 Python has a testing framework in the standard library, `unittest`,
 modeled on Java's JUnit.
-It works, but it carries the class-based boilerplate of its heritage.
+`unittest` works, but it carries the class-based boilerplate of its heritage.
 The wider Python world has settled on `pytest`, and so does this book.
 
 `pytest` rests on two ideas that keep tests short.
@@ -242,7 +242,7 @@ def test_overdraft_reports_the_shortfall() -> None:
 The assertion after the block belongs outside it:
 a failed withdrawal must leave the balance alone,
 and that check has nothing to do with the exception.
-Inside the block it never runs:
+Inside the block the assertion never runs:
 the exception from `withdraw()` skips the rest of the block,
 and `pytest.raises()` then absorbs it.
 
@@ -277,7 +277,8 @@ def test_interest_compounds() -> None:
 Applying 5% five times produces `127.62815624999999`,
 so the same assertion written with `==` against `127.62815625` fails.
 Use `approx()` by default rather than adding it after a comparison fails:
-the first test does not need it, and you cannot tell by looking which tests do.
+`test_interest_uses_approx()` does not need it,
+and you cannot tell by looking which tests do.
 
 ## Parametrizing Tests
 
@@ -328,7 +329,7 @@ You declare fixtures as parameters to a test,
 and each parameter name tells `pytest` to call that fixture and pass its result to the test.
 
 The `funded` function in `test_account.py` is a fixture.
-`pytest` is the only thing that calls it:
+Only `pytest` calls it:
 a test that calls `funded()` fails with `Fixture "funded" called directly`.
 
 Each test gets its own freshly built `funded` account,
@@ -367,7 +368,7 @@ A failing check there surfaces as an error, not as a test failure:
 so read the error to see which invariant broke.
 
 A fixture marked `@pytest.fixture(autouse=True)` runs for every test in its scope without any test naming it.
-That suits a fixture whose value is a side effect rather than an object:
+Autouse suits a fixture whose value is a side effect rather than an object:
 resetting a global registry, or installing a `monkeypatch` every test needs.
 Autouse runs the fixture, and only a parameter delivers its value.
 If you mark `funded` autouse and leave it out of the parameter list,
@@ -478,7 +479,7 @@ In a language with access control, the compiler enforces the difference.
 Python has no access control, so every attribute is reachable.
 A single leading underscore, as in `self._balance`,
 changes nothing at the language level.
-Python stores it under that name, reachable like any other attribute.
+Python stores `_balance` under that name, reachable like any other attribute.
 Only convention says, "this is private, do not rely on it."
 
 A leading double underscore changes the name Python stores,
@@ -575,7 +576,7 @@ def test_missing_file_raises(
 ```
 
 `data_dir()` reads `APP_DATA` on every call,
-so `monkeypatch.setenv()` can redirect it.
+so `monkeypatch.setenv()` can change the directory it returns.
 A module-level `DATA_DIR = Path(os.environ.get("APP_DATA", "."))` reads the variable once,
 at import time, before any test body runs,
 so patching the environment afterward changes nothing.
@@ -645,7 +646,7 @@ This technique is *dependency injection*:
 the caller hands the function what it depends on,
 and the function fetches nothing on its own.
 
-The `4` here is what `Random(0)` produces first,
+The `4` in `test_dice_rng.py` is what `Random(0)` produces first,
 and its match with the stubbed value in `test_dice.py` is a coincidence:
 as with any seed, you record the value it gives you rather than pick one.
 
@@ -661,7 +662,7 @@ def elapsed(start: float) -> float:
     return time.time() - start
 ```
 
-`monkeypatch` pins it to a fixed value the same way it does for `randint()`:
+`monkeypatch` pins `time.time()` to a fixed value the same way it does for `randint()`:
 
 ```python
 # test_stopwatch.py
@@ -792,7 +793,8 @@ so `weather.urlopen` is the name the call site reads and the name to patch.
 Patching `urllib.request.urlopen` instead leaves `weather`'s copy untouched.
 One rule covers both import forms: patch the name the calling code looks up.
 The same approach isolates a database, a message queue, or any other service.
-Replace the boundary function with a stand-in and assert against its result.
+Replace the boundary function with a stand-in,
+and assert against what the calling code returns.
 
 ### Stubs and Mocks
 

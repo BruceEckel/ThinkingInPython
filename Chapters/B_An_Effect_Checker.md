@@ -56,12 +56,12 @@ class Unknown: ...
 One question decides whether something deserves a name: does a test replace it?
 A test replaces the clock, the network, and the file system.
 No test replaces `len()`.
-A finer vocabulary makes the rows unreadable and the table below unmaintainable.
+A finer vocabulary makes the rows unreadable and the table in `effect_table.py` unmaintainable.
 
 Appendix A lists three answers to the question of what untracked code performs.
-This checker takes the third, a separate declaration,
-because the first two are wrong for `print()`.
-It writes to the console,
+This checker takes the third, a separate declaration, because the first two,
+pure and `Unknown`, are wrong for `print()`.
+`print()` writes to the console,
 and calling it `Unknown` puts `Unknown` in nearly every row.
 The declaration cannot go on the function.
 A built-in has no `__annotations__` and no `__dict__` in which to store one,
@@ -382,7 +382,8 @@ the Effects it hides, and the names it calls.
 
 Hiding needs a marker, and `ask()` in Appendix A shows why.
 `ask()` declares `Ask` and calls `input()`, which performs `Console`.
-Both are true, and [The Check](#the-check) shows the checker reporting each.
+Both descriptions are accurate, and [The Check](#the-check)
+shows the checker reporting each.
 A second piece of metadata names the Effects that stop at this function:
 
 ```python
@@ -586,7 +587,7 @@ The guard, `if found == marker`, compares a captured name with a parameter,
 which a pattern alone cannot do.
 For a function with no such annotation, `marked()` returns `None`,
 which means "inferred."
-An empty row means "pure," so the two must differ.
+An empty row means "pure," so `None` and the empty row must differ.
 `Row | None` is an ordinary optional, with no assertion anywhere to unwrap it.
 
 `parameters()` and `assigned()` fill a scope's `types`: an annotated parameter,
@@ -598,7 +599,7 @@ and a name a pattern captures.
 Each alternative of the or-pattern binds `name`, as an or-pattern requires.
 Such a name gets `UNRESOLVED`,
 and so does a name that two assignments give different types.
-An annotation overrides both.
+An annotation overrides `UNRESOLVED` in both cases.
 `ast.walk()` visits an assignment before its target,
 so `values` holds the type of the right side by the time the target's `Name` arrives.
 
@@ -948,7 +949,8 @@ The checker infers `['Tell']` from the call to `tell()`.
 `quiet()` declares itself pure and calls `shout()`,
 and the checker reports `quiet()`,
 two calls away from the `tell()` whose declaration supplies the `Tell`.
-That is propagation, the thing Appendix A's `tracked_greeting.py` could not do.
+Carrying `Tell` up two calls is propagation,
+which Appendix A's `tracked_greeting.py` could not do.
 
 [Facts About a Function](#facts-about-a-function)
 predicted the first two findings.
@@ -1136,7 +1138,7 @@ and now calls `read(path)`.
 Each change is small, and two of them improved the code.
 All four are what the tool requires.
 You write for it as you write for a type checker,
-with types where it needs them.
+with types where the tool needs them.
 
 ## What the Checker Resolves, and What It Cannot See
 

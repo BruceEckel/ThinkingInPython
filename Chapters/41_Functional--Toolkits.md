@@ -148,7 +148,8 @@ reserves a position so you can preset a later positional argument and leave an e
 ### `partialmethod`
 
 The same idea as `partial()`, but for a method.
-The descriptor binds `self` automatically when you access it on an instance.
+`partialmethod` returns a descriptor,
+which binds `self` automatically when you access the method on an instance.
 
 ```python
 # functools_partialmethod.py
@@ -257,7 +258,7 @@ that same `print()` reports `wrapper - None`,
 and every tool that reports a function by its name or docstring,
 `help()` among them, reports the wrapper too.
 The name `greet` refers to `wrapper` either way;
-`wraps()` copies the original's name and docstring onto it.
+`wraps()` copies the original's name and docstring onto `wrapper`.
 `wraps()` also sets `greet.__wrapped__` to the original function,
 so a tool that needs the original, such as `inspect.signature()`, can reach it.
 
@@ -313,8 +314,8 @@ print(light < heavy, light <= heavy, light > heavy)
 #: True True False
 ```
 
-The plain class exists to show the tool.
-In real code this `Weight` would be `@dataclass(frozen=True, order=True)`,
+`Weight` is a hand-written class to show the tool.
+In real code `Weight` would be `@dataclass(frozen=True, order=True)`,
 which generates all five comparison methods from the field order.
 `total_ordering` is the right tool when the class cannot be a dataclass,
 or when the ordering differs from the fields in declaration order.
@@ -414,7 +415,7 @@ print(list(map(pow, range(5), repeat(2))))
 ```
 
 The fixed form replaces the list you would have written as `["x"] * 3`.
-The infinite form is the reason to import it.
+The infinite form is the reason to import `repeat()`.
 It supplies a constant argument for as many calls as `map()` makes,
 and it holds one object in memory however many calls there are.
 Here the output stops when `range(5)` runs out,
@@ -644,7 +645,7 @@ Plain `zip()` stops at the shortest and raises no error,
 the right choice when the extra elements are genuinely surplus.
 `zip(a, b, strict=True)` raises a `ValueError`,
 which for the two lists above reads `zip() argument 2 is shorter than argument 1`.
-It is the right choice when equal lengths are an invariant you want checked.
+`strict=True` is the right choice when equal lengths are an invariant you want checked.
 `zip_longest()` pads,
 the right choice when the missing elements are data in their own right.
 
@@ -665,7 +666,7 @@ print([(k, list(g)) for k, g in groupby(["b", "a", "b"])])
 #: [('b', ['b']), ('a', ['a']), ('b', ['b'])]
 ```
 
-The second line shows what unsorted input does:
+The second `print()` shows what unsorted input does:
 `"b"` comes back as two separate groups, and no error reports it.
 `groupby(sorted(data, key=keyfunc), key=keyfunc)` is the fix,
 with the same key function both times.
@@ -944,7 +945,7 @@ A perfect trio schedule exists only when the roster size leaves a remainder of 3
 so seven students have none.
 A given `students` and `size` may have no exact answer,
 so the general version below trades rotation for a greedy search and settles for a good schedule.
-It builds each group one member at a time,
+The greedy search builds each group one member at a time,
 adding whoever the current members have met the fewest times.
 Those meeting counts come from a running history,
 updated at the end of every round:

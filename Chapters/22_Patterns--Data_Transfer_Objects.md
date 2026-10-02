@@ -235,7 +235,7 @@ Unpacking is the part a data class lacks.
 since a data class is not iterable.
 `dataclasses.astuple()` converts a data class when you need the positional form.
 [More Data Class Tools](12_Techniques--Data_Classes_as_Types.md#more-data-class-tools)
-covers its recursive, copying behavior.
+covers the recursive, copying behavior of `astuple()`.
 
 ## A NamedTuple Is Still a Tuple
 
@@ -325,7 +325,7 @@ since `json` sees a sequence and the field names never reach the output.
 Converting first, with `json.dumps(Color(1, 2, 3)._asdict())`,
 writes `{"r": 1, "g": 2, "b": 3}`.
 `json.dumps()` on a data class raises a `TypeError` instead.
-That is the safer failure of the two,
+The `TypeError` is the safer failure of the two,
 because the array version drops the names silently.
 
 ## Which Should You Use?

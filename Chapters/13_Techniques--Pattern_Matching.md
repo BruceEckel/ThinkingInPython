@@ -230,7 +230,7 @@ and a comma builds a tuple there too.
 Given a `sign()` helper that returns `-1`, `0`, or `1`,
 `match sign(x), sign(y):` matches on a pair computed inline.
 Transforming the subject this way turns a set of comparisons into literal patterns,
-and that usually reads better than the [guards](#guards)
+and literal patterns usually read better than the [guards](#guards)
 you would write otherwise.
 
 ```python
@@ -301,7 +301,7 @@ so `Point(0, y)` means "position 0 is `x`, position 1 is `y`."
 `NamedTuple` generates it too.
 An ordinary class must assign it by hand.
 A positional pattern raises a `TypeError` when `__match_args__` is too short to name every position you supply.
-For an ordinary class `R` that lacks one,
+For an ordinary class `R` that lacks `__match_args__`,
 `case R(1)` reports `TypeError: R() accepts 0 positional sub-patterns (1 given)`.
 
 ```python
@@ -551,7 +551,7 @@ def test_mapping_patterns() -> None:
 
 ## Patterns Nest
 
-A sub-pattern is a pattern, so any of these forms can sit inside any other:
+A sub-pattern is a pattern, so any kind of pattern can sit inside any other:
 
 ```python
 # nested_patterns.py
@@ -579,7 +579,7 @@ print(survey([Point(1, 2), Point(3, 4)]))
 ```
 
 The first case is a sequence pattern holding a class pattern holding two literals,
-with a starred capture beside it.
+with a starred capture beside the class pattern.
 `as` binds whatever its sub-pattern matched,
 so `start` is the whole `Point` while `0, 0` checks its fields.
 Without `as` you must choose between testing the shape and keeping the object.
@@ -662,7 +662,8 @@ and Java's newer switch expressions check exhaustiveness,
 as an error in Java and Kotlin and a warning in Scala.
 The check applies only when the matched type is a closed set the compiler can see in full:
 a sealed hierarchy or an enum.
-Their versions are also expressions, producing a value you can assign.
+The Scala, Kotlin, and Java versions are also expressions,
+producing a value you can assign.
 Python's `match` is a statement, not an expression,
 so a `match` that must produce a value goes inside a function that returns from each `case`.
 
@@ -676,8 +677,9 @@ A `match` makes the shape of the dispatch explicit.
 [Dynamic Binding vs. Pattern Matching](#dynamic-binding-vs-pattern-matching)
 compares the two approaches directly.
 
-The string `"x"` is no `Shape`, so the call carries a `# type: ignore`.
-At runtime `assert_never()` catches it:
+The string `"x"` is no `Shape`,
+so the test's `area("x")` call carries a `# type: ignore`.
+At runtime `assert_never()` catches the string:
 
 ```python
 # test_exhaustive.py
@@ -724,7 +726,7 @@ so its cost grows with the number of cases.
 A dictionary lookup costs the same at any size.
 At three entries the difference is invisible.
 The dictionary wins as the table grows,
-and a dictionary is the only one of the two you can build or change at runtime.
+and you can build or change a dictionary at runtime, but not a `match`.
 
 When the set of types is *open* (anyone can add a new one),
 inheritance and dynamic binding work better than `match`.

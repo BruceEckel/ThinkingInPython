@@ -58,7 +58,7 @@ You run `cProfile` on a script from the command line:
 ### Reading a `cProfile` Report
 
 `cProfile`'s report is a table, one row per function.
-This one profiles a small script, `prof_demo.py`,
+This section's report profiles a small script, `prof_demo.py`,
 built with one obvious hot spot and one function called too many times:
 
 ```python
@@ -412,7 +412,8 @@ It is unrelated to tail-call optimization of Python functions,
 which CPython does not do, as [Recursion](41_Functional--Toolkits.md#recursion)
 notes.
 
-Nothing in your program changes, and nothing in your program can tell.
+The tail-calling interpreter changes nothing in your program,
+and nothing in your program can tell.
 No `sys` function reports it, and the documentation calls it an internal detail.
 The python.org Windows 64-bit binaries for 3.15 use it,
 as do the python-build-standalone 3.15 builds that `uv` installs,
@@ -517,8 +518,8 @@ Measuring your own program costs two runs:
 time the workload with `PYTHON_JIT` set to `1` and to `0`,
 and change nothing else.
 
-Numba's `@njit`, later in this chapter, is also a just-in-time compiler,
-and the two make opposite trades.
+Numba's `@njit` ([JIT Compilation with Numba](#jit-compilation-with-numba))
+is also a just-in-time compiler, and the two make opposite trades.
 The CPython JIT asks nothing of you,
 applies to whatever code turns out to be hot, and pays in percentages.
 `@njit` applies only to numeric functions,
@@ -677,14 +678,14 @@ instead of the O(n) scan a `list` needs.
 which returns the position after any elements equal to the target,
 while `bisect_left()` returns the position before them
 (`insort()` is likewise an alias for `insort_right()`).
-Either one answers "where does this go,"
+`bisect_left()` and `bisect_right()` both answer "where does this go,"
 but when the target is already in the list,
 only `bisect_left()` returns its index, so a membership test must use it,
 as `search_comparison.py` does below.
 The speed is in the search alone:
 `insort()` still shifts everything after the insertion point.
 Under heavy insert traffic, when the smallest item is all you read,
-consider the heap below instead.
+consider a [heap](#heap) instead.
 
 ### Scan, Bisect, or Hash
 
@@ -887,7 +888,7 @@ On descending data, the kind `heap_corruption.py` uses,
 Timsort detects the existing run and `sorted()` wins outright.
 A heap is not automatically the right choice.
 Measure with data shaped like production data.
-`heapq.nsmallest(100, data)`, introduced above,
+`heapq.nsmallest(100, data)`, introduced in `heap_queue.py`,
 answers this top-N question directly,
 and is the tool to use before hand-rolling either comparison here.
 The heap fits a different shape of problem:
@@ -957,9 +958,9 @@ One pass exhausts a generator.
 
 Fitting the whole data set in memory gives you more than a second pass.
 Random access, sorting,
-and the `bisect` searches from earlier in this chapter all need an indexable structure,
+and the `bisect` searches in `bisect_search.py` all need an indexable structure,
 not a stream of values that arrive once and disappear.
-NumPy's vectorized arithmetic, covered later in this chapter,
+NumPy's vectorized arithmetic ([Vectorize with NumPy](#vectorize-with-numpy))
 needs the same thing: a whole array in memory,
 not values arriving one at a time.
 
@@ -1032,7 +1033,7 @@ and the collector can reclaim none of them.
 For a value computed once per object,
 use [`functools.cached_property`](07_Foundations--Classes.md#cached-property),
 which stores the result on the instance, so the result dies with the instance.
-A class that declares `__slots__` cannot use it
+A class that declares `__slots__` cannot use `cached_property`
 (see [When Slots Does Not Fit](#when-slots-does-not-fit) below).
 
 ## Reduce Memory Overhead
@@ -1472,7 +1473,7 @@ print(f"NumPy at least 3x faster: {t_numpy * 3 < t_loop}")
 Both build the same sequence of `n` numbers (it's `arange`, not `arrange`).
 `list(range(n))` boxes each one as a Python `int`.
 `np.arange()` packs them into one contiguous block of C doubles,
-the same layout `array` uses earlier in this chapter,
+the same layout `array` uses in `compact_array.py`,
 with `dtype=np.float64` choosing the element type the way `array`'s `"d"` type code does.
 
 `vectorized()` computes the same `3x + 1` as `pure_python()`,
@@ -1518,7 +1519,7 @@ compiles such a function to machine code on its first call:
     # Sample run: Numba speedup: 15.9x
 
 `njit(count_primes)` wraps the same function `@njit` decorates,
-and returns something that compiles itself at the first call.
+and the `fast_count_primes` it returns compiles itself at the first call.
 Calling `fast_count_primes(1)` first pays the compilation and warm-up cost outside the timed region,
 so the comparison measures steady-state speed.
 Numba shines on numeric code over simple types and NumPy arrays,
@@ -1588,7 +1589,7 @@ use a vectorized NumPy expression wherever the shape of the computation allows i
 and drop to a `@njit` loop for the steps that resist vectorizing,
 keeping the array as the shared data structure throughout.
 
-(Like the Numba example above, this one needs Numba, so the build does not run it.
+(Like the `count_primes()` example, this example needs Numba, so the build does not run it.
 The comment shows one machine's actual output.
 Expect a different, but still large, multiple on yours.)
 
@@ -1660,7 +1661,7 @@ fn fastcount(m: &Bound<'_, PyModule>) -> PyResult<()> {
 }
 ```
 
-`maturin develop` compiles and installs it,
+`maturin develop` compiles and installs `fastcount`,
 and Python sees a normal module with both functions attached:
 
 ```python
@@ -1717,7 +1718,8 @@ print(f"collatz_lengths Rust speedup: "
 
 That is one baseline and three ways past it,
 but not a ladder where each step outruns the last.
-The plain Python loop from the Numba example above is the baseline.
+The plain Python loop, timed in both the Numba examples and `demo.py`,
+is the baseline.
 NumPy alone handles the parts of a problem that reduce to whole-array arithmetic.
 `@njit` compiles the untranslatable loop on its first call, from inside Python.
 Rust compiles that loop ahead of time,
@@ -1823,7 +1825,7 @@ Each exercise is answered in this chapter's [solutions](../Solutions/18_Techniqu
 6.  In `slots.py`, add `class Point3D(Point)` that declares no `__slots__` of its own.
     Confirm that an instance accepts `p.z = 3`,
     which `Point` rejects with an `AttributeError`,
-    and find where the storage for it came from.
+    and find where the storage for `z` came from.
 7.  In `monitoring_counts.py`,
     swap `set_local_events()` for `set_events()` and say which entry in the `Counter` is new and why.
     Then get the same two counts back using two local attachments instead,

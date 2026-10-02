@@ -49,7 +49,7 @@ and handling removes the effect from the row.
 The design has two halves, the row and the handlers,
 and a language can have one without the other:
 OCaml 5 has handlers and records no row in a function's type.
-*Algebraic effect tracking* is the row half: the rule above,
+*Algebraic effect tracking* is the row half: the `row(f)` rule,
 computed and checked for every function.
 
 A system that tracks Effects needs three things:
@@ -231,7 +231,7 @@ A function that declares `performs()` with no arguments states that it is pure,
 and `row()` returns the same empty list for it.
 The list alone does not separate a function declared pure from one that declares nothing.
 [Decide What Untracked Code Performs](#decide-what-untracked-code-performs)
-weighs what a checker can assume about the second kind.
+weighs what a checker can assume about a function that declares nothing.
 
 Notice also that `ask()` calls `input()` directly.
 `Ask` is a label here.
@@ -239,9 +239,10 @@ It has no methods, and nothing can substitute another implementation for it.
 
 ## What a Checker for the Row Must Do
 
-`row()` fills the first role.
-A tool that fills the second and third must solve five problems,
-and each one is larger than it first appears.
+`Annotated` fills the first role, a place to write the row,
+and `row()` reads it back.
+A tool that fills the second and third, computing the row and checking it,
+must solve five problems, and each one is larger than it first appears.
 
 ### Resolve Every Call
 
@@ -281,7 +282,7 @@ def each[T](
 ```
 
 The row of `each()` is the row of `action`, and that row differs at every call.
-Koka writes that with the Effect variable `e`.
+Koka writes such a row with the Effect variable `e`.
 Python's type variables cannot help,
 because a type variable placed inside metadata is one more object the checker ignores.
 The tool would require its own notation,
@@ -343,12 +344,12 @@ with handling(Ask, Scripted()):
     greet()
 ```
 
-`Scripted` is the test stand-in from `ask_tell.py`,
-which answers every prompt with a fixed name.
+`Scripted`, the test stand-in from `ask_tell.py`,
+answers every prompt with a fixed name.
 Inside that block the tool would remove `Ask` from the row.
 The subtraction is sound if the handler intercepts the Effect,
 and that interception requires `ask()` to consult the installed handler instead of calling `input()`.
-That takes a runtime mechanism,
+Consulting an installed handler takes a runtime mechanism,
 such as the `ContextVar` in [Effects by Hand](44_Effects--Effect_Management.md#effects-by-hand).
 Now the design has two halves, a static tool and a runtime library,
 and the tool cannot check that the library does what the metadata says.
@@ -374,7 +375,7 @@ and each assumption creates its own problem:
   so nearly every row reads `Unknown` until someone declares the libraries below your code.
 - **Declare the libraries separately.**
   Gradual typing took this route with stub files and typeshed.
-  The C functions under `print()` and `open()` need it regardless,
+  The C functions under `print()` and `open()` need separate declarations regardless,
   since they have no Python body to analyze.
   [Effect Management](44_Effects--Effect_Management.md#effect-management-for-python)
   says how long that took: a decade.
@@ -392,11 +393,11 @@ The first is inside the type checker,
 a place [Resolve Every Call](#resolve-every-call) rules out for `ty`.
 
 The second is a separate static tool, run beside `ty` and `ruff`.
-Every problem above applies to it in full.
+The four problems before this section apply in full to a separate tool.
 [An Effect Checker](B_An_Effect_Checker.md) builds a small one.
-It reports `Unknown` for a call it cannot resolve,
-and its [closing section](B_An_Effect_Checker.md#what-the-checker-resolves-and-what-it-cannot-see)
-lists the cases it passes over with no report.
+That checker reports `Unknown` for a call it cannot resolve,
+and that appendix's [closing section](B_An_Effect_Checker.md#what-the-checker-resolves-and-what-it-cannot-see)
+lists the cases the checker passes over with no report.
 
 The third is the runtime.
 A decorator reads each function's row once with `row()`,
@@ -434,8 +435,8 @@ divides algebraic effects into a row half and a handler half.
 `Annotated` can carry the row, and no metadata can supply a handler.
 A native handler receives the continuation and decides what to do with it.
 [Stateless in Practice](47_Effects--Stateless_in_Practice.md#handlers-cannot-capture-the-continuation)
-shows the ceiling Python puts on that half: a Python generator is one-shot,
-so a handler can resume a computation once.
+shows the ceiling Python puts on the handler half:
+a Python generator is one-shot, so a handler can resume a computation once.
 What PEP 593 could give Python is algebraic effect tracking, the row half.
 The handler half would still come from a library, under that ceiling.
 
