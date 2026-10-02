@@ -26,7 +26,8 @@ class Thermometer(Subject[float]):
     def celsius(self) -> float:
         return self._celsius
 
-    def set_celsius(self, value: float) -> None:
+    @celsius.setter
+    def celsius(self, value: float) -> None:
         self._celsius = value
         self.notify(value)
 
@@ -38,5 +39,5 @@ class Display:
 
 t = Thermometer(20.0)
 t.attach(Display())
-t.set_celsius(25)
+t.celsius = 25
 #: display: 25C

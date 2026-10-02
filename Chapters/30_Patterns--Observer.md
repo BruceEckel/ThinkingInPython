@@ -11,8 +11,9 @@ and it decides which arguments every call receives.
 This is [designing the communication rather than the parts](21_Patterns--Design_Patterns.md#design-principles).
 
 Use *Observer* if a group of objects must update themselves based on a state change.
-Event handling typically uses *Observer*:
-a widget (like a button) keeps a list of handlers and calls each one when its event (a button press) arrives.
+Event handling typically uses *Observer*: a widget (like a button)
+keeps a list of handlers and calls each one when its event (a button press)
+arrives.
 
 In its common form, where observers attach and detach at runtime,
 *Observer* is the most dynamic of the callback patterns.
@@ -27,7 +28,8 @@ In both, *Observer* connects the state change to its views:
 one subject keeps a list of views and accepts any view that has the update method it calls.
 This way, a *document* can have more than one way to view it,
 such as a plot and a table.
-With *Observer*, a change in the subject's data notifies each interested view, so that every view refreshes.
+With *Observer*, a change in the subject's data notifies each interested view,
+so that every view refreshes.
 
 ## The Classic Observer
 
@@ -68,7 +70,9 @@ class Subject[T]:
 `notify()` calls `update()` on every observer in the list,
 so one change to the subject's state reaches all observers.
 
-`Thermometer`'s `set_celsius()` stores the new reading and calls `notify()`:
+`Thermometer`'s `celsius` setter stores the new reading and calls `notify()`.
+A setter runs at every assignment to its attribute,
+so every assignment to `celsius` reaches the observers:
 
 ```python
 # classic_thermometer.py
@@ -83,7 +87,8 @@ class Thermometer(Subject[float]):
     def celsius(self) -> float:
         return self._celsius
 
-    def set_celsius(self, value: float) -> None:
+    @celsius.setter
+    def celsius(self, value: float) -> None:
         self._celsius = value
         self.notify(value)
 ```
@@ -108,7 +113,7 @@ class Display:
 
 t = Thermometer(20.0)
 t.attach(Display())
-t.set_celsius(25)
+t.celsius = 25
 #: display: 25C
 ```
 
@@ -134,7 +139,7 @@ To use pull, you must add either a runtime `isinstance()` check or a second type
 
 GoF leaves a second choice open, separate from push or pull:
 who calls `notify()`.
-Here `set_celsius()` calls it, so every change broadcasts at once.
+Here the `celsius` setter calls it, so every change broadcasts at once.
 Otherwise the client calls `notify()` after making its changes,
 so several changes can coalesce into one broadcast,
 but a client can forget to make the call.
@@ -248,9 +253,8 @@ A design that needs an answer uses a different pattern;
 for example [*Chain of Responsibility*](28_Patterns--Function_Objects.md#chain-of-responsibility-choosing-the-handler-at-runtime)
 tries its handlers in turn and returns the result from the first one that succeeds.
 
-`Thermometer` announces from its `celsius` setter.
-A setter runs at every assignment to its attribute,
-so every assignment to `celsius` reaches the responders:
+The new `Thermometer` changes only its base class and the call in its `celsius` setter,
+`announce()` in place of `notify()`:
 
 ```python
 # thermometer.py

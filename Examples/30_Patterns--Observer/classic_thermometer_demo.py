@@ -10,5 +10,5 @@ class Display:
 
 t = Thermometer(20.0)
 t.attach(Display())
-t.set_celsius(25)
+t.celsius = 25
 #: display: 25C
