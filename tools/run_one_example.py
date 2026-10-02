@@ -26,14 +26,14 @@ its path:
     python -m tools.run_one_example Solutions/47/research_by_hand
 
 Each piece before the last is found, in order, inside a directory name,
-the tree's included (``Solutions`` picks out ``SolutionsCode/``,
+the tree's included (``Solutions`` picks out ``Solutions/``,
 ``18`` the chapter directory). The last piece is the file: a name equal to
 it beats one that only contains it. A spec matching several files lists
 them and exits 2. Anything after the spec is passed to the example as its
 own arguments.
 
 The chapter listings and the Solutions answers are searched together, in
-``Examples/`` and ``SolutionsCode/``, the committed and always-synced trees
+``Examples/`` and ``Solutions/``, the committed and always-synced trees
 a reader browses. ``build/examples/`` and ``build/solutions/`` are searched
 only if nothing there matches. No argument prints this help and exits 0:
 this is a reader's helper, not a gate, so running it bare should teach
@@ -58,7 +58,7 @@ COMMITTED_EXAMPLES = ROOT / "Examples"
 # Solutions tree has no utils/ of its own and uses its chapter tree's.
 TREES: dict[Path, Path] = {
     COMMITTED_EXAMPLES: COMMITTED_EXAMPLES / "utils",
-    ROOT / "SolutionsCode": COMMITTED_EXAMPLES / "utils",
+    ROOT / "Solutions": COMMITTED_EXAMPLES / "utils",
     EXAMPLES_TREE: SHARED_UTILS,
     EXAMPLES_TREE.parent / "solutions": SHARED_UTILS,
 }

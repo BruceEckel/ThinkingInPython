@@ -16,7 +16,7 @@ rewritten into the chapter with the gate green, which is the failure
 timing.txt exists to prevent. Nothing reports either until it bites.
 
 Each pattern is matched against the committed trees, ``Examples/`` and
-``SolutionsCode/``. One file serves both trees, so a pattern passes when
+``Solutions/``. One file serves both trees, so a pattern passes when
 it matches in either. The gate runs this after the drift check, so the
 committed trees are known to equal what the Markdown generates.
 
@@ -32,7 +32,7 @@ from tools.config import NORUN_FILE, ROOT, TIMING_FILE
 from tools.report import Finding, report
 
 LISTS = (NORUN_FILE, TIMING_FILE)
-TREES = (ROOT / "Examples", ROOT / "SolutionsCode")
+TREES = (ROOT / "Examples", ROOT / "Solutions")
 
 
 def numbered_patterns(path: Path) -> list[tuple[int, str]]:

@@ -837,7 +837,7 @@ the single generic surrogate in `state_surrogate.py` is simpler and just as flex
 
 ## Exercises
 
-Each exercise is answered in this chapter's [solutions](../Solutions/26_Patterns--Surrogate.md).
+Each exercise is answered in this chapter's [solutions](../Solutions/26_Patterns--Surrogate/).
 
 1.  Extend `virtual_proxy.py`'s `Lazy` so it answers one cheap attribute itself,
     a `description` string given at construction, without building `Expensive`.

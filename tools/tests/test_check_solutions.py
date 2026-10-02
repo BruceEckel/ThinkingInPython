@@ -160,9 +160,10 @@ def test_a_bare_number_selects_one_chapter() -> None:
 
 # ── the Solutions link ────────────────────────────────────────────────────────
 
-NAME = "05_Foundations--Demo.md"
-LINK = f"](../Solutions/{NAME})"
-SENTENCE = solutions_sentence(NAME)
+STEM = "05_Foundations--Demo"
+NAME = f"{STEM}.md"
+LINK = f"](../Solutions/{STEM}/)"
+SENTENCE = solutions_sentence(STEM)
 
 
 def findings(text: str) -> list[str]:
@@ -172,7 +173,7 @@ def findings(text: str) -> list[str]:
 def test_a_missing_link_is_reported_at_the_heading() -> None:
     [finding] = solutions_links(Path(NAME), doc(CHAPTER))
     assert finding.line == 3
-    assert f"no link to Solutions/{NAME}" in finding.message
+    assert f"no link to Solutions/{STEM}/" in finding.message
     assert "tip fix-solutions-links" in finding.message
 
 
@@ -183,7 +184,24 @@ def test_a_link_to_another_file_is_reported() -> None:
     [finding] = solutions_links(Path(NAME), doc(text))
     assert finding.line == 5
     assert "04_Old--Name.md" in finding.message
-    assert NAME in finding.message
+    assert STEM in finding.message
+
+
+def test_the_flat_layout_link_is_stale() -> None:
+    text = CHAPTER.replace(
+        "1.  Rewrite",
+        f"See [s](../Solutions/{NAME}).\n\n1.  Rewrite")
+    [finding] = solutions_links(Path(NAME), doc(text))
+    assert f"Solutions/{NAME}" in finding.message
+
+
+def test_the_readme_file_link_passes_with_or_without_an_anchor() -> None:
+    for tail in ("", "#2-second"):
+        text = CHAPTER.replace(
+            "1.  Rewrite",
+            f"See [s](../Solutions/{STEM}/README.md{tail}).\n\n"
+            "1.  Rewrite")
+        assert findings(text) == []
 
 
 def test_the_right_link_passes() -> None:
@@ -228,8 +246,24 @@ def test_write_corrects_a_stale_target_and_keeps_the_wording() -> None:
         "1.  Rewrite",
         "Answers are [here](../Solutions/04_Old--Name.md#a).\n\n1.  Rewrite")
     out = with_solutions_link(text, NAME)
-    assert f"Answers are [here](../Solutions/{NAME}#a)." in out
+    assert f"Answers are [here](../Solutions/{STEM}/#a)." in out
     assert out.count("\n") == text.count("\n")
+
+
+def test_write_migrates_the_flat_layout_link_to_the_folder() -> None:
+    text = CHAPTER.replace(
+        "1.  Rewrite", f"Answers are [here](../Solutions/{NAME}).\n\n"
+        "1.  Rewrite")
+    out = with_solutions_link(text, NAME)
+    assert f"Answers are [here](../Solutions/{STEM}/)." in out
+    assert findings(out) == []
+
+
+def test_write_leaves_the_readme_file_link_alone() -> None:
+    text = CHAPTER.replace(
+        "1.  Rewrite", f"Answers: [here](../Solutions/{STEM}/README.md).\n\n"
+        "1.  Rewrite")
+    assert with_solutions_link(text, NAME) == text
 
 
 def test_write_twice_changes_nothing() -> None:
@@ -251,3 +285,38 @@ def test_write_links_leaves_a_chapter_without_a_solutions_file(
     chapter.write_text(CHAPTER, encoding="utf-8")
     assert write_links([chapter]) == []
     assert chapter.read_text(encoding="utf-8") == CHAPTER
+
+
+# ── how a solutions file cites its chapter ────────────────────────────────────
+
+def citation_messages(text: str, tmp_path: Path) -> list[str]:
+    path = tmp_path / "Solutions" / STEM / "README.md"
+    path.parent.mkdir(parents=True)
+    path.write_text(text, encoding="utf-8")
+    return [f.message for f in check_solutions.chapter_citations(path)]
+
+
+def test_a_bare_chapter_link_says_to_use_two_levels(
+        tmp_path: Path) -> None:
+    [message] = citation_messages(
+        "See [x](26_Patterns--Surrogate.md#state).\n", tmp_path)
+    assert "../../Chapters/26_Patterns--Surrogate.md" in message
+
+
+def test_a_one_level_chapters_link_is_reported(tmp_path: Path) -> None:
+    [message] = citation_messages(
+        "See [x](../Chapters/26_Patterns--Surrogate.md#state).\n", tmp_path)
+    assert "resolves inside Solutions/" in message
+    assert "../../Chapters/26_Patterns--Surrogate.md#state" in message
+
+
+def test_a_two_level_chapters_link_passes(tmp_path: Path) -> None:
+    assert citation_messages(
+        "See [x](../../Chapters/26_Patterns--Surrogate.md#state).\n",
+        tmp_path) == []
+
+
+def test_a_one_level_link_in_a_fence_is_ignored(tmp_path: Path) -> None:
+    assert citation_messages(
+        "```text\n[x](../Chapters/26_Patterns--Surrogate.md)\n```\n",
+        tmp_path) == []

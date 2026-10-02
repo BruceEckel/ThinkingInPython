@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Copy each exercise statement into its Solutions heading as a block quote.
 
-`Solutions/NN_*.md` answers the exercises `Chapters/NN_*.md` sets, under
+`Solutions/NN_*/README.md` answers the exercises `Chapters/NN_*.md` sets, under
 headings `## N. <short title>`. A solution with no exercise above it
 sends the reader back to the chapter, and a solution that answers the
 wrong exercise under the right number is hard to see.
@@ -38,10 +38,11 @@ with a bare `>` line between items.
 
 Two edits happen inside the copy, and no others:
 
-- Links. `Solutions/` sits beside `Chapters/`, so a chapter-relative link
-  needs a prefix. `](#anchor)` becomes `](../Chapters/<this chapter>#anchor)`
+- Links. A solutions file sits two directories below the book root
+  (`Solutions/<chapter>/README.md`), so a chapter-relative link needs a
+  prefix. `](#anchor)` becomes `](../../Chapters/<this chapter>#anchor)`
   and a bare book-file link, `](17_Techniques--Metaprogramming.md#x)` or
-  `](A_Effect_Tracking.md)`, becomes `](../Chapters/17_...md#x)`. The
+  `](A_Effect_Tracking.md)`, becomes `](../../Chapters/17_...md#x)`. The
   rewrite matches the target's form, so a code span such as
   `last[T](items: list[T])` stays as written. `http` links and any target
   holding a `/` are left alone.
@@ -85,6 +86,7 @@ from tools.check_solutions import (
     selected,
 )
 from tools.markdown import Document
+from tools.repo import solutions_file
 from tools.report import Finding, report
 
 # A level-2 heading, the form a solution's heading takes.
@@ -170,9 +172,9 @@ def statements(doc: Document) -> dict[int, Statement]:
 
 
 def rewrite_links(text: str, chapter: str) -> str:
-    """`text` with chapter-relative links made valid from Solutions/."""
-    text = ANCHOR_LINK.sub(f"](../Chapters/{chapter}#", text)
-    text = BOOK_LINK.sub(r"](../Chapters/\1\2)", text)
+    """`text` with chapter-relative links made valid from a solutions file."""
+    text = ANCHOR_LINK.sub(f"](../../Chapters/{chapter}#", text)
+    text = BOOK_LINK.sub(r"](../../Chapters/\1\2)", text)
     return FOOTNOTE_REF.sub("", text)
 
 
@@ -266,7 +268,7 @@ def apply(
 
 def process(chapter: Path, write: bool) -> tuple[list[Finding], int, int]:
     """(drift findings, statements inserted, statements replaced)."""
-    solutions = SOLUTIONS_DIR / chapter.name
+    solutions = solutions_file(chapter, SOLUTIONS_DIR)
     if not solutions.exists():
         return [], 0, 0
     source = Document.parse(chapter)
@@ -307,7 +309,7 @@ def main(argv: list[str] | None = None) -> int:
         inserted += new
         replaced += old
         if args.write and found:
-            print(f"Solutions/{chapter.name}: {new} inserted, "
+            print(f"Solutions/{chapter.stem}/README.md: {new} inserted, "
                   f"{old} replaced")
     if args.write:
         print(f"{files} file(s) changed: {inserted} statement(s) "

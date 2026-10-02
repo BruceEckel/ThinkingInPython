@@ -1334,7 +1334,7 @@ Both exist to work around languages where a class is not an object you can put i
 
 ## Exercises
 
-Each exercise is answered in this chapter's [solutions](../Solutions/27_Patterns--Factory.md).
+Each exercise is answered in this chapter's [solutions](../Solutions/27_Patterns--Factory/).
 
 1.  Add a class `Triangle` to `shape_factory_method.py`.
 2.  Add a class `Triangle` to `shape_factory_objects.py`.

@@ -9,7 +9,7 @@ passes and reports on it afterwards:
     tip gate-status
 
 The stamp is more than a timestamp. It records a hash of every
-``Chapters/*.md`` and ``Solutions/*.md`` file, so the report can answer the
+``Chapters/*.md`` and ``Solutions/*/README.md`` file, so the report can answer the
 question that actually matters, which is not "when did the gate run" but
 "has anything changed since it did":
 
@@ -34,6 +34,7 @@ from datetime import datetime
 from typing import Any
 
 from tools.config import BUILD_DIR, ROOT
+from tools.repo import md_files
 
 STAMP = BUILD_DIR / "gate-stamp.json"
 SOURCES = ("Chapters", "Solutions")
@@ -43,10 +44,10 @@ MAX_LISTED = 6
 def digests() -> dict[str, str]:
     """A hash per Markdown file the gate checks."""
     out: dict[str, str] = {}
-    for folder in SOURCES:
-        for md in sorted((ROOT / folder).glob("*.md")):
-            data = md.read_bytes()
-            out[f"{folder}/{md.name}"] = hashlib.sha256(data).hexdigest()
+    for md in md_files([ROOT / folder for folder in SOURCES]):
+        data = md.read_bytes()
+        key = md.relative_to(ROOT).as_posix()
+        out[key] = hashlib.sha256(data).hexdigest()
     return out
 
 
@@ -106,8 +107,8 @@ def report() -> int:
     if not edited:
         print("Nothing in Chapters/ or Solutions/ has changed since.")
         return 0
-    # Keep the folder: Chapters/ and Solutions/ share file names by design,
-    # so a bare basename reports the same thing twice.
+    # Keep the folder: each key is the file's path from the repo root,
+    # since every solutions file is named README.md.
     shown = ", ".join(edited[:MAX_LISTED])
     extra = len(edited) - MAX_LISTED
     more = f", +{extra} more" if extra > 0 else ""

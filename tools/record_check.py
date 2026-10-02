@@ -74,7 +74,7 @@ from functools import cache
 from pathlib import Path
 from tools.config import DATA_DIR, ROOT
 from tools.markdown import Block, Document
-from tools.repo import add_paths_arg, md_files
+from tools.repo import add_paths_arg, chapter_stem, is_solutions_file, md_files
 from tools.report import Check, Finding, report
 
 EXCEPTIONS_FILE = DATA_DIR / "record_exceptions.txt"
@@ -119,13 +119,17 @@ def exemptions(path: Path = EXCEPTIONS_FILE) -> tuple[Exemption, ...]:
 
 
 def chapter_name(path: Path) -> str:
-    """`Rethinking_Objects` from `20_Patterns--Rethinking_Objects.md`."""
-    stem = path.stem.split("_", 1)[-1]
+    """`Rethinking_Objects` from `20_Patterns--Rethinking_Objects.md`.
+
+    A solutions file (`Solutions/<stem>/README.md`) names its chapter
+    the same way, through its directory.
+    """
+    stem = chapter_stem(path).split("_", 1)[-1]
     return stem.split("--", 1)[-1]
 
 
 def chapter_number(path: Path) -> int | None:
-    head = path.stem.split("_", 1)[0]
+    head = chapter_stem(path).split("_", 1)[0]
     return int(head) if head.isdigit() else None
 
 
@@ -209,7 +213,7 @@ def in_scope_blocks(doc: Document) -> Iterator[Block]:
     if number is None or number < FIRST_CHAPTER:
         return
     started = (number > FIRST_CHAPTER
-               or "Solutions" in doc.path.resolve().parts)
+               or is_solutions_file(doc.path))
     for block in doc.python_blocks():
         if started:
             yield block

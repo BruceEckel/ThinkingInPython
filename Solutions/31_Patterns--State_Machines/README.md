@@ -1,0 +1,747 @@
+# State Machines: Solutions
+
+Several exercises below reuse the book's generic table-driven engine,
+so it appears once here, in its own file that the others import:
+
+```python
+# table_machine.py
+from collections.abc import Callable
+from enum import Enum
+
+type Transition = tuple[
+    Callable[..., bool] | None,
+    Callable[..., None] | None, Enum
+]
+type Table = dict[tuple[Enum, type], list[Transition]]
+
+class NoTransition(RuntimeError):
+    "No table row matched this state and event."
+
+class StateMachine:
+    def __init__(self, initial: Enum, table: Table) -> None:
+        self.state = initial
+        self.table = table
+
+    def handle(self, event: object) -> None:
+        for condition, action, next_state in self.table.get(
+                (self.state, type(event)), []):
+            if condition is None or condition(event):
+                if action is not None:
+                    action(event)
+                self.state = next_state
+                return
+        raise NoTransition(
+            f"no transition from {self.state!r} "
+            f"on {type(event).__name__}")
+```
+
+## 1. `UnpredictablePerson` with a `Prozac` mood
+
+> Using [*State*](../../Chapters/26_Patterns--Surrogate.md#state),
+> make a class called `UnpredictablePerson` that changes the kind of response to its `hello()` method depending on its current `Mood`.
+> Add another kind of `Mood` called `Prozac`.
+
+```python
+# exercise_1.py
+from typing import Protocol
+
+class Mood(Protocol):
+    def hello(self) -> str: ...
+
+class Happy:
+    def hello(self) -> str:
+        return "Great to see you!"
+
+class Grumpy:
+    def hello(self) -> str:
+        return "What do you want?"
+
+class Prozac:
+    def hello(self) -> str:
+        return "Everything is wonderful. Just wonderful."
+
+class UnpredictablePerson:
+    def __init__(self, mood: Mood) -> None:
+        self._mood = mood
+
+    def change_to(self, mood: Mood) -> None:
+        self._mood = mood
+
+    def hello(self) -> str:
+        return self._mood.hello()
+
+person = UnpredictablePerson(Happy())
+print(person.hello())
+#: Great to see you!
+person.change_to(Grumpy())
+print(person.hello())
+#: What do you want?
+person.change_to(Prozac())
+print(person.hello())
+#: Everything is wonderful. Just wonderful.
+```
+
+`Prozac` needs nothing beyond `Happy` and `Grumpy`'s own shape: one
+`hello()` method. `UnpredictablePerson` never mentions any specific
+mood by name, so a third mood changes only which `Mood` object
+`change_to()` swaps in. `UnpredictablePerson` is the *State*
+surrogate from [*Surrogate*](../../Chapters/26_Patterns--Surrogate.md#state),
+applied to a new domain.
+
+## 2. The mood machine, on the first design
+
+> Turn exercise 1's `UnpredictablePerson` into a state machine using `state_machine.py`,
+> the first design, where each state decides the next one.
+
+```python
+# exercise_2.py
+from collections.abc import Iterable
+from typing import Protocol
+
+# The chapter's state.py and state_machine.py, inlined:
+class State(Protocol):
+    def run(self) -> None: ...
+    def next(self, event: object) -> State: ...
+
+class StateMachine:
+    def __init__(self, initial_state: State) -> None:
+        self.current_state = initial_state
+        self.current_state.run()
+    def run_all(self, inputs: Iterable[object]) -> None:
+        for event in inputs:
+            print(event)
+            self.current_state = (
+                self.current_state.next(event))
+            self.current_state.run()
+
+class TakePill:
+    def __repr__(self) -> str:
+        return "TakePill"
+
+class Annoy:
+    def __repr__(self) -> str:
+        return "Annoy"
+
+class Calm:
+    def __repr__(self) -> str:
+        return "Calm"
+
+class Happy:
+    def run(self) -> None:
+        print("Great to see you!")
+    def next(self, event: object) -> State:
+        if isinstance(event, Annoy):
+            return Grumpy()
+        if isinstance(event, TakePill):
+            return Prozac()
+        return self
+
+class Grumpy:
+    def run(self) -> None:
+        print("What do you want?")
+    def next(self, event: object) -> State:
+        if isinstance(event, Calm):
+            return Happy()
+        if isinstance(event, TakePill):
+            return Prozac()
+        return self
+
+class Prozac:
+    def run(self) -> None:
+        print("Everything is wonderful.")
+    def next(self, event: object) -> State:
+        return self
+
+StateMachine(Happy()).run_all(
+    [Annoy(), Calm(), TakePill(), Annoy()])
+#: Great to see you!
+#: Annoy
+#: What do you want?
+#: Calm
+#: Great to see you!
+#: TakePill
+#: Everything is wonderful.
+#: Annoy
+#: Everything is wonderful.
+```
+
+Each state decides its own successor. `Happy.next()` answers `Annoy`
+with a `Grumpy`, `Grumpy.next()` answers `Calm` with a `Happy`, and
+both answer `TakePill` with a `Prozac` that returns itself for
+everything after. Nothing outside the states holds the transition
+rules, which distinguishes this design from the chapter's
+table-driven one: there the rules live in a dictionary
+a reader can audit in one place, and here they live in the `next()`
+method of whichever state is current.
+
+Where exercise 1's `UnpredictablePerson` swaps in a whole `Mood`
+object through `change_to()`, this version reaches the same moods by
+returning a new `State` from `next()`. Both model "a thing that
+changes behavior over time." The *State* surrogate suits that job when
+each mood needs real per-mood logic. The table-driven machine wins
+when the transitions themselves, not the mood behaviors, are the part
+worth making explicit and easy to audit.
+
+## 3. A word-driven state machine with per-state transition tables
+
+> Create a *State Machine* system in which the current state and the input together determine the next state.
+> Use a `dict` to map a `str` naming a state to its state object.
+> Give each state subclass its own transition table,
+> which its `next_state()` method consults.
+> Feed the machine a sequence of single words,
+> such as a text file with one word per line.
+
+```python
+# exercise_3.py
+from typing import ClassVar
+
+class Controller:
+    def __init__(self, initial: str) -> None:
+        self.states: dict[str, WordState] = {}
+        self.current = initial
+
+    def register(self, name: str, state: WordState) -> None:
+        self.states[name] = state
+
+    def process(self, word: str) -> None:
+        state = self.states[self.current]
+        self.current = state.next_state(word)
+
+class WordState:
+    TRANSITIONS: ClassVar[dict[str, str]] = {}
+
+    def next_state(self, word: str) -> str:
+        return self.TRANSITIONS.get(
+            word, self.TRANSITIONS["*"])
+
+class Locked(WordState):
+    TRANSITIONS = {"coin": "unlocked", "*": "locked"}
+
+class Unlocked(WordState):
+    TRANSITIONS = {"push": "locked", "*": "unlocked"}
+
+controller = Controller("locked")
+controller.register("locked", Locked())
+controller.register("unlocked", Unlocked())
+
+words = ["push", "coin", "push", "coin", "coin", "push"]
+history = [controller.current]
+for word in words:
+    controller.process(word)
+    history.append(controller.current)
+print(" ".join(history))
+#: locked locked unlocked locked unlocked unlocked locked
+```
+
+This is the classic turnstile: `push` while locked does nothing (the
+`"*"` fallback), `coin` unlocks it, and `push` while unlocked locks it
+again. Each state subclass carries its own transition table as a class
+attribute. `next_state()` looks the word up in that table with
+`.get(word, ...["*"])`, so `Controller` never branches on the current
+state or word. It asks the current state object what comes next, the
+same delegation `state_machine.py`'s `run_all()` performs when it
+calls `next()`. Reading the words
+from a file, one per line, takes one line of code:
+`words = Path("moves.txt").read_text().split()`.
+
+## 4. Configuring the machine from one transition table
+
+> Modify the previous exercise so that you can configure the state machine by editing a single transition table.
+
+The per-state design in exercise 3 spreads the turnstile's rules
+across two classes, one dictionary each. A single table keyed by
+`(state, word)` collects both dictionaries and makes the whole
+machine's behavior editable in one place:
+
+```python
+# exercise_4.py
+type Transitions = dict[tuple[str, str], str]
+
+TRANSITIONS: Transitions = {
+    ("locked", "coin"): "unlocked",
+    ("locked", "push"): "locked",
+    ("unlocked", "push"): "locked",
+    ("unlocked", "coin"): "unlocked",
+}
+
+class TableController:
+    def __init__(self, initial: str,
+                 table: Transitions) -> None:
+        self.current = initial
+        self.table = table
+
+    def process(self, word: str) -> None:
+        self.current = self.table[self.current, word]
+
+words = ["push", "coin", "push", "coin", "coin", "push"]
+tc = TableController("locked", TRANSITIONS)
+history = [tc.current]
+for word in words:
+    tc.process(word)
+    history.append(tc.current)
+print(" ".join(history))
+#: locked locked unlocked locked unlocked unlocked locked
+```
+
+Both versions produce the same history. The per-state design (exercise
+3) puts each state's rules with that state, which reads well when a
+state does more than look a word up. The single-table design puts
+every rule for the whole machine in one dictionary, which is easier to
+audit and edit as a unit. The chapter's own
+[table-driven state machine](../../Chapters/31_Patterns--State_Machines.md#table-driven-state-machine)
+makes the same trade-off over the per-state `mouse_trap_states.py`.
+
+## 5. `mouse_move_generator()`
+
+> Write a `mouse_move_generator()`,
+> a [generator](../../Chapters/23_Patterns--Iterators.md#generators)
+> that yields valid `MouseAction` moves in sequence,
+> where each possible move depends on the previous one
+> (it is another state machine).
+> Have it accept an `int` for the number of moves to produce, then stop.
+
+```python
+# exercise_5.py
+import random
+from collections.abc import Iterator
+from enum import StrEnum
+
+class MouseAction(StrEnum):
+    APPEARS = "mouse appears"
+    RUNS_AWAY = "mouse runs away"
+    ENTERS = "mouse enters trap"
+    ESCAPES = "mouse escapes"
+    TRAPPED = "mouse trapped"
+    REMOVED = "mouse removed"
+
+NEXT_ACTIONS: dict[MouseAction | None,
+                   list[MouseAction]] = {
+    None: [MouseAction.APPEARS],
+    MouseAction.APPEARS: [MouseAction.RUNS_AWAY,
+                          MouseAction.ENTERS],
+    MouseAction.RUNS_AWAY: [MouseAction.APPEARS],
+    MouseAction.ENTERS: [MouseAction.ESCAPES,
+                         MouseAction.TRAPPED],
+    MouseAction.ESCAPES: [MouseAction.APPEARS],
+    MouseAction.TRAPPED: [MouseAction.REMOVED],
+    MouseAction.REMOVED: [MouseAction.APPEARS],
+}
+
+def mouse_move_generator(
+    count: int, seed: int = 0
+) -> Iterator[MouseAction]:
+    rng = random.Random(seed)
+    previous: MouseAction | None = None
+    for _ in range(count):
+        previous = rng.choice(NEXT_ACTIONS[previous])
+        yield previous
+
+moves = list(mouse_move_generator(8, seed=1))
+print(" ".join(m.name for m in moves[:4]))
+#: APPEARS RUNS_AWAY APPEARS RUNS_AWAY
+print(" ".join(m.name for m in moves[4:]))
+#: APPEARS ENTERS TRAPPED REMOVED
+```
+
+`NEXT_ACTIONS` is a small state machine of its own: a dictionary from
+"the action just produced" to "the legal actions that can follow it,"
+including the special `None` key for "nothing has happened yet," which
+leads only to `APPEARS`. The generator's own state is just `previous`,
+the last action it yielded. Each `next()` call on the generator,
+here made by `list()`, picks a legal successor and remembers it for
+the following call. `NEXT_ACTIONS` constrains every choice, so every
+sequence this generator produces is legal by construction.
+`mouse_trap_states.py` accepts any move in any state and lets each
+`case _` absorb the ones that make no sense there, so the generator's
+table is the stricter of the two.
+
+## 6. A washing machine, table-driven
+
+> Apply the table-driven `StateMachine` from `tabledriven/table_machine.py` to a washing-machine problem.
+> Give one `(state, input)` pair two rows told apart by a condition,
+> such as a load too heavy for the fast spin.
+> Then press `Start` in the middle of a cycle,
+> an input that state has no row for,
+> and decide what the caller does with the `NoTransition`:
+> ignore the press or stop the machine.
+> Say which policy suits a washing machine, and why.
+
+```python
+# exercise_6.py
+from collections.abc import Callable
+from dataclasses import dataclass
+from enum import Enum, auto
+from exceptions import expect
+from table_machine import NoTransition, StateMachine, Table
+
+class WashState(Enum):
+    IDLE = auto()
+    FILLING = auto()
+    WASHING = auto()
+    RINSING = auto()
+    SPINNING = auto()
+    DONE = auto()
+
+@dataclass
+class Start:
+    load_kg: float
+
+class Full:
+    pass
+class WashDone:
+    pass
+class RinseDone:
+    pass
+class SpinDone:
+    pass
+
+class WashingMachine(StateMachine):
+    def __init__(self) -> None:
+        self.load_kg = 0.0
+        self.log: list[str] = []
+        table: Table = {
+            (WashState.IDLE, Start):
+                [(None, self.begin, WashState.FILLING)],
+            (WashState.FILLING, Full):
+                [(None, self.log_msg("washing"),
+                  WashState.WASHING)],
+            (WashState.WASHING, WashDone):
+                [(None, self.log_msg("rinsing"),
+                  WashState.RINSING)],
+            (WashState.RINSING, RinseDone): [
+                (self.too_heavy, self.log_msg("slow spin"),
+                 WashState.SPINNING),
+                (None, self.log_msg("fast spin"),
+                 WashState.SPINNING),
+            ],
+            (WashState.SPINNING, SpinDone):
+                [(None, self.log_msg("done"),
+                  WashState.DONE)],
+        }
+        super().__init__(WashState.IDLE, table)
+
+    def begin(self, start: Start) -> None:
+        self.load_kg = start.load_kg
+        self.log.append("filling")
+
+    def too_heavy(self, event: RinseDone) -> bool:
+        return self.load_kg > 6
+
+    def log_msg(
+            self, msg: str) -> Callable[[object], None]:
+        def action(event: object) -> None:
+            self.log.append(msg)
+        return action
+
+cycle = [Full(), WashDone(), RinseDone(), SpinDone()]
+heavy = WashingMachine()
+for event in [Start(8), *cycle]:
+    heavy.handle(event)
+print(heavy.log)
+#: ['filling', 'washing', 'rinsing', 'slow spin', 'done']
+light = WashingMachine()
+for event in [Start(3), *cycle]:
+    light.handle(event)
+print(light.log)
+#: ['filling', 'washing', 'rinsing', 'fast spin', 'done']
+
+# Start pressed again, mid-cycle:
+busy = WashingMachine()
+busy.handle(Start(3))
+expect(NoTransition, busy.handle, Start(5))
+#: [NoTransition] no transition from <WashState.FILLING: 2>
+#: on Start
+print(busy.state.name, busy.load_kg)
+#: FILLING 3
+```
+
+The `(RINSING, RinseDone)` key holds the two rows the exercise asks
+for, told apart by `too_heavy()`. A load over six kilograms takes the
+slow spin, and anything lighter falls through to the unconditional
+fast-spin row below it. A `RinseDone` event carries no data of its
+own, so the condition reads `load_kg` off the machine, where
+`begin()` recorded it when the cycle started. The rest of the cycle
+is a straight line, one event type per state, and the machine is
+still the chapter's `table_machine.py` engine unchanged.
+
+A second `Start` during `FILLING` finds no row, so `handle()` raises
+`NoTransition`. The press changes nothing: the state is still
+`FILLING` and `load_kg` is still 3, because the engine finds a row
+before it runs any action. For a washing machine the caller should
+ignore the press: catch `NoTransition` and carry on, as
+`vending_view.py`'s `send()` does. A control panel is a source of
+stray presses, and a cycle that stops because
+someone leans on a button is the worse failure. Raising the
+exception is still the right default for the engine. A caller can
+turn an exception into a no-op, and cannot turn a silent no-op into
+a report.
+
+## 7. An elevator, table-driven
+
+> Create an elevator state machine using `tabledriven/table_machine.py`.
+> Give the "doors closing" state two rows for the same input,
+> one guarded by a door-obstruction condition.
+
+```python
+# exercise_7.py
+from dataclasses import dataclass
+from enum import Enum, auto
+from table_machine import StateMachine, Table
+
+class ElevatorState(Enum):
+    IDLE = auto()
+    MOVING_UP = auto()
+    MOVING_DOWN = auto()
+    DOORS_OPEN = auto()
+    DOORS_CLOSING = auto()
+
+@dataclass
+class CallButton:
+    floor: int
+
+class ArrivedAtFloor:
+    pass
+class CloseDoors:
+    pass
+
+@dataclass
+class DoorSensor:
+    blocked: bool
+
+class Elevator(StateMachine):
+    def __init__(self, floor: int = 0) -> None:
+        self.floor = floor
+        self.target = floor
+        table: Table = {
+            (ElevatorState.IDLE, CallButton): [
+                (self.above, self.set_target,
+                 ElevatorState.MOVING_UP),
+                (self.below, self.set_target,
+                 ElevatorState.MOVING_DOWN),
+                (None, None, ElevatorState.DOORS_OPEN),
+            ],
+            (ElevatorState.MOVING_UP, ArrivedAtFloor):
+                [(None, self.arrive,
+                  ElevatorState.DOORS_OPEN)],
+            (ElevatorState.MOVING_DOWN, ArrivedAtFloor):
+                [(None, self.arrive,
+                  ElevatorState.DOORS_OPEN)],
+            (ElevatorState.DOORS_OPEN, CloseDoors):
+                [(None, None, ElevatorState.DOORS_CLOSING)],
+            (ElevatorState.DOORS_CLOSING, DoorSensor): [
+                (self.obstructed, None,
+                 ElevatorState.DOORS_OPEN),
+                (None, None, ElevatorState.IDLE),
+            ],
+        }
+        super().__init__(ElevatorState.IDLE, table)
+
+    def above(self, call: CallButton) -> bool:
+        return call.floor > self.floor
+
+    def below(self, call: CallButton) -> bool:
+        return call.floor < self.floor
+
+    def set_target(self, call: CallButton) -> None:
+        self.target = call.floor
+
+    def arrive(self, event: object) -> None:
+        self.floor = self.target
+
+    def obstructed(self, sensor: DoorSensor) -> bool:
+        return sensor.blocked
+
+elevator = Elevator(floor=0)
+elevator.handle(CallButton(3))
+print(elevator.state, elevator.floor)
+#: ElevatorState.MOVING_UP 0
+elevator.handle(ArrivedAtFloor())
+print(elevator.state, elevator.floor)
+#: ElevatorState.DOORS_OPEN 3
+elevator.handle(CloseDoors())
+elevator.handle(DoorSensor(blocked=True))
+print(elevator.state)
+#: ElevatorState.DOORS_OPEN
+elevator.handle(CloseDoors())
+elevator.handle(DoorSensor(blocked=False))
+print(elevator.state)
+#: ElevatorState.IDLE
+```
+
+The "doors closing" state carries the two rows the exercise asks for.
+Under `(DOORS_CLOSING, DoorSensor)`, the first row reopens the doors
+when `obstructed()` passes, and the unconditional row below it
+finishes the close in `IDLE`. The `(IDLE, CallButton)` key shows the
+same idiom three wide, in the vending machine's
+`(State.SELECTING, SecondDigit)` shape: candidate transitions share
+one key, `handle()` tries them in order, and the first whose condition
+passes wins. `above()` and `below()` pick `MOVING_UP` or
+`MOVING_DOWN`, and a call for the current floor falls through both
+conditions to open the doors with no travel.
+
+## 8. A heating/air-conditioning system, table-driven
+
+> Create a heating/air-conditioning system using `tabledriven/table_machine.py`.
+> A single `TemperatureReading` input must be able to lead to heating,
+> cooling, or idle, decided entirely by conditions on one `(state, input)` key.
+
+```python
+# exercise_8.py
+from dataclasses import dataclass
+from enum import Enum, auto
+from table_machine import StateMachine, Table
+
+class HVACState(Enum):
+    IDLE = auto()
+    HEATING = auto()
+    COOLING = auto()
+
+@dataclass
+class TemperatureReading:
+    degrees: float
+
+class HVAC(StateMachine):
+    def __init__(self, target: float = 20,
+                 band: float = 2) -> None:
+        self.target = target
+        self.band = band
+        table: Table = {
+            (HVACState.IDLE, TemperatureReading): [
+                (self.too_cold, None, HVACState.HEATING),
+                (self.too_hot, None, HVACState.COOLING),
+                (None, None, HVACState.IDLE),
+            ],
+            (HVACState.HEATING, TemperatureReading): [
+                (self.too_cold, None, HVACState.HEATING),
+                (None, None, HVACState.IDLE),
+            ],
+            (HVACState.COOLING, TemperatureReading): [
+                (self.too_hot, None, HVACState.COOLING),
+                (None, None, HVACState.IDLE),
+            ],
+        }
+        super().__init__(HVACState.IDLE, table)
+
+    def too_cold(self, r: TemperatureReading) -> bool:
+        return r.degrees < self.target - self.band
+
+    def too_hot(self, r: TemperatureReading) -> bool:
+        return r.degrees > self.target + self.band
+
+hvac = HVAC()
+for degrees in [15, 17, 21, 30, 20]:
+    hvac.handle(TemperatureReading(degrees))
+    print(degrees, hvac.state.name)
+#: 15 HEATING
+#: 17 HEATING
+#: 21 IDLE
+#: 30 COOLING
+#: 20 IDLE
+```
+
+The machine has one input type. The `(IDLE, TemperatureReading)` key
+holds three rows, so a single reading leads to heating, cooling, or
+staying idle, and the two conditions decide which, as the exercise
+requires. The running states carry their own two-row groups: a reading
+still outside the band keeps the system running, and one inside the
+band falls through to the unconditional row back to `IDLE`. Every
+decision in the machine is a condition on the one event type. Every
+action slot here holds `None`, and the fall-through rows leave the
+condition slot `None` too, so both slots are optional per row.
+
+## 9. A `Nickel` the table has never heard of
+
+> Build a two-state machine that collects `Money`,
+> modeled on `vending_machine.py`'s.
+> Add a `Nickel` class deriving from `Money` and feed one in without touching the table.
+> Explain the exception, then make it work two ways: by adding a row,
+> and by making `Nickel` an instance of `Money` rather than a subclass.
+> Say which you would keep.
+
+```python
+# exercise_9.py
+from dataclasses import dataclass
+from enum import Enum, auto
+from exceptions import expect
+from table_machine import NoTransition, StateMachine, Table
+
+class State(Enum):
+    QUIESCENT = auto()
+    COLLECTING = auto()
+
+@dataclass
+class Money:
+    name: str
+    value: int
+
+@dataclass
+class Nickel(Money):  # A subclass, not a new instance
+    pass
+
+class Machine(StateMachine):
+    def __init__(self, *,
+                 accept_nickels: bool = False) -> None:
+        self.amount = 0
+        rows = [(None, self.add, State.COLLECTING)]
+        table: Table = {
+            (State.QUIESCENT, Money): rows,
+            (State.COLLECTING, Money): rows,
+        }
+        if accept_nickels:  # Fix 1: a row keyed on Nickel
+            table[(State.QUIESCENT, Nickel)] = rows
+            table[(State.COLLECTING, Nickel)] = rows
+        super().__init__(State.QUIESCENT, table)
+
+    def add(self, event: Money) -> None:
+        self.amount += event.value
+
+m = Machine()
+m.handle(Money("quarter", 25))
+print(m.state, m.amount)
+#: State.COLLECTING 25
+expect(NoTransition, m.handle, Nickel("nickel", 5))
+#: [NoTransition] no transition from <State.COLLECTING: 2>
+#: on Nickel
+
+# Fix 1: the table names Nickel too
+m1 = Machine(accept_nickels=True)
+m1.handle(Nickel("nickel", 5))
+print(m1.amount)
+#: 5
+
+# Fix 2: a Nickel that is a Money, not a subclass of one
+NICKEL = Money("nickel", 5)
+m2 = Machine()
+m2.handle(NICKEL)
+print(m2.amount)
+#: 5
+```
+
+The exception is `NoTransition`, not a `TypeError` or a silent no-op,
+and its message names the event class that found no row: `Nickel`.
+`handle()` looks up `(self.state, type(event))`, and
+`type(Nickel("nickel", 5))` is `Nickel`. A dictionary probe compares
+keys by equality, so the `Nickel` key misses the `Money` row even
+though `Nickel` subclasses `Money`. Nothing walks the MRO. That lookup
+is the exact-type dispatch the chapter describes, and a subclass of an
+event type is how most readers first meet it.
+
+**Fix 1** adds `(state, Nickel)` rows. Those rows work, and they scale
+badly: every new denomination needs a row for every state that accepts
+money, so a machine with five states and six coins carries thirty rows
+that all do the same thing. Fix 1 is the right fix when the new
+subclass really does behave differently, as `FirstDigit` and
+`SecondDigit` do in `vending_machine.py`. They exist as separate
+classes so they arrive under different keys.
+
+**Fix 2** stops making a class for something that is a value. A nickel
+is not a new kind of money. It is a `Money` whose `value` is 5.
+`Money("nickel", 5)` arrives under a key the table has, so the table
+and the classes stay as they are.
+
+Keep fix 2. A subclass is worth creating when the machine must treat
+the input differently. A nickel differs from a quarter only in a
+number the existing action already reads. The two fixes illustrate a
+general rule: under exact-type dispatch, a class is a dispatch key,
+so create one when you want a separate row and not when you want a
+separate value.

@@ -73,6 +73,7 @@ from pathlib import Path
 
 from tools.config import BUILD_DIR, DATA_DIR, ROOT
 from tools.markdown import Block, Document
+from tools.repo import chapter_stem, is_solutions_file, md_files
 from tools.report import Finding, report
 
 BASELINE = DATA_DIR / "quoted_diagnostics_baseline.txt"
@@ -115,12 +116,14 @@ def listing_dirs(md: Path) -> list[Path]:
     listing, so its chapter directory under build/examples is searched
     after its own, and the shared helpers in build/examples/utils last.
     """
-    tree = TREES.get(md.parent.name)
+    tree = (TREES["Solutions"] if is_solutions_file(md)
+            else TREES.get(md.parent.name))
     if tree is None:
         return []
-    dirs = [tree / md.stem]
+    stem = chapter_stem(md)
+    dirs = [tree / stem]
     if tree is not TREES["Chapters"]:
-        dirs.append(TREES["Chapters"] / md.stem)
+        dirs.append(TREES["Chapters"] / stem)
     dirs.append(TREES["Chapters"] / "utils")
     return dirs
 
@@ -327,9 +330,8 @@ def main(argv: list[str] | None = None) -> int:
                          "`# type: ignore` that the prose never mentions "
                          "(report-only, no baseline)")
     args = ap.parse_args(argv)
-    paths = [Path(p) for p in args.paths] or sorted(
-        list((ROOT / "Chapters").glob("*.md"))
-        + list((ROOT / "Solutions").glob("*.md")))
+    paths = [Path(p) for p in args.paths] or md_files(
+        [ROOT / "Chapters", ROOT / "Solutions"])
     if args.pragmas:
         return report(
             [f for p in paths

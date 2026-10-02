@@ -25,18 +25,70 @@ import shutil
 import subprocess
 from pathlib import Path
 
-from tools.config import CHAPTERS_DIR, PATH_LINE_RE
+from tools.config import (
+    CHAPTERS_DIR,
+    PATH_LINE_RE,
+    SOLUTIONS_DIR,
+    SOLUTIONS_MD,
+)
+
+
+def is_solutions_file(path: str | Path) -> bool:
+    """True for a chapter's authored solutions, `Solutions/<stem>/README.md`.
+
+    Chapters/ and Solutions/ share a chapter's name by design, and a
+    solutions file is the one book Markdown whose own name says nothing
+    about its chapter: the directory above it does.
+    """
+    path = Path(path)
+    return path.name == SOLUTIONS_MD and path.parent.parent.name == "Solutions"
+
+
+def chapter_stem(path: str | Path) -> str:
+    """The chapter a book Markdown file belongs to, as a name.
+
+    `Chapters/02_Foundations--Tour.md` and
+    `Solutions/02_Foundations--Tour/README.md` both give
+    `02_Foundations--Tour`. Use this wherever a file's stem or name
+    would otherwise stand for its chapter, since a solutions file's
+    own stem is `README`.
+    """
+    path = Path(path)
+    return path.parent.name if is_solutions_file(path) else path.stem
+
+
+def solutions_file(
+    chapter: str | Path, solutions_dir: Path = SOLUTIONS_DIR,
+) -> Path:
+    """The solutions file for a chapter, given its path, filename, or stem.
+
+    Neither the chapter nor the file need exist: this builds the path
+    `Solutions/<stem>/README.md` under `solutions_dir`.
+    """
+    return solutions_dir / chapter_stem(chapter) / SOLUTIONS_MD
+
+
+def solutions_files(root: Path = SOLUTIONS_DIR) -> list[Path]:
+    """Every chapter's solutions file under `root`, sorted by chapter."""
+    return sorted(root.glob(f"*/{SOLUTIONS_MD}"))
 
 
 def md_files(paths: list[str | Path] | None = None) -> list[Path]:
-    """Markdown files named directly, or every *.md in a named directory.
+    """Markdown files named directly, or every book *.md in a directory.
 
-    Defaults to CHAPTERS_DIR when `paths` is empty or None.
+    A directory yields its flat `*.md` files plus each `*/README.md`,
+    so Chapters/ gives the chapters and Solutions/ gives one solutions
+    file per chapter directory. Defaults to CHAPTERS_DIR when `paths`
+    is empty or None.
     """
     files: list[Path] = []
     for p in (paths or [CHAPTERS_DIR]):
         path = Path(p)
-        files.extend(sorted(path.glob("*.md")) if path.is_dir() else [path])
+        if path.is_dir():
+            files.extend(sorted([*path.glob("*.md"),
+                                 *path.glob(f"*/{SOLUTIONS_MD}")]))
+        else:
+            files.append(path)
     return files
 
 

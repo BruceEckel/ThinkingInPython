@@ -29,7 +29,7 @@ from pathlib import Path
 from tools.config import CHAPTERS_DIR, PATH_LINE_RE, ROOT
 from tools.config import EXAMPLES_TREE as DEFAULT_TREE
 from tools.pycode import walk_fenced
-from tools.repo import write_text_lf
+from tools.repo import chapter_stem, md_files, write_text_lf
 
 
 def block_slug(block: list[str]) -> str | None:
@@ -111,7 +111,7 @@ def collect_markdown(targets: list[Path]) -> list[Path]:
     files: list[Path] = []
     for t in targets:
         if t.is_dir():
-            files.extend(sorted(t.glob('*.md')))
+            files.extend(md_files([t]))
         elif t.suffix == '.md':
             files.append(t)
     return files
@@ -148,7 +148,7 @@ def main(argv: list[str] | None = None) -> int:
     files = collect_markdown(args.targets)
     total = 0
     for md in files:
-        chapter = md.stem
+        chapter = chapter_stem(md)
 
         def fixed_for(slug: str | None) -> str | None:
             if slug is None:
@@ -165,9 +165,9 @@ def main(argv: list[str] | None = None) -> int:
         total += len(changed)
         if args.fix:
             write_text_lf(md, new_text)
-            print(f"organized {md.name}: {', '.join(changed)}")
+            print(f"organized {chapter}.md: {', '.join(changed)}")
         else:
-            print(f"{md.name}: would organize {', '.join(changed)}")
+            print(f"{chapter}.md: would organize {', '.join(changed)}")
 
     if total == 0:
         print("Imports OK: every listing is organized.")

@@ -80,7 +80,7 @@ from pathlib import Path
 from tools import judgments
 from tools.config import CHAPTERS_DIR, DATA_DIR
 from tools.markdown import Document
-from tools.repo import add_paths_arg, md_files
+from tools.repo import add_paths_arg, chapter_stem, md_files
 from tools.report import Check, Finding, report
 
 WAIVERS_FILE = DATA_DIR / "self_reference_ok.txt"
@@ -333,8 +333,9 @@ def corpus() -> dict[str, Chapter]:
 def scan(doc: Document, waivers: frozenset[str]) -> Iterator[Finding]:
     """Every self-reference a literal search disproves."""
     book = corpus()
-    here = book.get(doc.path.name)
-    stem = doc.path.stem
+    own = f"{chapter_stem(doc.path)}.md"
+    here = book.get(own)
+    stem = chapter_stem(doc.path)
     for line, text in sentences(doc):
         # dict.fromkeys, not set: the report reads better in the order
         # the sentence names things, and a term repeated in one sentence
@@ -348,7 +349,7 @@ def scan(doc: Document, waivers: frozenset[str]) -> Iterator[Finding]:
                     continue
                 others = sorted(
                     name for name, chapter in book.items()
-                    if name != doc.path.name and chapter.uses(term))
+                    if name != own and chapter.uses(term))
                 if others:
                     shown = ", ".join(c.split("_", 1)[0] for c in others[:4])
                     more = "" if len(others) <= 4 else f" +{len(others) - 4}"
@@ -427,9 +428,9 @@ def grounding_sites(doc: Document, waivers: frozenset[str]
     chapter.
     """
     book = corpus()
-    if doc.path.name not in book:
+    if f"{chapter_stem(doc.path)}.md" not in book:
         return
-    stem = doc.path.stem
+    stem = chapter_stem(doc.path)
     previous = ""
     for line, text in sentences(doc):
         live = [

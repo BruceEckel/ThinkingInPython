@@ -88,9 +88,20 @@ from pathlib import Path
 from tools.config import EXAMPLES_TREE as DEFAULT_TREE, utils_dir
 from tools.skip_stamps import (
     forced_full, marker_context, markers_current, record_markers)
-from tools.config import INLINE_NORUN_MARKER, NORUN_FILE, TIMING_FILE
+from tools.config import (
+    INLINE_NORUN_MARKER,
+    NORUN_FILE,
+    SOLUTIONS_MD,
+    TIMING_FILE,
+)
 from tools.pycode import walk_fenced
-from tools.repo import add_jobs_arg, block_slug, load_glob_list, write_text_lf
+from tools.repo import (
+    add_jobs_arg,
+    block_slug,
+    chapter_stem,
+    load_glob_list,
+    write_text_lf,
+)
 
 # Matches #: or #: <content> at column 0 only.
 MARKER_RE = re.compile(r'^#:(?: (.*))?$')
@@ -375,7 +386,7 @@ def process_markdown(
     """
     skips = skips or []
     claims = claims or []
-    chapter = path.stem
+    chapter = chapter_stem(path)
     lines = path.read_text(encoding='utf-8').splitlines(keepends=True)
 
     out: list[str] = []
@@ -562,6 +573,22 @@ def run_watched(
     return False, notes + f"; hung in all {attempts} runs\n"
 
 
+def generated_beside_markdown(path: Path, root: Path) -> bool:
+    """True for a .py file under a directory holding a solutions README.
+
+    Solutions/<chapter>/ holds the authored README.md beside the .py files
+    extracted from it, and a chapter can nest packages below that
+    (Solutions/06_.../a_package/). The Markdown is the source of truth and
+    its blocks already run, so a walk of `root` must not run the
+    generated copies too (and, with --update, must not rewrite them).
+    """
+    if path.suffix != '.py':
+        return False
+    below = path.relative_to(root).parent
+    return any((root / d / SOLUTIONS_MD).is_file()
+               for d in (below, *below.parents) if d != Path('.'))
+
+
 def collect_files(targets: list[Path]) -> list[Path]:
     files: list[Path] = []
     for t in targets:
@@ -570,6 +597,7 @@ def collect_files(targets: list[Path]) -> list[Path]:
                 sorted(
                     p for p in t.rglob('*')
                     if p.suffix in ('.py', '.md')
+                    and not generated_beside_markdown(p, t)
                 )
             )
         elif t.suffix in ('.py', '.md'):

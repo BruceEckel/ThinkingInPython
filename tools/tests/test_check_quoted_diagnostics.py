@@ -9,6 +9,8 @@ counts as a match, what is reported, and how the baseline behaves.
 from collections import Counter
 from pathlib import Path
 
+import pytest
+
 from tools import check_quoted_diagnostics as cqd
 from tools.markdown import Document
 from tools.report import Finding
@@ -189,3 +191,16 @@ def test_a_scoped_run_ignores_other_files_baseline_entries() -> None:
     now, new, gone = cqd.delta([], cqd.scoped(accepted, [here]))
     assert gone == Counter([mine])
     assert not new
+
+
+def test_a_solutions_readme_looks_in_its_chapters_directories(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    solutions = tmp_path / "Solutions" / "05_F"
+    solutions.mkdir(parents=True)
+    md = solutions / "README.md"
+    monkeypatch.setitem(cqd.TREES, "Solutions", tmp_path / "built")
+    monkeypatch.setitem(cqd.TREES, "Chapters", tmp_path / "examples")
+    dirs = cqd.listing_dirs(md)
+    assert dirs[0] == tmp_path / "built" / "05_F"
+    assert dirs[1] == tmp_path / "examples" / "05_F"
+    assert cqd.entry_path(md).endswith("Solutions/05_F/README.md")

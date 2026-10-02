@@ -31,7 +31,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from tools.markdown import Block, Document
-from tools.repo import write_text_lf
+from tools.repo import chapter_stem, write_text_lf
 
 Router = Callable[[Document, Block], str | None]
 """Where a block extracts to, relative to the tool's root, or None to pass."""
@@ -101,11 +101,11 @@ def extract(
             existing = result.files.get(rel)
             if existing and existing.content != content:
                 result.conflicts.append(
-                    Conflict(rel, existing.source_md, doc.path.name)
+                    Conflict(rel, existing.source_md, f"{chapter_stem(doc.path)}.md")
                 )
                 continue
             result.files[rel] = ExtractedFile(
-                rel, content, doc.path.name, block.lang
+                rel, content, f"{chapter_stem(doc.path)}.md", block.lang
             )
     return result
 

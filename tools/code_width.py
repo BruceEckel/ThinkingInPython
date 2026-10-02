@@ -12,7 +12,7 @@ The report is a self-contained HTML page, written to
 build/reports/code_width.html and served from a local port so a click
 can reach the editor (below); the default browser opens on it. It
 groups the lines by chapter, and each row names the extracted file
-and line (`Examples/` for Chapters/, `SolutionsCode/` for Solutions/,
+and line (`Examples/` for Chapters/, `Solutions/` for Solutions/,
 `(fragment)` for a block extract_examples.py never writes), the
 Markdown line, the width, and the line itself with everything past
 the limit highlighted. The page carries every line wider than
@@ -73,7 +73,13 @@ from tools.listing_width import WIDTH_LIMIT, _effective_width, _triple_states
 from tools.config import BUILD_DIR, ROOT
 from tools.markdown import Document
 from tools.pycode import scan_line
-from tools.repo import add_paths_arg, md_files, write_text_lf
+from tools.repo import (
+    add_paths_arg,
+    chapter_stem,
+    is_solutions_file,
+    md_files,
+    write_text_lf,
+)
 
 DEFAULT_WIDTH = 60
 # The slider's range. Every line wider than SLIDER_MIN is embedded in
@@ -81,7 +87,7 @@ DEFAULT_WIDTH = 60
 SLIDER_MIN, SLIDER_MAX = 40, 80
 REPORT: Final = BUILD_DIR / "reports" / "code_width.html"
 # Where each Markdown tree's blocks extract to, by the tree's dir name.
-TREES = {"Chapters": "Examples", "Solutions": "SolutionsCode"}
+TREES = {"Chapters": "Examples", "Solutions": "Solutions"}
 FRAGMENT: Final = "(fragment)"
 # Where Zed's per-user installer puts the CLI, when it is not on PATH.
 ZED_INSTALLS: Final = (
@@ -130,8 +136,9 @@ def find(doc: Document, width: int) -> Iterator[Wide]:
         source = doc.path.relative_to(ROOT).as_posix()
     except ValueError:
         source = doc.path.as_posix()
-    tree_root = TREES.get(doc.path.parent.name, doc.path.parent.name)
-    tree = f"{tree_root}/{doc.path.stem}"
+    stem = chapter_stem(doc.path)
+    folder = "Solutions" if is_solutions_file(doc.path) else doc.path.parent.name
+    tree = f"{TREES.get(folder, folder)}/{stem}"
     for block in doc.python_blocks():
         target = route(doc, block)
         triples = _triple_states(block.lines)
@@ -144,7 +151,7 @@ def find(doc: Document, width: int) -> Iterator[Wide]:
             else:
                 # route() prefixes the chapter stem (or utils/); the row
                 # shows only the part below the group's directory.
-                name = target.removeprefix(f"{doc.path.stem}/")
+                name = target.removeprefix(f"{stem}/")
                 code = f"{name}:{i + 1}"
             yield Wide(source, doc.path, tree, code, block.line_number(i),
                        len(line), _effective_width(block.lines, i, triples),

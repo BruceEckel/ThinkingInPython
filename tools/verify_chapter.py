@@ -26,8 +26,8 @@ The steps, in order, mirror `verify` (fixers first, markers before sync):
    refreshing their ``#:`` markers. This is the step the full gate spends
    its time on, and the one worth narrowing. A rewritten marker triggers
    a second extract so the build trees carry the new text.
-6. Sync ``Examples/`` and ``SolutionsCode/`` from the Markdown, then the
-   drift and orphan checks over both.
+6. Sync ``Examples/`` and the code beside ``Solutions/<chapter>/README.md``
+   from the Markdown, then the drift and orphan checks over both.
 7. The Markdown gates: ``check_all`` on the chapter (every gate check, or
    the ``--checks`` list tools/tasks.py passes from ``GATE_CHECKS``),
    ``anchors`` and ``widths`` on the Solutions file, quoted ``ty``
@@ -50,7 +50,8 @@ import sys
 from pathlib import Path
 
 from tools.check_chapter import resolve, run, run_markers
-from tools.config import BUILD_DIR, EXAMPLES_TREE, ROOT
+from tools.config import BUILD_DIR, EXAMPLES_TREE, ROOT, SOLUTIONS_MD
+from tools.repo import chapter_stem, solutions_file
 
 PY = [sys.executable]
 NO_TESTS_COLLECTED = 5  # pytest's exit code for an empty directory
@@ -91,11 +92,12 @@ def main(argv: list[str] | None = None) -> int:
     args = ap.parse_args(argv)
 
     md = resolve(args.chapter)
-    sol = SOLUTIONS_DIR / md.name
+    sol = solutions_file(md, SOLUTIONS_DIR)
     prose = [md, sol] if sol.exists() else [md]
     number = md.stem.split("_", 1)[0]
     print(f"Verifying {md.name}"
-          + (f" and Solutions/{sol.name}" if sol.exists() else "")
+          + (f" and Solutions/{chapter_stem(md)}/{SOLUTIONS_MD}"
+             if sol.exists() else "")
           + "\n")
 
     results = [
@@ -124,7 +126,7 @@ def main(argv: list[str] | None = None) -> int:
 
     results += [
         run("sync", [*extract, "-o", "Examples"]),
-        run("solutions-sync", [*extract_sol, "-o", "SolutionsCode"]),
+        run("solutions-sync", [*extract_sol, "-o", "Solutions"]),
         run("drift", [*PY, "-m", "tools.extract_examples"]),
         run("solutions-drift", [*PY, "-m", "tools.extract_solutions"]),
         run("checks",

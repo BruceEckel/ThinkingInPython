@@ -211,8 +211,7 @@ The words "observer" and "listener" name a role that waits and watches,
 and neither word says what happens when the change arrives.
 "Responder" names the action.
 That word points you at the question every *Observer* design must answer:
-what does this code do when a change reaches it?
-The rest of the chapter repeats that question.
+what does this code do when there's a change?
 A responder can disconnect itself mid-notification, raise an exception,
 wait on a slow network call, or write back to its broadcaster,
 and each of those behaviors changes how the broadcaster is written.
@@ -220,7 +219,7 @@ and each of those behaviors changes how the broadcaster is written.
 ## The Pythonic Observer
 
 A responder is any callable that takes a notification and returns `None`.
-A broadcaster keeps a list of those callables and announces each change to every one:
+A broadcaster keeps a list of those callables and announces a change to every responder:
 
 ```python
 # broadcaster.py
@@ -245,12 +244,14 @@ class Broadcaster[T]:
 
 Four things from the classic version disappear: the `Observer` interface,
 its `update()` method, a class per reaction, and the `subject` argument.
+`update()` is the observer's method, and nothing replaces it.
 A classic observer is an object,
 so `notify()` calls the method its interface names, `update()`.
 In Python the responder is a callable, so `announce()` calls it directly:
 `responder(data)`, whereas the classic version calls `observer.update(self, arg)`.
-The remaining method names change as well:
-GoF's `attach()` and `detach()` become `connect()` and `disconnect()`.
+The subject's three methods keep their jobs and change their names:
+GoF's `attach()`, `detach()`, and `notify()` become `connect()`, `disconnect()`,
+and `announce()`.
 A responder that needs the changed object takes it as part of the payload
 (`announce((self, value))`),
 or is a bound method of an object that holds a reference to the broadcaster.
@@ -293,6 +294,14 @@ class Thermometer(Broadcaster[float]):
         self._celsius = value
         self.announce(value)
 ```
+
+The setter does two things.
+Storing the new reading is the change.
+Calling `announce()` is what the thermometer chooses to do about that change,
+and the method is named for the choice.
+This setter announces every assignment.
+[Deciding What Matters](#deciding-what-matters)
+shows a setter that announces a reading when it differs enough from the previous reading.
 
 The constructor assigns its argument to `_celsius` directly,
 bypassing the setter, so creating a `Thermometer` announces nothing.
@@ -1520,7 +1529,7 @@ instead of guessing which responders need it.
 
 ## Exercises
 
-Each exercise is answered in this chapter's [solutions](../Solutions/30_Patterns--Observer.md).
+Each exercise is answered in this chapter's [solutions](../Solutions/30_Patterns--Observer/).
 
 1.  Create a minimal *Observer* design of your own,
     without looking at `broadcaster.py`:

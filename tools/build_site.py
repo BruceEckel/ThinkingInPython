@@ -71,10 +71,12 @@ RELEASE_URL = f"{REPO_URL}/releases/latest"
 # test them. Renaming that heading breaks this anchor, and nothing
 # checks it: GitHub serves the page either way, just unscrolled.
 EXAMPLES_URL = f"{REPO_URL}#examples-and-solutions"
-# Where a chapter's Solutions file lives on GitHub. The built site,
-# EPUB, and PDF carry only the chapters, so link_solutions() points
-# each chapter's relative `../Solutions/` link here.
-SOLUTIONS_URL = f"{REPO_URL}/blob/master/Solutions"
+# Where a chapter's Solutions folder (a `tree` URL) and the README.md in
+# it (a `blob` URL) live on GitHub. The built site, EPUB, and PDF carry
+# only the chapters, so link_solutions() points each chapter's relative
+# `../Solutions/` link here.
+SOLUTIONS_TREE_URL = f"{REPO_URL}/tree/master/Solutions"
+SOLUTIONS_BLOB_URL = f"{REPO_URL}/blob/master/Solutions"
 SPONSORS_URL = "https://github.com/sponsors/BruceEckel"
 KOFI_URL = "https://ko-fi.com/bruceeckel"
 HEADING_FONT = "Lexend Deca"
@@ -114,14 +116,28 @@ def derive_label(stem: str) -> str:
     return re.sub(r"^\d+_", "", stem).replace("_", " ")
 
 
-SOLUTIONS_LINK = re.compile(r"\]\(\.\./Solutions/([\w.-]+\.md)(#[^)\s]*)?\)")
+# `](../Solutions/<stem>/)` is the folder; `](../Solutions/<stem>/README.md)`
+# is the file in it. Group 1 is the stem, group 2 is "README.md" for the
+# file form, and group 3 is an optional anchor.
+SOLUTIONS_LINK = re.compile(
+    r"\]\(\.\./Solutions/([\w.-]+)/(README\.md)?(#[^)\s]*)?\)")
+
+
+def solutions_url(m: re.Match[str]) -> str:
+    """The replacement for one `SOLUTIONS_LINK` match."""
+    stem, readme, anchor = m.group(1), m.group(2), m.group(3) or ""
+    if readme:
+        return f"]({SOLUTIONS_BLOB_URL}/{stem}/{readme}{anchor})"
+    return f"]({SOLUTIONS_TREE_URL}/{stem}{anchor})"
 
 
 def link_solutions(body: str) -> str:
-    """Point each `](../Solutions/<file>.md)` link at the GitHub URL.
+    """Point each `](../Solutions/<stem>/)` link at the GitHub URL.
 
-    A chapter links its Solutions file with a relative path, so a reader
-    on GitHub can click through. The site and the EPUB and PDF carry no
+    A chapter links its Solutions folder with a relative path, so a reader
+    on GitHub can click through. The folder becomes a `tree` URL (GitHub
+    renders its README.md under the file list), and a link to the
+    README.md itself becomes a `blob` URL. The site and the EPUB and PDF carry no
     Solutions pages. The site's `rewrite_md_links()` would turn the
     relative link into a dead `.html` link, and `build_epub.relink()`
     reports a link to an unknown chapter and exits nonzero, which fails
@@ -134,9 +150,7 @@ def link_solutions(body: str) -> str:
     fenced = Document.from_text(body).in_fence()
     for i, line in enumerate(lines):
         if not fenced[i]:
-            lines[i] = SOLUTIONS_LINK.sub(
-                lambda m: f"]({SOLUTIONS_URL}/{m.group(1)}"
-                          f"{m.group(2) or ''})", line)
+            lines[i] = SOLUTIONS_LINK.sub(solutions_url, line)
     return "\n".join(lines)
 
 

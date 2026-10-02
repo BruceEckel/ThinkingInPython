@@ -22,6 +22,11 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 TOOLS_DIR = ROOT / "tools"
 CHAPTERS_DIR = ROOT / "Chapters"
+# Each chapter's worked exercises live in Solutions/<chapter stem>/: the
+# authored SOLUTIONS_MD beside the .py files extracted from it. The
+# helpers that read this layout are in tools/repo.py.
+SOLUTIONS_DIR = ROOT / "Solutions"
+SOLUTIONS_MD = "README.md"
 PYVER = ROOT / ".python-version"
 
 # The word lists, allowlists, and glob lists the scripts read. Kept in

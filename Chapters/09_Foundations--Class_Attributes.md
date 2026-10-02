@@ -589,7 +589,7 @@ a constructor default or a `@dataclass` field for per-object.
 
 ## Exercises
 
-Each exercise is answered in this chapter's [solutions](../Solutions/09_Foundations--Class_Attributes.md).
+Each exercise is answered in this chapter's [solutions](../Solutions/09_Foundations--Class_Attributes/).
 
 1.  In `class_attribute_confusion.py`,
     add a third instance `c = Stars()` after the `Stars.rating = 9` line,

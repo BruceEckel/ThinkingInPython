@@ -23,7 +23,7 @@ from functools import cache
 from pathlib import Path
 
 from tools.markdown import Document
-from tools.repo import add_paths_arg, md_files
+from tools.repo import add_paths_arg, is_solutions_file, md_files
 from tools.report import Check, Finding, report
 
 EXPLICIT_ID = re.compile(r"\{#([\w-]+)[^}]*\}\s*$")
@@ -111,7 +111,8 @@ def find(doc: Document) -> Iterator[Finding]:
     own = frozenset(heading_anchors(doc))
     # Only the book's files pass through build_site and build_epub;
     # tools/README.md is rendered by GitHub, where such anchors work.
-    built = doc.path.parent.name in BUILT_DIRS
+    built = (doc.path.parent.name in BUILT_DIRS
+             or is_solutions_file(doc.path))
     for lineno, stem, anchor in anchor_links(doc):
         if built and not ANCHOR_TARGET.match(f"#{anchor}"):
             yield Finding(

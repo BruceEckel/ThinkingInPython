@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check that Solutions/NN_*.md answers the exercises Chapters/NN_*.md asks.
+"""Check that Solutions/NN_*/README.md answers what Chapters/NN_*.md asks.
 
 `heading_links.py` gates anchors and `extract_solutions.py` gates the code,
 but the correspondence between a chapter's "## Exercises" list and its
@@ -22,7 +22,7 @@ This compares the two numberings:
 Reported: a chapter with exercises and no Solutions file, an exercise with
 no solution, a solution with no exercise, either list numbered other
 than 1..N in order, and a chapter whose Exercises section lacks a link
-to its Solutions file. What it cannot see is a solution that answers the
+to its Solutions folder. What it cannot see is a solution that answers the
 wrong exercise under the right number; that still needs a human reading
 the two side by side.
 
@@ -31,26 +31,32 @@ named `exercise_N.py` (or `exercise_Nb.py`, `exercise_N_frozen.py`) must
 have N == 3, or one of the numbers a combined heading names. Reordering
 a chapter's exercises renumbers the headings, and the names stay behind
 with nothing else reading them: chapter 30 kept `exercise_3.py` under
-`## 2.` that way, so `SolutionsCode/.../exercise_2.py` held the answer
+`## 2.` that way, so `Solutions/.../exercise_2.py` held the answer
 to exercise 4. A listing with any other name (a test file, a helper) is
 exempt.
 
-It also checks how a solution *cites* its chapter. `Solutions/` sits
-beside `Chapters/`, so a link written the way a chapter writes it,
-`](24_Patterns--Singleton.md#...)`, resolves to `Solutions/24_Patterns--Singleton.md`, a real
-file with the wrong content. The correct form is `../Chapters/24_Patterns--Singleton.md`.
-Seventeen links were wrong this way before anything looked. Write `./` on
-the front for a deliberate link to a neighboring solution.
+It also checks how a solution *cites* its chapter. A solutions file sits
+two directories below the book root (`Solutions/<chapter>/README.md`), so
+a link written the way a chapter writes it, `](24_Patterns--Singleton.md#...)`,
+resolves inside the chapter's solutions folder, and the one-level form
+`](../Chapters/24_Patterns--Singleton.md)` resolves inside `Solutions/`;
+both miss. The correct form is `../../Chapters/24_Patterns--Singleton.md`.
+Seventeen links were wrong this way before anything looked, and
+`heading_links.py` checks only links that carry an `#anchor`. Write `./`
+on the front for a deliberate link to a neighboring file.
 
-Each chapter with exercises also links its Solutions file from the
+Each chapter with exercises also links its Solutions folder from the
 Exercises section, so a reader browsing `Chapters/` on GitHub can click
 through. Between the last `## Exercises` heading and the first exercise
-there must be a link of the form `](../Solutions/<chapter filename>)`.
-A missing link is reported, and so is a link to another file, which a
-chapter rename leaves behind. The check holds the link target only; the
-sentence around it is the author's to reword. `--write` inserts the
-default sentence where the link is missing and corrects a stale target,
-keeping the author's wording.
+there must be a link of the form `](../Solutions/<chapter stem>/)`; the
+file form `](../Solutions/<chapter stem>/README.md)`, with an optional
+`#anchor`, is accepted too. A missing link is reported, and so is a
+link to another target, which a chapter rename (or the old flat
+`../Solutions/<stem>.md` layout) leaves behind. The check holds the
+link target only; the sentence around it is the author's to reword.
+`--write` inserts the default sentence where the link is missing and
+corrects a stale target to the folder form, keeping the author's
+wording.
 
 Usage:
     python -m tools.check_solutions           # every chapter
@@ -63,12 +69,10 @@ import re
 from collections.abc import Iterator
 from pathlib import Path
 
-from tools.config import ROOT
+from tools.config import CHAPTERS_DIR, SOLUTIONS_DIR, SOLUTIONS_MD
 from tools.markdown import Document
+from tools.repo import chapter_stem, solutions_file
 from tools.report import Finding, report
-
-CHAPTERS_DIR = ROOT / "Chapters"
-SOLUTIONS_DIR = ROOT / "Solutions"
 
 # The heading that opens a chapter's exercise list.
 EXERCISES_HEADING = re.compile(r"^#{1,6}\s+Exercises\s*$")
@@ -99,16 +103,26 @@ EXERCISE_LISTING = re.compile(r"^exercise_(\d+)")
 # silently stops matching every chapter and reports nothing.
 BARE_CHAPTER_LINK = re.compile(r"\]\((\d{2}_[A-Za-z_-]+\.md)([^)]*)\)")
 
-# A link from a chapter to a file in Solutions/, with an optional anchor:
-# "](../Solutions/02_Foundations--Tour.md)". Group 1 is the file name.
-SOLUTIONS_LINK = re.compile(
-    r"\]\(\.\./Solutions/([\w.-]+\.md)(#[^)\s]*)?\)")
+# A link to a chapter one level up, which from `Solutions/<chapter>/` is
+# a path inside Solutions/: "](../Chapters/24_Patterns--Singleton.md)".
+# Group 1 is the rest of the target. `](../../Chapters/` does not match.
+SHALLOW_CHAPTER_LINK = re.compile(r"\]\(\.\./Chapters/([^)\s]*)")
+
+# A link from a chapter into Solutions/, with an optional anchor:
+# "](../Solutions/02_Foundations--Tour/)". Group 1 is the target below
+# Solutions/ (a folder with its slash, a file, or a stale flat name).
+SOLUTIONS_LINK = re.compile(r"\]\(\.\./Solutions/([^)\s#]*)(#[^)\s]*)?\)")
 
 
-def solutions_sentence(name: str) -> str:
-    """The default sentence that links a chapter to its Solutions file."""
+def solutions_targets(stem: str) -> tuple[str, str]:
+    """The link targets, below Solutions/, that count as correct."""
+    return f"{stem}/", f"{stem}/{SOLUTIONS_MD}"
+
+
+def solutions_sentence(stem: str) -> str:
+    """The default sentence that links a chapter to its Solutions folder."""
     return (f"Each exercise is answered in this chapter's "
-            f"[solutions](../Solutions/{name}).")
+            f"[solutions](../Solutions/{stem}/).")
 
 
 def intro_span(doc: Document) -> tuple[int, int] | None:
@@ -129,7 +143,7 @@ def intro_span(doc: Document) -> tuple[int, int] | None:
 
 
 def span_links(doc: Document, span: tuple[int, int]) -> Iterator[tuple[int, str]]:
-    """(0-based line, file name) for each Solutions link in the span."""
+    """(0-based line, target below Solutions/) for each link in the span."""
     fenced = doc.in_fence()
     for i in range(span[0] + 1, span[1]):
         if fenced[i]:
@@ -144,46 +158,49 @@ def solutions_links(chapter: Path, doc: Document) -> Iterator[Finding]:
     if span is None:
         return
     links = list(span_links(doc, span))
-    if any(name == chapter.name for _, name in links):
+    stem = chapter_stem(chapter)
+    if any(target in solutions_targets(stem) for _, target in links):
         return
     fix = "run `tip fix-solutions-links`"
     if not links:
         yield Finding(
             chapter, span[0] + 1,
-            f"no link to Solutions/{chapter.name} under the Exercises "
+            f"no link to Solutions/{stem}/ under the Exercises "
             f"heading; {fix}")
-    for i, name in links:
+    for i, target in links:
         yield Finding(
             chapter, i + 1,
-            f"link names Solutions/{name}, but this chapter is "
-            f"{chapter.name}; {fix}")
+            f"link names Solutions/{target}, but this chapter is "
+            f"{stem}; {fix}")
 
 
 def with_solutions_link(text: str, name: str) -> str:
     """`text` with its Solutions link inserted, or its target corrected.
 
-    A link that names another file keeps its wording and anchor and
-    changes only the file. With no link, the default sentence goes in as
+    `name` is the chapter's stem or filename. A link that names another
+    target keeps its wording and anchor and changes only the target, to
+    the folder form. With no link, the default sentence goes in as
     its own paragraph just before the first exercise. Line endings and
     every other line stay as they are.
     """
+    stem = chapter_stem(name)
     doc = Document.from_text(text)
     span = intro_span(doc)
     if span is None:
         return text
     links = list(span_links(doc, span))
-    if any(n == name for _, n in links):
+    if any(t in solutions_targets(stem) for _, t in links):
         return text
     lines = list(doc.lines)
     if links:
         for i, _ in links:
             lines[i] = SOLUTIONS_LINK.sub(
-                lambda m: f"](../Solutions/{name}{m.group(2) or ''})",
+                lambda m: f"](../Solutions/{stem}/{m.group(2) or ''})",
                 lines[i])
         return doc.rendered(lines)
     cr = "\r" if lines[span[0]].endswith("\r") else ""
     at = span[1]
-    new = [solutions_sentence(name) + cr, cr]
+    new = [solutions_sentence(stem) + cr, cr]
     if lines[at - 1].strip():
         new.insert(0, cr)
     lines[at:at] = new
@@ -198,7 +215,7 @@ def write_links(chapters: list[Path]) -> list[Path]:
     """
     changed: list[Path] = []
     for chapter in chapters:
-        if not (SOLUTIONS_DIR / chapter.name).exists():
+        if not solutions_file(chapter, SOLUTIONS_DIR).exists():
             continue
         old = chapter.read_bytes().decode("utf-8")
         new = with_solutions_link(old, chapter.name)
@@ -302,15 +319,24 @@ def chapter_citations(solutions: Path) -> Iterator[Finding]:
         for m in BARE_CHAPTER_LINK.finditer(line):
             yield Finding(
                 solutions, lineno,
-                f"link to {m.group(1)} resolves to Solutions/, not the "
-                f"chapter; write ../Chapters/{m.group(1)}",
+                f"link to {m.group(1)} resolves inside the solutions "
+                f"folder, not the chapter; write "
+                f"../../Chapters/{m.group(1)}",
+            )
+        for m in SHALLOW_CHAPTER_LINK.finditer(line):
+            yield Finding(
+                solutions, lineno,
+                f"link to ../Chapters/{m.group(1)} resolves inside "
+                f"Solutions/, not the chapter; write "
+                f"../../Chapters/{m.group(1)}",
             )
 
 
 def compare(chapter: Path) -> Iterator[Finding]:
     """Findings for one chapter against its Solutions file."""
     exercises = exercise_numbers(Document.parse(chapter))
-    solutions = SOLUTIONS_DIR / chapter.name
+    solutions = solutions_file(chapter, SOLUTIONS_DIR)
+    where = f"Solutions/{chapter_stem(chapter)}/{SOLUTIONS_MD}"
     if solutions.exists():
         yield from chapter_citations(solutions)
     if not exercises:
@@ -318,7 +344,7 @@ def compare(chapter: Path) -> Iterator[Finding]:
     if not solutions.exists():
         yield Finding(
             chapter, exercises[0][1],
-            f"{len(exercises)} exercise(s) but no Solutions/{chapter.name}",
+            f"{len(exercises)} exercise(s) but no {where}",
         )
         return
 
@@ -334,8 +360,7 @@ def compare(chapter: Path) -> Iterator[Finding]:
         if number not in answered:
             yield Finding(
                 chapter, line,
-                f"exercise {number} has no solution in "
-                f"Solutions/{chapter.name}",
+                f"exercise {number} has no solution in {where}",
             )
     asked = {n for n, _ in exercises}
     for number, line in answers:

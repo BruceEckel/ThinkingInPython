@@ -919,7 +919,7 @@ The forms above are the modern ones.
 
 ## Exercises
 
-Each exercise is answered in this chapter's [solutions](../Solutions/08_Foundations--Static_Types.md).
+Each exercise is answered in this chapter's [solutions](../Solutions/08_Foundations--Static_Types/).
 
 1.  In `protocols.py`, add a class `Triangle` with its own `draw()`,
     and pass an instance to `render()` without changing `Drawable` or `render()`.

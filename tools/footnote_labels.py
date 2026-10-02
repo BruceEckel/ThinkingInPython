@@ -13,7 +13,8 @@ carried chapter 11's `parametrize` footnote through release 0.5.9 that
 way; the only sign was one line in the release's build output.
 
 This check reads every `[^label]:` definition in the directory the
-checked file sits in (its siblings are the files a book build
+checked file sits in (for a `Solutions/<chapter>/README.md`, the
+`Solutions/` directory above it; its siblings are the files a book build
 concatenates) and reports a definition whose label another file, or an
 earlier line of the same file, also defines. Definitions inside fenced
 code are ignored. References are not checked: one note may be cited
@@ -31,7 +32,7 @@ from collections.abc import Iterator
 from functools import cache
 from pathlib import Path
 from tools.markdown import Document
-from tools.repo import add_paths_arg, md_files
+from tools.repo import add_paths_arg, chapter_stem, is_solutions_file, md_files
 from tools.report import Check, Finding, report
 
 DEFINITION = re.compile(r"^\[\^([^\]\s]+)\]:")
@@ -55,6 +56,15 @@ def _tree_definitions(directory: Path) -> dict[str, list[tuple[Path, int]]]:
     return found
 
 
+def book_dir(path: Path) -> Path:
+    """The directory whose files a build concatenates with `path`.
+
+    A solutions file sits one level down, in `Solutions/<chapter>/`,
+    and its siblings in the book sense are the other chapters' files.
+    """
+    return path.parent.parent if is_solutions_file(path) else path.parent
+
+
 def find(doc: Document) -> Iterator[Finding]:
     """A finding per definition in `doc` whose label is defined elsewhere.
 
@@ -63,10 +73,10 @@ def find(doc: Document) -> Iterator[Finding]:
     no siblings, so only its own duplicates are reported.
     """
     seen: dict[str, int] = {}
-    tree = (_tree_definitions(doc.path.parent.resolve())
+    tree = (_tree_definitions(book_dir(doc.path).resolve())
             if doc.path.is_file() else {})
     for lineno, label in definitions(doc):
-        others = [f"{p.name}:{n}" for p, n in tree.get(label, [])
+        others = [f"{chapter_stem(p)}.md:{n}" for p, n in tree.get(label, [])
                   if p.resolve() != doc.path.resolve()]
         if label in seen:
             others.insert(0, f"line {seen[label]}")

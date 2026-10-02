@@ -807,7 +807,7 @@ Here it keeps a decision available to whoever should make it.
 
 ## Exercises
 
-Each exercise is answered in this chapter's [solutions](../Solutions/34_Patterns--Composite_and_Interpreter.md).
+Each exercise is answered in this chapter's [solutions](../Solutions/34_Patterns--Composite_and_Interpreter/).
 
 1.  Add `find(entry, name)` to `filesystem.py`:
     a generator yielding the path of every entry whose name matches.

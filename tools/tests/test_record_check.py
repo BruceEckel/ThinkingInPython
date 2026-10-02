@@ -19,8 +19,11 @@ def doc(tmp_path: Path, text: str,
         name: str = "20_Patterns--Rethinking_Objects.md",
         tree: str = "Chapters") -> Document:
     directory = tmp_path / tree
-    directory.mkdir(exist_ok=True)
     path = directory / name
+    if tree == "Solutions":
+        # A solutions file is Solutions/<chapter stem>/README.md.
+        path = directory / Path(name).stem / "README.md"
+    path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(text, encoding="utf-8")
     return Document.parse(path)
 

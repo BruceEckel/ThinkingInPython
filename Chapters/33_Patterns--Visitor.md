@@ -449,7 +449,7 @@ use the table keyed by a tuple of types from [*Multiple Dispatching*](32_Pattern
 
 ## Exercises
 
-Each exercise is answered in this chapter's [solutions](../Solutions/33_Patterns--Visitor.md).
+Each exercise is answered in this chapter's [solutions](../Solutions/33_Patterns--Visitor/).
 
 1.  Rewrite `flower_visitors.py` with `singledispatch`:
     make `pollinate()` and `eat()` functions defined outside the `Flower` hierarchy,

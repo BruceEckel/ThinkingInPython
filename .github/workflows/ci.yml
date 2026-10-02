@@ -127,7 +127,7 @@ jobs:
       # The same five checks, applied to Solutions/ (worked exercise
       # answers), which go through a parallel extract/validate/ty/ruff/pytest
       # pipeline (tools/extract_solutions.py). See tools/README.md.
-      - name: Check solutions match Solutions/*.md
+      - name: Check solutions match Solutions/*/README.md
         run: uv run python -m tools.extract_solutions
 
       - name: Extract solutions for running

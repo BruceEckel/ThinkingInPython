@@ -459,7 +459,7 @@ and the chapters after it build a checked system on that idea.
 
 ## Exercises
 
-Each exercise is answered in this chapter's [solutions](../Solutions/43_Functional--Confidence.md).
+Each exercise is answered in this chapter's [solutions](../Solutions/43_Functional--Confidence/).
 
 1.  Change `count_primes()` to return `(count, os.getpid())` and print the distinct process IDs alongside the counts.
     Narrow `assert parallel == serial` to compare only the counts,

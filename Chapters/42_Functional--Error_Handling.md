@@ -853,7 +853,7 @@ reuses this `Result` machinery to convert Effects.
 
 ## Exercises
 
-Each exercise is answered in this chapter's [solutions](../Solutions/42_Functional--Error_Handling.md).
+Each exercise is answered in this chapter's [solutions](../Solutions/42_Functional--Error_Handling/).
 
 1.  Add a `func_d()` that returns a `Result[int, str]`,
     and extend the `bind()` chain in `composing_with_bind.py` to include it.

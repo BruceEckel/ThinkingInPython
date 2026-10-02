@@ -15,7 +15,7 @@ LIST = """\
 
 def build(tmp_path: Path) -> tuple[Path, Path, Path]:
     examples = tmp_path / "Examples"
-    solutions = tmp_path / "SolutionsCode"
+    solutions = tmp_path / "Solutions"
     for tree, rel in [(examples, "07_Classes/gui_view.py"),
                       (solutions, "38_Simulation/rats/rats_view.py")]:
         path = tree / rel
@@ -40,7 +40,7 @@ def test_a_pattern_passes_when_either_tree_matches(tmp_path: Path) -> None:
     findings = stale((skip,), (examples, solutions))
     assert [(f.line, f.path) for f in findings] == [(6, skip)]
     assert "`19_Concurrency/renamed_away.py`" in findings[0].message
-    assert "Examples/ or SolutionsCode/" in findings[0].message
+    assert "Examples/ or Solutions/" in findings[0].message
 
 def test_pycache_does_not_keep_a_pattern_alive(tmp_path: Path) -> None:
     skip, examples, solutions = build(tmp_path)

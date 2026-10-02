@@ -837,3 +837,35 @@ def test_run_watched_fails_a_process_that_dies(tmp_path: Path) -> None:
     result, output = run_watched(p, work=work_dies)
     assert result is False
     assert "exited with code 3 before reporting" in output
+
+
+# ── Solutions/<chapter>/README.md beside its generated .py files ─────────────
+
+def test_a_walk_skips_the_py_files_generated_beside_a_readme(
+        tmp_path: Path) -> None:
+    chapter = tmp_path / "02_Tour"
+    (chapter / "pkg" / "sub").mkdir(parents=True)
+    readme = chapter / "README.md"
+    readme.write_text("# s\n", encoding="utf-8")
+    for rel in ("exercise_1.py", "pkg/mod.py", "pkg/sub/deep.py"):
+        (chapter / rel).write_text("", encoding="utf-8")
+    other = tmp_path / "03_Loose"
+    other.mkdir()
+    (other / "run_me.py").write_text("", encoding="utf-8")
+    (tmp_path / "notes.md").write_text("", encoding="utf-8")
+    assert collect_files([tmp_path]) == [
+        readme, tmp_path / "03_Loose" / "run_me.py", tmp_path / "notes.md"]
+
+
+def test_a_readme_at_the_walk_root_does_not_hide_its_py_files(
+        tmp_path: Path) -> None:
+    (tmp_path / "README.md").write_text("", encoding="utf-8")
+    (tmp_path / "a.py").write_text("", encoding="utf-8")
+    assert tmp_path / "a.py" in collect_files([tmp_path])
+
+
+def test_a_py_file_named_directly_is_still_collected(tmp_path: Path) -> None:
+    (tmp_path / "README.md").write_text("", encoding="utf-8")
+    one = tmp_path / "a.py"
+    one.write_text("", encoding="utf-8")
+    assert collect_files([one]) == [one]

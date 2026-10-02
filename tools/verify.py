@@ -4,7 +4,7 @@
 `tip verify` is what to run after touching a chapter: every mutating
 fixer (the comment-style fixers, import sorting, blank-line cleanup), a
 refresh of the `#:` output markers, a sync of the committed Examples/ and
-SolutionsCode/ trees, the figure gallery, then the full gate. Each fixer
+Solutions/ code, the figure gallery, then the full gate. Each fixer
 repairs something the gate would otherwise fail on, and the gate already
 self-heals line endings, reflow, and markers, so a loop without the
 fixers would only trade a fix for a failure.

@@ -1805,7 +1805,7 @@ not just where it sits on that curve:
 
 ## Exercises
 
-Each exercise is answered in this chapter's [solutions](../Solutions/18_Techniques--Performance.md).
+Each exercise is answered in this chapter's [solutions](../Solutions/18_Techniques--Performance/).
 
 1.  `membership.py` sets `target` to the worst case, the last element.
     Measure the average case by timing lookups of many random targets,

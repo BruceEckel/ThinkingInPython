@@ -84,9 +84,9 @@ def test_anchor_and_book_links_gain_the_chapters_prefix() -> None:
         "See [x](#a-heading) and [y](17_Techniques--Metaprogramming.md#z)"
         " and [z](A_Effect_Tracking.md).", NAME)
     assert text == (
-        f"See [x](../Chapters/{NAME}#a-heading) and "
-        "[y](../Chapters/17_Techniques--Metaprogramming.md#z) and "
-        "[z](../Chapters/A_Effect_Tracking.md).")
+        f"See [x](../../Chapters/{NAME}#a-heading) and "
+        "[y](../../Chapters/17_Techniques--Metaprogramming.md#z) and "
+        "[z](../../Chapters/A_Effect_Tracking.md).")
 
 
 def test_code_spans_and_other_links_are_left_alone() -> None:
@@ -143,8 +143,8 @@ def test_generated_lines_are_the_quote_lines_only() -> None:
 
 def test_exercise_refs_skips_the_generated_statement(
         tmp_path: Path) -> None:
-    path = tmp_path / "Solutions" / "05_Foundations--Demo.md"
-    path.parent.mkdir()
+    path = tmp_path / "Solutions" / "05_Foundations--Demo" / "README.md"
+    path.parent.mkdir(parents=True)
     path.write_text(
         "## 1. A\n\n> See exercise 2 for the rest.\n\n"
         "Body mentions exercise 2 again.\n\n## 2. B\n\nText.\n",

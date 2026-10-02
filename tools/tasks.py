@@ -54,7 +54,7 @@ GATE_CHECKS = ("listings widths banned comment-periods comment-caps "
 # Two of these links were dead for a while precisely because nothing looked
 # outside Chapters/, and three anchors in Solutions/ were dead for the same
 # reason. check_solutions.py covers the other half of a Solutions link, the
-# `../Chapters/` prefix that `anchors` cannot see is missing.
+# `../../Chapters/` prefix that `anchors` cannot see is missing.
 GATE_DOCS = ["tools/README.md", "Solutions"]
 
 SOLUTIONS_TREE = str(ROOT / "build" / "solutions")
@@ -71,8 +71,9 @@ def prose_files(v: Vars) -> list[str]:
     if not ch:
         return v.words("DOCS") or ["Chapters", "Solutions"]
     found = [str(p.relative_to(ROOT).as_posix())
-             for d in ("Chapters", "Solutions")
-             for p in sorted((ROOT / d).glob(f"{ch}*.md"))]
+             for pattern in (f"Chapters/{ch}*.md",
+                             f"Solutions/{ch}*/README.md")
+             for p in sorted(ROOT.glob(pattern))]
     return found or [f"Chapters/{ch}*.md"]
 
 
@@ -106,13 +107,13 @@ also("check-ch", "run-one")
 
 
 @task("The everyday loop: every fixer, refresh #: markers, sync "
-      "Examples/ and SolutionsCode/, figures, then every gate but the "
+      "Examples/ and Solutions/, figures, then every gate but the "
       "site build (ARGS=--help lists the steps)")
 def verify(v: Vars) -> None:
     """The edit-and-check loop to repeat after touching a chapter: every
     mutating fixer (the comment-style fixers, import sorting, blank-line
     cleanup), a refresh of the #: output markers, a sync of the committed
-    Examples/ and SolutionsCode/ trees, the figure gallery, then the full
+    Examples/ and Solutions/ code, the figure gallery, then the full
     gate. Each fixer repairs something the gate would otherwise fail on,
     and the gate already self-heals line endings, reflow, and markers, so
     a fixer-free loop would only trade a fix for a failure. The marker
@@ -180,8 +181,8 @@ def gate(v: Vars) -> None:
     the gate; only marker text is self-corrected. The drift check also fails on
     an orphaned stray under Examples/ (a file no block generates and no chapter
     mentions); run `tip prune` to delete those. solutions-gate applies the same
-    stray check to SolutionsCode/ against Solutions/*.md; `prune` covers that
-    tree too. reflow_prose.py runs here with --write, so prose that drifts out
+    stray check to Solutions/ against each Solutions/<chapter>/README.md;
+    `prune` covers that tree too (and never deletes a Markdown file). reflow_prose.py runs here with --write, so prose that drifts out
     of Semantic Line Breaks self-heals (rewriting Chapters/) the same way
     fix-eol and validate_output's marker --update do, instead of failing the
     build and forcing a `tip reflow` plus a second full run. The safety valve
@@ -250,8 +251,8 @@ def solutions_gate(v: Vars) -> None:
     tree found one that could not execute at all. It costs about six seconds.
     The numbering check runs first because it is the cheapest and reports a
     missing answer, which no later step here would notice. extract_solutions.py
-    also fails on an orphaned stray under SolutionsCode/; `tip prune` deletes
-    exactly those. Folded out of the listing: `gate` names it, and `gate` is
+    also fails on an orphaned stray under Solutions/; `tip prune` deletes
+    exactly those (never a README.md). Folded out of the listing: `gate` names it, and `gate` is
     what you run. MARKERS=fresh skips the marker refresh, as in `gate`, and
     `run` is quick here too.
     """
@@ -571,37 +572,38 @@ def fix_imports(v: Vars) -> None:
     py("tools.fix_imports", "--fix")
 
 
-@task("Update the committed Examples/ and SolutionsCode/ trees from the"
+@task("Update the committed Examples/ and Solutions/ code from the"
       " Markdown")
 def sync(v: Vars) -> None:
     """Write the extracted trees straight into the committed copies, Examples/
-    from Chapters/ and SolutionsCode/ from Solutions/, so the drift check
-    passes. Run after editing a code block. Each Solutions block is
+    from Chapters/ and each Solutions/<chapter>/ from its README.md, beside
+    the README, so the drift check passes. Run after editing a code block. Each Solutions block is
     self-contained (it redeclares whatever book context it needs) rather
     than importing from Examples/, so that tree never breaks when a book
     example changes.
     """
     py("tools.extract_examples", "--write", "-o", "Examples")
-    py("tools.extract_solutions", "--write", "-o", "SolutionsCode")
+    py("tools.extract_solutions", "--write", "-o", "Solutions")
 
 
-@task("Verify the committed Examples/ and SolutionsCode/ trees match "
+@task("Verify the committed Examples/ and Solutions/ code matches "
       "the Markdown")
 def check(v: Vars) -> None:
     py("tools.extract_examples")
     py("tools.extract_solutions")
 
 
-@task("Delete orphaned stray files under Examples/ and SolutionsCode/ "
+@task("Delete orphaned stray files under Examples/ and Solutions/ "
       "(see `check`)")
 def prune(v: Vars) -> None:
     """`check`/`gate` already fail on an orphaned stray (a file under Examples/
     with no matching block and no mention anywhere in the book, typically left
     behind by a rename). This deletes exactly those; a stray whose filename is
     still mentioned somewhere in the book is left alone for a human to review.
-    It prunes SolutionsCode/ in the same run, since a renamed listing that both
+    It prunes Solutions/ in the same run, since a renamed listing that both
     trees copy (a utils/ helper) otherwise fails solutions-gate after the
-    Examples/ prune looked complete.
+    Examples/ prune looked complete. It never deletes Markdown, so the
+    authored README.md files in Solutions/ are safe.
     """
     py("tools.extract_examples", "--prune")
     py("tools.extract_solutions", "--prune")
@@ -1013,7 +1015,7 @@ def unique_slugs(v: Vars) -> None:
 @task("Fail if a norun.txt or timing.txt pattern matches no listing")
 def skip_lists(v: Vars) -> None:
     """Fail on a pattern in tools/data/norun.txt or tools/data/timing.txt that
-    matches no file under Examples/ or SolutionsCode/. A renamed or deleted
+    matches no file under Examples/ or Solutions/. A renamed or deleted
     listing, or a renumbered chapter, leaves its pattern behind, and a stale
     timing.txt entry is the dangerous one: the listing's wall-clock marker
     stops being a claim, and the gate rewrites its next flip into the chapter
@@ -1031,19 +1033,20 @@ def solutions_numbering(v: Vars) -> None:
     (anchors) both look straight past it. It also fails an `exercise_N.py`
     listing whose N is not its heading's number, which a reordering of the
     exercises leaves behind. It also fails a chapter whose `## Exercises`
-    section has no link to its own Solutions file, or links another one.
+    section has no link to its own Solutions folder, or links another one.
     Takes chapter numbers to check one, e.g.
     `tip solutions-numbering ARGS=19`.
     """
     py("tools.check_solutions", *v.words("ARGS"))
 
 
-@task("Insert or correct each chapter's link to its Solutions file")
+@task("Insert or correct each chapter's link to its Solutions folder")
 def fix_solutions_links(v: Vars) -> None:
     """Add the sentence `Each exercise is answered in this chapter's
-    [solutions](../Solutions/<file>).` under each `## Exercises` heading
-    that lacks a link to its own Solutions file, and correct the target of
-    a link that names another file, which a chapter rename leaves behind.
+    [solutions](../Solutions/<chapter stem>/).` under each `## Exercises`
+    heading that lacks a link to its own Solutions folder, and correct the
+    target of a link that names anything else (a chapter rename, or the old
+    flat `../Solutions/<stem>.md`, leaves one behind) to the folder form.
     A reworded sentence keeps its wording. Prints the chapters it changed,
     and a second run changes nothing. No gate runs this, since no tool
     rewrites `Chapters/` prose on its own; `tip solutions-numbering` fails
@@ -1296,7 +1299,7 @@ def edit_patterns(v: Vars) -> None:
       defaults={"WIDTH": "60"})
 def code_width(v: Vars) -> None:
     """A survey, not a gate: every listing line wider than WIDTH (raw width,
-    no pragma exemption), with its Examples/ or SolutionsCode/ path and
+    no pragma exemption), with its Examples/ or Solutions/ path and
     line, its Markdown path and line, its width, and the line itself.
     For sizing questions ("what breaks at 50?"), not for enforcement.
     Writes build/reports/code_width.html and opens it in the browser,

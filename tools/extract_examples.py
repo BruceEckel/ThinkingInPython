@@ -78,7 +78,7 @@ from tools.extract import (
     write_tree,
 )
 from tools.markdown import Block, Document
-from tools.repo import md_files
+from tools.repo import chapter_stem, md_files
 
 COMMITTED_DIR = ROOT / "Examples"
 DEFAULT_OUT = EXAMPLES_TREE
@@ -99,7 +99,7 @@ def route(doc: Document, block: Block) -> str | None:
     slug = block.slug
     if slug is None or slug.startswith("rust/"):
         return None
-    return slug if slug.startswith("utils/") else f"{doc.path.stem}/{slug}"
+    return slug if slug.startswith("utils/") else f"{chapter_stem(doc.path)}/{slug}"
 
 
 def extract(markdown_dir: Path = CHAPTERS_DIR) -> ExtractResult:
@@ -123,11 +123,16 @@ def is_derived(out_dir: Path) -> bool:
         return False
 
 
-def find_strays(result: ExtractResult, committed: Path) -> list[str]:
+def find_strays(
+    result: ExtractResult, committed: Path, source_md: str | None = None,
+) -> list[str]:
     """Files under `committed` that no book block generates.
 
     Excludes NOISE_DIR_NAMES (__pycache__, .idea), which are expected to sit
-    there without ever having a matching block.
+    there without ever having a matching block. When the Markdown that
+    generates the tree lives inside it (Solutions/<chapter>/README.md),
+    the caller names that file as `source_md` and each chapter
+    directory's copy is skipped: it is the source, not a leftover.
     """
     if not committed.exists():
         return []
@@ -139,6 +144,8 @@ def find_strays(result: ExtractResult, committed: Path) -> list[str]:
         if NOISE_DIR_NAMES & set(path.relative_to(committed).parts):
             continue
         rel = path.relative_to(committed).as_posix()
+        if source_md and rel.count("/") == 1 and path.name == source_md:
+            continue
         if rel not in expected:
             strays.append(rel)
     return sorted(strays)
@@ -178,7 +185,7 @@ def classify_strays(
     most common source of strays would never be prunable.
     """
     mds = md_files(search)
-    by_stem = {md.stem: md for md in mds}
+    by_stem = {chapter_stem(md): md for md in mds}
     whole_tree: str | None = None
     orphaned, referenced = [], []
     for rel in strays:
@@ -196,6 +203,11 @@ def classify_strays(
     return orphaned, referenced
 
 
+def is_markdown(rel: str) -> bool:
+    """True for a path --prune refuses to unlink."""
+    return Path(rel).suffix.lower() == ".md"
+
+
 def report_strays(strays: list[str], committed: Path,
                   search: list[str | Path] | None = None,
                   prune: bool = False) -> tuple[list[str], list[str]]:
@@ -204,17 +216,29 @@ def report_strays(strays: list[str], committed: Path,
     Returns (orphaned, referenced) as they stand after any pruning. The
     caller folds the orphans into its exit status and words its "in sync"
     line against the referenced ones. Pruning empties the orphan list, so
-    a --prune run reports what it deleted and then succeeds.
+    a --prune run reports what it deleted and then succeeds. Pruning
+    never deletes a Markdown file, whatever its classification: the
+    authored text sits beside generated code in Solutions/, and a
+    mistaken stray report must not cost the author a file. A stray
+    `.md` stays in the orphan list, so the run fails and a human looks.
     """
     orphaned, referenced = classify_strays(strays, search)
     if prune and orphaned:
-        for p in orphaned:
+        deletable = [p for p in orphaned if not is_markdown(p)]
+        for p in deletable:
             (committed / p).unlink()
-        print(f"\nPruned {len(orphaned)} orphaned stray file(s) "
-              f"from {committed.name}/:")
-        for p in orphaned:
-            print(f"  - {p}")
-        orphaned = []
+        if deletable:
+            print(f"\nPruned {len(deletable)} orphaned stray file(s) "
+                  f"from {committed.name}/:")
+            for p in deletable:
+                print(f"  - {p}")
+        orphaned = [p for p in orphaned if is_markdown(p)]
+        if orphaned:
+            print(f"\n{len(orphaned)} orphaned Markdown file(s) under "
+                  f"{committed.name}/ left alone (--prune does not "
+                  "delete Markdown):")
+            for p in orphaned:
+                print(f"  x {p}")
     elif orphaned:
         print(f"\n{len(orphaned)} orphaned stray file(s) under "
               f"{committed.name}/ (no block generates it, and the name "

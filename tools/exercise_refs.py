@@ -74,7 +74,7 @@ Usage:
     python -m tools.exercise_refs            # the delta
     python -m tools.exercise_refs --all      # every reference
     python -m tools.exercise_refs --accept   # rewrite the baseline
-    python -m tools.exercise_refs Chapters/30_*.md Solutions/30_*.md
+    python -m tools.exercise_refs Chapters/30_*.md Solutions/30_*/README.md
 """
 import argparse
 import re
@@ -89,6 +89,7 @@ from tools.config import DATA_DIR, ROOT
 from tools.exercise_statements import generated_lines
 from tools.markdown import Document
 from tools.record_check import chapter_name
+from tools.repo import chapter_stem, is_solutions_file, md_files, solutions_file
 from tools.report import Finding
 
 BASELINE = DATA_DIR / "exercise_refs_baseline.txt"
@@ -118,7 +119,7 @@ WORDED = re.compile(
 
 # A link to a chapter file, from Chapters/ or from Solutions/.
 CHAPTER_LINK = re.compile(
-    r"\]\((?:\.\./Chapters/)?([\w-]+)\.md(?:#[\w-]*)?\)")
+    r"\]\((?:\.\./(?:\.\./)?Chapters/)?([\w-]+)\.md(?:#[\w-]*)?\)")
 LINK_AFTER = re.compile(
     r"\s+(?:of|in|from)\s+\[[^\]]*" + CHAPTER_LINK.pattern)
 LINK_BEFORE = re.compile(CHAPTER_LINK.pattern + r"['\u2019]s\s+$")
@@ -217,7 +218,7 @@ def target_of(para: Paragraph, start: int, end: int, own: str) -> str:
 
 def references(path: Path) -> Iterator[Reference]:
     doc = Document.parse(path)
-    solutions = path.parent.name == "Solutions"
+    solutions = is_solutions_file(path)
     for para in paragraphs(doc, solutions):
         found: list[tuple[int, int, list[int]]] = []
         for m in NUMERIC.finditer(para.text):
@@ -233,7 +234,7 @@ def references(path: Path) -> Iterator[Reference]:
                 number = ORDINALS.index(word) + 1
             found.append((m.start(), m.end(), [number]))
         for start, end, numbers in sorted(found):
-            target = target_of(para, start, end, path.stem)
+            target = target_of(para, start, end, chapter_stem(path))
             for number in numbers:
                 yield Reference(path, para.line_at(start), number,
                                 target, para.text[start:end])
@@ -241,7 +242,7 @@ def references(path: Path) -> Iterator[Reference]:
 
 def titles(root: Path, stem: str) -> dict[int, str]:
     """{exercise number: heading title} from a chapter's Solutions."""
-    path = root / "Solutions" / f"{stem}.md"
+    path = solutions_file(stem, root / "Solutions")
     found: dict[int, str] = {}
     if not path.exists():
         return found
@@ -251,6 +252,11 @@ def titles(root: Path, stem: str) -> dict[int, str]:
             for number in cs.expand(m.group(1)):
                 found[number] = title
     return found
+
+
+def tree_label(path: Path) -> str:
+    """`Solutions` for a solutions file, else the directory's name."""
+    return "Solutions" if is_solutions_file(path) else path.parent.name
 
 
 def resolve(refs: list[Reference], root: Path,
@@ -273,10 +279,10 @@ def resolve(refs: list[Reference], root: Path,
         if title is None:
             errors.append(Finding(
                 ref.path, ref.line,
-                f'"{ref.phrase}": Solutions/{ref.target}.md has no '
+                f'"{ref.phrase}": Solutions/{ref.target}/README.md has no '
                 f"exercise {ref.number}"))
             continue
-        source = f"{ref.path.parent.name}/{chapter_name(ref.path)}"
+        source = f"{tree_label(ref.path)}/{chapter_name(ref.path)}"
         name = chapter_name(Path(ref.target))
         pairs.append(
             (ref, f"{source}\t{name}\t{ref.number}\t{title}"))
@@ -300,7 +306,7 @@ def write_baseline(entries: Counter[str],
 
 def scoped(baseline: Counter[str], paths: list[Path]) -> Counter[str]:
     """The baseline entries whose referring file is among `paths`."""
-    sources = {f"{p.parent.name}/{chapter_name(p)}" for p in paths}
+    sources = {f"{tree_label(p)}/{chapter_name(p)}" for p in paths}
     return Counter({entry: n for entry, n in baseline.items()
                     if entry.split("\t", 1)[0] in sources})
 
@@ -334,9 +340,8 @@ def main(argv: list[str] | None = None) -> int:
     if args.paths and args.accept:
         ap.error(
             "--accept rewrites the whole baseline; give no paths")
-    paths = [Path(p) for p in args.paths] or sorted(
-        list((args.root / "Chapters").glob("*.md"))
-        + list((args.root / "Solutions").glob("*.md")))
+    paths = [Path(p) for p in args.paths] or md_files(
+        [args.root / "Chapters", args.root / "Solutions"])
     refs = [ref for path in paths for ref in references(path)]
     pairs, errors = resolve(refs, args.root)
     for error in errors:

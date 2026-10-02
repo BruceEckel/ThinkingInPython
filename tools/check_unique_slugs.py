@@ -24,7 +24,7 @@ Three kinds of reuse are legitimate and are not reported:
 - A `shared:` listing lives in `utils/` and is imported by name from
   several chapters. It is one file, declared once.
 - A chapter and its own solutions may reuse a name, since
-  `Solutions/NN_x.md` answers `Chapters/NN_x.md` and the pairing is the
+  `Solutions/NN_x/README.md` answers `Chapters/NN_x.md` and the pairing is the
   point. Only cross-chapter reuse is a collision.
 - `Solutions/` names its listings positionally, so every solutions file
   has an `exercise_1.py`. That is the convention rather than a clash,
@@ -39,12 +39,10 @@ import sys
 from collections import defaultdict
 from pathlib import Path
 
-from tools.config import ROOT
+from tools.config import CHAPTERS_DIR, ROOT, SOLUTIONS_DIR
 from tools.markdown import Document
+from tools.repo import chapter_stem, md_files
 from tools.report import Finding, report
-
-CHAPTERS_DIR = ROOT / "Chapters"
-SOLUTIONS_DIR = ROOT / "Solutions"
 
 # Solutions/ names its listings by exercise number, so the same name
 # appears in nearly every solutions file. That is the convention.
@@ -53,7 +51,7 @@ POSITIONAL = re.compile(r"^exercise_\d+[a-z]?\.py$")
 
 def chapter_key(path: Path) -> str:
     """The chapter number a file belongs to, e.g. "24" or "A"."""
-    return path.stem.split("_", 1)[0]
+    return chapter_stem(path).split("_", 1)[0]
 
 
 def collisions() -> list[Finding]:
@@ -62,10 +60,7 @@ def collisions() -> list[Finding]:
     seen: defaultdict[str, list[tuple[str, Path, int, str]]] = (
         defaultdict(list)
     )
-    sources = sorted(CHAPTERS_DIR.glob("*.md")) + sorted(
-        SOLUTIONS_DIR.glob("*.md")
-    )
-    for md in sources:
+    for md in md_files([CHAPTERS_DIR, SOLUTIONS_DIR]):
         doc = Document.parse(md)
         for block in doc.python_blocks():
             slug = block.slug
@@ -89,7 +84,7 @@ def collisions() -> list[Finding]:
         for _, md, line, slug in uses:
             others = ", ".join(
                 sorted(
-                    f"{other.name}:{other_line}"
+                    f"{chapter_stem(other)}.md:{other_line}"
                     for _, other, other_line, _ in uses
                     if other != md
                 )

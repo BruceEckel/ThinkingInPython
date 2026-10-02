@@ -34,16 +34,15 @@ OTHER_SOLUTIONS = (
 
 def book(root: Path, chapter: str, solutions: str = SOLUTIONS) -> Path:
     """A two-chapter tree under `root`; returns the chapter's path."""
-    for tree in ("Chapters", "Solutions"):
-        (root / tree).mkdir(exist_ok=True)
+    (root / "Chapters").mkdir(exist_ok=True)
     md = root / "Chapters" / f"{CHAPTER}.md"
     md.write_text(chapter, encoding="utf-8")
-    (root / "Solutions" / f"{CHAPTER}.md").write_text(
-        solutions, encoding="utf-8")
+    for stem, text in ((CHAPTER, solutions), (OTHER, OTHER_SOLUTIONS)):
+        folder = root / "Solutions" / stem
+        folder.mkdir(parents=True, exist_ok=True)
+        (folder / "README.md").write_text(text, encoding="utf-8")
     (root / "Chapters" / f"{OTHER}.md").write_text(
         "# Factory\n", encoding="utf-8")
-    (root / "Solutions" / f"{OTHER}.md").write_text(
-        OTHER_SOLUTIONS, encoding="utf-8")
     return md
 
 
@@ -101,7 +100,7 @@ def test_previous_and_next_resolve_from_the_exercise_item(
 def test_previous_resolves_from_the_solutions_section(
         tmp_path: Path) -> None:
     book(tmp_path, "# Observer\n")
-    sol = tmp_path / "Solutions" / f"{CHAPTER}.md"
+    sol = tmp_path / "Solutions" / CHAPTER / "README.md"
     assert entries(tmp_path, sol) == [
         "Solutions/Observer\tObserver\t2\tA failing listener",
         "Solutions/Observer\tObserver\t1\tA minimal pair",
@@ -187,9 +186,10 @@ def test_baseline_ignores_line_numbers_and_chapter_numbers(
     md.write_text("# Observer\n\nA new paragraph.\n\n"
                   "Exercise 2 covers it.\n", encoding="utf-8")
     assert entries(tmp_path, md) == before
-    for tree in ("Chapters", "Solutions"):
-        old = tmp_path / tree / f"{CHAPTER}.md"
-        old.rename(old.with_name("31_Behavior--Observer.md"))
+    old = tmp_path / "Chapters" / f"{CHAPTER}.md"
+    old.rename(old.with_name("31_Behavior--Observer.md"))
+    folder = tmp_path / "Solutions" / CHAPTER
+    folder.rename(folder.with_name("31_Behavior--Observer"))
     moved = tmp_path / "Chapters" / "31_Behavior--Observer.md"
     assert entries(tmp_path, moved) == before
 

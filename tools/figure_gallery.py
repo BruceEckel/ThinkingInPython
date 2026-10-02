@@ -69,6 +69,7 @@ from tools.arrowheads import (MAX_GAP, MIN_GAP, crossed_boxes, marker_kinds,
 from tools.svg_text import clipped, collisions
 from tools.build_site import IMAGES_SRC
 from tools.config import BUILD_DIR, CHAPTERS_DIR, ROOT
+from tools.repo import chapter_stem, is_solutions_file, md_files
 
 SOLUTIONS_DIR = ROOT / "Solutions"
 
@@ -133,11 +134,11 @@ class Reference:
 
     @property
     def chapter(self) -> str:
-        return self.doc.stem.split("_", 1)[0]
+        return chapter_stem(self.doc).split("_", 1)[0]
 
     @property
     def tree(self) -> str:
-        return self.doc.parent.name
+        return "Solutions" if is_solutions_file(self.doc) else self.doc.parent.name
 
 
 @dataclass
@@ -282,7 +283,7 @@ def scan(docs_dirs: list[Path] | None = None,
     for d in dirs:
         if not d.is_dir():
             continue
-        for doc in sorted(d.glob("*.md")):
+        for doc in md_files([d]):
             text = doc.read_text(encoding="utf-8")
             for m in FIG_REF.finditer(text):
                 line = text.count("\n", 0, m.start()) + 1

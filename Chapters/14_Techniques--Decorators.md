@@ -1206,7 +1206,7 @@ and stacking decorators multiplies both by the number of layers.
 
 ## Exercises
 
-Each exercise is answered in this chapter's [solutions](../Solutions/14_Techniques--Decorators.md).
+Each exercise is answered in this chapter's [solutions](../Solutions/14_Techniques--Decorators/).
 
 1.  Write a class decorator `announce` that prints the name of each class it decorates and returns it unchanged,
     then apply it to two small classes.

@@ -40,5 +40,5 @@ def test_chapter_01_appendices_and_solutions_are_skipped() -> None:
     text = "# Title\n\nAn ordinary paragraph.\n"
     assert lines("01_Introduction.md", text) == []
     assert lines("A_Effect_Tracking.md", text) == []
-    doc = Document.from_text(text, Path("Solutions") / "30_P.md")
+    doc = Document.from_text(text, Path("Solutions") / "30_P" / "README.md")
     assert list(find(doc)) == []

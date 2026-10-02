@@ -26,7 +26,7 @@ import argparse
 import re
 from collections.abc import Iterator
 from tools.markdown import Document
-from tools.repo import add_paths_arg, md_files
+from tools.repo import add_paths_arg, is_solutions_file, md_files
 from tools.report import Check, Finding, report
 
 CHAPTER = re.compile(r"^(\d{2})_")
@@ -37,7 +37,7 @@ MAX_LINES = 4
 
 def applies(doc: Document) -> bool:
     """True for a numbered chapter from FIRST_CHAPTER on."""
-    if doc.path.parent.name == "Solutions":
+    if is_solutions_file(doc.path):
         return False
     m = CHAPTER.match(doc.path.name)
     return m is not None and int(m.group(1)) >= FIRST_CHAPTER
