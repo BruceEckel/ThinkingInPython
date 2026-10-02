@@ -120,7 +120,10 @@ def run_one(
     existing = os.environ.get("PYTHONPATH")
     pythonpath = (str(utils_dir) if not existing
                   else f"{utils_dir}{os.pathsep}{existing}")
-    env = {**os.environ, "PYTHONPATH": pythonpath}
+    # The last stderr line is parsed below; PYTHON_COLORS=0 overrides
+    # an inherited FORCE_COLOR, which would wrap the traceback in ANSI.
+    env = {**os.environ, "PYTHONPATH": pythonpath,
+           "PYTHON_COLORS": "0"}
     for attempt in range(1, TIMEOUT_ATTEMPTS + 1):
         try:
             proc = subprocess.run(

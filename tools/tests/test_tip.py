@@ -212,7 +212,12 @@ def test_the_real_tasks_name_every_dep_and_no_helper() -> None:
                                               reg.tasks.values()], helper
 
 
-def test_python_m_tools_tip_lists_the_tasks_when_piped() -> None:
+def test_python_m_tools_tip_lists_the_tasks_when_piped(
+        monkeypatch: pytest.MonkeyPatch) -> None:
+    # The help listing honors FORCE_COLOR; this test asserts the
+    # uncolored piped form, so the child inherits neither variable.
+    monkeypatch.delenv("FORCE_COLOR", raising=False)
+    monkeypatch.delenv("NO_COLOR", raising=False)
     out = subprocess.run(
         [sys.executable, "-m", "tools.tip", "help", "--pick", "never"],
         cwd=ROOT, capture_output=True, text=True, check=True).stdout
