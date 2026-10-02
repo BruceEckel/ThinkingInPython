@@ -161,8 +161,8 @@ With the copy, `detach()` changes `self._observers` while the loop reads the cop
 A `notify()` call therefore reaches every observer in `_observers` at the moment the call begins.
 If `detach()` removes an observer from `_observers` partway through a `notify()` call,
 the copy still holds that observer, so it receives the call's notification.
-An observer that `attach()` adds during the call is absent from the copy,
-so its first notification comes from the next `notify()` call.
+Attaching an observer during the call does not attach to the copy,
+so the new observer isn't part of the `notify()` on the copy.
 [Disconnecting During a Notification](#disconnecting-during-a-notification)
 runs a responder that disconnects itself,
 and shows index by index which responder the loop skips without the copy.
