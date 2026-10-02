@@ -144,7 +144,8 @@ The alternative leaves the call to the client,
 the code that changes the subject.
 The client makes all its changes and then calls `notify()` once,
 so the observers receive one notification for the whole batch.
-The cost is that a client that forgets the call leaves every observer with stale data.
+In exchange, every client must make that call, and until it does,
+the observers hold stale data.
 
 ### Why `notify()` Copies the List
 
