@@ -159,7 +159,7 @@ that `detach()` shifts the remaining observers down one index,
 and the loop skips the observer after the one that detached,
 without raising an exception.
 With the copy, the `for` loop reads a second list,
-so `detach()` changes `self._observers` while the loop reads a list nobody is modifying.
+so `detach()` changes `self._observers` while the loop reads the copy.
 The copy therefore settles which observers a `notify()` call reaches before its loop starts.
 An observer detached partway through a `notify()` call still receives that call's notification,
 and a newcomer attached during the call receives its first notification from the next `notify()` call.
@@ -250,8 +250,9 @@ The type checker rejects a responder that returns a value.
 Notification runs one way, from broadcaster to responders,
 so `announce()` calls each responder as a statement.
 *GoF Design Patterns* gives the reason under broadcast communication.
-A notification names no receiver, and each responder may handle or ignore it,
-so one call with several responders has no single answer to collect.
+A notification goes to every connected responder,
+and each one decides whether to handle it,
+so one call to several responders could produce several answers, or none.
 A design that needs an answer uses a different pattern;
 for example [*Chain of Responsibility*](28_Patterns--Function_Objects.md#chain-of-responsibility-choosing-the-handler-at-runtime)
 tries its handlers in turn and returns the result from the first one that succeeds.
@@ -278,12 +279,11 @@ class Thermometer(Broadcaster[float]):
         self.announce(value)
 ```
 
-The constructor assigns its argument directly to `_celsius` rather than to `celsius`,
-which would go through the setter.
-This way, construction skips the setter and doesn't call `announce()`.
+The constructor assigns its argument to `_celsius` directly,
+bypassing the setter, so creating a `Thermometer` announces nothing.
 
 `Thermometer`'s constructor is simple and suggests using a `dataclass`.
-Inheriting does not stop a class from being a `dataclass`,
+A class that inherits from another can be a `dataclass`,
 but [a `dataclass`-generated `__init__()` does not call the base class's `__init__()`](12_Techniques--Data_Classes_as_Types.md#dataclass-inheritance).
 A `@dataclass` `Thermometer` has no list of responders,
 and `connect()` raises an `AttributeError`.
@@ -411,8 +411,8 @@ def test_late_responder_misses_earlier_changes() -> None:
 The tests connect a list's `append` to the broadcaster,
 so the list records every announced value.
 
-You cannot `disconnect()` a lambda; you need a named reference to the responder.
-`disconnect()` matches by equality, and a lambda equals only itself.
+`disconnect()` matches by equality, and a lambda equals only itself,
+so disconnecting a lambda requires a name bound to the lambda object that `connect()` received.
 
 A bound method is different:
 `test_disconnect_stops_delivery()` disconnects `received.append` without storing it first.
@@ -469,8 +469,8 @@ with no exception to say a responder was skipped.
 
 ### Raising an Exception
 
-If a responder raises an exception,
-the rest of the responders in the list are not called.
+If a responder raises an exception, `announce()`'s loop ends at that responder,
+and the responders after it in the list miss the notification.
 The exception leaves `announce()` and reaches the code that assigned to `celsius`.
 You must decide whether `announce()` should catch, collect, and continue
 (see exercise 3).
@@ -478,10 +478,10 @@ You must decide whether `announce()` should catch, collect, and continue
 Another option keeps the failure inside the responder.
 The responder catches its own exception and [returns the error as a value](42_Functional--Error_Handling.md#return-the-error-as-a-value),
 and `announce()` collects the returned errors for the caller.
-Every responder runs, and no failure escapes as an exception.
+Every responder runs, and every failure arrives as a value.
 However, the `Responder` type becomes a callable that returns a success or an error,
 so a method such as `readings.append()`, which returns `None`,
-no longer fits without a wrapper (see exercise 5).
+needs a wrapper to fit (see exercise 5).
 
 ### Lapsed Listeners
 
@@ -543,7 +543,7 @@ which is safe mid-notification because `announce()` iterates through a copy.
 The `ValueError` confirms the connection is gone:
 `disconnect()` finds nothing left to remove.
 
-Most programs do not need weak responders.
+Most programs can keep strong connections.
 A broadcaster that lives no longer than its responders releases them when it goes away,
 and an explicit `disconnect()` covers a responder that leaves early.
 A weak responder earns its extra code only when a long-lived broadcaster holds short-lived responders that nothing disconnects.
@@ -637,7 +637,7 @@ its list of responders can change at any moment,
 including in the middle of an `announce()`.
 Several of the preceding sections exist because of that.
 The copy in `announce()` guards against a `disconnect()` call during the loop,
-a lambda cannot be disconnected,
+a lambda written inline in `connect()` stays connected for good,
 and a lapsed listener is a connection that nobody removed.
 
 Decoupling and dynamism are separate properties.
@@ -672,16 +672,16 @@ print(log)
 #: [25.0, 150.0]
 ```
 
-`FixedBroadcaster` is a record, so nothing can rebind its `responders` field,
-and the tuple in that field cannot change.
-The constructor fixes the set of responders.
-`announce()` iterates through the tuple with no copy,
-because no responder can be disconnected mid-notification.
-The lambda needs no named reference,
-since there is no `disconnect()` to match it.
-The broadcaster still holds strong references to its responders,
-but they exist before it does and none can join later,
-so the set it keeps alive cannot grow into a lapsed-listener leak.
+`FixedBroadcaster` is a record whose `responders` field holds a tuple:
+the record fixes the field, and the tuple fixes its contents,
+so the constructor sets the responders for good.
+`announce()` iterates through the tuple directly,
+because the set stays the same throughout a notification.
+The lambda can go inline in the constructor call,
+since `FixedBroadcaster` has no `disconnect()` to match it.
+The broadcaster holds strong references to its responders,
+but the set is complete at construction,
+so the broadcaster keeps alive only the responders it started with.
 Two problems remain:
 a responder that raises an exception still stops `announce()`,
 and a responder that writes back to its subject still re-enters it.
@@ -762,14 +762,14 @@ the copy reads an attribute that does not exist yet.
 The constructor therefore writes `_responders` through `self.__dict__`,
 which bypasses `__setattr__()`.
 The two assignments after that line go through `__setattr__()`.
-Each notifies a list that is still empty.
-Because the constructor hasn't returned, no caller can connect a responder.
+Each notifies an empty list,
+since callers can connect responders only after the constructor returns.
 `super().__setattr__()` does the storing,
 because an ordinary assignment inside `__setattr__()` calls `__setattr__()` again.
 
 In a class body, a name with a type and no initialization value [declares an attribute rather than creating one](09_Foundations--Class_Attributes.md#a-bare-annotation-declares-it-does-not-create).
 Such a name is a *bare annotation*.
-It looks like a class variable but is not, because it is not assigned a value.
+It looks like a class variable, but a class variable needs a value.
 `_responders` creates no attribute anywhere,
 and the constructor gives each `Watched` its own `_responders` list.
 The same line with `= []` creates a class attribute,
@@ -786,7 +786,7 @@ not an assignment to an attribute.
 The bare annotation supplies the attribute and its type instead.
 Without it, `ty` reports an `unresolved-attribute` error in each method that reads the list.
 
-One method for every attribute is less precise than a property per attribute,
+One method for every attribute costs the precision of a property per attribute,
 in three ways:
 
 1.  `Watched`'s responders have a wider signature:
@@ -809,8 +809,8 @@ in three ways:
 
 ## Observer and I/O
 
-So far, no responder has had to wait.
-Each prints, appends, or writes back, then returns.
+So far, every responder finishes at once: each prints, appends, or writes back,
+then returns.
 If a responder calls a network service or writes to a database,
 notifying responders one at a time delays every responder after that one.
 
@@ -819,7 +819,7 @@ If responders are coroutines,
 so one state change notifies every responder concurrently.
 A slow responder doesn't delay the others.
 `gather()` waits for all of them,
-so `announce()` returns only after every responder finishes.
+so `announce()` returns once every responder finishes.
 
 [Concurrency](19_Techniques--Concurrency.md#asyncio-mechanics)
 covers the `asyncio` mechanics (`async def`, `await`, `gather()`, `run()`):
@@ -919,7 +919,7 @@ so the faster responder prints first.
 The results `gather()` returns stay in argument order;
 only the side effects interleave.
 
-A responder need not act on every notification.
+A responder chooses which notifications to act on.
 Below its threshold, the alarm returns at once.
 
 ### Disconnecting During an Async Notification
@@ -1013,7 +1013,7 @@ For in-memory responders the synchronous `Broadcaster` from `broadcaster.py` is 
 This example emphasizes the model-view split.
 The *model*, `box_observer.py`,
 is a grid of colored boxes and the rule that decides what a selection changes.
-It only manipulates `Grid`s and doesn't know anything about displaying them.
+It manipulates `Grid`s and leaves displaying them to the view.
 The *view*, `box_view.py`,
 displays the boxes using the standard library's `tkinter`.
 Clicking a box advances it to the next color, along with the boxes above, below,
@@ -1230,7 +1230,7 @@ with 60-pixel cells, a click at `e.x == 130` is in column `130 // 60`,
 which is `2`.
 A click on the canvas becomes a `select()` on the model,
 and the resulting notification repaints the view.
-The handler only calls the model; `draw()`, run by that notification,
+The handler calls the model, and `draw()`, run by that notification,
 does all the painting.
 So the view handles the mouse as well as the screen,
 the controller's job folded into the view, which the next section takes apart.
@@ -1415,7 +1415,8 @@ whose choice is limited to filtering the changes it receives.
 which says that every change matters to everyone.
 [Leaving that call to the client](#push-or-pull)
 lets several changes coalesce into one announcement,
-but a caller who forgets the call leaves every responder out of date.
+but then every caller must make that call,
+and the responders stay out of date until it does.
 Push sends the value, so the thermometer decides what each responder receives.
 Pull sends the thermometer,
 so each responder reads the attributes it needs from the thermometer and depends on the thermometer's interface.

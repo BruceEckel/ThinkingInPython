@@ -271,7 +271,7 @@
  },
  "1f2521c2404fcd22": {
   "file": "30_Patterns--Observer.md",
-  "line": 472,
+  "line": 479,
   "target": "42_Functional--Error_Handling.md",
   "terms": [
    "announce"
@@ -282,7 +282,7 @@
  },
  "e8e91f728192b79c": {
   "file": "30_Patterns--Observer.md",
-  "line": 1556,
+  "line": 1564,
   "target": "17_Techniques--Metaprogramming.md",
   "terms": [
    "Notifying",
