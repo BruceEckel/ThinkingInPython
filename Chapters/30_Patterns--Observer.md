@@ -199,8 +199,8 @@ A responder is a callable, so the receiving end needs no specially-named method.
 Sending a change and receiving it share one name, `announce()`,
 where GoF has two.
 
-The catalog calls it *Observer*,
-[[which catalog?]] and Java and the reactive libraries use the older nouns.
+GoF calls the pattern *Observer*,
+and Java and the reactive libraries use the older nouns.
 The table is your map into that literature.
 Java and JavaScript call a responder a *listener*,
 as in `ActionListener` and `addEventListener()`.
