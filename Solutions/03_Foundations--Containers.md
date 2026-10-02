@@ -2,6 +2,15 @@
 
 ## 1. Timing `deque` vs. `list` at different sizes
 
+> In `deque_timing.py`, change `n` from `20_000` to `2_000`,
+> change the printed comparison to `deque_time < list_time`,
+> and run the timing again.
+> Does `deque_time < list_time` still hold?
+> Change `n` to `200_000` and try again.
+> The list version takes several seconds at that size,
+> and much longer on a slow machine.
+> Explain what changes about the comparison as `n` grows.
+
 ```python
 # exercise_1.py
 from collections import deque
@@ -42,6 +51,10 @@ wins by a wide and growing margin.
 
 ## 2. `defaultdict(int)` for counting
 
+> In `defaultdict.py`, replace `defaultdict(list)` with `defaultdict(int)`,
+> change the loop to count occurrences of each `kind` instead of collecting names,
+> and print the result.
+
 ```python
 # exercise_2.py
 from collections import defaultdict
@@ -62,6 +75,9 @@ list.
 
 ## 3. Set operations across three sets
 
+> In `set_methods.py`,
+> add a set `d = {1, 5, 9}` and print `a.union(b, d)` and `a.intersection(b, d)`.
+
 ```python
 # exercise_3.py
 a = {1, 2, 3}
@@ -79,6 +95,11 @@ The three-way intersection is empty because no single value is a
 member of all three sets.
 
 ## 4. Why a `list` cannot join a set of `frozenset`s
+
+> In `immutable_containers.py`, add a line that tries `groups.add([1, 2])`
+> (a plain list, not a `frozenset`) and catch the exception it raises.
+> Explain, in terms of hashability,
+> why a `frozenset` works as a set member but a `list` does not.
 
 ```python
 # exercise_4.py
@@ -99,6 +120,10 @@ is mutable, so Python refuses to hash it, and an object with no hash
 cannot be a set member or a dictionary key.
 
 ## 5. Four slices of one list
+
+> Given `xs = [10, 20, 30, 40, 50]`, write one slice expression for each of:
+> the last two items, everything but the first and last,
+> and a reversed copy of the middle three.
 
 ```python
 # exercise_5.py
@@ -121,6 +146,9 @@ bounds swap roles: `3` is now the first index visited and `0` is the
 excluded stop, so the element at index `0` does not appear.
 
 ## 6. `defaultdict(int)` in place of `Counter`
+
+> Rewrite `counter.py`'s tally using a `defaultdict(int)` and no `Counter`.
+> Which parts of `Counter` did you have to write yourself?
 
 ```python
 # exercise_6.py
@@ -150,6 +178,9 @@ after the `counts["dog"]` line.
 
 ## 7. `heterogeneous.py` as a `namedtuple`
 
+> Rewrite `heterogeneous.py` with a `namedtuple`.
+> Show that the unpacking line still works unchanged.
+
 ```python
 # exercise_7.py
 from collections import namedtuple
@@ -174,6 +205,11 @@ means. They cost nothing, so a heterogeneous tuple that outlives one
 function is usually better as a `namedtuple` or a data class.
 
 ## 8. Building and merging a `dict`
+
+> Given `pairs = [("a", 1), ("b", 2), ("c", 3)]`, build a `dict` from it,
+> then print its keys, its values,
+> and the result of merging it with `{"c": 30, "d": 4}`.
+> Which value ends up under `"c"`, and why?
 
 ```python
 # exercise_8.py
@@ -209,6 +245,11 @@ set version commutes. `|=` updates the left dictionary in place, while
 `print(counts)` above confirms.
 
 ## 9. Unpacking without indexing
+
+> Using one unpacking assignment each, and no indexing,
+> pull the first element, the last element,
+> and everything in between out of `row = [1, 2, 3, 4, 5]`.
+> Then explain why `a, b = row` raises a `ValueError` while `a, *b = row` does not.
 
 ```python
 # exercise_9.py
@@ -251,6 +292,13 @@ flexible one, and the same flexibility lets `*args` work in a
 function signature.
 
 ## 10. A `frozendict` as a dictionary key
+
+> Build a `frozendict` from the pairs `[("host", "localhost"), ("port", 8080)]`,
+> then use it as a key in a `dict` that maps a configuration to a connection name.
+> Look that value up again with a separately built, equal `frozendict`.
+> Catch the `TypeError` that assigning to one of its entries raises.
+> Finally, build a `frozendict` whose value is a `list`, try to hash it,
+> and explain the result in terms of shallow immutability.
 
 ```python
 # exercise_10.py

@@ -2,6 +2,10 @@
 
 ## 1. `classify()` over lists, a `Point`, and anything else
 
+> Write `classify(value)` that uses `match` to return `"empty list"`,
+> `"singleton"`, or `"longer list"` for lists, `"point"` for a `Point`,
+> and `"other"` for anything else.
+
 ```python
 # exercise_1.py
 from dataclasses import dataclass
@@ -57,6 +61,9 @@ first tests for a `list`, then matches the one-element shape.
 
 ## 2. Adding `Rectangle` without its `case`
 
+> Add a `Rectangle` type to `exhaustive.py`'s `Shape` union without adding its `case`.
+> Run `ty` and read the error it reports at `assert_never()`.
+
 ```python
 @dataclass(frozen=True)
 class Rectangle:
@@ -100,6 +107,10 @@ runtime.
 
 ## 3. Matching a nested shape
 
+> Rewrite `mapping_patterns.handle()` to also accept a nested shape,
+> such as `{"type": "click", "at": {"x": x, "y": y}}`,
+> binding `x` and `y` from the inner dictionary.
+
 ```python
 # exercise_3.py
 
@@ -137,6 +148,12 @@ at the first one that fits, so that catchall sits after the specific
 click and key cases.
 
 ## 4. A `Webhook` channel added to the union
+
+> Add a `Webhook` channel to `notifications_match.py`:
+> a data class with a `url` field, added to the `Notification` union.
+> Run `ty` before adding its `case` to `render()` and `cost()`,
+> and read the errors.
+> Then add both cases and confirm `ty` passes.
 
 ```python
 # exercise_4.py
@@ -221,6 +238,10 @@ check fails. Two diagnostics for one new channel is the cost the
 chapter describes: adding a type touches every operation.
 
 ## 5. Quadrants with guards, and without them
+
+> Rewrite `guards.py`'s `quadrant()` so it handles the third and fourth quadrants too.
+> Then write it a second time with one `case` per sign combination,
+> using `|` alternations and no guards, and say which version reads better.
 
 ```python
 # exercise_5.py
@@ -309,6 +330,11 @@ returns an `int`, so without that case it reports that `quadrant()`
 can return `None`.
 
 ## 6. A constant that captures, and two ways to fix it
+
+> Give `value_patterns.py`'s `Signal` a third member,
+> and write `act()` so that it compares against a module-level `FALLBACK: Final[Signal]`.
+> Run it and confirm that the constant captures instead of comparing.
+> Then fix it two ways, with a dotted name and with a guard.
 
 ```python
 # ch13_fallback_capture.py

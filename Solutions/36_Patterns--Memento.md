@@ -2,6 +2,12 @@
 
 ## 1. `erase()` in both sketches
 
+> Add `erase()` to both sketches.
+> It removes the last stroke.
+> In `sketch.py` it mutates.
+> In `frozen_sketch.py` it returns a new `Drawing`.
+> Write tests proving existing mementos and histories stay unchanged in each version.
+
 ```python
 # exercise_1_mutable.py
 from record import record
@@ -174,6 +180,10 @@ strokes.
 
 ## 2. A bounded `History`
 
+> Give `History` a maximum depth.
+> When the past grows beyond `n` states, discard the oldest.
+> What should `can_undo()` report then?
+
 ```python
 # exercise_2.py
 class History[S]:
@@ -222,6 +232,10 @@ correct answer, not a bug.
 
 ## 3. Serializing a `Drawing` to JSON
 
+> Serialize a `Drawing` to JSON using `dataclasses.asdict()` and reconstruct it.
+> What did the round trip change that `pickle` preserved,
+> and where must your reconstruction compensate?
+
 ```python
 # exercise_3.py
 import json
@@ -265,6 +279,12 @@ record otherwise supplies (`hash()` raises a `TypeError`,
 `unhashable type: 'list'`).
 
 ## 4. `Memento` holding the list itself
+
+> Change `sketch.py` so `Memento` holds the list itself instead of a tuple copy,
+> and so `restore()` assigns that list rather than copying it,
+> leaving the sketch and the memento sharing one list in both directions.
+> Then write the test that exposes the corruption.
+> Which of the three tests in `test_sketch.py` catches it first?
 
 ```python
 @record
@@ -324,6 +344,10 @@ when the assertion runs, because `draw("b")` appended to the one list
 both objects hold.
 
 ## 5. `goto(steps_back)`
+
+> Add `goto(steps_back)` to `History`:
+> jump the present several states into the past in one call,
+> keeping redo consistent.
 
 ```python
 # exercise_5.py
@@ -390,6 +414,10 @@ a jump that raises an `IndexError` leaves the history where it was,
 as the chapter's `undo()` does.
 
 ## 6. Restoring one named field
+
+> A `History` of `Drawing` states records a rename and three strokes.
+> Write `restore_field(history, name, past)` that pushes a new state taking one named field from `past` and the rest from `history.present`.
+> Why must it go through `do()` rather than editing `_past` directly?
 
 ```python
 # exercise_6.py
@@ -472,6 +500,13 @@ leaves a redo stack pointing at states the history can no longer
 reach.
 
 ## 7. What pickle skips on load
+
+> Save two `Drawing`s with `pickle`, one of them with an empty title,
+> then add a field with a default to `Drawing` and load the old bytes.
+> Does the default appear?
+> Now add a `__post_init__()` that rejects an empty title,
+> and load the blank one again.
+> What did pickle skip, and what does `copy.replace()` catch?
 
 ```python
 # drawing_v1.py

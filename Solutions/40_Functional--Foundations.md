@@ -2,6 +2,10 @@
 
 ## 1. `deposit()` is impure for the same reason `withdraw()` is
 
+> In `pure_functions.py`, write a third function, `deposit(amount)`,
+> that behaves like `withdraw()` but adds to `balance` instead of subtracting.
+> Explain, the way the text does for `withdraw()`, why `deposit()` is impure.
+
 ```python
 # exercise_1.py
 balance = 100
@@ -26,6 +30,9 @@ result you must track the history of every prior call, and that
 tracking is the problem the chapter raises for `withdraw()`.
 
 ## 2. A `"*"` operator added to the dispatch table
+
+> In `dispatch.py`, add a `"*"` operator to the `operations` table backed by a new `mul()` function,
+> with no change to how `operations["*"](6, 4)` gets called.
 
 ```python
 # exercise_2.py
@@ -66,6 +73,9 @@ from the shared `exceptions` helper catches the missing-key
 
 ## 3. A fourth independent closure
 
+> In `closures.py`, add `quadruple = multiplier(4)` and confirm it behaves independently of `double` and `triple`,
+> each holding its own `factor`.
+
 ```python
 # exercise_3.py
 from collections.abc import Callable
@@ -90,6 +100,10 @@ nothing, because each `factor` is reachable only through the one
 function that captured it.
 
 ## 4. A three-stage composition
+
+> In `compose_functions.py`, write a third small function, `square(n)`,
+> and build `increment_then_double_then_square = compose(square, increment_then_double)`.
+> Predict `increment_then_double_then_square(3)` before running it.
 
 ```python
 # exercise_4.py
@@ -123,6 +137,10 @@ a third stage: wrapping one composed function inside another
 `compose()` call extends the pipeline.
 
 ## 5. Presetting a leading argument, and why the trailing one differs
+
+> In `placeholder.py`, build a second partial, `at_least_ten`,
+> that presets only `low` to 10 and leaves both other arguments to the caller.
+> Then try to preset only `high` without a `Placeholder` and explain why that is impossible.
 
 ```python
 # exercise_5.py
@@ -159,6 +177,13 @@ on `partial(clamp, high=100)`, the line that builds the partial, where
 the runtime waits for the call.
 
 ## 6. `Final` locks the name, not the object
+
+> In `immutable_types.py`,
+> add `CONFIG: Final[list[int]] = [1, 2]` and a line that appends to it.
+> Run `ty`, which reports nothing.
+> Then add `MAX_SIZE = 200`, run `ty` again,
+> and explain why the rebinding is an error while the append is not.
+> Then change the annotation so appending *is* rejected.
 
 ```python
 # exercise_6.py
@@ -216,6 +241,13 @@ own type guards the contents. You need both.
 
 ## 7. Comprehensions, a different `key`, and a bare `map` object
 
+> In `higher_order.py`,
+> replace the `map()` and `filter()` calls with comprehensions,
+> and the `sorted(key=len)` call with one that sorts by last letter.
+> Then start again from the original file,
+> delete the `list()` around the `map()` call, print the result,
+> and say what you see and why.
+
 ```python
 # exercise_7.py
 numbers = [1, 2, 3, 4, 5]
@@ -262,6 +294,12 @@ back a finished list, which you can walk as many times as you like.
 
 ## 8. Only the assigned name needs `nonlocal`
 
+> In `make_counter.py`, give `make_counter()` a `step: int = 1` parameter,
+> so `make_counter(10)` builds a counter that counts 10, 20, 30.
+> `increment()` reads `step` without declaring it `nonlocal`:
+> explain why `count` needs the declaration and `step` does not.
+> Then delete the `nonlocal` line and compare the type checker's report with the runtime failure.
+
 ```python
 # exercise_8.py
 from collections.abc import Callable
@@ -296,6 +334,12 @@ checker points at the assignment that went wrong. The runtime message
 complains about a local variable the code never meant to create.
 
 ## 9. A second filter, and why the stages are not interchangeable
+
+> In `pipeline.py`, add `colder_than(limit, r)` beside `warmer_than()`,
+> and give `report()` a second `filter()` stage built with `partial()`,
+> so only readings between 20.0 and 30.0 Celsius reach the output.
+> Then write a second version of `report()` that calls `map(to_fahrenheit, ...)` ahead of both filters,
+> and explain the list it returns.
 
 ```python
 # exercise_9.py

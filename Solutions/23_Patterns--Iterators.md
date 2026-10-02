@@ -2,6 +2,9 @@
 
 ## 1. `evens(n)`, summed by the unmodified `total()`
 
+> Write a generator `evens(n)` that yields the first `n` even numbers,
+> and confirm `total()` from `iterators.py` sums them without modification.
+
 ```python
 # exercise_1.py
 from collections.abc import Iterable, Iterator
@@ -27,6 +30,9 @@ iterator rather than running the body immediately. `total()` calls
 generator now exists alongside `fibonacci()` and `Countdown`.
 
 ## 2. `Countdown` with `__len__()`
+
+> Rewrite `Countdown` to also support `len()`,
+> then explain why a generator cannot.
 
 ```python
 # exercise_2.py
@@ -74,6 +80,8 @@ produces a generator on demand. The container keeps the value
 
 ## 3. The first ten values of `fibonacci(1_000_000)`
 
+> Use `itertools.islice()` to take the first 10 values of `fibonacci(1_000_000)` without computing the rest.
+
 ```python
 # exercise_3.py
 from collections.abc import Iterator
@@ -100,6 +108,11 @@ run, the same laziness
 both rely on.
 
 ## 4. Two fixes for a spent generator
+
+> `generator_lifecycle.py` returns an empty list on its second pass.
+> Fix the caller two ways: collect into a list once and reuse it,
+> then instead convert `squares` into a `Countdown`-style iterable class whose `__iter__()` builds a fresh generator.
+> Which fix would you choose for a stream of a million items, and why?
 
 ```python
 # exercise_4.py
@@ -148,6 +161,15 @@ expensive and you know the data is small, or when nothing can replay
 the source, as with a network response.
 
 ## 5. `tee` with the branches `k` items apart
+
+> `tee.py` measures two extremes: one branch drained before the other starts,
+> and both branches in lockstep.
+> Measure what lies between them.
+> Advance one branch `k` items ahead of the other,
+> then walk both together so the leading branch stays `k` items ahead.
+> Predict how the buffer grows with `k` before you measure it,
+> then measure it for two values of `k` with `tee.py`'s `tracemalloc` approach,
+> and explain the result using that section's rule for what `tee` buffers.
 
 ```python
 # exercise_5.py
@@ -202,6 +224,11 @@ does not. Pass `--numbers` to see the figures your machine reports.
 
 ## 6. A test for `filter()`
 
+> The prose pairs the generator expression's `if` clause with `filter()`,
+> but no test covers `filter()`.
+> Add one to `test_endless.py`,
+> and say which existing test it should resemble.
+
 ```python
 # test_ch23_filter.py
 from collections.abc import Iterator
@@ -239,6 +266,15 @@ no such chance: it receives values one at a time and can answer only
 "keep" or "skip" about the value in front of it, never "stop."
 
 ## 7. `OverSequence`, and `first()` on an endless source
+
+> `gof_iterator.py` shows only the stream version.
+> Write `OverSequence` over a `Sequence[T]`,
+> confirm `traverse()` drives it with no changes to `traverse()`,
+> and explain why it needs no `seen` list.
+> Then build an `OverStream` over `itertools.count(1)`.
+> `traverse()` never returns on an endless source,
+> so drive the four methods yourself for 50,000 steps and report `len(stream.seen)`.
+> What has `first()` cost you on an endless source?
 
 ```python
 # exercise_7.py
@@ -338,6 +374,10 @@ iterate and impossible to rewind.
 
 ## 8. A peekable iterator
 
+> Write `peek(it)` that reports an iterator's next value without consuming it.
+> You cannot, so write a `Peekable` wrapper that can,
+> and name what it stores that a bare iterator does not.
+
 ```python
 # exercise_8.py
 from collections.abc import Iterable, Iterator
@@ -394,6 +434,12 @@ eagerness `tee`, `OverStream`, and this chapter's other lookahead all
 pay: answering a question about the future means fetching the future.
 
 ## 9. A string that never bottoms out
+
+> `flatten()` recurses on anything that is not an `int`.
+> Call it on `[1, "ab", 2]` and explain the `RecursionError` you get,
+> given that a one-character string is still a `Sequence`.
+> Then fix `flatten()` so a `str` yields as one item,
+> and say what the same fix looks like in `flatten_loop()`.
 
 ```python
 # exercise_9.py
@@ -460,6 +506,13 @@ string. Under `ty` the failure arrives as a `RecursionError` at
 runtime rather than an error at the assignment.
 
 ## 10. Skipping instead of raising
+
+> `typed()` raises a `TypeError` on the first item of the wrong type,
+> which ends the stream.
+> Write `typed_skipping()`, which drops mismatched items and keeps going,
+> then say which of the two you would want wrapping a parsed log file,
+> and why.
+> Which one is easier to write as `TypedIterator`?
 
 ```python
 # exercise_10.py

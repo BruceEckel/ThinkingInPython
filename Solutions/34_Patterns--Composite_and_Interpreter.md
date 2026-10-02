@@ -2,6 +2,10 @@
 
 ## 1. `find(entry, name)`
 
+> Add `find(entry, name)` to `filesystem.py`:
+> a generator yielding the path of every entry whose name matches.
+> A directory can match, and matching should continue into it.
+
 ```python
 # exercise_1.py
 from collections.abc import Iterator
@@ -57,6 +61,11 @@ holds two separate directories named `"src"`, and both come back as
 `root/src`, so a path alone does not say which one matched.
 
 ## 2. A `Symlink` node
+
+> Add a `Symlink` node to the `Node` union in `filesystem.py`,
+> holding a name and a target path,
+> and let the type checker report every operation that must change.
+> Decide what `disk_usage()` and `walk()` should do with a link.
 
 ```python
 # exercise_2.py
@@ -126,6 +135,11 @@ than following it into the target's subtree, since following it could
 loop forever if a link ever pointed back at one of its own ancestors.
 
 ## 3. `Neg` and `Div`
+
+> Add `Neg` (negation) and `Div` (division) nodes to `expr.py`,
+> along with `__neg__()` and `__truediv__()` operator methods.
+> Update `evaluate()`, `to_infix()`, and `simplify()`.
+> What should `simplify()` do with division by `Num(0)`?
 
 ```python
 # exercise_3.py
@@ -302,6 +316,10 @@ it, and the error arrives when the line executes.
 
 ## 4. Precedence-aware `to_infix()`
 
+> `to_infix()` parenthesizes every operation.
+> Rewrite it to emit only the parentheses that precedence requires,
+> so `2 * x + 1` renders as `2 * x + 1` but `(x + 1) * (x + 2)` keeps its parentheses.
+
 ```python
 # exercise_4.py
 from typing import Final, assert_never
@@ -388,6 +406,11 @@ right-hand child at the *same* precedence as its parent
 omits a pair that changes the expression's meaning.
 
 ## 5. `derivative(e, name)`
+
+> Write `derivative(e, name)`:
+> a function that returns the symbolic derivative of an expression with respect to a variable,
+> using the sum rule and the product rule.
+> Run its results through `simplify()` and compare.
 
 ```python
 # exercise_5.py
@@ -520,6 +543,12 @@ exercise.
 
 ## 6. Declining with `NotImplemented`
 
+> At runtime, `"a" + x` silently builds `Add(Num("a"), x)`,
+> an ill-typed tree the type checker rejects in source it can see.
+> Rewrite all four operator methods to return `NotImplemented` for an operand they cannot use
+> ([*Multiple Dispatching*](../Chapters/32_Patterns--Multiple_Dispatching.md#operators-dispatch-twice) shows the idiom),
+> and confirm that `"a" + x` and `x + "a"` both now raise a `TypeError`.
+
 ```python
 # exercise_6.py
 from exceptions import expected
@@ -619,6 +648,11 @@ sees, the case an interpreter exists to handle.
 
 ## 7. A third walker: `to_html()`
 
+> Write a third walker over `Template` in `template_query.py`, `to_html()`,
+> that emits the literal pieces unchanged and replaces `<`, `>`,
+> and `&` in every interpolated value with their HTML entities.
+> Show that `t"<p>{comment}</p>"` survives a `comment` containing a `<script>` tag.
+
 ```python
 # exercise_7.py
 from html import escape
@@ -660,6 +694,14 @@ version never loses the distinction, so escaping is a decision the
 renderer can still make.
 
 ## 8. An iterative walk over a deep tree
+
+> Build a left-deep expression by folding `+` over a few thousand `Num` nodes,
+> and confirm that `evaluate()` raises a `RecursionError`.
+> Then write `evaluate_iterative()`,
+> which walks the same tree with an explicit stack and no recursion,
+> and check that the two agree on a small expression.
+> Raising the limit with `sys.setrecursionlimit()` also avoids the error.
+> Say what it costs.
 
 ```python
 # exercise_8.py
@@ -800,6 +842,11 @@ iterative walk keeps its pending work in one list and changes no
 setting that other code can see.
 
 ## 9. Reopening the set of node types
+
+> A plugin package needs to add its own entry types to `filesystem.py` without editing your code.
+> Sketch what breaks, then write the version of `disk_usage()` that supports it.
+> Which of the two designs would you use for a file system,
+> and which for the expression language in `expr.py`?
 
 ```python
 # exercise_9.py

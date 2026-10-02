@@ -2,6 +2,10 @@
 
 ## 1. Leap-year support for `Month`, tests written first
 
+> Add leap-year support to `Month`,
+> so February allows 29 days when the `BirthDate`'s `Year` is a leap year.
+> Write the tests first.
+
 `Year` gains an `is_leap()` method using the standard rule (divisible
 by 4, and not by 100 unless also by 400). `Month.check_day()` takes
 the `Year` as a second argument so it can raise February's cap to 29
@@ -113,6 +117,10 @@ leap year.
 
 ## 2. A stricter `EmailAddress`
 
+> Give `EmailAddress` a stricter check
+> (a single `@`, with text on both sides).
+> Add tests for the values the check should now reject.
+
 ```python
 # exercise_2.py
 from dataclasses import dataclass
@@ -164,6 +172,12 @@ somewhere. `count("@") == 1` additionally rejects two-`@` strings like
 sides, so it rejects `"@x.com"` and `"b@"`.
 
 ## 3. The `NamedTuple` subclass workaround, and the hole it leaves
+
+> Take `test_namedtuple_no_hook.py`'s `Stars` and build the subclass workaround:
+> a `_Stars(NamedTuple)` holding the field,
+> and a `Stars(_Stars)` whose `__new__()` runs the check.
+> Show that `Stars(11)` now raises a `TypeFailure` while `copy.replace(Stars(5), number=99)` does not,
+> and explain why a frozen data class has no equivalent hole.
 
 ```python
 # exercise_3.py
@@ -219,6 +233,11 @@ goes through the constructor. `copy.replace()` calls the constructor,
 the constructor calls `__post_init__()`, and the check runs.
 
 ## 4. `from_json()` rejects a bad email
+
+> Feed `from_json()` a JSON string whose email has no `@`,
+> and confirm that it raises `TypeFailure`.
+> The validation you wrote once, in `EmailAddress`,
+> now also guards your JSON input.
 
 ```python
 # exercise_4.py
@@ -286,6 +305,11 @@ no additional code in `from_json()`.
 
 ## 5. `__replace__()` on an ordinary class
 
+> Make `copy.replace()` work on a `Stars` that is not a data class:
+> write an ordinary class holding the rating, validate in `__init__()`,
+> define `__replace__()`,
+> and confirm that `copy.replace()` still runs your validation.
+
 ```python
 # exercise_5.py
 import copy
@@ -335,6 +359,13 @@ stays validated across a replacement for the same reason. Any
 `copy.copy()` does, skips the check.
 
 ## 6. A `ClassVar` counter on a frozen `Stars`
+
+> Add a `ClassVar[int]` counter to `Stars` that counts every `Stars` created.
+> Predict whether it appears in the generated `__init__()`'s parameter list before you run it,
+> then check by printing `inspect.signature(Stars.__init__)`.
+> Incrementing the counter as `Stars.built += 1` from `__post_init__()` works on a frozen class,
+> while `self.built += 1` does not.
+> Explain why.
 
 ```python
 # exercise_6.py
@@ -404,6 +435,13 @@ carries a `# type: ignore` to demonstrate the runtime failure.
 
 ## 7. A `dict` field default, three ways
 
+> Give `Months` a second field,
+> a `dict[str, Month]` index written with a `= {}` default,
+> and read the error `@dataclass` reports.
+> Then fix it two ways,
+> with `default_factory=dict` and with `default_factory=dict[str, Month]`,
+> and say which one a type checker can verify.
+
 ```python
 # exercise_7.py
 from dataclasses import dataclass, field
@@ -457,6 +495,12 @@ can see that the factory and the annotation agree. Subscript the
 factory when you want the checker to confirm the agreement.
 
 ## 8. A type test in the check
+
+> `stars_float.py` builds a `Stars` holding `5.5`.
+> Add a type test to the check in `__post_init__()` so that `Stars(5.5)` raises `TypeFailure`.
+> `Stars(True)` also passes the range check.
+> Explain why an `isinstance()` test accepts it,
+> and write the test so that it rejects `True` as well.
 
 ```python
 # exercise_8.py

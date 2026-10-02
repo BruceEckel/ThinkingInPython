@@ -2,6 +2,10 @@
 
 ## 1. Nesting a second `Trace` inside the first
 
+> In `trace_cm.py`, nest a second `with Trace("B") as u:` block inside the body of the first `with Trace("A") as t:` block,
+> with its own `print(f"inside {u.name}")`.
+> Before running it, predict the order in which the six "enter"/"inside"/"exit" lines appear.
+
 ```python
 # exercise_1.py
 from typing import Self
@@ -39,6 +43,11 @@ you write the nesting as two separate `with` statements or as one
 comma-separated line.
 
 ## 2. Suppressing a second exception type
+
+> In `demo_exceptions.py`,
+> change `expected(ZeroDivisionError)` to `expected((ZeroDivisionError, TypeError))`,
+> then raise a `TypeError` instead of dividing by zero,
+> and confirm that `expected` catches and prints it too.
 
 ```python
 # ch15_expected_types.py
@@ -79,6 +88,10 @@ accepts the second form, and that is the design
 
 ## 3. A third manager on one `with` line
 
+> Add a third manager to the `with` statement in `multiple.py`,
+> `tag("li")` again for a second item,
+> and confirm the exit order still reverses the entry order.
+
 ```python
 # exercise_3.py
 from collections.abc import Iterator
@@ -110,6 +123,10 @@ appear on the line. The pattern from two managers extends
 unchanged to three, four, or more.
 
 ## 4. Both pool connections leased at once
+
+> In `test_object_pool.py`, add a test that leases both connections at once,
+> entering a second `with pool.lease()` block inside the first,
+> and confirms `pool.available()` reaches `0`.
 
 ```python
 # test_ch15_both_leased.py
@@ -166,6 +183,8 @@ return one.
 
 ## 5. Two `banner` decorators stacked on one function
 
+> Stack `@banner("outer")` and `@banner("inner")` from `context_decorator.py` on a single function and predict the order of the four bracketing lines before running it.
+
 ```python
 # exercise_5.py
 from collections.abc import Iterator
@@ -211,6 +230,10 @@ on every call instead, so every call shares any state the instance
 holds.
 
 ## 6. `ignore_missing`, which suppresses only `KeyError`
+
+> Write a context manager `ignore_missing` whose `__exit__()` suppresses only `KeyError` and lets everything else through,
+> without using `contextlib.suppress`.
+> Test it with a block that raises a `KeyError` and a block that raises a `ValueError`.
 
 ```python
 # ignore_missing.py
@@ -262,6 +285,10 @@ The class uses a lowercase name because you use it like a function.
 `contextlib.suppress` is lowercase for the same reason.
 
 ## 7. `exit_stack.py` driven from the command line
+
+> Rewrite `exit_stack.py` to take its names from `sys.argv[1:]`,
+> run it with no arguments and with three,
+> and confirm the close order reverses the open order in both cases.
 
 Both calls to `wrap()` go, replaced by one call that reads the names
 from the command line:
@@ -342,6 +369,10 @@ wrap(["x", "y", "z"])
 ```
 
 ## 8. `careless()` with its `try`/`finally` restored
+
+> Wrap the `yield` in `careless()` from `no_finally.py` in `try`/`finally`,
+> with the `exit` line in the `finally`.
+> Before running it, predict where `exit A` appears relative to `caught: boom`.
 
 ```python
 # exercise_8.py

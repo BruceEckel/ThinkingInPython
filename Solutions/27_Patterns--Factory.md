@@ -2,6 +2,10 @@
 
 ## 1 & 2. A `Triangle` in both factory styles
 
+> 1.  Add a class `Triangle` to `shape_factory_method.py`.
+>
+> 2.  Add a class `Triangle` to `shape_factory_objects.py`.
+
 `shape_factory_method.py`'s single static `factory()` needs one new `case`:
 
 ```python
@@ -111,6 +115,13 @@ one step further: each class registers itself, so even the table entry
 disappears.
 
 ## 3. `GnomesAndFairies`
+
+> Add a new type of `GameElementFactory` called `GnomesAndFairies`,
+> first to `abstract_factory_abc.py` and then to `abstract_factory_protocol.py`.
+> In `abstract_factory_protocol.py`, leave out `make_obstacle()` at first,
+> pass the factory to `GameEnvironment`,
+> and confirm the error your type checker reports.
+> Then add it.
 
 ```python
 # exercise_3.py
@@ -239,6 +250,9 @@ missing method. Nothing guards that version at runtime:
 
 ## 4. An Abstract Factory for "thick" and "thin" shapes
 
+> Modify `shape_factory_objects.py` to use an *Abstract Factory* to create different sets of shapes
+> (for example, one type of factory object creates "thick shapes," another creates "thin shapes," but each factory object can create all the shapes: circles, squares, triangles, etc.).
+
 ```python
 # exercise_4.py
 from abc import ABC, abstractmethod
@@ -307,6 +321,15 @@ family of shapes from thick to thin is choosing a different factory
 object, not editing every call site that creates a shape.
 
 ## 5. A four-topping limit, in both pizza styles
+
+> Add a rule to both pizza examples: a pizza may carry at most four toppings.
+> In `pizza_direct.py`, enforce it with `__post_init__()`,
+> as [Data Classes as Types](../Chapters/12_Techniques--Data_Classes_as_Types.md#a-type-is-a-set-of-values)
+> does for `Stars`.
+> In `pizza_builder.py`,
+> decide whether it belongs in `topping()` or `build()`.
+> In which version can an invalid pizza exist, even momentarily?
+> `stars_class.py` in that chapter shows the same hazard.
 
 ```python
 # exercise_5.py
@@ -384,6 +407,12 @@ check fails: `damaged` still prints `Stars(13)` after `f1()` raises a
 `ValueError` and still holds five toppings.
 
 ## 6. A registry whose classes live somewhere else
+
+> Move `Circle` and `Square` out of `registry.py` into a new module,
+> `extra_shapes.py`.
+> Confirm that `make("Circle")` now raises `KeyError` until something imports `extra_shapes`,
+> and explain which line of which file registers the class, and when it runs.
+> Then make `registry_demo.py` print the same key list it printed before the move.
 
 ```python
 # registry.py
@@ -485,6 +514,13 @@ statements, until the first use of a name the demo never uses.
 
 ## 7. What `copy.copy()` costs a prototype registry
 
+> Give `Monster` in `prototype_registry.py` a `parts: dict[str, int]` field and add a prototype that uses it.
+> Change `spawn()` to use `copy.copy()` instead of `copy.deepcopy()`,
+> run `test_prototype.py` with `pytest`
+> (`uv run pytest Examples/27_Patterns--Factory/test_prototype.py` from the repository root),
+> and explain which assertion fails and why.
+> Then restore `deepcopy()` and add a test that would have caught the bug through `parts` rather than `powers`.
+
 ```python
 # exercise_7.py
 import copy
@@ -567,6 +603,12 @@ spawn being correct, and that assertion fails under `copy.copy()`.
 
 ## 8. What the `eval()` dispatcher accepts
 
+> Recreate the `eval()` dispatcher described after `shape_factory_objects.py`'s listing:
+> a `create_shape()` that builds each factory with `eval(f"_{kind}.Factory()")` instead of consulting `FACTORIES`.
+> Call it with a `kind` string that is not a shape name but a Python expression with a side effect,
+> and show that it runs the expression.
+> Then show that the `FACTORIES` version raises `KeyError` for the same string.
+
 ```python
 # exercise_8.py
 from abc import ABC, abstractmethod
@@ -631,6 +673,14 @@ request, or a command line, the table is the only acceptable version
 of the two.
 
 ## 9. Recursing through `__subclasses__()`
+
+> Derive `_Oval` from `_Circle` in `shape_factory_method.py`,
+> give it its own `draw()`, and add a `case "Oval"` to `factory()`.
+> Run the program and confirm that `shape_name()` never yields `"Oval"`,
+> then explain why.
+> Write a recursive generator `all_subclasses()` that yields a class's direct subclasses and,
+> through each one's own `__subclasses__()`, every class below them.
+> Use it in `shape_name()` and confirm that `Oval` now appears.
 
 ```python
 # exercise_9.py
@@ -724,6 +774,14 @@ factory that should build only leaf classes needs a further filter,
 
 ## 10. Finding the class that forgot `@make.register`
 
+> Add a `Hexagon` to `protocol_registry.py` that satisfies `Shape` but carries no `@make.register`,
+> and show what `make("Hexagon")` does.
+> Then write a check that reports every class in the module that satisfies `Shape` and is missing from `make.registry`,
+> so the forgotten decorator is found before any `make()` call.
+> `@runtime_checkable`, which [*Surrogate*](../Chapters/26_Patterns--Surrogate.md#proxy)
+> shows with `isinstance()`,
+> also lets `issubclass()` test a class against a Protocol whose members are all methods.
+
 ```python
 # exercise_10.py
 from typing import Protocol, runtime_checkable
@@ -803,6 +861,13 @@ The check also sees one namespace at a time, so a plugin module
 must run it over its own `globals()`.
 
 ## 11. Prototypes registered by decoration
+
+> Fill `PROTOTYPES` in `prototype_registry.py` by decoration instead of a table literal.
+> Write a `@prototype(name)` decorator for a function that builds and returns the `Monster`,
+> so that each decorated function's result is stored under `name`.
+> Explain why the decorator takes the name as an argument rather than reading the function's `__name__`:
+> write that version and read what `ty` reports.
+> Then say what the decorated form gains over the table and what it costs.
 
 ```python
 # exercise_11.py

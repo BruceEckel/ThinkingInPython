@@ -37,6 +37,10 @@ class StateMachine:
 
 ## 1. `UnpredictablePerson` with a `Prozac` mood
 
+> Using [*State*](../Chapters/26_Patterns--Surrogate.md#state),
+> make a class called `UnpredictablePerson` that changes the kind of response to its `hello()` method depending on its current `Mood`.
+> Add another kind of `Mood` called `Prozac`.
+
 ```python
 # exercise_1.py
 from typing import Protocol
@@ -85,6 +89,9 @@ surrogate from [*Surrogate*](../Chapters/26_Patterns--Surrogate.md#state),
 applied to a new domain.
 
 ## 2. The mood machine, on the first design
+
+> Turn exercise 1's `UnpredictablePerson` into a state machine using `state_machine.py`,
+> the first design, where each state decides the next one.
 
 ```python
 # exercise_2.py
@@ -177,6 +184,13 @@ worth making explicit and easy to audit.
 
 ## 3. A word-driven state machine with per-state transition tables
 
+> Create a *State Machine* system in which the current state and the input together determine the next state.
+> Use a `dict` to map a `str` naming a state to its state object.
+> Give each state subclass its own transition table,
+> which its `next_state()` method consults.
+> Feed the machine a sequence of single words,
+> such as a text file with one word per line.
+
 ```python
 # exercise_3.py
 from typing import ClassVar
@@ -232,6 +246,8 @@ from a file, one per line, takes one line of code:
 
 ## 4. Configuring the machine from one transition table
 
+> Modify the previous exercise so that you can configure the state machine by editing a single transition table.
+
 The per-state design in exercise 3 spreads the turnstile's rules
 across two classes, one dictionary each. A single table keyed by
 `(state, word)` collects both dictionaries and makes the whole
@@ -276,6 +292,13 @@ audit and edit as a unit. The chapter's own
 makes the same trade-off over the per-state `mouse_trap_states.py`.
 
 ## 5. `mouse_move_generator()`
+
+> Write a `mouse_move_generator()`,
+> a [generator](../Chapters/23_Patterns--Iterators.md#generators)
+> that yields valid `MouseAction` moves in sequence,
+> where each possible move depends on the previous one
+> (it is another state machine).
+> Have it accept an `int` for the number of moves to produce, then stop.
 
 ```python
 # exercise_5.py
@@ -333,6 +356,15 @@ sequence this generator produces is legal by construction.
 table is the stricter of the two.
 
 ## 6. A washing machine, table-driven
+
+> Apply the table-driven `StateMachine` from `tabledriven/table_machine.py` to a washing-machine problem.
+> Give one `(state, input)` pair two rows told apart by a condition,
+> such as a load too heavy for the fast spin.
+> Then press `Start` in the middle of a cycle,
+> an input that state has no row for,
+> and decide what the caller does with the `NoTransition`:
+> ignore the press or stop the machine.
+> Say which policy suits a washing machine, and why.
 
 ```python
 # exercise_6.py
@@ -446,6 +478,10 @@ a report.
 
 ## 7. An elevator, table-driven
 
+> Create an elevator state machine using `tabledriven/table_machine.py`.
+> Give the "doors closing" state two rows for the same input,
+> one guarded by a door-obstruction condition.
+
 ```python
 # exercise_7.py
 from dataclasses import dataclass
@@ -545,6 +581,10 @@ conditions to open the doors with no travel.
 
 ## 8. A heating/air-conditioning system, table-driven
 
+> Create a heating/air-conditioning system using `tabledriven/table_machine.py`.
+> A single `TemperatureReading` input must be able to lead to heating,
+> cooling, or idle, decided entirely by conditions on one `(state, input)` key.
+
 ```python
 # exercise_8.py
 from dataclasses import dataclass
@@ -610,6 +650,13 @@ action slot here holds `None`, and the fall-through rows leave the
 condition slot `None` too, so both slots are optional per row.
 
 ## 9. A `Nickel` the table has never heard of
+
+> Build a two-state machine that collects `Money`,
+> modeled on `vending_machine.py`'s.
+> Add a `Nickel` class deriving from `Money` and feed one in without touching the table.
+> Explain the exception, then make it work two ways: by adding a row,
+> and by making `Nickel` an instance of `Money` rather than a subclass.
+> Say which you would keep.
 
 ```python
 # exercise_9.py

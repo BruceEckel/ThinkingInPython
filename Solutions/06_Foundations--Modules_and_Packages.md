@@ -2,6 +2,13 @@
 
 ## 1. A fourth module, imported three ways
 
+> Add a fourth module, `a_package/module5.py`,
+> with its own `function5()` and a top-level `print()` so the module announces itself when it loads.
+> Import it three ways, using `import a_package.module5`,
+> `from a_package import module5`,
+> and `from a_package.module5 import function5`,
+> and confirm the loading message prints only once however many of the three you use together.
+
 The package's `__init__.py` is the chapter's:
 
 ```python
@@ -44,6 +51,12 @@ code again. It only binds a name to the module in the cache. The
 package's `__init__.py` runs once for the same reason.
 
 ## 2. A nested module, and a badly named package
+
+> Add `a_package/b_package/module6.py` with a `function6()` that calls `function5()` from `module5`.
+> Import and call `function6()` from a script outside `a_package`,
+> then rename `b_package` to `bPackage` (and rename it back afterward)
+> and explain, from the rules in [File Names](../Chapters/06_Foundations--Modules_and_Packages.md#file-names),
+> why that name is a poor choice even though the import still works.
 
 `b_package` keeps the chapter's `__init__.py` too:
 
@@ -98,6 +111,13 @@ import check, the one exercise 4 examines, rejects that spelling.
 
 ## 3. Lazy imports load in use order, not declaration order
 
+> Write a small module `noisy2.py` whose top-level body prints a message,
+> like `noisy.py`.
+> In a new script, `lazy import` both `noisy` and `noisy2`,
+> then use `noisy2` before `noisy`.
+> Confirm the two loading messages print in the order you used the modules,
+> not the order you wrote the `lazy import` lines.
+
 ```python
 # noisy.py
 
@@ -144,6 +164,16 @@ first.
 
 ## 4. Renaming `module.py` to `Module.py`
 
+> Rename `module.py` to `Module.py`,
+> change `use_module.py` to `import Module`,
+> and update its call to `Module.useful_function()`.
+> Run it.
+> Then change the import back to `import module`,
+> leaving the file named `Module.py`, and run it again.
+> Predict the result before you run it, then explain what you see,
+> given that Windows and macOS open `module.py` and `Module.py` as the same file.
+> Look up `PYTHONCASEOK` to confirm your explanation.
+
 The `import Module` statement resolves, because the name and the file
 agree, and the call in the body becomes `Module.useful_function()` to
 match; left as `module.useful_function()`, it raises a `NameError`.
@@ -182,6 +212,12 @@ recommends `snake_case` for modules, and an all-lowercase name has
 only one spelling for the check to match.
 
 ## 5. Absolute imports and running a package module as a script
+
+> Change `a_package/module4.py` to the absolute import `from a_package.module1 import function1` and confirm `use_module4.py` still works.
+> Then run `python a_package/module4.py` directly,
+> both before and after the change.
+> Both fail, with different errors: explain each,
+> and say why `python -m a_package.module4` works either way.
 
 Changing `a_package/module4.py` to
 `from a_package.module1 import function1` leaves `use_module4.py`
@@ -224,6 +260,10 @@ top level, outside any package.
 
 ## 6. Star import without `__all__`
 
+> Remove the `__all__` line from `exporting.py`.
+> Predict what `star_import.py` prints without it, run it to check,
+> then restore the line.
+
 ```python
 # exporting_no_all.py
 
@@ -258,6 +298,13 @@ direction only: `__all__` can export an underscored name, but without
 import.
 
 ## 7. A `from` import shares the object, not the name
+
+> Give a module a top-level list, `plugins = []`,
+> and bring the list into a script with `from ... import plugins`.
+> Append to the list through the module's name,
+> then print the script's `plugins`.
+> Rebind the module's name to a new list, append to that one, and print both.
+> Explain why the first change reaches the script's name and the second does not.
 
 ```python
 # plugin_list.py

@@ -2,6 +2,9 @@
 
 ## 1. `transfer()`, tests written first
 
+> Add a `transfer(other: Account, amount: float)` method to `Account` and write its tests first:
+> a successful transfer, and an overdraft that leaves both accounts unchanged.
+
 ```python
 # test_ch11_transfer.py
 from dataclasses import dataclass
@@ -65,6 +68,9 @@ transfer as a whole should fail.
 
 ## 2. Parametrized interest rates
 
+> Use `parametrize` to test `add_interest()` at several rates,
+> comparing with `pytest.approx()`.
+
 ```python
 # test_ch11_interest_rates.py
 from dataclasses import dataclass
@@ -107,6 +113,10 @@ interest applied more than once, is where the assertion needs the
 tolerance.
 
 ## 3. A fixture asserting an invariant after the test
+
+> Write a fixture that `yield`s an `Account` and asserts, after the `yield`,
+> that the balance is never negative.
+> Use it in two tests.
 
 ```python
 # test_ch11_invariant.py
@@ -162,6 +172,12 @@ invariant check, with no assertion duplicated in either test body.
 
 ## 4. The environment variable, patched and then injected
 
+> Write `settings_path()`,
+> which returns `Path(os.environ["APP_CONFIG"]) / "settings.ini"`,
+> and test it with `monkeypatch` and `tmp_path`.
+> Then rewrite the function to take the directory as an argument and test it again.
+> Which test survives a change to the environment variable's name?
+
 ```python
 # settings.py
 import os
@@ -213,6 +229,11 @@ usually one function at the program's edge, and that function is the
 one place a patching test is worth writing.
 
 ## 5. Stubbing a boundary, patched and then injected
+
+> `weather.current_temp()` calls `urlopen()`.
+> Write a second function that takes a fetcher as an argument instead,
+> and test both: one with `monkeypatch`, one with a plain function passed in.
+> Then rename `weather.urlopen` to `weather.fetch` and see which test still passes.
 
 ```python
 # ch11_weather.py
@@ -280,6 +301,12 @@ of going looking for something no caller handed it, the chapter's
 description of a function that is hard to test.
 
 ## 6. The branch that sends nothing
+
+> `test_notifier.py` checks that a negative balance sends a message.
+> Write the test for the other branch:
+> a balance of zero or more sends nothing.
+> Then write the same test with a hand-written stub in place of the `Mock`.
+> What must the stub gain to make the check?
 
 ```python
 # test_ch11_silent_notifier.py

@@ -5,6 +5,12 @@ Paper and Scissors, and loses to Rock. Lizard versus Lizard is a draw.
 
 ## 1. Adding `Lizard` to the table version
 
+> Add a fourth `Item`, `Lizard`, to `paper_scissors_rock_table.py`.
+> Lizard beats Paper and Scissors, and loses to Rock.
+> Lizard versus Lizard is a draw.
+> Add the seven new entries that `OUTCOME` needs:
+> both orders of each mixed pair, plus Lizard versus Lizard.
+
 ```python
 # exercise_1.py
 from enum import StrEnum
@@ -67,6 +73,12 @@ The `__main__` guard lets exercise 3 import this module without
 running its demonstration, as the chapter's own two versions do.
 
 ## 2. Adding `Lizard` to the double-dispatch version
+
+> Add the same `Lizard` to `paper_scissors_rock.py`,
+> the double-dispatch version,
+> which means adding an `eval_lizard()` method to every existing class,
+> plus a `Lizard` class with its own `compete()` and four `eval_*()` methods.
+> Compare how much code this took versus adding `Lizard` to the table version.
 
 ```python
 # exercise_2.py
@@ -174,6 +186,10 @@ should override while inheriting the rest.
 
 ## 3. Sixteen matchups in `EXPECTED`
 
+> In `test_paper_scissors.py`, add `Lizard`'s seven matchups to `EXPECTED`,
+> taking it from nine entries to sixteen,
+> and confirm both versions still agree with each other and with `EXPECTED`.
+
 ```python
 # exercise_3.py
 from types import ModuleType
@@ -230,6 +246,14 @@ comprehension builds from `EXPECTED`, so the test reports sixteen
 cases per module where it reported nine.
 
 ## 4. Counting how often each item type appears
+
+> In `arena.py`, give `item_pair_gen()` an optional `counts: Counter[str] | None = None` parameter,
+> and have it update that counter in place with a tally of every item type it chooses.
+> It still yields `(item1, item2)` pairs, so existing calls need no change.
+> The counter fills only as you consume the generator,
+> so pass in your own `Counter`,
+> iterate over all 100 pairs from `item_pair_gen(Item, 100, counts)`,
+> and then print how many times `Lizard` appeared.
 
 ```python
 # exercise_4.py
@@ -317,6 +341,15 @@ produces, one increment per item, so the caller can read
 
 ## 5. `__sub__()` and `__rsub__()` on `Meters`
 
+> Give `Meters` a `__sub__()` and a `__rsub__()`.
+> `__sub__()` handles a `Meters`, an `int`, or a `float`,
+> and returns `NotImplemented` for anything else.
+> `__rsub__()` needs only the `int` and `float` cases,
+> since Python never calls the reflected form for two `Meters`.
+> Subtraction does not commute, so the reflected form must undo the swap:
+> check that `10 - Meters(3)` produces `Meters(7)` rather than `Meters(-7)`.
+> Then confirm that `"ten" - Meters(3)` raises a `TypeError` rather than producing a `Meters`.
+
 ```python
 # exercise_5.py
 from exceptions import expected
@@ -376,6 +409,12 @@ inside `__rsub__()` reports `Meters`'s complaint instead of
 Python's account of which pair of types has no defined subtraction.
 
 ## 6. Making the table tolerate subclasses
+
+> Subclass `Paper` as `Origami` and duel it against `Rock` in the table version,
+> as `exact_match.py` does.
+> Explain the `KeyError` in terms of how the lookup matches.
+> Then make the table match subclasses by walking both operands' `__mro__` for the first pair that has a row,
+> and say what becomes of each of the two properties the lookup shares with the table-driven state machine.
 
 ```python
 # exercise_6.py
@@ -482,6 +521,12 @@ everything is a new competitor.
 
 ## 7. A business-modeling environment
 
+> Create a business-modeling environment with three types of `Inhabitant`:
+> `Dwarf` (for engineers), `Elf` (for marketers), and `Troll` (for managers).
+> Now create a class called `Project` that creates the different inhabitants and causes them to `interact()` with each other.
+> Single dispatch is enough here.
+> The next exercise adds the second dispatch.
+
 ```python
 # exercise_7.py
 import random
@@ -533,6 +578,18 @@ double dispatch once `interact()`'s behavior must vary by `other`'s type too,
 and exercise 8 adds that dependence.
 
 ## 8. Weapons, battles, and a full meeting
+
+> Modify the previous exercise's `Project` to make the interactions more detailed.
+> Each `Inhabitant` can randomly produce a `Weapon` using `get_weapon()`:
+> a `Dwarf` uses `Jargon` or `Play`,
+> an `Elf` uses `InventFeature` or `SellImaginaryProduct`,
+> and a `Troll` uses `Edict` or `Schedule`.
+> You must decide which weapons "win" and "lose" in each interaction
+> (as in `paper_scissors_rock.py`).
+> Add a `battle()` method to `Project` that takes two `Inhabitant`s and matches them against each other.
+> Now create a `meeting()` method for `Project` that creates groups of `Dwarf`,
+> `Elf`, and `Troll` and battles the groups against each other until only members of one group remain.
+> These are the "winners."
 
 The listing gives each `Inhabitant` kind two of six weapon types,
 ranked around a cycle: each weapon beats the previous two in the
@@ -763,6 +820,22 @@ exactly as it does in a real rock-paper-scissors tournament.
 
 ## 9. A table of callables
 
+> The chapter claims that a table cell can hold a function,
+> so even elaborate behavior fits the table.
+> Build that version.
+> In `paper_scissors_rock_table.py`,
+> give every `OUTCOME` cell a `Callable[[Item, Item], Outcome]` in place of its `Outcome`,
+> and have `compete()` call the cell it finds:
+> `OUTCOME[type(self), type(item)](self, item)`.
+> The call site stays `item1.compete(item2)`.
+> Write a helper that wraps a constant `Outcome` in a callable,
+> so the seven unchanged cells stay one line each.
+> Then give `Paper` a `wet` attribute and make the `(Paper, Rock)` and `(Rock, Paper)` cells read it:
+> dry paper wraps the rock and wins, wet paper is too soggy and draws,
+> whichever of the two calls `compete()`.
+> The chapter gives two reasons for preferring the double-dispatch version.
+> Say which one this change answers, and which one survives it.
+
 ```python
 # exercise_9.py
 from collections.abc import Callable
@@ -873,6 +946,8 @@ running through every class, which is the difference between a test
 you write once and a test every new `Item` forces you to edit.
 
 ## 10. Exercise 8, rebuilt on a table
+
+> Modify exercise 8 to use the table lookup technique of `paper_scissors_rock_table.py`.
 
 ```python
 # exercise_10.py

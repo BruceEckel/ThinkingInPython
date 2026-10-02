@@ -2,6 +2,12 @@
 
 ## 1. Which process ran each call
 
+> Change `count_primes()` to return `(count, os.getpid())` and print the distinct process IDs alongside the counts.
+> Narrow `assert parallel == serial` to compare only the counts,
+> since the serial run now carries the parent's ID and the parallel one carries the workers'.
+> Compare the number of distinct IDs to `os.process_cpu_count()`,
+> and run `parallel_pure.py` three times before deciding what that number means.
+
 ```python
 import os
 from concurrent.futures import ProcessPoolExecutor
@@ -63,6 +69,8 @@ not belong in a `#:` marker in the book.
 
 ## 2. Which thread ran each call
 
+> Replace `ProcessPoolExecutor` with `ThreadPoolExecutor` in the previous exercise and explain the IDs you see instead.
+
 ```python
 import os
 from concurrent.futures import ThreadPoolExecutor
@@ -96,6 +104,11 @@ underneath. That contrast is the substitutable-backend point from
 [Concurrency](../Chapters/19_Techniques--Concurrency.md#one-executor-interface-three-pools).
 
 ## 3. Three property shapes for `sorted()`
+
+> Write Hypothesis properties for `sorted()` using two shapes from [A Family of Property Shapes](../Chapters/43_Functional--Confidence.md#a-family-of-property-shapes):
+> an invariant (every adjacent pair of the output is in order) and idempotence
+> (sorting a sorted list changes nothing).
+> Then add the oracle property that `sorted(xs)` agrees with a hand-written insertion sort on short lists.
 
 ```python
 # test_sorted_laws.py
@@ -158,6 +171,13 @@ Capping the list length keeps the quadratic oracle cheap, since the
 bugs it catches show up on short inputs.
 
 ## 4. A law that is false
+
+> State a law that is false and watch Hypothesis falsify it:
+> `@given(strategies.text())` with `assert s.upper().lower() == s.lower()`.
+> Report the counterexample Hypothesis shrinks to, run the test a few times,
+> deleting the `.hypothesis/` directory before each run,
+> to see which characters Hypothesis reports,
+> and explain what those characters reveal about Unicode case mapping.
 
 ```python
 from hypothesis import given, strategies
@@ -233,6 +253,14 @@ strings reach the parts of the repertoire nobody thinks to type, and
 that reach is the argument for property testing in one example.
 
 ## 5. A property test for `group_rounds()`
+
+> Write a property test for `group_rounds()` from [Toolkits](../Chapters/41_Functional--Toolkits.md#groups-of-any-size):
+> for any roster and any group size,
+> every student appears in exactly one group per round.
+> Use a strategy that generates rosters of distinct names.
+> Then break `group_rounds()` on purpose, run the test twice,
+> and confirm Hypothesis reports the same counterexample both times:
+> Hypothesis records a failing case under `.hypothesis/` and replays it first on the next run.
 
 ```python
 # test_group_rounds.py
@@ -370,6 +398,11 @@ comes up again on every later run.
 
 ## 6. Two impure functions with no `global` in sight
 
+> Write two functions that are *not* referentially transparent without using `global`:
+> one that reads `datetime.now()`, and one that reads an environment variable.
+> For each, name the substitution that changes the program's behavior,
+> then rewrite the function so the value arrives as an argument.
+
 ```python
 # opaque_inputs.py
 import os
@@ -429,6 +462,10 @@ middle of it. [Testing](../Chapters/11_Techniques--Testing.md#random-numbers)
 makes the same move for a random source.
 
 ## 7. `match` against `isinstance()` on the same function
+
+> Take the `describe()` function from [Error Handling](../Chapters/42_Functional--Error_Handling.md#matching-on-the-error)
+> and rewrite its `match` as `isinstance()` tests.
+> Count the lines, then run `ty` on both versions and compare what it knows about the value inside the `Ok` in each.
 
 ```python
 # describe_isinstance.py

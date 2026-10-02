@@ -188,6 +188,15 @@ def gate(v: Vars) -> None:
     stays: a paragraph that fails reflow's round-trip check is never rewritten,
     and that failure still exits nonzero and stops the gate.
 
+    exercise_statements.py runs with --write twice, and each run self-heals
+    the exercise statements copied into Solutions/ the same way. The first
+    sits right after the line-ending fix and before the check_all calls: the
+    `anchors` check reads Solutions/, so a statement link left stale by a
+    renamed chapter heading would otherwise fail the gate before the copy
+    could be refreshed, and never heal. The second sits right after the
+    reflow: reflow can rewrap a chapter's exercise lines, and the copy must
+    match the reflowed chapter in the same run instead of one run later.
+
     Two steps skip work that cannot find anything new (tools/skip_stamps.py
     has the policy): the tools' own tests run only when tools/ changed
     since they last passed, and `run` executes only the listings without
@@ -205,6 +214,7 @@ def gate(v: Vars) -> None:
     full_if_asked(v)
     py("tools.tools_tests", *v.words("PYTEST_N"))
     py("tools.check_line_endings")
+    py("tools.exercise_statements", "--write")
     py("tools.check_all", *GATE_CHECKS)
     py("tools.check_all", "anchors", "--paths", *GATE_DOCS)
     py("tools.check_all", "widths", "records", "--paths", "Solutions")
@@ -213,6 +223,7 @@ def gate(v: Vars) -> None:
     py("tools.check_quoted_diagnostics")
     py("tools.exercise_refs")
     py("tools.reflow_prose", "--write")
+    py("tools.exercise_statements", "--write")
     py("tools.check_unique_slugs")
     py("tools.extract_examples")
     py("tools.check_skip_lists")
@@ -1023,6 +1034,28 @@ def solutions_numbering(v: Vars) -> None:
     `tip solutions-numbering ARGS=19`.
     """
     py("tools.check_solutions", *v.words("ARGS"))
+
+
+@task("Copy each exercise statement into its Solutions heading")
+def statements(v: Vars) -> None:
+    """Rewrite the block quote under each numbered `## N.` heading in
+    Solutions/ from the chapter's exercise statement, so a reader sees the
+    question above its answer. The chapter is the source; the quote is
+    generated and replaced on every run. `gate` runs this too, twice, so the
+    copy self-heals. Takes chapter numbers to rewrite one, e.g.
+    `tip statements ARGS=19`.
+    """
+    py("tools.exercise_statements", "--write", *v.words("ARGS"))
+
+
+@task("Fail if a Solutions exercise statement differs from its chapter")
+def statements_check(v: Vars) -> None:
+    """Report each generated exercise statement in Solutions/ that is
+    missing or differs from the chapter's, and exit nonzero. `tip statements`
+    rewrites them. Takes chapter numbers to check one, e.g.
+    `tip statements-check ARGS=19`.
+    """
+    py("tools.exercise_statements", *v.words("ARGS"))
 
 
 @task("Check every design pattern name is written *Capitalized*; `tip "

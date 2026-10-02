@@ -2,6 +2,12 @@
 
 ## 1. An advancing handler, and the fix it cannot break
 
+> `crossing` in `midnight.py` walks a fixed list, so it answers two requests.
+> Write a handler that instead advances a stored moment by one second at each request,
+> and confirm `archive()` still crosses midnight under it.
+> Then rewrite `archive()` so the file name and the stamp cannot disagree,
+> and explain why no handler can reproduce the bug afterward.
+
 ```python
 # advancing_clock.py
 from collections.abc import Callable
@@ -87,6 +93,15 @@ Naming the clock as an Ability makes the failure reproducible.
 Deriving both strings from a single reading removes it.
 
 ## 2. A leak the type checker cannot see
+
+> `leaky_effect.py` type-checks even though its `Success[int]` claim is false.
+> Describe a review rule or a lint check that catches it,
+> and explain why a type checker cannot.
+> Then demonstrate the error-side twin:
+> write a function that raises a `KeyError` with no `@throws`,
+> wrap it in `catch(KeyError)`, and run it on a failing input.
+> Explain what the types claim, what the run does,
+> and which line restores the guarantee.
 
 The rule that catches `leaky_effect.py` is a reading rule about one line:
 a function whose return type is an `Effect` and whose body is not a generator
@@ -285,6 +300,12 @@ depleting nothing, since wind costs no fuel.
 
 ## 3. A wind turbine between solar and the battery
 
+> Add a wind turbine to `power.py` that is available only during a fixed windy stretch of the evening,
+> put it between solar and the battery in the `sun_first` order,
+> and confirm `run_load()` needs no change.
+> Then shorten every source until some hour has no supplier, run it,
+> and say where the `Blackout` propagates to and why `catch(Blackout)` around `run_load()` does not intercept it.
+
 ```python
 # exercise_3.py
 from exceptions import expect
@@ -350,6 +371,12 @@ so the handler returns a value rather than raising an exception,
 and `plug()` declares the failure it can produce.
 
 ## 4. A scripted outlet
+
+> Write a handler for `Outlet` that ignores `request.hour` and hands out a fixed sequence of sources,
+> the way `scripted` handed out a fixed sequence of tosses.
+> Use it to test that `run_load()` re-requests after a failure,
+> without modeling weather, a clock, or a battery.
+> Then say what such a test cannot tell you about `controller()`.
 
 ```python
 # exercise_4.py
@@ -524,6 +551,12 @@ def report() -> Depend[
 
 ## 5. A fourth failure
 
+> Add a fourth failure to `research()`:
+> a `TooLong` raised when an article exceeds some length.
+> Follow the type checker's diagnostics until the program type-checks again,
+> and list every line you edited.
+> Then do the same to `research_by_hand.py` and say which tool named the lines to change in each case.
+
 ```python
 # research_long.py
 from typing import Final
@@ -633,6 +666,10 @@ changed.
 
 ## 6. A stale wire
 
+> `scenarios.py` supplies a `DeadWire` that fails without printing anything.
+> Write a `StaleWire` whose `latest()` prints `feed: fetching` and then raises `Unavailable`.
+> Predict the trace, then say why it differs from `DeadWire`'s even though both fail the same way.
+
 ```python
 # exercise_6.py
 from feeds import SHELF, StaleWire
@@ -664,6 +701,10 @@ Neither run reaches `need(Encyclopedia)`, so no `library:` line prints in
 either.
 
 ## 7. Retrying the wrong failure
+
+> Wrap `research()` in `retry()` and supply a `Time()`.
+> Explain what happens under the `WEATHER` scenario and why retrying a `NotInteresting` failure is the wrong behavior,
+> then say what an Effect system needs for you to retry only `Unavailable`.
 
 ```python
 # exercise_7.py
@@ -725,6 +766,14 @@ remains. That is more machinery than a predicate, and it changes the result
 type. Both are the cost of a missing operator.
 
 ## 8. Processes instead of threads
+
+> Change `parallel.py` to use a `ProcessPoolExecutor` instead of a `ThreadPoolExecutor`,
+> and confirm `squares()` stays unchanged.
+> Processes re-import the module,
+> so the driver needs the `if __name__ == "__main__":` guard [Concurrency](../Chapters/19_Techniques--Concurrency.md)
+> describes; without it the pool breaks before any work starts.
+> Then try to fork an Effect that still declares a `Need`,
+> and record what the type checker says.
 
 ```python
 import time
@@ -803,6 +852,12 @@ handler can answer a request, and that is the same guarantee running through
 both chapters, applied to a boundary between threads or processes.
 
 ## 9. A scripted wallet
+
+> `wallet.py` runs `spree()` against a `Cell`.
+> Script it instead: write a `Get` handler that answers from a fixed sequence of balances and a `Put` handler that appends every request to a list,
+> the way `scripted` fed `Flip`.
+> Assert that `spree()` attempts every price and writes once per purchase.
+> Then say what this test cannot detect that the `Cell` version can.
 
 ```python
 # test_ch47_wallet.py
@@ -895,6 +950,11 @@ Both are worth having, and each one's blind spot is the other's subject.
 
 ## 10. `throw()` and `@throws` side by side
 
+> `fetch_nonempty()` puts `Empty` into the channel with `throw()`.
+> Rewrite it to raise `Empty` in the body and lift it with `@throws(Empty)`,
+> and confirm the two versions type-check and behave identically.
+> Then make each version fail with an undeclared exception type and compare what the type checker reports for each.
+
 ```python
 # exercise_10.py
 from dataclasses import dataclass
@@ -975,6 +1035,12 @@ ordinary code that raises exceptions, such as `latest()`.
 
 ## 11. A fourth failure, with `catch_all()`
 
+> Exercise 5 adds a `TooLong` failure to `research()`.
+> Repeat it with `catch_everything.py` in the build:
+> predict what the type checker reports in `outcome()`, then confirm.
+> Remove `outcome()`'s return annotation and rerun `ty`,
+> and explain what the type checker stopped verifying.
+
 ```python
 # exercise_11.py
 from dataclasses import dataclass
@@ -1046,6 +1112,14 @@ catch a missing `yield from`: a type checker verifies claims, and an inferred
 type is not a claim.
 
 ## 12. A `Random` Ability
+
+> Write a `Random` Ability whose handler returns an `int` in a range carried on the request,
+> and an accessor `roll(low, high)` for it.
+> Use it to write a dice game as an Effect, then run the game twice:
+> once with a handler that calls `random.randint()`,
+> and once with a handler that walks a scripted sequence.
+> Then delete the `low: int` annotation from the accessor's parameter and say what changes,
+> and delete the annotation on the *handler's* parameter and say what changes.
 
 ```python
 # exercise_12.py
@@ -1168,6 +1242,11 @@ def toast() -> Depend[
 
 ## 13. A dependency two levels down
 
+> Add a `Butter` appliance to `bakery.py` and a `buttered()` Effect that needs it and calls `toast()`.
+> Write `buttered()`'s signature with only `Need[Butter]` first, run `ty`,
+> and read the diagnostic before fixing it.
+> Then remove `Toaster(3)` from `supply()` and say which of the two diagnostics tells you about a dependency two levels down.
+
 ```python
 # exercise_13.py
 from kitchen import Dough, Oven, Toaster, toast
@@ -1246,6 +1325,13 @@ at `run()` catches an under-supplied environment at the program's edge. Neither
 one requires a comment or a docstring to say what depends on what.
 
 ## 14. A shared signature for a cast
+
+> `play()` in `casts.py` accepts any three actors, matched or not.
+> `kitties_and_puzzles()` and `warriors_and_weapons()` already share a signature;
+> give that shape a name so a caller can pass either one where a cast belongs,
+> and say what that recovers of the *Abstract Factory* and what it does not.
+> Then add a fourth actor to `encounter()` and count the lines you edit in `quest.py`,
+> `casts.py`, and `two_games.py`.
 
 The two factories in `casts.py` already have the same signature. The exercise
 is to name it and see what naming it gains. Here is the chapter's cast, with

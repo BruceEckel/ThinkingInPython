@@ -2,6 +2,12 @@
 
 ## 1. Rebinding `counters` instead of clearing it
 
+> In `weak_value.py`, replace the final `counters.clear()` with `counters = []`
+> (rebinding the name) and confirm `live_count()` still reaches `0`.
+> The two do different things to the list object.
+> Say what each one does,
+> then say what a second name bound to the same list sees after each.
+
 ```python
 # exercise_1.py
 from typing import ClassVar
@@ -62,6 +68,9 @@ and `live_count()` stuck at `3`.
 
 ## 2. Listing the names of every live instance
 
+> In `weak_value.py`, add a classmethod `live_names()` to `Counter` that returns a sorted list of the `.name` of every live instance,
+> by reading `cls._instances.values()`.
+
 ```python
 # exercise_2.py
 from typing import ClassVar
@@ -94,6 +103,10 @@ gives a deterministic order, since a dictionary's iteration order here
 follows insertion, not name order.
 
 ## 3. Building the `list` with a comprehension instead of a loop
+
+> In `cleanup.py`, change the loop to build `counters` with a list comprehension instead of `append()` in a `for` loop,
+> and confirm the output stays the same:
+> no object goes away before `End of delete loop` prints.
 
 ```python
 # exercise_3.py
@@ -146,6 +159,10 @@ has printed.
 
 ## 4. A strong registry that never lets go
 
+> In `weak_value.py`, change `_instances` from a `WeakValueDictionary` to a `dict[int, Counter]` and run the file again.
+> Report what `live_count()` prints after each `pop()`,
+> and explain the difference in terms of what each container holds.
+
 ```python
 # exercise_4.py
 from typing import ClassVar
@@ -189,6 +206,13 @@ because the registry keeps them all alive. A
 question without changing the answer.
 
 ## 5. `finalize(self, self.close)` and what it keeps alive
+
+> In `finalizer.py`, change the `finalize()` call to `finalize(self, self.close)`,
+> make `close()` print `self.name, "closed"` instead of invoking the finalizer,
+> and call `a.closer()` where the file now calls `a.close()`.
+> Run it again.
+> Report when `B closed` now prints relative to `End of program`,
+> and say what keeps the `Connection` alive.
 
 ```python
 # exercise_5.py
@@ -257,6 +281,12 @@ back to its own object.
 
 ## 6. A two-object cycle, with and without the collector
 
+> In `cycle.py`, change `self_link()` to build a two-object cycle
+> (`a.peer = b` and `b.peer = a`) instead of a self-reference.
+> Confirm both finalizers run at `gc.collect()`,
+> then remove the `gc.disable()`/`gc.enable()` pair and explain why the language no longer guarantees when the two `finalized` lines appear,
+> even though this small program still prints them in the same place every run.
+
 ```python
 # exercise_6.py
 import gc
@@ -311,6 +341,13 @@ a demonstration whose entire subject is the absence of determinism, so
 the listing turns the collector back on immediately afterward.
 
 ## 7. An `__enter__()` that fails, unguarded and guarded
+
+> In `faulty_init.py`,
+> move the `print()` and the `raise` from `__init__()` into `__enter__()`,
+> in place of its `return self`.
+> Run it and report whether `C closed` prints.
+> Then wrap the `raise` in a `try`/`except` that prints the `closed` line before re-raising the exception,
+> and confirm `C opened` now has its matching `closed`.
 
 ```python
 # exercise_7.py

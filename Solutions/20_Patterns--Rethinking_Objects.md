@@ -2,6 +2,11 @@
 
 ## 1. A leaking `tags` list, then plugged
 
+> In `leaky.py`, add a `tags: list[str]` field to `Leaky`,
+> exposed through a `@property` the same way `numbers` is,
+> and demonstrate the same leak by mutating the list you get back.
+> Then plug the leak the way `plugged.py` plugs `numbers` and `bob`.
+
 ```python
 # exercise_1a.py
 from dataclasses import dataclass
@@ -66,6 +71,14 @@ the data instead.
 
 ## 2. A mutable `Bob` in a frozen data class
 
+> In `immutable.py`, remove `frozen=True` from `Bob` and leave it on `Immutable`.
+> Show that `ty check` still passes,
+> that `immutable.bob.name = "Ralph"` now succeeds,
+> and that `hash(immutable)` now raises a `TypeError`,
+> so the frozen instance can no longer be a dict key.
+> Restore the `frozen=True`.
+> Who, then, must make immutability go all the way down?
+
 ```python
 # exercise_2.py
 from dataclasses import dataclass
@@ -115,6 +128,14 @@ those declarations once you write them. It will not choose them for
 you.
 
 ## 3. `NewType` at the protocol boundary
+
+> In `protocol_collision.py`,
+> define `Price = NewType("Price", float)` and `Weight = NewType("Weight", float)`,
+> change `Priced.total()` to return a `Price`,
+> `Weighted.total()` to return a `Weight`,
+> and `Package.total()` to return a `Weight`.
+> Run `ty check` and read the error it reports for `charge(package)`.
+> Then say what still goes wrong at runtime if someone deletes the annotations.
 
 ```python
 # exercise_3.py
@@ -175,6 +196,12 @@ bargain the chapter describes.
 
 ## 4. A `Triple`, adapted by composition
 
+> In `distance_protocol.py`, add a third class, `Triple`, with fields `a`,
+> `b`, `c` (no `x` or `y`),
+> and an adapter `TripleCoord` that exposes `x` as `a` and `y` as `b`,
+> ignoring `c`.
+> Confirm `distance()` works on a `TripleCoord` with no change to `distance()`.
+
 ```python
 # exercise_4.py
 from math import sqrt
@@ -220,6 +247,11 @@ as it is, because it asks for `.x` and `.y` alone. `TripleCoord`
 supplies that shape, the same way `PairCoord` adapts `Pair`.
 
 ## 5. Adding `Square` to the closed `Shape` union
+
+> In `shapes_match.py`, add a new shape, `Square(side: float)`,
+> to the `Shape` union, add its `case` to `area()`,
+> and confirm `ty check` still passes.
+> Then temporarily comment out the new `case` and observe what `assert_never()` causes the type checker to report.
 
 ```python
 # exercise_5.py
@@ -286,6 +318,10 @@ a type error instead of a runtime failure.
 
 ## 6. A `NullCache`, following `NullLogger`'s shape
 
+> In `null_logger.py`, write a second null-object style class, `NullCache`,
+> whose `get(key)` always returns `None` and whose `set(key, value)` does nothing,
+> following the same shape as `NullLogger`.
+
 ```python
 # exercise_6.py
 from typing import Protocol
@@ -316,6 +352,11 @@ different matter. A miss is information the caller acts on, so it stays
 in the return type.
 
 ## 7. Counting every route into the list
+
+> In `counting_list.py`, count `__setitem__` as well,
+> then find a second `list` method that changes the contents without going through either override.
+> Rewrite `CountingList` to hold a list instead of inheriting from one,
+> and show that the counts are now correct for every route in.
 
 ```python
 # exercise_7.py
@@ -394,6 +435,13 @@ choice composition asks you to make on purpose, instead of discovering
 later that inheritance made it for you.
 
 ## 8. `BoundedStack` without breaking the contract
+
+> In `lsp_violation.py`,
+> make `BoundedStack` obey the Liskov Substitution Principle without removing the limit:
+> keep the base contract that `push()` always succeeds,
+> and expose "full" some other way.
+> Then say what you gave up,
+> and whether `BoundedStack` should be a subclass of `Stack` at all.
 
 ```python
 # exercise_8.py

@@ -2,6 +2,11 @@
 
 ## 1. `tally()`, driven by hand
 
+> Write `tally()`, a generator that yields a prompt string,
+> receives an `int` for each prompt, and returns the total once it has three.
+> Give it the full three-parameter annotation,
+> then drive it by hand with `next()` and `send()` and read the total off `StopIteration`.
+
 ```python
 # exercise_1.py
 from collections.abc import Generator
@@ -52,6 +57,14 @@ result of `send()`.
 suspensions with no storage anywhere else. The frame is the state.
 
 ## 2. A driver that answers from an iterator
+
+> `drive()` answers from a `dict`.
+> Write a second driver that answers from an `Iterator[Answer]`, in order,
+> and run `interview()` under both.
+> Explain what, if anything, needed to change in `interview()`, and why.
+> Give your driver fewer answers than questions and say what it returns.
+> `StopIteration` now means two different things in the same loop.
+> Keep them apart.
 
 ```python
 # exercise_2.py
@@ -175,6 +188,9 @@ Keeping the two meanings apart is a one-line discipline: put inside the
 
 ## 3. A third delegation in `yield_from_send.py`
 
+> Predict the output of `yield_from_send.py` after adding a third `yield from collect("gamma")` to `both()` and extending the loop to `[1, 2, 3, 4, 5]`.
+> Write down the sequence of printed lines before running it.
+
 ```python
 # exercise_3.py
 from collections.abc import Generator
@@ -232,6 +248,12 @@ down to whichever `yield` is currently suspended, two frames below.
 
 ## 4. Removing the `yield from`
 
+> Remove `yield from` in `yield_from_nested.py`,
+> leaving `profile: Result = interview()`.
+> Run `ty check` and the script, and explain both results.
+> Which one told you more,
+> and what does the type checker say if `profile` carries no annotation?
+
 ```python
 def survey() -> Generator[Question, Answer, Result]:
     profile: Result = interview()
@@ -286,6 +308,12 @@ you want to pin down.
 
 ## 5. `report()` with a return value
 
+> `report()` in `yield_from_return.py` yields but returns nothing.
+> Rewrite it to return the character count as well,
+> and give it the full annotation.
+> Then write a caller that delegates to it with `yield from` and yields that count in a line of its own,
+> and say which type parameter carries each of the two values.
+
 ```python
 # exercise_5.py
 from collections.abc import Generator
@@ -333,6 +361,11 @@ driver, a returned value goes to the delegating generator.
 
 ## 6. Why a driver primes with `next()`
 
+> Explain why a driver must prime with `next()` rather than `send(None)`,
+> given that the two are equivalent at runtime.
+> `send_none_is_next.py` has the answer.
+> State it in terms of the `SendType`.
+
 `next(g)` and `g.send(None)` do the same thing at runtime, and the
 `SendType` is where they stop being interchangeable.
 
@@ -375,6 +408,17 @@ with `next()` sidesteps the whole question: the one call that cannot
 carry a value comes from the one function that cannot pass one.
 
 ## 7. A vending machine as a single generator
+
+> [A Vending Machine](../Chapters/31_Patterns--State_Machines.md#a-vending-machine)
+> keeps its current state in an attribute and looks up each transition in a table.
+> Write a simplified version as a single generator instead: it collects money,
+> takes two digits, then dispenses or refuses.
+> It yields its current state and receives each event with `send()`,
+> so the position in the generator's body carries the state.
+> This generator's `yield` reports the state the machine reached rather than requesting something the machine needs,
+> the opposite direction from `interview()`.
+> Say which of the two versions you would rather extend with another state,
+> and why.
 
 ```python
 # exercise_7.py

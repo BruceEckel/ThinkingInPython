@@ -2,6 +2,11 @@
 
 ## 1. `flower_visitors.py` with `singledispatch`
 
+> Rewrite `flower_visitors.py` with `singledispatch`:
+> make `pollinate()` and `eat()` functions defined outside the `Flower` hierarchy,
+> with `Chrysanthemum`'s toxicity a registered implementation of `eat()`.
+> Which classes and which methods disappear?
+
 ```python
 # exercise_1.py
 from functools import singledispatch
@@ -62,6 +67,11 @@ operation name recovers the "choose an operation at runtime" half of
 what the `Visitor` hierarchy provided, without the classes.
 
 ## 2. Adding a type against adding an operation
+
+> Add a `Rose` to `visitor_singledispatch.py` with abundant nectar and a strong fragrance,
+> then add a third operation, `thorns()`, over all four flowers.
+> Count the lines each change costs,
+> and say which of the two changes `@singledispatch` makes cheaper.
 
 ```python
 # exercise_2.py
@@ -140,6 +150,11 @@ make adding an operation cheap, and no arrangement makes both cheap at
 once.
 
 ## 3. The `Visits` protocol in place of `Any`
+
+> Rewrite `flower_visitors.py` with the `Visits` protocol in place of `Any`,
+> so `accept()` declares what it needs.
+> Then add a `Beetle(Bug)` with no `visit()` method and pass it to `accept()`.
+> Which version reports the mistake, and when?
 
 ```python
 # exercise_3.py

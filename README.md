@@ -54,7 +54,7 @@ The answers to the exercises are in `Solutions/`.
 |---|---|
 | `Examples/` | The book's listings, one directory per chapter (`Examples/07_Foundations--Classes/`), each file named the way the book names it (`property_setter.py`). |
 | `Examples/utils/` | Helpers that several chapters import, such as `display.py` and `benchmark.py`. Not a chapter. |
-| `Solutions/` | Worked answers to the exercises, one Markdown file per chapter, numbered to match that chapter's exercise list. |
+| `Solutions/` | Worked answers to the exercises, one Markdown file per chapter, numbered to match that chapter's exercise list. Each answer opens with the exercise it answers, quoted from the chapter. |
 | `SolutionsCode/` | The solution listings extracted to `.py` files, the same way `Examples/` is. |
 | `Chapters/` | The book itself, one Markdown file per chapter. |
 
@@ -85,6 +85,12 @@ Copy the example file, change it, run it. Then compare with the numbered answer 
 that chapter's `Solutions/` file. Each solution is self-contained: it
 repeats whatever it needs from the chapter rather than importing it, so you
 can read or run one on its own.
+
+Each answer opens with its exercise, quoted from the chapter, so you can
+read the question and the answer together. A solution often rewrites the
+listing instead of editing it, so a line-by-line diff of your file against
+`SolutionsCode/` is mostly noise. Compare what the two programs print and
+how they are organized.
 
 `tip sync` regenerates `Examples/` and `SolutionsCode/` from the Markdown,
 discarding any edits you made there. Experiment in them freely, but keep

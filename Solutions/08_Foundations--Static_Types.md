@@ -2,6 +2,9 @@
 
 ## 1. A third shape satisfying `Drawable`
 
+> In `protocols.py`, add a class `Triangle` with its own `draw()`,
+> and pass an instance to `render()` without changing `Drawable` or `render()`.
+
 ```python
 # exercise_1.py
 from typing import Protocol
@@ -39,6 +42,9 @@ print(render(Triangle()))
 
 ## 2. Removing `# type: ignore` from `area.py`
 
+> In `area.py`, remove the `# type: ignore` comment and run `ty check` on the file.
+> Read the error, then restore the comment.
+
 ```python
 def area(width: int, height: int) -> int:
     return width * height
@@ -72,6 +78,10 @@ the comment restores the error.
 
 ## 3. A second generic function, `last()`
 
+> In `generics.py`, write a second generic function,
+> `last[T](items: list[T]) -> T`, that returns the final element,
+> and call it on both a `list[int]` and a `list[str]` the way the listing calls `first()`.
+
 ```python
 # exercise_3.py
 def first[T](items: list[T]) -> T:
@@ -94,6 +104,10 @@ the same as `first()` does. The type checker therefore knows that
 returns a `str`.
 
 ## 4. A subclass of `NamedTally` still chains through `Self`
+
+> In `self_type.py`, add a subclass of `NamedTally` called `LoudTally` whose `report()` returns the message in all capitals,
+> calling `super().report()` first.
+> Confirm `.bump().bump().report()` still chains correctly on a `LoudTally`.
 
 ```python
 # exercise_4.py
@@ -136,6 +150,11 @@ no `report()` method.
 
 ## 5. What a missing type parameter default costs
 
+> Add `reveal_type(words.top())` to `type_defaults.py` and run `ty check` on the file.
+> Remove the `= str` default and run it again.
+> The type checker reports no error either way.
+> Say what that means for a bare `Stack` annotation.
+
 ```python
 # exercise_5.py
 from typing import reveal_type
@@ -168,6 +187,10 @@ checks, and that is the reason to give one to a class whose
 parameter is usually the same type.
 
 ## 6. A `Literal` that does not admit `"purple"`
+
+> In `type_aliases.py`,
+> call `paint(grid, (2, 3), "purple")` and run `ty check`.
+> Read the error, then widen `Color` to admit `"purple"` and confirm the error goes away.
 
 ```python
 # exercise_6.py
@@ -213,6 +236,9 @@ call. `grid[cell] = color` needs no change, since `Grid`'s values are
 `str` and every `Color` is a `str`.
 
 ## 7. Widening `add_square()` to `Sequence[Shape]`
+
+> In `variance.py`, change `add_square()`'s parameter annotation to `Sequence[Shape]` and uncomment the call.
+> Explain why the type checker now accepts the call and why `shapes.append(...)` no longer type-checks.
 
 ```python
 # exercise_7.py
@@ -263,6 +289,9 @@ callers whose argument lacks it.
 
 ## 8. Truthiness in place of `is not None`
 
+> In `narrowing.py`, replace `if text is not None:` with `if text:` and run `ty check`.
+> Explain why the empty string now takes the other branch even though the type checker accepts either version.
+
 ```python
 # exercise_8.py
 
@@ -298,6 +327,12 @@ you mean "was anything supplied," and truthiness when an empty value
 belongs with the missing one.
 
 ## 9. Narrowing a local copy of an attribute
+
+> In `narrowing_attribute.py`,
+> copy `b.val` into a local variable before the `if` and use the local inside it.
+> Replace the `expect()` call with `print(show(box))` for a `Box` named `box`,
+> then print `box.val`.
+> Explain why the `AttributeError` is gone although `reset()` still runs.
 
 ```python
 # exercise_9.py

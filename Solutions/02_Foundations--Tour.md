@@ -2,6 +2,11 @@
 
 ## 1. Aliasing vs. slicing
 
+> In `references.py`, add a line after `c = a[:]` that appends `99` to `c`.
+> Print `a` and `c` and confirm only `c` changed,
+> then explain why `b.append(4)` earlier did change what `a` sees,
+> but appending to `c` does not.
+
 ```python
 # exercise_1.py
 a = [1, 2, 3]
@@ -18,6 +23,10 @@ object. `c = a[:]` makes a new list with the same elements, so
 `c.append(99)` only changes `c`. Slicing copies. Assignment does not.
 
 ## 2. Truthiness of empty and non-empty containers
+
+> In `truthiness.py`, add an empty dictionary `{}` and a dictionary with one entry to the list of test values.
+> Predict what `bool()` reports for each before running it,
+> then check your prediction.
 
 ```python
 # exercise_2.py
@@ -40,6 +49,10 @@ same for every container: falsy when empty, truthy otherwise.
 
 ## 3. f-string precision and the debug specifier
 
+> In `fstrings.py`, add a line that formats `score` with two decimal places instead of zero,
+> using `{score:.2f}` in place of `{score:.0f}%`,
+> and a second line using the debug specifier, `f"{score = }"`.
+
 ```python
 # exercise_3.py
 name = "Alice"
@@ -56,6 +69,14 @@ expression's source text and its value, so a quick debugging print
 needs no separate `print("score", score)`.
 
 ## 4. What a name signals
+
+> `augmented.py` defines `total` and `bitwise.py` defines `flags`.
+> Rename them to `totalSum` and `flagBits`,
+> then to `TOTAL_SUM` and `FLAG_BITS`.
+> Every version runs.
+> Using [Naming Conventions](../Chapters/02_Foundations--Tour.md#naming-conventions),
+> say what each form signals to a reader who did not write the code,
+> and which of the three a linter flags.
 
 The camelCase versions of `total` and `flags`:
 
@@ -98,6 +119,11 @@ for a mixed-case global. The uppercase form is legal style, merely a
 false claim about the value. CapWords stays reserved for class names.
 
 ## 5. A third `Template` consumer
+
+> In `tstrings.py`, write a third consumer, `quoted(template)`,
+> that wraps every interpolated value in single quotes and leaves the literal text alone,
+> then print `quoted(message)`.
+> Explain why you cannot post-process an f-string the same way.
 
 ```python
 # exercise_5.py
@@ -144,6 +170,12 @@ escaping a value before it enters SQL or HTML, where a wrong guess is a
 security hole rather than a typo.
 
 ## 6. Negative floor division and modulo
+
+> Before running anything,
+> write down what C or Java prints for `-9 / 4` and `-9 % 4` using integer math,
+> then what Python prints for `-9 // 4` and `-9 % 4`.
+> Run `print(-9 // 4, -9 % 4)` and check.
+> State the rule that predicts the sign of the result of `%`.
 
 ```python
 # exercise_6.py

@@ -2,6 +2,10 @@
 
 ## 1. Timing random targets instead of the worst case
 
+> `membership.py` sets `target` to the worst case, the last element.
+> Measure the average case by timing lookups of many random targets,
+> and see whether the conclusion changes.
+
 ```python
 # exercise_1.py
 import random
@@ -44,6 +48,8 @@ the front of the list.
 
 ## 2. Finding the crossover size
 
+> Use `timeit` to find the collection size below which the `list` scan beats the `set` lookup on your machine.
+
 ```python
 # exercise_2.py
 import timeit
@@ -73,6 +79,9 @@ relative advantage, if any, evaporating almost immediately) should
 look similar.
 
 ## 3. `eager_first_evens()` as one list comprehension
+
+> Rewrite `eager_first_evens()` as a single list comprehension and measure its peak with `tracemalloc`.
+> How close can an eager version get to the lazy one?
 
 ```python
 # exercise_3.py
@@ -127,6 +136,10 @@ five values, so it builds no large collection.
 
 ## 4. Caching a function with a side effect
 
+> Apply `@cache` to a function that prints as a side effect,
+> and demonstrate that repeated calls skip the printing.
+> Explain why caching suits only pure functions.
+
 ```python
 # exercise_4.py
 from functools import cache
@@ -159,6 +172,11 @@ counter, occurs on the first call with a given argument, and
 the cache silently skips it on every repeat.
 
 ## 5. Popping a heap correctly
+
+> In `heap_corruption.py`, replace `heap.pop(0)` with `heappop(heap)`.
+> Pop three times, printing the heap after each one,
+> and confirm `heap[0]` is the smallest remaining value every time.
+> Why does the list still look unsorted after a correct pop?
 
 ```python
 # exercise_5.py
@@ -193,6 +211,11 @@ costs far more and gains nothing, since callers read only the front
 element.
 
 ## 6. A subclass that forgets `__slots__`
+
+> In `slots.py`, add `class Point3D(Point)` that declares no `__slots__` of its own.
+> Confirm that an instance accepts `p.z = 3`,
+> which `Point` rejects with an `AttributeError`,
+> and find where the storage for it came from.
 
 ```python
 # exercise_6.py
@@ -233,6 +256,11 @@ declare `__slots__` itself, using an empty tuple when it adds no
 fields of its own.
 
 ## 7. Global monitoring versus two local attachments
+
+> In `monitoring_counts.py`,
+> swap `set_local_events()` for `set_events()` and say which entry in the `Counter` is new and why.
+> Then get the same two counts back using two local attachments instead,
+> and explain what the two versions stop agreeing about in a larger program.
 
 ```python
 # exercise_7.py
@@ -291,6 +319,10 @@ a profiler.
 
 ## 8. Reading `tottime` against `cumtime`
 
+> Profile a script of your own with `uv run python -m cProfile -s cumulative`.
+> Name the function with the largest `tottime` and the one with the largest `cumtime`,
+> and explain why they are usually not the same function.
+
 Any script works. This one makes the two columns disagree on purpose:
 
 ```python
@@ -326,6 +358,11 @@ that calls nothing else, which is why the bottom of a call chain is
 where the two lists finally meet.
 
 ## 9. A compact `array` is not a faster `array`
+
+> `compact_array.py` compares an `array` against a `list` of the same floats.
+> Time an element-by-element sum over each with `timeit`.
+> The `array` uses a quarter of the memory: is it also faster to iterate,
+> and why not?
 
 ```python
 # exercise_9.py
@@ -366,6 +403,11 @@ the same bytes creates no Python object per element, which is why
 vectorizing wins where `array` alone does not.
 
 ## 10. `"".join()` against `+=`, at two sizes
+
+> Time `"".join(parts)` against `+=` in a loop for 10,000 short strings,
+> then repeat at 100 strings.
+> At which size does the difference stop mattering,
+> and which of the two would you write anyway?
 
 ```python
 # ch18_join_vs_concat.py
@@ -423,6 +465,11 @@ string the loop is building.
 
 ## 11. `bisect()` and `bisect_left()` against duplicates
 
+> `bisect_search.py` uses `bisect()` and `search_comparison.py` uses `bisect_left()`.
+> Build a sorted list with duplicates,
+> run both against a value that appears three times,
+> and explain which one you need to find the first occurrence and which one you need to insert after the last.
+
 ```python
 # ch18_bisect_duplicates.py
 import bisect
@@ -460,6 +507,12 @@ raise. `xs[left:right]` is the run of equal values, and
 `right - left` counts them, both in O(log n) with no scan.
 
 ## 12. Which build am I running, and does the JIT show up?
+
+> Run `jit_status.py` on your own interpreter and say which of the three states it reports.
+> If it reports the second,
+> run `membership.py` under `PYTHON_JIT=1` and `PYTHON_JIT=0` with the `--numbers` flag,
+> and compare the two `ratio` lines.
+> Explain why a listing this small is a poor test of the JIT.
 
 ```python
 # ch18_jit_probe.py

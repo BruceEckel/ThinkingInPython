@@ -59,6 +59,11 @@ no `## N.` heading in the target's Solutions file, and an exercise
 of "the previous chapter" or "the next chapter", which a chapter
 split silently retargets; name the chapter with a link instead.
 
+Solutions files carry a generated copy of each exercise statement
+under its heading (`exercise_statements.py`). Those lines repeat the
+chapter's references, so the scan skips them and the baseline counts
+each reference once.
+
 Under-reports by design: "the last three exercises", and an
 exercise described without a number, are invisible to it. A
 reference that was wrong when the baseline was written stays
@@ -81,6 +86,7 @@ from pathlib import Path
 
 from tools import check_solutions as cs
 from tools.config import DATA_DIR, ROOT
+from tools.exercise_statements import generated_lines
 from tools.markdown import Document
 from tools.record_check import chapter_name
 from tools.report import Finding
@@ -150,9 +156,13 @@ def paragraphs(doc: Document, solutions: bool) -> Iterator[Paragraph]:
     In a chapter the exercise is the numbered item under the last
     Exercises heading; in a Solutions file it is the `## N.` section
     (the first number of a combined heading). A numbered item opens a
-    new paragraph, so "the previous exercise" resolves per item.
+    new paragraph, so "the previous exercise" resolves per item. The
+    block quotes `exercise_statements.py` copies under each `## N.`
+    heading are skipped: they repeat the chapter's own references, which
+    this check already reads in the chapter.
     """
     fenced = doc.in_fence()
+    skip = generated_lines(doc) if solutions else set()
     exercise, inside = 0, False
     pending: list[tuple[int, str]] = []
 
@@ -168,7 +178,7 @@ def paragraphs(doc: Document, solutions: bool) -> Iterator[Paragraph]:
 
     for index, raw in enumerate(doc.lines):
         line = raw.strip()
-        if fenced[index] or not line:
+        if fenced[index] or not line or index + 1 in skip:
             yield from flush()
             continue
         if cs.HEADING.match(raw):

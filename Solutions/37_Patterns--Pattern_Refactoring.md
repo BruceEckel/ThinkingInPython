@@ -2,6 +2,12 @@
 
 ## 1. Adding `Plastic`
 
+> Add a `Plastic` material to `trash.py`,
+> then point `recycle_dict.py` at `plastic.dat` and run it.
+> Confirm that its sorting loop and `parse_trash.py` need no other changes,
+> then account for every pound of plastic that `plastic_dropped.py` loses.
+> Which test in `test_trash.py` fails, and why is that failure correct?
+
 ```python
 # exercise_1.py
 from collections import defaultdict
@@ -75,6 +81,10 @@ you update the expected set, the test guards registration again.
 
 ## 2. `price()` and `heaviest()`
 
+> Write a `price()` operation as a function over a list of `Trash`,
+> and a `heaviest()` operation that returns the single heaviest piece.
+> Decide for each whether it needs `singledispatch`.
+
 ```python
 # exercise_2.py
 from typing import ClassVar
@@ -127,6 +137,9 @@ every type and varies only in the numbers each type carries, write an
 ordinary function.
 
 ## 3. `recycling_note()` as a `singledispatchmethod`
+
+> Replace the `recycling_note()` single-dispatch function with a `singledispatchmethod` on a `Sorter` class,
+> and explain what changed.
 
 ```python
 # exercise_3.py
@@ -202,6 +215,13 @@ registration made through the subclass changes `Sorter`'s answers
 too.
 
 ## 4. Exact-type bins against MRO dispatch
+
+> Derive `CrushedAluminum` from `Aluminum`,
+> add it to the data `recycle_dict.py` reads,
+> then run `recycle_dict.py` and `recycling_note.py`.
+> Explain why it gets its own bin but not its own note.
+> Then change `recycle_dict.py` so a subclass shares its parent's bin,
+> without naming any material in the sorting loop.
 
 ```python
 # exercise_4.py
@@ -280,6 +300,14 @@ declares its own key can express groupings the type hierarchy leaves
 out.
 
 ## 5. A base function that refuses to answer
+
+> Define `Plastic`, whose disposal hazard is toxic fumes,
+> and leave it out of `disposal_hazard.py`'s registrations.
+> What does `hazard()` answer for a piece of plastic?
+> Then write `strict_hazard()`,
+> whose base function raises `NotImplementedError`,
+> and call it on the same piece.
+> What does the strict form cost the materials whose hazard is "none"?
 
 ```python
 # exercise_5.py

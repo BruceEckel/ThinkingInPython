@@ -2,6 +2,12 @@
 
 ## 1. Production bindings for `ask_tell.py`
 
+> Write the production bindings for `ask_tell.py`:
+> a `Console` class whose `ask()` calls `input()` and whose `tell()` calls `print()`,
+> and run `greet(Console(), Console())` interactively.
+> Confirm `greet()` itself requires no change:
+> serving a new context without edits is what delayed binding provides.
+
 ```python
 # exercise_1.py
 from typing import Protocol
@@ -62,6 +68,14 @@ at the `greet(...)` call, not at the class definition, because the
 class never says which protocol it means to satisfy.
 
 ## 2. Threading a `Log` Effect through by hand
+
+> Do the bookkeeping the chapter describes.
+> Starting from `bookkeeping_scales.py`, add a `Log` Effect
+> (a protocol with `log(message)`) used by a new helper that `greet()` calls,
+> and log from `greet()` too.
+> The chapter counts five signatures for that version;
+> say how many of the five use the `Log` they name,
+> and then what an EMS would do instead.
 
 ```python
 # exercise_2.py
@@ -152,6 +166,15 @@ while `greet()` stays unchanged.
 
 ## 3. Classifying three Effects
 
+> Classify every Effect in `slope_catch.py`,
+> `withdraw()` from [Foundations](../Chapters/40_Functional--Foundations.md#pure-functions),
+> and the `Thermometer` that keeps a `_celsius` from [*Observer*](../Chapters/30_Patterns--Observer.md#the-pythonic-observer):
+> side effect, side cause, or exception.
+> Which of the three conversions from [Converting Effectful to Pure](../Chapters/44_Effects--Effect_Management.md#converting-effectful-to-pure)
+> applies to the exceptions,
+> and which technique from [Effects by Hand](../Chapters/44_Effects--Effect_Management.md#effects-by-hand)
+> applies to the rest?
+
 | Code | Effect | Kind | Conversion |
 | --- | --- | --- | --- |
 | `slope_catch.py` | `validate()` raises a `ValueError` | Exception | Catch the expected exception, or make the bad value impossible |
@@ -209,6 +232,12 @@ outside the call participates in the result.
 
 ## 4. `PositiveInt` in place of both checks
 
+> `NonZero` guards zero but not negative values,
+> while `validate()` in `slope_catch.py` rejects negatives but not zero.
+> Build a `PositiveInt` that makes both bad values unconstructable,
+> rewrite `slope()` to take it,
+> and note which checks disappear from `slope()` as a result.
+
 ```python
 # exercise_4.py
 from exceptions import expect
@@ -260,6 +289,13 @@ spends a line of code on it. Each signature says which values the
 function accepts, instead of leaving that to a docstring.
 
 ## 5. What `async` tracks, and what it does not
+
+> `coroutines_are_descriptions.py` shows that `async` tracks one Effect.
+> Write a synchronous `total_price()` that calls a helper,
+> then make the helper `async` and follow what the type checker and the interpreter force you to change,
+> all the way up to `asyncio.run()`.
+> Name the two properties of a full EMS that `async` does *not* have,
+> using the three-item list in [Tracking and Management](../Chapters/44_Effects--Effect_Management.md#tracking-and-management).
 
 ```python
 # exercise_5.py

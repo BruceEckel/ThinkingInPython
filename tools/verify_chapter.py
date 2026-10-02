@@ -15,27 +15,30 @@ The steps, in order, mirror `verify` (fixers first, markers before sync):
    the gate reflows ``Chapters/`` only, and Solutions prose is wrapped
    at a column, so reflowing it here would rewrite a hundred lines the
    gate never asked for.
-3. ``extract_examples --write`` and ``extract_solutions --write`` rebuild
+3. ``exercise_statements --write`` on the chapter, so the exercise
+   statements copied under the Solutions headings match the reflowed
+   chapter.
+4. ``extract_examples --write`` and ``extract_solutions --write`` rebuild
    both ``build/`` trees. Whole-book, because listings import siblings.
    Fail-fast: nothing below means anything against a tree that would not
    build.
-4. ``validate_output --update`` on the chapter and on its Solutions file,
+5. ``validate_output --update`` on the chapter and on its Solutions file,
    refreshing their ``#:`` markers. This is the step the full gate spends
    its time on, and the one worth narrowing. A rewritten marker triggers
    a second extract so the build trees carry the new text.
-5. Sync ``Examples/`` and ``SolutionsCode/`` from the Markdown, then the
+6. Sync ``Examples/`` and ``SolutionsCode/`` from the Markdown, then the
    drift and orphan checks over both.
-6. The Markdown gates: ``check_all`` on the chapter (every gate check, or
+7. The Markdown gates: ``check_all`` on the chapter (every gate check, or
    the ``--checks`` list tools/tasks.py passes from ``GATE_CHECKS``),
    ``anchors`` and ``widths`` on the Solutions file, quoted ``ty``
    diagnostics in both, prose references to numbered exercises in
    both (the ones these two files make; a reference another chapter
    makes to this chapter's exercises needs the whole-book run),
    exercise/solution numbering, unique slugs.
-7. ``ty``, ``ruff``, ``run_examples``, and ``pytest`` over the chapter's
+8. ``ty``, ``ruff``, ``run_examples``, and ``pytest`` over the chapter's
    directory in each build tree.
 
-Everything after step 3 runs even when an earlier step fails, so one pass
+Everything after step 4 runs even when an earlier step fails, so one pass
 reports every problem. It does not write the gate stamp: it checks one
 chapter, not the book, and `tip verify` is still the pre-commit run
 after a change that could reach other chapters (a renamed listing, a
@@ -99,6 +102,8 @@ def main(argv: list[str] | None = None) -> int:
         run("fix-eol", [*PY, "-m", "tools.check_line_endings", "--fix"]),
         run("reflow", [*PY, "-m", "tools.reflow_prose", "--write",
                        str(md)]),
+        run("statements", [*PY, "-m", "tools.exercise_statements",
+                           "--write", number]),
     ]
     extract = [*PY, "-m", "tools.extract_examples", "--write"]
     extract_sol = [*PY, "-m", "tools.extract_solutions", "--write"]

@@ -2,6 +2,12 @@
 
 ## 1. A minimal broadcaster-responder pair
 
+> Create a minimal *Observer* design of your own,
+> without looking at `broadcaster.py`:
+> the smallest `Broadcaster` that lets you connect callables,
+> then notifies them.
+> Demonstrate it by connecting several responders and causing one change that updates them all.
+
 ```python
 # exercise_1.py
 from collections.abc import Callable
@@ -34,6 +40,15 @@ each one in turn, so every connected responder sees the same update,
 in connection order.
 
 ## 2. The pull model, twice
+
+> Rewrite the classic listings to use the pull model:
+> `Display.update()` reads `subject.celsius` instead of `arg`.
+> A `Display` that narrows its `subject` parameter to `Thermometer` no longer satisfies `Observer[float]`,
+> so make it type-check two ways:
+> once with a runtime `isinstance()` check inside `update()`,
+> and once with an `Observer[S, T]` protocol whose first parameter is the subject type,
+> which `Subject` supplies as `Self`.
+> Say what each version adds.
 
 The protocol here is `classic_observer.py`'s, unchanged.
 `update()` declares the widest type `attach()` can hand it,
@@ -158,6 +173,13 @@ read, and each observer pays by knowing what it is watching.
 
 ## 3. An `announce()` that survives a failing responder
 
+> Make `Broadcaster.announce()` survive a responder that raises an exception:
+> every other responder is still notified,
+> and `announce()` re-raises the failures afterward, together,
+> as an [`ExceptionGroup`](../Chapters/19_Techniques--Concurrency.md#structured-concurrency-with-taskgroup)
+> (which you build yourself here: `raise ExceptionGroup("message", failures)`).
+> Write a test in which the first responder raises an exception and the second still records its notification.
+
 ```python
 # exercise_3.py
 from collections.abc import Callable
@@ -236,6 +258,12 @@ what its responders do, so it cannot name their failure modes. Catching
 responder stops the notification instead of joining `failures`.
 
 ## 4. The same rescue, for the async fan-out
+
+> Redo exercise 3 for `async_broadcaster.py`.
+> Make `announce()` use `gather(*coros, return_exceptions=True)`,
+> separate the returned exceptions from the successes,
+> and raise them together as an `ExceptionGroup`.
+> Write a test in which the first responder raises an exception and the second still records its notification.
 
 ```python
 # exercise_4.py
@@ -339,6 +367,14 @@ supplied by `gather()` in the async one.
 
 ## 5. Failures returned as values
 
+> Redo exercise 3 with each failure returned as a value instead of raised as an exception.
+> Each responder returns a [`Result`](../Chapters/42_Functional--Error_Handling.md#a-result-type)
+> from `utils/result.py`,
+> and `announce()` returns the `Err` values it collects.
+> Write an adapter that lets a responder returning `None`,
+> such as `received.append`, be connected.
+> Write a test in which the first responder fails and the second still records its notification.
+
 ```python
 # exercise_5.py
 from collections.abc import Callable
@@ -422,6 +458,14 @@ For a broadcaster that accepts arbitrary callables,
 exercise 3's catch-and-collect protects the loop from code you did not write.
 
 ## 6. Turning `box_observer.py` into a flood-fill game
+
+> Turn `box_observer.py` into a simple game:
+> you own the contiguous patch of same-colored squares containing the top-left corner,
+> and selecting any square recolors your patch to that square's color,
+> absorbing neighbors that now match.
+> Write the neighbor test yourself, and count diagonal squares as neighbors.
+> Track the moves it takes to make the whole field one color.
+> For competition, alternate turns between players.
 
 ```python
 # exercise_6.py
@@ -524,6 +568,11 @@ Protocol (or to `Broadcaster[Grid]` plus `size`, `grid`, and
 
 ## 7. A new selection rule, and the same view
 
+> Change the rule for a selection in `box_observer.py`:
+> make `recolored()` advance every box in the selected box's row and column.
+> Run `box_view.py` without editing it,
+> and explain why the view needed no change.
+
 ```python
 # exercise_7.py
 from enum import StrEnum
@@ -593,6 +642,13 @@ from the other side: it is a second view of a `Grid`, written without
 knowing the rule.
 
 ## 8. Two views on one model
+
+> Add a second view to `box_observer.py`'s `BoxModel`.
+> Write one view that prints a letter per cell and another that prints how many cells each color holds,
+> connect both to the same model,
+> and show that one `select()` updates the pair.
+> Keep both views textual so the example runs without a window,
+> and leave the model as `box_observer.py` has it.
 
 ```python
 # exercise_8.py
@@ -702,6 +758,15 @@ grid. Running that combination means `show()` takes over with
 
 ## 9. Which colors a grid can reach
 
+> Work out which colors the whole grid can reach from `new_grid(size)` under `box_observer.py`'s rule.
+> Selecting a cell advances up to five cells by one, modulo three,
+> and selections commute, so this is a linear system over the integers mod 3:
+> the unknowns are how many times you select each cell.
+> Write Gaussian elimination mod 3 to decide whether the system has a solution,
+> and print the reachable colors for every size from 3 through 8.
+> The 8x8 grid reaches `palegreen` alone,
+> and one smaller size reaches nothing.
+
 ```python
 # exercise_9.py
 from enum import StrEnum
@@ -808,6 +873,16 @@ that lets `box_view.py` hand a `Color` to `tkinter`.
 
 ## 10. A descriptor per watched attribute
 
+> Write a `Notifying` [descriptor](../Chapters/17_Techniques--Metaprogramming.md#a-descriptor-that-validates)
+> that replaces the `@property` and `announce()` pair,
+> so one class declares several independently watched attributes:
+> `celsius = Notifying[float]()` beside `humidity = Notifying[float]()`.
+> Each attribute keeps its own responders.
+> Connecting needs the descriptor, not the value it stores,
+> so `__get__()` returns the descriptor for an access through the class,
+> and `Thermometer.celsius.connect(t, readings.append)` reaches it.
+> Show that an assignment to one attribute calls no responder of the other.
+
 ```python
 # exercise_10.py
 from collections.abc import Callable
@@ -901,6 +976,15 @@ rather than declaring it on the class, where every instance shares
 one list.
 
 ## 11. Responders registered at load time
+
+> Write a load-time version of `Broadcaster`:
+> a module-level list of responders and a `@responds` decorator that appends a function to it and returns the function unchanged.
+> Each responder then registers when Python runs its `def` statement,
+> and for a module-level function Python runs that statement while it imports the module.
+> Give a `Thermometer` a `celsius` setter that announces to that list,
+> and create two thermometers.
+> Say which of the problems in this chapter's runtime sections the load-time form keeps,
+> which it removes, and what it costs that `Broadcaster` does not.
 
 ```python
 # exercise_11.py

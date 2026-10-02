@@ -2,6 +2,13 @@
 
 ## 1. `shrink()` still goes through the setter's validation
 
+> Add a method `shrink(self, factor)` to `Circle` in `property_setter.py` that sets `self.radius = self.radius / factor`,
+> going through the existing setter.
+> Confirm `shrink(2)` on a `Circle(10)` leaves the radius at `5.0`.
+> Then call `shrink(-2)` on that same circle,
+> which would divide the radius down to `-2.5`,
+> and confirm the setter raises its `ValueError` instead of silently storing a negative radius.
+
 ```python
 # exercise_1.py
 from exceptions import expect
@@ -40,6 +47,11 @@ that, the same as it rejects `c.radius = -2.5` written by hand.
 
 ## 2. A second alternative constructor, `from_kelvin()`
 
+> In `class_methods.py`, add a second alternative constructor,
+> `from_kelvin(cls, k)`, using `celsius = k - 273.15`.
+> Add a call that builds a `Temperature` both ways for the same physical temperature and confirms they agree,
+> within rounding.
+
 ```python
 # exercise_2.py
 
@@ -74,6 +86,12 @@ the arithmetic. Both class methods end with `return cls(...)`, so
 does, with a different formula for `celsius`.
 
 ## 3. A third override in the chain, `MoreDerived`
+
+> In `simple_subclass.py`, add a third class, `MoreDerived(Derived)`,
+> that overrides `show()` again,
+> printing its own message before calling `super().show(msg)`.
+> Predict, then confirm,
+> the full chain of prints from `MoreDerived("x").show_twice()`.
 
 ```python
 # exercise_3.py
@@ -131,6 +149,10 @@ the messages appear in derived-to-base order, twice.
 
 ## 4. A second `cached_property` that reads the first
 
+> Add a `@cached_property` called `average` to `Numbers` in `cached_property_demo.py` that returns `self.total / len(self.values)`.
+> Access `n.total` and then `n.average`,
+> and confirm `total` is not recomputed when `average` uses it.
+
 ```python
 # exercise_4.py
 from functools import cached_property
@@ -168,6 +190,11 @@ just on first use instead of in advance.
 
 ## 5. `__repr__()` and `__str__()` on `Temperature`
 
+> Give `Temperature` in `class_methods.py` a `__repr__()` that returns `Temperature(21.0)` for a temperature of 21 degrees Celsius.
+> Print a single `Temperature` and a list of two of them,
+> and confirm the list shows the same form for each element.
+> Then add a `__str__()` returning `21.0C` and confirm which of the two `print()` uses for each case.
+
 ```python
 # exercise_5.py
 
@@ -204,6 +231,14 @@ debugger. `21.0C` says what the value means, which is what you want
 in output a user reads.
 
 ## 6. A misspelled override, with and without the decorator
+
+> In `override_intro.py`, misspell `Derived`'s method as `shwo()`,
+> keeping the `@override` decorator.
+> Run the program and confirm it now prints `Base.show`,
+> then run the type checker
+> ([Static Types](../Chapters/08_Foundations--Static_Types.md#the-type-checker-ty) sets one up)
+> and read what it says.
+> Remove `@override` and confirm the type checker goes quiet while the program's behavior does not change.
 
 ```python
 # exercise_6.py

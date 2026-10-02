@@ -2,6 +2,10 @@
 
 ## 1. Two `Messenger`s do not share attributes
 
+> In `messenger_idiom.py`,
+> create a second `Messenger` with different keyword arguments and confirm the two instances do not share attributes
+> (unlike a [class attribute](../Chapters/09_Foundations--Class_Attributes.md)).
+
 ```python
 # exercise_1.py
 from typing import Any
@@ -29,6 +33,10 @@ and `m2` share nothing: `m1` has no `name`, and `m2` has no `info`.
 
 ## 2. A third field on `Point`
 
+> In `point_dataclass.py`, add a third field, `z: float`,
+> to the `Point` data class,
+> and update the `Point(...)` call to pass three arguments.
+
 ```python
 # exercise_2.py
 from dataclasses import dataclass
@@ -54,6 +62,10 @@ generates `__init__()`, `__repr__()`, and `__eq__()` to match. Adding
 with no other code to update.
 
 ## 3. A `NamedTuple` holding a list
+
+> Add a `NamedTuple` called `Recipe` with fields `name: str` and `steps: list[str]` to `color_namedtuple.py`.
+> Mutate the `steps` list of an instance and print the record.
+> Then try to use the record as a `dict` key and explain the result.
 
 ```python
 # exercise_3.py
@@ -97,6 +109,12 @@ never two problems.
 
 ## 4. A fourth attribute, by keyword and by assignment
 
+> In `display_namespace.py`,
+> add a fourth attribute to `m` by passing it to the constructor,
+> then add it by assignment after the existing `m.more = 11` instead.
+> Confirm `vars(m)` reports the same four attributes either way,
+> and note whether they come out in the same order.
+
 ```python
 # exercise_4.py
 from types import SimpleNamespace
@@ -131,6 +149,12 @@ In `assigned` the assignment to `note` follows `assigned.more = 11`,
 so `note` comes last.
 
 ## 5. Returning a bare `tuple[float, int]`
+
+> In `fetch_stats.py`,
+> change `summarize()` to return a bare `tuple[float, int]`,
+> and repair the one line that stops working.
+> What do the call sites lose,
+> and which mistakes does the type checker still catch?
 
 ```python
 # exercise_5.py
@@ -181,6 +205,11 @@ Position is something the type checker can verify and a reader cannot.
 A name is something both can.
 
 ## 6. Structural equality across three-field types
+
+> In `still_a_tuple.py`, add `class Point3(NamedTuple)` with fields `x`, `y`,
+> `z`.
+> Predict `Color(1, 2, 3) == Point3(1, 2, 3)` before running it,
+> then predict `FrozenColor(1, 2, 3) == (1, 2, 3)` and check that too.
 
 ```python
 # exercise_6.py
@@ -234,6 +263,12 @@ catches the mismatch instead. Which one is right depends on whether
 you want your three numbers to travel as data or to mean something.
 
 ## 7. Choosing a type for three scenarios
+
+> For each scenario, name the type from "Which Should You Use?" that fits,
+> and say why the others do not:
+> a configuration bag whose keys arrive at runtime and are not known in advance;
+> a 2D grid coordinate that must work as a `dict` key;
+> a record decoded from a JSON API response whose fields you also validate.
 
 **The configuration bag is a `SimpleNamespace`.** Its keys arrive at
 runtime, so no fixed set of fields exists to declare. A `@dataclass`

@@ -2,6 +2,13 @@
 
 ## 1. Door and tree kinds, plus `walkable_neighbors()`
 
+> Add door (`+`, walkable) and tree (`T`, not walkable)
+> kinds to `tile_map.py`.
+> Extend `Symbol` and `SPECS` to match,
+> then write `walkable_neighbors(field, row, col)` returning the count of adjacent walkable cells.
+> Confirm the tile pool size still equals the number of kinds,
+> however large the map.
+
 ```python
 # exercise_1.py
 from functools import cache
@@ -70,6 +77,10 @@ distinct objects, one per kind (`grass`, `water`, `rock`, `door`,
 because `@cache` keys on the symbol alone.
 
 ## 2. `tracemalloc`, shared vs. unshared tiles
+
+> Use `tracemalloc` to compare the memory `parse_map()` uses on a large map when every cell shares its `Tile` against when each cell gets a new one,
+> by removing `@cache` from `tile()`.
+> How does the ratio change as the map grows?
 
 ```python
 # exercise_2.py
@@ -149,6 +160,9 @@ then carries a dictionary too.
 
 ## 3. Replacing `@record` with `@dataclass` exposes the sharing bug
 
+> Replace `@record` on `Tile` with `@dataclass` and set `field[0][0].walkable = False` on a parsed map.
+> Write a test that exposes the resulting bug, then restore `@record`.
+
 ```python
 # exercise_3.py
 from dataclasses import dataclass
@@ -224,6 +238,12 @@ the bug needs never completes, and that refusal makes sharing one
 object safe.
 
 ## 4. Modeling chess
+
+> Model chess: a frozen `Piece` (color, kind)
+> and a board that is a `dict` mapping squares to pieces.
+> A full opening position holds thirty-two piece references.
+> How many `Piece` objects exist?
+> How do you capture and promote?
 
 ```python
 # exercise_4.py
@@ -314,6 +334,10 @@ at that one instead.
 
 ## 5. `interned_color.py`, rewritten on a weak pool
 
+> Rewrite `interned_color.py` to hold its pool weakly, as `weak_pool.py` does,
+> and show that building and dropping a palette of colors leaves the pool empty.
+> Say what the rewrite gave up to get there.
+
 ```python
 # exercise_5.py
 from dataclasses import dataclass
@@ -376,6 +400,10 @@ says, on a `Color` declared with the same
 `@dataclass(frozen=True, slots=True, weakref_slot=True)` line.
 
 ## 6. Constraining `interned_color.py`'s components
+
+> Constrain `red`, `green`, and `blue` to `0`-`255` in `interned_color.py`.
+> Raise `ValueError` from `__new__()` for an out-of-range component,
+> and write a test for it.
 
 ```python
 # exercise_6.py
@@ -456,6 +484,11 @@ instead, because interning must intercept construction.
 
 ## 7. `tile_map.py` rebuilt on the enum
 
+> Rewrite `tile_map.py` on top of `tile_enum.py`'s `Tile`,
+> so `parse_map()` returns `list[list[Tile]]` of enum members and `to_symbol()` disappears.
+> What does the type checker now catch that the `Literal` version caught,
+> and what does it catch that the `Literal` version did not?
+
 ```python
 # exercise_7.py
 from enum import Enum
@@ -522,6 +555,14 @@ If the boundary matters, keep a `to_tile()` wrapper that catches the
 `ValueError` and re-raises it with the offending line and column.
 
 ## 8. Four threads on a cold key
+
+> Make `tile()`'s body slow,
+> with a `time.sleep(0.05)` before it builds the `Tile`,
+> and call it from four threads with the same, previously unseen symbol.
+> How many `Tile` objects get built,
+> and how many distinct objects do the four threads hold?
+> Fix it two ways: populate the pool eagerly at import,
+> and guard the factory with a `threading.Lock`.
 
 ```python
 # exercise_8.py

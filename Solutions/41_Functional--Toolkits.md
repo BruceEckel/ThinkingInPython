@@ -2,6 +2,11 @@
 
 ## 1. `deep_sum()` with an explicit stack
 
+> Rewrite `deep_sum()` from `nested_sum.py` without recursion,
+> using a list as an explicit stack.
+> Compare the two versions for length,
+> and name the mistakes the loop version allows that the recursive one cannot make.
+
 ```python
 # exercise_1.py
 type Nested = int | list[Nested]
@@ -41,6 +46,10 @@ mistakes, because it never has the choice.
 
 ## 2. `lru_cache` with `maxsize=3`
 
+> `functools_lru_cache.py` prints `CacheInfo(hits=1, misses=4, maxsize=2, currsize=2)`.
+> Change `maxsize` to `3`, predict the four numbers before running it,
+> then run it and account for any difference.
+
 ```python
 # exercise_2.py
 from functools import lru_cache
@@ -73,6 +82,11 @@ recently used," stops being true here.
 
 ## 3. `batch_totals()` stays lazy
 
+> Write `batch_totals(source, n)`,
+> which takes an iterator and yields the sum of each `n`-element batch,
+> built only from `itertools` pieces and a generator expression.
+> Show that it stays lazy by passing it `count(1)` and taking five values.
+
 ```python
 # exercise_3.py
 from collections.abc import Iterable, Iterator
@@ -98,6 +112,10 @@ immediately, and `islice()` then pulls exactly five totals, so
 advances the source by three.
 
 ## 4. `grouped()` cannot repeat a key
+
+> `groupby()` on unsorted input silently returns the same key more than once.
+> Write `grouped(data, key)` returning a `dict[K, list[V]]` that cannot make that mistake,
+> and say what it costs relative to `groupby()`.
 
 ```python
 # exercise_4.py
@@ -133,6 +151,9 @@ so `grouped()` is the better answer whenever the input already fits in
 memory.
 
 ## 5. `@cache` on `deep_sum()`
+
+> Decorate `deep_sum()` with `@cache` and explain the exception.
+> What must change about the `Nested` alias for caching to be possible?
 
 ```python
 # exercise_5.py
@@ -186,6 +207,11 @@ already pure, and caching it would be correct. The obstacle is the
 argument type alone.
 
 ## 6. Injecting the random source
+
+> `group_rounds()` takes a `seed` and builds its own `random.Random`.
+> Replace the `seed` parameter with an `rng: random.Random` parameter.
+> Which property of the function does the `rng` parameter preserve,
+> and which one does it leave to the caller?
 
 ```python
 # exercise_6.py

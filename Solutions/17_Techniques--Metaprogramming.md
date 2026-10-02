@@ -2,6 +2,9 @@
 
 ## 1. Tracking leaves through two more generations
 
+> In `init_subclass.py`, add a class `Yellow(Color)` and then `Gold(Yellow)`.
+> Predict `Color.registry` after each new class, then confirm.
+
 ```python
 # exercise_1.py
 from typing import ClassVar
@@ -46,6 +49,9 @@ edit to `Color`.
 
 ## 2. A third `Field` descriptor
 
+> In `set_name.py`, add a third `Field()` attribute, `z`, to `Point`,
+> set `p.z = 9`, and confirm `p.__dict__` now also holds `_z`.
+
 ```python
 # exercise_2.py
 from typing import Any
@@ -86,6 +92,10 @@ one its own attribute name, so `z`'s `Field` instance learns the name
 `"z"` and stores under `"_z"`, independently of the other two.
 
 ## 3. A third independent singleton class
+
+> In `singleton.py`, add a third class `CSingleton(metaclass=Singleton)` and confirm `c1 = CSingleton(); c2 = CSingleton(); c1 is c2` is `True`,
+> while `c1 is a` (comparing across the different singleton classes)
+> is `False`.
 
 ```python
 # exercise_3.py
@@ -134,6 +144,11 @@ the body reads the cache through the class name,
 `Singleton._instances`, rather than through `cls`.
 
 ## 4. Declaring finality with a keyword in the class header
+
+> Extend `final_runtime.py` so a class declares itself final with a keyword in its header,
+> `class B(A, final=True):`,
+> using the `**kwargs` that `__init_subclass__()` receives.
+> Confirm that a non-final sibling of `B` still subclasses freely.
 
 ```python
 # exercise_4.py
@@ -189,6 +204,12 @@ only for a class whose `__mro__` holds one of the classes in
 
 ## 5. A small `inspect`-based `describe()` helper
 
+> Using `inspect_tour.py` as a model,
+> write a function `describe(func)` that prints a function's name,
+> its `inspect.signature()`, and its docstring
+> (or `"(no docstring)"` if `inspect.getdoc()` returns `None`),
+> then call it on `greet` and on a lambda.
+
 ```python
 # exercise_5.py
 import inspect
@@ -220,6 +241,10 @@ printing `None`. A `lambda` always has a name, `"<lambda>"`, so
 `lambda`, with no special case needed to tell them apart.
 
 ## 6. The static diagnostic beside the runtime `TypeError`
+
+> Delete the `# type: ignore` comment from `metaclass_layout_conflict.py` and run `ty` over the file.
+> Compare the `instance-layout-conflict` diagnostic it reports with the `TypeError` the program prints:
+> the static report and the runtime failure describe the same collision.
 
 Removing the `# type: ignore` from `metaclass_layout_conflict.py` leaves
 the class header unsuppressed, inside the `with expected(TypeError):` the
@@ -279,6 +304,11 @@ crash on purpose.
 
 ## 7. Building a `float` subclass with `type()`
 
+> Using `type()` directly, build a class `Celsius` with a base of `float`,
+> an attribute `unit = "C"`,
+> and a method `describe(self)` returning `f"{self} degrees {self.unit}"`.
+> Confirm `Celsius(21.5).describe()` works and that `type(Celsius)` is `type`.
+
 ```python
 # exercise_7.py
 from typing import Any
@@ -318,6 +348,10 @@ attribute. That is the cost of building a class from data
 rather than from a `class` statement.
 
 ## 8. Moving `bases += (Tag,)` into `__init__()`
+
+> In `new_vs_init.py`,
+> move the `bases += (Tag,)` line from `__new__()` into `__init__()` and predict what happens before running it.
+> Explain the result in terms of when the class object comes into existence.
 
 The prediction: nothing happens. `Tag` stays out of `Demo.__bases__`,
 and Python raises no error.
@@ -361,6 +395,15 @@ builds it from. `__init__()` can only modify the object that already
 exists, which is why `setattr(cls, ...)` still works there.
 
 ## 9. Removing the `KNOWN_COMMANDS` check
+
+> `commander.py` validates `class_name` against `KNOWN_COMMANDS` before splicing it into source text.
+> Remove that check, call `Command.make_class()` with a name containing a newline and a second statement,
+> and confirm that the injected statement runs.
+> `make_class()` splices the name in twice,
+> the second time inside a string literal,
+> so a bare newline ends the payload as an unterminated string;
+> the payload's last line must close or swallow that second splice.
+> Restore the check.
 
 ```python
 # ch17_exec_injection.py
@@ -428,6 +471,12 @@ the hole at the only point that works: before `make_class()` builds
 the string.
 
 ## 10. Keeping the first definition instead of raising an exception
+
+> Change `prepare_namespace.py`'s `NoDuplicates` so that instead of raising an exception,
+> it keeps the *first* definition of a duplicated name and discards the later one.
+> Give the two `on_open` bodies different `print()` calls so you can tell them apart,
+> then confirm that `Handlers().on_open()` runs the first one.
+> Explain why no class decorator could achieve the same thing.
 
 ```python
 # ch17_keep_first.py

@@ -2,6 +2,14 @@
 
 ## 1. `singleton_pattern.py` rewritten to eager initialization
 
+> `singleton_pattern.py` waits for the first construction to build its inner object.
+> Modify it to use *eager initialization*,
+> creating the inner instance in the class body,
+> and remove the sentinel and the guard.
+> What did the change cost,
+> and which failure from [Tests, Threads, and Locks](../Chapters/24_Patterns--Singleton.md#tests-threads-and-locks)
+> can no longer occur?
+
 ```python
 # exercise_1.py
 from dataclasses import dataclass, field
@@ -45,6 +53,11 @@ sentinel and each build an inner object. The single-threaded
 import builds the object, leaving no first call to race.
 
 ## 2. A pool of connections instead of one instance
+
+> Using `singleton_cached_factory.py` as a starting point,
+> create a factory that manages a fixed pool of objects
+> (say, database connections) and hands them out,
+> rather than a single instance.
 
 ```python
 # exercise_2.py
@@ -115,6 +128,9 @@ hand one connection to two callers.
 
 ## 3. A class-based singleton rewritten as a module
 
+> Rewrite one of the class-based singletons above as a module,
+> and argue which you would use in real code.
+
 ```python
 # only_one.py
 val: list[str] = []
@@ -150,6 +166,12 @@ expects, or needing `__new__()`-level control over construction.
 Absent that requirement, a module is the simpler tool.
 
 ## 4. Rebinding instead of mutating
+
+> In `shared_config.py`, replace the mutation with a rebinding,
+> `settings = {"theme": "dark"}`,
+> and add `import config` plus `print(config.settings)` at the end.
+> Predict both printed values before running it,
+> and explain the difference using the binding-versus-mutation distinction from [A Module Is Already a *Singleton*](../Chapters/24_Patterns--Singleton.md#a-module-is-already-a-singleton).
 
 ```python
 # config.py
@@ -202,6 +224,11 @@ singleton built on module state depends on that difference. Mutate
 through any name, rebind only through the module.
 
 ## 5. A lock in the wrong place
+
+> Add a `threading.Lock` *inside* `settings()` in `singleton_cached_race.py`,
+> wrapping only the body of the cached function, and run it.
+> Explain why the object count does not drop to one,
+> then fix it without a lock.
 
 ```python
 # exercise_5.py
@@ -283,6 +310,10 @@ answer.
 
 ## 6. Two Borg subclasses share one namespace
 
+> Give `singleton_borg.py` a second `Borg` subclass and construct one of each.
+> Explain the value you get back,
+> and change the code so the two subclasses keep separate shared state.
+
 ```python
 # exercise_6.py
 from typing import Any, ClassVar
@@ -348,6 +379,13 @@ keep sharing. *Borg* sharpens the trap: mutation is its
 design, so every version of the pattern carries the trap.
 
 ## 7. `__init__()` runs on every construction
+
+> In `singleton_class_variable.py`,
+> remove the two lines of `__new__()` that use `val`.
+> Add an `__init__()` that takes `arg`, prints it,
+> and sets `self.val = [arg]`.
+> Predict what `x.val` holds after the three constructions, then run it.
+> Explain the result using what `__new__()` returns.
 
 ```python
 # exercise_7.py

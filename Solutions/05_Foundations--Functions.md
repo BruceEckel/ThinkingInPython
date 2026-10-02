@@ -2,6 +2,11 @@
 
 ## 1. A third call to `bad_append()`, and why a tuple default doesn't fix it
 
+> In `mutable_default.py`,
+> call `bad_append(3)` a third time and predict the result before checking it.
+> Then change `bad_append()`'s default from `[]` to `()` and explain why that alone does not fix it
+> (hint: `target.append(item)` on a tuple).
+
 ```python
 # exercise_1.py
 from exceptions import expect
@@ -40,6 +45,11 @@ build a new list inside the function body on every call.
 
 ## 2. A `get()` that re-raises, and why `None` cannot be its sentinel
 
+> In `sentinel_default.py`, replace `return MISSING` with a bare `raise`,
+> so a missing key with no default re-raises the `KeyError`.
+> Confirm that `get(prefs, "theme")` raises a `KeyError` and that `get(prefs, "theme", None)` returns `None`.
+> Explain why `default=None` could not serve as the sentinel in this function.
+
 ```python
 # exercise_2.py
 from exceptions import expect
@@ -74,6 +84,11 @@ raises an `AttributeError` when `obj` has no `x`, and
 
 ## 3. A keyword-only `label` parameter
 
+> In `param_markers.py`, add a parameter `label="result"` to `divide()`,
+> keyword-only, so `print(divide(10, 2, label="half"))` shows `half: 5.0`.
+> Confirm that `divide(10, 2, "half")`, passing `label` positionally,
+> is now a `TypeError`.
+
 ```python
 # exercise_3.py
 from exceptions import expect
@@ -97,6 +112,10 @@ the function body runs.
 
 ## 4. `report()` with an optional total
 
+> Rewrite `report()` from `var_args.py` so it accepts a `total=False` keyword-only flag that,
+> when true, also prints `sum(values)`.
+> Confirm `report("nums", 1, 2, 3, total=True)` prints the sum.
+
 ```python
 # exercise_4.py
 def report(label, *values, total=False, **options):
@@ -116,6 +135,10 @@ needs no change to how `report()` collects its positional and
 keyword arguments.
 
 ## 5. `apply_twice()` with a lambda
+
+> Write `apply_twice(func, value)` that returns `func(func(value))`,
+> then call it with a lambda that appends `"!"` to a string.
+> Predict the result of `apply_twice(lambda s: s + "!", "hi")` before running it.
 
 ```python
 # exercise_5.py
@@ -138,6 +161,10 @@ one argument.
 
 ## 6. Unpacking both containers at a call site
 
+> Given `args = ("point", 3, 4)` and `opts = {"color": "red"}`,
+> call `report()` from `var_args.py` so it prints `point (3, 4) {'color': 'red'}`,
+> passing both containers without naming their contents.
+
 ```python
 # exercise_6.py
 def report(label, *values, **options):
@@ -157,6 +184,11 @@ element of `args` is not special to the caller: it becomes `label`
 only because of where it sits in the sequence.
 
 ## 7. `describe(name, /, **facts)`
+
+> Write `describe(name, /, **facts)` that prints `name` followed by each keyword argument as `key=value`,
+> one per line.
+> Confirm that `describe(name="Bob")` is a `TypeError`,
+> and explain which marker caused it.
 
 ```python
 # exercise_7.py
@@ -211,6 +243,12 @@ without the `/` the same call fails with two values for `name`.
 
 ## 8. `UnboundLocalError` from both directions
 
+> In `function_scope.py`,
+> delete the `global count` line from `writes_global()` and predict what a call raises before running it.
+> Then restore it, and instead add `print(count)` as the first line of `rebinds()`.
+> Explain why that also raises an `UnboundLocalError`,
+> even though the assignment to `count` comes after the `print`.
+
 ```python
 # exercise_8.py
 from exceptions import expect
@@ -250,6 +288,11 @@ each flag them, so the offending lines carry `# type: ignore` and
 `param_markers.py` marks its two bad calls.
 
 ## 9. Rebinding a parameter against mutating it
+
+> Write `clear_by_assignment(target)`, which assigns `target = []`,
+> and `clear_by_method(target)`, which calls `target.clear()`.
+> Pass the same list to each,
+> and predict which call empties the caller's list before running them.
 
 ```python
 # exercise_9.py

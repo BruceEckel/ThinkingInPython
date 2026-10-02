@@ -2,6 +2,10 @@
 
 ## 1. `find_factor(97)` and the loop's `else`
 
+> In `loop_else.py`, call `find_factor(97)`.
+> Predict whether the `for` loop's `else` clause runs before you check,
+> then confirm.
+
 ```python
 # exercise_1.py
 def find_factor(n):
@@ -21,6 +25,9 @@ does not reach `break`. The `for`'s `else` clause runs when the loop
 finishes without a `break`, so it prints `97 is prime`.
 
 ## 2. Counting odd steps in the Collatz sequence
+
+> Change `collatz_sequence()` in `while_loop.py` to also count how many times `n` is odd,
+> and print that count alongside the step count.
 
 ```python
 # exercise_2.py
@@ -53,6 +60,11 @@ Six steps total, and only one of them (`5 -> 16`) starts from an odd
 
 ## 3. Swapped order of `continue` and `break`
 
+> In `break_continue.py`, swap the order of the two `if` blocks,
+> so the `n == 6` `break` check comes first and the `n == 3` `continue` check comes second.
+> Predict whether the output changes before running it,
+> then explain what you find.
+
 ```python
 # exercise_3.py
 for n in range(10):
@@ -74,6 +86,10 @@ conditions can both be true for the same value and send execution
 down different paths. Here they cannot.
 
 ## 4. An exception that escapes the handler
+
+> In `demonstrate_exceptions.py`, add a call `divide_and_report(1, "x")`
+> (a `TypeError` that `except ValueError` does not catch).
+> Run it and read the traceback that escapes.
 
 ```python
 # exercise_4.py
@@ -113,6 +129,10 @@ where the `try` block finishes cleanly.
 
 ## 5. A three-item `case` in `pattern_matching.py`
 
+> In `pattern_matching.py`,
+> add a `case ["go", direction, distance]` that reports both parts,
+> and check what `run("go north 3")` returns before and after you add it.
+
 ```python
 # exercise_5.py
 def run(command):
@@ -142,6 +162,9 @@ These two cannot, so either arrangement works here.
 
 ## 6. The comprehension written as a loop
 
+> Rewrite the `evens` list comprehension in `comprehensions_intro.py` as a `for` loop that appends to a list,
+> then say which version you would rather read six months from now.
+
 ```python
 # exercise_6.py
 evens = []
@@ -162,6 +185,10 @@ with two filters and a nested loop is harder to read than the code it
 replaced.
 
 ## 7. Chaining from an exception you build yourself
+
+> In `exception_chaining.py`,
+> add a fourth function that catches the `ValueError` and raises `BadNumber` from a *different* exception object it constructs.
+> Predict which line `joining_line()` prints before you run it.
 
 ```python
 # exercise_7.py
@@ -221,6 +248,10 @@ that one in. `from None` sets `__suppress_context__`, hiding the
 
 ## 8. `read_text()` in place of the reading `with`
 
+> Rewrite `context_manager.py`'s reading half using `path.read_text()`.
+> Say what the `with` form gives you that the one-liner does not,
+> and when that matters.
+
 ```python
 # exercise_8.py
 import tempfile
@@ -259,6 +290,11 @@ or not the read succeeds. For a configuration file of a few kilobytes
 read once at startup, `read_text()` is the better choice.
 
 ## 9. Adjacent `2`s in `mutating_while_looping.py`
+
+> In `mutating_while_looping.py`, change the list to `[2, 2, 1, 3]`,
+> so a `2` sits in the first slot.
+> Use the shifting-slots explanation to predict what the loop leaves in `scores`,
+> then run it to check.
 
 ```python
 # exercise_9.py

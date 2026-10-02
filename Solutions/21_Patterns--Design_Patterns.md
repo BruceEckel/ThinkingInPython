@@ -9,6 +9,11 @@ figure.
 
 ## 1. Naming a vector of change
 
+> Pick a program you have written that changed more than once.
+> Name its vector of change: the thing that shifted every time.
+> Say which part of the design absorbed the change,
+> and which parts you edited by hand.
+
 The example is a small report writer. It prints plain text, then has
 to emit CSV for a spreadsheet, then JSON for a web front end. Three
 changes along one axis, the output format. Everything else stays put
@@ -99,6 +104,11 @@ what keep changing.
 
 ## 2. Subtracting a pattern
 
+> Take a pattern you know from another language and list its parts:
+> the classes, the interfaces, and the methods its usual form requires.
+> Cross out every part Python supplies without your writing it.
+> Describe what remains in one sentence.
+
 The pattern is *Strategy*, in the shape it takes in Java. Its usual
 form requires:
 
@@ -156,6 +166,11 @@ intent survives the subtraction. Only the scaffolding disappears.
 
 ## 3. Applying *Subtraction*
 
+> Apply *Subtraction* to a design of your own.
+> Remove one class, one interface, or one level of inheritance,
+> and say what stopped working.
+> If nothing did, leave it out.
+
 The design is the same shipping calculation, written the way it looks
 before anyone questions it: an abstract base and two subclasses.
 
@@ -209,6 +224,13 @@ scaffolding. Something broke means you found the floor, and the thing
 you removed is worth keeping and worth naming.
 
 ## 4. Measuring the reach of a change
+
+> Write the `Report` design from [The Reach of a Change](../Chapters/21_Patterns--Design_Patterns.md#the-reach-of-a-change)
+> twice, with a PDF writer and an HTML writer:
+> once where `Report` names each writer class,
+> and once where `Report` names a `Writer` protocol.
+> Add a Markdown writer to both versions.
+> For each version, list the existing classes and functions you edited.
 
 The first version gives each writer its own method name, which is the
 usual reason a class like `Report` ends up naming every writer: it

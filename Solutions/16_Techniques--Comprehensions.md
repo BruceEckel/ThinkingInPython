@@ -2,6 +2,13 @@
 
 ## 1. Squaring digit-only strings from `a_list`
 
+> Using `a_list` from `a_list.py` (`[1, "4", 9, "a", 0, 4]`),
+> write a list comprehension that finds the string elements made only of digits
+> (`e.isdigit()`), converts each to `int` with `int(e)`, and squares it.
+> The predicate must reject `"a"` so `int()` never sees it.
+> Of the types in `a_list`, only `str` has `isdigit()`,
+> so the predicate must test `isinstance(e, str)` before calling it.
+
 ```python
 # exercise_1.py
 a_list = [1, "4", 9, "a", 0, 4]
@@ -19,6 +26,10 @@ entirely of digits, so it is the one the comprehension converts and
 squares.
 
 ## 2. A `2` on the diagonal instead of `1`
+
+> In `identity_matrix.py`,
+> change the comprehension to put `2` on the diagonal instead of `1`,
+> without adding a second pass over the result.
 
 ```python
 # exercise_2.py
@@ -43,6 +54,10 @@ Only the literal in the conditional expression changes, from `1` to
 value on the diagonal.
 
 ## 3. Adding `"Galahad"` to `names`
+
+> In `dict_comprehension.py`, add `"Galahad"` to `names`,
+> then predict which entries the comprehension produces before running it,
+> given the `len(name) > 3` filter.
 
 ```python
 # exercise_3.py
@@ -71,6 +86,10 @@ not two, and the value comes from whichever name appears last in the
 list.
 
 ## 4. Dropping the length filter from `set_comprehension.py`
+
+> In `set_comprehension.py`, drop the `if len(name) > 1` filter,
+> and predict how many entries `unique` holds before running it.
+> Explain why `"J"` does not collide with `"JOHN"`.
 
 ```python
 # exercise_4.py
@@ -102,6 +121,10 @@ duplicates of the normalized form, and it has no notion that `"J"`
 might be an abbreviation of `"John"`.
 
 ## 5. A comprehension that produces something worth keeping
+
+> `comprehension_side_effects.py` builds a list of `None`s.
+> Write a version that keeps the printing but produces a list the caller can use,
+> then say whether a comprehension or a `for` loop is the right shape for it.
 
 ```python
 # exercise_5.py
@@ -144,6 +167,10 @@ printing.
 
 ## 6. Predicting a merge where a key repeats
 
+> In `unpacking_comprehensions.py`,
+> add a fourth entry `{"a": 5, "c": 9}` to `dicts` and predict what `{**d for d in dicts}` produces before running it,
+> paying attention to which value wins for the key `"a"`.
+
 ```python
 # exercise_6.py
 dicts = [{"a": 1}, {"b": 2}, {"a": 3}, {"a": 5, "c": 9}]
@@ -160,6 +187,10 @@ insertion, which is why `"a"` still prints first even though its value
 comes from the last dictionary in the list.
 
 ## 7. Running `any()` before `sum()`
+
+> In `spent_generator.py`, move the `any()` line above the `sum()` line.
+> Predict all three printed values before running it,
+> remembering that `any()` stops when it finds a match.
 
 ```python
 # exercise_7.py
@@ -182,6 +213,11 @@ previous one stopped, and `any()`'s early exit leaves values behind for
 `sum()` to find.
 
 ## 8. Closing the gap with brackets
+
+> In `genexp_timing.py`,
+> turn the generator expression into a list comprehension and name the result `built`.
+> Predict the three printed lines, and their order, before running it.
+> Explain which value of `factor` the result uses.
 
 ```python
 # exercise_8.py

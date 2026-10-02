@@ -2,6 +2,13 @@
 
 ## 1. A dict-style lookup over a list of pairs
 
+> Write a `PairsAdapter` that wraps a list of `(key, value)` tuples,
+> following the shape of `getattr_adapter.py`.
+> Give it a dictionary-style `__getitem__()` that finds a value by key,
+> and forward every other attribute to the wrapped list with `__getattr__()`.
+> Confirm `adapter["name"]` finds a value while `adapter.append(...)` still reaches the underlying list.
+> Then call `len(adapter)` and explain the result.
+
 ```python
 # exercise_1.py
 from typing import Any
@@ -63,6 +70,10 @@ must keep being a list to someone else.
 
 ## 2. Deprecating the class instead of the method
 
+> In `deprecating.py`,
+> deprecate the whole `Report` class instead of the method,
+> and show that constructing a `Report` warns while calling `render()` does not.
+
 ```python
 # exercise_2.py
 import warnings
@@ -101,6 +112,11 @@ deprecated class emits the warning as soon as Python imports that
 library.
 
 ## 3. `facade.py` as a module
+
+> Rewrite `facade.py` as a module façade.
+> Put its classes behind leading-underscore names in one module,
+> expose functions that build them, and import only those from a second file.
+> Compare what a caller can see in each version.
 
 ```python
 # shop.py
@@ -175,6 +191,13 @@ and the module version pays none.
 
 ## 4. Classifying three wrappers
 
+> Consider three wrappers: one logs each call and forwards it unchanged,
+> one exposes a `read()` over an object that has only `next_chunk()`,
+> and one refuses calls unless you set a flag.
+> Classify each as *Proxy*, *Decorator*, *Adapter*,
+> or *Façade* using the "remove it and you lose" test from the table,
+> and say what you lose in each case.
+
 **The logging wrapper is a *Decorator*.** Its interface is the wrapped
 object's, unchanged, and it adds behavior on the way through. Remove
 it and every call still reaches the same method with the same
@@ -207,6 +230,12 @@ same `__getattr__()` forwarder. What separates them is the answer to
 tells the next reader why the wrapper is there.
 
 ## 5. Renaming a keyword-capable parameter
+
+> Copy the classes from `adapter.py` and remove the `/` from `WhatIUse.op()`.
+> Add `WhatIUse2` from `adapter_variations.py` unchanged,
+> and call `op()` on each class with the keyword `what_i_want=`.
+> Explain what `ty` reports and what happens at runtime.
+> Then fix `WhatIUse2.op()` without restoring the `/`.
 
 ```python
 # exercise_5.py

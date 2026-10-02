@@ -681,6 +681,8 @@ each had a `solutions-*` twin). Two targets are Solutions-only:
 
 ```
 tip solutions-numbering      # every exercise has a solution (below)
+tip statements               # copy each exercise under its solution heading
+tip statements-check         # report a statement that differs from its chapter
 tip solutions-gate           # numbering, drift, output, ty, ruff, run, pytest
 ```
 
@@ -748,6 +750,40 @@ of those were dead in `Solutions/` for the same "nothing looked here" reason.
 Neither check sees an anchorless link to a file that exists, so the two
 together are the coverage: `check_solutions.py` for the missing prefix,
 `heading_links.py` for the anchor.
+
+## exercise_statements.py
+
+A solution with no exercise above it sends the reader back to the chapter,
+and a solution that answers the wrong exercise under the right number is hard
+to see. `check_solutions.py` compares the numbers alone.
+
+This copies each statement from the chapter into `Solutions/` as a block
+quote directly under the matching `## N.` heading. The chapter is the single
+source of truth: the quote is generated, and every run rewrites it. A combined
+heading (`## 1 & 2.`) quotes each exercise it names, kept as the list item
+the chapter writes, with a bare `>` line between them. Headings with no
+leading number, and numbers that name no exercise, get nothing.
+
+```
+tip statements                 # rewrite every Solutions file
+tip statements ARGS=19         # only chapter 19
+tip statements-check           # report drift, change nothing
+```
+
+Two edits happen inside the copy. A chapter-relative link gets the
+`../Chapters/` prefix that `Solutions/` needs (`](#anchor)` and a bare
+`](17_Techniques--Metaprogramming.md#x)` both resolve from the new place), and
+a footnote reference `[^label]` is dropped, since its definition stays in the
+chapter. A statement ends at the next item, a heading, or any line in column
+0, so the footnote definitions that follow the last exercise in some chapters
+stay out of it.
+
+`gate` runs `tip statements` twice, so the copy self-heals the way reflow and
+the `#:` markers do: once before the `anchors` check, which reads `Solutions/`
+and would otherwise fail on a link a renamed heading left stale, and once
+after the reflow, which can rewrap a chapter's exercise lines.
+`verify-ch` runs it for its chapter. `exercise_refs.py` skips the generated
+lines, so the baseline counts each reference once.
 
 ## reflow_prose.py
 

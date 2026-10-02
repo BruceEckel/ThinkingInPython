@@ -6,6 +6,11 @@ keeps working when a chapter listing changes.
 
 ## 1. A `Console` that reads as well as prints
 
+> Add a `read()` method to the `Console` protocol in `console_protocol.py` and write `ask_and_greet()`,
+> an Effect that asks for a name and greets the result.
+> Supply a scripted `Console` in a test and a real one in a demo,
+> and confirm `ask_and_greet()` stays unchanged between them.
+
 ```python
 # test_ch46_ask_and_greet.py
 from dataclasses import dataclass, field
@@ -85,6 +90,11 @@ and `isinstance()` matches `Scripted` on shape.
 
 ## 2. An undeclared need, declared
 
+> Take `undeclared_need.py`, remove the `# type: ignore`,
+> and run `ty check` on it.
+> Fix the error by changing only the annotation,
+> then check what `greet_all()`'s callers must now declare.
+
 Removing the `# type: ignore` from `undeclared_need.py` produces:
 
 ```text
@@ -145,6 +155,10 @@ one that supplies it, and the type checker refuses to let any of them
 stay silent.
 
 ## 3. Catching an error that is already handled
+
+> Apply `reveal_type()` to `catch(ValueError)(one_unhandled)` and run `ty check`.
+> Explain why its result type differs from `all_handled()`'s,
+> given that both have handled every error `read_score()` declares.
 
 ```python
 # exercise_3.py
@@ -222,6 +236,9 @@ Skipping the `match` leaves the caught error sitting in the return
 type.
 
 ## 4. A `Log` protocol, and a test that records both
+
+> Rewrite `audit_log.py` so `Log` is a `Protocol` rather than a concrete class,
+> then write a test that supplies a recording `Log` and a recording `Console` at once and asserts on both.
 
 ```python
 # test_ch46_audit_log.py
@@ -304,6 +321,10 @@ are actions, so the test decides what performing them means.
 
 ## 5. A third material in the table
 
+> Add a `Metal` material to `test_nailer.py` with a strength that survives the robotic nailer,
+> and add its two rows to the table.
+> Then explain why the test function body needs no change.
+
 ```python
 # test_ch46_nailer.py
 from typing import Final
@@ -369,6 +390,21 @@ inside `holds()` needs three copies of the function, one per material,
 and a version that also constructs its own `Nailer` needs all six.
 
 ## 6. A handler that builds what the request names
+
+> This one looks ahead to `handle()`,
+> which [Abilities Are Not Special](../Chapters/47_Effects--Stateless_in_Practice.md#abilities-are-not-special)
+> covers.
+> `default_console.py` defaults by supplying an instance.
+> Write the other kind of default, one that builds whatever the request names.
+> `handle()` reads its handler's parameter annotation to decide what it answers,
+> so a function annotated `Need[Console]` and returning `ability.t()` hands back a default-constructed instance of the requested class.
+> Run it against `greeter.py`'s `greet()`,
+> whose `Console` constructs with no arguments,
+> and confirm the greeting prints.
+> Then declare a second Ability and request that one too,
+> and report which requests your handler answered at runtime and which ones the type checker believes it answered.
+> Account for the difference,
+> using `handle()`'s `t = get_origin(t) or t` as the evidence.
 
 ```python
 # exercise_6.py
@@ -437,6 +473,15 @@ assumes `ability.t` is a `Console` receives a `Clock` with
 nothing to stop it.
 
 ## 7. Two ways to drop a `yield from`
+
+> Break `audit_log.py` by removing the `yield from` in front of `greet(name)` in `greet_logged()`.
+> Run `ty check`, `ruff check`, and the script,
+> and record what each reports and what the program prints.
+> Explain where the greetings went and why no tool objects.
+> Then restore it, and instead remove the `yield from` in front of `need(Console)` in `greeter.py`'s `greet()`.
+> This time `ty` produces two diagnostics.
+> Explain what each one catches,
+> and why the type checker catches assigning a dropped request but not discarding one.
 
 Removing it from `greet(name)` in `greet_logged()`:
 
@@ -513,6 +558,16 @@ this library: a type checker verifies how a program uses its values,
 so a value nobody uses is a value nobody checks.
 
 ## 8. A registry of Effects, and why `retry()` takes a function
+
+> Build a registry of Effects:
+> a `dict[str, Success[None]]` that maps each of two names to `supply(Console())(greet)(name)`.
+> Run every entry, then run every entry a second time,
+> and record what prints on each pass.
+> Change the values to functions that build the Effect when called,
+> and run both passes again.
+> Explain which of the two shapes `retry()` requires,
+> and why it takes a schedule and returns a decorator of type `Callable[P, Effect[...]] -> Callable[P, Effect[...]]`,
+> rather than being an operation on an Effect.
 
 ```python
 # exercise_8.py
@@ -593,6 +648,16 @@ function, and apply the arguments where you need the Effect.
 
 ## 9. Three reports, one Effect
 
+> Write `report_all()`,
+> which calls `stateless_coroutine.py`'s `report()` for three URLs with `yield from` and returns the three results.
+> Importing that module runs its own unguarded `print(run(...))`,
+> so expect one line of its output before yours.
+> Work out what its annotation must be, and confirm it with the type checker.
+> Then call it from inside an `async def`,
+> once with `run()` and once with `await run_async()`,
+> and record what each one does.
+> Explain why the type checker accepts both.
+
 ```python
 # exercise_9.py
 import asyncio
@@ -653,6 +718,16 @@ type-based: `run()` at the outermost edge of a synchronous program,
 `run_async()` anywhere inside an asynchronous one.
 
 ## 10. A second failure in the channel
+
+> `announce()` declares `Effect[Need[Console], KeyError, None]`.
+> Give it a second failure:
+> a helper that formats the score and raises a `ValueError` on a negative one,
+> lifted with `@throws(ValueError)`.
+> Follow the type checker until the program builds,
+> add a negative score to `scores.py`'s `SCORES` so the new failure can occur,
+> then run it on a name that produces each failure and on one that succeeds,
+> and say where each failure surfaced.
+> Then delete `ValueError` from `announce()`'s annotation and record what the type checker reports and at which line.
 
 ```python
 # exercise_10.py
@@ -739,6 +814,16 @@ escaped and the delegation it escaped through, so the fix is either to
 declare it or to catch it, right there.
 
 ## 11. Making the ambiguity a type error
+
+> `ambiguous_supply.py` picks its `Console` by argument order.
+> Add a third implementation and predict, before running it,
+> which of the six orderings send Alice's greeting where.
+> Then follow the advice in [When Two Implementations Match](../Chapters/46_Effects--Stateless.md#when-two-implementations-match):
+> give the recording implementation a method name the screen one does not have,
+> declare each as its own `Protocol`,
+> and show that handing the wrong implementation to an Effect is now a type error rather than a silent choice.
+> Two implementations sharing one method name stay ambiguous under both `Protocol`s,
+> so say what the technique does and does not prevent.
 
 Three implementations have six orderings, and the prediction is short.
 `supply()` scans its arguments and takes the first that satisfies the

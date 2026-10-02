@@ -2,6 +2,10 @@
 
 ## 1. A class decorator that reports and returns
 
+> Write a class decorator `announce` that prints the name of each class it decorates and returns it unchanged,
+> then apply it to two small classes.
+> Compare what it can do to what `register` does.
+
 ```python
 # exercise_1.py
 def announce[T](cls: type[T]) -> type[T]:
@@ -41,6 +45,10 @@ instance. What the decorator does to its argument, and what it
 returns, decide which kind you have written.
 
 ## 2. A `timing` decorator stacked with `@trace`
+
+> Write a `timing` decorator that prints how long the wrapped function took,
+> using `time.perf_counter()`.
+> Apply it together with `@trace` and predict the order of the output.
 
 ```python
 # exercise_2.py
@@ -94,6 +102,12 @@ prints first and last, and each inner layer's output appears nested
 in between.
 
 ## 3. A coffee shop, object *Decorator* pattern
+
+> Implement the object-oriented *Decorator* pattern for a coffee shop:
+> plain drinks (Espresso, Cappuccino) and extra decorators
+> (Whipped cream, Decaf, Extra shot).
+> Build an espresso decorated with an extra shot and whipped cream,
+> then print its cost and description.
 
 ```python
 # exercise_3.py
@@ -160,6 +174,10 @@ compose in any order, since each layer knows only about the drink
 directly inside it.
 
 ## 4. A class-level counter shared across every decorated function
+
+> Write `trace` as a class-based decorator that also keeps a class-level counter shared across every decorated function,
+> and report the total number of traced calls in the program.
+> Note where the shared state lives compared to the per-instance `count` in `count_calls`.
 
 ```python
 # trace_counting.py
@@ -229,6 +247,12 @@ through the class name, is one value the whole family of decorated
 functions shares.
 
 ## 5. A `memo` that works with and without parentheses
+
+> Write a `memo` decorator that works both with and without parentheses,
+> so `@memo` and `@memo(maxsize=10)` both decorate a function.
+> Cache each result in a dictionary keyed by the arguments,
+> and drop the oldest entry once the cache holds more than `maxsize` of them.
+> Distinguish the two forms by checking whether the first argument arrived at all.
 
 ```python
 # exercise_5.py
@@ -319,6 +343,10 @@ implementation must reconsider that trade.
 
 ## 6. `retry(times)` in the function form
 
+> Write a `retry(times)` decorator in the function form that calls the wrapped function again when it raises an exception,
+> up to `times` attempts, and re-raises the last exception when they all fail.
+> Check that `__name__` survives.
+
 ```python
 # exercise_6.py
 from collections.abc import Callable
@@ -389,6 +417,12 @@ retrying a `TypeError` from a bad call signature just fails three
 times more slowly.
 
 ## 7. Two class-based decorators on methods
+
+> Decorate one method of a small class with the class-form `repeat` from `repeat_class.py`,
+> and a second method with `logged` from `method_decoration.py`.
+> Call the first through an instance,
+> then print the type of the object each method name refers to in the class.
+> Explain why one class-based decorator works on a method and the other does not.
 
 ```python
 # decorated_methods.py

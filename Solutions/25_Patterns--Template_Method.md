@@ -2,6 +2,17 @@
 
 ## 1. A file-processing framework, customized both ways
 
+> Create a framework that takes a list of file names.
+> It opens every file but the last for reading, and the last one for writing.
+> It processes each input file by a policy the customization supplies,
+> and writes the output to the last file.
+> Supply each of these policies twice,
+> once by subclassing and once by passing a function:
+>
+> 1.  Convert all the letters in each file to uppercase.
+> 2.  Treat the first file as a list of search words, one per line,
+>     and report which of those words appear in each remaining input file.
+
 The framework anchors the shape: read every file but the last, run the
 varying `process()` step over each one's text, and write the combined
 result to the last file. It appears twice, as a base class whose
@@ -148,6 +159,12 @@ calls the step belongs to the framework.
 
 ## 2. Two fixes for the premature engine
 
+> Repair `premature_engine.py` both ways:
+> first reorder the two lines in `Greeter.__init__()`,
+> then redesign `Framework` instead,
+> so clients construct the object and call `run()` explicitly.
+> Which repair still protects a second subclass author who has never read this chapter?
+
 The quick repair reorders the two lines so the subclass finishes its
 own setup before handing control to the base class:
 
@@ -227,6 +244,11 @@ where the timing of a hidden step makes the difference.
 
 ## 3. Who objects to a replaced `run()`
 
+> Subclass `ApplicationFramework` and override `run()` with a version that calls `customize2()` before `customize1()`.
+> Run it, then run `ty` over it.
+> Which of the two, Python or the type checker, objects to the change?
+> What does that tell you about where the anchored algorithm's guarantee comes from?
+
 ```python
 # exercise_3.py
 from typing import final, override
@@ -291,6 +313,12 @@ subclass's `class` statement, as soon as the class body has run, long
 before anyone constructs an instance.
 
 ## 4. Two faithless substitutes the type checker accepts
+
+> Write two subclasses of `ApplicationFramework` that both type-check but break the anchored algorithm:
+> one whose `customize1()` raises an exception the base never raises,
+> and one that leaves `customize2()` at its `...` default when the flow depends on it.
+> The type checker reports neither.
+> What must be true of the base class for it to catch either one?
 
 ```python
 # exercise_4.py
@@ -377,6 +405,12 @@ behavior, and Liskov substitution is a rule about behavior, so
 enforcing it stays where the chapter leaves it: with you.
 
 ## 5. Which names the misspelling check compares
+
+> In `near_miss.py`, subclass `MyApp` with a class that adds a method named `reports()`.
+> Predict what the `class` statement does, then run it.
+> Which names does `__init_subclass__()` compare a new method against?
+> Change the check so it compares a new method only against the names `ApplicationFramework` defines.
+> What does the narrower check no longer catch?
 
 The chapter's `__init_subclass__()` builds its set of names from every
 base class, so the set grows as the hierarchy does. `MyApp` adds

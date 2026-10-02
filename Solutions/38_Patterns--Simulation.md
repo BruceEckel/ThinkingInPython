@@ -2,6 +2,14 @@
 
 ## 1. Testing a `Rat` with a fake blackboard
 
+> Test a `Rat` with a fake blackboard.
+> Because `Rat` depends only on the `Recorder` `Protocol`,
+> you can drive it with a stand-in.
+> Write a fake whose `claim()` returns a scripted sequence of results and whose `spawn()` only records the coordinates it receives,
+> run one rat with `asyncio.run(rat.run())`,
+> and assert which cell the rat kept for itself and which cells it spawned.
+> You need no real `Blackboard`, `Maze`, or task scheduling.
+
 ```python
 # test_ch38_fake_blackboard.py
 import asyncio
@@ -92,6 +100,12 @@ that, here `(1, 0)` alone. Once the script runs out, `claim()` answers
 `run()` returns. The test needs no randomness and no real maze.
 
 ## 2. Reporting unreached cells
+
+> Report the cells the rats never reach.
+> After `explore()` finishes,
+> compare `blackboard.visited` against every open cell of the `Maze` and print the open cells that no rat claimed.
+> Build a maze for which that set is not empty,
+> and explain what makes a cell unreachable.
 
 ```python
 # exercise_2.py
@@ -227,6 +241,21 @@ rat can therefore reach a cell that has no open-cell path back to the
 entry, however many rats spawn.
 
 ## 3. Breaking `claim()`'s atomicity
+
+> Break the atomicity of `claim()`.
+> Make `claim()` an `async def`,
+> which forces matching changes in the `Recorder` protocol,
+> `Rat.run()`'s comprehension, and `explore()`.
+> Put `await asyncio.sleep(0)` between the membership test and `self.visited.add(...)`.
+> Then count how many calls return `True` and compare that count with `len(blackboard.visited)`,
+> using a maze that contains a loop.
+> `amaze.txt` is a perfect maze,
+> so no two rats ever reach one unclaimed cell and the counts always agree.
+> `test_rats_and_mazes.py` still passes, because `visited` is a set.
+> The guarantee that broke is "one rat per cell", not "every cell visited".
+> What happens to the two rats that both claimed one cell,
+> and why does the original `claim()`, with no `await` inside it,
+> need no lock?
 
 ```python
 # exercise_3.py
@@ -544,6 +573,14 @@ class GameBuilder:
 
 ## 4. A `Coin` item
 
+> Add a new kind of `Item` to the robot maze.
+> Define a `Coin` subclass of `Item` with the symbol `$`.
+> Its `interact()` removes itself the way `Food` does and adds one to a coin count carried by the `Robot`.
+> Place a few `$` characters in the maze and report how many the robot collects.
+> `item_factory()`, `Room`, and `GameBuilder` stay as they are.
+> Explain why the factory finds your new item on its own,
+> and what the factory does if you derive `Coin` from `Food` instead.
+
 ```python
 # exercise_4.py
 from typing import ClassVar, override
@@ -592,6 +629,21 @@ route, and `game.robot.coins` stays
 the factory's search and silently substitutes a different `Item`.
 
 ## 5. Sending the robot somewhere other than the `!`
+
+> Send the robot to something other than the `!`.
+> `solve()` stops at whatever room holds an `EndGame`,
+> the one goal it can express.
+> Replace that `isinstance()` test with a `Callable[[Room], bool]` parameter,
+> so the caller says what counts as arriving,
+> and change nothing else in the search,
+> beyond letting `solve()` return `None` when no room matches.
+> Then use the new parameter to feed the robot:
+> search for the nearest room holding a `Food`, walk there,
+> and repeat until no `Food` remains, then search for the `!` and walk that.
+> Report how many pieces of food the robot ate and how many moves the whole tour took.
+> The run answers two questions for you.
+> Why does the search have to run again after every meal instead of once at the start?
+> And why does asking for the nearest food each time not produce the shortest tour that eats everything?
 
 ```python
 # exercise_5.py
@@ -795,6 +847,13 @@ class Plate:
 
 ## 6. Freezing the plate
 
+> Freeze the plate.
+> Run the Chladni view with `MODES` starting at `(2, 2)`.
+> Work out what `amplitude()` returns whenever `m == n`,
+> and explain why the result is neither chaos nor a figure.
+> Then explain why the main diagonal shows up in every figure this plate makes.
+> Swapping `x` and `y` in the two terms of `amplitude()` is the clue.
+
 ```python
 # exercise_6.py
 from chladni import Plate, amplitude
@@ -838,6 +897,12 @@ has a nodal line straight down the main diagonal, and the figures all
 share that one feature no matter which `(m, n)` produced them.
 
 ## 7. Changing the physics
+
+> Change the physics.
+> Replace the body of `amplitude()` with `abs(math.sin(m * math.pi * x) * math.sin(n * math.pi * y))`,
+> the standing waves of a membrane fixed at its edges, like a drumhead.
+> Predict the figures before you run the view.
+> Why are the nodal lines now straight?
 
 ```python
 # exercise_7.py
@@ -906,6 +971,14 @@ vibration under it. Only the field changed, and with it every pattern
 the model produces.
 
 ## 8. Tuning the noise
+
+> Tune the noise.
+> Rerun `chladni_demo.py` passing `kick=0.005` and then `kick=0.5` to `plate.step()`,
+> printing agitation at the same checkpoints.
+> One setting produces order too slowly.
+> The other drives agitation down as convincingly as the default kick,
+> yet the figure never appears.
+> Explain both failures, and why an intermediate kick avoids them.
 
 ```python
 # exercise_8.py

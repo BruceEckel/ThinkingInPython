@@ -2,6 +2,12 @@
 
 ## 1. A fourth step, `func_d()`, added to the `bind()` chain
 
+> Add a `func_d()` that returns a `Result[int, str]`,
+> and extend the `bind()` chain in `composing_with_bind.py` to include it.
+> Put it in the middle of the chain rather than at the end,
+> so an `Err` from it has a later step to skip,
+> and confirm that the step never runs.
+
 ```python
 # exercise_1.py
 from result import Err, Ok, Result
@@ -59,6 +65,11 @@ wherever that falls, and the order of the steps decides where the
 chain stops.
 
 ## 2. `Err.map_error()`
+
+> Give `Err` a `map_error()` method that transforms the error it holds,
+> leaving an `Ok` untouched
+> (for chains to keep working, `Ok` needs its own `map_error()` that returns `self`).
+> Use it to add a prefix to every error.
 
 ```python
 # exercise_2.py
@@ -126,6 +137,10 @@ report the error, rather than threading the prefix through every
 function that might produce one.
 
 ## 3. `combined()` that collects every failure
+
+> Rewrite `combined()` so it collects all the failures instead of stopping at the first one,
+> returning `Result[str, list[str]]`.
+> Write the tests first.
 
 ```python
 # test_ch42_combined.py
@@ -200,6 +215,11 @@ cannot see that an empty error list means all three succeeded.
 
 ## 4. `@safe(ValueError)`, catching only what you name
 
+> Change `@safe` so it takes the exception types it should catch,
+> as in `@safe(ValueError)`, and lets anything else propagate.
+> Show that a `TypeError` raised inside the wrapped function now propagates,
+> and `@safe` no longer returns it as an `Err`.
+
 ```python
 # exercise_4.py
 from collections.abc import Callable
@@ -263,6 +283,11 @@ to `safe()`. A protocol with a generic `__call__` does say it, so
 
 ## 5. Notes that survive as data
 
+> Write `load_setting(name, text)` that returns `Result[int, Exception]` and attaches a note naming the setting.
+> Chain two of them with `bind()` and print the notes from whichever one failed.
+> Does the successful call carry a note?
+> Why or why not?
+
 ```python
 # exercise_5.py
 from result import Err, Ok, Result
@@ -319,6 +344,11 @@ in [The returns Library](../Chapters/42_Functional--Error_Handling.md#the-return
 reads better here.
 
 ## 6. `int | None` collapses the three failures into one
+
+> Rewrite `func_a()`, `func_b()`,
+> and `func_c()` to return `int | None` instead of `Result[int, str]`,
+> and adjust `composing.py` to match.
+> What can the caller still tell about which of the three steps failed?
 
 ```python
 # exercise_6.py

@@ -2,6 +2,12 @@
 
 ## 1. A third instance created after the class attribute changes
 
+> In `class_attribute_confusion.py`,
+> add a third instance `c = Stars()` after the `Stars.rating = 9` line,
+> and print `c.rating`.
+> Predict its value before running,
+> then explain why it differs from `a.rating`.
+
 ```python
 # exercise_1.py
 class Stars:
@@ -24,6 +30,11 @@ its own shadowing instance attribute when `a.rating = 1` ran, before
 whatever the class attribute currently holds.
 
 ## 2. A third subclass with no override
+
+> In `class_var_inheritance.py`,
+> add a third subclass `class Middle(Base): pass` (no override, like `Left`)
+> and print `Middle.shared` alongside the others at each step.
+> Confirm `Middle` tracks `Base` the way `Left` does.
 
 ```python
 # exercise_2.py
@@ -59,6 +70,10 @@ runs `shared = 100`.
 
 ## 3. Each `B()` instance keeps its own `x`
 
+> In `real_defaults.py`, create `b = B()` and assign `b.x = -1`.
+> Then create a second instance, `b2 = B()`,
+> and confirm `b2.x` is still `100`.
+
 ```python
 # exercise_3.py
 from dataclasses import dataclass
@@ -83,6 +98,11 @@ per instance, unlike a class-body attribute, which creates one value
 shared by all instances until something shadows it.
 
 ## 4. A plain class attribute masquerading as shared state
+
+> Rewrite `Tally` from `class_var.py` so `total` is a plain (non-`ClassVar`)
+> class attribute instead, then assign `a.total = 99` through an instance.
+> Using `vars()` as in `inside_objects.py`,
+> explain what that assignment creates, and where.
 
 ```python
 # exercise_4.py
@@ -118,6 +138,14 @@ before the line runs, because the assignment writes to a `ClassVar`
 through an instance.
 
 ## 5. A per-instance list, via `default_factory`
+
+> Rewrite `Cart` from `shared_mutable.py` as a `@dataclass` with `items: list[str] = field(default_factory=list)`,
+> importing `field` from `dataclasses`.
+> [Data Classes as Types](../Chapters/12_Techniques--Data_Classes_as_Types.md#defaults-built-not-shared)
+> covers `default_factory`;
+> this exercise needs only the one expression given here.
+> Repeat the `append` and confirm `b.items` stays empty.
+> Then try the same class with `items: list[str] = []` and report what `@dataclass` does about it.
 
 ```python
 # exercise_5.py
@@ -163,6 +191,12 @@ which is why `shared_mutable.py`'s `Cart` builds without complaint.
 
 ## 6. `del` unshadows, once
 
+> In `inside_objects.py`, add `del a.x` after the final `print`,
+> then print `vars(a)` and `a.x` again.
+> Predict both before running.
+> Then run `del a.x` a second time and explain the exception,
+> given what `vars(A)` still holds.
+
 ```python
 # exercise_6.py
 from exceptions import expected
@@ -195,6 +229,13 @@ The second `del a.x` fails because the instance dictionary is empty.
 has: reads fall back to the class, writes and deletes do not.
 
 ## 7. Why `self.total += 1` leaves the class counter at zero
+
+> In `counter_near_miss.py`,
+> print `vars(a)` and `vars(Tally)["total"]` after constructing both instances,
+> and use them to explain the `1 1 0` output.
+> Then fix the class so the shared counter moves,
+> without changing the `ClassVar` declaration,
+> and explain what the type checker reports when you remove the `# type: ignore` from the broken version.
 
 ```python
 # exercise_7.py
@@ -249,6 +290,10 @@ suppresses the report so it can demonstrate
 what the write does when it runs.
 
 ## 8. A mutable `ClassVar` shared down the hierarchy
+
+> Change `class_var_inheritance.py` so `shared` is `ClassVar[list[int]] = []` and `Left` and `Right` both call `.append()` on it.
+> Predict what `Base.shared` holds afterwards, then check.
+> Give `Right` its own list with `shared = []` in its body and repeat.
 
 ```python
 # exercise_8.py
@@ -316,6 +361,10 @@ subclass its own.
 
 ## 9. A declared attribute that no method assigns
 
+> Write a class `Ticket` with a bare annotation `seat: str` and an `__init__()` that stores a `holder` and leaves `seat` unassigned.
+> Run `ty` on it, then read `seat` on an instance inside `expected(AttributeError)`.
+> Assign `seat` from outside the class and print `vars()` of the instance before and after.
+
 ```python
 # exercise_9.py
 from exceptions import expected
@@ -350,6 +399,11 @@ that reads it. The type checker cannot confirm that order, so the
 class depends on its callers to keep it.
 
 ## 10. Watching `Sub` get its own counter
+
+> In `classvar_fork.py`,
+> print `vars(Sub).get("total")` before the first `Sub()` call and after each one,
+> and use the three values to explain the `1 3` output.
+> Then change the increment to `Base.total += 1` and predict all four lines before running.
 
 ```python
 # exercise_10.py

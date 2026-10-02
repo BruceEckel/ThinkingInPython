@@ -2,6 +2,10 @@
 
 ## 1. Undo, added to `command.py`
 
+> Add an "undo" capability to `command.py`.
+> What do the commands need to become, and is a function still enough,
+> or do you now want an object?
+
 ```python
 # exercise_1.py
 from typing import Protocol
@@ -74,6 +78,9 @@ bodies are what the shape costs. A base class pays for itself when
 the commands share implementation, and these commands share none.
 
 ## 2. `chain.py`, reporting every attempt
+
+> Rewrite `chain.py` so each handler also reports why it failed,
+> and the solver prints every attempt before returning the winner.
 
 ```python
 # exercise_2.py
@@ -191,6 +198,10 @@ because each solution runs on its own.
 
 ## 3. `sorted()` with a compound key, and why `key` is *Strategy*
 
+> Use `sorted()` with a `key` function to sort a list of `(name, score)` tuples by score,
+> then by name.
+> Explain why `key` is the *Strategy* pattern.
+
 ```python
 # exercise_3.py
 scores = [("Bob", 85), ("Amy", 92), ("Cid", 85),
@@ -213,6 +224,12 @@ knows nothing about tuples, scores, or names. Passing a different
 Context holding the current strategy is the call to `sorted()`.
 
 ## 4. A configurable `newton()`, closed over and partially applied
+
+> Following `bisection_within()`,
+> add a `tolerance` parameter to `newton()` in `algorithms.py` and build a configured strategy from it two ways:
+> with a closure, and with `functools.partial`.
+> Confirm that `chain.py`'s `solve()` runs a chain holding either one,
+> with no change to `solve()`.
 
 ```python
 # exercise_4.py
@@ -291,6 +308,13 @@ function, the way `bisection_within()` writes the tolerance into its
 `while` condition.
 
 ## 5. An event bus that walks the MRO, and can unsubscribe
+
+> Because `EventBus.publish()` looks up `type(event)`,
+> a subclass of `Deposit` finds no handler.
+> Change `publish()` to walk `type(event).__mro__` and call every handler registered along it,
+> parents last.
+> Then add `unsubscribe()`.
+> Which of the two changes can break an existing caller, and why?
 
 ```python
 # exercise_5.py
@@ -375,6 +399,13 @@ is a design decision: silent matches the bus's habit of letting an
 unmatched event pass without complaint.
 
 ## 6. Three fixes for late binding, and what none of them fix
+
+> Build a list of three commands in a `for` loop (not a comprehension)
+> with `lambda: print(n)`.
+> Call them and explain the output.
+> Fix the loop three ways: with a default argument, with `functools.partial`,
+> and with a factory function that takes `n` and returns the command.
+> Which one still works if you must compute the value at call time rather than at build time?
 
 ```python
 # exercise_6.py
@@ -462,6 +493,10 @@ the name you close over still means what you wanted when the call
 finally happens.
 
 ## 7. `event()` registering `cls`
+
+> In `tagged_bus.py`, change `event()` to register `cls` in place of `built`.
+> Predict what importing `bank_events.py` then does, and which line stops it.
+> Run it to check.
 
 ```python
 # exercise_7.py

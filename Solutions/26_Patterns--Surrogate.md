@@ -2,6 +2,13 @@
 
 ## 1. A virtual proxy that answers the cheap requests itself
 
+> Extend `virtual_proxy.py`'s `Lazy` so it answers one cheap attribute itself,
+> a `description` string given at construction, without building `Expensive`.
+> Count the accesses it answers that way,
+> and report the count at the moment `Expensive` is built.
+> Confirm that reading `description` several times builds nothing,
+> and that the first `query()` reports the count.
+
 ```python
 # exercise_1.py
 from typing import Any
@@ -57,6 +64,9 @@ pixels stay unloaded until something draws them.
 
 ## 2. A per-method tally in the counting proxy
 
+> Change `CountingProxy` in `counting_proxy.py` to keep a per-method tally in a `collections.Counter` instead of a single total.
+> Confirm the tally reports `f` called twice and `g` called once.
+
 ```python
 # exercise_2.py
 from collections import Counter
@@ -98,6 +108,12 @@ forwarding. The single `calls` integer becomes a `Counter`. The final
 `print()` shows `f` called twice and `g` once.
 
 ## 3. A simple copy-on-write list
+
+> Create a simple copy-on-write list.
+> Its `share()` returns a second list over the same data,
+> at the cost of incrementing a reference count,
+> and the first `append()` through a shared list copies the data before changing it.
+> Confirm that the two lists share their data before the write and not after.
 
 ```python
 # exercise_3.py
@@ -158,6 +174,10 @@ for it.
 
 ## 4. Why the typo reports as `RecursionError`
 
+> In `counting_proxy.py`,
+> misspell `self._impl` as `self._imp` inside `__getattr__()` and run it.
+> Use the fallback-hook behavior this chapter describes to explain why the failure reports as `RecursionError` rather than an `AttributeError` naming the typo.
+
 ```python
 # exercise_4.py
 from typing import Any
@@ -203,6 +223,14 @@ built through `object.__new__()`, for example) fails the same way on
 its first attribute access.
 
 ## 5. A connection pool that hands out proxies
+
+> Create a program similar to a DBMS that allows only a fixed number of connections at a time.
+> Implement this with a system modeled on [*Singleton*](../Chapters/24_Patterns--Singleton.md)
+> that controls the number of "connection" objects it creates.
+> When a user finishes with a connection,
+> the system must check that connection back in for reuse.
+> To guarantee this, return a proxy instead of a reference to the actual connection,
+> and design the proxy to release the connection back to the system.
 
 ```python
 # exercise_5.py
@@ -295,6 +323,11 @@ and it adds an action (the check-in) around the object's lifetime.
 
 ## 6. Forwarding `__len__()` explicitly
 
+> `dunder_bypass.py`'s `Proxy` cannot answer `len(p)`.
+> Give that `Proxy` a `__len__()` that forwards to the implementation,
+> and confirm `len(p)` returns 2.
+> Then explain why `__getattr__()` could not have supplied it.
+
 ```python
 # exercise_6.py
 from typing import Any
@@ -336,6 +369,9 @@ method per dunder, or generate them in a loop over a list of names and
 assign them onto the class.
 
 ## 7. A `change_to()` that refuses a narrower implementation
+
+> Extend `Surrogate` in `state_surrogate.py` so `change_to()` rejects an implementation missing a method the current one has,
+> and explain why the type checker could not have reported that swap.
 
 ```python
 # exercise_7.py
