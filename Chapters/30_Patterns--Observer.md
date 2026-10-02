@@ -71,7 +71,7 @@ class Subject[T]:
 so one change to the subject's state reaches all observers.
 
 `Thermometer`'s `celsius` setter stores the new reading and calls `notify()`.
-A setter runs at every assignment to its attribute,
+A setter runs on every assignment to its attribute,
 so every assignment to `celsius` reaches the observers:
 
 ```python
