@@ -182,7 +182,7 @@ doing the change means doing all of it: a moved or cut section takes its
 cross-references and defined terms with it (the "price the
 rearrangement" check is work you do, not a cost you report); a changed
 heading updates every link to its anchor, gated by `heading_links.py`;
-renumbered exercises renumber `Solutions/NN_name.md` in the same change,
+renumbered exercises renumber `Solutions/NN_name/README.md` in the same change,
 gated by `check_solutions.py`; and any of these ends with the full
 verify loop.
 

@@ -29,7 +29,7 @@ extracted too, so examples that read them can run.
 `Examples/` is the curated copy committed to git. `build/examples/` is a
 throwaway tree (git-ignored) regenerated from the Markdown for running.
 
-`Solutions/*.md` (worked exercise answers) go through the exact same
+`Solutions/*/README.md` (worked exercise answers) go through the exact same
 extract/validate/ty/ruff/pytest pipeline, via a parallel set of tools and
 `tip` targets described in [extract_solutions.py](#extract_solutions.py)
 below. The one difference is that a Solutions code block is
@@ -127,14 +127,14 @@ prints its wall-clock time when it finishes (`tip verify: 1m 32s`);
 [tip.py](#tip.py) explains the mechanism. The everyday ones:
 
 ```
-tip verify     # every fixer, refresh markers, sync Examples/ and SolutionsCode/, then the full gate but the site
+tip verify     # every fixer, refresh markers, sync Examples/ and Solutions/, then the full gate but the site
 tip ci         # the full local gate: check, ty, ruff, run, pytest, site
 ```
 
 `tip verify` is the loop to repeat after editing a chapter: every
 mutating fixer (the comment-style fixers, import sorting, blank-line
 cleanup), then a refresh of the `#:` output markers in both trees, then
-a sync of your Markdown changes out to `Examples/` and `SolutionsCode/`
+a sync of your Markdown changes out to `Examples/` and `Solutions/`
 (so the drift check passes), the figure gallery, then every gate except
 the site build; see [verify.py](#verify.py) below. It refreshes markers
 (`output`) *before* syncing, on purpose: `gate`/`solutions-gate` also
@@ -499,9 +499,9 @@ A stray whose bare filename appears nowhere in `Chapters/*.md` is
 helper) is *referenced* and only reported, since deleting it needs a human.
 
 ```
-tip sync    # write Examples/ and SolutionsCode/ from the Markdown
+tip sync    # write Examples/ and the .py files in Solutions/ from the Markdown
 tip check   # verify the Markdown matches both committed trees
-tip prune   # delete the orphaned strays check flags, in both trees
+tip prune   # delete the orphaned strays check flags, in both trees (never Markdown)
 ```
 
 A block whose slug starts with `rust/` (e.g. `# rust/fastcount/demo.py`)
@@ -564,7 +564,7 @@ The argument is a path, a file name (`.py` optional), or pieces of the
 path: each piece before the last is found, in order, inside a directory
 name, the tree's included, so `18/exercise_1` and
 `Solutions/47/research_by_hand` each pick one file. A spec matching several
-files lists them and exits 2. It reads `Examples/` and `SolutionsCode/`, the
+files lists them and exits 2. It reads `Examples/` and `Solutions/`, the
 committed trees, so it needs no extract step, and falls back to
 `build/examples/` and `build/solutions/`. A Solutions answer gets
 `Examples/utils` on its path, since its own tree has no `utils/`.
@@ -659,17 +659,20 @@ When pointed at `Solutions/`, `--tree` must be **absolute**; see
 The exact counterpart of `extract_examples.py`, pointed at `Solutions/`
 instead of `Chapters/`; it imports and reuses that module's `extract()`,
 `check_against()`, `write_tree()`, and `is_derived()` rather than duplicating
-them. `SolutionsCode/` is the committed copy (like `Examples/`);
-`build/solutions/` is the throwaway tree used for running (like
+them. `Solutions/` is the committed tree (like `Examples/`): each
+`Solutions/<chapter>/` holds the authored `README.md` beside the `.py`
+files extracted from it. `build/solutions/` is the throwaway tree used for running (like
 `build/examples/`). Same two modes: check (default, compares against
-`SolutionsCode/`) and `--write` (materializes a tree, default
+the `.py` files in `Solutions/`) and `--write` (materializes a tree, default
 `build/solutions/`, or `-o DIR`).
 
 Check mode reports strays the same way `extract_examples.py` does, using
 that module's `find_strays()` and `report_strays()`. A file under
-`SolutionsCode/` that no block generates is *orphaned* when its name
-appears nowhere in `Solutions/*.md` (fails the check) and *referenced*
-when it still does (reported for a human). A renumbered exercise is the
+`Solutions/` that no block generates is *orphaned* when its name
+appears nowhere in that chapter's `README.md` (fails the check) and *referenced*
+when it still does (reported for a human). The authored `README.md`
+files are the source, so they are never strays, and `--prune` refuses to
+delete any Markdown file. A renumbered exercise is the
 usual source. The grep covers the solutions alone: a leftover named only
 by a chapter is still orphaned here, since no solution block generates it
 and the chapter's own copy lives under `Examples/`.
@@ -737,19 +740,20 @@ first in `solutions-gate`, being the cheapest step and the only one that
 notices a missing answer.
 
 It also checks how a solution cites its chapter, which is a trap the layout
-sets. `Solutions/` sits beside `Chapters/` with the same file names, so a link
-copied from a chapter, `](24_Patterns--Singleton.md#state)`, resolves to
-`Solutions/24_Patterns--Singleton.md`: a real file, wrong content, no warning from
-anything. Seventeen links were wrong this way before anything looked. The
-correct form is `](../Chapters/24_Patterns--Singleton.md#state)`, and a leading `./`
-marks a deliberate link to a neighboring solution.
+sets. A link copied from a chapter, `](24_Patterns--Singleton.md#state)`,
+resolves inside the chapter's solutions folder, and the one-level form
+`](../Chapters/24_Patterns--Singleton.md#state)` resolves inside `Solutions/`;
+both miss, with no warning from anything. Seventeen links were wrong this way
+before anything looked. The correct form is
+`](../../Chapters/24_Patterns--Singleton.md#state)`, and a leading `./`
+marks a deliberate link to a neighboring file.
 
 The check runs the other way too. Each chapter with exercises links its own
-Solutions file from the Exercises section, so a reader browsing `Chapters/` on
+Solutions folder from the Exercises section, so a reader browsing `Chapters/` on
 GitHub can click through: `Each exercise is answered in this chapter's
-[solutions](../Solutions/<chapter filename>).` The check reports a chapter with
+[solutions](../Solutions/<chapter stem>/).` The check reports a chapter with
 no such link between the last `## Exercises` heading and the first exercise, and
-a link that names another file, which a chapter rename leaves behind. It holds
+a link that names another folder, which a chapter rename leaves behind. It holds
 the link target only, so the author may reword the sentence. `tip
 fix-solutions-links` inserts the default sentence where the link is missing and
 corrects a stale target, keeping the wording; it is not part of `verify`, since
@@ -785,7 +789,8 @@ tip statements-check           # report drift, change nothing
 ```
 
 Two edits happen inside the copy. A chapter-relative link gets the
-`../Chapters/` prefix that `Solutions/` needs (`](#anchor)` and a bare
+`../../Chapters/` prefix that `Solutions/<chapter>/README.md` needs
+(`](#anchor)` and a bare
 `](17_Techniques--Metaprogramming.md#x)` both resolve from the new place), and
 a footnote reference `[^label]` is dropped, since its definition stays in the
 chapter. A statement ends at the next item, a heading, or any line in column
@@ -1610,12 +1615,12 @@ Day to day:
 1. Make your changes by editing `Chapters/` (the source of truth for prose and
    code alike) or `Solutions/` (worked exercise answers).
 2. Run `tip verify site`: it pushes any code-block edits out to
-   `Examples/` and `SolutionsCode/`, then runs the full gate (drift, run,
+   `Examples/` and `Solutions/`, then runs the full gate (drift, run,
    pytest, ty, ruff, plus the same for `Solutions/`) and builds the site.
    Use plain `tip ci` when you want to confirm there is no drift rather
    than paper over it.
 3. When it is green, commit and push, including any updated `Examples/` or
-   `SolutionsCode/` files. The default CI path just rebuilds and publishes the
+   `Solutions/` files. The default CI path just rebuilds and publishes the
    site; it does not re-run the gates, so the push is fast.
 4. Only when you want CI to re-check the suite itself (an environment-specific
    change, say, or a release) request the gates: add `[full-ci]` to the push

@@ -25,14 +25,14 @@ git tag -l 'edit-start-*'
 - No tag at all: say so and stop.
 
 Resolve the chapter files as `/edit-start` does:
-`Chapters/NN_*.md` and, if present, `Solutions/NN_*.md`.
+`Chapters/NN_*.md` and, if present, `Solutions/NN_*/README.md`.
 
 ## Step 2: establish the diff
 
 One diff covers the whole pass, committed and not:
 
 ```
-git diff --word-diff=porcelain --ignore-all-space edit-start-NN -- Chapters/NN_*.md Solutions/NN_*.md
+git diff --word-diff=porcelain --ignore-all-space edit-start-NN -- Chapters/NN_*.md Solutions/NN_*/README.md
 ```
 
 That diff is the pass, whoever made each change: Bruce's editor

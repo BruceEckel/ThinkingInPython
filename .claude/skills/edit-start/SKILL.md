@@ -27,7 +27,7 @@ The argument is a chapter number (`28`), a stem prefix
 Resolve it to the two source files:
 
 ```
-ls Chapters/NN_*.md Solutions/NN_*.md
+ls Chapters/NN_*.md Solutions/NN_*/README.md
 ```
 
 A chapter without a Solutions file is fine; report it as such.
@@ -49,7 +49,7 @@ git tag -l 'edit-start-*'
 ## Step 3: note the working tree
 
 ```
-git status --porcelain -- Chapters/NN_*.md Solutions/NN_*.md Examples/NN_* SolutionsCode/NN_*
+git status --porcelain -- Chapters/NN_*.md Examples/NN_* Solutions/NN_*/
 ```
 
 Uncommitted changes to the chapter are not a problem:

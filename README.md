@@ -54,11 +54,10 @@ The answers to the exercises are in `Solutions/`.
 |---|---|
 | `Examples/` | The book's listings, one directory per chapter (`Examples/07_Foundations--Classes/`), each file named the way the book names it (`property_setter.py`). |
 | `Examples/utils/` | Helpers that several chapters import, such as `display.py` and `benchmark.py`. Not a chapter. |
-| `Solutions/` | Worked answers to the exercises, one Markdown file per chapter, numbered to match that chapter's exercise list. Each answer opens with the exercise it answers, quoted from the chapter. |
-| `SolutionsCode/` | The solution listings extracted to `.py` files, the same way `Examples/` is. |
+| `Solutions/` | One folder per chapter (`Solutions/07_Foundations--Classes/`). Its `README.md` holds the worked answers, numbered to match that chapter's exercise list, each opening with the exercise it answers, quoted from the chapter. The solution listings sit beside it as `.py` files generated from that `README.md`. |
 | `Chapters/` | The book itself, one Markdown file per chapter. |
 
-The build generates both code trees from `Chapters/` and `Solutions/`,
+The build generates the `.py` files in `Examples/` and `Solutions/` from `Chapters/` and `Solutions/`,
 where each listing is a fenced `python` block whose first line is a
 `# name.py` comment. The code you read is therefore the code that runs.
 
@@ -82,19 +81,20 @@ so a marker in the book always shows what the code prints.
 Each chapter ends with exercises that name the listing to start from
 (e.g.: "Add a method `shrink(self, factor)` to `Circle` in `property_setter.py`").
 Copy the example file, change it, run it. Then compare with the numbered answer in
-that chapter's `Solutions/` file. Each solution is self-contained: it
+that chapter's `Solutions/` folder. Each solution is self-contained: it
 repeats whatever it needs from the chapter rather than importing it, so you
 can read or run one on its own.
 
 Each answer opens with its exercise, quoted from the chapter, so you can
 read the question and the answer together. A solution often rewrites the
 listing instead of editing it, so a line-by-line diff of your file against
-`SolutionsCode/` is mostly noise. Compare what the two programs print and
-how they are organized.
+the solution's `.py` file is mostly noise. Compare what the two programs
+print and how they are organized.
 
-`tip sync` regenerates `Examples/` and `SolutionsCode/` from the Markdown,
-discarding any edits you made there. Experiment in them freely, but keep
-anything you want to save outside those two trees.
+`tip sync` regenerates `Examples/` and the `.py` files in `Solutions/` from
+the Markdown, discarding any edits you made to them. Each `README.md` is the
+source and is not overwritten. Experiment in the generated files freely, but
+keep anything you want to save outside them.
 
 ## Setup
 

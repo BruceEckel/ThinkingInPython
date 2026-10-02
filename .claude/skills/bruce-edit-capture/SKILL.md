@@ -61,7 +61,7 @@ Then drop everything that is not prose:
 - Any change inside a fenced code block is a code edit, not a prose edit.
 - A changed `#:` output marker is a code result, and often the gate's own
   self-healing rather than an edit at all.
-- `Examples/`, `SolutionsCode/`, `build/`, and lock files are derived or
+- `Examples/`, the generated `.py` files in `Solutions/`, `build/`, and lock files are derived or
   irrelevant; a change there follows from a code edit.
 
 Count the surviving prose changes before classifying them.

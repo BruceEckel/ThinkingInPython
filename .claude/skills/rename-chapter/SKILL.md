@@ -8,13 +8,15 @@ description: >-
 
 Moved from `CLAUDE.md`'s Traps. The filename convention itself (`NN_<Part>--<Chapter_Name>.md`) stays there.
 
-- **Renumbering or renaming a chapter** touches, in all four trees
-  (`Chapters/`, `Solutions/`, `Examples/`, `SolutionsCode/`): the filenames, every
+- **Renumbering or renaming a chapter** touches, in all three trees
+  (`Chapters/`, `Solutions/`, `Examples/`): the filenames (the Solutions side
+  is a directory rename, `git mv Solutions/<old> Solutions/<new>`, and the
+  `README.md` inside keeps its name), every
   `NN_*.md` cross-reference and its link text, `build_site.py` `PARTS`,
   `tools/data/norun.txt`, `tools/data/timing.txt` (since 2026-09-18 the
   gate's `skip-lists` step, `tools/check_skip_lists.py`, fails on a
   pattern in either that matches no file under `Examples/` or
-  `SolutionsCode/`, so a missed one is loud; renaming one *listing*
+  `Solutions/`, so a missed one is loud; renaming one *listing*
   trips it the same way),
   `tools/data/record_exceptions.txt` and
   `tools/data/exercise_refs_baseline.txt` (both keyed by chapter name,
@@ -34,9 +36,9 @@ Moved from `CLAUDE.md`'s Traps. The filename convention itself (`NN_<Part>--<Cha
   `pyproject.toml` for the old directory name before running `verify`.
   Renaming the *chapter title* additionally means the H1, the Solutions H1
   (`<Title>: Solutions`), and every link whose text was the old title.
-- **After renaming a chapter and its Solutions file, run
+- **After renaming a chapter and its Solutions folder, run
   `tip fix-solutions-links`.** The sentence under the chapter's
-  `## Exercises` heading links the Solutions file by name, so the old
+  `## Exercises` heading links the Solutions folder by name, so the old
   name stays behind and `tip solutions-numbering` fails until the link
   matches.
 - **Splitting a chapter silently invalidates every relative cross-reference in
