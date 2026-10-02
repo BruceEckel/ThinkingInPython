@@ -242,13 +242,15 @@ class Broadcaster[T]:
             responder(data)
 ```
 
-`Broadcaster` keeps `Subject`'s three methods under new names: GoF's `attach()`,
-`detach()`, and `notify()` become `connect()`, `disconnect()`, and `announce()`.
+`Broadcaster` is `classic_observer.py`'s `Subject` with its three methods renamed:
+GoF's `attach()`, `detach()`, and `notify()` become `connect()`, `disconnect()`,
+and `announce()`.
 The call inside the loop changes as well.
-`notify()` calls `observer.update(self, arg)`,
+`Subject.notify()` calls `observer.update(self, arg)`,
 so every observer is an object with an `update()` method.
 That takes a class for each reaction and an `Observer` interface to declare the method.
-`announce()` calls `responder(data)`, so a function serves as a responder.
+`Broadcaster.announce()` calls `responder(data)`,
+so a function serves as a responder.
 `announce()` passes the data alone, which is the push model.
 
 `Broadcaster` knows nothing about what it announces.
