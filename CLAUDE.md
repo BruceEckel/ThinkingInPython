@@ -168,6 +168,27 @@ raised where none is expected still fails the gate; only marker text is
 auto-corrected. A lone bare `#: ` with nothing after it is always treated
 as a not-yet-filled-in placeholder and filled in, even without `--update`.
 
+## Exercise statements in Solutions/ are generated
+
+The block quote under each `## N.` heading in `Solutions/` is the
+chapter's exercise statement, copied by `tools/exercise_statements.py`
+(`tip statements`, since 2026-10-02, after issue 16). The chapter is the
+source: edit the exercise in `Chapters/`, and `tip verify`, `tip gate`, or
+`tip verify-ch` rewrites the quote. A hand edit to the quote is
+overwritten on the next run. The tool owns the block quote that starts at
+the first non-blank line after a numbered heading, so a solution that
+opens with a quotation of its own needs a sentence in front of it. Links
+in the copy gain the `../Chapters/` prefix, and `exercise_refs.py` skips
+the copied lines. A solution's heading and its quoted exercise now sit
+together, so read the pair when a solution changes: a solution that
+answers a different exercise from the one quoted above it is the drift
+`check_solutions.py` cannot see.
+
+The site, EPUB, and PDF add one generated sentence under each chapter's
+`## Exercises` heading, linking to that chapter's Solutions file on
+GitHub (`build_site.load_chapter()`). It is not in `Chapters/`; do not
+write it there.
+
 ## Pyright: a periodic review, never a gate
 
 `ty` is the only checker the gates run.
