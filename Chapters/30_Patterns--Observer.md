@@ -194,6 +194,10 @@ The rest of this chapter uses names you can tell apart at a glance:
 | `notify()` | `announce()` |
 | `update()` | calling the responder |
 
+The last row has no method name on the right.
+A responder is a callable, so the receiving end needs no method,
+and the event has one name, `announce()`, where GoF has two.
+
 The catalog calls it *Observer*,
 and Java and the reactive libraries use the older nouns,
 so the table is also your map into that literature.
