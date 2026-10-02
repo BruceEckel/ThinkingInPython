@@ -565,6 +565,8 @@ so the registry cannot become the leak it exists to catch.
 
 ## Exercises
 
+Each exercise is answered in this chapter's [solutions](../Solutions/10_Foundations--Cleanup.md).
+
 1.  In `weak_value.py`, replace the final `counters.clear()` with `counters = []`
     (rebinding the name) and confirm `live_count()` still reaches `0`.
     The two do different things to the list object.

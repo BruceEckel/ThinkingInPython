@@ -852,6 +852,8 @@ That is the question the next chapter puts into the type system.
 
 ## Exercises
 
+Each exercise is answered in this chapter's [solutions](../Solutions/45_Effects--Generators.md).
+
 1.  Write `tally()`, a generator that yields a prompt string,
     receives an `int` for each prompt, and returns the total once it has three.
     Give it the full three-parameter annotation,

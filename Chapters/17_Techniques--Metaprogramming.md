@@ -2178,6 +2178,8 @@ The rest is the bookkeeping every class carries.
 
 ## Exercises
 
+Each exercise is answered in this chapter's [solutions](../Solutions/17_Techniques--Metaprogramming.md).
+
 1.  In `init_subclass.py`, add a class `Yellow(Color)` and then `Gold(Yellow)`.
     Predict `Color.registry` after each new class, then confirm.
 2.  In `set_name.py`, add a third `Field()` attribute, `z`, to `Point`,

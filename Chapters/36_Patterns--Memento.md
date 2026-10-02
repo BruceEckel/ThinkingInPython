@@ -771,6 +771,8 @@ Whenever you see rewind, rollback, or restore, something is producing mementos.
 
 ## Exercises
 
+Each exercise is answered in this chapter's [solutions](../Solutions/36_Patterns--Memento.md).
+
 1.  Add `erase()` to both sketches.
     It removes the last stroke.
     In `sketch.py` it mutates.

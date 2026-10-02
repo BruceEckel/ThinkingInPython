@@ -681,6 +681,7 @@ each had a `solutions-*` twin). Two targets are Solutions-only:
 
 ```
 tip solutions-numbering      # every exercise has a solution (below)
+tip fix-solutions-links      # insert or correct the chapter's Solutions link
 tip statements               # copy each exercise under its solution heading
 tip statements-check         # report a statement that differs from its chapter
 tip solutions-gate           # numbering, drift, output, ty, ruff, run, pytest
@@ -742,6 +743,19 @@ copied from a chapter, `](24_Patterns--Singleton.md#state)`, resolves to
 anything. Seventeen links were wrong this way before anything looked. The
 correct form is `](../Chapters/24_Patterns--Singleton.md#state)`, and a leading `./`
 marks a deliberate link to a neighboring solution.
+
+The check runs the other way too. Each chapter with exercises links its own
+Solutions file from the Exercises section, so a reader browsing `Chapters/` on
+GitHub can click through: `Each exercise is answered in this chapter's
+[solutions](../Solutions/<chapter filename>).` The check reports a chapter with
+no such link between the last `## Exercises` heading and the first exercise, and
+a link that names another file, which a chapter rename leaves behind. It holds
+the link target only, so the author may reword the sentence. `tip
+fix-solutions-links` inserts the default sentence where the link is missing and
+corrects a stale target, keeping the wording; it is not part of `verify`, since
+no tool rewrites `Chapters/` prose on its own. The builders rewrite the link to
+the GitHub URL in `build_site.load_chapter()`, because the site, EPUB, and PDF
+carry no Solutions pages.
 
 `heading_links.py` covers the other half. The gate now runs its `anchors`
 check over `Solutions/` as well (see `GATE_DOCS` in `tools/tasks.py`), which

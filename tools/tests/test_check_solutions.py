@@ -1,6 +1,9 @@
 """Tests for tools/check_solutions.py (exercise/solution correspondence)."""
 from pathlib import Path
 
+import pytest
+
+from tools import check_solutions
 from tools.check_solutions import (
     BARE_CHAPTER_LINK,
     answer_numbers,
@@ -8,6 +11,10 @@ from tools.check_solutions import (
     misnamed_listings,
     out_of_order,
     selected,
+    solutions_links,
+    solutions_sentence,
+    with_solutions_link,
+    write_links,
 )
 from tools.config import ROOT
 from tools.markdown import Document
@@ -150,3 +157,97 @@ def test_no_arguments_selects_every_chapter() -> None:
 
 def test_a_bare_number_selects_one_chapter() -> None:
     assert [p.stem for p in selected(["7"])] == ["07_Foundations--Classes"]
+
+# ── the Solutions link ────────────────────────────────────────────────────────
+
+NAME = "05_Foundations--Demo.md"
+LINK = f"](../Solutions/{NAME})"
+SENTENCE = solutions_sentence(NAME)
+
+
+def findings(text: str) -> list[str]:
+    return [f.message for f in solutions_links(Path(NAME), doc(text))]
+
+
+def test_a_missing_link_is_reported_at_the_heading() -> None:
+    [finding] = solutions_links(Path(NAME), doc(CHAPTER))
+    assert finding.line == 3
+    assert f"no link to Solutions/{NAME}" in finding.message
+    assert "tip fix-solutions-links" in finding.message
+
+
+def test_a_link_to_another_file_is_reported() -> None:
+    text = CHAPTER.replace(
+        "1.  Rewrite",
+        "See [s](../Solutions/04_Old--Name.md).\n\n1.  Rewrite")
+    [finding] = solutions_links(Path(NAME), doc(text))
+    assert finding.line == 5
+    assert "04_Old--Name.md" in finding.message
+    assert NAME in finding.message
+
+
+def test_the_right_link_passes() -> None:
+    text = CHAPTER.replace("1.  Rewrite", SENTENCE + "\n\n1.  Rewrite")
+    assert findings(text) == []
+
+
+def test_a_reworded_sentence_with_the_right_link_passes() -> None:
+    text = CHAPTER.replace(
+        "1.  Rewrite", f"Answers are [here]{LINK}.\n\n1.  Rewrite")
+    assert findings(text) == []
+
+
+def test_a_link_in_a_fence_does_not_count() -> None:
+    text = CHAPTER.replace(
+        "1.  Rewrite", f"```text\n[x]{LINK}\n```\n\n1.  Rewrite")
+    assert len(findings(text)) == 1
+
+
+def test_write_inserts_with_blank_lines() -> None:
+    out = with_solutions_link(CHAPTER, NAME)
+    assert "## Exercises\n\n" + SENTENCE + "\n\n1.  Rewrite" in out
+    assert out.count("\n") == CHAPTER.count("\n") + 2
+    assert out.endswith(CHAPTER[-30:])
+
+
+def test_write_adds_a_blank_line_when_none_precedes_the_items() -> None:
+    text = "## Exercises\n1.  First.\n"
+    assert with_solutions_link(text, NAME) == (
+        "## Exercises\n\n" + SENTENCE + "\n\n1.  First.\n")
+
+
+def test_write_keeps_crlf() -> None:
+    text = CHAPTER.replace("\n", "\r\n")
+    out = with_solutions_link(text, NAME)
+    assert SENTENCE + "\r\n\r\n1.  Rewrite" in out
+    assert out.replace("\r\n", "") .count("\n") == 0
+
+
+def test_write_corrects_a_stale_target_and_keeps_the_wording() -> None:
+    text = CHAPTER.replace(
+        "1.  Rewrite",
+        "Answers are [here](../Solutions/04_Old--Name.md#a).\n\n1.  Rewrite")
+    out = with_solutions_link(text, NAME)
+    assert f"Answers are [here](../Solutions/{NAME}#a)." in out
+    assert out.count("\n") == text.count("\n")
+
+
+def test_write_twice_changes_nothing() -> None:
+    once = with_solutions_link(CHAPTER, NAME)
+    assert with_solutions_link(once, NAME) == once
+
+
+def test_a_chapter_without_exercises_is_untouched() -> None:
+    text = "## Exercises\n\nMost chapters end with one.\n"
+    assert with_solutions_link(text, NAME) == text
+
+
+def test_write_links_leaves_a_chapter_without_a_solutions_file(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    empty = tmp_path / "Solutions"
+    empty.mkdir()
+    monkeypatch.setattr(check_solutions, "SOLUTIONS_DIR", empty)
+    chapter = tmp_path / NAME
+    chapter.write_text(CHAPTER, encoding="utf-8")
+    assert write_links([chapter]) == []
+    assert chapter.read_text(encoding="utf-8") == CHAPTER

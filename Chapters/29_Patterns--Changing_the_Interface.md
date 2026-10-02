@@ -573,6 +573,8 @@ without the mark, nothing tells them.
 
 ## Exercises
 
+Each exercise is answered in this chapter's [solutions](../Solutions/29_Patterns--Changing_the_Interface.md).
+
 1.  Write a `PairsAdapter` that wraps a list of `(key, value)` tuples,
     following the shape of `getattr_adapter.py`.
     Give it a dictionary-style `__getitem__()` that finds a value by key,

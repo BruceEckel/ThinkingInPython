@@ -72,8 +72,8 @@ RELEASE_URL = f"{REPO_URL}/releases/latest"
 # checks it: GitHub serves the page either way, just unscrolled.
 EXAMPLES_URL = f"{REPO_URL}#examples-and-solutions"
 # Where a chapter's Solutions file lives on GitHub. The built site,
-# EPUB, and PDF carry only the chapters, so solutions_note() points
-# each Exercises section here.
+# EPUB, and PDF carry only the chapters, so link_solutions() points
+# each chapter's relative `../Solutions/` link here.
 SOLUTIONS_URL = f"{REPO_URL}/blob/master/Solutions"
 SPONSORS_URL = "https://github.com/sponsors/BruceEckel"
 KOFI_URL = "https://ko-fi.com/bruceeckel"
@@ -114,47 +114,39 @@ def derive_label(stem: str) -> str:
     return re.sub(r"^\d+_", "", stem).replace("_", " ")
 
 
-EXERCISES_HEADING = re.compile(r"^#{1,6}\s+Exercises\s*$")
+SOLUTIONS_LINK = re.compile(r"\]\(\.\./Solutions/([\w.-]+\.md)(#[^)\s]*)?\)")
 
 
-def solutions_note(md: Path) -> str | None:
-    """The sentence linking `md`'s Solutions file, or None if it has none.
+def link_solutions(body: str) -> str:
+    """Point each `](../Solutions/<file>.md)` link at the GitHub URL.
 
-    The Solutions file shares the chapter's filename. Chapter 01, chapter
-    39, and the appendices have no such file, so they get no sentence.
-    """
-    if not (ROOT / "Solutions" / md.name).is_file():
-        return None
-    return (f"The [solutions to these exercises]"
-            f"({SOLUTIONS_URL}/{md.name}) are in the book's repository.")
-
-
-def add_solutions_note(body: str, note: str) -> str:
-    """`body` with `note` as its own paragraph under the last Exercises heading.
-
-    A heading line inside a fenced block does not count. A body with no
-    Exercises heading comes back unchanged.
+    A chapter links its Solutions file with a relative path, so a reader
+    on GitHub can click through. The site and the EPUB and PDF carry no
+    Solutions pages. The site's `rewrite_md_links()` would turn the
+    relative link into a dead `.html` link, and `build_epub.relink()`
+    reports a link to an unknown chapter and exits nonzero, which fails
+    the EPUB and the PDF. `load_chapter()` is the one function all three
+    builders read chapters through, so the rewrite happens there, before
+    any of them sees the link. An anchor is kept, and a link inside a
+    fenced block is left alone.
     """
     lines = body.split("\n")
     fenced = Document.from_text(body).in_fence()
-    found = [i for i, line in enumerate(lines)
-             if not fenced[i] and EXERCISES_HEADING.match(line)]
-    if not found:
-        return body
-    at = found[-1] + 1
-    lines[at:at] = ["", note]
-    if at + 2 < len(lines) and lines[at + 2].strip():
-        lines.insert(at + 2, "")
+    for i, line in enumerate(lines):
+        if not fenced[i]:
+            lines[i] = SOLUTIONS_LINK.sub(
+                lambda m: f"]({SOLUTIONS_URL}/{m.group(1)}"
+                          f"{m.group(2) or ''})", line)
     return "\n".join(lines)
 
 
 def load_chapter(md: Path) -> tuple[str, str]:
     """Return (title, body). Strips 00_Front YAML and the leading `#` heading.
 
-    A chapter with a Solutions file also gets `solutions_note()`'s
-    sentence under its last `## Exercises` heading, so the site, the
-    EPUB, and the PDF, which read chapters only through this function,
-    all say where the answers are. The Markdown source stays untouched.
+    The body's links to `../Solutions/` become GitHub URLs through
+    `link_solutions()`, so the site, the EPUB, and the PDF, which read
+    chapters only through this function, all link the answers. The
+    Markdown source stays untouched.
     """
     text = md.read_text(encoding="utf-8")
     if md.stem == FRONT_STEM:
@@ -173,10 +165,7 @@ def load_chapter(md: Path) -> tuple[str, str]:
             break
         break  # first real content is not a heading; leave body as-is
     body = "\n".join(lines).lstrip("\n")
-    note = solutions_note(md)
-    if note is not None:
-        body = add_solutions_note(body, note)
-    return title, body
+    return title, link_solutions(body)
 
 
 # A chapter's epigraph: the blockquote its body opens with, the

@@ -1454,6 +1454,8 @@ Run it.
 
 ## Exercises
 
+Each exercise is answered in this chapter's [solutions](../Solutions/38_Patterns--Simulation.md).
+
 1.  Test a `Rat` with a fake blackboard.
     Because `Rat` depends only on the `Recorder` `Protocol`,
     you can drive it with a stand-in.

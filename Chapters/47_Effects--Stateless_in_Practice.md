@@ -2341,6 +2341,8 @@ It is a language that does the encoding for you.
 
 ## Exercises
 
+Each exercise is answered in this chapter's [solutions](../Solutions/47_Effects--Stateless_in_Practice.md).
+
 1.  `crossing` in `midnight.py` walks a fixed list, so it answers two requests.
     Write a handler that instead advances a stored moment by one second at each request,
     and confirm `archive()` still crosses midnight under it.

@@ -20,8 +20,9 @@ This compares the two numberings:
   form when two exercises share one worked answer.
 
 Reported: a chapter with exercises and no Solutions file, an exercise with
-no solution, a solution with no exercise, and either list numbered other
-than 1..N in order. What it cannot see is a solution that answers the
+no solution, a solution with no exercise, either list numbered other
+than 1..N in order, and a chapter whose Exercises section lacks a link
+to its Solutions file. What it cannot see is a solution that answers the
 wrong exercise under the right number; that still needs a human reading
 the two side by side.
 
@@ -41,9 +42,20 @@ file with the wrong content. The correct form is `../Chapters/24_Patterns--Singl
 Seventeen links were wrong this way before anything looked. Write `./` on
 the front for a deliberate link to a neighboring solution.
 
+Each chapter with exercises also links its Solutions file from the
+Exercises section, so a reader browsing `Chapters/` on GitHub can click
+through. Between the last `## Exercises` heading and the first exercise
+there must be a link of the form `](../Solutions/<chapter filename>)`.
+A missing link is reported, and so is a link to another file, which a
+chapter rename leaves behind. The check holds the link target only; the
+sentence around it is the author's to reword. `--write` inserts the
+default sentence where the link is missing and corrects a stale target,
+keeping the author's wording.
+
 Usage:
     python -m tools.check_solutions           # every chapter
     python -m tools.check_solutions 19 45     # only these chapters
+    python -m tools.check_solutions --write   # insert or fix the links
 """
 
 import argparse
@@ -86,6 +98,114 @@ EXERCISE_LISTING = re.compile(r"^exercise_(\d+)")
 # off from its title (`26_Patterns--Surrogate.md`); without it this check
 # silently stops matching every chapter and reports nothing.
 BARE_CHAPTER_LINK = re.compile(r"\]\((\d{2}_[A-Za-z_-]+\.md)([^)]*)\)")
+
+# A link from a chapter to a file in Solutions/, with an optional anchor:
+# "](../Solutions/02_Foundations--Tour.md)". Group 1 is the file name.
+SOLUTIONS_LINK = re.compile(
+    r"\]\(\.\./Solutions/([\w.-]+\.md)(#[^)\s]*)?\)")
+
+
+def solutions_sentence(name: str) -> str:
+    """The default sentence that links a chapter to its Solutions file."""
+    return (f"Each exercise is answered in this chapter's "
+            f"[solutions](../Solutions/{name}).")
+
+
+def intro_span(doc: Document) -> tuple[int, int] | None:
+    """(heading, first item) as 0-based line indexes, or None.
+
+    The heading is the last `## Exercises` outside a fence, and the item
+    is the first top-level numbered item after it. A chapter with no
+    items has no span.
+    """
+    exercises = exercise_numbers(doc)
+    if not exercises:
+        return None
+    fenced = doc.in_fence()
+    heading = max(
+        i for i, line in enumerate(doc.lines)
+        if not fenced[i] and EXERCISES_HEADING.match(line))
+    return heading, exercises[0][1] - 1
+
+
+def span_links(doc: Document, span: tuple[int, int]) -> Iterator[tuple[int, str]]:
+    """(0-based line, file name) for each Solutions link in the span."""
+    fenced = doc.in_fence()
+    for i in range(span[0] + 1, span[1]):
+        if fenced[i]:
+            continue
+        for m in SOLUTIONS_LINK.finditer(doc.lines[i]):
+            yield i, m.group(1)
+
+
+def solutions_links(chapter: Path, doc: Document) -> Iterator[Finding]:
+    """Findings for a missing or stale link under the Exercises heading."""
+    span = intro_span(doc)
+    if span is None:
+        return
+    links = list(span_links(doc, span))
+    if any(name == chapter.name for _, name in links):
+        return
+    fix = "run `tip fix-solutions-links`"
+    if not links:
+        yield Finding(
+            chapter, span[0] + 1,
+            f"no link to Solutions/{chapter.name} under the Exercises "
+            f"heading; {fix}")
+    for i, name in links:
+        yield Finding(
+            chapter, i + 1,
+            f"link names Solutions/{name}, but this chapter is "
+            f"{chapter.name}; {fix}")
+
+
+def with_solutions_link(text: str, name: str) -> str:
+    """`text` with its Solutions link inserted, or its target corrected.
+
+    A link that names another file keeps its wording and anchor and
+    changes only the file. With no link, the default sentence goes in as
+    its own paragraph just before the first exercise. Line endings and
+    every other line stay as they are.
+    """
+    doc = Document.from_text(text)
+    span = intro_span(doc)
+    if span is None:
+        return text
+    links = list(span_links(doc, span))
+    if any(n == name for _, n in links):
+        return text
+    lines = list(doc.lines)
+    if links:
+        for i, _ in links:
+            lines[i] = SOLUTIONS_LINK.sub(
+                lambda m: f"](../Solutions/{name}{m.group(2) or ''})",
+                lines[i])
+        return doc.rendered(lines)
+    cr = "\r" if lines[span[0]].endswith("\r") else ""
+    at = span[1]
+    new = [solutions_sentence(name) + cr, cr]
+    if lines[at - 1].strip():
+        new.insert(0, cr)
+    lines[at:at] = new
+    return doc.rendered(lines)
+
+
+def write_links(chapters: list[Path]) -> list[Path]:
+    """Insert or correct the link in each chapter that needs it.
+
+    Returns the chapters changed. A chapter with no exercises or no
+    Solutions file is left alone.
+    """
+    changed: list[Path] = []
+    for chapter in chapters:
+        if not (SOLUTIONS_DIR / chapter.name).exists():
+            continue
+        old = chapter.read_bytes().decode("utf-8")
+        new = with_solutions_link(old, chapter.name)
+        if new != old:
+            chapter.write_bytes(new.encode("utf-8"))
+            changed.append(chapter)
+    return changed
 
 
 def exercise_numbers(doc: Document) -> list[tuple[int, int]]:
@@ -202,6 +322,7 @@ def compare(chapter: Path) -> Iterator[Finding]:
         )
         return
 
+    yield from solutions_links(chapter, Document.parse(chapter))
     solutions_doc = Document.parse(solutions)
     answers = answer_numbers(solutions_doc)
     yield from out_of_order(exercises, chapter, "exercise")
@@ -242,7 +363,18 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument(
         "chapters", nargs="*",
         help="chapter numbers to check (default: all)")
+    ap.add_argument(
+        "--write", action="store_true",
+        help="insert the Solutions link where missing and correct a "
+             "stale target, then exit")
     args = ap.parse_args(argv)
+
+    if args.write:
+        changed = write_links(selected(args.chapters))
+        for path in changed:
+            print(f"fixed {path.name}")
+        print(f"{len(changed)} chapter(s) changed.")
+        return 0
 
     findings = (f for c in selected(args.chapters) for f in compare(c))
     return report(
@@ -251,7 +383,9 @@ def main(argv: list[str] | None = None) -> int:
         problem="{n} problem(s) in Solutions/. Write the missing "
                 "solution, renumber so each `## N.` heading matches its "
                 "exercise, rename the listing to match its heading, or "
-                "fix the chapter link.",
+                "fix the chapter link, or run `tip fix-solutions-links` "
+                "when the Exercises section's Solutions link is missing "
+                "or stale.",
     )
 
 

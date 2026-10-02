@@ -34,6 +34,11 @@ Moved from `CLAUDE.md`'s Traps. The filename convention itself (`NN_<Part>--<Cha
   `pyproject.toml` for the old directory name before running `verify`.
   Renaming the *chapter title* additionally means the H1, the Solutions H1
   (`<Title>: Solutions`), and every link whose text was the old title.
+- **After renaming a chapter and its Solutions file, run
+  `tip fix-solutions-links`.** The sentence under the chapter's
+  `## Exercises` heading links the Solutions file by name, so the old
+  name stays behind and `tip solutions-numbering` fails until the link
+  matches.
 - **Splitting a chapter silently invalidates every relative cross-reference in
   the later half.** Nothing greps for prose, so no gate catches this. Splitting
   Generators out of Stateless left chapter 46 with fourteen phrases

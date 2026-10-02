@@ -1619,6 +1619,8 @@ that cost is worth measuring before you pay it everywhere.
 
 ## Exercises
 
+Each exercise is answered in this chapter's [solutions](../Solutions/12_Techniques--Data_Classes_as_Types.md).
+
 1.  Add leap-year support to `Month`,
     so February allows 29 days when the `BirthDate`'s `Year` is a leap year.
     Write the tests first.

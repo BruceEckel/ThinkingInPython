@@ -1030,10 +1030,27 @@ def solutions_numbering(v: Vars) -> None:
     on both sides, so extract_solutions.py (code) and heading_links.py
     (anchors) both look straight past it. It also fails an `exercise_N.py`
     listing whose N is not its heading's number, which a reordering of the
-    exercises leaves behind. Takes chapter numbers to check one, e.g.
+    exercises leaves behind. It also fails a chapter whose `## Exercises`
+    section has no link to its own Solutions file, or links another one.
+    Takes chapter numbers to check one, e.g.
     `tip solutions-numbering ARGS=19`.
     """
     py("tools.check_solutions", *v.words("ARGS"))
+
+
+@task("Insert or correct each chapter's link to its Solutions file")
+def fix_solutions_links(v: Vars) -> None:
+    """Add the sentence `Each exercise is answered in this chapter's
+    [solutions](../Solutions/<file>).` under each `## Exercises` heading
+    that lacks a link to its own Solutions file, and correct the target of
+    a link that names another file, which a chapter rename leaves behind.
+    A reworded sentence keeps its wording. Prints the chapters it changed,
+    and a second run changes nothing. No gate runs this, since no tool
+    rewrites `Chapters/` prose on its own; `tip solutions-numbering` fails
+    until it has run. Takes chapter numbers to fix one, e.g.
+    `tip fix-solutions-links ARGS=19`.
+    """
+    py("tools.check_solutions", "--write", *v.words("ARGS"))
 
 
 @task("Copy each exercise statement into its Solutions heading")

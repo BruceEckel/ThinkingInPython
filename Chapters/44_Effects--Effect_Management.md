@@ -1028,6 +1028,8 @@ puts it to work.
 
 ## Exercises
 
+Each exercise is answered in this chapter's [solutions](../Solutions/44_Effects--Effect_Management.md).
+
 1.  Write the production bindings for `ask_tell.py`:
     a `Console` class whose `ask()` calls `input()` and whose `tell()` calls `print()`,
     and run `greet(Console(), Console())` interactively.

@@ -1,75 +1,64 @@
-"""Tests for tools/build_site.py's Solutions note.
+"""Tests for tools/build_site.py's Solutions link rewrite.
 
-The built site, EPUB, and PDF carry only the chapters, so load_chapter()
-adds one sentence under each chapter's last `## Exercises` heading that
-links the chapter's Solutions file on GitHub.
+A chapter links its Solutions file with a relative path so GitHub shows
+a working link. The built site, EPUB, and PDF carry no Solutions pages,
+so load_chapter() rewrites the link to the file's GitHub URL.
 """
 from pathlib import Path
-import pytest
-from tools import build_site
+
+from tools.build_epub import Ids, relink
 from tools.build_site import (
     SOLUTIONS_URL,
+    link_solutions,
     load_chapter,
     rewrite_md_links,
 )
 
 NAME = "05_Foundations--Demo.md"
-NOTE = (f"The [solutions to these exercises]({SOLUTIONS_URL}/{NAME}) "
-        "are in the book's repository.")
+SENTENCE = ("Each exercise is answered in this chapter's "
+            "[solutions](../Solutions/{target}).")
+URL = f"{SOLUTIONS_URL}/{NAME}"
 
 
-@pytest.fixture
-def root(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
-    (tmp_path / "Solutions").mkdir()
-    monkeypatch.setattr(build_site, "ROOT", tmp_path)
-    return tmp_path
+def test_relative_link_becomes_the_github_url() -> None:
+    body = "## Exercises\n\n" + SENTENCE.format(target=NAME) + "\n"
+    assert f"[solutions]({URL})." in link_solutions(body)
+    assert "../Solutions/" not in link_solutions(body)
 
 
-def chapter(root: Path, text: str, solutions: bool = True) -> Path:
-    md = root / NAME
-    md.write_text(text, encoding="utf-8")
-    if solutions:
-        (root / "Solutions" / NAME).write_text("# S\n", encoding="utf-8")
-    return md
+def test_anchor_survives() -> None:
+    body = f"See [it](../Solutions/{NAME}#2-second) now.\n"
+    assert link_solutions(body) == f"See [it]({URL}#2-second) now.\n"
 
 
-def test_note_follows_the_exercises_heading(root: Path) -> None:
-    md = chapter(root, "# Demo\n\nbody\n\n## Exercises\n\n1. First\n")
+def test_link_inside_a_fence_is_left_alone() -> None:
+    body = f"```text\n[x](../Solutions/{NAME})\n```\n"
+    assert link_solutions(body) == body
+
+
+def test_body_without_the_link_is_unchanged() -> None:
+    body = "# Demo\n\nSee [other](06_Foundations--Other.md).\n"
+    assert link_solutions(body) == body
+
+
+def test_load_chapter_rewrites_the_link(tmp_path: Path) -> None:
+    md = tmp_path / NAME
+    md.write_text("# Demo\n\n## Exercises\n\n"
+                  + SENTENCE.format(target=NAME) + "\n\n1. First\n",
+                  encoding="utf-8")
     _, body = load_chapter(md)
-    assert "## Exercises\n\n" + NOTE + "\n\n1. First" in body
-
-
-def test_note_gets_its_own_paragraph_without_a_blank_line(root: Path) -> None:
-    md = chapter(root, "# Demo\n\n## Exercises\n1. First\n")
-    _, body = load_chapter(md)
-    assert "## Exercises\n\n" + NOTE + "\n\n1. First" in body
-
-
-def test_no_note_without_a_solutions_file(root: Path) -> None:
-    md = chapter(root, "# Demo\n\n## Exercises\n\n1. First\n", solutions=False)
-    _, body = load_chapter(md)
-    assert "solutions to these exercises" not in body
-
-
-def test_no_note_without_an_exercises_heading(root: Path) -> None:
-    md = chapter(root, "# Demo\n\nbody\n")
-    _, body = load_chapter(md)
-    assert "solutions to these exercises" not in body
-
-
-def test_heading_inside_a_fence_is_ignored(root: Path) -> None:
-    md = chapter(root, "# Demo\n\n```text\n## Exercises\n```\n\nbody\n")
-    _, body = load_chapter(md)
-    assert "solutions to these exercises" not in body
-
-
-def test_last_exercises_heading_is_used(root: Path) -> None:
-    md = chapter(root, "# Demo\n\n## Exercises\n\nx\n\n"
-                       "### Exercises\n\n1. First\n")
-    _, body = load_chapter(md)
-    assert body.count(NOTE) == 1
-    assert "### Exercises\n\n" + NOTE in body
+    assert f"[solutions]({URL})" in body
+    assert "../Solutions/" not in body
 
 
 def test_url_survives_rewrite_md_links() -> None:
-    assert rewrite_md_links(NOTE) == NOTE
+    text = f"[solutions]({URL}#x)"
+    assert rewrite_md_links(text) == text
+
+
+def test_url_survives_the_epub_relink() -> None:
+    text = f"[solutions]({URL})"
+    unresolved: set[str] = set()
+    ids = Ids(prefixes={}, known=set(), aliases={})
+    assert relink(text, "ch05", ids, unresolved) == text
+    assert unresolved == set()

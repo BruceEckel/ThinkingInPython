@@ -974,6 +974,8 @@ rather than a call, which is entry 5 rather than entry 4.
 
 ## Exercises
 
+Each exercise is answered in this chapter's [solutions](../Solutions/28_Patterns--Function_Objects.md).
+
 1.  Add an "undo" capability to `command.py`.
     What do the commands need to become, and is a function still enough,
     or do you now want an object?

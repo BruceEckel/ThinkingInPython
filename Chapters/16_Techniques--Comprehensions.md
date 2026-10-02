@@ -745,6 +745,8 @@ and pays it only for the values the consumer pulls.
 
 ## Exercises
 
+Each exercise is answered in this chapter's [solutions](../Solutions/16_Techniques--Comprehensions.md).
+
 1.  Using `a_list` from `a_list.py` (`[1, "4", 9, "a", 0, 4]`),
     write a list comprehension that finds the string elements made only of digits
     (`e.isdigit()`), converts each to `int` with `int(e)`, and squares it.

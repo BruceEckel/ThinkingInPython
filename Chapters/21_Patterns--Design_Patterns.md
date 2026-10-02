@@ -562,6 +562,8 @@ with a link to this book's coverage wherever it exists.
 
 ## Exercises
 
+Each exercise is answered in this chapter's [solutions](../Solutions/21_Patterns--Design_Patterns.md).
+
 1.  Pick a program you have written that changed more than once.
     Name its vector of change: the thing that shifted every time.
     Say which part of the design absorbed the change,

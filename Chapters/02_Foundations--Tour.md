@@ -642,6 +642,8 @@ Tools such as ruff point out violations and fix many of them automatically.
 
 ## Exercises
 
+Each exercise is answered in this chapter's [solutions](../Solutions/02_Foundations--Tour.md).
+
 1.  In `references.py`, add a line after `c = a[:]` that appends `99` to `c`.
     Print `a` and `c` and confirm only `c` changed,
     then explain why `b.append(4)` earlier did change what `a` sees,

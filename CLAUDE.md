@@ -184,10 +184,14 @@ together, so read the pair when a solution changes: a solution that
 answers a different exercise from the one quoted above it is the drift
 `check_solutions.py` cannot see.
 
-The site, EPUB, and PDF add one generated sentence under each chapter's
-`## Exercises` heading, linking to that chapter's Solutions file on
-GitHub (`build_site.load_chapter()`). It is not in `Chapters/`; do not
-write it there.
+Each chapter with exercises carries one sentence under its
+`## Exercises` heading that links `../Solutions/<its own filename>`,
+so a reader on GitHub can click through. `check_solutions.py` fails a
+chapter whose link is missing or names another file, which a chapter
+rename leaves behind; `tip fix-solutions-links` inserts or corrects it.
+The wording is the author's to change; the gate holds the target.
+`build_site.load_chapter()` rewrites the link to the GitHub URL, since
+the site, EPUB, and PDF carry no Solutions pages.
 
 ## Pyright: a periodic review, never a gate
 

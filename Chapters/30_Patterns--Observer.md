@@ -200,22 +200,22 @@ Sending a change and receiving it share one name, `announce()`,
 where GoF has two.
 
 The catalog calls it *Observer*,
-and Java and the reactive libraries use the older nouns,
-so the table is also your map into that literature.
+[[which catalog?]] and Java and the reactive libraries use the older nouns.
+The table is your map into that literature.
 Java and JavaScript call a responder a *listener*,
 as in `ActionListener` and `addEventListener()`.
 
 The essential part of *Observer* is the response: something changes,
-and code elsewhere runs because of it.
+and code elsewhere runs because of that change.
 The words "observer" and "listener" name a role that waits and watches,
 and neither word says what happens when the change arrives.
-"Responder" names the action,
-so the word points you at the question every design here must answer:
+"Responder" names the action.
+That word points you at the question every *Observer* design must answer:
 what does this code do when a change reaches it?
-The rest of the chapter keeps returning to that question.
+The rest of the chapter repeats that question.
 A responder can disconnect itself mid-notification, raise an exception,
 wait on a slow network call, or write back to its broadcaster,
-and each of those behaviors changes how the broadcaster must be written.
+and each of those behaviors changes how the broadcaster is written.
 
 ## The Pythonic Observer
 
@@ -1519,6 +1519,8 @@ The publisher then decides which event it is publishing, something it knows,
 instead of guessing which responders need it.
 
 ## Exercises
+
+Each exercise is answered in this chapter's [solutions](../Solutions/30_Patterns--Observer.md).
 
 1.  Create a minimal *Observer* design of your own,
     without looking at `broadcaster.py`:

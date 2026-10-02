@@ -1869,6 +1869,8 @@ and forgetting to declare either is a type error.
 
 ## Exercises
 
+Each exercise is answered in this chapter's [solutions](../Solutions/46_Effects--Stateless.md).
+
 1.  Add a `read()` method to the `Console` protocol in `console_protocol.py` and write `ask_and_greet()`,
     an Effect that asks for a name and greets the result.
     Supply a scripted `Console` in a test and a real one in a demo,

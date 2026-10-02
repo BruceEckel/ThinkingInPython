@@ -2492,6 +2492,8 @@ Here are a few of the topics beyond it:
 
 ## Exercises
 
+Each exercise is answered in this chapter's [solutions](../Solutions/19_Techniques--Concurrency.md).
+
 1.  In `async_mechanics.py`, add a fourth call, `fetch("d", 0.005)`,
     to the `gather()` line.
     Confirm that "d" starts last but resumes first,

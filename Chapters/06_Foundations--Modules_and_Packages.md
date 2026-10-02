@@ -664,6 +664,8 @@ including the ones whose only purpose is to run the module.
 
 ## Exercises
 
+Each exercise is answered in this chapter's [solutions](../Solutions/06_Foundations--Modules_and_Packages.md).
+
 1.  Add a fourth module, `a_package/module5.py`,
     with its own `function5()` and a top-level `print()` so the module announces itself when it loads.
     Import it three ways, using `import a_package.module5`,
