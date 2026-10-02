@@ -242,16 +242,13 @@ class Broadcaster[T]:
             responder(data)
 ```
 
+`Broadcaster` keeps `Subject`'s three methods under new names: GoF's `attach()`,
+`detach()`, and `notify()` become `connect()`, `disconnect()`, and `announce()`.
 Four things from the classic version disappear: the `Observer` interface,
 its `update()` method, a class per reaction, and the `subject` argument.
-`update()` is the observer's method, and nothing replaces it.
-A classic observer is an object,
-so `notify()` calls the method its interface names, `update()`.
-In Python the responder is a callable, so `announce()` calls it directly:
-`responder(data)`, whereas the classic version calls `observer.update(self, arg)`.
-The subject's three methods keep their jobs and change their names:
-GoF's `attach()`, `detach()`, and `notify()` become `connect()`, `disconnect()`,
-and `announce()`.
+A classic observer is an object, so `notify()` calls a method on it:
+`observer.update(self, arg)`.
+A responder is a callable, so `announce()` calls it directly: `responder(data)`.
 A responder that needs the changed object takes it as part of the payload
 (`announce((self, value))`),
 or is a bound method of an object that holds a reference to the broadcaster.
