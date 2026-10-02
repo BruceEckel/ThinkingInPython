@@ -142,7 +142,7 @@ PASSES: tuple[Pass, ...] = (
     Pass(
         "antecedents",
         "antecedents",
-        "name what each this/it/which points at when two things could",
+        "name what each this/it/one/thing points at when two nouns could",
         default=True,
     ),
     Pass(

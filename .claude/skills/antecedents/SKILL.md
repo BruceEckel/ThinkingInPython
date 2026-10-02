@@ -1,6 +1,6 @@
 ---
 name: antecedents
-description: Make every pointer word name its target. A sentence-opening "This" or "That", an "it" with two candidates, a clause-level "which", "the former/latter", or "above/below" gets the noun it stands for whenever a reader could pick the wrong one. Use when asked to clarify references or antecedents in a chapter (or the book). The argument names chapters by number or name; no argument means all of Chapters/.
+description: Make every pointer word name its target. A sentence-opening "This" or "That", an "it" or a "one" with two candidates, a stand-in noun ("thing", "something", "the value", "the code"), a clause-level "which", "the former/latter", or "above/below" gets the noun it stands for whenever a reader could pick the wrong one. Use when asked to clarify references or antecedents in a chapter (or the book). The argument names chapters by number or name; no argument means all of Chapters/.
 ---
 
 # Antecedents: every pointer names its target
@@ -69,6 +69,39 @@ Two singular nouns in the previous sentence make "it" a coin toss:
 - "Whoever holds `checkpoint` can restore the drawing.
   It does not reach inside and edit the strokes."
   becomes "... The holder does not reach inside and edit the strokes."
+
+**"One" standing in for a noun.**
+"A new one", "the first one", "the one that", "each one", "this one"
+make the reader carry the noun forward from wherever it last appeared.
+Two candidate nouns in the passage make "one" as ambiguous as "it":
+
+- "`wraps()` returns a new function, and the old one stays registered"
+  becomes "`wraps()` returns a wrapper, and the original function stays registered"
+- "Each handler gets an event and a context, and passes one along"
+  becomes "... and passes the event along"
+
+Keep "one" when its noun sits in the same clause or the one before it
+and nothing competes ("pass a `Fetcher`, or a fake one"),
+and in "the one place", "the one difference",
+where "one" means "single" and is not a pointer.
+
+**Stand-in nouns: "thing", "something", "anything", "stuff", and
+"the code", "the value", "the result", "the object", "the call".**
+These point as pronouns do, and they hide which noun is meant
+behind a word that fits every noun.
+When the passage names the specific item, use its name:
+
+- "The handler checks the value before storing it"
+  becomes "The handler checks the key before storing the entry"
+  when both a key and an entry are in play.
+- "The decorator runs the code, then logs the result"
+  becomes "The decorator runs the wrapped function, then logs its return value"
+  when "the code" could also be the decorator.
+
+Keep the generic word when generality is the claim
+("`print()` accepts anything", "Stateless has no such thing")
+or when the specific items are named in the very next words
+("two things: a clock and a feed").
 
 **Clause-level "which".**
 A "which" that points at the whole preceding clause rather than a noun
