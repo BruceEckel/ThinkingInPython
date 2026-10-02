@@ -144,23 +144,21 @@ The alternative leaves the call to the client,
 the code that changes the subject.
 The client makes all its changes and then calls `notify()` once,
 so the observers receive one notification for the whole batch.
-In exchange, every client must make that call, and until it does,
-the observers hold stale data.
+In exchange, every client must make that call.
+Until it does, the observers hold stale data.
 
 ### Why `notify()` Copies the List
 
-`_observers` is a list, so inside `notify()`,
-the copy via `list(self._observers)` appears redundant.
+Inside `notify()`, copying `_observers` via `list(self._observers)` appears redundant.
 It is not.
 
 The problem is that an observer may react to a notification by detaching.
 If the `for` loop in `notify()` reads `self._observers` directly,
-that `detach()` shifts the remaining observers down one index,
+a `detach()` shifts the remaining observers down one index,
 and the loop skips the observer after the one that detached,
 without raising an exception.
-With the copy, the `for` loop reads a second list,
-so `detach()` changes `self._observers` while the loop reads the copy.
-The copy therefore settles which observers a `notify()` call reaches before its loop starts.
+With the copy, `detach()` changes `self._observers` while the loop reads the copied list.
+A `notify()` call therefore reaches the observers attached when the call begins.
 An observer detached partway through a `notify()` call still receives that call's notification,
 and a newcomer attached during the call receives its first notification from the next `notify()` call.
 [Disconnecting During a Notification](#disconnecting-during-a-notification)
