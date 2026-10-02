@@ -57,7 +57,7 @@
  },
  "fa2f1549160e7e2a": {
   "file": "14_Techniques--Decorators.md",
-  "line": 1175,
+  "line": 1176,
   "target": "07_Foundations--Classes.md",
   "terms": [
    "trace"
@@ -79,7 +79,7 @@
  },
  "4754b53da37ff3e9": {
   "file": "19_Techniques--Concurrency.md",
-  "line": 1278,
+  "line": 1279,
   "target": "22_Patterns--Data_Transfer_Objects.md",
   "terms": [
    "Times"
@@ -90,7 +90,7 @@
  },
  "734b3d881649c1ef": {
   "file": "21_Patterns--Design_Patterns.md",
-  "line": 501,
+  "line": 504,
   "target": "20_Patterns--Rethinking_Objects.md",
   "terms": [
    "Need"
@@ -112,7 +112,7 @@
  },
  "4925ead030b960dc": {
   "file": "22_Patterns--Data_Transfer_Objects.md",
-  "line": 359,
+  "line": 361,
   "target": "09_Foundations--Class_Attributes.md",
   "terms": [
    "messenger_idiom.py",
@@ -124,7 +124,7 @@
  },
  "ebf2d05c88d18b4b": {
   "file": "23_Patterns--Iterators.md",
-  "line": 783,
+  "line": 784,
   "target": "20_Patterns--Rethinking_Objects.md",
   "terms": [
    "traverse",
@@ -136,7 +136,7 @@
  },
  "92ea1b2aa8c0d548": {
   "file": "23_Patterns--Iterators.md",
-  "line": 861,
+  "line": 862,
   "target": "05_Foundations--Functions.md",
   "terms": [
    "DONE"
@@ -180,7 +180,7 @@
  },
  "2e71dc56c76b481b": {
   "file": "26_Patterns--Surrogate.md",
-  "line": 768,
+  "line": 770,
   "target": "31_Patterns--State_Machines.md",
   "terms": [
    "change_to"
@@ -191,7 +191,7 @@
  },
  "04ed39e4b8874f00": {
   "file": "26_Patterns--Surrogate.md",
-  "line": 773,
+  "line": 775,
   "target": "19_Techniques--Concurrency.md",
   "terms": [
    "change_to"
@@ -213,7 +213,7 @@
  },
  "8ef838d56d0840f4": {
   "file": "28_Patterns--Function_Objects.md",
-  "line": 164,
+  "line": 165,
   "target": "18_Techniques--Performance.md",
   "terms": [
    "Repeat"
@@ -246,21 +246,22 @@
   "p_terms": 0.0,
   "asked": "2026-09-27"
  },
- "12ce46050bf0a689": {
+ "c8b45c3e67ecadbb": {
   "file": "29_Patterns--Changing_the_Interface.md",
-  "line": 271,
+  "line": 272,
   "target": "18_Techniques--Performance.md",
   "terms": [
+   "PairCoord",
    "distance",
    "Pair"
   ],
-  "sentence": "It is a [record](18_Techniques--Performance.md#record) with two properties, written because `distance()` requires `x` and `y` but a `Pair` supplies `a` and `b`.",
+  "sentence": "`PairCoord` is a [record](18_Techniques--Performance.md#record) with two properties, written because `distance()` requires `x` and `y` but a `Pair` supplies `a` and `b`.",
   "p_terms": 0.01,
-  "asked": "2026-09-27"
+  "asked": "2026-10-02"
  },
  "82bb6893784c05ff": {
   "file": "29_Patterns--Changing_the_Interface.md",
-  "line": 276,
+  "line": 278,
   "target": "26_Patterns--Surrogate.md",
   "terms": [
    "adapter"
@@ -271,7 +272,7 @@
  },
  "1f2521c2404fcd22": {
   "file": "30_Patterns--Observer.md",
-  "line": 479,
+  "line": 502,
   "target": "42_Functional--Error_Handling.md",
   "terms": [
    "announce"
@@ -282,7 +283,7 @@
  },
  "e8e91f728192b79c": {
   "file": "30_Patterns--Observer.md",
-  "line": 1564,
+  "line": 1591,
   "target": "17_Techniques--Metaprogramming.md",
   "terms": [
    "Notifying",
@@ -316,7 +317,7 @@
  },
  "e3c9c99b35195620": {
   "file": "31_Patterns--State_Machines.md",
-  "line": 492,
+  "line": 491,
   "target": "06_Foundations--Modules_and_Packages.md",
   "terms": [
    "state_machine.py"
@@ -327,7 +328,7 @@
  },
  "e8596ef215d9870a": {
   "file": "31_Patterns--State_Machines.md",
-  "line": 980,
+  "line": 981,
   "target": "26_Patterns--Surrogate.md",
   "terms": [
    "UnpredictablePerson",
@@ -340,7 +341,7 @@
  },
  "8b236a72729572a5": {
   "file": "31_Patterns--State_Machines.md",
-  "line": 992,
+  "line": 993,
   "target": "23_Patterns--Iterators.md",
   "terms": [
    "mouse_move_generator",
@@ -362,7 +363,7 @@
   "p_terms": 0.01,
   "asked": "2026-09-27"
  },
- "9c56880fd09f0864": {
+ "6e7bf0b5ce335367": {
   "file": "34_Patterns--Composite_and_Interpreter.md",
   "line": 168,
   "target": "08_Foundations--Static_Types.md",
@@ -370,9 +371,9 @@
    "Directory",
    "Node"
   ],
-  "sentence": "`Directory` mentions `Node` above the [`type` statement](08_Foundations--Static_Types.md#the-type-statement) that defines it.",
-  "p_terms": 0.11,
-  "asked": "2026-09-27"
+  "sentence": "`Directory` mentions `Node` above the [`type` statement](08_Foundations--Static_Types.md#the-type-statement) that defines `Node`.",
+  "p_terms": 0.23,
+  "asked": "2026-10-02"
  },
  "f52e1a4cb81fc818": {
   "file": "34_Patterns--Composite_and_Interpreter.md",
@@ -398,7 +399,7 @@
  },
  "1e7bdfa6c4734885": {
   "file": "37_Patterns--Pattern_Refactoring.md",
-  "line": 369,
+  "line": 372,
   "target": "32_Patterns--Multiple_Dispatching.md",
   "terms": [
    "bins"
@@ -409,7 +410,7 @@
  },
  "fc74baefc0b1e835": {
   "file": "37_Patterns--Pattern_Refactoring.md",
-  "line": 369,
+  "line": 372,
   "target": "31_Patterns--State_Machines.md",
   "terms": [
    "bins"
@@ -420,7 +421,7 @@
  },
  "ac09f5e8941b7dcd": {
   "file": "37_Patterns--Pattern_Refactoring.md",
-  "line": 631,
+  "line": 634,
   "target": "07_Foundations--Classes.md",
   "terms": [
    "singledispatch",
@@ -444,7 +445,7 @@
  },
  "d2b75b2af9d16cb3": {
   "file": "41_Functional--Toolkits.md",
-  "line": 624,
+  "line": 625,
   "target": "05_Foundations--Functions.md",
   "terms": [
    "fillvalue"
@@ -475,9 +476,20 @@
   "p_terms": 0.0,
   "asked": "2026-09-27"
  },
+ "66259d22eeb4fc05": {
+  "file": "47_Effects--Stateless_in_Practice.md",
+  "line": 431,
+  "target": "44_Effects--Effect_Management.md",
+  "terms": [
+   "Flip"
+  ],
+  "sentence": "`Flip` and `Now` are both side causes, in the vocabulary of [Effect Management](44_Effects--Effect_Management.md#what-is-an-effect):",
+  "p_terms": 0.16,
+  "asked": "2026-10-02"
+ },
  "757f33f7028c918e": {
   "file": "47_Effects--Stateless_in_Practice.md",
-  "line": 1310,
+  "line": 1312,
   "target": "46_Effects--Stateless.md",
   "terms": [
    "Oven",
