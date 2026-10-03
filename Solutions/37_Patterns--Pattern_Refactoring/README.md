@@ -8,6 +8,50 @@
 > then account for every pound of plastic that `plastic_dropped.py` loses.
 > Which test in `test_trash.py` fails, and why is that failure correct?
 
+<details>
+<summary>Where to look</summary>
+
+[Let a Dictionary Do the Sorting](../../Chapters/37_Patterns--Pattern_Refactoring.md#let-a-dictionary-do-the-sorting) shows the loop keying each bin on `type(t)`, and [The First Cut: Checking Every Type](../../Chapters/37_Patterns--Pattern_Refactoring.md#the-first-cut-checking-every-type) shows a `match` with no case for a new material.
+A subclass of `Trash` registers itself when its `class` statement runs, so compare what each script does with a key it has not seen.
+For the failing test, read what `test_trash.py` pins about the registry.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_1.py
+from collections import defaultdict
+from typing import ClassVar
+from record import record
+
+type Bins = dict[type[Trash], list[Trash]]
+
+@record
+class Trash:
+    weight: float
+    value: ClassVar[float] = 0.0
+    registry: ClassVar[dict[str, type[Trash]]] = {}
+
+    def __init_subclass__(cls, **kwargs: object) -> None:
+        ...
+
+    @classmethod
+    def create(cls, name: str, weight: float) -> Trash:
+        ...
+
+class Aluminum(Trash):
+    value: ClassVar[float] = 1.67
+
+class Plastic(Trash):
+    value: ClassVar[float] = 0.15
+
+def sum_value(items: list[Trash]) -> float:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
+
 ```python
 # exercise_1.py
 from collections import defaultdict
@@ -79,11 +123,59 @@ set the assertion compares. If the test still passed,
 `__init_subclass__()` would have stopped registering subclasses. Once
 you update the expected set, the test guards registration again.
 
+</details>
+</details>
+</details>
+
 ## 2. `price()` and `heaviest()`
 
 > Write a `price()` operation as a function over a list of `Trash`,
 > and a `heaviest()` operation that returns the single heaviest piece.
 > Decide for each whether it needs `singledispatch`.
+
+<details>
+<summary>Where to look</summary>
+
+[One `singledispatch` Function per Operation](../../Chapters/37_Patterns--Pattern_Refactoring.md#one-singledispatch-function-per-operation) uses `singledispatch` where behavior differs by type, and [Choosing the Lightest Construct](../../Chapters/37_Patterns--Pattern_Refactoring.md#choosing-the-lightest-construct) compares the options.
+Ask whether each operation reads anything that varies by class beyond the numbers every `Trash` already carries.
+When the form is the same for every type, an ordinary function over the list is enough.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_2.py
+from typing import ClassVar
+from record import record
+
+@record
+class Trash:
+    weight: float
+    value: ClassVar[float] = 0.0
+    registry: ClassVar[dict[str, type[Trash]]] = {}
+
+    def __init_subclass__(cls, **kwargs: object) -> None:
+        ...
+
+    @classmethod
+    def create(cls, name: str, weight: float) -> Trash:
+        ...
+
+class Aluminum(Trash):
+    value: ClassVar[float] = 1.67
+
+class Plastic(Trash):
+    value: ClassVar[float] = 0.15
+
+def price(items: list[Trash]) -> float:
+    ...
+
+def heaviest(items: list[Trash]) -> Trash:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_2.py
@@ -136,10 +228,75 @@ differs by type, such as `recycling_note()` giving `Aluminum` and
 every type and varies only in the numbers each type carries, write an
 ordinary function.
 
+</details>
+</details>
+</details>
+
 ## 3. `recycling_note()` as a `singledispatchmethod`
 
 > Replace the `recycling_note()` single-dispatch function with a `singledispatchmethod` on a `Sorter` class,
 > and explain what changed.
+
+<details>
+<summary>Where to look</summary>
+
+[One `singledispatch` Function per Operation](../../Chapters/37_Patterns--Pattern_Refactoring.md#one-singledispatch-function-per-operation) shows `recycling_note()` as a registered function.
+Move it into a `Sorter` class with `functools.singledispatchmethod`, and register each overload with the base method's `register` decorator.
+Dispatch still keys on the first argument after `self`, so consider what the class now provides that the function lacked.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_3.py
+from functools import singledispatchmethod
+from typing import ClassVar
+from record import record
+
+@record
+class Trash:
+    weight: float
+    value: ClassVar[float] = 0.0
+    registry: ClassVar[dict[str, type[Trash]]] = {}
+
+    def __init_subclass__(cls, **kwargs: object) -> None:
+        ...
+
+class Aluminum(Trash):
+    value: ClassVar[float] = 1.67
+
+class Paper(Trash):
+    value: ClassVar[float] = 0.10
+
+class Glass(Trash):
+    value: ClassVar[float] = 0.23
+
+class Cardboard(Trash):
+    value: ClassVar[float] = 0.79
+
+class Plastic(Trash):
+    value: ClassVar[float] = 0.15
+
+class Sorter:
+    @singledispatchmethod
+    def recycling_note(self, t: Trash) -> str:
+        ...
+
+    @recycling_note.register
+    def _(self, t: Aluminum) -> str:
+        ...
+
+    @recycling_note.register
+    def _(self, t: Glass) -> str:
+        ...
+
+    @recycling_note.register
+    def _(self, t: Cardboard) -> str:
+        ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_3.py
@@ -214,6 +371,10 @@ describes. A subclass of `Sorter` shares this one dispatcher, so a
 registration made through the subclass changes `Sorter`'s answers
 too.
 
+</details>
+</details>
+</details>
+
 ## 4. Exact-type bins against MRO dispatch
 
 > Derive `CrushedAluminum` from `Aluminum`,
@@ -222,6 +383,54 @@ too.
 > Explain why `CrushedAluminum` gets its own bin but not its own note.
 > Then change `recycle_dict.py` so a subclass shares its parent's bin,
 > without naming any material in the sorting loop.
+
+<details>
+<summary>Where to look</summary>
+
+[Let a Dictionary Do the Sorting](../../Chapters/37_Patterns--Pattern_Refactoring.md#let-a-dictionary-do-the-sorting) keys each bin on `type(t)`, an exact-class lookup, while `singledispatch` in [One `singledispatch` Function per Operation](../../Chapters/37_Patterns--Pattern_Refactoring.md#one-singledispatch-function-per-operation) walks the MRO.
+To let a subclass share its parent's bin, give `Trash` a class variable that names the bin's key, defaulted for each class in `__init_subclass__()`.
+A subclass overrides it, and the loop indexes by that attribute instead of `type(t)`.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_4.py
+from collections import defaultdict
+from functools import singledispatch
+from typing import ClassVar
+from record import record
+
+@record
+class Trash:
+    weight: float
+    value: ClassVar[float] = 0.0
+    bin: ClassVar[type[Trash]]
+
+    def __init_subclass__(cls, **kwargs: object) -> None:
+        ...
+
+class Aluminum(Trash):
+    value: ClassVar[float] = 1.67
+
+class CrushedAluminum(Aluminum):
+    value: ClassVar[float] = 1.67
+    bin: ClassVar[type[Trash]] = Aluminum
+
+class Glass(Trash):
+    value: ClassVar[float] = 0.23
+
+@singledispatch
+def recycling_note(t: Trash) -> str:
+    ...
+
+@recycling_note.register
+def _(t: Aluminum) -> str:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_4.py
@@ -299,6 +508,10 @@ subclasses restate `value`'s. The sorting loop becomes
 declares its own key can express groupings the type hierarchy leaves
 out.
 
+</details>
+</details>
+</details>
+
 ## 5. A base function that refuses to answer
 
 > Define `Plastic`, whose disposal hazard is toxic fumes,
@@ -308,6 +521,61 @@ out.
 > whose base function raises `NotImplementedError`,
 > and call it on the same piece.
 > What does the strict form cost the materials whose hazard is "none"?
+
+<details>
+<summary>Where to look</summary>
+
+[One `singledispatch` Function per Operation](../../Chapters/37_Patterns--Pattern_Refactoring.md#one-singledispatch-function-per-operation) builds `hazard()` with a base function that answers for any unregistered type.
+For `strict_hazard()`, make the base function raise `NotImplementedError` with a message naming the type, then register every material, including those whose answer is "none".
+Decide by comparing what a silent default and a stopped program each cost when a registration is forgotten.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_5.py
+from functools import singledispatch
+from typing import ClassVar
+from exceptions import expect
+from record import record
+
+@record
+class Trash:
+    weight: float
+    value: ClassVar[float] = 0.0
+
+class Aluminum(Trash):
+    value: ClassVar[float] = 1.67
+
+class Paper(Trash):
+    value: ClassVar[float] = 0.10
+
+class Plastic(Trash):
+    value: ClassVar[float] = 0.15
+
+@singledispatch
+def hazard(t: Trash) -> str:
+    ...
+
+@hazard.register
+def _(t: Aluminum) -> str:
+    ...
+
+@singledispatch
+def strict_hazard(t: Trash) -> str:
+    ...
+
+@strict_hazard.register
+def _(t: Aluminum) -> str:
+    ...
+
+@strict_hazard.register
+def _(t: Paper) -> str:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_5.py
@@ -373,3 +641,7 @@ default is right when it is a true answer for most types and a
 forgotten registration does little harm. A base function that raises
 an exception is right when a wrong answer is worse than a stopped
 program, as it is for a safety report.
+
+</details>
+</details>
+</details>

@@ -11,6 +11,16 @@ keeps working when a chapter listing changes.
 > Supply a scripted `Console` in a test and a real one in a demo,
 > and confirm `ask_and_greet()` stays unchanged between them.
 
+<details>
+<summary>Where to look</summary>
+
+[Supplying an Interface](../../Chapters/46_Effects--Stateless.md#supplying-an-interface) shows a `Protocol` standing in for a base class, and `need(Console)` hands back whatever object the supplier gave.
+Add `read()` to the protocol, then write `ask_and_greet()` as a generator that gets the `Console` with `need()` and calls `read()` and `print()` on it.
+A scripted class that returns a canned answer goes to `supply()` in the test, and a class wrapping `input()` goes to it in the demo.
+
+<details>
+<summary>Solution</summary>
+
 ```python
 # test_ch46_ask_and_greet.py
 from dataclasses import dataclass, field
@@ -88,12 +98,45 @@ argument, so `supply(scripted)` alone builds a handler for
 `supply()` still finds it, because `Console` is `@runtime_checkable`
 and `isinstance()` matches `Scripted` on shape.
 
+</details>
+</details>
+
 ## 2. An undeclared need, declared
 
 > Take `undeclared_need.py`, remove the `# type: ignore`,
 > and run `ty check` on it.
 > Fix the error by changing only the annotation,
 > then check what `greet_all()`'s callers must now declare.
+
+<details>
+<summary>Where to look</summary>
+
+[Effects Propagate, and the Type Checker Verifies It](../../Chapters/46_Effects--Stateless.md#effects-propagate-and-the-type-checker-verifies-it) shows what `ty` says when a function's annotation hides a request that `greet()` makes.
+Read the error's yield type, then change the return annotation of `greet_all()` so it names the request that comes up through `yield from`.
+Whoever calls `greet_all()` inherits that request, so look at what its callers declare next.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_2.py
+from stateless import Depend, Need, need, run, supply
+
+class Console:
+    def print(self, message: str) -> None:
+        ...
+
+def greet(name: str) -> Depend[Need[Console], None]:
+    ...
+
+def greet_all(names: list[str]) -> Depend[
+    Need[Console], None
+]:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 Removing the `# type: ignore` from `undeclared_need.py` produces:
 
@@ -154,11 +197,46 @@ the signature of every function between the one that uses the `Console`
 and the one that supplies it, and the type checker refuses to let any of them
 stay silent.
 
+</details>
+</details>
+</details>
+
 ## 3. Catching an error that is already handled
 
 > Apply `reveal_type()` to `catch(ValueError)(one_unhandled)` and run `ty check`.
 > Explain why its result type differs from `all_handled()`'s,
 > given that both have handled every error `read_score()` declares.
+
+<details>
+<summary>Where to look</summary>
+
+[Turning an Error Into a Value](../../Chapters/46_Effects--Stateless.md#turning-an-error-into-a-value) shows `catch()` moving a declared error out of the failure channel.
+Compare the two result types and ask what remains in each return type after `catch()` has run.
+Then look at what a `match` over the caught value does to that type, and which function in the pair contains one that covers every case.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_3.py
+from typing import Final, assert_never, reveal_type
+from stateless import Success, Try, catch, throws
+
+RAW: Final[dict[str, str]] = {"Alice": "42", "Bob": "seven"}
+
+@throws(KeyError, ValueError)
+def read_score(name: str) -> int:
+    ...
+
+def all_handled(name: str) -> Success[str]:
+    ...
+
+def one_unhandled(name: str) -> Try[ValueError, str]:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_3.py
@@ -235,10 +313,24 @@ failure into a value, and a `match` turns that value into a result.
 Skipping the `match` leaves the caught error sitting in the return
 type.
 
+</details>
+</details>
+</details>
+
 ## 4. A `Log` protocol, and a test that records both
 
 > Rewrite `audit_log.py` so `Log` is a `Protocol` rather than a concrete class,
 > then write a test that supplies a recording `Log` and a recording `Console` at once and asserts on both.
+
+<details>
+<summary>Where to look</summary>
+
+[Retrofitting an Effect](../../Chapters/46_Effects--Stateless.md#retrofitting-an-effect) builds `Log` as an Ability alongside `Console`, and [Supplying an Interface](../../Chapters/46_Effects--Stateless.md#supplying-an-interface) shows how a `Protocol` replaces a concrete class.
+Declare `Log` with a `write()` method, and write a recording class for each protocol.
+Pass both instances to `supply()` in one call, run the Effect, and assert on each recorder's list.
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # test_ch46_audit_log.py
@@ -319,11 +411,24 @@ whole environment can check that the greeting reached the console
 stdout and no temporary file. Both Effects are requests before they
 are actions, so the test decides what performing them means.
 
+</details>
+</details>
+
 ## 5. A third material in the table
 
 > Add a `Metal` material to `test_nailer.py` with a strength that survives the robotic nailer,
 > and add its two rows to the table.
 > Then explain why the test function body needs no change.
+
+<details>
+<summary>Where to look</summary>
+
+[One Effect, Many Environments](../../Chapters/46_Effects--Stateless.md#one-effect-many-environments) shows `holds()` run against a table of materials and nailers by `parametrize`.
+Define a `Metal` value whose strength exceeds the robotic nailer's force, and add one row for each nailer.
+Consider what `holds()` asks for by type, and whether a new instance of that type changes the request.
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # test_ch46_nailer.py
@@ -389,6 +494,9 @@ rows share one assertion. A version constructing its own `Material`
 inside `holds()` needs three copies of the function, one per material,
 and a version that also constructs its own `Nailer` needs all six.
 
+</details>
+</details>
+
 ## 6. A handler that builds what the request names
 
 > This one looks ahead to `handle()`,
@@ -405,6 +513,43 @@ and a version that also constructs its own `Nailer` needs all six.
 > and report which requests your handler answered at runtime and which ones the type checker believes it answered.
 > Account for the difference,
 > using `handle()`'s `t = get_origin(t) or t` as the evidence.
+
+<details>
+<summary>Where to look</summary>
+
+[Layering Handlers](../../Chapters/46_Effects--Stateless.md#layering-handlers) shows a default supplied under a more specific handler, and [Abilities Are Not Special](../../Chapters/47_Effects--Stateless_in_Practice.md#abilities-are-not-special) covers `handle()`.
+Write a handler function whose parameter is annotated `Need[Console]` and whose body returns a new instance of the class the request carries in `ability.t`.
+Wrap it with `handle()`, then compare what runs against what the annotation tells the type checker.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_6.py
+from stateless import Depend, Need, handle, need, run
+
+class Console:
+    def print(self, message: str) -> None:
+        ...
+
+class Clock:
+    def now(self) -> str:
+        ...
+
+def greet(name: str) -> Depend[Need[Console], None]:
+    ...
+
+def stamped(
+    name: str,
+) -> Depend[Need[Console] | Need[Clock], None]:
+    ...
+
+def default(ability: Need[Console]) -> Console:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_6.py
@@ -473,6 +618,10 @@ for matching but cannot enforce the distinction. The gap is real. A handler like
 assumes `ability.t` is a `Console` receives a `Clock` with
 nothing to stop it.
 
+</details>
+</details>
+</details>
+
 ## 7. Two ways to drop a `yield from`
 
 > Break `audit_log.py` by removing the `yield from` in front of `greet(name)` in `greet_logged()`.
@@ -483,6 +632,16 @@ nothing to stop it.
 > This time `ty` produces two diagnostics.
 > Explain what each one catches,
 > and why the type checker catches assigning a dropped request but not discarding one.
+
+<details>
+<summary>Where to look</summary>
+
+[Nothing Runs Yet](../../Chapters/46_Effects--Stateless.md#nothing-runs-yet) shows that calling a generator function builds an Effect without running its body, and [Why `yield from`](../../Chapters/46_Effects--Stateless.md#why-yield-from) explains what the keyword does.
+Ask whether a discarded generator breaks any rule `ty` or `ruff` checks.
+For the second case, read both diagnostics and ask what the function has become once its only `yield from` is gone, and whether the next line uses the dropped value.
+
+<details>
+<summary>Solution</summary>
 
 Removing the `yield from` in front of `greet(name)` in `greet_logged()`:
 
@@ -558,6 +717,9 @@ operation the type checker can evaluate. The lesson generalizes past
 this library: a type checker verifies how a program uses its values,
 so a value nobody uses is a value nobody checks.
 
+</details>
+</details>
+
 ## 8. A registry of Effects, and why `retry()` takes a function
 
 > Build a registry of Effects:
@@ -569,6 +731,40 @@ so a value nobody uses is a value nobody checks.
 > Explain which of the two shapes `retry()` requires,
 > and why it takes a schedule and returns a decorator of type `Callable[P, Effect[...]] -> Callable[P, Effect[...]]`,
 > rather than being an operation on an Effect.
+
+<details>
+<summary>Where to look</summary>
+
+[An Effect Runs Once](../../Chapters/46_Effects--Stateless.md#an-effect-runs-once) shows a spent Effect returning `None` when you run it again.
+Store the Effects in one dictionary and functions that build them in another, then run each twice.
+`retry()` has to start the work over after a failure, so consider what it needs to call each time.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_8.py
+from collections.abc import Callable
+from functools import partial
+from typing import Final
+from stateless import (Depend, Need, Success, need,
+                       run, supply)
+
+class Console:
+    def print(self, message: str) -> None:
+        ...
+
+def greet(name: str) -> Depend[Need[Console], None]:
+    ...
+
+NAMES: Final[list[str]] = ["Alice", "Bob"]
+
+def make(name: str) -> Success[None]:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_8.py
@@ -648,6 +844,10 @@ explains why storing Effects in a registry, a queue, or a cache is a
 mistake that looks fine until something runs an entry twice. Store the
 function, and apply the arguments where you need the Effect.
 
+</details>
+</details>
+</details>
+
 ## 9. Three reports, one Effect
 
 > Write `report_all()`,
@@ -659,6 +859,38 @@ function, and apply the arguments where you need the Effect.
 > once with `run()` and once with `await run_async()`,
 > and record what each one does.
 > Explain why the type checker accepts both.
+
+<details>
+<summary>Where to look</summary>
+
+[Waiting on a Coroutine](../../Chapters/46_Effects--Stateless.md#waiting-on-a-coroutine) shows `wait()` putting an `Async` request into an Effect, and [Where to Call `run()`](../../Chapters/46_Effects--Stateless.md#where-to-call-run) covers running one from inside an event loop.
+Loop over the URLs, delegate to `report()` with `yield from`, and collect the results in a list.
+The annotation carries the `Async` request, and the two runners differ in whether they start their own event loop.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_9.py
+import asyncio
+from exceptions import expect
+from stateless import Async, Depend, run, run_async, wait
+
+async def fetch(url: str) -> str:
+    ...
+
+def report(url: str) -> Depend[Async, str]:
+    ...
+
+def report_all(urls: list[str]) -> Depend[Async, list[str]]:
+    ...
+
+async def main() -> None:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_9.py
@@ -719,6 +951,10 @@ report. The rule is positional rather than
 type-based: `run()` at the outermost edge of a synchronous program,
 `run_async()` anywhere inside an asynchronous one.
 
+</details>
+</details>
+</details>
+
 ## 10. A second failure in the channel
 
 > `announce()` declares `Effect[Need[Console], KeyError, None]`.
@@ -730,6 +966,48 @@ type-based: `run()` at the outermost edge of a synchronous program,
 > then run it on a name that produces each failure and on one that succeeds,
 > and say where each failure surfaced.
 > Then delete `ValueError` from `announce()`'s annotation and record what the type checker reports and at which line.
+
+<details>
+<summary>Where to look</summary>
+
+[Multiple Errors](../../Chapters/46_Effects--Stateless.md#multiple-errors) shows an Effect declaring more than one failure, and [The Error Channel](../../Chapters/46_Effects--Stateless.md#the-error-channel) covers `@throws`.
+Lift the helper with `@throws(ValueError)`, then widen `announce()`'s failure type to a union and call the helper with `yield from`.
+Run the three names and note whether each failure comes out of `run()` as an exception.
+Deleting `ValueError` from the annotation makes the type checker flag the `yield from` of the helper.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_10.py
+from typing import Final
+from exceptions import expected
+from stateless import (Effect, Need, need, run, supply,
+                       throws)
+
+class Console:
+    def print(self, message: str) -> None:
+        ...
+
+SCORES: Final[dict[str, int]] = {
+    "Alice": 42, "Bob": 7, "Cyd": -3}
+
+@throws(KeyError)
+def score(name: str) -> int:
+    ...
+
+@throws(ValueError)
+def format_score(name: str, value: int) -> str:
+    ...
+
+def announce(
+    name: str,
+) -> Effect[Need[Console], KeyError | ValueError, None]:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_10.py
@@ -815,6 +1093,10 @@ line is the useful place for the diagnostic. The diagnostic names both
 the failure that escaped and the delegation it escaped through, so the
 fix is either to declare the failure or to catch it, right there.
 
+</details>
+</details>
+</details>
+
 ## 11. Making the ambiguity a type error
 
 > `ambiguous_supply.py` picks its `Console` by argument order.
@@ -826,6 +1108,53 @@ fix is either to declare the failure or to catch it, right there.
 > and show that handing the wrong implementation to an Effect is now a type error rather than a silent choice.
 > Two implementations sharing one method name stay ambiguous under both `Protocol`s,
 > so say what the technique does and does not prevent.
+
+<details>
+<summary>Where to look</summary>
+
+[When Two Implementations Match](../../Chapters/46_Effects--Stateless.md#when-two-implementations-match) explains why `supply()` takes the first argument that satisfies the request.
+Predict from argument order, since the first match wins.
+Give each implementation its own `Protocol` with a differently named method, and the type checker rejects an implementation that lacks the method the Effect requests.
+Then check what happens when two classes share one method name.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_11.py
+from dataclasses import dataclass, field
+from typing import Protocol, runtime_checkable
+from stateless import (Depend, Need, as_type, need,
+                       run, supply)
+
+@runtime_checkable
+class Screen(Protocol):
+    def print(self, message: str) -> None: ...
+
+@runtime_checkable
+class Recorder(Protocol):
+    def record(self, message: str) -> None: ...
+
+@dataclass
+class Terminal:
+    def print(self, message: str) -> None:
+        ...
+
+@dataclass
+class Capture:
+    messages: list[str] = field(default_factory=list)
+    def record(self, message: str) -> None:
+        ...
+
+def to_screen(name: str) -> Depend[Need[Screen], None]:
+    ...
+
+def to_log(name: str) -> Depend[Need[Recorder], None]:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 Three implementations have six orderings, and the prediction is short.
 `supply()` scans its arguments and takes the first that satisfies the
@@ -917,3 +1246,7 @@ resolves a request by scanning its arguments at runtime, so a
 duplicate is a fact about the call rather than about the types. ZIO's
 compile-time rejection of this case is the difference that section
 names.
+
+</details>
+</details>
+</details>

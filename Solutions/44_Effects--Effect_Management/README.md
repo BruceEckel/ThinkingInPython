@@ -8,6 +8,44 @@
 > Confirm `greet()` itself requires no change:
 > serving a new context without edits is what delayed binding provides.
 
+<details>
+<summary>Where to look</summary>
+
+[Effects by Hand](../../Chapters/44_Effects--Effect_Management.md#effects-by-hand) shows `greet()` taking its `ask` and `tell` capabilities as parameters.
+The `Ask` and `Tell` protocols are structural, so `Console` needs only methods with matching signatures.
+Pass one `Console` for both parameters, or pass a double for either.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_1.py
+from typing import Protocol
+
+class Ask(Protocol):
+    def ask(self, prompt: str) -> str: ...
+
+class Tell(Protocol):
+    def tell(self, message: str) -> None: ...
+
+def greet(ask: Ask, tell: Tell) -> None:
+    ...
+
+class Console:
+    def ask(self, prompt: str) -> str:
+        ...
+
+    def tell(self, message: str) -> None:
+        ...
+
+class Scripted:
+    def ask(self, prompt: str) -> str:
+        ...
+```
+
+<details>
+<summary>Solution</summary>
+
 ```python
 # exercise_1.py
 from typing import Protocol
@@ -67,6 +105,10 @@ satisfies both protocols structurally. If you give `Console` a
 at the `greet(...)` call, not at the class definition, because the
 class never says which protocol it means to satisfy.
 
+</details>
+</details>
+</details>
+
 ## 2. Threading a `Log` Effect through by hand
 
 > Do the bookkeeping the chapter describes.
@@ -76,6 +118,63 @@ class never says which protocol it means to satisfy.
 > The chapter counts five signatures for that version;
 > say how many of the five use the `Log` they name,
 > and then what an EMS would do instead.
+
+<details>
+<summary>Where to look</summary>
+
+[Effects by Hand](../../Chapters/44_Effects--Effect_Management.md#effects-by-hand) shows the bookkeeping that each new Effect adds to every signature on the path.
+Add a `Log` protocol, give the new helper and `greet()` a `log` parameter, and count which functions only pass it along.
+Compare that count with what [Tracking and Management](../../Chapters/44_Effects--Effect_Management.md#tracking-and-management) says an EMS declares instead.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_2.py
+from dataclasses import dataclass, field
+from typing import Protocol
+
+class Ask(Protocol):
+    def ask(self, prompt: str) -> str: ...
+
+class Tell(Protocol):
+    def tell(self, message: str) -> None: ...
+
+class Log(Protocol):
+    def log(self, message: str) -> None: ...
+
+def format_greeting(name: str, log: Log) -> str:
+    ...
+
+def greet(ask: Ask, tell: Tell, log: Log) -> None:
+    ...
+
+def session(ask: Ask, tell: Tell, log: Log) -> None:
+    ...
+
+def menu(ask: Ask, tell: Tell, log: Log) -> None:
+    ...
+
+def main(ask: Ask, tell: Tell, log: Log) -> None:
+    ...
+
+class Scripted:
+    def ask(self, prompt: str) -> str:
+        ...
+
+@dataclass
+class Capture:
+    messages: list[str] = field(default_factory=list)
+
+    def tell(self, message: str) -> None:
+        ...
+
+    def log(self, message: str) -> None:
+        ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_2.py
@@ -164,6 +263,10 @@ a real library: in its `audit_log.py`, `greet_logged()` and its caller
 `greet_all()` both carry a `Need[Log]` in the `Depend` return type,
 while `greet()` stays unchanged.
 
+</details>
+</details>
+</details>
+
 ## 3. Classifying three Effects
 
 > Classify every Effect in `slope_catch.py`,
@@ -174,6 +277,16 @@ while `greet()` stays unchanged.
 > applies to the exceptions,
 > and which technique from [Effects by Hand](../../Chapters/44_Effects--Effect_Management.md#effects-by-hand)
 > applies to the rest?
+
+<details>
+<summary>Where to look</summary>
+
+[Converting Effectful to Pure](../../Chapters/44_Effects--Effect_Management.md#converting-effectful-to-pure) covers the exception Effects, and [Effects by Hand](../../Chapters/44_Effects--Effect_Management.md#effects-by-hand) covers the rest.
+For each piece of code, ask whether it writes something outside its result (a side effect), reads something that can change (a side cause), or signals failure with an exception.
+Then match each kind to the conversion or technique that manages it.
+
+<details>
+<summary>Solution</summary>
 
 | Code | Effect | Kind | Conversion |
 | --- | --- | --- | --- |
@@ -233,6 +346,9 @@ of the language feature used. A global, an instance attribute, and a
 responder list are three storage mechanisms for one idea: something
 outside the call participates in the result.
 
+</details>
+</details>
+
 ## 4. `PositiveInt` in place of both checks
 
 > `NonZero` guards zero but not negative values,
@@ -240,6 +356,35 @@ outside the call participates in the result.
 > Build a `PositiveInt` that makes both bad values unconstructable,
 > rewrite `slope()` to take it,
 > and note which checks disappear from `slope()` as a result.
+
+<details>
+<summary>Where to look</summary>
+
+[Make the Bad Value Impossible](../../Chapters/44_Effects--Effect_Management.md#make-the-bad-value-impossible) builds `NonZero` so that an invalid value cannot be constructed.
+Write `PositiveInt` with a `__post_init__()` that checks one predicate covering both bad values.
+Then give `slope()` a `PositiveInt` parameter and see which guards have nothing left to do.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_4.py
+from exceptions import expect
+from record import record
+
+@record
+class PositiveInt:
+    value: int
+
+    def __post_init__(self) -> None:
+        ...
+
+def slope(rise: int, run: PositiveInt) -> float:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_4.py
@@ -291,6 +436,10 @@ function that touches the value. Every function downstream of a
 spends a line of code on it. Each signature says which values the
 function accepts, instead of leaving that to a docstring.
 
+</details>
+</details>
+</details>
+
 ## 5. What `async` tracks, and what it does not
 
 > `coroutines_are_descriptions.py` shows that `async` tracks one Effect.
@@ -299,6 +448,38 @@ function accepts, instead of leaving that to a docstring.
 > all the way up to `asyncio.run()`.
 > Name the two properties of a full EMS that `async` does *not* have,
 > using the three-item list in [Tracking and Management](../../Chapters/44_Effects--Effect_Management.md#tracking-and-management).
+
+<details>
+<summary>Where to look</summary>
+
+[Effect Management for Python?](../../Chapters/44_Effects--Effect_Management.md#effect-management-for-python) shows that calling an `async` function returns a coroutine, a description of work.
+Make the helper `async`, then change each caller to `async` with `await` until `asyncio.run()` ends the chain.
+Weigh what you get against the list in [Tracking and Management](../../Chapters/44_Effects--Effect_Management.md#tracking-and-management).
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_5.py
+import asyncio
+
+PRICES = {"apple": 1.5, "pear": 2.0}
+
+def price_of(item: str) -> float:
+    ...
+
+def total_price(items: list[str]) -> float:
+    ...
+
+async def price_of_async(item: str) -> float:
+    ...
+
+async def total_price_async(items: list[str]) -> float:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_5.py
@@ -380,3 +561,7 @@ implementation set at the call site. That is also why the
 propagation feels like a nuisance rather than a benefit: you
 get the bookkeeping cost of Effect tracking without the delayed
 binding that would repay it.
+
+</details>
+</details>
+</details>

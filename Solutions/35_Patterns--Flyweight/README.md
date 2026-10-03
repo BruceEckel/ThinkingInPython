@@ -9,6 +9,58 @@
 > Confirm the tile pool size still equals the number of kinds,
 > however large the map.
 
+<details>
+<summary>Where to look</summary>
+
+[Typing the Symbol Set](../../Chapters/35_Patterns--Flyweight.md#typing-the-symbol-set) shows `Symbol` and `SPECS` naming the same kinds, so the two grow together.
+Add the new symbols to both and leave `tile()` alone.
+For `walkable_neighbors()`, visit the four adjacent cells, skip any outside the grid, and count those whose `walkable` is true.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_1.py
+from functools import cache
+from typing import Final, Literal
+from record import record
+
+type Symbol = Literal[".", "~", "#", "+", "T"]
+type TileSpec = tuple[str, bool]
+
+@record
+class Tile:
+    symbol: Symbol
+    name: str
+    walkable: bool
+
+SPECS: Final[dict[Symbol, TileSpec]] = {
+    ".": ("grass", True),
+    "~": ("water", False),
+    "#": ("rock", False),
+    "+": ("door", True),
+    "T": ("tree", False),
+}
+
+@cache
+def tile(symbol: Symbol) -> Tile:
+    ...
+
+def to_symbol(char: str) -> Symbol:
+    ...
+
+def parse_map(text: str) -> list[list[Tile]]:
+    ...
+
+def walkable_neighbors(
+    field: list[list[Tile]], row: int, col: int
+) -> int:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
+
 ```python
 # exercise_1.py
 from functools import cache
@@ -76,11 +128,64 @@ distinct objects, one per kind (`grass`, `water`, `rock`, `door`,
 `tree`), and that count stays at five however large the map grows,
 because `@cache` keys on the symbol alone.
 
+</details>
+</details>
+</details>
+
 ## 2. `tracemalloc`, shared vs. unshared tiles
 
 > Use `tracemalloc` to compare the memory `parse_map()` uses on a large map when every cell shares its `Tile` against when each cell gets a new one,
 > by removing `@cache` from `tile()`.
 > How does the ratio change as the map grows?
+
+<details>
+<summary>Where to look</summary>
+
+[Intrinsic and Extrinsic State](../../Chapters/35_Patterns--Flyweight.md#intrinsic-and-extrinsic-state) compares a map that shares its tiles with one that builds a tile per cell.
+Write two factories, one with `@cache` and one without, and build the same map with each between `tracemalloc.start()` and `tracemalloc.get_traced_memory()`.
+Repeat for several map sizes and compare the peaks as a ratio.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_2.py
+import tracemalloc
+from functools import cache
+from typing import Final, Literal
+from record import record
+
+type Symbol = Literal[".", "~", "#"]
+type TileSpec = tuple[str, bool]
+
+@record
+class Tile:
+    symbol: Symbol
+    name: str
+    walkable: bool
+
+SPECS: Final[dict[Symbol, TileSpec]] = {
+    ".": ("grass", True),
+    "~": ("water", False),
+    "#": ("rock", False),
+}
+
+@cache
+def shared_tile(symbol: Symbol) -> Tile:
+    ...
+
+def unshared_tile(symbol: Symbol) -> Tile:
+    ...
+
+def to_symbol(char: str) -> Symbol:
+    ...
+
+def make_map(size: int) -> str:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_2.py
@@ -158,10 +263,50 @@ with no `__dict__`. With `@dataclass(frozen=True)` in place of `@record` the
 same run reports a ratio near ten, because every unshared `Tile`
 then carries a dictionary too.
 
+</details>
+</details>
+</details>
+
 ## 3. Replacing `@record` with `@dataclass` exposes the sharing bug
 
 > Replace `@record` on `Tile` with `@dataclass` and set `field[0][0].walkable = False` on a parsed map.
 > Write a test that exposes the resulting bug, then restore `@record`.
+
+<details>
+<summary>Where to look</summary>
+
+[Freezing the Shared Tile](../../Chapters/35_Patterns--Flyweight.md#freezing-the-shared-tile) explains why a flyweight must be immutable.
+The pool holds one object per kind, so assigning to a field through one cell is visible through every cell that shares it.
+In the test, assign through one cell, then assert on a different cell of the same kind.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_3.py
+from dataclasses import dataclass
+from functools import cache
+from typing import Final
+
+SPECS: Final[dict[str, tuple[str, bool]]] = {
+    ".": ("grass", True),
+    "~": ("water", False),
+    "#": ("rock", False),
+}
+
+@dataclass  # Not a record
+class MutableTile:
+    symbol: str
+    name: str
+    walkable: bool
+
+@cache
+def mutable_tile(symbol: str) -> MutableTile:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_3.py
@@ -237,6 +382,10 @@ because a record rejects assignment to every field. The assignment
 the bug needs never completes, and that refusal makes sharing one
 object safe.
 
+</details>
+</details>
+</details>
+
 ## 4. Modeling chess
 
 > Model chess: a frozen `Piece` (color, kind)
@@ -244,6 +393,63 @@ object safe.
 > A full opening position holds thirty-two piece references.
 > How many `Piece` objects exist?
 > How do you capture and promote?
+
+<details>
+<summary>Where to look</summary>
+
+[Intrinsic and Extrinsic State](../../Chapters/35_Patterns--Flyweight.md#intrinsic-and-extrinsic-state) separates what a piece is (color and kind) from where it stands.
+Share the first through a `@cache` factory keyed on color and kind, and keep the second as the `dict` key.
+A capture or a promotion then only changes which shared `Piece` a square refers to.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_4.py
+from enum import Enum
+from functools import cache
+from record import record
+
+class Color(Enum):
+    WHITE = "white"
+    BLACK = "black"
+
+class Kind(Enum):
+    PAWN = "P"
+    ROOK = "R"
+    KNIGHT = "N"
+    BISHOP = "B"
+    QUEEN = "Q"
+    KING = "K"
+
+@record
+class Piece:
+    color: Color
+    kind: Kind
+
+@cache
+def piece(color: Color, kind: Kind) -> Piece:
+    ...
+
+type Square = tuple[str, int]
+
+def starting_position() -> dict[Square, Piece]:
+    ...
+
+def move(
+    board: dict[Square, Piece], src: Square, dst: Square
+) -> None:
+    # Overwrites dst's old occupant
+    ...
+
+def promote(
+    board: dict[Square, Piece], square: Square, kind: Kind
+) -> None:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_4.py
@@ -332,11 +538,46 @@ follow.
 looks up (or builds) a different shared `Piece`, and the board points
 at that one instead.
 
+</details>
+</details>
+</details>
+
 ## 5. `interned_color.py`, rewritten on a weak pool
 
 > Rewrite `interned_color.py` to hold its pool weakly, as `weak_pool.py` does,
 > and show that building and dropping a palette of colors leaves the pool empty.
 > Say what the rewrite gave up to get there.
+
+<details>
+<summary>Where to look</summary>
+
+[A Pool That Does Not Leak](../../Chapters/35_Patterns--Flyweight.md#a-pool-that-does-not-leak) holds its flyweights in a `WeakValueDictionary` behind a factory function.
+Apply that shape to `Color`, and remember that a weak reference needs a slot for it, which `record()` does not pass through.
+To see what the rewrite gives up, compare how callers construct a `Color` here with [Interning in the Constructor](../../Chapters/35_Patterns--Flyweight.md#interning-in-the-constructor).
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_5.py
+from dataclasses import dataclass
+from typing import Final
+from weakref import WeakValueDictionary
+
+type RGB = tuple[int, int, int]
+
+@dataclass(frozen=True, slots=True, weakref_slot=True)
+class Color:
+    red: int
+    green: int
+    blue: int
+
+def make_color(red: int, green: int, blue: int) -> Color:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_5.py
@@ -399,11 +640,49 @@ as in a `dict`, as
 says, on a `Color` declared with the same
 `@dataclass(frozen=True, slots=True, weakref_slot=True)` line.
 
+</details>
+</details>
+</details>
+
 ## 6. Constraining `interned_color.py`'s components
 
 > Constrain `red`, `green`, and `blue` to `0`-`255` in `interned_color.py`.
 > Raise `ValueError` from `__new__()` for an out-of-range component,
 > and write a test for it.
+
+<details>
+<summary>Where to look</summary>
+
+[Interning in the Constructor](../../Chapters/35_Patterns--Flyweight.md#interning-in-the-constructor) puts the pool lookup in `__new__()`.
+Check each component against the range at the top of `__new__()`, before the lookup, so an invalid `Color` never reaches the pool.
+The test uses `pytest.raises(ValueError)` once for a component above the range and once for one below it.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_6.py
+from typing import ClassVar
+from exceptions import expect
+from record import record
+
+type RGB = tuple[int, int, int]
+
+@record
+class Color:
+    _pool: ClassVar[dict[RGB, Color]] = {}
+    red: int
+    green: int
+    blue: int
+
+    def __new__(
+        cls, red: int, green: int, blue: int
+    ) -> Color:
+        ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_6.py
@@ -482,12 +761,48 @@ pooled or returned. That check is the same *parse, don't validate* move
 makes with `__post_init__()`. Here the class validates in `__new__()`
 instead, because interning must intercept construction.
 
+</details>
+</details>
+</details>
+
 ## 7. `tile_map.py` rebuilt on the enum
 
 > Rewrite `tile_map.py` on top of `tile_enum.py`'s `Tile`,
 > so `parse_map()` returns `list[list[Tile]]` of enum members and `to_symbol()` disappears.
 > What does the type checker now catch that the `Literal` version caught,
 > and what does it catch that the `Literal` version did not?
+
+<details>
+<summary>Where to look</summary>
+
+[A Fixed Set: Enum](../../Chapters/35_Patterns--Flyweight.md#a-fixed-set-enum) lets the language hold the pool, so `Tile(symbol)` is the lookup.
+Move the spec table into the member values and delete `to_symbol()`.
+For the comparison, consider where each version reports a wrong symbol: a misspelled member, and a symbol that arrives as data.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_7.py
+from enum import Enum
+from exceptions import expect
+
+class Tile(Enum):
+    GRASS = (".", True)
+    WATER = ("~", False)
+    ROCK = ("#", False)
+
+    walkable: bool
+
+    def __new__(cls, symbol: str, walkable: bool) -> Tile:
+        ...
+
+def parse_map(text: str) -> list[list[Tile]]:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_7.py
@@ -554,6 +869,10 @@ raises a `ValueError` from deep inside `parse_map()`'s comprehension.
 If the boundary matters, keep a `to_tile()` wrapper that catches the
 `ValueError` and re-raises it with the offending line and column.
 
+</details>
+</details>
+</details>
+
 ## 8. Four threads on a cold key
 
 > Make `tile()`'s body slow,
@@ -563,6 +882,64 @@ If the boundary matters, keep a `to_tile()` wrapper that catches the
 > and how many distinct objects do the four threads hold?
 > Fix it two ways: populate the pool eagerly at import,
 > and guard the factory with a `threading.Lock`.
+
+<details>
+<summary>Where to look</summary>
+
+[Sharing, Not Caching](../../Chapters/35_Patterns--Flyweight.md#sharing-not-caching) says a flyweight's factory exists to guarantee identity, and `@cache` checks the key and stores the result in separate steps.
+The `time.sleep()` widens the gap between those steps, so every thread can miss before any thread stores.
+For the fixes, build every `Tile` into a table before starting any thread, and separately wrap the call to `tile()` in a `threading.Lock`.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_8.py
+import threading
+import time
+from collections.abc import Callable
+from functools import cache
+from typing import Final, Literal
+from record import record
+
+type Symbol = Literal[".", "~", "^", "*"]
+
+@record
+class Tile:
+    symbol: Symbol
+    name: str
+    walkable: bool
+
+SPECS: Final[dict[Symbol, tuple[str, bool]]] = {
+    ".": ("grass", True),
+    "~": ("water", False),
+    "^": ("hill", True),
+    "*": ("sand", True),
+}
+
+@cache
+def tile(symbol: Symbol) -> Tile:
+    # Widen the window between miss and store
+    ...
+
+def gather(
+    factory: Callable[[Symbol], Tile], symbol: Symbol
+) -> list[Tile]:
+    "Call factory(symbol) from four threads at once."
+    ...
+
+EAGER: Final[dict[Symbol, Tile]] = {
+    s: Tile(s, *spec) for s, spec in SPECS.items()}
+
+def eager_tile(symbol: Symbol) -> Tile:
+    ...
+
+def locked_tile(symbol: Symbol) -> Tile:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_8.py
@@ -663,3 +1040,7 @@ overwhelming majority once the pool is warm. If that serialization matters, lock
 only on the miss path with a hand-written pool, checking the key again
 inside the lock, since another thread may have filled that entry while
 this one waited.
+
+</details>
+</details>
+</details>

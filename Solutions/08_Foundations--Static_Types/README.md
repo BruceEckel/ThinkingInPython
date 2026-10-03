@@ -5,6 +5,42 @@
 > In `protocols.py`, add a class `Triangle` with its own `draw()`,
 > and pass an instance to `render()` without changing `Drawable` or `render()`.
 
+<details>
+<summary>Where to look</summary>
+
+[Structural Typing with Protocols](../../Chapters/08_Foundations--Static_Types.md#structural-typing-with-protocols) shows `Circle` and `Square` passing as `Drawable` without naming it.
+A class qualifies by having the members the `Protocol` declares.
+Write `Triangle` with a `draw()` that has the same signature, and leave `Drawable` and `render()` untouched.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_1.py
+from typing import Protocol
+
+class Drawable(Protocol):
+    def draw(self) -> str: ...
+
+class Circle:
+    def draw(self) -> str:
+        ...
+
+class Square:
+    def draw(self) -> str:
+        ...
+
+class Triangle:
+    def draw(self) -> str:
+        ...
+
+def render(shape: Drawable) -> str:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
+
 ```python
 # exercise_1.py
 from typing import Protocol
@@ -40,10 +76,24 @@ print(render(Triangle()))
 `Drawable` requires no more than that. Neither `Drawable` nor
 `render()` needs to change to accept a `Triangle`.
 
+</details>
+</details>
+</details>
+
 ## 2. Removing `# type: ignore` from `area.py`
 
 > In `area.py`, remove the `# type: ignore` comment and run `ty check` on the file.
 > Read the error, then restore the comment.
+
+<details>
+<summary>Where to look</summary>
+
+[Catching Mistakes](../../Chapters/08_Foundations--Static_Types.md#catching-mistakes) shows `area()` called with a `str` and silenced by the comment.
+Remove the comment, run `ty check` on the file, and read which argument and which parameter the diagnostic points at.
+Then consider what the call does at run time without the checker.
+
+<details>
+<summary>Solution</summary>
 
 ```python
 def area(width: int, height: int) -> int:
@@ -76,11 +126,36 @@ repetition. In the book, the `# type: ignore` comment on the
 `area("3", 4)` line lets a deliberately wrong example pass the book's build. Removing
 the comment restores the error.
 
+</details>
+</details>
+
 ## 3. A second generic function, `last()`
 
 > In `generics.py`, write a second generic function,
 > `last[T](items: list[T]) -> T`, that returns the final element,
 > and call it on both a `list[int]` and a `list[str]` the way the listing calls `first()`.
+
+<details>
+<summary>Where to look</summary>
+
+[Type Parameters](../../Chapters/08_Foundations--Static_Types.md#type-parameters) shows `first()` with one type parameter `T` shared by the argument and the return type.
+Give `last()` the same signature, index from the other end of the list,
+and call it on a `list[int]` and a `list[str]`.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_3.py
+def first[T](items: list[T]) -> T:
+    ...
+
+def last[T](items: list[T]) -> T:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_3.py
@@ -103,11 +178,51 @@ the same as `first()` does. The type checker therefore knows that
 `last([10, 20, 30])` returns an `int` and `last(["a", "b", "c"])`
 returns a `str`.
 
+</details>
+</details>
+</details>
+
 ## 4. A subclass of `NamedTally` still chains through `Self`
 
 > In `self_type.py`, add a subclass of `NamedTally` called `LoudTally` whose `report()` returns the message in all capitals,
 > calling `super().report()` first.
 > Confirm `.bump().bump().report()` still chains correctly on a `LoudTally`.
+
+<details>
+<summary>Where to look</summary>
+
+[The `Self` Return Type](../../Chapters/08_Foundations--Static_Types.md#the-self-type) explains why `bump()` is annotated with `Self` instead of a class name.
+Subclass `NamedTally`, override `report()` to build on `super().report()`,
+and chain `bump()` twice before calling `report()` on the `LoudTally`.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_4.py
+from typing import Self
+
+class Tally:
+    def __init__(self) -> None:
+        ...
+
+    def bump(self) -> Self:
+        ...
+
+class NamedTally(Tally):
+    def __init__(self, name: str) -> None:
+        ...
+
+    def report(self) -> str:
+        ...
+
+class LoudTally(NamedTally):
+    def report(self) -> str:
+        ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_4.py
@@ -148,12 +263,44 @@ annotation is the fixed type `Tally` instead of `Self`, the type
 checker rejects `.report()` on the chained result, since `Tally` has
 no `report()` method.
 
+</details>
+</details>
+</details>
+
 ## 5. What a missing type parameter default costs
 
 > Add `reveal_type(words.top())` to `type_defaults.py` and run `ty check` on the file.
 > Remove the `= str` default and run it again.
 > The type checker reports no error either way.
 > Say what that means for a bare `Stack` annotation.
+
+<details>
+<summary>Where to look</summary>
+
+[Type Parameter Defaults](../../Chapters/08_Foundations--Static_Types.md#type-parameter-defaults) gives `Stack` a default for `T` so a bare `Stack` annotation still means something.
+Use `reveal_type()` from `typing` on `words.top()` with and without the default, and compare what the checker reports.
+The question is what the checker knows about an expression whose type parameter nothing solves.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_5.py
+from typing import reveal_type
+
+class Stack[T = str]:
+    def __init__(self) -> None:
+        ...
+
+    def push(self, item: T) -> None:
+        ...
+
+    def top(self) -> T:
+        ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_5.py
@@ -186,11 +333,41 @@ A default turns a bare annotation that checks nothing into one that
 checks, and that is the reason to give a default to a class whose
 parameter is usually the same type.
 
+</details>
+</details>
+</details>
+
 ## 6. A `Literal` that does not admit `"purple"`
 
 > In `type_aliases.py`,
 > call `paint(grid, (2, 3), "purple")` and run `ty check`.
 > Read the error, then widen `Color` to admit `"purple"` and confirm the error goes away.
+
+<details>
+<summary>Where to look</summary>
+
+In [Naming Types: The `type` Statement](../../Chapters/08_Foundations--Static_Types.md#the-type-statement), `Color` is an alias for a `Literal` union of strings.
+Call `paint()` with `"purple"` and read how the diagnostic names the parameter's type.
+Then add the string to the alias in the one place where it is defined and run the check again.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_6.py
+from typing import Literal
+
+type Coord = tuple[int, int]
+type Grid = dict[Coord, str]
+type Color = Literal[
+    "red", "blue", "green", "yellow", "purple"]
+
+def paint(grid: Grid, cell: Coord, color: Color) -> None:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_6.py
@@ -235,10 +412,49 @@ the set is. Adding `"purple"` to the alias removes the error at every
 call. `grid[cell] = color` needs no change, since `Grid`'s values are
 `str` and every `Color` is a `str`.
 
+</details>
+</details>
+</details>
+
 ## 7. Widening `add_square()` to `Sequence[Shape]`
 
 > In `variance.py`, change `add_square()`'s parameter annotation to `Sequence[Shape]` and uncomment the call.
 > Explain why the type checker now accepts the call and why `shapes.append(...)` no longer type-checks.
+
+<details>
+<summary>Where to look</summary>
+
+[Variance](../../Chapters/08_Foundations--Static_Types.md#variance) shows `list[Circle]` refused where `list[Shape]` is required.
+Import `Sequence` from `collections.abc` and compare which operations it offers with those of `list`.
+The answer to both questions follows from whether the container can be written to.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_7.py
+from collections.abc import Sequence
+
+class Shape:
+    pass
+
+class Circle(Shape):
+    pass
+
+class Square(Shape):
+    pass
+
+def count(shapes: Sequence[Shape]) -> int:
+    ...
+
+def add_square(shapes: Sequence[Shape]) -> None:
+    # ty: "Sequence[Shape]" has no attribute "append":
+    # shapes.append(Square())
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_7.py
@@ -287,10 +503,33 @@ practical rule follows: annotate a parameter with the weakest shape
 the body needs, because each capability you declare rejects the
 callers whose argument lacks it.
 
+</details>
+</details>
+</details>
+
 ## 8. Truthiness in place of `is not None`
 
 > In `narrowing.py`, replace `if text is not None:` with `if text:` and run `ty check`.
 > Explain why the empty string now takes the other branch even though the type checker accepts either version.
+
+<details>
+<summary>Where to look</summary>
+
+[Narrowing](../../Chapters/08_Foundations--Static_Types.md#narrowing) shows `is not None` removing `None` from a `str | None` before `.upper()` is called.
+A truthiness test narrows the same way, so the checker accepts it.
+Feed the function `None`, a normal string, and the empty string, and compare which values each test sends to which branch.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_8.py
+def shout(text: str | None) -> str:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_8.py
@@ -326,6 +565,10 @@ answer applies. Test for the condition you mean. Use `is None` when
 you mean "was anything supplied," and truthiness when an empty value
 belongs with the missing one.
 
+</details>
+</details>
+</details>
+
 ## 9. Narrowing a local copy of an attribute
 
 > In `narrowing_attribute.py`,
@@ -333,6 +576,32 @@ belongs with the missing one.
 > Replace the `expect()` call with `print(show(box))` for a `Box` named `box`,
 > then print `box.val`.
 > Explain why the `AttributeError` is gone although `reset()` still runs.
+
+<details>
+<summary>Where to look</summary>
+
+[Narrowing](../../Chapters/08_Foundations--Static_Types.md#narrowing) shows the checker keeping a narrowing of `b.val` even though `reset()` can change that attribute.
+Bind `b.val` to a local name before the `if`, so the narrowed expression is a variable instead of an attribute.
+Then consider which name `reset()` can rebind.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_9.py
+class Box:
+    def __init__(self, val: str | None) -> None:
+        ...
+
+    def reset(self) -> None:
+        ...
+
+def show(b: Box) -> str:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_9.py
@@ -365,3 +634,7 @@ second line of output shows. The call cannot change `val`, though.
 holds through the call, and the type checker's verdict matches what
 the program does. In the chapter's version the verdict concerns
 `b.val`, which the call changes after the test.
+
+</details>
+</details>
+</details>

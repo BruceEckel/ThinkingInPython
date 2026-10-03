@@ -8,6 +8,52 @@
 > Then rewrite `archive()` so the file name and the stamp cannot disagree,
 > and explain why no handler can reproduce the bug afterward.
 
+<details>
+<summary>Where to look</summary>
+
+[A Clock That Crosses Midnight](../../Chapters/47_Effects--Stateless_in_Practice.md#a-clock-that-crosses-midnight) walks a fixed list inside a handler.
+A handler can be a closure: keep the stored moment in the enclosing scope and update it with `nonlocal`.
+For the second half, count how many times `archive()` reads the clock,
+since a mismatch between name and stamp needs two readings.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of advancing_clock.py
+from collections.abc import Callable
+from datetime import datetime, timedelta
+from typing import Final
+from stateless import Ability, Depend, handle, run
+
+class Now(Ability[datetime]):
+    pass
+
+def now() -> Depend[Now, datetime]:
+    ...
+
+def ticking(
+    start: datetime, step: timedelta
+) -> Callable[[Now], datetime]:
+    ...
+
+def archive_twice(
+    entry: str
+) -> Depend[Now, tuple[str, str]]:
+    ...
+
+def archive_once(
+    entry: str
+) -> Depend[Now, tuple[str, str]]:
+    ...
+
+LATE: Final[datetime] = datetime(2026, 1, 1, 23, 59, 59)
+SECOND: Final[timedelta] = timedelta(seconds=1)
+```
+
+<details>
+<summary>Solution</summary>
+
 ```python
 # advancing_clock.py
 from collections.abc import Callable
@@ -92,6 +138,10 @@ and two readings are two facts rather than one.
 Naming the clock as an Ability makes the failure reproducible.
 Deriving both strings from a single reading removes it.
 
+</details>
+</details>
+</details>
+
 ## 2. A leak the type checker cannot see
 
 > `leaky_effect.py` type-checks even though its `Success[int]` claim is false.
@@ -102,6 +152,41 @@ Deriving both strings from a single reading removes it.
 > wrap it in `catch(KeyError)`, and run it on a failing input.
 > Explain what the types claim, what the run does,
 > and which line restores the guarantee.
+
+<details>
+<summary>Where to look</summary>
+
+[Nothing stops an undeclared Effect](../../Chapters/47_Effects--Stateless_in_Practice.md#nothing-stops-an-undeclared-effect) explains why a signature cannot see what a body does before it returns.
+For the error side, ask when a `KeyError` raised in an ordinary function body fires relative to when `catch()` starts watching the channel.
+`@throws` is the decorator that moves a raised exception into the channel.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_2.py
+from typing import Final
+from exceptions import expect
+from stateless import Success, catch, run, success, throws
+
+RAW: Final[dict[str, int]] = {"Alice": 42}
+
+def size(name: str) -> Success[int]:
+    ...
+
+def caller() -> Success[int | KeyError]:
+    ...
+
+@throws(KeyError)
+def declared_size(name: str) -> int:
+    ...
+
+def fixed() -> Success[int | KeyError]:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 The rule that catches `leaky_effect.py` is a reading rule about one line:
 a function whose return type is an `Effect` and whose body is not a generator
@@ -181,6 +266,10 @@ raising it, so the exception becomes a value travelling the error channel.
 `catch()` then does what its type says: `run(fixed())` returns the `KeyError`
 rather than raising it.
 `success()` is for a value you already have. `@throws` is for work that can fail.
+
+</details>
+</details>
+</details>
 
 ## Shared code: the microgrid
 
@@ -307,6 +396,16 @@ depleting nothing, since wind costs no fuel.
 > run `run_load()` again,
 > and say where the `Blackout` propagates to and why `catch(Blackout)` around `run_load()` does not intercept it.
 
+<details>
+<summary>Where to look</summary>
+
+[Switching Implementations Mid-Run](../../Chapters/47_Effects--Stateless_in_Practice.md#switching-implementations-mid-run) shows `run_load()` asking for a `Source` and using whatever the handler returns.
+Add a source class with the same two methods and place it in the tuple that `controller()` receives.
+For the blackout, trace which frame the handler's `raise` unwinds through, and whether any `yield` lies between it and `run()`.
+
+<details>
+<summary>Solution</summary>
+
 ```python
 # exercise_3.py
 from exceptions import expect
@@ -371,6 +470,9 @@ Making a `Blackout` catchable means giving the Ability a failure type,
 so the handler returns a value rather than raising an exception,
 and `plug()` declares the failure it can produce.
 
+</details>
+</details>
+
 ## 4. A scripted outlet
 
 > Write a handler for `Outlet` that ignores `request.hour` and hands out a fixed sequence of sources,
@@ -378,6 +480,39 @@ and `plug()` declares the failure it can produce.
 > Use it to test that `run_load()` re-requests after a failure,
 > without modeling weather, a clock, or a battery.
 > Then say what such a test cannot tell you about `controller()`.
+
+<details>
+<summary>Where to look</summary>
+
+[Scripting an Unpredictable Source](../../Chapters/47_Effects--Stateless_in_Practice.md#scripting-an-unpredictable-source) shows `scripted` answering each `Flip` from a fixed sequence.
+Write a handler factory that closes over an iterator and returns `next()` on each request, ignoring the request's fields.
+Supply a source whose `available()` is always false so the first draws fail.
+Then list what the handler never consults, and what `controller()` therefore keeps to itself.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_4.py
+from collections.abc import Callable, Iterator
+from grid import Outlet, Solar, Source, run_load
+from stateless import handle, run
+
+def scripted(
+    sources: Iterator[Source]
+) -> Callable[[Outlet], Source]:
+    # request.hour ignored
+    ...
+
+class Dead:  # Never available, so every draw fails
+    def available(self, hour: int) -> bool:
+        ...
+    def deplete(self) -> None:
+        ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_4.py
@@ -428,6 +563,10 @@ The scripted test checks the consumer of the Ability while saying nothing about 
 `controller()` needs its own test, and that test can be an ordinary one:
 `controller()` builds an ordinary function from an `Outlet` to a `Source`, and
 no Effect takes part.
+
+</details>
+</details>
+</details>
 
 ## Shared code: the research pipeline
 
@@ -558,6 +697,63 @@ def report() -> Depend[
 > and list every line you edited.
 > Then do the same to `research_by_hand.py` and say which tool named the lines to change in each case.
 
+<details>
+<summary>Where to look</summary>
+
+[Composing a Program](../../Chapters/47_Effects--Stateless_in_Practice.md#composing-a-program) builds `research()` from `yield from` steps, and [The Success Path](../../Chapters/47_Effects--Stateless_in_Practice.md#the-success-path) writes the same pipeline with ordinary calls.
+In the Effect version, add a `@throws` function for the new check and widen the error parameter of the signature until `ty` is satisfied.
+In the by-hand version, look for the tool that reports the changes, or the lack of one.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of research_long.py
+from typing import Final
+from research import (Encyclopedia, Feed, NoArticle,
+                      NotInteresting, Unavailable, fetch,
+                      look_up, topic_of)
+from stateless import Effect, Need, need, throws
+
+class TooLong(Exception):
+    pass
+
+LIMIT: Final[int] = 100
+
+@throws(TooLong)
+def within_limit(article: str) -> str:
+    ...
+
+def research() -> Effect[
+    Need[Feed] | Need[Encyclopedia],
+    Unavailable | NotInteresting | NoArticle | TooLong,
+    str,
+]:
+    ...
+```
+
+```python
+# The shape of research_by_hand.py
+from feeds import Library, Wire
+from research import (TOPICS, Encyclopedia, Feed, NoArticle,
+                      NotInteresting, Unavailable)
+from research_long import LIMIT, TooLong
+
+def topic_of(headline: str) -> str:
+    ...
+
+def within_limit(article: str) -> str:
+    ...
+
+def research_and_report(
+    feed: Feed, book: Encyclopedia
+) -> str:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
+
 ```python
 # research_long.py
 from typing import Final
@@ -665,11 +861,39 @@ signature still says it returns a `str` no matter what.
 Both versions run. Only one of them has a tool that knows the set of failures
 changed.
 
+</details>
+</details>
+</details>
+
 ## 6. A stale wire
 
 > `scenarios.py` supplies a `DeadWire` that fails without printing anything.
 > Write a `StaleWire` whose `latest()` prints `feed: fetching` and then raises `Unavailable`.
 > Predict the trace, then say why it differs from `DeadWire`'s even though both fail the same way.
+
+<details>
+<summary>Where to look</summary>
+
+[Composing a Program](../../Chapters/47_Effects--Stateless_in_Practice.md#composing-a-program) shows `scenarios.py` supplying a `Feed` implementation to the whole pipeline.
+Write a class with a `latest()` method that calls `print()` before it raises `Unavailable`.
+Compare where in each `latest()` the failure begins, since the trace records how far the implementation got.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_6.py
+from feeds import SHELF, StaleWire
+from report import report
+from research import Encyclopedia, Feed
+from stateless import run, supply
+
+def outcome(feed: Feed, book: Encyclopedia) -> str:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_6.py
@@ -701,11 +925,45 @@ which the value `report()` returns cannot show.
 Neither run reaches `need(Encyclopedia)`, so no `library:` line prints in
 either.
 
+</details>
+</details>
+</details>
+
 ## 7. Retrying the wrong failure
 
 > Wrap `research()` in `retry()` and supply a `Time()`.
 > Explain what happens under the `WEATHER` scenario and why retrying a `NotInteresting` failure is the wrong behavior,
 > then say what an Effect system needs for you to retry only `Unavailable`.
+
+<details>
+<summary>Where to look</summary>
+
+[What Retry Cannot Judge](../../Chapters/47_Effects--Stateless_in_Practice.md#what-retry-cannot-judge) describes `retry()` applying one schedule to the whole error channel.
+Wrap `research()` with `retry()`, `catch()` the `RetryError`, and supply a `Time()` along with the feed and encyclopedia.
+Ask whether a headline that is the same on every attempt can ever produce a different result, then look at what `retry()` takes as arguments.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_7.py
+from datetime import timedelta
+from feeds import SHELF, WEATHER
+from research import Encyclopedia, Feed, research
+from stateless import catch, retry, run, supply
+from stateless.functions import RetryError
+from stateless.schedule import recurs, spaced
+from stateless.time import Time
+
+def attempt(
+    feed: Feed, book: Encyclopedia
+) -> str | RetryError:
+    # Named, so ty follows it
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_7.py
@@ -766,6 +1024,10 @@ so they leave the error channel and become values, then apply `retry()` to what
 remains. That narrowing takes more machinery than a predicate, and it changes the result
 type. Both are the cost of a missing operator.
 
+</details>
+</details>
+</details>
+
 ## 8. Processes instead of threads
 
 > Change `parallel.py` to use a `ProcessPoolExecutor` instead of a `ThreadPoolExecutor`,
@@ -775,6 +1037,16 @@ type. Both are the cost of a missing operator.
 > describes; without it the pool breaks before any work starts.
 > Then try to fork an Effect that still declares a `Need`,
 > and record what the type checker says.
+
+<details>
+<summary>Where to look</summary>
+
+[Running Effects in Parallel](../../Chapters/47_Effects--Stateless_in_Practice.md#running-effects-in-parallel) forks work onto an `Executor`.
+Swap in a `ProcessPoolExecutor`, and protect the driver with the `__main__` guard because each worker re-imports the module.
+For the `Need`, consider where the forked work runs and which handlers can reach it there.
+
+<details>
+<summary>Solution</summary>
 
 ```python
 import time
@@ -852,6 +1124,9 @@ first and fork the bound function. The type system enforces a rule about where a
 handler can answer a request, and that rule is the same guarantee running through
 both chapters, applied to a boundary between threads or processes.
 
+</details>
+</details>
+
 ## 9. A scripted wallet
 
 > `wallet.py` runs `spree()` against a `Cell`.
@@ -859,6 +1134,16 @@ both chapters, applied to a boundary between threads or processes.
 > the way `scripted` fed `Flip`.
 > Assert that `spree()` attempts every price and writes once per purchase.
 > Then say what this test cannot detect that the `Cell` version can.
+
+<details>
+<summary>Where to look</summary>
+
+[State as an Ability](../../Chapters/47_Effects--Stateless_in_Practice.md#state-as-an-ability) reads and writes the balance through `Get` and `Put` requests.
+Write one handler factory that reads from an iterator of balances and another that appends each `Put` to a list, then `handle()` both around `spree()`.
+Check the list and that the balance iterator is drained, and compare what the scripted answers share with each other.
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # test_ch47_wallet.py
@@ -949,12 +1234,60 @@ which order, with which payloads.
 The `Cell` test checks that the requests compose into correct arithmetic.
 Both are worth having, and each one's blind spot is the other's subject.
 
+</details>
+</details>
+
 ## 10. `throw()` and `@throws` side by side
 
 > `fetch_nonempty()` puts `Empty` into the channel with `throw()`.
 > Rewrite it to raise `Empty` in the body and lift it with `@throws(Empty)`,
 > and confirm the two versions type-check and behave identically.
 > Then make each version fail with an undeclared exception type and compare what the type checker reports for each.
+
+<details>
+<summary>Where to look</summary>
+
+[Failing from Inside an Effect](../../Chapters/47_Effects--Stateless_in_Practice.md#failing-from-inside-an-effect) contrasts `throw()` with `@throws` for putting `Empty` into the channel.
+Move the `raise` into an ordinary body and decorate it with `@throws(Empty)`.
+Then change each version to fail with a different exception and note which one `ty` flags, and at which line.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_10.py
+from dataclasses import dataclass
+from stateless import (Effect, Need, catch, need, run,
+                       supply, throw, throws)
+
+class Unavailable(Exception):
+    pass
+
+class Empty(Exception):
+    pass
+
+@dataclass
+class Ticker:
+    headline: str
+    def latest(self) -> str:
+        ...
+
+@throws(Unavailable)
+def fetch(feed: Ticker) -> str:
+    ...
+
+def thrown() -> Effect[
+    Need[Ticker], Unavailable | Empty, str
+]:
+    ...
+
+@throws(Empty)
+def lifted() -> Effect[Need[Ticker], Unavailable, str]:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_10.py
@@ -1034,6 +1367,10 @@ That difference decides between them. Use `throw()` for a failure the Effect
 decides on, where the type checker then verifies it. Keep `@throws` for
 ordinary code that raises exceptions, such as `latest()`.
 
+</details>
+</details>
+</details>
+
 ## 11. A fourth failure, with `catch_all()`
 
 > Exercise 5 adds a `TooLong` failure to `research()`.
@@ -1041,6 +1378,49 @@ ordinary code that raises exceptions, such as `latest()`.
 > predict what the type checker reports in `outcome()`, then confirm.
 > Remove `outcome()`'s return annotation and rerun `ty`,
 > and explain what the type checker stopped verifying.
+
+<details>
+<summary>Where to look</summary>
+
+[Catching the Whole Channel](../../Chapters/47_Effects--Stateless_in_Practice.md#catching-the-whole-channel) uses `catch_all()` to move the entire error channel into the return type.
+Widen `research()`'s failures, then read the `ty` diagnostic on `outcome()`'s return line before fixing the annotation.
+Afterward, delete the annotation and look at what `reveal_type()` reports for the function.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_11.py
+from dataclasses import dataclass
+from research import (Encyclopedia, Feed, NoArticle,
+                      NotInteresting, Unavailable)
+from research_long import TooLong, research
+from stateless import run, supply
+from stateless.effect import catch_all
+
+@dataclass
+class Bulletin:
+    headline: str
+    def latest(self) -> str:
+        ...
+
+class BareShelf:
+    def article(self, topic: str) -> str:
+        ...
+
+class LongShelf:
+    def article(self, topic: str) -> str:
+        ...
+
+def outcome(
+    feed: Feed, book: Encyclopedia
+) -> (str | Unavailable | NotInteresting | NoArticle
+      | TooLong):
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_11.py
@@ -1112,6 +1492,10 @@ That is the same reason exercise 4 of
 catch a missing `yield from`: a type checker verifies claims, and an inferred
 type is not a claim.
 
+</details>
+</details>
+</details>
+
 ## 12. A `Random` Ability
 
 > Write a `Random` Ability whose handler returns an `int` in a range carried on the request,
@@ -1121,6 +1505,47 @@ type is not a claim.
 > and once with a handler that walks a scripted sequence.
 > Then delete the `low: int` annotation from the accessor's parameter and say what changes,
 > and delete the annotation on the *handler's* parameter and say what changes.
+
+<details>
+<summary>Where to look</summary>
+
+[Abilities Are Not Special](../../Chapters/47_Effects--Stateless_in_Practice.md#abilities-are-not-special) defines an Ability as a class, an accessor that yields it, and a handler that answers it.
+Give the Ability fields for the range, and read them off the request in the handler.
+Use a closure over `random.randint()` for one run and over an iterator for the other.
+For the annotations, ask who reads each one: the type checker or `handle()`.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_12.py
+import random
+from collections.abc import Callable, Iterator
+from record import record
+from stateless import Ability, Depend, handle, run
+
+@record(slots=False)
+class Random(Ability[int]):
+    low: int
+    high: int
+
+def roll(low: int, high: int) -> Depend[Random, int]:
+    ...
+
+def game() -> Depend[Random, str]:
+    ...
+
+def real(request: Random) -> int:
+    ...
+
+def scripted_from(
+    values: Iterator[int],
+) -> Callable[[Random], int]:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_12.py
@@ -1197,6 +1622,10 @@ the accessor's is for the type checker, and the handler's is data the library
 reads at runtime. Only one of them is optional, and it is not the one that looks
 like bookkeeping.
 
+</details>
+</details>
+</details>
+
 ## Shared code: the bakery
 
 Exercise 13 extends the chapter's bakery, repeated here without its demo so the
@@ -1247,6 +1676,38 @@ def toast() -> Depend[
 > Write `buttered()`'s signature with only `Need[Butter]` first, run `ty`,
 > and read the diagnostic before fixing it.
 > Then remove `Toaster(3)` from `supply()` and say which of the two diagnostics tells you about a dependency two levels down.
+
+<details>
+<summary>Where to look</summary>
+
+[Dependencies That Need Dependencies](../../Chapters/47_Effects--Stateless_in_Practice.md#dependencies-that-need-dependencies) shows `Need[...]` unions growing as one Effect delegates to another with `yield from`.
+Write the first signature with only the new appliance and read where `ty` points.
+Then compare that diagnostic with the one `run()` reports when `supply()` leaves a requirement unanswered.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_13.py
+from kitchen import Dough, Oven, Toaster, toast
+from record import record
+from stateless import Depend, Need, need, run, supply
+
+@record
+class Butter:
+    grams: int
+    def spread(self, slice_: str) -> str:
+        ...
+
+def buttered() -> Depend[
+    Need[Dough] | Need[Oven] | Need[Toaster] | Need[Butter],
+    str
+]:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_13.py
@@ -1325,6 +1786,10 @@ under-declared signature at the delegation that breaks it. `invalid-argument-typ
 at `run()` catches an under-supplied environment at the program's edge. Neither
 one requires a comment or a docstring to say what depends on what.
 
+</details>
+</details>
+</details>
+
 ## 14. A shared signature for a cast
 
 > `play()` in `casts.py` accepts any three actors, matched or not.
@@ -1333,6 +1798,74 @@ one requires a comment or a docstring to say what depends on what.
 > and say what that recovers of the *Abstract Factory* and what it does not.
 > Then add a fourth actor to `encounter()` and count the lines you edit in `quest.py`,
 > `casts.py`, and `two_games.py`.
+
+<details>
+<summary>Where to look</summary>
+
+[Supplying a Whole Cast](../../Chapters/47_Effects--Stateless_in_Practice.md#supplying-a-whole-cast) shows `casts.py` grouping matched actors in factory functions, and [The Nine-Argument Ceiling](../../Chapters/47_Effects--Stateless_in_Practice.md#the-nine-argument-ceiling) shows the limit of passing them to `supply()` one by one.
+Give the shared signature a `type` alias over `Callable`, and have the caller take that alias.
+For the *Abstract Factory* question, ask what the type says about the actors inside each factory.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_14.py
+from collections.abc import Callable
+from typing import Protocol, runtime_checkable
+from stateless import Depend, Need, need, run, supply
+
+@runtime_checkable
+class Narrator(Protocol):
+    def say(self, line: str) -> None: ...
+
+@runtime_checkable
+class Hero(Protocol):
+    def name(self) -> str: ...
+
+@runtime_checkable
+class Obstacle(Protocol):
+    def blocks(self) -> str: ...
+
+def encounter() -> Depend[
+    Need[Narrator] | Need[Hero] | Need[Obstacle], None
+]:
+    ...
+
+class Kitty:
+    def name(self) -> str: ...
+
+class Puzzle:
+    def blocks(self) -> str: ...
+
+class Warrior:
+    def name(self) -> str: ...
+
+class Weapon:
+    def blocks(self) -> str: ...
+
+class Loud:
+    def say(self, line: str) -> None: ...
+
+def play(
+    narrator: Narrator, hero: Hero, obstacle: Obstacle
+) -> None:
+    ...
+
+def kitties(narrator: Narrator) -> None:
+    ...
+
+def warriors(narrator: Narrator) -> None:
+    ...
+
+type Cast = Callable[[Narrator], None]
+
+def run_season(casts: list[Cast]) -> None:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 The two factories in `casts.py` already have the same signature. The exercise
 is to name it and see what naming it gains. Here is the chapter's cast, with
@@ -1441,3 +1974,7 @@ whole cast absorb the change, and the code that only stages a scene does not
 change. The same distribution is why the chapter uses a factory function rather than more
 `supply()` arguments: `supply()` tops out at nine overloads, and a wide cast is
 what a positional interface handles worst.
+
+</details>
+</details>
+</details>

@@ -6,6 +6,28 @@
 > create a second `Messenger` with different keyword arguments and confirm the two instances do not share attributes
 > (unlike a [class attribute](../../Chapters/09_Foundations--Class_Attributes.md)).
 
+<details>
+<summary>Where to look</summary>
+
+[A Hand-Rolled Messenger](../../Chapters/22_Patterns--Data_Transfer_Objects.md#a-hand-rolled-messenger) shows `__init__()` assigning the keyword arguments to `self.__dict__`.
+Build two instances with different keywords, then compare what `hasattr()` reports for each name on each instance.
+The question to answer is where each instance keeps its dictionary.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_1.py
+from typing import Any
+
+class Messenger:
+    def __init__(self, **kwargs: Any) -> None:
+        ...
+```
+
+<details>
+<summary>Solution</summary>
+
 ```python
 # exercise_1.py
 from typing import Any
@@ -31,11 +53,25 @@ from [Class Attributes](../../Chapters/09_Foundations--Class_Attributes.md) work
 one object shared by every instance until something shadows it. `m1`
 and `m2` share nothing: `m1` has no `name`, and `m2` has no `info`.
 
+</details>
+</details>
+</details>
+
 ## 2. A third field on `Point`
 
 > In `point_dataclass.py`, add a third field, `z: float`,
 > to the `Point` data class,
 > and update the `Point(...)` call to pass three arguments.
+
+<details>
+<summary>Where to look</summary>
+
+[`@dataclass`](../../Chapters/22_Patterns--Data_Transfer_Objects.md#dataclass) shows that the decorator builds the methods from the annotated fields in the class body.
+Declare the new field with an annotation like the other two.
+Then check how `repr()` and `==` change without any further edits.
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_2.py
@@ -61,11 +97,24 @@ generates `__init__()`, `__repr__()`, and `__eq__()` to match. Adding
 `repr()` to three fields, and the equality comparison to three values,
 with no other code to update.
 
+</details>
+</details>
+
 ## 3. A `NamedTuple` holding a list
 
 > Add a `NamedTuple` called `Recipe` with fields `name: str` and `steps: list[str]` to `color_namedtuple.py`.
 > Mutate the `steps` list of an instance and print the record.
 > Then try to use the record as a `dict` key and explain the result.
+
+<details>
+<summary>Where to look</summary>
+
+[A `NamedTuple` Is Still a Tuple](../../Chapters/22_Patterns--Data_Transfer_Objects.md#a-namedtuple-is-still-a-tuple) shows that a `NamedTuple` inherits its behavior from `tuple`, including how it hashes.
+Call a mutating method on the `list` field, which assigns nothing to the record.
+For the `dict` key, ask what hashing a tuple does with each of its elements.
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_3.py
@@ -107,6 +156,9 @@ both at once: the contents stop being editable and the record becomes
 hashable. One declaration fixing both is the clue that they were
 never two problems.
 
+</details>
+</details>
+
 ## 4. A fourth attribute, by keyword and by assignment
 
 > In `display_namespace.py`,
@@ -114,6 +166,16 @@ never two problems.
 > then add it by assignment after the existing `m.more = 11` instead.
 > Confirm `vars(m)` reports the same four attributes either way,
 > and note whether they come out in the same order.
+
+<details>
+<summary>Where to look</summary>
+
+[`SimpleNamespace`](../../Chapters/22_Patterns--Data_Transfer_Objects.md#simplenamespace) shows `vars()` reading the instance's `__dict__`.
+Build one namespace with the extra keyword and another by assigning it afterward, then compare `list(vars(m))` for both.
+A `dict` remembers the order in which its keys were inserted, so consider when each version inserts the new name.
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_4.py
@@ -148,6 +210,9 @@ insert `note` at different moments. The constructor adds it to
 In `assigned` the assignment to `note` follows `assigned.more = 11`,
 so `note` comes last.
 
+</details>
+</details>
+
 ## 5. Returning a bare `tuple[float, int]`
 
 > In `fetch_stats.py`,
@@ -155,6 +220,25 @@ so `note` comes last.
 > and repair the one line that stops working.
 > What do the call sites lose,
 > and which mistakes does the type checker still catch?
+
+<details>
+<summary>Where to look</summary>
+
+[Returning Multiple Values](../../Chapters/22_Patterns--Data_Transfer_Objects.md#returning-multiple-values) compares a bare tuple with a named record as a return type.
+The broken line reads attributes that a plain tuple lacks, so index it instead.
+To see what the type checker still catches, try unpacking into the wrong number of names, then swap two names that have different types or the same type.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_5.py
+def summarize(data: list[float]) -> tuple[float, int]:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_5.py
@@ -204,12 +288,26 @@ not a `Stats`.
 Position is something the type checker can verify and a reader cannot.
 A name is something both can.
 
+</details>
+</details>
+</details>
+
 ## 6. Structural equality across three-field types
 
 > In `still_a_tuple.py`, add `class Point3(NamedTuple)` with fields `x`, `y`,
 > `z`.
 > Predict `Color(1, 2, 3) == Point3(1, 2, 3)` before running it,
 > then predict `FrozenColor(1, 2, 3) == (1, 2, 3)` and check that too.
+
+<details>
+<summary>Where to look</summary>
+
+[A `NamedTuple` Is Still a Tuple](../../Chapters/22_Patterns--Data_Transfer_Objects.md#a-namedtuple-is-still-a-tuple) explains that `NamedTuple` equality is `tuple` equality.
+Compare two `NamedTuple` classes with the same values, then a frozen data class with a tuple.
+For the second case, consider which class's `__eq__()` runs first and what it returns for an operand of another type.
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_6.py
@@ -262,6 +360,9 @@ data class is a distinct type, so it refuses those comparisons and
 catches the mismatch instead. Which one is right depends on whether
 you want your three numbers to travel as data or to mean something.
 
+</details>
+</details>
+
 ## 7. Choosing a type for three scenarios
 
 > For each scenario, name the type from "Which Should You Use?" that fits,
@@ -269,6 +370,16 @@ you want your three numbers to travel as data or to mean something.
 > a configuration bag whose keys arrive at runtime and are not known in advance;
 > a 2D grid coordinate that must work as a `dict` key;
 > a record decoded from a JSON API response whose fields you also validate.
+
+<details>
+<summary>Where to look</summary>
+
+[Which Should You Use?](../../Chapters/22_Patterns--Data_Transfer_Objects.md#which-should-you-use) lists what each type offers and what it costs.
+For each scenario, find the one requirement that rules out the others: keys unknown in advance, a hashable value, or code that checks fields on construction.
+Consider also what `json.dumps()` does with each type.
+
+<details>
+<summary>Solution</summary>
 
 **The configuration bag is a `SimpleNamespace`.** Its keys arrive at
 runtime, so no fixed set of fields exists to declare. A `@dataclass`
@@ -297,3 +408,6 @@ makes `__post_init__()` the method that rejects a value the JSON
 decoder otherwise accepts unchecked. A `TypedDict` matches the shape
 JSON arrives in and names the keys for the type checker, but it is a
 dict at runtime and runs no code, so it cannot validate.
+
+</details>
+</details>

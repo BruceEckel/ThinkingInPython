@@ -8,6 +8,62 @@
 > In `frozen_sketch.py` it returns a new `Drawing`.
 > Write tests proving existing mementos and histories stay unchanged in each version.
 
+<details>
+<summary>Where to look</summary>
+
+[The Classic Memento](../../Chapters/36_Patterns--Memento.md#the-classic-memento) shows `save()` copying the strokes into an immutable `Memento`, and [Immutability](../../Chapters/36_Patterns--Memento.md#immutability) shows a `Drawing` that returns a new state.
+In the mutable sketch, `erase()` pops from the list like `draw()` appends to it.
+In the frozen one, build the new `Drawing` with `replace()` and a sliced tuple.
+Test each by saving first, erasing, then checking the earlier state still holds both strokes.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_1_mutable.py
+from record import record
+
+@record
+class Memento:
+    strokes: tuple[str, ...]
+
+class Sketch:
+    def __init__(self) -> None:
+        ...
+
+    def draw(self, stroke: str) -> None:
+        ...
+
+    def erase(self) -> None:
+        ...
+
+    def save(self) -> Memento:
+        ...
+
+    def restore(self, memento: Memento) -> None:
+        ...
+```
+
+```python
+# The shape of exercise_1_frozen.py
+from dataclasses import replace
+from record import record
+
+@record
+class Drawing:
+    title: str
+    strokes: tuple[str, ...] = ()
+
+    def draw(self, stroke: str) -> Drawing:
+        ...
+
+    def erase(self) -> Drawing:
+        ...
+```
+
+<details>
+<summary>Solution</summary>
+
 ```python
 # exercise_1_mutable.py
 from record import record
@@ -178,11 +234,44 @@ The history test confirms that safety: after `do(before.erase())`,
 the stored past state `is` the original object, still carrying both
 strokes.
 
+</details>
+</details>
+</details>
+
 ## 2. A bounded `History`
 
 > Give `History` a maximum depth.
 > When the past grows beyond `n` states, discard the oldest.
 > What should `can_undo()` report then?
+
+<details>
+<summary>Where to look</summary>
+
+[The Caretaker: a Generic History](../../Chapters/36_Patterns--Memento.md#the-caretaker-a-generic-history) keeps the past as a list that `do()` appends to.
+After the append, check the length against a `max_depth` and drop the oldest entry with `pop(0)`.
+For `can_undo()`, ask what the list holds now, not what the program once pushed.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_2.py
+class History[S]:
+    def __init__(self, initial: S, max_depth: int) -> None:
+        ...
+
+    def do(self, new_state: S) -> None:
+        ...
+
+    def undo(self) -> S:
+        ...
+
+    def can_undo(self) -> bool:
+        ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_2.py
@@ -230,11 +319,44 @@ the bound discarded. Once the bound discards state `0`, nothing can
 bring it back, and `can_undo()` reporting `False` there is the
 correct answer, not a bug.
 
+</details>
+</details>
+</details>
+
 ## 3. Serializing a `Drawing` to JSON
 
 > Serialize a `Drawing` to JSON using `dataclasses.asdict()` and reconstruct it.
 > What did the round trip change that `pickle` preserved,
 > and where must your reconstruction compensate?
+
+<details>
+<summary>Where to look</summary>
+
+[Mementos That Outlive the Process](../../Chapters/36_Patterns--Memento.md#mementos-that-outlive-the-process) uses `pickle`, which keeps Python types intact.
+JSON has a smaller set of types, so print the type of `strokes` after `json.loads()`.
+Rebuild the `Drawing` from the loaded dictionary, converting that one field back to the type the record declares.
+Compare the result with the original using `==`.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_3.py
+import json
+from dataclasses import asdict, replace
+from record import record
+
+@record
+class Drawing:
+    title: str
+    strokes: tuple[str, ...] = ()
+
+    def draw(self, stroke: str) -> Drawing:
+        ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_3.py
@@ -278,6 +400,10 @@ equals a `tuple`, and the `list` costs the `Drawing` the hashability a
 record otherwise supplies (`hash()` raises a `TypeError`,
 `unhashable type: 'list'`).
 
+</details>
+</details>
+</details>
+
 ## 4. `Memento` holding the list itself
 
 > Change `sketch.py` so `Memento` holds the list itself instead of a tuple copy,
@@ -285,6 +411,17 @@ record otherwise supplies (`hash()` raises a `TypeError`,
 > leaving the sketch and the memento sharing one list in both directions.
 > Then write the test that exposes the corruption.
 > Which of the three tests in `test_sketch.py` catches it first?
+
+<details>
+<summary>Where to look</summary>
+
+[A Snapshot Is Not a Reference](../../Chapters/36_Patterns--Memento.md#a-snapshot-is-not-a-reference) shows what happens when two names share one list.
+Change `Memento` and `restore()` so the sketch and the memento hold the same list object.
+Run the existing tests with `pytest` and read the order of the failures.
+Then write a test that draws after `save()` and compares the memento's contents as a list, so only sharing can fail it.
+
+<details>
+<summary>Solution</summary>
 
 ```python
 @record
@@ -343,11 +480,53 @@ Against the shared-list version, `checkpoint.strokes` is `["a", "b"]`
 when the assertion runs, because `draw("b")` appended to the one list
 `sketch` and `checkpoint` share.
 
+</details>
+</details>
+
 ## 5. `goto(steps_back)`
 
 > Add `goto(steps_back)` to `History`:
 > jump the present several states into the past in one call,
 > keeping redo consistent.
+
+<details>
+<summary>Where to look</summary>
+
+In [The Caretaker: a Generic History](../../Chapters/36_Patterns--Memento.md#the-caretaker-a-generic-history), `undo()` already moves the present into the future list, which is what makes redo work.
+Build `goto()` on top of `undo()` in a loop.
+Check the distance against the length of the past before the first step, so a bad request changes nothing.
+Raise an `IndexError` for a distance out of range.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_5.py
+from exceptions import expect
+
+class History[S]:
+    def __init__(self, initial: S) -> None:
+        ...
+
+    @property
+    def present(self) -> S:
+        ...
+
+    def do(self, new_state: S) -> None:
+        ...
+
+    def undo(self) -> S:
+        ...
+
+    def redo(self) -> S:
+        ...
+
+    def goto(self, steps_back: int) -> S:
+        ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_5.py
@@ -413,11 +592,62 @@ raises an `IndexError` partway, after moving some states to
 a jump that raises an `IndexError` leaves the history where it was,
 as the chapter's `undo()` does.
 
+</details>
+</details>
+</details>
+
 ## 6. Restoring one named field
 
 > A `History` of `Drawing` states records a rename and three strokes.
 > Write `restore_field(history, name, past)` that pushes a new state taking one named field from `past` and the rest from `history.present`.
 > Why must it go through `do()` rather than editing `_past` directly?
+
+<details>
+<summary>Where to look</summary>
+
+[Restoring Part of a State](../../Chapters/36_Patterns--Memento.md#restoring-part-of-a-state) builds a new state from the present and one field of a past state.
+Generalize it with `getattr()` to read the named field from `past`, and pass it to `copy.replace()` as the only change.
+Push the result with `do()`, then call `undo()` to see that the restore is one step on the timeline.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_6.py
+import copy
+from dataclasses import replace
+from record import record
+
+@record
+class Drawing:
+    title: str
+    strokes: tuple[str, ...] = ()
+
+    def draw(self, stroke: str) -> Drawing:
+        ...
+
+class History[S]:
+    def __init__(self, initial: S) -> None:
+        ...
+
+    @property
+    def present(self) -> S:
+        ...
+
+    def do(self, new_state: S) -> None:
+        ...
+
+    def undo(self) -> S:
+        ...
+
+def restore_field(
+    history: History[Drawing], name: str, past: Drawing
+) -> None:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_6.py
@@ -500,6 +730,10 @@ clears `_future`, so a `_past` edited behind the caretaker's back
 leaves a redo stack pointing at states the history can no longer
 reach.
 
+</details>
+</details>
+</details>
+
 ## 7. What pickle skips on load
 
 > Save two `Drawing`s with `pickle`, one of them with an empty title,
@@ -508,6 +742,38 @@ reach.
 > Now add a `__post_init__()` that rejects an empty title,
 > and load the blank one again.
 > What did pickle skip, and what does `copy.replace()` catch?
+
+<details>
+<summary>Where to look</summary>
+
+[A Class That Changes After the Save](../../Chapters/36_Patterns--Memento.md#a-class-that-changes-after-the-save) shows `pickle` loading old bytes into a changed class, and [A Deleted Field Leaves a Ghost](../../Chapters/36_Patterns--Memento.md#a-deleted-field-leaves-a-ghost) shows what `pickle` writes into the instance.
+Point the old class name at the new class, load the bytes, and look in the instance's `__dict__` for the new field.
+Then ask which methods `pickle.loads()` calls, and compare with `copy.replace()`, which constructs a real instance.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_7.py
+import copy
+import pickle
+import drawing_v1
+from drawing_v1 import Drawing
+from exceptions import expect
+from record import record
+
+@record(slots=False)
+class DrawingV2:
+    title: str
+    strokes: tuple[str, ...] = ()
+    layer: int = 1
+
+    def __post_init__(self) -> None:
+        ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # drawing_v1.py
@@ -578,3 +844,7 @@ invalid state the moment anything derives a new state from it. That is
 the general shape: a constructor validates the value that enters your
 program through it, while a deserializer hands the value straight in.
 `msgspec` and `pydantic` exist to close that gap.
+
+</details>
+</details>
+</details>

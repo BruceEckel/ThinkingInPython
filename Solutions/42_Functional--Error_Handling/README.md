@@ -8,6 +8,39 @@
 > so an `Err` from it has a later step to skip,
 > and confirm that the step never runs.
 
+<details>
+<summary>Where to look</summary>
+
+[Composing With bind](../../Chapters/42_Functional--Error_Handling.md#composing-with-bind) chains steps so that an `Err` skips every step after it.
+Write `func_d()` with the same `Result[int, str]` signature, and add one more `.bind()` before the last step.
+To see that the skipped step never runs, give it a side effect such as a `print()`.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_1.py
+from result import Err, Ok, Result
+
+def func_a(i: int) -> Result[int, str]:
+    ...
+
+def func_b(i: int) -> Result[int, str]:
+    ...
+
+def func_c(i: int) -> Result[int, str]:
+    ...
+
+def func_d(i: int) -> Result[int, str]:
+    ...
+
+def composed(i: int) -> Result[int, str]:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
+
 ```python
 # exercise_1.py
 from result import Err, Ok, Result
@@ -64,12 +97,74 @@ at a different step. A chain short-circuits at its first failure,
 wherever that falls, and the order of the steps decides where the
 chain stops.
 
+</details>
+</details>
+</details>
+
 ## 2. `Err.map_error()`
 
 > Give `Err` a `map_error()` method that transforms the error it holds,
 > leaving an `Ok` untouched
 > (for chains to keep working, `Ok` needs its own `map_error()` that returns `self`).
 > Use it to add a prefix to every error.
+
+<details>
+<summary>Where to look</summary>
+
+[A Result Type](../../Chapters/42_Functional--Error_Handling.md#a-result-type) defines `Ok` and `Err` with a `bind()` on each, and `map_error()` is the mirror image of that split.
+`Err` applies the function to its error and wraps the return value in a new `Err`.
+`Ok` returns `self`, so a chain can call `map_error()` without checking which side it holds.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_2.py
+from collections.abc import Callable
+from typing import final
+from record import record
+
+@final
+@record
+class Ok[A]:
+    answer: A
+
+    def unwrap(self) -> A:
+        ...
+
+    def bind[B, E](
+        self, func: Callable[[A], Result[B, E]]
+    ) -> Result[B, E]:
+        ...
+
+    def map_error(
+        self, func: Callable[..., object]
+    ) -> Ok[A]:
+        ...
+
+@final
+@record
+class Err[E]:
+    error: E
+
+    def bind[B, F](
+        self, func: Callable[..., Result[B, F]]
+    ) -> Err[E]:
+        ...
+
+    def map_error[F](
+        self, func: Callable[[E], F]
+    ) -> Err[F]:
+        ...
+
+type Result[A, E] = Ok[A] | Err[E]
+
+def prefix(msg: str) -> str:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_2.py
@@ -136,11 +231,25 @@ wraps `func`'s return value in a new `Err`. Adding a prefix to every error in a 
 report the error, rather than threading the prefix through every
 function that might produce one.
 
+</details>
+</details>
+</details>
+
 ## 3. `combined()` that collects every failure
 
 > Rewrite `combined()` so it collects all the failures instead of stopping at the first one,
 > returning `Result[str, list[str]]`.
 > Write the tests first.
+
+<details>
+<summary>Where to look</summary>
+
+[Combining Multiple Results](../../Chapters/42_Functional--Error_Handling.md#combining-multiple-results) stops at the first `Err` because each step depends on the one before.
+Here the three calls are independent, so call all of them first and keep the results.
+Gather the `.error` of each `Err` into a list, return `Err(errors)` when the list is not empty, and write the three tests before the function.
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # test_ch42_combined.py
@@ -213,12 +322,50 @@ success to `Ok[int]` so `.answer` is an `int`. The asserts document
 what the `if errors:` return has already established, since a checker
 cannot see that an empty error list means all three succeeded.
 
+</details>
+</details>
+
 ## 4. `@safe(ValueError)`, catching only what you name
 
 > Change `@safe` so it takes the exception types it should catch,
 > as in `@safe(ValueError)`, and lets anything else propagate.
 > Show that a `TypeError` raised inside the wrapped function now propagates,
 > and `@safe` no longer returns it as an `Err`.
+
+<details>
+<summary>Where to look</summary>
+
+[Turning Exceptions into Results](../../Chapters/42_Functional--Error_Handling.md#turning-exceptions-into-results) shows `@safe` as a decorator that catches every exception.
+To take arguments, `safe()` becomes a function that receives the exception types and returns the decorator.
+An `except` clause accepts a tuple of exception types, so the wrapper changes very little.
+A `Protocol` with a generic `__call__` keeps the decorated function's signature precise.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_4.py
+from collections.abc import Callable
+from functools import wraps
+from typing import Protocol
+from exceptions import expect
+from result import Err, Ok, Result
+
+class SafeDecorator(Protocol):
+    def __call__[**P, A](
+        self, func: Callable[P, A]
+    ) -> Callable[P, Result[A, Exception]]: ...
+
+def safe(*catch: type[Exception]) -> SafeDecorator:
+    ...
+
+@safe(ValueError)
+def parse(text: str) -> int:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_4.py
@@ -281,12 +428,42 @@ to `safe()`. A protocol with a generic `__call__` does say it, so
 `parse` keeps the signature
 `(str) -> Result[int, Exception]` rather than degrading to `Any`.
 
+</details>
+</details>
+</details>
+
 ## 5. Notes that survive as data
 
 > Write `load_setting(name, text)` that returns `Result[int, Exception]` and attaches a note naming the setting.
 > Chain two of them with `bind()` and print the notes from whichever one failed.
 > Does the successful call carry a note?
 > Why or why not?
+
+<details>
+<summary>Where to look</summary>
+
+[Attaching Context to an Exception](../../Chapters/42_Functional--Error_Handling.md#attaching-context-to-an-exception) shows `add_note()` and the `__notes__` list it fills.
+Call `add_note()` in the `except` clause before wrapping the exception in an `Err`.
+A `match` on the `Result` reads the notes back from the error.
+To answer the question, look at which code path reaches `add_note()`.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_5.py
+from result import Err, Ok, Result
+
+def load_setting(name: str,
+                 text: str) -> Result[int, Exception]:
+    ...
+
+def report(result: Result[int, Exception]) -> None:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_5.py
@@ -343,12 +520,44 @@ and the lambda discards the answer. The do-notation mentioned
 in [The returns Library](../../Chapters/42_Functional--Error_Handling.md#the-returns-library)
 reads better here.
 
+</details>
+</details>
+</details>
+
 ## 6. `int | None` collapses the three failures into one
 
 > Rewrite `func_a()`, `func_b()`,
 > and `func_c()` to return `int | None` instead of `Result[int, str]`,
 > and adjust `composing.py` to match.
 > What can the caller still tell about which of the three steps failed?
+
+<details>
+<summary>Where to look</summary>
+
+[Which Failures Get a Result](../../Chapters/42_Functional--Error_Handling.md#which-failures-get-a-result) compares `None` with `Result`, and [Composing by Hand](../../Chapters/42_Functional--Error_Handling.md#composing-by-hand) has the chain to adapt.
+Return `None` where each function returned an `Err`, and replace each `isinstance` test with `is None`.
+Then compare the outputs for inputs `1`, `2`, and `3` with the `Result` version.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_6.py
+def func_a(i: int) -> int | None:
+    ...
+
+def func_b(i: int) -> int | None:
+    ...
+
+def func_c(i: int) -> int | None:
+    ...
+
+def composed(i: int) -> int | None:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_6.py
@@ -401,3 +610,7 @@ failure. The chapter weighs `None` against `Result`. Use `| None` when absence
 needs no explanation. Use a `Result` when the caller may need to act on
 which failure occurred, or when a person reading a bug report needs
 to know which of three steps went wrong.
+
+</details>
+</details>
+</details>

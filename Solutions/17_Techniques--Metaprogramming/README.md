@@ -5,6 +5,47 @@
 > In `init_subclass.py`, add a class `Yellow(Color)` and then `Gold(Yellow)`.
 > Predict `Color.registry` after each new class, then confirm.
 
+<details>
+<summary>Where to look</summary>
+
+[Self-Registration of Subclasses](../../Chapters/17_Techniques--Metaprogramming.md#self-registration-of-subclasses) shows `__init_subclass__()` running once for every new subclass.
+Trace what the hook adds and what it removes for `Yellow`, then for `Gold`.
+Write your predicted sets down before you run the listing.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_1.py
+from typing import ClassVar
+
+class Color:
+    registry: ClassVar[set[type[Color]]] = set()
+
+    def __init_subclass__(cls, **kwargs: object) -> None:
+        ...
+
+class Blue(Color):
+    pass
+class Red(Color):
+    pass
+class Green(Color):
+    pass
+class PhthaloBlue(Blue):
+    pass
+class CeruleanBlue(Blue):
+    pass
+
+class Yellow(Color):
+    pass
+
+class Gold(Yellow):
+    pass
+```
+
+<details>
+<summary>Solution</summary>
+
 ```python
 # exercise_1.py
 from typing import ClassVar
@@ -47,10 +88,48 @@ same pruning `PhthaloBlue` and `CeruleanBlue` do to `Blue` earlier.
 generation adds itself and prunes its parent automatically, with no
 edit to `Color`.
 
+</details>
+</details>
+</details>
+
 ## 2. A third `Field` descriptor
 
 > In `set_name.py`, add a third `Field()` attribute, `z`, to `Point`,
 > set `p.z = 9`, and confirm `p.__dict__` now also holds `_z`.
+
+<details>
+<summary>Where to look</summary>
+
+[A Descriptor That Learns Its Name](../../Chapters/17_Techniques--Metaprogramming.md#a-descriptor-that-learns-its-name) shows `__set_name__()` receiving the attribute name when the class is created.
+The hook runs once per descriptor instance, so a third attribute needs a third `Field()` and no new code.
+Compare `p.__dict__` with the attribute names on `Point`.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_2.py
+from typing import Any
+
+class Field:
+    def __set_name__(self, owner: type, name: str) -> None:
+        ...
+
+    def __get__(self, obj: Any,
+                owner: type | None = None) -> Any:
+        ...
+
+    def __set__(self, obj: Any, value: Any) -> None:
+        ...
+
+class Point:
+    x = Field()
+    y = Field()
+    z = Field()
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_2.py
@@ -91,11 +170,45 @@ Python calls it separately for each of `x`, `y`, and `z`, passing each
 one its own attribute name, so `z`'s `Field` instance learns the name
 `"z"` and stores under `"_z"`, independently of the other two.
 
+</details>
+</details>
+</details>
+
 ## 3. A third independent singleton class
 
 > In `singleton.py`, add a third class `CSingleton(metaclass=Singleton)` and confirm `c1 = CSingleton(); c2 = CSingleton(); c1 is c2` is `True`,
 > while `c1 is a` (comparing across the different singleton classes)
 > is `False`.
+
+<details>
+<summary>Where to look</summary>
+
+[Intercepting Instance Creation](../../Chapters/17_Techniques--Metaprogramming.md#intercepting-instance-creation) shows a metaclass `__call__()` that caches one instance per class.
+The cache is a dictionary keyed by the class, so each class that uses the metaclass gets its own entry.
+Add `CSingleton` with the same `metaclass=` argument and compare identities with `is`.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_3.py
+from typing import Any, ClassVar
+
+class Singleton(type):
+    _instances: ClassVar[dict[type, Any]] = {}
+
+    def __call__[T](
+            cls: type[T], *args: Any, **kwargs: Any) -> T:
+        ...
+
+class ASingleton(metaclass=Singleton):
+    pass
+class CSingleton(metaclass=Singleton):
+    pass
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_3.py
@@ -143,12 +256,51 @@ that annotation. `cls: type[T]` hides the fact that `cls` is a
 the body reads the cache through the class name,
 `Singleton._instances`, rather than through `cls`.
 
+</details>
+</details>
+</details>
+
 ## 4. Declaring finality with a keyword in the class header
 
 > Extend `final_runtime.py` so a class declares itself final with a keyword in its header,
 > `class B(A, final=True):`,
 > using the `**kwargs` that `__init_subclass__()` receives.
 > Confirm that a non-final sibling of `B` still subclasses freely.
+
+<details>
+<summary>Where to look</summary>
+
+[Making a Class Final](../../Chapters/17_Techniques--Metaprogramming.md#making-a-class-final) shows `__init_subclass__()` refusing a subclass at runtime.
+Keyword arguments in a class header are passed to `__init_subclass__()`, so give the hook a `final` parameter with a default.
+Record each final class in a set on the base, and check `cls.__mro__` when a new subclass appears.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_4.py
+from typing import ClassVar
+from exceptions import expected
+
+class A:
+    _final: ClassVar[set[type]] = set()
+
+    def __init_subclass__(cls, final: bool = False,
+                          **kwargs: object) -> None:
+        ...
+
+class B(A, final=True):
+    pass
+
+class Open(A):  # A sibling that says nothing
+    pass
+
+class Sub(Open):
+    pass
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_4.py
@@ -202,6 +354,10 @@ the hierarchy still subclasses freely: the hook raises a `TypeError`
 only for a class whose `__mro__` holds one of the classes in
 `A._final`.
 
+</details>
+</details>
+</details>
+
 ## 5. A small `inspect`-based `describe()` helper
 
 > Using `inspect_tour.py` as a model,
@@ -209,6 +365,32 @@ only for a class whose `__mro__` holds one of the classes in
 > its `inspect.signature()`, and its docstring
 > (or `"(no docstring)"` if `inspect.getdoc()` returns `None`),
 > then call it on `greet` and on a lambda.
+
+<details>
+<summary>Where to look</summary>
+
+[The Core Functions](../../Chapters/17_Techniques--Metaprogramming.md#the-core-functions) lists the `inspect` calls for signatures and docstrings.
+Call `inspect.signature()` and `inspect.getdoc()` on the function, and print the function's `__name__`.
+Since `getdoc()` returns `None` for a missing docstring, supply the fallback text with `or`.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_5.py
+import inspect
+from types import FunctionType
+
+def greet(name: str, loud: bool = False) -> str:
+    "Return a greeting."
+    ...
+
+def describe(func: FunctionType) -> None:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_5.py
@@ -240,11 +422,25 @@ printing `None`. A `lambda` always has a name, `"<lambda>"`, so
 `func.__name__` works uniformly on both a `def`-based function and a
 `lambda`, with no special case needed to tell them apart.
 
+</details>
+</details>
+</details>
+
 ## 6. The static diagnostic beside the runtime `TypeError`
 
 > Delete the `# type: ignore` comment from `metaclass_layout_conflict.py` and run `ty` over the file.
 > Compare the `instance-layout-conflict` diagnostic it reports with the `TypeError` the program prints:
 > the static report and the runtime failure describe the same collision.
+
+<details>
+<summary>Where to look</summary>
+
+[Multiple Inheritance and Metaclasses](../../Chapters/17_Techniques--Metaprogramming.md#multiple-inheritance-and-metaclasses) introduces the instance layout conflict in `metaclass_layout_conflict.py`.
+Remove the `# type: ignore` comment and run `uv run ty check` on the file.
+Read both the summary line and the `info` block of the diagnostic, and compare them with the message the `TypeError` carries.
+
+<details>
+<summary>Solution</summary>
 
 Removing the `# type: ignore` from `metaclass_layout_conflict.py` leaves
 the class header unsuppressed, inside the `with expected(TypeError):` the
@@ -302,12 +498,36 @@ chapter's `metaclass_layout_conflict.py` carries the `# type: ignore`
 because that listing exists to show the `TypeError`, and a suppressed
 diagnostic is the cost of demonstrating a crash on purpose.
 
+</details>
+</details>
+
 ## 7. Building a `float` subclass with `type()`
 
 > Using `type()` directly, build a class `Celsius` with a base of `float`,
 > an attribute `unit = "C"`,
 > and a method `describe(self)` returning `f"{self} degrees {self.unit}"`.
 > Confirm `Celsius(21.5).describe()` works and that `type(Celsius)` is `type`.
+
+<details>
+<summary>Where to look</summary>
+
+[Generating Classes with `type()`](../../Chapters/17_Techniques--Metaprogramming.md#generating-classes-with-type) shows the three-argument form of `type()`: a name, a tuple of bases, and a namespace dictionary.
+Define `describe()` as an ordinary function, then put it in the dictionary beside `unit`.
+Because a function is a descriptor, the lookup on an instance binds it as a method.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_7.py
+from typing import Any
+
+def describe(self: Any) -> str:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_7.py
@@ -347,11 +567,45 @@ know that this loose function ends up on a class carrying a `unit`
 attribute. The `Any` annotation is the cost of building a class from data
 rather than from a `class` statement.
 
+</details>
+</details>
+</details>
+
 ## 8. Moving `bases += (Tag,)` into `__init__()`
 
 > In `new_vs_init.py`,
 > move the `bases += (Tag,)` line from `__new__()` into `__init__()` and predict what happens before running it.
 > Explain the result in terms of when the class object comes into existence.
+
+<details>
+<summary>Where to look</summary>
+
+[`__init__()` versus `__new__()` in a Metaclass](../../Chapters/17_Techniques--Metaprogramming.md#init__-versus-__new__-in-a-metaclass) contrasts what each method can still change.
+Ask whether the class object exists yet when the metaclass `__init__()` begins.
+Then consider what `bases += (Tag,)` does to a parameter, and print `Demo.__bases__` to check your prediction.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_8.py
+from typing import Any
+
+class Tag:
+    pass
+
+class Meta(type):
+    def __init__(cls, name: str, bases: tuple[type, ...],
+                 nmspc: dict[str, Any]) -> None:
+        # Rebinds a local name, nothing else
+        ...
+
+class Demo(metaclass=Meta):
+    pass
+```
+
+<details>
+<summary>Solution</summary>
 
 The prediction: nothing happens. `Tag` stays out of `Demo.__bases__`,
 and Python raises no error.
@@ -394,6 +648,10 @@ arguments.
 builds it from. `__init__()` can only modify the class object that already
 exists, which is why `setattr(cls, ...)` still works there.
 
+</details>
+</details>
+</details>
+
 ## 9. Removing the `KNOWN_COMMANDS` check
 
 > `commander.py` validates `class_name` against `KNOWN_COMMANDS` before splicing it into source text.
@@ -404,6 +662,40 @@ exists, which is why `setattr(cls, ...)` still works there.
 > so a bare newline ends the payload as an unterminated string;
 > the payload's last line must close or swallow that second splice.
 > Restore the check.
+
+<details>
+<summary>Where to look</summary>
+
+[The Injection Risk](../../Chapters/17_Techniques--Metaprogramming.md#the-injection-risk) explains why `exec()` on text built from a caller's string is dangerous.
+`make_class()` inserts the name into the source twice, so build a payload that stays valid Python at both places.
+Open a triple-quoted string in the payload's last line so it absorbs the second insertion, and catch the `KeyError` the final lookup raises.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of ch17_exec_injection.py
+from collections.abc import Callable
+from dataclasses import dataclass
+from typing import Any, cast
+
+@dataclass
+class Command:
+    label: str
+
+    def run(self) -> str:
+        ...
+
+    @classmethod
+    def make_class(
+        cls, class_name: str
+    ) -> Callable[[], Command]:
+        # The KNOWN_COMMANDS check has been removed:
+        ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # ch17_exec_injection.py
@@ -471,6 +763,10 @@ Restoring the `if class_name not in cls.KNOWN_COMMANDS` check closes
 the hole at the only point that works: before `make_class()` builds
 the string.
 
+</details>
+</details>
+</details>
+
 ## 10. Keeping the first definition instead of raising an exception
 
 > Change `prepare_namespace.py`'s `NoDuplicates` so that instead of raising an exception,
@@ -478,6 +774,40 @@ the string.
 > Give the two `on_open` bodies different `print()` calls so you can tell them apart,
 > then confirm that `Handlers().on_open()` runs the first one.
 > Explain why no class decorator could achieve the same thing.
+
+<details>
+<summary>Where to look</summary>
+
+[When You Still Need a Metaclass](../../Chapters/17_Techniques--Metaprogramming.md#when-you-still-need-a-metaclass) shows `__prepare__()` supplying the mapping that a class body writes into.
+Subclass `dict` and override `__setitem__()` so a repeated key returns without storing.
+For the explanation, consider which hooks run before the body and which run after it.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of ch17_keep_first.py
+from typing import Any
+
+class KeepFirst(dict[str, Any]):
+    def __setitem__(self, key: str, value: Any) -> None:
+        ...
+
+class First(type):
+    @classmethod
+    def __prepare__(cls, name: str, bases: tuple[type, ...],
+                    **kwargs: Any) -> KeepFirst:
+        ...
+
+class Handlers(metaclass=First):
+    def on_open(self) -> None:
+        ...
+    def on_open(self) -> None:  # noqa: F811
+        ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # ch17_keep_first.py
@@ -520,3 +850,7 @@ no reference anywhere, so no later hook has anything to restore.
 `__prepare__()` is the only hook that sees the assignments one at a
 time, while they happen, and that is why the chapter calls it
 the one with no simpler substitute.
+
+</details>
+</details>
+</details>

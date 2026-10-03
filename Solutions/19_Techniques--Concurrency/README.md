@@ -8,6 +8,30 @@
 > and that the printed list still grows to four entries in the order given,
 > not the order they finish.
 
+<details>
+<summary>Where to look</summary>
+
+[`async def`, `await`, and the Event Loop](../../Chapters/19_Techniques--Concurrency.md#asyncio-mechanics) shows each coroutine suspending at its `await` while the loop starts the next one.
+Add the fourth `fetch()` to the arguments of `gather()` and compare two orders in the output.
+The order in which timers fire decides the `resumed` lines, while the argument positions decide the returned list.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_1.py
+import asyncio
+
+async def fetch(item: str, delay: float) -> str:
+    ...
+
+async def main() -> None:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
+
 ```python
 # exercise_1.py
 import asyncio
@@ -45,6 +69,10 @@ argument order, not the finishing order: `gather()` fills each
 position from the coroutine passed in that position, so `'D'` is last
 in the list even though `d` finished first.
 
+</details>
+</details>
+</details>
+
 ## 2. Awaiting in a comprehension
 
 > In `async_mechanics.py`,
@@ -52,6 +80,31 @@ in the list even though `d` finished first.
 > where `coroutines` is a list of the same three `fetch()` calls.
 > Predict the started/resumed trace and the total run time before running it,
 > and explain why this version takes the sum of the three delays.
+
+<details>
+<summary>Where to look</summary>
+
+[`async def`, `await`, and the Event Loop](../../Chapters/19_Techniques--Concurrency.md#asyncio-mechanics) explains that a coroutine object does nothing until something awaits it.
+In `[await c for c in coroutines]`, ask what the comprehension does with the first `await` before it moves to the second `c`.
+Compare that with `gather()`, which wraps every coroutine in a task before it waits on any of them.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_2.py
+import asyncio
+import time
+
+async def fetch(item: str, delay: float) -> str:
+    ...
+
+async def main() -> None:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_2.py
@@ -98,12 +151,60 @@ overlap. The list comprehension is not the problem. Calling `fetch()`
 builds a coroutine object and starts nothing. Only `gather()` or a
 `TaskGroup` schedules every coroutine as a task before waiting on any.
 
+</details>
+</details>
+</details>
+
 ## 3. A task that mixes waiting and computing
 
 > In `peak_concurrency.py`, add a third task function, `mixed_price()`,
 > that awaits `asyncio.sleep(0.05)` and then also runs the 1,000,000-iteration loop from `cpu_price()`.
 > Run it through `run()` and predict its `meter.peak` before checking:
 > is it closer to the I/O peak or the CPU peak?
+
+<details>
+<summary>Where to look</summary>
+
+[I/O-Bound vs CPU-Bound](../../Chapters/19_Techniques--Concurrency.md#io-bound-vs-cpu-bound) and [Overlapping the Waits](../../Chapters/19_Techniques--Concurrency.md#overlapping-the-waits) measure overlap with `meter.peak`.
+A task counts as active while it sits inside the `with meter:` block, including while it is suspended.
+Look at where the `await` falls relative to that block, and whether the other four tasks get a chance to start at it.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_3.py
+import asyncio
+from collections.abc import Awaitable, Callable
+from dataclasses import dataclass
+
+@dataclass
+class Meter:
+    active: int = 0
+    peak: int = 0
+
+    def __enter__(self) -> None:
+        ...
+
+    def __exit__(self, exc_type: object, exc: object,
+                 tb: object) -> None:
+        ...
+
+async def mixed_price(order: int, meter: Meter) -> int:
+    ...
+
+type PriceTask = Callable[[int, Meter], Awaitable[int]]
+
+async def run(price_task: PriceTask,
+              orders: list[int]) -> tuple[list[int], int]:
+    ...
+
+async def main() -> None:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_3.py
@@ -163,11 +264,60 @@ active. If you remove the `await`, as `cpu_price()` does, the peak falls
 to `1`. Overlap depends on whether an `await` sits inside the measured
 span, not on where it sits relative to the computation.
 
+</details>
+</details>
+</details>
+
 ## 4. Blocking inside a coroutine
 
 > In `peak_concurrency.py`,
 > change `io_price()`'s `await asyncio.sleep(0.05)` to `time.sleep(0.05)` and predict what happens to its `meter.peak` before running it.
 > Explain the result using `blocking_the_loop.py`.
+
+<details>
+<summary>Where to look</summary>
+
+[`time.sleep()` Stops the Loop](../../Chapters/19_Techniques--Concurrency.md#time-sleep-stops-the-loop) shows a blocking call freezing every other task.
+The event loop runs on one thread, and `time.sleep()` holds that thread instead of suspending the task.
+Think about whether any task can start while another one sleeps, and what that does to the count of simultaneous tasks.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_4.py
+import asyncio
+import time
+from collections.abc import Awaitable, Callable
+from dataclasses import dataclass
+
+@dataclass
+class Meter:
+    active: int = 0
+    peak: int = 0
+
+    def __enter__(self) -> None:
+        ...
+
+    def __exit__(self, exc_type: object, exc: object,
+                 tb: object) -> None:
+        ...
+
+async def io_price(order: int, meter: Meter) -> int:
+    ...
+
+type PriceTask = Callable[[int, Meter], Awaitable[int]]
+
+async def run(price_task: PriceTask,
+              orders: list[int]) -> tuple[list[int], int]:
+    ...
+
+async def main() -> None:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_4.py
@@ -225,6 +375,10 @@ spend almost all their time waiting and still never overlap, while
 blocking sleeps of 0.05 seconds take about a quarter second, while
 five awaited ones take about 0.05.
 
+</details>
+</details>
+</details>
+
 ## 5. A semaphore of one, and a stray release
 
 > In `async_locks.py`,
@@ -233,6 +387,41 @@ five awaited ones take about 0.05.
 > Confirm `counter` still reaches `400`,
 > and explain why a semaphore initialized to `1` stands in for a lock here.
 > Then add one stray `semaphore.release()` before the `gather()` call and explain the result.
+
+<details>
+<summary>Where to look</summary>
+
+[Locks](../../Chapters/19_Techniques--Concurrency.md#locks) and [Semaphores](../../Chapters/19_Techniques--Concurrency.md#semaphores) show `async with` guarding a critical section.
+A `Semaphore` holds a count of admitted holders, and `async with` decrements it on entry and restores it on exit.
+For the stray `release()`, ask how many tasks the count now admits and whether `release()` checks that an `acquire()` came first.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_5.py
+import asyncio
+
+async def increment(count: int) -> None:
+    ...
+
+async def main() -> None:
+    ...
+```
+
+```python
+# The shape of exercise_5_stray_release.py
+import asyncio
+
+async def increment(count: int) -> None:
+    ...
+
+async def main() -> None:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_5.py
@@ -306,6 +495,10 @@ lock is there to prevent. `asyncio.BoundedSemaphore(1)` is the
 semaphore that objects: the stray `release()` raises
 `ValueError: BoundedSemaphore released too many times`.
 
+</details>
+</details>
+</details>
+
 ## 6. Removing the `__main__` guard
 
 > Remove the `if __name__ == "__main__"` guard from `parallel_cpu.py`,
@@ -313,6 +506,16 @@ semaphore that objects: the stray `release()` raises
 > Read the error, whose useful part is the `RuntimeError` traceback each failing child process printed above the `BrokenProcessPool` at the bottom,
 > then explain it with the import mechanics described in [Parallelism](../../Chapters/19_Techniques--Concurrency.md#what-a-process-pool-requires):
 > what did each worker process do when it imported the module?
+
+<details>
+<summary>Where to look</summary>
+
+[What a Process Pool Requires](../../Chapters/19_Techniques--Concurrency.md#what-a-process-pool-requires) describes how a worker process finds the function it must run.
+The worker imports your module, and importing executes every top-level statement.
+Read the `RuntimeError` text for what a worker tries to do during that import, and for the name `__mp_main__` that the guard tests.
+
+<details>
+<summary>Solution</summary>
 
 With the guard gone, `parallel_cpu.py` builds its pool at import time:
 
@@ -362,12 +565,36 @@ default anymore. Windows and macOS default to `spawn`, and since 3.14
 Linux defaults to `forkserver`, which also imports the module. Every
 platform's default therefore requires the guard.
 
+</details>
+</details>
+
 ## 7. Removing the `sleep` from `gil_race.py`
 
 > In `gil_race.py`, remove the `time.sleep(0.000_001)` call and run the script several times.
 > Explain, using [The GIL Does Not Prevent Races](../../Chapters/19_Techniques--Concurrency.md#the-gil-does-not-prevent-races),
 > why the race becomes far less likely to show up without that sleep,
 > but is not thereby fixed.
+
+<details>
+<summary>Where to look</summary>
+
+[The GIL Does Not Prevent Races](../../Chapters/19_Techniques--Concurrency.md#the-gil-does-not-prevent-races) explains where the interpreter may switch threads.
+Without the call, check whether any switch point remains between the read and the write of the shared value.
+Then ask whether a missing switch point makes the read-modify-write sequence atomic, or only hides the gap.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_7.py
+from concurrent.futures import ThreadPoolExecutor
+
+def increment(count: int) -> None:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_7.py
@@ -404,11 +631,42 @@ interpreter has no GIL to hold through the sequence, so there the race
 needs no function call. The fix is still a lock, not the absence of
 an explicit sleep.
 
+</details>
+</details>
+</details>
+
 ## 8. A third thread submitting jobs
 
 > In `priority_queue.py`,
 > add a third thread submitting `[(1, "zzz"), (3, "aaa")]` and confirm the drain order still respects priority first,
 > then the description as a tiebreaker.
+
+<details>
+<summary>Where to look</summary>
+
+[Coordinating Threads with Queues](../../Chapters/19_Techniques--Concurrency.md#coordinating-threads-with-queues) shows producers feeding a `PriorityQueue` that a consumer drains.
+Add a third `pool.submit(enqueue, ...)` call and raise `max_workers` so every producer gets its own thread.
+The queue orders items by comparing tuples, so the interleaving of the producers does not affect the drain order.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_8.py
+from concurrent.futures import ThreadPoolExecutor
+from queue import PriorityQueue, ShutDown
+
+type Job = tuple[int, str]  # (priority, description)
+
+def enqueue(jobs: list[Job]) -> None:
+    ...
+
+def consume() -> None:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_8.py
@@ -463,6 +721,10 @@ before `3`, then alphabetically by the description within a priority
 first has no effect on the final order, because `consume()` starts
 after all three producers finish.
 
+</details>
+</details>
+</details>
+
 ## 9. A task that finishes before the failures land
 
 > In `utils/fetch_demo.py`,
@@ -472,6 +734,43 @@ after all three producers finish.
 > then run it and explain what a `TaskGroup` can and cannot undo.
 > Change `PAIRS` back afterward,
 > since `gather_with_exceptions.py` uses it too.
+
+<details>
+<summary>Where to look</summary>
+
+[Structured Concurrency with `TaskGroup`](../../Chapters/19_Techniques--Concurrency.md#structured-concurrency-with-taskgroup) shows a failing child causing the group to cancel its siblings.
+Compare each task's delay with the moment `c` and `d` fail to decide which tasks are still running when cancellation starts.
+Cancellation reaches only running tasks, so consider what it cannot do to a task that already returned.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_9.py
+import asyncio
+from typing import Final
+
+PAIRS: Final[list[tuple[str, float]]] = [
+    ("a", 0.01),
+    ("b", 0.02),
+    ("c", 0.03),
+    ("d", 0.03),
+    ("e", 0.005),  # Was 0.2, so e now finishes first
+    ("f", 0.3),
+]
+
+async def sleep_until(when: float) -> None:
+    ...
+
+async def fetch(item: str, delay: float, t0: float) -> str:
+    ...
+
+async def main() -> None:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_9.py
@@ -565,12 +864,38 @@ recovery is your problem, not the `TaskGroup`'s.
 address that recovery from different directions: pairing an action with the cleanup
 that undoes it, so "already finished" still means "still reversible."
 
+</details>
+</details>
+</details>
+
 ## 10. `gather()` without `return_exceptions`
 
 > In `gather_with_exceptions.py`,
 > delete `return_exceptions=True` and wrap the `await` in `try`/`except ValueError`.
 > Predict how many `fetched` lines still print,
 > and explain what became of the tasks on which the `gather()` call never reported.
+
+<details>
+<summary>Where to look</summary>
+
+[Failures as Values with `gather()`](../../Chapters/19_Techniques--Concurrency.md#failures-as-values-with-gather) shows `return_exceptions=True` collecting every outcome.
+Without it, the first child exception propagates out of the `await`, so count which timers fire before that moment.
+For the remaining tasks, compare with a `TaskGroup` and ask who cancels them, and what `asyncio.run()` does at shutdown.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_10.py
+import asyncio
+from fetch_demo import PAIRS, fetch
+
+async def main() -> None:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_10.py
@@ -627,6 +952,10 @@ That combination, results discarded and siblings left running, is why
 visible. A `TaskGroup` guarantees that nothing outlives the block.
 Bare `gather()` gives you neither.
 
+</details>
+</details>
+</details>
+
 ## 11. Setting the `ContextVar` in the parent
 
 > In `context_var.py`,
@@ -634,6 +963,32 @@ Bare `gather()` gives you neither.
 > setting it to `"main"`.
 > Predict what each task prints,
 > then explain the result with "every task starts with a copy of the context that created it."
+
+<details>
+<summary>Where to look</summary>
+
+[Context That Follows the Call Chain](../../Chapters/19_Techniques--Concurrency.md#context-that-follows-the-call-chain) shows each task running in its own copy of the context.
+Move the `set()` call so it runs before the `TaskGroup` creates any task, and ask what value each copy holds at creation.
+Also check what the `after:` line reads, since a child's `set()` and a parent's `set()` write to different contexts.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_11.py
+import asyncio
+from contextvars import ContextVar
+
+async def handle(name: str) -> None:
+    ...
+
+async def main() -> None:
+    # Set once, before any task exists
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_11.py
@@ -686,12 +1041,43 @@ every task, so the last writer wins and the other two tasks read a
 value meant for someone else. A `ContextVar` is per-task storage
 reachable by one name.
 
+</details>
+</details>
+</details>
+
 ## 12. Threads in place of subinterpreters
 
 > In `subinterpreters.py`,
 > replace `InterpreterPoolExecutor` with `ThreadPoolExecutor`.
 > The assertion still passes and the printed boolean flips.
 > Explain both, using [The GIL and Free Threading](../../Chapters/19_Techniques--Concurrency.md#the-gil-and-free-threading).
+
+<details>
+<summary>Where to look</summary>
+
+[The GIL and Free Threading](../../Chapters/19_Techniques--Concurrency.md#the-gil-and-free-threading) and [Subinterpreters](../../Chapters/19_Techniques--Concurrency.md#subinterpreters) describe where the GIL lives.
+The assertion compares results, which do not depend on which executor ran the work.
+The boolean compares times, so ask how many GILs a pool of threads shares and how many a pool of subinterpreters has.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_12.py
+import os
+import timeit
+from concurrent.futures import ThreadPoolExecutor
+from benchmark import report
+
+def cpu_price(order: int) -> int:
+    ...
+
+def sequential(orders: list[int]) -> list[int]:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_12.py
@@ -749,6 +1135,10 @@ interpreters mean more locks and real parallelism. A free-threaded
 build reaches the same end by removing the GIL instead of multiplying
 it, letting ordinary threads do what this listing's threads cannot.
 
+</details>
+</details>
+</details>
+
 ## 13. A lock around the loop body, not around `next()`
 
 > In `shared_iterator.py`,
@@ -757,6 +1147,48 @@ it, letting ordinary threads do what this listing's threads cannot.
 > the tempting fix in [Sharing an Iterator Between Threads](../../Chapters/19_Techniques--Concurrency.md#sharing-an-iterator-between-threads).
 > Predict whether `duplicates` becomes `False` before running it,
 > and explain which call the lock does and does not cover.
+
+<details>
+<summary>Where to look</summary>
+
+[Sharing an Iterator Between Threads](../../Chapters/19_Techniques--Concurrency.md#sharing-an-iterator-between-threads) shows the race inside a shared iterator and `threading.serialize_iterator()` fixing it.
+A `for` statement calls `__next__()` before it enters the indented body.
+Place a `with lock:` in the body and ask whether any thread still enters `__next__()` while another is inside it.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of ch19_body_lock.py
+import threading
+import time
+from collections.abc import Iterator
+from concurrent.futures import ThreadPoolExecutor
+from dataclasses import dataclass
+from typing import Final
+
+LIMIT: Final[int] = 200
+
+@dataclass
+class Tickets:
+    limit: int
+    next_number: int = 0
+
+    def __iter__(self) -> Iterator[int]:
+        ...
+
+    def __next__(self) -> int:
+        ...
+
+def drain(source: Iterator[int]) -> list[int]:
+    ...
+
+def report(source: Iterator[int]) -> None:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # ch19_body_lock.py
@@ -825,6 +1257,10 @@ inside `__next__()`, where `threading.serialize_iterator()` puts it. The lesson 
 statements it encloses, and a `for` loop's own call to `next()` is not
 one of them.
 
+</details>
+</details>
+</details>
+
 ## 14. Both tasks acquiring in the same order
 
 > In `async_deadlock.py`,
@@ -833,6 +1269,32 @@ one of them.
 > Predict what the program prints before running it, then explain,
 > in terms of who waits for whom,
 > why one shared acquisition order removes the cycle.
+
+<details>
+<summary>Where to look</summary>
+
+[Deadlock](../../Chapters/19_Techniques--Concurrency.md#deadlock) shows two tasks each holding one lock and waiting for the other.
+Change the second `worker()` call, then trace which task takes `lock_a` first and what the other task does at its `async with`.
+Draw an arrow from each waiting task to the task it waits on and check whether those arrows can form a loop.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of ch19_ordered_locks.py
+import asyncio
+
+async def worker(
+    first: asyncio.Lock, second: asyncio.Lock
+) -> None:
+    ...
+
+async def main() -> None:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # ch19_ordered_locks.py
@@ -884,6 +1346,10 @@ acquisitions globally makes such a cycle impossible. A task can only
 ever wait on a lock that comes later in the order than every lock it
 already holds, and "later" never loops back to "earlier."
 
+</details>
+</details>
+</details>
+
 ## 15. Awaiting `pool.submit()` directly
 
 > In `mixed_await.py`,
@@ -893,6 +1359,16 @@ already holds, and "later" never loops back to "earlier."
 > why you cannot await `pool.submit()`'s return value,
 > what `loop.run_in_executor()` returns instead,
 > and why the runtime `TypeError` arrives wrapped in an `ExceptionGroup`.
+
+<details>
+<summary>Where to look</summary>
+
+[One Task, Many Backends](../../Chapters/19_Techniques--Concurrency.md#one-task-many-backends) and [One `await`, Any Backend](../../Chapters/19_Techniques--Concurrency.md#one-await-any-backend) show how an executor's work becomes awaitable.
+Check what type `pool.submit()` returns and whether that type defines `__await__`.
+The bridge is `loop.run_in_executor()`, and the `ExceptionGroup` comes from the `TaskGroup` that runs `process_price()`.
+
+<details>
+<summary>Solution</summary>
 
 The changed method drops the bridge:
 
@@ -937,3 +1413,6 @@ the failure wrapped in an `ExceptionGroup`, the same packaging
 `task_group.py` catches with `except*`. `main()` has no
 `except*`, so the `ExceptionGroup` propagates out of `asyncio.run()` and prints
 as the grouped traceback above.
+
+</details>
+</details>

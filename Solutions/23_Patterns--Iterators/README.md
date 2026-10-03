@@ -5,6 +5,30 @@
 > Write a generator `evens(n)` that yields the first `n` even numbers,
 > and confirm `total()` from `iterators.py` sums them without modification.
 
+<details>
+<summary>Where to look</summary>
+
+[Generators](../../Chapters/23_Patterns--Iterators.md#generators) shows how a function containing `yield` returns an iterator.
+Write `evens()` the same way, then pass its result to `total()`.
+Any iterable works there, so `total()` needs no change.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_1.py
+from collections.abc import Iterable, Iterator
+
+def total(numbers: Iterable[int]) -> int:
+    ...
+
+def evens(n: int) -> Iterator[int]:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
+
 ```python
 # exercise_1.py
 from collections.abc import Iterable, Iterator
@@ -29,10 +53,43 @@ iterator rather than running the body immediately. `total()` calls
 `evens(5)`'s values without needing to know that a new kind of
 generator now exists alongside `fibonacci()` and `Countdown`.
 
+</details>
+</details>
+</details>
+
 ## 2. `Countdown` with `__len__()`
 
 > Rewrite `Countdown` to also support `len()`,
 > then explain why a generator cannot.
+
+<details>
+<summary>Where to look</summary>
+
+[Generators](../../Chapters/23_Patterns--Iterators.md#generators) shows `Countdown` as a class whose `__iter__()` is a generator.
+Add a `__len__()` that computes the answer from the `start` field.
+For the explanation, consider what a generator keeps between calls to `next()`, and what `len()` would have to do to learn a count.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_2.py
+from collections.abc import Iterator
+from dataclasses import dataclass
+
+@dataclass
+class Countdown:
+    start: int
+
+    def __iter__(self) -> Iterator[int]:
+        ...
+
+    def __len__(self) -> int:
+        ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_2.py
@@ -78,9 +135,35 @@ more times will you yield?" without running it to exhaustion.
 produces a generator on demand. The container keeps the value
 `len()` reads, and reading it consumes nothing.
 
+</details>
+</details>
+</details>
+
 ## 3. The first ten values of `fibonacci(1_000_000)`
 
 > Use `itertools.islice()` to take the first 10 values of `fibonacci(1_000_000)` without computing the rest.
+
+<details>
+<summary>Where to look</summary>
+
+[The Costs of Laziness](../../Chapters/23_Patterns--Iterators.md#the-costs-of-laziness) explains that creating a generator runs none of its body.
+Wrap the generator in `itertools.islice()` with a stop of 10.
+`islice()` pulls only as many values as you ask for, so the rest are never computed.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_3.py
+from collections.abc import Iterator
+from itertools import islice
+
+def fibonacci(n: int) -> Iterator[int]:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_3.py
@@ -107,12 +190,45 @@ run, the same laziness
 [Performance](../../Chapters/18_Techniques--Performance.md#lazy-evaluation-with-generators)
 both rely on.
 
+</details>
+</details>
+</details>
+
 ## 4. Two fixes for a spent generator
 
 > `generator_lifecycle.py` returns an empty list on its second pass.
 > Fix the caller two ways: collect into a list once and reuse it,
 > then instead convert `squares` into a `Countdown`-style iterable class whose `__iter__()` builds a fresh generator.
 > Which fix would you choose for a stream of a million items, and why?
+
+<details>
+<summary>Where to look</summary>
+
+[An Exhausted Generator Is Silently Empty](../../Chapters/23_Patterns--Iterators.md#an-exhausted-generator-is-silently-empty) shows the second pass returning nothing.
+One fix stores the values with `list()` once; the other turns `squares` into a class whose `__iter__()` builds a new generator on each call.
+Weigh the two by what each keeps in memory and what each recomputes.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_4.py
+from collections.abc import Iterator
+from dataclasses import dataclass
+
+def squares(n: int) -> Iterator[int]:
+    ...
+
+@dataclass
+class Squares:
+    n: int
+
+    def __iter__(self) -> Iterator[int]:
+        ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_4.py
@@ -160,6 +276,10 @@ merely costs time, in proportion. The list wins only when a pass is
 expensive and you know the data is small, or when nothing can replay
 the source, as with a network response.
 
+</details>
+</details>
+</details>
+
 ## 5. `tee` with the branches `k` items apart
 
 > `tee.py` measures two extremes: one branch drained before the other starts,
@@ -170,6 +290,36 @@ the source, as with a network response.
 > Predict how the buffer grows with `k` before you measure it,
 > then measure it for two values of `k` with `tee.py`'s `tracemalloc` approach,
 > and explain the result using the rule in [What `tee()` Buffers](../../Chapters/23_Patterns--Iterators.md#what-tee-buffers).
+
+<details>
+<summary>Where to look</summary>
+
+[What `tee()` Buffers](../../Chapters/23_Patterns--Iterators.md#what-tee-buffers) gives the rule for what `tee()` holds.
+Use `islice()` to advance one branch `k` items, then walk both with `zip()` so the gap stays fixed.
+Measure the peak with `tracemalloc` for two values of `k`, and compare the growth to the size of the gap.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_5.py
+import tracemalloc
+from collections.abc import Iterator
+from itertools import islice, tee
+from typing import Final
+from benchmark import report
+
+def squares(n: int) -> Iterator[int]:
+    ...
+
+N: Final[int] = 100_000
+
+def peak_at_gap(k: int) -> int:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_5.py
@@ -222,12 +372,26 @@ The script prints a boolean rather than the byte counts, since the
 sizes shift between machines and Python builds while their ordering
 does not. Pass `--numbers` to see the figures your machine reports.
 
+</details>
+</details>
+</details>
+
 ## 6. A test for `filter()`
 
 > The prose pairs the generator expression's `if` clause with `filter()`,
 > but no test covers `filter()`.
 > Add one to `test_endless.py`,
 > and say which existing test it should resemble.
+
+<details>
+<summary>Where to look</summary>
+
+[Reusable Algorithms](../../Chapters/23_Patterns--Iterators.md#reusable-algorithms) pairs the generator expression's `if` clause with `filter()` and contrasts both with `takewhile()`.
+Copy the shape of the existing test for the `if` clause, but call `filter()`.
+Feed it an endless source that raises an exception after too many pulls, and use `pytest.raises()` to confirm the filter keeps asking.
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # test_ch23_filter.py
@@ -265,6 +429,9 @@ than a clause, gets a chance to decide when to stop. `filter()` gets
 no such chance: it receives values one at a time and can answer only
 "keep" or "skip" about the value in front of it, never "stop."
 
+</details>
+</details>
+
 ## 7. `OverSequence`, and `first()` on an endless source
 
 > `gof_iterator.py` shows only the stream version.
@@ -275,6 +442,71 @@ no such chance: it receives values one at a time and can answer only
 > `traverse()` never returns on an endless source,
 > so drive the four methods yourself for 50,000 steps and report `len(stream.seen)`.
 > What has `first()` cost you on an endless source?
+
+<details>
+<summary>Where to look</summary>
+
+[The Pattern That Disappeared](../../Chapters/23_Patterns--Iterators.md#the-pattern-that-disappeared) and [`first()` and `current_item()` Rebuild the List](../../Chapters/23_Patterns--Iterators.md#first-and-current_item-rebuild-the-list) show the four-method interface over a stream.
+`OverSequence` can index its sequence directly.
+`OverStream` must remember every item it has pulled, so ask what that list does on a source that never ends.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_7.py
+from collections.abc import Iterable, Iterator, Sequence
+from dataclasses import dataclass
+from itertools import count
+from typing import Protocol
+
+DONE = sentinel("DONE")
+
+class GoFIterator[T](Protocol):
+    def first(self) -> None: ...
+    def advance(self) -> None: ...
+    def is_done(self) -> bool: ...
+    def current_item(self) -> T: ...
+
+@dataclass
+class OverSequence[T]:
+    items: Sequence[T]
+    index: int = 0
+
+    def first(self) -> None:
+        ...
+
+    def advance(self) -> None:
+        ...
+
+    def is_done(self) -> bool:
+        ...
+
+    def current_item(self) -> T:
+        ...
+
+class OverStream[T]:
+    def __init__(self, source: Iterable[T]) -> None:
+        ...
+
+    def first(self) -> None:
+        ...
+
+    def advance(self) -> None:
+        ...
+
+    def is_done(self) -> bool:
+        ...
+
+    def current_item(self) -> T:
+        ...
+
+def traverse(it: GoFIterator[int]) -> list[int]:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_7.py
@@ -372,11 +604,47 @@ on an endless source costs unbounded memory. Python's `__next__()` has
 no such requirement, which is why `itertools.count()` is safe to
 iterate and impossible to rewind.
 
+</details>
+</details>
+</details>
+
 ## 8. A peekable iterator
 
 > Write `peek(it)` that reports an iterator's next value without consuming it.
 > You cannot, so write a `Peekable` wrapper that can,
 > and name what it stores that a bare iterator does not.
+
+<details>
+<summary>Where to look</summary>
+
+[Asking Consumes an Item](../../Chapters/23_Patterns--Iterators.md#asking-consumes-an-item) shows that looking at the next value of an iterator advances it.
+Wrap the source in a class that pulls one item ahead and keeps it in a field.
+`peek()` returns that field, and `__next__()` returns it and then refills it, using a sentinel for the end.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_8.py
+from collections.abc import Iterable, Iterator
+from typing import override
+
+DONE = sentinel("DONE")
+
+class Peekable[T](Iterator[T]):
+    def __init__(self, source: Iterable[T]) -> None:
+        ...
+
+    def peek(self) -> T | DONE:
+        ...
+
+    @override
+    def __next__(self) -> T:
+        ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_8.py
@@ -433,6 +701,10 @@ blocks on its first read blocks at construction. The early pull is the same
 eagerness `tee`, `OverStream`, and this chapter's other lookahead all
 pay: answering a question about the future means fetching the future.
 
+</details>
+</details>
+</details>
+
 ## 9. A string that never bottoms out
 
 > `flatten()` recurses on anything that is not an `int`.
@@ -440,6 +712,35 @@ pay: answering a question about the future means fetching the future.
 > given that a one-character string is still a `Sequence`.
 > Then fix `flatten()` so a `str` yields as one item,
 > and say what the same fix looks like in `flatten_loop()`.
+
+<details>
+<summary>Where to look</summary>
+
+[Delegating with `yield from`](../../Chapters/23_Patterns--Iterators.md#delegating-with-yield-from) shows `flatten()` and its base case.
+Iterating a `str` produces more strings, so the recursion never reaches a base case.
+Test for `str` alongside `int` using `isinstance()` with a union, and apply the same test in `flatten_loop()`.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_9.py
+from collections.abc import Iterator, Sequence
+from exceptions import expect
+
+type Nested = int | Sequence[Nested]
+
+def flatten(nested: Sequence[Nested]) -> Iterator[int]:
+    ...
+
+def flatten_str(
+    nested: Sequence[Nested]
+) -> Iterator[int | str]:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_9.py
@@ -505,6 +806,10 @@ same endless descent that breaks `flatten()`. Pyright rejects the
 string. Under `ty` the failure arrives as a `RecursionError` at
 runtime rather than an error at the assignment.
 
+</details>
+</details>
+</details>
+
 ## 10. Skipping instead of raising
 
 > `typed()` raises a `TypeError` on the first item of the wrong type,
@@ -513,6 +818,46 @@ runtime rather than an error at the assignment.
 > then say which of the two you would want wrapping a parsed log file,
 > and why.
 > Which one is easier to write as `TypedIterator`?
+
+<details>
+<summary>Where to look</summary>
+
+[A Type-Checking Iterator](../../Chapters/23_Patterns--Iterators.md#a-type-checking-iterator) shows `typed()` and `TypedIterator`.
+In a generator, `typed_skipping()` does not `yield` a mismatched item.
+In a class, `__next__()` must return a value or raise `StopIteration`, so it needs a loop that keeps pulling until an item matches.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_10.py
+from collections.abc import Iterable, Iterator
+from dataclasses import dataclass
+from typing import override
+from exceptions import expect
+
+def typed[T](
+    it: Iterable[object], expected: type[T]
+) -> Iterator[T]:
+    ...
+
+def typed_skipping[T](
+    it: Iterable[object], expected: type[T]
+) -> Iterator[T]:
+    ...
+
+@dataclass(eq=False)
+class SkippingIterator[T](Iterator[T]):
+    imp: Iterator[object]
+    expected: type[T]
+
+    @override
+    def __next__(self) -> T:
+        ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_10.py
@@ -588,3 +933,7 @@ its own loop to keep pulling until a match arrives. A raising
 `__next__()` needs no loop, since it acts on the one item it just
 read. Generators write the state machine for you, and skipping is
 where you notice.
+
+</details>
+</details>
+</details>

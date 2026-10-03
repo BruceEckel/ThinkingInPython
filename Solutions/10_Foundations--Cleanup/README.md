@@ -8,6 +8,38 @@
 > Say what each one does,
 > then say what a second name bound to the same list sees after each.
 
+<details>
+<summary>Where to look</summary>
+
+[Watching Objects Without Holding Them](../../Chapters/10_Foundations--Cleanup.md#watching-objects-without-holding-them) ends with `counters.clear()` dropping the list's references.
+Rebinding a name and mutating the object that name refers to are different operations.
+To see the difference, bind a second name to the same list before you try each form,
+then print that second name.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_1.py
+from typing import ClassVar
+from weakref import WeakValueDictionary
+
+class Counter:
+    _instances: ClassVar[
+        WeakValueDictionary[int, Counter]
+    ] = WeakValueDictionary()
+
+    def __init__(self, name: str) -> None:
+        ...
+
+    @classmethod
+    def live_count(cls) -> int:
+        ...
+```
+
+<details>
+<summary>Solution</summary>
+
 ```python
 # exercise_1.py
 from typing import ClassVar
@@ -66,10 +98,45 @@ only which object this one name points at. The two coincide in
 two references, rebinding leaves the `Counter` objects alive
 and `live_count()` stuck at `3`.
 
+</details>
+</details>
+</details>
+
 ## 2. Listing the names of every live instance
 
 > In `weak_value.py`, add a classmethod `live_names()` to `Counter` that returns a sorted list of the `.name` of every live instance,
 > by reading `cls._instances.values()`.
+
+<details>
+<summary>Where to look</summary>
+
+In [Watching Objects Without Holding Them](../../Chapters/10_Foundations--Cleanup.md#watching-objects-without-holding-them), a `WeakValueDictionary` reads like a `dict`.
+Iterate `cls._instances.values()` in a `@classmethod`, take each `.name`,
+and wrap the result in `sorted()` so the order does not depend on insertion.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_2.py
+from typing import ClassVar
+from weakref import WeakValueDictionary
+
+class Counter:
+    _instances: ClassVar[
+        WeakValueDictionary[int, Counter]
+    ] = WeakValueDictionary()
+
+    def __init__(self, name: str) -> None:
+        ...
+
+    @classmethod
+    def live_names(cls) -> list[str]:
+        ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_2.py
@@ -102,11 +169,45 @@ currently tracked, since a `WeakValueDictionary` reads like a normal
 gives a deterministic order, since a dictionary's iteration order here
 follows insertion, not name order.
 
+</details>
+</details>
+</details>
+
 ## 3. Building the `list` with a comprehension instead of a loop
 
 > In `cleanup.py`, change the loop to build `counters` with a list comprehension instead of `append()` in a `for` loop,
 > and confirm the output stays the same:
 > no object goes away before `End of delete loop` prints.
+
+<details>
+<summary>Where to look</summary>
+
+[Why `__del__()` Is Not Cleanup](../../Chapters/10_Foundations--Cleanup.md#why-del-is-not-cleanup) explains why `del c` does not destroy an object while the list still references it.
+A list comprehension builds the same list, so ask what still holds each `Counter` during the loop.
+Compare the order of the output lines with the original listing.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_3.py
+from typing import ClassVar
+
+class Counter:
+    count: ClassVar[int] = 0
+
+    def __init__(self, name: str) -> None:
+        ...
+
+    def __del__(self) -> None:
+        ...
+
+    def __repr__(self) -> str:
+        ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_3.py
@@ -157,11 +258,43 @@ bearing on when its contents get destroyed, so the `deleted` messages
 appear, as before, at interpreter shutdown, after `End of delete loop`
 has printed.
 
+</details>
+</details>
+</details>
+
 ## 4. A strong registry that never lets go
 
 > In `weak_value.py`, change `_instances` from a `WeakValueDictionary` to a `dict[int, Counter]` and run the file again.
 > Report what `live_count()` prints after each `pop()`,
 > and explain the difference in terms of what each container holds.
+
+<details>
+<summary>Where to look</summary>
+
+[Watching Objects Without Holding Them](../../Chapters/10_Foundations--Cleanup.md#watching-objects-without-holding-them) uses a `WeakValueDictionary` so the registry does not count as a reference.
+A plain `dict` stores strong references.
+After each `pop()`, ask how many references to the `Counter` remain and who owns them.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_4.py
+from typing import ClassVar
+
+class Counter:
+    _instances: ClassVar[dict[int, Counter]] = {}
+
+    def __init__(self, name: str) -> None:
+        ...
+
+    @classmethod
+    def live_count(cls) -> int:
+        ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_4.py
@@ -205,6 +338,10 @@ because the registry keeps them all alive. A
 `WeakValueDictionary` holds its values weakly, so it can answer the
 question without changing the answer.
 
+</details>
+</details>
+</details>
+
 ## 5. `finalize(self, self.close)` and what it keeps alive
 
 > In `finalizer.py`, change the `finalize()` call to `finalize(self, self.close)`,
@@ -213,6 +350,31 @@ question without changing the answer.
 > Run it again.
 > Report when `B closed` now prints relative to `End of program`,
 > and say what keeps the `Connection` alive.
+
+<details>
+<summary>Where to look</summary>
+
+[The `self.close` Trap](../../Chapters/10_Foundations--Cleanup.md#the-self-close-trap) shows why a callback must not lead back to the object being finalized.
+`self.close` is a bound method, so ask what a bound method stores.
+Then ask who holds the callback, and what that means for the reference count when you `del b`.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_5.py
+from weakref import finalize
+
+class Connection:
+    def __init__(self, name: str) -> None:
+        ...
+
+    def close(self) -> None:
+        ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_5.py
@@ -279,6 +441,10 @@ finalizer's reference to `name` keeps a string alive, not a connection.
 The rule generalizes: a finalizer may capture anything except a path
 back to its own object.
 
+</details>
+</details>
+</details>
+
 ## 6. A two-object cycle, with and without the collector
 
 > In `cycle.py`, change `self_link()` to build a two-object cycle
@@ -286,6 +452,36 @@ back to its own object.
 > Confirm both finalizers run at `gc.collect()`,
 > then remove the `gc.disable()`/`gc.enable()` pair and explain why the language no longer guarantees when the two `finalized` lines appear,
 > even though this small program still prints them in the same place every run.
+
+<details>
+<summary>Where to look</summary>
+
+[Reference Cycles Delay Destruction](../../Chapters/10_Foundations--Cleanup.md#reference-cycles-delay-destruction) shows `__del__()` running only when `gc.collect()` reclaims a cycle.
+Give each of two `Node` objects a `peer` attribute pointing at the other.
+For the second part, consider what triggers the cycle collector when you do not call it, and what your explicit call to `gc.collect()` still fixes.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_6.py
+import gc
+
+class Node:
+    peer: Node
+
+    def __init__(self, name: str) -> None:
+        ...
+
+    def __del__(self) -> None:
+        ...
+
+def self_link() -> None:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_6.py
@@ -340,6 +536,10 @@ predictable. It is not advice. It buys a deterministic transcript for
 a demonstration whose entire subject is the absence of determinism, so
 the listing turns the collector back on immediately afterward.
 
+</details>
+</details>
+</details>
+
 ## 7. An `__enter__()` that fails, unguarded and guarded
 
 > In `faulty_init.py`,
@@ -348,6 +548,42 @@ the listing turns the collector back on immediately afterward.
 > Run it and report whether `C closed` prints.
 > Then wrap the `raise` in a `try`/`except` that prints the `closed` line before re-raising the exception,
 > and confirm `C opened` now has its matching `closed`.
+
+<details>
+<summary>Where to look</summary>
+
+[An `__init__()` That Fails Leaks the Resource](../../Chapters/10_Foundations--Cleanup.md#raising-init-leaks) shows a failure before the object is usable, and [An Explicit `close()` and a `with` Block](../../Chapters/10_Foundations--Cleanup.md#an-explicit-close-and-a-with-block) describes when `with` calls `__exit__()`.
+The `with` statement calls `__exit__()` only after `__enter__()` returns.
+To release the resource anyway, catch the exception inside `__enter__()`, release there, and use a bare `raise` to re-raise it.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_7.py
+class Faulty:
+    def __init__(self, name: str) -> None:
+        ...
+
+    def __enter__(self) -> Faulty:
+        ...
+
+    def __exit__(self, *exc: object) -> None:
+        ...
+
+class Guarded:
+    def __init__(self, name: str) -> None:
+        ...
+
+    def __enter__(self) -> Guarded:
+        ...
+
+    def __exit__(self, *exc: object) -> None:
+        ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_7.py
@@ -412,3 +648,7 @@ fails for some other reason holds no resource at that point. That move
 does not remove the need for the guard. Whichever method acquires a
 resource, a step that can fail after the acquisition releases the
 resource before it lets the exception go.
+
+</details>
+</details>
+</details>

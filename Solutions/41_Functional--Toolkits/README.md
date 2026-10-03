@@ -7,6 +7,28 @@
 > Compare the two versions for length,
 > and name the mistakes the loop version allows that the recursive one cannot make.
 
+<details>
+<summary>Where to look</summary>
+
+[Recursion](../../Chapters/41_Functional--Toolkits.md#recursion) shows `deep_sum()` letting the call stack hold the sublists still to walk.
+Replace that call stack with a list you manage: pop an item, add its total if it is an `int`,
+and otherwise push its elements back onto the list.
+Copy the input before you seed the stack, and think about which end you pop from.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_1.py
+type Nested = int | list[Nested]
+
+def deep_sum(items: list[Nested]) -> int:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
+
 ```python
 # exercise_1.py
 type Nested = int | list[Nested]
@@ -44,11 +66,37 @@ total, but the order matters the moment the function does anything
 order-dependent. The recursive version cannot make any of these
 mistakes, because it never has the choice.
 
+</details>
+</details>
+</details>
+
 ## 2. `lru_cache` with `maxsize=3`
 
 > `functools_lru_cache.py` prints `CacheInfo(hits=1, misses=4, maxsize=2, currsize=2)`.
 > Change `maxsize` to `3`, predict the four numbers before running it,
 > then run it and account for any difference.
+
+<details>
+<summary>Where to look</summary>
+
+[`lru_cache`](../../Chapters/41_Functional--Toolkits.md#lru_cache) shows `cache_info()` after a run with `maxsize=2`.
+Count the distinct arguments the function sees and compare that count with the new `maxsize`.
+The difference tells you whether any entry is ever evicted, and so which calls are hits.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_2.py
+from functools import lru_cache
+
+@lru_cache(maxsize=3)
+def square(n: int) -> int:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_2.py
@@ -80,12 +128,39 @@ what `maxsize` controls. With three slots the cache never evicts
 anything, so `functools_lru_cache.py`'s comment, "Evicts 1, the least
 recently used," stops being true here.
 
+</details>
+</details>
+</details>
+
 ## 3. `batch_totals()` stays lazy
 
 > Write `batch_totals(source, n)`,
 > which takes an iterator and yields the sum of each `n`-element batch,
 > built only from `itertools` pieces and a generator expression.
 > Show that it stays lazy by passing it `count(1)` and taking five values.
+
+<details>
+<summary>Where to look</summary>
+
+[`batched`](../../Chapters/41_Functional--Toolkits.md#batched) yields fixed-size tuples from any iterable, and a generator expression can sum each one.
+[Lazy Evaluation](../../Chapters/41_Functional--Toolkits.md#lazy-evaluation) explains why `islice()` over an infinite `count()` pulls only what it needs.
+If every stage is lazy, taking five values from `count(1)` terminates.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_3.py
+from collections.abc import Iterable, Iterator
+from itertools import batched, count, islice
+
+def batch_totals(source: Iterable[int],
+                 n: int) -> Iterator[int]:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_3.py
@@ -111,11 +186,39 @@ immediately, and `islice()` then pulls exactly five totals, so
 `1 + 2 + 3`, and each later one is nine larger, since every batch
 advances the source by three.
 
+</details>
+</details>
+</details>
+
 ## 4. `grouped()` cannot repeat a key
 
 > `groupby()` on unsorted input silently returns the same key more than once.
 > Write `grouped(data, key)` returning a `dict[K, list[V]]` that cannot make that mistake,
 > and say what it costs relative to `groupby()`.
+
+<details>
+<summary>Where to look</summary>
+
+[`groupby`](../../Chapters/41_Functional--Toolkits.md#groupby) shows why `groupby()` repeats a key when equal items are not adjacent.
+Accumulate into a `defaultdict(list)` keyed by `key(item)` instead, so each key exists once by construction.
+The cost follows from what the loop must finish before it can return anything.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_4.py
+from collections import defaultdict
+from collections.abc import Callable, Hashable, Iterable
+
+def grouped[V, K: Hashable](
+    data: Iterable[V], key: Callable[[V], K]
+) -> dict[K, list[V]]:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_4.py
@@ -150,10 +253,39 @@ order and loses the interleaving between them. Sorting first to make
 so `grouped()` is the better answer whenever the input already fits in
 memory.
 
+</details>
+</details>
+</details>
+
 ## 5. `@cache` on `deep_sum()`
 
 > Decorate `deep_sum()` with `@cache` and explain the exception.
 > What must change about the `Nested` alias for caching to be possible?
+
+<details>
+<summary>Where to look</summary>
+
+[`cache`](../../Chapters/41_Functional--Toolkits.md#cache) says the cache stores results in a dictionary keyed on the arguments.
+A dictionary key must be hashable, so ask which argument type in the signature fails that test.
+The fix changes the `Nested` alias, and the same section's note on pure functions covers a separate requirement.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_5.py
+from functools import cache
+from exceptions import expect
+
+type Nested = int | list[Nested]
+
+@cache
+def deep_sum(items: list[Nested]) -> int:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_5.py
@@ -206,12 +338,45 @@ Note that the exception says nothing about purity. `deep_sum()` is
 already pure, and caching it would be correct. The obstacle is the
 argument type alone.
 
+</details>
+</details>
+</details>
+
 ## 6. Injecting the random source
 
 > `group_rounds()` takes a `seed` and builds its own `random.Random`.
 > Replace the `seed` parameter with an `rng: random.Random` parameter.
 > Which property of the function does the `rng` parameter preserve,
 > and which one does it leave to the caller?
+
+<details>
+<summary>Where to look</summary>
+
+[Case Study: Pairing Rotations](../../Chapters/41_Functional--Toolkits.md#case-study-pairing-rotations) builds its own `random.Random` from a `seed`.
+Accept the `Random` object as a parameter and call its `shuffle()` where the function called its own.
+Then ask which part of reproducibility the function still controls and which part the caller now decides.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_6.py
+import random
+from collections import Counter
+from collections.abc import Iterator
+from itertools import combinations
+
+type Group = tuple[str, ...]
+type Round = list[Group]
+
+def group_rounds(
+    students: list[str], size: int, rng: random.Random
+) -> Iterator[Round]:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_6.py
@@ -290,3 +455,7 @@ makes for testing. The `rng` version is deterministic per `Random`
 object: two callers who each build `random.Random(0)` get identical
 schedules, while two calls sharing one `Random` do not, because
 `shuffle()` advances that object's state.
+
+</details>
+</details>
+</details>

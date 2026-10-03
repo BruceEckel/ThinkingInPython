@@ -6,6 +6,16 @@
 > so February allows 29 days when the `BirthDate`'s `Year` is a leap year.
 > Write the tests first.
 
+<details>
+<summary>Where to look</summary>
+
+[Enums Are Types Too](../../Chapters/12_Techniques--Data_Classes_as_Types.md#enums-are-types-too) shows `Month` checking a day against its own cap.
+The cap now depends on a second value, so `check_day()` needs the `Year` as well, and `Year` needs a method that applies the leap rule.
+Write the `pytest` tests first, covering a leap year, a century that is not leap, and a day that fails in every year.
+
+<details>
+<summary>Solution</summary>
+
 `Year` gains an `is_leap()` method using the standard rule (divisible
 by 4, and not by 100 unless also by 400). `Month.check_day()` takes
 the `Year` as a second argument so it can raise February's cap to 29
@@ -115,11 +125,52 @@ accepts. `Year(2021)` is not leap, so
 regardless of the year, because `max_days` is 29 at most, even in a
 leap year.
 
+</details>
+</details>
+
 ## 2. A stricter `EmailAddress`
 
 > Give `EmailAddress` a stricter check
 > (a single `@`, with text on both sides).
 > Add tests for the values the check should now reject.
+
+<details>
+<summary>Where to look</summary>
+
+[Composing Types from Types](../../Chapters/12_Techniques--Data_Classes_as_Types.md#composing-types-from-types) puts the check for `EmailAddress` in `__post_init__()`.
+Strengthen it there with two calls to `check()`: one that counts the `@` characters, and one that splits the text with `str.partition()` and tests both halves.
+The tests feed it each shape the new check should reject.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_2.py
+from dataclasses import dataclass
+from exceptions import expect
+
+@dataclass(eq=False)
+class TypeFailure(ValueError):
+    subject: str
+    reason: str = ""
+
+    def __str__(self) -> str:
+        ...
+
+def check(condition: bool, subject: str,
+          reason: str = "") -> None:
+    ...
+
+@dataclass(frozen=True)
+class EmailAddress:
+    text: str
+
+    def __post_init__(self) -> None:
+        ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_2.py
@@ -171,6 +222,10 @@ somewhere. `count("@") == 1` additionally rejects two-`@` strings like
 `"b@@x.com"`. The second check splits on `@` and requires text on both
 sides, so it rejects `"@x.com"` and `"b@"`.
 
+</details>
+</details>
+</details>
+
 ## 3. The `NamedTuple` subclass workaround, and the hole it leaves
 
 > Take `test_namedtuple_no_hook.py`'s `Stars` and build the subclass workaround:
@@ -178,6 +233,46 @@ sides, so it rejects `"@x.com"` and `"b@"`.
 > and a `Stars(_Stars)` whose `__new__()` runs the check.
 > Show that `Stars(11)` now raises a `TypeFailure` while `copy.replace(Stars(5), number=99)` does not,
 > and explain why a frozen data class has no equivalent hole.
+
+<details>
+<summary>Where to look</summary>
+
+[A `NamedTuple` Cannot Validate Itself](../../Chapters/12_Techniques--Data_Classes_as_Types.md#namedtuple-cannot-validate) explains why the class body of a `NamedTuple` refuses a `__new__()`.
+A subclass is free to define one, so put the check there and call `super().__new__()` afterward.
+For the hole, find which method `copy.replace()` calls on a `NamedTuple` and whether it passes through your `__new__()`.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_3.py
+import copy
+from dataclasses import dataclass
+from typing import NamedTuple
+from exceptions import expect
+
+@dataclass(eq=False)
+class TypeFailure(ValueError):
+    subject: str
+    reason: str = ""
+
+    def __str__(self) -> str:
+        ...
+
+def check(condition: bool, subject: str,
+          reason: str = "") -> None:
+    ...
+
+class _Stars(NamedTuple):
+    number: int
+
+class Stars(_Stars):
+    def __new__(cls, number: int) -> Stars:
+        ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_3.py
@@ -232,12 +327,71 @@ A frozen data class has no equivalent hole because its replacement
 goes through the constructor. `copy.replace()` calls the constructor,
 the constructor calls `__post_init__()`, and the check runs.
 
+</details>
+</details>
+</details>
+
 ## 4. `from_json()` rejects a bad email
 
 > Feed `from_json()` a JSON string whose email has no `@`,
 > and confirm that it raises `TypeFailure`.
 > The validation you wrote once, in `EmailAddress`,
 > now also guards your JSON input.
+
+<details>
+<summary>Where to look</summary>
+
+[Serializing to JSON](../../Chapters/12_Techniques--Data_Classes_as_Types.md#serializing-to-json) rebuilds a `Person` from parsed JSON by calling the field classes.
+Build a JSON string whose email lacks an `@` with `json.dumps()`, and pass it to `from_json()`.
+Watch which code raises the `TypeFailure`: the constructor of `EmailAddress`, not `from_json()`.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_4.py
+import json
+from dataclasses import dataclass
+from typing import Any
+from exceptions import expect
+
+@dataclass(eq=False)
+class TypeFailure(ValueError):
+    subject: str
+    reason: str = ""
+
+    def __str__(self) -> str:
+        ...
+
+def check(condition: bool, subject: str,
+          reason: str = "") -> None:
+    ...
+
+@dataclass(frozen=True)
+class FullName:
+    text: str
+
+    def __post_init__(self) -> None:
+        ...
+
+@dataclass(frozen=True)
+class EmailAddress:
+    text: str
+
+    def __post_init__(self) -> None:
+        ...
+
+@dataclass(frozen=True)
+class Person:
+    name: FullName
+    email: EmailAddress
+
+def from_json(text: str) -> Person:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_4.py
@@ -303,12 +457,59 @@ One check, inside `EmailAddress`, protects every path that constructs
 a `Person`. The path from untrusted JSON input is one of those, with
 no additional code in `from_json()`.
 
+</details>
+</details>
+</details>
+
 ## 5. `__replace__()` on an ordinary class
 
 > Make `copy.replace()` work on a `Stars` that is not a data class:
 > write an ordinary class holding the rating, validate in `__init__()`,
 > define `__replace__()`,
 > and confirm that `copy.replace()` still runs your validation.
+
+<details>
+<summary>Where to look</summary>
+
+[Defining `__replace__()`](../../Chapters/12_Techniques--Data_Classes_as_Types.md#defining-replace) shows the method that `copy.replace()` looks for.
+In an ordinary class, write `__replace__()` so it merges the current field values with the keyword changes and calls the class constructor.
+Because the rebuild goes through `__init__()`, the check runs on the replacement.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_5.py
+import copy
+from dataclasses import dataclass
+from typing import Self
+from exceptions import expect
+
+@dataclass(eq=False)
+class TypeFailure(ValueError):
+    subject: str
+    reason: str = ""
+
+    def __str__(self) -> str:
+        ...
+
+def check(condition: bool, subject: str,
+          reason: str = "") -> None:
+    ...
+
+class Stars:
+    def __init__(self, number: int) -> None:
+        ...
+
+    def __repr__(self) -> str:
+        ...
+
+    def __replace__(self, **changes: int) -> Self:
+        ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_5.py
@@ -358,6 +559,10 @@ stays validated across a replacement for the same reason. Any
 `__replace__()` that restores the state directly, the way
 `copy.copy()` does, skips the check.
 
+</details>
+</details>
+</details>
+
 ## 6. A `ClassVar` counter on a frozen `Stars`
 
 > Add a `ClassVar[int]` counter to `Stars` that counts every `Stars` created.
@@ -366,6 +571,55 @@ stays validated across a replacement for the same reason. Any
 > Incrementing the counter as `Stars.built += 1` from `__post_init__()` works on a frozen class,
 > while `self.built += 1` does not.
 > Explain why.
+
+<details>
+<summary>Where to look</summary>
+
+[A Real `ClassVar`](../../Chapters/12_Techniques--Data_Classes_as_Types.md#d-a-real-classvar) shows how `@dataclass` treats an annotation marked `ClassVar`.
+It skips that name when it builds the fields and the `__init__()` parameters, so check `fields()` and `inspect.signature()`.
+For the frozen question, compare what `Stars.built += 1` assigns to against what `self.built += 1` assigns to, and which of the two `frozen=True` guards (see [Immutability](../../Chapters/12_Techniques--Data_Classes_as_Types.md#immutability)).
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_6.py
+import inspect
+from dataclasses import dataclass, fields
+from typing import ClassVar
+from exceptions import expect
+
+@dataclass(eq=False)
+class TypeFailure(ValueError):
+    subject: str
+    reason: str = ""
+
+    def __str__(self) -> str:
+        ...
+
+def check(condition: bool, subject: str,
+          reason: str = "") -> None:
+    ...
+
+@dataclass(frozen=True)
+class Stars:
+    number: int
+    built: ClassVar[int] = 0
+
+    def __post_init__(self) -> None:
+        ...
+
+@dataclass(frozen=True)
+class Wrong:
+    number: int
+    built: ClassVar[int] = 0
+
+    def __post_init__(self) -> None:
+        ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_6.py
@@ -433,6 +687,10 @@ to store the result on the instance. That store is the assignment
 reporting `built` as read-only on a frozen instance, so the listing
 carries a `# type: ignore` to demonstrate the runtime failure.
 
+</details>
+</details>
+</details>
+
 ## 7. A `dict` field default, three ways
 
 > Give `Months` a second field,
@@ -441,6 +699,44 @@ carries a `# type: ignore` to demonstrate the runtime failure.
 > Then fix it two ways,
 > with `default_factory=dict` and with `default_factory=dict[str, Month]`,
 > and say which one a type checker can verify.
+
+<details>
+<summary>Where to look</summary>
+
+[Defaults Built Fresh, Not Shared](../../Chapters/12_Techniques--Data_Classes_as_Types.md#defaults-built-not-shared) shows `@dataclass` rejecting a mutable default and `field(default_factory=...)` as the fix.
+Wrap the class definition that has the `= {}` default in `expected(ValueError)` to capture the message.
+Then write the two fixed classes, and ask what return type a type checker can read from `dict` and from `dict[str, Month]`.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_7.py
+from dataclasses import dataclass, field
+from exceptions import expected
+
+@dataclass(frozen=True)
+class Month:
+    name: str
+    n: int
+
+def make_months() -> list[Month]:
+    ...
+
+@dataclass(frozen=True)
+class Bare:
+    months: list[Month] = field(default_factory=make_months)
+    index: dict[str, Month] = field(default_factory=dict)
+
+@dataclass(frozen=True)
+class Subscripted:
+    months: list[Month] = field(default_factory=make_months)
+    index: dict[str, Month] = field(
+        default_factory=dict[str, Month])
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_7.py
@@ -494,6 +790,10 @@ error before the program runs. The bare form is fine where a reader
 can see that the factory and the annotation agree. Subscript the
 factory when you want the checker to confirm the agreement.
 
+</details>
+</details>
+</details>
+
 ## 8. A type test in the check
 
 > `stars_float.py` builds a `Stars` holding `5.5`.
@@ -501,6 +801,44 @@ factory when you want the checker to confirm the agreement.
 > `Stars(True)` also passes the range check.
 > Explain why an `isinstance()` test accepts it,
 > and write the test so that it rejects `True` as well.
+
+<details>
+<summary>Where to look</summary>
+
+[The Annotation and the Check](../../Chapters/12_Techniques--Data_Classes_as_Types.md#the-annotation-and-the-check) shows `Stars(5.5)` passing because the annotation is not enforced at runtime.
+Add a type test as the first call to `check()` in `__post_init__()`, before the range comparison.
+For `True`, consider how `bool` relates to `int`, and compare the class of the value directly instead of using `isinstance()`.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_8.py
+from dataclasses import dataclass
+from exceptions import expect
+
+@dataclass(eq=False)
+class TypeFailure(ValueError):
+    subject: str
+    reason: str = ""
+
+    def __str__(self) -> str:
+        ...
+
+def check(condition: bool, subject: str,
+          reason: str = "") -> None:
+    ...
+
+@dataclass(frozen=True)
+class Stars:
+    number: int
+
+    def __post_init__(self) -> None:
+        ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_8.py
@@ -557,3 +895,7 @@ constructor does with a value the type checker did not see. The type checker
 accepts `Stars(True)`: a `bool` is an `int` to it for
 the same subclass reason, so the runtime test is the one check that
 rejects `True`.
+
+</details>
+</details>
+</details>

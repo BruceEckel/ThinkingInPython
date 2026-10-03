@@ -5,6 +5,17 @@
 > Add a `transfer(other: Account, amount: float)` method to `Account` and write its tests first:
 > a successful transfer, and an overdraft that leaves both accounts unchanged.
 
+<details>
+<summary>Where to look</summary>
+
+[Test-Driven Development (TDD)](../../Chapters/11_Techniques--Testing.md#test-driven-development-tdd) has you write the failing test before the code that satisfies it.
+Write both tests first, then build `transfer()` from the `withdraw()` and `deposit()` methods that already exist.
+The order of those two calls decides whether a failed transfer leaves the other account untouched.
+The overdraft test checks it with `pytest.raises()`, as in [Testing for Exceptions](../../Chapters/11_Techniques--Testing.md#testing-for-exceptions).
+
+<details>
+<summary>Solution</summary>
+
 ```python
 # test_ch11_transfer.py
 from dataclasses import dataclass
@@ -66,10 +77,23 @@ deliberate decision rather than an accident. A version that deposits
 first and withdraws second leaves `other` credited even when the
 transfer as a whole should fail.
 
+</details>
+</details>
+
 ## 2. Parametrized interest rates
 
 > Use `parametrize` to test `add_interest()` at several rates,
 > comparing with `pytest.approx()`.
+
+<details>
+<summary>Where to look</summary>
+
+[Parametrizing Tests](../../Chapters/11_Techniques--Testing.md#parametrizing-tests) shows `@pytest.mark.parametrize` running one test body once per value.
+Pass the rates as a list and take `rate` as a test parameter.
+Compare the balance using `pytest.approx()`, which [Comparing Floating-Point Values](../../Chapters/11_Techniques--Testing.md#comparing-floating-point-values) introduces.
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # test_ch11_interest_rates.py
@@ -112,11 +136,24 @@ well. A rate such as `0.1`, where the two sides differ by one bit, or
 interest applied more than once, is where the assertion needs the
 tolerance.
 
+</details>
+</details>
+
 ## 3. A fixture asserting an invariant after the test
 
 > Write a fixture that `yield`s an `Account` and asserts, after the `yield`,
 > that the balance is never negative.
 > Use it in two tests.
+
+<details>
+<summary>Where to look</summary>
+
+[Fixtures Replace Setup and Teardown](../../Chapters/11_Techniques--Testing.md#fixtures-replace-setup-and-teardown) shows a fixture that `yield`s its value, with teardown code after the `yield`.
+Create and fund the `Account` before the `yield`, and put the `assert` on its balance after it.
+Annotate the fixture as returning an `Iterator[Account]`, then name it as a parameter in two tests.
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # test_ch11_invariant.py
@@ -170,6 +207,9 @@ check: no matter what either test does to the account,
 body returns control to the fixture. Both tests pass the same
 invariant check, with no assertion duplicated in either test body.
 
+</details>
+</details>
+
 ## 4. The environment variable, patched and then injected
 
 > Write `settings_path()`,
@@ -177,6 +217,31 @@ invariant check, with no assertion duplicated in either test body.
 > and test it with `monkeypatch` and `tmp_path`.
 > Then rewrite the function to take the directory as an argument and test it again.
 > Which test survives a change to the environment variable's name?
+
+<details>
+<summary>Where to look</summary>
+
+[Filesystem and Environment](../../Chapters/11_Techniques--Testing.md#filesystem-and-environment) pairs `monkeypatch.setenv()` with the `tmp_path` fixture.
+Use both to test `settings_path()`, then write a second function that takes the directory as a parameter and test it with `tmp_path` alone.
+To answer the question, rename the variable in `settings_path()` and see which test still passes.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of settings.py
+import os
+from pathlib import Path
+
+def settings_path() -> Path:
+    ...
+
+def settings_path_in(directory: Path) -> Path:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # settings.py
@@ -228,12 +293,46 @@ to read `APP_CONFIG` and pass the directory in. That somebody is
 usually one function at the program's edge, and that function is the
 one place a patching test is worth writing.
 
+</details>
+</details>
+</details>
+
 ## 5. Stubbing a boundary, patched and then injected
 
 > `weather.current_temp()` calls `urlopen()`.
 > Write a second function that takes a fetcher as an argument instead,
 > and test both: one with `monkeypatch`, one with a plain function passed in.
 > Then rename `weather.urlopen` to `weather.fetch` and see which test still passes.
+
+<details>
+<summary>Where to look</summary>
+
+[Network Calls](../../Chapters/11_Techniques--Testing.md#network-calls) replaces `urlopen()` with `monkeypatch.setattr()` so the test never touches the network.
+For the second function, accept a `Callable` that opens the URL, and pass a plain function returning an `io.BytesIO`.
+Both tests can share that one stub.
+The rename shows how each test refers to the thing it replaces.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of ch11_weather.py
+import io
+from collections.abc import Callable
+from urllib.request import urlopen
+
+def current_temp(city: str) -> str:
+    ...
+
+def current_temp_with(
+    city: str,
+    fetch: Callable[[str], io.BufferedIOBase],
+) -> str:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # ch11_weather.py
@@ -300,6 +399,10 @@ part of the contract. The function then receives what it needs instead
 of going looking for something no caller handed it, the chapter's
 description of a function that is hard to test.
 
+</details>
+</details>
+</details>
+
 ## 6. The branch that sends nothing
 
 > `test_notifier.py` checks that a negative balance sends a message.
@@ -307,6 +410,16 @@ description of a function that is hard to test.
 > a balance of zero or more sends nothing.
 > Then write the same test with a hand-written stub in place of the `Mock`.
 > What must the stub gain to make the check?
+
+<details>
+<summary>Where to look</summary>
+
+[Stubs and Mocks](../../Chapters/11_Techniques--Testing.md#stubs-and-mocks) checks a call with a `Mock`, and `assert_not_called()` checks the opposite case.
+Test a balance of zero as well as a positive one, since zero is where the boundary lies, and use `parametrize` to cover both.
+A hand-written stub needs somewhere to keep what it receives, so the test has something to inspect afterward.
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # test_ch11_silent_notifier.py
@@ -355,3 +468,6 @@ so the type checker checks it against `Callable[[str], None]`,
 and a change to the real signature shows up as a type error.
 A `Mock` accepts any call,
 and the chapter closes that gap with `create_autospec()`.
+
+</details>
+</details>

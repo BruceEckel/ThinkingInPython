@@ -9,6 +9,36 @@
 > Confirm `adapter["name"]` finds a value while `adapter.append(...)` still reaches the underlying list.
 > Then call `len(adapter)` and explain the result.
 
+<details>
+<summary>Where to look</summary>
+
+[Adapter in Python](../../Chapters/29_Patterns--Changing_the_Interface.md#adapter-in-python) shows `__getattr__()` forwarding every attribute the adapter does not define.
+Add `__getitem__()` to the class for the lookup, then try `len()` on the result.
+Python finds special methods on the class, not through `__getattr__()`, which explains what `len()` does.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_1.py
+from typing import Any
+from exceptions import expected
+from record import record
+
+@record
+class PairsAdapter:
+    pairs: list[tuple[str, Any]]
+
+    def __getitem__(self, key: str) -> Any:
+        ...
+
+    def __getattr__(self, name: str) -> Any:
+        ...
+```
+
+<details>
+<summary>Solution</summary>
+
 ```python
 # exercise_1.py
 from typing import Any
@@ -68,11 +98,38 @@ If the pairs are many and the lookups frequent, convert to a real
 `dict` once with `dict(pairs)`, and adapt only when the list must
 stay a list for some other caller.
 
+</details>
+</details>
+</details>
+
 ## 2. Deprecating the class instead of the method
 
 > In `deprecating.py`,
 > deprecate the whole `Report` class instead of the method,
 > and show that constructing a `Report` warns while calling `render()` does not.
+
+<details>
+<summary>Where to look</summary>
+
+[Deprecating the Old Interface](../../Chapters/29_Patterns--Changing_the_Interface.md#deprecating-the-old-interface) marks a method with `warnings.deprecated()`.
+The same decorator accepts a class.
+Record warnings with `warnings.catch_warnings(record=True)`, and compare what constructing the class and calling its method add to the list.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_2.py
+import warnings
+
+@warnings.deprecated("Report is replaced by TextReport")
+class Report:
+    def render(self) -> str:
+        ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_2.py
@@ -112,12 +169,56 @@ import rather than on any call. A library that subclasses a
 deprecated class emits the warning as soon as Python imports that
 library.
 
+</details>
+</details>
+</details>
+
 ## 3. `facade.py` as a module
 
 > Rewrite `facade.py` as a module façade.
 > Put its classes behind leading-underscore names in one module,
 > expose functions that build them, and import only those from a second file.
 > Compare what a caller can see in each version.
+
+<details>
+<summary>Where to look</summary>
+
+[Façade](../../Chapters/29_Patterns--Changing_the_Interface.md#façade) builds the *Façade* as a class of static methods.
+A module is already a namespace, so the classes can stay in it behind leading-underscore names.
+Expose a function that assembles them, import only that function elsewhere, and list the module's public names with `vars()`.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of shop.py
+from record import record
+
+@record
+class _Engine:
+    def start(self) -> None:
+        ...
+
+@record
+class _FuelPump:
+    engine: _Engine
+
+    def prime(self) -> None:
+        ...
+
+@record
+class _Ignition:
+    pump: _FuelPump
+
+    def turn_key(self) -> None:
+        ...
+
+def start_car() -> _Ignition:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # shop.py
@@ -190,6 +291,10 @@ the point worth taking away. Neither version enforces anything. The
 difference is how much ceremony you pay to express the same intent,
 and the module version pays none.
 
+</details>
+</details>
+</details>
+
 ## 4. Classifying three wrappers
 
 > Consider three wrappers: one logs each call and forwards it unchanged,
@@ -198,6 +303,16 @@ and the module version pays none.
 > Classify each as *Proxy*, *Decorator*, *Adapter*,
 > or *Façade* using the "remove it and you lose" test from the table,
 > and say what you lose in each case.
+
+<details>
+<summary>Where to look</summary>
+
+[Distinguishing the Wrappers](../../Chapters/29_Patterns--Changing_the_Interface.md#distinguishing-the-wrappers) gives the table that separates *Proxy*, *Decorator*, *Adapter*, and *Façade*.
+For each wrapper, imagine deleting it and ask what breaks.
+Check whether the wrapper changes the interface, adds behavior to each call, or controls whether the call happens.
+
+<details>
+<summary>Solution</summary>
 
 **The logging wrapper is a *Decorator*.** Its interface is the wrapped
 object's, unchanged, and it adds behavior on the way through. Remove
@@ -230,6 +345,9 @@ same `__getattr__()` forwarder. What separates them is the answer to
 "what breaks if I delete this," and a name chosen from that answer
 tells the next reader why the wrapper is there.
 
+</details>
+</details>
+
 ## 5. Renaming a keyword-capable parameter
 
 > Copy the classes from `adapter.py` and remove the `/` from `WhatIUse.op()`.
@@ -237,6 +355,65 @@ tells the next reader why the wrapper is there.
 > and call `op()` on each class with the keyword `what_i_want=`.
 > Explain what `ty` reports and what happens at runtime.
 > Then fix `WhatIUse2.op()` without restoring the `/`.
+
+<details>
+<summary>Where to look</summary>
+
+[What an Override May Change](../../Chapters/29_Patterns--Changing_the_Interface.md#what-an-override-may-change) explains which parts of a signature a subclass may alter.
+The `/` keeps a parameter's name out of the interface, so without it the name is part of what callers rely on.
+Call through a `WhatIUse` variable, so the checker sees only the base class, and give the override the base parameter's name.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_5.py
+from typing import override
+from exceptions import expect
+from record import record
+
+class WhatIHave:
+    def g(self) -> None:
+        ...
+    def h(self) -> None:
+        ...
+
+class WhatIWant:
+    __slots__ = ()
+    def f(self) -> None: ...
+
+@record
+class ProxyAdapter(WhatIWant):
+    what_i_have: WhatIHave
+
+    @override
+    def f(self) -> None:
+        ...
+
+class WhatIUse:
+    def op(self, what_i_want: WhatIWant) -> None:
+        ...
+
+class Renamed(WhatIUse):
+    @override
+    def op(  # type: ignore
+        self, item: WhatIWant | WhatIHave
+    ) -> None:
+        ...
+
+class WhatIUse2(WhatIUse):
+    @override
+    def op(
+        self, what_i_want: WhatIWant | WhatIHave
+    ) -> None:
+        ...
+
+def run(user: WhatIUse) -> None:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_5.py
@@ -335,3 +512,7 @@ With the `/` in place, as in `adapter.py`, no caller can pass the
 parameter by name, so the override is free to call it `item`.
 A positional-only parameter keeps its name out of the interface,
 and an override can then change the name.
+
+</details>
+</details>
+</details>

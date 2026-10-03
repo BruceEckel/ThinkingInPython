@@ -14,6 +14,51 @@ figure.
 > Say which part of the design absorbed the change,
 > and which parts you edited by hand.
 
+<details>
+<summary>Where to look</summary>
+
+[The Vector of Change](../../Chapters/21_Patterns--Design_Patterns.md#the-vector-of-change) names the one axis along which a design keeps shifting.
+Look at your history for the same function edited again and again, since that function marks the axis.
+Then ask which part absorbed each change and which parts you had to edit by hand.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_1a.py
+from record import record
+
+@record
+class Row:
+    name: str
+    amount: int
+
+def render(rows: list[Row], style: str) -> str:
+    ...
+```
+
+```python
+# The shape of exercise_1b.py
+from collections.abc import Callable
+from record import record
+
+@record
+class Row:
+    name: str
+    amount: int
+
+STYLES: dict[str, Callable[[Row], str]] = {
+    "text": lambda r: f"{r.name}: {r.amount}",
+    "csv": lambda r: f"{r.name},{r.amount}",
+}
+
+def render(rows: list[Row], style: str) -> str:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
+
 The example is a small report writer. It prints plain text, then has
 to emit CSV for a spreadsheet, then JSON for a web front end. Three
 changes along one axis, the output format. Everything else stays put
@@ -102,12 +147,45 @@ vector says nothing about the others. A design that makes formats
 pluggable and fields painful is the right answer only if formats are
 what keep changing.
 
+</details>
+</details>
+</details>
+
 ## 2. Subtracting a pattern
 
 > Take a pattern you know from another language and list its parts:
 > the classes, the interfaces, and the methods its usual form requires.
 > Cross out every part Python supplies without your writing it.
 > Describe what remains in one sentence.
+
+<details>
+<summary>Where to look</summary>
+
+[When a Pattern Dissolves](../../Chapters/21_Patterns--Design_Patterns.md#when-a-pattern-dissolves) shows a pattern whose parts Python already supplies.
+List the interface, the concrete classes, the context, and the wiring the usual form needs.
+Cross out each part that a function or a type annotation covers, and state what remains in one sentence.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_2.py
+from collections.abc import Callable
+
+def flat(weight: float) -> float:
+    ...
+
+def by_weight(weight: float) -> float:
+    ...
+
+def checkout(
+    weight: float, shipping: Callable[[float], float]
+) -> float:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 The pattern is *Strategy*, in the shape it takes in Java. Its usual
 form requires:
@@ -164,12 +242,52 @@ a function that travels on its own, and
 describes that case as the language having the piece all along. The
 intent survives the subtraction. Only the scaffolding disappears.
 
+</details>
+</details>
+</details>
+
 ## 3. Applying *Subtraction*
 
 > Apply *Subtraction* to a design of your own.
 > Remove one class, one interface, or one level of inheritance,
 > and say what stopped working.
 > If nothing did, leave it out.
+
+<details>
+<summary>Where to look</summary>
+
+[Design Principles](../../Chapters/21_Patterns--Design_Patterns.md#design-principles) states *Subtraction* as a test: take one thing away and run the program.
+Choose a class or a level of inheritance that holds a single method and no state.
+If nothing breaks, the piece was scaffolding; if something breaks, you have found the part that carries the design's intent.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_3.py
+from abc import ABC, abstractmethod
+from typing import override
+
+class Shipping(ABC):
+    @abstractmethod
+    def cost(self, weight: float) -> float: ...
+
+class Flat(Shipping):
+    @override
+    def cost(self, weight: float) -> float:
+        ...
+
+class ByWeight(Shipping):
+    @override
+    def cost(self, weight: float) -> float:
+        ...
+
+def checkout(weight: float, shipping: Shipping) -> float:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 The design is the same shipping calculation, written the way it looks
 before anyone questions it: an abstract base and two subclasses.
@@ -223,6 +341,10 @@ the program, and read the result. Nothing broke means the piece was
 scaffolding. Something broke means you found the floor, and the thing
 you removed is worth keeping and worth naming.
 
+</details>
+</details>
+</details>
+
 ## 4. Measuring the reach of a change
 
 > Write the `Report` design from [The Reach of a Change](../../Chapters/21_Patterns--Design_Patterns.md#the-reach-of-a-change)
@@ -231,6 +353,79 @@ you removed is worth keeping and worth naming.
 > and once where `Report` names a `Writer` protocol.
 > Add a Markdown writer to both versions.
 > For each version, list the existing classes and functions you edited.
+
+<details>
+<summary>Where to look</summary>
+
+[The Reach of a Change](../../Chapters/21_Patterns--Design_Patterns.md#the-reach-of-a-change) compares a design in which `Report` names each writer with one in which it names a protocol.
+In the first version give each writer its own method name; in the second give every writer the same method and declare it in a `Protocol`.
+Add the Markdown writer to each, then count the existing definitions you had to open.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_4a.py
+from record import record
+
+class PdfWriter:
+    def pdf(self, text: str) -> str:
+        ...
+
+class HtmlWriter:
+    def html(self, text: str) -> str:
+        ...
+
+class MdWriter:
+    def markdown(self, text: str) -> str:
+        ...
+
+type AnyWriter = PdfWriter | HtmlWriter | MdWriter
+
+@record
+class Report:
+    text: str
+
+    def render(self, writer: AnyWriter) -> str:
+        ...
+
+def main(kind: str) -> None:
+    ...
+```
+
+```python
+# The shape of exercise_4b.py
+from typing import Protocol
+from record import record
+
+class Writer(Protocol):
+    def write(self, text: str) -> str: ...
+
+class PdfWriter:
+    def write(self, text: str) -> str:
+        ...
+
+class HtmlWriter:
+    def write(self, text: str) -> str:
+        ...
+
+class MdWriter:
+    def write(self, text: str) -> str:
+        ...
+
+@record
+class Report:
+    text: str
+
+    def render(self, writer: Writer) -> str:
+        ...
+
+def main(kind: str) -> None:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 The first version gives each writer its own method name, which is the
 usual reason a class like `Report` ends up naming every writer: it
@@ -354,3 +549,7 @@ the part whose job is to assemble the pieces. The `match` in `main()`
 is the heavy edge that remains, and a registry
 ([Self Registration](../../Chapters/27_Patterns--Factory.md#self-registration))
 moves it out of `main()` as well.
+
+</details>
+</details>
+</details>

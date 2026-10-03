@@ -9,6 +9,42 @@
 > Confirm that reading `description` several times builds nothing,
 > and that the first `query()` reports the count.
 
+<details>
+<summary>Where to look</summary>
+
+[Virtual Proxy](../../Chapters/26_Patterns--Surrogate.md#virtual-proxy) builds `Expensive` inside `__getattr__()`, which runs only when normal lookup fails.
+Give `Lazy` a property for the cheap attribute, so Python finds it on the class and never reaches the fallback.
+Increment a counter in that property, and print the counter at the moment the fallback builds the real object.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_1.py
+from typing import Any
+
+class Expensive:
+    def __init__(self) -> None:
+        ...
+
+    def query(self) -> str:
+        ...
+
+class Lazy:
+    def __init__(self, description: str) -> None:
+        ...
+
+    @property
+    def description(self) -> str:
+        ...
+
+    def __getattr__(self, name: str) -> Any:
+        ...
+```
+
+<details>
+<summary>Solution</summary>
+
 ```python
 # exercise_1.py
 from typing import Any
@@ -62,10 +98,44 @@ slow construction pushed past all of them. GoF's image proxy is the
 same design, answering an image's size from stored numbers while the
 pixels stay unloaded until something draws them.
 
+</details>
+</details>
+</details>
+
 ## 2. A per-method tally in the counting proxy
 
 > Change `CountingProxy` in `counting_proxy.py` to keep a per-method tally in a `collections.Counter` instead of a single total.
 > Confirm the tally reports `f` called twice and `g` called once.
+
+<details>
+<summary>Where to look</summary>
+
+[Smart Reference](../../Chapters/26_Patterns--Surrogate.md#smart-reference) wraps each forwarded call to count it.
+`__getattr__()` receives the attribute name, so use it as the key into a `collections.Counter` in place of the single total.
+Increment the entry inside the wrapper, before forwarding the call.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_2.py
+from collections import Counter
+from typing import Any
+
+class Implementation:
+    def f(self) -> None: ...
+    def g(self) -> None: ...
+
+class CountingProxy:
+    def __init__(self, impl: Any) -> None:
+        ...
+
+    def __getattr__(self, name: str) -> Any:
+        ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_2.py
@@ -107,6 +177,10 @@ attribute, so the wrapper charges the count to that name before
 forwarding. The single `calls` integer becomes a `Counter`. The final
 `print()` shows `f` called twice and `g` once.
 
+</details>
+</details>
+</details>
+
 ## 3. A simple copy-on-write list
 
 > Create a simple copy-on-write list.
@@ -114,6 +188,47 @@ forwarding. The single `calls` integer becomes a `Counter`. The final
 > at the cost of incrementing a reference count,
 > and the first `append()` through a shared list copies the data before changing it.
 > Confirm that the two lists share their data before the write and not after.
+
+<details>
+<summary>Where to look</summary>
+
+[Smart Reference](../../Chapters/26_Patterns--Surrogate.md#smart-reference) shows a surrogate doing extra work around each use of an implementation.
+Keep the data and a count of owners together in one small shared object, and let `share()` hand out the same object with the count raised.
+Have `append()` check the count and, when more than one owner exists, copy the data into a new object first.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_3.py
+from collections.abc import Sequence
+from dataclasses import dataclass
+
+@dataclass
+class Box:
+    data: list[object]
+    owners: int = 1
+
+class CowList:
+    def __init__(self, data: Sequence[object] | None = None,
+                 _box: Box | None = None) -> None:
+        ...
+
+    def share(self) -> CowList:
+        ...
+
+    def append(self, item: object) -> None:
+        ...
+
+    def __len__(self) -> int:
+        ...
+
+    def __repr__(self) -> str:
+        ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_3.py
@@ -172,11 +287,44 @@ of its owners), then appends to that private copy. Since no one called
 copy happens at the first write, and only the list that writes pays
 for it.
 
+</details>
+</details>
+</details>
+
 ## 4. Why the typo reports as `RecursionError`
 
 > In `counting_proxy.py`,
 > misspell `self._impl` as `self._imp` inside `__getattr__()` and run it.
 > Use the fallback-hook behavior this chapter describes to explain why the failure reports as `RecursionError` rather than an `AttributeError` naming the typo.
+
+<details>
+<summary>Where to look</summary>
+
+[The Recursion Trap](../../Chapters/26_Patterns--Surrogate.md#the-recursion-trap) and [Forwarding with `__getattr__()`](../../Chapters/26_Patterns--Surrogate.md#forwarding-with-getattr) describe a hook that runs only after normal lookup fails.
+Trace what happens when the first line inside that hook reads a name that does not exist.
+Use `expected()` from `exceptions` to catch the failure in the listing.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_4.py
+from typing import Any
+from exceptions import expected
+
+class Implementation:
+    def f(self) -> None: ...
+
+class BrokenProxy:
+    def __init__(self, impl: Any) -> None:
+        ...
+
+    def __getattr__(self, name: str) -> Any:
+        ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_4.py
@@ -222,6 +370,10 @@ straight back into `__getattr__()`. Reading `self._impl`, which
 built through `object.__new__()`, for example) fails the same way on
 its first attribute access.
 
+</details>
+</details>
+</details>
+
 ## 5. A connection pool that hands out proxies
 
 > Create a program similar to a DBMS that allows only a fixed number of connections at a time.
@@ -231,6 +383,64 @@ its first attribute access.
 > the system must check that connection back in for reuse.
 > To guarantee this, return a proxy instead of a reference to the actual connection,
 > and design the proxy to release the connection back to the system.
+
+<details>
+<summary>Where to look</summary>
+
+[Protection Proxy](../../Chapters/26_Patterns--Surrogate.md#protection-proxy) shows a surrogate that controls access to an implementation.
+Let only a `Pool` class create the `Connection` objects, and have `acquire()` return a proxy that forwards through `__getattr__()`.
+Make the proxy a context manager whose `__exit__()` returns the connection to the pool and drops its own reference.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_5.py
+from typing import Any, Final, Self
+from exceptions import expect
+
+POOL_SIZE: Final[int] = 2
+
+class PoolExhausted(RuntimeError):
+    "No connection is free."
+
+class Connection:
+    def __init__(self, number: int) -> None:
+        ...
+
+    def query(self, sql: str) -> str:
+        ...
+
+class Pool:
+    def __init__(self, size: int) -> None:
+        ...
+
+    def available(self) -> int:
+        ...
+
+    def acquire(self) -> ConnectionProxy:
+        ...
+
+    def release(self, connection: Connection) -> None:
+        ...
+
+class ConnectionProxy:
+    def __init__(self, pool: Pool,
+                 connection: Connection) -> None:
+        ...
+
+    def __getattr__(self, name: str) -> Any:
+        ...
+
+    def __enter__(self) -> Self:
+        ...
+
+    def __exit__(self, *exception: object) -> None:
+        ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_5.py
@@ -322,12 +532,51 @@ of letting two clients share one connection. `ConnectionProxy` is a
 *protection proxy* and a *smart reference* at once: it controls access,
 and it adds an action (the check-in) around each loan of the connection.
 
+</details>
+</details>
+</details>
+
 ## 6. Forwarding `__len__()` explicitly
 
 > `dunder_bypass.py`'s `Proxy` cannot answer `len(p)`.
 > Give that `Proxy` a `__len__()` that forwards to the implementation,
 > and confirm `len(p)` returns 2.
 > Then explain why `__getattr__()` could not have supplied it.
+
+<details>
+<summary>Where to look</summary>
+
+[Special Methods Bypass `__getattr__()`](../../Chapters/26_Patterns--Surrogate.md#special-methods-bypass-getattr) explains why `len(p)` fails on a proxy that forwards only through the fallback hook.
+Define `__len__()` on the proxy class and have it call `len()` on the implementation.
+For the explanation, consider where `len()` looks for the method.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_6.py
+from typing import Any
+
+class Words:
+    def __init__(self) -> None:
+        ...
+
+    def __len__(self) -> int:
+        ...
+
+class Proxy:
+    def __init__(self, impl: Any) -> None:
+        ...
+
+    def __getattr__(self, name: str) -> Any:
+        ...
+
+    def __len__(self) -> int:
+        ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_6.py
@@ -369,10 +618,54 @@ than `self.__implementation.__len__()`. Both give the same answer, and
 method per dunder, or generate them in a loop over a list of names and
 assign them onto the class.
 
+</details>
+</details>
+</details>
+
 ## 7. A `change_to()` that refuses a narrower implementation
 
 > Extend `Surrogate` in `state_surrogate.py` so `change_to()` rejects an implementation missing a method the current one has,
 > and explain why the type checker could not have reported that swap.
+
+<details>
+<summary>Where to look</summary>
+
+[*State*](../../Chapters/26_Patterns--Surrogate.md#state) swaps the implementation behind a surrogate with `change_to()`.
+Build a set of public callable names with `dir()` and `getattr()` for the current implementation and for the new one.
+Subtract the new set from the current one and raise a `TypeError` when anything remains.
+For the explanation, consider what type the surrogate gives its implementation.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_7.py
+from typing import Any
+from exceptions import expect
+
+def methods(obj: object) -> set[str]:
+    ...
+
+class Surrogate:
+    def __init__(self, implementation: Any) -> None:
+        ...
+
+    def change_to(self, new: Any) -> None:
+        ...
+
+    def __getattr__(self, name: str) -> Any:
+        ...
+
+class Full:
+    def f(self) -> None: ...
+    def g(self) -> None: ...
+
+class Lacking:
+    def f(self) -> None: ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_7.py
@@ -433,3 +726,7 @@ shape that every implementation must meet, a different guarantee. A
 `Protocol` cannot express "at least what the last implementation had,"
 because that comparison relates two runtime values rather than two
 declarations.
+
+</details>
+</details>
+</details>

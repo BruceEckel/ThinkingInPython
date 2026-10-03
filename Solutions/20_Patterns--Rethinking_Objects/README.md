@@ -7,6 +7,57 @@
 > and demonstrate the same leak by mutating the list you get back.
 > Then plug the leak the way `plugged.py` plugs `numbers` and `bob`.
 
+<details>
+<summary>Where to look</summary>
+
+[Encapsulation Leaks](../../Chapters/20_Patterns--Rethinking_Objects.md#encapsulation-leaks) shows a getter handing out a reference to the real internal list.
+Mutate what the `tags` property returns to see the leak.
+[Plugging Leaks Is Tedious](../../Chapters/20_Patterns--Rethinking_Objects.md#plugging-leaks-is-tedious) shows the fix: return a copy, so the caller changes only the copy.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_1a.py
+from dataclasses import dataclass
+
+@dataclass
+class Bob:
+    name: str = "Bob"
+
+class Leaky:
+    def __init__(
+        self, numbers: list[int], tags: list[str]
+    ) -> None:
+        ...
+
+    @property
+    def tags(self) -> list[str]:
+        ...
+```
+
+```python
+# The shape of exercise_1b.py
+from dataclasses import dataclass
+
+@dataclass
+class Bob:
+    name: str = "Bob"
+
+class Plugged:
+    def __init__(
+        self, numbers: list[int], tags: list[str]
+    ) -> None:
+        ...
+
+    @property
+    def tags(self) -> list[str]:
+        ...
+```
+
+<details>
+<summary>Solution</summary>
+
 ```python
 # exercise_1a.py
 from dataclasses import dataclass
@@ -69,6 +120,10 @@ keeps the items it had. Every new mutable field needs its own
 defensive copy. That repetition is the tedium that motivates freezing
 the data instead.
 
+</details>
+</details>
+</details>
+
 ## 2. A mutable `Bob` in a frozen data class
 
 > In `immutable.py`, remove `frozen=True` from `Bob` and leave it on `Immutable`.
@@ -78,6 +133,16 @@ the data instead.
 > so the frozen instance can no longer be a dict key.
 > Restore the `frozen=True`.
 > Who, then, must make immutability go all the way down?
+
+<details>
+<summary>Where to look</summary>
+
+[The Immutability Solution](../../Chapters/20_Patterns--Rethinking_Objects.md#the-immutability-solution) explains what `frozen=True` generates for a data class.
+Consider which operations it guards: rebinding a field, or changing the object the field refers to.
+The generated `__hash__()` hashes the field values, so look at what it must hash when one value is mutable.
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_2.py
@@ -127,6 +192,9 @@ mutable one for any nested value. The type checker will hold you to
 those declarations once you write them. It will not choose them for
 you.
 
+</details>
+</details>
+
 ## 3. `NewType` at the protocol boundary
 
 > In `protocol_collision.py`,
@@ -136,6 +204,41 @@ you.
 > and `Package.total()` to return a `Weight`.
 > Run `ty check` and read the error it reports for `charge(package)`.
 > Then say what still goes wrong at runtime if someone deletes the annotations.
+
+<details>
+<summary>Where to look</summary>
+
+[What the Shape Does Not Say](../../Chapters/20_Patterns--Rethinking_Objects.md#what-the-shape-does-not-say) shows two protocols whose `total()` methods have the same shape.
+`NewType` gives each `float` a distinct type, so the type checker can tell a `Price` from a `Weight`.
+For the runtime question, consider what `Weight(2.5)` returns when the program runs.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_3.py
+from typing import NewType, Protocol
+from record import record
+
+class Priced(Protocol):
+    def total(self) -> Price: ...
+
+class Weighted(Protocol):
+    def total(self) -> Weight: ...
+
+@record
+class Package:
+    weight_kg: float
+
+    def total(self) -> Weight:
+        ...
+
+def charge(item: Priced) -> float:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_3.py
@@ -194,6 +297,10 @@ now. It prints `4.5` and charges the customer for a number of kilograms.
 real in the source and absent in the process, and that split is the
 bargain the chapter describes.
 
+</details>
+</details>
+</details>
+
 ## 4. A `Triple`, adapted by composition
 
 > In `distance_protocol.py`, add a third class, `Triple`, with fields `a`,
@@ -201,6 +308,53 @@ bargain the chapter describes.
 > and an adapter `TripleCoord` that exposes `x` as `a` and `y` as `b`,
 > ignoring `c`.
 > Confirm `distance()` works on a `TripleCoord` with no change to `distance()`.
+
+<details>
+<summary>Where to look</summary>
+
+[Protocols Generalize, Composition Adapts](../../Chapters/20_Patterns--Rethinking_Objects.md#protocols-generalize-composition-adapts) defines the `Coord` protocol and adapts a class that lacks `x` and `y`.
+Write `TripleCoord` to hold a `Triple` and expose `x` and `y` as read-only properties that return the fields you choose.
+`distance()` needs no change, because it asks only for those two properties.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_4.py
+from math import sqrt
+from typing import Protocol
+from record import record
+
+class Coord(Protocol):
+    @property
+    def x(self) -> float: ...
+    @property
+    def y(self) -> float: ...
+
+def distance(a: Coord, b: Coord) -> float:
+    ...
+
+@record
+class Triple:
+    a: float
+    b: float
+    c: float
+
+@record
+class TripleCoord:
+    triple: Triple
+
+    @property
+    def x(self) -> float:
+        ...
+
+    @property
+    def y(self) -> float:
+        ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_4.py
@@ -246,12 +400,54 @@ the two properties `distance()` reads, ignoring `c`. `distance()` stays
 as it is, because it asks for `.x` and `.y` alone. `TripleCoord`
 supplies that shape, the same way `PairCoord` adapts `Pair`.
 
+</details>
+</details>
+</details>
+
 ## 5. Adding `Square` to the closed `Shape` union
 
 > In `shapes_match.py`, add a new shape, `Square(side: float)`,
 > to the `Shape` union, add its `case` to `area()`,
 > and confirm `ty check` still passes.
 > Then temporarily comment out the new `case` and observe what `assert_never()` causes the type checker to report.
+
+<details>
+<summary>Where to look</summary>
+
+[Pattern Matching on a Union](../../Chapters/20_Patterns--Rethinking_Objects.md#pattern-matching-on-a-union) shows `area()` matching on each member of a closed union.
+Add `Square` to the `type Shape` alias and give `area()` a matching `case` with a class pattern.
+The final `case _` calls `assert_never()`, which requires the type `Never`; remove your new `case` and read the type the checker reports for its argument.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_5.py
+import math
+from typing import assert_never
+from record import record
+
+@record
+class Rectangle:
+    length: float
+    width: float
+
+@record
+class Circle:
+    radius: float
+
+@record
+class Square:
+    side: float
+
+type Shape = Rectangle | Circle | Square
+
+def area(shape: Shape) -> float:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_5.py
@@ -316,11 +512,44 @@ requires `Never`, the type with no values. That report is the
 exhaustiveness check the closed union delivers. A missed case becomes
 a type error instead of a runtime failure.
 
+</details>
+</details>
+</details>
+
 ## 6. A `NullCache`, following `NullLogger`'s shape
 
 > In `null_logger.py`, write a second null-object style class, `NullCache`,
 > whose `get(key)` always returns `None` and whose `set(key, value)` does nothing,
 > following the same shape as `NullLogger`.
+
+<details>
+<summary>Where to look</summary>
+
+[Null Object](../../Chapters/20_Patterns--Rethinking_Objects.md#null-object) shows `NullLogger` standing in for a real logger with the same methods and neutral behavior.
+Declare a `Cache` protocol with `get()` and `set()`, then write `NullCache` to satisfy it.
+Its `get()` reports a miss, and its `set()` discards the value.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_6.py
+from typing import Protocol
+
+class Cache(Protocol):
+    def get(self, key: str) -> str | None: ...
+    def set(self, key: str, value: str) -> None: ...
+
+class NullCache:
+    def get(self, key: str) -> str | None:
+        ...
+
+    def set(self, key: str, value: str) -> None:
+        ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_6.py
@@ -351,12 +580,62 @@ shared `NullCache()` instance, so no code that uses the cache needs an
 different matter. A miss is information the caller acts on, so `None` stays
 in the return type.
 
+</details>
+</details>
+</details>
+
 ## 7. Counting every route into the list
 
 > In `counting_list.py`, count `__setitem__` as well,
 > then find a second `list` method that changes the contents without going through either override.
 > Rewrite `CountingList` to hold a list instead of inheriting from one,
 > and show that the counts are now correct for every route in.
+
+<details>
+<summary>Where to look</summary>
+
+[Prefer Composition to Inheritance](../../Chapters/20_Patterns--Rethinking_Objects.md#prefer-composition-to-inheritance) shows `CountingList` missing calls that `list` makes in its own implementation.
+Try `extend()` and `insert()` on the subclass and compare the counts with the contents.
+The composed version holds a `list` as a field and exposes only methods you write, so every mutation passes through a counter.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_7.py
+from dataclasses import dataclass, field
+from typing import override
+
+class CountingList(list[int]):
+    def __init__(self) -> None:
+        ...
+
+    @override
+    def append(self, item: int, /) -> None:
+        ...
+
+    @override
+    def __setitem__(self, index, value) -> None:
+        ...
+
+@dataclass
+class CountingBox:
+    items: list[int] = field(default_factory=list)
+    appends: int = 0
+    sets: int = 0
+
+    def append(self, item: int) -> None:
+        ...
+
+    def extend(self, more: list[int]) -> None:
+        ...
+
+    def __setitem__(self, index: int, value: int) -> None:
+        ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_7.py
@@ -434,6 +713,10 @@ and a caller who wants `sort()` waits until you write one. The trade is the
 choice composition asks you to make on purpose, instead of discovering
 later that inheritance made it for you.
 
+</details>
+</details>
+</details>
+
 ## 8. `BoundedStack` without breaking the contract
 
 > In `lsp_violation.py`,
@@ -442,6 +725,47 @@ later that inheritance made it for you.
 > and expose "full" some other way.
 > Then say what you gave up,
 > and whether `BoundedStack` should be a subclass of `Stack` at all.
+
+<details>
+<summary>Where to look</summary>
+
+[The Liskov Substitution Principle](../../Chapters/20_Patterns--Rethinking_Objects.md#liskov-substitution) shows `fill()` relying on a base `push()` that always succeeds.
+Keep that guarantee by having `push()` accept every item and enforce the limit another way, and add a `full()` method callers can ask.
+Then decide whether the weaker guarantee is acceptable, and whether a subclass is the right relationship.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_8.py
+from dataclasses import dataclass, field
+from typing import ClassVar, override
+
+@dataclass
+class Stack:
+    items: list[int] = field(default_factory=list)
+
+    def push(self, item: int) -> None:
+        ...
+
+@dataclass
+class BoundedStack(Stack):
+    limit: ClassVar[int] = 2
+
+    # The limit, exposed as a question
+    def full(self) -> bool:
+        ...
+
+    @override
+    def push(self, item: int) -> None:  # Always succeeds
+        ...
+
+def fill(stack: Stack, count: int) -> int:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_8.py
@@ -510,3 +834,7 @@ states that difference, with its own `push()` returning `bool` or
 raising an exception. Nothing then hands that class to a `fill()`
 written for a different contract. Inheritance is a claim about
 substitutability, and `BoundedStack` makes a claim it cannot keep.
+
+</details>
+</details>
+</details>

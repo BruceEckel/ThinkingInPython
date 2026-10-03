@@ -6,6 +6,25 @@
 > Predict whether the `for` loop's `else` clause runs before you check,
 > then confirm.
 
+<details>
+<summary>Where to look</summary>
+
+[The Loop `else` Clause](../../Chapters/04_Foundations--Control_Flow.md#the-loop-else-clause) says when a `for` loop runs its `else`.
+Ask whether any value of `d` reaches the `break` for 97.
+The `else` depends on how the loop ended, not on what the body did.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_1.py
+def find_factor(n):
+    ...
+```
+
+<details>
+<summary>Solution</summary>
+
 ```python
 # exercise_1.py
 def find_factor(n):
@@ -24,10 +43,33 @@ The loop tries every `d` from 2 up to 96 and finds no factor, so it
 does not reach `break`. The `for`'s `else` clause runs when the loop
 finishes without a `break`, so it prints `97 is prime`.
 
+</details>
+</details>
+</details>
+
 ## 2. Counting odd steps in the Collatz sequence
 
 > Change `collatz_sequence()` in `while_loop.py` to also count how many times `n` is odd,
 > and print that count alongside the step count.
+
+<details>
+<summary>Where to look</summary>
+
+[Loops](../../Chapters/04_Foundations--Control_Flow.md#loops) walks through `collatz_sequence()` in a `while` loop.
+Add a second counter next to `steps`, and increment it only in the branch that handles an odd `n`.
+Return both counts together so the caller can print them side by side.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_2.py
+def collatz_sequence(n):
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_2.py
@@ -58,12 +100,26 @@ Six steps total, and only one of them (`5 -> 16`) starts from an odd
 `n`. `odd_count` increments in the `else` branch, the one that takes
 `3 * n + 1`, and that branch runs only when `n` is odd.
 
+</details>
+</details>
+</details>
+
 ## 3. Swapped order of `continue` and `break`
 
 > In `break_continue.py`, swap the order of the two `if` blocks,
 > so the `n == 6` `break` check comes first and the `n == 3` `continue` check comes second.
 > Predict whether the output changes before running it,
 > then explain what you find.
+
+<details>
+<summary>Where to look</summary>
+
+[Loops](../../Chapters/04_Foundations--Control_Flow.md#loops) shows `break` leaving the loop and `continue` skipping to the next iteration.
+Compare the values of `n` that each `if` tests.
+Ask whether any single `n` can satisfy both tests, since that decides whether their order matters.
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_3.py
@@ -85,11 +141,36 @@ either order produces the same result. Order matters only when two
 conditions can both be true for the same value and send execution
 down different paths. Here they cannot.
 
+</details>
+</details>
+
 ## 4. An exception that escapes the handler
 
 > In `demonstrate_exceptions.py`, add a call `divide_and_report(1, "x")`
 > (a `TypeError` that `except ValueError` does not catch).
 > Run it and read the traceback that escapes.
+
+<details>
+<summary>Where to look</summary>
+
+[Errors and Exceptions](../../Chapters/04_Foundations--Control_Flow.md#errors-and-exceptions) shows how `except` selects which exception types it catches, and when `finally` and `else` run.
+Trace which clauses run when the exception type matches none of the `except` clauses.
+To see the escape in a listing, wrap the call in a `try` that names the exception type.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_4.py
+def checked_divide(a, b):
+    ...
+
+def divide_and_report(a, b):
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_4.py
@@ -127,11 +208,34 @@ escaping. An interactive session or an outer caller sees the
 `TypeError` escape the same way. The `else` clause never runs here: it belongs to the case
 where the `try` block finishes cleanly.
 
+</details>
+</details>
+</details>
+
 ## 5. A three-item `case` in `pattern_matching.py`
 
 > In `pattern_matching.py`,
 > add a `case ["go", direction, distance]` that reports both parts,
 > and check what `run("go north 3")` returns before and after you add it.
+
+<details>
+<summary>Where to look</summary>
+
+[Pattern Matching](../../Chapters/04_Foundations--Control_Flow.md#pattern-matching) shows sequence patterns matching a split command.
+A list pattern matches only a sequence of its own length, so count the items in `"go north 3"` against each existing `case`.
+Put the three-item pattern where it cannot shadow another, and bind `direction` and `distance` by name.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_5.py
+def run(command):
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_5.py
@@ -160,10 +264,24 @@ The longer pattern gives a three-item list a `case` of its own. Order
 matters only between patterns that could both match the same value.
 The two `go` patterns cannot, so either arrangement works here.
 
+</details>
+</details>
+</details>
+
 ## 6. The comprehension written as a loop
 
 > Rewrite the `evens` list comprehension in `comprehensions_intro.py` as a `for` loop that appends to a list,
 > then say which version you would rather read six months from now.
+
+<details>
+<summary>Where to look</summary>
+
+[Comprehensions](../../Chapters/04_Foundations--Control_Flow.md#comprehensions) introduces the list comprehension with a filter.
+Start from an empty list, loop over `range()`, test the condition with an `if`, and call `append()`.
+Then compare what each version tells the reader about the finished list.
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_6.py
@@ -184,11 +302,42 @@ grows past one condition and one expression, since a comprehension
 with two filters and a nested loop is harder to read than the nested `for`
 loops it replaces.
 
+</details>
+</details>
+
 ## 7. Chaining from an exception you build yourself
 
 > In `exception_chaining.py`,
 > add a fourth function that catches the `ValueError` and raises `BadNumber` from a *different* exception object it constructs.
 > Predict which line `joining_line()` prints before you run it.
+
+<details>
+<summary>Where to look</summary>
+
+[Exception Chaining](../../Chapters/04_Foundations--Control_Flow.md#exception-chaining) covers `raise ... from` and the `__cause__` and `__context__` attributes.
+The expression after `from` can be any exception object, including one you construct on the spot.
+Predict the joining line from `__cause__`, then print both attributes to see which exception each one holds.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_7.py
+import textwrap
+import traceback
+
+class BadNumber(Exception):
+    pass
+
+def substituted(text):
+    ...
+
+def joining_line(e):
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_7.py
@@ -246,11 +395,25 @@ fills that attribute in whether you want it or not. `__cause__` answers
 that one in. `from None` sets `__suppress_context__`, hiding the
 `__context__` answer, and leaves `__cause__` as `None`.
 
+</details>
+</details>
+</details>
+
 ## 8. `read_text()` in place of the reading `with`
 
 > Rewrite `context_manager.py`'s reading half using `path.read_text()`.
 > Say what the `with` form gives you that the one-liner does not,
 > and when that matters.
+
+<details>
+<summary>Where to look</summary>
+
+[Context Managers](../../Chapters/04_Foundations--Control_Flow.md#context-managers) explains what the `with` block does on entry and exit, and names `read_text()` and `write_text()` for small files.
+Call `read_text()` on the `Path` and split the result into lines.
+To compare the two forms, consider what the file object lets you do between the open and the close.
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_8.py
@@ -289,12 +452,25 @@ file in a `with` block of its own, so it closes the file too, whether
 or not the read succeeds. For a configuration file of a few kilobytes
 read once at startup, `read_text()` is the better choice.
 
+</details>
+</details>
+
 ## 9. Adjacent `2`s in `mutating_while_looping.py`
 
 > In `mutating_while_looping.py`, change the list to `[2, 2, 1, 3]`,
 > so a `2` sits in the first slot.
 > Use the shifting-slots explanation to predict what the loop leaves in `scores`,
 > then run it to check.
+
+<details>
+<summary>Where to look</summary>
+
+[Mutating a Container While Looping](../../Chapters/04_Foundations--Control_Flow.md#mutating-a-container-while-looping) explains how `remove()` shifts later items into slots the loop has passed.
+Walk the loop by index over `[2, 2, 1, 3]`, noting which item `remove()` deletes and which item moves into the current position.
+Then predict the final list before you run it.
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_9.py
@@ -319,3 +495,6 @@ passed, so its final position depends on the data. In the chapter's
 symptom moves with the input, and for that reason the chapter says to
 build a new container instead of reasoning your way around the
 mutation.
+
+</details>
+</details>

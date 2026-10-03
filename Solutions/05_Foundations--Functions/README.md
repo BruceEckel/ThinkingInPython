@@ -7,6 +7,30 @@
 > Then change `bad_append()`'s default from `[]` to `()` and explain why that change alone does not fix `bad_append()`
 > (hint: `target.append(item)` on a tuple).
 
+<details>
+<summary>Where to look</summary>
+
+[The Mutable Default Trap](../../Chapters/05_Foundations--Functions.md#the-mutable-default-trap) shows that a default is built once, when the `def` runs.
+Predict the third call from that, then see what `()` changes for the one method the function needs.
+[Safe Defaults](../../Chapters/05_Foundations--Functions.md#safe-defaults) shows the pattern that suits a function that mutates its parameter.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_1.py
+from exceptions import expect
+
+def bad_append(item, target=[]):
+    ...
+
+def tuple_append(item, target=()):
+    ...
+```
+
+<details>
+<summary>Solution</summary>
+
 ```python
 # exercise_1.py
 from exceptions import expect
@@ -43,12 +67,39 @@ default suits a parameter the function reads, as in
 the `None` sentinel that `good_append()` uses: test for `None` and
 build a new list inside the function body on every call.
 
+</details>
+</details>
+</details>
+
 ## 2. A `get()` that re-raises, and why `None` cannot be its sentinel
 
 > In `sentinel_default.py`, replace `return MISSING` with a bare `raise`,
 > so a missing key with no default re-raises the `KeyError`.
 > Confirm that `get(prefs, "theme")` raises a `KeyError` and that `get(prefs, "theme", None)` returns `None`.
 > Explain why `default=None` could not serve as the sentinel in this function.
+
+<details>
+<summary>Where to look</summary>
+
+[Sentinel Values](../../Chapters/05_Foundations--Functions.md#sentinel-values) builds a default that no caller can pass as data.
+Test the parameter with `is` against that object, and use a bare `raise` inside the `except` block.
+Consider what `get(prefs, "theme", None)` would look like to the function if `None` were the sentinel.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_2.py
+from exceptions import expect
+
+MISSING = sentinel("MISSING")
+
+def get(data, key, default=MISSING):
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_2.py
@@ -82,12 +133,37 @@ The built-in `getattr()` draws the same line: `getattr(obj, "x")`
 raises an `AttributeError` when `obj` has no `x`, and
 `getattr(obj, "x", None)` returns `None`.
 
+</details>
+</details>
+</details>
+
 ## 3. A keyword-only `label` parameter
 
 > In `param_markers.py`, add a parameter `label="result"` to `divide()`,
 > keyword-only, so `print(divide(10, 2, label="half"))` shows `half: 5.0`.
 > Confirm that `divide(10, 2, "half")`, passing `label` positionally,
 > is now a `TypeError`.
+
+<details>
+<summary>Where to look</summary>
+
+[Positional-Only and Keyword-Only Parameters](../../Chapters/05_Foundations--Functions.md#positional-only-and-keyword-only-parameters) explains the `/` and `*` markers.
+Place the new parameter after the `*`, and keep the `/` where it is.
+The `TypeError` comes from the call having one more positional argument than the signature accepts.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_3.py
+from exceptions import expect
+
+def divide(a, b, /, *, label="result"):
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_3.py
@@ -110,11 +186,34 @@ Calling `divide(10, 2, "half")` passes three positional arguments to
 a function that accepts two, so Python raises a `TypeError` before
 the function body runs.
 
+</details>
+</details>
+</details>
+
 ## 4. `report()` with an optional total
 
 > Rewrite `report()` from `var_args.py` so it accepts a `total=False` keyword-only flag that,
 > when true, also prints `sum(values)`.
 > Confirm `report("nums", 1, 2, 3, total=True)` prints the sum.
+
+<details>
+<summary>Where to look</summary>
+
+[Variable Argument Lists](../../Chapters/05_Foundations--Functions.md#variable-argument-lists) shows `report()`, and [Positional-Only and Keyword-Only Parameters](../../Chapters/05_Foundations--Functions.md#positional-only-and-keyword-only-parameters) shows how a parameter becomes keyword-only.
+Any parameter that follows `*values` is keyword-only.
+Put `total` there, ahead of `**options`, and test it in the body.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_4.py
+def report(label, *values, total=False, **options):
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_4.py
@@ -134,11 +233,34 @@ so it is keyword-only. Callers must write `total=True`, and neither
 needs no change to how `report()` collects its positional and
 keyword arguments.
 
+</details>
+</details>
+</details>
+
 ## 5. `apply_twice()` with a lambda
 
 > Write `apply_twice(func, value)` that returns `func(func(value))`,
 > then call it with a lambda that appends `"!"` to a string.
 > Predict the result of `apply_twice(lambda s: s + "!", "hi")` before running it.
+
+<details>
+<summary>Where to look</summary>
+
+[Lambdas](../../Chapters/05_Foundations--Functions.md#lambdas) shows a lambda passed as an argument, as the `key` of `sorted()`.
+`apply_twice()` is a function with a callable parameter, and it calls that parameter on its own result.
+Trace the string through the lambda twice before running the call.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_5.py
+def apply_twice(func, value):
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_5.py
@@ -159,11 +281,34 @@ as an argument needs nothing special to say so. `func` is a parameter
 like any other, and the only requirement is that it be callable with
 one argument.
 
+</details>
+</details>
+</details>
+
 ## 6. Unpacking both containers at a call site
 
 > Given `args = ("point", 3, 4)` and `opts = {"color": "red"}`,
 > call `report()` from `var_args.py` so it prints `point (3, 4) {'color': 'red'}`,
 > passing both containers without naming their contents.
+
+<details>
+<summary>Where to look</summary>
+
+[Unpacking Arguments](../../Chapters/05_Foundations--Functions.md#unpacking-arguments) shows `*` spreading a sequence and `**` spreading a dictionary at a call site.
+Pass each container with its own star, and let the position of each element decide which parameter receives it.
+The first element of the tuple fills `label`, and the rest collect into `values`.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_6.py
+def report(label, *values, **options):
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_6.py
@@ -183,12 +328,37 @@ into keyword arguments, which `**options` collects again. The first
 element of `args` is not special to the caller: it becomes `label`
 only because of where it sits in the sequence.
 
+</details>
+</details>
+</details>
+
 ## 7. `describe(name, /, **facts)`
 
 > Write `describe(name, /, **facts)` that prints `name` followed by each keyword argument as `key=value`,
 > one per line.
 > Confirm that `describe(name="Bob")` is a `TypeError`,
 > and explain which marker caused it.
+
+<details>
+<summary>Where to look</summary>
+
+[Positional-Only and Keyword-Only Parameters](../../Chapters/05_Foundations--Functions.md#positional-only-and-keyword-only-parameters) explains the `/` marker, and [Variable Argument Lists](../../Chapters/05_Foundations--Functions.md#variable-argument-lists) explains `**facts`.
+Follow the keyword `name="Bob"` through the signature: ask which parameter may receive it, and which one is left without a value.
+The error message names the missing parameter, so read it closely.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_7.py
+from exceptions import expect
+
+def describe(name, /, **facts):
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_7.py
@@ -241,6 +411,10 @@ also frees the word `name` for the caller's use:
 `describe("Bob", name="Robert")` stores a fact called `name`, where
 without the `/` the same call fails with two values for `name`.
 
+</details>
+</details>
+</details>
+
 ## 8. `UnboundLocalError` from both directions
 
 > In `function_scope.py`,
@@ -248,6 +422,30 @@ without the `/` the same call fails with two values for `name`.
 > Then restore it, and instead add `print(count)` as the first line of `rebinds()`.
 > Explain why that also raises an `UnboundLocalError`,
 > even though the assignment to `count` comes after the `print`.
+
+<details>
+<summary>Where to look</summary>
+
+[Names Inside a Function](../../Chapters/05_Foundations--Functions.md#names-inside-a-function) explains how Python decides whether a name is local or global.
+That decision is made for the whole function body when it is compiled, not line by line as the code runs.
+Apply it to `count += 1` in the first case and to the later `count = 99` in the second.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_8.py
+from exceptions import expect
+
+def writes_global():
+    ...
+
+def rebinds():
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_8.py
@@ -287,12 +485,38 @@ each flag them, so the offending lines carry `# type: ignore` and
 `# noqa` markers saying the misuse is deliberate, the way
 `param_markers.py` marks its two bad calls.
 
+</details>
+</details>
+</details>
+
 ## 9. Rebinding a parameter against mutating it
 
 > Write `clear_by_assignment(target)`, which assigns `target = []`,
 > and `clear_by_method(target)`, which calls `target.clear()`.
 > Pass the same list to each,
 > and predict which call empties the caller's list before running them.
+
+<details>
+<summary>Where to look</summary>
+
+[The Mutable Default Trap](../../Chapters/05_Foundations--Functions.md#the-mutable-default-trap) shows `rebind()` and `append_all()` in `mutating_arguments.py`.
+A parameter is a second name for the caller's object, so assigning to it moves only the local name.
+Calling a method on it changes the one object that both names share.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_9.py
+def clear_by_assignment(target):
+    ...
+
+def clear_by_method(target):
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_9.py
@@ -322,3 +546,7 @@ both names share, so the caller sees the list empty.
 `clear_by_assignment()` and `clear_by_method()` are `rebind()` and
 `append_all()` from `mutating_arguments.py` with the same operation,
 emptying a list, written both ways.
+
+</details>
+</details>
+</details>

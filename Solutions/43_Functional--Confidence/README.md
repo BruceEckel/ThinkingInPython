@@ -8,6 +8,16 @@
 > Compare the number of distinct IDs to `os.process_cpu_count()`,
 > and run `parallel_pure.py` three times before deciding what that number means.
 
+<details>
+<summary>Where to look</summary>
+
+[Automatic Parallelism](../../Chapters/43_Functional--Confidence.md#automatic-parallelism) runs a pure function through `ProcessPoolExecutor.map()`.
+Have `count_primes()` return `os.getpid()` with the count, and collect the IDs into a `set`.
+Compare its size to `os.process_cpu_count()`, and ask when the pool starts a worker.
+
+<details>
+<summary>Solution</summary>
+
 ```python
 import os
 from concurrent.futures import ProcessPoolExecutor
@@ -67,9 +77,22 @@ The number depends on the core count, the task sizes, and scheduling,
 so it is reproducible on your machine and nowhere else. That is why it does
 not belong in a `#:` marker in the book.
 
+</details>
+</details>
+
 ## 2. Which thread ran each call
 
 > Replace `ProcessPoolExecutor` with `ThreadPoolExecutor` in the previous exercise and explain the IDs you see instead.
+
+<details>
+<summary>Where to look</summary>
+
+In [Concurrency](../../Chapters/19_Techniques--Concurrency.md#one-executor-interface-three-pools), the pools share one `map()` interface.
+Swap in `ThreadPoolExecutor` and keep the rest of the program.
+Think about what threads share that processes do not, and which function reports an identity per thread.
+
+<details>
+<summary>Solution</summary>
 
 ```python
 import os
@@ -104,12 +127,25 @@ present the identical `map()` interface and differ this fundamentally
 underneath. That contrast is the substitutable-backend point from
 [Concurrency](../../Chapters/19_Techniques--Concurrency.md#one-executor-interface-three-pools).
 
+</details>
+</details>
+
 ## 3. Three property shapes for `sorted()`
 
 > Write Hypothesis properties for `sorted()` using two shapes from [A Family of Property Shapes](../../Chapters/43_Functional--Confidence.md#a-family-of-property-shapes):
 > an invariant (every adjacent pair of the output is in order) and idempotence
 > (sorting a sorted list changes nothing).
 > Then add the oracle property that `sorted(xs)` agrees with a hand-written insertion sort on short lists.
+
+<details>
+<summary>Where to look</summary>
+
+[A Family of Property Shapes](../../Chapters/43_Functional--Confidence.md#a-family-of-property-shapes) names the invariant, idempotence, and oracle shapes.
+Write each as its own `@given` test over `strategies.lists(strategies.integers())`.
+For the oracle, write an insertion sort slow and simple enough to check by reading, and cap the list length.
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # test_sorted_laws.py
@@ -171,6 +207,9 @@ having, and what makes `assert sorted(xs) == sorted(xs)` worthless.
 Capping the list length keeps the quadratic oracle cheap, since the
 bugs it catches show up on short inputs.
 
+</details>
+</details>
+
 ## 4. A law that is false
 
 > State a law that is false and watch Hypothesis falsify it:
@@ -179,6 +218,16 @@ bugs it catches show up on short inputs.
 > deleting the `.hypothesis/` directory before each run,
 > to see which characters Hypothesis reports,
 > and explain what those characters reveal about Unicode case mapping.
+
+<details>
+<summary>Where to look</summary>
+
+[Shrinking a Failure](../../Chapters/43_Functional--Confidence.md#shrinking-a-failure) shows Hypothesis reducing a failing input to a minimal one.
+Put `s.upper().lower() == s.lower()` under `@given(strategies.text())` and read the shrunk string.
+Print its code points with `unicodedata.name()`, since the two sides of the failed assertion look alike.
+
+<details>
+<summary>Solution</summary>
 
 ```python
 from hypothesis import given, strategies
@@ -253,6 +302,9 @@ A hand-written loop over `"abcde"` never reaches `µ`. The generated
 strings reach the parts of the repertoire nobody thinks to type, and
 that reach is the argument for property testing in one example.
 
+</details>
+</details>
+
 ## 5. A property test for `group_rounds()`
 
 > Write a property test for `group_rounds()` from [Toolkits](../../Chapters/41_Functional--Toolkits.md#groups-of-any-size):
@@ -262,6 +314,16 @@ that reach is the argument for property testing in one example.
 > Then break `group_rounds()` on purpose, run the test twice,
 > and confirm Hypothesis reports the same counterexample both times:
 > Hypothesis records a failing case under `.hypothesis/` and replays it first on the next run.
+
+<details>
+<summary>Where to look</summary>
+
+[The Same Law in Hypothesis](../../Chapters/43_Functional--Confidence.md#the-same-law-in-hypothesis) shows how `@given` turns a law into a test.
+Build rosters with `strategies.lists(..., unique=True)`, and check that the sorted students in each round equal the sorted roster.
+To break the function, remove the step that places leftover students, then rerun to see Hypothesis replay the failure from `.hypothesis/`.
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # test_group_rounds.py
@@ -397,12 +459,49 @@ behaves like a regression test you never had to write. It keeps
 failing until you fix the bug, then rejoins the pool of examples and
 comes up again on every later run.
 
+</details>
+</details>
+
 ## 6. Two impure functions with no `global` in sight
 
 > Write two functions that are *not* referentially transparent without using `global`:
 > one that reads `datetime.now()`, and one that reads an environment variable.
 > For each, name the substitution that changes the program's behavior,
 > then rewrite the function so the value arrives as an argument.
+
+<details>
+<summary>Where to look</summary>
+
+[Referential Transparency](../../Chapters/43_Functional--Confidence.md#referential-transparency) tests a function by substituting a call with its value.
+A function that reads the clock or `os.environ` takes an input its signature does not declare.
+Move each hidden input into the parameter list, a `datetime` for the clock and a `Mapping` for the environment.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of opaque_inputs.py
+import os
+from collections.abc import Mapping
+from datetime import datetime, timedelta
+
+def stale(created: datetime, limit: timedelta) -> bool:
+    ...
+
+def timeout() -> int:
+    ...
+
+def stale_pure(
+    created: datetime, limit: timedelta, now: datetime
+) -> bool:
+    ...
+
+def timeout_pure(env: Mapping[str, str]) -> int:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # opaque_inputs.py
@@ -462,11 +561,54 @@ line at the edge of the program instead of a dependency buried in the
 middle of it. [Testing](../../Chapters/11_Techniques--Testing.md#random-numbers)
 makes the same move for a random source.
 
+</details>
+</details>
+</details>
+
 ## 7. `match` against `isinstance()` on the same function
 
 > Take the `describe()` function from [Error Handling](../../Chapters/42_Functional--Error_Handling.md#matching-on-the-error)
 > and rewrite its `match` as `isinstance()` tests.
 > Count the lines, then run `ty` on both versions and compare what it knows about the value inside the `Ok` in each.
+
+<details>
+<summary>Where to look</summary>
+
+[Error Handling](../../Chapters/42_Functional--Error_Handling.md#matching-on-the-error) shows `describe()` using `match` on an `Ok` or `Err` result.
+Rewrite each `case` as an `isinstance()` test on the result, then on its error.
+Count lines in both versions, and compare the type `ty` reveals for the value inside `Ok` using `reveal_type()`.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of describe_isinstance.py
+from typing import final
+from record import record
+
+@final
+@record
+class Ok[A]:
+    answer: A
+
+@final
+@record
+class Err[E]:
+    error: E
+
+type Result[A, E] = Ok[A] | Err[E]
+
+def compute(text: str) -> Result[float, Exception]:
+    ...
+
+def describe(
+    text: str, result: Result[float, Exception]
+) -> str:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # describe_isinstance.py
@@ -544,3 +686,7 @@ useful finding than either version winning.
 The choice is about reading, not about proving. Neither form tells
 the type checker anything the other cannot, so pick the one that
 states the shapes you expect: the `match`.
+
+</details>
+</details>
+</details>

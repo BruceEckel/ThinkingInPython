@@ -7,6 +7,46 @@
 > with `Chrysanthemum`'s toxicity a registered implementation of `eat()`.
 > Which classes and which methods disappear?
 
+<details>
+<summary>Where to look</summary>
+
+[The Pythonic Visitor: singledispatch](../../Chapters/33_Patterns--Visitor.md#the-pythonic-visitor-singledispatch) adds an operation to a fixed hierarchy from outside it.
+Decide which of `pollinate()` and `eat()` answers differently by flower type; only that one needs `@singledispatch` and `register`.
+Then list what the *Visitor* machinery in [The Classic Visitor](../../Chapters/33_Patterns--Visitor.md#the-classic-visitor) existed to do, and what in it is left without a job.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_1.py
+from functools import singledispatch
+
+class Flower:
+    def __str__(self) -> str:
+        ...
+
+class Gladiolus(Flower):
+    pass
+class Ranunculus(Flower):
+    pass
+class Chrysanthemum(Flower):
+    pass
+
+def pollinate(flower: Flower, pollinator: str) -> str:
+    ...
+
+@singledispatch
+def eat(flower: Flower, eater: str) -> str:
+    ...
+
+@eat.register
+def _(flower: Chrysanthemum, eater: str) -> str:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
+
 ```python
 # exercise_1.py
 from functools import singledispatch
@@ -66,12 +106,84 @@ around as an object. When that matters, the function is still a value.
 operation name recovers the "choose an operation at runtime" half of
 what the `Visitor` hierarchy provided, without the classes.
 
+</details>
+</details>
+</details>
+
 ## 2. Adding a type against adding an operation
 
 > Add a `Rose` to `visitor_singledispatch.py` with abundant nectar and a strong fragrance,
 > then add a third operation, `thorns()`, over all four flowers.
 > Count the lines each change costs,
 > and say which of the two changes `@singledispatch` makes cheaper.
+
+<details>
+<summary>Where to look</summary>
+
+[The Pythonic Visitor: singledispatch](../../Chapters/33_Patterns--Visitor.md#the-pythonic-visitor-singledispatch) builds each operation as one `@singledispatch` function with a default and a `register` per exception.
+A new class costs the class plus one registration in every operation where its answer differs from the default.
+A new operation costs one function plus a registration for each flower that differs.
+Count both in lines, then compare with [One Dispatch Is Enough](../../Chapters/33_Patterns--Visitor.md#one-dispatch-is-enough).
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_2.py
+from functools import singledispatch
+
+class Flower:
+    def __str__(self) -> str:
+        ...
+
+class Gladiolus(Flower):
+    pass
+class Ranunculus(Flower):
+    pass
+class Chrysanthemum(Flower):
+    pass
+class Rose(Flower):  # The new type: 2 lines
+    pass
+
+@singledispatch
+def nectar(flower: Flower) -> str:
+    ...
+
+@nectar.register
+def _(flower: Gladiolus) -> str:
+    ...
+
+@nectar.register
+def _(flower: Chrysanthemum) -> str:
+    ...
+
+@nectar.register
+def _(flower: Rose) -> str:  # 3 lines
+    ...
+
+@singledispatch
+def fragrance(flower: Flower) -> str:
+    ...
+
+@fragrance.register
+def _(flower: Ranunculus) -> str:
+    ...
+
+@fragrance.register
+def _(flower: Rose) -> str:  # 3 lines
+    ...
+
+@singledispatch  # The new operation: 3 lines
+def thorns(flower: Flower) -> str:
+    ...
+
+@thorns.register
+def _(flower: Rose) -> str:  # 3 lines
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_2.py
@@ -149,12 +261,66 @@ methods on a class make adding a type cheap, functions over a hierarchy
 make adding an operation cheap, and no arrangement makes both cheap at
 once.
 
+</details>
+</details>
+</details>
+
 ## 3. The `Visits` protocol in place of `Any`
 
 > Rewrite `flower_visitors.py` with the `Visits` protocol in place of `Any`,
 > so `accept()` declares what it needs.
 > Then add a `Beetle(Bug)` with no `visit()` method and pass it to `accept()`.
 > Which version reports the mistake, and when?
+
+<details>
+<summary>Where to look</summary>
+
+[The Price of the Empty Base](../../Chapters/33_Patterns--Visitor.md#the-price-of-the-empty-base) shows a `Protocol` with a single `visit()` method as the type of the `accept()` parameter.
+Because a `Protocol` matches by structure, `Bee` needs no change.
+Run the `Beetle` call through the type checker and then through the interpreter, and note which one objects and at what point.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_3.py
+from typing import Protocol
+from exceptions import expect
+
+class Visits(Protocol):
+    def visit(self, flower: Flower) -> None: ...
+
+class Flower:
+    def accept(self, visitor: Visits) -> None:
+        ...
+    def pollinate(self, pollinator: Visitor) -> None:
+        ...
+    def __str__(self) -> str:
+        ...
+
+class Gladiolus(Flower):
+    pass
+
+class Visitor:
+    def __str__(self) -> str:
+        ...
+
+class Bug(Visitor):
+    pass
+
+class Pollinator(Bug):
+    def visit(self, flower: Flower) -> None:
+        ...
+
+class Bee(Pollinator):
+    pass
+
+class Beetle(Bug):  # Inherits no visit()
+    pass
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_3.py
@@ -221,3 +387,7 @@ an error a type checker can catch into the run. The chapter's version
 pays that price because its `Visitor` base is empty. Either fix
 restores the check: declaring `visit()` abstract on that base, as the
 classic pattern does, or writing the `Visits` protocol above.
+
+</details>
+</details>
+</details>

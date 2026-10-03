@@ -6,6 +6,32 @@
 > Measure the average case by timing lookups of many random targets,
 > and see whether the conclusion changes.
 
+<details>
+<summary>Where to look</summary>
+
+[Benchmark Alternatives with `timeit`](../../Chapters/18_Techniques--Performance.md#benchmark-alternatives-with-timeit) times one lookup of the last element, which is the worst case for a `list` scan.
+Build a list of targets with `random.randrange()`, seeded so the run repeats.
+Time a loop over all of them against the `list`, then against the `set`, and compare the two totals.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_1.py
+import random
+import timeit
+from benchmark import report
+
+def list_lookups() -> None:
+    ...
+
+def set_lookups() -> None:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
+
 ```python
 # exercise_1.py
 import random
@@ -46,9 +72,23 @@ and the average case tell the same story here.
 They only diverge if most real lookups cluster near
 the front of the list.
 
+</details>
+</details>
+</details>
+
 ## 2. Finding the crossover size
 
 > Use `timeit` to find the collection size below which the `list` scan beats the `set` lookup on your machine.
+
+<details>
+<summary>Where to look</summary>
+
+[Benchmark Alternatives with `timeit`](../../Chapters/18_Techniques--Performance.md#benchmark-alternatives-with-timeit) compares a `list` against a `set` at one large size.
+Repeat that comparison in a loop over a ladder of small sizes, building both collections at each size.
+Print the faster one per size and look for where the winner changes.
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_2.py
@@ -78,10 +118,45 @@ expect a different exact number, though the trend (the `list`'s
 relative advantage, if any, evaporating almost immediately) should
 look similar.
 
+</details>
+</details>
+
 ## 3. `eager_first_evens()` as one list comprehension
 
 > Rewrite `eager_first_evens()` as a single list comprehension and measure its peak with `tracemalloc`.
 > How close can an eager version get to the lazy one?
+
+<details>
+<summary>Where to look</summary>
+
+[Lazy Evaluation with Generators](../../Chapters/18_Techniques--Performance.md#lazy-evaluation-with-generators) compares an eager two-list version with a lazy pipeline.
+Fold the squaring and the evenness test into one comprehension, so no intermediate `squares` list exists.
+Measure each version's peak with `tracemalloc.get_traced_memory()`, and compare both against the lazy version.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_3.py
+import tracemalloc
+from collections.abc import Callable
+from itertools import islice
+
+def two_lists() -> list[int]:  # The original
+    ...
+
+def one_list() -> list[int]:
+    ...
+
+def lazy() -> list[int]:  # The chapter's lazy version
+    ...
+
+def peak_of(func: Callable[[], list[int]]) -> int:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_3.py
@@ -134,11 +209,37 @@ close that gap, because an eager version computes every value up
 front. The lazy generator pipeline stops when `islice()` has its
 five values, so it builds no large collection.
 
+</details>
+</details>
+</details>
+
 ## 4. Caching a function with a side effect
 
 > Apply `@cache` to a function that prints as a side effect,
 > and demonstrate that repeated calls skip the printing.
 > Explain why caching suits only pure functions.
+
+<details>
+<summary>Where to look</summary>
+
+[Caching](../../Chapters/18_Techniques--Performance.md#caching) shows `@cache` returning a stored result for a repeated argument.
+Decorate a function that prints before it returns, then call it three times with the same argument.
+Count how many times the message appears, and ask what else the function body would have done on each call.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_4.py
+from functools import cache
+
+@cache
+def noisy(n: int) -> int:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_4.py
@@ -171,12 +272,26 @@ performs, such as printing, writing a file, or incrementing a
 counter, occurs on the first call with a given argument, and
 the cache silently skips it on every repeat.
 
+</details>
+</details>
+</details>
+
 ## 5. Popping a heap correctly
 
 > In `heap_corruption.py`, replace `heap.pop(0)` with `heappop(heap)`.
 > Pop three times, printing the heap after each one,
 > and confirm `heap[0]` is the smallest remaining value every time.
 > Why does the list still look unsorted after a correct pop?
+
+<details>
+<summary>Where to look</summary>
+
+[Heap](../../Chapters/18_Techniques--Performance.md#heap) explains the invariant that `heappop()` maintains and `list.pop(0)` breaks.
+Call `heapify()`, then pop three times with `heappop()`, printing the heap and a check of `heap[0]` against `min()` each time.
+For the last question, compare the invariant with what "sorted" requires.
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_5.py
@@ -210,12 +325,39 @@ through O(log n) comparisons. Sorting the whole list on every pop
 costs far more and gains nothing, since callers read only the front
 element.
 
+</details>
+</details>
+
 ## 6. A subclass that forgets `__slots__`
 
 > In `slots.py`, add `class Point3D(Point)` that declares no `__slots__` of its own.
 > Confirm that an instance accepts `p.z = 3`,
 > which `Point` rejects with an `AttributeError`,
 > and find where the storage for `z` came from.
+
+<details>
+<summary>Where to look</summary>
+
+[When Slots Does Not Fit](../../Chapters/18_Techniques--Performance.md#when-slots-does-not-fit) covers what a slotted class gives up, and [Slots](../../Chapters/18_Techniques--Performance.md#slots) shows what `__slots__` removes.
+Subclass a slotted class without declaring `__slots__`, assign a new attribute, and inspect the instance with `vars()`.
+Ask which class in the hierarchy still creates a `__dict__` for each instance.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_6.py
+class Point:
+    __slots__ = ("x", "y")
+    def __init__(self, x: int, y: int) -> None:
+        ...
+
+class Point3D(Point):  # Declares no __slots__ of its own
+    pass
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_6.py
@@ -255,12 +397,50 @@ two slots and a dictionary. A subclass of a slotted class must
 declare `__slots__` itself, using an empty tuple when it adds no
 fields of its own.
 
+</details>
+</details>
+</details>
+
 ## 7. Global monitoring versus two local attachments
 
 > In `monitoring_counts.py`,
 > swap `set_local_events()` for `set_events()` and say which entry in the `Counter` is new and why.
 > Then get the same two counts back using two local attachments instead,
 > and explain what the two versions stop agreeing about in a larger program.
+
+<details>
+<summary>Where to look</summary>
+
+[Measuring One Function with `sys.monitoring`](../../Chapters/18_Techniques--Performance.md#measuring-one-function-with-sys-monitoring) attaches `PY_START` to chosen code objects with `set_local_events()`.
+`set_events()` attaches the same event to every Python code object in the process, so read the `Counter` for entries beyond your two functions.
+For the local version, call `set_local_events()` once per function on its `__code__`, and turn each off again before `free_tool_id()`.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_7.py
+import sys
+from collections import Counter
+from types import CodeType
+from typing import Final
+
+TOOL: Final[int] = monitoring.PROFILER_ID
+PY_START: Final[int] = monitoring.events.PY_START
+NO_EVENTS: Final[int] = monitoring.events.NO_EVENTS
+
+def on_start(code: CodeType, offset: int) -> None:
+    ...
+
+def fib(n: int) -> int:
+    ...
+
+def square(n: int) -> int:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_7.py
@@ -317,11 +497,37 @@ Local monitoring answers "how often did *this* run," which is the
 question you already had when you opened `sys.monitoring` instead of
 a profiler.
 
+</details>
+</details>
+</details>
+
 ## 8. Reading `tottime` against `cumtime`
 
 > Profile a script of your own with `uv run python -m cProfile -s cumulative`.
 > Name the function with the largest `tottime` and the one with the largest `cumtime`,
 > and explain why they are usually not the same function.
+
+<details>
+<summary>Where to look</summary>
+
+[Reading a `cProfile` Report](../../Chapters/18_Techniques--Performance.md#reading-a-cprofile-report) defines the two columns.
+Write a script in which one function calls another twice, so a caller sits above the work and a callee does it.
+Run it under `cProfile`, then compare the top row sorted by `cumtime` with the top row sorted by `tottime`.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_8.py
+def inner() -> int:
+    ...
+
+def outer() -> int:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 Any script works. This one makes the two columns disagree on purpose:
 
@@ -357,12 +563,40 @@ it changes nothing. The two columns coincide only for a leaf function, one
 that calls nothing else, which is why the two rankings can name
 the same function only at the bottom of a call chain.
 
+</details>
+</details>
+</details>
+
 ## 9. A compact `array` is not a faster `array`
 
 > `compact_array.py` compares an `array` against a `list` of the same floats.
 > Time an element-by-element sum over each with `timeit`.
 > The `array` uses a quarter of the memory: is it also faster to iterate,
 > and why not?
+
+<details>
+<summary>Where to look</summary>
+
+[Array Instead of List](../../Chapters/18_Techniques--Performance.md#array-instead-of-list) measures the memory saving of `array`, and [Vectorize with NumPy](../../Chapters/18_Techniques--Performance.md#vectorize-with-numpy) shows where a compact layout pays off.
+Time `sum()` over the `list` and over the `array`, taking the `min()` of several `timeit.repeat()` rounds.
+For the why, consider what Python must hand to your code for each element of each container.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_9.py
+import timeit
+from array import array
+from collections.abc import Callable
+from benchmark import report
+
+def best(f: Callable[[], float]) -> float:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_9.py
@@ -402,12 +636,41 @@ layout pays off when the loop over it leaves Python. `sum()` over an
 the same bytes creates no Python object per element, which is why
 vectorizing wins where `array` alone does not.
 
+</details>
+</details>
+</details>
+
 ## 10. `"".join()` against `+=`, at two sizes
 
 > Time `"".join(parts)` against `+=` in a loop for 10,000 short strings,
 > then repeat at 100 strings.
 > At which size does the difference stop mattering,
 > and which of the two would you write anyway?
+
+<details>
+<summary>Where to look</summary>
+
+[Trusting a Measurement](../../Chapters/18_Techniques--Performance.md#trusting-a-measurement) says how to read a `timeit` result, and [Is It Too Slow?](../../Chapters/18_Techniques--Performance.md#is-it-too-slow) says when a difference is worth acting on.
+Write one function that joins a list of parts and one that concatenates with `+=`, then time both at 10,000 parts and at 100.
+Compare the ratio at each size, and then the absolute time per call.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of ch18_join_vs_concat.py
+import timeit
+from benchmark import report
+
+def build_join(parts: list[str]) -> str:
+    ...
+
+def build_concat(parts: list[str]) -> str:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # ch18_join_vs_concat.py
@@ -463,12 +726,26 @@ slower rather than quadratic. That optimization is an implementation
 detail, and it disappears the moment a second name refers to the
 string the loop is building.
 
+</details>
+</details>
+</details>
+
 ## 11. `bisect()` and `bisect_left()` against duplicates
 
 > `bisect_search.py` uses `bisect()` and `search_comparison.py` uses `bisect_left()`.
 > Build a sorted list with duplicates,
 > run both against a value that appears three times,
 > and explain which one you need to find the first occurrence and which one you need to insert after the last.
+
+<details>
+<summary>Where to look</summary>
+
+[Bisect](../../Chapters/18_Techniques--Performance.md#bisect) uses `bisect()` to find a position in a sorted list.
+Build a list in which one value repeats three times, and print the index each of `bisect_left()` and `bisect()` returns for it.
+Index the list at both positions to see which one is the target's first copy and which one is one past its last.
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # ch18_bisect_duplicates.py
@@ -506,6 +783,9 @@ The pair together answers a third question the chapter does not
 raise. `xs[left:right]` is the run of equal values, and
 `right - left` counts them, both in O(log n) with no scan.
 
+</details>
+</details>
+
 ## 12. Which build am I running, and does the JIT show up?
 
 > Run `jit_status.py` on your own interpreter and say which of the three states it reports.
@@ -513,6 +793,16 @@ raise. `xs[left:right]` is the run of equal values, and
 > run `membership.py` under `PYTHON_JIT=1` and `PYTHON_JIT=0` with the `--numbers` flag,
 > and compare the two `ratio` lines.
 > Explain why a listing this small is a poor test of the JIT.
+
+<details>
+<summary>Where to look</summary>
+
+[The CPython JIT](../../Chapters/18_Techniques--Performance.md#the-cpython-jit) describes the three states that `sys._jit.is_available()` and `sys._jit.is_enabled()` report.
+Print both flags, then run `membership.py` with `--numbers` under each setting of the `PYTHON_JIT` environment variable.
+For the last question, consider where the measured work runs, how long the program lives, and what the `ratio` line compares.
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # ch18_jit_probe.py
@@ -571,3 +861,6 @@ with `min(timeit.repeat(...))`. Expect a single-digit percentage
 either way, and run-to-run noise of the same size. That noise is why
 `pyperformance` reports a geometric mean over dozens of benchmarks
 instead of one number from one program.
+
+</details>
+</details>

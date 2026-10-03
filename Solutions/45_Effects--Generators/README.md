@@ -7,6 +7,28 @@
 > Give it the full three-parameter annotation,
 > then drive it by hand with `next()` and `send()` and read the total off `StopIteration`.
 
+<details>
+<summary>Where to look</summary>
+
+[Annotating a Generator](../../Chapters/45_Effects--Generators.md#annotating-a-generator) names the three parameters of `Generator`: what it yields, what it receives, and what it returns.
+Give each channel its own type so that a swap is a type error.
+After the third `send()`, the generator finishes, and the total is the `value` of the `StopIteration` that `send()` raises.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_1.py
+from collections.abc import Generator
+from typing import NewType
+
+def tally() -> Generator[Prompt, Amount, Total]:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
+
 ```python
 # exercise_1.py
 from collections.abc import Generator
@@ -56,6 +78,10 @@ result of `send()`.
 `total` is the generator's own local, and it survives across three
 suspensions with no storage anywhere else. The frame is the state.
 
+</details>
+</details>
+</details>
+
 ## 2. A driver that answers from an iterator
 
 > `drive()` answers from a `dict`.
@@ -65,6 +91,43 @@ suspensions with no storage anywhere else. The frame is the state.
 > Give your driver fewer answers than questions and say what it returns.
 > `StopIteration` now means two different things in the same loop.
 > Keep them apart.
+
+<details>
+<summary>Where to look</summary>
+
+[A Generator Is a Description](../../Chapters/45_Effects--Generators.md#a-generator-is-a-description) explains why `interview()` does not care who answers it.
+Write the new driver as a loop that fetches the next answer, then calls `send()`.
+Both the answer iterator and the generator signal the end with `StopIteration`, so choose carefully which call sits inside the `try`.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_2.py
+from collections.abc import Generator, Iterator
+from typing import NewType
+
+def interview() -> Generator[Question, Answer, Result]:
+    ...
+
+def drive_from_dict(
+        conversation: Generator[Question, Answer, Result],
+        answers: dict[Question, Answer]) -> Result:
+    ...
+
+def drive_naive(
+        conversation: Generator[Question, Answer, Result],
+        answers: Iterator[Answer]) -> Result:
+    ...
+
+def drive_in_order(
+        conversation: Generator[Question, Answer, Result],
+        answers: Iterator[Answer]) -> Result:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_2.py
@@ -186,10 +249,38 @@ string, far from the driver that produced it.
 Keeping the two meanings apart is a one-line discipline: put inside the
 `try` only the call whose `StopIteration` you mean to interpret.
 
+</details>
+</details>
+</details>
+
 ## 3. A third delegation in `yield_from_send.py`
 
 > Predict the output of `yield_from_send.py` after adding a third `yield from collect("gamma")` to `both()` and extending the loop to `[1, 2, 3, 4, 5]`.
 > Write down the sequence of printed lines before running it.
+
+<details>
+<summary>Where to look</summary>
+
+[The Send Channel](../../Chapters/45_Effects--Generators.md#the-send-channel) follows each sent value to the delegated generator that is suspended at that moment.
+Count how many values one `collect()` consumes, then count how many the loop supplies in total.
+Write the printed lines before you run the script, and note which sends produce one line and which produce two.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_3.py
+from collections.abc import Generator
+
+def collect(name: str) -> Generator[str, int]:
+    ...
+
+def both() -> Generator[str, int]:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_3.py
@@ -246,6 +337,10 @@ collector remains to prompt, so `gamma` finishes, `both()` raises
 relays in both directions on its own: prompts up to the driver, numbers
 down to whichever `yield` is currently suspended, two frames below.
 
+</details>
+</details>
+</details>
+
 ## 4. Removing the `yield from`
 
 > Remove `yield from` in `yield_from_nested.py`,
@@ -253,6 +348,16 @@ down to whichever `yield` is currently suspended, two frames below.
 > Run `ty check` and the script, and explain both results.
 > Which one told you more,
 > and what does the type checker say if `profile` carries no annotation?
+
+<details>
+<summary>Where to look</summary>
+
+[Composing Is Not Interpreting](../../Chapters/45_Effects--Generators.md#composing-is-not-interpreting) shows `survey()` delegating to `interview()` with `yield from`.
+Without it, the call only builds a generator object, and nothing drives it.
+Compare the declared type of `profile` with what the call produces, then compare the type checker's report with the script's output.
+
+<details>
+<summary>Solution</summary>
 
 ```python
 def survey() -> Generator[Question, Answer, Result]:
@@ -306,6 +411,9 @@ The annotation does the whole of the work here. That is the argument
 for annotating a local whose value comes from a call whose return type
 you want to pin down.
 
+</details>
+</details>
+
 ## 5. `report()` with a return value
 
 > `report()` in `yield_from_return.py` yields but returns nothing.
@@ -313,6 +421,33 @@ you want to pin down.
 > and give it the full annotation.
 > Then write a caller that delegates to it with `yield from` and yields that count in a line of its own,
 > and say which type parameter carries each of the two values.
+
+<details>
+<summary>Where to look</summary>
+
+[The Return Channel](../../Chapters/45_Effects--Generators.md#the-return-channel) shows how `yield from` delivers a delegate's return value to the delegating generator.
+`Iterator[str]` cannot declare a return value, so `report()` needs the full `Generator` annotation.
+The caller binds the count with `yield from`, then yields it as a string of its own.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_5.py
+from collections.abc import Generator
+
+def emit(items: list[str]) -> Generator[str, None, int]:
+    ...
+
+def report(items: list[str]) -> Generator[str, None, int]:
+    ...
+
+def summarize(items: list[str]) -> Generator[str]:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_5.py
@@ -359,12 +494,26 @@ and the driver receives it. No generator binds it to a name. The same number can
 way, and the choice decides who can see it: a yielded value goes to the
 driver, a returned value goes to the delegating generator.
 
+</details>
+</details>
+</details>
+
 ## 6. Why a driver primes with `next()`
 
 > Explain why a driver must prime with `next()` rather than `send(None)`,
 > given that the two are equivalent at runtime.
 > `send_none_is_next.py` has the answer.
 > State it in terms of the `SendType`.
+
+<details>
+<summary>Where to look</summary>
+
+[Annotating a Generator](../../Chapters/45_Effects--Generators.md#annotating-a-generator) defines the `SendType`, and `send_none_is_next.py` calls `send(None)` on a generator whose `SendType` is not `None`.
+Read the signature of `send()` and ask what it accepts for `interview()`.
+Then ask what `next()` accepts, and whether a generator that has not yet run has anywhere to put a sent value.
+
+<details>
+<summary>Solution</summary>
 
 `next(g)` and `g.send(None)` do the same thing at runtime, and the
 `SendType` is where they stop being interchangeable.
@@ -407,6 +556,9 @@ formats what it receives, so it passes the check either way. Priming
 with `next()` sidesteps the whole question: the one call that cannot
 carry a value comes from the one function that cannot pass one.
 
+</details>
+</details>
+
 ## 7. A vending machine as a single generator
 
 > [A Vending Machine](../../Chapters/31_Patterns--State_Machines.md#a-vending-machine)
@@ -419,6 +571,45 @@ carry a value comes from the one function that cannot pass one.
 > the opposite direction from `interview()`.
 > Say which of the two versions you would rather extend with another state,
 > and why.
+
+<details>
+<summary>Where to look</summary>
+
+[A Vending Machine](../../Chapters/31_Patterns--State_Machines.md#a-vending-machine) holds its state in an attribute and a transition table.
+Here the position inside the generator's body is the state, so use loops and `isinstance()` checks on the event that `yield` returns.
+Because `yield` reports the state reached, the driver's `send()` delivers events rather than answers.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_7.py
+from collections.abc import Generator
+from typing import Final, Literal
+from record import record
+
+@record
+class Coin:
+    cents: int
+
+@record
+class Digit:
+    value: str
+
+type Event = Coin | Digit
+type Report = Literal[
+    "QUIESCENT", "COLLECTING", "SELECTING",
+    "UNAVAILABLE", "WANT_MORE", "DISPENSED"]
+
+PRICES: Final[dict[str, int]] = {"11": 25, "12": 75}
+STOCK: Final[dict[str, int]] = {"11": 0, "12": 3}
+
+def machine() -> Generator[Report, Event]:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_7.py
@@ -517,3 +708,7 @@ ones, where you can read the whole machine at once. The generator is
 the better choice for a conversation with a beginning and an end, like
 `interview()`. The table is the better choice for a machine that runs
 forever and can go anywhere from anywhere.
+
+</details>
+</details>
+</details>

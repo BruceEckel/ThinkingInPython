@@ -9,6 +9,25 @@
 > and `from a_package.module5 import function5`,
 > and confirm the loading message prints only once however many of the three you use together.
 
+<details>
+<summary>Where to look</summary>
+
+[Packages](../../Chapters/06_Foundations--Modules_and_Packages.md#packages) shows the three import forms and the messages each module prints as it loads.
+Python records every loaded module in `sys.modules` under its full dotted name.
+Ask what a second `import` of a name already in that cache does with the module's top-level code.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of a_package/module5.py
+def function5():
+    ...
+```
+
+<details>
+<summary>Solution</summary>
+
 The package's `__init__.py` is the chapter's:
 
 ```python
@@ -50,6 +69,10 @@ these forms, finds the cached module and skips running its top-level
 code again. It only binds a name to the module in the cache. The
 package's `__init__.py` runs once for the same reason.
 
+</details>
+</details>
+</details>
+
 ## 2. A nested module, and a badly named package
 
 > Add `a_package/b_package/module6.py` with a `function6()` that calls `function5()` from `module5`.
@@ -57,6 +80,27 @@ package's `__init__.py` runs once for the same reason.
 > then rename `b_package` to `bPackage` (and rename it back afterward)
 > and explain, from the rules in [File Names](../../Chapters/06_Foundations--Modules_and_Packages.md#file-names),
 > why that name is a poor choice even though the import still works.
+
+<details>
+<summary>Where to look</summary>
+
+[Imports Within a Package](../../Chapters/06_Foundations--Modules_and_Packages.md#imports-within-a-package) covers a module that imports a sibling, and [Nested Packages](../../Chapters/06_Foundations--Modules_and_Packages.md#nested-packages) shows the two-level import.
+`module6` reaches `module5` across a package boundary, so write the import with its full `a_package.` path.
+For the rename, compare `bPackage` with the naming advice in [File Names](../../Chapters/06_Foundations--Modules_and_Packages.md#file-names).
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of a_package/b_package/module6.py
+from a_package.module5 import function5
+
+def function6():
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 `b_package` keeps the chapter's `__init__.py` too:
 
@@ -109,6 +153,10 @@ spelling to get wrong: on a case-insensitive filesystem the shell and
 the editor accept `bpackage` as well, and only Python's case-sensitive
 import check, the one exercise 4 examines, rejects that spelling.
 
+</details>
+</details>
+</details>
+
 ## 3. Lazy imports load in use order, not declaration order
 
 > Write a small module `noisy2.py` whose top-level body prints a message,
@@ -117,6 +165,31 @@ import check, the one exercise 4 examines, rejects that spelling.
 > then use `noisy2` before `noisy`.
 > Confirm the two loading messages print in the order you used the modules,
 > not the order you wrote the `lazy import` lines.
+
+<details>
+<summary>Where to look</summary>
+
+[Watching the Deferral](../../Chapters/06_Foundations--Modules_and_Packages.md#watching-the-deferral) runs a `lazy import` of a module that prints when it loads.
+A `lazy import` binds the name without running the module.
+The body runs when the name is first used, so order your uses and your `print()` calls to watch the messages appear.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of noisy.py
+def announce():
+    ...
+```
+
+```python
+# The shape of noisy2.py
+def announce():
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # noisy.py
@@ -162,6 +235,10 @@ The module's top-level code runs at the first use of that
 name, so use order, not declaration order, decides which module loads
 first.
 
+</details>
+</details>
+</details>
+
 ## 4. Renaming `module.py` to `Module.py`
 
 > Rename `module.py` to `Module.py`,
@@ -173,6 +250,16 @@ first.
 > Predict the result before you run it, then explain what you see,
 > given that Windows and macOS open `module.py` and `Module.py` as the same file.
 > Look up `PYTHONCASEOK` to confirm your explanation.
+
+<details>
+<summary>Where to look</summary>
+
+[File Names](../../Chapters/06_Foundations--Modules_and_Packages.md#file-names) explains how Python compares an import name with the file name on disk.
+The filesystem may treat the two spellings as one file, but the import system reads the directory listing and decides for itself.
+The `PYTHONCASEOK` environment variable switches that comparison off, which tests your explanation.
+
+<details>
+<summary>Solution</summary>
 
 The `import Module` statement resolves, because the name and the file
 agree, and the call in the body becomes `Module.useful_function()` to
@@ -211,6 +298,9 @@ None of this arises if you follow the convention.
 recommends `snake_case` for modules, and an all-lowercase name has
 only one spelling for the check to match.
 
+</details>
+</details>
+
 ## 5. Absolute imports and running a package module as a script
 
 > Change `a_package/module4.py` to the absolute import `from a_package.module1 import function1` and confirm `use_module4.py` still works.
@@ -218,6 +308,17 @@ only one spelling for the check to match.
 > both before and after the change.
 > Both fail, with different errors: explain each,
 > and say why `python -m a_package.module4` works either way.
+
+<details>
+<summary>Where to look</summary>
+
+[Imports Within a Package](../../Chapters/06_Foundations--Modules_and_Packages.md#imports-within-a-package) shows `module4`'s relative import, and [`PYTHONPATH`](../../Chapters/06_Foundations--Modules_and_Packages.md#pythonpath) describes where Python searches for top-level names.
+A relative import needs the module's `__package__`, and a file run as a script has none.
+An absolute import needs the project root on `sys.path`, which depends on where the first entry comes from.
+Compare what `python file.py` and `python -m package.module` put there.
+
+<details>
+<summary>Solution</summary>
 
 Changing `a_package/module4.py` to
 `from a_package.module1 import function1` leaves `use_module4.py`
@@ -258,11 +359,42 @@ A module inside a package is not a script. `-m` is how you run a
 package module, and a file you intend to run both ways belongs at the
 top level, outside any package.
 
+</details>
+</details>
+
 ## 6. Star import without `__all__`
 
 > Remove the `__all__` line from `exporting.py`.
 > Predict what `star_import.py` prints without it, run it to check,
 > then restore the line.
+
+<details>
+<summary>Where to look</summary>
+
+[What a Module Exports](../../Chapters/06_Foundations--Modules_and_Packages.md#what-a-module-exports) shows `from module import *` and the role `__all__` plays in it.
+Without `__all__`, the star import falls back to a naming convention.
+Copy `exporting.py` without the line, add a name of your own, and print what `dir()` reports after the import.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exporting_no_all.py
+def public():
+    ...
+
+def helper():
+    ...
+
+def _internal():
+    ...
+
+def undeclared():
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exporting_no_all.py
@@ -298,6 +430,10 @@ underscore convention compose in one direction only:
 `__all__` an underscore is the only way to keep a name out of a star
 import.
 
+</details>
+</details>
+</details>
+
 ## 7. A `from` import shares the object, not the name
 
 > Give a module a top-level list, `plugins = []`,
@@ -306,6 +442,16 @@ import.
 > then print the script's `plugins`.
 > Rebind the module's name to a new list, append to that one, and print both.
 > Explain why the first change reaches the script's name and the second does not.
+
+<details>
+<summary>Where to look</summary>
+
+In [Importing Names with `from` and `as`](../../Chapters/06_Foundations--Modules_and_Packages.md#importing-names-with-from-and-as), `from_snapshot.py` shows an imported name keeping the value it had at import time.
+A `from` import binds your name to the object, not to the module's name.
+Compare mutating the list with rebinding the module's attribute, and use `is` to check whether the two names still share one object.
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # plugin_list.py
@@ -341,3 +487,6 @@ refer to. `exercise_7.py` is `from_snapshot.py` with a mutable value: the
 `from` import takes no copy, and it does not follow the module's
 name when that name moves. When a module's list or dict can be
 replaced, import the module and read `plugin_list.plugins` each time.
+
+</details>
+</details>

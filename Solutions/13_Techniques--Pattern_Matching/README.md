@@ -6,6 +6,32 @@
 > `"singleton"`, or `"longer list"` for lists, `"point"` for a `Point`,
 > and `"other"` for anything else.
 
+<details>
+<summary>Where to look</summary>
+
+[Sequence Patterns](../../Chapters/13_Techniques--Pattern_Matching.md#sequence-patterns) covers matching by shape, including a star pattern for the rest of a sequence.
+Then [Class Patterns](../../Chapters/13_Techniques--Pattern_Matching.md#class-patterns) shows how to test for a `Point` without binding its fields.
+`match` tries cases top to bottom, so put the narrow list shapes before the wider one.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_1.py
+from dataclasses import dataclass
+
+@dataclass(frozen=True)
+class Point:
+    x: int
+    y: int
+
+def classify(value: object) -> str:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
+
 ```python
 # exercise_1.py
 from dataclasses import dataclass
@@ -59,10 +85,24 @@ one-element tuple is a "singleton" here. When the answer must hold for
 a `list` alone, wrap the pattern in a class pattern: `case list([_]):`
 first tests for a `list`, then matches the one-element shape.
 
+</details>
+</details>
+</details>
+
 ## 2. Adding `Rectangle` without its `case`
 
 > Add a `Rectangle` type to `exhaustive.py`'s `Shape` union without adding its `case`.
 > Run `ty` and read the error it reports at `assert_never()`.
+
+<details>
+<summary>Where to look</summary>
+
+[Exhaustive Matching](../../Chapters/13_Techniques--Pattern_Matching.md#exhaustive-matching) ends the `match` with `assert_never()`.
+Add the new data class and include it in the `Shape` union, but leave `area()` alone.
+The type checker's message shows the type that survives every `case` above `assert_never()`.
+
+<details>
+<summary>Solution</summary>
 
 ```python
 @dataclass(frozen=True)
@@ -105,11 +145,33 @@ the missing case becomes a type error at check time instead of a
 silent gap that shows up only when a `Rectangle` reaches `area()` at
 runtime.
 
+</details>
+</details>
+
 ## 3. Matching a nested shape
 
 > Rewrite `mapping_patterns.handle()` to also accept a nested shape,
 > such as `{"type": "click", "at": {"x": x, "y": y}}`,
 > binding `x` and `y` from the inner dictionary.
+
+<details>
+<summary>Where to look</summary>
+
+[Mapping Patterns](../../Chapters/13_Techniques--Pattern_Matching.md#mapping-patterns) matches a dictionary by the keys it must contain.
+A value inside a mapping pattern can itself be a pattern, as [Patterns Nest](../../Chapters/13_Techniques--Pattern_Matching.md#patterns-nest) shows.
+Put a mapping pattern inside the `"at"` entry, and keep the flat click case so both shapes still work.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_3.py
+def handle(event: dict[str, object]) -> str:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_3.py
@@ -147,6 +209,10 @@ of them. Order matters for `{"type": kind}`, which any event with a
 at the first one that fits, so `{"type": kind}` sits after the specific
 click and key cases.
 
+</details>
+</details>
+</details>
+
 ## 4. A `Webhook` channel added to the union
 
 > Add a `Webhook` channel to `notifications_match.py`:
@@ -154,6 +220,49 @@ click and key cases.
 > Run `ty` before adding its `case` to `render()` and `cost()`,
 > and read the errors.
 > Then add both cases and confirm `ty` passes.
+
+<details>
+<summary>Where to look</summary>
+
+[The Match Version](../../Chapters/13_Techniques--Pattern_Matching.md#the-match-version) ends both `render()` and `cost()` with `assert_never()`.
+Add the `Webhook` data class to the `Notification` union first and run the type checker before touching either function.
+Each function that matches on the union reports its own error until it gains a `case`.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_4.py
+from dataclasses import dataclass
+from typing import assert_never
+
+@dataclass(frozen=True)
+class Email:
+    subject: str
+
+@dataclass(frozen=True)
+class Sms:
+    body: str
+
+@dataclass(frozen=True)
+class Push:
+    title: str
+
+@dataclass(frozen=True)
+class Webhook:
+    url: str
+
+type Notification = Email | Sms | Push | Webhook
+
+def render(note: Notification, recipient: str) -> str:
+    ...
+
+def cost(note: Notification) -> float:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_4.py
@@ -237,11 +346,57 @@ handled types. A `Webhook` can still reach the `assert_never()` call,
 so the check fails. Two diagnostics for one new channel is the cost the
 chapter describes: adding a type touches every operation.
 
+</details>
+</details>
+</details>
+
 ## 5. Quadrants with guards, and without them
 
 > Rewrite `guards.py`'s `quadrant()` so it handles the third and fourth quadrants too.
 > Then write it a second time with one `case` per sign combination,
 > using `|` alternations and no guards, and say which version reads better.
+
+<details>
+<summary>Where to look</summary>
+
+[Guards](../../Chapters/13_Techniques--Pattern_Matching.md#guards) adds an `if` condition to a `case`.
+For the second version, change the subject of the `match` to a tuple of derived values.
+Then write literal patterns for each combination, and use `|` from [Alternatives and Capture](../../Chapters/13_Techniques--Pattern_Matching.md#alternatives-and-capture) to join the axis cases.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_5.py
+from dataclasses import dataclass
+
+@dataclass(frozen=True)
+class Point:
+    x: int
+    y: int
+
+def quadrant(p: Point) -> str:
+    ...
+```
+
+```python
+# The shape of exercise_5_signs.py
+from dataclasses import dataclass
+
+@dataclass(frozen=True)
+class Point:
+    x: int
+    y: int
+
+def sign(n: int) -> int:
+    ...
+
+def quadrant(p: Point) -> str:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_5.py
@@ -329,12 +484,54 @@ all nine pairs of signs. The type checker sees only that `sign()`
 returns an `int`, so without that case it reports that `quadrant()`
 can return `None`.
 
+</details>
+</details>
+</details>
+
 ## 6. A constant that captures, and two ways to fix it
 
 > Give `value_patterns.py`'s `Signal` a third member,
 > and write `act()` so that it compares against a module-level `FALLBACK: Final[Signal]`.
 > Run it and confirm that the constant captures instead of comparing.
 > Then fix it two ways, with a dotted name and with a guard.
+
+<details>
+<summary>Where to look</summary>
+
+[A Bare Name Captures, a Dotted Name Compares](../../Chapters/13_Techniques--Pattern_Matching.md#a-bare-name-captures-a-dotted-name-compares) explains why a module-level constant in a `case` binds instead of comparing.
+For the first fix, put the constant in a namespace so the pattern is a dotted name.
+For the second, bind any value and compare it to the constant in a guard, where the name is an ordinary expression.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of ch13_fallback_capture.py
+from enum import Enum
+from typing import Final
+
+class Signal(Enum):
+    STOP = "stop"
+    GO = "go"
+    CAUTION = "caution"
+
+FALLBACK: Final[Signal] = Signal.CAUTION
+
+class Defaults:
+    FALLBACK: Final[Signal] = Signal.CAUTION
+
+def act(s: Signal) -> str:
+    ...
+
+def dotted(s: Signal) -> str:
+    ...
+
+def guarded(s: Signal) -> str:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # ch13_fallback_capture.py
@@ -408,3 +605,7 @@ guard, where `FALLBACK` is an ordinary expression rather than a
 pattern. `case other if other is FALLBACK:` is more verbose than the
 dotted name, but it is what you want when the test is more than
 equality.
+
+</details>
+</details>
+</details>

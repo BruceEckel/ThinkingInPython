@@ -7,6 +7,16 @@
 > then explain why `b.append(4)` earlier did change what `a` sees,
 > but appending to `c` does not.
 
+<details>
+<summary>Where to look</summary>
+
+[Variables and References](../../Chapters/02_Foundations--Tour.md#variables-and-references) shows that assignment copies a reference, not the list.
+A slice builds a new list object, so `a` and `c` stop sharing.
+Compare what `b` and `c` are bound to before you explain the difference.
+
+<details>
+<summary>Solution</summary>
+
 ```python
 # exercise_1.py
 a = [1, 2, 3]
@@ -22,11 +32,24 @@ print(a, c)
 object. `c = a[:]` makes a new list with the same elements, so
 `c.append(99)` only changes `c`. Slicing copies. Assignment does not.
 
+</details>
+</details>
+
 ## 2. Truthiness of empty and non-empty containers
 
 > In `truthiness.py`, add an empty dictionary `{}` and a dictionary with one entry to the list of test values.
 > Predict what `bool()` reports for each before running it,
 > then check your prediction.
+
+<details>
+<summary>Where to look</summary>
+
+[Booleans, None, and Truthiness](../../Chapters/02_Foundations--Tour.md#booleans-none-and-truthiness) lists which values `bool()` reports as false.
+Add the two dictionaries to the loop's list and write your predictions down first.
+Then ask whether the rule you see for lists and strings extends to a `dict`.
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_2.py
@@ -47,11 +70,24 @@ An empty dictionary is falsy, the same as an empty list or an empty
 string. A dictionary with even one entry is truthy. The rule is the
 same for every container: falsy when empty, truthy otherwise.
 
+</details>
+</details>
+
 ## 3. f-string precision and the debug specifier
 
 > In `fstrings.py`, add a line that formats `score` with two decimal places instead of zero,
 > using `{score:.2f}` in place of `{score:.0f}%`,
 > and a second line using the debug specifier, `f"{score = }"`.
+
+<details>
+<summary>Where to look</summary>
+
+[f-Strings](../../Chapters/02_Foundations--Tour.md#f-strings) covers the format spec after the colon in a replacement field.
+Change the digit after the `.` in `.0f` to set the precision.
+A trailing `=` inside the braces makes the field print its own source text before the value.
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_3.py
@@ -68,6 +104,9 @@ second digit is a trailing zero. `{score = }` prints both the
 expression's source text and its value, so a quick debugging print
 needs no separate `print("score", score)`.
 
+</details>
+</details>
+
 ## 4. What a name signals
 
 > `augmented.py` defines `total` and `bitwise.py` defines `flags`.
@@ -77,6 +116,16 @@ needs no separate `print("score", score)`.
 > Using [Naming Conventions](../../Chapters/02_Foundations--Tour.md#naming-conventions),
 > say what each form signals to a reader who did not write the code,
 > and which of the three a linter flags.
+
+<details>
+<summary>Where to look</summary>
+
+[Naming Conventions](../../Chapters/02_Foundations--Tour.md#naming-conventions) says what each casing form tells a reader.
+Rename the variables in both styles and run each version to confirm the interpreter does not care.
+Then run `ruff check` on the camelCase file and see which rule code it reports.
+
+<details>
+<summary>Solution</summary>
 
 The camelCase versions of `total` and `flags`:
 
@@ -118,12 +167,36 @@ is the only one a linter objects to: ruff's PEP 8 checks report `N816`
 for a mixed-case global. The uppercase form is legal style, merely a
 false claim about the value. CapWords stays reserved for class names.
 
+</details>
+</details>
+
 ## 5. A third `Template` consumer
 
 > In `tstrings.py`, write a third consumer, `quoted(template)`,
 > that wraps every interpolated value in single quotes and leaves the literal text alone,
 > then print `quoted(message)`.
 > Explain why you cannot post-process an f-string the same way.
+
+<details>
+<summary>Where to look</summary>
+
+[t-Strings](../../Chapters/02_Foundations--Tour.md#t-strings) shows a `Template` as a sequence of literal strings and `Interpolation` objects.
+Iterate over the template, test each piece with `isinstance()`, and build the result from the pieces.
+For the explanation, consider what an f-string has already done by the time you receive its result.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_5.py
+from string.templatelib import Interpolation, Template
+
+def quoted(template: Template) -> str:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_5.py
@@ -169,6 +242,10 @@ Quoting is a harmless demonstration, but the same reasoning covers
 escaping a value before it enters SQL or HTML, where a wrong guess is a
 security hole rather than a typo.
 
+</details>
+</details>
+</details>
+
 ## 6. Negative floor division and modulo
 
 > Before running anything,
@@ -176,6 +253,16 @@ security hole rather than a typo.
 > then what Python prints for `-9 // 4` and `-9 % 4`.
 > Run `print(-9 // 4, -9 % 4)` and check.
 > State the rule that predicts the sign of the result of `%`.
+
+<details>
+<summary>Where to look</summary>
+
+[Numbers and Arithmetic](../../Chapters/02_Foundations--Tour.md#numbers-and-arithmetic) describes `//` and `%` on integers.
+Work the C or Java answer by truncating toward zero, then the Python answer by flooring.
+Use the identity relating `//`, `%`, and the divisor to see what the remainder must be.
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_6.py
@@ -190,3 +277,6 @@ infinity, so `-9 // 4` is `-3`. The identity
 is that the result of `%` takes the sign of the divisor. With a
 positive divisor the remainder is nonnegative, which is why
 `index % len(items)` wraps cleanly in either direction.
+
+</details>
+</details>

@@ -13,6 +13,82 @@
 > 2.  Treat the first file as a list of search words, one per line,
 >     and report which of those words appear in each remaining input file.
 
+<details>
+<summary>Where to look</summary>
+
+[Passing the Steps as Functions](../../Chapters/25_Patterns--Template_Method.md#passing-the-steps-as-functions) shows the same algorithm anchored in a function that takes the varying step as an argument.
+The subclass form is in [The Anchored Algorithm](../../Chapters/25_Patterns--Template_Method.md#the-anchored-algorithm).
+Put the fixed loop (read each input, apply the step, write the output) in one `run()` and one function, and leave only `process()` open.
+The search policy needs the word list, so store it on the subclass and close over it in the function form.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_1.py
+from abc import ABC, abstractmethod
+from collections.abc import Callable
+from pathlib import Path
+from typing import final
+
+class FileFramework(ABC):
+    __slots__ = ()
+
+    @final
+    def run(self, filenames: list[str]) -> None:
+        ...
+
+    @abstractmethod
+    def process(self, text: str) -> str: ...
+
+def run_file_framework(
+    filenames: list[str], process: Callable[[str], str]
+) -> None:
+    ...
+```
+
+```python
+# The shape of exercise_1_upper.py
+import tempfile
+from pathlib import Path
+from typing import override
+from exercise_1 import FileFramework, run_file_framework
+
+class Uppercase(FileFramework):
+    @override
+    def process(self, text: str) -> str:
+        ...
+
+def demo() -> None:
+    ...
+```
+
+```python
+# The shape of exercise_1_search.py
+import tempfile
+from pathlib import Path
+from typing import override
+from exercise_1 import FileFramework, run_file_framework
+from record import record
+
+def found(words: list[str], text: str) -> str:
+    ...
+
+@record
+class Search(FileFramework):
+    words: list[str]
+
+    @override
+    def process(self, text: str) -> str:
+        ...
+
+def demo() -> None:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
+
 The framework anchors the shape: read every file but the last, run the
 varying `process()` step over each one's text, and write the combined
 result to the last file. It appears twice, as a base class whose
@@ -157,6 +233,10 @@ local variable `words`. In both, `run()` and `run_file_framework()`
 stay unchanged: a new policy is a new step, and the algorithm that
 calls the step belongs to the framework.
 
+</details>
+</details>
+</details>
+
 ## 2. Two fixes for the premature engine
 
 > Repair `premature_engine.py` both ways:
@@ -164,6 +244,63 @@ calls the step belongs to the framework.
 > then redesign `Framework` instead,
 > so clients construct the object and call `run()` explicitly.
 > Which repair still protects a second subclass author who has never read this chapter?
+
+<details>
+<summary>Where to look</summary>
+
+[Don't Start the Engine in the Constructor](../../Chapters/25_Patterns--Template_Method.md#dont-start-the-engine-in-the-constructor) shows `Framework.__init__()` calling a step before the subclass has set its attributes.
+One repair changes the order of two lines in `Greeter.__init__()`.
+The other removes the call from `Framework.__init__()` so that the client calls `run()`.
+To choose between them, consider who must remember what.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_2_reorder.py
+from typing import final, override
+
+class Framework:
+    def __init__(self) -> None:
+        ...
+
+    @final
+    def run(self) -> None:
+        ...
+
+    def step(self) -> None: ...
+
+class Greeter(Framework):
+    def __init__(self, name: str) -> None:
+        ...
+
+    @override
+    def step(self) -> None:
+        ...
+```
+
+```python
+# The shape of exercise_2_redesign.py
+from typing import final, override
+
+class Framework:
+    @final
+    def run(self) -> None:  # No longer called from __init__
+        ...
+
+    def step(self) -> None: ...
+
+class Greeter(Framework):
+    def __init__(self, name: str) -> None:
+        ...
+
+    @override
+    def step(self) -> None:
+        ...
+```
+
+<details>
+<summary>Solution</summary>
 
 The quick repair reorders the two lines so the subclass finishes its
 own setup before handing control to the base class:
@@ -242,12 +379,56 @@ ready. The same reasoning drives eager versus lazy construction in
 [*Singleton*](../../Chapters/24_Patterns--Singleton.md#double-checked-locking-and-eager-creation),
 where the timing of a hidden step makes the difference.
 
+</details>
+</details>
+</details>
+
 ## 3. Who objects to a replaced `run()`
 
 > Subclass `ApplicationFramework` and override `run()` with a version that calls `customize2()` before `customize1()`.
 > Run it, then run `ty` over it.
 > Which of the two, Python or the type checker, objects to the change?
 > What does that tell you about where the anchored algorithm's guarantee comes from?
+
+<details>
+<summary>Where to look</summary>
+
+[Hooks and the Misspelled Override](../../Chapters/25_Patterns--Template_Method.md#hooks-and-the-misspelled-override) explains how `@final` marks `run()` as the fixed part of the *Template Method*.
+Override `run()` anyway, run the file, then run `ty` over it.
+Compare what each one reports, and ask which of them reads the `@final` marker.
+A `# type: ignore` on the override keeps the listing in the build.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_3.py
+from typing import final, override
+
+class ApplicationFramework:
+    @final
+    def run(self) -> None:
+        ...
+
+    def customize1(self) -> None: ...
+    def customize2(self) -> None: ...
+
+class Reversed(ApplicationFramework):
+    @override
+    def run(self) -> None:  # type: ignore
+        ...
+
+    @override
+    def customize1(self) -> None:
+        ...
+
+    @override
+    def customize2(self) -> None:
+        ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_3.py
@@ -312,6 +493,10 @@ method a subclass replaces. The check raises a `TypeError` at the
 subclass's `class` statement, as soon as the class body has run, long
 before anyone constructs an instance.
 
+</details>
+</details>
+</details>
+
 ## 4. Two faithless substitutes the type checker accepts
 
 > Write two subclasses of `ApplicationFramework` that both type-check but break the anchored algorithm:
@@ -319,6 +504,47 @@ before anyone constructs an instance.
 > and one that leaves `customize2()` at its `...` default when the flow depends on it.
 > The type checker reports neither.
 > What must be true of the base class for the type checker to catch either one?
+
+<details>
+<summary>Where to look</summary>
+
+[Substitutability](../../Chapters/25_Patterns--Template_Method.md#substitutability) shows a subclass that type-checks yet breaks the algorithm the base class anchors.
+Write one subclass whose `customize1()` raises an exception, and one that keeps the `...` default for a step the flow depends on.
+The base class can declare a step mandatory with `ABC` and `@abstractmethod`.
+Consider which of the two failures any declaration available in Python could expose.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_4.py
+from typing import final, override
+from exceptions import expect
+
+class ApplicationFramework:
+    @final
+    def run(self) -> None:
+        ...
+
+    def customize1(self) -> None: ...
+    def customize2(self) -> None: ...
+
+class Exploder(ApplicationFramework):
+    @override
+    def customize1(self) -> None:
+        ...
+
+class HalfDone(ApplicationFramework):
+    def __init__(self) -> None:
+        ...
+
+    @override
+    def customize1(self) -> None:
+        ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_4.py
@@ -404,6 +630,10 @@ that a base class can declare. What a step does once called is
 behavior, and Liskov substitution is a rule about behavior, so
 enforcing it stays where the chapter leaves it: with you.
 
+</details>
+</details>
+</details>
+
 ## 5. Which names the misspelling check compares
 
 > In `near_miss.py`, subclass `MyApp` with a class that adds a method named `reports()`.
@@ -411,6 +641,73 @@ enforcing it stays where the chapter leaves it: with you.
 > Which names does `__init_subclass__()` compare a new method against?
 > Change the check so it compares a new method only against the names `ApplicationFramework` defines.
 > What does the narrower check no longer catch?
+
+<details>
+<summary>Where to look</summary>
+
+[Hooks and the Misspelled Override](../../Chapters/25_Patterns--Template_Method.md#hooks-and-the-misspelled-override) builds the set of known names inside `__init_subclass__()` from the classes in `cls.__mro__`.
+Add a method to `MyApp`, subclass it with a near-miss name, and watch which names the check sees.
+For the narrower version, take the names from `vars(ApplicationFramework)` alone.
+Then test a misspelling of a name that a subclass added.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_5.py
+from difflib import get_close_matches
+from typing import final, override
+from exceptions import expected
+
+class ApplicationFramework:
+    @final
+    def run(self) -> None:
+        ...
+
+    def customize1(self) -> None: ...
+    def customize2(self) -> None: ...
+
+    def __init_subclass__(cls) -> None:
+        ...
+
+class MyApp(ApplicationFramework):
+    @override
+    def customize1(self) -> None:
+        ...
+
+    def report(self) -> None: ...
+```
+
+```python
+# The shape of exercise_5_narrow.py
+from difflib import get_close_matches
+from typing import final, override
+from exceptions import expected
+
+class ApplicationFramework:
+    @final
+    def run(self) -> None:
+        ...
+
+    def customize1(self) -> None: ...
+    def customize2(self) -> None: ...
+
+    def __init_subclass__(cls) -> None:
+        ...
+
+class MyApp(ApplicationFramework):
+    @override
+    def customize1(self) -> None:
+        ...
+
+    def report(self) -> None: ...
+
+class Audited(MyApp):
+    def reports(self) -> None: ...
+```
+
+<details>
+<summary>Solution</summary>
 
 The chapter's `__init_subclass__()` builds its set of names from every
 base class, so the set grows as the hierarchy does. `MyApp` adds
@@ -550,3 +847,7 @@ subclass introduced. If `Audited` meant to override `report()`, its
 reports nothing. Catching that misspelling falls to `Audited`'s
 author, who can use the protection the chapter recommends for steps:
 `@override` on the method, and a type checker in the build.
+
+</details>
+</details>
+</details>

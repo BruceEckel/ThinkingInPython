@@ -6,6 +6,92 @@
 >
 > 2.  Add a class `Triangle` to `shape_factory_objects.py`.
 
+<details>
+<summary>Where to look</summary>
+
+[Simple Factory Method](../../Chapters/27_Patterns--Factory.md#simple-factory-method) and [Factory Objects](../../Chapters/27_Patterns--Factory.md#factory-objects) each keep the concrete classes behind a single creation point.
+A new shape needs a class with `draw()` and `erase()`, plus one entry where that creation point chooses by name.
+In the first style that entry is a `case` in `Shape.factory()`; in the second it is a nested `Factory` class, registered by name in the `FACTORIES` table.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_1.py
+from abc import ABC, abstractmethod
+from typing import override
+
+class Shape(ABC):
+    @abstractmethod
+    def draw(self) -> None: ...
+
+    @abstractmethod
+    def erase(self) -> None: ...
+
+    @staticmethod
+    def factory(kind: str) -> Shape:
+        ...
+
+class _Circle(Shape):
+    @override
+    def draw(self) -> None:
+        ...
+
+    @override
+    def erase(self) -> None:
+        ...
+
+class _Square(Shape):
+    @override
+    def draw(self) -> None:
+        ...
+
+    @override
+    def erase(self) -> None:
+        ...
+
+class _Triangle(Shape):
+    @override
+    def draw(self) -> None:
+        ...
+
+    @override
+    def erase(self) -> None:
+        ...
+```
+
+```python
+# The shape of exercise_2.py
+from abc import ABC, abstractmethod
+from typing import Final, Protocol, override
+
+class ShapeMaker(Protocol):
+    def create(self) -> Shape: ...
+
+class Shape(ABC):
+    @abstractmethod
+    def draw(self) -> None: ...
+
+class _Triangle(Shape):
+    @override
+    def draw(self) -> None:
+        ...
+
+    class Factory:
+        def create(self) -> _Triangle:
+            ...
+
+FACTORIES: Final[dict[str, ShapeMaker]] = {
+    "Triangle": _Triangle.Factory(),
+}
+
+def create_shape(kind: str) -> Shape:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
+
 `shape_factory_method.py`'s single static `factory()` needs one new `case`:
 
 ```python
@@ -114,6 +200,10 @@ by table entry rather than by code. The chapter's `registry.py` goes
 one step further: each class registers itself, so even the table entry
 disappears.
 
+</details>
+</details>
+</details>
+
 ## 3. `GnomesAndFairies`
 
 > Add a new type of `GameElementFactory` called `GnomesAndFairies`,
@@ -122,6 +212,98 @@ disappears.
 > pass the factory to `GameEnvironment`,
 > and confirm the error your type checker reports.
 > Then add `make_obstacle()`.
+
+<details>
+<summary>Where to look</summary>
+
+[Abstract Factories](../../Chapters/27_Patterns--Factory.md#abstract-factories) shows `GameElementFactory` as a family of creation methods, once as an abstract base class and once as a `Protocol`.
+A new concrete factory implements both `make_character()` and `make_obstacle()`, returning a new `Character` and a new `Obstacle` that belong together.
+The `Protocol` version declares no base class, so only the type checker reports the missing `make_obstacle()`, at the line where you pass the factory to `GameEnvironment`.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_3.py
+from abc import ABC, abstractmethod
+from typing import override
+
+class Obstacle(ABC):
+    @abstractmethod
+    def description(self) -> str: ...
+
+class Character(ABC):
+    @abstractmethod
+    def interact_with(self, obstacle: Obstacle) -> None: ...
+
+class GameElementFactory(ABC):
+    @abstractmethod
+    def make_character(self) -> Character: ...
+
+    @abstractmethod
+    def make_obstacle(self) -> Obstacle: ...
+
+class GameEnvironment:
+    def __init__(self, factory: GameElementFactory) -> None:
+        ...
+
+    def play(self) -> None:
+        ...
+
+class Gnome(Character):
+    @override
+    def interact_with(self, obstacle: Obstacle) -> None:
+        ...
+
+class Fairy(Obstacle):
+    @override
+    def description(self) -> str:
+        ...
+
+class GnomesAndFairies(GameElementFactory):
+    @override
+    def make_character(self) -> Character:
+        ...
+
+    @override
+    def make_obstacle(self) -> Obstacle:
+        ...
+```
+
+```python
+# The shape of exercise_3_protocol.py
+from typing import Protocol
+
+class Obstacle(Protocol):
+    def description(self) -> str: ...
+
+class Character(Protocol):
+    def interact_with(self, obstacle: Obstacle) -> None: ...
+
+class GameElementFactory(Protocol):
+    def make_character(self) -> Character: ...
+    def make_obstacle(self) -> Obstacle: ...
+
+class GameEnvironment:
+    def __init__(self, factory: GameElementFactory) -> None:
+        ...
+    def play(self) -> None:
+        ...
+
+class Gnome:
+    def interact_with(self, obstacle: Obstacle) -> None:
+        ...
+
+class Fairy:
+    def description(self) -> str: ...
+
+class GnomesAndFairies:  # Declares no base class
+    def make_character(self) -> Gnome: ...
+    def make_obstacle(self) -> Fairy: ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_3.py
@@ -248,10 +430,76 @@ missing method. Nothing guards that version at runtime:
 `GameEnvironment.__init__()` raises an `AttributeError` when it calls
 `make_obstacle()`.
 
+</details>
+</details>
+</details>
+
 ## 4. An Abstract Factory for "thick" and "thin" shapes
 
 > Modify `shape_factory_objects.py` to use an *Abstract Factory* to create different sets of shapes
 > (for example, one type of factory object creates "thick shapes," another creates "thin shapes," but each factory object can create all the shapes: circles, squares, triangles, etc.).
+
+<details>
+<summary>Where to look</summary>
+
+[Abstract Factories](../../Chapters/27_Patterns--Factory.md#abstract-factories) makes one factory object produce a matching family of products.
+Here the family is the set of shapes, and the variation is the style.
+Declare a `Protocol` with one creation method per shape, write one factory class for thick shapes and one for thin, and give each shape a thickness the factory supplies.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_4.py
+from abc import ABC, abstractmethod
+from typing import Literal, Protocol, override
+
+type Thickness = Literal["thick", "thin"]
+
+class Shape(ABC):
+    @abstractmethod
+    def draw(self) -> None: ...
+
+class Circle(Shape):
+    def __init__(self, thickness: Thickness) -> None:
+        ...
+
+    @override
+    def draw(self) -> None:
+        ...
+
+class Square(Shape):
+    def __init__(self, thickness: Thickness) -> None:
+        ...
+
+    @override
+    def draw(self) -> None:
+        ...
+
+class ShapeFactory(Protocol):
+    def make_circle(self) -> Shape: ...
+    def make_square(self) -> Shape: ...
+
+class ThickShapeFactory:
+    def make_circle(self) -> Shape:
+        ...
+
+    def make_square(self) -> Shape:
+        ...
+
+class ThinShapeFactory:
+    def make_circle(self) -> Shape:
+        ...
+
+    def make_square(self) -> Shape:
+        ...
+
+def build_shapes(factory: ShapeFactory) -> list[Shape]:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_4.py
@@ -320,6 +568,10 @@ accepts any object with those two methods, so switching a whole
 family of shapes from thick to thin is choosing a different factory
 object, not editing every call site that creates a shape.
 
+</details>
+</details>
+</details>
+
 ## 5. A four-topping limit, in both pizza styles
 
 > Add a rule to both pizza examples: a pizza may carry at most four toppings.
@@ -330,6 +582,45 @@ object, not editing every call site that creates a shape.
 > decide whether it belongs in `topping()` or `build()`.
 > In which version can an invalid pizza exist, even momentarily?
 > `stars_class.py` in that chapter shows the same hazard.
+
+<details>
+<summary>Where to look</summary>
+
+[Builder](../../Chapters/27_Patterns--Factory.md#builder) separates assembling a pizza from the finished `Pizza`.
+In `pizza_direct.py`, `__post_init__()` runs while the constructor is still executing, so a bad pizza never escapes it.
+In `pizza_builder.py`, compare what the builder's own list of toppings holds after a fifth `topping()` call when the check sits in `topping()` and when it sits in `build()`.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_5.py
+from typing import Self
+from exceptions import expect
+from record import record
+
+@record
+class Pizza:
+    size: int = 12
+    cheese: bool = True
+    toppings: tuple[str, ...] = ()
+
+    def __post_init__(self) -> None:
+        ...
+
+class PizzaBuilder:
+    def __init__(self) -> None:
+        ...
+
+    def topping(self, name: str) -> Self:
+        ...
+
+    def build(self) -> Pizza:
+        ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_5.py
@@ -406,6 +697,10 @@ check fails: `damaged` still prints `Stars(13)` after `f1()` raises a
 `TypeFailure`. A builder that checks in `build()` raises its
 `ValueError` and still holds five toppings.
 
+</details>
+</details>
+</details>
+
 ## 6. A registry whose classes live somewhere else
 
 > Move `Circle` and `Square` out of `registry.py` into a new module,
@@ -413,6 +708,51 @@ check fails: `damaged` still prints `Stars(13)` after `f1()` raises a
 > Confirm that `make("Circle")` now raises `KeyError` until something imports `extra_shapes`,
 > and explain which line of which file registers the class, and when it runs.
 > Then make `registry_demo.py` print the same key list it printed before the move.
+
+<details>
+<summary>Where to look</summary>
+
+[Self Registration](../../Chapters/27_Patterns--Factory.md#self-registration) fills the registry from `__init_subclass__()`, which runs when a `class` statement executes.
+A class registers itself only if its module has been imported, so a module that nothing imports contributes nothing.
+To restore the old key list, make `registry_demo.py` import `extra_shapes`, and read [Hazards of Self Registration](../../Chapters/27_Patterns--Factory.md#hazards-of-self-registration) for why that import needs a comment for the linter.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of registry.py
+from abc import ABC, abstractmethod
+from typing import ClassVar
+
+class Shape(ABC):
+    registry: ClassVar[dict[str, type[Shape]]] = {}
+
+    def __init_subclass__(cls, **kwargs: object) -> None:
+        ...
+
+    @abstractmethod
+    def draw(self) -> None: ...
+
+def make(name: str) -> Shape:
+    ...
+```
+
+```python
+# The shape of extra_shapes.py
+from typing import override
+from registry import Shape
+
+class Circle(Shape):
+    @override
+    def draw(self) -> None: ...
+
+class Square(Shape):
+    @override
+    def draw(self) -> None: ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # registry.py
@@ -512,6 +852,10 @@ exists for its side effect. It must stay an ordinary import, since a
 `lazy import` defers the module body, and with it the two `class`
 statements, until the first use of a name the demo never uses.
 
+</details>
+</details>
+</details>
+
 ## 7. What `copy.copy()` costs a prototype registry
 
 > Give `Monster` in `prototype_registry.py` a `parts: dict[str, int]` field and add a prototype that uses it.
@@ -520,6 +864,43 @@ statements, until the first use of a name the demo never uses.
 > (`uv run pytest Examples/27_Patterns--Factory/test_prototype.py` from the repository root),
 > and explain which assertion fails and why.
 > Then restore `deepcopy()` and add a test that would have caught the bug through `parts` rather than `powers`.
+
+<details>
+<summary>Where to look</summary>
+
+[Prototype](../../Chapters/27_Patterns--Factory.md#prototype) contrasts `copy.deepcopy()`, which follows every reference, with a copy that shares what it holds.
+A shallow copy duplicates the `Monster` but reuses the objects its fields refer to.
+Compare an assertion that rebinds a field with one that mutates a list or dictionary in place, and see which of them `test_prototype.py` makes.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_7.py
+import copy
+from dataclasses import dataclass, field
+from typing import Final
+
+@dataclass
+class Monster:
+    name: str
+    hp: int
+    powers: list[str] = field(default_factory=list)
+    parts: dict[str, int] = field(default_factory=dict)
+
+PROTOTYPES: Final[dict[str, Monster]] = {
+    "goblin": Monster("Goblin", hp=10, powers=["bite"],
+                      parts={"arms": 2}),
+    "hydra": Monster("Hydra", hp=60, powers=["bite"],
+                     parts={"heads": 9}),
+}
+
+def shallow_spawn(kind: str) -> Monster:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_7.py
@@ -602,6 +983,10 @@ prototype survived is good. A user of the registry depends on the next
 spawn being correct, and the second assertion tests that spawn,
 which `copy.copy()` corrupts.
 
+</details>
+</details>
+</details>
+
 ## 8. What the `eval()` dispatcher accepts
 
 > Recreate the `eval()` dispatcher described after `shape_factory_objects.py`'s listing:
@@ -609,6 +994,53 @@ which `copy.copy()` corrupts.
 > Call it with a `kind` string that is not a shape name but a Python expression with a side effect,
 > and show that it runs the expression.
 > Then show that the `FACTORIES` version raises `KeyError` for the same string.
+
+<details>
+<summary>Where to look</summary>
+
+[Factory Objects](../../Chapters/27_Patterns--Factory.md#factory-objects) describes the `eval()` dispatcher and the `FACTORIES` table that replaces it.
+`eval()` compiles and runs whatever string it receives, so `kind` can be an expression with a side effect, such as a conditional whose test calls `print()`.
+A dictionary lookup treats the same string only as a key, and a missing key raises `KeyError`.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_8.py
+from abc import ABC, abstractmethod
+from typing import Final, Protocol, override
+from exceptions import expect
+
+class ShapeMaker(Protocol):
+    def create(self) -> Shape: ...
+
+class Shape(ABC):
+    @abstractmethod
+    def draw(self) -> None: ...
+
+class _Circle(Shape):
+    @override
+    def draw(self) -> None: ...
+    class Factory:
+        def create(self) -> _Circle: ...
+
+def eval_shape(kind: str) -> Shape:
+    ...
+
+ATTACK: Final[str] = (
+    "Circle.Factory() if print('side effect!')"
+    " else _Circle")
+
+FACTORIES: Final[dict[str, ShapeMaker]] = {
+    "Circle": _Circle.Factory(),
+}
+
+def create_shape(kind: str) -> Shape:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_8.py
@@ -673,6 +1105,10 @@ verifies. Whenever `kind` can come from a configuration file, a
 request, or a command line, the table is the only acceptable version
 of the two.
 
+</details>
+</details>
+</details>
+
 ## 9. Recursing through `__subclasses__()`
 
 > Derive `_Oval` from `_Circle` in `shape_factory_method.py`,
@@ -682,6 +1118,61 @@ of the two.
 > Write a recursive generator `all_subclasses()` that yields a class's direct subclasses and,
 > through each one's own `__subclasses__()`, every class below them.
 > Use it in `shape_name()` and confirm that `Oval` now appears.
+
+<details>
+<summary>Where to look</summary>
+
+[Hiding the Concrete Classes](../../Chapters/27_Patterns--Factory.md#hiding-the-concrete-classes) notes that `__subclasses__()` covers only the first level of inheritance.
+Compare that with where `_Oval` sits in the hierarchy.
+Write `all_subclasses()` as a recursive generator: yield each direct subclass, then `yield from` a call on that subclass.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_9.py
+import random
+from abc import ABC, abstractmethod
+from collections.abc import Iterable, Iterator
+from typing import override
+
+class Shape(ABC):
+    @abstractmethod
+    def draw(self) -> None: ...
+    @abstractmethod
+    def erase(self) -> None: ...
+    @staticmethod
+    def factory(kind: str) -> Shape:
+        ...
+
+class _Circle(Shape):
+    @override
+    def draw(self) -> None: ...
+    @override
+    def erase(self) -> None: ...
+
+class _Square(Shape):
+    @override
+    def draw(self) -> None: ...
+    @override
+    def erase(self) -> None: ...
+
+class _Oval(_Circle):
+    @override
+    def draw(self) -> None: ...
+
+def all_subclasses[T](cls: type[T]) -> Iterator[type[T]]:
+    ...
+
+def names(classes: Iterable[type[Shape]]) -> list[str]:
+    ...
+
+def shape_name(n: int) -> Iterator[str]:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_9.py
@@ -773,6 +1264,10 @@ the deeper classes without removing the intermediate ones, and a
 factory that should build only leaf classes needs a further filter,
 `not cls.__subclasses__()`.
 
+</details>
+</details>
+</details>
+
 ## 10. Finding the class that forgot `@make.register`
 
 > Add a `Hexagon` to `protocol_registry.py` that satisfies `Shape` but carries no `@make.register`,
@@ -782,6 +1277,53 @@ factory that should build only leaf classes needs a further filter,
 > `@runtime_checkable`, which [*Surrogate*](../../Chapters/26_Patterns--Surrogate.md#proxy)
 > shows with `isinstance()`,
 > also lets `issubclass()` test a class against a Protocol whose members are all methods.
+
+<details>
+<summary>Where to look</summary>
+
+[Explicit Registration with a Protocol](../../Chapters/27_Patterns--Factory.md#explicit-registration-with-a-protocol) registers classes with `@make.register`, so a class that omits the decorator is absent from `make.registry`.
+The check walks a module's namespace, keeps the objects that are classes, and tests each against `Shape` with `issubclass()`.
+That test works on a `Protocol` only when it is `@runtime_checkable`; report the classes that pass it and are missing from the registry.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_10.py
+from typing import Protocol, runtime_checkable
+from exceptions import expect
+
+@runtime_checkable
+class Shape(Protocol):
+    def draw(self) -> None: ...
+
+class ShapeFactory:
+    def __init__(self) -> None:
+        ...
+
+    def register[S: Shape](self, cls: type[S]) -> type[S]:
+        ...
+
+    def __call__(self, name: str) -> Shape:
+        ...
+
+@make.register
+class Circle:
+    def draw(self) -> None: ...
+
+@make.register
+class Square:
+    def draw(self) -> None: ...
+
+class Hexagon:
+    def draw(self) -> None: ...
+
+def unregistered(namespace: dict[str, object]) -> list[str]:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_10.py
@@ -861,6 +1403,10 @@ a Protocol with a data attribute raises a `TypeError` from
 `unregistered()` also sees one namespace at a time, so a plugin module
 must run it over its own `globals()`.
 
+</details>
+</details>
+</details>
+
 ## 11. Prototypes registered by decoration
 
 > Fill `PROTOTYPES` in `prototype_registry.py` by decoration instead of a table literal.
@@ -869,6 +1415,51 @@ must run it over its own `globals()`.
 > Explain why the decorator takes the name as an argument rather than reading the function's `__name__`:
 > write that version and read what `ty` reports.
 > Then say what the decorated form gains over the table and what it costs.
+
+<details>
+<summary>Where to look</summary>
+
+[Prototype](../../Chapters/27_Patterns--Factory.md#prototype) keeps ready-made instances in a table, and [Self Registration](../../Chapters/27_Patterns--Factory.md#self-registration) fills a table as definitions execute.
+`prototype(name)` is a decorator factory: the outer call takes the name and returns a function that stores the builder's result and returns the builder.
+The `__name__` version fails because of what the `Callable` annotation declares, which the type checker's message shows.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_11.py
+import copy
+from collections.abc import Callable
+from dataclasses import dataclass, field
+from typing import Final
+
+@dataclass
+class Monster:
+    name: str
+    hp: int
+    powers: list[str] = field(default_factory=list)
+
+type Builder = Callable[[], Monster]
+
+PROTOTYPES: Final[dict[str, Monster]] = {}
+
+def prototype(name: str) -> Callable[[Builder], Builder]:
+    ...
+
+@prototype("goblin")
+def goblin() -> Monster:
+    ...
+
+@prototype("troll")
+def troll() -> Monster:
+    ...
+
+def spawn(name: str) -> Monster:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_11.py
@@ -953,3 +1544,7 @@ attached to registration: an undecorated builder is absent from the
 table, with a `KeyError` from `spawn()` that names the key and not
 the builder, and a builder in an unimported module never runs. For two monsters in one
 file, the table literal says the same thing in fewer lines.
+
+</details>
+</details>
+</details>

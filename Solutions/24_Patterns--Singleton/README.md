@@ -10,6 +10,39 @@
 > and which failure from [Tests, Threads, and Locks](../../Chapters/24_Patterns--Singleton.md#tests-threads-and-locks)
 > can no longer occur?
 
+<details>
+<summary>Where to look</summary>
+
+[Lazy Creation](../../Chapters/24_Patterns--Singleton.md#lazy-creation) builds the inner object on the first construction, behind a sentinel and a guard.
+Move that construction into the class body so it runs once, when the class is defined.
+Then read [Tests, Threads, and Locks](../../Chapters/24_Patterns--Singleton.md#tests-threads-and-locks) for the failure that depends on a first call, and ask whether a first call still exists.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_1.py
+from dataclasses import dataclass, field
+from typing import Any, ClassVar
+
+class OnlyOne:
+    @dataclass
+    class __OnlyOne:
+        val: list[str] = field(default_factory=list)
+
+    # Created once, when the class is defined:
+    instance: ClassVar[__OnlyOne] = __OnlyOne()
+
+    def __init__(self, arg: str) -> None:
+        ...
+
+    def __getattr__(self, name: str) -> Any:
+        ...
+```
+
+<details>
+<summary>Solution</summary>
+
 ```python
 # exercise_1.py
 from dataclasses import dataclass, field
@@ -52,12 +85,55 @@ two threads racing the first construction could each see the `None`
 sentinel and each build an inner object. The single-threaded
 import builds the object, leaving no first call to race.
 
+</details>
+</details>
+</details>
+
 ## 2. A pool of connections instead of one instance
 
 > Using `singleton_cached_factory.py` as a starting point,
 > create a factory that manages a fixed pool of objects
 > (say, database connections) and hands them out,
 > rather than a single instance.
+
+<details>
+<summary>Where to look</summary>
+
+[When You Want a Class, Cache the Instance](../../Chapters/24_Patterns--Singleton.md#when-you-want-a-class-cache-the-instance) uses `functools.cache` on a zero-argument function to return one object.
+Keep that technique for the pool itself, and give the pooled object a list of available connections and a set of leased ones.
+`acquire()` moves a connection from one to the other, and `release()` moves it back.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_2.py
+from functools import cache
+from exceptions import expect
+from record import record
+
+@record
+class Connection:
+    number: int
+
+class ConnectionPool:
+    def __init__(self, size: int) -> None:
+        ...
+
+    def acquire(self) -> Connection:
+        ...
+
+    def release(self, conn: Connection) -> None:
+        ...
+
+@cache
+def pool() -> ConnectionPool:
+    "Always returns the same ConnectionPool instance."
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_2.py
@@ -126,10 +202,33 @@ not on lease. With `discard()` there, a second `release()` would
 put the same connection into `_available` twice, and the pool would
 hand one connection to two callers.
 
+</details>
+</details>
+</details>
+
 ## 3. A class-based singleton rewritten as a module
 
 > Rewrite one of the class-based singletons above as a module,
 > and argue which you would use in real code.
+
+<details>
+<summary>Where to look</summary>
+
+[A Module Is Already a *Singleton*](../../Chapters/24_Patterns--Singleton.md#a-module-is-already-a-singleton) explains that Python caches a module in `sys.modules` and runs its body once.
+Put the shared list at module level, add a function that appends to it, and use it from a second file.
+For the argument, weigh the code each form needs against what only a class can offer.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of only_one.py
+def add(arg: str) -> None:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # only_one.py
@@ -165,6 +264,10 @@ of a class, such as participating in an interface other code
 expects, or needing `__new__()`-level control over construction.
 Absent that requirement, a module is the simpler tool.
 
+</details>
+</details>
+</details>
+
 ## 4. Rebinding instead of mutating
 
 > In `shared_config.py`, replace the mutation with a rebinding,
@@ -172,6 +275,16 @@ Absent that requirement, a module is the simpler tool.
 > and add `import config` plus `print(config.settings)` at the end.
 > Predict both printed values before running it,
 > and explain the difference using the binding-versus-mutation distinction from [A Module Is Already a *Singleton*](../../Chapters/24_Patterns--Singleton.md#a-module-is-already-a-singleton).
+
+<details>
+<summary>Where to look</summary>
+
+[A Module Is Already a *Singleton*](../../Chapters/24_Patterns--Singleton.md#a-module-is-already-a-singleton) distinguishes mutating a shared object from rebinding a name.
+`from config import settings` creates a second name for the same dict in your module's namespace.
+Ask which name an assignment changes, and which names a mutation reaches.
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # config.py
@@ -223,12 +336,53 @@ A name and the object it refers to are different things, and every
 singleton built on module state depends on that difference. Mutate
 through any name, rebind only through the module.
 
+</details>
+</details>
+
 ## 5. A lock in the wrong place
 
 > Add a `threading.Lock` *inside* `settings()` in `singleton_cached_race.py`,
 > wrapping only the body of the cached function, and run it.
 > Explain why the object count does not drop to one,
 > then fix it without a lock.
+
+<details>
+<summary>Where to look</summary>
+
+[The First-Call Race](../../Chapters/24_Patterns--Singleton.md#the-first-call-race) shows several threads missing the cache before any of them stores a result.
+Compare the order of the two steps in a cached call, the lookup and the body, with where the lock sits.
+For the fix without a lock, see [Double-Checked Locking and Eager Creation](../../Chapters/24_Patterns--Singleton.md#double-checked-locking-and-eager-creation): call the cached function once before any thread starts.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_5.py
+import threading
+import time
+from concurrent.futures import ThreadPoolExecutor
+from dataclasses import dataclass, field
+from functools import cache
+from typing import Final
+
+@dataclass
+class Settings:
+    data: dict[str, str] = field(default_factory=dict)
+
+    def __post_init__(self) -> None:
+        ...
+
+@cache
+def settings() -> Settings:
+    ...
+
+@cache
+def primed() -> Settings:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_5.py
@@ -308,11 +462,54 @@ anything uses it. For settings that cost is nothing. For a database
 connection it may be real, and then the hand-written lock is the
 answer.
 
+</details>
+</details>
+</details>
+
 ## 6. Two Borg subclasses share one namespace
 
 > Give `singleton_borg.py` a second `Borg` subclass and construct one of each.
 > Explain the value you get back,
 > and change the code so the two subclasses keep separate shared state.
+
+<details>
+<summary>Where to look</summary>
+
+[Borg: Singleton by Inheritance](../../Chapters/24_Patterns--Singleton.md#borg-singleton-by-inheritance) points every instance's `__dict__` at a dict held in a class variable.
+Check which class owns that dict when a second subclass looks up `_shared_state`.
+A subclass that binds its own `_shared_state` in its class body gets separate storage.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_6.py
+from typing import Any, ClassVar
+
+class Borg:
+    _shared_state: ClassVar[dict[str, Any]] = {}
+
+    def __init__(self) -> None:
+        ...
+
+class Singleton(Borg):
+    def __init__(self, arg: str) -> None:
+        ...
+
+class Other(Borg):
+    def __init__(self, arg: str) -> None:
+        ...
+
+class Separate(Borg):
+    # Its own storage
+    _shared_state: ClassVar[dict[str, Any]] = {}
+
+    def __init__(self, arg: str) -> None:
+        ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_6.py
@@ -378,6 +575,10 @@ every subclass inherits that same one. A subclass that binds its own
 gets storage of its own, while the others keep sharing. *Borg* sharpens the trap: mutation is its
 design, so every version of the pattern carries the trap.
 
+</details>
+</details>
+</details>
+
 ## 7. `__init__()` runs on every construction
 
 > In `singleton_class_variable.py`,
@@ -386,6 +587,34 @@ design, so every version of the pattern carries the trap.
 > and sets `self.val = [arg]`.
 > Predict what `x.val` holds after the three constructions, then run it.
 > Explain the result using what `__new__()` returns.
+
+<details>
+<summary>Where to look</summary>
+
+[One Instance in a Class Variable](../../Chapters/24_Patterns--Singleton.md#one-instance-in-a-class-variable) returns the stored instance from `__new__()`.
+When `__new__()` returns an instance of the class under construction, Python then calls `__init__()` on it.
+Count how many times that happens across the three constructions, and what each call does to `val`.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_7.py
+from typing import ClassVar
+
+class SingletonClassVar:
+    val: list[str]
+    __instance: ClassVar[SingletonClassVar | None] = None
+
+    def __new__(cls, arg: str) -> SingletonClassVar:
+        ...
+
+    def __init__(self, arg: str) -> None:
+        ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_7.py
@@ -437,3 +666,7 @@ The metaclass form in
 [Metaprogramming](../../Chapters/17_Techniques--Metaprogramming.md#intercepting-instance-creation)
 has no such problem. Its `__call__()` runs before `__new__()` and
 `__init__()`, and after the first construction it calls neither.
+
+</details>
+</details>
+</details>

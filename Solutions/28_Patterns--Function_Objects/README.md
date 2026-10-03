@@ -6,6 +6,54 @@
 > What do the commands need to become, and is a function still enough,
 > or do you now want an object?
 
+<details>
+<summary>Where to look</summary>
+
+[A Callable Object as a Command](../../Chapters/28_Patterns--Function_Objects.md#a-callable-object-as-a-command) shows a command that carries its own state and is still called with `()`.
+A command that must answer two requests, running and reversing, needs a type with two members.
+Describe that type with a `Protocol`, and make each command remember what it did so it can reverse it.
+A `Macro` then undoes its list in `reversed()` order.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_1.py
+from typing import Protocol
+from record import record
+
+class UndoableCommand(Protocol):
+    def __call__(self) -> None: ...
+    def undo(self) -> None: ...
+
+@record
+class Deposit:
+    account: dict[str, int]
+    amount: int
+
+    def __call__(self) -> None:
+        ...
+
+    def undo(self) -> None:
+        ...
+
+class Macro:
+    def __init__(self) -> None:
+        ...
+
+    def add(self, command: UndoableCommand) -> None:
+        ...
+
+    def run(self) -> None:
+        ...
+
+    def undo_all(self) -> None:
+        ...
+```
+
+<details>
+<summary>Solution</summary>
+
 ```python
 # exercise_1.py
 from typing import Protocol
@@ -77,10 +125,70 @@ a base class with two `raise NotImplementedError` bodies, and those
 bodies are what the shape costs. A base class pays for itself when
 the commands share implementation, and these commands share none.
 
+</details>
+</details>
+</details>
+
 ## 2. `chain.py`, reporting every attempt
 
 > Rewrite `chain.py` so each handler also reports why it failed,
 > and the solver prints every attempt before returning the winner.
+
+<details>
+<summary>Where to look</summary>
+
+[Chain of Responsibility: Choosing the Handler at Runtime](../../Chapters/28_Patterns--Function_Objects.md#chain-of-responsibility-choosing-the-handler-at-runtime) uses `None` to mean that a handler failed.
+`None` carries no reason, so give each handler a failure value that does, and return `float | Failed`.
+In `solve()`, tell a root from a failure with `match`, print each attempt, and read the handler's name from `__name__`.
+Because `Callable` has no name, the type of the chain needs a `Protocol` that declares `__name__`.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_2.py
+from collections.abc import Callable
+from typing import Final, Protocol
+from record import record
+
+type Fn = Callable[[float], float]
+
+@record
+class Failed:
+    reason: str
+
+class Finder(Protocol):
+    __name__: str
+    def __call__(self, f: Fn, a: float,
+                 b: float) -> float | Failed: ...
+
+TOLERANCE: Final[float] = 1e-12
+MAX_ITER: Final[int] = 200
+NO_CONVERGENCE: Final[Failed] = Failed(
+    f"no convergence in {MAX_ITER} steps")
+
+def bisection(f: Fn, a: float, b: float) -> float | Failed:
+    ...
+
+def secant(f: Fn, a: float, b: float) -> float | Failed:
+    ...
+
+def newton(f: Fn, a: float, b: float) -> float | Failed:
+    ...
+
+def solve(f: Fn, a: float, b: float,
+          chain: list[Finder]) -> float | None:
+    ...
+
+def f(x: float) -> float:
+    ...
+
+def g(x: float) -> float:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_2.py
@@ -196,11 +304,25 @@ alongside `__call__()`, and a function satisfies both. The listing
 copies the finders from `algorithms.py` rather than importing them,
 because each solution runs on its own.
 
+</details>
+</details>
+</details>
+
 ## 3. `sorted()` with a compound key, and why `key` is *Strategy*
 
 > Use `sorted()` with a `key` function to sort a list of `(name, score)` tuples by score,
 > then by name.
 > Explain why `key` is the *Strategy* pattern.
+
+<details>
+<summary>Where to look</summary>
+
+[Strategy: Choosing the Algorithm at Runtime](../../Chapters/28_Patterns--Function_Objects.md#strategy-choosing-the-algorithm-at-runtime) shows a caller supplying the interchangeable part of an algorithm as a function.
+Have the `key` function return a tuple, since Python compares tuples element by element.
+For the explanation, ask what `sorted()` fixes and what the caller supplies.
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_3.py
@@ -223,6 +345,9 @@ knows nothing about tuples, scores, or names. Passing a different
 *Strategy* form swaps the algorithm its Context holds. Here the
 Context holding the current strategy is the call to `sorted()`.
 
+</details>
+</details>
+
 ## 4. A configurable `newton()`, closed over and partially applied
 
 > Following `bisection_within()`,
@@ -230,6 +355,46 @@ Context holding the current strategy is the call to `sorted()`.
 > with a closure, and with `functools.partial`.
 > Confirm that `chain.py`'s `solve()` runs a chain holding either one,
 > with no change to `solve()`.
+
+<details>
+<summary>Where to look</summary>
+
+[Strategy: Choosing the Algorithm at Runtime](../../Chapters/28_Patterns--Function_Objects.md#strategy-choosing-the-algorithm-at-runtime) builds a configured *Strategy* from `bisection_within()` and again with `functools.partial`.
+Give `newton()` a `tolerance` parameter with a default so existing calls keep working.
+Then write a factory that returns an inner function calling `newton()` with the tolerance, and build a second finder with `partial()` and a keyword argument.
+Both match the `RootFinder` type, which is why `solve()` needs no change.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_4.py
+from collections.abc import Callable
+from functools import partial
+from typing import Final
+
+type Fn = Callable[[float], float]
+type RootFinder = Callable[[Fn, float, float], float | None]
+
+MAX_ITER: Final[int] = 200
+
+def newton(f: Fn, a: float, b: float,
+           tolerance: float = 1e-12) -> float | None:
+    ...
+
+def newton_within(tolerance: float) -> RootFinder:
+    ...
+
+def solve(f: Fn, a: float, b: float,
+          chain: list[RootFinder]) -> float | None:
+    ...
+
+def f(x: float) -> float:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_4.py
@@ -307,6 +472,10 @@ You need a closure when the setting is not a parameter of the
 function, the way `bisection_within()` writes the tolerance into its
 `while` condition.
 
+</details>
+</details>
+</details>
+
 ## 5. An event bus that walks the MRO, and can unsubscribe
 
 > Because `EventBus.publish()` looks up `type(event)`,
@@ -315,6 +484,59 @@ function, the way `bisection_within()` writes the tolerance into its
 > parents last.
 > Then add `unsubscribe()`.
 > Which of the two changes can break an existing caller, and why?
+
+<details>
+<summary>Where to look</summary>
+
+[An Event Bus: Handlers Keyed by Type](../../Chapters/28_Patterns--Function_Objects.md#an-event-bus-handlers-keyed-by-type) looks handlers up by `type(event)` in a `defaultdict`.
+Iterate `type(event).__mro__` instead, and read each class's handlers with `.get()` so a lookup does not insert keys.
+`unsubscribe()` removes a handler from that list, so decide what should happen when the handler was never subscribed.
+For the last question, compare which change alters what code that never calls the new method receives.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_5.py
+from collections import defaultdict
+from collections.abc import Callable
+from typing import Any
+from record import record
+
+type Handler[E] = Callable[[E], None]
+
+@record
+class Deposit:
+    amount: int
+
+@record
+class BigDeposit(Deposit):
+    pass
+
+class EventBus:
+    def __init__(self) -> None:
+        ...
+
+    def subscribe[E](self, event_type: type[E],
+                     handler: Handler[E]) -> None:
+        ...
+
+    def unsubscribe[E](self, event_type: type[E],
+                       handler: Handler[E]) -> None:
+        ...
+
+    def publish(self, event: object) -> None:
+        ...
+
+def on_deposit(event: Deposit) -> None:
+    ...
+
+def on_big(event: BigDeposit) -> None:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_5.py
@@ -398,6 +620,10 @@ that was never subscribed. Whether that case should be silent or loud
 is a design decision: silent matches the bus's habit of letting an
 unmatched event pass without complaint.
 
+</details>
+</details>
+</details>
+
 ## 6. Three fixes for late binding, and what none of them fix
 
 > Build a list of three commands in a `for` loop (not a comprehension)
@@ -406,6 +632,33 @@ unmatched event pass without complaint.
 > Fix the loop three ways: with a default argument, with `functools.partial`,
 > and with a factory function that takes `n` and returns the command.
 > Which one still works if you must compute the value at call time rather than at build time?
+
+<details>
+<summary>Where to look</summary>
+
+[The Late-Binding Trap](../../Chapters/28_Patterns--Function_Objects.md#the-late-binding-trap) explains that a closure reads a variable when it is called, not when it is created.
+Each fix evaluates `n` while the loop runs: a default argument, `partial()`, and a factory function with its own scope.
+For the closing question, find a value that must still be read at call time and ask which fix freezes it.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_6.py
+from collections.abc import Callable
+from functools import partial
+
+type Command = Callable[[], None]
+
+def make(n: int) -> Command:
+    ...
+
+def report() -> None:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_6.py
@@ -492,11 +745,55 @@ feature are the same mechanism. Which one you have depends on whether
 the name you close over still means what you wanted when the call
 finally happens.
 
+</details>
+</details>
+</details>
+
 ## 7. `event()` registering `cls`
 
 > In `tagged_bus.py`, change `event()` to register `cls` in place of `built`.
 > Predict what importing `bank_events.py` then does, and which line stops it.
 > Run it to check.
+
+<details>
+<summary>Where to look</summary>
+
+[A Tagged Bus: Handlers That Name Their Event](../../Chapters/28_Patterns--Function_Objects.md#a-tagged-bus-handlers-that-name-their-event) builds the class first and registers `built`.
+With `slots=True`, `dataclass()` returns a new class, so ask which class the name `Deposit` ends up bound to and which class `EVENTS` holds.
+Then trace the check that `handler()` makes against `EVENTS` on its first decorated class.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_7.py
+import inspect
+from dataclasses import dataclass
+from typing import Final, dataclass_transform
+from exceptions import expect
+
+EVENTS: Final[set[type]] = set()
+
+@dataclass_transform(frozen_default=True)
+def event[E](cls: type[E]) -> type[E]:
+    ...
+
+@dataclass_transform(frozen_default=True)
+def handler[H](cls: type[H]) -> type[H]:
+    ...
+
+@event
+class Deposit:
+    amount: int
+
+class Announce:
+    prefix: str
+    def __call__(self, event: Deposit) -> None:
+        ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_7.py
@@ -559,3 +856,7 @@ class `dataclass()` returned, and does not find it in `EVENTS`.
 through `@event` a few lines earlier. If something else created
 the handlers, `publish()` would refuse every event for the same
 reason, since `type(event)` is the returned class too.
+
+</details>
+</details>
+</details>

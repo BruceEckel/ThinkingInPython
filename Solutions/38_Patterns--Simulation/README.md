@@ -10,6 +10,17 @@
 > and assert which cell the rat kept for itself and which cells it spawned.
 > You need no real `Blackboard`, `Maze`, or task scheduling.
 
+<details>
+<summary>Where to look</summary>
+
+[The Rat and the Blackboard](../../Chapters/38_Patterns--Simulation.md#the-rat-and-the-blackboard) shows `Rat` calling only the methods of the `Recorder` `Protocol`.
+Write a class with those methods, so it satisfies the `Protocol` by shape.
+Make `claim()` return values from an iterator you script, and have `spawn()` append to a list.
+After `asyncio.run(rat.run())`, assert on the rat's position and on that list.
+
+<details>
+<summary>Solution</summary>
+
 ```python
 # test_ch38_fake_blackboard.py
 import asyncio
@@ -99,6 +110,9 @@ that, here `(1, 0)` alone. Once the script runs out, `claim()` answers
 `False` to everything, so the rat dead-ends on its second turn and
 `run()` returns. The test needs no randomness and no real maze.
 
+</details>
+</details>
+
 ## 2. Reporting unreached cells
 
 > Report the cells the rats never reach.
@@ -106,6 +120,79 @@ that, here `(1, 0)` alone. Once the script runs out, `claim()` answers
 > compare `blackboard.visited` against every open cell of the `Maze` and print the open cells that no rat claimed.
 > Build a maze for which that set is not empty,
 > and explain what makes a cell unreachable.
+
+<details>
+<summary>Where to look</summary>
+
+[Running the Maze](../../Chapters/38_Patterns--Simulation.md#running-the-maze) shows `explore()` starting every rat from one entry cell and recording what the rats claim in `blackboard.visited`.
+Build a set of every open cell in the `Maze` and subtract `visited` from it.
+To make the difference non-empty, draw a maze whose open cells split into regions that no open path joins.
+Then ask where every rat begins.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_2.py
+import asyncio
+from dataclasses import dataclass, field
+from enum import StrEnum
+from typing import Final, Self
+
+type Coord = tuple[int, int]
+
+DIRECTIONS: Final[list[tuple[int, int]]] = [
+    (0, 1), (0, -1), (-1, 0), (1, 0)]
+
+class Maze:
+    class Cell(StrEnum):
+        WALL = "*"
+        OPEN = " "
+
+    def __init__(self, rows: list[str]) -> None:
+        ...
+
+    @classmethod
+    def from_text(cls, text: str) -> Self:
+        ...
+
+    def is_open(self, x: int, y: int) -> bool:
+        ...
+
+    def entry(self) -> Coord:
+        ...
+
+@dataclass
+class Rat:
+    blackboard: Blackboard
+    x: int
+    y: int
+
+    async def run(self) -> None:
+        ...
+
+@dataclass
+class Blackboard:
+    maze: Maze
+    visited: set[Coord] = field(init=False,
+                                default_factory=set)
+    group: asyncio.TaskGroup = field(init=False)
+
+    def claim(self, x: int, y: int) -> bool:
+        ...
+
+    def spawn(self, x: int, y: int) -> None:
+        ...
+
+    async def explore(self) -> None:
+        ...
+
+async def main() -> None:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_2.py
@@ -240,6 +327,10 @@ rat traces back to that single starting point through `claim()`. No
 rat can therefore reach a cell that has no open-cell path back to the
 entry, however many rats spawn.
 
+</details>
+</details>
+</details>
+
 ## 3. Breaking `claim()`'s atomicity
 
 > Break the atomicity of `claim()`.
@@ -256,6 +347,210 @@ entry, however many rats spawn.
 > What happens to the two rats that both claimed one cell,
 > and why does the original `claim()`, with no `await` inside it,
 > need no lock?
+
+<details>
+<summary>Where to look</summary>
+
+[Contention on a Loop](../../Chapters/38_Patterns--Simulation.md#contention-on-a-loop) shows what happens when two rats reach one unclaimed cell, and [The Rat and the Blackboard](../../Chapters/38_Patterns--Simulation.md#the-rat-and-the-blackboard) shows the `claim()` you are changing.
+Making `claim()` an `async def` means each caller must `await` it, which spreads through the `Protocol`, the comprehension, and `explore()`.
+Count the `True` results in a field on the `Blackboard` and compare the count with `len(visited)`.
+A coroutine gives up control only at an `await`, which decides whether a lock is needed.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_3.py
+import asyncio
+from dataclasses import dataclass, field
+from enum import StrEnum
+from typing import Final, Protocol, Self
+
+type Coord = tuple[int, int]
+
+DIRECTIONS: Final[list[tuple[int, int]]] = [
+    (0, 1), (0, -1), (-1, 0), (1, 0)]
+
+LAYOUT: Final[str] = """\
+*********
+*       *
+*** *** *
+*   *   *
+* ***** *
+*       *
+*********
+"""
+
+class Maze:
+    class Cell(StrEnum):
+        WALL = "*"
+        OPEN = " "
+
+    def __init__(self, rows: list[str]) -> None:
+        ...
+
+    @classmethod
+    def from_text(cls, text: str) -> Self:
+        ...
+
+    def is_open(self, x: int, y: int) -> bool:
+        ...
+
+    def entry(self) -> Coord:
+        ...
+
+class Recorder(Protocol):
+    async def claim(self, x: int, y: int) -> bool: ...
+    def spawn(self, x: int, y: int) -> None: ...
+
+@dataclass
+class Rat:
+    blackboard: Recorder
+    x: int
+    y: int
+
+    async def run(self) -> None:
+        ...
+
+@dataclass
+class Blackboard:
+    maze: Maze
+    visited: set[Coord] = field(init=False,
+                                default_factory=set)
+    true_claims: int = field(init=False, default=0)
+    group: asyncio.TaskGroup = field(init=False)
+
+    async def claim(self, x: int, y: int) -> bool:
+        ...
+
+    def spawn(self, x: int, y: int) -> None:
+        ...
+
+    async def explore(self) -> None:
+        ...
+
+async def main() -> None:
+    ...
+```
+
+```python
+# The shape of robot_world.py
+from enum import Enum, auto
+from itertools import groupby
+from typing import ClassVar, Final, override
+
+class Urge(Enum):
+    NORTH = auto()
+    SOUTH = auto()
+    EAST = auto()
+    WEST = auto()
+
+class Item:
+    symbol: ClassVar[str] = ""
+
+    def interact(self, robot: Robot, room: Room) -> Room:
+        ...
+
+    def __str__(self) -> str:
+        ...
+
+class Robot(Item):
+    symbol: ClassVar[str] = "R"
+    # Set by the builder when the robot is placed
+    room: Room
+
+    def __init__(self) -> None:
+        ...
+
+    def move(self, urge: Urge) -> None:
+        ...
+
+class Wall(Item):
+    symbol: ClassVar[str] = "#"
+
+    @override
+    def interact(self, robot: Robot, room: Room) -> Room:
+        ...
+
+class Food(Item):
+    symbol: ClassVar[str] = "."
+
+    @override
+    def interact(self, robot: Robot, room: Room) -> Room:
+        ...
+
+class Teleport(Item):
+    symbol: ClassVar[str] = ""  # Shown as its target letter
+    target_room: Room  # Paired up by the builder
+
+    def __init__(self, target: str) -> None:
+        ...
+
+    @override
+    def interact(self, robot: Robot, room: Room) -> Room:
+        ...
+
+    @override
+    def __str__(self) -> str:
+        ...
+
+class Empty(Item):
+    symbol: ClassVar[str] = "_"
+
+class Edge(Item):
+    symbol: ClassVar[str] = "/"
+
+    @override
+    def interact(self, robot: Robot, room: Room) -> Room:
+        # The void outside the maze: stay put
+        ...
+
+class EndGame(Item):
+    symbol: ClassVar[str] = "!"
+
+    @override
+    def interact(self, robot: Robot, room: Room) -> Room:
+        ...
+
+def item_factory(symbol: str) -> Item:
+    ...
+
+type Coord = tuple[int, int]
+type RoomMap = dict[Coord, Room]
+
+class Room:
+    def __init__(self, occupant: Item) -> None:
+        ...
+
+    def enter(self, robot: Robot) -> Room:
+        ...
+
+    def __repr__(self) -> str:
+        ...
+
+class Doors:
+    def __init__(self) -> None:
+        ...
+
+    def connect(self, row: int, col: int,
+                rooms: RoomMap) -> None:
+        ...
+
+    def open(self, urge: Urge) -> Room:
+        ...
+
+EDGE: Final[Room] = Room(Edge())
+
+class GameBuilder:
+    def __init__(self, maze: str) -> None:
+        ...
+
+    def run(self, solution: str) -> None:
+        ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_3.py
@@ -571,6 +866,10 @@ class GameBuilder:
             self.robot.move(moves[char])
 ```
 
+</details>
+</details>
+</details>
+
 ## 4. A `Coin` item
 
 > Add a new kind of `Item` to the robot maze.
@@ -582,6 +881,34 @@ class GameBuilder:
 > `item_factory()`, `Room`, and `GameBuilder` stay as they are.
 > Explain why the factory finds your new item on its own,
 > and what the factory does if you derive `Coin` from `Food` instead.
+
+<details>
+<summary>Where to look</summary>
+
+[Rooms, Robots, and the Item Factory](../../Chapters/38_Patterns--Simulation.md#rooms-robots-and-the-item-factory) shows how `Food.interact()` replaces its own occupant and how `item_factory()` finds an `Item` class from its `symbol`.
+Give `Coin` the `$` symbol, an `interact()` that does the same replacement, and a count on `Robot`.
+To see why the factory finds `Coin` by itself, read which classes `Item.__subclasses__()` returns.
+Then check whether a class derived from `Food` appears in that list.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_4.py
+from typing import ClassVar, override
+from robot_world import (Empty, GameBuilder, Item,
+                         Robot, Room)
+
+class Coin(Item):
+    symbol: ClassVar[str] = "$"
+
+    @override
+    def interact(self, robot: Robot, room: Room) -> Room:
+        ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_4.py
@@ -630,6 +957,10 @@ route, and `game.robot.coins` stays
 `0`. A one-word change to a class header moves a character out of
 the factory's search and silently substitutes a different `Item`.
 
+</details>
+</details>
+</details>
+
 ## 5. Sending the robot somewhere other than the `!`
 
 > Send the robot to something other than the `!`.
@@ -647,6 +978,46 @@ the factory's search and silently substitutes a different `Item`.
 > The run answers two questions for you.
 > Why does the search have to run again after every meal instead of once at the start?
 > And why does asking for the nearest food each time not produce the shortest tour that eats everything?
+
+<details>
+<summary>Where to look</summary>
+
+[Choosing the Path](../../Chapters/38_Patterns--Simulation.md#choosing-the-path) shows `solve()` searching breadth-first and stopping at the room that holds an `EndGame`.
+Replace that `isinstance()` test with a call to the `Callable[[Room], bool]` parameter, and return `None` when the queue empties.
+Write one small predicate function for food and another for the `!`.
+Loop with the walrus operator, `while (leg := solve(...)) is not None`, and walk each leg with `run()`.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_5.py
+from collections import deque
+from collections.abc import Callable
+from typing import Final
+from robot_world import (Edge, EndGame, Food, GameBuilder,
+                         Room, Teleport, Urge, Wall)
+
+MOVES: Final[dict[Urge, str]] = {
+    Urge.NORTH: "n", Urge.SOUTH: "s",
+    Urge.EAST: "e", Urge.WEST: "w"}
+
+def landing(room: Room, urge: Urge) -> Room | None:
+    ...
+
+def solve(game: GameBuilder,
+          arrived: Callable[[Room], bool]) -> str | None:
+    ...
+
+def food(room: Room) -> bool:
+    ...
+
+def end(room: Room) -> bool:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_5.py
@@ -764,6 +1135,10 @@ greedy tour does guarantee is that every leg is a shortest path,
 which is all breadth-first search guarantees.
 <!-- vale proselint.GenderBias = YES -->
 
+</details>
+</details>
+</details>
+
 ## 6, 7, and 8: the Chladni plate
 
 The last three exercises all shake the same plate, so this file
@@ -857,6 +1232,17 @@ class Plate:
 > Then explain why the main diagonal shows up in every figure this plate makes.
 > Swapping `x` and `y` in the two terms of `amplitude()` is the clue.
 
+<details>
+<summary>Where to look</summary>
+
+[The Model](../../Chapters/38_Patterns--Simulation.md#the-model) shows `step()` scaling each grain's random displacement by `amplitude()`.
+Substitute `m == n` into the two products of `amplitude()` and compare them.
+For the diagonal, swap `x` and `y` and see what happens to the sign of the difference inside `abs()`.
+Then ask what that implies where `x == y`.
+
+<details>
+<summary>Solution</summary>
+
 ```python
 # exercise_6.py
 from chladni import Plate, amplitude
@@ -899,6 +1285,9 @@ forces that value to zero. Every mode this plate can ring in therefore
 has a nodal line straight down the main diagonal, and the figures all
 share that one feature no matter which `(m, n)` produced them.
 
+</details>
+</details>
+
 ## 7. Changing the physics
 
 > Change the physics.
@@ -906,6 +1295,17 @@ share that one feature no matter which `(m, n)` produced them.
 > the standing waves of a membrane fixed at its edges, like a drumhead.
 > Predict the figures before you run the view.
 > Why are the nodal lines now straight?
+
+<details>
+<summary>Where to look</summary>
+
+[What the Numbers Show](../../Chapters/38_Patterns--Simulation.md#what-the-numbers-show) explains how agitation measures the plate settling toward its nodal lines.
+Pass a second field function to `Plate` and compare the figures.
+Write the new field as a product of a function of `x` and a function of `y`.
+A product is zero when either factor is zero, so find where each `sin` factor vanishes.
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_7.py
@@ -973,6 +1373,9 @@ same random walk, same rule that a grain moves in proportion to the
 vibration under it. Only the field changed, and with it every pattern
 the model produces.
 
+</details>
+</details>
+
 ## 8. Tuning the noise
 
 > Tune the noise.
@@ -982,6 +1385,17 @@ the model produces.
 > The other drives agitation down as convincingly as the default kick,
 > yet the figure never appears.
 > Explain both failures, and why an intermediate kick avoids them.
+
+<details>
+<summary>Where to look</summary>
+
+[The Model](../../Chapters/38_Patterns--Simulation.md#the-model) shows `step()` multiplying the random kick by the amplitude, so a grain slows as it nears a nodal line.
+Loop over the three kick values with a fresh `Plate` for each, and print agitation at the same checkpoints.
+For the large kick, compare a grain's maximum single step with the size of the plate.
+[Watching It Happen](../../Chapters/38_Patterns--Simulation.md#watching-it-happen) shows the rendered figure, which is the check that agitation cannot make.
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_8.py
@@ -1042,3 +1456,6 @@ big enough to leave the neighborhood the grain is settling into. The
 default `0.05` sits where both halves work: at most a tenth of the
 plate where the amplitude peaks, and vanishingly small once a grain
 arrives.
+
+</details>
+</details>

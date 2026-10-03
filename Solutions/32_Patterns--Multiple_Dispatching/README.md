@@ -11,6 +11,67 @@ Paper and Scissors, and loses to Rock. Lizard versus Lizard is a draw.
 > Add the seven new entries that `OUTCOME` needs:
 > both orders of each mixed pair, plus Lizard versus Lizard.
 
+<details>
+<summary>Where to look</summary>
+
+[One Lookup in a Table](../../Chapters/32_Patterns--Multiple_Dispatching.md#one-lookup-in-a-table) shows that `OUTCOME` is a dictionary keyed on a pair of classes.
+Adding a class touches no method, only the dictionary, so `compete()` stays as it is.
+Write one entry for each ordered pair of `Lizard` with another item, and one for `Lizard` against `Lizard`.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_1.py
+from enum import StrEnum
+from typing import Final
+
+class Outcome(StrEnum):
+    WIN = "win"
+    LOSE = "lose"
+    DRAW = "draw"
+
+class Item:
+    def compete(self, item: Item) -> Outcome:
+        ...
+
+    def __str__(self) -> str:
+        ...
+
+class Paper(Item):
+    pass
+class Scissors(Item):
+    pass
+class Rock(Item):
+    pass
+class Lizard(Item):
+    pass
+
+type Table = dict[tuple[type[Item], type[Item]], Outcome]
+
+OUTCOME: Final[Table] = {
+  (Paper, Rock): Outcome.WIN,
+  (Paper, Scissors): Outcome.LOSE,
+  (Paper, Paper): Outcome.DRAW,
+  (Paper, Lizard): Outcome.LOSE,
+  (Scissors, Paper): Outcome.WIN,
+  (Scissors, Rock): Outcome.LOSE,
+  (Scissors, Scissors): Outcome.DRAW,
+  (Scissors, Lizard): Outcome.LOSE,
+  (Rock, Scissors): Outcome.WIN,
+  (Rock, Paper): Outcome.LOSE,
+  (Rock, Rock): Outcome.DRAW,
+  (Rock, Lizard): Outcome.WIN,
+  (Lizard, Paper): Outcome.WIN,
+  (Lizard, Scissors): Outcome.WIN,
+  (Lizard, Rock): Outcome.LOSE,
+  (Lizard, Lizard): Outcome.DRAW,
+}
+```
+
+<details>
+<summary>Solution</summary>
+
 ```python
 # exercise_1.py
 from enum import StrEnum
@@ -72,6 +133,10 @@ ordered pairs `Lizard` forms with the other three, plus
 The `__main__` guard lets exercise 3 import this module without
 running its demonstration, as the chapter's own two versions do.
 
+</details>
+</details>
+</details>
+
 ## 2. Adding `Lizard` to the double-dispatch version
 
 > Add the same `Lizard` to `paper_scissors_rock.py`,
@@ -79,6 +144,98 @@ running its demonstration, as the chapter's own two versions do.
 > which means adding an `eval_lizard()` method to every existing class,
 > plus a `Lizard` class with its own `compete()` and four `eval_*()` methods.
 > Compare how much code this took versus adding `Lizard` to the table version.
+
+<details>
+<summary>Where to look</summary>
+
+[Two Dispatches Through Methods](../../Chapters/32_Patterns--Multiple_Dispatching.md#two-dispatches-through-methods) shows `compete()` calling an `eval_*()` method on the opponent, so each class answers for one type.
+A new class needs its own `compete()` and four `eval_*()` methods, and every existing class needs an `eval_lizard()`.
+Count the methods you wrote, then compare with the dictionary rows in the previous solution.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_2.py
+from enum import StrEnum
+from typing import Any
+
+class Outcome(StrEnum):
+    WIN = "win"
+    LOSE = "lose"
+    DRAW = "draw"
+
+class Item:
+    def __str__(self) -> str:
+        ...
+
+class Paper(Item):
+    def compete(self, item: Any) -> Outcome:
+        ...
+
+    def eval_paper(self, item: Any) -> Outcome:
+        ...
+
+    def eval_scissors(self, item: Any) -> Outcome:
+        ...
+
+    def eval_rock(self, item: Any) -> Outcome:
+        ...
+
+    def eval_lizard(self, item: Any) -> Outcome:
+        ...
+
+class Scissors(Item):
+    def compete(self, item: Any) -> Outcome:
+        ...
+
+    def eval_paper(self, item: Any) -> Outcome:
+        ...
+
+    def eval_scissors(self, item: Any) -> Outcome:
+        ...
+
+    def eval_rock(self, item: Any) -> Outcome:
+        ...
+
+    def eval_lizard(self, item: Any) -> Outcome:
+        ...
+
+class Rock(Item):
+    def compete(self, item: Any) -> Outcome:
+        ...
+
+    def eval_paper(self, item: Any) -> Outcome:
+        ...
+
+    def eval_scissors(self, item: Any) -> Outcome:
+        ...
+
+    def eval_rock(self, item: Any) -> Outcome:
+        ...
+
+    def eval_lizard(self, item: Any) -> Outcome:
+        ...
+
+class Lizard(Item):
+    def compete(self, item: Any) -> Outcome:
+        ...
+
+    def eval_paper(self, item: Any) -> Outcome:
+        ...
+
+    def eval_scissors(self, item: Any) -> Outcome:
+        ...
+
+    def eval_rock(self, item: Any) -> Outcome:
+        ...
+
+    def eval_lizard(self, item: Any) -> Outcome:
+        ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_2.py
@@ -184,11 +341,60 @@ reserves the method version for behavior that belongs to the class: a
 combination that reads the object's own state, or one a subclass
 should override while inheriting the rest.
 
+</details>
+</details>
+</details>
+
 ## 3. Sixteen matchups in `EXPECTED`
 
 > In `test_paper_scissors.py`, add `Lizard`'s seven matchups to `EXPECTED`,
 > taking it from nine entries to sixteen,
 > and confirm both versions still agree with each other and with `EXPECTED`.
+
+<details>
+<summary>Where to look</summary>
+
+[Testing Both Versions](../../Chapters/32_Patterns--Multiple_Dispatching.md#testing-both-versions) keeps one `EXPECTED` mapping that both implementations are checked against.
+Add the seven `Lizard` rows to that mapping, keyed on the player's and opponent's class names.
+A helper looks each class up by name with `getattr()` on whichever module it receives, so one mapping drives both versions and a disagreement shows up as a failure.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_3.py
+from types import ModuleType
+from typing import Final
+import exercise_1 as table
+import exercise_2 as methods
+from exercise_1 import Outcome
+
+EXPECTED: Final[dict[tuple[str, str], Outcome]] = {
+    ("Paper", "Rock"): Outcome.WIN,
+    ("Paper", "Scissors"): Outcome.LOSE,
+    ("Paper", "Paper"): Outcome.DRAW,
+    ("Paper", "Lizard"): Outcome.LOSE,
+    ("Scissors", "Paper"): Outcome.WIN,
+    ("Scissors", "Rock"): Outcome.LOSE,
+    ("Scissors", "Scissors"): Outcome.DRAW,
+    ("Scissors", "Lizard"): Outcome.LOSE,
+    ("Rock", "Scissors"): Outcome.WIN,
+    ("Rock", "Paper"): Outcome.LOSE,
+    ("Rock", "Rock"): Outcome.DRAW,
+    ("Rock", "Lizard"): Outcome.WIN,
+    ("Lizard", "Paper"): Outcome.WIN,
+    ("Lizard", "Scissors"): Outcome.WIN,
+    ("Lizard", "Rock"): Outcome.LOSE,
+    ("Lizard", "Lizard"): Outcome.DRAW,
+}
+
+def compete(module: ModuleType, player: str,
+            opponent: str) -> str:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_3.py
@@ -245,6 +451,10 @@ number of item types. `pytest` parametrizes it from `MATCHUPS`, which a
 comprehension builds from `EXPECTED`, so the test reports sixteen
 cases per module where it reported nine.
 
+</details>
+</details>
+</details>
+
 ## 4. Counting how often each item type appears
 
 > In `arena.py`, give `item_pair_gen()` an optional `counts: Counter[str] | None = None` parameter,
@@ -254,6 +464,78 @@ cases per module where it reported nine.
 > so pass in your own `Counter`,
 > iterate over all 100 pairs from `item_pair_gen(Item, 100, counts)`,
 > and then print how many times `Lizard` appeared.
+
+<details>
+<summary>Where to look</summary>
+
+In [Two Dispatches Through Methods](../../Chapters/32_Patterns--Multiple_Dispatching.md#two-dispatches-through-methods), `item_pair_gen()` is a generator, so its body runs only as you iterate.
+When the caller passes no `Counter`, create a fresh one so the body has a single path.
+Increment the count for each item inside the loop, before the `yield`, and the caller's own `Counter` fills as the loop consumes the pairs.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_4.py
+import random
+from collections import Counter
+from collections.abc import Iterator
+from enum import StrEnum
+from typing import Any, Final
+
+class Outcome(StrEnum):
+    WIN = "win"
+    LOSE = "lose"
+    DRAW = "draw"
+
+class Item:
+    def compete(self, item: Item) -> Outcome:
+        ...
+
+    def __str__(self) -> str:
+        ...
+
+class Paper(Item):
+    pass
+class Scissors(Item):
+    pass
+class Rock(Item):
+    pass
+class Lizard(Item):
+    pass
+
+type Table = dict[tuple[type[Item], type[Item]], Outcome]
+
+OUTCOME: Final[Table] = {
+  (Paper, Rock): Outcome.WIN,
+  (Paper, Scissors): Outcome.LOSE,
+  (Paper, Paper): Outcome.DRAW,
+  (Paper, Lizard): Outcome.LOSE,
+  (Scissors, Paper): Outcome.WIN,
+  (Scissors, Rock): Outcome.LOSE,
+  (Scissors, Scissors): Outcome.DRAW,
+  (Scissors, Lizard): Outcome.LOSE,
+  (Rock, Scissors): Outcome.WIN,
+  (Rock, Paper): Outcome.LOSE,
+  (Rock, Rock): Outcome.DRAW,
+  (Rock, Lizard): Outcome.WIN,
+  (Lizard, Paper): Outcome.WIN,
+  (Lizard, Scissors): Outcome.WIN,
+  (Lizard, Rock): Outcome.LOSE,
+  (Lizard, Lizard): Outcome.DRAW,
+}
+
+def duel(item1: Any, item2: Any) -> None:
+    ...
+
+def item_pair_gen[T](base: type[T], n: int,
+                     counts: Counter[str] | None = None
+                     ) -> Iterator[tuple[T, T]]:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_4.py
@@ -339,6 +621,10 @@ produces, one increment per item, so the caller can read
 `counts["Lizard"]` at any point during or after the loop, without
 `item_pair_gen()` needing to change what it yields.
 
+</details>
+</details>
+</details>
+
 ## 5. `__sub__()` and `__rsub__()` on `Meters`
 
 > Give `Meters` a `__sub__()` and a `__rsub__()`.
@@ -349,6 +635,35 @@ produces, one increment per item, so the caller can read
 > Subtraction does not commute, so the reflected form must undo the swap:
 > check that `10 - Meters(3)` produces `Meters(7)` rather than `Meters(-7)`.
 > Then confirm that `"ten" - Meters(3)` raises a `TypeError` rather than producing a `Meters`.
+
+<details>
+<summary>Where to look</summary>
+
+[Operators Dispatch Twice](../../Chapters/32_Patterns--Multiple_Dispatching.md#operators-dispatch-twice) shows `__add__()` returning `NotImplemented` so Python retries with `__radd__()` on the other operand.
+Use the same protocol for subtraction, with an `isinstance()` check per accepted type and `NotImplemented` for the rest.
+In `__rsub__()`, `self` is the right-hand operand, so compute the other value minus `self.n` to undo the swap.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_5.py
+from exceptions import expected
+from record import record
+
+@record
+class Meters:
+    n: float
+
+    def __sub__(self, other: object) -> Meters:
+        ...
+
+    def __rsub__(self, other: object) -> Meters:
+        ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_5.py
@@ -408,6 +723,10 @@ raising an exception makes that message possible: an exception raised
 inside `__rsub__()` reports `Meters`'s complaint instead of
 Python's account of which pair of types has no defined subtraction.
 
+</details>
+</details>
+</details>
+
 ## 6. Making the table tolerate subclasses
 
 > Subclass `Paper` as `Origami` and duel it against `Rock` in the table version,
@@ -416,6 +735,62 @@ Python's account of which pair of types has no defined subtraction.
 > Then make the table match subclasses by walking both operands' `__mro__` for the first pair that has a row,
 > and say what becomes of each of the two properties the lookup shares with the table-driven state machine:
 > exact matching, and failure at the first duel that needs a missing pair.
+
+<details>
+<summary>Where to look</summary>
+
+[One Lookup in a Table](../../Chapters/32_Patterns--Multiple_Dispatching.md#one-lookup-in-a-table) shows `exact_match.py`, where the key uses `type()` and a dictionary probe compares keys by equality, so a subclass finds no row.
+Every class has an `__mro__` tuple that lists it and then its bases in lookup order.
+Loop over one operand's `__mro__` and, inside it, the other's, skip classes that are not an `Item` (such as `object`), and return the first pair that has a row in `OUTCOME`.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_6.py
+from enum import StrEnum
+from typing import Final
+
+class Outcome(StrEnum):
+    WIN = "win"
+    LOSE = "lose"
+    DRAW = "draw"
+
+class Item:
+    def compete(self, item: Item) -> Outcome:
+        ...
+    def __str__(self) -> str:
+        ...
+
+class Paper(Item):
+    pass
+class Rock(Item):
+    pass
+
+type Table = dict[tuple[type[Item], type[Item]], Outcome]
+
+OUTCOME: Final[Table] = {
+    (Paper, Rock): Outcome.WIN,
+    (Rock, Paper): Outcome.LOSE,
+}
+
+class Origami(Paper):
+    pass
+
+class TolerantItem(Item):
+    def compete(self, item: Item) -> Outcome:
+        ...
+
+class TolerantPaper(TolerantItem):
+    pass
+class TolerantRock(TolerantItem):
+    pass
+class TolerantOrigami(TolerantPaper):
+    pass
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_6.py
@@ -520,6 +895,10 @@ competitor or a variation on an existing one. `Origami` really is
 paper for the purposes of this game. A `WetPaper` that loses to
 everything is a new competitor.
 
+</details>
+</details>
+</details>
+
 ## 7. A business-modeling environment
 
 > Create a business-modeling environment with three types of `Inhabitant`:
@@ -527,6 +906,54 @@ everything is a new competitor.
 > Now create a class called `Project` that creates the different inhabitants and causes them to `interact()` with each other.
 > Single dispatch is enough here.
 > The next exercise adds the second dispatch.
+
+<details>
+<summary>Where to look</summary>
+
+[Two Dispatches Through Methods](../../Chapters/32_Patterns--Multiple_Dispatching.md#two-dispatches-through-methods) starts with one dispatch, a method call that resolves its receiver's type.
+Give `Inhabitant` an `interact()` method and override it in `Dwarf`, `Elf`, and `Troll`.
+`Project` creates the inhabitants with a seeded `random.Random` and calls `interact()` on neighboring pairs.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_7.py
+import random
+from typing import Any
+
+class Inhabitant:
+    def interact(self, other: Any) -> str:
+        ...
+
+    def __str__(self) -> str:
+        ...
+
+class Dwarf(Inhabitant):
+    def interact(self, other: Any) -> str:
+        ...
+
+class Elf(Inhabitant):
+    def interact(self, other: Any) -> str:
+        ...
+
+class Troll(Inhabitant):
+    def interact(self, other: Any) -> str:
+        ...
+
+class Project:
+    def __init__(self, seed: int = 0) -> None:
+        ...
+
+    def gather(self, n: int) -> list[Inhabitant]:
+        ...
+
+    def meet(self, n: int) -> None:
+        ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_7.py
@@ -578,6 +1005,10 @@ interpolates `other` without inspecting its type. The design becomes
 double dispatch once `interact()`'s behavior must vary by `other`'s type too,
 and exercise 8 adds that dependence.
 
+</details>
+</details>
+</details>
+
 ## 8. Weapons, battles, and a full meeting
 
 > Modify the previous exercise's `Project` to make the interactions more detailed.
@@ -591,6 +1022,173 @@ and exercise 8 adds that dependence.
 > Now create a `meeting()` method for `Project` that creates groups of `Dwarf`,
 > `Elf`, and `Troll` and battles the groups against each other until only members of one group remain.
 > These are the "winners."
+
+<details>
+<summary>Where to look</summary>
+
+[Two Dispatches Through Methods](../../Chapters/32_Patterns--Multiple_Dispatching.md#two-dispatches-through-methods) shows the `compete()` and `eval_*()` pair that resolves both types.
+Give `Weapon` the same pair for six weapon classes, and let each `Inhabitant` kind hold a `WEAPONS` tuple from which `get_weapon()` picks one at random.
+Rank the weapons around a cycle, remembering that an even count leaves each weapon an opposite that draws, then have `battle()` compare two weapons and `meeting()` repeat battles until one group remains.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_8.py
+import random
+from enum import StrEnum
+from typing import Any, ClassVar, override
+
+class Outcome(StrEnum):
+    WIN = "win"
+    LOSE = "lose"
+    DRAW = "draw"
+
+class Weapon:
+    def compete(self, item: Any) -> Outcome:
+        ...
+    def __str__(self) -> str:
+        ...
+
+class Jargon(Weapon):
+    @override
+    def compete(self, item: Any) -> Outcome:
+        ...
+    def eval_jargon(self, item: Any) -> Outcome:
+        ...
+    def eval_play(self, item: Any) -> Outcome:
+        ...
+    def eval_invent_feature(self, item: Any) -> Outcome:
+        ...
+    def eval_sell_imaginary_product(self,
+                                    item: Any) -> Outcome:
+        ...
+    def eval_edict(self, item: Any) -> Outcome:
+        ...
+    def eval_schedule(self, item: Any) -> Outcome:
+        ...
+
+class Play(Weapon):
+    @override
+    def compete(self, item: Any) -> Outcome:
+        ...
+    def eval_jargon(self, item: Any) -> Outcome:
+        ...
+    def eval_play(self, item: Any) -> Outcome:
+        ...
+    def eval_invent_feature(self, item: Any) -> Outcome:
+        ...
+    def eval_sell_imaginary_product(self,
+                                    item: Any) -> Outcome:
+        ...
+    def eval_edict(self, item: Any) -> Outcome:
+        ...
+    def eval_schedule(self, item: Any) -> Outcome:
+        ...
+
+class InventFeature(Weapon):
+    @override
+    def compete(self, item: Any) -> Outcome:
+        ...
+    def eval_jargon(self, item: Any) -> Outcome:
+        ...
+    def eval_play(self, item: Any) -> Outcome:
+        ...
+    def eval_invent_feature(self, item: Any) -> Outcome:
+        ...
+    def eval_sell_imaginary_product(self,
+                                    item: Any) -> Outcome:
+        ...
+    def eval_edict(self, item: Any) -> Outcome:
+        ...
+    def eval_schedule(self, item: Any) -> Outcome:
+        ...
+
+class SellImaginaryProduct(Weapon):
+    @override
+    def compete(self, item: Any) -> Outcome:
+        ...
+    def eval_jargon(self, item: Any) -> Outcome:
+        ...
+    def eval_play(self, item: Any) -> Outcome:
+        ...
+    def eval_invent_feature(self, item: Any) -> Outcome:
+        ...
+    def eval_sell_imaginary_product(self,
+                                    item: Any) -> Outcome:
+        ...
+    def eval_edict(self, item: Any) -> Outcome:
+        ...
+    def eval_schedule(self, item: Any) -> Outcome:
+        ...
+
+class Edict(Weapon):
+    @override
+    def compete(self, item: Any) -> Outcome:
+        ...
+    def eval_jargon(self, item: Any) -> Outcome:
+        ...
+    def eval_play(self, item: Any) -> Outcome:
+        ...
+    def eval_invent_feature(self, item: Any) -> Outcome:
+        ...
+    def eval_sell_imaginary_product(self,
+                                    item: Any) -> Outcome:
+        ...
+    def eval_edict(self, item: Any) -> Outcome:
+        ...
+    def eval_schedule(self, item: Any) -> Outcome:
+        ...
+
+class Schedule(Weapon):
+    @override
+    def compete(self, item: Any) -> Outcome:
+        ...
+    def eval_jargon(self, item: Any) -> Outcome:
+        ...
+    def eval_play(self, item: Any) -> Outcome:
+        ...
+    def eval_invent_feature(self, item: Any) -> Outcome:
+        ...
+    def eval_sell_imaginary_product(self,
+                                    item: Any) -> Outcome:
+        ...
+    def eval_edict(self, item: Any) -> Outcome:
+        ...
+    def eval_schedule(self, item: Any) -> Outcome:
+        ...
+
+class Inhabitant2:
+    WEAPONS: ClassVar[tuple[type[Weapon], ...]]
+
+    def __init__(self, rng: random.Random) -> None:
+        ...
+
+    def get_weapon(self) -> Weapon:
+        ...
+
+class Dwarf2(Inhabitant2):
+    WEAPONS = (Jargon, Play)
+class Elf2(Inhabitant2):
+    WEAPONS = (InventFeature, SellImaginaryProduct)
+class Troll2(Inhabitant2):
+    WEAPONS = (Edict, Schedule)
+
+class Project2:
+    def __init__(self, seed: int = 0) -> None:
+        ...
+
+    def battle(
+        self, a: Inhabitant2, b: Inhabitant2
+    ) -> Inhabitant2 | None:
+        ...
+
+    def meeting(self, group_size: int) -> str:
+        ...
+```
+
+<details>
+<summary>Solution</summary>
 
 The listing gives each `Inhabitant` kind two of six weapon types,
 ranked around a cycle: each weapon beats the previous two in the
@@ -819,6 +1417,10 @@ each case the draw. Over two hundred seeds all three kinds win
 `meeting(5)`, so the outcome depends on the random draws each round,
 exactly as it does in a real rock-paper-scissors tournament.
 
+</details>
+</details>
+</details>
+
 ## 9. A table of callables
 
 > The chapter claims that a table cell can hold a function,
@@ -836,6 +1438,72 @@ exactly as it does in a real rock-paper-scissors tournament.
 > whichever of the two calls `compete()`.
 > The chapter gives two reasons for preferring the double-dispatch version.
 > Say which one this change answers, and which one survives it.
+
+<details>
+<summary>Where to look</summary>
+
+[Methods or Table](../../Chapters/32_Patterns--Multiple_Dispatching.md#methods-or-table) says a table cell can hold a function, and [One Lookup in a Table](../../Chapters/32_Patterns--Multiple_Dispatching.md#one-lookup-in-a-table) shows the lookup.
+Store a callable in every cell and call what the lookup returns with both items.
+A helper returns a closure that ignores its arguments to wrap each constant `Outcome`, and the `(Paper, Rock)` and `(Rock, Paper)` cells each read `wet` from the item in their own position.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_9.py
+from collections.abc import Callable
+from enum import StrEnum
+from typing import Final
+
+class Outcome(StrEnum):
+    WIN = "win"
+    LOSE = "lose"
+    DRAW = "draw"
+
+class Item:
+    def compete(self, item: Item) -> Outcome:
+        ...
+    def __str__(self) -> str:
+        ...
+
+class Paper(Item):
+    def __init__(self, wet: bool = False) -> None:
+        ...
+    def __str__(self) -> str:
+        ...
+
+class Scissors(Item):
+    pass
+class Rock(Item):
+    pass
+
+type Cell = Callable[[Item, Item], Outcome]
+
+def always(outcome: Outcome) -> Cell:
+    ...
+
+def paper_vs_rock(item1: Item, item2: Item) -> Outcome:
+    ...
+
+def rock_vs_paper(item1: Item, item2: Item) -> Outcome:
+    ...
+
+OUTCOME: Final[
+    dict[tuple[type[Item], type[Item]], Cell]] = {
+    (Paper, Rock): paper_vs_rock,
+    (Paper, Scissors): always(Outcome.LOSE),
+    (Paper, Paper): always(Outcome.DRAW),
+    (Scissors, Paper): always(Outcome.WIN),
+    (Scissors, Rock): always(Outcome.LOSE),
+    (Scissors, Scissors): always(Outcome.DRAW),
+    (Rock, Scissors): always(Outcome.WIN),
+    (Rock, Paper): rock_vs_paper,
+    (Rock, Rock): always(Outcome.DRAW),
+}
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_9.py
@@ -947,9 +1615,108 @@ the chapter warns about in the ladder version. Here the test sits
 inside one cell rather than running through every class, so you write
 it once instead of editing it for every new `Item`.
 
+</details>
+</details>
+</details>
+
 ## 10. Exercise 8, rebuilt on a table
 
 > Modify exercise 8 to use the table lookup technique of `paper_scissors_rock_table.py`.
+
+<details>
+<summary>Where to look</summary>
+
+[One Lookup in a Table](../../Chapters/32_Patterns--Multiple_Dispatching.md#one-lookup-in-a-table) replaces the `eval_*()` methods with one dictionary keyed on `type(self)` and `type(item)`.
+Keep `get_weapon()` and the inhabitant classes from the previous solution, and shrink the weapons to empty classes.
+Write the 36 answers as a grid whose rows and columns follow one `ORDER`, and build `OUTCOME` from it with a comprehension.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_10.py
+import random
+from typing import ClassVar, Final
+import exercise_8 as methods
+from exercise_8 import Outcome
+
+class Weapon:
+    def compete(self, item: Weapon) -> Outcome:
+        ...
+    def __str__(self) -> str:
+        ...
+
+class Jargon(Weapon):
+    pass
+class Play(Weapon):
+    pass
+class InventFeature(Weapon):
+    pass
+class SellImaginaryProduct(Weapon):
+    pass
+class Edict(Weapon):
+    pass
+class Schedule(Weapon):
+    pass
+
+type Table = dict[
+    tuple[type[Weapon], type[Weapon]], Outcome]
+
+W: Final[Outcome] = Outcome.WIN
+L: Final[Outcome] = Outcome.LOSE
+D: Final[Outcome] = Outcome.DRAW
+ORDER: Final[tuple[type[Weapon], ...]] = (
+    Jargon, Play, InventFeature,
+    SellImaginaryProduct, Edict, Schedule)
+GRID: Final[tuple[tuple[Outcome, ...], ...]] = (
+    (D, L, L, D, W, W),  # Jargon
+    (W, D, L, L, D, W),  # Play
+    (W, W, D, L, L, D),  # InventFeature
+    (D, W, W, D, L, L),  # SellImaginaryProduct
+    (L, D, W, W, D, L),  # Edict
+    (L, L, D, W, W, D),  # Schedule
+)
+OUTCOME: Final[Table] = {
+    (a, b): cell
+    for a, row in zip(ORDER, GRID, strict=True)
+    for b, cell in zip(ORDER, row, strict=True)
+}
+
+class Inhabitant2:
+    WEAPONS: ClassVar[tuple[type[Weapon], ...]]
+
+    def __init__(self, rng: random.Random) -> None:
+        ...
+
+    def get_weapon(self) -> Weapon:
+        ...
+
+class Dwarf2(Inhabitant2):
+    WEAPONS = (Jargon, Play)
+class Elf2(Inhabitant2):
+    WEAPONS = (InventFeature, SellImaginaryProduct)
+class Troll2(Inhabitant2):
+    WEAPONS = (Edict, Schedule)
+
+class Project2:
+    def __init__(self, seed: int = 0) -> None:
+        ...
+
+    def battle(
+        self, a: Inhabitant2, b: Inhabitant2
+    ) -> Inhabitant2 | None:
+        ...
+
+    def meeting(self, group_size: int) -> str:
+        ...
+
+def by_methods(a: type[Weapon],
+               b: type[Weapon]) -> Outcome:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_10.py
@@ -1092,3 +1859,7 @@ Exercise 8's version keeps one advantage.
 Its `eval_*()` methods receive the competing objects,
 so a weapon whose result depends on its own state fits there,
 while this grid would need exercise 9's callable cells.
+
+</details>
+</details>
+</details>

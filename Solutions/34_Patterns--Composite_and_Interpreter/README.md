@@ -6,6 +6,42 @@
 > a generator yielding the path of every entry whose name matches.
 > A directory can match, and matching should continue into it.
 
+<details>
+<summary>Where to look</summary>
+
+[The Classic Composite](../../Chapters/34_Patterns--Composite_and_Interpreter.md#the-classic-composite) and [A Composite of Data Classes](../../Chapters/34_Patterns--Composite_and_Interpreter.md#a-composite-of-data-classes) show `walk()` recursing through a `Directory` with `match`.
+Write `find()` in the same shape, with one case per `Node` type and `yield from` for the recursion.
+A `Directory` case checks its own name before it descends, and it carries the path prefix down.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_1.py
+from collections.abc import Iterator
+from typing import assert_never
+from record import record
+
+@record
+class File:
+    name: str
+    size: int
+
+@record
+class Directory:
+    name: str
+    entries: tuple[Node, ...]
+
+type Node = File | Directory
+
+def find(entry: Node, name: str,
+         prefix: str = "") -> Iterator[str]:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
+
 ```python
 # exercise_1.py
 from collections.abc import Iterator
@@ -60,12 +96,59 @@ the results. The second call shows a simpler duplication: `root`
 holds two separate directories named `"src"`, and both come back as
 `root/src`, so a path alone does not say which one matched.
 
+</details>
+</details>
+</details>
+
 ## 2. A `Symlink` node
 
 > Add a `Symlink` node to the `Node` union in `filesystem.py`,
 > holding a name and a target path,
 > and let the type checker report every operation that must change.
 > Decide what `disk_usage()` and `walk()` should do with a link.
+
+<details>
+<summary>Where to look</summary>
+
+[A Composite of Data Classes](../../Chapters/34_Patterns--Composite_and_Interpreter.md#a-composite-of-data-classes) ends each `match` with `assert_never()`.
+Add a `@record` class to the `Node` union and run the type checker: each operation that lacks a case reports the unhandled type.
+Then decide per operation what a link means, and avoid following the target into a subtree.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_2.py
+from collections.abc import Iterator
+from typing import assert_never
+from record import record
+
+@record
+class File:
+    name: str
+    size: int
+
+@record
+class Directory:
+    name: str
+    entries: tuple[Node, ...]
+
+@record
+class Symlink:
+    name: str
+    target: str
+
+type Node = File | Directory | Symlink
+
+def disk_usage(entry: Node) -> int:
+    ...
+
+def walk(entry: Node, prefix: str = "") -> Iterator[str]:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_2.py
@@ -134,12 +217,100 @@ the real file lives. Adding the target's size again double-counts those bytes.
 than following it into the target's subtree, since following it could
 loop forever if a link ever pointed back at one of its own ancestors.
 
+</details>
+</details>
+</details>
+
 ## 3. `Neg` and `Div`
 
 > Add `Neg` (negation) and `Div` (division) nodes to `expr.py`,
 > along with `__neg__()` and `__truediv__()` operator methods.
 > Update `evaluate()`, `to_infix()`, and `simplify()`.
 > What should `simplify()` do with division by `Num(0)`?
+
+<details>
+<summary>Where to look</summary>
+
+[The Nodes and the `Operators` Base](../../Chapters/34_Patterns--Composite_and_Interpreter.md#the-nodes-and-the-operators-base) explains why node classes inherit their operator methods and why `Expr` is the union that each walker's `assert_never()` checks.
+Add both classes to `Expr`, put `__neg__()` and `__truediv__()` on `Operators`, and follow the type checker to every walker.
+For `simplify()`, consider what rewrite is safe for `Div` and which input should be left alone.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_3.py
+from typing import assert_never
+from record import record
+
+class Operators:
+    __slots__ = ()
+
+    def __add__(self: Expr, other: Expr | int) -> Add:
+        ...
+
+    def __radd__(self: Expr, other: int) -> Add:
+        ...
+
+    def __mul__(self: Expr, other: Expr | int) -> Mul:
+        ...
+
+    def __rmul__(self: Expr, other: int) -> Mul:
+        ...
+
+    def __neg__(self: Expr) -> Neg:
+        ...
+
+    def __truediv__(self: Expr, other: Expr | int) -> Div:
+        ...
+
+    def __rtruediv__(self: Expr, other: int) -> Div:
+        ...
+
+@record
+class Num(Operators):
+    value: int
+
+@record
+class Var(Operators):
+    name: str
+
+@record
+class Add(Operators):
+    left: Expr
+    right: Expr
+
+@record
+class Mul(Operators):
+    left: Expr
+    right: Expr
+
+@record
+class Neg(Operators):
+    operand: Expr
+
+@record
+class Div(Operators):
+    left: Expr
+    right: Expr
+
+type Expr = Num | Var | Add | Mul | Neg | Div
+
+def wrap(value: Expr | int) -> Expr:
+    ...
+
+def evaluate(e: Expr, /, **env: int) -> float:
+    ...
+
+def to_infix(e: Expr) -> str:
+    ...
+
+def simplify(e: Expr) -> Expr:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_3.py
@@ -314,11 +485,78 @@ raise `ZeroDivisionError` when the division runs, and not before.
 Python treats `1 / 0` in source the same way: the compiler accepts
 it, and the error arrives when the line executes.
 
+</details>
+</details>
+</details>
+
 ## 4. Precedence-aware `to_infix()`
 
 > `to_infix()` parenthesizes every operation.
 > Rewrite it to emit only the parentheses that precedence requires,
 > so `2 * x + 1` renders as `2 * x + 1` but `(x + 1) * (x + 2)` keeps its parentheses.
+
+<details>
+<summary>Where to look</summary>
+
+[New Operations, Same Tree](../../Chapters/34_Patterns--Composite_and_Interpreter.md#new-operations-same-tree) builds `to_infix()` as one more walker over `Expr`.
+Give each operator a precedence number and pass the enclosing operator's precedence down the recursion.
+A subexpression adds parentheses only when its own precedence is lower than the context it sits in.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_4.py
+from typing import Final, assert_never
+from record import record
+
+class Operators:
+    __slots__ = ()
+
+    def __add__(self: Expr, other: Expr | int) -> Add:
+        ...
+
+    def __radd__(self: Expr, other: int) -> Add:
+        ...
+
+    def __mul__(self: Expr, other: Expr | int) -> Mul:
+        ...
+
+    def __rmul__(self: Expr, other: int) -> Mul:
+        ...
+
+@record
+class Num(Operators):
+    value: int
+
+@record
+class Var(Operators):
+    name: str
+
+@record
+class Add(Operators):
+    left: Expr
+    right: Expr
+
+@record
+class Mul(Operators):
+    left: Expr
+    right: Expr
+
+type Expr = Num | Var | Add | Mul
+
+def wrap(value: Expr | int) -> Expr:
+    ...
+
+PRECEDENCE: Final[dict[type[Expr], int]] = {
+    Add: 1, Mul: 2, Num: 3, Var: 3}
+
+def to_infix(e: Expr, parent_prec: int = 0) -> str:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_4.py
@@ -405,12 +643,82 @@ right-hand child at the *same* precedence as its parent
 (`x + (x + 1)` instead of the fully terse `x + x + 1`), but it never
 omits a pair that changes the expression's meaning.
 
+</details>
+</details>
+</details>
+
 ## 5. `derivative(e, name)`
 
 > Write `derivative(e, name)`:
 > a function that returns the symbolic derivative of an expression with respect to a variable,
 > using the sum rule and the product rule.
 > Run its results through `simplify()` and compare.
+
+<details>
+<summary>Where to look</summary>
+
+[Simplification Rewrites the Tree](../../Chapters/34_Patterns--Composite_and_Interpreter.md#simplification-rewrites-the-tree) shows a walker that returns a new `Expr` instead of a value.
+`derivative()` is another such walker, with one case per node: a `Num` and a `Var` give constants, an `Add` applies the sum rule, and a `Mul` applies the product rule.
+The raw result is correct but cluttered, so pass it through `simplify()` to see the difference.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_5.py
+from typing import assert_never
+from record import record
+
+class Operators:
+    __slots__ = ()
+
+    def __add__(self: Expr, other: Expr | int) -> Add:
+        ...
+
+    def __radd__(self: Expr, other: int) -> Add:
+        ...
+
+    def __mul__(self: Expr, other: Expr | int) -> Mul:
+        ...
+
+    def __rmul__(self: Expr, other: int) -> Mul:
+        ...
+
+@record
+class Num(Operators):
+    value: int
+
+@record
+class Var(Operators):
+    name: str
+
+@record
+class Add(Operators):
+    left: Expr
+    right: Expr
+
+@record
+class Mul(Operators):
+    left: Expr
+    right: Expr
+
+type Expr = Num | Var | Add | Mul
+
+def wrap(value: Expr | int) -> Expr:
+    ...
+
+def to_infix(e: Expr) -> str:
+    ...
+
+def simplify(e: Expr) -> Expr:
+    ...
+
+def derivative(e: Expr, name: str) -> Expr:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_5.py
@@ -541,6 +849,10 @@ produces a squared denominator beyond what `simplify()`'s current
 rules handle, so this solution leaves that rule for a further
 exercise.
 
+</details>
+</details>
+</details>
+
 ## 6. Declining with `NotImplemented`
 
 > At runtime, `"a" + x` silently builds `Add(Num("a"), x)`,
@@ -548,6 +860,63 @@ exercise.
 > Rewrite all four operator methods to return `NotImplemented` for an operand they cannot use
 > ([*Multiple Dispatching*](../../Chapters/32_Patterns--Multiple_Dispatching.md#operators-dispatch-twice) shows the idiom),
 > and confirm that `"a" + x` and `x + "a"` both now raise a `TypeError`.
+
+<details>
+<summary>Where to look</summary>
+
+[Operators That Build Nodes](../../Chapters/34_Patterns--Composite_and_Interpreter.md#operators-that-build-nodes) defines the four operator methods, and the Multiple Dispatching chapter's [Operators Dispatch Twice](../../Chapters/32_Patterns--Multiple_Dispatching.md#operators-dispatch-twice) shows the idiom.
+In each method, test the operand with `isinstance()` and return `NotImplemented` when it is neither an `Expr` nor an `int`.
+Python then tries the reflected method on the other operand and, when that declines too, raises the `TypeError` for you.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_6.py
+from exceptions import expected
+from record import record
+
+class Operators:
+    __slots__ = ()
+
+    def __add__(self: Expr, other: Expr | int) -> Add:
+        ...
+
+    def __radd__(self: Expr, other: int) -> Add:
+        ...
+
+    def __mul__(self: Expr, other: Expr | int) -> Mul:
+        ...
+
+    def __rmul__(self: Expr, other: int) -> Mul:
+        ...
+
+@record
+class Num(Operators):
+    value: int
+
+@record
+class Var(Operators):
+    name: str
+
+@record
+class Add(Operators):
+    left: Expr
+    right: Expr
+
+@record
+class Mul(Operators):
+    left: Expr
+    right: Expr
+
+type Expr = Num | Var | Add | Mul
+
+def wrap(value: Expr | int) -> Expr:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_6.py
@@ -646,12 +1015,38 @@ is the gap between what the checker sees and what runs. Closing it matters
 when a program builds the expression from data the type checker never
 sees, the case an interpreter exists to handle.
 
+</details>
+</details>
+</details>
+
 ## 7. A third walker: `to_html()`
 
 > Write a third walker over `Template` in `template_query.py`, `to_html()`,
 > that emits the literal pieces unchanged and replaces `<`, `>`,
 > and `&` in every interpolated value with their HTML entities.
 > Show that `t"<p>{comment}</p>"` survives a `comment` containing a `<script>` tag.
+
+<details>
+<summary>Where to look</summary>
+
+[A Template Is a Tree](../../Chapters/34_Patterns--Composite_and_Interpreter.md#a-template-is-a-tree) shows that a `Template` already separates literal strings from `Interpolation` objects.
+Loop over the template, copy each string piece unchanged, and pass each interpolation's value through `html.escape()`.
+Comparing with an f-string on the same input shows what the structure keeps that a finished string loses.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_7.py
+from html import escape
+from string.templatelib import Interpolation, Template
+
+def to_html(template: Template) -> str:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_7.py
@@ -693,6 +1088,10 @@ tag and the paragraph markup are the same kind of text. The template
 version never loses the distinction, so escaping is a decision the
 renderer can still make.
 
+</details>
+</details>
+</details>
+
 ## 8. An iterative walk over a deep tree
 
 > Build a left-deep expression by folding `+` over a few thousand `Num` nodes,
@@ -702,6 +1101,75 @@ renderer can still make.
 > and check that the two agree on a small expression.
 > Raising the limit with `sys.setrecursionlimit()` also avoids the error.
 > Say what it costs.
+
+<details>
+<summary>Where to look</summary>
+
+[Evaluation Is a Tree Walk](../../Chapters/34_Patterns--Composite_and_Interpreter.md#evaluation-is-a-tree-walk) shows `evaluate()` recursing once per node, so tree depth becomes call-stack depth.
+For `evaluate_iterative()`, keep your own list as a stack of nodes and a second stack of values, and process each node after its children.
+For the `sys.setrecursionlimit()` question, consider what the interpreter's own stack must hold at that depth.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_8.py
+from enum import Enum
+from typing import assert_never
+from exceptions import expect
+from record import record
+
+class Operators:
+    __slots__ = ()
+
+    def __add__(self: Expr, other: Expr | int) -> Add:
+        ...
+
+    def __radd__(self: Expr, other: int) -> Add:
+        ...
+
+    def __mul__(self: Expr, other: Expr | int) -> Mul:
+        ...
+
+    def __rmul__(self: Expr, other: int) -> Mul:
+        ...
+
+@record
+class Num(Operators):
+    value: int
+
+@record
+class Var(Operators):
+    name: str
+
+@record
+class Add(Operators):
+    left: Expr
+    right: Expr
+
+@record
+class Mul(Operators):
+    left: Expr
+    right: Expr
+
+type Expr = Num | Var | Add | Mul
+
+def wrap(value: Expr | int) -> Expr:
+    ...
+
+def evaluate(e: Expr, /, **env: int) -> int:
+    ...
+
+class Op(Enum):
+    ADD = "+"
+    MUL = "*"
+
+def evaluate_iterative(e: Expr, /, **env: int) -> int:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_8.py
@@ -841,6 +1309,10 @@ that raises it changes the behavior of code that never asked. The
 iterative walk keeps its pending work in one list and changes no
 setting that other code can see.
 
+</details>
+</details>
+</details>
+
 ## 9. Reopening the set of node types
 
 > A plugin package needs to add its own entry types to `filesystem.py` without editing your code.
@@ -849,6 +1321,60 @@ setting that other code can see.
 > a `match` over a union or a method on a base class,
 > would you use for a file system,
 > and which for the expression language in `expr.py`?
+
+<details>
+<summary>Where to look</summary>
+
+[A Composite of Data Classes](../../Chapters/34_Patterns--Composite_and_Interpreter.md#a-composite-of-data-classes) closes `Node` as a union, so every operation is a `match` in your module.
+To open the set, move `disk_usage()` onto an abstract base class as an `@abstractmethod`, and let each entry type implement it.
+When you choose between the designs, ask who owns the list of node types and who writes new operations.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_9.py
+from abc import ABC, abstractmethod
+from typing import override
+from record import record
+
+class Entry(ABC):
+    __slots__ = ()
+    name: str
+
+    @abstractmethod
+    def disk_usage(self) -> int: ...
+
+@record
+class File(Entry):
+    name: str
+    size: int
+
+    @override
+    def disk_usage(self) -> int:
+        ...
+
+@record
+class Directory(Entry):
+    name: str
+    entries: tuple[Entry, ...]
+
+    @override
+    def disk_usage(self) -> int:
+        ...
+
+@record
+class Symlink(Entry):
+    name: str
+    target: str
+
+    @override
+    def disk_usage(self) -> int:
+        ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_9.py
@@ -929,3 +1455,7 @@ rather than helpfully extended. The `assert_never()` that reads as an
 obstacle in the file system reads as the point here: when the grammar
 does grow a `Neg`, the type checker hands you the list of walkers to
 update.
+
+</details>
+</details>
+</details>

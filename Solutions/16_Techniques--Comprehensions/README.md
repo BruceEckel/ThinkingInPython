@@ -9,6 +9,16 @@
 > Of the types in `a_list`, only `str` has `isdigit()`,
 > so the predicate must test `isinstance(e, str)` before calling it.
 
+<details>
+<summary>Where to look</summary>
+
+[List Comprehensions](../../Chapters/16_Techniques--Comprehensions.md#list-comprehensions) shows the trailing `if` clause that filters elements before the output expression runs.
+Combine two tests in that clause with `and`.
+The `and` operator stops at the first false operand, so the second test never sees an element the first rejected.
+
+<details>
+<summary>Solution</summary>
+
 ```python
 # exercise_1.py
 a_list = [1, "4", 9, "a", 0, 4]
@@ -25,11 +35,24 @@ both of which must be true before `int(e)` ever runs. `"a"` fails
 entirely of digits, so it is the one the comprehension converts and
 squares.
 
+</details>
+</details>
+
 ## 2. A `2` on the diagonal instead of `1`
 
 > In `identity_matrix.py`,
 > change the comprehension to put `2` on the diagonal instead of `1`,
 > without adding a second pass over the result.
+
+<details>
+<summary>Where to look</summary>
+
+[Nested Comprehensions](../../Chapters/16_Techniques--Comprehensions.md#nested-comprehensions) builds the matrix with an inner comprehension inside an outer one.
+The diagonal comes from a conditional expression in the output position, which already chooses between two values.
+Change what that expression yields, and leave the loops alone.
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_2.py
@@ -53,11 +76,24 @@ Only the literal in the conditional expression changes, from `1` to
 `2`. Two nested loops still produce a list of lists, with a different
 value on the diagonal.
 
+</details>
+</details>
+
 ## 3. Adding `"Galahad"` to `names`
 
 > In `dict_comprehension.py`, add `"Galahad"` to `names`,
 > then predict which entries the comprehension produces before running it,
 > given the `len(name) > 3` filter.
+
+<details>
+<summary>Where to look</summary>
+
+[Dictionary Comprehensions](../../Chapters/16_Techniques--Comprehensions.md#dictionary-comprehensions) shows a key expression and a value expression with an `if` filter at the end.
+The filter runs on the loop variable, before either expression is evaluated.
+For the collision question, recall that a `dict` holds one value per key, so a later assignment replaces an earlier one.
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_3.py
@@ -85,11 +121,24 @@ one. Adding `"robin"` alongside `"Robin"` produces one `'ROBIN'` entry,
 not two, and the value comes from whichever name appears last in the
 list.
 
+</details>
+</details>
+
 ## 4. Dropping the length filter from `set_comprehension.py`
 
 > In `set_comprehension.py`, drop the `if len(name) > 1` filter,
 > and predict how many entries `unique` holds before running it.
 > Explain why `"J"` does not collide with `"JOHN"`.
+
+<details>
+<summary>Where to look</summary>
+
+[Set Comprehensions](../../Chapters/16_Techniques--Comprehensions.md#set-comprehensions) normalizes each name and lets the set discard repeats.
+Work out the normalized form of every name, including the one-character name, and count the distinct results.
+Two entries collide only if their normalized strings are equal.
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_4.py
@@ -120,11 +169,33 @@ shows what the set is doing on its own: it collapses only exact
 duplicates of the normalized form, and it has no notion that `"J"`
 might be an abbreviation of `"John"`.
 
+</details>
+</details>
+
 ## 5. A comprehension that produces something worth keeping
 
 > `comprehension_side_effects.py` builds a list of `None`s.
 > Write a version that keeps the printing but produces a list the caller can use,
 > then say whether a comprehension or a `for` loop is the right shape for it.
+
+<details>
+<summary>Where to look</summary>
+
+[Comprehensions Build, Loops Execute](../../Chapters/16_Techniques--Comprehensions.md#comprehensions-build-loops-execute) explains why a comprehension is for the collection it builds and a loop is for its side effects.
+Write a small function that does the printing and returns a value, then call it in the output expression.
+Decide the shape by asking whether anyone uses the resulting list.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_5.py
+def show(n: int) -> str:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_5.py
@@ -165,11 +236,25 @@ worth a second look, even when it returns something useful. `show()`
 does two jobs, and a reader has to open it to learn that one of them is
 printing.
 
+</details>
+</details>
+</details>
+
 ## 6. Predicting a merge where a key repeats
 
 > In `unpacking_comprehensions.py`,
 > add a fourth entry `{"a": 5, "c": 9}` to `dicts` and predict what `{**d for d in dicts}` produces before running it,
 > paying attention to which value wins for the key `"a"`.
+
+<details>
+<summary>Where to look</summary>
+
+[Unpacking in Comprehensions](../../Chapters/16_Techniques--Comprehensions.md#unpacking-in-comprehensions) shows `**d` inside a dictionary display, merging each `d` as the loop reaches it.
+A repeated key keeps the value written last.
+A key keeps the position of its first insertion, which fixes the print order.
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_6.py
@@ -186,11 +271,24 @@ is `5`, the last one written. The result orders keys by first
 insertion, which is why `"a"` still prints first even though its value
 comes from the last dictionary in the list.
 
+</details>
+</details>
+
 ## 7. Running `any()` before `sum()`
 
 > In `spent_generator.py`, move the `any()` line above the `sum()` line.
 > Predict all three printed values before running it,
 > remembering that `any()` stops when it finds a match.
+
+<details>
+<summary>Where to look</summary>
+
+[A Generator Expression Runs Once](../../Chapters/16_Techniques--Comprehensions.md#a-generator-expression-runs-once) shows consumers sharing one generator, each taking what remains.
+`any()` stops at its first true value, so the generator keeps its position when it returns.
+Trace which values each later consumer receives.
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_7.py
@@ -212,12 +310,34 @@ position rather than a beginning. Each consumer picks up where the
 previous one stopped, and `any()`'s early exit leaves values behind for
 `sum()` to find.
 
+</details>
+</details>
+
 ## 8. Closing the gap with brackets
 
 > In `genexp_timing.py`,
 > turn the generator expression into a list comprehension and name the result `built`.
 > Predict the three printed lines, and their order, before running it.
 > Explain which value of `factor` the result uses.
+
+<details>
+<summary>Where to look</summary>
+
+[The Gap Between Creation and Consumption](../../Chapters/16_Techniques--Comprehensions.md#the-gap-between-creation-and-consumption) shows a generator expression delaying its work until a consumer pulls values.
+Square brackets make the comprehension run to completion at the line where it appears.
+Ask when `source()` is called and when `factor` is read, then compare with the print order.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_8.py
+def source() -> list[int]:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_8.py
@@ -247,3 +367,7 @@ The generator expression calls `source()` at the same point, which
 is why the first line of output does not move. The brackets change
 when the output expression runs, and with it which value of
 `factor` the expression reads.
+
+</details>
+</details>
+</details>
