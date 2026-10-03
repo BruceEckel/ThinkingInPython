@@ -475,7 +475,7 @@ print(run(constant), run(constant))
 
 The first run exhausted the generator,
 so the second `run()` of the same object gets an immediate `StopIteration` whose value is `None`.
-The function never resumed, so it greets nobody and produces `None`.
+The function does not resume, so it greets nobody and produces `None`.
 Calling `bound("Alice")` again builds a fresh description, and that one runs.
 `success()` is the exception because it builds no generator.
 Its small object's `send()` reports the value every time,
@@ -644,7 +644,7 @@ A `Depend` function's callers must also declare the dependency,
 all the way to `supply()`.
 The difference is that you can declare as many Abilities as you like.
 
-The `yield from` inside `greet_all()` is what relays `greet(name)`'s request to the driver.
+The `yield from` inside `greet_all()` relays `greet(name)`'s request to the driver.
 If you write that loop body as a bare `greet(name)`,
 `ty` objects with an `invalid-return-type`:
 "Function always implicitly returns `None`."
@@ -744,7 +744,7 @@ print(log.entries)
 ```
 
 The new Effect is the `Log` write inside `greet_logged()`.
-Every function on the path to it gained a `Need[Log]`,
+Every function on the path to it gains a `Need[Log]`,
 here `greet_logged()` and its caller `greet_all()`,
 while `greet()` keeps its signature.
 `supply()` now provides both a `Console` and a `Log`.
@@ -1151,7 +1151,7 @@ and frameworks such as FastAPI's `Depends` build on it.
 Constructor injection answers the complaint that the type checker never validates the dependency:
 the dependency arrives as a parameter,
 so a static type checker validates every call that supplies one.
-The binding happens once, at the endpoint or the constructor.
+You bind the dependency once, at the endpoint or the constructor.
 Every function that boundary calls passes the dependency onward as a parameter,
 the same parameter an EMS replaces with a channel in the return type.
 
@@ -1791,7 +1791,7 @@ def one_unhandled(name: str) -> Try[ValueError, str]:
 `both` is `(str) -> Success[int | KeyError | ValueError]`.
 Every failure moves into the result, so nothing remains in the error channel.
 `all_handled()` returns `Success[str]`:
-no failure can escape as a thrown exception.
+no failure escapes as a thrown exception.
 
 `one` is `(str) -> Try[ValueError, int | KeyError]`.
 The caught error moves to the result and the uncaught one remains.

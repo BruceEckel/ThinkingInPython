@@ -281,7 +281,7 @@ suggestion shows that Python found the file and declined it.
 The failure on Windows and macOS is the surprising part. Windows's
 NTFS and macOS's default filesystem both open `module.py` and
 `Module.py` as the same file, so the filesystem would hand Python
-the file under either spelling. Python declines to accept it.
+the file under either name. Python declines it.
 Its import machinery reads the directory listing and compares the
 module name against the name on disk case-sensitively, so
 `"module" + ".py"` does not match the stored `Module.py` and the
@@ -297,9 +297,9 @@ own machine.
 
 Setting `PYTHONCASEOK` in the environment turns the check off on a
 case-insensitive platform, and `import module` then finds `Module.py`.
-The variable exists for legacy code. New code should leave it unset.
-The existence of the switch confirms the check is Python's rather
-than the filesystem's.
+The variable exists for legacy code. Leave it unset in new code.
+A Python environment variable turns the check off, so the check is
+Python's rather than the filesystem's.
 
 None of this arises if you follow the convention.
 [File Names](../../Chapters/06_Foundations--Modules_and_Packages.md#file-names)
@@ -492,13 +492,14 @@ item.
 
 **Replace the module's list.** The assignment `plugin_list.plugins = []` rebinds the module's
 name to a second list and leaves the script's name on the first, so
-the second `append()` reaches a list the script's `plugins` does not
-refer to.
+the second `append()` reaches a list to which the script's `plugins`
+does not refer.
 
 `exercise_7.py` is `from_snapshot.py` with a mutable value: the
 `from` import takes no copy, and it does not follow the module's
-name when that name moves. When a module's list or dict can be
-replaced, import the module and read `plugin_list.plugins` each time.
+name when that name moves. When a module's name can move to a new
+list or dict, import the module and read `plugin_list.plugins` each
+time.
 
 </details>
 </details>

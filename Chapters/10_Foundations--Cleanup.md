@@ -119,7 +119,7 @@ In the direct run, shutdown destroys the objects,
 and shutdown is the precarious moment the warning describes.
 `Counter` and `print()` were still available, so the output came out cleanly,
 but nothing guarantees the teardown order that allowed it.
-`__del__()` should do as little as possible, and you should not depend on it.
+Make `__del__()` do as little as possible, and do not depend on it.
 
 The swallowed exception is the failure that costs most in production:
 
@@ -274,7 +274,7 @@ the explicit `sock.close()` after the `with` block prints nothing,
 because `self.closed` blocks the repeat.
 The `with` protocol calls `close()` for you once;
 nothing stops your own code from calling it again,
-so a real `close()` must guard itself against being called more than once,
+so a real `close()` must do nothing on a repeat call,
 the way a file object's `close()` does.
 
 ### An `__init__()` That Fails Leaks the Resource {#raising-init-leaks}
@@ -352,7 +352,7 @@ print("End of program")
 #: End of program
 ```
 
-`finalize()` registers `print(name, "closed")` to run when the `Connection` is destroyed.
+`finalize()` registers `print(name, "closed")` to run when Python destroys the `Connection`.
 The callback receives `name`, not the `Connection`,
 so registering the cleanup does not keep the object alive.
 `finalize(self, self.close)` looks tidier and defeats that separation:
@@ -520,7 +520,7 @@ The weak registry runs none of your code when an object goes away.
 
 ## The Rule
 
-Never put resource release in `__del__()`.
+Never release a resource in `__del__()`.
 The standard library's file and socket types bend that rule as a diagnostic backstop:
 `io.IOBase` (so every file object)
 and `socket.socket` each carry a `__del__()` that closes the resource and reports a `ResourceWarning`,

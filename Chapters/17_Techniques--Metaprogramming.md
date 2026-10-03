@@ -3,7 +3,7 @@
 > Ordinary code makes objects.
 > Metaprogramming works one level up, on the classes that make them.
 
-Every object is created by another, special object.
+Every object comes from another, special object.
 These special objects are *classes*,
 and you configure them to produce the objects you want.
 
@@ -247,7 +247,7 @@ so the compiler never gives it the `__class__` cell that zero-argument `super()`
 
 The dict comprehension in `eager_event_classes.py` builds all seven classes whether the schedule uses them or not.
 Seven classes are few enough to build up front.
-With hundreds, most are built and never used.
+With hundreds, the schedule uses few of the classes the comprehension builds.
 So the next version delays building each class until the first lookup asks for it.
 Delaying the build takes a `dict` subclass and a placeholder for the classes not yet built:
 
@@ -622,7 +622,7 @@ A decorator can use that storage to mark a method.
 A method decorator runs as Python executes the class body,
 before the class object exists, so it cannot register the method with its class.
 It can leave a mark on the function instead,
-and `__init_subclass__()` collects the marks once the class is built:
+and `__init_subclass__()` collects the marks once Python builds the class:
 
 ```python
 # marked_methods.py
@@ -834,7 +834,7 @@ so a library can read the checker's types and enforce them live.
 ### `@dataclass_transform` Is a Claim {#dataclass-transform}
 
 How does the checker know what `@dataclass` does?
-For the standard library, the knowledge is built in.
+For the standard library, the checker has that knowledge built in.
 For a class-building decorator of your own,
 the checker knows only what you declare.
 `@dataclass_transform` marks a decorator as dataclass-like,
@@ -1023,7 +1023,8 @@ and on every lookup a data descriptor outranks the instance's `__dict__`.
 If `__get__()` asks `obj` for `"x"`, the attribute's own name,
 that lookup routes back to the descriptor and calls `__get__()` again,
 until Python raises a `RecursionError`.
-No descriptor is assigned to `_x`, so storing the value there breaks the loop.
+`Point` has no descriptor named `_x`,
+so storing the value there breaks the loop.
 
 A descriptor with only `__get__()` is a *non-data descriptor*,
 and the ranking reverses: the instance's `__dict__` wins.
@@ -1337,7 +1338,7 @@ And each class must write `class ASingleton(metaclass=Singleton[ASingleton]):`,
 naming `ASingleton` before its class body finishes defining it.[^crtp]
 The method-level `[T]` on `__call__()` avoids both problems.
 It binds `T` from `cls` at the call site, `ASingleton()`,
-and that call happens after `ASingleton` exists.
+and that call runs after `ASingleton` exists.
 
 The metaclass version works,
 but it is heavier than the problem usually requires.
@@ -1576,7 +1577,7 @@ and nothing that runs after the class exists can give it any.
 
 ## The `inspect` Module
 
-Up to now, you've been modifying classes.
+Up to now, you've modified classes.
 `type()` builds them,
 and metaclasses and `__init_subclass__()` run code during their creation.
 The `inspect` module is the other half of metaprogramming:
@@ -1630,7 +1631,7 @@ shows that machinery on a class:
 `__annotate_func__` is the code that computes the annotations,
 and `__annotations_cache__` holds the result after the first request.
 
-`display_object()` is built from `inspect` functions:
+`display_object()` relies on `inspect` functions:
 `getmembers_static()` finds the members, `signature()` renders each method,
 and `get_annotations()`,
 which returns a class's declared annotations in a `dict`,
@@ -1682,7 +1683,7 @@ Nothing evaluates the annotation until something asks for it,
 so a class can declare a field whose type appears further down the module.
 A metaprogram asks early.
 A decorator, an `__init_subclass__()` hook,
-or a metaclass runs while the class is being created,
+or a metaclass runs while Python creates the class,
 and if it reads the annotations then,
 a name they mention may still be undefined.
 Evaluating them at that moment raises a `NameError`.
@@ -1699,7 +1700,7 @@ The argument has three values:
 - `Format.STRING` evaluates nothing,
   and returns each annotation as a string that matches the source as closely as it can.
 
-Here, one forward-referencing annotation is read in all three formats:
+The listing reads one forward-referencing annotation in all three formats:
 
 ```python
 # forward_formats.py
@@ -1735,7 +1736,7 @@ The `VALUE` request fails the same way it would inside a decorator applied to `O
 the reference's `__forward_arg__` holds the missing name.
 `STRING` evaluates nothing, so it cannot fail, but it gives up the objects:
 you get the text `'str'` rather than the class `str`.
-Once `Customer` is defined, the default `VALUE` request succeeds,
+Once `Customer` exists, the default `VALUE` request succeeds,
 because the failed attempt cached nothing.
 
 A tool that reads annotations at definition time therefore asks for `FORWARDREF`.

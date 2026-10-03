@@ -7,14 +7,14 @@
 A *function object* decouples the choice of function to call from the place that calls it.
 That decoupling is the goal of three patterns: *Command*, *Strategy*,
 and *Chain of Responsibility*.
-The call site names the signature it will call and says nothing about where the callable came from.
+The call site names the signature it calls and says nothing about the callable's source.
 [Design Patterns](21_Patterns--Design_Patterns.md#design-principles)
 states that principle as "design the communication, not the parts."
 
 Each pattern defers something:
 
 - *Command* defers *what* to do, so you can store the action and run it later.
-- *Strategy* defers *how*: the job is fixed,
+- *Strategy* defers *how*: the job stays fixed,
   and the caller picks the algorithm that does it.
 - *Chain of Responsibility* defers *which* handler takes the job,
   trying candidates until one accepts.
@@ -152,8 +152,8 @@ Each call still reads and updates `account.balance`,
 the state the bound method carries with it.
 
 The entry is `account.deposit`, without parentheses.
-`account.deposit()` calls the method while the list is being built and stores the result,
-`None`.
+`account.deposit()` calls the method while Python builds the list,
+so the list stores the result, `None`.
 The type checker rejects that list, because `None` is not a `Command`.
 
 ### A Callable Object as a Command
@@ -242,7 +242,7 @@ is an ordinary expression that Python evaluates where you write it,
 so each command stores the string built from its own iteration's `n` and has nothing left to look up later.
 The older fix, `lambda n=n: print(f"step {n}")`,
 does the same job with a default argument, which Python evaluates once,
-when the lambda is created.
+when it creates the lambda.
 When commands built in a loop all behave like the last one,
 the shared loop variable is the cause.
 
@@ -262,7 +262,7 @@ not a bracket.
 `chain.py`, under *Chain of Responsibility*,
 falls back on them when bisection has no bracket.
 All three share one signature, so they are interchangeable,
-and `solve()` runs whichever one it is given:
+and `solve()` runs whichever one the caller passes:
 
 ```python
 # algorithms.py
@@ -358,8 +358,8 @@ where a model notifies its views.
 
 Python uses strategies-as-functions constantly without calling them a pattern.
 The `key` argument passed to `sorted()`, `min()`, and `max()` is a strategy:
-it chooses the value by which each item is compared,
-and the algorithm that does the comparing stays the same (see exercise 3).
+it chooses the value the algorithm compares for each item,
+and that algorithm stays the same (see exercise 3).
 
 When a strategy needs configuration,
 use a [*closure*](40_Functional--Foundations.md#closures).
@@ -440,7 +440,7 @@ Each `partial` object satisfies `RootFinder`,
 so `solve()` runs it as it runs the closures.
 A positional-only parameter takes no keyword,
 so binding one means passing a [`Placeholder`](40_Functional--Foundations.md#leaving-a-gap-with-placeholder)
-in each position the caller will fill.
+in each position the caller fills.
 
 Save the strategy class for an algorithm that carries several related methods or mutable state.
 Configuration alone is a closure's job.
@@ -494,7 +494,7 @@ because the interval `[1.0, 1.3]` does not straddle the root,
 bisection fails by returning `None`.
 The loop continues to a method that needs no bracket.
 To add, remove, or reorder the handlers you edit the `chain` list.
-You have now seen all three patterns, and they share one shape:
+All three patterns share one shape:
 
 ![](_images/function_objects_story)
 
@@ -800,9 +800,9 @@ so a handler may give that parameter any name.
 
 Each decorator registers `built`, the class that `dataclass()` returns,
 and not the `cls` it received.
-A class's slots are fixed when the class is created,
+Python fixes a class's slots when it creates the class,
 so `slots=True` makes `dataclass()` build a new class and return it.
-Registering `cls` puts a class in `EVENTS` that no event is an instance of.
+Registering `cls` puts a class in `EVENTS` of which no event is an instance.
 `publish()` then refuses every event,
 and `@handler` refuses every handler class,
 because the annotation it reads names the class that `dataclass()` returned
@@ -886,7 +886,7 @@ so a stray string reaches the bus and `EVENTS` rejects it there.
 
 The price is the registration-time check of the first version.
 `subscribe(Deposit, on_withdraw)` fails under the type checker because no `E` fits both arguments.
-With one argument there is no pair to compare,
+One argument leaves no pair to compare,
 so a class with the right `__call__()` that skipped `@handler` passes the type checker and fails only when `subscribe()` looks it up.
 Tests cover that refusal and the other three: a non-event published,
 a `@handler` class with no `__call__()`,

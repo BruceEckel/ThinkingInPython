@@ -397,9 +397,8 @@ print(" ".join(history))
 #: locked locked unlocked locked unlocked unlocked locked
 ```
 
-**Delegate to the current state.** `Controller` asks the current state object what comes next, the
-same delegation `state_machine.py`'s `run_all()` performs when it
-calls `next()`.
+**Delegate to the current state.** `Controller` asks the current state object what comes next, as
+`state_machine.py`'s `run_all()` does when it calls `next()`.
 
 **Look up the next state.** `next_state()` looks the word up in its class's table with
 `.get(word, ...["*"])`, so `Controller` never branches on the current
@@ -612,9 +611,9 @@ including the special `None` key for "nothing has happened yet," which
 leads only to `APPEARS`.
 
 **Remember the last move.** The generator's own state is just `previous`,
-the last action it yielded. Each `next()` call on the generator,
-here made by `list()`, picks a legal successor and remembers it for
-the following call. `NEXT_ACTIONS` constrains every choice, so every
+the last action it yielded. Each time `list()` calls `next()` on the
+generator, the generator picks a legal successor and remembers it
+for the following call. `NEXT_ACTIONS` constrains every choice, so every
 sequence this generator produces is legal by construction.
 
 `mouse_trap_states.py` accepts any move in any state and lets each

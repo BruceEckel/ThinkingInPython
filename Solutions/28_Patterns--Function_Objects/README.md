@@ -9,7 +9,7 @@
 <details>
 <summary>Where to look</summary>
 
-[A Callable Object as a Command](../../Chapters/28_Patterns--Function_Objects.md#a-callable-object-as-a-command) shows a command that carries its own state and is still called with `()`.
+[A Callable Object as a Command](../../Chapters/28_Patterns--Function_Objects.md#a-callable-object-as-a-command) shows a command that carries its own state, which the macro still calls with `()`.
 A command that must answer two requests, running and reversing, needs a type with two members.
 Describe that type with a `Protocol`, and make each command remember what it did so it can reverse it.
 A `Macro` then undoes its list in `reversed()` order.
@@ -109,9 +109,9 @@ print(account["balance"])
 ```
 
 A bare function is no longer enough, though not because of state.
-`callable_command.py`'s `Repeat` already carries its configuration and
-is still called with `()`, so state alone does not force more than a
-callable. Undo does, because a command now answers two requests,
+`callable_command.py`'s `Repeat` already carries its configuration, and
+the macro still calls it with `()`, so state alone does not force more
+than a callable. Undo does, because a command now answers two requests,
 `__call__()` and `undo()`, and a callable has only one call.
 
 **Name both requests in one type.** The second operation costs a type rather than a hierarchy.
@@ -119,8 +119,8 @@ callable. Undo does, because a command now answers two requests,
 so a list of undoable commands needs a type with two members,
 `__call__()` and `undo()`, and in Python that type is a `Protocol`.
 `UndoableCommand` above is that `Protocol`: `Macro` annotates
-`self.commands` against it, `Deposit` inherits nothing, and a `Deposit`
-is still called with `()`, so the function form's habit survives. The *GoF Design Patterns* shape is
+`self.commands` against it, `Deposit` inherits nothing, and `run()`
+still calls each `Deposit` with `()`, so the function form's habit survives. The *GoF Design Patterns* shape is
 a base class with two `raise NotImplementedError` bodies, and those
 bodies are what the shape costs. A base class pays for itself when
 the commands share implementation, and these commands share none.
@@ -306,8 +306,7 @@ loop continue, and any other value is the root.
 
 The chapter's advice about the failure value still holds. A `Failed`
 is never a root, so `float | Failed` says which result is which, and
-the test is a comparison against the failure type, never the
-truthiness of the result.
+`solve()` checks the result's type, never its truthiness.
 
 **Name each attempt.** `finder.__name__` reads the function's own name, since every function
 carries its name as an attribute, so the report needs no extra
@@ -485,7 +484,7 @@ the call. Both produce a finder matching `RootFinder`, so `solve()`
 accepts either with no change.
 
 The two coarse finders print the same wrong-looking answer, `1.500000`,
-and that answer is how you can tell the tolerance took effect.
+and that answer shows the tolerance took effect.
 Newton's method starting at `1.0` moves by `0.5` on its first step, to
 `1.5`, and a tolerance of `0.6` accepts a step that size, so the loop
 stops there. The fine finder runs the same code to `1e-12` and agrees
@@ -640,8 +639,8 @@ never calls it behaves as before. The MRO walk can.
 A handler subscribed to `Deposit` starts receiving every subclass of
 `Deposit`, including subclasses written after the handler, so a
 `BigDeposit` that reached only `on_big` before the change now reaches
-`on_deposit` too. That wider reach is the intended feature, and it is
-still a behavior change to existing code. Any handler that assumes
+`on_deposit` too. That wider reach is the intended feature, and it
+still changes how existing code behaves. Any handler that assumes
 `type(event) is Deposit`, or that counts events, now sees more than it
 did before.
 
@@ -661,9 +660,9 @@ did before.
 <details>
 <summary>Where to look</summary>
 
-[The Late-Binding Trap](../../Chapters/28_Patterns--Function_Objects.md#the-late-binding-trap) explains that a closure reads a variable when it is called, not when it is created.
+[The Late-Binding Trap](../../Chapters/28_Patterns--Function_Objects.md#the-late-binding-trap) explains that a closure reads a variable when the closure runs, not when Python creates it.
 Each fix evaluates `n` while the loop runs: a default argument, `partial()`, and a factory function with its own scope.
-For the closing question, find a value that must still be read at call time and ask which fix freezes it.
+For the closing question, find a value the command must still read at call time and ask which fix freezes it.
 
 <details>
 <summary>The shape</summary>
@@ -767,8 +766,8 @@ loop builds the command. You then want the original behavior, aimed at
 something that outlives the loop, as `report()` does by reading
 `settings` at call time. The late-binding trap and late binding as a
 feature are the same mechanism. Which one you have depends on whether
-the name you close over still means what you wanted when the call
-finally happens.
+the name you close over still means what you wanted when the command
+finally runs.
 
 </details>
 </details>
@@ -785,7 +784,7 @@ finally happens.
 
 [A Tagged Bus: Handlers That Name Their Event](../../Chapters/28_Patterns--Function_Objects.md#a-tagged-bus-handlers-that-name-their-event) builds the class first and registers `built`.
 With `slots=True`, `dataclass()` returns a new class, so ask which class the name `Deposit` ends up bound to and which class `EVENTS` holds.
-Then trace the check that `handler()` makes against `EVENTS` on its first decorated class.
+Then trace how `handler()` checks its first decorated class against `EVENTS`.
 
 <details>
 <summary>The shape</summary>
@@ -862,9 +861,9 @@ expect(TypeError, handler, Announce)
 #: [TypeError] Announce: not an @event
 ```
 
-The listing copies the two decorators, with the change made and the
-checks the question does not reach left out, and applies `handler()`
-as a call so that `expect()` can report the failure.
+The listing copies the two decorators, makes the change, leaves out
+the checks the question does not reach, and applies `handler()` as a
+call so that `expect()` can report the failure.
 
 **Register the wrong class.** Python creates the three `@event` classes in `bank_events.py` without
 complaint, which makes the mistake easy to miss. `EVENTS` holds one

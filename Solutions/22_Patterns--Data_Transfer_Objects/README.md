@@ -165,8 +165,8 @@ mutable object hands that object's mutability back. `frozen=True` in
 [Rethinking Objects](../../Chapters/20_Patterns--Rethinking_Objects.md#the-immutability-solution)
 is shallow the same way. Declaring `steps: tuple[str, ...]` fixes
 both at once: the contents stop being editable and the record becomes
-hashable. One declaration fixing both is the clue that they were
-never two problems.
+hashable. One declaration fixing both is the clue that they are
+one problem.
 
 </details>
 </details>
@@ -184,7 +184,7 @@ never two problems.
 
 [`SimpleNamespace`](../../Chapters/22_Patterns--Data_Transfer_Objects.md#simplenamespace) shows `vars()` reading the instance's `__dict__`.
 Build one namespace with the extra keyword and another by assigning it afterward, then compare `list(vars(m))` for both.
-A `dict` remembers the order in which its keys were inserted, so consider when each version inserts the new name.
+A `dict` keeps its keys in insertion order, so consider when each version inserts the new name.
 
 <details>
 <summary>Solution</summary>
@@ -293,7 +293,7 @@ Passing `mean` to a parameter declared `int` fails, since the element
 types are still known positionally. Indexing past the end fails, and
 so does calling a `str` method on `count`.
 
-What the checker cannot catch is the mistake this exercise is about:
+The checker cannot catch the mistake this exercise examines:
 swapping `mean` and `count`. `mean, count = summarize(data)` and
 `count, mean = summarize(data)` destructure the same
 `tuple[float, int]` into two names. The second type-checks cleanly and
@@ -415,8 +415,8 @@ passing it to code that takes a tuple are both things the scenario
 needs and a frozen data class refuses.
 
 **The JSON record is a `@dataclass`.** `json.dumps()` writes a
-`NamedTuple` as a bare array, so the names you decoded into are gone
-when the record goes back out. Given a `@dataclass`, `json.dumps()` raises a `TypeError`
+`NamedTuple` as a bare array, so the record goes back out without
+its field names. Given a `@dataclass`, `json.dumps()` raises a `TypeError`
 instead of dropping the names silently. A `@dataclass` also has a place for the
 validation this scenario requires: [Data Classes as
 Types](../../Chapters/12_Techniques--Data_Classes_as_Types.md#a-type-is-a-set-of-values)

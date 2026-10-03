@@ -12,7 +12,7 @@
 
 [The Pythonic Visitor: singledispatch](../../Chapters/33_Patterns--Visitor.md#the-pythonic-visitor-singledispatch) adds an operation to a fixed hierarchy from outside it.
 Decide which of `pollinate()` and `eat()` answers differently by flower type; only that one needs `@singledispatch` and `register`.
-Then list what the *Visitor* machinery in [The Classic Visitor](../../Chapters/33_Patterns--Visitor.md#the-classic-visitor) existed to do, and what in it is left without a job.
+Then list what the *Visitor* machinery in [The Classic Visitor](../../Chapters/33_Patterns--Visitor.md#the-classic-visitor) exists to do, and what in it has no job left.
 
 <details>
 <summary>The shape</summary>
@@ -104,7 +104,7 @@ You lose one thing: holding a visitor in a variable and passing it
 around as an object. When that matters, the function is still a value.
 `op = eat` works, and a `dict[str, Callable[[Flower, str], str]]` keyed by
 operation name recovers the "choose an operation at runtime" half of
-what the `Visitor` hierarchy provided, without the classes.
+what the `Visitor` hierarchy provides, without the classes.
 
 </details>
 </details>

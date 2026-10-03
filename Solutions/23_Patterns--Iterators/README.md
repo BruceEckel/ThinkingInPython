@@ -156,7 +156,7 @@ produces a generator on demand. The container keeps the value
 
 [The Costs of Laziness](../../Chapters/23_Patterns--Iterators.md#the-costs-of-laziness) explains that creating a generator runs none of its body.
 Wrap the generator in `itertools.islice()` with a stop of 10.
-`islice()` pulls only as many values as you ask for, so the rest are never computed.
+`islice()` pulls only as many values as you ask for, so the generator never computes the rest.
 
 <details>
 <summary>The shape</summary>
@@ -439,7 +439,7 @@ the generator expression's `if` clause are the same operation written
 two ways. Both skip what does not match and both keep asking forever,
 so both trip the wire. Only `takewhile()` stops.
 
-Writing this test is how you confirm the pairing the prose asserts. A
+Writing this test confirms the pairing the prose asserts. A
 reader might reasonably guess that `filter()`, being a function rather
 than a clause, gets a chance to decide when to stop. `filter()` gets
 no such chance: it receives values one at a time and can answer only
@@ -965,7 +965,7 @@ returning to. Skipping is silent, so a filter that quietly drops every
 line looks the same as a file with nothing to report. If you take the
 skipping version, count what it drops and report the count.
 
-**Keep pulling until a match.** The skipping version is harder to write as a class, and the reason is instructive.
+**Keep pulling until a match.** The skipping version is harder to write as a class.
 A generator may decline to produce a value: `typed_skipping()` reaches
 an item it does not want and does not `yield`, and the `for`
 loop continues. `__next__()` has no such option. Every call must

@@ -310,7 +310,7 @@ one `Drink` and forwards through the same interface. Nothing inherits
 from `Drink`, and nothing needs to. The type checker matches the
 `Protocol` structurally.
 
-**Change the name, keep the price.** `Decaf` is worth noticing. Its `add_cost` is `0.0`, so `Decaf` changes
+**Change the name, keep the price.** `Decaf`'s `add_cost` is `0.0`, so `Decaf` changes
 the description and leaves the price alone. A class-per-combination
 design still needs a separate class for every decaf variant. Adding a
 fourth extra means one class with one number in it, and the extras
@@ -503,7 +503,7 @@ def add(a: int, b: int) -> int:
 
 If you key the cache on `(args, kwargs)`,
 the first call, `square(4)`, raises a `TypeError`:
-the tuple holds a `dict`, which is unhashable, so the tuple cannot serve as a dictionary key.
+the tuple holds a `dict`, which is unhashable, so the tuple cannot be a dictionary key.
 The type checker passes that version, so the failure appears only when the program runs.
 The solution turns the keyword arguments into a tuple of name-value pairs,
 which hashes whenever every argument does.
@@ -591,8 +591,8 @@ binds to `func` and cannot bind to `maxsize`.
 since `add(1, 2)` and `add(a=1, b=2)` are different keys and both are
 legal calls.
 
-**Drop the oldest entry.** Eviction relies on a dictionary preserving insertion
-order, so `next(iter(cache))` is the oldest key. Evicting the oldest
+**Drop the oldest entry.** A dictionary preserves insertion order,
+so `next(iter(cache))` is the oldest key. Evicting the oldest
 key makes `memo` a first-in-first-out cache rather than the
 least-recently-used cache `functools.lru_cache` gives you. A real
 implementation must reconsider that trade.
@@ -703,7 +703,7 @@ each frame from the code object, which `wraps` leaves alone, so the
 **Retry all but the last attempt.** The loop runs `times - 1` attempts inside a `try`, and the final
 attempt sits outside it, with no handler.
 
-**Retry after any ordinary failure.** Catching bare `Exception` is deliberate here and worth flagging: a
+**Retry after any ordinary failure.** Catching bare `Exception` is a deliberate shortcut here: a
 real `retry` should take the exception types it retries, since
 retrying a `TypeError` from a bad call signature just fails three
 times more slowly.
@@ -836,8 +836,8 @@ leaves in the class.
 and then calls it with `bump`, and that `__call__()` returns
 `wrapper`, an ordinary function. A function has `__get__()`, so
 `counter.bump` binds `counter` to `wrapper` like any other method. The
-`repeat` instance has done its work by then and is not what the name
-refers to.
+`repeat` instance has done its work by then, and the name `bump`
+refers to `wrapper`, not to it.
 
 **Store an instance that cannot bind.** `@logged` stores the `logged` instance in the class. That
 instance has no `__get__()`, so `counter.peek` hands it back unbound

@@ -101,7 +101,7 @@ and two `Messenger`s with identical attributes compare unequal,
 because `Messenger` inherits `object`'s identity-based equality.
 
 A `SimpleNamespace` also accepts any name you invent,
-so no type checker can know which names to expect.
+so no type checker knows which names to expect.
 Its type declaration says so: reading any attribute yields `Any`,
 so `m.inof` passes the type checker here too.
 

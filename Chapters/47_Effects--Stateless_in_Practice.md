@@ -38,7 +38,7 @@ so the answer can differ at every request.
 
 An Ability subclasses `Ability[T]`, where `T` is the type its handler returns.
 `Ability` declares no `__slots__`,
-so an Ability is written [`@record(slots=False)`](18_Techniques--Performance.md#record):
+so you decorate an Ability with [`@record(slots=False)`](18_Techniques--Performance.md#record):
 the base gives every instance its `__dict__` back,
 and the flag says so at the class.
 Here is the Stateless version of `Ask` and `Tell` from [Effect Management](44_Effects--Effect_Management.md#effects-by-hand):
@@ -432,14 +432,14 @@ and no signature between `handle()` and the request mentions it.
 in the vocabulary of [Effect Management](44_Effects--Effect_Management.md#what-is-an-effect):
 the function reads something from outside.
 The `Recorder` of [Swapping the Implementation](46_Effects--Stateless.md#swapping-the-implementation)
-stood in for a side effect, where the function writes something outward.
+stands in for a side effect, where the function writes something outward.
 The technique is the same for both.
 Name each contact with the outside as an Ability and bind it at the edge to whatever the context needs.
 What an EMS adds is that the type checker enforces the declaration.
 
 ## Switching Implementations Mid-Run
 
-Every handler so far answered with data: a name, a `bool`, a `datetime`.
+Every handler so far answers with data: a name, a `bool`, a `datetime`.
 A handler can also answer with an implementation,
 an object whose methods the program then calls,
 and it can choose a different one at each request.
@@ -646,7 +646,7 @@ and here the right answer changes with the hour.
 In `microgrid.py` the binding is a call to `choose()`,
 which checks each source's `available()` at each request.
 [Swapping the Implementation](46_Effects--Stateless.md#swapping-the-implementation)
-swapped an implementation between runs.
+swaps an implementation between runs.
 `microgrid.py` swaps one during a run.
 The consumer names no source, so nothing in it changes.
 
@@ -1197,7 +1197,7 @@ the same two calls in the other order.
 and [The type checker decides what survives handling](#the-type-checker-decides-what-survives-handling)
 explains the difference.
 
-The choice between `catch()` and `catch_all()` decides what happens when a new failure appears.
+`catch()` and `catch_all()` differ in what they do with a new failure.
 When `research()` gains a fourth error,
 `report()`'s named `catch()` leaves it in the channel,
 so `report()`'s declared type no longer matches and the type checker points at the `yield from`.
@@ -1511,7 +1511,7 @@ An Effect that asks for ten separate things is usually two Effects.
 ## Adding Behavior to an Existing Effect
 
 [The Success Path](#the-success-path)
-said that a caller could retry a pipeline without editing it.
+says that a caller can retry a pipeline without editing it.
 Stateless provides a few decorators that add such behavior.
 Retry is the one to study, because of what it does to the type.
 
@@ -1800,7 +1800,7 @@ Supplying a `ProcessPoolExecutor` moves the same work into processes,
 and `squares()` stays as written.
 `as_type(Executor)` appears for the reason it always does:
 `ThreadPoolExecutor` is the more specific type,
-and `squares()` asked for the general one.
+and `squares()` asks for the general one.
 
 The type checker enforces one restriction.
 A forked Effect must have nothing left to supply.
@@ -2189,8 +2189,7 @@ not a utility you import for one module.
 Dependency wiring is the first omission,
 and `bakery.py` in [Dependencies That Need Dependencies](#dependencies-that-need-dependencies)
 shows its shape.
-`supply()` binds instances that are already built,
-and `handle()` takes an ordinary function,
+`supply()` binds finished instances, and `handle()` takes an ordinary function,
 so constructing a dependency cannot be an Effect.
 ZIO's `ZLayer` is a constructor that can read configuration, fail, and retry.
 It resolves a dependency graph at compile time,
@@ -2336,7 +2335,7 @@ But watch the direction.
 Python got one Effect tracked into its type system with `async`.
 The languages listed under [Native Effect Management](44_Effects--Effect_Management.md#native-effect-management)
 track all of them.
-Stateless is the demonstration that Python's type system is expressive enough to do it,
+Stateless demonstrates that Python's type system is expressive enough to do it,
 given a library willing to encode everything into return types.
 What is missing is not the capacity.
 It is a language that does the encoding for you.
@@ -2366,7 +2365,7 @@ give a hint, usually the shape of the code, and a full answer for each exercise.
     run `run_load()` again,
     and say where the `Blackout` propagates to and why `catch(Blackout)` around `run_load()` does not intercept it.
 4.  Write a handler for `Outlet` that ignores `request.hour` and hands out a fixed sequence of sources,
-    the way `scripted` handed out a fixed sequence of tosses.
+    the way `scripted` hands out a fixed sequence of tosses.
     Use it to test that `run_load()` re-requests after a failure,
     without modeling weather, a clock, or a battery.
     Then say what such a test cannot tell you about `controller()`.
@@ -2390,7 +2389,7 @@ give a hint, usually the shape of the code, and a full answer for each exercise.
     and record what the type checker says.
 9.  `wallet.py` runs `spree()` against a `Cell`.
     Script it instead: write a `Get` handler that answers from a fixed sequence of balances and a `Put` handler that appends every request to a list,
-    the way `scripted` fed `Flip`.
+    the way `scripted` feeds `Flip`.
     Assert that `spree()` attempts every price and writes once per purchase.
     Then say what this test cannot detect that the `Cell` version can.
 10. `fetch_nonempty()` puts `Empty` into the channel with `throw()`.

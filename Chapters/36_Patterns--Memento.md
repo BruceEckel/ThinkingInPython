@@ -161,7 +161,7 @@ so reassigning `checkpoint.strokes` raises `FrozenInstanceError` at runtime.
 Neither the checker's report nor the frozen field stops code holding a `Memento` from reading `.strokes`,
 unpacking that tuple, or building a `Memento` by hand;
 the caretaker's side of the contract remains a convention,
-the one the classic pattern always relied on.
+the one on which the classic pattern relies.
 What changes is the accidental case,
 a caretaker that mixes up a `Memento` with some other tuple:
 
@@ -637,7 +637,7 @@ The bytes encode a class by module and name,
 not by the shape that class had at save time.
 If the state class gains, loses, or renames a field before the load,
 `pickle.loads()` still succeeds.
-The error comes later, from whatever reads a field the bytes never carried.
+The error comes later, from whatever reads a field the bytes lack.
 `pickle_drift.py` simulates that drift.
 `SketchV1` sits in a module of its own because a real class drifts between two runs of a program:
 
@@ -697,7 +697,7 @@ a record's generated `__setattr__()` raises `FrozenInstanceError`,
 and pickle writes `__dict__` directly.
 The same shortcut skips `__post_init__()`,
 so a memento saved before a field gained its validation loads a value that the validation never saw.
-`title` is absent, since the old bytes never had one.
+`title` is absent, since the old bytes lack one.
 `restored.strokes` works because both versions agree on that field.
 `restored.title` raises `AttributeError` when anything reads it,
 often far from the line that called `pickle.loads()`.
@@ -768,7 +768,7 @@ and checkout is `restore()`.
 Git shares unchanged content between commits just as the immutable `Drawing` states in `History` share their unchanged strokes.
 Databases provide savepoints, mementos scoped to a transaction.
 Multiplayer games snapshot the world so they can rewind and replay when a late packet arrives.
-Whenever you see rewind, rollback, or restore, something is producing mementos.
+Whenever you see rewind, rollback, or restore, something produces mementos.
 
 ## Exercises
 

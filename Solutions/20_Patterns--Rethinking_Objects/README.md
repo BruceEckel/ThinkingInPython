@@ -176,20 +176,20 @@ of the code that `frozen=True` generated runs.
 
 **Check hashability.** The `hash()` failure shows the same shallowness from another side.
 `frozen=True` generates a `__hash__()` that hashes the tuple of field
-values, so hashing an `Immutable` hashes its `Bob`. A data class that
-compares by value and is not frozen has its `__hash__` set to `None`:
-a hash computed from fields that can change would lose the object
-inside a dict. Restoring `frozen=True` on `Bob` removes the mutation
-and the hash failure together, the clue that they are one problem: a
-frozen wrapper around a mutable value. `frozen_leaky.py` shows the same
-two symptoms for a `list` field.
+values, so hashing an `Immutable` hashes its `Bob`. On a data class
+that compares by value and is not frozen, `@dataclass` sets
+`__hash__` to `None`: a hash computed from fields that can change
+would lose the object inside a dict. Restoring `frozen=True` on `Bob`
+removes the mutation and the hash failure together, the clue that they
+are one problem: a frozen wrapper around a mutable value.
+`frozen_leaky.py` shows the same two symptoms for a `list` field.
 
 Nothing enforces deep immutability, and that is the answer: taking
 immutability all the way down is the author's job, one field at a time.
 Declare `tuple` rather than `list`, `frozenset` rather than `set`,
 `frozendict` rather than `dict`, and a frozen data class rather than a
-mutable one for any nested value. The type checker will hold you to
-those declarations once you write them. It will not choose them for
+mutable one for any nested value. The type checker holds you to
+those declarations once you write them. It does not choose them for
 you.
 
 </details>
@@ -293,7 +293,7 @@ still runs and prints `4.5`.
 **Give each meaning its own type.** The structural match still holds: `Package.total()` still takes no
 arguments and still returns a float at runtime. The two `NewType`
 declarations add a distinction the shapes never carry, so the type
-checker can finally see that a weight is not a price.
+checker finally sees that a weight is not a price.
 
 If someone deletes the annotations, the program behaves as it does
 now. It prints `4.5` and charges the customer for a number of kilograms.
@@ -725,12 +725,12 @@ list exists. The class holds a list rather than being one, so every
 mutation goes through a method this class wrote. Nothing inherited can
 bypass a counter that nothing inherited knows about.
 
-The trade is explicit. `CountingList` gets `sort()`, `index()`,
-`__len__()`, slicing, and everything else `list` offers, and gets the
-counting wrong. `CountingBox` gets only the methods you write for it,
-and a caller who wants `sort()` waits until you write one. The trade is the
-choice composition asks you to make on purpose, instead of discovering
-later that inheritance made it for you.
+`CountingList` gets `sort()`, `index()`, `__len__()`, slicing, and
+everything else `list` offers, and gets the counting wrong.
+`CountingBox` gets only the methods you write for it, and a caller who
+needs `sort()` waits until you write one. The trade is the choice
+composition asks you to make on purpose, instead of discovering later
+that inheritance made it for you.
 
 </details>
 </details>

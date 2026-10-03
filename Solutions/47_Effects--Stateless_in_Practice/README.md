@@ -486,7 +486,7 @@ and `plug()` declares the failure it can produce.
 ## 4. A scripted outlet
 
 > Write a handler for `Outlet` that ignores `request.hour` and hands out a fixed sequence of sources,
-> the way `scripted` handed out a fixed sequence of tosses.
+> the way `scripted` hands out a fixed sequence of tosses.
 > Use it to test that `run_load()` re-requests after a failure,
 > without modeling weather, a clock, or a battery.
 > Then say what such a test cannot tell you about `controller()`.
@@ -711,7 +711,7 @@ def report() -> Depend[
 <summary>Where to look</summary>
 
 [Composing a Program](../../Chapters/47_Effects--Stateless_in_Practice.md#composing-a-program) builds `research()` from `yield from` steps, and [The Success Path](../../Chapters/47_Effects--Stateless_in_Practice.md#the-success-path) writes the same pipeline with ordinary calls.
-In the Effect version, add a `@throws` function for the new check and widen the error parameter of the signature until `ty` is satisfied.
+In the Effect version, add a `@throws` function for the new check and widen the error parameter of the signature until `ty` reports nothing.
 In the by-hand version, look for the tool that reports the changes, or the lack of one.
 
 <details>
@@ -1149,7 +1149,7 @@ both chapters, applied to a boundary between threads or processes.
 
 > `wallet.py` runs `spree()` against a `Cell`.
 > Script it instead: write a `Get` handler that answers from a fixed sequence of balances and a `Put` handler that appends every request to a list,
-> the way `scripted` fed `Flip`.
+> the way `scripted` feeds `Flip`.
 > Assert that `spree()` attempts every price and writes once per purchase.
 > Then say what this test cannot detect that the `Cell` version can.
 
@@ -1158,7 +1158,7 @@ both chapters, applied to a boundary between threads or processes.
 
 [State as an Ability](../../Chapters/47_Effects--Stateless_in_Practice.md#state-as-an-ability) reads and writes the balance through `Get` and `Put` requests.
 Write one handler factory that reads from an iterator of balances and another that appends each `Put` to a list, then `handle()` both around `spree()`.
-Check the list and that the balance iterator is drained, and compare what the scripted answers share with each other.
+Check the list, check that the balance iterator has nothing left, and compare what the scripted answers share with each other.
 
 <details>
 <summary>Solution</summary>

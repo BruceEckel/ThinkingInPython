@@ -95,7 +95,7 @@ for i in range(5):
 `func_d()` has a later step to skip.
 
 **Make the skipped step visible.** `func_c()` prints a line when it runs, and
-that line is the confirmation: it appears for `0` and `3` and is
+that line confirms the skip: it appears for `0` and `3` and is
 missing for `4`. `4` reaches `func_d()` because it survives
 `func_a()` and `func_b()`, and the `Err` that comes back travels to
 the end of the chain untouched: `Err.bind()` returns `self` without
@@ -245,8 +245,8 @@ function returns the new error, and `map_error()` wraps it, the way
 the chapter's `map()` wraps a new answer. The `returns` library names
 this method `alt()`.
 
-**Leave a success alone.** `Ok`'s version is a no-op, since there is no
-error to touch.
+**Leave a success alone.** `Ok`'s version is a no-op, since an `Ok`
+holds no error to touch.
 
 **Transform the failure.** `Err`'s version applies `func` to `self.error` and
 wraps `func`'s return value in a new `Err`.
@@ -343,8 +343,8 @@ every `Err`'s `.error` into one list. `combined(1, 5)` now
 reports a single-item list, `["func_a(1)"]`, because `func_b(5)` and
 `func_c(6)` both succeed. `combined(1, 2)` reports all three failures
 at once: `i=1` fails `func_a`, `j=2` fails `func_b`, and `i+j=3`
-fails `func_c`. The short-circuiting `bind()` chain could never
-surface those three failures together.
+fails `func_c`. The short-circuiting `bind()` chain stops at the
+first of them, `func_a(1)`.
 
 **Widen the error channel.** One generic pair carries both shapes. The three steps return
 `Result[int, str]`, an `int` or one error string, while `combined()`
@@ -453,7 +453,7 @@ expect(TypeError, parse, "oops")
 ```
 
 **Type the returned decorator.** `safe()`
-returns a decorator that is generic over the function it
+returns a decorator generic over the function it
 decorates. The `SafeDecorator` protocol says that with a generic `__call__`,
 so `parse` keeps the signature `(text: str) -> Result[int, Exception]`.
 A nested `Callable` annotation types `parse` as precisely.

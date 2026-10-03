@@ -81,7 +81,7 @@ with no error to signal the gap.
 so it does report the gap, but only at runtime,
 when someone first asks it for a triangle.
 Nothing at edit time points at the missing case,
-and the type checker cannot know which strings `export_svg()` is meant to handle.
+and the type checker cannot know which strings `export_svg()` should handle.
 An `Enum` for `kind` and an `assert_never()` wildcard [moves that report to check time](13_Techniques--Pattern_Matching.md#exhaustive-matching),
 though an if-chain like `render()` still slips past the check.
 Either way, adding a type means editing every call site.
@@ -307,7 +307,7 @@ so `SHAPES` cannot gain a shape name without adding it to the `Literal` first.
 
 ### Self Registration
 
-It is even nicer if a new `Shape` subclass registers itself with no edit to existing code.
+Better still, a new `Shape` subclass can register itself with no edit to existing code.
 In this case, a closed `Literal` complicates things by requiring an edit for every new subclass.
 A closed set of names suits `Literal`, while an open set does not:
 
@@ -513,10 +513,10 @@ class ShapeFactory:
 `register()` stores a class under its name and returns the class unchanged,
 so it works as a [class decorator](14_Techniques--Decorators.md#decorating-classes).
 `__call__()` makes a `ShapeFactory` instance callable,
-so the factory is called the way `make()` is in `registry.py`;
+so you call the factory the way you call `make()` in `registry.py`;
 [A Callable Object as a *Command*](28_Patterns--Function_Objects.md#a-callable-object-as-a-command)
 covers `__call__()`.
-Each class registers with the factory that will build it:
+Each class registers with the factory that builds it:
 
 ```python
 # protocol_registry.py
@@ -549,13 +549,13 @@ where `functools.singledispatch` keeps a function's table beside it.
 because it picks an implementation by the type of its first argument,
 and `make()` receives a name.
 
-The type parameter of `register()` is bounded to `Shape`,
+The type parameter of `register()` has `Shape` as its bound,
 and the bound turns the decorator into a check.
 A decorated class must satisfy the Protocol, so a class without `draw()`,
 or with a `draw()` that takes an extra parameter,
 draws `invalid-argument-type` at its `@make.register` line before the program runs.
 That is the case [Self Registration](#self-registration) left to runtime,
-where a subclass that forgot `draw()` registers, fails at construction,
+where a subclass that forgets `draw()` registers, fails at construction,
 and no checker sees it.
 `register()` returns `type[S]`, the decorated class's own type,
 so after the decorator runs the checker still knows `Circle` as `Circle`,
@@ -578,14 +578,14 @@ Registration is opt-in,
 so a class that satisfies `Shape` but lacks `@make.register` is absent from the table,
 and `make()` fails with a `KeyError` that names the key,
 not the class that lacks the decorator (see exercise 10).
-Inheriting from the ABC cannot be forgotten that way,
+A subclass of the ABC cannot skip registration that way,
 because the subclass line is the registration.
 The runtime guard is weaker too.
 A class that ignores the checker's report still registers,
 and fails with an `AttributeError` at its first `draw()` call rather than a `TypeError` at construction.
 Choose the failure you prefer:
-the ABC catches the incomplete class when it is built,
-the Protocol when it is checked.
+the ABC catches the incomplete class at construction,
+the Protocol at check time.
 
 A factory that is an object also gives each test its own table:
 
@@ -801,10 +801,10 @@ When you create the factory object,
 you choose the concrete version of every object that factory creates.
 The example in *GoF Design Patterns* makes one program work across several graphical user interfaces
 (GUIs).
-You create a factory object for the GUI you're working with,
+You create a factory object for the GUI you use,
 and from then on when you ask that factory for a menu, button, or slider,
 the factory creates the version of that item suited to that GUI.
-The change from one GUI to another then touches only a single place in the code,
+Switching from one GUI to another then touches only a single place in the code,
 most likely via startup configuration.
 
 As another example, suppose you are creating a general-purpose gaming environment that supports different types of games.
@@ -1055,7 +1055,7 @@ not because the clone is checked.
 When the variant differs only in field values,
 `copy.replace()` builds it through the constructor, as `knight` shows,
 so a `__post_init__()` check runs on the result.
-Every field you do not name is passed by reference,
+`copy.replace()` passes every field you do not name by reference,
 so `knight` shares `goblin`'s `powers` list, the same sharing `shallow` shows.
 Pass a fresh list for that field when the variant must own one.
 
@@ -1196,7 +1196,7 @@ if __name__ == "__main__":
 #: Pizza(size=16, cheese=True, toppings=('basil', 'olives'))
 ```
 
-Calls can be chained because each setter returns `self`.
+You can chain the calls because each setter returns `self`.
 `build()` freezes the accumulated settings into an immutable `Pizza`.
 
 The builder is quietly single-use.
@@ -1381,13 +1381,13 @@ usually the shape of the code, and a full answer for each exercise.
 10. Add a `Hexagon` to `protocol_registry.py` that satisfies `Shape` but carries no `@make.register`,
     and show what `make("Hexagon")` does.
     Then write a check that reports every class in the module that satisfies `Shape` and is missing from `make.registry`,
-    so the forgotten decorator is found before any `make()` call.
+    so you find the forgotten decorator before any `make()` call.
     `@runtime_checkable`, which [*Surrogate*](26_Patterns--Surrogate.md#proxy)
     shows with `isinstance()`,
     also lets `issubclass()` test a class against a Protocol whose members are all methods.
 11. Fill `PROTOTYPES` in `prototype_registry.py` by decoration instead of a table literal.
     Write a `@prototype(name)` decorator for a function that builds and returns the `Monster`,
-    so that each decorated function's result is stored under `name`.
+    so that the decorator stores each decorated function's result under `name`.
     Explain why the decorator takes the name as an argument rather than reading the function's `__name__`:
     write that version and read what `ty` reports.
     Then say what the decorated form gains over the table and what it costs.

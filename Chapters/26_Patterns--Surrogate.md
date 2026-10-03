@@ -364,7 +364,7 @@ because a declared `__setattr__()` makes the type checker accept assignment to a
 Mangling rewrites identifiers, not string literals,
 so storing a double-underscore name through `object.__setattr__()` means writing the mangled form,
 `"_WriteProxy__implementation"`, by hand.
-The single underscore costs the protection that mangling gave:
+The single underscore costs the protection that mangling gives:
 if the implementation has an `_implementation` of its own,
 `p._implementation` finds the proxy's and the implementation's is out of reach.
 
@@ -642,7 +642,7 @@ Lookup fails on every `p.f`, so every access builds another `counted`.
 Two lookups of the same name therefore produce two different objects,
 and the wrapper reports its own name, `counted`, rather than `f`.
 Building a `counted` increments nothing.
-Only a call to `counted` performs the increment,
+Only a call to `counted` increments the tally,
 so the three lookups in the `print()` leave the tally at three.
 
 This proxy names its implementation `_impl`, with one underscore,
@@ -657,7 +657,7 @@ The proxy therefore names no method of the implementation while still keeping st
 The same few lines serve lazy initialization (a *virtual proxy*), access checks
 (a *protection proxy*), or call tracking (a *smart reference*), over any object.
 
-Testing confirms that a call reaches the implementation and returns its result,
+The tests confirm that a call reaches the implementation and returns its result,
 and that the proxy counts calls without counting an attribute read:
 
 ```python
@@ -845,7 +845,7 @@ usually the shape of the code, and a full answer for each exercise.
 1.  Extend `virtual_proxy.py`'s `Lazy` so it answers one cheap attribute itself,
     a `description` string given at construction, without building `Expensive`.
     Count the accesses it answers that way,
-    and report the count at the moment `Expensive` is built.
+    and report the count when `Lazy` builds `Expensive`.
     Confirm that reading `description` several times builds nothing,
     and that the first `query()` reports the count.
 2.  Change `CountingProxy` in `counting_proxy.py` to keep a per-method tally in a `collections.Counter` instead of a single total.

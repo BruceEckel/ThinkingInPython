@@ -233,7 +233,7 @@ The list alone does not separate a function declared pure from one that declares
 [Decide What Untracked Code Performs](#decide-what-untracked-code-performs)
 weighs what a checker can assume about a function that declares nothing.
 
-Notice also that `ask()` calls `input()` directly.
+`ask()` calls `input()` directly.
 `Ask` is a label here.
 It has no methods, and nothing can substitute another implementation for it.
 
@@ -267,7 +267,7 @@ Of the three checkers this book names, mypy has a plugin interface;
 `ty` and Pyright have none at this writing.
 A tool that runs outside the checker has two choices.
 It can repeat the checker's inference,
-or it can check the calls it is able to resolve and treat the others as unknown.
+or it can check the calls it can resolve and treat the others as unknown.
 
 ### Propagate Through Callbacks
 
@@ -327,7 +327,7 @@ run(supply(Console())(hello_twice)())
 
 `A` stands for whatever row the argument carries.
 `reveal_type(twice(hello))` reports `Generator[Need[Console], Any, None]`.
-`ty` solved `A` as `Need[Console]`,
+`ty` solves `A` as `Need[Console]`,
 with the solver it uses for every other generic.
 `hello_twice()` must then declare that row,
 or the checker rejects its `yield from`.
@@ -437,7 +437,7 @@ A native handler receives the continuation and decides what to do with it.
 [Stateless in Practice](47_Effects--Stateless_in_Practice.md#handlers-cannot-capture-the-continuation)
 shows the ceiling Python puts on the handler half:
 a Python generator is one-shot, so a handler can resume a computation once.
-What PEP 593 could give Python is algebraic effect tracking, the row half.
+PEP 593 could give Python algebraic effect tracking, the row half.
 The handler half would still come from a library, under that ceiling.
 
 Stateless gets tracking, interface separation,
@@ -454,7 +454,7 @@ describes.
 
 `Annotated` keeps the code ordinary and eager, and nothing verifies the row.
 A native system keeps ordinary code and a verified row,
-because the compiler that runs the code is the one that tracks it.
+because the compiler that runs the code also tracks it.
 That is the case for putting Effect tracking in the language,
 and it is why [Effects Are the Next Barrier](44_Effects--Effect_Management.md#effects-are-the-next-barrier)
 expects the tracking to move into the language or its toolchain.

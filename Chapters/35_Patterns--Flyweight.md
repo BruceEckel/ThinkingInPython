@@ -593,8 +593,9 @@ A map with millions of cells and three kinds of tile qualifies.
 A list of customer records, each one different, does not.
 Second, can everything that varies per use move out of the object?
 If a position, an owner, or a count must live inside,
-every object is unique and nothing can be shared, as `unshared_cells.py` shows.
-Third, can what remains be frozen?
+every object is unique and no two uses can share an object,
+as `unshared_cells.py` shows.
+Third, can you freeze what remains?
 Sharing a mutable object lets one use's change appear in every use
 (see exercise 3).
 

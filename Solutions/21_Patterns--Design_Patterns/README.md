@@ -132,10 +132,10 @@ print(render(rows, "json"))
 #: {"name": "paper", "amount": 7}
 ```
 
-**Hold each format as data.** The third format arrives without touching `render()`. The part worth
-noticing is where the assignment that adds the format can sit: in any module
-that imports `STYLES`. `STYLES` absorbs the change because a format is
-now data. Everything the axis does not cover still needs hand edits.
+**Hold each format as data.** The third format arrives without touching `render()`. The
+assignment that adds the format can sit in any module that imports
+`STYLES`. `STYLES` absorbs the change because a format is now data.
+Everything the axis does not cover still needs hand edits.
 Adding a field to `Row` touches every entry in `STYLES`, because a
 field is a different vector of change, one this design does nothing
 about.
@@ -330,7 +330,7 @@ is not complete.
 Taking away one more thing changes the answer. If you remove
 `checkout()`'s `shipping` parameter, inlining `5.0` where the call through `shipping` was,
 the program still runs and still prints a number. What stops working is
-the requirement: there is now no way to charge by weight without
+the requirement: you can no longer charge by weight without
 editing `checkout()`. Removing the parameter reaches the floor, the
 point where subtraction stops. The parameter is the last piece that carries the design's
 intent, so removing it removes the design rather than its scaffolding.
@@ -487,7 +487,7 @@ main("md")
 #: **Q3 sales**
 ```
 
-`MdWriter` is new code, so it does not count. Its arrival edits three
+`MdWriter` is new code, so it does not count. Adding it edits three
 existing things: the `AnyWriter` alias gains a member, `Report.render()`
 gains a `case`, and `main()` gains a `case`. The alias and `render()`
 both belong to `Report`, so the change reaches two parts, `Report` and

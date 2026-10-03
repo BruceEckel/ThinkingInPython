@@ -343,8 +343,7 @@ print(count)
 If you drop the `global` from `writes_global()`,
 `count += 1` reads a local before assigning it,
 so the call raises an `UnboundLocalError`.
-`global` governs rebinding, not reading,
-and that is why `read_only()` needs no declaration.
+`global` governs rebinding, not reading, so `read_only()` needs no declaration.
 [Closures](40_Functional--Foundations.md#closures) covers `nonlocal`,
 which rebinds a name in an enclosing function the way `global` rebinds a module-level name.
 A function that rebinds a global couples every caller to that shared,
@@ -458,7 +457,7 @@ The error arrives one level down, when `trace()` calls `report()`.
 ## Positional-Only and Keyword-Only Parameters
 
 Two markers in a parameter list control how callers may pass arguments.
-That control also decides how much of a signature you commit to keeping:
+The markers also decide how much of a signature you commit to keeping:
 a parameter's name is part of the contract when a caller can write it,
 and stays outside the contract when the caller must pass by position.
 A `/` ends the *positional-only* parameters.

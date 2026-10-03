@@ -81,7 +81,7 @@ I think most programmers will regularly use AI, if they don't already.
 Perhaps I am teaching the equivalent of assembly language after everyone has started using the equivalent of compilers.
 However, at the time of this writing,
 Python seems to be the most popular language for AI-generated code.
-Some small percentage of people might still wish to analyze what the AIs are generating.
+Some small percentage of people might still wish to analyze what the AIs generate.
 This book might have some value yet.
 
 The knowledge in this book has helped me guide AIs toward better solutions.
@@ -203,7 +203,7 @@ The short form is the listing's name alone:
 `tip membership` runs `membership.py`,
 and words after the name go to the program,
 so `tip membership --numbers` passes it the `--numbers` flag.
-When the book says to run a listing, the short form is the command to use.
+When the book says to run a listing, use the short form.
 A filename comment that starts with `rust/`,
 like the `# rust/fastcount/demo.py` listing in [Performance](18_Techniques--Performance.md),
 names a file in the repository's `rust/` directory, outside the Python build.
@@ -231,7 +231,7 @@ Output from inside a loop, or from an `import`,
 therefore appears in the group of markers after the loop or the `import`,
 not next to the line that produced it.
 The build verifies these markers against a real run,
-so they cannot drift from what the code prints.
+so they always match what the code prints.
 
 If you find a mistake, please send a correction.
 See `CONTRIBUTING.md` in the source repository.

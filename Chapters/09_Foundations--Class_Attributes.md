@@ -78,9 +78,9 @@ That instance dictionary is not guaranteed.
 A class that declares `__slots__`, or a data class built with `slots=True`
 ([Performance](18_Techniques--Performance.md#slots) shows the trade-off),
 has no instance `__dict__`.
-A class attribute in such a class cannot be shadowed:
-assigning to that name on an instance raises an `AttributeError`,
-because there is no instance dictionary to write into.
+An instance of such a class cannot shadow a class attribute:
+assigning to that name on the instance raises an `AttributeError`,
+because the instance has no dictionary to hold the new attribute.
 
 A method is a class attribute like any other.
 `def show(self):` in a class body stores a function object in the class dictionary,
@@ -295,7 +295,7 @@ not a `ClassVar`, so neither checker catches this read.
 `Registry.count = 0` creates the attribute on the class,
 and an instance finds it by fallback.
 
-The value does the creating in every case.
+In every case the value creates the attribute.
 An annotation states the type, and `ClassVar` adds where the attribute belongs,
 while the `= 0` brings it into existence.
 That holds for `label: str`, for `total: ClassVar[int] = 0`,

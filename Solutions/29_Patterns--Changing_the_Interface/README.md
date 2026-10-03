@@ -288,10 +288,9 @@ The module is already a namespace before anyone asked, and it comes
 with the underscore convention, `__all__`, and one-time initialization
 built in.
 
-A caller sees nearly the same names in both versions, and that is
-the point worth taking away. Neither version enforces anything. The
-difference is how much ceremony you pay to express the same intent,
-and the module version pays none.
+A caller sees nearly the same names in both versions. Neither
+version enforces anything. The difference is how much ceremony you
+pay to express the same intent, and the module version pays none.
 
 </details>
 </details>
@@ -321,7 +320,7 @@ object's, unchanged, and it adds behavior on the way through. Remove
 it and every call still reaches the same method with the same
 arguments and returns the same result. What you lose is the log. That
 is the *Decorator* row: same interface, added behavior, and the behavior
-is what disappears.
+disappears.
 
 **The `read()` wrapper is an *Adapter*.** Its interface is not the
 wrapped object's. The caller asks for `read()`, and the wrapped
@@ -341,8 +340,8 @@ call happens. This wrapper is the
 [protection proxy](../../Chapters/26_Patterns--Surrogate.md#protection-proxy).
 
 None of the three is a *Façade*, because a *Façade* narrows many objects
-to a few names and each of these wraps one object. The lesson is that
-the classification never turns on the code: all three could be the
+to a few names and each of these wraps one object. The
+classification never turns on the code: all three could be the
 same `__getattr__()` forwarder. What separates them is the answer to
 "what breaks if I delete this," and a name chosen from that answer
 tells the next reader why the wrapper is there.

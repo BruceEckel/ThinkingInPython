@@ -96,7 +96,7 @@ value on the diagonal.
 <summary>Where to look</summary>
 
 [Dictionary Comprehensions](../../Chapters/16_Techniques--Comprehensions.md#dictionary-comprehensions) shows a key expression and a value expression with an `if` filter at the end.
-The filter runs on the loop variable, before either expression is evaluated.
+The filter runs on the loop variable, before either expression runs.
 For the collision question, recall that a `dict` holds one value per key, so a later assignment replaces an earlier one.
 
 <details>
@@ -172,7 +172,7 @@ empty string, so the concatenation adds nothing to the capital. `"J"`
 and `"John"` are distinct strings, so the set keeps both.
 
 The filter exists to drop the initial `"J"` as noise. Removing the filter
-shows what the set is doing on its own: it collapses only exact
+shows what the set does on its own: it collapses only exact
 duplicates of the normalized form, and it has no notion that `"J"`
 might be an abbreviation of `"John"`.
 
@@ -339,7 +339,7 @@ previous one stopped, and `any()`'s early exit leaves values behind for
 
 [The Gap Between Creation and Consumption](../../Chapters/16_Techniques--Comprehensions.md#the-gap-between-creation-and-consumption) shows a generator expression delaying its work until a consumer pulls values.
 Square brackets make the comprehension run to completion at the line where it appears.
-Ask when `source()` is called and when `factor` is read, then compare with the print order.
+Ask when the comprehension calls `source()` and when it reads `factor`, then compare with the print order.
 
 <details>
 <summary>The shape</summary>

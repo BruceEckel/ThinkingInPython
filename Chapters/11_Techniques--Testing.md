@@ -12,7 +12,7 @@ that the account refuses an overdraft.
 Tests give you a safety net.
 With them you can refactor boldly, change designs, and clean up code.
 Tests also push back on the design.
-A function you cannot test easily is usually one that goes looking for the clock,
+A function you cannot test easily usually goes looking for the clock,
 the filesystem, or the network instead of receiving them.
 
 Perhaps more importantly,
@@ -834,7 +834,7 @@ recording every call as it goes.
 `assert_called_once_with()` checks two things at once:
 that `send` ran exactly once, and that it ran with this argument.
 A plain stub cannot make that check.
-`fake_urlopen()` has no memory of how it was called.
+`fake_urlopen()` remembers nothing about the calls it receives.
 
 Accepting any call has a cost.
 A `Mock` accepts a call the real function would reject,
@@ -865,7 +865,7 @@ Replace those at the boundary,
 by injection where you can change the code and with `monkeypatch` where you cannot.
 Then pin the remaining behavior with a handful of parametrized cases.
 The work is mostly in the first step,
-since a function that is hard to test is usually one that goes looking for something no caller handed it.
+since a function that is hard to test usually goes looking for something no caller handed it.
 
 To find out what you have not tested, run the suite under `coverage.py`,
 which the `pytest-cov` plugin wires up when you pass `--cov`.

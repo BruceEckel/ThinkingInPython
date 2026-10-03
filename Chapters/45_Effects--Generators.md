@@ -812,7 +812,7 @@ task_runner()
 #: index: merge
 ```
 
-`to_send` holds what each job's next turn will receive:
+`to_send` holds the value each job receives on its next turn:
 `None` until the runner has answered that job's most recent request.
 `job.send(to_send.pop(job))` primes a fresh job the same way `next(job)` does,
 since `send(None)` and `next()` are equivalent.

@@ -142,7 +142,7 @@ error[type-assertion-failure]: Argument does not have asserted type `Never`
 info: `Never` and `Rectangle & ~Circle & ~Square` are not equivalent types
 ```
 
-Once `Rectangle` joins the `Shape` union, the type checker can prove that a
+Once `Rectangle` joins the `Shape` union, the type checker proves that a
 `Rectangle` value falls through both `case`s and reaches `case _`.
 `assert_never()` demands an argument of type `Never`, meaning "this
 code is unreachable." The type checker now knows `shape` can be a
@@ -357,7 +357,7 @@ line 43 in `cost()`.
 `assert_never()` declares its parameter as `Never`, the type with no
 values, so the call checks only when the cases above it have already
 eliminated every member of the union. The inferred type spells out
-what survived those cases: a `Webhook` that is none of the three
+what survives those cases: a `Webhook` that is none of the three
 handled types. A `Webhook` can still reach the `assert_never()` call,
 so the check fails. Two diagnostics for one new channel is the cost the
 chapter describes: adding a type touches every operation.
@@ -492,7 +492,7 @@ does as briefly.
 
 The cost is the `sign()` helper and one extra layer of indirection:
 the `match` no longer mentions `Point`. That trade is usually worth it
-when the guards are all testing the same handful of derived facts, and
+when the guards all test the same handful of derived facts, and
 not worth it when each guard asks a different question.
 
 **Give every path a return.** The final `case _` is unreachable, since the six cases above it cover

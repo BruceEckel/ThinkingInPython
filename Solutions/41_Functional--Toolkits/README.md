@@ -49,7 +49,7 @@ print(deep_sum([1, [2, [3, 4], 5], 6]))
 ```
 
 The loop version runs two lines longer than the recursive one, so brevity
-is not the argument either way. What changed is how much of the
+is not the argument either way. The rewrite changes how much of the
 bookkeeping is yours. The recursive version never names a stack: the
 call stack holds the sublists still to walk, and `return` pops one.
 Here you allocate the stack, seed it with a copy of `items`, choose
@@ -88,7 +88,7 @@ mistakes, because it never has the choice.
 
 [`lru_cache`](../../Chapters/41_Functional--Toolkits.md#lru_cache) shows `cache_info()` after a run with `maxsize=2`.
 Count the distinct arguments the function sees and compare that count with the new `maxsize`.
-The difference tells you whether any entry is ever evicted, and so which calls are hits.
+The difference tells you whether the cache evicts any entry, and so which calls are hits.
 
 <details>
 <summary>The shape</summary>
@@ -124,7 +124,7 @@ print(square.cache_info())
 
 The prediction: `hits=2, misses=3, maxsize=3, currsize=3`. Three
 distinct arguments arrive, so the cache misses three times and keeps
-all three results. Nothing is ever evicted, so the repeat calls to
+all three results. The cache evicts nothing, so the repeat calls to
 `square(2)` and `square(1)` both find their stored answers.
 
 The difference from the chapter's `maxsize=2` run is the second
@@ -191,10 +191,10 @@ print(list(islice(batch_totals(count(1), 3), 5)))
 #: [6, 15, 24, 33, 42]
 ```
 
-**Total each batch.** `batched()` does the chunking and a generator expression does the
-summing, so the body fits on one line with no hand-written loop.
+**Total each batch.** `batched()` chunks the source and a generator expression sums
+each batch, so the body fits on one line with no hand-written loop.
 
-**Test laziness on an infinite source.** Passing `count(1)` is the proof of laziness. `count()` never ends, so
+**Test laziness on an infinite source.** Passing `count(1)` proves the function is lazy. `count()` never ends, so
 if `batch_totals()` builds a list of batches, or if `batched()` reads
 its source eagerly, the call never returns. The call returns
 immediately, and `islice()` then pulls exactly five totals, so
@@ -357,7 +357,7 @@ that "`@cache` works correctly only for pure functions." Hashability
 constrains the key, purity constrains the function, and a function can
 meet one without the other.
 
-Note that the exception says nothing about purity. `deep_sum()` is
+The exception says nothing about purity. `deep_sum()` is
 already pure, and caching it would be correct. The obstacle is the
 argument type alone.
 

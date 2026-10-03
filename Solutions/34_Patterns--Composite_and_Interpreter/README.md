@@ -96,7 +96,7 @@ print(list(find(root, "src")))
 `Node` type, recursing with `yield from` into each `Directory`'s
 entries.
 
-**Match a directory, then descend.** The difference is that a `Directory` can itself match `name`,
+**Match a directory, then descend.** A `Directory` can itself match `name`,
 where `walk()` only ever yields file paths. Matching also continues
 *into* a matched directory rather than stopping there, so a directory
 named `"src"` and a file beneath it named `"src"` can both appear in
@@ -121,7 +121,7 @@ holds two separate directories named `"src"`, and both come back as
 <summary>Where to look</summary>
 
 [A Composite of Data Classes](../../Chapters/34_Patterns--Composite_and_Interpreter.md#a-composite-of-data-classes) ends each `match` with `assert_never()`.
-Add a `@record` class to the `Node` union and run the type checker: each operation that lacks a case reports the unhandled type.
+Add a `@record` class to the `Node` union and run the type checker: it reports the unhandled type in each operation that lacks a case.
 Then decide per operation what a link means, and avoid following the target into a subtree.
 
 <details>
@@ -246,7 +246,7 @@ loop forever if a link ever pointed back at one of its own ancestors.
 
 [The Nodes and the `Operators` Base](../../Chapters/34_Patterns--Composite_and_Interpreter.md#the-nodes-and-the-operators-base) explains why node classes inherit their operator methods and why `Expr` is the union that each walker's `assert_never()` checks.
 Add both classes to `Expr`, put `__neg__()` and `__truediv__()` on `Operators`, and follow the type checker to every walker.
-For `simplify()`, consider what rewrite is safe for `Div` and which input should be left alone.
+For `simplify()`, consider what rewrite is safe for `Div` and which input to leave alone.
 
 <details>
 <summary>The shape</summary>
@@ -653,7 +653,7 @@ print(to_infix((x + 1) * (x + 2)))
 ```
 
 **Parenthesize by context.** Each recursive call passes down the precedence its *parent* requires.
-A child only gets parenthesized when its own operator binds more
+A child only gets parentheses when its own operator binds more
 loosely than what the parent needs. `Mul`'s children therefore need
 parens around a lower-precedence `Add`, while `Add`'s children never
 need parens around another `Add`.
@@ -1032,7 +1032,8 @@ explains the convention: typeshed gives the sentinel a type
 inheriting `Any`, so returning it satisfies any declared return type.
 The declaration also lets `(2 * x + 1).right` resolve for a caller.
 
-Note what `NotImplemented` does not fix. The type checker already rejects
+`NotImplemented` closes a runtime hole, not a type-checking one.
+The type checker already rejects
 `"a" + x` in source it can see, which is why the listing's `"a" + x`
 line carries a `# type: ignore` to keep `exercise_6.py` in the build. The runtime hole
 is the gap between what the checker sees and what runs. Closing it matters
@@ -1106,8 +1107,8 @@ keeps demonstrating on `Expr`. The whole walker is the same loop with
 a different body, because the structure already separates the literal
 pieces from the interpolations.
 
-**Escape the interpolated values.** `html.escape()` does the character replacement, so the exercise's
-real content is *where* `to_html()` applies it: to the interpolated
+**Escape the interpolated values.** `html.escape()` replaces the characters, so the exercise's
+real content is *where* `to_html()` calls it: on the interpolated
 values. The `<p>` and `</p>` the author typed pass through untouched,
 so the output is valid HTML rather than a document with its own tags
 escaped.
@@ -1322,7 +1323,7 @@ bottom. Nothing about the expression is unusual. Only its shape is.
 the exercise bites. Pushing children and popping them in a loop gives
 a pre-order walk that visits every node and computes nothing, because
 an `Add` can combine its children's values only *after* the children
-have produced them. The fix is to stack the pending operation behind
+have produced them. The solution stacks the pending operation behind
 its own children: `work += [Op.ADD, right, left]` puts `Op.ADD`
 deepest, so it comes off last, by which point the two values it needs
 are on `values`.
@@ -1488,8 +1489,8 @@ adds, not a decision your code gets to make. Third-party node types
 are the normal case.
 
 For `expr.py`, use the closed one. The four node types *are* the
-grammar, so a plugin adding a fifth is not extending the language but
-defining a different one. Every walker would then be silently wrong
+grammar, so a plugin adding a fifth does not extend the language but
+defines a different one. Every walker would then be silently wrong
 rather than helpfully extended. The `assert_never()` that reads as an
 obstacle in the file system reads as the point here: when the grammar
 does grow a `Neg`, the type checker hands you the list of walkers to

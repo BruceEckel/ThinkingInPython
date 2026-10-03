@@ -248,7 +248,7 @@ A shallow copy of a list of `Bob`s protects the list and not the `Bob`s:
 the caller's copy holds the same `Bob` objects yours does,
 and can change each one.
 
-Testing confirms that the defensive copy holds.
+A test confirms that the defensive copy holds.
 Mutating the returned list leaves the original untouched:
 
 ```python
@@ -540,9 +540,9 @@ so no inherited method slips past the counter.
 and more than one of them skips the counter.
 Composition still allows the counting bug.
 If you write `extend()` as `self.items.extend(more)` instead of going through `append()`,
-the count is wrong again.
+the count is still wrong.
 What changes is where the bug lives: in the class you read,
-rather than in `list` internals hidden behind `CountingList`.
+not in `list` internals hidden behind `CountingList`.
 
 Composition does more than repair a broken subclass.
 A type holds other types as fields,
@@ -723,7 +723,7 @@ The bases in [Changing the Interface](29_Patterns--Changing_the_Interface.md)
 and [*Composite* and *Interpreter*](34_Patterns--Composite_and_Interpreter.md)
 carry the same empty `__slots__` for the same reason.
 When a base comes from a library and declares no `__slots__`,
-its records are written `@record(slots=False)`,
+its records use `@record(slots=False)`,
 which gives up slots visibly instead of letting the base take them back.
 
 ### Dynamic Typing
@@ -805,8 +805,8 @@ A protocol is *structural*, so it works with any type that has matching members,
 including types in libraries you cannot edit.
 The type's author need not hear that your protocol exists.
 That independence is why this chapter emphasizes protocols.
-The independence has a cost.
-Nothing in a class's own source names the protocols it satisfies,
+The independence has a cost:
+nothing in a class's own source names the protocols it satisfies,
 so you cannot grep a codebase for every type that implements one,
 the way you can search for subclasses of a base class.
 Protocols connect pieces without requiring any piece to change.
@@ -827,7 +827,7 @@ its method resolution order (MRO).
 The choice is deterministic, never ambiguous,
 but a deep hierarchy still makes it easy to lose track of which method runs.
 Protocols avoid the question: with no inheritance graph,
-there is nothing to linearize.
+C3 has nothing to linearize.
 Satisfying three of them costs nothing more than having the three methods:
 
 ```python
@@ -988,7 +988,7 @@ introduced in [Pattern Matching](13_Techniques--Pattern_Matching.md#exhaustive-m
 The shapes become immutable data, and one free function handles all the cases,
 with no base class and no overridden methods.
 The type checker ensures that the match covers every shape.
-Here is `shapes_oo.py` modified to use pattern matching:
+`shapes_match.py` rewrites `shapes_oo.py` with pattern matching:
 
 ```python
 # shapes_match.py

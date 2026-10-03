@@ -517,7 +517,7 @@ and that entry is why `use_module.py` can `import module` with no setup.
 The entries from `PYTHONPATH` come next,
 and installed packages sit further down.
 Running with `-P` drops that first entry,
-so a local `random.py` can no longer shadow the standard library.
+so a local `random.py` no longer shadows the standard library.
 
 What if your module or package isn't in the same directory as the Python file that imports it?
 The original solution was the `PYTHONPATH` environment variable,
@@ -530,7 +530,7 @@ It raises a `ModuleNotFoundError` when no directory does.
 `PYTHONPATH` still works,
 but today you install your package into the environment you use,
 and the install puts it on the search path with no environment variable.
-Concretely, with `uv` (this book's tool of choice), that means `uv sync`,
+With `uv` (this book's tool of choice), you run `uv sync`,
 or `uv pip install -e .` for an editable install.
 The package resolves by name from anywhere,
 and edits to its source take effect immediately, without reinstalling.

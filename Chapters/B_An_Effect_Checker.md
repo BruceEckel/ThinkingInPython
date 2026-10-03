@@ -628,7 +628,7 @@ and its inferred row says what running the file performs.
 
 `read_module()` is the one operation here that can fail.
 It returns a [`Result`](42_Functional--Error_Handling.md#a-result-type),
-so a parse failure becomes a value the caller must look at.
+so a parse failure becomes a value the caller must inspect.
 
 ```python
 # test_function_facts.py
@@ -895,7 +895,7 @@ def check(
 It reads no file and prints nothing,
 so a test passes it a string and checks the returned value,
 with no files to create or output to capture.
-The `match` on `read_module()`'s result is where a parse failure becomes a finding,
+The `match` on `read_module()`'s result turns a parse failure into a finding,
 beside the findings about rows.
 
 Here is the checker on Appendix A's greeting program, with one function added:
@@ -943,17 +943,17 @@ for finding in report.findings:
 #: greeting.quiet undeclared Tell
 ```
 
-The demo prints each row that is not empty, then each finding.
+The demo prints each nonempty row, then each finding.
 Appendix A's `row(shout)` read `[]`, because `shout()` declares nothing.
 The checker infers `['Tell']` from the call to `tell()`.
 `quiet()` declares itself pure and calls `shout()`,
 and the checker reports `quiet()`,
 two calls away from the `tell()` whose declaration supplies the `Tell`.
 Carrying `Tell` up two calls is propagation,
-which Appendix A's `tracked_greeting.py` could not do.
+which Appendix A's `tracked_greeting.py` cannot do.
 
 [Facts About a Function](#facts-about-a-function)
-predicted the first two findings.
+predicts the first two findings.
 `ask()` and `tell()` perform `Console` and say `Ask` and `Tell`.
 Adding `hides(Console)` to each clears both findings, as this test file shows:
 
@@ -1057,7 +1057,7 @@ With it, `requests.get` is a declared function like any other.
 The checker's existing rule covers `requests.get`: callers trust a declared row.
 The stub's body is `...`, which calls nothing,
 so its body row is empty and stays within its declaration.
-Type checkers solved the same problem the same way,
+Type checkers solve the same problem the same way,
 with stub files that declare the types of code they cannot read.
 
 ## The Checker Checks Itself

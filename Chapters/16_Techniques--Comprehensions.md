@@ -409,7 +409,7 @@ If you turn the comprehension's brackets into parentheses,
 the program prints nothing and raises no exception.
 A generator expression does not start walking until `sorted()` pulls on it,
 and that pull comes outside the `with`.
-By then the directory is gone,
+By then the context manager has deleted the directory,
 and `Path.walk()` ignores the error unless you pass `on_error`.
 [Generator Expressions](#the-gap-between-creation-and-consumption)
 returns to that gap.
@@ -663,12 +663,12 @@ print(list(gen))
 `source()` runs as Python builds the generator expression,
 before the `generator created` line prints.
 The output expression waits,
-so it reads `factor` when `list()` pulls the values rather than at the generator's creation.
+so it reads `factor` when `list()` pulls the values rather than when Python creates the generator.
 The answer is `[10, 20, 30]` instead of `[2, 4, 6]`.
 A list comprehension has no such gap: it reads everything at once.
 That gap is also why `path_walk_comprehension.py` uses brackets.
-With parentheses, its outermost iterable, `root.walk()`, is called at creation,
-but the walking and the filtering wait for a consumer that arrives after the directory disappears.
+With parentheses, Python calls `root.walk()`, its outermost iterable,
+at creation, but the walking and the filtering wait for a consumer that arrives after the directory disappears.
 A `lambda` created in a comprehension reads its variables late for the same reason:
 its body runs when something calls it.
 [Function Objects](28_Patterns--Function_Objects.md#the-late-binding-trap)
@@ -733,7 +733,7 @@ works the same way ([Concurrency](19_Techniques--Concurrency.md#asyncio-mechanic
 ## Choosing a Form
 
 The four forms are one expression with different delimiters,
-and that is why learning the list form teaches all four.
+so learning the list form teaches all four.
 Brackets when you want a list.
 Braces for a set, or for a dict when a colon separates a key from a value.
 Parentheses when the consumer takes values one at a time and does not need them all at once.

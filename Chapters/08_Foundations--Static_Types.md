@@ -291,7 +291,7 @@ Programmers often call dynamic typing *duck typing*.
 If it looks like a duck and quacks like a duck, treat it as a duck.
 
 *Structural typing* is the static counterpart.
-Instead of waiting until the program is running,
+Instead of waiting until the program runs,
 a type checker verifies ahead of time that an object has the required *shape*.
 "Shape" means the methods and attributes that the code using the object requires.
 Dynamic typing and structural typing are the same idea checked at different moments.
@@ -720,7 +720,7 @@ Inside `label()`, `style` is a `Style` dictionary.
 `NotRequired` makes `fill` optional,
 so `label()` reads it with `.get()` and a default.
 
-The checking happens at the call.
+The type checker checks the keywords at each call.
 A call that passes `width="6"` draws `invalid-argument-type` from `ty`,
 reporting "Expected `int`, found `Literal["6"]`",
 the same diagnostic a wrongly typed ordinary parameter draws.
@@ -947,4 +947,4 @@ give a hint, usually the shape of the code, and a full answer for each exercise.
     copy `b.val` into a local variable before the `if` and use the local inside it.
     Replace the `expect()` call with `print(show(box))` for a `Box` named `box`,
     then print `box.val`.
-    Explain why the `AttributeError` is gone although `reset()` still runs.
+    Explain why the `AttributeError` disappears although `reset()` still runs.

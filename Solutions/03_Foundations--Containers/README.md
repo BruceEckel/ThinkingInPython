@@ -276,7 +276,7 @@ print(sorted(counts.items(), key=lambda kv: -kv[1])[:2])
 #: [('a', 3), ('cat', 2)]
 ```
 
-**Count each word.** The first thing you write yourself is the loop. `Counter(words)`
+**Count each word.** First, you write the loop yourself. `Counter(words)`
 counts an iterable inside its constructor, while `defaultdict(int)`
 removes the "does this key exist yet" check and leaves the counting to
 you.

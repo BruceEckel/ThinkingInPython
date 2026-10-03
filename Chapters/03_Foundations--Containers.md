@@ -410,7 +410,7 @@ and the later entry wins a collision.
 Like a list display, a `dict` display accepts any number of starred operands,
 with ordinary `key: value` entries among them.
 The last line feeds `dict()` an iterable of `(key, value)` pairs,
-and any iterable that yields such pairs will do.
+and `dict()` accepts any iterable that yields such pairs.
 `zip()` pairs up two sequences element by element.
 [Control Flow](04_Foundations--Control_Flow.md#range-enumerate-and-zip)
 covers it with the other loop tools.
@@ -516,7 +516,7 @@ Single elements move in and out with `add()`, `remove()`, and `discard()`.
 `discard()` stays silent.
 
 Repeated lookups run faster against a `set` than against a `list`.
-A `list` compares the item you are looking for against every element in turn.
+A `list` compares the item you look for against every element in turn.
 A `set` computes one hash and looks in one place.
 `timeit()` runs a callable `number` times and returns the total elapsed seconds.
 The `lambda:` prefix wraps an expression into the callable `timeit()` needs

@@ -335,7 +335,7 @@ cells. A cell is unreachable when no path of open cells connects it to
 the entry, not when a wall happens to surround it. `Maze.entry()`
 scans row by row and returns the first open cell it finds, and every
 rat traces back to that single starting point through `claim()`. No
-rat can therefore reach a cell that has no open-cell path back to the
+rat therefore reaches a cell that has no open-cell path back to the
 entry, however many rats spawn.
 
 </details>
@@ -365,7 +365,7 @@ entry, however many rats spawn.
 [Contention on a Loop](../../Chapters/38_Patterns--Simulation.md#contention-on-a-loop) shows what happens when two rats reach one unclaimed cell, and [The Rat and the Blackboard](../../Chapters/38_Patterns--Simulation.md#the-rat-and-the-blackboard) shows the `claim()` you are changing.
 Making `claim()` an `async def` means each caller must `await` it, which spreads through the `Protocol`, the comprehension, and `explore()`.
 Count the `True` results in a field on the `Blackboard` and compare the count with `len(visited)`.
-A coroutine gives up control only at an `await`, which decides whether a lock is needed.
+A coroutine gives up control only at an `await`, which decides whether `claim()` needs a lock.
 
 <details>
 <summary>The shape</summary>
@@ -567,7 +567,7 @@ If you test the broken `claim()` on `amaze.txt`,
 the count of `True` returns equals `len(visited)` on every run,
 and the gap looks harmless.
 A perfect maze offers one path to each cell,
-so two rats cannot reach one unclaimed cell.
+so no two rats reach one unclaimed cell.
 The solution uses the seven-by-nine maze from `test_rats_and_mazes.py`,
 whose loop lets two rats approach one cell from opposite directions.
 
@@ -698,7 +698,7 @@ Both rats reach `await asyncio.sleep(0)` while the same cell still
 looks unclaimed, because neither has added that cell to `visited`
 yet. Both membership tests therefore pass, and only afterward does
 each rat call `self.visited.add(...)`.
-The result is two rats that each believe they alone claimed that cell.
+Each of the two rats believes it alone claimed that cell.
 Both move into it, and that overlap breaks the invariant that no two
 rats cover the same ground. Nothing goes unexplored. Both rats proceed
 from the shared cell and duplicate each other's work from there, while
@@ -960,8 +960,7 @@ factory searches.
 **Act through the shared interface.** `Room` and `GameBuilder` need no change either,
 since both only ever call `occupant.interact(robot, room)` through the
 shared `Item` interface.
-Neither one has ever needed to know which concrete `Item` subclasses
-exist.
+Neither one needs to know which concrete `Item` subclasses exist.
 
 **Give the robot a counter.** `Robot.__init__()` needs only one new line, `self.coins = 0`, to have
 somewhere to count (folded into `robot_world.py` above so this
@@ -1134,8 +1133,8 @@ print("finished:", game.robot.finished)
 
 **Let the caller define arrival.** `solve()` changes in one place. The `isinstance(room.occupant,
 EndGame)` test becomes `arrived(room)`, a predicate the caller
-supplies. Nothing else in the search knows or cares what it is
-looking for. The `EndGame` version is now one line at the call site,
+supplies. Nothing else in the search knows or cares what counts as
+arriving. The `EndGame` version is now one line at the call site,
 `end`, and `food` is another.
 
 **Report an empty search as `None`.** The other change is the return type.
@@ -1161,9 +1160,9 @@ of food can sit close together down one dead-end corridor while a
 third sits one step nearer in the opposite direction. Taking the
 single near one first means walking the corridor twice. The shortest
 complete tour is a travelling-salesman problem over the food rooms,
-and its first leg is often not the shortest leg available. What the
-greedy tour does guarantee is that every leg is a shortest path,
-which is all breadth-first search guarantees.
+and its first leg is often not the shortest leg available. The greedy
+tour does guarantee that every leg is a shortest path, which is all
+breadth-first search guarantees.
 <!-- vale proselint.GenderBias = YES -->
 
 </details>
@@ -1302,8 +1301,8 @@ so the difference is exactly `0.0` at every point on the plate.
 displacement by the amplitude under that grain, so
 `uniform(-kick, kick) * 0.0` moves nothing, and 1200 steps leave every
 grain where the constructor scattered it. The view shows
-neither chaos nor a figure because no grain ever moves: what you see
-is the initial random scatter, frozen. Agitation reads `0.000` from
+neither chaos nor a figure because no grain ever moves: it shows the
+initial random scatter, frozen. Agitation reads `0.000` from
 the first step, the same number a perfectly settled plate reports, so
 the summary statistic cannot tell "finished" from "never started."
 
@@ -1401,7 +1400,7 @@ come from the physics the chapter's formula approximates, a real plate
 with free edges rather than a membrane clamped all around its rim. The
 simulation machinery stays the same across both fields: same grains,
 same random walk, same rule that a grain moves in proportion to the
-vibration under it. Only the field changed, and with it every pattern
+vibration under it. Only the field changes, and with it every pattern
 the model produces.
 
 </details>
@@ -1471,10 +1470,10 @@ strip. Rendered, the run shows nearly every grain in those two
 corners and the nodal lines between them empty. The plate reports
 settled sand in the wrong places.
 
-The failure at `kick=0.5` is worth keeping in mind. Agitation measures whether the
-grains are sitting where the field is weak, not whether the figure is
-right, so one number cannot distinguish a sharp pattern from two
-blobs. The render is the check the number cannot perform.
+Agitation measures whether the grains sit where the field is weak,
+not whether the figure is right, so one number cannot distinguish a
+sharp pattern from two blobs. The render is the check the number
+cannot perform.
 
 An intermediate kick avoids both failures because the amplitude scaling
 in `step()` is a feedback loop, and the loop only works within a range

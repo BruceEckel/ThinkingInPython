@@ -146,7 +146,7 @@ Python runs `with Trace("A") as t:` in five steps:
 `__enter__()` returns the object that `as` binds, often `self`.
 The return annotation `Self`
 (introduced in [Static Types](08_Foundations--Static_Types.md#the-self-type))
-declares an instance of the class on which the method is called,
+declares an instance of the class on which you call the method,
 so it adapts to subclasses.
 
 The three parameters of `__exit__()` describe the exception that ended the block.
@@ -508,7 +508,7 @@ wrapped by `textwrap.fill()` when that line is wider than `WIDTH`.
 `WIDTH` is 57 because this book's listings are 60 columns wide and a `#:` output line spends three of them on its prefix.
 An exception of another type propagates,
 and a call that raises nothing fails with an `AssertionError`,
-so a demo that stops failing is reported instead of quietly printing nothing.
+so `expect()` reports a demo that stops failing instead of quietly printing nothing.
 The `/` makes `types` and `fn` positional-only,
 so every keyword argument goes to `fn`.
 [`**P`](14_Techniques--Decorators.md#p-and-r-keep-the-static-interface)
@@ -589,7 +589,7 @@ Each call of the decorated function builds a fresh manager,
 so you can call `report()` any number of times,
 each with its own enter and exit.
 The single-use caution from `trace_gen.py` still holds for the manager object you name in a `with`.
-The machinery applies [`functools.wraps`](14_Techniques--Decorators.md#wraps-keeps-the-runtime-interface),
+`ContextDecorator` applies [`functools.wraps`](14_Techniques--Decorators.md#wraps-keeps-the-runtime-interface),
 so `report` keeps its name and docstring.
 
 Here's the same `banner` as a class.
@@ -646,14 +646,14 @@ forwards `*args` and `**kwargs` and returns the wrapped function's result,
 while [`hijack`](14_Techniques--Decorators.md#what-at-does)
 returns a replacement that runs instead of the original function,
 skipping its call.
-What `banner` offers instead is one definition,
+`banner` offers one definition instead,
 usable both as a `with` block and as a `@` decorator.
 Use `ContextDecorator` when setup and cleanup should be identical on every call.
 
 The wrapper treats a generator function differently.
 Before Python 3.15, it wrapped only the call that creates the generator object,
 so the context entered and exited before the generator's body ran,
-and any resource the manager opened was gone by the time the body used it.
+and the manager closed any resource it opened before the body could use it.
 On 3.15 the context opens at the first `next()` and closes after the generator's last `yield`:
 
 ```python
@@ -987,7 +987,7 @@ if __name__ == "__main__":
 
 `lease()` takes an item out of the queue and yields it to the `with` block.
 The `finally` puts it back.
-The crash inside the second `with` block still returns the connection,
+The second `with` block crashes, and the `finally` still returns the connection,
 so the count is back to two.
 `Pool` is generic over the pooled type,
 and it never creates or destroys anything.
@@ -1004,9 +1004,8 @@ and the lease exists to take it back.
 
 The queue does more than store the idle items.
 `Queue` is thread-safe, and `get()` blocks while the pool is empty,
-so a borrower waits until someone else's `with` block ends and a return makes an item available.
-When several threads share one pool,
-the queue becomes the throttle that limits concurrent use,
+so a borrower waits until another borrower's `with` block ends and returns an item to the queue.
+When several threads share one pool, the queue limits concurrent use,
 the way a real database connection pool does.
 `pool_contention.py` puts the pool under real contention:
 eight threads share a pool of two connections and lease and release two hundred times each.
@@ -1054,7 +1053,7 @@ Across sixteen hundred lease-and-release cycles,
 spread over eight threads competing for two connections,
 `held` never climbs past two:
 a thread that arrives while the pool is empty blocks in `get()` instead of racing past it.
-`over capacity` stays `False` because `Queue`'s blocking does the throttling,
+`over capacity` stays `False` because `Queue`'s blocking throttles the threads,
 and the demo measures that rather than assuming it.
 `available()` is a snapshot for the demo, not a synchronization primitive:
 `Queue.qsize()` is only approximate once more than one thread is borrowing,

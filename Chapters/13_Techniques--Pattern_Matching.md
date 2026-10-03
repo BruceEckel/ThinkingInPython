@@ -602,7 +602,7 @@ and its body recurses into that node's children.
 
 When a value is one of a fixed set of types,
 define that set as a union using the [`type` statement](08_Foundations--Static_Types.md#the-type-statement).
-Now you can `match` on that union.
+Then `match` on that union.
 When you end with `case _: assert_never(value)`,
 the type checker ensures the match is *exhaustive*.
 If you add a type to the union without its `case`,

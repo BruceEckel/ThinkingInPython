@@ -12,7 +12,7 @@
 
 [Variables and References](../../Chapters/02_Foundations--Tour.md#variables-and-references) shows that assignment copies a reference, not the list.
 A slice builds a new list object, so `a` and `c` stop sharing.
-Compare what `b` and `c` are bound to before you explain the difference.
+Check which of `b` and `c` names the same list as `a` before you explain the difference.
 
 <details>
 <summary>Solution</summary>

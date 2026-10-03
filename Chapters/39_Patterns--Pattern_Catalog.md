@@ -272,4 +272,4 @@ Python includes the piece their inventors set out to supply.
 | [*Flyweight*](35_Patterns--Flyweight.md#python-uses-flyweights) | Interned strings and cached small integers |
 
 Subtracting Python's share leaves the intent, not the structure.
-Each link leads to the section that makes that subtraction for its pattern.
+Each link leads to the section that subtracts Python's share from its pattern.

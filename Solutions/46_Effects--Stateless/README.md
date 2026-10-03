@@ -95,7 +95,7 @@ interchangeable because none of them appears in the Effect. Adding
 `read()` to the protocol changed which classes qualify, and `supply()`
 still picks among them the same way.
 
-**Supply under the protocol's type.** `as_type(Console)` is doing quiet work in both calls, and the work is
+**Supply under the protocol's type.** `as_type(Console)` does quiet work in both calls, and the work is
 static. `supply()` reads the Ability from the declared type of its
 argument, so `supply(scripted)` alone builds a handler for
 `Need[Scripted]` rather than the `Need[Console]` that
@@ -196,8 +196,8 @@ run(supply(Console())(greet_all)(["Alice", "Bob"]))
 #: Hello, Bob!
 ```
 
-**Fix the signature, not the body.** The body never changes. `greet_all()` was already doing the right
-thing. Its signature was describing a different function.
+**Fix the signature, not the body.** The body never changes. `greet_all()` already did the right
+thing. Its signature described a different function.
 
 What `greet_all()`'s callers must now declare is the point of the exercise. Before,
 `greet_all()` claimed to need nothing, so a caller could run it with no
@@ -205,7 +205,7 @@ environment: `run(greet_all(names))`. Now every caller has two
 options, the same two `greet()`'s callers have. Supply a `Console`,
 ending the requirement, or declare `Need[Console]` in its own return
 type and pass the requirement further up. No third option exists,
-which is what makes the dependency visible. The requirement appears in
+which makes the dependency visible. The requirement appears in
 the signature of every function between the one that uses the `Console`
 and the one that supplies it, and the type checker refuses to let any of them
 stay silent.
@@ -418,7 +418,7 @@ a test has to construct one and read `log.entries` afterward. As a
 `Protocol`, `Log` is a shape, and a single `Recorder` can have that
 shape and the `Console` shape at once.
 
-**Supply one object under two types.** The two `as_type()` calls are what make one object answerable to two
+**Supply one object under two types.** The two `as_type()` calls make one object answerable to two
 requests. `supply()` reads the Ability from each argument's declared
 type, so `supply(recorder, recorder)` builds a handler for
 `Need[Recorder]`, an Ability neither Effect requests. Each wrapper
@@ -443,7 +443,7 @@ are actions, so the test decides what performing them means.
 <details>
 <summary>Where to look</summary>
 
-[One Effect, Many Environments](../../Chapters/46_Effects--Stateless.md#one-effect-many-environments) shows `holds()` run against a table of materials and nailers by `parametrize`.
+[One Effect, Many Environments](../../Chapters/46_Effects--Stateless.md#one-effect-many-environments) shows `parametrize` running `holds()` against a table of materials and nailers.
 Define a `Metal` value whose strength exceeds the robotic nailer's force, and add one row for each nailer.
 Consider what `holds()` asks for by type, and whether a new instance of that type changes the request.
 
@@ -538,7 +538,7 @@ and a version that also constructs its own `Nailer` needs all six.
 <summary>Where to look</summary>
 
 [Layering Handlers](../../Chapters/46_Effects--Stateless.md#layering-handlers) shows a default supplied under a more specific handler, and [Abilities Are Not Special](../../Chapters/47_Effects--Stateless_in_Practice.md#abilities-are-not-special) covers `handle()`.
-Write a handler function whose parameter is annotated `Need[Console]` and whose body returns a new instance of the class the request carries in `ability.t`.
+Write a handler function that takes a `Need[Console]` parameter and returns a new instance of the class the request carries in `ability.t`.
 Wrap it with `handle()`, then compare what runs against what the annotation tells the type checker.
 
 <details>
@@ -633,7 +633,7 @@ Neither view is wrong about what it describes. `isinstance()` cannot
 test a type argument: `Need[Clock]` and `Need[Console]` are the same
 runtime class, so no runtime check tells the two apart. The annotation
 is the only place the distinction exists, and `handle()` uses the annotation
-for matching but cannot enforce the distinction. The gap is real. A handler like
+for matching but cannot enforce the distinction. A handler like
 `default()` genuinely handles more than its type says, and one that
 assumes `ability.t` is a `Console` receives a `Clock` with
 nothing to stop it.
@@ -658,7 +658,7 @@ nothing to stop it.
 
 [Nothing Runs Yet](../../Chapters/46_Effects--Stateless.md#nothing-runs-yet) shows that calling a generator function builds an Effect without running its body, and [Why `yield from`](../../Chapters/46_Effects--Stateless.md#why-yield-from) explains what the keyword does.
 Ask whether a discarded generator breaks any rule `ty` or `ruff` checks.
-For the second case, read both diagnostics and ask what the function has become once its only `yield from` is gone, and whether the next line uses the dropped value.
+For the second case, read both diagnostics and ask what the function has become once it loses its only `yield from`, and whether the next line uses the dropped value.
 
 <details>
 <summary>Solution</summary>
@@ -1135,7 +1135,7 @@ fix is either to declare the failure or to catch it, right there.
 
 [When Two Implementations Match](../../Chapters/46_Effects--Stateless.md#when-two-implementations-match) explains why `supply()` takes the first argument that satisfies the request.
 Predict from argument order, since the first match wins.
-Give each implementation its own `Protocol` with a differently named method, and the type checker rejects an implementation that lacks the method the Effect requests.
+If you give each implementation its own `Protocol` with a differently named method, the type checker rejects an implementation that lacks the method the Effect requests.
 Then check what happens when two classes share one method name.
 
 <details>
@@ -1235,9 +1235,9 @@ Effect per `Protocol`. The two `Protocol`s no longer overlap, so
 neither implementation satisfies both, and each Effect names the
 `Protocol` it needs.
 
-That change turns the coin flip into a diagnostic. Add one
+That change turns the coin flip into a diagnostic. If you add one
 more line to the end of the listing, handing `to_log` the object that
-prints instead of the one that records, and `ty` rejects it before the
+prints instead of the one that records, `ty` rejects it before the
 program runs:
 
 ```text
@@ -1250,15 +1250,15 @@ info: type `Terminal` is not assignable to protocol `Recorder`
 info: └── protocol member `record` is not defined on type `Terminal`
 ```
 
-The second `info` line is the part worth reading. The type checker
-names the missing method rather than the missing type, and that is
+In the second `info` line, the type checker names the missing
+method rather than the missing type, and that is
 what structural typing means: `Terminal` fails not because of what it
 is but because of what it does not do.
 
 One limit remains. Distinct method names remove the ambiguity *between*
 abilities. They do nothing about two implementations of the *same*
-ability. Add a second recorder, an `Audit` that also defines
-`record()`, and `supply(capture, audit)` is ambiguous again by argument
+ability. If you add a second recorder, an `Audit` that also defines
+`record()`, `supply(capture, audit)` is ambiguous again by argument
 order, with no diagnostic.
 [When Two Implementations Match](../../Chapters/46_Effects--Stateless.md#when-two-implementations-match)
 gives its advice in two halves for that reason. No type can enforce

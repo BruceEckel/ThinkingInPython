@@ -231,7 +231,7 @@ Each `case` names its member through the class, as in `MouseAction.APPEARS`.
 A dotted name compares the event with that member,
 while a bare `APPEARS` would be a capture pattern that matches every event
 ([Pattern Matching](13_Techniques--Pattern_Matching.md#a-bare-name-captures-a-dotted-name-compares)).
-`Waiting.next()` returns `MouseTrap.luring` although `MouseTrap` is defined further down the file.
+`Waiting.next()` returns `MouseTrap.luring` although the `class MouseTrap` statement comes further down the file.
 Python looks up a name inside a function when the function runs,
 not when its `def` executes.
 By the time anything calls `next()`,
@@ -273,7 +273,7 @@ the empty base and the `NotImplementedError` base report it at the call.
 The `match` statements inside `next()` work,
 but a machine with many states means many `match` statements,
 spread across many classes.
-Another approach puts a table inside each `State` object,
+The second version puts a table inside each `State` object,
 listing the next state for each input.
 A state's table cannot sit in that state's class body,
 because the entries name the other states,
@@ -409,7 +409,7 @@ expect(RuntimeError, trap2.run_all, [MouseAction.ESCAPES])
 ```
 
 The nine moves produce the first version's output, line for line.
-The source is what changed: with many `State` classes to maintain,
+The source differs: with many `State` classes to maintain,
 the tables read more easily than the `match` statements.
 
 ### An Unexpected Input
@@ -945,8 +945,7 @@ An action that must run on every entry into one state belongs in that state's `r
 written once; sounding a chime whenever the trap reaches `Holding` is such an action.
 
 Inside that design, `match` statements and per-state tables differ in which code handles an unrecognized input.
-With `match`, each state's `case _` sets its own policy,
-in the method you are reading.
+With `match`, each state's `case _` sets its own policy, in the method you read.
 With tables, `TableState.next()` sets one policy for every state,
 and each class shrinks to its `run()`.
 The tables read better as the states multiply,

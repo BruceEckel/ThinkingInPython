@@ -3,7 +3,7 @@
 > A loop needs the next item and has no reason to care where that item is stored.
 > An *Iterator* supplies the item and keeps the storage out of sight.
 
-Code written against an *iterator* does not care whether the data came from a list,
+Code written against an *iterator* does not care whether the data comes from a list,
 a file, a database cursor, or a computation.
 It asks only for the next item.
 That is the communication-first design [Design Patterns](21_Patterns--Design_Patterns.md#design-principles)
@@ -417,7 +417,7 @@ along with what goes wrong when two threads call `next()` on the same iterator.
 ## Delegating with `yield from`
 
 A generator can delegate part of its work to another iterator using `yield from`.
-The delegation yields every value that iterator produces, in turn,
+`yield from` yields every value that iterator produces, in turn,
 as if the outer generator had written the loop itself:
 
 ```python
@@ -719,7 +719,7 @@ describes this dissolution.
 
 Written in Python, the four GoF *Iterator* methods show what `first()` and `current_item()` ask of a source.
 The listing names GoF's `Next()` `advance()`,
-so `advance()` cannot be mistaken for Python's `next()`.
+so a reader cannot confuse `advance()` with Python's `next()`.
 Over a list the four are unremarkable.
 `first()` resets an index, `is_done()` compares it to `len()`,
 and `current_item()` reads without consuming.
@@ -785,7 +785,7 @@ print(stream.seen)
 and it drives any type with those four methods,
 because `GoFIterator` is a [protocol](20_Patterns--Rethinking_Objects.md#protocols)
 rather than a base class.
-The first pass spent the generator,
+The first pass spends the generator,
 yet `first()` rewinds and `traverse()` produces the same three values.
 
 `seen` is how.
@@ -793,8 +793,8 @@ yet `first()` rewinds and `traverse()` produces the same three values.
 and keeps every item it reads.
 `current_item()` then indexes the cache instead of touching the source,
 so it reports a value without advancing.
-Look at the last line of output.
-By the time all four methods work, `seen` holds the entire stream.
+The last line of output shows that by the time all four methods work,
+`seen` holds the entire stream.
 The interface needs more than a buffer: it rebuilds the list.
 
 That is the cost the pattern hides.
@@ -871,11 +871,11 @@ so an ordinary end of stream reads like a bug somewhere else.
 Only a bare `next()` hands you a `StopIteration`.
 With a default, `next()` returns the default,
 and every other construct here absorbs the exception.
-`yield from source` ends its delegation when the source runs out.
+`yield from source` stops delegating when the source runs out.
 It passes each value through unchanged, though,
 so per-item work such as doubling needs a loop.
 That is why `doubled_ok()` uses `for`,
-and the loop absorbs the exception as every loop in this chapter has.
+and the loop absorbs the exception as every loop in this chapter does.
 The fix is almost never a `try`.
 Let the loop do the asking.
 

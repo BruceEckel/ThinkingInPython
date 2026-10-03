@@ -727,7 +727,7 @@ check fails: `damaged` still prints `Stars(13)` after `f1()` raises a
 <summary>Where to look</summary>
 
 [Self Registration](../../Chapters/27_Patterns--Factory.md#self-registration) fills the registry from `__init_subclass__()`, which runs when a `class` statement executes.
-A class registers itself only if its module has been imported, so a module that nothing imports contributes nothing.
+A class registers itself only when its module runs, so a module that nothing imports contributes nothing.
 To restore the old key list, make `registry_demo.py` import `extra_shapes`, and read [Hazards of Self Registration](../../Chapters/27_Patterns--Factory.md#hazards-of-self-registration) for why that import needs a comment for the linter.
 
 <details>
@@ -1301,7 +1301,7 @@ factory that should build only leaf classes needs a further filter,
 > Add a `Hexagon` to `protocol_registry.py` that satisfies `Shape` but carries no `@make.register`,
 > and show what `make("Hexagon")` does.
 > Then write a check that reports every class in the module that satisfies `Shape` and is missing from `make.registry`,
-> so the forgotten decorator is found before any `make()` call.
+> so you find the forgotten decorator before any `make()` call.
 > `@runtime_checkable`, which [*Surrogate*](../../Chapters/26_Patterns--Surrogate.md#proxy)
 > shows with `isinstance()`,
 > also lets `issubclass()` test a class against a Protocol whose members are all methods.
@@ -1432,8 +1432,8 @@ at `@make.register`. The two checks cover each other: the checker
 rejects a decorated class that does not fit, and `unregistered()`
 reports a fitting class that is not decorated. `issubclass()`
 against a Protocol also works only when every member is a method;
-a Protocol with a data attribute raises a `TypeError` from
-`issubclass()`, and `isinstance()` on an instance is the fallback.
+if the Protocol has a data attribute, `issubclass()` raises a
+`TypeError`, and `isinstance()` on an instance is the fallback.
 `unregistered()` also sees one namespace at a time, so a plugin module
 must run it over its own `globals()`.
 
@@ -1445,7 +1445,7 @@ must run it over its own `globals()`.
 
 > Fill `PROTOTYPES` in `prototype_registry.py` by decoration instead of a table literal.
 > Write a `@prototype(name)` decorator for a function that builds and returns the `Monster`,
-> so that each decorated function's result is stored under `name`.
+> so that the decorator stores each decorated function's result under `name`.
 > Explain why the decorator takes the name as an argument rather than reading the function's `__name__`:
 > write that version and read what `ty` reports.
 > Then say what the decorated form gains over the table and what it costs.
@@ -1553,8 +1553,8 @@ back unchanged. The table is empty at its declaration and full by the
 time `spawn()` runs, because each `@prototype` line executes as the
 module loads, the same timing the chapter's `registry.py` relies on.
 
-**Take the key as an argument.** The name is an argument because the builder's own name is not
-available to the type checker. `Builder` is a `Callable`, and a
+**Take the key as an argument.** The name is an argument because the type checker cannot
+see the builder's own name. `Builder` is a `Callable`, and a
 `Callable` declares only how you call it, not that it carries a
 `__name__`. Writing `PROTOTYPES[build.__name__] = build()` draws:
 
@@ -1570,7 +1570,7 @@ checks with `ty`. Passing the name also frees the key from the
 function's name, so you can call the builder `make_goblin()` while
 the key stays `"goblin"`.
 
-What the decorated form gains is the same openness the registries
+The decorated form gains the same openness the registries
 gain: any module can define a prototype, with its name beside its
 definition, and `PROTOTYPES` needs no edit. The key type widens from
 the chapter's `Kind` to `str` for the same reason: an open table
@@ -1579,7 +1579,7 @@ cannot list its names in advance. The builder is also a function, so
 needs one that nothing has touched. The costs are the table literal
 becoming a decorator plus a function for each monster, the name
 repeated at every definition, and the two failures the chapter
-attached to registration: an undecorated builder is absent from the
+attaches to registration: an undecorated builder is absent from the
 table, with a `KeyError` from `spawn()` that names the key and not
 the builder, and a builder in an unimported module never runs. For two monsters in one
 file, the table literal says the same thing in fewer lines.

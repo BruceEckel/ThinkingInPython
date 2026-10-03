@@ -47,7 +47,7 @@ Most programmers call `__init__()` the constructor,
 since it does the job of constructors in other OOP languages.
 This book follows that practice.
 
-Python calls the constructor automatically during object creation.
+Python calls the constructor automatically when it creates an object.
 In the demo, creating an object looks like calling a function named after the class.
 
 Ordinary methods require a reference to the current object.

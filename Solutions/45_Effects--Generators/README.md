@@ -226,12 +226,12 @@ the generator describes the conversation, and the driver interprets it.
 Swapping one interpreter for another leaves the description untouched.
 
 **Find the answer for each request.** The two drivers differ in the property they rely on. The dictionary
-driver looks each answer up by the request, so it answers correctly no
-matter what order the questions arrive in, and it answers a repeated
+driver looks each answer up by the request, so it answers correctly in
+whatever order the questions arrive, and it answers a repeated
 question the same way twice. The iterator driver goes by
-position, so it depends on the generator asking the questions the
-driver has replies for, in that order. Both satisfy the same type. The
-type says what travels, not what the driver knows.
+position, so it depends on the generator asking the questions for
+which the driver has replies, in that order. Both satisfy the same
+type. The type says what travels, not what the driver knows.
 
 **Keep the two endings apart.** One detail in `drive_in_order()` earns its comment. `next(answers)` sits
 outside the `try` because the `except StopIteration` meant for the
@@ -269,7 +269,7 @@ Keeping the two meanings apart is a one-line discipline: put inside the
 <details>
 <summary>Where to look</summary>
 
-[The Send Channel](../../Chapters/45_Effects--Generators.md#the-send-channel) follows each sent value to the delegated generator that is suspended at that moment.
+[The Send Channel](../../Chapters/45_Effects--Generators.md#the-send-channel) follows each sent value to the delegated generator suspended at that moment.
 Count how many values one `collect()` consumes, then count how many the loop supplies in total.
 Write the printed lines before you run the script, and note which sends produce one line and which produce two.
 
@@ -324,7 +324,7 @@ except StopIteration:
 #: both() is exhausted
 ```
 
-**Count the values the collectors need.** The prediction to write down is that the five sends do not divide
+**Count the values the collectors need.** The five sends do not divide
 evenly among three collectors. Each `collect()` consumes two values, so
 the three collectors need six, and the loop supplies five. `gamma`
 stays suspended at its second `yield` until the `send(6)` after the
@@ -398,9 +398,9 @@ ask(question = 'color') -> answer = 'blue'
 Both results describe the same mistake: calling a generator function
 produces a description rather than a conversation. `interview()` builds
 a generator object and stops. Nothing ever calls `next()` or `send()`
-on that object, so its three questions are never asked. The final line
-interpolates the object's repr into the sentence where an answer
-belonged.
+on that object, so the generator never asks its three questions. The
+final line interpolates the object's repr into the sentence where an
+answer belonged.
 
 The type checker told you more. Its message names the two types and
 points at the assignment that mismatches them, and that assignment is
@@ -627,7 +627,7 @@ def machine() -> Generator[Report, Event]:
 <summary>Solution</summary>
 
 If you write `stock = STOCK` instead of copying with `dict(STOCK)`,
-each sale changes the module-level table that every machine starts from.
+each sale changes the module-level table from which every machine starts.
 After three `"12"` sales, by any mix of machines,
 a fresh `machine()` answers the next `"12"` order with `UNAVAILABLE`.
 The `Final` annotation forbids rebinding the name, not changing the dictionary,

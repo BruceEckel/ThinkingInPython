@@ -423,7 +423,7 @@ object safe.
 
 [Intrinsic and Extrinsic State](../../Chapters/35_Patterns--Flyweight.md#intrinsic-and-extrinsic-state) separates what a piece is (color and kind) from where it stands.
 Share the first through a `@cache` factory keyed on color and kind, and keep the second as the `dict` key.
-A capture or a promotion then only changes which shared `Piece` a square refers to.
+A capture or a promotion then changes only which shared `Piece` occupies a square.
 
 <details>
 <summary>The shape</summary>
@@ -564,7 +564,7 @@ particular knight on a square. A capture removes a position from the
 board, and the twelve `Piece` objects remain however many captures
 follow.
 
-**Promote by switching flyweights.** `promote()` swaps which flyweight a square points to, because a frozen
+**Promote by switching flyweights.** `promote()` points a square at a different flyweight, because a frozen
 `Piece` cannot change its color or kind. `piece(current.color, kind)`
 looks up (or builds) a different shared `Piece`, and the board points
 at that one instead.
@@ -583,7 +583,7 @@ at that one instead.
 <summary>Where to look</summary>
 
 [A Pool That Does Not Leak](../../Chapters/35_Patterns--Flyweight.md#a-pool-that-does-not-leak) holds its flyweights in a `WeakValueDictionary` behind a factory function.
-Apply that shape to `Color`, and remember that a weak reference needs a slot for it, which `record()` does not pass through.
+Apply that shape to `Color`, and remember that a weak reference needs a slot for it, which `record()` does not forward.
 To see what the rewrite gives up, compare how callers construct a `Color` here with [Interning in the Constructor](../../Chapters/35_Patterns--Flyweight.md#interning-in-the-constructor).
 
 <details>
@@ -662,17 +662,17 @@ function, `make_color()`, and a `WeakValueDictionary` for the pool.
 `__eq__()`, and `__hash__()`, as the record `Color` in
 `interned_color.py` does. This `Color` writes the `dataclass` call in full for
 the reason `weak_pool.py`'s `Name` does: a weak reference needs
-`weakref_slot=True`, which `record()` does not pass through.
+`weakref_slot=True`, which `record()` does not forward.
 
 **Empty the pool on release.** Once `del` drops every
 reference to the fifty-shade palette and both crimson names, nothing
 keeps those `Color` objects alive, and the pool empties itself with no
 explicit cleanup.
 
-The rewrite gave up the constructor syntax and the guarantee that came
-with it. `Color(220, 20, 60)` still runs, but it skips the pool and
+The rewrite gives up the constructor syntax and the guarantee that
+comes with it. `Color(220, 20, 60)` still runs, but it skips the pool and
 builds a second object equal to the pooled one, the same bypass a
-direct `Tile(...)` makes in the chapter. Weak references did not force
+direct `Tile(...)` makes in the chapter. Weak references do not force
 that trade. `__new__()` can look in a `WeakValueDictionary` as easily
 as in a `dict`, as
 [Choosing a *Flyweight* and Its Pool](../../Chapters/35_Patterns--Flyweight.md#choosing-a-flyweight-and-its-pool)
@@ -799,10 +799,11 @@ def test_out_of_range_component_raises() -> None:
         Color(0, -1, 0)
 ```
 
-**Validate before the pool lookup.** The check runs first in `__new__()`, before the pool lookup, so an
-out-of-range component raises a `ValueError` before `__new__()` can
-find a pooled instance or build a new one. No invalid `Color` is ever
-pooled or returned. That check is the same *parse, don't validate* move
+**Validate before the pool lookup.** The check runs first in `__new__()`, before the pool lookup, so
+`__new__()` raises a `ValueError` for an out-of-range component before
+it can find a pooled instance or build a new one. Every `Color` that
+`__new__()` pools or returns has in-range components. That check is
+the same *parse, don't validate* move
 [Data Classes as Types](../../Chapters/12_Techniques--Data_Classes_as_Types.md#parse-dont-validate)
 makes with `__post_init__()`. Here the class validates in `__new__()`
 instead, because interning must intercept construction.
@@ -888,20 +889,20 @@ expect(ValueError, parse_map, "?")
 ```
 
 **Let the enum hold the pool.** `SPECS`, `tile()` and `to_symbol()` all disappear. The member tuples
-are the spec table, and `Tile(s)` is the pool lookup. The
-value-to-member table the metaclass builds performs the runtime
-membership check `to_symbol()` does by hand.
+are the spec table, and `Tile(s)` is the pool lookup. `Tile(s)` checks
+membership at runtime against the value-to-member table the metaclass
+builds, the check `to_symbol()` does by hand.
 
-The type checker still catches what the `Literal` version caught
+The type checker still catches what the `Literal` version catches
 where the mistake can still occur. A `match` over `Tile` that leaves out a
 member draws the same `invalid-return-type` as a `match` over `Symbol`
-that leaves out a symbol. The drift the `SPECS` annotation guarded
-against, a key that `Symbol` does not list, can no longer happen,
+that leaves out a symbol. The enum rules out the drift against which
+the `SPECS` annotation guards, a key that `Symbol` does not list,
 because the enum declares the set once instead of twice.
 
 The enum adds one check. A misspelled or missing member, such as
 `Tile.DOOR`, is an `unresolved-attribute` error. The `Literal` version
-never checked the matching mistake: `@cache` hides `tile()`'s `Symbol`
+misses the matching mistake: `@cache` hides `tile()`'s `Symbol`
 parameter from callers, so `tile("+")` passes the type checker and
 fails at runtime with a `KeyError`.
 
@@ -910,8 +911,8 @@ versions. The type checker passes `Tile("?")`, and the call raises a
 `ValueError`.
 
 The enum gives up the moment of failure. `to_symbol()` raises a
-`KeyError` at a named boundary the chapter can point at. `Tile("?")`
-raises a `ValueError` from deep inside `parse_map()`'s comprehension.
+`KeyError` at a named boundary. `Tile("?")` raises a `ValueError`
+from deep inside `parse_map()`'s comprehension.
 If the boundary matters, keep a `to_tile()` wrapper that catches the
 `ValueError` and re-raises it with the offending line and column.
 

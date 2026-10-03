@@ -139,7 +139,7 @@ A profiler answers a broad question about the whole program.
 Sometimes you have a narrow one:
 how many times does this function run during a request,
 and does that branch run at all?
-A counter added to the function changes the code you are studying,
+A counter added to the function changes the code you study,
 and a full profiler costs more than the answer is worth.
 
 `sys.monitoring` ([PEP 669](https://peps.python.org/pep-0669/))
@@ -246,11 +246,10 @@ print(calls["used"], calls["unused"])
 
 Returning `monitoring.DISABLE` tells the interpreter to stop reporting this event at this location until someone calls `restart_events()`.
 `used()` ran a thousand times and the callback ran for it once.
-That makes coverage measurement affordable: the question is "was this reached,"
-so the second answer is worthless,
+`DISABLE` makes coverage measurement affordable:
+the question is "was this reached," so the second answer is worthless,
 and after the first hit the monitored code returns to full speed.
 
-The trade against a profiler is the usual one.
 A profiler gives you a ranked table with no code to write.
 `sys.monitoring` gives you one number about one function,
 and that is the better tool when you know which function matters and the profiler's overhead changes the answer.
@@ -328,7 +327,7 @@ and an optimization tuned to toy input can behave badly in production.
 `timeit` also turns the garbage collector off while it measures,
 so its runs stay repeatable.
 For a benchmark that allocates heavily, that hides a cost production pays,
-so pass `setup="gc.enable()"` when collection pauses are part of what you are comparing.
+so pass `setup="gc.enable()"` when collection pauses are part of what you compare.
 
 ### Numbers on Your Machine {#numbers-on-your-machine}
 
@@ -401,9 +400,9 @@ If it's noticeably less, buying new hardware might be a quick win.
 
 ## The Tail-Calling Interpreter
 
-The tail-calling interpreter is chosen when CPython is built,
+The tail-calling interpreter is a build-time choice,
 and nothing at run time turns it on or off.
-Since 3.14, CPython can be built so that each bytecode instruction is a small C function that ends by calling the function for the next instruction,
+Since 3.14, a CPython build can make each bytecode instruction a small C function that ends by calling the function for the next instruction,
 in place of one large C `switch` that dispatches every instruction.
 The C compiler turns each of those calls into a jump,
 and the loop that runs Python bytecode gets faster.
@@ -436,7 +435,7 @@ applies to CPython's own developers too.]
 The JIT in the next section stacks on top of this speedup.
 The JIT compiles the hot paths,
 the tail-calling interpreter runs everything else faster,
-and the macOS figure in that section is measured against a tail-calling build.
+and the macOS figure in that section uses a tail-calling build as its baseline.
 
 ## The CPython JIT
 
@@ -510,7 +509,7 @@ On the `pyperformance` suite,
 3.15 measures 7-8% faster on x86-64 Linux against the standard optimized build,
 and 11-12% faster on AArch64 macOS against the tail-calling interpreter.
 Those are geometric means over dozens of benchmarks,
-and the What's New that reports them is still marked as a draft.
+and the What's New that reports them is still a draft.
 The report sets aside one microbenchmark, `unpack_sequence`,
 and the rest range from roughly 15% slower to more than twice as fast,
 so the mean predicts your program poorly.
@@ -1192,8 +1191,8 @@ The called form, `@record(slots=False)`,
 is for the class that must keep a `__dict__`,
 and dropping the slots takes a visible flag rather than a missing option.
 The two forms follow [Decorators With Optional Parentheses](14_Techniques--Decorators.md#decorators-with-optional-parentheses):
-`cls` is `None` when the decorator is called with arguments,
-and the two `@overload` declarations tell the checker which form it is reading.
+`cls` is `None` when you call the decorator with arguments,
+and the two `@overload` declarations tell the checker which form it reads.
 The test is `cls is None` rather than `callable(cls)`,
 since a class is callable.
 A class decorated with `@record` behaves like any frozen data class,
@@ -1770,10 +1769,10 @@ A profiler finds the slow spots without guessing,
 and it also answers a question the rest of this list assumes you already know:
 is the program spending its time computing, or waiting?
 A program mostly waiting on a database, a socket, or a subprocess is I/O-bound,
-and steps 2 through 9 below will not help it much.
+and steps 2 through 9 below do not help it much.
 Skip to step 10 and restructure around `asyncio` instead.
 A program mostly consuming CPU is compute-bound,
-and the list below is written for that case, cheapest change first.
+and the list below targets that case, cheapest change first.
 Every performance optimization costs something in effort, complexity,
 or dependencies.
 Work down this list from the cheapest change to the most involved,

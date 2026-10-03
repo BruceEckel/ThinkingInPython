@@ -139,8 +139,7 @@ and nothing in the language checks that the function it wraps is referentially t
 ## Automatic Parallelism
 
 A pure function is automatically parallelizable.
-Each call's answer comes from its arguments alone,
-so no call can affect another.
+Each call's answer comes from its arguments alone, so no call affects another.
 The calls can run in any order, on any schedule, on any number of cores,
 and the answers stay the same.
 
@@ -396,8 +395,8 @@ It shrinks its failure down to the smallest code point outside that agreement,
 `'\x80'`, the first character UTF-8 encodes in two bytes instead of one.
 Decoding those two bytes as Latin-1 returns two characters where one went in,
 so the round trip returns a different string.
-That code point is the unusual Unicode the hand-written loop's alphabet kept out of reach.
-Hypothesis found it by drawing from a wider alphabet,
+That code point is the unusual Unicode the hand-written loop's alphabet keeps out of reach.
+Hypothesis finds it by drawing from a wider alphabet,
 treating `decode()` as opaque throughout.
 
 `derandomize=True` seeds the search from a hash of the test function so this book gets the same answer every run,
@@ -422,7 +421,7 @@ An *oracle* states that two implementations agree:
 the simple version you can check by reading matches the fast one.
 `parallel_pure.py`'s `assert parallel == serial` makes that claim about `map()` and `pool.map()`.
 
-The mistake to avoid is a property that restates the implementation.
+Avoid a property that restates the implementation.
 Asserting `encode(text) == text.encode().hex()` tests nothing,
 because the test and the code share any bug.
 A good law, like the roundtrip,

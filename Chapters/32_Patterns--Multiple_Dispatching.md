@@ -169,7 +169,7 @@ Follow one duel to see which competitor each result describes.
 and calls `paper.eval_scissors(...)`.
 That call is the second dispatch.
 It resolves `paper` and runs `Paper.eval_scissors()`,
-the one method in which both types are known:
+the one method that knows both types:
 its class is `Paper` and its name says `Scissors`.
 Which competitor does that method's result describe?
 `Paper.eval_scissors()` returns `WIN`.
@@ -541,7 +541,8 @@ The test imports the two modules, not their classes.
 so one table of nine expected answers drives two independent sets of `Paper`,
 `Scissors`, and `Rock` classes.
 Each module guards its demonstration loop with `if __name__ == "__main__"`,
-so direct execution runs the loop and the test's import defines only the classes.
+so running a module directly executes the loop,
+and the test's import defines only the classes.
 
 ## Operators Dispatch Twice
 

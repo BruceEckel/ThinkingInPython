@@ -441,7 +441,7 @@ Raise your own exception that way when the caller should hear about the bad argu
 The optional `else` runs when the `try` block raises no exception,
 the same shape as the loop `else` that runs when the loop hits no `break`.
 Code in the `else` is outside the reach of the `except` clauses,
-so an exception from the follow-up work is not mistaken for the failure the handler expects.
+so no `except` clause mistakes an exception from the follow-up work for the failure it expects.
 The optional `finally` always runs, and that makes it the place for cleanup.
 A `return`, `break`,
 or `continue` inside `finally` swallows any exception in flight,

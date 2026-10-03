@@ -5,7 +5,7 @@
 > Extend `virtual_proxy.py`'s `Lazy` so it answers one cheap attribute itself,
 > a `description` string given at construction, without building `Expensive`.
 > Count the accesses it answers that way,
-> and report the count at the moment `Expensive` is built.
+> and report the count when `Lazy` builds `Expensive`.
 > Confirm that reading `description` several times builds nothing,
 > and that the first `query()` reports the count.
 
@@ -304,13 +304,13 @@ print(a._box is b._box)
 `owners` tracking how many `CowList`s point at that `Box`. `share()`
 costs almost nothing: it copies a reference and bumps a count.
 
-**Copy before a shared write.** `append()` does the copying, and only when `owners > 1`. `b.append(4)`
+**Copy before a shared write.** `append()` copies the data, and only when `owners > 1`. `b.append(4)`
 detaches `b` into its own private `Box` holding a fresh copy of the
 data, decrements the shared `Box`'s count (since `b` is no longer one
 of its owners), then appends to that private copy. Since no one called
 `a.append()`, `a` still points at the original, untouched `Box`. The
-copy happens at the first write, and only the list that writes pays
-for it.
+first write triggers the copy, and only the list that writes pays for
+it.
 
 </details>
 </details>
@@ -545,9 +545,8 @@ print("outer released:", pool.available())
 ```
 
 **Limit who creates connections.** `Pool` builds every `Connection` in its constructor, and nothing else
-creates one. Letting only `Pool` create connections is
-*Singleton*'s control over creation, with the
-limit raised from one object to `POOL_SIZE`.
+creates one. `Pool` controls creation as a *Singleton* class does, with
+the limit raised from one object to `POOL_SIZE`.
 
 **Hand out a stand-in.** The client never holds a `Connection`. `acquire()` hands back a
 `ConnectionProxy`, which forwards `query()` through `__getattr__()`

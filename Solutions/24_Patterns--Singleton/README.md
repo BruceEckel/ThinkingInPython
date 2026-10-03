@@ -14,7 +14,7 @@
 <summary>Where to look</summary>
 
 [Lazy Creation](../../Chapters/24_Patterns--Singleton.md#lazy-creation) builds the inner object on the first construction, behind a sentinel and a guard.
-Move that construction into the class body so it runs once, when the class is defined.
+Move that construction into the class body so it runs once, when Python defines the class.
 Then read [Tests, Threads, and Locks](../../Chapters/24_Patterns--Singleton.md#tests-threads-and-locks) for the failure that depends on a first call, and ask whether a first call still exists.
 
 <details>
@@ -275,7 +275,7 @@ print(only_one.val)
 The module behaves like `OnlyOne` from
 `singleton_pattern.py`: a shared, one-and-only-one `val` list that
 any part of the program can append to. The module is the single
-shared object Python caches in `sys.modules`, so the design drops
+shared object Python caches in `sys.modules`, so the solution drops
 the chapter's machinery: the wrapper class, the nested private
 class, the `ClassVar` sentinel, and the `__getattr__()` delegation.
 
@@ -454,7 +454,7 @@ print(len({id(s) for s in shared}))
 **Order only the body.** The count does not drop, because the lock guards the wrong step. A
 call to `settings()` takes two steps: `@cache` looks for a stored
 result, and, on a miss, the body runs. The lock sits inside the
-body, so it can only order the second step. All eight threads reach
+body, so it orders only the second step. All eight threads reach
 the lookup before any of them has stored anything, so all eight
 miss. Each is already committed to running the body before the
 first one takes the lock.
@@ -625,7 +625,7 @@ design, so every version of the pattern carries the trap.
 
 [One Instance in a Class Variable](../../Chapters/24_Patterns--Singleton.md#one-instance-in-a-class-variable) returns the stored instance from `__new__()`.
 When `__new__()` returns an instance of the class under construction, Python then calls `__init__()` on it.
-Count how many times that happens across the three constructions, and what each call does to `val`.
+Count how many times Python calls `__init__()` across the three constructions, and what each call does to `val`.
 
 <details>
 <summary>The shape</summary>
@@ -686,8 +686,8 @@ runs `__init__()` on it after every call to `__new__()`.
 **Reset the state on every construction.** The trace
 shows three runs. Each one rebinds `val` to a new one-item list,
 and the lists from the first two constructions are gone. The
-object is single, and its state is reset by every caller who
-constructs it.
+object is single, and every caller who constructs it resets its
+state.
 
 The chapter's listing avoids the reset by defining no `__init__()`.
 Its `__new__()` does the work, and the `None` test there separates

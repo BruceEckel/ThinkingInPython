@@ -617,10 +617,11 @@ and only one of those things exists.
 
 `HalfDone`'s omission is repairable. The `...` body makes the step
 optional, and that is the base class's decision: it declares that a
-subclass may skip this step. Declare instead that a subclass may not,
-by inheriting from `ABC` and marking `customize2()` with
-`@abstractmethod`, and Python refuses to construct `HalfDone`. The
-type checker reports the construction too, before the program runs.
+subclass may skip this step. If the base class declares instead that
+a subclass may not, by inheriting from `ABC` and marking
+`customize2()` with `@abstractmethod`, Python refuses to construct
+`HalfDone`. The type checker reports the construction too, before the
+program runs.
 No checker could catch the omission before, because
 "deliberately empty" and "forgotten" were the same code, and only
 the base class could have recorded that difference.

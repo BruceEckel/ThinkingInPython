@@ -231,7 +231,8 @@ not only to catch misspellings.
 
 If every subclass must supply a step,
 inherit from `ABC` and declare that step with `@abstractmethod`,
-as shown in [Rethinking Objects](20_Patterns--Rethinking_Objects.md#abstract-base-classes).
+as [Rethinking Objects](20_Patterns--Rethinking_Objects.md#abstract-base-classes)
+shows.
 The interpreter then refuses to instantiate a subclass that forgot it,
 and the type checker reports the attempt.
 
@@ -287,7 +288,7 @@ That is why `ApplicationFramework` has no `__init__()` and the client calls `MyA
 
 ### Substitutability
 
-This pattern depends on the [Liskov Substitution Principle](20_Patterns--Rethinking_Objects.md#liskov-substitution):
+The *Template Method* depends on the [Liskov Substitution Principle](20_Patterns--Rethinking_Objects.md#liskov-substitution):
 when code expects a base-class instance,
 an instance of a subclass must work in its place.
 The base `run()` calls `customize1()` and `customize2()`,
@@ -327,7 +328,7 @@ OnlyOnce().run()
 
 `run()` calls `customize1()` twice, and `OnlyOnce` prints once.
 The name, the parameters, and the return type all match the base,
-so `@override` is satisfied and the type checker reports nothing.
+so the type checker accepts `@override` and reports nothing.
 The base states its algorithm in the loop, not in any type:
 each pass calls the step, so each pass must perform it.
 An unexpected exception, an empty step,

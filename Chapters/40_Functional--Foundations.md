@@ -260,7 +260,7 @@ Freezing a dataclass lets it keep contents-based equality and a hash at the same
 [`@record`](18_Techniques--Performance.md#record) freezes `Point`,
 so `Point(3, 4)` can key `distances`.
 Python computes that hash from the fields, so every field must be hashable too.
-A record that holds a `list` is frozen and still raises a `TypeError` when hashed.
+Hashing a frozen record that holds a `list` still raises a `TypeError`.
 `frozen_leaky.py` in [Rethinking Objects](20_Patterns--Rethinking_Objects.md#the-immutability-solution)
 demonstrates that failure.
 Contents-based equality together with a stable hash is why a dictionary key,
@@ -388,7 +388,7 @@ print(sorted(words, key=len))
 #: ['pie', 'kiwi', 'banana', 'watermelon']
 ```
 
-Each call passes a function to another function, which does the looping.
+Each call passes a function to another function, which runs the loop.
 Returning a function is the other half of the definition.
 [Closures](#closures) covers it below.
 
@@ -418,7 +418,7 @@ The comprehension builds a finished list.
 `map()` returns an iterator you can pass to the next stage without building the list.
 A [generator expression](16_Techniques--Comprehensions.md#generator-expressions)
 is the comprehension's lazy form, and removes that difference.
-The rule of thumb is to use the higher-order form when the function already exists,
+As a rule of thumb, use the higher-order form when the function already exists,
 and the comprehension when you would write the expression inline.
 `sorted()`'s `key` has no comprehension equivalent,
 so it is a higher-order argument either way.
@@ -726,7 +726,7 @@ give a hint, usually the shape of the code, and a full answer for each exercise.
     that behaves like `withdraw()` but adds to `balance` instead of subtracting.
     Explain, the way the text does for `withdraw()`, why `deposit()` is impure.
 2.  In `dispatch.py`, add a `"*"` operator to the `operations` table backed by a new `mul()` function,
-    with no change to how `operations["*"](6, 4)` gets called.
+    with no change to how you call `operations["*"](6, 4)`.
 3.  In `closures.py`, add `quadruple = multiplier(4)` and confirm it behaves independently of `double` and `triple`,
     each holding its own `factor`.
 4.  In `compose_functions.py`, write a third small function, `square(n)`,
@@ -740,7 +740,7 @@ give a hint, usually the shape of the code, and a full answer for each exercise.
     Run `ty`, which reports nothing.
     Then add `MAX_SIZE = 200`, run `ty` again,
     and explain why the rebinding is an error while the append is not.
-    Then change the annotation so appending *is* rejected.
+    Then change the annotation so `ty` rejects the append.
 7.  In `higher_order.py`,
     replace the `map()` and `filter()` calls with comprehensions,
     and the `sorted(key=len)` call with one that sorts by last letter.

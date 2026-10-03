@@ -259,8 +259,7 @@ with expected(ValueError):
 The check runs once, in `__post_init__()`, when `NonZero(...)` builds the value.
 Every function that receives a `NonZero`, including `slope()`,
 inherits that guarantee.
-`slope()` can never divide by zero,
-so it needs no `try` and no `Result` to say so.
+`slope()` never divides by zero, so it needs no `try` and no `Result` to say so.
 
 ### Combine the First and Third
 
@@ -429,7 +428,7 @@ A function you understand today gets called by a function written next week,
 which gets called by code a colleague writes next month.
 Each step adds dependencies no signature names, and no one knows the whole set.
 
-Tracking is what is missing.
+The missing piece is tracking.
 With it you know what a function does:
 whether it is safe to run in parallel with another,
 and what happens when you call it twice in a row.
@@ -484,7 +483,7 @@ usually the edge of the program, where storage binds to an implementation.
 Changing that one binding changes the behavior of all hundred functions at once.
 A test provides an in-memory binding, production provides the real database,
 and none of the hundred functions change.
-Cross-cutting behavior gets the same treatment.
+Cross-cutting behavior works the same way.
 To add caching, tracing, or retries to every storage access,
 you insert a layer at the binding point instead of touching every call site.
 Variation concentrates at the boundary of the program,
@@ -673,8 +672,7 @@ You annotate explicitly when you want a constraint,
 such as declaring that a function must remain Effect-free.
 If another function calls `greet()`,
 the compiler adds `ask` and `tell` to that function's row automatically.
-The by-hand version makes you perform that addition yourself,
-one parameter per signature.
+The by-hand version makes you add them yourself, one parameter per signature.
 
 Something must eventually fulfill every Effect,
 and the construct that fulfills one is a *handler*.
@@ -828,8 +826,8 @@ it gets delayed binding by deferring execution.
 That deferral adds one question to every value you handle:
 is it a description or an action?
 Code that mixes the two compiles cleanly but misbehaves,
-because the imperative part runs during the description's construction,
-not at its execution.
+because the imperative part runs when the program builds the description,
+not when the runtime executes it.
 
 Libraries in this family include ZIO, Cats Effect, and Kyo in Scala,
 polysemy and effectful in Haskell, Effect in TypeScript,

@@ -101,7 +101,7 @@ edit to `Color`.
 <details>
 <summary>Where to look</summary>
 
-[A Descriptor That Learns Its Name](../../Chapters/17_Techniques--Metaprogramming.md#a-descriptor-that-learns-its-name) shows `__set_name__()` receiving the attribute name when the class is created.
+[A Descriptor That Learns Its Name](../../Chapters/17_Techniques--Metaprogramming.md#a-descriptor-that-learns-its-name) shows `__set_name__()` receiving the attribute name when Python creates the class.
 The hook runs once per descriptor instance, so a third attribute needs a third `Field()` and no new code.
 Compare `p.__dict__` with the attribute names on `Point`.
 
@@ -239,8 +239,8 @@ print(c1 is a)
 #: False
 ```
 
-**Type the result as the calling class.** The `__call__[T]` signature is the chapter's, and it is worth keeping
-here rather than simplifying to `-> Any`. It ties the return type to
+**Type the result as the calling class.** The `__call__[T]` signature is the chapter's, and this solution keeps it
+rather than simplifying to `-> Any`. It ties the return type to
 `cls`, so `CSingleton()` type-checks as a `CSingleton`, and the type
 checker still flags a misspelled attribute on the result. Two details follow from
 that annotation. `cls: type[T]` hides the fact that `cls` is a
@@ -272,7 +272,7 @@ is a separate object.
 <summary>Where to look</summary>
 
 [Making a Class Final](../../Chapters/17_Techniques--Metaprogramming.md#making-a-class-final) shows `__init_subclass__()` refusing a subclass at runtime.
-Keyword arguments in a class header are passed to `__init_subclass__()`, so give the hook a `final` parameter with a default.
+Python passes the keyword arguments in a class header to `__init_subclass__()`, so give the hook a `final` parameter with a default.
 Record each final class in a set on the base, and check `cls.__mro__` when a new subclass appears.
 
 <details>
@@ -348,7 +348,7 @@ with expected(TypeError):
 
 **Accept the header keyword.** The keywords in a class header travel to `__init_subclass__()`, so
 `final=True` in `class B(A, final=True):` arrives as a parameter of
-the hook that `B`'s creation triggers. Declaring `final` with a
+the hook Python calls when it creates `B`. Declaring `final` with a
 default, `final: bool = False`, lets every other subclass omit it.
 
 **Pass the other keywords up.** The
@@ -506,10 +506,9 @@ reports it as the terse "instance lay-out conflict." `ty` reaches the
 same conclusion from the class header alone, before anything runs, and
 points at both bases to say which pair is at fault.
 
-The difference between the two messages is worth taking from this
-exercise. The runtime message tells you something collided. The static
-one tells you which two bases collided and why, at the moment you type
-the header rather than the moment the module is first imported. The
+The runtime message tells you something collided. The static one tells
+you which two bases collided and why, at the moment you type the
+header rather than the moment Python first imports the module. The
 chapter's `metaclass_layout_conflict.py` carries the `# type: ignore`
 because that listing exists to show the `TypeError`, and a suppressed
 diagnostic is the cost of demonstrating a crash on purpose.
@@ -578,7 +577,7 @@ rather than from a `class` statement.
 
 **Assemble the class from data.** The three arguments are the name, the bases, and the namespace, the
 same three a `class` statement assembles for you. A function defined
-at module level becomes a method by landing in that namespace dict. It
+at module level becomes a method when you put it in that namespace dict. It
 needs no decoration, because a function is a descriptor: the attribute
 lookup binds it to the instance.
 
@@ -589,8 +588,8 @@ metaclass of your own.
 **Inherit the base's arithmetic.** `Celsius` inherits `float`'s arithmetic, so
 `c + 0.5` works, though the sum is a `float` rather than a `Celsius`:
 `float.__add__()` builds its result from `float`, and that is why a
-numeric subclass usually overrides every operator whose result it
-wants to keep its own type.
+numeric subclass usually overrides every operator whose result
+should keep the subclass's type.
 
 </details>
 </details>
@@ -771,7 +770,7 @@ can do anything the program can do.
 
 **Absorb the second splice.** The payload needs a little care, because `make_class()` splices
 `class_name` in twice. The first splice supplies the attack lines. The
-second lands inside the `super().__init__("...")` string literal, where
+second puts them inside the `super().__init__("...")` string literal, where
 a bare newline is a `SyntaxError` before anything runs. So the
 payload's last line opens a triple-quoted string, `Y = """`. That
 string swallows the second splice, and the trailing `#` comments out
@@ -782,8 +781,8 @@ class body has finished.
 
 **Catch the failed lookup.** The `KeyError` afterward is incidental damage, not protection.
 `namespace[class_name]` looks for a class named after the whole
-payload, which was never defined. The injected statement already ran
-before that lookup happened, so failing the lookup rescues nothing.
+payload, which the spliced source does not define. The injected
+statement ran before that lookup, so failing the lookup rescues nothing.
 Restoring the `if class_name not in cls.KNOWN_COMMANDS` check closes
 the hole at the only point that works: before `make_class()` builds
 the string.
@@ -803,7 +802,7 @@ the string.
 <details>
 <summary>Where to look</summary>
 
-[When You Still Need a Metaclass](../../Chapters/17_Techniques--Metaprogramming.md#when-you-still-need-a-metaclass) shows `__prepare__()` supplying the mapping that a class body writes into.
+[When You Still Need a Metaclass](../../Chapters/17_Techniques--Metaprogramming.md#when-you-still-need-a-metaclass) shows `__prepare__()` supplying the mapping into which a class body writes.
 Subclass `dict` and override `__setitem__()` so a repeated key returns without storing.
 For the explanation, consider which hooks run before the body and which run after it.
 
@@ -881,7 +880,7 @@ after its body has finished executing, and by then the body has run
 namespace mapping. The first function has no name pointing at it and
 no reference anywhere, so no later hook has anything to restore.
 `__prepare__()` is the only hook that sees the assignments one at a
-time, while they happen, and that is why the chapter calls it
+time, as the body makes them, and that is why the chapter calls it
 the one with no simpler substitute.
 
 </details>

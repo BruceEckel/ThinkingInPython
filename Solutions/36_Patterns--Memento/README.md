@@ -157,7 +157,7 @@ does, so it needs no special handling.
 
 **Copy the state when saving.** `save()` copies the strokes
 into an immutable `Memento` the moment it runs, so nothing later,
-erase included, can reach back and change a memento already taken.
+erase included, changes a memento already taken.
 
 **Prove the history keeps its states.** The history test shows the same safety one level up, using a
 `History` trimmed to what the test needs. The states that `History`
@@ -462,7 +462,7 @@ FAILED test_sketch.py::test_memento_ignores_later_drawing
 FAILED test_sketch.py::test_drawing_after_restore_spares_memento
 ```
 
-**Share the list on save.** The corruption is deeper than any single test expects. Because
+**Share the list on save.** Because
 `Memento.strokes` is now the same list `Sketch.strokes` points
 to, `sketch.draw("b")` after `checkpoint = sketch.save()` mutates
 `checkpoint.strokes` too. By the time `test_restore_rewinds_state`
@@ -508,7 +508,7 @@ when the assertion runs, because `draw("b")` appended to the one list
 <details>
 <summary>Where to look</summary>
 
-In [The Caretaker: a Generic History](../../Chapters/36_Patterns--Memento.md#the-caretaker-a-generic-history), `undo()` already moves the present into the future list, which is what makes redo work.
+In [The Caretaker: a Generic History](../../Chapters/36_Patterns--Memento.md#the-caretaker-a-generic-history), `undo()` already moves the present into the future list, which makes redo work.
 Build `goto()` on top of `undo()` in a loop.
 Check the distance against the length of the past before the first step, so a bad request changes nothing.
 Raise an `IndexError` for a distance out of range.

@@ -190,7 +190,7 @@ works through a case with a real motivation.
 
 Because one parameter can replace a pattern's interface and classes,
 the chapters ahead keep asking the question [Rethinking Objects](20_Patterns--Rethinking_Objects.md#guidelines)
-posed: how much of each pattern's machinery does Python still need,
+poses: how much of each pattern's machinery does Python still need,
 and how much of it becomes functions, data, and protocols?
 
 ## Pattern Taxonomy
@@ -401,7 +401,7 @@ The shaded parts are the ones whose source changes when `MdWriter` arrives,
 and the red edges are the ones the change adds.
 On the left, `Report` gains a branch and `main` gains a case.
 On the right, `Report` keeps its source,
-because the new writer satisfies the protocol and `Report` named no writer.
+because the new writer satisfies the protocol and `Report` names no writer.
 `main` still changes, since something must construct the new class.
 A registry factory ([Factory](27_Patterns--Factory.md#self-registration))
 takes that last change out too,
@@ -493,7 +493,7 @@ and the rest are here for your own designs.
     argues for composition on those grounds.
 -   *Managed Coupling*.
     Simply declaring that a design should have "low coupling" is usually too vague.
-    Coupling happens, so acknowledge it and control it:
+    Every design has coupling, so acknowledge it and control it:
     say "coupling can cause problems" and compensate for those problems with a well-considered design or pattern.
 -   *Design the communication, not the parts*.
     Alan Kay, on what object orientation was for:

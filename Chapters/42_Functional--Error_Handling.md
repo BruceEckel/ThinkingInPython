@@ -22,7 +22,7 @@ and a reviewer sees it without reading the body.
 Control flow stays local: the failure returns to the immediate caller,
 the way any value does.
 You do write a check at each step,
-but that check is where every failure gets handled.
+but that check is where you handle every failure.
 
 This material comes from my PyCon 2024 talk,
 [Functional Error Handling](https://github.com/BruceEckel/functional_error_handling).
@@ -55,7 +55,7 @@ except ValueError as e:
 
 Function calls 0-2 produce correct values,
 but the exception ends the comprehension before it produces the list,
-so `results` is never assigned.
+so the assignment to `results` never runs.
 To keep the good results you must wrap each call in its own `try`.
 That repeats the handling at every call,
 the way [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#a-value-to-check-everywhere)
@@ -443,7 +443,7 @@ def test_bind_short_circuits_a_failure() -> None:
     assert failure.bind(lambda x: Ok(x + 1)) is failure
 ```
 
-Testing confirms that the hand-written and `bind()` versions agree on every input:
+`test_composing.py` confirms that the hand-written and `bind()` versions agree on every input:
 
 ```python
 # test_composing.py
@@ -485,7 +485,7 @@ if __name__ == "__main__":
 Each lambda's parameter is the previous step's answer.
 The nesting keeps every earlier answer in scope,
 so `a` is still visible inside the inner lambda that receives `b`.
-A flat sequence of `bind()` calls cannot keep the earlier answer in scope,
+A flat sequence of `bind()` calls drops the earlier answer from scope,
 because each step's function receives one argument, the previous answer.
 
 A third input adds a third level:
@@ -534,7 +534,7 @@ and each input you add nests one level deeper.
 at the end of this chapter offers do-notation,
 a flatter alternative to this nesting.
 
-Testing confirms that `combined()` returns the correct value,
+`test_combining.py` confirms that `combined()` returns the correct value,
 or the first failure in the chain:
 
 ```python

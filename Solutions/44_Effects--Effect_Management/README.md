@@ -92,12 +92,12 @@ with a double, and the other one never notices.
 
 **Declare what the function needs.** `greet()` requires no change, and could not have required one. It
 names two capabilities it needs and calls methods on them. It never
-mentions `Console`, `input()`, `print()`, or `Scripted`, so a change of
-binding has nothing in its body to affect. That is the delayed-binding
+mentions `Console`, `input()`, `print()`, or `Scripted`, so changing the
+binding affects nothing in its body. That is the delayed-binding
 payoff: the choice of implementation moves to the call site, where a
 test can choose differently from production.
 
-**Satisfy the protocols structurally.** Notice what the type checker still enforces after the choice moves.
+**Satisfy the protocols structurally.** The type checker still enforces the protocols after the choice moves.
 `Console` inherits from nothing and declares no relationship to `Ask`
 or `Tell`, but it has the two methods with the right signatures, so it
 satisfies both protocols structurally. If you give `Console` a
@@ -342,11 +342,10 @@ from the temperature source, and the caller folds new readings into
 whatever state it keeps. That is what the chapter calls
 [pushing the Effects to the edges](../../Chapters/44_Effects--Effect_Management.md#a-program-can-never-be-pure).
 
-Notice one thing across `withdraw()` and
-`Thermometer`: the classification is not a property
-of the language feature used. A global, an instance attribute, and a
-responder list are three storage mechanisms for one idea: something
-outside the call participates in the result.
+Across `withdraw()` and `Thermometer`, the classification is not a
+property of the language feature used. A global, an instance
+attribute, and a responder list are three storage mechanisms for one
+idea: something outside the call participates in the result.
 
 </details>
 </details>
@@ -362,7 +361,7 @@ outside the call participates in the result.
 <details>
 <summary>Where to look</summary>
 
-[Make the Bad Value Impossible](../../Chapters/44_Effects--Effect_Management.md#make-the-bad-value-impossible) builds `NonZero` so that an invalid value cannot be constructed.
+[Make the Bad Value Impossible](../../Chapters/44_Effects--Effect_Management.md#make-the-bad-value-impossible) builds `NonZero`, whose `__post_init__()` rejects an invalid value.
 Write `PositiveInt` with a `__post_init__()` that checks one predicate covering both bad values.
 Then give `slope()` a `PositiveInt` parameter and see which guards have nothing left to do.
 
@@ -439,7 +438,7 @@ it. Only the division remains.
 **Fail at the construction site.** The cost moves rather than vanishing. `PositiveInt(bad)` still raises
 an exception, at the boundary where an untrusted number enters the
 program, and a caller reading from a file or a form still has to
-handle it. The count changed: one construction site instead of every
+handle it. The count changes: one construction site instead of every
 function that touches the value. Every function downstream of a
 `PositiveInt` is pure with respect to this failure, and none of them
 spends a line of code on it. Each signature says which values the
@@ -547,7 +546,7 @@ hands `sum()` a list.
 become `async` in turn, and the propagation stops only at `asyncio.run()`,
 the boundary that discharges the Effect.
 
-That propagation is Effect tracking, and it is worth naming as such.
+That propagation is Effect tracking.
 The Effect appears in the type: `ty` reports `price_of_async`'s return
 as `CoroutineType[Any, Any, float]`, not `float`. A caller that
 forgets `await` then gets a type error rather than a mysterious value.
@@ -570,7 +569,7 @@ It does not **bind the implementation later**. `asyncio.run()` chooses
 an event loop, and that choice sounds like late binding until you ask
 what it lets you swap. Choosing a loop does not let a test substitute
 a different meaning for the awaits inside: you settle what those
-awaits mean when you write the coroutine. A test that wants fake
+awaits mean when you write the coroutine. A test that needs fake
 prices still has to inject `price_of_async` itself, by the same
 hand-threading this chapter's exercise 2 measures. The event loop is a
 scheduler, not a handler.

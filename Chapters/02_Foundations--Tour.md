@@ -84,7 +84,7 @@ except NameError as e:
 #: name 'val' is not defined
 ```
 
-The body of the `if` never runs, so `val` is never bound.
+The body of the `if` never runs, so `val` stays unbound.
 Indentation shows where the assignment sits, not whether it runs.
 The type checker sees that nothing ever defines `val` and reports an error on `print(val)`,
 so `# type: ignore` tells it the mistake is deliberate.
@@ -369,7 +369,7 @@ print(10 if count is None else count)  # Keeps the 0
 ```
 
 `and` stops at its first falsy operand and returns it,
-so `items[0]` is never evaluated on the empty list.
+so Python never evaluates `items[0]` on the empty list.
 `x or default` is a common way to supply a fallback,
 and it replaces every falsy `x`:
 a legitimate `0` or `""` gets the fallback just as a missing value does.

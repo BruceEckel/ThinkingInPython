@@ -80,7 +80,7 @@ While that thread waits, the OS can run other threads,
 producing faster overall progress.
 
 Another benefit of threads emerged when more CPUs became available on a single machine.
-Threads were already designed to distribute computing resources,
+Threads already distributed computing resources,
 so more CPUs simply meant more resources to distribute
 (of course, it wasn't quite that easy).
 Adapting the threading mechanism let threads also perform ad-hoc parallelism:
@@ -191,7 +191,7 @@ asyncio.run(main())
 The first printed line proves that calling a coroutine runs nothing.
 `main()`'s first line calls `fetch("a", 0.03)`, yet no "started" line appears,
 only the type of object the call built: `coroutine`.
-The work is scheduled when `gather()` receives that object.
+`gather()` schedules the work when it receives that object.
 If you never hand that coroutine object to `gather()` (or `create_task()`),
 nothing runs, and Python points this out with a `RuntimeWarning: coroutine 'fetch' was never awaited` when the garbage collector reclaims it.
 
@@ -584,7 +584,7 @@ The shared deadline puts both failures in the group.
 The loop runs every timer due at one instant in the same turn,
 so `c` and `d` both raise their exceptions before the group's own callback runs and starts cancelling.
 If each calls `asyncio.sleep(0.03)`,
-the two timers are set a few microseconds apart,
+the two calls set their timers a few microseconds apart,
 since each call reads the clock when it runs,
 and a loop that wakes between them runs `c`'s failure,
 cancels `d` while its timer is still pending,
@@ -609,7 +609,7 @@ Keeping the task objects pays off even after a partial failure.
 so `task.exception()` returns the `ValueError` instead of raising it.
 `e` and `f` never reach their `fetched` print because the group cancels them,
 so `task.cancelled()` is `True` for both.
-A partial failure cancels whatever was still in flight.
+A partial failure cancels whatever is still in flight.
 It does not erase what already succeeded.
 
 Cancellation reaches a task by raising `asyncio.CancelledError` inside it,
@@ -1041,7 +1041,7 @@ and all three surface in `parallel_cpu.py`:
    so it must be importable from the top level of the module.
    Passing a `lambda` to `pool.map()` fails with a pickling error.
    That boundary crossing echoes [Performance](18_Techniques--Performance.md#converting-a-slow-function-to-rust)'s coarse-interface rule:
-   a million tiny results can cost more to pickle than the parallelism saved.
+   a million tiny results can cost more to pickle than the parallelism saves.
 3. `pool.map()` raises nothing itself.
    It returns a generator,
    and consuming a worker's result re-raises that worker's exception in the calling process.
@@ -1305,7 +1305,7 @@ print("threads at least 3x faster on I/O: "
 Five 50-millisecond waits finish in about the time of one.
 Each sleeping thread releases the GIL,
 so the operating system runs another thread while it waits,
-the same overlap `asyncio` achieved with suspended tasks.
+the same overlap `asyncio` achieves with suspended tasks.
 That overlap is `blocking_the_loop.py` turned inside out:
 a blocking call freezes an event loop,
 but a pool of threads absorbs blocking calls.
@@ -1647,7 +1647,7 @@ Often one thread runs both,
 because the first producer finishes before the pool picks up the second,
 but the order in which jobs enter the queue can vary with scheduling.
 Waiting for both producer futures before submitting the consumer guarantees every job is already in the queue once `consume()` starts,
-so the drain still comes out in priority order however the producers were scheduled.
+so the drain still comes out in priority order however the pool scheduled the producers.
 Collecting the producer futures and calling `result()` turns a producer's exception into one you can see,
 as [Parallelism](#what-a-process-pool-requires)'s third point describes.
 When two jobs share a priority,
@@ -2015,9 +2015,8 @@ Three different backends run inside one `TaskGroup`.
 wrapped in one `async def` so `TaskGroup` can hold it alongside the others.
 All three start together, and the block does not exit until all three finish,
 so the printed `[10, 20, 30]` holds one result from each backend.
-The event loop is doing the job it has done all chapter:
-it schedules awaitables, whatever runs underneath, a coroutine, a thread,
-or a process.
+The event loop does the job it has done all chapter: it schedules awaitables,
+whatever runs underneath, a coroutine, a thread, or a process.
 
 An `Executor` and `asyncio` give their result-that-arrives-later the same name,
 and the shared name invites one specific mistake.

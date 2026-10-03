@@ -185,7 +185,7 @@ Rounded to two places, both print `27.0`.
 
 [Inheritance](../../Chapters/07_Foundations--Classes.md#inheritance) shows `Derived.show()` printing a message and then calling `super().show(msg)`.
 Give `MoreDerived` a `show()` with the same shape and its own message.
-`show_twice()` is inherited and calls `self.show()`, so the lookup starts at the class of the object and each `super()` call moves one class up.
+`MoreDerived` inherits `show_twice()`, which calls `self.show()`, so the lookup starts at the class of the object and each `super()` call moves one class up.
 
 <details>
 <summary>The shape</summary>
@@ -356,8 +356,8 @@ message, and stores `30` on the instance.
 reads `self.total` and gets that stored value directly. No second
 `"summing"` message appears, because `total` is already computed and
 cached before `average` asks for it. If you access `average`
-first, its own body triggers `total`'s computation the same way,
-just on first use instead of in advance.
+first, its body reads `self.total`, which computes `total` the same
+way, on first use instead of in advance.
 
 </details>
 </details>
@@ -495,14 +495,14 @@ Derived().show()
 
 **Miss the base-class method.** The program prints `Base.show`. Nothing overrides anything: `shwo()` is
 a new method in the subclass, and `show()` resolves up the chain to
-`Base`. Python does not check whether a subclass method was meant to
+`Base`. Python does not check whether you meant a subclass method to
 replace a base-class method, so the misspelling is not an error.
 `shwo()` is a second method that nothing calls.
 
 **Declare the intended override.** With `from typing import override` added and the decorator
 uncommented, the program still prints `Base.show`,
 because the decorator adds no wrapper and changes no behavior. The
-type checker is where the difference shows:
+type checker reports the difference:
 
 ```text
 error[invalid-explicit-override]: Method `shwo` is decorated with

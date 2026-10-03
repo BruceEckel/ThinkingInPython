@@ -55,7 +55,7 @@ tracking is the problem the chapter raises for `withdraw()`.
 ## 2. A `"*"` operator added to the dispatch table
 
 > In `dispatch.py`, add a `"*"` operator to the `operations` table backed by a new `mul()` function,
-> with no change to how `operations["*"](6, 4)` gets called.
+> with no change to how you call `operations["*"](6, 4)`.
 
 <details>
 <summary>Where to look</summary>
@@ -262,7 +262,7 @@ a third stage: wrapping one composed function inside another
 
 [Leaving a Gap with `Placeholder`](../../Chapters/40_Functional--Foundations.md#leaving-a-gap-with-placeholder) shows how `partial()` fills arguments.
 Positional arguments given to `partial()` fill parameters from the left.
-For the second half, build a partial with a keyword argument and see where the failure appears, then consider how a positional-only parameter can be supplied.
+For the second half, build a partial with a keyword argument and see where the failure appears, then consider how a caller can supply a positional-only parameter.
 
 <details>
 <summary>The shape</summary>
@@ -313,7 +313,7 @@ the two remaining parameters stay open in order.
 `high` positionally means passing `low` and `value` first, which is
 the opposite of leaving them to the caller.
 `partial(clamp, Placeholder, Placeholder, 100)` is the version that
-works, and it is what `Placeholder` exists for.
+works, and `Placeholder` exists for that case.
 
 **Suppress the type checker's report.** The `# type: ignore` is there because `ty` finds the mistake earlier
 than the runtime does. `ty` reports `positional-only-parameter-as-kwarg`
@@ -331,13 +331,13 @@ the runtime waits for the call.
 > Run `ty`, which reports nothing.
 > Then add `MAX_SIZE = 200`, run `ty` again,
 > and explain why the rebinding is an error while the append is not.
-> Then change the annotation so appending *is* rejected.
+> Then change the annotation so `ty` rejects the append.
 
 <details>
 <summary>Where to look</summary>
 
 [Immutability in Annotations](../../Chapters/40_Functional--Foundations.md#immutability-in-annotations) contrasts `Final` with a read-only type such as `Sequence`.
-`Final` constrains what a name is bound to, and says nothing about the object's methods.
+`Final` constrains a name's binding, and says nothing about the object's methods.
 To make the append an error, choose an annotation whose type has no method that mutates.
 
 <details>
@@ -387,7 +387,7 @@ print(CONFIG)
 #: (1, 2)
 ```
 
-Adding `CONFIG.append(3)` to that version reports:
+If you add `CONFIG.append(3)` to that version, `ty` reports:
 
 ```
 error[unresolved-attribute]: Object of type `tuple[Literal[1], Literal[2]]` has no attribute `append`
@@ -481,7 +481,7 @@ back a finished list, which you can walk as many times as you like.
 <summary>Where to look</summary>
 
 [Closures](../../Chapters/40_Functional--Foundations.md#closures) introduces `make_counter()` and the `nonlocal` declaration.
-Python treats a name assigned anywhere in a function as local to that function, while a name only read is looked up in the enclosing scope.
+Python treats a name assigned anywhere in a function as local to that function, but looks up a name the function only reads in the enclosing scope.
 Remove `nonlocal`, run `ty`, then run the program, and compare where each one reports the problem.
 
 <details>

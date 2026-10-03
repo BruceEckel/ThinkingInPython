@@ -104,7 +104,7 @@ runs `shared = 100`.
 <summary>Where to look</summary>
 
 [Real Per-Object Defaults](../../Chapters/09_Foundations--Class_Attributes.md#real-per-object-defaults) shows a constructor default giving each instance its own value.
-A `@dataclass` field with a default has its generated `__init__()` assign `self.x` on every call.
+For a `@dataclass` field with a default, the generated `__init__()` assigns `self.x` on every call.
 Assign to `b.x`, build `b2`, and print both.
 
 <details>
@@ -222,7 +222,7 @@ through an instance.
 
 [A Shared Mutable Value](../../Chapters/09_Foundations--Class_Attributes.md#a-shared-mutable-value) shows two `Cart` objects appending to one list.
 The fix builds the list per instance with `field(default_factory=list)` from `dataclasses`.
-For the second half, write the bare `[]` default and see whether the class even gets defined, and when.
+For the second half, write the bare `[]` default and see whether the `class` statement even finishes, and when.
 
 <details>
 <summary>Solution</summary>
@@ -247,8 +247,7 @@ every `Cart`. Each object owns its list from birth, and `a`'s append
 cannot reach `b`.
 
 `@dataclass` refuses to build the same class written with a bare
-`items: list[str] = []`, so the shared-list bug never gets a chance to
-appear:
+`items: list[str] = []`, so the shared-list bug never appears:
 
 ```python
 # exercise_5_rejected.py
@@ -263,9 +262,9 @@ with expected(ValueError):
 #: items is not allowed: use default_factory
 ```
 
-**Fail at class definition.** The error arrives at class-definition time, not at first use, and
+**Fail at class definition.** `@dataclass` raises the `ValueError` at class-definition time, not at first use, and
 the full message ends with the remedy: `use default_factory`.
-`@dataclass` can detect the mistake because it inspects every default
+`@dataclass` detects the mistake because it inspects every default
 before generating the constructor. Nobody inspects a plain class body,
 so `shared_mutable.py`'s `Cart` builds without complaint.
 
@@ -422,7 +421,7 @@ what the write does at runtime.
 **Send the write to the class.** The fix names the class on the left. `Counting.total += 1` reads and
 writes the same class dictionary, so both instances report `2`.
 `vars(c)` is empty because the constructor writes only to the class,
-and `c.total` is the read falling back to that shared value.
+and reading `c.total` falls back to that shared value.
 
 </details>
 </details>
@@ -483,7 +482,7 @@ print(Base2.shared, Left2.shared, Right2.shared)
 three names share one list. Neither `Left` nor `Right` declares its
 own, so both names read through to `Base`, and `.append()` mutates
 what it finds there. `Left.shared is Base.shared` proves they are one
-object rather than three that happen to be equal.
+object, not three equal lists.
 
 Here the mutable-value trap of `shared_mutable.py` meets the
 inheritance rule of `class_var_inheritance.py`. Each is harmless on

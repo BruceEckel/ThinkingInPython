@@ -158,7 +158,7 @@ because `Worm` inherits the operation from the class that defines it.
 For `Chrysanthemum` the second dispatch resolves to the override,
 and for `Gladiolus` to the inherited `Flower.eat`.
 The trace shows that flower-side choice,
-which `flower_visitors.py`'s output left implicit.
+which `flower_visitors.py`'s output leaves implicit.
 
 ## The Price of the Empty Base
 
@@ -427,7 +427,7 @@ out to the visitor and back again,
 and the frames differ only in the method the return trip reaches.
 In the third frame no method on `Flower` takes part.
 One lookup in `nectar()`'s table, keyed by the flower's type, finds the answer.
-That one dispatch resolves everything *Visitor*'s two dispatches did.
+That one dispatch resolves everything *Visitor*'s two dispatches do.
 The second dispatch in the classic pattern exists not because two types are unknown,
 but because the operation must be a method on some class.
 The visitor's type stands in for the operation,

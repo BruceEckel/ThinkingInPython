@@ -117,7 +117,7 @@ It registers itself, and `create()` builds it.
 that ordinary function reads `t.value` and `t.weight` polymorphically,
 without checking the type of a piece.
 
-Testing confirms that each subclass registers itself,
+The tests confirm that each subclass registers itself,
 `create()` builds one by name,
 and `sum_value()` totals weight times the per-pound value:
 
@@ -332,7 +332,7 @@ The loop appends two of the four pieces to a bin,
 so the sixty pounds of plastic vanish from the totals the plant uses.
 "Silently drop trash on the floor" means a number that is wrong and looks right,
 not an exception to debug.
-The `match` is the statement that loses the plastic, not the parser:
+The `match` loses the plastic, not the parser:
 `__init_subclass__()` registers `Plastic` the moment its `class` statement runs,
 and without that `class` statement `create()` raises a `KeyError` at the first `Plastic:` line,
 loudly, at parse time.

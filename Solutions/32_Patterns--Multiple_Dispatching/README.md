@@ -351,14 +351,13 @@ combinations.
 
 **Guard the demonstration.** The `__main__` guard serves exercise 3, as in exercise 1.
 
-The comparison makes the chapter's point concrete. The table costs one
-class and seven dictionary rows to extend. The method version costs
-one class and five new methods, plus retrofitting a method onto every
-class that already exists. That cost only grows as you add more item
-types. The chapter therefore recommends the table by default, and
-reserves the method version for behavior that belongs to the class: a
-combination that reads the object's own state, or one a subclass
-should override while inheriting the rest.
+The table costs one class and seven dictionary rows to extend. The
+method version costs one class and five new methods, plus retrofitting
+a method onto every class that already exists. That cost only grows as
+you add more item types. The chapter therefore recommends the table by
+default, and reserves the method version for behavior that belongs to
+the class: a combination that reads the object's own state, or one a
+subclass should override while inheriting the rest.
 
 </details>
 </details>
@@ -373,7 +372,7 @@ should override while inheriting the rest.
 <details>
 <summary>Where to look</summary>
 
-[Testing Both Versions](../../Chapters/32_Patterns--Multiple_Dispatching.md#testing-both-versions) keeps one `EXPECTED` mapping that both implementations are checked against.
+[Testing Both Versions](../../Chapters/32_Patterns--Multiple_Dispatching.md#testing-both-versions) keeps one `EXPECTED` mapping and checks both implementations against it.
 Add the seven `Lizard` rows to that mapping, keyed on the player's and opponent's class names.
 A helper looks each class up by name with `getattr()` on whichever module it receives, so one mapping drives both versions and a disagreement shows up as a failure.
 
@@ -906,9 +905,9 @@ share.
 
 **Fall back to an ancestor's row.** The tolerant version walks both MROs and takes the first pair that has
 a row, so `TolerantOrigami` finds `(TolerantPaper, TolerantRock)` one
-step up on the left. What that version gives up is exactly the
-property the chapter names first: the match is no longer exact. Three
-consequences follow, and only the first is obvious.
+step up on the left. That version gives up the property the chapter
+names first: the match is no longer exact. Three consequences follow,
+and only the first is obvious.
 
 The lookup is no longer one probe. It is a nested loop over two MROs,
 so a miss now costs the product of the two depths instead of a single
@@ -1648,7 +1647,7 @@ this: `item1.compete(item2)` reads as it does in
 `paper_scissors_rock.py`, where four method definitions per class
 stand behind it. A table of callables keeps the method-call syntax.
 
-**Wrap the constant answers.** `always()` is what keeps the table readable. It returns a closure
+**Wrap the constant answers.** `always()` keeps the table readable. It returns a closure
 over one `Outcome` that ignores both operands, so the seven
 combinations with a fixed answer stay one line each and still read as
 a table of answers. Only the cells that need code look like code.
@@ -1908,7 +1907,7 @@ print(Project2(seed=3).meeting(group_size=5))
 
 **Look up both types at once.**
 The weapons shrink to six empty classes,
-and `Weapon.compete()` makes one lookup keyed on both types,
+and `Weapon.compete()` looks up both types in one probe,
 as in `paper_scissors_rock_table.py`.
 
 **Lay the answers out as a grid.**

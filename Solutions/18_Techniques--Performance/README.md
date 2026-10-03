@@ -199,7 +199,7 @@ print(f"lazy peak under 1% of one list: "
 
 **Skip the intermediate list.** `one_list()` filters `x * x` directly instead of first building a
 `squares` list and then an `evens` list from it, so the
-million-element `squares` list is gone. Peak memory drops to about
+million-element `squares` list disappears. Peak memory drops to about
 half of the two-list version's. That is as close as an eager version
 gets.
 
@@ -264,15 +264,15 @@ print(noisy(3))
 The `"computing noisy(3)"` message prints only once, on the first
 call. Every later call with the same argument returns the cached
 result directly, without running the function body again, so the
-print statement (and any other side effect) never happens a second
+`print()` call (and any other side effect) does not run a second
 time. Skipping the body is the reason to cache only pure functions.
 A cache assumes that calling the function again is unnecessary,
 because the answer cannot have changed and nothing observable
 happens during the call besides computing that answer. An impure
-function breaks that assumption. Any side effect the function
-performs, such as printing, writing a file, or incrementing a
-counter, occurs on the first call with a given argument, and
-the cache silently skips it on every repeat.
+function breaks that assumption. The function performs any side
+effect, such as printing, writing a file, or incrementing a
+counter, on the first call with a given argument, and the cache
+silently skips it on every repeat.
 
 </details>
 </details>
@@ -403,8 +403,8 @@ alongside it.
 `('x', 'y')`, inherited from `Point`, so reading that attribute makes
 the subclass look slotted while it still carries a `__dict__`.
 
-The memory saving is quietly lost. Every `Point3D` pays for both the
-two slots and a dictionary. A subclass of a slotted class must
+`Point3D` quietly loses the memory saving. Every instance pays for
+both the two slots and a dictionary. A subclass of a slotted class must
 declare `__slots__` itself, using an empty tuple when it adds no
 fields of its own.
 
@@ -559,7 +559,7 @@ largest
 `cumtime` belongs to `exec`, then `<module>`, then `outer`. The
 largest `tottime` belongs to `{built-in method builtins.sum}`, with
 the generator expression inside `inner()` second: the largest of the
-script's own Python frames, where the arithmetic happens.
+script's own Python frames, where the arithmetic runs.
 
 The two columns pick different functions because they measure different things.
 `cumtime` is the time from entering a function to leaving it,
@@ -636,10 +636,9 @@ as the `list`. The memory saving is real (the chapter measures
 
 A `list` of floats stores pointers to `float` objects that already
 exist, so reading an element hands back a reference. An `array` stores raw
-eight-byte doubles with no objects at all, so reading an element has to
-build a fresh `float` object to hand to Python. That allocation, on
-every single element, is the cost that eats the advantage of the
-tighter layout.
+eight-byte doubles with no objects at all, so reading an element
+builds a fresh `float` object to hand to Python. That allocation,
+on every single element, eats the advantage of the tighter layout.
 
 That cost is the chapter's NumPy lesson arriving early: a compact
 layout pays off when the loop over it leaves Python. `sum()` over an
@@ -844,7 +843,7 @@ build's `python`, from the chapter directory with `utils/` on the import path
 `membership.py` is a poor subject for that comparison, for three
 reasons.
 
-The measured work happens in C, not in bytecode. `target in as_list`
+The measured work runs in C, not in bytecode. `target in as_list`
 and `target in as_set` both run their loops in the interpreter's own
 C code, so almost none of the time the listing reports is time the
 JIT could compile. The advice in [Write Idiomatic

@@ -348,7 +348,7 @@ print(copy.replace(Stars(5), number=99))
 **Validate in a subclass.**
 `typing.NamedTuple` refuses a `__new__()` in its own class body but
 accepts one in a subclass, so `Stars(11)` now raises a `TypeFailure`.
-The chapter's factory function could only advise against that call.
+The chapter's factory function can only advise against that call.
 
 **Test the replacement path.** The guarantee still leaks. `_replace()` builds the new tuple through
 `tuple.__new__()` rather than through `cls.__new__()`, so the check
@@ -822,8 +822,8 @@ default as the decorator runs, finds an unhashable object, and raises
 a `ValueError` naming the fix.
 
 **Fix it with a bare factory.**
-`Bare` and `Subscripted` both work, and they differ in what `ty` can
-see. For `field(default_factory=dict)` `ty` infers `Unknown`, a type
+`Bare` and `Subscripted` both work, and they differ in what `ty`
+sees. For `field(default_factory=dict)` `ty` infers `Unknown`, a type
 that satisfies any annotation, so `ty` never compares the factory
 against the field. Checkers differ here: Pyright and mypy
 both compare the bare factory and reject a mismatched one.
@@ -850,7 +850,7 @@ factory when you want the checker to confirm the agreement.
 <details>
 <summary>Where to look</summary>
 
-[The Annotation and the Check](../../Chapters/12_Techniques--Data_Classes_as_Types.md#the-annotation-and-the-check) shows `Stars(5.5)` passing because the annotation is not enforced at runtime.
+[The Annotation and the Check](../../Chapters/12_Techniques--Data_Classes_as_Types.md#the-annotation-and-the-check) shows `Stars(5.5)` passing because Python does not enforce the annotation at runtime.
 Add a type test as the first call to `check()` in `__post_init__()`, before the range comparison.
 For `True`, consider how `bool` relates to `int`, and compare the class of the value directly instead of using `isinstance()`.
 

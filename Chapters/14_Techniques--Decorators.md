@@ -427,7 +427,7 @@ The implementation must satisfy both overloads,
 so it declares the widest return type, `Any`,
 and the overloads narrow that back down at every call site.
 
-This idiom assumes that only the decorated function can arrive in that first position.
+The `callable(func)` test assumes that only the decorated function can arrive in that first position.
 Where a decorator's own argument could itself be callable,
 checking `func is None` instead of `callable(func)` removes the ambiguity.
 
@@ -484,7 +484,7 @@ Stacking works because each wrapper preserves the interface of what it wraps:
 every layer looks like the original function,
 so the layers compose to any depth.
 
-Testing confirms that the name survives two layers of wrapping,
+The tests confirm that the name survives two layers of wrapping,
 and that the inner decorator still repeats the body once per outer call:
 
 ```python
@@ -994,7 +994,7 @@ if __name__ == "__main__":
 and hands back whatever `greeting()` returned.
 After decoration the name `greeting` refers to that `str`,
 so `greeting()` raises a `TypeError`: a `str` is not callable.
-This idiom pays off for a value that needs one-time setup logic but stays constant afterward.
+`run_once` pays off for a value that needs one-time setup logic but stays constant afterward.
 For anything simpler,
 a module-level constant computed the ordinary way reads better.
 

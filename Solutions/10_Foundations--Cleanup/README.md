@@ -261,8 +261,8 @@ order, and the resulting list is again the only thing holding
 references to those three objects.
 
 **Drop the loop variable's reference.** `del c` inside the loop unbinds the
-name `c` and leaves the list alone. How the list gets built has no
-bearing on when its contents get destroyed, so the `deleted` messages
+name `c` and leaves the list alone. How you build the list does
+not change when Python destroys its contents, so the `deleted` messages
 appear, as before, at interpreter shutdown, after `End of delete loop`
 has printed.
 
@@ -362,7 +362,7 @@ question without changing the answer.
 <details>
 <summary>Where to look</summary>
 
-[The `self.close` Trap](../../Chapters/10_Foundations--Cleanup.md#the-self-close-trap) shows why a callback must not lead back to the object being finalized.
+[The `self.close` Trap](../../Chapters/10_Foundations--Cleanup.md#the-self-close-trap) shows why a callback must not lead back to the object whose death triggers it.
 `self.close` is a bound method, so ask what a bound method stores.
 Then ask who holds the callback, and what that means for the reference count when you `del b`.
 
@@ -430,7 +430,7 @@ the point in its own right. The rest of the output matches the
 chapter's, so the mistake is hard to see: the callback still
 runs, at a different time and for a different reason.
 
-**Register the cleanup callback.** What keeps the `Connection` alive is the callback itself. `self.close`
+**Register the cleanup callback.** The callback keeps the `Connection` alive. `self.close`
 is a bound method, and a bound method holds a strong reference to
 its instance. `finalize()` stores the callback, so the finalizer
 registry now holds a reference to the `Connection` for whose death

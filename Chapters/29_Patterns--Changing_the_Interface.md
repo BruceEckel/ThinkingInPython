@@ -8,12 +8,12 @@ Sometimes the problem you're solving is as simple as "I don't have the interface
 Two of the patterns in *GoF Design Patterns* solve this problem.
 *Adapter* takes one type and produces an interface to some other type.
 *Façade* creates an interface to a set of classes.
-The caller sees one entry point and never learns how those classes are built and wired together,
+The caller sees one entry point and never learns how the façade builds those classes and wires them together,
 so the wiring can change without affecting the caller.
 *Adapter* and *Façade* both wrap something that already exists,
 which puts them adjacent to *Proxy* and *Decorator*.
 Adding an interface leaves the existing one in place, so nothing breaks.
-When the new interface is meant to replace one you own,
+When the new interface replaces one you own,
 callers keep using the old one until you mark it deprecated.
 
 ## Adapter
@@ -23,7 +23,7 @@ A common real case: a third-party library names its methods `g()` and `h()`,
 you wrote your code against an `f()`-calling interface,
 and you cannot change either one.
 An adapter sits between them and turns each `f()` call into calls to `g()` and `h()`.
-The first version uses a class to perform adaptation:
+The first version puts the adaptation in a class:
 
 ```python
 # adapter.py
@@ -288,10 +288,11 @@ No `adaptee` exists yet,
 so `__getattr__()` calls itself until Python raises a `RecursionError`.
 `Adapter` avoids the trap because it is a record.
 A frozen, slotted data class defines `__getstate__()` and `__setstate__()`,
-so normal lookup finds `__setstate__()` and `__getattr__()` is not called.
+so normal lookup finds `__setstate__()`,
+and Python does not call `__getattr__()`.
 An adapter written as an ordinary class needs the guard that `getattr_guard.py` in *Surrogate* shows.
 
-Testing confirms that the new `f()` puts its own output in front of the adaptee's `g()` and `h()` results,
+The tests confirm that the new `f()` puts its own output in front of the adaptee's `g()` and `h()` results,
 that every other call forwards to the wrapped object,
 and that a copy and a pickled adapter both still work:
 
@@ -387,7 +388,7 @@ In real code, constructing three or thirty classes in the right order is knowled
 one call runs the constructors in the right order, starts the car,
 and returns the assembled `Ignition`.
 
-With both patterns in hand, you can compare them as two before-and-after pairs:
+The figure shows each pattern as a before-and-after pair:
 
 ![](_images/interface_story)
 
@@ -553,7 +554,7 @@ so the listing records the warnings and prints the record.
 
 `warnings.deprecated()` requires the message,
 and that message should say what to use instead.
-"Deprecated" tells a reader that someone decided this should no longer be called.
+"Deprecated" tells a reader that someone decided callers should stop using this.
 "replaced by `render()`" tells them what to do about it.
 
 The decorator also applies to a class,
@@ -570,7 +571,7 @@ as they do for the whole-function form.
 An *Adapter* and a *Façade* both add an interface and leave what is already there in place,
 which is why they are safe moves.
 Replacing an interface you own is the unsafe move,
-because every caller was written against the old one.
+because every caller depends on the old one.
 Marking the old interface deprecated keeps it working and tells each caller what to use instead;
 without the mark, nothing tells them.
 

@@ -249,7 +249,7 @@ ordinary function.
 
 [One `singledispatch` Function per Operation](../../Chapters/37_Patterns--Pattern_Refactoring.md#one-singledispatch-function-per-operation) shows `recycling_note()` as a registered function.
 Move it into a `Sorter` class with `functools.singledispatchmethod`, and register each overload with the base method's `register` decorator.
-Dispatch still keys on the first argument after `self`, so consider what the class now provides that the function lacked.
+Dispatch still keys on the first argument after `self`, so consider what the class now provides that the function lacks.
 
 <details>
 <summary>The shape</summary>
@@ -554,7 +554,7 @@ out.
 
 [One `singledispatch` Function per Operation](../../Chapters/37_Patterns--Pattern_Refactoring.md#one-singledispatch-function-per-operation) builds `hazard()` with a base function that answers for any unregistered type.
 For `strict_hazard()`, make the base function raise `NotImplementedError` with a message naming the type, then register every material, including those whose answer is "none".
-Decide by comparing what a silent default and a stopped program each cost when a registration is forgotten.
+Decide by comparing what a silent default and a stopped program each cost when you forget a registration.
 
 <details>
 <summary>The shape</summary>
@@ -664,7 +664,7 @@ material at the first call.
 
 **Register every material.** The strict form costs one registration for every material, including
 each one whose answer is "none": `Paper` needs three lines to say what
-`hazard()`'s base function answered without a registration.
+`hazard()`'s base function answers without a registration.
 
 Choose by which mistake costs more. A
 default is right when it is a true answer for most types and a

@@ -113,7 +113,7 @@ print("survived")
 #: survived
 ```
 
-**Widen what the manager catches.** Everything the exercise asks for happens at the call site. `expected`
+**Widen what the manager catches.** You make every change the exercise asks for at the call site. `expected`
 takes one `types` argument that is either an exception class or a
 tuple of them, and `issubclass(exc_type, self.types)` accepts either
 shape. Passing `(ZeroDivisionError, TypeError)` therefore suppresses
@@ -206,7 +206,7 @@ unchanged to three, four, or more.
 <summary>Where to look</summary>
 
 [Testing the Lease](../../Chapters/15_Techniques--Context_Managers.md#testing-the-lease) shows a test that leases a connection with `pool.lease()` and checks `pool.available()`.
-Nest a second `with pool.lease()` inside the first and assert on `available()` while both are held.
+Nest a second `with pool.lease()` inside the first and assert on `available()` while the test holds both connections.
 Check the count again after both blocks exit.
 
 <details>
@@ -251,8 +251,7 @@ def test_both_leased_at_once() -> None:
 
 The solutions tree cannot import the chapter's `object_pool.py`, so
 the file carries its own copy of `Connection` and `Pool`. In the
-chapter's `test_object_pool.py` the test function alone is the
-addition.
+chapter's `test_object_pool.py` you add the test function alone.
 
 **Hold both connections at once.** The first `lease()` takes one connection out of the queue, and the
 nested second `lease()` takes the other, so `pool.available()` is `0`
@@ -361,8 +360,8 @@ holds.
 
 [The `__exit__()` Arguments](../../Chapters/15_Techniques--Context_Managers.md#the-__exit__-arguments) shows that a true return value from `__exit__()` suppresses the exception and a false one lets it continue.
 Write a class whose `__exit__()` returns the result of testing `exc_type` against `KeyError`.
-Remember that `exc_type` is `None` when the block raises nothing.
-Test the `ValueError` case inside the chapter's `expected()` so the exception is caught and printed.
+`exc_type` is `None` when the block raises nothing.
+Test the `ValueError` case inside the chapter's `expected()` so it catches and prints the exception.
 
 <details>
 <summary>The shape</summary>

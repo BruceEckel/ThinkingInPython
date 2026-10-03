@@ -102,7 +102,7 @@ Keep singleton state in a module you import, not in the script you run.
 A module's state is a set of loose names.
 When the shared thing has fields and methods that belong together,
 or other code needs a type to name in an annotation, it is a class.
-The goal is then that every construction returns the same object.
+Every construction should then return the same object.
 The simplest approach hides construction behind a cached factory:
 `functools.cache` applied to a *constructor function*,
 an ordinary function that builds and returns an instance of a class.
@@ -173,7 +173,7 @@ and that marking is as far as Python goes.
 A second underscore adds no strength.
 The compiler [mangles](11_Techniques--Testing.md#white-box-and-black-box-tests)
 names only inside a class body,
-so at module level `__Settings` is stored under that name,
+so at module level `__Settings` keeps its name unmangled,
 as reachable as any other.
 The second underscore's one effect is a trap.
 In code inside a class body,
@@ -619,7 +619,7 @@ A subclass that needs storage of its own declares it:
 The lookup through `self` finds the subclass's dict first,
 and Martelli wrote `self._shared_state` instead of `Borg._shared_state` to allow that override.
 
-Testing confirms that the objects differ but share one set of state.
+The first test below confirms that the objects differ but share one set of state.
 *Borg* has no `cache_clear()`:
 whatever one test leaves in `_shared_state` is still there for the next.
 A pytest fixture closes that gap by clearing the dict before each test:
@@ -756,7 +756,7 @@ Under `ty` and Pyright,
 which accepts any arguments and returns `Any`.
 A wrong argument type passes the check,
 and so does a misspelled attribute on the result.
-Under mypy the name is still the class, so both are checked.
+Under mypy the name is still the class, so mypy catches both.
 `singleton_class_variable.py` keeps the name pointing at a real class,
 and that is the reason to prefer it.
 

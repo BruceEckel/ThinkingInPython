@@ -10,7 +10,7 @@
 <details>
 <summary>Where to look</summary>
 
-[The Mutable Default Trap](../../Chapters/05_Foundations--Functions.md#the-mutable-default-trap) shows that a default is built once, when the `def` runs.
+[The Mutable Default Trap](../../Chapters/05_Foundations--Functions.md#the-mutable-default-trap) shows that Python builds a default once, when the `def` runs.
 Predict the third call from that, then see what `()` changes for the one method the function needs.
 [Safe Defaults](../../Chapters/05_Foundations--Functions.md#safe-defaults) shows the pattern that suits a function that mutates its parameter.
 
@@ -290,8 +290,7 @@ result, so `"hi"` gains two exclamation points rather than one. The
 second call shows the same shape with numbers: `3` squares to `9`,
 which squares to `81`, not `9`. A function that takes another function
 as an argument needs nothing special to say so. `func` is a parameter
-like any other, and the only requirement is that it be callable with
-one argument.
+like any other, and it need only be callable with one argument.
 
 </details>
 </details>
@@ -362,7 +361,7 @@ only because of where it sits in the sequence.
 <summary>Where to look</summary>
 
 [Positional-Only and Keyword-Only Parameters](../../Chapters/05_Foundations--Functions.md#positional-only-and-keyword-only-parameters) explains the `/` marker, and [Variable Argument Lists](../../Chapters/05_Foundations--Functions.md#variable-argument-lists) explains `**facts`.
-Follow the keyword `name="Bob"` through the signature: ask which parameter may receive it, and which one is left without a value.
+Follow the keyword `name="Bob"` through the signature: ask which parameter may receive it, and which one gets no value.
 The error message names the missing parameter, so read it closely.
 
 <details>
@@ -398,11 +397,11 @@ expect(TypeError, describe, name="Bob")  # type: ignore
 ```
 
 **Reject a keyword for `name`.** The `/` causes the `TypeError`. `name` is positional-only, so
-`name="Bob"` cannot reach it. Where the argument goes instead is the
-part worth tracing. `**facts` accepts any keyword the parameters do
-not claim, and after the `/` no parameter claims `name`. So `"Bob"`
-goes into `facts`, and the positional `name` stays unfilled. The message
-is therefore `describe() missing 1 required positional argument: 'name'`,
+`name="Bob"` cannot reach it. `**facts` accepts any keyword the
+parameters do not claim, and after the `/` no parameter claims `name`.
+So `"Bob"` goes into `facts`, and the positional `name` stays unfilled.
+The message is therefore
+`describe() missing 1 required positional argument: 'name'`,
 which points at the parameter the caller thought they were filling.
 The mistake is visible without running the code, so the call carries a
 `# type: ignore` telling the type checker the misuse is deliberate,
@@ -416,7 +415,7 @@ the stray name now has somewhere to go. Without the `/`,
 `describe(name="Bob")` succeeds and `facts` stays empty.
 
 `**facts` is the opposite direction from exercise 6. There, `**opts`
-at the call site spread a dictionary into separate keyword arguments.
+at the call site spreads a dictionary into separate keyword arguments.
 Here, `**facts` in the parameter list collects separate keyword
 arguments back into a dictionary. The two forms use the same `**` and
 are inverses of each other, and that inversion is why a function
@@ -446,7 +445,7 @@ without the `/` the same call fails with two values for `name`.
 <summary>Where to look</summary>
 
 [Names Inside a Function](../../Chapters/05_Foundations--Functions.md#names-inside-a-function) explains how Python decides whether a name is local or global.
-That decision is made for the whole function body when it is compiled, not line by line as the code runs.
+Python makes that decision for the whole function body when it compiles the function, not line by line as the code runs.
 Apply it to `count += 1` in the first case and to the later `count = 99` in the second.
 
 <details>

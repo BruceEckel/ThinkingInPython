@@ -210,8 +210,8 @@ enough to check by reading, so asserting that it agrees with
 `sorted()` pins down the elements, their multiplicities, and their
 order at once. The oracle earns its place because it repeats no part
 of `sorted()`'s implementation. It arrives at the same answer by a
-different route. That independence is what makes an oracle worth
-having, and what makes `assert sorted(xs) == sorted(xs)` worthless.
+different route. That independence makes an oracle worth
+having, and makes `assert sorted(xs) == sorted(xs)` worthless.
 Capping the list length keeps the quadratic oracle cheap, since the
 bugs it catches show up on short inputs.
 
@@ -263,7 +263,7 @@ E       )
 ```
 
 The two sides print almost identically, so the failure hides until
-you look at the code points. That is the first lesson.
+you look at the code points.
 
 Most runs shrink to `'µ'`. Now and then a run stops at `'ß'` instead,
 since the shrinker does not always find the smallest failing
@@ -303,8 +303,8 @@ characters that are lowercase without being the lowercase of
 anything. `ß` breaks the same law from the other side: `"ß".upper()`
 is `"SS"`, two characters, so uppercasing can change a string's
 length. For case-insensitive comparison Python provides
-`str.casefold()` rather than `str.lower()`, and `casefold()` cannot
-be reversed either.
+`str.casefold()` rather than `str.lower()`, and `casefold()` has
+no inverse either.
 
 A hand-written loop over `"abcde"` never reaches `µ`. The generated
 strings reach the parts of the repertoire nobody thinks to type, and
@@ -424,7 +424,7 @@ prefers small examples, so a size of `3` against a roster of `2`
 comes up on its own. The property says what should be true for every
 roster.
 
-**State the precondition in the strategy.** The `unique=True` on the roster strategy is doing real work.
+**State the precondition in the strategy.** The `unique=True` on the roster strategy does real work.
 `group_rounds()` keys its history by `frozenset` of names, so two
 students sharing a name are one student to the algorithm. The
 property still passes on such a roster, because every name lands in

@@ -166,7 +166,7 @@ The order is a choice, not something mutation forces.
 and then `damaged` stays `Stars(8)` instead of holding a corrupted `13`.
 What mutation forces is that every method must choose that order correctly,
 every time it changes the value.
-`f1()` here is a method that gets that order wrong.
+`f1()` here gets that order wrong.
 
 *Design by Contract* (DbC)
 is the practice of checking arguments on the way in and results on the way out,
@@ -265,7 +265,7 @@ print(m)
 which produces the class name and the named argument values.
 
 `replace()` returns a copy with some fields changed, leaving the original alone.
-This copy-instead-of-mutate style reduces errors.
+Copying instead of mutating reduces errors.
 `copy.replace()`, in [The General Form of `replace()`](#the-general-form-of-replace),
 does the same for anything immutable, not only for data classes.
 
@@ -708,7 +708,7 @@ argues for annotating the values that cross a boundary.
 A parameter annotated `Stars` states more than a type:
 the value passed the check.
 
-Testing demonstrates that illegal values cannot exist.
+`test_stars.py` demonstrates that illegal values cannot exist.
 `pytest.raises()` confirms that the constructor rejects values outside the set:
 
 ```python
@@ -1317,7 +1317,7 @@ print(asdict(line))  # Recurses into the list of Points
 
 `asdict()` and `astuple()` copy as they go,
 so every list and dict in the result is a new object rather than the one inside the instance.
-Changing the result cannot reach back into the original.
+Changing the result leaves the original untouched.
 
 `KW_ONLY` forces callers to pass the fields after it by keyword:
 

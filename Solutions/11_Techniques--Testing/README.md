@@ -133,11 +133,11 @@ def test_add_interest_rates(funded: Account,
 
 **Run one body per rate.**
 `parametrize` runs this one test body four times, once per rate,
-reported individually as `test_add_interest_rates[0.0]`,
+and `pytest` reports each run as `test_add_interest_rates[0.0]`,
 `test_add_interest_rates[0.05]`, and so on.
 
 **Allow for rounding.**
-`pytest.approx()` is here
+The test uses `pytest.approx()`
 because the two sides of the assertion, `100 + 100 * rate` in the method
 and `100 * (1 + rate)` in the test, can round differently, not because
 these four rates round. For `0.0`, `0.05`, `0.5`, and `1.0` on a balance
@@ -408,7 +408,7 @@ tests.
 now wrong.
 
 **Pass the dependency in.**
-`test_injected()` still passes, because it never named the dependency.
+`test_injected()` still passes, because it does not name the dependency.
 It passes one in, and `current_temp_with()` calls whatever it
 receives.
 

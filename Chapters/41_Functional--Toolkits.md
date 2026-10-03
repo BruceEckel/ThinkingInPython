@@ -89,7 +89,7 @@ comes back to why the recursive form is worth keeping.
 An iterative Fibonacci, `a, b = b, a + b` in a loop,
 needs neither recursion nor a cache;
 the recursive one stays the running example here because it keeps the point about caching small:
-the branching and the repeated subproblem are what matter, not the arithmetic.
+the branching and the repeated subproblem matter, not the arithmetic.
 
 One trap: decorating a method with `@cache` keys every entry on `self`,
 so the cache holds a strong reference to each instance forever.
@@ -349,7 +349,7 @@ print(describe("hi"), "|", describe(5))
 
 `singledispatch()` dispatches on the first argument alone,
 so a rule that depends on two types needs [*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md).
-That argument must be passed by position:
+The caller must pass that argument by position:
 `describe(value=5)` raises `TypeError: describe requires at least 1 positional argument`.
 
 ### `singledispatchmethod`
@@ -414,7 +414,7 @@ print(list(map(pow, range(5), repeat(2))))
 #: [0, 1, 4, 9, 16]
 ```
 
-The fixed form replaces the list you would have written as `["x"] * 3`.
+The fixed form replaces the list you would write as `["x"] * 3`.
 The infinite form is the reason to import `repeat()`.
 It supplies a constant argument for as many calls as `map()` makes,
 and it holds one object in memory however many calls there are.

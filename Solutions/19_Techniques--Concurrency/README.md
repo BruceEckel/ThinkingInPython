@@ -259,7 +259,7 @@ their siblings start before any of them begins computing. All five are
 in flight, waiting, at once.
 
 **Count a suspended task as active.** The peak stays `5` wherever the loop sits, because the `await` is inside
-the `with meter:` block: a task suspended there is still counted as
+the `with meter:` block: a task suspended there still counts as
 active. If you remove the `await`, as `cpu_price()` does, the peak falls
 to `1`. Overlap depends on whether an `await` sits inside the measured
 span, not on where it sits relative to the computation.
@@ -368,7 +368,7 @@ task, and the event loop runs on that thread. A coroutine that never awaits neve
 a chance to start another task, so each task runs start to finish
 before the next begins.
 
-Waiting is not what creates overlap. Suspending is. These five tasks
+Waiting does not create overlap. Suspending does. These five tasks
 spend almost all their time waiting and still never overlap, while
 `cpu_price()` never overlaps for the opposite reason: it has no
 `await` to reach. The total run time makes the cost visible: five
@@ -850,7 +850,7 @@ asyncio.run(main())
 **Let one task finish first.** Only `f` reports `cancelled` now. With `e` at `0.005` its timer fires
 long before `c` and `d` fail at `0.03`, so `e` prints `fetched`,
 returns `"E"`, and has finished by the time the group starts
-cancelling. `f` still sleeps for `0.3`, so cancellation reaches it
+cancelling. `f` still sleeps for `0.3`, so the group cancels it
 during that sleep and its task ends cancelled.
 
 **Cancel what is still running.** The difference between `e` and `f` is the line between what a
@@ -950,8 +950,8 @@ tick, but the `gather()` future has already resolved by then, so
 it. The call loses the four results it was collecting, including `a`
 and `b`, which had already succeeded.
 
-**Leave the other tasks running.** The unfinished tasks, `e` and `f`, are the interesting part. `gather()` does not cancel
-them when the exception propagates, unlike a `TaskGroup`, so `e` and
+**Leave the other tasks running.** `gather()` does not cancel the unfinished tasks, `e` and `f`,
+when the exception propagates, unlike a `TaskGroup`, so `e` and
 `f` are still sleeping when `main()` returns. `asyncio.run()` then
 cancels whatever tasks remain as it shuts the loop down, which is why
 `e` and `f` print nothing further. If `main()` goes on to other work,
@@ -1040,7 +1040,7 @@ writes to the variable afterward, so all three copies stay identical
 and the original version's per-request identity disappears.
 
 **Read the value after the group.** The `after:` line changes too. In the chapter's version it prints
-`context -`, the default, because each `set()` happens inside a task's
+`context -`, the default, because each `set()` runs inside a task's
 own copy and none of them can reach `main()`'s context. Here the
 `set()` is in `main()`, so it writes to `main()`'s own context and the
 value is still there once the group finishes. Copying runs one way: a child sees
@@ -1253,7 +1253,7 @@ report(Tickets(LIMIT))
 because the race is not in the loop body.
 
 **Take each item unguarded.** `for item in source:` is the `for` statement calling
-`source.__next__()`, and that call happens before control reaches the
+`source.__next__()`, and that call runs before control reaches the
 indented block. The `with lock:` inside the body therefore starts
 *after* `next()` has already returned a number, and ends before the
 next `next()` begins. Two threads can be inside `__next__()` at the
@@ -1353,8 +1353,8 @@ second task then takes each lock with no other task holding it.
 The deadlock version makes the waiting circular: task one holds
 `lock_a` and wants `lock_b`, task two holds `lock_b` and wants
 `lock_a`, so each task's progress depends on the other task's
-progress. A deadlock is that cycle. Ordering the
-acquisitions globally makes such a cycle impossible. A task can only
+progress. A deadlock is that cycle. Acquiring the
+locks in one global order makes such a cycle impossible. A task can only
 ever wait on a lock that comes later in the order than every lock it
 already holds, and "later" never loops back to "earlier."
 

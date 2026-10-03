@@ -166,14 +166,14 @@ class Maze:
 
 `Cell` nests inside `Maze` because it names concepts only `Maze` uses.
 It is a `StrEnum` rather than an `Enum`, so each member is also a `str`.
-That is why `WALL` serves as the fill character for `ljust()`,
+That is why `ljust()` accepts `WALL` as its fill character,
 and `self.rows[y][x]` compares equal to `Cell.OPEN` on an open cell.
 
 The blackboard holds everything the rats share.
 `claim()` holds the rule the whole program depends on.
 It tests and marks a cell in one step with no `await` in between,
 so a single rat gets each cell even when several reach it.
-Its atomicity comes from the absence of that `await` rather than from a lock:
+The missing `await`, not a lock, makes `claim()` atomic:
 the [read-modify-write race](19_Techniques--Concurrency.md#a-single-thread-still-races)
 needs a suspension point inside the update,
 and `claim()` runs from its test to its `add()` as one synchronous stretch
@@ -549,7 +549,7 @@ so the tasks take turns in round robin and the run stays deterministic.
 The tasks run one at a time,
 so the design runs no faster than a synchronous worklist: a stack of frontiers,
 popped and pushed in a loop, visits the same 139 cells.
-What `asyncio` provides is control flow:
+`asyncio` provides control flow:
 each rat's own path through the maze stays one `while` loop in `run()`,
 instead of a stack of pending frontiers that one function pushes and pops by hand.
 The cost is the event loop,
@@ -1052,7 +1052,7 @@ A test can check the model without opening a window.
 The first test builds the maze, searches it, walks the result,
 and checks that the robot finished on the `!` square.
 The second walks a three-cell maze,
-then reads the string `show_maze()` renders to confirm the food is gone:
+then reads the string `show_maze()` renders to confirm the robot ate the food:
 
 ```python
 # robot_explorer/test_robot.py
@@ -1167,7 +1167,7 @@ because `claim()` is atomic.
 The robot reaches the goal because polymorphism handles every encounter.
 Both times you know the outcome in advance and run the program to confirm it.
 The third example gives you only half the outcome.
-`amplitude()` determines the shape the sand will trace:
+`amplitude()` determines the shape the sand traces:
 the curves are the formula's zero set.
 No line of the code computes how two thousand independent random walks reach that shape and stay there.
 That is simulation's other purpose,
@@ -1185,7 +1185,6 @@ Bowing a different spot rings the plate in a different mode and draws a differen
 
 ### The Model
 
-The model is small.
 `amplitude()` is the standing-wave field of a square plate ringing in mode `(m, n)`.
 Physics supplies the formula, an approximation for a plate with free edges.
 Treat it as given; only its shape matters here.

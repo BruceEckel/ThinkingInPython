@@ -94,7 +94,7 @@ print(render(Triangle()))
 <details>
 <summary>Where to look</summary>
 
-[Catching Mistakes](../../Chapters/08_Foundations--Static_Types.md#catching-mistakes) shows `area()` called with a `str` and silenced by the comment.
+[Catching Mistakes](../../Chapters/08_Foundations--Static_Types.md#catching-mistakes) shows the comment silencing the error on a call that passes `area()` a `str`.
 Remove the comment, run `ty check` on the file, and read which argument and which parameter the diagnostic points at.
 Then consider what the call does at run time without the checker.
 
@@ -204,7 +204,7 @@ returns a `str`.
 <details>
 <summary>Where to look</summary>
 
-[The `Self` Return Type](../../Chapters/08_Foundations--Static_Types.md#the-self-type) explains why `bump()` is annotated with `Self` instead of a class name.
+[The `Self` Return Type](../../Chapters/08_Foundations--Static_Types.md#the-self-type) explains why `bump()` declares its return type as `Self` instead of a class name.
 Subclass `NamedTally`, override `report()` to build on `super().report()`,
 and chain `bump()` twice before calling `report()` on the `LoudTally`.
 
@@ -267,7 +267,7 @@ print(t.bump().bump().report())
 ```
 
 **Keep the subclass type through the chain.** `Tally` declares `bump()` with return type `Self`, which the type
-checker resolves to the class on which the call is made. On
+checker resolves to the class of the object receiving the call. On
 a `LoudTally`, `Self` means `LoudTally`, so `t.bump().bump()`
 type-checks as a `LoudTally` and `.report()` is available on the
 result. The `.report()` call resolves to `LoudTally.report()`, because Python
@@ -361,7 +361,7 @@ parameter is usually the same type.
 
 In [Naming Types: The `type` Statement](../../Chapters/08_Foundations--Static_Types.md#the-type-statement), `Color` is an alias for a `Literal` union of strings.
 Call `paint()` with `"purple"` and read how the diagnostic names the parameter's type.
-Then add the string to the alias in the one place where it is defined and run the check again.
+Then add the string to the one `type` statement that defines the alias and run the check again.
 
 <details>
 <summary>The shape</summary>
@@ -439,9 +439,9 @@ call. `grid[cell] = color` needs no change, since `Grid`'s values are
 <details>
 <summary>Where to look</summary>
 
-[Variance](../../Chapters/08_Foundations--Static_Types.md#variance) shows `list[Circle]` refused where `list[Shape]` is required.
+[Variance](../../Chapters/08_Foundations--Static_Types.md#variance) shows the checker refusing a `list[Circle]` where the parameter requires a `list[Shape]`.
 Import `Sequence` from `collections.abc` and compare which operations it offers with those of `list`.
-The answer to both questions follows from whether the container can be written to.
+The answer to both questions follows from whether you can write to the container.
 
 <details>
 <summary>The shape</summary>
@@ -508,8 +508,8 @@ argument because `list` is invariant.
 **Give up the write operations.** `shapes.append(...)` stops type-checking for the reason the widening
 works. `Sequence` has no `append()`: it is the read-only abstract
 shape, so the diagnostic is `unresolved-attribute` rather than an
-argument-type error. The type checker is not saying "you may not
-append a `Square` here." It is saying the type you declared has no
+argument-type error. The type checker does not say "you may not
+append a `Square` here." It says the type you declared has no
 such operation.
 
 The one edit shows both sides of variance. A container you can write
@@ -530,7 +530,7 @@ callers whose argument lacks it.
 <details>
 <summary>Where to look</summary>
 
-[Narrowing](../../Chapters/08_Foundations--Static_Types.md#narrowing) shows `is not None` removing `None` from a `str | None` before `.upper()` is called.
+[Narrowing](../../Chapters/08_Foundations--Static_Types.md#narrowing) shows `is not None` removing `None` from a `str | None` before `shout()` calls `.upper()`.
 A truthiness test narrows the same way, so the checker accepts it.
 Feed the function `None`, a normal string, and the empty string, and compare which values each test sends to which branch.
 
@@ -590,7 +590,7 @@ belongs with the missing one.
 > copy `b.val` into a local variable before the `if` and use the local inside it.
 > Replace the `expect()` call with `print(show(box))` for a `Box` named `box`,
 > then print `box.val`.
-> Explain why the `AttributeError` is gone although `reset()` still runs.
+> Explain why the `AttributeError` disappears although `reset()` still runs.
 
 <details>
 <summary>Where to look</summary>

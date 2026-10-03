@@ -398,19 +398,19 @@ Python builds the traceback that `joining_line()` searches from
 report the same way a caught one does. `from` takes an expression, not a name
 bound by `except`.
 
-**Compare the cause with the context.** The second `print()` shows what makes this case worth writing. Both
+**Compare the cause with the context.** The second `print()` shows that both
 attributes hold an exception, and different ones: `__cause__` is the
 `ArithmeticError` you supplied, and `__context__` is still the
-`ValueError` Python recorded on its own when the `raise` happened
-inside a handler. Python reports the cause when one exists, so the
+`ValueError` Python recorded on its own when `raise` ran inside a
+handler. Python reports the cause when one exists, so the
 context is present but invisible.
 
-That difference is the useful shape of the rule. `__context__` answers
-"what was the `except` block handling when `raise` ran," and Python
-fills that attribute in whether you want it or not. `__cause__` answers
-"what do you, the author, say explains this," and only `from` fills
-that one in. `from None` sets `__suppress_context__`, hiding the
-`__context__` answer, and leaves `__cause__` as `None`.
+`__context__` answers "what was the `except` block handling when
+`raise` ran," and Python fills that attribute in whether you want it
+or not. `__cause__` answers "what do you, the author, say explains
+this," and only `from` fills that one in. `from None` sets
+`__suppress_context__`, hiding the `__context__` answer, and leaves
+`__cause__` as `None`.
 
 </details>
 </details>
@@ -463,7 +463,7 @@ lets several operations share one open file, while each `read_text()`
 call opens and closes the file again.
 
 That control matters when the file is large enough that holding it
-costs something, or when you are reading a stream that has no end.
+costs something, or when you read a stream that has no end.
 The closing guarantee is not the difference: `read_text()` opens the
 file in a `with` block of its own, so it closes the file too, whether
 or not the read succeeds. For a configuration file of a few kilobytes
@@ -506,7 +506,7 @@ which the loop has already passed, so the next iteration looks at
 position 1 and finds `1`. The loop does not visit the survivor.
 
 The prediction covers more than "one survives": it says which item
-and where. The survivor is whatever slid into a slot the loop had
+and where. The survivor is whatever slides into a slot the loop has
 passed, so its final position depends on the data. In the chapter's
 `[1, 2, 2, 3]` the survivor sits mid-list. Here it sits first. The
 symptom moves with the input, and for that reason the chapter says to
