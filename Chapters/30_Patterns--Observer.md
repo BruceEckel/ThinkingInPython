@@ -266,6 +266,11 @@ since it calls each responder as a statement.
 The alias turns that silent loss into a type error.
 The type checker rejects a responder that returns a value,
 because the author of that responder likely expected someone to use the value.
+The alternative alias `Callable[[T], object]` accepts any callable that takes a `T`,
+since every return type, `None` included, is assignable to `object`.
+That alias trades the type error for convenience:
+a responder can return a value, and `announce()` drops it without a report.
+`Responder` keeps `None` to catch that mistake.
 Notification runs one way, from broadcaster to responders.
 *GoF Design Patterns* gives the reason under broadcast communication.
 A notification goes to every connected responder,
