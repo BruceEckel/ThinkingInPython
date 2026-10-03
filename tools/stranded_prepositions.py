@@ -47,12 +47,17 @@ import re
 from collections.abc import Iterator
 from pathlib import Path
 from typing import Final
-
 from tools.config import ROOT
 from tools.markdown import Document
 from tools.prose import (
-    BLOCKQUOTE, HEADING, HTML, HTML_COMMENT_CLOSE, HTML_COMMENT_OPEN,
-    INDENTED_CODE, LIST_ITEM, TABLE,
+    BLOCKQUOTE,
+    HEADING,
+    HTML,
+    HTML_COMMENT_CLOSE,
+    HTML_COMMENT_OPEN,
+    INDENTED_CODE,
+    LIST_ITEM,
+    TABLE,
 )
 from tools.repo import add_paths_arg, md_files
 from tools.report import Finding

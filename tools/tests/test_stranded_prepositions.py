@@ -1,12 +1,9 @@
 """Tests for tools/stranded_prepositions.py, on in-memory documents."""
 
 from pathlib import Path
-
 import pytest
-
 from tools.markdown import Document
 from tools.stranded_prepositions import find, main
-
 
 def hits(text: str) -> list[tuple[int, str]]:
     doc = Document.from_text(text, Path("fixture.md"))
