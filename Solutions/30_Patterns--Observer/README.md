@@ -457,7 +457,8 @@ re-raised exception cannot do.
 
 [A Failing Responder Orphans the Rest](../../Chapters/30_Patterns--Observer.md#a-failing-responder-orphans-the-rest) shows `gather()` abandoning the other coroutines on the first failure.
 With `return_exceptions=True`, `gather()` returns every result, exceptions among them.
-Keep the results that are `Exception` instances and raise them as one `ExceptionGroup`.
+Keep the results that are exceptions and raise them as one group.
+A responder that was cancelled comes back as a `CancelledError`, a `BaseException`, so the filter and the group must admit one.
 
 <details>
 <summary>The shape</summary>
@@ -525,9 +526,10 @@ class Broadcaster[T]:
               for responder in self._responders),
             return_exceptions=True)
         failures = [
-            r for r in results if isinstance(r, Exception)]
+            r for r in results
+            if isinstance(r, BaseException)]
         if failures:
-            raise ExceptionGroup(
+            raise BaseExceptionGroup(
                 "responder failures", failures)
 
 received: list[int] = []
@@ -578,6 +580,27 @@ def test_later_responder_still_runs_after_a_failure(
 
     asyncio.run(run())
     assert received == [1]
+
+def test_a_cancelled_responder_is_reported() -> None:
+    received: list[int] = []
+
+    async def cancelled(data: int) -> None:
+        raise asyncio.CancelledError()
+
+    async def record(data: int) -> None:
+        received.append(data)
+
+    async def run() -> None:
+        broadcaster = Broadcaster[int]()
+        broadcaster.connect(cancelled)
+        broadcaster.connect(record)
+        with pytest.raises(BaseExceptionGroup) as info:
+            await broadcaster.announce(1)
+        assert info.group_contains(
+            asyncio.CancelledError)
+
+    asyncio.run(run())
+    assert received == [1]
 ```
 
 **Run every responder to completion.** `return_exceptions=True` changes `gather()` from "re-raise the first
@@ -588,28 +611,32 @@ loop to do, because `gather()` is already the loop.
 **Pick out the failures.** The results come back in argument order, so the list is a record of
 which responder produced what. This version needs the failures alone,
 so its comprehension keeps each result for which
-`isinstance(r, Exception)` is true. A successful responder returned
+`isinstance(r, BaseException)` is true. A successful responder returned
 `None`, which fails that test and stays out of `failures`.
 
-**Keep cancellation out of the failures.** The exception filter uses `Exception`, not `BaseException`, for the
-reason exercise 3 gives, and for a second reason here.
-If another task cancels the awaiting task while `gather()` waits,
+**Report a cancelled responder too.** If another task cancels the awaiting task while `gather()` waits,
 `gather()` cancels every responder,
-and `asyncio.CancelledError` reaches the awaiting task with either filter,
-since `announce()` gets no results to filter.
-The cancellation that `return_exceptions=True` does return comes from a responder that cancels its own task,
-and the `Exception` filter drops it from `failures` because `asyncio.CancelledError` derives from `BaseException`.
-A `BaseException` filter would put that cancellation in `failures`,
-which `ExceptionGroup` cannot hold:
-`ty` reports an `invalid-argument-type` at the constructor call,
-and at runtime `announce()` raises a `TypeError` ("Cannot nest BaseExceptions in an ExceptionGroup")
-in place of the responder failures.
-The `Exception` filter is the right one:
-it reports every ordinary failure,
-at the cost of treating a responder that cancelled itself as one that finished.
+and `asyncio.CancelledError` reaches the awaiting task before `announce()` has any results to filter,
+so that cancellation needs nothing from the filter.
+The cancellation that `return_exceptions=True` does hand back is a responder's own:
+a `CancelledError` raised inside the responder, which is what a cancelled `await` propagates.
+An `isinstance(r, Exception)` filter drops that result from `failures` with no report,
+because `CancelledError` derives from `BaseException`,
+so this version filters on `BaseException`.
+`ExceptionGroup` cannot hold a `BaseException`:
+with the wider filter, `ty` reports an `invalid-argument-type` at an `ExceptionGroup(...)` call.
+The listing raises a `BaseExceptionGroup` instead,
+and that constructor returns an `ExceptionGroup` when every member is an `Exception`,
+so the demo's `except* RuntimeError` and the first test still see the group the exercise asks for.
+When a cancellation is among the failures, the group is a `BaseExceptionGroup`,
+and the second test confirms that the cancelled responder is reported and the later responder still runs.
+Exercise 3's synchronous version keeps `except Exception`,
+and the difference is where a `BaseException` goes:
+there it passes through the loop and stops the notification, which is right for a `KeyboardInterrupt`;
+here `gather()` has already turned it into a value, and dropping a value reports nothing.
 
 The synchronous and asynchronous versions now answer the same
-question, and both end in an `ExceptionGroup`. The difference is only
+question, and both end in an exception group. The difference is only
 where the loop lives: written by hand in the synchronous version,
 supplied by `gather()` in the async one.
 

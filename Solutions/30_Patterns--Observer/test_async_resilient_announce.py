@@ -23,3 +23,24 @@ def test_later_responder_still_runs_after_a_failure(
 
     asyncio.run(run())
     assert received == [1]
+
+def test_a_cancelled_responder_is_reported() -> None:
+    received: list[int] = []
+
+    async def cancelled(data: int) -> None:
+        raise asyncio.CancelledError()
+
+    async def record(data: int) -> None:
+        received.append(data)
+
+    async def run() -> None:
+        broadcaster = Broadcaster[int]()
+        broadcaster.connect(cancelled)
+        broadcaster.connect(record)
+        with pytest.raises(BaseExceptionGroup) as info:
+            await broadcaster.announce(1)
+        assert info.group_contains(
+            asyncio.CancelledError)
+
+    asyncio.run(run())
+    assert received == [1]

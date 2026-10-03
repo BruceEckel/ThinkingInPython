@@ -19,9 +19,10 @@ class Broadcaster[T]:
               for responder in self._responders),
             return_exceptions=True)
         failures = [
-            r for r in results if isinstance(r, Exception)]
+            r for r in results
+            if isinstance(r, BaseException)]
         if failures:
-            raise ExceptionGroup(
+            raise BaseExceptionGroup(
                 "responder failures", failures)
 
 received: list[int] = []
