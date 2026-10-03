@@ -146,19 +146,7 @@ block, for ruff's `I001`).
 
 Prose-only edits still need `heading_links.py` (cross-references),
 `banned_phrases.py`, and `check_self_reference.py` (claims the book makes
-about its own chapters); all three are in `tip verify`. Two report-only
-prose checks run in `tip prose`, never in a gate, each with a baseline
-of judged keeps in `tools/data/` so only new hits print (since
-2026-10-03): `tip stranded` (`tools/stranded_prepositions.py`, a clause
-ending on a preposition whose object moved) and `tip watch-words`
-(`tools/watch_words.py`, the style guide's don't-use and avoid tiers).
-`tip stranded-accept` and `tip watch-words-accept` add the current new
-hits to the baseline after a human read; `ARGS=--all` lists every hit.
-The 2026-10-03 sweeps read every hit: 87 strandings fixed and 84
-accepted, 610 watch words fixed and 220 accepted (a `want` with a
-human subject, an arithmetic `even`, a `never` that is the claim, a
-heading echoed in link text). Chapter 30's hits were left for its open
-editing pass and are not in either baseline. So is
+about its own chapters); all three are in `tip verify`. So is
 `check_quoted_diagnostics.py`: every quoted `ty` diagnostic's gutter
 lines are compared with the extracted listing, and the dozen quotes
 the book deliberately makes against an edited copy of a listing live
@@ -187,6 +175,20 @@ still land in the diff if its output actually changed. An exception
 raised where none is expected still fails the gate; only marker text is
 auto-corrected. A lone bare `#: ` with nothing after it is always treated
 as a not-yet-filled-in placeholder and filled in, even without `--update`.
+
+Two report-only
+prose checks run in `tip prose`, never in a gate, each with a baseline
+of judged keeps in `tools/data/` so only new hits print (since
+2026-10-03): `tip stranded` (`tools/stranded_prepositions.py`, a clause
+ending on a preposition whose object moved) and `tip watch-words`
+(`tools/watch_words.py`, the style guide's don't-use and avoid tiers).
+`tip stranded-accept` and `tip watch-words-accept` add the current new
+hits to the baseline after a human read; `ARGS=--all` lists every hit.
+The 2026-10-03 sweeps read every hit: 87 strandings fixed and 84
+accepted, 610 watch words fixed and 220 accepted (a `want` with a
+human subject, an arithmetic `even`, a `never` that is the claim, a
+heading echoed in link text). Chapter 30's hits were left for its open
+editing pass and are not in either baseline.
 
 ## Exercise statements in Solutions/ are generated
 
