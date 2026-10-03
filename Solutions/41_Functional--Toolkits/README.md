@@ -54,16 +54,23 @@ bookkeeping is yours. The recursive version never names a stack: the
 call stack holds the sublists still to walk, and `return` pops one.
 Here you allocate the stack, seed it with a copy of `items`, choose
 `pop()` over `pop(0)`, and choose `extend()` over `append()`.
+Three of those choices are places to be wrong.
 
-Three of those choices are places to be wrong. Seeding with `items`
+**Protect the caller's list.** Seeding with `items`
 instead of `list(items)` mutates the caller's list as the loop drains
-it. Using `append()` where `extend()` belongs pushes the sublist as
-a single element and loops forever on it. The pop end decides the
+it.
+
+**Pick which item comes next.** The pop end decides the
 visiting order, and neither end gives the recursive version's
 left-to-right walk: `pop()` visits the leaves right to left, and
 `pop(0)` walks the structure breadth-first. Both still give the right
 total, but the order matters the moment the function does anything
-order-dependent. The recursive version cannot make any of these
+order-dependent.
+
+**Descend into a sublist.** Using `append()` where `extend()` belongs pushes the sublist as
+a single element and loops forever on it.
+
+The recursive version cannot make any of these
 mistakes, because it never has the choice.
 
 </details>
@@ -162,6 +169,15 @@ def batch_totals(source: Iterable[int],
 <details>
 <summary>Solution</summary>
 
+If you build the totals with a list comprehension, `[sum(b) for b in batched(source, n)]`,
+`ty` reports an `invalid-return-type`:
+a `list[int]` has no `__next__()`, so it is not an `Iterator[int]`.
+If you change the annotation to `list[int]` to match,
+the demo's call does not return,
+because the comprehension tries to sum every batch `count(1)` can supply
+and `islice()` gets no total to take.
+The generator expression computes each total only when `islice()` requests it.
+
 ```python
 # exercise_3.py
 from collections.abc import Iterable, Iterator
@@ -175,10 +191,10 @@ print(list(islice(batch_totals(count(1), 3), 5)))
 #: [6, 15, 24, 33, 42]
 ```
 
-`batched()` does the chunking and a generator expression does the
+**Total each batch.** `batched()` does the chunking and a generator expression does the
 summing, so the body fits on one line with no hand-written loop.
 
-Passing `count(1)` is the proof of laziness. `count()` never ends, so
+**Test laziness on an infinite source.** Passing `count(1)` is the proof of laziness. `count()` never ends, so
 if `batch_totals()` builds a list of batches, or if `batched()` reads
 its source eagerly, the call never returns. The call returns
 immediately, and `islice()` then pulls exactly five totals, so
@@ -220,6 +236,13 @@ def grouped[V, K: Hashable](
 <details>
 <summary>Solution</summary>
 
+If you wrap `groupby()` in a dictionary comprehension, `{k: list(g) for k, g in groupby(data, key)}`,
+the demo prints `{'B': ['b'], 'A': ['a']}`.
+The second `"b"` group replaces the first under the same key,
+so one item disappears with no error, and the type checker passes the function.
+The solution's `defaultdict` appends each item to the list stored under its key,
+so a key that comes back adds to its group instead of replacing it.
+
 ```python
 # exercise_4.py
 from collections import defaultdict
@@ -237,7 +260,7 @@ print(grouped(["b", "a", "b"], str.upper))
 #: {'B': ['b', 'b'], 'A': ['a']}
 ```
 
-A dictionary key exists once by construction, so the duplicate-key
+**Collect each item under its key.** A dictionary key exists once by construction, so the duplicate-key
 failure `groupby()` has on unsorted input cannot occur. The two `"b"`
 entries land in the same list no matter how far apart they arrive, and
 the caller needs no `sorted()` call to make that happen.
@@ -309,13 +332,13 @@ expect(TypeError, deep_sum,
 #: [TypeError] unhashable type: 'list'
 ```
 
-`cache` stores results in a dictionary keyed on the arguments, so
+**Show why the call fails.** `cache` stores results in a dictionary keyed on the arguments, so
 every argument has to be hashable. A `list` is not hashable, because
 its contents can change after the cache stores it, and a mutated key
 no longer hashes to the slot holding its entry. The call fails
 before `deep_sum()`'s body runs.
 
-`ty` reports the same problem before the program runs. The standard
+**Silence the checker so the listing runs.** `ty` reports the same problem before the program runs. The standard
 library's type declarations give a cached function's parameters the
 type `Hashable`, so both calls draw
 `invalid-argument-type`: "Expected `Hashable`, found `list[Nested]`"

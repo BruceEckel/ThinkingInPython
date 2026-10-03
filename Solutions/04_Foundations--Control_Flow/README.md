@@ -71,6 +71,12 @@ def collatz_sequence(n):
 <details>
 <summary>Solution</summary>
 
+If you keep the chapter's one-line conditional expression and add `if n % 2 == 1: odd_count += 1` after it,
+the test sees the new `n`, not the one the step started from.
+The count then includes the `1` that ends the sequence, and `collatz_sequence(10)` returns `(6, 2)`.
+The solution splits the conditional expression into an `if`/`else` statement,
+so the odd case has a branch of its own and the count shares the test that chooses `3 * n + 1`.
+
 ```python
 # exercise_2.py
 def collatz_sequence(n):
@@ -197,16 +203,18 @@ except TypeError as e:
 #: escaped: TypeError
 ```
 
-`divide_and_report(1, "x")` raises `TypeError` inside
+**Let an unmatched exception through.** `divide_and_report(1, "x")` raises `TypeError` inside
 `checked_divide()`, because Python cannot divide an `int` by a `str`.
 The `except` clause catches only `ValueError`, so the `TypeError`
 passes it by. The `finally` block runs anyway: `finally` runs
-whatever kind of exception is in flight. The `TypeError` keeps
+whatever kind of exception is in flight. The `else` clause never runs here: it belongs to the case
+where the `try` block finishes cleanly.
+
+**Catch the escape at the caller.** The `TypeError` keeps
 propagating up past `divide_and_report()`, so this listing wraps the
 call in its own `try`/`except TypeError` to show the exception
 escaping. An interactive session or an outer caller sees the
-`TypeError` escape the same way. The `else` clause never runs here: it belongs to the case
-where the `try` block finishes cleanly.
+`TypeError` escape the same way.
 
 </details>
 </details>
@@ -237,6 +245,13 @@ def run(command):
 <details>
 <summary>Solution</summary>
 
+If you add the new `case` at the bottom of the `match`, below `case _`,
+Python rejects the file before running any of it:
+`SyntaxError: wildcard makes remaining patterns unreachable`.
+A wildcard matches every value, so no `case` after it could run,
+and Python treats that as an error rather than as dead code.
+The solution puts the three-item pattern first, above the wildcard.
+
 ```python
 # exercise_5.py
 def run(command):
@@ -256,11 +271,13 @@ print(run("go north"))
 #: moving north
 ```
 
-Before the new `case` exists, `run("go north 3")` returns `unknown
+**Give the longer command a case.** Before the new `case` exists, `run("go north 3")` returns `unknown
 command`. A list pattern matches on length as well as content, so
 `["go", direction]` matches only a list of two items. The three-item
 split matches neither of the original patterns and reaches `case _`.
-The longer pattern gives a three-item list a `case` of its own. Order
+The longer pattern gives a three-item list a `case` of its own.
+
+**Arrange the patterns.** Order
 matters only between patterns that could both match the same value.
 The two `go` patterns cannot, so either arrangement works here.
 
@@ -374,14 +391,14 @@ except BadNumber as e:
 #: ArithmeticError ValueError
 ```
 
-The prediction is the "direct cause" line, the same one `explicit()`
+**Chain from a constructed cause.** The prediction is the "direct cause" line, the same one `explicit()`
 produces. `from` sets `__cause__` to whatever object follows it, and
 Python builds the traceback that `joining_line()` searches from
 `__cause__`. An exception constructed in the `raise` statement joins the
 report the same way a caught one does. `from` takes an expression, not a name
 bound by `except`.
 
-The second `print()` shows what makes this case worth writing. Both
+**Compare the cause with the context.** The second `print()` shows what makes this case worth writing. Both
 attributes hold an exception, and different ones: `__cause__` is the
 `ArithmeticError` you supplied, and `__context__` is still the
 `ValueError` Python recorded on its own when the `raise` happened

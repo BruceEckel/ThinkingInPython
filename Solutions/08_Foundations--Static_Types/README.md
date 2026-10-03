@@ -41,6 +41,12 @@ def render(shape: Drawable) -> str:
 <details>
 <summary>Solution</summary>
 
+If you name `Triangle`'s method `paint()`, as the chapter's `Blob` does,
+`ty check` rejects `render(Triangle())` with an `invalid-argument-type`,
+reporting that protocol member `draw` is not defined on type `Triangle`.
+The call also fails at run time with an `AttributeError`, because `render()` calls `shape.draw()`.
+A protocol matches on names and signatures, so the solution's method is the `draw() -> str` that `Drawable` declares.
+
 ```python
 # exercise_1.py
 from typing import Protocol
@@ -157,6 +163,13 @@ def last[T](items: list[T]) -> T:
 <details>
 <summary>Solution</summary>
 
+If you annotate `last()` the way the chapter annotates `first_any()`,
+with a bare `list` parameter and an `Any` return,
+`ty check` accepts `.upper()` on the result of `last([10, 20, 30])`.
+The call then fails at run time with an `AttributeError`: `'int' object has no attribute 'upper'`.
+The solution shares one type parameter `T` between the argument and the return type,
+so each call's result keeps the list's element type.
+
 ```python
 # exercise_3.py
 def first[T](items: list[T]) -> T:
@@ -253,7 +266,7 @@ print(t.bump().bump().report())
 #: CLICKS: 2
 ```
 
-`Tally` declares `bump()` with return type `Self`, which the type
+**Keep the subclass type through the chain.** `Tally` declares `bump()` with return type `Self`, which the type
 checker resolves to the class on which the call is made. On
 a `LoudTally`, `Self` means `LoudTally`, so `t.bump().bump()`
 type-checks as a `LoudTally` and `.report()` is available on the
@@ -408,7 +421,9 @@ The diagnostic names the alias rather than the union behind it, so
 you read `Color` and find the four permitted strings in the `type`
 statement. An alias makes that trade: a short message and one place
 to change the allowed set, against following the name to see what
-the set is. Adding `"purple"` to the alias removes the error at every
+the set is.
+
+**Widen the set at its definition.** Adding `"purple"` to the alias removes the error at every
 call. `grid[cell] = color` needs no change, since `Grid`'s values are
 `str` and every `Color` is a `str`.
 
@@ -484,13 +499,13 @@ print(count(circles))
 #: 2
 ```
 
-The type checker accepts the call because `Sequence` is covariant in its element
+**Widen what the parameter accepts.** The type checker accepts the call because `Sequence` is covariant in its element
 type. A `Sequence[Shape]` declares only that you can read `Shape`s out
 of it, and every `Circle` you read out is a `Shape`, so a
 `list[Circle]` meets that requirement. `list[Shape]` refuses the same
 argument because `list` is invariant.
 
-`shapes.append(...)` stops type-checking for the reason the widening
+**Give up the write operations.** `shapes.append(...)` stops type-checking for the reason the widening
 works. `Sequence` has no `append()`: it is the read-only abstract
 shape, so the diagnostic is `unresolved-attribute` rather than an
 argument-type error. The type checker is not saying "you may not
@@ -547,11 +562,11 @@ print(shout(""))  # The empty string is falsy
 #: (nothing)
 ```
 
-The type checker accepts either version, because truthiness narrows too. `None`
+**Narrow out the missing value.** The type checker accepts either version, because truthiness narrows too. `None`
 is falsy, so inside `if text:` the type checker rules out `None` the
 same as `is not None` does, and `.upper()` is safe in both versions.
 
-The change is in which values reach which branch. `is not None` asks
+**Send empty values to the fallback.** The change is in which values reach which branch. `is not None` asks
 one question, whether the value is missing. `if text:` asks a
 different one, whether the value is missing or empty, and answers
 both with `"(nothing)"`. The function can no longer tell an empty
@@ -603,6 +618,12 @@ def show(b: Box) -> str:
 <details>
 <summary>Solution</summary>
 
+If you copy `b.val` into `val` and test `val` but still call `b.val.upper()`,
+the test narrows the local and leaves the attribute at `str | None`.
+`ty check` then reports an `unresolved-attribute` on `b.val.upper()`,
+and the call fails at run time with an `AttributeError`, because `reset()` has set the attribute to `None`.
+The solution calls `upper()` on the local, the name the test narrowed.
+
 ```python
 # exercise_9.py
 
@@ -627,7 +648,7 @@ print(box.val)
 #: None
 ```
 
-`reset()` still runs and still sets the attribute to `None`, as the
+**Narrow a name no call can rebind.** `reset()` still runs and still sets the attribute to `None`, as the
 second line of output shows. The call cannot change `val`, though.
 `val` is a second name for the string `"hi"`, and `reset()` rebinds
 `b.val`, not the local. The narrowing of `val` to `str` therefore

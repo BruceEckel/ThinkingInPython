@@ -199,6 +199,15 @@ class Prozac:
 <details>
 <summary>Solution</summary>
 
+If you leave out the final `return self` in `Happy.next()`,
+`ty` reports an `invalid-return-type`,
+because the method can fall off its end and return `None`.
+The demo still prints the same lines, since every input that reaches `Happy` has a branch there,
+but if a second `Calm` in a row reaches `Happy`, its `next()` returns `None`,
+and `run_all()`'s call to `run()` raises an `AttributeError`.
+Each `next()` in the solution ends with `return self`,
+so an input a state ignores keeps the machine where it is.
+
 ```python
 # exercise_2.py
 from collections.abc import Iterable
@@ -271,7 +280,7 @@ StateMachine(Happy()).run_all(
 #: Everything is wonderful.
 ```
 
-Each state decides its own successor. `Happy.next()` answers `Annoy`
+**Let each state pick its successor.** Each state decides its own successor. `Happy.next()` answers `Annoy`
 with a `Grumpy`, `Grumpy.next()` answers `Calm` with a `Happy`, and
 both answer `TakePill` with a `Prozac` that returns itself for
 everything after. Nothing outside the states holds the transition
@@ -341,6 +350,11 @@ class Unlocked(WordState):
 <details>
 <summary>Solution</summary>
 
+If `next_state()` indexes the table with `self.TRANSITIONS[word]`,
+the first word, `push` while locked, raises `KeyError: 'push'`.
+A turnstile ignores a word that changes nothing,
+so each table carries a `"*"` entry, and `next_state()` falls back on it through `.get()`.
+
 ```python
 # exercise_3.py
 from typing import ClassVar
@@ -383,14 +397,20 @@ print(" ".join(history))
 #: locked locked unlocked locked unlocked unlocked locked
 ```
 
-The machine is the classic turnstile: `push` while locked does nothing (the
+**Delegate to the current state.** `Controller` asks the current state object what comes next, the
+same delegation `state_machine.py`'s `run_all()` performs when it
+calls `next()`.
+
+**Look up the next state.** `next_state()` looks the word up in its class's table with
+`.get(word, ...["*"])`, so `Controller` never branches on the current
+state or word.
+
+**Give each state its own table.** The machine is the classic turnstile: `push` while locked does nothing (the
 `"*"` fallback), `coin` unlocks it, and `push` while unlocked locks it
 again. Each state subclass carries its own transition table as a class
-attribute. `next_state()` looks the word up in that table with
-`.get(word, ...["*"])`, so `Controller` never branches on the current
-state or word. `Controller` asks the current state object what comes next, the
-same delegation `state_machine.py`'s `run_all()` performs when it
-calls `next()`. Reading the words
+attribute.
+
+Reading the words
 from a file, one per line, takes one line of code:
 `words = Path("moves.txt").read_text().split()`.
 
@@ -434,6 +454,12 @@ class TableController:
 
 <details>
 <summary>Solution</summary>
+
+If the table holds the two rows that change the state and no others,
+nothing in the table stands in for exercise 3's `"*"` entries,
+and the first word, `push` while locked, raises `KeyError: ('locked', 'push')`.
+A dictionary keyed on `(state, word)` has no wildcard,
+so the solution writes out the two rows that leave the state unchanged.
 
 The per-state design in exercise 3 spreads the turnstile's rules
 across two classes, one dictionary each. A single table keyed by
@@ -580,14 +606,17 @@ print(" ".join(m.name for m in moves[4:]))
 #: APPEARS ENTERS TRAPPED REMOVED
 ```
 
-`NEXT_ACTIONS` is a small state machine of its own: a dictionary from
+**Encode the legal successors.** `NEXT_ACTIONS` is a small state machine of its own: a dictionary from
 "the action just produced" to "the legal actions that can follow it,"
 including the special `None` key for "nothing has happened yet," which
-leads only to `APPEARS`. The generator's own state is just `previous`,
+leads only to `APPEARS`.
+
+**Remember the last move.** The generator's own state is just `previous`,
 the last action it yielded. Each `next()` call on the generator,
 here made by `list()`, picks a legal successor and remembers it for
 the following call. `NEXT_ACTIONS` constrains every choice, so every
 sequence this generator produces is legal by construction.
+
 `mouse_trap_states.py` accepts any move in any state and lets each
 `case _` absorb the moves that make no sense there, so the generator's
 table is the stricter of the two.
@@ -663,6 +692,12 @@ class WashingMachine(StateMachine):
 
 <details>
 <summary>Solution</summary>
+
+If you put the unconditional fast-spin row first,
+it matches every `RinseDone`, and the eight-kilogram load logs `'fast spin'` like the light one.
+A row with no condition matches every time,
+as [The Engine](../../Chapters/31_Patterns--State_Machines.md#the-engine) points out,
+so the solution lists the guarded row first and leaves the unconditional row to catch the rest.
 
 ```python
 # exercise_6.py
@@ -753,19 +788,23 @@ print(busy.state.name, busy.load_kg)
 #: FILLING 3
 ```
 
-The `(RINSING, RinseDone)` key holds the two rows the exercise asks
+**Split one input on a condition.** The `(RINSING, RinseDone)` key holds the two rows the exercise asks
 for, told apart by `too_heavy()`. A load over six kilograms takes the
 slow spin, and anything lighter falls through to the unconditional
-fast-spin row below it. A `RinseDone` event carries no data of its
-own, so the condition reads `load_kg` off the machine, where
-`begin()` recorded it when the cycle started. The rest of the cycle
+fast-spin row below it. The rest of the cycle
 is a straight line, one event type per state, and the machine is
 still the chapter's `table_machine.py` engine unchanged.
 
-A second `Start` during `FILLING` finds no row, so `handle()` raises
+**Record what later conditions need.** A `RinseDone` event carries no data of its
+own, so the condition reads `load_kg` off the machine, where
+`begin()` recorded it when the cycle started.
+
+**Reject an input with no row.** A second `Start` during `FILLING` finds no row, so `handle()` raises
 `NoTransition`. The press changes nothing: the state is still
 `FILLING` and `load_kg` is still 3, because the engine finds a row
-before it runs any action. For a washing machine the caller should
+before it runs any action.
+
+For a washing machine the caller should
 ignore the press: catch `NoTransition` and carry on, as
 `vending_view.py`'s `send()` does. A control panel is a source of
 stray presses, and a cycle that stops because
@@ -842,6 +881,12 @@ class Elevator(StateMachine):
 
 <details>
 <summary>Solution</summary>
+
+If you leave out the unconditional `(None, None, ElevatorState.DOORS_OPEN)` row under `(IDLE, CallButton)`,
+a call for the floor the car is on fails both `above()` and `below()`,
+and `handle()` raises `NoTransition`: `no transition from <ElevatorState.IDLE: 1> on CallButton`.
+The demo makes no such call, so its output does not change.
+The solution keeps that row last, as the group's `else`.
 
 ```python
 # exercise_7.py
@@ -929,16 +974,18 @@ print(elevator.state)
 #: ElevatorState.IDLE
 ```
 
-The "doors closing" state carries the two rows the exercise asks for.
-Under `(DOORS_CLOSING, DoorSensor)`, the first row reopens the doors
-when `obstructed()` passes, and the unconditional row below it
-finishes the close in `IDLE`. The `(IDLE, CallButton)` key shows the
-same idiom three wide, in the vending machine's
+**Choose a direction from the call.** The `(IDLE, CallButton)` key holds three candidate rows, in the vending machine's
 `(State.SELECTING, SecondDigit)` shape: candidate transitions share
 one key, `handle()` tries them in order, and the first whose condition
 passes wins. `above()` and `below()` pick `MOVING_UP` or
 `MOVING_DOWN`, and a call for the current floor falls through both
 conditions to open the doors with no travel.
+
+**Reopen the doors on an obstruction.** The "doors closing" state carries the two rows the exercise asks for,
+the same idiom two wide.
+Under `(DOORS_CLOSING, DoorSensor)`, the first row reopens the doors
+when `obstructed()` passes, and the unconditional row below it
+finishes the close in `IDLE`.
 
 </details>
 </details>
@@ -1044,12 +1091,16 @@ for degrees in [15, 17, 21, 30, 20]:
 #: 20 IDLE
 ```
 
-The machine has one input type. The `(IDLE, TemperatureReading)` key
+**Decide among three outcomes.** The machine has one input type. The `(IDLE, TemperatureReading)` key
 holds three rows, so a single reading leads to heating, cooling, or
 staying idle, and the two conditions decide which, as the exercise
-requires. The running states carry their own two-row groups: a reading
+requires.
+
+**Run until back inside the band.** The running states carry their own two-row groups: a reading
 still outside the band keeps the system running, and one inside the
-band falls through to the unconditional row back to `IDLE`. Every
+band falls through to the unconditional row back to `IDLE`.
+
+Every
 decision in the machine is a condition on the one event type. Every
 action slot here holds `None`, and the fall-through rows leave the
 condition slot `None` too, so both slots are optional per row.
@@ -1170,7 +1221,7 @@ print(m2.amount)
 #: 5
 ```
 
-The exception is `NoTransition`, not a `TypeError` or a silent no-op,
+**Reproduce the failure.** The exception is `NoTransition`, not a `TypeError` or a silent no-op,
 and its message names the event class that found no row: `Nickel`.
 `handle()` looks up `(self.state, type(event))`, and
 `type(Nickel("nickel", 5))` is `Nickel`. A dictionary probe compares

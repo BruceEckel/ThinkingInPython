@@ -21,6 +21,12 @@ A scripted class that returns a canned answer goes to `supply()` in the test, an
 <details>
 <summary>Solution</summary>
 
+If you pass `scripted` to `supply()` without `as_type(Console)`,
+the demo still prints `['Hello, Bob!']`,
+but `ty` reports an `invalid-argument-type` at each `run()` call.
+The Effect reaching `run()` still carries the `Need[Console]` that `ask_and_greet()` requests,
+so the solution wraps each supplied object in `as_type(Console)`.
+
 ```python
 # test_ch46_ask_and_greet.py
 from dataclasses import dataclass, field
@@ -82,14 +88,14 @@ either way, and neither binding requires a change to
 `ask_and_greet()`, which is character-for-character the same function
 under both.
 
-No binding could have required a change. `ask_and_greet()` names a capability
+**Request a capability, not a class.** No binding could have required a change. `ask_and_greet()` names a capability
 in its return type and calls two methods on whatever answers.
 `Terminal`, `Scripted`, and any third implementation are
 interchangeable because none of them appears in the Effect. Adding
 `read()` to the protocol changed which classes qualify, and `supply()`
 still picks among them the same way.
 
-`as_type(Console)` is doing quiet work in both calls, and the work is
+**Supply under the protocol's type.** `as_type(Console)` is doing quiet work in both calls, and the work is
 static. `supply()` reads the Ability from the declared type of its
 argument, so `supply(scripted)` alone builds a handler for
 `Need[Scripted]` rather than the `Need[Console]` that
@@ -138,6 +144,13 @@ def greet_all(names: list[str]) -> Depend[
 <details>
 <summary>Solution</summary>
 
+If you fix the annotation but keep a caller that runs `greet_all()` with no environment,
+as `run(greet_all(["Alice", "Bob"]))` does,
+`ty` reports an `invalid-argument-type` at that `run()` call.
+The run raises a `MissingAbilityError` before the first greeting prints.
+The new annotation hands the requirement to every caller,
+so the solution wraps `greet_all` in `supply(Console())` before calling `run()`.
+
 Removing the `# type: ignore` from `undeclared_need.py` produces:
 
 ```text
@@ -183,7 +196,7 @@ run(supply(Console())(greet_all)(["Alice", "Bob"]))
 #: Hello, Bob!
 ```
 
-The body never changes. `greet_all()` was already doing the right
+**Fix the signature, not the body.** The body never changes. `greet_all()` was already doing the right
 thing. Its signature was describing a different function.
 
 What `greet_all()`'s callers must now declare is the point of the exercise. Before,
@@ -293,13 +306,13 @@ carry `Never` in the yield channel, so both agree that nothing can
 fail from here on. They differ in the return channel: `str` for
 `all_handled()`, `str | ValueError` for the wrapped `one_unhandled()`.
 
-The difference is where the error stops travelling. `all_handled()`
+**Consume every caught error.** The difference is where the error stops travelling. `all_handled()`
 catches both errors, then consumes both in its `match`, turning each
 into a sentence and returning a `str`. No error remains, and the
 `assert_never()` proves it: the `match` covers every case inside the
 function.
 
-`one_unhandled()` catches only the `KeyError` and consumes that one.
+**Pass the remaining error up.** `one_unhandled()` catches only the `KeyError` and consumes that one.
 The `ValueError` stays declared, as `Try[ValueError, str]` says, so it
 is still in the yield channel when `catch(ValueError)` wraps
 `one_unhandled()`. `catch()` does not delete an error. It moves the error
@@ -331,6 +344,13 @@ Pass both instances to `supply()` in one call, run the Effect, and assert on eac
 
 <details>
 <summary>Solution</summary>
+
+If you declare `Log` as a `Protocol` without `@runtime_checkable`,
+`ty` passes the listing,
+but the run raises a `TypeError` at the first request for a `Log`.
+`supply()` matches each request with `isinstance()`,
+and `isinstance()` raises a `TypeError` on a `Protocol` without that decorator.
+The solution puts the decorator on both protocols, as `console_protocol.py` does on `Console`.
 
 ```python
 # test_ch46_audit_log.py
@@ -392,20 +412,20 @@ print(recorder.printed, recorder.entries)
 #: ['Hello, Cyd!'] ['greeted Cyd']
 ```
 
-One object satisfies both protocols. The concrete-class version could
+**Fill both roles with one object.** One object satisfies both protocols. The concrete-class version could
 not arrange that: `Log` is a `dataclass` holding its own entries, so
 a test has to construct one and read `log.entries` afterward. As a
 `Protocol`, `Log` is a shape, and a single `Recorder` can have that
 shape and the `Console` shape at once.
 
-The two `as_type()` calls are what make one object answerable to two
+**Supply one object under two types.** The two `as_type()` calls are what make one object answerable to two
 requests. `supply()` reads the Ability from each argument's declared
 type, so `supply(recorder, recorder)` builds a handler for
 `Need[Recorder]`, an Ability neither Effect requests. Each wrapper
 names the role this instance fills. Supplying the same object twice
 under two different types is the case `as_type()` exists for.
 
-Writing both assertions in one test is the payoff. A test holding the
+**Check the greeting and the log together.** Writing both assertions in one test is the payoff. A test holding the
 whole environment can check that the greeting reached the console
 *and* that the log recorded it, in one function, with no capture of
 stdout and no temporary file. Both Effects are requests before they
@@ -474,11 +494,11 @@ print(run(supply(METAL, ROBOTIC)(holds)()))
 #: True
 ```
 
-`METAL` at strength `20` outlasts the robotic nailer's force of `11`,
+**Pick a strength above both forces.** `METAL` at strength `20` outlasts the robotic nailer's force of `11`,
 so its two rows read `True` and `True`. `METAL` is the first material
 in the table that survives both nailers.
 
-The test function body needs no change because it never mentions a
+**Build each environment from a row.** The test function body needs no change because it never mentions a
 material or a nailer. It receives two objects and an expectation,
 builds an environment from them with `supply()`, and asks whether the
 answer matches. The `parametrize` table decides which two objects
@@ -589,13 +609,13 @@ run(defaults(stamped)("Bob"))  # type: ignore
 #: [noon] Hello, Bob!
 ```
 
-`default()` never names `Console` in its body. It reads `ability.t`,
+**Build the class the request names.** `default()` never names `Console` in its body. It reads `ability.t`,
 the class the request carries, and calls that class, so `default()`
 answers a request by constructing the class asked for. That is the other kind of
 default: `default_console.py` supplies one prepared instance, and
 `default()` builds whatever the request names, on demand.
 
-At runtime the handler answered three requests across the two calls,
+**Run both Effects through one handler.** At runtime the handler answered three requests across the two calls,
 two for `Console` and one for `Clock`, even though `default()`
 annotates its parameter `Need[Console]`. The type checker believes the handler
 answers only `Need[Console]`, so the second `run()` needs a
@@ -812,7 +832,7 @@ for builder in builders.values():
 #: Hello, Bob!
 ```
 
-The first pass over `built` greets both names. The second prints
+**Run each stored Effect twice.** The first pass over `built` greets both names. The second prints
 nothing at all, and `run()` returns `None` for each entry without
 raising an exception. An Effect is a generator, and a generator runs
 once. Resuming a finished generator raises `StopIteration` immediately,
@@ -820,7 +840,7 @@ which `run()` reads as "already returned, with no value."
 So a spent Effect looks the same as one that succeeded and returned
 `None`, and nothing reports the difference.
 
-The dictionary of builders behaves as a reader expects. Each pass
+**Build a fresh Effect per run.** The dictionary of builders behaves as a reader expects. Each pass
 calls each entry, each call builds a new generator, and each generator
 runs its body once. The stored value goes from a description `run()`
 consumes once to a recipe a caller can follow as often as it likes.
@@ -926,7 +946,7 @@ asyncio.run(main())
 #: body = 'fetched c', len(body) = 9
 ```
 
-The annotation is `Depend[Async, list[str]]`. `report()` needs `Async`,
+**Relay the request, collect the results.** The annotation is `Depend[Async, list[str]]`. `report()` needs `Async`,
 and `yield from` passes that requirement straight up, so `report_all()`
 needs it too. Three delegations to the same Effect type add nothing
 new to the channel: `Need[Console] | Need[Log]` grows because the two
@@ -934,7 +954,7 @@ requirements differ, and here they do not. Only the return type
 changes, from one `str` to a `list[str]`, since `report_all()`
 collects the results rather than relaying them.
 
-`run()` raises a `RuntimeError`, and `await run_async(...)` works.
+**Drive the Effect from a coroutine.** `run()` raises a `RuntimeError`, and `await run_async(...)` works.
 `run(effect)` is `asyncio.run(run_async(effect))`. `asyncio.run()`
 refuses to start an event loop inside a running one, so calling
 `run()` from `main()` fails. `run_async()` is the same driver in
@@ -1051,17 +1071,18 @@ for who in ("Alice", "Cyd", "Dana"):
 #: [KeyError] 'Dana'
 ```
 
-`@throws(ValueError)` turns `format_score()` from a function that
+**Lift the helper into an Effect.** `@throws(ValueError)` turns `format_score()` from a function that
 raises an exception into an Effect that declares one, so its failure
 travels as a value in the yield channel instead of unwinding the stack.
-Following the type checker until the program builds means one edit: widening
+
+**Declare the second failure.** Following the type checker until the program builds means one edit: widening
 `announce()`'s error parameter from `KeyError` to
 `KeyError | ValueError`. `line: str` and `value: int` carry
 annotations by choice, not by demand: `yield from` on a `@throws`
 function produces the declared success type, and naming that type
 keeps the type checker's inference pinned.
 
-Each failure surfaces at `run()`, and nowhere earlier. `Cyd` has a
+**Surface each failure at `run()`.** Each failure surfaces at `run()`, and nowhere earlier. `Cyd` has a
 score, so the lookup succeeds and `format_score()` fails. `Dana` has
 none, so the lookup fails and `format_score()` never runs. In both
 cases the error value travels up through the `yield from` chain
@@ -1208,7 +1229,7 @@ print(capture.messages)
 #: ['Hello, Bob!']
 ```
 
-The fix renames `Capture.print()` to `record()`, gives each method its
+**Give each role its own protocol.** The fix renames `Capture.print()` to `record()`, gives each method its
 own `Protocol`, `Screen` and `Recorder`, and splits `greet()` into one
 Effect per `Protocol`. The two `Protocol`s no longer overlap, so
 neither implementation satisfies both, and each Effect names the

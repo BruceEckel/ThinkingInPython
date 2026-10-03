@@ -94,10 +94,12 @@ for kind, group in bins.items():
 #: Aluminum 3.34
 ```
 
-The `Plastic` class is the only new Python code.
+**Register the new material.** The `Plastic` class is the only new Python code.
 `__init_subclass__()` registers it in `Trash.registry` the moment the
 `class` statement runs, so `Trash.create("Plastic", weight)` works
-with no further wiring. `recycle_dict.py`'s sorting loop needs no
+with no further wiring.
+
+**Bin each piece by its class.** `recycle_dict.py`'s sorting loop needs no
 change because `bins[type(t)].append(t)` keys on the class of each
 piece. `Plastic` is a key the dictionary has not seen, and
 `defaultdict` creates its bin the way it creates every other. The one
@@ -176,6 +178,11 @@ def heaviest(items: list[Trash]) -> Trash:
 
 <details>
 <summary>Solution</summary>
+
+If you call `max(items)` without the `key=` argument,
+`heaviest()` raises a `TypeError`: "'>' not supported between instances of 'Aluminum' and 'Plastic'".
+`ty` reports the same call as an `invalid-argument-type`, because a record defines no ordering for `max()` to use.
+The solution passes `key=lambda t: t.weight`, so `max()` compares the weights and returns the whole piece.
 
 ```python
 # exercise_2.py
@@ -298,6 +305,13 @@ class Sorter:
 <details>
 <summary>Solution</summary>
 
+If you decorate the `Sorter` methods with `@singledispatch` instead of `@singledispatchmethod`,
+the loop prints "no special handling" for all five materials, `Aluminum` included,
+and the type checker reports nothing.
+`singledispatch` dispatches on the first argument, which in a method call is the `Sorter` instance,
+and the registry holds no implementation for `Sorter`, so the base method answers every call.
+`singledispatchmethod` skips `self` and dispatches on the piece of trash.
+
 ```python
 # exercise_3.py
 from functools import singledispatchmethod
@@ -356,9 +370,11 @@ for cls in Trash.registry.values():
 #: Plastic: no special handling
 ```
 
-The dispatch is the same as in the function version:
+**Route each piece by its type.** The dispatch is the same as in the function version:
 `singledispatchmethod` routes on the type of the first argument after
-`self`. What changes is where the operation lives. `recycling_note()`
+`self`.
+
+**Move the operation onto an object.** What changes is where the operation lives. `recycling_note()`
 is now a method you call as `sorter.recycling_note(t)`. That matters
 if `Sorter` holds state of its own (a log of notes issued, a
 configuration, statistics) alongside the dispatch. When `Sorter`
@@ -432,6 +448,12 @@ def _(t: Aluminum) -> str:
 <details>
 <summary>Solution</summary>
 
+If you set `cls.bin = cls` in `__init_subclass__()` without checking `cls.__dict__` first,
+the shared sort still prints three bins, `['Aluminum', 'CrushedAluminum', 'Glass']`.
+`__init_subclass__()` runs after the class body,
+so the assignment overwrites the `bin = Aluminum` that `CrushedAluminum` declares.
+The `"bin" not in cls.__dict__` test fills in the default only for a class that declares no `bin` of its own.
+
 ```python
 # exercise_4.py
 from collections import defaultdict
@@ -487,21 +509,26 @@ print(sorted(k.__name__ for k in shared))
 #: ['Aluminum', 'Glass']
 ```
 
-`bins[type(t)]` is a dictionary probe on the exact class, so
+**Key the bins on the exact class.** `bins[type(t)]` is a dictionary probe on the exact class, so
 `CrushedAluminum` is a key the dictionary has never seen and gets a bin
-of its own. `singledispatch` resolves through the MRO instead, finds no
+of its own.
+
+**Resolve the note through the MRO.** `singledispatch` resolves through the MRO instead, finds no
 registration for `CrushedAluminum`, and takes `Aluminum`'s. Both
 behaviors are deliberate, and neither is a fallback. The sorter must
 know exactly what arrived, and the note takes the nearest answer
 anyone has written.
 
-To share a parent's bin without naming a material in the loop, choose
+**Give each class a default bin.** To share a parent's bin without naming a material in the loop, choose
 your own key instead of accepting `type(t)`. A `bin` class variable
 supplies that key: `__init_subclass__()` defaults each class to
 itself, so a material that sets no `bin` keeps a bin of its own.
-`CrushedAluminum` opts in by setting `bin` to `Aluminum`, and it
+
+**Let a subclass share its parent's bin.** `CrushedAluminum` opts in by setting `bin` to `Aluminum`, and it
 restates the `ClassVar` annotation for the reason the chapter's
-subclasses restate `value`'s. The sorting loop becomes
+subclasses restate `value`'s.
+
+**Sort by the declared key.** The sorting loop becomes
 `shared[t.bin].append(t)` and still names no material.
 
 `type(t)` is a convenient key, not an inevitable one. A design that
@@ -628,15 +655,18 @@ expect(NotImplementedError, strict_hazard, Plastic(1.0))
 #: [NotImplementedError] no hazard rule for Plastic
 ```
 
-`hazard()` answers "none" for the plastic. That answer is wrong and
+**Fall back to a default answer.** `hazard()` answers "none" for the plastic. That answer is wrong and
 looks like every correct "none" beside it. The forgotten registration
 produces no exception and no report from the type checker.
-`strict_hazard()` raises a `NotImplementedError` that names the
+
+**Refuse an unregistered type.** `strict_hazard()` raises a `NotImplementedError` that names the
 material at the first call.
 
-The strict form costs one registration for every material, including
+**Register every material.** The strict form costs one registration for every material, including
 each one whose answer is "none": `Paper` needs three lines to say what
-`hazard()`'s base function answered without a registration. Choose by which mistake costs more. A
+`hazard()`'s base function answered without a registration.
+
+Choose by which mistake costs more. A
 default is right when it is a true answer for most types and a
 forgotten registration does little harm. A base function that raises
 an exception is right when a wrong answer is worse than a stopped

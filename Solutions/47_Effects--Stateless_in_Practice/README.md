@@ -54,6 +54,12 @@ SECOND: Final[timedelta] = timedelta(seconds=1)
 <details>
 <summary>Solution</summary>
 
+If you leave out `nonlocal`, `moment += step` makes `moment` a local name of `advancing()`,
+so `current = moment` raises an `UnboundLocalError` at the first request.
+`ty` reports the mistake before any run, as an `unresolved-reference` on both lines that use `moment`.
+The solution declares `moment` nonlocal, so each request rebinds the enclosing variable
+and the stored moment carries over to the next request.
+
 ```python
 # advancing_clock.py
 from collections.abc import Callable
@@ -105,26 +111,24 @@ print(run(
 #: ('log-2026-01-01.txt', '[2026-01-01] ok')
 ```
 
-`ticking()` is a handler factory.
+**Keep the moment between requests.** `ticking()` is a handler factory.
 It stores a moment.
 The handler answers each request with the current value,
 then advances the stored moment by `step`.
 `nonlocal` makes the handler stateful.
-Without it, `moment += step` makes `moment` a local name,
-so `current = moment` raises an `UnboundLocalError` at the first request.
 `crossing` in `midnight.py` walks a two-element list and stops there,
 while `ticking()` answers any number of requests,
 so the same handler serves an Effect that reads the clock three times or thirty.
 Each call to `ticking()` builds a fresh handler with its own stored moment,
 so both runs in the listing start at 23:59:59.
 
-`archive_twice()` is the original function.
+**Reproduce the bug under the new handler.** `archive_twice()` is the original function.
 The first request names the file for January 1 and the second stamps the entry January 2,
 so the bug survives the change of handler.
 It should.
 Nothing about the handler causes it.
 
-`archive_once()` reads the clock one time and derives both strings from that value.
+**Make the two strings agree.** `archive_once()` reads the clock one time and derives both strings from that value.
 The mismatch needs two readings that could differ.
 With one reading, the two strings cannot disagree.
 A handler still chooses the moment, and it can choose 23:59:59,
@@ -251,7 +255,7 @@ print(type(run(fixed())).__name__)
 #: KeyError
 ```
 
-The types claim that `catch()` handles the `KeyError`.
+**Leak the failure past `catch()`.** The types claim that `catch()` handles the `KeyError`.
 `catch(KeyError)(size)` says it moves a `KeyError` from the failure channel to the
 return channel, and `caller()`'s `int | KeyError` says the caller is ready for either.
 The run does something else.
@@ -260,7 +264,7 @@ before the Effect exists and long before `catch()` has anything to watch,
 so the exception unwinds the stack in the ordinary way and escapes `run()` entirely.
 `catch()` cannot catch what never entered the channel.
 
-The line that restores the guarantee is `@throws(KeyError)`.
+**Lift the failure into the channel.** The line that restores the guarantee is `@throws(KeyError)`.
 It turns `declared_size()` into a function that yields its failure instead of
 raising it, so the exception becomes a value travelling the error channel.
 `catch()` then does what its type says: `run(fixed())` returns the `KeyError`
@@ -406,6 +410,12 @@ For the blackout, trace which frame the handler's `raise` unwinds through, and w
 <details>
 <summary>Solution</summary>
 
+If you wrap `run_load()` in `catch(Blackout)` to turn the blackout into a value,
+the program still type-checks and the run prints the same trace through `Turbine offline`.
+Then the `Blackout` escapes `run()` uncaught, and the traceback ends with `grid.Blackout: 20`.
+The wrapper changes nothing, so the solution leaves `run_load()` unwrapped
+and uses `expect()` to show the `Blackout` arriving at `run()`.
+
 ```python
 # exercise_3.py
 from exceptions import expect
@@ -444,7 +454,7 @@ expect(Blackout, run, handle(short)(run_load)(17, 6))
 #: [Blackout] 20
 ```
 
-The turbine takes the evening hours the battery covered without it, and the battery
+**Slot a new source into the order.** The turbine takes the evening hours the battery covered without it, and the battery
 drops back to one hour at 22:00 once the wind stops.
 `run_load()` needs no change, and could not have needed one: it asks for a
 `Source` at an hour and uses whatever the handler hands back.
@@ -453,7 +463,7 @@ whether one of them is new.
 That is the same substitution `Console` and `Feed` allow, applied to a choice
 made fresh at every request rather than once at the start.
 
-With every source shortened, hour 20 has no supplier, and the `Blackout`
+**Leave an hour with no supplier.** With every source shortened, hour 20 has no supplier, and the `Blackout`
 surfaces out of `run()`, not out of the Effect.
 `catch(Blackout)` around `run_load()` does not intercept it because `catch()`
 watches the error channel, and this exception never enters that channel.
@@ -546,7 +556,7 @@ run(handle(scripted(sequence))(run_load)(10, 2))
 #: Solar offline
 ```
 
-Three requests for two hours of power. The first two hand back a `Dead` source
+**Force a re-request.** Three requests for two hours of power. The first two hand back a `Dead` source
 that fails immediately, and `run_load()` responds by breaking out of the inner
 loop, leaving the `connected` block, and asking for another source.
 The third request produces a working one, which then covers both hours.
@@ -787,7 +797,7 @@ def research() -> Effect[
     return checked
 ```
 
-Four edits, and the type checker names one of them.
+**Add and declare the failure.** Four edits, and the type checker names one of them.
 
 1. A new exception class, `TooLong`.
 2. A new `@throws(TooLong)` function, `within_limit()`, since `@throws` lifts a raised
@@ -795,7 +805,7 @@ Four edits, and the type checker names one of them.
 3. One new line in `research()`, the `yield from within_limit(article)`.
 4. `research()`'s error parameter, widened to include `TooLong`.
 
-Adding line 3 without line 4 is the one `ty` reports, as an `invalid-yield` at the
+**Widen the signature to match.** Adding line 3 without line 4 is the one `ty` reports, as an `invalid-yield` at the
 new line rather than at the signature: `expression of type 'TooLong', expected 'Need[Feed] |
 Need[Encyclopedia] | Unavailable | NotInteresting | NoArticle'`.
 Widening the signature then breaks every caller that names the old set. `report()` stops at
@@ -999,7 +1009,7 @@ if isinstance(outcome, RetryError):
 #:   NotInteresting: mild and cloudy
 ```
 
-Under `WEATHER`, `fetch()` reads the feed three times, each attempt fails with
+**Run out of attempts.** Under `WEATHER`, `fetch()` reads the feed three times, each attempt fails with
 the same `NotInteresting`, and the retry gives up with a `RetryError` carrying
 three identical failures.
 
@@ -1048,6 +1058,12 @@ For the `Need`, consider where the forked work runs and which handlers can reach
 <details>
 <summary>Solution</summary>
 
+If you leave out the `__main__` guard, each worker re-imports the module,
+reaches the `with` block, and tries to start a pool of its own before it has finished starting.
+The workers die with a `RuntimeError` about their bootstrapping phase,
+and the driver's `run()` fails with a `BrokenProcessPool` instead of printing the squares.
+The guard keeps the driver out of the import, so a worker loads `slow_square()` without running the driver.
+
 ```python
 import time
 from concurrent.futures import Executor, ProcessPoolExecutor
@@ -1085,9 +1101,11 @@ if __name__ == "__main__":
 [0, 1, 4, 9, 16]
 ```
 
-`squares()` stays the same, character for character. It asks for an `Executor`
+**Leave the Effect alone.** `squares()` stays the same, character for character. It asks for an `Executor`
 and never says which kind, so a process pool satisfies the request as a thread
-pool does. Two things around it did change, and neither is in the Effect.
+pool does.
+
+**Guard the driver.** Two things around `squares()` did change, and neither is in the Effect.
 The `__main__` guard is now required, because a process pool starts workers by
 re-importing the module, and without the guard each worker builds another pool.
 This book's output checker also skips the listing, for the same reason:
@@ -1116,7 +1134,7 @@ info:   [**P, E, R](f: (**P) -> Generator[Async | E, Any, R])
 info:            -> ((**P) -> Generator[Need[Executor], Any, Task[R]])
 ```
 
-Every overload accepts an Effect whose yield channel holds errors, `Async`, or
+**Keep requests out of forked work.** Every overload accepts an Effect whose yield channel holds errors, `Async`, or
 nothing, and none accepts one that still holds a `Need`. The forked work leaves
 the driver: it runs in a worker with no access to the handler stack that would
 answer a request. So you must remove the requirement before the fork: supply it
@@ -1209,7 +1227,7 @@ print(run(scripted((60, 50, 30, 20))), written)
 #: 2 [40, 10]
 ```
 
-The scripted balances are the four the `Cell` version produces:
+**Replay the balances.** The scripted balances are the four the `Cell` version produces:
 `100` before the first purchase, `40` after it, `40` again because `purchase()`
 refuses the `50` and writes nothing, and `10` after the `30` goes through.
 `spree()` attempts all four prices, and the test proves it from both sides.
@@ -1218,7 +1236,8 @@ A fifth price exhausts the script, and `handle()` reads the
 chapter describes: `run()` returns `None` and the first assertion fails on
 `None == 2`. Stopping early leaves a balance unread, and the final
 assertion catches that by checking that the iterator has nothing left.
-`written` records one entry per successful purchase, `[40, 10]`, so the
+
+**Record each write.** `written` records one entry per successful purchase, `[40, 10]`, so the
 assertions together say that `spree()` tries every price and writes only the
 affordable ones.
 
@@ -1339,14 +1358,15 @@ for version in (thrown, lifted):
 #: lifted: Empty()
 ```
 
-The two versions produce the same results, as the loop demonstrates, and
+**Give both versions one type.** The two versions produce the same results, as the loop demonstrates, and
 `reveal_type()` reports the same return type for both:
 `Generator[Need[Ticker] | Unavailable | Empty, Any, str]`.
 `thrown()` writes that union in its annotation. `lifted()` annotates the
 undecorated shape, `Effect[Need[Ticker], Unavailable, str]`, and
 `@throws(Empty)` adds `Empty` to it, the way the chapter's `fetch_effectful.py`
 adds `Unavailable`.
-They differ in where you write the failure. `throw()` puts an exception into
+
+**Send the failure into the channel.** The versions differ in where you write the failure. `throw()` puts an exception into
 the channel at the point of the `yield from`. `@throws` lifts what the body
 raises, so the `raise` is an ordinary statement and the decorator moves the
 exception into the channel.
@@ -1463,7 +1483,7 @@ print(type(long).__name__)
 #: TooLong
 ```
 
-The prediction is that `outcome()`'s return annotation breaks.
+**Widen the annotation with the channel.** The prediction is that `outcome()`'s return annotation breaks.
 `catch_all()` moves the entire error channel into the return type, so widening
 `research()`'s failures to include `TooLong` widens what `catch_all()` returns,
 and the declared
@@ -1585,14 +1605,14 @@ print(run(handle(scripted_from(iter([3, 4])))(game)()))
 #: 3 + 4 = 7
 ```
 
-The request carries the range, which is the difference from a `Need`.
+**Carry the question's arguments.** The request carries the range, which is the difference from a `Need`.
 `Need[T]` asks for an instance of `T`, so its request consists of the type alone.
 `Random(1, 6)` asks a question with arguments, and the handler reads them off
 the request. That is why this Ability is a record with fields, where the
 chapter's `Flip` is an empty class: the fields are the parameters of the
 question.
 
-You write `game()` once, and it runs under both handlers unchanged. The scripted
+**Run one game under two handlers.** You write `game()` once, and it runs under both handlers unchanged. The scripted
 handler is the testable one, and it is a closure over an iterator rather than a
 class, because a handler is an ordinary function.
 
@@ -1756,7 +1776,7 @@ error[invalid-yield]: Yield expression type does not match annotation
    |                         expected `Need[Butter]`
 ```
 
-The diagnostic points at the `yield from`, not at the signature, and it prints
+**Declare every inherited requirement.** The diagnostic points at the `yield from`, not at the signature, and it prints
 the whole union that arrived. That union is the answer to "what does
 `buttered()` need," and the fix is to write it down. `buttered()` names
 `Dough` and `Oven` in its type without mentioning either in its body, which is
@@ -1775,7 +1795,7 @@ error[invalid-argument-type]: Argument to function `run` is incorrect
    |                               found `Generator[Need[Toaster], Any, str]`
 ```
 
-This one tells you about the dependency two levels down. `supply()` fails to
+**Answer every requirement at the edge.** This one tells you about the dependency two levels down. `supply()` fails to
 subtract `Need[Toaster]`, so it reaches `run()` still in the channel. Nothing in
 `buttered()`'s body mentions a toaster. The requirement comes from `toast()`,
 which `buttered()` calls, and the error names it at the program's edge, past the
@@ -1937,13 +1957,13 @@ play(Loud(), Kitty(), Weapon())
 #: Kitty meets the nasty weapon
 ```
 
-What the shared signature recovers is the *Abstract Factory*'s *interface*.
+**Name the factory's shape.** What the shared signature recovers is the *Abstract Factory*'s *interface*.
 `run_season()` accepts anything that can stage a scene and stays ignorant of
 which family it gets, and that ignorance is the property the pattern exists to
 provide. Python gives it away, because a function is already an object with a
 type: saying so takes no abstract factory class.
 
-What it does not recover is the guarantee that makes the pattern worth naming.
+**Show the mismatch getting through.** What it does not recover is the guarantee that makes the pattern worth naming.
 `Cast` says "give me a narrator and I will stage something." It says nothing
 about the actors inside agreeing with each other.
 The listing's last call, `play(Loud(), Kitty(), Weapon())`, is the proof,

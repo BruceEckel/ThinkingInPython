@@ -113,13 +113,14 @@ print("survived")
 #: survived
 ```
 
-Everything the exercise asks for happens at the call site. `expected`
+**Widen what the manager catches.** Everything the exercise asks for happens at the call site. `expected`
 takes one `types` argument that is either an exception class or a
 tuple of them, and `issubclass(exc_type, self.types)` accepts either
 shape. Passing `(ZeroDivisionError, TypeError)` therefore suppresses
 both, and the `TypeError` block prints a `[Type] message` line in the
 same form the `ZeroDivisionError` block printed before the change.
-The second block shows that the tuple still covers the original
+
+**Check that the original type still matches.** The second block shows that the tuple still covers the original
 exception.
 
 Note the double parentheses. `expected((ZeroDivisionError, TypeError))`
@@ -253,16 +254,18 @@ the file carries its own copy of `Connection` and `Pool`. In the
 chapter's `test_object_pool.py` the test function alone is the
 addition.
 
-The first `lease()` takes one connection out of the queue, and the
+**Hold both connections at once.** The first `lease()` takes one connection out of the queue, and the
 nested second `lease()` takes the other, so `pool.available()` is `0`
-inside the inner `with`. Exiting the inner `with` puts `second`
-back, then exiting the outer `with` puts `first` back,
-restoring `pool.available()` to `2`. The `0` confirms the pool has no
+inside the inner `with`. The `0` confirms the pool has no
 built-in limit of "one lease at a time." The pool holds the items you
 gave its constructor, and it hands out as many concurrent leases as
 it has items. A third nested `lease()` would block forever in
 `get()`, since this one thread holds both connections and nothing can
 return one.
+
+**Check that both connections come back.** Exiting the inner `with` puts `second`
+back, then exiting the outer `with` puts `first` back,
+restoring `pool.available()` to `2`.
 
 </details>
 </details>
@@ -325,7 +328,7 @@ report()
 #: === outer ends ===
 ```
 
-The prediction is the same one stacking produces anywhere. Python reads
+**Apply the decorators bottom-up.** The prediction is the same one stacking produces anywhere. Python reads
 the stack as `report = banner("outer")(banner("inner")(report))`.
 `@banner("inner")` is nearest the `def`, so it wraps `report()` first,
 and `@banner("outer")` then wraps the inner wrapper. Calling `report()`
@@ -334,7 +337,7 @@ which enters the inner manager before running the body. Unwinding
 reverses that order, so the four bracketing lines nest rather than
 interleave.
 
-Each `@banner(...)` line builds one manager object, when Python
+**Enter a fresh manager on each call.** Each `@banner(...)` line builds one manager object, when Python
 defines `report()`. A generator manager is single-use, so the wrapper
 that `ContextDecorator` supplies does not enter that object. On each
 call of `report()` the wrapper builds a fresh manager from the same generator
@@ -385,6 +388,14 @@ class ignore_missing:
 <details>
 <summary>Solution</summary>
 
+If you return `issubclass(exc_type, KeyError)` without the `None` test,
+the demo prints the same two lines, because both of its blocks raise an exception.
+A block that finishes cleanly then fails:
+`__exit__()` receives `None`, and `issubclass()` raises a `TypeError`.
+`ty` reports an `invalid-argument-type` at the `issubclass()` call,
+so the type checker catches the mistake the demo misses.
+The solution tests `exc_type is not None` first.
+
 ```python
 # ignore_missing.py
 from types import TracebackType
@@ -417,14 +428,14 @@ with expected(ValueError):
 #: [ValueError] not a lookup problem
 ```
 
-`__exit__()` decides an exception's fate through its return value:
+**Suppress one exception type.** `__exit__()` decides an exception's fate through its return value:
 truthy suppresses, falsy lets the exception continue. Returning
 `issubclass(exc_type, KeyError)` therefore suppresses `KeyError` and
 propagates everything else. The second block confirms the
 propagation: the `ValueError` passes through `ignore_missing` and
 reaches the chapter's `expected`, which prints it.
 
-The `exc_type is not None` test keeps the normal path working. When a
+**Handle a clean exit.** The `exc_type is not None` test keeps the normal path working. When a
 block finishes without an exception, Python still calls `__exit__()`,
 passing `None` for all three arguments, and
 `issubclass(None, KeyError)` raises a `TypeError`. Checking for `None`
@@ -497,7 +508,7 @@ Run with none, `uv run python exit_stack.py`:
 using []
 ```
 
-`enter_context()` pushes each manager onto the stack as the
+**Close in reverse order of opening.** `enter_context()` pushes each manager onto the stack as the
 comprehension walks the list left to right. Leaving the `with` unwinds
 that stack, so the closes come out in reverse. The reversal holds for
 any number of names, including zero, the property the exercise asks
@@ -604,7 +615,7 @@ except ValueError as error:
 #: caught: boom
 ```
 
-`exit A` now prints, and it prints before `caught: boom`. Python
+**Clean up before the exception propagates.** `exit A` now prints, and it prints before `caught: boom`. Python
 raises the block's `ValueError` inside the generator, at the `yield`.
 The `finally` runs on the way out of the generator, and only then
 does the exception leave the `with` statement and reach the `except`.

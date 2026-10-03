@@ -54,15 +54,16 @@ expect(AttributeError, tuple_append, 1)
 #: [AttributeError] 'tuple' object has no attribute 'append'
 ```
 
-Each call keeps appending to the same list. Python creates the
+**Accumulate in the shared default.** Each call keeps appending to the same list. Python creates the
 default once, when it defines the function, and every call that
 omits `target` reuses that same object.
 
-Changing the default to `()` trades one failure for another. The
+**Try an immutable default.** Changing the default to `()` trades one failure for another. The
 function's job is to append, and a tuple has no `append()`, so the
 first call that omits `target` raises an `AttributeError`.
-`tuple_append()` is `bad_append()` with that one change. An immutable
-default suits a parameter the function reads, as in
+`tuple_append()` is `bad_append()` with that one change.
+
+An immutable default suits a parameter the function reads, as in
 `immutable_default.py`. A function that mutates the parameter needs
 the `None` sentinel that `good_append()` uses: test for `None` and
 build a new list inside the function body on every call.
@@ -101,6 +102,12 @@ def get(data, key, default=MISSING):
 <details>
 <summary>Solution</summary>
 
+If you make `None` the sentinel, writing `default=None` and testing `default is None`,
+then `get(prefs, "theme", None)` raises a `KeyError` instead of returning `None`.
+A caller who asks for `None` as the default cannot get it.
+The solution tests against `MISSING` instead,
+so `None` stays available as an ordinary default.
+
 ```python
 # exercise_2.py
 from exceptions import expect
@@ -122,7 +129,7 @@ print(get(prefs, "theme", None))
 #: None
 ```
 
-The two calls ask for different things. The first supplies no
+**Tell an omitted default from `None`.** The two calls ask for different things. The first supplies no
 default, so a missing key is an error. The second supplies `None` as
 the default, so a missing key produces `None`. With `default=None` as
 the sentinel, `get()` receives the same `None` in both calls and
@@ -164,6 +171,11 @@ def divide(a, b, /, *, label="result"):
 
 <details>
 <summary>Solution</summary>
+
+If you add `label` after the `/` without a `*`, as `def divide(a, b, /, label="result")`,
+`label` is positional-or-keyword,
+and `divide(10, 2, "half")` returns `half: 5.0` instead of raising a `TypeError`.
+The solution adds the `*` so that `label` can arrive by name alone.
 
 ```python
 # exercise_3.py
@@ -310,6 +322,13 @@ def report(label, *values, **options):
 <details>
 <summary>Solution</summary>
 
+If you pass `opts` without its `**`, as `report(*args, opts)`,
+the call prints `point (3, 4, {'color': 'red'}) {}`.
+The dictionary arrives as one more positional argument,
+so `values` collects it and `options` stays empty.
+The solution spreads `opts` with `**`,
+which turns each key into a keyword argument for `**options` to collect.
+
 ```python
 # exercise_6.py
 def report(label, *values, **options):
@@ -378,7 +397,7 @@ expect(TypeError, describe, name="Bob")  # type: ignore
 #: argument: 'name'
 ```
 
-The `/` causes the `TypeError`. `name` is positional-only, so
+**Reject a keyword for `name`.** The `/` causes the `TypeError`. `name` is positional-only, so
 `name="Bob"` cannot reach it. Where the argument goes instead is the
 part worth tracing. `**facts` accepts any keyword the parameters do
 not claim, and after the `/` no parameter claims `name`. So `"Bob"`
@@ -469,17 +488,21 @@ expect(UnboundLocalError, rebinds)
 #: where it is not associated with a value
 ```
 
-Both calls raise `UnboundLocalError: cannot access local variable
+**Drop the `global` declaration.** Both calls raise `UnboundLocalError: cannot access local variable
 'count' where it is not associated with a value`,
 which the listing prints in full. Without `global`,
 the assignment in `count += 1` makes `count` local to
 `writes_global()`, so the read half of `+=` looks for a local that
-has no value yet. `rebinds()` fails for the same reason even though
+has no value yet.
+
+**Assign after the read.** `rebinds()` fails for the same reason even though
 its `print` comes first in time. Python decides which names are local
 when it compiles the function body, so the `count = 99` below the
 `print` makes `count` local throughout. The first `print`
 therefore reads the unassigned local, not the module-level name,
-and the second `print` does not run. Both mistakes
+and the second `print` does not run.
+
+**Mark the deliberate mistakes.** Both mistakes
 are visible without running the code. The type checker and the linter
 each flag them, so the offending lines carry `# type: ignore` and
 `# noqa` markers saying the misuse is deliberate, the way
@@ -538,11 +561,14 @@ print(mine)
 ```
 
 Only `clear_by_method()` empties the caller's list. When a call
-begins, `target` and `mine` are two names for one list. The
-assignment in `clear_by_assignment()` binds `target` to a new empty
+begins, `target` and `mine` are two names for one list.
+
+**Rebind the local name.** The assignment in `clear_by_assignment()` binds `target` to a new empty
 list, which the function prints, and `mine` still names the original.
-`target.clear()` rebinds nothing. It calls a method on the one list
+
+**Change the shared list.** `target.clear()` rebinds nothing. It calls a method on the one list
 both names share, so the caller sees the list empty.
+
 `clear_by_assignment()` and `clear_by_method()` are `rebind()` and
 `append_all()` from `mutating_arguments.py` with the same operation,
 emptying a list, written both ways.

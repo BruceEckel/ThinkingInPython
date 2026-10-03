@@ -93,7 +93,7 @@ print(render(rows, "csv"))
 #: paper,7
 ```
 
-Nothing absorbs the change. Each new format means opening `render()`
+**Branch on the format.** Nothing absorbs the change. Each new format means opening `render()`
 and adding a `case`, so the third request edits the same function the
 first two did. The `match` reads well and hides the cost, which is why
 this shape survives as long as it does. It is not wrong, but every new
@@ -132,7 +132,7 @@ print(render(rows, "json"))
 #: {"name": "paper", "amount": 7}
 ```
 
-The third format arrives without touching `render()`. The part worth
+**Hold each format as data.** The third format arrives without touching `render()`. The part worth
 noticing is where the assignment that adds the format can sit: in any module
 that imports `STYLES`. `STYLES` absorbs the change because a format is
 now data. Everything the axis does not cover still needs hand edits.
@@ -426,6 +426,12 @@ def main(kind: str) -> None:
 
 <details>
 <summary>Solution</summary>
+
+If you add `MdWriter` to the `AnyWriter` alias and to `main()` but miss the `case` in `Report.render()`,
+`main("md")` prints `None`, because no `case` matches and `render()` returns nothing.
+The type checker catches the gap: `ty` reports `invalid-return-type`, since `render()` can implicitly return `None`.
+The first version below makes all three edits,
+and the second takes the other path, leaving `Report` no `case` to miss.
 
 The first version gives each writer its own method name, which is the
 usual reason a class like `Report` ends up naming every writer: it

@@ -76,7 +76,7 @@ with expected(TypeError):
 #: [TypeError] object of type 'PairsAdapter' has no len()
 ```
 
-The adapter adds the one method the caller wants, `__getitem__()`,
+**Forward the rest to the list.** The adapter adds the one method the caller wants, `__getitem__()`,
 and forwards everything else to the wrapped list through
 `__getattr__()`, the same shape as `getattr_adapter.py`.
 The adapter defines no `append()`, so the lookup falls through to
@@ -85,7 +85,7 @@ the new entry.
 The record is frozen, and the list it holds is not: `append()`
 changes the list and assigns nothing to the adapter.
 
-`len(adapter)` fails although the list has a `__len__()`.
+**Show what forwarding misses.** `len(adapter)` fails although the list has a `__len__()`.
 Python looks up a special method on the class, not on the instance,
 so the lookup skips `__getattr__()` and finds no `__len__()` on
 `PairsAdapter`.
@@ -153,7 +153,7 @@ for entry in caught:
 #: DeprecationWarning Report is replaced by TextReport
 ```
 
-Decorating the class moves the warning to the two places where a
+**Move the warning to the type.** Decorating the class moves the warning to the two places where a
 caller commits to the type: constructing an instance and subclassing.
 `render()` runs outside the recording block and adds nothing to
 `caught`, so code that already holds a `Report` runs without a
@@ -162,7 +162,7 @@ That is the right split: `TextReport` replaces the type, not the
 method. A caller who wants to act on the warning must change where
 the `Report` comes from, not where they call `render()`.
 
-The type checker reports both the construction and the subclass, so
+**Use the deprecated class on purpose.** The type checker reports both the construction and the subclass, so
 both lines carry `# type: ignore`. The
 subclass warning fires at class-creation time, so it arrives on
 import rather than on any call. A library that subclasses a
@@ -265,11 +265,13 @@ print([name for name in vars(shop)
 #: ['record', 'start_car']
 ```
 
-The caller sees one function, and `start_car()` keeps the assembly
+**Hide the classes behind a function.** The caller sees one function, and `start_car()` keeps the assembly
 order, `_Ignition(_FuelPump(_Engine()))`, inside the module.
 `shop._Engine` and `shop._FuelPump` still reach the classes, because
 Python enforces nothing. The underscore marks them as private, and
-`from shop import *` skips them. The listing prints the module's
+`from shop import *` skips them.
+
+**List what a caller can see.** The listing prints the module's
 public names, the ones `from shop import *` binds. `record` appears because an
 import binds a name in the module too. A real module therefore
 either sets
@@ -415,6 +417,13 @@ def run(user: WhatIUse) -> None:
 <details>
 <summary>Solution</summary>
 
+If you fix the override by adding a `/` to `WhatIUse2.op()` and keeping the name `item`,
+the override refuses the keyword that every `WhatIUse` caller may pass.
+`ty` reports `invalid-method-override` because the parameter is positional-only,
+and `run(WhatIUse2())` raises a `TypeError` for the unexpected keyword `what_i_want`.
+The solution gives the parameter the base class's name instead,
+so the override accepts every call the base accepts.
+
 ```python
 # exercise_5.py
 from typing import override
@@ -483,7 +492,7 @@ WhatIUse2().op(what_i_want=WhatIHave())
 #: WhatIHave.h()
 ```
 
-`Renamed` is `WhatIUse2` from `adapter_variations.py`, unchanged.
+**Reproduce the broken override.** `Renamed` is `WhatIUse2` from `adapter_variations.py`, unchanged.
 Without the `/`, `what_i_want` is a name callers can pass by keyword,
 and `run()` does. `ty` rejects the override:
 
@@ -495,14 +504,14 @@ info: the parameter named `item` does not match
 info: This violates the Liskov Substitution Principle
 ```
 
-The `# type: ignore` silences that report so the listing can show
+**Call through the base type.** The `# type: ignore` silences that report so the listing can show
 what the checker prevents. `run()` accepts any `WhatIUse`, and a
 `Renamed` is one, so the type checker reports nothing about the call
 inside `run()`. At runtime `Renamed.op()` has no parameter named
 `what_i_want`, and the call raises a `TypeError`. The override broke
 a caller that does not mention `Renamed`.
 
-The fix keeps the base class's parameter name, `what_i_want`.
+**Keep the base parameter's name.** The fix keeps the base class's parameter name, `what_i_want`.
 `WhatIUse2.op()` still widens
 the type to the union, which an override may do, and it accepts the
 keyword every `WhatIUse` caller uses. The last call passes a

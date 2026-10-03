@@ -102,6 +102,13 @@ def function6():
 <details>
 <summary>Solution</summary>
 
+If you write the import as `from module5 import function5`, dropping the `a_package.` prefix,
+both packages initialize and then `use_module6.py` stops with `ModuleNotFoundError: No module named 'module5'`.
+Python looks for a top-level `module5` on `sys.path`,
+and no directory there holds a `module5.py`, because the file lives inside `a_package`.
+The full dotted path names `module5` through the package that contains it,
+so the solution writes `from a_package.module5 import function5`.
+
 `b_package` keeps the chapter's `__init__.py` too:
 
 ```python
@@ -132,14 +139,15 @@ print(function6())
 #: function6 calls function5 in module5 in a_package
 ```
 
-Python initializes both packages before it runs `module6`. `module5`
-then loads before `module6` finishes loading, because `module6`'s
-own import runs while its body is executing. All four messages
-therefore print before the script's own `print()` runs.
-The import crosses a package boundary, from `b_package` up to
+**Reach the parent package's module.** The import crosses a package boundary, from `b_package` up to
 `a_package`, so the absolute form is the right choice here. The
 relative equivalent, `from ..module5 import function5`, works too.
 Prefer the relative form only for siblings within one package.
+
+**Load the import chain first.** Python initializes both packages before it runs `module6`. `module5`
+then loads before `module6` finishes loading, because `module6`'s
+own import runs while its body is executing. All four messages
+therefore print before the script's own `print()` runs.
 
 After you rename the directory to `bPackage` and update the import to
 `a_package.bPackage.module6`, the script still runs. Python accepts
@@ -477,13 +485,17 @@ print(plugins is plugin_list.plugins)
 #: False
 ```
 
-`from plugin_list import plugins` binds the script's `plugins` to the
+**Share one list between two names.** `from plugin_list import plugins` binds the script's `plugins` to the
 list the module's name refers to, so at first the two names share one
 object. Appending changes that object, and both names show the new
-item. The assignment `plugin_list.plugins = []` rebinds the module's
+item.
+
+**Replace the module's list.** The assignment `plugin_list.plugins = []` rebinds the module's
 name to a second list and leaves the script's name on the first, so
 the second `append()` reaches a list the script's `plugins` does not
-refer to. `exercise_7.py` is `from_snapshot.py` with a mutable value: the
+refer to.
+
+`exercise_7.py` is `from_snapshot.py` with a mutable value: the
 `from` import takes no copy, and it does not follow the module's
 name when that name moves. When a module's list or dict can be
 replaced, import the module and read `plugin_list.plugins` each time.

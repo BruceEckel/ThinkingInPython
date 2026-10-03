@@ -19,6 +19,13 @@ The `and` operator stops at the first false operand, so the second test never se
 <details>
 <summary>Solution</summary>
 
+If you test `e.isdigit()` alone, or before the type test,
+the comprehension raises an `AttributeError` at the first element,
+since the integer `1` has no `isdigit()` method.
+The type checker flags the call before the program runs:
+`ty` reports `unresolved-attribute`, because `e` is `int | str` at that point.
+The solution tests `isinstance(e, str)` first, and `and` keeps `isdigit()` away from every integer.
+
 ```python
 # exercise_1.py
 a_list = [1, "4", 9, "a", 0, 4]
@@ -108,14 +115,14 @@ print(lengths["GALAHAD"], "NI" in lengths)
 #: 7 False
 ```
 
-`"Galahad"` is seven characters, so it passes the `len(name) > 3`
+**Filter before building each entry.** `"Galahad"` is seven characters, so it passes the `len(name) > 3`
 filter and adds one entry. `"Ni"` is still the only name the filter
 drops. The filter tests the original name, not the upper-cased key, so
 the filter judges a name before the output expression ever runs. That
 ordering matters when the output expression changes the length, as
 `name * 2` does.
 
-Two names that upper-case to the same string collide, since the
+**Keep one value per key.** Two names that upper-case to the same string collide, since the
 comprehension builds a `dict` and a later key overwrites an earlier
 one. Adding `"robin"` alongside `"Robin"` produces one `'ROBIN'` entry,
 not two, and the value comes from whichever name appears last in the
@@ -153,12 +160,12 @@ print(sorted(unique))
 #: ['Alice', 'Bob', 'J', 'John']
 ```
 
-The set holds four entries, one more than the filtered version. The
+**Collapse the repeats.** The set holds four entries, one more than the filtered version. The
 seven names normalize to `Bob`, `John`, `Alice`, `Bob`, `Alice`, `J`,
 `Bob`. A set keeps one of each, so the duplicates and the case variants
 collapse to `Bob`, `John`, and `Alice`, and `J` joins them.
 
-`"J"` does not collide with `"JOHN"` because the normalization is a
+**Normalize without truncating.** `"J"` does not collide with `"JOHN"` because the normalization is a
 string transformation, not a truncation: `"J"` becomes `"J"` and
 `"JOHN"` becomes `"John"`. `name[1:]` on a one-character string is the
 empty string, so the concatenation adds nothing to the capital. `"J"`
@@ -197,6 +204,13 @@ def show(n: int) -> str:
 <details>
 <summary>Solution</summary>
 
+If you leave `return line` out of `show()`,
+the function returns `None` implicitly,
+and `lines` prints as `[None, None, None]`, the list `comprehension_side_effects.py` builds.
+The type checker catches the omission:
+`ty` reports `invalid-return-type`, because `show()` declares a `str` return type.
+The solution returns the line it printed, so the comprehension collects strings.
+
 ```python
 # exercise_5.py
 def show(n: int) -> str:
@@ -218,13 +232,13 @@ for n in [1, 2, 3]:  # Printing alone stays a loop
 #: item 3
 ```
 
-The original comprehension collects `print()`'s return value, which is
+**Give the output expression a value.** The original comprehension collects `print()`'s return value, which is
 always `None`, so the list it builds is worthless and the brackets
 mislead the reader. Giving the output expression something to return
 fixes both: `show()` prints and hands back the line, so `lines` holds
 the three strings a caller can assert on, write to a file, or join.
 
-Which shape is right depends on whether you want the list. Here the
+**Choose the shape by the result.** Which shape is right depends on whether you want the list. Here the
 comprehension is correct, because `lines` is the point and the printing
 is incidental. The `for` loop at the end is the right shape for
 `comprehension_side_effects.py`, where printing is the purpose. The rule from the
@@ -355,7 +369,7 @@ print(built)
 #: [2, 4, 6]
 ```
 
-The lines print in the same order as in `genexp_timing.py`, and the
+**Compute the products eagerly.** The lines print in the same order as in `genexp_timing.py`, and the
 last one changes from `[10, 20, 30]` to `[2, 4, 6]`. A list
 comprehension does all its work on the line where it appears: it
 calls `source()`, reads `factor` while `factor` is `2`, and stores

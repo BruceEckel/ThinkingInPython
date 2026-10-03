@@ -187,13 +187,17 @@ print(Tally.total)
 #: 2
 ```
 
-`a.total = 99` looks like it should update the shared count, but
+**Shadow the class attribute.** `a.total = 99` looks like it should update the shared count, but
 assignment through an instance always writes to the instance, never
 the class. That assignment creates a brand-new instance attribute
 named `total` on `a`, which then shadows `Tally.total` for `a`
-specifically. `vars(a)` shows the shadow directly: `a` now has its
+specifically.
+
+**Check where the write went.** `vars(a)` shows the shadow directly: `a` now has its
 own `total` entry. `Tally.total`, read through the class, still
-reports `2`, because nothing wrote to the class. This shadow is the
+reports `2`, because nothing wrote to the class.
+
+This shadow is the
 bug `ClassVar` exists to catch. With `total: ClassVar[int] = 0`
 declared instead, the type checker flags `a.total = 99` as an error
 before the line runs, because the assignment writes to a `ClassVar`
@@ -237,7 +241,7 @@ print(a.items, b.items)
 #: ['apple'] []
 ```
 
-`default_factory=list` calls `list()` once per construction, so the
+**Build a list per instance.** `default_factory=list` calls `list()` once per construction, so the
 generated `__init__()` assigns a brand-new list to `self.items` on
 every `Cart`. Each object owns its list from birth, and `a`'s append
 cannot reach `b`.
@@ -259,7 +263,7 @@ with expected(ValueError):
 #: items is not allowed: use default_factory
 ```
 
-The error arrives at class-definition time, not at first use, and
+**Fail at class definition.** The error arrives at class-definition time, not at first use, and
 the full message ends with the remedy: `use default_factory`.
 `@dataclass` can detect the mistake because it inspects every default
 before generating the constructor. Nobody inspects a plain class body,
@@ -305,13 +309,13 @@ with expected(AttributeError):
 #: [AttributeError] 'A' object has no attribute 'x'
 ```
 
-`del a.x` removes the entry from the instance dictionary, which is
+**Remove the shadow.** `del a.x` removes the entry from the instance dictionary, which is
 the only place assignment ever writes. `vars(a)` is empty again, and
 `a.x` reads `100`, because the lookup falls back to the class the
 way it did before any assignment. The class attribute keeps its `100`
 throughout: the assignment and the `del` both stay on the instance.
 
-The second `del a.x` fails because the instance dictionary is empty.
+**Show that deletes stop at the instance.** The second `del a.x` fails because the instance dictionary is empty.
 `del` stops at the instance, the way assignment does, so
 `vars(A)["x"]` keeps its `100`. Deleting the class attribute takes
 `del A.x`, naming the class. The asymmetry is the same one assignment
@@ -359,6 +363,13 @@ class Counting:
 <details>
 <summary>Solution</summary>
 
+If you fix the increment with `type(self).total += 1`,
+this listing prints `2 2 2` too, because `Counting` has no subclass.
+Once a subclass exists, the counter forks the way `classvar_fork.py` forks it for `Sub`:
+constructing an empty subclass twice leaves `Counting.total` at `2`
+and gives the subclass its own `total` of `4`.
+The solution names the class, so every write goes to one dictionary.
+
 ```python
 # exercise_7.py
 from typing import ClassVar
@@ -388,7 +399,7 @@ print(vars(c), vars(Counting)["total"])
 #: {} 2
 ```
 
-`vars(a)` holds `{'total': 1}` and the class still holds `0`, and
+**Show where each write went.** `vars(a)` holds `{'total': 1}` and the class still holds `0`, and
 those two facts explain the output. `self.total += 1` expands to
 `self.total = self.total + 1`. The read finds nothing on the instance,
 falls back to the class, and gets `0`. The write then goes where every
@@ -396,12 +407,7 @@ write through an instance goes: onto the instance. Each object ends up
 with its own `total` of `1`, shadowing a class attribute that still
 holds `0`.
 
-The fix names the class on the left. `Counting.total += 1` reads and
-writes the same class dictionary, so both instances report `2`.
-`vars(c)` is empty because the constructor writes only to the class,
-and `c.total` is the read falling back to that shared value.
-
-With the `# type: ignore` removed, the type checker (`ty`) reports
+**Silence the checker's report.** With the `# type: ignore` removed, the type checker (`ty`) reports
 `invalid-attribute-access`, naming the type of `self`. The augmented
 form expands to an assignment through `self`, and the type checker
 treats that assignment the way it treats a write like `a.total = 99`
@@ -412,6 +418,11 @@ For such a write it reports
 The `ClassVar` declaration catches the mistake at check time.
 The listing suppresses the report so it can demonstrate
 what the write does at runtime.
+
+**Send the write to the class.** The fix names the class on the left. `Counting.total += 1` reads and
+writes the same class dictionary, so both instances report `2`.
+`vars(c)` is empty because the constructor writes only to the class,
+and `c.total` is the read falling back to that shared value.
 
 </details>
 </details>
@@ -468,7 +479,7 @@ print(Base2.shared, Left2.shared, Right2.shared)
 #: [1] [1] [2]
 ```
 
-`Base.shared` holds `[1, 2]`, and so do both subclasses, because all
+**Share one list across the hierarchy.** `Base.shared` holds `[1, 2]`, and so do both subclasses, because all
 three names share one list. Neither `Left` nor `Right` declares its
 own, so both names read through to `Base`, and `.append()` mutates
 what it finds there. `Left.shared is Base.shared` proves they are one
@@ -481,7 +492,7 @@ can change it in place, and a mutable one in a single class keeps the
 sharing visible. Together they produce a base-class list that every
 subclass writes to and none of them declares.
 
-Giving `Right2` its own `shared = []` splits off `Right2` alone. The
+**Give one subclass its own list.** Giving `Right2` its own `shared = []` splits off `Right2` alone. The
 assignment in the class body creates a new entry in `Right2`'s own
 dictionary, so `Right2.shared` stops reading through to `Base2`,
 while `Left2` still shares `Base2`'s list. The result, `[1] [1] [2]`,
@@ -551,13 +562,13 @@ print(vars(t), t.seat)
 #: {'holder': 'Ada', 'seat': '14C'} 14C
 ```
 
-The type checker reports nothing for this file. The annotation `seat: str` states
+**Declare the attribute without creating it.** The type checker reports nothing for this file. The annotation `seat: str` states
 that a `Ticket` carries a `seat`, and the checker trusts the declaration
 without checking that a method assigns `seat`. At runtime the declaration
 creates nothing: `vars(t)` holds `holder` alone, and reading `t.seat`
 raises an `AttributeError`.
 
-`t.seat = "14C"` creates the attribute on the instance, and the type checker
+**Create the attribute from outside.** `t.seat = "14C"` creates the attribute on the instance, and the type checker
 checks that assignment against the declared `str`. A bare annotation
 is safe when the code that assigns the attribute runs before any code
 that reads it. The type checker cannot confirm that order, so the
@@ -657,14 +668,14 @@ print(Counted.total, SubCounted.total)
 #: 3 3
 ```
 
-Before the first `Sub()`, `vars(Sub)` has no `total`: `Sub` reads
+**Watch the subclass fork the counter.** Before the first `Sub()`, `vars(Sub)` has no `total`: `Sub` reads
 `Base`'s. The first `Sub()` runs `type(self).total += 1` with
 `type(self)` as `Sub`. The read falls back to `Base.total`, which is
 `1`, and the write stores `2` in `Sub`'s own dictionary. From then on
 `Sub` has its own counter, and the second `Sub()` moves it to `3`
 while `Base.total` stays at `1`.
 
-`Counted` names the class on the left, so every construction reads
+**Keep one counter for the hierarchy.** `Counted` names the class on the left, so every construction reads
 and writes `Counted`'s dictionary. `vars(SubCounted)` holds no `total`
 at any point, and both names report the one shared count of `3`.
 

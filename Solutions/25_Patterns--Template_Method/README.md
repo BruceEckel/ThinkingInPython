@@ -126,7 +126,7 @@ def run_file_framework(
     Path(output).write_text("".join(pieces))
 ```
 
-The empty `__slots__` lets a subclass that carries data be a record,
+**Let a subclass be a record.** The empty `__slots__` lets a subclass that carries data be a record,
 as
 [Rethinking Objects](../../Chapters/20_Patterns--Rethinking_Objects.md#abstract-base-classes)
 explains.
@@ -227,7 +227,9 @@ demo()
 ```
 
 The report has one line for each input file, naming the search words
-that file contains. The two forms differ in where the word list
+that file contains.
+
+**Give the step its data.** The two forms differ in where the word list
 lives. `Search` stores it in a field, and the lambda closes over the
 local variable `words`. In both, `run()` and `run_file_framework()`
 stay unchanged: a new policy is a new step, and the algorithm that
@@ -301,6 +303,14 @@ class Greeter(Framework):
 
 <details>
 <summary>Solution</summary>
+
+If you drop the `super().__init__()` call from `Greeter.__init__()` to avoid the trap,
+`Greeter("Brian")` runs without an error and prints nothing,
+because the engine starts in `Framework.__init__()`, which no longer runs.
+The type checker reports nothing either.
+The reorder keeps the call and moves it after the setup,
+and the redesign takes the start out of construction,
+so no subclass constructor decides whether the engine runs.
 
 The quick repair reorders the two lines so the subclass finishes its
 own setup before handing control to the base class:
@@ -588,13 +598,13 @@ The type checker reports nothing about either class. Both override with
 the right name, the right parameters, and the right return type, so both satisfy
 `@override` and every signature rule the base class states.
 
-`Exploder` breaks the algorithm on the first step of the first pass.
+**Raise an unexpected exception.** `Exploder` breaks the algorithm on the first step of the first pass.
 Code written against `ApplicationFramework` expects `run()` to return
 normally for every subclass the base contemplates. `Exploder` raises
 an exception instead, so a caller with no `try` around `run()` gets an
 exception out of a method that never advertised one.
 
-`HalfDone` breaks the algorithm more quietly, which makes it the
+**Skip a step the flow needs.** `HalfDone` breaks the algorithm more quietly, which makes it the
 worse of the two. `customize1()` accumulates work for `customize2()`
 to consume, so the pair is a two-step flow. Leaving `customize2()` at
 its default breaks the second half, and the program neither raises an
@@ -768,7 +778,7 @@ with expected(TypeError):
 #: [TypeError] Audited.reports: did you mean report?
 ```
 
-The `class Audited` statement raises a `TypeError`. The check
+**Compare against every base.** The `class Audited` statement raises a `TypeError`. The check
 compares a new method against every non-dunder name in every base,
 and `report` is one of them, although `report()` is a helper that
 `MyApp` added and no step of the framework. The framework enforces a
@@ -835,8 +845,10 @@ with expected(TypeError):
 #: [TypeError] Typo.customise2: did you mean customize2?
 ```
 
-`ApplicationFramework` exists by the time any subclass's `class`
-statement runs, so `__init_subclass__()` can name it. `Audited` now
+**Draw names from the framework alone.** `ApplicationFramework` exists by the time any subclass's `class`
+statement runs, so `__init_subclass__()` can name it.
+
+**Pass the helper, catch the step.** `Audited` now
 finishes, and a misspelled step still fails at any depth of the
 hierarchy, because the check compares every subclass against the
 framework's three names.

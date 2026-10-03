@@ -197,11 +197,13 @@ print(f"lazy peak under 1% of one list: "
 #: lazy peak under 1% of one list: True
 ```
 
-`one_list()` filters `x * x` directly instead of first building a
+**Skip the intermediate list.** `one_list()` filters `x * x` directly instead of first building a
 `squares` list and then an `evens` list from it, so the
 million-element `squares` list is gone. Peak memory drops to about
 half of the two-list version's. That is as close as an eager version
-gets, and the last line shows how far away the eager version still is:
+gets.
+
+**Measure the remaining gap.** The last line shows how far away the eager version still is:
 the lazy peak is under one percent of the one-list peak. The comprehension must build and
 hold the whole list of half a million even squares before `[:5]`
 discards nearly all of them. Restructuring the eager version cannot
@@ -293,6 +295,14 @@ For the last question, compare the invariant with what "sorted" requires.
 <details>
 <summary>Solution</summary>
 
+If you keep `heap.pop(0)` from the original,
+the three pops return `3`, `6`, and `4`,
+and the check prints `False` after the first and the third.
+Removing the front element shifts the rest of the list one place left,
+and the shifted list no longer satisfies the heap ordering.
+The solution calls `heappop()`, which restores that ordering after every removal,
+so `heap[0]` stays the smallest value.
+
 ```python
 # exercise_5.py
 from heapq import heapify, heappop
@@ -310,7 +320,7 @@ for _ in range(3):
 #: 5 [6, 7, 8, 9, 10] True
 ```
 
-Each pop returns the true smallest remaining value: `3`, then `4`,
+**Check the invariant after each pop.** Each pop returns the true smallest remaining value: `3`, then `4`,
 then `5`. After every pop, `heap[0]` is still the minimum. Compare
 `heap.pop(0)` in the original, which returns the right value once and
 then leaves a list that is no longer a heap.
@@ -380,15 +390,16 @@ print(Point3D.__slots__)
 #: ('x', 'y')
 ```
 
-`Point` refuses `p.z = 3` with an `AttributeError`, but `Point3D`
+**Locate the new attribute's storage.** `Point` refuses `p.z = 3` with an `AttributeError`, but `Point3D`
 accepts it, and `vars(p)` shows where the value went: an instance
 `__dict__` that the base class does not have.
-
 Declaring `__slots__` does not disable the instance dictionary for a
 whole hierarchy. It omits the `__dict__` from the declaring class alone.
 Any subclass that does not declare its own `__slots__` gets the
 default behavior, a `__dict__`, and inherits the parent's slots
-alongside it. The last line shows the trap: `Point3D.__slots__` reads
+alongside it.
+
+**Expose the inherited `__slots__`.** The last line shows the trap: `Point3D.__slots__` reads
 `('x', 'y')`, inherited from `Point`, so reading that attribute makes
 the subclass look slotted while it still carries a `__dict__`.
 
@@ -768,18 +779,18 @@ print(xs)
 #: [1, 3, 5, 5, 5, 5, 7, 9]
 ```
 
-`bisect_left()` finds the first occurrence. It returns the position
+**Find the start of the run.** `bisect_left()` finds the first occurrence. It returns the position
 before any equal elements, so `xs[left]` is the target when the
 target is present, which is what a membership test needs and what
 `search_comparison.py` relies on.
 
-`bisect()`, the alias for `bisect_right()`, returns the position
+**Find the end of the run.** `bisect()`, the alias for `bisect_right()`, returns the position
 after the last equal element. That is the position to insert at when
 you want a new duplicate to land after the existing ones. It is the
 wrong index to read: `xs[right]` is the next larger value, or an
 `IndexError` when the target is the largest element in the list.
 
-The pair together answers a third question the chapter does not
+**Recover the whole run.** The pair together answers a third question the chapter does not
 raise. `xs[left:right]` is the run of equal values, and
 `right - left` counts them, both in O(log n) with no scan.
 

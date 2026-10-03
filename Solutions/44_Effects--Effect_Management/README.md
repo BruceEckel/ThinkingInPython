@@ -90,14 +90,14 @@ terminal to read from. The substitution is the point either way: one
 object for both parameters. You can also replace either parameter
 with a double, and the other one never notices.
 
-`greet()` requires no change, and could not have required one. It
+**Declare what the function needs.** `greet()` requires no change, and could not have required one. It
 names two capabilities it needs and calls methods on them. It never
 mentions `Console`, `input()`, `print()`, or `Scripted`, so a change of
 binding has nothing in its body to affect. That is the delayed-binding
 payoff: the choice of implementation moves to the call site, where a
 test can choose differently from production.
 
-Notice what the type checker still enforces after the choice moves.
+**Satisfy the protocols structurally.** Notice what the type checker still enforces after the choice moves.
 `Console` inherits from nothing and declares no relationship to `Ask`
 or `Tell`, but it has the two methods with the right signatures, so it
 satisfies both protocols structurally. If you give `Console` a
@@ -232,12 +232,14 @@ for line in captured.messages:
 ```
 
 Five signatures name the new Effect, and only two of them use it.
-One of the five is new rather than edited: `format_greeting()`, the
+
+**Log at the point of use.** One of the five is new rather than edited: `format_greeting()`, the
 helper that uses the `Log`. You must edit four existing signatures.
 `greet()` both uses a `Log` and accepts one, to hand down to
-`format_greeting()`. Then `session()`, `menu()`, and `main()` each
-gain a `log` parameter that they only hand to the next function.
+`format_greeting()`.
 
+**Hand the Effect down the call chain.** `session()`, `menu()`, and `main()` each
+gain a `log` parameter that they only hand to the next function.
 Three of the five never use the `Log` they name. Those functions
 sit between the Effect's user and the call site that binds it, and
 they pay for an Effect they never mention again. Their signatures now
@@ -386,6 +388,13 @@ def slope(rise: int, run: PositiveInt) -> float:
 <details>
 <summary>Solution</summary>
 
+If you keep `NonZero`'s `self.value == 0` test under the new name,
+`PositiveInt(-1)` constructs without complaint,
+and `slope(10, PositiveInt(-1))` returns `-10.0`.
+The demo's `expect()` loop then raises an `AssertionError` ("no exception raised") on `-1`,
+and the type checker reports nothing, because every argument has the right type.
+The solution's `__post_init__()` tests `value <= 0` instead, which rejects both bad values.
+
 ```python
 # exercise_4.py
 from exceptions import expect
@@ -412,13 +421,7 @@ for bad in (0, -1):
 #: [ValueError] PositiveInt needs a positive value: -1
 ```
 
-Both checks disappear from `slope()`, and so does everything they
-brought with them. A `PositiveInt` cannot hold zero, so the
-`try`/`except ZeroDivisionError` goes. It cannot hold a negative
-either, so the call to `validate()` goes, and `validate()` along with
-it. Only the division remains.
-
-The original `slope_catch.py` splits the guarding in a way that is
+**Cover both bad values with one predicate.** The original `slope_catch.py` splits the guarding in a way that is
 easy to miss. `validate()` rejects negatives but lets zero through,
 and the `try` catches zero but says nothing about negatives. Two
 mechanisms in two places cover the two bad values, and neither one
@@ -427,7 +430,13 @@ One predicate, `value <= 0`, covers both, because "positive" is a
 single idea and "not zero, and also not negative" is the same idea
 described as two exceptions.
 
-The cost moves rather than vanishing. `PositiveInt(bad)` still raises
+**Trust the parameter's type.** Both checks disappear from `slope()`, and so does everything they
+brought with them. A `PositiveInt` cannot hold zero, so the
+`try`/`except ZeroDivisionError` goes. It cannot hold a negative
+either, so the call to `validate()` goes, and `validate()` along with
+it. Only the division remains.
+
+**Fail at the construction site.** The cost moves rather than vanishing. `PositiveInt(bad)` still raises
 an exception, at the boundary where an untrusted number enters the
 program, and a caller reading from a file or a form still has to
 handle it. The count changed: one construction site instead of every
@@ -481,6 +490,14 @@ async def total_price_async(items: list[str]) -> float:
 <details>
 <summary>Solution</summary>
 
+If you leave out the `await` in the list comprehension,
+`sum()` receives a list of coroutines rather than prices.
+`ty` reports `no-matching-overload` at the `sum()` call,
+and the `asyncio.run()` call raises a `TypeError` for adding an `int` and a `coroutine`,
+with a `RuntimeWarning` that `price_of_async` was never awaited.
+Calling an `async` function builds a coroutine and runs none of its body,
+so the solution awaits each call to get its `float`.
+
 ```python
 # exercise_5.py
 import asyncio
@@ -513,15 +530,20 @@ description.close()  # Never awaited, so close it explicitly
 ```
 
 Making the helper `async` forces four changes, and none of them is
-optional. `price_of_async("apple")` now returns a coroutine instead of
+optional.
+
+**Await the helper from a coroutine.** `price_of_async("apple")` now returns a coroutine instead of
 a `float`, as the last `print()` shows, so `total_price()` cannot sum
 the results until each call has an `await`. Only an `async def` may
 contain `await`, so `total_price()` becomes `total_price_async()`.
-The argument to `sum()` gains brackets. A generator expression with
+
+**Collect the results before summing.** The argument to `sum()` gains brackets. A generator expression with
 an `await` inside it is an asynchronous generator, which `sum()`
 cannot iterate: `ty` reports `no-matching-overload`, and the call
 raises a `TypeError`. The list comprehension awaits each price and
-hands `sum()` a list. The callers of `total_price_async()` then must
+hands `sum()` a list.
+
+**Run the coroutine at the edge.** The callers of `total_price_async()` then must
 become `async` in turn, and the propagation stops only at `asyncio.run()`,
 the boundary that discharges the Effect.
 

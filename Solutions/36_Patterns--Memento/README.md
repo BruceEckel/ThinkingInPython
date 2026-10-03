@@ -152,11 +152,14 @@ def test_erase_leaves_history_states_untouched() -> None:
     assert history.past[0].strokes == ("a",)
 ```
 
-`erase()` mutates `self.strokes` in place, as `draw()`
-does, so it needs no special handling. `save()` copies the strokes
+**Remove the last stroke.** `erase()` mutates `self.strokes` in place, as `draw()`
+does, so it needs no special handling.
+
+**Copy the state when saving.** `save()` copies the strokes
 into an immutable `Memento` the moment it runs, so nothing later,
 erase included, can reach back and change a memento already taken.
-The history test shows the same safety one level up, using a
+
+**Prove the history keeps its states.** The history test shows the same safety one level up, using a
 `History` trimmed to what the test needs. The states that `History`
 stores are mementos, and mementos never change, so erasing after a
 `do()` leaves both the present state and the past one intact.
@@ -226,11 +229,12 @@ def test_erase_leaves_history_states_untouched() -> None:
     assert before.strokes == ("circle", "beak")
 ```
 
-The frozen version's `erase()` follows `draw()`'s shape too: it
+**Derive the shorter state.** The frozen version's `erase()` follows `draw()`'s shape too: it
 returns a new `Drawing` via `replace()`, this time with the last stroke
 sliced off. `before` keeps its own strokes, so any `History` holding
 `before` as a past state stays safe.
-The history test confirms that safety: after `do(before.erase())`,
+
+**Prove the history keeps its states.** The history test confirms that safety: after `do(before.erase())`,
 the stored past state `is` the original object, still carrying both
 strokes.
 
@@ -273,6 +277,13 @@ class History[S]:
 <details>
 <summary>Solution</summary>
 
+If `can_undo()` counts the `do()` calls that `undo()` has not yet reversed,
+rather than looking at `_past`,
+it reports `True` once the bound has discarded a state the count still includes.
+In the demo it reports `True` after the two undos, with `_past` empty,
+and the `undo()` it approves raises an `IndexError` from `pop()`.
+The solution keeps the chapter's `bool(self._past)`, which asks what the list holds now.
+
 ```python
 # exercise_2.py
 class History[S]:
@@ -311,7 +322,7 @@ print(h.can_undo())
 #: False
 ```
 
-`can_undo()` needs no change: it already asks whether `_past` still
+**Report what the past still holds.** `can_undo()` needs no change: it already asks whether `_past` still
 holds a state. A bounded history empties `_past` sooner: after at
 most `max_depth` undos, rather than one undo per `do()` the program
 made. So `can_undo()` reports `False` while earlier states exist that
@@ -358,6 +369,16 @@ class Drawing:
 <details>
 <summary>Solution</summary>
 
+If you pass `data["strokes"]` to `Drawing` without wrapping it in `tuple(...)`,
+`ty check` still passes, because `json.loads()` returns `Any`,
+and an `Any` satisfies the declared `tuple[str, ...]`.
+The mismatch surfaces only when the program runs:
+`reconstructed == drawing` becomes `False`, since a `list` never
+equals a `tuple`, and the `list` costs the `Drawing` the hashability a
+record otherwise supplies (`hash()` raises a `TypeError`,
+`unhashable type: 'list'`).
+The solution converts the field back, so the rebuilt `Drawing` equals the original.
+
 ```python
 # exercise_3.py
 import json
@@ -384,21 +405,16 @@ print(reconstructed == drawing)
 #: True
 ```
 
-JSON has no tuple type, only arrays, so `strokes` comes back from
+**Find what the round trip changed.** JSON has no tuple type, only arrays, so `strokes` comes back from
 `json.loads()` as a `list`, where the record declares it
 `tuple[str, ...]`. `pickle` preserves the exact Python type, tuple
 in, tuple out, because it serializes Python's own object
 representations rather than translating into a shared,
-language-neutral format. The reconstruction compensates for what
+language-neutral format.
+
+**Restore the declared type.** The reconstruction compensates for what
 JSON loses: it wraps `data["strokes"]` back in `tuple(...)` before
-passing it to `Drawing`. A type checker cannot catch a missing
-`tuple(...)` here, because `json.loads()` returns `Any`, and an `Any` satisfies the
-declared `tuple[str, ...]`. Without the `tuple(...)`, `ty check` still
-passes. The mismatch surfaces only when the program runs:
-`reconstructed == drawing` becomes `False`, since a `list` never
-equals a `tuple`, and the `list` costs the `Drawing` the hashability a
-record otherwise supplies (`hash()` raises a `TypeError`,
-`unhashable type: 'list'`).
+passing it to `Drawing`.
 
 </details>
 </details>
@@ -446,7 +462,7 @@ FAILED test_sketch.py::test_memento_ignores_later_drawing
 FAILED test_sketch.py::test_drawing_after_restore_spares_memento
 ```
 
-The corruption is deeper than any single test expects. Because
+**Share the list on save.** The corruption is deeper than any single test expects. Because
 `Memento.strokes` is now the same list `Sketch.strokes` points
 to, `sketch.draw("b")` after `checkpoint = sketch.save()` mutates
 `checkpoint.strokes` too. By the time `test_restore_rewinds_state`
@@ -476,7 +492,7 @@ def test_memento_is_a_snapshot() -> None:
     assert list(checkpoint.strokes) == ["a"]
 ```
 
-Against the shared-list version, `checkpoint.strokes` is `["a", "b"]`
+**Isolate the sharing bug.** Against the shared-list version, `checkpoint.strokes` is `["a", "b"]`
 when the assertion runs, because `draw("b")` appended to the one list
 `sketch` and `checkpoint` share.
 
@@ -527,6 +543,14 @@ class History[S]:
 
 <details>
 <summary>Solution</summary>
+
+If you leave out the range check,
+a jump too far raises an `IndexError` partway, after moving some states to `_future`:
+in the demo, `goto(4)` undoes three states before `pop()` fails,
+and the present is `0` rather than `3`.
+The solution checks the distance before it moves anything, so
+a jump that raises an `IndexError` leaves the history where it was,
+as the chapter's `undo()` does.
 
 ```python
 # exercise_5.py
@@ -580,17 +604,12 @@ print(h.present)
 #: 3
 ```
 
-`goto()` adds no new mechanism. It calls the existing `undo()`
+**Step back through `undo()`.** `goto()` adds no new mechanism. It calls the existing `undo()`
 repeatedly, and each `undo()` pushes the state it leaves onto
 `_future`. Redo therefore works exactly as if you had called `undo()`
 twice: `h.redo()` after `goto(2)` returns `2`, then `3`, retracing
 the same path forward. Jumping several states back
-"in one call" is a convenience for the caller, with one difference
-from a loop of `undo()` calls. A loop that runs out of past states
-raises an `IndexError` partway, after moving some states to
-`_future`. `goto()` checks the distance before it moves anything, so
-a jump that raises an `IndexError` leaves the history where it was,
-as the chapter's `undo()` does.
+"in one call" is a convenience for the caller.
 
 </details>
 </details>
@@ -706,20 +725,20 @@ print(history.undo())
 #: Drawing(title='Goose', strokes=('body', 'beak', 'tail'))
 ```
 
-`restore_field()` is `partial_restore.py` with the field name lifted
+**Take one field from the past.** `restore_field()` is `partial_restore.py` with the field name lifted
 into a parameter. It reads one attribute off the past state, hands it
 to `copy.replace()` as the single change, and pushes the result
 through `do()`. The rename to `"Goose"` survives the restore because
 `copy.replace()` carries over every field the call did not name.
 
-`restore_field()` takes a `History[Drawing]` rather than a generic
+**Narrow the history's state type.** `restore_field()` takes a `History[Drawing]` rather than a generic
 `History[S]`, and that is a typing constraint rather than a design
 choice. `copy.replace()` requires a `__replace__()` method, and a bare
 type variable `S` has no such method, so a generic version needs
 a `Protocol` declaring `__replace__()` as the type variable's bound.
 Worth doing in a library; noise in a solution.
 
-`restore_field()` must go through `do()` for the reason
+**Record the restore as an action.** `restore_field()` must go through `do()` for the reason
 [Restoring Part of a State](../../Chapters/36_Patterns--Memento.md#restoring-part-of-a-state)
 gives, and the listing's last line proves it: the partial restore is
 itself an action, so it belongs on the timeline. Editing `_past`
@@ -775,6 +794,13 @@ class DrawingV2:
 <details>
 <summary>Solution</summary>
 
+If you write `DrawingV2` with a bare `@record`, as the chapter writes `Drawing`,
+the default does not appear: reading `restored.layer` raises an `AttributeError`.
+A slotted class keeps `layer` in a slot instead of as a class attribute,
+so nothing supplies the value the old bytes lack.
+The solution writes `@record(slots=False)`,
+which keeps the default on the class and gives each instance the `__dict__` the listing inspects.
+
 ```python
 # drawing_v1.py
 from record import record
@@ -822,7 +848,7 @@ expect(ValueError, copy.replace, empty, strokes=())
 #: [ValueError] title must not be empty
 ```
 
-The default appears, and not because pickle supplied it. A dataclass
+**Find the default on the class.** The default appears, and not because pickle supplied it. A dataclass
 field with a simple default stores that default as a class attribute,
 so `restored.layer` finds `DrawingV2.layer` by ordinary attribute
 lookup while `restored.__dict__` has no `layer`. With the field
@@ -831,13 +857,13 @@ disappears: a `default_factory` leaves no class attribute, so the
 loaded object raises an `AttributeError` the first time anything
 reads `layer`.
 
-What pickle skips is every line of code the class runs at
+**Skip the constructor on load.** What pickle skips is every line of code the class runs at
 construction. `pickle.loads()` builds a bare instance and writes the
 saved `__dict__` into it, so `__init__()` never runs and neither does
 `__post_init__()`. The empty title loads into a class written to
 reject it.
 
-`copy.replace()`, which the chapter's partial restore uses, behaves
+**Run the validation on replace.** `copy.replace()`, which the chapter's partial restore uses, behaves
 differently. It goes through `__replace__()`, which constructs a real instance
 and therefore runs `__post_init__()`, so `__post_init__()` catches the
 invalid state the moment anything derives a new state from it. That is

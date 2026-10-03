@@ -69,7 +69,7 @@ print(Counter.live_count())
 #: 0
 ```
 
-`counters.clear()` empties the existing list in place, dropping its
+**Abandon the old list.** `counters.clear()` empties the existing list in place, dropping its
 references to all three `Counter` objects. `counters = []` does
 something different: it points the name `counters` at a brand-new,
 empty list and abandons the old one. Here nothing else refers to that
@@ -92,7 +92,7 @@ print(other)
 #: []
 ```
 
-`clear()` changes the object every name can see. Rebinding changes
+**Look through a second name.** `clear()` changes the object every name can see. Rebinding changes
 only which object this one name points at. The two coincide in
 `weak_value.py` because that list has exactly one reference. With
 two references, rebinding leaves the `Counter` objects alive
@@ -138,6 +138,12 @@ class Counter:
 <details>
 <summary>Solution</summary>
 
+If you return `[c.name for c in cls._instances.values()]` without `sorted()`,
+the demo prints `['Charlie', 'Alpha', 'Bravo']`, the order in which the demo created the instances.
+The type checker accepts that version, since the result is still a `list[str]`,
+so the output alone shows the mistake.
+The solution sorts, so the list depends on which names are live and not on when the program created each instance.
+
 ```python
 # exercise_2.py
 from typing import ClassVar
@@ -163,7 +169,7 @@ print(Counter.live_names())
 #: ['Alpha', 'Bravo', 'Charlie']
 ```
 
-`cls._instances.values()` iterates the live `Counter` objects
+**Gather the live names.** `cls._instances.values()` iterates the live `Counter` objects
 currently tracked, since a `WeakValueDictionary` reads like a normal
 `dict`. The generator expression pulls out each one's `.name`. Sorting
 gives a deterministic order, since a dictionary's iteration order here
@@ -249,10 +255,12 @@ print("End of delete loop")
 #: End of delete loop
 ```
 
-The output is identical to the original `for`-loop-with-`append()`
+**Build the same list.** The output is identical to the original `for`-loop-with-`append()`
 version. A comprehension calls `Counter(name)` once per name, in
 order, and the resulting list is again the only thing holding
-references to those three objects. `del c` inside the loop unbinds the
+references to those three objects.
+
+**Drop the loop variable's reference.** `del c` inside the loop unbinds the
 name `c` and leaves the list alone. How the list gets built has no
 bearing on when its contents get destroyed, so the `deleted` messages
 appear, as before, at interpreter shutdown, after `End of delete loop`
@@ -326,7 +334,7 @@ print(Counter.live_count())
 #: 3
 ```
 
-The count never falls. A `dict` holds a strong reference to each
+**Register each instance strongly.** The count never falls. A `dict` holds a strong reference to each
 value, so `_instances` alone keeps every `Counter` alive no matter
 what `counters` does. `pop()` removes one reference and the registry
 keeps another, so the object's reference count stays above zero and
@@ -422,7 +430,7 @@ the point in its own right. The rest of the output matches the
 chapter's, so the mistake is hard to see: the callback still
 runs, at a different time and for a different reason.
 
-What keeps the `Connection` alive is the callback itself. `self.close`
+**Register the cleanup callback.** What keeps the `Connection` alive is the callback itself. `self.close`
 is a bound method, and a bound method holds a strong reference to
 its instance. `finalize()` stores the callback, so the finalizer
 registry now holds a reference to the `Connection` for whose death
@@ -513,14 +521,14 @@ print("after collect")
 #: after collect
 ```
 
-Both finalizers run at `gc.collect()`, in creation order. The
+**Form a two-object cycle.** Both finalizers run at `gc.collect()`, in creation order. The
 principle is the same as in `cycle.py`. Reference counting cannot reclaim
 either object, because each holds the other. The cycle collector
 reclaims both together when it runs. A cycle through two objects
 behaves like a cycle through one. The self-reference in
 `cycle.py` is the smallest case.
 
-Removing the `gc.disable()`/`gc.enable()` pair takes away the
+**Pause the automatic collector.** Removing the `gc.disable()`/`gc.enable()` pair takes away the
 guarantee about when the finalizers run. The collector is then free to
 run on its own schedule, triggered by allocation counts rather than by
 your call, so an automatic pass could in principle reclaim the cycle at
@@ -585,6 +593,15 @@ class Guarded:
 <details>
 <summary>Solution</summary>
 
+If you leave out the bare `raise`, the `except` clause swallows the exception,
+and the `Guarded` demo prints `C closed` twice and no `caught boom`.
+`__enter__()` returns `None` instead of failing,
+so the `with` block runs as though the acquisition succeeded,
+and `__exit__()` releases the resource a second time.
+`ty` reports that version as `invalid-return-type`,
+since the method now always implicitly returns `None` where its annotation declares `Guarded`.
+The solution re-raises the exception, so the caller sees `boom` and the `closed` line prints once.
+
 ```python
 # exercise_7.py
 
@@ -631,13 +648,13 @@ except RuntimeError as e:
 #: caught boom
 ```
 
-`C closed` does not print for `Faulty`. Moving the acquisition from
+**Acquire the resource on entry.** `C closed` does not print for `Faulty`. Moving the acquisition from
 `__init__()` to `__enter__()` moves the leak with it. The `with`
 statement calls `__exit__()` only for a block it has entered, and it
 enters the block only after `__enter__()` returns. An `__enter__()`
 that fails has not returned, so `__exit__()` never runs.
 
-`Guarded` releases the resource in the method that acquired it. Its
+**Release before re-raising.** `Guarded` releases the resource in the method that acquired it. Its
 `except` clause prints the `closed` line and then re-raises the
 exception with a bare `raise`, so the caller still sees `boom`.
 `__exit__()` runs in neither class, and `Guarded` releases the

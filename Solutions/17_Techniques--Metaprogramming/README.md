@@ -80,9 +80,10 @@ print(sorted(c.__name__ for c in Color.registry))
 #: ['CeruleanBlue', 'Gold', 'Green', 'PhthaloBlue', 'Red']
 ```
 
-Creating `Yellow` adds it to the registry. Nothing removes it yet,
+**Register a new leaf.** Creating `Yellow` adds it to the registry. Nothing removes it yet,
 since `Color` (its only base) is never in the registry to begin with.
-Creating `Gold` adds it and removes its base, `Yellow`, the
+
+**Drop a base that gains a child.** Creating `Gold` adds it and removes its base, `Yellow`, the
 same pruning `PhthaloBlue` and `CeruleanBlue` do to `Blue` earlier.
 `__init_subclass__()` runs for every new subclass, so each new
 generation adds itself and prunes its parent automatically, with no
@@ -238,15 +239,7 @@ print(c1 is a)
 #: False
 ```
 
-`Singleton._instances` is a dictionary keyed by the class itself, so
-each class using the `Singleton` metaclass gets its own independent
-slot: `ASingleton`'s single instance, `BSingleton`'s single instance
-(omitted here, but present in the book), and now `CSingleton`'s.
-Calling `CSingleton()` twice returns the same object both times.
-`ASingleton` occupies its own key in that dictionary, so its instance
-is a separate object.
-
-The `__call__[T]` signature is the chapter's, and it is worth keeping
+**Type the result as the calling class.** The `__call__[T]` signature is the chapter's, and it is worth keeping
 here rather than simplifying to `-> Any`. It ties the return type to
 `cls`, so `CSingleton()` type-checks as a `CSingleton`, and the type
 checker still flags a misspelled attribute on the result. Two details follow from
@@ -255,6 +248,14 @@ that annotation. `cls: type[T]` hides the fact that `cls` is a
 `ty` rejects a zero-argument `super()`. For the same reason
 the body reads the cache through the class name,
 `Singleton._instances`, rather than through `cls`.
+
+**Keep one instance per class.** `Singleton._instances` is a dictionary keyed by the class itself, so
+each class using the `Singleton` metaclass gets its own independent
+slot: `ASingleton`'s single instance, `BSingleton`'s single instance
+(omitted here, but present in the book), and now `CSingleton`'s.
+Calling `CSingleton()` twice returns the same object both times.
+`ASingleton` occupies its own key in that dictionary, so its instance
+is a separate object.
 
 </details>
 </details>
@@ -302,6 +303,13 @@ class Sub(Open):
 <details>
 <summary>Solution</summary>
 
+If you declare `final` without a default,
+`class B(A, final=True):` still builds,
+but `class Open(A):` fails with
+`TypeError: A.__init_subclass__() missing 1 required positional argument: 'final'`.
+The solution gives `final` the default `False`,
+so a subclass that is not final can leave the keyword out of its header.
+
 ```python
 # exercise_4.py
 from typing import ClassVar
@@ -338,15 +346,17 @@ with expected(TypeError):
 #: [TypeError] B is final; you cannot subclass it
 ```
 
-The keywords in a class header travel to `__init_subclass__()`, so
+**Accept the header keyword.** The keywords in a class header travel to `__init_subclass__()`, so
 `final=True` in `class B(A, final=True):` arrives as a parameter of
 the hook that `B`'s creation triggers. Declaring `final` with a
-default, `final: bool = False`, lets every other subclass omit it. The
+default, `final: bool = False`, lets every other subclass omit it.
+
+**Pass the other keywords up.** The
 remaining `**kwargs` go on to `super().__init_subclass__()`, which
 turns a misspelled keyword into a `TypeError` instead of a silent
 no-op.
 
-The chapter's `final_runtime.py` hard-codes the refusal into `B`'s own
+**Refuse any descendant of a final class.** The chapter's `final_runtime.py` hard-codes the refusal into `B`'s own
 `__init_subclass__()`. This version moves the decision into a set that
 `A` owns, so the hook has to walk `cls.__mro__` to ask whether any
 ancestor declared itself final. `Open` and `Sub` show that the rest of
@@ -529,6 +539,13 @@ def describe(self: Any) -> str:
 <details>
 <summary>Solution</summary>
 
+If you write the bases as `(float)`, without the trailing comma,
+the parentheses group an expression and build no tuple,
+so `type()` raises a `TypeError`:
+`type.__new__() argument 2 must be tuple, not type`.
+The solution writes `(float,)`, a one-element tuple,
+which the three-argument form requires for its bases.
+
 ```python
 # exercise_7.py
 from typing import Any
@@ -548,24 +565,26 @@ print(c + 0.5, isinstance(c, float))
 #: 22.0 True
 ```
 
-The three arguments are the name, the bases, and the namespace, the
+**Define the method as a function.** `describe()` annotates `self` as `Any` because the type checker cannot
+know that this loose function ends up on a class carrying a `unit`
+attribute. The `Any` annotation is the cost of building a class from data
+rather than from a `class` statement.
+
+**Assemble the class from data.** The three arguments are the name, the bases, and the namespace, the
 same three a `class` statement assembles for you. A function defined
 at module level becomes a method by landing in that namespace dict. It
 needs no decoration, because a function is a descriptor: the attribute
 lookup binds it to the instance.
 
-`type(Celsius)` is `type` because this listing calls `type()` as a
+**Confirm the metaclass.** `type(Celsius)` is `type` because this listing calls `type()` as a
 constructor rather than subclassing it. Nothing here involves a
-metaclass of your own. `Celsius` inherits `float`'s arithmetic, so
+metaclass of your own.
+
+**Inherit the base's arithmetic.** `Celsius` inherits `float`'s arithmetic, so
 `c + 0.5` works, though the sum is a `float` rather than a `Celsius`:
 `float.__add__()` builds its result from `float`, and that is why a
 numeric subclass usually overrides every operator whose result it
 wants to keep its own type.
-
-`describe()` annotates `self` as `Any` because the type checker cannot
-know that this loose function ends up on a class carrying a `unit`
-attribute. The `Any` annotation is the cost of building a class from data
-rather than from a `class` statement.
 
 </details>
 </details>
@@ -739,12 +758,12 @@ except KeyError:
 #: lookup failed, after the injection ran
 ```
 
-`print("injected code ran")` is not part of any class body. It runs at
+**Break out of the class block.** `print("injected code ran")` is not part of any class body. It runs at
 module level inside `exec()`, and that is the danger: a name that
 reaches `make_class()` unchecked becomes source code, and source code
 can do anything the program can do.
 
-The payload needs a little care, because `make_class()` splices
+**Absorb the second splice.** The payload needs a little care, because `make_class()` splices
 `class_name` in twice. The first splice supplies the attack lines. The
 second lands inside the `super().__init__("...")` string literal, where
 a bare newline is a `SyntaxError` before anything runs. So the
@@ -755,7 +774,7 @@ compiles, and the
 injected `print()` runs at module level inside `exec()`, after the
 class body has finished.
 
-The `KeyError` afterward is incidental damage, not protection.
+**Catch the failed lookup.** The `KeyError` afterward is incidental damage, not protection.
 `namespace[class_name]` looks for a class named after the whole
 payload, which was never defined. The injected statement already ran
 before that lookup happened, so failing the lookup rescues nothing.
@@ -809,6 +828,14 @@ class Handlers(metaclass=First):
 <details>
 <summary>Solution</summary>
 
+If you leave `@classmethod` off `__prepare__()`,
+Python's call fills `self` with the class name and `name` with the bases.
+The `class Handlers` statement then fails with
+`TypeError: First.__prepare__() missing 1 required positional argument: 'bases'`,
+a message that says nothing about the missing decorator.
+Python calls `__prepare__()` on the metaclass before any class object exists,
+so the solution keeps the decorator, as [When You Still Need a Metaclass](../../Chapters/17_Techniques--Metaprogramming.md#when-you-still-need-a-metaclass) requires.
+
 ```python
 # ch17_keep_first.py
 from typing import Any
@@ -835,7 +862,7 @@ Handlers().on_open()
 #: first on_open
 ```
 
-`NoDuplicates` raises an exception on a repeated key. `KeepFirst`
+**Discard a repeated name.** `NoDuplicates` raises an exception on a repeated key. `KeepFirst`
 returns instead, so Python builds the second `on_open` function, hands
 it to `__setitem__()`, and the mapping discards it. The name still
 refers to the first function when the body finishes, as

@@ -90,7 +90,7 @@ annotation the chapter explains. `Flower` also loses `pollinate()` and
 `Chrysanthemum`'s `eat()` override becomes a registration. Two
 functions and one registration remain.
 
-Only `eat()` is a `singledispatch` function, because only `eat()`
+**Dispatch where the flower type matters.** Only `eat()` is a `singledispatch` function, because only `eat()`
 answers differently for one flower type. `pollinate()` does the same
 thing for every flower, so it stays an ordinary function.
 
@@ -185,6 +185,12 @@ def _(flower: Rose) -> str:  # 3 lines
 <details>
 <summary>Solution</summary>
 
+If you add the `Rose` class without registering it with `nectar()` and `fragrance()`,
+both operations fall back to their defaults,
+and the demo prints `Rose: no nectar / faint / sharp`.
+Neither the interpreter nor the type checker reports the omission, so the wrong answer goes unnoticed.
+The solution registers `Rose` with every operation whose default is wrong for a rose.
+
 ```python
 # exercise_2.py
 from functools import singledispatch
@@ -245,9 +251,11 @@ print(thorns(Gladiolus()))
 #: none
 ```
 
-Adding `Rose` costs eight lines: two for the class and three for each
+**Add a type.** Adding `Rose` costs eight lines: two for the class and three for each
 of its two registrations, one per operation whose default is wrong for
-a rose. Adding `thorns()` costs six: three for the function and three
+a rose.
+
+**Add an operation.** Adding `thorns()` costs six lines: three for the function and three
 for the one flower that differs. Neither change edits an existing line.
 
 `@singledispatch` makes adding an *operation* cheaper than adding a
@@ -322,6 +330,13 @@ class Beetle(Bug):  # Inherits no visit()
 <details>
 <summary>Solution</summary>
 
+If you annotate the `accept()` parameter as `Visitor` instead of `Visits`,
+`ty` reports an `unresolved-attribute` on `visitor.visit`,
+because the empty `Visitor` base declares no `visit()`.
+The `Beetle` call then passes the checker, since `Beetle` is a `Visitor`,
+and fails at runtime with the same `AttributeError` as under `Any`.
+The solution annotates the parameter with `Visits`, which names the method `accept()` calls.
+
 ```python
 # exercise_3.py
 from typing import Protocol
@@ -365,7 +380,7 @@ expect(AttributeError, Gladiolus().accept, Beetle())  # type: ignore
 #: [AttributeError] 'Beetle' object has no attribute 'visit'
 ```
 
-`Visits` names the one method `accept()` calls, so the parameter
+**Declare the visitor's interface.** `Visits` names the one method `accept()` calls, so the parameter
 declares what `accept()` needs instead of accepting anything. `Bee`
 neither mentions `Visits` nor inherits from it, because a `Protocol`
 matches on structure: any class with a compatible `visit()` satisfies
@@ -377,8 +392,10 @@ The two versions report the `Beetle` mistake at different times. Under
 the call type-checks and the program dies at runtime with the
 `AttributeError` above. Under `Visits`, the type checker rejects the argument
 before the program runs, because `Beetle` inherits no `visit()` and so
-does not match the protocol. The `# type: ignore` comment keeps the checker
-quiet about that call so the listing can show the runtime failure;
+does not match the protocol.
+
+**Demonstrate the runtime failure.** The `# type: ignore` comment keeps the checker
+quiet about the `Beetle` call so the listing can show the runtime failure;
 without it, `ty` reports an `invalid-argument-type`.
 
 Losing the check on the visitor side is the price the chapter names

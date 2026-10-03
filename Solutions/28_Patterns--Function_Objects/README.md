@@ -54,6 +54,13 @@ class Macro:
 <details>
 <summary>Solution</summary>
 
+If you keep `command.py`'s `Command` alias as the type of the macro's list,
+the script still prints `15` and `0`,
+but `ty` reports `unresolved-attribute` on `c.undo()`,
+because an object of type `Command` has no attribute `undo`.
+`Command` describes one call,
+so the solution gives the list a `Protocol` that declares both operations.
+
 ```python
 # exercise_1.py
 from typing import Protocol
@@ -107,14 +114,7 @@ is still called with `()`, so state alone does not force more than a
 callable. Undo does, because a command now answers two requests,
 `__call__()` and `undo()`, and a callable has only one call.
 
-`Deposit` also has to remember what it did, here the account and the
-amount, so it can reverse that action later: a fresh call to the same
-function cannot know what a previous call changed. `Deposit` is a record,
-like `Repeat`, because neither field changes after construction. The
-record is frozen and the dictionary it refers to is not, so
-`__call__()` and `undo()` can still update the balance.
-
-The second operation costs a type rather than a hierarchy.
+**Name both requests in one type.** The second operation costs a type rather than a hierarchy.
 `Command`, the chapter's `Callable[[], None]`, has room for one call,
 so a list of undoable commands needs a type with two members,
 `__call__()` and `undo()`, and in Python that type is a `Protocol`.
@@ -124,6 +124,13 @@ is still called with `()`, so the function form's habit survives. The *GoF Desig
 a base class with two `raise NotImplementedError` bodies, and those
 bodies are what the shape costs. A base class pays for itself when
 the commands share implementation, and these commands share none.
+
+**Remember what to reverse.** `Deposit` also has to remember what it did, here the account and the
+amount, so it can reverse that action later: a fresh call to the same
+function cannot know what a previous call changed. `Deposit` is a record,
+like `Repeat`, because neither field changes after construction. The
+record is frozen and the dictionary it refers to is not, so
+`__call__()` and `undo()` can still update the balance.
 
 </details>
 </details>
@@ -189,6 +196,12 @@ def g(x: float) -> float:
 
 <details>
 <summary>Solution</summary>
+
+If you annotate `chain` with a `Callable` type, as the chapter's `RootFinder` is,
+the script runs and prints the same report,
+but `ty` reports `unresolved-attribute` on both reads of `finder.__name__`.
+A `Callable` describes a call and says nothing about a name,
+so the solution types `chain` with the `Finder` protocol, which declares `__name__`.
 
 ```python
 # exercise_2.py
@@ -277,13 +290,17 @@ solve(g, 0.0, 2.0, [bisection])
 #: every finder failed
 ```
 
-`None` says that a handler failed and cannot say why, so a handler
+**Give failure a reason.** `None` says that a handler failed and cannot say why, so a handler
 that reports its reason needs a failure value with room for the reason.
 `Failed` is that value, a record with one field, and each finder now
-returns `float | Failed`. A finder has more than one way to fail:
+returns `float | Failed`.
+
+**Report each way to fail.** A finder has more than one way to fail:
 `bisection()` gives up at once when the interval holds no sign change,
 and it can also run out of iterations, so each failing `return`
-states its own reason. `solve()` tells a root from a `Failed`
+states its own reason.
+
+**Tell a root from a failure.** `solve()` tells a root from a `Failed`
 with `match`. `case Failed(reason)` prints the reason and lets the
 loop continue, and any other value is the root.
 
@@ -292,7 +309,7 @@ is never a root, so `float | Failed` says which result is which, and
 the test is a comparison against the failure type, never the
 truthiness of the result.
 
-`finder.__name__` reads the function's own name, since every function
+**Name each attempt.** `finder.__name__` reads the function's own name, since every function
 carries its name as an attribute, so the report needs no extra
 bookkeeping to say which handler ran. That name is why `chain` needs a
 `Protocol` here instead of an alias like the chapter's `RootFinder`.
@@ -396,6 +413,12 @@ def f(x: float) -> float:
 <details>
 <summary>Solution</summary>
 
+If you leave out the keyword and write `partial(newton, 0.6)`,
+`partial()` binds `0.6` to `f`, the first positional parameter.
+`ty` rejects the assignment to `RootFinder` with `invalid-assignment`,
+and at run time calling the finder raises a `TypeError` when `newton()` adds the function in `a` to a float.
+The solution binds `tolerance` by keyword, as `partial_bisection.py` does.
+
 ```python
 # exercise_4.py
 from collections.abc import Callable
@@ -451,8 +474,10 @@ for finder in (coarse_closure, coarse_partial,
 #: 1.414214
 ```
 
-`tolerance` becomes a parameter with a default, so every existing call
-to `newton(f, a, b)` keeps working. The closure and the `partial` then
+**Keep existing calls working.** `tolerance` becomes a parameter with a default, so every existing call
+to `newton(f, a, b)` keeps working.
+
+**Configure the finder two ways.** The closure and the `partial` then
 reach the same configured strategy from two directions. `newton_within()`
 writes a new function whose body supplies the argument.
 `partial(newton, tolerance=0.6)` stores the argument and supplies it at
@@ -597,7 +622,13 @@ bus.publish(BigDeposit(500))
 #: big deposit 500
 ```
 
-`type(event).__mro__` already runs from the class outward to `object`,
+**Ignore a handler never subscribed.** `unsubscribe()` guards with `if handler in handlers` rather than calling
+`remove()` outright, since `remove()` raises a `ValueError` for a handler
+that was never subscribed. Whether that case should be silent or loud
+is a design decision: silent matches the bus's habit of letting an
+unmatched event pass without complaint.
+
+**Walk the ancestry, most specific first.** `type(event).__mro__` already runs from the class outward to `object`,
 so iterating it in order calls the most specific handlers first and the
 inherited ones after. That order is what "parents last" asks for.
 `publish()` keeps using `.get()` for the same reason the chapter gives:
@@ -613,12 +644,6 @@ A handler subscribed to `Deposit` starts receiving every subclass of
 still a behavior change to existing code. Any handler that assumes
 `type(event) is Deposit`, or that counts events, now sees more than it
 did before.
-
-`unsubscribe()` guards with `if handler in handlers` rather than calling
-`remove()` outright, since `remove()` raises a `ValueError` for a handler
-that was never subscribed. Whether that case should be silent or loud
-is a design decision: silent matches the bus's habit of letting an
-unmatched event pass without complaint.
 
 </details>
 </details>
@@ -715,13 +740,13 @@ report()
 #: high
 ```
 
-A `for` loop does not create a scope, so `n` is one variable that the
+**Reproduce the late-binding trap.** A `for` loop does not create a scope, so `n` is one variable that the
 loop rebinds three times. All three lambdas close over that one
 variable rather than over its value. By the time anything calls them,
 the loop has finished and `n` holds 2. Nothing is wrong with the
 lambdas. They read the variable they name, at the moment of the call.
 
-The three fixes all work, and all work the same way: each one
+**Capture the value at build time.** The three fixes all work, and all work the same way: each one
 evaluates `n` while the loop is still running and stores the result.
 `lambda n=n:` evaluates the default at definition. `partial(print, n)`
 evaluates the argument where it appears. `make(n)` gives each lambda
@@ -735,7 +760,7 @@ lambda forms run their body at the call, so
 `rate()` when the command runs. `partial(print, n * rate())`
 evaluates the product while the loop builds the command.
 
-None of the three preserves late lookup of `n`, and that is the point
+**Read the variable at call time.** None of the three preserves late lookup of `n`, and that is the point
 of the exercise's closing question. If the command must read `n`
 when it runs, all three fixes are wrong: they freeze the value when the
 loop builds the command. You then want the original behavior, aimed at
@@ -841,7 +866,7 @@ The listing copies the two decorators, with the change made and the
 checks the question does not reach left out, and applies `handler()`
 as a call so that `expect()` can report the failure.
 
-Python creates the three `@event` classes in `bank_events.py` without
+**Register the wrong class.** Python creates the three `@event` classes in `bank_events.py` without
 complaint, which makes the mistake easy to miss. `EVENTS` holds one
 class for each, and none of them is the class the module's names refer
 to. `dataclass()` with `slots=True` builds a new class, `event()`
@@ -849,7 +874,7 @@ returns that new class, and the `class` statement binds `Deposit` to
 what `event()` returns. The set holds the class that `dataclass()`
 started from, which no name refers to and no event is an instance of.
 
-The import stops at the first `@handler`, on `Announce`.
+**Refuse the first handler.** The import stops at the first `@handler`, on `Announce`.
 `handler()` reads the annotation on `event`, which is `Deposit`, the
 class `dataclass()` returned, and does not find it in `EVENTS`.
 `handler()` then raises `TypeError: Announce: not an @event`, although `Deposit` went

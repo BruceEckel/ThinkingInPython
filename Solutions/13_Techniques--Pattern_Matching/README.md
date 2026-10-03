@@ -32,6 +32,11 @@ def classify(value: object) -> str:
 <details>
 <summary>Solution</summary>
 
+If you drop the parentheses and write `case Point:`, the script does not compile.
+Without parentheses `Point` is a bare name, so the pattern captures any value,
+and Python rejects the `case _` after it with `SyntaxError: name capture 'Point' makes remaining patterns unreachable`.
+The solution writes `case Point():`, a class pattern that tests the type.
+
 ```python
 # exercise_1.py
 from dataclasses import dataclass
@@ -68,13 +73,15 @@ print(classify((1,)))
 #: singleton
 ```
 
-`[]` matches only an empty sequence. `[_]` matches a list with exactly
+**Tell lists apart by length.** `[]` matches only an empty sequence. `[_]` matches a list with exactly
 one element (the `_` throws the element away without a name). `[_, *_]`
 matches one or more elements: the first `_` matches the first element,
 and `*_` collects the rest, including an empty rest. So
 `[_, *_]` also fits a singleton, and order matters: `[_]` must come
 before `[_, *_]`, or the general pattern claims `[1]` first and
-the "singleton" case is unreachable. `Point()` matches any `Point`
+the "singleton" case is unreachable.
+
+**Test the type alone.** `Point()` matches any `Point`
 instance without binding its fields, since `classify()` doesn't need
 `x` or `y`.
 
@@ -173,6 +180,11 @@ def handle(event: dict[str, object]) -> str:
 <details>
 <summary>Solution</summary>
 
+If you replace the flat click case with the nested one, a flat click event matches no click case.
+It falls through to `{"type": kind}`, and `handle()` returns `Other event: click`.
+The exercise asks for the nested shape in addition to the flat one,
+so the solution keeps both cases.
+
 ```python
 # exercise_3.py
 
@@ -197,14 +209,18 @@ print(handle({"type": "key", "key": "Enter"}))
 #: Key Enter
 ```
 
-The new `case` nests a mapping pattern inside a mapping pattern:
+**Match the inner dictionary.** The new `case` nests a mapping pattern inside a mapping pattern:
 `{"at": {"x": x, "y": y}}` matches when `"at"` maps to a dictionary
-that itself has `"x"` and `"y"` keys, binding both in one step. The
+that itself has `"x"` and `"y"` keys, binding both in one step.
+
+**Accept both click shapes.** The
 nested case and the flat `{"type": "click", "x": x, "y": y}` case
 each describe one shape of click event, and both return the same
 string. The two cases do not compete: a flat event has no `"at"` key
 and a nested one has no top-level `"x"`, so each event fits only one
-of them. Order matters for `{"type": kind}`, which any event with a
+of them.
+
+**Try the specific cases first.** Order matters for `{"type": kind}`, which any event with a
 `"type"` key satisfies. `match` tries cases top to bottom and stops
 at the first one that fits, so `{"type": kind}` sits after the specific
 click and key cases.
@@ -479,7 +495,7 @@ the `match` no longer mentions `Point`. That trade is usually worth it
 when the guards are all testing the same handful of derived facts, and
 not worth it when each guard asks a different question.
 
-The final `case _` is unreachable, since the six cases above it cover
+**Give every path a return.** The final `case _` is unreachable, since the six cases above it cover
 all nine pairs of signs. The type checker sees only that `sign()`
 returns an `int`, so without that case it reports that `quadrant()`
 can return `None`.
@@ -584,7 +600,7 @@ print(guarded(Signal.STOP), guarded(Signal.CAUTION))
 #: brake fallback
 ```
 
-`act()` answers "fallback" for `Signal.STOP`, which is not the
+**Demonstrate the accidental capture.** `act()` answers "fallback" for `Signal.STOP`, which is not the
 fallback value. `case FALLBACK:` is a bare name, so it captures: it
 matches `Signal.STOP`, binds it to a local named `FALLBACK` inside
 `act()`, and compares nothing. The module-level constant
@@ -592,7 +608,7 @@ still holds `Signal.CAUTION` afterward, so the mistake is
 easy to miss. Python accepts `case FALLBACK:` only because it is the
 last case. Another case after it fails to compile.
 
-The first fix gives the constant a dotted name by putting it in a
+**Compare through a dotted name.** The first fix gives the constant a dotted name by putting it in a
 namespace. `Defaults.FALLBACK` is a value pattern, so `dotted()`
 compares against it and answers "brake" for `Signal.STOP`. Any dotted
 name works, including `Signal.CAUTION`. In a program the constant
@@ -600,7 +616,7 @@ would live in `Defaults` alone, one definition for every use. The
 listing keeps the module-level copy because `act()` and `guarded()`
 need the bare name.
 
-The second fix keeps the bare constant and moves the comparison into a
+**Compare in a guard.** The second fix keeps the bare constant and moves the comparison into a
 guard, where `FALLBACK` is an ordinary expression rather than a
 pattern. `case other if other is FALLBACK:` is more verbose than the
 dotted name, but it is what you want when the test is more than

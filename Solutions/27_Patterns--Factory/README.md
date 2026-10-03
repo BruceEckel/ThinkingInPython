@@ -92,6 +92,13 @@ def create_shape(kind: str) -> Shape:
 <details>
 <summary>Solution</summary>
 
+If you add the `_Triangle` class and stop there, the type checker accepts both files,
+but with the chapter's seed neither demo finishes.
+`shape_name()` draws from `Shape.__subclasses__()`, which lists `_Triangle` as soon as its `class` statement runs,
+so the demo asks for a `"Triangle"` that the creation point cannot build:
+`Shape.factory()` raises `ValueError: Bad shape: Triangle`, and `create_shape()` raises `KeyError: 'Triangle'`.
+Each solution therefore adds the class and its entry together.
+
 `shape_factory_method.py`'s single static `factory()` needs one new `case`:
 
 ```python
@@ -356,7 +363,7 @@ GameEnvironment(GnomesAndFairies()).play()
 #: Gnome discovers a Fairy
 ```
 
-`GameEnvironment` never names `Kitty`, `Warrior`, `Puzzle`, or
+**Ask the factory for each product.** `GameEnvironment` never names `Kitty`, `Warrior`, `Puzzle`, or
 `Weapon` directly. It only calls `make_character()` and
 `make_obstacle()` on whatever `GameElementFactory` it receives. A
 third concrete factory slots in beside `KittiesAndPuzzles` and
@@ -559,11 +566,13 @@ for shape in build_shapes(ThinShapeFactory()):
 #: thin Square.draw
 ```
 
-`ShapeFactory` is `abstract_factory_protocol.py`'s form applied to
+**Build each family in one factory.** `ShapeFactory` is `abstract_factory_protocol.py`'s form applied to
 shapes instead of game elements: a `Protocol` with a method per
 product (`make_circle()`, `make_square()`), and concrete factories
 that each produce a consistent *family* of products, here "all
-thick" or "all thin," without inheriting anything. `build_shapes()`
+thick" or "all thin," without inheriting anything.
+
+**Accept any factory.** `build_shapes()`
 accepts any object with those two methods, so switching a whole
 family of shapes from thick to thin is choosing a different factory
 object, not editing every call site that creates a shape.
@@ -622,6 +631,11 @@ class PizzaBuilder:
 <details>
 <summary>Solution</summary>
 
+If you put the check in `build()` and let `topping()` append freely, the call `topping("e")` succeeds.
+The demo's `expect()` then raises an `AssertionError` ("no exception raised"),
+and the builder holds five toppings until `build()` raises the `ValueError`.
+The solution checks in `topping()`, so the builder's list stops at four toppings.
+
 ```python
 # exercise_5.py
 from typing import Self
@@ -669,7 +683,7 @@ print(pb.build().toppings)
 #: ('a', 'b', 'c', 'd')
 ```
 
-In `pizza_direct.py`, an invalid `Pizza` can never exist, not even
+**Reject the value during construction.** In `pizza_direct.py`, an invalid `Pizza` can never exist, not even
 momentarily. `__post_init__()` runs immediately after the constructor
 assigns every field, and raises a `ValueError` before that constructor
 call returns. The rejection is therefore atomic: no code anywhere can
@@ -677,7 +691,7 @@ hold a reference to a `Pizza` carrying five toppings. That guarantee is
 [A Type Is a Set of Values](../../Chapters/12_Techniques--Data_Classes_as_Types.md#a-type-is-a-set-of-values)
 again: illegal values are unrepresentable.
 
-Placing the check in `topping()`, as above, gives `PizzaBuilder` the
+**Check before each change.** Placing the check in `topping()`, as above, gives `PizzaBuilder` the
 same guarantee: the fifth `.topping()` call raises a `ValueError`
 before appending, so `self._toppings` never grows past four.
 Placing the check in `build()` instead gives up that guarantee. The
@@ -754,6 +768,12 @@ class Square(Shape):
 <details>
 <summary>Solution</summary>
 
+If you add `import extra_shapes` to `registry_demo.py` without a `noqa` comment,
+`ruff check` reports it as `F401`, an unused import, and offers to fix it by removing the line.
+Running `ruff check --fix` deletes the import,
+and the demo then prints `[]` and raises `KeyError: 'Circle'` at its first `make()` call.
+The solution keeps the import and marks it `# noqa: F401`, because the import exists for its side effect.
+
 ```python
 # registry.py
 from abc import ABC, abstractmethod
@@ -807,7 +827,7 @@ print(extra_shapes.Circle.__name__)
 #: Circle
 ```
 
-`Shape.__init_subclass__()` registers `Circle` as the
+**Register as the class statement runs.** `Shape.__init_subclass__()` registers `Circle` as the
 `class Circle(Shape):` line in `extra_shapes.py` executes, and that
 line executes the first time something imports `extra_shapes`.
 Nothing else triggers the registration. `registry` knows nothing
@@ -845,7 +865,7 @@ expect(KeyError, make, "Triangle")
 #: [KeyError] 'Triangle'
 ```
 
-The demo never uses the name `extra_shapes`, so ruff reports the
+**Mark the import as deliberate.** The demo never uses the name `extra_shapes`, so ruff reports the
 import as unused and the `noqa` comment is the only sign that it is
 deliberate. That is the shape the chapter warns about: an import that
 exists for its side effect. It must stay an ordinary import, since a
@@ -978,7 +998,7 @@ def test_nested_dict_is_copied() -> None:
     assert spawn("hydra").parts == {"heads": 9}
 ```
 
-The second assertion is the one worth writing. Checking that the
+**Test what the next caller receives.** The second assertion is the one worth writing. Checking that the
 prototype survived is good. A user of the registry depends on the next
 spawn being correct, and the second assertion tests that spawn,
 which `copy.copy()` corrupts.
@@ -1087,7 +1107,7 @@ expect(KeyError, create_shape, ATTACK)
 #: else _Circle"
 ```
 
-`eval_shape()` prepends the underscore and appends `.Factory()`, so
+**Evaluate the name as code.** `eval_shape()` prepends the underscore and appends `.Factory()`, so
 the string it hands to `eval()` is `_Circle.Factory() if
 print('side effect!') else _Circle.Factory()`. Python evaluates the
 condition first, which is the injected side effect. `print()` returns
@@ -1096,7 +1116,7 @@ condition first, which is the injected side effect. `print()` returns
 That string can reach anything in the module's namespace, and anything
 `__import__()` can reach.
 
-`create_shape()` is the chapter's version, a dictionary keyed on the
+**Look the name up as a key.** `create_shape()` is the chapter's version, a dictionary keyed on the
 same names. Looking up a `kind` that is not a key raises a `KeyError`
 naming the string, and nothing evaluates that string. The table also
 lets the type checker see that every value is a `ShapeMaker`, where
@@ -1174,6 +1194,12 @@ def shape_name(n: int) -> Iterator[str]:
 <details>
 <summary>Solution</summary>
 
+If you call `all_subclasses(sub)` without `yield from`, the call builds a generator that nothing iterates.
+`names(all_subclasses(Shape))` then prints `['Circle', 'Square']`, the same list as `Shape.__subclasses__()`,
+and the demo draws no `Oval`.
+Neither the type checker nor ruff reports the dropped keyword.
+The solution's `yield from` runs each inner generator and hands every class it yields to the caller.
+
 ```python
 # exercise_9.py
 import random
@@ -1243,17 +1269,19 @@ for shape in [Shape.factory(s) for s in shape_name(6)]:
 #: Oval.draw
 ```
 
-`_Oval` is a subclass of `_Circle`, not of `Shape`, so
+**Show what one level misses.** `_Oval` is a subclass of `_Circle`, not of `Shape`, so
 `Shape.__subclasses__()` lists `_Circle` and `_Square` and stops. The
 original `shape_name()` draws only from that list, so no seed
 produces `"Oval"`, and the new `case` in `factory()` is unreachable
 from the demo even though `Shape.factory("Oval")` works when called directly.
 
-`all_subclasses()` yields each direct subclass and then, before moving
+**Walk the whole hierarchy.** `all_subclasses()` yields each direct subclass and then, before moving
 to the next one, recurses into that subclass: depth first, so `Oval`
 comes out between `Circle` and `Square`. The generic `T` keeps the
 yielded classes typed as `type[Shape]` when the argument is `Shape`,
-and `names()` requires that type. `random.choice()` takes a
+and `names()` requires that type.
+
+**Choose from the full list.** `random.choice()` takes a
 sequence, so `shape_name()` materializes the generator with `list()`.
 With the same seed the sequence differs from the chapter's, because
 `choice()` now picks from three classes instead of two.
@@ -1325,6 +1353,12 @@ def unregistered(namespace: dict[str, object]) -> list[str]:
 <details>
 <summary>Solution</summary>
 
+If you leave `@runtime_checkable` off `Shape`, `Hexagon().draw()` still works and `make("Hexagon")` still raises a `KeyError`,
+but `unregistered(globals())` raises a `TypeError` at its `issubclass()` call:
+"Instance and class checks can only be used with @runtime_checkable protocols".
+`ty` reports the same call before the program runs, as `isinstance-against-protocol`.
+The solution decorates the Protocol because `issubclass()` rejects a Protocol that is not runtime-checkable.
+
 ```python
 # exercise_10.py
 from typing import Protocol, runtime_checkable
@@ -1376,14 +1410,14 @@ print(unregistered(globals()))
 #: ['Hexagon']
 ```
 
-`Hexagon` is a complete `Shape`: the type checker accepts it wherever code
+**Leave one class unregistered.** `Hexagon` is a complete `Shape`: the type checker accepts it wherever code
 takes a `Shape`, and `Hexagon().draw()` works. `make("Hexagon")` fails with a
 `KeyError`, because the table never heard of it, and the error names
 the key rather than the class or the missing line. No checker reports
 the omission, since a class that nothing decorates is an ordinary
 class.
 
-`unregistered()` walks a namespace and keeps every class that
+**Report the unregistered classes.** `unregistered()` walks a namespace and keeps every class that
 `issubclass()` accepts as a `Shape` and that `make.registry` lacks.
 `@runtime_checkable` allows the `issubclass()` call; without
 it, testing a class against a Protocol raises a `TypeError`. The
@@ -1461,6 +1495,11 @@ def spawn(name: str) -> Monster:
 <details>
 <summary>Solution</summary>
 
+If you leave out `return build`, the table still fills and the demo prints the same three lines,
+but `register()` returns `None`, so the decorator binds the names `goblin` and `troll` to `None` rather than to the builders.
+`ty` reports `invalid-return-type`, since `register()` declares that it returns a `Builder`.
+The solution returns the builder unchanged, so `goblin()` still builds a fresh prototype when a test needs one.
+
 ```python
 # exercise_11.py
 import copy
@@ -1507,14 +1546,14 @@ print(spawn("troll"))
 #: Monster(name='Troll', hp=40, powers=['smash', 'regen'])
 ```
 
-`prototype()` is a decorator factory, the shape [Decorators](../../Chapters/14_Techniques--Decorators.md#decorators-that-take-arguments)
+**Store each builder's prototype.** `prototype()` is a decorator factory, the shape [Decorators](../../Chapters/14_Techniques--Decorators.md#decorators-that-take-arguments)
 introduces: the outer call takes the name and returns `register()`,
 which runs the builder once, stores the result, and hands the builder
 back unchanged. The table is empty at its declaration and full by the
 time `spawn()` runs, because each `@prototype` line executes as the
 module loads, the same timing the chapter's `registry.py` relies on.
 
-The name is an argument because the builder's own name is not
+**Take the key as an argument.** The name is an argument because the builder's own name is not
 available to the type checker. `Builder` is a `Callable`, and a
 `Callable` declares only how you call it, not that it carries a
 `__name__`. Writing `PROTOTYPES[build.__name__] = build()` draws:

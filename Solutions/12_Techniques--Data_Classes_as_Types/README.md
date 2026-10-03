@@ -16,6 +16,15 @@ Write the `pytest` tests first, covering a leap year, a century that is not leap
 <details>
 <summary>Solution</summary>
 
+If you drop the `% 400` clause from `is_leap()`,
+every century year counts as common,
+and `test_feb_29_allowed_in_2000` fails when `check_day()` raises a `TypeFailure` for `Day(29)`.
+A test for divisibility by 4 alone passes all four tests,
+because 2000 is the one century year `Year` accepts.
+The solution still writes the full rule,
+because `Year`'s upper bound follows `date.today()`,
+and 2100 is not a leap year.
+
 `Year` gains an `is_leap()` method using the standard rule (divisible
 by 4, and not by 100 unless also by 400). `Month.check_day()` takes
 the `Year` as a second argument so it can raise February's cap to 29
@@ -117,10 +126,13 @@ def test_feb_30_always_rejected() -> None:
         BirthDate(Month.of(2), Day(30), Year(2020))
 ```
 
+**Accept both kinds of leap year.**
 `BirthDate(Month.of(2), Day(29), Year(2020))` succeeds because 2020 is
 divisible by 4 and not by 100. 2000 is divisible by 100 and also by
 400, so it is a leap year too, and it is the one century year `Year`
-accepts. `Year(2021)` is not leap, so
+accepts.
+
+**Reject a day past the cap.** `Year(2021)` is not leap, so
 `check_day()` rejects the same day. `check_day()` rejects February 30
 regardless of the year, because `max_days` is 29 at most, even in a
 leap year.
@@ -172,6 +184,14 @@ class EmailAddress:
 <details>
 <summary>Solution</summary>
 
+If you keep only the `partition()` check, `"b@@x.com"` passes:
+`partition()` splits at the first `@`,
+and the domain half, `"@x.com"`, is not empty.
+The demo loop stops there with an `AssertionError`,
+because `expect()` finds no exception to report.
+Counting the `@` characters closes that gap,
+so the solution makes two calls to `check()`.
+
 ```python
 # exercise_2.py
 from dataclasses import dataclass
@@ -217,9 +237,12 @@ print(EmailAddress("grace@example.com"))
 #: EmailAddress(text='grace@example.com')
 ```
 
+**Require a single `@`.**
 The original check, `"@" in self.text`, only confirms an `@` appears
 somewhere. `count("@") == 1` additionally rejects two-`@` strings like
-`"b@@x.com"`. The second check splits on `@` and requires text on both
+`"b@@x.com"`.
+
+**Require text on both halves.** The second check splits on `@` and requires text on both
 sides, so it rejects `"@x.com"` and `"b@"`.
 
 </details>
@@ -274,6 +297,14 @@ class Stars(_Stars):
 <details>
 <summary>Solution</summary>
 
+If you define `__new__()` in the `NamedTuple` class body,
+the `class` statement raises an `AttributeError`
+(`Cannot overwrite NamedTuple attribute __new__`),
+and `Stars` never exists.
+[A `NamedTuple` Cannot Validate Itself](../../Chapters/12_Techniques--Data_Classes_as_Types.md#namedtuple-cannot-validate) shows the same failure in its third test.
+The prohibition covers only the body that `NamedTuple` processes,
+so the solution defines `__new__()` in a subclass.
+
 ```python
 # exercise_3.py
 import copy
@@ -313,11 +344,12 @@ print(copy.replace(Stars(5), number=99))
 #: Stars(number=99)
 ```
 
+**Validate in a subclass.**
 `typing.NamedTuple` refuses a `__new__()` in its own class body but
 accepts one in a subclass, so `Stars(11)` now raises a `TypeFailure`.
 The chapter's factory function could only advise against that call.
 
-The guarantee still leaks. `_replace()` builds the new tuple through
+**Test the replacement path.** The guarantee still leaks. `_replace()` builds the new tuple through
 `tuple.__new__()` rather than through `cls.__new__()`, so the check
 never runs. `copy.replace()` calls `_replace()` and inherits the hole.
 A validated `Stars` therefore produces an unvalidated one.
@@ -450,6 +482,7 @@ expect(TypeFailure, from_json, bad_json)
 #: [TypeFailure] EmailAddress('no-at-sign') needs an @
 ```
 
+**Let the field types validate.**
 `from_json()` does not validate the email string. It hands the raw
 JSON value straight to `EmailAddress(...)`, and `EmailAddress`'s own
 `__post_init__()` runs the same check it runs for any other caller.
@@ -550,10 +583,13 @@ expect(TypeFailure, copy.replace, s, number=99)
 #: [TypeFailure] Stars(99)
 ```
 
+**Merge the changes into the arguments.**
 `copy.replace()` looks for `__replace__()` and calls it with the
 keyword changes. This implementation recovers the constructor
 arguments (`{"number": self.number}`), uses `|` to override the
-arguments the changes name, and rebuilds through `type(self)(...)`. The validation runs
+arguments the changes name, and rebuilds through `type(self)(...)`.
+
+**Validate the replacement.** The validation runs
 because the rebuild goes through `__init__()`. A frozen data class
 stays validated across a replacement for the same reason. Any
 `__replace__()` that restores the state directly, the way
@@ -673,14 +709,18 @@ expect(Exception, Wrong, 1)
 #: [FrozenInstanceError] cannot assign to field 'built'
 ```
 
+**Keep the counter out of the fields.**
 `@dataclass` reads the annotation, sees `ClassVar`, and leaves `built`
 alone as an ordinary class attribute, so `built` never reaches
 `__init__()`. `dataclasses.fields()` reports only `number`, and the
 generated signature takes only `number`.
 
+**Count on the class.**
 `frozen=True` installs a `__setattr__()` that rejects assignment to
 an instance. `Stars.built += 1` assigns to the class instead, so it
-works. `Wrong` writes the same intent a different way, and fails:
+works.
+
+**Show the instance store failing.** `Wrong` writes the same intent a different way, and fails:
 `self.built += 1` reads the class attribute, adds one, and then tries
 to store the result on the instance. That store is the assignment
 `frozen=True` refuses. The type checker rejects the line before the program runs,
@@ -775,15 +815,19 @@ print(Bare().index, Subscripted().index)
 #: {} {}
 ```
 
+**Provoke the decorator's error.**
 `= {}` never reaches a running program. `@dataclass` inspects the
 default as the decorator runs, finds an unhashable object, and raises
 a `ValueError` naming the fix.
 
+**Fix it with a bare factory.**
 `Bare` and `Subscripted` both work, and they differ in what `ty` can
 see. For `field(default_factory=dict)` `ty` infers `Unknown`, a type
 that satisfies any annotation, so `ty` never compares the factory
 against the field. Checkers differ here: Pyright and mypy
 both compare the bare factory and reject a mismatched one.
+
+**Give the checker a return type.**
 `dict[str, Month]` is callable too, and its return type is concrete, so
 `field(default_factory=dict[int, int])` on this field draws a type
 error before the program runs. The bare form is fine where a reader
@@ -840,6 +884,15 @@ class Stars:
 <details>
 <summary>Solution</summary>
 
+If you write the type test as `isinstance(self.number, int)`,
+the test [The Annotation and the Check](../../Chapters/12_Techniques--Data_Classes_as_Types.md#the-annotation-and-the-check) shows for a type built at a JSON boundary,
+`Stars(5.5)` and `Stars("five")` raise a `TypeFailure`,
+but `Stars(True)` builds `Stars(number=True)`.
+The demo loop then stops with an `AssertionError`,
+because `expect()` finds no exception to report.
+The solution compares the class of the value with `int`,
+a test that a `bool` fails.
+
 ```python
 # exercise_8.py
 from dataclasses import dataclass
@@ -880,15 +933,17 @@ print(issubclass(bool, int), isinstance(True, int))
 #: True True
 ```
 
+**Test the exact class.**
 `bool` is a subclass of `int`, so `isinstance(True, int)` is `True`
 and an `isinstance()` test admits `True` as the rating 1.
 `type(self.number) is int` compares the class of the value with `int`
 and rejects a `bool` along with a `float` and a `str`.
 
-The type test runs first. Comparing `"five"` with `1` raises a
+**Test the type before the range.** The type test runs first. Comparing `"five"` with `1` raises a
 `TypeError`, so with the range check first a `str` never reaches a
 `TypeFailure`.
 
+**Feed values the checker refuses.**
 The type checker rejects `5.5` and `"five"` as arguments before the program runs,
 and the `# type: ignore` silences the type checker so the listing can show what the
 constructor does with a value the type checker did not see. The type checker

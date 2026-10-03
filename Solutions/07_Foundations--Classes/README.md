@@ -42,6 +42,13 @@ class Circle:
 <details>
 <summary>Solution</summary>
 
+If you write `shrink()` to assign the underscore attribute `self._radius` directly,
+the setter does not run.
+`shrink(-2)` then stores `-2.5` without complaint,
+and `expect()` fails with `AssertionError: no exception raised`.
+The solution assigns to `self.radius`,
+so every change to the radius passes the setter's check.
+
 ```python
 # exercise_1.py
 from exceptions import expect
@@ -71,10 +78,12 @@ expect(ValueError, c.shrink, -2)
 #: [ValueError] radius cannot be negative
 ```
 
-`shrink()` does not touch `self._radius`. It assigns to
+**Route the change through the setter.** `shrink()` does not touch `self._radius`. It assigns to
 `self.radius`, which goes through `@radius.setter`, so the
 existing validation applies to every method that changes the radius
-this way. `shrink(-2)` runs after `shrink(2)` has brought the radius
+this way.
+
+**Confirm the setter rejects a negative result.** `shrink(-2)` runs after `shrink(2)` has brought the radius
 to `5.0`, so it computes `5.0 / -2 == -2.5` and the setter rejects
 `-2.5`, the same as it rejects `c.radius = -2.5` written by hand.
 
@@ -146,13 +155,15 @@ print(round(t1.celsius, 2), round(t2.celsius, 2))
 #: 100.0 100.0
 ```
 
-212°F, 373.15 K, and 100°C are the same temperature (water's boiling
+**Convert, then construct.** Both class methods end with `return cls(...)`, so
+`from_kelvin()` builds a `Temperature` the way `from_fahrenheit()`
+does, with a different formula for `celsius`.
+
+**Compare the results within rounding.** 212°F, 373.15 K, and 100°C are the same temperature (water's boiling
 point), so both alternative constructors produce `100.0`. The exercise
 asks for agreement within rounding, so the `print()` call passes each
 `celsius` through `round()` to guard against floating-point noise in
-the arithmetic. Both class methods end with `return cls(...)`, so
-`from_kelvin()` builds a `Temperature` the way `from_fahrenheit()`
-does, with a different formula for `celsius`.
+the arithmetic.
 
 </details>
 </details>
@@ -204,6 +215,14 @@ class MoreDerived(Derived):
 <details>
 <summary>Solution</summary>
 
+If you leave `super().show(msg)` out of `MoreDerived.show()`,
+the chain stops at `MoreDerived`.
+`show_twice()` then prints `MoreDerived show() method` twice,
+and neither `Derived`'s message nor `x` appears.
+Python calls no base-class method on its own,
+as [Calling the Base Constructor](../../Chapters/07_Foundations--Classes.md#calling-the-base-constructor) shows for `__init__()`,
+so each override in the solution passes the call up with `super()`.
+
 ```python
 # exercise_3.py
 from typing import override
@@ -248,10 +267,12 @@ This solution copies `Simple` and `Derived` without their constructor
 `MoreDerived` to `simple_subclass.py`, as the exercise says, the two
 constructor lines print first.
 
-`MoreDerived` inherits `show_twice()` unchanged from `Simple`, and
+**Dispatch on the object's class.** `MoreDerived` inherits `show_twice()` unchanged from `Simple`, and
 `show_twice()` calls `self.show()` twice. Because `self` is a
 `MoreDerived`, each call resolves to `MoreDerived.show()` first (the lookup
-starts at the class of the object). `MoreDerived.show()` prints its own
+starts at the class of the object).
+
+**Pass each call up the chain.** `MoreDerived.show()` prints its own
 message, then calls `super().show(msg)`, which runs `Derived.show()`.
 `Derived.show()` prints its message and calls `super().show(msg)`
 again, which runs `Simple.show()`, and `Simple.show()` finally prints
@@ -325,8 +346,10 @@ print(n.average)
 #: 10.0
 ```
 
-Accessing `n.total` first runs its body once, prints the `"summing"`
-message, and stores `30` on the instance. `average`'s body then
+**Compute on first access.** Accessing `n.total` first runs its body once, prints the `"summing"`
+message, and stores `30` on the instance.
+
+**Reuse the cached value.** `average`'s body then
 reads `self.total` and gets that stored value directly. No second
 `"summing"` message appears, because `total` is already computed and
 cached before `average` asks for it. If you access `average`
@@ -370,6 +393,11 @@ class Temperature:
 <details>
 <summary>Solution</summary>
 
+If you define only `__str__()`, `print(t)` shows `21.0C`,
+but the list shows the default `<__main__.Temperature object at 0x...>` for each element.
+A container formats its elements with `repr()`, which ignores `__str__()`.
+The solution defines `__repr__()` for that form and adds `__str__()` for the readable one.
+
 ```python
 # exercise_5.py
 
@@ -392,9 +420,11 @@ print(f"{t} is {t!r}")
 #: 21.0C is Temperature(21.0)
 ```
 
-With only `__repr__()` defined, `print(t)` and the printed list both
+**Supply the fallback form.** With only `__repr__()` defined, `print(t)` and the printed list both
 show `Temperature(21.0)`: `print()` finds no `__str__()` and falls
-back to `__repr__()`. Adding `__str__()` makes the two outputs differ.
+back to `__repr__()`.
+
+**Add a readable form for users.** Adding `__str__()` makes the two outputs differ.
 `print(t)` and `f"{t}"` take the readable form, while the list keeps
 showing `Temperature(21.0)` for each element, because a container
 formats its elements with `repr()` and never with `str()`. `{t!r}`
@@ -460,13 +490,13 @@ Derived().show()
 #: Base.show
 ```
 
-The program prints `Base.show`. Nothing overrides anything: `shwo()` is
+**Miss the base-class method.** The program prints `Base.show`. Nothing overrides anything: `shwo()` is
 a new method in the subclass, and `show()` resolves up the chain to
 `Base`. Python does not check whether a subclass method was meant to
 replace a base-class method, so the misspelling is not an error.
 `shwo()` is a second method that nothing calls.
 
-With `from typing import override` added and the decorator
+**Declare the intended override.** With `from typing import override` added and the decorator
 uncommented, the program still prints `Base.show`,
 because the decorator adds no wrapper and changes no behavior. The
 type checker is where the difference shows:

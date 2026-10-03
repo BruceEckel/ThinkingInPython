@@ -34,6 +34,13 @@ class Empty:
 <details>
 <summary>Solution</summary>
 
+If you leave out `return cls`, `announce` returns `None`,
+and Python binds `None` to `Point` and to `Empty`.
+Both `decorating` lines still print,
+but the final `print()` raises an `AttributeError`, since `None` has no `__name__`,
+and `ty` reports an `invalid-return-type` on `announce` before the program runs.
+The solution returns `cls`, so each name stays bound to its class.
+
 ```python
 # exercise_1.py
 def announce[T](cls: type[T]) -> type[T]:
@@ -55,9 +62,11 @@ print(Point.__name__, Empty.__name__)
 #: Point Empty
 ```
 
-Both `decorating` lines print before anything else, because a class
+**Report at definition time.** Both `decorating` lines print before anything else, because a class
 decorator runs when the `class` statement finishes, not at
-instantiation. `announce` returns `cls` unchanged, so `Point` is the
+instantiation.
+
+**Hand back the same class.** `announce` returns `cls` unchanged, so `Point` is the
 class object the `class` statement created. The only effect is the
 side effect.
 
@@ -115,6 +124,13 @@ def add(a: int, b: int) -> int:
 <details>
 <summary>Solution</summary>
 
+If `timing`'s wrapper calls `func(*args, **kwargs)` without keeping and returning its value,
+the timing line still prints, but `add(2, 3)` returns `None`,
+and `trace` prints `<- add = None`.
+`ty` reports an `invalid-return-type`, because the wrapper declares `-> R` and returns nothing.
+The solution saves the call's value in `result` before it reads the clock again,
+and returns `result` after the report.
+
 ```python
 # exercise_2.py
 import time
@@ -153,14 +169,18 @@ add(2, 3)
 #: <- add = 5
 ```
 
-`@trace` above `@timing` means `add = trace(timing(add))`, so `trace`'s
-wrapper is the outermost layer and `timing`'s is inside it. Calling
+**Keep the output reproducible.** In real code you would print the raw `elapsed`.
+The listing prints a deterministic check instead, because a fixed
+marker cannot capture a number that changes every run.
+
+**Stack the layers.** `@trace` above `@timing` means `add = trace(timing(add))`, so `trace`'s
+wrapper is the outermost layer and `timing`'s is inside it.
+
+**Run the layers outside in.** Calling
 `add(2, 3)` enters `trace`'s wrapper first, which prints the `->` line,
 then calls the *wrapped* function, which is `timing`'s wrapper.
 `timing`'s wrapper measures and reports the elapsed time around the
-real `add()` call. (In real code you would print the raw `elapsed`.
-The listing prints a deterministic check instead, because a fixed
-marker cannot capture a number that changes every run.) Control then
+real `add()` call. Control then
 returns outward to `trace`'s wrapper, which prints the `<-` line
 last. The output order mirrors the wrapping order: outermost decorator
 prints first and last, and each inner layer's output appears nested
@@ -283,14 +303,14 @@ print(f"{decaf.description}: ${decaf.cost:.2f}")
 #: Cappuccino + Decaf: $3.25
 ```
 
-The listing has `pizza_decorator.py`'s shape with the menu changed: a
+**Share one interface.** The listing has `pizza_decorator.py`'s shape with the menu changed: a
 `Drink` `Protocol` naming the two readable properties, plain drinks
 that satisfy it with class attributes, and an `Extra` base that wraps
 one `Drink` and forwards through the same interface. Nothing inherits
 from `Drink`, and nothing needs to. The type checker matches the
 `Protocol` structurally.
 
-`Decaf` is worth noticing. Its `add_cost` is `0.0`, so `Decaf` changes
+**Change the name, keep the price.** `Decaf` is worth noticing. Its `add_cost` is `0.0`, so `Decaf` changes
 the description and leaves the price alone. A class-per-combination
 design still needs a separate class for every decaf variant. Adding a
 fourth extra means one class with one number in it, and the extras
@@ -346,6 +366,13 @@ def g(x: int) -> int:
 <details>
 <summary>Solution</summary>
 
+If you increment the shared counter with `self.total_calls += 1`,
+the assignment creates an instance attribute on each `trace_counting` instance,
+which shadows the class attribute, so `trace_counting.total_calls` stays at `0`
+and the last line prints `2 1 0`.
+`ty` reports an `invalid-attribute-access` for assigning to a `ClassVar` through an instance.
+The solution writes through the class name, so every instance updates the one shared value.
+
 ```python
 # trace_counting.py
 from collections.abc import Callable
@@ -394,18 +421,22 @@ print(f.count, g.count, trace_counting.total_calls)
 #: 2 1 3
 ```
 
-`__call__()` prints the chapter's arrow lines around the forwarded
-call, so the decorator traces every call as well as counting it.
-
-Each decorated function gets its own instance of `trace_counting`
+**Count each function's calls.** Each decorated function gets its own instance of `trace_counting`
 (the same as `count_calls`), so `f.count` and `g.count` track only
-their own function's calls: `2` and `1`. `total_calls` is a class
+their own function's calls: `2` and `1`.
+
+**Share one total across functions.** `total_calls` is a class
 attribute, annotated `ClassVar[int]`, so it belongs to the
 `trace_counting` class, not to any one instance. Every
 `__call__()`, on any decorated function, increments the same shared
 counter through `trace_counting.total_calls += 1`. The counter
 therefore accumulates across every function decorated with
-`@trace_counting`, reaching `3` after the three calls above. The two
+`@trace_counting`, reaching `3` after the three calls above.
+
+**Trace every call.** `__call__()` prints the chapter's arrow lines around the forwarded
+call, so the decorator traces every call as well as counting it.
+
+The two
 counters show the same class-attribute-versus-instance-attribute
 distinction from
 [Class Attributes](../../Chapters/09_Foundations--Class_Attributes.md): `self.count` shadows
@@ -470,6 +501,13 @@ def add(a: int, b: int) -> int:
 <details>
 <summary>Solution</summary>
 
+If you key the cache on `(args, kwargs)`,
+the first call, `square(4)`, raises a `TypeError`:
+the tuple holds a `dict`, which is unhashable, so the tuple cannot serve as a dictionary key.
+The type checker passes that version, so the failure appears only when the program runs.
+The solution turns the keyword arguments into a tuple of name-value pairs,
+which hashes whenever every argument does.
+
 ```python
 # exercise_5.py
 from collections.abc import Callable
@@ -530,7 +568,16 @@ print(square.__name__, add.__name__)
 #: square add
 ```
 
-The two decorations call `memo` two different ways, and the body
+**Describe both call shapes.** The two `@overload` declarations are for the type checker, which cannot
+otherwise tell which of the two shapes a given call has. The first
+says "given a function, return a function of the same signature." The
+second says "given only `maxsize`, return a decorator." The
+implementation returns `Any` because `Any` satisfies both overloads. The overloads
+are what callers see: `square(4)` type-checks as an `int`, and
+`memo(maxsize=2)` type-checks as something you can apply to a
+function.
+
+**Tell the two forms apart.** The two decorations call `memo` two different ways, and the body
 tells them apart by what arrives in `func`. Used bare, `@memo` calls
 `memo(square)`, so `func` is the function and the decoration finishes
 immediately with `decorate(func)`. Used with parentheses,
@@ -540,18 +587,11 @@ and `memo` returns `decorate` for Python to apply to `add`. Making
 keeps the two calls unambiguous: a positional argument always
 binds to `func` and cannot bind to `maxsize`.
 
-The two `@overload` declarations are for the type checker, which cannot
-otherwise tell which of the two shapes a given call has. The first
-says "given a function, return a function of the same signature." The
-second says "given only `maxsize`, return a decorator." The
-implementation returns `Any` because `Any` satisfies both overloads. The overloads
-are what callers see: `square(4)` type-checks as an `int`, and
-`memo(maxsize=2)` type-checks as something you can apply to a
-function.
-
-The cache key pairs the positional arguments with the keyword items,
+**Key on every argument.** The cache key pairs the positional arguments with the keyword items,
 since `add(1, 2)` and `add(a=1, b=2)` are different keys and both are
-legal calls. Eviction relies on a dictionary preserving insertion
+legal calls.
+
+**Drop the oldest entry.** Eviction relies on a dictionary preserving insertion
 order, so `next(iter(cache))` is the oldest key. Evicting the oldest
 key makes `memo` a first-in-first-out cache rather than the
 least-recently-used cache `functools.lru_cache` gives you. A real
@@ -600,6 +640,12 @@ def always_fails() -> str:
 <details>
 <summary>Solution</summary>
 
+If you re-raise the exception from inside the loop with a bare `raise` on the last attempt,
+`retry` works at runtime, but the type checker cannot tell
+that `wrapper()` always either returns or raises an exception.
+`ty` reports an `invalid-return-type`: `wrapper()` can implicitly return `None`.
+The solution makes the final attempt outside the `try` instead.
+
 ```python
 # exercise_6.py
 from collections.abc import Callable
@@ -647,27 +693,25 @@ expect(RuntimeError, always_fails)
 #: [RuntimeError] no luck
 ```
 
-The loop runs `times - 1` attempts inside a `try`, and the final
-attempt sits outside it, with no handler. That last call satisfies
-both requirements at once. It returns `R` on success, so `wrapper()`
-has a return value on every path the type checker can see. It also
-lets the last exception propagate with no handler in its way.
-Re-raising the exception from inside the loop with a bare `raise` on the last
-attempt also works at runtime, but then the type checker cannot tell
-that `wrapper()` always either returns or raises an exception, so
-it reports that `wrapper()` can implicitly return `None`.
-
-`@wraps(func)` keeps the identity: `flaky.__name__` reports the
+**Keep the wrapped function's identity.** `@wraps(func)` keeps the identity: `flaky.__name__` reports the
 wrapped function's name, not `wrapper`. Without it, every retried
 function reports itself as `wrapper` to a log line or a test report
 that reads `__name__`. A traceback is the same either way: it names
 each frame from the code object, which `wraps` leaves alone, so the
 `wrapper` frame appears with or without it.
 
-Catching bare `Exception` is deliberate here and worth flagging: a
+**Retry all but the last attempt.** The loop runs `times - 1` attempts inside a `try`, and the final
+attempt sits outside it, with no handler.
+
+**Retry after any ordinary failure.** Catching bare `Exception` is deliberate here and worth flagging: a
 real `retry` should take the exception types it retries, since
 retrying a `TypeError` from a bad call signature just fails three
 times more slowly.
+
+**Make the last attempt unguarded.** The last call, outside the `try`, satisfies
+both requirements at once. It returns `R` on success, so `wrapper()`
+has a return value on every path the type checker can see. It also
+lets the last exception propagate with no handler in its way.
 
 </details>
 </details>
@@ -785,21 +829,27 @@ print(type(peek).__name__, hasattr(peek, "__get__"))
 #: logged False
 ```
 
-`counter.bump(2)` works: the body runs three times with `counter` as
-`self`, and the total reaches `6`. Reading the two names from
-`Counter.__dict__` skips the attribute lookup that would bind them,
-so each `print()` shows the object the class stores.
-
 Both decorators are classes, and the difference is in what each one
-leaves in the class. `@repeat(times=3)` builds a `repeat` instance
+leaves in the class.
+
+**Return a function that binds.** `@repeat(times=3)` builds a `repeat` instance
 and then calls it with `bump`, and that `__call__()` returns
 `wrapper`, an ordinary function. A function has `__get__()`, so
 `counter.bump` binds `counter` to `wrapper` like any other method. The
 `repeat` instance has done its work by then and is not what the name
-refers to. `@logged` stores the `logged` instance in the class. That
+refers to.
+
+**Store an instance that cannot bind.** `@logged` stores the `logged` instance in the class. That
 instance has no `__get__()`, so `counter.peek` hands it back unbound
 and `counter.peek()` calls `peek()` with no `self`, the `TypeError`
 `method_decoration.py` shows.
+
+**Call through an instance.** `counter.bump(2)` works: the body runs three times with `counter` as
+`self`, and the total reaches `6`.
+
+**Read what the class stores.** Reading the two names from
+`Counter.__dict__` skips the attribute lookup that would bind them,
+so each `print()` shows the object the class stores.
 
 The class form fails on methods only when the instance of the
 decorator class is the object that replaces the method.

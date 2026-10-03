@@ -84,7 +84,7 @@ print(leaky.tags)
 #: ['a', 'b', 'z']
 ```
 
-`tags` leaks for the same reason `numbers` does: the getter hands back
+**Expose the internal list.** `tags` leaks for the same reason `numbers` does: the getter hands back
 a reference to the real internal list, so appending to what it returns
 mutates `Leaky`'s own state from outside.
 
@@ -114,7 +114,7 @@ print(plugged.tags)
 #: ['a', 'b']
 ```
 
-`.copy()` closes the leak the same way it does for `numbers`: the
+**Isolate the internal list.** `.copy()` closes the leak the same way it does for `numbers`: the
 caller now mutates a throwaway copy, and `plugged`'s real `_tags`
 keeps the items it had. Every new mutable field needs its own
 defensive copy. That repetition is the tedium that motivates freezing
@@ -168,13 +168,13 @@ expect(TypeError, hash, immutable)
 #: [TypeError] unhashable type: 'Bob'
 ```
 
-The type checker reports nothing, and Python runs the assignment. `frozen=True` on
+**Mutate past the frozen field.** The type checker reports nothing, and Python runs the assignment. `frozen=True` on
 `Immutable` blocks rebinding `immutable.bob`. It says nothing about
 the object `bob` refers to, and that object is now a mutable `Bob`.
 The assignment to `name` assigns to no field of `Immutable`, so none
 of the code that `frozen=True` generated runs.
 
-The `hash()` failure shows the same shallowness from another side.
+**Check hashability.** The `hash()` failure shows the same shallowness from another side.
 `frozen=True` generates a `__hash__()` that hashes the tuple of field
 values, so hashing an `Immutable` hashes its `Bob`. A data class that
 compares by value and is not frozen has its `__hash__` set to `None`:
@@ -240,6 +240,11 @@ def charge(item: Priced) -> float:
 <details>
 <summary>Solution</summary>
 
+If you change the annotation on `Package.total()` to `Weight` and leave `return self.weight_kg` as it is,
+`ty` reports an `invalid-return-type` error on that line: it expected `Weight` and found `float`.
+A `float` is not a `Weight` until `Weight()` marks it as one.
+The solution wraps the return value in `Weight(...)`, a call that returns the same float at runtime.
+
 ```python
 # exercise_3.py
 from typing import NewType, Protocol
@@ -285,7 +290,7 @@ info:     └── incompatible return types: `Weight` is not assignable to `Pr
 The comment lets the listing pass the book's type check while the call
 still runs and prints `4.5`.
 
-The structural match still holds: `Package.total()` still takes no
+**Give each meaning its own type.** The structural match still holds: `Package.total()` still takes no
 arguments and still returns a float at runtime. The two `NewType`
 declarations add a distinction the shapes never carry, so the type
 checker can finally see that a weight is not a price.
@@ -449,6 +454,12 @@ def area(shape: Shape) -> float:
 <details>
 <summary>Solution</summary>
 
+If you end the `match` without the `case _` arm, `ty check` still passes on the full listing,
+because the three cases cover the union.
+Commenting out the `Square` case then draws an `invalid-return-type` error,
+which reports that `area()` can implicitly return `None` but names no shape.
+The solution keeps `assert_never()` so the report names the missing `Square`.
+
 ```python
 # exercise_5.py
 import math
@@ -505,7 +516,7 @@ error[type-assertion-failure]: Argument does not have asserted type `Never`
 info: `Never` and `Square & ~Rectangle & ~Circle` are not equivalent types
 ```
 
-The inferred type names the missing case. The first two `case` lines
+**Check exhaustiveness.** The inferred type names the missing case. The first two `case` lines
 rule out `Rectangle` and `Circle`, so the `shape` that arrives at
 `case _` is a `Square` that is neither of them, and `assert_never()`
 requires `Never`, the type with no values. That report is the
@@ -637,6 +648,12 @@ class CountingBox:
 <details>
 <summary>Solution</summary>
 
+If you write `CountingBox.extend()` as `self.items.extend(more)`, the box prints `3 1 1`:
+the two items arrive through the held list's own `extend()`, and `appends` misses them.
+Composition moves the bug into a class you can read but does not prevent it,
+as [Prefer Composition to Inheritance](../../Chapters/20_Patterns--Rethinking_Objects.md#prefer-composition-to-inheritance) notes.
+The solution's `extend()` loops over `append()`, so every element passes the counter.
+
 ```python
 # exercise_7.py
 from dataclasses import dataclass, field
@@ -692,16 +709,18 @@ print(len(box.items), box.appends, box.sets)
 #: 3 3 1
 ```
 
-The subclass counts one append out of three and misses `insert()`
-entirely. `extend()` and `insert()` both add elements through `list`'s
-own C implementation, which never calls the Python-level `append()` or
-`__setitem__()` you overrode. Other routes past the counters include
-`+=` and `*=`. A future CPython could add another. The override of
+**Count item assignment too.** The override of
 `__setitem__()` leaves its parameters unannotated because `list`
 overloads that method, once for an index and once for a slice, and the
 counter treats both alike.
 
-`CountingBox` reports `3 3 1` because no inherited route into the
+**Find the routes past the overrides.** The subclass counts one append out of three and misses `insert()`
+entirely. `extend()` and `insert()` both add elements through `list`'s
+own C implementation, which never calls the Python-level `append()` or
+`__setitem__()` you overrode. Other routes past the counters include
+`+=` and `*=`. A future CPython could add another.
+
+**Route every mutation through a counter.** `CountingBox` reports `3 3 1` because no inherited route into the
 list exists. The class holds a list rather than being one, so every
 mutation goes through a method this class wrote. Nothing inherited can
 bypass a counter that nothing inherited knows about.
@@ -767,6 +786,12 @@ def fill(stack: Stack, count: int) -> int:
 <details>
 <summary>Solution</summary>
 
+If you have `push()` return `False` when the stack is full,
+`ty` reports an `invalid-method-override` error: `bool` is not assignable to the `None` that `Stack.push()` returns.
+`fill()` ignores the return value, so it returns 2 with no sign that three pushes failed.
+A refusal by return value is still a refusal,
+so the solution's `push()` accepts every item and leaves the question of fullness to `full()`.
+
 ```python
 # exercise_8.py
 from dataclasses import dataclass, field
@@ -811,10 +836,12 @@ print(bounded.full(), bounded.items)
 #: True [1, 2]
 ```
 
-`fill()` assumes a `Stack` whose `push()` always succeeds, so the fix
+**Expose the limit as a question.** Callers who care about
+the limit ask `full()` before pushing.
+
+**Keep the base guarantee.** `fill()` assumes a `Stack` whose `push()` always succeeds, so the fix
 keeps that guarantee. `BoundedStack.push()` accepts every item and
-discards the oldest to stay inside the limit. Callers who care about
-the limit ask `full()` before pushing. `fill()` now runs on both
+discards the oldest to stay inside the limit. `fill()` now runs on both
 classes without an exception.
 
 You gave up the refusal. The original `BoundedStack` guarantees that

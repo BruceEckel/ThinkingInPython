@@ -138,7 +138,7 @@ asyncio.run(main())
 #: took the sum, not the longest: True
 ```
 
-Each `started` line has its own `resumed` line directly beneath it,
+**Await each coroutine in turn.** Each `started` line has its own `resumed` line directly beneath it,
 the signature of no overlap. The comprehension awaits one coroutine at
 a time, and `await` does not return until that coroutine finishes, so
 `b` cannot start until `a` finishes. Nothing schedules the later
@@ -252,13 +252,13 @@ asyncio.run(main())
 #: mixed peak=5, prices=[10, 20, 30, 40, 50]
 ```
 
-The peak is `5`, matching the I/O-bound case rather than the CPU-bound
+**Suspend before computing.** The peak is `5`, matching the I/O-bound case rather than the CPU-bound
 one. `mixed_price()` reaches its `await asyncio.sleep(0.05)` before the
 CPU-heavy loop, so all five coroutines suspend at that `await` and let
 their siblings start before any of them begins computing. All five are
 in flight, waiting, at once.
 
-The peak stays `5` wherever the loop sits, because the `await` is inside
+**Count a suspended task as active.** The peak stays `5` wherever the loop sits, because the `await` is inside
 the `with meter:` block: a task suspended there is still counted as
 active. If you remove the `await`, as `cpu_price()` does, the peak falls
 to `1`. Overlap depends on whether an `await` sits inside the measured
@@ -361,7 +361,7 @@ asyncio.run(main())
 #: blocking peak=1, prices=[10, 20, 30, 40, 50]
 ```
 
-The peak falls from `5` to `1`, the same figure the CPU-bound version
+**Hold the thread while waiting.** The peak falls from `5` to `1`, the same figure the CPU-bound version
 produced. `time.sleep()` does here what it does in
 `blocking_the_loop.py`: it stops the thread instead of suspending the
 task, and the event loop runs on that thread. A coroutine that never awaits never gives the loop
@@ -446,7 +446,7 @@ asyncio.run(main())
 #: 400
 ```
 
-A semaphore holds a count of how many holders it admits at once, and
+**Admit one holder at a time.** A semaphore holds a count of how many holders it admits at once, and
 `async with` decrements that count on the way in and restores it on the
 way out. With the count initialized to `1`, the first task through
 exhausts it, so every other task suspends at `async with` until that
@@ -481,7 +481,7 @@ asyncio.run(main())
 #: 200
 ```
 
-Exactly half the increments survive. Two tasks now sit inside the
+**Admit a second holder.** Exactly half the increments survive. Two tasks now sit inside the
 critical section together, both reading `counter` before either writes,
 so each pair of increments collapses into one. The semaphore reports
 no error, because `release()` adds one to the count whether or not an
@@ -544,7 +544,7 @@ the same `RuntimeError`:
     child processes and you have forgotten to use the proper idiom
     in the main module
 
-Each worker does what the chapter describes. To find `cpu_price()`, a
+**Build the pool at import time.** Each worker does what the chapter describes. To find `cpu_price()`, a
 fresh interpreter imports this module, and importing it runs every
 top-level statement, including the `with ProcessPoolExecutor()` line
 that creates workers. Each worker therefore tries to build a pool of
@@ -615,7 +615,7 @@ print(f"lost updates: {counter < 8 * 50}")
 #: lost updates: False
 ```
 
-Running this repeatedly on the standard build prints
+**Run the read and write back to back.** Running this repeatedly on the standard build prints
 `lost updates: False` every time. Since 3.10, the interpreter
 considers switching threads only at a function call or at the jump
 that closes a loop iteration. With the `time.sleep()` call removed, the read and the
@@ -710,9 +710,10 @@ with ThreadPoolExecutor(max_workers=4) as pool:
 #: (3, 'backup')
 ```
 
-The changes are the third `pool.submit(enqueue, ...)` and
+**Add a third producer.** The changes are the third `pool.submit(enqueue, ...)` and
 `max_workers=4`, which gives the third producer a thread of its own.
-The six jobs arrive in an unpredictable interleaving from three racing
+
+**Drain in priority order.** The six jobs arrive in an unpredictable interleaving from three racing
 threads, but `PriorityQueue` orders its items by comparing the tuples.
 The drain order is therefore always priority first, `1` before `2`
 before `3`, then alphabetically by the description within a priority
@@ -842,13 +843,13 @@ asyncio.run(main())
 #: f: cancelled
 ```
 
-Only `f` reports `cancelled` now. With `e` at `0.005` its timer fires
+**Let one task finish first.** Only `f` reports `cancelled` now. With `e` at `0.005` its timer fires
 long before `c` and `d` fail at `0.03`, so `e` prints `fetched`,
 returns `"E"`, and has finished by the time the group starts
 cancelling. `f` still sleeps for `0.3`, so cancellation reaches it
 during that sleep and its task ends cancelled.
 
-The difference between `e` and `f` is the line between what a
+**Cancel what is still running.** The difference between `e` and `f` is the line between what a
 `TaskGroup` can and cannot undo. A
 `TaskGroup` cancels what is still running, which is why the original
 `PAIRS` has both `e` and `f` cancelled. It cannot reach into a task
@@ -897,6 +898,13 @@ async def main() -> None:
 <details>
 <summary>Solution</summary>
 
+If you leave out the `return` in the `except` block,
+the handler prints its line and execution falls through to `print(results)`.
+`results` is unbound at that point,
+so the line raises an `UnboundLocalError` right after the `gather raised` line.
+The type checker passes that version, so the failure shows up at run time.
+The solution returns from the handler, so the code after the `try` statement runs when `gather()` returns a list.
+
 ```python
 # exercise_10.py
 import asyncio
@@ -930,7 +938,7 @@ before `c` fails at `0.03`. `e` and `f` never print one, and
 `print(results)` never runs, because the `await` raises the
 `ValueError` instead of returning a value.
 
-Without `return_exceptions=True`, the first child exception propagates
+**Propagate the first failure.** Without `return_exceptions=True`, the first child exception propagates
 out of the `await` immediately, and `gather()` reports that one
 exception rather than a list of six outcomes. `d` fails in the same
 tick, but the `gather()` future has already resolved by then, so
@@ -938,7 +946,7 @@ tick, but the `gather()` future has already resolved by then, so
 it. The call loses the four results it was collecting, including `a`
 and `b`, which had already succeeded.
 
-The unfinished tasks, `e` and `f`, are the interesting part. `gather()` does not cancel
+**Leave the other tasks running.** The unfinished tasks, `e` and `f`, are the interesting part. `gather()` does not cancel
 them when the exception propagates, unlike a `TaskGroup`, so `e` and
 `f` are still sleeping when `main()` returns. `asyncio.run()` then
 cancels whatever tasks remain as it shuts the loop down, which is why
@@ -1021,13 +1029,13 @@ asyncio.run(main())
 #: after: context main, global req-3
 ```
 
-All three tasks print `context main`. Every task starts with a copy of
+**Set the value before any task exists.** All three tasks print `context main`. Every task starts with a copy of
 the context that created it, and that context already carries
 `request_id = "main"`, so each copy inherits the same value. No task
 writes to the variable afterward, so all three copies stay identical
 and the original version's per-request identity disappears.
 
-The `after:` line changes too. In the chapter's version it prints
+**Read the value after the group.** The `after:` line changes too. In the chapter's version it prints
 `context -`, the default, because each `set()` happens inside a task's
 own copy and none of them can reach `main()`'s context. Here the
 `set()` is in `main()`, so it writes to `main()`'s own context and the
@@ -1112,14 +1120,14 @@ print(f"threads run in parallel: {t_seq > t_thr * target}")
 #: threads run in parallel: False
 ```
 
-The assertion passes because correctness never depends on the
+**Check that the results agree.** The assertion passes because correctness never depends on the
 executor. `cpu_price()` reads its argument and returns a number,
 touching nothing shared, so five calls produce the same five results
 whether they run one after another, in five threads, or in five
 subinterpreters. Swapping the executor changes when the work runs, not
 what it computes.
 
-The boolean flips because threads in one interpreter share one GIL.
+**Compare the timings.** The boolean flips because threads in one interpreter share one GIL.
 `cpu_price()` is a counting loop with no I/O and no `sleep`, so it
 holds the GIL except at the interpreter's periodic switch points. Five
 such threads take turns on one processor and finish in about the time
@@ -1240,7 +1248,7 @@ report(Tickets(LIMIT))
 `duplicates` stays `True`. The lock changes nothing about the race,
 because the race is not in the loop body.
 
-`for item in source:` is the `for` statement calling
+**Take each item unguarded.** `for item in source:` is the `for` statement calling
 `source.__next__()`, and that call happens before control reaches the
 indented block. The `with lock:` inside the body therefore starts
 *after* `next()` has already returned a number, and ends before the
@@ -1248,7 +1256,7 @@ next `next()` begins. Two threads can be inside `__next__()` at the
 same moment, read the same `next_number`, and come away with the same
 ticket, as they do without the lock.
 
-The lock does cover `out.append(item)`, which never needs covering:
+**Lock the loop body.** The lock does cover `out.append(item)`, which never needs covering:
 `out` is a local list, one per worker, so no other thread can touch
 it.
 
@@ -1331,7 +1339,7 @@ asyncio.run(main())
 The program prints `both workers finished`, and finishes in about
 twenty milliseconds rather than waiting out the half-second timeout.
 
-Follow who waits for whom. The first task takes `lock_a`, sleeps, then
+**Acquire the locks in one order.** Follow who waits for whom. The first task takes `lock_a`, sleeps, then
 takes `lock_b`, which nobody holds. Meanwhile the second task reaches
 `async with lock_a` and suspends, because the first task has it. That
 suspension is a wait, but a wait on a task that is waiting on nothing the second

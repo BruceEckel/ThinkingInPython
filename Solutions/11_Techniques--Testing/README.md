@@ -16,6 +16,11 @@ The overdraft test checks it with `pytest.raises()`, as in [Testing for Exceptio
 <details>
 <summary>Solution</summary>
 
+If you deposit first and withdraw second,
+`other` keeps the deposit even when the transfer as a whole should fail.
+The overdraft test then fails with `assert 1000.0 == 0` on `other.balance`.
+The solution withdraws first, so `withdraw()` checks the balance before either account changes.
+
 ```python
 # test_ch11_transfer.py
 from dataclasses import dataclass
@@ -68,14 +73,15 @@ def test_transfer_overdraft_leaves_both_unchanged(
     assert other.balance == 0
 ```
 
+**Fail before changing either account.**
 `transfer()` calls `self.withdraw(amount)` before `other.deposit(amount)`.
 `withdraw()` checks the balance and raises `InsufficientFunds` before
 touching `self.balance`, so an overdrafting transfer never reaches the
 `deposit()` call. Both accounts keep the balances they had.
+
+**Pin the order with a test.**
 Writing the overdraft test first makes this ordering a
-deliberate decision rather than an accident. A version that deposits
-first and withdraws second leaves `other` credited even when the
-transfer as a whole should fail.
+deliberate decision rather than an accident.
 
 </details>
 </details>
@@ -125,9 +131,13 @@ def test_add_interest_rates(funded: Account,
     assert funded.balance == pytest.approx(100 * (1 + rate))
 ```
 
+**Run one body per rate.**
 `parametrize` runs this one test body four times, once per rate,
 reported individually as `test_add_interest_rates[0.0]`,
-`test_add_interest_rates[0.05]`, and so on. `pytest.approx()` is here
+`test_add_interest_rates[0.05]`, and so on.
+
+**Allow for rounding.**
+`pytest.approx()` is here
 because the two sides of the assertion, `100 + 100 * rate` in the method
 and `100 * (1 + rate)` in the test, can round differently, not because
 these four rates round. For `0.0`, `0.05`, `0.5`, and `1.0` on a balance
@@ -199,12 +209,16 @@ def test_never_negative_after_deposit(
     never_negative.deposit(10)
 ```
 
+**Check the invariant at teardown.**
 Code after a fixture's `yield` runs as teardown, once the test function
 that uses the fixture finishes, whether it passes or raises an
 exception. Here that teardown is an assertion, so it doubles as a
 check: no matter what either test does to the account,
 `never_negative`'s balance must still be non-negative once the test
-body returns control to the fixture. Both tests pass the same
+body returns control to the fixture.
+
+**Share the check across tests.**
+Both tests pass the same
 invariant check, with no assertion duplicated in either test body.
 
 </details>
@@ -275,15 +289,18 @@ def test_settings_path_in_takes_the_directory(
     assert settings.settings_path_in(tmp_path) == expected
 ```
 
+**Supply the directory through the environment.**
 The first test has to know two things about the implementation: that the
 function reads an environment variable, and that the variable's name is
 `APP_CONFIG`. Renaming the variable to `APP_SETTINGS_DIR` breaks the
 test even though the function still behaves the same. The failure is a
 `KeyError` from inside the function rather than a message about the
-name. The second test knows only what the function does: given a
+name.
+
+**Supply the directory as an argument.**
+The second test knows only what the function does: given a
 directory, it returns the settings file inside it. That test survives
 the rename, and it survives dropping the environment variable.
-
 `tmp_path` is still worth taking in the second test, even though
 nothing touches the disk, because it supplies a real, valid path
 where a hard-coded one differs across operating systems.
@@ -334,6 +351,12 @@ def current_temp_with(
 <details>
 <summary>Solution</summary>
 
+If you patch `urllib.request.urlopen` instead of `ch11_weather.urlopen`,
+`current_temp()` still calls the real `urlopen()`,
+because `from urllib.request import urlopen` binds the name in `ch11_weather`'s own namespace at import.
+The test then tries to open a real connection to `example.com`.
+The solution patches the name that `current_temp()` looks up.
+
 ```python
 # ch11_weather.py
 import io
@@ -371,18 +394,23 @@ def test_injected() -> None:
     assert got == "21C"
 ```
 
+**Answer with a canned response.**
 Both tests pass and neither touches the network. The stub is the same
 function in both: a fetcher returning a `BytesIO` that behaves enough
 like a response to satisfy the `with` block and `.read()`.
 
+**Replace the dependency by name.**
 Renaming `urlopen` to `fetch` in `ch11_weather.py` separates the two
 tests.
-`test_injected()` still passes, because it never named the dependency.
-It passes one in, and `current_temp_with()` calls whatever it
-receives. `test_patched()` fails with `AttributeError: <module
+`test_patched()` fails with `AttributeError: <module
 'ch11_weather' from '...'> has no attribute 'urlopen'`, because
 `monkeypatch.setattr()` looks the name up by string and the string is
 now wrong.
+
+**Pass the dependency in.**
+`test_injected()` still passes, because it never named the dependency.
+It passes one in, and `current_temp_with()` calls whatever it
+receives.
 
 That separation is the same lesson exercise 4 draws from the environment
 variable, applied to a different kind of dependency. A patched test
@@ -421,6 +449,11 @@ A hand-written stub needs somewhere to keep what it receives, so the test has so
 <details>
 <summary>Solution</summary>
 
+If you test only a positive balance,
+a mistaken `balance <= 0` in `notify_low_balance()` goes unnoticed: both tests pass at `50`.
+`<` and `<=` disagree only at zero,
+so the solution adds `0` to the `parametrize` list, and with the mistaken `<=` both zero cases fail.
+
 ```python
 # test_ch11_silent_notifier.py
 from collections.abc import Callable
@@ -449,10 +482,12 @@ def test_stub_not_called(balance: float) -> None:
     assert sent == []
 ```
 
+**Test the boundary with a mock.**
 Zero is the boundary: `notify_low_balance()` tests `balance < 0`,
 so a mistaken `<=` would send at zero and fail the zero case.
 `assert_not_called()` passes only if `send` received no call.
 
+**Record the calls by hand.**
 A stub like exercise 5's `fake_fetch()` cannot make this check.
 It records nothing, so the test would pass whether or not `send` ran,
 and a `notify_low_balance()` that always sent would go unnoticed.

@@ -198,6 +198,12 @@ def quoted(template: Template) -> str:
 <details>
 <summary>Solution</summary>
 
+If you build each value with `str(piece.value)`, the way the chapter's `safe()` does,
+the output reads `'Alice' scored '91.5'%`.
+The value drops the template's `:.0f`,
+because `str()` receives the value alone and the `Interpolation` keeps the spec separately, in `piece.format_spec`.
+The solution passes the value and its spec to `format()`, as `shout()` does, so `score` still prints as `'92'`.
+
 ```python
 # exercise_5.py
 from string.templatelib import Interpolation, Template
@@ -220,7 +226,7 @@ print(quoted(message))
 #: 'Alice' scored '92'%
 ```
 
-`quoted()` is `shout()` with the two branches swapped over: the
+**Tell values from literal text.** `quoted()` is `shout()` with the two branches swapped over: the
 `Interpolation` branch is the one that changes something, and the
 literal branch passes its text through. The `isinstance()` test does
 all the work. Each piece arrives already labelled as text the author

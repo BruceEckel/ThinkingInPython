@@ -29,6 +29,14 @@ def tally() -> Generator[Prompt, Amount, Total]:
 <details>
 <summary>Solution</summary>
 
+If you read the total as the result of the last `send()`,
+writing `total: Total = t.send(Amount(12))` with no `try`,
+the script prints the three prompts and then stops with `StopIteration: 42`.
+`ty` rejects that line before it runs:
+`send()` returns the `YieldType`, so it reports an `invalid-assignment` of a `Prompt` to a `Total`.
+A generator's return value arrives only on its `StopIteration`,
+so the solution catches that exception and reads its `value`.
+
 ```python
 # exercise_1.py
 from collections.abc import Generator
@@ -60,14 +68,14 @@ print(total)
 #: 42
 ```
 
-The three-parameter annotation names all three channels:
+**Keep the three channels apart.** The three-parameter annotation names all three channels:
 `Generator[Prompt, Amount, Total]` says this generator yields a
 `Prompt`, receives an `Amount`, and finally returns a `Total`. Three
 `NewType` definitions over `str`, `int`, and `int` keep the two integer
 channels apart, so transposing the `SendType` and the `ReturnType`
 is a type checker error rather than a bug that shows up in arithmetic.
 
-Driving `tally()` by hand takes four calls: one `next()` and three
+**Drive the conversation by hand.** Driving `tally()` by hand takes four calls: one `next()` and three
 sends. `next(t)` runs the body up to the first `yield` and produces the
 first prompt. Each `send()` resumes at that suspended `yield`, whose
 value becomes `amount`, then runs to the next one. The third `send()`
@@ -211,13 +219,13 @@ print(repr(drive_naive(interview(),
 #: None
 ```
 
-Nothing in `interview()` changes, and nothing could have. It yields a
+**Reuse the generator unchanged.** Nothing in `interview()` changes, and nothing could have. It yields a
 `Question` and receives an `Answer`. Where the answer came from is a
 question it never asks. That is the separation the chapter teaches:
 the generator describes the conversation, and the driver interprets it.
 Swapping one interpreter for another leaves the description untouched.
 
-The two drivers differ in the property they rely on. The dictionary
+**Find the answer for each request.** The two drivers differ in the property they rely on. The dictionary
 driver looks each answer up by the request, so it answers correctly no
 matter what order the questions arrive in, and it answers a repeated
 question the same way twice. The iterator driver goes by
@@ -225,13 +233,13 @@ position, so it depends on the generator asking the questions the
 driver has replies for, in that order. Both satisfy the same type. The
 type says what travels, not what the driver knows.
 
-One detail in `drive_in_order()` earns its comment. `next(answers)` sits
+**Keep the two endings apart.** One detail in `drive_in_order()` earns its comment. `next(answers)` sits
 outside the `try` because the `except StopIteration` meant for the
 conversation otherwise catches a `StopIteration` raised by an
 exhausted answer list. Two different iterators raising one exception
 type is a real hazard when a driver holds both.
 
-The last two runs show that hazard. Given one answer and three
+**Test a short answer source.** The last two runs show that hazard. Given one answer and three
 questions, `drive_in_order()` lets the `StopIteration` escape, so the
 caller learns the answer source ran dry. `drive_naive()` differs only
 in having `next(answers)` inside the `try`. It catches that same
@@ -316,13 +324,13 @@ except StopIteration:
 #: both() is exhausted
 ```
 
-The prediction to write down is that the five sends do not divide
+**Count the values the collectors need.** The prediction to write down is that the five sends do not divide
 evenly among three collectors. Each `collect()` consumes two values, so
 the three collectors need six, and the loop supplies five. `gamma`
 stays suspended at its second `yield` until the `send(6)` after the
 loop completes it.
 
-The pairs of lines are the tell. A send that supplies a collector's
+**Read the output in pairs.** The pairs of lines are the tell. A send that supplies a collector's
 first value produces one line, the same collector's second prompt. A
 send that supplies a collector's second value produces two: the
 completed collector's `print()`, then the first prompt of the next
@@ -449,6 +457,13 @@ def summarize(items: list[str]) -> Generator[str]:
 <details>
 <summary>Solution</summary>
 
+If you change `report()`'s annotation but leave out `return size`,
+the script still runs, and the printed list ends with `'total: None'`:
+`report()` returns `None`, and the second `yield from` delivers that `None` into `counted`.
+`ty` reports an `invalid-return-type` on the annotation,
+because a function declared to return an `int` always implicitly returns `None`.
+The solution returns `size` from `report()`, so the count reaches `summarize()` through a second return.
+
 ```python
 # exercise_5.py
 from collections.abc import Generator
@@ -473,13 +488,13 @@ print(list(summarize(["red", "green", "blue"])))
 #: ['red', 'green', 'blue', '(12 characters)', 'total: 12']
 ```
 
-`report()`'s annotation changes from `Iterator[str]` to
+**Declare the return channel.** `report()`'s annotation changes from `Iterator[str]` to
 `Generator[str, None, int]`, because a generator that returns something
 needs the long form. `Iterator` sets the `ReturnType` to `None`, so
 `ty` rejects `report()`'s own `return size` with expected `None`, found
 `int`.
 
-The strings and the count travel by different channels, and the listing
+**Keep the strings and the count apart.** The strings and the count travel by different channels, and the listing
 shows both at once. Every string that `emit()` or `report()` yields
 travels through the `YieldType` and comes out in the list. The count
 travels through the `ReturnType`: `emit()` returns it, `yield from`
@@ -611,6 +626,14 @@ def machine() -> Generator[Report, Event]:
 <details>
 <summary>Solution</summary>
 
+If you write `stock = STOCK` instead of copying with `dict(STOCK)`,
+each sale changes the module-level table that every machine starts from.
+After three `"12"` sales, by any mix of machines,
+a fresh `machine()` answers the next `"12"` order with `UNAVAILABLE`.
+The `Final` annotation forbids rebinding the name, not changing the dictionary,
+so the type checker passes the shared version.
+The solution copies `STOCK` into a local, so each generator's frame holds its own stock.
+
 ```python
 # exercise_7.py
 from collections.abc import Generator
@@ -674,7 +697,7 @@ for event in [Coin(25), Digit("1"), Digit("1"), Digit("1"),
 #: Digit(value='2') -> DISPENSED
 ```
 
-The machine holds no `state` attribute and consults no table. Where the
+**Let position carry the state.** The machine holds no `state` attribute and consults no table. Where the
 generator pauses is the state: paused in the coin loop means
 COLLECTING, paused after `yield "SELECTING"` means a first digit has
 arrived and the machine waits for a second. `amount`, `row`, and
@@ -682,7 +705,7 @@ arrived and the machine waits for a second. `amount`, `row`, and
 has no counterpart for two parts of the table-driven version: the state
 attribute and the transition lookup.
 
-The `yield` in `machine()` runs the opposite direction from the one in
+**Report the state reached.** The `yield` in `machine()` runs the opposite direction from the one in
 `interview()`, and neither signature says so. Both yield strings, but
 `interview()` yields a request the driver must satisfy, while
 `machine()` yields a report the driver may ignore. The driver's event

@@ -91,6 +91,12 @@ class Countdown:
 <details>
 <summary>Solution</summary>
 
+If `__len__()` returns `self.start` alone,
+`len(Countdown(-1))` raises a `ValueError`, since `len()` rejects a negative length.
+So does `list(Countdown(-1))`, because `list()` calls `__len__()` to size its result,
+though a `for` loop over the same object runs zero times without complaint.
+The solution returns `max(self.start, 0)`, so the length matches the zero values that iteration produces.
+
 ```python
 # exercise_2.py
 from collections.abc import Iterator
@@ -118,10 +124,12 @@ print(len(c))  # Still works after iterating
 #: 5
 ```
 
-`Countdown` supports `len()` because it is a reusable iterable,
+**Build a fresh generator per pass.** `Countdown` supports `len()` because it is a reusable iterable,
 not an iterator. Each `for` loop or `list()` call gets a fresh
 generator from a fresh call to `__iter__()`, so iterating leaves
-`c.start` alone. `len(c)` computes from `c.start` directly, any number
+`c.start` alone.
+
+**Count without consuming.** `len(c)` computes from `c.start` directly, any number
 of times, before or after.
 
 A generator cannot support `len()`. Once you call a generator
@@ -164,6 +172,12 @@ def fibonacci(n: int) -> Iterator[int]:
 
 <details>
 <summary>Solution</summary>
+
+If you slice the generator the way you would a list,
+`fibonacci(1_000_000)[:10]` raises a `TypeError`, because a generator defines no `__getitem__()`.
+The type checker rejects the slice before the program runs, and `ty` reports it as `not-subscriptable`.
+`islice()` slices an iterator by pulling from it,
+as [Reusable Algorithms](../../Chapters/23_Patterns--Iterators.md#reusable-algorithms) notes.
 
 ```python
 # exercise_3.py
@@ -359,16 +373,18 @@ measurements in `tee.py` are this rule at its limits: draining one
 branch first stretches the gap to the whole stream, and lockstep
 consumption shrinks it to a single item.
 
-`islice(ahead, k)` opens the gap, and the `zip()` loop holds it there.
+**Hold the gap at `k` items.** `islice(ahead, k)` opens the gap, and the `zip()` loop holds it there.
 Each step takes one item from each branch, so the buffer neither grows
-nor shrinks through the rest of the run. One machine measured about
+nor shrinks through the rest of the run.
+
+**Compare two gap widths.** One machine measured about
 9,400 bytes at `k` of 100 and about 416,000 at `k` of 10,000. A
 hundredfold wider gap costs roughly forty times the memory rather than
 a hundred, because the smaller figure is mostly the fixed cost of the
 two branches. The difference between the two figures, about 41 bytes per
 buffered item, is the part that tracks `k`.
 
-The script prints a boolean rather than the byte counts, since the
+**Report what holds across machines.** The script prints a boolean rather than the byte counts, since the
 sizes shift between machines and Python builds while their ordering
 does not. Pass `--numbers` to see the figures your machine reports.
 
@@ -508,6 +524,12 @@ def traverse(it: GoFIterator[int]) -> list[int]:
 <details>
 <summary>Solution</summary>
 
+If you pass the endless `OverStream` to `traverse()`, the call does not return:
+`traverse()` stops only when `is_done()` reports the end, and `count(1)` has none.
+`seen` gains an item on every step for as long as the call runs.
+The solution calls the four methods in a loop of 50,000 steps instead,
+so the run ends and the listing prints `len(endless.seen)`.
+
 ```python
 # exercise_7.py
 from collections.abc import Iterable, Iterator, Sequence
@@ -586,18 +608,18 @@ print(len(endless.seen))
 #: 50000
 ```
 
-`traverse()` needs no change, because its parameter names the
+**Match by methods, not by base.** `traverse()` needs no change, because its parameter names the
 `GoFIterator` protocol rather than a class. `OverSequence` and
 `OverStream` share no base class and never mention the protocol.
 Defining its four methods is enough to satisfy it.
 
-`OverSequence` needs no `seen` list because its `items` sequence
+**Read without consuming.** `OverSequence` needs no `seen` list because its `items` sequence
 already holds every value. A caller can index that sequence
 repeatedly, in any order, without consuming it, and the GoF
 interface assumes a collection allows that. `OverStream`
 builds `seen` to fake the same ability.
 
-The endless source shows what the faking costs. After 50,000 steps
+**Measure what rewinding costs.** The endless source shows what the faking costs. After 50,000 steps
 `seen` holds 50,000 items, and it holds a million after a million.
 `first()` works only if every value stays reachable, so supporting it
 on an endless source costs unbounded memory. Python's `__next__()` has
@@ -646,6 +668,13 @@ class Peekable[T](Iterator[T]):
 <details>
 <summary>Solution</summary>
 
+If you write `peek(it)` as `return next(it, DONE)`
+and call it on the demo's `(x * 2 for x in [1, 2, 3])`,
+it reports the `2` and consumes it: the following `next(it)` returns `4`.
+The type checker passes that version, so the loss shows only when the program runs.
+`Peekable` keeps the pulled item in a field,
+where `peek()` can read it any number of times and `__next__()` can still hand it out.
+
 ```python
 # exercise_8.py
 from collections.abc import Iterable, Iterator
@@ -688,13 +717,13 @@ You cannot write a bare `peek(it)` function. Reading a value requires
 back. The next value does not exist anywhere you can reach
 without advancing the iterator.
 
-`Peekable` stores what a bare iterator does not: one item, pulled
+**Buffer one item ahead.** `Peekable` stores what a bare iterator does not: one item, pulled
 early. That one stored item is the difference, and it restores
 the `current_item()` that GoF had and Python dropped. `peek()` is
 now free and repeatable, as the three identical `2`s show,
 because it reads a field rather than the source.
 
-The cost appears in the constructor. `Peekable` pulls from the source
+**Fill the buffer at construction.** The cost appears in the constructor. `Peekable` pulls from the source
 before any caller asks for a value, so the constructor computes an
 expensive first item whether or not anything uses it. A source that
 blocks on its first read blocks at construction. The early pull is the same
@@ -742,6 +771,11 @@ def flatten_str(
 <details>
 <summary>Solution</summary>
 
+If you add `str` to the `isinstance()` test but leave the return type as `Iterator[int]`,
+the program prints the same lists,
+and `ty` reports an `invalid-yield` at `yield item`, whose type is now `int | str`.
+The solution widens the return type with the test, so the annotation names every kind of leaf the function yields.
+
 ```python
 # exercise_9.py
 from collections.abc import Iterator, Sequence
@@ -774,7 +808,7 @@ print(list(flatten_str([1, ["ab", [2]], 3])))
 #: [1, 'ab', 2, 3]
 ```
 
-`flatten()` asks one question, "is this an `int`?", and treats every
+**Descend until a leaf.** `flatten()` asks one question, "is this an `int`?", and treats every
 other answer as something to recurse into. A `str` is not an `int`, so
 `"ab"` goes to `flatten("ab")`, which iterates it into `"a"`. That
 `"a"` is also not an `int`, so `flatten("ab")` recurses into
@@ -785,7 +819,7 @@ built-in that never does: a one-character string is still a `Sequence`
 of one-character strings. The recursion has no base case, so it runs
 until Python raises a `RecursionError`.
 
-The fix widens the base case rather than the recursive one. Testing
+**Treat a string as a leaf.** The fix widens the base case rather than the recursive one. Testing
 `isinstance(item, int | str)` makes `str` a leaf, so `flatten_str()`
 yields each string whole instead of iterating it. The return type
 widens to `Iterator[int | str]` to say so.
@@ -859,6 +893,13 @@ class SkippingIterator[T](Iterator[T]):
 <details>
 <summary>Solution</summary>
 
+If `SkippingIterator.__next__()` drops the loop and tests only the one item it reads,
+a mismatch falls off the end of the method, which returns `None`:
+over the demo's `items`, the class produces `[1, None, 3, None, 4]`.
+`ty` catches that version with an `invalid-return-type`, since the method can implicitly return `None`.
+The solution loops until an item matches,
+so every call returns a value or raises `StopIteration`.
+
 ```python
 # exercise_10.py
 from collections.abc import Iterable, Iterator
@@ -904,7 +945,7 @@ print(list(SkippingIterator(iter(items), int)))
 #: [1, 3, 4]
 ```
 
-`typed()` and `typed_skipping()` ask the same `isinstance()` question
+**Skip a mismatch and keep going.** `typed()` and `typed_skipping()` ask the same `isinstance()` question
 and act differently on a no, and that difference decides what a bad
 item costs. `typed()` ends the stream: the consumer receives the `1`
 before `"two"` and nothing after it. The caller gets an exception
@@ -924,7 +965,7 @@ returning to. Skipping is silent, so a filter that quietly drops every
 line looks the same as a file with nothing to report. If you take the
 skipping version, count what it drops and report the count.
 
-The skipping version is harder to write as a class, and the reason is instructive.
+**Keep pulling until a match.** The skipping version is harder to write as a class, and the reason is instructive.
 A generator may decline to produce a value: `typed_skipping()` reaches
 an item it does not want and does not `yield`, and the `for`
 loop continues. `__next__()` has no such option. Every call must

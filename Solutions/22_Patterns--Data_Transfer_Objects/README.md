@@ -73,6 +73,12 @@ Then check how `repr()` and `==` change without any further edits.
 <details>
 <summary>Solution</summary>
 
+If you add `z: float` and leave the call as `Point(1.0, 2.0)`,
+Python raises a `TypeError` at that call for the missing positional argument `'z'`,
+and `ty` reports a `missing-argument` on the call before the script runs.
+A field declared without a default becomes a required parameter of the generated `__init__()`,
+so the solution passes three arguments to every `Point(...)` call.
+
 ```python
 # exercise_2.py
 from dataclasses import dataclass
@@ -116,6 +122,12 @@ For the `dict` key, ask what hashing a tuple does with each of its elements.
 <details>
 <summary>Solution</summary>
 
+If you assign a longer list to the field, as in `toast.steps = toast.steps + ["butter"]`,
+Python raises an `AttributeError` (`can't set attribute`) and the type checker reports the assignment,
+the same refusal `color_namedtuple.py` shows for `red.r = 9`.
+That attempt tests the record's immutability, which holds.
+The solution calls `append()` instead, which assigns nothing to the record and edits the field's list in place.
+
 ```python
 # exercise_3.py
 from typing import NamedTuple
@@ -135,13 +147,13 @@ with expected(TypeError):
 #: type: 'list')
 ```
 
-The record changed, and nothing objected. `NamedTuple` refuses to
+**Mutate through the field.** The record changed, and nothing objected. `NamedTuple` refuses to
 rebind `toast.steps`. It says nothing about the list that field
 already refers to, so `append()` edits that list through the record.
 Both the type checker and Python stay silent, because `append()` mutates the
 list instead of assigning to a field.
 
-Using the record as a `dict` key raises a `TypeError`, whose message
+**Hash the record.** Using the record as a `dict` key raises a `TypeError`, whose message
 names the cause: `cannot use 'Recipe' as a dict key (unhashable type:
 'list')`. Hashing a tuple hashes each element, so a `Recipe` is
 hashable only when every field is. The `list` has no hash, so the
@@ -199,16 +211,16 @@ print(vars(built) == vars(assigned), built == assigned)
 #: True True
 ```
 
-A keyword argument and a later assignment both add one entry to the
-instance's `__dict__`, and `vars()` reads that dict. `built` and `assigned`
-end with the same four attributes, so the two dicts compare equal and
-so do the namespaces, since dict equality ignores order.
-
-The order differs. A dict keeps insertion order, and the two versions
+**Add the attribute two ways.** A keyword argument and a later assignment both add one entry to the
+instance's `__dict__`, and `vars()` reads that dict. A dict keeps insertion order, and the two versions
 insert `note` at different moments. The constructor adds it to
 `built` before `built.more = 11` runs, so `note` comes third there.
 In `assigned` the assignment to `note` follows `assigned.more = 11`,
 so `note` comes last.
+
+**Compare the contents.** The order differs, but `built` and `assigned`
+end with the same four attributes, so the two dicts compare equal and
+so do the namespaces, since dict equality ignores order.
 
 </details>
 </details>
@@ -255,7 +267,7 @@ print(mean, count)
 #: 2.0 2
 ```
 
-Printing and unpacking still run, because a `NamedTuple` was a tuple
+**Read the fields by position.** Printing and unpacking still run, because a `NamedTuple` was a tuple
 all along. The line that reads `result.mean` and `result.count` stops
 working: a bare tuple has neither attribute, so the type checker
 reports both reads and Python raises an `AttributeError` at the first.
@@ -337,7 +349,7 @@ print(FrozenColor(1, 2, 3) == (1, 2, 3))
 #: False
 ```
 
-`Color(1, 2, 3) == Point3(1, 2, 3)` is `True`, the same answer
+**Compare by position and length.** `Color(1, 2, 3) == Point3(1, 2, 3)` is `True`, the same answer
 `Dimensions` gives, and for the same reason: a `NamedTuple` inherits
 `tuple.__eq__`, which compares length and elements and consults neither
 class. Adding a third `NamedTuple` adds a third type that compares
@@ -345,7 +357,7 @@ equal to `Color` and `Dimensions`, so the family of things that equal `(1, 2, 3)
 grows with every three-integer `NamedTuple` in the program. The field names
 are for you, not for `==`.
 
-`FrozenColor(1, 2, 3) == (1, 2, 3)` is `False`. A frozen data class's
+**Check the class before the fields.** `FrozenColor(1, 2, 3) == (1, 2, 3)` is `False`. A frozen data class's
 generated `__eq__()` checks `other.__class__ is self.__class__` before
 comparing fields, and returns `NotImplemented` for a tuple.
 Python then tries the tuple's own comparison, which also returns

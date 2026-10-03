@@ -42,6 +42,12 @@ def find(entry: Node, name: str,
 <details>
 <summary>Solution</summary>
 
+If you copy `walk()` and add a name test to the `File` case alone,
+`find(root, "main.py")` still works, but `find(root, "src")` returns an empty list.
+A `Directory` case that only descends never yields its own path.
+The exercise says a directory can match,
+so the solution's `Directory` case tests its own name before it descends.
+
 ```python
 # exercise_1.py
 from collections.abc import Iterator
@@ -86,13 +92,17 @@ print(list(find(root, "src")))
 #: ['root/src', 'root/src']
 ```
 
-`find()` follows `walk()`'s shape: a `match` with one case per
+**Dispatch on the node type.** `find()` follows `walk()`'s shape: a `match` with one case per
 `Node` type, recursing with `yield from` into each `Directory`'s
-entries. The difference is that a `Directory` can itself match `name`,
+entries.
+
+**Match a directory, then descend.** The difference is that a `Directory` can itself match `name`,
 where `walk()` only ever yields file paths. Matching also continues
 *into* a matched directory rather than stopping there, so a directory
 named `"src"` and a file beneath it named `"src"` can both appear in
-the results. The second call shows a simpler duplication: `root`
+the results.
+
+The second call shows a simpler duplication: `root`
 holds two separate directories named `"src"`, and both come back as
 `root/src`, so a path alone does not say which one matched.
 
@@ -205,15 +215,18 @@ print(list(walk(tree)))
 #: ['root/a.txt', 'root/shortcut -> /root/a.txt']
 ```
 
-Adding `Symlink` to the union makes every `match` whose `case _` calls
+**Extend the union.** Adding `Symlink` to the union makes every `match` whose `case _` calls
 `assert_never()` fail type checking, as the chapter says.
 In both `disk_usage()` and `walk()`, the type checker reports that `entry` could
 be a `Symlink` that no case handles, until you add the case shown
 here. Deciding what a link should do is a judgment call, not
-something the type checker picks for you: `disk_usage()` counts a link
+something the type checker picks for you.
+
+**Avoid counting bytes twice.** `disk_usage()` counts a link
 as free, since the bytes it references already get counted wherever
 the real file lives. Adding the target's size again double-counts those bytes.
-`walk()` reports the link as its own entry, `name -> target`, rather
+
+**Show a link without following it.** `walk()` reports the link as its own entry, `name -> target`, rather
 than following it into the target's subtree, since following it could
 loop forever if a link ever pointed back at one of its own ancestors.
 
@@ -311,6 +324,12 @@ def simplify(e: Expr) -> Expr:
 
 <details>
 <summary>Solution</summary>
+
+If you write `__truediv__()`, the one division method the exercise names,
+`x / 2` builds a `Div`, but `1 / x` raises a `TypeError`.
+`int.__truediv__` returns `NotImplemented` for a `Var`, and Python finds no reflected method to try.
+The chapter's `Operators` pairs `__add__()` with `__radd__()` and `__mul__()` with `__rmul__()` for that reason,
+so the solution adds `__rtruediv__()` as well.
 
 ```python
 # exercise_3.py
@@ -467,14 +486,15 @@ print(to_infix(simplify(Neg(Neg(x)) + Num(0))))
 #: x
 ```
 
-`evaluate()` and `to_infix()` gain one case per new node, and
+**Extend each walker by one case per node.** `evaluate()` and `to_infix()` gain one case per new node, and
 `evaluate()` now returns a `float`, since `/` produces one.
-`simplify()` is the interesting one. For `Neg`, a constant operand
+
+**Fold negations where possible.** `simplify()` is the interesting one. For `Neg`, a constant operand
 folds (`Neg(Num(a))` → `Num(-a)`), and a double negation cancels
 (`Neg(Neg(inner))` → `inner`). Every case keeps the chapter's `is`
 guard, so an unchanged subtree is still shared.
 
-For `Div`, `simplify()` folds nothing. A quotient of two `int`s is
+**Leave division for evaluation.** For `Div`, `simplify()` folds nothing. A quotient of two `int`s is
 usually not an `int`, so it does not fit in a `Num`, and division by
 `Num(0)` has no value to fold to. Nor should `simplify()` raise the
 `ZeroDivisionError` itself. It rewrites a tree without evaluating it,
@@ -632,11 +652,13 @@ print(to_infix((x + 1) * (x + 2)))
 #: (x + 1) * (x + 2)
 ```
 
-Each recursive call passes down the precedence its *parent* requires.
+**Parenthesize by context.** Each recursive call passes down the precedence its *parent* requires.
 A child only gets parenthesized when its own operator binds more
 loosely than what the parent needs. `Mul`'s children therefore need
 parens around a lower-precedence `Add`, while `Add`'s children never
-need parens around another `Add`. Passing `prec + 1` (rather than
+need parens around another `Add`.
+
+**Guard the right operand.** Passing `prec + 1` (rather than
 `prec`) for the right operand is a simple, always-safe rule: it can
 occasionally print one redundant pair of parentheses around a
 right-hand child at the *same* precedence as its parent
@@ -832,14 +854,16 @@ print(to_infix(simplify(d)))
 #: (x + x)
 ```
 
-`derivative()` walks the tree like `evaluate()` and
+**Differentiate the leaves.** `derivative()` walks the tree like `evaluate()` and
 `to_infix()`, one case per node type, but produces another `Expr`
 instead of a number or a string. A `Num` never changes, so its
 derivative is always `0`. The derivative of `Var(n)` is `1` with
 respect to itself and `0` with respect to every other variable.
-`Add`'s case is the sum rule. `Mul`'s case is the product rule, which
+
+**Combine the children's derivatives.** `Add`'s case is the sum rule. `Mul`'s case is the product rule, which
 keeps both the derivative *and* the original, undifferentiated
 subtree on each side, because the rule multiplies one by the other.
+
 Running the raw result through `simplify()` turns `((1 * x) + (x * 1))`
 into the much more readable `(x + x)` (reaching `2 * x` takes a further
 rule, "combine like terms," that this `simplify()` does not
@@ -987,21 +1011,21 @@ that `Num`. `str.__add__` declines a `Var`, so Python falls back to
 `Var.__radd__("a")`. The old `__radd__()` accepts anything, wrapping
 the string in a `Num` without looking at it.
 
-Returning `NotImplemented` puts the decision back where it belongs.
+**Hand the decision back to Python.** Returning `NotImplemented` puts the decision back where it belongs.
 `__radd__()` now answers only for an `int`, so both sides decline and
 Python raises the `TypeError` it raises for any other mismatched pair.
 The message comes from `str`, which is the right source: the left
 operand is what the caller wrote first, and nothing in this expression
 language ever claims to extend `str`.
 
-The forward methods need the same guard for the same reason. Without
+**Guard the forward direction too.** The forward methods need the same guard for the same reason. Without
 it `x + "a"` wraps the string in a `Num` and builds the ill-typed tree
 from the other direction, so all four methods decline what they cannot
 use. The two messages differ because a different object gets the last
 word: `str` reports `"a" + x`, and Python's own fallback reports
 `x + "a"`, once both operands have declined.
 
-Each method declares the type it really returns, `Add` or `Mul`,
+**Declare the node each method builds.** Each method declares the type it really returns, `Add` or `Mul`,
 even though it can also return `NotImplemented`.
 [*Multiple Dispatching*](../../Chapters/32_Patterns--Multiple_Dispatching.md#operators-dispatch-twice)
 explains the convention: typeshed gives the sentinel a type
@@ -1048,6 +1072,13 @@ def to_html(template: Template) -> str:
 <details>
 <summary>Solution</summary>
 
+If you build the page with an f-string and pass the finished string to `escape()`,
+the `<script>` tag comes out escaped, but so do the author's `<p>` tags,
+and the output begins `&lt;p&gt;`.
+A finished string no longer records which characters the author typed.
+The exercise asks for the literal pieces unchanged,
+so the solution escapes each interpolation's value and copies each string piece as it is.
+
 ```python
 # exercise_7.py
 from html import escape
@@ -1069,13 +1100,13 @@ print(f"<p>{comment}</p>")
 #: <p><script>steal()</script> & run</p>
 ```
 
-`to_html()` is the third operation over `Template`, and it changes
+**Add an operation beside the others.** `to_html()` is the third operation over `Template`, and it changes
 nothing about `to_query()` and `to_shape()`, the property the chapter
 keeps demonstrating on `Expr`. The whole walker is the same loop with
 a different body, because the structure already separates the literal
 pieces from the interpolations.
 
-`html.escape()` does the character replacement, so the exercise's
+**Escape the interpolated values.** `html.escape()` does the character replacement, so the exercise's
 real content is *where* `to_html()` applies it: to the interpolated
 values. The `<p>` and `</p>` the author typed pass through untouched,
 so the output is valid HTML rather than a document with its own tags
@@ -1170,6 +1201,12 @@ def evaluate_iterative(e: Expr, /, **env: int) -> int:
 
 <details>
 <summary>Solution</summary>
+
+If you push an `Add` or `Mul` node's two children with no marker behind them,
+`evaluate_iterative(2 * x + 1, x=3)` returns `1` instead of `7`.
+`values` collects the three leaves, and the function returns the last one it reached.
+The solution pushes an `Op` beneath each pair of children,
+so the combine runs once both values are on `values`.
 
 ```python
 # exercise_8.py
@@ -1281,18 +1318,20 @@ The tree is 2000 `Add` nodes deep, and `evaluate()` needs one frame
 per level against a limit of 1000, so it fails before reaching the
 bottom. Nothing about the expression is unusual. Only its shape is.
 
-The stack version cannot be a straight translation, and this is where
+**Defer the combine behind its children.** The stack version cannot be a straight translation, and this is where
 the exercise bites. Pushing children and popping them in a loop gives
 a pre-order walk that visits every node and computes nothing, because
 an `Add` can combine its children's values only *after* the children
 have produced them. The fix is to stack the pending operation behind
 its own children: `work += [Op.ADD, right, left]` puts `Op.ADD`
 deepest, so it comes off last, by which point the two values it needs
-are on `values`. Pushing `right` before `left` makes `left` pop
+are on `values`.
+
+**Preserve operand order.** Pushing `right` before `left` makes `left` pop
 first, and that order matters for the subtraction and division a fuller
 language adds.
 
-`Op` is an enum rather than a string so the `match` stays exhaustive.
+**Keep the match exhaustive.** `Op` is an enum rather than a string so the `match` stays exhaustive.
 `work` holds `Expr | Op`, and every member of both types has its own
 case, so `assert_never()` still type-checks. A string marker leaves
 `case _` reachable and the guarantee gone.
@@ -1436,7 +1475,7 @@ never sees fares worse: its `Symlink` falls through every case to
 are to vendor a patched copy of your module or to persuade you to add
 the case. The open design removes that coupling.
 
-Moving the operation back onto the classes reverses the trade the
+**Move the operation onto the classes.** Moving the operation back onto the classes reverses the trade the
 chapter spent the first two sections making. Adding `Symlink` now
 costs nothing to existing code, while adding a *new operation* costs
 a method in every class, including the ones you do not own. The

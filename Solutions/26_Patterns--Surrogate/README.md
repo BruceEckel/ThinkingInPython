@@ -45,6 +45,13 @@ class Lazy:
 <details>
 <summary>Solution</summary>
 
+If you store `description` as an ordinary instance attribute,
+normal lookup finds it and the three reads build nothing,
+but no code runs on a read.
+The counter stays at zero, so the first `query()` reports `0 answered before build`.
+A property runs a method on each read,
+so the solution counts there without reaching `__getattr__()`.
+
 ```python
 # exercise_1.py
 from typing import Any
@@ -87,12 +94,16 @@ print(p.query())
 #: result
 ```
 
-`description` is a property on the proxy, so Python finds it without
+**Answer the cheap request without building.** `description` is a property on the proxy, so Python finds it without
 calling `__getattr__()`, and the three reads build nothing. Each one
-increments `_answered`. The first `query()` is the first name the proxy
+increments `_answered`.
+
+**Build the real object on demand.** The first `query()` is the first name the proxy
 lacks, so `__getattr__()` runs, reports the count, and builds the real
 object; the second `query()` finds `_real` set and forwards without
-reporting or building. The counter records how much work the proxy saved: three
+reporting or building.
+
+The counter records how much work the proxy saved: three
 requests served from a string the proxy held from the start, with the
 slow construction pushed past all of them. GoF's image proxy is the
 same design, answering an image's size from stored numbers while the
@@ -137,6 +148,12 @@ class CountingProxy:
 <details>
 <summary>Solution</summary>
 
+If you increment `self.calls[name]` in `__getattr__()` before the `callable()` test,
+the demo still prints `2 1`, because each lookup there leads to one call.
+A lookup without a call counts too: evaluating `p.f is p.f` adds two to `f`'s tally.
+The solution counts inside `counted`,
+so the tally advances at the call, as it does in the chapter's `CountingProxy`.
+
 ```python
 # exercise_2.py
 from collections import Counter
@@ -171,7 +188,7 @@ print(p.calls["f"], p.calls["g"])
 #: 2 1
 ```
 
-Where the chapter's `CountingProxy` keeps one total, this one tallies
+**Tally each call by name.** Where the chapter's `CountingProxy` keeps one total, this one tallies
 per method name. `__getattr__()` already receives the name of the
 attribute, so the wrapper charges the count to that name before
 forwarding. The single `calls` integer becomes a `Counter`. The final
@@ -230,6 +247,13 @@ class CowList:
 <details>
 <summary>Solution</summary>
 
+If you build the private `Box` around `self._box.data` without the `list(...)` copy,
+`b` gets a `Box` of its own that holds the same list.
+`b.append(4)` then changes `a` too:
+the demo prints `[1, 2, 3, 4] [1, 2, 3, 4]` while `a._box is b._box` reports `False`.
+A new `Box` gives `b` its own owner count but not its own data,
+so the solution copies the list before the write.
+
 ```python
 # exercise_3.py
 from collections.abc import Sequence
@@ -276,10 +300,11 @@ print(a._box is b._box)
 #: False
 ```
 
-`a` and `b` start out sharing one `Box`, the same underlying list, with
+**Share the data and count its owners.** `a` and `b` start out sharing one `Box`, the same underlying list, with
 `owners` tracking how many `CowList`s point at that `Box`. `share()`
 costs almost nothing: it copies a reference and bumps a count.
-`append()` does the copying, and only when `owners > 1`. `b.append(4)`
+
+**Copy before a shared write.** `append()` does the copying, and only when `owners > 1`. `b.append(4)`
 detaches `b` into its own private `Box` holding a fresh copy of the
 data, decrements the shared `Box`'s count (since `b` is no longer one
 of its owners), then appends to that private copy. Since no one called
@@ -442,6 +467,13 @@ class ConnectionProxy:
 <details>
 <summary>Solution</summary>
 
+If you leave out the line in `__exit__()` that sets `_connection` to `None`,
+the pool gets each connection back, but the proxy keeps its reference.
+After both blocks end, `c1.query()` answers through connection 0,
+and when a later `acquire()` lends connection 0 to another client,
+both proxies query through it.
+The solution clears the reference, so a released proxy raises a `RuntimeError` instead.
+
 ```python
 # exercise_5.py
 from typing import Any, Final, Self
@@ -512,20 +544,22 @@ print("outer released:", pool.available())
 #: outer released: 2
 ```
 
-`Pool` builds every `Connection` in its constructor, and nothing else
+**Limit who creates connections.** `Pool` builds every `Connection` in its constructor, and nothing else
 creates one. Letting only `Pool` create connections is
 *Singleton*'s control over creation, with the
 limit raised from one object to `POOL_SIZE`.
 
-The client never holds a `Connection`. `acquire()` hands back a
+**Hand out a stand-in.** The client never holds a `Connection`. `acquire()` hands back a
 `ConnectionProxy`, which forwards `query()` through `__getattr__()`
 and owns the one job the connection cannot do for itself: returning
-that connection to the pool. The proxy is also a context manager
+that connection to the pool.
+
+**Return the connection on exit.** The proxy is also a context manager
 ([Context Managers](../../Chapters/15_Techniques--Context_Managers.md)).
 `__exit__()` runs whether the block ends normally or raises an
 exception, so "must check that connection back in" becomes a guarantee.
 
-`__exit__()` also drops the proxy's reference to the connection, so a
+**Refuse use after release.** `__exit__()` also drops the proxy's reference to the connection, so a
 released proxy cannot keep using a connection that now belongs to
 someone else. The check in `__getattr__()` reports that misuse instead
 of letting two clients share one connection. `ConnectionProxy` is a
@@ -612,7 +646,7 @@ the one event that calls `__getattr__()`. Python looks up every
 implicitly invoked special method this way, so the method must exist on
 the proxy's class.
 
-`__len__()` here delegates with `len(self.__implementation)` rather
+**Forward the special method explicitly.** `__len__()` here delegates with `len(self.__implementation)` rather
 than `self.__implementation.__len__()`. Both give the same answer, and
 `len()` reads better. To forward many dunders, you write one such
 method per dunder, or generate them in a loop over a list of names and
@@ -710,9 +744,10 @@ s.g()  # The old implementation is still in place
 #: Full.g()
 ```
 
-`methods()` reports the public callables an object carries, the set a
+**List the reachable methods.** `methods()` reports the public callables an object carries, the set a
 caller can reach through the surrogate's `__getattr__()`.
-`change_to()` compares the two sets and refuses the swap when the
+
+**Refuse a narrower replacement.** `change_to()` compares the two sets and refuses the swap when the
 replacement drops a name the current implementation answers. The
 surrogate keeps its current implementation, so `s.g()` still works
 after the rejected swap.

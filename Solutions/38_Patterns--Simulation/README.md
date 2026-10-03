@@ -21,6 +21,13 @@ After `asyncio.run(rat.run())`, assert on the rat's position and on that list.
 <details>
 <summary>Solution</summary>
 
+If you call `next(self.claim_results)` without the `False` default,
+the fake works for the rat's first turn and fails on its second.
+The fifth `claim()` finds the script empty, so `next()` raises a `StopIteration` inside the coroutine,
+and Python turns it into a `RuntimeError` ("coroutine raised StopIteration") that fails the test.
+The default lets the fake answer `False` once the script runs out,
+so the rat dead-ends the way it would against walls.
+
 ```python
 # test_ch38_fake_blackboard.py
 import asyncio
@@ -99,14 +106,18 @@ def test_rat_keeps_one_claim_and_spawns_the_rest() -> None:
         "Rat 1 dead-ends at (0, -1)."]
 ```
 
-`Rat` imports only the `Recorder` `Protocol`, never `Blackboard`, so
+**Stand in for the blackboard.** `Rat` imports only the `Recorder` `Protocol`, never `Blackboard`, so
 `FakeBlackboard` satisfies that `Protocol` by shape: it defines
 `claim()`, `spawn()`, `log()`, and `next_number()`, and none of the
-four touches a real `Maze` or `asyncio.create_task()`. Scripting
+four touches a real `Maze` or `asyncio.create_task()`.
+
+**Script the rat's choices.** Scripting
 `claim()`'s return values in a fixed sequence decides which neighbor
 the rat keeps for itself and which cells it spawns new rats into: the
 first cell the loop finds open, `(0, -1)`, and every open one after
-that, here `(1, 0)` alone. Once the script runs out, `claim()` answers
+that, here `(1, 0)` alone.
+
+**Stop the rat when the script ends.** Once the script runs out, `claim()` answers
 `False` to everything, so the rat dead-ends on its second turn and
 `run()` returns. The test needs no randomness and no real maze.
 
@@ -300,14 +311,14 @@ asyncio.run(main())
 #: 9 (5, 1) (7, 3)
 ```
 
-The classes are the chapter's, trimmed of what the exercise does not
+**Reuse the chapter's classes.** The classes are the chapter's, trimmed of what the exercise does not
 need: rat numbers, logging, and the file loader.
 The structure that matters survives the trim. `claim()` keeps the
 chapter's body word for word, and `explore()` still opens a
 `TaskGroup` and lets `spawn()` add tasks to that group, because new
 rats keep arriving after the block begins.
 
-For a maze built with two separate rooms and no connecting opening
+**Split the open cells into two regions.** For a maze built with two separate rooms and no connecting opening
 between them:
 
 ```
@@ -552,6 +563,14 @@ class GameBuilder:
 <details>
 <summary>Solution</summary>
 
+If you test the broken `claim()` on `amaze.txt`,
+the count of `True` returns equals `len(visited)` on every run,
+and the gap looks harmless.
+A perfect maze offers one path to each cell,
+so two rats cannot reach one unclaimed cell.
+The solution uses the seven-by-nine maze from `test_rats_and_mazes.py`,
+whose loop lets two rats approach one cell from opposite directions.
+
 ```python
 # exercise_3.py
 import asyncio
@@ -665,7 +684,7 @@ asyncio.run(main())
 #: cells visited: 24
 ```
 
-The one requested change drags three more edits with it, and that
+**Carry the `async` to every caller.** The one requested change drags three more edits with it, and that
 spread is the exercise's quiet lesson: `async` is contagious.
 Once `claim()` is an `async def`, the `Recorder` protocol must declare
 it `async` too, `Rat.run()`'s comprehension needs
@@ -673,7 +692,7 @@ it `async` too, `Rat.run()`'s comprehension needs
 its own first claim.
 `spawn()` stays synchronous, because nothing in it suspends.
 
-On the chapter's seven-by-nine test maze, `claim()` returns `True` 25
+**Let two rats claim one cell.** On the chapter's seven-by-nine test maze, `claim()` returns `True` 25
 times for 24 open cells: one pair of rats collided.
 Both rats reach `await asyncio.sleep(0)` while the same cell still
 looks unclaimed, because neither has added that cell to `visited`
@@ -931,18 +950,22 @@ print(game.robot.coins)
 #: 2
 ```
 
-`Robot.__init__()` needs only one new line, `self.coins = 0`, to have
-somewhere to count (folded into `robot_world.py` above so this
-exercise's file stays a single, runnable unit). `item_factory()` needs
+**Register the item by subclassing.** `item_factory()` needs
 no change. It searches `Item.__subclasses__()` for a
 class whose `symbol` matches the character it receives, and
 `__subclasses__()` reports the subclasses that exist right now, so
 `class Coin(Item)` in `exercise_4.py` puts `Coin` on the list the
-factory searches. `Room` and `GameBuilder` need no change either,
+factory searches.
+
+**Act through the shared interface.** `Room` and `GameBuilder` need no change either,
 since both only ever call `occupant.interact(robot, room)` through the
 shared `Item` interface.
 Neither one has ever needed to know which concrete `Item` subclasses
 exist.
+
+**Give the robot a counter.** `Robot.__init__()` needs only one new line, `self.coins = 0`, to have
+somewhere to count (folded into `robot_world.py` above so this
+exercise's file stays a single, runnable unit).
 
 Deriving `Coin` from `Food` instead breaks the maze, and the reason is
 where the factory searches, not what `Coin` inherits. `item_factory()`
@@ -1018,6 +1041,12 @@ def end(room: Room) -> bool:
 
 <details>
 <summary>Solution</summary>
+
+If you keep the chapter's final `raise ValueError`,
+the food loop cannot end normally.
+After the last meal, the search for more food raises the `ValueError`,
+and the script stops with a traceback before the walk to the `!` and before either `print()`.
+Returning `None` makes an empty search the loop's ordinary exit.
 
 ```python
 # exercise_5.py
@@ -1103,18 +1132,20 @@ print("finished:", game.robot.finished)
 #: finished: True
 ```
 
-`solve()` changes in one place. The `isinstance(room.occupant,
+**Let the caller define arrival.** `solve()` changes in one place. The `isinstance(room.occupant,
 EndGame)` test becomes `arrived(room)`, a predicate the caller
 supplies. Nothing else in the search knows or cares what it is
 looking for. The `EndGame` version is now one line at the call site,
-`end`, and `food` is another. The other change is the return type.
+`end`, and `food` is another.
+
+**Report an empty search as `None`.** The other change is the return type.
 The chapter's version raises a `ValueError` when the search runs out
 of rooms, because a maze with no reachable `!` is a broken maze.
 Here, running out of rooms is the ordinary way the food loop ends,
 so `solve()` returns `None` and the walrus in the `while` reads it as
 "nothing left to eat."
 
-The search has to run again after every meal because both of its ends
+**Replan after every meal.** The search has to run again after every meal because both of its ends
 move. `Food.interact()` replaces the food with an `Empty()`, so the
 room the robot just arrived at stops being a goal, and the robot's
 own room is now the new start. A path planned from the entry is no
@@ -1261,13 +1292,13 @@ print(amplitude(0.37, 0.37, (1, 2)))
 #: 0.0
 ```
 
-With `m == n`, `amplitude()` returns zero everywhere. Its two terms
+**Probe the field at `m == n`.** With `m == n`, `amplitude()` returns zero everywhere. Its two terms
 become `cos(mπx)cos(mπy)` and `cos(mπx)cos(mπy)`, the same product
 written twice, and the function subtracts one from the other. Not
 approximately zero: the two multiplications produce identical floats,
 so the difference is exactly `0.0` at every point on the plate.
 
-A zero field means a zero kick. `step()` scales each grain's random
+**Confirm that no grain moves.** A zero field means a zero kick. `step()` scales each grain's random
 displacement by the amplitude under that grain, so
 `uniform(-kick, kick) * 0.0` moves nothing, and 1200 steps leave every
 grain where the constructor scattered it. The view shows
@@ -1276,7 +1307,7 @@ is the initial random scatter, frozen. Agitation reads `0.000` from
 the first step, the same number a perfectly settled plate reports, so
 the summary statistic cannot tell "finished" from "never started."
 
-The main diagonal in every figure follows from the same two terms.
+**Probe a point on the diagonal.** The main diagonal in every figure follows from the same two terms.
 Swapping `x` and `y` turns the first term into the second and the
 second into the first, so the swap reverses the subtraction inside
 `amplitude()`'s `abs()`. On the line `x == y` the swap changes

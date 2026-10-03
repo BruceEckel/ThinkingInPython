@@ -61,6 +61,13 @@ def walkable_neighbors(
 <details>
 <summary>Solution</summary>
 
+If you add `"+"` and `"T"` to `SPECS` but leave `Symbol` listing three kinds,
+the script still runs and prints `24 5`.
+`ty` rejects the `SPECS` annotation with an `invalid-assignment` error,
+because the dictionary now holds keys that `Symbol` does not list.
+The solution adds both symbols to the `Symbol` literal,
+so the two tables name the same five kinds.
+
 ```python
 # exercise_1.py
 from functools import cache
@@ -120,10 +127,12 @@ print(len(cells), len({id(t) for t in cells}))
 #: 24 5
 ```
 
-Door and tree tiles need two new symbols in `SPECS`, and the same two
+**Name each new kind in both tables.** Door and tree tiles need two new symbols in `SPECS`, and the same two
 in the `Symbol` literal, so the type checker still flags a `SPECS` key
 that `Symbol` does not list. The edit stops there. `tile()` and
-`parse_map()` never change. Twenty-four cells collapse to five
+`parse_map()` never change.
+
+**Confirm one tile per kind.** Twenty-four cells collapse to five
 distinct objects, one per kind (`grass`, `water`, `rock`, `door`,
 `tree`), and that count stays at five however large the map grows,
 because `@cache` keys on the symbol alone.
@@ -186,6 +195,13 @@ def make_map(size: int) -> str:
 
 <details>
 <summary>Solution</summary>
+
+If you leave out the first `tracemalloc.stop()`,
+tracing runs straight through both builds,
+and the ratio comes out larger at every size.
+The unshared peak then counts the shared field, which is still alive, on top of its own.
+The solution stops tracing after each build,
+so each peak measures that build's allocations alone.
 
 ```python
 # exercise_2.py
@@ -250,7 +266,7 @@ for size in (50, 100, 200):
 #: 200 ratio unshared/shared: 6.9
 ```
 
-The ratio holds near six at every size: about 6x at a 50x50 map,
+**Compare the peaks across sizes.** The ratio holds near six at every size: about 6x at a 50x50 map,
 close to 7x at 200x200. Both peaks grow with the number of
 cells, because both versions build the same nested list of references.
 The two versions differ in what one cell costs. A cell in the shared field
@@ -258,6 +274,7 @@ costs one reference into a pool of three `Tile` objects, while a cell
 in the unshared field costs a brand-new `Tile`, roughly six times as
 much memory. The flyweight's saving is therefore per cell: the
 multiplier stays near six, and the bytes saved grow with the map.
+
 `Tile` is a record, so each unshared `Tile` is a slotted instance
 with no `__dict__`. With `@dataclass(frozen=True)` in place of `@record` the
 same run reports a ratio near ten, because every unshared `Tile`
@@ -308,6 +325,13 @@ def mutable_tile(symbol: str) -> MutableTile:
 <details>
 <summary>Solution</summary>
 
+If you assert on the cell you assigned through,
+the test passes whether or not the cells share a tile.
+With `@cache` removed from `mutable_tile()`,
+`field[0][0].walkable` is still `False` after the assignment, and no bug shows.
+The test asserts on `field[1][1]` instead, a different grass cell,
+whose `walkable` turns `False` only when the cells share one `MutableTile`.
+
 ```python
 # exercise_3.py
 from dataclasses import dataclass
@@ -339,7 +363,7 @@ print(field[0][1].walkable, field[1][0].walkable,
 #: False False False
 ```
 
-Setting `walkable = False` on the tile at `(0, 0)` changes `walkable`
+**Expose the shared state.** Setting `walkable = False` on the tile at `(0, 0)` changes `walkable`
 for every other grass cell in the map too, because all four cells
 share one `MutableTile` object. Only one grass tile exists in memory,
 and every cell holds a reference to that one object. This test pins
@@ -451,6 +475,13 @@ def promote(
 <details>
 <summary>Solution</summary>
 
+If you promote by assigning to the piece, as in `board[square].kind = kind`,
+the frozen `Piece` rejects the assignment with a `FrozenInstanceError`.
+If you drop the freeze so the assignment succeeds,
+promoting the pawn on `e4` turns every white pawn into a queen,
+because every white pawn is the same object.
+`promote()` leaves the shared `Piece` alone and points the square at a different one.
+
 ```python
 # exercise_4.py
 from enum import Enum
@@ -518,14 +549,14 @@ print(queen.color, queen.kind)
 #: Color.WHITE Kind.QUEEN
 ```
 
-`starting_position()` fills thirty-two squares with only twelve
+**Share one piece per color and kind.** `starting_position()` fills thirty-two squares with only twelve
 distinct `Piece` objects: two colors times six kinds. Every white pawn
 is the same object, and every other color-and-kind combination
 collapses the same way. The board is a `dict` mapping squares to
 references. That mapping keeps the extrinsic position separate from
 the intrinsic color-and-kind that `@cache` shares.
 
-Capturing leaves every `Piece` object alive. `board[dst] = ...`
+**Capture by replacing a reference.** Capturing leaves every `Piece` object alive. `board[dst] = ...`
 replaces the reference at `dst`, the captured piece, with the moving
 piece's reference. The captured piece's flyweight stays in the cache,
 because it represents "a black knight" in the abstract rather than any
@@ -533,7 +564,7 @@ particular knight on a square. A capture removes a position from the
 board, and the twelve `Piece` objects remain however many captures
 follow.
 
-`promote()` swaps which flyweight a square points to, because a frozen
+**Promote by switching flyweights.** `promote()` swaps which flyweight a square points to, because a frozen
 `Piece` cannot change its color or kind. `piece(current.color, kind)`
 looks up (or builds) a different shared `Piece`, and the board points
 at that one instead.
@@ -579,6 +610,12 @@ def make_color(red: int, green: int, blue: int) -> Color:
 <details>
 <summary>Solution</summary>
 
+If you keep `@record` on `Color`,
+the first `make_color()` call raises a `TypeError` at `_pool[key] = found`,
+because the `WeakValueDictionary` cannot create a weak reference to a slotted `Color` with no `__weakref__` slot.
+The solution writes the `dataclass` call out with `weakref_slot=True`,
+which adds that one slot and still no `__dict__`.
+
 ```python
 # exercise_5.py
 from dataclasses import dataclass
@@ -619,13 +656,15 @@ print(len(_pool))
 #: 0
 ```
 
-This listing is `weak_pool.py`'s shape applied to colors: a factory
+**Pool colors weakly behind a factory.** This listing is `weak_pool.py`'s shape applied to colors: a factory
 function, `make_color()`, and a `WeakValueDictionary` for the pool.
 `Color` is a frozen data class, so it gets a generated `__repr__()`,
 `__eq__()`, and `__hash__()`, as the record `Color` in
 `interned_color.py` does. This `Color` writes the `dataclass` call in full for
 the reason `weak_pool.py`'s `Name` does: a weak reference needs
-`weakref_slot=True`, which `record()` does not pass through. Once `del` drops every
+`weakref_slot=True`, which `record()` does not pass through.
+
+**Empty the pool on release.** Once `del` drops every
 reference to the fifty-shade palette and both crimson names, nothing
 keeps those `Color` objects alive, and the pool empties itself with no
 explicit cleanup.
@@ -683,6 +722,13 @@ class Color:
 
 <details>
 <summary>Solution</summary>
+
+If you validate the components in `__post_init__()`,
+`Color(300, 0, 0)` still raises a `ValueError`,
+but only after `__new__()` has pooled the instance.
+`Color._pool` then keeps an out-of-range `Color(red=300, green=0, blue=0)`.
+The solution checks the components at the top of `__new__()`, before the lookup,
+so an invalid `Color` stays out of the pool.
 
 ```python
 # exercise_6.py
@@ -753,7 +799,7 @@ def test_out_of_range_component_raises() -> None:
         Color(0, -1, 0)
 ```
 
-The check runs first in `__new__()`, before the pool lookup, so an
+**Validate before the pool lookup.** The check runs first in `__new__()`, before the pool lookup, so an
 out-of-range component raises a `ValueError` before `__new__()` can
 find a pooled instance or build a new one. No invalid `Color` is ever
 pooled or returned. That check is the same *parse, don't validate* move
@@ -841,7 +887,7 @@ expect(ValueError, parse_map, "?")
 #: [ValueError] '?' is not a valid Tile
 ```
 
-`SPECS`, `tile()` and `to_symbol()` all disappear. The member tuples
+**Let the enum hold the pool.** `SPECS`, `tile()` and `to_symbol()` all disappear. The member tuples
 are the spec table, and `Tile(s)` is the pool lookup. The
 value-to-member table the metaclass builds performs the runtime
 membership check `to_symbol()` does by hand.
@@ -1015,7 +1061,7 @@ print(len({id(t) for t in gather(locked_tile, "~")}))
 #: 1
 ```
 
-Each thread builds its own `Tile` and keeps it, so `is` fails between
+**Expose the cold-key race.** Each thread builds its own `Tile` and keeps it, so `is` fails between
 all four results. `@cache` looks up the key, misses, calls the
 function, and stores the result. No lock spans those steps, so four
 threads that all miss on the same cold key all run the body. The last
@@ -1029,12 +1075,12 @@ computation, a duplicate build costs time but not correctness.
 *Flyweight* raises the stakes, because its whole point is that
 `tile("^") is tile("^")`.
 
-The eager fix builds every value before any thread exists, so no miss
+**Fill the pool eagerly.** The eager fix builds every value before any thread exists, so no miss
 remains to race on. It is the better answer whenever the whole value
 set fits in one small table, the same condition that makes an `Enum`
 work. The eager fix costs nothing at runtime.
 
-The lock fix handles an unbounded value set, and its cost is real.
+**Guard the factory with a lock.** The lock fix handles an unbounded value set, and its cost is real.
 Every lookup now serializes, including the hits, which are the
 overwhelming majority once the pool is warm. If that serialization matters, lock
 only on the miss path with a hand-written pool, checking the key again

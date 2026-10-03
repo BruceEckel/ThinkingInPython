@@ -279,6 +279,13 @@ def clamp(low: int, value: int, high: int, /) -> int:
 <details>
 <summary>Solution</summary>
 
+If you build `at_least_ten` as `partial(clamp, 10, Placeholder, Placeholder)`,
+the `partial()` call raises a `TypeError`, "trailing Placeholders are not allowed," before you call the result.
+A placeholder at the end does nothing,
+because `partial()` appends the call's arguments after the bound ones,
+so the library rejects it, as the chapter says.
+The solution passes `10` alone, with no `Placeholder`.
+
 ```python
 # exercise_5.py
 from functools import partial
@@ -295,11 +302,11 @@ expect(TypeError, partial(clamp, high=100), 0, 5)  # type: ignore
 #: passed as keyword arguments: 'high'
 ```
 
-`at_least_ten` needs no `Placeholder`. `low` is the first parameter,
+**Preset the leading argument.** `at_least_ten` needs no `Placeholder`. `low` is the first parameter,
 and `partial()` already fills positional arguments from the left, so
 the two remaining parameters stay open in order.
 
-Presetting `high` alone is the case that needs a `Placeholder`.
+**Show where the keyword fails.** Presetting `high` alone is the case that needs a `Placeholder`.
 `partial()` does not inspect the signature, so building
 `partial(clamp, high=100)` succeeds. The call is where the partial fails:
 `high` is positional-only, so it cannot arrive by name. Passing
@@ -308,7 +315,7 @@ the opposite of leaving them to the caller.
 `partial(clamp, Placeholder, Placeholder, 100)` is the version that
 works, and it is what `Placeholder` exists for.
 
-The `# type: ignore` is there because `ty` finds the mistake earlier
+**Suppress the type checker's report.** The `# type: ignore` is there because `ty` finds the mistake earlier
 than the runtime does. `ty` reports `positional-only-parameter-as-kwarg`
 on `partial(clamp, high=100)`, the line that builds the partial, where
 the runtime waits for the call.
@@ -348,7 +355,14 @@ print(CONFIG, MAX_SIZE)
 #: [1, 2, 3] 200
 ```
 
-The reassignment carries a `# type: ignore` so the listing passes the
+**Separate mutation from rebinding.** `Final` constrains the binding between a name and an object: `CONFIG`
+must keep pointing at the same list forever. `Final` says nothing
+about that list's contents, so `CONFIG.append(3)` passes: `append()`
+mutates the object and leaves the binding alone. `MAX_SIZE = 200` is
+the operation `Final` exists to reject, because it points the name at
+a different object.
+
+**Suppress the rebinding error.** The reassignment carries a `# type: ignore` so the listing passes the
 book's build. With that comment removed, `ty` reports one error here,
 not two, and the one it reports is the assignment:
 
@@ -361,13 +375,6 @@ error[invalid-assignment]: Reassignment of `Final` symbol `MAX_SIZE` is not allo
 7 | MAX_SIZE = 200
   | ^^^^^^^^^^^^^^ Symbol later reassigned here
 ```
-
-`Final` constrains the binding between a name and an object: `CONFIG`
-must keep pointing at the same list forever. `Final` says nothing
-about that list's contents, so `CONFIG.append(3)` passes: `append()`
-mutates the object and leaves the binding alone. `MAX_SIZE = 200` is
-the operation `Final` exists to reject, because it points the name at
-a different object.
 
 To reject the append, the value's own type has to be immutable:
 
@@ -426,9 +433,11 @@ print(sorted(words, key=lambda w: w[-1]))
 #: ['banana', 'pie', 'kiwi', 'watermelon']
 ```
 
-Both comprehensions say what `map()` and `filter()` said, without the
+**Write the expressions inline.** Both comprehensions say what `map()` and `filter()` said, without the
 lambda, and the chapter's rule of thumb picks the comprehension for an
-expression you write inline. The last letters `a`, `e`, `i`, and `n`
+expression you write inline.
+
+**Change the sort key.** The last letters `a`, `e`, `i`, and `n`
 already ascend, so sorting by last letter hands the word list back in
 its original order, where the chapter's `key=len` put `pie` first.
 Check an order like that rather than assuming it.
@@ -447,10 +456,11 @@ print(list(raw))
 #: []
 ```
 
-Printing `raw` directly shows `<map object at 0x...>` rather than any
+**Inspect the lazy object.** Printing `raw` directly shows `<map object at 0x...>` rather than any
 values, because `map()` returns a lazy iterator that has computed
-nothing yet, so its `repr()` shows only the type and an address. The
-second `list(raw)` is the more dangerous half:
+nothing yet, so its `repr()` shows only the type and an address.
+
+**Exhaust the iterator.** The second `list(raw)` is the more dangerous half:
 it returns `[]` and raises no error. The first `list(raw)` consumed
 the iterator, and nothing rewinds it, so any later pass sees an
 exhausted object and silently produces nothing. A comprehension hands
@@ -505,7 +515,7 @@ print(tally(), tally(), tally())
 #: 10 20 30
 ```
 
-`increment()` captures two names, and only one of them needs the
+**Declare the name you assign.** `increment()` captures two names, and only one of them needs the
 `nonlocal` declaration. It only reads `step`, the way `multiply()`
 reads `factor` in `multiplier()`, and reading a captured name needs no
 declaration. `increment()` assigns `count`, and assignment is how
@@ -619,14 +629,16 @@ print([r.celsius for r in data])
 #: [18.0, 25.0, 30.5]
 ```
 
-`colder_than()` mirrors `warmer_than()`, and `partial()` turns each
-into the one-argument callable `filter()` requires. Chaining the two
+**Add the upper bound.** `colder_than()` mirrors `warmer_than()`, and `partial()` turns each
+into the one-argument callable `filter()` requires.
+
+**Narrow to the band.** Chaining the two
 filters leaves only `b`, whose 25.0 Celsius sits inside the band:
 `a` is too cold and `c` is too warm. The two filters commute, because
 each one tests the same untouched Celsius value, so swapping the
 `warm` and `band` lines reports the same reading.
 
-The empty list from `converted_first()` shows that the `map()` does
+**Reorder the stages.** The empty list from `converted_first()` shows that the `map()` does
 not commute with the filters. Once `to_fahrenheit()` has run, every
 reading carries a Fahrenheit number, and 64.4, 77.0, and 86.9 all pass
 `warmer_than(20.0)` and all fail `colder_than(30.0)`. The predicates
@@ -637,7 +649,7 @@ correct on their own.
 The unit lives only in the field name. A stage that changes what a
 value means must run after every stage that reads the old meaning.
 
-The last `print()` repeats the chapter's point. `report()` and
+**Show the input untouched.** The last `print()` repeats the chapter's point. `report()` and
 `converted_first()` both read `data` and neither writes it, so the
 Celsius values stay the same after three traversals, and you can run
 either function again and get the same answer.

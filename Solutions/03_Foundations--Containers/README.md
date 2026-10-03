@@ -95,6 +95,11 @@ That default lets the loop add to a key before it exists.
 <details>
 <summary>Solution</summary>
 
+If you start the tally from an empty `dict`,
+the first `counts[kind] += 1` raises a `KeyError` for `'dog'`,
+because `+=` reads the key before it writes it.
+The solution uses `defaultdict(int)`, which supplies the `0` that the first read needs.
+
 ```python
 # exercise_2.py
 from collections import defaultdict
@@ -204,6 +209,12 @@ A negative `step` also reverses in a single slice, but then `start` and `stop` s
 <details>
 <summary>Solution</summary>
 
+If you fold the two slices into one as `xs[1:4:-1]`, you get an empty list.
+A negative `step` walks left from `start`,
+and index `1` lies left of the stop at `4`,
+so the slice ends before it takes an item.
+The one-slice form in the solution swaps the bounds to `xs[3:0:-1]`.
+
 ```python
 # exercise_5.py
 xs = [10, 20, 30, 40, 50]
@@ -242,6 +253,13 @@ Then reproduce `most_common()` with `sorted()` and a `key` function, and notice 
 <details>
 <summary>Solution</summary>
 
+If you leave the minus sign out of the `key` function,
+`sorted()` ranks the lowest counts first,
+and the slice prints `[('dog', 0), ('sat', 1)]`.
+The `'dog'` entry is the `0` that the earlier `counts["dog"]` read stored.
+`most_common()` ranks from the highest count down,
+so the key negates each count to put the largest first.
+
 ```python
 # exercise_6.py
 from collections import defaultdict
@@ -258,15 +276,18 @@ print(sorted(counts.items(), key=lambda kv: -kv[1])[:2])
 #: [('a', 3), ('cat', 2)]
 ```
 
-The first thing you write yourself is the loop. `Counter(words)`
+**Count each word.** The first thing you write yourself is the loop. `Counter(words)`
 counts an iterable inside its constructor, while `defaultdict(int)`
 removes the "does this key exist yet" check and leaves the counting to
-you. The rest is what `Counter` supplies after the tally:
-`most_common()` becomes a `sorted()` call with a key function and a
-slice, and the `Counter({...})` repr becomes a `dict()` conversion.
-A read of a missing key also leaves a `Counter` alone, while
+you.
+
+**Default a missing key to zero.** A read of a missing key also leaves a `Counter` alone, while
 `defaultdict(int)` stores a `0` for `"dog"`, so their contents differ
 after the `counts["dog"]` line.
+
+**Rebuild the reporting.** The rest is what `Counter` supplies after the tally:
+`most_common()` becomes a `sorted()` call with a key function and a
+slice, and the `Counter({...})` repr becomes a `dict()` conversion.
 
 </details>
 </details>
@@ -344,23 +365,25 @@ print(counts)  # The merge built a new dict
 #: {'a': 1, 'b': 2, 'c': 3}
 ```
 
-`dict()` accepts any iterable of two-item pairs, so a list of tuples
+**Build the dictionary.** `dict()` accepts any iterable of two-item pairs, so a list of tuples
 becomes a dictionary with no loop. `dict(zip(names, values))` is the
 same constructor fed from two parallel sequences.
 
-`30` ends up under `"c"`, because `|` resolves a collision in favor of
+**Resolve the collision.** `30` ends up under `"c"`, because `|` resolves a collision in favor of
 the right operand. The rule follows from what a merge must be: the
 result is one value per key, and the two dictionaries disagree about
 `"c"`, so one of them must lose. The right intuition for `a | b` is
 "start from `a`, then apply `b`", and that reading matches
 `a.update(b)`, which has always worked that way.
 
+**Leave the left operand unchanged.** `|=` updates the left dictionary in place, while
+`|` builds a new one and leaves the left operand alone, as the last
+`print(counts)` above confirms.
+
 Letting the right operand win makes `|` on dictionaries asymmetric,
 unlike `|` on sets, where `a | b` and `b | a` are the same set. The
 two uses share one operator because both mean "combine," but only the
-set version commutes. `|=` updates the left dictionary in place, while
-`|` builds a new one and leaves the left operand alone, as the last
-`print(counts)` above confirms.
+set version commutes.
 
 </details>
 </details>
@@ -402,13 +425,13 @@ except ValueError as e:
 #: too many values to unpack (expected 2, got 5)
 ```
 
-A starred target absorbs however many items remain, so one assignment
+**Absorb the remaining items.** A starred target absorbs however many items remain, so one assignment
 reaches any of the three positions without an index. The star may
 appear anywhere in the target list, so `first, *middle, last = row`
 works: `first` and `last` each take one item and `middle` takes the
 rest, however many that is.
 
-`a, b = row` fails because an unstarred target list states an exact
+**Reject a count mismatch.** `a, b = row` fails because an unstarred target list states an exact
 count, two, and `row` holds five. Python raises a `ValueError` rather
 than dropping the extras, since a silent drop would hide the mismatch.
 The same error appears in the other direction, as
@@ -470,24 +493,24 @@ except TypeError as e:
 #: unhashable type: 'list'
 ```
 
-`frozendict` takes the same arguments `dict` does: an iterable of
+**Build the configuration.** `frozendict` takes the same arguments `dict` does: an iterable of
 two-item pairs, keyword arguments, or another mapping. So `pairs`
 builds the same object `frozendict(host="localhost", port=8080)`
 would.
 
-The lookup with `same` succeeds because a dictionary finds a key by
+**Look up by an equal key.** The lookup with `same` succeeds because a dictionary finds a key by
 hash and equality, so an equal key need not be the same object.
 `config` and `same` are separate objects built in different entry
 orders, but they hold the same pairs, so they compare equal and hash
 the same. A `frozendict` key gives you that property: any equal
 configuration reaches the same entry, whoever built it and whenever.
 
-Assigning to an entry raises a `TypeError` rather than quietly
+**Catch the rejected assignment.** Assigning to an entry raises a `TypeError` rather than quietly
 succeeding, and the type checker rejects the assignment too, so the
 line carries a `# type: ignore`. The runtime exception is the point of the
 listing.
 
-`nested` shows how far that immutability reaches. A `frozendict` freezes
+**Find the limit of immutability.** `nested` shows how far that immutability reaches. A `frozendict` freezes
 which objects it maps its keys to, not what those objects contain, so
 `hash(nested)` must hash a `list` and fails. The immutability is
 shallow, as it is for the `tuple` in `shallow_immutability.py`.

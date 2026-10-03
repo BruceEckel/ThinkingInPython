@@ -18,6 +18,12 @@ Compare its size to `os.process_cpu_count()`, and ask when the pool starts a wor
 <details>
 <summary>Solution</summary>
 
+If you keep `assert parallel == serial` from `parallel_pure.py`,
+the script stops with a bare `AssertionError` before it prints a line.
+Each pair now carries the ID of the process that computed it,
+so no parallel result can equal its serial twin.
+The solution compares the counts alone, the part a pure function guarantees.
+
 ```python
 import os
 from concurrent.futures import ProcessPoolExecutor
@@ -45,15 +51,17 @@ if __name__ == "__main__":
     main()
 ```
 
-`ProcessPoolExecutor` needs `count_primes` picklable and importable
+**Keep the worker function importable.** `ProcessPoolExecutor` needs `count_primes` picklable and importable
 from `__main__` in a worker process. Only a real script file meets
 that requirement, not a fenced block executed in place.
 
-The assertion compares the counts alone, since the serial run carries
+**Check that the answers agree.** The assertion compares the counts alone, since the serial run carries
 the parent's process ID and the parallel run carries the workers'.
 The counts stay the same, `[17984, 33860, 49098, 63951]`: the same
 pure function gives the same answers wherever it runs, which is the
-point of `parallel_pure.py`. The interesting number is the second
+point of `parallel_pure.py`.
+
+**Count the processes that answered.** The interesting number is the second
 line. Three consecutive runs on one 32-core machine reported `4`
 distinct process IDs each time.
 
@@ -184,20 +192,20 @@ def test_agrees_with_insertion_sort(xs: list[int]) -> None:
     assert sorted(xs) == insertion_sort(xs)
 ```
 
-The invariant is the weakest of the three, and the interesting part is
+**State a fact about every output.** The invariant is the weakest of the three, and the interesting part is
 how weak. A function that ignores its argument and returns `[]` passes
 `test_output_is_ordered()` on every input, and so does one that returns
 the first element alone. "Ordered" says nothing about the elements
 being the same ones you handed in.
 
-Idempotence is weaker still on its own: the same `[]`-returning
+**Check that repeating changes nothing.** Idempotence is weaker still on its own: the same `[]`-returning
 function passes it too. Idempotence buys a different kind of check,
 one about the operation rather than the output. It catches a sort
 that drops the last element. That sort's output is always ordered, so
 the invariant passes, but running it on its own output drops another
 element, so twice and once disagree on every list of two or more.
 
-The oracle closes the gap. `insertion_sort()` is slow and simple
+**Compare against an independent version.** The oracle closes the gap. `insertion_sort()` is slow and simple
 enough to check by reading, so asserting that it agrees with
 `sorted()` pins down the elements, their multiplicities, and their
 order at once. The oracle earns its place because it repeats no part
@@ -282,7 +290,7 @@ def test_upper_leaves_the_micro_sign_in_the_greek_block(
     assert MICRO.upper().lower() != MICRO.lower()
 ```
 
-`µ` is U+00B5 MICRO SIGN, a character Latin-1 kept separate from the
+**Trace the round trip.** `µ` is U+00B5 MICRO SIGN, a character Latin-1 kept separate from the
 Greek letter it looks like. `µ` is already lowercase, so `.lower()`
 returns it unchanged. But it has no uppercase form of its own, so
 `.upper()` maps it to U+039C GREEK CAPITAL LETTER MU, and lowering
@@ -324,6 +332,13 @@ To break the function, remove the step that places leftover students, then rerun
 
 <details>
 <summary>Solution</summary>
+
+If you compare `placed == names` without sorting either side,
+the property fails against the correct `group_rounds()`,
+and Hypothesis shrinks the failure to `names=['a', 'b'], size=2`.
+`group_rounds()` shuffles the pool before it forms each round,
+so the students come back in an order of their own.
+The property concerns which students each round places, not their order, so the solution sorts both sides before comparing them.
 
 ```python
 # test_group_rounds.py
@@ -385,16 +400,7 @@ def test_every_student_appears_once_per_round(
         assert sorted(placed) == sorted(names)
 ```
 
-The `unique=True` on the roster strategy is doing real work.
-`group_rounds()` keys its history by `frozenset` of names, so two
-students sharing a name are one student to the algorithm. The
-property still passes on such a roster, because every name lands in
-one group, but the schedule the property checks counts the two as one
-student when `group_rounds()` avoids repeat meetings.
-Generating distinct names states `group_rounds()`'s precondition where
-the test can see it.
-
-The two lines guarding an empty `groups` are the interesting part,
+**Handle a roster smaller than a group.** The two lines guarding an empty `groups` are the interesting part,
 because the property test finds the need for them. Against the
 version without them, Hypothesis reports a two-name roster with
 `size=3`, such as `names=['a', 'b']`, and a
@@ -417,6 +423,15 @@ cases. The strategy generates small rosters because Hypothesis
 prefers small examples, so a size of `3` against a roster of `2`
 comes up on its own. The property says what should be true for every
 roster.
+
+**State the precondition in the strategy.** The `unique=True` on the roster strategy is doing real work.
+`group_rounds()` keys its history by `frozenset` of names, so two
+students sharing a name are one student to the algorithm. The
+property still passes on such a roster, because every name lands in
+one group, but the schedule the property checks counts the two as one
+student when `group_rounds()` avoids repeat meetings.
+Generating distinct names states `group_rounds()`'s precondition where
+the test can see it.
 
 Breaking the function on purpose is the other half of the exercise.
 Delete the loop that places leftovers:
@@ -536,14 +551,14 @@ Neither impure function assigns to anything, which is the lesson.
 `stale()` and `timeout()` are quiet ones: both *read* state the
 caller cannot see.
 
-The substitution that breaks `stale()` is replacing a call with the
+**Take the time without declaring it.** The substitution that breaks `stale()` is replacing a call with the
 answer it just gave. `stale(made, timedelta(hours=12))` returns
 `False` at 11:00 and `True` at 13:00, so writing down `False` and
 substituting it changes the program the moment the clock passes noon.
 Nothing in the signature warns you, because `datetime.now()` is an
 argument the function takes without declaring.
 
-`timeout()` breaks the same way across a boundary that is easier to
+**Take a setting without declaring it.** `timeout()` breaks the same way across a boundary that is easier to
 miss, since the environment usually holds still during a run.
 Substituting `30` for `timeout()` is correct until someone sets
 `TIMEOUT`, and then the substituted version and the original disagree
@@ -551,7 +566,7 @@ while both still look right. Tests show the problem first: one test
 that sets the variable changes the answer for every test after it, and
 no argument list records the dependency.
 
-The repair is the same for both, and it is the one this part of the
+**Make the hidden input a parameter.** The repair is the same for both, and it is the one this part of the
 book keeps making. Move the hidden input into the parameter list.
 `stale_pure()` takes the current time, and `timeout_pure()` takes the
 mapping to read. Both are now referentially transparent, and both are
@@ -668,7 +683,9 @@ has to reconstruct that `result` must be an `Err` by ruling out the
 
 `ty` reports the same thing about both. Inside the `Ok` it knows
 `float` either way, and in the error branches it knows `Exception`
-narrowed to `ValueError` or `ZeroDivisionError`. The precision
+narrowed to `ValueError` or `ZeroDivisionError`.
+
+**Rule out a shared subclass.** The precision
 behind that agreement rests on one decorator: both `Ok`
 and `Err` carry `@final`, in the listing above and in
 `utils/result.py`. Without that decorator `ty` 0.0.84 allows for a
