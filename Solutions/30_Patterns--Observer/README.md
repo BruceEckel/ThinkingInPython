@@ -8,6 +8,37 @@
 > then notifies them.
 > Demonstrate it by connecting several responders and causing one change that updates them all.
 
+<details>
+<summary>Where to look</summary>
+
+The design is the one [The Pythonic Observer](../../Chapters/30_Patterns--Observer.md#the-pythonic-observer) describes:
+a list of callables, one method that appends to it,
+and one that calls each entry with the same arguments.
+Any callable is a responder, a `lambda` included,
+so the demonstration needs no observer class.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_1.py
+from collections.abc import Callable
+from typing import Any
+
+class Broadcaster:
+    def __init__(self) -> None:
+        ...
+
+    def connect(self, responder: Callable) -> None:
+        ...
+
+    def announce(self, *args: Any) -> None:
+        ...
+```
+
+<details>
+<summary>Solution</summary>
+
 ```python
 # exercise_1.py
 from collections.abc import Callable
@@ -39,6 +70,10 @@ collects them in a list. `announce()` then hands its own arguments to
 each one in turn, so every connected responder sees the same update,
 in connection order.
 
+</details>
+</details>
+</details>
+
 ## 2. The pull model, twice
 
 > Rewrite the classic listings to use the pull model:
@@ -49,6 +84,98 @@ in connection order.
 > and once with an `Observer[S, T]` protocol whose first parameter is the subject type,
 > which `Subject` supplies as `Self`.
 > Say what each version adds.
+
+<details>
+<summary>Where to look</summary>
+
+[Push or Pull](../../Chapters/30_Patterns--Observer.md#push-or-pull) describes the pull model.
+The type problem is that a parameter is contravariant:
+an `update()` that narrows `subject` to `Thermometer` accepts less than `Observer[float]` requires.
+The first version keeps the protocol and narrows at runtime with `isinstance()`.
+The second gives the protocol a second type parameter for the subject,
+and `Subject.attach()` asks for an `Observer[Self, T]`.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_2_narrowing.py
+from typing import Protocol
+
+class Observer[T](Protocol):
+    def update(
+        self, subject: Subject[T], arg: T
+    ) -> None: ...
+
+class Subject[T]:
+    def __init__(self) -> None:
+        ...
+
+    def attach(self, observer: Observer[T]) -> None:
+        ...
+
+    def notify(self, arg: T) -> None:
+        ...
+
+class Thermometer(Subject[float]):
+    def __init__(self, celsius: float) -> None:
+        ...
+
+    @property
+    def celsius(self) -> float:
+        ...
+
+    @celsius.setter
+    def celsius(self, value: float) -> None:
+        ...
+
+class Display:
+    def update(
+        self, subject: Subject[float], arg: float
+    ) -> None:
+        ...
+```
+
+```python
+# The shape of exercise_2_generic.py
+from typing import Protocol, Self
+
+class Observer[S, T](Protocol):
+    def update(self, subject: S, arg: T) -> None: ...
+
+class Subject[T]:
+    def __init__(self) -> None:
+        ...
+
+    def attach(
+        self, observer: Observer[Self, T]
+    ) -> None:
+        ...
+
+    def notify(self, arg: T) -> None:
+        ...
+
+class Thermometer(Subject[float]):
+    def __init__(self, celsius: float) -> None:
+        ...
+
+    @property
+    def celsius(self) -> float:
+        ...
+
+    @celsius.setter
+    def celsius(self, value: float) -> None:
+        ...
+
+class Display:
+    def update(
+        self, subject: Thermometer, arg: float
+    ) -> None:
+        ...
+```
+
+<details>
+<summary>Solution</summary>
 
 The protocol here is `classic_observer.py`'s, unchanged.
 `update()` declares the widest type `attach()` can hand it,
@@ -171,6 +298,10 @@ Both versions print the same line, and neither needs `arg`. That is
 pull's bargain: the subject decides nothing about what its observers
 read, and each observer pays by knowing what it is watching.
 
+</details>
+</details>
+</details>
+
 ## 3. An `announce()` that survives a failing responder
 
 > Make `Broadcaster.announce()` survive a responder that raises an exception:
@@ -179,6 +310,40 @@ read, and each observer pays by knowing what it is watching.
 > as an [`ExceptionGroup`](../../Chapters/19_Techniques--Concurrency.md#structured-concurrency-with-taskgroup)
 > (which you build yourself here: `raise ExceptionGroup("message", failures)`).
 > Write a test in which the first responder raises an exception and the second still records its notification.
+
+<details>
+<summary>Where to look</summary>
+
+[Raising an Exception](../../Chapters/30_Patterns--Observer.md#raising-an-exception) shows one failing responder stopping the loop in `announce()`.
+Put a `try` inside the loop, append each exception to a list,
+and after the loop raise an `ExceptionGroup` when the list is not empty.
+The test catches it with `pytest.raises(ExceptionGroup)`.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_3.py
+from collections.abc import Callable
+
+type Responder[T] = Callable[[T], None]
+
+class Broadcaster[T]:
+    def __init__(self) -> None:
+        ...
+
+    def connect(self, responder: Responder[T]) -> None:
+        ...
+
+    def announce(self, data: T) -> None:
+        ...
+
+def broken(data: int) -> None:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_3.py
@@ -257,6 +422,10 @@ what its responders do, so it cannot name their failure modes. Catching
 `KeyboardInterrupt` or an `asyncio.CancelledError` passing through a
 responder stops the notification instead of joining `failures`.
 
+</details>
+</details>
+</details>
+
 ## 4. The same rescue, for the async fan-out
 
 > Redo exercise 3 for `async_broadcaster.py`.
@@ -264,6 +433,48 @@ responder stops the notification instead of joining `failures`.
 > separate the returned exceptions from the successes,
 > and raise them together as an `ExceptionGroup`.
 > Write a test in which the first responder raises an exception and the second still records its notification.
+
+<details>
+<summary>Where to look</summary>
+
+[A Failing Responder Orphans the Rest](../../Chapters/30_Patterns--Observer.md#a-failing-responder-orphans-the-rest) shows `gather()` abandoning the other coroutines on the first failure.
+With `return_exceptions=True`, `gather()` returns every result, exceptions among them.
+Keep the results that are `Exception` instances and raise them as one `ExceptionGroup`.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_4.py
+import asyncio
+from collections.abc import Awaitable, Callable
+
+type AsyncResponder[T] = Callable[[T], Awaitable[None]]
+
+class Broadcaster[T]:
+    def __init__(self) -> None:
+        ...
+
+    def connect(
+        self, responder: AsyncResponder[T]
+    ) -> None:
+        ...
+
+    async def announce(self, data: T) -> None:
+        ...
+
+async def broken(data: int) -> None:
+    ...
+
+async def record(data: int) -> None:
+    ...
+
+async def main() -> None:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_4.py
@@ -365,6 +576,10 @@ question, and both end in an `ExceptionGroup`. The difference is only
 where the loop lives: written by hand in the synchronous version,
 supplied by `gather()` in the async one.
 
+</details>
+</details>
+</details>
+
 ## 5. Failures returned as values
 
 > Redo exercise 3 with each failure returned as a value instead of raised as an exception.
@@ -374,6 +589,46 @@ supplied by `gather()` in the async one.
 > Write an adapter that lets a responder returning `None`,
 > such as `received.append`, be connected.
 > Write a test in which the first responder fails and the second still records its notification.
+
+<details>
+<summary>Where to look</summary>
+
+Change the responder type to return a [`Result`](../../Chapters/42_Functional--Error_Handling.md#a-result-type),
+and make `announce()` a comprehension that keeps each result that is an `Err`.
+The adapter takes a `None`-returning callable
+and returns a responder that calls it and answers `Ok(None)`.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_5.py
+from collections.abc import Callable
+from result import Err, Ok, Result
+
+type Responder[T] = Callable[[T], Result[None, str]]
+
+class Broadcaster[T]:
+    def __init__(self) -> None:
+        ...
+
+    def connect(self, responder: Responder[T]) -> None:
+        ...
+
+    def announce(self, data: T) -> list[Err[str]]:
+        ...
+
+def succeeds[T](
+    action: Callable[[T], None],
+) -> Responder[T]:
+    ...
+
+def checked(data: int) -> Result[None, str]:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_5.py
@@ -457,6 +712,10 @@ Returning errors as values works when you write the responders.
 For a broadcaster that accepts arbitrary callables,
 exercise 3's catch-and-collect protects the loop from code you did not write.
 
+</details>
+</details>
+</details>
+
 ## 6. Turning `box_observer.py` into a flood-fill game
 
 > Turn `box_observer.py` into a simple game:
@@ -466,6 +725,63 @@ exercise 3's catch-and-collect protects the loop from code you did not write.
 > Write the neighbor test yourself, and count diagonal squares as neighbors.
 > Track the moves it takes to make the whole field one color.
 > For competition, alternate turns between players.
+
+<details>
+<summary>Where to look</summary>
+
+Keep `Color` and `new_grid()` from [The Model](../../Chapters/30_Patterns--Observer.md#the-model).
+Your patch is the set of cells a depth-first search reaches from the origin through same-colored cells,
+with a neighbor test that allows a difference of at most one in each coordinate.
+A move repaints that set and then searches again.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_6.py
+from enum import StrEnum
+
+class Color(StrEnum):
+    SKYBLUE = "skyblue"
+    PALEGREEN = "palegreen"
+    KHAKI = "khaki"
+
+    @classmethod
+    def at(cls, n: int) -> Color:
+        ...
+
+type Coord = tuple[int, int]
+type Grid = dict[Coord, Color]
+
+def new_grid(size: int) -> Grid:
+    ...
+
+def adjacent(a: Coord, b: Coord) -> bool:
+    ...
+
+class FloodGame:
+    ("Flood-fill game: grow a patch "
+     "from the origin to fill the board.")
+    def __init__(self, size: int,
+                 origin: Coord = (0, 0)) -> None:
+        ...
+
+    def _flood(self, color: Color) -> set[Coord]:
+        ("Every cell reachable from origin "
+         "through same-colored cells.")
+        ...
+
+    def select(self, cell: Coord) -> bool:
+        ("Recolor the owned patch "
+         "to the selected cell's color.")
+        ...
+
+    def is_complete(self) -> bool:
+        ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_6.py
@@ -566,12 +882,59 @@ it names `BoxModel`, and a `FloodGame` is not one. Widening it to a
 Protocol (or to `Broadcaster[Grid]` plus `size`, `grid`, and
 `select()`) lets the same view draw either model.
 
+</details>
+</details>
+</details>
+
 ## 7. A new selection rule, and the same view
 
 > Change the rule for a selection in `box_observer.py`:
 > make `recolored()` advance every box in the selected box's row and column.
 > Run `box_view.py` without editing it,
 > and explain why the view needed no change.
+
+<details>
+<summary>Where to look</summary>
+
+In [The Model](../../Chapters/30_Patterns--Observer.md#the-model), `recolored()` alone decides which cells change;
+`BoxModel.select()` calls it and announces the result.
+Build the new `Grid` from every cell that shares the selection's `x` or its `y`.
+For why the view needs no change, see what `draw()` receives in [The View](../../Chapters/30_Patterns--Observer.md#the-view).
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_7.py
+from enum import StrEnum
+
+class Color(StrEnum):
+    SKYBLUE = "skyblue"
+    PALEGREEN = "palegreen"
+    KHAKI = "khaki"
+
+    @classmethod
+    def at(cls, n: int) -> Color:
+        ...
+
+    def next(self) -> Color:
+        ...
+
+type Coord = tuple[int, int]
+type Grid = dict[Coord, Color]
+
+def new_grid(size: int) -> Grid:
+    ...
+
+def recolored(grid: Grid, selected: Coord) -> Grid:
+    ...
+
+def initials(grid: Grid, size: int) -> str:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_7.py
@@ -641,6 +1004,10 @@ The rule sits in `recolored()`, `BoxModel.select()` calls it, and
 from the other side: it is a second view of a `Grid`, written without
 knowing the rule.
 
+</details>
+</details>
+</details>
+
 ## 8. Two views on one model
 
 > Add a second view to `box_observer.py`'s `BoxModel`.
@@ -649,6 +1016,72 @@ knowing the rule.
 > and show that one `select()` updates the pair.
 > Keep both views textual so the example runs without a window,
 > and leave the model as `box_observer.py` has it.
+
+<details>
+<summary>Where to look</summary>
+
+In [The View](../../Chapters/30_Patterns--Observer.md#the-view), `draw()` is a responder that takes a `Grid`,
+and any function with that signature is another view.
+Write one that prints a letter per cell and one that counts with `collections.Counter`,
+then `connect()` both before calling `select()`.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_8.py
+from collections import Counter
+from collections.abc import Callable
+from enum import StrEnum
+
+class Color(StrEnum):
+    SKYBLUE = "skyblue"
+    PALEGREEN = "palegreen"
+    KHAKI = "khaki"
+
+    @classmethod
+    def at(cls, n: int) -> Color:
+        ...
+
+    def next(self) -> Color:
+        ...
+
+type Coord = tuple[int, int]
+type Grid = dict[Coord, Color]
+type Responder[T] = Callable[[T], None]
+
+def new_grid(size: int) -> Grid:
+    ...
+
+def recolored(grid: Grid, selected: Coord) -> Grid:
+    ...
+
+class Broadcaster[T]:
+    def __init__(self) -> None:
+        ...
+
+    def connect(self, responder: Responder[T]) -> None:
+        ...
+
+    def announce(self, data: T) -> None:
+        ...
+
+class BoxModel(Broadcaster[Grid]):
+    def __init__(self, size: int) -> None:
+        ...
+
+    def select(self, cell: Coord) -> None:
+        ...
+
+def letters(grid: Grid) -> None:
+    ...
+
+def tally(grid: Grid) -> None:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_8.py
@@ -756,6 +1189,10 @@ already has `letters()` and `tally()`, so the window and the terminal
 report the same grid. Running that combination means `show()` takes
 over with `root.mainloop()`, so call `show()` last.
 
+</details>
+</details>
+</details>
+
 ## 9. Which colors a grid can reach
 
 > Work out which colors the whole grid can reach from `new_grid(size)` under `box_observer.py`'s rule.
@@ -766,6 +1203,50 @@ over with `root.mainloop()`, so call `show()` last.
 > and print the reachable colors for every size from 3 through 8.
 > The 8x8 grid reaches `palegreen` alone,
 > and one smaller size reaches nothing.
+
+<details>
+<summary>Where to look</summary>
+
+The rule in [The Model](../../Chapters/30_Patterns--Observer.md#the-model) adds one, modulo three, to the selected cell and its four neighbors,
+so each selection is a column of a 0/1 matrix and the target color is a right-hand side.
+Gaussian elimination mod 3 differs from the usual in two places:
+divide by a pivot with `pow(x, -1, 3)`, and reduce every subtraction with `% 3`.
+A zero row with a nonzero right-hand side means no solution.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_9.py
+from enum import StrEnum
+from typing import Final
+
+class Color(StrEnum):
+    SKYBLUE = "skyblue"
+    PALEGREEN = "palegreen"
+    KHAKI = "khaki"
+
+type Coord = tuple[int, int]
+type Row = list[int]
+
+MOD: Final[int] = len(Color)
+
+def cross(cell: Coord, size: int) -> list[Coord]:
+    ...
+
+def system(size: int, target: int) -> list[Row]:
+    "One row per cell, with the target in the last column."
+    ...
+
+def solvable(rows: list[Row]) -> bool:
+    ...
+
+def reachable(size: int) -> list[Color]:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_9.py
@@ -871,6 +1352,10 @@ selections turns that board one color.
 `", ".join(reachable(size))` with no conversion, the same property
 that lets `box_view.py` hand a `Color` to `tkinter`.
 
+</details>
+</details>
+</details>
+
 ## 10. A descriptor per watched attribute
 
 > Write a `Notifying` [descriptor](../../Chapters/17_Techniques--Metaprogramming.md#a-descriptor-that-validates)
@@ -882,6 +1367,60 @@ that lets `box_view.py` hand a `Color` to `tkinter`.
 > so `__get__()` returns the descriptor for an access through the class,
 > and `Thermometer.celsius.connect(t, readings.append)` reaches it.
 > Show that an assignment to one attribute calls no responder of the other.
+
+<details>
+<summary>Where to look</summary>
+
+A descriptor's `__set_name__()` ([A Descriptor That Validates](../../Chapters/17_Techniques--Metaprogramming.md#a-descriptor-that-validates)) receives the attribute's name,
+from which it can derive one storage name and one responder-list name per attribute.
+`__set__()` stores the value and then calls that attribute's responders.
+`__get__()` returns `self` when `obj` is `None`, so `Thermometer.celsius.connect()` reaches it,
+and two `@overload`s tell the type checker which result each access gets.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_10.py
+from collections.abc import Callable
+from typing import overload
+
+type Responder[T] = Callable[[T], None]
+
+class Notifying[T]:
+    def __set_name__(
+        self, owner: type, name: str
+    ) -> None:
+        ...
+
+    @overload
+    def __get__(self, obj: None,
+                owner: type) -> Notifying[T]: ...
+    @overload
+    def __get__(self, obj: object,
+                owner: type) -> T: ...
+    def __get__(self, obj: object | None,
+                owner: type) -> T | Notifying[T]:
+        ...
+
+    def __set__(self, obj: object, value: T) -> None:
+        ...
+
+    def connect(self, obj: object,
+                responder: Responder[T]) -> None:
+        ...
+
+class Thermometer:
+    celsius = Notifying[float]()
+    humidity = Notifying[float]()
+
+    def __init__(self, celsius: float,
+                 humidity: float) -> None:
+        ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_10.py
@@ -975,6 +1514,10 @@ which draws no complaint from Pyright.
 rather than declaring it on the class, where every instance shares
 one list.
 
+</details>
+</details>
+</details>
+
 ## 11. Responders registered at load time
 
 > Write a load-time version of `Broadcaster`:
@@ -985,6 +1528,52 @@ one list.
 > and create two thermometers.
 > Say which of the problems in this chapter's runtime sections the load-time form keeps,
 > which it removes, and what it costs that `Broadcaster` does not.
+
+<details>
+<summary>Where to look</summary>
+
+A module-level list and a decorator that appends its function and returns it unchanged make every decorated `def` a registration.
+For the comparison, reread the problems the runtime sections raise after [The Pythonic Observer](../../Chapters/30_Patterns--Observer.md#the-pythonic-observer):
+disconnecting, a raised exception, lapsed listeners, and re-entrant notification.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_11.py
+from collections.abc import Callable
+from typing import Final
+
+type Responder = Callable[[float], None]
+
+RESPONDERS: Final[list[Responder]] = []
+
+def responds(fn: Responder) -> Responder:
+    ...
+
+class Thermometer:
+    def __init__(self, celsius: float) -> None:
+        ...
+
+    @property
+    def celsius(self) -> float:
+        ...
+
+    @celsius.setter
+    def celsius(self, value: float) -> None:
+        ...
+
+@responds
+def display(celsius: float) -> None:
+    ...
+
+@responds
+def alarm(celsius: float) -> None:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
 
 ```python
 # exercise_11.py
@@ -1068,3 +1657,7 @@ The load-time form also costs three things that `Broadcaster` does not:
 - Tests share the registry.
   A test that decorates a responder leaves it registered for every test that runs after it,
   unless the test removes it from `RESPONDERS`.
+
+</details>
+</details>
+</details>
