@@ -269,8 +269,12 @@ print(mean, count)
 
 **Read the fields by position.** Printing and unpacking still run, because a `NamedTuple` was a tuple
 all along. The line that reads `result.mean` and `result.count` stops
-working: a bare tuple has neither attribute, so the type checker
-reports both reads and Python raises an `AttributeError` at the first.
+working: a bare tuple has no `mean` attribute, so the type checker
+reports the `mean` read, and at runtime that read raises an
+`AttributeError` first.
+The `count` read passes the type checker, because a tuple has a
+`count()` method, so `result.count` names that bound method instead of
+the number.
 The repair is `result[0]` and `result[1]`.
 
 The call sites lose the names. `print(result)` now writes

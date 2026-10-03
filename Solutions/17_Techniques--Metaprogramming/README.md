@@ -358,8 +358,14 @@ no-op.
 
 **Refuse any descendant of a final class.** The chapter's `final_runtime.py` hard-codes the refusal into `B`'s own
 `__init_subclass__()`. This version moves the decision into a set that
-`A` owns, so the hook has to walk `cls.__mro__` to ask whether any
-ancestor declared itself final. `Open` and `Sub` show that the rest of
+`A` owns, and the hook walks `cls.__mro__` to ask whether any
+ancestor declared itself final.
+A check of the direct bases in `cls.__bases__` would also refuse every descendant:
+the hook refuses the first subclass of a final class as Python creates that subclass,
+so no deeper descendant exists.
+The walk stays because it states the rule as written,
+"no final class anywhere above," in one line.
+`Open` and `Sub` show that the rest of
 the hierarchy still subclasses freely: the hook raises a `TypeError`
 only for a class whose `__mro__` holds one of the classes in
 `A._final`.

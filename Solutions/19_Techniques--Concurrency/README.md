@@ -645,7 +645,8 @@ an explicit sleep.
 <summary>Where to look</summary>
 
 [Coordinating Threads with Queues](../../Chapters/19_Techniques--Concurrency.md#coordinating-threads-with-queues) shows producers feeding a `PriorityQueue` that a consumer drains.
-Add a third `pool.submit(enqueue, ...)` call and raise `max_workers` so every producer gets its own thread.
+Add a third `pool.submit(enqueue, ...)` call and keep the chapter's `max_workers=3`.
+Three workers cover three producers, and the consumer needs no extra worker, since the listing submits it after the producers finish.
 The queue orders items by comparing tuples, so the interleaving of the producers does not affect the drain order.
 
 <details>
@@ -688,7 +689,7 @@ def consume() -> None:
         except ShutDown:
             return
 
-with ThreadPoolExecutor(max_workers=4) as pool:
+with ThreadPoolExecutor(max_workers=3) as pool:
     producers = [
         pool.submit(enqueue,
                     [(3, "backup"), (1, "page oncall")]),
@@ -710,8 +711,10 @@ with ThreadPoolExecutor(max_workers=4) as pool:
 #: (3, 'backup')
 ```
 
-**Add a third producer.** The changes are the third `pool.submit(enqueue, ...)` and
-`max_workers=4`, which gives the third producer a thread of its own.
+**Add a third producer.** The one change is the third `pool.submit(enqueue, ...)`.
+The chapter's `max_workers=3` stays: three workers cover the three producers,
+and `consume()` needs no fourth, because the listing submits it after every producer finishes.
+A run with `max_workers=4` prints the same six lines in the same order.
 
 **Drain in priority order.** The six jobs arrive in an unpredictable interleaving from three racing
 threads, but `PriorityQueue` orders its items by comparing the tuples.

@@ -467,12 +467,17 @@ builds its own `Settings` and still returns the one it built.
 objects the cache no longer holds. The lock makes the program
 slower and fixes nothing.
 
-You cannot move the lock to the right place either. The right place
-is inside `functools.cache`, where the check and the store live,
-and you do not own that code, so the chapter's
-`singleton_locked_settings.py` drops `@cache` and hand-writes the
-check: once you need the test and the construction inside one lock,
-you need to own both.
+You cannot put the lock inside `functools.cache`,
+where the check and the store live and where a per-key lock would sit,
+because you do not own that code.
+You can put it around the cached call.
+An uncached wrapper function takes the lock and calls the cached `settings()` inside it,
+so the lookup and the body both run under one lock,
+and eight racing first calls build one object.
+The cost is that every call takes the lock, not just the first,
+because the wrapper cannot see a hit until it has asked the cache.
+The chapter's `singleton_locked_settings.py` pays the same cost:
+it drops `@cache` and hand-writes the check inside one lock.
 
 **Build the object before the threads start.** Without a lock, the fix is to remove the race rather than to order
 it. A race needs two threads arriving before the object exists, so

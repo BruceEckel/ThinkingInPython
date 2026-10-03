@@ -103,7 +103,7 @@ to `5.0`, so it computes `5.0 / -2 == -2.5` and the setter rejects
 
 [Static and Class Methods](../../Chapters/07_Foundations--Classes.md#static-and-class-methods) shows `from_fahrenheit()` as a `@classmethod` that converts its argument and returns `cls(...)`.
 Write `from_kelvin()` the same way with the formula from the exercise.
-Compare the two results with `round()`, since floating-point arithmetic rarely agrees to the last digit.
+Compare the two results with `round()`, since floating-point arithmetic can miss by a last digit: `310.0 - 273.15` gives `36.85000000000002`.
 
 <details>
 <summary>The shape</summary>
@@ -162,8 +162,11 @@ does, with a different formula for `celsius`.
 **Compare the results within rounding.** 212°F, 373.15 K, and 100°C are the same temperature (water's boiling
 point), so both alternative constructors produce `100.0`. The exercise
 asks for agreement within rounding, so the `print()` call passes each
-`celsius` through `round()` to guard against floating-point noise in
-the arithmetic.
+`celsius` through `round()`.
+These inputs carry no floating-point noise (the unrounded values compare equal),
+but other inputs do: `from_kelvin(300.15)` stores `27.0`, while
+`from_fahrenheit(80.6)`, the same temperature, stores `26.999999999999996`.
+Rounded to two places, both print `27.0`.
 
 </details>
 </details>

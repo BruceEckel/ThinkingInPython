@@ -172,8 +172,8 @@ print(Counter.live_names())
 **Gather the live names.** `cls._instances.values()` iterates the live `Counter` objects
 currently tracked, since a `WeakValueDictionary` reads like a normal
 `dict`. The generator expression pulls out each one's `.name`. Sorting
-gives a deterministic order, since a dictionary's iteration order here
-follows insertion, not name order.
+makes the result independent of creation order, since a dictionary's
+iteration order here follows insertion, not name order.
 
 </details>
 </details>

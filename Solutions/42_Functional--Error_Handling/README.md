@@ -452,13 +452,19 @@ expect(TypeError, parse, "oops")
 #: [TypeError] 'oops' is not digits
 ```
 
-**Type the returned decorator.** The `SafeDecorator` protocol keeps the types precise. `safe()`
+**Type the returned decorator.** `safe()`
 returns a decorator that is generic over the function it
-decorates. A plain `Callable[...]` annotation cannot say that,
-because the type parameters belong to the returned callable, not
-to `safe()`. A protocol with a generic `__call__` does say it, so
-`parse` keeps the signature
-`(str) -> Result[int, Exception]` rather than degrading to `Any`.
+decorates. The `SafeDecorator` protocol says that with a generic `__call__`,
+so `parse` keeps the signature `(text: str) -> Result[int, Exception]`.
+A nested `Callable` annotation types `parse` as precisely.
+If `safe()` declares `[**P, A]` and returns
+`Callable[[Callable[P, A]], Callable[P, Result[A, Exception]]]`,
+`ty` reveals `parse` as `(text: str) -> Ok[int] | Err[Exception]`,
+and one `safe(ValueError)` decorator stays generic across two different functions.
+The protocol is a readability choice:
+it gives the decorator's shape a name,
+so `safe()`'s return annotation reads `SafeDecorator`
+and the revealed signature keeps the `Result` alias.
 
 **Accept the types to catch.** `safe()` gains a layer: it now takes the exception types and returns
 the decorator, instead of being the decorator.

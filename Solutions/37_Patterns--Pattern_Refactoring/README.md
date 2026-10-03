@@ -509,7 +509,7 @@ print(sorted(k.__name__ for k in shared))
 #: ['Aluminum', 'Glass']
 ```
 
-**Key the bins on the exact class.** `bins[type(t)]` is a dictionary probe on the exact class, so
+**Key the bins on the exact class.** `exact[type(t)]` is a dictionary probe on the exact class, so
 `CrushedAluminum` is a key the dictionary has never seen and gets a bin
 of its own.
 

@@ -17,7 +17,7 @@ def consume() -> None:
         except ShutDown:
             return
 
-with ThreadPoolExecutor(max_workers=4) as pool:
+with ThreadPoolExecutor(max_workers=3) as pool:
     producers = [
         pool.submit(enqueue,
                     [(3, "backup"), (1, "page oncall")]),

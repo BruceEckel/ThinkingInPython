@@ -11,7 +11,8 @@
 
 [Enums Are Types Too](../../Chapters/12_Techniques--Data_Classes_as_Types.md#enums-are-types-too) shows `Month` checking a day against its own cap.
 The cap now depends on a second value, so `check_day()` needs the `Year` as well, and `Year` needs a method that applies the leap rule.
-Write the `pytest` tests first, covering a leap year, a century that is not leap, and a day that fails in every year.
+Write the `pytest` tests first, covering a leap year, a year that is not leap, the leap century 2000, and a day that fails in every year.
+`Year` accepts 1901 through the current year, so it rejects 1900 and 2100, the century years that are not leap.
 
 <details>
 <summary>Solution</summary>
