@@ -367,7 +367,8 @@ def editor_pin(v: Vars) -> None:
 
 @task("House-style lint with Vale (CH=29 for one chapter; needs vale binary)")
 def prose(v: Vars) -> None:
-    """House-style lint with Vale: no em-dashes and no filler phrases. Run one
+    """House-style lint with Vale: no em-dashes and no filler phrases, then
+    the report-only stranded-preposition scan. Run one
     chapter with CH= (e.g. `tip prose CH=29`) or a path with DOCS=.
     Vale is a standalone binary (not uv-managed; `tip tools-check-full`
     says how to install it). Its style packages (.vale.ini's Packages)
@@ -377,6 +378,16 @@ def prose(v: Vars) -> None:
     if not (ROOT / "styles" / "write-good").exists():
         run(["vale", "sync"])
     run(["vale", *prose_files(v)])
+    py("tools.stranded_prepositions", *prose_files(v))
+
+
+@task("Report clauses ending on a stranded preposition (report-only)")
+def stranded(v: Vars) -> None:
+    """Report prose clauses that end on a stranded preposition ("the
+    field they sit on"). It reports and never gates; `tip prose` runs it
+    after Vale. CH= picks one chapter and its Solutions file.
+    """
+    py("tools.stranded_prepositions", *prose_files(v))
 
 
 also("checks", "pattern-names")
