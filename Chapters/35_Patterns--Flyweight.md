@@ -630,7 +630,8 @@ you can write its equality checks as `is`.
 
 ## Exercises
 
-Each exercise is answered in this chapter's [solutions](../Solutions/35_Patterns--Flyweight/).
+This chapter's [solutions](../Solutions/35_Patterns--Flyweight/) give a hint,
+usually the shape of the code, and a full answer for each exercise.
 
 1.  Add door (`+`, walkable) and tree (`T`, not walkable)
     kinds to `tile_map.py`.

@@ -976,7 +976,8 @@ The named operation puts the GoF form at entry 5 rather than entry 4.
 
 ## Exercises
 
-Each exercise is answered in this chapter's [solutions](../Solutions/28_Patterns--Function_Objects/).
+This chapter's [solutions](../Solutions/28_Patterns--Function_Objects/)
+give a hint, usually the shape of the code, and a full answer for each exercise.
 
 1.  Add an "undo" capability to `command.py`.
     What do the commands need to become, and is a function still enough,

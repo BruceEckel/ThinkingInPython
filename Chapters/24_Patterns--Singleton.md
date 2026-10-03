@@ -799,7 +799,8 @@ In Python, a module is that single instance, so most of the ceremony falls away.
 
 ## Exercises
 
-Each exercise is answered in this chapter's [solutions](../Solutions/24_Patterns--Singleton/).
+This chapter's [solutions](../Solutions/24_Patterns--Singleton/) give a hint,
+usually the shape of the code, and a full answer for each exercise.
 
 1.  `singleton_pattern.py` waits for the first construction to build its inner object.
     Modify it to use *eager initialization*,

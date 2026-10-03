@@ -1538,7 +1538,8 @@ instead of guessing which responders need the event.
 
 ## Exercises
 
-Each exercise is answered in this chapter's [solutions](../Solutions/30_Patterns--Observer/).
+This chapter's [solutions](../Solutions/30_Patterns--Observer/) give a hint,
+usually the shape of the code, and a full answer for each exercise.
 
 1.  Create a minimal *Observer* design of your own,
     without looking at `broadcaster.py`:

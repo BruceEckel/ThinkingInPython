@@ -893,7 +893,8 @@ or a peekable wrapper, pays for the answer with a buffer.
 
 ## Exercises
 
-Each exercise is answered in this chapter's [solutions](../Solutions/23_Patterns--Iterators/).
+This chapter's [solutions](../Solutions/23_Patterns--Iterators/) give a hint,
+usually the shape of the code, and a full answer for each exercise.
 
 1.  Write a generator `evens(n)` that yields the first `n` even numbers,
     and confirm `total()` from `iterators.py` sums them without modification.

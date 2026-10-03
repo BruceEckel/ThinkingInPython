@@ -976,7 +976,8 @@ Choose a library once the machine needs more than a page of code.
 
 ## Exercises
 
-Each exercise is answered in this chapter's [solutions](../Solutions/31_Patterns--State_Machines/).
+This chapter's [solutions](../Solutions/31_Patterns--State_Machines/)
+give a hint, usually the shape of the code, and a full answer for each exercise.
 
 1.  Using [*State*](26_Patterns--Surrogate.md#state),
     make a class called `UnpredictablePerson` that changes the kind of response to its `hello()` method depending on its current `Mood`.

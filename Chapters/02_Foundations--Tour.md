@@ -642,7 +642,8 @@ Tools such as ruff point out violations and fix many of them automatically.
 
 ## Exercises
 
-Each exercise is answered in this chapter's [solutions](../Solutions/02_Foundations--Tour/).
+This chapter's [solutions](../Solutions/02_Foundations--Tour/) give a hint,
+usually the shape of the code, and a full answer for each exercise.
 
 1.  In `references.py`, add a line after `c = a[:]` that appends `99` to `c`.
     Print `a` and `c` and confirm only `c` changed,

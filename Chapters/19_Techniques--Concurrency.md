@@ -2500,7 +2500,8 @@ Here are a few of the topics beyond it:
 
 ## Exercises
 
-Each exercise is answered in this chapter's [solutions](../Solutions/19_Techniques--Concurrency/).
+This chapter's [solutions](../Solutions/19_Techniques--Concurrency/)
+give a hint, usually the shape of the code, and a full answer for each exercise.
 
 1.  In `async_mechanics.py`, add a fourth call, `fetch("d", 0.005)`,
     to the `gather()` line.

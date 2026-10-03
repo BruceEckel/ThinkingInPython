@@ -1070,8 +1070,9 @@ def solutions_numbering(v: Vars) -> None:
 
 @task("Insert or correct each chapter's link to its Solutions folder")
 def fix_solutions_links(v: Vars) -> None:
-    """Add the sentence `Each exercise is answered in this chapter's
-    [solutions](../Solutions/<chapter stem>/).` under each `## Exercises`
+    """Add the sentence `This chapter's [solutions](../Solutions/<chapter
+    stem>/) give a hint, usually the shape of the code, and a full answer
+    for each exercise.` under each `## Exercises`
     heading that lacks a link to its own Solutions folder, and correct the
     target of a link that names anything else (a chapter rename, or the old
     flat `../Solutions/<stem>.md`, leaves one behind) to the folder form.

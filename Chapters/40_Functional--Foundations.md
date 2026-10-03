@@ -719,7 +719,8 @@ The chapters ahead build on that single property.
 
 ## Exercises
 
-Each exercise is answered in this chapter's [solutions](../Solutions/40_Functional--Foundations/).
+This chapter's [solutions](../Solutions/40_Functional--Foundations/)
+give a hint, usually the shape of the code, and a full answer for each exercise.
 
 1.  In `pure_functions.py`, write a third function, `deposit(amount)`,
     that behaves like `withdraw()` but adds to `balance` instead of subtracting.

@@ -25,21 +25,22 @@ from tools.search_index import clean, split_sections
 
 STEM = "05_Foundations--Demo"
 NAME = f"{STEM}.md"
-SENTENCE = ("Each exercise is answered in this chapter's "
-            "[solutions](../Solutions/{target}).")
+SENTENCE = ("This chapter's [solutions](../Solutions/{target}) give "
+            "a hint, usually the shape of the code, and a full answer "
+            "for each exercise.")
 URL = f"{SOLUTIONS_TREE_URL}/{STEM}"
 FILE_URL = f"{SOLUTIONS_BLOB_URL}/{STEM}/README.md"
 
 
 def test_folder_link_becomes_the_github_tree_url() -> None:
     body = "## Exercises\n\n" + SENTENCE.format(target=f"{STEM}/") + "\n"
-    assert f"[solutions]({URL})." in link_solutions(body)
+    assert f"[solutions]({URL}) give" in link_solutions(body)
     assert "../Solutions/" not in link_solutions(body)
 
 
 def test_readme_link_becomes_the_github_blob_url() -> None:
     body = SENTENCE.format(target=f"{STEM}/README.md") + "\n"
-    assert f"[solutions]({FILE_URL})." in link_solutions(body)
+    assert f"[solutions]({FILE_URL}) give" in link_solutions(body)
 
 
 def test_anchor_survives() -> None:
@@ -73,7 +74,7 @@ def test_site_form_links_the_solutions_page() -> None:
     page = solutions_page_name(STEM)
     assert page == f"{STEM}.solutions.html"
     body = SENTENCE.format(target=f"{STEM}/") + "\n"
-    assert f"[solutions]({page})." in link_solutions(body, site=True)
+    assert f"[solutions]({page}) give" in link_solutions(body, site=True)
     body = f"See [it](../Solutions/{STEM}/README.md#2-second) now.\n"
     assert link_solutions(body, site=True) == (
         f"See [it]({page}#2-second) now.\n")

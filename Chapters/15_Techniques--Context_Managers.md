@@ -1166,7 +1166,8 @@ and every change you make later goes inside the manager.
 
 ## Exercises
 
-Each exercise is answered in this chapter's [solutions](../Solutions/15_Techniques--Context_Managers/).
+This chapter's [solutions](../Solutions/15_Techniques--Context_Managers/)
+give a hint, usually the shape of the code, and a full answer for each exercise.
 
 1.  In `trace_cm.py`, nest a second `with Trace("B") as u:` block inside the body of the first `with Trace("A") as t:` block,
     with its own `print(f"inside {u.name}")`.

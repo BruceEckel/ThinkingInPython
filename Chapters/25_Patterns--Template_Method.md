@@ -431,7 +431,8 @@ Ask how the algorithm might break, and choose the mechanism that protects it.
 
 ## Exercises
 
-Each exercise is answered in this chapter's [solutions](../Solutions/25_Patterns--Template_Method/).
+This chapter's [solutions](../Solutions/25_Patterns--Template_Method/)
+give a hint, usually the shape of the code, and a full answer for each exercise.
 
 1.  Create a framework that takes a list of file names.
     It opens every file but the last for reading, and the last one for writing.

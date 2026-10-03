@@ -572,7 +572,8 @@ Write a lambda when the key needs an expression that neither getter builds.
 
 ## Exercises
 
-Each exercise is answered in this chapter's [solutions](../Solutions/05_Foundations--Functions/).
+This chapter's [solutions](../Solutions/05_Foundations--Functions/) give a hint,
+usually the shape of the code, and a full answer for each exercise.
 
 1.  In `mutable_default.py`,
     call `bad_append(3)` a third time and predict the result before checking it.

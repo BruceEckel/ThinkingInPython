@@ -356,7 +356,8 @@ see [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#a-type-is-a-
 
 ## Exercises
 
-Each exercise is answered in this chapter's [solutions](../Solutions/22_Patterns--Data_Transfer_Objects/).
+This chapter's [solutions](../Solutions/22_Patterns--Data_Transfer_Objects/)
+give a hint, usually the shape of the code, and a full answer for each exercise.
 
 1.  In `messenger_idiom.py`,
     create a second `Messenger` with different keyword arguments and confirm the two instances do not share attributes

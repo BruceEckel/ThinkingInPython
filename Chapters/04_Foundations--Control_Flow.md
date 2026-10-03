@@ -685,7 +685,8 @@ generator expressions, and when to write a loop instead.
 
 ## Exercises
 
-Each exercise is answered in this chapter's [solutions](../Solutions/04_Foundations--Control_Flow/).
+This chapter's [solutions](../Solutions/04_Foundations--Control_Flow/)
+give a hint, usually the shape of the code, and a full answer for each exercise.
 
 1.  In `loop_else.py`, call `find_factor(97)`.
     Predict whether the `for` loop's `else` clause runs before you check,

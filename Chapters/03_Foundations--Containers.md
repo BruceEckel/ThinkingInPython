@@ -908,7 +908,8 @@ and freeze whichever you pick as soon as it stops changing.
 
 ## Exercises
 
-Each exercise is answered in this chapter's [solutions](../Solutions/03_Foundations--Containers/).
+This chapter's [solutions](../Solutions/03_Foundations--Containers/)
+give a hint, usually the shape of the code, and a full answer for each exercise.
 
 1.  In `deque_timing.py`, change `n` from `20_000` to `2_000`,
     change the printed comparison to `deque_time < list_time`,
