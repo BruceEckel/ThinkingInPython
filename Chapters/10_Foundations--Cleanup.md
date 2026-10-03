@@ -88,7 +88,7 @@ could destroy the objects in a different order, or skip the finalizers at exit.
 So `__del__()` is fragile:
 the language specifies neither when it runs nor whether it runs.
 At interpreter shutdown,
-the globals a `__del__()` method refers to may have vanished.
+the globals a `__del__()` method uses may have vanished.
 The Python documentation warns:
 
 > Warning: Due to the precarious circumstances under which `__del__()`

@@ -163,7 +163,7 @@ author came from Java or JavaScript.
 
 Only the camelCase form breaks
 [Naming Conventions](../../Chapters/02_Foundations--Tour.md#naming-conventions), and it
-is the only one a linter objects to: ruff's PEP 8 checks report `N816`
+is the only one a linter flags: ruff's PEP 8 checks report `N816`
 for a mixed-case global. The uppercase form is legal style, merely a
 false claim about the value. CapWords stays reserved for class names.
 

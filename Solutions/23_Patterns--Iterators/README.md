@@ -199,10 +199,10 @@ values, but building it computes nothing. A generator's body runs only
 as far as the next `yield`, each time something asks it for a value.
 `islice(..., 10)` asks for exactly ten, so only the first ten
 iterations of `fibonacci()`'s loop ever run. The other 999,990 never
-run, the same laziness
+run, the same laziness on which
 [Comprehensions](../../Chapters/16_Techniques--Comprehensions.md#generator-expressions) and
 [Performance](../../Chapters/18_Techniques--Performance.md#lazy-evaluation-with-generators)
-both rely on.
+both rely.
 
 </details>
 </details>
@@ -961,7 +961,7 @@ continuing means parsing the file again and somehow starting past the
 line that failed.
 
 That choice has a price, and it is the one this chapter keeps
-returning to. Skipping is silent, so a filter that quietly drops every
+revisiting. Skipping is silent, so a filter that quietly drops every
 line looks the same as a file with nothing to report. If you take the
 skipping version, count what it drops and report the count.
 

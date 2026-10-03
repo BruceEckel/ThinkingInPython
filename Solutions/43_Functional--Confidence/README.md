@@ -291,7 +291,7 @@ def test_upper_leaves_the_micro_sign_in_the_greek_block(
 ```
 
 **Trace the round trip.** `µ` is U+00B5 MICRO SIGN, a character Latin-1 kept separate from the
-Greek letter it looks like. `µ` is already lowercase, so `.lower()`
+Greek letter it resembles. `µ` is already lowercase, so `.lower()`
 returns it unchanged. But it has no uppercase form of its own, so
 `.upper()` maps it to U+039C GREEK CAPITAL LETTER MU, and lowering
 that gives U+03BC GREEK SMALL LETTER MU. The round trip lands one

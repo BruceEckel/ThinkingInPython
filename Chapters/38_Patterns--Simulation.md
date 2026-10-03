@@ -170,7 +170,7 @@ That is why `ljust()` accepts `WALL` as its fill character,
 and `self.rows[y][x]` compares equal to `Cell.OPEN` on an open cell.
 
 The blackboard holds everything the rats share.
-`claim()` holds the rule the whole program depends on.
+`claim()` holds the rule on which the whole program depends.
 It tests and marks a cell in one step with no `await` in between,
 so a single rat gets each cell even when several reach it.
 The missing `await`, not a lock, makes `claim()` atomic:
@@ -256,7 +256,7 @@ and most of the rats do not exist yet.
 `group` carries `field(init=False)` and no default,
 so a new blackboard has no `group` attribute until `explore()` assigns one.
 A `spawn()` before then raises an `AttributeError`.
-The declaration gives the type checker the attribute's type with no `None` placeholder to test for.
+The declaration gives the type checker the attribute's type with no `None` placeholder to check.
 The robot example later in this chapter declares `Robot.room` for the same reason,
 with a bare annotation.
 The other four `init=False` fields, `visited`, `tasks`, `messages`,

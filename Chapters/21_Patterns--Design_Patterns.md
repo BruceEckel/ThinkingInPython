@@ -496,7 +496,7 @@ and the rest are here for your own designs.
     Every design has coupling, so acknowledge it and control it:
     say "coupling can cause problems" and compensate for those problems with a well-considered design or pattern.
 -   *Design the communication, not the parts*.
-    Alan Kay, on what object orientation was for:
+    Alan Kay, on the purpose of object orientation:
     "The key in making great and growable systems is much more to design how its modules communicate rather than what their internal properties and behaviors should be."^[Alan Kay, squeak-dev mailing list, 10 October 1998, "prototypes vs classes was: Re: Sun's HotSpot". The same message's second paragraph begins "The big idea is 'messaging'."]
     A `Protocol` is that design made literal:
     it names what a caller needs from the object on the other side of a call,

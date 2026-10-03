@@ -137,8 +137,8 @@ assignment that adds the format can sit in any module that imports
 `STYLES`. `STYLES` absorbs the change because a format is now data.
 Everything the axis does not cover still needs hand edits.
 Adding a field to `Row` touches every entry in `STYLES`, because a
-field is a different vector of change, one this design does nothing
-about.
+field is a different vector of change, one about which this design
+does nothing.
 
 Two things generalize from the example. First, the axis is visible in
 the history rather than in the code: the same function appearing in
@@ -336,7 +336,7 @@ point where subtraction stops. The parameter is the last piece that carries the 
 intent, so removing it removes the design rather than its scaffolding.
 
 Both outcomes are the exercise working correctly. Subtraction is a test
-you run rather than a direction you push in: take something away, run
+you run rather than a direction in which you push: take something away, run
 the program, and read the result. Nothing broke means the piece was
 scaffolding. Something broke means you found the floor, and the thing
 you removed is worth keeping and worth naming.

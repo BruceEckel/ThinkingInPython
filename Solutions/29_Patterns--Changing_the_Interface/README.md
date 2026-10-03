@@ -160,7 +160,7 @@ caller commits to the type: constructing an instance and subclassing.
 warning.
 That is the right split: `TextReport` replaces the type, not the
 method. A caller who wants to act on the warning must change where
-the `Report` comes from, not where they call `render()`.
+they get the `Report`, not where they call `render()`.
 
 **Use the deprecated class on purpose.** The type checker reports both the construction and the subclass, so
 both lines carry `# type: ignore`. The

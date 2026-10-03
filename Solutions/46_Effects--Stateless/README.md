@@ -423,7 +423,7 @@ requests. `supply()` reads the Ability from each argument's declared
 type, so `supply(recorder, recorder)` builds a handler for
 `Need[Recorder]`, an Ability neither Effect requests. Each wrapper
 names the role this instance fills. Supplying the same object twice
-under two different types is the case `as_type()` exists for.
+under two different types is the case for which `as_type()` exists.
 
 **Check the greeting and the log together.** Writing both assertions in one test is the payoff. A test holding the
 whole environment can check that the greeting reached the console
@@ -611,7 +611,7 @@ run(defaults(stamped)("Bob"))  # type: ignore
 
 **Build the class the request names.** `default()` never names `Console` in its body. It reads `ability.t`,
 the class the request carries, and calls that class, so `default()`
-answers a request by constructing the class asked for. That is the other kind of
+answers a request by constructing the requested class. That is the other kind of
 default: `default_console.py` supplies one prepared instance, and
 `default()` builds whatever the request names, on demand.
 
@@ -856,8 +856,8 @@ build a fresh Effect per attempt, and only the function that builds
 the Effect can do that.
 So `retry()` decorates the function, calls it once per attempt, and
 hands back a function that takes the same arguments. The Effect the
-returned function builds has a wider type: `retry()` adds the clock it sleeps
-on and replaces the error with a `RetryError`.
+returned function builds has a wider type: `retry()` adds the clock on which it
+sleeps and replaces the error with a `RetryError`.
 
 The same reasoning explains `repeat()` and `memoize()`. It also
 explains why storing Effects in a registry, a queue, or a cache is a
@@ -1090,7 +1090,7 @@ untouched, past `announce()`, past `supply()`, to the driver. `run()`
 raises it as an ordinary exception because nothing along the way
 catches it. Declaring a failure is not handling it. The declaration
 says the failure can arrive, and `catch()` turns it into a value the
-program deals with.
+program handles.
 
 Deleting `ValueError` from the annotation gives:
 

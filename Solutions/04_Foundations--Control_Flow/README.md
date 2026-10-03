@@ -72,7 +72,7 @@ def collatz_sequence(n):
 <summary>Solution</summary>
 
 If you keep the chapter's one-line conditional expression and add `if n % 2 == 1: odd_count += 1` after it,
-the test sees the new `n`, not the one the step started from.
+the test sees the new `n`, not the value `n` held when the step began.
 The count then includes the `1` that ends the sequence, and `collatz_sequence(10)` returns `(6, 2)`.
 The solution splits the conditional expression into an `if`/`else` statement,
 so the odd case has a branch of its own and the count shares the test that chooses `3 * n + 1`.

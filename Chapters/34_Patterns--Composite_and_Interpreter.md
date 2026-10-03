@@ -458,7 +458,7 @@ and that convenience has a memory cost.
 Each recursive call packs a fresh dict from `**env`,
 so at any moment one dict is live per level of recursion,
 and the live entries total the tree's depth times the number of bound variables.
-The cost matters most on the deep trees this chapter warns about later,
+The cost matters most on the deep trees about which this chapter warns later,
 which can run thousands of levels.
 `**env` is also why the `/` is there.
 The `/` makes `e` [positional-only](05_Foundations--Functions.md#positional-only-and-keyword-only-parameters),

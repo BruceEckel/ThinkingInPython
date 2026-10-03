@@ -1675,7 +1675,7 @@ this version has nothing to override: `Item` defines `compete()` once.
 **Narrow the operand's type.** One cost comes with the change. `paper_vs_rock()` and
 `rock_vs_paper()` take two `Item`s, because every cell must, so each
 recovers `Paper` with an `isinstance()` test. That is the type test
-the chapter warns about in the ladder version. Here the test sits
+about which the chapter warns in the ladder version. Here the test sits
 inside one cell rather than running through every class, so you write
 it once instead of editing it for every new `Item`.
 

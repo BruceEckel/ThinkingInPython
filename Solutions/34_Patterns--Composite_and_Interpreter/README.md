@@ -520,7 +520,7 @@ it, and the error arrives when the line executes.
 
 [New Operations, Same Tree](../../Chapters/34_Patterns--Composite_and_Interpreter.md#new-operations-same-tree) builds `to_infix()` as one more walker over `Expr`.
 Give each operator a precedence number and pass the enclosing operator's precedence down the recursion.
-A subexpression adds parentheses only when its own precedence is lower than the context it sits in.
+A subexpression adds parentheses only when its own precedence is lower than the context in which it sits.
 
 <details>
 <summary>The shape</summary>

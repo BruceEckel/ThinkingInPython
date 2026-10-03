@@ -1311,7 +1311,7 @@ Swapping `x` and `y` turns the first term into the second and the
 second into the first, so the swap reverses the subtraction inside
 `amplitude()`'s `abs()`. On the line `x == y` the swap changes
 nothing, so the subtraction there must equal its own negation, which
-forces that value to zero. Every mode this plate can ring in therefore
+forces that value to zero. Every mode in which this plate can ring therefore
 has a nodal line straight down the main diagonal, and the figures all
 share that one feature no matter which `(m, n)` produced them.
 
@@ -1482,7 +1482,7 @@ fast. As it nears a nodal line the amplitude shrinks and so does its
 step, so it slows down and stops without overshooting. Too small a kick
 starves the loop's first half, and the grain never travels. Too large a
 kick breaks the second half, since even a heavily scaled step is still
-big enough to leave the neighborhood the grain is settling into. The
+big enough to leave the neighborhood into which the grain is settling. The
 default `0.05` sits where both halves work: at most a tenth of the
 plate where the amplitude peaks, and vanishingly small once a grain
 arrives.

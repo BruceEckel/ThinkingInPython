@@ -251,7 +251,7 @@ strokes.
 <details>
 <summary>Where to look</summary>
 
-[The Caretaker: a Generic History](../../Chapters/36_Patterns--Memento.md#the-caretaker-a-generic-history) keeps the past as a list that `do()` appends to.
+[The Caretaker: a Generic History](../../Chapters/36_Patterns--Memento.md#the-caretaker-a-generic-history) keeps the past as a list to which `do()` appends.
 After the append, check the length against a `max_depth` and drop the oldest entry with `pop(0)`.
 For `can_undo()`, ask what the list holds now, not what the program once pushed.
 
@@ -463,8 +463,8 @@ FAILED test_sketch.py::test_drawing_after_restore_spares_memento
 ```
 
 **Share the list on save.** Because
-`Memento.strokes` is now the same list `Sketch.strokes` points
-to, `sketch.draw("b")` after `checkpoint = sketch.save()` mutates
+`Memento.strokes` is now the same list to which `Sketch.strokes`
+points, `sketch.draw("b")` after `checkpoint = sketch.save()` mutates
 `checkpoint.strokes` too. By the time `test_restore_rewinds_state`
 calls `sketch.restore(checkpoint)`, `checkpoint` has already silently
 absorbed the `"b"` stroke that the copy in `save()` exists to keep

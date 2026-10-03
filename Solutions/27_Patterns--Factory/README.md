@@ -867,7 +867,7 @@ expect(KeyError, make, "Triangle")
 
 **Mark the import as deliberate.** The demo never uses the name `extra_shapes`, so ruff reports the
 import as unused and the `noqa` comment is the only sign that it is
-deliberate. That is the shape the chapter warns about: an import that
+deliberate. That is the shape about which the chapter warns: an import that
 exists for its side effect. It must stay an ordinary import, since a
 `lazy import` defers the module body, and with it the two `class`
 statements, until the first use of a name the demo never uses.
@@ -1551,7 +1551,7 @@ introduces: the outer call takes the name and returns `register()`,
 which runs the builder once, stores the result, and hands the builder
 back unchanged. The table is empty at its declaration and full by the
 time `spawn()` runs, because each `@prototype` line executes as the
-module loads, the same timing the chapter's `registry.py` relies on.
+module loads, the same timing on which the chapter's `registry.py` relies.
 
 **Take the key as an argument.** The name is an argument because the type checker cannot
 see the builder's own name. `Builder` is a `Callable`, and a

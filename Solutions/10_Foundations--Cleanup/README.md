@@ -12,7 +12,7 @@
 <summary>Where to look</summary>
 
 [Watching Objects Without Holding Them](../../Chapters/10_Foundations--Cleanup.md#watching-objects-without-holding-them) ends with `counters.clear()` dropping the list's references.
-Rebinding a name and mutating the object that name refers to are different operations.
+Rebinding a name and mutating the object that name references are different operations.
 To see the difference, bind a second name to the same list before you try each form,
 then print that second name.
 

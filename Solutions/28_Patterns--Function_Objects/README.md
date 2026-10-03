@@ -129,7 +129,7 @@ the commands share implementation, and these commands share none.
 amount, so it can reverse that action later: a fresh call to the same
 function cannot know what a previous call changed. `Deposit` is a record,
 like `Repeat`, because neither field changes after construction. The
-record is frozen and the dictionary it refers to is not, so
+record is frozen and the dictionary it references is not, so
 `__call__()` and `undo()` can still update the balance.
 
 </details>
@@ -783,7 +783,7 @@ finally runs.
 <summary>Where to look</summary>
 
 [A Tagged Bus: Handlers That Name Their Event](../../Chapters/28_Patterns--Function_Objects.md#a-tagged-bus-handlers-that-name-their-event) builds the class first and registers `built`.
-With `slots=True`, `dataclass()` returns a new class, so ask which class the name `Deposit` ends up bound to and which class `EVENTS` holds.
+With `slots=True`, `dataclass()` returns a new class, so ask which class ends up bound to the name `Deposit` and which class `EVENTS` holds.
 Then trace how `handler()` checks its first decorated class against `EVENTS`.
 
 <details>
@@ -867,11 +867,11 @@ call so that `expect()` can report the failure.
 
 **Register the wrong class.** Python creates the three `@event` classes in `bank_events.py` without
 complaint, which makes the mistake easy to miss. `EVENTS` holds one
-class for each, and none of them is the class the module's names refer
-to. `dataclass()` with `slots=True` builds a new class, `event()`
+class for each, and none of them is the class the module's names
+reference. `dataclass()` with `slots=True` builds a new class, `event()`
 returns that new class, and the `class` statement binds `Deposit` to
-what `event()` returns. The set holds the class that `dataclass()`
-started from, which no name refers to and no event is an instance of.
+what `event()` returns. The set holds the class from which `dataclass()`
+started, which no name references and of which no event is an instance.
 
 **Refuse the first handler.** The import stops at the first `@handler`, on `Announce`.
 `handler()` reads the annotation on `event`, which is `Deposit`, the

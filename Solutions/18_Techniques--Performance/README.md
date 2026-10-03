@@ -784,8 +784,8 @@ target is present, which is what a membership test needs and what
 `search_comparison.py` relies on.
 
 **Find the end of the run.** `bisect()`, the alias for `bisect_right()`, returns the position
-after the last equal element. That is the position to insert at when
-you want a new duplicate to land after the existing ones. It is the
+after the last equal element. That is the position at which
+to insert a new duplicate after the existing ones. It is the
 wrong index to read: `xs[right]` is the next larger value, or an
 `IndexError` when the target is the largest element in the list.
 

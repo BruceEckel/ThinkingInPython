@@ -13,7 +13,7 @@
 [Recursion](../../Chapters/41_Functional--Toolkits.md#recursion) shows `deep_sum()` letting the call stack hold the sublists still to walk.
 Replace that call stack with a list you manage: pop an item, add its total if it is an `int`,
 and otherwise push its elements back onto the list.
-Copy the input before you seed the stack, and think about which end you pop from.
+Copy the input before you seed the stack, and consider from which end you pop.
 
 <details>
 <summary>The shape</summary>

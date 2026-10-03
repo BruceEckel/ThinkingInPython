@@ -622,7 +622,7 @@ inside `worker()`'s frame, the same way the `with` block's exception does.
 `worker()` catches it, prints, and yields again,
 so the generator keeps running when its `except` clause handles the thrown exception.
 
-`g.close()` raises `GeneratorExit` at the `yield` the generator now waits on,
+`g.close()` raises `GeneratorExit` at the `yield` on which the generator now waits,
 `yield "recovered"`.
 `worker()` has no matching `except`, so `GeneratorExit` propagates,
 the `finally` block runs, and the generator ends.

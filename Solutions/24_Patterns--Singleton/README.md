@@ -273,14 +273,14 @@ print(only_one.val)
 ```
 
 The module behaves like `OnlyOne` from
-`singleton_pattern.py`: a shared, one-and-only-one `val` list that
-any part of the program can append to. The module is the single
+`singleton_pattern.py`: a shared, one-and-only-one `val` list to
+which any part of the program can append. The module is the single
 shared object Python caches in `sys.modules`, so the solution drops
 the chapter's machinery: the wrapper class, the nested private
 class, the `ClassVar` sentinel, and the `__getattr__()` delegation.
 
 For real code, prefer the module. It is less code, has no
-indirection to read through, and gets the same guarantee.
+indirection to follow, and gets the same guarantee.
 [A Module Is Already a *Singleton*](../../Chapters/24_Patterns--Singleton.md#a-module-is-already-a-singleton)
 makes that argument at the top of the chapter. The class-based
 versions are worth their complexity when something needs the shape
@@ -335,10 +335,10 @@ The two prints disagree, and the exercise turns on why.
 module's `settings` and `config.settings`, initially pointing at
 one dict. Mutating through either name, as the original
 `settings["theme"] = "dark"` does, changes the object both names
-refer to, so both see the change.
+reference, so both see the change.
 
 **Rebind only the local name.** Assigning to `settings` changes
-only which object this module's name refers to. The name in
+only which object this module's name references. The name in
 `config` still points at the original empty dict, so the
 second print shows `{}`.
 

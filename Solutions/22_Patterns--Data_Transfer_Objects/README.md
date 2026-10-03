@@ -149,7 +149,7 @@ with expected(TypeError):
 
 **Mutate through the field.** The record changed, and nothing objected. `NamedTuple` refuses to
 rebind `toast.steps`. It says nothing about the list that field
-already refers to, so `append()` edits that list through the record.
+already references, so `append()` edits that list through the record.
 Both the type checker and Python stay silent, because `append()` mutates the
 list instead of assigning to a field.
 

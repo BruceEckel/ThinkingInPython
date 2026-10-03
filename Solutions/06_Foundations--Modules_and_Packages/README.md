@@ -486,7 +486,7 @@ print(plugins is plugin_list.plugins)
 ```
 
 **Share one list between two names.** `from plugin_list import plugins` binds the script's `plugins` to the
-list the module's name refers to, so at first the two names share one
+list the module's name references, so at first the two names share one
 object. Appending changes that object, and both names show the new
 item.
 
