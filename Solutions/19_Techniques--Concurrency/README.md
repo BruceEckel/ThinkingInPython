@@ -716,8 +716,9 @@ The chapter's `max_workers=3` stays: three workers cover the three producers,
 and `consume()` needs no fourth, because the listing submits it after every producer finishes.
 A run with `max_workers=4` prints the same six lines in the same order.
 
-**Drain in priority order.** The six jobs arrive in an unpredictable interleaving from three racing
-threads, but `PriorityQueue` orders its items by comparing the tuples.
+**Drain in priority order.** The pool may run the three producers on one thread or on two,
+depending on whether each producer finishes before the pool picks up the next.
+The order in which the six jobs enter the queue can therefore vary, but `PriorityQueue` orders its items by comparing the tuples.
 The drain order is therefore always priority first, `1` before `2`
 before `3`, then alphabetically by the description within a priority
 (the tuple's second field): `"alert"` before `"page oncall"` before

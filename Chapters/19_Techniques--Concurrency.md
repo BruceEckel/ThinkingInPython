@@ -1642,9 +1642,12 @@ with ThreadPoolExecutor(max_workers=3) as pool:
 #: (3, 'backup')
 ```
 
-The four jobs arrive from two threads in an unpredictable interleaving.
+The pool may run the two producers on one thread or on two.
+Often one thread runs both,
+because the first producer finishes before the pool picks up the second,
+but the order in which jobs enter the queue can vary with scheduling.
 Waiting for both producer futures before submitting the consumer guarantees every job is already in the queue once `consume()` starts,
-so the drain still comes out in priority order no matter who won each race.
+so the drain still comes out in priority order however the producers were scheduled.
 Collecting the producer futures and calling `result()` turns a producer's exception into one you can see,
 as [Parallelism](#what-a-process-pool-requires)'s third point describes.
 When two jobs share a priority,
