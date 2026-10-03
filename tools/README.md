@@ -804,6 +804,41 @@ after the reflow, which can rewrap a chapter's exercise lines.
 `verify-ch` runs it for its chapter. `exercise_refs.py` skips the generated
 lines, so the baseline counts each reference once.
 
+## solution_steps.py
+
+A solution gives everything away at once. This folds each solution that
+carries a `Hint:` paragraph (the first paragraph after the generated
+exercise quote) into a ladder of nested HTML `<details>`, which GitHub and
+the site render collapsed: "Where to look" (the hint), then "The shape"
+(each listing reduced to its imports, aliases, constants, classes, and
+signatures, every function body replaced by `...`), then "Solution"
+(everything else, as authored). Nesting is what orders the steps: the
+"Solution" toggle is not visible until "The shape" is open. A solution
+with no `Hint:` paragraph is left as it is.
+
+```
+tip steps                      # rewrite every Solutions file
+tip steps ARGS=30              # only chapter 30
+tip steps-check                # report drift, change nothing
+tip hint CH=30 N=3             # the next step, at the command line
+```
+
+The tags and the shape blocks are generated and replaced on every run,
+the way `exercise_statements.py` replaces the quote; `gate` and
+`verify-ch` run it, so they self-heal. The authored prose and listings
+round-trip byte for byte: a run strips the tags and the shape blocks,
+restores the `Hint:` prefix, and nests the section again. A shape block's
+first line is `# The shape of <path>`, which no extractor reads as a path,
+and it carries no `#:` marker, so `extract_solutions.py` and
+`validate_output.py` leave it alone; a `test_*.py` listing gets no shape.
+
+`hint.py` prints the same ladder one step per run, keeping its place in
+`build/hints.json`; `--reset` starts over and `--all` prints every step.
+On the site, `resources/static/solutions.js` remembers which steps a
+reader opened and offers to hide them all, and `solutions.css` draws the
+summary rows as steps; without the script the native elements do the
+same job without the memory.
+
 ## reflow_prose.py
 
 Rewrites prose paragraphs in `Chapters/*.md` so each sentence sits on its own
@@ -1265,6 +1300,14 @@ use `-o DIR` to build elsewhere. `tip serve` serves the
 existing `build/site/` at <http://localhost:8000>, watching for edits and
 copying selections; `tip local` builds the site first and also opens a
 browser at it.
+
+Each `Solutions/<stem>/README.md` becomes `<stem>.solutions.html` beside
+the chapter's page (`write_solutions_page()`), carrying the chapter's
+label, a link back to the chapter, the step assets (`solutions.css`,
+`solutions.js`), and the listing links into the chapters. The chapter's
+`../Solutions/` link and the index's `solutions` link beside each chapter
+point at it; the EPUB and PDF keep the GitHub URL, since they carry no
+Solutions pages.
 
 `rebuild_chapter()` is the incremental entry point `serve.py --watch` uses:
 it re-renders one chapter (a single pandoc run, against the ~46 of a full

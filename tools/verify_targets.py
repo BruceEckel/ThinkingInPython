@@ -94,6 +94,7 @@ EXCLUDED: dict[str, str] = {
     "rewrite": "runs headless claude passes that cost tokens and edit prose",
     "check-ch": "needs a CH= chapter selector this smoke test cannot supply",
     "verify-ch": "needs a CH= chapter selector this smoke test cannot supply",
+    "hint": "needs CH= and N= selectors this smoke test cannot supply",
     "pyright": "the raw run prints the baseline disagreements with ty and "
                "exits nonzero by design; pyright-review is the check",
     **{name: "needs a Rust toolchain, which no other task requires"

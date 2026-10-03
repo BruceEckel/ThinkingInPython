@@ -197,6 +197,9 @@ def gate(v: Vars) -> None:
     could be refreshed, and never heal. The second sits right after the
     reflow: reflow can rewrap a chapter's exercise lines, and the copy must
     match the reflowed chapter in the same run instead of one run later.
+    solution_steps.py runs with --write once, after the first, so the
+    `<details>` ladders and the generated shape blocks in Solutions/ heal
+    the same way (`tip steps` has the format).
 
     Two steps skip work that cannot find anything new (tools/skip_stamps.py
     has the policy): the tools' own tests run only when tools/ changed
@@ -223,6 +226,7 @@ def gate(v: Vars) -> None:
     py("tools.tools_tests", *v.words("PYTEST_N"))
     py("tools.check_line_endings")
     py("tools.exercise_statements", "--write")
+    py("tools.solution_steps", "--write")
     py("tools.check_all", *GATE_CHECKS)
     py("tools.check_all", "anchors", "--paths", *GATE_DOCS)
     py("tools.check_all", "widths", "records", "--paths", "Solutions")
@@ -1090,6 +1094,44 @@ def statements(v: Vars) -> None:
     `tip statements ARGS=19`.
     """
     py("tools.exercise_statements", "--write", *v.words("ARGS"))
+
+
+@task("Fold each hinted solution into reveal-one-at-a-time steps")
+def steps(v: Vars) -> None:
+    """Rewrite the `<details>` ladder under each `## N.` heading in
+    Solutions/ whose section carries a `Hint:` paragraph: "Where to look"
+    (the hint), "The shape" (each listing with its function bodies
+    elided, generated), then "Solution" (the rest, as authored). GitHub
+    and the site render the ladder collapsed, so a reader opens one step
+    at a time; `tip hint` prints the same steps at the command line. The
+    tags and the shape blocks are generated and replaced on every run,
+    and `gate` runs this too, so they self-heal. Takes chapter numbers
+    to rewrite one, e.g. `tip steps ARGS=30`.
+    """
+    py("tools.solution_steps", "--write", *v.words("ARGS"))
+
+
+@task("Fail if a solution's steps differ from what `tip steps` writes")
+def steps_check(v: Vars) -> None:
+    """Report each `## N.` section in Solutions/ whose `<details>` ladder
+    or generated shape block is missing or stale, and exit nonzero. `tip
+    steps` rewrites them. Takes chapter numbers to check one, e.g.
+    `tip steps-check ARGS=30`.
+    """
+    py("tools.solution_steps", *v.words("ARGS"))
+
+
+@task("Reveal the next step of one solution: CH=30 N=3, ARGS=--reset "
+      "or --all")
+def hint(v: Vars) -> None:
+    """Print the exercise statement and the next unrevealed step of its
+    solution: where to look, then the shape of the listing, then the
+    solution. Progress is kept in build/hints.json, per chapter and
+    exercise, so each run reveals one more step. `ARGS=--reset` forgets
+    the progress and `ARGS=--all` prints every step together. An exercise
+    with no `Hint:` paragraph has one step, the solution itself.
+    """
+    py("tools.hint", v.get("CH"), v.get("N"), *v.words("ARGS"))
 
 
 @task("Fail if a Solutions exercise statement differs from its chapter")

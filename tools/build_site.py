@@ -36,7 +36,7 @@ from tools import listing_links, search_index
 from tools.config import BUILD_SITE_DIR as DEFAULT_OUT
 from tools.config import ROOT
 from tools.markdown import Document
-from tools.repo import md_files
+from tools.repo import chapter_stem, md_files, solutions_file
 
 IMAGES_SRC = ROOT / "resources" / "images"
 STATIC_SRC = ROOT / "resources" / "static"
@@ -47,7 +47,8 @@ TEMPLATE = ROOT / "template.html"
 # listing_links.py writes, and the cross-references, chapter links, and
 # footnotes. The contents page loads it too, for its chapter titles.
 STATIC_FILES = ("search.css", "search.js",
-                "link-preview.css", "link-preview.js")
+                "link-preview.css", "link-preview.js",
+                "solutions.css", "solutions.js")
 
 # Experimental: give each chapter page its own table of contents (its own
 # sections). Flip this default, or override per-build with --chapter-toc /
@@ -72,9 +73,10 @@ RELEASE_URL = f"{REPO_URL}/releases/latest"
 # checks it: GitHub serves the page either way, just unscrolled.
 EXAMPLES_URL = f"{REPO_URL}#examples-and-solutions"
 # Where a chapter's Solutions folder (a `tree` URL) and the README.md in
-# it (a `blob` URL) live on GitHub. The built site, EPUB, and PDF carry
-# only the chapters, so link_solutions() points each chapter's relative
-# `../Solutions/` link here.
+# it (a `blob` URL) live on GitHub. The EPUB and PDF carry only the
+# chapters, so link_solutions() points each chapter's relative
+# `../Solutions/` link here. The site renders each Solutions file as a
+# page of its own (solutions_page_name()), and links that instead.
 SOLUTIONS_TREE_URL = f"{REPO_URL}/tree/master/Solutions"
 SOLUTIONS_BLOB_URL = f"{REPO_URL}/blob/master/Solutions"
 SPONSORS_URL = "https://github.com/sponsors/BruceEckel"
@@ -123,44 +125,58 @@ SOLUTIONS_LINK = re.compile(
     r"\]\(\.\./Solutions/([\w.-]+)/(README\.md)?(#[^)\s]*)?\)")
 
 
-def solutions_url(m: re.Match[str]) -> str:
+def solutions_page_name(stem: str) -> str:
+    """The site page for a chapter's Solutions file.
+
+    `30_Patterns--Observer.solutions.html` sits beside the chapter's
+    own page, so the shared assets resolve from both.
+    """
+    return f"{stem}.solutions.html"
+
+
+def solutions_url(m: re.Match[str], site: bool = False) -> str:
     """The replacement for one `SOLUTIONS_LINK` match."""
     stem, readme, anchor = m.group(1), m.group(2), m.group(3) or ""
+    if site:
+        return f"]({solutions_page_name(stem)}{anchor})"
     if readme:
         return f"]({SOLUTIONS_BLOB_URL}/{stem}/{readme}{anchor})"
     return f"]({SOLUTIONS_TREE_URL}/{stem}{anchor})"
 
 
-def link_solutions(body: str) -> str:
+def link_solutions(body: str, site: bool = False) -> str:
     """Point each `](../Solutions/<stem>/)` link at the GitHub URL.
 
     A chapter links its Solutions folder with a relative path, so a reader
     on GitHub can click through. The folder becomes a `tree` URL (GitHub
     renders its README.md under the file list), and a link to the
-    README.md itself becomes a `blob` URL. The site and the EPUB and PDF carry no
-    Solutions pages. The site's `rewrite_md_links()` would turn the
-    relative link into a dead `.html` link, and `build_epub.relink()`
-    reports a link to an unknown chapter and exits nonzero, which fails
-    the EPUB and the PDF. `load_chapter()` is the one function all three
-    builders read chapters through, so the rewrite happens there, before
-    any of them sees the link. An anchor is kept, and a link inside a
-    fenced block is left alone.
+    README.md itself becomes a `blob` URL. The EPUB and PDF carry no
+    Solutions pages, and `build_epub.relink()` reports a link to an
+    unknown chapter and exits nonzero, which fails the EPUB and the
+    PDF. The site does carry them (`write_solutions_page()`), so with
+    `site` the link points at that page instead; without the rewrite,
+    `rewrite_md_links()` would turn the relative link into a dead
+    `.html` link. `load_chapter()` is the one function all three
+    builders read chapters through, so the rewrite happens there,
+    before any of them sees the link. An anchor is kept, and a link
+    inside a fenced block is left alone.
     """
     lines = body.split("\n")
     fenced = Document.from_text(body).in_fence()
     for i, line in enumerate(lines):
         if not fenced[i]:
-            lines[i] = SOLUTIONS_LINK.sub(solutions_url, line)
+            lines[i] = SOLUTIONS_LINK.sub(
+                lambda m: solutions_url(m, site), line)
     return "\n".join(lines)
 
 
-def load_chapter(md: Path) -> tuple[str, str]:
+def load_chapter(md: Path, site: bool = False) -> tuple[str, str]:
     """Return (title, body). Strips 00_Front YAML and the leading `#` heading.
 
     The body's links to `../Solutions/` become GitHub URLs through
-    `link_solutions()`, so the site, the EPUB, and the PDF, which read
-    chapters only through this function, all link the answers. The
-    Markdown source stays untouched.
+    `link_solutions()`, so the EPUB and the PDF, which read chapters
+    only through this function, link the answers; with `site`, the
+    site's own Solutions page. The Markdown source stays untouched.
     """
     text = md.read_text(encoding="utf-8")
     if md.stem == FRONT_STEM:
@@ -179,7 +195,39 @@ def load_chapter(md: Path) -> tuple[str, str]:
             break
         break  # first real content is not a heading; leave body as-is
     body = "\n".join(lines).lstrip("\n")
-    return title, link_solutions(body)
+    return title, link_solutions(body, site)
+
+
+# A Solutions file's links to the chapters, written from two directories
+# below the book root. On the site the chapters are pages beside it.
+CHAPTERS_LINK = re.compile(r"\]\(\.\./\.\./Chapters/")
+
+
+def load_solutions(md: Path) -> tuple[str, str]:
+    """Return (title, body) for a `Solutions/<stem>/README.md`.
+
+    The leading `#` heading is the title. Links into `../../Chapters/`
+    lose that prefix, so `rewrite_md_links()` then points them at the
+    chapter pages, which sit beside the Solutions page.
+    """
+    text = md.read_text(encoding="utf-8")
+    title = f"{derive_label(chapter_stem(md))}: Solutions"
+    lines = text.split("\n")
+    for i, line in enumerate(lines):
+        if not line.strip():
+            continue
+        m = ATX.match(line)
+        if m:
+            title = m.group(1)
+            del lines[i]
+        break
+    body = "\n".join(lines).lstrip("\n")
+    out = body.split("\n")
+    fenced = Document.from_text(body).in_fence()
+    for i, line in enumerate(out):
+        if not fenced[i]:
+            out[i] = CHAPTERS_LINK.sub("](", line)
+    return title, "\n".join(out)
 
 
 # A chapter's epigraph: the blockquote its body opens with, the
@@ -358,7 +406,14 @@ def render_toc_menu(chapters: list[Chapter], current: Chapter) -> str:
 
 def render_chapter(body: str, ch: Chapter,
                    prev: Chapter | None, nxt: Chapter | None,
-                   chapter_toc: bool = False, toc_menu: str = "") -> str:
+                   chapter_toc: bool = False, toc_menu: str = "",
+                   steps: bool = False) -> str:
+    """Render one page through template.html.
+
+    `steps` adds solutions.css and solutions.js, the styling and the
+    progress memory for a Solutions page's step ladders
+    (tools/solution_steps.py has the format).
+    """
     variables = [
         f"--variable=title:{ch.title}",
         f"--variable=chapter-label:{ch.label}",
@@ -372,6 +427,11 @@ def render_chapter(body: str, ch: Chapter,
         "--variable=preview-js:link-preview.js"
         f"{static_tag('link-preview.js')}",
     ]
+    if steps:
+        variables += [
+            f"--variable=steps-css:solutions.css{static_tag('solutions.css')}",
+            f"--variable=steps-js:solutions.js{static_tag('solutions.js')}",
+        ]
     if prev is not None:
         variables += [f"--variable=prev-url:{prev.out_name}",
                       f"--variable=prev-title:{prev.title}"]
@@ -428,9 +488,14 @@ def render_index(chapters: list[Chapter]) -> str:
             items.append(
                 '    <li class="toc-part">'
                 f'{part_label(roman, title, "&middot;")}</li>')
+        answers = ""
+        if solutions_file(ch.md).exists():
+            answers = (f'<a class="toc-solutions" '
+                       f'href="{solutions_page_name(ch.md.stem)}">'
+                       'solutions</a>')
         items.append(
             f'    <li><span class="toc-num">{ch.number}</span>'
-            f'<a href="{ch.out_name}">{ch.title}</a></li>')
+            f'<a href="{ch.out_name}">{ch.title}</a>{answers}</li>')
     rows = "\n".join(items)
     # Art mode (make_cover.py) emits a JPEG; drawn mode an SVG.
     cover_art = ("cover-art.jpg"
@@ -521,6 +586,9 @@ figcaption {{ font-family: '{HEADING_FONT}', sans-serif;
 .toc-list a {{ font-family: 'Cormorant Garamond', serif; font-size: 1.15rem;
   color: var(--ink); text-decoration: none; flex: 1; }}
 .toc-list a:hover {{ color: var(--accent); }}
+.toc-list a.toc-solutions {{ flex: none; font-family: 'Cormorant SC', serif;
+  font-size: 0.7rem; letter-spacing: 0.1em; color: var(--muted); }}
+.toc-list a.toc-solutions:hover {{ color: var(--accent); }}
 .toc-part {{ display: block; border-bottom: none; margin-top: 1.5rem;
   padding: 0.4rem 0; font-family: 'Cormorant SC', serif; font-size: 1.7rem;
   letter-spacing: 0.15em; color: var(--accent); }}
@@ -566,7 +634,7 @@ def write_page(ch: Chapter, chapters: list[Chapter], out_dir: Path,
     i = chapters.index(ch)
     prev = chapters[i - 1] if i > 0 else None
     nxt = chapters[i + 1] if i + 1 < len(chapters) else None
-    _, body = load_chapter(ch.md)
+    _, body = load_chapter(ch.md, site=solutions_file(ch.md).exists())
     used = {m.group(2) for m in IMG_REF.finditer(body)}
     body = rewrite_images(body, img_map, missing)
     body = rewrite_md_links(body)
@@ -579,6 +647,35 @@ def write_page(ch: Chapter, chapters: list[Chapter], out_dir: Path,
                           render_toc_menu(chapters, ch))
     (out_dir / ch.out_name).write_text(page, encoding="utf-8")
     return used
+
+
+def write_solutions_page(ch: Chapter, chapters: list[Chapter],
+                         out_dir: Path, img_map: dict[str, str],
+                         missing: set[str], chapter_toc: bool,
+                         targets: dict[str, listing_links.Target] | None
+                         = None) -> bool:
+    """Render the chapter's Solutions file beside its page, if it has one.
+
+    The page carries the chapter's label, a link back to the chapter
+    where the previous-chapter link sits, and the step assets. The
+    listing links treat the page as belonging to no chapter, so each
+    `name.py` mention links into the chapter that defines it.
+    """
+    sol = solutions_file(ch.md)
+    if not sol.exists():
+        return False
+    title, body = load_solutions(sol)
+    body = rewrite_images(body, img_map, missing)
+    body = rewrite_md_links(body)
+    out_name = solutions_page_name(ch.md.stem)
+    if targets is not None:
+        body = listing_links.site_rewrite(body, targets, out_name)
+    page_info = Chapter(sol, out_name, ch.number, title,
+                        f"{ch.label} &middot; Solutions")
+    page = render_chapter(body, page_info, ch, None, chapter_toc,
+                          render_toc_menu(chapters, ch), steps=True)
+    (out_dir / out_name).write_text(page, encoding="utf-8")
+    return True
 
 
 def write_shared(chapters: list[Chapter], out_dir: Path) -> int:
@@ -613,6 +710,8 @@ def rebuild_chapter(md: Path, out_dir: Path,
     targets = listing_targets(chapters) if listing_links_on else None
     used = write_page(ch, chapters, out_dir, img_map, set(), chapter_toc,
                       targets)
+    write_solutions_page(ch, chapters, out_dir, img_map, set(),
+                         chapter_toc, targets)
     images_out = out_dir / "images"
     for name in sorted(used):
         filename = img_map.get(name)
@@ -640,9 +739,12 @@ def build(out_dir: Path, chapter_toc: bool = CHAPTER_TOC,
     used_images: set[str] = set()
     missing: set[str] = set()
 
+    solutions_pages = 0
     for ch in chapters:
         used_images |= write_page(ch, chapters, out_dir, img_map, missing,
                                   chapter_toc, targets)
+        solutions_pages += write_solutions_page(
+            ch, chapters, out_dir, img_map, missing, chapter_toc, targets)
 
     (out_dir / "style.css").write_text(render_css(), encoding="utf-8")
 
@@ -662,7 +764,8 @@ def build(out_dir: Path, chapter_toc: bool = CHAPTER_TOC,
         if (STATIC_SRC / asset).exists():
             shutil.copy2(STATIC_SRC / asset, out_dir / asset)
 
-    print(f"Built {len(chapters)} pages + index into {out_dir}")
+    print(f"Built {len(chapters)} pages + {solutions_pages} solutions "
+          f"pages + index into {out_dir}")
     print(f"Copied {copied} image(s).")
     print(f"Indexed {sections} sections for search "
           f"({(out_dir / search_index.INDEX_NAME).stat().st_size / 1024:.0f}"

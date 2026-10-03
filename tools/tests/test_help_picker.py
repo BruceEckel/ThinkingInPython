@@ -105,7 +105,10 @@ def test_rendering_caps_the_scroll_at_the_highlighted_sections_heading():
     rows = all_rows(_sections())
     picker = Picker(rows, output=DummyOutput())
     picker.window.vertical_scroll = 500      # as if arrowed far down
-    picker.search("CH=")                     # doc-only: `verify-ch`, row 1
+    # Doc-only; `(CH=` rather than `CH=` so a later task whose doc
+    # names CH= outside parentheses (`hint`) does not become the last
+    # match. The first is `verify-ch`, row 1.
+    picker.search("(CH=")
     assert picker.rows[picker.cursor].label == "verify-ch"
     picker._body()
     assert picker.window.vertical_scroll == 0    # its heading is line 0

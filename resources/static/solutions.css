@@ -1,0 +1,63 @@
+/* A Solutions page's step ladders (tools/solution_steps.py): each
+   exercise folds its hint, the shape of its listing, and the answer
+   into nested <details>, which the browser renders collapsed with
+   no script at all. This styles the summary rows as the steps they
+   are and indents each level; solutions.js adds the progress memory
+   and the "hide everything" control. */
+
+details.step {
+  margin: 1.2rem 0;
+  padding-left: 1rem;
+  border-left: 2px solid var(--rule);
+}
+details.step[open] { border-left-color: var(--accent); }
+
+details.step > summary {
+  cursor: pointer;
+  list-style: none;
+  font-family: 'Cormorant SC', serif;
+  font-size: 0.8rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  user-select: none;
+}
+details.step > summary::-webkit-details-marker { display: none; }
+details.step > summary::before {
+  content: "\25B8";               /* a small triangle, pointing right */
+  display: inline-block;
+  width: 1.2em;
+}
+details.step[open] > summary::before { content: "\25BE"; }
+details.step > summary:hover { color: var(--ink); }
+details.step[open] > summary { margin-bottom: 0.8rem; }
+
+/* The row above the first exercise: how many steps are open, and the
+   control that closes them. Shown only once the script has run. */
+.steps-bar {
+  display: none;
+  justify-content: space-between;
+  align-items: baseline;
+  margin: 0 0 1.5rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid var(--rule);
+  font-family: 'Cormorant SC', serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.steps-bar.ready { display: flex; }
+.steps-bar button {
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  color: var(--accent);
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--rule);
+  padding: 0 0 1px;
+  cursor: pointer;
+}
+.steps-bar button:hover { border-color: var(--accent); }
+.steps-bar button[disabled] { color: var(--muted); cursor: default; }

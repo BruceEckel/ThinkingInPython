@@ -1,9 +1,10 @@
-"""Tests for tools/build_site.py's Solutions link rewrite.
+"""Tests for tools/build_site.py's Solutions link rewrite and pages.
 
 A chapter links its Solutions folder with a relative path so GitHub shows
-a working link. The built site, EPUB, and PDF carry no Solutions pages,
-so load_chapter() rewrites the link to the folder's GitHub `tree` URL
-(and a link to the README.md in it to the `blob` URL).
+a working link. The EPUB and PDF carry no Solutions pages, so
+load_chapter() rewrites the link to the folder's GitHub `tree` URL (and
+a link to the README.md in it to the `blob` URL). The site renders each
+Solutions file as a page beside the chapter's, and links that instead.
 """
 from pathlib import Path
 
@@ -13,7 +14,9 @@ from tools.build_site import (
     SOLUTIONS_TREE_URL,
     link_solutions,
     load_chapter,
+    load_solutions,
     rewrite_md_links,
+    solutions_page_name,
 )
 
 STEM = "05_Foundations--Demo"
@@ -60,6 +63,33 @@ def test_load_chapter_rewrites_the_link(tmp_path: Path) -> None:
     _, body = load_chapter(md)
     assert f"[solutions]({URL})" in body
     assert "../Solutions/" not in body
+
+
+def test_site_form_links_the_solutions_page() -> None:
+    page = solutions_page_name(STEM)
+    assert page == f"{STEM}.solutions.html"
+    body = SENTENCE.format(target=f"{STEM}/") + "\n"
+    assert f"[solutions]({page})." in link_solutions(body, site=True)
+    body = f"See [it](../Solutions/{STEM}/README.md#2-second) now.\n"
+    assert link_solutions(body, site=True) == (
+        f"See [it]({page}#2-second) now.\n")
+
+
+def test_load_solutions_takes_the_title_and_relinks_chapters(
+        tmp_path: Path) -> None:
+    folder = tmp_path / "Solutions" / STEM
+    folder.mkdir(parents=True)
+    md = folder / "README.md"
+    md.write_text("# Demo: Solutions\n\n## 1. First\n\n"
+                  f"> See [here](../../Chapters/{NAME}#x).\n\n"
+                  "```text\n](../../Chapters/kept.md)\n```\n",
+                  encoding="utf-8")
+    title, body = load_solutions(md)
+    assert title == "Demo: Solutions"
+    assert body.startswith("## 1. First")
+    assert f"[here]({NAME}#x)" in body
+    assert "](../../Chapters/kept.md)" in body
+    assert rewrite_md_links(f"[here]({NAME}#x)") == f"[here]({STEM}.html#x)"
 
 
 def test_url_survives_rewrite_md_links() -> None:

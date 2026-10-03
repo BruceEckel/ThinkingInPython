@@ -209,6 +209,28 @@ hand. Tools find the file through `tools/repo.py` (`solutions_file()`,
 own stem is `README`. `--prune` deletes orphaned `.py` strays and never
 deletes Markdown.
 
+## Solutions reveal in steps: `tip steps`
+
+A solution whose section opens (after the generated quote) with a
+paragraph beginning `Hint:` is folded by `tools/solution_steps.py`
+(`tip steps`, in `gate` and `verify-ch` since 2026-10-02) into nested
+`<details>`: "Where to look" (the hint), "The shape" (each listing
+with its function bodies elided, generated), then "Solution" (the
+rest, as authored). GitHub and the site render the ladder collapsed,
+so a reader opens one step at a time; `tip hint CH=30 N=3` prints the
+same steps one per run. The `<details>` lines, the three `<summary>`
+labels, and every block starting `# The shape of` are tool-owned and
+rewritten on every run; edit the hint, the prose, and the listings
+inside the ladder, never the tags. A solution without a `Hint:`
+paragraph is left flat. Chapter 30 is the prototype; the other 44
+files have no hints yet. The site renders each Solutions file as
+`<stem>.solutions.html` beside its chapter (`tools/build_site.py`,
+`write_solutions_page()`), with `solutions.js` remembering which
+steps a reader opened; the EPUB and PDF still link GitHub. A shape
+block carries no `#:` marker and no path comment, so the extractor
+and the marker validator skip it, and the widths check still reads
+it.
+
 ## Pyright: a periodic review, never a gate
 
 `ty` is the only checker the gates run.

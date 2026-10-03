@@ -17,7 +17,8 @@ The steps, in order, mirror `verify` (fixers first, markers before sync):
    gate never asked for.
 3. ``exercise_statements --write`` on the chapter, so the exercise
    statements copied under the Solutions headings match the reflowed
-   chapter.
+   chapter, then ``solution_steps --write``, so each hinted solution's
+   step ladder and shape blocks match its listings.
 4. ``extract_examples --write`` and ``extract_solutions --write`` rebuild
    both ``build/`` trees. Whole-book, because listings import siblings.
    Fail-fast: nothing below means anything against a tree that would not
@@ -108,6 +109,8 @@ def main(argv: list[str] | None = None) -> int:
                        str(md)]),
         run("statements", [*PY, "-m", "tools.exercise_statements",
                            "--write", number]),
+        run("steps", [*PY, "-m", "tools.solution_steps",
+                      "--write", number]),
     ]
     extract = [*PY, "-m", "tools.extract_examples", "--write"]
     extract_sol = [*PY, "-m", "tools.extract_solutions", "--write"]

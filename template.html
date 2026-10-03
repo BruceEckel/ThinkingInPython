@@ -11,6 +11,10 @@
   <script src="$if(search-js)$$search-js$$else$search.js$endif$" defer></script>
   <link rel="stylesheet" href="$if(preview-css)$$preview-css$$else$link-preview.css$endif$">
   <script src="$if(preview-js)$$preview-js$$else$link-preview.js$endif$" defer></script>
+  $if(steps-css)$
+  <link rel="stylesheet" href="$steps-css$">
+  <script src="$steps-js$" defer></script>
+  $endif$
   $if(highlighting-css)$
   <style>
   $highlighting-css$
