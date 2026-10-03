@@ -241,7 +241,7 @@ excluded stop, so the element at index `0` does not appear.
 ## 6. `defaultdict(int)` in place of `Counter`
 
 > Rewrite `counter.py`'s tally using a `defaultdict(int)` and no `Counter`.
-> Which parts of `Counter` did you have to write yourself?
+> Which parts of `Counter` did you write yourself?
 
 <details>
 <summary>Where to look</summary>
@@ -515,8 +515,8 @@ the objects to which it maps its keys, not what those objects contain,
 so `hash(nested)` must hash a `list` and fails. The immutability is
 shallow, as it is for the `tuple` in `shallow_immutability.py`.
 `frozendict` is hashable *when its values are*, so keep values
-immutable, a `tuple` here instead of a `list`, whenever the mapping has
-to serve as a key.
+immutable, a `tuple` here instead of a `list`, whenever the mapping
+serves as a key.
 
 </details>
 </details>

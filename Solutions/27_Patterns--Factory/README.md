@@ -702,7 +702,7 @@ guarantee. The builder then accepts a fifth, sixth, or tenth
 list, and discovers the problem only when `build()` finally runs,
 leaving a window between the fifth `.topping()` call and that `build()`
 call. During that window the builder's own internal state violates the
-rule the finished `Pizza` must guarantee, though no `Pizza` object ever
+rule the finished `Pizza` must guarantee, though no `Pizza` object
 violates it. Checking in `topping()` closes that window. Checking only
 in `build()` leaves it open for as long as the caller keeps adding
 toppings.

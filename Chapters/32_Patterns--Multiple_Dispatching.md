@@ -190,8 +190,8 @@ since the outcome depends on the two types alone.
 
 Those `Any` annotations turn off static checking.
 `Item` declares `__str__()` alone,
-so the parameter takes `Any` unless something declares all four methods:
-`Item` itself, as abstract methods, or a `Protocol`.
+so the parameter takes `Any` unless something declares all four methods: `Item`,
+as abstract methods, or a `Protocol`.
 With `Any`, a class that supplies eight of the nine answers passes the type checker,
 and Python raises an `AttributeError` at the first duel that calls the ninth.
 Declaring the four methods restores the checking,
@@ -621,7 +621,7 @@ Raising a `TypeError` inside `__add__()` ends the expression there,
 since the exception propagates immediately;
 only a returned sentinel makes Python try the right operand's `__radd__()`.
 When both operands have the same type, Python tries `__add__()` alone,
-so `__add__()` by itself resolves `Meters + Meters`.
+so `__add__()` resolves `Meters + Meters`.
 Adding two instances of a class that implements only `__radd__()` raises a `TypeError`.
 One case reverses the order:
 when the right operand's type is a subclass of the left's and overrides the reflected method,
@@ -661,7 +661,7 @@ The methods perform the second dispatch through a second method call that you wr
 and distribute the answers across the classes.
 The table replaces both dispatches with a single lookup,
 and collects the answers in one place.
-The operators are the one case where Python performs the second dispatch itself.
+The operators are the one case where Python performs the second dispatch.
 Everywhere else you choose between writing a second dispatch in methods and replacing both dispatches with one lookup in data.
 
 ## Exercises

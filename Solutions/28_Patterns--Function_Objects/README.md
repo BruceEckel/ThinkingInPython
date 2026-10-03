@@ -125,7 +125,7 @@ a base class with two `raise NotImplementedError` bodies, and those
 bodies are what the shape costs. A base class pays for itself when
 the commands share implementation, and these commands share none.
 
-**Remember what to reverse.** `Deposit` also has to remember what it did, here the account and the
+**Remember what to reverse.** `Deposit` must also remember what it did, here the account and the
 amount, so it can reverse that action later: a fresh call to the same
 function cannot know what a previous call changed. `Deposit` is a record,
 like `Repeat`, because neither field changes after construction. The

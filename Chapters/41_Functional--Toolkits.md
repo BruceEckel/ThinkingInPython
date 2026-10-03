@@ -322,7 +322,7 @@ which generates all five comparison methods from the field order.
 or when the ordering differs from the fields in declaration order.
 Each synthesized comparison is slower than a hand-written one,
 because it wraps a call to your `__lt__` or `__eq__`;
-a directly generated method compares the fields itself.
+a directly generated method compares the fields with no extra call.
 
 ### `singledispatch`
 

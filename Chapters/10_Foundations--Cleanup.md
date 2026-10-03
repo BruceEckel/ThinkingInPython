@@ -189,7 +189,7 @@ but the object still refers to itself, so its count stays above zero.
 Inside `self_link()`,
 `gc.get_referrers(node)` returns the objects that refer directly to `node`,
 and the call destroys nothing.
-The only referrer is `node` itself, which confirms the self-reference.
+The only referrer is `node`, which confirms the self-reference.
 When a real object won't disappear and you don't know why,
 `gc.get_referrers()` is how you find what still holds it,
 the same way this listing uses it to show its own cycle.

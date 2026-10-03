@@ -290,7 +290,7 @@ def test_settings_path_in_takes_the_directory(
 ```
 
 **Supply the directory through the environment.**
-The first test has to know two things about the implementation: that the
+The first test must know two things about the implementation: that the
 function reads an environment variable, and that the variable's name is
 `APP_CONFIG`. Renaming the variable to `APP_SETTINGS_DIR` breaks the
 test although the function still behaves the same. The failure is a
@@ -305,8 +305,8 @@ the rename, and it survives dropping the environment variable.
 nothing touches the disk, because it supplies a real, valid path
 where a hard-coded one differs across operating systems.
 
-The trade is that injection moves the decision outward: somebody has
-to read `APP_CONFIG` and pass the directory in. That somebody is
+The trade is that injection moves the decision outward: somebody must
+read `APP_CONFIG` and pass in the directory. That somebody is
 usually one function at the program's edge, and that function is the
 one place a patching test is worth writing.
 

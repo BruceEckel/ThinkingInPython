@@ -8,7 +8,7 @@ A simulation models a set of objects that act on their own and interact through 
 This chapter builds three,
 each giving its agents less to work with than the last.
 A pack of rats coordinates through a shared blackboard,
-a single robot walks a maze where each object it meets decides what happens,
+a single robot walks a maze where each object it meets handles the robot's arrival,
 and a plate of vibrating sand runs on grains that hold only a position.
 The first two confirm a design you can predict from the code.
 The third produces a pattern no one wrote down as a picture:
@@ -1334,7 +1334,7 @@ The curves come from the formula alone.
 A plot of `amplitude()`'s zero set draws them.
 The run demonstrates the gathering, not the shape: random,
 uncoordinated steps concentrate onto a curve that no grain,
-and no line of `step()`, ever names.
+and no line of `step()`, names.
 
 ### Testing a Random Process
 
@@ -1477,7 +1477,7 @@ usually the shape of the code, and a full answer for each exercise.
     Then count how many calls return `True` and compare that count with `len(blackboard.visited)`,
     using a maze that contains a loop.
     `amaze.txt` is a perfect maze,
-    so no two rats ever reach one unclaimed cell and the counts always agree.
+    so no two rats reach one unclaimed cell and the counts always agree.
     `test_rats_and_mazes.py` still passes, because `visited` is a set.
     The guarantee that broke is "one rat per cell", not "every cell visited".
     What happens to the two rats that both claimed one cell,
@@ -1505,7 +1505,7 @@ usually the shape of the code, and a full answer for each exercise.
     then search for the `!` and walk the route the search finds.
     Report how many pieces of food the robot ate and how many moves the whole tour took.
     The run answers two questions for you.
-    Why does the search have to run again after every meal instead of once at the start?
+    Why must the search run again after every meal instead of once at the start?
     And why does asking for the nearest food each time not produce the shortest tour that eats everything?
 6.  Freeze the plate.
     Run the Chladni view with `MODES` starting at `(2, 2)`.

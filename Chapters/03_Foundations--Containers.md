@@ -34,7 +34,7 @@ for x in odds:
 
 The first line creates a `list`.
 `append()` adds new elements to `odds`.
-The `list` automatically resizes itself.
+The `list` grows automatically.
 The `for` statement iterates through `odds`,
 so `x` takes on each value in the `list`.
 
@@ -932,7 +932,7 @@ give a hint, usually the shape of the code, and a full answer for each exercise.
     the last two items, everything but the first and last,
     and a reversed copy of the middle three.
 6.  Rewrite `counter.py`'s tally using a `defaultdict(int)` and no `Counter`.
-    Which parts of `Counter` did you have to write yourself?
+    Which parts of `Counter` did you write yourself?
 7.  Rewrite `heterogeneous.py` with a `namedtuple`.
     Show that the unpacking line still works unchanged.
 8.  Given `pairs = [("a", 1), ("b", 2), ("c", 3)]`, build a `dict` from it,

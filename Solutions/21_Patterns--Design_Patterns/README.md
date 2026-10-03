@@ -19,7 +19,7 @@ figure.
 
 [The Vector of Change](../../Chapters/21_Patterns--Design_Patterns.md#the-vector-of-change) names the one axis along which a design keeps shifting.
 Look at your history for the same function edited again and again, since that function marks the axis.
-Then ask which part absorbed each change and which parts you had to edit by hand.
+Then ask which part absorbed each change and which parts you edited by hand.
 
 <details>
 <summary>The shape</summary>
@@ -59,8 +59,8 @@ def render(rows: list[Row], style: str) -> str:
 <details>
 <summary>Solution</summary>
 
-The example is a small report writer. It prints plain text, then has
-to emit CSV for a spreadsheet, then JSON for a web front end. Three
+The example is a small report writer. It prints plain text, then must
+emit CSV for a spreadsheet, then JSON for a web front end. Three
 changes along one axis, the output format. Everything else stays put
 through all three: the rows, their source, what the numbers mean.
 
@@ -98,8 +98,8 @@ first two did. The `match` reads well and hides the cost, which is why
 this shape survives as long as it does. It is not wrong, but every new
 format is an edit you make by hand.
 
-Naming the axis says what to do about it. If the format is what varies,
-the format has to become a value the program can hold, rather than a
+Naming the axis says what to do about it. If the format varies, the
+format must become a value the program can hold, rather than a
 branch in a function:
 
 ```python
@@ -358,7 +358,7 @@ you removed is worth keeping and worth naming.
 
 [The Reach of a Change](../../Chapters/21_Patterns--Design_Patterns.md#the-reach-of-a-change) compares a design in which `Report` names each writer with one in which it names a protocol.
 In the first version give each writer its own method name; in the second give every writer the same method and declare it in a `Protocol`.
-Add the Markdown writer to each, then count the existing definitions you had to open.
+Add the Markdown writer to each, then count the existing definitions you opened.
 
 <details>
 <summary>The shape</summary>
@@ -434,7 +434,7 @@ and the second takes the other path, leaving `Report` no `case` to miss.
 
 The first version gives each writer its own method name, which is the
 usual reason a class like `Report` ends up naming every writer: it
-has to know which method to call on which class.
+must know which method to call on which class.
 
 ```python
 # exercise_4a.py

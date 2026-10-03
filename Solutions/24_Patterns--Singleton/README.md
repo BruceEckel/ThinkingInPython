@@ -89,7 +89,7 @@ changes: `x.val` accumulates the same way, `x is y` is still
 
 The cost
 is that Python builds the inner object at class definition, during
-module import, whether or not anything ever constructs an
+module import, whether or not anything constructs an
 `OnlyOne`. Removing the deferral also removes the first-call race from
 [Tests, Threads, and Locks](../../Chapters/24_Patterns--Singleton.md#tests-threads-and-locks):
 two threads racing the first construction could each see the `None`
@@ -111,7 +111,7 @@ import builds the object, leaving no first call to race.
 <summary>Where to look</summary>
 
 [When You Want a Class, Cache the Instance](../../Chapters/24_Patterns--Singleton.md#when-you-want-a-class-cache-the-instance) uses `functools.cache` on a zero-argument function to return one object.
-Keep that technique for the pool itself, and give the pooled object a list of available connections and a set of leased ones.
+Keep that technique for the pool, and give the pooled object a list of available connections and a set of leased ones.
 `acquire()` moves a connection from one to the other, and `release()` moves it back.
 
 <details>
@@ -692,7 +692,7 @@ state.
 The chapter's listing avoids the reset by defining no `__init__()`.
 Its `__new__()` does the work, and the `None` test there separates
 the first construction, which creates `val`, from the later ones,
-which append to it. A singleton that keeps an `__init__()` has to
+which append to it. A singleton that keeps an `__init__()` must
 make it safe to run repeatedly, for example by returning at once
 when `hasattr(self, "val")` is true.
 

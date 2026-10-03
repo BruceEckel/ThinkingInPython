@@ -209,7 +209,7 @@ using `functools.singledispatch`.
 `singledispatch` turns a plain function into one that dispatches on the type of its first argument,
 with per-type implementations registered from anywhere.
 Adding an operation from outside is what *Visitor* does,
-and `singledispatch` does it without the `accept()` method or the `Visitor` class hierarchy.
+and `singledispatch` adds one without the `accept()` method or the `Visitor` class hierarchy.
 The flowers below are the same three as in `flower_visitors.py`.
 The two operations, `nectar()` and `fragrance()`, are new,
 each added independently of the other:

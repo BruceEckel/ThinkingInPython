@@ -381,7 +381,7 @@ Facade.start_car()
 Turning the key primes the pump, and priming starts the engine.
 Each constructor takes the object its method calls:
 `Ignition` takes a `FuelPump`, and `FuelPump` takes an `Engine`,
-so a caller has to build the three from the inside out.
+so a caller must build the three from the inside out.
 These three classes are the "confusing collection of classes and interactions,"
 small enough to read in one glance here.
 In real code, constructing three or thirty classes in the right order is knowledge no caller should need.
@@ -603,5 +603,5 @@ give a hint, usually the shape of the code, and a full answer for each exercise.
 5.  Copy the classes from `adapter.py` and remove the `/` from `WhatIUse.op()`.
     Add `WhatIUse2` from `adapter_variations.py` unchanged,
     and call `op()` on each class with the keyword `what_i_want=`.
-    Explain what `ty` reports and what happens at runtime.
+    Explain what `ty` reports and what each call does at runtime.
     Then fix `WhatIUse2.op()` without restoring the `/`.

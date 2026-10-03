@@ -444,7 +444,7 @@ on an object that `del b` should have destroyed.
 
 The chapter's `finalize(self, print, name, "closed")` avoids the trap
 by passing the pieces the callback needs rather than the object that
-has them. `name` is a `str` the `Connection` also happens to hold. The
+has them. `name` is a `str` the `Connection` also holds. The
 finalizer's reference to `name` keeps a string alive, not a connection.
 The rule generalizes: a finalizer may capture anything except a path
 back to its own object.

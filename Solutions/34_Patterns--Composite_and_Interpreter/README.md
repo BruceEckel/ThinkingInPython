@@ -96,8 +96,8 @@ print(list(find(root, "src")))
 `Node` type, recursing with `yield from` into each `Directory`'s
 entries.
 
-**Match a directory, then descend.** A `Directory` can itself match `name`,
-where `walk()` only ever yields file paths. Matching also continues
+**Match a directory, then descend.** A `Directory` can match `name`,
+where `walk()` yields only file paths. Matching also continues
 *into* a matched directory rather than stopping there, so a directory
 named `"src"` and a file beneath it named `"src"` can both appear in
 the results.
@@ -497,7 +497,7 @@ guard, so an unchanged subtree is still shared.
 **Leave division for evaluation.** For `Div`, `simplify()` folds nothing. A quotient of two `int`s is
 usually not an `int`, so it does not fit in a `Num`, and division by
 `Num(0)` produces no value to fold. Nor should `simplify()` raise the
-`ZeroDivisionError` itself. It rewrites a tree without evaluating it,
+`ZeroDivisionError`. It rewrites a tree without evaluating it,
 and a caller can simplify an expression and then discard it, so an
 exception raised in `simplify()` would report an error in a
 computation that does not run. Leaving `Div(lhs, Num(0))` in the
@@ -1017,7 +1017,7 @@ the string in a `Num` without looking at it.
 Python raises the `TypeError` it raises for any other mismatched pair.
 The message comes from `str`, which is the right source: the left
 operand is what the caller wrote first, and nothing in this expression
-language ever claims to extend `str`.
+language claims to extend `str`.
 
 **Guard the forward direction too.** The forward methods need the same guard for the same reason. Without
 it `x + "a"` wraps the string in a `Num` and builds the ill-typed tree
@@ -1471,7 +1471,7 @@ Directory` lives in your source, so a plugin cannot extend it. The
 type checker does warn the plugin author: `ty` reports a `Symlink`
 passed to `disk_usage()`, or placed in a `Directory`'s entries, as
 `invalid-argument-type`. The warning leaves the plugin nothing to fix,
-because the union it would have to extend is yours. Unchecked
+because the union it would need to extend is yours. Unchecked
 code fares worse: its `Symlink` falls through every case to
 `assert_never()`, which raises an `AssertionError` at runtime. The plugin's alternatives
 are to vendor a patched copy of your module or to persuade you to add

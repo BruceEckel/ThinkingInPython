@@ -167,7 +167,7 @@ print(p.__dict__)
 #: {'_x': 3, '_y': 4, '_z': 9}
 ```
 
-`z = Field()` needs no change to the `Field` class itself.
+`z = Field()` needs no change to the `Field` class.
 `__set_name__()` runs once per descriptor, at class-creation time.
 Python calls it separately for each of `x`, `y`, and `z`, passing each
 one its own attribute name, so `z`'s `Field` instance learns the name
@@ -251,7 +251,7 @@ that annotation. `cls: type[T]` hides the fact that `cls` is a
 the body reads the cache through the class name,
 `Singleton._instances`, rather than through `cls`.
 
-**Keep one instance per class.** `Singleton._instances` is a dictionary keyed by the class itself, so
+**Keep one instance per class.** `Singleton._instances` is a dictionary keyed by the class, so
 each class using the `Singleton` metaclass gets its own independent
 slot: `ASingleton`'s single instance, `BSingleton`'s single instance
 (omitted here, but present in the book), and now `CSingleton`'s.
@@ -601,7 +601,7 @@ should keep the subclass's type.
 ## 8. Moving `bases += (Tag,)` into `__init__()`
 
 > In `new_vs_init.py`,
-> move the `bases += (Tag,)` line from `__new__()` into `__init__()` and predict what happens before running it.
+> move the `bases += (Tag,)` line from `__new__()` into `__init__()` and predict the outcome before running it.
 > Explain the result in terms of when the class object comes into existence.
 
 <details>
@@ -634,8 +634,8 @@ class Demo(metaclass=Meta):
 <details>
 <summary>Solution</summary>
 
-The prediction: nothing happens. `Tag` stays out of `Demo.__bases__`,
-and Python raises no error.
+The prediction: the move changes nothing. `Tag` stays out of
+`Demo.__bases__`, and Python raises no error.
 
 ```python
 # exercise_8.py
@@ -669,7 +669,7 @@ stays the same. Passing the longer tuple on to `type.__init__()` changes
 nothing either, since `type.__init__()` only validates its arguments.
 
 `new_vs_init.py` makes the same point from the other side, with its
-`added_in_init` key. `__new__()` has to make every decision about *what
+`added_in_init` key. `__new__()` must make every decision about *what
 the class is*: its name, its bases, and the namespace `type` builds it
 from. `__init__()` can only modify the completed class object, which is
 why `setattr(cls, ...)` still works there.

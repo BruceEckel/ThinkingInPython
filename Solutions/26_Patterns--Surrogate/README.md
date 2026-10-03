@@ -326,7 +326,7 @@ it.
 <summary>Where to look</summary>
 
 [The Recursion Trap](../../Chapters/26_Patterns--Surrogate.md#the-recursion-trap) and [Forwarding with `__getattr__()`](../../Chapters/26_Patterns--Surrogate.md#forwarding-with-getattr) describe a method that Python calls only after normal lookup fails.
-Trace what happens when the first line inside that method reads a name that does not exist.
+Trace what Python does when the first line inside that method reads a name that does not exist.
 Use `expected()` from `exceptions` to catch the failure in the listing.
 
 <details>

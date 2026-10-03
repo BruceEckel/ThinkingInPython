@@ -351,7 +351,7 @@ ModuleNotFoundError: No module named 'a_package'. Did you mean: 'b_package'?
 
 The name is now fully qualified, so the parent question does not
 arise. But `sys.path[0]` is the directory of the script you ran,
-`a_package/` itself. The project root is nowhere on the path, so the
+`a_package/`. The project root is nowhere on the path, so the
 search for a top-level package called `a_package` fails: Python is
 inside the package, looking for it. The suggestion names `b_package`,
 the one package Python does find on that path.

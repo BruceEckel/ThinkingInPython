@@ -1516,7 +1516,7 @@ compiles such a function to machine code on its first call:
     # Sample run: Numba speedup: 15.9x
 
 `njit(count_primes)` wraps the same function `@njit` decorates,
-and the `fast_count_primes` it returns compiles itself at the first call.
+and Numba compiles the `fast_count_primes` it returns at the first call.
 Calling `fast_count_primes(1)` first pays the compilation and warm-up cost outside the timed region,
 so the comparison measures steady-state speed.
 Numba shines on numeric code over simple types and NumPy arrays,

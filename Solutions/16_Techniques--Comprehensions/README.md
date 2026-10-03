@@ -36,7 +36,7 @@ print(result)
 ```
 
 The predicate has two parts, `isinstance(e, str)` and `e.isdigit()`,
-both of which must be true before `int(e)` ever runs. `"a"` fails
+both of which must be true before `int(e)` runs. `"a"` fails
 `isdigit()`, so it does not reach `int()`, which otherwise raises a
 `ValueError`. `"4"` is the only element that is both a string and made
 entirely of digits, so it is the one the comprehension converts and
@@ -118,7 +118,7 @@ print(lengths["GALAHAD"], "NI" in lengths)
 **Filter before building each entry.** `"Galahad"` is seven characters, so it passes the `len(name) > 3`
 filter and adds one entry. `"Ni"` is still the only name the filter
 drops. The filter tests the original name, not the upper-cased key, so
-the filter judges a name before the output expression ever runs. That
+the filter judges a name before the output expression runs. That
 ordering matters when the output expression changes the length, as
 `name * 2` does.
 
@@ -247,7 +247,7 @@ produces, and a loop when you want the side effect.
 
 A comprehension whose output expression has a side effect is still
 worth a second look, even when it returns something useful. `show()`
-does two jobs, and a reader has to open it to learn that one of them is
+does two jobs, and a reader must open it to learn that one of them is
 printing.
 
 </details>

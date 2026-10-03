@@ -279,7 +279,7 @@ The repair is `result[0]` and `result[1]`.
 
 The call sites lose the names. `print(result)` now writes
 `(4.0, 3)` instead of `Stats(mean=4.0, count=3)`, so the repr no longer
-says which number is which. A reader of the call site has to open
+says which number is which. A reader of the call site must open
 `summarize()` to find out. The call sites also lose attribute access:
 `result.mean` becomes `result[0]`, which holds the same value and no
 longer says what it is. And they lose the type as a name. Nothing can

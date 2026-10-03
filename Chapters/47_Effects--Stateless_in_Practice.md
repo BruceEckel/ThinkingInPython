@@ -252,8 +252,7 @@ Indexing a list rather than walking an iterator turns the mistake into an `Index
 
 Reading the current time is another side cause.
 A real clock answers with the present moment,
-so a test cannot ask it what happens at some critical time
-(midnight, or tomorrow).
+so a test cannot set it to some critical time (midnight, or tomorrow).
 `stamp()` puts the current time into its output,
 and `batch_due()` decides whether a day has passed since the last run.
 Against a real clock neither is testable.
@@ -1004,7 +1003,7 @@ without a cast.
 ## The Success Path
 
 `research()` handles no errors.
-Its body is a straight run of six lines, each saying what should happen next,
+Its body is a straight run of six lines, each naming the next step,
 and no line tests whether the previous one worked.
 The error channel makes that straight run possible.
 Here is the same pipeline with the failures handled where they arise:
@@ -1338,7 +1337,7 @@ The next example goes wide instead.
 [Abstract Factories](27_Patterns--Factory.md#abstract-factories)
 builds a gaming environment where a `GameElementFactory` returns a matched `Character` and `Obstacle`,
 and a `GameEnvironment` plays whatever that factory produces.
-Here each kind of actor is an Ability the program requests for itself:
+Here each kind of actor is an Ability the program requests:
 
 ```python
 # quest.py
@@ -2377,7 +2376,7 @@ give a hint, usually the shape of the code, and a full answer for each exercise.
     Write a `StaleWire` whose `latest()` prints `feed: fetching` and then raises `Unavailable`.
     Predict the trace, then say why it differs from `DeadWire`'s even though both fail the same way.
 7.  Wrap `research()` in `retry()` and supply a `Time()`.
-    Explain what happens under the `WEATHER` scenario and why retrying a `NotInteresting` failure is the wrong behavior,
+    Explain what `retry()` does under the `WEATHER` scenario and why retrying a `NotInteresting` failure is the wrong behavior,
     then say what an Effect system needs for you to retry only `Unavailable`.
 8.  Change `parallel.py` to use a `ProcessPoolExecutor` instead of a `ThreadPoolExecutor`,
     and confirm `squares()` stays unchanged.

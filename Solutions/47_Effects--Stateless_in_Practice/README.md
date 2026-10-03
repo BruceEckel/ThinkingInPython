@@ -943,7 +943,7 @@ either.
 ## 7. Retrying the wrong failure
 
 > Wrap `research()` in `retry()` and supply a `Time()`.
-> Explain what happens under the `WEATHER` scenario and why retrying a `NotInteresting` failure is the wrong behavior,
+> Explain what `retry()` does under the `WEATHER` scenario and why retrying a `NotInteresting` failure is the wrong behavior,
 > then say what an Effect system needs for you to retry only `Unavailable`.
 
 <details>
@@ -951,7 +951,7 @@ either.
 
 [What Retry Cannot Judge](../../Chapters/47_Effects--Stateless_in_Practice.md#what-retry-cannot-judge) describes `retry()` applying one schedule to the whole error channel.
 Wrap `research()` with `retry()`, `catch()` the `RetryError`, and supply a `Time()` along with the feed and encyclopedia.
-Ask whether a headline that is the same on every attempt can ever produce a different result, then look at what `retry()` takes as arguments.
+Ask whether a headline that is the same on every attempt can produce a different result, then look at what `retry()` takes as arguments.
 
 <details>
 <summary>The shape</summary>

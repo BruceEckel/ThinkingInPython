@@ -263,7 +263,7 @@ print(grouped(["b", "a", "b"], str.upper))
 **Collect each item under its key.** A dictionary key exists once by construction, so the duplicate-key
 failure `groupby()` has on unsorted input cannot occur. The two `"b"`
 entries go into the same list no matter how far apart they arrive, and
-the caller needs no `sorted()` call to make that happen.
+the caller needs no `sorted()` call to group them.
 
 The cost is the streaming `groupby()` provides. `grouped()` reads the
 whole input before returning anything, so an infinite source makes it
@@ -332,7 +332,7 @@ expect(TypeError, deep_sum,
 ```
 
 **Show why the call fails.** `cache` stores results in a dictionary keyed on the arguments, so
-every argument has to be hashable. A `list` is not hashable, because
+every argument must be hashable. A `list` is not hashable, because
 its contents can change after the cache stores it, and a mutated key
 no longer hashes to the slot holding its entry. The call fails
 before `deep_sum()`'s body runs.
@@ -463,8 +463,8 @@ about the algorithm reaches outside its arguments for randomness.
 
 What the `rng` parameter hands to the caller is control of the seed,
 and with it the responsibility for reproducibility. The
-`seed: int = 0` version accepts only an integer. A caller who wants
-two different schedules has to pass a different integer, and a caller who
+`seed: int = 0` version accepts only an integer. A caller who needs
+two different schedules must pass a different integer, and a caller who
 wants this function to share a program-wide random stream has no way
 to say so. The `rng` version allows both. In exchange, a caller can
 now pass `random.Random()` with no seed and get schedules that differ

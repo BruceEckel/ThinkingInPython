@@ -398,7 +398,7 @@ ask(question = 'color') -> answer = 'blue'
 
 Both results describe the same mistake: calling a generator function
 produces a description rather than a conversation. `interview()` builds
-a generator object and stops. Nothing ever calls `next()` or `send()`
+a generator object and stops. Nothing calls `next()` or `send()`
 on that object, so the generator asks none of its three questions. The
 final line interpolates the object's repr into the sentence where an
 answer belonged.

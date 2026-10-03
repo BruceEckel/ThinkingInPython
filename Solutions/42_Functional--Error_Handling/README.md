@@ -470,7 +470,7 @@ and the revealed signature keeps the `Result` alias.
 the decorator, instead of being the decorator.
 
 **Catch only the named types.** The `except catch`
-clause accepts the tuple directly, so `wrapper` itself changes by
+clause accepts the tuple directly, so `wrapper` changes by
 one word.
 
 **Let everything else propagate.** `parse("42")` still comes back as an `Ok`. `parse("oops")` raises a

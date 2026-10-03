@@ -473,7 +473,7 @@ and `klass` splices `class_name` directly into source text.
 An unvalidated name containing a newline and a second statement could then break out of the `class` block and run anything,
 the same way an unescaped value breaks out of a hand-built SQL query.
 The `KNOWN_COMMANDS` check closes that hole:
-only three fixed names ever reach the template.
+only three fixed names reach the template.
 `EventMakers` carries no such risk,
 because `type(class_name, (Event,), ...)` treats `class_name` as a string value,
 not as source code.
@@ -574,7 +574,7 @@ None of this needs a metaclass.
 `__init_subclass__()` is implicitly a class method.
 Its first argument is the new subclass.
 `__init_subclass__()` runs for classes derived from the class whose body defines it,
-and not for that class itself,
+and not for that class,
 so neither `Color` nor `Shape` appears in its own registry.
 
 The keyword arguments come from the subclass header.
@@ -862,7 +862,7 @@ expect(TypeError, User, "Guido", 30)
 
 The checker synthesizes a `User.__init__()` from the field declarations,
 with `name` required and `age` defaulted, as it does for `@dataclass`.
-It believes the declaration without ever running `model()`,
+It believes the declaration without running `model()`,
 so the call checks clean and fails at runtime: this `model()` generates nothing,
 and `object`'s constructor takes no arguments.
 The declaration is a claim, and this one is false.
@@ -1480,7 +1480,7 @@ Use a metaclass when you need to change the class object rather than react to it
   `__init_subclass__()` needs a common base to live on,
   and the shared metaclass is what such a family has instead.
 
-A metaclass can give the class itself an `__iter__()`,
+A metaclass can give the class object an `__iter__()`,
 the same method that lets `EnumType` make `for c in Color` work:
 
 ```python
@@ -1508,14 +1508,14 @@ for c in Color:
 ```
 
 `IterableMeta.__iter__()` fires when you write `for c in Color`,
-iterating the class object itself, not an instance of it.
+iterating the class object, not an instance of it.
 It walks `vars(cls)`, the class's own namespace,
 skipping every underscore-prefixed name,
 which for `Color` is the dunder bookkeeping every class carries,
 so it yields the three values the body assigned: `"red"`, `"green"`, `"blue"`.
 A class decorator cannot make `for c in Color` work.
 It can only add methods that instances see,
-not a protocol method the class object itself must answer,
+not a protocol method the class object must answer,
 which is why `Color` needs a metaclass, not a decorator.
 
 `__prepare__()` is the one with no simpler substitute:
@@ -1662,7 +1662,7 @@ truncated to keep the line within `max_width`.
 
 An attribute tagged `[CV]`, for *class variable*,
 lives on the class or a base class rather than in `obj`'s own `__dict__`.
-When `obj` is itself a class, every attribute lives on a class,
+When `obj` is a class, every attribute lives on a class,
 so all of them carry the tag.
 In [Comparing Ordinary Classes and Data Classes](12_Techniques--Data_Classes_as_Types.md#comparing-ordinary-classes-and-data-classes),
 `classvar_dataclass.py`'s `show(D)` tags both `D.x` and `D.s`,
@@ -1803,7 +1803,7 @@ class Derived(Base):
 ```
 
 `Base`'s four lines are the bare sequence,
-and they also show that `Base.__init_subclass__()` does not run for `Base` itself,
+and they also show that `Base.__init_subclass__()` does not run for `Base`,
 the rule [Making a Class Final](#making-a-class-final) needs.
 `Derived` adds the rest.
 `__prepare__()` runs before the body, so its line comes first.
@@ -2207,7 +2207,7 @@ give a hint, usually the shape of the code, and a full answer for each exercise.
     and a method `describe(self)` returning `f"{self} degrees {self.unit}"`.
     Confirm `Celsius(21.5).describe()` works and that `type(Celsius)` is `type`.
 8.  In `new_vs_init.py`,
-    move the `bases += (Tag,)` line from `__new__()` into `__init__()` and predict what happens before running it.
+    move the `bases += (Tag,)` line from `__new__()` into `__init__()` and predict the outcome before running it.
     Explain the result in terms of when the class object comes into existence.
 9.  `commander.py` validates `class_name` against `KNOWN_COMMANDS` before splicing it into source text.
     Remove that check, call `Command.make_class()` with a name containing a newline and a second statement,

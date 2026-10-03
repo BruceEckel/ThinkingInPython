@@ -706,8 +706,8 @@ a stream of two node kinds,
 the literal `str` pieces the author typed and the `Interpolation` objects holding the values.
 Iterating a `Template` is flat.
 `for piece in template` yields exactly one level of `str` and `Interpolation` objects,
-so the walk itself is a loop rather than a recursion.
-An interpolation's value can itself be a `Template`,
+so the walk is a loop rather than a recursion.
+An interpolation's value can be a `Template`,
 built by nesting one `t`-string inside another.
 `+` concatenates `t`-strings into one flat `Template`,
 as the `query` in the listing below shows,
@@ -796,7 +796,7 @@ The reason is structural rather than clever:
 so values stay out of the `sql` list.
 Written as an f-string,
 the same line is one finished `str` with the attack inside it.
-Any defense then has to inspect that string and guess where the user's text begins.
+Any defense must then inspect that string and guess where the user's text begins.
 
 That separation is the general argument for handing a consumer the structure instead of the answer.
 A finished string no longer records which characters the program wrote and which a user did,

@@ -4,7 +4,7 @@
 > *Proxy* and *State* are both built on that stand-in,
 > which this chapter calls a *Surrogate*.
 
-Both *Proxy* and *State* provide a surrogate class that changes what happens behind a call without changing the calling code.
+Both *Proxy* and *State* provide a surrogate class that changes what runs behind a call without changing the calling code.
 The surrogate hides the implementing class that does the work.
 When you call a method in the surrogate,
 the surrogate calls that method in the implementing class.

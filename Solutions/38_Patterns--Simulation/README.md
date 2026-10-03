@@ -332,7 +332,7 @@ between them:
 the rats, starting in the left room, map every cell of that room and
 none of the right room's, so `unreached` is the right room's nine open
 cells. A cell is unreachable when no path of open cells connects it to
-the entry, not when a wall happens to surround it. `Maze.entry()`
+the entry, not when a wall surrounds it. `Maze.entry()`
 scans row by row and returns the first open cell it finds, and every
 rat traces back to that single starting point through `claim()`. No
 rat therefore reaches a cell that has no open-cell path back to the
@@ -352,7 +352,7 @@ entry, however many rats spawn.
 > Then count how many calls return `True` and compare that count with `len(blackboard.visited)`,
 > using a maze that contains a loop.
 > `amaze.txt` is a perfect maze,
-> so no two rats ever reach one unclaimed cell and the counts always agree.
+> so no two rats reach one unclaimed cell and the counts always agree.
 > `test_rats_and_mazes.py` still passes, because `visited` is a set.
 > The guarantee that broke is "one rat per cell", not "every cell visited".
 > What happens to the two rats that both claimed one cell,
@@ -362,7 +362,7 @@ entry, however many rats spawn.
 <details>
 <summary>Where to look</summary>
 
-[Contention on a Loop](../../Chapters/38_Patterns--Simulation.md#contention-on-a-loop) shows what happens when two rats reach one unclaimed cell, and [The Rat and the Blackboard](../../Chapters/38_Patterns--Simulation.md#the-rat-and-the-blackboard) shows the `claim()` you are changing.
+[Contention on a Loop](../../Chapters/38_Patterns--Simulation.md#contention-on-a-loop) shows two rats reaching one unclaimed cell, and [The Rat and the Blackboard](../../Chapters/38_Patterns--Simulation.md#the-rat-and-the-blackboard) shows the `claim()` you are changing.
 Making `claim()` an `async def` means each caller must `await` it, which spreads through the `Protocol`, the comprehension, and `explore()`.
 Count the `True` results in a field on the `Blackboard` and compare the count with `len(visited)`.
 A coroutine gives up control only at an `await`, which decides whether `claim()` needs a lock.
@@ -713,7 +713,7 @@ The original `claim()` needs no lock because it has no `await`
 between the test and the add. A coroutine yields control only at an
 `await`, so the two statements run as one uninterruptible unit: the
 event loop can hand control to another rat before the test or after
-the add, but not between them. Adding the `await` opens exactly that
+the add, but not between them. Adding the `await` opens that
 gap in the middle, and the whole guarantee depends on the gap's absence.
 
 Exercises 4 and 5 both build on the same `robot_explorer` world,
@@ -958,7 +958,7 @@ class whose `symbol` matches the character it receives, and
 factory searches.
 
 **Act through the shared interface.** `Room` and `GameBuilder` need no change either,
-since both only ever call `occupant.interact(robot, room)` through the
+since both call `occupant.interact(robot, room)` through the
 shared `Item` interface.
 Neither one needs to know which concrete `Item` subclasses exist.
 
@@ -998,7 +998,7 @@ the factory's search and silently substitutes a different `Item`.
 > then search for the `!` and walk the route the search finds.
 > Report how many pieces of food the robot ate and how many moves the whole tour took.
 > The run answers two questions for you.
-> Why does the search have to run again after every meal instead of once at the start?
+> Why must the search run again after every meal instead of once at the start?
 > And why does asking for the nearest food each time not produce the shortest tour that eats everything?
 
 <details>
@@ -1144,7 +1144,7 @@ Here, running out of rooms is the ordinary way the food loop ends,
 so `solve()` returns `None` and the walrus in the `while` reads it as
 "nothing left to eat."
 
-**Replan after every meal.** The search has to run again after every meal because both of its ends
+**Replan after every meal.** The search must run again after every meal because both of its ends
 move. `Food.interact()` replaces the food with an `Empty()`, so the
 room the robot just arrived at stops being a goal, and the robot's
 own room is now the new start. A path planned from the entry is no
@@ -1267,7 +1267,7 @@ class Plate:
 
 [The Model](../../Chapters/38_Patterns--Simulation.md#the-model) shows `step()` scaling each grain's random displacement by `amplitude()`.
 Substitute `m == n` into the two products of `amplitude()` and compare them.
-For the diagonal, swap `x` and `y` and see what happens to the sign of the difference inside `abs()`.
+For the diagonal, swap `x` and `y` and compare the sign of the difference inside `abs()` before and after.
 Then ask what that implies where `x == y`.
 
 <details>
@@ -1301,7 +1301,7 @@ so the difference is exactly `0.0` at every point on the plate.
 displacement by the amplitude under that grain, so
 `uniform(-kick, kick) * 0.0` moves nothing, and 1200 steps leave every
 grain where the constructor scattered it. The view shows
-neither chaos nor a figure because no grain ever moves: it shows the
+neither chaos nor a figure because no grain moves: it shows the
 initial random scatter, frozen. Agitation reads `0.000` from
 the first step, the same number a perfectly settled plate reports, so
 the summary statistic cannot tell "finished" from "never started."
@@ -1394,7 +1394,7 @@ picture.
 The plate's own field does not separate into a factor in `x` times a
 factor in `y`. Each of its two terms mixes `x` and `y`, and
 subtracting one from the other leaves zeros along the curves where the
-two products happen to agree, which is why the original figures are
+two products agree, which is why the original figures are
 diagonals, crosses, and rings rather than a grid. Those mixed terms
 come from the physics the chapter's formula approximates, a real plate
 with free edges rather than a membrane clamped all around its rim. The

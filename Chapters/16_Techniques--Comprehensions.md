@@ -419,7 +419,7 @@ with no explicit walk and no comprehension.
 Try `rglob()` first: a glob pattern says what you want.
 `walk()` earns its place when the filter needs more than a glob pattern can express,
 a file's size or its contents rather than its name, say,
-or when the comprehension needs the directory structure itself,
+or when the comprehension needs the directory structure,
 not just the files at the bottom of it.
 
 ## Breaking Up a Complex Comprehension
@@ -464,8 +464,8 @@ if __name__ == "__main__":
 Reading the `report` comprehension means untangling several questions at once:
 which items qualify, how the warehouses flatten together,
 in what order the result arrives, and how each line renders.
-A comprehension nested inside `sorted()`,
-itself nested inside the outer comprehension, does four jobs in one expression.
+The outer comprehension iterates over `sorted()` of an inner comprehension,
+and that one expression does four jobs.
 Giving each stage a name gives each question its own statement:
 
 ```python

@@ -212,7 +212,7 @@ print(handle({"type": "key", "key": "Enter"}))
 
 **Match the inner dictionary.** The new `case` nests a mapping pattern inside a mapping pattern:
 `{"at": {"x": x, "y": y}}` matches when `"at"` maps to a dictionary
-that itself has `"x"` and `"y"` keys, binding both in one step.
+that has `"x"` and `"y"` keys, binding both in one step.
 
 **Accept both click shapes.** The
 nested case and the flat `{"type": "click", "x": x, "y": y}` case
@@ -484,7 +484,7 @@ print(quadrant(Point(0, 7)))
 ```
 
 The second version reads better. A guard hides the shape of the
-dispatch: you have to read four nearly identical `if` clauses one at a
+dispatch: you must read four nearly identical `if` clauses one at a
 time to see that they enumerate sign combinations. Once the subject is
 `sign(p.x), sign(p.y)`, the cases are literals in a two-column table,
 and a missing combination is visible at a glance. The `|` alternation

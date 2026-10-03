@@ -64,7 +64,6 @@ Solutions/02_Foundations--Tour/README.md	and the literal branch passes its text 
 Solutions/03_Foundations--Containers/README.md	and everything between
 Solutions/04_Foundations--Control_Flow/README.md	**Let an unmatched exception through
 Solutions/11_Techniques--Testing/README.md	**Pass the dependency in
-Solutions/11_Techniques--Testing/README.md	somebody has to read CODE and pass the directory in
 Solutions/14_Techniques--Decorators/README.md	and nothing needs to
 Solutions/14_Techniques--Decorators/README.md	so work out which layer prints before and which after
 Solutions/16_Techniques--Comprehensions/README.md	Stopping there leaves the generator part-way through

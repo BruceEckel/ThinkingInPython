@@ -241,7 +241,7 @@ Decorating a coroutine function raises no exception.
 without running the coroutine's body,
 so `result` holds that coroutine object rather than the value the coroutine will eventually produce.
 The trace line then prints `<- add = <coroutine object add at 0x...>`.
-A wrapper over a coroutine function must itself be `async def` and `await func(*args, **kwargs)`,
+A wrapper over a coroutine function must be `async def` and `await func(*args, **kwargs)`,
 the shape covered in [`async def`, `await`, and the Event Loop](19_Techniques--Concurrency.md#asyncio-mechanics).
 
 ## Decorators That Take Arguments
@@ -416,7 +416,7 @@ The second overload returns the shape `repeat.py` takes apart,
 now under the name `Decorator[P, R]`:
 a generic alias whose parameters are the wrapped function's.
 `func` defaults to `None`, and the body branches on `callable(func)`.
-Called bare, `func` is `one` itself, `callable(func)` is `True`,
+Called bare, `func` is `one`, `callable(func)` is `True`,
 so `label` decorates it immediately by calling `decorate(func)`.
 Called with arguments, `func` stays `None`, `callable(func)` is `False`,
 so `label` returns `decorate` for Python to apply to `two`.
@@ -428,7 +428,7 @@ so it declares the widest return type, `Any`,
 and the overloads narrow that back down at every call site.
 
 The `callable(func)` test assumes that only the decorated function can arrive in that first position.
-Where a decorator's own argument could itself be callable,
+Where a decorator's own argument could be callable,
 checking `func is None` instead of `callable(func)` removes the ambiguity.
 
 ```python
@@ -1138,7 +1138,7 @@ that list is the simpler design.
 The *Decorator* pattern earns its structure when a topping needs behavior,
 not just data: a topping that changes how `cost` rounds,
 adds a description only under some condition,
-or must itself be handed elsewhere as a `Pizza`.
+or must be handed elsewhere as a `Pizza`.
 A list of toppings is data that a pizza holds.
 A decorator chain is a pizza,
 each layer satisfying the same interface the plain pizzas do.
@@ -1197,7 +1197,7 @@ The one piece of machinery left for later is the descriptor protocol that `@prop
 takes it up.
 
 Every decorator costs two things `wraps` does not remove,
-since `wraps` copies metadata, not the call itself.
+since `wraps` copies metadata and leaves the extra call in place.
 A traceback through a decorated function shows `wrapper`,
 one more frame than the caller and the original body alone show.
 Each call also pays for an extra Python-level function call, the wrapper's own,

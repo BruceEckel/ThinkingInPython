@@ -222,7 +222,7 @@ and the failing one alone gets no `__exit__()` call.
 `Fragile.__exit__(self, *exc: object)` collects the three arguments into a tuple the method ignores,
 the shorter form for a cleanup that ignores why the block ended.
 
-The guarantee has a matching gap on the other side: cleanup itself can fail.
+The guarantee has a matching gap on the other side: cleanup can fail.
 When `__exit__()` raises an exception,
 that new exception replaces the block's original one,
 and the original survives only as the new exception's `__context__`:
@@ -832,8 +832,8 @@ Choose these before writing `__enter__()` and `__exit__()` by hand.
 - `nullcontext(value)` is a do-nothing manager whose `__enter__()` returns `value`,
   useful when a `with` is optional and one code path should cover it.
 
-A function might write to a path it opens itself,
-to a stream the caller hands it, or to standard output by default.
+A function might write to a path it opens, to a stream the caller hands it,
+or to standard output by default.
 When it finishes, the function should close the file it opened and leave the caller's stream and standard output open.
 `nullcontext` lets a single `with` block serve all three cases:
 

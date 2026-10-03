@@ -414,7 +414,7 @@ print(recorder.printed, recorder.entries)
 
 **Fill both roles with one object.** One object satisfies both protocols. The concrete-class version could
 not arrange that: `Log` is a `dataclass` holding its own entries, so
-a test has to construct one and read `log.entries` afterward. As a
+a test must construct one and read `log.entries` afterward. As a
 `Protocol`, `Log` is a shape, and a single `Recorder` can have that
 shape and the `Console` shape at once.
 
@@ -757,7 +757,7 @@ so a value nobody uses is a value nobody checks.
 
 [An Effect Runs Once](../../Chapters/46_Effects--Stateless.md#an-effect-runs-once) shows a spent Effect returning `None` when you run it again.
 Store the Effects in one dictionary and functions that build them in another, then run each twice.
-`retry()` has to start the work over after a failure, so consider what it needs to call each time.
+`retry()` starts the work over after a failure, so consider what it needs to call each time.
 
 <details>
 <summary>The shape</summary>
@@ -1137,7 +1137,7 @@ there.
 [When Two Implementations Match](../../Chapters/46_Effects--Stateless.md#when-two-implementations-match) explains why `supply()` takes the first argument that satisfies the request.
 Predict from argument order, since the first match wins.
 If you give each implementation its own `Protocol` with a differently named method, the type checker rejects an implementation that lacks the method the Effect requests.
-Then check what happens when two classes share one method name.
+Then check whether the type checker can tell two classes apart when they share one method name.
 
 <details>
 <summary>The shape</summary>

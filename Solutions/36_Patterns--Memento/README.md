@@ -432,7 +432,7 @@ passing it to `Drawing`.
 <details>
 <summary>Where to look</summary>
 
-[A Snapshot Is Not a Reference](../../Chapters/36_Patterns--Memento.md#a-snapshot-is-not-a-reference) shows what happens when two names share one list.
+[A Snapshot Is Not a Reference](../../Chapters/36_Patterns--Memento.md#a-snapshot-is-not-a-reference) shows an `append()` through one name appearing through the other when two names share one list.
 Change `Memento` and `restore()` so the sketch and the memento hold the same list object.
 Run the existing tests with `pytest` and read the order of the failures.
 Then write a test that draws after `save()` and compares the memento's contents as a list, so only sharing can fail it.
@@ -605,7 +605,7 @@ print(h.present)
 
 **Step back through `undo()`.** `goto()` adds no new mechanism. It calls the existing `undo()`
 repeatedly, and each `undo()` pushes the state it leaves onto
-`_future`. Redo therefore works exactly as if you had called `undo()`
+`_future`. Redo therefore works as if you had called `undo()`
 twice: `h.redo()` after `goto(2)` returns `2`, then `3`, retracing
 the same path forward. Jumping several states back
 "in one call" is a convenience for the caller.
@@ -740,7 +740,7 @@ Worth doing in a library; noise in a solution.
 **Record the restore as an action.** `restore_field()` must go through `do()` for the reason
 [Restoring Part of a State](../../Chapters/36_Patterns--Memento.md#restoring-part-of-a-state)
 gives, and the listing's last line proves it: the partial restore is
-itself an action, so it belongs on the timeline. Editing `_past`
+an action, so it belongs on the timeline. Editing `_past`
 directly rewrites history rather than extending it, leaving the user
 who wanted the strokes back no way to change their mind. Direct
 editing also desynchronizes the caretaker's own bookkeeping: `do()`

@@ -249,7 +249,7 @@ with expected(TypeError):
 #: [TypeError] unhashable type: 'list'
 ```
 
-What costs a type its hash is contents-based equality, not mutability by itself.
+What costs a type its hash is contents-based equality, not mutability alone.
 A plain class instance is mutable and still hashes, by identity,
 so it works as a dictionary key.
 A `list` and an unfrozen `@dataclass` both compare by contents,

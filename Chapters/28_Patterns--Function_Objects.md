@@ -15,7 +15,7 @@ Each pattern defers something:
 
 - *Command* defers *what* to do, so you can store the action and run it later.
 - *Strategy* defers *how*: the job stays fixed,
-  and the caller picks the algorithm that does it.
+  and the caller picks the algorithm that performs it.
 - *Chain of Responsibility* defers *which* handler takes the job,
   trying candidates until one accepts.
 

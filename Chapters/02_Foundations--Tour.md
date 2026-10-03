@@ -86,7 +86,7 @@ except NameError as e:
 
 Python skips the body of the `if`, so `val` stays unbound.
 Indentation shows where the assignment sits, not whether it runs.
-The type checker sees that nothing ever defines `val` and reports an error on `print(val)`,
+The type checker sees that `val = 1` cannot run and reports an error on `print(val)`,
 so `# type: ignore` tells it the mistake is deliberate.
 The `try` and `except` catch the exception so the script can print the exception's message and finish;
 [Control Flow](04_Foundations--Control_Flow.md#errors-and-exceptions)

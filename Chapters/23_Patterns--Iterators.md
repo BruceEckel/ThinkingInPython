@@ -417,7 +417,7 @@ along with what goes wrong when two threads call `next()` on the same iterator.
 
 A generator can delegate part of its work to another iterator using `yield from`.
 `yield from` yields every value that iterator produces, in turn,
-as if the outer generator had written the loop itself:
+as if the outer generator had written the loop:
 
 ```python
 # yield_from.py
@@ -451,7 +451,7 @@ print(list(flatten(data)))
 
 Both functions call themselves on each nested sequence,
 and both pass each value from the recursive call out to the caller.
-`flatten_loop()` does it by hand: start the recursive call,
+`flatten_loop()` passes the values out by hand: start the recursive call,
 then re-yield each value it produces.
 `flatten()` replaces those two lines with `yield from`,
 and the matching output shows the substitution is exact.
@@ -578,7 +578,7 @@ def test_islice_stops_after_its_count() -> None:
 
 The first test is `list(count(1))` with a stopping point built into the source.
 `list()` keeps asking for value after value,
-so the tripwire fires and no list ever comes back.
+so the tripwire fires and no list comes back.
 The second test is the `if`-clause lookalike.
 Nothing after `2` satisfies `n < 3`,
 yet the generator expression keeps pulling from `counter()` to find another match,

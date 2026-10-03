@@ -190,7 +190,7 @@ function that captured it.
 <summary>Where to look</summary>
 
 [Composing Functions](../../Chapters/40_Functional--Foundations.md#composing-functions) defines `compose()`, which returns a function that applies one function to the result of another.
-The result of `compose()` is itself a one-argument function, so it can be an argument to `compose()` again.
+The result of `compose()` is a one-argument function, so it can be an argument to `compose()` again.
 Work out the order in which the three functions run by hand, then compare with the output.
 
 <details>
@@ -376,7 +376,7 @@ error[invalid-assignment]: Reassignment of `Final` symbol `MAX_SIZE` is not allo
   | ^^^^^^^^^^^^^^ Symbol later reassigned here
 ```
 
-To reject the append, the value's own type has to be immutable:
+To reject the append, the value's own type must be immutable:
 
 ```python
 # exercise_6_tuple.py

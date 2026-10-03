@@ -267,8 +267,8 @@ result directly, without running the function body again, so the
 `print()` call (and any other side effect) does not run a second
 time. Skipping the body is the reason to cache only pure functions.
 A cache assumes that calling the function again is unnecessary,
-because the answer cannot have changed and nothing observable
-happens during the call besides computing that answer. An impure
+because the answer cannot have changed and the call does nothing
+observable besides computing that answer. An impure
 function breaks that assumption. The function performs any side
 effect, such as printing, writing a file, or incrementing a
 counter, on the first call with a given argument, and the cache
@@ -405,7 +405,7 @@ the subclass look slotted while it still carries a `__dict__`.
 
 `Point3D` quietly loses the memory saving. Every instance pays for
 both the two slots and a dictionary. A subclass of a slotted class must
-declare `__slots__` itself, using an empty tuple when it adds no
+declare `__slots__`, using an empty tuple when it adds no
 fields of its own.
 
 </details>
@@ -522,7 +522,7 @@ a profiler.
 <summary>Where to look</summary>
 
 [Reading a `cProfile` Report](../../Chapters/18_Techniques--Performance.md#reading-a-cprofile-report) defines the two columns.
-Write a script in which one function calls another twice, so a caller sits above the work and a callee does it.
+Write a script in which one function calls another twice, so a caller sits above the work and a callee performs it.
 Run it under `cProfile`, then compare the top row sorted by `cumtime` with the top row sorted by `tottime`.
 
 <details>

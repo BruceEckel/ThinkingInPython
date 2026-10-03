@@ -331,7 +331,7 @@ It reads nothing from its environment and changes nothing in its environment,
 so its result reaches no screen, file, or socket,
 not even the exit code the operating system checks.
 From outside the process,
-that program looks exactly like one that computes nothing.
+that program is indistinguishable from one that computes nothing.
 
 ```python
 # pure_and_pointless.py
@@ -430,7 +430,7 @@ Each step adds dependencies no signature names, and no one knows the whole set.
 The missing piece is tracking.
 With it you know what a function does:
 whether it is safe to run in parallel with another,
-and what happens when you call it twice in a row.
+and what it does when you call it twice in a row.
 That knowledge lets you compose functions,
 and composition is how programs grow large.
 
@@ -678,7 +678,7 @@ and the construct that fulfills one is a *handler*.
 The compiler rejects a program that performs an Effect with no handler in scope,
 so every Effect a running program performs has a handler.
 Think of a handler as a generalized `except` block.
-An `except` block intercepts exceptions and decides what happens next.
+An `except` block intercepts exceptions and decides what the program does next.
 A handler intercepts any Effect operation and decides what it means.
 In `main()`, the `with fun ask(prompt)` handler decides that `ask` means "prompt the console and read a line."
 Handling an Effect also discharges it.
@@ -850,7 +850,7 @@ Most of these languages are tracking systems,
 in the sense [Tracking and Management](#tracking-and-management) gives the term:
 they provide the first part of a full EMS and stop there.
 For their purpose the other two parts, interface separation and delayed binding,
-are liabilities, because a host that supplies every implementation itself can guarantee what generated code can do.
+are liabilities, because a host that supplies every implementation can guarantee what generated code can do.
 
 Two go further.
 In [Pact](https://github.com/KikotVit/pact-lang),
@@ -1031,7 +1031,7 @@ give a hint, usually the shape of the code, and a full answer for each exercise.
 1.  Write the production bindings for `ask_tell.py`:
     a `Console` class whose `ask()` calls `input()` and whose `tell()` calls `print()`,
     and run `greet(Console(), Console())` interactively.
-    Confirm `greet()` itself requires no change:
+    Confirm `greet()` requires no change:
     serving a new context without edits is what delayed binding provides.
 2.  Do the bookkeeping the chapter describes.
     Starting from `bookkeeping_scales.py`, add a `Log` Effect

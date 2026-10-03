@@ -680,7 +680,7 @@ appears three times in `describe_isinstance.py` and nowhere in the
 reading it back off `result`. The final `return` is also weaker than
 the `match`'s `case Err(error)`. It is a fallthrough that happens to
 be correct rather than a branch stating what it matches, so a reader
-has to reconstruct that `result` must be an `Err` by ruling out the
+must deduce that `result` is an `Err` by ruling out the
 `Ok` branch above.
 
 `ty` reports the same thing about both. Inside the `Ok` it knows

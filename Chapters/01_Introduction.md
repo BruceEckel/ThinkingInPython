@@ -31,7 +31,7 @@ The experience was amazing,
 and I began adding material from my blog posts and presentations.
 Claude allowed me to create tooling for the book that I had imagined but never fully realized.
 
-This book never would have happened without the help of Claude.
+This book would not exist without the help of Claude.
 That said, it is still my work, derived from existing work, designed by me,
 checked and rewritten by me.
 It has my voice, and I've gone over every sentence multiple times, editing,

@@ -310,7 +310,7 @@ pay to express the same intent, and the module version pays none.
 
 [Distinguishing the Wrappers](../../Chapters/29_Patterns--Changing_the_Interface.md#distinguishing-the-wrappers) gives the table that separates *Proxy*, *Decorator*, *Adapter*, and *Façade*.
 For each wrapper, imagine deleting it and ask what breaks.
-Check whether the wrapper changes the interface, adds behavior to each call, or controls whether the call happens.
+Check whether the wrapper changes the interface, adds behavior to each call, or controls whether the call proceeds.
 
 <details>
 <summary>Solution</summary>
@@ -335,8 +335,8 @@ changes the name the caller uses.
 object's, and it adds no behavior to a call that goes through. What it
 adds is a decision about whether the call proceeds. Remove
 it and every call reaches the implementation, including the ones the
-proxy refuses, so what you lose is control over when and whether the
-call happens. This wrapper is the
+proxy refuses, so what you lose is control over when and whether a
+call proceeds. This wrapper is the
 [protection proxy](../../Chapters/26_Patterns--Surrogate.md#protection-proxy).
 
 None of the three is a *Façade*, because a *Façade* narrows many objects
@@ -354,7 +354,7 @@ tells the next reader why the wrapper is there.
 > Copy the classes from `adapter.py` and remove the `/` from `WhatIUse.op()`.
 > Add `WhatIUse2` from `adapter_variations.py` unchanged,
 > and call `op()` on each class with the keyword `what_i_want=`.
-> Explain what `ty` reports and what happens at runtime.
+> Explain what `ty` reports and what each call does at runtime.
 > Then fix `WhatIUse2.op()` without restoring the `/`.
 
 <details>

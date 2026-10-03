@@ -606,7 +606,7 @@ print(" ".join(m.name for m in moves[4:]))
 
 **Encode the legal successors.** `NEXT_ACTIONS` is a small state machine of its own: a dictionary from
 "the action just produced" to "the legal actions that can follow it,"
-including the special `None` key for "nothing has happened yet," which
+including the special `None` key for "no action yet," which
 leads only to `APPEARS`.
 
 **Remember the last move.** The generator's own state is just `previous`,

@@ -646,7 +646,7 @@ print(counts["Lizard"])
 ```
 
 **Keep existing calls working.** `counts` is an optional parameter with a default of `None`, so every
-existing call such as `item_pair_gen(Item, 10)` still works exactly as
+existing call such as `item_pair_gen(Item, 10)` still works as
 before, unpacking a plain `(item1, item2)` pair each time.
 
 **Tally into the caller's counter.** Only a
@@ -1471,7 +1471,7 @@ weapon pairings, a `Troll` beats an `Elf` on three of four, and a
 `Dwarf` beats a `Troll` on three of four, with the fourth pairing in
 each case the draw. Over two hundred seeds all three kinds win
 `meeting(5)`, so the outcome depends on the random draws each round,
-exactly as it does in a real rock-paper-scissors tournament.
+as it does in a real rock-paper-scissors tournament.
 
 </details>
 </details>

@@ -562,7 +562,7 @@ so after the decorator runs the checker still knows `Circle` as `Circle`,
 not as `Shape`.
 The bound is also why the factory names `Shape` instead of taking a type parameter.
 A generic factory would need `register()`'s bound to name the factory's own type parameter,
-and `ty` rejects a type variable's bound that is itself generic.
+and `ty` rejects a type variable's bound that is generic.
 
 Keeping the table in the factory removes two hazards from [Hazards of Self Registration](#hazards-of-self-registration).
 No `cls.registry` lookup walks the MRO,

@@ -55,7 +55,7 @@ That isolation makes the code cheaper to maintain and usually simpler to underst
 ### What an Abstraction Erases
 
 Isolating what changes discards information.
-An abstraction is a bet about which details no caller will ever need,
+An abstraction is a bet about which details no caller will need,
 and a good abstraction does more than hide those details.
 It erases them.
 Code outside the boundary cannot recover information the boundary discards,

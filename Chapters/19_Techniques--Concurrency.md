@@ -6,7 +6,7 @@
 
 [Performance](18_Techniques--Performance.md)
 makes one stream of instructions faster.
-*Concurrency* runs independent tasks so they happen "at the same time" instead of waiting in line.
+*Concurrency* runs independent tasks "at the same time" instead of making them wait in line.
 Performance is about the math, while concurrency is about the machine.
 Both try to speed progress.
 
@@ -98,10 +98,10 @@ but these tricks made the resulting programs more expensive to create and mainta
 
 *Asynchrony*, implemented with *coroutines*,
 moves the context switch out of the OS and into the program.
-Engineers don't have to fight the threading system.
+Engineers no longer fight the threading system.
 The programming language decides, based on its knowledge of the program,
 the smallest amount of data to include in the context switch.
-The programmer minimizes context switches by deciding when they happen.
+The programmer minimizes context switches by choosing where the code yields control.
 Moving that control into the program simplifies both writing the program and reasoning about it.
 
 Moving the context switch into the program was the first big shift.
@@ -472,7 +472,7 @@ uses `gather()` to notify slow observers together instead of one at a time.
 
 ## Structured Concurrency with `TaskGroup`
 
-What happens if `gather()` encounters a failure?
+How does `gather()` respond to a failure?
 If one of its coroutines raises an exception,
 `gather()` re-raises that exception into the awaiting code,
 but the other tasks it started keep running.
@@ -517,7 +517,7 @@ one reading of the event loop's clock that the caller takes before it starts any
 and `sleep_until()` hands that absolute time to `loop.call_at()`.
 `a` and `b` have the shortest delays and succeed.
 `c` and `d` share one deadline, so they fail together.
-`e` and `f` are still sleeping when that happens,
+`e` and `f` are still sleeping when `c` and `d` fail,
 with a wide gap to their own deadlines.
 The gap gives cancellation time to arrive first on any platform's timer,
 and that margin keeps the trace deterministic.
@@ -580,7 +580,7 @@ keep the returned task in a variable or a set that outlives the task.
 `c` and `d` raise exceptions at the same 0.03-second mark,
 and the `TaskGroup` responds by cancelling `e` and `f`,
 which are still suspended with far more sleep to go,
-so neither ever reaches its `fetched` print.
+so neither reaches its `fetched` print.
 The shared deadline puts both failures in the group.
 The loop runs every timer due at one instant in the same turn,
 so `c` and `d` both raise their exceptions before the group's own callback runs and starts cancelling.
@@ -815,7 +815,7 @@ asyncio.run(main())
 
 The change from `async_race.py` is the module-level `lock` and the `async with lock:` block.
 The block protects the read, the yielding `await`, and the write.
-A task that reaches `async with lock` while another task holds the lock suspends itself until the lock becomes available.
+A task that reaches `async with lock` while another task holds the lock suspends until the lock becomes available.
 This way, only one task runs its read-modify-write at a time,
 no matter how many times the event loop switches to another task in between.
 The counter now reaches 400, the same fix `threading.Lock` produces for threads.
@@ -1038,12 +1038,12 @@ and all three surface in `parallel_cpu.py`:
 2. Work crosses the process boundary by *pickling*.
    One process serializes each argument and each return value,
    and the other rebuilds it.
-   The function itself travels by name,
+   The function travels by name,
    so it must be importable from the top level of the module.
    Passing a `lambda` to `pool.map()` fails with a pickling error.
    That boundary crossing echoes [Performance](18_Techniques--Performance.md#converting-a-slow-function-to-rust)'s coarse-interface rule:
    a million tiny results can cost more to pickle than the parallelism saves.
-3. `pool.map()` raises nothing itself.
+3. `pool.map()` raises no exception when called.
    It returns a generator,
    and consuming a worker's result re-raises that worker's exception in the calling process.
    The `list(...)` around the call turns a failure in any worker into an exception here,
@@ -1116,7 +1116,7 @@ Use `multiprocessing` when the job is a different shape:
 You can test the claim that wall-clock time falls toward a single task's time as you add more cores.
 Split a fixed amount of work into a growing number of tasks,
 keep the pool warm across every measurement,
-and watch what happens once task count passes the number of cores:
+and watch how the time changes once task count passes the number of cores:
 
 ```python
 # task_scaling.py
@@ -1221,8 +1221,8 @@ one more chunk to pickle, one more result to collect.
 Once that added overhead outweighs the benefit of the smaller pieces,
 the curve stops falling.
 The ceiling applies to any system that divides work across independent workers,
-in Python or anywhere else, and that is why adding cores is not, by itself,
-a scaling strategy.
+in Python or anywhere else,
+and that is why adding cores alone is not a scaling strategy.
 
 ## The GIL and Free Threading
 
@@ -1469,7 +1469,7 @@ The change from `gil_race.py` is the `with lock:` block wrapped around the read-
 plus the `threading` import, the module-level `lock`,
 and a final line that reports every update preserved rather than updates lost.
 Eight threads still take turns,
-but now no two of them ever read the same value before either writes,
+but now no two of them read the same value before either writes,
 so `counter` reaches 400 every time,
 the same fix `asyncio.Lock` gives the coroutines in `async_locks.py`.
 
@@ -2054,7 +2054,7 @@ The interpreter pool keeps all five workers in one process.
 
 `asyncio` handles I/O-bound work.
 Processes and subinterpreters handle CPU-bound work.
-With both halves covered, does new code ever need threads?
+With both halves covered, does new code still need threads?
 
 It does, but not for the reason threads were once the default choice.
 [I/O-Bound vs CPU-Bound](#io-bound-vs-cpu-bound)
@@ -2174,7 +2174,7 @@ then restores it, so the measurement leaves the rest of the program untouched.
 The listing stipulates that stack figure instead of measuring it:
 `STACK_SIZE` is a constant the code sets and reads back,
 standing for a common one-mebibyte default,
-not a number the OS reports for a thread that actually ran.
+not a number the OS reports for a thread that ran.
 A single thread's reserved stack,
 paid before it runs one line of its target function,
 could instead hold hundreds of suspended tasks.
@@ -2495,7 +2495,7 @@ Here are a few of the topics beyond it:
   (STM):** Runs a block of code as an atomic transaction against shared memory,
   retrying automatically if another thread interferes.[^stm-status]
 - **Memory models and data races:** Define which writes by one thread another thread sees for certain,
-  and what happens when two threads touch the same memory with no synchronization between them.
+  and what the language guarantees when two threads touch the same memory with no synchronization between them.
 
 ## Exercises
 
@@ -2517,7 +2517,7 @@ give a hint, usually the shape of the code, and a full answer for each exercise.
     Run it through `run()` and predict its `meter.peak` before checking:
     is it closer to the I/O peak or the CPU peak?
 4.  In `peak_concurrency.py`,
-    change `io_price()`'s `await asyncio.sleep(0.05)` to `time.sleep(0.05)` and predict what happens to its `meter.peak` before running it.
+    change `io_price()`'s `await asyncio.sleep(0.05)` to `time.sleep(0.05)` and predict how its `meter.peak` changes before running it.
     Explain the result using `blocking_the_loop.py`.
 5.  In `async_locks.py`,
     replace `lock = asyncio.Lock()` with `semaphore = asyncio.Semaphore(1)`,

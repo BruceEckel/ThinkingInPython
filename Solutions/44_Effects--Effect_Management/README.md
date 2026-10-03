@@ -5,7 +5,7 @@
 > Write the production bindings for `ask_tell.py`:
 > a `Console` class whose `ask()` calls `input()` and whose `tell()` calls `print()`,
 > and run `greet(Console(), Console())` interactively.
-> Confirm `greet()` itself requires no change:
+> Confirm `greet()` requires no change:
 > serving a new context without edits is what delayed binding provides.
 
 <details>
@@ -438,7 +438,7 @@ it. Only the division remains.
 
 **Fail at the construction site.** The cost moves rather than vanishing. `PositiveInt(bad)` still raises
 an exception, at the boundary where an untrusted number enters the
-program, and a caller reading from a file or a form still has to
+program, and a caller reading from a file or a form must still
 handle it. The count changes: one construction site instead of every
 function that touches the value. Every function downstream of a
 `PositiveInt` is pure with respect to this failure, and none of them
@@ -571,7 +571,7 @@ an event loop, and that choice sounds like late binding until you ask
 what it lets you swap. Choosing a loop does not let a test substitute
 a different meaning for the awaits inside: you settle what those
 awaits mean when you write the coroutine. A test that needs fake
-prices still has to inject `price_of_async` itself, by the same
+prices must still inject `price_of_async`, by the same
 hand-threading this chapter's exercise 2 measures. The event loop is a
 scheduler, not a handler.
 

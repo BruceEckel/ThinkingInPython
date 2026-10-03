@@ -455,9 +455,9 @@ one-liner is shorter and has no block. For a small file read in one
 go, the one-liner is the better choice, and the chapter names `read_text()` and
 `write_text()` for that case.
 
-The `with` form gives you control over what happens between the open
-and the close. Two things follow from that control. The `with` form
-hands you the file object, so you can iterate lazily, line by line,
+The `with` form gives you control over the code between the open and
+the close. Two things follow from that control. The `with` form hands
+you the file object, so you can iterate lazily, line by line,
 without the whole file in memory. `read_text()` builds one string of
 the entire contents before you see any of it. The `with` form also
 lets several operations share one open file, while each `read_text()`

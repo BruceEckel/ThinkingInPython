@@ -309,7 +309,7 @@ with expected(AttributeError):
 ```
 
 **Remove the shadow.** `del a.x` removes the entry from the instance dictionary, which is
-the only place assignment ever writes. `vars(a)` is empty again, and
+the only place assignment writes. `vars(a)` is empty again, and
 `a.x` reads `100`, because the lookup falls back to the class the
 way it did before any assignment. The class attribute keeps its `100`
 throughout: the assignment and the `del` both stay on the instance.
@@ -589,7 +589,7 @@ class depends on its callers to keep it.
 
 [`type(self)` Forks the Counter](../../Chapters/09_Foundations--Class_Attributes.md#typeself-forks-the-counter) shows the first `Sub()` writing a new `total` into `Sub`'s own dictionary.
 Print `vars(Sub).get("total")` at each step and watch when the entry appears.
-For the second half, naming `Base` in the increment sends every write to `Base`'s dictionary, so predict whether `Sub` ever gets an entry.
+For the second half, naming `Base` in the increment sends every write to `Base`'s dictionary, so predict whether `Sub` gets an entry.
 
 <details>
 <summary>The shape</summary>

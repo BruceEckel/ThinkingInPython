@@ -197,7 +197,7 @@ Generator[Need[Console] | KeyError, Any, None]
 ```
 
 `A` and `E` share the first type parameter, and `R` is the third.
-Nothing in the union itself tells a request from a failure;
+Nothing in the union tells a request from a failure;
 two bounds on the library's type variables do that instead.
 `A`'s bound is `Ability[Any]`, and `E`'s bound is `Exception`.
 The two bounds do not exclude each other:
@@ -1519,7 +1519,7 @@ def announce(
 it needs a `Console`, can fail with `KeyError`, and produces nothing.
 If you drop the `KeyError` from the annotation,
 the type checker points at the `yield from score(name)` line.
-Every function on the path has to declare it.
+Every function on the path must declare it.
 
 ### Declaring Is Not Handling
 
@@ -1645,7 +1645,7 @@ Wrapping it in `supply(Console())` is enough to send the `KeyError` past the `ex
 `catch_score.py`, ahead in [Turning an Error Into a Value](#turning-an-error-into-a-value),
 has the identical shape: `supply()` wraps a function `run()` drives.
 The `catch()` there still works,
-because it matches the yielded value itself rather than relying on the driver to throw it back in.
+because it matches the yielded value rather than relying on the driver to throw it back in.
 
 ## Turning an Error Into a Value
 

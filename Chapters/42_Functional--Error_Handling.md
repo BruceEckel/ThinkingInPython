@@ -363,7 +363,7 @@ whereas `sum_type.py` at the start of this chapter keeps every result in a list.
 `bind()` is the sequence `composing.py` repeats at every step, written once.
 Look again at the two `bind()` methods in `result.py`.
 On an `Ok`, `bind()` passes the answer to the next function.
-On an `Err`, `bind()` skips the function and returns the `Err` itself,
+On an `Err`, `bind()` skips the function and returns the `Err`,
 the same failure.
 The two signatures differ because `Err` holds no answer to pass to the next step.
 `Err.bind()` therefore accepts a callable with any parameter list,

@@ -272,7 +272,7 @@ span, not on where it sits relative to the computation.
 ## 4. Blocking inside a coroutine
 
 > In `peak_concurrency.py`,
-> change `io_price()`'s `await asyncio.sleep(0.05)` to `time.sleep(0.05)` and predict what happens to its `meter.peak` before running it.
+> change `io_price()`'s `await asyncio.sleep(0.05)` to `time.sleep(0.05)` and predict how its `meter.peak` changes before running it.
 > Explain the result using `blocking_the_loop.py`.
 
 <details>
@@ -1358,7 +1358,7 @@ The deadlock version makes the waiting circular: task one holds
 waits for `lock_a`, so each task's progress depends on the other task's
 progress. A deadlock is that cycle. Acquiring the
 locks in one global order makes such a cycle impossible. A task can only
-ever wait on a lock that comes later in the order than every lock it
+wait on a lock that comes later in the order than every lock it
 holds, and "later" never loops back to "earlier."
 
 </details>
