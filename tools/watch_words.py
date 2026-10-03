@@ -1,23 +1,30 @@
 #!/usr/bin/env python
 """Report the author's "words and phrases to watch" in prose.
 
-The global style guide keeps two lists of words that are usually a
+The global style guide keeps three lists of words that are usually a
 defect. Tier 3 ("Don't use") is metaphor standing in for a literal
 statement: `ships`, `lands`, `fuse`, `load-bearing`, `part ways`,
 `rides on`, `near-miss`, `the way out`, `in the first place`, `wants`,
 `spelling`. Tier 2 ("Avoid if possible") is a word that must earn its
 place: `already`, `even`, `honest`, `buy`, `hooks`, `never`, `anyway`,
-`at all`, `promise`. A Tier 3 hit is a defect to fix unless a human
-reads it as literal ("a person wants a refund"); a Tier 2 hit is kept
-where the word changes the meaning.
+`at all`, `promise`. Tier 1 ("Consider rewriting") is a word with
+legitimate uses that the author checks every time: `happen`, `is what`,
+`and nothing else`, `nothing more`, `nothing but`, `does it`, `ever`,
+`only`, `exactly`, `has to` (with `have to` and `had to`), `actually`,
+`itself`, `was to`, `used to`. A Tier 3 hit is a defect to fix unless a
+human reads it as literal ("a person wants a refund"); a Tier 2 hit is
+kept where the word changes the meaning; a Tier 1 hit is a prompt to
+try a rewrite, and most stay.
 
 The check reuses the prose walk of `tools.stranded_prepositions`:
 fenced listings, headings, block quotes, tables, HTML lines, link
 definitions, and `#:` lines are skipped, inline code spans become the
 placeholder `CODE`, and links lose their targets. It matches whole
 words and phrases, case-insensitively, so `relationship` is not
-`ship` and `landscape` is not `land`. Two words carry a literal sense
-that is not flagged: `even` in the arithmetic sense ("even number",
+`ship` and `landscape` is not `land`. `ever` matches as a word of its
+own, so `never`, `every`, `however`, and `forever` do not count. Two
+words carry a literal sense that is not flagged: `even` in the
+arithmetic sense ("even number",
 "odd and even", "even integer"), and `hook` within four words of
 `pre-commit`, `git`, `SessionStart`, `Claude`, or `hooks.py`, or
 before `module`.
@@ -28,21 +35,31 @@ line of the word. Report-only: it prints and exits 0. `--fail` exits 1
 when a NEW Tier 3 hit is found; Tier 2 alone never fails. `--tier 3`
 prints only Tier 3.
 
+Tier 1 is advisory. Its hits are numerous and mostly fine, so a
+default run never prints them, and they never count toward `new` or
+`--fail`. `--all` prints them marked `[T1]`, `--tier 1` prints them
+alone, and either adds a `c T1` count to the summary. `--accept`
+leaves them out of the baseline; `--accept --tier 1` baselines only
+the Tier 1 hits.
+
 Every hit a human judges a keep lives in
 `tools/data/watch_words_baseline.txt`, so a run prints only what is
 new. An entry is `path<TAB>word: clause`, whitespace normalized and no
 line number, so a reflow leaves it alone and an edit to the clause
 retires it. An entry is a judged keep, not an exemption from the rule.
 The default run prints each NEW hit, a `stale` entry that matches no
-hit any more, and a summary (`N new (a T3, b T2), M accepted`).
+hit any more, and a summary (`N new (a T3, b T2), M accepted`; with
+Tier 1 shown, `N new (a T3, b T2, c T1), M accepted`).
 `--all` prints every hit, marked NEW or accepted. `--accept` appends
-every NEW hit to the baseline and drops the stale entries. A run
+every NEW Tier 2 and Tier 3 hit to the baseline and drops the stale
+entries. A run
 given paths compares against those files' entries alone, and refuses
 `--accept`.
 
     uv run python -m tools.watch_words          # new hits
     uv run python -m tools.watch_words --all    # every hit
     uv run python -m tools.watch_words --tier 3 # Tier 3 only
+    uv run python -m tools.watch_words --tier 1 # advisory Tier 1
     uv run python -m tools.watch_words --accept # judged keeps
     uv run tip watch-words CH=30
     uv run tip watch-words-accept
@@ -79,6 +96,20 @@ HEADER: Final = (
 RULES: Final[tuple[tuple[int, re.Pattern[str]], ...]] = tuple(
     (tier, re.compile(rf"\b(?:{pattern})\b", re.IGNORECASE))
     for tier, pattern in [
+        (1, r"happen(?:s|ed|ing)?"),
+        (1, r"is what"),
+        (1, r"and nothing else"),
+        (1, r"nothing more"),
+        (1, r"nothing but"),
+        (1, r"does it"),
+        (1, r"ever"),
+        (1, r"only"),
+        (1, r"exactly"),
+        (1, r"(?:has|have|had) to"),
+        (1, r"actually"),
+        (1, r"itself"),
+        (1, r"was to"),
+        (1, r"used to"),
         (3, r"in the first place"),
         (3, r"ships?|shipped|shipping"),
         (3, r"lands?|landed|landing"),
@@ -178,16 +209,18 @@ def main(argv: list[str] | None = None) -> int:
                     help="exit 1 when any NEW Tier 3 hit is found")
     ap.add_argument("--all", action="store_true",
                     help="print every hit, marked NEW or accepted")
-    ap.add_argument("--tier", type=int, choices=(2, 3),
-                    help="print only this tier")
+    ap.add_argument("--tier", type=int, choices=(1, 2, 3),
+                    help="print only this tier (1 is advisory)")
     ap.add_argument("--accept", action="store_true",
-                    help="add the NEW hits to the baseline and drop "
-                         "stale entries")
+                    help="add the NEW Tier 2 and 3 hits (with --tier "
+                         "1, the Tier 1 hits) to the baseline and "
+                         "drop stale entries")
     args = ap.parse_args(argv)
     if args.paths and args.accept:
         ap.error("--accept rewrites the whole baseline; give no paths")
-    if args.tier and args.accept:
-        ap.error("--accept covers both tiers; give no --tier")
+    if args.accept and args.tier in (2, 3):
+        ap.error("--accept covers Tiers 2 and 3; give no --tier, "
+                 "or --tier 1")
     paths = md_files(args.paths or [ROOT / "Chapters", ROOT / "Solutions"])
     shown_paths = {display(p) for p in paths}
     found = sorted(
@@ -200,13 +233,17 @@ def main(argv: list[str] | None = None) -> int:
     current = {key(s, w, c) for s, _, _, w, c in found}
     stale = sorted(scope - current)
     if args.accept:
-        added = {key(s, w, c) for s, _, _, w, c in found
-                 if key(s, w, c) not in baseline}
+        added = {key(s, w, c) for s, _, t, w, c in found
+                 if (t == 1) == (args.tier == 1)
+                 and key(s, w, c) not in baseline}
         write_baseline((baseline - set(stale)) | added, BASELINE)
         print(f"Baseline: added {len(added)}, dropped {len(stale)} "
               f"stale, in {display(BASELINE)}")
         return 0
-    shown = [h for h in found if not args.tier or h[2] == args.tier]
+    show_t1 = args.all or args.tier == 1
+    shown = [h for h in found
+             if (h[2] == args.tier if args.tier
+                 else show_t1 or h[2] != 1)]
     new = [h for h in shown if key(h[0], h[3], h[4]) not in baseline]
     for path, line, tier, word, clause in shown:
         accepted = key(path, word, clause) in baseline
@@ -217,8 +254,12 @@ def main(argv: list[str] | None = None) -> int:
     for entry in stale:
         path, rest = entry.split("\t", 1)
         print(f"stale    {path}: {rest}")
-    t3 = sum(1 for h in new if h[2] == 3)
-    print(f"{len(new)} new ({t3} T3, {len(new) - t3} T2), "
+    count = {t: sum(1 for h in new if h[2] == t) for t in (1, 2, 3)}
+    t3 = count[3]
+    tiers = f"{t3} T3, {count[2]} T2"
+    if show_t1:
+        tiers += f", {count[1]} T1"
+    print(f"{len(new)} new ({tiers}), "
           f"{len(shown) - len(new)} accepted"
           + (f", {len(stale)} stale" if stale else ""))
     return 1 if args.fail and t3 else 0

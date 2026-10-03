@@ -171,3 +171,82 @@ def test_tier_filter(
     assert main([str(path), "--tier", "3"]) == 0
     out = capsys.readouterr().out
     assert "[T3]" in out and "[T2]" not in out
+
+
+T1_TEXT = "The value is only set once.\n"
+
+
+def test_tier_1_words() -> None:
+    words = [h[2] for h in hits(
+        "It may happen. That is what it does. It used to work. "
+        "She had to go. It runs exactly once, itself.")]
+    assert sorted(words) == sorted([
+        "happen", "is what", "used to", "had to", "exactly", "itself"])
+
+
+@pytest.mark.parametrize("text", [
+    "The tool never stops.",
+    "Every call returns.",
+    "However, the call returns.",
+    "Whatever, whenever, wherever, forever.",
+])
+def test_ever_is_a_whole_word(text: str) -> None:
+    assert [h for h in hits(text) if h[2] == "ever"] == []
+
+
+def test_ever_matches_alone() -> None:
+    assert [h[2] for h in hits("Does it ever stop?")] == [
+        "does it", "ever"]
+
+
+def test_tier_1_hidden_by_default_shown_with_all_and_tier_1(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str],
+) -> None:
+    path = tmp_path / "a.md"
+    path.write_text(T1_TEXT, encoding="utf-8")
+    assert main([str(path)]) == 0
+    out = capsys.readouterr().out
+    assert "[T1]" not in out
+    assert "0 new (0 T3, 0 T2), 0 accepted" in out
+    assert main([str(path), "--all"]) == 0
+    out = capsys.readouterr().out
+    assert "[T1] only" in out
+    assert "1 new (0 T3, 0 T2, 1 T1), 0 accepted" in out
+    assert main([str(path), "--tier", "1"]) == 0
+    out = capsys.readouterr().out
+    assert "[T1] only" in out
+    assert "1 new (0 T3, 0 T2, 1 T1), 0 accepted" in out
+
+
+def test_fail_ignores_tier_1(tmp_path: Path) -> None:
+    path = tmp_path / "a.md"
+    path.write_text(T1_TEXT, encoding="utf-8")
+    assert main([str(path), "--fail", "--all"]) == 0
+    assert main([str(path), "--fail", "--tier", "1"]) == 0
+
+
+def test_accept_leaves_tier_1_unaccepted(
+    book: Path, capsys: pytest.CaptureFixture[str],
+) -> None:
+    book.write_text(f"{CLAUSE}. The value is only set.\n",
+                    encoding="utf-8")
+    assert main(["--accept"]) == 0
+    assert load_baseline(baseline_of(book)) == {entry(book)}
+    capsys.readouterr()
+    assert main(["--tier", "1"]) == 0
+    out = capsys.readouterr().out
+    assert "NEW" in out and "[T1] only" in out
+
+
+def test_accept_tier_1_accepts_only_tier_1(book: Path) -> None:
+    book.write_text(f"{CLAUSE}. The value is only set.\n",
+                    encoding="utf-8")
+    assert main(["--accept", "--tier", "1"]) == 0
+    assert load_baseline(baseline_of(book)) == {
+        entry(book, "The value is only set", "only")}
+    assert main(["--accept", "--tier", "1"]) == 0
+
+
+def test_accept_refuses_tier_3(book: Path) -> None:
+    with pytest.raises(SystemExit):
+        main(["--accept", "--tier", "3"])

@@ -406,7 +406,8 @@ def watch_words(v: Vars) -> None:
     """Report prose uses of the words the style guide says to cut
     (Tier 3: ships, lands, wants) or to weigh (Tier 2: already, even,
     never). It reports and never gates; `tip prose` runs it after the
-    stranded scan. CH= picks one chapter; hits judged keeps live in
+    stranded scan. Tier 1 (only, itself, actually) is advisory and
+    prints only with ARGS=--all or ARGS="--tier 1". CH= picks one chapter; hits judged keeps live in
     tools/data/watch_words_baseline.txt; ARGS=--all lists every hit,
     ARGS="--tier 3" only Tier 3, ARGS=--fail exits 1 on a new Tier 3 hit.
     """
