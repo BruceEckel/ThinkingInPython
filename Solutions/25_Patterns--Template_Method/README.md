@@ -398,7 +398,7 @@ where the timing of a hidden step makes the difference.
 > Subclass `ApplicationFramework` and override `run()` with a version that calls `customize2()` before `customize1()`.
 > Run it, then run `ty` over it.
 > Which of the two, Python or the type checker, objects to the change?
-> What does that tell you about where the anchored algorithm's guarantee comes from?
+> What does that tell you about the source of the anchored algorithm's guarantee?
 
 <details>
 <summary>Where to look</summary>
@@ -519,7 +519,7 @@ before anyone constructs an instance.
 <summary>Where to look</summary>
 
 [Substitutability](../../Chapters/25_Patterns--Template_Method.md#substitutability) shows a subclass that type-checks yet breaks the algorithm the base class anchors.
-Write one subclass whose `customize1()` raises an exception, and one that keeps the `...` default for a step the flow depends on.
+Write one subclass whose `customize1()` raises an exception, and one that keeps the `...` default for a step on which the flow depends.
 The base class can declare a step mandatory with `ABC` and `@abstractmethod`.
 Consider which of the two failures any declaration available in Python could expose.
 
@@ -649,7 +649,7 @@ enforcing it stays where the chapter leaves it: with you.
 
 > In `near_miss.py`, subclass `MyApp` with a class that adds a method named `reports()`.
 > Predict what the `class` statement does, then run it.
-> Which names does `__init_subclass__()` compare a new method against?
+> Against which names does `__init_subclass__()` compare a new method?
 > Change the check so it compares a new method only against the names `ApplicationFramework` defines.
 > What does the narrower check no longer catch?
 

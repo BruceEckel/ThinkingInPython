@@ -107,7 +107,7 @@ it raises an exception when a subclass replaces a function that carries `__final
 ### Hooks and the Misspelled Override
 
 The step methods default to `...`,
-so a subclass overrides only the steps it cares about,
+so a subclass overrides only the steps that matter to it,
 and a forgotten step silently does nothing.
 This kind of optional step is a *hook*.
 The `setUp()` and `tearDown()` in the opening example are hooks.
@@ -453,7 +453,7 @@ give a hint, usually the shape of the code, and a full answer for each exercise.
 3.  Subclass `ApplicationFramework` and override `run()` with a version that calls `customize2()` before `customize1()`.
     Run it, then run `ty` over it.
     Which of the two, Python or the type checker, objects to the change?
-    What does that tell you about where the anchored algorithm's guarantee comes from?
+    What does that tell you about the source of the anchored algorithm's guarantee?
 4.  Write two subclasses of `ApplicationFramework` that both type-check but break the anchored algorithm:
     one whose `customize1()` raises an exception the base never raises,
     and one that leaves `customize2()` at its `...` default when the flow depends on it.
@@ -461,6 +461,6 @@ give a hint, usually the shape of the code, and a full answer for each exercise.
     What must be true of the base class for the type checker to catch either one?
 5.  In `near_miss.py`, subclass `MyApp` with a class that adds a method named `reports()`.
     Predict what the `class` statement does, then run it.
-    Which names does `__init_subclass__()` compare a new method against?
+    Against which names does `__init_subclass__()` compare a new method?
     Change the check so it compares a new method only against the names `ApplicationFramework` defines.
     What does the narrower check no longer catch?

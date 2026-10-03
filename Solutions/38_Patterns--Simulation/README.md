@@ -111,11 +111,10 @@ def test_rat_keeps_one_claim_and_spawns_the_rest() -> None:
 `claim()`, `spawn()`, `log()`, and `next_number()`, and none of the
 four touches a real `Maze` or `asyncio.create_task()`.
 
-**Script the rat's choices.** Scripting
-`claim()`'s return values in a fixed sequence decides which neighbor
-the rat keeps for itself and which cells it spawns new rats into: the
-first cell the loop finds open, `(0, -1)`, and every open one after
-that, here `(1, 0)` alone.
+**Script the rat's choices.** Scripting `claim()`'s return values in a
+fixed sequence decides which neighbor the rat keeps for itself and
+into which cells it spawns new rats: the first cell the loop finds
+open, `(0, -1)`, and every open one after that, here `(1, 0)` alone.
 
 **Stop the rat when the script ends.** Once the script runs out, `claim()` answers
 `False` to everything, so the rat dead-ends on its second turn and

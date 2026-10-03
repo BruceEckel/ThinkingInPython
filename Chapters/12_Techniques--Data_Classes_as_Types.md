@@ -100,7 +100,7 @@ and the type system is no help.
 The `int` annotation says "any integer," which is not what you mean.
 Checking the argument also says nothing about the result: `f1(6)` returns 11,
 which no rating may be.
-`f3()` is what forgetting looks like.
+`f3()` shows a forgotten check.
 `11` is not a legal rating, and nothing objects: not the annotation,
 not the type checker, not the running program.
 `f3(11)` returns 1100, a number that no rating can produce,

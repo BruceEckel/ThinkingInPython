@@ -505,7 +505,7 @@ no additional code in `from_json()`.
 <details>
 <summary>Where to look</summary>
 
-[Defining `__replace__()`](../../Chapters/12_Techniques--Data_Classes_as_Types.md#defining-replace) shows the method that `copy.replace()` looks for.
+[Defining `__replace__()`](../../Chapters/12_Techniques--Data_Classes_as_Types.md#defining-replace) shows the method that `copy.replace()` calls.
 In an ordinary class, write `__replace__()` so it merges the current field values with the keyword changes and calls the class constructor.
 Because the rebuild goes through `__init__()`, the check runs on the replacement.
 
@@ -614,7 +614,7 @@ stays validated across a replacement for the same reason. Any
 
 [A Real `ClassVar`](../../Chapters/12_Techniques--Data_Classes_as_Types.md#d-a-real-classvar) shows how `@dataclass` treats an annotation marked `ClassVar`.
 It skips that name when it builds the fields and the `__init__()` parameters, so check `fields()` and `inspect.signature()`.
-For the frozen question, compare what `Stars.built += 1` assigns to against what `self.built += 1` assigns to, and which of the two `frozen=True` guards (see [Immutability](../../Chapters/12_Techniques--Data_Classes_as_Types.md#immutability)).
+For the frozen question, compare the target of `Stars.built += 1` with the target of `self.built += 1`, and which of the two `frozen=True` guards (see [Immutability](../../Chapters/12_Techniques--Data_Classes_as_Types.md#immutability)).
 
 <details>
 <summary>The shape</summary>

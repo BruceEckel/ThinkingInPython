@@ -2281,7 +2281,7 @@ Consider the signatures once more:
   through something supplied later.
 - `Effect[Need[Console], KeyError, None]`: prints, might not find the name.
 
-Each one describes what a function depends on, what it can produce,
+Each one describes what a function needs, what it can produce,
 and how it can fail, before you read a single line of the body.
 That is the property this book has returned to since [Foundations](40_Functional--Foundations.md#pure-functions).
 Purity is valuable because it is verifiable,

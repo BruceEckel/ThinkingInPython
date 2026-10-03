@@ -627,12 +627,13 @@ that was never subscribed. Whether that case should be silent or loud
 is a design decision: silent matches the bus's habit of letting an
 unmatched event pass without complaint.
 
-**Walk the ancestry, most specific first.** `type(event).__mro__` already runs from the class outward to `object`,
-so iterating it in order calls the most specific handlers first and the
-inherited ones after. That order is what "parents last" asks for.
-`publish()` keeps using `.get()` for the same reason the chapter gives:
-indexing a `defaultdict` on a read inserts an empty list for every
-class in every published event's MRO, `object` included.
+**Walk the ancestry, most specific first.** `type(event).__mro__`
+already runs from the class outward to `object`, so iterating it in
+order calls the most specific handlers first and the inherited ones
+after. That order meets the "parents last" requirement. `publish()`
+keeps using `.get()` for the same reason the chapter gives: indexing
+a `defaultdict` on a read inserts an empty list for every class in
+every published event's MRO, `object` included.
 
 Adding `unsubscribe()` cannot break an existing caller, since code that
 never calls it behaves as before. The MRO walk can.

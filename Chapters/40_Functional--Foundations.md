@@ -5,7 +5,7 @@
 
 This chapter begins the book's exploration of functional programming.
 The ideas are useful before you learn their names.
-A pure function cannot corrupt state you forgot about.
+A pure function cannot corrupt state you overlooked.
 A bug in a pure function reproduces from the arguments alone,
 and the function needs no mock or fixture to test.
 A cache from `functools`, or a sliding window from `itertools`,

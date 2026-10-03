@@ -140,7 +140,7 @@ express those differing roles better.
 ### Two List Traps
 
 Two list operations produce surprises.
-`*` repeats a reference rather than copying what it points at,
+`*` repeats a reference rather than copying the object it references,
 so a grid built that way has one row under three names:
 
 ```python

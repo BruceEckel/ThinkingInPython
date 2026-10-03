@@ -236,7 +236,7 @@ for n in [1, 2, 3]:  # Printing alone stays a loop
 always `None`, so the list it builds is worthless and the brackets
 mislead the reader. Giving the output expression something to return
 fixes both: `show()` prints and hands back the line, so `lines` holds
-the three strings a caller can assert on, write to a file, or join.
+the three strings a caller can check, write to a file, or join.
 
 **Choose the shape by the result.** Which shape is right depends on whether you want the list. Here the
 comprehension is correct, because `lines` is the point and the printing

@@ -12,7 +12,7 @@ Science has theories that fit the data, are predictive, and are falsifiable.
 If "computer science" is to live up to its name,
 some of its ideas and practices should fit that definition,
 and perhaps some should even be mathematically provable.
-This seems to me to be the broader challenge that functional programming takes on.
+This seems to me to be the broader challenge that functional programming tackles.
 
 The preceding chapters build the machinery.
 [Foundations](40_Functional--Foundations.md)
@@ -243,7 +243,7 @@ You decide how far up the spectrum to go.
 
 1. The first rung, local reasoning, takes the least work.
    Pure functions and immutable values let you understand one piece at a time,
-   with no hidden state to keep track of.
+   with no hidden state to track.
    Most code needs no more.
 2. Next are tests over chosen examples,
    the subject of [Testing](11_Techniques--Testing.md).
@@ -473,7 +473,8 @@ usually the shape of the code, and a full answer for each exercise.
     Then add the oracle property that `sorted(xs)` agrees with a hand-written insertion sort on short lists.
 4.  State a law that is false and watch Hypothesis falsify it:
     `@given(strategies.text())` with `assert s.upper().lower() == s.lower()`.
-    Report the counterexample Hypothesis shrinks to, run the test a few times,
+    Report the counterexample Hypothesis finds after shrinking,
+    run the test a few times,
     deleting the `.hypothesis/` directory before each run,
     to see which characters Hypothesis reports,
     and explain what those characters reveal about Unicode case mapping.

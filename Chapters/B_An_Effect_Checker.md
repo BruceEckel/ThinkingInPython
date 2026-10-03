@@ -315,7 +315,7 @@ An attribute is either a path through an import, such as `time.sleep`,
 or a method on a receiver.
 `type_of()` finds the receiver's type where the source makes it evident:
 a string constant, one of the literals in `LITERALS`,
-a variable the scope has a type for, or a call,
+a variable whose type the scope records, or a call,
 which takes its callee's name as its type.
 `p = Path(name)` therefore gives `p` the type `pathlib.Path`,
 and `p.read_text()` becomes `pathlib.Path.read_text`,

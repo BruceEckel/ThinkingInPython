@@ -196,7 +196,7 @@ def test_agrees_with_insertion_sort(xs: list[int]) -> None:
 how weak. A function that ignores its argument and returns `[]` passes
 `test_output_is_ordered()` on every input, and so does one that returns
 the first element alone. "Ordered" says nothing about the elements
-being the same ones you handed in.
+being the same ones you supplied.
 
 **Check that repeating changes nothing.** Idempotence is weaker still on its own: the same `[]`-returning
 function passes it too. Idempotence buys a different kind of check,
@@ -222,7 +222,8 @@ bugs it catches show up on short inputs.
 
 > State a law that is false and watch Hypothesis falsify it:
 > `@given(strategies.text())` with `assert s.upper().lower() == s.lower()`.
-> Report the counterexample Hypothesis shrinks to, run the test a few times,
+> Report the counterexample Hypothesis finds after shrinking,
+> run the test a few times,
 > deleting the `.hypothesis/` directory before each run,
 > to see which characters Hypothesis reports,
 > and explain what those characters reveal about Unicode case mapping.

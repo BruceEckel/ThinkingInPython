@@ -437,7 +437,7 @@ print(list(islice(range(10), 2, 8, 2)))
 Two differences from a list slice.
 `islice()` rejects negative indices with a `ValueError`,
 since a negative index counts from an end the iterable may never reach.
-And it consumes what it passes over.
+And it consumes every element it passes.
 An iterator you pass to `islice()` resumes where the slice stopped;
 a list slice leaves the list as it was.
 
@@ -754,8 +754,7 @@ print(list(product("AB", repeat=2)))
 `combinations()` treats those as the same draw and keeps one,
 and keeping one is right when you want each pair of distinct elements once.
 `combinations_with_replacement()` also ignores order,
-but draws from the full input each time,
-and that repeated draw is where `AA` comes from.
+but draws from the full input each time, and that repeated draw produces `AA`.
 `product()` with `repeat=` is the fourth combination of answers:
 order matters and elements repeat, so it yields all four pairs.
 
@@ -1067,7 +1066,7 @@ print(next(group_rounds(["Ana", "Bo"], 5)))
 A roster smaller than one full group is the extreme case of joining instead of sitting out.
 In `group_rounds()`,
 the `while len(pool) >= size` loop exits at once and leaves `groups` empty.
-The `if pool and not groups` line then creates the one group the leftovers fold into.
+The `if pool and not groups` line then creates the one group into which the leftovers fold.
 If you delete that line,
 `min()` receives an empty sequence and raises a `ValueError`.
 Two students and a requested size of five produce one group of two,

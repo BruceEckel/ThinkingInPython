@@ -226,7 +226,7 @@ The code at the bottom of the file builds a `MouseTrap` and runs it through the 
 
 Each `next()` is a `match` on the event:
 a `case` for every input the state recognizes,
-and a `case _` that returns the state the machine is in.
+and a `case _` that returns the machine's current state.
 Each `case` names its member through the class, as in `MouseAction.APPEARS`.
 A dotted name compares the event with that member,
 while a bare `APPEARS` would be a capture pattern that matches every event
@@ -238,7 +238,7 @@ By the time anything calls `next()`,
 the whole module has run and `MouseTrap` exists.
 
 `StateMachine`'s constructor runs the initial state,
-the construction-starts-the-engine choice that [*Template Method* warns against](25_Patterns--Template_Method.md#dont-start-the-engine-in-the-constructor).
+the construction-starts-the-engine choice that [*Template Method* discourages](25_Patterns--Template_Method.md#dont-start-the-engine-in-the-constructor).
 Two facts make that choice safe here:
 `MouseTrap.__init__()` assigns nothing after its `super().__init__()` call,
 and no state's `run()` reads anything off the machine.
@@ -1000,7 +1000,7 @@ give a hint, usually the shape of the code, and a full answer for each exercise.
     Give one `(state, input)` pair two rows told apart by a condition,
     such as a load too heavy for the fast spin.
     Then press `Start` in the middle of a cycle,
-    an input that state has no row for,
+    an input for which that state has no row,
     and decide what the caller does with the `NoTransition`:
     ignore the press or stop the machine.
     Say which policy suits a washing machine, and why.

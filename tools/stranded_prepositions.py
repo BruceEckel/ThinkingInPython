@@ -76,7 +76,7 @@ IDIOMS: Final[frozenset[str]] = frozenset("""
     so-on then-on early-on later-on as-before left-behind left-over
     built-in in-between outside-in inside-out back-in all-along
     twice-over and-over over-and-over fall-through falls-through
-    fell-through moves-on move-on moved-on live-on lives-on carries-over
+    fell-through moves-on move-on moved-on carries-over
     carry-over carried-over passed-in compiled-in baked-in locked-in
     logged-in signed-in opted-in checked-in cleanup-after here-on
     and-after everything-after far-along

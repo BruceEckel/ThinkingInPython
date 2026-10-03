@@ -854,7 +854,7 @@ usually the shape of the code, and a full answer for each exercise.
     Its `share()` returns a second list over the same data,
     at the cost of incrementing a reference count,
     and the first `append()` through a shared list copies the data before changing it.
-    Confirm that the two lists share their data before the write and not after.
+    Confirm that the two lists share their data before the write and not after it.
 4.  In `counting_proxy.py`,
     misspell `self._impl` as `self._imp` inside `__getattr__()` and run it.
     Use the fallback-hook behavior this chapter describes to explain why the failure reports as `RecursionError` rather than an `AttributeError` naming the typo.

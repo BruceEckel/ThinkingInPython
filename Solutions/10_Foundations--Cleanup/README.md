@@ -92,11 +92,11 @@ print(other)
 #: []
 ```
 
-**Look through a second name.** `clear()` changes the object every name can see. Rebinding changes
-only which object this one name points at. The two coincide in
-`weak_value.py` because that list has exactly one reference. With
-two references, rebinding leaves the `Counter` objects alive
-and `live_count()` stuck at `3`.
+**Look through a second name.** `clear()` changes the object every
+name can see. Rebinding changes only which object this one name
+references. The two coincide in `weak_value.py` because that list
+has exactly one reference. With two references, rebinding leaves the
+`Counter` objects alive and `live_count()` stuck at `3`.
 
 </details>
 </details>

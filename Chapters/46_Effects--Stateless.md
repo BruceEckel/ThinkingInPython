@@ -1561,7 +1561,7 @@ The generator yields the exception as a value,
 `run()` receives it and calls the generator's `throw()` method,
 and `throw()` raises the exception at the innermost suspended `yield`
 ([`throw()` and `close()` Reach the Innermost Generator](45_Effects--Generators.md#throw-and-close-reach-the-innermost-generator)).
-That `yield` belongs to the Effect the `yield from` delegates to.
+That `yield` belongs to the Effect to which the `yield from` delegates.
 The exception propagates out of that Effect as any raised exception does,
 and the `except` clause around the `yield from` catches it.
 Catching is different from handling: the `KeyError` stays in the channel,

@@ -123,7 +123,7 @@ Two schools of thought exist:
     you can replace the function call with the crash itself, and the program behaves the same.
 
 2.  **Functional**: Exceptions bypass normal control flow,
-    and that bypass makes code difficult to reason about,
+    and that bypass makes it difficult to reason about code,
     so functional programming avoids them altogether.
     A *Total Function* returns errors as data in explicit wrapper types instead of raising them,
     as you saw in [Error Handling](42_Functional--Error_Handling.md).
@@ -419,9 +419,8 @@ and that makes code hard to understand:
 - Does it fail silently, loudly, or not at all?
 
 You cannot answer these questions by reading the function's signature.
-You must read the implementation,
-then trust that you found everything it depends on, everything it changes,
-and everything that might go wrong.
+You must read the implementation, then trust that you found everything it needs,
+everything it changes, and everything that might go wrong.
 In a small codebase you can hold that knowledge in your head.
 In a large one you cannot.
 A function you understand today gets called by a function written next week,
@@ -463,7 +462,7 @@ The first item can stand alone.
 The difference between it and the whole list matters in the chapters that follow.
 *Effect tracking* tells you which Effects a function can perform.
 Tracking alone tells you whether a function is pure,
-and names the kinds of impurity a caller takes on.
+and names the kinds of impurity a caller inherits.
 Effect management is tracking plus the second and third items.
 Once an Effect is an interface and a caller binds the implementation later,
 you can replace what the Effect does without editing the function that performs it.
@@ -835,7 +834,7 @@ and Stateless in Python.
 Stateless builds on generators, so [Generators](45_Effects--Generators.md)
 covers that mechanism first.
 [Stateless](46_Effects--Stateless.md)
-then writes these programs again in the language this book is about,
+then writes these programs again in the language this book teaches,
 and [Stateless in Practice](47_Effects--Stateless_in_Practice.md#abilities-are-not-special)
 rebuilds the `ask`/`tell` pair from [Effects by Hand](#effects-by-hand).
 
@@ -984,7 +983,7 @@ Nobody audits their imports for name collisions anymore.
 The language does the bookkeeping.
 
 The same pattern repeats across the field.
-Version control gave every state of the code a name you can return to,
+Version control gave every state of the code a name to which you can return,
 so experimenting became safe.
 Automated testing moved "does it still work?" from a manual ritual into the build.
 Garbage collection took the tracking of memory ownership out of the programmer's head.
@@ -1007,7 +1006,7 @@ Like every hand-tracked concern before it, this one stops scaling.
 
 An Effect Management System moves the bookkeeping into the type system.
 The function signature answers the questions from [Effect Management Systems](#effect-management-systems):
-what does this function depend on, what does it change, what can go wrong.
+what does this function need, what does it change, what can go wrong.
 The compiler checks every composition,
 comparing each callee's Effects with the caller's declaration at each call.
 The languages that do this today are young,

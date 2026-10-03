@@ -260,7 +260,7 @@ except RuntimeError as e:
 
 `with` calls `__enter__()` at the top of the block and `__exit__()` on the way out,
 and `__exit__()` calls `close()`.
-So `close()` runs at the end of the `with` block, at a line you can point at,
+So `close()` runs at the end of the `with` block, at a line you can identify,
 and the `Socket("B")` block shows `close()` running when the body raises an exception.
 Compare `cleanup.py`,
 where the cleanup runs at an unknowable moment after the program's last statement.
@@ -442,7 +442,7 @@ expect(TypeError, finalize, Slotted("x"), print, "closed")
 
 `__slots__` removes the instance `__dict__` and, by default,
 the `__weakref__` slot along with it,
-so `finalize()` has nothing to attach a reference to.
+so `finalize()` has nowhere to attach a reference.
 Listing `__weakref__` among the slots opts back in.
 
 ## Watching Objects Without Holding Them

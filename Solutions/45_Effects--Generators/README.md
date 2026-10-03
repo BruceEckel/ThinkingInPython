@@ -225,13 +225,14 @@ question it never asks. That is the separation the chapter teaches:
 the generator describes the conversation, and the driver interprets it.
 Swapping one interpreter for another leaves the description untouched.
 
-**Find the answer for each request.** The two drivers differ in the property they rely on. The dictionary
-driver looks each answer up by the request, so it answers correctly in
-whatever order the questions arrive, and it answers a repeated
-question the same way twice. The iterator driver goes by
-position, so it depends on the generator asking the questions for
-which the driver has replies, in that order. Both satisfy the same
-type. The type says what travels, not what the driver knows.
+**Find the answer for each request.** The two drivers differ in the
+property on which they rely. The dictionary driver looks each answer
+up by the request, so it answers correctly in whatever order the
+questions arrive, and it answers a repeated question the same way
+twice. The iterator driver goes by position, so it depends on the
+generator asking the questions for which the driver has replies,
+in that order. Both satisfy the same type. The type says what
+travels, not what the driver knows.
 
 **Keep the two endings apart.** One detail in `drive_in_order()` earns its comment. `next(answers)` sits
 outside the `try` because the `except StopIteration` meant for the

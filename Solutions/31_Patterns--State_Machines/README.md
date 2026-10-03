@@ -127,7 +127,7 @@ print(person.hello())
 `Prozac` needs nothing beyond `Happy` and `Grumpy`'s own shape: one
 `hello()` method. `UnpredictablePerson` never mentions any specific
 mood by name, so a third mood changes only which `Mood` object
-`change_to()` swaps in. `UnpredictablePerson` is the *State*
+`change_to()` installs. `UnpredictablePerson` is the *State*
 surrogate from [*Surrogate*](../../Chapters/26_Patterns--Surrogate.md#state),
 applied to a new domain.
 
@@ -630,7 +630,7 @@ table is the stricter of the two.
 > Give one `(state, input)` pair two rows told apart by a condition,
 > such as a load too heavy for the fast spin.
 > Then press `Start` in the middle of a cycle,
-> an input that state has no row for,
+> an input for which that state has no row,
 > and decide what the caller does with the `NoTransition`:
 > ignore the press or stop the machine.
 > Say which policy suits a washing machine, and why.
@@ -787,12 +787,13 @@ print(busy.state.name, busy.load_kg)
 #: FILLING 3
 ```
 
-**Split one input on a condition.** The `(RINSING, RinseDone)` key holds the two rows the exercise asks
-for, told apart by `too_heavy()`. A load over six kilograms takes the
-slow spin, and anything lighter falls through to the unconditional
-fast-spin row below it. The rest of the cycle
-is a straight line, one event type per state, and the machine is
-still the chapter's `table_machine.py` engine unchanged.
+**Split one input on a condition.** The `(RINSING, RinseDone)` key
+holds the two rows the exercise requires, told apart by
+`too_heavy()`. A load over six kilograms takes the slow spin, and
+anything lighter falls through to the unconditional fast-spin row
+below it. The rest of the cycle is a straight line, one event type
+per state, and the machine is still the chapter's
+`table_machine.py` engine unchanged.
 
 **Record what later conditions need.** A `RinseDone` event carries no data of its
 own, so the condition reads `load_kg` off the machine, where
@@ -980,8 +981,8 @@ passes wins. `above()` and `below()` pick `MOVING_UP` or
 `MOVING_DOWN`, and a call for the current floor falls through both
 conditions to open the doors with no travel.
 
-**Reopen the doors on an obstruction.** The "doors closing" state carries the two rows the exercise asks for,
-the same idiom two wide.
+**Reopen the doors on an obstruction.** The "doors closing" state
+carries the two rows the exercise requires, the same idiom two wide.
 Under `(DOORS_CLOSING, DoorSensor)`, the first row reopens the doors
 when `obstructed()` passes, and the unconditional row below it
 finishes the close in `IDLE`.

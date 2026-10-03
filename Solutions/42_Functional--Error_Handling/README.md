@@ -554,8 +554,8 @@ report(load_setting("timeout", "30").bind(
 
 **Note only the failing path.** The successful call has no note to lose. A successful
 `load_setting()` returns from inside the `try` block, so it never
-reaches `add_note()`, and an `Ok` carries no exception to hang a
-note on. Notes attach to exceptions, so only the failing path
+reaches `add_note()`, and an `Ok` carries no exception on which to
+hang a note. Notes attach to exceptions, so only the failing path
 carries one, and only the failing path has anything to explain.
 
 **Report without a traceback.** Each failure reports the setting that caused it, and the second and

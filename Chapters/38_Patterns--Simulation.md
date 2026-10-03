@@ -407,7 +407,7 @@ The entry has two open neighbors,
 so rat 1 keeps one neighbor and spawns rat 2 at the other.
 `CountingBlackboard` tallies every `claim()` rejected on an open cell.
 Seven of the nine rejections are backtracking:
-each rat tests the cell it came from, once per cell other than the entry,
+each rat tests the cell from which it came, once per cell other than the entry,
 and `len(blackboard.visited) - 1` counts those cells.
 The other two belong to the loop's closing edge, tested from both ends:
 rat 1 dead-ends at `(2, 3)` because rat 2 already claimed `(3, 3)`,
@@ -691,7 +691,7 @@ which tells the type checker the attribute's type and keeps that type `Room` ins
 so code that reads `room` skips the `None` check.
 `GameBuilder` creates the attribute by assigning `robot.room` when it places the robot.
 Reading `room` before then raises an `AttributeError`,
-and the builder runs first, so every read comes after.
+and the builder runs first, so every read comes afterward.
 
 `item_factory()` turns a maze character into an `Item`.
 It searches `Item.__subclasses__()` for a matching `symbol`,

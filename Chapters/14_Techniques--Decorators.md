@@ -926,7 +926,7 @@ def test_registry_looks_up_by_name() -> None:
 A decorator line must sit directly above a `def` or a `class`.
 `@decorator` above a bare assignment, or above a `type` alias,
 is a syntax error rather than a decorator applied to something unusual.
-Past that, `@` places no requirement on the callable it hands over.
+Past that, `@` places no requirement on the callable it passes to the decorator.
 The callable you decorate can come from somewhere other than a `def`:
 
 ```python

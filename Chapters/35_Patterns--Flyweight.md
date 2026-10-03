@@ -188,7 +188,7 @@ The listing shows the object count, not the memory behind it (see exercise 2).
 
 The last two lines call `label()` on one object, the shared water tile,
 and get two answers, because each caller passes in the position.
-The shared object holds what every use agrees on,
+The shared object holds the state common to every use,
 and an operation that depends on the use takes that use's context as an argument.
 The grid holds each cell's position by where it stores the reference.
 Asking "is the cell at row 1, column 5 walkable?" is `field[1][5].walkable`,
@@ -214,7 +214,7 @@ so past the guard `char` is a `Symbol`,
 and `return char` satisfies the declared return type as written.
 The narrowing proves what a [`cast()`](08_Foundations--Static_Types.md#typing-decorators-and-directives)
 asserts.
-Prefer a guard the type checker narrows on.
+Prefer a guard that lets the type checker narrow.
 Keep `cast()` for the cases where no guard exists,
 because the type checker accepts a `cast()` without verifying it.
 

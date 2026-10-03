@@ -322,7 +322,7 @@ only one spelling for the check to match.
 
 [Imports Within a Package](../../Chapters/06_Foundations--Modules_and_Packages.md#imports-within-a-package) shows `module4`'s relative import, and [`PYTHONPATH`](../../Chapters/06_Foundations--Modules_and_Packages.md#pythonpath) describes where Python searches for top-level names.
 A relative import needs the module's `__package__`, and a file run as a script has none.
-An absolute import needs the project root on `sys.path`, which depends on where the first entry comes from.
+An absolute import needs the project root on `sys.path`, which depends on the source of the first entry.
 Compare what `python file.py` and `python -m package.module` put there.
 
 <details>

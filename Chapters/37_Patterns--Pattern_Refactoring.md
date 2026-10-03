@@ -261,7 +261,7 @@ Testing for all of them means you write the type-to-bin lookup by hand.
 
 Readers of [*Composite* and *Interpreter*](34_Patterns--Composite_and_Interpreter.md)
 may expect `assert_never()` to make the type checker report the missed case.
-Exhaustiveness checking needs a *closed* union to compare the cases against,
+Exhaustiveness checking needs a *closed* union against which to compare the cases,
 but `Trash` is deliberately open: the registry exists to accept new subclasses.
 With `case _: assert_never(t)` added,
 the type checker reports the call although the `match` names all four materials,

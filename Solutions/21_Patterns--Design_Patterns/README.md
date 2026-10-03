@@ -62,8 +62,7 @@ def render(rows: list[Row], style: str) -> str:
 The example is a small report writer. It prints plain text, then has
 to emit CSV for a spreadsheet, then JSON for a web front end. Three
 changes along one axis, the output format. Everything else stays put
-through all three: the rows, where they come from, what the numbers
-mean.
+through all three: the rows, their source, what the numbers mean.
 
 Here is the version that survived the first two changes:
 

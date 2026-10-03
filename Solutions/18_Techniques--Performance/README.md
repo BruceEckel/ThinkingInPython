@@ -343,7 +343,7 @@ element.
 > In `slots.py`, add `class Point3D(Point)` that declares no `__slots__` of its own.
 > Confirm that an instance accepts `p.z = 3`,
 > which `Point` rejects with an `AttributeError`,
-> and find where the storage for `z` came from.
+> and find what provides the storage for `z`.
 
 <details>
 <summary>Where to look</summary>
@@ -660,7 +660,7 @@ vectorizing wins where `array` alone does not.
 <details>
 <summary>Where to look</summary>
 
-[Trusting a Measurement](../../Chapters/18_Techniques--Performance.md#trusting-a-measurement) says how to read a `timeit` result, and [Is It Too Slow?](../../Chapters/18_Techniques--Performance.md#is-it-too-slow) says when a difference is worth acting on.
+[Trusting a Measurement](../../Chapters/18_Techniques--Performance.md#trusting-a-measurement) says how to read a `timeit` result, and [Is It Too Slow?](../../Chapters/18_Techniques--Performance.md#is-it-too-slow) says when a difference justifies an optimization.
 Write one function that joins a list of parts and one that concatenates with `+=`, then time both at 10,000 parts and at 100.
 Compare the ratio at each size, and then the absolute time per call.
 
@@ -781,7 +781,7 @@ print(xs)
 **Find the start of the run.** `bisect_left()` finds the first occurrence. It returns the position
 before any equal elements, so `xs[left]` is the target when the
 target is present, which is what a membership test needs and what
-`search_comparison.py` relies on.
+`search_comparison.py` assumes.
 
 **Find the end of the run.** `bisect()`, the alias for `bisect_right()`, returns the position
 after the last equal element. That is the position at which

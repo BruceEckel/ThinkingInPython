@@ -1129,7 +1129,7 @@ and `test_objects_reused_not_recreated()` relies on that.
 `stale` still points at the `Connection` that `second` now legitimately holds.
 Calling `stale.query()` after the first `with` block ended works as if `second` had called it,
 because they are the same object.
-For a mutable pooled resource, that is where corruption comes from:
+For a mutable pooled resource, that is the source of corruption:
 two borrowers each believe they have exclusive use of one connection.
 Guarding against it takes a wrapper that invalidates the borrower's handle on exit,
 one more refinement the `Pool` skeleton leaves out.

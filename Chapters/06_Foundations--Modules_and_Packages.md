@@ -454,7 +454,7 @@ With it, only the listed names arrive,
 and the star import skips `_internal` either way.
 
 The `# noqa: F403` silences the linter's objection to the star import,
-which hides where each name comes from, from a reader and from the tools.
+which hides the source of each name from a reader and from the tools.
 Name what you import,
 and keep the star for experiments at the interactive prompt.
 

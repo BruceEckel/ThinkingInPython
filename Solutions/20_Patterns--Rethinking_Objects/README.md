@@ -138,7 +138,7 @@ the data instead.
 <summary>Where to look</summary>
 
 [The Immutability Solution](../../Chapters/20_Patterns--Rethinking_Objects.md#the-immutability-solution) explains what `frozen=True` generates for a data class.
-Consider which operations it guards: rebinding a field, or changing the object the field refers to.
+Consider which operations it guards: rebinding a field, or changing the object to which the field refers.
 The generated `__hash__()` hashes the field values, so look at what it must hash when one value is mutable.
 
 <details>
@@ -170,9 +170,9 @@ expect(TypeError, hash, immutable)
 
 **Mutate past the frozen field.** The type checker reports nothing, and Python runs the assignment. `frozen=True` on
 `Immutable` blocks rebinding `immutable.bob`. It says nothing about
-the object `bob` refers to, and that object is now a mutable `Bob`.
-The assignment to `name` assigns to no field of `Immutable`, so none
-of the code that `frozen=True` generated runs.
+the object to which `bob` refers, and that object is now a mutable
+`Bob`. The assignment to `name` assigns to no field of `Immutable`,
+so none of the code that `frozen=True` generated runs.
 
 **Check hashability.** The `hash()` failure shows the same shallowness from another side.
 `frozen=True` generates a `__hash__()` that hashes the tuple of field
@@ -588,8 +588,8 @@ nothing, and `get()` always reports "not found." A function that takes
 an optional cache can take a required `Cache` instead, defaulting to a
 shared `NullCache()` instance, so no code that uses the cache needs an
 `is None` branch on the cache. The `None` that `get()` returns is a
-different matter. A miss is information the caller acts on, so `None` stays
-in the return type.
+different matter. A miss is information on which the caller acts, so
+`None` stays in the return type.
 
 </details>
 </details>
@@ -722,8 +722,8 @@ own C implementation, which never calls the Python-level `append()` or
 
 **Route every mutation through a counter.** `CountingBox` reports `3 3 1` because no inherited route into the
 list exists. The class holds a list rather than being one, so every
-mutation goes through a method this class wrote. Nothing inherited can
-bypass a counter that nothing inherited knows about.
+mutation goes through a method this class wrote. Nothing inherited
+knows the counters exist, so nothing inherited can bypass them.
 
 `CountingList` gets `sort()`, `index()`, `__len__()`, slicing, and
 everything else `list` offers, and gets the counting wrong.

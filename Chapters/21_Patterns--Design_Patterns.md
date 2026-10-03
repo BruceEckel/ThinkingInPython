@@ -91,7 +91,7 @@ you have evidence.
 Design patterns isolate changes in your code.
 You have seen some design patterns in this book.
 For example, you can think of [inheritance](07_Foundations--Classes.md)
-as a design pattern (albeit one the language builds in).
+as a design pattern (albeit one built into the language).
 Inheritance lets you express differences in behavior
 (that's the thing that changes) in objects that all have the same interface
 (that's what stays the same).
@@ -447,7 +447,7 @@ Design principles are at least as important as design patterns,
 but they do a different job.
 A pattern is a shape of solution.
 A principle is a test you apply to whatever shape you chose:
-a claim you can hold the design up against.
+a claim the design either satisfies or violates.
 Most hold for any code,
 but *Reflexivity* and the *Law of Demeter* assume classes and objects.
 The list is a reference:

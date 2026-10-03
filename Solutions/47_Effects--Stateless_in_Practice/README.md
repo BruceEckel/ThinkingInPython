@@ -405,7 +405,7 @@ depleting nothing, since wind costs no fuel.
 
 [Switching Implementations Mid-Run](../../Chapters/47_Effects--Stateless_in_Practice.md#switching-implementations-mid-run) shows `run_load()` asking for a `Source` and using whatever the handler returns.
 Add a source class with the same two methods and place it in the tuple that `controller()` receives.
-For the blackout, trace which frame the handler's `raise` unwinds through, and whether any `yield` lies between it and `run()`.
+For the blackout, trace which frame the handler's `raise` crosses as it unwinds, and whether any `yield` lies between it and `run()`.
 
 <details>
 <summary>Solution</summary>
@@ -564,11 +564,12 @@ The test pins down that re-request behavior with a handler that answers from a l
 instead of weather, a clock, or a battery.
 
 What the test cannot tell you is whether `controller()` is right.
-Every question about policy is out of its reach: whether `controller()` prefers
-solar before the battery, whether the battery reports itself unavailable once
-exhausted, whether the hour `controller()` asks about is the hour `run_load()`
-draws power for. The scripted handler ignores `request.hour` entirely, and that
-omission is the source of both its convenience and its blindness.
+Every question about policy is out of its reach: whether `controller()`
+prefers solar before the battery, whether the battery reports itself
+unavailable once exhausted, whether `controller()` asks about the hour
+for which `run_load()` draws power. The scripted handler ignores
+`request.hour` entirely, and that omission is the source of both its
+convenience and its blindness.
 The scripted test checks the consumer of the Ability while saying nothing about the producer.
 `controller()` needs its own test, and that test can be an ordinary one:
 `controller()` builds an ordinary function from an `Outlet` to a `Source`, and
@@ -1383,9 +1384,9 @@ and no type checker compares a `raise` with a decorator's arguments.
 So the type checker verifies the version whose failure travels through a
 `yield`, and trusts the version whose failure starts as a `raise`.
 
-That difference decides between them. Use `throw()` for a failure the Effect
-decides on, where the type checker then verifies it. Keep `@throws` for
-ordinary code that raises exceptions, such as `latest()`.
+That difference decides between them. Use `throw()` when the Effect
+chooses to fail, and the type checker then verifies the failure. Keep
+`@throws` for ordinary code that raises exceptions, such as `latest()`.
 
 </details>
 </details>

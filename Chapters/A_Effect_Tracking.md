@@ -126,8 +126,7 @@ and that compiler analyzes every function in the program.
 PEP 593 added `Annotated[T, x, y, ...]` to `typing` in Python 3.9.
 `T` is a type.
 The arguments after it are *metadata*, and they are values, not types.
-Each one is an ordinary expression,
-and `Annotated` keeps whatever it evaluates to.
+Each one is an ordinary expression, and `Annotated` keeps its value.
 `Annotated[int, "meters", range(0, 100)]` carries two pieces of metadata,
 a string and a `range` object.
 `Annotated` requires one piece of metadata and accepts any number after it.

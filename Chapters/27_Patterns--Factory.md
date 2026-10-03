@@ -482,10 +482,10 @@ because the registry keeps every entry it has taken.
 
 ### Explicit Registration with a Protocol
 
-The ABC in `registry.py` exists so that `__init_subclass__()` has a class to run from.
+The ABC in `registry.py` exists so that `__init_subclass__()` has a class from which to run.
 If registration is explicit instead, `Shape` can be a Protocol,
 with a class decorator doing the registering.
-The table then needs no class to live on,
+The table then needs no class on which to live,
 and its natural owner is the factory that reads it.
 Python lets you [set an attribute on a function](17_Techniques--Metaprogramming.md#attributes-on-a-function),
 but the type checker reports every dotted access to such an attribute,
@@ -566,7 +566,7 @@ and `ty` rejects a type variable's bound that is itself generic.
 
 Keeping the table in the factory removes two hazards from [Hazards of Self Registration](#hazards-of-self-registration).
 No `cls.registry` lookup walks the MRO,
-and no `@classmethod` needs a class to sit on,
+and no `@classmethod` needs a class on which to sit,
 since the table belongs to `make` rather than to a class in the hierarchy.
 An intermediate class also stays out of the table unless something decorates it.
 Under `__init_subclass__()`,

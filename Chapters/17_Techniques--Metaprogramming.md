@@ -1821,7 +1821,7 @@ The decorator is last, because it receives a class that is already finished.
   or an `exec()`ed class body when the definition is easier to read as source.
 - Change the name, the bases, or the namespace before Python builds the class:
   a metaclass `__new__()`.
-- Control the namespace the body executes into: `__prepare__()`.
+- Control the namespace into which the body executes: `__prepare__()`.
 - Decide whether an instance gets built: a metaclass `__call__()`.
 - Read a class you did not write: `inspect`.
 

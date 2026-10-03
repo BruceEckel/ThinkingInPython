@@ -146,7 +146,7 @@ and a full profiler costs more than the answer is worth.
 is the interpreter's own instrumentation mechanism,
 the one profilers and debuggers now use.
 You claim a tool identifier, register a callback for an event,
-and say which code the event applies to.
+and name the code to which the event applies.
 Registering nothing costs nothing:
 the interpreter specializes the bytecode that has no callback attached,
 so unmonitored code runs at full speed.
@@ -484,7 +484,7 @@ print(jit_state())
 ```
 
 `is_enabled()` implies `is_available()`,
-so testing `is_available()` first and `is_enabled()` second names the three states a build can be in.
+so testing `is_available()` first and `is_enabled()` second names a build's three possible states.
 The first `print()` tests that implication, and it shows `True` on every build.
 
 Most listings in this book print the same line on every machine.
@@ -1395,7 +1395,7 @@ with expected(TypeError):
 ```
 
 `payload` is a second `memoryview`, not a copy of `data`.
-`payload.obj` names the buffer it reads from, and that buffer is `data`.
+`payload.obj` names the buffer from which it reads, and that buffer is `data`.
 That sharing is also the trap.
 `memoryview(data)` keeps an export open on `data` for as long as `view`
 (or `payload`, sliced from it) stays alive.
@@ -1825,7 +1825,7 @@ give a hint, usually the shape of the code, and a full answer for each exercise.
 6.  In `slots.py`, add `class Point3D(Point)` that declares no `__slots__` of its own.
     Confirm that an instance accepts `p.z = 3`,
     which `Point` rejects with an `AttributeError`,
-    and find where the storage for `z` came from.
+    and find what provides the storage for `z`.
 7.  In `monitoring_counts.py`,
     swap `set_local_events()` for `set_events()` and say which entry in the `Counter` is new and why.
     Then get the same two counts back using two local attachments instead,

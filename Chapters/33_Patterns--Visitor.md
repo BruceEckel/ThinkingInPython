@@ -136,7 +136,7 @@ and the visitor's type alone decides which method runs.
 
 `flower_visitors.py`'s output shows results, not mechanism.
 To make both dispatches visible,
-print the qualified name of the method each dispatch resolves to:
+print the qualified name of the method to which each dispatch resolves:
 
 ```python
 # dispatch_trace.py

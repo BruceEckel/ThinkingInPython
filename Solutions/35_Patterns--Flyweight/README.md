@@ -325,7 +325,7 @@ def mutable_tile(symbol: str) -> MutableTile:
 <details>
 <summary>Solution</summary>
 
-If you assert on the cell you assigned through,
+If you assert on the cell through which you made the assignment,
 the test passes whether or not the cells share a tile.
 With `@cache` removed from `mutable_tile()`,
 `field[0][0].walkable` is still `False` after the assignment, and no bug shows.

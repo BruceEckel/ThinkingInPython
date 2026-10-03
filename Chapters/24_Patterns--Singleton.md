@@ -185,7 +185,7 @@ because the name is public.
 `settings()` returns a `Settings`,
 so the class already appears in the module's public signature.
 A caller who annotates the result must write that name,
-and a type outsiders must name is not private, whatever it starts with.
+and a type outsiders must name is not private, whatever its first character.
 `_Settings` fits a type that never leaves the module.
 
 Two stronger-looking moves fail the same way.

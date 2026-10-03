@@ -72,7 +72,7 @@ The empty `__slots__` on `WhatIWant` keeps `ProxyAdapter` a slotted [record](18_
 as `shapes_oo.py` in [Rethinking Objects](20_Patterns--Rethinking_Objects.md#abstract-base-classes)
 explains.
 The name `ProxyAdapter` uses the term "[*Proxy*](26_Patterns--Surrogate.md#proxy)" loosely:
-*GoF Design Patterns* requires a *Proxy* to have the same interface as the object it forwards to.
+*GoF Design Patterns* requires a *Proxy* to have the same interface as the object to which it forwards.
 
 ### Three Places for the Adaptation
 

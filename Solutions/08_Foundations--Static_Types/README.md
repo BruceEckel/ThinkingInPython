@@ -95,7 +95,7 @@ print(render(Triangle()))
 <summary>Where to look</summary>
 
 [Catching Mistakes](../../Chapters/08_Foundations--Static_Types.md#catching-mistakes) shows the comment silencing the error on a call that passes `area()` a `str`.
-Remove the comment, run `ty check` on the file, and read which argument and which parameter the diagnostic points at.
+Remove the comment, run `ty check` on the file, and read which argument and which parameter the diagnostic marks.
 Then consider what the call does at run time without the checker.
 
 <details>

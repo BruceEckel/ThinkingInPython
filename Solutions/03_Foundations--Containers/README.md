@@ -511,8 +511,8 @@ line carries a `# type: ignore`. The runtime exception is the point of the
 listing.
 
 **Find the limit of immutability.** `nested` shows how far that immutability reaches. A `frozendict` freezes
-which objects it maps its keys to, not what those objects contain, so
-`hash(nested)` must hash a `list` and fails. The immutability is
+the objects to which it maps its keys, not what those objects contain,
+so `hash(nested)` must hash a `list` and fails. The immutability is
 shallow, as it is for the `tuple` in `shallow_immutability.py`.
 `frozendict` is hashable *when its values are*, so keep values
 immutable, a `tuple` here instead of a `list`, whenever the mapping has

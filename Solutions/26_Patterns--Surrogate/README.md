@@ -204,7 +204,7 @@ forwarding. The single `calls` integer becomes a `Counter`. The final
 > Its `share()` returns a second list over the same data,
 > at the cost of incrementing a reference count,
 > and the first `append()` through a shared list copies the data before changing it.
-> Confirm that the two lists share their data before the write and not after.
+> Confirm that the two lists share their data before the write and not after it.
 
 <details>
 <summary>Where to look</summary>

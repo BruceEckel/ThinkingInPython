@@ -156,7 +156,7 @@ produces a generator on demand. The container keeps the value
 
 [The Costs of Laziness](../../Chapters/23_Patterns--Iterators.md#the-costs-of-laziness) explains that creating a generator runs none of its body.
 Wrap the generator in `itertools.islice()` with a stop of 10.
-`islice()` pulls only as many values as you ask for, so the generator never computes the rest.
+`islice()` pulls only as many values as you request, so the generator never computes the rest.
 
 <details>
 <summary>The shape</summary>

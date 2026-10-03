@@ -390,7 +390,7 @@ while the built-in call `type(shape)` in the demo retrieves an object's class at
 
 An annotation can grow to the point of obscurity.
 `dict[tuple[int, int], str]` is precise,
-but it never says what those pairs and strings stand for.
+but it never says what those pairs and strings represent.
 The *type statement* gives the annotation a name:
 
 ```python

@@ -889,7 +889,7 @@ statements, until the first use of a name the demo never uses.
 <summary>Where to look</summary>
 
 [Prototype](../../Chapters/27_Patterns--Factory.md#prototype) contrasts `copy.deepcopy()`, which follows every reference, with a copy that shares what it holds.
-A shallow copy duplicates the `Monster` but reuses the objects its fields refer to.
+A shallow copy duplicates the `Monster` but reuses the objects its fields reference.
 Compare an assertion that rebinds a field with one that mutates a list or dictionary in place, and see which of them `test_prototype.py` makes.
 
 <details>
@@ -965,7 +965,7 @@ rebinds an `int` field on the copy rather than mutating a shared
 object.
 
 The split between those two assertions carries the lesson. A shallow
-copy duplicates the top object and shares everything it refers to, so
+copy duplicates the top object and shares everything it references, so
 the fields that break are the mutable ones, and only when
 something mutates them in place. Assignment to a field is always safe.
 `append()`, `[k] = v`, and `.update()` are not.

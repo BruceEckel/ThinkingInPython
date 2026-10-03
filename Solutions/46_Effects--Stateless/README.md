@@ -83,7 +83,7 @@ Hello, Alice!
 
 The demo in `test_ch46_ask_and_greet.py` uses `Scripted` rather than
 `Terminal` for the reason any book listing does: a call to `input()`
-has no terminal to read from. The substitution is the point
+has no terminal from which to read. The substitution is the point
 either way, and neither binding requires a change to
 `ask_and_greet()`, which is character-for-character the same function
 under both.
@@ -1111,8 +1111,9 @@ error[invalid-yield]: Yield expression type does not match annotation
 The error appears on line 29, the `yield from` that introduces the
 undeclared failure, not on the signature and not at the call site. That
 line is the useful place for the diagnostic. The diagnostic names both
-the failure that escaped and the delegation it escaped through, so the
-fix is either to declare the failure or to catch it, right there.
+the failure that escaped and the delegation through which it escaped,
+so the fix is either to declare the failure or to catch it, right
+there.
 
 </details>
 </details>

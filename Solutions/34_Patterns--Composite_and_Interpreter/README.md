@@ -496,7 +496,7 @@ guard, so an unchanged subtree is still shared.
 
 **Leave division for evaluation.** For `Div`, `simplify()` folds nothing. A quotient of two `int`s is
 usually not an `int`, so it does not fit in a `Num`, and division by
-`Num(0)` has no value to fold to. Nor should `simplify()` raise the
+`Num(0)` produces no value to fold. Nor should `simplify()` raise the
 `ZeroDivisionError` itself. It rewrites a tree without evaluating it,
 and a caller can simplify an expression it never evaluates, so an
 exception raised in `simplify()` would report an error in a computation that

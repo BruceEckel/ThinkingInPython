@@ -643,7 +643,7 @@ The function takes its source of randomness as an argument,
 so production code hands it a fresh `random.Random()` while the test hands it a seeded one.
 The randomness is now an input, not a hidden dependency.
 This technique is *dependency injection*:
-the caller hands the function what it depends on,
+the caller hands the function its dependencies,
 and the function fetches nothing on its own.
 
 The `4` in `test_dice_rng.py` is what `Random(0)` produces first,
@@ -700,7 +700,7 @@ def test_elapsed() -> None:
 
 Both tests check the same arithmetic.
 The injected one runs with no `monkeypatch`,
-and its signature says where the time comes from.
+and its signature names the source of the time.
 
 Injection is not free.
 The `rng` or `now` parameter must appear on every function between the caller and the code that needs it.
@@ -859,7 +859,7 @@ library that automates it.
 ## Making Code Testable
 
 You can now take an untested function and make it testable.
-Name what it depends on: the clock, randomness, the filesystem, the environment,
+Name its dependencies: the clock, randomness, the filesystem, the environment,
 the network.
 Replace those at the boundary,
 by injection where you can change the code and with `monkeypatch` where you cannot.
