@@ -814,6 +814,57 @@ separate sentences"):
 memory `colon-splice-audit-completed`. Promoted at Bruce's call
 (2026-09-17).
 
+### R22. In Solutions/, label each step paragraph with what its lines accomplish
+
+**Test.** In a `Solutions/*/README.md` file, inside a solution's
+"Solution" step, a discussion paragraph that follows a listing and
+explains one group of that listing's lines, with no opening label. Open
+it with a bold label ending in a period inside the bold: a verb phrase
+of two to six words naming what the group accomplishes,
+context-independent, the kind of phrase that fits any implementation of
+the same design ("Collect the responders.", "Keep the loop going past a
+failure.", "Return the descriptor on class access."). Name the function
+of the step, not its content: "Append to the list." is content and is
+wrong; "Collect the responders." is function and is right. Labels follow
+listing order, three to six per solution; split a paragraph that covers
+two groups, merge two short paragraphs that cover one. The explanation
+after the label is full sentences, as R5 requires. This is an additive
+rule: it adds a label where the paragraph had none. A literature report
+on exercise and solution design (`reports/Exercise and solution design
+for learning.md`) found subgoal labels on worked examples carry a medium
+learning effect (Morrison, Margulieux, and Decker: d = .59 on far
+transfer, half the withdrawals).
+
+**Keep when.** A paragraph that is not about a group of lines gets no
+label: a closing comparison of two versions, a remark on running the
+demo, a paragraph about a test file that explains no step, the "If you
+..." contrast paragraph that opens a solution, and the `Hint:`
+paragraph. A one-paragraph discussion of a short listing may carry one
+label or none.
+
+**Sightings.** 2
+- `Solutions/22_Patterns--Data_Transfer_Objects` 2026-10-02, the three
+  labeled paragraphs "**The configuration bag is a `SimpleNamespace`.**",
+  "**The grid coordinate is a `NamedTuple`.**", and "**The JSON record
+  is a `@dataclass`.**" These name a thing rather than a step, so they
+  are the form's precedent rather than a full match.
+- `Solutions/30_Patterns--Observer` 2026-10-03 (`93ad36e0`), was
+  Claude-written at Bruce's request, 33 labels over 11 solutions:
+  - "Like `broadcaster.py`, this solution has no separate `Observer`
+    class ..." -> "**Collect the responders.** Like `broadcaster.py`,
+    this solution has no separate `Observer` class ..."
+  - "`ExceptionGroup` is the right container because more than one
+    responder ..." -> "**Report every failure together.**
+    `ExceptionGroup` is the right container because more than one
+    responder ..."
+  - "The results come back in argument order, so the list is a record
+    of ..." -> "**Pick out the failures.** The results come back in
+    argument order, so the list is a record of ..."
+
+**Home.** this file only. Promoted at Bruce's call (2026-10-03) on one
+file's evidence, as R2-R9 were; the next Solutions file to carry labels
+confirms or narrows it.
+
 ---
 
 ## Candidates
@@ -1147,6 +1198,34 @@ it (the mark that makes it safe).
   interface you own is the unsafe move, because every caller was
   written against the old one."; "someone decided to retire this" ->
   "this should no longer be called"
+
+### C28. Open a solution with the wrong approach the reader likely took
+
+**Test.** A solution in `Solutions/*/README.md` whose exercise has a
+specific wrong approach that the chapter demonstrates failing, that the
+exercise or hint rules out by name, or that is the direct simplification
+of the solution dropping one part (one keyword, one `list(...)` copy,
+one `return fn`). Open the "Solution" step, before the listing, with one
+paragraph beginning "If you ..." that names the approach, states its
+observable consequence, and says why the solution takes the other path.
+Two to four sentences. Every stated consequence is reproduced by running
+the wrong variant before it is written. This is additive: the paragraph
+contrasts the reader's likely attempt with the canonical solution, the
+device Loibl and Rummel (2014) tested, from the same report as R22.
+
+**Keep when.** No qualifying wrong approach exists; do not invent one.
+In Solutions 30, four of eleven solutions (1, 5, 7, 8) have none.
+
+**Sightings.** 1, `Solutions/30_Patterns--Observer` 2026-10-03
+(`93ad36e0`), was Claude-written at Bruce's request: seven paragraphs.
+- Exercise 3, inserted before the listing: "If you catch each exception
+  and move on without keeping it, every responder runs, but `announce()`
+  returns normally. The demo's `except*` block does not run, so the
+  script prints nothing, and the test's `pytest.raises(ExceptionGroup)`
+  fails with "DID NOT RAISE". The solution keeps each exception in a
+  list and raises the list as one `ExceptionGroup` once the loop ends."
+
+**Home.** this file only.
 
 ---
 

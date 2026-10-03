@@ -593,10 +593,20 @@ so its comprehension keeps each result for which
 
 **Keep cancellation out of the failures.** The exception filter uses `Exception`, not `BaseException`, for the
 reason exercise 3 gives, and for a second reason here.
-`asyncio.CancelledError` derives from `BaseException`, and
-`return_exceptions=True` still returns a cancellation among the
-results. Treating that result as an ordinary responder failure
-swallows a cancellation the event loop meant to propagate.
+If another task cancels the awaiting task while `gather()` waits,
+`gather()` cancels every responder,
+and `asyncio.CancelledError` reaches the awaiting task with either filter,
+since `announce()` gets no results to filter.
+The cancellation that `return_exceptions=True` does return comes from a responder that cancels its own task,
+and the `Exception` filter drops it from `failures` because `asyncio.CancelledError` derives from `BaseException`.
+A `BaseException` filter would put that cancellation in `failures`,
+which `ExceptionGroup` cannot hold:
+`ty` reports an `invalid-argument-type` at the constructor call,
+and at runtime `announce()` raises a `TypeError` ("Cannot nest BaseExceptions in an ExceptionGroup")
+in place of the responder failures.
+The `Exception` filter is the right one:
+it reports every ordinary failure,
+at the cost of treating a responder that cancelled itself as one that finished.
 
 The synchronous and asynchronous versions now answer the same
 question, and both end in an `ExceptionGroup`. The difference is only
