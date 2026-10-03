@@ -944,13 +944,12 @@ and rejects a `bool` along with a `float` and a `str`.
 `TypeError`, so with the range check first a `str` never reaches a
 `TypeFailure`.
 
-**Feed values the checker refuses.**
-The type checker rejects `5.5` and `"five"` as arguments before the program runs,
-and the `# type: ignore` silences the type checker so the listing can show what the
-constructor does with a value the type checker did not see. The type checker
-accepts `Stars(True)`: a `bool` is an `int` to it for
-the same subclass reason, so the runtime test is the one check that
-rejects `True`.
+**Feed values the checker refuses.** The type checker rejects `5.5`
+and `"five"` as arguments before the program runs, and the
+`# type: ignore` silences that report so the listing can show what the
+constructor does with each value at runtime. The type checker accepts
+`Stars(True)`: a `bool` is an `int` to it for the same subclass
+reason, so the runtime test is the one check that rejects `True`.
 
 </details>
 </details>

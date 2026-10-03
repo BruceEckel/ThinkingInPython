@@ -802,7 +802,8 @@ The language devices you have met divide into four families.
 ### The Four Families
 
 `@final` and `@override` are *markers*.
-At runtime each sets a single attribute that nothing reads.
+At runtime each sets a single attribute that nothing in the interpreter reads,
+though your own code can read it, as `near_miss.py` does.
 The type checker carries the entire meaning,
 and [Making a Class Final](#making-a-class-final)
 builds the runtime half by hand with `__init_subclass__()`.

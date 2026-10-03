@@ -97,7 +97,7 @@ value on the diagonal.
 
 [Dictionary Comprehensions](../../Chapters/16_Techniques--Comprehensions.md#dictionary-comprehensions) shows a key expression and a value expression with an `if` filter at the end.
 The filter runs on the loop variable, before either expression runs.
-For the collision question, recall that a `dict` holds one value per key, so a later assignment replaces an earlier one.
+The comprehension builds a `dict`, which holds one value per key, so a later name whose key matches an earlier one replaces that entry.
 
 <details>
 <summary>Solution</summary>

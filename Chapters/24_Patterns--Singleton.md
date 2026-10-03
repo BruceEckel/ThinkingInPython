@@ -227,7 +227,7 @@ Three implementation notes:
    and each caller can end up holding a different object,
    with only one of them staying in the cache.
    With a constructor slow enough to widen that race,
-   eight threads calling `settings()` at once run the constructor eight times and hand back eight different objects.
+   eight threads calling `settings()` at once usually run the constructor eight times and hand back eight different objects.
    When threads can arrive before the singleton exists,
    create it eagerly instead: call `settings()` once at import time,
    or use the module form, which the import system builds exactly once.
@@ -314,7 +314,8 @@ print(len({id(s) for s in built}))
 
 One thread finds `_instance` empty and builds it.
 The rest wait on the lock, and each finds `_instance` already filled.
-Under the same eight-thread race, the cached version produces eight objects.
+Under the same eight-thread race,
+the cached version produces more than one object, usually eight.
 The locked version produces one, as the printed count confirms.
 The sleep stands in for a constructor that does real work,
 such as opening a file or a connection.

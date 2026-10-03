@@ -1076,10 +1076,11 @@ computation, a duplicate build costs time but not correctness.
 *Flyweight* raises the stakes, because its whole point is that
 `tile("^") is tile("^")`.
 
-**Fill the pool eagerly.** The eager fix builds every value before any thread exists, so no miss
-remains to race on. It is the better answer whenever the whole value
-set fits in one small table, the same condition that makes an `Enum`
-work. The eager fix costs nothing at runtime.
+**Fill the pool eagerly.** The eager fix builds every value before any
+thread exists, so every lookup hits, and only a miss can start a race.
+It is the better answer whenever the whole value set fits in one small
+table, the same condition that makes an `Enum` work. The eager fix
+costs nothing at runtime.
 
 **Guard the factory with a lock.** The lock fix handles an unbounded value set, and its cost is real.
 Every lookup now serializes, including the hits, which are the

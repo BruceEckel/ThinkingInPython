@@ -883,7 +883,7 @@ and it fails as soon as anything overlaps.
 and the readers resume to find a value that belongs to somebody else.
 A `ContextVar` is the same convenience without that failure.
 It holds a value per *context*,
-and every task starts with a copy of the context that created it,
+and every task starts with a copy of the context current when `create_task()` runs,
 so one task's `set()` is invisible to its siblings and to its parent:
 
 ```python
@@ -2425,7 +2425,7 @@ for example letting only the task with the lower ID give.
   A lock inside the loop body guards the wrong thing:
   the `for` statement calls `next()` outside it.
 - **Pass request-scoped values in a `ContextVar`, not a global.**
-  Each task starts from a copy of the context that created it,
+  Each task starts from a copy of the context current when `create_task()` runs,
   and `asyncio.to_thread()` carries that copy into the worker thread.
 - **A `TaskGroup` failure arrives as an `ExceptionGroup`.**
   Catch it with `except*`.
@@ -2552,7 +2552,7 @@ give a hint, usually the shape of the code, and a full answer for each exercise.
     move the `request_id.set()` call out of `handle()` and into `main()` above the `TaskGroup`,
     setting it to `"main"`.
     Predict what each task prints,
-    then explain the result with "every task starts with a copy of the context that created it."
+    then explain the result with "every task starts with a copy of the context current when `create_task()` runs."
 12. In `subinterpreters.py`,
     replace `InterpreterPoolExecutor` with `ThreadPoolExecutor`.
     The assertion still passes and the printed boolean flips.

@@ -84,11 +84,11 @@ Hello, Alice!
 ```
 
 `exercise_1.py` binds the real `Console` for `tell` and keeps the
-scripted `ask`, because a book listing that calls `input()` has no
-terminal to read from. The substitution is the point either way: one
+scripted `ask`, because a book listing that calls `input()` runs with
+no terminal attached. The substitution is the point either way: one
 `Console` instance satisfies both protocols, so you can pass the same
-object for both parameters. You can also replace either parameter
-with a double, and the other one never notices.
+object for both parameters. You can also replace either parameter with
+a double, and the other one never notices.
 
 **Declare what the function needs.** `greet()` requires no change, and could not have required one. It
 names two capabilities it needs and calls methods on them. It never

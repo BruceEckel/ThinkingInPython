@@ -974,7 +974,7 @@ Bare `gather()` gives you neither.
 > move the `request_id.set()` call out of `handle()` and into `main()` above the `TaskGroup`,
 > setting it to `"main"`.
 > Predict what each task prints,
-> then explain the result with "every task starts with a copy of the context that created it."
+> then explain the result with "every task starts with a copy of the context current when `create_task()` runs."
 
 <details>
 <summary>Where to look</summary>
@@ -1033,11 +1033,12 @@ asyncio.run(main())
 #: after: context main, global req-3
 ```
 
-**Set the value before any task exists.** All three tasks print `context main`. Every task starts with a copy of
-the context that created it, and that context already carries
-`request_id = "main"`, so each copy inherits the same value. No task
-writes to the variable afterward, so all three copies stay identical
-and the original version's per-request identity disappears.
+**Set the value before any task exists.** All three tasks print
+`context main`. Every task starts with a copy of the context current
+when `create_task()` runs, and inside `main()` that context already
+carries `request_id = "main"`, so each copy inherits the same value.
+No task writes to the variable afterward, so all three copies stay
+identical and the original version's per-request identity disappears.
 
 **Read the value after the group.** The `after:` line changes too. In the chapter's version it prints
 `context -`, the default, because each `set()` runs inside a task's

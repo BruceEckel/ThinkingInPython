@@ -1245,7 +1245,7 @@ The listing gives each `Inhabitant` kind two of six weapon types,
 ranked around a cycle: each weapon beats the previous two in the
 ranking and loses to the next two. Six is an even number, so each
 weapon has one opponent left over: its opposite, three steps around
-the circle, which it neither beats nor loses to. That pair draws.
+the circle, and neither beats the other. That pair draws.
 `paper_scissors_rock.py` needs no such case because three items leave
 nothing over: with an odd count every weapon beats half the rest and
 loses to the other half. An even count always leaves the opposite pair

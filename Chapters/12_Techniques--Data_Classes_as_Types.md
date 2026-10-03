@@ -1475,7 +1475,8 @@ Every implementation takes that shape: recover the constructor arguments,
 override the named ones, rebuild.
 `__init__()` packs a channel dictionary using `SHIFTS`,
 and `channels` unpacks one with the same table, so the two are inverses.
-Returning `Self` from `type(self)(...)` means a subclass gets a copy of its own class.
+Calling `type(self)(...)` rather than `Color(...)` gives a subclass a copy of its own class,
+and the `Self` return annotation tells the type checker so.
 
 Define `__replace__()` when your type is immutable and callers need variants of it.
 Skip it when the type is mutable,

@@ -461,7 +461,7 @@ If you change `report()`'s annotation but leave out `return size`,
 the script still runs, and the printed list ends with `'total: None'`:
 `report()` returns `None`, and the second `yield from` delivers that `None` into `counted`.
 `ty` reports an `invalid-return-type` on the annotation,
-because a function declared to return an `int` always implicitly returns `None`.
+because with no `return` statement `report()` always implicitly returns `None`, and its annotation declares an `int` return value.
 The solution returns `size` from `report()`, so the count reaches `summarize()` through a second return.
 
 ```python

@@ -492,7 +492,8 @@ A `History` of lists is a stack of aliases, the bug in `aliased_snapshot.py`.
 The classic `Memento` from `sketch.py` is already immutable,
 so the same generic caretaker holds snapshots of the mutable `Sketch`.
 The surrounding code calls `save()` and `restore()`,
-the two calls a frozen state replaces by handing `History` the state directly:
+two calls a frozen state makes unnecessary,
+since `History` holds each frozen `Drawing` as it is:
 
 ```python
 # history_classic.py

@@ -361,7 +361,7 @@ tells the next reader why the wrapper is there.
 <summary>Where to look</summary>
 
 [What an Override May Change](../../Chapters/29_Patterns--Changing_the_Interface.md#what-an-override-may-change) explains which parts of a signature a subclass may alter.
-The `/` keeps a parameter's name out of the interface, so without it the name is part of what callers rely on.
+The `/` keeps a parameter's name out of the interface, so without it callers can rely on the name.
 Call through a `WhatIUse` variable, so the checker sees only the base class, and give the override the base parameter's name.
 
 <details>

@@ -80,8 +80,9 @@ print(sorted(c.__name__ for c in Color.registry))
 #: ['CeruleanBlue', 'Gold', 'Green', 'PhthaloBlue', 'Red']
 ```
 
-**Register a new leaf.** Creating `Yellow` adds it to the registry. Nothing removes it yet,
-since `Color` (its only base) is never in the registry to begin with.
+**Register a new leaf.** Creating `Yellow` adds it to the registry and
+removes its only base, `Color`, which was never there, so that removal
+changes nothing. `Yellow` stays until a subclass of its own arrives.
 
 **Drop a base that gains a child.** Creating `Gold` adds it and removes its base, `Yellow`, the
 same pruning `PhthaloBlue` and `CeruleanBlue` do to `Blue` earlier.
