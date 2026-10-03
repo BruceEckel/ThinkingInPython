@@ -21,7 +21,7 @@ with expected_one(ZeroDivisionError):
     1 / 0
     # Never runs: the error jumps to __exit__
     print("after")
-print("survived")
 #: before
 #: ZeroDivisionError('division by zero')
+print("survived")
 #: survived

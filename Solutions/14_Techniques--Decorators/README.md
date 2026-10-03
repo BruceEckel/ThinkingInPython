@@ -16,14 +16,14 @@ def announce[T](cls: type[T]) -> type[T]:
 class Point:
     x: int
     y: int
+#: decorating Point
 
 @announce
 class Empty:
     pass
+#: decorating Empty
 
 print(Point.__name__, Empty.__name__)
-#: decorating Point
-#: decorating Empty
 #: Point Empty
 ```
 

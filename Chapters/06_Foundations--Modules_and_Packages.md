@@ -19,10 +19,10 @@ def useful_function():
 import module
 
 print("'module' imported")
+#: 'module' imported
 
 if __name__ == "__main__":
     print(module.useful_function())
-#: 'module' imported
 #: I'm being useful!
 ```
 

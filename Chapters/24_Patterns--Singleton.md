@@ -38,8 +38,8 @@ settings: dict[str, str] = {}
 import config
 import config as again
 
-print(config is again, config.settings is again.settings)
 #: config body runs
+print(config is again, config.settings is again.settings)
 #: True True
 ```
 
@@ -57,9 +57,9 @@ Mutating it through one import is visible through every other:
 # shared_config.py
 from config import settings
 
+#: config body runs
 settings["theme"] = "dark"
 print(settings)
-#: config body runs
 #: {'theme': 'dark'}
 ```
 

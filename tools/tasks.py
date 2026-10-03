@@ -537,6 +537,20 @@ def output_check(v: Vars) -> None:
     py("tools.validate_output", "--tree", SOLUTIONS_TREE, "Solutions")
 
 
+@task("Report #: runs not directly after the statement that printed them",
+      deps=("extract",))
+def marker_placement(v: Vars) -> None:
+    """Run each marked listing one top-level statement at a time and report
+    every #: run that sits below a statement other than the one that printed
+    it, such as markers gathered at the end of a listing. validate_output.py
+    cannot see this: it checks a run against everything printed since the
+    previous run. ARGS=--write moves the runs; the module docstring of
+    tools/marker_placement.py gives the layout rules (import output goes
+    below the import block, for ruff's I001).
+    """
+    py("tools.marker_placement", "Chapters", "Solutions", *v.words("ARGS"))
+
+
 @task("Run the pytest examples (test_*.py) in both build trees",
       deps=("extract",))
 def test(v: Vars) -> None:

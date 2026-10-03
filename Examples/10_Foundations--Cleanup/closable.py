@@ -20,10 +20,10 @@ class Socket:
 
 with Socket("A") as sock:
     print("using", sock.name)
-sock.close()
 #: A opened
 #: using A
 #: A closed
+sock.close()
 try:
     with Socket("B"):
         raise RuntimeError("boom")

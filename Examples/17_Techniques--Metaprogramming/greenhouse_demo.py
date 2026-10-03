@@ -3,10 +3,10 @@ from pathlib import Path
 from greenhouse import Event
 
 Event.load_schedule(Path("schedule.txt"))
-Event.run_events()
 #: Creating LightOff
 #: Creating LightOn
 #: Creating RingBell
+Event.run_events()
 #: 1:00: LightOn
 #: 2:00: LightOff
 #: * 7:00: RingBell

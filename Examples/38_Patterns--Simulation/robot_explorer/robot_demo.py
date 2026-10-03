@@ -4,8 +4,8 @@ from solver import solve
 
 game = GameBuilder(string_maze)
 print("start:")
-print(game.show_maze())
 #: start:
+print(game.show_maze())
 #: ###############################
 #: #R#.____#____.#_______#_______#
 #: #_###_#_###_#_#_#_#####_#####_#
@@ -35,9 +35,9 @@ if game.robot.finished:
     print("Game over!")
 #: Game over!
 print("\nfinal:")
-print(game.show_maze())
 #:
 #: final:
+print(game.show_maze())
 #: ###############################
 #: #_#.____#_____#_______#_______#
 #: #_###_#_###_#_#_#_#####_#####_#

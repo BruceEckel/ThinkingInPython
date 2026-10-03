@@ -21,8 +21,8 @@ print(run(
 caught = catch(RetryError)(retried)
 outcome = run(
     supply(Database(failures=9), Time())(caught)("Morty"))
-print(type(outcome).__name__)
 #: attempt 1: saving Morty
 #: attempt 2: saving Morty
 #: attempt 3: saving Morty
+print(type(outcome).__name__)
 #: RetryError

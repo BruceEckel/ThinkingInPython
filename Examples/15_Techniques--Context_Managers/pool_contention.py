@@ -28,6 +28,6 @@ for worker in workers:
 for worker in workers:
     worker.join()
 print("over capacity:", over_capacity)
-print("pool size after:", pool.available())
 #: over capacity: False
+print("pool size after:", pool.available())
 #: pool size after: 2

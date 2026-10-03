@@ -100,11 +100,11 @@ def announce(func: Callable) -> Callable:
 @announce
 def cheese() -> None:
     print("Wensleydale")
+#: Decorating
 
 print("Definitions done")
-cheese()
-#: Decorating
 #: Definitions done
+cheese()
 #: Calling
 #: Wensleydale
 ```

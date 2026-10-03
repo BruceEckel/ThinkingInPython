@@ -58,10 +58,10 @@ with pool.acquire() as c1:
         print("free:", pool.available())
         expect(PoolExhausted, pool.acquire)
     print("inner released:", pool.available())
-print("outer released:", pool.available())
 #: connection 0: select 1
 #: connection 1: select 2
 #: free: 0
 #: [PoolExhausted] all 2 in use
 #: inner released: 1
+print("outer released:", pool.available())
 #: outer released: 2

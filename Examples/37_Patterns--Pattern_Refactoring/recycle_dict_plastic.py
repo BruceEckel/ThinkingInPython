@@ -15,12 +15,12 @@ for t in pieces:
 for kind, items in bins.items():
     print(f"--- {kind.__name__} ---")
     sum_value(items)
-binned = sum(len(v) for v in bins.values())
-print(f"parsed {len(pieces)}, binned {binned}")
 #: --- Glass ---
 #: Total value = 2.30
 #: --- Plastic ---
 #: Total value = 9.00
 #: --- Aluminum ---
 #: Total value = 50.10
+binned = sum(len(v) for v in bins.values())
+print(f"parsed {len(pieces)}, binned {binned}")
 #: parsed 4, binned 4

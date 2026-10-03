@@ -13,7 +13,7 @@ with ignoring(ZeroDivisionError):
     print("before")
     1 / 0
     print("after")
-print("survived")
 #: before
 #: swallowed ZeroDivisionError('division by zero')
+print("survived")
 #: survived

@@ -508,10 +508,10 @@ A comprehension can run code for its side effect and throw away the list it buil
 ```python
 # comprehension_side_effects.py
 wasted = [print(n) for n in [1, 2, 3]]
-print(wasted)
 #: 1
 #: 2
 #: 3
+print(wasted)
 #: [None, None, None]
 ```
 

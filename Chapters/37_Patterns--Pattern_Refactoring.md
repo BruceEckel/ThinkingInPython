@@ -316,12 +316,12 @@ for t in pieces:
 for kind, items in bins.items():
     print(f"--- {kind.__name__} ---")
     sum_value(items)
-binned = sum(len(v) for v in bins.values())
-print(f"parsed {len(pieces)}, binned {binned}")
 #: --- Glass ---
 #: Total value = 2.30
 #: --- Aluminum ---
 #: Total value = 50.10
+binned = sum(len(v) for v in bins.values())
+print(f"parsed {len(pieces)}, binned {binned}")
 #: parsed 4, binned 2
 ```
 
@@ -410,14 +410,14 @@ for t in pieces:
 for kind, items in bins.items():
     print(f"--- {kind.__name__} ---")
     sum_value(items)
-binned = sum(len(v) for v in bins.values())
-print(f"parsed {len(pieces)}, binned {binned}")
 #: --- Glass ---
 #: Total value = 2.30
 #: --- Plastic ---
 #: Total value = 9.00
 #: --- Aluminum ---
 #: Total value = 50.10
+binned = sum(len(v) for v in bins.values())
+print(f"parsed {len(pieces)}, binned {binned}")
 #: parsed 4, binned 4
 ```
 
@@ -492,11 +492,11 @@ materials = [Aluminum, Glass, Cardboard]
 for cls in materials:
     t = cls(1.0)
     print(f"{t.note()} | hazard: {t.hazard()}")
-edited = [c for c in materials if "hazard" in c.__dict__]
-print(f"classes edited for one operation: {len(edited)}")
 #: Aluminum: crush and bale | hazard: sharp edges
 #: Glass: sort by color, then crush | hazard: sharp edges
 #: Cardboard: flatten and bundle | hazard: none
+edited = [c for c in materials if "hazard" in c.__dict__]
+print(f"classes edited for one operation: {len(edited)}")
 #: classes edited for one operation: 3
 ```
 
@@ -598,13 +598,13 @@ def _(t: Glass) -> str:
 
 for cls in Trash.registry.values():
     print(f"{cls.__name__}: {hazard(cls(1.0))}")
-edited = [c for c in Trash.registry.values()
-          if "hazard" in c.__dict__]
-print(f"classes edited for one operation: {len(edited)}")
 #: Aluminum: sharp edges
 #: Paper: none
 #: Glass: sharp edges
 #: Cardboard: none
+edited = [c for c in Trash.registry.values()
+          if "hazard" in c.__dict__]
+print(f"classes edited for one operation: {len(edited)}")
 #: classes edited for one operation: 0
 ```
 

@@ -6,17 +6,17 @@ with expected(ZeroDivisionError):
     1 / 0
     # Never runs: the error jumps to __exit__
     print("after")
-print("survived")
 #: before
 #: [ZeroDivisionError] division by zero
+print("survived")
 #: survived
 
 with expected():  # No argument means ALL
     print("before")
     raise KeyError("anything")
-print("survived")
 #: before
 #: [KeyError] 'anything'
+print("survived")
 #: survived
 
 with expected() as x:
