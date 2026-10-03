@@ -1562,7 +1562,7 @@ Each exercise is answered in this chapter's [solutions](../Solutions/30_Patterns
 4.  Redo exercise 3 for `async_broadcaster.py`.
     Make `announce()` use `gather(*coros, return_exceptions=True)`,
     separate the returned exceptions from the successes,
-    and raise them together as an `ExceptionGroup`.
+    and raise them together as an exception group.
     Write a test in which the first responder raises an exception and the second still records its notification.
 5.  Redo exercise 3 with each failure returned as a value instead of raised as an exception.
     Each responder returns a [`Result`](42_Functional--Error_Handling.md#a-result-type)

@@ -449,7 +449,7 @@ re-raised exception cannot do.
 > Redo exercise 3 for `async_broadcaster.py`.
 > Make `announce()` use `gather(*coros, return_exceptions=True)`,
 > separate the returned exceptions from the successes,
-> and raise them together as an `ExceptionGroup`.
+> and raise them together as an exception group.
 > Write a test in which the first responder raises an exception and the second still records its notification.
 
 <details>
