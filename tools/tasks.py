@@ -368,7 +368,7 @@ def editor_pin(v: Vars) -> None:
 @task("House-style lint with Vale (CH=29 for one chapter; needs vale binary)")
 def prose(v: Vars) -> None:
     """House-style lint with Vale: no em-dashes and no filler phrases, then
-    the report-only stranded-preposition scan. Run one
+    the report-only stranded-preposition and watch-word scans. Run one
     chapter with CH= (e.g. `tip prose CH=29`) or a path with DOCS=.
     Vale is a standalone binary (not uv-managed; `tip tools-check-full`
     says how to install it). Its style packages (.vale.ini's Packages)
@@ -379,6 +379,7 @@ def prose(v: Vars) -> None:
         run(["vale", "sync"])
     run(["vale", *prose_files(v)])
     py("tools.stranded_prepositions", *prose_files(v))
+    py("tools.watch_words", *prose_files(v))
 
 
 @task("Report new clauses ending on a stranded preposition "
@@ -397,6 +398,25 @@ def stranded(v: Vars) -> None:
       "stale entries", secondary=True)
 def stranded_accept(v: Vars) -> None:
     py("tools.stranded_prepositions", "--accept")
+
+
+@task("Report new uses of the style guide's watch words "
+      "(report-only; accept with `tip watch-words-accept`)")
+def watch_words(v: Vars) -> None:
+    """Report prose uses of the words the style guide says to cut
+    (Tier 3: ships, lands, wants) or to weigh (Tier 2: already, even,
+    never). It reports and never gates; `tip prose` runs it after the
+    stranded scan. CH= picks one chapter; hits judged keeps live in
+    tools/data/watch_words_baseline.txt; ARGS=--all lists every hit,
+    ARGS="--tier 3" only Tier 3, ARGS=--fail exits 1 on a new Tier 3 hit.
+    """
+    py("tools.watch_words", *prose_files(v), *v.words("ARGS"))
+
+
+@task("Add new watch-word hits to the baseline and drop stale "
+      "entries", secondary=True)
+def watch_words_accept(v: Vars) -> None:
+    py("tools.watch_words", "--accept")
 
 
 also("checks", "pattern-names")
