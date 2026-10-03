@@ -8,8 +8,11 @@ whole index ships to the reader; it is fetched lazily, the first time someone
 opens the search box.
 
 A section is the text under one `##` or `###` heading, plus the chapter's
-opening text (which sits under no heading and links to the page itself). Each
-record carries the URL and anchor needed to deep-link to it:
+opening text (which sits under no heading and links to the page itself). The
+Solutions pages are sources too (`build_site.search_sources()`), labeled
+"Solutions 30", one record per exercise; their step-ladder summary labels
+are dropped from the text. Each record carries the URL and anchor needed
+to deep-link to it:
 
     {"u": "12_Techniques--Data_Classes_as_Types.html",  # page
      "a": "immutability",                   # heading anchor, "" for the intro
@@ -52,6 +55,12 @@ MD_LINK = re.compile(r"\[([^\]]*)\]\([^)]*\)")
 MD_IMAGE = re.compile(r"!\[[^\]]*\]\([^)]*\)")
 FOOTNOTE = re.compile(r"\[\^[^\]]*\]")
 HTML_TAG = re.compile(r"<[^>]+>")
+# A Solutions file's step ladder (tools/solution_steps.py): the summary
+# labels are not text a reader searches for, and every exercise carries
+# them, so they would match every query that named one.
+STEP_SUMMARY = re.compile(
+    r"^<summary>(?:Where to look|The shape|Solution)</summary>\s*$",
+    re.MULTILINE)
 # Underscores survive: `__post_init__` and `snake_case` names are exactly what
 # a reader searches for. The book writes emphasis with `*`, not `_`.
 DECORATION = re.compile(r"[`*>|]+")
@@ -83,6 +92,7 @@ class Section(NamedTuple):
 def clean(lines: list[str]) -> str:
     """Strip Markdown decoration, leaving text worth matching against."""
     text = "\n".join(lines)
+    text = STEP_SUMMARY.sub(" ", text)
     text = MD_IMAGE.sub(" ", text)
     text = MD_LINK.sub(r"\1", text)
     text = FOOTNOTE.sub(" ", text)

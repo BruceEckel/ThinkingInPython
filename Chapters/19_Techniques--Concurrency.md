@@ -315,7 +315,7 @@ peak 1.
 
 The event loop overlaps waiting, not computing.
 
-### `time.sleep()` Stops the Loop
+### `time.sleep()` Stops the Loop {#time-sleep-stops-the-loop}
 
 `asyncio.sleep()` in `io_price()` is not `time.sleep()`.
 Awaiting `asyncio.sleep()` suspends only the current task and hands control to the event loop,

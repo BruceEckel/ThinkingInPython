@@ -678,12 +678,28 @@ def write_solutions_page(ch: Chapter, chapters: list[Chapter],
     return True
 
 
+def search_sources(chapters: list[Chapter]) -> list[search_index.Source]:
+    """The chapters, then each Solutions file, as search index sources.
+
+    A Solutions record carries the label "Solutions 30" and the page's
+    URL, so a search for an exercise's name lands on its answer.
+    """
+    sources = [search_index.Source(ch.md, ch.out_name, ch.title, ch.label)
+               for ch in chapters]
+    for ch in chapters:
+        sol = solutions_file(ch.md)
+        if sol.exists():
+            title, _ = load_solutions(sol)
+            sources.append(search_index.Source(
+                sol, solutions_page_name(ch.md.stem), title,
+                ch.label.replace("Chapter", "Solutions")))
+    return sources
+
+
 def write_shared(chapters: list[Chapter], out_dir: Path) -> int:
     """Write the index page and the search index. Returns sections indexed."""
     (out_dir / "index.html").write_text(render_index(chapters), encoding="utf-8")
-    return search_index.write(
-        [search_index.Source(ch.md, ch.out_name, ch.title, ch.label)
-         for ch in chapters], out_dir)
+    return search_index.write(search_sources(chapters), out_dir)
 
 
 def rebuild_chapter(md: Path, out_dir: Path,

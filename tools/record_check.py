@@ -74,6 +74,7 @@ from functools import cache
 from pathlib import Path
 from tools.config import DATA_DIR, ROOT
 from tools.markdown import Block, Document
+from tools.solution_steps import SHAPE_PREFIX
 from tools.repo import add_paths_arg, chapter_stem, is_solutions_file, md_files
 from tools.report import Check, Finding, report
 
@@ -215,10 +216,21 @@ def in_scope_blocks(doc: Document) -> Iterator[Block]:
     started = (number > FIRST_CHAPTER
                or is_solutions_file(doc.path))
     for block in doc.python_blocks():
+        if is_shape_block(block):
+            # A generated "The shape" block (tools/solution_steps.py)
+            # repeats a listing's class declarations under no slug, so
+            # the exemptions file could not name it; the listing it was
+            # cut from is checked instead.
+            continue
         if started:
             yield block
         elif block.slug == DEFINING_SLUG:
             started = True
+
+
+def is_shape_block(block: Block) -> bool:
+    first = next((line for line in block.lines if line.strip()), "")
+    return first.startswith(SHAPE_PREFIX)
 
 
 def _slotted(name: str, here: str, index: dict[str, list[ClassInfo]],

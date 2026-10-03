@@ -197,3 +197,17 @@ def test_an_exemption_covers_the_dict_form(
     d = doc(tmp_path, listing("point.py", DICT_FORM))
     assert messages(d) == []
     assert list(unused_exemptions([d])) == []
+
+
+def test_a_generated_shape_block_is_not_checked() -> None:
+    from pathlib import Path
+
+    from tools.markdown import Document
+    from tools.record_check import find
+    text = "\n".join([
+        "```python", "# The shape of drawing_v2.py",
+        "from record import record", "", "@record(slots=False)",
+        "class DrawingV2:", "    x: int", "```", ""])
+    doc = Document.from_text(
+        text, Path("Solutions/36_Patterns--Memento/README.md"))
+    assert list(find(doc)) == []

@@ -369,7 +369,7 @@ For an object still alive when the program ends,
 `finalize()` runs the callback from the `atexit` module's exit handlers,
 ahead of the teardown that makes `__del__()` unreliable.
 
-### The `self.close` Trap
+### The `self.close` Trap {#the-self-close-trap}
 
 Passing `self.close` to `finalize()` produces no error,
 only an object that never goes away:

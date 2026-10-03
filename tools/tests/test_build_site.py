@@ -8,6 +8,8 @@ Solutions file as a page beside the chapter's, and links that instead.
 """
 from pathlib import Path
 
+import pytest
+
 from tools.build_epub import Ids, relink
 from tools.build_site import (
     SOLUTIONS_BLOB_URL,
@@ -16,8 +18,10 @@ from tools.build_site import (
     load_chapter,
     load_solutions,
     rewrite_md_links,
+    search_sources,
     solutions_page_name,
 )
+from tools.search_index import clean, split_sections
 
 STEM = "05_Foundations--Demo"
 NAME = f"{STEM}.md"
@@ -106,3 +110,36 @@ def test_url_survives_the_epub_relink() -> None:
         ids = Ids(prefixes={}, known=set(), aliases={})
         assert relink(text, "ch05", ids, unresolved) == text
         assert unresolved == set()
+
+
+def test_solutions_pages_join_the_search_index(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    from tools import build_site
+    from tools.build_site import Chapter
+    monkeypatch.setattr(build_site, "solutions_file",
+                        lambda md: tmp_path / "Solutions" / STEM / "README.md")
+    chapters_dir = tmp_path / "Chapters"
+    chapters_dir.mkdir()
+    md = chapters_dir / NAME
+    md.write_text("# Demo\n\nText.\n", encoding="utf-8")
+    folder = tmp_path / "Solutions" / STEM
+    folder.mkdir(parents=True)
+    sol = folder / "README.md"
+    sol.write_text("# Demo: Solutions\n\n## 1. First\n\n> Ask.\n\n"
+                   "<details>\n<summary>Where to look</summary>\n\n"
+                   "Look at `thing()`.\n\n</details>\n", encoding="utf-8")
+    ch = Chapter(md, f"{STEM}.html", "05", "Demo", "Chapter 5")
+    sources = search_sources([ch])
+    assert [s.url for s in sources] == [f"{STEM}.html",
+                                        f"{STEM}.solutions.html"]
+    assert sources[1].label == "Solutions 5"
+    assert sources[1].title == "Demo: Solutions"
+    [record] = [s for s in split_sections(sources[1]) if s.anchor]
+    assert record.heading == "First"  # the list mark is stripped
+    assert "Where to look" not in record.text
+    assert "thing()" in record.text
+
+
+def test_clean_drops_only_the_step_labels() -> None:
+    assert clean(["<summary>Solution</summary>", "A Solution here."]) == (
+        "A Solution here.")
