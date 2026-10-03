@@ -245,7 +245,7 @@ Inverting assumes the values are unique.
 `Arthur` and `Robin` both sit at seat `1`.
 `Robin`, entered later, overwrites `Arthur` at key `1`,
 the same rule any duplicate dictionary key follows.
-`Arthur` never appears in `name_at`.
+The result has no entry for `Arthur`.
 
 ## Nested Comprehensions
 
@@ -283,7 +283,7 @@ It sits in the output position, before the `for`,
 and decides what each element *is*.
 Every `col` still produces one.
 An `if` after the `for`, as in `[e ** 2 for e in a_list if isinstance(e, int)]`,
-decides *whether* the comprehension produces an element at all.
+decides *whether* the comprehension produces an element.
 The positions are not interchangeable:
 `[x for x in xs if a else b]` is a `SyntaxError`.
 When you need both a conditional expression and a filter,
@@ -415,8 +415,8 @@ and `Path.walk()` ignores the error unless you pass `on_error`.
 returns to that gap.
 
 `root.rglob("*.py")` finds the same two files in one line,
-with no explicit walk and no comprehension at all.
-Try `rglob()` first: a glob pattern already says what you want.
+with no explicit walk and no comprehension.
+Try `rglob()` first: a glob pattern says what you want.
 `walk()` earns its place when the filter needs more than a glob pattern can express,
 a file's size or its contents rather than its name, say,
 or when the comprehension needs the directory structure itself,
@@ -531,8 +531,7 @@ for n in [1, 2, 3]:
 ```
 
 The `for` loop prints the same values without building a wasted list.
-With the comprehension's brackets gone,
-nothing suggests a collection the code never uses.
+With the comprehension's brackets gone, nothing suggests an unused collection.
 Use a comprehension when you want the collection it produces,
 and a `for` loop when you want the side effect.
 If nothing assigns or uses a comprehension's result, write it as a loop instead.
@@ -635,7 +634,7 @@ A generator expression runs once,
 and after something consumes its values it is empty.
 `sum()` drains `nums`,
 so `any()` sees no elements and reports `False` instead of `True`,
-with no exception to say the question was never asked.
+with no exception to say the question went unasked.
 When you must traverse something twice,
 either materialize it with `list()` or write the generator expression again.
 
@@ -753,7 +752,7 @@ give a hint, usually the shape of the code, and a full answer for each exercise.
 1.  Using `a_list` from `a_list.py` (`[1, "4", 9, "a", 0, 4]`),
     write a list comprehension that finds the string elements made only of digits
     (`e.isdigit()`), converts each to `int` with `int(e)`, and squares it.
-    The predicate must reject `"a"` so `int()` never sees it.
+    The predicate must reject `"a"` before `int()` sees it.
     Of the types in `a_list`, only `str` has `isdigit()`,
     so the predicate must test `isinstance(e, str)` before calling it.
 2.  In `identity_matrix.py`,

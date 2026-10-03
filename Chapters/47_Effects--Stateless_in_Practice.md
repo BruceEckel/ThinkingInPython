@@ -212,7 +212,7 @@ print(4_000 < heads < 6_000)
 ```
 
 `count_heads()` needs a `Flip` and produces an `int`.
-Its body never calls `random`, and no parameter carries a seed or a source.
+Its body does not call `random`, and no parameter carries a seed or a source.
 `Ask` and `Tell` each carry a payload the request delivers,
 whereas `Flip`'s whole content is its type and the `bool` it produces.
 
@@ -1893,8 +1893,7 @@ which is the description/execution split in table form.
 The rule about where to call `run()` and `run_async()` has a reason.
 `run()` is `asyncio.run(run_async(effect))`,
 building a fresh event loop for the call and tearing it down after.
-If you call it from inside a loop already running
-(the shape of any async web handler),
+If you call it from inside a running loop (the shape of any async web handler),
 `asyncio.run()` raises a `RuntimeError` before your Effect runs:
 
 ```python
@@ -1939,7 +1938,7 @@ print(f"run() at least 20x slower: "
 #: run() at least 20x slower: True
 ```
 
-`run_async()` reuses the loop already running and costs little beyond the Effect.
+`run_async()` reuses the running loop and costs little beyond the Effect.
 `run()` builds and tears down a loop on every call,
 at least twenty times the cost of `run_async()`, by the listing's own measure.
 Running the listing with `--numbers` prints both per-call costs
@@ -2002,7 +2001,7 @@ expect(ZeroDivisionError, run, caller())
 so the `ZeroDivisionError` propagates as an ordinary raised exception,
 untracked.
 `catch()` matches the values an Effect yields, not exceptions the body raises,
-so a failure `@throws` never lifted goes past `catch()` untouched.
+so a failure that no `@throws` lifts goes past `catch()` untouched.
 Watch for a failure going past `catch()`,
 because `catch(ZeroDivisionError)` type-checks and then does nothing:
 the protection appears to be there.
@@ -2256,7 +2255,7 @@ past any `catch()` the caller wraps around the result.
 The type agrees with the runtime.
 `reveal_type(bad)` under `ty` 0.0.84 reports `(n: int) -> Generator[Need[Executor], Any, Task[int]]`,
 with `Boom` nowhere in it.
-The fix is the discipline `catch()` and `catch_all` already teach:
+The fix is the discipline `catch()` and `catch_all` teach:
 move the failure into the result before you fork.
 Apply `catch_all()` before `@fork`: with `bad` left undecorated,
 `fork(catch_all(bad))` matches the overload for an Effect with no declared error,
@@ -2321,7 +2320,7 @@ gives three techniques: returning a `Result`, catching the exception you expect,
 and restricting a type so bad values cannot exist.
 They make most of a function's failures visible in its signature,
 with no generator discipline and no description/execution split.
-Use Stateless when a system is large enough that hidden Effects have already caused a production incident,
+Use Stateless when a system is large enough that hidden Effects have caused a production incident,
 and when the team will declare every Effect at every boundary.
 Below that scale, the discipline matters and the machinery is optional.
 

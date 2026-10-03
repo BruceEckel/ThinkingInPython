@@ -160,7 +160,7 @@ what keep changing.
 <details>
 <summary>Where to look</summary>
 
-[When a Pattern Dissolves](../../Chapters/21_Patterns--Design_Patterns.md#when-a-pattern-dissolves) shows a pattern whose parts Python already supplies.
+[When a Pattern Dissolves](../../Chapters/21_Patterns--Design_Patterns.md#when-a-pattern-dissolves) shows a pattern whose parts Python supplies.
 List the interface, the concrete classes, the context, and the wiring the usual form needs.
 Cross out each part that a function or a type annotation covers, and state what remains in one sentence.
 
@@ -198,7 +198,7 @@ form requires:
 
 Now cross out what Python supplies:
 
-- The interface goes. A function is already a value with a call
+- The interface goes. A function is a value with a call
   signature, and `Callable[[float], float]` states that signature
   without declaring a type.
 - The concrete classes go. Each holds one method and no state, so each

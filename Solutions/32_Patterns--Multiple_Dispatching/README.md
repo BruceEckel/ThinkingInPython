@@ -344,8 +344,8 @@ if __name__ == "__main__":
 
 **Give the new class both dispatches.** The new `Lizard` class needs a `compete()` plus four
 `eval_*()` methods, one per opponent type including its own. Those
-methods encode the same sixteen answers already sitting in the table
-version's `OUTCOME` dictionary, spread across four classes instead of
+methods encode the same sixteen answers that the table version's
+`OUTCOME` dictionary holds, spread across four classes instead of
 collected in one place. The two implementations agree on all sixteen
 combinations.
 
@@ -353,7 +353,7 @@ combinations.
 
 The table costs one class and seven dictionary rows to extend. The
 method version costs one class and five new methods, plus retrofitting
-a method onto every class that already exists. That cost only grows as
+a method onto every existing class. That cost only grows as
 you add more item types. The chapter therefore recommends the table by
 default, and reserves the method version for behavior that belongs to
 the class: a combination that reads the object's own state, or one a
@@ -666,7 +666,7 @@ produces, one increment per item, so the caller can read
 > `__sub__()` handles a `Meters`, an `int`, or a `float`,
 > and returns `NotImplemented` for anything else.
 > `__rsub__()` needs only the `int` and `float` cases,
-> since Python never calls the reflected form for two `Meters`.
+> since Python skips the reflected form when both operands are `Meters`.
 > Subtraction does not commute, so the reflected form must undo the swap:
 > check that `10 - Meters(3)` produces `Meters(7)` rather than `Meters(-7)`.
 > Then confirm that `"ten" - Meters(3)` raises a `TypeError` rather than producing a `Meters`.
@@ -735,9 +735,10 @@ with expected(TypeError):
 **Handle each accepted type.** `__sub__()` is `__add__()` with the sign changed, and the three cases
 line up the same way: a `Meters`, a number, or `NotImplemented` for
 anything else. `__rsub__()` needs only the numeric case, because
-Python asks the left operand first, and `Meters.__sub__()` already
+Python asks the left operand first, and `Meters.__sub__()`
 answers `Meters(10) - Meters(3)`. Python tries the reflected form only
-when the left operand declines, and two `Meters` never decline.
+when the left operand declines, and for two `Meters` the left
+operand accepts.
 
 **Undo the swap.** The swap is where subtraction differs from addition. Python calls
 `Meters.__rsub__(Meters(3), 10)` for the expression `10 - Meters(3)`,
@@ -750,7 +751,7 @@ negative of every reflected subtraction. `__radd__()` hides that swap
 because addition commutes, so the mistake costs nothing there and
 costs the wrong answer here.
 
-**Decline an unsupported operand.** `"ten" - Meters(3)` finds no `str.__sub__` at all, so Python goes
+**Decline an unsupported operand.** `"ten" - Meters(3)` finds no `str.__sub__`, so Python goes
 straight to `Meters.__rsub__`, which returns `NotImplemented` for a
 `str`. With both sides declining, Python raises the `TypeError`, and
 the message names both types. Returning `NotImplemented` rather than
@@ -897,8 +898,8 @@ print(TolerantOrigami().compete(TolerantRock()))
 
 **Reproduce the exact-match failure.** The `KeyError` comes from a dictionary probe, which compares keys by
 equality. `Origami` inherits from `Paper` but is not `Paper`, so
-`(Origami, Rock)` is not `(Paper, Rock)`. Inheritance never enters the
-lookup: a `dict` hashes the key and compares, and neither step
+`(Origami, Rock)` is not `(Paper, Rock)`. Inheritance plays no part in
+the lookup: a `dict` hashes the key and compares, and neither step
 consults an MRO. That is what the chapter's "matches classes exactly"
 means, and exact matching is the property `singledispatch` does not
 share.
@@ -925,11 +926,10 @@ version safe, though only for a subclass of a concrete item. An
 `Origami(Paper)` whose rows you forgot to write no longer raises a
 `KeyError`. It silently inherits `Paper`'s answers and plays as paper.
 A `Lizard(Item)` still fails fast, since no row has `Item` in its key
-and the MRO walk finds nothing to inherit. Tolerance buys the
-convenience of skipping rows at the price of the fail-fast policy the
-chapter recommends for a table under construction, and it pays that
-price where the table is most likely to mistake a new type for an
-old one.
+and the MRO walk finds nothing to inherit. Tolerance lets you
+skip rows, and in exchange it drops the fail-fast policy the chapter
+recommends for a table under construction. It drops that policy
+where the table is most likely to mistake a new type for an old one.
 
 Which behavior you want depends on whether a subclass is a new
 competitor or a variation on an existing one. `Origami` really is
@@ -1642,7 +1642,7 @@ for item1, item2 in [
 
 **Call what the lookup returns.** `compete()` changes by one pair of parentheses. It still finds the
 cell with a single probe keyed on both types, and now calls what it
-finds instead of returning it. The call site never learns any of
+finds instead of returning it. The call site shows none of
 this: `item1.compete(item2)` reads as it does in
 `paper_scissors_rock.py`, where four method definitions per class
 stand behind it. A table of callables keeps the method-call syntax.
@@ -1665,7 +1665,7 @@ from the same two objects.
 
 The second reason survives. A subclass still cannot override one
 combination and inherit the rest, because the lookup still matches
-types exactly: an `Origami(Paper)` finds no row at all, callable or
+types exactly: an `Origami(Paper)` finds no row, callable or
 not, and the fix is to write `Origami`'s rows rather than to override
 one combination. Changing a cell changes it for every `Item`, since `OUTCOME` is
 one shared dictionary. `paper_scissors_rock_subclass.py`'s `DampPaper`

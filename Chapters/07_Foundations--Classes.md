@@ -121,7 +121,7 @@ so `display_object()` hides it by default.
 ## Inheritance
 
 Because Python is dynamically typed,
-it applies an operation to an object and never checks an interface first.
+it applies an operation to an object without checking an interface first.
 With inheritance in C++ or Java,
 you often inherit only to establish a common interface.
 Python is different.
@@ -556,7 +556,7 @@ print([p])
 ```
 
 `print()` and `str()` use `__str__()` when it exists and fall back to `__repr__()` when it does not.
-The fallback runs in one direction: `repr()` never consults `__str__()`.
+The fallback runs in one direction: `repr()` ignores `__str__()`.
 A container builds its own display from the `__repr__()` of its elements,
 and that is why the list prints `Point(3, 4)` rather than `(3, 4)`.
 In an f-string, `{p}` selects `__str__()` and `{p!r}` selects `__repr__()`.
@@ -572,7 +572,7 @@ shows how `@dataclass` writes the constructor and `__repr__()`.
 
 ## Static and Class Methods
 
-A method that never touches `self` can be a `@staticmethod`.
+A method that doesn't touch `self` can be a `@staticmethod`.
 A method that needs the class rather than an instance can be a `@classmethod`.
 A class method receives the class as its first argument,
 conventionally named `cls`:

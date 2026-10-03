@@ -85,12 +85,13 @@ the "singleton" case is unreachable.
 instance without binding its fields, since `classify()` doesn't need
 `x` or `y`.
 
-The string `"hi"` is a sequence of two characters, and it still lands
-in "other": a sequence pattern excludes `str`. The tuple `(1,)` goes
-the other way. A sequence pattern tests the shape, not the type, so a
-one-element tuple is a "singleton" here. When the answer must hold for
-a `list` alone, wrap the pattern in a class pattern: `case list([_]):`
-first tests for a `list`, then matches the one-element shape.
+The string `"hi"` is a sequence of two characters, and `classify()`
+still returns "other" for it: a sequence pattern excludes `str`. The
+tuple `(1,)` goes the other way. A sequence pattern tests the shape,
+not the type, so a one-element tuple is a "singleton" here. When the
+answer must hold for a `list` alone, wrap the pattern in a class
+pattern: `case list([_]):` first tests for a `list`, then matches the
+one-element shape.
 
 </details>
 </details>
@@ -355,7 +356,7 @@ The fence shows the first diagnostic, in `render()`. The second is identical, at
 line 43 in `cost()`.
 
 `assert_never()` declares its parameter as `Never`, the type with no
-values, so the call checks only when the cases above it have already
+values, so the call checks only when the cases above it have
 eliminated every member of the union. The inferred type spells out
 what survives those cases: a `Webhook` that is none of the three
 handled types. A `Webhook` can still reach the `assert_never()` call,

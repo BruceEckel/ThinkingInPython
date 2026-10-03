@@ -5,7 +5,7 @@
 > A *Singleton* creates that one instance and shares it.
 
 The classic form is a class that refuses a second instance.
-Before writing one, ask whether the language already solves the problem,
+Before writing one, ask whether the language solves the problem for you,
 the question [When a Pattern Dissolves](21_Patterns--Design_Patterns.md#when-a-pattern-dissolves)
 poses for every pattern.
 For *Singleton*, the language already has an answer.
@@ -183,10 +183,10 @@ and that lookup fails.
 The cached-factory listings name the class `Settings`, with no underscore,
 because the name is public.
 `settings()` returns a `Settings`,
-so the class already appears in the module's public signature.
+so the class appears in the module's public signature.
 A caller who annotates the result must write that name,
 and a type outsiders must name is not private, whatever its first character.
-`_Settings` fits a type that never leaves the module.
+`_Settings` fits a type that stays inside the module.
 
 Two stronger-looking moves fail the same way.
 Deleting the name after building the instance leaves the class reachable:
@@ -235,7 +235,7 @@ Three implementation notes:
 3. A [lock](19_Techniques--Concurrency.md#the-gil-does-not-prevent-races)
    is the other fix for that race, but not in the obvious place.
    A `threading.Lock` around the cached function's body changes nothing,
-   because every thread has already missed the cache before reaching the lock.
+   because every thread misses the cache before reaching the lock.
    They serialize, each still builds an object,
    and the cache keeps whichever finished last.
    The check must run inside the lock, as `singleton_locked_settings.py` shows.
@@ -313,7 +313,7 @@ print(len({id(s) for s in built}))
 ```
 
 One thread finds `_instance` empty and builds it.
-The rest wait on the lock, and each finds `_instance` already filled.
+The rest wait on the lock, and each finds `_instance` filled.
 Under the same eight-thread race,
 the cached version produces more than one object, usually eight.
 The locked version produces one, as the printed count confirms.
@@ -330,7 +330,7 @@ reappears here, from inside a function.
 as [Names Inside a Function](05_Foundations--Functions.md#names-inside-a-function)
 shows.
 `with _lock:` reads the name,
-even though acquiring and releasing changes that lock's state,
+although acquiring and releasing changes that lock's state,
 from unlocked to locked and back.
 Changing an object is not rebinding a name.
 `_instance` differs because the function assigns to it.
@@ -601,7 +601,7 @@ print(x.val, x is y, x.__dict__ is y.__dict__ is z.__dict__)
 
 `Singleton` writes its `__init__()` by hand, and it cannot be a `@dataclass`.
 The sharing depends on `super().__init__()` rebinding `self.__dict__` to `_shared_state`,
-and a dataclass generates its own `__init__()` that assigns the fields and [never calls the base `__init__()`](12_Techniques--Data_Classes_as_Types.md#dataclass-inheritance),
+and a dataclass generates its own `__init__()` that assigns the fields and [skips the base `__init__()`](12_Techniques--Data_Classes_as_Types.md#dataclass-inheritance),
 so each instance keeps its own `__dict__`.
 The dataclass version still runs; the class has quietly stopped being a `Borg`.
 A `__post_init__()` that does the rebinding fails differently:
@@ -773,7 +773,7 @@ That listing puts its work inside `__new__()`,
 so later calls append to the shared instance instead of overwriting it.
 [Metaprogramming](17_Techniques--Metaprogramming.md)
 also covers `__init_subclass__()` and `__set_name__()`,
-the simpler hooks that replace most metaclasses.
+the simpler methods that replace most metaclasses.
 A singleton needs none of this machinery,
 since a module or a cached factory gives you one instance without intercepting construction.
 
@@ -789,7 +789,7 @@ Use the lightest tool that fits:
 - If you really want many handles sharing one set of state, use *Borg*,
   but only when something needs those handles to be objects:
   an existing class-based interface, an `isinstance()` check, or subclassing.
-  A module already shares that state with every importer and needs no class,
+  A module shares that state with every importer and needs no class,
   so shared data alone is no reason to use *Borg*.
 - The decorator and metaclass forms work,
   but they are more machinery than the problem usually justifies.

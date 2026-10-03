@@ -14,7 +14,7 @@
 
 [Packages](../../Chapters/06_Foundations--Modules_and_Packages.md#packages) shows the three import forms and the messages each module prints as it loads.
 Python records every loaded module in `sys.modules` under its full dotted name.
-Ask what a second `import` of a name already in that cache does with the module's top-level code.
+Ask what a second `import` of a name in that cache does with the module's top-level code.
 
 <details>
 <summary>The shape</summary>
@@ -79,7 +79,7 @@ package's `__init__.py` runs once for the same reason.
 > Import and call `function6()` from a script outside `a_package`,
 > then rename `b_package` to `bPackage` (and rename it back afterward)
 > and explain, from the rules in [File Names](../../Chapters/06_Foundations--Modules_and_Packages.md#file-names),
-> why that name is a poor choice even though the import still works.
+> why that name is a poor choice although the import still works.
 
 <details>
 <summary>Where to look</summary>
@@ -156,10 +156,10 @@ the convention provides.
 [File Names](../../Chapters/06_Foundations--Modules_and_Packages.md#file-names) calls
 for short, all-lowercase package names, so `bPackage` stands out as
 something other than a package to anyone scanning an import line.
-Its capital letter also adds a
-spelling to get wrong: on a case-insensitive filesystem the shell and
-the editor accept `bpackage` as well, and only Python's case-sensitive
-import check, the one exercise 4 examines, rejects that spelling.
+Its capital letter also makes the name easy to mistype: on a
+case-insensitive filesystem the shell and the editor accept `bpackage`
+as well, and only Python's case-sensitive import check, the one
+exercise 4 examines, rejects `bpackage`.
 
 </details>
 </details>
@@ -236,12 +236,11 @@ print("after both")
 #: after both
 ```
 
-Even though the `lazy import noisy` line comes first, `noisy`'s body
-does not run until `noisy.announce()` executes, and that call comes
-after `noisy2.announce()`. Each `lazy import` only reserves the name.
-The module's top-level code runs at the first use of that
-name, so use order, not declaration order, decides which module loads
-first.
+Although the `lazy import noisy` line comes first, `noisy`'s body does
+not run until `noisy.announce()` executes, and that call comes after
+`noisy2.announce()`. Each `lazy import` only reserves the name. The
+module's top-level code runs at the first use of that name, so use
+order, not declaration order, decides which module loads first.
 
 </details>
 </details>
@@ -263,7 +262,7 @@ first.
 <summary>Where to look</summary>
 
 [File Names](../../Chapters/06_Foundations--Modules_and_Packages.md#file-names) explains how Python compares an import name with the file name on disk.
-The filesystem may treat the two spellings as one file, but the import system reads the directory listing and decides for itself.
+The filesystem may treat the two names as one file, but the import system reads the directory listing and decides for itself.
 The `PYTHONCASEOK` environment variable switches that comparison off, which tests your explanation.
 
 <details>
@@ -303,8 +302,8 @@ Python's rather than the filesystem's.
 
 None of this arises if you follow the convention.
 [File Names](../../Chapters/06_Foundations--Modules_and_Packages.md#file-names)
-recommends `snake_case` for modules, and an all-lowercase name has
-only one spelling for the check to match.
+recommends `snake_case` for modules, and with an all-lowercase name,
+an import and its file cannot differ in case.
 
 </details>
 </details>

@@ -301,7 +301,7 @@ class Stars(_Stars):
 If you define `__new__()` in the `NamedTuple` class body,
 the `class` statement raises an `AttributeError`
 (`Cannot overwrite NamedTuple attribute __new__`),
-and `Stars` never exists.
+and `Stars` stays undefined.
 [A `NamedTuple` Cannot Validate Itself](../../Chapters/12_Techniques--Data_Classes_as_Types.md#namedtuple-cannot-validate) shows the same failure in its third test.
 The prohibition covers only the body that `NamedTuple` processes,
 so the solution defines `__new__()` in a subclass.
@@ -351,8 +351,8 @@ accepts one in a subclass, so `Stars(11)` now raises a `TypeFailure`.
 The chapter's factory function can only advise against that call.
 
 **Test the replacement path.** The guarantee still leaks. `_replace()` builds the new tuple through
-`tuple.__new__()` rather than through `cls.__new__()`, so the check
-never runs. `copy.replace()` calls `_replace()` and inherits the hole.
+`tuple.__new__()` rather than through `cls.__new__()`, so it skips
+the check. `copy.replace()` calls `_replace()` and inherits the hole.
 A validated `Stars` therefore produces an unvalidated one.
 That leak is worse than no check: the type now looks like it guarantees its values.
 
@@ -712,7 +712,7 @@ expect(Exception, Wrong, 1)
 
 **Keep the counter out of the fields.**
 `@dataclass` reads the annotation, sees `ClassVar`, and leaves `built`
-alone as an ordinary class attribute, so `built` never reaches
+alone as an ordinary class attribute, so `built` stays out of
 `__init__()`. `dataclasses.fields()` reports only `number`, and the
 generated signature takes only `number`.
 
@@ -817,14 +817,14 @@ print(Bare().index, Subscripted().index)
 ```
 
 **Provoke the decorator's error.**
-`= {}` never reaches a running program. `@dataclass` inspects the
-default as the decorator runs, finds an unhashable object, and raises
-a `ValueError` naming the fix.
+`= {}` fails at the class definition, before any instance exists.
+`@dataclass` inspects the default as the decorator runs, finds an
+unhashable object, and raises a `ValueError` naming the fix.
 
 **Fix it with a bare factory.**
 `Bare` and `Subscripted` both work, and they differ in what `ty`
 sees. For `field(default_factory=dict)` `ty` infers `Unknown`, a type
-that satisfies any annotation, so `ty` never compares the factory
+that satisfies any annotation, so `ty` does not compare the factory
 against the field. Checkers differ here: Pyright and mypy
 both compare the bare factory and reject a mismatched one.
 
@@ -941,8 +941,8 @@ and an `isinstance()` test admits `True` as the rating 1.
 and rejects a `bool` along with a `float` and a `str`.
 
 **Test the type before the range.** The type test runs first. Comparing `"five"` with `1` raises a
-`TypeError`, so with the range check first a `str` never reaches a
-`TypeFailure`.
+`TypeError`, so with the range check first a `str` ends in that
+`TypeError` instead of a `TypeFailure`.
 
 **Feed values the checker refuses.** The type checker rejects `5.5`
 and `"five"` as arguments before the program runs, and the

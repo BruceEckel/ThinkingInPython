@@ -46,7 +46,7 @@ The heap reserves no space in advance.
 It starts essentially empty and grows only as the program asks for more,
 one allocation at a time.
 A stack is the reverse: creating the thread sets its maximum size,
-and that size never changes.
+and that size stays fixed.
 The amount used out of that fixed allotment varies at runtime.
 If a chain of function calls needs more room than the maximum,
 the stack overflows instead of growing to fit.
@@ -92,7 +92,7 @@ and therefore cannot optimize that program.
 For example, the OS does not know what data is important to preserve and what isn't.
 If it knew, it could switch contexts faster.
 In addition, each thread reserves a stack large enough to serve virtually any program,
-even though some tasks need only a fraction of that.
+although some tasks need only a fraction of that.
 Engineers learned tricks to make programs run faster despite these disadvantages,
 but these tricks made the resulting programs more expensive to create and maintain.
 
@@ -192,8 +192,9 @@ The first printed line proves that calling a coroutine runs nothing.
 `main()`'s first line calls `fetch("a", 0.03)`, yet no "started" line appears,
 only the type of object the call built: `coroutine`.
 `gather()` schedules the work when it receives that object.
-If you never hand that coroutine object to `gather()` (or `create_task()`),
-nothing runs, and Python points this out with a `RuntimeWarning: coroutine 'fetch' was never awaited` when the garbage collector reclaims it.
+If you discard that coroutine object without handing it to `gather()`
+(or `create_task()`), nothing runs,
+and Python points this out with a `RuntimeWarning: coroutine 'fetch' was never awaited` when the garbage collector reclaims it.
 
 The trace shows the event loop's schedule.
 `gather()` wraps each coroutine in a *task*,
@@ -235,7 +236,7 @@ Scheduling does not mean running.
 The bodies execute after `main()` suspends at its `await`,
 which returns control to the event loop.
 Each runs until its first `await`, which the trace's `started` lines record.
-The comprehension never has more than one coroutine in flight:
+The comprehension keeps at most one coroutine in flight:
 it starts the next coroutine only after the previous one has finished.
 
 ## Overlapping the Waits
@@ -248,7 +249,7 @@ writing the same price lookup twice.
 A `Meter` records the peak number of tasks in flight at once.
 `Meter` is a [context manager](15_Techniques--Context_Managers.md):
 `__enter__()` counts the task in flight, `__exit__()` counts it done,
-and `__exit__()` runs even if the body raises an exception:
+and `__exit__()` runs whether or not the body raises an exception:
 
 ```python
 # peak_concurrency.py
@@ -310,8 +311,8 @@ writing `with meter:` around its own active span.
 Both runs use the same `asyncio.gather()`, yet the peaks differ.
 Each I/O task reaches its `await` and suspends there.
 All five are in flight at once: peak 5.
-The CPU tasks never `await`, so each runs to the end before the next starts:
-peak 1.
+The CPU tasks contain no `await`,
+so each runs to the end before the next starts: peak 1.
 
 The event loop overlaps waiting, not computing.
 
@@ -425,7 +426,7 @@ the same guarantee `async_mechanics.py` makes for sleeps.
 
 ## Escaping to a Thread
 
-The rule inside `async def` is to `await`, never block.
+The rule inside `async def` is to `await` instead of blocking.
 If you cannot rewrite a blocking call,
 for example a library function that reads a file or talks to a database,
 you can put it in a thread.
@@ -598,19 +599,19 @@ The `except*` form catches members of a group by type,
 and iterating through `group.exceptions` reaches every member.
 
 The `except*` form matters.
-A `TaskGroup` always wraps what it re-raises, even when exactly one task failed,
+A `TaskGroup` wraps what it re-raises whether one task failed or several,
 so a plain `except ValueError:` around the `async with` block catches nothing,
 and the `ExceptionGroup` propagates uncaught.
 
-Keeping the task objects pays off even after a partial failure.
-`a` and `b` already succeeded, and their results stay untouched:
+Keeping the task objects lets you inspect each outcome after a partial failure.
+`a` and `b` succeeded before the failures, and their results stay untouched:
 `task.result()` returns `'A'` and `'B'`, as if nothing else had gone wrong.
 `c` and `d` each completed with their own exception,
 so `task.exception()` returns the `ValueError` instead of raising it.
-`e` and `f` never reach their `fetched` print because the group cancels them,
+The group cancels `e` and `f` before they reach their `fetched` print,
 so `task.cancelled()` is `True` for both.
 A partial failure cancels whatever is still in flight.
-It does not erase what already succeeded.
+It leaves the results of the tasks that succeeded intact.
 
 Cancellation reaches a task by raising `asyncio.CancelledError` inside it,
 at whichever `await` currently suspends it.
@@ -736,7 +737,7 @@ instead of one call.
 
 ## A Single Thread Still Races
 
-`asyncio` runs one coroutine at a time, never two at once,
+`asyncio` runs one coroutine at a time,
 and that fact tempts you to conclude that shared state needs no locking.
 But "one at a time" protects only the instructions between two `await`s,
 not a value that lives across one.
@@ -814,7 +815,7 @@ asyncio.run(main())
 
 The change from `async_race.py` is the module-level `lock` and the `async with lock:` block.
 The block protects the read, the yielding `await`, and the write.
-A task that reaches `async with lock` while another task already holds the lock suspends itself until the lock becomes available.
+A task that reaches `async with lock` while another task holds the lock suspends itself until the lock becomes available.
 This way, only one task runs its read-modify-write at a time,
 no matter how many times the event loop switches to another task in between.
 The counter now reaches 400, the same fix `threading.Lock` produces for threads.
@@ -859,7 +860,7 @@ Here, the first `await` comes after both updates,
 so the task keeps control through them and needs no lock.
 
 A semaphore initialized to one behaves like a lock, with one difference.
-A `Lock` refuses a release it never granted,
+A `Lock` refuses a release when no task holds it,
 raising `RuntimeError: Lock is not acquired`.
 An over-released `Semaphore` quietly raises its own limit instead,
 so a stray `release()` turns a semaphore of one into a semaphore of two.
@@ -1091,7 +1092,7 @@ waiting for it to finish, and reassembling results that can arrive in any order
 Draining after `join()` works here because all five results are small enough for every worker to finish writing with no reader waiting.
 Bulky data changes that: once the pipe between the processes fills,
 each worker's feeder thread blocks until a reader consumes its output,
-so the worker never exits and `join()` deadlocks.
+so the worker cannot exit, and `join()` deadlocks.
 Drain a queue carrying bulky data before joining.
 
 `ProcessPoolExecutor` builds on `multiprocessing`.
@@ -1189,8 +1190,7 @@ One run on a 32-core machine produced this:
 
 This is one machine's real output.
 Exact timings shift with load and hardware, but the shape holds:
-wall time drops sharply up to the core count,
-then flattens or even reverses past it,
+wall time drops sharply up to the core count, then flattens or reverses past it,
 as doubling from 32 to 64 tasks did here.
 `TOTAL` and `CORE_MULTIPLIER` are the two constants worth changing:
 raise `TOTAL` for a slower, more dramatic slope on your own machine,
@@ -1210,7 +1210,7 @@ the best any number of cores can do is:
     speedup(n) = 1 / (s + (1 − s) / n)
 
 As *n* → ∞, that ceiling approaches 1 / *s* and stops climbing.
-A job that spends 10 percent of its time in serial overhead never speeds up more than tenfold,
+A job that spends 10 percent of its time in serial overhead speeds up at most tenfold,
 on 16 cores or 1,600.
 
 Splitting into more, smaller tasks yields real gains up to a point,
@@ -1282,7 +1282,7 @@ The two callers below use the two styles a `NamedTuple` allows,
 access by field name and positional unpacking.
 
 Here `time.sleep()` stands in for a blocking network call,
-and five threads overlap five of those waits even with the GIL in place:
+and five threads overlap five of those waits despite the GIL:
 
 ```python
 # io_threads.py
@@ -1384,7 +1384,7 @@ and the per-interpreter GIL of [Subinterpreters](#subinterpreters) in 2023.
 ### The GIL Does Not Prevent Races
 
 The lock ensures that reference counts stay consistent,
-dictionaries never corrupt their internal structure, and imports do not collide.
+dictionaries keep their internal structure intact, and imports do not collide.
 
 Your shared state gets no such protection.
 The statement `counter += 1` compiles to separate bytecode instructions:
@@ -1435,7 +1435,7 @@ so all eight threads read the same value,
 and their eight writes store the same result.
 
 At full speed, with no deliberate sleep, the GIL makes this race rare.
-But it never makes the race impossible.
+But the GIL does not make the race impossible.
 Threads that share mutable state need a lock,
 or a queue like the one in [Coordinating Threads with Queues](#coordinating-threads-with-queues).
 The fix mirrors `async_locks.py`'s: wrap the read, the sleep,
@@ -1502,7 +1502,7 @@ Usually only one thread touches an object, the one that created it.
 non-atomic arithmetic.
 Only other threads pay for an atomic operation.
 Permanent objects like `None`, `True`, and small integers become *immortal*.
-Their counts never change.
+Their counts stay fixed.
 Immortality arrived in 3.12 for every build but pays off most in the free-threaded one,
 since it removes the one atomic operation every thread otherwise contests.
 Mutable containers like dictionaries and lists carry individual locks,
@@ -1646,7 +1646,7 @@ The pool may run the two producers on one thread or on two.
 Often one thread runs both,
 because the first producer finishes before the pool picks up the second,
 but the order in which jobs enter the queue can vary with scheduling.
-Waiting for both producer futures before submitting the consumer guarantees every job is already in the queue once `consume()` starts,
+Waiting for both producer futures before submitting the consumer guarantees every job is in the queue before `consume()` starts,
 so the drain still comes out in priority order however the pool scheduled the producers.
 Collecting the producer futures and calling `result()` turns a producer's exception into one you can see,
 as [Parallelism](#what-a-process-pool-requires)'s third point describes.
@@ -1656,9 +1656,9 @@ tuple comparison falls through to the second field, the description string.
 `consume()` calls `get()` in a loop, the way a live consumer should:
 parked there, it costs nothing while it waits,
 and it wakes the instant `put()` adds an item, with no polling in between.
-This listing's queue already holds every job by the time `consume()` starts,
+This listing's queue holds every job by the time `consume()` starts,
 so its first `get()` returns immediately,
-but the same code runs unchanged whether the queue is empty or already stocked.
+but the same code runs unchanged whether the queue is empty or stocked.
 The [*Object Pool*](15_Techniques--Context_Managers.md#an-empty-pool-blocks-the-caller)
 in Context Managers uses the same `Queue` as a throttle.
 
@@ -1671,10 +1671,10 @@ Calling `shutdown()` while items remain in the queue is safe too;
 those items still come out through `get()` normally,
 and only a `get()` against an empty, shut-down queue raises `ShutDown`.
 A `put()` after `shutdown()` raises the same exception immediately,
-which is how a producer discovers that its consumers have already left.
+which is how a producer discovers that its consumers have left.
 
 Python provides three queue classes with near-identical interfaces,
-the first two of which already appeared in this chapter:
+the first two of which appear earlier in this chapter:
 
 - `queue.Queue` (and its sibling `PriorityQueue`)
   coordinates threads within one interpreter,
@@ -1732,7 +1732,7 @@ a producer decides what each consumer gets.
 The pull half looks simpler.
 Hand every worker the same iterator and let each one take the next item when it is ready.
 Nothing in the language stops you, and nothing in the language makes it work.
-An iterator has never been thread-safe
+An iterator is not thread-safe
 ([Iterators](23_Patterns--Iterators.md) covers the protocol):
 
 ```python
@@ -1832,7 +1832,7 @@ print("synchronized:", outcome(guarded(LIMIT)))
 #: synchronized: 200 taken, any thread failed: False
 ```
 
-A generator refuses to resume while already running,
+A generator refuses to resume while it is running,
 so the second thread through gets `ValueError: generator already executing`.
 A typical run loses seven of the eight workers to that `ValueError` while the first drains the whole sequence.
 That is better than silent duplication,
@@ -1842,8 +1842,7 @@ but only in the way a crash is better than corruption.
 not a generator, and returns a function that serializes every generator it creates.
 `synchronized_iterator()` also works as a decorator on the `def`,
 the right form when the serializing belongs to the function rather than to each caller.
-Keep the pairing straight:
-`serialize_iterator()` wraps one iterator you already have,
+Keep the pairing straight: `serialize_iterator()` wraps one existing iterator,
 and `synchronized_iterator()` wraps the callable that makes them.
 
 Serializing solves the case where the workers divide one stream.
@@ -2029,7 +2028,7 @@ so both are awaitable and neither blocks anything.
 it submits to the executor and returns an `asyncio.Future` that resolves when the executor's own future does.
 That bridge is why `process_price()` calls `loop.run_in_executor()` instead of `pool.submit()`.
 
-`main()` receives an already-built `pool` instead of creating one itself.
+`main()` takes `pool` as a parameter instead of creating it.
 Creating a `ProcessPoolExecutor` sets up its queues and pipes,
 its first `submit()` spawns the workers,
 and `__exit__` joins them through `shutdown(wait=True)`.
@@ -2091,7 +2090,7 @@ The GIL [does not prevent races](#the-gil-does-not-prevent-races).
 It doesn't protect a read-modify-write spanning a function call.
 With free threading,
 two threads can execute at the same instant on separate cores.
-Race conditions become even easier to hit.
+Race conditions become easier to hit.
 
 `asyncio` switches only at an `await`,
 and that makes it easier to [reason about interleaving](#a-single-thread-still-races).
@@ -2238,11 +2237,12 @@ Scheduling 3,000 tasks skips all of that.
 
 How many threads can one machine support before `Thread.start()` raises `RuntimeError: can't start new thread`?
 That number belongs to the machine, not to Python.
-On one well-provisioned machine,
-60,000 threads parked on a never-set `threading.Event` started in about four seconds with room to spare.
+On one well-provisioned machine, 60,000 threads,
+each parked on a `threading.Event` that nothing sets,
+started in about four seconds with room to spare.
 A laptop with far less memory can fail at a fraction of that.
 To find your own machine's number,
-start threads that park on a never-set `threading.Event` and raise the count until `start()` raises an exception.
+start threads that park on a `threading.Event` that nothing sets and raise the count until `start()` raises an exception.
 Tasks have no equivalent ceiling,
 because a task consumes none of the OS resources that limit threads.
 
@@ -2313,8 +2313,8 @@ Without the sleep, the first task takes both locks and releases them before the 
 and the program prints nothing.
 
 Once both hold their first lock,
-each task's `async with second:` suspends on a lock the other holds and never releases.
-A real deadlock has no `timeout` and never resolves.
+each task's `async with second:` suspends on a lock the other task keeps holding.
+A real deadlock has no `timeout`.
 Both tasks wait forever, the event loop included,
 since nothing remains that can wake them.
 Here, `asyncio.wait_for()` bounds the wait: when its deadline passes,
@@ -2371,9 +2371,9 @@ asyncio.run(main())
 
 Each round, `a` checks `b_wants` and `b` checks `a_wants`,
 and both still see the other wanting the resource, so both give.
-Thus both still want it on the next round.
+Thus `a_wants` and `b_wants` both stay `True` for the next round.
 Two equally polite tasks make no progress,
-even though the event loop keeps both tasks busy the whole time.
+although the event loop keeps both tasks busy the whole time.
 
 A real livelock looks busy on a monitor,
 with CPU time spent and state visibly changing.
@@ -2430,7 +2430,7 @@ for example letting only the task with the lower ID give.
 - **A `TaskGroup` failure arrives as an `ExceptionGroup`.**
   Catch it with `except*`.
   A plain `except ValueError:` around the `async with` block misses it,
-  even when only one task failed.
+  whether one task failed or several.
 - **Cancellation is a `BaseException`, not an `Exception`.**
   `except Exception:` inside a task lets it through, and that is what you want.
   Catching `asyncio.CancelledError` and not re-raising it strands the `TaskGroup` that asked the task to stop.
@@ -2451,10 +2451,10 @@ That definition covers both asynchrony and parallelism.
 
 Concurrency also keeps pulling you down to the OS.
 Concurrency tears through the comfortable abstraction that normal programming provides.
-Sometimes you even need to go beyond the OS-level abstraction,
+Sometimes you need to go beyond the OS-level abstraction,
 all the way to hardware, to understand a particular bug.
 
-Someone who declares "concurrency is easy!" has dipped their toes in it and never encountered a tricky problem.
+Someone who declares "concurrency is easy!" has dipped their toes in it and has yet to encounter a tricky problem.
 This chapter makes concurrency look (somewhat)
 easy because it has only touched the surface of shared mutable state problems.
 
@@ -2483,7 +2483,7 @@ Here are a few of the topics beyond it:
   are two different disciplines built on this same idea.
 - **Actor languages:** Give each unit of concurrency the shape of an actor,
   an isolated object that reacts only to messages sent to its own mailbox,
-  never shares state directly, and can spawn more actors.
+  shares no state directly, and can spawn more actors.
   The most established production examples include Erlang,
   built at Ericsson for telephone switches.
   Elixir is newer and built on Erlang's BEAM virtual machine.
@@ -2547,7 +2547,7 @@ give a hint, usually the shape of the code, and a full answer for each exercise.
 10. In `gather_with_exceptions.py`,
     delete `return_exceptions=True` and wrap the `await` in `try`/`except ValueError`.
     Predict how many `fetched` lines still print,
-    and explain what became of the tasks on which the `gather()` call never reported.
+    and explain what became of the tasks whose outcomes the `gather()` call left unreported.
 11. In `context_var.py`,
     move the `request_id.set()` call out of `handle()` and into `main()` above the `TaskGroup`,
     setting it to `"main"`.

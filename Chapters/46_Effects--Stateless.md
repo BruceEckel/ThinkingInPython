@@ -27,7 +27,7 @@ Stateless supplies the vocabulary for the requests and the driver that answers t
 An Effect declares two channels:
 the dependencies it needs and the ways it can fail.
 Both channels live in the signature,
-and both use the yield channel a generator already carries.
+and both use the yield channel every generator carries.
 [Stateless in Practice](47_Effects--Stateless_in_Practice.md)
 builds examples using those channels.
 
@@ -1142,13 +1142,13 @@ so the type checker accepts both.
 
 DI meets its goal: the `Console` is swappable.
 But it relocates a [side cause](44_Effects--Effect_Management.md#what-is-an-effect)
-rather than declaring one, so the type checker never validates the dependency.
+rather than declaring one, so the type checker does not validate the dependency.
 
 `dependency_injection.py` demonstrates one shape of DI, a service locator:
 a body reads the container directly, with `get(Console)`.
 Constructor injection is the stronger, more common shape,
 and frameworks such as FastAPI's `Depends` build on it.
-Constructor injection answers the complaint that the type checker never validates the dependency:
+Constructor injection answers the complaint that the type checker does not validate the dependency:
 the dependency arrives as a parameter,
 so a static type checker validates every call that supplies one.
 You bind the dependency once, at the endpoint or the constructor.
@@ -1197,7 +1197,7 @@ DI takes the same change with no signature recording it.
 
 Type checking is the earliest practical time to discover a forgotten dependency,
 so the objection concerns churn and coupling rather than correctness.
-A function that never logs still names `Need[Log]` in its type,
+A function that does not log still names `Need[Log]` in its type,
 and taking that dependency back out later changes every signature on the path a second time.
 People made the same complaint against Java's checked exceptions,
 which [Effect Management](44_Effects--Effect_Management.md#catch-the-exception-you-expect)
@@ -1411,7 +1411,7 @@ it appears whenever asynchronous code calls `run()`.
 
 `run_async()` is the same driver packaged as a coroutine, so you `await` it.
 A synchronous program calls `run()` once at its outermost edge.
-A program that is already asynchronous, a web service or a bot,
+An asynchronous program, a web service or a bot,
 awaits `run_async()` at the edge of each request.
 Calling `run()` inside a coroutine is a runtime error rather than a type error,
 because no type records whether an event loop is running.
@@ -1640,7 +1640,7 @@ expect(KeyError, run, supply(Console())(guarded)("Carol"))
 ```
 
 `guarded()` here is the same function as before,
-except that it also needs a `Console`, which this path never reaches.
+except that it also needs a `Console`, which this path does not reach.
 Wrapping it in `supply(Console())` is enough to send the `KeyError` past the `except`.
 `catch_score.py`, ahead in [Turning an Error Into a Value](#turning-an-error-into-a-value),
 has the identical shape: `supply()` wraps a function `run()` drives.

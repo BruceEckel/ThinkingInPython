@@ -315,7 +315,7 @@ If you forget to fill a state's table,
 the machine reports `Waiting has no transition for ...` rather than the `AttributeError` a missing `transitions` attribute would produce.
 
 `next()` raises its `RuntimeError` `from None`,
-because the chained `KeyError` would only repeat the event the message already names.
+because the chained `KeyError` would only repeat the event the message names.
 
 The subclasses shrink to their `run()` behavior.
 The transitions live in the tables filled in at the bottom of the file:
@@ -416,7 +416,7 @@ the tables read more easily than the `match` statements.
 
 The two versions also differ on an unexpected input,
 one the current state does not name.
-The nine moves in the file never produce one,
+None of the nine moves in the file produces one,
 so both listings end with one more call:
 feeding `MouseAction.ESCAPES` to a fresh trap in `Waiting`,
 where neither the `match` nor the table names that input.
@@ -746,7 +746,7 @@ although the slot is empty and no amount of money would.
 If you swap the row order, the same input reports `UNAVAILABLE` instead.
 Both results follow from the ordering rule stated in [The Engine](#the-engine):
 the first row whose condition passes wins,
-even when a lower row is the one that matters.
+whether or not a lower row matters more.
 
 The engine's lookup keys on `type(event)` exactly,
 one dictionary lookup rather than an `isinstance()` test against each row.

@@ -5,7 +5,7 @@
 > Using `a_list` from `a_list.py` (`[1, "4", 9, "a", 0, 4]`),
 > write a list comprehension that finds the string elements made only of digits
 > (`e.isdigit()`), converts each to `int` with `int(e)`, and squares it.
-> The predicate must reject `"a"` so `int()` never sees it.
+> The predicate must reject `"a"` before `int()` sees it.
 > Of the types in `a_list`, only `str` has `isdigit()`,
 > so the predicate must test `isinstance(e, str)` before calling it.
 
@@ -14,7 +14,7 @@
 
 [List Comprehensions](../../Chapters/16_Techniques--Comprehensions.md#list-comprehensions) shows the trailing `if` clause that filters elements before the output expression runs.
 Combine two tests in that clause with `and`.
-The `and` operator stops at the first false operand, so the second test never sees an element the first rejected.
+The `and` operator stops at the first false operand, so the second test does not run on an element the first rejected.
 
 <details>
 <summary>Solution</summary>
@@ -37,7 +37,7 @@ print(result)
 
 The predicate has two parts, `isinstance(e, str)` and `e.isdigit()`,
 both of which must be true before `int(e)` ever runs. `"a"` fails
-`isdigit()`, so it never reaches `int()`, which otherwise raises a
+`isdigit()`, so it does not reach `int()`, which otherwise raises a
 `ValueError`. `"4"` is the only element that is both a string and made
 entirely of digits, so it is the one the comprehension converts and
 squares.
@@ -282,7 +282,7 @@ appears more than once, the value from the *later* dictionary
 overwrites the earlier value. The key `"a"` appears in the first, third,
 and fourth dictionaries (`1`, then `3`, then `5`), so the final value
 is `5`, the last one written. The result orders keys by first
-insertion, which is why `"a"` still prints first even though its value
+insertion, which is why `"a"` still prints first although its value
 comes from the last dictionary in the list.
 
 </details>

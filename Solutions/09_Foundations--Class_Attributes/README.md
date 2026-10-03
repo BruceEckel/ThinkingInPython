@@ -36,7 +36,7 @@ print(c.rating)
 reading `c.rating` falls back to the class attribute, which is now
 `9`. `c.rating` differs from `a.rating` (still `1`) because `a` got
 its own shadowing instance attribute when `a.rating = 1` ran, before
-`Stars.rating = 9` ran. `c` never shadowed anything, so it sees
+`Stars.rating = 9` ran. `c` shadows nothing, so it sees
 whatever the class attribute currently holds.
 
 </details>
@@ -188,7 +188,7 @@ print(Tally.total)
 ```
 
 **Shadow the class attribute.** `a.total = 99` looks like it should update the shared count, but
-assignment through an instance always writes to the instance, never
+assignment through an instance always writes to the instance, not
 the class. That assignment creates a brand-new instance attribute
 named `total` on `a`, which then shadows `Tally.total` for `a`
 specifically.
@@ -222,7 +222,7 @@ through an instance.
 
 [A Shared Mutable Value](../../Chapters/09_Foundations--Class_Attributes.md#a-shared-mutable-value) shows two `Cart` objects appending to one list.
 The fix builds the list per instance with `field(default_factory=list)` from `dataclasses`.
-For the second half, write the bare `[]` default and see whether the `class` statement even finishes, and when.
+For the second half, write the bare `[]` default and see whether the `class` statement finishes, and when.
 
 <details>
 <summary>Solution</summary>
@@ -247,7 +247,7 @@ every `Cart`. Each object owns its list from birth, and `a`'s append
 cannot reach `b`.
 
 `@dataclass` refuses to build the same class written with a bare
-`items: list[str] = []`, so the shared-list bug never appears:
+`items: list[str] = []`, so the shared-list bug cannot arise:
 
 ```python
 # exercise_5_rejected.py

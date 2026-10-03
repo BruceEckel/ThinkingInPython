@@ -454,7 +454,7 @@ functions shares.
 > so `@memo` and `@memo(maxsize=10)` both decorate a function.
 > Cache each result in a dictionary keyed by the arguments,
 > and drop the oldest entry once the cache holds more than `maxsize` of them.
-> Distinguish the two forms by checking whether the first argument arrived at all.
+> Distinguish the two forms by checking whether a first argument arrived.
 
 <details>
 <summary>Where to look</summary>

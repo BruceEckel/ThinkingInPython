@@ -83,7 +83,7 @@ Here the originator is a `Sketch` that accumulates strokes in a list.
 Its memento converts that list to a tuple,
 so the snapshot is immutable while the originator stays mutable.
 `restore()` copies in the other direction,
-rebuilding a fresh list so the sketch and the memento never share one:
+rebuilding a fresh list so the sketch and the memento share nothing:
 
 ```python
 # sketch.py
@@ -131,7 +131,7 @@ An originator holding containers inside containers needs `copy.deepcopy()` in `s
 and pays the cost described in [A Snapshot Is Not a Reference](#a-snapshot-is-not-a-reference).
 
 The caretaker's side of the contract is to store `checkpoint` and return it,
-and never to read or assign its `strokes`.
+without reading or assigning its `strokes`.
 Languages with access control enforce that rule.
 In Python it is a convention,
 though freezing the memento turns an accidental edit into an exception:
@@ -203,8 +203,7 @@ with expected(FrozenInstanceError):
 `restore_tuple()` accepts either tuple, since both are `tuple[str, ...]`.
 `restore_memento()` accepts the checkpoint,
 and the type checker reports the plain tuple before the program runs.
-If you run the program anyway,
-it raises `AttributeError` at the first line that reads `.strokes`.
+At run time, the program raises `AttributeError` at the first line that reads `.strokes`.
 The checker rejects the assignment to `checkpoint.strokes` too,
 and the runtime raises `FrozenInstanceError`.
 The `strokes` tuple is immutable on its own;
@@ -249,7 +248,7 @@ Both `save()` and `restore()` must copy.
 ## Immutability
 
 All that copying exists because `Sketch` mutates its list.
-A state that never mutates needs no copy.
+An immutable state needs no copy.
 Once the state is a record, every state is a memento:
 
 ```python
@@ -392,10 +391,10 @@ def test_replace_carries_other_fields() -> None:
 
 The caretaker reads no field of the states it holds,
 since opacity is the pattern's whole point.
-The classic form already has that opacity,
+The classic form has that opacity,
 so `History[S]` below holds the classic `Memento` from `sketch.py` as readily as a `Drawing`.
 What immutability removes is the explicit `save()` and `restore()` at every edit,
-since a state that keeps its value is already a memento.
+since a state that keeps its value serves as its own memento.
 Undo and redo are two stacks of past and future states,
 generic over the state type
 (the `class History[S]` syntax is from [Static Types](08_Foundations--Static_Types.md#type-parameters)):
@@ -489,7 +488,7 @@ so a list mutated in place changes in the past too.
 A `History` of lists is a stack of aliases, the bug in `aliased_snapshot.py`.
 
 `History` holds the classic form as well.
-The classic `Memento` from `sketch.py` is already immutable,
+The classic `Memento` from `sketch.py` is immutable,
 so the same generic caretaker holds snapshots of the mutable `Sketch`.
 The surrounding code calls `save()` and `restore()`,
 two calls a frozen state makes unnecessary,
@@ -697,7 +696,7 @@ The fields go straight into the object's `__dict__`, past the frozen check:
 a record's generated `__setattr__()` raises `FrozenInstanceError`,
 and pickle writes `__dict__` directly.
 The same shortcut skips `__post_init__()`,
-so a memento saved before a field gained its validation loads a value that the validation never saw.
+so a memento saved before a field gained its validation loads a value that bypassed the validation.
 `title` is absent, since the old bytes lack one.
 `restored.strokes` works because both versions agree on that field.
 `restored.title` raises `AttributeError` when anything reads it,
@@ -758,7 +757,7 @@ instead of the delayed `AttributeError` from `pickle_drift.py`.
 Protocol Buffers goes further.
 A schema shared across languages gives every field an explicit number.
 Old and new versions can then read each other's messages by design.
-All three read the bytes as data and never run code from them,
+All three read the bytes as data and run no code from them,
 so pickle's security risk does not apply.
 
 ## Snapshots in the Wild

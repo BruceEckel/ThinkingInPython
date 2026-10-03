@@ -202,10 +202,10 @@ to `_Proxy__implementation`,
 so it cannot collide with an attribute the implementation defines.
 
 Do not confuse `__getattr__()` with its lookalike, `__getattribute__()`.
-`__getattr__()` is the *fallback* hook:
+`__getattr__()` is the *fallback* method:
 Python calls it only after normal lookup fails.
 Normal lookup finds `self.__implementation`,
-so reading that name in the hook's body does not call the hook again.
+so reading that name inside `__getattr__()` does not call it again.
 `__getattribute__()` intercepts every attribute access,
 including each `self.` access in its own body,
 so a `__getattribute__()` that reads `self.__implementation` calls itself forever.
@@ -232,7 +232,7 @@ including ones added later.
 
 The lost static check is the first of five limits on `__getattr__()` delegation.
 The next four sections cover the rest:
-Python never calls `__getattr__()` for a special-method lookup or for an assignment,
+Python skips `__getattr__()` for a special-method lookup and for an assignment,
 `__getattr__()` calls itself when the name it reads is also missing,
 and a surrogate that supplies its methods through `__getattr__()` fails an `isinstance()` check.
 
@@ -240,7 +240,7 @@ and a surrogate that supplies its methods through `__getattr__()` fails an `isin
 
 Python looks up dunders like `__len__()` and `__str__()` on the proxy's type,
 not on the instance, so `len(p)` and `print(p)` do not delegate,
-even though an explicit `p.__len__()` does:
+while an explicit `p.__len__()` does:
 
 ```python
 # dunder_bypass.py
@@ -286,8 +286,7 @@ A proxy that must forward special methods defines them explicitly.
 `print(p)` reports no missing method: `object` defines `__str__()`,
 so the lookup on `type(p)` finds `object`'s `__str__()` and the proxy prints as a `Proxy` object.
 Whenever `object` defines the dunder, the bypass raises no error.
-The proxy answers with `object`'s version,
-and the call never reaches the implementation.
+The proxy answers with `object`'s version instead of calling the implementation.
 
 ### Forwarding Writes
 
@@ -316,8 +315,8 @@ print(p.level, settings.level)
 #: high low
 ```
 
-`__getattr__()` is a read hook: Python calls it for a failed read,
-never for an assignment.
+`__getattr__()` handles reads: Python calls it for a failed read,
+not for an assignment.
 The assignment stores `level` in the proxy's `__dict__`,
 not the implementation's `__dict__`.
 The next `p.level` lookup succeeds without calling `__getattr__()`.
@@ -370,7 +369,7 @@ if the implementation has an `_implementation` of its own,
 
 ### The Recursion Trap
 
-The fallback hook `__getattr__()` can recurse.
+`__getattr__()` can recurse.
 If `__getattr__()`'s body reads a proxy attribute that does not exist,
 the failed lookup calls `__getattr__()` again.
 Python reports the recursion as a `RecursionError`,
@@ -420,7 +419,7 @@ and `isinstance()` checks only the proxy's own class.
 A `@runtime_checkable` `Protocol` does not change that.
 Since Python 3.12 the Protocol check uses `inspect.getattr_static()`,
 which reads the class and instance dictionaries instead of running attribute lookup.
-That function never calls `__getattr__()`,
+That function bypasses `__getattr__()`,
 so a proxy that supplies every method through `__getattr__()` also fails the `isinstance()` check:
 
 ```python
@@ -589,7 +588,7 @@ A surrogate whose `__getattr__()` can raise something other than `AttributeError
 The surrogate fails `isinstance()` for a different reason:
 as [A *Surrogate* Is Not Its Implementation](#a-surrogate-is-not-its-implementation)
 explains, the Protocol check uses `inspect.getattr_static()`,
-which never calls `__getattr__()`.
+which bypasses `__getattr__()`.
 
 ### Smart Reference
 
@@ -857,7 +856,7 @@ usually the shape of the code, and a full answer for each exercise.
     Confirm that the two lists share their data before the write and not after it.
 4.  In `counting_proxy.py`,
     misspell `self._impl` as `self._imp` inside `__getattr__()` and run it.
-    Use the fallback-hook behavior this chapter describes to explain why the failure reports as `RecursionError` rather than an `AttributeError` naming the typo.
+    Use the fallback behavior this chapter describes to explain why the failure reports as `RecursionError` rather than an `AttributeError` naming the typo.
 5.  Create a program similar to a DBMS that allows only a fixed number of connections at a time.
     Implement this with a system modeled on [*Singleton*](24_Patterns--Singleton.md)
     that controls the number of "connection" objects it creates.

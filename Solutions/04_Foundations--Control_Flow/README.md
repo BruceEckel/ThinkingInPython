@@ -203,12 +203,13 @@ except TypeError as e:
 #: escaped: TypeError
 ```
 
-**Let an unmatched exception through.** `divide_and_report(1, "x")` raises `TypeError` inside
-`checked_divide()`, because Python cannot divide an `int` by a `str`.
-The `except` clause catches only `ValueError`, so the `TypeError`
-passes it by. The `finally` block runs anyway: `finally` runs
-whatever kind of exception is in flight. The `else` clause never runs here: it belongs to the case
-where the `try` block finishes cleanly.
+**Let an unmatched exception through.** `divide_and_report(1, "x")`
+raises `TypeError` inside `checked_divide()`, because Python cannot
+divide an `int` by a `str`. The `except` clause catches only
+`ValueError`, so the `TypeError` passes it by. The `finally` block
+still runs: `finally` runs whatever kind of exception is in flight.
+The `else` clause does not run here: it belongs to the case where the
+`try` block finishes cleanly.
 
 **Catch the escape at the caller.** The `TypeError` keeps
 propagating up past `divide_and_report()`, so this listing wraps the
@@ -502,8 +503,8 @@ print(scores)
 One `2` survives again, but this time at the front. At position 0 the
 loop sees `2` and `remove()` deletes the first equal item, which is
 that same position-0 element. The second `2` slides down into slot 0,
-which the loop has already passed, so the next iteration looks at
-position 1 and finds `1`. The loop does not visit the survivor.
+which the loop has passed, so the next iteration looks at position 1
+and finds `1`. The loop does not visit the survivor.
 
 The prediction covers more than "one survives": it says which item
 and where. The survivor is whatever slides into a slot the loop has

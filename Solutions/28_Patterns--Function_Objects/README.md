@@ -306,7 +306,7 @@ loop continue, and any other value is the root.
 
 The chapter's advice about the failure value still holds. A `Failed`
 is never a root, so `float | Failed` says which result is which, and
-`solve()` checks the result's type, never its truthiness.
+`solve()` checks the result's type, not its truthiness.
 
 **Name each attempt.** `finder.__name__` reads the function's own name, since every function
 carries its name as an attribute, so the report needs no extra
@@ -514,8 +514,8 @@ function, the way `bisection_within()` writes the tolerance into its
 
 [An Event Bus: Handlers Keyed by Type](../../Chapters/28_Patterns--Function_Objects.md#an-event-bus-handlers-keyed-by-type) looks handlers up by `type(event)` in a `defaultdict`.
 Iterate `type(event).__mro__` instead, and read each class's handlers with `.get()` so a lookup does not insert keys.
-`unsubscribe()` removes a handler from that list, so decide what should happen when the handler was never subscribed.
-For the last question, compare which change alters what code that never calls the new method receives.
+`unsubscribe()` removes a handler from that list, so decide what it should do with a handler that is not in the list.
+For the last question, compare which change alters what an existing caller receives.
 
 <details>
 <summary>The shape</summary>
@@ -621,9 +621,9 @@ bus.publish(BigDeposit(500))
 #: big deposit 500
 ```
 
-**Ignore a handler never subscribed.** `unsubscribe()` guards with `if handler in handlers` rather than calling
+**Ignore a handler that is not subscribed.** `unsubscribe()` guards with `if handler in handlers` rather than calling
 `remove()` outright, since `remove()` raises a `ValueError` for a handler
-that was never subscribed. Whether that case should be silent or loud
+not in the list. Whether that case should be silent or loud
 is a design decision: silent matches the bus's habit of letting an
 unmatched event pass without complaint.
 
@@ -635,8 +635,8 @@ keeps using `.get()` for the same reason the chapter gives: indexing
 a `defaultdict` on a read inserts an empty list for every class in
 every published event's MRO, `object` included.
 
-Adding `unsubscribe()` cannot break an existing caller, since code that
-never calls it behaves as before. The MRO walk can.
+Adding `unsubscribe()` cannot break an existing caller, which does not
+call it and so behaves as before. The MRO walk can.
 A handler subscribed to `Deposit` starts receiving every subclass of
 `Deposit`, including subclasses written after the handler, so a
 `BigDeposit` that reached only `on_big` before the change now reaches

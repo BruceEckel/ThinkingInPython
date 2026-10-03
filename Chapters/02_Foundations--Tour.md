@@ -66,9 +66,9 @@ An indented block groups statements without creating a scope, so `val`,
 assigned inside the `if`, stays visible afterward,
 unlike a variable declared inside braces in C++ or Java.
 New scopes come from functions, classes, modules, and comprehensions,
-never from an `if` or a `for` block.
+not from an `if` or a `for` block.
 Python binds a name only when the assignment runs:
-with any answer other than `"yes"`, `val = 1` never executes,
+with any answer other than `"yes"`, the `if` skips `val = 1`,
 and `print(val)` raises a `NameError`.
 
 ```python
@@ -84,7 +84,7 @@ except NameError as e:
 #: name 'val' is not defined
 ```
 
-The body of the `if` never runs, so `val` stays unbound.
+Python skips the body of the `if`, so `val` stays unbound.
 Indentation shows where the assignment sits, not whether it runs.
 The type checker sees that nothing ever defines `val` and reports an error on `print(val)`,
 so `# type: ignore` tells it the mistake is deliberate.
@@ -369,7 +369,7 @@ print(10 if count is None else count)  # Keeps the 0
 ```
 
 `and` stops at its first falsy operand and returns it,
-so Python never evaluates `items[0]` on the empty list.
+so Python skips `items[0]` on the empty list.
 `x or default` is a common way to supply a fallback,
 and it replaces every falsy `x`:
 a legitimate `0` or `""` gets the fallback just as a missing value does.
@@ -428,7 +428,7 @@ Without the `r`, the last literal in `strings.py` is a syntax error:
 `\u` starts a Unicode escape, and `tils` is not the four hex digits it requires.
 One limit remains.
 A raw string cannot end with a single backslash,
-because even there the backslash escapes the closing quote.
+because a raw string's backslash still escapes the closing quote.
 
 ### Common String Operations
 

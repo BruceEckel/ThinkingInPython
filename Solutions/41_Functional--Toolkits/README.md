@@ -50,7 +50,7 @@ print(deep_sum([1, [2, [3, 4], 5], 6]))
 
 The loop version runs two lines longer than the recursive one, so brevity
 is not the argument either way. The rewrite changes how much of the
-bookkeeping is yours. The recursive version never names a stack: the
+bookkeeping is yours. The recursive version names no stack: the
 call stack holds the sublists still to walk, and `return` pops one.
 Here you allocate the stack, seed it with a copy of `items`, choose
 `pop()` over `pop(0)`, and choose `extend()` over `append()`.
@@ -71,7 +71,7 @@ order-dependent.
 a single element and loops forever on it.
 
 The recursive version cannot make any of these
-mistakes, because it never has the choice.
+mistakes, because it makes none of those choices.
 
 </details>
 </details>
@@ -131,8 +131,8 @@ The difference from the chapter's `maxsize=2` run is the second
 `square(1)`. Under `maxsize=2` that call is a fourth miss, because
 computing `square(3)` has pushed `1` out to make room. One extra slot
 converts that miss into a hit, and that conversion is the whole of
-what `maxsize` controls. With three slots the cache never evicts
-anything, so `functools_lru_cache.py`'s comment, "Evicts 1, the least
+what `maxsize` controls. With three slots the cache keeps every
+result, so `functools_lru_cache.py`'s comment, "Evicts 1, the least
 recently used," stops being true here.
 
 </details>
@@ -194,9 +194,9 @@ print(list(islice(batch_totals(count(1), 3), 5)))
 **Total each batch.** `batched()` chunks the source and a generator expression sums
 each batch, so the body fits on one line with no hand-written loop.
 
-**Test laziness on an infinite source.** Passing `count(1)` proves the function is lazy. `count()` never ends, so
+**Test laziness on an infinite source.** Passing `count(1)` proves the function is lazy. `count()` is infinite, so
 if `batch_totals()` builds a list of batches, or if `batched()` reads
-its source eagerly, the call never returns. The call returns
+its source eagerly, the call hangs. The call returns
 immediately, and `islice()` then pulls exactly five totals, so
 `count()` yields exactly fifteen integers in all. The first total is
 `1 + 2 + 3`, and each later one is nine larger, since every batch
@@ -262,7 +262,7 @@ print(grouped(["b", "a", "b"], str.upper))
 
 **Collect each item under its key.** A dictionary key exists once by construction, so the duplicate-key
 failure `groupby()` has on unsorted input cannot occur. The two `"b"`
-entries land in the same list no matter how far apart they arrive, and
+entries go into the same list no matter how far apart they arrive, and
 the caller needs no `sorted()` call to make that happen.
 
 The cost is the streaming `groupby()` provides. `grouped()` reads the
@@ -273,8 +273,7 @@ is why it can stream a file larger than memory. It also preserves the
 input's order, while `grouped()` reports groups in first-appearance
 order and loses the interleaving between them. Sorting first to make
 `groupby()` safe costs the same memory as `grouped()`, plus the sort,
-so `grouped()` is the better answer whenever the input already fits in
-memory.
+so `grouped()` is the better answer whenever the input fits in memory.
 
 </details>
 </details>
@@ -357,8 +356,8 @@ that "`@cache` works correctly only for pure functions." Hashability
 constrains the key, purity constrains the function, and a function can
 meet one without the other.
 
-The exception says nothing about purity. `deep_sum()` is
-already pure, and caching it would be correct. The obstacle is the
+The exception says nothing about purity. `deep_sum()` is pure,
+and caching it would be correct. The obstacle is the
 argument type alone.
 
 </details>

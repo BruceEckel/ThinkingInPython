@@ -466,7 +466,7 @@ made fresh at every request rather than once at the start.
 **Leave an hour with no supplier.** With every source shortened, hour 20 has no supplier, and the `Blackout`
 surfaces out of `run()`, not out of the Effect.
 `catch(Blackout)` around `run_load()` does not intercept it because `catch()`
-watches the error channel, and this exception never enters that channel.
+watches the error channel, and this exception stays outside that channel.
 `choose()`, the handler, raises the `Blackout`, and a handler answers each
 request from inside the driver.
 No `yield` sits between the `raise` and `run()`'s own stack frame,
@@ -497,7 +497,7 @@ and `plug()` declares the failure it can produce.
 [Scripting an Unpredictable Source](../../Chapters/47_Effects--Stateless_in_Practice.md#scripting-an-unpredictable-source) shows `scripted` answering each `Flip` from a fixed sequence.
 Write a handler factory that closes over an iterator and returns `next()` on each request, ignoring the request's fields.
 Supply a source whose `available()` is always false so the first draws fail.
-Then list what the handler never consults, and what `controller()` therefore keeps to itself.
+Then list what the handler ignores, and what `controller()` therefore keeps to itself.
 
 <details>
 <summary>The shape</summary>
@@ -1103,8 +1103,8 @@ if __name__ == "__main__":
 ```
 
 **Leave the Effect alone.** `squares()` stays the same, character for character. It asks for an `Executor`
-and never says which kind, so a process pool satisfies the request as a thread
-pool does.
+without saying which kind, so a process pool satisfies the request as a
+thread pool does.
 
 **Guard the driver.** Two things around `squares()` did change, and neither is in the Effect.
 The `__main__` guard is now required, because a process pool starts workers by
@@ -1975,9 +1975,10 @@ come from one world" in the type. Here the matching lives inside
 `kitties()`'s body, a fact about how someone wrote that function, and nothing
 checks it.
 
-So the shared signature narrows the loss without closing it. A caller that
-takes a `Cast` can no longer assemble a mismatched set by accident, because it
-never sees the actors. `play()` is still there and still accepts any of them.
+So the shared signature narrows the loss without closing it. A caller
+that takes a `Cast` can no longer assemble a mismatched set by
+accident, because it does not see the actors. `play()` is still there
+and still accepts any of them.
 
 Adding a fourth actor to the chapter's three-actor version shows where the
 cost falls. `quest.py` gains a `Protocol`, a member in `encounter()`'s `Need[...]`
@@ -1987,8 +1988,8 @@ union, a `yield from`, and a line that uses the new actor, so four edits.
 argument in each of the two factory calls, so seven. `two_games.py` needs two
 edits, its direct `play()` call and the `from casts import` list that supplies
 the new actor, and none for its two factory calls. The
-`Cast` alias does not change, because the new actor never reaches the
-caller.
+`Cast` alias does not change, because the new actor stays inside the
+factories.
 
 That distribution is the argument for the factory. The functions that name a
 whole cast absorb the change, and the code that only stages a scene does not

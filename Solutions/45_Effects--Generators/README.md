@@ -220,8 +220,8 @@ print(repr(drive_naive(interview(),
 ```
 
 **Reuse the generator unchanged.** Nothing in `interview()` changes, and nothing could have. It yields a
-`Question` and receives an `Answer`. Where the answer came from is a
-question it never asks. That is the separation the chapter teaches:
+`Question` and receives an `Answer` without asking about the answer's
+source. That is the separation the chapter teaches:
 the generator describes the conversation, and the driver interprets it.
 Swapping one interpreter for another leaves the description untouched.
 
@@ -247,7 +247,7 @@ in having `next(answers)` inside the `try`. It catches that same
 exception, reads it as "the conversation finished," and returns
 `stop.value`, which is `None`.
 
-`None` is the wrong answer twice over. The interview never finished, so
+`None` is the wrong answer twice over. The interview did not finish, so
 no `Result` exists, and `None` is not a `Result` in any case. Nothing
 catches the mistake: `StopIteration.value` has type `Any`, so
 `return stop.value` satisfies a declared `Result` and the checker reports
@@ -399,7 +399,7 @@ ask(question = 'color') -> answer = 'blue'
 Both results describe the same mistake: calling a generator function
 produces a description rather than a conversation. `interview()` builds
 a generator object and stops. Nothing ever calls `next()` or `send()`
-on that object, so the generator never asks its three questions. The
+on that object, so the generator asks none of its three questions. The
 final line interpolates the object's repr into the sentence where an
 answer belonged.
 
@@ -503,7 +503,7 @@ delivers it into `report()`'s `size`, `report()` returns it again, and
 the second `yield from` delivers it into `summarize()`'s `counted`. The
 `SendType` is `None` throughout, since nobody sends anything in.
 
-`12` therefore reaches `summarize()` through two returns and is never
+`12` therefore reaches `summarize()` through two returns and is not
 yielded on its own. `'(12 characters)'` takes the other route:
 `report()` yields it, the `yield from` in `summarize()` relays it,
 and the driver receives it. No generator binds it to a name. The same number can travel either

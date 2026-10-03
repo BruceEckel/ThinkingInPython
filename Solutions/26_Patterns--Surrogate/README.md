@@ -13,7 +13,7 @@
 <summary>Where to look</summary>
 
 [Virtual Proxy](../../Chapters/26_Patterns--Surrogate.md#virtual-proxy) builds `Expensive` inside `__getattr__()`, which runs only when normal lookup fails.
-Give `Lazy` a property for the cheap attribute, so Python finds it on the class and never reaches the fallback.
+Give `Lazy` a property for the cheap attribute, so Python finds it on the class and skips the fallback.
 Increment a counter in that property, and print the counter at the moment the fallback builds the real object.
 
 <details>
@@ -189,7 +189,7 @@ print(p.calls["f"], p.calls["g"])
 ```
 
 **Tally each call by name.** Where the chapter's `CountingProxy` keeps one total, this one tallies
-per method name. `__getattr__()` already receives the name of the
+per method name. `__getattr__()` receives the name of the
 attribute, so the wrapper charges the count to that name before
 forwarding. The single `calls` integer becomes a `Counter`. The final
 `print()` shows `f` called twice and `g` once.
@@ -320,13 +320,13 @@ it.
 
 > In `counting_proxy.py`,
 > misspell `self._impl` as `self._imp` inside `__getattr__()` and run it.
-> Use the fallback-hook behavior this chapter describes to explain why the failure reports as `RecursionError` rather than an `AttributeError` naming the typo.
+> Use the fallback behavior this chapter describes to explain why the failure reports as `RecursionError` rather than an `AttributeError` naming the typo.
 
 <details>
 <summary>Where to look</summary>
 
-[The Recursion Trap](../../Chapters/26_Patterns--Surrogate.md#the-recursion-trap) and [Forwarding with `__getattr__()`](../../Chapters/26_Patterns--Surrogate.md#forwarding-with-getattr) describe a hook that runs only after normal lookup fails.
-Trace what happens when the first line inside that hook reads a name that does not exist.
+[The Recursion Trap](../../Chapters/26_Patterns--Surrogate.md#the-recursion-trap) and [Forwarding with `__getattr__()`](../../Chapters/26_Patterns--Surrogate.md#forwarding-with-getattr) describe a method that Python calls only after normal lookup fails.
+Trace what happens when the first line inside that method reads a name that does not exist.
 Use `expected()` from `exceptions` to catch the failure in the listing.
 
 <details>
@@ -386,14 +386,14 @@ by reading `self._imp`. Each attempt to report the missing attribute
 creates another missing-attribute lookup, and the stack runs out before
 Python can raise an `AttributeError`.
 
-The trap is specific to the fallback hook. `__getattr__()` runs only
+The trap is specific to the fallback method. `__getattr__()` runs only
 when normal lookup fails, so any missing name it touches sends Python
 straight back into `__getattr__()`. Reading `self._impl`, which
-`__init__()` did assign, resolves normally and never reaches
-`__getattr__()`. That normal lookup is why the chapter's working version is safe and
-`BrokenProxy` is not. A proxy whose `__init__()` never ran (an instance
-built through `object.__new__()`, for example) fails the same way on
-its first attribute access.
+`__init__()` did assign, resolves normally without reaching
+`__getattr__()`. That normal lookup is why the chapter's working
+version is safe and `BrokenProxy` is not. A proxy whose `__init__()`
+did not run (an instance built through `object.__new__()`, for
+example) fails the same way on its first attribute access.
 
 </details>
 </details>
@@ -548,7 +548,7 @@ print("outer released:", pool.available())
 creates one. `Pool` controls creation as a *Singleton* class does, with
 the limit raised from one object to `POOL_SIZE`.
 
-**Hand out a stand-in.** The client never holds a `Connection`. `acquire()` hands back a
+**Hand out a stand-in.** The client holds no `Connection`. `acquire()` hands back a
 `ConnectionProxy`, which forwards `query()` through `__getattr__()`
 and owns the one job the connection cannot do for itself: returning
 that connection to the pool.
@@ -579,7 +579,7 @@ and it adds an action (the check-in) around each loan of the connection.
 <details>
 <summary>Where to look</summary>
 
-[Special Methods Bypass `__getattr__()`](../../Chapters/26_Patterns--Surrogate.md#special-methods-bypass-getattr) explains why `len(p)` fails on a proxy that forwards only through the fallback hook.
+[Special Methods Bypass `__getattr__()`](../../Chapters/26_Patterns--Surrogate.md#special-methods-bypass-getattr) explains why `len(p)` fails on a proxy that forwards only through `__getattr__()`.
 Define `__len__()` on the proxy class and have it call `len()` on the implementation.
 For the explanation, consider where `len()` looks for the method.
 
@@ -638,7 +638,7 @@ print(len(p))
 ```
 
 `__getattr__()` could not have supplied `__len__()` because `len()`
-never looks the name up on the instance. `len()` asks `type(p)` for
+does not look the name up on the instance. `len()` asks `type(p)` for
 `__len__()` and calls what it finds there. That lookup skips the
 instance, so no instance lookup fails, and a failed instance lookup is
 the one event that calls `__getattr__()`. Python looks up every

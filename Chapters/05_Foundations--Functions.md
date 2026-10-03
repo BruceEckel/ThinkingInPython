@@ -302,7 +302,7 @@ and a missing key with no default comes back as `MISSING`
 (a real `get()` re-raises the `KeyError` there, as the comment says).
 
 Create a sentinel once and share that name.
-Each `sentinel()` call builds a new object, even for the same name,
+Two `sentinel()` calls with the same name build two different objects,
 so `default is sentinel("MISSING")` compares against a second object and is always false.
 
 ## Names Inside a Function
@@ -603,7 +603,7 @@ usually the shape of the code, and a full answer for each exercise.
     delete the `global count` line from `writes_global()` and predict what a call raises before running it.
     Then restore it, and instead add `print(count)` as the first line of `rebinds()`.
     Explain why that also raises an `UnboundLocalError`,
-    even though the assignment to `count` comes after the `print`.
+    although the assignment to `count` comes after the `print`.
 9.  Write `clear_by_assignment(target)`, which assigns `target = []`,
     and `clear_by_method(target)`, which calls `target.clear()`.
     Pass the same list to each,

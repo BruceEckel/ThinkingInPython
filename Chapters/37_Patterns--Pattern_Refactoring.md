@@ -508,7 +508,7 @@ in the real program they go in `trash.py`.
 A method belongs in the body of its own class by design.
 You can assign a function onto a class from outside,
 but a reader of the class must then search every module for the behavior assigned onto it.
-A plant that buys its material classes from a supplier has no class body to edit.
+A plant whose material classes come from a supplier has no class body to edit.
 
 The method form is a real option, not an example built to fail.
 This hierarchy is small and the book owns every subclass,

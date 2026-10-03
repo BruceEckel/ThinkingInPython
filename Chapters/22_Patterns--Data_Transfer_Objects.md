@@ -52,7 +52,7 @@ Because `**kwargs` is the only parameter,
 `Messenger("Spam")` raises a `TypeError`,
 and the `*` marker from [Positional-Only and Keyword-Only Parameters](05_Foundations--Functions.md#positional-only-and-keyword-only-parameters)
 is unnecessary here.
-Writing `def __init__(self, *, **kwargs)` anyway is a syntax error,
+Writing `def __init__(self, *, **kwargs)` is a syntax error,
 since a named parameter must follow a bare `*`.
 
 The `m: Any` annotation does real work.
@@ -61,7 +61,7 @@ so without that annotation the type checker rejects both `m.more = 11` and `m.in
 `Any` switches the type checker off for `m`.
 You can move that `Any` into the class instead of repeating it at every use site,
 by declaring a `__getattr__()` that returns `Any` and a `__setattr__()` that accepts one
-([*Surrogate*](26_Patterns--Surrogate.md#forwarding-with-getattr) explains the `__getattr__()` fallback hook).
+([*Surrogate*](26_Patterns--Surrogate.md#forwarding-with-getattr) explains the `__getattr__()` fallback).
 With `__getattr__()` alone, the type checker still rejects the write,
 `m.more = 11`.
 The standard library's type declaration for `SimpleNamespace` has such a pair
@@ -321,7 +321,7 @@ so that `order=True` is the one difference between each `Frozen` class and its `
 
 Tuple behavior shows up in serialization too.
 `json.dumps(Color(1, 2, 3))` writes the array `[1, 2, 3]`,
-since `json` sees a sequence and the field names never reach the output.
+since `json` sees a sequence and leaves the field names out.
 Converting first, with `json.dumps(Color(1, 2, 3)._asdict())`,
 writes `{"r": 1, "g": 2, "b": 3}`.
 `json.dumps()` on a data class raises a `TypeError` instead.
@@ -349,7 +349,7 @@ When the data must stay a dict,
 because it arrives as JSON or goes back out as JSON,
 a [`TypedDict`](08_Foundations--Static_Types.md#dictionary-and-record-shapes)
 names the keys and their types for the type checker while the value stays a real dict.
-When the data need only become a dict on the way out,
+When the data need only become a dict for output,
 `_asdict()` on a `NamedTuple` and `dataclasses.asdict()` on a data class each produce one.
 To make a `@dataclass` guarantee that its values are legal, not merely typed,
 see [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#a-type-is-a-set-of-values).

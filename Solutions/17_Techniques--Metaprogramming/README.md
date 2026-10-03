@@ -9,7 +9,7 @@
 <summary>Where to look</summary>
 
 [Self-Registration of Subclasses](../../Chapters/17_Techniques--Metaprogramming.md#self-registration-of-subclasses) shows `__init_subclass__()` running once for every new subclass.
-Trace what the hook adds and what it removes for `Yellow`, then for `Gold`.
+Trace what `__init_subclass__()` adds and what it removes for `Yellow`, then for `Gold`.
 Write your predicted sets down before you run the listing.
 
 <details>
@@ -81,8 +81,9 @@ print(sorted(c.__name__ for c in Color.registry))
 ```
 
 **Register a new leaf.** Creating `Yellow` adds it to the registry and
-removes its only base, `Color`, which was never there, so that removal
-changes nothing. `Yellow` stays until a subclass of its own arrives.
+removes its only base, `Color`, which is not in the registry, so that
+removal changes nothing. `Yellow` stays until a subclass of its own
+arrives.
 
 **Drop a base that gains a child.** Creating `Gold` adds it and removes its base, `Yellow`, the
 same pruning `PhthaloBlue` and `CeruleanBlue` do to `Blue` earlier.
@@ -103,7 +104,7 @@ edit to `Color`.
 <summary>Where to look</summary>
 
 [A Descriptor That Learns Its Name](../../Chapters/17_Techniques--Metaprogramming.md#a-descriptor-that-learns-its-name) shows `__set_name__()` receiving the attribute name when Python creates the class.
-The hook runs once per descriptor instance, so a third attribute needs a third `Field()` and no new code.
+`__set_name__()` runs once per descriptor instance, so a third attribute needs a third `Field()` and no new code.
 Compare `p.__dict__` with the attribute names on `Point`.
 
 <details>
@@ -273,7 +274,7 @@ is a separate object.
 <summary>Where to look</summary>
 
 [Making a Class Final](../../Chapters/17_Techniques--Metaprogramming.md#making-a-class-final) shows `__init_subclass__()` refusing a subclass at runtime.
-Python passes the keyword arguments in a class header to `__init_subclass__()`, so give the hook a `final` parameter with a default.
+Python passes the keyword arguments in a class header to `__init_subclass__()`, so give that method a `final` parameter with a default.
 Record each final class in a set on the base, and check `cls.__mro__` when a new subclass appears.
 
 <details>
@@ -347,28 +348,29 @@ with expected(TypeError):
 #: [TypeError] B is final; you cannot subclass it
 ```
 
-**Accept the header keyword.** The keywords in a class header travel to `__init_subclass__()`, so
-`final=True` in `class B(A, final=True):` arrives as a parameter of
-the hook Python calls when it creates `B`. Declaring `final` with a
-default, `final: bool = False`, lets every other subclass omit it.
+**Accept the header keyword.** The keywords in a class header travel to
+`__init_subclass__()`, so `final=True` in `class B(A, final=True):`
+arrives as a parameter of the method Python calls when it creates `B`.
+Declaring `final` with a default, `final: bool = False`, lets every
+other subclass omit it.
 
 **Pass the other keywords up.** The
 remaining `**kwargs` go on to `super().__init_subclass__()`, which
 turns a misspelled keyword into a `TypeError` instead of a silent
 no-op.
 
-**Refuse any descendant of a final class.** The chapter's `final_runtime.py` hard-codes the refusal into `B`'s own
+**Refuse any descendant of a final class.** The chapter's
+`final_runtime.py` hard-codes the refusal into `B`'s own
 `__init_subclass__()`. This version moves the decision into a set that
-`A` owns, and the hook walks `cls.__mro__` to ask whether any
-ancestor declared itself final.
-A check of the direct bases in `cls.__bases__` would also refuse every descendant:
-the hook refuses the first subclass of a final class as Python creates that subclass,
-so no deeper descendant exists.
-The walk stays because it states the rule as written,
-"no final class anywhere above," in one line.
-`Open` and `Sub` show that the rest of
-the hierarchy still subclasses freely: the hook raises a `TypeError`
-only for a class whose `__mro__` holds one of the classes in
+`A` owns, and `A.__init_subclass__()` walks `cls.__mro__` to ask whether
+any ancestor declared itself final. A check of the direct bases in
+`cls.__bases__` would also refuse every descendant:
+`A.__init_subclass__()` refuses the first subclass of a final class as
+Python creates that subclass, so no deeper descendant exists. The walk
+stays because it states the rule as written, "no final class anywhere
+above," in one line. `Open` and `Sub` show that the rest of the
+hierarchy still subclasses freely: `A.__init_subclass__()` raises a
+`TypeError` only for a class whose `__mro__` holds one of the classes in
 `A._final`.
 
 </details>
@@ -460,8 +462,8 @@ Read both the summary line and the `info` block of the diagnostic, and compare t
 <summary>Solution</summary>
 
 Removing the `# type: ignore` from `metaclass_layout_conflict.py` leaves
-the class header unsuppressed, inside the `with expected(TypeError):` the
-listing already has:
+the class header unsuppressed, inside the listing's
+`with expected(TypeError):` block:
 
 ```python
 with expected(TypeError):
@@ -498,14 +500,14 @@ Running the same file prints
 `[TypeError] multiple bases have instance lay-out conflict`.
 
 The diagnostic and the exception describe one collision. `ty`'s summary
-line even names the consequence, "Class will raise `TypeError` at
-runtime." Its `info` block explains the rule the interpreter enforces
-without explaining: `type` and `dict` are both implemented in C, each
-with its own instance layout, so no single object can be both. CPython
-discovers that conflict while executing the `class` statement and
-reports it as the terse "instance lay-out conflict." `ty` reaches the
-same conclusion from the class header alone, before anything runs, and
-points at both bases to say which pair is at fault.
+line names the consequence, "Class will raise `TypeError` at runtime."
+Its `info` block explains the rule the interpreter enforces without
+explaining: `type` and `dict` are both implemented in C, each with its
+own instance layout, so no single object can be both. CPython discovers
+that conflict while executing the `class` statement and reports it as
+the terse "instance lay-out conflict." `ty` reaches the same conclusion
+from the class header alone, before anything runs, and points at both
+bases to say which pair is at fault.
 
 The runtime message tells you something collided. The static one tells
 you which two bases collided and why, at the moment you type the
@@ -661,17 +663,16 @@ print(Tag in Demo.__bases__)
 By the time `__init__()` runs, the class object is complete. `type`
 built it inside `__new__()`, using the bases the class header supplied
 there, and laid out its `__mro__` from them. The `bases` parameter of
-`__init__()` reports the tuple `__new__()` already used rather than
-choosing a new one, so `bases += (Tag,)` rebinds a local name, and
-`Demo.__bases__` never changes. Passing the longer tuple on to `type.__init__()`
-changes nothing either, since `type.__init__()` only validates its
-arguments.
+`__init__()` reports the tuple `__new__()` used rather than choosing a
+new one, so `bases += (Tag,)` rebinds a local name, and `Demo.__bases__`
+stays the same. Passing the longer tuple on to `type.__init__()` changes
+nothing either, since `type.__init__()` only validates its arguments.
 
 `new_vs_init.py` makes the same point from the other side, with its
-`added_in_init` key. `__new__()` has to make every decision about
-*what the class is*: its name, its bases, and the namespace `type`
-builds it from. `__init__()` can only modify the class object that already
-exists, which is why `setattr(cls, ...)` still works there.
+`added_in_init` key. `__new__()` has to make every decision about *what
+the class is*: its name, its bases, and the namespace `type` builds it
+from. `__init__()` can only modify the completed class object, which is
+why `setattr(cls, ...)` still works there.
 
 </details>
 </details>
@@ -805,7 +806,7 @@ the string.
 
 [When You Still Need a Metaclass](../../Chapters/17_Techniques--Metaprogramming.md#when-you-still-need-a-metaclass) shows `__prepare__()` supplying the mapping into which a class body writes.
 Subclass `dict` and override `__setitem__()` so a repeated key returns without storing.
-For the explanation, consider which hooks run before the body and which run after it.
+For the explanation, consider which class-creation steps run before the body and which run after it.
 
 <details>
 <summary>The shape</summary>
@@ -878,10 +879,10 @@ No class decorator can keep the first definition, and neither can
 `__init_subclass__()` or `__set_name__()`. All three receive the class
 after its body has finished executing, and by then the body has run
 `on_open = <second function>` as an ordinary assignment into the
-namespace mapping. The first function has no name pointing at it and
-no reference anywhere, so no later hook has anything to restore.
-`__prepare__()` is the only hook that sees the assignments one at a
-time, as the body makes them, and that is why the chapter calls it
+namespace mapping. The first function has no name pointing at it and no
+reference anywhere, so none of the three has anything to restore. Among
+the class-creation steps, `__prepare__()` alone sees the assignments one
+at a time, as the body makes them, and that is why the chapter calls it
 the one with no simpler substitute.
 
 </details>

@@ -44,7 +44,8 @@ Objects were optional,
 and C++ brought object-oriented programming and exceptions into the mainstream.
 
 *Java* drew from Smalltalk.
-Everything lives inside a class, even when all you need is a function.
+Everything lives inside a class,
+including code that would work as a standalone function.
 Java is statically compiled, so substitutability matters,
 yet it encouraged reusing code by inheriting implementation,
 and that reuse pulls in the other direction.
@@ -123,7 +124,7 @@ expect(OverflowError, fill, BoundedStack(), 5)
 
 `BoundedStack.push()` takes the same argument and returns the same type,
 so `@override` holds and the type checker reports nothing.
-`fill()` takes a `Stack`, which never refuses a `push()`,
+`fill()` takes a `Stack`, whose `push()` always succeeds,
 so a `BoundedStack` handed to it raises an exception on the third item.
 The subclass matches the signature and breaks the contract behind it.
 
@@ -186,7 +187,7 @@ Encapsulation with private fields and getters still leaks.
 The `is` check shows the mechanism:
 the getter returns no view or snapshot of the list, but a reference to the list,
 the identical object the underscore hides.
-Python's `return` hands out references, never copies.
+Python's `return` hands out references, not copies.
 The property blocks reassigning `numbers`,
 but cannot stop the caller from mutating the list it returns.
 
@@ -306,7 +307,7 @@ def test_frozen_cannot_be_mutated() -> None:
 
 The test goes through `setattr()` because the type checker rejects `immutable.bob.name = "Ralph"`.
 `frozen=True` is the defense that holds at runtime,
-against code the type checker never sees.
+against code outside the type checker's view.
 
 Two quiet changes in `immutable.py` do as much work as `frozen=True`:
 `numbers` is a `tuple`, not a `list`, and `Bob` carries `frozen=True` too.
@@ -661,7 +662,7 @@ not a function that runs.
 Only the last, unmarked definition executes.
 `stringify(42)` checks as returning `str`,
 and `stringify([1, 2, 3])` checks as returning `list[str]`,
-even though both calls run the same branching body.
+although both calls run the same branching body.
 
 [`singledispatch`](33_Patterns--Visitor.md#the-pythonic-visitor-singledispatch)
 is ad-hoc polymorphism's other Python form.
@@ -824,7 +825,7 @@ Classic multiple inheritance has the *diamond problem*.
 If two base classes trace back to a common ancestor,
 Python resolves which version to call with C3 linearization,
 its method resolution order (MRO).
-The choice is deterministic, never ambiguous,
+The choice is deterministic,
 but a deep hierarchy still makes it easy to lose track of which method runs.
 Protocols avoid the question: with no inheritance graph,
 C3 has nothing to linearize.
@@ -962,7 +963,8 @@ Nothing in that test can fail.
 The `NewType` protection lives in the type checker alone.
 Passing a raw `int` where a signature says `UserId` raises no exception.
 In `newtype_boundary.py`,
-the `# type: ignore` silences the type checker's diagnostic so the rejected call can run anyway.
+the `# type: ignore` silences the type checker's diagnostic,
+which lets the rejected call run.
 [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#composing-types-from-types)
 takes the other route.
 A frozen data class with a validating `__post_init__()` enforces the distinction at runtime too,
@@ -1122,7 +1124,7 @@ and it is safe as a default argument value.
 The standard library includes this idea as `logging.NullHandler`,
 and the maze in [Simulation](38_Patterns--Simulation.md)
 points every doorless direction at one shared `EDGE` room,
-so movement code never checks for `None`.
+so movement code needs no `None` check.
 
 Null objects stand in for "nothing to do," not `None`'s "nothing there."
 Sometimes a caller must notice absence,
@@ -1268,4 +1270,4 @@ give a hint, usually the shape of the code, and a full answer for each exercise.
     keep the base contract that `push()` always succeeds,
     and expose "full" some other way.
     Then say what you gave up,
-    and whether `BoundedStack` should be a subclass of `Stack` at all.
+    and whether `BoundedStack` should be a subclass of `Stack`.

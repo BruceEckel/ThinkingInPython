@@ -324,7 +324,7 @@ def solve(f: Fn, a: float, b: float,
 
 `solve()` is the part of the procedure that does not change.
 It runs a finder and turns a failed search into an exception,
-so a caller receives a root or an exception and never handles `None`.
+so a caller receives a root or an exception, not a `None` to check.
 Because each finder is a function with the same signature,
 passing one to `solve()` chooses the strategy:
 
@@ -510,7 +510,7 @@ A finder returns `0.0` for a function whose root is at zero, and `0.0` is falsy,
 so a truthiness test discards a correct answer and calls the next finder.
 The hazard is the truthiness test, not the choice of failure value.
 Whichever value marks failure, compare the result against it with `is`.
-`None` is the right failure value here because a root is never `None`,
+`None` is the right failure value here because a root is always a `float`,
 so `float | None` says which result is which.
 A [`sentinel()`](05_Foundations--Functions.md#sentinel-values)
 is for the case where `None` is a possible result and cannot double as the failure mark.
@@ -522,7 +522,7 @@ and reports that decision as its return value.
 A step below the tolerance is not quite the same as reaching a root,
 so a chain is no more reliable than its handlers.
 
-Testing confirms that the first finder to converge returns the root while the rest never run,
+Testing confirms that the first finder to converge returns the root and the finders after it do not run,
 that a later finder succeeds where an earlier one fails,
 that an empty chain returns `None`,
 and that a chain whose finders all fail returns `None` too:

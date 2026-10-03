@@ -42,7 +42,7 @@ print(deposit(30), deposit(30))
 scope. A pure function reads nothing that can change and changes
 nothing outside itself, so `deposit()` breaks both halves of that
 definition. What `deposit(30)` returns depends on how many times
-`deposit()` (or `withdraw()`) has already run: the two identical calls
+`deposit()` (or `withdraw()`) has run: the two identical calls
 `deposit(30)` and `deposit(30)` return `130` and then `160`, where a
 pure function returns the same value both times. To predict either
 result you must track the history of every prior call, and that
@@ -172,7 +172,7 @@ print(double(10), triple(10), quadruple(10))
 Each call to `multiplier()` creates a new `multiply` closure with its
 own private `factor`. `quadruple` remembers `4` independently of
 `double`'s `2` and `triple`'s `3`, the same way `double` and `triple`
-are already independent of each other. The three closures share
+are independent of each other. The three closures share
 nothing, because each `factor` is reachable only through the one
 function that captured it.
 
@@ -303,7 +303,7 @@ expect(TypeError, partial(clamp, high=100), 0, 5)  # type: ignore
 ```
 
 **Preset the leading argument.** `at_least_ten` needs no `Placeholder`. `low` is the first parameter,
-and `partial()` already fills positional arguments from the left, so
+and `partial()` fills positional arguments from the left, so
 the two remaining parameters stay open in order.
 
 **Show where the keyword fails.** Presetting `high` alone is the case that needs a `Placeholder`.
@@ -438,8 +438,8 @@ lambda, and the chapter's rule of thumb picks the comprehension for an
 expression you write inline.
 
 **Change the sort key.** The last letters `a`, `e`, `i`, and `n`
-already ascend, so sorting by last letter hands the word list back in
-its original order, where the chapter's `key=len` put `pie` first.
+ascend in list order, so sorting by last letter hands the word list
+back in its original order, where the chapter's `key=len` put `pie` first.
 Check an order like that rather than assuming it.
 
 Dropping the `list()` is the part that surprises:
@@ -525,11 +525,11 @@ value exists.
 
 Deleting the `nonlocal` line draws two complaints, in order. `ty`
 reports `Name 'count' used when not defined` on the `count += step`
-line before the program runs. Running anyway raises an
+line before the program runs. Running the program raises an
 `UnboundLocalError` at the first `tally()` call: "cannot access local
 variable 'count' where it is not associated with a value." The type
 checker points at the assignment that went wrong. The runtime message
-complains about a local variable `increment()` never meant to create.
+complains about an unintended local variable in `increment()`.
 
 </details>
 </details>
@@ -548,7 +548,7 @@ complains about a local variable `increment()` never meant to create.
 
 [Putting the Pieces Together](../../Chapters/40_Functional--Foundations.md#putting-the-pieces-together) chains `filter()` and `map()` over `Reading` values, with `partial()` fixing the limit.
 Chain a second `filter()` onto the first, each with its own `partial()`.
-In the second version of `report()`, check which field the predicates read and what unit `map()` has already put in it.
+In the second version of `report()`, check which field the predicates read and what unit `map()` has put in it.
 
 <details>
 <summary>The shape</summary>

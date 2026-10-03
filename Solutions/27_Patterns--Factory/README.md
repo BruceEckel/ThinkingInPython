@@ -363,11 +363,12 @@ GameEnvironment(GnomesAndFairies()).play()
 #: Gnome discovers a Fairy
 ```
 
-**Ask the factory for each product.** `GameEnvironment` never names `Kitty`, `Warrior`, `Puzzle`, or
-`Weapon` directly. It only calls `make_character()` and
-`make_obstacle()` on whatever `GameElementFactory` it receives. A
-third concrete factory slots in beside `KittiesAndPuzzles` and
-`WarriorsAndWeapons` with no change to `GameEnvironment`.
+**Ask the factory for each product.** `GameEnvironment` does not name
+`Kitty`, `Warrior`, `Puzzle`, or `Weapon` directly. It only calls
+`make_character()` and `make_obstacle()` on whatever
+`GameElementFactory` it receives. A third concrete factory slots in
+beside `KittiesAndPuzzles` and `WarriorsAndWeapons` with no change to
+`GameEnvironment`.
 
 `abstract_factory_protocol.py` asks for the same factory without a base class. Leaving
 `make_obstacle()` out at first is the point of the second half:
@@ -596,7 +597,7 @@ object, not editing every call site that creates a shape.
 <summary>Where to look</summary>
 
 [Builder](../../Chapters/27_Patterns--Factory.md#builder) separates assembling a pizza from the finished `Pizza`.
-In `pizza_direct.py`, `__post_init__()` runs while the constructor is still executing, so a bad pizza never escapes it.
+In `pizza_direct.py`, `__post_init__()` runs while the constructor is still executing, so a bad pizza cannot escape it.
 In `pizza_builder.py`, compare what the builder's own list of toppings holds after a fifth `topping()` call when the check sits in `topping()` and when it sits in `build()`.
 
 <details>
@@ -683,27 +684,28 @@ print(pb.build().toppings)
 #: ('a', 'b', 'c', 'd')
 ```
 
-**Reject the value during construction.** In `pizza_direct.py`, an invalid `Pizza` can never exist, not even
-momentarily. `__post_init__()` runs immediately after the constructor
-assigns every field, and raises a `ValueError` before that constructor
-call returns. The rejection is therefore atomic: no code anywhere can
-hold a reference to a `Pizza` carrying five toppings. That guarantee is
+**Reject the value during construction.** In `pizza_direct.py`, an
+invalid `Pizza` cannot exist at any moment. `__post_init__()` runs
+immediately after the constructor assigns every field, and raises a
+`ValueError` before that constructor call returns. The rejection is
+therefore atomic: no code anywhere can hold a reference to a `Pizza`
+carrying five toppings. That guarantee is
 [A Type Is a Set of Values](../../Chapters/12_Techniques--Data_Classes_as_Types.md#a-type-is-a-set-of-values)
 again: illegal values are unrepresentable.
 
-**Check before each change.** Placing the check in `topping()`, as above, gives `PizzaBuilder` the
-same guarantee: the fifth `.topping()` call raises a `ValueError`
-before appending, so `self._toppings` never grows past four.
-Placing the check in `build()` instead gives up that guarantee. The
-builder then accepts a fifth, sixth, or tenth `.topping()` call without
-complaint, silently accumulating an already-too-long list, and
-discovers the problem only when `build()` finally runs, leaving a
-window between the fifth `.topping()` call and that `build()` call.
-During that window the builder's own internal state violates the rule
-the finished `Pizza` must guarantee, though no `Pizza` object ever
-violates it. Checking in `topping()` closes that window.
-Checking only in `build()` leaves it open for as long as the caller
-keeps adding toppings.
+**Check before each change.** Placing the check in `topping()`, as
+above, gives `PizzaBuilder` the same guarantee: the fifth `.topping()`
+call raises a `ValueError` before appending, so `self._toppings` holds
+at most four. Placing the check in `build()` instead gives up that
+guarantee. The builder then accepts a fifth, sixth, or tenth
+`.topping()` call without complaint, silently accumulating an overlong
+list, and discovers the problem only when `build()` finally runs,
+leaving a window between the fifth `.topping()` call and that `build()`
+call. During that window the builder's own internal state violates the
+rule the finished `Pizza` must guarantee, though no `Pizza` object ever
+violates it. Checking in `topping()` closes that window. Checking only
+in `build()` leaves it open for as long as the caller keeps adding
+toppings.
 
 That window is the hazard `stars_class.py` shows. A mutable object
 that checks its rule after the change keeps the illegal value when the
@@ -827,13 +829,13 @@ print(extra_shapes.Circle.__name__)
 #: Circle
 ```
 
-**Register as the class statement runs.** `Shape.__init_subclass__()` registers `Circle` as the
-`class Circle(Shape):` line in `extra_shapes.py` executes, and that
-line executes the first time something imports `extra_shapes`.
-Nothing else triggers the registration. `registry` knows nothing
-about `extra_shapes` and never imports it, so until some other module
-does, `Shape.registry` is empty and every `make()` call raises a
-`KeyError`.
+**Register as the class statement runs.** `Shape.__init_subclass__()`
+registers `Circle` as the `class Circle(Shape):` line in
+`extra_shapes.py` executes, and that line executes the first time
+something imports `extra_shapes`. Nothing else triggers the
+registration. `registry` knows nothing about `extra_shapes` and does not
+import it, so until some other module does, `Shape.registry` is empty
+and every `make()` call raises a `KeyError`.
 
 That is the plugin failure the chapter describes, reproduced in
 miniature. The registry is correct, the subclass is correct, and the
@@ -865,12 +867,13 @@ expect(KeyError, make, "Triangle")
 #: [KeyError] 'Triangle'
 ```
 
-**Mark the import as deliberate.** The demo never uses the name `extra_shapes`, so ruff reports the
-import as unused and the `noqa` comment is the only sign that it is
-deliberate. That is the shape about which the chapter warns: an import that
-exists for its side effect. It must stay an ordinary import, since a
-`lazy import` defers the module body, and with it the two `class`
-statements, until the first use of a name the demo never uses.
+**Mark the import as deliberate.** The demo does not use the name
+`extra_shapes`, so ruff reports the import as unused and the `noqa`
+comment is the only sign that it is deliberate. That is the shape about
+which the chapter warns: an import that exists for its side effect. It
+must stay an ordinary import, since a `lazy import` defers the module
+body, and with it the two `class` statements, until the first use of
+`extra_shapes`, and the demo has none.
 
 </details>
 </details>
@@ -1269,11 +1272,12 @@ for shape in [Shape.factory(s) for s in shape_name(6)]:
 #: Oval.draw
 ```
 
-**Show what one level misses.** `_Oval` is a subclass of `_Circle`, not of `Shape`, so
-`Shape.__subclasses__()` lists `_Circle` and `_Square` and stops. The
-original `shape_name()` draws only from that list, so no seed
-produces `"Oval"`, and the new `case` in `factory()` is unreachable
-from the demo even though `Shape.factory("Oval")` works when called directly.
+**Show what one level misses.** `_Oval` is a subclass of `_Circle`, not
+of `Shape`, so `Shape.__subclasses__()` lists `_Circle` and `_Square`
+and stops. The original `shape_name()` draws only from that list, so no
+seed produces `"Oval"`, and the new `case` in `factory()` is unreachable
+from the demo although `Shape.factory("Oval")` works when called
+directly.
 
 **Walk the whole hierarchy.** `all_subclasses()` yields each direct subclass and then, before moving
 to the next one, recurses into that subclass: depth first, so `Oval`
@@ -1410,12 +1414,12 @@ print(unregistered(globals()))
 #: ['Hexagon']
 ```
 
-**Leave one class unregistered.** `Hexagon` is a complete `Shape`: the type checker accepts it wherever code
-takes a `Shape`, and `Hexagon().draw()` works. `make("Hexagon")` fails with a
-`KeyError`, because the table never heard of it, and the error names
-the key rather than the class or the missing line. No checker reports
-the omission, since a class that nothing decorates is an ordinary
-class.
+**Leave one class unregistered.** `Hexagon` is a complete `Shape`: the
+type checker accepts it wherever code takes a `Shape`, and
+`Hexagon().draw()` works. `make("Hexagon")` fails with a `KeyError`,
+because the table has no entry for it, and the error names the key
+rather than the class or the missing line. No checker reports the
+omission, since a class that nothing decorates is an ordinary class.
 
 **Report the unregistered classes.** `unregistered()` walks a namespace and keeps every class that
 `issubclass()` accepts as a `Shape` and that `make.registry` lacks.
@@ -1570,19 +1574,19 @@ checks with `ty`. Passing the name also frees the key from the
 function's name, so you can call the builder `make_goblin()` while
 the key stays `"goblin"`.
 
-The decorated form gains the same openness the registries
-gain: any module can define a prototype, with its name beside its
-definition, and `PROTOTYPES` needs no edit. The key type widens from
-the chapter's `Kind` to `str` for the same reason: an open table
-cannot list its names in advance. The builder is also a function, so
-`goblin()` still produces a fresh prototype on demand when a test
-needs one that nothing has touched. The costs are the table literal
-becoming a decorator plus a function for each monster, the name
-repeated at every definition, and the two failures the chapter
-attaches to registration: an undecorated builder is absent from the
-table, with a `KeyError` from `spawn()` that names the key and not
-the builder, and a builder in an unimported module never runs. For two monsters in one
-file, the table literal says the same thing in fewer lines.
+The decorated form gains the same openness the registries gain: any
+module can define a prototype, with its name beside its definition, and
+`PROTOTYPES` needs no edit. The key type widens from the chapter's
+`Kind` to `str` for the same reason: an open table cannot list its names
+in advance. The builder is also a function, so `goblin()` still produces
+a fresh prototype on demand when a test needs one that nothing has
+touched. The costs are the table literal becoming a decorator plus a
+function for each monster, the name repeated at every definition, and
+the two failures the chapter attaches to registration: an undecorated
+builder is absent from the table, with a `KeyError` from `spawn()` that
+names the key and not the builder, and the decorator on a builder in an
+unimported module does not run. For two monsters in one file, the table
+literal says the same thing in fewer lines.
 
 </details>
 </details>

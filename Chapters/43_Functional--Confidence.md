@@ -237,7 +237,7 @@ takes a `Result` apart with one branch per kind of failure.
 A description of the result is easier to check than a sequence of steps,
 because less of it can be wrong.
 It also leaves the runtime free to choose the steps, so a SQL query,
-a NumPy expression, or a dataframe operation can run on an optimized or parallel engine you never call directly.
+a NumPy expression, or a dataframe operation can run on an optimized or parallel engine that the library calls for you.
 
 You decide how far up the spectrum to go.
 
@@ -320,7 +320,7 @@ Hypothesis's name for an input generator, and state the law once,
 as a normal `test_` function.
 The framework supplies the cases.
 It draws on every character UTF-8 can encode rather than `property_check.py`'s five-letter alphabet,
-so it reaches inputs the loop never tries, such as unusual Unicode:
+so it reaches inputs outside the loop's alphabet, such as unusual Unicode:
 
 ```python
 # test_property.py

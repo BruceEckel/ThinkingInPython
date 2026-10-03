@@ -104,7 +104,7 @@ A class attribute reads like a default right up until someone assigns to an attr
 After that, a change to the class attribute reaches every other object,
 while the object that assigned keeps its own value.
 The bug surfaces far from the line that caused it,
-often in a different function that never mentions the assignment:
+often in a different function that does not mention the assignment:
 
 ```python
 # far_from_the_cause.py
@@ -157,7 +157,7 @@ print(a.items, b.items)
 #: ['pear'] ['apple']
 ```
 
-`a.items.append("apple")` never assigns to `a.items`.
+`a.items.append("apple")` does not assign to `a.items`.
 It reads `items`, finds nothing on `a`, falls back to the class,
 and mutates the one list stored there.
 The mutation creates no instance attribute, so `b` sees the apple too.
@@ -380,7 +380,7 @@ print(a.total, b.total, Tally.total)
 `self.total += 1` expands to `self.total = self.total + 1`.
 The read falls back to the class and finds `0`.
 The write creates a fresh `total` on the instance.
-Every `Tally` counts itself once and the shared counter never moves.
+Every `Tally` counts itself once and the shared counter stays at `0`.
 The write through `self` is why `class_var.py` increments through the class name,
 `Tally.total += 1`.
 `ClassVar` does save you here, at check time:
@@ -439,7 +439,7 @@ print(Base.shared, Left.shared, Right.shared)
 `Left` has no `shared` of its own,
 so it tracks `Base.shared` until something assigns to `Left.shared` directly.
 `Right` overrides `shared` at class-definition time,
-so it never sees changes made through `Base`.
+so it keeps `100` when `Base.shared` changes.
 `ClassVar` leaves all of that alone:
 it tells the type checker that `shared` belongs to the class,
 and says nothing about whether subclasses share storage.
@@ -488,7 +488,7 @@ The first `Sub()` reads through to that `1`, adds one,
 and the assignment creates `Sub.total = 2` on `Sub` alone,
 the same shadowing `Right` demonstrates in `class_var_inheritance.py`.
 The second `Sub()` increments that separate copy to `3`.
-`Base.total` never moves past `1`, and the type checker reports no diagnostic:
+`Base.total` stays at `1`, and the type checker reports no diagnostic:
 the augmented assignment is a valid `ClassVar[int]` update either way,
 and nothing in the annotation says which class name should receive it.
 Write the increment through the literal class name, as `class_var.py` does,
@@ -497,7 +497,7 @@ A [`@classmethod`](07_Foundations--Classes.md#static-and-class-methods)
 that writes `cls.total += 1` forks the same way,
 because `cls` is the class that received the call.
 [Pattern Refactoring](37_Patterns--Pattern_Refactoring.md#the-trash-hierarchy)'s registry sidesteps the fork by mutating `Trash.registry` in place,
-never reassigning it through `cls`.
+instead of reassigning it through `cls`.
 
 ## Real Per-Object Defaults
 

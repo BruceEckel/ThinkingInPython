@@ -77,7 +77,7 @@ print(render(Triangle()))
 #: triangle
 ```
 
-`Triangle` never mentions `Drawable`, the same as `Circle` and
+`Triangle` doesn't mention `Drawable`, the same as `Circle` and
 `Square`. It qualifies because it has a `draw() -> str` method, and
 `Drawable` requires no more than that. Neither `Drawable` nor
 `render()` needs to change to accept a `Triangle`.
@@ -595,7 +595,7 @@ belongs with the missing one.
 <details>
 <summary>Where to look</summary>
 
-[Narrowing](../../Chapters/08_Foundations--Static_Types.md#narrowing) shows the checker keeping a narrowing of `b.val` even though `reset()` can change that attribute.
+[Narrowing](../../Chapters/08_Foundations--Static_Types.md#narrowing) shows the checker keeping a narrowing of `b.val` although `reset()` can change that attribute.
 Bind `b.val` to a local name before the `if`, so the narrowed expression is a variable instead of an attribute.
 Then consider which name `reset()` can rebind.
 

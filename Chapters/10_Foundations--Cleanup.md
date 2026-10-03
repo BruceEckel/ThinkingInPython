@@ -185,7 +185,7 @@ CPython frees most objects by counting references:
 when the last reference to an object goes away, the object goes with it.
 A reference cycle defeats that count.
 `self_link()` returns and its local `node` disappears,
-but the object still refers to itself, so its count never reaches zero.
+but the object still refers to itself, so its count stays above zero.
 Inside `self_link()`,
 `gc.get_referrers(node)` returns the objects that refer directly to `node`,
 and the call destroys nothing.
@@ -258,7 +258,7 @@ except RuntimeError as e:
 #: caught boom
 ```
 
-`with` calls `__enter__()` at the top of the block and `__exit__()` on the way out,
+`with` calls `__enter__()` at the top of the block and `__exit__()` as control leaves the block,
 and `__exit__()` calls `close()`.
 So `close()` runs at the end of the `with` block, at a line you can identify,
 and the `Socket("B")` block shows `close()` running when the body raises an exception.
@@ -282,8 +282,8 @@ the way a file object's `close()` does.
 `Socket.__init__()` prints "opened" before `__enter__()` runs.
 That ordering hides a trap:
 if `__init__()` raises an exception after acquiring the resource,
-the `with` statement never receives a context manager,
-so `__enter__()` and `__exit__()` never run and the resource leaks silently:
+the `with` statement receives no context manager,
+so neither `__enter__()` nor `__exit__()` runs, and the resource leaks silently:
 
 ```python
 # faulty_init.py
@@ -372,7 +372,7 @@ ahead of the teardown that makes `__del__()` unreliable.
 ### The `self.close` Trap {#the-self-close-trap}
 
 Passing `self.close` to `finalize()` produces no error,
-only an object that never goes away:
+but the object stays alive until the program exits:
 
 ```python
 # finalize_trap.py
@@ -409,7 +409,7 @@ because `Leaky` is not part of an unreachable cycle.
 `finalize()` keeps every callback in a registry,
 and the callback `self.close` holds the object,
 so the registry keeps `Leaky` reachable.
-`Leaky` printed nothing, because its callback never ran and nothing failed.
+`Leaky` printed nothing, because its callback did not run and nothing failed.
 With `atexit` left on, the callback runs as the program exits,
 and a late `L closed` is the one sign of the leak.
 The listing turns `atexit` off on `Leaky`'s finalizer,
@@ -592,7 +592,7 @@ usually the shape of the code, and a full answer for each exercise.
     (`a.peer = b` and `b.peer = a`) instead of a self-reference.
     Confirm both finalizers run at `gc.collect()`,
     then remove the `gc.disable()`/`gc.enable()` pair and explain why the language no longer guarantees when the two `finalized` lines appear,
-    even though this small program still prints them in the same place every run.
+    although this small program still prints them in the same place every run.
 7.  In `faulty_init.py`,
     move the `print()` and the `raise` from `__init__()` into `__enter__()`,
     in place of its `return self`.

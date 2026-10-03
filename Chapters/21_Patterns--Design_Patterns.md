@@ -128,7 +128,7 @@ A dictionary mapping one program's shape names to its shape classes is a specifi
 stage two.
 The same dictionary is a standard design, stage three,
 once each subclass registers itself as its `class` statement runs,
-so adding a type never means editing the factory
+so adding a type leaves the factory untouched
 ([Factory](27_Patterns--Factory.md) builds both).
 [*Template Method*](25_Patterns--Template_Method.md) is a design pattern,
 stage four: a shape of solution you could build in any language with polymorphism.

@@ -373,7 +373,7 @@ def test_dispatch_follows_inheritance() -> None:
 
 *Visitor* still has a place:
 when an object must loop over its own elements inside `accept()`,
-or when someone else's framework already calls that method.
+or when someone else's framework calls that method.
 Both cases are rare in Python.
 The `recycling_note.py` example in [Pattern Refactoring](37_Patterns--Pattern_Refactoring.md#one-singledispatch-function-per-operation)
 reaches the same conclusion:

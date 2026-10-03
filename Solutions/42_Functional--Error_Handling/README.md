@@ -6,14 +6,14 @@
 > and extend the `bind()` chain in `composing_with_bind.py` to include it.
 > Put it in the middle of the chain rather than at the end,
 > so an `Err` from it has a later step to skip,
-> and confirm that the step never runs.
+> and confirm that the step does not run.
 
 <details>
 <summary>Where to look</summary>
 
 [Composing With bind](../../Chapters/42_Functional--Error_Handling.md#composing-with-bind) chains steps so that an `Err` skips every step after it.
 Write `func_d()` with the same `Result[int, str]` signature, and add one more `.bind()` before the last step.
-To see that the skipped step never runs, give it a side effect such as a `print()`.
+To confirm that the skipped step does not run, give it a side effect such as a `print()`.
 
 <details>
 <summary>The shape</summary>
@@ -279,7 +279,7 @@ Gather the `.error` of each `Err` into a list, return `Err(errors)` when the lis
 If you keep the nested `bind()` calls from `combining.py`,
 `combined(1, 2)` returns `Err(error='func_a(1)')`:
 the chain stops at the first failure,
-so the failures from `func_b(2)` and `func_c(3)` never reach the caller,
+so the caller sees no failure from `func_b(2)` or `func_c(3)`,
 and the first test fails.
 The three calls are independent,
 so the solution makes all three before it inspects any result.
@@ -474,7 +474,7 @@ clause accepts the tuple directly, so `wrapper` itself changes by
 one word.
 
 **Let everything else propagate.** `parse("42")` still comes back as an `Ok`. `parse("oops")` raises a
-`TypeError`, which `@safe(ValueError)` never catches, so the
+`TypeError`, which `@safe(ValueError)` does not catch, so the
 `TypeError` propagates through `wrapper` untouched. `expect()`
 catches it outside `parse()` and prints it; without that catch the
 caller sees an ordinary traceback. Under the chapter's `@safe` that same
@@ -553,8 +553,8 @@ report(load_setting("timeout", "30").bind(
 ```
 
 **Note only the failing path.** The successful call has no note to lose. A successful
-`load_setting()` returns from inside the `try` block, so it never
-reaches `add_note()`, and an `Ok` carries no exception on which to
+`load_setting()` returns from inside the `try` block, so it does not
+reach `add_note()`, and an `Ok` carries no exception on which to
 hang a note. Notes attach to exceptions, so only the failing path
 carries one, and only the failing path has anything to explain.
 

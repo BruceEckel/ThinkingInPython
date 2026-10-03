@@ -211,7 +211,7 @@ binding the two ends by name and everything between them to `middle`.
 
 A sequence pattern deliberately excludes `str`, `bytes`, and `bytearray`.
 `case [a, b, c]` does not match `"abc"`,
-even though a string is a sequence in every other context.
+although a string is a sequence in every other context.
 Iterating a string a character at a time is rarely what a pattern means,
 so the language rules it out.
 A tuple does match.

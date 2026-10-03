@@ -149,7 +149,7 @@ with expected(TypeError):
 
 **Mutate through the field.** The record changed, and nothing objected. `NamedTuple` refuses to
 rebind `toast.steps`. It says nothing about the list that field
-already references, so `append()` edits that list through the record.
+references, so `append()` edits that list through the record.
 Both the type checker and Python stay silent, because `append()` mutates the
 list instead of assigning to a field.
 
@@ -298,9 +298,9 @@ swapping `mean` and `count`. `mean, count = summarize(data)` and
 `count, mean = summarize(data)` destructure the same
 `tuple[float, int]` into two names. The second type-checks cleanly and
 misnames both values. With `Stats` you write `result.count`, so the
-order never enters the code. A parameter annotated `Stats` also rejects
-a hand-built tuple in either order, because a `tuple[float, int]` is
-not a `Stats`.
+code does not depend on the order. A parameter annotated `Stats` also
+rejects a hand-built tuple in either order, because a
+`tuple[float, int]` is not a `Stats`.
 Position is something the type checker can verify and a reader cannot.
 A name is something both can.
 

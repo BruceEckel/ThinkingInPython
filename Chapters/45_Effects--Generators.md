@@ -19,7 +19,7 @@ It yields a request, suspends, and continues when a caller sends the answer.
 
 This chapter covers the full three-channel annotation,
 the loop that carries such a conversation, and `yield from`,
-which composes generators that never name their driver.
+which composes generators that do not name their driver.
 [Stateless](46_Effects--Stateless.md) builds an Effect system on the annotation,
 the loop, and `yield from`, but generators are useful without it.
 
@@ -134,7 +134,7 @@ so the generator returns its `Result`.
 
 A returning generator also raises `StopIteration`,
 and the `Result` arrives as that exception's `value`.
-A `for` loop never sees that value,
+A `for` loop loses that value,
 because `for` catches the `StopIteration` and discards it along with its `value`.
 To read the `ReturnType`, catch the exception yourself,
 as `interview_generator.py` does.
@@ -174,7 +174,7 @@ so both lines start from the beginning and produce the first question.
 The `# type: ignore` marks a real mismatch:
 `interview()` declares `Answer` as its `SendType`,
 and `None` is not an `Answer`.
-The type checker rejects the priming `send()` even though the interpreter accepts it,
+The type checker rejects the priming `send()` although the interpreter accepts it,
 because the annotation has no way to make an exception for the first call.
 A driver therefore primes with `next()`.
 
@@ -366,7 +366,7 @@ and neither function names the driver.
 Any iterable can follow `yield from`,
 and the expression takes its value from the `StopIteration` that ends the iteration.
 A generator's `return` sets that value.
-A list's iterator never does,
+A list's iterator sets none,
 so `v = yield from [1, 2, 3]` yields the three items and sets `v` to `None`.
 
 ### The Send Channel
@@ -494,7 +494,7 @@ if __name__ == "__main__":
 #: Alice of Wonderland, friend Rabbit
 ```
 
-`drive()` is the same function as in `two_way_generator.py` and never references `ask()`.
+`drive()` is the same function as in `two_way_generator.py` and does not reference `ask()`.
 Only the generator portion changed.
 
 `ask()` uses `Answer` in two of the three positions, for two different reasons.
@@ -664,7 +664,7 @@ g.close()
 `g.throw()` goes to `outer()`, but `inner()` prints the `caught` line.
 `yield from` passes the exception down to the `yield` where `inner()` waits,
 and `inner()`'s `except` clause handles it,
-so `outer()` never sees the `ValueError`.
+so the `ValueError` stays inside `inner()`.
 `g.close()` raises `GeneratorExit` in `inner()` first,
 and the cleanup lines print from the inside out.
 A driver holding only the outermost generator can still stop and clean up every frame beneath it.

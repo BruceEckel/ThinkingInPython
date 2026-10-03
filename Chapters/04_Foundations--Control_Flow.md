@@ -263,7 +263,7 @@ except ValueError as e:
 ```
 
 `zip()` produces one item from each sequence and stops when the shortest runs out,
-so the extra score never appears.
+so it drops the extra score.
 Stopping without an error is convenient when the lengths differ on purpose and a bug when you expect them to match.
 `strict=True` raises a `ValueError` on the mismatch instead.
 When you need the index as well, wrap the `zip()` in `enumerate()`.
@@ -341,7 +341,7 @@ except RuntimeError as e:
 ```
 
 The list loop walks by position.
-Removing an item shifts the next one down into the slot the loop already passed,
+Removing an item shifts the next one down into the slot the loop has passed,
 so the loop skips it and one of the two `2`s survives,
 with no exception to tell you.
 The dictionary raises a `RuntimeError` instead of skipping silently.
@@ -445,7 +445,7 @@ so no `except` clause mistakes an exception from the follow-up work for the fail
 The optional `finally` always runs, and that makes it the place for cleanup.
 A `return`, `break`,
 or `continue` inside `finally` swallows any exception in flight,
-so cleanup code must never contain any of the three:
+so keep all three out of cleanup code:
 
 ```python
 # finally_swallows.py

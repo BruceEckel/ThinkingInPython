@@ -40,7 +40,7 @@ If two different type hierarchies interact,
 you need a dispatching method call for each hierarchy.
 
 When the interaction is an operator,
-Python already performs this second dispatch for you:
+Python performs this second dispatch for you:
 `a + b` retries as `b.__radd__(a)` if `a.__add__(b)` declines.
 That retry is how the opening `Number + Number` question resolves
 ([Operators Dispatch Twice](#operators-dispatch-twice) below).
@@ -309,7 +309,7 @@ except KeyError as e:
 
 A dictionary probe compares keys by equality,
 so `Origami` is not `Paper` however closely the two relate.
-The lookup never walks the [MRO](07_Foundations--Classes.md#method-resolution-order).
+The lookup ignores the [MRO](07_Foundations--Classes.md#method-resolution-order).
 
 ## One Type or Many
 
@@ -408,9 +408,9 @@ print(Rock().compete(Rock()))
 Both registrations attach to `Item.compete`,
 the attribute `Paper` and `Rock` both inherit,
 so the second `@register` silently overwrites the first's entry for `Rock`.
-`self`'s type never enters the `singledispatch` lookup,
+The `singledispatch` lookup ignores `self`'s type,
 so both duels return the same answer,
-even though each registration went through its own class.
+although each registration went through its own class.
 
 ## Methods or Table
 
@@ -562,7 +562,7 @@ Every binary arithmetic and bitwise operator has a reflected form,
 named by inserting an `r` before the operator's name: `__rsub__()`,
 `__rmul__()`, `__rtruediv__()`.
 The in-place forms, `__iadd__()` and its siblings, are a separate family:
-they serve `+=`, and `a + b` never calls one.
+they serve `+=`, not `a + b`.
 Here is the machinery, with each dispatch traced:
 
 ```python
@@ -628,7 +628,7 @@ when the right operand's type is a subclass of the left's and overrides the refl
 Python tries that reflected method first,
 so the subclass's method runs before the base's.
 
-Both methods declare `-> Meters` even though each can return `NotImplemented`.
+Both methods declare `-> Meters` although each can return `NotImplemented`.
 That is the standard convention rather than a shortcut.
 Typeshed annotates `timedelta.__add__()` as returning `timedelta`, not a union.
 It can do that because it gives `NotImplemented` a type that inherits from `Any`.
@@ -639,7 +639,7 @@ since the sentinel branch has no `n`.
 Pyright and mypy accept the access,
 because that inheritance from `Any` makes any attribute access on the sentinel branch type-check.
 The sentinel is a signal to the interpreter,
-and the `+` expression never evaluates to it,
+and no `+` expression evaluates to it,
 so an annotation that names it describes the wrong thing.
 Widening the return to `Any` describes nothing and turns off checking for every caller.
 
@@ -693,7 +693,7 @@ give a hint, usually the shape of the code, and a full answer for each exercise.
     `__sub__()` handles a `Meters`, an `int`, or a `float`,
     and returns `NotImplemented` for anything else.
     `__rsub__()` needs only the `int` and `float` cases,
-    since Python never calls the reflected form for two `Meters`.
+    since Python skips the reflected form when both operands are `Meters`.
     Subtraction does not commute, so the reflected form must undo the swap:
     check that `10 - Meters(3)` produces `Meters(7)` rather than `Meters(-7)`.
     Then confirm that `"ten" - Meters(3)` raises a `TypeError` rather than producing a `Meters`.

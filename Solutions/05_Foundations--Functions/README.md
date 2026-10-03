@@ -439,7 +439,7 @@ without the `/` the same call fails with two values for `name`.
 > delete the `global count` line from `writes_global()` and predict what a call raises before running it.
 > Then restore it, and instead add `print(count)` as the first line of `rebinds()`.
 > Explain why that also raises an `UnboundLocalError`,
-> even though the assignment to `count` comes after the `print`.
+> although the assignment to `count` comes after the `print`.
 
 <details>
 <summary>Where to look</summary>
@@ -494,10 +494,10 @@ the assignment in `count += 1` makes `count` local to
 `writes_global()`, so the read half of `+=` looks for a local that
 has no value yet.
 
-**Assign after the read.** `rebinds()` fails for the same reason even though
-its `print` comes first in time. Python decides which names are local
-when it compiles the function body, so the `count = 99` below the
-`print` makes `count` local throughout. The first `print`
+**Assign after the read.** `rebinds()` fails for the same reason
+although its `print` comes first in time. Python decides which names
+are local when it compiles the function body, so the `count = 99`
+below the `print` makes `count` local throughout. The first `print`
 therefore reads the unassigned local, not the module-level name,
 and the second `print` does not run.
 

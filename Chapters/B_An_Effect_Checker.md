@@ -130,7 +130,7 @@ a specific name goes above the glob that would otherwise match it.
 Whole modules take one line each, which keeps the table short.
 A name that matches nothing is `UNKNOWN`.
 Because the table lists pure modules explicitly,
-leaving a module out can add an `Unknown` and can never hide an Effect.
+leaving a module out can add an `Unknown` and cannot hide an Effect.
 
 The key is the name as a programmer imports it,
 because a function's own attributes report its name unreliably.
@@ -141,7 +141,7 @@ The checker reads source, and in source the name is `os.remove`.
 
 Because `names()` builds a row from classes,
 a misspelled Effect in the table is an error the type checker reports.
-A `Row` is a `frozenset[str]` because the checker never imports the code it reads.
+A `Row` is a `frozenset[str]` because the checker does not import the code it reads.
 In source text, `performs(Ask)` is the name `Ask`.
 
 ```python

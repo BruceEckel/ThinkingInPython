@@ -292,7 +292,7 @@ still runs and prints `4.5`.
 
 **Give each meaning its own type.** The structural match still holds: `Package.total()` still takes no
 arguments and still returns a float at runtime. The two `NewType`
-declarations add a distinction the shapes never carry, so the type
+declarations add a distinction the shapes lack, so the type
 checker finally sees that a weight is not a price.
 
 If someone deletes the annotations, the program behaves as it does
@@ -716,9 +716,9 @@ counter treats both alike.
 
 **Find the routes past the overrides.** The subclass counts one append out of three and misses `insert()`
 entirely. `extend()` and `insert()` both add elements through `list`'s
-own C implementation, which never calls the Python-level `append()` or
-`__setitem__()` you overrode. Other routes past the counters include
-`+=` and `*=`. A future CPython could add another.
+own C implementation, which calls neither the Python-level `append()`
+nor `__setitem__()` you overrode. Other routes past the counters
+include `+=` and `*=`. A future CPython could add another.
 
 **Route every mutation through a counter.** `CountingBox` reports `3 3 1` because no inherited route into the
 list exists. The class holds a list rather than being one, so every
@@ -743,7 +743,7 @@ that inheritance made it for you.
 > keep the base contract that `push()` always succeeds,
 > and expose "full" some other way.
 > Then say what you gave up,
-> and whether `BoundedStack` should be a subclass of `Stack` at all.
+> and whether `BoundedStack` should be a subclass of `Stack`.
 
 <details>
 <summary>Where to look</summary>
@@ -845,15 +845,15 @@ discards the oldest to stay inside the limit. `fill()` now runs on both
 classes without an exception.
 
 You gave up the refusal. The original `BoundedStack` guarantees that
-it never accepts more than two items. This version guarantees only that it
-never *keeps* more than two. A caller who pushes five items loses three
+it accepts at most two items. This version guarantees only that it
+*keeps* at most two. A caller who pushes five items loses three
 of them silently, and `fill()` returns 2 where a caller counting on
 `Stack` expects 5. That loss is the right behavior for a ring buffer of
 recent events and the wrong behavior for a queue of work that must keep
 every item. If `Stack`'s contract includes "every pushed item stays,"
 this version still breaks it.
 
-Should `BoundedStack` have been a subclass at all? Probably not. The
+Should `BoundedStack` be a subclass of `Stack`? Probably not. The
 exercise has two answers to the same bind:
 either weaken the guarantee until it fits the base contract, or admit
 that "a stack that can refuse" is a different type. A separate class

@@ -88,12 +88,12 @@ scripted `ask`, because a book listing that calls `input()` runs with
 no terminal attached. The substitution is the point either way: one
 `Console` instance satisfies both protocols, so you can pass the same
 object for both parameters. You can also replace either parameter with
-a double, and the other one never notices.
+a double, and the other one is unaffected.
 
 **Declare what the function needs.** `greet()` requires no change, and could not have required one. It
-names two capabilities it needs and calls methods on them. It never
-mentions `Console`, `input()`, `print()`, or `Scripted`, so changing the
-binding affects nothing in its body. That is the delayed-binding
+names two capabilities it needs and calls methods on them. Its body
+names none of `Console`, `input()`, `print()`, or `Scripted`, so
+changing the binding affects nothing there. That is the delayed-binding
 payoff: the choice of implementation moves to the call site, where a
 test can choose differently from production.
 
@@ -103,7 +103,7 @@ or `Tell`, but it has the two methods with the right signatures, so it
 satisfies both protocols structurally. If you give `Console` a
 `tell()` that returns a `str`, `ty` reports `invalid-argument-type`
 at the `greet(...)` call, not at the class definition, because the
-class never says which protocol it means to satisfy.
+class does not declare which protocol it means to satisfy.
 
 </details>
 </details>
@@ -240,11 +240,12 @@ helper that uses the `Log`. You must edit four existing signatures.
 
 **Hand the Effect down the call chain.** `session()`, `menu()`, and `main()` each
 gain a `log` parameter that they only hand to the next function.
-Three of the five never use the `Log` they name. Those functions
+Three of the five name a `Log` they do not use. Those functions
 sit between the Effect's user and the call site that binds it, and
-they pay for an Effect they never mention again. Their signatures now
-describe a capability they do not exercise, so a reader of `menu()`
-learns something false about what `menu()` does.
+they pay for an Effect whose sole use in their bodies is forwarding
+it. Their signatures now describe a capability they do not exercise,
+so a reader of `menu()` learns something false about what `menu()`
+does.
 
 The cost also scales the wrong way. Adding a fourth Effect later means
 walking the same chain again, and the chain is longer in a real
@@ -256,7 +257,7 @@ logger differently.
 An Effect Management System collapses the parameter lists and the call
 sites, not the signatures. `format_greeting()` declares in its return
 type that it needs a `Log`, and so does every function on the path to
-it, but none of them gains a parameter it never uses, no call site
+it, but none of them gains an unused parameter, no call site
 changes, and the type checker names each declaration you miss. You
 still supply the binding, but at one place near the top, where the
 program decides what a `Log` means.
@@ -303,7 +304,7 @@ Neither function in `slope_catch.py` has a side effect or a side
 cause. Both read only their arguments and change nothing outside
 themselves. The two Effects are both exceptions, and the chapter
 demonstrates both conversions the table names for them: `slope()`
-already catches the `ZeroDivisionError`, and `slope_nonzero.py` shows
+catches the `ZeroDivisionError`, and `slope_nonzero.py` shows
 the version where a restrictive type makes a zero `run` unconstructable.
 The third conversion, a `Result`, applies to both exceptions as well:
 `slope_result.py` returns the `ZeroDivisionError` as an `Err`, and

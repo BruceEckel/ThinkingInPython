@@ -67,8 +67,8 @@ for value in [0, 1, "", "hi", [], [1], None, {}, {"k": 1}]:
 ```
 
 An empty dictionary is falsy, the same as an empty list or an empty
-string. A dictionary with even one entry is truthy. The rule is the
-same for every container: falsy when empty, truthy otherwise.
+string. A dictionary with one or more entries is truthy. The rule is
+the same for every container: falsy when empty, truthy otherwise.
 
 </details>
 </details>
@@ -99,10 +99,10 @@ print(f"{score = }")
 #: score = 91.5
 ```
 
-`.2f` always shows two digits after the decimal point, even when the
-second digit is a trailing zero. `{score = }` prints both the
-expression's source text and its value, so a quick debugging print
-needs no separate `print("score", score)`.
+`.2f` always shows two digits after the decimal point, a trailing
+zero included. `{score = }` prints both the expression's source text
+and its value, so a quick debugging print needs no separate
+`print("score", score)`.
 
 </details>
 </details>
@@ -155,9 +155,9 @@ All three forms run, since Python does not enforce a naming convention
 at the language level. What differs is what a reader infers.
 `total` and `flags` say "an ordinary variable that changes,"
 which is what both of these are. `TOTAL_SUM` and `FLAG_BITS` say "a
-constant, fixed for the life of the program," and the second line of
-`exercise_4_constants.py` changes `TOTAL_SUM` anyway. Neither Python nor the linter objects,
-so the name misleads every reader who trusts it.
+constant, fixed for the life of the program," yet the second line of
+`exercise_4_constants.py` changes `TOTAL_SUM`. Neither Python nor
+the linter objects, so the name misleads every reader who trusts it.
 `totalSum` and `flagBits` say nothing about the value. They only say the
 author came from Java or JavaScript.
 
@@ -182,7 +182,7 @@ false claim about the value. CapWords stays reserved for class names.
 
 [t-Strings](../../Chapters/02_Foundations--Tour.md#t-strings) shows a `Template` as a sequence of literal strings and `Interpolation` objects.
 Iterate over the template, test each piece with `isinstance()`, and build the result from the pieces.
-For the explanation, consider what an f-string has already done by the time you receive its result.
+For the explanation, consider what an f-string has done by the time you receive its result.
 
 <details>
 <summary>The shape</summary>
@@ -229,8 +229,8 @@ print(quoted(message))
 **Tell values from literal text.** `quoted()` is `shout()` with the two branches swapped over: the
 `Interpolation` branch is the one that changes something, and the
 literal branch passes its text through. The `isinstance()` test does
-all the work. Each piece arrives already labelled as text the author
-typed or as a value the program supplied, so deciding what to do with
+all the work. Each piece arrives labelled as text the author typed
+or as a value the program supplied, so deciding what to do with
 each is a two-line `if` rather than a parsing problem.
 
 You cannot post-process an f-string this way, because the string it

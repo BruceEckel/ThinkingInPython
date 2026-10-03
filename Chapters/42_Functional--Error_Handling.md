@@ -55,7 +55,7 @@ except ValueError as e:
 
 Function calls 0-2 produce correct values,
 but the exception ends the comprehension before it produces the list,
-so the assignment to `results` never runs.
+so the assignment to `results` does not run.
 To keep the good results you must wrap each call in its own `try`.
 That repeats the handling at every call,
 the way [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#a-value-to-check-everywhere)
@@ -258,7 +258,7 @@ def lies(i: int) -> Result[int, str]:
 ```
 
 `func_a(1)` returns a `Result` that the listing discards,
-and `lies()` never returns the `Result` its signature declares.
+and `lies()` raises an exception instead of returning the `Result` its signature declares.
 The type checker accepts both.
 
 ## Composing by Hand
@@ -729,8 +729,7 @@ so a caller who wants the original must read it from the new exception's `__caus
 (set when a handler raises an exception without `from`).
 `BaseException.add_note()`, added in Python 3.11,
 improves the message and keeps the exception.
-It appends a line to the message you already have,
-and the traceback prints that line:
+It appends a line to the existing message, and the traceback prints that line:
 
 ```python
 # add_note.py
@@ -761,7 +760,7 @@ which renders the message and the notes and leaves out the file paths a full tra
 
 Notes accumulate.
 As the stack unwinds,
-each `except` clause on the way out can add a line built from its own frame's locals,
+each `except` clause along the way can add a line built from its own frame's locals,
 which the raiser's frame does not have.
 `add_note()` appends each note to a list, `__notes__`,
 which the first call creates.
@@ -861,7 +860,7 @@ give a hint, usually the shape of the code, and a full answer for each exercise.
     and extend the `bind()` chain in `composing_with_bind.py` to include it.
     Put it in the middle of the chain rather than at the end,
     so an `Err` from it has a later step to skip,
-    and confirm that the step never runs.
+    and confirm that the step does not run.
 2.  Give `Err` a `map_error()` method that transforms the error it holds,
     leaving an `Ok` untouched
     (for chains to keep working, `Ok` needs its own `map_error()` that returns `self`).

@@ -201,7 +201,7 @@ For each name the subclass defines,
 `getattr(super(cls, cls), name, None)` finds the attribute that the name replaces,
 searching the classes that follow `cls` in its method resolution order.
 If that attribute carries `__final__`,
-`__init_subclass__()` raises a `TypeError`: `class Hijack` never finishes,
+`__init_subclass__()` raises a `TypeError`: `class Hijack` fails,
 because a subclass that replaces the anchor moves the algorithm out of the base class,
 and `@final` stops that replacement only for the type checker.
 The `__final__` check names no method,
@@ -222,8 +222,7 @@ so the misspelling fails at import time,
 not later when the framework runs and the step silently does nothing.
 Rejecting every new method catches the typo too, but it also forbids `report()`,
 and a framework that bans helper methods in its subclasses is too restrictive.
-The close-match check also rejects legitimate names:
-`class Weird` never finishes either,
+The close-match check also rejects legitimate names: `class Weird` fails too,
 because `customized_report()` shares enough letters with `customize2` for `get_close_matches()` to flag it,
 although it is not a typo.
 A team that adopts this check should expect to rename an occasional legitimate method,
@@ -275,7 +274,7 @@ expect(AttributeError, Greeter, "Robin")
 #: [AttributeError] 'Greeter' object has no attribute 'name'
 ```
 
-`Greeter("Robin")` never finishes.
+`Greeter("Robin")` fails with an `AttributeError`.
 `super().__init__()` starts the engine, the engine calls `step()`,
 and `step()` reads `self.name` before the constructor assigns it.
 The quick repair is reordering: assign `self.name` first,
@@ -449,13 +448,13 @@ give a hint, usually the shape of the code, and a full answer for each exercise.
     first reorder the two lines in `Greeter.__init__()`,
     then redesign `Framework` instead,
     so clients construct the object and call `run()` explicitly.
-    Which repair still protects a second subclass author who has never read this chapter?
+    Which repair still protects a second subclass author who has not read this chapter?
 3.  Subclass `ApplicationFramework` and override `run()` with a version that calls `customize2()` before `customize1()`.
     Run it, then run `ty` over it.
     Which of the two, Python or the type checker, objects to the change?
     What does that tell you about the source of the anchored algorithm's guarantee?
 4.  Write two subclasses of `ApplicationFramework` that both type-check but break the anchored algorithm:
-    one whose `customize1()` raises an exception the base never raises,
+    one whose `customize1()` raises an exception the base does not raise,
     and one that leaves `customize2()` at its `...` default when the flow depends on it.
     The type checker reports neither.
     What must be true of the base class for the type checker to catch either one?

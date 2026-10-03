@@ -245,7 +245,7 @@ calls the step belongs to the framework.
 > first reorder the two lines in `Greeter.__init__()`,
 > then redesign `Framework` instead,
 > so clients construct the object and call `run()` explicitly.
-> Which repair still protects a second subclass author who has never read this chapter?
+> Which repair still protects a second subclass author who has not read this chapter?
 
 <details>
 <summary>Where to look</summary>
@@ -404,7 +404,7 @@ where the timing of a hidden step makes the difference.
 <summary>Where to look</summary>
 
 [Hooks and the Misspelled Override](../../Chapters/25_Patterns--Template_Method.md#hooks-and-the-misspelled-override) explains how `@final` marks `run()` as the fixed part of the *Template Method*.
-Override `run()` anyway, run the file, then run `ty` over it.
+Override `run()` in a subclass, run the file, then run `ty` over it.
 Compare what each one reports, and ask which of them reads the `@final` marker.
 A `# type: ignore` on the override keeps the listing in the build.
 
@@ -510,7 +510,7 @@ before anyone constructs an instance.
 ## 4. Two faithless substitutes the type checker accepts
 
 > Write two subclasses of `ApplicationFramework` that both type-check but break the anchored algorithm:
-> one whose `customize1()` raises an exception the base never raises,
+> one whose `customize1()` raises an exception the base does not raise,
 > and one that leaves `customize2()` at its `...` default when the flow depends on it.
 > The type checker reports neither.
 > What must be true of the base class for the type checker to catch either one?
@@ -602,7 +602,7 @@ the right name, the right parameters, and the right return type, so both satisfy
 Code written against `ApplicationFramework` expects `run()` to return
 normally for every subclass the base contemplates. `Exploder` raises
 an exception instead, so a caller with no `try` around `run()` gets an
-exception out of a method that never advertised one.
+exception out of a method that advertised none.
 
 **Skip a step the flow needs.** `HalfDone` breaks the algorithm more quietly, which makes it the
 worse of the two. `customize1()` accumulates work for `customize2()`
@@ -657,7 +657,7 @@ enforcing it stays where the chapter leaves it: with you.
 <summary>Where to look</summary>
 
 [Hooks and the Misspelled Override](../../Chapters/25_Patterns--Template_Method.md#hooks-and-the-misspelled-override) builds the set of known names inside `__init_subclass__()` from the classes in `cls.__mro__`.
-Add a method to `MyApp`, subclass it with a near-miss name, and watch which names the check sees.
+Add a method to `MyApp`, subclass it with a method name one letter off a known one, and watch which names the check sees.
 For the narrower version, take the names from `vars(ApplicationFramework)` alone.
 Then test a misspelling of a name that a subclass added.
 

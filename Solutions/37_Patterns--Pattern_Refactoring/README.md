@@ -139,7 +139,7 @@ you update the expected set, the test guards registration again.
 <summary>Where to look</summary>
 
 [One `singledispatch` Function per Operation](../../Chapters/37_Patterns--Pattern_Refactoring.md#one-singledispatch-function-per-operation) uses `singledispatch` where behavior differs by type, and [Choosing the Lightest Construct](../../Chapters/37_Patterns--Pattern_Refactoring.md#choosing-the-lightest-construct) compares the options.
-Ask whether each operation reads anything that varies by class beyond the numbers every `Trash` already carries.
+Ask whether each operation reads anything that varies by class beyond the numbers every `Trash` carries.
 When the form is the same for every type, an ordinary function over the list is enough.
 
 <details>
@@ -509,9 +509,9 @@ print(sorted(k.__name__ for k in shared))
 #: ['Aluminum', 'Glass']
 ```
 
-**Key the bins on the exact class.** `exact[type(t)]` is a dictionary probe on the exact class, so
-`CrushedAluminum` is a key the dictionary has never seen and gets a bin
-of its own.
+**Key the bins on the exact class.** `exact[type(t)]` is a dictionary
+probe on the exact class, so `CrushedAluminum` is a new key and gets a
+bin of its own.
 
 **Resolve the note through the MRO.** `singledispatch` resolves through the MRO instead, finds no
 registration for `CrushedAluminum`, and takes `Aluminum`'s. Both

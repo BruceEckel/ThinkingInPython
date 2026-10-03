@@ -116,8 +116,7 @@ You invoke it like this:
 
     uv run python -m profiling.sampling run my_program.py
 
-The new profiler can also attach to a process that is already running,
-using the process ID.
+The new profiler can also attach to a running process, using the process ID.
 Attaching makes it the tool for a slowdown you can only reproduce live:
 
     uv run python -m profiling.sampling attach 12345
@@ -138,7 +137,7 @@ separates Python time from native time and profiles memory line by line.
 A profiler answers a broad question about the whole program.
 Sometimes you have a narrow one:
 how many times does this function run during a request,
-and does that branch run at all?
+and does that branch run?
 A counter added to the function changes the code you study,
 and a full profiler costs more than the answer is worth.
 
@@ -191,7 +190,7 @@ The counting lives outside them, in `on_start()`,
 which the interpreter calls each time a monitored Python function begins.
 `set_local_events()` is the narrow instrument:
 it attaches the event to one code object,
-and that is why `square()` is absent from the count even though it ran.
+and that is why `square()` is absent from the count although it ran.
 The event does not spread to whatever that code calls,
 so a helper that `fib()` invokes goes uncounted as well.
 The global form is `set_events()`,
@@ -204,8 +203,8 @@ When one function is the question,
 and `free_tool_id()` releases the identifier.
 The identifiers are a shared resource: `PROFILER_ID`, `DEBUGGER_ID`,
 and `COVERAGE_ID` carry the names of their intended users.
-Claiming one that another tool already holds raises a `ValueError`,
-so two profilers never fight silently over the same callbacks.
+Claiming one that another tool holds raises a `ValueError`,
+so a second tool fails loudly instead of silently replacing the first tool's callbacks.
 
 For an answer you need once rather than continuously,
 the callback can turn its own event off:
@@ -356,7 +355,7 @@ def report(**measured: float) -> None:
 ```
 
 `report()` prints when the flag is present and stays silent otherwise,
-so the listing's own output, the line the book shows, never changes.
+so the listing's own output, the line the book shows, stays the same.
 Running `membership.py` with the flag, as `tip membership --numbers`,
 adds the measurements above that line:
 
@@ -455,7 +454,7 @@ Three switches stand between your program and that machine code:
    Running the result does not.
 2. The process must *enable* it, through the `PYTHON_JIT` environment variable.
 3. The code must get *hot*.
-   A script that runs briefly and exits never reaches the threshold,
+   A script that runs briefly exits before it reaches the threshold,
    so it pays the compiler's warm-up and collects nothing.
 
 Since 3.14, the official python.org Windows and macOS binaries use `--enable-experimental-jit=yes-off`,
@@ -678,9 +677,8 @@ which returns the position after any elements equal to the target,
 while `bisect_left()` returns the position before them
 (`insort()` is likewise an alias for `insort_right()`).
 `bisect_left()` and `bisect_right()` both answer "where does this go,"
-but when the target is already in the list,
-only `bisect_left()` returns its index, so a membership test must use it,
-as `search_comparison.py` does below.
+but when the list holds the target, only `bisect_left()` returns its index,
+so a membership test must use it, as `search_comparison.py` does below.
 The speed is in the search alone:
 `insort()` still shifts everything after the insertion point.
 Under heavy insert traffic, when the smallest item is all you read,
@@ -951,7 +949,7 @@ while the lazy one computes only the handful of values that `islice()` extracts.
 `islice()` replaces the eager version's `evens[:5]`:
 a generator has no `__getitem__`,
 so slicing one raises `TypeError: 'generator' object is not subscriptable`.
-When the consumer needs every element anyway and the data fits in memory,
+When the consumer needs every element and the data fits in memory,
 a list is fine, and you can iterate it twice.
 One pass exhausts a generator.
 
@@ -980,7 +978,7 @@ stream it from the start, like `lazy_first_evens()`.
 
 If you call a [pure function](40_Functional--Foundations.md#pure-functions)
 repeatedly with the same arguments,
-the fastest way to get the answer is to reuse the one you already computed.
+the fastest way to get the answer is to reuse the result of an earlier call.
 `functools.cache` stores each result the first time and replays it after that.
 The classic demonstration is the naive recursive Fibonacci,
 which recomputes the same subproblems exponentially many times:
@@ -1766,7 +1764,7 @@ That is a design decision with its own chapter,
 
 Measure first.
 A profiler finds the slow spots without guessing,
-and it also answers a question the rest of this list assumes you already know:
+and it also answers a question whose answer the rest of this list assumes:
 is the program spending its time computing, or waiting?
 A program mostly waiting on a database, a socket, or a subprocess is I/O-bound,
 and steps 2 through 9 below do not help it much.
@@ -1840,7 +1838,7 @@ give a hint, usually the shape of the code, and a full answer for each exercise.
 10. Time `"".join(parts)` against `+=` in a loop for 10,000 short strings,
     then repeat at 100 strings.
     At which size does the difference stop mattering,
-    and which of the two would you write anyway?
+    and which of the two would you write regardless?
 11. `bisect_search.py` uses `bisect()` and `search_comparison.py` uses `bisect_left()`.
     Build a sorted list with duplicates,
     run both against a value that appears three times,

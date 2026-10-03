@@ -196,8 +196,8 @@ run(supply(Console())(greet_all)(["Alice", "Bob"]))
 #: Hello, Bob!
 ```
 
-**Fix the signature, not the body.** The body never changes. `greet_all()` already did the right
-thing. Its signature described a different function.
+**Fix the signature, not the body.** The body stays as it is: `greet_all()` did the right
+thing all along. Its signature described a different function.
 
 What `greet_all()`'s callers must now declare is the point of the exercise. Before,
 `greet_all()` claimed to need nothing, so a caller could run it with no
@@ -498,16 +498,16 @@ print(run(supply(METAL, ROBOTIC)(holds)()))
 so its two rows read `True` and `True`. `METAL` is the first material
 in the table that survives both nailers.
 
-**Build each environment from a row.** The test function body needs no change because it never mentions a
-material or a nailer. It receives two objects and an expectation,
+**Build each environment from a row.** The test function body needs no change because it mentions no
+material or nailer. It receives two objects and an expectation,
 builds an environment from them with `supply()`, and asks whether the
 answer matches. The `parametrize` table decides which two objects
 those are, and adding a row adds a case without touching the function body that
 runs it.
 
 That split between the table and the body is the same one running through the whole chapter, seen
-from the testing side. `holds()` declares two requirements and never
-names an instance, so every combination of instances is a valid
+from the testing side. `holds()` declares two requirements and names
+no instance, so every combination of instances is a valid
 environment for it. The parametrize table is a list of environments,
 and the test body is the driver that runs the Effect in each one. Six
 rows share one assertion. A version constructing its own `Material`
@@ -609,14 +609,14 @@ run(defaults(stamped)("Bob"))  # type: ignore
 #: [noon] Hello, Bob!
 ```
 
-**Build the class the request names.** `default()` never names `Console` in its body. It reads `ability.t`,
+**Build the class the request names.** `default()` names no `Console` in its body. It reads `ability.t`,
 the class the request carries, and calls that class, so `default()`
 answers a request by constructing the requested class. That is the other kind of
 default: `default_console.py` supplies one prepared instance, and
 `default()` builds whatever the request names, on demand.
 
 **Run both Effects through one handler.** At runtime the handler answered three requests across the two calls,
-two for `Console` and one for `Clock`, even though `default()`
+two for `Console` and one for `Clock`, although `default()`
 annotates its parameter `Need[Console]`. The type checker believes the handler
 answers only `Need[Console]`, so the second `run()` needs a
 `# type: ignore`. Without that pragma, the type checker reports a
@@ -683,7 +683,7 @@ runs to completion and prints:
 
 No greeting prints. `greet(name)` calls a generator function, so
 it builds an Effect and returns it. Nothing then drives that Effect,
-so its body never runs and never makes the `Need[Console]` request.
+so its body does not run and makes no `Need[Console]` request.
 The log entries still appear because the deletion touches only the
 greeting half of the function. The surviving entries make the failure quieter still:
 the program looks like it worked and produced most of its output.
@@ -833,7 +833,7 @@ for builder in builders.values():
 ```
 
 **Run each stored Effect twice.** The first pass over `built` greets both names. The second prints
-nothing at all, and `run()` returns `None` for each entry without
+nothing, and `run()` returns `None` for each entry without
 raising an exception. An Effect is a generator, and a generator runs
 once. Resuming a finished generator raises `StopIteration` immediately,
 which `run()` reads as "already returned, with no value."
@@ -850,7 +850,7 @@ decorator of type
 `Callable[P, Effect[...]] -> Callable[P, Effect[...]]` rather than
 one of type `Effect[...] -> Effect[...]`. Retrying means running the
 same work more than once, and an Effect cannot supply the second run:
-by the time the first attempt fails, that attempt has already run the
+by the time the first attempt fails, that attempt has run the
 generator to its end, leaving nothing to resume. `retry()` needs to
 build a fresh Effect per attempt, and only the function that builds
 the Effect can do that.
@@ -958,7 +958,7 @@ collects the results rather than relaying them.
 `run(effect)` is `asyncio.run(run_async(effect))`. `asyncio.run()`
 refuses to start an event loop inside a running one, so calling
 `run()` from `main()` fails. `run_async()` is the same driver in
-coroutine form, so the loop already running can await it.
+coroutine form, so the running loop can await it.
 
 The type checker accepts both calls because both are correctly typed. `run()` takes an
 Effect and returns its result. `run_async()` takes an Effect and returns
@@ -1084,7 +1084,7 @@ keeps the type checker's inference pinned.
 
 **Surface each failure at `run()`.** Each failure surfaces at `run()`, and nowhere earlier. `Cyd` has a
 score, so the lookup succeeds and `format_score()` fails. `Dana` has
-none, so the lookup fails and `format_score()` never runs. In both
+none, so the lookup fails and `format_score()` does not run. In both
 cases the error value travels up through the `yield from` chain
 untouched, past `announce()`, past `supply()`, to the driver. `run()`
 raises it as an ordinary exception because nothing along the way

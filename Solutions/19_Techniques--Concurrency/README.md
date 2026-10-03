@@ -67,7 +67,7 @@ in the order their timers fire, so the shortest delay wakes first and
 `d` resumes before the other three. The returned list follows the
 argument order, not the finishing order: `gather()` fills each
 position from the coroutine passed in that position, so `'D'` is last
-in the list even though `d` finished first.
+in the list although `d` finished first.
 
 </details>
 </details>
@@ -146,10 +146,11 @@ coroutines while the current one waits.
 
 The timing follows from the trace. `gather()` finishes in about the
 longest delay, 0.03 seconds, because all three waits overlap. This
-version takes their sum, about 0.06 seconds, because the waits never
-overlap. The list comprehension is not the problem. Calling `fetch()`
-builds a coroutine object and starts nothing. Only `gather()` or a
-`TaskGroup` schedules every coroutine as a task before waiting on any.
+version takes their sum, about 0.06 seconds, because the waits run one
+after another. The list comprehension is not the problem. Calling
+`fetch()` builds a coroutine object and starts nothing. Only `gather()`
+or a `TaskGroup` schedules every coroutine as a task before waiting on
+any.
 
 </details>
 </details>
@@ -361,16 +362,16 @@ asyncio.run(main())
 #: blocking peak=1, prices=[10, 20, 30, 40, 50]
 ```
 
-**Hold the thread while waiting.** The peak falls from `5` to `1`, the same figure the CPU-bound version
-produced. `time.sleep()` does here what it does in
-`blocking_the_loop.py`: it stops the thread instead of suspending the
-task, and the event loop runs on that thread. A coroutine that never awaits never gives the loop
-a chance to start another task, so each task runs start to finish
-before the next begins.
+**Hold the thread while waiting.** The peak falls from `5` to `1`, the
+same figure the CPU-bound version produced. `time.sleep()` does here
+what it does in `blocking_the_loop.py`: it stops the thread instead of
+suspending the task, and the event loop runs on that thread. A coroutine
+with no `await` gives the loop no chance to start another task, so each
+task runs start to finish before the next begins.
 
 Waiting does not create overlap. Suspending does. These five tasks
-spend almost all their time waiting and still never overlap, while
-`cpu_price()` never overlaps for the opposite reason: it has no
+spend almost all their time waiting and still run one at a time,
+and `cpu_price()` runs one at a time for the opposite reason: it has no
 `await` to reach. The total run time makes the cost visible: five
 blocking sleeps of 0.05 seconds take about a quarter second, while
 five awaited ones take about 0.05.
@@ -447,8 +448,8 @@ asyncio.run(main())
 ```
 
 **Admit one holder at a time.** A semaphore holds a count of how many holders it admits at once, and
-`async with` decrements that count on the way in and restores it on the
-way out. With the count initialized to `1`, the first task through
+`async with` decrements that count on entry and restores it on
+exit. With the count initialized to `1`, the first task through
 exhausts it, so every other task suspends at `async with` until that
 task leaves. Only one read-modify-write runs at a time, as with
 `asyncio.Lock`, and all 400 increments survive.
@@ -487,12 +488,13 @@ so each pair of increments collapses into one. The semaphore reports
 no error, because `release()` adds one to the count whether or not an
 `acquire()` came first.
 
-That silence is the difference between a semaphore and a lock. `asyncio.Lock`
-refuses a release it never granted, raising `RuntimeError: Lock is not
-acquired.` A semaphore does not track what it granted, so the same
-mistake silently admits a second holder and reintroduces the race the
-lock is there to prevent. `asyncio.BoundedSemaphore(1)` is the
-semaphore that objects: the stray `release()` raises
+That silence is the difference between a semaphore and a lock.
+`asyncio.Lock` refuses a release with no matching acquire, raising
+`RuntimeError: Lock is not acquired.` A semaphore does not track what it
+granted, so the same mistake silently admits a second holder and
+reintroduces the race the lock is there to prevent.
+`asyncio.BoundedSemaphore(1)` is the semaphore that objects: the stray
+`release()` raises
 `ValueError: BoundedSemaphore released too many times`.
 
 </details>
@@ -626,7 +628,7 @@ guarantee: the race stays invisible only because this interpreter
 places its switch points elsewhere. Any function call put back
 between the read and the write, a blocking I/O call, a `print()`, or
 an innocuous-looking helper, reopens the same gap, because the
-read-modify-write sequence never became atomic. A free-threaded
+read-modify-write sequence is still not atomic. A free-threaded
 interpreter has no GIL to hold through the sequence, so there the race
 needs no function call. The fix is still a lock, not the absence of
 an explicit sleep.
@@ -745,7 +747,7 @@ after all three producers finish.
 
 [Structured Concurrency with `TaskGroup`](../../Chapters/19_Techniques--Concurrency.md#structured-concurrency-with-taskgroup) shows a failing child causing the group to cancel its siblings.
 Compare each task's delay with the moment `c` and `d` fail to decide which tasks are still running when cancellation starts.
-Cancellation reaches only running tasks, so consider what it cannot do to a task that already returned.
+Cancellation reaches only running tasks, so consider what it cannot do to a task that has returned.
 
 <details>
 <summary>The shape</summary>
@@ -857,7 +859,7 @@ during that sleep and its task ends cancelled.
 `TaskGroup` can and cannot undo. A
 `TaskGroup` cancels what is still running, which is why the original
 `PAIRS` has both `e` and `f` cancelled. It cannot reach into a task
-that already returned, and it cannot unprint `e: fetched` or undo
+that has returned, and it cannot unprint `e: fetched` or undo
 whatever a real `fetch()` wrote to a database on its way out.
 Structured concurrency guarantees that no task outlives the block, not
 that no task had an effect before the failure.
@@ -878,7 +880,7 @@ that undoes it, so "already finished" still means "still reversible."
 > In `gather_with_exceptions.py`,
 > delete `return_exceptions=True` and wrap the `await` in `try`/`except ValueError`.
 > Predict how many `fetched` lines still print,
-> and explain what became of the tasks on which the `gather()` call never reported.
+> and explain what became of the tasks whose outcomes the `gather()` call left unreported.
 
 <details>
 <summary>Where to look</summary>
@@ -938,17 +940,17 @@ asyncio.run(main())
 ```
 
 Two `fetched` lines print, `a` and `b`, the two whose timers fire
-before `c` fails at `0.03`. `e` and `f` never print one, and
-`print(results)` never runs, because the `await` raises the
+before `c` fails at `0.03`. `e` and `f` print nothing, and
+`print(results)` does not run, because the `await` raises the
 `ValueError` instead of returning a value.
 
 **Propagate the first failure.** Without `return_exceptions=True`, the first child exception propagates
 out of the `await` immediately, and `gather()` reports that one
 exception rather than a list of six outcomes. `d` fails in the same
-tick, but the `gather()` future has already resolved by then, so
+tick, but the `gather()` future has resolved by then, so
 `gather()` retrieves `d`'s failure and discards it instead of raising
 it. The call loses the four results it was collecting, including `a`
-and `b`, which had already succeeded.
+and `b`, which had succeeded.
 
 **Leave the other tasks running.** `gather()` does not cancel the unfinished tasks, `e` and `f`,
 when the exception propagates, unlike a `TaskGroup`, so `e` and
@@ -1125,12 +1127,12 @@ print(f"threads run in parallel: {t_seq > t_thr * target}")
 #: threads run in parallel: False
 ```
 
-**Check that the results agree.** The assertion passes because correctness never depends on the
-executor. `cpu_price()` reads its argument and returns a number,
-touching nothing shared, so five calls produce the same five results
-whether they run one after another, in five threads, or in five
-subinterpreters. Swapping the executor changes when the work runs, not
-what it computes.
+**Check that the results agree.** The assertion passes because
+correctness does not depend on the executor. `cpu_price()` reads its
+argument and returns a number, touching nothing shared, so five calls
+produce the same five results whether they run one after another, in
+five threads, or in five subinterpreters. Swapping the executor changes
+when the work runs, not what it computes.
 
 **Compare the timings.** The boolean flips because threads in one interpreter share one GIL.
 `cpu_price()` is a counting loop with no I/O and no `sleep`, so it
@@ -1256,14 +1258,14 @@ because the race is not in the loop body.
 **Take each item unguarded.** `for item in source:` is the `for` statement calling
 `source.__next__()`, and that call runs before control reaches the
 indented block. The `with lock:` inside the body therefore starts
-*after* `next()` has already returned a number, and ends before the
+*after* `next()` has returned a number, and ends before the
 next `next()` begins. Two threads can be inside `__next__()` at the
 same moment, read the same `next_number`, and come away with the same
 ticket, as they do without the lock.
 
-**Lock the loop body.** The lock does cover `out.append(item)`, which never needs covering:
-`out` is a local list, one per worker, so no other thread can touch
-it.
+**Lock the loop body.** The lock does cover `out.append(item)`, which
+needs no lock: `out` is a local list, one per worker, so no other thread
+can touch it.
 
 Serializing an iterator means putting the lock where the mutation is,
 inside `__next__()`, where `threading.serialize_iterator()` puts it. The lesson generalizes past iterators: a lock protects the
@@ -1352,12 +1354,12 @@ task holds. The first task finishes and releases both locks, and the
 second task then takes each lock with no other task holding it.
 
 The deadlock version makes the waiting circular: task one holds
-`lock_a` and wants `lock_b`, task two holds `lock_b` and wants
-`lock_a`, so each task's progress depends on the other task's
+`lock_a` and waits for `lock_b`, task two holds `lock_b` and
+waits for `lock_a`, so each task's progress depends on the other task's
 progress. A deadlock is that cycle. Acquiring the
 locks in one global order makes such a cycle impossible. A task can only
 ever wait on a lock that comes later in the order than every lock it
-already holds, and "later" never loops back to "earlier."
+holds, and "later" never loops back to "earlier."
 
 </details>
 </details>
@@ -1396,7 +1398,7 @@ async def process_price(
 
     error[invalid-await]: `Future[int]` is not awaitable
 
-Running it anyway raises a `TypeError` before any price comes back:
+At runtime the line raises a `TypeError` before any price comes back:
 
     + Exception Group Traceback (most recent call last):
       ...

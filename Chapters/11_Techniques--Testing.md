@@ -361,7 +361,8 @@ def test_spend_some(open_account: Account) -> None:
 ```
 
 Everything before the `yield` is setup.
-Everything after it runs once the test finishes, even if the test fails.
+Everything after it runs once the test finishes,
+whether the test passes or fails.
 Close files, release locks, or check a final invariant after the `yield`.
 A failing check there surfaces as an error, not as a test failure:
 `pytest` prints `1 passed, 1 error`,
@@ -552,7 +553,7 @@ def load(name: str) -> str:
 ```
 
 The tests point `APP_DATA` at a throwaway directory,
-so they never touch real data and never collide with each other:
+so they leave real data untouched and cannot collide with each other:
 
 ```python
 # test_storage.py
@@ -709,7 +710,7 @@ you widen every signature along the way,
 or introduce a context object to carry the parameter.
 `monkeypatch` skips that plumbing: it patches the name in place,
 at the cost of a process-wide patch that stands until teardown restores the name.
-Choose injection when the parameter already sits near the boundary.
+Choose injection when the parameter sits near the boundary.
 Choose `monkeypatch` when threading it through touches more code than the test is worth.
 
 `datetime.now()` is harder to patch:
@@ -753,7 +754,7 @@ but it is the standard answer for code built around `datetime`.
 
 ### Network Calls
 
-A test must never use a real network.
+A test must not use a real network.
 The call is slow, it fails whenever the service or the connection does,
 and it ties the test to data you do not control.
 `monkeypatch` replaces the function that fetches data with one that returns a canned response,
@@ -882,7 +883,7 @@ usually the shape of the code, and a full answer for each exercise.
 2.  Use `parametrize` to test `add_interest()` at several rates,
     comparing with `pytest.approx()`.
 3.  Write a fixture that `yield`s an `Account` and asserts, after the `yield`,
-    that the balance is never negative.
+    that the balance is not negative.
     Use it in two tests.
 4.  Write `settings_path()`,
     which returns `Path(os.environ["APP_CONFIG"]) / "settings.ini"`,

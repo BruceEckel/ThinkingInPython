@@ -232,7 +232,7 @@ expect(AttributeError, show, Box("hi"))
 `ty check` passes this file.
 The `if` narrows `b.val` to `str`,
 and nothing in the checker's model connects `reset()` to that narrowing,
-so the checker never widens `b.val` back to `str | None`.
+so the checker keeps `b.val` narrowed to `str`.
 The `AttributeError` shows the narrowing was stale by the time `upper()` ran.
 A narrowing on a local variable holds; a narrowing on an attribute can go stale,
 so recheck the attribute after any call that might touch the object.
@@ -333,7 +333,7 @@ print(render(Square()))
 # render(Blob())
 ```
 
-`Circle` and `Square` never mention `Drawable`.
+Neither `Circle` nor `Square` mentions `Drawable`.
 The type checker accepts both because each has a `draw()` that takes no arguments and returns a `str`,
 so each matches `Drawable`'s shape.
 The signature is part of that shape: a `draw()` that returns an `int`,
@@ -390,7 +390,7 @@ while the built-in call `type(shape)` in the demo retrieves an object's class at
 
 An annotation can grow to the point of obscurity.
 `dict[tuple[int, int], str]` is precise,
-but it never says what those pairs and strings represent.
+but it does not say what those pairs and strings represent.
 The *type statement* gives the annotation a name:
 
 ```python
@@ -728,7 +728,7 @@ A call that leaves out `width` draws `missing-argument`.
 A misspelled keyword is where the checkers disagree.
 Pyright rejects `fill` misspelled as `fil="*"` with `No parameter named "fil"`,
 but `ty` 0.0.84 accepts that call without a diagnostic.
-At runtime `fil` becomes an extra key in `style`, which `label()` never reads,
+At runtime `fil` becomes an extra key in `style`, which `label()` ignores,
 so the fill quietly stays a space.
 
 The payoff grows when several functions accept the same options:

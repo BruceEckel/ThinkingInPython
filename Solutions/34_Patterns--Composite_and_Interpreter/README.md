@@ -223,7 +223,7 @@ here. Deciding what a link should do is a judgment call, not
 something the type checker picks for you.
 
 **Avoid counting bytes twice.** `disk_usage()` counts a link
-as free, since the bytes it references already get counted wherever
+as free, since the bytes it references get counted wherever
 the real file lives. Adding the target's size again double-counts those bytes.
 
 **Show a link without following it.** `walk()` reports the link as its own entry, `name -> target`, rather
@@ -498,10 +498,11 @@ guard, so an unchanged subtree is still shared.
 usually not an `int`, so it does not fit in a `Num`, and division by
 `Num(0)` produces no value to fold. Nor should `simplify()` raise the
 `ZeroDivisionError` itself. It rewrites a tree without evaluating it,
-and a caller can simplify an expression it never evaluates, so an
-exception raised in `simplify()` would report an error in a computation that
-never runs. Leaving `Div(lhs, Num(0))` in the tree lets `evaluate()`
-raise `ZeroDivisionError` when the division runs, and not before.
+and a caller can simplify an expression and then discard it, so an
+exception raised in `simplify()` would report an error in a
+computation that does not run. Leaving `Div(lhs, Num(0))` in the
+tree lets `evaluate()` raise `ZeroDivisionError` when the division
+runs, and not before.
 Python treats `1 / 0` in source the same way: the compiler accepts
 it, and the error arrives when the line executes.
 
@@ -655,15 +656,15 @@ print(to_infix((x + 1) * (x + 2)))
 **Parenthesize by context.** Each recursive call passes down the precedence its *parent* requires.
 A child only gets parentheses when its own operator binds more
 loosely than what the parent needs. `Mul`'s children therefore need
-parens around a lower-precedence `Add`, while `Add`'s children never
-need parens around another `Add`.
+parens around a lower-precedence `Add`, while `Add`'s children need
+no parens around another `Add`.
 
 **Guard the right operand.** Passing `prec + 1` (rather than
 `prec`) for the right operand is a simple, always-safe rule: it can
 occasionally print one redundant pair of parentheses around a
 right-hand child at the *same* precedence as its parent
-(`x + (x + 1)` instead of the fully terse `x + x + 1`), but it never
-omits a pair that changes the expression's meaning.
+(`x + (x + 1)` instead of the fully terse `x + x + 1`), but it keeps
+every pair that the expression's meaning requires.
 
 </details>
 </details>
@@ -856,7 +857,7 @@ print(to_infix(simplify(d)))
 
 **Differentiate the leaves.** `derivative()` walks the tree like `evaluate()` and
 `to_infix()`, one case per node type, but produces another `Expr`
-instead of a number or a string. A `Num` never changes, so its
+instead of a number or a string. A `Num` is constant, so its
 derivative is always `0`. The derivative of `Var(n)` is `1` with
 respect to itself and `0` with respect to every other variable.
 
@@ -1026,19 +1027,19 @@ word: `str` reports `"a" + x`, and Python's own fallback reports
 `x + "a"`, once both operands have declined.
 
 **Declare the node each method builds.** Each method declares the type it really returns, `Add` or `Mul`,
-even though it can also return `NotImplemented`.
+although it can also return `NotImplemented`.
 [*Multiple Dispatching*](../../Chapters/32_Patterns--Multiple_Dispatching.md#operators-dispatch-twice)
 explains the convention: typeshed gives the sentinel a type
 inheriting `Any`, so returning it satisfies any declared return type.
 The declaration also lets `(2 * x + 1).right` resolve for a caller.
 
 `NotImplemented` closes a runtime hole, not a type-checking one.
-The type checker already rejects
+The type checker rejects
 `"a" + x` in source it can see, which is why the listing's `"a" + x`
 line carries a `# type: ignore` to keep `exercise_6.py` in the build. The runtime hole
 is the gap between what the checker sees and what runs. Closing it matters
-when a program builds the expression from data the type checker never
-sees, the case an interpreter exists to handle.
+when a program builds the expression from data the type checker cannot
+see, the case an interpreter exists to handle.
 
 </details>
 </details>
@@ -1054,7 +1055,7 @@ sees, the case an interpreter exists to handle.
 <details>
 <summary>Where to look</summary>
 
-[A Template Is a Tree](../../Chapters/34_Patterns--Composite_and_Interpreter.md#a-template-is-a-tree) shows that a `Template` already separates literal strings from `Interpolation` objects.
+[A Template Is a Tree](../../Chapters/34_Patterns--Composite_and_Interpreter.md#a-template-is-a-tree) shows that a `Template` separates literal strings from `Interpolation` objects.
 Loop over the template, copy each string piece unchanged, and pass each interpolation's value through `html.escape()`.
 Comparing with an f-string on the same input shows what the structure keeps that a finished string loses.
 
@@ -1104,7 +1105,7 @@ print(f"<p>{comment}</p>")
 **Add an operation beside the others.** `to_html()` is the third operation over `Template`, and it changes
 nothing about `to_query()` and `to_shape()`, the property the chapter
 keeps demonstrating on `Expr`. The whole walker is the same loop with
-a different body, because the structure already separates the literal
+a different body, because the structure separates the literal
 pieces from the interpolations.
 
 **Escape the interpolated values.** `html.escape()` replaces the characters, so the exercise's
@@ -1117,7 +1118,7 @@ The f-string on the last line is the comparison. It produces a
 `<script>` tag that a browser runs, and nothing downstream can
 intervene, because by the time a function receives that string the
 tag and the paragraph markup are the same kind of text. The template
-version never loses the distinction, so escaping is a decision the
+version keeps the distinction, so escaping is a decision the
 renderer can still make.
 
 </details>
@@ -1345,9 +1346,9 @@ through C still stops: `repr()` or `hash()` on that same tree raises
 a `RecursionError` that reports a stack overflow, whatever the limit
 says. Each pending level also holds a frame and a fresh `env` dict,
 so memory grows with depth. The limit is global too, so a library
-that raises it changes the behavior of code that never asked. The
-iterative walk keeps its pending work in one list and changes no
-setting that other code can see.
+that raises it changes the behavior of code that did not ask for a
+higher limit. The iterative walk keeps its pending work in one list
+and changes no setting that other code can see.
 
 </details>
 </details>
@@ -1470,8 +1471,8 @@ Directory` lives in your source, so a plugin cannot extend it. The
 type checker does warn the plugin author: `ty` reports a `Symlink`
 passed to `disk_usage()`, or placed in a `Directory`'s entries, as
 `invalid-argument-type`. The warning leaves the plugin nothing to fix,
-because the union it would have to extend is yours. Code the checker
-never sees fares worse: its `Symlink` falls through every case to
+because the union it would have to extend is yours. Unchecked
+code fares worse: its `Symlink` falls through every case to
 `assert_never()`, which raises an `AssertionError` at runtime. The plugin's alternatives
 are to vendor a patched copy of your module or to persuade you to add
 the case. The open design removes that coupling.
@@ -1480,7 +1481,7 @@ the case. The open design removes that coupling.
 chapter spent the first two sections making. Adding `Symlink` now
 costs nothing to existing code, while adding a *new operation* costs
 a method in every class, including the ones you do not own. The
-`@abstractmethod` keeps the plugin honest: Python refuses to
+`@abstractmethod` enforces the contract on the plugin: Python refuses to
 instantiate a subclass that defines no `disk_usage()`.
 
 For a file system, use the open design. Which node types exist is a

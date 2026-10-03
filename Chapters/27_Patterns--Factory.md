@@ -197,7 +197,7 @@ For a deeper hierarchy, recurse through each subclass's own `__subclasses__()`
 
 The concrete shapes carry a leading underscore because no caller needs their names.
 `factory()` returns `Shape`,
-so a caller only works with `Shape`s and never writes `_Circle`.
+so a caller works with `Shape`s and has no need to name `_Circle`.
 The underscore discourages direct construction,
 but it is a convention rather than concealment.
 [*Singleton*](24_Patterns--Singleton.md#nothing-keeps-the-class-private)
@@ -230,7 +230,7 @@ Each takes data and returns an instance,
 and each raises an exception for data it does not recognize; for `Month`,
 a number outside one through twelve.
 `of()` needs no `match`.
-The `Enum` already holds every member `of()` could return,
+The `Enum` holds every member `of()` could return,
 so the method indexes `list(Month)` instead of naming a class.
 A factory over a closed set of products reduces to a lookup.
 [The Pythonic Factory: a Dictionary](#the-pythonic-factory-a-dictionary)
@@ -301,7 +301,7 @@ and one new member in `Kind`.
 Typing `kind` as the closed `Literal` instead of `str` moves a bad name from a runtime `KeyError` to a check-time error,
 the same trade [Explicit Registration with a Protocol](#explicit-registration-with-a-protocol)
 makes for a class that forgets `draw()`.
-`Kind` names the two members `SHAPES` already has,
+`Kind` names the two keys in `SHAPES`,
 and the checker rejects a key that `Kind` does not list,
 so `SHAPES` cannot gain a shape name without adding it to the `Literal` first.
 
@@ -344,7 +344,7 @@ Nothing in the listing calls a register function;
 the two `class` statements fill `Shape.registry` on their own.
 Registering through `__init_subclass__()` is why `Shape` is an abstract base class rather than a `Protocol`.
 `__init_subclass__()` runs only for classes that inherit from `Shape`,
-so a class that merely matches a Protocol's shape never registers.
+so a class that merely matches a Protocol's shape stays out of the registry.
 Inheritance is the mechanism, and `ABC` adds one guard on top of that.
 A subclass registers as its `class` statement executes,
 so a subclass that forgets `draw()` still registers.
@@ -423,13 +423,13 @@ Import a plugin module eagerly when the import exists for its side effect.
 The registry keys on `cls.__name__` alone, so two classes that share a name,
 from different modules, silently overwrite each other.
 Key on `f"{cls.__module__}.{cls.__qualname__}"` when a collision is possible.
-The registry also never removes an entry:
+The registry also keeps every entry it receives:
 a class defined inside a function or a test stays in the table,
 and the strong reference keeps the class alive for the rest of the process.
 
 `__init_subclass__()` names `Shape.registry` rather than `cls.registry` on purpose:
 `cls.registry` resolves through the [MRO](07_Foundations--Classes.md#method-resolution-order),
-so a subclass that defines its own `registry` creates a second table that `make()` never reads,
+so a subclass that defines its own `registry` creates a second table beside the one `make()` reads,
 with no error to signal it.
 
 `make()` stays a module-level function for three reasons.
@@ -729,7 +729,7 @@ you get either a factory or a `KeyError`.
 
 Every factory so far keeps the choice in one place: a `match` in `factory()`,
 a key in `SHAPES`, a lookup in `FACTORIES`.
-*Factory Method* moves the choice into the type of the object you already hold.
+*Factory Method* moves the choice into the type of the object you hold.
 A base class calls a creation method it does not implement,
 and each subclass overrides that method to name a concrete product:
 
@@ -778,7 +778,7 @@ for sketch in (CircleSketch(), SquareSketch()):
 `new_shape()` is the factory method,
 and the only method `CircleSketch` and `SquareSketch` override.
 Adding a `Triangle` means one new `Shape` subclass and one new `Sketch` subclass,
-with no edit to code that already works.
+with no edit to existing code.
 Overriding a creation method in a subclass is the form *GoF Design Patterns* describes,
 and the reason the pattern is named for a method rather than for a class.
 
@@ -1048,7 +1048,7 @@ so changing that list through one object changes it for the other,
 with no error to signal the sharing.
 
 `deepcopy()` restores the clone's state without running the constructor,
-so a `__post_init__()` check never sees the clone
+so a clone skips the `__post_init__()` check
 ([Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#copy-skips-the-constructor) shows which copying calls run it).
 A prototype of a validated type is safe because the prototype is valid,
 not because the clone is checked.
@@ -1112,7 +1112,7 @@ Here the table holds instances and `spawn()` copies one.
 Use the prototype form when the interesting part of an object is its configured state rather than its type.
 
 A prototype registry has two required properties.
-Each spawn must be independent, and the stored prototype must never change:
+Each spawn must be independent, and the stored prototype must stay unchanged:
 
 ```python
 # test_prototype.py
@@ -1203,13 +1203,13 @@ The builder is quietly single-use.
 `build()` reads `self._toppings` without clearing it,
 so a second `build()` on the same builder returns a pizza carrying the first pizza's toppings,
 and every `.topping()` call in between adds to that same list.
-The chained call in `__main__` never shows the problem,
+The chained call in `__main__` hides the problem,
 because it keeps no reference to the builder after `build()` returns.
 Making the builder reusable means resetting the fields in `build()`,
 and that reset removes the other reasonable use:
 configuring a builder once and building from it twice.
 
-Even without the single-use hazard,
+Apart from the single-use hazard,
 the builder class solves a problem Python does not have.
 Keyword arguments with defaults are Python's built-in builder:
 

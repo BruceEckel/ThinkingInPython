@@ -21,7 +21,7 @@ from a single `reduce()` call to an alternate dispatch mechanism.
 Each one replaces code you would otherwise write and debug yourself.
 Caching logic, an eviction policy, a dispatch table:
 each has an edge case that's easy to miss on the first attempt.
-These tools are already written and already correct.
+The library's versions handle those edge cases correctly.
 CPython implements in C the ones where speed matters most: `reduce()`,
 `partial()`, and the two caches.
 What follows starts with the simplest tools and works up to `singledispatch` and `singledispatchmethod`,
@@ -122,9 +122,10 @@ print(square.cache_info())
 ```
 
 The single hit is the second `square(2)`, which is still in the cache.
-The second `square(1)` is a fourth miss even though `1` was the first value computed,
+The second `square(1)` is a fourth miss,
+although `1` was the first value computed,
 and that miss proves the cache evicted `1`.
-`currsize` never passes `maxsize`:
+`currsize` stays at or below `maxsize`:
 the cache discards the least recently used entry before it stores a new one.
 
 ### `partial`
@@ -378,7 +379,7 @@ print(d.describe("hi"), "|", d.describe(5))
 ```
 
 `singledispatchmethod` dispatches on the first argument after `self`,
-never on `self`, so the type of `value` selects the implementation,
+not on `self`, so the type of `value` selects the implementation,
 just as it does for the plain `describe()` in `functools_singledispatch.py`.
 
 `itertools` does for iteration what `functools` does for functions:
@@ -391,7 +392,7 @@ in place of loops you write and test again.
 Each one produces values on demand instead of building a list up front,
 the property [Lazy Evaluation](#lazy-evaluation) revisits below.
 Each is also a loop you would otherwise write by hand.
-The `itertools` version is already written in C and already correct on the edge cases a hand-written version can miss:
+The `itertools` version is written in C and correct on the edge cases a hand-written version can miss:
 the empty iterable, the single element,
 and the point where two sequences run out at different lengths.
 Combine them the way you combine any small function,
@@ -436,7 +437,7 @@ print(list(islice(range(10), 2, 8, 2)))
 
 Two differences from a list slice.
 `islice()` rejects negative indices with a `ValueError`,
-since a negative index counts from an end the iterable may never reach.
+since a negative index counts back from the end, and an iterable may have none.
 And it consumes every element it passes.
 An iterator you pass to `islice()` resumes where the slice stopped;
 a list slice leaves the list as it was.
@@ -565,7 +566,7 @@ print(list(takewhile(lambda n: n < 3, [1, 2, 3, 4, 1])))
 The input carries a trailing `1` to separate `takewhile()` from `filter()`.
 `filter(lambda n: n < 3, ...)` returns `[1, 2, 1]`,
 because `filter()` skips a failing element and tests the next.
-`takewhile()` stops at the first failure and never reaches the last element.
+`takewhile()` stops at the first failure, before it reaches the last element.
 On finite data the distinction is a detail.
 On an infinite source it decides whether the program terminates.
 [Reusable Algorithms](23_Patterns--Iterators.md#reusable-algorithms)
@@ -697,7 +698,7 @@ print(list(a), list(b))
 
 Two cautions.
 After `tee()`, use only the returned iterators.
-Advancing the original source consumes values the copies never receive.
+Advancing the original source consumes values that the copies then miss.
 And `tee()` buffers every value one copy has consumed and the other still awaits.
 This demo drains `a` completely before touching `b`,
 so `tee()` stores the whole sequence.
@@ -725,8 +726,8 @@ print(list(product("AB", [1, 2])))
 Unlike the tools above,
 `product()` reads its inputs completely before yielding its first tuple,
 so every input must be finite.
-`product(count(1), "AB")` never returns,
-because the call itself reads `count(1)` to an end that never comes.
+`product(count(1), "AB")` runs forever,
+because the call tries to read all of `count(1)`, an input with no end.
 
 ### `permutations` and `combinations` {#permutations-and-combinations}
 
@@ -814,7 +815,7 @@ print(first_five)
 #: [1, 4, 9, 16, 25]
 ```
 
-`squares()` never finishes on its own,
+`squares()` yields squares without end,
 yet the program terminates because `islice()` requests five values.
 Each `computing square N` line appears the moment `islice()` pulls that value,
 one at a time, the same way any `for` loop consumes a generator.
@@ -823,7 +824,8 @@ because `islice()` asks for exactly five.
 
 `list(squares())[:5]` looks equivalent and is a different program.
 It builds the whole list before slicing, so it asks `squares()` for every value.
-`squares()` never runs out, so the program never reaches the slice.
+`squares()` has no last value,
+so `list()` keeps asking for more and the program stalls before the slice.
 Slicing lazily lets the source be infinite.
 Slicing a list requires a source that ends.
 [Lazy Evaluation with Generators](18_Techniques--Performance.md#lazy-evaluation-with-generators)
@@ -1103,7 +1105,7 @@ since `random.Random(seed)` draws every number from its own seeded state.
 ## Choosing From the Toolkits
 
 The rule for both modules is the same: before writing a loop,
-ask whether the loop already has a name.
+ask whether the loop has a name in one of these modules.
 A running total is `accumulate()`, a width-two sliding window is `pairwise()`,
 a remainder-safe chunking is `batched()`,
 and a memoized pure function is `@cache`.

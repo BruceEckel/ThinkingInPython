@@ -47,14 +47,14 @@ so no two rats claim the same cell.
 When a rat claims more than one neighbor,
 it keeps the first for itself and spawns a new rat at each of the others.
 After every move it yields so its siblings can run.
-When every neighbor is a wall or already claimed,
+When every neighbor is a wall or a claimed cell,
 the rat has reached a dead end and its task ends.
 When the last rat's task ends,
 the pack has claimed every cell reachable from the entry.
 
 ### The Rat and the Blackboard
 
-The rat never imports the blackboard.
+The rat does not import the blackboard.
 It needs only an object with matching methods,
 so a `Protocol` describes what it expects.
 That `Protocol` is [structural typing](08_Foundations--Static_Types.md#structural-typing-with-protocols).
@@ -172,7 +172,7 @@ and `self.rows[y][x]` compares equal to `Cell.OPEN` on an open cell.
 The blackboard holds everything the rats share.
 `claim()` holds the rule on which the whole program depends.
 It tests and marks a cell in one step with no `await` in between,
-so a single rat gets each cell even when several reach it.
+so each cell goes to one rat, however many reach it.
 The missing `await`, not a lock, makes `claim()` atomic:
 the [read-modify-write race](19_Techniques--Concurrency.md#a-single-thread-still-races)
 needs a suspension point inside the update,
@@ -346,7 +346,7 @@ The full log runs to eighteen messages, two per rat.
 
 `amaze.txt` is a *perfect maze*, one with no loop:
 exactly one path connects any two of its open cells.
-So every `claim()` the run above rejects on an open cell is a rat testing a cell already claimed:
+So every `claim()` the run above rejects on an open cell is a rat testing a claimed cell:
 its own previous cell,
 or the parent's cell when a newly spawned rat tests its neighbors.
 Only a maze with a loop lets two rats try to claim the same new cell,
@@ -410,11 +410,11 @@ Seven of the nine rejections are backtracking:
 each rat tests the cell from which it came, once per cell other than the entry,
 and `len(blackboard.visited) - 1` counts those cells.
 The other two belong to the loop's closing edge, tested from both ends:
-rat 1 dead-ends at `(2, 3)` because rat 2 already claimed `(3, 3)`,
-and rat 2 dead-ends at `(3, 3)` because rat 1 already claimed `(2, 3)`.
+rat 1 dead-ends at `(2, 3)` because rat 2 claimed `(3, 3)` first,
+and rat 2 dead-ends at `(3, 3)` because rat 1 claimed `(2, 3)` first.
 Each rat loses a cell to the other, not to itself.
 That is the race `claim()`'s atomicity exists to resolve,
-and a perfect maze like `amaze.txt` never produces it.
+and a perfect maze like `amaze.txt` cannot produce it.
 
 ### Testing Full Coverage
 
@@ -891,7 +891,7 @@ Stage 1 does test types,
 with `isinstance(occupant, Robot)` and `isinstance(occupant, Teleport)`.
 Those tests are not the type switch that polymorphism removes.
 `GameBuilder` still must tell the kinds of item apart, once,
-and the movement code that runs afterward never tests a type again.
+and the movement code that runs afterward tests no types.
 
 The `Robot` branch builds `Room(Empty())` rather than `Room(occupant)`.
 The robot is the one item that moves,
@@ -966,7 +966,7 @@ because two rooms holding the same kind of item are still two different places.
 rather than when it leaves, so each room enters the queue once.
 
 Searching leaves the maze as it was.
-`solve()` reads doors and occupants and never calls `enter()`,
+`solve()` reads doors and occupants without calling `enter()`,
 so every `.` stays in place and the robot stays where it started.
 `solve()` cannot ask `interact()` where a door leads, because `interact()` acts:
 `Food` replaces itself, and `EndGame` sets `finished`.
@@ -1193,7 +1193,7 @@ A `Grain` is a position.
 All the simulation's logic sits in `step()`.
 Every grain takes one random step,
 and the plate's vibration at that grain's location scales the step.
-Grains never read each other's positions and store only their own.
+Grains do not read each other's positions and store only their own.
 
 ```python
 # chladni_plate/chladni.py
@@ -1324,7 +1324,7 @@ Agitation collapses toward zero, and the picture shows why.
 The grains have gathered on the nodal lines of mode `(2, 3)`.
 Nothing steered them there.
 In a loud region the kicks stay large,
-so a grain keeps moving until a random step lands near a quiet line,
+so a grain keeps moving until a random step puts it near a quiet line,
 where the kicks shrink toward zero.
 Noise can carry a grain into a quiet place.
 It cannot carry the grain back out.
@@ -1433,9 +1433,9 @@ The chapter begins by defining a simulation as objects that act on their own and
 The grains are the limiting case of that definition.
 The shared state is the plate,
 and a grain's whole interaction with it is one read of the field at its own position.
-Even so, structure that no agent encodes appears in the aggregate.
+Yet structure that no agent encodes appears in the aggregate.
 This is *emergence*:
-global order arising from local rules that never mention it.
+global order arising from local rules that say nothing about it.
 The less each agent's rule uses, the more the run can tell you,
 because the outcome comes from the interactions rather than from the instructions.
 
@@ -1464,7 +1464,7 @@ usually the shape of the code, and a full answer for each exercise.
     run one rat with `asyncio.run(rat.run())`,
     and assert which cell the rat kept for itself and which cells it spawned.
     You need no real `Blackboard`, `Maze`, or task scheduling.
-2.  Report the cells the rats never reach.
+2.  Report the cells no rat reaches.
     After `explore()` finishes,
     compare `blackboard.visited` against every open cell of the `Maze` and print the open cells that no rat claimed.
     Build a maze for which that set is not empty,
@@ -1523,5 +1523,5 @@ usually the shape of the code, and a full answer for each exercise.
     printing agitation at the same checkpoints.
     One setting produces order too slowly.
     The other drives agitation down as convincingly as the default kick,
-    yet the figure never appears.
+    yet no figure appears.
     Explain both failures, and why an intermediate kick avoids them.

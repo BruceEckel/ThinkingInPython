@@ -9,7 +9,7 @@
 <summary>Where to look</summary>
 
 [Test-Driven Development (TDD)](../../Chapters/11_Techniques--Testing.md#test-driven-development-tdd) has you write the failing test before the code that satisfies it.
-Write both tests first, then build `transfer()` from the `withdraw()` and `deposit()` methods that already exist.
+Write both tests first, then build `transfer()` from the existing `withdraw()` and `deposit()` methods.
 The order of those two calls decides whether a failed transfer leaves the other account untouched.
 The overdraft test checks it with `pytest.raises()`, as in [Testing for Exceptions](../../Chapters/11_Techniques--Testing.md#testing-for-exceptions).
 
@@ -17,7 +17,7 @@ The overdraft test checks it with `pytest.raises()`, as in [Testing for Exceptio
 <summary>Solution</summary>
 
 If you deposit first and withdraw second,
-`other` keeps the deposit even when the transfer as a whole should fail.
+`other` keeps the deposit when the transfer as a whole should fail.
 The overdraft test then fails with `assert 1000.0 == 0` on `other.balance`.
 The solution withdraws first, so `withdraw()` checks the balance before either account changes.
 
@@ -76,7 +76,7 @@ def test_transfer_overdraft_leaves_both_unchanged(
 **Fail before changing either account.**
 `transfer()` calls `self.withdraw(amount)` before `other.deposit(amount)`.
 `withdraw()` checks the balance and raises `InsufficientFunds` before
-touching `self.balance`, so an overdrafting transfer never reaches the
+touching `self.balance`, so an overdrafting transfer stops before the
 `deposit()` call. Both accounts keep the balances they had.
 
 **Pin the order with a test.**
@@ -152,7 +152,7 @@ tolerance.
 ## 3. A fixture asserting an invariant after the test
 
 > Write a fixture that `yield`s an `Account` and asserts, after the `yield`,
-> that the balance is never negative.
+> that the balance is not negative.
 > Use it in two tests.
 
 <details>
@@ -293,7 +293,7 @@ def test_settings_path_in_takes_the_directory(
 The first test has to know two things about the implementation: that the
 function reads an environment variable, and that the variable's name is
 `APP_CONFIG`. Renaming the variable to `APP_SETTINGS_DIR` breaks the
-test even though the function still behaves the same. The failure is a
+test although the function still behaves the same. The failure is a
 `KeyError` from inside the function rather than a message about the
 name.
 
@@ -301,7 +301,7 @@ name.
 The second test knows only what the function does: given a
 directory, it returns the settings file inside it. That test survives
 the rename, and it survives dropping the environment variable.
-`tmp_path` is still worth taking in the second test, even though
+`tmp_path` is still worth taking in the second test, although
 nothing touches the disk, because it supplies a real, valid path
 where a hard-coded one differs across operating systems.
 
@@ -324,7 +324,7 @@ one place a patching test is worth writing.
 <details>
 <summary>Where to look</summary>
 
-[Network Calls](../../Chapters/11_Techniques--Testing.md#network-calls) replaces `urlopen()` with `monkeypatch.setattr()` so the test never touches the network.
+[Network Calls](../../Chapters/11_Techniques--Testing.md#network-calls) replaces `urlopen()` with `monkeypatch.setattr()` so the test stays off the network.
 For the second function, accept a `Callable` that opens the URL, and pass a plain function returning an `io.BytesIO`.
 Both tests can share that one stub.
 The rename shows how each test refers to the thing it replaces.

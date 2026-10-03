@@ -54,7 +54,7 @@ I keep going until I've tweaked everything that occurs to me.
 For things I have generated rather than written from scratch,
 I've become the director of the movie instead of an actor in it.
 This book is what I've always wanted to create,
-but have never had the capacity to flesh out in all its myriad detail.
+but have always lacked the capacity to flesh out in all its myriad detail.
 With Claude and my directing and rewriting, I can build my ideal book.
 
 Using Claude greatly simplified and sped the writing process.
@@ -88,7 +88,7 @@ The knowledge in this book has helped me guide AIs toward better solutions.
 
 ## Who This Book Is For
 
-I am writing for the programmer who already knows how to program,
+I am writing for the programmer who knows how to program,
 either in another language or in Python.
 The goal is to move from writing Python that works to writing Python that is clear,
 idiomatic, and a pleasure to maintain.
@@ -123,7 +123,7 @@ Part I, *Foundations*, is a fast tour of the language: its syntax, containers,
 control flow, functions, modules, classes, static typing, class attributes,
 and object cleanup.
 This part is for programmers coming to Python from another language.
-If you already know Python, you can skim for topics you don't know,
+If you know Python, you can skim for topics you don't know,
 or skip it altogether.
 If you skip Part I, come back for [Static Types](08_Foundations--Static_Types.md):
 every chapter after it annotates its examples,
@@ -242,7 +242,7 @@ Most chapters end with a short "Exercises" section.
 These come from workshops, where pairs work through them at a keyboard.
 They are short enough to do on your own, and they are worth doing that way.
 They usually ask you to change a small,
-already-working example from that chapter and observe the result: add a class,
+working example from that chapter and observe the result: add a class,
 break an invariant on purpose, extend a table, rewrite one function two ways.
 The point is to touch the code, predict what it does, then run it and check.
 A few chapters in the Patterns part keep larger exercises,

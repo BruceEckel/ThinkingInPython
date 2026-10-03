@@ -125,10 +125,9 @@ print(person.hello())
 ```
 
 `Prozac` needs nothing beyond `Happy` and `Grumpy`'s own shape: one
-`hello()` method. `UnpredictablePerson` never mentions any specific
-mood by name, so a third mood changes only which `Mood` object
-`change_to()` installs. `UnpredictablePerson` is the *State*
-surrogate from [*Surrogate*](../../Chapters/26_Patterns--Surrogate.md#state),
+`hello()` method. `UnpredictablePerson` names no specific mood, so a
+third mood changes only which `Mood` object `change_to()` installs.
+`UnpredictablePerson` is the *State* surrogate from [*Surrogate*](../../Chapters/26_Patterns--Surrogate.md#state),
 applied to a new domain.
 
 </details>
@@ -145,7 +144,7 @@ applied to a new domain.
 
 [Each State Decides](../../Chapters/31_Patterns--State_Machines.md#each-state-decides) gives states a `run()` and a `next()` that takes an input and returns the successor state.
 Make each mood a state, make the inputs small classes, and test them with `isinstance()` inside each `next()`.
-A state that never changes returns itself.
+A state that stays the same returns itself.
 
 <details>
 <summary>The shape</summary>
@@ -401,7 +400,7 @@ print(" ".join(history))
 `state_machine.py`'s `run_all()` does when it calls `next()`.
 
 **Look up the next state.** `next_state()` looks the word up in its class's table with
-`.get(word, ...["*"])`, so `Controller` never branches on the current
+`.get(word, ...["*"])`, so `Controller` has no branch on the current
 state or word.
 
 **Give each state its own table.** The machine is the classic turnstile: `push` while locked does nothing (the
@@ -1225,9 +1224,9 @@ print(m2.amount)
 and its message names the event class that found no row: `Nickel`.
 `handle()` looks up `(self.state, type(event))`, and
 `type(Nickel("nickel", 5))` is `Nickel`. A dictionary probe compares
-keys by equality, so the `Nickel` key misses the `Money` row even
-though `Nickel` subclasses `Money`. Nothing walks the MRO. That lookup
-is the exact-type dispatch the chapter describes, and a subclass of an
+keys by equality, so the `Nickel` key misses the `Money` row although
+`Nickel` subclasses `Money`. Nothing walks the MRO. That lookup is
+the exact-type dispatch the chapter describes, and a subclass of an
 event type is how most readers first meet it.
 
 **Fix 1** adds `(state, Nickel)` rows. Those rows work, and they scale
@@ -1245,7 +1244,7 @@ and the classes stay as they are.
 
 Keep fix 2. A subclass is worth creating when the machine must treat
 the input differently. A nickel differs from a quarter only in a
-number the existing action already reads. The two fixes illustrate a
+number the existing action reads. The two fixes illustrate a
 general rule: under exact-type dispatch, a class is a dispatch key,
 so create one when you want a separate row and not when you want a
 separate value.

@@ -354,7 +354,7 @@ message, and stores `30` on the instance.
 
 **Reuse the cached value.** `average`'s body then
 reads `self.total` and gets that stored value directly. No second
-`"summing"` message appears, because `total` is already computed and
+`"summing"` message appears, because `total` is computed and
 cached before `average` asks for it. If you access `average`
 first, its body reads `self.total`, which computes `total` the same
 way, on first use instead of in advance.
@@ -430,7 +430,7 @@ back to `__repr__()`.
 **Add a readable form for users.** Adding `__str__()` makes the two outputs differ.
 `print(t)` and `f"{t}"` take the readable form, while the list keeps
 showing `Temperature(21.0)` for each element, because a container
-formats its elements with `repr()` and never with `str()`. `{t!r}`
+formats its elements with `repr()`, not `str()`. `{t!r}`
 asks for the same `Temperature(21.0)` form inside an f-string.
 
 The two forms answer different questions. `Temperature(21.0)` says

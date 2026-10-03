@@ -8,9 +8,10 @@ Sometimes the problem you're solving is as simple as "I don't have the interface
 Two of the patterns in *GoF Design Patterns* solve this problem.
 *Adapter* takes one type and produces an interface to some other type.
 *Façade* creates an interface to a set of classes.
-The caller sees one entry point and never learns how the façade builds those classes and wires them together,
+The caller sees one entry point,
+not how the façade builds those classes and wires them together,
 so the wiring can change without affecting the caller.
-*Adapter* and *Façade* both wrap something that already exists,
+*Adapter* and *Façade* both wrap existing code,
 which puts them adjacent to *Proxy* and *Decorator*.
 Adding an interface leaves the existing one in place, so nothing breaks.
 When the new interface replaces one you own,
@@ -383,7 +384,7 @@ Each constructor takes the object its method calls:
 so a caller has to build the three from the inside out.
 These three classes are the "confusing collection of classes and interactions,"
 small enough to read in one glance here.
-In real code, constructing three or thirty classes in the right order is knowledge a caller should never need.
+In real code, constructing three or thirty classes in the right order is knowledge no caller should need.
 `Facade.start_car()` is the static factory method:
 one call runs the constructors in the right order, starts the car,
 and returns the assembled `Ignition`.
@@ -400,7 +401,7 @@ so the caller keeps calling `f()`.
 so the caller stops naming `Engine` and `FuelPump`.
 
 The cleaner Python façade is a module.
-A module already presents a curated set of names over any confusing collection of classes behind it.
+A module presents a curated set of names over any confusing collection of classes behind it.
 As [*Singleton*](24_Patterns--Singleton.md#a-module-is-already-a-singleton)
 notes, a module loads once, and every importer shares the same module.
 At module level, put the convenient functions and the few classes to expose.
@@ -464,7 +465,7 @@ That `__init__.py` is the idiomatic place for a façade that fronts a whole subs
 GoF's usual case for the pattern.
 
 *Façade* has a failure mode.
-An advanced caller who needs a name the façade never exposed has two bad options:
+An advanced caller who needs a name the façade does not expose has two bad options:
 use the underscored name despite the convention,
 or wait for the façade's author to expose the name.
 If you expose enough names, the façade stops simplifying anything;
@@ -563,12 +564,12 @@ Applied to a single `@overload`,
 the mark deprecates one call signature while the rest stay current.
 A function that now takes a `Path` in place of a string can then warn only the callers still passing a string.
 That form is static only.
-Python discards the overload declarations at runtime and never issues the `DeprecationWarning`.
+Python discards the overload declarations at runtime and issues no `DeprecationWarning`.
 `ty`, Pyright, and mypy all report a deprecated overload.
 Pyright and mypy need their deprecation rule switched on,
 as they do for the whole-function form.
 
-An *Adapter* and a *Façade* both add an interface and leave what is already there in place,
+An *Adapter* and a *Façade* both add an interface and leave the existing one in place,
 which is why they are safe moves.
 Replacing an interface you own is the unsafe move,
 because every caller depends on the old one.

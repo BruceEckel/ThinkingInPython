@@ -155,14 +155,15 @@ def test_erase_leaves_history_states_untouched() -> None:
 **Remove the last stroke.** `erase()` mutates `self.strokes` in place, as `draw()`
 does, so it needs no special handling.
 
-**Copy the state when saving.** `save()` copies the strokes
-into an immutable `Memento` the moment it runs, so nothing later,
-erase included, changes a memento already taken.
+**Copy the state when saving.** `save()` copies the strokes into an
+immutable `Memento` the moment it runs, so nothing later, erase
+included, changes a memento after `save()` returns it.
 
-**Prove the history keeps its states.** The history test shows the same safety one level up, using a
-`History` trimmed to what the test needs. The states that `History`
-stores are mementos, and mementos never change, so erasing after a
-`do()` leaves both the present state and the past one intact.
+**Prove the history keeps its states.** The history test shows the
+same safety one level up, using a `History` trimmed to what the test
+needs. The states that `History` stores are mementos, and mementos are
+immutable, so erasing after a `do()` leaves both the present state and
+the past one intact.
 
 ```python
 # exercise_1_frozen.py
@@ -322,13 +323,13 @@ print(h.can_undo())
 #: False
 ```
 
-**Report what the past still holds.** `can_undo()` needs no change: it already asks whether `_past` still
-holds a state. A bounded history empties `_past` sooner: after at
-most `max_depth` undos, rather than one undo per `do()` the program
-made. So `can_undo()` reports `False` while earlier states exist that
-the bound discarded. Once the bound discards state `0`, nothing can
-bring it back, and `can_undo()` reporting `False` there is the
-correct answer, not a bug.
+**Report what the past still holds.** `can_undo()` needs no change: it
+asks whether `_past` still holds a state. A bounded history empties
+`_past` sooner: after at most `max_depth` undos, rather than one undo
+per `do()` the program made. So `can_undo()` reports `False` while
+earlier states exist that the bound discarded. Once the bound discards
+state `0`, nothing can bring it back, and `can_undo()` reporting
+`False` there is the correct answer, not a bug.
 
 </details>
 </details>
@@ -373,7 +374,7 @@ If you pass `data["strokes"]` to `Drawing` without wrapping it in `tuple(...)`,
 `ty check` still passes, because `json.loads()` returns `Any`,
 and an `Any` satisfies the declared `tuple[str, ...]`.
 The mismatch surfaces only when the program runs:
-`reconstructed == drawing` becomes `False`, since a `list` never
+`reconstructed == drawing` becomes `False`, since no `list`
 equals a `tuple`, and the `list` costs the `Drawing` the hashability a
 record otherwise supplies (`hash()` raises a `TypeError`,
 `unhashable type: 'list'`).
@@ -462,26 +463,24 @@ FAILED test_sketch.py::test_memento_ignores_later_drawing
 FAILED test_sketch.py::test_drawing_after_restore_spares_memento
 ```
 
-**Share the list on save.** Because
-`Memento.strokes` is now the same list to which `Sketch.strokes`
-points, `sketch.draw("b")` after `checkpoint = sketch.save()` mutates
-`checkpoint.strokes` too. By the time `test_restore_rewinds_state`
-calls `sketch.restore(checkpoint)`, `checkpoint` has already silently
-absorbed the `"b"` stroke that the copy in `save()` exists to keep
-out. `sketch.strokes == ["a"]` then fails immediately, before the
-test reaches the scenario
-`test_drawing_after_restore_spares_memento` catches. Making
-`Memento` a record prevents
-reassigning `strokes` after construction, but the list inside stays
-mutable, and every later `draw()` changes it. So `save()`
-must copy into a `tuple`, an immutable container, instead of wrapping
-a mutable list in a record.
+**Share the list on save.** Because `Memento.strokes` is now the same
+list to which `Sketch.strokes` points, `sketch.draw("b")` after
+`checkpoint = sketch.save()` mutates `checkpoint.strokes` too. By the
+time `test_restore_rewinds_state` calls `sketch.restore(checkpoint)`,
+`checkpoint` has silently absorbed the `"b"` stroke that the copy in
+`save()` exists to keep out. `sketch.strokes == ["a"]` then fails
+immediately, before the test reaches the scenario
+`test_drawing_after_restore_spares_memento` catches. Making `Memento`
+a record prevents reassigning `strokes` after construction, but the
+list inside stays mutable, and every later `draw()` changes it. So
+`save()` must copy into a `tuple`, an immutable container, instead of
+wrapping a mutable list in a record.
 
 Two of those failures prove less than they seem. The second and third
-tests compare `checkpoint.strokes` with a tuple, and a `list` never
-equals a `tuple`, so a `Memento` holding a copied list fails them
-too, with no sharing at all. The test that exposes the corruption
-compares contents only, so the type change alone cannot fail it:
+tests compare `checkpoint.strokes` with a tuple, and no `list` equals
+a `tuple`, so a `Memento` holding a copied list fails them too, though
+it shares nothing. The test that exposes the corruption compares
+contents only, so the type change alone cannot fail it:
 
 ```python
 def test_memento_is_a_snapshot() -> None:
@@ -508,7 +507,7 @@ when the assertion runs, because `draw("b")` appended to the one list
 <details>
 <summary>Where to look</summary>
 
-In [The Caretaker: a Generic History](../../Chapters/36_Patterns--Memento.md#the-caretaker-a-generic-history), `undo()` already moves the present into the future list, which makes redo work.
+In [The Caretaker: a Generic History](../../Chapters/36_Patterns--Memento.md#the-caretaker-a-generic-history), `undo()` moves the present into the future list, which makes redo work.
 Build `goto()` on top of `undo()` in a loop.
 Check the distance against the length of the past before the first step, so a bad request changes nothing.
 Raise an `IndexError` for a distance out of range.
@@ -857,11 +856,11 @@ disappears: a `default_factory` leaves no class attribute, so the
 loaded object raises an `AttributeError` the first time anything
 reads `layer`.
 
-**Skip the constructor on load.** What pickle skips is every line of code the class runs at
-construction. `pickle.loads()` builds a bare instance and writes the
-saved `__dict__` into it, so `__init__()` never runs and neither does
-`__post_init__()`. The empty title loads into a class written to
-reject it.
+**Skip the constructor on load.** What pickle skips is every line of
+code the class runs at construction. `pickle.loads()` builds a bare
+instance and writes the saved `__dict__` into it, so neither
+`__init__()` nor `__post_init__()` runs. The empty title loads into a
+class written to reject it.
 
 **Run the validation on replace.** `copy.replace()`, which the chapter's partial restore uses, behaves
 differently. It goes through `__replace__()`, which constructs a real instance

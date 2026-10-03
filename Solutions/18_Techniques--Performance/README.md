@@ -63,7 +63,7 @@ print(f"set faster on average-case targets too: "
 The conclusion does not change. `target = n - 1` in the original
 measures the single worst case for a `list` scan: the element the
 scan reaches only after walking past every other one. Random targets
-land in every position instead, including targets near the front that a
+cover every position instead, including targets near the front that a
 `list` finds quickly. The `set`'s O(1) hash lookup still beats the
 `list`'s O(n) scan by a wide margin (thousands of times faster in
 this run), because the scan for an average target still walks about
@@ -106,8 +106,8 @@ for size in (1, 2, 5, 10, 20, 50, 100, 200, 500):
     print(size, winner)
 ```
 
-On this machine, the `set` already wins starting at size `2`. Only at
-size `1` does the `list` edge ahead, and even then barely. The
+On this machine, the `set` wins starting at size `2`. Only at
+size `1` does the `list` edge ahead, and then barely. The
 `set`'s advantage grows steadily as `size` increases, as the
 different growth rates (`O(1)` vs. `O(n)`) predict. The crossover
 point is not a fixed number. It depends on the machine, the Python
@@ -494,18 +494,18 @@ With `set_events()` in place of the local attachment, the new entry
 is `'square': 1`. Nothing else appears, because `PY_START` fires when
 a Python code object starts running, and the module's own frame
 starts before the tool attaches. CPython implements `print()` in C,
-so it never starts a Python frame, and a program this small has no
+so it starts no Python frame, and a program this small has no
 other candidates.
 
 The two local attachments above produce the identical `Counter`, and
 that agreement is an artifact of the example's size. In a real
 program `set_events()` reports every Python function the process
-runs, including library code you did not write and never wanted
+runs, including library code you did not write and did not want
 counted, and it pays the callback cost on every one of those functions. Local
 attachment names the code objects you care about and leaves the rest
 running at full speed. Global monitoring answers "what ran."
 Local monitoring answers "how often did *this* run," which is the
-question you already had when you opened `sys.monitoring` instead of
+question you had when you opened `sys.monitoring` instead of
 a profiler.
 
 </details>
@@ -563,10 +563,10 @@ script's own Python frames, where the arithmetic runs.
 
 The two columns pick different functions because they measure different things.
 `cumtime` is the time from entering a function to leaving it,
-including everything it called, so a caller can never show a smaller
-`cumtime` than the work beneath it. Every caller on the path
-accumulates the same time. `tottime` excludes the callees, so it
-attributes time to the frame that is executing.
+including everything it called, so a caller's `cumtime` always covers
+the work beneath it. Every caller on the path accumulates the same
+time. `tottime` excludes the callees, so it attributes time to the
+frame that is executing.
 
 A function high on `cumtime` and near zero on `tottime` is a
 pass-through: it is slow only because of what it calls, and rewriting
@@ -636,7 +636,7 @@ as the `list`. The memory saving is real (the chapter measures
 
 A `list` of floats stores pointers to `float` objects that already
 exist, so reading an element hands back a reference. An `array` stores raw
-eight-byte doubles with no objects at all, so reading an element
+eight-byte doubles instead of objects, so reading an element
 builds a fresh `float` object to hand to Python. That allocation,
 on every single element, eats the advantage of the tighter layout.
 
@@ -655,7 +655,7 @@ vectorizing wins where `array` alone does not.
 > Time `"".join(parts)` against `+=` in a loop for 10,000 short strings,
 > then repeat at 100 strings.
 > At which size does the difference stop mattering,
-> and which of the two would you write anyway?
+> and which of the two would you write regardless?
 
 <details>
 <summary>Where to look</summary>
@@ -727,7 +727,7 @@ a size where the two versions become equally fast, but a size where both
 are fast enough that the difference is below anything you would
 measure.
 
-Write `join()` anyway. It is one line instead of three, it says what
+Still, write `join()`. It is one line instead of three, it says what
 the result is rather than how it accumulates, and it is the version
 that keeps working when the 100 parts turn into 100,000. CPython
 does special-case `out += p` when `out` has a single reference,

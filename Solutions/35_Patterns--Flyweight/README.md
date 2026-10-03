@@ -130,7 +130,7 @@ print(len(cells), len({id(t) for t in cells}))
 **Name each new kind in both tables.** Door and tree tiles need two new symbols in `SPECS`, and the same two
 in the `Symbol` literal, so the type checker still flags a `SPECS` key
 that `Symbol` does not list. The edit stops there. `tile()` and
-`parse_map()` never change.
+`parse_map()` stay as they are.
 
 **Confirm one tile per kind.** Twenty-four cells collapse to five
 distinct objects, one per kind (`grass`, `water`, `rock`, `door`,
@@ -403,7 +403,7 @@ def test_mutation_without_frozen_leaks_across_cells(
 If you restore `@record`, this test stops at its assignment:
 `field[0][0].walkable = False` raises a `FrozenInstanceError`,
 because a record rejects assignment to every field. The assignment
-the bug needs never completes, and that refusal makes sharing one
+the bug needs fails, and that refusal makes sharing one
 object safe.
 
 </details>

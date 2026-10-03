@@ -45,7 +45,7 @@ The `@hijack` above `cheese()` means:
 `hijack` returns `doesnt_matter`, which Python assigns to the name `cheese`,
 so `cheese` now refers to `doesnt_matter`.
 Calling `cheese()` runs `doesnt_matter`,
-which never calls `func` and prints its own message instead.
+which ignores `func` and prints its own message instead.
 The original body of `cheese()` never runs.
 
 Since Python binds the returned function to the name `cheese`, the local name
@@ -218,7 +218,7 @@ You may only use them together,
 as the `*args` and `**kwargs` of a function typed with `P`.
 They bind the wrapper's arguments to the parameters captured by `**P`,
 so the type checker accepts `add(2, 3)` but rejects `add("x")` or `add(2, 3, 4)`,
-even though the body of `wrapper()` forwards anything.
+although the body of `wrapper()` forwards anything.
 Without `**P` you fall back to `*args: Any, **kwargs: Any`,
 and the wrapper swallows any arguments,
 discarding the signature the decorator should preserve.
@@ -354,7 +354,7 @@ def test_repeat_rejects_times_below_one(times: int) -> None:
 
 ## Decorators With Optional Parentheses
 
-`trace` never takes arguments; `repeat` always does.
+`trace` takes no arguments; `repeat` always does.
 A decorator can support both conventions at once, `@name` and `@name(...)`,
 letting a caller add arguments only when the defaults don't fit.
 `pytest.fixture` and `click.command` both work this way.
@@ -634,7 +634,7 @@ if __name__ == "__main__":
 ```
 
 Each `@count_calls` creates its own instance,
-so the count on one decorated function never leaks into another:
+so each decorated function keeps its own count:
 
 ```python
 # test_count_calls.py
@@ -900,7 +900,7 @@ A class decorator can also return a replacement class,
 just as a function decorator returns a replacement function.
 
 A registry filled this way is as complete as the imports that ran:
-a class in a module nobody imported never registers.
+a class in a module nobody imported stays out of the registry.
 Keying on `cls.__name__` also means two same-named classes from different modules overwrite each other.
 [Factory](27_Patterns--Factory.md#hazards-of-self-registration) returns to both.
 
@@ -1122,7 +1122,7 @@ Both read as a `float`, so both match.
 
 `Topping.__init__()` sets `self.name = type(self).__name__`,
 reading each subclass's own name at construction time instead of repeating it as a string.
-`Garlic`, `Olives`, and `Feta` never mention their own names.
+`Garlic`, `Olives`, and `Feta` don't mention their own names.
 The class name is the topping name.
 
 Adding a new topping means adding one class with one line, `add_cost`.
@@ -1229,7 +1229,7 @@ usually the shape of the code, and a full answer for each exercise.
     so `@memo` and `@memo(maxsize=10)` both decorate a function.
     Cache each result in a dictionary keyed by the arguments,
     and drop the oldest entry once the cache holds more than `maxsize` of them.
-    Distinguish the two forms by checking whether the first argument arrived at all.
+    Distinguish the two forms by checking whether a first argument arrived.
 6.  Write a `retry(times)` decorator in the function form that calls the wrapped function again when it raises an exception,
     up to `times` attempts, and re-raises the last exception when they all fail.
     Check that `__name__` survives.

@@ -218,12 +218,12 @@ Knowing every one of them is the tracking problem an Effect Management System so
 
 C++ and Java tried to track exceptions with *exception specifications*,
 a list of exceptions written by hand on each function.
-The compiler never computed that list from the functions a body called,
+The compiler did not compute that list from the functions a body called,
 so an exception introduced three levels down meant editing every signature above it by hand.
 Programmers usually avoided that work by widening the specification until it permitted every exception.
 The specifications exposed implementation details,
 and most people now count them a failure.
-C++ reduced its version to a single bit: whether a function throws at all.
+C++ reduced its version to a single bit: whether a function can throw.
 
 ### Make the Bad Value Impossible
 
@@ -259,7 +259,7 @@ with expected(ValueError):
 The check runs once, in `__post_init__()`, when `NonZero(...)` builds the value.
 Every function that receives a `NonZero`, including `slope()`,
 inherits that guarantee.
-`slope()` never divides by zero, so it needs no `try` and no `Result` to say so.
+`slope()` cannot divide by zero, so it needs no `try` and no `Result` to say so.
 
 ### Combine the First and Third
 
@@ -319,8 +319,8 @@ for text in ["2", "0"]:
 
 `parse_run()` is the only place that can fail,
 and `@safe` turns that failure into a `Result` its caller must unpack.
-Past that one `match`, `slope()` never checks anything:
-`NonZero` already guarantees `run.value` isn't 0.
+Past that one `match`, `slope()` checks nothing:
+`NonZero` guarantees `run.value` isn't 0.
 The `Result` handles the input a caller doesn't trust,
 and `NonZero` lets every function downstream trust what it receives.
 
@@ -328,8 +328,8 @@ and `NonZero` lets every function downstream trust what it receives.
 
 A perfectly pure program computes something and writes the result nowhere.
 It reads nothing from its environment and changes nothing in its environment,
-so its result never reaches a screen, a file, a socket,
-or even the exit code the operating system checks.
+so its result reaches no screen, file, or socket,
+not even the exit code the operating system checks.
 From outside the process,
 that program looks exactly like one that computes nothing.
 
@@ -367,7 +367,7 @@ Effect Management keeps the Effects and isolates them,
 so the rest of the program can stay pure.
 People call this "pushing the Effects to the edges."
 
-What does keeping the rest pure buy you?
+What do you gain by keeping the rest pure?
 The first and most obvious answer is parallelism.
 A function with no Effects reads and writes nothing shared,
 so it is safe to run in parallel.
@@ -416,7 +416,7 @@ and that makes code hard to understand:
 - Can you call this function in a test without mocking every service it calls?
 - If you call it twice with the same arguments, do you get the same result?
 - Does it behave differently in a different environment?
-- Does it fail silently, loudly, or not at all?
+- Can it fail, and does it fail silently or loudly?
 
 You cannot answer these questions by reading the function's signature.
 You must read the implementation, then trust that you found everything it needs,
@@ -540,7 +540,7 @@ The bindings come later.
 The demo binds them to test stand-ins, `Scripted` and `Capture`,
 and checks the greeting with no console in sight.
 A production caller passes objects that read with `input()` and write with `print()`,
-and `greet()` never changes.
+and `greet()` stays the same.
 Delayed binding by hand explains why "pass in your dependencies" is such durable advice.
 
 The signature says what `greet()` needs, not everything `greet()` might do:
@@ -593,7 +593,7 @@ print(captured.messages)
 #: ['Hello, Alice!']
 ```
 
-`session()`, `menu()`, and `main()` never call `ask.ask()` or `tell.tell()`,
+`session()`, `menu()`, and `main()` do not call `ask.ask()` or `tell.tell()`,
 yet each must name both parameters only to pass them to the function below it.
 Nothing propagates automatically.
 If a new helper that `greet()` calls needs a `Log` Effect,
@@ -713,7 +713,7 @@ plus handlers that receive the continuation.
 A Python generator suspends a computation,
 hands control to whoever is driving it, and resumes it with a value.
 That makes a suspended generator a continuation you can resume once or discard,
-but never resume twice, because nothing can copy a generator's paused frame.
+but not resume twice, because nothing can copy a generator's paused frame.
 [Generators](45_Effects--Generators.md) covers the full two-way form,
 the mechanism behind the Python Effect library in [Stateless](46_Effects--Stateless.md).
 
@@ -820,7 +820,7 @@ Native systems deliver tracking, interface separation,
 and delayed binding while the code runs eagerly,
 with no description trees and no interpreter.
 A library has only the description route.
-In a language never designed for Effects,
+In a language not designed for Effects,
 it gets delayed binding by deferring execution.
 That deferral adds one question to every value you handle:
 is it a description or an action?
@@ -866,7 +866,7 @@ the second and third properties of a full EMS.
 ## Effect Management for Python?
 
 The Python language has no Effect Management System, but it has a start.
-Python already tracks one Effect in function signatures,
+Python tracks one Effect in function signatures,
 and enforces that tracking on every caller: `async`.
 
 ```python
@@ -923,7 +923,7 @@ One library supplies all three parts.
 [Stateless](46_Effects--Stateless.md)
 encodes each Effect's dependencies and failures into the return type of every function that performs that Effect,
 and a type checker verifies that each caller carries them forward.
-Declaring a dependency you never bind is a type error.
+Leaving a declared dependency unbound is a type error.
 Calling an effectful function from one annotated as pure is a type error.
 That is tracking, interface separation, and delayed binding,
 the three properties of a full EMS, inside Python's existing type system.

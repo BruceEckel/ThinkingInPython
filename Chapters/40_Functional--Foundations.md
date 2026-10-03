@@ -30,7 +30,7 @@ Part V then applies the same discipline to a function's effects.
 [Effect Management](44_Effects--Effect_Management.md)
 tracks a function's effects in its type,
 and [Generators](45_Effects--Generators.md)
-supplies the mechanism Python already has for describing a computation without running it.
+supplies Python's built-in mechanism for describing a computation without running it.
 [Stateless](46_Effects--Stateless.md)
 and [Stateless in Practice](47_Effects--Stateless_in_Practice.md)
 then build a checked Effect system on that mechanism.
@@ -124,8 +124,7 @@ Tuples, strings, `frozenset`, and frozen dataclasses are immutable.
 Each freezes only its own top level:
 the tuple `([1], 2)` always holds that same list,
 and anyone can still append to the list.
-A value that never changes stays what you last read,
-whatever code ran in between,
+An immutable value stays what you last read, whatever code ran in between,
 and that guarantee is why removing shared mutable state is the practical core of the functional style.
 
 Instead of modifying an object, you build a new one from the old:
@@ -160,7 +159,7 @@ For a record with many fields,
 [`copy.replace()`](12_Techniques--Data_Classes_as_Types.md#the-general-form-of-replace)
 builds the new value from the old one and the fields that change,
 as in `copy.replace(p, x=p.x + 10)`.
-When a value never changes after creation,
+When a value is immutable,
 two parts of a program can share one without coordinating,
 and concurrent code needs no lock to read it.
 
@@ -355,7 +354,7 @@ The functions in this section take lambdas as inline arguments,
 where a lambda fits best.
 A lambda's value is locality.
 When a transformation is one short expression,
-a lambda keeps it at the call site, where the reader already is,
+a lambda keeps it at the call site, where the reader is,
 instead of defining it as a named function elsewhere.
 `sorted(words, key=lambda w: (len(w), w))` states the sort order,
 by length and then alphabetically, right where the code sorts.
@@ -471,7 +470,7 @@ The last two lines show the captured values directly:
 A closure is the functional answer to "an object with one method and some stored data."
 
 `multiply()` reads `factor` rather than receiving it, yet it stays pure.
-`factor` never changes after capture,
+`factor` stays fixed after capture,
 so the same argument always produces the same answer.
 `withdraw()` is unpredictable because every call changes the global `balance`;
 nothing changes `factor` after capture.

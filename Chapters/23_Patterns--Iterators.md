@@ -23,7 +23,7 @@ An iterator has `__next__()`,
 which returns the next item or raises `StopIteration`.
 An iterator is also iterable: its `__iter__()` returns itself,
 so an iterator works anywhere code expects an iterable.
-The `for` loop calls these methods, so you almost never call them directly.
+The `for` loop calls these methods, so you rarely call them directly.
 Every container uses this protocol,
 so a function written against an iterable stays decoupled from the container.
 
@@ -401,8 +401,7 @@ so when `first` drains while `second` waits, the buffer holds the whole stream.
 That is the memory a list uses, and the comparison confirms it
 (one machine measured 4,096,992 bytes buffered against 3,999,992 for the list).
 The last block advances `first2` and `second2` together instead,
-one `zip()` step at a time,
-so `tee` never buffers more than the gap between them.
+one `zip()` step at a time, so `tee` buffers at most the gap between them.
 That gap stays near zero, and the measurement confirms it.
 Use `tee` when two consumers advance together,
 not when one finishes before the other starts.
@@ -530,13 +529,13 @@ including the sorted-input trap `groupby()` sets for an unwary caller.
 Choose `takewhile()` deliberately,
 because its lookalike is the `if` clause of a generator expression
 (or `filter()`), and these behave differently with an infinite source.
-The `if` version skips nonmatching values but keeps looking forever,
-so once values stop matching, a `list()` around it never returns.
+The `if` version skips nonmatching values but keeps looking,
+so once values stop matching, a `list()` around it runs forever.
 `takewhile()` stops at the first failure.
 Skipping and stopping look the same on finite data and behave nothing alike on infinite data.
 
 A test can demonstrate that difference, but not by writing `list(count(1))`.
-That call never returns, and the test never finishes.
+That call runs forever, and so does the test.
 In `test_endless.py`, `counter()` stands in for `count(1)`.
 It counts up the same way,
 then raises an exception once something has pulled `LIMIT` values:
@@ -578,13 +577,14 @@ def test_islice_stops_after_its_count() -> None:
 ```
 
 The first test is `list(count(1))` with a stopping point built into the source.
-`list()` asks for value after value and never stops,
+`list()` keeps asking for value after value,
 so the tripwire fires and no list ever comes back.
 The second test is the `if`-clause lookalike.
 Nothing after `2` satisfies `n < 3`,
 yet the generator expression keeps pulling from `counter()` to find another match,
 and trips the same wire.
-The `takewhile()` and `islice()` tests stop on their own and never reach the tripwire.
+The `takewhile()` and `islice()` tests stop on their own,
+before reaching the tripwire.
 
 Failing at 1,000 values stands in for how a real program fails:
 it stops responding, or it dies when it exhausts memory.
@@ -876,7 +876,7 @@ It passes each value through unchanged, though,
 so per-item work such as doubling needs a loop.
 That is why `doubled_ok()` uses `for`,
 and the loop absorbs the exception as every loop in this chapter does.
-The fix is almost never a `try`.
+The fix is rarely a `try`.
 Let the loop do the asking.
 
 ## The Protocol Answers Nothing
@@ -922,7 +922,7 @@ usually the shape of the code, and a full answer for each exercise.
     confirm `traverse()` drives it with no changes to `traverse()`,
     and explain why it needs no `seen` list.
     Then build an `OverStream` over `itertools.count(1)`.
-    `traverse()` never returns on an endless source,
+    `traverse()` runs forever on an endless source,
     so drive the four methods yourself for 50,000 steps and report `len(stream.seen)`.
     What has `first()` cost you on an endless source?
 8.  Write `peek(it)` that reports an iterator's next value without consuming it.

@@ -106,10 +106,11 @@ def test_rat_keeps_one_claim_and_spawns_the_rest() -> None:
         "Rat 1 dead-ends at (0, -1)."]
 ```
 
-**Stand in for the blackboard.** `Rat` imports only the `Recorder` `Protocol`, never `Blackboard`, so
-`FakeBlackboard` satisfies that `Protocol` by shape: it defines
-`claim()`, `spawn()`, `log()`, and `next_number()`, and none of the
-four touches a real `Maze` or `asyncio.create_task()`.
+**Stand in for the blackboard.** `Rat` imports only the `Recorder`
+`Protocol`, not `Blackboard`, so `FakeBlackboard` satisfies that
+`Protocol` by shape: it defines `claim()`, `spawn()`, `log()`, and
+`next_number()`, and none of the four touches a real `Maze` or
+`asyncio.create_task()`.
 
 **Script the rat's choices.** Scripting `claim()`'s return values in a
 fixed sequence decides which neighbor the rat keeps for itself and
@@ -125,7 +126,7 @@ open, `(0, -1)`, and every open one after that, here `(1, 0)` alone.
 
 ## 2. Reporting unreached cells
 
-> Report the cells the rats never reach.
+> Report the cells no rat reaches.
 > After `explore()` finishes,
 > compare `blackboard.visited` against every open cell of the `Maze` and print the open cells that no rat claimed.
 > Build a maze for which that set is not empty,
@@ -712,7 +713,7 @@ The original `claim()` needs no lock because it has no `await`
 between the test and the add. A coroutine yields control only at an
 `await`, so the two statements run as one uninterruptible unit: the
 event loop can hand control to another rat before the test or after
-the add, but never between them. Adding the `await` opens exactly that
+the add, but not between them. Adding the `await` opens exactly that
 gap in the middle, and the whole guarantee depends on the gap's absence.
 
 Exercises 4 and 5 both build on the same `robot_explorer` world,
@@ -1390,7 +1391,7 @@ seven lines, and the interior lines number `m - 1` vertical and
 `n - 1` horizontal, so the mode numbers are readable straight off the
 picture.
 
-The plate's own field never separates into a factor in `x` times a
+The plate's own field does not separate into a factor in `x` times a
 factor in `y`. Each of its two terms mixes `x` and `y`, and
 subtracting one from the other leaves zeros along the curves where the
 two products happen to agree, which is why the original figures are
@@ -1412,7 +1413,7 @@ the model produces.
 > printing agitation at the same checkpoints.
 > One setting produces order too slowly.
 > The other drives agitation down as convincingly as the default kick,
-> yet the figure never appears.
+> yet no figure appears.
 > Explain both failures, and why an intermediate kick avoids them.
 
 <details>
@@ -1450,7 +1451,7 @@ at most one percent of the plate, so a grain starting in the middle
 of a bright region needs hundreds of steps to walk anywhere near a
 nodal line. After 1200 steps agitation has fallen from `0.58` to
 `0.38`, roughly a third of the way, while the default kick was
-already down to `0.00` by step 400. Rendered, this run still looks
+down to `0.00` by step 400. Rendered, this run still looks
 like noise with a faint trace of structure in it. Nothing is wrong
 with the physics. The run is not finished, and finishing it
 means more steps than anyone wants to watch.
@@ -1479,7 +1480,7 @@ in `step()` is a feedback loop, and the loop only works within a range
 of step sizes. A grain in a loud region gets a large kick and moves
 fast. As it nears a nodal line the amplitude shrinks and so does its
 step, so it slows down and stops without overshooting. Too small a kick
-starves the loop's first half, and the grain never travels. Too large a
+starves the loop's first half, and the grain barely travels. Too large a
 kick breaks the second half, since even a heavily scaled step is still
 big enough to leave the neighborhood into which the grain is settling. The
 default `0.05` sits where both halves work: at most a tenth of the

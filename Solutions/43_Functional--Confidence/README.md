@@ -67,11 +67,12 @@ distinct process IDs each time.
 
 Two things follow, and neither is the one most people predict. The
 count is greater than one, so the work left the main process, and
-`assert parallel == serial` alone could never show where the work ran. But the count
-also sits far below thirty-two. `ProcessPoolExecutor` allows one
-worker per core, but it starts workers on demand: a submitted task
-starts a new worker only when no existing worker is idle. Four tasks
-therefore start at most four processes, never thirty-two.
+`assert parallel == serial` alone could not show where the work ran.
+But the count also sits far below thirty-two. `ProcessPoolExecutor`
+allows one worker per core, but it starts workers on demand: a
+submitted task starts a new worker only when no existing worker is
+idle. Four tasks therefore start at most four processes, not
+thirty-two.
 
 The count can also fall below four. With limits twenty times smaller,
 `[10_000, 20_000, 30_000, 40_000]`, the same machine reported `3` on
@@ -128,7 +129,7 @@ if __name__ == "__main__":
 The thread pool reports exactly `1`. Threads share their process, so
 `os.getpid()` returns the same value in every one of them. Counting
 distinct process IDs revealed process parallelism in the previous
-exercise, and it says nothing at all about thread parallelism.
+exercise, and it says nothing about thread parallelism.
 `threading.get_ident()` is the equivalent for threads.
 `ProcessPoolExecutor` and `ThreadPoolExecutor`
 present the identical `map()` interface and differ this fundamentally
@@ -199,7 +200,7 @@ the first element alone. "Ordered" says nothing about the elements
 being the same ones you supplied.
 
 **Check that repeating changes nothing.** Idempotence is weaker still on its own: the same `[]`-returning
-function passes it too. Idempotence buys a different kind of check,
+function passes it too. Idempotence adds a different kind of check,
 one about the operation rather than the output. It catches a sort
 that drops the last element. That sort's output is always ordered, so
 the invariant passes, but running it on its own output drops another
@@ -292,10 +293,10 @@ def test_upper_leaves_the_micro_sign_in_the_greek_block(
 ```
 
 **Trace the round trip.** `µ` is U+00B5 MICRO SIGN, a character Latin-1 kept separate from the
-Greek letter it resembles. `µ` is already lowercase, so `.lower()`
+Greek letter it resembles. `µ` is lowercase, so `.lower()`
 returns it unchanged. But it has no uppercase form of its own, so
 `.upper()` maps it to U+039C GREEK CAPITAL LETTER MU, and lowering
-that gives U+03BC GREEK SMALL LETTER MU. The round trip lands one
+that gives U+03BC GREEK SMALL LETTER MU. The round trip ends one
 block away from where it started.
 
 Unicode case mapping is not a pair of inverse functions. It is a
@@ -307,7 +308,7 @@ length. For case-insensitive comparison Python provides
 `str.casefold()` rather than `str.lower()`, and `casefold()` has
 no inverse either.
 
-A hand-written loop over `"abcde"` never reaches `µ`. The generated
+A hand-written loop over `"abcde"` does not reach `µ`. The generated
 strings reach the parts of the repertoire nobody thinks to type, and
 that reach is the argument for property testing in one example.
 
@@ -406,7 +407,7 @@ because the property test finds the need for them. Against the
 version without them, Hypothesis reports a two-name roster with
 `size=3`, such as `names=['a', 'b']`, and a
 `ValueError: min() iterable argument is empty`. With fewer students
-than the group size, the `while len(pool) >= size` loop never runs
+than the group size, the `while len(pool) >= size` loop runs zero times
 and `groups` stays empty. The leftover loop then asks `min()` for the
 smallest of nothing.
 
@@ -428,7 +429,7 @@ roster.
 **State the precondition in the strategy.** The `unique=True` on the roster strategy does real work.
 `group_rounds()` keys its history by `frozenset` of names, so two
 students sharing a name are one student to the algorithm. The
-property still passes on such a roster, because every name lands in
+property still passes on such a roster, because every name appears in
 one group, but the schedule the property checks counts the two as one
 student when `group_rounds()` avoids repeat meetings.
 Generating distinct names states `group_rounds()`'s precondition where
@@ -471,7 +472,7 @@ noticeably faster. Hypothesis writes each failing case into
 `.hypothesis/examples/` and replays that database before generating
 anything new, so it re-finds the failure you are in the middle of
 fixing instead of leaving it to chance. The shrunk case therefore
-behaves like a regression test you never had to write. It keeps
+behaves like a regression test you did not write. It keeps
 failing until you fix the bug, then rejoins the pool of examples and
 comes up again on every later run.
 
@@ -674,7 +675,7 @@ what separates them. The `match` reads as one
 description of four shapes while the `isinstance()` version reads as
 four separate questions.
 The difference shows in what each version repeats: `result.error`
-appears three times in `describe_isinstance.py` and never in the
+appears three times in `describe_isinstance.py` and nowhere in the
 `match`, because each `case` matches on the error directly instead of
 reading it back off `result`. The final `return` is also weaker than
 the `match`'s `case Err(error)`. It is a fallthrough that happens to

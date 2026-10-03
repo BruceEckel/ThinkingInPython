@@ -76,13 +76,13 @@ print(sys.modules["use_module"] is use_module)
 #: True
 ```
 
-`use_module`'s body runs once even though two `import` statements name it.
+`use_module`'s body runs once, although two `import` statements name it.
 The first `import` stores the finished module object in `sys.modules`,
 a dict keyed by dotted module name.
 Every later `import` of that name, from any file in the program,
 finds it there and binds the same object instead of re-running the file,
 so `use_module` and `second` are one object.
-One consequence: editing a module's file changes nothing in a program that has already imported it.
+One consequence: editing a module's file changes nothing in a program that has imported it.
 Restart the program, or call `importlib.reload(use_module)`,
 which re-runs the body into the existing module object.
 Reloading leaves every name bound by a `from ... import` pointing at the old objects,
@@ -188,7 +188,7 @@ An empty `__init__.py`, the common case,
 only flags the directory as a package.^[The name `__init__.py` often confuses people. In hindsight, it might have been better to name the file `__package__.py`.]
 An `__init__.py` with content usually re-exports the package's public names:
 if `a_package/__init__.py` re-exports `function1`,
-`from a_package import function1` works and callers never learn which submodule defines `function1`.
+`from a_package import function1` works without callers naming the submodule that defines `function1`.
 You can still import a directory without `__init__.py` as a *namespace package*,
 but an explicit `__init__.py` makes the package's identity and boundary clear,
 so this book uses one by default.
@@ -469,7 +469,7 @@ over its internals or as a shared single instance
 To be the target of an `import` statement,
 a module's file name must be a valid Python identifier and not a keyword.
 `import my-mod` is a syntax error.
-(`importlib.import_module("my-mod")` still loads the file, and plugin loaders reach oddly named files that way, but choose an importable name anyway.)
+(`importlib.import_module("my-mod")` still loads the file, and plugin loaders reach oddly named files that way, but give your own modules importable names.)
 
 **Modules** (`.py` files): short, all-lowercase,
 with underscores between words if that improves readability,
@@ -681,7 +681,7 @@ give a hint, usually the shape of the code, and a full answer for each exercise.
     Import and call `function6()` from a script outside `a_package`,
     then rename `b_package` to `bPackage` (and rename it back afterward)
     and explain, from the rules in [File Names](#file-names),
-    why that name is a poor choice even though the import still works.
+    why that name is a poor choice although the import still works.
 3.  Write a small module `noisy2.py` whose top-level body prints a message,
     like `noisy.py`.
     In a new script, `lazy import` both `noisy` and `noisy2`,

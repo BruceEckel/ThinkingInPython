@@ -169,7 +169,7 @@ every time it changes the value.
 `f1()` here gets that order wrong.
 
 *Design by Contract* (DbC)
-is the practice of checking arguments on the way in and results on the way out,
+is the practice of checking arguments on entry and results on exit,
 with a class invariant that must hold between calls.
 `f1()` takes no argument, so only the postcondition appears here.
 A method that accepts a second rating needs a precondition for it as well.
@@ -345,7 +345,7 @@ print(A.__annotations__)
 so every one of them is `object`'s generic version,
 and `show(A())` reports none as redefined.
 
-`x` and `s` in `A` are *bare annotations*: declared, but never assigned a value.
+`x` and `s` in `A` are *bare annotations*: declared, but not assigned a value.
 As [Class Attributes](09_Foundations--Class_Attributes.md#a-bare-annotation-declares-it-does-not-create)
 puts it, a bare annotation is a declaration rather than a placeholder.
 It records, in `A.__annotations__`,
@@ -694,7 +694,7 @@ Refusing instead keeps the constructor a gate and leaves the cleanup to the call
 
 Validating once, at construction, often goes by the name *parse,
 don't validate*.^[Coined by Alexis King in her 2019 essay ["Parse, don't validate"](https://lexi-lambda.github.io/blog/2019/11/05/parse-don-t-validate/).]
-Instead of checking a changeable value everywhere and hoping you never miss a spot,
+Instead of checking a changeable value everywhere and hoping you cover every spot,
 you parse it once into a precise type.
 After that, holding the type is proof the check passed.
 No other code repeats the check, because it cannot fail.
@@ -1129,7 +1129,7 @@ a limit every factory in [Factory](27_Patterns--Factory.md#hiding-the-concrete-c
 shares.
 The third test shows why the check cannot move inside the type.
 `NamedTuple` refuses `__new__()`, refuses `__init__()` the same way,
-and the class never comes into existence:
+and no class comes into existence:
 the error arrives while Python is still executing the `class` statement.
 `ty` reports the `__new__()` override as `invalid-named-tuple`,
 which the `# type: ignore` silences.

@@ -209,17 +209,17 @@ except RuntimeError as error:
 #: caught: no resource
 ```
 
-`exit runs` never prints,
+`exit runs` is missing from the output,
 because Python only registers the cleanup once `__enter__()` returns.
 An `__enter__()` that acquires several things must clean up its own partial work before it raises an exception.
 [`ExitStack`](#combining-context-managers), later in this chapter,
-is the standard tool for that:
-it unwinds whatever it already entered when a later entry fails.
+is the standard tool for that: when a later entry fails,
+it unwinds the managers it entered earlier.
 A `with` naming several managers applies the same rule per manager:
 the ones that entered still exit,
 and the failing one alone gets no `__exit__()` call.
 
-`Fragile.__exit__(self, *exc: object)` collects the three arguments into a tuple the method never reads,
+`Fragile.__exit__(self, *exc: object)` collects the three arguments into a tuple the method ignores,
 the shorter form for a cleanup that ignores why the block ended.
 
 The guarantee has a matching gap on the other side: cleanup itself can fail.
@@ -262,7 +262,7 @@ When the block finishes normally, all three are `None`.
 When it raises an exception, they hold the exception's class, its instance,
 and its traceback object.
 `Trace.__exit__()` in `trace_cm.py` types `exc` and `tb` as `object`,
-the most general type, since it never inspects either one.
+the most general type, since it ignores both.
 
 The return value decides that exception's fate.
 A falsy value lets it propagate.
@@ -549,9 +549,9 @@ A typical [decorator](14_Techniques--Decorators.md)
 brackets a function call the same way.
 `contextlib.ContextDecorator` connects the two.
 A subclass works both as a context manager and as a decorator.
-Every manager `@contextmanager` produces already inherits from `ContextDecorator`,
+Every manager `@contextmanager` produces inherits from `ContextDecorator`,
 so `banner` works as a decorator,
-even though `ContextDecorator` never appears in `context_decorator.py`:
+although `ContextDecorator` is absent from `context_decorator.py`:
 
 ```python
 # context_decorator.py
@@ -638,7 +638,7 @@ so every call shares any state the instance holds.
 and that wrapper always calls the function once, unchanged,
 with setup before it and cleanup after.
 So `banner` sees neither the arguments nor the return value of `report()`,
-and it can never skip the call.
+and it cannot skip the call.
 A hand-written decorator can do all three,
 because it defines its own wrapper function:
 [`repeat`](14_Techniques--Decorators.md#decorators-that-take-arguments)
@@ -775,9 +775,9 @@ wrap(["a", "b", "c"])
 `wrap()` finds out how many managers to enter when it runs,
 and a comma-separated `with` cannot express that.
 
-`wrap()` never has a failing entry,
-so it never exercises `ExitStack`'s other guarantee: when a later entry fails,
-the stack unwinds whatever already entered.
+Every entry in `wrap()` succeeds,
+so `wrap()` leaves `ExitStack`'s other guarantee untested:
+when a later entry fails, the stack unwinds the managers that entered earlier.
 In `exit_stack_fails.py` the third manager fails to enter.
 The first two unwind, and the third's cleanup does not run:
 
@@ -810,9 +810,9 @@ with expected(RuntimeError):
 #: [RuntimeError] c failed to open
 ```
 
-`c` never gets a `close c` line,
+`c` gets no `close c` line,
 because its `__enter__()` raises a `RuntimeError` before `ExitStack` can register it.
-`a` and `b` already entered, so both unwind in reverse,
+`a` and `b` entered first, so both unwind in reverse,
 the same rule a comma-separated `with` follows.
 
 ## The `contextlib` Toolkit
@@ -990,7 +990,7 @@ The `finally` puts it back.
 The second `with` block crashes, and the `finally` still returns the connection,
 so the count is back to two.
 `Pool` is generic over the pooled type,
-and it never creates or destroys anything.
+and it neither creates nor destroys anything.
 It only tracks custody.
 
 An object pool differs from [*Flyweight*](35_Patterns--Flyweight.md),
@@ -1051,7 +1051,7 @@ incremented once the lease begins and decremented right after the check,
 so `over_capacity` turns `True` when three of those windows overlap.
 Across sixteen hundred lease-and-release cycles,
 spread over eight threads competing for two connections,
-`held` never climbs past two:
+`held` stays at or below two:
 a thread that arrives while the pool is empty blocks in `get()` instead of racing past it.
 `over capacity` stays `False` because `Queue`'s blocking throttles the threads,
 and the demo measures that rather than assuming it.

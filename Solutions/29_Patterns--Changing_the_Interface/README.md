@@ -76,7 +76,7 @@ with expected(TypeError):
 #: [TypeError] object of type 'PairsAdapter' has no len()
 ```
 
-**Forward the rest to the list.** The adapter adds the one method the caller wants, `__getitem__()`,
+**Forward the rest to the list.** The adapter adds the one method the caller needs, `__getitem__()`,
 and forwards everything else to the wrapped list through
 `__getattr__()`, the same shape as `getattr_adapter.py`.
 The adapter defines no `append()`, so the lookup falls through to
@@ -156,7 +156,7 @@ for entry in caught:
 **Move the warning to the type.** Decorating the class moves the warning to the two places where a
 caller commits to the type: constructing an instance and subclassing.
 `render()` runs outside the recording block and adds nothing to
-`caught`, so code that already holds a `Report` runs without a
+`caught`, so code that holds a `Report` runs without a
 warning.
 That is the right split: `TextReport` replaces the type, not the
 method. A caller who wants to act on the warning must change where
@@ -282,9 +282,9 @@ The class version differs in one way that matters. `Facade` is a
 namespace the language does not treat as one: `Facade.start_car` and
 `shop.start_car` read identically at the call site, but you must
 define the class, import it, and carry it around. `@staticmethod`
-exists only to stop Python passing `self` to functions that never
-wanted it.
-The module is already a namespace before anyone asked, and it comes
+exists only to stop Python passing `self` to functions that do not
+use it.
+The module is a namespace from the start, and it comes
 with the underscore convention, `__all__`, and one-time initialization
 built in.
 
@@ -333,7 +333,7 @@ changes the name the caller uses.
 
 **The flag-checking wrapper is a *Proxy*.** Its interface is the wrapped
 object's, and it adds no behavior to a call that goes through. What it
-adds is a decision about whether the call goes through at all. Remove
+adds is a decision about whether the call proceeds. Remove
 it and every call reaches the implementation, including the ones the
 proxy refuses, so what you lose is control over when and whether the
 call happens. This wrapper is the
@@ -341,7 +341,7 @@ call happens. This wrapper is the
 
 None of the three is a *Façade*, because a *Façade* narrows many objects
 to a few names and each of these wraps one object. The
-classification never turns on the code: all three could be the
+code does not decide the classification: all three could be the
 same `__getattr__()` forwarder. What separates them is the answer to
 "what breaks if I delete this," and a name chosen from that answer
 tells the next reader why the wrapper is there.

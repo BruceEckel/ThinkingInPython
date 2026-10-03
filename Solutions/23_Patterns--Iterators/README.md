@@ -156,7 +156,7 @@ produces a generator on demand. The container keeps the value
 
 [The Costs of Laziness](../../Chapters/23_Patterns--Iterators.md#the-costs-of-laziness) explains that creating a generator runs none of its body.
 Wrap the generator in `itertools.islice()` with a stop of 10.
-`islice()` pulls only as many values as you request, so the generator never computes the rest.
+`islice()` pulls only as many values as you request, so the rest stay uncomputed.
 
 <details>
 <summary>The shape</summary>
@@ -197,9 +197,9 @@ print(list(islice(fibonacci(1_000_000), 10)))
 `fibonacci(1_000_000)` builds a generator ready to yield a million
 values, but building it computes nothing. A generator's body runs only
 as far as the next `yield`, each time something asks it for a value.
-`islice(..., 10)` asks for exactly ten, so only the first ten
-iterations of `fibonacci()`'s loop ever run. The other 999,990 never
-run, the same laziness on which
+`islice(..., 10)` asks for exactly ten, so `fibonacci()`'s loop runs
+ten iterations and leaves the other 999,990 uncomputed, the same
+laziness on which
 [Comprehensions](../../Chapters/16_Techniques--Comprehensions.md#generator-expressions) and
 [Performance](../../Chapters/18_Techniques--Performance.md#lazy-evaluation-with-generators)
 both rely.
@@ -443,7 +443,7 @@ Writing this test confirms the pairing the prose asserts. A
 reader might reasonably guess that `filter()`, being a function rather
 than a clause, gets a chance to decide when to stop. `filter()` gets
 no such chance: it receives values one at a time and can answer only
-"keep" or "skip" about the value in front of it, never "stop."
+"keep" or "skip" about the value in front of it, not "stop."
 
 </details>
 </details>
@@ -455,7 +455,7 @@ no such chance: it receives values one at a time and can answer only
 > confirm `traverse()` drives it with no changes to `traverse()`,
 > and explain why it needs no `seen` list.
 > Then build an `OverStream` over `itertools.count(1)`.
-> `traverse()` never returns on an endless source,
+> `traverse()` runs forever on an endless source,
 > so drive the four methods yourself for 50,000 steps and report `len(stream.seen)`.
 > What has `first()` cost you on an endless source?
 
@@ -464,7 +464,7 @@ no such chance: it receives values one at a time and can answer only
 
 [The Pattern That Disappeared](../../Chapters/23_Patterns--Iterators.md#the-pattern-that-disappeared) and [`first()` and `current_item()` Rebuild the List](../../Chapters/23_Patterns--Iterators.md#first-and-current_item-rebuild-the-list) show the four-method interface over a stream.
 `OverSequence` can index its sequence directly.
-`OverStream` must remember every item it has pulled, so ask what that list does on a source that never ends.
+`OverStream` must remember every item it has pulled, so ask what that list does on an endless source.
 
 <details>
 <summary>The shape</summary>
@@ -610,11 +610,11 @@ print(len(endless.seen))
 
 **Match by methods, not by base.** `traverse()` needs no change, because its parameter names the
 `GoFIterator` protocol rather than a class. `OverSequence` and
-`OverStream` share no base class and never mention the protocol.
+`OverStream` share no base class, and neither names the protocol.
 Defining its four methods is enough to satisfy it.
 
 **Read without consuming.** `OverSequence` needs no `seen` list because its `items` sequence
-already holds every value. A caller can index that sequence
+holds every value. A caller can index that sequence
 repeatedly, in any order, without consuming it, and the GoF
 interface assumes a collection allows that. `OverStream`
 builds `seen` to fake the same ability.
@@ -746,7 +746,7 @@ pay: answering a question about the future means fetching the future.
 <summary>Where to look</summary>
 
 [Delegating with `yield from`](../../Chapters/23_Patterns--Iterators.md#delegating-with-yield-from) shows `flatten()` and its base case.
-Iterating a `str` produces more strings, so the recursion never reaches a base case.
+Iterating a `str` produces more strings, so the recursion has no base case to stop it.
 Test for `str` alongside `int` using `isinstance()` with a union, and apply the same test in `flatten_loop()`.
 
 <details>
@@ -815,7 +815,7 @@ an `int`, so `"ab"` goes to `flatten("ab")`, which iterates it into
 into `flatten("a")`, which iterates `"a"` into `"a"`. The string has
 stopped getting shorter. Every other sequence bottoms out because
 indexing it eventually yields a non-sequence, and `str` is the one
-built-in that never does: a one-character string is still a `Sequence`
+built-in exception: a one-character string is still a `Sequence`
 of one-character strings. The recursion has no base case, so it runs
 until Python raises a `RecursionError`.
 
@@ -949,8 +949,8 @@ print(list(SkippingIterator(iter(items), int)))
 and act differently on a no, and that difference decides what a bad
 item costs. `typed()` ends the stream: the consumer receives the `1`
 before `"two"` and nothing after it. The caller gets an exception
-instead of a list. `typed_skipping()` delivers `[1, 3, 4]` and never
-mentions `"two"` or the `None`.
+instead of a list. `typed_skipping()` delivers `[1, 3, 4]` and says
+nothing about `"two"` or the `None`.
 
 For a parsed log file, take the skipping version. A log is an
 append-only record that many processes write, so a malformed line is
@@ -967,7 +967,7 @@ skipping version, count what it drops and report the count.
 
 **Keep pulling until a match.** The skipping version is harder to write as a class.
 A generator may decline to produce a value: `typed_skipping()` reaches
-an item it does not want and does not `yield`, and the `for`
+an item of the wrong type and does not `yield`, so the `for`
 loop continues. `__next__()` has no such option. Every call must
 return a value or raise `StopIteration`, so `SkippingIterator` needs
 its own loop to keep pulling until a match arrives. A raising

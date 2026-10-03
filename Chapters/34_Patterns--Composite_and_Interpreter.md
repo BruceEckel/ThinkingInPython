@@ -180,7 +180,7 @@ Each `match` needs one case per member of the union and no more.
 `disk_usage()` still accepts a lone `File`, a subtree, or the whole tree;
 what changed from `filesystem_classic.py` is only where the operations live.
 `disk_usage()` and `walk()` are ordinary functions outside the node classes,
-so a new operation is a new function, and the nodes never change.
+so a new operation is a new function, and the nodes stay unchanged.
 In the classic version a new node type is one class and a new operation is a method in every class.
 The pairing has a name:
 the [*expression problem*](13_Techniques--Pattern_Matching.md#the-expression-problem).
@@ -395,7 +395,7 @@ When a library's `==` must build a node, as SQLAlchemy's `col == 5` does,
 the library sets `eq=False` on the dataclass, giving up structural comparison,
 and writes its own `__eq__()`.
 This chapter keeps structural comparison;
-a class gets either that or an `==` that builds a node, never both.
+a class gets either that or an `==` that builds a node, not both.
 
 `and`, `or`, and `not` belong to Python alone.
 Python tests the operand's truth value;
@@ -463,7 +463,7 @@ which can run thousands of levels.
 `**env` is also why the `/` is there.
 The `/` makes `e` [positional-only](05_Foundations--Functions.md#positional-only-and-keyword-only-parameters),
 which keeps the parameter name out of the variable namespace,
-so an expression can use `e` as a variable: `e=5` lands in `env`,
+so an expression can use `e` as a variable: `e=5` goes into `env`,
 and `test_e_is_available_as_a_variable()` below confirms that it binds the variable.
 A `dict[str, int]` parameter passes the same bindings by reference at every call,
 and it would spare both the `/` and this explanation.
@@ -502,7 +502,7 @@ def test_e_is_available_as_a_variable() -> None:
 
 Evaluation has no privileged status.
 Rendering the tree as an infix string is another function, in another file,
-and the node classes never change:
+and the node classes stay unchanged:
 
 ```python
 # infix.py
@@ -608,8 +608,7 @@ if __name__ == "__main__":
 With `2 + 3`, both operands are plain `int`,
 so Python adds them to `5` before any node exists.
 `simplify()` would receive `5 * x` with the fold already done.
-`Num(2)` is already a node,
-so `+` dispatches to `Operators.__add__()` and builds an `Add` for `simplify()` to fold back down.
+`Num(2)` is a node, so `+` dispatches to `Operators.__add__()` and builds an `Add` for `simplify()` to fold back down.
 `2 + 3` shows the limit of using the host parser:
 an operator builds a node when either operand is one,
 and does plain arithmetic otherwise.
@@ -694,7 +693,7 @@ One practical limit applies.
 Every function here recurses once per level of tree,
 and Python's recursion limit (roughly a thousand frames)
 caps how deep a tree they can walk.
-Realistic expressions never approach it.
+Realistic expressions stay far below it.
 A machine-generated chain of thousands of nested nodes does.
 The alternative is an iterative walk with an explicit stack of pending nodes.
 
@@ -787,16 +786,16 @@ iterating any one `Template` stays flat.
 
 `to_query()` and `to_shape()` stand in the same relationship as `evaluate()` and `to_infix()`:
 two operations over one structure that names neither of them.
-Adding a third changes nothing that already exists.
+Adding a third changes none of the existing code.
 
 `to_query()` uses the walk to keep user values out of the query text.
 `name` holds an injection attempt,
 and it comes out as a value in the parameter list rather than as text in the query.
 The reason is structural rather than clever:
 `to_query()` receives the literal pieces and the values separately,
-so a value never reaches the `sql` list.
+so values stay out of the `sql` list.
 Written as an f-string,
-the same line is one finished `str` with the attack already inside it.
+the same line is one finished `str` with the attack inside it.
 Any defense then has to inspect that string and guess where the user's text begins.
 
 That separation is the general argument for handing a consumer the structure instead of the answer.

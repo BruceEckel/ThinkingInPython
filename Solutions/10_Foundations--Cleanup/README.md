@@ -334,7 +334,7 @@ print(Counter.live_count())
 #: 3
 ```
 
-**Register each instance strongly.** The count never falls. A `dict` holds a strong reference to each
+**Register each instance strongly.** The count stays at three. A `dict` holds a strong reference to each
 value, so `_instances` alone keeps every `Counter` alive no matter
 what `counters` does. `pop()` removes one reference and the registry
 keeps another, so the object's reference count stays above zero and
@@ -459,7 +459,7 @@ back to its own object.
 > (`a.peer = b` and `b.peer = a`) instead of a self-reference.
 > Confirm both finalizers run at `gc.collect()`,
 > then remove the `gc.disable()`/`gc.enable()` pair and explain why the language no longer guarantees when the two `finalized` lines appear,
-> even though this small program still prints them in the same place every run.
+> although this small program still prints them in the same place every run.
 
 <details>
 <summary>Where to look</summary>
@@ -540,9 +540,10 @@ it or wait until the interpreter shuts down. The loss is in the
 guarantee, not in what this run prints.
 
 `gc.disable()` is in the chapter's listing only to keep the output
-predictable. It is not advice. It buys a deterministic transcript for
-a demonstration whose entire subject is the absence of determinism, so
-the listing turns the collector back on immediately afterward.
+predictable. It is not advice. It produces a deterministic transcript
+for a demonstration whose entire subject is the absence of
+determinism, so the listing turns the collector back on immediately
+afterward.
 
 </details>
 </details>
@@ -562,7 +563,7 @@ the listing turns the collector back on immediately afterward.
 
 [An `__init__()` That Fails Leaks the Resource](../../Chapters/10_Foundations--Cleanup.md#raising-init-leaks) shows a failure before the object is usable, and [An Explicit `close()` and a `with` Block](../../Chapters/10_Foundations--Cleanup.md#an-explicit-close-and-a-with-block) describes when `with` calls `__exit__()`.
 The `with` statement calls `__exit__()` only after `__enter__()` returns.
-To release the resource anyway, catch the exception inside `__enter__()`, release there, and use a bare `raise` to re-raise it.
+To release the resource without `__exit__()`, catch the exception inside `__enter__()`, release there, and use a bare `raise` to re-raise it.
 
 <details>
 <summary>The shape</summary>
@@ -652,13 +653,13 @@ except RuntimeError as e:
 `__init__()` to `__enter__()` moves the leak with it. The `with`
 statement calls `__exit__()` only for a block it has entered, and it
 enters the block only after `__enter__()` returns. An `__enter__()`
-that fails has not returned, so `__exit__()` never runs.
+that fails has not returned, so `__exit__()` does not run.
 
 **Release before re-raising.** `Guarded` releases the resource in the method that acquired it. Its
 `except` clause prints the `closed` line and then re-raises the
 exception with a bare `raise`, so the caller still sees `boom`.
-`__exit__()` runs in neither class, and `Guarded` releases the
-resource anyway.
+`__exit__()` runs in neither class, yet `Guarded` releases the
+resource.
 
 Acquiring in `__enter__()` still helps: a `Guarded` whose `__init__()`
 fails for some other reason holds no resource at that point. That move

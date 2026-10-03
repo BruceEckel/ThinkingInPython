@@ -616,13 +616,14 @@ except ValueError as error:
 
 **Clean up before the exception propagates.** `exit A` now prints, and it prints before `caught: boom`. Python
 raises the block's `ValueError` inside the generator, at the `yield`.
-The `finally` runs on the way out of the generator, and only then
-does the exception leave the `with` statement and reach the `except`.
+The `finally` runs as the exception leaves the generator, and only
+then does the exception leave the `with` statement and reach the
+`except`.
 That is the order `exit_on_error.py` shows for the class form: cleanup
 first, then propagation.
 
 In `no_finally.py` the same exception left the generator from the
-bare `yield`, so the `print()` after it never ran. The `finally` is
+bare `yield`, so the `print()` after it did not run. The `finally` is
 the only difference between the two listings, apart from the
 function's name.
 

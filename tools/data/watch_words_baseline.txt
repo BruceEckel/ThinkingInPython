@@ -1,0 +1,226 @@
+# Stranded-preposition hits a human read and judged false
+# positives: a particle after a noun object, an adverb, a clause
+# the splitter cut, an infinitive marker. An entry is not an
+# exemption from the rule.
+# path<TAB>clause, with the clause's whitespace normalized and no
+# line number, so a reflow leaves an entry alone and an edit to
+# the clause retires it. Rewritten by `tip stranded-accept`; read
+# the delta with `tip stranded` before accepting.
+# See tools/stranded_prepositions.py.
+Chapters/01_Introduction.md	already: and does the language already do the pattern's job
+Chapters/01_Introduction.md	already: if they don't already
+Chapters/01_Introduction.md	already: this book asks whether the language already solves the problem
+Chapters/01_Introduction.md	even: Eventually I even wrote a message confirming I would not complete it
+Chapters/01_Introduction.md	never: Claude allowed me to create tooling for the book that I had imagined but never fully realized
+Chapters/01_Introduction.md	never: This book never would have happened without the help of Claude
+Chapters/01_Introduction.md	never: never using an idea before formally introducing it
+Chapters/02_Foundations--Tour.md	even: CODE breaks a tie to the nearest even value
+Chapters/03_Foundations--Containers.md	already: CODE returns the list already stored under CODE
+Chapters/03_Foundations--Containers.md	never: and assignment never copies
+Chapters/03_Foundations--Containers.md	want: Use CODE or CODE when you only want to look
+Chapters/04_Foundations--Control_Flow.md	even: even if the body raises an exception
+Chapters/04_Foundations--Control_Flow.md	never: so CODE through CODE never print
+Chapters/04_Foundations--Control_Flow.md	want: CODE is the broad catch you want instead
+Chapters/05_Foundations--Functions.md	want: Write a lambda when no existing function computes the key you want
+Chapters/06_Foundations--Modules_and_Packages.md	even: A name listed in CODE arrives even when it begins with an underscore
+Chapters/06_Foundations--Modules_and_Packages.md	even: even on a filesystem that treats the two names as one
+Chapters/06_Foundations--Modules_and_Packages.md	want: you want its definitions and none of the code at the bottom of the file
+Chapters/07_Foundations--Classes.md	never: Python never calls a base-class constructor on its own
+Chapters/07_Foundations--Classes.md	want: When you override a method but still want the base-class version
+Chapters/07_Foundations--Classes.md	want: so you choose the access you want by defining one or both
+Chapters/08_Foundations--Static_Types.md	even: Explain why the empty string now takes the other branch even though the type checker accepts either version
+Chapters/08_Foundations--Static_Types.md	even: even though CODE is a valid CODE
+Chapters/08_Foundations--Static_Types.md	never: The Python runtime never acts on a type hint
+Chapters/08_Foundations--Static_Types.md	want: If you want static type checking like you get from a compiler in a typed language
+Chapters/08_Foundations--Static_Types.md	want: callers who want that type omit the brackets
+Chapters/09_Foundations--Class_Attributes.md	never: so each object shadows the class attribute immediately and never reads the shared one
+Chapters/09_Foundations--Class_Attributes.md	want: Decide which you want
+Chapters/09_Foundations--Class_Attributes.md	want: When you genuinely want one shared value
+Chapters/10_Foundations--Cleanup.md	never: Never release a resource in CODE
+Chapters/10_Foundations--Cleanup.md	never: so the count never falls
+Chapters/11_Techniques--Testing.md	never: Inside the block the assertion never runs
+Chapters/12_Techniques--Data_Classes_as_Types.md	even: even when only one field moved
+Chapters/12_Techniques--Data_Classes_as_Types.md	want: Subscript the factory when you want that agreement checked
+Chapters/13_Techniques--Pattern_Matching.md	want: Use CODE for a closed set of cases you want to handle in one place
+Chapters/14_Techniques--Decorators.md	already: A function is already a descriptor
+Chapters/14_Techniques--Decorators.md	even: even after the decorator has returned
+Chapters/14_Techniques--Decorators.md	never: The CODE instance never arrives
+Chapters/14_Techniques--Decorators.md	never: The original body of CODE never runs
+Chapters/14_Techniques--Decorators.md	want: If you want the run-once idiom
+Chapters/14_Techniques--Decorators.md	want: Sometimes you want to choose later
+Chapters/15_Techniques--Context_Managers.md	even: even if the block raises an exception
+Chapters/15_Techniques--Context_Managers.md	even: it comes back even when the block raises an exception
+Chapters/15_Techniques--Context_Managers.md	never: CODE never reaches the CODE
+Chapters/15_Techniques--Context_Managers.md	never: never runs
+Chapters/15_Techniques--Context_Managers.md	want: Write a manager once you want the CODE syntax at the call site
+Chapters/15_Techniques--Context_Managers.md	want: once you have decided you want one
+Chapters/15_Techniques--Context_Managers.md	want: so name the types you expect unless you want a block that nothing escapes
+Chapters/16_Techniques--Comprehensions.md	already: CODE and CODE pay off when the function already exists
+Chapters/16_Techniques--Comprehensions.md	want: A CODE loop when you want the side effect rather than the collection
+Chapters/16_Techniques--Comprehensions.md	want: Brackets when you want a list
+Chapters/16_Techniques--Comprehensions.md	want: Use a comprehension when you want the collection it produces
+Chapters/16_Techniques--Comprehensions.md	want: a glob pattern says what you want
+Chapters/16_Techniques--Comprehensions.md	want: and a CODE loop when you want the side effect
+Chapters/16_Techniques--Comprehensions.md	want: and append the ones you want
+Chapters/17_Techniques--Metaprogramming.md	already: so CODE sees the second CODE assigned to a name it already holds
+Chapters/17_Techniques--Metaprogramming.md	even: even an empty one
+Chapters/17_Techniques--Metaprogramming.md	hook: Every hook in this chapter is an ordinary function that Python calls at a known moment during class construction
+Chapters/17_Techniques--Metaprogramming.md	hook: No other hook can catch the second CODE
+Chapters/17_Techniques--Metaprogramming.md	hook: The one hook missing from its trace is CODE
+Chapters/17_Techniques--Metaprogramming.md	hook: an CODE hook
+Chapters/17_Techniques--Metaprogramming.md	hooks: Then come the simpler hooks
+Chapters/17_Techniques--Metaprogramming.md	hooks: and you write one when the simpler hooks are not enough
+Chapters/17_Techniques--Metaprogramming.md	hooks: but simpler hooks cover almost every case a metaclass handled before those hooks existed
+Chapters/17_Techniques--Metaprogramming.md	spelling: You might expect to parameterize[^parameterize-spelling] the class
+Chapters/17_Techniques--Metaprogramming.md	want: and you configure them to produce the objects you want
+Chapters/18_Techniques--Performance.md	already: so a frozen instance already cannot grow
+Chapters/18_Techniques--Performance.md	even: halve an even value or triple-and-increment an odd one
+Chapters/19_Techniques--Concurrency.md	already: Threads already distributed computing resources
+Chapters/19_Techniques--Concurrency.md	already: Use a thread pool for I/O when the blocking calls already exist and rewriting them as coroutines is not worth the effort
+Chapters/19_Techniques--Concurrency.md	even: Even when you understand the problems produced by shared mutable state
+Chapters/19_Techniques--Concurrency.md	even: even a program written as CODE from top to bottom keeps a thread pool underneath
+Chapters/19_Techniques--Concurrency.md	even: since finer chunks even out the load across workers
+Chapters/19_Techniques--Concurrency.md	never: **Never call a blocking function inside a coroutine
+Chapters/19_Techniques--Concurrency.md	never: and adds lock overhead the GIL never charged
+Chapters/19_Techniques--Concurrency.md	want: and that is what you want
+Chapters/20_Patterns--Rethinking_Objects.md	never: An override may accept more than the base does but never less
+Chapters/20_Patterns--Rethinking_Objects.md	promise: The first OOP promise is encapsulation
+Chapters/20_Patterns--Rethinking_Objects.md	promise: The fourth OOP promise is polymorphism
+Chapters/20_Patterns--Rethinking_Objects.md	promise: The second OOP promise is behavior inside the object
+Chapters/20_Patterns--Rethinking_Objects.md	promise: The third OOP promise is reuse through inheritance
+Chapters/20_Patterns--Rethinking_Objects.md	promised: Substitutability is one thing OOP promised that no tool can check
+Chapters/20_Patterns--Rethinking_Objects.md	promises: OOP made four promises
+Chapters/20_Patterns--Rethinking_Objects.md	want: I want to question how much of that machinery you need
+Chapters/21_Patterns--Design_Patterns.md	already: but [*Singleton* shows that a Python module already is one.]
+Chapters/22_Patterns--Data_Transfer_Objects.md	even: and a comparison between two different frozen types raises one even then
+Chapters/22_Patterns--Data_Transfer_Objects.md	want: When you want the fields named and checked
+Chapters/23_Patterns--Iterators.md	want: then say which of the two you would want wrapping a parsed log file
+Chapters/24_Patterns--Singleton.md	already: The mutate-versus-rebind distinction from A Module Is Already a *Singleton* reappears here
+Chapters/24_Patterns--Singleton.md	already: The other seven are already in the hands of their callers
+Chapters/24_Patterns--Singleton.md	already: and explain the difference using the binding-versus-mutation distinction from A Module Is Already a *Singleton*
+Chapters/24_Patterns--Singleton.md	already: the language already has an answer
+Chapters/24_Patterns--Singleton.md	want: Alex Martelli observes that what you usually want is not one object but one shared set of state
+Chapters/24_Patterns--Singleton.md	want: If you really want many handles sharing one set of state
+Chapters/24_Patterns--Singleton.md	want: If you want a class
+Chapters/25_Patterns--Template_Method.md	hook: A stateless hook is usually better as a function than as an overridden method
+Chapters/25_Patterns--Template_Method.md	hook: This kind of optional step is a *hook*
+Chapters/25_Patterns--Template_Method.md	hook: whether the subclass overrides CODE or misspells a hook
+Chapters/25_Patterns--Template_Method.md	hooks: The CODE and CODE in the opening example are hooks
+Chapters/25_Patterns--Template_Method.md	hooks: starting from the base class with its empty hooks
+Chapters/25_Patterns--Template_Method.md	want: If you want the interpreter to refuse an override
+Chapters/26_Patterns--Surrogate.md	even: even when the implementation defines a CODE of its own
+Chapters/27_Patterns--Factory.md	already: a data class with keyword arguments already does the job
+Chapters/27_Patterns--Factory.md	even: A lazy import produces the same failure even when the import statement is in the file
+Chapters/27_Patterns--Factory.md	even: even momentarily
+Chapters/27_Patterns--Factory.md	never: An import written only to trigger registration never uses that name
+Chapters/27_Patterns--Factory.md	never: Run the program and confirm that CODE never yields CODE
+Chapters/27_Patterns--Factory.md	never: The classic failure is a plugin that "never registered"
+Chapters/28_Patterns--Function_Objects.md	want: or do you now want an object
+Chapters/31_Patterns--State_Machines.md	want: or want the mechanism visible in your own code
+Chapters/32_Patterns--Multiple_Dispatching.md	even: so even elaborate behavior fits the table
+Chapters/32_Patterns--Multiple_Dispatching.md	even: so even elaborate behavior fits the table (see exercise 9)
+Chapters/32_Patterns--Multiple_Dispatching.md	want: You want to say CODE
+Chapters/34_Patterns--Composite_and_Interpreter.md	already: CODE would receive CODE with the fold already done
+Chapters/34_Patterns--Composite_and_Interpreter.md	already: Each rule is a nested pattern over a pair of already-simplified children
+Chapters/34_Patterns--Composite_and_Interpreter.md	even: CODE fails type checking even with a case for every node
+Chapters/35_Patterns--Flyweight.md	want: If you want callers to construct objects with an ordinary class call such as CODE
+Chapters/37_Patterns--Pattern_Refactoring.md	wants: Now the safety officer wants a disposal hazard printed beside the instruction
+Chapters/40_Functional--Foundations.md	already: CODE already appends the call's arguments after the bound ones
+Chapters/40_Functional--Foundations.md	already: CODE and CODE are the better choice when the function already exists
+Chapters/40_Functional--Foundations.md	already: already correct on the edge case you would otherwise miss
+Chapters/40_Functional--Foundations.md	already: each with one argument already supplied
+Chapters/40_Functional--Foundations.md	already: use the higher-order form when the function already exists
+Chapters/40_Functional--Foundations.md	even: and CODE holds even when the caller passes a mutable CODE
+Chapters/40_Functional--Foundations.md	want: A closure fits when you want to configure behavior once
+Chapters/41_Functional--Toolkits.md	want: CODE is the right choice when equal lengths are an invariant you want checked
+Chapters/41_Functional--Toolkits.md	want: CODE to take as many of them as you want
+Chapters/41_Functional--Toolkits.md	want: and keeping one is right when you want each pair of distinct elements once
+Chapters/42_Functional--Error_Handling.md	wants: so a caller who wants the original must read it from the new exception's CODE (set by CODE) or CODE (set when a handler raises an exception without CODE)
+Chapters/43_Functional--Confidence.md	even: and perhaps some should even be mathematically provable
+Chapters/43_Functional--Confidence.md	want: *Declarative* code states the result you want
+Chapters/44_Effects--Effect_Management.md	already: imagine a signature that declares its Effects the way CODE already declares one
+Chapters/44_Effects--Effect_Management.md	even: A handler can even invoke the continuation several times
+Chapters/44_Effects--Effect_Management.md	even: not even the exit code the operating system checks
+Chapters/44_Effects--Effect_Management.md	want: You annotate explicitly when you want a constraint
+Chapters/46_Effects--Stateless.md	already: A function that already returns an Effect needs no CODE
+Chapters/46_Effects--Stateless.md	already: CODE is a second handler already applied to CODE
+Chapters/46_Effects--Stateless.md	already: CODE is already CODE
+Chapters/46_Effects--Stateless.md	already: its accessor carries CODE on a function that already returns an Effect
+Chapters/46_Effects--Stateless.md	already: which raises a CODE because a loop is already running
+Chapters/46_Effects--Stateless.md	even: CODE must declare the CODE even though no CODE appears in its body
+Chapters/46_Effects--Stateless.md	even: and even then it is the bare union CODE rather than a wrapper object
+Chapters/46_Effects--Stateless.md	even: even for an Effect with no CODE in it
+Chapters/46_Effects--Stateless.md	even: even though only CODE
+Chapters/46_Effects--Stateless.md	never: A test can then supply a clock that never waits
+Chapters/46_Effects--Stateless.md	never: Failures never vanish
+Chapters/46_Effects--Stateless.md	never: because CODE matches the yielded value before the driver gets it and never resumes the inner generator
+Chapters/46_Effects--Stateless.md	never: so CODE never returns a subclass registered under its own name
+Chapters/46_Effects--Stateless.md	never: so the inner CODE never runs
+Chapters/46_Effects--Stateless.md	wants: A caller who wants to redirect the output
+Chapters/47_Effects--Stateless_in_Practice.md	already: CODE and CODE already share a signature
+Chapters/47_Effects--Stateless_in_Practice.md	already: which CODE already declares
+Chapters/47_Effects--Stateless_in_Practice.md	even: CODE stays distinct even then
+Chapters/47_Effects--Stateless_in_Practice.md	even: CODE type-checks even though its CODE claim is false
+Chapters/47_Effects--Stateless_in_Practice.md	even: then say why it differs from CODE's even though both fail the same way
+Chapters/47_Effects--Stateless_in_Practice.md	never: CODE never runs
+Chapters/47_Effects--Stateless_in_Practice.md	never: and the driver never resumes the generator
+Chapters/47_Effects--Stateless_in_Practice.md	never: and this one never propagates
+Chapters/A_Effect_Tracking.md	want: You write a row when you want a constraint
+Chapters/B_An_Effect_Checker.md	even: even when it matches the name of a built-in
+Solutions/04_Foundations--Control_Flow/README.md	want: and Python fills that attribute in whether you want it or not
+Solutions/07_Foundations--Classes/README.md	want: the form you want in a traceback or a debugger
+Solutions/07_Foundations--Classes/README.md	want: the form you want in output a user reads
+Solutions/12_Techniques--Data_Classes_as_Types/README.md	even: even in a leap year
+Solutions/12_Techniques--Data_Classes_as_Types/README.md	want: Subscript the factory when you want the checker to confirm the agreement
+Solutions/13_Techniques--Pattern_Matching/README.md	want: but it is what you want when the test is more than equality
+Solutions/16_Techniques--Comprehensions/README.md	already: which already chooses between two values
+Solutions/16_Techniques--Comprehensions/README.md	even: even when it returns something useful
+Solutions/16_Techniques--Comprehensions/README.md	want: Which shape is right depends on whether you want the list
+Solutions/16_Techniques--Comprehensions/README.md	want: and a loop when you want the side effect
+Solutions/16_Techniques--Comprehensions/README.md	want: use a comprehension when you want the collection it produces
+Solutions/18_Techniques--Performance/README.md	already: A CODE of floats stores pointers to CODE objects that already exist
+Solutions/18_Techniques--Performance/README.md	already: CODE means the JIT is already running
+Solutions/18_Techniques--Performance/README.md	even: The comprehension must build and hold the whole list of half a million even squares before CODE discards nearly all of them
+Solutions/18_Techniques--Performance/README.md	even: and even which values you store
+Solutions/18_Techniques--Performance/README.md	want: including library code you did not write and did not want counted
+Solutions/19_Techniques--Concurrency/README.md	already: and inside CODE that context already carries CODE
+Solutions/19_Techniques--Concurrency/README.md	already: so "already finished" still means "still reversible
+Solutions/19_Techniques--Concurrency/README.md	never: and "later" never loops back to "earlier
+Solutions/21_Patterns--Design_Patterns/README.md	shipping: The design is the same shipping calculation
+Solutions/22_Patterns--Data_Transfer_Objects/README.md	want: Which one is right depends on whether you want your three numbers to travel as data or to mean something
+Solutions/24_Patterns--Singleton/README.md	already: A Module Is Already a *Singleton* distinguishes mutating a shared object from rebinding a name
+Solutions/24_Patterns--Singleton/README.md	already: A Module Is Already a *Singleton* explains that Python caches a module in CODE and runs its body once
+Solutions/24_Patterns--Singleton/README.md	already: A Module Is Already a *Singleton* makes that argument at the top of the chapter
+Solutions/24_Patterns--Singleton/README.md	already: Each is already committed to running the body before the first one takes the lock
+Solutions/24_Patterns--Singleton/README.md	want: When You Want a Class
+Solutions/25_Patterns--Template_Method/README.md	hooks: Hooks and the Misspelled Override builds the set of known names inside CODE from the classes in CODE
+Solutions/25_Patterns--Template_Method/README.md	hooks: Hooks and the Misspelled Override explains how CODE marks CODE as the fixed part of the *Template Method*
+Solutions/27_Patterns--Factory/README.md	even: so even the table entry disappears
+Solutions/28_Patterns--Function_Objects/README.md	already: CODE already runs from the class outward to CODE
+Solutions/28_Patterns--Function_Objects/README.md	already: CODE's CODE already carries its configuration
+Solutions/28_Patterns--Function_Objects/README.md	never: A CODE is never a root
+Solutions/28_Patterns--Function_Objects/README.md	want: You then want the original behavior
+Solutions/29_Patterns--Changing_the_Interface/README.md	already: A module is already a namespace
+Solutions/29_Patterns--Changing_the_Interface/README.md	wants: A caller who wants to act on the warning must change where they get the CODE
+Solutions/31_Patterns--State_Machines/README.md	want: so create one when you want a separate row and not when you want a separate value
+Solutions/32_Patterns--Multiple_Dispatching/README.md	even: An even count always leaves the opposite pair to define
+Solutions/32_Patterns--Multiple_Dispatching/README.md	even: remembering that an even count leaves each weapon an opposite that draws
+Solutions/32_Patterns--Multiple_Dispatching/README.md	want: Which behavior you want depends on whether a subclass is a new competitor or a variation on an existing one
+Solutions/32_Patterns--Multiple_Dispatching/README.md	wants: Only a caller that wants the tally needs to pass its own CODE in
+Solutions/34_Patterns--Composite_and_Interpreter/README.md	never: A CODE case that only descends never yields its own path
+Solutions/35_Patterns--Flyweight/README.md	never: so an invalid CODE never reaches the pool
+Solutions/38_Patterns--Simulation/README.md	even: since even a heavily scaled step is still big enough to leave the neighborhood into which the grain is settling
+Solutions/38_Patterns--Simulation/README.md	never: so the summary statistic cannot tell "finished" from "never started
+Solutions/38_Patterns--Simulation/README.md	wants: and finishing it means more steps than anyone wants to watch
+Solutions/41_Functional--Toolkits/README.md	wants: A caller who wants two different schedules has to pass a different integer
+Solutions/41_Functional--Toolkits/README.md	wants: and a caller who wants this function to share a program-wide random stream has no way to say so
+Solutions/42_Functional--Error_Handling/README.md	already: The asserts document what the CODE return has already established
+Solutions/43_Functional--Confidence/README.md	already: CODE already keeps everyone in a group when a roster divides unevenly
+Solutions/43_Functional--Confidence/README.md	even: The measurement the exercise asks for therefore comes out even at either precision
+Solutions/44_Effects--Effect_Management/README.md	never: with a CODE that CODE was never awaited
+Solutions/45_Effects--Generators/README.md	want: That is the argument for annotating a local whose value comes from a call whose return type you want to pin down
+Solutions/46_Effects--Stateless/README.md	already: which CODE reads as "already returned
+Solutions/47_Effects--Stateless_in_Practice/README.md	already: CODE is for a value you already have
+Solutions/47_Effects--Stateless_in_Practice/README.md	already: The two factories in CODE already have the same signature
+Solutions/47_Effects--Stateless_in_Practice/README.md	already: because a function is already an object with a type
+Solutions/47_Effects--Stateless_in_Practice/README.md	never: CODE cannot catch what never entered the channel

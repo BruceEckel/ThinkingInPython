@@ -110,7 +110,7 @@ The tile's symbol, name, and walkability are intrinsic:
 every grass cell agrees on them,
 so they go in a [record](18_Techniques--Performance.md#record).
 The tile's position is extrinsic.
-It is the cell's coordinates in the grid, so the `Tile` object never stores it,
+It is the cell's coordinates in the grid, so it stays out of the `Tile` object,
 and an operation that needs the position takes it as an argument.
 
 The factory is `tile()`, a constructor function under `functools.cache`.
@@ -342,7 +342,7 @@ On a pooled instance the re-run assigns the same three components again,
 through the `object.__setattr__()` calls a frozen record's `__init__()` makes,
 so the object stays as it was.
 Once a field has a `default_factory` or `__post_init__()` has a side effect,
-the re-run repeats that factory call or that side effect on an object that is already finished.
+the re-run repeats that factory call or that side effect on a finished object.
 
 Every caller that asks for the same components receives the same `Color`,
 so a caller that set `crimson.red` would change every crimson in the program.
@@ -459,7 +459,7 @@ so two uses of one value can hold two objects,
 and an `is` comparison between them answers `False`.
 Use `lru_cache` where a stored result saves recomputation,
 not as a flyweight factory.
-The weak pool never makes that trade.
+The weak pool avoids that trade.
 Its entry lives exactly as long as something references the object,
 so every request during that life returns the one object.
 
