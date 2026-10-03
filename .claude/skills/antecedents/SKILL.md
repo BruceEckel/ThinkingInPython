@@ -181,6 +181,16 @@ if the paragraph needs its sentences reordered, leave it for `cohesion`.
   do not change it to "you", however the sentence is otherwise rewritten.
 - **Headings stay** unless the section is already being edited;
   a renamed heading changes its anchor.
+- **A heading copied into link text can carry a pattern name.**
+  Replacing "the previous section" with `[Heading](#anchor)` puts the
+  heading's words into prose, where `tools/pattern_names.py` requires
+  every design-pattern name in italics, and the gate fails on a plain one.
+  Check the heading against the names in `tools/data/pattern_names.txt`.
+  If the word names the pattern, italicize it in the link text
+  (`[A Callable Object as a *Command*](#a-callable-object-as-a-command)`).
+  If it is the ordinary word, add the heading to that file's `!` exclusions
+  (`!Restoring Part of a State`).
+  Run `uv run tip pattern-names` after the pass either way.
 - **Check the exemption records first.**
   `deep_review_db.md` in the repo root carries standing exemptions.
 
