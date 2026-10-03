@@ -25,8 +25,22 @@ not a hit and a code span ending a clause is not read as prose. Links
 keep their text and lose their targets.
 
 Report-only: it prints the hits and exits 0, because the heuristic is
-literal and no gate runs it. `--fail` exits 1 when anything is found.
+literal and no gate runs it. `--fail` exits 1 when a NEW hit is found.
 It runs inside `tip prose` and alone as `tip stranded`.
+
+Every hit in the book was read once by a human, and the ones judged
+false positives live in `tools/data/stranded_baseline.txt`, so a run
+prints only what is new. An entry is `path<TAB>clause`: the clause
+text with its whitespace normalized and no line number, so a reflow or
+an edit elsewhere in the file leaves the entry alone, while an edit to
+the clause itself retires it and the rewritten clause reports as NEW.
+An entry is a judged false positive, not an exemption from the rule.
+The default run prints each NEW hit and a summary
+(`N new, M accepted`), and lists a `stale` entry that matches no hit
+any more. `--all` prints every hit, marked NEW or accepted. `--accept`
+appends every NEW hit to the baseline and drops the stale entries,
+keeping the file sorted and free of duplicates. A run given paths
+compares against those files' entries alone, and refuses `--accept`.
 
 Known false-positive shapes, all left in the report for a human:
 an infinitive marker closing a clause ("the thing you want to"), a
@@ -37,9 +51,12 @@ no pronoun ("a function to look up"), the quoted word itself
 fronted relative clause whose object is far ahead ("the tool with
 which you work on").
 
-    uv run python -m tools.stranded_prepositions          # whole book
+    uv run python -m tools.stranded_prepositions          # new hits
+    uv run python -m tools.stranded_prepositions --all    # every hit
+    uv run python -m tools.stranded_prepositions --accept # judged false
     uv run python -m tools.stranded_prepositions Chapters/30_*.md
     uv run tip stranded CH=30
+    uv run tip stranded-accept
 """
 
 import argparse
@@ -47,7 +64,7 @@ import re
 from collections.abc import Iterator
 from pathlib import Path
 from typing import Final
-from tools.config import ROOT
+from tools.config import DATA_DIR, ROOT
 from tools.markdown import Document
 from tools.prose import (
     BLOCKQUOTE,
@@ -84,6 +101,18 @@ IDIOMS: Final[frozenset[str]] = frozenset("""
 """Trailing bigrams (hyphen-joined) in which the final word is an
 adverb or a fixed idiom, not a preposition missing its object."""
 MIN_WORDS: Final = 3
+BASELINE: Final = DATA_DIR / "stranded_baseline.txt"
+HEADER: Final = (
+    "# Stranded-preposition hits a human read and judged false\n"
+    "# positives: a particle after a noun object, an adverb, a clause\n"
+    "# the splitter cut, an infinitive marker. An entry is not an\n"
+    "# exemption from the rule.\n"
+    "# path<TAB>clause, with the clause's whitespace normalized and no\n"
+    "# line number, so a reflow leaves an entry alone and an edit to\n"
+    "# the clause retires it. Rewritten by `tip stranded-accept`; read\n"
+    "# the delta with `tip stranded` before accepting.\n"
+    "# See tools/stranded_prepositions.py.\n"
+)
 
 CODE_SPAN = re.compile(r"``[^`]*``|`[^`]*`")
 IMAGE = re.compile(r"!\[[^\]]*\]\([^)]*\)")
@@ -209,24 +238,73 @@ def display(path: Path) -> str:
         return path.as_posix()
 
 
+def key(shown: str, clause: str) -> str:
+    """The baseline line for a hit: path and clause, no line number."""
+    return f"{shown}\t{' '.join(clause.split())}"
+
+
+def load_baseline(path: Path | None = None) -> set[str]:
+    """The accepted keys, without comments or blank lines."""
+    path = path or BASELINE
+    if not path.exists():
+        return set()
+    return {
+        line for line in path.read_text(encoding="utf-8").splitlines()
+        if line.strip() and not line.startswith("#")
+    }
+
+
+def write_baseline(entries: set[str], path: Path | None = None) -> None:
+    """The header plus the sorted entries, with LF line endings."""
+    path = path or BASELINE
+    body = "".join(f"{entry}\n" for entry in sorted(entries))
+    path.write_text(HEADER + body, encoding="utf-8", newline="\n")
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(
         description=__doc__,
         formatter_class=argparse.RawDescriptionHelpFormatter)
     add_paths_arg(ap)
     ap.add_argument("--fail", action="store_true",
-                    help="exit 1 when any clause is found")
+                    help="exit 1 when any NEW clause is found")
+    ap.add_argument("--all", action="store_true",
+                    help="print every hit, marked NEW or accepted")
+    ap.add_argument("--accept", action="store_true",
+                    help="add the NEW hits to the baseline and drop "
+                         "stale entries")
     args = ap.parse_args(argv)
+    if args.paths and args.accept:
+        ap.error("--accept rewrites the whole baseline; give no paths")
     paths = md_files(args.paths or [ROOT / "Chapters", ROOT / "Solutions"])
+    shown_paths = {display(p) for p in paths}
     found = sorted(
         (display(f.path), f.line, f.message)
         for p in paths for f in find(Document.parse(p))
     )
+    baseline = load_baseline()
+    scope = {e for e in baseline if e.split("\t", 1)[0] in shown_paths}
+    current = {key(shown, clause) for shown, _, clause in found}
+    new = [(s, n, c) for s, n, c in found if key(s, c) not in baseline]
+    stale = sorted(scope - current)
+    if args.accept:
+        added = {key(s, c) for s, _, c in new}
+        write_baseline((baseline - set(stale)) | added)
+        print(f"Baseline: added {len(added)}, dropped {len(stale)} "
+              f"stale, in {display(BASELINE)}")
+        return 0
     for shown, line, clause in found:
-        print(f"{shown}:{line}: {clause}")
-    files = len({shown for shown, _, _ in found})
-    print(f"{len(found)} stranded prepositions in {files} files")
-    return 1 if args.fail and found else 0
+        accepted = key(shown, clause) in baseline
+        if accepted and not args.all:
+            continue
+        mark = "accepted" if accepted else "NEW"
+        print(f"{mark:8} {shown}:{line}: {clause}")
+    for entry in stale:
+        shown, clause = entry.split("\t", 1)
+        print(f"stale    {shown}: {clause}")
+    print(f"{len(new)} new, {len(found) - len(new)} accepted"
+          + (f", {len(stale)} stale" if stale else ""))
+    return 1 if args.fail and new else 0
 
 
 if __name__ == "__main__":

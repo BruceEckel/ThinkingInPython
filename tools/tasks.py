@@ -381,13 +381,22 @@ def prose(v: Vars) -> None:
     py("tools.stranded_prepositions", *prose_files(v))
 
 
-@task("Report clauses ending on a stranded preposition (report-only)")
+@task("Report new clauses ending on a stranded preposition "
+      "(report-only; accept with `tip stranded-accept`)")
 def stranded(v: Vars) -> None:
     """Report prose clauses that end on a stranded preposition ("the
     field they sit on"). It reports and never gates; `tip prose` runs it
-    after Vale. CH= picks one chapter and its Solutions file.
+    after Vale. CH= picks one chapter and its Solutions file. Hits
+    judged false positives live in tools/data/stranded_baseline.txt, so
+    the run prints only new ones; ARGS=--all lists every hit.
     """
-    py("tools.stranded_prepositions", *prose_files(v))
+    py("tools.stranded_prepositions", *prose_files(v), *v.words("ARGS"))
+
+
+@task("Add new stranded-preposition hits to the baseline and drop "
+      "stale entries", secondary=True)
+def stranded_accept(v: Vars) -> None:
+    py("tools.stranded_prepositions", "--accept")
 
 
 also("checks", "pattern-names")

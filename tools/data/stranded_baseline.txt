@@ -1,0 +1,93 @@
+# Stranded-preposition hits a human read and judged false
+# positives: a particle after a noun object, an adverb, a clause
+# the splitter cut, an infinitive marker. An entry is not an
+# exemption from the rule.
+# path<TAB>clause, with the clause's whitespace normalized and no
+# line number, so a reflow leaves an entry alone and an edit to
+# the clause retires it. Rewritten by `tip stranded-accept`; read
+# the delta with `tip stranded` before accepting.
+# See tools/stranded_prepositions.py.
+Chapters/01_Introduction.md	The result is much better than anything I managed before
+Chapters/01_Introduction.md	You can read straight through
+Chapters/01_Introduction.md	You should be comfortable with
+Chapters/01_Introduction.md	along with the CODE comments that appear from that chapter on
+Chapters/03_Foundations--Containers.md	Entries come out as easily as they go in
+Chapters/03_Foundations--Containers.md	so changes to that CODE still show through
+Chapters/03_Foundations--Containers.md	write one slice expression for each of
+Chapters/04_Foundations--Control_Flow.md	and the outer CODE runs right after
+Chapters/05_Foundations--Functions.md	Nothing checks the arguments on the way in
+Chapters/06_Foundations--Modules_and_Packages.md	That silent failure is also why CODE is an experiment to run rather than a setting to leave on
+Chapters/09_Foundations--Class_Attributes.md	The annotated field in CODE also leaves a class attribute behind
+Chapters/10_Foundations--Cleanup.md	With CODE left on
+Chapters/11_Techniques--Testing.md	CODE only passes because CODE ran first and left its entry behind
+Chapters/11_Techniques--Testing.md	The other half is asking what let the bug through
+Chapters/11_Techniques--Testing.md	When a bug does get through
+Chapters/12_Techniques--Data_Classes_as_Types.md	as it was before
+Chapters/15_Techniques--Context_Managers.md	Write a context manager CODE whose CODE suppresses only CODE and lets everything else through
+Chapters/16_Techniques--Comprehensions.md	A list comprehension consists of
+Chapters/16_Techniques--Comprehensions.md	without touching any real files or leaving anything behind
+Chapters/17_Techniques--Metaprogramming.md	CODE checks the value on its way in
+Chapters/17_Techniques--Metaprogramming.md	CODE needs a common base to live on
+Chapters/18_Techniques--Performance.md	so always set it for a function you have not timed before
+Chapters/18_Techniques--Performance.md	so the first question is not "is the JIT on
+Chapters/19_Techniques--Concurrency.md	and CODE puts back whatever the variable held before
+Chapters/19_Techniques--Concurrency.md	one call in
+Chapters/20_Patterns--Rethinking_Objects.md	and show that the counts are now correct for every route in
+Chapters/22_Patterns--Data_Transfer_Objects.md	passes a package of information around
+Chapters/23_Patterns--Iterators.md	so the type checker carries the element type through
+Chapters/24_Patterns--Singleton.md	People can create as many objects as they like
+Chapters/28_Patterns--Function_Objects.md	and publishing an unhandled event leaves no stray entry behind
+Chapters/28_Patterns--Function_Objects.md	each handler holding a reference to the next and deciding whether to pass the request along
+Chapters/28_Patterns--Function_Objects.md	otherwise leaves a stray entry behind
+Chapters/29_Patterns--Changing_the_Interface.md	Pyright and mypy need their deprecation rule switched on
+Chapters/29_Patterns--Changing_the_Interface.md	and callers keep using it until something tells them not to
+Chapters/30_Patterns--Observer.md	A bound method holds the object it came from
+Chapters/30_Patterns--Observer.md	A responder chooses which notifications to act on
+Chapters/30_Patterns--Observer.md	along with the attribute name to filter by
+Chapters/30_Patterns--Observer.md	set before CODE and cleared after
+Chapters/30_Patterns--Observer.md	so an announcement carries the type of thing that happened and each handler subscribes to the type it cares about
+Chapters/30_Patterns--Observer.md	so every listing asks you to decode which end you are looking at
+Chapters/30_Patterns--Observer.md	so the broadcaster keeps alive only the responders it started with
+Chapters/38_Patterns--Simulation.md	The teleports are not shortcuts but the only way through
+Chapters/41_Functional--Toolkits.md	An odd roster leaves one player over
+Chapters/41_Functional--Toolkits.md	CODE saves each element the first time through
+Chapters/42_Functional--Error_Handling.md	the CODE parameter carries the wrapped function's whole parameter list through
+Chapters/43_Functional--Confidence.md	Decoding those two bytes as Latin-1 returns two characters where one went in
+Chapters/45_Effects--Generators.md	As the CODE it is the value the driver sends in
+Chapters/46_Effects--Stateless.md	CODE puts an instance in
+Chapters/46_Effects--Stateless.md	Here the subtraction leaves nothing behind
+Chapters/47_Effects--Stateless_in_Practice.md	building a fresh event loop for the call and tearing it down after
+Chapters/47_Effects--Stateless_in_Practice.md	two purchases went through
+Chapters/a.md	Name the field they sit on
+Solutions/02_Foundations--Tour/README.md	CODE is CODE with the two branches swapped over
+Solutions/02_Foundations--Tour/README.md	and the literal branch passes its text through
+Solutions/03_Foundations--Containers/README.md	and everything between
+Solutions/04_Foundations--Control_Flow/README.md	**Let an unmatched exception through
+Solutions/11_Techniques--Testing/README.md	**Pass the dependency in
+Solutions/11_Techniques--Testing/README.md	somebody has to read CODE and pass the directory in
+Solutions/14_Techniques--Decorators/README.md	and nothing needs to
+Solutions/14_Techniques--Decorators/README.md	so work out which layer prints before and which after
+Solutions/16_Techniques--Comprehensions/README.md	Stopping there leaves the generator part-way through
+Solutions/21_Patterns--Design_Patterns/README.md	a CODE to pass in
+Solutions/23_Patterns--Iterators/README.md	before or after
+Solutions/25_Patterns--Template_Method/README.md	No checker could catch the omission before
+Solutions/28_Patterns--Function_Objects/README.md	now sees more than it did before
+Solutions/28_Patterns--Function_Objects/README.md	so iterating it in order calls the most specific handlers first and the inherited ones after
+Solutions/29_Patterns--Changing_the_Interface/README.md	and it adds behavior on the way through
+Solutions/29_Patterns--Changing_the_Interface/README.md	and it adds no behavior to a call that goes through
+Solutions/30_Patterns--Observer/README.md	CODE gives the single-player scoring the exercise asks for
+Solutions/30_Patterns--Observer/README.md	CODE receives the name the class body binds each descriptor to
+Solutions/30_Patterns--Observer/README.md	CODE reuses CODE from CODE unchanged and adds the CODE the exercise asks for
+Solutions/30_Patterns--Observer/README.md	so the demo's CODE and the first test still see the group the exercise asks for
+Solutions/30_Patterns--Observer/README.md	that column and that row have moved one color along
+Solutions/31_Patterns--State_Machines/README.md	catch CODE and carry on
+Solutions/32_Patterns--Multiple_Dispatching/README.md	CODE needs no such case because three items leave nothing over
+Solutions/34_Patterns--Composite_and_Interpreter/README.md	and it costs more than it appears to
+Solutions/34_Patterns--Composite_and_Interpreter/README.md	and not before
+Solutions/36_Patterns--Memento/README.md	while a deserializer hands the value straight in
+Solutions/43_Functional--Confidence/README.md	Three students in groups of two leaves one student over
+Solutions/44_Effects--Effect_Management/README.md	CODE rejects negatives but lets zero through
+Solutions/45_Effects--Generators/README.md	since nobody sends anything in
+Solutions/47_Effects--Stateless_in_Practice/README.md	**Show the mismatch getting through
+Solutions/47_Effects--Stateless_in_Practice/README.md	and CODE after the CODE goes through
+Solutions/47_Effects--Stateless_in_Practice/README.md	because its schedule decides *when* to try again and nothing decides *whether* to
