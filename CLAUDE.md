@@ -137,6 +137,13 @@ too, but only after their own prior sync step already copied the Markdown,
 so a marker that needed fixing would otherwise stay one sync behind until
 the next run caught it up.
 
+Both gates and `verify-ch` also run `tools/marker_placement.py` (since
+2026-10-02): a `#:` run must sit directly after the statement that
+printed it, never gathered at the end of a listing. It reports and does
+not self-heal; `tip marker-placement ARGS=--write` moves the runs, and
+its docstring has the layout rules (import output goes below the import
+block, for ruff's `I001`).
+
 Prose-only edits still need `heading_links.py` (cross-references),
 `banned_phrases.py`, and `check_self_reference.py` (claims the book makes
 about its own chapters); all three are in `tip verify`. So is

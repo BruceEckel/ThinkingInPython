@@ -37,6 +37,9 @@ that records the last time the work passed:
   chapter's directory. An edit to one chapter then refreshes that
   chapter. A marker the refresh rewrites changes the file, so the next
   run refreshes it once more and then settles.
+  ``marker_placement --changed-only`` keeps the same digest in a stamp of
+  its own, ``PLACEMENT_STAMP``: the refresh records a chapter before the
+  placement check has looked at it, so one stamp cannot serve both.
 
 Setting ``TIP_FULL=1`` in the environment disables every shortcut. ``tip
 ci``, ``tip release``, and ``tip everything`` set it; ``tip gate
@@ -59,6 +62,7 @@ FULL_RUN_EVERY = timedelta(hours=24)
 TOOLS_STAMP = BUILD_DIR / "tools-tests-stamp.json"
 FULL_RUN_STAMP = BUILD_DIR / "full-run-stamp.json"
 MARKER_STAMP = BUILD_DIR / "marker-stamp.json"
+PLACEMENT_STAMP = BUILD_DIR / "placement-stamp.json"
 # Beyond tools/: what a tool's behavior also depends on.
 TOOLS_EXTRA = ("pyproject.toml", "uv.lock")
 
@@ -168,18 +172,22 @@ def _marker_key(md: Path) -> str | None:
     return resolved.relative_to(ROOT).as_posix()
 
 
-def markers_current(md: Path, context: str) -> bool:
+def markers_current(
+    md: Path, context: str, stamp: Path = MARKER_STAMP,
+) -> bool:
     key = _marker_key(md)
     return (key is not None
-            and _read(MARKER_STAMP).get(key) == marker_digest(md, context))
+            and _read(stamp).get(key) == marker_digest(md, context))
 
 
-def record_markers(passed: list[Path], context: str) -> None:
+def record_markers(
+    passed: list[Path], context: str, stamp: Path = MARKER_STAMP,
+) -> None:
     keyed = [(key, md) for md in passed
              if (key := _marker_key(md)) is not None]
     if not keyed:
         return
-    stamps = _read(MARKER_STAMP)
+    stamps = _read(stamp)
     for key, md in keyed:
         stamps[key] = marker_digest(md, context)
-    _write(MARKER_STAMP, stamps)
+    _write(stamp, stamps)

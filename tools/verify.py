@@ -71,7 +71,7 @@ DOC_OVERRIDES: dict[str, str] = {
     "output": "Update the #: output markers of every chapter changed "
               "since its markers last passed, in both trees",
     "gate": "The gate, minus the marker refresh `output` just did "
-            "(check, reflow, slugs, ty, ruff, run, pytest, solutions-gate)",
+            "(check, reflow, slugs, placement, ty, ruff, run, pytest, solutions-gate)",
 }
 
 

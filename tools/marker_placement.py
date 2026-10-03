@@ -50,11 +50,21 @@ from tools.config import (
 from tools.pycode import walk_fenced
 from tools.repo import (
     add_jobs_arg, block_slug, chapter_stem, load_glob_list, write_text_lf)
+from tools.skip_stamps import (
+    PLACEMENT_STAMP, forced_full, marker_context, markers_current,
+    record_markers)
 from tools.validate_output import (
     collect_files, collect_now, encode_output, is_marker, run_location,
     run_watched)
 
 SOLUTIONS_TREE = BUILD_DIR / "solutions"
+
+
+def tree_for(path: Path) -> Path:
+    """The build tree a Markdown file's listings run from."""
+    if path.resolve().is_relative_to(SOLUTIONS_DIR):
+        return SOLUTIONS_TREE
+    return EXAMPLES_TREE
 
 
 @dataclass
@@ -249,8 +259,7 @@ def process(
     path: Path, *, write: bool, skips: list[str],
 ) -> tuple[bool | None, str]:
     """Check one Markdown file. True: clean; False: something to report."""
-    tree = (SOLUTIONS_TREE if path.resolve().is_relative_to(SOLUTIONS_DIR)
-            else EXAMPLES_TREE)
+    tree = tree_for(path)
     chapter = chapter_stem(path)
     lines = path.read_text(encoding="utf-8").splitlines(keepends=True)
     out: list[str] = []
@@ -293,9 +302,26 @@ def main(argv: list[str] | None = None) -> int:
                     help="Markdown files or directories")
     ap.add_argument("--write", action="store_true",
                     help="move misplaced runs (default: report)")
+    ap.add_argument("--changed-only", action="store_true",
+                    help="skip a file unchanged since it last passed "
+                         "(see tools/skip_stamps.py)")
     add_jobs_arg(ap, "files")
     args = ap.parse_args(argv)
     files = [f for f in collect_files(args.targets) if f.suffix == ".md"]
+    if not files:
+        print("No Markdown files found.")
+        return 1
+    contexts = {tree: marker_context(tree, utils_dir(tree))
+                for tree in (EXAMPLES_TREE, SOLUTIONS_TREE)}
+    unchanged: list[Path] = []
+    if args.changed_only and not forced_full():
+        unchanged = [f for f in files if markers_current(
+            f, contexts[tree_for(f)], PLACEMENT_STAMP)]
+        files = [f for f in files if f not in unchanged]
+        if not files:
+            print(f"All {len(unchanged)} file(s) unchanged since their "
+                  "markers were last in place.")
+            return 0
     work = functools.partial(
         process, write=args.write, skips=load_glob_list(NORUN_FILE))
     jobs = min(max(1, args.jobs), len(files))
@@ -311,9 +337,18 @@ def main(argv: list[str] | None = None) -> int:
             print(f"{path.as_posix()}\n{report}", end="")
         if result is False:
             bad += 1
+        else:
+            record_markers([path], contexts[tree_for(path)],
+                           PLACEMENT_STAMP)
     verb = "rewritten" if args.write else "to fix"
-    print(f"\n{bad} file(s) {verb} of {len(files)}.")
-    return 1 if bad and not args.write else 0
+    unchanged_note = (f", {len(unchanged)} unchanged since they last "
+                      "passed" if unchanged else "")
+    print(f"\n{bad} file(s) {verb} of {len(files)}{unchanged_note}.")
+    if bad and not args.write:
+        print("`tip marker-placement ARGS=--write` moves the runs; "
+              "a skipped block needs `tip output` or a human.")
+        return 1
+    return 0
 
 
 if __name__ == "__main__":

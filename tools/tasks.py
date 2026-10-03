@@ -168,8 +168,8 @@ def markers_fresh(v: Vars) -> bool:
     return v.get("MARKERS") == "fresh"
 
 
-@task("The gate without sync or site (check, reflow, slugs, output, ty,"
-      " ruff, run, pytest, solutions-gate)",
+@task("The gate without sync or site (check, reflow, slugs, output,"
+      " placement, ty, ruff, run, pytest, solutions-gate)",
       deps=("solutions-gate",))
 def gate(v: Vars) -> None:
     """The local gate without the site build: line endings, listing density,
@@ -211,6 +211,13 @@ def gate(v: Vars) -> None:
     touches prose only). The refresh executes every marked block, about half
     of `verify`'s gate time, so running it twice cost ~15 s a run for no
     information. Run alone, the gate always refreshes.
+
+    marker_placement.py runs after the refresh, in both gates, and fails on
+    a #: run that sits below a statement other than the one that printed it
+    (`tip marker-placement` has the details). It reports rather than
+    self-heals: a move can need a human's eye, as the first sweep's
+    misplaced comment in chapter 20 showed. It keeps its own stamp, so a
+    chapter unchanged since its markers were last in place is skipped.
     """
     full_if_asked(v)
     py("tools.tools_tests", *v.words("PYTEST_N"))
@@ -231,6 +238,7 @@ def gate(v: Vars) -> None:
     py("tools.extract_examples", "--write")
     if not markers_fresh(v):
         py("tools.validate_output", "--update", "Chapters")
+    py("tools.marker_placement", "--changed-only", "Chapters")
     tool("ty", "check", "build/examples")
     tool("ruff", "check", "build/examples")
     py("tools.run_examples", "--quick")
@@ -263,6 +271,7 @@ def solutions_gate(v: Vars) -> None:
     if not markers_fresh(v):
         py("tools.validate_output", "--update", "--tree", SOLUTIONS_TREE,
            "Solutions")
+    py("tools.marker_placement", "--changed-only", "Solutions")
     tool("ty", "check", "build/solutions")
     tool("ruff", "check", "build/solutions")
     py("tools.run_examples", "--quick", "--tree", SOLUTIONS_TREE)
@@ -544,7 +553,8 @@ def marker_placement(v: Vars) -> None:
     every #: run that sits below a statement other than the one that printed
     it, such as markers gathered at the end of a listing. validate_output.py
     cannot see this: it checks a run against everything printed since the
-    previous run. ARGS=--write moves the runs; the module docstring of
+    previous run. The gate runs it on changed chapters only. ARGS=--write
+    moves the runs; the module docstring of
     tools/marker_placement.py gives the layout rules (import output goes
     below the import block, for ruff's I001).
     """

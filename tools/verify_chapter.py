@@ -26,6 +26,8 @@ The steps, in order, mirror `verify` (fixers first, markers before sync):
    refreshing their ``#:`` markers. This is the step the full gate spends
    its time on, and the one worth narrowing. A rewritten marker triggers
    a second extract so the build trees carry the new text.
+   ``marker_placement`` then checks that each run sits directly after
+   the statement that printed it, in both files.
 6. Sync ``Examples/`` and the code beside ``Solutions/<chapter>/README.md``
    from the Markdown, then the drift and orphan checks over both.
 7. The Markdown gates: ``check_all`` on the chapter (every gate check, or
@@ -123,6 +125,9 @@ def main(argv: list[str] | None = None) -> int:
         # extracted from the old text.
         results += [run("re-extract", extract),
                     run("solutions-re-extract", extract_sol)]
+    results.append(run("marker placement",
+                       [*PY, "-m", "tools.marker_placement",
+                        *map(str, prose)]))
 
     results += [
         run("sync", [*extract, "-o", "Examples"]),
