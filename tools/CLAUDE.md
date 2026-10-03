@@ -76,16 +76,27 @@ question of every anchored cross-chapter link: does the linked section
 cover what the sentence credits it with? It reports and never gates,
 and caches in `tools/data/link_support_verdicts.json`. Its first run
 found chapter 42 linking "put the meaning in the type" to annotation
-syntax in chapter 08. `tools/prose_calibration.py` asks four questions of
+syntax in chapter 08. `tools/prose_calibration.py` asks five questions of
 sentences Bruce rewrote in his editor commits and of neighbors he left
-alone: three Scores (subject-verb distance, ambiguous pointers, skipped
-steps) and a Noul, `would_rewrite`, that shows six before/after pairs
-from `bruce_edit_db.md` and asks whether he would rewrite the sentence.
+alone: four Scores (subject-verb distance, ambiguous pointers, skipped
+steps, overloaded claims) and a Noul, `would_rewrite`, that shows six
+before/after pairs from `bruce_edit_db.md` and asks whether he would
+rewrite the sentence.
 It reports on the half of the commits the examples did not come from.
 On 2026-09-27 (115 restructured rewrites, 299 controls) `would_rewrite`
 led at AUC 0.66 ± 0.03, unchanged by length banding; pointers and
-skipped steps were near 0.58, subject-verb distance near chance. That
-is enough to rank sentences for a human, not to edit on. Rerun it
+skipped steps were near 0.58, subject-verb distance near chance.
+On 2026-10-03 (110 restructured rewrites, 294 controls) the added
+`overloaded` question scored AUC 0.59 ± 0.03, 0.58 within length
+bands. That trails `would_rewrite` (0.63) and sits just under
+pointers (0.62) and skipped steps (0.61).
+The same day three Nouls took the wordings of the riff prose linter's
+rules that had read well on chapter 30 (`preamble`, `fractal_summary`,
+`comma_tail`), asked with the sentence's paragraph and heading as
+`edit_patterns.py` asks: 0.54, 0.50, and 0.56 on the restructured
+rewrites, so none of them tracks what Bruce rewrites, and `comma_tail`
+alone reaches the Score questions' range.
+That is enough to rank sentences for a human, not to edit on. Rerun it
 before letting a model score steer a prose pass.
 
 `tip edit-patterns` (`tools/edit_patterns.py`, `/edit-done` step 3b)

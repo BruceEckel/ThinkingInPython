@@ -16,7 +16,7 @@ more and also score higher on every one of these questions, so the
 report also gives the AUC of length alone, and each question's AUC
 within length bands, which is the part length cannot explain.
 
-Four questions. Three are Scores for one named fault each. The fourth,
+Eight questions. Four are Scores for one named fault each. The fifth,
 `would_rewrite`, is a Noul that asks the author's question directly and
 shows six before/after pairs from `bruce_edit_db.md`'s promoted rules
 (`EXAMPLES`). Examples drawn from the data would inflate its score on
@@ -24,6 +24,10 @@ that data, so the samples split by commit into two halves: the commits
 the examples came from are forced into the first, any sample containing
 an example's phrase is dropped from the second, and the report is
 computed on the second half alone. `would_rewrite` is asked only there.
+The last three, `preamble`, `fractal_summary`, and `comma_tail`, are
+Nouls for the faults the riff prose linter flags. They judge `sentence`
+with its `paragraph` and `section_heading` as context, so each sample
+carries both, taken from the sentence's own passage.
 
 Which commits count: no Co-Authored-By trailer and a subject of the
 form his editor writes ("Update 30_Patterns--Observer.md", "more ch
@@ -156,6 +160,27 @@ QUESTIONS: dict[str, dict[str, Any]] = {
             "reader cannot recover from the surrounding text.",
         ],
     },
+    "overloaded": {
+        "type": "score",
+        "instructions": (
+            "A claim is a statement that could stand as a sentence of "
+            "its own. How many independent claims does `sentence` "
+            "carry after its main verb, and how are they joined? Use "
+            "`previous_sentence` and `next_sentence` only to "
+            "understand the sentence."),
+        "criteria": [
+            "The sentence makes one claim or gives one instruction.",
+            "The sentence makes two claims joined by a stated relation, "
+            "such as a cause, a condition, a contrast, or a purpose, so "
+            "neither would stand well alone.",
+            "The sentence makes two independent claims that could each "
+            "stand as a sentence, joined only by 'and', a semicolon, or "
+            "a colon.",
+            "The sentence stacks several independent claims or "
+            "consequences after one main verb, so a reader would follow "
+            "it more easily as separate sentences.",
+        ],
+    },
     "would_rewrite": {
         "type": "noul",
         "instructions": {
@@ -183,6 +208,56 @@ QUESTIONS: dict[str, dict[str, Any]] = {
         },
     },
 }
+
+QUESTIONS |= {
+    "preamble": {
+        "type": "noul",
+        "instructions": (
+            "Judge `sentence`, using `paragraph` and `section_heading` "
+            "as context. Does `sentence` announce what it is about to "
+            "say instead of saying it?"),
+        "criteria": {
+            "true": ("The sentence tells the reader what the text is "
+                     "about to do, show, or discuss, such as 'This "
+                     "section explains...', 'The next two listings "
+                     "isolate...', or 'This chapter opened by "
+                     "saying...', without making its point."),
+            "false": ("The sentence states a fact, an instruction, or a "
+                      "claim, or introduces a list or listing whose "
+                      "items follow directly."),
+        },
+    },
+    "fractal_summary": {
+        "type": "noul",
+        "instructions": (
+            "Judge `sentence`, using `paragraph` and `section_heading` "
+            "as context. Does `sentence` restate itself at the start "
+            "or end of a section?"),
+        "criteria": {
+            "true": ("The sentence repeats a point that `paragraph` or "
+                     "the section has already made, in other words, "
+                     "and adds no new information."),
+            "false": ("The sentence adds a fact, a reason, a step, or "
+                      "a consequence not already stated."),
+        },
+    },
+    "comma_tail": {
+        "type": "noul",
+        "instructions": (
+            "Judge `sentence`, using `paragraph` and `section_heading` "
+            "as context. Does `sentence` hang a short tail off a comma "
+            "instead of landing the point?"),
+        "criteria": {
+            "true": ("The sentence ends with a short phrase after a "
+                     "comma (an appositive, an afterthought, an "
+                     "example, or a qualifier such as 'one job each' "
+                     "or 'as with X') that could have been its own "
+                     "sentence or folded into the main clause."),
+            "false": ("The sentence ends on its main clause, or the "
+                      "final comma introduces a full clause."),
+        },
+    },
+}
 HELD_OUT_ONLY = {"would_rewrite"}
 
 
@@ -203,6 +278,10 @@ class Sample:
     after: str
     """The closest sentence in the commit's version, for a rewrite."""
     similarity: float
+    heading: str
+    """The nearest heading above the sentence."""
+    paragraph: str
+    """The whole paragraph holding the sentence."""
 
     @property
     def key(self) -> str:
@@ -236,10 +315,12 @@ def collect(seed: int) -> list[Sample]:
                 git("show", f"{commit}:{path}"), path)
             rewrites = [Sample(True, commit, name, r.before.line,
                                r.before.previous, r.before.text,
-                               r.before.following, r.after, r.similarity)
+                               r.before.following, r.after, r.similarity,
+                               r.before.heading, r.before.paragraph)
                         for r in found]
             alone = [Sample(False, commit, name, s.line, s.previous,
-                            s.text, s.following, "", 1.0) for s in left]
+                            s.text, s.following, "", 1.0, s.heading,
+                            s.paragraph) for s in left]
             if rewrites:
                 per_commit.append((rewrites, alone))
     ever_rewritten = {s.sentence for r, _ in per_commit for s in r}
@@ -392,7 +473,9 @@ def main(argv: list[str] | None = None) -> int:
     if todo:
         answers = judgments.ask(
             [({"previous_sentence": s.previous, "sentence": s.sentence,
-               "next_sentence": s.following}, m) for s, m in todo],
+               "next_sentence": s.following,
+               "section_heading": s.heading,
+               "paragraph": s.paragraph}, m) for s, m in todo],
             progress)
         for (s, m), a in zip(todo, answers):
             entry = cache.setdefault(s.key, {
