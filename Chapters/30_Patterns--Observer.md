@@ -261,9 +261,12 @@ and a class that inherits `Broadcaster` gets `connect()`, `disconnect()`,
 and `announce()`.
 
 A responder returns `None`, as seen in the `Responder` alias.
-The type checker rejects a responder that returns a value.
-Notification runs one way, from broadcaster to responders,
-so `announce()` calls each responder as a statement.
+At runtime, `announce()` discards whatever a responder returns,
+since it calls each responder as a statement.
+The alias turns that silent loss into a type error.
+The type checker rejects a responder that returns a value,
+because the author of that responder likely expected someone to use the value.
+Notification runs one way, from broadcaster to responders.
 *GoF Design Patterns* gives the reason under broadcast communication.
 A notification goes to every connected responder,
 and each one decides whether to handle it,
