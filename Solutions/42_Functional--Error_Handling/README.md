@@ -373,7 +373,7 @@ cannot see that an empty error list means all three succeeded.
 
 [Turning Exceptions into Results](../../Chapters/42_Functional--Error_Handling.md#turning-exceptions-into-results) shows `@safe` as a decorator that catches every exception.
 To take arguments, `safe()` becomes a function that receives the exception types and returns the decorator.
-An `except` clause accepts a tuple of exception types, so the wrapper changes very little.
+An `except` clause accepts a tuple of exception types, so the wrapper changes in one place.
 A `Protocol` with a generic `__call__` keeps the decorated function's signature precise.
 
 <details>

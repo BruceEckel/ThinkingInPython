@@ -1690,7 +1690,7 @@ Evaluating them at that moment raises a `NameError`.
 The standard library's `annotationlib` module handles this case.
 Its `get_annotations()` takes a `format` argument that chooses how to evaluate the annotations,
 and `inspect.get_annotations()` accepts the same argument.
-There are three formats:
+The argument has three values:
 
 - `Format.VALUE`, the default, evaluates each annotation to a real object,
   and raises a `NameError` when a name is missing.

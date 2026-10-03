@@ -332,7 +332,7 @@ loops it replaces.
 <summary>Where to look</summary>
 
 [Exception Chaining](../../Chapters/04_Foundations--Control_Flow.md#exception-chaining) covers `raise ... from` and the `__cause__` and `__context__` attributes.
-The expression after `from` can be any exception object, including one you construct on the spot.
+The expression after `from` can be any exception object, including one the `raise` statement constructs.
 Predict the joining line from `__cause__`, then print both attributes to see which exception each one holds.
 
 <details>
