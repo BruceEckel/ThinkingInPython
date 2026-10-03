@@ -247,10 +247,6 @@ class Broadcaster[T]:
 GoF's `attach()`, `detach()`, and `notify()` become `connect()`, `disconnect()`,
 and `announce()`.
 The call inside the loop changes as well.
-`Subject.notify()` calls `observer.update(self, arg)`,
-so every observer is an object with an `update()` method.
-Each reaction then needs its own class,
-plus an `Observer` interface to declare the method.
 `Broadcaster.announce()` calls `responder(data)`,
 so a function serves as a responder.
 `announce()` passes the data alone, so `Broadcaster` uses the push model.
@@ -260,7 +256,7 @@ Its type parameter `T` sets the type of each notification,
 and a class that inherits `Broadcaster` gets `connect()`, `disconnect()`,
 and `announce()`.
 
-A responder returns `None`, as seen in the `Responder` alias.
+A responder returns `None`, as seen in the `Responder` `type` alias.
 At runtime, `announce()` discards whatever a responder returns,
 since it calls each responder as a statement.
 The alias turns that silent loss into a type error.
@@ -886,7 +882,7 @@ class Broadcaster[T]:
 so `announce()` calls the responders in a generator expression and [unpacks](05_Foundations--Functions.md#unpacking-arguments)
 that generator with `*`, turning each coroutine into its own argument.
 
-The `AsyncResponder` alias makes the type checker reject a plain function as a responder.
+The `AsyncResponder` `type` alias makes the type checker reject a plain function as a responder.
 A responder must return an awaitable,
 and calling an `async` function produces one.
 The type checker also rejects the reverse mistake,
