@@ -131,8 +131,8 @@ I/O-bound work overlaps within a single process,
 with `asyncio` or a thread pool.
 CPU-bound work needs multiple cores.
 A separate process is the traditional way to get more than one core.
-Two other approaches appear later in this chapter,
-each running inside a single process.
+Free threading and subinterpreters, both later in this chapter,
+each run inside a single process.
 
 ## `async def`, `await`, and the Event Loop {#asyncio-mechanics}
 
@@ -154,9 +154,8 @@ which discovers the next available task to run.
    and shuts the loop down.
    This is the entry point, called once to run the program.
    Calling it from inside a coroutine raises `RuntimeError: asyncio.run() cannot be called from a running event loop`.
-   Inside an `async def`, `await` the coroutine directly.
-
-This listing uses all four:
+   Inside an `async def`,
+   `await` the coroutine instead of passing it to `asyncio.run()`.
 
 ```python
 # async_mechanics.py
@@ -196,7 +195,6 @@ If you discard that coroutine object without handing it to `gather()`
 (or `create_task()`), nothing runs,
 and Python points this out with a `RuntimeWarning: coroutine 'fetch' was never awaited` when the garbage collector reclaims it.
 
-The trace shows the event loop's schedule.
 `gather()` wraps each coroutine in a *task*,
 the event loop's unit of scheduling, and starts the tasks in the order given.
 Each runs until it reaches its `await`, so the started lines print as a, b, c.
@@ -463,7 +461,7 @@ which hands the call to a worker thread and awaits its completion.
 not the one running the event loop,
 so the loop stays free to run the other four tasks while each sleep finishes.
 Five offloaded sleeps overlap and finish together,
-the same shape of result `asyncio.sleep()` gives the loop directly.
+the same shape of result `asyncio.sleep()` gives the loop with no worker thread.
 
 [Simulation](38_Patterns--Simulation.md)
 builds a full program on these mechanics:
@@ -611,8 +609,6 @@ Keeping the task objects lets you inspect each outcome after a partial failure.
 so `task.exception()` returns the `ValueError` instead of raising it.
 The group cancels `e` and `f` before they reach their `fetched` print,
 so `task.cancelled()` is `True` for both.
-A partial failure cancels whatever is still in flight.
-It leaves the results of the tasks that succeeded intact.
 
 Cancellation reaches a task by raising `asyncio.CancelledError` inside it,
 at whichever `await` currently suspends it.
@@ -731,7 +727,8 @@ Because the cancellation traces back to its own deadline,
 so the caller sees an ordinary exception instead of a bare cancellation.
 `asyncio.wait_for()` bounds one awaitable the same way.
 [`async_deadlock.py`](#deadlock)
-uses it as an escape hatch so that demo doesn't hang forever.
+uses it to cut off the deadlocked wait after 0.5 seconds,
+so that demo doesn't hang forever.
 `asyncio.timeout()` is the newer, composable form,
 scoping the deadline over an entire block, `TaskGroup` included,
 instead of one call.
@@ -988,9 +985,8 @@ Computing is the other half, and it needs a second mechanism.
 A CPU-bound task cannot overlap if only a single core is available.
 With several cores, it can.
 `ProcessPoolExecutor` runs each call in one of its worker processes,
-each with its own interpreter and its own *Global Interpreter Lock* (GIL),
-the interpreter-wide lock that lets one thread at a time run Python bytecode.
-[The GIL and Free Threading](#the-gil-and-free-threading) explains the lock.
+each with its own interpreter and its own [*Global Interpreter Lock*](#the-gil-and-free-threading)
+(GIL), the interpreter-wide lock that lets one thread at a time run Python bytecode.
 Here, each interpreter has its own,
 so the operating system can place these processes on different cores and run them at the same time:
 
@@ -1117,9 +1113,9 @@ Use `multiprocessing` when the job is a different shape:
 ### Measuring the Speedup
 
 You can test the claim that wall-clock time falls toward a single task's time as you add more cores.
-Split a fixed amount of work into a growing number of tasks,
-keep the pool warm across every measurement,
-and watch how the time changes once task count passes the number of cores:
+`task_scaling.py` splits a fixed amount of work into a growing number of tasks,
+keeps the pool warm across every measurement,
+and shows how the time changes once task count passes the number of cores:
 
 ```python
 # task_scaling.py
@@ -1191,7 +1187,6 @@ One run on a 32-core machine produced this:
      32 tasks:  0.103s (5.85x)
      64 tasks:  0.111s (5.42x)
 
-This is one machine's real output.
 Exact timings shift with load and hardware, but the shape holds.
 Wall time drops sharply up to the core count, then flattens or reverses past it,
 as doubling from 32 to 64 tasks did here.
@@ -1237,10 +1232,9 @@ so one thread at a time runs Python bytecode, no matter how many cores sit idle.
 
 A thread waiting on I/O releases the GIL.
 That release is why a thread pool helps with I/O-bound work.
-The next two examples make that concrete, one for waiting and one for computing.
-Both use the same harness,
-which runs a price function sequentially and threaded, confirms they agree,
-and times each.
+The next two examples, one for waiting and one for computing,
+use the same harness, which runs a price function sequentially and threaded,
+confirms they agree, and times each.
 `compare()` times each variant five times,
 alternating between the two so a stray background load spike slows both,
 and keeps each variant's best with `min`:
@@ -1278,8 +1272,7 @@ def compare(
 
 Two timings of the same type come back from one call,
 so a bare `tuple[float, float]` forces every caller to remember which float came first.
-`Times` names them, as [Data Transfer Objects](22_Patterns--Data_Transfer_Objects.md#returning-multiple-values)
-describes.
+`Times` [names them](22_Patterns--Data_Transfer_Objects.md#returning-multiple-values).
 The two callers below use the two styles a `NamedTuple` allows,
 access by field name and positional unpacking.
 
@@ -1306,7 +1299,7 @@ print("threads at least 3x faster on I/O: "
 
 Five 50-millisecond waits finish in about the time of one.
 Each sleeping thread releases the GIL,
-so the operating system runs another thread while it waits,
+so the operating system runs another thread while the sleeping one waits,
 the same overlap `asyncio` achieves with suspended tasks.
 That overlap is `blocking_the_loop.py` turned inside out.
 A blocking call freezes an event loop,
@@ -1531,8 +1524,7 @@ Fine-grained sharing loses.
 A counter with a lock around every increment serializes the threads all over again,
 and adds lock overhead the GIL never charged.
 On a free-threaded interpreter, threads alone are enough for CPU-bound work,
-and they share memory directly,
-without a process pool's pickling between processes.
+and they share memory without a process pool's pickling between processes.
 
 ## Subinterpreters
 
@@ -1602,7 +1594,7 @@ When threads divide work, the danger comes from shared mutable state.
 The standard solution is a thread-safe queue that hands each item to a single consumer,
 with built-in locking.
 `queue.Queue` is first-in, first-out, while `queue.PriorityQueue`
-(the threaded form of `heapq` seen in [Performance](18_Techniques--Performance.md))
+(the threaded form of [`heapq`](18_Techniques--Performance.md))
 always produces the smallest item.
 A live consumer thread calls `get()` and lets that blocking call do the waiting,
 rather than polling whether the queue is empty:
@@ -1651,13 +1643,12 @@ because the first producer finishes before the pool picks up the second,
 but the order in which jobs enter the queue can vary with scheduling.
 Waiting for both producer futures before submitting the consumer guarantees every job is in the queue before `consume()` starts,
 so the drain still comes out in priority order however the pool scheduled the producers.
-Collecting the producer futures and calling `result()` turns a producer's exception into one you can see,
-as [Parallelism](#what-a-process-pool-requires)'s third point describes.
+Collecting the producer futures and calling `result()` [turns a producer's exception into one you can see](#what-a-process-pool-requires).
 When two jobs share a priority,
 tuple comparison falls through to the second field, the description string.
 
 `consume()` calls `get()` in a loop, the way a live consumer should.
-Parked there, it costs nothing while it waits,
+Parked there, it uses no processor time while it waits,
 and it wakes the instant `put()` adds an item, with no polling in between.
 This listing's queue holds every job by the time `consume()` starts,
 so its first `get()` returns immediately,
@@ -1734,10 +1725,9 @@ Match the queue to the concurrency model.
 A queue is the push half of distributing work.
 A producer decides what each consumer gets.
 The pull half looks simpler.
-Hand every worker the same iterator and let each one take the next item when it is ready.
+Every worker gets the same iterator and takes the next item when it is ready.
 Nothing in the language stops you, and nothing in the language makes it work.
-An iterator is not thread-safe
-([Iterators](23_Patterns--Iterators.md) covers the protocol):
+An [iterator](23_Patterns--Iterators.md) is not thread-safe:
 
 ```python
 # shared_iterator.py
@@ -1798,8 +1788,8 @@ and the workers need no changes.
 If the iterator also defines `send()`, `throw()`, or `close()`,
 the wrapper serializes those too.
 
-A generator ([Iterators](23_Patterns--Iterators.md#generators) covers them)
-fails differently, and louder:
+A [generator](23_Patterns--Iterators.md#generators) fails differently,
+and louder:
 
 ```python
 # shared_generator.py
@@ -2077,8 +2067,7 @@ and plenty of C extensions block the calling thread and expose no `async` entry 
 If Python had always supported coroutines,
 you could expect every library to conform.
 But rewriting all existing libraries to use `asyncio` instead of threads is not realistic.
-`asyncio.to_thread()`, from [Escaping to a Thread](#escaping-to-a-thread),
-is the standard library solution.
+[`asyncio.to_thread()`](#escaping-to-a-thread) is the standard library solution.
 Thus, even a program written as `asyncio` from top to bottom keeps a thread pool underneath,
 because the libraries it calls still block.
 
@@ -2114,9 +2103,9 @@ You can support the claim that a thread costs far more memory than a task.
 `threading.stack_size()` sets the stack CPython reserves for each new thread and reports the size last set,
 or `0` while the platform's default is in effect.
 A common default across platforms is on the order of one mebibyte.^[A mebibyte (MiB) is 2<sup>20</sup> while a megabyte (MB) is 10<sup>6</sup>.]
-`tracemalloc` measures a task's actual heap footprint directly,
+`tracemalloc` measures a task's actual heap footprint,
 since a task consists of ordinary Python objects.
-You can calculate the ratio between a thread's stack and a task's footprint:
+`task_vs_thread_memory.py` calculates the ratio between a thread's stack and a task's footprint:
 
 ```python
 # task_vs_thread_memory.py
@@ -2476,7 +2465,6 @@ Only in the last decade or so have programmers widely adopted advances such as a
 The vocabulary this chapter builds,
 from processes and threads to tasks and coroutines,
 is a small corner of the territory.
-Here are a few of the topics beyond it:
 
 - **Barriers:** Make a group of threads or tasks wait until every one of them arrives,
   then release them together.
@@ -2484,12 +2472,12 @@ Here are a few of the topics beyond it:
   a barrier is a rendezvous point where the running code arrives and blocks,
   often reused across repeated phases,
   not a supervisor waiting from outside for everything to finish.
-- **Message passing and channels:** Let concurrent units exchange data by sending values instead of sharing memory directly.
+- **Message passing and channels:** Let concurrent units exchange data by sending values instead of sharing memory.
   Actor languages and CSP, below,
   are two different disciplines built on this same idea.
 - **Actor languages:** Give each unit of concurrency the shape of an actor,
   an isolated object that reacts only to messages sent to its own mailbox,
-  shares no state directly, and can spawn more actors.
+  shares no state, and can spawn more actors.
   The most established production examples include Erlang,
   built at Ericsson for telephone switches.
   Elixir is newer and built on Erlang's BEAM virtual machine.

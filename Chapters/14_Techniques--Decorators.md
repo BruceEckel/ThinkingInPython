@@ -114,14 +114,13 @@ so `announce` runs when Python executes the `def` for `cheese()`,
 before any call.
 Only the body of `wrapper()` waits for the call.
 
-`wrapper()` is a *closure*.
+`wrapper()` is a [*closure*](40_Functional--Foundations.md#closures).
 Defined inside its decorator, it refers to `func`,
 a variable from the enclosing scope, not one of its own parameters.
 Python keeps `func` alive for as long as `wrapper()` exists,
 even after the decorator has returned.
 That lets `cheese()`, called long after decoration finished,
 still reach the original `cheese` function through `func`.
-[Closures](40_Functional--Foundations.md#closures) covers the general mechanism.
 
 Decoration is a simple kind of [metaprogramming](17_Techniques--Metaprogramming.md).
 The same idea appears in design patterns as the *Decorator* pattern:
@@ -201,8 +200,8 @@ def test_trace_returns_original_result() -> None:
 
 ### `**P` and `R` Keep the Static Interface {#p-and-r-keep-the-static-interface}
 
-`wraps` keeps the runtime interface, and the type parameters
-(introduced in [Static Types](08_Foundations--Static_Types.md#generic-functions-and-classes))
+`wraps` keeps the runtime interface,
+and the [type parameters](08_Foundations--Static_Types.md#generic-functions-and-classes)
 keep the static one.
 `trace[**P, R]` declares two of them.
 `R` is the wrapped function's return type.
@@ -220,7 +219,7 @@ They bind the wrapper's arguments to the parameters captured by `**P`,
 so the type checker accepts `add(2, 3)` but rejects `add("x")` or `add(2, 3, 4)`,
 although the body of `wrapper()` forwards anything.
 Without `**P` you fall back to `*args: Any, **kwargs: Any`,
-and the wrapper swallows any arguments,
+and the wrapper accepts any arguments,
 discarding the signature the decorator should preserve.
 
 `R` checks the wrapper's result the same way.
@@ -241,8 +240,8 @@ Decorating a coroutine function raises no exception.
 without running the coroutine's body,
 so `result` holds that coroutine object rather than the value the coroutine will eventually produce.
 The trace line then prints `<- add = <coroutine object add at 0x...>`.
-A wrapper over a coroutine function must be `async def` and `await func(*args, **kwargs)`,
-the shape covered in [`async def`, `await`, and the Event Loop](19_Techniques--Concurrency.md#asyncio-mechanics).
+A wrapper over a coroutine function must be [`async def`](19_Techniques--Concurrency.md#asyncio-mechanics)
+and `await func(*args, **kwargs)`.
 
 ## Decorators That Take Arguments
 
@@ -281,8 +280,8 @@ if __name__ == "__main__":
 ```
 
 Take the return type apart: `Callable[[Callable[P, R]], Callable[P, R]]`.
-`Callable[[A, B], X]` reads as "a callable that takes `A` and `B` and returns `X`"
-(see the summary in [Static Types](08_Foundations--Static_Types.md#containers)).
+[`Callable[[A, B], X]`](08_Foundations--Static_Types.md#containers)
+reads as "a callable that takes `A` and `B` and returns `X`".
 The first bracket group is a list holding the parameter types,
 so `[Callable[P, R]]` is a parameter list of length one,
 not a list of callables.
@@ -479,7 +478,6 @@ if __name__ == "__main__":
 The two `@` lines mean `greet = trace(repeat(times=2)(greet))`.
 `@repeat(times=2)` wraps `greet()` first, then `@trace` wraps that result,
 so a single `greet("Bob")` traces one call whose body runs twice.
-Each decorator wraps the result of the one below it.
 Stacking works because each wrapper preserves the interface of what it wraps.
 Every layer looks like the original function,
 so the layers compose to any depth.
@@ -572,7 +570,7 @@ and calling `add(2, 3)` invokes `__call__()`.
 `wraps` is the decorator form of that same call.
 `@wraps(func)` above `def wrapper` runs `update_wrapper(wrapper, func)`.
 The class form has no inner function to decorate, only `self`,
-so it calls `update_wrapper()` directly.
+so its `__init__()` calls `update_wrapper(self, func)`.
 
 Like the function form, the class is generic in `**P` and `R`,
 so `__call__()` keeps the wrapped signature and `add(2, 3)` still type-checks as an `int`.
@@ -659,8 +657,7 @@ def test_counts_are_independent_per_function() -> None:
 ```
 
 The function form can keep a count too,
-in a variable of the decorator's body that `wrapper()` updates
-([Closures](40_Functional--Foundations.md#closures) shows how, with `nonlocal`).
+in a variable of the decorator's body that `wrapper()` updates through [`nonlocal`](40_Functional--Foundations.md#closures).
 That variable is visible only inside the closure,
 while `hello.count` is an attribute any caller can read.
 The wrapper's own `__dict__` could hold the count as well,
@@ -789,8 +786,8 @@ with no hint that the real cause is a missing `__get__()`.
 shows the descriptor protocol,
 which a class-based decorator must implement to work on methods.
 
-A function is already a descriptor,
-so `wrapper()` in the function form binds to an instance like any other method:
+Because a function is a descriptor,
+`wrapper()` in the function form binds to an instance like any other method:
 
 ```python
 # method_function_form.py
@@ -823,7 +820,6 @@ catching the same problem.
 
 ### Function Form or Class Form?
 
-Compare the two class-form cases.
 `@trace` with no arguments calls `trace(add)`.
 The function goes straight to the constructor.
 `@repeat(times=3)` calls `repeat(times=3)` first, producing an instance,
@@ -853,10 +849,8 @@ A decorator meant for methods either returns a function,
 as the function form and `repeat_class.repeat` both do,
 or implements `__get__()`.
 
-A context manager can also decorate a function,
+A [context manager can also decorate a function](15_Techniques--Context_Managers.md#context-manager-as-decorator),
 bracketing every call with its setup and cleanup code.
-[Context Managers](15_Techniques--Context_Managers.md#context-manager-as-decorator)
-shows `contextlib.ContextDecorator`.
 
 ## Decorating Classes
 
@@ -1054,9 +1048,9 @@ A class for every pizza-and-topping combination explodes: Margherita,
 Margherita with olives, Margherita with olives and feta, and so on.
 Each new topping doubles the menu.
 
-Instead, model the toppings as decorators.
+Instead, the toppings become decorators.
 A plain pizza knows its own cost and description.
-A topping dynamically wraps a pizza, adds to the cost,
+A topping wraps a pizza at runtime, adds to the cost,
 and adds to the description.
 Because a topping is a pizza, you can wrap a topping in another topping.
 
@@ -1129,7 +1123,6 @@ Both read as a `float`, so both match.
 `Topping.__init__()` sets `self.name = type(self).__name__`,
 reading each subclass's own name at construction time instead of repeating it as a string.
 `Garlic`, `Olives`, and `Feta` don't mention their own names.
-The class name is the topping name.
 
 Adding a new topping means adding one class with one line, `add_cost`.
 Changing the price of a topping means changing one number, in one place.
@@ -1155,9 +1148,7 @@ to illustrate the unrelated *Builder* pattern.
 The two examples share a topic, not a type.
 
 A *Decorator* keeps the wrapped object's interface and adds behavior.
-*Proxy*, *Adapter*, and *Façade* wrap the same way and differ in intent.
-[Distinguishing the Wrappers](29_Patterns--Changing_the_Interface.md#distinguishing-the-wrappers)
-sorts the four.
+*Proxy*, *Adapter*, and *Façade* wrap the same way and [differ in intent](29_Patterns--Changing_the_Interface.md#distinguishing-the-wrappers).
 
 ```python
 # test_pizza_decorator.py
@@ -1179,8 +1170,9 @@ def test_single_topping() -> None:
 ## Decorators You Already Know
 
 Several decorators elsewhere in this book use this mechanism.
-`@property`, `@cached_property`, `@staticmethod`, and `@classmethod`
-(see [Properties](07_Foundations--Classes.md#properties) and [Static and Class Methods](07_Foundations--Classes.md#static-and-class-methods))
+[`@property`](07_Foundations--Classes.md#properties), `@cached_property`,
+[`@staticmethod`](07_Foundations--Classes.md#static-and-class-methods),
+and [`@classmethod`](07_Foundations--Classes.md#static-and-class-methods)
 each wrap a function the same way `trace` does,
 but return a descriptor instead of a plain wrapper.
 That lets them change how attribute access behaves,
@@ -1196,7 +1188,7 @@ and `@functools.lru_cache` wrap a function the way `add_behavior` does,
 in a wrapper that holds `func` and calls it,
 storing results in a memo dictionary instead of printing around the call.
 Understanding any of these needs no new syntax.
-They are ordinary decorators.
+
 The one piece of machinery left for later is the descriptor protocol that `@property`,
 `@cached_property`, `@staticmethod`, and `@classmethod` implement.
 [Metaprogramming](17_Techniques--Metaprogramming.md#learning-a-name-with-__set_name__)

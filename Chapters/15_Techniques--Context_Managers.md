@@ -19,9 +19,9 @@ with pool.lease() as conn:
     conn.query("SELECT name FROM users")
 ```
 
-The connection returns to the pool on every path out of that block,
-including the exception path, and the borrower writes nothing to arrange it.
-[An Object Pool](#an-object-pool) builds that pool.
+The connection returns to the [pool](#an-object-pool)
+on every path out of that block, including the exception path,
+and the borrower writes nothing to arrange it.
 
 ## A Basic Context Manager
 
@@ -108,7 +108,6 @@ It knows nothing about generators or `@contextmanager`.
 A *context manager* is any object that implements two methods: `__enter__()`,
 which runs at the start of the block, and `__exit__()`, which runs at the end.
 `@contextmanager` manufactures such an object from a generator function.
-Writing the class by hand shows the machinery directly.
 Every hand-written context manager class in this chapter keeps `__init__()` in longhand rather than becoming a `@dataclass`,
 so every line between the class statement and the two protocol methods reads as ordinary Python:
 
@@ -145,8 +144,7 @@ Python runs `with Trace("A") as t:` in five steps:
 5. Call the manager's `__exit__()`, no matter how the block finished.
 
 `__enter__()` returns the object that `as` binds, often `self`.
-The return annotation `Self`
-(introduced in [Static Types](08_Foundations--Static_Types.md#the-self-type))
+The return annotation [`Self`](08_Foundations--Static_Types.md#the-self-type)
 declares an instance of the class on which you call the method,
 so it adapts to subclasses.
 
@@ -328,9 +326,8 @@ print("survived")
 #: survived
 ```
 
-`suppress` is a class named like a function because you use it like one.
-See [Naming Conventions](02_Foundations--Tour.md#naming-conventions)
-for when a class departs from `CapWords`.
+`suppress` is a class [named like a function](02_Foundations--Tour.md#naming-conventions)
+because you use it like one.
 
 A class manager suppresses through the return value of `__exit__()`.
 `expected_one` returns `True` for one exception type,
@@ -375,7 +372,7 @@ so a `ZeroDivisionError` still matches `expected_one(ArithmeticError)`.
 `exc!r` prints the exception's `repr()`,
 which includes both its type and its arguments, not just `exc_type.__name__`.
 `__enter__()` returns `None` because this manager has nothing to hand to `as`.
-You can still write `as`, but it binds `None`.
+An `as` clause still works, but it binds `None`.
 
 ### The `expected` Manager
 
@@ -513,8 +510,8 @@ wrapped by `textwrap.fill()` when that line is wider than `WIDTH`.
 `WIDTH` is 57 because this book's listings are 60 columns wide and a `#:` output line spends three of them on its prefix.
 An exception of another type propagates,
 and a call that raises nothing fails with an `AssertionError`,
-so `expect()` reports a demo that stops failing instead of quietly printing nothing.
-The `/` makes `types` and `fn` positional-only,
+so `expect()` flags a demo that stops failing instead of quietly printing nothing.
+The `/` makes `types` and `fn` [positional-only](05_Foundations--Functions.md#positional-only-and-keyword-only-parameters),
 so every keyword argument goes to `fn`.
 [`**P`](14_Techniques--Decorators.md#p-and-r-keep-the-static-interface)
 ties `*args` and `**kwargs` to `fn`'s own signature,
@@ -592,13 +589,10 @@ if __name__ == "__main__":
 The parentheses in `@banner("report")` matter.
 The call constructs the manager, which then decorates the function.
 Each call of the decorated function builds a fresh manager,
-so you can call `report()` any number of times,
-each with its own enter and exit.
+so `report()` can run any number of times, each with its own enter and exit.
 The single-use caution from `trace_gen.py` still holds for the manager object you name in a `with`.
 `ContextDecorator` applies [`functools.wraps`](14_Techniques--Decorators.md#wraps-keeps-the-runtime-interface),
 so `report` keeps its name and docstring.
-
-Here's the same `banner` as a class.
 
 ```python
 # banner_cm.py
@@ -640,7 +634,7 @@ the class form re-enters the same instance on every call to `report()`,
 so every call shares any state the instance holds.
 
 `banner`'s wrapper comes from `ContextDecorator`
-(directly in `banner_cm.py`, or by way of `@contextmanager` in `context_decorator.py`),
+(as the base class in `banner_cm.py`, or by way of `@contextmanager` in `context_decorator.py`),
 and that wrapper always calls the function once, unchanged,
 with setup before it and cleanup after.
 So `banner` sees neither the arguments nor the return value of `report()`,
@@ -831,8 +825,7 @@ Choose these before writing `__enter__()` and `__exit__()` by hand.
   without `expected`'s printing or its catch-everything default.
 - `closing(obj)` calls `obj.close()` on exit,
   for objects that have `close()` but are not context managers themselves.
-- `ExitStack` manages a dynamic or conditional set of managers,
-  as [Combining Context Managers](#combining-context-managers) shows.
+- `ExitStack` manages a [dynamic or conditional set of managers](#combining-context-managers).
 - `ContextDecorator` lets a context manager double as a decorator,
   as `banner` shows.
 - `nullcontext(value)` is a do-nothing manager whose `__enter__()` returns `value`,
@@ -1059,8 +1052,6 @@ Across sixteen hundred lease-and-release cycles,
 spread over eight threads competing for two connections,
 `held` stays at or below two.
 A thread that arrives while the pool is empty blocks in `get()` instead of racing past it.
-`over capacity` stays `False` because `Queue`'s blocking throttles the threads,
-and the demo measures that rather than assuming it.
 `available()` is a snapshot for the demo, not a synchronization primitive.
 `Queue.qsize()` becomes approximate once more than one thread is borrowing,
 because another thread can lease or return between the count and its use.
@@ -1103,7 +1094,7 @@ def test_objects_reused_not_recreated() -> None:
 A production pool adds refinements to the `Pool` skeleton,
 such as lazily creating items on first demand,
 validating an item before lending it out,
-and giving `get()` a timeout so a starved borrower fails loudly instead of waiting forever.
+and giving `get()` a timeout so a starved borrower gets a `queue.Empty` exception instead of waiting forever.
 
 None of those refinements guard against the opposite mistake.
 Nothing in `Pool` stops a borrower from keeping a reference after the `with` block ends,
@@ -1138,11 +1129,11 @@ Calling `stale.query()` after the first `with` block ended works as if `second` 
 because they are the same object.
 For a mutable pooled resource, that is the source of corruption.
 Two borrowers each believe they have exclusive use of one connection.
-Guarding against it takes a wrapper that invalidates the borrower's handle on exit,
+Guarding against a stale reference takes a wrapper that invalidates the borrower's handle on exit,
 one more refinement the `Pool` skeleton leaves out.
 
 Each of those refinements is a change inside `lease()`,
-invisible to every `with pool.lease()` in the codebase.
+invisible to every `with pool.lease()`.
 That is the protocol's payoff.
 The borrower's contract is two lines long, the return is impossible to forget,
 and everything hard about custody lives on the other side of the `yield`.

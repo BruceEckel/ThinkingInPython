@@ -67,8 +67,7 @@ def test_hello_is_not_a_palindrome() -> None:
 At this point `palindrome.py` does not exist,
 so running this file fails before a single assertion runs.
 `pytest` cannot import a module that is not there.
-That failure is the point.
-It confirms the test catches a missing implementation, not just a wrong one.
+That failure confirms the test catches a missing implementation as well as a wrong one.
 
 ```python
 # palindrome.py
@@ -101,8 +100,8 @@ No base class needs inheriting,
 and no special assertion methods need memorizing.
 `pytest` rewrites `assert` so that a failure still shows you both sides of the comparison.
 
-Most of this chapter's tests check the following `Account` class, a `@dataclass`
-([Data Classes as Types](12_Techniques--Data_Classes_as_Types.md) explains the decorator):
+Most of this chapter's tests check the following `Account` class,
+a [`@dataclass`](12_Techniques--Data_Classes_as_Types.md#data-classes):
 
 ```python
 # account.py
@@ -175,8 +174,7 @@ def test_interest_uses_approx(funded: Account) -> None:
 This file previews two features that get their own sections later in this chapter:
 the `parametrize`[^parametrize] mark runs one test over several inputs,
 and the `funded` fixture builds a prepared account for each test that names it as a parameter.
-The `@` lines apply decorators, which [Decorators](14_Techniques--Decorators.md)
-explains.
+The `@` lines apply [decorators](14_Techniques--Decorators.md).
 Here they mark the functions for `pytest`.
 
 Run the test suite by typing `pytest` in the project directory.[^book-tests]
@@ -284,8 +282,9 @@ and you cannot tell by looking which tests do.
 ## Parametrizing Tests
 
 When the same logic should run against several inputs, do not copy the test.
-Mark the test with `parametrize`, as `test_nonpositive_deposit_raises()` does,
-and `pytest` runs it once per case and reports each separately.
+If you mark the test with `parametrize`,
+as `test_nonpositive_deposit_raises()` does,
+`pytest` runs it once per case and reports each separately.
 That single function becomes three independent tests,
 and a failure names the case that failed.
 
@@ -337,10 +336,8 @@ Each test gets its own freshly built `funded` account,
 so tests cannot leak state into each other.
 If a fixture needs cleanup,
 it can `yield` the value and run teardown code after the `yield`.
-A function containing `yield` is a generator.
-[Iterators](23_Patterns--Iterators.md#generators) covers the mechanism,
-and a fixture needs only the shape.
-For example:
+A function containing `yield` is a [generator](23_Patterns--Iterators.md#generators),
+and a fixture needs only its shape.
 
 ```python
 # test_teardown.py
@@ -404,13 +401,12 @@ def preloaded(request: pytest.FixtureRequest) -> Account:
     return Account(request.param)
 ```
 
-Take `bank_name` first.
-`pytest` builds the `scope="session"` fixture once and reuses it,
+`pytest` builds the session-scoped `bank_name` fixture once and reuses it,
 and that reuse suits expensive resources.
 The reuse is the risk as well as the point.
 Every test receives the same object,
 so one test that mutates it changes what the next test sees.
-A session fixture that returns a mutable object shows the leak directly:
+A session fixture that returns a mutable object shows the leak:
 
 ```python
 # test_session_leak.py
@@ -439,7 +435,7 @@ Both tests pass, and that is the problem.
 `test_first_write()` ran first and left its entry behind.
 If you swap the two functions' order in the file,
 `test_second_sees_leftover()` fails, since nothing has written `"seen"` yet.
-Keep session fixtures to values nothing modifies, like `bank_name`,
+Keep session fixtures to immutable values, like `bank_name`,
 or to a resource with its own reset,
 and leave anything a test mutates at the default per-test scope.
 
@@ -581,7 +577,7 @@ def test_missing_file_raises(
 ```
 
 `data_dir()` reads `APP_DATA` on every call,
-so `monkeypatch.setenv()` can change the directory it returns.
+so `monkeypatch.setenv()` can change the directory `data_dir()` returns.
 A module-level `DATA_DIR = Path(os.environ.get("APP_DATA", "."))` reads the variable once,
 at import time, before any test body runs,
 so patching the environment afterward changes nothing.
@@ -707,7 +703,6 @@ Both tests check the same arithmetic.
 The injected one runs with no `monkeypatch`,
 and its signature names the source of the time.
 
-Injection is not free.
 The `rng` or `now` parameter must appear on every function between the caller and the code that needs it.
 When that code sits several calls deep in a real codebase,
 you widen every signature along the way,
@@ -843,7 +838,6 @@ that `send` ran exactly once, and that it ran with this argument.
 A plain stub cannot make that check.
 `fake_urlopen()` remembers nothing about the calls it receives.
 
-Accepting any call has a cost.
 A `Mock` accepts a call the real function would reject,
 so a test keeps passing after the real signature changes.
 `create_autospec()`, also in `unittest.mock`,

@@ -3,8 +3,8 @@
 > A loop says how to build a collection, one step at a time.
 > A comprehension says what the collection is, and Python builds it.
 
-*Comprehensions* build one collection from another in a single expression
-([Control Flow](04_Foundations--Control_Flow.md#comprehensions) introduces them).
+[*Comprehensions*](04_Foundations--Control_Flow.md#comprehensions)
+build one collection from another in a single expression.
 The idea originated in mathematical set-builder notation,
 and passed into functional programming.
 Haskell had list comprehensions, and Python borrowed them.
@@ -45,8 +45,6 @@ print(squared_ints)
 ```
 
 ![The parts of a list comprehension, numbered in the order Python evaluates them](_images/listComprehensions)
-
-In this comprehension:
 
 -   The iterator walks through each member `e` of the input sequence `a_list`.
 -   The predicate checks if the member is an integer.
@@ -102,15 +100,14 @@ and its brackets show at a glance that it produces a list.
 So the `lambda` makes `map_and_filter.py` worse, not `map()`.
 [Functional Foundations](40_Functional--Foundations.md) returns to the choice.
 
-The `# type: ignore` comments mark a cost beyond readability.
 `filter()` with a `lambda` predicate does not narrow the element type,
 so `ty` still sees `int | str` coming out and rejects `e ** 2`.
 Pyright infers the mixed list literal as `list[Unknown]` and checks nothing there.
 The comprehension's `if isinstance(e, int)` does narrow,
-so `list_comprehension.py` needs no such comment.
+so `list_comprehension.py` needs no `# type: ignore` comment.
 `filter()` can narrow,
-but only when its predicate is a named function annotated to return `TypeIs[int]` or `TypeGuard[int]` rather than `bool`
-(the [narrowing summary](08_Foundations--Static_Types.md#type-narrowing) covers the pair).
+but only when its predicate is a named function annotated to return [`TypeIs[int]` or `TypeGuard[int]`](08_Foundations--Static_Types.md#type-narrowing)
+rather than `bool`.
 `filter(None, items)` is the other narrowing form.
 It drops the falsy values, and the type checker knows no `None` survives.
 
@@ -144,7 +141,7 @@ With `base = 3` in the class body,
 The outermost iterable is the one part Python evaluates in the enclosing scope,
 so `[n for n in range(base)]` works.
 
-The walrus operator is the exception to the comprehension's scope.
+The walrus operator escapes the comprehension's scope.
 `total := total + n` assigns in the enclosing scope,
 so `total` holds the running sum after the comprehension finishes.
 That leak is deliberate.
@@ -206,7 +203,7 @@ print(unique == same)
 ```
 
 `same` builds a list with a list comprehension, then passes it to `set()`.
-The result is the same,
+The result is identical,
 but the throwaway list costs time and memory that the set comprehension avoids.
 
 ## Dictionary Comprehensions
@@ -245,7 +242,6 @@ Inverting assumes the values are unique.
 `Arthur` and `Robin` both sit at seat `1`.
 `Robin`, entered later, overwrites `Arthur` at key `1`,
 the same rule any duplicate dictionary key follows.
-The result has no entry for `Arthur`.
 
 ## Nested Comprehensions
 
@@ -326,7 +322,7 @@ and the comprehension produces a wrong list with no exception.
 Everything to the right of `in` is an ordinary iterable expression,
 so anything that produces one works there.
 
-Use `zip()` to walk two sequences together, taking one element from each:
+`zip()` walks two sequences together, taking one element from each:
 
 ```python
 # zip_pairs.py
@@ -339,7 +335,7 @@ print([f"{n}={v}" for n, v in zip(names, values)])
 `zip()` stops at the end of the shorter sequence.
 Pass `strict=True` to make a length mismatch raise a `ValueError` instead of silently truncating.
 
-Unpack a tuple in the `for` clause's target,
+The `for` clause's target can unpack a tuple,
 here a `(name, function)` pair applied to a value:
 
 ```python
@@ -411,8 +407,6 @@ A generator expression does not start walking until `sorted()` pulls on it,
 and that pull comes outside the `with`.
 By then the context manager has deleted the directory,
 and `Path.walk()` ignores the error unless you pass `on_error`.
-[Generator Expressions](#the-gap-between-creation-and-consumption)
-returns to that gap.
 
 `root.rglob("*.py")` finds the same two files in one line,
 with no explicit walk and no comprehension.
@@ -532,8 +526,6 @@ for n in [1, 2, 3]:
 
 The `for` loop prints the same values without building a wasted list.
 With the comprehension's brackets gone, nothing suggests an unused collection.
-Use a comprehension when you want the collection it produces,
-and a `for` loop when you want the side effect.
 If nothing assigns or uses a comprehension's result, write it as a loop instead.
 
 ## Generator Expressions {#generator-expressions}
@@ -583,8 +575,8 @@ print(initials)
 
 A set or dict must hold every element, so no lazy `set` or `dict` exists.
 `set(...)` or `dict(...)` consumes the whole generator immediately.
-The set comprehension `{len(w) for w in words}` and the dict comprehension `{w: w[0] for w in words}` build the same results,
-read more directly, and are the better choice.
+The set comprehension `{len(w) for w in words}` and the dict comprehension `{w: w[0] for w in words}` build the same results without a call to `set()` or `dict()`,
+and are the better choice.
 
 Use a generator expression when the consumer takes values one at a time and does not need them all at once,
 such as `sum()`, `any()`, `all()`, `min()`, or `max()`:
@@ -603,8 +595,7 @@ print(max(len(str(n)) for n in nums))
 
 None of these builds an intermediate collection of a million items,
 and `any()` stops when it finds a match.
-`str.join()` is the exception.
-It needs two passes, one to size the result and one to fill it,
+`str.join()` needs two passes, one to size the result and one to fill it,
 so it converts its argument to a list first.
 A generator expression therefore saves nothing over a list comprehension there.
 
@@ -681,7 +672,7 @@ covers the values they receive as well as the ones they produce.
 
 `path_walk_comprehension.py` flattens a tree with two `for` clauses.
 Python 3.15 ([PEP 798](https://peps.python.org/pep-0798/))
-adds a more direct way to flatten.
+adds a way to flatten with one `for` clause.
 The unpacking operators `*` and `**` may appear in the output expression of a comprehension or generator expression,
 splicing each iterable or mapping into the result.
 PEP 798 extends the [PEP 448](https://peps.python.org/pep-0448/)
@@ -719,7 +710,7 @@ print({*s for s in [{1, 2}, {3}]})
 
 `[*row for row in rows]` reads as "splice each `row` in,"
 and produces the same flat list as the two-`for` `[x for row in rows for x in row]`,
-while saying what it does more directly.
+with one `for` clause instead of two.
 It is a shallow flatten, splicing only the outer iterable,
 so the nested `[2, 3]` above comes through unflattened.
 `**` does the same for dictionaries,

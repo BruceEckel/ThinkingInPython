@@ -39,7 +39,7 @@ not at the size that is convenient to type.
 
 ## Profilers
 
-A *profiler* looks for the slow spots in your code, so you know where to focus.
+A *profiler* looks for the slow spots, so you know where to focus.
 You may think you "have a pretty good idea where the slowdown is,"
 but programmers turn out to be bad at guessing.
 A profiler tells you for sure, preventing wasted time.
@@ -49,8 +49,7 @@ The first is the classic `cProfile`,
 a deterministic tracing profiler that arrived in 2006 and records every function call and return.
 Its numbers are exact, but the instrumentation slows the program,
 sometimes enough to distort the behavior you are measuring.
-The second, new in Python 3.15, is a sampling profiler,
-described after the `cProfile` report.
+The second, new in Python 3.15, is a sampling profiler.
 You run `cProfile` on a script from the command line:
 
     uv run python -m cProfile -s cumulative my_program.py
@@ -265,8 +264,8 @@ insulating the measurement from startup cost and clock granularity.
 Timings differ from machine to machine,
 so the following example prints a comparison instead of raw numbers.
 The numbers are one flag away.
-Run any measured listing in this book with `--numbers` to see what your machine does
-([Numbers on Your Machine](#numbers-on-your-machine)).
+Run any measured listing in this book with [`--numbers`](#numbers-on-your-machine)
+to see what your machine does.
 A `list` tests membership by scanning.
 `target in as_list` walks the list from the start,
 comparing each element until it finds a match or reaches the end.
@@ -298,7 +297,7 @@ print(f"set at least 100x faster: {t_set * 100 < t_list}")
 `timeit.timeit()` calls its first argument repeatedly and returns the total elapsed time in seconds for every call combined,
 not the time for one call.
 That first argument is a `lambda` here rather than a string of code,
-since a `lambda` can close over `target`, `as_list`, and `as_set` directly,
+since a `lambda` can close over `target`, `as_list`, and `as_set`,
 with no separate `setup` argument needed to build them.
 `number` sets how many times `timeit` calls the lambda, 100 in this case.
 Leaving `number` out defaults to a million calls,
@@ -316,7 +315,7 @@ and the smallest of them is the run with the least interference.
 Report `min(...)`, not the mean.
 A slow run means something stole the CPU,
 so averaging folds that theft into your answer,
-while the fastest run is the closest you get to measuring only your code.
+while the fastest run is the closest you get to measuring your code alone.
 
 `timeit` also has a command-line form for one-off questions:
 
@@ -381,8 +380,6 @@ The cheapest platform change is a newer CPython.
 3.11 alone measured 1.25x faster than 3.10 across the `pyperformance` suite,
 a range of 10-60% depending on the workload,
 and later releases have continued that work.
-Moving a project forward two or three releases costs a test run rather than a rewrite.
-A speedup that needs neither new code nor new hardware is rare.
 
 Two more speedups need no new code: the tail-calling interpreter,
 and the experimental just-in-time compiler inside CPython.
@@ -409,9 +406,8 @@ in place of one large C `switch` that dispatches every instruction.
 The C compiler turns each of those calls into a jump,
 and the loop that runs Python bytecode gets faster.
 The tail call is in C, inside the interpreter.
-It is unrelated to tail-call optimization of Python functions,
-which CPython does not do, as [Recursion](41_Functional--Toolkits.md#recursion)
-notes.
+It is unrelated to [tail-call optimization of Python functions](41_Functional--Toolkits.md#recursion),
+which CPython does not do.
 
 The tail-calling interpreter changes nothing in your program,
 and nothing in your program can tell.
@@ -515,12 +511,12 @@ and the What's New that reports them is still a draft.
 The report sets aside one microbenchmark, `unpack_sequence`,
 and the rest range from roughly 15% slower to more than twice as fast,
 so the mean predicts your program poorly.
-Measuring your own program costs two runs.
-Time the workload with `PYTHON_JIT` set to `1` and to `0`,
+To measure your own program,
+time the workload with `PYTHON_JIT` set to `1` and to `0`,
 and change nothing else.
 
-Numba's `@njit` ([JIT Compilation with Numba](#jit-compilation-with-numba))
-is also a just-in-time compiler, and the two make opposite trades.
+Numba's [`@njit`](#jit-compilation-with-numba) is also a just-in-time compiler,
+and the two make opposite trades.
 The CPython JIT asks nothing of you,
 applies to whatever code turns out to be hot, and pays in percentages.
 `@njit` applies only to numeric functions,
@@ -575,9 +571,8 @@ Other examples:
   (one bytecode appends the element, instead of an attribute lookup and a call).
   Write it for the readability.
   The speed is a rounding error.
-- The C-implemented standard library's `itertools`, `collections`,
-  and `functools` are faster than hand-rolled equivalents
-  ([Iterators](23_Patterns--Iterators.md#reusable-algorithms) tours the iterator algorithms).
+- The C-implemented standard library's [`itertools`](23_Patterns--Iterators.md#reusable-algorithms),
+  `collections`, and `functools` are faster than hand-rolled equivalents.
 
 As a last resort in a proven hot loop,
 hoist a repeated attribute or global lookup into a local,
@@ -770,7 +765,7 @@ print(heapq.nlargest(2, [5, 1, 8, 3, 2]))
 After `heapify()` the smallest element sits at index 0.
 `nsmallest()` and `nlargest()` answer top-N questions without heapifying the list first.
 
-Through Python 3.13, `heapq` only built a min-heap.
+Through Python 3.13, `heapq` built only a min-heap.
 Getting a max-heap meant negating every value going in and out.
 Python 3.14 added `_max` variants
 (`heapify_max()`, `heappush_max()`, `heappop_max()`, and friends)
@@ -889,7 +884,7 @@ Timsort detects the existing run and `sorted()` wins outright.
 A heap is not automatically the right choice.
 Measure with data shaped like production data.
 `heapq.nsmallest(100, data)`, introduced in `heap_queue.py`,
-answers this top-N question directly,
+answers this top-N question in one call,
 and is the tool to use before hand-rolling either comparison here.
 The heap fits a different shape of problem:
 pushes and pops interleaved over time, with nothing to presort in advance.
@@ -960,9 +955,8 @@ Fitting the whole data set in memory gives you more than a second pass.
 Random access, sorting,
 and the `bisect` searches in `bisect_search.py` all need an indexable structure,
 not a stream of values that arrive once and disappear.
-NumPy's vectorized arithmetic ([Vectorize with NumPy](#vectorize-with-numpy))
-needs the same thing: a whole array in memory,
-not values arriving one at a time.
+NumPy's [vectorized arithmetic](#vectorize-with-numpy) needs the same thing:
+a whole array in memory, not values arriving one at a time.
 
 The risk is the cliff at the edge of that memory.
 Performance holds steady as the data approaches available RAM,
@@ -971,8 +965,6 @@ A data set that fits runs at full speed.
 One that no longer fits forces the operating system to swap pages to disk,
 turning microseconds into milliseconds, a thousandfold slowdown.
 Past that point the process fails outright, with `MemoryError` or an OS kill.
-Nothing warns you as the data approaches the limit,
-and everything changes the moment it crosses.
 
 The cliff is the argument for laziness.
 If a data set can outgrow memory, stream it from the start,
@@ -1033,8 +1025,7 @@ and the collector can reclaim none of them.
 For a value computed once per object,
 use [`functools.cached_property`](07_Foundations--Classes.md#cached-property),
 which stores the result on the instance, so the result dies with the instance.
-A class that declares `__slots__` cannot use `cached_property`
-(see [When Slots Does Not Fit](#when-slots-does-not-fit) below).
+A class that declares `__slots__` [cannot use `cached_property`](#when-slots-does-not-fit).
 
 ## Reduce Memory Overhead
 
@@ -1149,7 +1140,7 @@ print(f"slots at least 5x smaller: "
 ```
 
 `expected(AttributeError)` catches the frozen error because `FrozenInstanceError` subclasses `AttributeError`.
-`sys.getsizeof()` reports only an object's own size, not what it references,
+`sys.getsizeof()` reports an object's own size, not what it references,
 so `frozen_bytes` adds the dict's size on top.
 One machine measured 344 bytes against 48, roughly seven to one.
 The exact byte counts vary by platform and Python build,
@@ -1238,7 +1229,6 @@ as `shapes_oo.py` in [Rethinking Objects](20_Patterns--Rethinking_Objects.md#abs
 does.
 A class that needs an option `record()` lacks keeps `@dataclass` written out:
 `order=True`, or `weakref_slot=True` for a weak reference.
-The next section shows how slots break a weak reference and a `cached_property`.
 
 ### When Slots Does Not Fit {#when-slots-does-not-fit}
 
@@ -1411,7 +1401,6 @@ The second trap is about direction, not lifetime.
 A `memoryview` over immutable `bytes` supports reading and slicing,
 but writing through it raises a `TypeError` regardless of whether anything else has it open.
 `memory_view.py` above writes through a view of a `bytearray`, which is mutable.
-Only a view of `bytes` is read-only.
 
 The saving shows up at a size worth measuring:
 
@@ -1523,8 +1512,8 @@ compiles such a function to machine code on its first call:
 and Numba compiles the `fast_count_primes` it returns at the first call.
 Calling `fast_count_primes(1)` first pays the compilation and warm-up cost outside the timed region,
 so the comparison measures steady-state speed.
-Numba shines on numeric code over simple types and NumPy arrays,
-often running nearly as fast as C.
+On numeric code over simple types and NumPy arrays,
+Numba often runs nearly as fast as C.
 The first call pays a compilation delay,
 and code that uses general Python objects, such as custom classes,
 does not compile.
@@ -1583,7 +1572,7 @@ so no single array expression produces it:
 
 `collatz_lengths()` takes a NumPy array and returns one,
 so it composes with vectorized NumPy code on either side.
-Compiling changes only the loop's interior.
+Compiling changes the loop's interior alone.
 The same Python source runs as machine code instead of as bytecode over boxed `int` objects.
 That division is the pattern in practice.
 Use a vectorized NumPy expression wherever the shape of the computation allows it,
@@ -1603,8 +1592,8 @@ tested example. -->
 
 Moving the hot function into a compiled language works well.
 Rust fits because its tooling makes the bridge nearly painless.
-Ask your AI to convert the hot Python function,
-and it can walk you through the rest of the process.
+If you ask your AI to convert the hot Python function,
+it can walk you through the rest of the process.
 Once you're done, you import a module that looks from the outside like any other Python module,
 except that it runs faster.
 
@@ -1741,7 +1730,7 @@ Numbers, strings, bytes, and NumPy arrays cross cheaply.
 The list `collatz_lengths()` takes and returns carries 50,000 integers across the boundary each way,
 which sounds like the thing to avoid.
 But a hundred-odd loop iterations of real work follow each integer,
-so the conversion cost disappears.
+so the conversion cost is small beside that work.
 The question is not the object count on its own but the work done per object crossed.
 
 The repository's `rust/README.md` explains how to build and run `fastcount` yourself.

@@ -63,8 +63,8 @@ so `case 200:` also matches `200.0` and `case 1:` matches `True`.
 `None`, `True`, and `False` are the exception.
 Those three compare with `is`, so `case True:` does not match `1`.
 
-For a value-to-value lookup like this, a dictionary is often shorter
-(see [When Not to Match](#when-not-to-match)).
+For a value-to-value lookup like this,
+a [dictionary is often shorter](#when-not-to-match).
 
 ## Alternatives and Capture
 
@@ -99,8 +99,6 @@ print(step("jump"))
 The alternatives in `step()` are literals, which bind nothing.
 When alternatives do capture, each one must bind the same set of names,
 so the body can use those names whichever alternative matched.
-`nested_patterns.py` in [Patterns Nest](#patterns-nest)
-has a `case` of that kind.
 
 ## A Bare Name Captures, a Dotted Name Compares
 
@@ -108,8 +106,7 @@ A bare name always binds.
 It does not compare against a variable of that name,
 so a named constant in a `case` silently captures instead.
 A *value pattern* is a dotted name, and it does compare.
-`Signal` is an `Enum`
-([Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#enums-are-types-too) introduces them):
+`Signal` is an [`Enum`](12_Techniques--Data_Classes_as_Types.md#enums-are-types-too):
 
 ```python
 # value_patterns.py
@@ -291,7 +288,6 @@ print(locate(Point(3, 4)))
 
 `Point(0, 0)` matches a point whose fields are both zero.
 `Point(0, y)` matches when `x` is zero and captures `y`.
-The literal and the capture combine in one pattern.
 
 Despite the call syntax, a class pattern builds nothing.
 It tests the subject's type and reads its attributes.
@@ -589,7 +585,7 @@ Without `as` you must choose between testing the shape and keeping the object.
 The second case alternates two class patterns and binds `n` from either,
 inside a one-element sequence pattern.
 `survey([Point(0, 5)])` matches, but a list of two points does not.
-The compiler enforces the same-names rule from [Alternatives and Capture](#alternatives-and-capture).
+The compiler enforces the [same-names rule](#alternatives-and-capture).
 Adding a third alternative `| Point(1, 1)`, which binds nothing,
 fails with `SyntaxError: alternative patterns bind different names`.
 
@@ -674,11 +670,9 @@ Python has no `sealed` keyword.
 `assert_never()` plus a type checker fills that role instead.
 An `if`/`isinstance()` chain can reach the same guarantee,
 but only if you remember to end it with `assert_never()`.
-A `match` makes the shape of the dispatch explicit.
+A `match` makes the form of the dispatch explicit.
 
 `Shape` turns the classic OOP "shapes" example into a closed type union instead of a class hierarchy.
-[Dynamic Binding vs. Pattern Matching](#dynamic-binding-vs-pattern-matching)
-compares the two approaches directly.
 
 The string `"x"` is no `Shape`,
 so the test's `area("x")` call carries a `# type: ignore`.
@@ -822,7 +816,7 @@ print(round(email.cost() + sms.cost() + push.cost(), 4))
 `@abstractmethod` forces `Email`, `Sms`,
 and `Push` to define both `render()` and `cost()`.
 If you leave one out, the class stays abstract.
-Instantiating it raises a `TypeError`.
+Instantiating that class raises a `TypeError`.
 
 ### The `match` Version
 
@@ -917,8 +911,8 @@ In the match version,
 you add a `Webhook` data class to the `Notification` union,
 and the type checker flags `assert_never()` in both `render()` and `cost()` until you add a `case Webhook(...)` to each.
 
-Now try adding a new operation, `priority()`, that ranks channels by urgency.
-In the object version, every existing subclass needs a new method.
+If you add a new operation, `priority()`, that ranks channels by urgency,
+every existing subclass in the object version needs a new method.
 In the match version, you write one new function with its own `match`,
 and the existing classes and functions stay untouched.
 

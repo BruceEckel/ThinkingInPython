@@ -70,8 +70,7 @@ You can customize how Python produces classes by running extra code or injecting
 That is metaclass programming.
 
 You have used metaclasses without writing one.
-`abc.ABCMeta` builds `abc.ABC`
-([Rethinking Objects](20_Patterns--Rethinking_Objects.md#abstract-base-classes) puts it to work),
+`abc.ABCMeta` builds [`abc.ABC`](20_Patterns--Rethinking_Objects.md#abstract-base-classes),
 and makes a class with an unimplemented abstract method refuse instantiation.
 `enum.EnumType` builds each `Enum` subclass,
 turning every class-body assignment into a member and making `for c in Color` walk them.
@@ -170,8 +169,6 @@ Printing the class of the class produces the metaclass.
 ### A Family of Generated Classes
 
 Generating classes programmatically with `type()` pays off when a family of classes differs only by name.
-Where you might otherwise write many near-identical subclasses by hand,
-you can instead generate them dynamically.
 A greenhouse controller runs scheduled events, one class per kind of event,
 and a dict comprehension builds all of them:
 
@@ -238,9 +235,10 @@ The cast states the signature, and nothing confirms it.
 `make()` exists so that each `init()` closes over its own `name`.
 A lambda written inline in the comprehension closes over the comprehension's variable instead,
 so every generated class records the final name, `RingBell`, as its `action`:
-the late-binding trap `late_binding.py` demonstrates in [Function Objects](28_Patterns--Function_Objects.md#the-late-binding-trap).
+the [late-binding trap](28_Patterns--Function_Objects.md#the-late-binding-trap)
+that `late_binding.py` demonstrates.
 
-`init()` calls `Event.__init__(self, ...)` directly instead of `super().__init__(...)`.
+`init()` calls `Event.__init__(self, ...)` by name instead of `super().__init__(...)`.
 It is a nested function, not a method defined inside a `class` statement,
 so the compiler gives it no `__class__` cell for zero-argument `super()` to use.
 
@@ -356,8 +354,8 @@ replacing the colon with a second space before splitting on whitespace.
 `Event._event_maker[class_name]` gets the class object that builds that `Event`.
 The first time a lookup asks for an event type,
 `EventMakers` builds the class and registers it under its name.
-An unknown name raises a `KeyError`,
-which a caller writing `try: ... except KeyError` around a lookup expects.
+An unknown name raises a `KeyError`, as a missing key in any `dict` does,
+so a `try: ... except KeyError` around a lookup catches it.
 
 Running the schedule prints a line for each class as `EventMakers` builds it,
 then the events in time order:
@@ -379,7 +377,7 @@ Event.run_events()
 ```
 
 The schedule names three of the seven declared event types.
-`EventMakers` builds only those three: seven classes declared, three built.
+`EventMakers` builds those three: seven classes declared, three built.
 
 `run_events()` puts the type distinction to work.
 It fetches the `RingBell` class through `_event_maker`,
@@ -389,8 +387,8 @@ That is what a distinct subclass adds.
 Each event carries its kind as its type,
 where `isinstance()` or a `match` class pattern can test it.
 
-Calling `Event(class_name, hour, minute)` directly still produces the right field values,
-but every entry shares one type,
+Calling the base class, `Event(class_name, hour, minute)`,
+still produces the right field values, but every entry shares one type,
 and `run_events()` has no `RingBell` class for `isinstance()` to test.
 The `* ` marker depends on `RingBell` being a distinct class,
 not just a distinct name.
@@ -463,15 +461,13 @@ Calling `make_class("Start")` twice builds two distinct classes.
 The compiler treats a block that arrived as a string the same as one read from a file.
 Sitting inside a class body is the difference from `greenhouse.py`,
 whose `init()` is a nested function rather than a method in a class body,
-so it gets no `__class__` cell and cannot use zero-argument `super()`.
-Text that reaches the compiler as a class body gets the cell.
-A function object handed to `type()` does not.
+so `init()` gets no `__class__` cell and cannot use zero-argument `super()`.
 
 ### The Injection Risk
 
 The `klass` string is the danger in this approach.
 `exec()` runs its argument with the full power of the language,
-and `klass` splices `class_name` directly into source text.
+and `klass` splices `class_name` into source text as-is.
 An unvalidated name containing a newline and a second statement could then break out of the `class` block and run anything,
 the same way an unescaped value breaks out of a hand-built SQL query.
 The `KNOWN_COMMANDS` check closes that hole.
@@ -495,13 +491,11 @@ and `inspect.getsource()` raises a `TypeError`,
 because a built-in class carries no source.
 `type()`-built classes fail differently, but just as completely.
 `LightOn` gets `__module__` set to `eager_event_classes` correctly,
-but it lives only in the `makers` dict, not as a module attribute.
+but it lives in the `makers` dict, not as a module attribute.
 Pickle therefore looks for `eager_event_classes.LightOn` and does not find that either,
 and `inspect.getsource()` raises an `OSError` instead.
 Neither generator's classes survive a round trip through `pickle`,
-and neither yields source to `inspect.getsource()`,
-a real cost given that [The `inspect` Module](#the-inspect-module)
-is a few pages away.
+and neither yields source to `inspect.getsource()`.
 A class built this way serves the process that built it.
 It is not for storage or introspection.
 
@@ -677,7 +671,7 @@ print(Button.press.__dict__)
 
 `on()` takes the event name and returns `mark()`,
 the decorator that does the work.
-Its type parameter `F` has the bound `Callable[..., object]`,
+`on()`'s type parameter `F` has the bound `Callable[..., object]`,
 which any function satisfies, and `mark()` returns the same `F` it receives,
 so `press()` keeps its own signature through the decoration.
 `@on("click")` stores `"click"` under the key `"event"` in the `__dict__` of `press()`,
@@ -734,8 +728,6 @@ b = B()
 print(type(b).__name__)
 #: B
 ```
-
-The type checker rejects the commented line.
 
 Type checkers such as `ty`, mypy, and Pyright check `@final` statically.
 At runtime the decorator marks the class, setting `__final__ = True`
@@ -804,16 +796,15 @@ The language devices you have met divide into four families.
 ### The Four Families
 
 `@final` and `@override` are *markers*.
-At runtime each sets a single attribute that nothing in the interpreter reads,
-though your own code can read it, as `near_miss.py` does.
+At runtime each sets a single attribute, `__final__` or `__override__`,
+that the interpreter ignores and your own code can read, as `near_miss.py` does.
 The type checker carries the entire meaning,
 and [Making a Class Final](#making-a-class-final)
 builds the runtime half by hand with `__init_subclass__()`.
 
-`@dataclass` is *mirrored machinery*.
+[`@dataclass`](12_Techniques--Data_Classes_as_Types.md) is *mirrored machinery*.
 At runtime it is a code generator,
-synthesizing `__init__()` and its siblings at class-creation time
-([Data Classes as Types](12_Techniques--Data_Classes_as_Types.md) relies on it throughout).
+synthesizing `__init__()` and its siblings at class-creation time.
 The type checker does not run the decorator.
 It recognizes the name and re-implements the generator's rules statically:
 the synthesized signature, the frozen write-ban, the field-ordering rule.
@@ -827,8 +818,8 @@ while the interpreter raises its own `TypeError` at class creation.
 A third family carries *two real semantics*.
 `@abstractmethod` makes the checker report an abstract instantiation,
 and separately makes the runtime refuse one.
-`assert_never()` proves exhaustiveness statically and raises an `AssertionError` at runtime when a lying value reaches it
-([Pattern Matching](13_Techniques--Pattern_Matching.md#exhaustive-matching) shows both).
+[`assert_never()`](13_Techniques--Pattern_Matching.md#exhaustive-matching)
+proves exhaustiveness statically and raises an `AssertionError` at runtime when a lying value reaches it.
 The fourth family runs in the other direction.
 Annotations survive into the running program,
 as [The `inspect` Module](#the-inspect-module) shows,
@@ -904,7 +895,7 @@ which neither imports nor executes your code.
 That is why `commander.py` in [Generating Classes with `exec()`](#generating-classes-with-exec),
 whose class exists only as text in a string,
 uses a `cast()` to state the real signature.
-The checker models what it recognizes, believes what you declare,
+The checker emulates what it recognizes, believes what you declare,
 and sees nothing else.
 
 ## Learning a Name with `__set_name__()`
@@ -1114,8 +1105,8 @@ The rejected assignment does not reach `_width`,
 so `r.area()` still uses the width the constructor stored.
 A `property` protects one attribute the same way,
 but `Rectangle` then carries the check twice, once per attribute.
-A descriptor is the reusable form.
-The rule lives in one class, and each attribute that needs it says `Positive()`.
+With a descriptor, the rule lives in one class,
+and each attribute that needs it says `Positive()`.
 
 `Positive.__get__()` omits the `obj is None` branch that `Field` has,
 so it works through an instance and fails through the class.
@@ -1162,8 +1153,8 @@ and patches a new method onto the freshly built class.
 In the `display_object()` output,
 `uses_metaclass(self)` sits alongside `ping` and `pong`,
 indistinguishable from the methods in the class body.
-The injected value is a lambda, but a function is a descriptor
-([Learning a Name with `__set_name__()`](#learning-a-name-with-__set_name__)),
+The injected value is a lambda,
+but a function is a [descriptor](#learning-a-name-with-__set_name__),
 so `Simple().uses_metaclass()` binds it like any other method.
 
 Since a metaclass is a subclass of `type`,
@@ -1316,7 +1307,6 @@ assert c is d
 assert a is not c
 ```
 
-The trace shows the interception.
 The second `ASingleton()` does not reach `__new__()` or `__init__()`.
 `__call__()` finds the cached instance and returns it without building anything.
 Each class gets its own entry in the `_instances` dictionary,
@@ -1413,8 +1403,7 @@ with expected(AttributeError):  # A metamethod: class only
 
 `helper()` arrives through the metaclass,
 so `Sub` has it and a `Sub` instance does not.
-That is the metamethod rule from the start of [Intercepting Instance Creation](#intercepting-instance-creation),
-failing out loud.
+The `AttributeError` comes from the metamethod rule at the start of [Intercepting Instance Creation](#intercepting-instance-creation).
 An instance of `Sub` is not an instance of `Base`,
 so nothing in its lookup chain reaches `Mixin`.
 A `classmethod` answers on both.
@@ -1460,7 +1449,6 @@ print(type(D).__name__)
 #: MetaC
 ```
 
-The result is a metaclass conflict.
 As with the layout conflict just shown,
 `ty` reports `conflicting-metaclass` and names both `MetaA` and `MetaB`,
 so the line carries a `# type: ignore`.
@@ -1597,7 +1585,6 @@ what a function's signature is, and what its docstring says.
 
 `inspect` works on any live object: modules, classes, functions, methods,
 and instances.
-A few functions cover most needs:
 
 - `inspect.signature(callable)` returns a `Signature` object describing the parameters,
   their annotations, and their defaults.
@@ -1651,7 +1638,7 @@ at the end of this chapter.
 ### Sorting Members into Attributes and Methods
 
 `display_object()` walks every member that `inspect.getmembers_static()` returns.
-The static variant reads members from the object and its classes directly,
+The static variant reads members from the `__dict__` of the object and of each of its classes,
 without invoking descriptors, properties, or `__getattr__()`.
 Inspecting an object therefore runs none of its code and triggers no side effect,
 and that safety matters when you point this tool at something unfamiliar.
@@ -1674,7 +1661,8 @@ When `obj` is a class, every attribute lives on a class,
 so all of them carry the tag.
 In [Comparing Ordinary Classes and Data Classes](12_Techniques--Data_Classes_as_Types.md#comparing-ordinary-classes-and-data-classes),
 `classvar_dataclass.py`'s `show(D)` tags both `D.x` and `D.s`,
-although `D` declares them directly, because neither belongs to an instance.
+although `D` declares them in its own body,
+because neither belongs to an instance.
 For an instance, the tag says whether the value lives on the class or on the object,
 the same rule `Stars.rating` demonstrates in [Class Attributes](09_Foundations--Class_Attributes.md#class-attributes-are-not-default-values).
 `class_with_defaults.py`'s `show(B())`, from that same chapter 12 comparison,
@@ -1699,7 +1687,6 @@ Evaluating them at that moment raises a `NameError`.
 The standard library's `annotationlib` module handles this case.
 Its `get_annotations()` takes a `format` argument that chooses how to evaluate the annotations,
 and `inspect.get_annotations()` accepts the same argument.
-The argument has three values:
 
 - `Format.VALUE`, the default, evaluates each annotation to a real object,
   and raises a `NameError` when a name is missing.
