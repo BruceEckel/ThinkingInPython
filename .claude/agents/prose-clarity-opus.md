@@ -1,5 +1,5 @@
 ---
-name: prose-clarity
+name: prose-clarity-opus
 description: One-file clarity pass over a chapter or solutions file: buried actors, subjects held open, overloaded sentences, stacked negatives, pointers with two candidates, cause after effect, passives with a natural actor, compressed reasoning that skips a step, a figure of speech standing in for a mechanism, and any claim about a listing checked against the listing before it is rewritten. Use for "clarity pass", "straighten", "clear the passives in", "make X clearer", or "obscure/unclear sentences" on a named file. Runs on Opus.
 model: opus
 tools: Read, Edit, Write, Grep, Glob, Bash

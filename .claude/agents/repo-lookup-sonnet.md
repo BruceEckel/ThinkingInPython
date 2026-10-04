@@ -1,5 +1,5 @@
 ---
-name: repo-lookup
+name: repo-lookup-sonnet
 description: Read-only fact finding in this repo: which chapters link to an anchor, where a term is defined, what a gate reported, which files carry a vale warning, what a listing prints. Use when the answer is a list or a number and no file will change. Runs on Sonnet; never edits.
 model: sonnet
 tools: Read, Grep, Glob, Bash

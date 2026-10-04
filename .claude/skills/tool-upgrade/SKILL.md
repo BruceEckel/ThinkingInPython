@@ -57,7 +57,7 @@ Moved from `CLAUDE.md`, which keeps the rule that you never start an upgrade you
   0.16.8) was a quiet one: `tip sweep` green on both trees, the
   pyright delta empty, all six version-pinned claims re-probed
   unchanged, and all 40 quoted diagnostics matching. The quote recheck
-  ran as one `verify-claims` agent (about 130k tokens, seven minutes),
+  ran as one `verify-claims-opus` agent (about 130k tokens, seven minutes),
   and reading that closely it found two stale Solutions passages no
   upgrade caused: Solutions 46 naming line 28 under a quote that points
   at line 29, and Solutions 17 showing a `try`/`except` the listing had
@@ -76,7 +76,7 @@ Moved from `CLAUDE.md`, which keeps the rule that you never start an upgrade you
   pyright delta was one GONE, the same line, because pyright honors
   the `# type: ignore` too. The five remaining pinned claims and the
   `record(cls)` gap re-probed unchanged, and all 40 quoted diagnostics
-  matched (two `verify-claims` agents, about 80k and 130k tokens).
+  matched (two `verify-claims-opus` agents, about 80k and 130k tokens).
   **Sweep `Solutions/` for quoted diagnostics too, not just `Chapters/`.**
   The 2026-09-02 exercise pass found ten stale `ty` quotes, every one of
   them in `Solutions/` and not one in `Chapters/`: wrong line numbers,
@@ -141,7 +141,7 @@ Moved from `CLAUDE.md`, which keeps the rule that you never start an upgrade you
   list the library's overloads verbatim (nine for `supply()` in
   Chapters 47, four for `fork()` in Solutions 47), which a new overload
   makes stale with no gate reading message text; and one
-  `verify-claims` agent each over Chapters 46 and 47 and their
+  `verify-claims-opus` agent each over Chapters 46 and 47 and their
   Solutions files, told to check every sentence about the library's
   behavior against the installed source in
   `.venv/Lib/site-packages/stateless/`. Those sentences carry no
