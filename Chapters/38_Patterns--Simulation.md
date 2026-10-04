@@ -14,15 +14,12 @@ The first two confirm a design you can predict from the code.
 The third produces a pattern no one wrote down as a picture.
 The formula determines its shape, and the grains gather on it.
 
-The first example, the pack of rats, puts `asyncio` tasks,
+The first example, the pack of rats,
+puts [`asyncio` tasks](19_Techniques--Concurrency.md#asyncio-mechanics),
 a shared coordination object,
 and structural typing together in one small program.
-[Concurrency](19_Techniques--Concurrency.md#asyncio-mechanics)
-introduces the `asyncio` mechanics (`async def`, `await`, `gather()`, `run()`).
 
 ## Rats & Mazes
-
-The problem has three types.
 
 A *maze* holds its own layout.
 Given a coordinate, it reports whether that cell is a wall or an opening,
@@ -32,7 +29,7 @@ It reports what a coordinate contains.
 
 A *blackboard* is the shared surface on which every rat writes.
 *Blackboard* is a classic coordination pattern.
-Independent agents read from and write to one common data structure instead of calling each other directly.
+Independent agents read from and write to one common data structure instead of calling each other's methods.
 Here the blackboard owns the maze, records which cells the rats have explored,
 hands out rat numbers, and creates the task for each new rat.
 The rats run as cooperative `asyncio` tasks.
@@ -702,7 +699,7 @@ so a new kind of item registers itself.
 Once you define the subclass with its symbol, the factory finds it.
 That search is the [registry idea](27_Patterns--Factory.md#the-pythonic-factory-a-dictionary),
 using the class hierarchy as the registry.
-`__subclasses__()` reports only direct subclasses,
+`__subclasses__()` reports direct subclasses and misses their descendants,
 so a new item must inherit directly from `Item`.
 If you derive a class from `Food` to inherit its behavior,
 that class is a grandchild of `Item`.
@@ -1197,7 +1194,7 @@ A `Grain` is a position.
 All the simulation's logic sits in `step()`.
 Every grain takes one random step,
 and the plate's vibration at that grain's location scales the step.
-Grains do not read each other's positions and store only their own.
+Grains do not read each other's positions and store their own.
 
 ```python
 # chladni_plate/chladni.py

@@ -23,8 +23,7 @@ In Python a function is an object.
 You can name it, store it in a list, pass it as an argument, and return it.
 That makes all three patterns largely unnecessary.
 Where *GoF Design Patterns* builds a hierarchy, Python uses a function,
-the dissolution that [Design Patterns](21_Patterns--Design_Patterns.md#when-a-pattern-dissolves)
-describes.
+and the pattern [dissolves into the language](21_Patterns--Design_Patterns.md#when-a-pattern-dissolves).
 
 ## Command: Choosing the Operation at Runtime
 
@@ -101,14 +100,12 @@ macro.run()
 #: It's pining for the fjords.
 ```
 
-Both forms do the same thing.
 The class version takes four classes and a wrapper to say what one list of functions says.
 *GoF Design Patterns* calls commands "an object-oriented replacement for callbacks."
 Because in Python a callback is a function, the replacement is unnecessary.
 A `Command` base class is worthwhile when the commands share implementation.
 A second operation alone does not call for one.
-The undo discussion in [A Callable Object as a *Command*](#a-callable-object-as-a-command)
-needs only a type.
+The [undo discussion](#a-callable-object-as-a-command) needs only a type.
 
 ### A Bound Method as a Command
 
@@ -493,7 +490,7 @@ The second `solve()` call shows the fall-through.
 Because the interval `[1.0, 1.3]` does not straddle the root,
 bisection fails by returning `None`.
 The loop continues to a method that needs no bracket.
-To add, remove, or reorder the handlers you edit the `chain` list.
+Adding, removing, or reordering the handlers means editing the `chain` list.
 All three patterns share one shape:
 
 ![](_images/function_objects_story)
@@ -668,7 +665,7 @@ mixes handlers for every event type in one structure.
 Its lists cannot name a single event class,
 so their element type is `Handler[Any]`.
 
-`subscribe()` indexes `self._handlers` directly,
+`subscribe()` indexes `self._handlers`,
 letting the `defaultdict` build each event type's list on first use.
 `publish()` reads with `.get(type(event), [])` instead of indexing,
 because indexing a `defaultdict` inserts an empty list as a side effect.
@@ -728,10 +725,10 @@ In `event_bus.py`, the events are records, the handlers are functions,
 and the bus is a `dict`.
 Each `subscribe()` call repeats the event type that the handler's annotation names.
 A second version reads the annotation, so a handler names its event once.
-It gives each side a decorator, both producing records.
-`@event` records its class in `EVENTS`.
+The second version gives each side a decorator, both producing records.
+`@event` registers its class in `EVENTS`.
 `@handler` makes a function object whose fields are its configuration,
-and records in `HANDLES` which event its `__call__()` accepts.
+and stores in `HANDLES` the event its `__call__()` accepts.
 `Handler` becomes a `Protocol` whose one method is `__call__()`,
 because the handlers are now objects rather than functions.
 `Handler` still names their signature.
@@ -849,7 +846,7 @@ class OnWithdraw:
 tells the type checker that a class passing through either decorator comes out a frozen data class.
 `Audit(threshold=50)` therefore has its generated `__init__()`,
 and the type checker rejects `Audit(50).threshold = 1` as an assignment to a read-only property,
-as it does with `@dataclass(frozen=True)` written directly.
+as it does for a class decorated with `@dataclass(frozen=True)`.
 The entries in `EVENTS` and `HANDLES` are runtime facts.
 `@handler` reads the annotation on the first parameter after `self` in `__call__()`,
 the same annotation the type checker checks, so a handler names its event once.
@@ -884,7 +881,7 @@ expect(TypeError, bus.publish, "Deposit")
 because no static type means "a class `@event` decorated",
 so a stray string reaches the bus and `EVENTS` rejects it there.
 
-The price is the registration-time check of the first version.
+The tagged bus gives up the registration-time check of the first version.
 `subscribe(Deposit, on_withdraw)` fails under the type checker because no `E` fits both arguments.
 One argument leaves no pair to compare,
 so a class with the right `__call__()` that skipped `@handler` passes the type checker and fails only when `subscribe()` looks it up.
@@ -962,8 +959,7 @@ Stop at the first form that supports what you need:
 
 A function that carries data in its `__dict__` would sit between entries 1 and 3,
 and the list leaves it out.
-The type checker reports each dotted access to such an attribute
-([Attributes on a Function](17_Techniques--Metaprogramming.md#attributes-on-a-function)),
+The type checker reports each [dotted access to such an attribute](17_Techniques--Metaprogramming.md#attributes-on-a-function),
 so configuration goes in a closure or a callable object instead.
 
 The *GoF Design Patterns* forms of *Command*, *Strategy*,

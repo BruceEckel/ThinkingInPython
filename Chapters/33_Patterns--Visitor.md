@@ -135,8 +135,7 @@ If you delete the override, every flower resolves to the same `Flower.eat()`,
 and the visitor's type alone decides which method runs.
 
 `flower_visitors.py`'s output shows results, not mechanism.
-To make both dispatches visible,
-print the qualified name of the method to which each dispatch resolves:
+Printing the qualified name of the method to which each dispatch resolves makes both dispatches visible:
 
 ```python
 # dispatch_trace.py
@@ -168,7 +167,7 @@ If you declare that parameter as `Visitor` instead,
 the type checker reports `visitor.visit` as an unresolved attribute.
 The classic pattern declares `visit()` abstract on the visitor base,
 so `visitor.visit` resolves.
-A `Protocol` removes the `Any` at the cost of two new lines:
+A `Protocol` that declares `visit()` removes the `Any`:
 
     class Visits(Protocol):
         def visit(self, flower: Flower) -> None: ...
@@ -287,7 +286,6 @@ A subclass resolves to its nearest registered ancestor.
 Every class descends from `object`,
 and `@singledispatch` registers the base implementation under `object`,
 so a type with no other registered ancestor gets the default.
-`test_visitor.py` checks each case.
 
 `visitor_singledispatch.py`'s last two output lines inspect the dispatch table the decorator built.
 `nectar.registry` maps each registered type to its implementation,
@@ -316,7 +314,7 @@ A `match` over a union of types, with `assert_never()` in its `case _`,
 goes further.
 The type checker [reports the omission](34_Patterns--Composite_and_Interpreter.md#a-composite-of-data-classes)
 before anything runs.
-The price is a closed set, since adding a type means editing the union.
+The set of types is then closed, since adding a type means editing the union.
 
 Under `@singledispatch`, adding a new operation is a new function.
 Adding a new flower is a class,
@@ -329,8 +327,8 @@ instead.
 
 ### Testing the Operations
 
-Because each operation is a plain function, testing is direct.
-Call it with each flower type and assert the result.
+Because each operation is a plain function,
+a test calls it with each flower type and asserts the result.
 The cases worth covering are the registered types,
 the `@singledispatch` default for an unregistered type,
 and a subclass that resolves to its nearest registered ancestor:
@@ -378,9 +376,7 @@ when an object must loop over its own elements inside `accept()`,
 or when someone else's framework calls that method.
 Both cases are rare in Python.
 The `recycling_note.py` example in [Pattern Refactoring](37_Patterns--Pattern_Refactoring.md#one-singledispatch-function-per-operation)
-reaches the same conclusion:
-`singledispatch` adds an operation to a hierarchy from outside it,
-and *Visitor* imitates that with `accept()`.
+reaches the same conclusion.
 
 A minimal example shows the first of those cases,
 a loop that runs inside `accept()`.

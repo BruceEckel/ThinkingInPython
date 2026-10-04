@@ -128,7 +128,7 @@ The copy's `strokes` is the same list as `sketch.strokes`,
 the alias from `aliased_snapshot.py` one level down.
 `save()`'s one-level copy is enough because a stroke is a string.
 An originator holding containers inside containers needs `copy.deepcopy()` in `save()`,
-and pays the cost described in [A Snapshot Is Not a Reference](#a-snapshot-is-not-a-reference).
+and pays the [cost of a deep copy](#a-snapshot-is-not-a-reference).
 
 The caretaker's side of the contract is to store `checkpoint` and return it,
 without reading or assigning its `strokes`.
@@ -289,7 +289,6 @@ Saving means keeping a reference,
 the assignment that aliased in `aliased_snapshot.py`.
 Here that assignment is safe because the object bound to `before` keeps its value as long as it exists,
 so the `Memento` class, `save()`, `restore()`, and the copying are all gone.
-The figure sets the two forms side by side:
 
 ![](_images/memento_story)
 
@@ -397,8 +396,7 @@ so `History[S]` below holds the classic `Memento` from `sketch.py` as readily as
 What immutability removes is the explicit `save()` and `restore()` at every edit,
 since a state that keeps its value serves as its own memento.
 Undo and redo are two stacks of past and future states,
-generic over the state type
-(the `class History[S]` syntax is from [Static Types](08_Foundations--Static_Types.md#type-parameters)):
+[generic](08_Foundations--Static_Types.md#type-parameters) over the state type:
 
 ![](_images/memento_history)
 
@@ -470,7 +468,7 @@ the history stays as it was.
 Nothing mutates, so every other state stays valid,
 and the program runs on with the history one state short.
 `apply()` takes the edit instead of its result.
-It reads `present` itself and passes whatever the edit returns straight to `do()`,
+It reads `present` in place of the caller and passes whatever the edit returns unchanged to `do()`,
 so no call site can build a state and forget to record it.
 `do()` stays public for a state built some other way than by editing the present,
 such as the `Sketch` mementos that `history_classic.py` passes to it below.
@@ -548,8 +546,7 @@ def test_bounds_are_reported() -> None:
 
 The alternative design stores commands instead of states.
 Each undoable action carries its own inverse,
-the *Command* variation that [Function Objects](28_Patterns--Function_Objects.md#a-callable-object-as-a-command)
-mentions.
+the [*Command* variation](28_Patterns--Function_Objects.md#a-callable-object-as-a-command).
 *Command*-based undo saves memory when a snapshot is large,
 but needs an inverse written and tested for every action.
 Try snapshot-based undo first,
@@ -561,7 +558,7 @@ Switch to *Command* once the `O(k^2)` pointers `growth_cost.py` counts grow too 
 
 A whole-state snapshot answers one question: what was every field's value then?
 An editor's undo is often narrower.
-Undo the drawing, but keep the rename.
+Undo the strokes, but keep the rename.
 `History` cannot express that,
 because it stores and returns whole states and reads no field of them.
 The state must supply the answer,
@@ -598,9 +595,8 @@ as the last line shows.
 The edit that `apply()` receives is a lambda here because a partial restore combines two states,
 and every method on `Drawing` works from one.
 
-`copy.replace()` is the general version of `dataclasses.replace()`,
-as [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#the-general-form-of-replace)
-describes.
+`copy.replace()` is the [general version](12_Techniques--Data_Classes_as_Types.md#the-general-form-of-replace)
+of `dataclasses.replace()`.
 Choosing `copy.replace()` over `dataclasses.replace()` keeps the technique available to whatever state type a `History` holds.
 `NamedTuple`, `datetime`, and any class defining `__replace__()` all accept it.
 
@@ -695,7 +691,7 @@ That name is now bound to `SketchV2`.
 skipping `__init__()`, and copies in the fields the old bytes had.
 The fields go straight into the object's `__dict__`, past the frozen check.
 A record's generated `__setattr__()` raises `FrozenInstanceError`,
-and pickle writes `__dict__` directly.
+and pickle updates `__dict__` without calling `__setattr__()`.
 The same shortcut skips `__post_init__()`,
 so a memento saved before a field gained its validation loads a value that bypassed the validation.
 `title` is absent, since the old bytes lack one.
@@ -738,7 +734,6 @@ print(restored == SketchV1(("circle",)))
 #: True
 ```
 
-Each print contradicts the one before it.
 The `repr()` shows a one-field object.
 The `__dict__` shows two entries.
 The loaded object is `==` to a `SketchV1` built with strokes alone,

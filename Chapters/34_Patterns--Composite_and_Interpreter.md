@@ -103,7 +103,7 @@ and counting files or finding an entry by name each needs another.
 
 ## A Composite of Data Classes
 
-Now move the operations out of the classes.
+The next version moves the operations out of the classes.
 The nodes keep their fields, a union names the closed set of alternatives,
 and each operation becomes a recursive function that matches on that union.
 With no unslotted base class above them,
@@ -242,8 +242,7 @@ If plugins or other packages must add new kinds of entries,
 a method on a base class lets them do that in their own code,
 but a central `match` needs an edit in yours.
 The [guidance on when not to match](13_Techniques--Pattern_Matching.md#when-not-to-match)
-applies directly.
-Match over a closed set, use polymorphism for an open one.
+applies to node types.
 
 A file and a directory are both a `Path`,
 which makes `pathlib` look like a *Composite*.
@@ -387,7 +386,7 @@ or as SQL.
 Python's grammar sets the limit of the technique.
 You can overload the arithmetic, bitwise, and comparison operators this way,
 so an expression written with them builds nodes instead of computing.
-`==` is the exception.
+`==`, though, compares nodes instead of building one.
 `@dataclass` writes its own `__eq__()` onto every node class.
 Attribute lookup finds a class's own method before an inherited one,
 so that generated `__eq__()` shadows anything `Operators` defines.
@@ -788,7 +787,7 @@ Composing `t`-strings this way builds a nested composite.
 Iterating any one `Template` stays flat.
 
 `to_query()` and `to_shape()` stand in the same relationship as `evaluate()` and `to_infix()`:
-two operations over one structure that names neither of them.
+two operations over one structure that mentions neither of them.
 Adding a third changes none of the existing code.
 
 `to_query()` uses the walk to keep user values out of the query text.

@@ -49,7 +49,8 @@ Parsing at runtime builds the integer after compilation,
 so any sharing that remains comes from the cache.
 
 String *interning* keeps one copy of identifier-like strings.
-`sys.intern()` gives you the string pool directly:
+`sys.intern()` adds a string to the pool,
+or returns the pooled copy if one exists:
 
 ```python
 # string_interning.py
@@ -255,7 +256,7 @@ Mutating the grass tile in one cell changes every grass cell in the map.
 The freezing must hold all the way down.
 A record blocks assignment to a field, not mutation inside one,
 so a `Tile` holding a `list` hands the same mutable list to every cell that shares the tile,
-the shallow-freezing trap in [Rethinking Objects](20_Patterns--Rethinking_Objects.md#the-immutability-solution).
+the [shallow-freezing trap](20_Patterns--Rethinking_Objects.md#the-immutability-solution).
 Every field here is immutable, so the sharing is safe.
 
 ## Sharing, Not Caching
@@ -282,8 +283,6 @@ A `Tile` built without `tile()` equals the shared tile but is a separate object.
 The memory saving and every `is` comparison depend on that sameness,
 so a factory that forgets an entry and builds a replacement breaks the pattern,
 where a cache that forgets an entry runs slower and stays correct.
-The sections that follow change how the factory keeps its objects,
-and each one either keeps the identity guarantee or says where it ends.
 
 ## Interning in the Constructor
 
@@ -367,7 +366,7 @@ Every `Color(...)` call looks in the pool first,
 so two `Color`s with the same components are the same object and `is` answers what `==` would.
 The bookkeeping exists for that guarantee, or for the constructor syntax.
 When you need neither,
-the `@cache` factory from `tile_map.py` does the same job with one decorator.
+the `@cache` factory from `tile_map.py` does the same job.
 
 One more property carries over from [*Singleton*](24_Patterns--Singleton.md#the-first-call-race)'s cached factory.
 Every lazy check-then-insert pool races under threads.
@@ -533,7 +532,7 @@ so an `__init__()` that assigns `_value_` later comes too late,
 and the lookup table behind `Tile(".")` stays keyed by the tuples.
 With `_value_` set in `__new__()`, `Tile(".")` is a lookup.
 
-`object.__new__(cls)` builds a bare instance directly,
+`object.__new__(cls)` builds a bare instance,
 skipping `Tile.__new__()` so the call does not recurse.
 `_value_` is a name Enum's metaclass reads,
 to build the `Tile(".")` lookup table and the member's `repr()`,

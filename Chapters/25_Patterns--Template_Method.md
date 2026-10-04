@@ -199,7 +199,7 @@ with expected(TypeError):
 including `run`.
 For each name the subclass defines,
 `getattr(super(cls, cls), name, None)` finds the attribute that the name replaces,
-searching the classes that follow `cls` in its method resolution order.
+searching the classes that follow `cls` in its [method resolution order](07_Foundations--Classes.md#method-resolution-order).
 If that attribute carries `__final__`,
 `__init_subclass__()` raises a `TypeError`.
 `class Hijack` fails because a subclass that replaces the anchor moves the algorithm out of the base class,
@@ -229,9 +229,7 @@ although it is not a typo.
 A team that adopts this check should expect to catch typos and also to rename an occasional legitimate method.
 
 If every subclass must supply a step,
-inherit from `ABC` and declare that step with `@abstractmethod`,
-as [Rethinking Objects](20_Patterns--Rethinking_Objects.md#abstract-base-classes)
-shows.
+inherit from `ABC` and declare that step with [`@abstractmethod`](20_Patterns--Rethinking_Objects.md#abstract-base-classes).
 The interpreter then refuses to instantiate a subclass that forgot it,
 and the type checker reports the attempt.
 
@@ -406,14 +404,14 @@ although the two look alike at the call site.
 A *Strategy* swaps out a whole algorithm behind a single interface.
 In `template_function.py` the algorithm stays put,
 and only its steps come from outside.
-The choice between a class and a function is the same trade-off as in [Function Objects](28_Patterns--Function_Objects.md#strategy-choosing-the-algorithm-at-runtime).
+The choice between a class and a function is the same trade-off a [*Strategy*](28_Patterns--Function_Objects.md#strategy-choosing-the-algorithm-at-runtime)
+faces.
 A stateless hook is usually better as a function than as an overridden method.
 
 ## What Anchors the Algorithm
 
 An anchored algorithm is only as secure as its anchor.
-This chapter shows four.
-Each guards against a different way of breaking the flow:
+Each of this chapter's four anchors guards against a different way of breaking the flow:
 
 - Structure, in `template_function.py`.
   No subclass exists, so nothing can replace the loop.

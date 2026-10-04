@@ -10,7 +10,7 @@ When you call a method in the surrogate,
 the surrogate calls that method in the implementing class.
 The two patterns are so similar that *Proxy* is a special case of *State*.
 
-From a base class, derive the surrogate along with the class or classes that provide the implementation:
+The surrogate and the class or classes that provide the implementation all derive from one base class:
 
 ![*Surrogate* and each Implementation realize the same Interface](_images/surrogate)
 
@@ -63,9 +63,8 @@ p.g()
 `Proxy` qualifies as long as code calls it in place of the implementation.
 That is a looser definition than in *GoF Design Patterns*,
 and relies only on intent.
-Under GoF's stricter definition, the interface separates *Proxy* from *Adapter*.
-[Distinguishing the Wrappers](29_Patterns--Changing_the_Interface.md#distinguishing-the-wrappers)
-clarifies both readings.
+Under GoF's stricter definition,
+[the interface separates *Proxy* from *Adapter*](29_Patterns--Changing_the_Interface.md#distinguishing-the-wrappers).
 
 A common interface helps, though.
 `Implementation` must then supply every method that `Proxy` calls.
@@ -281,7 +280,7 @@ and reports that `Proxy` has no `len()`.
 so the listing needs the `# type: ignore` to show the runtime failure.
 Under mypy, `__getattr__()` also satisfies the lookup for `__len__()`,
 so `len(p)` passes the check and fails only at runtime.
-A proxy that must forward special methods defines them explicitly.
+A proxy that must forward special methods defines each one in its class body.
 
 `len(p)` reports the missing method because `object` defines no `__len__()`.
 `print(p)` reports no missing method.
@@ -365,7 +364,7 @@ because a declared `__setattr__()` makes the type checker accept assignment to a
 Mangling rewrites identifiers, not string literals,
 so storing a double-underscore name through `object.__setattr__()` means writing the mangled form,
 `"_WriteProxy__implementation"`, by hand.
-The single underscore costs the protection that mangling gives.
+The single underscore leaves the name unmangled.
 If the implementation has an `_implementation` of its own,
 `p._implementation` finds the proxy's and the implementation's is out of reach.
 
@@ -452,7 +451,6 @@ print(isinstance(p, Implementation), isinstance(p, Service))
 
 Ordinary attribute access falls back to `__getattr__()`,
 so `p.f()` runs and `hasattr(p, "f")` is `True`.
-Both `isinstance()` checks return `False`.
 
 Code that calls the method, or checks with `hasattr()`, works on a surrogate,
 as long as `__getattr__()` raises an `AttributeError`, and no other exception,
@@ -588,15 +586,12 @@ not against a caller who goes around it.
 so `hasattr(guest, "erase")` raises `PermissionError` too,
 where a missing name returns `False`.
 A surrogate whose `__getattr__()` can raise something other than `AttributeError` breaks `hasattr()`.
-The surrogate fails `isinstance()` for a different reason.
-As [A *Surrogate* Is Not Its Implementation](#a-surrogate-is-not-its-implementation)
-explains, the Protocol check uses `inspect.getattr_static()`,
-which bypasses `__getattr__()`.
+The surrogate fails `isinstance()` for a [different reason](#a-surrogate-is-not-its-implementation).
 
 ### Smart Reference
 
 A *smart reference* proxy adds behavior around each access.
-With `__getattr__()` you can wrap every method call, for example to count them:
+`__getattr__()` can wrap every method call, for example to count the calls:
 
 ```python
 # counting_proxy.py
@@ -783,8 +778,7 @@ for what an unsynchronized swap costs.
 `run(b: Any)` has no alternative.
 Annotating `run(b: Behavior)` and passing it `b` is a type error,
 because `Surrogate` defines no `f()` of its own.
-As [Forwarding with `__getattr__()`](#forwarding-with-getattr) explains,
-the checker cannot verify a method that `__getattr__()` supplies.
+The checker [cannot verify a method that `__getattr__()` supplies](#forwarding-with-getattr).
 
 The test passes the *State* surrogate a small stand-in and confirms that calls reach the current implementation and that `change_to()` swaps it:
 
@@ -823,7 +817,6 @@ as `state_demo.py` does,
 puts the check where it does not restrict the surrogate.
 The type checker verifies that `Implementation1` and `Implementation2` supply everything the Protocol declares,
 and reports a missing method.
-That declaration covers the implementations, not the surrogate.
 
 ## One Surrogate, Two Intents
 

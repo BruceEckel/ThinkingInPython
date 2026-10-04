@@ -298,7 +298,7 @@ Absent that requirement, a module is the simpler tool.
 > `settings = {"theme": "dark"}`,
 > and add `import config` plus `print(config.settings)` at the end.
 > Predict both printed values before running it,
-> and explain the difference using the binding-versus-mutation distinction from [A Module Is Already a *Singleton*](../../Chapters/24_Patterns--Singleton.md#a-module-is-already-a-singleton).
+> and explain the difference using the [binding-versus-mutation distinction](../../Chapters/24_Patterns--Singleton.md#a-module-is-already-a-singleton).
 
 <details>
 <summary>Where to look</summary>

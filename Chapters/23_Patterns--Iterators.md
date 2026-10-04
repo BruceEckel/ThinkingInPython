@@ -8,8 +8,7 @@ a file, a database cursor, or a computation.
 It asks only for the next item.
 That is the communication-first design [Design Patterns](21_Patterns--Design_Patterns.md#design-principles)
 recommends.
-The caller states what it needs,
-and the container's type stays out of the conversation.
+The caller states what it needs and does not name the container's type.
 
 Python builds iterators into the language.
 Any object that follows the *iterator protocol* works with `for`,
@@ -25,7 +24,7 @@ which returns the next item or raises `StopIteration`.
 An iterator is also iterable.
 Its `__iter__()` returns itself,
 so an iterator works anywhere code expects an iterable.
-The `for` loop calls these methods, so you rarely call them directly.
+The `for` loop calls these methods, so you rarely call them.
 Every container uses this protocol,
 so a function written against an iterable stays decoupled from the container.
 
@@ -221,13 +220,13 @@ print(f"generator used far less memory: "
 
 Iterating the generator keeps one squared value alive at a time.
 Collecting the same million values into a list keeps all of them alive at once,
-so the generator's peak stays a rounding error next to the list's.
+so the generator's peak stays under one percent of the list's.
 
 A generator can be *infinite*.
 A `while True` loop that yields forever, or `itertools.count()`,
 produces values on demand with no end.
 You take as many as you need
-(`itertools.islice()` in [Reusable Algorithms](#reusable-algorithms) does the taking),
+([`itertools.islice()`](#reusable-algorithms) does the taking),
 while a list must hold every value first.
 
 ## The Costs of Laziness
@@ -399,7 +398,6 @@ print(f"lockstep buffered far less: "
 
 Both branches see all five squares,
 so `tee` delivers the second pass the generator could not.
-The second half of the listing shows the price.
 `tee` buffers every item the leading branch consumes until the trailing one catches up,
 so when `first` drains while `second` waits, the buffer holds the whole stream.
 That is the memory a list uses, and the comparison confirms it
@@ -600,14 +598,13 @@ A generator built from `while True` looks the same as a finite one until it runs
 The one rule that touches this code is a comprehension check.
 It offers to rewrite `[n for n in count(1)]` as `list(count(1))`,
 the same problem with fewer characters.
-Nothing in the toolchain discovers problems like this.
 
 ## A Type-Checking Iterator
 
 The [*Decorator* Pattern](14_Techniques--Decorators.md#the-decorator-pattern)
 wraps an existing iterator,
 producing a new one with the same interface and added behavior.
-Here, you force every item to match an expected type:
+Here, the wrapper forces every item to match an expected type:
 
 ```python
 # typed_iterator.py
@@ -645,7 +642,7 @@ so `TypedIterator` defines `__next__()` and inherits `__iter__()`.
 The `dataclass` decoration carries `eq=False`.
 A data class that generates `__eq__()` sets `__hash__` to `None`,
 so the wrapper can no longer go in a set or serve as a dict key,
-as every other iterator in Python can.
+as every other iterator can.
 Field-by-field comparison is also the wrong question to ask about a cursor.
 Two wrappers over one source compare equal as soon as their counts agree,
 though each has delivered different items,
@@ -715,10 +712,9 @@ with separate methods to start a traversal, advance it,
 test whether it has finished, and read the current item.
 It names them `First()`, `Next()`, `IsDone()`, and `CurrentItem()`.
 Nothing in this chapter looks like that.
-Those four methods became two: `__iter__()` and `__next__()`.
+Those four methods [dissolved](21_Patterns--Design_Patterns.md#when-a-pattern-dissolves)
+into two: `__iter__()` and `__next__()`.
 The language calls both on your behalf.
-[Design Patterns](21_Patterns--Design_Patterns.md#when-a-pattern-dissolves)
-describes this dissolution.
 
 ### `first()` and `current_item()` Rebuild the List
 
@@ -815,8 +811,8 @@ That method is `__next__()`.
 
 ### Asking Consumes an Item
 
-You can ask a GoF iterator repeatedly whether it has finished,
-without disturbing it.
+A GoF iterator answers whether it has finished as often as you ask,
+without advancing.
 Python makes that question part of `__next__()`,
 so the only way to ask is to take.
 The answer arrives as a `StopIteration` exception that the `for` loop swallows on your behalf.
@@ -893,7 +889,7 @@ The only way to find out whether the body accepts its arguments is to pull a val
 and the only way to find out whether the source has run out is to pull and get nothing back.
 `for` and `list()` catch that second answer and report nothing,
 so an exhausted source and an empty one produce identical output.
-The protocol costs you nothing, and tells you nothing.
+The protocol buffers nothing and tells you nothing in advance.
 Every tool in this chapter that does answer in advance, `tee`, `OverStream`,
 or a peekable wrapper, pays for the answer with a buffer.
 

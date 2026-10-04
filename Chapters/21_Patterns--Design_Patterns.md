@@ -75,7 +75,7 @@ tells you to measure at a realistic size rather than trust a small trial.
 
 Often, the most difficult part of developing an elegant and cheap-to-maintain design is discovering what I call "the vector of change"
 (here, "vector" means a direction of change, not an array of numbers).
-You look for the most important thing that changes in your system,
+You look for the most important thing that changes,
 because that is where your greatest cost lies.
 Once you discover the vector of change,
 you have the focal point around which to structure your design.
@@ -88,7 +88,6 @@ you have evidence.
 
 ### Patterns You Have Already Seen
 
-Design patterns isolate changes in your code.
 You have seen some design patterns in this book.
 For example, you can think of [inheritance](07_Foundations--Classes.md)
 as a design pattern (albeit one built into the language).
@@ -206,7 +205,7 @@ each named for the aspect that can vary:
     and [Factory](27_Patterns--Factory.md) covers the other four:
     *Factory Method*, *Abstract Factory*, *Prototype*, and *Builder*.
 2.  **Structural**: how objects connect to other objects,
-    arranged so that changes in the system leave those connections alone.
+    arranged so that changes leave those connections alone.
     [*Surrogate*](26_Patterns--Surrogate.md),
     [Changing the Interface](29_Patterns--Changing_the_Interface.md),
     [*Flyweight*](35_Patterns--Flyweight.md),
@@ -230,8 +229,8 @@ each named for the aspect that can vary:
 
 The catalog above is GoF's.
 Patterns from outside it,
-like the *Null Object* that [Rethinking Objects](20_Patterns--Rethinking_Objects.md#null-object)
-builds, appear in the [Pattern Catalog](39_Patterns--Pattern_Catalog.md).
+like the [*Null Object*](20_Patterns--Rethinking_Objects.md#null-object),
+appear in the [Pattern Catalog](39_Patterns--Pattern_Catalog.md).
 
 <!-- The quoted "clearly" below is the vague word this paragraph objects to,
      so House.Weasel flagging it is the rule agreeing with the point. -->
@@ -334,8 +333,8 @@ that pattern has nothing left to build.
 
 ### A Pattern Moves an Edge
 
-Draw a design as parts and the edges between them,
-and let the edge say what the dependent part knows.
+In a design drawn as parts and the edges between them,
+each edge says what the dependent part knows.
 A heavy edge names a concrete class.
 A thin edge names an interface.
 A dashed edge with a hollow head says the part satisfies that interface.
@@ -390,7 +389,6 @@ coupling you can see and have placed on purpose.
 ### The Reach of a Change
 
 Coupling matters because of what it does when something changes.
-Here is a small design twice.
 A `Report` renders itself through a writer, and `main` assembles the pieces.
 On the left, `Report` names each writer class and chooses between them.
 On the right, `Report` names a `Writer` protocol.
@@ -404,7 +402,7 @@ On the left, `Report` gains a branch and `main` gains a case.
 On the right, `Report` keeps its source,
 because the new writer satisfies the protocol and `Report` names no writer.
 `main` still changes, since something must construct the new class.
-A registry factory ([Factory](27_Patterns--Factory.md#self-registration))
+A [registry factory](27_Patterns--Factory.md#self-registration)
 takes that last change out too,
 by letting the new class register itself as its `class` statement runs.
 
@@ -428,7 +426,7 @@ and neither of its ends names the other.
 Here the type checker draws it when it compares `Circle`'s members with the protocol's.
 With a `Callable`, the interface has no name and no file of its own.
 It lives in the caller's signature,
-and any function of the right shape satisfies it.
+and any function whose parameters and return type match satisfies it.
 
 The edge a `Protocol` deletes is the one that in C++ or Java is mandatory.
 The implementer must name the interface.
@@ -470,10 +468,9 @@ and the rest are here for your own designs.
     the slower the programmer works.
     The cost does not grow one rule at a time.
     The rules interact.
--   *Liskov Substitution Principle* (LSP):
-    a subtype must work anywhere code expects its base type,
-    as [Rethinking Objects](20_Patterns--Rethinking_Objects.md#liskov-substitution)
-    describes.
+-   [*Liskov Substitution Principle*](20_Patterns--Rethinking_Objects.md#liskov-substitution)
+    (LSP).
+    A subtype must work anywhere code expects its base type.
 -   *Law of Demeter*: a.k.a. "Don't talk to strangers."
     A method should talk only to itself, its own attributes, its parameters,
     and objects it creates,
@@ -508,7 +505,8 @@ and the rest are here for your own designs.
     where `Need` names what the function requires of its surroundings.
     Designing the communication gives Managed Coupling its target:
     not the least coupling, but coupling you can read.
--   *Subtraction*: a design is complete when you cannot take anything else away^[Antoine de Saint-Exupéry, *Wind, Sand and Stars*: "perfection is reached not when there's nothing left to add, but when there's nothing left to remove". The English wording varies by translation.].
+-   *Subtraction*.
+    A design is complete when you cannot take anything else away^[Antoine de Saint-Exupéry, *Wind, Sand and Stars*: "perfection is reached not when there's nothing left to add, but when there's nothing left to remove". The English wording varies by translation.].
 -   *Simplicity before generality*^[From an email from Kevlin Henney.].
     A common problem we find in frameworks is that they aim to be general purpose without reference to actual systems.
     This leads to a dizzying array of options that are often unused,
@@ -523,14 +521,13 @@ and the rest are here for your own designs.
 -   *Reflexivity*.
     One abstraction per class, one class per abstraction.
     Also goes by Isomorphism.
--   *Once and once only*:
+-   *Once and once only*.
     Avoid duplication of logic and structure where the duplication is not accidental,
     i.e., where both pieces of code express the same intent for the same reason.
--   *Make things as immutable as possible*,
-    as [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#immutability)
-    describes.
--   *Make functions pure whenever you can*,
-    as [Pure Functions](40_Functional--Foundations.md#pure-functions) describes.
+-   *Make things as [immutable](12_Techniques--Data_Classes_as_Types.md#immutability)
+    as possible*.
+-   *Make functions [pure](40_Functional--Foundations.md#pure-functions)
+    whenever you can*.
 
 <!-- vale write-good.Passive = YES -->
 <!-- vale House.WeakVerb = YES -->

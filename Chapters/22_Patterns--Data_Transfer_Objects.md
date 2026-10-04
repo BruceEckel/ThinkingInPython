@@ -15,8 +15,9 @@ Fowler's DTO crosses a process or network boundary,
 batching several values into one object to cut round trips.
 The objects in this chapter have the same shape,
 whether or not they leave the process.
-When one does leave, a process pool pickles it across the process boundary
-([Parallelism](19_Techniques--Concurrency.md#what-a-process-pool-requires)),
+When one does leave,
+a [process pool pickles it](19_Techniques--Concurrency.md#what-a-process-pool-requires)
+across the process boundary,
 and [Serializing to JSON](12_Techniques--Data_Classes_as_Types.md#serializing-to-json)
 turns a data class into the wire format for a network call.
 
@@ -60,8 +61,8 @@ The `Messenger` class declares no attributes,
 so without that annotation the type checker rejects both `m.more = 11` and `m.info`.
 `Any` switches the type checker off for `m`.
 You can move that `Any` into the class instead of repeating it at every use site,
-by declaring a `__getattr__()` that returns `Any` and a `__setattr__()` that accepts one
-([*Surrogate*](26_Patterns--Surrogate.md#forwarding-with-getattr) explains the `__getattr__()` fallback).
+by declaring a [`__getattr__()`](26_Patterns--Surrogate.md#forwarding-with-getattr)
+that returns `Any` and a `__setattr__()` that accepts one.
 With `__getattr__()` alone, the type checker still rejects the write,
 `m.more = 11`.
 The standard library's type declaration for `SimpleNamespace` has such a pair
@@ -142,7 +143,6 @@ A `NamedTuple` declares its fields the same way but produces an immutable record
 Both build a subclass of `tuple` whose positions also have names,
 but the class form declares a type for each field,
 so a type checker knows a `Color`'s `r` is an `int`.
-The functional form declares no field types.
 Because a `Color` is a tuple underneath,
 you can read each field by name or by position:
 

@@ -540,8 +540,7 @@ print(caught[0].message)
 #: Report.to_string() is replaced by render()
 ```
 
-`to_string()` keeps working, which is the point.
-Existing callers get a warning, not a break.
+`to_string()` keeps working, so existing callers get a warning, not a break.
 The mark works in two halves.
 The static half is a `ty` diagnostic on the deprecated call,
 and the caller sees it before running anything.

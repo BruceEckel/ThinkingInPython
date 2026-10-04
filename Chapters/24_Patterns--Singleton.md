@@ -12,8 +12,8 @@ For *Singleton*, the language already has an answer.
 
 ## A Module Is Already a Singleton
 
-Python imports each module once and caches it in `sys.modules`,
-as [Modules and Packages](06_Foundations--Modules_and_Packages.md) shows.
+Python [imports each module once](06_Foundations--Modules_and_Packages.md)
+and caches it in `sys.modules`.
 Every `import` after the first produces the same module object.
 A module is a singleton.
 Whatever it defines at module level exists once per interpreter,
@@ -204,19 +204,16 @@ while the class lives in the function's own locals.
 A type checker reports an unresolved reference,
 and `inspect.get_annotations()` raises a `NameError`.
 The signature must name something reachable,
-so nesting costs you either the annotation or a separate `Protocol` to name in its place.
+so a nested class forces a choice between dropping the annotation and defining a separate `Protocol` to name in its place.
 
 Privacy in Python is advice, not enforcement.
 An underscore asks callers to stay out, and nothing makes them.
 [Rethinking Objects](20_Patterns--Rethinking_Objects.md#encapsulation-leaks)
-makes the same case about hidden data,
-where a getter hands back a reference to the internals it should protect.
+makes the same case about hidden data.
 The reachable class is also useful when a test needs a fresh,
 uncached `Settings`.
 
 ### Tests, Threads, and Locks
-
-Three implementation notes:
 
 1. A singleton holds shared state, and shared state leaks between tests.
    The cached factory offers a reset the classic forms lack.
@@ -325,11 +322,10 @@ and that silence is the more dangerous case.
 A window too narrow to reproduce is still a window.
 
 `settings()` declares `global` for `_instance` and leaves `_lock` undeclared.
-The mutate-versus-rebind distinction from [A Module Is Already a *Singleton*](#a-module-is-already-a-singleton)
+The [mutate-versus-rebind distinction](#a-module-is-already-a-singleton)
 reappears here, from inside a function.
-`global` governs rebinding, not use,
-as [Names Inside a Function](05_Foundations--Functions.md#names-inside-a-function)
-shows.
+`global` [governs rebinding](05_Foundations--Functions.md#names-inside-a-function),
+not use.
 `with _lock:` reads the name,
 although acquiring and releasing changes that lock's state,
 from unlocked to locked and back.
@@ -345,7 +341,6 @@ Declare only what you rebind.
 
 Every call to the locked `settings()` acquires the lock,
 including the thousands that arrive long after the object exists.
-That is the price of laziness under threads.
 
 The classic escape is *double-checked locking*:
 test `_instance` before taking the lock,
@@ -432,8 +427,7 @@ and it builds the singleton with more apparatus.
 Its class blocks direct construction and hands out the sole instance through a class operation,
 `Instance()`, which builds the object on the first call.
 The cached factory's `settings()` is that operation written as a function.
-Python cannot block construction,
-as [Nothing Keeps the Class Private](#nothing-keeps-the-class-private) shows,
+Python [cannot block construction](#nothing-keeps-the-class-private),
 so the class-based forms here keep the constructor public and route every construction to the same shared state.
 Each does more work than the module or the cached factory above.
 
@@ -511,8 +505,7 @@ you can create it *eagerly* in the class body instead,
 `instance: ClassVar[__OnlyOne] = __OnlyOne()`.
 Eager creation removes the sentinel, the guard,
 and the first-call race the cached factory meets under threads,
-at the cost of building the object whether or not anything uses it
-(see exercise 1).
+and builds the object whether or not anything uses it (see exercise 1).
 (The bare `__OnlyOne()` works because the nested class exists at that point in the body.
 The qualified `OnlyOne.__OnlyOne()` fails,
 since the name `OnlyOne` stays unbound until its own class body finishes running.)
@@ -522,7 +515,7 @@ Either way, `OnlyOne` is a lot of code for what a module does on its own.
 ### One Instance in a Class Variable
 
 The nested private class is optional.
-Here you keep the single instance in a class variable.
+Here the class keeps the single instance in a class variable.
 `__new__()`, the method that creates an instance,
 builds it when needed and returns it as the result of every construction:
 
@@ -706,8 +699,8 @@ print(first is second, second.name,
 The name `Registry` now refers to a `singleton` object that holds the class,
 not to the class.
 Why does `__call__()` intercept the constructor for a `Registry`?
-To evaluate `obj(...)`, Python looks up `__call__()` on the *type* of `obj`
-([*Surrogate*](26_Patterns--Surrogate.md#special-methods-bypass-getattr) examines this type-based lookup in full).
+To evaluate `obj(...)`,
+Python [looks up `__call__()` on the *type* of `obj`](26_Patterns--Surrogate.md#special-methods-bypass-getattr).
 For an ordinary class `C`, `type(C)` is `type`,
 and the parentheses run `type.__call__()`,
 the machinery that invokes `__new__()` and then `__init__()`.
@@ -823,7 +816,7 @@ usually the shape of the code, and a full answer for each exercise.
     `settings = {"theme": "dark"}`,
     and add `import config` plus `print(config.settings)` at the end.
     Predict both printed values before running it,
-    and explain the difference using the binding-versus-mutation distinction from [A Module Is Already a *Singleton*](#a-module-is-already-a-singleton).
+    and explain the difference using the [binding-versus-mutation distinction](#a-module-is-already-a-singleton).
 5.  Add a `threading.Lock` *inside* `settings()` in `singleton_cached_race.py`,
     wrapping only the body of the cached function, and run it.
     Explain why the object count does not drop to one,

@@ -111,8 +111,7 @@ Each subclass restates `ClassVar[float]`,
 which keeps [the check](09_Foundations--Class_Attributes.md#classvar-and-inheritance)
 that makes the type checker reject `Aluminum(1.0).value = 2.0`.
 
-A new recyclable type costs one class definition.
-It registers itself, and `create()` builds it.
+A new recyclable type registers itself, and `create()` builds it.
 `sum_value()` needs no edit for it either.
 That ordinary function reads `t.value` and `t.weight` polymorphically,
 without checking the type of a piece.
@@ -252,7 +251,7 @@ for kind, items in bins.items():
 ```
 
 `recycle_rtti.py` satisfies the requirement, but it has a classic flaw.
-It tests for every type in the system.
+It tests for every type.
 When a new material joins the system, say `Plastic`,
 you must find every `match` statement that enumerates specific types.
 Each one you miss silently drops trash on the floor.
@@ -276,9 +275,7 @@ A `case _:` wildcard could catch a new material.
 The wildcard is worth adding, and the flaw remains.
 Every new material means editing this `match`.
 A sorter over an open set must let each piece choose its own bin,
-and `bins[type(t)]`,
-in [Let a Dictionary Do the Sorting](#let-a-dictionary-do-the-sorting),
-does that with no edit.
+and [`bins[type(t)]`](#let-a-dictionary-do-the-sorting) does that with no edit.
 
 Now the plant starts accepting plastic,
 so the data gains some new lines and the program gains a new material class:
@@ -372,7 +369,7 @@ including one defined at runtime.
 The loop has no list of materials to maintain and no case to forget.
 `bins[type(t)]` is the same dictionary-probe dispatch as the tables in [State Machines](31_Patterns--State_Machines.md#the-engine)
 and [*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md#one-lookup-in-a-table).
-That dispatch first appeared in the event bus in [Function Objects](28_Patterns--Function_Objects.md#an-event-bus-handlers-keyed-by-type).
+That dispatch first appeared in an [event bus keyed by type](28_Patterns--Function_Objects.md#an-event-bus-handlers-keyed-by-type).
 
 The key is the *exact* class.
 If you derive `CrushedAluminum` from `Aluminum`,
@@ -501,7 +498,7 @@ print(f"classes edited for one operation: {len(edited)}")
 #: classes edited for one operation: 3
 ```
 
-Both operations answer correctly, and the last line counts the edits.
+The last line counts the edits.
 One new question is an edit to all three material classes,
 and the question after it is three more edits.
 Those edits sit in each class body, as `note_methods.py` shows.
@@ -561,9 +558,7 @@ for cls in Trash.registry.values():
 #: Cardboard: flatten and bundle
 ```
 
-Each implementation above takes the name `_`,
-the placeholder that [*Visitor*](33_Patterns--Visitor.md#the-pythonic-visitor-singledispatch)
-explains.
+Each implementation above takes the [placeholder name `_`](33_Patterns--Visitor.md#the-pythonic-visitor-singledispatch).
 
 `recycling_note()` is a new operation defined outside the `Trash` hierarchy.
 Three materials register a note, and `Paper`, the fourth,
@@ -610,7 +605,6 @@ print(f"classes edited for one operation: {len(edited)}")
 #: classes edited for one operation: 0
 ```
 
-The counter reads zero.
 The loop reads every material from the registry, `hazard()` answers for each,
 and `trash.py` stays untouched.
 A third question and a fourth are one more file each,

@@ -22,8 +22,7 @@ and [*State Machine*](31_Patterns--State_Machines.md) are one overlapping pair.
 *State Machine* builds on *State*.
 The machine chooses each successor,
 so the object advances without the client choosing.
-The body of this book argues that several of the patterns written around a language's limits dissolve in Python
-([Design Patterns](21_Patterns--Design_Patterns.md#when-a-pattern-dissolves) says why).
+The body of this book argues that several of the patterns written around a language's limits [dissolve in Python](21_Patterns--Design_Patterns.md#when-a-pattern-dissolves).
 
 The tables follow each source's own grouping,
 so each name sits where its source puts it.

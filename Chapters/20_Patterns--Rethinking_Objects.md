@@ -123,8 +123,8 @@ expect(OverflowError, fill, BoundedStack(), 5)
 #: [OverflowError] Stack is full
 ```
 
-`BoundedStack.push()` takes the same argument and returns the same type,
-so `@override` holds and the type checker reports nothing.
+Because `BoundedStack.push()` takes the same argument and returns the same type,
+`@override` holds and the type checker reports nothing.
 `fill()` takes a `Stack`, whose `push()` always succeeds,
 so a `BoundedStack` handed to it raises an exception on the third item.
 The subclass matches the signature and breaks the contract behind it.
@@ -194,7 +194,7 @@ but cannot stop the caller from mutating the list it returns.
 
 ## Plugging Leaks Is Tedious
 
-You can stop the leak by copying everything a getter returns.
+Copying everything a getter returns stops the leak.
 Copying works, but every getter must remember to copy,
 and so must every getter in every subclass, forever:
 
@@ -237,7 +237,7 @@ so the caller can still mutate the internals through that reference.
 A fully defensive class must copy on the way in as well.
 
 A `@dataclass` version of `Plugged` trims the constructor,
-but its generated `__repr__` prints `_numbers` and `_bob` directly,
+but its generated `__repr__` prints `_numbers` and `_bob`,
 leaking the internals yet again.
 
 The two getters also copy differently, and the difference is its own trap.
@@ -345,9 +345,6 @@ But nothing stops that list from changing, the identical leak `Leaky` has.
 Hashing goes the same way.
 A frozen data class is hashable only when every field it holds is hashable,
 so `hash(fl)` raises a `TypeError` and a `FrozenLeaky` cannot be a dict key.
-The listing shows all three side by side.
-`frozen=True` catches the rebinding,
-while the mutation and the failed hash get past it.
 That is why `immutable.py` needs both the `tuple` and the frozen `Bob`.
 Immutability lets you share an object safely and use it as a dict key only when it goes all the way down.
 
@@ -593,11 +590,9 @@ print({c: "value"}[c])
 
 `Contact` inherits nothing, and gains no methods it did not request.
 It holds a `Name` and an `Address`, and those types stay usable on their own.
-The arrangement has a cost.
 Changing one city means rebuilding the `Address` and then the `Contact`.
 [The General Form of `replace()`](12_Techniques--Data_Classes_as_Types.md#the-general-form-of-replace)
 makes that rebuild routine.
-The equality check and the dictionary lookup are the payoff.
 Two contacts built from equal parts are equal, and the whole structure hashes,
 because value equality and hashing follow from the fields rather than from a base class.
 
@@ -809,7 +804,6 @@ A protocol is *structural*, so it works with any type that has matching members,
 including types in libraries you cannot edit.
 The type's author need not hear that your protocol exists.
 That independence is why this chapter emphasizes protocols.
-The independence has a cost.
 Nothing in a class's own source names the protocols it satisfies,
 so you cannot grep a codebase for every type that implements one,
 the way you can search for subclasses of a base class.
@@ -885,7 +879,7 @@ if __name__ == "__main__":
 
 `Invoice` inherits from `object` alone, yet `charge()`, `persist()`,
 and `audit()` each accept it,
-because each function's parameter names only the one method it needs.
+because each function's parameter names the one method it needs.
 
 #### What the Shape Does Not Say
 
@@ -951,7 +945,7 @@ The same distinction separates `Priced` from `Weighted` in `protocol_collision.p
 
 `NewType` is only an aid during type checking.
 It builds no wrapper object.
-At runtime it is the identity function, so `UserId(42)` is `42`:
+At runtime `UserId` is the identity function, so `UserId(42)` is `42`:
 
 ```python
 # test_newtype_boundary.py
@@ -963,7 +957,6 @@ def test_newtype_has_no_runtime_effect() -> None:
 ```
 
 Nothing in that test can fail.
-The `NewType` protection lives in the type checker alone.
 Passing a raw `int` where a signature says `UserId` raises no exception.
 In `newtype_boundary.py`,
 the `# type: ignore` silences the type checker's diagnostic,
@@ -971,7 +964,7 @@ which lets the rejected call run.
 [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#composing-types-from-types)
 takes the other route.
 A frozen data class with a validating `__post_init__()` enforces the distinction at runtime too,
-at the cost of a constructor call instead of a bare literal.
+and each value then needs a constructor call instead of a bare literal.
 
 A protocol also sharpens what [the Liskov Substitution Principle](#liskov-substitution)
 does and does not guarantee.
@@ -988,8 +981,7 @@ whether membership comes from inheriting a base class or matching a protocol.
 
 ### Pattern Matching on a Union
 
-Another approach uses a union and a `match`,
-introduced in [Pattern Matching](13_Techniques--Pattern_Matching.md#exhaustive-matching).
+Another approach uses a union and an [exhaustive `match`](13_Techniques--Pattern_Matching.md#exhaustive-matching).
 The shapes become immutable data, and one free function handles all the cases,
 with no base class and no overridden methods.
 The type checker ensures that the match covers every shape.
@@ -1078,7 +1070,7 @@ if __name__ == "__main__":
 #: 4.0 2
 ```
 
-The type checker correctly insists on the guard.
+The type checker requires the guard.
 Without it, `total()` calls `.log()` on `None` and raises an `AttributeError`.
 The `None` branch does nothing.
 Doing nothing is behavior, and behavior belongs in an object.

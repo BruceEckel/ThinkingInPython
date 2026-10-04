@@ -15,7 +15,7 @@ If object creation is spread throughout your application,
 adding a type means finding and editing every place that names a concrete class.
 
 Here `Triangle` has just joined the hierarchy.
-Two call sites build shapes by naming `Circle` or `Square` directly,
+Two call sites build shapes by calling `Circle()` or `Square()`,
 and neither has been updated for `Triangle`:
 
 ```python
@@ -163,17 +163,16 @@ if __name__ == "__main__":
 ```
 
 The `factory()` argument indicates the type of `Shape` to create.
-Here that argument is a string, but it could be any kind of data.
+Here that argument is a string, but it could be any sort of data.
 Apart from the new subclass,
 `factory()` is the only code that changes when you add a new type of `Shape`.
 `factory()` names `_Circle` and `_Square` above the point where the file defines either class.
 Python looks up a name in a function body when the function runs,
 and both classes exist before anything calls `factory()`.
-*GoF Design Patterns* defines *Factory Method* as a creation method that subclasses override to choose the concrete type.
+*GoF Design Patterns* defines *Factory Method* as a creation method that [subclasses override](#subclasses-choose-the-type)
+to choose the concrete type.
 This `factory()` is the smallest version of that idea: one class, one method,
 and a `match` where the overrides would be.
-[Subclasses Choose the Type](#subclasses-choose-the-type)
-shows the subclass-override form.
 
 `shape_name()` is a [*generator*](23_Patterns--Iterators.md#generators).
 Whereas a factory takes information telling it what to build,
@@ -201,9 +200,7 @@ so a caller works with `Shape`s and has no need to name `_Circle`.
 The underscore discourages direct construction,
 but it is a convention rather than concealment.
 [*Singleton*](24_Patterns--Singleton.md#nothing-keeps-the-class-private)
-makes the same case,
-and keeps its bare `Settings` name because `settings()` returns that type,
-which callers must write.
+makes the same case.
 `shape_name()` strips the underscore,
 so the name a caller passes to `factory()` is `"Circle"`, not `_Circle`.
 
@@ -233,22 +230,19 @@ For `Month`, that is a number outside one through twelve.
 The `Enum` holds every member `of()` could return,
 so the method indexes `list(Month)` instead of naming a class.
 A factory over a closed set of products reduces to a lookup.
-[The Pythonic Factory: a Dictionary](#the-pythonic-factory-a-dictionary)
-writes that lookup table by hand,
-and then lets the classes fill it for an open set.
 
 [`from_fahrenheit()`](07_Foundations--Classes.md#static-and-class-methods)
 is the usual form of alternative constructor:
 a `@classmethod` that computes the constructor's arguments and ends with `return cls(...)`.
-That form is the most common factory in Python code,
+That form is the most common factory,
 and `dict.fromkeys()` and `datetime.fromisoformat()` are two from the standard library.
 The `@classmethod` form chooses arguments rather than a class,
 so a subclass that calls it gets an instance of the subclass with no override.
 
 ## The Pythonic Factory: a Dictionary
 
-A factory turns data, such as a name,
-into an object without scattering constructors through your code.
+A factory turns data, such as a name, into an object,
+so constructor calls stay in one place.
 In Python a class is a first-class object.
 You can store it in a variable and call it to construct an instance.
 You saw this in [`defaultdict(list)`](03_Foundations--Containers.md#defaultdict)
@@ -309,7 +303,6 @@ so `SHAPES` cannot gain a shape name without adding it to the `Literal` first.
 
 Better still, a new `Shape` subclass can register itself with no edit to existing code.
 In this case, a closed `Literal` complicates things by requiring an edit for every new subclass.
-A closed set of names suits `Literal`, while an open set does not:
 
 ```python
 # registry.py
@@ -344,7 +337,8 @@ Nothing in the listing calls a register function.
 The two `class` statements fill `Shape.registry` on their own.
 Registering through `__init_subclass__()` is why `Shape` is an abstract base class rather than a `Protocol`.
 `__init_subclass__()` runs only for classes that inherit from `Shape`,
-so a class that merely matches a Protocol's shape stays out of the registry.
+so a class that satisfies a Protocol structurally,
+without inheriting from `Shape`, stays out of the registry.
 Inheritance is the mechanism, and `ABC` adds one guard on top of that.
 A subclass registers as its `class` statement executes,
 so a subclass that forgets `draw()` still registers.
@@ -512,10 +506,9 @@ class ShapeFactory:
 
 `register()` stores a class under its name and returns the class unchanged,
 so it works as a [class decorator](14_Techniques--Decorators.md#decorating-classes).
-`__call__()` makes a `ShapeFactory` instance callable,
+[`__call__()`](28_Patterns--Function_Objects.md#a-callable-object-as-a-command)
+makes a `ShapeFactory` instance callable,
 so you call the factory the way you call `make()` in `registry.py`.
-[A Callable Object as a *Command*](28_Patterns--Function_Objects.md#a-callable-object-as-a-command)
-covers `__call__()`.
 Each class registers with the factory that builds it:
 
 ```python
@@ -553,7 +546,7 @@ The type parameter of `register()` has `Shape` as its bound,
 and the bound turns the decorator into a check.
 A decorated class must satisfy the Protocol, so a class without `draw()`,
 or with a `draw()` that takes an extra parameter,
-draws `invalid-argument-type` at its `@make.register` line before the program runs.
+gets an `invalid-argument-type` diagnostic at its `@make.register` line before the program runs.
 That is the case [Self Registration](#self-registration) left to runtime,
 where a subclass that forgets `draw()` registers, fails at construction,
 and no checker sees it.
@@ -573,7 +566,7 @@ Under `__init_subclass__()`,
 an abstract `Polygon` between `Shape` and `Triangle` registers as well,
 and `make("Polygon")` fails with a `TypeError`.
 
-The cost is the opposite failure.
+Explicit registration fails the opposite way.
 Registration is opt-in,
 so a class that satisfies `Shape` but lacks `@make.register` is absent from the table,
 and `make()` fails with a `KeyError` that names the key,
@@ -625,8 +618,6 @@ or the factory's own decorator fills it.
 That is the dissolution [Design Patterns](21_Patterns--Design_Patterns.md#when-a-pattern-dissolves)
 describes.
 The pattern remains, but no longer needs a class hierarchy to express it.
-The remaining sections cover the classic object-oriented factories,
-for contrast.
 
 ## Factory Objects
 
@@ -782,7 +773,7 @@ with no edit to existing code.
 Overriding a creation method in a subclass is the form *GoF Design Patterns* describes,
 and the reason the pattern is named for a method rather than for a class.
 
-The price is a second hierarchy.
+*Factory Method* adds a second hierarchy.
 Each product needs a creator that produces it,
 so the two hierarchies grow together.
 The second hierarchy is worth having only when the creator does work of its own,
@@ -797,8 +788,7 @@ a dictionary of classes says the same thing with no second hierarchy:
 The *Abstract Factory* pattern has the same structure as `Sketch`,
 with not one but several factory methods, each overridden in a concrete factory.
 Each factory method creates a different kind of object.
-When you create the factory object,
-you choose the concrete version of every object that factory creates.
+Creating the factory object chooses the concrete version of every object that factory creates.
 The example in *GoF Design Patterns* makes one program work across several graphical user interfaces
 (GUIs).
 You create a factory object for the GUI you use,
@@ -808,7 +798,6 @@ Switching from one GUI to another then touches only a single place in the code,
 most likely via startup configuration.
 
 As another example, suppose you are creating a general-purpose gaming environment that supports different types of games.
-Here's how it might look using an abstract factory:
 
 ![](_images/abstract_factory)
 
@@ -889,7 +878,7 @@ g2.play()
 
 `Character` objects interact with `Obstacle` objects,
 but the types of characters and obstacles depend on the game you're playing.
-You determine the game by choosing a particular `GameElementFactory`.
+Choosing a particular `GameElementFactory` determines the game.
 The `GameEnvironment` controls the setup and play of the game.
 Setup and play are simple here,
 but the initial conditions and the way the state changes can determine much of a game's outcome.
@@ -1049,8 +1038,7 @@ so changing that list through one object changes it for the other,
 with no error to signal the sharing.
 
 `deepcopy()` restores the clone's state without running the constructor,
-so a clone skips the `__post_init__()` check
-([Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#copy-skips-the-constructor) shows which copying calls run it).
+so a clone [skips the `__post_init__()` check](12_Techniques--Data_Classes_as_Types.md#copy-skips-the-constructor).
 A prototype of a validated type is safe because the prototype is valid,
 not because the clone is checked.
 When the variant differs only in field values,
@@ -1291,15 +1279,15 @@ The standard library's `argparse.ArgumentParser` has the same shape.
 `add_argument()` calls accumulate a specification,
 and `parse_args()` is the `build()`.
 
-The smallest builder in Python is easy to overlook.
+The smallest builder is easy to overlook.
 Appending parts to a list and finishing with `"".join(parts)` builds an immutable string through a mutable intermediate.
 `PizzaBuilder` has the same shape.
 It collects toppings in a list and freezes them into a tuple at `build()`.
 That shape is everywhere,
 so save the name *Builder* for construction that is a process in its own right,
-with intermediate state and rules that span the steps.
-When the "steps" are optional values,
-a data class with keyword arguments already does the job.
+with intermediate state and rules that apply across several steps.
+When each builder call sets one optional value,
+a data class with keyword arguments does the job.
 
 ## Which Factory to Use
 
@@ -1324,9 +1312,10 @@ Match the machinery to what varies:
 - When the interesting part of an object is its configured state rather than its type,
   keep a prototype and copy it.
   For a record, `replace()` is that copy.
-- When construction is a genuine process with ordered steps and rules spanning them,
+- When construction is a genuine process with ordered steps and rules that apply across several of them,
   use *Builder*.
-  When the "steps" are optional values, keyword arguments are the builder.
+  When each builder call sets one optional value,
+  keyword arguments are the builder.
 
 The static `factory()` method and the nested-`Factory`-class dispatcher are here because the object-oriented tradition writes factories that way,
 not because Python needs them.
