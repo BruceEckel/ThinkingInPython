@@ -303,12 +303,27 @@ does not happen ("an attribute nothing reads"), or a vague "other" /
 "the only other" whose excluded item can be named, where the concrete
 means, frequency, kind, or item can be named ("as arguments",
 "sometimes", "a type-checking attribute", "apart from the new
-subclass").
+subclass"). Also a bare `only X` whose excluded item the context can
+name: write the item ("catches only `AttributeError`" -> "catches
+`AttributeError` and lets every other exception propagate").
 
 **Keep when.** The concrete word is unknown or would be wrong; a hedge
-that is the claim ("potentially unbounded") stays.
+that is the claim ("potentially unbounded") stays. An `only X` whose
+alternative is unbounded ("accepts only keyword arguments") stays.
 
-**Sightings.** 7 (additive), 2 chapters
+**Sightings.** 7 (additive), 2 chapters, plus about 55 `only X` sites in
+roughly 25 files from 2026-10-04 (`c06fecc2`), the `only` sweep applying Bruce's rulings on the Only Shapes page:
+- `26_Patterns--Surrogate`: "`hasattr()` catches only `AttributeError`"
+  -> "`hasattr()` catches `AttributeError` and lets every other
+  exception propagate"
+- `46_Effects--Stateless`: "a double that overrides only `print()`" ->
+  "a double that overrides `print()` and inherits `input()`"
+- `27_Patterns--Factory`: "it lists only direct subclasses" -> "it lists
+  direct subclasses and misses their descendants"; "adding a new type
+  only changes the factory" -> "changes the factory and no call site"
+- `Solutions/46_Effects--Stateless`: "the handler answers only
+  `Need[Console]`" -> "answers `Need[Console]` and not `Need[Clock]`"
+- Widened to cover `only X` on 2026-10-04, at Bruce's approval.
 - `27_Patterns--Factory` 2026-09-01 (`2b18eed8`), was Bruce-written
   (older draft): "you will likely extend your program" -> "you often
   extend that program"; "first use polymorphism to create a common
@@ -915,6 +930,157 @@ the preamble's rule.
 
 ---
 
+### R24. `only`: keep it, delete it, or fix the words around it
+
+**Test.** Three outcomes, in order. *Keep* when the restriction is the
+claim and the sentence reads cleanly; six whole shapes were ruled fine
+as a class (sentence-initial "Only", "the only X", "only when/if", "only
+the/a X", "only in/for/at", clause-final "only"). *Delete* when the
+sentence already bounds: a count or "once" followed by a bounding clause,
+a following "not" clause, or a next sentence that carries the exclusion.
+*Rewrite* when the words around `only` are the problem: R25-R28, C28,
+C29 name the shapes. Bruce's ruling (2026-10-04): "In many cases, 'only'
+is fine. In some 'only' can be removed. In other cases, it's not
+necessarily the 'only' but the wording around it that makes it awkward
+and confusing."
+
+**Keep when.** The restriction is the claim. A compound (`read-only`,
+`keyword-only`), a quotation, a diagnostic, a heading echoed in link
+text.
+
+**Sightings.** 154 sites in 60 files, 2026-10-04 (`c06fecc2`), the `only` sweep applying Bruce's rulings on the Only Shapes page:
+37 deletions, 117 rewrites. Deletions:
+- `Solutions/18_Techniques--Performance`: "The `"computing noisy(3)"`
+  message prints only once, on the first call." -> "prints once, on the
+  first call."
+- `Solutions/38_Patterns--Simulation`: "`Robot.__init__()` needs only one
+  new line, `self.coins = 0`" -> "needs one new line, `self.coins = 0`"
+- `06_Foundations--Modules_and_Packages`: "so the set tracks only names
+  still waiting, not names your program ever deferred" -> "tracks names
+  still waiting, not names your program ever deferred"
+- `17_Techniques--Metaprogramming`: "At runtime the decorator only marks
+  the class, setting `__final__ = True`" -> "the decorator marks the
+  class, setting `__final__ = True`"
+- `46_Effects--Stateless`: "Failures never vanish. They only relocate."
+  -> "They relocate."
+
+**Home.** CLAUDE.md watch list (global, Writing Style), a dedicated
+bullet beside the "nothing else" family, written 2026-10-04. The
+baseline `tools/data/watch_words_baseline.txt` holds the 688 keeps.
+
+### R25. Put `only` beside the phrase it restricts
+
+**Test.** `only` sits before the verb while a later "when"/"if" clause or
+the verb's object carries the restriction. Move it in front of that
+phrase.
+
+**Keep when.** The verb is the restricted element; there the choice is
+between keeping and deleting (R24), not moving.
+
+**Sightings.** 5, 3 files, 2026-10-04 (`c06fecc2`), the `only` sweep applying Bruce's rulings on the Only Shapes page:
+- `18_Techniques--Performance`: "The comparison only holds when the input
+  order gives neither side an advantage." -> "The comparison holds only
+  when ..."
+- `19_Techniques--Concurrency`: "**More cores only speed up the parallel
+  fraction of the work.**" -> "**More cores speed up only the parallel
+  fraction of the work.**"; "**A shared lock only prevents deadlock if
+  every user agrees on the order.**" -> "prevents deadlock only if ...";
+  "it has only touched the surface" -> "it has touched only the surface"
+- `Solutions/34_Patterns--Composite_and_Interpreter`: "A child only gets
+  parentheses when its own operator binds more loosely" -> "A child gets
+  parentheses only when ..."
+
+**Home.** CLAUDE.md watch list, inside the `only` bullet (R24).
+
+### R26. "X is the one Y that ..." for an exclusive member
+
+**Test.** `only` before a code span, where the point is that one member
+of a known set has the property ("only `depth` appears", "calls only
+`f()`", "adds only `accept()`"). Make the member the subject: "X is the
+one Y that ...", "whose one Y is X", "leave X as the one open Y".
+
+**Keep when.** The set is open, so "one" would overclaim.
+
+**Sightings.** 6, 5 files (additive), 2026-10-04 (`c06fecc2`), the `only` sweep applying Bruce's rulings on the Only Shapes page:
+- `12_Techniques--Data_Classes_as_Types`: "of the three fields only
+  `depth` appears as an attribute, because it has an initialization
+  value." -> "`depth` is the one field of the three that appears as an
+  attribute, because it has an initialization value; `name` and `number`
+  have none."
+- `29_Patterns--Changing_the_Interface`: "Because at runtime
+  `WhatIUse.op()` calls only `f()`," -> "Because `f()` is the one method
+  `WhatIUse.op()` calls at runtime,"; "an object that has only
+  `next_chunk()`" -> "an object whose one method is `next_chunk()`"
+- `33_Patterns--Visitor`: "so it adds only `accept()` to the primary
+  hierarchy" -> "so `accept()` is the one method it adds to the primary
+  hierarchy"
+- `Solutions/12_Techniques--Data_Classes_as_Types`: "`dataclasses.fields()`
+  reports only `number`, and the generated signature takes only `number`."
+  -> "`number` is the one field that `dataclasses.fields()` reports and
+  the one parameter that the generated signature takes."
+- `Solutions/25_Patterns--Template_Method`: "and leave only `process()`
+  open" -> "and leave `process()` as the one open step"
+
+**Home.** CLAUDE.md watch list, inside the `only` bullet (R24).
+
+### R27. "X alone" where `only` restricts a verb's object
+
+**Test.** `only` after the verb and before its object or a possessive
+("concepts only `Maze` uses", "the type of only one of them", "with only
+`Need[Butter]`"). Write "X alone".
+
+**Keep when.** An "alone" already sits nearby, or the object is a count
+(R24 decides).
+
+**Sightings.** 5, 5 files, 2026-10-04 (`c06fecc2`), the `only` sweep applying Bruce's rulings on the Only Shapes page:
+- `38_Patterns--Simulation`: "it names concepts only `Maze` uses" -> "it
+  names concepts that `Maze` alone uses"
+- `32_Patterns--Multiple_Dispatching`: "a method call resolves the type of
+  only one of them, its receiver" -> "a method call resolves its
+  receiver's type alone"
+- `45_Effects--Generators`: "generators that only yield" -> "generators
+  that use the yield channel alone"
+- `47_Effects--Stateless_in_Practice`: "with only `Need[Butter]` first" ->
+  "with `Need[Butter]` alone first"
+- `Solutions/04_Foundations--Control_Flow`: "and only `from` fills that one
+  in" -> "and `from` alone fills that one in"
+
+**Home.** CLAUDE.md watch list, inside the `only` bullet (R24); the
+"nothing but" bullet already recommends "alone".
+
+### R28. "can only X" states the obligation or names the missing ability
+
+**Test.** "can only", "may only", "can only ever" before a verb. Where X
+is required, write "must X"; where the sentence is about a ceiling, name
+what lies past it ("X, and cannot Y").
+
+**Keep when.** The ceiling is the claim and no alternative is nameable.
+A quoted diagnostic ("can only be used with @runtime_checkable
+protocols") stays.
+
+**Sightings.** 6, 6 files (additive), 2026-10-04 (`c06fecc2`), the `only` sweep applying Bruce's rulings on the Only Shapes page:
+- `05_Foundations--Functions`: "`a` can only arrive positionally, `c` can
+  only arrive by name," -> "`a` must arrive positionally, `c` must arrive
+  by name,"
+- `14_Techniques--Decorators`: "You may only use them together, as the
+  `*args` and `**kwargs`" -> "They must appear together, as the `*args`
+  and `**kwargs`"
+- `47_Effects--Stateless_in_Practice`: "A library can only check the ones
+  you wrote down." -> "A library checks the Effects you wrote down and
+  cannot see any others."
+- `Solutions/12_Techniques--Data_Classes_as_Types`: "The chapter's factory
+  function can only advise against that call." -> "The chapter's factory
+  function cannot stop that call, since a caller can construct `Stars`
+  directly."
+- `Solutions/17_Techniques--Metaprogramming`: "`__init__()` can only modify
+  the completed class object" -> "`__init__()` receives the completed
+  class object and can change it in place"
+- `Solutions/19_Techniques--Concurrency`: "A task can only wait on a lock
+  that comes later in the order than every lock it holds" -> "Every lock
+  a task waits for comes later in the order than every lock it holds"
+
+**Home.** CLAUDE.md watch list, inside the `only` bullet (R24).
+
 ## Candidates
 
 One sighting each. Logged, not applied. A second sighting in a different
@@ -1248,6 +1414,45 @@ it (the mark that makes it safe).
   "this should no longer be called"
 
 ---
+
+### C28. "one X at a time", not "only one X ... at a time"
+
+**Test.** "only one" and "at a time" in one clause with words between
+them. Bruce (Only Shapes page): "'only one' is too far away from 'at a
+time'." Drop `only` and move "at a time" next to "one".
+
+**Keep when.** None seen yet.
+
+**Sightings.** 5, all `19_Techniques--Concurrency`, 2026-10-04
+(`c06fecc2`), the `only` sweep applying Bruce's rulings on the Only
+Shapes page (one chapter, so not yet independent):
+- "the interpreter-wide lock that lets only one thread run Python bytecode
+  at a time" -> "that lets one thread at a time run Python bytecode"
+- "so only one task holds it at a time" -> "so one task at a time holds
+  it"
+- "whose authors assumed that only one thread runs at a time" -> "whose
+  authors assumed that threads run one at a time"
+- "the event loop lets only one coroutine touch it at a time" -> "lets one
+  coroutine at a time touch it"
+
+### C29. "not only X but also Y" takes parallel halves, or "both X and Y"
+
+**Test.** "not only X but also Y" where X and Y differ in kind (a noun
+against a clause, a phrase against a sentence). Make the halves the same
+kind, or write "both X and Y". Bruce marked the chapter 28 sentence
+"garbled".
+
+**Keep when.** The halves already match; most "not only ... but" pairs in
+the book were kept.
+
+**Sightings.** 2 (chapters 25 and 28), 2026-10-04 (`c06fecc2`), the `only` sweep applying Bruce's rulings on the Only Shapes page; thin, so held as a
+candidate at the capture's suggestion:
+- `28_Patterns--Function_Objects`: "The tests can then assert not only the
+  root but also which finders ran." -> "The tests can then assert both the
+  root and the names of the finders that ran."
+- `25_Patterns--Template_Method`: "should expect to rename an occasional
+  legitimate method, not only to catch misspellings" -> "should expect to
+  catch typos and also to rename an occasional legitimate method"
 
 ## Retired
 

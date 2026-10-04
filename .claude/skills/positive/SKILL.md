@@ -112,11 +112,20 @@ Let the later passage carry it.
   The count test flags them; the per-item test clears them.
 - **The deliberate two-beat contrast.**
   "The `list()` copy looks redundant. It is not." and "Failures never
-  vanish. They only relocate." are rhythm the author chose, with the
+  vanish. They relocate." are rhythm the author chose, with the
   positive half present.
   Leave a contrast whose second beat supplies the positive; rewrite one
   that stops at the negation ("The `Any` is not laziness." with no
   second beat became "The `Any` is there to let ...").
+- **A negation that names what an `only` excluded.**
+  "reads its argument without changing it", "governs `total()`, not
+  the caller", "answers `Need[Console]` and not `Need[Clock]`" each
+  replaced an `only` ("only reads", "covers only `total()`'s side",
+  "answers only `Need[Console]`") in the 2026-10-04 sweep.
+  An `only` before a code span makes the reader compute the negative;
+  the rewrite states it, with the excluded item named.
+  That negation is the fix, so leave it (`bruce_edit_db.md` R9 and
+  R24; Bruce's ruling on the Only Shapes page).
 - **Bruce's "we" stays.**
   The book addresses the reader as "you", and new prose uses "you"
   unless "we" clearly reads better in that sentence.
