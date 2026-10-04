@@ -804,6 +804,13 @@ sentences at colons." So a medium-confidence site is applied; the
 keep-whens above hold where they clearly apply, and a split that
 leaves a fragment is the one other reason to keep the colon.
 
+Extended to semicolons on 2026-10-04, after Bruce approved chapter 30:
+"Go through the book looking for sentences that can be split into
+smaller sentences at ':' or ';'." A semicolon joining two independent
+clauses is a site under the same test; the style guide's "tightly
+linked" exception and a semicolon separating comma-bearing items are
+the keeps.
+
 **Sightings.** 3 rounds, 21 chapters. Bruce named the rule on chapter
 30 (2026-09-17, "There are colons that could be removed in favor of
 separate sentences"):
