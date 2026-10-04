@@ -55,11 +55,11 @@ if __name__ == "__main__":
 from `__main__` in a worker process. Only a real script file meets
 that requirement, not a fenced block executed in place.
 
-**Check that the answers agree.** The assertion compares the counts alone, since the serial run carries
-the parent's process ID and the parallel run carries the workers'.
-The counts stay the same, `[17984, 33860, 49098, 63951]`: the same
-pure function gives the same answers wherever it runs, which is the
-point of `parallel_pure.py`.
+**Check that the answers agree.** The assertion compares the counts
+alone, since the serial run carries the parent's process ID and the
+parallel run carries the workers'. The counts stay the same,
+`[17984, 33860, 49098, 63951]`. The same pure function gives the same
+answers wherever it runs, which is the point of `parallel_pure.py`.
 
 **Count the processes that answered.** The interesting number is the second
 line. Three consecutive runs on one 32-core machine reported `4`
@@ -69,7 +69,7 @@ Two things follow, and neither is the one most people predict. The
 count is greater than one, so the work left the main process, and
 `assert parallel == serial` alone could not show where the work ran.
 But the count also sits far below thirty-two. `ProcessPoolExecutor`
-allows one worker per core, but it starts workers on demand: a
+allows one worker per core, but it starts workers on demand. A
 submitted task starts a new worker only when no existing worker is
 idle. Four tasks therefore start at most four processes, not
 thirty-two.
@@ -199,22 +199,24 @@ how weak. A function that ignores its argument and returns `[]` passes
 the first element alone. "Ordered" says nothing about the elements
 being the same ones you supplied.
 
-**Check that repeating changes nothing.** Idempotence is weaker still on its own: the same `[]`-returning
-function passes it too. Idempotence adds a different kind of check,
-one about the operation rather than the output. It catches a sort
-that drops the last element. That sort's output is always ordered, so
-the invariant passes, but running it on its own output drops another
-element, so twice and once disagree on every list of two or more.
+**Check that repeating changes nothing.** Idempotence is weaker still
+on its own. The same `[]`-returning function passes it too.
+Idempotence adds a different kind of check, one about the operation
+rather than the output. It catches a sort that drops the last element.
+That sort's output is always ordered, so the invariant passes, but
+running it on its own output drops another element, so twice and once
+disagree on every list of two or more.
 
-**Compare against an independent version.** The oracle closes the gap. `insertion_sort()` is slow and simple
-enough to check by reading, so asserting that it agrees with
-`sorted()` pins down the elements, their multiplicities, and their
-order at once. The oracle earns its place because it repeats no part
-of `sorted()`'s implementation. It arrives at the same answer by a
-different route. That independence makes an oracle worth
-having, and makes `assert sorted(xs) == sorted(xs)` worthless.
-Capping the list length keeps the quadratic oracle cheap, since the
-bugs it catches show up on short inputs.
+**Compare against an independent version.** The oracle closes the gap.
+Because `insertion_sort()` is slow and simple enough to check by
+reading, asserting that it agrees with `sorted()` pins down the
+elements, their multiplicities, and their order at once. The oracle
+earns its place because it repeats no part of `sorted()`'s
+implementation. It arrives at the same answer by a different route.
+That independence makes an oracle worth having, and makes
+`assert sorted(xs) == sorted(xs)` worthless. Capping the list length
+keeps the quadratic oracle cheap, since the bugs it catches show up on
+short inputs.
 
 </details>
 </details>
@@ -264,12 +266,12 @@ E           s='µ',
 E       )
 ```
 
-The two sides print almost identically, so the failure hides until
-you look at the code points.
+Because the two sides print almost identically, the failure hides
+until you look at the code points.
 
 Most runs shrink to `'µ'`. Now and then a run stops at `'ß'` instead,
 since the shrinker does not always find the smallest failing
-character; `ß` breaks the law for a different reason, covered below.
+character. `ß` breaks the law for a different reason, covered below.
 Once a run fails, Hypothesis stores the counterexample in
 `.hypothesis/` and replays it first, so later runs report the same
 character until you delete that directory.
@@ -301,12 +303,11 @@ block away from where it started.
 
 Unicode case mapping is not a pair of inverse functions. It is a
 many-to-one mapping in each direction, over a repertoire containing
-characters that are lowercase without being the lowercase of
-anything. `ß` breaks the same law from the other side: `"ß".upper()`
-is `"SS"`, two characters, so uppercasing can change a string's
-length. For case-insensitive comparison Python provides
-`str.casefold()` rather than `str.lower()`, and `casefold()` has
-no inverse either.
+characters that are lowercase without being the lowercase of anything.
+`ß` breaks the same law from the other side. `"ß".upper()` is `"SS"`,
+two characters, so uppercasing can change a string's length. For
+case-insensitive comparison Python provides `str.casefold()` rather
+than `str.lower()`, and `casefold()` has no inverse either.
 
 A hand-written loop over `"abcde"` does not reach `µ`. The generated
 strings reach the parts of the repertoire nobody thinks to type, and
@@ -460,7 +461,7 @@ E           )
 
 Three students in groups of two leaves one student over, and the
 report shows that shrunk case rather than whatever wide random roster
-failed first. The names vary from run to run: Hypothesis shrinks a
+failed first. The names vary from run to run. Hypothesis shrinks a
 generated string toward a longer run of `a` before it reaches a third
 letter, so `'aa'` arrives as readily as `'c'` would. Some runs shrink
 to a different shape, a roster too small to fill one group:
@@ -549,9 +550,9 @@ print(timeout_pure({"TIMEOUT": "5"}), timeout_pure({}))
 ```
 
 Neither impure function assigns to anything, which is the lesson.
-`global` is the loud way to break referential transparency.
-`stale()` and `timeout()` are quiet ones: both *read* state the
-caller cannot see.
+`global` is the loud way to break referential transparency. `stale()`
+and `timeout()` are quiet ones. Both *read* state the caller cannot
+see.
 
 **Take the time without declaring it.** The substitution that breaks `stale()` is replacing a call with the
 answer it just gave. `stale(made, timedelta(hours=12))` returns
@@ -560,13 +561,13 @@ substituting it changes the program the moment the clock passes noon.
 Nothing in the signature warns you, because `datetime.now()` is an
 argument the function takes without declaring.
 
-**Take a setting without declaring it.** `timeout()` breaks the same way across a boundary that is easier to
-miss, since the environment usually holds still during a run.
-Substituting `30` for `timeout()` is correct until someone sets
-`TIMEOUT`, and then the substituted version and the original disagree
-while both still look right. Tests show the problem first: one test
-that sets the variable changes the answer for every test after it, and
-no argument list records the dependency.
+**Take a setting without declaring it.** `timeout()` breaks the same
+way across a boundary that is easier to miss, since the environment
+usually holds still during a run. Substituting `30` for `timeout()` is
+correct until someone sets `TIMEOUT`, and then the substituted version
+and the original disagree while both still look right. Tests show the
+problem first. One test that sets the variable changes the answer for
+every test after it, and no argument list records the dependency.
 
 **Make the hidden input a parameter.** The repair is the same for both, and it is the one this part of the
 book keeps making. Move the hidden input into the parameter list.
@@ -669,38 +670,36 @@ for sample in ("4", "0", "OOPS"):
 ```
 
 The two versions produce identical output. Counting lines favors the
-`isinstance()` version by two: it needs no `match result:` line, and
+`isinstance()` version by two. It needs no `match result:` line, and
 its final `return` replaces a `case` line and its body. Length is not
-what separates them. The `match` reads as one
-description of four shapes while the `isinstance()` version reads as
-four separate questions.
-The difference shows in what each version repeats: `result.error`
-appears three times in `describe_isinstance.py` and nowhere in the
-`match`, because each `case` matches on the error directly instead of
-reading it back off `result`. The final `return` is also weaker than
-the `match`'s `case Err(error)`. It is a fallthrough that happens to
-be correct rather than a branch stating what it matches, so a reader
-must deduce that `result` is an `Err` by ruling out the
-`Ok` branch above.
+what separates them. The `match` reads as one description of four
+shapes while the `isinstance()` version reads as four separate
+questions. The difference shows in what each version repeats.
+`result.error` appears three times in `describe_isinstance.py` and
+nowhere in the `match`, because each `case` matches on the error
+instead of reading it back off `result`. The final `return` is also
+weaker than the `match`'s `case Err(error)`. It is a fallthrough that
+happens to be correct rather than a branch stating what it matches, so
+a reader must deduce that `result` is an `Err` by ruling out the `Ok`
+branch above.
 
 `ty` reports the same thing about both. Inside the `Ok` it knows
 `float` either way, and in the error branches it knows `Exception`
 narrowed to `ValueError` or `ZeroDivisionError`.
 
-**Rule out a shared subclass.** The precision
-behind that agreement rests on one decorator: both `Ok`
-and `Err` carry `@final`, in the listing above and in
-`utils/result.py`. Without that decorator `ty` 0.0.84 allows for a
-class inheriting from both, so the intersection of the two stays
-alive and the value in the `Ok` comes back as `float | Unknown`
-rather than plain `float`. The `match` and the `isinstance()` tests
-lose that precision together:
-`result.answer` after a positive `isinstance()` and `answer` in
-`case Ok(answer)` read `float | Unknown` alike. Pyright and mypy do
-not build that intersection and report `float` with or without the
-decorator. The measurement the exercise asks for therefore comes out
-even at either precision, and what the decorator changes is a more
-useful finding than either version winning.
+**Rule out a shared subclass.** The precision behind that agreement
+rests on one decorator: both `Ok` and `Err` carry `@final`, in the
+listing above and in `utils/result.py`. Without that decorator `ty`
+0.0.84 allows for a class inheriting from both, so the intersection of
+the two stays alive and the value in the `Ok` comes back as
+`float | Unknown` rather than plain `float`. The `match` and the
+`isinstance()` tests lose that precision together. `result.answer`
+after a positive `isinstance()` and `answer` in `case Ok(answer)` read
+`float | Unknown` alike. Pyright and mypy do not build that
+intersection and report `float` with or without the decorator. The
+measurement the exercise asks for therefore comes out even at either
+precision, and what the decorator changes is a more useful finding
+than either version winning.
 
 The choice is about reading, not about proving. Neither form tells
 the type checker anything the other cannot, so pick the one that

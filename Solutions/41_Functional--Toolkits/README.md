@@ -48,24 +48,23 @@ print(deep_sum([1, [2, [3, 4], 5], 6]))
 #: 21
 ```
 
-The loop version runs two lines longer than the recursive one, so brevity
-is not the argument either way. The rewrite changes how much of the
-bookkeeping is yours. The recursive version names no stack: the
+The loop version runs two lines longer than the recursive one, so
+brevity is not the argument either way. The rewrite changes how much
+of the bookkeeping is yours. The recursive version names no stack. The
 call stack holds the sublists still to walk, and `return` pops one.
 Here you allocate the stack, seed it with a copy of `items`, choose
-`pop()` over `pop(0)`, and choose `extend()` over `append()`.
-Three of those choices are places to be wrong.
+`pop()` over `pop(0)`, and choose `extend()` over `append()`. Three of
+those choices are places to be wrong.
 
 **Protect the caller's list.** Seeding with `items`
 instead of `list(items)` mutates the caller's list as the loop drains
 it.
 
-**Pick which item comes next.** The pop end decides the
-visiting order, and neither end gives the recursive version's
-left-to-right walk: `pop()` visits the leaves right to left, and
-`pop(0)` walks the structure breadth-first. Both still give the right
-total, but the order matters the moment the function does anything
-order-dependent.
+**Pick which item comes next.** The pop end decides the visiting
+order, and neither end gives the recursive version's left-to-right
+walk. `pop()` visits the leaves right to left, and `pop(0)` walks the
+structure breadth-first. Both still give the right total, but the
+order matters the moment the function does anything order-dependent.
 
 **Descend into a sublist.** Using `append()` where `extend()` belongs pushes the sublist as
 a single element and loops forever on it.
@@ -170,8 +169,8 @@ def batch_totals(source: Iterable[int],
 <summary>Solution</summary>
 
 If you build the totals with a list comprehension, `[sum(b) for b in batched(source, n)]`,
-`ty` reports an `invalid-return-type`:
-a `list[int]` has no `__next__()`, so it is not an `Iterator[int]`.
+`ty` reports an `invalid-return-type`.
+A `list[int]` has no `__next__()`, so it is not an `Iterator[int]`.
 If you change the annotation to `list[int]` to match,
 the demo's call does not return,
 because the comprehension tries to sum every batch `count(1)` can supply
@@ -260,10 +259,11 @@ print(grouped(["b", "a", "b"], str.upper))
 #: {'B': ['b', 'b'], 'A': ['a']}
 ```
 
-**Collect each item under its key.** A dictionary key exists once by construction, so the duplicate-key
-failure `groupby()` has on unsorted input cannot occur. The two `"b"`
-entries go into the same list no matter how far apart they arrive, and
-the caller needs no `sorted()` call to group them.
+**Collect each item under its key.** Because a dictionary key exists
+once by construction, the duplicate-key failure `groupby()` has on
+unsorted input cannot occur. The two `"b"` entries go into the same
+list no matter how far apart they arrive, and the caller needs no
+`sorted()` call to group them.
 
 The cost is the streaming `groupby()` provides. `grouped()` reads the
 whole input before returning anything, so an infinite source makes it
@@ -331,11 +331,11 @@ expect(TypeError, deep_sum,
 #: [TypeError] unhashable type: 'list'
 ```
 
-**Show why the call fails.** `cache` stores results in a dictionary keyed on the arguments, so
-every argument must be hashable. A `list` is not hashable, because
-its contents can change after the cache stores it, and a mutated key
-no longer hashes to the slot holding its entry. The call fails
-before `deep_sum()`'s body runs.
+**Show why the call fails.** Because `cache` stores results in a
+dictionary keyed on the arguments, every argument must be hashable. A
+`list` is not hashable, because its contents can change after the
+cache stores it, and a mutated key no longer hashes to the slot
+holding its entry. The call fails before `deep_sum()`'s body runs.
 
 **Silence the checker so the listing runs.** `ty` reports the same problem before the program runs. The standard
 library's type declarations give a cached function's parameters the
@@ -346,15 +346,15 @@ inferred type, on the list passed through `expect()`. The two
 `# type: ignore` comments silence those diagnostics so the listing
 can run and show the exception.
 
-For caching to be possible, `Nested` must describe an
-immutable structure: `type Nested = int | tuple[Nested, ...]`, with
-the parameter annotated `tuple[Nested, ...]` rather than
-`list[Nested]`. Tuples hash by contents, and their contents cannot
-change, so a tuple meets both conditions a cache key needs. Purity
-is a second, separate requirement: the chapter's `cache` entry states
-that "`@cache` works correctly only for pure functions." Hashability
-constrains the key, purity constrains the function, and a function can
-meet one without the other.
+For caching to be possible, `Nested` must describe an immutable
+structure: `type Nested = int | tuple[Nested, ...]`, with the
+parameter annotated `tuple[Nested, ...]` rather than `list[Nested]`.
+Tuples hash by contents, and their contents cannot change, so a tuple
+meets both conditions a cache key needs. Purity is a second, separate
+requirement. The chapter's `cache` entry states that "`@cache` works
+correctly only for pure functions." Hashability constrains the key,
+purity constrains the function, and a function can meet one without
+the other.
 
 The exception says nothing about purity. `deep_sum()` is pure,
 and caching it would be correct. The obstacle is the
@@ -474,7 +474,7 @@ Passing the `rng` is dependency injection applied to a source of
 nondeterminism, the same move
 [Random Numbers](../../Chapters/11_Techniques--Testing.md#random-numbers)
 makes for testing. The `rng` version is deterministic per `Random`
-object: two callers who each build `random.Random(0)` get identical
+object. Two callers who each build `random.Random(0)` get identical
 schedules, while two calls sharing one `Random` do not, because
 `shuffle()` advances that object's state.
 

@@ -38,15 +38,15 @@ print(deposit(30), deposit(30))
 #: 130 160
 ```
 
-`deposit()` reads and mutates `balance`, a name outside its own
-scope. A pure function reads nothing that can change and changes
-nothing outside itself, so `deposit()` breaks both halves of that
-definition. What `deposit(30)` returns depends on how many times
-`deposit()` (or `withdraw()`) has run: the two identical calls
-`deposit(30)` and `deposit(30)` return `130` and then `160`, where a
-pure function returns the same value both times. To predict either
-result you must track the history of every prior call, and that
-tracking is the problem the chapter raises for `withdraw()`.
+`deposit()` reads and mutates `balance`, a name outside its own scope.
+A pure function reads nothing that can change and changes nothing
+outside itself, so `deposit()` breaks both halves of that definition.
+What `deposit(30)` returns depends on how many times `deposit()` (or
+`withdraw()`) has run. The two identical calls `deposit(30)` and
+`deposit(30)` return `130` and then `160`, where a pure function
+returns the same value both times. To predict either result you must
+track the history of every prior call, and that tracking is the
+problem the chapter raises for `withdraw()`.
 
 </details>
 </details>
@@ -244,7 +244,7 @@ print(increment_then_double_then_square(3))
 `increment_then_double_then_square(3)` runs `increment_then_double(3)`
 first, which computes `(3 + 1) * 2 = 8`, then feeds that `8` into
 `square`, giving `8 * 8 = 64`. `compose()` needs no change to support
-a third stage: wrapping one composed function inside another
+a third stage. Wrapping one composed function inside another
 `compose()` call extends the pipeline.
 
 </details>
@@ -308,12 +308,12 @@ expect(TypeError, partial(clamp, high=100), 0, 5)  # type: ignore
 and `partial()` fills positional arguments from the left, so
 the two remaining parameters stay open in order.
 
-**Show where the keyword fails.** Presetting `high` alone is the case that needs a `Placeholder`.
-`partial()` does not inspect the signature, so building
-`partial(clamp, high=100)` succeeds. The call is where the partial fails:
-`high` is positional-only, so it cannot arrive by name. Passing
-`high` positionally means passing `low` and `value` first, which is
-the opposite of leaving them to the caller.
+**Show where the keyword fails.** Presetting `high` alone is the case
+that needs a `Placeholder`. `partial()` does not inspect the
+signature, so building `partial(clamp, high=100)` succeeds. The call
+is where the partial fails. `high` is positional-only, so it cannot
+arrive by name. Passing `high` positionally means passing `low` and
+`value` first, which is the opposite of leaving them to the caller.
 `partial(clamp, Placeholder, Placeholder, 100)` is the version that
 works, and `Placeholder` exists for that case.
 
@@ -357,12 +357,12 @@ print(CONFIG, MAX_SIZE)
 #: [1, 2, 3] 200
 ```
 
-**Separate mutation from rebinding.** `Final` constrains the binding between a name and an object: `CONFIG`
-must keep pointing at the same list forever. `Final` says nothing
-about that list's contents, so `CONFIG.append(3)` passes: `append()`
-mutates the object and leaves the binding alone. `MAX_SIZE = 200` is
-the operation `Final` exists to reject, because it points the name at
-a different object.
+**Separate mutation from rebinding.** `Final` constrains the binding
+between a name and an object. `CONFIG` must keep pointing at the same
+list forever. `Final` says nothing about that list's contents, so
+`CONFIG.append(3)` passes. `append()` mutates the object and leaves
+the binding alone. `MAX_SIZE = 200` is the operation `Final` exists to
+reject, because it points the name at a different object.
 
 **Suppress the rebinding error.** The reassignment carries a `# type: ignore` so the listing passes the
 book's build. With that comment removed, `ty` reports one error here,
@@ -458,15 +458,17 @@ print(list(raw))
 #: []
 ```
 
-**Inspect the lazy object.** Printing `raw` directly shows `<map object at 0x...>` rather than any
-values, because `map()` returns a lazy iterator that has computed
-nothing yet, so its `repr()` shows only the type and an address.
+**Inspect the lazy object.** Printing `raw` with no `list()` around it
+shows `<map object at 0x...>` rather than any values, because `map()`
+returns a lazy iterator that has computed nothing yet, so its `repr()`
+shows only the type and an address.
 
-**Exhaust the iterator.** The second `list(raw)` is the more dangerous half:
-it returns `[]` and raises no error. The first `list(raw)` consumed
-the iterator, and nothing rewinds it, so any later pass sees an
-exhausted object and silently produces nothing. A comprehension hands
-back a finished list, which you can walk as many times as you like.
+**Exhaust the iterator.** The second `list(raw)` is the more dangerous
+half. It returns `[]` and raises no error. The first `list(raw)`
+consumed the iterator, and nothing rewinds it, so any later pass sees
+an exhausted object and silently produces nothing. A comprehension
+hands back a finished list, which you can walk as many times as you
+like.
 
 </details>
 </details>
@@ -635,11 +637,11 @@ print([r.celsius for r in data])
 **Add the upper bound.** `colder_than()` mirrors `warmer_than()`, and `partial()` turns each
 into the one-argument callable `filter()` requires.
 
-**Narrow to the band.** Chaining the two
-filters keeps `b`, whose 25.0 Celsius sits inside the band:
-`a` is too cold and `c` is too warm. The two filters commute, because
-each one tests the same untouched Celsius value, so swapping the
-`warm` and `band` lines reports the same reading.
+**Narrow to the band.** Chaining the two filters keeps `b`, whose 25.0
+Celsius sits inside the band. `a` falls below the band and `c` above
+it. The two filters commute, because each one tests the same untouched
+Celsius value, so swapping the `warm` and `band` lines reports the
+same reading.
 
 **Reorder the stages.** The empty list from `converted_first()` shows that the `map()` does
 not commute with the filters. Once `to_fahrenheit()` has run, every
@@ -652,10 +654,10 @@ correct on their own.
 The unit lives only in the field name. A stage that changes what a
 value means must run after every stage that reads the old meaning.
 
-**Show the input untouched.** The last `print()` repeats the chapter's point. `report()` and
-`converted_first()` both read `data` and neither writes it, so the
-Celsius values stay the same after three traversals, and you can run
-either function again and get the same answer.
+**Show the input untouched.** `report()` and `converted_first()` both
+read `data` and neither writes it, so the Celsius values stay the same
+after three traversals, and you can run either function again and get
+the same answer.
 
 </details>
 </details>

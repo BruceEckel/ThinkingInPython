@@ -42,8 +42,8 @@ def composed(i: int) -> Result[int, str]:
 <summary>Solution</summary>
 
 If you append `func_d()` at the end of the chain,
-an `Err` from it has no later step to skip:
-input `4` prints `func_c(4) runs` and then `Err(error='func_d(4)')`,
+an `Err` from it has no later step to skip.
+Input `4` prints `func_c(4) runs` and then `Err(error='func_d(4)')`,
 so the run cannot show that a failure from the new step stops the chain.
 The solution puts `func_d()` before `func_c()`,
 whose printed line then goes missing for `4`.
@@ -89,16 +89,16 @@ for i in range(5):
 #: 4 Err(error='func_d(4)')
 ```
 
-**Insert the new step.** `Result` comes from the chapter's `utils/result.py`: adding a fourth
-`.bind(func_d)` needs no change to `Result`, `Ok`, or `Err`.
-`func_d()` sits before `func_c()` in the chain, so an `Err` from
-`func_d()` has a later step to skip.
+**Insert the new step.** `Result` comes from the chapter's
+`utils/result.py`. Adding a fourth `.bind(func_d)` needs no change to
+`Result`, `Ok`, or `Err`. Because `func_d()` sits before `func_c()` in
+the chain, an `Err` from `func_d()` has a later step to skip.
 
-**Make the skipped step visible.** `func_c()` prints a line when it runs, and
-that line confirms the skip: it appears for `0` and `3` and is
-missing for `4`. `4` reaches `func_d()` because it survives
+**Make the skipped step visible.** `func_c()` prints a line when it
+runs, and that line confirms the skip. It appears for `0` and `3` and
+is missing for `4`. `4` reaches `func_d()` because it survives
 `func_a()` and `func_b()`, and the `Err` that comes back travels to
-the end of the chain untouched: `Err.bind()` returns `self` without
+the end of the chain untouched. `Err.bind()` returns `self` without
 calling `func_c()`.
 
 `1` and `2` fail earlier and stop the chain
@@ -237,13 +237,13 @@ print(Err("boom").map_error(prefix))
 
 This exercise changes `Ok` and `Err`, so the listing defines its own
 pair and does not import the chapter's. `map_error()` works on the
-side `bind()` skips: `bind()` passes a success to the next step and
-leaves a failure alone, while `map_error()` transforms the failure
-and leaves a success alone. `map_error()` differs from `bind()` in
-what it asks of `func`. `bind()`'s function returns a `Result`; `map_error()`'s
-function returns the new error, and `map_error()` wraps it, the way
-the chapter's `map()` wraps a new answer. The `returns` library names
-this method `alt()`.
+side `bind()` skips. `bind()` passes a success to the next step and
+leaves a failure alone, while `map_error()` transforms the failure and
+leaves a success alone. `map_error()` differs from `bind()` in what it
+asks of `func`. `bind()`'s function returns a `Result`.
+`map_error()`'s function returns the new error, and `map_error()`
+wraps it, the way the chapter's `map()` wraps a new answer. The
+`returns` library names this method `alt()`.
 
 **Leave a success alone.** `Ok`'s version is a no-op, since an `Ok`
 holds no error to touch.
@@ -277,12 +277,12 @@ Gather the `.error` of each `Err` into a list, return `Err(errors)` when the lis
 <summary>Solution</summary>
 
 If you keep the nested `bind()` calls from `combining.py`,
-`combined(1, 2)` returns `Err(error='func_a(1)')`:
-the chain stops at the first failure,
+`combined(1, 2)` returns `Err(error='func_a(1)')`.
+The chain stops at the first failure,
 so the caller sees no failure from `func_b(2)` or `func_c(3)`,
 and the first test fails.
-The three calls are independent,
-so the solution makes all three before it inspects any result.
+Because the three calls are independent,
+the solution makes all three before it inspects any result.
 
 ```python
 # test_ch42_combined.py
@@ -346,13 +346,14 @@ at once: `i=1` fails `func_a`, `j=2` fails `func_b`, and `i+j=3`
 fails `func_c`. The short-circuiting `bind()` chain stops at the
 first of them, `func_a(1)`.
 
-**Widen the error channel.** One generic pair carries both shapes. The three steps return
-`Result[int, str]`, an `int` or one error string, while `combined()`
-returns `Result[str, list[str]]`, a finished `str` or a list of error strings.
-`Ok` and `Err` take whatever type parameters each call needs, so the
-error channel widening from `str` to `list[str]` costs no new classes.
+**Widen the error channel.** One generic pair carries both shapes. The
+three steps return `Result[int, str]`, an `int` or one error string,
+while `combined()` returns `Result[str, list[str]]`, a finished `str`
+or a list of error strings. `Ok` and `Err` take whatever type
+parameters each call needs.
 
-**Narrow for the type checker.** The type checker follows the widening: `isinstance(r, Err)` narrows the comprehension to
+**Narrow for the type checker.** The type checker follows the
+widening. `isinstance(r, Err)` narrows the comprehension to
 `list[str]`, and the three `assert isinstance` lines narrow each
 success to `Ok[int]` so `.answer` is an `int`. The asserts document
 what the `if errors:` return has already established, since a checker
@@ -409,7 +410,7 @@ Python then calls that wrapper with `parse()` as its argument,
 so `parse` names an `Ok` holding a `ValueError`,
 and `parse("42")` raises a `TypeError`, `'Ok' object is not callable`
 (`ty` reports `call-non-callable` at the same call).
-The solution adds an outer layer:
+The solution adds an outer layer.
 `safe(ValueError)` returns the decorator, and the decorator wraps `parse()`.
 
 ```python
@@ -461,25 +462,25 @@ If `safe()` declares `[**P, A]` and returns
 `Callable[[Callable[P, A]], Callable[P, Result[A, Exception]]]`,
 `ty` reveals `parse` as `(text: str) -> Ok[int] | Err[Exception]`,
 and one `safe(ValueError)` decorator stays generic across two different functions.
-The protocol is a readability choice:
-it gives the decorator's shape a name,
+The protocol is a readability choice.
+It gives the decorator's shape a name,
 so `safe()`'s return annotation reads `SafeDecorator`
 and the revealed signature keeps the `Result` alias.
 
-**Accept the types to catch.** `safe()` gains a layer: it now takes the exception types and returns
-the decorator, instead of being the decorator.
+**Accept the types to catch.** `safe()` gains a layer. It now takes
+the exception types and returns the decorator, instead of being the
+decorator.
 
-**Catch only the named types.** The `except catch`
-clause accepts the tuple directly, so `wrapper` changes by
-one word.
+**Catch only the named types.** Because the `except catch` clause
+accepts the tuple, `wrapper` changes by one word.
 
-**Let everything else propagate.** `parse("42")` still comes back as an `Ok`. `parse("oops")` raises a
-`TypeError`, which `@safe(ValueError)` does not catch, so the
-`TypeError` propagates through `wrapper` untouched. `expect()`
-catches it outside `parse()` and prints it; without that catch the
-caller sees an ordinary traceback. Under the chapter's `@safe` that same
-`TypeError` arrives as `Err(TypeError(...))`, indistinguishable from
-a bad-input failure.
+**Let everything else propagate.** `parse("42")` still comes back as
+an `Ok`. `parse("oops")` raises a `TypeError`, which
+`@safe(ValueError)` does not catch, so the `TypeError` propagates
+through `wrapper` untouched. `expect()` catches it outside `parse()`
+and prints it. Without that catch the caller sees an ordinary
+traceback. Under the chapter's `@safe` that same `TypeError` arrives
+as `Err(TypeError(...))`, indistinguishable from a bad-input failure.
 
 </details>
 </details>
@@ -558,19 +559,21 @@ reach `add_note()`, and an `Ok` carries no exception on which to
 hang a note. Notes attach to exceptions, so only the failing path
 carries one, and only the failing path has anything to explain.
 
-**Report without a traceback.** Each failure reports the setting that caused it, and the second and
-third runs differ only in which name appears in the note. The note
-travels inside the `Err` as ordinary data, so `report()` can print
-it long after the frame that knew the setting name has returned.
-`report()` reconstructs nothing from a traceback, because nothing
-prints one: the exception still holds its `__traceback__`, and the
-exception does not propagate to a handler that would show it.
+**Report without a traceback.** Each failure reports the setting that
+caused it, and the second and third runs differ only in which name
+appears in the note. The note travels inside the `Err` as ordinary
+data, so `report()` can print it long after the frame that knew the
+setting name has returned. `report()` reconstructs nothing from a
+traceback, because nothing prints one. The exception still holds its
+`__traceback__`, and the exception does not propagate to a handler
+that would show it.
 
-**Sequence the two loads.** The lambdas ignore their parameter, since the second setting does not
-depend on the first one's value. `bind()` reads worst in that case:
-it exists to pass an answer forward, and here it passes an ordering
-and the lambda discards the answer. The do-notation mentioned
-in [The returns Library](../../Chapters/42_Functional--Error_Handling.md#the-returns-library)
+**Sequence the two loads.** The lambdas ignore their parameter, since
+the second setting does not depend on the first one's value. `bind()`
+reads worst in that case. It exists to pass an answer forward, and
+here it passes an ordering and the lambda discards the answer. The
+`returns` library's
+[do-notation](../../Chapters/42_Functional--Error_Handling.md#the-returns-library)
 reads better here.
 
 </details>
@@ -662,11 +665,11 @@ reasons, and all three arrive as the same `None`. Compare the
 `Result` version, where the same three inputs report `func_a(1)`,
 `func_b(2)`, and `func_c(3): division by zero`.
 
-**Stop at the first failure.** The structure of `composed()` barely changes: `if a is None` replaces
-`if isinstance(a, Err)`, and the early returns stay. What changes is
-what survives the return. `None` is a single value with no room to
-carry a reason, so every failure that reaches it becomes the same
-failure.
+**Stop at the first failure.** The structure of `composed()` barely
+changes. `if a is None` replaces `if isinstance(a, Err)`, and the
+early returns stay. What changes is what survives the return. `None`
+is a single value with no room to carry a reason, so every failure
+that reaches it becomes the same failure.
 
 The chapter weighs `None` against `Result`. Use `| None` when absence
 needs no explanation. Use a `Result` when the caller may need to act on
