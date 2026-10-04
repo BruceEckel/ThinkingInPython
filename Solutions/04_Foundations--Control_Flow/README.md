@@ -207,8 +207,8 @@ except TypeError as e:
 raises `TypeError` inside `checked_divide()`, because Python cannot
 divide an `int` by a `str`. The `except` clause names
 `ValueError`, so the `TypeError` passes it by. The `finally` block
-still runs: `finally` runs whatever kind of exception is in flight.
-The `else` clause does not run here: it belongs to the case where the
+still runs. `finally` runs whatever kind of exception is in flight.
+The `else` clause does not run here. It belongs to the case where the
 `try` block finishes cleanly.
 
 **Catch the escape at the caller.** The `TypeError` keeps
@@ -400,7 +400,7 @@ report the same way a caught one does. `from` takes an expression, not a name
 bound by `except`.
 
 **Compare the cause with the context.** The second `print()` shows that both
-attributes hold an exception, and different ones: `__cause__` is the
+attributes hold an exception, and different ones. `__cause__` is the
 `ArithmeticError` you supplied, and `__context__` is still the
 `ValueError` Python recorded on its own when `raise` ran inside a
 handler. Python reports the cause when one exists, so the
@@ -465,7 +465,7 @@ call opens and closes the file again.
 
 That control matters when the file is large enough that holding it
 costs something, or when you read a stream that has no end.
-The closing guarantee is not the difference: `read_text()` opens the
+The closing guarantee is not the difference. `read_text()` opens the
 file in a `with` block of its own, so it closes the file too, whether
 or not the read succeeds. For a configuration file of a few kilobytes
 read once at startup, `read_text()` is the better choice.
@@ -506,7 +506,7 @@ that same position-0 element. The second `2` slides down into slot 0,
 which the loop has passed, so the next iteration looks at position 1
 and finds `1`. The loop does not visit the survivor.
 
-The prediction covers more than "one survives": it says which item
+The prediction covers more than "one survives". It says which item
 and where. The survivor is whatever slides into a slot the loop has
 passed, so its final position depends on the data. In the chapter's
 `[1, 2, 2, 3]` the survivor sits mid-list. Here it sits first. The

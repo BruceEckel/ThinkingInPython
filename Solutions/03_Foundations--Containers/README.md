@@ -67,7 +67,7 @@ print(deque_time < list_time)
 ```
 
 `deque_time < list_time` holds at `n = 2_000`, `20_000`, and `200_000`.
-But the margin grows with `n`: each `list.insert(0, x)` or
+But the margin grows with `n`. Each `list.insert(0, x)` or
 `list.pop(0)` shifts every remaining element, so the whole loop costs
 O(n²). Each `deque` operation is O(1), so the `deque` loop costs O(n). At a few
 dozen items the constant-factor overhead of a `deque` nearly closes the
@@ -185,7 +185,7 @@ except TypeError as e:
 ```
 
 A `set` hashes each element once, at insertion, so every element must
-be hashable. `frozenset` is hashable because it is immutable: its
+be hashable. `frozenset` is hashable because it is immutable. Its
 contents stay fixed after creation, so its hash stays valid. A `list`
 is mutable, so Python refuses to hash it, and an object with no hash
 cannot be a set member or a dictionary key.
@@ -232,7 +232,7 @@ A negative `start` counts from the end, so `xs[-2:]` needs no length.
 `xs[1:-1]` trims one from each end. The reversed middle has two
 forms: slice, then reverse the copy, or walk backwards with a
 negative `step`. The one-slice form is harder to read because the
-bounds swap roles: `3` is now the first index visited and `0` is the
+bounds swap roles. `3` is now the first index visited and `0` is the
 excluded stop, so the element at index `0` does not appear.
 
 </details>
@@ -285,9 +285,10 @@ you.
 `defaultdict(int)` stores a `0` for `"dog"`, so their contents differ
 after the `counts["dog"]` line.
 
-**Rebuild the reporting.** The rest is what `Counter` supplies after the tally:
-`most_common()` becomes a `sorted()` call with a key function and a
-slice, and the `Counter({...})` repr becomes a `dict()` conversion.
+**Rebuild the reporting.** The rest is what `Counter` supplies after
+the tally. `most_common()` becomes a `sorted()` call with a key
+function and a slice, and the `Counter({...})` repr becomes a `dict()`
+conversion.
 
 </details>
 </details>
@@ -325,10 +326,11 @@ print(person[0], type(person[0]).__name__)
 ```
 
 The unpacking line stays the same, because a `namedtuple` is a tuple
-subclass: it unpacks by position like any other tuple. The names add
-the second `print()`, where `person.height` says what `person[2]`
-means. They cost nothing, so a heterogeneous tuple that outlives one
-function is usually better as a `namedtuple` or a data class.
+subclass. The `namedtuple` unpacks by position like any other tuple.
+The names add the second `print()`, where `person.height` says what
+`person[2]` means. Unpacking and `person[0]` still work beside the
+names, so a heterogeneous tuple that outlives one function is usually
+better as a `namedtuple` or a data class.
 
 </details>
 </details>
@@ -370,7 +372,7 @@ becomes a dictionary with no loop. `dict(zip(names, values))` is the
 same constructor fed from two parallel sequences.
 
 **Resolve the collision.** `30` ends up under `"c"`, because `|` resolves a collision in favor of
-the right operand. The rule follows from what a merge must be: the
+the right operand. The rule follows from what a merge must be. The
 result is one value per key, and the two dictionaries disagree about
 `"c"`, so one of them must lose. The right intuition for `a | b` is
 "start from `a`, then apply `b`", and that reading matches
@@ -428,7 +430,7 @@ except ValueError as e:
 **Absorb the remaining items.** A starred target absorbs however many items remain, so one assignment
 reaches any of the three positions without an index. The star may
 appear anywhere in the target list, so `first, *middle, last = row`
-works: `first` and `last` each take one item and `middle` takes the
+works. `first` and `last` each take one item and `middle` takes the
 rest, however many that is.
 
 **Reject a count mismatch.** `a, b = row` fails because an unstarred target list states an exact
@@ -502,7 +504,7 @@ would.
 hash and equality, so an equal key need not be the same object.
 `config` and `same` are separate objects built in different entry
 orders, but they hold the same pairs, so they compare equal and hash
-the same. A `frozendict` key gives you that property: any equal
+the same. A `frozendict` key gives you that property. Any equal
 configuration reaches the same entry, whoever built it and whenever.
 
 **Catch the rejected assignment.** Assigning to an entry raises a `TypeError` rather than quietly

@@ -42,7 +42,7 @@ class Circle:
 <details>
 <summary>Solution</summary>
 
-If you write `shrink()` to assign the underscore attribute `self._radius` directly,
+If you write `shrink()` to assign `self._radius`,
 the setter does not run.
 `shrink(-2)` then stores `-2.5` without complaint,
 and `expect()` fails with `AssertionError: no exception raised`.
@@ -164,7 +164,7 @@ point), so both alternative constructors produce `100.0`. The exercise
 asks for agreement within rounding, so the `print()` call passes each
 `celsius` through `round()`.
 These inputs carry no floating-point noise (the unrounded values compare equal),
-but other inputs do: `from_kelvin(300.15)` stores `27.0`, while
+but other inputs do. `from_kelvin(300.15)` stores `27.0`, while
 `from_fahrenheit(80.6)`, the same temperature, stores `26.999999999999996`.
 Rounded to two places, both print `27.0`.
 
@@ -353,7 +353,7 @@ print(n.average)
 message, and stores `30` on the instance.
 
 **Reuse the cached value.** `average`'s body then
-reads `self.total` and gets that stored value directly. No second
+reads `self.total` and gets that stored value. No second
 `"summing"` message appears, because `total` is computed and
 cached before `average` asks for it. If you access `average`
 first, its body reads `self.total`, which computes `total` the same
@@ -425,7 +425,7 @@ print(f"{t} is {t!r}")
 
 **Supply the fallback form.** With `__repr__()` defined and no
 `__str__()`, `print(t)` and the printed list both show
-`Temperature(21.0)`: `print()` finds no `__str__()` and falls back to
+`Temperature(21.0)`. `print()` finds no `__str__()` and falls back to
 `__repr__()`.
 
 **Add a readable form for users.** Adding `__str__()` makes the two outputs differ.
@@ -458,7 +458,8 @@ in output a user reads.
 
 [Marking Overrides with `@override`](../../Chapters/07_Foundations--Classes.md#marking-overrides-with-override) shows the decorator from `typing` on a method that replaces a base-class method.
 Python compares no method names between a subclass and its base, so the misspelling creates a new method and `show()` resolves to `Base`.
-The decorator is for the type checker: run it with and without `@override` and compare.
+The decorator is for the type checker.
+Run the type checker with and without `@override` and compare.
 
 <details>
 <summary>The shape</summary>
@@ -494,11 +495,12 @@ Derived().show()
 #: Base.show
 ```
 
-**Miss the base-class method.** The program prints `Base.show`. Nothing overrides anything: `shwo()` is
-a new method in the subclass, and `show()` resolves up the chain to
-`Base`. Python does not check whether you meant a subclass method to
-replace a base-class method, so the misspelling is not an error.
-`shwo()` is a second method that nothing calls.
+**Miss the base-class method.** The program prints `Base.show`.
+Nothing overrides anything. `shwo()` is a new method in the subclass,
+and `show()` resolves up the chain to `Base`. Python does not check
+whether you meant a subclass method to replace a base-class method,
+so the misspelling is not an error. `shwo()` is a second method that
+nothing calls.
 
 **Declare the intended override.** With `from typing import override` added and the decorator
 uncommented, the program still prints `Base.show`,

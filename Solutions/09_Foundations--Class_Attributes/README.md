@@ -36,8 +36,8 @@ print(c.rating)
 reading `c.rating` falls back to the class attribute, which is now
 `9`. `c.rating` differs from `a.rating` (still `1`) because `a` got
 its own shadowing instance attribute when `a.rating = 1` ran, before
-`Stars.rating = 9` ran. `c` shadows nothing, so it sees
-whatever the class attribute currently holds.
+`Stars.rating = 9` ran. Because `c` shadows nothing, it sees whatever
+the class attribute currently holds.
 
 </details>
 </details>
@@ -85,11 +85,11 @@ print(Base.shared, Left.shared, Middle.shared, Right.shared)
 #: 9 5 9 100
 ```
 
-`Middle` behaves like `Left`: neither declares its own `shared`, so
+`Middle` behaves like `Left`. Neither declares its own `shared`, so
 both track `Base.shared` through the normal attribute lookup chain,
-until something assigns to `Left.shared` or `Middle.shared` directly. `Right` holds `100` throughout, because it
-creates its own separate class attribute the moment its class body
-runs `shared = 100`.
+until something assigns to `Left.shared` or `Middle.shared`. `Right`
+holds `100` throughout, because it creates its own separate class
+attribute the moment its class body runs `shared = 100`.
 
 </details>
 </details>
@@ -129,7 +129,7 @@ Each call to `B()` runs the generated `__init__()`, which assigns `100`
 to `self.x` as a fresh instance attribute for that particular object.
 `b.x = -1` touches `b`'s own attribute. `b2` comes from its own
 `B()` call and keeps its own `100`. `real_defaults.py` demonstrates
-the same guarantee with `A`: a constructor default creates one value
+the same guarantee with `A`. A constructor default creates one value
 per instance, unlike a class-body attribute, which creates one value
 shared by all instances until something shadows it.
 
@@ -193,9 +193,9 @@ the class. That assignment creates a brand-new instance attribute
 named `total` on `a`, which then shadows `Tally.total` for `a`
 specifically.
 
-**Check where the write went.** `vars(a)` shows the shadow directly: `a` now has its
-own `total` entry. `Tally.total`, read through the class, still
-reports `2`, because nothing wrote to the class.
+**Check where the write went.** `vars(a)` shows the shadow. `a` now
+has its own `total` entry. `Tally.total`, read through the class,
+still reports `2`, because nothing wrote to the class.
 
 This shadow is the
 bug `ClassVar` exists to catch. With `total: ClassVar[int] = 0`
@@ -308,11 +308,12 @@ with expected(AttributeError):
 #: [AttributeError] 'A' object has no attribute 'x'
 ```
 
-**Remove the shadow.** `del a.x` removes the entry from the instance dictionary, which is
-the only place assignment writes. `vars(a)` is empty again, and
-`a.x` reads `100`, because the lookup falls back to the class the
-way it did before any assignment. The class attribute keeps its `100`
-throughout: the assignment and the `del` both stay on the instance.
+**Remove the shadow.** `del a.x` removes the entry from the instance
+dictionary, which is the only place assignment writes. `vars(a)` is
+empty again, and `a.x` reads `100`, because the lookup falls back to
+the class the way it did before any assignment. The assignment and the
+`del` both stay on the instance, so the class attribute keeps its
+`100` throughout.
 
 **Show that deletes stop at the instance.** The second `del a.x` fails because the instance dictionary is empty.
 `del` stops at the instance, the way assignment does, so
@@ -364,8 +365,9 @@ class Counting:
 
 If you fix the increment with `type(self).total += 1`,
 this listing prints `2 2 2` too, because `Counting` has no subclass.
-Once a subclass exists, the counter forks the way `classvar_fork.py` forks it for `Sub`:
-constructing an empty subclass twice leaves `Counting.total` at `2`
+Once a subclass exists, the counter forks
+the way `classvar_fork.py` forks it for `Sub`.
+Constructing an empty subclass twice leaves `Counting.total` at `2`
 and gives the subclass its own `total` of `4`.
 The solution names the class, so every write goes to one dictionary.
 
@@ -438,7 +440,9 @@ and reading `c.total` falls back to that shared value.
 
 [A Shared Mutable Value](../../Chapters/09_Foundations--Class_Attributes.md#a-shared-mutable-value) and [ClassVar and Inheritance](../../Chapters/09_Foundations--Class_Attributes.md#classvar-and-inheritance) each cover half of this one.
 A mutable `ClassVar` on the base is a single object that every subclass reaches by lookup, so `.append()` changes it for all.
-An assignment in a subclass body makes a new entry in that subclass's dictionary; compare the two runs with `is`.
+An assignment in a subclass body makes a new entry
+in that subclass's dictionary.
+Compare the two runs with `is`.
 
 <details>
 <summary>Solution</summary>
@@ -486,7 +490,7 @@ object, not three equal lists.
 
 Here the mutable-value trap of `shared_mutable.py` meets the
 inheritance rule of `class_var_inheritance.py`. Each is harmless on
-its own: an immutable `ClassVar` survives inheritance because nothing
+its own. An immutable `ClassVar` survives inheritance because nothing
 can change it in place, and a mutable one in a single class keeps the
 sharing visible. Together they produce a base-class list that every
 subclass writes to and none of them declares.
@@ -564,7 +568,7 @@ print(vars(t), t.seat)
 **Declare the attribute without creating it.** The type checker reports nothing for this file. The annotation `seat: str` states
 that a `Ticket` carries a `seat`, and the checker trusts the declaration
 without checking that a method assigns `seat`. At runtime the declaration
-creates nothing: `vars(t)` holds `holder` alone, and reading `t.seat`
+creates nothing. `vars(t)` holds `holder` alone, and reading `t.seat`
 raises an `AttributeError`.
 
 **Create the attribute from outside.** `t.seat = "14C"` creates the attribute on the instance, and the type checker
@@ -667,12 +671,12 @@ print(Counted.total, SubCounted.total)
 #: 3 3
 ```
 
-**Watch the subclass fork the counter.** Before the first `Sub()`, `vars(Sub)` has no `total`: `Sub` reads
-`Base`'s. The first `Sub()` runs `type(self).total += 1` with
-`type(self)` as `Sub`. The read falls back to `Base.total`, which is
-`1`, and the write stores `2` in `Sub`'s own dictionary. From then on
-`Sub` has its own counter, and the second `Sub()` moves it to `3`
-while `Base.total` stays at `1`.
+**Watch the subclass fork the counter.** Before the first `Sub()`,
+`vars(Sub)` has no `total`, so `Sub` reads `Base`'s. The first `Sub()`
+runs `type(self).total += 1` with `type(self)` as `Sub`. The read
+falls back to `Base.total`, which is `1`, and the write stores `2` in
+`Sub`'s own dictionary. From then on `Sub` has its own counter, and
+the second `Sub()` moves it to `3` while `Base.total` stays at `1`.
 
 **Keep one counter for the hierarchy.** `Counted` names the class on the left, so every construction reads
 and writes `Counted`'s dictionary. `vars(SubCounted)` holds no `total`

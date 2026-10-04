@@ -125,12 +125,12 @@ info: Function defined here
   |     ^^^^ ---------- Parameter declared here
 ```
 
-The type checker pinpoints the mistake the chapter describes: `"3"`
+The type checker pinpoints the mistake the chapter describes. `"3"`
 is a `str`, not an `int`, so it violates `width: int`. The call still
 runs without error at runtime, because `"3" * 4` is valid string
 repetition. In the book, the `# type: ignore` comment on the
-`area("3", 4)` line lets a deliberately wrong example pass the book's build. Removing
-the comment restores the error.
+`area("3", 4)` line lets a deliberately wrong example pass the book's
+build. Removing the comment restores the error.
 
 </details>
 </details>
@@ -292,7 +292,8 @@ no `report()` method.
 
 [Type Parameter Defaults](../../Chapters/08_Foundations--Static_Types.md#type-parameter-defaults) gives `Stack` a default for `T` so a bare `Stack` annotation still means something.
 Use `reveal_type()` from `typing` on `words.top()` with and without the default, and compare what the checker reports.
-The question is what the checker knows about an expression whose type parameter nothing solves.
+The question is what the checker knows
+about an expression whose type parameter stays unsolved.
 
 <details>
 <summary>The shape</summary>
@@ -505,16 +506,16 @@ of it, and every `Circle` you read out is a `Shape`, so a
 `list[Circle]` meets that requirement. `list[Shape]` refuses the same
 argument because `list` is invariant.
 
-**Give up the write operations.** `shapes.append(...)` stops type-checking for the reason the widening
-works. `Sequence` has no `append()`: it is the read-only abstract
-shape, so the diagnostic is `unresolved-attribute` rather than an
-argument-type error. The type checker does not say "you may not
-append a `Square` here." It says the type you declared has no
-such operation.
+**Give up the write operations.** `shapes.append(...)` stops
+type-checking for the reason the widening works. `Sequence` has no
+`append()`. It is a read-only abstract base class, so the diagnostic
+is `unresolved-attribute` rather than an argument-type error. The type
+checker does not say "you may not append a `Square` here." It says the
+type you declared has no such operation.
 
 The one edit shows both sides of variance. A container you can write
 to is invariant, and giving up the writes makes it covariant. The
-practical rule follows: annotate a parameter with the weakest shape
+practical rule follows: annotate a parameter with the weakest type
 the body needs, because each capability you declare rejects the
 callers whose argument lacks it.
 
@@ -574,11 +575,11 @@ string a caller passed on purpose from no string.
 
 Whether that matters depends on the caller. The type checker cannot
 tell you, because both versions are type-correct. The truthiness test
-is the same trap as `if not target:` on a mutable default in
-[Functions](../../Chapters/05_Foundations--Functions.md), and the same
-answer applies. Test for the condition you mean. Use `is None` when
-you mean "was anything supplied," and truthiness when an empty value
-belongs with the missing one.
+is the same trap as [`if not target:` on a mutable
+default](../../Chapters/05_Foundations--Functions.md#sentinel-values),
+and the same answer applies. Test for the condition you mean. Use
+`is None` when you mean "was anything supplied," and truthiness when
+an empty value belongs with the missing one.
 
 </details>
 </details>

@@ -157,7 +157,7 @@ the convention provides.
 [File Names](../../Chapters/06_Foundations--Modules_and_Packages.md#file-names) calls
 for short, all-lowercase package names, so `bPackage` stands out as
 something other than a package to anyone scanning an import line.
-Its capital letter also makes the name easy to mistype: on a
+Its capital letter also makes the name easy to mistype. On a
 case-insensitive filesystem the shell and the editor accept `bpackage`
 as well, and Python's case-sensitive import check, the one
 exercise 4 examines, rejects `bpackage`.
@@ -271,7 +271,8 @@ The `PYTHONCASEOK` environment variable switches that comparison off, which test
 
 The `import Module` statement resolves, because the name and the file
 agree, and the call in the body becomes `Module.useful_function()` to
-match; left as `module.useful_function()`, the call raises a `NameError`.
+match. Left as `module.useful_function()`, the call raises a
+`NameError`.
 Changing the import back to `import module` while the file is still
 `Module.py` raises
 `ModuleNotFoundError: No module named 'module'. Did you mean: 'Module'?`,
@@ -288,7 +289,7 @@ module name against the name on disk case-sensitively, so
 search moves on.
 
 The case check is deliberate, and
-[PEP 235](https://peps.python.org/pep-0235/) says why: without it, a
+[PEP 235](https://peps.python.org/pep-0235/) says why. Without it, a
 program written on Windows imports happily there and fails the first
 time it runs on Linux, where the two names really are different
 files. Making the case rule the same everywhere turns a portability
@@ -333,7 +334,7 @@ Changing `a_package/module4.py` to
 working as before. Both forms find the same function. They
 differ only in how they name it.
 
-Running the module directly fails either way, with different errors.
+Running the module as a script fails either way, with different errors.
 With the relative import, `python a_package/module4.py` reports:
 
 ```text
@@ -341,8 +342,8 @@ ImportError: attempted relative import with no known parent package
 ```
 
 Python resolves a relative import against the module's `__package__`,
-and a file run as a script has none: it runs as `__main__`, which
-belongs to no package. The single dot has no parent to name.
+and a file run as a script has none. The script runs as `__main__`,
+which belongs to no package. The single dot has no parent to name.
 
 With the absolute import, the same command reports:
 
@@ -353,7 +354,7 @@ ModuleNotFoundError: No module named 'a_package'. Did you mean: 'b_package'?
 The name is now fully qualified, so the parent question does not
 arise. But `sys.path[0]` is the directory of the script you ran,
 `a_package/`. The project root is nowhere on the path, so the
-search for a top-level package called `a_package` fails: Python is
+search for a top-level package called `a_package` fails. Python is
 inside the package, looking for it. The suggestion names `b_package`,
 the one package Python does find on that path.
 
@@ -433,7 +434,7 @@ convention: every top-level name that does not start with an
 underscore arrives. `undeclared` therefore joins `public` and
 `helper`, and `_internal` stays out. Restoring the `__all__` line
 shrinks the surface back to `public` and `helper`. `__all__` and the
-underscore convention compose in one direction only:
+underscore convention compose in one direction only.
 `__all__` can export an underscored name, but without
 `__all__` an underscore is the only way to keep a name out of a star
 import.
@@ -495,7 +496,7 @@ name to a second list and leaves the script's name on the first, so
 the second `append()` reaches a list to which the script's `plugins`
 does not refer.
 
-`exercise_7.py` is `from_snapshot.py` with a mutable value: the
+`exercise_7.py` is `from_snapshot.py` with a mutable value. The
 `from` import takes no copy, and it does not follow the module's
 name when that name moves. When a module's name can move to a new
 list or dict, import the module and read `plugin_list.plugins` each

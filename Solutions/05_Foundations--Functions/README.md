@@ -65,8 +65,8 @@ first call that omits `target` raises an `AttributeError`.
 
 An immutable default suits a parameter the function reads, as in
 `immutable_default.py`. A function that mutates the parameter needs
-the `None` sentinel that `good_append()` uses: test for `None` and
-build a new list inside the function body on every call.
+the `None` sentinel. `good_append()` tests for `None` and builds a new
+list inside the function body on every call.
 
 </details>
 </details>
@@ -133,10 +133,10 @@ print(get(prefs, "theme", None))
 default, so a missing key is an error. The second supplies `None` as
 the default, so a missing key produces `None`. With `default=None` as
 the sentinel, `get()` receives the same `None` in both calls and
-cannot tell them apart: it must raise an exception for both or return
+cannot tell them apart. It must raise an exception for both or return
 `None` for both. `MISSING` is an object no caller passes as data, so
 `default is MISSING` is true only when the caller supplied no default.
-The built-in `getattr()` draws the same line: `getattr(obj, "x")`
+The built-in `getattr()` draws the same line. `getattr(obj, "x")`
 raises an `AttributeError` when `obj` has no `x`, and
 `getattr(obj, "x", None)` returns `None`.
 
@@ -287,7 +287,7 @@ print(apply_twice(lambda n: n * n, 3))
 
 The lambda runs twice, on the original value and then on its own
 result, so `"hi"` gains two exclamation points rather than one. The
-second call shows the same shape with numbers: `3` squares to `9`,
+second call shows the same shape with numbers. `3` squares to `9`,
 which squares to `81`, not `9`. A function that takes another function
 as an argument needs nothing special to say so. `func` is a parameter
 like any other, and it need only be callable with one argument.
@@ -343,7 +343,7 @@ One `*` and one `**` do the whole job. `*args` spreads the tuple into
 three positional arguments, so `"point"` fills `label` and the
 remaining two collect into `values`. `**opts` spreads the dictionary
 into keyword arguments, which `**options` collects again. The first
-element of `args` is not special to the caller: it becomes `label`
+element of `args` is not special to the caller. It becomes `label`
 only because of where it sits in the sequence.
 
 </details>
@@ -361,7 +361,8 @@ only because of where it sits in the sequence.
 <summary>Where to look</summary>
 
 [Positional-Only and Keyword-Only Parameters](../../Chapters/05_Foundations--Functions.md#positional-only-and-keyword-only-parameters) explains the `/` marker, and [Variable Argument Lists](../../Chapters/05_Foundations--Functions.md#variable-argument-lists) explains `**facts`.
-Follow the keyword `name="Bob"` through the signature: ask which parameter may receive it, and which one gets no value.
+Follow the keyword `name="Bob"` through the signature.
+Ask which parameter may receive it, and which one gets no value.
 The error message names the missing parameter, so read it closely.
 
 <details>
@@ -407,7 +408,7 @@ The mistake is visible without running the code, so the call carries a
 `# type: ignore` telling the type checker the misuse is deliberate,
 the same way `param_markers.py` marks its two bad calls.
 
-Without `**facts`, Python reports the mismatch directly:
+Without `**facts`, Python reports the mismatch:
 `describe() got some positional-only arguments passed as keyword
 arguments: 'name'`, the same error `divide(a=10, b=2)` raises in
 `param_markers.py`. Catch-all keywords hide that message, because
@@ -425,7 +426,7 @@ unchanged.
 The `/` and `**facts` are also worth using together. `/` hides the
 parameter name `name` from callers, so a later rename breaks no
 caller, while `**facts` accepts any name a caller writes. The `/`
-also frees the word `name` for the caller's use:
+also frees the word `name` for the caller's use.
 `describe("Bob", name="Robert")` stores a fact called `name`, where
 without the `/` the same call fails with two values for `name`.
 

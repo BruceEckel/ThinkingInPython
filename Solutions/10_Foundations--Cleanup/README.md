@@ -69,12 +69,13 @@ print(Counter.live_count())
 #: 0
 ```
 
-**Abandon the old list.** `counters.clear()` empties the existing list in place, dropping its
-references to all three `Counter` objects. `counters = []` does
-something different: it points the name `counters` at a brand-new,
-empty list and abandons the old one. Here nothing else refers to that
-old list, so it (and every reference it held) becomes collectible
-immediately, and both forms reach `live_count() == 0`.
+**Abandon the old list.** `counters.clear()` empties the existing list
+in place, dropping its references to all three `Counter` objects.
+`counters = []` does something different. It points the name
+`counters` at a brand-new, empty list and abandons the old one. Here
+nothing else refers to that old list, so it (and every reference it
+held) becomes collectible immediately, and both forms reach
+`live_count() == 0`.
 
 The two forms stop agreeing once a second name refers to the list:
 
@@ -340,7 +341,7 @@ what `counters` does. `pop()` removes one reference and the registry
 keeps another, so the object's reference count stays above zero and
 the object survives.
 
-The registry has become the leak it exists to catch: `live_count()`
+The registry has become the leak it exists to catch. `live_count()`
 now reports how many `Counter` objects the program has created,
 because the registry keeps them all alive. A
 `WeakValueDictionary` holds its values weakly, so it can answer the
@@ -411,7 +412,7 @@ print("End of program")
 #: End of program
 ```
 
-Run directly, the whole output is:
+Run as a standalone script, the whole output is:
 
 ```text
 A opened
@@ -425,10 +426,9 @@ B closed
 `B closed` now prints *after* `End of program`, where the chapter's
 version prints it at the `del b`. The listing has no marker for it
 because the line arrives during interpreter shutdown, after the book's
-output checker has stopped capturing. That late arrival demonstrates
-the point in its own right. The rest of the output matches the
-chapter's, so the mistake is hard to see: the callback still
-runs, at a different time and for a different reason.
+output checker has stopped capturing. The rest of the output matches
+the chapter's, so the mistake is hard to see. The callback still runs,
+at a different time and for a different reason.
 
 **Register the cleanup callback.** The callback keeps the `Connection` alive. `self.close`
 is a bound method, and a bound method holds a strong reference to
@@ -661,7 +661,7 @@ exception with a bare `raise`, so the caller still sees `boom`.
 `__exit__()` runs in neither class, yet `Guarded` releases the
 resource.
 
-Acquiring in `__enter__()` still helps: a `Guarded` whose `__init__()`
+Acquiring in `__enter__()` still helps. A `Guarded` whose `__init__()`
 fails for some other reason holds no resource at that point. That move
 does not remove the need for the guard. Whichever method acquires a
 resource, a step that can fail after the acquisition releases the

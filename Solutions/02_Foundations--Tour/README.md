@@ -164,7 +164,7 @@ author came from Java or JavaScript.
 
 Only the camelCase form breaks
 [Naming Conventions](../../Chapters/02_Foundations--Tour.md#naming-conventions), and it
-is the only one a linter flags: ruff's PEP 8 checks report `N816`
+is the only one a linter flags. Ruff's PEP 8 checks report `N816`
 for a mixed-case global. The uppercase form is legal style, merely a
 false claim about the value. CapWords stays reserved for class names.
 
@@ -227,12 +227,13 @@ print(quoted(message))
 #: 'Alice' scored '92'%
 ```
 
-**Tell values from literal text.** `quoted()` is `shout()` with the two branches swapped over: the
-`Interpolation` branch is the one that changes something, and the
-literal branch passes its text through. The `isinstance()` test does
-all the work. Each piece arrives labelled as text the author typed
-or as a value the program supplied, so deciding what to do with
-each is a two-line `if` rather than a parsing problem.
+**Tell values from literal text.** `quoted()` is `shout()` with the
+two branches swapped over. The `Interpolation` branch is the one that
+changes something, and the literal branch passes its text through.
+The `isinstance()` test does all the work. Each piece arrives labelled
+as text the author typed or as a value the program supplied, so
+deciding what to do with each is a two-line `if` rather than a parsing
+problem.
 
 You cannot post-process an f-string this way, because the string it
 produces carries no label. `f"{name} scored {score:.0f}%"` evaluates to
@@ -240,7 +241,7 @@ the single string `Alice scored 92%`, and nothing in that string records
 that `Alice` came from a variable and ` scored ` came from the source.
 A post-processor has only the characters, so it must guess
 which spans to quote by matching them against the values. The guess
-fails as soon as a literal looks like a value: with
+fails as soon as a literal looks like a value. With
 `name = "scored"`, the finished string reads `scored scored 92%`, and
 nothing in it says which of the two words is the value.
 
