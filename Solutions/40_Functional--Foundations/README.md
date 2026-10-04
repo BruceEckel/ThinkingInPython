@@ -483,7 +483,7 @@ back a finished list, which you can walk as many times as you like.
 <summary>Where to look</summary>
 
 [Closures](../../Chapters/40_Functional--Foundations.md#closures) introduces `make_counter()` and the `nonlocal` declaration.
-Python treats a name assigned anywhere in a function as local to that function, but looks in the enclosing scope for a name the function reads without assigning.
+Python treats a name assigned anywhere in a function as local to that function, and looks in the enclosing scope for every other name the function reads.
 Remove `nonlocal`, run `ty`, then run the program, and compare where each one reports the problem.
 
 <details>

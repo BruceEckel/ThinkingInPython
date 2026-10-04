@@ -89,7 +89,7 @@ Either way, adding a type means editing every call site.
 The solution is to encapsulate object creation.
 A common *factory* creates every object instead of spreading creational code through the system.
 Your program must call this factory whenever it needs an object,
-so adding a new type changes the factory and no call site.
+so adding a new type changes the factory and leaves every call site as it was.
 
 Every object-oriented program creates objects,
 and you often extend such programs by adding new types.
@@ -361,7 +361,7 @@ moves that report to the check.
 To add a `Triangle` is a single class definition,
 and `make()` builds it with no change to the factory.
 `Shape.__subclasses__()` can build the table instead,
-but it lists direct subclasses and misses their descendants,
+but it stops at direct subclasses,
 while `__init_subclass__()` runs for every class anywhere below `Shape`.
 [Pattern Refactoring](37_Patterns--Pattern_Refactoring.md#the-trash-hierarchy)
 uses this same self-registration.

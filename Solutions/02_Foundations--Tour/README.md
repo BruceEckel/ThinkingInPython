@@ -3,7 +3,7 @@
 ## 1. Aliasing vs. slicing
 
 > In `references.py`, add a line after `c = a[:]` that appends `99` to `c`.
-> Print `a` and `c` and confirm that `c` changed and `a` did not,
+> Print `a` and `c` and confirm that `c` changed and `a` still holds `[1, 2, 3, 4]`,
 > then explain why `b.append(4)` earlier did change what `a` sees,
 > but appending to `c` does not.
 

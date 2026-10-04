@@ -232,7 +232,7 @@ Rebinding one does not.
 
 `good_append()` builds a fresh list on every call,
 and any function that mutates a parameter with a default must do the same.
-If the function reads the parameter without changing it,
+If the function reads the parameter and leaves it as it was,
 use an immutable default such as an empty tuple.
 Calls still share that tuple,
 and the sharing is harmless because a tuple cannot change:

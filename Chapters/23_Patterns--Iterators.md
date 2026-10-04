@@ -66,8 +66,8 @@ while True:
 ```
 
 One legacy path bypasses `__iter__()`.
-A class that defines `__getitem__()` taking integers from zero,
-and no `__iter__()`, is still iterable:
+A class that defines `__getitem__()` in place of `__iter__()`,
+taking integers from zero, is still iterable:
 `iter()` builds an iterator that calls `__getitem__()` with 0, 1, 2, and so on,
 until `IndexError`.
 Such a class works with `for`,
@@ -460,7 +460,7 @@ and the matching output shows the substitution is exact.
 `flatten_loop()` carries a `# noqa` because ruff's `UP028` rule reports a `for` loop whose body is a lone `yield` of the loop variable,
 and tells you to write `yield from` instead.
 
-The two forms agree for a generator that yields values and returns no result,
+The two forms agree for a generator that yields values and returns `None`,
 as `flatten()` does.
 The `yield from` expression, however, has a value:
 `result = yield from inner()` binds whatever `inner()` returned when it stopped.

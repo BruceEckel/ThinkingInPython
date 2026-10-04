@@ -396,7 +396,7 @@ class Temperature:
 <details>
 <summary>Solution</summary>
 
-If you define `__str__()` without `__repr__()`, `print(t)` shows `21.0C`,
+If you define `__str__()` alone, `print(t)` shows `21.0C`,
 but the list shows the default `<__main__.Temperature object at 0x...>` for each element.
 A container formats its elements with `repr()`, which ignores `__str__()`.
 The solution defines `__repr__()` for that form and adds `__str__()` for the readable one.

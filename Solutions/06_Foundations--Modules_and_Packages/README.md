@@ -239,10 +239,9 @@ print("after both")
 
 Although the `lazy import noisy` line comes first, `noisy`'s body does
 not run until `noisy.announce()` executes, and that call comes after
-`noisy2.announce()`. Each `lazy import` reserves the name without
-loading the module. The module's top-level code runs at the first
-use of that name, so use order, not declaration order, decides which
-module loads first.
+`noisy2.announce()`. Each `lazy import` reserves the name. The module's
+top-level code runs at the first use of that name, so use order, not
+declaration order, decides which module loads first.
 
 </details>
 </details>

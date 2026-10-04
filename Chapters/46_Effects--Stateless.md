@@ -591,7 +591,7 @@ def test_greet() -> None:
 
 The test captures nothing from stdout and mocks nothing:
 it supplies a different `Console`, and `greet()` stays as written,
-since its body names `Console`, not any implementation of it.
+since its body names `Console` and leaves the choice of implementation to `supply()`.
 
 `as_type(Console)` is the only extra call in that test.
 It says "treat this recorder as a `Console`,"

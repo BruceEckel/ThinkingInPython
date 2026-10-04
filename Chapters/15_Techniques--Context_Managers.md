@@ -694,7 +694,7 @@ print("done")
 ```
 
 `created` prints before the opening banner,
-because calling `rows()` builds the generator object and opens no banner.
+because calling `rows()` builds the generator object.
 The banner opens when the `for` loop asks for the first value,
 and it stays open each time the body resumes after a `yield`.
 Before 3.15, both banner lines printed before `created`.

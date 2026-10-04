@@ -182,7 +182,7 @@ kept private to one function, is still the right choice.
 Type annotations can state immutability so a type checker enforces it.
 `typing.Final` marks a name bound once, at its declaration.
 The read-only collection types in `collections.abc`,
-such as `Sequence` and `Mapping`, describe a value you can read but not change.
+such as `Sequence` and `Mapping`, expose the operations that read a collection.
 They have no `append()` or item assignment,
 so a type checker rejects any attempt to mutate through them:
 
@@ -207,7 +207,7 @@ and `Sequence[int]` holds even when the caller passes a mutable `list`.
 The type checker rejects `MAX_SIZE = 200` written later in the module,
 and rejects `values.append(4)` inside `total()`.
 The `Sequence[int]` constraint governs `total()`, not the caller.
-It declares that `total()` reads its argument without changing it.
+It declares that `total()` reads its argument and leaves it as it was.
 The caller keeps its `list` and can append to it at any time,
 including from another thread while `total()` is running.
 `Final` freezes the binding, and only the binding:
@@ -507,7 +507,7 @@ Each call to `make_counter()` builds an independent counter with its own `count`
 
 `increment()` is impure on purpose, to contrast with `withdraw()`.
 `withdraw()` mutates a module-level name that any code can assign.
-`increment()` mutates a name that no other code can assign.
+`increment()` mutates a name that it alone can assign.
 When state must exist,
 a closure is one way to let exactly one function change it.
 

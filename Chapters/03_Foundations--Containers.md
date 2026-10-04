@@ -630,7 +630,7 @@ a callable that builds the default.
 Here, `list` produces a fresh empty list for each new key.
 Reading a missing key runs the factory and stores its result,
 so the lookup of `"fish"` adds that key to the dictionary.
-To look without adding a key, use `in` or `dict.get()`.
+For a lookup that leaves the dictionary as it was, use `in` or `dict.get()`.
 
 A plain `dict` has a second option, `setdefault()`.
 In `plain.setdefault(kind, []).append(name)`,

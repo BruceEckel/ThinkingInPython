@@ -117,7 +117,7 @@ You invoke it like this:
     uv run python -m profiling.sampling run my_program.py
 
 The new profiler can also attach to a running process, using the process ID.
-Attaching makes it the tool for a slowdown that appears in the running process and not in a fresh run:
+Attaching makes it the tool for a slowdown that appears in the running process and disappears in a fresh run:
 
     uv run python -m profiling.sampling attach 12345
 

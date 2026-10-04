@@ -301,8 +301,7 @@ print(function2())
 and `using_packages.py` print the same loading messages,
 because `from` loads what `import` loads.
 The whole module runs either way.
-The statement decides which names this file binds,
-not how much of the module runs.
+The statement decides which names this file binds.
 
 ### Nested Packages
 

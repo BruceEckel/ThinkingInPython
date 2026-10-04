@@ -553,7 +553,7 @@ If you pass `circles`,
 The type checker refuses the call to prevent that.
 A read-only container has no such problem,
 so `Sequence[Shape]` accepts a `list[Circle]`.
-Annotating a parameter `Sequence[T]` instead of `list[T]` declares that the function reads its argument without modifying it,
+Annotating a parameter `Sequence[T]` instead of `list[T]` declares that the function reads its argument and leaves it as it was,
 so the function accepts arguments that a `list[T]` parameter rejects.
 A `list[T]` is *invariant* in `T`, and a `Sequence[T]` is *covariant*.
 

@@ -944,7 +944,7 @@ either.
 
 > Wrap `research()` in `retry()` and supply a `Time()`.
 > Explain what `retry()` does under the `WEATHER` scenario and why retrying a `NotInteresting` failure is the wrong behavior,
-> then say what an Effect system needs for you to retry `Unavailable` and no other failure.
+> then say what an Effect system needs for you to retry `Unavailable` alone.
 
 <details>
 <summary>Where to look</summary>

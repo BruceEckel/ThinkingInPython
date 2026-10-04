@@ -1027,7 +1027,7 @@ until Python raises a `RecursionError`.
 `Point` has no descriptor named `_x`,
 so storing the value there breaks the loop.
 
-A descriptor that defines `__get__()` and no `__set__()` is a *non-data descriptor*,
+A descriptor that defines `__get__()` alone is a *non-data descriptor*,
 and the ranking reverses: the instance's `__dict__` wins.
 That is why assigning to `greet` on a `Person` instance shadows the method on that one instance,
 while `p.x = 3` cannot shadow `Field`, because `Field` defines `__set__()`.

@@ -231,7 +231,8 @@ The trailing `...` is `display_object()` trimming that line to its report width.
 so it gives up hashability rather than let you put a mutable instance in a `set` or use it as a `dict` key.
 As [Class Attributes](09_Foundations--Class_Attributes.md) explains,
 `depth` is the one field of the three that appears as an attribute,
-because it has an initialization value; `name` and `number` have none.
+because it has an initialization value;
+`name` and `number` declare a type alone.
 
 ```python
 # demo_messenger.py

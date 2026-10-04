@@ -746,14 +746,14 @@ variable rather than over its value. By the time anything calls them,
 the loop has finished and `n` holds 2. Nothing is wrong with the
 lambdas. They read the variable they name, at the moment of the call.
 
-**Capture the value at build time.** The three fixes all work, and all work the same way: each one
-evaluates `n` while the loop is still running and stores the result.
-`lambda n=n:` evaluates the default at definition. `partial(print, n)`
-evaluates the argument where it appears. `make(n)` gives each lambda
-its own `n` in its own function scope, and only that fix keeps the
-value private. `lambda n=n:` exposes the value as a parameter a caller
-can override, and `partial(print, n)` has no body in which to use the
-value; it goes straight to `print()`.
+**Capture the value at build time.** The three fixes all work, and all
+work the same way: each one evaluates `n` while the loop is still
+running and stores the result. `lambda n=n:` evaluates the default at
+definition. `partial(print, n)` evaluates the argument where it appears.
+`make(n)` gives each lambda its own `n` in its own function scope, and
+only that fix keeps the value private. `lambda n=n:` exposes the value
+as a parameter a caller can override, and `partial(print, n)` passes the
+value straight to `print()`.
 
 A value computed from the frozen `n` separates the fixes. The two
 lambda forms run their body at the call, so

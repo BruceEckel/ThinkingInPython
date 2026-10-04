@@ -615,12 +615,13 @@ answers a request by constructing the requested class. That is the other kind of
 default: `default_console.py` supplies one prepared instance, and
 `default()` builds whatever the request names, on demand.
 
-**Run both Effects through one handler.** At runtime the handler answered three requests across the two calls,
-two for `Console` and one for `Clock`, although `default()`
-annotates its parameter `Need[Console]`. The type checker believes the handler
-answers `Need[Console]` and not `Need[Clock]`, so the second `run()`
-needs a `# type: ignore`. Without that pragma, the type checker reports a
-leftover `Need[Clock]`.
+**Run both Effects through one handler.** At runtime the handler
+answered three requests across the two calls, two for `Console` and one
+for `Clock`, although `default()` annotates its parameter
+`Need[Console]`. The type checker believes the handler answers
+`Need[Console]` and leaves `Need[Clock]` open, so the second `run()`
+needs a `# type: ignore`. Without that pragma, the type checker reports
+a leftover `Need[Clock]`.
 
 `handle()`'s `t = get_origin(t) or t` is the evidence. `handle()`
 reads the annotation, reduces `Need[Console]` to its origin, `Need`,

@@ -1973,7 +1973,7 @@ It cannot verify that you declared everything effectful,
 because Python's `print()`, `open()`,
 and `requests.get()` are ordinary calls with ordinary types.
 A native EMS computes a function's Effects from its body.
-A library checks the Effects you wrote down and cannot see any others.
+A library's view stops at the Effects you wrote down.
 The guarantee is about consistency, not completeness.
 
 The same limit applies on the error side.
@@ -2377,7 +2377,7 @@ give a hint, usually the shape of the code, and a full answer for each exercise.
     Predict the trace, then say why it differs from `DeadWire`'s even though both fail the same way.
 7.  Wrap `research()` in `retry()` and supply a `Time()`.
     Explain what `retry()` does under the `WEATHER` scenario and why retrying a `NotInteresting` failure is the wrong behavior,
-    then say what an Effect system needs for you to retry `Unavailable` and no other failure.
+    then say what an Effect system needs for you to retry `Unavailable` alone.
 8.  Change `parallel.py` to use a `ProcessPoolExecutor` instead of a `ThreadPoolExecutor`,
     and confirm `squares()` stays unchanged.
     Processes re-import the module,

@@ -1133,7 +1133,7 @@ where a price change touches every class that includes that topping.
 A `Pizza` with a `toppings: list[Topping]` field,
 summing each topping's `add_cost` and joining its name,
 solves the same combinatorial problem, with no wrapping and no `Protocol`.
-Here, where a topping contributes a number and a name and no behavior,
+Here, where a topping contributes data (a number and a name),
 that list is the simpler design.
 The *Decorator* pattern earns its structure when a topping needs behavior,
 not just data: a topping that changes how `cost` rounds,

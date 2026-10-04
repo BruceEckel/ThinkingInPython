@@ -622,7 +622,7 @@ since the exception propagates immediately;
 only a returned sentinel makes Python try the right operand's `__radd__()`.
 When both operands have the same type, Python tries `__add__()` alone,
 so `__add__()` resolves `Meters + Meters`.
-Adding two instances of a class that implements `__radd__()` but not `__add__()` raises a `TypeError`.
+Adding two instances of a class that implements `__radd__()` alone raises a `TypeError`.
 One case reverses the order:
 when the right operand's type is a subclass of the left's and overrides the reflected method,
 Python tries that reflected method first,

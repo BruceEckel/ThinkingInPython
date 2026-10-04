@@ -205,7 +205,7 @@ expect(ValueError, slope, 10, -1)
 Catching the exception works with the types you have.
 But it guards only the exceptions `slope()`'s `try` names.
 `validate()` raises `ValueError` for a negative `run`,
-and the `try` around it catches `ZeroDivisionError`, not `ValueError`.
+and the `try` around it catches `ZeroDivisionError` and lets `ValueError` propagate.
 Because `slope()` calls `validate()`,
 `validate()`'s Effect becomes `slope()`'s Effect.
 This listing puts `validate()` directly above `slope()`,

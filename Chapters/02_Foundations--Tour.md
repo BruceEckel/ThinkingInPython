@@ -646,7 +646,7 @@ This chapter's [solutions](../Solutions/02_Foundations--Tour/) give a hint,
 usually the shape of the code, and a full answer for each exercise.
 
 1.  In `references.py`, add a line after `c = a[:]` that appends `99` to `c`.
-    Print `a` and `c` and confirm that `c` changed and `a` did not,
+    Print `a` and `c` and confirm that `c` changed and `a` still holds `[1, 2, 3, 4]`,
     then explain why `b.append(4)` earlier did change what `a` sees,
     but appending to `c` does not.
 2.  In `truthiness.py`, add an empty dictionary `{}` and a dictionary with one entry to the list of test values.

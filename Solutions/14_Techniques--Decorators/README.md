@@ -568,14 +568,14 @@ print(square.__name__, add.__name__)
 #: square add
 ```
 
-**Describe both call shapes.** The two `@overload` declarations are for the type checker, which cannot
-otherwise tell which of the two shapes a given call has. The first
-says "given a function, return a function of the same signature." The
-second says "given `maxsize` and no function, return a decorator." The
-implementation returns `Any` because `Any` satisfies both overloads. The overloads
-are what callers see: `square(4)` type-checks as an `int`, and
-`memo(maxsize=2)` type-checks as something you can apply to a
-function.
+**Describe both call shapes.** The two `@overload` declarations are for
+the type checker, which cannot otherwise tell which of the two shapes a
+given call has. The first says "given a function, return a function of
+the same signature." The second says "given `maxsize` alone, return a
+decorator." The implementation returns `Any` because `Any` satisfies
+both overloads. The overloads are what callers see: `square(4)`
+type-checks as an `int`, and `memo(maxsize=2)` type-checks as something
+you can apply to a function.
 
 **Tell the two forms apart.** The two decorations call `memo` two different ways, and the body
 tells them apart by what arrives in `func`. Used bare, `@memo` calls

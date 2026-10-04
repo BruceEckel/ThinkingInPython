@@ -42,7 +42,7 @@ But a pattern embodies a complete idea within a program,
 so it can appear at the analysis phase or high-level design phase,
 where you are still describing what the system does rather than how to build it.
 It appears at every level,
-and often you do not discover that you need one until you reach the code.
+and often you first discover that you need one when you reach the code.
 
 The basic concept of a pattern is also the basic concept of program design:
 adding a layer of abstraction.
