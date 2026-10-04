@@ -305,7 +305,10 @@ means, frequency, kind, or item can be named ("as arguments",
 "sometimes", "a type-checking attribute", "apart from the new
 subclass"). Also a bare `only X` whose excluded item the context can
 name: write the item ("catches only `AttributeError`" -> "catches
-`AttributeError` and lets every other exception propagate").
+`AttributeError` and lets every other exception propagate"). State
+the item's fate positively where a positive exists; "and not Y" is the
+fallback (Bruce, 2026-10-04: a negative statement costs the reader the
+effort of turning it into what it means).
 
 **Keep when.** The concrete word is unknown or would be wrong; a hedge
 that is the claim ("potentially unbounded") stays. An `only X` whose
@@ -939,7 +942,10 @@ the/a X", "only in/for/at", clause-final "only"). *Delete* when the
 sentence already bounds: a count or "once" followed by a bounding clause,
 a following "not" clause, or a next sentence that carries the exclusion.
 *Rewrite* when the words around `only` are the problem: R25-R28, C28,
-C29 name the shapes. Bruce's ruling (2026-10-04): "In many cases, 'only'
+C29 name the shapes. A rewrite that names the excluded item states
+its fate positively where a positive exists ("inherits `input()`",
+"leaves `Need[Clock]` open"), since a "not Y" is a negative too
+(Bruce, 2026-10-04). Bruce's ruling (2026-10-04): "In many cases, 'only'
 is fine. In some 'only' can be removed. In other cases, it's not
 necessarily the 'only' but the wording around it that makes it awkward
 and confusing."

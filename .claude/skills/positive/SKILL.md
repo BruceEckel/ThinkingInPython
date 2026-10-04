@@ -16,6 +16,14 @@ but it is one rule among eighteen in the `elements-of-style` pass,
 which is how a paragraph carrying eight negatives went through that pass
 unchanged.
 This one does nothing else, so it counts.
+Bruce's principle (2026-10-04), which this pass serves: "The human
+brain does not automatically understand negative statements. It
+requires extra effort to analyze a negative statement and turn it from
+what it is excluding to what it actually means. I would like to avoid
+this extra effort as much as possible."
+So the count test below finds the dense paragraphs first, and the
+per-negation test then applies everywhere: a single accidental
+negation with a positive form turns around too.
 It edits `Chapters/NN_*.md` prose only;
 code blocks, `#:` output markers, and quoted material stay untouched.
 
@@ -35,8 +43,10 @@ Count the whole family, not just the word "not":
 - **Concessive**: all the same, even so, still, nevertheless, anyway
 - **"Without" plus a gerund**: without deriving, without naming
 
-Two or fewer in a paragraph is normal.
-Three or more, or two inside one sentence, is a rewrite.
+Three or more in a paragraph, or two inside one sentence, marks the
+paragraph for a rewrite first.
+A paragraph under that count still gets each negation asked the
+question below (since 2026-10-04; before that, two or fewer passed).
 
 Then ask of each one: is this negation the claim, or is it an accident
 of how the sentence came out?
@@ -67,6 +77,20 @@ The sentence describing a failure usually knows what did occur:
   the omission before any call happens"
   becomes "An `@abstractmethod` moves that error earlier, to the
   constructor."
+
+**Name the excluded item's fate.**
+An `only` before a code span hides a negative (the other members do
+not), and the first repair, "X and not Y", states it.
+The better repair says what becomes of Y:
+
+- "`hasattr()` catches only `AttributeError`" becomes "`hasattr()`
+  catches `AttributeError` and lets every other exception propagate"
+- "a double that overrides only `print()`" becomes "a double that
+  overrides `print()` and inherits `input()`"
+- "answers only `Need[Console]`" becomes "answers `Need[Console]` and
+  leaves `Need[Clock]` open", not "and not `Need[Clock]`"
+- "reads its argument without changing it" is still a negation;
+  "reads its argument and leaves it as it was" is the positive
 
 **Delete a negation that only hedges.**
 "at least", "all the same", "even so", "still" often soften a claim the
@@ -117,15 +141,15 @@ Let the later passage carry it.
   Leave a contrast whose second beat supplies the positive; rewrite one
   that stops at the negation ("The `Any` is not laziness." with no
   second beat became "The `Any` is there to let ...").
-- **A negation that names what an `only` excluded.**
-  "reads its argument without changing it", "governs `total()`, not
-  the caller", "answers `Need[Console]` and not `Need[Clock]`" each
-  replaced an `only` ("only reads", "covers only `total()`'s side",
-  "answers only `Need[Console]`") in the 2026-10-04 sweep.
-  An `only` before a code span makes the reader compute the negative;
-  the rewrite states it, with the excluded item named.
-  That negation is the fix, so leave it (`bruce_edit_db.md` R9 and
-  R24; Bruce's ruling on the Only Shapes page).
+- **A negation that names what an `only` excluded, when no positive
+  fate exists.**
+  "governs `total()`, not the caller" replaced "covers only
+  `total()`'s side" in the 2026-10-04 sweep, and the next sentence
+  says what the caller keeps, so the "not" stays as half of that
+  contrast.
+  Where Y's fate can be stated ("leaves `Need[Clock]` open",
+  "inherits `input()`"), state it: see "Name the excluded item's
+  fate" above (`bruce_edit_db.md` R9 and R24).
 - **Bruce's "we" stays.**
   The book addresses the reader as "you", and new prose uses "you"
   unless "we" clearly reads better in that sentence.
