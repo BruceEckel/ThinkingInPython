@@ -153,7 +153,7 @@ The first call must therefore be `next()`:
 
 A suspended generator holds its frame:
 the position in the body and every local variable.
-`interview()`'s locals `name` and `town` survive two `send()` calls,
+`interview()`'s local `name` survives the next two `send()` calls and `town` survives the last one,
 because resuming continues an existing computation.
 The frame holds them, and the frame is the generator's state.
 

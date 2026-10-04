@@ -693,7 +693,7 @@ Every function here recurses once per level of tree,
 and Python's recursion limit (roughly a thousand frames)
 caps how deep a tree they can walk.
 Realistic expressions stay far below it.
-A machine-generated chain of thousands of nested nodes does.
+A machine-generated chain of thousands of nested nodes exceeds the limit.
 The alternative is an iterative walk with an explicit stack of pending nodes.
 
 ## A Template Is a Tree {#a-template-is-a-tree}

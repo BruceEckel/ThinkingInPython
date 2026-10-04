@@ -82,7 +82,7 @@ so it does report the gap, but only at runtime,
 when someone first asks it for a triangle.
 Nothing at edit time points at the missing case,
 and the type checker cannot know which strings `export_svg()` should handle.
-An `Enum` for `kind` and an `assert_never()` wildcard [moves that report to check time](13_Techniques--Pattern_Matching.md#exhaustive-matching),
+An `Enum` for `kind` and an `assert_never()` wildcard [move that report to check time](13_Techniques--Pattern_Matching.md#exhaustive-matching),
 though an if-chain like `render()` still slips past the check.
 Either way, adding a type means editing every call site.
 
@@ -909,7 +909,8 @@ Suppose you write a factory subclass and forget `make_obstacle()`.
 Python defines the class,
 and the `TypeError` appears when you create an instance,
 before `GameEnvironment.__init__()` calls anything,
-the same way `Shape` fails in this chapter's earlier listings and `Partial()` does in [*Surrogate*](26_Patterns--Surrogate.md#proxy).
+the same way `make()` fails on a `Shape` subclass that forgets `draw()`,
+and `Partial()` does in [*Surrogate*](26_Patterns--Surrogate.md#proxy).
 The type checker reports that construction before the program runs.
 A *Protocol* names the required methods and needs no base class,
 so a Protocol simplifies the *Abstract Factory*:

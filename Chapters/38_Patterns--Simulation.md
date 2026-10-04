@@ -1162,8 +1162,8 @@ the starting point for a robot that steers continuously instead of planning a gr
 ## Order from Noise
 
 The two simulations so far confirm designs.
-The rats cover every reachable cell, one rat per cell,
-because `claim()` is atomic.
+The rats cover every reachable cell, and because `claim()` is atomic,
+each cell gets one rat.
 The robot reaches the goal because polymorphism handles every encounter.
 Both times you know the outcome in advance and run the program to confirm it.
 The third example gives you only half the outcome.
