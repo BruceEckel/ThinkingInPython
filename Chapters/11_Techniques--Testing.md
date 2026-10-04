@@ -720,7 +720,7 @@ Choose `monkeypatch` when threading it through touches more code than the test i
 
 `datetime.now()` is harder to patch.
 `datetime` is an immutable C type that rejects attribute assignment.
-That makes the injection approach worth the small effort.
+That justifies the effort of injection.
 
 If you cannot change the code,
 the library [`time-machine`](https://github.com/adamchainz/time-machine)

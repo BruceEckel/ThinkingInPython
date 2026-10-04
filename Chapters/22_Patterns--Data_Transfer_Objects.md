@@ -67,7 +67,7 @@ With `__getattr__()` alone, the type checker still rejects the write,
 The standard library's type declaration for `SimpleNamespace` has such a pair
 (its read half is `__getattribute__()`, which intercepts every attribute access),
 so the next listing needs no annotation.
-The price of an ad-hoc attribute bag is that no type checker knows your attribute names.
+With an ad-hoc attribute bag, no type checker knows your attribute names.
 A typo like `m.inof` is a runtime `AttributeError`, not a static error.
 
 ## The Standard-Library Versions
@@ -341,10 +341,10 @@ Between it and a `NamedTuple`,
 the deciding question is whether tuple behavior is a feature.
 Choose `NamedTuple` when it is: unpacking, multiple return values,
 compatibility with code that expects a tuple.
-Choose a [frozen data class](12_Techniques--Data_Classes_as_Types.md#immutability),
-which this book writes as `@record`,
-when the value should be a distinct type that equals only its own kind,
-and when inherited ordering and array-shaped JSON are wrong rather than convenient.
+Choose a [frozen data class](12_Techniques--Data_Classes_as_Types.md#immutability)
+when the value should be a distinct type that equals instances of its own class alone.
+This book writes it as `@record`.
+Choose it too when inherited ordering and array-shaped JSON are wrong rather than convenient.
 
 When the data must stay a dict,
 because it arrives as JSON or goes back out as JSON,

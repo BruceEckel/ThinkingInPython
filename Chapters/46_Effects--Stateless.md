@@ -377,8 +377,9 @@ info[revealed-type]: Revealed type
    |                 ^^^^^ `(name: str) -> Generator[Never, Any, None]`
 ```
 
-`ty` shows `greet` as the `def` it is, name included;
-`bound` is a function `supply()` built, so `ty` shows only its signature.
+`ty` shows `greet` as a `def` with its name.
+`bound` is a function that `supply()` built,
+so `ty` shows its signature with no name.
 The two revealed types are the expanded forms of `Depend[Need[Console], None]` and `Success[None]`.
 `Need[Console]` sits in the first type parameter of `greet` and disappears from `bound`,
 leaving the `Never` from the alias table.

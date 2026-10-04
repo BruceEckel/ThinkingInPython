@@ -221,7 +221,7 @@ at check time.
 `Result` is the same idea as in [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#parse-dont-validate):
 put the meaning in the type.
 Python's simpler form is `int | None`.
-Both force the caller to unpack, but `None` says only "no answer,"
+Both force the caller to unpack, but `None` says "no answer,"
 while an `Err` carries the reason for the failure.
 Use `| None` when absence needs no explanation,
 as in a lookup that found nothing.

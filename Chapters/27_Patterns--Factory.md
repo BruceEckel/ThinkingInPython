@@ -1149,10 +1149,9 @@ The builder most programmers meet is narrower,
 the one Joshua Bloch's *Effective Java* recommends.
 In Java and C++, a class with many optional settings needs a constructor for every useful combination,
 because those languages have no keyword arguments.
-That pile of constructors is the *telescoping constructor*,
-and this builder is the workaround,
+That pile of constructors is the *telescoping constructor*.
+This builder, translated into Python, is the workaround,
 a companion class that collects settings one method call at a time.
-Translated to Python, it looks like this:
 
 ```python
 # pizza_builder.py

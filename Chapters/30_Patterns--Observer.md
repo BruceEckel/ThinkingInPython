@@ -441,7 +441,7 @@ The tests connect a list's `append` to the broadcaster,
 so the list records every announced value.
 
 `disconnect()` matches by equality, and a lambda equals only itself,
-so disconnecting a lambda requires a name bound to the lambda object that `connect()` received.
+so disconnecting a lambda requires a name bound to the same lambda object that `connect()` received.
 
 A bound method is different.
 `test_disconnect_stops_delivery()` disconnects `received.append` without storing it first.

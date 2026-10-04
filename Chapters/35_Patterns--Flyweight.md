@@ -608,7 +608,7 @@ If callers must keep writing `C(...)`,
 intern in `__new__()` and write the bookkeeping.
 If the set keeps growing,
 use a `WeakValueDictionary` so the pool shrinks with the live set.
-Otherwise use a `@cache` factory, which is the least machinery for the job.
+Otherwise use a `@cache` factory.
 
 These four answers read as an if/elif chain,
 but the questions behind them are independent.

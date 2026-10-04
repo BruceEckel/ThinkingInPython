@@ -626,9 +626,8 @@ Solar covers two hours and stops at sunset.
 The battery covers two more and stops when its charge falls below the threshold.
 The grid covers one and stops when the outage begins at 22:00.
 The backup covers the last.
-Four implementations, one Ability, one running program.
 
-`run_load()` names none of them,
+`run_load()` names none of the four sources,
 and that is why the second run prints a different trace from the same code.
 `battery_first` puts the battery ahead of the sun,
 so the charge drains first and the grid supplies the load from 19:00.

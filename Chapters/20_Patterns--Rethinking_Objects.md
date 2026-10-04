@@ -832,7 +832,7 @@ The choice is deterministic,
 but a deep hierarchy still makes it easy to lose track of which method runs.
 Protocols avoid the question.
 With no inheritance graph, C3 has nothing to linearize.
-Satisfying three of them costs nothing more than having the three methods:
+`Invoice`'s three methods satisfy the three protocols:
 
 ```python
 # multi_protocol.py
@@ -1156,8 +1156,8 @@ If you avoid implementation inheritance,
 the payoff for using types is tremendous.
 
 Start with functions and data.
-When a program truly needs an object, it tells you:
-you are passing the same data into every function,
+When a program truly needs an object, it tells you.
+You find yourself passing the same data into every function,
 or bundling behavior with state.
 Compare functions and an object on a running balance:
 

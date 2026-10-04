@@ -1012,7 +1012,6 @@ print(fib_cached(25), fib_cached.cache_info().misses)
 #: 75025 26
 ```
 
-Same answer, from 242,785 calls against 26.
 `cache_info().misses` counts the calls that found nothing stored and ran the body,
 one for each `n` from 0 through 25.
 Every avoided call is work the cached version skips,

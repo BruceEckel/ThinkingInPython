@@ -320,7 +320,6 @@ Chapters/19_Techniques--Concurrency.md	want: and that is what you want
 Chapters/20_Patterns--Rethinking_Objects.md	is what: *Subtype polymorphism* is what the four subsections below demonstrate
 Chapters/20_Patterns--Rethinking_Objects.md	is what: the question is what Python delivers and what it costs
 Chapters/20_Patterns--Rethinking_Objects.md	never: An override may accept more than the base does but never less
-Chapters/20_Patterns--Rethinking_Objects.md	nothing more: Satisfying three of them costs nothing more than having the three methods
 Chapters/20_Patterns--Rethinking_Objects.md	only: A frozen data class is hashable only when every field it holds is hashable
 Chapters/20_Patterns--Rethinking_Objects.md	only: And these copies plug only the outbound leak
 Chapters/20_Patterns--Rethinking_Objects.md	only: But a method is only a function whose first argument is the object
@@ -363,7 +362,6 @@ Chapters/22_Patterns--Data_Transfer_Objects.md	itself: CODE names the fields and
 Chapters/22_Patterns--Data_Transfer_Objects.md	only: Because CODE is the only parameter
 Chapters/22_Patterns--Data_Transfer_Objects.md	only: The hand-rolled CODE is worth writing only to show how CODE works underneath
 Chapters/22_Patterns--Data_Transfer_Objects.md	only: and the CODE marker from Positional-Only and Keyword-Only Parameters is unnecessary here
-Chapters/22_Patterns--Data_Transfer_Objects.md	only: when the value should be a distinct type that equals only its own kind
 Chapters/22_Patterns--Data_Transfer_Objects.md	want: When you want the fields named and checked
 Chapters/23_Patterns--Iterators.md	ever: No type checker can read the code and decide whether an iterator ever ends
 Chapters/23_Patterns--Iterators.md	itself: Its CODE returns itself
@@ -597,7 +595,6 @@ Chapters/41_Functional--Toolkits.md	want: and keeping one is right when you want
 Chapters/42_Functional--Error_Handling.md	exactly: The narrowing works because CODE is a union of exactly two classes
 Chapters/42_Functional--Error_Handling.md	only: Reading CODE directly is safe here only because CODE adds a note on every failure
 Chapters/42_Functional--Error_Handling.md	only: The only way to the answer is narrowing to one of the two classes
-Chapters/42_Functional--Error_Handling.md	only: but CODE says only "no answer
 Chapters/42_Functional--Error_Handling.md	only: only CODE passes all three steps
 Chapters/42_Functional--Error_Handling.md	only: so only the value's runtime type says which side you received
 Chapters/42_Functional--Error_Handling.md	wants: so a caller who wants the original must read it from the new exception's CODE (set by CODE) or CODE (set when a handler raises an exception without CODE)
@@ -673,7 +670,6 @@ Chapters/46_Effects--Stateless.md	only: and CODE handles only a CODE
 Chapters/46_Effects--Stateless.md	only: and only a subclass can replace it
 Chapters/46_Effects--Stateless.md	only: but an interface reaches CODE only through an implementation
 Chapters/46_Effects--Stateless.md	only: even though only CODE
-Chapters/46_Effects--Stateless.md	only: so CODE shows only its signature
 Chapters/46_Effects--Stateless.md	only: so looking up a name is the only step and CODE is the only failure
 Chapters/46_Effects--Stateless.md	only: so today the parent contributes only the name CODE matches
 Chapters/46_Effects--Stateless.md	wants: A caller who wants to redirect the output

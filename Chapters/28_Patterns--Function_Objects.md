@@ -102,7 +102,7 @@ macro.run()
 ```
 
 Both forms do the same thing.
-The class version is four classes and a wrapper to say what one list of functions says directly.
+The class version takes four classes and a wrapper to say what one list of functions says.
 *GoF Design Patterns* calls commands "an object-oriented replacement for callbacks."
 Because in Python a callback is a function, the replacement is unnecessary.
 A `Command` base class is worthwhile when the commands share implementation.
