@@ -85,17 +85,18 @@ Hello, Alice!
 
 `exercise_1.py` binds the real `Console` for `tell` and keeps the
 scripted `ask`, because a book listing that calls `input()` runs with
-no terminal attached. The substitution is the point either way: one
+no terminal attached. The substitution is the point either way. One
 `Console` instance satisfies both protocols, so you can pass the same
 object for both parameters. You can also replace either parameter with
 a double, and the other one is unaffected.
 
-**Declare what the function needs.** `greet()` requires no change, and could not have required one. It
-names two capabilities it needs and calls methods on them. Its body
-names none of `Console`, `input()`, `print()`, or `Scripted`, so
-changing the binding affects nothing there. That is the delayed-binding
-payoff: the choice of implementation moves to the call site, where a
-test can choose differently from production.
+**Declare what the function needs.** `greet()` requires no change, and
+could not have required one. It names two capabilities it needs and
+calls methods on them. Its body names none of `Console`, `input()`,
+`print()`, or `Scripted`, so changing the binding affects nothing
+there. That is the delayed-binding payoff. The choice of
+implementation moves to the call site, where a test can choose
+differently from production.
 
 **Satisfy the protocols structurally.** The type checker still enforces the protocols after the choice moves.
 `Console` inherits from nothing and declares no relationship to `Ask`
@@ -250,21 +251,21 @@ does.
 The cost also scales the wrong way. Adding a fourth Effect later means
 walking the same chain again, and the chain is longer in a real
 program than in this one. The alternative most codebases pick, a
-module-level logger, removes the parameter by removing the choice: the
+module-level logger, removes the parameter by removing the choice. The
 function no longer says it logs, and a test can no longer bind the
 logger differently.
 
 An Effect Management System collapses the parameter lists and the call
 sites, not the signatures. `format_greeting()` declares in its return
 type that it needs a `Log`, and so does every function on the path to
-it, but none of them gains an unused parameter, no call site
-changes, and the type checker names each declaration you miss. You
-still supply the binding, but at one place near the top, where the
-program decides what a `Log` means.
-[Stateless](../../Chapters/46_Effects--Stateless.md) shows that shape with
-a real library: in its `audit_log.py`, `greet_logged()` and its caller
-`greet_all()` both carry a `Need[Log]` in the `Depend` return type,
-while `greet()` stays unchanged.
+it, but none of them gains an unused parameter, no call site changes,
+and the type checker names each declaration you miss. You still supply
+the binding, but at one place near the top, where the program decides
+what a `Log` means.
+[Stateless](../../Chapters/46_Effects--Stateless.md) shows that shape
+with a real library. In its `audit_log.py`, `greet_logged()` and its
+caller `greet_all()` both carry a `Need[Log]` in the `Depend` return
+type, while `greet()` stays unchanged.
 
 </details>
 </details>
@@ -304,13 +305,13 @@ Neither function in `slope_catch.py` has a side effect or a side
 cause. Both read only their arguments and change nothing outside
 themselves. The two Effects are both exceptions, and the chapter
 demonstrates both conversions the table names for them: `slope()`
-catches the `ZeroDivisionError`, and `slope_nonzero.py` shows
-the version where a restrictive type makes a zero `run` unconstructable.
-The third conversion, a `Result`, applies to both exceptions as well:
+catches the `ZeroDivisionError`, and `slope_nonzero.py` shows the
+version where a restrictive type makes a zero `run` unconstructable.
+The third conversion, a `Result`, applies to both exceptions as well.
 `slope_result.py` returns the `ZeroDivisionError` as an `Err`, and
-`@safe` on `slope_catch.py`'s `slope()` does the same for the `ValueError`.
-The `ValueError` from `validate()` is the one still escaping, and
-exercise 4 moves it out of `slope()`.
+`@safe` on `slope_catch.py`'s `slope()` does the same for the
+`ValueError`. The `ValueError` from `validate()` is the one still
+escaping, and exercise 4 moves it out of `slope()`.
 
 `withdraw()` is both a side cause and a side effect in three lines. `balance -= amount` reads
 the global and writes it back, so the function's result depends on the
@@ -318,11 +319,12 @@ global `balance` rather than on its arguments, and the call changes
 `balance` where no caller can see it. Reading and rewriting the global
 is why `withdraw(30)` twice returns `70` then `40`, the demonstration
 the [Foundations](../../Chapters/40_Functional--Foundations.md#pure-functions)
-chapter uses to show purity failing;
+chapter uses to show purity failing.
 [Confidence](../../Chapters/43_Functional--Confidence.md#referential-transparency)
-reuses `withdraw()` to show referential transparency failing. The three
+reuses `withdraw()` to show referential
+transparency failing. Because the three
 conversions in [Converting Effectful to Pure](../../Chapters/44_Effects--Effect_Management.md#converting-effectful-to-pure)
-all manage the exception Effect, so none of them applies here. The
+all manage the exception Effect, none of them applies here. The
 by-hand technique for a side cause and a side effect comes from
 [Effects by Hand](../../Chapters/44_Effects--Effect_Management.md#effects-by-hand) instead:
 pass in what the function would otherwise read or write.
@@ -330,17 +332,17 @@ For `withdraw()`, that means taking the balance as a parameter and returning the
 inputs then give the same answer, and the caller
 holds the state.
 
-`Thermometer` has the same pair inside a design pattern.
-The `celsius` setter writes `_celsius`, an instance attribute rather
-than a global, and then calls `announce()`, which invokes arbitrary code
-in every subscribed responder. The write is a side effect on the
-object. The notification is a side effect on the world, since a
-responder may print, record, or fail. Reading `celsius` is a side cause
-for the same reason `withdraw()` reading `balance` is one: the value
-can change between calls, so the answer depends on history rather than
-arguments. The functional conversion returns each reading as a value
-from the temperature source, and the caller folds new readings into
-whatever state it keeps. That is what the chapter calls
+`Thermometer` has the same pair inside a design pattern. The `celsius`
+setter writes `_celsius`, an instance attribute rather than a global,
+and then calls `announce()`, which invokes arbitrary code in every
+subscribed responder. The write is a side effect on the object. The
+notification is a side effect on the world, since a responder may
+print, record, or fail. Reading `celsius` is a side cause for the same
+reason `withdraw()` reading `balance` is one. The value can change
+between calls, so the answer depends on history rather than arguments.
+The functional conversion returns each reading as a value from the
+temperature source, and the caller folds new readings into whatever
+state it keeps. That is what the chapter calls
 [pushing the Effects to the edges](../../Chapters/44_Effects--Effect_Management.md#a-program-can-never-be-pure).
 
 Across `withdraw()` and `Thermometer`, the classification is not a
@@ -495,8 +497,9 @@ If you leave out the `await` in the list comprehension,
 `ty` reports `no-matching-overload` at the `sum()` call,
 and the `asyncio.run()` call raises a `TypeError` for adding an `int` and a `coroutine`,
 with a `RuntimeWarning` that `price_of_async` was never awaited.
-Calling an `async` function builds a coroutine and runs none of its body,
-so the solution awaits each call to get its `float`.
+Because calling an `async` function builds a coroutine
+and runs none of its body,
+the solution awaits each call to get its `float`.
 
 ```python
 # exercise_5.py
@@ -537,11 +540,11 @@ a `float`, as the last `print()` shows, so `total_price()` cannot sum
 the results until each call has an `await`. Only an `async def` may
 contain `await`, so `total_price()` becomes `total_price_async()`.
 
-**Collect the results before summing.** The argument to `sum()` gains brackets. A generator expression with
-an `await` inside it is an asynchronous generator, which `sum()`
-cannot iterate: `ty` reports `no-matching-overload`, and the call
-raises a `TypeError`. The list comprehension awaits each price and
-hands `sum()` a list.
+**Collect the results before summing.** The argument to `sum()` gains
+brackets. A generator expression with an `await` inside it is an
+asynchronous generator, which `sum()` cannot iterate. `ty` reports
+`no-matching-overload`, and the call raises a `TypeError`. The list
+comprehension awaits each price and hands `sum()` a list.
 
 **Run the coroutine at the edge.** The callers of `total_price_async()` then must
 become `async` in turn, and the propagation stops only at `asyncio.run()`,
@@ -569,20 +572,20 @@ that yields a price" and choosing the implementation later.
 It does not **bind the implementation later**. `asyncio.run()` chooses
 an event loop, and that choice sounds like late binding until you ask
 what it lets you swap. Choosing a loop does not let a test substitute
-a different meaning for the awaits inside: you settle what those
+a different meaning for the awaits inside. You settle what those
 awaits mean when you write the coroutine. A test that needs fake
-prices must still inject `price_of_async`, by the same
-hand-threading this chapter's exercise 2 measures. The event loop is a
-scheduler, not a handler.
+prices must still inject `price_of_async`, by the same hand-threading
+this chapter's exercise 2 measures. The event loop is a scheduler, not
+a handler.
 
 So `async` is an Effect-tracking system rather than a full EMS, in the
 same sense as most of the AI languages in
 [Custom AI Languages with Effects](../../Chapters/44_Effects--Effect_Management.md#custom-ai-languages-with-effects).
 It tracks one fixed Effect, chosen by the language, with the
-implementation set at the call site. That is also why the
-propagation feels like a nuisance rather than a benefit: you
-get the bookkeeping cost of Effect tracking without the delayed
-binding that would repay it.
+implementation set at the call site. That is also why the propagation
+feels like a nuisance rather than a benefit. You get the bookkeeping
+cost of Effect tracking without the delayed binding that would repay
+it.
 
 </details>
 </details>

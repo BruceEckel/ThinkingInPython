@@ -32,8 +32,9 @@ def tally() -> Generator[Prompt, Amount, Total]:
 If you read the total as the result of the last `send()`,
 writing `total: Total = t.send(Amount(12))` with no `try`,
 the script prints the three prompts and then stops with `StopIteration: 42`.
-`ty` rejects that line before it runs:
-`send()` returns the `YieldType`, so it reports an `invalid-assignment` of a `Prompt` to a `Total`.
+`ty` rejects that line before it runs.
+`send()` returns the `YieldType`,
+so `ty` reports an `invalid-assignment` of a `Prompt` to a `Total`.
 A generator's return value arrives only on its `StopIteration`,
 so the solution catches that exception and reads its `value`.
 
@@ -68,12 +69,13 @@ print(total)
 #: 42
 ```
 
-**Keep the three channels apart.** The three-parameter annotation names all three channels:
-`Generator[Prompt, Amount, Total]` says this generator yields a
-`Prompt`, receives an `Amount`, and finally returns a `Total`. Three
-`NewType` definitions over `str`, `int`, and `int` keep the two integer
-channels apart, so transposing the `SendType` and the `ReturnType`
-is a type checker error rather than a bug that shows up in arithmetic.
+**Keep the three channels apart.** The three-parameter annotation
+names all three channels. `Generator[Prompt, Amount, Total]` says
+this generator yields a `Prompt`, receives an `Amount`, and finally
+returns a `Total`. Three `NewType` definitions over `str`, `int`, and
+`int` keep the two integer channels apart, so transposing the
+`SendType` and the `ReturnType` is a type checker error rather than a
+bug that shows up in arithmetic.
 
 **Drive the conversation by hand.** Driving `tally()` by hand takes four calls: one `next()` and three
 sends. `next(t)` runs the body up to the first `yield` and produces the
@@ -249,7 +251,7 @@ exception, reads it as "the conversation finished," and returns
 
 `None` is the wrong answer twice over. The interview did not finish, so
 no `Result` exists, and `None` is not a `Result` in any case. Nothing
-catches the mistake: `StopIteration.value` has type `Any`, so
+catches the mistake. `StopIteration.value` has type `Any`, so
 `return stop.value` satisfies a declared `Result` and the checker reports
 nothing. The failure is silent at the type checker and silent at
 runtime. It surfaces later as a `None` where the caller expects a
@@ -337,7 +339,7 @@ send that supplies a collector's second value produces two: the
 completed collector's `print()`, then the first prompt of the next
 collector. The two-line sends are `send(2)`, `send(4)`, and `send(6)`,
 so the output alternates between one-line and two-line responses all
-the way down. The second line of `send(6)`'s pair is the exception: no
+the way down. The second line of `send(6)`'s pair is the exception. No
 collector remains to prompt, so `gamma` finishes, `both()` raises
 `StopIteration`, and the `except` prints `both() is exhausted`.
 
@@ -459,8 +461,9 @@ def summarize(items: list[str]) -> Generator[str]:
 <summary>Solution</summary>
 
 If you change `report()`'s annotation but leave out `return size`,
-the script still runs, and the printed list ends with `'total: None'`:
-`report()` returns `None`, and the second `yield from` delivers that `None` into `counted`.
+the script still runs, and the printed list ends with `'total: None'`.
+`report()` returns `None`,
+and the second `yield from` delivers that `None` into `counted`.
 `ty` reports an `invalid-return-type` on the annotation,
 because with no `return` statement `report()` always implicitly returns `None`, and its annotation declares an `int` return value.
 The solution returns `size` from `report()`, so the count reaches `summarize()` through a second return.
@@ -558,7 +561,7 @@ The mismatch is real rather than a type checker limitation. A
 generator's `SendType` describes what a suspended `yield` expression
 can receive, and a just-started generator has no suspended `yield`, so
 nothing receives the value handed to the first `send()`. The runtime
-enforces the same rule from the other side: `send()` with a non-`None`
+enforces the same rule from the other side. `send()` with a non-`None`
 value on a fresh generator raises `TypeError: can't send non-None value
 to a just-started generator`. So the first call is special in both
 directions, and `None` is the only value it accepts.
@@ -570,7 +573,7 @@ every `yield` expression whose value the generator uses as an `Answer`
 must then handle a `None` that arrives only once. `interview()` puts
 what it receives into an f-string, which formats a `None` as readily
 as an `Answer`, so `interview()` passes the check either way. Priming
-with `next()` sidesteps the whole question: the one call that cannot
+with `next()` sidesteps the whole question. The one call that cannot
 carry a value comes from the one function that cannot pass one.
 
 </details>
@@ -699,10 +702,11 @@ for event in [Coin(25), Digit("1"), Digit("1"), Digit("1"),
 #: Digit(value='2') -> DISPENSED
 ```
 
-**Let position carry the state.** The machine holds no `state` attribute and consults no table. Where the
-generator pauses is the state: paused in the coin loop means
-COLLECTING, paused after `yield "SELECTING"` means a first digit has
-arrived and the machine waits for a second. `amount`, `row`, and
+**Let position carry the state.** The machine holds no `state`
+attribute and consults no table. Where the generator pauses is the
+state. A pause in the coin loop means COLLECTING, and a pause after
+`yield "SELECTING"` means a first digit has arrived and the machine
+waits for a second. `amount`, `row`, and
 `stock` are locals that survive because the frame does. This version
 has no counterpart for two parts of the table-driven version: the state
 attribute and the transition lookup.
@@ -711,18 +715,18 @@ attribute and the transition lookup.
 `interview()`, and neither signature says so. Both yield strings, but
 `interview()` yields a request the driver must satisfy, while
 `machine()` yields a report the driver may ignore. The driver's event
-and the machine's report travel independently: `send(Coin(25))` answers
-no question, it delivers an event. A generator's type describes the
-traffic, not who is in charge. Both arrangements fit the same
-`Generator` annotation.
+and the machine's report travel independently. `send(Coin(25))`
+delivers an event and answers no question. A generator's type
+describes the traffic, not who is in charge. Both arrangements fit
+the same `Generator` annotation.
 
 For another state, take the table. The generator's compactness comes
 from the states forming a line, so control flow can express the
-sequence. The two states here that break the line cost
-something: an `if` chain reaches `UNAVAILABLE` and `WANT_MORE`, and
-each one returns by looping back to the top, a `goto` written as a
-`while True`. Now add a state reachable from three others, the way the
-table handles `Quit` from every state but `QUIESCENT`. No position in the body
+sequence. The two states here that break the line cost something. An
+`if` chain reaches `UNAVAILABLE` and `WANT_MORE`, and each one returns
+by looping back to the top, a `goto` written as a `while True`. If you
+add a state reachable from three others, the way the table handles
+`Quit` from every state but `QUIESCENT`, no position in the body
 corresponds to it. The new state becomes a flag, or a check repeated at
 several `yield`s, and either one breaks the correspondence between
 position and state, the one thing that makes this version readable.
