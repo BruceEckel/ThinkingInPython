@@ -93,7 +93,7 @@ The branching and the repeated subproblem matter, not the arithmetic.
 
 One trap: decorating a method with `@cache` keys every entry on `self`,
 so the cache holds a strong reference to each instance forever.
-That is the *lapsed listener* leak of [*Observer*](30_Patterns--Observer.md#lapsed-listeners)
+That is *Observer*'s [*lapsed listener* leak](30_Patterns--Observer.md#lapsed-listeners)
 in cache form.
 For the usual case, one expensive value per instance,
 use [`@cached_property`](#cached_property).
@@ -229,8 +229,8 @@ shows.
 
 Copies a wrapped function's name and docstring onto its wrapper,
 so a tool that reads those attributes reports the original.
-[Decorators](14_Techniques--Decorators.md#decorators-as-classes)
-covers its sibling, `update_wrapper()`, for wrapping with a class instance.
+Its sibling, [`update_wrapper()`](14_Techniques--Decorators.md#decorators-as-classes),
+copies the same metadata onto a wrapper that is a class instance.
 
 ```python
 # functools_wraps.py
@@ -265,7 +265,7 @@ so a tool that needs the original, such as `inspect.signature()`, can reach it.
 
 ### `cmp_to_key`
 
-Wraps an old-style comparator into a key function `sorted()` uses directly.
+Wraps an old-style comparator into a key function that `sorted()` accepts as its `key` argument.
 A comparator takes two values and returns negative, zero, or positive.
 
 ```python
@@ -322,7 +322,7 @@ which generates all five comparison methods from the field order.
 or when the ordering differs from the fields in declaration order.
 Each synthesized comparison is slower than a hand-written one,
 because it wraps a call to your `__lt__` or `__eq__`.
-A directly generated method compares the fields with no extra call.
+A method that `dataclass` generates compares the fields with no extra call.
 
 ### `singledispatch`
 
@@ -356,9 +356,7 @@ The caller must pass that argument by position.
 ### `singledispatchmethod`
 
 The same dispatch, written as a method so it reads as `self.op(x)` instead of a bare function call.
-The registered method below again takes the name `_`,
-which [*Visitor*](33_Patterns--Visitor.md#the-pythonic-visitor-singledispatch)
-explains.
+The registered method below again takes the [placeholder name `_`](33_Patterns--Visitor.md#the-pythonic-visitor-singledispatch).
 
 ```python
 # functools_singledispatchmethod.py
@@ -388,8 +386,7 @@ in place of loops you write and test again.
 
 ## The `itertools` Toolkit
 
-`itertools` builds lazy iterators from a small set of composable pieces.
-Each one produces values on demand instead of building a list up front,
+Each `itertools` function produces values on demand instead of building a list up front,
 the property [Lazy Evaluation](#lazy-evaluation) revisits below.
 Each is also a loop you would otherwise write by hand.
 The `itertools` version is written in C and correct on the edge cases a hand-written version can miss:
@@ -908,8 +905,6 @@ To write `deep_sum()` as a loop,
 you build your own stack to track which sublists are still open,
 and you must get the push and pop right at every depth.
 The recursive version hands that bookkeeping to the call stack.
-The body says what to do with one element and where to descend.
-The call stack tracks the depth.
 
 ## Case Study: Pairing Rotations
 
@@ -923,9 +918,9 @@ and a seeded random source that makes the whole schedule reproducible.
 
 The *circle method* solves the pairs-only version exactly,
 by direct construction.
-Hold one player in place and arrange the rest in a circle.
-Each round, pair players sitting across from each other,
-then rotate everyone but the fixed player by one seat.
+The method holds one player in place and arranges the rest in a circle.
+Each round, it pairs players sitting across from each other,
+then rotates everyone but the fixed player by one seat.
 For an even number of players `n`,
 the circle method produces `n - 1` rounds with no repeated pair.
 No schedule can do better,
@@ -1033,7 +1028,8 @@ The coverage costs `14` repeat meetings.
 An odd roster leaves one player over,
 so each round adds that player to an existing pair.
 A triple holds three meetings where a pair holds one,
-and those two extra meetings a round, over seven rounds, are the `14` repeats.
+and those two additional meetings a round, over seven rounds,
+are the `14` repeats.
 
 Trios come from the same seven students:
 
@@ -1093,7 +1089,7 @@ In the circle method, which pair sits where in round `r` follows from `r` alone.
 because no formula takes a round number and returns the grouping of arbitrary size that keeps every pair's meeting count lowest.
 To reach round `100`,
 `group_rounds()` therefore generates rounds `0` through `99` first.
-The circle method computes round `100` directly, from its arithmetic alone.
+The circle method computes round `100` from its arithmetic alone.
 [Recursion](#recursion) makes the same choice, memory for generality,
 when the problem outgrows a loop's counter and needs a stack.
 

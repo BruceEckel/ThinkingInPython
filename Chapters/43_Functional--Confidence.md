@@ -52,8 +52,8 @@ the move you make in algebra, and so check parts of a program,
 and sometimes prove them correct.
 
 Substitution stops working the moment a function reads or writes outside itself.
-`withdraw()` from [Foundations](40_Functional--Foundations.md#pure-functions)
-does both, reading and writing the module-level `balance`:
+[`withdraw()`](40_Functional--Foundations.md#pure-functions) does both,
+reading and writing the module-level `balance`:
 
 ```python
 # not_transparent.py
@@ -76,7 +76,6 @@ so substituting `70` for it ought to change nothing.
 The substitution changes `110` into `140`.
 `withdraw()` is not referentially transparent,
 and any expression containing it inherits the problem.
-Substitution reasoning stops at the first impure call.
 
 A `global` statement is one way to break substitution.
 A function that mutates an argument is another:
@@ -109,8 +108,8 @@ and the more of your program is referentially transparent,
 the more of it a machine, or a proof, can verify.
 
 Caching an impure function returns wrong values and raises no exception.
-`withdraw()` reads and writes `balance`,
-so decorating it with `lru_cache` leaves `balance` wrong:
+Because `withdraw()` reads and writes `balance`,
+decorating it with `lru_cache` leaves `balance` wrong:
 
 ```python
 # cached_withdraw.py
@@ -193,8 +192,8 @@ because a pure call returns the same answer whichever process runs it,
 and whenever.
 
 The limits in `parallel_pure.py` are large enough for the difference to show.
-`report()` comes from [Numbers on Your Machine](18_Techniques--Performance.md#numbers-on-your-machine)
-and prints the two times only when you run the listing with `--numbers`.
+[`report()`](18_Techniques--Performance.md#numbers-on-your-machine)
+prints the two times only when you run the listing with `--numbers`.
 On the machine that built this book,
 the serial run took a few seconds and the parallel run about half that,
 well over the 1.3x margin `faster` checks.
@@ -222,8 +221,7 @@ along with the reasons Python parallelism uses processes rather than threads.
 
 ## A Confidence Spectrum
 
-The chapter opens by asking whether programming can make the kind of provable claims a science makes.
-Functional programming's answer is not one guarantee but a spectrum.
+Functional programming's answer to whether programming can make provable claims is not one guarantee but a spectrum.
 Purity, immutability, and referential transparency,
 the properties these chapters build, provide confidence at every level.
 
@@ -237,7 +235,7 @@ the way [Error Handling](42_Functional--Error_Handling.md#matching-on-the-error)
 takes a `Result` apart with one branch per kind of failure.
 A description of the result is easier to check than a sequence of steps,
 because less of it can be wrong.
-It also leaves the runtime free to choose the steps, so a SQL query,
+A description also leaves the runtime free to choose the steps, so a SQL query,
 a NumPy expression, or a dataframe operation can run on an optimized or parallel engine that the library calls for you.
 
 You decide how far up the spectrum to go.
@@ -408,7 +406,7 @@ A real test keeps the defaults.
 
 `roundtrip()` exists to fail, and a failing `test_` function fails the build.
 `roundtrip()` therefore drops the `test_` prefix from its name,
-and the listing calls it directly inside a `try`.
+and the listing calls it inside a `try`.
 
 ### A Family of Property Shapes
 

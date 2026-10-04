@@ -21,8 +21,7 @@ so the type checker forces a caller to check for the failure before reading the 
 and a reviewer sees it without reading the body.
 Control flow stays local.
 The failure returns to the immediate caller, the way any value does.
-You do write a check at each step,
-but that check is where you handle every failure.
+The check at each step is where you handle every failure.
 
 This material comes from my PyCon 2024 talk,
 [Functional Error Handling](https://github.com/BruceEckel/functional_error_handling).
@@ -105,7 +104,7 @@ You need something that says "success" or "failure" no matter what types they ca
 
 ## A Result Type
 
-Make success and failure explicit by defining them as types.
+Defining success and failure as types makes them explicit.
 `Ok` wraps an answer, `Err` wraps an error,
 and `Result` is the union of the two.
 The value's class is now the tag that tells the two cases apart,
@@ -152,8 +151,7 @@ type Result[A, E] = Ok[A] | Err[E]
 so no class can inherit from both.
 An object the type checker finds to be an `Err` therefore cannot also be an `Ok`,
 and a check against one class narrows a `Result` to one side of the union.
-`A`, `B`, `E`, and `F` are type parameters
-(introduced in [Static Types](08_Foundations--Static_Types.md#type-parameters)):
+`A`, `B`, `E`, and `F` are [type parameters](08_Foundations--Static_Types.md#type-parameters):
 placeholders that take concrete types when you use the class.
 Here they have no bounds or constraints, so any type can fill them.
 
@@ -189,8 +187,8 @@ success by returning an `Ok` object.
 `func_a()`'s return type, `Result[int, str]`,
 says it returns an `int` on success or a `str` on failure.
 To get the answer, the caller must unpack the `Result`.
-`unwrap()`, a name borrowed from Rust, makes that unpacking literal.
-Reading the `answer` field directly works the same way.
+`unwrap()`, a name borrowed from Rust, returns the answer an `Ok` holds.
+Reading the `answer` field works the same way.
 Use whichever name reads better in your own code.
 Both exist on `Ok` alone, so the type checker rejects `func_a(i).unwrap()`,
 as it rejects using the `Result` as if it were a number.
@@ -421,8 +419,7 @@ and that union is wider than the annotation you wrote.
 Keep a chain's error type the same at every step,
 or annotate the chain with the union each step can produce.
 
-Because failures are values, you can assert on them directly,
-with no `pytest.raises()`.
+Because failures are values, you can assert on them with no `pytest.raises()`.
 The tests check that `unwrap()` returns the answer,
 and that `bind()` chains a success and short-circuits a failure.
 The last assertion uses `is` rather than `==`,
@@ -461,7 +458,6 @@ def test_manual_and_bind_agree(i: int) -> None:
 `bind()` passes one value from each step to the next.
 When you have several independent inputs,
 nest the binds so each answer stays in scope for the next step.
-Two inputs show the shape:
 
 ```python
 # combining_two.py
@@ -515,7 +511,7 @@ if __name__ == "__main__":
 ```
 
 An `Err` anywhere short-circuits to the end.
-Of the four inputs, only `(7, 5)` passes all three steps,
+`(7, 5)` is the one input of the four that passes all three steps,
 so `add()` runs for that input alone.
 
 Short-circuiting is right for a dependent chain,
@@ -708,8 +704,7 @@ so the comprehension computes all three results before `describe()` matches any 
 A raised exception would have ended the comprehension at the first failure.
 
 The parentheses in `Err(ValueError())` do the type test.
-Without them, `case Err(ValueError):` is a capture
-([Pattern Matching](13_Techniques--Pattern_Matching.md#a-bare-name-captures-a-dotted-name-compares)).
+Without them, `case Err(ValueError):` is a [capture](13_Techniques--Pattern_Matching.md#a-bare-name-captures-a-dotted-name-compares).
 It matches every `Err` and binds the error to a new local named `ValueError`.
 Python compiles that `case` and the type checker accepts it,
 so `describe()` would answer "Not a number" for a `ZeroDivisionError`.
@@ -814,7 +809,7 @@ The `Err` branch reads `error.__notes__`,
 and that read type-checks because the `match` narrowed the `Result` to `Err`.
 The narrowing works because `Result` is a union of exactly two classes,
 and it works the same way with `isinstance()`.
-Reading `error.__notes__` directly is safe here only because `parse_field()` adds a note on every failure.
+Reading `error.__notes__` without a default is safe here only because `parse_field()` adds a note on every failure.
 An exception that arrives from code you did not write may carry no notes,
 so read `__notes__` with `getattr(error, "__notes__", [])`.
 
@@ -823,8 +818,8 @@ so read `__notes__` with `getattr(error, "__notes__", [])`.
 A library can supply `Result` for you.
 The [returns](https://github.com/dry-python/returns)
 library provides a `Result` type whose two cases are `Success` and `Failure`,
-the same `@safe` decorator you built in `safe.py`,
-and do-notation that makes combining multiple results read more directly than nested binds.
+the same `@safe` decorator you built in `safe.py`, and do-notation,
+which combines multiple results in one flat expression instead of nested binds.
 Its `@safe` takes an `exceptions` argument naming the types to catch,
 the production form that exercise 4 builds.
 

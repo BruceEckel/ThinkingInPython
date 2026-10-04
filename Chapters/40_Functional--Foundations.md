@@ -213,7 +213,7 @@ including from another thread while `total()` is running.
 `Final` freezes the binding, and only the binding.
 If you declare `CONFIG: Final[list[int]] = [...]`,
 `CONFIG.append(...)` still succeeds, for the type checker and at runtime alike.
-Freezing only the binding is the shallow-freezing lesson of [Rethinking Objects](20_Patterns--Rethinking_Objects.md#the-immutability-solution)
+Freezing only the binding is the [shallow-freezing lesson](20_Patterns--Rethinking_Objects.md#the-immutability-solution)
 again, with `Final` in place of `frozen=True`.
 For an immutable value, make the value's own type immutable,
 `Final[tuple[int, ...]]`.
@@ -267,11 +267,9 @@ a cache entry, or a value shared across threads is normally a tuple or a record.
 
 ## Functions as First-Class Objects
 
-A function in Python is an object like any other,
-which is what *first-class* means.
+A function is an object like any other, which is what *first-class* means.
 You can bind a function to a name, store it in a container,
 pass it as an argument, and return it from another function.
-A function value is data you can store and pass.
 
 ```python
 # first_class.py
@@ -348,8 +346,8 @@ and a table when the set should grow from outside.
 
 ## Higher-Order Functions
 
-A *lambda* is an unnamed function written as a single expression,
-introduced in [Functions](05_Foundations--Functions.md#lambdas).
+A [*lambda*](05_Foundations--Functions.md#lambdas)
+is an unnamed function written as a single expression.
 The functions in this section take lambdas as inline arguments,
 where a lambda fits best.
 A lambda's value is locality.
@@ -358,8 +356,6 @@ a lambda keeps it at the call site, where the reader is,
 instead of defining it as a named function elsewhere.
 `sorted(words, key=lambda w: (len(w), w))` states the sort order,
 by length and then alphabetically, right where the code sorts.
-Naming that one-liner adds a line, a name to invent,
-and a definition to look up, and changes nothing about the sort.
 For anything larger, write a `def`.
 A named function carries a docstring, a readable name in tracebacks,
 and room for more than one expression.
@@ -389,24 +385,22 @@ print(sorted(words, key=len))
 
 Each call passes a function to another function, which runs the loop.
 Returning a function is the other half of the definition.
-[Closures](#closures) covers it below.
 
 The `list()` calls do real work.
 `map()` and `filter()` return [one-shot iterators](23_Patterns--Iterators.md#generators).
 `print(map(...))` therefore shows `<map object at 0x...>` instead of values,
 and a second pass over the same object silently produces nothing.
-`sorted()` is the exception.
-It must read every element before it can order any of them,
-so it always returns a list.
-It is also the pure counterpart of `list.sort()`,
-which [Containers](03_Foundations--Containers.md)
-shows reordering the list in place and returning `None`.
+`sorted()` must read every element before it can order any of them,
+so it returns a list rather than an iterator.
+It is also the pure counterpart of [`list.sort()`](03_Foundations--Containers.md),
+which reorders the list in place and returns `None`.
 `sorted()` builds a new list and leaves its input as it was.
 
 When you would write a fresh lambda for `map()` or `filter()`,
 Python offers a lookalike you should usually prefer,
 the [comprehension](16_Techniques--Comprehensions.md).
-`[n * n for n in numbers]` says more directly what `map()` plus a fresh lambda says,
+`[n * n for n in numbers]` says what `map()` plus a fresh lambda says,
+with no lambda and no function call,
 and `[n for n in numbers if n % 2 == 0]` replaces the `filter()` call the same way.
 `map()` and `filter()` are the better choice when the function already exists.
 `map(str.strip, lines)` reads better than `[line.strip() for line in lines]`,
@@ -432,8 +426,7 @@ and with it the off-by-one and accumulator-initialization mistakes a hand-writte
 A higher-order function can also return a function.
 It wraps the function it receives with operations like timing, retries,
 or logging, and returns the wrapper.
-A decorator does that wrapping, as [Decorators](14_Techniques--Decorators.md)
-shows.
+A [decorator](14_Techniques--Decorators.md) does that wrapping.
 
 ## Closures
 
@@ -465,7 +458,7 @@ print(inspect.getclosurevars(triple).nonlocals)
 
 `multiplier()` returns `multiply()`,
 and each returned function holds its own `factor`.
-The last two lines show the captured values directly.
+The last two lines read the captured values with `inspect.getclosurevars()`.
 `double` and `triple` are the same code holding different captured values.
 A closure is the functional answer to "an object with one method and some stored data."
 
@@ -520,13 +513,12 @@ a closure states an intention that the language does not enforce.
 The `nonlocal` statement lets `increment()` assign to the captured variable.
 Reading a captured name, as `multiply()` reads `factor`, needs no declaration.
 But any assignment to a name inside a function makes that name local,
-so without a declaration, `count += 1` makes `count` a fresh local variable,
+so without a declaration, `count += 1` makes `count` a new local variable,
 reads that local before anything has assigned it,
 and fails with `UnboundLocalError`.
 `nonlocal count` redirects the assignment to the enclosing function's variable.
-`global` does the same for a module-level name,
-as [Names Inside a Function](05_Foundations--Functions.md#names-inside-a-function)
-shows, and the two are not interchangeable.
+[`global`](05_Foundations--Functions.md#names-inside-a-function)
+does the same for a module-level name, and the two are not interchangeable.
 With `global count` in place of `nonlocal count`,
 `increment()` looks for a module-level `count`, finds none,
 and raises a `NameError`.
@@ -568,7 +560,7 @@ because positional arguments fill from the left.
 `square(5)` would then compute `2 ** 5`.
 
 Partial application turns a general function into the specific one a caller needs.
-`multiplier()` in [Closures](#closures) does the same by hand,
+[`multiplier()`](#closures) does the same by hand,
 a factory that presets one argument and returns a function expecting the rest.
 When the general function exists, as `power()` does here,
 `partial()` removes the factory.
@@ -577,9 +569,8 @@ Use partial application when an API expects a function of one argument and you h
 Unlike a lambda, `partial()` keeps the bound arguments as data you can inspect,
 through its `.func`, `.args`, and `.keywords` attributes.
 It also binds their values when you build it,
-whereas a lambda created in a loop reads each captured name at call time.
-`late_binding.py` in [Function Objects](28_Patterns--Function_Objects.md#the-late-binding-trap)
-demonstrates that late-binding trap.
+whereas a lambda created in a loop reads each captured name at call time,
+the [late-binding trap](28_Patterns--Function_Objects.md#the-late-binding-trap).
 
 ### Leaving a Gap with `Placeholder` {#leaving-a-gap-with-placeholder}
 
@@ -624,8 +615,8 @@ The runtime behaves correctly.
 
 ## Composing Functions
 
-*Function composition* builds a new function that passes one function's result straight to the next.
-You can assemble behavior from small pieces, one stage at a time:
+*Function composition* builds a new function that passes one function's result to the next as its argument.
+Composition assembles behavior from small pieces, one stage at a time:
 
 ```python
 # compose_functions.py
@@ -666,8 +657,8 @@ A larger behavior is a new named composition of existing stages.
 When a requirement changes,
 you insert or swap a single stage and the others stay as they were.
 
-The standard library supplies whole modules of these small, composable pieces.
-[Toolkits](41_Functional--Toolkits.md) tours them.
+The standard library supplies [whole modules](41_Functional--Toolkits.md)
+of these small, composable pieces.
 
 ## Putting the Pieces Together
 
