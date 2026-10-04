@@ -172,8 +172,8 @@ find_factor(13)
 
 The `else` belongs to the `for`, not the `if`.
 A `while` loop can use `else` the same way.
-This `else` is also how you leave two nested loops at once:
-put `continue` in the inner loop's `else` and a `break` right after it.
+This `else` is also how you leave two nested loops at once.
+Put `continue` in the inner loop's `else` and a `break` right after it.
 When the inner loop `break`s,
 Python skips its `else` and the outer `break` runs.
 When the inner loop runs to the end,
@@ -345,7 +345,8 @@ Removing an item shifts the next one down into the slot the loop has passed,
 so the loop skips it and one of the two `2`s survives,
 with no exception to tell you.
 The dictionary raises a `RuntimeError` instead of skipping silently.
-The fix is the same for both: build a new container with a comprehension,
+The fix is the same for both.
+Build a new container with a comprehension,
 or collect what to remove first and remove it after the loop.
 
 ## Pattern Matching
@@ -376,9 +377,9 @@ print(run("dance"))
 
 Only the first matching `case` runs.
 Unlike C, a `case` does not fall through, so it needs no `break`.
-The first `case` destructures the split command:
-it matches a two-item list starting with `"go"` and binds the second item to `direction`.
-A bare name in a `case` captures rather than compares:
+The first `case` destructures the split command.
+It matches a two-item list starting with `"go"` and binds the second item to `direction`.
+A bare name in a `case` captures rather than compares.
 `case direction:` binds anything to `direction` and matches every value.
 Write a constant as a literal (`case "quit":`) or as a dotted name
 (`case Command.QUIT:`).
@@ -386,7 +387,7 @@ Write a constant as a literal (`case "quit":`) or as a dotted name
 `match` and `case` are *soft keywords*:
 they are keywords only in this statement,
 so existing code that uses `match` as a variable name still runs.
-Avoid the name, though: a reader must work out which meaning applies.
+Avoid the name, though, because a reader must work out which meaning applies.
 [Pattern Matching](13_Techniques--Pattern_Matching.md) covers `match` in detail.
 
 ## Errors and Exceptions
@@ -463,14 +464,14 @@ print(risky())
 `risky()` raises a `ValueError`,
 but the `return` in `finally` discards it before it reaches the caller,
 so the caller sees `"swallowed"` and no trace of the exception.
-Python also flags the `return` in `finally` at compile time:
-running the listing prints `SyntaxWarning: 'return' in a 'finally' block` to standard error before `swallowed`.
+Python also flags the `return` in `finally` at compile time.
+Running the listing prints `SyntaxWarning: 'return' in a 'finally' block` to standard error before `swallowed`.
 
 Catch an exception only when you can do something about it.
 A bare `except:` with no type catches everything,
 including the `KeyboardInterrupt` you press to stop a runaway program.
 It also catches a bug in the `try` block and makes it look like an expected failure.
-`except Exception:` is the broad catch you want instead:
+`except Exception:` is the broad catch you want instead.
 `KeyboardInterrupt` and `SystemExit` derive from `BaseException` rather than `Exception`,
 so they propagate past that clause and still stop the program.
 To handle several types the same way, give a tuple:
@@ -596,8 +597,8 @@ print(forgiving("\N{SUPERSCRIPT TWO}"))
 `isdigit()` rejects `"-5"`, which `int()` converts fine,
 and `isdigit()` accepts `"²"`, which `int()` refuses.
 The `try` block asks the only question that matters: does this conversion work?
-The world can also change between the test and the operation:
-a file that exists at the `if` can disappear before the `open()`,
+The world can also change between the test and the operation.
+A file that exists at the `if` can disappear before the `open()`,
 and only the EAFP form is safe against that.
 
 ## Context Managers
@@ -636,8 +637,8 @@ path.unlink()  # Delete the file
 ```
 
 The exception propagates, but the `with` closes the file first.
-`f` is still in scope afterward, so the listing can print `f.closed`:
-a `with` statement creates a guarantee about the exit, not a scope.
+A `with` statement creates a guarantee about the exit, not a scope,
+so `f` is still in scope afterward and the listing can print `f.closed`.
 
 Closing the file is cleanup that runs whether or not the block succeeds.
 [Cleanup](10_Foundations--Cleanup.md)
@@ -678,7 +679,8 @@ print(parities)
 Every form has the same order: the expression that produces each item,
 the `for` clause that supplies the values,
 and an optional `if` that filters them.
-The delimiters choose the container: brackets build a list, braces build a set,
+The delimiters choose the container.
+Brackets build a list, braces build a set,
 and braces around a `key: value` expression build a dictionary.
 [Comprehensions](16_Techniques--Comprehensions.md) covers nesting,
 generator expressions, and when to write a loop instead.

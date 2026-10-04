@@ -119,8 +119,8 @@ Two schools of thought exist:
     Pure languages like Haskell treat an unhandled runtime exception or crash as a *bottom* value, denoted ⊥.
     A bottom value stands for a computation that never produces an ordinary value.
     Because ⊥ is a value in the theory, raising an error that nothing catches
-    is referentially transparent:
-    you can replace the function call with the crash itself, and the program behaves the same.
+    is referentially transparent.
+    You can replace the function call with the crash itself, and the program behaves the same.
 
 2.  **Functional**: Exceptions bypass normal control flow,
     and that bypass makes it difficult to reason about code,
@@ -169,7 +169,8 @@ for args in [(10, 2), (10, 0)]:
 
 `@safe` catches whatever `slope()` raises, so the fix is the decorator,
 not a change to the function it wraps.
-`slope()` is now total: every call returns a `Result`,
+`slope()` is now total.
+Every call returns a `Result`,
 and the caller must unpack it to reach the number.
 
 ### Catch the Exception You Expect
@@ -281,8 +282,8 @@ and `NonZero` moves it to the one line that builds the value.
 They differ in how many functions must know about it.
 
 Standard practice combines the first and third,
-the `Result` and the restrictive type:
-parse untrusted input into the restrictive type at the boundary,
+the `Result` and the restrictive type.
+Parse untrusted input into the restrictive type at the boundary,
 using a `Result` to report a bad value instead of raising an exception,
 and let every function past that boundary take `NonZero` and stay total:
 
@@ -319,7 +320,7 @@ for text in ["2", "0"]:
 
 `parse_run()` is the only place that can fail,
 and `@safe` turns that failure into a `Result` its caller must unpack.
-Past that one `match`, `slope()` checks nothing:
+Past that one `match`, `slope()` checks nothing.
 `NonZero` guarantees `run.value` isn't 0.
 The `Result` handles the input a caller doesn't trust,
 and `NonZero` lets every function downstream trust what it receives.
@@ -442,8 +443,8 @@ that Effect belongs in your function's type.
 If another function then calls yours,
 the same Effect belongs in that function's type,
 and so on out to the edge of the program.
-A native system adds each Effect for you;
-a library like Stateless has you declare each one,
+A native system adds each Effect for you.
+A library like Stateless has you declare each one,
 and the type checker verifies each declaration.
 With an EMS, the function signature tells you whether the function is pure,
 and for an impure function it names the kinds of impurity.
@@ -543,8 +544,8 @@ A production caller passes objects that read with `input()` and write with `prin
 and `greet()` stays the same.
 Delayed binding by hand explains why "pass in your dependencies" is such durable advice.
 
-The signature says what `greet()` needs, not everything `greet()` might do:
-a `print()` in the body is still invisible.
+The signature says what `greet()` needs, not everything `greet()` might do.
+A `print()` in the body is still invisible.
 [Effect Management for Python?](#effect-management-for-python)
 returns to that limit.
 
@@ -663,7 +664,7 @@ fun main() : <console,exn> ()
 
 The angle brackets in `greet()`'s signature hold the *Effect row*,
 the set of Effects the function performs.
-The row is the second channel:
+The row is the second channel.
 `ask` and `tell` are part of the type without adding a parameter.
 The compiler infers the row from what the body calls,
 so you rarely write one by hand.
@@ -689,8 +690,8 @@ and the row that remains holds the Effects the handler bodies perform:
 A test installs a different handler, one that returns a fixed name,
 and `greet()` runs unchanged.
 
-Separating the request from its fulfillment is the core of every Effect system:
-the code that requests an Effect stands apart from the code that performs it,
+Separating the request from its fulfillment is the core of every Effect system.
+The code that requests an Effect stands apart from the code that performs it,
 and a handler sits between them.
 `greet()` names `ask` and `tell` without deciding what either one means.
 The handler decides, and a different handler decides differently.
@@ -847,8 +848,8 @@ and an AI can start using that language as soon as it works,
 so adoption skips the years a human language spends waiting for people to learn it.
 
 Most of these languages are tracking systems,
-in the sense [Tracking and Management](#tracking-and-management) gives the term:
-they provide the first part of a full EMS and stop there.
+in the sense [Tracking and Management](#tracking-and-management) gives the term.
+They provide the first part of a full EMS and stop there.
 For their purpose the other two parts, interface separation and delayed binding,
 are liabilities, because a host that supplies every implementation can guarantee what generated code can do.
 
@@ -891,8 +892,8 @@ and `ran` stays empty.
 [Concurrency](19_Techniques--Concurrency.md#asyncio-mechanics)
 gives the same demonstration.
 The body runs only when something awaits the description or hands it to `asyncio.run()`.
-That is the library Effect system model:
-descriptions compose inside `async def` functions,
+That is the library Effect system model.
+Descriptions compose inside `async def` functions,
 and `asyncio.run()` is the boundary where description becomes action.
 
 Python enforces the tracking the way an EMS does.
@@ -912,8 +913,8 @@ a `Maybe` container for a value that might be absent,
 an `IO` container that marks a value as having come from input/output,
 and a `RequiresContext` container for delayed binding of dependencies.
 The [effect](https://pypi.org/project/effect/)
-library ports the description/execution split to Python;
-it shares only its name with the TypeScript library.
+library ports the description/execution split to Python.
+It shares only its name with the TypeScript library.
 Code builds objects describing intents, and separate performers execute them,
 swappable for tests.
 The [eff](https://github.com/orsinium-labs/eff) library models Effect handlers.
@@ -934,18 +935,18 @@ A function can still call `print()` directly,
 next to its carefully declared Effects.
 In Koka, that call changes the function's Effect row, and every caller's row.
 In Python, neither Stateless nor the type checker reports it.
-A library checks the Effects you wrote down;
-checking the ones you left out takes the language.
+A library checks the Effects you wrote down,
+but checking the ones you left out takes the language.
 
 Could Python itself gain Effect tracking,
 so that a tool infers every declaration instead of you writing it?
-The annotation syntax could carry the Effect row:
-imagine a signature that declares its Effects the way `async def` already declares one.
+The annotation syntax could carry the Effect row.
+Imagine a signature that declares its Effects the way `async def` already declares one.
 The hard part is propagation, not syntax.
 A type checker must compute the Effect row of every function from the functions it calls,
 across every library on PyPI, almost all of which carry no Effect annotations.
-`async` succeeded because it arrived as part of the language:
-the interpreter enforces it,
+`async` succeeded because it arrived as part of the language.
+The interpreter enforces it,
 and its keyword marks each function that carries the Effect.
 An Effect row must instead reach every library in an ecosystem of untracked code.
 Gradual typing faced the same problem, and took a decade.
@@ -1031,14 +1032,14 @@ give a hint, usually the shape of the code, and a full answer for each exercise.
 1.  Write the production bindings for `ask_tell.py`:
     a `Console` class whose `ask()` calls `input()` and whose `tell()` calls `print()`,
     and run `greet(Console(), Console())` interactively.
-    Confirm `greet()` requires no change:
-    serving a new context without edits is what delayed binding provides.
+    Confirm `greet()` requires no change.
+    Serving a new context without edits is what delayed binding provides.
 2.  Do the bookkeeping the chapter describes.
     Starting from `bookkeeping_scales.py`, add a `Log` Effect
     (a protocol with `log(message)`) used by a new helper that `greet()` calls,
     and log from `greet()` too.
-    The chapter counts five signatures for that version;
-    say how many of the five use the `Log` they name,
+    The chapter counts five signatures for that version.
+    Say how many of the five use the `Log` they name,
     and then what an EMS would do instead.
 3.  Classify every Effect in `slope_catch.py`,
     `withdraw()` from [Foundations](40_Functional--Foundations.md#pure-functions),

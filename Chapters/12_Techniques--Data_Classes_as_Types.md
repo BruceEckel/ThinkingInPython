@@ -98,8 +98,8 @@ print(f3(11))
 Each function duplicates the check, the check is easy to forget,
 and the type system is no help.
 The `int` annotation says "any integer," which is not what you mean.
-Checking the argument also says nothing about the result: `f1(6)` returns 11,
-which no rating may be.
+Checking the argument also says nothing about the result.
+`f1(6)` returns 11, which no rating may be.
 `f3()` shows a forgotten check.
 `11` is not a legal rating, and nothing objects: not the annotation,
 not the type checker, not the running program.
@@ -156,7 +156,7 @@ if __name__ == "__main__":
 A read-only `@property` keeps users from assigning to `number`,
 but the object still mutates `_number`,
 so `f1()` must re-check the result before returning it.
-That check runs after the mutation, not instead of it:
+That check runs after the mutation, not instead of it.
 `Stars(8).f1()` sets `_number` to 13, then raises `TypeFailure`,
 and the object goes on holding that illegal value.
 Catching the exception does not undo the damage.
@@ -184,8 +184,8 @@ Some values must change in place over their lifetime: a counter,
 a connection's open-or-closed state, a running total.
 You cannot always replace one with a fresh instance on every change.
 The accepted answer for those is a validating setter that checks before assigning,
-the fix that `stars_class.py`'s `f1()` skips: pay DbC's scattering cost,
-because the value must stay mutable.
+the fix that `stars_class.py`'s `f1()` skips.
+Pay DbC's scattering cost, because the value must stay mutable.
 [Immutability](#immutability) covers the case the rest of this chapter prefers,
 where a fresh, validated instance replacing the old one is cheap enough.
 
@@ -227,11 +227,12 @@ display_object(Messenger, INTERESTING_DUNDERS)
 `@dataclass` generates the dunder methods,
 and the constructor arguments cover all the fields in `Messenger`.
 The trailing `...` is `display_object()` trimming that line to its report width.
-`__hash__` is `None`: a `@dataclass` compares by value with `__eq__()`,
+`__hash__` is `None`.
+A `@dataclass` compares by value with `__eq__()`,
 so it gives up hashability rather than let you put a mutable instance in a `set` or use it as a `dict` key.
 As [Class Attributes](09_Foundations--Class_Attributes.md) explains,
 `depth` is the one field of the three that appears as an attribute,
-because it has an initialization value;
+because it has an initialization value.
 `name` and `number` declare a type alone.
 
 ```python
@@ -353,8 +354,8 @@ It records, in `A.__annotations__`,
 that some future `A` will carry an `x` and an `s`,
 but stores nothing until code assigns a value.
 `A` has no `__init__()` to assign them, so the declaration goes unfulfilled.
-That is why `show(A())` finds nothing: no `x` and no `s` exist to report,
-on the class or on the instance.
+That is why `show(A())` finds nothing.
+No `x` and no `s` exist to report, on the class or on the instance.
 
 ### `B`: Class-Level Defaults
 
@@ -425,7 +426,7 @@ tagged `[CV]`, no matter how many `B` instances exist.
 `@dataclass` reads them to learn what fields exist and in what order,
 then uses that to write the parameter list of `__init__()` and the assignments inside it.
 `dataclasses.fields()` reports the field list `@dataclass` recorded.
-`@dataclass` stores no value for a field on the class:
+`@dataclass` stores no value for a field on the class.
 `x` is still absent from `C.__dict__` after decoration, as it was before.
 The generated `__init__()` fulfills the declaration when it runs,
 once per instance.
@@ -496,7 +497,8 @@ It has no initializer, so it is a bare annotation,
 as `x` and `s` are back in `A`: a declaration recorded in `D.__annotations__`,
 with no value stored anywhere to report.
 `D.f` raises `AttributeError`, for the same reason `A().x` does.
-Assigning a value creates the attribute; declaring it `ClassVar` does not.
+Assigning a value creates the attribute.
+Declaring it `ClassVar` does not.
 
 ## Immutability
 
@@ -542,8 +544,8 @@ and a frozen instance is hashable only when every field it holds is.
 demonstrates that leak.
 The types this chapter validates hold `int`s and `str`s,
 so for them the guarantee is total.
-`Months` and `Line`, both later in this chapter, each hold a `list`:
-neither is hashable, and neither is safe from a change made through that list.
+`Months` and `Line`, both later in this chapter, each hold a `list`.
+Neither is hashable, and neither is safe from a change made through that list.
 
 A frozen data class still carries a per-instance `__dict__`.
 Adding `slots=True` drops it, for less memory and faster attribute access.
@@ -551,8 +553,8 @@ Adding `slots=True` drops it, for less memory and faster attribute access.
 measures the memory difference.
 
 The standard library has a second immutable record, `typing.NamedTuple`,
-which also rejects assignment and hashes under the same rule:
-every field it holds must be hashable.
+which also rejects assignment and hashes under the same rule.
+Every field it holds must be hashable.
 The two differ in equality.
 A frozen data class equals another instance of its own class,
 while a `NamedTuple` equals any tuple holding the same values,
@@ -1032,8 +1034,8 @@ Use `default_factory` for any default that is not an immutable value.
 
 `default_factory` accepts any callable that takes no arguments.
 A named function like `make_months` is one.
-A type is another, which is why `field(default_factory=list)` appears throughout this book:
-calling `list` builds an empty one.
+A type is another, which is why `field(default_factory=list)` appears throughout this book.
+Calling `list` builds an empty one.
 A subscripted generic is callable too,
 so `field(default_factory=dict[str, str])` is legal and produces an empty dict.
 That form seems redundant, because the annotation on the left names the type,
@@ -1072,7 +1074,7 @@ which can be far from the declaration that caused it.
 A bare `list`, `dict`,
 or `set` produces a type loose enough that `ty` accepts it against any annotation,
 so `ty` does not compare the factory with the field.
-Checkers differ here:
+Checkers differ here.
 Pyright infers `set[Unknown]` for this factory and rejects it against `dict[str, str]`.
 Subscripting makes the factory's return type concrete,
 and `field(default_factory=dict[int, int])` on this field then draws a type error.
@@ -1130,8 +1132,8 @@ a limit every factory in [Factory](27_Patterns--Factory.md#hiding-the-concrete-c
 shares.
 The third test shows why the check cannot move inside the type.
 `NamedTuple` refuses `__new__()`, refuses `__init__()` the same way,
-and no class comes into existence:
-the error arrives while Python is still executing the `class` statement.
+and no class comes into existence.
+The error arrives while Python is still executing the `class` statement.
 `ty` reports the `__new__()` override as `invalid-named-tuple`,
 which the `# type: ignore` silences.
 Pyright accepts the `__new__()` without comment.
@@ -1143,7 +1145,7 @@ so `copy.replace()` on a validated instance quietly produces an unvalidated one.
 
 A frozen data class runs `__post_init__()` on every construction,
 including the ones you did not anticipate,
-and replacement has no such back door:
+and replacement has no such back door.
 `copy.replace()` goes through the constructor,
 as [The General Form of `replace()`](#the-general-form-of-replace) shows.
 That is the deciding difference whenever a type must guarantee its own values.

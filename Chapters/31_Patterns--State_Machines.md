@@ -18,9 +18,9 @@ You call `run()` on a state to perform its behavior,
 and you pass an "input" object to the state's `next()`,
 which returns the state to enter next.
 
-The chapter shows two designs that differ in one way: in the first,
-each `State` object decides its own next state; in the second,
-a single table holds every transition.
+The chapter shows two designs that differ in one way.
+In the first, each `State` object decides its own next state.
+In the second, a single table holds every transition.
 
 ## Each State Decides
 
@@ -66,8 +66,8 @@ class StateMachine:
             self.current_state.run()
 ```
 
-`run_all()` is the template method: it defines the flow
-(report the input, transition, run the new state),
+`run_all()` is the template method.
+It defines the flow (report the input, transition, run the new state),
 while the varying behavior lives in each `State`'s `run()` and `next()`.
 [*Template Method*](25_Patterns--Template_Method.md)
 puts the varying steps in a subclass.
@@ -96,7 +96,7 @@ Because `MouseAction` is a `StrEnum`, each member *is* a `str`,
 and compares equal to and prints as its value.
 That is why `print(event)` in `run_all()` shows `mouse appears` rather than `MouseAction.APPEARS`.
 The members still hash and look up correctly, so they work as dictionary keys.
-`MouseAction("mouse appears")` returns the matching member;
+`MouseAction("mouse appears")` returns the matching member.
 `mouse_trap_states.py` parses each line of the test input with that call.
 
 A text file supplies the sequence of mouse inputs,
@@ -220,8 +220,8 @@ trap.run_all([MouseAction.ESCAPES])
 ```
 
 `MouseTrap` holds all the possible states as class attributes and sets up the initial state.
-A state class stores nothing, so each state can be one shared object:
-a single `Waiting` serves every `MouseTrap` and every visit to that state.
+A state class stores nothing, so each state can be one shared object.
+A single `Waiting` serves every `MouseTrap` and every visit to that state.
 The code at the bottom of the file builds a `MouseTrap` and runs it through the whole sequence of moves read from the text file.
 
 Each `next()` is a `match` on the event:
@@ -265,8 +265,8 @@ make `State` an `ABC` with `@abstractmethod` on both methods,
 and the error moves to the constructor,
 which raises a `TypeError` for a subclass that defines `run()` alone.
 The type checker reports that construction too,
-so the `ABC` and the Protocol both report the missing method before the program runs;
-the empty base and the `NotImplementedError` base report it at the call.
+so the `ABC` and the Protocol both report the missing method before the program runs.
+The empty base and the `NotImplementedError` base report it at the call.
 
 ### A Table Inside Each State
 
@@ -284,7 +284,8 @@ and module-level code fills in the tables once every state object exists.
 `TableState` supplies `next()` from a `transitions` dict that maps each input to its next state,
 and leaves `run()` abstract for its subclasses.
 It is an `ABC`, the alternative the first version set aside,
-because here the base has code to share: every subclass inherits `next()`.
+because here the base has code to share.
+Every subclass inherits `next()`.
 `TableState`'s `run()` and `next()` have the signatures the `State` Protocol names,
 so the `StateMachine` class from `state_machine.py` drives every `TableState`,
 with no change to that class:
@@ -315,8 +316,8 @@ If you forget to fill a state's table,
 the machine reports `Waiting has no transition for ...` rather than the `AttributeError` a missing `transitions` attribute would produce.
 
 `next()` raises its `RuntimeError` `from None`,
-because the chained `KeyError` would add nothing:
-its key is the event the message names.
+because the chained `KeyError` would add nothing.
+Its key is the event the message names.
 
 The subclasses shrink to their `run()` behavior.
 The transitions live in the tables filled in at the bottom of the file:
@@ -410,7 +411,8 @@ expect(RuntimeError, trap2.run_all, [MouseAction.ESCAPES])
 ```
 
 The nine moves produce the first version's output, line for line.
-The source differs: with many `State` classes to maintain,
+The source differs.
+With many `State` classes to maintain,
 the tables read more easily than the `match` statements.
 
 ### An Unexpected Input
@@ -537,8 +539,9 @@ class StateMachine:
 
 The listing writes `StateMachine` by hand rather than as a `@dataclass`,
 because a generated `__init__()` names each parameter after its field.
-This constructor renames what it stores: the caller passes `initial`,
-but the attribute is `state`, which `handle()` updates.
+This constructor renames what it stores.
+The caller passes `initial`, but the attribute is `state`,
+which `handle()` updates.
 
 Several candidate transitions can share one `(state, input)` key.
 Their conditions tell them apart.
@@ -734,8 +737,8 @@ if __name__ == "__main__":
 The sold-out and too-expensive clears both print `Cleared` and end in different states.
 Too expensive returns to `COLLECTING` with the money still inserted,
 while sold out goes to `UNAVAILABLE`.
-The state names the condition;
-the message alone leaves you inferring the condition from the quantity.
+The state names the condition.
+The message alone leaves you inferring the condition from the quantity.
 
 The last three events insert a dime and pick the same sold-out slot again,
 this time with too little money for it as well.
@@ -745,16 +748,16 @@ so the engine takes the `too_expensive` row.
 The machine reports `COLLECTING`, as though more money would sell the item,
 although the slot is empty and no amount of money would.
 If you swap the row order, the same input reports `UNAVAILABLE` instead.
-Both results follow from the ordering rule stated in [The Engine](#the-engine):
-the first row whose condition passes wins,
+Both results follow from the ordering rule stated in [The Engine](#the-engine).
+The first row whose condition passes wins,
 whether or not a lower row matters more.
 
 The engine's lookup keys on `type(event)` exactly,
 one dictionary lookup rather than an `isinstance()` test against each row.
 The table keys separate rows on `FirstDigit` and `SecondDigit`,
 two subclasses of `Digit` that differ only in their class.
-The same exactness excludes a further subclass:
-an event whose class derives from `Money` matches none of `Money`'s rows,
+The same exactness excludes a further subclass.
+An event whose class derives from `Money` matches none of `Money`'s rows,
 because the key is the event's exact class.
 
 The table goes in `__init__()` rather than in the class body,
@@ -766,7 +769,8 @@ The engine passes the event to both the condition and the action,
 so `refund()` takes an argument it ignores.
 The `Callable[..., bool]` and `Callable[..., None]` annotations leave the parameters as `...` because each method declares the specific event type it handles,
 and those types differ from row to row.
-That `...` costs a check: the type checker accepts any callable in any row,
+That `...` costs a check.
+The type checker accepts any callable in any row,
 whatever event class the key names.
 If you pair a `SecondDigit` key with a method written for a `FirstDigit`,
 the table type-checks clean and does the wrong thing at runtime.
@@ -943,7 +947,8 @@ so reading `mouse_trap_states.py`'s `Luring` tells you what luring does and whic
 Adding a state is one class.
 The design reads best when the transitions are obvious from the state's own name.
 An action that must run on every entry into one state belongs in that state's `run()`,
-written once; sounding a chime whenever the trap reaches `Holding` is such an action.
+written once.
+Sounding a chime whenever the trap reaches `Holding` is such an action.
 
 Inside that design, `match` statements and per-state tables differ in which code handles an unrecognized input.
 With `match`, each state's `case _` sets its own policy, in the method you read.

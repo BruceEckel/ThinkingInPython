@@ -110,10 +110,10 @@ print("ok")
 ```
 
 If you delete the last `total = 0`,
-the second `running_total()` assertion fails:
+the second `running_total()` assertion fails.
 `total` is still 5 from the first call, so the second call returns 10.
 That line is the fixture the impure version needs, and purity removes it.
-`slope()` appears again later in the book:
+`slope()` appears again later in the book.
 [Are Exceptions Impure?](44_Effects--Effect_Management.md#are-exceptions-impure)
 asks whether raising an exception breaks its purity.
 
@@ -121,8 +121,8 @@ asks whether raising an exception breaks its purity.
 
 An *immutable* value cannot change after creation.
 Tuples, strings, `frozenset`, and frozen dataclasses are immutable.
-Each freezes only its own top level:
-the tuple `([1], 2)` always holds that same list,
+Each freezes only its own top level.
+The tuple `([1], 2)` always holds that same list,
 and anyone can still append to the list.
 An immutable value stays what you last read, whatever code ran in between,
 and that guarantee is why removing shared mutable state is the practical core of the functional style.
@@ -172,7 +172,7 @@ Copying a two-field `Point` takes so little time that you can ignore it.
 A large structure that changes often copies the whole value on every change.
 That time and memory are the price of sharing without coordination.
 Languages built around immutability answer this with *persistent* data structures,
-which share every part a change leaves alone;
+which share every part a change leaves alone.
 Python's standard library has none,
 so a large value that changes often is the one place a mutable structure,
 kept private to one function, is still the right choice.
@@ -210,14 +210,14 @@ The `Sequence[int]` constraint governs `total()`, not the caller.
 It declares that `total()` reads its argument and leaves it as it was.
 The caller keeps its `list` and can append to it at any time,
 including from another thread while `total()` is running.
-`Final` freezes the binding, and only the binding:
-if you declare `CONFIG: Final[list[int]] = [...]`,
+`Final` freezes the binding, and only the binding.
+If you declare `CONFIG: Final[list[int]] = [...]`,
 `CONFIG.append(...)` still succeeds, for the type checker and at runtime alike.
 Freezing only the binding is the shallow-freezing lesson of [Rethinking Objects](20_Patterns--Rethinking_Objects.md#the-immutability-solution)
 again, with `Final` in place of `frozen=True`.
 For an immutable value, make the value's own type immutable,
-`Final[tuple[int, ...]]`: the tuple guards the contents,
-and `Final` guards the binding.
+`Final[tuple[int, ...]]`.
+The tuple guards the contents, and `Final` guards the binding.
 
 ### A Stable Hash and Safe Sharing
 
@@ -395,8 +395,8 @@ The `list()` calls do real work.
 `map()` and `filter()` return [one-shot iterators](23_Patterns--Iterators.md#generators).
 `print(map(...))` therefore shows `<map object at 0x...>` instead of values,
 and a second pass over the same object silently produces nothing.
-`sorted()` is the exception:
-it must read every element before it can order any of them,
+`sorted()` is the exception.
+It must read every element before it can order any of them,
 so it always returns a list.
 It is also the pure counterpart of `list.sort()`,
 which [Containers](03_Foundations--Containers.md)
@@ -429,8 +429,8 @@ and you supply only the part that differs from one use to the next.
 You stop rewriting the same loop,
 and with it the off-by-one and accumulator-initialization mistakes a hand-written loop allows.
 
-A higher-order function can also return a function:
-it wraps the function it receives with operations like timing, retries,
+A higher-order function can also return a function.
+It wraps the function it receives with operations like timing, retries,
 or logging, and returns the wrapper.
 A decorator does that wrapping, as [Decorators](14_Techniques--Decorators.md)
 shows.
@@ -465,15 +465,15 @@ print(inspect.getclosurevars(triple).nonlocals)
 
 `multiplier()` returns `multiply()`,
 and each returned function holds its own `factor`.
-The last two lines show the captured values directly:
+The last two lines show the captured values directly.
 `double` and `triple` are the same code holding different captured values.
 A closure is the functional answer to "an object with one method and some stored data."
 
 `multiply()` reads `factor` rather than receiving it, yet it stays pure.
 `factor` stays fixed after capture,
 so the same argument always produces the same answer.
-`withdraw()` is unpredictable because every call changes the global `balance`;
-nothing changes `factor` after capture.
+`withdraw()` is unpredictable because every call changes the global `balance`.
+Nothing changes `factor` after capture.
 
 A closure fits when you want to configure behavior once, reuse it,
 and keep its configuration private.
@@ -502,7 +502,7 @@ print(fresh())
 #: 1
 ```
 
-Each call to `make_counter()` builds an independent counter with its own `count`:
+Each call to `make_counter()` builds an independent counter with its own `count`.
 `fresh` starts at 1 after `tally` has reached 3.
 
 `increment()` is impure on purpose, to contrast with `withdraw()`.
@@ -609,8 +609,8 @@ print(percent.args)
 
 `percent` presets the bounds and leaves the middle argument open.
 Before 3.14, a hand-written wrapper supplied that specialization.
-A `Placeholder` reserves the position and leaves the value to the caller:
-calling `percent()` with no argument raises a `TypeError`.
+A `Placeholder` reserves the position and leaves the value to the caller.
+Calling `percent()` with no argument raises a `TypeError`.
 The library also rejects a *trailing* placeholder, because it would do nothing.
 `partial()` already appends the call's arguments after the bound ones,
 so `partial(clamp, 0, Placeholder)` would mean the same as `partial(clamp, 0)`.

@@ -20,8 +20,8 @@ so the type checker reports a node kind that no case handles.
 
 A file system is the canonical composite.
 A directory holds entries, and each entry is a file or another directory.
-The point is uniformity: one call serves a file, a directory,
-and the whole tree.
+The point is uniformity.
+One call serves a file, a directory, and the whole tree.
 
 ![Each directory adds up what its entries return](_images/composite_tree)
 
@@ -94,7 +94,8 @@ for path in root.walk():
 The demo's first `print()` makes that one call on the whole tree,
 on the `src` subtree, and on a lone file.
 
-Adding a node type is one class: a plugin writes it and edits nothing above it.
+Adding a node type is one class.
+A plugin writes it and edits nothing above it.
 Adding an *operation* exposes the weakness.
 `walk()` needs a method in every class,
 and counting files or finding an entry by name each needs another.
@@ -177,8 +178,8 @@ Every function over `Node` repeats the union's recursion.
 so `disk_usage()` and `walk()` call themselves on each entry.
 Each `match` needs one case per member of the union and no more.
 
-`disk_usage()` still accepts a lone `File`, a subtree, or the whole tree;
-what changed from `filesystem_classic.py` is only where the operations live.
+`disk_usage()` still accepts a lone `File`, a subtree, or the whole tree.
+What changed from `filesystem_classic.py` is only where the operations live.
 `disk_usage()` and `walk()` are ordinary functions outside the node classes,
 so a new operation is a new function, and the nodes stay unchanged.
 In the classic version a new node type is one class and a new operation is a method in every class.
@@ -202,8 +203,9 @@ A record freezes the binding of the field,
 and the list it holds keeps its `append()`,
 as [Rethinking Objects](20_Patterns--Rethinking_Objects.md#the-immutability-solution)
 demonstrates.
-With the tuple, sharing a subtree is safe: the demo builds `src` first,
-then places it inside `root`, and `src` stays as built.
+With the tuple, sharing a subtree is safe.
+The demo builds `src` first, then places it inside `root`,
+and `src` stays as built.
 
 ```python
 # test_filesystem.py
@@ -245,8 +247,8 @@ Match over a closed set, use polymorphism for an open one.
 
 A file and a directory are both a `Path`,
 which makes `pathlib` look like a *Composite*.
-`pathlib` has the uniform interface: `name`, `exists()`,
-and `stat()` work on either kind of entry,
+`pathlib` has the uniform interface.
+`name`, `exists()`, and `stat()` work on either kind of entry,
 and `iterdir()` and `rglob()` walk the tree without asking which kind they hold.
 `pathlib` lacks the structure.
 A `Path` is an immutable value that names a location and holds no entries.
@@ -281,8 +283,8 @@ sentences written as Python source in which every operator has at least one node
 A data class declares a node in three lines,
 and operator overloading lets Python's own parser build the trees.
 A GoF *Interpreter* more often parses a rules file, a configuration value,
-or a query a user types at runtime; those arrive as text,
-and text needs a real parser.
+or a query a user types at runtime.
+Those arrive as text, and text needs a real parser.
 Here is the complete grammar for a small arithmetic language:
 
 ```python
@@ -389,17 +391,18 @@ so an expression written with them builds nodes instead of computing.
 `@dataclass` writes its own `__eq__()` onto every node class.
 Attribute lookup finds a class's own method before an inherited one,
 so that generated `__eq__()` shadows anything `Operators` defines.
-`expr.py` leaves `==` alone; the nodes compare by value,
+`expr.py` leaves `==` alone.
+The nodes compare by value,
 and `evaluate.py`'s demo and its tests rely on that comparison.
 When a library's `==` must build a node, as SQLAlchemy's `col == 5` does,
 the library sets `eq=False` on the dataclass, giving up structural comparison,
 and writes its own `__eq__()`.
-This chapter keeps structural comparison;
-a class gets either that or an `==` that builds a node, not both.
+This chapter keeps structural comparison.
+A class gets either that or an `==` that builds a node, not both.
 
 `and`, `or`, and `not` belong to Python alone.
-Python tests the operand's truth value;
-then `and` and `or` return one of the two objects, and `not` returns a `bool`.
+Python tests the operand's truth value.
+Then `and` and `or` return one of the two objects, and `not` returns a `bool`.
 `x and y` evaluates to `y`, builds nothing, and reports no error.
 An expression language that needs boolean operators overloads `&` and `|` instead,
 so a Pandas filter reads `(a > 1) & (b > 2)`.
@@ -441,11 +444,11 @@ if __name__ == "__main__":
 #: 7 21
 ```
 
-The demo confirms that the operators build the tree you assemble by hand:
-data classes generate `__eq__()`,
+The demo confirms that the operators build the tree you assemble by hand.
+Data classes generate `__eq__()`,
 so `expr == by_hand` compares the two trees by value.
-Printing `expr.left` shows the nesting: the `Add` at the root holds a `Mul`,
-which holds a `Num` and a `Var`.
+Printing `expr.left` shows the nesting.
+The `Add` at the root holds a `Mul`, which holds a `Num` and a `Var`.
 The second `print()` line evaluates that same `expr` twice,
 once with `x=3` and once with `x=10`.
 Building `2 * x + 1` does not compute a number.
@@ -463,7 +466,8 @@ which can run thousands of levels.
 `**env` is also why the `/` is there.
 The `/` makes `e` [positional-only](05_Foundations--Functions.md#positional-only-and-keyword-only-parameters),
 which keeps the parameter name out of the variable namespace,
-so an expression can use `e` as a variable: `e=5` goes into `env`,
+so an expression can use `e` as a variable.
+`e=5` goes into `env`,
 and `test_e_is_available_as_a_variable()` below confirms that it binds the variable.
 A `dict[str, int]` parameter passes the same bindings by reference at every call,
 and it would spare both the `/` and this explanation.
@@ -609,8 +613,8 @@ With `2 + 3`, both operands are plain `int`,
 so Python adds them to `5` before any node exists.
 `simplify()` would receive `5 * x` with the fold already done.
 `Num(2)` is a node, so `+` dispatches to `Operators.__add__()` and builds an `Add` for `simplify()` to fold back down.
-`2 + 3` shows the limit of using the host parser:
-an operator builds a node when either operand is one,
+`2 + 3` shows the limit of using the host parser.
+An operator builds a node when either operand is one,
 and does plain arithmetic otherwise.
 
 The patterns read like the algebra they implement.
@@ -720,7 +724,7 @@ a closed union like `Node` with two members,
 so an `isinstance` test narrows it as well as a `match` does.
 The `else` paired with `isinstance(piece, Interpolation)` is the `str` case.
 Iteration skips the empty literal pieces,
-so `t"{a}{b}"` yields two `Interpolation` objects and no strings;
+so `t"{a}{b}"` yields two `Interpolation` objects and no strings.
 `template.strings` keeps the empty slots when the alternation matters.
 The structure is data, and its meaning is whatever a function computes from it:
 
@@ -780,8 +784,8 @@ print(values2)
 `to_query()` checks for that case and recurses,
 so `inner`'s pieces flatten into the same `sql` string and `values` list.
 Every entry in `values2` is then a value a database driver accepts.
-Composing `t`-strings this way builds a nested composite;
-iterating any one `Template` stays flat.
+Composing `t`-strings this way builds a nested composite.
+Iterating any one `Template` stays flat.
 
 `to_query()` and `to_shape()` stand in the same relationship as `evaluate()` and `to_infix()`:
 two operations over one structure that names neither of them.
@@ -790,7 +794,7 @@ Adding a third changes none of the existing code.
 `to_query()` uses the walk to keep user values out of the query text.
 `name` holds an injection attempt,
 and it comes out as a value in the parameter list rather than as text in the query.
-The reason is structural rather than clever:
+The reason is structural rather than clever.
 `to_query()` receives the literal pieces and the values separately,
 so values stay out of the `sql` list.
 Written as an f-string,

@@ -580,8 +580,8 @@ carry a value comes from the one function that cannot pass one.
 
 > [A Vending Machine](../../Chapters/31_Patterns--State_Machines.md#a-vending-machine)
 > keeps its current state in an attribute and looks up each transition in a table.
-> Write a simplified version as a single generator instead: it collects money,
-> takes two digits, then dispenses or refuses.
+> Write a simplified version as a single generator instead.
+> It collects money, takes two digits, then dispenses or refuses.
 > It yields its current state and receives each event with `send()`,
 > so the position in the generator's body carries the state.
 > This generator's `yield` reports the state the machine reached rather than requesting something the machine needs,

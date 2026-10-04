@@ -4,9 +4,10 @@
 > Python gives each grouping a literal and a type of its own.
 
 In C++ and Java a container is a library class you name and construct.
-Python builds its containers into the grammar: `[1, 2]`, `{"a": 1}`,
-and `{1, 2}` are literals, `in` and `len()` work on all of them,
-and slicing works on the sequences, without importing anything.
+Python builds its containers into the grammar.
+`[1, 2]`, `{"a": 1}`, and `{1, 2}` are literals,
+`in` and `len()` work on all of them, and slicing works on the sequences,
+without importing anything.
 Lists, tuples, dictionaries, and sets are fundamental data types.
 
 ## Lists
@@ -109,7 +110,7 @@ print(sorted(words, reverse=True))
 so `x = x.sort()` binds `None` and loses the list.
 Uppercase sorts before lowercase because Python compares strings by code point.
 [Functions](05_Foundations--Functions.md#lambdas)
-shows how a `key=` function changes the ordering;
+shows how a `key=` function changes the ordering.
 `key=str.lower` folds the case here.
 
 ### Mixed Element Types
@@ -157,7 +158,8 @@ print(grid)
 ```
 
 The grid is [Variables and References](02_Foundations--Tour.md#variables-and-references)
-again: `*` binds the same object into every slot, and assignment never copies.
+again.
+`*` binds the same object into every slot, and assignment never copies.
 The second `grid` comes from a *comprehension*:
 a single expression that produces a new list,
 in place of a loop with `append()`.
@@ -285,7 +287,7 @@ a tuple, a string, a `range`, or the value a call returns,
 as with `*sorted("cab")`.
 Unlike a starred target, any number of operands can carry a star,
 and they mix freely with ordinary elements.
-The last two lines use both directions:
+The last two lines use both directions.
 `*rest` collects on the left of the assignment and spreads inside the display,
 so the pair rotates `evens` by one place.
 `+` joins two lists as well, but both operands must be lists,
@@ -359,14 +361,14 @@ A `dict` iterates in insertion order, and the language guarantees that order.
 A `dict` has three views: `keys()`, `values()`, and `items()`.
 Iterating the `dict` iterates `keys()`, so `for name in ages` walks the names.
 `items()` alone yields `(key, value)` pairs,
-and leaving it off is a common slip:
+and leaving it off is a common slip.
 `for name, age in ages` iterates the keys and tries to unpack each one.
 Unpacking `"Alice"` into two names raises a `ValueError`,
 since the string has more than two characters.
 A two-character key such as `"Bo"` unpacks into its letters and the loop finishes with no error.
 
-`keys()` is also set-like, and so is `items()` when every value is hashable:
-each supports `&`, `|`, `-`,
+`keys()` is also set-like, and so is `items()` when every value is hashable.
+Each supports `&`, `|`, `-`,
 and `^` against another dict's view or against any set.
 [Sets](#sets) covers those operators.
 
@@ -402,8 +404,9 @@ print(dict(zip("abc", [1, 2, 3])))  # Build from pairs
 `|` builds a merged `dict` and `|=` updates in place,
 the same job `update()` does.
 For sets, `|` means union, and the order of the operands makes no difference.
-For dictionaries the order matters: when both dictionaries hold the same key,
-the right operand's value wins, so `"y"` comes out as `20`.
+For dictionaries the order matters.
+When both dictionaries hold the same key, the right operand's value wins,
+so `"y"` comes out as `20`.
 `{**a, **b}` builds the same merged `dict`,
 with `**` spreading each dictionary's entries the way `*` spreads a list's elements,
 and the later entry wins a collision.
@@ -432,7 +435,8 @@ except RuntimeError as e:
 
 A `set` raises the same exception,
 with the message `Set changed size during iteration`.
-Only the `list` hides the mistake; the `dict` and the `set` both report it.
+Only the `list` hides the mistake.
+The `dict` and the `set` both report it.
 
 ## Sets
 
@@ -472,8 +476,8 @@ The order these sets print comes from CPython's hashing, not from any guarantee,
 so do not write code, or a test, that depends on it.
 
 Every set-algebra operator in `sets.py` has a named method.
-The methods are more flexible:
-they accept any iterable where the operators need a set on both sides,
+The methods are more flexible.
+They accept any iterable where the operators need a set on both sides,
 and `union()`, `intersection()`,
 and `difference()` take several arguments at once.
 `isdisjoint()` adds one more test, with no operator form:
@@ -546,8 +550,8 @@ Searching the `list` is O(n) and searching the `set` is O(1),
 so the gap widens without limit as `n` grows.
 At ten times the size the ratio is bigger rather than the same,
 so `large_gap` comes out bigger than `small_gap`.
-The probe value is missing on purpose:
-searching for an absent item is the `list`'s worst case,
+The probe value is missing on purpose.
+Searching for an absent item is the `list`'s worst case,
 since the scan compares all `n` elements before reporting `False`.
 
 A timing depends on the machine that took it,
@@ -634,8 +638,8 @@ For a lookup that leaves the dictionary as it was, use `in` or `dict.get()`.
 
 A plain `dict` has a second option, `setdefault()`.
 In `plain.setdefault(kind, []).append(name)`,
-`setdefault()` returns the list already stored under `kind`;
-when `kind` is missing, it stores the new `[]` and returns that instead.
+`setdefault()` returns the list already stored under `kind`.
+When `kind` is missing, it stores the new `[]` and returns that instead.
 The `[]` argument builds an empty list on every call, used or not.
 Every place that touches the dictionary must also repeat the whole expression.
 A `defaultdict` states the default once, where you create the dictionary.
@@ -753,8 +757,8 @@ print(height)
 
 A `namedtuple` is a fixed-length record like the tuple in `heterogeneous.py`,
 but its fields are self-documenting.
-`typing.NamedTuple` is the class form of the same idea:
-it declares a type for each field instead of listing bare names,
+`typing.NamedTuple` is the class form of the same idea.
+It declares a type for each field instead of listing bare names,
 so a type checker knows what each one holds.
 For a record that must be mutable,
 use a [data class](12_Techniques--Data_Classes_as_Types.md#data-classes).
@@ -834,8 +838,8 @@ writing to `settings` changes what `config` reports.
 
 ### `frozendict`
 
-A `MappingProxyType` is a window onto a `dict` that still exists and can change;
-a `frozendict` owns its contents.
+A `MappingProxyType` is a window onto a `dict` that still exists and can change.
+A `frozendict` owns its contents.
 This listing requires Python 3.15:
 
 ```python

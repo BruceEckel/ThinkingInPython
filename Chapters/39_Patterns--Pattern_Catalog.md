@@ -19,7 +19,8 @@ and several exist only to work around limits of a particular language.
 and [*State Machine*](31_Patterns--State_Machines.md) are one overlapping pair.
 *State* changes an object's behavior when its internal state changes.
 *State Machine* drives an object through a fixed set of states in response to inputs.
-*State Machine* builds on *State*: the machine chooses each successor,
+*State Machine* builds on *State*.
+The machine chooses each successor,
 so the object advances without the client choosing.
 The body of this book argues that several of the patterns written around a language's limits dissolve in Python
 ([Design Patterns](21_Patterns--Design_Patterns.md#when-a-pattern-dissolves) says why).
@@ -131,11 +132,11 @@ so use this section's table when you know the problem but not the name.
 | [*Thread-Specific Storage*](19_Techniques--Concurrency.md#context-that-follows-the-call-chain) | Give each thread its own copy of a value, as `threading.local` does; `ContextVar` scopes the value to the context instead. |
 
 *Reactor* is a name that hides its job.
-The pattern is a dispatcher:
-one loop waits on many event sources and hands each event to the handler registered for it,
+The pattern is a dispatcher.
+One loop waits on many event sources and hands each event to the handler registered for it,
 and the original description of *Reactor* lists *Dispatcher* as another name for it.
-"Reactor" survives because the literature and the libraries use it:
-asyncio's `SelectorEventLoop` and Twisted's `reactor` are both Reactors.
+"Reactor" survives because the literature and the libraries use it.
+Both asyncio's `SelectorEventLoop` and Twisted's `reactor` are Reactors.
 *Proactor* follows the same naming, and asyncio's `ProactorEventLoop`,
 the default on Windows, is one.
 

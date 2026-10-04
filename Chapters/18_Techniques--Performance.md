@@ -26,8 +26,8 @@ Do not automatically assume that a simply written program will be too slow.
 Try it out first.
 It might be fine.
 
-The opposite assumption fails just as often:
-a program that works in the small may not scale.
+The opposite assumption fails just as often.
+A program that works in the small may not scale.
 A run over a hundred records says nothing about a million,
 because costs grow at different rates.
 An algorithm that revisits its data looks instant at one size and takes hours at another,
@@ -90,8 +90,8 @@ Running it under the profiler prints a table like this one
 
 `tottime` is the time spent inside that function alone.
 `cumtime` adds the time spent in everything it called.
-Sorting by `cumtime` puts `exec` and `<module>` on top, which tells you nothing:
-they call everything, so they contain everything.
+Sorting by `cumtime` puts `exec` and `<module>` on top, which tells you nothing.
+They call everything, so they contain everything.
 Scan down to the first row where `tottime` is large: here, `slow()`.
 That is the function to attack, since its own loop, not anything it calls,
 burns most of the time.
@@ -125,7 +125,8 @@ Either form ends with a table ranked by sample count.
 Its rows are source lines, where `cProfile`'s are functions,
 so a hot loop shows up as the line inside it.
 The table has `tottime` and `cumtime` columns, estimated from the samples,
-and no `ncalls` column: a sampler sees where the program is at each snapshot,
+and no `ncalls` column.
+A sampler sees where the program is at each snapshot,
 not how many times it arrived there.
 When the call count is the question, use the tracing profiler.
 
@@ -135,8 +136,8 @@ separates Python time from native time and profiles memory line by line.
 ## Measuring One Function with `sys.monitoring` {#measuring-one-function-with-sys-monitoring}
 
 A profiler answers a broad question about the whole program.
-Sometimes you have a narrow one:
-how many times does this function run during a request,
+Sometimes you have a narrow one.
+How many times does this function run during a request,
 and does that branch run?
 A counter added to the function changes the code you study,
 and a full profiler costs more than the answer is worth.
@@ -146,8 +147,8 @@ is the interpreter's own instrumentation mechanism,
 the one profilers and debuggers now use.
 You claim a tool identifier, register a callback for an event,
 and name the code to which the event applies.
-Registering nothing costs nothing:
-the interpreter specializes the bytecode that has no callback attached,
+Registering nothing costs nothing.
+The interpreter specializes the bytecode that has no callback attached,
 so unmonitored code runs at full speed.
 `sys.settrace()`, by contrast, slows every Python function its thread runs,
 since its trace function runs on each call and then on each line:
@@ -188,8 +189,8 @@ print(counts)
 `fib()` and `square()` stay untouched.
 The counting lives outside them, in `on_start()`,
 which the interpreter calls each time a monitored Python function begins.
-`set_local_events()` is the narrow instrument:
-it attaches the event to one code object,
+`set_local_events()` is the narrow instrument.
+It attaches the event to one code object,
 and that is why `square()` is absent from the count although it ran.
 The event does not spread to whatever that code calls,
 so a helper that `fib()` invokes goes uncounted as well.
@@ -201,7 +202,8 @@ When one function is the question,
 
 `set_local_events()` with `NO_EVENTS` detaches,
 and `free_tool_id()` releases the identifier.
-The identifiers are a shared resource: `PROFILER_ID`, `DEBUGGER_ID`,
+The identifiers are a shared resource.
+`PROFILER_ID`, `DEBUGGER_ID`,
 and `COVERAGE_ID` carry the names of their intended users.
 Claiming one that another tool holds raises a `ValueError`,
 so a second tool fails loudly instead of silently replacing the first tool's callbacks.
@@ -245,8 +247,8 @@ print(calls["used"], calls["unused"])
 
 Returning `monitoring.DISABLE` tells the interpreter to stop reporting this event at this location until someone calls `restart_events()`.
 `used()` ran a thousand times and the callback ran for it once.
-`DISABLE` makes coverage measurement affordable:
-the question is "was this reached," so the second answer is worthless,
+`DISABLE` makes coverage measurement affordable.
+The question is "was this reached," so the second answer is worthless,
 and after the first hit the monitored code returns to full speed.
 
 A profiler gives you a ranked table with no code to write.
@@ -262,8 +264,8 @@ insulating the measurement from startup cost and clock granularity.
 
 Timings differ from machine to machine,
 so the following example prints a comparison instead of raw numbers.
-The numbers are one flag away:
-run any measured listing in this book with `--numbers` to see what your machine does
+The numbers are one flag away.
+Run any measured listing in this book with `--numbers` to see what your machine does
 ([Numbers on Your Machine](#numbers-on-your-machine)).
 A `list` tests membership by scanning.
 `target in as_list` walks the list from the start,
@@ -311,7 +313,8 @@ A million lookups is the difference between instant and minutes.
 A single measurement includes whatever else the machine is doing.
 `timeit.repeat(f, number=100, repeat=5)` returns a list of five such totals,
 and the smallest of them is the run with the least interference.
-Report `min(...)`, not the mean: a slow run means something stole the CPU,
+Report `min(...)`, not the mean.
+A slow run means something stole the CPU,
 so averaging folds that theft into your answer,
 while the fastest run is the closest you get to measuring only your code.
 
@@ -366,8 +369,8 @@ adds the measurements above that line:
 
 The names are the keyword arguments at the call site,
 so each listing labels its own measurements.
-Your ratio differs from the one above;
-seeing your own number is the point of running it.
+Your ratio differs from the one above.
+Seeing your own number is the point of running it.
 
 ## Try a Faster Platform
 
@@ -424,7 +427,7 @@ On Windows x86-64, 3.15 measures 15-20% faster on the `pyperformance` geometric 
 with individual programs from 14% to 40%.
 The 3.14 figure, with Clang 19,
 is 3-5%.^[The 3.14 announcement said 10-15%. Nelson Elhage's [March 2025 analysis](https://blog.nelhage.com/post/cpython-tail-call/)
-traced most of that to the baseline:
+traced most of that to the baseline.
 LLVM 19 had capped its tail-duplication pass,
 which collapsed the old interpreter's 332 dispatch jumps into 3,
 so the comparison was against a compiler regression rather than a fast interpreter.
@@ -512,8 +515,8 @@ and the What's New that reports them is still a draft.
 The report sets aside one microbenchmark, `unpack_sequence`,
 and the rest range from roughly 15% slower to more than twice as fast,
 so the mean predicts your program poorly.
-Measuring your own program costs two runs:
-time the workload with `PYTHON_JIT` set to `1` and to `0`,
+Measuring your own program costs two runs.
+Time the workload with `PYTHON_JIT` set to `1` and to `0`,
 and change nothing else.
 
 Numba's `@njit` ([JIT Compilation with Numba](#jit-compilation-with-numba))
@@ -530,8 +533,8 @@ Neither one rescues a quadratic algorithm.
 then 20% for the JIT combined with [free threading](19_Techniques--Concurrency.md#free-threading)
 by 3.17.
 The PEP calls that the minimum for continuing to develop the JIT inside CPython.
-Meeting it does not turn the JIT on by default:
-that step needs separate approval from the release manager.
+Meeting it does not turn the JIT on by default.
+That step needs separate approval from the release manager.
 
 ## Write Idiomatic Python
 
@@ -679,7 +682,7 @@ while `bisect_left()` returns the position before them
 `bisect_left()` and `bisect_right()` both answer "where does this go,"
 but when the list holds the target, only `bisect_left()` returns its index,
 so a membership test must use it, as `search_comparison.py` does below.
-The speed is in the search alone:
+The speed is in the search alone.
 `insort()` still shifts everything after the insertion point.
 Under heavy insert traffic, when the smallest item is all you read,
 consider a [heap](#heap) instead.
@@ -946,8 +949,8 @@ so the lazy peak does not include the eager lists.
 Both versions produce the same five numbers,
 but the eager one builds a million-element list and a half-million-element list to get them,
 while the lazy one computes only the handful of values that `islice()` extracts.
-`islice()` replaces the eager version's `evens[:5]`:
-a generator has no `__getitem__`,
+`islice()` replaces the eager version's `evens[:5]`.
+A generator has no `__getitem__`,
 so slicing one raises `TypeError: 'generator' object is not subscriptable`.
 When the consumer needs every element and the data fits in memory,
 a list is fine, and you can iterate it twice.
@@ -971,8 +974,9 @@ Past that point the process fails outright, with `MemoryError` or an OS kill.
 Nothing warns you as the data approaches the limit,
 and everything changes the moment it crosses.
 
-The cliff is the argument for laziness: if a data set can outgrow memory,
-stream it from the start, like `lazy_first_evens()`.
+The cliff is the argument for laziness.
+If a data set can outgrow memory, stream it from the start,
+like `lazy_first_evens()`.
 
 ## Caching
 
@@ -1188,7 +1192,7 @@ where a *record* is an immutable class defined by its fields.
 The called form, `@record(slots=False)`,
 is for the class that must keep a `__dict__`,
 and dropping the slots takes a visible flag rather than a missing option.
-The two forms follow [Decorators With Optional Parentheses](14_Techniques--Decorators.md#decorators-with-optional-parentheses):
+The two forms follow [Decorators With Optional Parentheses](14_Techniques--Decorators.md#decorators-with-optional-parentheses).
 `cls` is `None` when you call the decorator with arguments,
 and the two `@overload` declarations tell the checker which form it reads.
 The test is `cls is None` rather than `callable(cls)`,
@@ -1216,15 +1220,15 @@ with expected(AttributeError):
 #: [FrozenInstanceError] cannot assign to field 'x'
 ```
 
-`frozen_default=True` is the reason the assignment carries a `# type: ignore`:
-the checker knows `Point` is frozen and reports `p.x = 3` before the program runs.
+`frozen_default=True` is the reason the assignment carries a `# type: ignore`.
+The checker knows `Point` is frozen and reports `p.x = 3` before the program runs.
 `@dataclass_transform` has no parameter that describes slots,
 so the checker does not know `Point` is slotted.
 On a frozen class that gap has no effect,
 because the checker rejects every assignment to an instance.
 
-A class whose base declares no `__slots__` writes `@record(slots=False)`:
-the base gives every instance its `__dict__` back,
+A class whose base declares no `__slots__` writes `@record(slots=False)`.
+The base gives every instance its `__dict__` back,
 so slots on the subclass would remove nothing,
 and the flag says so at the class.
 That form is for a base that is not yours to change, such as a library's,
@@ -1289,16 +1293,16 @@ with expected(TypeError):
 `cached_property` writes its cached value into the instance's `__dict__`,
 so a slotted class needs a `"__dict__"` entry of its own in `__slots__` before `cached_property` works.
 That entry gives back the per-instance dict that `slots=True` exists to remove.
-The same is true of weak references:
-add `"__weakref__"` to `__slots__` if some other object needs to hold one
+The same is true of weak references.
+Add `"__weakref__"` to `__slots__` if some other object needs to hold one
 (`weakref_slot=True` adds it to a data class).
 Multiple inheritance is the sharpest edge.
 Python lays out a slotted instance as a fixed block of storage,
 and two unrelated classes that both declare non-empty `__slots__` each claim their own incompatible layout,
 so a class cannot inherit from both.
 A class can inherit from one slotted base as long as its other bases declare no slots of their own.
-Exercise 6 covers a fourth trap:
-a subclass that declares no `__slots__` of its own quietly grows a `__dict__` back,
+Exercise 6 covers a fourth trap.
+A subclass that declares no `__slots__` of its own quietly grows a `__dict__` back,
 undoing the saving for every instance of that subclass.
 
 ### Array Instead of List
@@ -1338,8 +1342,8 @@ print(f"array at least 3x smaller: "
 
 The type code sets one type for every element,
 so `array` stores them compactly and rejects values of the wrong type.
-The size comparison shows the cost of boxing:
-the `list` holds an 8-byte pointer to a 24-byte `float` object per element,
+The size comparison shows the cost of boxing.
+The `list` holds an 8-byte pointer to a 24-byte `float` object per element,
 while the `array` spends 8 bytes per element total,
 roughly a four-to-one difference
 (one machine measured 325,176 bytes against 80,080).
@@ -1364,7 +1368,8 @@ print(view.nbytes)
 ```
 
 The view shares storage with `data`, so writing through it changes the original.
-`bytes(chunk)` copies, but only to print the slice; the view copies nothing.
+`bytes(chunk)` copies, but only to print the slice.
+The view copies nothing.
 A view can also read fields out of a buffer without copying it,
 the way a real protocol parser reads a header:
 
@@ -1399,12 +1404,12 @@ That sharing is also the trap.
 (or `payload`, sliced from it) stays alive.
 `bytearray.append()` needs to resize the buffer,
 so it refuses while an export is open.
-That is why `data.append(1)` fails here:
+That is why `data.append(1)` fails here.
 `view` and `payload` are both still alive at that point.
 The fix is to release every view first, explicitly (`view.release()`)
 or by letting them go out of scope, before resizing the buffer they read.
-The second trap is about direction, not lifetime:
-a `memoryview` over immutable `bytes` supports reading and slicing,
+The second trap is about direction, not lifetime.
+A `memoryview` over immutable `bytes` supports reading and slicing,
 but writing through it raises a `TypeError` regardless of whether anything else has it open.
 `memory_view.py` above writes through a view of a `bytearray`, which is mutable.
 Only a view of `bytes` is read-only.
@@ -1579,10 +1584,10 @@ so no single array expression produces it:
 
 `collatz_lengths()` takes a NumPy array and returns one,
 so it composes with vectorized NumPy code on either side.
-Compiling changes only the loop's interior:
-the same Python source runs as machine code instead of as bytecode over boxed `int` objects.
-That division is the pattern in practice:
-use a vectorized NumPy expression wherever the shape of the computation allows it,
+Compiling changes only the loop's interior.
+The same Python source runs as machine code instead of as bytecode over boxed `int` objects.
+That division is the pattern in practice.
+Use a vectorized NumPy expression wherever the shape of the computation allows it,
 and drop to a `@njit` loop for the steps that resist vectorizing,
 keeping the array as the shared data structure throughout.
 
@@ -1833,8 +1838,8 @@ give a hint, usually the shape of the code, and a full answer for each exercise.
     and explain why they are usually not the same function.
 9.  `compact_array.py` compares an `array` against a `list` of the same floats.
     Time an element-by-element sum over each with `timeit`.
-    The `array` uses a quarter of the memory: is it also faster to iterate,
-    and why not?
+    The `array` uses a quarter of the memory.
+    Is it also faster to iterate, and why not?
 10. Time `"".join(parts)` against `+=` in a loop for 10,000 short strings,
     then repeat at 100 strings.
     At which size does the difference stop mattering,

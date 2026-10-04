@@ -1450,8 +1450,8 @@ must run it over its own `globals()`.
 > Fill `PROTOTYPES` in `prototype_registry.py` by decoration instead of a table literal.
 > Write a `@prototype(name)` decorator for a function that builds and returns the `Monster`,
 > so that the decorator stores each decorated function's result under `name`.
-> Explain why the decorator takes the name as an argument rather than reading the function's `__name__`:
-> write that version and read what `ty` reports.
+> Explain why the decorator takes the name as an argument rather than reading the function's `__name__`.
+> Write that version and read what `ty` reports.
 > Then say what the decorated form gains over the table and what it costs.
 
 <details>

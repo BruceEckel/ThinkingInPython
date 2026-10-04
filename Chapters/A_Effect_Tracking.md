@@ -47,7 +47,7 @@ An algebraic effect is a set of operations declared as an interface.
 A handler gives those operations their meaning,
 and handling removes the effect from the row.
 The design has two halves, the row and the handlers,
-and a language can have one without the other:
+and a language can have one without the other.
 OCaml 5 has handlers and records no row in a function's type.
 *Algebraic effect tracking* is the row half: the `row(f)` rule,
 computed and checked for every function.
@@ -118,7 +118,8 @@ Koka's `println()` carries `console` in its type,
 as does every function that calls it, in your code and in the standard library.
 The compiler tracks all code, so every Effect appears in some function's row.
 
-All four follow from one fact: the three roles belong to one compiler,
+All four follow from one fact.
+The three roles belong to one compiler,
 and that compiler analyzes every function in the program.
 
 ## A Row Inside `Annotated` {#a-row-inside-annotated}
@@ -130,8 +131,8 @@ Each one is an ordinary expression, and `Annotated` keeps its value.
 `Annotated[int, "meters", range(0, 100)]` carries two pieces of metadata,
 a string and a `range` object.
 `Annotated` requires one piece of metadata and accepts any number after it.
-The PEP gives tools one rule:
-a tool with no logic for a piece of metadata ignores that piece and treats the annotation as `T`.
+The PEP gives tools one rule.
+A tool with no logic for a piece of metadata ignores that piece and treats the annotation as `T`.
 Each tool can therefore put its own object in the list,
 and every other tool reads past it.
 So metadata changes nothing for a type checker,
@@ -210,7 +211,7 @@ for f in ask, tell, greet, shout:
 ```
 
 The bodies are ordinary eager code, with no generators and no `yield from`.
-`ty` follows the PEP's rule:
+`ty` follows the PEP's rule.
 `reveal_type(ask)` reports `def ask(prompt: str) -> str`,
 and `name: str = ask(...)` checks against that `str`.
 Existing callers need no change,
@@ -255,14 +256,14 @@ For `console.print(message)` the tool needs the type of `console`.
 That type may come from a parameter annotation, an assignment,
 a narrowing `isinstance()`, a generic, or an overload.
 A subclass may also override the method.
-An override needs its own rule:
-the overriding method's row must fit inside the row of the method it replaces,
+An override needs its own rule.
+The overriding method's row must fit inside the row of the method it replaces,
 or a caller holding the base type performs Effects the base row omits.
 
 Working all of that out is type inference,
 which the type checker performs on every run.
 The tool therefore belongs inside the checker.
-Of the three checkers this book names, mypy has a plugin interface;
+Of the three checkers this book names, mypy has a plugin interface.
 `ty` and Pyright have none at this writing.
 A tool that runs outside the checker has two choices.
 It can repeat the checker's inference,
@@ -434,15 +435,15 @@ divides algebraic effects into a row half and a handler half.
 `Annotated` can carry the row, and no metadata can supply a handler.
 A native handler receives the continuation and decides what to do with it.
 [Stateless in Practice](47_Effects--Stateless_in_Practice.md#handlers-cannot-capture-the-continuation)
-shows the ceiling Python puts on the handler half:
-a Python generator is one-shot, so a handler can resume a computation once.
+shows the ceiling Python puts on the handler half.
+A Python generator is one-shot, so a handler can resume a computation once.
 PEP 593 could give Python algebraic effect tracking, the row half.
 The handler half would still come from a library, under that ceiling.
 
 Stateless gets tracking, interface separation,
 and delayed binding with no new tool.
-The reason is where it puts the row:
-the generator's yield type is a place the type checker examines on every run.
+The reason is where it puts the row.
+The generator's yield type is a place the type checker examines on every run.
 You declare the row there,
 and the checker verifies the propagation by checking every `yield from` in the body against it.
 The `Handler` that `supply()` returns subtracts the supplied Abilities from the row,

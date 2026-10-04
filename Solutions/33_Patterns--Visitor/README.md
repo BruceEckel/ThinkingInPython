@@ -2,8 +2,8 @@
 
 ## 1. `flower_visitors.py` with `singledispatch`
 
-> Rewrite `flower_visitors.py` with `singledispatch`:
-> make `pollinate()` and `eat()` functions defined outside the `Flower` hierarchy,
+> Rewrite `flower_visitors.py` with `singledispatch`.
+> Make `pollinate()` and `eat()` functions defined outside the `Flower` hierarchy,
 > with `Chrysanthemum`'s toxicity a registered implementation of `eat()`.
 > Which classes and which methods disappear?
 

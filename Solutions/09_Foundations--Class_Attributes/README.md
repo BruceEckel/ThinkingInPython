@@ -212,8 +212,8 @@ through an instance.
 > Rewrite `Cart` from `shared_mutable.py` as a `@dataclass` with `items: list[str] = field(default_factory=list)`,
 > importing `field` from `dataclasses`.
 > [Data Classes as Types](../../Chapters/12_Techniques--Data_Classes_as_Types.md#defaults-built-not-shared)
-> covers `default_factory`;
-> this exercise needs only the one expression given here.
+> covers `default_factory`.
+> This exercise needs only the one expression given here.
 > Repeat the `append` and confirm `b.items` stays empty.
 > Then try the same class with `items: list[str] = []` and report what `@dataclass` does about it.
 

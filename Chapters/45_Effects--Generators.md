@@ -113,7 +113,7 @@ With `NewType` you can give each channel a distinct type,
 so the annotation states the arrangement and a type checker enforces it.
 `Question` fills the `YieldType` position, `Answer` the `SendType`,
 and `Result` the `ReturnType`.
-The distinction exists only for the type checker:
+The distinction exists only for the type checker.
 `Question("name")` produces the plain `str`.
 
 The `NewType` definitions catch a transposed annotation.
@@ -138,8 +138,8 @@ A `for` loop loses that value,
 because `for` catches the `StopIteration` and discards it along with its `value`.
 To read the `ReturnType`, catch the exception yourself,
 as `interview_generator.py` does.
-Python raises that `StopIteration` for the generator;
-the body finishes with `return`.
+Python raises that `StopIteration` for the generator.
+The body finishes with `return`.
 A `StopIteration` that escapes the body,
 such as one from calling `next()` on an exhausted iterator,
 becomes a `RuntimeError` ([PEP 479](https://peps.python.org/pep-0479/)),
@@ -148,7 +148,7 @@ shows.
 
 A newly created generator pauses at the top of the function body,
 before any code runs, so no `yield` expression is waiting to receive a value.
-The first call must therefore be `next()`:
+The first call must therefore be `next()`.
 `i.send(Answer("Alice"))` at that point raises `TypeError: can't send non-None value to a just-started generator`.
 
 A suspended generator holds its frame:
@@ -171,7 +171,7 @@ print(f"{next(interview()) = }")
 
 Each `interview()` call creates a new generator,
 so both lines start from the beginning and produce the first question.
-The `# type: ignore` marks a real mismatch:
+The `# type: ignore` marks a real mismatch.
 `interview()` declares `Answer` as its `SendType`,
 and `None` is not an `Answer`.
 The type checker rejects the priming `send()` although the interpreter accepts it,
@@ -191,8 +191,8 @@ Calling `interview()` returns a generator object but runs nothing in the functio
 `next()` and `send()` do that work, one `yield` at a time.
 
 A generator is more useful than a coroutine here because you write the driver.
-The event loop receives a coroutine's requests;
-whatever code calls `next()` and `send()` receives a generator's.
+The event loop receives a coroutine's requests.
+Whatever code calls `next()` and `send()` receives a generator's.
 The generator yields a *request* out,
 and whatever drives it sends the *answer* back in.
 That conversation makes an Effect Management System possible,
@@ -235,7 +235,8 @@ if __name__ == "__main__":
 #: result = 'Alice of Wonderland, friend Rabbit'
 ```
 
-The listing imports the generator unchanged; the driver is new.
+The listing imports the generator unchanged.
+The driver is new.
 The first line of output describes what `interview()` produced:
 an ordinary `generator` object whose `__name__` is the function's name.
 That `__name__` exists on the object at runtime but not in the `Generator` type,
@@ -270,8 +271,8 @@ Swapping the dictionary for a database changes a single argument.
 The generator declares Effects, and the driver interprets them.
 
 One generator, one driver.
-No annotation states that pairing, but the runtime enforces it:
-a generator resumed from two threads at once raises `ValueError: generator already executing` rather than interleaving.
+No annotation states that pairing, but the runtime enforces it.
+A generator resumed from two threads at once raises `ValueError: generator already executing` rather than interleaving.
 [Concurrency](19_Techniques--Concurrency.md#sharing-an-iterator-between-threads)
 shows that error and `threading.synchronized_iterator()`,
 which serializes the conversation.
@@ -317,11 +318,12 @@ print(list(top()))
 ```
 
 Each `yield from` runs its target until that generator finishes,
-so the line delegating to `one()` contributes one value and the line delegating to `three()` contributes three:
-the target decides how many values each delegation contributes.
+so the line delegating to `one()` contributes one value and the line delegating to `three()` contributes three.
+The target decides how many values each delegation contributes.
 Without `from`, a bare `yield one()` yields the generator object as a single value.
-"Exhausted" describes where the delegation ends; in between,
-the inner generator yields each value one at a time, as the driver requests it.
+"Exhausted" describes where the delegation ends.
+In between, the inner generator yields each value one at a time,
+as the driver requests it.
 
 Exhaustion is transitive.
 `top()` delegates to `outer()`, which delegates to `one()` and `three()`,
@@ -359,7 +361,7 @@ print(list(report(["red", "green", "blue"])))
 `emit()` is a `Generator[str, None, int]`: it yields strings, receives nothing,
 and returns the `int` total it accumulates while iterating.
 
-The return channel delivers a value from a generator to the generator that delegated to it:
+The return channel delivers a value from a generator to the generator that delegated to it.
 `report()` receives the total `emit()` computed,
 and neither function names the driver.
 
@@ -411,8 +413,8 @@ so the annotation shortens to `Generator[str, int]`.
 `both()` declares that same type,
 because `yield from` passes the inner generator's yield and send channels through to the driver.
 
-`yield from` delivers each number to the `yield` that produced the prompt:
-the value from `g.send(1)` becomes the result of the first `yield` inside `collect("alpha")`,
+`yield from` delivers each number to the `yield` that produced the prompt.
+The value from `g.send(1)` becomes the result of the first `yield` inside `collect("alpha")`,
 two frames below the driver.
 `both()` needs no forwarding code of its own,
 because `yield from` does the forwarding.
@@ -456,8 +458,8 @@ Each `send()` delivers its value to `manual()`'s own `yield`, which discards it.
 The `for` loop then resumes `collect()` with `next()`,
 so both of `collect()`'s `yield` expressions produce `None`.
 The type checker reports nothing,
-because `manual()` is a valid `Generator[str, int]`:
-the send channel appears in the declaration and goes unused.
+because `manual()` is a valid `Generator[str, int]`.
+The send channel appears in the declaration and goes unused.
 `yield from` is not shorthand for this loop.
 
 ### All Three Channels
@@ -749,8 +751,8 @@ task_runner()
 #: download: checksum
 ```
 
-`@task` is the [registering-decorator shape](14_Techniques--Decorators.md#decorating-classes):
-it calls each generator function once at definition time,
+`@task` is the [registering-decorator shape](14_Techniques--Decorators.md#decorating-classes).
+It calls each generator function once at definition time,
 queues the generator that call builds, and hands the function back unchanged.
 `task_runner()` gives the front task one `next()` per turn.
 A task that yields moves to the back of the queue.
@@ -759,7 +761,7 @@ Each `yield` suspends its task and returns control to `task_runner()`,
 which then runs the next one, so the output interleaves the two tasks,
 though neither names the other and no threads exist.
 
-`task_runner()` calls `next()` and takes turns;
+`task_runner()` calls `next()` and takes turns.
 `drive()` calls `send()` and answers questions.
 Giving each job a question combines turn-taking and answering in one loop:
 
@@ -843,8 +845,8 @@ to the task that drives it.
 When the `Future` has a result, the loop resumes the coroutine,
 and the `await` expression evaluates to that result.
 `asyncio.run()` is the single interpreter at the edge of the program.
-That is why an `await` in a function makes every caller `async` in turn:
-the requests must reach the loop.
+That is why an `await` in a function makes every caller `async` in turn.
+The requests must reach the loop.
 
 Once you see a program that way,
 the question stops being what a function does and becomes what it requests.
@@ -884,8 +886,8 @@ usually the shape of the code, and a full answer for each exercise.
     State it in terms of the `SendType`.
 7.  [A Vending Machine](31_Patterns--State_Machines.md#a-vending-machine)
     keeps its current state in an attribute and looks up each transition in a table.
-    Write a simplified version as a single generator instead: it collects money,
-    takes two digits, then dispenses or refuses.
+    Write a simplified version as a single generator instead.
+    It collects money, takes two digits, then dispenses or refuses.
     It yields its current state and receives each event with `send()`,
     so the position in the generator's body carries the state.
     This generator's `yield` reports the state the machine reached rather than requesting something the machine needs,

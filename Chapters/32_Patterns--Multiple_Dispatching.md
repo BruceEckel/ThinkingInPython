@@ -29,8 +29,8 @@ Runtime dispatch resolves on the type of one object,
 the one receiving the method call.
 That is why one method call can resolve only one unknown type.
 
-The solution is *Multiple Dispatching*: to dispatch on two unknown types,
-you need two method calls.
+The solution is *Multiple Dispatching*.
+To dispatch on two unknown types, you need two method calls.
 The first resolves the first type, and the second resolves the second.
 Two unknown types means two dispatches, which is *double dispatching*.
 In `paper_scissors_rock.py`,
@@ -40,7 +40,7 @@ If two different type hierarchies interact,
 you need a dispatching method call for each hierarchy.
 
 When the interaction is an operator,
-Python performs this second dispatch for you:
+Python performs this second dispatch for you.
 `a + b` retries as `b.__radd__(a)` if `a.__add__(b)` declines.
 That retry is how the opening `Number + Number` question resolves
 ([Operators Dispatch Twice](#operators-dispatch-twice) below).
@@ -169,8 +169,8 @@ Follow one duel to see which competitor each result describes.
 and calls `paper.eval_scissors(...)`.
 That call is the second dispatch.
 It resolves `paper` and runs `Paper.eval_scissors()`,
-the one method that knows both types:
-its class is `Paper` and its name says `Scissors`.
+the one method that knows both types.
+Its class is `Paper` and its name says `Scissors`.
 Which competitor does that method's result describe?
 `Paper.eval_scissors()` returns `WIN`.
 Scissors cut paper, so that is the outcome for the scissors that started the duel,
@@ -260,8 +260,8 @@ if __name__ == "__main__":
 #: Scissors <--> Scissors : draw
 ```
 
-Dictionary keys are flexible: a tuple works as a key,
-the same as a single object.
+Dictionary keys are flexible.
+A tuple works as a key, the same as a single object.
 
 Both versions now hold the same nine answers, one for each pair of types:
 
@@ -359,8 +359,8 @@ print(compete(Origami(), Rock()))
 `Origami()` matches the `Paper()` pattern,
 though the table lookup in `exact_match.py` raises a `KeyError` for the same subclass.
 Unlike `singledispatch`, every case sits together in one block,
-closed the way the table is: adding an `Item` means adding cases,
-not registering a function elsewhere.
+closed the way the table is.
+Adding an `Item` means adding cases, not registering a function elsewhere.
 
 ### The `singledispatchmethod` Trap
 
@@ -370,8 +370,8 @@ It dispatches once on `self` through ordinary method resolution,
 then again on its first argument through `singledispatch`.
 That is the pair of dispatches the `eval_*()` family writes out by hand.
 Like `singledispatch`, it matches on the MRO rather than exactly.
-One mistake raises no error and prints a plausible answer:
-a `@singledispatchmethod` declared on a shared base gives every subclass one dispatcher,
+One mistake raises no error and prints a plausible answer.
+A `@singledispatchmethod` declared on a shared base gives every subclass one dispatcher,
 and the resolution on `self` then reaches that same dispatcher for every subclass,
 so each class needs its own `@singledispatchmethod`.
 Here is the mistake:
@@ -414,8 +414,8 @@ although each registration went through its own class.
 
 ## Methods or Table
 
-The version most programmers write first is neither the methods nor the table:
-it is an `isinstance()` ladder inside `compete()`,
+The version most programmers write first is neither the methods nor the table.
+It is an `isinstance()` ladder inside `compete()`,
 testing the opponent's type case by case.
 It works, and it keeps the method version's cost without its benefit.
 The type tests repeat in every class,
@@ -561,8 +561,8 @@ The fallback is how a type written decades after `int` can add itself to an `int
 Every binary arithmetic and bitwise operator has a reflected form,
 named by inserting an `r` before the operator's name: `__rsub__()`,
 `__rmul__()`, `__rtruediv__()`.
-The in-place forms, `__iadd__()` and its siblings, are a separate family:
-they serve `+=`, not `a + b`.
+The in-place forms, `__iadd__()` and its siblings, are a separate family.
+They serve `+=`, not `a + b`.
 Here is the machinery, with each dispatch traced:
 
 ```python
@@ -605,8 +605,8 @@ with expected(TypeError):
 #: and 'str'
 ```
 
-The first two additions resolve inside `__add__()`:
-one of the left operand's `isinstance()` tests matches the right operand.
+The first two additions resolve inside `__add__()`.
+One of the left operand's `isinstance()` tests matches the right operand.
 `4 + Meters(3)` calls `int.__add__()` first,
 which returns `NotImplemented` for a `Meters` operand.
 The sentinel is a decline rather than an error,
@@ -618,13 +618,13 @@ and `str` defines no `__radd__()`.
 Python raises the `TypeError` once both sides have declined.
 
 Raising a `TypeError` inside `__add__()` ends the expression there,
-since the exception propagates immediately;
-only a returned sentinel makes Python try the right operand's `__radd__()`.
+since the exception propagates immediately.
+Only a returned sentinel makes Python try the right operand's `__radd__()`.
 When both operands have the same type, Python tries `__add__()` alone,
 so `__add__()` resolves `Meters + Meters`.
 Adding two instances of a class that implements `__radd__()` alone raises a `TypeError`.
-One case reverses the order:
-when the right operand's type is a subclass of the left's and overrides the reflected method,
+One case reverses the order.
+When the right operand's type is a subclass of the left's and overrides the reflected method,
 Python tries that reflected method first,
 so the subclass's method runs before the base's.
 
@@ -694,8 +694,8 @@ give a hint, usually the shape of the code, and a full answer for each exercise.
     and returns `NotImplemented` for anything else.
     `__rsub__()` needs only the `int` and `float` cases,
     since Python skips the reflected form when both operands are `Meters`.
-    Subtraction does not commute, so the reflected form must undo the swap:
-    check that `10 - Meters(3)` produces `Meters(7)` rather than `Meters(-7)`.
+    Subtraction does not commute, so the reflected form must undo the swap.
+    Check that `10 - Meters(3)` produces `Meters(7)` rather than `Meters(-7)`.
     Then confirm that `"ten" - Meters(3)` raises a `TypeError` rather than producing a `Meters`.
 6.  Subclass `Paper` as `Origami` and duel it against `Rock` in the table version,
     as `exact_match.py` does.
@@ -729,8 +729,8 @@ give a hint, usually the shape of the code, and a full answer for each exercise.
     The call site stays `item1.compete(item2)`.
     Write a helper that wraps a constant `Outcome` in a callable,
     so the seven unchanged cells stay one line each.
-    Then give `Paper` a `wet` attribute and make the `(Paper, Rock)` and `(Rock, Paper)` cells read it:
-    dry paper wraps the rock and wins, wet paper is too soggy and draws,
+    Then give `Paper` a `wet` attribute and make the `(Paper, Rock)` and `(Rock, Paper)` cells read it.
+    Dry paper wraps the rock and wins, wet paper is too soggy and draws,
     whichever of the two calls `compete()`.
     The chapter gives two reasons for preferring the double-dispatch version.
     Say which one this change answers, and which one survives it.

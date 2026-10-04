@@ -7,7 +7,8 @@ Code written against an *iterator* does not care whether the data comes from a l
 a file, a database cursor, or a computation.
 It asks only for the next item.
 That is the communication-first design [Design Patterns](21_Patterns--Design_Patterns.md#design-principles)
-recommends: the caller states what it needs,
+recommends.
+The caller states what it needs,
 and the container's type stays out of the conversation.
 
 Python builds iterators into the language.
@@ -21,7 +22,8 @@ Two methods make up the protocol.
 An *iterable* has `__iter__()`, which returns an *iterator*.
 An iterator has `__next__()`,
 which returns the next item or raises `StopIteration`.
-An iterator is also iterable: its `__iter__()` returns itself,
+An iterator is also iterable.
+Its `__iter__()` returns itself,
 so an iterator works anywhere code expects an iterable.
 The `for` loop calls these methods, so you rarely call them directly.
 Every container uses this protocol,
@@ -49,7 +51,7 @@ then calls `next()` until the iterator raises `StopIteration`.
 A loop absorbs `StopIteration` as the normal end rather than an error.
 The first `is` shows that calling `iter()` on a list creates a new iterator each time.
 The second `is` shows that calling `iter()` on an iterator returns that iterator.
-The tempting call is `next(nums)`: `next()` accepts only an iterator,
+The tempting call is `next(nums)`, but `next()` accepts only an iterator,
 and a list has no `__next__()`, so that call raises a `TypeError` at runtime.
 The type checker rejects `next(nums)` before the program runs.
 
@@ -67,7 +69,7 @@ while True:
 
 One legacy path bypasses `__iter__()`.
 A class that defines `__getitem__()` in place of `__iter__()`,
-taking integers from zero, is still iterable:
+taking integers from zero, is still iterable.
 `iter()` builds an iterator that calls `__getitem__()` with 0, 1, 2, and so on,
 until `IndexError`.
 Such a class works with `for`,
@@ -137,8 +139,8 @@ then puts `total()` in the loop's place:
 The shaded region in each frame holds what the caller cannot see.
 Inside `total()`, `sum()` makes the same `iter()` and `next()` calls as the written-out `for` loop,
 so a new source needs no change to `total()`.
-The third frame shows a limit of the protocol:
-a caller learns that the items have run out by asking for one more.
+The third frame shows a limit of the protocol.
+A caller learns that the items have run out by asking for one more.
 
 `fibonacci(8)` returns an iterator, which one pass exhausts.
 `Countdown(5)` is an iterable whose `__iter__()` builds a fresh generator for every pass,
@@ -259,8 +261,8 @@ Calling `squares(6)` runs none of its body.
 The `print()` at the top runs only when something demands the first value.
 It runs once, not on every value.
 Each later `next()` resumes the body just after the `yield` instead of restarting it.
-Any validation at the top of a generator inherits this delay:
-a check meant to reject a bad argument raises its exception at the first `next()`,
+Any validation at the top of a generator inherits this delay.
+A check meant to reject a bad argument raises its exception at the first `next()`,
 far from the call that caused the problem.
 
 To validate eagerly,
@@ -300,7 +302,8 @@ whose `__iter__()` builds a fresh generator for every pass.
 Laziness and single use are separate properties.
 `Countdown` is as lazy as the generator its `__iter__()` builds,
 yet it survives repeated passes, because each pass gets a fresh iterator.
-`range()` works the same way: one `range` object can drive loop after loop.
+`range()` works the same way.
+One `range` object can drive loop after loop.
 The iterator runs out, not the iterable that made it.
 
 An `Iterable[T]` annotation gives no warning,
@@ -335,8 +338,8 @@ When a function iterates more than once, say so in the signature.
 which no generator has,
 so the type checker rejects the generator at the call instead of letting it run wrong.
 `twice_collection(gen(3))` is the call the checker refuses,
-and that is why the listing leaves it out:
-every chapter listing must type-check.
+and that is why the listing leaves it out.
+Every chapter listing must type-check.
 `total()` in `iterators.py` stays `Iterable[int]` because it sums once.
 
 ### What `tee()` Buffers
@@ -452,8 +455,8 @@ print(list(flatten(data)))
 
 Both functions call themselves on each nested sequence,
 and both pass each value from the recursive call out to the caller.
-`flatten_loop()` passes the values out by hand: start the recursive call,
-then re-yield each value it produces.
+`flatten_loop()` passes the values out by hand.
+It starts the recursive call, then re-yields each value that call produces.
 `flatten()` replaces those two lines with `yield from`,
 and the matching output shows the substitution is exact.
 
@@ -462,7 +465,7 @@ and tells you to write `yield from` instead.
 
 The two forms agree for a generator that yields values and returns `None`,
 as `flatten()` does.
-The `yield from` expression, however, has a value:
+The `yield from` expression, however, has a value.
 `result = yield from inner()` binds whatever `inner()` returned when it stopped.
 The hand-written loop drops that value.
 `yield from` also forwards `send()` and `throw()` into the inner generator,
@@ -587,8 +590,8 @@ and trips the same wire.
 The `takewhile()` and `islice()` tests stop on their own,
 before reaching the tripwire.
 
-Failing at 1,000 values stands in for how a real program fails:
-it stops responding, or it dies when it exhausts memory.
+Failing at 1,000 values stands in for how a real program fails.
+A real program stops responding, or it dies when it exhausts memory.
 The toolchain lets `list(count(1))` through.
 The type checker accepts it,
 and so does `ruff` with every one of its rules enabled.
@@ -643,8 +646,8 @@ The `dataclass` decoration carries `eq=False`.
 A data class that generates `__eq__()` sets `__hash__` to `None`,
 so the wrapper can no longer go in a set or serve as a dict key,
 as every other iterator in Python can.
-Field-by-field comparison is also the wrong question to ask about a cursor:
-two wrappers over one source compare equal as soon as their counts agree,
+Field-by-field comparison is also the wrong question to ask about a cursor.
+Two wrappers over one source compare equal as soon as their counts agree,
 though each has delivered different items,
 and two wrappers over separate iterators of the same list compare unequal.
 Turning equality off restores the identity comparison an iterator should have.
@@ -671,7 +674,8 @@ if __name__ == "__main__":
 ```
 
 Use the class when the wrapper needs its own state or extra methods,
-such as `accepted` in `typed_iterator.py`: a caller reads it mid-stream,
+such as `accepted` in `typed_iterator.py`.
+A caller reads `accepted` mid-stream,
 while a generator's local variables have no name a caller can use.
 Use the generator when it does not.
 Either way, the wrapper plugs into every place that accepts an iterator,
@@ -679,11 +683,11 @@ because every such place uses the same protocol.
 The two wrappers' inputs differ, though.
 `typed()` takes an `Iterable[object]`, so a list is fine.
 `TypedIterator` calls `next()` on what it stores,
-so it needs an `Iterator[object]`: write `TypedIterator(iter(items), int)`,
-not `TypedIterator(items, int)`.
+so it needs an `Iterator[object]`.
+Write `TypedIterator(iter(items), int)`, not `TypedIterator(items, int)`.
 The type checker rejects the second form.
 Both take `expected: type[T]`,
-so the type checker carries the element type through:
+so the type checker carries the element type through.
 `typed(items, int)` is an `Iterator[int]`, not an `Iterator[Any]`.
 
 ```python
@@ -796,7 +800,8 @@ and keeps every item it reads.
 so it reports a value without advancing.
 The last line of output shows that by the time all four methods work,
 `seen` holds the entire stream.
-The interface needs more than a buffer: it rebuilds the list.
+The interface needs more than a buffer.
+It rebuilds the list.
 
 That is the cost the pattern hides.
 `first()` and `current_item()` assume a collection you can re-read and inspect in place,
@@ -805,8 +810,8 @@ The chapter has now reached that conclusion three times: here,
 in `tee`'s buffering,
 and in the advice to collect into a list when you must walk data twice.
 Python dropped both methods rather than paying for them everywhere.
-Without them, `advance()` must return the value it reached;
-that method is `__next__()`.
+Without them, `advance()` must return the value it reached.
+That method is `__next__()`.
 
 ### Asking Consumes an Item
 
@@ -857,13 +862,13 @@ Each question costs an item.
 Nothing in the protocol looks ahead without advancing.
 That is why a peekable iterator must buffer,
 and why `tee` buffered a whole stream in `tee.py`.
-A membership test pays the same way:
+A membership test pays the same way.
 `"c" in letters` pulls items until it finds a match,
 and every item it pulled is gone, the match included.
 `DONE` is a [sentinel](05_Foundations--Functions.md#sentinel-values),
 because the answer must differ from every value the source could yield.
 `None` collapses an exhausted source and a source that yields `None` into the same reply.
-The built-in `iter()` uses a sentinel the same way in its two-argument form:
+The built-in `iter()` uses a sentinel the same way in its two-argument form.
 `iter(callable, DONE)` calls `callable` until it hands back `DONE`.
 A `StopIteration` that escapes a generator body becomes a `RuntimeError`
 ([PEP 479](https://peps.python.org/pep-0479/)),

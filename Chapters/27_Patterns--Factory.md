@@ -177,8 +177,8 @@ shows the subclass-override form.
 
 `shape_name()` is a [*generator*](23_Patterns--Iterators.md#generators).
 Whereas a factory takes information telling it what to build,
-a generator object does the opposite:
-it holds an internal algorithm and needs no argument to produce the next value.
+a generator object does the opposite.
+It holds an internal algorithm and needs no argument to produce the next value.
 `shape_name()` takes `n`
 (the maximum number of shapes the generator can produce)
 and returns a generator object.
@@ -227,8 +227,8 @@ while `Month.of(7)` returns `JULY`.
 `Month.of()` is also a factory, of the same form as `factory()`.
 Both are static methods within the type.
 Each takes data and returns an instance,
-and each raises an exception for data it does not recognize; for `Month`,
-a number outside one through twelve.
+and each raises an exception for data it does not recognize.
+For `Month`, that is a number outside one through twelve.
 `of()` needs no `match`.
 The `Enum` holds every member `of()` could return,
 so the method indexes `list(Month)` instead of naming a class.
@@ -340,16 +340,16 @@ def make(name: str) -> Shape:
 
 [`__init_subclass__()`](17_Techniques--Metaprogramming.md#self-registration-of-subclasses)
 lets each subclass register itself.
-Nothing in the listing calls a register function;
-the two `class` statements fill `Shape.registry` on their own.
+Nothing in the listing calls a register function.
+The two `class` statements fill `Shape.registry` on their own.
 Registering through `__init_subclass__()` is why `Shape` is an abstract base class rather than a `Protocol`.
 `__init_subclass__()` runs only for classes that inherit from `Shape`,
 so a class that merely matches a Protocol's shape stays out of the registry.
 Inheritance is the mechanism, and `ABC` adds one guard on top of that.
 A subclass registers as its `class` statement executes,
 so a subclass that forgets `draw()` still registers.
-The guard acts when `make()` constructs that class:
-the call fails with a `TypeError`,
+The guard acts when `make()` constructs that class.
+The call fails with a `TypeError`,
 where a base class without `ABC` waits for the first `draw()` call.
 The type checker reports a line that constructs such a class by name,
 but `make()` contains no such line.
@@ -423,11 +423,11 @@ Import a plugin module eagerly when the import exists for its side effect.
 The registry keys on `cls.__name__` alone, so two classes that share a name,
 from different modules, silently overwrite each other.
 Key on `f"{cls.__module__}.{cls.__qualname__}"` when a collision is possible.
-The registry also keeps every entry it receives:
-a class defined inside a function or a test stays in the table,
+The registry also keeps every entry it receives.
+A class defined inside a function or a test stays in the table,
 and the strong reference keeps the class alive for the rest of the process.
 
-`__init_subclass__()` names `Shape.registry` rather than `cls.registry` on purpose:
+`__init_subclass__()` names `Shape.registry` rather than `cls.registry` on purpose.
 `cls.registry` resolves through the [MRO](07_Foundations--Classes.md#method-resolution-order),
 so a subclass that defines its own `registry` creates a second table beside the one `make()` reads,
 with no error to signal it.
@@ -513,7 +513,7 @@ class ShapeFactory:
 `register()` stores a class under its name and returns the class unchanged,
 so it works as a [class decorator](14_Techniques--Decorators.md#decorating-classes).
 `__call__()` makes a `ShapeFactory` instance callable,
-so you call the factory the way you call `make()` in `registry.py`;
+so you call the factory the way you call `make()` in `registry.py`.
 [A Callable Object as a *Command*](28_Patterns--Function_Objects.md#a-callable-object-as-a-command)
 covers `__call__()`.
 Each class registers with the factory that builds it:
@@ -615,16 +615,16 @@ def test_each_factory_starts_empty() -> None:
 
 The last test passes although the test before it registered `Triangle`,
 because each test registers with a `ShapeFactory` of its own.
-`test_registry.py` cannot do that:
+`test_registry.py` cannot do that.
 `Shape.registry` is one table for the whole process,
-so its last test asks for `"Hexagon"`.
+so the last test in `test_registry.py` asks for `"Hexagon"`.
 
 The ordinary Python factory is a dictionary of classes,
 whether you fill it by hand, the classes fill it themselves,
 or the factory's own decorator fills it.
 That is the dissolution [Design Patterns](21_Patterns--Design_Patterns.md#when-a-pattern-dissolves)
-describes: the pattern remains,
-but no longer needs a class hierarchy to express it.
+describes.
+The pattern remains, but no longer needs a class hierarchy to express it.
 The remaining sections cover the classic object-oriented factories,
 for contrast.
 
@@ -722,8 +722,8 @@ Dispatching through `eval()` is unnecessary, and it makes things worse.
 `create_shape()` then compiles and runs any string it receives,
 so a configuration file, a request,
 or a command line can hand it arbitrary code instead of a shape name.
-Using the dictionary lookup gives you type safety:
-you get either a factory or a `KeyError`.
+Using the dictionary lookup gives you type safety.
+You get either a factory or a `KeyError`.
 
 ## Subclasses Choose the Type
 
@@ -972,8 +972,8 @@ g2.play()
 #: Warrior battles a Weapon
 ```
 
-The type checker verifies that each concrete class satisfies the appropriate `Protocol`:
-a `GameElementFactory` must supply `make_character()` and `make_obstacle()`,
+The type checker verifies that each concrete class satisfies the appropriate `Protocol`.
+A `GameElementFactory` must supply `make_character()` and `make_obstacle()`,
 a `Character` must supply `interact_with()`,
 and an `Obstacle` must supply `description()`.
 `BrokenFactory` supplies `make_character()` and omits `make_obstacle()`.
@@ -987,8 +987,8 @@ With the Protocol, constructing a `BrokenFactory` is legal,
 and the checker reports the line that passes it to `GameEnvironment`.
 The two differ more at runtime.
 The abstract base class refuses to construct the factory,
-while the Protocol has no runtime guard:
-a program that ignores the report fails with an `AttributeError` when `GameEnvironment.__init__()` calls `make_obstacle()`.
+while the Protocol has no runtime guard.
+A program that ignores the report fails with an `AttributeError` when `GameEnvironment.__init__()` calls `make_obstacle()`.
 Checking against a Protocol is [structural typing](08_Foundations--Static_Types.md#structural-typing-with-protocols).
 Structural typing preserves the purpose of the interfaces,
 without the coupling a shared base class imposes.
@@ -1043,7 +1043,7 @@ print(knight.powers is goblin.powers)
 Because the `clone()` method wraps `copy.deepcopy()`,
 `captain` gets its own `powers` list,
 and appending to it leaves `goblin.powers` unchanged.
-The `shallow` lines are a warning, not an example to follow:
+The `shallow` lines are a warning, not an example to follow.
 `copy.copy()` duplicates the `Monster` and shares its `powers` list,
 so changing that list through one object changes it for the other,
 with no error to signal the sharing.
@@ -1294,8 +1294,8 @@ and `parse_args()` is the `build()`.
 
 The smallest builder in Python is easy to overlook.
 Appending parts to a list and finishing with `"".join(parts)` builds an immutable string through a mutable intermediate.
-`PizzaBuilder` has the same shape:
-it collects toppings in a list and freezes them into a tuple at `build()`.
+`PizzaBuilder` has the same shape.
+It collects toppings in a list and freezes them into a tuple at `build()`.
 That shape is everywhere,
 so save the name *Builder* for construction that is a process in its own right,
 with intermediate state and rules that span the steps.
@@ -1306,7 +1306,7 @@ a data class with keyword arguments already does the job.
 
 Match the machinery to what varies:
 
-- When a name maps to a class: use a dictionary.
+- When a name maps to a class, use a dictionary.
   When the set of classes is closed,
   write the table by hand and key it by a `Literal`, as in `shape_table.py`,
   so a bad name fails at the check.
@@ -1389,6 +1389,6 @@ usually the shape of the code, and a full answer for each exercise.
 11. Fill `PROTOTYPES` in `prototype_registry.py` by decoration instead of a table literal.
     Write a `@prototype(name)` decorator for a function that builds and returns the `Monster`,
     so that the decorator stores each decorated function's result under `name`.
-    Explain why the decorator takes the name as an argument rather than reading the function's `__name__`:
-    write that version and read what `ty` reports.
+    Explain why the decorator takes the name as an argument rather than reading the function's `__name__`.
+    Write that version and read what `ty` reports.
     Then say what the decorated form gains over the table and what it costs.

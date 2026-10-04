@@ -133,8 +133,8 @@ while keeping the wrapped object's interface so the wrapping stays invisible to 
 The wrappers so far declare no parameters,
 so `add_behavior` is limited to functions that take none.
 With `add_behavior` on a `def add(a, b)`,
-the call `add(2, 3)` raises a `TypeError`:
-the wrapper takes zero positional arguments, and the call passes two.
+the call `add(2, 3)` raises a `TypeError`.
+The wrapper takes zero positional arguments, and the call passes two.
 A wrapper that must handle any function collects the call with `*args, **kwargs` and forwards it unchanged,
 the [argument-unpacking pattern](05_Foundations--Functions.md#unpacking-arguments).
 This decorator traces calls, and its `wrapper()` takes that shape:
@@ -228,8 +228,8 @@ A wrapper that calls `func(*args, **kwargs)` without returning the result makes 
 and the `-> R` annotation lets the type checker report the missing `return`.
 
 The `# type: ignore` comments silence a diagnostic from `ty`,
-which rejects `func.__name__`:
-a `Callable` need not have a `__name__` attribute, though every function does.
+which rejects `func.__name__`.
+A `Callable` need not have a `__name__` attribute, though every function does.
 Pyright and mypy both accept the attribute here.
 
 ### A Coroutine Function Needs an `async` Wrapper {#coroutine-needs-async-wrapper}
@@ -313,7 +313,7 @@ Python binds `greet` to `decorate`.
 Calling `greet("Bob")` then passes `"Bob"` where `decorate` expects a function and hands back a wrapper,
 and the only symptom is missing output.
 The annotations catch the mistake either way,
-at the decoration rather than at the call:
+at the decoration rather than at the call.
 The type checker reports that `repeat` expected an `int` for `times` and got a function.
 A second diagnostic follows at `greet("Bob")`,
 but that one is harder to read back to the missing `()`.
@@ -354,13 +354,13 @@ def test_repeat_rejects_times_below_one(times: int) -> None:
 
 ## Decorators With Optional Parentheses
 
-`trace` takes no arguments; `repeat` always does.
+`trace` takes no arguments, but `repeat` always does.
 A decorator can support both conventions at once, `@name` and `@name(...)`,
 letting a caller add arguments only when the defaults don't fit.
 `pytest.fixture` and `click.command` both work this way.
 
 The two forms differ in what Python passes first.
-`@label` calls `label(one)`: a function arrives as the only argument.
+`@label` calls `label(one)`, so a function arrives as the only argument.
 `@label(prefix="TAG")` calls `label(prefix="TAG")` first, with no function,
 then applies the result to `two`.
 Checking whether that first argument is callable tells the two calls apart:
@@ -480,8 +480,8 @@ The two `@` lines mean `greet = trace(repeat(times=2)(greet))`.
 `@repeat(times=2)` wraps `greet()` first, then `@trace` wraps that result,
 so a single `greet("Bob")` traces one call whose body runs twice.
 Each decorator wraps the result of the one below it.
-Stacking works because each wrapper preserves the interface of what it wraps:
-every layer looks like the original function,
+Stacking works because each wrapper preserves the interface of what it wraps.
+Every layer looks like the original function,
 so the layers compose to any depth.
 
 The tests confirm that the name survives two layers of wrapping,
@@ -517,8 +517,9 @@ def test_stacked_decorators_repeat_the_call() -> None:
 A decorator is any callable that accepts one argument.
 A class with `__call__()` is a callable,
 so a decorator can be a class instead of a function.
-The class form separates the two phases cleanly: the constructor runs once,
-at decoration, and `__call__()` runs on every call to the decorated function.
+The class form separates the two phases cleanly.
+The constructor runs once, at decoration,
+and `__call__()` runs on every call to the decorated function.
 
 These classes take lowercase names, against the usual `PascalCase` rule,
 because a decorator reads like a function at the call site.
@@ -568,7 +569,7 @@ The name `add` now refers to a `trace` instance,
 and calling `add(2, 3)` invokes `__call__()`.
 
 `functools.update_wrapper(self, func)` copies `func`'s metadata onto an existing object.
-`wraps` is the decorator form of that same call:
+`wraps` is the decorator form of that same call.
 `@wraps(func)` above `def wrapper` runs `update_wrapper(wrapper, func)`.
 The class form has no inner function to decorate, only `self`,
 so it calls `update_wrapper()` directly.
@@ -744,8 +745,8 @@ def test_repeat_rejects_times_below_one(times: int) -> None:
 
 ### A Limitation: Methods Need a Descriptor
 
-The class form has one limitation:
-a method decorated this way becomes an instance rather than a function,
+The class form has one limitation.
+A method decorated this way becomes an instance rather than a function,
 and the call then fails.
 `trace_class.py` and `count_calls.py` decorate bare functions on purpose:
 
@@ -813,8 +814,8 @@ print(ex.method(5))
 `self` arrives as the first traced argument,
 and the `__repr__()` the class defines prints it as `Ex()`,
 so the same decoration that failed as a class works here with no descriptor of your own.
-For the same reason, `repeat_class.repeat` escapes the limitation:
-its `__call__()` returns `wrapper`, an ordinary function,
+For the same reason, `repeat_class.repeat` escapes the limitation.
+Its `__call__()` returns `wrapper`, an ordinary function,
 so a method decorated with `@repeat(times=3)` is still a function.
 With a fully typed class-based decorator, like `trace_class.trace`,
 the type checker reports a missing argument and a type mismatch on a call like `ex.method(5)`,
@@ -899,8 +900,8 @@ and `ty` and Pyright see `Espresso()` as an `Any`.
 A class decorator can also return a replacement class,
 just as a function decorator returns a replacement function.
 
-A registry filled this way is as complete as the imports that ran:
-a class in a module nobody imported stays out of the registry.
+A registry filled this way is as complete as the imports that ran.
+A class in a module nobody imported stays out of the registry.
 Keying on `cls.__name__` also means two same-named classes from different modules overwrite each other.
 [Factory](27_Patterns--Factory.md#hazards-of-self-registration) returns to both.
 
@@ -955,7 +956,8 @@ if __name__ == "__main__":
 #: 63
 ```
 
-`report` requires a callable; where `func` came from does not matter.
+`report` requires a callable.
+Where `func` came from does not matter.
 Calling `report` directly, instead of through `@`,
 decorates the `lambda` in place.
 `@` is convenient sugar for the common case of decorating a fresh `def`,
@@ -963,7 +965,8 @@ not a requirement.
 The same call decorates a `functools.partial`, a bound method,
 or an instance of a class with `__call__()`,
 since all a decorator receives is a callable.
-Calling the result is another matter: `report`'s wrapper reads `func.__name__`,
+Calling the result is another matter.
+`report`'s wrapper reads `func.__name__`,
 which a `partial` and a callable instance lack,
 so those two raise an `AttributeError` at the call,
 while the function and the bound method run.
@@ -993,7 +996,8 @@ if __name__ == "__main__":
 `run_once` calls `greeting` immediately, at decoration time,
 and hands back whatever `greeting()` returned.
 After decoration the name `greeting` refers to that `str`,
-so `greeting()` raises a `TypeError`: a `str` is not callable.
+so `greeting()` raises a `TypeError`.
+A `str` is not callable.
 `run_once` pays off for a value that needs one-time setup logic but stays constant afterward.
 For anything simpler,
 a module-level constant computed the ordinary way reads better.
@@ -1015,21 +1019,23 @@ print(fib_table)
 ```
 
 The run-once idiom is the most common real use of `@lambda`.
-The practical reason for it is scope: the loop needs a working variable,
-`table`, and building the list inside a function keeps `table` local.
+The practical reason for it is scope.
+The loop needs a working variable, `table`,
+and building the list inside a function keeps `table` local.
 The module gains one name, `fib_table`, holding the finished list.
 
 Treat `@lambda` as a curiosity and avoid it.
 A reader who sees `def fib_table()` expects a function and finds a list.
-The type checker loses track too: the lambda's parameter has no annotation,
+The type checker loses track too.
+The lambda's parameter has no annotation,
 so `ty` reports `fib_table` as `Unknown`,
 where the generic `run_once` carries `T` through to `str`.
 If you want the run-once idiom, use the named decorator.
 
 A decorator can replace a class the same way.
 [*Singleton*](24_Patterns--Singleton.md#singleton-by-class-decorator)
-replaces a class with a callable object that stands in for it:
-the first call constructs one instance,
+replaces a class with a callable object that stands in for it.
+The first call constructs one instance,
 and every later call returns that same instance.
 The name that follows `class` then refers to that callable object,
 not to a class.
@@ -1192,7 +1198,7 @@ storing results in a memo dictionary instead of printing around the call.
 Understanding any of these needs no new syntax.
 They are ordinary decorators.
 The one piece of machinery left for later is the descriptor protocol that `@property`,
-`@cached_property`, `@staticmethod`, and `@classmethod` implement;
+`@cached_property`, `@staticmethod`, and `@classmethod` implement.
 [Metaprogramming](17_Techniques--Metaprogramming.md#learning-a-name-with-__set_name__)
 takes it up.
 
@@ -1202,8 +1208,8 @@ A traceback through a decorated function shows `wrapper`,
 one more frame than the caller and the original body alone show.
 Each call also pays for an extra Python-level function call, the wrapper's own,
 before the real body runs.
-Neither matters for a function called occasionally;
-both add up for one called in a tight loop,
+Neither matters for a function called occasionally.
+Both add up for one called in a tight loop,
 and stacking decorators multiplies both by the number of layers.
 
 ## Exercises

@@ -65,7 +65,7 @@ def test_hello_is_not_a_palindrome() -> None:
 ```
 
 At this point `palindrome.py` does not exist,
-so running this file fails before a single assertion runs:
+so running this file fails before a single assertion runs.
 `pytest` cannot import a module that is not there.
 That failure is the point.
 It confirms the test catches a missing implementation, not just a wrong one.
@@ -78,8 +78,8 @@ def is_palindrome(s: str) -> bool:
 
 The test written first stays the same.
 Only the code changes to satisfy it.
-That is TDD working as a design tool:
-the test defines what "done" means before any implementation exists to shape that definition.
+That is TDD working as a design tool.
+The test defines what "done" means before any implementation exists to shape that definition.
 
 That said, TDD requires that you know what you are creating.
 It assumes you are confident the design is correct,
@@ -176,7 +176,8 @@ This file previews two features that get their own sections later in this chapte
 the `parametrize`[^parametrize] mark runs one test over several inputs,
 and the `funded` fixture builds a prepared account for each test that names it as a parameter.
 The `@` lines apply decorators, which [Decorators](14_Techniques--Decorators.md)
-explains; here they mark the functions for `pytest`.
+explains.
+Here they mark the functions for `pytest`.
 
 Run the test suite by typing `pytest` in the project directory.[^book-tests]
 `pytest` puts each test file's own directory at the front of `sys.path`,
@@ -208,7 +209,7 @@ E        +  where 100.0 = Account(balance=100.0).balance
 test_account.py:11: AssertionError
 ```
 
-The `where` line is the rewriting at work:
+The `where` line is the rewriting at work.
 `pytest` keeps the sub-expression `account.balance` and its value,
 which a bare `assert` statement discards.
 `Account` is a `@dataclass`,
@@ -239,11 +240,11 @@ def test_overdraft_reports_the_shortfall() -> None:
     assert account.balance == 100
 ```
 
-The assertion after the block belongs outside it:
-a failed withdrawal must leave the balance alone,
+The assertion after the block belongs outside it.
+A failed withdrawal must leave the balance alone,
 and that check has nothing to do with the exception.
-Inside the block the assertion never runs:
-the exception from `withdraw()` skips the rest of the block,
+Inside the block the assertion never runs.
+The exception from `withdraw()` skips the rest of the block,
 and `pytest.raises()` then absorbs it.
 
 ## Comparing Floating-Point Values
@@ -252,8 +253,8 @@ Testing floating-point results for exact equality is unreliable.
 `test_interest_uses_approx()` compares with `pytest.approx()`,
 which allows a small tolerance: a relative difference of 1e-6,
 unless you pass `rel=` or `abs=`.
-Code outside a test has no `approx()`;
-its standard-library counterpart is `math.isclose()`,
+Code outside a test has no `approx()`.
+Its standard-library counterpart is `math.isclose()`,
 whose default relative tolerance is a tighter 1e-9,
 adjustable through its `rel_tol` and `abs_tol` arguments.
 
@@ -276,7 +277,7 @@ def test_interest_compounds() -> None:
 
 Applying 5% five times produces `127.62815624999999`,
 so the same assertion written with `==` against `127.62815625` fails.
-Use `approx()` by default rather than adding it after a comparison fails:
+Use `approx()` by default rather than adding it after a comparison fails.
 `test_interest_uses_approx()` does not need it,
 and you cannot tell by looking which tests do.
 
@@ -329,8 +330,8 @@ You declare fixtures as parameters to a test,
 and each parameter name tells `pytest` to call that fixture and pass its result to the test.
 
 The `funded` function in `test_account.py` is a fixture.
-Only `pytest` calls it:
-a test that calls `funded()` fails with `Fixture "funded" called directly`.
+Only `pytest` calls it.
+A test that calls `funded()` fails with `Fixture "funded" called directly`.
 
 Each test gets its own freshly built `funded` account,
 so tests cannot leak state into each other.
@@ -364,7 +365,7 @@ Everything before the `yield` is setup.
 Everything after it runs once the test finishes,
 whether the test passes or fails.
 Close files, release locks, or check a final invariant after the `yield`.
-A failing check there surfaces as an error, not as a test failure:
+A failing check there surfaces as an error, not as a test failure.
 `pytest` prints `1 passed, 1 error`,
 so read the error to see which invariant broke.
 
@@ -373,8 +374,8 @@ Autouse suits a fixture whose value is a side effect rather than an object:
 resetting a global registry, or installing a `monkeypatch` every test needs.
 Autouse runs the fixture, and only a parameter delivers its value.
 If you mark `funded` autouse and leave it out of the parameter list,
-`funded.withdraw(40)` raises an `AttributeError`:
-the bare name finds the fixture object the decorator left behind,
+`funded.withdraw(40)` raises an `AttributeError`.
+The bare name finds the fixture object the decorator left behind,
 not the `Account` it returns.
 
 Fixtures eliminate duplicated setup.
@@ -406,7 +407,8 @@ def preloaded(request: pytest.FixtureRequest) -> Account:
 Take `bank_name` first.
 `pytest` builds the `scope="session"` fixture once and reuses it,
 and that reuse suits expensive resources.
-The reuse is the risk as well as the point: every test receives the same object,
+The reuse is the risk as well as the point.
+Every test receives the same object,
 so one test that mutates it changes what the next test sees.
 A session fixture that returns a mutable object shows the leak directly:
 
@@ -432,7 +434,7 @@ def test_second_sees_leftover(
     assert shared_cache == {"seen": 1}
 ```
 
-Both tests pass, and that is the problem:
+Both tests pass, and that is the problem.
 `test_second_sees_leftover()` passes for one reason:
 `test_first_write()` ran first and left its entry behind.
 If you swap the two functions' order in the file,
@@ -521,7 +523,8 @@ not of compiler enforcement.
 That makes black-box testing the sensible default.
 If you test the public surface, the methods a caller should use,
 you can change the internals without rewriting the tests.
-The `Account` tests are black-box: they read no private attributes.
+The `Account` tests are black-box.
+They read no private attributes.
 When you do need a white-box test for a tricky internal, nothing stops you,
 but treat each one as a test that may break when you refactor.
 
@@ -649,8 +652,8 @@ the caller hands the function its dependencies,
 and the function fetches nothing on its own.
 
 The `4` in `test_dice_rng.py` is what `Random(0)` produces first,
-and its match with the stubbed value in `test_dice.py` is a coincidence:
-as with any seed, you record the value it gives you rather than pick one.
+and its match with the stubbed value in `test_dice.py` is a coincidence.
+As with any seed, you record the value it gives you rather than pick one.
 
 ### The Clock
 
@@ -709,12 +712,13 @@ The `rng` or `now` parameter must appear on every function between the caller an
 When that code sits several calls deep in a real codebase,
 you widen every signature along the way,
 or introduce a context object to carry the parameter.
-`monkeypatch` skips that plumbing: it patches the name in place,
+`monkeypatch` skips that plumbing.
+It patches the name in place,
 at the cost of a process-wide patch that stands until teardown restores the name.
 Choose injection when the parameter sits near the boundary.
 Choose `monkeypatch` when threading it through touches more code than the test is worth.
 
-`datetime.now()` is harder to patch:
+`datetime.now()` is harder to patch.
 `datetime` is an immutable C type that rejects attribute assignment.
 That makes the injection approach worth the small effort.
 
@@ -804,8 +808,9 @@ A stand-in like `fake_urlopen()` is a *stub*:
 it answers with a canned value and records nothing.
 The standard library's `unittest.mock` turns up in most existing code.
 It builds stubs for you, and it builds *mocks*.
-A `Mock` goes further than a stub: it remembers every call it received,
-so a test can check the call, not just what the call returned.
+A `Mock` goes further than a stub.
+It remembers every call it received, so a test can check the call,
+not just what the call returned.
 
 ```python
 # notifier.py
@@ -871,8 +876,8 @@ since a function that is hard to test usually goes looking for something no call
 
 To find out what you have not tested, run the suite under `coverage.py`,
 which the `pytest-cov` plugin wires up when you pass `--cov`.
-Read the result as a list of lines nothing exercised, not as a score:
-a line a test happened to execute is not the same as a line a test checks.
+Read the result as a list of lines nothing exercised, not as a score.
+A line a test happened to execute is not the same as a line a test checks.
 
 ## Exercises
 

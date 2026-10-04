@@ -133,8 +133,8 @@ print(running, total)
 A comprehension's loop variable belongs to the comprehension.
 The `e` inside the brackets is a different name from the `e` outside them,
 so the outer `e` survives untouched.
-A `for` loop behaves the opposite way:
-its loop variable stays behind in the enclosing scope after the loop ends.
+A `for` loop behaves the opposite way.
+Its loop variable stays behind in the enclosing scope after the loop ends.
 
 The scope works like a function's, and that matters in a class body.
 Names assigned in a class body are invisible to the scopes nested inside it,
@@ -147,8 +147,8 @@ so `[n for n in range(base)]` works.
 The walrus operator is the exception to the comprehension's scope.
 `total := total + n` assigns in the enclosing scope,
 so `total` holds the running sum after the comprehension finishes.
-That leak is deliberate:
-it lets a comprehension accumulate a value without a separate loop.
+That leak is deliberate.
+It lets a comprehension accumulate a value without a separate loop.
 Three uses are a `SyntaxError`:
 a walrus that rebinds the comprehension's own iteration variable,
 a walrus inside the iterable expression that follows `in`,
@@ -284,7 +284,7 @@ and decides what each element *is*.
 Every `col` still produces one.
 An `if` after the `for`, as in `[e ** 2 for e in a_list if isinstance(e, int)]`,
 decides *whether* the comprehension produces an element.
-The positions are not interchangeable:
+The positions are not interchangeable.
 `[x for x in xs if a else b]` is a `SyntaxError`.
 When you need both a conditional expression and a filter,
 write each in its own position: `[x if a else b for x in xs if c]`.
@@ -581,7 +581,7 @@ print(initials)
 #: {'pol': 'p', 'parrot': 'p', 'fjord': 'f', 'ex': 'e'}
 ```
 
-A set or dict must hold every element, so no lazy `set` or `dict` exists:
+A set or dict must hold every element, so no lazy `set` or `dict` exists.
 `set(...)` or `dict(...)` consumes the whole generator immediately.
 The set comprehension `{len(w) for w in words}` and the dict comprehension `{w: w[0] for w in words}` build the same results,
 read more directly, and are the better choice.
@@ -603,20 +603,20 @@ print(max(len(str(n)) for n in nums))
 
 None of these builds an intermediate collection of a million items,
 and `any()` stops when it finds a match.
-`str.join()` is the exception: it needs two passes,
-one to size the result and one to fill it,
+`str.join()` is the exception.
+It needs two passes, one to size the result and one to fill it,
 so it converts its argument to a list first.
 A generator expression therefore saves nothing over a list comprehension there.
 
 A generator expression needs no parentheses of its own when it is a function's only argument.
-A second argument makes them required:
+A second argument makes them required.
 `sum(n * n for n in nums, 0)` is a `SyntaxError`,
 and `sum((n * n for n in nums), 0)` is the fix.
 
 ### A Generator Expression Runs Once
 
-`genexp_consumers.py` can iterate `nums` three times because a `range` is re-iterable:
-each `for` over it starts again at zero.
+`genexp_consumers.py` can iterate `nums` three times because a `range` is re-iterable.
+Each `for` over it starts again at zero.
 A generator expression is not re-iterable:
 
 ```python
@@ -664,12 +664,13 @@ before the `generator created` line prints.
 The output expression waits,
 so it reads `factor` when `list()` pulls the values rather than when Python creates the generator.
 The answer is `[10, 20, 30]` instead of `[2, 4, 6]`.
-A list comprehension has no such gap: it reads everything at once.
+A list comprehension has no such gap.
+It reads everything at once.
 That gap is also why `path_walk_comprehension.py` uses brackets.
 With parentheses, Python calls `root.walk()`, its outermost iterable,
 at creation, but the walking and the filtering wait for a consumer that arrives after the directory disappears.
-A `lambda` created in a comprehension reads its variables late for the same reason:
-its body runs when something calls it.
+A `lambda` created in a comprehension reads its variables late for the same reason.
+Its body runs when something calls it.
 [Function Objects](28_Patterns--Function_Objects.md#the-late-binding-trap)
 demonstrates that trap.
 [Iterators](23_Patterns--Iterators.md#generators) explores generators further,
@@ -724,8 +725,8 @@ so the nested `[2, 3]` above comes through unflattened.
 `**` does the same for dictionaries,
 merging each mapping with later keys winning.
 With braces, `*` builds a set and `**` builds a dict.
-Everywhere else the colon decides between the two;
-here neither form has a colon, so the unpacking operator decides.
+Everywhere else the colon decides between the two.
+Here neither form has a colon, so the unpacking operator decides.
 The asynchronous generator form (`(*a async for a in agen())`)
 works the same way ([Concurrency](19_Techniques--Concurrency.md#asyncio-mechanics) introduces `async` syntax).
 

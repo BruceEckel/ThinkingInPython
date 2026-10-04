@@ -6,8 +6,8 @@
 
 The `with` statement,
 introduced in [Control Flow](04_Foundations--Control_Flow.md#context-managers),
-marks out a span of execution:
-it runs setup before a block and cleanup after it,
+marks out a span of execution.
+It runs setup before a block and cleanup after it,
 even if the block raises an exception.
 That guarantee is far more reliable than the [`__del__()` approach](10_Foundations--Cleanup.md).
 Writing your own context managers shows how `with` works.
@@ -27,8 +27,8 @@ including the exception path, and the borrower writes nothing to arrange it.
 
 The simplest way to write a context manager is a generator function with a single `yield`.
 The `contextlib.contextmanager` decorator turns that function into a context manager.
-The `yield` here works the way it does in a `pytest` fixture that [`yield`s its value](11_Techniques--Testing.md#fixtures-replace-setup-and-teardown):
-everything before it is setup, everything after it is teardown.
+The `yield` here works the way it does in a `pytest` fixture that [`yield`s its value](11_Techniques--Testing.md#fixtures-replace-setup-and-teardown).
+Everything before the `yield` is setup, and everything after it is teardown.
 [Iterators](23_Patterns--Iterators.md#generators) covers generators in full.
 A context manager needs nothing beyond that shape.
 
@@ -68,8 +68,8 @@ Nor does a loop around the `yield` make the manager reusable.
 `@contextmanager` allows one `yield`,
 and a generator that reaches a second one makes the manager raise `RuntimeError: generator didn't stop` when the block ends.
 
-The `finally` makes the cleanup dependable:
-an exception raised in the block appears at the `yield`,
+The `finally` makes the cleanup dependable.
+An exception raised in the block appears at the `yield`,
 and `finally` still runs the cleanup before the exception propagates.
 
 Leaving the `try`/`finally` out is the common mistake:
@@ -97,7 +97,8 @@ except ValueError as error:
 Without the `try`/`finally`,
 Python resumes the generator by raising the block's exception at the `yield`,
 so the code after the `yield`, `exit A` included, never runs.
-Nothing warns you: the generator silently skips the cleanup on the one path where it matters most.
+Nothing warns you.
+The generator silently skips the cleanup on the one path where it matters most.
 Wrap the `yield` in `try`/`finally` in every `@contextmanager` generator.
 
 ## The Protocol
@@ -155,10 +156,11 @@ The block in `trace_cm.py` ends normally, so all three are `None`.
 In generator terms, `__enter__()` is the portion before the `yield`.
 `__exit__()` is the portion after it.
 
-`Trace` is also reusable: the same instance can appear in a second `with`,
+`Trace` is also reusable.
+The same instance can appear in a second `with`,
 because `__enter__()` just runs again.
-A generator manager cannot appear in a second `with`;
-that is the single-use caution from `trace_gen.py`.
+A generator manager cannot appear in a second `with`.
+That is the single-use caution from `trace_gen.py`.
 A class manager that stores per-`with` state stays reusable only if `__enter__()` resets that state.
 
 The generator form is usually the clearest choice.
@@ -214,16 +216,17 @@ because Python registers the cleanup when `__enter__()` returns,
 and this `__enter__()` raises an exception instead.
 An `__enter__()` that acquires several things must clean up its own partial work before it raises an exception.
 [`ExitStack`](#combining-context-managers), later in this chapter,
-is the standard tool for that: when a later entry fails,
-it unwinds the managers it entered earlier.
-A `with` naming several managers applies the same rule per manager:
-the ones that entered still exit,
+is the standard tool for that.
+When a later entry fails, `ExitStack` unwinds the managers it entered earlier.
+A `with` naming several managers applies the same rule per manager.
+The ones that entered still exit,
 and the failing one alone gets no `__exit__()` call.
 
 `Fragile.__exit__(self, *exc: object)` collects the three arguments into a tuple the method ignores,
 the shorter form for a cleanup that ignores why the block ended.
 
-The guarantee has a matching gap on the other side: cleanup can fail.
+The guarantee has a matching gap on the other side.
+Cleanup can fail.
 When `__exit__()` raises an exception,
 that new exception replaces the block's original one,
 and the original survives only as the new exception's `__context__`:
@@ -251,8 +254,8 @@ except ValueError as error:
 `KeyError('original')` never reaches the `except`.
 `Careless.__exit__()` raises a `ValueError` before `with` can propagate the `KeyError`,
 so the caller sees the cleanup's failure instead of the block's.
-Python does not discard `original`: it becomes `error.__context__`,
-the same chaining a nested `except` produces.
+Python does not discard `original`.
+It becomes `error.__context__`, the same chaining a nested `except` produces.
 A broken cleanup path that hides the real failure is one of the most common context-manager bugs in practice,
 so write `__exit__()` methods that fail only for reasons worse than the original exception.
 
@@ -376,9 +379,10 @@ You can still write `as`, but it binds `None`.
 
 ### The `expected` Manager
 
-`expected` is a fuller version of `expected_one`:
-it takes several types at once, and with no argument it catches everything.
-Its name says how the book uses it: the block is expected to raise an exception,
+`expected` is a fuller version of `expected_one`.
+It takes several types at once, and with no argument it catches everything.
+Its name says how the book uses it.
+The block is expected to raise an exception,
 and the manager shows what the block raised.
 It is useful enough to reuse elsewhere in the book, so it lives in `utils/`,
 where any chapter can import it:
@@ -440,7 +444,7 @@ async def aexpect[**P](
 ```
 
 `expected` adds two things to `expected_one`.
-The first is the tuple form:
+The first is the tuple form.
 `issubclass()` accepts a tuple of classes as its second argument,
 matching if `cls` is a subclass of any one of them,
 so `expected((ZeroDivisionError, TypeError))` covers several types in one manager.
@@ -459,7 +463,7 @@ so a long message wraps instead of overrunning the listing width.
 `expect()`, in the same file, prints through `report()` too,
 so every demonstrated exception in the book has one form.
 
-`suppress` treats the no-argument call the opposite way:
+`suppress` treats the no-argument call the opposite way.
 `suppress()` suppresses nothing,
 because a raised exception has no listed type to match.
 An `expected()` that catches everything also catches `KeyboardInterrupt` and `SystemExit`,
@@ -536,10 +540,11 @@ expect(json.JSONDecodeError, json.loads, "{bad")
 The second call names two types in a tuple and forwards `base=1` as a keyword,
 which `parse()` passes on to `int()`.
 The third call's message is too long for one line, so it wraps.
-`aexpect()` is the `async` form: it awaits the call instead of making it,
+`aexpect()` is the `async` form.
+It awaits the call instead of making it,
 for a coroutine function whose failure is the demonstration.
 Where a demonstration needs several statements or an assignment in the guarded block,
-`expected` remains the right tool;
+`expected` remains the right tool.
 `expect()` covers the common case of one call.
 
 ## Context Manager as Decorator
@@ -584,8 +589,8 @@ if __name__ == "__main__":
 ```
 
 `banner` works both as a decorator for `report` and in a `with` in `__main__`.
-The parentheses in `@banner("report")` matter: the call constructs the manager,
-which then decorates the function.
+The parentheses in `@banner("report")` matter.
+The call constructs the manager, which then decorates the function.
 Each call of the decorated function builds a fresh manager,
 so you can call `report()` any number of times,
 each with its own enter and exit.
@@ -641,7 +646,7 @@ with setup before it and cleanup after.
 So `banner` sees neither the arguments nor the return value of `report()`,
 and it cannot skip the call.
 A hand-written decorator can do all three,
-because it defines its own wrapper function:
+because it defines its own wrapper function.
 [`repeat`](14_Techniques--Decorators.md#decorators-that-take-arguments)
 forwards `*args` and `**kwargs` and returns the wrapped function's result,
 while [`hijack`](14_Techniques--Decorators.md#what-at-does)
@@ -777,8 +782,8 @@ wrap(["a", "b", "c"])
 and a comma-separated `with` cannot express that.
 
 Every entry in `wrap()` succeeds,
-so `wrap()` leaves `ExitStack`'s other guarantee untested:
-when a later entry fails, the stack unwinds the managers that entered earlier.
+so `wrap()` leaves `ExitStack`'s other guarantee untested.
+When a later entry fails, the stack unwinds the managers that entered earlier.
 In `exit_stack_fails.py` the third manager fails to enter.
 The first two unwind, and the third's cleanup does not run:
 
@@ -1008,8 +1013,8 @@ The queue does more than store the idle items.
 so a borrower waits until another borrower's `with` block ends and returns an item to the queue.
 When several threads share one pool, the queue limits concurrent use,
 the way a real database connection pool does.
-`pool_contention.py` puts the pool under real contention:
-eight threads share a pool of two connections and lease and release two hundred times each.
+`pool_contention.py` puts the pool under real contention.
+Eight threads share a pool of two connections and lease and release two hundred times each.
 
 ```python
 # pool_contention.py
@@ -1052,11 +1057,11 @@ incremented once the lease begins and decremented right after the check,
 so `over_capacity` turns `True` when three of those windows overlap.
 Across sixteen hundred lease-and-release cycles,
 spread over eight threads competing for two connections,
-`held` stays at or below two:
-a thread that arrives while the pool is empty blocks in `get()` instead of racing past it.
+`held` stays at or below two.
+A thread that arrives while the pool is empty blocks in `get()` instead of racing past it.
 `over capacity` stays `False` because `Queue`'s blocking throttles the threads,
 and the demo measures that rather than assuming it.
-`available()` is a snapshot for the demo, not a synchronization primitive:
+`available()` is a snapshot for the demo, not a synchronization primitive.
 `Queue.qsize()` becomes approximate once more than one thread is borrowing,
 because another thread can lease or return between the count and its use.
 
@@ -1100,8 +1105,8 @@ such as lazily creating items on first demand,
 validating an item before lending it out,
 and giving `get()` a timeout so a starved borrower fails loudly instead of waiting forever.
 
-None of those refinements guard against the opposite mistake:
-nothing in `Pool` stops a borrower from keeping a reference after the `with` block ends,
+None of those refinements guard against the opposite mistake.
+Nothing in `Pool` stops a borrower from keeping a reference after the `with` block ends,
 then using it once the lease has moved on to someone else.
 The pool hands out the same object again, not a copy,
 so a stale reference and the new borrower's object are one and the same:
@@ -1123,22 +1128,23 @@ with pool.lease() as second:
 
 The assignment to `stale` stands for any place a borrower stores the reference,
 such as an attribute or a list.
-The name `first` escapes without that assignment: `with` creates no scope,
+The name `first` escapes without that assignment.
+`with` creates no scope,
 so `first` still names the connection after its block ends,
 and `test_objects_reused_not_recreated()` relies on that.
 
 `stale` still points at the `Connection` that `second` now legitimately holds.
 Calling `stale.query()` after the first `with` block ended works as if `second` had called it,
 because they are the same object.
-For a mutable pooled resource, that is the source of corruption:
-two borrowers each believe they have exclusive use of one connection.
+For a mutable pooled resource, that is the source of corruption.
+Two borrowers each believe they have exclusive use of one connection.
 Guarding against it takes a wrapper that invalidates the borrower's handle on exit,
 one more refinement the `Pool` skeleton leaves out.
 
 Each of those refinements is a change inside `lease()`,
 invisible to every `with pool.lease()` in the codebase.
-That is the protocol's payoff: the borrower's contract is two lines long,
-the return is impossible to forget,
+That is the protocol's payoff.
+The borrower's contract is two lines long, the return is impossible to forget,
 and everything hard about custody lives on the other side of the `yield`.
 
 ## Choosing a Form
@@ -1157,8 +1163,8 @@ Otherwise write a generator with `@contextmanager`,
 which is the shortest thing that can express setup, teardown,
 and a `try`/`finally` between them.
 Write a class with `__enter__()` and `__exit__()` when the manager needs state beyond one setup and teardown,
-methods beyond the two protocol ones, or reuse across several `with` statements;
-a generator provides none of those.
+methods beyond the two protocol ones, or reuse across several `with` statements.
+A generator provides none of those.
 Add `ContextDecorator` only when the same bracket should also wrap whole functions.
 
 Whichever form you choose, the borrower's side contains two lines,

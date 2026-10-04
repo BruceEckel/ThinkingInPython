@@ -15,8 +15,8 @@ For *Singleton*, the language already has an answer.
 Python imports each module once and caches it in `sys.modules`,
 as [Modules and Packages](06_Foundations--Modules_and_Packages.md) shows.
 Every `import` after the first produces the same module object.
-A module is a singleton:
-whatever it defines at module level exists once per interpreter,
+A module is a singleton.
+Whatever it defines at module level exists once per interpreter,
 and every importer shares it.
 One interpreter, not one machine.
 A process pool or an [`InterpreterPoolExecutor`](19_Techniques--Concurrency.md#subinterpreters)
@@ -82,7 +82,7 @@ Rebinding is the mistake that quietly ends it.
 Mutating through your name, `settings["theme"] = "dark"`,
 changes that shared object, so every module sees it.
 But `settings = {}` in your module rebinds only your module's name,
-and the two modules silently diverge:
+and the two modules silently diverge.
 `config.settings` still holds the old dict,
 while your code now talks to a private one.
 To replace the whole value, go through the module: `import config`,
@@ -189,8 +189,8 @@ and a type outsiders must name is not private, whatever its first character.
 `_Settings` fits a type that stays inside the module.
 
 Two stronger-looking moves fail the same way.
-Deleting the name after building the instance leaves the class reachable:
-`type(settings())` hands it back.
+Deleting the name after building the instance leaves the class reachable.
+`type(settings())` hands the class back.
 Defining the class inside `settings()` leaves the module no name for it,
 since `@cache` runs that body once and the class lives in the function's locals.
 `type(settings())` still recovers the class.
@@ -219,7 +219,7 @@ uncached `Settings`.
 Three implementation notes:
 
 1. A singleton holds shared state, and shared state leaks between tests.
-   The cached factory offers a reset the classic forms lack:
+   The cached factory offers a reset the classic forms lack.
    `settings.cache_clear()` discards the instance, so each test can start fresh.
 
 2. Every lazy singleton has a first-call race under threads.
@@ -229,8 +229,9 @@ Three implementation notes:
    With a constructor slow enough to widen that race,
    eight threads calling `settings()` at once usually run the constructor eight times and hand back eight different objects.
    When threads can arrive before the singleton exists,
-   create it eagerly instead: call `settings()` once at import time,
-   or use the module form, which the import system builds exactly once.
+   create it eagerly instead.
+   Call `settings()` once at import time, or use the module form,
+   which the import system builds exactly once.
 
 3. A [lock](19_Techniques--Concurrency.md#the-gil-does-not-prevent-races)
    is the other fix for that race, but not in the obvious place.
@@ -273,8 +274,8 @@ Every thread checks the cache before any of them has filled it,
 so each runs the constructor and hands its caller a different object.
 Only the object from the last thread to finish stays in the cache.
 The other seven are already in the hands of their callers.
-The listing prints a comparison instead of the count because the count depends on timing:
-it is eight when every thread misses the cache,
+The listing prints a comparison instead of the count because the count depends on timing.
+The count is eight when every thread misses the cache,
 and the sleep makes that the usual result without guaranteeing it.
 
 The fix puts the check inside a lock.
@@ -413,8 +414,8 @@ print(settings() is settings())
 #: True
 ```
 
-The priming call is safe for the same reason the module form is:
-the import system runs a module body once,
+The priming call is safe for the same reason the module form is.
+The import system runs a module body once,
 so the object exists before any thread can ask for it.
 The race needs laziness, and this listing gives it up on purpose.
 
@@ -570,8 +571,8 @@ A *Borg* points every instance's `__dict__` at the same storage:
 
 ![Three distinct instances share one `__dict__`](_images/borg_shared_state)
 
-The previous singleton designs stand alone;
-you reuse *Borg* through inheritance:
+The previous singleton designs stand alone,
+but you reuse *Borg* through inheritance:
 
 ```python
 # singleton_borg.py
@@ -603,9 +604,10 @@ print(x.val, x is y, x.__dict__ is y.__dict__ is z.__dict__)
 The sharing depends on `super().__init__()` rebinding `self.__dict__` to `_shared_state`,
 and a dataclass generates its own `__init__()` that assigns the fields and [skips the base `__init__()`](12_Techniques--Data_Classes_as_Types.md#dataclass-inheritance),
 so each instance keeps its own `__dict__`.
-The dataclass version still runs; the class has quietly stopped being a `Borg`.
-A `__post_init__()` that does the rebinding fails differently:
-it runs after `__init__()` has assigned the fields,
+The dataclass version still runs,
+but the class has quietly stopped being a `Borg`.
+A `__post_init__()` that does the rebinding fails differently.
+It runs after `__init__()` has assigned the fields,
 so the rebinding discards them, and reading `val` raises an `AttributeError`.
 The hand-written `__init__()` makes the sharing work,
 and silently losing the sharing is worse than failing outright.
@@ -621,8 +623,8 @@ The lookup through `self` finds the subclass's dict first,
 and Martelli wrote `self._shared_state` instead of `Borg._shared_state` to allow that override.
 
 The first test below confirms that the objects differ but share one set of state.
-*Borg* has no `cache_clear()`:
-whatever one test leaves in `_shared_state` is still there for the next.
+*Borg* has no `cache_clear()`,
+so whatever one test leaves in `_shared_state` is still there for the next.
 A pytest fixture closes that gap by clearing the dict before each test:
 
 ```python
@@ -739,8 +741,8 @@ def test_subclassing_the_decorated_name_fails() -> None:
             pass
 ```
 
-`ty` and Pyright reject `Sub` statically: its base has type `singleton`,
-not a class.
+`ty` and Pyright reject `Sub` statically.
+Its base has type `singleton`, not a class.
 Under mypy, which does not apply a class decorator's return type,
 `Registry` is still a class and `Sub` passes.
 At runtime the `class` statement raises a `TypeError`.
@@ -763,7 +765,8 @@ and that is the reason to prefer it.
 
 A metaclass can also intercept construction.
 [Metaprogramming](17_Techniques--Metaprogramming.md#intercepting-instance-creation)
-shows that singleton: its metaclass overrides `__call__()`,
+shows that singleton.
+Its metaclass overrides `__call__()`,
 and that override skips `__init__()` on every later construction,
 so the first call's arguments win.
 In a class that overrides `__new__()` instead,

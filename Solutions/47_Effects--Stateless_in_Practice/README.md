@@ -1045,7 +1045,8 @@ type. Both are the cost of a missing operator.
 > and confirm `squares()` stays unchanged.
 > Processes re-import the module,
 > so the driver needs the `if __name__ == "__main__":` guard [Concurrency](../../Chapters/19_Techniques--Concurrency.md)
-> describes; without it the pool breaks before any work starts.
+> describes.
+> Without it the pool breaks before any work starts.
 > Then try to fork an Effect that still declares a `Need`,
 > and record what the type checker says.
 
@@ -1149,7 +1150,8 @@ both chapters, applied to a boundary between threads or processes.
 ## 9. A scripted wallet
 
 > `wallet.py` runs `spree()` against a `Cell`.
-> Script it instead: write a `Get` handler that answers from a fixed sequence of balances and a `Put` handler that appends every request to a list,
+> Script it instead.
+> Write a `Get` handler that answers from a fixed sequence of balances and a `Put` handler that appends every request to a list,
 > the way `scripted` feeds `Flip`.
 > Assert that `spree()` attempts every price and writes once per purchase.
 > Then say what this test cannot detect that the `Cell` version can.
@@ -1395,8 +1397,8 @@ chooses to fail, and the type checker then verifies the failure. Keep
 ## 11. A fourth failure, with `catch_all()`
 
 > Exercise 5 adds a `TooLong` failure to `research()`.
-> Repeat it with `catch_everything.py` in the build:
-> predict what the type checker reports in `outcome()`, then confirm.
+> Repeat it with `catch_everything.py` in the build.
+> Predict what the type checker reports in `outcome()`, then confirm.
 > Remove `outcome()`'s return annotation and rerun `ty`,
 > and explain what the type checker stopped verifying.
 
@@ -1814,8 +1816,8 @@ one requires a comment or a docstring to say what depends on what.
 ## 14. A shared signature for a cast
 
 > `play()` in `casts.py` accepts any three actors, matched or not.
-> `kitties_and_puzzles()` and `warriors_and_weapons()` already share a signature;
-> give that shape a name so a caller can pass either one where a cast belongs,
+> `kitties_and_puzzles()` and `warriors_and_weapons()` already share a signature.
+> Give that shape a name so a caller can pass either one where a cast belongs,
 > and say what that recovers of the *Abstract Factory* and what it does not.
 > Then add a fourth actor to `encounter()` and count the lines you edit in `quest.py`,
 > `casts.py`, and `two_games.py`.

@@ -6,8 +6,8 @@
 
 [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#a-type-is-a-set-of-values)
 makes a value carry a guarantee.
-This chapter does the same for errors:
-the return value is either the answer or the failure, and its type says so.
+This chapter does the same for errors.
+The return value is either the answer or the failure, and its type says so.
 
 Exceptions are Python's default error mechanism, and they have three drawbacks.
 An exception unwinds the stack, so it discards any work done so far.
@@ -19,8 +19,8 @@ Returning the failure as a value addresses all three.
 Failure appears in the return type,
 so the type checker forces a caller to check for the failure before reading the answer,
 and a reviewer sees it without reading the body.
-Control flow stays local: the failure returns to the immediate caller,
-the way any value does.
+Control flow stays local.
+The failure returns to the immediate caller, the way any value does.
 You do write a check at each step,
 but that check is where you handle every failure.
 
@@ -190,8 +190,8 @@ success by returning an `Ok` object.
 says it returns an `int` on success or a `str` on failure.
 To get the answer, the caller must unpack the `Result`.
 `unwrap()`, a name borrowed from Rust, makes that unpacking literal.
-Reading the `answer` field directly works the same way;
-use whichever name reads better in your own code.
+Reading the `answer` field directly works the same way.
+Use whichever name reads better in your own code.
 Both exist on `Ok` alone, so the type checker rejects `func_a(i).unwrap()`,
 as it rejects using the `Result` as if it were a number.
 The only way to the answer is narrowing to one of the two classes,
@@ -241,7 +241,7 @@ and the type checker cannot report that,
 so totality is a discipline the function's author keeps.
 The caller's side has the same limit.
 A statement that calls the function and discards the `Result` passes the checker.
-The type checker catches a misread of a `Result`; ignoring one is up to you.
+The type checker catches a misread of a `Result`, but ignoring one is up to you.
 The listing holds one gap of each kind:
 
 ```python
@@ -353,7 +353,7 @@ if __name__ == "__main__":
 ```
 
 The two `composed()` functions succeed and fail on the same inputs,
-and the exception version is shorter, but its signature says less:
+and the exception version is shorter, but its signature says less.
 `-> int` names no failure, where `-> Result[int, str]` names one.
 The failure also disappears when the `except` clause ends,
 whereas `sum_type.py` at the start of this chapter keeps every result in a list.
@@ -392,12 +392,12 @@ if __name__ == "__main__":
 
 The body is now one line that reads in order: `func_a()`, then `func_b()`,
 then `func_c()`.
-`bind()` removes the boilerplate by chaining the steps:
+`bind()` removes the boilerplate by chaining the steps.
 `composed()` has no `isinstance()` check and no early return left.
 
 Functional programmers have a name for a type with a way to wrap a plain value
 (`Ok()` here) and this chaining operation: a *monad*.
-You can use `bind()` without the word, but the word names a reusable shape:
+You can use `bind()` without the word, but the word names a reusable shape.
 `Maybe` chains a value that might be absent,
 `Result` chains one that might have failed,
 and an async container chains one whose computation has not finished yet,
@@ -629,8 +629,8 @@ A production version takes the exception types to catch as an argument and lets 
 Letting the rest propagate keeps the distinction that [Which Failures Get a Result](#which-failures-get-a-result)
 draws: a failure the caller can handle versus a bug the caller cannot.
 
-`@safe` changes the return type and keeps what the function accepts:
-the `**P` parameter carries the wrapped function's whole parameter list through,
+`@safe` changes the return type and keeps what the function accepts.
+The `**P` parameter carries the wrapped function's whole parameter list through,
 so `parse("42")` type-checks and the checker rejects `parse(42)`.
 `**P` is the technique for [maintaining the wrapped interface](14_Techniques--Decorators.md#p-and-r-keep-the-static-interface),
 and [Decorators](14_Techniques--Decorators.md)
@@ -709,8 +709,8 @@ A raised exception would have ended the comprehension at the first failure.
 
 The parentheses in `Err(ValueError())` do the type test.
 Without them, `case Err(ValueError):` is a capture
-([Pattern Matching](13_Techniques--Pattern_Matching.md#a-bare-name-captures-a-dotted-name-compares)):
-it matches every `Err` and binds the error to a new local named `ValueError`.
+([Pattern Matching](13_Techniques--Pattern_Matching.md#a-bare-name-captures-a-dotted-name-compares)).
+It matches every `Err` and binds the error to a new local named `ValueError`.
 Python compiles that `case` and the type checker accepts it,
 so `describe()` would answer "Not a number" for a `ZeroDivisionError`.
 
@@ -806,7 +806,7 @@ for field, value in (("age", "42"), ("size", "oops")):
 The note attaches before the exception becomes a value,
 in the one frame that has both the exception and the field name.
 Code that reads the `Err` later can report which field failed without the frame that parsed it.
-The note is the chapter's opening argument, applied one level down:
+The note is the chapter's opening argument, applied one level down.
 `Err` says the call failed, the exception says what went wrong,
 and a note says which piece of work produced it.
 

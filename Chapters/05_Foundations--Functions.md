@@ -140,8 +140,8 @@ print(connect(port=80, host="web.example.com"))
 #: web.example.com:80 (timeout 30s)
 ```
 
-Passing by name does not require a default: `host` has none,
-and the last call still names it.
+Passing by name does not require a default.
+`host` has none, and the last call still names it.
 At the call site, write every keyword argument after the positional ones.
 `connect(port=80, "web.example.com")` is a `SyntaxError`:
 `positional argument follows keyword argument`.
@@ -263,7 +263,7 @@ such a parameter reads:
 
 The `None` default in `good_append()` is a *sentinel*:
 a value chosen to mean "the caller passed nothing" rather than to serve as data.
-Test the parameter with `is None` rather than truthiness:
+Test the parameter with `is None` rather than truthiness.
 `if not target:` also discards an empty list the caller passed on purpose.
 
 `None` works there because no caller would pass `None` as a real `target`.
@@ -348,8 +348,8 @@ so the call raises an `UnboundLocalError`.
 which rebinds a name in an enclosing function the way `global` rebinds a module-level name.
 A function that rebinds a global couples every caller to that shared,
 mutable state.
-[Pure Functions](40_Functional--Foundations.md#pure-functions) shows the cost:
-to understand one call, you must trace every call before it.
+[Pure Functions](40_Functional--Foundations.md#pure-functions) shows the cost.
+To understand one call, you must trace every call before it.
 [Effect Management](44_Effects--Effect_Management.md#what-is-an-effect)
 classifies rebinding a global as a side effect and reading one as a side cause.
 
@@ -419,8 +419,8 @@ and that is the standard shape of a wrapper.
 A function is an [object like any other](40_Functional--Foundations.md#functions-as-first-class-objects),
 so you can pass `report` to `trace()` as an argument,
 and `func.__name__` reads the name of whatever function arrived.
-`expect()` has the same shape: it receives a function and the arguments for it,
-and makes the call.
+`expect()` has the same shape.
+It receives a function and the arguments for it, and makes the call.
 [Decorators](14_Techniques--Decorators.md) builds on that forwarding.
 
 A forwarded `**kwargs` can collide with an argument the wrapped function receives another way.
@@ -457,8 +457,8 @@ The error arrives one level down, when `trace()` calls `report()`.
 ## Positional-Only and Keyword-Only Parameters
 
 Two markers in a parameter list control how callers may pass arguments.
-The markers also decide how much of a signature you commit to keeping:
-a parameter's name is part of the contract when a caller can write it,
+The markers also decide how much of a signature you commit to keeping.
+A parameter's name is part of the contract when a caller can write it,
 and stays outside the contract when the caller must pass by position.
 A `/` ends the *positional-only* parameters.
 You must pass every parameter before it by position, not by name.
@@ -531,8 +531,8 @@ In the standard library,
 many built-in functions and methods take positional-only parameters,
 such as `dict.get(key, default=None, /)`.
 Marking a parameter positional-only also keeps its name out of the method's contract.
-That matters when a subclass overrides a method:
-the subclass can rename the parameter, and the type checker accepts the rename.
+That matters when a subclass overrides a method.
+The subclass can rename the parameter, and the type checker accepts the rename.
 
 ## Lambdas
 
@@ -540,7 +540,7 @@ A `lambda` is a small anonymous function you write as a single expression.
 Use one to pass behavior to functions such as `sorted()`,
 which accepts a `key` function, calls it on each element,
 and orders by the results.
-When an existing function computes the key, pass that function:
+When an existing function computes the key, pass that function.
 `key=len` needs no lambda.
 Write a lambda when no existing function computes the key you want,
 such as ordering by a word's last letter:
@@ -565,7 +565,7 @@ a lambda body must be a single expression.
 For anything more complicated, write a separate function.
 
 For a key that reads an index or an attribute,
-`operator.itemgetter()` and `operator.attrgetter()` name the same operation without a lambda:
+`operator.itemgetter()` and `operator.attrgetter()` name the same operation without a lambda.
 `sorted(words, key=operator.itemgetter(-1))` replaces `key=lambda w: w[-1]` in `lambdas.py`.
 Write a lambda when the key needs an expression that neither getter builds.
 

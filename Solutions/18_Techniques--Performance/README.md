@@ -582,8 +582,8 @@ the same function only at the bottom of a call chain.
 
 > `compact_array.py` compares an `array` against a `list` of the same floats.
 > Time an element-by-element sum over each with `timeit`.
-> The `array` uses a quarter of the memory: is it also faster to iterate,
-> and why not?
+> The `array` uses a quarter of the memory.
+> Is it also faster to iterate, and why not?
 
 <details>
 <summary>Where to look</summary>

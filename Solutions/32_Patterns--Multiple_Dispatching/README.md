@@ -667,8 +667,8 @@ produces, one increment per item, so the caller can read
 > and returns `NotImplemented` for anything else.
 > `__rsub__()` needs only the `int` and `float` cases,
 > since Python skips the reflected form when both operands are `Meters`.
-> Subtraction does not commute, so the reflected form must undo the swap:
-> check that `10 - Meters(3)` produces `Meters(7)` rather than `Meters(-7)`.
+> Subtraction does not commute, so the reflected form must undo the swap.
+> Check that `10 - Meters(3)` produces `Meters(7)` rather than `Meters(-7)`.
 > Then confirm that `"ten" - Meters(3)` raises a `TypeError` rather than producing a `Meters`.
 
 <details>
@@ -1489,8 +1489,8 @@ as it does in a real rock-paper-scissors tournament.
 > The call site stays `item1.compete(item2)`.
 > Write a helper that wraps a constant `Outcome` in a callable,
 > so the seven unchanged cells stay one line each.
-> Then give `Paper` a `wet` attribute and make the `(Paper, Rock)` and `(Rock, Paper)` cells read it:
-> dry paper wraps the rock and wins, wet paper is too soggy and draws,
+> Then give `Paper` a `wet` attribute and make the `(Paper, Rock)` and `(Rock, Paper)` cells read it.
+> Dry paper wraps the rock and wins, wet paper is too soggy and draws,
 > whichever of the two calls `compete()`.
 > The chapter gives two reasons for preferring the double-dispatch version.
 > Say which one this change answers, and which one survives it.

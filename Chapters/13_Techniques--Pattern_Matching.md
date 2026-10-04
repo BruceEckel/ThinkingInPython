@@ -22,8 +22,8 @@ Pattern matching first appears in [Control Flow](04_Foundations--Control_Flow.md
 `match` and `case` are *soft keywords*:
 they act as keywords only inside this statement,
 so existing code that uses `match` as a variable name still runs.
-Avoid naming a new variable `match`: the name shadows no keyword,
-but it reads like the statement.
+Avoid naming a new variable `match`.
+The name shadows no keyword, but it reads like the statement.
 
 ## Matching Values
 
@@ -31,8 +31,8 @@ The simplest patterns are literal values.
 A `case _` at the end is the wildcard.
 It matches anything, like a default.
 Without one, a `match` that fits no pattern does nothing and raises no error.
-`match` tries the patterns top to bottom and the first match wins:
-one `case` body runs, then the statement ends.
+`match` tries the patterns top to bottom and the first match wins.
+One `case` body runs, then the statement ends.
 Unlike C's `switch`, cases do not fall through,
 and `match` has no `break` to forget:
 
@@ -60,8 +60,8 @@ print(describe(301))
 
 A literal pattern compares with `==`, not with `is`,
 so `case 200:` also matches `200.0` and `case 1:` matches `True`.
-`None`, `True`, and `False` are the exception: those three compare with `is`,
-so `case True:` does not match `1`.
+`None`, `True`, and `False` are the exception.
+Those three compare with `is`, so `case True:` does not match `1`.
 
 For a value-to-value lookup like this, a dictionary is often shorter
 (see [When Not to Match](#when-not-to-match)).
@@ -144,15 +144,16 @@ print(DEFAULT)
 ```
 
 `case Signal.GO` compares.
-`case DEFAULT` binds: it matches `Signal.GO`,
-rebinds `DEFAULT` as a local name inside `broken()`,
+`case DEFAULT` binds.
+It matches `Signal.GO`, rebinds `DEFAULT` as a local name inside `broken()`,
 and leaves the module-level constant untouched.
 Python catches the mistake when a later `case` follows a bare-name capture,
 refusing to compile with `SyntaxError: name capture 'DEFAULT' makes remaining patterns unreachable`.
 When the capture is the last `case`, as here,
 Python compiles it without a warning, and neither `ty` nor `ruff` reports it.
 
-`act()` also shows why an enum is worth the trouble: `Signal` is a closed set,
+`act()` also shows why an enum is worth the trouble.
+`Signal` is a closed set,
 so the type checker sees that the cases cover both members and accepts the function with no trailing `return`.
 
 ## Sequence Patterns
@@ -197,14 +198,14 @@ print(last_of([1, 2, 3, 4]))
 
 `summarize()` shows the structural part of "structural pattern matching."
 The pattern `[first, second]` matches only a two-element sequence and pulls both out at once.
-The last `case _` is unreachable:
+The last `case _` is unreachable.
 `[first, *rest]` catches every nonempty list and `[]` the empty one.
 The type checker cannot prove that,
 so the wildcard stays to satisfy the declared return type.
 
 A starred name can appear anywhere in a sequence pattern, not only at the end,
 as long as the pattern has no more than one.
-`last_of()` puts it first:
+`last_of()` puts it first.
 `[*init, last]` binds every element but the last to `init`.
 `[first, *middle, last]` puts it in the middle instead,
 binding the two ends by name and everything between them to `middle`.
@@ -220,7 +221,7 @@ because the pattern describes a shape, not a concrete type.
 Parentheses group a pattern rather than build a tuple.
 `case (x)` is `case x`, an unconditional capture,
 and `case (x,)` is a one-element sequence pattern.
-The subject must be a sequence, though, not merely iterable:
+The subject must be a sequence, though, not merely iterable.
 `case [a, b]` matches a `range` but not a generator and not a `set`.
 
 The brackets are optional in a sequence pattern,
@@ -292,8 +293,8 @@ print(locate(Point(3, 4)))
 `Point(0, y)` matches when `x` is zero and captures `y`.
 The literal and the capture combine in one pattern.
 
-Despite the call syntax, a class pattern builds nothing:
-it tests the subject's type and reads its attributes.
+Despite the call syntax, a class pattern builds nothing.
+It tests the subject's type and reads its attributes.
 Positional matching depends on `__match_args__`,
 a class attribute listing field names in order.
 `@dataclass` generates it automatically from the field order,
@@ -349,7 +350,7 @@ print(describe(Point(3, 4)))
 ```
 
 `Point(x=0)` matches any point whose `x` attribute is zero, ignoring `y`.
-A positional pattern can leave fields unchecked too:
+A positional pattern can leave fields unchecked too.
 `Point(0)` supplies fewer sub-patterns than `__match_args__` names,
 so it ignores `y`, and `Point(_, 0)` uses the wildcard to skip `x`.
 Naming the attribute is clearer, and it survives a change to the field order.
@@ -405,7 +406,7 @@ print(describe(3.5))
 
 Because a subclass matches, the order of the cases decides which one wins.
 `bool` is a subclass of `int`,
-so moving `case bool(b)` below `case int(n)` makes it unreachable:
+so moving `case bool(b)` below `case int(n)` makes it unreachable.
 `describe(True)` answers `int True`.
 
 In `int(n)`, the positional sub-pattern binds the whole value rather than an attribute.
@@ -413,7 +414,7 @@ Python special-cases a handful of built-ins this way
 (`bool`, `int`, `float`, `str`, `bytes`, `bytearray`, `list`, `tuple`, `dict`, `frozendict`, `set`, `frozenset`),
 so `case str(s)` reads as "a string, call it `s`."
 
-Dropping the parentheses changes the meaning:
+Dropping the parentheses changes the meaning.
 `case str:` is a bare-name capture, not a type test,
 matching any value and binding it to a local named `str`.
 `case str:` repeats the `DEFAULT` mistake from `value_patterns.py`,
@@ -475,8 +476,8 @@ left over from the failed guard in the case above it.
 A case that does not rebind a name inherits whatever an earlier,
 failed case left behind.
 That holds for a failed guard, where the pattern matched and made its bindings.
-A pattern that fails partway is different:
-the language reference leaves it to the implementation whether the captures made before the failure stay bound.
+A pattern that fails partway is different.
+The language reference leaves it to the implementation whether the captures made before the failure stay bound.
 Use a captured name only in the `case` that captured it.
 
 A pattern tests shape and equality,
@@ -536,7 +537,8 @@ because `Point` declares its fields that way.
 The shape test is precise,
 but each binding takes the dictionary's one declared value type.
 When the data has a known shape, parse it into a dataclass first,
-then match on the dataclass: you keep the shape test and gain the field types.
+then match on the dataclass.
+You keep the shape test and gain the field types.
 
 ```python
 # test_mapping_patterns.py
@@ -585,8 +587,8 @@ so `start` is the whole `Point` while `0, 0` checks its fields.
 Without `as` you must choose between testing the shape and keeping the object.
 
 The second case alternates two class patterns and binds `n` from either,
-inside a one-element sequence pattern: `survey([Point(0, 5)])` matches,
-but a list of two points does not.
+inside a one-element sequence pattern.
+`survey([Point(0, 5)])` matches, but a list of two points does not.
 The compiler enforces the same-names rule from [Alternatives and Capture](#alternatives-and-capture).
 Adding a third alternative `| Point(1, 1)`, which binds nothing,
 fails with `SyntaxError: alternative patterns bind different names`.
@@ -595,7 +597,8 @@ Nesting has a fixed depth, the depth you write into the pattern.
 A self-referential type such as a tree needs recursion instead:
 a function whose `match` takes one level apart and calls the function again on the parts.
 [*Composite* and *Interpreter*](34_Patterns--Composite_and_Interpreter.md#evaluation-is-a-tree-walk)
-walks an expression tree this way: each `case` matches one node type,
+walks an expression tree this way.
+Each `case` matches one node type,
 and its body recurses into that node's children.
 
 ## Exhaustive Matching
@@ -647,16 +650,16 @@ naming the value it received.
 
 `act()` in `value_patterns.py` has no `assert_never()`,
 and the type checker still confirms that its cases cover `Signal`.
-That check comes from the return type:
-a missing `case` would let the function run off its end and return `None`,
+That check comes from the return type.
+A missing `case` would let the function run off its end and return `None`,
 which is not a `str`.
 A `match` whose cases return nothing gets no such check,
 so there a missing `case` passes unnoticed.
 `assert_never()` covers both kinds of `match`,
 and it reports the error at the `match` instead of at the function's signature.
 
-A `switch` in C, JavaScript, or traditional Java has no such check:
-nothing forces you to add a case, and an unhandled value falls through silently.
+A `switch` in C, JavaScript, or traditional Java has no such check.
+Nothing forces you to add a case, and an unhandled value falls through silently.
 Scala's `match`, Kotlin's `when`,
 and Java's newer switch expressions check exhaustiveness,
 as an error in Java and Kotlin and a warning in Scala.
@@ -718,8 +721,8 @@ print(describe(301))
 #: Status 301
 ```
 
-The lookup is `try`/`except` rather than `STATUS.get(status, f"Status {status}")` because Python evaluates arguments before the call:
-every lookup builds the default string, including the hits that discard it.
+The lookup is `try`/`except` rather than `STATUS.get(status, f"Status {status}")` because Python evaluates arguments before the call.
+Every lookup builds the default string, including the hits that discard it.
 
 A literal `match` compiles to a chain of comparisons, one per `case`,
 so its cost grows with the number of cases.
@@ -818,8 +821,8 @@ print(round(email.cost() + sms.cost() + push.cost(), 4))
 `Notification` names the shape every channel must have.
 `@abstractmethod` forces `Email`, `Sms`,
 and `Push` to define both `render()` and `cost()`.
-If you leave one out, the class stays abstract:
-instantiating it raises a `TypeError`.
+If you leave one out, the class stays abstract.
+Instantiating it raises a `TypeError`.
 
 ### The `match` Version
 

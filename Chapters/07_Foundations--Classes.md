@@ -126,8 +126,8 @@ With inheritance in C++ or Java,
 you often inherit only to establish a common interface.
 Python is different.
 You inherit an implementation, to reuse the code from the base class.
-Python can still name an interface without inheritance:
-a [`Protocol`](08_Foundations--Static_Types.md#structural-typing-with-protocols)
+Python can still name an interface without inheritance.
+A [`Protocol`](08_Foundations--Static_Types.md#structural-typing-with-protocols)
 describes the shape a function needs, with no base class to inherit.
 
 First import the base class the same way you import [any name from a module](06_Foundations--Modules_and_Packages.md#importing-names-with-from-and-as).
@@ -136,7 +136,7 @@ Python supports multiple inheritance, so you can list several classes,
 though [Rethinking Objects](20_Patterns--Rethinking_Objects.md#one-class-many-protocols)
 argues against it in favor of protocols.
 `simple_subclass.py` imports and subclasses `Simple` from the `simple_class` module.
-Ignore the `@override` decorator for now;
+Ignore the `@override` decorator for now.
 [Marking Overrides with `@override`](#marking-overrides-with-override)
 explains it.
 
@@ -213,8 +213,8 @@ An `import` inside a class body binds the imported name like any other assignmen
 so importing a module-level function there attaches it to the class as a method,
 `self` and all.
 More than one unrelated class can pick up the same function this way,
-but that import trick is a curiosity more than a technique:
-a helper object or a module-level function is almost always clearer.
+but that import trick is a curiosity more than a technique.
+A helper object or a module-level function is almost always clearer.
 
 ### Method Resolution Order
 
@@ -370,8 +370,8 @@ which raises a `TypeError`.
 
 ### Adding a Setter
 
-A `@property` with a getter alone rejects writes:
-assigning to it raises an `AttributeError`.
+A `@property` with a getter alone rejects writes.
+Assigning to it raises an `AttributeError`.
 A *setter* enables writing,
 and it is the place to validate the value before storing it:
 
@@ -410,7 +410,7 @@ expect(ValueError, Circle, -1)
 #: [ValueError] radius cannot be negative
 ```
 
-`property_setter.py` completes the conversion:
+`property_setter.py` completes the conversion.
 `radius` began as a plain attribute and is now a validated property.
 The two lines that read `c.radius` and `c.area` are the ones from `properties.py`,
 unchanged.
@@ -422,8 +422,8 @@ so the value goes into a separate attribute.
 A single leading underscore marks `_radius` as internal to the class,
 a convention rather than a language rule.
 The separate name matters.
-Inside the getter, `self.radius` calls the getter again; inside the setter,
-`self.radius = value` calls the setter again.
+Inside the getter, `self.radius` calls the getter again.
+Inside the setter, `self.radius = value` calls the setter again.
 Either loop repeats until the interpreter raises a `RecursionError`.
 Naming both the property and the backing attribute `radius` reproduces the `RecursionError`:
 
@@ -449,8 +449,8 @@ expect(RecursionError, Circle, 10)
 
 The getter and setter are independent,
 so you choose the access you want by defining one or both.
-A write-only property is possible but rare;
-a method expresses that intent better.
+A write-only property is possible but rare.
+A method expresses that intent better.
 
 ### Caching with `cached_property` {#cached-property}
 
@@ -556,7 +556,8 @@ print([p])
 ```
 
 `print()` and `str()` use `__str__()` when it exists and fall back to `__repr__()` when it does not.
-The fallback runs in one direction: `repr()` ignores `__str__()`.
+The fallback runs in one direction.
+`repr()` ignores `__str__()`.
 A container builds its own display from the `__repr__()` of its elements,
 and that is why the list prints `Point(3, 4)` rather than `(3, 4)`.
 In an f-string, `{p}` selects `__str__()` and `{p!r}` selects `__repr__()`.
@@ -610,8 +611,9 @@ print(type(r).__name__)
 Called on a subclass, `from_fahrenheit()` receives that subclass as `cls`,
 so the alternative constructor produces the right kind of object.
 The subclass inherits the method unchanged.
-`Reading.from_fahrenheit(212)` proves it: `cls` is `Reading` there,
-not `Temperature`, so `type(r).__name__` reports `'Reading'`.
+`Reading.from_fahrenheit(212)` proves it.
+`cls` is `Reading` there, not `Temperature`,
+so `type(r).__name__` reports `'Reading'`.
 Naming the class directly, `return Temperature(...)`,
 hard-codes `Temperature` into every subclass, including `Reading`.
 

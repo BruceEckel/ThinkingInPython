@@ -46,8 +46,8 @@ an implementation may cache the call, run the two calls in either order,
 or skip the second.
 The language has no way to mark `add()` as pure,
 so CPython leaves all three to you.
-The same substitution serves your reasoning as well as the machine's optimization:
-you can reason about the code by replacing a call with its value,
+The same substitution serves your reasoning as well as the machine's optimization.
+You can reason about the code by replacing a call with its value,
 the move you make in algebra, and so check parts of a program,
 and sometimes prove them correct.
 
@@ -101,7 +101,8 @@ The call also appends to `cart`, and the list put in its place appends nothing.
 If you substitute the list for either call, `cart` ends with one `'eggs'` fewer.
 
 Referential transparency makes [`lru_cache`](41_Functional--Toolkits.md#lru_cache)
-safe: a memoizer can return a stored result because the call is interchangeable with its value.
+safe.
+A memoizer can return a stored result because the call is interchangeable with its value.
 Every optimization that skips or reuses work,
 from a cache to a database query planner, benefits the same way,
 and the more of your program is referentially transparent,
@@ -148,8 +149,8 @@ Two parallel `withdraw()` calls could both read `balance` before either writes i
 The second write then overwrites the first, so `balance` records one withdrawal.
 A lock makes the two calls safe,
 and the lock serializes the work you wanted to overlap.
-Purity removes the problem instead of managing it: with nothing shared,
-a lock has nothing to guard.
+Purity removes the problem instead of managing it.
+With nothing shared, a lock has nothing to guard.
 
 `count_primes()` is pure, and each call does enough work to spread across cores:
 
@@ -211,8 +212,8 @@ so `count_primes()` must sit at the top level of a module a worker can import.
 A `lambda` or a closure fails with a `PicklingError`,
 and that rules out two shapes these chapters use often.
 A `functools.partial` pickles as its wrapped function plus its bound arguments.
-The `if __name__ == "__main__"` guard exists for the same reason:
-each worker imports this module to find `count_primes()`,
+The `if __name__ == "__main__"` guard exists for the same reason.
+Each worker imports this module to find `count_primes()`,
 and without the guard each worker re-runs the pool-building code,
 which fails in the worker with a `RuntimeError` and in the parent with `BrokenProcessPool`.
 [Concurrency](19_Techniques--Concurrency.md#parallelism)
@@ -227,8 +228,8 @@ Purity, immutability, and referential transparency,
 the properties these chapters build, provide confidence at every level.
 
 Style contributes before the first rung.
-*Declarative* code states the result you want;
-*imperative* code spells out each step to produce it.
+*Declarative* code states the result you want.
+*Imperative* code spells out each step to produce it.
 A [comprehension](16_Techniques--Comprehensions.md) names the result,
 "the squares of the even numbers."
 [`match`](13_Techniques--Pattern_Matching.md) names the shapes you expect,
@@ -413,12 +414,12 @@ and the listing calls it directly inside a `try`.
 
 The *roundtrip* law is one member of a small family of reusable property shapes,
 and knowing the family is most of the skill.
-An *invariant* states a fact about every output:
-sorting produces an ordered list.
-*Idempotence* states that repeating changes nothing:
-sorting a sorted list returns the same order.
-An *oracle* states that two implementations agree:
-the simple version you can check by reading matches the fast one.
+An *invariant* states a fact about every output.
+Sorting produces an ordered list.
+*Idempotence* states that repeating changes nothing.
+Sorting a sorted list returns the same order.
+An *oracle* states that two implementations agree.
+The simple version you can check by reading matches the fast one.
 `parallel_pure.py`'s `assert parallel == serial` makes that claim about `map()` and `pool.map()`.
 
 Avoid a property that restates the implementation.
@@ -427,13 +428,13 @@ because the test and the code share any bug.
 A good law, like the roundtrip,
 constrains the function's behavior without repeating its body.
 
-Every shape in the family requires purity:
+Every shape in the family requires purity.
 Hypothesis can rerun and shrink freely because each call depends on its arguments alone.
 
 ## Affordable Proof
 
 Two caveats limit the chapter's argument.
-First, proof works on imperative code too:
+First, proof works on imperative code too.
 Hoare logic and tools like Dafny verify it.
 What purity changes is the cost.
 With no mutable state to track, each step of the reasoning is shorter.
@@ -451,7 +452,7 @@ and test as statements about what is true.
 That gain, more than the presence of functions,
 is the "functionality" the introduction sets out to find.
 
-Part V extends the same discipline and asks the type checker to enforce it:
+Part V extends the same discipline and asks the type checker to enforce it.
 [Effect Management](44_Effects--Effect_Management.md)
 puts a function's effects in its signature,
 and the chapters after it build a checked system on that idea.
@@ -483,7 +484,7 @@ usually the shape of the code, and a full answer for each exercise.
     every student appears in exactly one group per round.
     Use a strategy that generates rosters of distinct names.
     Then break `group_rounds()` on purpose, run the test twice,
-    and confirm Hypothesis reports the same counterexample both times:
+    and confirm Hypothesis reports the same counterexample both times.
     Hypothesis records a failing case under `.hypothesis/` and replays it first on the next run.
 6.  Write two functions that are *not* referentially transparent without using `global`:
     one that reads `datetime.now()`, and one that reads an environment variable.

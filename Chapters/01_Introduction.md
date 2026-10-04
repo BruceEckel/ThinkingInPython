@@ -125,8 +125,8 @@ and object cleanup.
 This part is for programmers coming to Python from another language.
 If you know Python, you can skim for topics you don't know,
 or skip it altogether.
-If you skip Part I, come back for [Static Types](08_Foundations--Static_Types.md):
-every chapter after it annotates its examples,
+If you skip Part I, come back for [Static Types](08_Foundations--Static_Types.md).
+Every chapter after it annotates its examples,
 and Static Types is the one Part I chapter the rest of the book assumes.
 
 Part II, *Techniques*,
@@ -161,8 +161,8 @@ and asks what Python could adopt.
 Another develops the full generator protocol.
 The last two put Effect tracking and generators to work with Stateless,
 a library that builds Effect tracking on generators and brings it to Python today.
-Read these four chapters in order:
-the last two build on the chapters before them.
+Read these four chapters in order.
+The last two build on the chapters before them.
 Two appendices follow.
 [Effect Tracking](A_Effect_Tracking.md)
 asks how far Python's `Annotated` type could carry Effect tracking without a library,
@@ -199,7 +199,7 @@ has a command for running one example.
 `tip run-one <name>` (`tools/run_one_example.py`)
 supplies the working directory and import path the book assumes,
 and prints the equivalent by-hand commands first.
-The short form is the listing's name alone:
+The short form is the listing's name alone.
 `tip membership` runs `membership.py`,
 and words after the name go to the program,
 so `tip membership --numbers` passes it the `--numbers` flag.
@@ -219,8 +219,8 @@ The code you read is the code that runs,
 and the output you see is the output it produces.
 A few early listings carry a `# type: ignore` comment.
 [Static Types](08_Foundations--Static_Types.md) defines it,
-along with the `# ty:` comments that appear from that chapter on;
-until then the comment marks a line a type checker would flag.
+along with the `# ty:` comments that appear from that chapter on.
+Until then, the comment marks a line a type checker would flag.
 
 Output appears inside the listings as comments beginning with `#:`,
 one line of output per marker.
@@ -274,7 +274,8 @@ Other resources:
 
 © 2026 Bruce Eckel.
 This book carries a [CC BY-NC-ND 4.0](https://creativecommons.org/licenses/by-nc-nd/4.0/deed.en)
-license: you may share it unchanged, with attribution, for noncommercial use.
+license.
+You may share it unchanged, with attribution, for noncommercial use.
 It is freely readable online.
 Commercial publication requires a contract with me.
 The source repository's `CONTRIBUTING.md` has the details.

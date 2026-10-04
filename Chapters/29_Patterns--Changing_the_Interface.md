@@ -20,7 +20,7 @@ callers keep using the old one until you mark it deprecated.
 ## Adapter
 
 An adapter's only job is to produce the interface you need from the one you have.
-A common real case: a third-party library names its methods `g()` and `h()`,
+In a common real case, a third-party library names its methods `g()` and `h()`,
 you wrote your code against an `f()`-calling interface,
 and you cannot change either one.
 An adapter sits between them and turns each `f()` call into calls to `g()` and `h()`.
@@ -72,7 +72,7 @@ compares an ABC with a `Protocol`.
 The empty `__slots__` on `WhatIWant` keeps `ProxyAdapter` a slotted [record](18_Techniques--Performance.md#record),
 as `shapes_oo.py` in [Rethinking Objects](20_Patterns--Rethinking_Objects.md#abstract-base-classes)
 explains.
-The name `ProxyAdapter` uses the term "[*Proxy*](26_Patterns--Surrogate.md#proxy)" loosely:
+The name `ProxyAdapter` uses the term "[*Proxy*](26_Patterns--Surrogate.md#proxy)" loosely.
 *GoF Design Patterns* requires a *Proxy* to have the same interface as the object to which it forwards.
 
 ### Three Places for the Adaptation
@@ -117,8 +117,8 @@ WhatIUse().op(WhatIHave2())  # Approach 3
 ```
 
 Counting the object adapter in `adapter.py`,
-three structures produce one behavior:
-each approach calls the same two methods on a `WhatIHave`,
+three structures produce one behavior.
+Each approach calls the same two methods on a `WhatIHave`,
 and the output is the same.
 The approaches differ in where the adaptation lives.
 
@@ -163,8 +163,8 @@ An override cannot narrow what it accepts.
 The commented-out signature in `adapter_variations.py` takes a `WhatIHave` alone,
 which is all Approach 2 needs for its own callers.
 If you use that signature in place of the union,
-a type checker rejects the override:
-a `WhatIUse2` refuses the `WhatIWant` that every `WhatIUse` accepts,
+a type checker rejects the override.
+A `WhatIUse2` refuses the `WhatIWant` that every `WhatIUse` accepts,
 and that breaks [substitutability](20_Patterns--Rethinking_Objects.md#liskov-substitution).
 `ty` reports the rejection as `invalid-method-override`:
 
@@ -180,13 +180,13 @@ The type checker reports a second error at the listing's second call,
 which passes a `ProxyAdapter` where the narrow signature takes a `WhatIHave`.
 With the narrow signature,
 Approach 2 is a different operation under an inherited name.
-The union keeps it the same operation:
-building the adapter into `op()` adds the `WhatIHave` case and leaves the `WhatIWant` case in place.
+The union keeps it the same operation.
+Building the adapter into `op()` adds the `WhatIHave` case and leaves the `WhatIWant` case in place.
 
 ### Adapter in Python
 
-All three approaches carry one Java habit:
-the adapter inherits from `WhatIWant` so that `op()` accepts it.
+All three approaches carry one Java habit.
+The adapter inherits from `WhatIWant` so that `op()` accepts it.
 Because `f()` is the one method `WhatIUse.op()` calls at runtime,
 any object with an `f()` works and no shared base class takes part.
 A type checker still enforces the annotation,
@@ -269,7 +269,8 @@ Because `__getattr__()` runs only for attributes Python does not find normally,
 not a hierarchy.
 With no base class above it, `Adapter` is a record.
 [Rethinking Objects](20_Patterns--Rethinking_Objects.md#protocols-generalize-composition-adapts)
-has a real one: `PairCoord` adapts a `Pair` to the `Coord` protocol.
+has a real one.
+`PairCoord` adapts a `Pair` to the `Coord` protocol.
 `PairCoord` is a [record](18_Techniques--Performance.md#record)
 with two properties,
 written because `distance()` requires `x` and `y` but a `Pair` supplies `a` and `b`.
@@ -335,8 +336,8 @@ create an interface that presents only what the client programmer needs.
 
 A *Façade* is often a [*Singleton*](24_Patterns--Singleton.md)
 [*Abstract Factory*](27_Patterns--Factory.md#abstract-factories).
-GoF supplies both halves of that combination:
-one *Façade* object is usually enough, which makes it a *Singleton*,
+GoF supplies both halves of that combination.
+One *Façade* object is usually enough, which makes it a *Singleton*,
 and an *Abstract Factory* creates the subsystem's objects for it.
 A class containing static factory methods covers both halves:
 
@@ -379,14 +380,14 @@ Facade.start_car()
 ```
 
 Turning the key primes the pump, and priming starts the engine.
-Each constructor takes the object its method calls:
+Each constructor takes the object its method calls.
 `Ignition` takes a `FuelPump`, and `FuelPump` takes an `Engine`,
 so a caller must build the three from the inside out.
 These three classes are the "confusing collection of classes and interactions,"
 small enough to read in one glance here.
 In real code, constructing three or thirty classes in the right order is knowledge no caller should need.
-`Facade.start_car()` is the static factory method:
-one call runs the constructors in the right order, starts the car,
+`Facade.start_car()` is the static factory method.
+One call runs the constructors in the right order, starts the car,
 and returns the assembled `Ignition`.
 
 The figure shows each pattern as a before-and-after pair:
@@ -447,7 +448,8 @@ The three classes carry leading underscores,
 and their required assembly order appears only inside `total()`.
 The façade can rearrange both while every caller's code stays the same.
 
-The underscore is a convention; Python does not enforce it.
+The underscore is a convention.
+Python does not enforce it.
 `checkout._PriceEngine` still resolves for anyone who types it.
 Mechanically, the underscore keeps the name out of `from checkout import *`,
 and an [`__all__`](06_Foundations--Modules_and_Packages.md#what-a-module-exports)
@@ -457,8 +459,8 @@ not a restriction on the rest.
 
 A `Facade` class full of static methods reproduces what a module gives you,
 with more ceremony.
-`checkout.py` is one file; a façade that outgrows one file scales the same way,
-one level up.
+`checkout.py` is one file.
+A façade that outgrows one file scales the same way, one level up.
 A package's `__init__.py` re-exports a curated set of names from private submodules,
 the same underscore convention, applied to modules instead of classes.
 That `__init__.py` is the idiomatic place for a façade that fronts a whole subsystem several modules deep,
@@ -468,15 +470,16 @@ GoF's usual case for the pattern.
 An advanced caller who needs a name the façade does not expose has two bad options:
 use the underscored name despite the convention,
 or wait for the façade's author to expose the name.
-If you expose enough names, the façade stops simplifying anything;
-it relays every name the subsystem has.
+If you expose enough names, the façade stops simplifying anything.
+It relays every name the subsystem has.
 
 ## Distinguishing the Wrappers
 
 *Adapter* and *Façade* complete a family of wrappers that share one structure,
 a front object forwarding to something behind it,
 often through the same few lines of `__getattr__()`.
-Intent separates them; [Design Patterns](21_Patterns--Design_Patterns.md)
+Intent separates them.
+[Design Patterns](21_Patterns--Design_Patterns.md)
 says that distinction remains when structures match.
 When you cannot decide what to call your wrapper,
 ask what breaks if you remove it:
@@ -537,8 +540,8 @@ print(caught[0].message)
 #: Report.to_string() is replaced by render()
 ```
 
-`to_string()` keeps working, which is the point: existing callers get a warning,
-not a break.
+`to_string()` keeps working, which is the point.
+Existing callers get a warning, not a break.
 The mark works in two halves.
 The static half is a `ty` diagnostic on the deprecated call,
 and the caller sees it before running anything.
@@ -546,8 +549,8 @@ The `# type: ignore` silences that diagnostic here,
 since this listing calls the deprecated method on purpose.
 The runtime half is a `DeprecationWarning`.
 Python ignores those by default outside `__main__` and test runners,
-and that default is the trap:
-the caller who most needs the warning is the least likely to see it.
+and that default is the trap.
+The caller who most needs the warning is the least likely to see it.
 Run with `-W default::DeprecationWarning` to see them all,
 or `-W error::DeprecationWarning` in continuous integration to fail on one.
 A warning also goes to standard error, where a `#:` marker cannot capture it,
@@ -573,8 +576,8 @@ An *Adapter* and a *Façade* both add an interface and leave the existing one in
 which is why they are safe moves.
 Replacing an interface you own is the unsafe move,
 because every caller depends on the old one.
-Marking the old interface deprecated keeps it working and tells each caller what to use instead;
-without the mark, nothing tells them.
+Marking the old interface deprecated keeps it working and tells each caller what to use instead.
+Without the mark, nothing tells them.
 
 ## Exercises
 

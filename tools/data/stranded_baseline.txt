@@ -45,19 +45,18 @@ Chapters/30_Patterns--Observer.md	A bound method holds the object it came from
 Chapters/30_Patterns--Observer.md	A responder chooses which notifications to act on
 Chapters/30_Patterns--Observer.md	along with the attribute name to filter by
 Chapters/30_Patterns--Observer.md	set before CODE and cleared after
-Chapters/30_Patterns--Observer.md	so an announcement carries the type of thing that happened and each handler subscribes to the type it cares about
 Chapters/30_Patterns--Observer.md	so every listing asks you to decode which end you are looking at
 Chapters/30_Patterns--Observer.md	so the broadcaster keeps alive only the responders it started with
 Chapters/38_Patterns--Simulation.md	The teleports are not shortcuts but the only way through
 Chapters/41_Functional--Toolkits.md	An odd roster leaves one player over
 Chapters/41_Functional--Toolkits.md	CODE saves each element the first time through
-Chapters/42_Functional--Error_Handling.md	the CODE parameter carries the wrapped function's whole parameter list through
+Chapters/42_Functional--Error_Handling.md	The CODE parameter carries the wrapped function's whole parameter list through
 Chapters/43_Functional--Confidence.md	Decoding those two bytes as Latin-1 returns two characters where one went in
 Chapters/45_Effects--Generators.md	As the CODE it is the value the driver sends in
 Chapters/46_Effects--Stateless.md	CODE puts an instance in
 Chapters/46_Effects--Stateless.md	Here the subtraction leaves nothing behind
+Chapters/47_Effects--Stateless_in_Practice.md	Two purchases went through
 Chapters/47_Effects--Stateless_in_Practice.md	building a fresh event loop for the call and tearing it down after
-Chapters/47_Effects--Stateless_in_Practice.md	two purchases went through
 Chapters/a.md	Name the field they sit on
 Solutions/02_Foundations--Tour/README.md	CODE is CODE with the two branches swapped over
 Solutions/02_Foundations--Tour/README.md	and the literal branch passes its text through

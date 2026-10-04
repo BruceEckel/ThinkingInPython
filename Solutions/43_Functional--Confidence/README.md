@@ -322,7 +322,7 @@ that reach is the argument for property testing in one example.
 > every student appears in exactly one group per round.
 > Use a strategy that generates rosters of distinct names.
 > Then break `group_rounds()` on purpose, run the test twice,
-> and confirm Hypothesis reports the same counterexample both times:
+> and confirm Hypothesis reports the same counterexample both times.
 > Hypothesis records a failing case under `.hypothesis/` and replays it first on the next run.
 
 <details>

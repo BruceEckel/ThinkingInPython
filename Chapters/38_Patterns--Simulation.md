@@ -11,8 +11,8 @@ A pack of rats coordinates through a shared blackboard,
 a single robot walks a maze where each object it meets handles the robot's arrival,
 and a plate of vibrating sand runs on grains that hold only a position.
 The first two confirm a design you can predict from the code.
-The third produces a pattern no one wrote down as a picture:
-the formula determines its shape, and the grains gather on it.
+The third produces a pattern no one wrote down as a picture.
+The formula determines its shape, and the grains gather on it.
 
 The first example, the pack of rats, puts `asyncio` tasks,
 a shared coordination object,
@@ -27,7 +27,8 @@ The problem has three types.
 A *maze* holds its own layout.
 Given a coordinate, it reports whether that cell is a wall or an opening,
 and it hands out an entry point.
-The maze decides nothing; it reports what a coordinate contains.
+The maze decides nothing.
+It reports what a coordinate contains.
 
 A *blackboard* is the shared surface on which every rat writes.
 *Blackboard* is a classic coordination pattern.
@@ -35,8 +36,9 @@ Independent agents read from and write to one common data structure instead of c
 Here the blackboard owns the maze, records which cells the rats have explored,
 hands out rat numbers, and creates the task for each new rat.
 The rats run as cooperative `asyncio` tasks.
-They take turns, one at a time, so the blackboard needs no lock:
-each rat finishes its update before the next one runs.
+They take turns, one at a time,
+and each rat finishes its update before the next one runs,
+so the blackboard needs no lock.
 
 A *rat* explores.
 Each rat runs as its own task.
@@ -173,8 +175,8 @@ The blackboard holds everything the rats share.
 `claim()` holds the rule on which the whole program depends.
 It tests and marks a cell in one step with no `await` in between,
 so each cell goes to one rat, however many reach it.
-The missing `await`, not a lock, makes `claim()` atomic:
-the [read-modify-write race](19_Techniques--Concurrency.md#a-single-thread-still-races)
+The missing `await`, not a lock, makes `claim()` atomic.
+The [read-modify-write race](19_Techniques--Concurrency.md#a-single-thread-still-races)
 needs a suspension point inside the update,
 and `claim()` runs from its test to its `add()` as one synchronous stretch
 (see exercise 3).
@@ -248,7 +250,8 @@ class Blackboard:
 
 A `TaskGroup` stays open until every task inside it has finished,
 including tasks created after the block began.
-That matches this problem: each rat can create more rats.
+That matches this problem.
+Each rat can create more rats.
 A single `asyncio.gather(*self.tasks)` would await only the tasks in the list at the moment of the call,
 because `*self.tasks` unpacks the list at that moment,
 and most of the rats do not exist yet.
@@ -260,7 +263,7 @@ The declaration gives the type checker the attribute's type with no `None` place
 The robot example later in this chapter declares `Robot.room` for the same reason,
 with a bare annotation.
 The other four `init=False` fields, `visited`, `tasks`, `messages`,
-and `_numbers`, are internal bookkeeping:
+and `_numbers`, are internal bookkeeping.
 `init=False` keeps them out of the generated signature,
 and each `default_factory` builds a fresh object per blackboard.
 
@@ -406,11 +409,11 @@ asyncio.run(main())
 The entry has two open neighbors,
 so rat 1 keeps one neighbor and spawns rat 2 at the other.
 `CountingBlackboard` tallies every `claim()` rejected on an open cell.
-Seven of the nine rejections are backtracking:
-each rat tests the cell from which it came, once per cell other than the entry,
+Seven of the nine rejections are backtracking.
+Each rat tests the cell from which it came, once per cell other than the entry,
 and `len(blackboard.visited) - 1` counts those cells.
-The other two belong to the loop's closing edge, tested from both ends:
-rat 1 dead-ends at `(2, 3)` because rat 2 claimed `(3, 3)` first,
+The other two belong to the loop's closing edge, tested from both ends.
+Rat 1 dead-ends at `(2, 3)` because rat 2 claimed `(3, 3)` first,
 and rat 2 dead-ends at `(3, 3)` because rat 1 claimed `(2, 3)` first.
 Each rat loses a cell to the other, not to itself.
 That is the race `claim()`'s atomicity exists to resolve,
@@ -423,8 +426,8 @@ the rats cover every cell reachable from the entry,
 because every claimed cell gets a rat,
 and that rat tests all four of its neighbors.
 The test verifies this by comparing the cells the rats visited against a flood fill of the same maze.
-Coverage does not depend on atomic claiming: `visited` is a set,
-so a cell claimed twice still counts once.
+Coverage does not depend on atomic claiming.
+`visited` is a set, so a cell claimed twice still counts once.
 Atomicity adds the other guarantee, one rat per cell,
 which only a count like exercise 3's can see.
 
@@ -547,10 +550,10 @@ In the rats model, concurrency organizes the code and adds no speed.
 Every rat awaits `asyncio.sleep(0)` at the same point,
 so the tasks take turns in round robin and the run stays deterministic.
 The tasks run one at a time,
-so the design runs no faster than a synchronous worklist: a stack of frontiers,
-popped and pushed in a loop, visits the same 139 cells.
-`asyncio` provides control flow:
-each rat's own path through the maze stays one `while` loop in `run()`,
+so the design runs no faster than a synchronous worklist.
+A stack of frontiers, popped and pushed in a loop, visits the same 139 cells.
+`asyncio` provides control flow.
+Each rat's own path through the maze stays one `while` loop in `run()`,
 instead of a stack of pending frontiers that one function pushes and pops by hand.
 The cost is the event loop,
 a component whose one job here is to hand the turn from rat to rat.
@@ -695,8 +698,8 @@ and the builder runs first, so every read comes afterward.
 
 `item_factory()` turns a maze character into an `Item`.
 It searches `Item.__subclasses__()` for a matching `symbol`,
-so a new kind of item registers itself:
-once you define the subclass with its symbol, the factory finds it.
+so a new kind of item registers itself.
+Once you define the subclass with its symbol, the factory finds it.
 That search is the [registry idea](27_Patterns--Factory.md#the-pythonic-factory-a-dictionary),
 using the class hierarchy as the registry.
 `__subclasses__()` reports only direct subclasses,
@@ -721,8 +724,8 @@ so the robot stays where it was.
 ![The maze as a graph of rooms](_images/maze_graph)
 
 `Doors.connect()` links each room to its neighbors on the grid.
-Teleports add links that cross the grid:
-two rooms whose `Teleport` items share a target letter lead to each other.
+Teleports add links that cross the grid.
+Two rooms whose `Teleport` items share a target letter lead to each other.
 
 ```python
 # robot_explorer/world.py
@@ -877,15 +880,15 @@ Sorting by target letter puts each pair of partners side by side.
 `groupby(teleports, key=target)` then walks the sorted rooms in one pass,
 yielding each run of matching letters,
 and `pair = list(group)` collects each run.
-`assert len(pair) == 2, letter` checks a rule the maze layout must obey:
-every target letter marks exactly two rooms.
+`assert len(pair) == 2, letter` checks a rule the maze layout must obey.
+Every target letter marks exactly two rooms.
 A typo that gives a letter one room, or three, fails here at build time,
 naming the offending letter.
 If you remove the check, the build still stops,
 at `room1, room2 = pair` on the next line.
 The `ValueError` that unpacking raises says how many values it expected and leaves you to find the letter.
-The `assert isinstance()` lines that follow guard the run and inform the type checker:
-each narrows the occupant to `Teleport` before the code assigns `target_room`.
+The `assert isinstance()` lines that follow guard the run and inform the type checker.
+Each narrows the occupant to `Teleport` before the code assigns `target_room`.
 
 Stage 1 does test types,
 with `isinstance(occupant, Robot)` and `isinstance(occupant, Teleport)`.
@@ -968,7 +971,7 @@ rather than when it leaves, so each room enters the queue once.
 Searching leaves the maze as it was.
 `solve()` reads doors and occupants without calling `enter()`,
 so every `.` stays in place and the robot stays where it started.
-`solve()` cannot ask `interact()` where a door leads, because `interact()` acts:
+`solve()` cannot ask `interact()` where a door leads, because `interact()` acts.
 `Food` replaces itself, and `EndGame` sets `finished`.
 So `landing()` repeats the rules as a type switch,
 the construct the movement code avoids.
@@ -1167,8 +1170,8 @@ each cell gets one rat.
 The robot reaches the goal because polymorphism handles every encounter.
 Both times you know the outcome in advance and run the program to confirm it.
 The third example gives you only half the outcome.
-`amplitude()` determines the shape the sand traces:
-the curves are the formula's zero set.
+`amplitude()` determines the shape the sand traces.
+The curves are the formula's zero set.
 No line of the code computes how two thousand independent random walks reach that shape and stay there.
 That is simulation's other purpose,
 to discover behavior instead of confirming it.
@@ -1187,7 +1190,8 @@ Bowing a different spot rings the plate in a different mode and draws a differen
 
 `amplitude()` is the standing-wave field of a square plate ringing in mode `(m, n)`.
 Physics supplies the formula, an approximation for a plate with free edges.
-Treat it as given; only its shape matters here.
+Treat it as given.
+Only its shape matters here.
 The field is zero along curves, and those curves are the nodal lines.
 A `Grain` is a position.
 All the simulation's logic sits in `step()`.
@@ -1332,8 +1336,8 @@ The randomness produces the order instead of opposing it.
 
 The curves come from the formula alone.
 A plot of `amplitude()`'s zero set draws them.
-The run demonstrates the gathering, not the shape: random,
-uncoordinated steps concentrate onto a curve that no grain,
+The run demonstrates the gathering, not the shape.
+Random, uncoordinated steps concentrate onto a curve that no grain,
 and no line of `step()`, names.
 
 ### Testing a Random Process

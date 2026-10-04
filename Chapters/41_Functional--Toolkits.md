@@ -40,8 +40,8 @@ print(reduce(add, [1, 2, 3, 4]))
 #: 10
 ```
 
-`operator.add` is `+` as a function:
-the `operator` module supplies a named function for each operator,
+`operator.add` is `+` as a function.
+The `operator` module supplies a named function for each operator,
 ready to pass to a fold in place of `lambda a, b: a + b`.
 For addition specifically, `sum()` is the dedicated built-in,
 and `math.prod()` covers multiplication.
@@ -59,8 +59,8 @@ so a repeated call with the same arguments returns the stored result without run
 A cached function with side effects runs those effects on the first call with each set of arguments,
 and skips them on every repeat.
 The cache is a dictionary keyed on the arguments,
-so every argument must be hashable:
-passing a `list` raises `TypeError: unhashable type: 'list'`.
+so every argument must be hashable.
+Passing a `list` raises `TypeError: unhashable type: 'list'`.
 
 ```python
 # functools_cache.py
@@ -87,9 +87,9 @@ where every branch recomputes the whole subtree beneath it.
 runs both versions side by side, and [Recursion](#recursion)
 comes back to why the recursive form is worth keeping.
 An iterative Fibonacci, `a, b = b, a + b` in a loop,
-needs neither recursion nor a cache;
-the recursive one stays the running example here because it keeps the point about caching small:
-the branching and the repeated subproblem matter, not the arithmetic.
+needs neither recursion nor a cache.
+The recursive one stays the running example here because it keeps the point about caching small.
+The branching and the repeated subproblem matter, not the arithmetic.
 
 One trap: decorating a method with `@cache` keys every entry on `self`,
 so the cache holds a strong reference to each instance forever.
@@ -125,8 +125,8 @@ The single hit is the second `square(2)`, which is still in the cache.
 The second `square(1)` is a fourth miss,
 although `1` was the first value computed,
 and that miss proves the cache evicted `1`.
-`currsize` stays at or below `maxsize`:
-the cache discards the least recently used entry before it stores a new one.
+The cache discards the least recently used entry before it stores a new one,
+so `currsize` stays at or below `maxsize`.
 
 ### `partial`
 
@@ -208,10 +208,10 @@ print(x.squared)
 #: 25
 ```
 
-The stored result stays when an input changes:
+The stored result stays when an input changes.
 `x.n = 10` leaves `squared` at `25`.
-`del x.squared` resets it:
-deleting the cached attribute discards the stored value,
+`del x.squared` resets it.
+Deleting the cached attribute discards the stored value,
 and the next access recomputes it from the current state.
 
 A first access from two threads at once is a race.
@@ -219,8 +219,8 @@ A first access from two threads at once is a race.
 so both threads can find no stored value and both run the property's code.
 
 The stored value goes in the instance's `__dict__`, so the class must have one.
-A record is slotted and has none:
-the first access to a `cached_property` on a `@record` raises a `TypeError`,
+A record is slotted and has none.
+The first access to a `cached_property` on a `@record` raises a `TypeError`,
 as `slots_limits.py` in [When Slots Does Not Fit](18_Techniques--Performance.md#when-slots-does-not-fit)
 shows.
 `Lazy` is a `@dataclass` for that reason, and because the demo assigns to `x.n`.
@@ -258,7 +258,7 @@ If you delete the `@wraps(func)` line,
 that same `print()` reports `wrapper - None`,
 and every tool that reports a function by its name or docstring,
 `help()` among them, reports the wrapper too.
-The name `greet` refers to `wrapper` either way;
+The name `greet` refers to `wrapper` either way.
 `wraps()` copies the original's name and docstring onto `wrapper`.
 `wraps()` also sets `greet.__wrapped__` to the original function,
 so a tool that needs the original, such as `inspect.signature()`, can reach it.
@@ -280,7 +280,7 @@ print(sorted(words, key=cmp_to_key(by_length_desc)))
 #: ['ccc', 'bb', 'a']
 ```
 
-This ordering has a key:
+This ordering has a key.
 `sorted(words, key=len, reverse=True)` gives the same list,
 and a key function is the better choice whenever one exists.
 `cmp_to_key()` is for a comparator that arrives from older code,
@@ -321,8 +321,8 @@ which generates all five comparison methods from the field order.
 `total_ordering` is the right tool when the class cannot be a dataclass,
 or when the ordering differs from the fields in declaration order.
 Each synthesized comparison is slower than a hand-written one,
-because it wraps a call to your `__lt__` or `__eq__`;
-a directly generated method compares the fields with no extra call.
+because it wraps a call to your `__lt__` or `__eq__`.
+A directly generated method compares the fields with no extra call.
 
 ### `singledispatch`
 
@@ -350,7 +350,7 @@ print(describe("hi"), "|", describe(5))
 
 `singledispatch()` dispatches on the first argument alone,
 so a rule that depends on two types needs [*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md).
-The caller must pass that argument by position:
+The caller must pass that argument by position.
 `describe(value=5)` raises `TypeError: describe requires at least 1 positional argument`.
 
 ### `singledispatchmethod`
@@ -382,8 +382,8 @@ print(d.describe("hi"), "|", d.describe(5))
 not on `self`, so the type of `value` selects the implementation,
 just as it does for the plain `describe()` in `functools_singledispatch.py`.
 
-`itertools` does for iteration what `functools` does for functions:
-it supplies ready-made pieces you compose,
+`itertools` does for iteration what `functools` does for functions.
+It supplies ready-made pieces you compose,
 in place of loops you write and test again.
 
 ## The `itertools` Toolkit
@@ -439,8 +439,8 @@ Two differences from a list slice.
 `islice()` rejects negative indices with a `ValueError`,
 since a negative index counts back from the end, and an iterable may have none.
 And it consumes every element it passes.
-An iterator you pass to `islice()` resumes where the slice stopped;
-a list slice leaves the list as it was.
+An iterator you pass to `islice()` resumes where the slice stopped.
+A list slice leaves the list as it was.
 
 ### `count`
 
@@ -536,8 +536,8 @@ print(list(accumulate([1, 2, 3, 4], mul)))
 #: [1, 2, 6, 24]
 ```
 
-`accumulate()` is `reduce()` with the intermediate results kept:
-the last value it yields is the value `reduce()` returns.
+`accumulate()` is `reduce()` with the intermediate results kept.
+The last value it yields is the value `reduce()` returns.
 
 ### `compress`
 
@@ -667,7 +667,7 @@ print([(k, list(g)) for k, g in groupby(["b", "a", "b"])])
 #: [('b', ['b']), ('a', ['a']), ('b', ['b'])]
 ```
 
-The second `print()` shows what unsorted input does:
+The second `print()` shows what unsorted input does.
 `"b"` comes back as two separate groups, and no error reports it.
 `groupby(sorted(data, key=keyfunc), key=keyfunc)` is the fix,
 with the same key function both times.
@@ -706,7 +706,7 @@ When one consumer runs far ahead of the other,
 `list()` is simpler and uses the same memory.
 `tee()` saves memory when the consumers stay roughly in step.
 [Iterators](23_Patterns--Iterators.md#what-tee-buffers)
-measures that buffering and adds a third caution:
+measures that buffering and adds a third caution.
 `tee()` shares one unlocked buffer between its branches,
 so two threads advancing them at the same time can raise a `RuntimeError`.
 
@@ -756,8 +756,8 @@ print(list(product("AB", repeat=2)))
 and keeping one is right when you want each pair of distinct elements once.
 `combinations_with_replacement()` also ignores order,
 but draws from the full input each time, and that repeated draw produces `AA`.
-`product()` with `repeat=` is the fourth combination of answers:
-order matters and elements repeat, so it yields all four pairs.
+`product()` with `repeat=` is the fourth combination of answers.
+Order matters and elements repeat, so it yields all four pairs.
 
 ### Composing the Pieces
 
@@ -865,8 +865,8 @@ A `for` loop computes this same factorial in about the same number of lines and 
 Python pushes a frame for every recursive call, including one in tail position,
 where a language with *tail-call optimization* reuses the caller's frame.
 The stack has a cap, so deep recursion raises a `RecursionError`.
-`sys.setrecursionlimit()` raises that limit when the depth is genuine;
-a long flat sequence calls for a loop or one of the `itertools` tools.
+`sys.setrecursionlimit()` raises that limit when the depth is genuine.
+A long flat sequence calls for a loop or one of the `itertools` tools.
 For a countdown like this one, the loop is as short as the recursion and faster,
 since it makes no calls.
 Recursion is the better choice once the problem branches rather than repeats,
@@ -876,8 +876,8 @@ Branching adds a problem of its own.
 More than one branch can reach the same subproblem,
 and a plain recursive function recomputes it every time.
 That recomputation is why the recursive `fib()` under [`cache`](#cache)
-gets a decorator rather than a rewrite as a loop:
-the recursion states the definition, and the cache removes the repetition.
+gets a decorator rather than a rewrite as a loop.
+The recursion states the definition, and the cache removes the repetition.
 
 Self-similar problems, such as walking a tree,
 are a different reason to recurse.
@@ -908,8 +908,8 @@ To write `deep_sum()` as a loop,
 you build your own stack to track which sublists are still open,
 and you must get the push and pop right at every depth.
 The recursive version hands that bookkeeping to the call stack.
-The body says what to do with one element and where to descend;
-the call stack tracks the depth.
+The body says what to do with one element and where to descend.
+The call stack tracks the depth.
 
 ## Case Study: Pairing Rotations
 
@@ -930,8 +930,8 @@ For an even number of players `n`,
 the circle method produces `n - 1` rounds with no repeated pair.
 No schedule can do better,
 because those rounds use every one of the `n * (n - 1) / 2` possible pairs exactly once.
-The classical fix for an odd roster is a phantom player:
-whoever draws the phantom sits out that round.
+The classical fix for an odd roster is a phantom player.
+Whoever draws the phantom sits out that round.
 
 ### Groups of Any Size
 
@@ -1084,16 +1084,16 @@ If you pass a tuple instead, the calls succeed and the schedule gets worse.
 `met()` reads `history`, which changes at the end of every round.
 An answer cached in round 0 therefore comes back unchanged in a later round,
 after the counts it summed have grown.
-The `cache` entry's rule, pure functions only, is the reason:
-a function that reads mutable state is impure, however simple its body looks.
+The `cache` entry's rule, pure functions only, is the reason.
+A function that reads mutable state is impure, however simple its body looks.
 
-The general version needs memory, where the circle method needs a round number:
-in the circle method, which pair sits where in round `r` follows from `r` alone.
+The general version needs memory, where the circle method needs a round number.
+In the circle method, which pair sits where in round `r` follows from `r` alone.
 `group_rounds()` needs the `history` `Counter`,
 because no formula takes a round number and returns the grouping of arbitrary size that keeps every pair's meeting count lowest.
 To reach round `100`,
-`group_rounds()` therefore generates rounds `0` through `99` first;
-the circle method computes round `100` directly, from its arithmetic alone.
+`group_rounds()` therefore generates rounds `0` through `99` first.
+The circle method computes round `100` directly, from its arithmetic alone.
 [Recursion](#recursion) makes the same choice, memory for generality,
 when the problem outgrows a loop's counter and needs a stack.
 
@@ -1104,8 +1104,8 @@ since `random.Random(seed)` draws every number from its own seeded state.
 
 ## Choosing From the Toolkits
 
-The rule for both modules is the same: before writing a loop,
-ask whether the loop has a name in one of these modules.
+The rule for both modules is the same.
+Before writing a loop, ask whether the loop has a name in one of these modules.
 A running total is `accumulate()`, a width-two sliding window is `pairwise()`,
 a remainder-safe chunking is `batched()`,
 and a memoized pure function is `@cache`.

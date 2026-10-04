@@ -5,8 +5,8 @@
 > Write the production bindings for `ask_tell.py`:
 > a `Console` class whose `ask()` calls `input()` and whose `tell()` calls `print()`,
 > and run `greet(Console(), Console())` interactively.
-> Confirm `greet()` requires no change:
-> serving a new context without edits is what delayed binding provides.
+> Confirm `greet()` requires no change.
+> Serving a new context without edits is what delayed binding provides.
 
 <details>
 <summary>Where to look</summary>
@@ -115,8 +115,8 @@ class does not declare which protocol it means to satisfy.
 > Starting from `bookkeeping_scales.py`, add a `Log` Effect
 > (a protocol with `log(message)`) used by a new helper that `greet()` calls,
 > and log from `greet()` too.
-> The chapter counts five signatures for that version;
-> say how many of the five use the `Log` they name,
+> The chapter counts five signatures for that version.
+> Say how many of the five use the `Log` they name,
 > and then what an EMS would do instead.
 
 <details>

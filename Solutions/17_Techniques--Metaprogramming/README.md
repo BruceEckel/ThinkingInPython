@@ -448,8 +448,8 @@ printing `None`. A `lambda` always has a name, `"<lambda>"`, so
 ## 6. The static diagnostic beside the runtime `TypeError`
 
 > Delete the `# type: ignore` comment from `metaclass_layout_conflict.py` and run `ty` over the file.
-> Compare the `instance-layout-conflict` diagnostic it reports with the `TypeError` the program prints:
-> the static report and the runtime failure describe the same collision.
+> Compare the `instance-layout-conflict` diagnostic it reports with the `TypeError` the program prints.
+> The static report and the runtime failure describe the same collision.
 
 <details>
 <summary>Where to look</summary>
@@ -686,8 +686,8 @@ it in place, which is why `setattr(cls, ...)` still works there.
 > and confirm that the injected statement runs.
 > `make_class()` splices the name in twice,
 > the second time inside a string literal,
-> so a bare newline ends the payload as an unterminated string;
-> the payload's last line must close or swallow that second splice.
+> so a bare newline ends the payload as an unterminated string.
+> The payload's last line must close or swallow that second splice.
 > Restore the check.
 
 <details>

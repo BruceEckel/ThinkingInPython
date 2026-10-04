@@ -44,11 +44,11 @@ print(vars(m))
 
 The constructor replaces the object's `__dict__` with the `dict` that the `**kwargs` parameter automatically creates.
 `vars(m)` returns that same `__dict__`,
-and its output shows that the attributes and the keyword arguments are one dict:
-`m.more = 11` adds a key, just as passing `more=11` to the constructor does.
+and its output shows that the attributes and the keyword arguments are one dict.
+`m.more = 11` adds a key, as passing `more=11` to the constructor does.
 
 Because `**kwargs` is the only parameter,
-`Messenger` accepts keyword arguments alone:
+`Messenger` accepts keyword arguments alone.
 `Messenger("Spam")` raises a `TypeError`,
 and the `*` marker from [Positional-Only and Keyword-Only Parameters](05_Foundations--Functions.md#positional-only-and-keyword-only-parameters)
 is unnecessary here.
@@ -102,7 +102,8 @@ because `Messenger` inherits `object`'s identity-based equality.
 
 A `SimpleNamespace` also accepts any name you invent,
 so no type checker knows which names to expect.
-Its type declaration says so: reading any attribute yields `Any`,
+Its type declaration says so.
+Reading any attribute yields `Any`,
 so `m.inof` passes the type checker here too.
 
 ### `@dataclass`
@@ -173,10 +174,10 @@ Printing a `NamedTuple` gives the same readable output as a data class.
 A bare tuple prints `(255, 0, 0)` and leaves you counting positions.
 Assigning to a field raises an `AttributeError`,
 and the type checker reports the assignment as well.
-An attribute bag accepts every write; a `NamedTuple` rejects this one,
-at runtime and in the checker.
-Because no field can change, `_replace()` is the way to change one:
-it produces an updated copy.
+An attribute bag accepts every write.
+A `NamedTuple` rejects this one, at runtime and in the checker.
+Because no field can change, `_replace()` is the way to change one.
+It produces an updated copy.
 [`copy.replace()`](12_Techniques--Data_Classes_as_Types.md#the-general-form-of-replace)
 does the same job for a `NamedTuple`, a frozen data class,
 and any other type that defines `__replace__()`.
@@ -191,8 +192,8 @@ because hashing a tuple hashes its contents, and a list has no hash.
 An immutable record needs immutable fields.
 
 The leading underscore on `_replace()`, `_asdict()`,
-and `_fields` keeps every unprefixed name free for your fields:
-a record can declare a field called `replace` or `fields`.
+and `_fields` keeps every unprefixed name free for your fields.
+A record can declare a field called `replace` or `fields`.
 The underscore marks `NamedTuple`'s own members, and says nothing about privacy.
 
 ## Returning Multiple Values
@@ -225,7 +226,7 @@ Every caller must then remember that position 0 is the mean and position 1 is th
 a fact the code states nowhere.
 `Stats` names the fields and documents itself at each call site,
 and because a `NamedTuple` is a tuple, you can unpack it.
-Unpacking goes by position, so it brings the bare tuple's hazard back:
+Unpacking goes by position, so it brings the bare tuple's hazard back.
 `count, mean = summarize(data)` runs, passes the type checker,
 and binds each name to the other's value.
 Reading `result.mean` has no order to get wrong.

@@ -184,7 +184,7 @@ and adds a context class to hold the chosen algorithm.
 The `how` parameter replaces all three.
 
 This listing shows only the shape.
-Nobody designs a `Strategy` class hierarchy around calling `max` or `sum`;
+Nobody designs a `Strategy` class hierarchy around calling `max` or `sum`.
 [Function Objects](28_Patterns--Function_Objects.md#strategy-choosing-the-algorithm-at-runtime)
 works through a case with a real motivation.
 
@@ -279,7 +279,7 @@ not an implementation" says stop naming concrete classes.
 a class that holds a reference to an abstract class "refers to a *type* of object,
 not a concrete object."
 Read this way, the catalog is one idea applied twenty-three times.
-GoF's own discussion of the behavioral patterns compares four of them by their coupling:
+GoF's own discussion of the behavioral patterns compares four of them by their coupling.
 *Command*, *Observer*, *Mediator*,
 and *Chain of Responsibility* each decouple a sender from a receiver,
 "but with different trade-offs,"
@@ -309,7 +309,8 @@ and a caller that writes `isinstance(s, Circle)` knows the name and tests an obj
 A caller written against an abstract base class knows a set of method names and signatures,
 and every class that implements them says so in its own `class` line.
 A caller written against a `Protocol` knows the same set of names,
-but no class declares that it implements them; the type checker matches shapes.
+but no class declares that it implements them.
+The type checker matches shapes.
 A caller that takes a `Callable` knows one signature.
 A caller that takes a value knows the value's type and nothing about who produced it.
 
@@ -374,8 +375,8 @@ so it can wrap a pizza or another topping without naming either.
 
 *Visitor* is the reverse of the others.
 The visitor names every concrete element.
-The pattern concentrates the heavy edges in one place on purpose:
-adding an operation means writing one new visitor and changing nothing else,
+The pattern concentrates the heavy edges in one place on purpose.
+Adding an operation means writing one new visitor and changing nothing else,
 while adding an element type means changing every visitor.
 [*Visitor*](33_Patterns--Visitor.md) is that trade,
 and the diagram shows what you are trading.
@@ -429,8 +430,8 @@ With a `Callable`, the interface has no name and no file of its own.
 It lives in the caller's signature,
 and any function of the right shape satisfies it.
 
-The edge a `Protocol` deletes is the one that in C++ or Java is mandatory:
-the implementer must name the interface.
+The edge a `Protocol` deletes is the one that in C++ or Java is mandatory.
+The implementer must name the interface.
 That edge makes every implementer depend on the interface,
 so renaming or moving the interface touches every file that names it.
 [Rethinking Objects](20_Patterns--Rethinking_Objects.md#protocols)
@@ -450,8 +451,8 @@ A principle is a test you apply to whatever shape you chose:
 a claim the design either satisfies or violates.
 Most hold for any code,
 but *Reflexivity* and the *Law of Demeter* assume classes and objects.
-The list is a reference:
-later chapters name a few of these principles when a design turns on them,
+The list is a reference.
+Later chapters name a few of these principles when a design turns on them,
 and the rest are here for your own designs.
 
 <!-- Several principles below quote their sources word for word (Saint-Exupery
@@ -493,13 +494,13 @@ and the rest are here for your own designs.
     argues for composition on those grounds.
 -   *Managed Coupling*.
     Simply declaring that a design should have "low coupling" is usually too vague.
-    Every design has coupling, so acknowledge it and control it:
-    say "coupling can cause problems" and compensate for those problems with a well-considered design or pattern.
+    Every design has coupling, so acknowledge it and control it.
+    Say "coupling can cause problems" and compensate for those problems with a well-considered design or pattern.
 -   *Design the communication, not the parts*.
     Alan Kay, on the purpose of object orientation:
     "The key in making great and growable systems is much more to design how its modules communicate rather than what their internal properties and behaviors should be."^[Alan Kay, squeak-dev mailing list, 10 October 1998, "prototypes vs classes was: Re: Sun's HotSpot". The same message's second paragraph begins "The big idea is 'messaging'."]
-    A `Protocol` is that design made literal:
-    it names what a caller needs from the object on the other side of a call,
+    A `Protocol` is that design made literal.
+    It names what a caller needs from the object on the other side of a call,
     and says nothing about what that object is.
     [Rethinking Objects](20_Patterns--Rethinking_Objects.md#protocols-generalize-composition-adapts)
     builds on this, and [Stateless](46_Effects--Stateless.md#declaring-a-dependency)
@@ -556,8 +557,9 @@ through [*Memento*](36_Patterns--Memento.md)
 opens with a figure of its pattern at work,
 drawn from that chapter's own listings.
 The gallery in [A Pattern Moves an Edge](#a-pattern-moves-an-edge)
-shows which way each dependency points; those figures show what happens,
-in what order, and which part knows about which.
+shows which way each dependency points.
+Those figures show what happens, in what order,
+and which part knows about which.
 
 Part III closes with a [Pattern Catalog](39_Patterns--Pattern_Catalog.md),
 a name-and-intent index of the wider literature,

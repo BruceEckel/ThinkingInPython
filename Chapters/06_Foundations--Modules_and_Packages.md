@@ -36,7 +36,7 @@ The code at the end of `use_module.py` starts with an `if` clause that checks wh
 In Python, any identifier that begins and ends with double underscores
 (commonly called a "dunder") is special in some way.
 Dunder methods, for example,
-connect your class to the language's operators and built-in functions;
+connect your class to the language's operators and built-in functions.
 [Classes](07_Foundations--Classes.md)
 shows how `print()` and `str()` reach a class's `__str__()`.
 
@@ -101,8 +101,8 @@ if __name__ == "__main__":
 #: I'm being useful!
 ```
 
-`from` works like an assignment:
-it binds a name in this file to the object the module's name refers to at that moment.
+`from` works like an assignment.
+It binds a name in this file to the object the module's name refers to at that moment.
 The two names are separate,
 so rebinding the module's name afterward leaves this file's name as it was:
 
@@ -151,7 +151,7 @@ if __name__ == "__main__":
 A module's namespace is an ordinary dict you can read and write.
 `globals()` returns it,
 the same dict Python searches when it looks up a top-level name.
-A dotted name reads that same dict:
+A dotted name reads that same dict.
 `module.__dict__` from outside is the same object `globals()` returns inside `module`,
 so `module.useful_function()` and a top-level lookup inside `module.py` find the same function.
 Assigning into that dict works like writing the assignment directly:
@@ -186,8 +186,8 @@ To make a directory a package, you put a special file named `__init__.py` in it.
 `__init__.py` runs once, before any module inside the package loads.
 An empty `__init__.py`, the common case,
 only flags the directory as a package.^[The name `__init__.py` often confuses people. In hindsight, it might have been better to name the file `__package__.py`.]
-An `__init__.py` with content usually re-exports the package's public names:
-if `a_package/__init__.py` re-exports `function1`,
+An `__init__.py` with content usually re-exports the package's public names.
+If `a_package/__init__.py` re-exports `function1`,
 `from a_package import function1` works without callers naming the submodule that defines `function1`.
 You can still import a directory without `__init__.py` as a *namespace package*,
 but an explicit `__init__.py` makes the package's identity and boundary clear,
@@ -245,7 +245,7 @@ print(a_package.module2.function2())
 Loading `module1` also stores that submodule as an attribute of `a_package`,
 so `a_package.module1.function1()` resolves.
 The shorter `module1.function1()` fails here,
-since nothing binds `module1` in this file;
+since nothing binds `module1` in this file.
 `module1.function1()` works in `from_packages.py`, below,
 where `from` binds `module1` directly.
 
@@ -390,8 +390,8 @@ Python suspects a name collision with a library instead of a cycle:
 `ImportError: cannot import name 'f' from 'modx' (consider renaming '.../modx.py' if it has the same name as a library you intended to import)`.
 Python names the offending file by its full path, abbreviated here as `...`.
 
-A cycle is a design signal:
-move the shared piece into a third module both can import.
+A cycle is a design signal.
+Move the shared piece into a third module both can import.
 When the cycle exists only in annotations,
 an `if TYPE_CHECKING:` import breaks it.
 `typing.TYPE_CHECKING` is `False` at runtime,
@@ -493,8 +493,8 @@ A file named `random.py`, `string.py`,
 or `weakref.py` can hide the stdlib one and break imports,
 because Python searches the script's directory before the standard library
 (see [`PYTHONPATH`](#pythonpath) below).
-Give a shared module a distinctive name for the same reason:
-the first `config.py` imported anywhere in the process is the one every later `import config` gets.
+Give a shared module a distinctive name for the same reason.
+The first `config.py` imported anywhere in the process is the one every later `import config` gets.
 
 Windows and macOS default to case-insensitive filesystems,
 so `module.py` and `Module.py` name the same file there.
@@ -563,7 +563,7 @@ print(Path("report/data.txt").suffix)
 A `lazy import` looks like an ordinary one, with `lazy` in front,
 and once loaded the names behave like eagerly imported ones.
 `json` and `pathlib` load at the `json.dumps()` and `Path(...)` calls.
-The output is the same either way, so this listing cannot show the deferral;
+The output is the same either way, so this listing cannot show the deferral.
 `lazy_noisy.py`, in [Watching the Deferral](#watching-the-deferral), does.
 
 ### Deferring an Import Before 3.15

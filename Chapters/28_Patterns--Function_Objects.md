@@ -14,8 +14,8 @@ states that principle as "design the communication, not the parts."
 Each pattern defers something:
 
 - *Command* defers *what* to do, so you can store the action and run it later.
-- *Strategy* defers *how*: the job stays fixed,
-  and the caller picks the algorithm that performs it.
+- *Strategy* defers *how*.
+  The job stays fixed, and the caller picks the algorithm that performs it.
 - *Chain of Responsibility* defers *which* handler takes the job,
   trying candidates until one accepts.
 
@@ -55,8 +55,8 @@ for command in macro:
 #: It's pining for the fjords.
 ```
 
-`Command` names the signature every entry must have:
-it takes no arguments and returns `None`.
+`Command` names the signature every entry must have.
+Each entry takes no arguments and returns `None`.
 The classic object form turns that name into a base class and wraps each action in a `Command` subclass with an `execute()` method:
 
 ```python
@@ -106,8 +106,8 @@ The class version is four classes and a wrapper to say what one list of function
 *GoF Design Patterns* calls commands "an object-oriented replacement for callbacks."
 Because in Python a callback is a function, the replacement is unnecessary.
 A `Command` base class is worthwhile when the commands share implementation.
-A second operation alone does not call for one;
-the undo discussion in [A Callable Object as a *Command*](#a-callable-object-as-a-command)
+A second operation alone does not call for one.
+The undo discussion in [A Callable Object as a *Command*](#a-callable-object-as-a-command)
 needs only a type.
 
 ### A Bound Method as a Command
@@ -349,16 +349,16 @@ A "Context" class holds the chosen algorithm.
 A parameter carries a strategy into one call and is gone when the call returns,
 so a Context earns its place when the algorithm must outlast the call.
 A view holding a controller is that Context in Smalltalk's MVC,
-and *GoF Design Patterns* names the pair as an example of *Strategy*:
-the controller decides how the view responds to input.
+and *GoF Design Patterns* names the pair as an example of *Strategy*.
+The controller decides how the view responds to input.
 Replacing the controller changes the response without changing the display,
 and a controller that ignores input events disables the view.
 [*Observer*](30_Patterns--Observer.md) covers MVC's other half,
 where a model notifies its views.
 
 Python uses strategies-as-functions constantly without calling them a pattern.
-The `key` argument passed to `sorted()`, `min()`, and `max()` is a strategy:
-it chooses the value the algorithm compares for each item,
+The `key` argument passed to `sorted()`, `min()`, and `max()` is a strategy.
+It chooses the value the algorithm compares for each item,
 and that algorithm stays the same (see exercise 3).
 
 When a strategy needs configuration,
@@ -486,11 +486,11 @@ print(f"{r2:.6f}" if r2 is not None else "no root")
 
 Each handler is a *Strategy* function, `chain` is the list of strategies,
 and success is a non-`None` return.
-This `solve()` reuses the name from `algorithms.py` with the opposite failure contract:
-an exhausted chain returns `None` rather than raising an exception,
+This `solve()` reuses the name from `algorithms.py` with the opposite failure contract.
+An exhausted chain returns `None` rather than raising an exception,
 and the caller decides what an empty result means.
-The second `solve()` call shows the fall-through:
-because the interval `[1.0, 1.3]` does not straddle the root,
+The second `solve()` call shows the fall-through.
+Because the interval `[1.0, 1.3]` does not straddle the root,
 bisection fails by returning `None`.
 The loop continues to a method that needs no bracket.
 To add, remove, or reorder the handlers you edit the `chain` list.
@@ -515,8 +515,8 @@ so `float | None` says which result is which.
 A [`sentinel()`](05_Foundations--Functions.md#sentinel-values)
 is for the case where `None` is a possible result and cannot double as the failure mark.
 
-The chain has no check of its own:
-each handler decides for itself whether it failed,
+The chain has no check of its own.
+Each handler decides for itself whether it failed,
 and reports that decision as its return value.
 `secant()` and `newton()` report success when their latest step shrinks below the tolerance.
 A step below the tolerance is not quite the same as reaching a root,
@@ -577,8 +577,8 @@ The tests can then assert both the root and the names of the finders that ran.
 
 `watched()` carries a `# type: ignore` because `RootFinder` is a `Callable`,
 and a `Callable` declares no `__name__`.
-`ty` is right about the type: a `partial` object is a `RootFinder`,
-and it has no `__name__`.
+`ty` is right about the type.
+A `partial` object is a `RootFinder`, and it has no `__name__`.
 The three finders here are functions, and every function has one.
 A `Protocol` that declares `__name__` beside `__call__()` states that requirement in the type and needs no comment.
 
@@ -733,8 +733,8 @@ It gives each side a decorator, both producing records.
 `@handler` makes a function object whose fields are its configuration,
 and records in `HANDLES` which event its `__call__()` accepts.
 `Handler` becomes a `Protocol` whose one method is `__call__()`,
-because the handlers are now objects rather than functions;
-it still names their signature.
+because the handlers are now objects rather than functions.
+`Handler` still names their signature.
 `subscribe()` then takes one argument, since the handler says what it handles,
 and `publish()` refuses an object that no `@event` class produced:
 
@@ -793,8 +793,8 @@ class EventBus:
 
 `handler()` looks for `__call__()` in `vars(cls)`, the class's own namespace.
 `hasattr(cls, "__call__")` cannot make that test,
-because it is true of every class: a class is callable,
-and calling it builds an instance.
+because it is true of every class.
+A class is callable, and calling it builds an instance.
 The `/` in `Handler` makes `event` positional-only,
 so a handler may give that parameter any name.
 
@@ -932,7 +932,8 @@ def test_handler_needs_a_call_on_an_event() -> None:
 ```
 
 The bus is the [*Observer*](30_Patterns--Observer.md#the-pythonic-observer)
-with one shared subject: instead of every subject holding its own list,
+with one shared subject.
+Instead of every subject holding its own list,
 one bus holds every list and the event type selects the handlers.
 Here a type may have many handlers.
 When each type needs exactly one,
@@ -960,15 +961,15 @@ Stop at the first form that supports what you need:
     or the several related methods and mutable state the *Strategy* section describes.
 
 A function that carries data in its `__dict__` would sit between entries 1 and 3,
-and the list leaves it out:
-the type checker reports each dotted access to such an attribute
+and the list leaves it out.
+The type checker reports each dotted access to such an attribute
 ([Attributes on a Function](17_Techniques--Metaprogramming.md#attributes-on-a-function)),
 so configuration goes in a closure or a callable object instead.
 
 The *GoF Design Patterns* forms of *Command*, *Strategy*,
 and *Chain of Responsibility* all start at number 5.
-The C++ of that book had no lighter form that could carry state:
-a function pointer carried none, and closures did not exist yet,
+The C++ of that book had no lighter form that could carry state.
+A function pointer carried none, and closures did not exist yet,
 so a class was the only form available.
 The GoF form then gives that class a named operation, `execute()`,
 rather than a call.

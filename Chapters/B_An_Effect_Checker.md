@@ -1054,7 +1054,8 @@ print(problems({"app": APP, "requests": STUB}))
 Without the stub, `requests.get` matches nothing in the table and reads `Unknown`,
 so `fetch()` draws a finding.
 With it, `requests.get` is a declared function like any other.
-The checker's existing rule covers `requests.get`: callers trust a declared row.
+The checker's existing rule covers `requests.get`.
+Callers trust a declared row.
 The stub's body is `...`, which calls nothing,
 so its body row is empty and stays within its declaration.
 Type checkers solve the same problem the same way,
@@ -1237,11 +1238,12 @@ and a production tool must remove each one:
 Some of the second list is bookkeeping,
 such as resolving `Annotated` through the imports and reading the decorator that marks a `staticmethod`.
 Cleverness removes none of the rest, in either list.
-Most are pieces of type inference:
-an operator runs a method that its operands' types select,
+Most are pieces of type inference.
+An operator runs a method that its operands' types select,
 and a method on a call's result needs the type the call returns.
 A callback needs the Effect variable of [Effect Tracking](A_Effect_Tracking.md#propagate-through-callbacks).
-Appendix A's argument holds: past this point you are writing a type checker.
+Appendix A's argument holds.
+Past this point you are writing a type checker.
 Much of tracking needs no type inference, though.
 Name resolution, a table of the standard library,
 and a fixed point give every function in a program a row.

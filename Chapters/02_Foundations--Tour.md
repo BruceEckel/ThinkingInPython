@@ -67,8 +67,8 @@ assigned inside the `if`, stays visible afterward,
 unlike a variable declared inside braces in C++ or Java.
 New scopes come from functions, classes, modules, and comprehensions,
 not from an `if` or a `for` block.
-Python binds a name only when the assignment runs:
-with any answer other than `"yes"`, the `if` skips `val = 1`,
+Python binds a name only when the assignment runs.
+With any answer other than `"yes"`, the `if` skips `val = 1`,
 and `print(val)` raises a `NameError`.
 
 ```python
@@ -88,7 +88,7 @@ Python skips the body of the `if`, so `val` stays unbound.
 Indentation shows where the assignment sits, not whether it runs.
 The type checker sees that `val = 1` cannot run and reports an error on `print(val)`,
 so `# type: ignore` tells it the mistake is deliberate.
-The `try` and `except` catch the exception so the script can print the exception's message and finish;
+The `try` and `except` catch the exception so the script can print the exception's message and finish.
 [Control Flow](04_Foundations--Control_Flow.md#errors-and-exceptions)
 covers them.
 
@@ -292,8 +292,8 @@ Python reserves one further operator, `@` (with `@=` to match),
 for matrix multiplication.
 The built-in numeric types do not implement it,
 but array libraries such as NumPy do.
-The same character in front of a `def` or a `class` means something else:
-that is [decorator syntax](14_Techniques--Decorators.md).
+The same character in front of a `def` or a `class` means something else.
+That is [decorator syntax](14_Techniques--Decorators.md).
 
 ## Booleans, None, and Truthiness
 
@@ -340,12 +340,12 @@ if not []:
 
 `repr()` returns a value's unambiguous representation,
 so the empty string shows as `''` and not as blank.
-`Bucket` defines no `__bool__()`, so `bool()` falls back to its `__len__()`:
+`Bucket` defines no `__bool__()`, so `bool()` falls back to its `__len__()`.
 `Bucket(0)` is false and `Bucket(3)` is true.
 `Bucket` is a small class, and [Classes](07_Foundations--Classes.md)
 covers the syntax.
 Its `count: int` and `-> int` are type hints.
-They state the types for the reader and the type checker and change nothing about how the code runs;
+They state the types for the reader and the type checker and change nothing about how the code runs.
 [Static Types](08_Foundations--Static_Types.md#type-hints) covers them.
 
 `and` and `or` short-circuit and return one of their operands,
@@ -371,8 +371,8 @@ print(10 if count is None else count)  # Keeps the 0
 `and` stops at its first falsy operand and returns it,
 so Python skips `items[0]` on the empty list.
 `x or default` is a common way to supply a fallback,
-and it replaces every falsy `x`:
-a legitimate `0` or `""` gets the fallback just as a missing value does.
+and it replaces every falsy `x`.
+A legitimate `0` or `""` gets the fallback the same as a missing value does.
 When zero or an empty string is a legal value, test for `None` instead:
 `default if x is None else x`.
 That is a [conditional expression](04_Foundations--Control_Flow.md#conditionals).
@@ -418,13 +418,14 @@ Examples often include Python-esque references.
 
 The triple-quote syntax quotes everything, including newlines.
 That suits any block of literal text, such as an embedded template, a SQL query,
-or a chunk of HTML: you can write it out in full without escaping line breaks.
+or a chunk of HTML.
+You can write it out in full without escaping line breaks.
 
-In an ordinary string, a backslash starts an escape sequence, as in C and Java:
+In an ordinary string, a backslash starts an escape sequence, as in C and Java.
 `\n` is a newline and `\t` is a tab.
 The `r` right before a string means "raw":
 Python takes each backslash literally, as a single character.
-Without the `r`, the last literal in `strings.py` is a syntax error:
+Without the `r`, the last literal in `strings.py` is a syntax error.
 `\u` starts a Unicode escape, and `tils` is not the four hex digits it requires.
 One limit remains.
 A raw string cannot end with a single backslash,
@@ -462,7 +463,7 @@ String methods return new values rather than changing the original.
 but it is a set of characters, not a prefix or suffix.
 `"test_setup".lstrip("test_")` removes every leading `t`, `e`, `s`, and `_`,
 leaving `"up"`.
-To remove one exact piece from an end, use `removeprefix()` or `removesuffix()`:
+To remove one exact piece from an end, use `removeprefix()` or `removesuffix()`.
 `"test_setup".removeprefix("test_")` is `"setup"`,
 and `"notes.txt".removesuffix(".txt")` is `"notes"`.
 
@@ -595,7 +596,7 @@ each either a `str` the author typed or an `Interpolation` carrying a value.
 An `Interpolation` also remembers the source text of the expression that produced it,
 and `piece.expression` reports that text.
 Collecting every `piece.expression` above uses a list comprehension,
-which has the same kind of `for` clause as the generator expression in `arithmetic.py` but builds a list;
+which has the same kind of `for` clause as the generator expression in `arithmetic.py` but builds a list.
 [Comprehensions](16_Techniques--Comprehensions.md#list-comprehensions)
 covers the general form.
 Iteration skips empty literal strings,
@@ -604,13 +605,13 @@ That skipping is why a consumer cannot assume that literals and interpolations a
 `shout()` uppercases the literal text and leaves the interpolated values in their original case.
 No amount of work on a finished f-string could do that reliably,
 because the finished string no longer says which characters came from where.
-`safe()` puts that separation to work:
-it passes the literal text through unchanged,
+`safe()` puts that separation to work.
+It passes the literal text through unchanged,
 and it rejects an interpolated value that contains a single quote,
 the way `trouble` does above.
 An f-string finishes assembling the result, quote and all,
 before any code can object.
-Uppercasing and rejecting are small demonstrations;
+Uppercasing and rejecting are small demonstrations.
 [*Composite* and *Interpreter*](34_Patterns--Composite_and_Interpreter.md#a-template-is-a-tree)
 builds a full query from the parts the same way.
 

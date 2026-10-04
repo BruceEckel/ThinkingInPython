@@ -25,18 +25,19 @@ A feature that looks strange now usually made sense for the problem,
 and the hardware, of its time.
 Consider the origin of OOP.
 
-*Simula* introduced objects in the 1960s to model simulations:
-a system is a set of things that interact.
+*Simula* introduced objects in the 1960s to model simulations.
+In a simulation, a system is a set of things that interact.
 Not everything in Simula was an object.
 The language still had standalone functions.
 It was a compiled, statically typed language,
 so the discipline later named the Liskov Substitution Principle (LSP)
 fit naturally.
 
-*Smalltalk* took the other path: everything is an object,
-and you act on objects only by sending messages, always late-bound.
-Smalltalk was emphatically dynamic:
-you built a program at runtime by finding the closest existing object and inheriting from it to add behavior.
+*Smalltalk* took the other path.
+Everything is an object, and you act on objects only by sending messages,
+always late-bound.
+Smalltalk was emphatically dynamic.
+You built a program at runtime by finding the closest existing object and inheriting from it to add behavior.
 That style guarantees nothing about substitutability.
 
 *C++* drew from Simula.
@@ -132,8 +133,8 @@ No tool catches this, but a test can.
 Two later tests pin down runtime guarantees:
 `test_plugged.py` pins down that a getter's copy holds,
 and `test_immutable.py` pins down that a frozen field refuses assignment.
-The same pattern covers substitutability:
-a test written against `Stack`'s contract, run against `BoundedStack` too,
+The same pattern covers substitutability.
+A test written against `Stack`'s contract, run against `BoundedStack` too,
 catches `fill()` failing on the third item.
 
 Substitutability is one thing OOP promised that no tool can check.
@@ -184,8 +185,8 @@ if __name__ == "__main__":
 ```
 
 Encapsulation with private fields and getters still leaks.
-The `is` check shows the mechanism:
-the getter returns no view or snapshot of the list, but a reference to the list,
+The `is` check shows the mechanism.
+The getter returns no view or snapshot of the list, but a reference to the list,
 the identical object the underscore hides.
 Python's `return` hands out references, not copies.
 The property blocks reassigning `numbers`,
@@ -245,8 +246,8 @@ That sharing is safe here because the elements are immutable `int`s.
 `Bob` gets `deepcopy()`,
 which recursively copies everything the object references,
 the conservative choice when a field's own fields might be mutable.
-A shallow copy of a list of `Bob`s protects the list and not the `Bob`s:
-the caller's copy holds the same `Bob` objects yours does,
+A shallow copy of a list of `Bob`s protects the list and not the `Bob`s.
+The caller's copy holds the same `Bob` objects yours does,
 and can change each one.
 
 A test confirms that the defensive copy holds.
@@ -344,7 +345,8 @@ But nothing stops that list from changing, the identical leak `Leaky` has.
 Hashing goes the same way.
 A frozen data class is hashable only when every field it holds is hashable,
 so `hash(fl)` raises a `TypeError` and a `FrozenLeaky` cannot be a dict key.
-The listing shows all three side by side: `frozen=True` catches the rebinding,
+The listing shows all three side by side.
+`frozen=True` catches the rebinding,
 while the mutation and the failed hash get past it.
 That is why `immutable.py` needs both the `tuple` and the frozen `Bob`.
 Immutability lets you share an object safely and use it as a dict key only when it goes all the way down.
@@ -402,9 +404,9 @@ When you fetch it from the class instead of from an instance,
 and the call passes `p1` as the first argument.
 `p1.distance_to(p2)` is shorthand for that call.
 The dot fills in `self`.
-`distance()` reads the same and computes the same, and it has one advantage:
-it can live outside `Point`.
-The method keeps one advantage of its own:
+`distance()` reads the same and computes the same, and it has one advantage.
+It can live outside `Point`.
+The method keeps one advantage of its own.
 `p1.` shows every operation `Point` supports,
 a discoverability the free function does not offer.
 
@@ -468,7 +470,8 @@ Both have `x` and `y`, and those two attributes are all `distance()` requires.
 `Coord` declares `x` and `y` as properties rather than as bare `x: float` annotations.
 A bare annotation in a protocol is a read-write attribute,
 so an implementer must allow assignment to it.
-Neither class here allows it: `PairCoord` computes `x` from its `Pair`,
+Neither class here allows it.
+`PairCoord` computes `x` from its `Pair`,
 and the frozen `Point` rejects assignment to every field.
 Both satisfy the property form, and both fail the annotation form.
 Declare a protocol member read-only unless callers really do write to it.
@@ -590,8 +593,8 @@ print({c: "value"}[c])
 
 `Contact` inherits nothing, and gains no methods it did not request.
 It holds a `Name` and an `Address`, and those types stay usable on their own.
-The arrangement has a cost:
-changing one city means rebuilding the `Address` and then the `Contact`.
+The arrangement has a cost.
+Changing one city means rebuilding the `Address` and then the `Contact`.
 [The General Form of `replace()`](12_Techniques--Data_Classes_as_Types.md#the-general-form-of-replace)
 makes that rebuild routine.
 The equality check and the dictionary lookup are the payoff.
@@ -806,8 +809,8 @@ A protocol is *structural*, so it works with any type that has matching members,
 including types in libraries you cannot edit.
 The type's author need not hear that your protocol exists.
 That independence is why this chapter emphasizes protocols.
-The independence has a cost:
-nothing in a class's own source names the protocols it satisfies,
+The independence has a cost.
+Nothing in a class's own source names the protocols it satisfies,
 so you cannot grep a codebase for every type that implements one,
 the way you can search for subclasses of a base class.
 Protocols connect pieces without requiring any piece to change.
@@ -827,8 +830,8 @@ Python resolves which version to call with C3 linearization,
 its method resolution order (MRO).
 The choice is deterministic,
 but a deep hierarchy still makes it easy to lose track of which method runs.
-Protocols avoid the question: with no inheritance graph,
-C3 has nothing to linearize.
+Protocols avoid the question.
+With no inheritance graph, C3 has nothing to linearize.
 Satisfying three of them costs nothing more than having the three methods:
 
 ```python

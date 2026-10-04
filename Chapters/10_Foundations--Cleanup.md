@@ -85,8 +85,8 @@ and it can differ from one CPython build to the next.
 Another implementation, such as PyPy with a tracing garbage collector,
 could destroy the objects in a different order, or skip the finalizers at exit.
 
-So `__del__()` is fragile:
-the language specifies neither when it runs nor whether it runs.
+So `__del__()` is fragile.
+The language specifies neither when it runs nor whether it runs.
 At interpreter shutdown,
 the globals a `__del__()` method uses may have vanished.
 The Python documentation warns:
@@ -141,8 +141,9 @@ print("still running")
 
 The release fails, and stdout says nothing about it.
 A traceback goes to `sys.stderr` labeled `Exception ignored`,
-but nothing propagates: no caller can catch the `RuntimeError`,
-the exit status is still `0`, and a test asserting on stdout passes.
+but nothing propagates.
+No caller can catch the `RuntimeError`, the exit status is still `0`,
+and a test asserting on stdout passes.
 A `close()` call in a `with` block fails loudly instead.
 
 ## Reference Cycles Delay Destruction
@@ -181,8 +182,8 @@ print("after collect")
 #: after collect
 ```
 
-CPython frees most objects by counting references:
-when the last reference to an object goes away, the object goes with it.
+CPython frees most objects by counting references.
+When the last reference to an object goes away, the object goes with it.
 A reference cycle defeats that count.
 `self_link()` returns and its local `node` disappears,
 but the object still refers to itself, so its count stays above zero.
@@ -204,8 +205,8 @@ leaving the objects in `gc.garbage`.
 [PEP 442](https://peps.python.org/pep-0442/) removed that restriction,
 so a cycle now costs only the delay.
 
-Cycles are one more reason to keep cleanup out of `__del__()`:
-one back-reference between two objects is enough to postpone `__del__()`,
+Cycles are one more reason to keep cleanup out of `__del__()`.
+One back-reference between two objects is enough to postpone `__del__()`,
 and the code that creates the cycle often lives far from the code that owns the resource.
 
 ## Reliable Alternatives
@@ -269,19 +270,19 @@ the `@contextmanager` shorthand, and what `__exit__`'s arguments mean.
 This chapter shows the shape.
 That chapter explains it.
 
-`close()` also guards against a second call:
-the explicit `sock.close()` after the `with` block prints nothing,
+`close()` also guards against a second call.
+The explicit `sock.close()` after the `with` block prints nothing,
 because `self.closed` blocks the repeat.
-The `with` protocol calls `close()` for you once;
-nothing stops your own code from calling it again,
+The `with` protocol calls `close()` for you once.
+Nothing stops your own code from calling it again,
 so a real `close()` must do nothing on a repeat call,
 the way a file object's `close()` does.
 
 ### An `__init__()` That Fails Leaks the Resource {#raising-init-leaks}
 
 `Socket.__init__()` prints "opened" before `__enter__()` runs.
-That ordering hides a trap:
-if `__init__()` raises an exception after acquiring the resource,
+That ordering hides a trap.
+If `__init__()` raises an exception after acquiring the resource,
 the `with` statement receives no context manager,
 so neither `__enter__()` nor `__exit__()` runs, and the resource leaks silently:
 
@@ -309,11 +310,11 @@ except RuntimeError as e:
 #: caught boom
 ```
 
-`C opened` has no matching `closed`:
-nothing releases what `__init__()` acquired before it failed.
+`C opened` has no matching `closed`.
+Nothing releases what `__init__()` acquired before it failed.
 One fix keeps `__init__()` free of resources and acquires them in `__enter__()`,
 so a failed construction has nothing to leak.
-`__enter__()` has the same exposure, though:
+`__enter__()` has the same exposure, though.
 `__exit__()` runs only after `__enter__()` returns (see exercise 7).
 Whichever method acquires the resource,
 a step that can fail after the acquisition needs its own `try`/`except`,
@@ -355,12 +356,12 @@ print("End of program")
 `finalize()` registers `print(name, "closed")` to run when Python destroys the `Connection`.
 The callback receives `name`, not the `Connection`,
 so registering the cleanup does not keep the object alive.
-`finalize(self, self.close)` looks tidier and defeats that separation:
-the bound method holds a strong reference to the object,
+`finalize(self, self.close)` looks tidier and defeats that separation.
+The bound method holds a strong reference to the object,
 so the object survives until the program ends.
 `close()` runs the callback immediately.
-The second `close()` does nothing: a finalizer runs at most once,
-and `alive` reports whether it still can.
+The second `close()` does nothing.
+A finalizer runs at most once, and `alive` reports whether it still can.
 `b` holds the only reference to its `Connection`,
 so `del b` destroys the object here, where the `del c` in `cleanup.py` does not.
 Nobody calls `close()`, but the callback still runs,
@@ -399,11 +400,12 @@ print(leaky() is None, safe() is None)
 #: False True
 ```
 
-A `ref()` is a weak reference: it watches its object without keeping it alive,
+A `ref()` is a weak reference.
+It watches its object without keeping it alive,
 and it reports `None` once the object disappears.
 So `False True` says the interpreter reclaimed `Safe` and kept `Leaky`.
-`Safe` printed `S closed` at the `ref()` line:
-reference counting reclaimed it there, before `gc.collect()` ran.
+`Safe` printed `S closed` at the `ref()` line.
+Reference counting reclaimed it there, before `gc.collect()` ran.
 `gc.collect()` cannot reclaim `Leaky`,
 because `Leaky` is not part of an unreachable cycle.
 `finalize()` keeps every callback in a registry,
@@ -521,7 +523,7 @@ The weak registry runs none of your code when an object goes away.
 ## The Rule
 
 Never release a resource in `__del__()`.
-The standard library's file and socket types bend that rule as a diagnostic backstop:
+The standard library's file and socket types bend that rule as a diagnostic backstop.
 `io.IOBase` (so every file object)
 and `socket.socket` each carry a `__del__()` that closes the resource and reports a `ResourceWarning`,
 catching a forgotten `close()` rather than replacing it:
@@ -550,10 +552,10 @@ path.unlink()
 Losing the last reference to an open file finalizes it,
 and its `__del__()` closes the file and reports the leak,
 at the same unpredictable moment as any other `__del__()`.
-On CPython `del f` is that moment;
-the `gc.collect()` call covers an implementation that waits for its collector.
-That backstop exists to catch the mistake, not to be the plan:
-it still depends on the collector reclaiming the object,
+On CPython `del f` is that moment.
+The `gc.collect()` call covers an implementation that waits for its collector.
+That backstop exists to catch the mistake, not to be the plan.
+It still depends on the collector reclaiming the object,
 and a reference cycle defers that collection until the cyclic collector runs,
 or forever if `gc.disable()` has stopped it.
 

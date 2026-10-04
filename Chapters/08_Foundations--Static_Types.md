@@ -39,7 +39,8 @@ the tricky data, the code on which other people depend.
 An explicit `Any` indicates that a value is truly dynamic.
 `ty` reports the `Any` that comes from a missing annotation as `Unknown`,
 to distinguish it from an `Any` you wrote yourself.
-They behave the same: both are compatible with everything.
+They behave the same.
+Both are compatible with everything.
 
 `Any` and `object` differ.
 Both accept every value,
@@ -234,7 +235,8 @@ The `if` narrows `b.val` to `str`,
 and nothing in the checker's model connects `reset()` to that narrowing,
 so the checker keeps `b.val` narrowed to `str`.
 The `AttributeError` shows the narrowing was stale by the time `upper()` ran.
-A narrowing on a local variable holds; a narrowing on an attribute can go stale,
+A narrowing on a local variable holds.
+A narrowing on an attribute can go stale,
 so recheck the attribute after any call that might touch the object.
 Copying the attribute into a local variable before the test avoids the recheck,
 because a called function cannot rebind its caller's local variable
@@ -269,8 +271,8 @@ print(MAX_RETRIES, GREETING, HISTORY)
 `HISTORY.append("first")` checks and runs,
 the same as it does on a non-`Final` list.
 The type checker refuses only an assignment to the name `HISTORY`.
-This is the misconception `Final` invites: the word suggests immutability,
-but the object stays mutable.
+This is the misconception `Final` invites.
+The word suggests immutability, but the object stays mutable.
 
 You can give the type explicitly, as in `GREETING`,
 or let the type checker infer it from the value, as with `MAX_RETRIES`.
@@ -336,19 +338,19 @@ print(render(Square()))
 Neither `Circle` nor `Square` mentions `Drawable`.
 The type checker accepts both because each has a `draw()` that takes no arguments and returns a `str`,
 so each matches `Drawable`'s shape.
-The signature is part of that shape: a `draw()` that returns an `int`,
-or that requires an argument, does not match.
+The signature is part of that shape.
+A `draw()` that returns an `int`, or that requires an argument, does not match.
 A `Protocol` is a checking-time construct,
 so `isinstance(Circle(), Drawable)` raises a `TypeError` instead of answering.
 Decorating the Protocol with `@runtime_checkable` allows the call,
-at the cost of a weaker check:
-see [*Surrogate*](26_Patterns--Surrogate.md#what-the-implementation-supplies).
+at the cost of a weaker check.
+See [*Surrogate*](26_Patterns--Surrogate.md#what-the-implementation-supplies).
 
 `Drawable` appears in one place, the annotation on `render()`'s parameter.
 If you pass an object without a `draw()` to `render()`,
 the type checker rejects the call.
-`Blob` is the case worth watching: it draws, in the everyday sense,
-but the method's name is `paint()`,
+`Blob` is the case worth watching.
+It draws, in the everyday sense, but the method's name is `paint()`,
 and a protocol matches on names and signatures rather than on intent.
 Protocols preserve the flexibility of dynamic typing but add the early warning of static type checking.
 
@@ -410,8 +412,8 @@ print(grid)
 #: {(2, 3): 'red'}
 ```
 
-Like `match`, `type` is a [soft keyword](04_Foundations--Control_Flow.md#pattern-matching):
-it is a keyword only at the start of this statement.
+Like `match`, `type` is a [soft keyword](04_Foundations--Control_Flow.md#pattern-matching).
+It is a keyword only at the start of this statement.
 Everywhere else, `type` is still the built-in `type()` function,
 so `type(grid)` in the same file returns `dict` as it always has.
 
@@ -420,7 +422,7 @@ A `type` alias is a new name, not a new type.
 so the type checker accepts any pair of ints as a `Coord`.
 (For a type the type checker keeps separate from its base, use `NewType`, listed under [Aliases and distinct types](#aliases-and-distinct-types).)
 Because an alias creates no new type,
-save it for a compound shape instead of using it to rename a built-in:
+save it for a compound shape instead of using it to rename a built-in.
 `type UserId = int` looks like a new type in a signature while behaving like `int`.
 
 `Color` names a union of literal values instead of a union of types.
@@ -450,7 +452,8 @@ This function works on a list holding any type.
 A useful annotation makes the return type match the list's element type,
 whatever that type is.
 
-`Any` loses that connection: `first_any()` accepts any list,
+`Any` loses that connection.
+`first_any()` accepts any list,
 and the return type then says nothing about what the list holds:
 
 ```python
@@ -512,9 +515,10 @@ print(box.get().upper())
 
 Constructing `Box("gift")` binds `T` to `str` for that instance,
 so `get()` returns a `str` and the call to `upper()` checks.
-A *bound* limits the parameter:
+A *bound* limits the parameter.
 `class Box[T: Shape]` accepts `Shape` and its subclasses.
-A *constraint* lists the choices: with `[T: (int, str)]`, `T` is `int` or `str`.
+A *constraint* lists the choices.
+With `[T: (int, str)]`, `T` is `int` or `str`.
 
 ### Variance {#variance}
 
@@ -588,8 +592,8 @@ print(counts.top() + 1)
 `words: Stack` names the class without its brackets,
 and the default makes that annotation mean `Stack[str]`,
 so `words.top()` is a `str` and `upper()` checks.
-A default matters most for a class whose type parameter is usually the same type:
-callers who want that type omit the brackets, and the annotation stays precise.
+A default matters most for a class whose type parameter is usually the same type.
+Callers who use that type omit the brackets, and the annotation stays precise.
 
 `Queue` is the same class without the default,
 so a bare `Queue` annotation leaves `T` unsolved:
@@ -682,8 +686,8 @@ print(t.bump().bump().report())
 and the result has `report()`.
 If `bump()` declares `-> Tally`, the type checker rejects `report()`,
 because `Tally` has no such method.
-Alternative constructors benefit the same way:
-a `@classmethod` that ends with `return cls(...)` returns `Self`,
+Alternative constructors benefit the same way.
+A `@classmethod` that ends with `return cls(...)` returns `Self`,
 so a call on a subclass produces an instance of that subclass, not of the base.
 
 ## Typing `**kwargs` with a `TypedDict` {#typed-kwargs}
@@ -731,8 +735,8 @@ but `ty` 0.0.84 accepts that call without a diagnostic.
 At runtime `fil` becomes an extra key in `style`, which `label()` ignores,
 so the fill quietly stays a space.
 
-The payoff grows when several functions accept the same options:
-one `TypedDict` declares them once,
+The payoff grows when several functions accept the same options.
+One `TypedDict` declares them once,
 and every signature that unpacks it stays in step.
 
 ## Hints Are Not Enforced at Run Time

@@ -101,8 +101,8 @@ Your own code can read it.
 If you want the interpreter to refuse an override,
 the [`__init_subclass__()` technique](17_Techniques--Metaprogramming.md#making-a-class-final)
 also works with methods.
-`near_miss.py` in the next section includes that check:
-it raises an exception when a subclass replaces a function that carries `__final__`.
+`near_miss.py` in the next section includes that check.
+It raises an exception when a subclass replaces a function that carries `__final__`.
 
 ### Hooks and the Misspelled Override
 
@@ -201,8 +201,8 @@ For each name the subclass defines,
 `getattr(super(cls, cls), name, None)` finds the attribute that the name replaces,
 searching the classes that follow `cls` in its method resolution order.
 If that attribute carries `__final__`,
-`__init_subclass__()` raises a `TypeError`: `class Hijack` fails,
-because a subclass that replaces the anchor moves the algorithm out of the base class,
+`__init_subclass__()` raises a `TypeError`.
+`class Hijack` fails because a subclass that replaces the anchor moves the algorithm out of the base class,
 and `@final` stops that replacement only for the type checker.
 The `__final__` check names no method,
 so a second `@final` method in `ApplicationFramework` gets the same protection with no change to `__init_subclass__()`.
@@ -222,7 +222,8 @@ so the misspelling fails at import time,
 not later when the framework runs and the step silently does nothing.
 Rejecting every new method catches the typo too, but it also forbids `report()`,
 and a framework that bans helper methods in its subclasses is too restrictive.
-The close-match check also rejects legitimate names: `class Weird` fails too,
+The close-match check also rejects legitimate names.
+`class Weird` fails too,
 because `customized_report()` shares enough letters with `customize2` for `get_close_matches()` to flag it,
 although it is not a typo.
 A team that adopts this check should expect to catch typos and also to rename an occasional legitimate method.
@@ -276,11 +277,12 @@ expect(AttributeError, Greeter, "Robin")
 `Greeter("Robin")` fails with an `AttributeError`.
 `super().__init__()` starts the engine, the engine calls `step()`,
 and `step()` reads `self.name` before the constructor assigns it.
-The quick repair is reordering: assign `self.name` first,
-then call `super().__init__()`.
+The quick repair is reordering.
+Assign `self.name` first, then call `super().__init__()`.
 That works, but it inverts the convention Python programmers expect,
 and the next subclass author might restore the usual order without thinking.
-The reliable repair changes the framework: separate construction from starting,
+The reliable repair changes the framework.
+Separate construction from starting,
 and have the client call `run()` explicitly on a fully built object.
 That is why `ApplicationFramework` has no `__init__()` and the client calls `MyApp().run()`.
 
@@ -327,8 +329,8 @@ OnlyOnce().run()
 `run()` calls `customize1()` twice, and `OnlyOnce` prints once.
 The name, the parameters, and the return type all match the base,
 so the type checker accepts `@override` and reports nothing.
-The base states its algorithm in the loop, not in any type:
-each pass calls the step, so each pass must perform it.
+The base states its algorithm in the loop, not in any type.
+Each pass calls the step, so each pass must perform it.
 An unexpected exception, an empty step,
 and a skipped pass each corrupt the anchored algorithm.
 The `...` defaults make a step optional,
@@ -373,11 +375,12 @@ starting from the base class with its empty hooks:
 
 ![](_images/template_method_story)
 
-The loop box stays the same in all three frames;
-only the box beneath it changes.
+The loop box stays the same in all three frames.
+Only the box beneath it changes.
 In the second frame each arrow is a call through `self`,
 so the base calls the subclass's methods.
-In the third the arrows lose `self`: `run_framework()` calls its own parameters,
+In the third the arrows lose `self`.
+`run_framework()` calls its own parameters,
 and the output column shows that the lambdas print the same four lines as `MyApp`.
 
 Both the *Template Method* and the function version have an anchored algorithm and varying steps.
@@ -387,8 +390,8 @@ If each step is independent,
 passing functions is lighter and avoids a class hierarchy.
 The subclass form also gets optional steps without extra work,
 since the base supplies the `...` default.
-The function form must give each parameter a default of its own:
-omitting `customize2` in `template_function.py` raises a `TypeError` instead.
+The function form must give each parameter a default of its own.
+Without one, omitting `customize2` in `template_function.py` raises a `TypeError`.
 A do-nothing default such as `lambda: None` makes a step optional and keeps the loop free of `None` tests.
 
 The function version also needs no `@final`.
