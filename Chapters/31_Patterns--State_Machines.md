@@ -260,9 +260,9 @@ The error waits until `run_all()` calls the missing `next()` and Python raises a
 A base whose methods `raise NotImplementedError` satisfies the checker.
 The call to the missing method then raises that `NotImplementedError` from the base,
 with whatever message you write there.
-[*Surrogate*](26_Patterns--Surrogate.md#proxy) shows one more option:
-make `State` an `ABC` with `@abstractmethod` on both methods,
-and the error moves to the constructor,
+[*Surrogate*](26_Patterns--Surrogate.md#proxy) shows one more option.
+If you make `State` an `ABC` with `@abstractmethod` on both methods,
+the error moves to the constructor,
 which raises a `TypeError` for a subclass that defines `run()` alone.
 The type checker reports that construction too,
 so the `ABC` and the Protocol both report the missing method before the program runs.
@@ -410,8 +410,6 @@ expect(RuntimeError, trap2.run_all, [MouseAction.ESCAPES])
 #: escapes
 ```
 
-The nine moves produce the first version's output, line for line.
-The source differs.
 With many `State` classes to maintain,
 the tables read more easily than the `match` statements.
 
@@ -454,7 +452,7 @@ The table-driven engine in `tabledriven/table_machine.py` raises an exception fo
 The each-state-decides design keeps each state's transitions inside the state class.
 A fully table-driven design represents the entire machine as a single transition table.
 All the behavior is then in one place,
-so you can build and maintain the table directly from a state-transition diagram.
+so you can build and maintain the table from a state-transition diagram.
 The example is a vending machine, built in two steps:
 an engine with no vending-specific code in it, then the machine's table.
 
@@ -487,7 +485,7 @@ so `type(event)` is the same key for all of them.
 This design reuses two names with new meanings.
 `tabledriven/table_machine.py` holds a different `StateMachine` from the one in `state_machine.py`,
 and `State` is now an `Enum` of names rather than a `Protocol` the state classes satisfy.
-The states in this design do nothing.
+The states in this design are bare names.
 The table holds all the behavior.
 
 The name `table_machine.py` differs from the first engine's `state_machine.py` on purpose.
@@ -748,7 +746,7 @@ so the engine takes the `too_expensive` row.
 The machine reports `COLLECTING`, as though more money would sell the item,
 although the slot is empty and no amount of money would.
 If you swap the row order, the same input reports `UNAVAILABLE` instead.
-Both results follow from the ordering rule stated in [The Engine](#the-engine).
+Both results follow from the engine's [ordering rule](#the-engine).
 The first row whose condition passes wins,
 whether or not a lower row matters more.
 
@@ -769,8 +767,7 @@ The engine passes the event to both the condition and the action,
 so `refund()` takes an argument it ignores.
 The `Callable[..., bool]` and `Callable[..., None]` annotations leave the parameters as `...` because each method declares the specific event type it handles,
 and those types differ from row to row.
-That `...` costs a check.
-The type checker accepts any callable in any row,
+With that `...`, the type checker accepts any callable in any row,
 whatever event class the key names.
 If you pair a `SecondDigit` key with a method written for a `FirstDigit`,
 the table type-checks clean and does the wrong thing at runtime.
@@ -855,7 +852,7 @@ Printing there is convenient for a book listing and wrong for a reusable machine
 because it puts the `print()` call in the engine,
 where every user of `run_all()` gets it.
 
-Using `tkinter`, you can build a GUI for the vending machine.
+A `tkinter` GUI is a second view of the same vending machine.
 The GUI reads `amount`, the stock, and `message` and shows them on screen.
 Its coin, refund, and item buttons turn presses into events for `handle()`.
 Because this listing requires user interaction, the harness skips it
