@@ -115,8 +115,8 @@ display_object(x)
 
 The instance carries one attribute, `s`,
 while the two methods belong to the class.
-The constructor `__init__()` is a dunder,
-so `display_object()` hides it by default.
+Because the constructor `__init__()` is a dunder,
+`display_object()` hides it by default.
 
 ## Inheritance
 
@@ -193,7 +193,7 @@ f(Different())
 
 `Derived` inherits from `Simple`.
 In the constructor, `super().__init__()` calls the base-class constructor.
-In `display()`, you can call `show()` as a method of `self`.
+`display()` calls `show()` as a method of `self`.
 When you override a method but still want the base-class version,
 call it through `super()`, as `Derived`'s `show()` does.
 
@@ -259,7 +259,6 @@ The base-class constructor runs because `Derived`'s constructor calls it.
 Unlike C++ and Java, Python never calls a base-class constructor on its own.
 If you remove the `super().__init__(text)` line, nothing creates `self.s`,
 so the first method that reads it raises an `AttributeError`.
-Dropping the call and then calling `show()` produces that error:
 
 ```python
 # missing_super.py
@@ -491,10 +490,9 @@ print(n.total)
 The first access runs the method.
 The second access produces the same result from the stored value.
 The attribute is *lazily initialized*, created on first use,
-so it costs nothing until something reads it.
-The stored value lives in the instance's `__dict__`,
-the dictionary that holds the instance's attributes
-([Class Attributes](09_Foundations--Class_Attributes.md#two-dictionaries-one-lookup) looks inside it).
+so the method runs at the first read rather than when the object is built.
+The stored value lives in the instance's [`__dict__`](09_Foundations--Class_Attributes.md#two-dictionaries-one-lookup),
+the dictionary that holds the instance's attributes.
 An instance of a class that declares `__slots__` has no `__dict__`,
 so `cached_property` has nowhere to store the value,
 and the first access raises a `TypeError`
@@ -614,7 +612,7 @@ The subclass inherits the method unchanged.
 `Reading.from_fahrenheit(212)` proves it.
 `cls` is `Reading` there, not `Temperature`,
 so `type(r).__name__` reports `'Reading'`.
-Naming the class directly, `return Temperature(...)`,
+Naming the class, `return Temperature(...)`,
 hard-codes `Temperature` into every subclass, including `Reading`.
 
 `is_freezing()` also works as a module-level function.

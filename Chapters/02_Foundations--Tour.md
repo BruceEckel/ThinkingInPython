@@ -540,8 +540,6 @@ A consumer that receives the parts separately knows which text came from the pro
 so it can quote, escape,
 or reject the values before they become part of the result.
 
-The parts look like this:
-
 ```python
 # tstrings.py
 from string.templatelib import Interpolation, Template

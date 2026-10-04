@@ -98,7 +98,6 @@ so the code you read here checks as well as runs.
 ## Catching Mistakes
 
 Type checking discovers mistakes before the program runs.
-Consider:
 
 ```python
 # area.py
@@ -343,8 +342,7 @@ A `draw()` that returns an `int`, or that requires an argument, does not match.
 A `Protocol` is a checking-time construct,
 so `isinstance(Circle(), Drawable)` raises a `TypeError` instead of answering.
 Decorating the Protocol with `@runtime_checkable` allows the call,
-at the cost of a weaker check.
-See [*Surrogate*](26_Patterns--Surrogate.md#what-the-implementation-supplies).
+at the cost of a [weaker check](26_Patterns--Surrogate.md#what-the-implementation-supplies).
 
 `Drawable` appears in one place, the annotation on `render()`'s parameter.
 If you pass an object without a `draw()` to `render()`,
@@ -420,7 +418,7 @@ so `type(grid)` in the same file returns `dict` as it always has.
 A `type` alias is a new name, not a new type.
 `Coord` and `tuple[int, int]` are interchangeable,
 so the type checker accepts any pair of ints as a `Coord`.
-(For a type the type checker keeps separate from its base, use `NewType`, listed under [Aliases and distinct types](#aliases-and-distinct-types).)
+(For a type the type checker keeps separate from its base, use [`NewType`](#aliases-and-distinct-types).)
 Because an alias creates no new type,
 save it for a compound shape instead of using it to rename a built-in.
 `type UserId = int` looks like a new type in a signature while behaving like `int`.

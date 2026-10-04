@@ -33,7 +33,7 @@ To call `useful_function()`, you must *qualify* it with the name of the module:
 `module.useful_function()`.
 
 The code at the end of `use_module.py` starts with an `if` clause that checks whether the standard variable `__name__` equals the string `"__main__"`.
-In Python, any identifier that begins and ends with double underscores
+Any identifier that begins and ends with double underscores
 (commonly called a "dunder") is special in some way.
 Dunder methods, for example,
 connect your class to the language's operators and built-in functions.
@@ -42,7 +42,7 @@ shows how `print()` and `str()` reach a class's `__str__()`.
 
 The `if` exists because you can also use any file as a library module within another program.
 In that case, you want its definitions and none of the code at the bottom of the file.
-The condition is true only when you run this file directly.
+The condition is true only when you run this file as a script.
 That is, `__name__` is `"__main__"` when you use the command line:
 
 ```
@@ -154,7 +154,7 @@ the same dict Python searches when it looks up a top-level name.
 A dotted name reads that same dict.
 `module.__dict__` from outside is the same object `globals()` returns inside `module`,
 so `module.useful_function()` and a top-level lookup inside `module.py` find the same function.
-Assigning into that dict works like writing the assignment directly:
+Assigning into that dict works like writing the assignment as a statement:
 
 ```python
 # globals_demo.py
@@ -247,7 +247,7 @@ so `a_package.module1.function1()` resolves.
 The shorter `module1.function1()` fails here,
 since nothing binds `module1` in this file.
 `module1.function1()` works in `from_packages.py`, below,
-where `from` binds `module1` directly.
+where `from` binds `module1` in that file.
 
 Importing the package alone does not import what is inside it:
 
@@ -491,8 +491,7 @@ This book uses `test_*.py`, e.g. `test_result.py`.
 Don't shadow standard-library modules.
 A file named `random.py`, `string.py`,
 or `weakref.py` can hide the stdlib one and break imports,
-because Python searches the script's directory before the standard library
-(see [`PYTHONPATH`](#pythonpath) below).
+because Python [searches the script's directory before the standard library](#pythonpath).
 Give a shared module a distinctive name for the same reason.
 The first `config.py` imported anywhere in the process is the one every later `import config` gets.
 

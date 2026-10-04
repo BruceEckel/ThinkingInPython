@@ -13,7 +13,7 @@ Lists, tuples, dictionaries, and sets are fundamental data types.
 ## Lists
 
 A `list` holds objects, of any kind, in an ordered, mutable sequence.
-The `for` statement iterates through a list directly rather than counting through a sequence of numbers:
+The `for` statement iterates through the elements of a list rather than counting through a sequence of numbers:
 
 ```python
 # list.py
@@ -523,8 +523,8 @@ Repeated lookups run faster against a `set` than against a `list`.
 A `list` compares the item you look for against every element in turn.
 A `set` computes one hash and looks in one place.
 `timeit()` runs a callable `number` times and returns the total elapsed seconds.
-The `lambda:` prefix wraps an expression into the callable `timeit()` needs
-([Functions](05_Foundations--Functions.md#lambdas) covers `lambda` fully):
+The [`lambda:`](05_Foundations--Functions.md#lambdas)
+prefix wraps an expression into the callable `timeit()` needs:
 
 ```python
 # membership_cost.py
@@ -693,7 +693,6 @@ print(lst)
 A `list` can stand in for a `deque`,
 but `insert(0, x)` and `pop(0)` must shift every remaining element,
 so both are O(n) instead of O(1).
-Timing a `list` and a `deque` at the left end shows the difference:
 
 ```python
 # deque_timing.py

@@ -21,8 +21,6 @@ A Python class attribute corresponds to a C++ or Java `static` field.
 No syntax in a Python class body allocates a per-object field.
 Assigning through `self` inside a method creates that storage instead.
 
-The next listing shows the confusion:
-
 ```python
 # class_attribute_confusion.py
 
@@ -76,9 +74,8 @@ The instance dictionary is a plain `dict` holding what the code assigned,
 and that alone.
 
 That instance dictionary is not guaranteed.
-A class that declares `__slots__`, or a data class built with `slots=True`
-([Performance](18_Techniques--Performance.md#slots) shows the trade-off),
-has no instance `__dict__`.
+A class that declares [`__slots__`](18_Techniques--Performance.md#slots),
+or a data class built with `slots=True`, has no instance `__dict__`.
 An instance of such a class cannot shadow a class attribute.
 Assigning to that name on the instance raises an `AttributeError`,
 because the instance has no dictionary to hold the new attribute.
@@ -165,12 +162,11 @@ The mutation creates no instance attribute, so `b` sees the apple too.
 The next line does assign,
 and that assignment creates `a.items` on the instance and shadows the class list,
 leaving `b` still reading the shared one.
-Shadowing starts with an assignment, and `.append()` makes none,
-so a read followed by a mutation slips past the rule.
+Because shadowing starts with an assignment and `.append()` makes none,
+a read followed by a mutation slips past the rule.
 A type checker accepts the line too.
 `a.items.append("apple")` is a correct call on a `list[str]`.
-[Real Per-Object Defaults](#real-per-object-defaults),
-at the end of this chapter, gives each object its own value instead.
+
 A mutable default belongs in a `@dataclass` field with a [`default_factory`](12_Techniques--Data_Classes_as_Types.md#defaults-built-not-shared).
 
 ## Declaring Shared State with ClassVar
@@ -357,9 +353,8 @@ It records that `total` belongs to the class,
 and turns the accidental shadowing from `class_attribute_confusion.py` into a check-time error.
 Python's own attribute lookup ignores the hint.
 `@dataclass` does read it at runtime.
-It leaves a `ClassVar` field out of the constructor it generates,
-as [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#d-a-real-classvar)
-shows.
+It [leaves a `ClassVar` field out](12_Techniques--Data_Classes_as_Types.md#d-a-real-classvar)
+of the constructor it generates.
 
 At runtime an assignment does the same thing with or without `ClassVar`:
 
@@ -384,7 +379,7 @@ The write creates a fresh `total` on the instance.
 Every `Tally` counts itself once and the shared counter stays at `0`.
 The write through `self` is why `class_var.py` increments through the class name,
 `Tally.total += 1`.
-`ClassVar` does save you here, at check time.
+`ClassVar` does catch this mistake, at check time.
 `ty` rejects the augmented form as it rejects a direct `self.total = 5`,
 reporting "Cannot assign to ClassVar `total` from an instance of type `Tally`" for a write like `a.total = 99`,
 and naming the type of `self` where the write sits inside `__init__()`.
@@ -396,9 +391,9 @@ and a constant that all instances read but none change are all class attributes,
 and each reads better when you declare the sharing.
 `Tally.total` is the first of these.
 For the third, a class-level constant,
-`Final[int]` from [Static Types](08_Foundations--Static_Types.md#constants-with-final)
+[`Final[int]`](08_Foundations--Static_Types.md#constants-with-final)
 says more than `ClassVar[int]`.
-It declares the value both shared and not reassignable.
+`Final[int]` declares the value both shared and not reassignable.
 Use `ClassVar` when you intend the shared value to change,
 as `Tally.total` does.
 The bug is not the class attribute.
@@ -438,7 +433,7 @@ print(Base.shared, Left.shared, Right.shared)
 ```
 
 `Left` has no `shared` of its own,
-so it tracks `Base.shared` until something assigns to `Left.shared` directly.
+so it tracks `Base.shared` until something assigns to `Left.shared`.
 `Right` overrides `shared` at class-definition time,
 so it keeps `100` when `Base.shared` changes.
 `ClassVar` leaves all of that alone.
@@ -448,7 +443,7 @@ Attribute lookup on a subclass is the shadowing rule from `class_attribute_confu
 one level up.
 `Left` reads through to `Base` until an assignment gives `Left` its own copy,
 the way `a` reads through to `Stars` until `a.rating = 1`.
-A subclass stands to its base class as an instance stands to its class.
+
 `Right` writes `shared = 100` without repeating the annotation.
 Under `ty`, that bare override loses the guard against instance assignment.
 `ty` rejects `Left().shared = 5` and accepts `Right().shared = 5`.
@@ -460,7 +455,7 @@ Restating `ClassVar[int]` on an override keeps the check under either checker.
 The mistake in `counter_near_miss.py` has a subclass form.
 `class_var.py` increments `Tally.total` through the literal class name.
 Writing that same increment through `type(self)`,
-a common idiom for reaching "my own class" from a method,
+a common idiom for naming the instance's class from a method,
 forks the counter once the base class has subclasses,
 the same way `Right` forks `shared`:
 
@@ -536,7 +531,7 @@ In `inside_objects.py` the `100` lives on the class and every instance reads it.
 In `real_defaults.py` it is a default argument,
 and `self.x = x` runs on every construction,
 giving each object its own storage before anything can read it.
-The difference is not the value but where you write it.
+
 Python still builds the [default value](05_Foundations--Functions.md#the-mutable-default-trap)
 once, at definition time,
 so a mutable default argument brings the sharing straight back.

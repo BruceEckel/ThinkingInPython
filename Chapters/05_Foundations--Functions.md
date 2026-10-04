@@ -30,8 +30,8 @@ print(a_function("yes"))
 `response` is a *parameter*, the name the function gives to what it receives.
 The value a call passes, `"no"` or `"yes"`, is an *argument*.
 
-A string literal directly under `def`, before any other statement,
-becomes the function's *docstring*, stored on `__doc__`:
+A string literal that is the first statement under `def` becomes the function's *docstring*,
+stored on `__doc__`:
 
 ```python
 # documented_function.py
@@ -52,8 +52,7 @@ not for the interpreter, which stores the text without acting on it.
 reads it back with `inspect.getdoc()`.
 
 The signatures so far give only the function name and the parameter names,
-with no argument types or return types
-([Static Types](08_Foundations--Static_Types.md#type-hints) covers these).
+with no [argument types or return types](08_Foundations--Static_Types.md#type-hints).
 Python is dynamically typed,
 so type errors surface at runtime rather than at compile time:
 

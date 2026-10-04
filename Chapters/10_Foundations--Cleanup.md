@@ -64,7 +64,7 @@ That list holds the only remaining references, so when it goes,
 the objects it holds go with it.
 The listing ends at `End of delete loop`, the program's last statement,
 and each `__del__()` prints afterward.
-If you run `cleanup.py` directly,
+If you run `cleanup.py` as a standalone program,
 three more pairs of lines follow `End of delete loop`:
 
     Third deleted
@@ -144,7 +144,7 @@ A traceback goes to `sys.stderr` labeled `Exception ignored`,
 but nothing propagates.
 No caller can catch the `RuntimeError`, the exit status is still `0`,
 and a test asserting on stdout passes.
-A `close()` call in a `with` block fails loudly instead.
+In a `with` block, an exception from `close()` propagates to the caller instead.
 
 ## Reference Cycles Delay Destruction
 
@@ -216,9 +216,8 @@ Two approaches are more reliable:
 ### An Explicit `close()` and a `with` Block
 
 The first is an explicit cleanup method,
-such as the `close()` that file objects provide, which a `with` block calls.
-[Control Flow](04_Foundations--Control_Flow.md#context-managers)
-uses `with` on a file.
+such as the `close()` that file objects provide,
+which a [`with` block](04_Foundations--Control_Flow.md#context-managers) calls.
 Here a class supplies the two methods that `with` calls,
 and `close()` runs whether or not an error interrupts the block:
 
@@ -267,8 +266,6 @@ Compare `cleanup.py`,
 where the cleanup runs at an unknowable moment after the program's last statement.
 [Context Managers](15_Techniques--Context_Managers.md) covers the protocol,
 the `@contextmanager` shorthand, and what `__exit__`'s arguments mean.
-This chapter shows the shape.
-That chapter explains it.
 
 `close()` also guards against a second call.
 The explicit `sock.close()` after the `with` block prints nothing,
@@ -421,9 +418,9 @@ so its output ends at `False True`.
 
 `finalize()` needs a target that supports weak references,
 and so does the `WeakValueDictionary` in the next section.
-A class that declares `__slots__` lists its instance attributes ahead of time,
-and its instances store those attributes without a per-instance `__dict__`
-([Performance](18_Techniques--Performance.md#slots) introduces `__slots__`).
+A class that declares [`__slots__`](18_Techniques--Performance.md#slots)
+lists its instance attributes ahead of time,
+and its instances store those attributes without a per-instance `__dict__`.
 A class with `__slots__` that omits `__weakref__` cannot be weakly referenced:
 
 ```python
@@ -491,11 +488,10 @@ print(Counter.live_count())
 
 A `WeakSet` would do for counting alone.
 You need the dictionary as soon as you look instances up rather than count them,
-and [*Flyweight*](35_Patterns--Flyweight.md)
-looks its shared objects up in a pool keyed by the values that define them.
+as [*Flyweight*](35_Patterns--Flyweight.md) does.
 `id(self)` is the key here because the registry needs one entry per object,
 not per name.
-Keyed by name, two counters that share a name collide,
+Keyed by name, two `Counter` objects that share a name collide,
 and the second displaces the first.
 Reused `id()` values are harmless,
 since the dictionary holds only live objects and no two live objects share an id.
@@ -504,7 +500,7 @@ so it reports how many `Counter` objects currently exist.
 When an instance loses its last ordinary reference,
 in this case when `pop()` or `clear()` removes it from the `counters` list,
 the interpreter collects it at once,
-and the dictionary drops its entry on its own.
+and the dictionary drops that instance's entry on its own.
 The count falls `3, 2, 1, 0` as the list releases the objects,
 with no `__del__()` and no explicit cleanup call.
 

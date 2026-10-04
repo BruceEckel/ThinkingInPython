@@ -71,8 +71,8 @@ print(not_implemented(), not_implemented_yet())
 `pass` marks an indented block with nothing in it yet.
 `...` is the conventional body for a stub whose implementation lives elsewhere.
 You normally write it on the same line as the signature it stubs,
-as in a `Protocol` method
-([Static Types](08_Foundations--Static_Types.md#structural-typing-with-protocols) uses that form).
+as in a [`Protocol`](08_Foundations--Static_Types.md#structural-typing-with-protocols)
+method.
 
 ## Loops
 
@@ -216,7 +216,7 @@ and a function with more work to do after the search.
 
 ### `range()`, `enumerate()`, and `zip()`
 
-`for` walks any iterable directly.
+`for` walks the items of any iterable.
 A list, a set, a dictionary, or a string needs no index.
 Use `range()` for counting and `enumerate()` when you also need the index:
 
@@ -316,9 +316,8 @@ shows a `list` skipping items as the loop removes them,
 and a `dict` raising a `RuntimeError` under the same treatment.
 Lists and dictionaries are the two containers you are most likely to mutate this way,
 and each one fails differently.
-A list comprehension, covered in [Comprehensions](#comprehensions)
-later in this chapter,
-fixes the list case by building the filtered list directly instead of mutating in place:
+A [list comprehension](#comprehensions) fixes the list case by building a new,
+filtered list instead of mutating the original in place:
 
 ```python
 # mutating_while_looping.py
