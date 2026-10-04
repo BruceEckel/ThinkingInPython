@@ -423,7 +423,7 @@ object safe.
 
 [Intrinsic and Extrinsic State](../../Chapters/35_Patterns--Flyweight.md#intrinsic-and-extrinsic-state) separates what a piece is (color and kind) from where it stands.
 Share the first through a `@cache` factory keyed on color and kind, and keep the second as the `dict` key.
-A capture or a promotion then changes only which shared `Piece` occupies a square.
+A capture or a promotion then puts a different shared `Piece` on a square and leaves every `Piece` object unchanged.
 
 <details>
 <summary>The shape</summary>
@@ -549,7 +549,7 @@ print(queen.color, queen.kind)
 #: Color.WHITE Kind.QUEEN
 ```
 
-**Share one piece per color and kind.** `starting_position()` fills thirty-two squares with only twelve
+**Share one piece per color and kind.** `starting_position()` fills thirty-two squares with twelve
 distinct `Piece` objects: two colors times six kinds. Every white pawn
 is the same object, and every other color-and-kind combination
 collapses the same way. The board is a `dict` mapping squares to

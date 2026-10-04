@@ -126,7 +126,8 @@ print(person.hello())
 
 `Prozac` needs nothing beyond `Happy` and `Grumpy`'s own shape: one
 `hello()` method. `UnpredictablePerson` names no specific mood, so a
-third mood changes only which `Mood` object `change_to()` installs.
+third mood changes the `Mood` object that `change_to()` installs, and
+no code in `UnpredictablePerson`.
 `UnpredictablePerson` is the *State* surrogate from [*Surrogate*](../../Chapters/26_Patterns--Surrogate.md#state),
 applied to a new domain.
 

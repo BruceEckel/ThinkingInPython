@@ -435,7 +435,7 @@ passing it to `Drawing`.
 [A Snapshot Is Not a Reference](../../Chapters/36_Patterns--Memento.md#a-snapshot-is-not-a-reference) shows an `append()` through one name appearing through the other when two names share one list.
 Change `Memento` and `restore()` so the sketch and the memento hold the same list object.
 Run the existing tests with `pytest` and read the order of the failures.
-Then write a test that draws after `save()` and compares the memento's contents as a list, so only sharing can fail it.
+Then write a test that draws after `save()` and compares the memento's contents as a list, so the test can fail for one reason: the shared list.
 
 <details>
 <summary>Solution</summary>

@@ -72,7 +72,8 @@ print(vars(A)["x"])
 
 The listing subscripts `vars(A)` instead of printing it whole,
 because a class's dictionary is a read-only `mappingproxy` that carries the compiler's own bookkeeping alongside `x`.
-The instance dictionary is a plain `dict` holding only what the code assigned.
+The instance dictionary is a plain `dict` holding what the code assigned,
+with none of that bookkeeping.
 
 That instance dictionary is not guaranteed.
 A class that declares `__slots__`, or a data class built with `slots=True`

@@ -51,7 +51,7 @@ python use_module.py
 
 However, if another program imports `use_module.py` as a module,
 `__name__` is `"use_module"` instead, so the `"__main__"` block does not run.
-The next program only imports `use_module`:
+The next program consists of one statement, `import use_module`:
 
 ```python
 # import_module.py
@@ -301,7 +301,8 @@ print(function2())
 and `using_packages.py` print the same loading messages,
 because `from` loads what `import` loads.
 The whole module runs either way.
-The statement decides only which names this file binds.
+The statement decides which names this file binds,
+not how much of the module runs.
 
 ### Nested Packages
 
@@ -377,7 +378,7 @@ Two modules in a package can end up importing each other.
 Python places the first one to load in `sys.modules` before its body finishes,
 so a `from` import in the second finds a partially initialized module and fails with `ImportError: cannot import name ... (most likely due to a circular import)`.
 A plain `import` of that same module succeeds at this point,
-since it only needs the module to exist in `sys.modules`,
+since it needs the module to exist in `sys.modules`,
 not to have finished running.
 The failure then surfaces later, as an `AttributeError`,
 wherever the second module first uses a name the first module has not defined yet.
@@ -637,8 +638,7 @@ print("noisy" in sys.lazy_modules)
 This script marks one import lazy and the set holds more than one name,
 so `sys.lazy_modules` is not a clean "what my program deferred" list.
 `noisy` leaves the set once `noisy.announce()` loads it,
-so the set tracks only names still waiting,
-not names your program ever deferred.
+so the set tracks names still waiting, not names your program ever deferred.
 Check it for a specific name you marked lazy, rather than reading the whole set.
 
 ### Limits of `lazy`
@@ -676,7 +676,8 @@ give a hint, usually the shape of the code, and a full answer for each exercise.
     Import it three ways, using `import a_package.module5`,
     `from a_package import module5`,
     and `from a_package.module5 import function5`,
-    and confirm the loading message prints only once however many of the three you use together.
+    and confirm the loading message prints once,
+    however many of the three you use together.
 2.  Add `a_package/b_package/module6.py` with a `function6()` that calls `function5()` from `module5`.
     Import and call `function6()` from a script outside `a_package`,
     then rename `b_package` to `bPackage` (and rename it back afterward)

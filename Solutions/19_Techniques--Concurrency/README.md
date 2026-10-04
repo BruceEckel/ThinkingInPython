@@ -582,7 +582,7 @@ platform's default therefore requires the guard.
 
 [The GIL Does Not Prevent Races](../../Chapters/19_Techniques--Concurrency.md#the-gil-does-not-prevent-races) explains where the interpreter may switch threads.
 Without the call, check whether any switch point remains between the read and the write of the shared value.
-Then ask whether a missing switch point makes the read-modify-write sequence atomic, or only hides the gap.
+Then ask whether a missing switch point makes the read-modify-write sequence atomic, or hides the gap.
 
 <details>
 <summary>The shape</summary>
@@ -1357,9 +1357,9 @@ The deadlock version makes the waiting circular: task one holds
 `lock_a` and waits for `lock_b`, task two holds `lock_b` and
 waits for `lock_a`, so each task's progress depends on the other task's
 progress. A deadlock is that cycle. Acquiring the
-locks in one global order makes such a cycle impossible. A task can only
-wait on a lock that comes later in the order than every lock it
-holds, and "later" never loops back to "earlier."
+locks in one global order makes such a cycle impossible. Every lock a
+task waits for comes later in the order than every lock it holds,
+and "later" never loops back to "earlier."
 
 </details>
 </details>

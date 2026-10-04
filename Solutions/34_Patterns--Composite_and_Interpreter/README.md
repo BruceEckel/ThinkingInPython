@@ -44,7 +44,7 @@ def find(entry: Node, name: str,
 
 If you copy `walk()` and add a name test to the `File` case alone,
 `find(root, "main.py")` still works, but `find(root, "src")` returns an empty list.
-A `Directory` case that only descends never yields its own path.
+A `Directory` case that descends without a name test omits its own path.
 The exercise says a directory can match,
 so the solution's `Directory` case tests its own name before it descends.
 
@@ -654,7 +654,7 @@ print(to_infix((x + 1) * (x + 2)))
 ```
 
 **Parenthesize by context.** Each recursive call passes down the precedence its *parent* requires.
-A child only gets parentheses when its own operator binds more
+A child gets parentheses only when its own operator binds more
 loosely than what the parent needs. `Mul`'s children therefore need
 parens around a lower-precedence `Add`, while `Add`'s children need
 no parens around another `Add`.

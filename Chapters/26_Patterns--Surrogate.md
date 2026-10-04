@@ -453,7 +453,8 @@ so `p.f()` runs and `hasattr(p, "f")` is `True`.
 Both `isinstance()` checks return `False`.
 
 Code that calls the method, or checks with `hasattr()`, works on a surrogate,
-as long as `__getattr__()` raises only `AttributeError` for a name it does not have.
+as long as `__getattr__()` raises an `AttributeError`, and no other exception,
+for a name it does not have.
 The [protection proxy](#protection-proxy) below raises a different exception,
 and its section shows what `hasattr()` does with it.
 
@@ -580,7 +581,7 @@ The protection is a convention, like the underscore on `_doc`:
 A protection proxy guards against mistakes,
 not against a caller who goes around it.
 
-`hasattr()` catches only `AttributeError`.
+`hasattr()` catches `AttributeError` and lets every other exception propagate.
 `guest.__getattr__()` raises `PermissionError` instead,
 so `hasattr(guest, "erase")` raises `PermissionError` too,
 where a missing name returns `False`.

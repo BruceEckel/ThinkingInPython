@@ -513,7 +513,7 @@ print(box.get().upper())
 Constructing `Box("gift")` binds `T` to `str` for that instance,
 so `get()` returns a `str` and the call to `upper()` checks.
 A *bound* limits the parameter:
-`class Box[T: Shape]` accepts only `Shape` and its subclasses.
+`class Box[T: Shape]` accepts `Shape` and its subclasses.
 A *constraint* lists the choices: with `[T: (int, str)]`, `T` is `int` or `str`.
 
 ### Variance {#variance}
@@ -553,7 +553,7 @@ If you pass `circles`,
 The type checker refuses the call to prevent that.
 A read-only container has no such problem,
 so `Sequence[Shape]` accepts a `list[Circle]`.
-Annotating a parameter `Sequence[T]` instead of `list[T]` declares that the function only reads,
+Annotating a parameter `Sequence[T]` instead of `list[T]` declares that the function reads its argument without modifying it,
 so the function accepts arguments that a `list[T]` parameter rejects.
 A `list[T]` is *invariant* in `T`, and a `Sequence[T]` is *covariant*.
 

@@ -69,7 +69,7 @@ cover every position instead, including targets near the front that a
 this run), because the scan for an average target still walks about
 half the `list`, far more work than one hash lookup. The worst case
 and the average case tell the same story here.
-They only diverge if most real lookups cluster near
+They diverge when most real lookups cluster near
 the front of the list.
 
 </details>
@@ -261,7 +261,7 @@ print(noisy(3))
 #: 9
 ```
 
-The `"computing noisy(3)"` message prints only once, on the first
+The `"computing noisy(3)"` message prints once, on the first
 call. Every later call with the same argument returns the cached
 result directly, without running the function body again, so the
 `print()` call (and any other side effect) does not run a second

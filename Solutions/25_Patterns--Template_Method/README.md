@@ -18,7 +18,7 @@
 
 [Passing the Steps as Functions](../../Chapters/25_Patterns--Template_Method.md#passing-the-steps-as-functions) shows the same algorithm anchored in a function that takes the varying step as an argument.
 The subclass form is in [The Anchored Algorithm](../../Chapters/25_Patterns--Template_Method.md#the-anchored-algorithm).
-Put the fixed loop (read each input, apply the step, write the output) in one `run()` and one function, and leave only `process()` open.
+Put the fixed loop (read each input, apply the step, write the output) in one `run()` and one function, and leave `process()` as the one open step.
 The search policy needs the word list, so store it on the subclass and close over it in the function form.
 
 <details>

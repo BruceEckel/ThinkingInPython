@@ -315,7 +315,8 @@ If you forget to fill a state's table,
 the machine reports `Waiting has no transition for ...` rather than the `AttributeError` a missing `transitions` attribute would produce.
 
 `next()` raises its `RuntimeError` `from None`,
-because the chained `KeyError` would only repeat the event the message names.
+because the chained `KeyError` would add nothing:
+its key is the event the message names.
 
 The subclasses shrink to their `run()` behavior.
 The transitions live in the tables filled in at the bottom of the file:

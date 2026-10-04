@@ -90,7 +90,7 @@ annotation the chapter explains. `Flower` also loses `pollinate()` and
 `Chrysanthemum`'s `eat()` override becomes a registration. Two
 functions and one registration remain.
 
-**Dispatch where the flower type matters.** Only `eat()` is a `singledispatch` function, because only `eat()`
+**Dispatch where the flower type matters.** Only `eat()` is a `singledispatch` function, because `eat()`
 answers differently for one flower type. `pollinate()` does the same
 thing for every flower, so it stays an ordinary function.
 

@@ -337,10 +337,9 @@ one dict. Mutating through either name, as the original
 `settings["theme"] = "dark"` does, changes the object both names
 reference, so both see the change.
 
-**Rebind only the local name.** Assigning to `settings` changes
-only which object this module's name references. The name in
-`config` still points at the original empty dict, so the
-second print shows `{}`.
+**Rebind only the local name.** Assigning to `settings` points
+this module's name at a new dict. The name in `config` still
+points at the original empty dict, so the second print shows `{}`.
 
 Nothing warns you at runtime. The module still imports, the
 assignment succeeds, and the local `settings` holds what you put in

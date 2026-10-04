@@ -348,7 +348,8 @@ print(copy.replace(Stars(5), number=99))
 **Validate in a subclass.**
 `typing.NamedTuple` refuses a `__new__()` in its own class body but
 accepts one in a subclass, so `Stars(11)` now raises a `TypeFailure`.
-The chapter's factory function can only advise against that call.
+The chapter's factory function cannot stop that call, since a caller
+can construct `Stars` directly.
 
 **Test the replacement path.** The guarantee still leaks. `_replace()` builds the new tuple through
 `tuple.__new__()` rather than through `cls.__new__()`, so it skips
@@ -713,8 +714,8 @@ expect(Exception, Wrong, 1)
 **Keep the counter out of the fields.**
 `@dataclass` reads the annotation, sees `ClassVar`, and leaves `built`
 alone as an ordinary class attribute, so `built` stays out of
-`__init__()`. `dataclasses.fields()` reports only `number`, and the
-generated signature takes only `number`.
+`__init__()`. `number` is the one field that `dataclasses.fields()`
+reports and the one parameter that the generated signature takes.
 
 **Count on the class.**
 `frozen=True` installs a `__setattr__()` that rejects assignment to

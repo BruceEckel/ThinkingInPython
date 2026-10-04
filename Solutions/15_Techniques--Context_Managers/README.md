@@ -351,7 +351,7 @@ holds.
 
 ## 6. `ignore_missing`, which suppresses only `KeyError`
 
-> Write a context manager `ignore_missing` whose `__exit__()` suppresses only `KeyError` and lets everything else through,
+> Write a context manager `ignore_missing` whose `__exit__()` suppresses `KeyError` and lets everything else through,
 > without using `contextlib.suppress`.
 > Test it with a block that raises a `KeyError` and a block that raises a `ValueError`.
 

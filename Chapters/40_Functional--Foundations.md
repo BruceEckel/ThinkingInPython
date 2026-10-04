@@ -182,7 +182,7 @@ kept private to one function, is still the right choice.
 Type annotations can state immutability so a type checker enforces it.
 `typing.Final` marks a name bound once, at its declaration.
 The read-only collection types in `collections.abc`,
-such as `Sequence` and `Mapping`, describe a value you only read.
+such as `Sequence` and `Mapping`, describe a value you can read but not change.
 They have no `append()` or item assignment,
 so a type checker rejects any attempt to mutate through them:
 
@@ -206,8 +206,8 @@ Each annotation is a constraint the type checker enforces,
 and `Sequence[int]` holds even when the caller passes a mutable `list`.
 The type checker rejects `MAX_SIZE = 200` written later in the module,
 and rejects `values.append(4)` inside `total()`.
-The `Sequence[int]` constraint covers only `total()`'s side.
-It declares that `total()` only reads its argument.
+The `Sequence[int]` constraint governs `total()`, not the caller.
+It declares that `total()` reads its argument without changing it.
 The caller keeps its `list` and can append to it at any time,
 including from another thread while `total()` is running.
 `Final` freezes the binding, and only the binding:
@@ -507,7 +507,7 @@ Each call to `make_counter()` builds an independent counter with its own `count`
 
 `increment()` is impure on purpose, to contrast with `withdraw()`.
 `withdraw()` mutates a module-level name that any code can assign.
-`increment()` mutates a name that only it can assign.
+`increment()` mutates a name that no other code can assign.
 When state must exist,
 a closure is one way to let exactly one function change it.
 
@@ -705,8 +705,8 @@ print(data[0])
 ```
 
 Five of the chapter's ideas work at once: a record for the value,
-`Sequence` to state that `report()` only reads, two pure functions,
-`partial()` to turn a two-argument predicate into the one-argument callable `filter()` requires,
+`Sequence` to state that `report()` leaves its input unchanged,
+two pure functions, `partial()` to turn a two-argument predicate into the one-argument callable `filter()` requires,
 and `map()` and `filter()` for the traversal.
 The second `print()` shows what the discipline gives you.
 The input list stays unchanged, so you can recompute the whole report, cache it,
@@ -732,8 +732,10 @@ give a hint, usually the shape of the code, and a full answer for each exercise.
     and build `increment_then_double_then_square = compose(square, increment_then_double)`.
     Predict `increment_then_double_then_square(3)` before running it.
 5.  In `placeholder.py`, build a second partial, `at_least_ten`,
-    that presets only `low` to 10 and leaves both other arguments to the caller.
-    Then try to preset only `high` without a `Placeholder` and explain why that is impossible.
+    that presets `low` to 10 and leaves both other arguments to the caller.
+    Then try, without a `Placeholder`,
+    to preset `high` and leave `low` and `value` open,
+    and explain why that is impossible.
 6.  In `immutable_types.py`,
     add `CONFIG: Final[list[int]] = [1, 2]` and a line that appends to it.
     Run `ty`, which reports nothing.

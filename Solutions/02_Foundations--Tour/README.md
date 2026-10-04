@@ -3,7 +3,7 @@
 ## 1. Aliasing vs. slicing
 
 > In `references.py`, add a line after `c = a[:]` that appends `99` to `c`.
-> Print `a` and `c` and confirm only `c` changed,
+> Print `a` and `c` and confirm that `c` changed and `a` did not,
 > then explain why `b.append(4)` earlier did change what `a` sees,
 > but appending to `c` does not.
 
@@ -30,7 +30,8 @@ print(a, c)
 
 `b.append(4)` changes `a` too, because `b` and `a` name the same list
 object. `c = a[:]` makes a new list with the same elements, so
-`c.append(99)` only changes `c`. Slicing copies. Assignment does not.
+`c.append(99)` changes `c` and leaves `a` alone. Slicing copies.
+Assignment does not.
 
 </details>
 </details>
@@ -158,7 +159,7 @@ which is what both of these are. `TOTAL_SUM` and `FLAG_BITS` say "a
 constant, fixed for the life of the program," yet the second line of
 `exercise_4_constants.py` changes `TOTAL_SUM`. Neither Python nor
 the linter objects, so the name misleads every reader who trusts it.
-`totalSum` and `flagBits` say nothing about the value. They only say the
+`totalSum` and `flagBits` say nothing about the value. They say the
 author came from Java or JavaScript.
 
 Only the camelCase form breaks

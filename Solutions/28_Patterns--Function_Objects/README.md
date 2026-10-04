@@ -312,7 +312,7 @@ is never a root, so `float | Failed` says which result is which, and
 carries its name as an attribute, so the report needs no extra
 bookkeeping to say which handler ran. That name is why `chain` needs a
 `Protocol` here instead of an alias like the chapter's `RootFinder`.
-`Callable[...]` describes only what a handler accepts and returns, and
+`Callable[...]` describes what a handler accepts and returns, and
 says nothing about a name, so `ty` rejects `finder.__name__` on a
 handler annotated that way (Pyright allows it, inferring the
 attributes of a function object). `Finder` declares `__name__`
@@ -639,7 +639,7 @@ Adding `unsubscribe()` cannot break an existing caller, which does not
 call it and so behaves as before. The MRO walk can.
 A handler subscribed to `Deposit` starts receiving every subclass of
 `Deposit`, including subclasses written after the handler, so a
-`BigDeposit` that reached only `on_big` before the change now reaches
+`BigDeposit` that reached `on_big` before the change now reaches
 `on_deposit` too. That wider reach is the intended feature, and it
 still changes how existing code behaves. Any handler that assumes
 `type(event) is Deposit`, or that counts events, now sees more than it
@@ -752,7 +752,8 @@ evaluates `n` while the loop is still running and stores the result.
 evaluates the argument where it appears. `make(n)` gives each lambda
 its own `n` in its own function scope, and only that fix keeps the
 value private. `lambda n=n:` exposes the value as a parameter a caller
-can override, and `partial(print, n)` can only feed it to one call.
+can override, and `partial(print, n)` has no body in which to use the
+value; it goes straight to `print()`.
 
 A value computed from the frozen `n` separates the fixes. The two
 lambda forms run their body at the call, so

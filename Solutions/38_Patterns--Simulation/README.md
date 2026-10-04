@@ -5,7 +5,7 @@
 > Test a `Rat` with a fake blackboard.
 > Because `Rat` depends only on the `Recorder` `Protocol`,
 > you can drive it with a stand-in.
-> Write a fake whose `claim()` returns a scripted sequence of results and whose `spawn()` only records the coordinates it receives,
+> Write a fake whose `claim()` returns a scripted sequence of results and whose `spawn()` records the coordinates it receives instead of starting a rat,
 > run one rat with `asyncio.run(rat.run())`,
 > and assert which cell the rat kept for itself and which cells it spawned.
 > You need no real `Blackboard`, `Maze`, or task scheduling.
@@ -696,8 +696,8 @@ its own first claim.
 times for 24 open cells: one pair of rats collided.
 Both rats reach `await asyncio.sleep(0)` while the same cell still
 looks unclaimed, because neither has added that cell to `visited`
-yet. Both membership tests therefore pass, and only afterward does
-each rat call `self.visited.add(...)`.
+yet. Both membership tests therefore pass before either rat calls
+`self.visited.add(...)`.
 Each of the two rats believes it alone claimed that cell.
 Both move into it, and that overlap breaks the invariant that no two
 rats cover the same ground. Nothing goes unexplored. Both rats proceed
@@ -962,7 +962,7 @@ since both call `occupant.interact(robot, room)` through the
 shared `Item` interface.
 Neither one needs to know which concrete `Item` subclasses exist.
 
-**Give the robot a counter.** `Robot.__init__()` needs only one new line, `self.coins = 0`, to have
+**Give the robot a counter.** `Robot.__init__()` needs one new line, `self.coins = 0`, to have
 somewhere to count (folded into `robot_world.py` above so this
 exercise's file stays a single, runnable unit).
 
@@ -1476,8 +1476,9 @@ sharp pattern from two blobs. The render is the check the number
 cannot perform.
 
 An intermediate kick avoids both failures because the amplitude scaling
-in `step()` is a feedback loop, and the loop only works within a range
-of step sizes. A grain in a loud region gets a large kick and moves
+in `step()` is a feedback loop, and the loop works within a range
+of step sizes and fails outside it.
+A grain in a loud region gets a large kick and moves
 fast. As it nears a nodal line the amplitude shrinks and so does its
 step, so it slows down and stops without overshooting. Too small a kick
 starves the loop's first half, and the grain barely travels. Too large a

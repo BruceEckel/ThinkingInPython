@@ -364,7 +364,7 @@ GameEnvironment(GnomesAndFairies()).play()
 ```
 
 **Ask the factory for each product.** `GameEnvironment` does not name
-`Kitty`, `Warrior`, `Puzzle`, or `Weapon` directly. It only calls
+`Kitty`, `Warrior`, `Puzzle`, or `Weapon` directly. It calls
 `make_character()` and `make_obstacle()` on whatever
 `GameElementFactory` it receives. A third concrete factory slots in
 beside `KittiesAndPuzzles` and `WarriorsAndWeapons` with no change to
@@ -1290,11 +1290,11 @@ sequence, so `shape_name()` materializes the generator with `list()`.
 With the same seed the sequence differs from the chapter's, because
 `choice()` now picks from three classes instead of two.
 
-`_Oval` overrides only `draw()`, so an `Oval` still erases as a
-`Circle`. `Circle` stays in the list as well, because recursion adds
-the deeper classes without removing the intermediate ones, and a
-factory that should build only leaf classes needs a further filter,
-`not cls.__subclasses__()`.
+`_Oval` overrides `draw()` and inherits `erase()` from `_Circle`, so
+an `Oval` still erases as a `Circle`. `Circle` stays in the list as
+well, because recursion adds the deeper classes without removing the
+intermediate ones, and a factory that should build only leaf classes
+needs a further filter, `not cls.__subclasses__()`.
 
 </details>
 </details>
@@ -1559,7 +1559,7 @@ module loads, the same timing on which the chapter's `registry.py` relies.
 
 **Take the key as an argument.** The name is an argument because the type checker cannot
 see the builder's own name. `Builder` is a `Callable`, and a
-`Callable` declares only how you call it, not that it carries a
+`Callable` declares how you call it, not that it carries a
 `__name__`. Writing `PROTOTYPES[build.__name__] = build()` draws:
 
 ```text

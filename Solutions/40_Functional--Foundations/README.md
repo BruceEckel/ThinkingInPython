@@ -254,8 +254,10 @@ a third stage: wrapping one composed function inside another
 ## 5. Presetting a leading argument, and why the trailing one differs
 
 > In `placeholder.py`, build a second partial, `at_least_ten`,
-> that presets only `low` to 10 and leaves both other arguments to the caller.
-> Then try to preset only `high` without a `Placeholder` and explain why that is impossible.
+> that presets `low` to 10 and leaves both other arguments to the caller.
+> Then try, without a `Placeholder`,
+> to preset `high` and leave `low` and `value` open,
+> and explain why that is impossible.
 
 <details>
 <summary>Where to look</summary>
@@ -481,7 +483,7 @@ back a finished list, which you can walk as many times as you like.
 <summary>Where to look</summary>
 
 [Closures](../../Chapters/40_Functional--Foundations.md#closures) introduces `make_counter()` and the `nonlocal` declaration.
-Python treats a name assigned anywhere in a function as local to that function, but looks up a name the function only reads in the enclosing scope.
+Python treats a name assigned anywhere in a function as local to that function, but looks in the enclosing scope for a name the function reads without assigning.
 Remove `nonlocal`, run `ty`, then run the program, and compare where each one reports the problem.
 
 <details>
@@ -516,8 +518,9 @@ print(tally(), tally(), tally())
 ```
 
 **Declare the name you assign.** `increment()` captures two names, and only one of them needs the
-`nonlocal` declaration. It only reads `step`, the way `multiply()`
-reads `factor` in `multiplier()`, and reading a captured name needs no
+`nonlocal` declaration. It reads `step` without assigning it, the
+way `multiply()` reads `factor` in `multiplier()`,
+and reading a captured name needs no
 declaration. `increment()` assigns `count`, and assignment is how
 Python decides a name is local. Without `nonlocal`, the
 `count += step` line creates a fresh local and reads it before any
@@ -633,7 +636,7 @@ print([r.celsius for r in data])
 into the one-argument callable `filter()` requires.
 
 **Narrow to the band.** Chaining the two
-filters leaves only `b`, whose 25.0 Celsius sits inside the band:
+filters keeps `b`, whose 25.0 Celsius sits inside the band:
 `a` is too cold and `c` is too warm. The two filters commute, because
 each one tests the same untouched Celsius value, so swapping the
 `warm` and `band` lines reports the same reading.

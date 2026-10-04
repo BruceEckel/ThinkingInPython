@@ -225,7 +225,7 @@ Three implementation notes:
 2. Every lazy singleton has a first-call race under threads.
    Concurrent first calls can each run the constructor,
    and each caller can end up holding a different object,
-   with only one of them staying in the cache.
+   and the cache keeps one of those objects.
    With a constructor slow enough to widen that race,
    eight threads calling `settings()` at once usually run the constructor eight times and hand back eight different objects.
    When threads can arrive before the singleton exists,

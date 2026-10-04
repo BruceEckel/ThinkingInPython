@@ -131,7 +131,7 @@ while keeping the wrapped object's interface so the wrapping stays invisible to 
 ## Maintaining the Wrapped Interface
 
 The wrappers so far declare no parameters,
-so `add_behavior` only works on functions that take none.
+so `add_behavior` is limited to functions that take none.
 With `add_behavior` on a `def add(a, b)`,
 the call `add(2, 3)` raises a `TypeError`:
 the wrapper takes zero positional arguments, and the call passes two.
@@ -214,7 +214,7 @@ and returning `Callable[P, R]` declares that the wrapper has that same signature
 
 Inside the wrapper, `*args: P.args` and `**kwargs: P.kwargs` are the two halves of that captured list.
 `P.args` is the positional part and `P.kwargs` the keyword part.
-You may only use them together,
+They must appear together,
 as the `*args` and `**kwargs` of a function typed with `P`.
 They bind the wrapper's arguments to the parameters captured by `**P`,
 so the type checker accepts `add(2, 3)` but rejects `add("x")` or `add(2, 3, 4)`,
@@ -1133,7 +1133,7 @@ where a price change touches every class that includes that topping.
 A `Pizza` with a `toppings: list[Topping]` field,
 summing each topping's `add_cost` and joining its name,
 solves the same combinatorial problem, with no wrapping and no `Protocol`.
-Here, where a topping only contributes a number and a name,
+Here, where a topping contributes a number and a name and no behavior,
 that list is the simpler design.
 The *Decorator* pattern earns its structure when a topping needs behavior,
 not just data: a topping that changes how `cost` rounds,

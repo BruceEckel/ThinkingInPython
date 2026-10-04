@@ -573,7 +573,7 @@ def test_all_fail_returns_none() -> None:
 
 The first two tests wrap each finder in `watched()`,
 which records the finder's name as it runs.
-The tests can then assert not only the root but also which finders ran.
+The tests can then assert both the root and the names of the finders that ran.
 
 `watched()` carries a `# type: ignore` because `RootFinder` is a `Callable`,
 and a `Callable` declares no `__name__`.
@@ -679,8 +679,8 @@ The lookup uses `type(event)`, which matches the class and no ancestor.
 A subclass of `Deposit` published to this bus matches no handler,
 so `publish()` calls nothing, as it does for `Closed`.
 Walking `type(event).__mro__` and calling every handler along it gives a subclass event its parent's handlers.
-An event then runs every handler registered anywhere in its ancestry,
-not only the ones registered for its own type (see exercise 5).
+An event then runs the handlers registered for its own type and for every ancestor
+(see exercise 5).
 
 Testing confirms that publishing calls every handler registered for a type,
 a handler receives only its own event type,

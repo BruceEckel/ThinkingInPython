@@ -19,11 +19,11 @@ Chapters/05_Foundations--Functions.md	Nothing checks the arguments on the way in
 Chapters/06_Foundations--Modules_and_Packages.md	That silent failure is also why CODE is an experiment to run rather than a setting to leave on
 Chapters/09_Foundations--Class_Attributes.md	The annotated field in CODE also leaves a class attribute behind
 Chapters/10_Foundations--Cleanup.md	With CODE left on
-Chapters/11_Techniques--Testing.md	CODE only passes because CODE ran first and left its entry behind
+Chapters/11_Techniques--Testing.md	CODE ran first and left its entry behind
 Chapters/11_Techniques--Testing.md	The other half is asking what let the bug through
 Chapters/11_Techniques--Testing.md	When a bug does get through
 Chapters/12_Techniques--Data_Classes_as_Types.md	as it was before
-Chapters/15_Techniques--Context_Managers.md	Write a context manager CODE whose CODE suppresses only CODE and lets everything else through
+Chapters/15_Techniques--Context_Managers.md	Write a context manager CODE whose CODE suppresses CODE and lets everything else through
 Chapters/16_Techniques--Comprehensions.md	A list comprehension consists of
 Chapters/16_Techniques--Comprehensions.md	without touching any real files or leaving anything behind
 Chapters/17_Techniques--Metaprogramming.md	CODE checks the value on its way in

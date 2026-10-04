@@ -883,7 +883,7 @@ The decorator adds the error the same way it does for `score()` in [The Error Ch
 `ty` reports `fetch_headline` as `() -> Generator[Need[Feed] | Unavailable, Any, str]`,
 which is `Effect[Need[Feed], Unavailable, str]`.
 `research.py` keeps the request and the failure in separate functions,
-because a function that only transforms its arguments is easier to test on its own,
+because a function that receives everything it uses as arguments is easier to test on its own,
 and because the split keeps the Ability requests in one place.
 Either shape type-checks and either propagates correctly.
 
@@ -1214,7 +1214,7 @@ Two cautions.
 `catch_all` comes from `stateless.effect`,
 since the package root does not export it.
 And `catch_all()` leaves the guarantee where it was:
-it matches only what `@throws` lifted into the channel,
+it matches the failures `@throws` lifted into the channel,
 and an unlifted failure propagates past it as it does past `catch()`.
 
 ## Dependencies That Need Dependencies
@@ -1876,7 +1876,7 @@ turning it into one that returns an Effect.
 And `catch_all` comes from `stateless.effect`,
 since the package root does not export it.
 
-Two execute an Effect that has only `Async` and errors left,
+Two execute an Effect whose yield channel has narrowed to `Async` and errors,
 raising a leftover error rather than returning it:
 
 | Tool | Where to call it |
@@ -1973,7 +1973,7 @@ It cannot verify that you declared everything effectful,
 because Python's `print()`, `open()`,
 and `requests.get()` are ordinary calls with ordinary types.
 A native EMS computes a function's Effects from its body.
-A library can only check the ones you wrote down.
+A library checks the Effects you wrote down and cannot see any others.
 The guarantee is about consistency, not completeness.
 
 The same limit applies on the error side.
@@ -2082,7 +2082,7 @@ and a run raises a `MissingAbilityError` naming the same `Need`.
 and `reveal_type()` on the intermediate shows which channel it left unfinished.
 
 The type checker verifies the subtraction,
-including where you answer only part of what an Effect declares.
+including where you answer part of what an Effect declares.
 Here `supply()` answers one `Need` of two:
 
 ```python
@@ -2377,7 +2377,7 @@ give a hint, usually the shape of the code, and a full answer for each exercise.
     Predict the trace, then say why it differs from `DeadWire`'s even though both fail the same way.
 7.  Wrap `research()` in `retry()` and supply a `Time()`.
     Explain what `retry()` does under the `WEATHER` scenario and why retrying a `NotInteresting` failure is the wrong behavior,
-    then say what an Effect system needs for you to retry only `Unavailable`.
+    then say what an Effect system needs for you to retry `Unavailable` and no other failure.
 8.  Change `parallel.py` to use a `ProcessPoolExecutor` instead of a `ThreadPoolExecutor`,
     and confirm `squares()` stays unchanged.
     Processes re-import the module,
@@ -2407,7 +2407,7 @@ give a hint, usually the shape of the code, and a full answer for each exercise.
     Then delete the `low: int` annotation from the accessor's parameter and say what changes,
     and delete the annotation on the *handler's* parameter and say what changes.
 13. Add a `Butter` appliance to `bakery.py` and a `buttered()` Effect that needs it and calls `toast()`.
-    Write `buttered()`'s signature with only `Need[Butter]` first, run `ty`,
+    Write `buttered()`'s signature with `Need[Butter]` alone first, run `ty`,
     and read the diagnostic before fixing it.
     Then remove `Toaster(3)` from `supply()` and say which of the two diagnostics tells you about a dependency two levels down.
 14. `play()` in `casts.py` accepts any three actors, matched or not.

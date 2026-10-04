@@ -189,7 +189,7 @@ where a bag of attributes named at runtime leaves no precise type to write.
 
 Notice which hierarchy holds the behavior.
 The classic pattern overloads `visit()` once per flower type and keeps each operation's body in the visitor,
-so it adds only `accept()` to the primary hierarchy.
+so `accept()` is the one method it adds to the primary hierarchy.
 Python has no method overloading,
 since a second `def visit()` replaces the first.
 [`@overload`](14_Techniques--Decorators.md#decorators-with-optional-parentheses)
@@ -378,7 +378,7 @@ Both cases are rare in Python.
 The `recycling_note.py` example in [Pattern Refactoring](37_Patterns--Pattern_Refactoring.md#one-singledispatch-function-per-operation)
 reaches the same conclusion:
 `singledispatch` adds an operation to a hierarchy from outside it,
-and *Visitor* can only imitate that with `accept()`.
+and *Visitor* imitates that with `accept()`.
 
 A minimal example shows the first of those cases,
 a loop that runs inside `accept()`.

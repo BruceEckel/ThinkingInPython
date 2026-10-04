@@ -66,7 +66,8 @@ while True:
 ```
 
 One legacy path bypasses `__iter__()`.
-A class that defines only `__getitem__()` taking integers from zero is still iterable:
+A class that defines `__getitem__()` taking integers from zero,
+and no `__iter__()`, is still iterable:
 `iter()` builds an iterator that calls `__getitem__()` with 0, 1, 2, and so on,
 until `IndexError`.
 Such a class works with `for`,
@@ -456,10 +457,10 @@ then re-yield each value it produces.
 `flatten()` replaces those two lines with `yield from`,
 and the matching output shows the substitution is exact.
 
-`flatten_loop()` carries a `# noqa` because ruff's `UP028` rule reports a `for` loop that only re-yields,
+`flatten_loop()` carries a `# noqa` because ruff's `UP028` rule reports a `for` loop whose body is a lone `yield` of the loop variable,
 and tells you to write `yield from` instead.
 
-The two forms agree for a generator that only produces values,
+The two forms agree for a generator that yields values and returns no result,
 as `flatten()` does.
 The `yield from` expression, however, has a value:
 `result = yield from inner()` binds whatever `inner()` returned when it stopped.
@@ -636,7 +637,7 @@ if __name__ == "__main__":
 ```
 
 `collections.abc.Iterator` supplies `__iter__()` to its subclasses,
-so `TypedIterator` need only define `__next__()`.
+so `TypedIterator` defines `__next__()` and inherits `__iter__()`.
 
 The `dataclass` decoration carries `eq=False`.
 A data class that generates `__eq__()` sets `__hash__` to `None`,

@@ -297,7 +297,7 @@ the messages appear in derived-to-base order, twice.
 
 [Caching with `cached_property`](../../Chapters/07_Foundations--Classes.md#cached-property) shows `total` computed once and then stored on the instance.
 Decorate `average` with `@cached_property` and read `self.total` in its body.
-A cached property is an ordinary attribute access from inside another property, so look for the `summing` message to print only once.
+A cached property is an ordinary attribute access from inside another property, so look for the `summing` message to print once.
 
 <details>
 <summary>The shape</summary>
@@ -396,7 +396,7 @@ class Temperature:
 <details>
 <summary>Solution</summary>
 
-If you define only `__str__()`, `print(t)` shows `21.0C`,
+If you define `__str__()` without `__repr__()`, `print(t)` shows `21.0C`,
 but the list shows the default `<__main__.Temperature object at 0x...>` for each element.
 A container formats its elements with `repr()`, which ignores `__str__()`.
 The solution defines `__repr__()` for that form and adds `__str__()` for the readable one.
@@ -423,9 +423,10 @@ print(f"{t} is {t!r}")
 #: 21.0C is Temperature(21.0)
 ```
 
-**Supply the fallback form.** With only `__repr__()` defined, `print(t)` and the printed list both
-show `Temperature(21.0)`: `print()` finds no `__str__()` and falls
-back to `__repr__()`.
+**Supply the fallback form.** With `__repr__()` defined and no
+`__str__()`, `print(t)` and the printed list both show
+`Temperature(21.0)`: `print()` finds no `__str__()` and falls back to
+`__repr__()`.
 
 **Add a readable form for users.** Adding `__str__()` makes the two outputs differ.
 `print(t)` and `f"{t}"` take the readable form, while the list keeps

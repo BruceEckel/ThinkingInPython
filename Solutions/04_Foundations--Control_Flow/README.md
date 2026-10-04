@@ -205,7 +205,7 @@ except TypeError as e:
 
 **Let an unmatched exception through.** `divide_and_report(1, "x")`
 raises `TypeError` inside `checked_divide()`, because Python cannot
-divide an `int` by a `str`. The `except` clause catches only
+divide an `int` by a `str`. The `except` clause names
 `ValueError`, so the `TypeError` passes it by. The `finally` block
 still runs: `finally` runs whatever kind of exception is in flight.
 The `else` clause does not run here: it belongs to the case where the
@@ -409,7 +409,7 @@ context is present but invisible.
 `__context__` answers "what was the `except` block handling when
 `raise` ran," and Python fills that attribute in whether you want it
 or not. `__cause__` answers "what do you, the author, say explains
-this," and only `from` fills that one in. `from None` sets
+this," and `from` alone fills that one in. `from None` sets
 `__suppress_context__`, hiding the `__context__` answer, and leaves
 `__cause__` as `None`.
 

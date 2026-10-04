@@ -14,31 +14,92 @@ Chapters/01_Introduction.md	even: Eventually I even wrote a message confirming I
 Chapters/01_Introduction.md	is what: This book is what I've always wanted to create
 Chapters/01_Introduction.md	never: Claude allowed me to create tooling for the book that I had imagined but never fully realized
 Chapters/01_Introduction.md	never: never using an idea before formally introducing it
+Chapters/01_Introduction.md	only: Instead of a class that exists only to hold one method
+Chapters/01_Introduction.md	only: My only hope is that this book will be engaging to read
+Chapters/01_Introduction.md	only: and adds the complexity only when the answer is no
+Chapters/01_Introduction.md	only: because a pattern shows its value only in a program you build yourself
 Chapters/02_Foundations--Tour.md	even: CODE breaks a tie to the nearest even value
+Chapters/02_Foundations--Tour.md	only: Python binds a name only when the assignment runs
+Chapters/02_Foundations--Tour.md	only: Use a t-string only when a consumer must inspect
 Chapters/03_Foundations--Containers.md	already: CODE returns the list already stored under CODE
 Chapters/03_Foundations--Containers.md	never: and assignment never copies
-Chapters/03_Foundations--Containers.md	want: Use CODE or CODE when you only want to look
+Chapters/03_Foundations--Containers.md	only: A CODE is fast only at its append end
+Chapters/03_Foundations--Containers.md	only: Go past those four only when a measurement or a specific job calls for it
+Chapters/03_Foundations--Containers.md	only: Only the CODE hides the mistake
+Chapters/03_Foundations--Containers.md	only: is a read-only *view* onto a CODE you still hold
 Chapters/04_Foundations--Control_Flow.md	even: even if the body raises an exception
 Chapters/04_Foundations--Control_Flow.md	never: so CODE through CODE never print
+Chapters/04_Foundations--Control_Flow.md	only: All three raise the same exception and differ only in that report
+Chapters/04_Foundations--Control_Flow.md	only: Catch an exception only when you can do something about it
+Chapters/04_Foundations--Control_Flow.md	only: Only the first matching CODE runs
+Chapters/04_Foundations--Control_Flow.md	only: The CODE block asks the only question that matters
+Chapters/04_Foundations--Control_Flow.md	only: You can give only the type
+Chapters/04_Foundations--Control_Flow.md	only: and only the EAFP form is safe against that
+Chapters/04_Foundations--Control_Flow.md	only: they are keywords only in this statement
 Chapters/04_Foundations--Control_Flow.md	want: CODE is the broad catch you want instead
 Chapters/05_Foundations--Functions.md	itself: A call that names its arguments documents itself
+Chapters/05_Foundations--Functions.md	only: A CODE begins the *keyword-only* parameters
+Chapters/05_Foundations--Functions.md	only: A CODE ends the *positional-only* parameters
+Chapters/05_Foundations--Functions.md	only: Keyword-only parameters are exempt
+Chapters/05_Foundations--Functions.md	only: Marking a parameter positional-only also keeps its name out of the method's contract
+Chapters/05_Foundations--Functions.md	only: Only the named form
+Chapters/05_Foundations--Functions.md	only: Rewrite CODE from CODE so it accepts a CODE keyword-only flag that
+Chapters/05_Foundations--Functions.md	only: The signatures so far give only the function name and the parameter names
+Chapters/05_Foundations--Functions.md	only: because CODE and CODE are positional-only
+Chapters/05_Foundations--Functions.md	only: because CODE is keyword-only
+Chapters/05_Foundations--Functions.md	only: keyword-only
+Chapters/05_Foundations--Functions.md	only: many built-in functions and methods take positional-only parameters
+Chapters/05_Foundations--Functions.md	only: positional-only
 Chapters/05_Foundations--Functions.md	want: Write a lambda when no existing function computes the key you want
 Chapters/06_Foundations--Modules_and_Packages.md	even: A name listed in CODE arrives even when it begins with an underscore
 Chapters/06_Foundations--Modules_and_Packages.md	even: even on a filesystem that treats the two names as one
 Chapters/06_Foundations--Modules_and_Packages.md	ever: not names your program ever deferred
 Chapters/06_Foundations--Modules_and_Packages.md	itself: create a directory called CODE whose CODE announces itself
 Chapters/06_Foundations--Modules_and_Packages.md	itself: with its own CODE and a top-level CODE so the module announces itself when it loads
+Chapters/06_Foundations--Modules_and_Packages.md	only: Assigning into CODE matters whenever code needs to define a module-level name known only at runtime
+Chapters/06_Foundations--Modules_and_Packages.md	only: CODE binds only the name CODE in this file
+Chapters/06_Foundations--Modules_and_Packages.md	only: For a large program that imports many modules but uses only some of them on any given run
+Chapters/06_Foundations--Modules_and_Packages.md	only: The condition is true only when you run this file directly
+Chapters/06_Foundations--Modules_and_Packages.md	only: The submodule becomes an attribute of the package only when something imports it by name
+Chapters/06_Foundations--Modules_and_Packages.md	only: When the cycle exists only in annotations
+Chapters/06_Foundations--Modules_and_Packages.md	only: a keyword only inside an CODE statement
+Chapters/06_Foundations--Modules_and_Packages.md	only: and underscores only when they genuinely help (CODE)
+Chapters/06_Foundations--Modules_and_Packages.md	only: but only at module scope
+Chapters/06_Foundations--Modules_and_Packages.md	only: defers only the imports you marked CODE
+Chapters/06_Foundations--Modules_and_Packages.md	only: including the ones whose only purpose is to run the module
+Chapters/06_Foundations--Modules_and_Packages.md	only: neither of which can see a name that appears only as a dict key
+Chapters/06_Foundations--Modules_and_Packages.md	only: not only a package's submodules
+Chapters/06_Foundations--Modules_and_Packages.md	only: only flags the directory as a package.^[The name CODE often confuses people
+Chapters/06_Foundations--Modules_and_Packages.md	only: only the listed names arrive
+Chapters/06_Foundations--Modules_and_Packages.md	only: so a run pays only for the modules it uses
+Chapters/06_Foundations--Modules_and_Packages.md	only: the way CODE is a keyword only inside a CODE statement
 Chapters/06_Foundations--Modules_and_Packages.md	want: you want its definitions and none of the code at the bottom of the file
 Chapters/07_Foundations--Classes.md	never: Python never calls a base-class constructor on its own
+Chapters/07_Foundations--Classes.md	only: A write-only property is possible but rare
+Chapters/07_Foundations--Classes.md	only: Cache only what cannot change
+Chapters/07_Foundations--Classes.md	only: and add CODE only when users see the output
+Chapters/07_Foundations--Classes.md	only: you often inherit only to establish a common interface
 Chapters/07_Foundations--Classes.md	want: When you override a method but still want the base-class version
 Chapters/07_Foundations--Classes.md	want: so you choose the access you want by defining one or both
 Chapters/08_Foundations--Static_Types.md	even: Explain why the empty string now takes the other branch even though the type checker accepts either version
 Chapters/08_Foundations--Static_Types.md	even: even though CODE is a valid CODE
 Chapters/08_Foundations--Static_Types.md	never: The Python runtime never acts on a type hint
+Chapters/08_Foundations--Static_Types.md	only: A read-only container has no such problem
+Chapters/08_Foundations--Static_Types.md	only: CODE appends a CODE to a list its caller believes holds only circles
+Chapters/08_Foundations--Static_Types.md	only: It stores the hint and evaluates it only when something reads the annotations
+Chapters/08_Foundations--Static_Types.md	only: The Python runtime checks types only when an operation runs
+Chapters/08_Foundations--Static_Types.md	only: The type checker refuses only an assignment to the name CODE
+Chapters/08_Foundations--Static_Types.md	only: and only the type checker rejects a reassignment
+Chapters/08_Foundations--Static_Types.md	only: but that is only a hint to human readers
+Chapters/08_Foundations--Static_Types.md	only: it is a keyword only at the start of this statement
+Chapters/08_Foundations--Static_Types.md	only: that rejection is the only enforcement
 Chapters/08_Foundations--Static_Types.md	want: If you want static type checking like you get from a compiler in a typed language
 Chapters/08_Foundations--Static_Types.md	want: callers who want that type omit the brackets
 Chapters/09_Foundations--Class_Attributes.md	itself: Every CODE counts itself once and the shared counter stays at CODE
 Chapters/09_Foundations--Class_Attributes.md	never: so each object shadows the class attribute immediately and never reads the shared one
+Chapters/09_Foundations--Class_Attributes.md	only: The shadowing rule confines a change to one object only while the shared value is immutable
+Chapters/09_Foundations--Class_Attributes.md	only: because a class's dictionary is a read-only CODE that carries the compiler's own bookkeeping alongside CODE
+Chapters/09_Foundations--Class_Attributes.md	only: this exercise needs only the one expression given here
 Chapters/09_Foundations--Class_Attributes.md	want: Decide which you want
 Chapters/09_Foundations--Class_Attributes.md	want: When you genuinely want one shared value
 Chapters/10_Foundations--Cleanup.md	itself: An object that refers to itself
@@ -46,32 +107,104 @@ Chapters/10_Foundations--Cleanup.md	itself: The weak reference lets the registry
 Chapters/10_Foundations--Cleanup.md	itself: but the object still refers to itself
 Chapters/10_Foundations--Cleanup.md	never: Never release a resource in CODE
 Chapters/10_Foundations--Cleanup.md	never: so the count never falls
+Chapters/10_Foundations--Cleanup.md	only: CODE holds the only reference to its CODE
+Chapters/10_Foundations--Cleanup.md	only: CODE runs only after CODE returns (see exercise 7)
+Chapters/10_Foundations--Cleanup.md	only: That list holds the only remaining references
+Chapters/10_Foundations--Cleanup.md	only: The only referrer is CODE
+Chapters/10_Foundations--Cleanup.md	only: since the dictionary holds only live objects and no two live objects share an id
+Chapters/10_Foundations--Cleanup.md	only: so a cycle now costs only the delay
+Chapters/10_Foundations--Cleanup.md	only: so that count is correct only if CODE runs and succeeds
 Chapters/11_Techniques--Testing.md	exactly: CODE is exactly CODE on any IEEE double
 Chapters/11_Techniques--Testing.md	exactly: that CODE ran exactly once
 Chapters/11_Techniques--Testing.md	happened: a line a test happened to execute is not the same as a line a test checks
 Chapters/11_Techniques--Testing.md	is what: The CODE in CODE is what CODE produces first
 Chapters/11_Techniques--Testing.md	never: Inside the block the assertion never runs
+Chapters/11_Techniques--Testing.md	only: A *black-box* test treats the code as an opaque box and exercises only its public interface
+Chapters/11_Techniques--Testing.md	only: CODE runs only the tests whose names contain "overdraft"
+Chapters/11_Techniques--Testing.md	only: If the problem surfaces only after multiple changes
+Chapters/11_Techniques--Testing.md	only: Only CODE calls it
+Chapters/11_Techniques--Testing.md	only: Only convention says
+Chapters/11_Techniques--Testing.md	only: Only the code changes to satisfy it
+Chapters/11_Techniques--Testing.md	only: The test passes only if the block raises the expected exception
+Chapters/11_Techniques--Testing.md	only: and a fixture needs only the shape
+Chapters/11_Techniques--Testing.md	only: and only a parameter delivers its value
+Chapters/11_Techniques--Testing.md	only: so that only implementation remains
+Chapters/11_Techniques--Testing.md	only: the patch is only half the job
 Chapters/12_Techniques--Data_Classes_as_Types.md	even: even when only one field moved
 Chapters/12_Techniques--Data_Classes_as_Types.md	is what: one field different" is what you do with any immutable value
 Chapters/12_Techniques--Data_Classes_as_Types.md	itself: The type guards itself
 Chapters/12_Techniques--Data_Classes_as_Types.md	itself: as A CODE Cannot Validate Itself shows
+Chapters/12_Techniques--Data_Classes_as_Types.md	only: A read-only CODE keeps users from assigning to CODE
+Chapters/12_Techniques--Data_Classes_as_Types.md	only: CODE tags only one
+Chapters/12_Techniques--Data_Classes_as_Types.md	only: CODE works only on data classes
+Chapters/12_Techniques--Data_Classes_as_Types.md	only: Fields after CODE are keyword-only
+Chapters/12_Techniques--Data_Classes_as_Types.md	only: Passing CODE to CODE makes every field keyword-only
+Chapters/12_Techniques--Data_Classes_as_Types.md	only: The only way to make a CODE is through the constructor
+Chapters/12_Techniques--Data_Classes_as_Types.md	only: and CODE accepts only instances
+Chapters/12_Techniques--Data_Classes_as_Types.md	only: and a frozen instance is hashable only when every field it holds is
+Chapters/12_Techniques--Data_Classes_as_Types.md	only: and only three day counts are distinct
+Chapters/12_Techniques--Data_Classes_as_Types.md	only: and those members are the only values the type has
+Chapters/12_Techniques--Data_Classes_as_Types.md	only: because rebuilding through the constructor is the only way to get the check back
+Chapters/12_Techniques--Data_Classes_as_Types.md	only: even when only one field moved
+Chapters/12_Techniques--Data_Classes_as_Types.md	only: not only for data classes
+Chapters/12_Techniques--Data_Classes_as_Types.md	only: so each report lists only the dunders a class customizes
+Chapters/12_Techniques--Data_Classes_as_Types.md	only: so only the postcondition appears here
 Chapters/12_Techniques--Data_Classes_as_Types.md	want: Subscript the factory when you want that agreement checked
 Chapters/13_Techniques--Pattern_Matching.md	and nothing else: and nothing else changes
+Chapters/13_Techniques--Pattern_Matching.md	only: That case matches only a dictionary whose CODE is CODE
+Chapters/13_Techniques--Pattern_Matching.md	only: The case matches only when the pattern fits and the guard is true
+Chapters/13_Techniques--Pattern_Matching.md	only: The check applies only when the matched type is a closed set the compiler can see in full
+Chapters/13_Techniques--Pattern_Matching.md	only: The pattern CODE matches only a two-element sequence and pulls both out at once
+Chapters/13_Techniques--Pattern_Matching.md	only: Use a captured name only in the CODE that captured it
+Chapters/13_Techniques--Pattern_Matching.md	only: Use it as a type-only check or a final catch-all
+Chapters/13_Techniques--Pattern_Matching.md	only: but only if you remember to end it with CODE
+Chapters/13_Techniques--Pattern_Matching.md	only: not only a parameter
+Chapters/13_Techniques--Pattern_Matching.md	only: not only at the end
+Chapters/13_Techniques--Pattern_Matching.md	only: they act as keywords only inside this statement
+Chapters/13_Techniques--Pattern_Matching.md	only: which matches only an empty sequence
 Chapters/13_Techniques--Pattern_Matching.md	want: Use CODE for a closed set of cases you want to handle in one place
 Chapters/14_Techniques--Decorators.md	already: A function is already a descriptor
 Chapters/14_Techniques--Decorators.md	even: even after the decorator has returned
 Chapters/14_Techniques--Decorators.md	never: The CODE instance never arrives
 Chapters/14_Techniques--Decorators.md	never: The original body of CODE never runs
+Chapters/14_Techniques--Decorators.md	only: A read-only CODE in a CODE requires that reading the name produce the property's return type
+Chapters/14_Techniques--Decorators.md	only: CODE runs with CODE as its only argument
+Chapters/14_Techniques--Decorators.md	only: Only now does CODE's own body run
+Chapters/14_Techniques--Decorators.md	only: Only the body of CODE waits for the call
+Chapters/14_Techniques--Decorators.md	only: Python binds a class attribute to an instance only when that attribute is a *descriptor*
+Chapters/14_Techniques--Decorators.md	only: That variable is visible only inside the closure
+Chapters/14_Techniques--Decorators.md	only: The CODE test assumes that only the decorated function can arrive in that first position
+Chapters/14_Techniques--Decorators.md	only: a function arrives as the only argument
+Chapters/14_Techniques--Decorators.md	only: adds a description only under some condition
+Chapters/14_Techniques--Decorators.md	only: and the only symptom is missing output
+Chapters/14_Techniques--Decorators.md	only: given only keyword arguments
+Chapters/14_Techniques--Decorators.md	only: letting a caller add arguments only when the defaults don't fit
+Chapters/14_Techniques--Decorators.md	only: only CODE
 Chapters/14_Techniques--Decorators.md	want: If you want the run-once idiom
 Chapters/14_Techniques--Decorators.md	want: Sometimes you want to choose later
 Chapters/15_Techniques--Context_Managers.md	even: even if the block raises an exception
 Chapters/15_Techniques--Context_Managers.md	even: it comes back even when the block raises an exception
 Chapters/15_Techniques--Context_Managers.md	never: CODE never reaches the CODE
 Chapters/15_Techniques--Context_Managers.md	never: never runs
+Chapters/15_Techniques--Context_Managers.md	only: A class manager that stores per-CODE state stays reusable only if CODE resets that state
+Chapters/15_Techniques--Context_Managers.md	only: Add CODE only when the same bracket should also wrap whole functions
+Chapters/15_Techniques--Context_Managers.md	only: CODE closes only the file it opened
+Chapters/15_Techniques--Context_Managers.md	only: The CODE makes CODE and CODE positional-only
+Chapters/15_Techniques--Context_Managers.md	only: and the original survives only as the new exception's CODE
+Chapters/15_Techniques--Context_Managers.md	only: it wrapped only the call that creates the generator object
+Chapters/15_Techniques--Context_Managers.md	only: so write CODE methods that fail only for reasons worse than the original exception
 Chapters/15_Techniques--Context_Managers.md	want: Write a manager once you want the CODE syntax at the call site
 Chapters/15_Techniques--Context_Managers.md	want: once you have decided you want one
 Chapters/15_Techniques--Context_Managers.md	want: so name the types you expect unless you want a block that nothing escapes
 Chapters/16_Techniques--Comprehensions.md	already: CODE and CODE pay off when the function already exists
+Chapters/16_Techniques--Comprehensions.md	only: A generator expression needs no parentheses of its own when it is a function's only argument
+Chapters/16_Techniques--Comprehensions.md	only: and pays it only for the values the consumer pulls
+Chapters/16_Techniques--Comprehensions.md	only: but only when its predicate is a named function annotated to return CODE or CODE rather than CODE (the narrowing summary covers the pair)
+Chapters/16_Techniques--Comprehensions.md	only: especially if you consume the result only once
+Chapters/16_Techniques--Comprehensions.md	only: keeping only the names longer than three characters
+Chapters/16_Techniques--Comprehensions.md	only: only CODE has CODE
+Chapters/16_Techniques--Comprehensions.md	only: splicing only the outer iterable
+Chapters/16_Techniques--Comprehensions.md	only: write a list comprehension that finds the string elements made only of digits (CODE)
 Chapters/16_Techniques--Comprehensions.md	want: A CODE loop when you want the side effect rather than the collection
 Chapters/16_Techniques--Comprehensions.md	want: Brackets when you want a list
 Chapters/16_Techniques--Comprehensions.md	want: Use a comprehension when you want the collection it produces
@@ -93,11 +226,45 @@ Chapters/17_Techniques--Metaprogramming.md	is what: and the shared metaclass is 
 Chapters/17_Techniques--Metaprogramming.md	itself: A descriptor pays for itself when the write must do more than store
 Chapters/17_Techniques--Metaprogramming.md	itself: Extend CODE so a class declares itself final with a keyword in its header
 Chapters/17_Techniques--Metaprogramming.md	itself: and returns itself when you read it through the class
+Chapters/17_Techniques--Metaprogramming.md	only: CODE and CODE normally run only because the default CODE calls them
+Chapters/17_Techniques--Metaprogramming.md	only: CODE builds only those three
+Chapters/17_Techniques--Metaprogramming.md	only: Generating classes programmatically with CODE pays off when a family of classes differs only by name
+Chapters/17_Techniques--Metaprogramming.md	only: Now the end user needs only to write and maintain the schedule file
+Chapters/17_Techniques--Metaprogramming.md	only: Only a metaclass makes the class callable in a new way
+Chapters/17_Techniques--Metaprogramming.md	only: Testing shows that each registry holds only its current leaf classes
+Chapters/17_Techniques--Metaprogramming.md	only: The comment suppresses the diagnostic only because provoking that crash is educational
+Chapters/17_Techniques--Metaprogramming.md	only: Use a metaclass only when these cannot do the job
+Chapters/17_Techniques--Metaprogramming.md	only: and CPython allows multiple inheritance only when at most one base carries a nontrivial layout
+Chapters/17_Techniques--Metaprogramming.md	only: but it lives only in the CODE dict
+Chapters/17_Techniques--Metaprogramming.md	only: it keeps only the ones whose value differs from CODE's own
+Chapters/17_Techniques--Metaprogramming.md	only: not only descriptors
+Chapters/17_Techniques--Metaprogramming.md	only: only three fixed names reach the template
+Chapters/17_Techniques--Metaprogramming.md	only: so only the current leaves remain
+Chapters/17_Techniques--Metaprogramming.md	only: the checker knows only what you declare
+Chapters/17_Techniques--Metaprogramming.md	only: while a metamethod works only through the class
+Chapters/17_Techniques--Metaprogramming.md	only: whose class exists only as text in a string
 Chapters/17_Techniques--Metaprogramming.md	spelling: You might expect to parameterize[^parameterize-spelling] the class
 Chapters/17_Techniques--Metaprogramming.md	want: and you configure them to produce the objects you want
 Chapters/18_Techniques--Performance.md	already: so a frozen instance already cannot grow
 Chapters/18_Techniques--Performance.md	even: halve an even value or triple-and-increment an odd one
 Chapters/18_Techniques--Performance.md	is what: so that is what the heap needs to beat
+Chapters/18_Techniques--Performance.md	only: CODE applies only to numeric functions
+Chapters/18_Techniques--Performance.md	only: CODE only built a min-heap
+Chapters/18_Techniques--Performance.md	only: CODE reports only an object's own size
+Chapters/18_Techniques--Performance.md	only: Caching is correct only when the function is pure
+Chapters/18_Techniques--Performance.md	only: Compiling changes only the loop's interior
+Chapters/18_Techniques--Performance.md	only: Explain why caching suits only pure functions
+Chapters/18_Techniques--Performance.md	only: Only a view of CODE is read-only
+Chapters/18_Techniques--Performance.md	only: The comparison holds only when the input order gives neither side an advantage
+Chapters/18_Techniques--Performance.md	only: You keep that speedup only while the data stays inside NumPy
+Chapters/18_Techniques--Performance.md	only: a query behind an attribute) that only a realistic load reveals
+Chapters/18_Techniques--Performance.md	only: but only to print the slice
+Chapters/18_Techniques--Performance.md	only: only CODE returns its index
+Chapters/18_Techniques--Performance.md	only: since it needs only one hash and one equality check no matter how large CODE grows
+Chapters/18_Techniques--Performance.md	only: so pulling it costs only O(log n) each time
+Chapters/18_Techniques--Performance.md	only: then each CODE costs only O(log n)
+Chapters/18_Techniques--Performance.md	only: while the fastest run is the closest you get to measuring only your code
+Chapters/18_Techniques--Performance.md	only: while the lazy one computes only the handful of values that CODE extracts
 Chapters/19_Techniques--Concurrency.md	already: Threads already distributed computing resources
 Chapters/19_Techniques--Concurrency.md	already: Use a thread pool for I/O when the blocking calls already exist and rewriting them as coroutines is not worth the effort
 Chapters/19_Techniques--Concurrency.md	even: Even when you understand the problems produced by shared mutable state
@@ -109,11 +276,68 @@ Chapters/19_Techniques--Concurrency.md	itself: not just itself
 Chapters/19_Techniques--Concurrency.md	itself: suspends itself and yields control
 Chapters/19_Techniques--Concurrency.md	never: **Never call a blocking function inside a coroutine
 Chapters/19_Techniques--Concurrency.md	never: and adds lock overhead the GIL never charged
+Chapters/19_Techniques--Concurrency.md	only: "concurrency is not parallelism" (I'm hoping he meant to say "concurrency is not **only** parallelism").[^concurrency-def] As this chapter shows
+Chapters/19_Techniques--Concurrency.md	only: **A shared lock prevents deadlock only if every user agrees on the order
+Chapters/19_Techniques--Concurrency.md	only: **More cores speed up only the parallel fraction of the work
+Chapters/19_Techniques--Concurrency.md	only: A CPU-bound task cannot overlap if only a single core is available
+Chapters/19_Techniques--Concurrency.md	only: An CODE block owns every task started inside it and exits only after it has accounted for every one
+Chapters/19_Techniques--Concurrency.md	only: An CODE is legal only inside an CODE
+Chapters/19_Techniques--Concurrency.md	only: Awaiting CODE suspends only the current task and hands control to the event loop
+Chapters/19_Techniques--Concurrency.md	only: Before 3.14 the guard was a Windows and macOS concern only
+Chapters/19_Techniques--Concurrency.md	only: But "one at a time" protects only the instructions between two CODEs
+Chapters/19_Techniques--Concurrency.md	only: CODE switches only at an CODE
+Chapters/19_Techniques--Concurrency.md	only: CODE unifies backends that share only a result that arrives later
+Chapters/19_Techniques--Concurrency.md	only: Code reaches a heap allocation only through a reference
+Chapters/19_Techniques--Concurrency.md	only: Free threading pays off only when every extension you load has passed an audit
+Chapters/19_Techniques--Concurrency.md	only: Independent processes that communicate only over explicit
+Chapters/19_Techniques--Concurrency.md	only: It starts essentially empty and grows only as the program asks for more
+Chapters/19_Techniques--Concurrency.md	only: Only CODE or CODE schedules every coroutine as a task before waiting on any of them
+Chapters/19_Techniques--Concurrency.md	only: Only other threads pay for an atomic operation
+Chapters/19_Techniques--Concurrency.md	only: People continue to work toward better ways of concurrent programming.[^libraries] Only in the last decade or so have programmers widely adopted advances such as async/await and structured concurrency
+Chapters/19_Techniques--Concurrency.md	only: Since 3.10 the interpreter switches threads only at a function call or at the jump that closes a loop iteration
+Chapters/19_Techniques--Concurrency.md	only: Tasks run one at a time and switch only at an CODE
+Chapters/19_Techniques--Concurrency.md	only: The event loop keeps only weak references to its tasks
+Chapters/19_Techniques--Concurrency.md	only: The only difference between one run and another is how finely the listing splits the total work
+Chapters/19_Techniques--Concurrency.md	only: This chapter makes concurrency look (somewhat) easy because it has touched only the surface of shared mutable state problems
+Chapters/19_Techniques--Concurrency.md	only: Typically a thread runs only a few milliseconds at a time
+Chapters/19_Techniques--Concurrency.md	only: Usually only one thread touches an object
+Chapters/19_Techniques--Concurrency.md	only: Yielding only at a written CODE makes the gap easier to find
+Chapters/19_Techniques--Concurrency.md	only: although some tasks need only a fraction of that
+Chapters/19_Techniques--Concurrency.md	only: an isolated object that reacts only to messages sent to its own mailbox
+Chapters/19_Techniques--Concurrency.md	only: and a free-threaded build only once you know every extension you use supports it
+Chapters/19_Techniques--Concurrency.md	only: and only a CODE against an empty
+Chapters/19_Techniques--Concurrency.md	only: but CODE admits only two at a time
+Chapters/19_Techniques--Concurrency.md	only: but only in the way a crash is better than corruption
+Chapters/19_Techniques--Concurrency.md	only: for example letting only the task with the lower ID give
+Chapters/19_Techniques--Concurrency.md	only: it is a suspended function that runs only when the event loop resumes it
+Chapters/19_Techniques--Concurrency.md	only: it starts the next coroutine only after the previous one has finished
+Chapters/19_Techniques--Concurrency.md	only: not only a process pool
+Chapters/19_Techniques--Concurrency.md	only: only one task runs its read-modify-write at a time
+Chapters/19_Techniques--Concurrency.md	only: only the type of object the call built
+Chapters/19_Techniques--Concurrency.md	only: so only the split changes from one line of output to the next
+Chapters/19_Techniques--Concurrency.md	only: so two threads contend only when they touch the same container
+Chapters/19_Techniques--Concurrency.md	only: while a coroutine yields only at an CODE you chose to write
 Chapters/19_Techniques--Concurrency.md	want: and that is what you want
 Chapters/20_Patterns--Rethinking_Objects.md	is what: *Subtype polymorphism* is what the four subsections below demonstrate
 Chapters/20_Patterns--Rethinking_Objects.md	is what: the question is what Python delivers and what it costs
 Chapters/20_Patterns--Rethinking_Objects.md	never: An override may accept more than the base does but never less
 Chapters/20_Patterns--Rethinking_Objects.md	nothing more: Satisfying three of them costs nothing more than having the three methods
+Chapters/20_Patterns--Rethinking_Objects.md	only: A frozen data class is hashable only when every field it holds is hashable
+Chapters/20_Patterns--Rethinking_Objects.md	only: And these copies plug only the outbound leak
+Chapters/20_Patterns--Rethinking_Objects.md	only: But a method is only a function whose first argument is the object
+Chapters/20_Patterns--Rethinking_Objects.md	only: CODE is only an aid during type checking
+Chapters/20_Patterns--Rethinking_Objects.md	only: Declare a protocol member read-only unless callers really do write to it
+Chapters/20_Patterns--Rethinking_Objects.md	only: Each protocol names only the shape it needs
+Chapters/20_Patterns--Rethinking_Objects.md	only: Immutability lets you share an object safely and use it as a dict key only when it goes all the way down
+Chapters/20_Patterns--Rethinking_Objects.md	only: Inheritance is only one way to get there
+Chapters/20_Patterns--Rethinking_Objects.md	only: Only the last
+Chapters/20_Patterns--Rethinking_Objects.md	only: Python hides a field with a leading underscore and a read-only property
+Chapters/20_Patterns--Rethinking_Objects.md	only: Substitution is safe only when both halves work
+Chapters/20_Patterns--Rethinking_Objects.md	only: and expose only what you meant to expose
+Chapters/20_Patterns--Rethinking_Objects.md	only: and the only validity check comes at runtime
+Chapters/20_Patterns--Rethinking_Objects.md	only: and you act on objects only by sending messages
+Chapters/20_Patterns--Rethinking_Objects.md	only: because each function's parameter names only the one method it needs
+Chapters/20_Patterns--Rethinking_Objects.md	only: expose it only through methods you control
 Chapters/20_Patterns--Rethinking_Objects.md	promise: The first OOP promise is encapsulation
 Chapters/20_Patterns--Rethinking_Objects.md	promise: The fourth OOP promise is polymorphism
 Chapters/20_Patterns--Rethinking_Objects.md	promise: The second OOP promise is behavior inside the object
@@ -128,17 +352,50 @@ Chapters/21_Patterns--Design_Patterns.md	itself: A CODE renders itself through a
 Chapters/21_Patterns--Design_Patterns.md	itself: A method should talk only to itself
 Chapters/21_Patterns--Design_Patterns.md	itself: by letting the new class register itself as its CODE statement runs
 Chapters/21_Patterns--Design_Patterns.md	itself: once each subclass registers itself as its CODE statement runs
+Chapters/21_Patterns--Design_Patterns.md	only: *Once and once only*
+Chapters/21_Patterns--Design_Patterns.md	only: A dotted edge in the figure exists only at check time
+Chapters/21_Patterns--Design_Patterns.md	only: A method should talk only to itself
+Chapters/21_Patterns--Design_Patterns.md	only: A pattern earns its place only when you have the problem it solves
+Chapters/21_Patterns--Design_Patterns.md	only: In a language whose only rungs are a part's internals and its name
+Chapters/21_Patterns--Design_Patterns.md	only: This listing shows only the shape
+Chapters/21_Patterns--Design_Patterns.md	only: This usually appears only after you apply a standard design several times
 Chapters/22_Patterns--Data_Transfer_Objects.md	even: and a comparison between two different frozen types raises one even then
 Chapters/22_Patterns--Data_Transfer_Objects.md	itself: CODE names the fields and documents itself at each call site
+Chapters/22_Patterns--Data_Transfer_Objects.md	only: Because CODE is the only parameter
+Chapters/22_Patterns--Data_Transfer_Objects.md	only: The hand-rolled CODE is worth writing only to show how CODE works underneath
+Chapters/22_Patterns--Data_Transfer_Objects.md	only: and the CODE marker from Positional-Only and Keyword-Only Parameters is unnecessary here
+Chapters/22_Patterns--Data_Transfer_Objects.md	only: when the value should be a distinct type that equals only its own kind
 Chapters/22_Patterns--Data_Transfer_Objects.md	want: When you want the fields named and checked
 Chapters/23_Patterns--Iterators.md	ever: No type checker can read the code and decide whether an iterator ever ends
 Chapters/23_Patterns--Iterators.md	itself: its CODE returns itself
+Chapters/23_Patterns--Iterators.md	only: CODE accepts only an iterator
+Chapters/23_Patterns--Iterators.md	only: CODE shows only the stream version
+Chapters/23_Patterns--Iterators.md	only: It asks only for the next item
+Chapters/23_Patterns--Iterators.md	only: Only CODE waits
+Chapters/23_Patterns--Iterators.md	only: Only a bare CODE hands you a CODE
+Chapters/23_Patterns--Iterators.md	only: The CODE at the top runs only when something demands the first value
+Chapters/23_Patterns--Iterators.md	only: The only way to find out whether the body accepts its arguments is to pull a value and let it run
+Chapters/23_Patterns--Iterators.md	only: and the only way to find out whether the source has run out is to pull and get nothing back
+Chapters/23_Patterns--Iterators.md	only: but only by keeping everything the traversal has seen
+Chapters/23_Patterns--Iterators.md	only: so the only way to ask is to take
 Chapters/23_Patterns--Iterators.md	want: then say which of the two you would want wrapping a parsed log file
 Chapters/24_Patterns--Singleton.md	already: The mutate-versus-rebind distinction from A Module Is Already a *Singleton* reappears here
 Chapters/24_Patterns--Singleton.md	already: The other seven are already in the hands of their callers
 Chapters/24_Patterns--Singleton.md	already: and explain the difference using the binding-versus-mutation distinction from A Module Is Already a *Singleton*
 Chapters/24_Patterns--Singleton.md	already: the language already has an answer
 Chapters/24_Patterns--Singleton.md	exactly: which the import system builds exactly once
+Chapters/24_Patterns--Singleton.md	only: A constructor function with no arguments has only one possible call
+Chapters/24_Patterns--Singleton.md	only: But CODE in your module rebinds only your module's name
+Chapters/24_Patterns--Singleton.md	only: Declare only what you rebind
+Chapters/24_Patterns--Singleton.md	only: Only the first call constructs a CODE
+Chapters/24_Patterns--Singleton.md	only: Only the object from the last thread to finish stays in the cache
+Chapters/24_Patterns--Singleton.md	only: Python calls it only when ordinary attribute lookup fails
+Chapters/24_Patterns--Singleton.md	only: Rebind only through the module
+Chapters/24_Patterns--Singleton.md	only: The compiler mangles names only inside a class body
+Chapters/24_Patterns--Singleton.md	only: and the wrapped class's constructor runs only when that method decides to call it
+Chapters/24_Patterns--Singleton.md	only: because an annotation evaluates only when something reads it
+Chapters/24_Patterns--Singleton.md	only: but only when something needs those handles to be objects
+Chapters/24_Patterns--Singleton.md	only: wrapping only the body of the cached function
 Chapters/24_Patterns--Singleton.md	want: Alex Martelli observes that what you usually want is not one object but one shared set of state
 Chapters/24_Patterns--Singleton.md	want: If you really want many handles sharing one set of state
 Chapters/24_Patterns--Singleton.md	want: If you want a class
@@ -147,11 +404,32 @@ Chapters/25_Patterns--Template_Method.md	hook: This kind of optional step is a *
 Chapters/25_Patterns--Template_Method.md	hook: whether the subclass overrides CODE or misspells a hook
 Chapters/25_Patterns--Template_Method.md	hooks: The CODE and CODE in the opening example are hooks
 Chapters/25_Patterns--Template_Method.md	hooks: starting from the base class with its empty hooks
+Chapters/25_Patterns--Template_Method.md	only: An anchored algorithm is only as secure as its anchor
+Chapters/25_Patterns--Template_Method.md	only: Change the check so it compares a new method only against the names CODE defines
+Chapters/25_Patterns--Template_Method.md	only: Only the type checker enforces CODE
+Chapters/25_Patterns--Template_Method.md	only: That decorator stops an override only when the type checker runs
+Chapters/25_Patterns--Template_Method.md	only: The *Template Method* works only when every subclass is a faithful substitute for its base
+Chapters/25_Patterns--Template_Method.md	only: This works only when you can pass functions instead of subclassing
+Chapters/25_Patterns--Template_Method.md	only: and CODE stops that replacement only for the type checker
+Chapters/25_Patterns--Template_Method.md	only: and only its steps come from outside
+Chapters/25_Patterns--Template_Method.md	only: only one that nearly matches an inherited name produces a CODE
+Chapters/25_Patterns--Template_Method.md	only: only the box beneath it changes
+Chapters/25_Patterns--Template_Method.md	only: so a subclass overrides only the steps that matter to it
+Chapters/25_Patterns--Template_Method.md	only: whereas CODE is only a type-checking attribute
 Chapters/25_Patterns--Template_Method.md	want: If you want the interpreter to refuse an override
 Chapters/26_Patterns--Surrogate.md	even: even when the implementation defines a CODE of its own
 Chapters/26_Patterns--Surrogate.md	itself: CODE calls itself when the name it reads is also missing
 Chapters/26_Patterns--Surrogate.md	itself: Extend CODE's CODE so it answers one cheap attribute itself
 Chapters/26_Patterns--Surrogate.md	itself: so a CODE that reads CODE calls itself forever
+Chapters/26_Patterns--Surrogate.md	only: A guest reaches only the names in CODE
+Chapters/26_Patterns--Surrogate.md	only: CODE against a CODE Protocol checks only that the methods exist
+Chapters/26_Patterns--Surrogate.md	only: Create a program similar to a DBMS that allows only a fixed number of connections at a time
+Chapters/26_Patterns--Surrogate.md	only: Only a call to CODE increments the tally
+Chapters/26_Patterns--Surrogate.md	only: Only the surrogate's current implementation changes
+Chapters/26_Patterns--Surrogate.md	only: Python calls it only after normal lookup fails
+Chapters/26_Patterns--Surrogate.md	only: and CODE checks only the proxy's own class
+Chapters/26_Patterns--Surrogate.md	only: and relies only on intent
+Chapters/26_Patterns--Surrogate.md	only: so CODE passes the check and fails only at runtime
 Chapters/27_Patterns--Factory.md	already: a data class with keyword arguments already does the job
 Chapters/27_Patterns--Factory.md	even: A lazy import produces the same failure even when the import statement is in the file
 Chapters/27_Patterns--Factory.md	even: even momentarily
@@ -162,11 +440,42 @@ Chapters/27_Patterns--Factory.md	itself: but a subclass defined in another modul
 Chapters/27_Patterns--Factory.md	never: An import written only to trigger registration never uses that name
 Chapters/27_Patterns--Factory.md	never: Run the program and confirm that CODE never yields CODE
 Chapters/27_Patterns--Factory.md	never: The classic failure is a plugin that "never registered"
+Chapters/27_Patterns--Factory.md	only: An import written only to trigger registration never uses that name
+Chapters/27_Patterns--Factory.md	only: CODE covers only the first level of inheritance
+Chapters/27_Patterns--Factory.md	only: CODE is the only code that changes when you add a new type of CODE
+Chapters/27_Patterns--Factory.md	only: CODE runs only for classes that inherit from CODE
+Chapters/27_Patterns--Factory.md	only: Switching from one GUI to another then touches only a single place in the code
+Chapters/27_Patterns--Factory.md	only: The second hierarchy is worth having only when the creator does work of its own
+Chapters/27_Patterns--Factory.md	only: When choosing the class is the creator's only job
+Chapters/27_Patterns--Factory.md	only: When the variant differs only in field values
+Chapters/27_Patterns--Factory.md	only: and a factory class only when that work has state of its own
+Chapters/27_Patterns--Factory.md	only: and the only method CODE and CODE override
+Chapters/27_Patterns--Factory.md	only: but a subclass defined in another module registers itself only when something imports that module
+Chapters/27_Patterns--Factory.md	only: but only at runtime
+Chapters/27_Patterns--Factory.md	only: that method is the only code you change
 Chapters/28_Patterns--Function_Objects.md	exactly: When each type needs exactly one
 Chapters/28_Patterns--Function_Objects.md	itself: each handler decides for itself whether it failed
+Chapters/28_Patterns--Function_Objects.md	only: A positional-only parameter takes no keyword
+Chapters/28_Patterns--Function_Objects.md	only: The CODE in CODE makes CODE positional-only
+Chapters/28_Patterns--Function_Objects.md	only: a handler receives only its own event type
+Chapters/28_Patterns--Function_Objects.md	only: and the type checker rejects CODE as an assignment to a read-only property
+Chapters/28_Patterns--Function_Objects.md	only: so a class was the only form available
+Chapters/28_Patterns--Function_Objects.md	only: so a class with the right CODE that skipped CODE passes the type checker and fails only when CODE looks it up
+Chapters/28_Patterns--Function_Objects.md	only: the undo discussion in A Callable Object as a *Command* needs only a type
 Chapters/28_Patterns--Function_Objects.md	want: or do you now want an object
 Chapters/29_Patterns--Changing_the_Interface.md	itself: so CODE calls itself until Python raises a CODE
+Chapters/29_Patterns--Changing_the_Interface.md	only: A function that now takes a CODE in place of a string can then warn only the callers still passing a string
+Chapters/29_Patterns--Changing_the_Interface.md	only: An adapter's only job is to produce the interface you need from the one you have
+Chapters/29_Patterns--Changing_the_Interface.md	only: Because CODE runs only for attributes Python does not find normally
+Chapters/29_Patterns--Changing_the_Interface.md	only: That form is static only
+Chapters/29_Patterns--Changing_the_Interface.md	only: The CODE in CODE makes its parameter positional-only
+Chapters/29_Patterns--Changing_the_Interface.md	only: The rename is legal because no caller can pass a positional-only parameter by name
+Chapters/29_Patterns--Changing_the_Interface.md	only: and import only those from a second file
+Chapters/29_Patterns--Changing_the_Interface.md	only: and their required assembly order appears only inside CODE
+Chapters/29_Patterns--Changing_the_Interface.md	only: create an interface that presents only what the client programmer needs
 Chapters/31_Patterns--State_Machines.md	exactly: The engine's lookup keys on CODE exactly
+Chapters/31_Patterns--State_Machines.md	only: and those states exist only after every class definition has run
+Chapters/31_Patterns--State_Machines.md	only: two subclasses of CODE that differ only in their class
 Chapters/31_Patterns--State_Machines.md	want: or want the mechanism visible in your own code
 Chapters/32_Patterns--Multiple_Dispatching.md	even: so even elaborate behavior fits the table
 Chapters/32_Patterns--Multiple_Dispatching.md	even: so even elaborate behavior fits the table (see exercise 9)
@@ -175,24 +484,48 @@ Chapters/32_Patterns--Multiple_Dispatching.md	exactly: The lookup matches classe
 Chapters/32_Patterns--Multiple_Dispatching.md	exactly: it matches on the MRO rather than exactly
 Chapters/32_Patterns--Multiple_Dispatching.md	exactly: while the table matches the class exactly
 Chapters/32_Patterns--Multiple_Dispatching.md	itself: The fallback is how a type written decades after CODE can add itself to an CODE on the left
+Chapters/32_Patterns--Multiple_Dispatching.md	only: CODE needs only the CODE and CODE cases
+Chapters/32_Patterns--Multiple_Dispatching.md	only: That is why one method call can resolve only one unknown type
+Chapters/32_Patterns--Multiple_Dispatching.md	only: The counter fills only as you consume the generator
+Chapters/32_Patterns--Multiple_Dispatching.md	only: and CODE and battles the groups against each other until only members of one group remain
+Chapters/32_Patterns--Multiple_Dispatching.md	only: and the test's import defines only the classes
+Chapters/32_Patterns--Multiple_Dispatching.md	only: only a returned sentinel makes Python try the right operand's CODE
 Chapters/32_Patterns--Multiple_Dispatching.md	want: You want to say CODE
 Chapters/33_Patterns--Visitor.md	is what: Adding an operation from outside is what *Visitor* does
 Chapters/33_Patterns--Visitor.md	itself: *Multiple Dispatching* is the end in itself
+Chapters/33_Patterns--Visitor.md	only: CODE is the conventional placeholder for a name that exists only to satisfy CODE
+Chapters/33_Patterns--Visitor.md	only: Only mypy rejects it
+Chapters/33_Patterns--Visitor.md	only: and the frames differ only in the method the return trip reaches
 Chapters/34_Patterns--Composite_and_Interpreter.md	already: CODE would receive CODE with the fold already done
 Chapters/34_Patterns--Composite_and_Interpreter.md	already: Each rule is a nested pattern over a pair of already-simplified children
 Chapters/34_Patterns--Composite_and_Interpreter.md	even: CODE fails type checking even with a case for every node
 Chapters/34_Patterns--Composite_and_Interpreter.md	exactly: CODE yields exactly one level of CODE and CODE objects
 Chapters/34_Patterns--Composite_and_Interpreter.md	itself: so the alias names itself through one of its own members
+Chapters/34_Patterns--Composite_and_Interpreter.md	only: Only the value a node returns differs
+Chapters/34_Patterns--Composite_and_Interpreter.md	only: Rewrite it to emit only the parentheses that precedence requires
+Chapters/34_Patterns--Composite_and_Interpreter.md	only: The CODE makes CODE positional-only
+Chapters/34_Patterns--Composite_and_Interpreter.md	only: what changed from CODE is only where the operations live
 Chapters/35_Patterns--Flyweight.md	does it: and what does it catch that the CODE version did not
 Chapters/35_Patterns--Flyweight.md	exactly: Its entry lives exactly as long as something references the object
 Chapters/35_Patterns--Flyweight.md	itself: A first design gives each cell everything it knows about itself
+Chapters/35_Patterns--Flyweight.md	only: Only identity proves sharing
+Chapters/35_Patterns--Flyweight.md	only: and a slotted class gets one only by declaring it
+Chapters/35_Patterns--Flyweight.md	only: but only a handful of tile kinds
 Chapters/35_Patterns--Flyweight.md	want: If you want callers to construct objects with an ordinary class call such as CODE
 Chapters/36_Patterns--Memento.md	itself: Change CODE so CODE holds the list itself instead of a tuple copy
 Chapters/36_Patterns--Memento.md	itself: It reads CODE itself and passes whatever the edit returns straight to CODE
 Chapters/36_Patterns--Memento.md	itself: an opaque snapshot of itself
+Chapters/36_Patterns--Memento.md	only: A parameter typed CODE accepts only a CODE
+Chapters/36_Patterns--Memento.md	only: CODE exists only for the type checker
+Chapters/36_Patterns--Memento.md	only: Only unpickle data you trust
+Chapters/36_Patterns--Memento.md	only: because a memento works only when it is a copy and fails when it is an alias
+Chapters/36_Patterns--Memento.md	only: but it copies only the CODE
+Chapters/36_Patterns--Memento.md	only: so a history of CODE states stores each stroke once and duplicates only the pointers
+Chapters/36_Patterns--Memento.md	only: the record makes the attribute that holds it read-only too
 Chapters/37_Patterns--Pattern_Refactoring.md	itself: It registers itself
 Chapters/37_Patterns--Pattern_Refactoring.md	itself: The tests confirm that each subclass registers itself
 Chapters/37_Patterns--Pattern_Refactoring.md	itself: so each one can register itself in CODE automatically
+Chapters/37_Patterns--Pattern_Refactoring.md	only: A design that adds a type without editing existing code ordinarily adds an operation only by editing every type
 Chapters/37_Patterns--Pattern_Refactoring.md	wants: Now the safety officer wants a disposal hazard printed beside the instruction
 Chapters/38_Patterns--Simulation.md	exactly: every target letter marks exactly two rooms
 Chapters/38_Patterns--Simulation.md	exactly: exactly one path connects any two of its open cells
@@ -204,6 +537,22 @@ Chapters/38_Patterns--Simulation.md	itself: it keeps the first for itself and sp
 Chapters/38_Patterns--Simulation.md	itself: not to itself
 Chapters/38_Patterns--Simulation.md	itself: so a new kind of item registers itself
 Chapters/38_Patterns--Simulation.md	itself: so each view drives or replays its model itself
+Chapters/38_Patterns--Simulation.md	only: A single CODE would await only the tasks in the list at the moment of the call
+Chapters/38_Patterns--Simulation.md	only: Because CODE depends only on the CODE CODE
+Chapters/38_Patterns--Simulation.md	only: CODE is CODE only for a type checker reading the file and CODE at runtime
+Chapters/38_Patterns--Simulation.md	only: CODE reports only direct subclasses
+Chapters/38_Patterns--Simulation.md	only: Grains do not read each other's positions and store only their own
+Chapters/38_Patterns--Simulation.md	only: It needs only an object with matching methods
+Chapters/38_Patterns--Simulation.md	only: Only a maze with a loop lets two rats try to claim the same new cell
+Chapters/38_Patterns--Simulation.md	only: The teleports are not shortcuts but the only way through
+Chapters/38_Patterns--Simulation.md	only: The third example gives you only half the outcome
+Chapters/38_Patterns--Simulation.md	only: The view is the only part that touches the screen
+Chapters/38_Patterns--Simulation.md	only: and Python evaluates an annotation only when something reads it
+Chapters/38_Patterns--Simulation.md	only: and a plate of vibrating sand runs on grains that hold only a position
+Chapters/38_Patterns--Simulation.md	only: only its shape matters here
+Chapters/38_Patterns--Simulation.md	only: which only a count like exercise 3's can see
+Chapters/39_Patterns--Pattern_Catalog.md	only: and several exist only to work around limits of a particular language
+Chapters/39_Patterns--Pattern_Catalog.md	only: not only the original *Design Patterns* (GoF) set
 Chapters/40_Functional--Foundations.md	already: CODE already appends the call's arguments after the bound ones
 Chapters/40_Functional--Foundations.md	already: CODE and CODE are the better choice when the function already exists
 Chapters/40_Functional--Foundations.md	already: already correct on the edge case you would otherwise miss
@@ -213,6 +562,14 @@ Chapters/40_Functional--Foundations.md	even: and CODE holds even when the caller
 Chapters/40_Functional--Foundations.md	exactly: a closure is one way to let exactly one function change it
 Chapters/40_Functional--Foundations.md	is what: which is what *first-class* means
 Chapters/40_Functional--Foundations.md	itself: and it changes nothing outside itself
+Chapters/40_Functional--Foundations.md	only: Each freezes only its own top level
+Chapters/40_Functional--Foundations.md	only: For a function whose parameters are positional-only
+Chapters/40_Functional--Foundations.md	only: Freezing only the binding is the shallow-freezing lesson of Rethinking Objects again
+Chapters/40_Functional--Foundations.md	only: The read-only collection types in CODE
+Chapters/40_Functional--Foundations.md	only: and only the binding
+Chapters/40_Functional--Foundations.md	only: and you supply only the part that differs from one use to the next
+Chapters/40_Functional--Foundations.md	only: position is the only way to bind an argument
+Chapters/40_Functional--Foundations.md	only: so only readings between 20.0 and 30.0 Celsius reach the output
 Chapters/40_Functional--Foundations.md	want: A closure fits when you want to configure behavior once
 Chapters/41_Functional--Toolkits.md	does it: and which one does it leave to the caller
 Chapters/41_Functional--Toolkits.md	exactly: Groups of three are far harder to schedule so that every pair meets exactly once
@@ -223,14 +580,34 @@ Chapters/41_Functional--Toolkits.md	exactly: how do you split every possible pai
 Chapters/41_Functional--Toolkits.md	itself: *Recursion* expresses a repeated computation as a function that calls itself
 Chapters/41_Functional--Toolkits.md	itself: CODE states what to do with one element and delegates the nesting to itself
 Chapters/41_Functional--Toolkits.md	itself: The function handles one node and calls itself for the rest
+Chapters/41_Functional--Toolkits.md	only: *Lazy evaluation* computes a value only when something needs it
+Chapters/41_Functional--Toolkits.md	only: A perfect trio schedule exists only when the roster size leaves a remainder of 3 when divided by 6
+Chapters/41_Functional--Toolkits.md	only: CODE works correctly only for pure functions
+Chapters/41_Functional--Toolkits.md	only: Pairs are the only group size where that question has a tidy rotation-based answer
+Chapters/41_Functional--Toolkits.md	only: Rotation is a pairs-only method
+Chapters/41_Functional--Toolkits.md	only: The *circle method* solves the pairs-only version exactly
+Chapters/41_Functional--Toolkits.md	only: and it holds only the few items in flight
+Chapters/41_Functional--Toolkits.md	only: built only from CODE pieces and a generator expression
+Chapters/41_Functional--Toolkits.md	only: pure functions only
+Chapters/41_Functional--Toolkits.md	only: since CODE groups only adjacent elements
+Chapters/41_Functional--Toolkits.md	only: use only the returned iterators
+Chapters/41_Functional--Toolkits.md	only: you can describe an infinite sequence and take only the part you use
 Chapters/41_Functional--Toolkits.md	want: CODE is the right choice when equal lengths are an invariant you want checked
 Chapters/41_Functional--Toolkits.md	want: CODE to take as many of them as you want
 Chapters/41_Functional--Toolkits.md	want: and keeping one is right when you want each pair of distinct elements once
 Chapters/42_Functional--Error_Handling.md	exactly: The narrowing works because CODE is a union of exactly two classes
+Chapters/42_Functional--Error_Handling.md	only: Reading CODE directly is safe here only because CODE adds a note on every failure
+Chapters/42_Functional--Error_Handling.md	only: The only way to the answer is narrowing to one of the two classes
+Chapters/42_Functional--Error_Handling.md	only: but CODE says only "no answer
+Chapters/42_Functional--Error_Handling.md	only: only CODE passes all three steps
+Chapters/42_Functional--Error_Handling.md	only: so only the value's runtime type says which side you received
 Chapters/42_Functional--Error_Handling.md	wants: so a caller who wants the original must read it from the new exception's CODE (set by CODE) or CODE (set when a handler raises an exception without CODE)
 Chapters/43_Functional--Confidence.md	even: and perhaps some should even be mathematically provable
 Chapters/43_Functional--Confidence.md	exactly: every student appears in exactly one group per round
 Chapters/43_Functional--Confidence.md	itself: Substitution stops working the moment a function reads or writes outside itself
+Chapters/43_Functional--Confidence.md	only: CODE comes from Numbers on Your Machine and prints the two times only when you run the listing with CODE
+Chapters/43_Functional--Confidence.md	only: Narrow CODE to compare only the counts
+Chapters/43_Functional--Confidence.md	only: so the theorem holds only as far as the annotations reach
 Chapters/43_Functional--Confidence.md	want: *Declarative* code states the result you want
 Chapters/44_Effects--Effect_Management.md	already: imagine a signature that declares its Effects the way CODE already declares one
 Chapters/44_Effects--Effect_Management.md	does it: Automated testing moved "does it still work
@@ -244,8 +621,23 @@ Chapters/44_Effects--Effect_Management.md	is what: CODE is what it produces on s
 Chapters/44_Effects--Effect_Management.md	is what: serving a new context without edits is what delayed binding provides
 Chapters/44_Effects--Effect_Management.md	itself: Could Python itself gain Effect tracking
 Chapters/44_Effects--Effect_Management.md	itself: The function reads nothing outside itself and changes nothing outside itself
+Chapters/44_Effects--Effect_Management.md	only: A library can act only on values
+Chapters/44_Effects--Effect_Management.md	only: A library has only the description route
+Chapters/44_Effects--Effect_Management.md	only: But it guards only the exceptions CODE's CODE names
+Chapters/44_Effects--Effect_Management.md	only: CODE is the only place that can fail
+Chapters/44_Effects--Effect_Management.md	only: Caching works only because the cached function is pure
+Chapters/44_Effects--Effect_Management.md	only: Only a runtime failure verifies the wiring
+Chapters/44_Effects--Effect_Management.md	only: The body runs only when something awaits the description or hands it to CODE
+Chapters/44_Effects--Effect_Management.md	only: it shares only its name with the TypeScript library
+Chapters/44_Effects--Effect_Management.md	only: yet each must name both parameters only to pass them to the function below it
 Chapters/44_Effects--Effect_Management.md	want: You annotate explicitly when you want a constraint
 Chapters/45_Effects--Generators.md	itself: Nothing prints the CODE itself
+Chapters/45_Effects--Generators.md	only: A driver holding only the outermost generator can still stop and clean up every frame beneath it
+Chapters/45_Effects--Generators.md	only: CODE's single CODE finishes only after every generator beneath it has finished
+Chapters/45_Effects--Generators.md	only: Only the generator portion changed
+Chapters/45_Effects--Generators.md	only: The distinction exists only for the type checker
+Chapters/45_Effects--Generators.md	only: The driver sees CODE only when CODE finishes its last delegation
+Chapters/45_Effects--Generators.md	only: so only the CODE call sits there
 Chapters/46_Effects--Stateless.md	already: A function that already returns an Effect needs no CODE
 Chapters/46_Effects--Stateless.md	already: CODE is a second handler already applied to CODE
 Chapters/46_Effects--Stateless.md	already: CODE is already CODE
@@ -265,6 +657,26 @@ Chapters/46_Effects--Stateless.md	never: Failures never vanish
 Chapters/46_Effects--Stateless.md	never: because CODE matches the yielded value before the driver gets it and never resumes the inner generator
 Chapters/46_Effects--Stateless.md	never: so CODE never returns a subclass registered under its own name
 Chapters/46_Effects--Stateless.md	never: so the inner CODE never runs
+Chapters/46_Effects--Stateless.md	only: A CODE-shaped value appears in Stateless only after CODE (Turning an Error Into a Value)
+Chapters/46_Effects--Stateless.md	only: A function that constructs its own CODE can use only that class
+Chapters/46_Effects--Stateless.md	only: A library acts only on objects handed to it
+Chapters/46_Effects--Stateless.md	only: At runtime it prints only the class of its argument (CODE
+Chapters/46_Effects--Stateless.md	only: CODE has appeared so far only in the type CODE expects
+Chapters/46_Effects--Stateless.md	only: CODE is the only CODE here
+Chapters/46_Effects--Stateless.md	only: CODE is the only extra call in that test
+Chapters/46_Effects--Stateless.md	only: Fix the error by changing only the annotation
+Chapters/46_Effects--Stateless.md	only: Only the static type changes
+Chapters/46_Effects--Stateless.md	only: That CODE is the only CODE in CODE
+Chapters/46_Effects--Stateless.md	only: The channel carries only the failures CODE lifted into it
+Chapters/46_Effects--Stateless.md	only: The two names differ only in case
+Chapters/46_Effects--Stateless.md	only: You can catch both errors or only one
+Chapters/46_Effects--Stateless.md	only: and CODE handles only a CODE
+Chapters/46_Effects--Stateless.md	only: and only a subclass can replace it
+Chapters/46_Effects--Stateless.md	only: but an interface reaches CODE only through an implementation
+Chapters/46_Effects--Stateless.md	only: even though only CODE
+Chapters/46_Effects--Stateless.md	only: so CODE shows only its signature
+Chapters/46_Effects--Stateless.md	only: so looking up a name is the only step and CODE is the only failure
+Chapters/46_Effects--Stateless.md	only: so today the parent contributes only the name CODE matches
 Chapters/46_Effects--Stateless.md	wants: A caller who wants to redirect the output
 Chapters/47_Effects--Stateless_in_Practice.md	already: CODE and CODE already share a signature
 Chapters/47_Effects--Stateless_in_Practice.md	already: which CODE already declares
@@ -279,72 +691,255 @@ Chapters/47_Effects--Stateless_in_Practice.md	never: CODE never runs
 Chapters/47_Effects--Stateless_in_Practice.md	never: and the driver never resumes the generator
 Chapters/47_Effects--Stateless_in_Practice.md	never: and this one never propagates
 Chapters/47_Effects--Stateless_in_Practice.md	nothing more: and here a scenario is nothing more than arguments to CODE
+Chapters/47_Effects--Stateless_in_Practice.md	only: Add a wind turbine to CODE that is available only during a fixed windy stretch of the evening
+Chapters/47_Effects--Stateless_in_Practice.md	only: CODE comes from the only two schedule combinators the library has
+Chapters/47_Effects--Stateless_in_Practice.md	only: CODE's signature is also the only place its failures appear
+Chapters/47_Effects--Stateless_in_Practice.md	only: Stateless offers only the first of the three
+Chapters/47_Effects--Stateless_in_Practice.md	only: That cache key is only the argument
+Chapters/47_Effects--Stateless_in_Practice.md	only: That restriction is the only one the checker enforces
+Chapters/47_Effects--Stateless_in_Practice.md	only: The channel carries only what you put into it
+Chapters/47_Effects--Stateless_in_Practice.md	only: The matched set comes back only if you write it down
+Chapters/47_Effects--Stateless_in_Practice.md	only: These two are the only functions that perform work
+Chapters/47_Effects--Stateless_in_Practice.md	only: Trust a green check only where you have seen the same construct produce a red one
+Chapters/47_Effects--Stateless_in_Practice.md	only: and only the function can build a second description
+Chapters/47_Effects--Stateless_in_Practice.md	only: and the CODE that comes back is only a return value
+Chapters/47_Effects--Stateless_in_Practice.md	only: and the only difference is what you supply
+Chapters/47_Effects--Stateless_in_Practice.md	only: and the only types it mentions are the three Protocols
+Chapters/47_Effects--Stateless_in_Practice.md	only: and the window for the mistake is only as wide as the gap between the two reads
+Chapters/47_Effects--Stateless_in_Practice.md	only: and whose body is only the success path
+Chapters/47_Effects--Stateless_in_Practice.md	only: memoize a function only where one environment serves the memoized call for its whole lifetime
+Chapters/47_Effects--Stateless_in_Practice.md	only: so the only evidence is a bug report saying the log file is occasionally short by a few lines
+Chapters/A_Effect_Tracking.md	only: and the PEP directs every consumer to act only on the objects it recognizes
+Chapters/A_Effect_Tracking.md	only: so a caller declares only what remains unhandled
 Chapters/A_Effect_Tracking.md	want: You write a row when you want a constraint
 Chapters/B_An_Effect_Checker.md	even: even when it matches the name of a built-in
 Chapters/B_An_Effect_Checker.md	is what: is what the checker resolves
 Chapters/B_An_Effect_Checker.md	itself: CODE declares itself pure and calls CODE
 Solutions/02_Foundations--Tour/README.md	is what: What differs is what a reader infers
 Solutions/02_Foundations--Tour/README.md	is what: which is what both of these are
+Solutions/02_Foundations--Tour/README.md	only: A post-processor has only the characters
+Solutions/02_Foundations--Tour/README.md	only: Only the camelCase form breaks Naming Conventions
+Solutions/02_Foundations--Tour/README.md	only: and it is the only one a linter flags
 Solutions/03_Foundations--Containers/README.md	is what: The rest is what CODE supplies after the tally
+Solutions/03_Foundations--Containers/README.md	only: Only an empty list falls short
+Solutions/03_Foundations--Containers/README.md	only: but only the set version commutes
+Solutions/04_Foundations--Control_Flow/README.md	only: A list pattern matches only a sequence of its own length
+Solutions/04_Foundations--Control_Flow/README.md	only: Order matters only between patterns that could both match the same value
+Solutions/04_Foundations--Control_Flow/README.md	only: Order matters only when two conditions can both be true for the same value and send execution down different paths
+Solutions/04_Foundations--Control_Flow/README.md	only: and increment it only in the branch that handles an odd CODE
+Solutions/04_Foundations--Control_Flow/README.md	only: and only one of them (CODE) starts from an odd CODE
+Solutions/04_Foundations--Control_Flow/README.md	only: and that branch runs only when CODE is odd
+Solutions/04_Foundations--Control_Flow/README.md	only: so CODE matches only a list of two items
 Solutions/04_Foundations--Control_Flow/README.md	want: and Python fills that attribute in whether you want it or not
+Solutions/05_Foundations--Functions/README.md	only: Any parameter that follows CODE is keyword-only
+Solutions/05_Foundations--Functions/README.md	only: CODE and CODE stay positional-only (from the original CODE)
+Solutions/05_Foundations--Functions/README.md	only: CODE is positional-only
+Solutions/05_Foundations--Functions/README.md	only: Only CODE empties the caller's list
+Solutions/05_Foundations--Functions/README.md	only: Positional-Only and Keyword-Only Parameters explains the CODE and CODE markers
+Solutions/05_Foundations--Functions/README.md	only: Positional-Only and Keyword-Only Parameters explains the CODE marker
+Solutions/05_Foundations--Functions/README.md	only: `describe() got some positional-only arguments passed as keyword arguments
+Solutions/05_Foundations--Functions/README.md	only: and Positional-Only and Keyword-Only Parameters shows how a parameter becomes keyword-only
+Solutions/05_Foundations--Functions/README.md	only: and it need only be callable with one argument
+Solutions/05_Foundations--Functions/README.md	only: as keyword-only
+Solutions/05_Foundations--Functions/README.md	only: it becomes CODE only because of where it sits in the sequence
+Solutions/05_Foundations--Functions/README.md	only: so CODE is true only when the caller supplied no default
+Solutions/05_Foundations--Functions/README.md	only: so assigning to it moves only the local name
+Solutions/05_Foundations--Functions/README.md	only: so it is keyword-only
 Solutions/06_Foundations--Modules_and_Packages/README.md	itself: but the import system reads the directory listing and decides for itself
+Solutions/06_Foundations--Modules_and_Packages/README.md	only: CODE and the underscore convention compose in one direction only
+Solutions/06_Foundations--Modules_and_Packages/README.md	only: Prefer the relative form only for siblings within one package
+Solutions/06_Foundations--Modules_and_Packages/README.md	only: They differ only in how they name it
+Solutions/06_Foundations--Modules_and_Packages/README.md	only: but without CODE an underscore is the only way to keep a name out of a star import
+Solutions/07_Foundations--Classes/README.md	only: so the trace shows only the CODE chain
 Solutions/07_Foundations--Classes/README.md	want: the form you want in a traceback or a debugger
 Solutions/07_Foundations--Classes/README.md	want: the form you want in output a user reads
 Solutions/08_Foundations--Static_Types/README.md	is what: The question is what the checker knows about an expression whose type parameter nothing solves
+Solutions/08_Foundations--Static_Types/README.md	only: A CODE declares only that you can read CODEs out of it
+Solutions/08_Foundations--Static_Types/README.md	only: it is the read-only abstract shape
+Solutions/09_Foundations--Class_Attributes/README.md	only: CODE is empty because the constructor writes only to the class
+Solutions/09_Foundations--Class_Attributes/README.md	only: which is the only place assignment writes
 Solutions/10_Foundations--Cleanup/README.md	exactly: The two coincide in CODE because that list has exactly one reference
+Solutions/10_Foundations--Cleanup/README.md	only: CODE is in the chapter's listing only to keep the output predictable
+Solutions/10_Foundations--Cleanup/README.md	only: CODE prints only because CODE's CODE backstop runs every still-alive finalizer as the interpreter shuts down
+Solutions/10_Foundations--Cleanup/README.md	only: Reference Cycles Delay Destruction shows CODE running only when CODE reclaims a cycle
+Solutions/10_Foundations--Cleanup/README.md	only: The CODE statement calls CODE only after CODE returns
+Solutions/10_Foundations--Cleanup/README.md	only: The CODE statement calls CODE only for a block it has entered
+Solutions/10_Foundations--Cleanup/README.md	only: and it enters the block only after CODE returns
+Solutions/10_Foundations--Cleanup/README.md	only: and the resulting list is again the only thing holding references to those three objects
+Solutions/11_Techniques--Testing/README.md	only: An injected test depends only on the shape of what it passes
+Solutions/11_Techniques--Testing/README.md	only: CODE and CODE disagree only at zero
+Solutions/11_Techniques--Testing/README.md	only: CODE passes only if CODE received no call
+Solutions/11_Techniques--Testing/README.md	only: If you test only a positive balance
+Solutions/11_Techniques--Testing/README.md	only: The second test knows only what the function does
 Solutions/12_Techniques--Data_Classes_as_Types/README.md	even: even in a leap year
 Solutions/12_Techniques--Data_Classes_as_Types/README.md	itself: A CODE Cannot Validate Itself explains why the class body of a CODE refuses a CODE
 Solutions/12_Techniques--Data_Classes_as_Types/README.md	itself: A CODE Cannot Validate Itself shows the same failure in its third test
+Solutions/12_Techniques--Data_Classes_as_Types/README.md	only: CODE takes the CODE as a second argument so it can raise February's cap to 29 only when the year is leap
+Solutions/12_Techniques--Data_Classes_as_Types/README.md	only: If you keep only the CODE check
+Solutions/12_Techniques--Data_Classes_as_Types/README.md	only: The prohibition covers only the body that CODE processes
+Solutions/12_Techniques--Data_Classes_as_Types/README.md	only: only confirms an CODE appears somewhere
+Solutions/12_Techniques--Data_Classes_as_Types/README.md	only: reporting CODE as read-only on a frozen instance
 Solutions/12_Techniques--Data_Classes_as_Types/README.md	want: Subscript the factory when you want the checker to confirm the agreement
 Solutions/13_Techniques--Pattern_Matching/README.md	exactly: CODE matches a list with exactly one element (the CODE throws the element away without a name)
 Solutions/13_Techniques--Pattern_Matching/README.md	is what: but it is what you want when the test is more than equality
 Solutions/13_Techniques--Pattern_Matching/README.md	itself: A value inside a mapping pattern can itself be a pattern
+Solutions/13_Techniques--Pattern_Matching/README.md	only: CODE matches only an empty sequence
+Solutions/13_Techniques--Pattern_Matching/README.md	only: Python accepts CODE only because it is the last case
+Solutions/13_Techniques--Pattern_Matching/README.md	only: The type checker sees only that CODE returns an CODE
+Solutions/13_Techniques--Pattern_Matching/README.md	only: so each event fits only one of them
+Solutions/13_Techniques--Pattern_Matching/README.md	only: so the call checks only when the cases above it have eliminated every member of the union
+Solutions/13_Techniques--Pattern_Matching/README.md	only: the missing case becomes a type error at check time instead of a silent gap that shows up only when a CODE reaches CODE at runtime
 Solutions/13_Techniques--Pattern_Matching/README.md	want: but it is what you want when the test is more than equality
 Solutions/14_Techniques--Decorators/README.md	itself: every retried function reports itself as CODE to a log line or a test report that reads CODE
+Solutions/14_Techniques--Decorators/README.md	only: Give CODE a CODE parameter that defaults to CODE and a keyword-only CODE
+Solutions/14_Techniques--Decorators/README.md	only: Making CODE the only positional parameter and CODE keyword-only keeps the two calls unambiguous
+Solutions/14_Techniques--Decorators/README.md	only: The class form fails on methods only when the instance of the decorator class is the object that replaces the method
+Solutions/14_Techniques--Decorators/README.md	only: The only effect is the side effect
+Solutions/14_Techniques--Decorators/README.md	only: since each layer knows only about the drink directly inside it
+Solutions/14_Techniques--Decorators/README.md	only: so CODE and CODE track only their own function's calls
+Solutions/14_Techniques--Decorators/README.md	only: so the failure appears only when the program runs
+Solutions/15_Techniques--Context_Managers/README.md	only: CODE accepts a count settled only at runtime
+Solutions/15_Techniques--Context_Managers/README.md	only: The CODE is the only difference between the two listings
+Solutions/15_Techniques--Context_Managers/README.md	only: and only then does the exception leave the CODE statement and reach the CODE
 Solutions/16_Techniques--Comprehensions/README.md	already: which already chooses between two values
 Solutions/16_Techniques--Comprehensions/README.md	even: even when it returns something useful
+Solutions/16_Techniques--Comprehensions/README.md	only: CODE is still the only name the filter drops
+Solutions/16_Techniques--Comprehensions/README.md	only: CODE is the only element that is both a string and made entirely of digits
+Solutions/16_Techniques--Comprehensions/README.md	only: Only the literal in the conditional expression changes
+Solutions/16_Techniques--Comprehensions/README.md	only: Two entries collide only if their normalized strings are equal
+Solutions/16_Techniques--Comprehensions/README.md	only: it collapses only exact duplicates of the normalized form
 Solutions/16_Techniques--Comprehensions/README.md	want: Which shape is right depends on whether you want the list
 Solutions/16_Techniques--Comprehensions/README.md	want: and a loop when you want the side effect
 Solutions/16_Techniques--Comprehensions/README.md	want: use a comprehension when you want the collection it produces
 Solutions/17_Techniques--Metaprogramming/README.md	itself: and CODE walks CODE to ask whether any ancestor declared itself final
 Solutions/17_Techniques--Metaprogramming/README.md	itself: so each new generation adds itself and prunes its parent automatically
+Solutions/17_Techniques--Metaprogramming/README.md	only: CODE raises a CODE only for a class whose CODE holds one of the classes in CODE
+Solutions/17_Techniques--Metaprogramming/README.md	only: Creating CODE adds it to the registry and removes its only base
+Solutions/17_Techniques--Metaprogramming/README.md	only: Restoring the CODE check closes the hole at the only point that works
 Solutions/18_Techniques--Performance/README.md	already: A CODE of floats stores pointers to CODE objects that already exist
 Solutions/18_Techniques--Performance/README.md	already: CODE means the JIT is already running
 Solutions/18_Techniques--Performance/README.md	does it: The answer to "at which size does it stop mattering" is therefore not a size where the two versions become equally fast
 Solutions/18_Techniques--Performance/README.md	even: The comprehension must build and hold the whole list of half a million even squares before CODE discards nearly all of them
 Solutions/18_Techniques--Performance/README.md	even: and even which values you store
 Solutions/18_Techniques--Performance/README.md	is what: which is what a membership test needs and what CODE assumes
+Solutions/18_Techniques--Performance/README.md	only: Only at size CODE does the CODE edge ahead
+Solutions/18_Techniques--Performance/README.md	only: Skipping the body is the reason to cache only pure functions
+Solutions/18_Techniques--Performance/README.md	only: The two columns coincide only for a leaf function
+Solutions/18_Techniques--Performance/README.md	only: and the JIT compiles only what the interpreter runs
+Solutions/18_Techniques--Performance/README.md	only: it is slow only because of what it calls
+Solutions/18_Techniques--Performance/README.md	only: since callers read only the front element
+Solutions/18_Techniques--Performance/README.md	only: the element the scan reaches only after walking past every other one
+Solutions/18_Techniques--Performance/README.md	only: which is why the two rankings can name the same function only at the bottom of a call chain
 Solutions/18_Techniques--Performance/README.md	want: including library code you did not write and did not want counted
 Solutions/19_Techniques--Concurrency/README.md	already: and inside CODE that context already carries CODE
 Solutions/19_Techniques--Concurrency/README.md	already: so "already finished" still means "still reversible
 Solutions/19_Techniques--Concurrency/README.md	exactly: Exactly half the increments survive
 Solutions/19_Techniques--Concurrency/README.md	never: and "later" never loops back to "earlier
+Solutions/19_Techniques--Concurrency/README.md	only: Cancellation reaches only running tasks
+Solutions/19_Techniques--Concurrency/README.md	only: Only CODE or a CODE schedules every coroutine as a task before waiting on any
+Solutions/19_Techniques--Concurrency/README.md	only: Only CODE reports CODE now
+Solutions/19_Techniques--Concurrency/README.md	only: Only one read-modify-write runs at a time
+Solutions/19_Techniques--Concurrency/README.md	only: The equivalence is only as good as the count
+Solutions/19_Techniques--Concurrency/README.md	only: so the child skips the pool-building code and only the process you launched runs it
+Solutions/19_Techniques--Concurrency/README.md	only: the interpreter considers switching threads only at a function call or at the jump that closes a loop iteration
+Solutions/19_Techniques--Concurrency/README.md	only: the race stays invisible only because this interpreter places its switch points elsewhere
+Solutions/20_Patterns--Rethinking_Objects/README.md	only: CODE exists only for the type checker
+Solutions/20_Patterns--Rethinking_Objects/README.md	only: CODE gets only the methods you write for it
+Solutions/20_Patterns--Rethinking_Objects/README.md	only: The composed version holds a CODE as a field and exposes only methods you write
+Solutions/20_Patterns--Rethinking_Objects/README.md	only: This version guarantees only that it *keeps* at most two
+Solutions/20_Patterns--Rethinking_Objects/README.md	only: Write CODE to hold a CODE and expose CODE and CODE as read-only properties that return the fields you choose
+Solutions/20_Patterns--Rethinking_Objects/README.md	only: because it asks only for those two properties
+Solutions/20_Patterns--Rethinking_Objects/README.md	only: so the caller changes only the copy
+Solutions/21_Patterns--Design_Patterns/README.md	only: A design that makes formats pluggable and fields painful is the right answer only if formats are what keep changing
+Solutions/21_Patterns--Design_Patterns/README.md	only: Only the scaffolding disappears
+Solutions/21_Patterns--Design_Patterns/README.md	only: only an argument to pass
 Solutions/21_Patterns--Design_Patterns/README.md	shipping: The design is the same shipping calculation
+Solutions/22_Patterns--Data_Transfer_Objects/README.md	only: 'list')CODERecipe` is hashable only when every field is
+Solutions/22_Patterns--Data_Transfer_Objects/README.md	only: but only when frozen (with the default CODE)
 Solutions/22_Patterns--Data_Transfer_Objects/README.md	want: Which one is right depends on whether you want your three numbers to travel as data or to mean something
 Solutions/23_Patterns--Iterators/README.md	exactly: CODE asks for exactly ten
 Solutions/23_Patterns--Iterators/README.md	have to: and what CODE would have to do to learn a count
+Solutions/23_Patterns--Iterators/README.md	only: A generator's body runs only as far as the next CODE
+Solutions/23_Patterns--Iterators/README.md	only: A log is an append-only record that many processes write
+Solutions/23_Patterns--Iterators/README.md	only: CODE pulls only as many values as you request
+Solutions/23_Patterns--Iterators/README.md	only: CODE stops only when CODE reports the end
+Solutions/23_Patterns--Iterators/README.md	only: CODE works only if every value stays reachable
+Solutions/23_Patterns--Iterators/README.md	only: If CODE drops the loop and tests only the one item it reads
+Solutions/23_Patterns--Iterators/README.md	only: Only CODE stops
+Solutions/23_Patterns--Iterators/README.md	only: The list wins only when a pass is expensive and you know the data is small
+Solutions/23_Patterns--Iterators/README.md	only: since CODE and CODE differ only in how they re-yield
+Solutions/23_Patterns--Iterators/README.md	only: so the loss shows only when the program runs
+Solutions/23_Patterns--Iterators/README.md	only: the only way to learn how many values remain is to consume them
 Solutions/24_Patterns--Singleton/README.md	already: A Module Is Already a *Singleton* distinguishes mutating a shared object from rebinding a name
 Solutions/24_Patterns--Singleton/README.md	already: A Module Is Already a *Singleton* explains that Python caches a module in CODE and runs its body once
 Solutions/24_Patterns--Singleton/README.md	already: A Module Is Already a *Singleton* makes that argument at the top of the chapter
 Solutions/24_Patterns--Singleton/README.md	already: Each is already committed to running the body before the first one takes the lock
 Solutions/24_Patterns--Singleton/README.md	is what: The change from CODE is what the one shared object *is*
+Solutions/24_Patterns--Singleton/README.md	only: **Order only the body
+Solutions/24_Patterns--Singleton/README.md	only: **Rebind only the local name
+Solutions/24_Patterns--Singleton/README.md	only: one-and-only-one CODE list to which any part of the program can append
+Solutions/24_Patterns--Singleton/README.md	only: rebind only through the module
+Solutions/24_Patterns--Singleton/README.md	only: so it orders only the second step
+Solutions/24_Patterns--Singleton/README.md	only: weigh the code each form needs against what only a class can offer
 Solutions/24_Patterns--Singleton/README.md	want: When You Want a Class
 Solutions/25_Patterns--Template_Method/README.md	hooks: Hooks and the Misspelled Override builds the set of known names inside CODE from the classes in CODE
 Solutions/25_Patterns--Template_Method/README.md	hooks: Hooks and the Misspelled Override explains how CODE marks CODE as the fixed part of the *Template Method*
+Solutions/25_Patterns--Template_Method/README.md	only: Only discipline
+Solutions/25_Patterns--Template_Method/README.md	only: and it survives only as long as everyone remembers it
+Solutions/25_Patterns--Template_Method/README.md	only: and only one of those things exists
+Solutions/25_Patterns--Template_Method/README.md	only: and only the base class could have recorded that difference
+Solutions/25_Patterns--Template_Method/README.md	only: and only when you run that tool
+Solutions/25_Patterns--Template_Method/README.md	only: but it works only for the subclass that performs it
 Solutions/26_Patterns--Surrogate/README.md	and nothing else: and nothing else creates one
 Solutions/26_Patterns--Surrogate/README.md	itself: which forwards CODE through CODE and owns the one job the connection cannot do for itself
+Solutions/26_Patterns--Surrogate/README.md	only: CODE runs only when normal lookup fails
+Solutions/26_Patterns--Surrogate/README.md	only: Let only a CODE class create the CODE objects
+Solutions/26_Patterns--Surrogate/README.md	only: Special Methods Bypass CODE explains why CODE fails on a proxy that forwards only through CODE
+Solutions/26_Patterns--Surrogate/README.md	only: The Recursion Trap and Forwarding with CODE describe a method that Python calls only after normal lookup fails
+Solutions/26_Patterns--Surrogate/README.md	only: and only the list that writes pays for it
+Solutions/26_Patterns--Surrogate/README.md	only: and only when CODE
+Solutions/26_Patterns--Surrogate/README.md	only: which runs only when normal lookup fails
 Solutions/27_Patterns--Factory/README.md	even: so even the table entry disappears
 Solutions/27_Patterns--Factory/README.md	itself: A class registers itself only when its module runs
 Solutions/27_Patterns--Factory/README.md	itself: each class registers itself
+Solutions/27_Patterns--Factory/README.md	only: "Instance and class checks can only be used with @runtime_checkable protocols"
+Solutions/27_Patterns--Factory/README.md	only: A class registers itself only when its module runs
+Solutions/27_Patterns--Factory/README.md	only: A dictionary lookup treats the same string only as a key
+Solutions/27_Patterns--Factory/README.md	only: CODE against a Protocol also works only when every member is a method
+Solutions/27_Patterns--Factory/README.md	only: Checking only in CODE leaves it open for as long as the caller keeps adding toppings
+Solutions/27_Patterns--Factory/README.md	only: Hiding the Concrete Classes notes that CODE covers only the first level of inheritance
+Solutions/27_Patterns--Factory/README.md	only: That test works on a CODE only when it is CODE
+Solutions/27_Patterns--Factory/README.md	only: The original CODE draws only from that list
+Solutions/27_Patterns--Factory/README.md	only: and a factory that should build only leaf classes needs a further filter
+Solutions/27_Patterns--Factory/README.md	only: and discovers the problem only when CODE finally runs
+Solutions/27_Patterns--Factory/README.md	only: and only when something mutates them in place
+Solutions/27_Patterns--Factory/README.md	only: but only on its second assertion
+Solutions/27_Patterns--Factory/README.md	only: so only the type checker reports the missing CODE
+Solutions/27_Patterns--Factory/README.md	only: so ruff reports the import as unused and the CODE comment is the only sign that it is deliberate
+Solutions/27_Patterns--Factory/README.md	only: the table is the only acceptable version of the two
 Solutions/28_Patterns--Function_Objects/README.md	already: CODE already runs from the class outward to CODE
 Solutions/28_Patterns--Function_Objects/README.md	already: CODE's CODE already carries its configuration
 Solutions/28_Patterns--Function_Objects/README.md	itself: A base class pays for itself when the commands share implementation
 Solutions/28_Patterns--Function_Objects/README.md	never: A CODE is never a root
+Solutions/28_Patterns--Function_Objects/README.md	only: and a callable has only one call
+Solutions/28_Patterns--Function_Objects/README.md	only: and only that fix keeps the value private
 Solutions/28_Patterns--Function_Objects/README.md	want: You then want the original behavior
 Solutions/29_Patterns--Changing_the_Interface/README.md	already: A module is already a namespace
+Solutions/29_Patterns--Changing_the_Interface/README.md	only: A positional-only parameter keeps its name out of the interface
+Solutions/29_Patterns--Changing_the_Interface/README.md	only: CODE exists only to stop Python passing CODE to functions that do not use it
+Solutions/29_Patterns--Changing_the_Interface/README.md	only: CODE reports CODE because the parameter is positional-only
+Solutions/29_Patterns--Changing_the_Interface/README.md	only: Remove it and you lose only the fit
+Solutions/29_Patterns--Changing_the_Interface/README.md	only: and adapt only when the list must stay a list for some other caller
+Solutions/29_Patterns--Changing_the_Interface/README.md	only: and only the *Adapter* changes the name the caller uses
+Solutions/29_Patterns--Changing_the_Interface/README.md	only: import only that function elsewhere
+Solutions/29_Patterns--Changing_the_Interface/README.md	only: so the checker sees only the base class
 Solutions/29_Patterns--Changing_the_Interface/README.md	wants: A caller who wants to act on the warning must change where they get the CODE
 Solutions/31_Patterns--State_Machines/README.md	itself: A state that stays the same returns itself
 Solutions/31_Patterns--State_Machines/README.md	itself: and both answer CODE with a CODE that returns itself for everything after
+Solutions/31_Patterns--State_Machines/README.md	only: A nickel differs from a quarter only in a number the existing action reads
+Solutions/31_Patterns--State_Machines/README.md	only: each CODE is legal only after certain others
+Solutions/31_Patterns--State_Machines/README.md	only: only a lookup
+Solutions/31_Patterns--State_Machines/README.md	only: which leads only to CODE
 Solutions/31_Patterns--State_Machines/README.md	want: so create one when you want a separate row and not when you want a separate value
 Solutions/32_Patterns--Multiple_Dispatching/README.md	even: An even count always leaves the opposite pair to define
 Solutions/32_Patterns--Multiple_Dispatching/README.md	even: remembering that an even count leaves each weapon an opposite that draws
@@ -352,41 +947,121 @@ Solutions/32_Patterns--Multiple_Dispatching/README.md	exactly: That is what the 
 Solutions/32_Patterns--Multiple_Dispatching/README.md	exactly: because the lookup still matches types exactly
 Solutions/32_Patterns--Multiple_Dispatching/README.md	happen: Which one wins depends on the order the loops happen to walk
 Solutions/32_Patterns--Multiple_Dispatching/README.md	is what: That is what the chapter's "matches classes exactly" means
+Solutions/32_Patterns--Multiple_Dispatching/README.md	only: CODE needs only the numeric case
+Solutions/32_Patterns--Multiple_Dispatching/README.md	only: CODE resolves on CODE's type only
+Solutions/32_Patterns--Multiple_Dispatching/README.md	only: If you walk only the left operand's MRO and key on CODE as it is
+Solutions/32_Patterns--Multiple_Dispatching/README.md	only: If you write only one order of a mixed pair
+Solutions/32_Patterns--Multiple_Dispatching/README.md	only: Only a caller that wants the tally needs to pass its own CODE in
+Solutions/32_Patterns--Multiple_Dispatching/README.md	only: Only the cells that need code look like code
+Solutions/32_Patterns--Multiple_Dispatching/README.md	only: Python tries the reflected form only when the left operand declines
+Solutions/32_Patterns--Multiple_Dispatching/README.md	only: and only the first is obvious
+Solutions/32_Patterns--Multiple_Dispatching/README.md	only: only the dictionary
+Solutions/32_Patterns--Multiple_Dispatching/README.md	only: since it plays only the pairs the table holds
+Solutions/32_Patterns--Multiple_Dispatching/README.md	only: so its body runs only as you iterate
+Solutions/32_Patterns--Multiple_Dispatching/README.md	only: though only for a subclass of a concrete item
 Solutions/32_Patterns--Multiple_Dispatching/README.md	want: Which behavior you want depends on whether a subclass is a new competitor or a variation on an existing one
 Solutions/32_Patterns--Multiple_Dispatching/README.md	wants: Only a caller that wants the tally needs to pass its own CODE in
+Solutions/33_Patterns--Visitor/README.md	only: Only CODE is a CODE function
+Solutions/33_Patterns--Visitor/README.md	only: only that one needs CODE and CODE
+Solutions/33_Patterns--Visitor/README.md	only: the listing keeps only the pollinating half of them
 Solutions/34_Patterns--Composite_and_Interpreter/README.md	ever: since following it could loop forever if a link ever pointed back at one of its own ancestors
 Solutions/34_Patterns--Composite_and_Interpreter/README.md	is what: the left operand is what the caller wrote first
 Solutions/34_Patterns--Composite_and_Interpreter/README.md	itself: The derivative of CODE is CODE with respect to itself and CODE with respect to every other variable
-Solutions/34_Patterns--Composite_and_Interpreter/README.md	never: A CODE case that only descends never yields its own path
+Solutions/34_Patterns--Composite_and_Interpreter/README.md	only: A child gets parentheses only when its own operator binds more loosely than what the parent needs
+Solutions/34_Patterns--Composite_and_Interpreter/README.md	only: A subexpression adds parentheses only when its own precedence is lower than the context in which it sits
+Solutions/34_Patterns--Composite_and_Interpreter/README.md	only: CODE now answers only for an CODE
+Solutions/34_Patterns--Composite_and_Interpreter/README.md	only: Only its shape is
+Solutions/34_Patterns--Composite_and_Interpreter/README.md	only: because an CODE can combine its children's values only *after* the children have produced them
+Solutions/34_Patterns--Composite_and_Interpreter/README.md	only: where CODE yields only file paths
 Solutions/35_Patterns--Flyweight/README.md	itself: and the pool empties itself with no explicit cleanup
 Solutions/35_Patterns--Flyweight/README.md	never: so an invalid CODE never reaches the pool
+Solutions/35_Patterns--Flyweight/README.md	only: Only one grass tile exists in memory
+Solutions/35_Patterns--Flyweight/README.md	only: and only a miss can start a race
+Solutions/35_Patterns--Flyweight/README.md	only: but only after CODE has pooled the instance
+Solutions/35_Patterns--Flyweight/README.md	only: lock only on the miss path with a hand-written pool
+Solutions/35_Patterns--Flyweight/README.md	only: whose CODE turns CODE only when the cells share one CODE
+Solutions/36_Patterns--Memento/README.md	only: The mismatch surfaces only when the program runs
+Solutions/36_Patterns--Memento/README.md	only: The test that exposes the corruption compares contents only
+Solutions/36_Patterns--Memento/README.md	only: and pass it to CODE as the only change
+Solutions/36_Patterns--Memento/README.md	only: only arrays
 Solutions/37_Patterns--Pattern_Refactoring/README.md	exactly: The sorter must know exactly what arrived
 Solutions/37_Patterns--Pattern_Refactoring/README.md	exactly: because it pins the registry to exactly CODE and CODE is now a fifth entry
 Solutions/37_Patterns--Pattern_Refactoring/README.md	itself: A subclass of CODE registers itself when its CODE statement runs
 Solutions/37_Patterns--Pattern_Refactoring/README.md	itself: CODE defaults each class to itself
+Solutions/37_Patterns--Pattern_Refactoring/README.md	only: The CODE class is the only new Python code
+Solutions/37_Patterns--Pattern_Refactoring/README.md	only: The CODE test fills in the default only for a class that declares no CODE of its own
+Solutions/37_Patterns--Pattern_Refactoring/README.md	only: When a calculation has the same form for every type and varies only in the numbers each type carries
 Solutions/38_Patterns--Simulation/README.md	even: since even a heavily scaled step is still big enough to leave the neighborhood into which the grain is settling
 Solutions/38_Patterns--Simulation/README.md	exactly: so the difference is exactly CODE at every point on the plate
 Solutions/38_Patterns--Simulation/README.md	happen: Watching It Happen shows the rendered figure
 Solutions/38_Patterns--Simulation/README.md	itself: Scripting CODE's return values in a fixed sequence decides which neighbor the rat keeps for itself and into which cells it spawns new rats
 Solutions/38_Patterns--Simulation/README.md	itself: To see why the factory finds CODE by itself
 Solutions/38_Patterns--Simulation/README.md	never: so the summary statistic cannot tell "finished" from "never started
+Solutions/38_Patterns--Simulation/README.md	only: A coroutine gives up control only at an CODE
+Solutions/38_Patterns--Simulation/README.md	only: A coroutine yields control only at an CODE
+Solutions/38_Patterns--Simulation/README.md	only: CODE imports only the CODE CODE
+Solutions/38_Patterns--Simulation/README.md	only: It jumps somewhere unrelated and stays only if that spot is quiet
+Solutions/38_Patterns--Simulation/README.md	only: Only the field changes
+Solutions/38_Patterns--Simulation/README.md	only: The Rat and the Blackboard shows CODE calling only the methods of the CODE CODE
+Solutions/38_Patterns--Simulation/README.md	only: where along a nodal line it is weak only in a thin strip
+Solutions/38_Patterns--Simulation/README.md	only: which lists only the *direct* subclasses of CODE
 Solutions/38_Patterns--Simulation/README.md	wants: and finishing it means more steps than anyone wants to watch
 Solutions/40_Functional--Foundations/README.md	itself: A pure function reads nothing that can change and changes nothing outside itself
+Solutions/40_Functional--Foundations/README.md	only: CODE is positional-only
+Solutions/40_Functional--Foundations/README.md	only: Immutability in Annotations contrasts CODE with a read-only type such as CODE
+Solutions/40_Functional--Foundations/README.md	only: The unit lives only in the field name
+Solutions/40_Functional--Foundations/README.md	only: and only one of them needs the CODE declaration
+Solutions/40_Functional--Foundations/README.md	only: because each CODE is reachable only through the one function that captured it
+Solutions/40_Functional--Foundations/README.md	only: so its CODE shows only the type and an address
+Solutions/40_Functional--Foundations/README.md	only: then consider how a caller can supply a positional-only parameter
 Solutions/41_Functional--Toolkits/README.md	exactly: and CODE then pulls exactly five totals
 Solutions/41_Functional--Toolkits/README.md	exactly: so CODE yields exactly fifteen integers in all
 Solutions/41_Functional--Toolkits/README.md	is what: because CODE is what CODE builds internally
+Solutions/41_Functional--Toolkits/README.md	only: CODE yields each group as it arrives and keeps only the current one
+Solutions/41_Functional--Toolkits/README.md	only: Lazy Evaluation explains why CODE over an infinite CODE pulls only what it needs
+Solutions/41_Functional--Toolkits/README.md	only: The CODE version accepts only an integer
+Solutions/41_Functional--Toolkits/README.md	only: The generator expression computes each total only when CODE requests it
+Solutions/41_Functional--Toolkits/README.md	only: the chapter's CODE entry states that "CODE works correctly only for pure functions
 Solutions/41_Functional--Toolkits/README.md	wants: and a caller who wants this function to share a program-wide random stream has no way to say so
 Solutions/42_Functional--Error_Handling/README.md	already: The asserts document what the CODE return has already established
 Solutions/42_Functional--Error_Handling/README.md	is what: What changes is what survives the return
+Solutions/42_Functional--Error_Handling/README.md	only: **Catch only the named types
+Solutions/42_Functional--Error_Handling/README.md	only: **Note only the failing path
+Solutions/42_Functional--Error_Handling/README.md	only: Calling every step regardless of earlier failures makes sense only when the steps are independent of each other's results
+Solutions/42_Functional--Error_Handling/README.md	only: and only the failing path has anything to explain
+Solutions/42_Functional--Error_Handling/README.md	only: and the second and third runs differ only in which name appears in the note
+Solutions/42_Functional--Error_Handling/README.md	only: so only the failing path carries one
 Solutions/43_Functional--Confidence/README.md	already: CODE already keeps everyone in a group when a roster divides unevenly
 Solutions/43_Functional--Confidence/README.md	even: The measurement the exercise asks for therefore comes out even at either precision
 Solutions/43_Functional--Confidence/README.md	exactly: The thread pool reports exactly CODE
 Solutions/43_Functional--Confidence/README.md	happens: It is a fallthrough that happens to be correct rather than a branch stating what it matches
+Solutions/43_Functional--Confidence/README.md	only: Only a real script file meets that requirement
+Solutions/43_Functional--Confidence/README.md	only: a submitted task starts a new worker only when no existing worker is idle
 Solutions/44_Effects--Effect_Management/README.md	is what: That is what the chapter calls pushing the Effects to the edges
 Solutions/44_Effects--Effect_Management/README.md	never: with a CODE that CODE was never awaited
+Solutions/44_Effects--Effect_Management/README.md	only: Both read only their arguments and change nothing outside themselves
+Solutions/44_Effects--Effect_Management/README.md	only: Only an CODE may contain CODE
+Solutions/44_Effects--Effect_Management/README.md	only: Only the division remains
+Solutions/44_Effects--Effect_Management/README.md	only: and only two of them use it
+Solutions/44_Effects--Effect_Management/README.md	only: and the propagation stops only at CODE
+Solutions/44_Effects--Effect_Management/README.md	only: so CODE needs only methods with matching signatures
+Solutions/45_Effects--Generators/README.md	only: A generator's return value arrives only on its CODE
+Solutions/45_Effects--Generators/README.md	only: CODE differs only in having CODE inside the CODE
+Solutions/45_Effects--Generators/README.md	only: and CODE is the only value it accepts
+Solutions/45_Effects--Generators/README.md	only: and every CODE expression whose value the generator uses as an CODE must then handle a CODE that arrives only once
+Solutions/45_Effects--Generators/README.md	only: put inside the CODE only the call whose CODE you mean to interpret
 Solutions/45_Effects--Generators/README.md	want: That is the argument for annotating a local whose value comes from a call whose return type you want to pin down
 Solutions/46_Effects--Stateless/README.md	already: which CODE reads as "already returned
 Solutions/46_Effects--Stateless/README.md	is what: and that is what structural typing means
+Solutions/46_Effects--Stateless/README.md	only: CODE catches only the CODE and consumes that one
+Solutions/46_Effects--Stateless/README.md	only: Only CODE has *interpreted* what it caught
+Solutions/46_Effects--Stateless/README.md	only: Only the return type changes
+Solutions/46_Effects--Stateless/README.md	only: Removing the only CODE in the body leaves no CODE anywhere
+Solutions/46_Effects--Stateless/README.md	only: The annotation is the only place the distinction exists
+Solutions/46_Effects--Stateless/README.md	only: The log entries still appear because the deletion touches only the greeting half of the function
+Solutions/46_Effects--Stateless/README.md	only: and only the annotation
+Solutions/46_Effects--Stateless/README.md	only: and only the function that builds the Effect can do that
+Solutions/46_Effects--Stateless/README.md	only: read both diagnostics and ask what the function has become once it loses its only CODE
 Solutions/47_Effects--Stateless_in_Practice/README.md	already: CODE is for a value you already have
 Solutions/47_Effects--Stateless_in_Practice/README.md	already: The two factories in CODE already have the same signature
 Solutions/47_Effects--Stateless_in_Practice/README.md	already: because a function is already an object with a type
@@ -394,3 +1069,14 @@ Solutions/47_Effects--Stateless_in_Practice/README.md	is what: and a wide cast i
 Solutions/47_Effects--Stateless_in_Practice/README.md	itself: and what CODE therefore keeps to itself
 Solutions/47_Effects--Stateless_in_Practice/README.md	itself: whether the battery reports itself unavailable once exhausted
 Solutions/47_Effects--Stateless_in_Practice/README.md	never: CODE cannot catch what never entered the channel
+Solutions/47_Effects--Stateless_in_Practice/README.md	only: A failure is part of the Effect only if it travels as a value
+Solutions/47_Effects--Stateless_in_Practice/README.md	only: CODE is the only addition
+Solutions/47_Effects--Stateless_in_Practice/README.md	only: Only one of them has a tool that knows the set of failures changed
+Solutions/47_Effects--Stateless_in_Practice/README.md	only: Only one of them is optional
+Solutions/47_Effects--Stateless_in_Practice/README.md	only: The accessor is the only place where the type checker checks a caller's arguments
+Solutions/47_Effects--Stateless_in_Practice/README.md	only: Write the first signature with only the new appliance and read where CODE points
+Solutions/47_Effects--Stateless_in_Practice/README.md	only: a function whose return type is an CODE and whose body is not a generator must contain only the expression it returns
+Solutions/47_Effects--Stateless_in_Practice/README.md	only: since past the accessor the arguments are fields on a request that only the handler reads
+Solutions/47_Effects--Stateless_in_Practice/README.md	only: so the assertions together say that CODE tries every price and writes only the affordable ones
+Solutions/47_Effects--Stateless_in_Practice/README.md	only: so the guarantee holds only for Effects that go through CODE
+Solutions/47_Effects--Stateless_in_Practice/README.md	only: so the run prints only the message

@@ -736,7 +736,7 @@ print(type(b).__name__)
 The type checker rejects the commented line.
 
 Type checkers such as `ty`, mypy, and Pyright check `@final` statically.
-At runtime the decorator only marks the class, setting `__final__ = True`
+At runtime the decorator marks the class, setting `__final__ = True`
 (as `test_final.py` below confirms),
 so the interpreter still runs `class C(B): pass`.
 
@@ -1027,7 +1027,7 @@ until Python raises a `RecursionError`.
 `Point` has no descriptor named `_x`,
 so storing the value there breaks the loop.
 
-A descriptor with only `__get__()` is a *non-data descriptor*,
+A descriptor that defines `__get__()` and no `__set__()` is a *non-data descriptor*,
 and the ranking reverses: the instance's `__dict__` wins.
 That is why assigning to `greet` on a `Person` instance shadows the method on that one instance,
 while `p.x = 3` cannot shadow `Field`, because `Field` defines `__set__()`.
@@ -1514,8 +1514,8 @@ skipping every underscore-prefixed name,
 which for `Color` is the dunder bookkeeping every class carries,
 so it yields the three values the body assigned: `"red"`, `"green"`, `"blue"`.
 A class decorator cannot make `for c in Color` work.
-It can only add methods that instances see,
-not a protocol method the class object must answer,
+It can add methods that instances see,
+but not a protocol method the class object must answer,
 which is why `Color` needs a metaclass, not a decorator.
 
 `__prepare__()` is the one with no simpler substitute:
@@ -2062,7 +2062,7 @@ passes `exclude=("__hash__",)`.
 `exclude` drops specific names regardless of what `dunder` otherwise shows,
 and it applies to any member, not just dunders.
 `display_object(obj, REDEFINED_DUNDERS, exclude=("__hash__",))` shows whatever `REDEFINED_DUNDERS` finds redefined,
-minus `__hash__`, useful when an earlier listing has made that point and repeating it only adds noise.
+minus `__hash__`, useful when an earlier listing has made that point and repeating it adds noise.
 The check runs first, before the `dunder` logic sees the name,
 so an excluded name stays out of `[Attributes]` and `[Methods]` no matter which mode selects it.
 

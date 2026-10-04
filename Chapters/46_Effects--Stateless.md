@@ -438,7 +438,7 @@ The first run has `fallback` as its one handler, so the default answers.
 The second run wraps `greet()` in its own `supply()` first,
 and that inner `supply()` empties the Ability channel before any request reaches `fallback`.
 The handler nearest the Effect answers first,
-and the outer one answers only what remains.
+and the outer one handles the requests that remain.
 The type records which handler answered:
 `chosen` is already `(str) -> Success[None]`,
 so `fallback(chosen)` keeps that type.
@@ -591,7 +591,7 @@ def test_greet() -> None:
 
 The test captures nothing from stdout and mocks nothing:
 it supplies a different `Console`, and `greet()` stays as written,
-since its body names only `Console`.
+since its body names `Console`, not any implementation of it.
 
 `as_type(Console)` is the only extra call in that test.
 It says "treat this recorder as a `Console`,"
@@ -933,7 +933,7 @@ If a `cast()` forces the static type,
 the run fails with a `MissingAbilityError`.
 A double for the built-in `Console` must therefore inherit from it.
 That `Console` implements `input()` as well as `print()`,
-so a double that overrides only `print()` reads live stdin.
+so a double that overrides `print()` and inherits `input()` reads live stdin.
 An interface has no implementation to inherit by accident:
 
 ```python
@@ -1237,7 +1237,7 @@ The rule is the same in both cases: the channel holds Abilities.
 `Async` is an Ability, so it sits there bare.
 `Console` is an ordinary class,
 and `Need[Console]` is the Ability that asks for it.
-The first type parameter accepts only `Ability` subclasses,
+The first type parameter is bound to `Ability`,
 so the type checker rejects `Depend[Console, None]` at the annotation.
 [Abilities Are Not Special](47_Effects--Stateless_in_Practice.md#abilities-are-not-special)
 writes an Ability from scratch and takes that type bound apart.
@@ -1826,7 +1826,7 @@ def test_one_unhandled() -> None:
 The test's assertion for Bob is `pytest.raises(ValueError)`:
 the failure the signature declares is the one the caller sees.
 Failures never vanish.
-They only relocate.
+They relocate.
 
 ## Emptying the Channels
 

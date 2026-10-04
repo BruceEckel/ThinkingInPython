@@ -786,7 +786,7 @@ just as the same race between threads needs a `threading.Lock`.
 
 ### Locks
 
-A *lock* grants exclusive access to a shared resource so only one task holds it at a time.
+A *lock* grants exclusive access to a shared resource so one task at a time holds it.
 Wrapping the read-modify-write from `async_race.py` in an `asyncio.Lock` restores the missing updates by serializing access to `counter`:
 
 ```python
@@ -987,7 +987,7 @@ A CPU-bound task cannot overlap if only a single core is available.
 With several cores, it can.
 `ProcessPoolExecutor` runs each call in one of its worker processes,
 each with its own interpreter and its own *Global Interpreter Lock* (GIL),
-the interpreter-wide lock that lets only one thread run Python bytecode at a time.
+the interpreter-wide lock that lets one thread at a time run Python bytecode.
 [The GIL and Free Threading](#the-gil-and-free-threading) explains the lock.
 Here, each interpreter has its own,
 so the operating system can place these processes on different cores and run them at the same time:
@@ -1228,8 +1228,7 @@ and that is why adding cores alone is not a scaling strategy.
 
 Threads don't help with the CPU-bound work in [Parallelism](#parallelism).
 The standard CPython build has one GIL for the whole process,
-so only one thread runs Python bytecode at a time,
-no matter how many cores sit idle.
+so one thread at a time runs Python bytecode, no matter how many cores sit idle.
 
 ### Threads Overlap Waits, Not Computing
 
@@ -1512,7 +1511,7 @@ On the `pyperformance` benchmark suite the average overhead runs from about one 
 depending on the platform.
 
 Removing the lock also removes three decades of accidental protection for C extensions,
-whose authors assumed that only one thread runs at a time.
+whose authors assumed that threads run one at a time.
 The free-threaded build comes with a safety net.
 Loading an extension that has not declared itself thread-safe re-enables the GIL for the whole process and emits a warning.
 Free threading pays off only when every extension you load has passed an audit,
@@ -1713,7 +1712,7 @@ so `get()` suspends it rather than blocking the thread underneath it.
 `producer()` then runs, sleeps to stand in for slow work, and puts an item.
 That `put()` wakes the waiting consumer.
 `asyncio.Queue` needs no locks,
-since the event loop lets only one coroutine touch it at a time.
+since the event loop lets one coroutine at a time touch it.
 That guarantee holds within the event loop's own thread alone:
 a call from another thread has no protection, so the class is not thread-safe.
 
@@ -2233,7 +2232,7 @@ Starting and joining 3,000 threads does OS-level work for each one,
 allocating a stack, registering with the scheduler,
 tearing the thread down again.
 Scheduling 3,000 tasks skips all of that.
-`gather()` only builds Python objects and steps the event loop through them.
+`gather()` builds Python objects and steps the event loop through them.
 
 How many threads can one machine support before `Thread.start()` raises `RuntimeError: can't start new thread`?
 That number belongs to the machine, not to Python.
@@ -2407,7 +2406,7 @@ for example letting only the task with the lower ID give.
   Use raw `multiprocessing` when the job is a different shape:
   a worker that runs continuously,
   or processes that share state through a `Manager`.
-- **More cores only speed up the parallel fraction of the work.**
+- **More cores speed up only the parallel fraction of the work.**
   Splitting past the number of cores sometimes yields a little more.
   Then the per-task cost of pickling and reassembling catches up,
   and the gains flatten (Amdahl's Law).
@@ -2434,10 +2433,10 @@ for example letting only the task with the lower ID give.
 - **Cancellation is a `BaseException`, not an `Exception`.**
   `except Exception:` inside a task lets it through, and that is what you want.
   Catching `asyncio.CancelledError` and not re-raising it strands the `TaskGroup` that asked the task to stop.
-- **A shared lock only prevents deadlock if every user agrees on the order.**
+- **A shared lock prevents deadlock only if every user agrees on the order.**
   Acquire shared locks in the same sequence everywhere.
   When two units keep yielding to each other instead,
-  break the symmetry so only one of them gives way.
+  break the symmetry so one of them gives way and the other goes ahead.
 
 ## Concurrency Is Not Easy
 
@@ -2456,7 +2455,7 @@ all the way to hardware, to understand a particular bug.
 
 Someone who declares "concurrency is easy!" has dipped their toes in it and has yet to encounter a tricky problem.
 This chapter makes concurrency look (somewhat)
-easy because it has only touched the surface of shared mutable state problems.
+easy because it has touched only the surface of shared mutable state problems.
 
 Even when you understand the problems produced by shared mutable state,
 you might not have a choice.

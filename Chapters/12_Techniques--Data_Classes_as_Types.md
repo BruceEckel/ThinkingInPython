@@ -230,8 +230,8 @@ The trailing `...` is `display_object()` trimming that line to its report width.
 `__hash__` is `None`: a `@dataclass` compares by value with `__eq__()`,
 so it gives up hashability rather than let you put a mutable instance in a `set` or use it as a `dict` key.
 As [Class Attributes](09_Foundations--Class_Attributes.md) explains,
-of the three fields only `depth` appears as an attribute,
-because it has an initialization value.
+`depth` is the one field of the three that appears as an attribute,
+because it has an initialization value; `name` and `number` have none.
 
 ```python
 # demo_messenger.py
@@ -553,7 +553,7 @@ The standard library has a second immutable record, `typing.NamedTuple`,
 which also rejects assignment and hashes under the same rule:
 every field it holds must be hashable.
 The two differ in equality.
-A frozen data class equals only another instance of its own class,
+A frozen data class equals another instance of its own class,
 while a `NamedTuple` equals any tuple holding the same values,
 a difference [Data Transfer Objects](22_Patterns--Data_Transfer_Objects.md#a-namedtuple-is-still-a-tuple)
 covers.
@@ -1609,7 +1609,7 @@ and that boundary is the last point where a bad value is cheap to reject.
 Past that line your code holds types rather than raw data,
 and a function receiving one does its work without asking whether the value makes sense.
 
-The price also shows up in memory and time, not only at the boundaries.
+The price also shows up away from the boundaries, in memory and time.
 Every value is now an object:
 a constructor call and attribute access where a bare `int` or `str` needs neither.
 `copy.replace()` re-validates the whole object on every change,

@@ -666,13 +666,14 @@ there, and laid out its `__mro__` from them. The `bases` parameter of
 `__init__()` reports the tuple `__new__()` used rather than choosing a
 new one, so `bases += (Tag,)` rebinds a local name, and `Demo.__bases__`
 stays the same. Passing the longer tuple on to `type.__init__()` changes
-nothing either, since `type.__init__()` only validates its arguments.
+nothing either, since `type.__init__()` checks its arguments and then
+ignores them.
 
 `new_vs_init.py` makes the same point from the other side, with its
 `added_in_init` key. `__new__()` must make every decision about *what
 the class is*: its name, its bases, and the namespace `type` builds it
-from. `__init__()` can only modify the completed class object, which is
-why `setattr(cls, ...)` still works there.
+from. `__init__()` receives the completed class object and can change
+it in place, which is why `setattr(cls, ...)` still works there.
 
 </details>
 </details>

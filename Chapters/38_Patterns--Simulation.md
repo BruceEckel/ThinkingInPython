@@ -27,7 +27,7 @@ The problem has three types.
 A *maze* holds its own layout.
 Given a coordinate, it reports whether that cell is a wall or an opening,
 and it hands out an entry point.
-The maze decides nothing; it only reports what a coordinate contains.
+The maze decides nothing; it reports what a coordinate contains.
 
 A *blackboard* is the shared surface on which every rat writes.
 *Blackboard* is a classic coordination pattern.
@@ -164,7 +164,7 @@ class Maze:
         raise ValueError("the maze has no open cell")
 ```
 
-`Cell` nests inside `Maze` because it names concepts only `Maze` uses.
+`Cell` nests inside `Maze` because it names concepts that `Maze` alone uses.
 It is a `StrEnum` rather than an `Enum`, so each member is also a `str`.
 That is why `ljust()` accepts `WALL` as its fill character,
 and `self.rows[y][x]` compares equal to `Cell.OPEN` on an open cell.
@@ -1460,7 +1460,7 @@ usually the shape of the code, and a full answer for each exercise.
 1.  Test a `Rat` with a fake blackboard.
     Because `Rat` depends only on the `Recorder` `Protocol`,
     you can drive it with a stand-in.
-    Write a fake whose `claim()` returns a scripted sequence of results and whose `spawn()` only records the coordinates it receives,
+    Write a fake whose `claim()` returns a scripted sequence of results and whose `spawn()` records the coordinates it receives instead of starting a rat,
     run one rat with `asyncio.run(rat.run())`,
     and assert which cell the rat kept for itself and which cells it spawned.
     You need no real `Blackboard`, `Maze`, or task scheduling.

@@ -123,7 +123,7 @@ class does not declare which protocol it means to satisfy.
 <summary>Where to look</summary>
 
 [Effects by Hand](../../Chapters/44_Effects--Effect_Management.md#effects-by-hand) shows the bookkeeping that each new Effect adds to every signature on the path.
-Add a `Log` protocol, give the new helper and `greet()` a `log` parameter, and count which functions only pass it along.
+Add a `Log` protocol, give the new helper and `greet()` a `log` parameter, and count which functions use the `Log` and which forward it to the next call.
 Compare that count with what [Tracking and Management](../../Chapters/44_Effects--Effect_Management.md#tracking-and-management) says an EMS declares instead.
 
 <details>
@@ -239,7 +239,7 @@ helper that uses the `Log`. You must edit four existing signatures.
 `format_greeting()`.
 
 **Hand the Effect down the call chain.** `session()`, `menu()`, and `main()` each
-gain a `log` parameter that they only hand to the next function.
+gain a `log` parameter that they hand to the next function.
 Three of the five name a `Log` they do not use. Those functions
 sit between the Effect's user and the call site that binds it, and
 they pay for an Effect whose sole use in their bodies is forwarding

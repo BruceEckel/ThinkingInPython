@@ -299,7 +299,7 @@ pay to express the same intent, and the module version pays none.
 ## 4. Classifying three wrappers
 
 > Consider three wrappers: one logs each call and forwards it unchanged,
-> one exposes a `read()` over an object that has only `next_chunk()`,
+> one exposes a `read()` over an object whose one method is `next_chunk()`,
 > and one refuses calls unless you set a flag.
 > Classify each as *Proxy*, *Decorator*, *Adapter*,
 > or *Façade* using the "remove it and you lose" test from the table,
@@ -324,7 +324,7 @@ disappears.
 
 **The `read()` wrapper is an *Adapter*.** Its interface is not the
 wrapped object's. The caller asks for `read()`, and the wrapped
-object offers only `next_chunk()`, so the wrapper exists to make one
+object offers `next_chunk()` instead, so the wrapper exists to make one
 type fit a caller that expects another. Remove it and you lose only
 the fit, which is enough: the call no longer resolves. An *Adapter*
 adds no behavior, and that is the test that separates the *Adapter*

@@ -462,7 +462,7 @@ print(risky())
 
 `risky()` raises a `ValueError`,
 but the `return` in `finally` discards it before it reaches the caller,
-so the caller sees only `"swallowed"` with no trace of the exception.
+so the caller sees `"swallowed"` and no trace of the exception.
 Python also flags the `return` in `finally` at compile time:
 running the listing prints `SyntaxWarning: 'return' in a 'finally' block` to standard error before `swallowed`.
 
@@ -556,7 +556,7 @@ With no `from`, Python still records the earlier exception in `__context__` and 
 `from None` sets `__suppress_context__`,
 and nothing appears above the new exception.
 Use `from e` when the earlier exception explains this one,
-and `from None` when the earlier exception only distracts from your own message.
+and `from None` when the earlier exception distracts from your own message.
 
 ### Ask Forgiveness, Not Permission
 

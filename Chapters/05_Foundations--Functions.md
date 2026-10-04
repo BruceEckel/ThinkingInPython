@@ -232,7 +232,7 @@ Rebinding one does not.
 
 `good_append()` builds a fresh list on every call,
 and any function that mutates a parameter with a default must do the same.
-If the function only reads the parameter,
+If the function reads the parameter without changing it,
 use an immutable default such as an empty tuple.
 Calls still share that tuple,
 and the sharing is harmless because a tuple cannot change:
@@ -524,7 +524,7 @@ f(1, 2, 3, 4, c=5, d=6)
 #: 1 2 (3, 4) 5 {'d': 6}
 ```
 
-`a` can only arrive positionally, `c` can only arrive by name,
+`a` must arrive positionally, `c` must arrive by name,
 and `b` can arrive either way.
 
 In the standard library,

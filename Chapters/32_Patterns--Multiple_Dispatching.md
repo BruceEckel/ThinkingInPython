@@ -14,7 +14,7 @@ how can you get them to interact properly?
 The answer starts with a fact about the language that rarely comes up.
 Python dispatches on one type at a time.
 When two objects of unknown type interact,
-a method call resolves the type of only one of them, its receiver.
+a method call resolves its receiver's type alone.
 You end up testing the other type by hand,
 writing out the dispatch the language performed for the receiver.
 
@@ -622,7 +622,7 @@ since the exception propagates immediately;
 only a returned sentinel makes Python try the right operand's `__radd__()`.
 When both operands have the same type, Python tries `__add__()` alone,
 so `__add__()` resolves `Meters + Meters`.
-Adding two instances of a class that implements only `__radd__()` raises a `TypeError`.
+Adding two instances of a class that implements `__radd__()` but not `__add__()` raises a `TypeError`.
 One case reverses the order:
 when the right operand's type is a subclass of the left's and overrides the reflected method,
 Python tries that reflected method first,

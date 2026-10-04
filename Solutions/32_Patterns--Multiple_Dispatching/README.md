@@ -353,8 +353,8 @@ combinations.
 
 The table costs one class and seven dictionary rows to extend. The
 method version costs one class and five new methods, plus retrofitting
-a method onto every existing class. That cost only grows as
-you add more item types. The chapter therefore recommends the table by
+a method onto every existing class. That cost grows with
+each item type you add. The chapter therefore recommends the table by
 default, and reserves the method version for behavior that belongs to
 the class: a combination that reads the object's own state, or one a
 subclass should override while inheriting the rest.

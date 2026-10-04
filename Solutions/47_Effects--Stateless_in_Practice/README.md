@@ -944,7 +944,7 @@ either.
 
 > Wrap `research()` in `retry()` and supply a `Time()`.
 > Explain what `retry()` does under the `WEATHER` scenario and why retrying a `NotInteresting` failure is the wrong behavior,
-> then say what an Effect system needs for you to retry only `Unavailable`.
+> then say what an Effect system needs for you to retry `Unavailable` and no other failure.
 
 <details>
 <summary>Where to look</summary>
@@ -1694,7 +1694,7 @@ def toast() -> Depend[
 ## 13. A dependency two levels down
 
 > Add a `Butter` appliance to `bakery.py` and a `buttered()` Effect that needs it and calls `toast()`.
-> Write `buttered()`'s signature with only `Need[Butter]` first, run `ty`,
+> Write `buttered()`'s signature with `Need[Butter]` alone first, run `ty`,
 > and read the diagnostic before fixing it.
 > Then remove `Toaster(3)` from `supply()` and say which of the two diagnostics tells you about a dependency two levels down.
 
@@ -1992,8 +1992,8 @@ the new actor, and none for its two factory calls. The
 factories.
 
 That distribution is the argument for the factory. The functions that name a
-whole cast absorb the change, and the code that only stages a scene does not
-change. The same distribution is why the chapter uses a factory function rather than more
+whole cast absorb the change, and the code that calls a factory to stage a
+scene does not change. The same distribution is why the chapter uses a factory function rather than more
 `supply()` arguments: `supply()` tops out at nine overloads, and a wide cast is
 what a positional interface handles worst.
 

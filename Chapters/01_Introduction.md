@@ -220,7 +220,7 @@ and the output you see is the output it produces.
 A few early listings carry a `# type: ignore` comment.
 [Static Types](08_Foundations--Static_Types.md) defines it,
 along with the `# ty:` comments that appear from that chapter on;
-until then the comment only marks a line a type checker would flag.
+until then the comment marks a line a type checker would flag.
 
 Output appears inside the listings as comments beginning with `#:`,
 one line of output per marker.

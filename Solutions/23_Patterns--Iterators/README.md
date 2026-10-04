@@ -279,7 +279,7 @@ print(list(sq))
 Both fixes survive a second pass, and they pay differently. The list holds
 every value for as long as the name lives, so a million items is a
 million items in memory, and the second pass costs nothing. `Squares`
-holds only `n`, and each pass recomputes from scratch.
+holds one integer, `n`, and each pass recomputes from scratch.
 
 For a stream of a million items, choose `Squares`. Memory is the
 resource that fails catastrophically, as
@@ -442,7 +442,7 @@ so both trip the wire. Only `takewhile()` stops.
 Writing this test confirms the pairing the prose asserts. A
 reader might reasonably guess that `filter()`, being a function rather
 than a clause, gets a chance to decide when to stop. `filter()` gets
-no such chance: it receives values one at a time and can answer only
+no such chance: it receives values one at a time and can answer
 "keep" or "skip" about the value in front of it, not "stop."
 
 </details>

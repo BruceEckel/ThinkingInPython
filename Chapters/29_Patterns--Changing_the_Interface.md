@@ -187,7 +187,7 @@ building the adapter into `op()` adds the `WhatIHave` case and leaves the `WhatI
 
 All three approaches carry one Java habit:
 the adapter inherits from `WhatIWant` so that `op()` accepts it.
-Because at runtime `WhatIUse.op()` calls only `f()`,
+Because `f()` is the one method `WhatIUse.op()` calls at runtime,
 any object with an `f()` works and no shared base class takes part.
 A type checker still enforces the annotation,
 so name the requirement with a [`Protocol`](08_Foundations--Static_Types.md#structural-typing-with-protocols)
@@ -455,7 +455,7 @@ list of the public names states the same boundary explicitly.
 A façade is an agreement about which names to call,
 not a restriction on the rest.
 
-A `Facade` class full of static methods reproduces only what a module gives you,
+A `Facade` class full of static methods reproduces what a module gives you,
 with more ceremony.
 `checkout.py` is one file; a façade that outgrows one file scales the same way,
 one level up.
@@ -595,7 +595,7 @@ give a hint, usually the shape of the code, and a full answer for each exercise.
     expose functions that build them, and import only those from a second file.
     Compare what a caller can see in each version.
 4.  Consider three wrappers: one logs each call and forwards it unchanged,
-    one exposes a `read()` over an object that has only `next_chunk()`,
+    one exposes a `read()` over an object whose one method is `next_chunk()`,
     and one refuses calls unless you set a flag.
     Classify each as *Proxy*, *Decorator*, *Adapter*,
     or *Façade* using the "remove it and you lose" test from the table,

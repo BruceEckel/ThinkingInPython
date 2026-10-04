@@ -210,7 +210,8 @@ except RuntimeError as error:
 ```
 
 `exit runs` is missing from the output,
-because Python only registers the cleanup once `__enter__()` returns.
+because Python registers the cleanup when `__enter__()` returns,
+and this `__enter__()` raises an exception instead.
 An `__enter__()` that acquires several things must clean up its own partial work before it raises an exception.
 [`ExitStack`](#combining-context-managers), later in this chapter,
 is the standard tool for that: when a later entry fails,
@@ -693,7 +694,7 @@ print("done")
 ```
 
 `created` prints before the opening banner,
-because calling `rows()` only builds the generator object.
+because calling `rows()` builds the generator object and opens no banner.
 The banner opens when the `for` loop asks for the first value,
 and it stays open each time the body resumes after a `yield`.
 Before 3.15, both banner lines printed before `created`.
@@ -991,7 +992,7 @@ The second `with` block crashes, and the `finally` still returns the connection,
 so the count is back to two.
 `Pool` is generic over the pooled type,
 and it neither creates nor destroys anything.
-It only tracks custody.
+Its one job is tracking custody.
 
 An object pool differs from [*Flyweight*](35_Patterns--Flyweight.md),
 its nearest neighbor.
@@ -1056,7 +1057,7 @@ a thread that arrives while the pool is empty blocks in `get()` instead of racin
 `over capacity` stays `False` because `Queue`'s blocking throttles the threads,
 and the demo measures that rather than assuming it.
 `available()` is a snapshot for the demo, not a synchronization primitive:
-`Queue.qsize()` is only approximate once more than one thread is borrowing,
+`Queue.qsize()` becomes approximate once more than one thread is borrowing,
 because another thread can lease or return between the count and its use.
 
 ### Testing the Lease
@@ -1182,7 +1183,7 @@ give a hint, usually the shape of the code, and a full answer for each exercise.
     entering a second `with pool.lease()` block inside the first,
     and confirms `pool.available()` reaches `0`.
 5.  Stack `@banner("outer")` and `@banner("inner")` from `context_decorator.py` on a single function and predict the order of the four bracketing lines before running it.
-6.  Write a context manager `ignore_missing` whose `__exit__()` suppresses only `KeyError` and lets everything else through,
+6.  Write a context manager `ignore_missing` whose `__exit__()` suppresses `KeyError` and lets everything else through,
     without using `contextlib.suppress`.
     Test it with a block that raises a `KeyError` and a block that raises a `ValueError`.
 7.  Rewrite `exit_stack.py` to take its names from `sys.argv[1:]`,

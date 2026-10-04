@@ -26,7 +26,7 @@ the loop, and `yield from`, but generators are useful without it.
 ## Annotating a Generator
 
 Earlier examples annotate every generator with the short `Iterator` form.
-That form fits a generator that only produces values.
+That form fits a generator that yields values and receives none.
 
 A generator that also receives values needs the full annotation:
 
@@ -42,7 +42,7 @@ This annotation names the three things a generator exchanges with its caller:
   which arrives as `StopIteration.value`.
 
 The last two type parameters default to `None`.
-A generator that only produces values can use either form:
+A generator that neither receives nor returns a value can use either form:
 
 ```python
 # generator_defaults.py
@@ -285,7 +285,7 @@ Each of the three channels crosses a `yield from` differently.
 
 ### Running to Exhaustion
 
-The simplest `yield from` targets generators that only yield:
+The simplest `yield from` targets generators that use the yield channel alone:
 
 ```python
 # yield_to_exhaustion.py
@@ -825,7 +825,7 @@ and no annotation ties the `None` to a generator's first turn.
 
 `download()` reads what it receives, into `reply`.
 `index()` discards what it receives,
-as a task that only takes turns is free to do.
+which a task that needs no answer is free to do.
 The queue still rotates task to task,
 and now the runner also does `drive()`'s work,
 answering each request before the next turn.

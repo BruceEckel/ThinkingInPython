@@ -197,7 +197,7 @@ with the asker supplying the coordinates.
 ### Typing the Symbol Set
 
 `Symbol` names the closed set of valid map characters,
-so `Tile.symbol` and `SPECS` can hold only one of them.
+so `Tile.symbol` and every key of `SPECS` is one of those characters.
 If you add a kind to `SPECS` without adding it to `Symbol`,
 the type checker rejects the mismatch.
 `tile()` declares its parameter a `Symbol`,

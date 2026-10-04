@@ -117,7 +117,7 @@ You invoke it like this:
     uv run python -m profiling.sampling run my_program.py
 
 The new profiler can also attach to a running process, using the process ID.
-Attaching makes it the tool for a slowdown you can only reproduce live:
+Attaching makes it the tool for a slowdown that appears in the running process and not in a fresh run:
 
     uv run python -m profiling.sampling attach 12345
 
@@ -880,7 +880,7 @@ no matter how few items you then take.
 so the same 100 extractions cost roughly O(n + 100 log n),
 smaller than sorting whenever the fraction you extract stays small.
 One machine measured the heap at about 3 times faster here.
-The comparison only holds when the input order gives neither side an advantage.
+The comparison holds only when the input order gives neither side an advantage.
 On descending data, the kind `heap_corruption.py` uses,
 Timsort detects the existing run and `sorted()` wins outright.
 A heap is not automatically the right choice.
@@ -1150,7 +1150,7 @@ print(f"slots at least 5x smaller: "
 so `frozen_bytes` adds the dict's size on top.
 One machine measured 344 bytes against 48, roughly seven to one.
 The exact byte counts vary by platform and Python build,
-so the listing prints a comparison that holds anywhere rather than numbers that hold only here.
+so the listing prints a comparison that holds anywhere rather than numbers that hold here.
 
 ### A Decorator for the Default {#record}
 

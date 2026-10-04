@@ -629,8 +629,7 @@ Matching the pair of simplified children, rather than the original node,
 lets the rules compose.
 A `case Add(Num(0), other)` at the top of the function tests the tree as the caller wrote it,
 so `(0 * y) + x` keeps its zero.
-The left child is a `Mul`,
-and only becomes a `Num` once something simplifies it.
+The left child is a `Mul` until something simplifies it into a `Num`.
 Simplifying both children first, then matching the results,
 applies the rule to the `Num(0)` the recursion just produced.
 That order is how the demo's `((1 * x) + (0 * y))` collapses to `x`.

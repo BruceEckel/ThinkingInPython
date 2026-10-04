@@ -362,7 +362,7 @@ down to whichever `yield` is currently suspended, two frames below.
 <summary>Where to look</summary>
 
 [Composing Is Not Interpreting](../../Chapters/45_Effects--Generators.md#composing-is-not-interpreting) shows `survey()` delegating to `interview()` with `yield from`.
-Without it, the call only builds a generator object, and nothing drives it.
+Without it, the call builds a generator object, and nothing drives it.
 Compare the declared type of `profile` with what the call produces, then compare the type checker's report with the script's output.
 
 <details>
@@ -567,8 +567,9 @@ An annotation cannot express "`None` for the first call, `Answer`
 afterward," because a single `SendType` covers every call. Widening the
 `SendType` to `Answer | None` states the exception in the type, and
 every `yield` expression whose value the generator uses as an `Answer`
-must then handle a `None` that arrives only once. `interview()` only
-formats what it receives, so it passes the check either way. Priming
+must then handle a `None` that arrives only once. `interview()` puts
+what it receives into an f-string, which formats a `None` as readily
+as an `Answer`, so `interview()` passes the check either way. Priming
 with `next()` sidesteps the whole question: the one call that cannot
 carry a value comes from the one function that cannot pass one.
 

@@ -7,7 +7,8 @@
 > Import it three ways, using `import a_package.module5`,
 > `from a_package import module5`,
 > and `from a_package.module5 import function5`,
-> and confirm the loading message prints only once however many of the three you use together.
+> and confirm the loading message prints once,
+> however many of the three you use together.
 
 <details>
 <summary>Where to look</summary>
@@ -61,12 +62,12 @@ print(function5())
 #: function5 in module5 in a_package
 ```
 
-The `"importing module5..."` message prints only once, no matter how
+The `"importing module5..."` message prints once, no matter how
 many of the three import styles you combine. Python caches every
 module in `sys.modules` on its first import, keyed by the module's
 full dotted name. A later `import` of the same module, in any of
 these forms, finds the cached module and skips running its top-level
-code again. It only binds a name to the module in the cache. The
+code again. It binds a name to the module in the cache. The
 package's `__init__.py` runs once for the same reason.
 
 </details>
@@ -158,7 +159,7 @@ for short, all-lowercase package names, so `bPackage` stands out as
 something other than a package to anyone scanning an import line.
 Its capital letter also makes the name easy to mistype: on a
 case-insensitive filesystem the shell and the editor accept `bpackage`
-as well, and only Python's case-sensitive import check, the one
+as well, and Python's case-sensitive import check, the one
 exercise 4 examines, rejects `bpackage`.
 
 </details>
@@ -238,9 +239,10 @@ print("after both")
 
 Although the `lazy import noisy` line comes first, `noisy`'s body does
 not run until `noisy.announce()` executes, and that call comes after
-`noisy2.announce()`. Each `lazy import` only reserves the name. The
-module's top-level code runs at the first use of that name, so use
-order, not declaration order, decides which module loads first.
+`noisy2.announce()`. Each `lazy import` reserves the name without
+loading the module. The module's top-level code runs at the first
+use of that name, so use order, not declaration order, decides which
+module loads first.
 
 </details>
 </details>

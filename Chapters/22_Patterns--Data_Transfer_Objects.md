@@ -349,7 +349,7 @@ When the data must stay a dict,
 because it arrives as JSON or goes back out as JSON,
 a [`TypedDict`](08_Foundations--Static_Types.md#dictionary-and-record-shapes)
 names the keys and their types for the type checker while the value stays a real dict.
-When the data need only become a dict for output,
+When the data becomes a dict for output alone,
 `_asdict()` on a `NamedTuple` and `dataclasses.asdict()` on a data class each produce one.
 To make a `@dataclass` guarantee that its values are legal, not merely typed,
 see [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#a-type-is-a-set-of-values).

@@ -27,7 +27,7 @@ The fix then turns that test green, and the bug cannot return unnoticed.
 The other half is asking what let the bug through: a case no test covered,
 a claim no annotation stated, an interface that invites misuse.
 Put out the fire, and also find what is starting fires.
-A team that only patches fixes the same kind of bug forever.
+A team that stops at the patch fixes the same kind of bug forever.
 
 ## Test-Driven Development (TDD)
 
@@ -176,7 +176,7 @@ This file previews two features that get their own sections later in this chapte
 the `parametrize`[^parametrize] mark runs one test over several inputs,
 and the `funded` fixture builds a prepared account for each test that names it as a parameter.
 The `@` lines apply decorators, which [Decorators](14_Techniques--Decorators.md)
-explains; here they only mark the functions for `pytest`.
+explains; here they mark the functions for `pytest`.
 
 Run the test suite by typing `pytest` in the project directory.[^book-tests]
 `pytest` puts each test file's own directory at the front of `sys.path`,
@@ -433,7 +433,8 @@ def test_second_sees_leftover(
 ```
 
 Both tests pass, and that is the problem:
-`test_second_sees_leftover()` only passes because `test_first_write()` ran first and left its entry behind.
+`test_second_sees_leftover()` passes for one reason:
+`test_first_write()` ran first and left its entry behind.
 If you swap the two functions' order in the file,
 `test_second_sees_leftover()` fails, since nothing has written `"seen"` yet.
 Keep session fixtures to values nothing modifies, like `bank_name`,

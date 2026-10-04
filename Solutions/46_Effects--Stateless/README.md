@@ -618,16 +618,17 @@ default: `default_console.py` supplies one prepared instance, and
 **Run both Effects through one handler.** At runtime the handler answered three requests across the two calls,
 two for `Console` and one for `Clock`, although `default()`
 annotates its parameter `Need[Console]`. The type checker believes the handler
-answers only `Need[Console]`, so the second `run()` needs a
-`# type: ignore`. Without that pragma, the type checker reports a
+answers `Need[Console]` and not `Need[Clock]`, so the second `run()`
+needs a `# type: ignore`. Without that pragma, the type checker reports a
 leftover `Need[Clock]`.
 
 `handle()`'s `t = get_origin(t) or t` is the evidence. `handle()`
 reads the annotation, reduces `Need[Console]` to its origin, `Need`,
 and installs the runtime check `isinstance(ability, Need)`. That check
 ignores the type argument, so every `Need[...]` request matches. The
-type checker reads the same annotation without that reduction and
-subtracts only `Need[Console]` from the requirements.
+type checker reads the same annotation without that reduction,
+subtracts `Need[Console]` from the requirements, and leaves
+`Need[Clock]` in place.
 
 Neither view is wrong about what it describes. `isinstance()` cannot
 test a type argument: `Need[Clock]` and `Need[Console]` are the same

@@ -63,7 +63,7 @@ when it tears down the global `counters` list.
 That list holds the only remaining references, so when it goes,
 the objects it holds go with it.
 The listing ends at `End of delete loop`, the program's last statement,
-and each `__del__()` prints only afterward.
+and each `__del__()` prints afterward.
 If you run `cleanup.py` directly,
 three more pairs of lines follow `End of delete loop`:
 

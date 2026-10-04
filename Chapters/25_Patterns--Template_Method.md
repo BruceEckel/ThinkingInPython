@@ -225,8 +225,7 @@ and a framework that bans helper methods in its subclasses is too restrictive.
 The close-match check also rejects legitimate names: `class Weird` fails too,
 because `customized_report()` shares enough letters with `customize2` for `get_close_matches()` to flag it,
 although it is not a typo.
-A team that adopts this check should expect to rename an occasional legitimate method,
-not only to catch misspellings.
+A team that adopts this check should expect to catch typos and also to rename an occasional legitimate method.
 
 If every subclass must supply a step,
 inherit from `ABC` and declare that step with `@abstractmethod`,
