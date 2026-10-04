@@ -113,7 +113,10 @@ state; `History` (ch. 36) and `StateMachine` (ch. 31) rename what they store,
 which a generated `__init__()` cannot express; `Sketch` (ch. 36) is the mutable
 originator deliberately contrasted with the frozen `Drawing`; the `singleton`
 decorator class (ch. 24) matches chapter 14's `repeat`; `PizzaBuilder` (ch. 27)
-is framed as a direct translation of a Java workaround; and the minimal wrapper
+is framed as a direct translation of a Java workaround (the bare pointer
+sentence "Translated to Python, it looks like this:" went on 2026-10-04 at
+Bruce's ruling, with the framing kept in the sentence before the listing);
+and the minimal wrapper
 stand-ins in chapters 26, 29, 30, and 38 would gain a second topic from
 dataclass machinery in listings whose one new thing is the pattern. Chapter
 18's `slots.py` is the same call: the very next listing is the

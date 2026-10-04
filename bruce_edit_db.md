@@ -123,9 +123,14 @@ evidence ("accept all", 2026-08-29).
 ### R3. Don't use an identifier's word in its ordinary sense nearby
 
 **Test.** A prose word that is also a method, function, or variable name
-in the section's listings (`run()`, `fix`), used in a different sense in
-the same section. Choose a synonym for the prose sense ("executes",
-"repair", "anchored") and keep the identifier's word for the identifier.
+in the section's listings (`shape`, `field`, `module`, `kind`), used in
+a different sense in the same section. Choose a synonym for the prose
+sense and keep the identifier's word for the identifier. Content words
+only (Bruce, 2026-10-04, Sweep Decisions page): a function word or a
+common verb used as an identifier (`run`, `order`, `one`, `first`,
+`times`, `group`, a capture named `only`) is a skip, since a reader
+does not confuse the English word with the identifier; the earlier
+sightings on `run()`/"runs" and `fix`/"fixes" stand as history.
 
 **Keep when.** The prose word names the identifier itself ("`run()` runs
 the steps" is about `run()`).
@@ -152,7 +157,13 @@ the steps" is about `run()`).
 
 **Test.** "X, so Y" where X restates something the reader already has
 (a fact the chapter established, a listing just shown) and Y is the
-sentence's claim. Rewrite as "Because X, Y".
+sentence's claim. Rewrite as "Because X, Y". Narrowed 2026-10-04
+(Bruce, Sweep Decisions page, after the book-wide report found 160
+sites and the agents said it fires on almost every "X, so Y" that
+explains the listing just shown): X must have been *stated in an
+earlier sentence of the same passage*, not merely visible in the
+listing; the evidential "so" ("the output shows X, so ...") is never
+a site; and a sweep applies only the sites rated high confidence.
 
 **Keep when.** X is new information. Bruce's own "no subclass exists, so
 nothing can replace the loop" keeps "so": the absence of a subclass is the
@@ -308,7 +319,11 @@ name: write the item ("catches only `AttributeError`" -> "catches
 `AttributeError` and lets every other exception propagate"). State
 the item's fate positively where a positive exists; "and not Y" is the
 fallback (Bruce, 2026-10-04: a negative statement costs the reader the
-effort of turning it into what it means).
+effort of turning it into what it means). For "directly" and the other
+vague adverbs (87 sites in the book-wide report, most of them
+"directly"), Bruce's ruling of the same day: write the concrete word
+where the listing supports one, and delete the adverb where no concrete
+word exists; "directly" rarely changes a sentence's meaning.
 
 **Keep when.** The concrete word is unknown or would be wrong; a hedge
 that is the claim ("potentially unbounded") stays. An `only X` whose
@@ -543,44 +558,6 @@ is not the rule; the chapter that owns a comparison carries it.
 **Home.** this file only. Promoted 2026-09-15, narrowed from C4's
 contrast reading (C4 -> R13).
 
-### R14. Introduce a test listing with "Testing confirms that ..."
-
-**Test.** A sentence introducing a test listing whose subject is "The
-tests", "The test", "Tests", "A test", or "another" ("A test confirms
-X, and another shows Y:"). Write "Testing confirms that X, and Y:".
-
-**Keep when.** The sentence names a specific test function.
-
-The lead-in is the only prose before the listing. A paragraph that
-explains how the tests work (a helper they share, what they assert)
-goes after the listing, not before it.
-
-**Sightings.** 3, `27_Patterns--Factory` and `28_Patterns--Function_Objects`,
-was Claude-written; plus the 2026-09-15 sweep
-- 2026-08-31 (`0b7ff81d`): "The tests confirm that every subclass
-  registers itself" -> "Testing confirms that every subclass registers
-  itself"
-- 2026-09-15 (`a9ca27eb`): "A test confirms the two forms produce the
-  same pizza, and another shows the single-use hazard:" -> "Testing
-  confirms that the two forms produce the same pizza, and the
-  single-use hazard:"
-- 2026-09-15 sweep after promotion, seven sites in six chapters, all
-  Claude-written: `17` "Tests confirm the `@final` marker is present,"
-  ; `20` "The test confirms the defensive copy holds."; `24` "The test
-  confirms the objects differ but share one set of state."; `28`, `37`,
-  and `42` (twice) "The tests confirm that ..." -> each "Testing
-  confirms that ...". Before the sweep the book had three "Testing
-  confirms" (17, 26, 27) against those seven.
-- `28_Patterns--Function_Objects` 2026-09-16, was Claude-written, the ordering
-  note: "The first two tests wrap each finder in `watched()`, which
-  records the finder's name as it runs. The tests can then assert not
-  just the root but *which* finders ran." moved from before
-  `test_chain.py` to after it, leaving "Testing confirms that ..." as
-  the only sentence before the listing
-
-**Home.** this file only. Promoted at Bruce's call on one chapter's
-evidence (2026-09-15, C14 -> R14).
-
 ### R15. Make the mechanism the subject where the sentence describes how a design behaves
 
 **Test.** An imperative ("make a common factory create every object")
@@ -630,6 +607,13 @@ chapter.
 
 **Keep when.** The citation points somewhere other than the term's
 definition, or the term is already a link to something else.
+
+Widened 2026-10-04 (Bruce, Sweep Decisions page) to the standalone
+pointer sentence ("[Modules and Packages](...) covers the import
+system.", about six in chapter 02) when the sentence before it already
+names the term: fold the link onto that term and delete the pointer.
+Keep a pointer sentence that is the paragraph's whole job, such as a
+where-to-read-more sentence closing a section.
 
 **Sightings.** 4, 2 chapters, was Claude-written:
 - 2026-08-31 (`d6144479`): "I have also used a *generator* (see
@@ -1100,6 +1084,20 @@ protocols") stays.
 
 **Home.** CLAUDE.md watch list, inside the `only` bullet (R24).
 
+### Rulings of 2026-10-04 (Sweep Decisions page)
+
+Bruce decided the book-wide apply report's open questions on https://claude.ai/artifact/HjHyafWs5EDXQkoPmhV9g9:
+R4 narrowed, R3 content words only, R16 widened, R9's "directly"
+ruling (all recorded on their entries), R14 retired (X2), and R1, R6,
+R20, R28 kept as guards although no site remained for them. Scope:
+the Solutions files get their own report-and-apply round after the
+chapters. Cadence: chapters 31 to 33 one at a time with his diff
+between, then one commit per Part. Of the 26 conflicts between a
+rule and a standing record, he applied the rule at 14 sites (chapters
+08, 11, 18, 20 x2, 22 x2, 27 x2, 28, 35, 42, 46, 47) and kept 12; the
+retired keeps are noted in `readability_db.md` and `deep_review_db.md`
+beside the records they override.
+
 ## Candidates
 
 One sighting each. Logged, not applied. A second sighting in a different
@@ -1488,3 +1486,50 @@ which vale flags. Bruce: "keep 'distributed'". The passive describes
 where the code sits, with no agent worth naming. Recorded as a keep-when
 in the `activate` skill (Step 2, passives). Do not propose "appears" or
 any active rewrite for this shape again.
+
+Retired 2026-10-04 at Bruce's ruling (Sweep Decisions page, "Let
+activate win, retire R14"). The activate pass had rewritten the
+lead-ins in chapters 20 and 24 (7d5576d0) to "A test confirms that" and
+"The first test below confirms", and chapter 37 reads "The tests confirm
+that"; those stay as activate wrote them, and the "Testing confirms
+that" form is no longer applied anywhere. The lead-in-only layout note
+(explanation after the listing) is still good practice. Entry as it
+stood:
+
+### X2. (was R14) Introduce a test listing with "Testing confirms that ..."
+
+**Test.** A sentence introducing a test listing whose subject is "The
+tests", "The test", "Tests", "A test", or "another" ("A test confirms
+X, and another shows Y:"). Write "Testing confirms that X, and Y:".
+
+**Keep when.** The sentence names a specific test function.
+
+The lead-in is the only prose before the listing. A paragraph that
+explains how the tests work (a helper they share, what they assert)
+goes after the listing, not before it.
+
+**Sightings.** 3, `27_Patterns--Factory` and `28_Patterns--Function_Objects`,
+was Claude-written; plus the 2026-09-15 sweep
+- 2026-08-31 (`0b7ff81d`): "The tests confirm that every subclass
+  registers itself" -> "Testing confirms that every subclass registers
+  itself"
+- 2026-09-15 (`a9ca27eb`): "A test confirms the two forms produce the
+  same pizza, and another shows the single-use hazard:" -> "Testing
+  confirms that the two forms produce the same pizza, and the
+  single-use hazard:"
+- 2026-09-15 sweep after promotion, seven sites in six chapters, all
+  Claude-written: `17` "Tests confirm the `@final` marker is present,"
+  ; `20` "The test confirms the defensive copy holds."; `24` "The test
+  confirms the objects differ but share one set of state."; `28`, `37`,
+  and `42` (twice) "The tests confirm that ..." -> each "Testing
+  confirms that ...". Before the sweep the book had three "Testing
+  confirms" (17, 26, 27) against those seven.
+- `28_Patterns--Function_Objects` 2026-09-16, was Claude-written, the ordering
+  note: "The first two tests wrap each finder in `watched()`, which
+  records the finder's name as it runs. The tests can then assert not
+  just the root but *which* finders ran." moved from before
+  `test_chain.py` to after it, leaving "Testing confirms that ..." as
+  the only sentence before the listing
+
+**Home.** this file only. Promoted at Bruce's call on one chapter's
+evidence (2026-09-15, C14 -> R14).

@@ -71,6 +71,9 @@ family, and its carve-out covers most of the book's uses: "a separate factory
 class is worth writing when …", "the hand-rolled `Messenger` is worth writing
 only to show …", "`Blob` is the case worth watching:". Each weighs an effort
 against a stated condition, with the payoff delivered in the same sentence.
+(2026-10-04, Sweep Decisions: Bruce split the `Blob` sentence at its colon;
+the "worth" stays. Chapter 11's "worth the small effort" became "justifies
+the effort", his wording.)
 
 **§34 real/actual/genuinely/truly stays where the contrast is named.** "the
 caller's copy of the list still holds your actual `Bob`s", "It uses genuinely
@@ -109,7 +112,11 @@ first-person or first-edition passages.
 
 **A short emphatic fragment is a beat, not a staccato run.** "It has a sharp
 edge.", "No class, no ceremony.", "`seen` is how.", "I hardly do." Each sits
-among long sentences and does deliberate work.
+among long sentences and does deliberate work. (2026-10-04, Sweep
+Decisions: Bruce cut two fragments that stated a verdict on output already
+on the page, chapter 18's "Same answer, from 242,785 calls against 26." and
+chapter 47's "Four implementations, one Ability, one running program."; the
+keep covers a beat, not a verdict.)
 
 **An expletive "there is" belongs to `/activate`, not here.** "Unlike C, there
 is no fall-through", "For event-heavy programs there are mature libraries". The
@@ -151,6 +158,9 @@ Recorded so a sweep does not read them as defects:
 - **Parallel prose decision tables.** 35_Patterns--Flyweight's four-way `If X, do Y` block
   and 27_Patterns--Factory's bullet list under "Which Factory Should You Use?" are
   decision tables written as prose; the uniformity is what makes them scannable.
+  (2026-10-04, Sweep Decisions: within that uniformity Bruce cut 35's trailing
+  "which is the least machinery for the job" as awkward, and gave 27's "When
+  a name maps to a class" bullet a comma, matching its siblings.)
   25_Patterns--Template_Method's four-way "Structure fixes it… Discipline fixes the rest"
   anaphora is the same call.
 
@@ -174,7 +184,9 @@ and the late-binding loop variable is the one closure trap with a reputation.
 
 **28_Patterns--Function_Objects, "to say what one list of functions says directly."** Not
 a finding at all: recorded as the sharpest sentence in the chapter and the
-reason the *Command* section works. Do not "tighten" it.
+reason the *Command* section works. Do not "tighten" it. (Superseded
+2026-10-04, Sweep Decisions: Bruce, "sentence can be simpler"; the "directly"
+went and the sentence was simplified at his ruling.)
 
 **30_Patterns--Observer, "It is simply a callable."** "Simply" is an empty adverb by the
 deletion test, but this is the deflating beat in the two-sentence pair carrying
@@ -191,7 +203,12 @@ methods" rides on it.
 **30_Patterns--Observer, "a lambda equals only itself."** Both watched words are
 load-bearing: the claim is identity-equality, and "a lambda equals itself"
 without "only" is trivially true of everything. 22's "equals only its own kind"
-is the same shape.
+is the same shape. (2026-10-04, Sweep Decisions: 30's stays, with "bound to
+the same lambda" nearby at his note; 22's sentence he ruled "too long and
+complex" and had split, the restriction kept in words. He also had the
+"only" dropped from 42's "`None` says only 'no answer'" and 46's "only its
+signature" sentence rewritten as shorter sentences, so the watch-list-
+absolute keep does not cover those two.)
 
 **31_Patterns--State_Machines, "The conditions and actions are plain methods."** "Plain"
 draws a real contrast: against the `Condition` and `Transition` class
@@ -239,3 +256,15 @@ it are examples rather than a statement of the rule.
   all. Neither contained anything of Bruce's, so nothing personal was lost.
 - **The r1/r2 split** (first generation only). Most chapters had two rounds; r2
   findings supersede r1, and only r2's declined items were durable.
+
+**2026-10-04, Sweep Decisions page: cost tallies Bruce had cut.** Chapter
+20's "Satisfying three of them costs nothing more than having the three
+methods" and chapter 22's "The price of an ad-hoc attribute bag is that
+..." lost their cost frames at his ruling (R2); 22 keeps the words "no
+type checker knows your attribute names" verbatim for the 22 -> 33 thread
+in `deep_review_db.md`. The twelve keeps he confirmed on that page (01's
+and 11's and 21's superlatives, 03's "assignment never copies", 06's
+underscore colon, 08's structural-typing restatement, 20's "truly", 31's
+"stored directly", 33's "results, not mechanism", 34's three-walker
+paragraph, 40's two-colon parallel and its "Choose `match`" sentence)
+stand as recorded.
