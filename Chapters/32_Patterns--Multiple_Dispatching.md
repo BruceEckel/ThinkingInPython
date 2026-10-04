@@ -42,8 +42,8 @@ you need a dispatching method call for each hierarchy.
 When the interaction is an operator,
 Python performs this second dispatch for you.
 `a + b` retries as `b.__radd__(a)` if `a.__add__(b)` declines.
-That retry is how the opening `Number + Number` question resolves
-([Operators Dispatch Twice](#operators-dispatch-twice) below).
+That [retry](#operators-dispatch-twice)
+is how the opening `Number + Number` question resolves.
 The rest of this chapter builds the general technique for an interaction that is not an operator,
 with a game of paper, scissors, rock as the working example.
 
@@ -90,8 +90,6 @@ as [`shape_name()`](27_Patterns--Factory.md#simple-factory-method) does.
 and this file must serve both.
 
 ## Two Dispatches Through Methods
-
-Here is *Multiple Dispatching* in action:
 
 ```python
 # paper_scissors_rock.py
@@ -195,7 +193,7 @@ as abstract methods, or a `Protocol`.
 With `Any`, a class that supplies eight of the nine answers passes the type checker,
 and Python raises an `AttributeError` at the first duel that calls the ninth.
 Declaring the four methods restores the checking,
-at the price of a declaration that repeats every class's method names.
+and that declaration repeats every class's method names.
 The table version keeps the checking and declares each name once.
 Its answers are rows in one dictionary,
 so a class is complete the moment it inherits `compete()`.
@@ -541,7 +539,7 @@ The test imports the two modules, not their classes.
 so one table of nine expected answers drives two independent sets of `Paper`,
 `Scissors`, and `Rock` classes.
 Each module guards its demonstration loop with `if __name__ == "__main__"`,
-so running a module directly executes the loop,
+so running a module as a script executes the loop,
 and the test's import defines only the classes.
 
 ## Operators Dispatch Twice
