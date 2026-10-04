@@ -73,7 +73,7 @@ For example, the function might:
 - Acquire a lock, or coordinate with another thread
 
 A side effect is easy to spot in the function that performs it,
-because it changes something outside that function.
+because the side effect changes something outside that function.
 One call up, it is invisible.
 
 The second is a *side cause*, the counterpart of a side effect:
@@ -94,8 +94,6 @@ People argue about whether an exception makes a function *impure*.
 
 ## Are Exceptions Impure?
 
-Consider the following:
-
 ```python
 # divide_by_zero_impurity.py
 
@@ -108,9 +106,8 @@ except when `run` is zero,
 where it raises an exception instead of returning a result.
 Does the exception break purity?
 
-Two schools of thought exist:
-
-1.  **Pure**: Raising `ZeroDivisionError` instead of returning a number does not break purity.
+1.  **Pure.**
+    Raising `ZeroDivisionError` instead of returning a number does not break purity.
     The same arguments still produce that same exception every time.
     The function reads nothing outside itself and changes nothing outside itself.
     Purity says the outcome depends on the arguments alone.
@@ -122,11 +119,12 @@ Two schools of thought exist:
     is referentially transparent.
     You can replace the function call with the crash itself, and the program behaves the same.
 
-2.  **Functional**: Exceptions bypass normal control flow,
+2.  **Functional.**
+    Exceptions bypass normal control flow,
     and that bypass makes it difficult to reason about code,
     so functional programming avoids them altogether.
-    A *Total Function* returns errors as data in explicit wrapper types instead of raising them,
-    as you saw in [Error Handling](42_Functional--Error_Handling.md).
+    A [*Total Function*](42_Functional--Error_Handling.md#total-functions)
+    returns errors as data in explicit wrapper types instead of raising them.
 
 The argument over purity leaves this chapter's question open.
 If you write a function `a()` that calls a function `b()` that raises an exception,
@@ -138,7 +136,6 @@ so an exception is an Effect alongside the side effect and the side cause.
 ## Converting Effectful to Pure
 
 Transforming the exception Effect in `slope()` from `divide_by_zero_impurity.py` makes the function pure.
-Here are three ways to do it.
 
 ### Return a Result Type
 
@@ -176,7 +173,7 @@ and the caller must unpack it to reach the number.
 ### Catch the Exception You Expect
 
 If you catch and handle the exception within the function,
-it stays inside that function, so it is not an Effect.
+the exception stays inside that function, so it is not an Effect.
 `slope()` can catch the one exception it names and turn the failure into an ordinary `float`,
 its existing return type, instead of introducing a new type:
 
@@ -257,7 +254,8 @@ with expected(ValueError):
 #: [ValueError] NonZero cannot hold 0
 ```
 
-The check runs once, in `__post_init__()`, when `NonZero(...)` builds the value.
+The check runs once, in `__post_init__()`,
+when `NonZero(...)` builds the instance.
 Every function that receives a `NonZero`, including `slope()`,
 inherits that guarantee.
 `slope()` cannot divide by zero, so it needs no `try` and no `Result` to say so.
@@ -278,14 +276,14 @@ and every function downstream is pure because it receives the type,
 not because its author remembered a check.
 None of the three makes the failure disappear.
 A `Result` turns it into a value, a `try` catches it,
-and `NonZero` moves it to the one line that builds the value.
+and `NonZero` moves it to the one line that builds the `NonZero`.
 They differ in how many functions must know about it.
 
 Standard practice combines the first and third,
 the `Result` and the restrictive type.
-Parse untrusted input into the restrictive type at the boundary,
+The boundary parses untrusted input into the restrictive type,
 using a `Result` to report a bad value instead of raising an exception,
-and let every function past that boundary take `NonZero` and stay total:
+and every function past that boundary takes `NonZero` and stays total:
 
 ```python
 # slope_edge.py
@@ -385,9 +383,7 @@ and easy testing for the pure part.
 The second phase divides the impure part by kind,
 and each kind yields its own benefit:
 
-- **Exceptions** become data,
-  as [Converting Effectful to Pure](#converting-effectful-to-pure)
-  shows with a `Result`.
+- **Exceptions** [become data](#converting-effectful-to-pure) in a `Result`.
   Failures turn into values whose type the checker verifies,
   and a test checks for an `Err` as easily as an `Ok`.
 - **Side causes** become replaceable inputs.
@@ -477,7 +473,7 @@ The third item names *delayed binding*.
 Delayed binding exists so that one fixed codebase can serve many contexts
 (test, production, retry-wrapped) without edits.
 When a hundred functions declare "I need something that can read from storage,"
-none of them contains an opinion about what that storage is.
+none of them names a storage implementation.
 Each declaration propagates to its caller, up to a single point,
 usually the edge of the program, where storage binds to an implementation.
 Changing that one binding changes the behavior of all hundred functions at once.
@@ -500,7 +496,7 @@ Each is a hand-built version of something an EMS automates.
 
 Side effects and side causes also have a by-hand technique:
 pass the implementation in as a parameter.
-Instead of calling `input()` and `print()` directly,
+Instead of calling the built-in `input()` and `print()`,
 `greet()` declares what it needs:
 
 ```python
@@ -546,8 +542,6 @@ Delayed binding by hand explains why "pass in your dependencies" is such durable
 
 The signature says what `greet()` needs, not everything `greet()` might do.
 A `print()` in the body is still invisible.
-[Effect Management for Python?](#effect-management-for-python)
-returns to that limit.
 
 The technique works, but you do the bookkeeping.
 Every function that calls `greet()` must accept an `Ask` and a `Tell` so it can pass them down.
@@ -822,7 +816,7 @@ and delayed binding while the code runs eagerly,
 with no description trees and no interpreter.
 A library has only the description route.
 In a language not designed for Effects,
-it gets delayed binding by deferring execution.
+a library gets delayed binding by deferring execution.
 That deferral adds one question to every value you handle:
 is it a description or an action?
 Code that mixes the two compiles cleanly but misbehaves,
@@ -887,10 +881,8 @@ print(asyncio.run(description), ran)
 #: Hello ['body']
 ```
 
-Calling `greet()` builds a coroutine object, a description of work,
-and `ran` stays empty.
-[Concurrency](19_Techniques--Concurrency.md#asyncio-mechanics)
-gives the same demonstration.
+Calling `greet()` builds a [coroutine object](19_Techniques--Concurrency.md#asyncio-mechanics),
+a description of work, and `ran` stays empty.
 The body runs only when something awaits the description or hands it to `asyncio.run()`.
 That is the library Effect system model.
 Descriptions compose inside `async def` functions,
@@ -931,8 +923,7 @@ the three properties of a full EMS, inside Python's existing type system.
 
 The guarantee has a limit.
 Stateless verifies that the Effects you *declare* propagate consistently.
-A function can still call `print()` directly,
-next to its carefully declared Effects.
+A function can still call `print()`, next to its carefully declared Effects.
 In Koka, that call changes the function's Effect row, and every caller's row.
 In Python, neither Stateless nor the type checker reports it.
 A library checks the Effects you wrote down,

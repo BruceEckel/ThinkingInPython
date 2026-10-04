@@ -195,8 +195,8 @@ The event loop receives a coroutine's requests.
 Whatever code calls `next()` and `send()` receives a generator's.
 The generator yields a *request* out,
 and whatever drives it sends the *answer* back in.
-That conversation makes an Effect Management System possible,
-the EMS of [Effect Management](44_Effects--Effect_Management.md#effect-management-systems).
+That conversation makes an [Effect Management System](44_Effects--Effect_Management.md#effect-management-systems)
+(EMS) possible.
 Typically, a driver function steps the generator:
 
 ```python
@@ -510,9 +510,8 @@ so both channels carry an `Answer`.
 `interview()` keeps `Result` as its `ReturnType`,
 because the sentence it builds from three answers is not an answer to any one question.
 
-The trace shows both directions.
 `drive()` receives a request that `ask()` yielded two frames down,
-and nothing in `drive()` distinguishes it from one `interview()` yielded directly.
+and nothing in `drive()` distinguishes it from one that `interview()` yielded in its own body.
 The answer `drive()` sends back becomes the value of the `yield` inside `ask()`,
 and nothing in `ask()` names the driver that sent it.
 A single loop at the edge of the program interprets Effects yielded anywhere inside it.
@@ -550,7 +549,7 @@ print(drive(survey(),
 ```
 
 The listing imports `interview()` unchanged from `yield_from_delegates.py`,
-where `drive()` drove it directly.
+where `drive()` drove it.
 Now `survey()` delegates to `interview()`.
 `interview()`'s `Result` arrives as the value of an expression instead of as `stop.value` in the driver.
 Its questions reach `drive()` through three frames rather than two,
@@ -593,7 +592,8 @@ and `close()` unwinds every frame in the chain.
 shows an exception raised at a generator's `yield`,
 described from the `with` block's side:
 "Python resumes the generator by raising the block's exception at the `yield`."
-`throw()` is that same resumption, called directly instead of by a `with` block:
+`throw()` is that same resumption,
+called by your own code instead of by a `with` block:
 
 ```python
 # throw_and_close.py
@@ -707,9 +707,9 @@ so the description can ask for something.
 `yield from` composes those conversations,
 and no generator in the chain names its driver.
 
-Those ideas are enough to build a task runner:
-register each generator with a decorator, keep the live ones in a queue,
-and take turns:
+Those ideas are enough to build a task runner.
+A decorator registers each generator, a queue keeps the live ones,
+and the runner gives each a turn:
 
 ```python
 # task_runner.py

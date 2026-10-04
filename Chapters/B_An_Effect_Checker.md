@@ -19,9 +19,8 @@ A call it cannot resolve contributes an Effect named `Unknown` to the caller's r
 The checker treats no unresolved call as pure.
 With that rule the tool stays small,
 and every call it fails to resolve shows in a row.
-A row that reads `Unknown` says the checker could not resolve a call, and where.
-[What the Checker Resolves, and What It Cannot See](#what-the-checker-resolves-and-what-it-cannot-see)
-lists the constructs the rule does not cover.
+A row that reads `Unknown` says the checker [could not resolve a call](#what-the-checker-resolves-and-what-it-cannot-see),
+and where.
 
 Name resolution covers more calls than you might expect.
 Of the roughly 6,600 calls in this book's chapter listings,
@@ -307,7 +306,7 @@ A `Scope` holds the names the checker has collected at one point in a file.
 then the module's imports and definitions, then `builtins`.
 A name found in `types` is a variable,
 and calling a variable calls whatever value it holds at runtime.
-The source does not name that value, so `name()` answers `UNRESOLVED`.
+The source does not say what that value is, so `name()` answers `UNRESOLVED`.
 
 `callee()` handles the two shapes a resolvable call takes.
 A bare name goes to `name()`.

@@ -98,7 +98,6 @@ It yields once, so the handler receives one request.
 The `yield from` then evaluates to that generator's return value,
 the [return-channel rule](45_Effects--Generators.md#the-return-channel),
 and here that value is whatever the handler sent back.
-The Ability produces nothing on its own.
 `prompt` is payload on the request, there for the handler to read,
 so the answer to an `Ask` is whatever `scripted()` returns.
 A `Tell` needs no answer,
@@ -400,7 +399,8 @@ print(run(handle(crossing)(archive)("backup ok")))
 
 Under `steady` the two dates agree and the function looks correct.
 `crossing` answers the first request one second before midnight and the second request one second after midnight.
-Now the file carries January 1's name and the entry inside it carries January 2's date.
+The file then carries January 1's name,
+and the entry inside it carries January 2's date.
 A day of entries can end up in the wrong file,
 and the window for the mistake is only as wide as the gap between the two reads.
 
@@ -1040,7 +1040,7 @@ def research_and_report(
 
 `topic_of()` appears again in full because `research.py`'s version carries a decorator.
 The decorated version returns an Effect,
-and ordinary `try`/`except` code cannot call it directly.
+and ordinary `try`/`except` code that calls it gets that Effect back in place of a topic.
 
 Three lines of work sit inside nine lines of handling.
 The pipeline is in there, spread across three `try` blocks.
@@ -1468,8 +1468,6 @@ print(len(script.lines), script.lines[1])
 #: 2 and bats at the puzzle
 ```
 
-One engine, four runs, and the only difference is what you supply.
-
 The fourth run swaps one cast member and captures the output.
 `Script` records what arrives,
 so a test reads the lines back as a list with no `capsys` and no monkeypatching.
@@ -1712,7 +1710,6 @@ print(f"attempts: {db.attempts}")
 #: attempts: 1
 ```
 
-Two runs, one attempt, and the second run still produces the value.
 `memoize()` caches by argument the way `functools.lru_cache` does.
 It wraps the Effect in an object that records the result and replays it rather than driving the spent generator again.
 That wrapper exists because a generator cannot run twice,
@@ -1820,9 +1817,7 @@ Supply first, then fork.
 That restriction is the only one the checker enforces.
 The restriction says nothing about a declared error.
 Two of those same four overloads accept an Effect that declares one,
-and both return a `Task` with no error type on it.
-[Where the Guarantee Stops](#fork-drops-the-error-channel)
-explains what `fork()` drops.
+and both return a `Task` with [no error type on it](#fork-drops-the-error-channel).
 
 Notice who manages the pool's lifetime.
 The `with` block sits outside `run()`, at the edge, in ordinary Python.
@@ -1879,7 +1874,7 @@ so supply first, then fork.
 `@throws` is an entry point rather than a transformation.
 It decorates an ordinary function that raises exceptions,
 turning it into one that returns an Effect.
-`throw()` instead builds the failure as a description directly.
+`throw()` instead builds the failure as a description.
 And `catch_all` comes from `stateless.effect`,
 since the package root does not export it.
 
@@ -1947,8 +1942,8 @@ print(f"run() at least 20x slower: "
 `run_async()` reuses the running loop and costs little beyond the Effect.
 `run()` builds and tears down a loop on every call,
 at least twenty times the cost of `run_async()`, by the listing's own measure.
-Running the listing with `--numbers` prints both per-call costs
-([Numbers on Your Machine](18_Techniques--Performance.md#numbers-on-your-machine)).
+Running the listing with [`--numbers`](18_Techniques--Performance.md#numbers-on-your-machine)
+prints both per-call costs.
 Synchronous code has no loop to reuse, so it pays that cost on every `run()`.
 From inside a running loop,
 `run_async()` is both the one that works and the one that is fast.
@@ -2117,7 +2112,7 @@ except MissingAbilityError as e:
 ```
 
 `half` is `() -> Depend[Need[Log], None]`,
-because the handler subtracts the `Console` and not the `Log`.
+because the handler subtracts the `Console` and leaves the `Log`.
 `run()` therefore rejects it before the program starts:
 
 ```text
@@ -2315,7 +2310,7 @@ and `yield from` is one operator for joining two Effects.
 once `@throws` has brought the ordinary functions in at the boundary.
 `Async` is one more Ability in the same channel rather than a second viral annotation.
 Resource lifetime is the one concern left outside the Effect type.
-Stateless has no scoping mechanism, so `with` blocks stay where they are.
+Because Stateless has no scoping mechanism, `with` blocks stay where they are.
 `ExitStack` flattens them,
 and they remain a separate mechanism from the Effect type.
 

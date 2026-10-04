@@ -4,8 +4,7 @@
 asks whether Python could gain Effect tracking.
 Its answer is that the annotation syntax could carry the information,
 and that propagation is the hard part.
-This appendix works through that answer.
-It states the tracking problem apart from any one language,
+This appendix states the tracking problem apart from any one language,
 says why a language that tracks Effects natively solves the problem best,
 and then builds the carrier Python has today,
 the `Annotated` type from [PEP 593](https://peps.python.org/pep-0593/).
@@ -82,8 +81,8 @@ and the first four problems in [What a Checker for the Row Must Do](#what-a-chec
 take them in the same order.
 
 **The compiler infers the row.**
-Koka computes a function's row from its body,
-so most functions need no written row.
+Because Koka computes a function's row from its body,
+most functions need no written row.
 You write a row when you want a constraint,
 such as requiring that a function stay pure.
 [Effects by Hand](44_Effects--Effect_Management.md#effects-by-hand)
@@ -229,11 +228,9 @@ Until a tool reads it, a row inside `Annotated` is a structured comment.
 `shout()`'s empty row has a second reading.
 A function that declares `performs()` with no arguments states that it is pure,
 and `row()` returns the same empty list for it.
-The list alone does not separate a function declared pure from one that declares nothing.
-[Decide What Untracked Code Performs](#decide-what-untracked-code-performs)
-weighs what a checker can assume about a function that declares nothing.
+The list alone does not separate a function declared pure from [one that declares nothing](#decide-what-untracked-code-performs).
 
-`ask()` calls `input()` directly.
+`ask()` calls `input()` in its own body, with no handler in between.
 `Ask` is a label here.
 It has no methods, and nothing can substitute another implementation for it.
 
@@ -412,8 +409,8 @@ It stands to the static tool as `isinstance()` assertions stand to the type chec
 
 ## Tracking Is Not Management
 
-Suppose the static tool existed, complete and correct.
-It would fill all three roles, and you would have Effect tracking.
+If the static tool existed, complete and correct, it would fill all three roles,
+and you would have Effect tracking.
 `ask()` would still call `input()`.
 No test could replace that call,
 because the row names an Effect without separating its interface from its implementation,
@@ -427,7 +424,6 @@ A runtime reader can treat it as a binding.
 FastAPI's [`Depends`](46_Effects--Stateless.md#dependency-injection)
 goes in `Annotated` metadata in the form FastAPI recommends,
 and the framework supplies the dependency when a request arrives.
-Nothing connects the two readers.
 No check confirms that the row one tool verified is the set of dependencies the other one binds.
 
 [The Tracking Problem](#the-tracking-problem)
