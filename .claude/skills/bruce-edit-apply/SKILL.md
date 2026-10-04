@@ -45,6 +45,15 @@ chapter boundary for Bruce to look at the diff. A rule that is subtly wrong
 shows up in the first chapter's diff, and stopping there costs one chapter
 rather than forty-seven.
 
+**Bruce's cadence ruling (2026-10-04).** After two warm-up chapters
+(31 and 32) whose diffs he read and committed, Bruce said: "let's just
+apply everything without me having to check it for each. I'm eventually
+going to have to check through it all anyway, and before then we will
+undoubtedly do more sweeps." So once the first chapters of a sweep look
+right, the rest of the book runs in parallel batches, one gate, and a
+commit per Part; the per-chapter stop is for a new or newly narrowed
+rule's first chapters, not the whole run.
+
 **Prefer the chapter Bruce is about to edit next.** Applying there turns the
 whole loop into a measurable one: his edits to that chapter score the rules
 directly, and `/bruce-edit-capture` on the result says which rules were right.

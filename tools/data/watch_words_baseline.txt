@@ -59,7 +59,7 @@ Chapters/06_Foundations--Modules_and_Packages.md	itself: with its own CODE and a
 Chapters/06_Foundations--Modules_and_Packages.md	only: Assigning into CODE matters whenever code needs to define a module-level name known only at runtime
 Chapters/06_Foundations--Modules_and_Packages.md	only: CODE binds only the name CODE in this file
 Chapters/06_Foundations--Modules_and_Packages.md	only: For a large program that imports many modules but uses only some of them on any given run
-Chapters/06_Foundations--Modules_and_Packages.md	only: The condition is true only when you run this file directly
+Chapters/06_Foundations--Modules_and_Packages.md	only: The condition is true only when you run this file as a script
 Chapters/06_Foundations--Modules_and_Packages.md	only: The submodule becomes an attribute of the package only when something imports it by name
 Chapters/06_Foundations--Modules_and_Packages.md	only: When the cycle exists only in annotations
 Chapters/06_Foundations--Modules_and_Packages.md	only: a keyword only inside an CODE statement
@@ -125,18 +125,16 @@ Chapters/11_Techniques--Testing.md	only: Only CODE calls it
 Chapters/11_Techniques--Testing.md	only: Only convention says
 Chapters/11_Techniques--Testing.md	only: Only the code changes to satisfy it
 Chapters/11_Techniques--Testing.md	only: The test passes only if the block raises the expected exception
-Chapters/11_Techniques--Testing.md	only: and a fixture needs only the shape
+Chapters/11_Techniques--Testing.md	only: and a fixture needs only its shape
 Chapters/11_Techniques--Testing.md	only: and only a parameter delivers its value
 Chapters/11_Techniques--Testing.md	only: so that only implementation remains
 Chapters/11_Techniques--Testing.md	only: the patch is only half the job
 Chapters/12_Techniques--Data_Classes_as_Types.md	even: even when only one field moved
 Chapters/12_Techniques--Data_Classes_as_Types.md	is what: one field different" is what you do with any immutable value
-Chapters/12_Techniques--Data_Classes_as_Types.md	itself: The type guards itself
-Chapters/12_Techniques--Data_Classes_as_Types.md	itself: as A CODE Cannot Validate Itself shows
 Chapters/12_Techniques--Data_Classes_as_Types.md	only: A read-only CODE keeps users from assigning to CODE
+Chapters/12_Techniques--Data_Classes_as_Types.md	only: Because fields after CODE are keyword-only
 Chapters/12_Techniques--Data_Classes_as_Types.md	only: CODE tags only one
 Chapters/12_Techniques--Data_Classes_as_Types.md	only: CODE works only on data classes
-Chapters/12_Techniques--Data_Classes_as_Types.md	only: Fields after CODE are keyword-only
 Chapters/12_Techniques--Data_Classes_as_Types.md	only: Passing CODE to CODE makes every field keyword-only
 Chapters/12_Techniques--Data_Classes_as_Types.md	only: The only way to make a CODE is through the constructor
 Chapters/12_Techniques--Data_Classes_as_Types.md	only: and CODE accepts only instances
@@ -162,7 +160,6 @@ Chapters/13_Techniques--Pattern_Matching.md	only: not only at the end
 Chapters/13_Techniques--Pattern_Matching.md	only: they act as keywords only inside this statement
 Chapters/13_Techniques--Pattern_Matching.md	only: which matches only an empty sequence
 Chapters/13_Techniques--Pattern_Matching.md	want: Use CODE for a closed set of cases you want to handle in one place
-Chapters/14_Techniques--Decorators.md	already: A function is already a descriptor
 Chapters/14_Techniques--Decorators.md	even: even after the decorator has returned
 Chapters/14_Techniques--Decorators.md	never: The CODE instance never arrives
 Chapters/14_Techniques--Decorators.md	never: The original body of CODE never runs
@@ -198,7 +195,7 @@ Chapters/15_Techniques--Context_Managers.md	want: so name the types you expect u
 Chapters/16_Techniques--Comprehensions.md	already: CODE and CODE pay off when the function already exists
 Chapters/16_Techniques--Comprehensions.md	only: A generator expression needs no parentheses of its own when it is a function's only argument
 Chapters/16_Techniques--Comprehensions.md	only: and pays it only for the values the consumer pulls
-Chapters/16_Techniques--Comprehensions.md	only: but only when its predicate is a named function annotated to return CODE or CODE rather than CODE (the narrowing summary covers the pair)
+Chapters/16_Techniques--Comprehensions.md	only: but only when its predicate is a named function annotated to return CODE or CODE rather than CODE
 Chapters/16_Techniques--Comprehensions.md	only: especially if you consume the result only once
 Chapters/16_Techniques--Comprehensions.md	only: keeping only the names longer than three characters
 Chapters/16_Techniques--Comprehensions.md	only: only CODE has CODE
@@ -206,9 +203,7 @@ Chapters/16_Techniques--Comprehensions.md	only: splicing only the outer iterable
 Chapters/16_Techniques--Comprehensions.md	only: write a list comprehension that finds the string elements made only of digits (CODE)
 Chapters/16_Techniques--Comprehensions.md	want: A CODE loop when you want the side effect rather than the collection
 Chapters/16_Techniques--Comprehensions.md	want: Brackets when you want a list
-Chapters/16_Techniques--Comprehensions.md	want: Use a comprehension when you want the collection it produces
 Chapters/16_Techniques--Comprehensions.md	want: a glob pattern says what you want
-Chapters/16_Techniques--Comprehensions.md	want: and a CODE loop when you want the side effect
 Chapters/16_Techniques--Comprehensions.md	want: and append the ones you want
 Chapters/17_Techniques--Metaprogramming.md	already: so CODE sees the second CODE assigned to a name it already holds
 Chapters/17_Techniques--Metaprogramming.md	even: even an empty one
@@ -226,7 +221,6 @@ Chapters/17_Techniques--Metaprogramming.md	itself: A descriptor pays for itself 
 Chapters/17_Techniques--Metaprogramming.md	itself: Extend CODE so a class declares itself final with a keyword in its header
 Chapters/17_Techniques--Metaprogramming.md	itself: and returns itself when you read it through the class
 Chapters/17_Techniques--Metaprogramming.md	only: CODE and CODE normally run only because the default CODE calls them
-Chapters/17_Techniques--Metaprogramming.md	only: CODE builds only those three
 Chapters/17_Techniques--Metaprogramming.md	only: Generating classes programmatically with CODE pays off when a family of classes differs only by name
 Chapters/17_Techniques--Metaprogramming.md	only: Now the end user needs only to write and maintain the schedule file
 Chapters/17_Techniques--Metaprogramming.md	only: Only a metaclass makes the class callable in a new way
@@ -235,7 +229,6 @@ Chapters/17_Techniques--Metaprogramming.md	only: Testing shows that each registr
 Chapters/17_Techniques--Metaprogramming.md	only: The comment suppresses the diagnostic only because provoking that crash is educational
 Chapters/17_Techniques--Metaprogramming.md	only: Use a metaclass only when these cannot do the job
 Chapters/17_Techniques--Metaprogramming.md	only: and CPython allows multiple inheritance only when at most one base carries a nontrivial layout
-Chapters/17_Techniques--Metaprogramming.md	only: but it lives only in the CODE dict
 Chapters/17_Techniques--Metaprogramming.md	only: it keeps only the ones whose value differs from CODE's own
 Chapters/17_Techniques--Metaprogramming.md	only: not only descriptors
 Chapters/17_Techniques--Metaprogramming.md	only: so only the current leaves remain
@@ -248,12 +241,9 @@ Chapters/18_Techniques--Performance.md	already: so a frozen instance already can
 Chapters/18_Techniques--Performance.md	even: halve an even value or triple-and-increment an odd one
 Chapters/18_Techniques--Performance.md	is what: so that is what the heap needs to beat
 Chapters/18_Techniques--Performance.md	only: CODE applies only to numeric functions
-Chapters/18_Techniques--Performance.md	only: CODE only built a min-heap
-Chapters/18_Techniques--Performance.md	only: CODE reports only an object's own size
+Chapters/18_Techniques--Performance.md	only: CODE built only a min-heap
 Chapters/18_Techniques--Performance.md	only: Caching is correct only when the function is pure
-Chapters/18_Techniques--Performance.md	only: Compiling changes only the loop's interior
 Chapters/18_Techniques--Performance.md	only: Explain why caching suits only pure functions
-Chapters/18_Techniques--Performance.md	only: Only a view of CODE is read-only
 Chapters/18_Techniques--Performance.md	only: The comparison holds only when the input order gives neither side an advantage
 Chapters/18_Techniques--Performance.md	only: You keep that speedup only while the data stays inside NumPy
 Chapters/18_Techniques--Performance.md	only: a query behind an attribute) that only a realistic load reveals
@@ -262,7 +252,6 @@ Chapters/18_Techniques--Performance.md	only: only CODE returns its index
 Chapters/18_Techniques--Performance.md	only: since it needs only one hash and one equality check no matter how large CODE grows
 Chapters/18_Techniques--Performance.md	only: so pulling it costs only O(log n) each time
 Chapters/18_Techniques--Performance.md	only: then each CODE costs only O(log n)
-Chapters/18_Techniques--Performance.md	only: while the fastest run is the closest you get to measuring only your code
 Chapters/18_Techniques--Performance.md	only: while the lazy one computes only the handful of values that CODE extracts
 Chapters/19_Techniques--Concurrency.md	already: Threads already distributed computing resources
 Chapters/19_Techniques--Concurrency.md	already: Use a thread pool for I/O when the blocking calls already exist and rewriting them as coroutines is not worth the effort
@@ -334,7 +323,6 @@ Chapters/20_Patterns--Rethinking_Objects.md	only: Substitution is safe only when
 Chapters/20_Patterns--Rethinking_Objects.md	only: and expose only what you meant to expose
 Chapters/20_Patterns--Rethinking_Objects.md	only: and the only validity check comes at runtime
 Chapters/20_Patterns--Rethinking_Objects.md	only: and you act on objects only by sending messages
-Chapters/20_Patterns--Rethinking_Objects.md	only: because each function's parameter names only the one method it needs
 Chapters/20_Patterns--Rethinking_Objects.md	only: expose it only through methods you control
 Chapters/20_Patterns--Rethinking_Objects.md	promise: The first OOP promise is encapsulation
 Chapters/20_Patterns--Rethinking_Objects.md	promise: The fourth OOP promise is polymorphism
@@ -376,9 +364,7 @@ Chapters/23_Patterns--Iterators.md	only: but CODE accepts only an iterator
 Chapters/23_Patterns--Iterators.md	only: but only by keeping everything the traversal has seen
 Chapters/23_Patterns--Iterators.md	only: so the only way to ask is to take
 Chapters/23_Patterns--Iterators.md	want: then say which of the two you would want wrapping a parsed log file
-Chapters/24_Patterns--Singleton.md	already: The mutate-versus-rebind distinction from A Module Is Already a *Singleton* reappears here
 Chapters/24_Patterns--Singleton.md	already: The other seven are already in the hands of their callers
-Chapters/24_Patterns--Singleton.md	already: and explain the difference using the binding-versus-mutation distinction from A Module Is Already a *Singleton*
 Chapters/24_Patterns--Singleton.md	already: the language already has an answer
 Chapters/24_Patterns--Singleton.md	exactly: which the import system builds exactly once
 Chapters/24_Patterns--Singleton.md	only: A constructor function with no arguments has only one possible call
@@ -427,7 +413,6 @@ Chapters/26_Patterns--Surrogate.md	only: Python calls it only after normal looku
 Chapters/26_Patterns--Surrogate.md	only: and CODE checks only the proxy's own class
 Chapters/26_Patterns--Surrogate.md	only: and relies only on intent
 Chapters/26_Patterns--Surrogate.md	only: so CODE passes the check and fails only at runtime
-Chapters/27_Patterns--Factory.md	already: a data class with keyword arguments already does the job
 Chapters/27_Patterns--Factory.md	even: A lazy import produces the same failure even when the import statement is in the file
 Chapters/27_Patterns--Factory.md	even: even momentarily
 Chapters/27_Patterns--Factory.md	itself: CODE lets each subclass register itself
@@ -454,7 +439,7 @@ Chapters/28_Patterns--Function_Objects.md	exactly: When each type needs exactly 
 Chapters/28_Patterns--Function_Objects.md	itself: Each handler decides for itself whether it failed
 Chapters/28_Patterns--Function_Objects.md	only: A positional-only parameter takes no keyword
 Chapters/28_Patterns--Function_Objects.md	only: The CODE in CODE makes CODE positional-only
-Chapters/28_Patterns--Function_Objects.md	only: The undo discussion in A Callable Object as a *Command* needs only a type
+Chapters/28_Patterns--Function_Objects.md	only: The undo discussion needs only a type
 Chapters/28_Patterns--Function_Objects.md	only: a handler receives only its own event type
 Chapters/28_Patterns--Function_Objects.md	only: and the type checker rejects CODE as an assignment to a read-only property
 Chapters/28_Patterns--Function_Objects.md	only: so a class was the only form available
@@ -510,7 +495,6 @@ Chapters/35_Patterns--Flyweight.md	only: and a slotted class gets one only by de
 Chapters/35_Patterns--Flyweight.md	only: but only a handful of tile kinds
 Chapters/35_Patterns--Flyweight.md	want: If you want callers to construct objects with an ordinary class call such as CODE
 Chapters/36_Patterns--Memento.md	itself: Change CODE so CODE holds the list itself instead of a tuple copy
-Chapters/36_Patterns--Memento.md	itself: It reads CODE itself and passes whatever the edit returns straight to CODE
 Chapters/36_Patterns--Memento.md	itself: an opaque snapshot of itself
 Chapters/36_Patterns--Memento.md	only: A parameter typed CODE accepts only a CODE
 Chapters/36_Patterns--Memento.md	only: CODE exists only for the type checker
@@ -519,7 +503,7 @@ Chapters/36_Patterns--Memento.md	only: The record makes the attribute that holds
 Chapters/36_Patterns--Memento.md	only: because a memento works only when it is a copy and fails when it is an alias
 Chapters/36_Patterns--Memento.md	only: but it copies only the CODE
 Chapters/36_Patterns--Memento.md	only: so a history of CODE states stores each stroke once and duplicates only the pointers
-Chapters/37_Patterns--Pattern_Refactoring.md	itself: It registers itself
+Chapters/37_Patterns--Pattern_Refactoring.md	itself: A new recyclable type registers itself
 Chapters/37_Patterns--Pattern_Refactoring.md	itself: The tests confirm that each subclass registers itself
 Chapters/37_Patterns--Pattern_Refactoring.md	itself: so each one can register itself in CODE automatically
 Chapters/37_Patterns--Pattern_Refactoring.md	only: A design that adds a type without editing existing code ordinarily adds an operation only by editing every type
@@ -537,8 +521,6 @@ Chapters/38_Patterns--Simulation.md	itself: so each view drives or replays its m
 Chapters/38_Patterns--Simulation.md	only: A single CODE would await only the tasks in the list at the moment of the call
 Chapters/38_Patterns--Simulation.md	only: Because CODE depends only on the CODE CODE
 Chapters/38_Patterns--Simulation.md	only: CODE is CODE only for a type checker reading the file and CODE at runtime
-Chapters/38_Patterns--Simulation.md	only: CODE reports only direct subclasses
-Chapters/38_Patterns--Simulation.md	only: Grains do not read each other's positions and store only their own
 Chapters/38_Patterns--Simulation.md	only: It needs only an object with matching methods
 Chapters/38_Patterns--Simulation.md	only: Only a maze with a loop lets two rats try to claim the same new cell
 Chapters/38_Patterns--Simulation.md	only: Only its shape matters here
@@ -561,7 +543,7 @@ Chapters/40_Functional--Foundations.md	is what: which is what *first-class* mean
 Chapters/40_Functional--Foundations.md	itself: and it changes nothing outside itself
 Chapters/40_Functional--Foundations.md	only: Each freezes only its own top level
 Chapters/40_Functional--Foundations.md	only: For a function whose parameters are positional-only
-Chapters/40_Functional--Foundations.md	only: Freezing only the binding is the shallow-freezing lesson of Rethinking Objects again
+Chapters/40_Functional--Foundations.md	only: Freezing only the binding is the shallow-freezing lesson again
 Chapters/40_Functional--Foundations.md	only: The read-only collection types in CODE
 Chapters/40_Functional--Foundations.md	only: and only the binding
 Chapters/40_Functional--Foundations.md	only: and you supply only the part that differs from one use to the next
@@ -593,15 +575,14 @@ Chapters/41_Functional--Toolkits.md	want: CODE is the right choice when equal le
 Chapters/41_Functional--Toolkits.md	want: CODE to take as many of them as you want
 Chapters/41_Functional--Toolkits.md	want: and keeping one is right when you want each pair of distinct elements once
 Chapters/42_Functional--Error_Handling.md	exactly: The narrowing works because CODE is a union of exactly two classes
-Chapters/42_Functional--Error_Handling.md	only: Reading CODE directly is safe here only because CODE adds a note on every failure
+Chapters/42_Functional--Error_Handling.md	only: Reading CODE without a default is safe here only because CODE adds a note on every failure
 Chapters/42_Functional--Error_Handling.md	only: The only way to the answer is narrowing to one of the two classes
-Chapters/42_Functional--Error_Handling.md	only: only CODE passes all three steps
 Chapters/42_Functional--Error_Handling.md	only: so only the value's runtime type says which side you received
 Chapters/42_Functional--Error_Handling.md	wants: so a caller who wants the original must read it from the new exception's CODE (set by CODE) or CODE (set when a handler raises an exception without CODE)
 Chapters/43_Functional--Confidence.md	even: and perhaps some should even be mathematically provable
 Chapters/43_Functional--Confidence.md	exactly: every student appears in exactly one group per round
 Chapters/43_Functional--Confidence.md	itself: Substitution stops working the moment a function reads or writes outside itself
-Chapters/43_Functional--Confidence.md	only: CODE comes from Numbers on Your Machine and prints the two times only when you run the listing with CODE
+Chapters/43_Functional--Confidence.md	only: CODE prints the two times only when you run the listing with CODE
 Chapters/43_Functional--Confidence.md	only: Narrow CODE to compare only the counts
 Chapters/43_Functional--Confidence.md	only: so the theorem holds only as far as the annotations reach
 Chapters/43_Functional--Confidence.md	want: *Declarative* code states the result you want
@@ -642,7 +623,6 @@ Chapters/46_Effects--Stateless.md	already: which raises a CODE because a loop is
 Chapters/46_Effects--Stateless.md	even: CODE must declare the CODE even though no CODE appears in its body
 Chapters/46_Effects--Stateless.md	even: and even then it is the bare union CODE rather than a wrapper object
 Chapters/46_Effects--Stateless.md	even: even for an Effect with no CODE in it
-Chapters/46_Effects--Stateless.md	even: even though only CODE
 Chapters/46_Effects--Stateless.md	exactly: A dictionary matches the key exactly
 Chapters/46_Effects--Stateless.md	happens: so you need no test that exercises the path and no reviewer who happens to notice it
 Chapters/46_Effects--Stateless.md	is what: CODE is what it produces
@@ -653,7 +633,7 @@ Chapters/46_Effects--Stateless.md	never: Failures never vanish
 Chapters/46_Effects--Stateless.md	never: because CODE matches the yielded value before the driver gets it and never resumes the inner generator
 Chapters/46_Effects--Stateless.md	never: so CODE never returns a subclass registered under its own name
 Chapters/46_Effects--Stateless.md	never: so the inner CODE never runs
-Chapters/46_Effects--Stateless.md	only: A CODE-shaped value appears in Stateless only after CODE (Turning an Error Into a Value)
+Chapters/46_Effects--Stateless.md	only: A CODE-shaped value appears in Stateless only after CODE
 Chapters/46_Effects--Stateless.md	only: A function that constructs its own CODE can use only that class
 Chapters/46_Effects--Stateless.md	only: A library acts only on objects handed to it
 Chapters/46_Effects--Stateless.md	only: At runtime it prints only the class of its argument (CODE
@@ -669,7 +649,6 @@ Chapters/46_Effects--Stateless.md	only: You can catch both errors or only one
 Chapters/46_Effects--Stateless.md	only: and CODE handles only a CODE
 Chapters/46_Effects--Stateless.md	only: and only a subclass can replace it
 Chapters/46_Effects--Stateless.md	only: but an interface reaches CODE only through an implementation
-Chapters/46_Effects--Stateless.md	only: even though only CODE
 Chapters/46_Effects--Stateless.md	only: so looking up a name is the only step and CODE is the only failure
 Chapters/46_Effects--Stateless.md	only: so today the parent contributes only the name CODE matches
 Chapters/46_Effects--Stateless.md	wants: A caller who wants to redirect the output
@@ -680,7 +659,6 @@ Chapters/47_Effects--Stateless_in_Practice.md	even: CODE type-checks even though
 Chapters/47_Effects--Stateless_in_Practice.md	even: then say why it differs from CODE's even though both fail the same way
 Chapters/47_Effects--Stateless_in_Practice.md	is what: Here is what ZIO does that Stateless cannot
 Chapters/47_Effects--Stateless_in_Practice.md	is what: The difference between the two ways in is what the type checker verifies
-Chapters/47_Effects--Stateless_in_Practice.md	is what: and the only difference is what you supply
 Chapters/47_Effects--Stateless_in_Practice.md	itself: It prints nothing itself
 Chapters/47_Effects--Stateless_in_Practice.md	never: CODE never runs
 Chapters/47_Effects--Stateless_in_Practice.md	never: and the driver never resumes the generator
@@ -699,7 +677,6 @@ Chapters/47_Effects--Stateless_in_Practice.md	only: These two are the only funct
 Chapters/47_Effects--Stateless_in_Practice.md	only: Trust a green check only where you have seen the same construct produce a red one
 Chapters/47_Effects--Stateless_in_Practice.md	only: and only the function can build a second description
 Chapters/47_Effects--Stateless_in_Practice.md	only: and the CODE that comes back is only a return value
-Chapters/47_Effects--Stateless_in_Practice.md	only: and the only difference is what you supply
 Chapters/47_Effects--Stateless_in_Practice.md	only: and the only types it mentions are the three Protocols
 Chapters/47_Effects--Stateless_in_Practice.md	only: and the window for the mistake is only as wide as the gap between the two reads
 Chapters/47_Effects--Stateless_in_Practice.md	only: and whose body is only the success path
