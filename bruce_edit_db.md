@@ -798,6 +798,12 @@ them"); or supplies a direct answer to what the left side sets up ("GoF
 leaves one choice open: who calls `notify()`"). R5 covers the colon
 after a bullet's label.
 
+Bruce's ruling on the 2026-10-04 book-wide report, where R21 had 501
+sites and only 157 rated high-confidence: "Lean towards splitting
+sentences at colons." So a medium-confidence site is applied; the
+keep-whens above hold where they clearly apply, and a split that
+leaves a fragment is the one other reason to keep the colon.
+
 **Sightings.** 3 rounds, 21 chapters. Bruce named the rule on chapter
 30 (2026-09-17, "There are colons that could be removed in favor of
 separate sentences"):
