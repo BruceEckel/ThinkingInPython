@@ -166,13 +166,13 @@ seven names normalize to `Bob`, `John`, `Alice`, `Bob`, `Alice`, `J`,
 collapse to `Bob`, `John`, and `Alice`, and `J` joins them.
 
 **Normalize without truncating.** `"J"` does not collide with `"JOHN"` because the normalization is a
-string transformation, not a truncation: `"J"` becomes `"J"` and
+string transformation, not a truncation. `"J"` becomes `"J"` and
 `"JOHN"` becomes `"John"`. `name[1:]` on a one-character string is the
 empty string, so the concatenation adds nothing to the capital. `"J"`
 and `"John"` are distinct strings, so the set keeps both.
 
 The filter exists to drop the initial `"J"` as noise. Removing the filter
-shows what the set does on its own: it collapses only exact
+shows what the set does on its own. It collapses only exact
 duplicates of the normalized form, and it has no notion that `"J"`
 might be an abbreviation of `"John"`.
 
@@ -235,7 +235,7 @@ for n in [1, 2, 3]:  # Printing alone stays a loop
 **Give the output expression a value.** The original comprehension collects `print()`'s return value, which is
 always `None`, so the list it builds is worthless and the brackets
 mislead the reader. Giving the output expression something to return
-fixes both: `show()` prints and hands back the line, so `lines` holds
+fixes both. `show()` prints and hands back the line, so `lines` holds
 the three strings a caller can check, write to a file, or join.
 
 **Choose the shape by the result.** Which shape is right depends on whether you want the list. Here the
@@ -317,7 +317,7 @@ print(list(nums))
 
 `any()` pulls values until one matches, so it consumes `0` through `5`,
 reports `True`, and stops. Stopping there leaves the generator part-way
-through, not empty: `sum()` continues from `6` and adds `36 + 49 + 64 +
+through, not empty. `sum()` continues from `6` and adds `36 + 49 + 64 +
 81`, giving `230` rather than the full `285`. By then `sum()` has
 drained every value, so `list()` gets nothing. A generator holds a
 position rather than a beginning. Each consumer picks up where the
@@ -371,7 +371,7 @@ print(built)
 
 **Compute the products eagerly.** The lines print in the same order as in `genexp_timing.py`, and the
 last one changes from `[10, 20, 30]` to `[2, 4, 6]`. A list
-comprehension does all its work on the line where it appears: it
+comprehension does all its work on the line where it appears. It
 calls `source()`, reads `factor` while `factor` is `2`, and stores
 the three products in `built`. The later `factor = 10` has nothing
 to affect, because `built` holds finished numbers and no code that

@@ -189,8 +189,7 @@ with (tag("ul") as outer, tag("li") as inner1,
 
 All three managers enter left to right (`ul`, then `li`, then `li`
 again) and exit in reverse order, regardless of how many managers
-appear on the line. The pattern from two managers extends
-unchanged to three, four, or more.
+appear on the line.
 
 </details>
 </details>
@@ -389,7 +388,7 @@ class ignore_missing:
 
 If you return `issubclass(exc_type, KeyError)` without the `None` test,
 the demo prints the same two lines, because both of its blocks raise an exception.
-A block that finishes cleanly then fails:
+A block that finishes cleanly then fails.
 `__exit__()` receives `None`, and `issubclass()` raises a `TypeError`.
 `ty` reports an `invalid-argument-type` at the `issubclass()` call,
 so the type checker catches the mistake the demo misses.
@@ -431,7 +430,7 @@ with expected(ValueError):
 truthy suppresses, falsy lets the exception continue. Returning
 `issubclass(exc_type, KeyError)` therefore suppresses `KeyError` and
 propagates everything else. The second block confirms the
-propagation: the `ValueError` passes through `ignore_missing` and
+propagation. The `ValueError` passes through `ignore_missing` and
 reaches the chapter's `expected`, which prints it.
 
 **Handle a clean exit.** The `exc_type is not None` test keeps the normal path working. When a
@@ -525,7 +524,7 @@ The `sys.argv` rewrite stays out of the extracted listings, because
 the book's output checker runs every listing inside one process with
 its own arguments, and a script reading `sys.argv` sees the checker's
 arguments instead. The listing below passes the names to `wrap()`
-directly, so the checker can run it, and it shows both cases:
+as list literals, so the checker can run it, and it shows both cases:
 
 ```python
 # exercise_7.py
@@ -622,8 +621,8 @@ then does the exception leave the `with` statement and reach the
 That is the order `exit_on_error.py` shows for the class form: cleanup
 first, then propagation.
 
-In `no_finally.py` the same exception left the generator from the
-bare `yield`, so the `print()` after it did not run. The `finally` is
+In `no_finally.py` the same exception leaves the generator from the
+bare `yield`, so the `print()` after it does not run. The `finally` is
 the only difference between the two listings, apart from the
 function's name.
 

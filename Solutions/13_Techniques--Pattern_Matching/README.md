@@ -73,25 +73,25 @@ print(classify((1,)))
 #: singleton
 ```
 
-**Tell lists apart by length.** `[]` matches only an empty sequence. `[_]` matches a list with exactly
-one element (the `_` throws the element away without a name). `[_, *_]`
-matches one or more elements: the first `_` matches the first element,
-and `*_` collects the rest, including an empty rest. So
-`[_, *_]` also fits a singleton, and order matters: `[_]` must come
-before `[_, *_]`, or the general pattern claims `[1]` first and
-the "singleton" case is unreachable.
+**Tell lists apart by length.** `[]` matches only an empty sequence.
+`[_]` matches a list with exactly one element (the `_` throws the
+element away without a name). `[_, *_]` matches one or more elements.
+The first `_` matches the first element, and `*_` collects the rest,
+including an empty rest. So `[_, *_]` also fits a singleton, and order
+matters. `[_]` must come before `[_, *_]`, or the general pattern
+claims `[1]` first and the "singleton" case is unreachable.
 
 **Test the type alone.** `Point()` matches any `Point`
 instance without binding its fields, since `classify()` doesn't need
 `x` or `y`.
 
-The string `"hi"` is a sequence of two characters, and `classify()`
-still returns "other" for it: a sequence pattern excludes `str`. The
-tuple `(1,)` goes the other way. A sequence pattern tests the shape,
-not the type, so a one-element tuple is a "singleton" here. When the
-answer must hold for a `list` alone, wrap the pattern in a class
-pattern: `case list([_]):` first tests for a `list`, then matches the
-one-element shape.
+The string `"hi"` is a sequence of two characters, but a sequence
+pattern excludes `str`, so `classify()` still returns "other" for it.
+The tuple `(1,)` goes the other way. A sequence pattern tests the
+shape, not the type, so a one-element tuple is a "singleton" here.
+When the answer must hold for a `list` alone, wrap the pattern in a
+class pattern. `case list([_]):` first tests for a `list`, then
+matches the one-element shape.
 
 </details>
 </details>
@@ -148,8 +148,8 @@ Once `Rectangle` joins the `Shape` union, the type checker proves that a
 `assert_never()` demands an argument of type `Never`, meaning "this
 code is unreachable." The type checker now knows `shape` can be a
 `Rectangle` at that point, so `Never` and the argument's type disagree and the checker
-reports an error. That error is the check the chapter describes:
-the missing case becomes a type error at check time instead of a
+reports an error. That error is the check the chapter describes.
+The missing case becomes a type error at check time instead of a
 silent gap that shows up only when a `Rectangle` reaches `area()` at
 runtime.
 
@@ -217,7 +217,7 @@ that has `"x"` and `"y"` keys, binding both in one step.
 **Accept both click shapes.** The
 nested case and the flat `{"type": "click", "x": x, "y": y}` case
 each describe one shape of click event, and both return the same
-string. The two cases do not compete: a flat event has no `"at"` key
+string. The two cases do not compete. A flat event has no `"at"` key
 and a nested one has no top-level `"x"`, so each event fits only one
 of them.
 
@@ -337,9 +337,9 @@ print(cost(hook))
 #: 0.0
 ```
 
-Add `Webhook` to the union and run `ty` before adding either `case`.
-The checker reports two diagnostics, one per function that matches on
-the union:
+If you add `Webhook` to the union and run `ty` before adding either
+`case`, the checker reports two diagnostics, one per function that
+matches on the union:
 
 ```
 error[type-assertion-failure]: Argument does not have asserted type `Never`
@@ -484,15 +484,15 @@ print(quadrant(Point(0, 7)))
 ```
 
 The second version reads better. A guard hides the shape of the
-dispatch: you must read four nearly identical `if` clauses one at a
+dispatch. You must read four nearly identical `if` clauses one at a
 time to see that they enumerate sign combinations. Once the subject is
 `sign(p.x), sign(p.y)`, the cases are literals in a two-column table,
 and a missing combination is visible at a glance. The `|` alternation
 then handles both axis cases in one line, which no guard arrangement
 does as briefly.
 
-The cost is the `sign()` helper and one extra layer of indirection:
-the `match` no longer mentions `Point`. That trade is usually worth it
+The cost is the `sign()` helper and one extra layer of indirection.
+The `match` no longer mentions `Point`. That trade is usually worth it
 when the guards all test the same handful of derived facts, and
 not worth it when each guard asks a different question.
 
@@ -602,7 +602,7 @@ print(guarded(Signal.STOP), guarded(Signal.CAUTION))
 ```
 
 **Demonstrate the accidental capture.** `act()` answers "fallback" for `Signal.STOP`, which is not the
-fallback value. `case FALLBACK:` is a bare name, so it captures: it
+fallback value. `case FALLBACK:` is a bare name, so it captures. It
 matches `Signal.STOP`, binds it to a local named `FALLBACK` inside
 `act()`, and compares nothing. The module-level constant
 still holds `Signal.CAUTION` afterward, so the mistake is

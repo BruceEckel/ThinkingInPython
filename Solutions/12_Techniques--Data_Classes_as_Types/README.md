@@ -185,7 +185,7 @@ class EmailAddress:
 <details>
 <summary>Solution</summary>
 
-If you keep only the `partition()` check, `"b@@x.com"` passes:
+If you keep only the `partition()` check, `"b@@x.com"` passes.
 `partition()` splits at the first `@`,
 and the domain half, `"@x.com"`, is not empty.
 The demo loop stops there with an `AssertionError`,
@@ -239,9 +239,9 @@ print(EmailAddress("grace@example.com"))
 ```
 
 **Require a single `@`.**
-The original check, `"@" in self.text`, only confirms an `@` appears
-somewhere. `count("@") == 1` additionally rejects two-`@` strings like
-`"b@@x.com"`.
+The original check, `"@" in self.text`, confirms only that an `@`
+appears somewhere. `count("@") == 1` additionally rejects two-`@`
+strings like `"b@@x.com"`.
 
 **Require text on both halves.** The second check splits on `@` and requires text on both
 sides, so it rejects `"@x.com"` and `"b@"`.
@@ -349,13 +349,14 @@ print(copy.replace(Stars(5), number=99))
 `typing.NamedTuple` refuses a `__new__()` in its own class body but
 accepts one in a subclass, so `Stars(11)` now raises a `TypeFailure`.
 The chapter's factory function cannot stop that call, since a caller
-can construct `Stars` directly.
+can construct `Stars` without calling `make_stars()`.
 
 **Test the replacement path.** The guarantee still leaks. `_replace()` builds the new tuple through
 `tuple.__new__()` rather than through `cls.__new__()`, so it skips
 the check. `copy.replace()` calls `_replace()` and inherits the hole.
 A validated `Stars` therefore produces an unvalidated one.
-That leak is worse than no check: the type now looks like it guarantees its values.
+That leak is worse than no check.
+The type now looks like it guarantees its values.
 
 A frozen data class has no equivalent hole because its replacement
 goes through the constructor. `copy.replace()` calls the constructor,
@@ -594,7 +595,7 @@ arguments the changes name, and rebuilds through `type(self)(...)`.
 **Validate the replacement.** The validation runs
 because the rebuild goes through `__init__()`. A frozen data class
 stays validated across a replacement for the same reason. Any
-`__replace__()` that restores the state directly, the way
+`__replace__()` that copies `__dict__` into a new object, the way
 `copy.copy()` does, skips the check.
 
 </details>
@@ -722,12 +723,13 @@ reports and the one parameter that the generated signature takes.
 an instance. `Stars.built += 1` assigns to the class instead, so it
 works.
 
-**Show the instance store failing.** `Wrong` writes the same intent a different way, and fails:
-`self.built += 1` reads the class attribute, adds one, and then tries
-to store the result on the instance. That store is the assignment
-`frozen=True` refuses. The type checker rejects the line before the program runs,
-reporting `built` as read-only on a frozen instance, so the listing
-carries a `# type: ignore` to demonstrate the runtime failure.
+**Show the instance store failing.** `Wrong` writes the same intent a
+different way, and fails. `self.built += 1` reads the class attribute,
+adds one, and then tries to store the result on the instance. That
+store is the assignment `frozen=True` refuses. The type checker rejects
+the line before the program runs, reporting `built` as read-only on a
+frozen instance, so the listing carries a `# type: ignore` to
+demonstrate the runtime failure.
 
 </details>
 </details>
@@ -826,7 +828,7 @@ unhashable object, and raises a `ValueError` naming the fix.
 `Bare` and `Subscripted` both work, and they differ in what `ty`
 sees. For `field(default_factory=dict)` `ty` infers `Unknown`, a type
 that satisfies any annotation, so `ty` does not compare the factory
-against the field. Checkers differ here: Pyright and mypy
+against the field. Checkers differ here. Pyright and mypy
 both compare the bare factory and reject a mismatched one.
 
 **Give the checker a return type.**
@@ -853,7 +855,9 @@ factory when you want the checker to confirm the agreement.
 
 [The Annotation and the Check](../../Chapters/12_Techniques--Data_Classes_as_Types.md#the-annotation-and-the-check) shows `Stars(5.5)` passing because Python does not enforce the annotation at runtime.
 Add a type test as the first call to `check()` in `__post_init__()`, before the range comparison.
-For `True`, consider how `bool` relates to `int`, and compare the class of the value directly instead of using `isinstance()`.
+For `True`, consider how `bool` relates to `int`,
+and compare the class of the value with `int`
+instead of using `isinstance()`.
 
 <details>
 <summary>The shape</summary>
@@ -949,8 +953,9 @@ and rejects a `bool` along with a `float` and a `str`.
 and `"five"` as arguments before the program runs, and the
 `# type: ignore` silences that report so the listing can show what the
 constructor does with each value at runtime. The type checker accepts
-`Stars(True)`: a `bool` is an `int` to it for the same subclass
-reason, so the runtime test is the one check that rejects `True`.
+`Stars(True)`. A `bool` is an `int` to the checker for the same
+subclass reason, so the runtime test is the one check that rejects
+`True`.
 
 </details>
 </details>

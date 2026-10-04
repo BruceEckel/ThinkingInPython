@@ -182,9 +182,9 @@ then calls the *wrapped* function, which is `timing`'s wrapper.
 `timing`'s wrapper measures and reports the elapsed time around the
 real `add()` call. Control then
 returns outward to `trace`'s wrapper, which prints the `<-` line
-last. The output order mirrors the wrapping order: outermost decorator
-prints first and last, and each inner layer's output appears nested
-in between.
+last. The output order mirrors the wrapping order. The outermost
+decorator prints first and last, and each inner layer's output appears
+nested in between.
 
 </details>
 </details>
@@ -314,8 +314,8 @@ from `Drink`, and nothing needs to. The type checker matches the
 the description and leaves the price alone. A class-per-combination
 design still needs a separate class for every decaf variant. Adding a
 fourth extra means one class with one number in it, and the extras
-compose in any order, since each layer knows only about the drink
-directly inside it.
+compose in any order, since each layer knows only about the drink it
+wraps.
 
 </details>
 </details>
@@ -436,13 +436,12 @@ therefore accumulates across every function decorated with
 **Trace every call.** `__call__()` prints the chapter's arrow lines around the forwarded
 call, so the decorator traces every call as well as counting it.
 
-The two
-counters show the same class-attribute-versus-instance-attribute
-distinction from
-[Class Attributes](../../Chapters/09_Foundations--Class_Attributes.md): `self.count` shadows
-nothing and lives per-instance, while `total_calls`, read and written
-through the class name, is one value the whole family of decorated
-functions shares.
+The two counters show the same
+class-attribute-versus-instance-attribute distinction from
+[Class Attributes](../../Chapters/09_Foundations--Class_Attributes.md).
+`self.count` shadows nothing and lives per-instance, while
+`total_calls`, read and written through the class name, is one value
+the whole family of decorated functions shares.
 
 </details>
 </details>
@@ -502,8 +501,9 @@ def add(a: int, b: int) -> int:
 <summary>Solution</summary>
 
 If you key the cache on `(args, kwargs)`,
-the first call, `square(4)`, raises a `TypeError`:
-the tuple holds a `dict`, which is unhashable, so the tuple cannot be a dictionary key.
+the first call, `square(4)`, raises a `TypeError`.
+The tuple holds a `dict`, which is unhashable,
+so the tuple cannot be a dictionary key.
 The type checker passes that version, so the failure appears only when the program runs.
 The solution turns the keyword arguments into a tuple of name-value pairs,
 which hashes whenever every argument does.
@@ -573,7 +573,7 @@ the type checker, which cannot otherwise tell which of the two shapes a
 given call has. The first says "given a function, return a function of
 the same signature." The second says "given `maxsize` alone, return a
 decorator." The implementation returns `Any` because `Any` satisfies
-both overloads. The overloads are what callers see: `square(4)`
+both overloads. The overloads are what callers see. `square(4)`
 type-checks as an `int`, and `memo(maxsize=2)` type-checks as something
 you can apply to a function.
 
@@ -584,7 +584,7 @@ immediately with `decorate(func)`. Used with parentheses,
 `@memo(maxsize=2)` calls `memo(maxsize=2)` first, `func` is `None`,
 and `memo` returns `decorate` for Python to apply to `add`. Making
 `func` the only positional parameter and `maxsize` keyword-only
-keeps the two calls unambiguous: a positional argument always
+keeps the two calls unambiguous. A positional argument always
 binds to `func` and cannot bind to `maxsize`.
 
 **Key on every argument.** The cache key pairs the positional arguments with the keyword items,
@@ -612,7 +612,7 @@ implementation must reconsider that trade.
 
 [Decorators That Take Arguments](../../Chapters/14_Techniques--Decorators.md#decorators-that-take-arguments) uses three nested functions: the outer takes the argument, the middle takes the function, and the inner is the wrapper.
 Catch the exception in a loop for all attempts but the last, then make the final call outside any `try`.
-Apply `@wraps` in the wrapper, as in [`wraps` Keeps the Runtime Interface](../../Chapters/14_Techniques--Decorators.md#wraps-keeps-the-runtime-interface).
+Apply [`@wraps`](../../Chapters/14_Techniques--Decorators.md#wraps-keeps-the-runtime-interface) in the wrapper.
 
 <details>
 <summary>The shape</summary>
@@ -693,18 +693,20 @@ expect(RuntimeError, always_fails)
 #: [RuntimeError] no luck
 ```
 
-**Keep the wrapped function's identity.** `@wraps(func)` keeps the identity: `flaky.__name__` reports the
-wrapped function's name, not `wrapper`. Without it, every retried
-function reports itself as `wrapper` to a log line or a test report
-that reads `__name__`. A traceback is the same either way: it names
-each frame from the code object, which `wraps` leaves alone, so the
-`wrapper` frame appears with or without it.
+**Keep the wrapped function's identity.** `@wraps(func)` keeps the
+identity. `flaky.__name__` reports the wrapped function's name, not
+`wrapper`. Without it, every retried function reports itself as
+`wrapper` to a log line or a test report that reads `__name__`. A
+traceback is the same either way. It names each frame from the code
+object, which `wraps` leaves alone, so the `wrapper` frame appears with
+or without it.
 
 **Retry all but the last attempt.** The loop runs `times - 1` attempts inside a `try`, and the final
 attempt sits outside it, with no handler.
 
-**Retry after any ordinary failure.** Catching bare `Exception` is a deliberate shortcut here: a
-real `retry` should take the exception types it retries, since
+**Retry after any ordinary failure.** Catching bare `Exception` is a
+deliberate shortcut here. A real `retry` should take the exception
+types it retries, since
 retrying a `TypeError` from a bad call signature just fails three
 times more slowly.
 
@@ -844,8 +846,8 @@ instance has no `__get__()`, so `counter.peek` hands it back unbound
 and `counter.peek()` calls `peek()` with no `self`, the `TypeError`
 `method_decoration.py` shows.
 
-**Call through an instance.** `counter.bump(2)` works: the body runs three times with `counter` as
-`self`, and the total reaches `6`.
+**Call through an instance.** `counter.bump(2)` works. The body runs
+three times with `counter` as `self`, and the total reaches `6`.
 
 **Read what the class stores.** Reading the two names from
 `Counter.__dict__` skips the attribute lookup that would bind them,

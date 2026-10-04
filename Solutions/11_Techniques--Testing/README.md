@@ -213,7 +213,7 @@ def test_never_negative_after_deposit(
 Code after a fixture's `yield` runs as teardown, once the test function
 that uses the fixture finishes, whether it passes or raises an
 exception. Here that teardown is an assertion, so it doubles as a
-check: no matter what either test does to the account,
+check. No matter what either test does to the account,
 `never_negative`'s balance must still be non-negative once the test
 body returns control to the fixture.
 
@@ -305,7 +305,7 @@ the rename, and it survives dropping the environment variable.
 nothing touches the disk, because it supplies a real, valid path
 where a hard-coded one differs across operating systems.
 
-The trade is that injection moves the decision outward: somebody must
+The trade is that injection moves the decision outward. Somebody must
 read `APP_CONFIG` and pass in the directory. That somebody is
 usually one function at the program's edge, and that function is the
 one place a patching test is worth writing.
@@ -450,7 +450,8 @@ A hand-written stub needs somewhere to keep what it receives, so the test has so
 <summary>Solution</summary>
 
 If you test only a positive balance,
-a mistaken `balance <= 0` in `notify_low_balance()` goes unnoticed: both tests pass at `50`.
+a mistaken `balance <= 0` in `notify_low_balance()` goes unnoticed.
+Both tests pass at `50`.
 `<` and `<=` disagree only at zero,
 so the solution adds `0` to the `parametrize` list, and with the mistaken `<=` both zero cases fail.
 
@@ -483,7 +484,8 @@ def test_stub_not_called(balance: float) -> None:
 ```
 
 **Test the boundary with a mock.**
-Zero is the boundary: `notify_low_balance()` tests `balance < 0`,
+Zero is the boundary.
+`notify_low_balance()` tests `balance < 0`,
 so a mistaken `<=` would send at zero and fail the zero case.
 `assert_not_called()` passes only if `send` received no call.
 
@@ -492,7 +494,8 @@ A stub like exercise 5's `fake_fetch()` cannot make this check.
 It records nothing, so the test would pass whether or not `send` ran,
 and a `notify_low_balance()` that always sent would go unnoticed.
 To make the check, the stub must gain a memory of its calls.
-Here that memory is the list `sent`: the stub appends each message to it,
+Here that memory is the list `sent`.
+The stub appends each message to it,
 and the test asserts that the list stays empty.
 A stub that records its calls is a mock written by hand.
 `Mock` builds that recording for you, along with the assertions that read it.

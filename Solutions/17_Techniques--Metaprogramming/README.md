@@ -364,12 +364,12 @@ no-op.
 `__init_subclass__()`. This version moves the decision into a set that
 `A` owns, and `A.__init_subclass__()` walks `cls.__mro__` to ask whether
 any ancestor declared itself final. A check of the direct bases in
-`cls.__bases__` would also refuse every descendant:
+`cls.__bases__` would also refuse every descendant.
 `A.__init_subclass__()` refuses the first subclass of a final class as
 Python creates that subclass, so no deeper descendant exists. The walk
 stays because it states the rule as written, "no final class anywhere
 above," in one line. `Open` and `Sub` show that the rest of the
-hierarchy still subclasses freely: `A.__init_subclass__()` raises a
+hierarchy still subclasses freely. `A.__init_subclass__()` raises a
 `TypeError` only for a class whose `__mro__` holds one of the classes in
 `A._final`.
 
@@ -573,25 +573,25 @@ print(c + 0.5, isinstance(c, float))
 #: 22.0 True
 ```
 
-**Define the method as a function.** `describe()` annotates `self` as `Any` because the type checker cannot
-know that this loose function ends up on a class carrying a `unit`
-attribute. The `Any` annotation is the cost of building a class from data
-rather than from a `class` statement.
+**Define the method as a function.** `describe()` annotates `self` as
+`Any` because the type checker cannot know that this loose function
+ends up on a class carrying a `unit` attribute.
 
-**Assemble the class from data.** The three arguments are the name, the bases, and the namespace, the
-same three a `class` statement assembles for you. A function defined
-at module level becomes a method when you put it in that namespace dict. It
-needs no decoration, because a function is a descriptor: the attribute
-lookup binds it to the instance.
+**Assemble the class from data.** The three arguments are the name,
+the bases, and the namespace, the same three a `class` statement
+assembles for you. A function defined at module level becomes a method
+when you put it in that namespace dict. It needs no decoration, because
+a function is a descriptor. The attribute lookup binds it to the
+instance.
 
 **Confirm the metaclass.** `type(Celsius)` is `type` because this listing calls `type()` as a
 constructor rather than subclassing it. Nothing here involves a
 metaclass of your own.
 
-**Inherit the base's arithmetic.** `Celsius` inherits `float`'s arithmetic, so
-`c + 0.5` works, though the sum is a `float` rather than a `Celsius`:
-`float.__add__()` builds its result from `float`, and that is why a
-numeric subclass usually overrides every operator whose result
+**Inherit the base's arithmetic.** `Celsius` inherits `float`'s
+arithmetic, so `c + 0.5` works. Because `float.__add__()` builds its
+result from `float`, the sum is a `float` rather than a `Celsius`. That
+is why a numeric subclass usually overrides every operator whose result
 should keep the subclass's type.
 
 </details>

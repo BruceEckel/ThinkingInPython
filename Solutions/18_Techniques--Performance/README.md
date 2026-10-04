@@ -197,11 +197,11 @@ print(f"lazy peak under 1% of one list: "
 #: lazy peak under 1% of one list: True
 ```
 
-**Skip the intermediate list.** `one_list()` filters `x * x` directly instead of first building a
-`squares` list and then an `evens` list from it, so the
-million-element `squares` list disappears. Peak memory drops to about
-half of the two-list version's. That is as close as an eager version
-gets.
+**Skip the intermediate list.** `one_list()` filters `x * x` instead
+of first building a `squares` list and then an `evens` list from it,
+so the million-element `squares` list disappears. Peak memory drops
+to about half of the two-list version's. That is as close as an eager
+version gets.
 
 **Measure the remaining gap.** The last line shows how far away the eager version still is:
 the lazy peak is under one percent of the one-list peak. The comprehension must build and
@@ -263,7 +263,7 @@ print(noisy(3))
 
 The `"computing noisy(3)"` message prints once, on the first
 call. Every later call with the same argument returns the cached
-result directly, without running the function body again, so the
+result without running the function body again, so the
 `print()` call (and any other side effect) does not run a second
 time. Skipping the body is the reason to cache only pure functions.
 A cache assumes that calling the function again is unnecessary,
@@ -329,11 +329,11 @@ The list still looks unsorted because a heap does not guarantee
 sorted order. A heap guarantees that the element at position `i` is
 no larger than its two children at positions `2i + 1` and `2i + 2`,
 which puts the smallest element at index 0 and says nothing about
-the order of the rest. `heappop()` maintains that weaker property, and maintaining it
-is cheap: the last element moves to the front and sinks back down
-through O(log n) comparisons. Sorting the whole list on every pop
-costs far more and gains nothing, since callers read only the front
-element.
+the order of the rest. `heappop()` maintains that weaker property,
+and maintaining it is cheap. The last element moves to the front and
+sinks back down through O(log n) comparisons. Sorting the whole list
+on every pop costs far more and gains nothing, since callers read
+only the front element.
 
 </details>
 </details>
@@ -399,9 +399,10 @@ Any subclass that does not declare its own `__slots__` gets the
 default behavior, a `__dict__`, and inherits the parent's slots
 alongside it.
 
-**Expose the inherited `__slots__`.** The last line shows the trap: `Point3D.__slots__` reads
-`('x', 'y')`, inherited from `Point`, so reading that attribute makes
-the subclass look slotted while it still carries a `__dict__`.
+**Expose the inherited `__slots__`.** The last line shows the trap.
+`Point3D.__slots__` reads `('x', 'y')`, inherited from `Point`, so
+reading that attribute makes the subclass look slotted while it still
+carries a `__dict__`.
 
 `Point3D` quietly loses the memory saving. Every instance pays for
 both the two slots and a dictionary. A subclass of a slotted class must
@@ -640,7 +641,7 @@ eight-byte doubles instead of objects, so reading an element
 builds a fresh `float` object to hand to Python. That allocation,
 on every single element, eats the advantage of the tighter layout.
 
-That cost is the chapter's NumPy lesson arriving early: a compact
+That cost is the chapter's NumPy lesson arriving early. A compact
 layout pays off when the loop over it leaves Python. `sum()` over an
 `array` stays in Python and boxes every element. A NumPy `sum` over
 the same bytes creates no Python object per element, which is why
@@ -718,7 +719,7 @@ print(f"both under 50 microseconds per call at 100 parts: "
 
 The ratio does not go away. One machine measured `join` about 19
 times faster at 10,000 parts and about 7 times faster at 100. What
-goes away is the amount at stake: at 100 short strings both versions
+goes away is the amount at stake. At 100 short strings both versions
 finish in a couple of microseconds, so the loop must run thousands
 of times before the choice shows up in a profile.
 
@@ -786,7 +787,7 @@ target is present, which is what a membership test needs and what
 **Find the end of the run.** `bisect()`, the alias for `bisect_right()`, returns the position
 after the last equal element. That is the position at which
 to insert a new duplicate after the existing ones. It is the
-wrong index to read: `xs[right]` is the next larger value, or an
+wrong index to read. `xs[right]` is the next larger value, or an
 `IndexError` when the target is the largest element in the list.
 
 **Recover the whole run.** The pair together answers a third question the chapter does not
@@ -823,10 +824,10 @@ print(sys._jit.is_available(), sys._jit.is_enabled())
 
 The listing carries no `#:` line, because its output depends on the
 interpreter. The book's build prints `False False`.
-The two flags name the state directly. `False False` means the build
+The two flags name the state. `False False` means the build
 has no JIT compiled in, so `PYTHON_JIT` does nothing. `True False` is
 the python.org Windows and macOS shape, built with
-`--enable-experimental-jit=yes-off`: the compiler sits in the binary,
+`--enable-experimental-jit=yes-off`. The compiler sits in the binary,
 waiting for `PYTHON_JIT=1`. `True True` means the JIT is already
 running, and `PYTHON_JIT=0` switches it back off.
 
@@ -848,7 +849,7 @@ and `target in as_set` both run their loops in the interpreter's own
 C code, so almost none of the time the listing reports is time the
 JIT could compile. The advice in [Write Idiomatic
 Python](../../Chapters/18_Techniques--Performance.md#write-idiomatic-python) speeds
-a program up for the same reason: work handed to C is work the
+a program up for the same reason. Work handed to C is work the
 interpreter skips, and the JIT compiles only what the interpreter
 runs.
 

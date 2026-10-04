@@ -65,7 +65,7 @@ The trace splits into two halves that run in opposite directions.
 task then suspends at its own `await`, and the event loop resumes them
 in the order their timers fire, so the shortest delay wakes first and
 `d` resumes before the other three. The returned list follows the
-argument order, not the finishing order: `gather()` fills each
+argument order, not the finishing order. `gather()` fills each
 position from the coroutine passed in that position, so `'D'` is last
 in the list although `d` finished first.
 
@@ -259,11 +259,12 @@ CPU-heavy loop, so all five coroutines suspend at that `await` and let
 their siblings start before any of them begins computing. All five are
 in flight, waiting, at once.
 
-**Count a suspended task as active.** The peak stays `5` wherever the loop sits, because the `await` is inside
-the `with meter:` block: a task suspended there still counts as
-active. If you remove the `await`, as `cpu_price()` does, the peak falls
-to `1`. Overlap depends on whether an `await` sits inside the measured
-span, not on where it sits relative to the computation.
+**Count a suspended task as active.** The peak stays `5` wherever the
+loop sits, because the `await` is inside the `with meter:` block. A
+task suspended there still counts as active. If you remove the
+`await`, as `cpu_price()` does, the peak falls to `1`. Overlap depends
+on whether an `await` sits inside the measured span, not on where it
+sits relative to the computation.
 
 </details>
 </details>
@@ -364,15 +365,16 @@ asyncio.run(main())
 
 **Hold the thread while waiting.** The peak falls from `5` to `1`, the
 same figure the CPU-bound version produced. `time.sleep()` does here
-what it does in `blocking_the_loop.py`: it stops the thread instead of
-suspending the task, and the event loop runs on that thread. A coroutine
-with no `await` gives the loop no chance to start another task, so each
-task runs start to finish before the next begins.
+what it does in `blocking_the_loop.py`. The call stops the thread
+instead of suspending the task, and the event loop runs on that
+thread. A coroutine with no `await` gives the loop no chance to start
+another task, so each task runs start to finish before the next
+begins.
 
 Waiting does not create overlap. Suspending does. These five tasks
 spend almost all their time waiting and still run one at a time,
 and `cpu_price()` runs one at a time for the opposite reason: it has no
-`await` to reach. The total run time makes the cost visible: five
+`await` to reach. The total run time makes the cost visible. Five
 blocking sleeps of 0.05 seconds take about a quarter second, while
 five awaited ones take about 0.05.
 
@@ -493,7 +495,7 @@ That silence is the difference between a semaphore and a lock.
 `RuntimeError: Lock is not acquired.` A semaphore does not track what it
 granted, so the same mistake silently admits a second holder and
 reintroduces the race the lock is there to prevent.
-`asyncio.BoundedSemaphore(1)` is the semaphore that objects: the stray
+`asyncio.BoundedSemaphore(1)` is the semaphore that objects. The stray
 `release()` raises
 `ValueError: BoundedSemaphore released too many times`.
 
@@ -624,7 +626,7 @@ that closes a loop iteration. With the `time.sleep()` call removed, the read and
 write run back to back, with no function call between them, so the
 interpreter finds no scheduling point at which to hand the GIL to
 another thread mid-sequence. That reliability is luck rather than a
-guarantee: the race stays invisible only because this interpreter
+guarantee. The race stays invisible only because this interpreter
 places its switch points elsewhere. Any function call put back
 between the read and the write, a blocking I/O call, a `print()`, or
 an innocuous-looking helper, reopens the same gap, because the
@@ -714,7 +716,8 @@ with ThreadPoolExecutor(max_workers=3) as pool:
 ```
 
 **Add a third producer.** The one change is the third `pool.submit(enqueue, ...)`.
-The chapter's `max_workers=3` stays: three workers cover the three producers,
+The chapter's `max_workers=3` stays.
+Three workers cover the three producers,
 and `consume()` needs no fourth, because the listing submits it after every producer finishes.
 A run with `max_workers=4` prints the same six lines in the same order.
 
@@ -1042,13 +1045,13 @@ carries `request_id = "main"`, so each copy inherits the same value.
 No task writes to the variable afterward, so all three copies stay
 identical and the original version's per-request identity disappears.
 
-**Read the value after the group.** The `after:` line changes too. In the chapter's version it prints
-`context -`, the default, because each `set()` runs inside a task's
-own copy and none of them can reach `main()`'s context. Here the
-`set()` is in `main()`, so it writes to `main()`'s own context and the
-value is still there once the group finishes. Copying runs one way: a child sees
-what the parent had at creation, and the parent sees nothing a child
-did.
+**Read the value after the group.** The `after:` line changes too. In
+the chapter's version it prints `context -`, the default, because each
+`set()` runs inside a task's own copy and none of them can reach
+`main()`'s context. Here the `set()` is in `main()`, so it writes to
+`main()`'s own context and the value is still there once the group
+finishes. Copying runs one way. A child sees what the parent had at
+creation, and the parent sees nothing a child did.
 
 `current` behaves as before, reaching `req-3` everywhere, which is the
 contrast the example exists to draw. A `global` is one cell shared by
@@ -1142,13 +1145,11 @@ five sequential calls take, so `t_seq` and `t_thr` come out close
 together and `t_seq > t_thr * target` is `False`.
 
 `InterpreterPoolExecutor` wins the same benchmark because each
-subinterpreter has its own GIL. The work spreads across processors
-instead of time-slicing on one.
-[Subinterpreters](../../Chapters/19_Techniques--Concurrency.md#subinterpreters)
-gives the reason: the GIL is per interpreter, not per process, so more
-interpreters mean more locks and real parallelism. A free-threaded
-build reaches the same end by removing the GIL instead of multiplying
-it, letting ordinary threads do what this listing's threads cannot.
+[subinterpreter](../../Chapters/19_Techniques--Concurrency.md#subinterpreters)
+has its own GIL. The work spreads across processors instead of
+time-slicing on one. A free-threaded build reaches the same end by
+removing the GIL instead of multiplying it, letting ordinary threads
+do what this listing's threads cannot.
 
 </details>
 </details>
@@ -1264,13 +1265,14 @@ same moment, read the same `next_number`, and come away with the same
 ticket, as they do without the lock.
 
 **Lock the loop body.** The lock does cover `out.append(item)`, which
-needs no lock: `out` is a local list, one per worker, so no other thread
-can touch it.
+needs no lock. `out` is a local list, one per worker, so no other
+thread can touch it.
 
 Serializing an iterator means putting the lock where the mutation is,
-inside `__next__()`, where `threading.serialize_iterator()` puts it. The lesson generalizes past iterators: a lock protects the
-statements it encloses, and a `for` loop's own call to `next()` is not
-one of them.
+inside `__next__()`, where `threading.serialize_iterator()` puts it.
+The lesson generalizes past iterators. A lock protects the statements
+it encloses, and a `for` loop's own call to `next()` is not one of
+them.
 
 </details>
 </details>
@@ -1353,7 +1355,7 @@ suspension is a wait, but a wait on a task that is waiting on nothing the second
 task holds. The first task finishes and releases both locks, and the
 second task then takes each lock with no other task holding it.
 
-The deadlock version makes the waiting circular: task one holds
+The deadlock version makes the waiting circular. Task one holds
 `lock_a` and waits for `lock_b`, task two holds `lock_b` and
 waits for `lock_a`, so each task's progress depends on the other task's
 progress. A deadlock is that cycle. Acquiring the
@@ -1409,7 +1411,7 @@ At runtime the line raises a `TypeError` before any price comes back:
 
 `pool.submit()` hands back a `concurrent.futures.Future`, the
 executor's own handle on a result a worker is still computing. Its
-interface blocks: you wait by calling `result()`, which stops the
+interface blocks. You wait by calling `result()`, which stops the
 calling thread until the worker finishes. Nothing about that future
 cooperates with an event loop, and it defines no `__await__`, so
 `await` refuses it, first statically and then at runtime.
