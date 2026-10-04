@@ -100,7 +100,7 @@ increments `_answered`.
 
 **Build the real object on demand.** The first `query()` is the first name the proxy
 lacks, so `__getattr__()` runs, reports the count, and builds the real
-object; the second `query()` finds `_real` set and forwards without
+object. The second `query()` finds `_real` set and forwards without
 reporting or building.
 
 The counter records how much work the proxy saved: three
@@ -150,7 +150,8 @@ class CountingProxy:
 
 If you increment `self.calls[name]` in `__getattr__()` before the `callable()` test,
 the demo still prints `2 1`, because each lookup there leads to one call.
-A lookup without a call counts too: evaluating `p.f is p.f` adds two to `f`'s tally.
+A lookup without a call counts too.
+Evaluating `p.f is p.f` adds two to `f`'s tally.
 The solution counts inside `counted`,
 so the tally advances at the call, as it does in the chapter's `CountingProxy`.
 
@@ -249,8 +250,9 @@ class CowList:
 
 If you build the private `Box` around `self._box.data` without the `list(...)` copy,
 `b` gets a `Box` of its own that holds the same list.
-`b.append(4)` then changes `a` too:
-the demo prints `[1, 2, 3, 4] [1, 2, 3, 4]` while `a._box is b._box` reports `False`.
+`b.append(4)` then changes `a` too.
+The demo prints `[1, 2, 3, 4] [1, 2, 3, 4]`
+while `a._box is b._box` reports `False`.
 A new `Box` gives `b` its own owner count but not its own data,
 so the solution copies the list before the write.
 
@@ -302,7 +304,7 @@ print(a._box is b._box)
 
 **Share the data and count its owners.** `a` and `b` start out sharing one `Box`, the same underlying list, with
 `owners` tracking how many `CowList`s point at that `Box`. `share()`
-costs almost nothing: it copies a reference and bumps a count.
+copies a reference and bumps a count.
 
 **Copy before a shared write.** `append()` copies the data, and only when `owners > 1`. `b.append(4)`
 detaches `b` into its own private `Box` holding a fresh copy of the
@@ -562,7 +564,7 @@ exception, so "must check that connection back in" becomes a guarantee.
 released proxy cannot keep using a connection that now belongs to
 someone else. The check in `__getattr__()` reports that misuse instead
 of letting two clients share one connection. `ConnectionProxy` is a
-*protection proxy* and a *smart reference* at once: it controls access,
+*protection proxy* and a *smart reference* at once. It controls access,
 and it adds an action (the check-in) around each loan of the connection.
 
 </details>
@@ -753,7 +755,7 @@ after the rejected swap.
 
 The type checker cannot make this decision. The decision compares
 the type of the implementation the surrogate holds right now with the type of
-the argument, and the checker knows neither: both are `Any`, because
+the argument, and the checker knows neither. Both are `Any`, because
 `__getattr__()` delegation deliberately leaves the implementation's
 type untracked. Annotating both against a `Protocol` states a fixed
 shape that every implementation must meet, a different guarantee. A

@@ -11,7 +11,9 @@
 
 [Simple Factory Method](../../Chapters/27_Patterns--Factory.md#simple-factory-method) and [Factory Objects](../../Chapters/27_Patterns--Factory.md#factory-objects) each keep the concrete classes behind a single creation point.
 A new shape needs a class with `draw()` and `erase()`, plus one entry where that creation point chooses by name.
-In the first style that entry is a `case` in `Shape.factory()`; in the second it is a nested `Factory` class, registered by name in the `FACTORIES` table.
+In the first style that entry is a `case` in `Shape.factory()`.
+In the second it is a nested `Factory` class,
+registered by name in the `FACTORIES` table.
 
 <details>
 <summary>The shape</summary>
@@ -162,7 +164,7 @@ s.erase()
 `shape_factory_objects.py`'s factory-object version instead needs a `_Triangle`
 that carries its own nested `Factory`, plus one `FACTORIES` entry
 mapping the name to an instance of that `Factory`. The listing below
-shows the new shape alone; in the chapter file its entry joins
+shows the new shape alone. In the chapter file its entry joins
 `_Circle`'s and `_Square`'s:
 
 ```python
@@ -204,7 +206,7 @@ logic you must re-read. `shape_factory_objects.py` adds a nested `Factory` to
 chapter draws between the two versions: more ceremony up front (a
 nested `Factory` per shape) in exchange for a dispatcher that changes
 by table entry rather than by code. The chapter's `registry.py` goes
-one step further: each class registers itself, so even the table entry
+one step further. Each class registers itself, so even the table entry
 disappears.
 
 </details>
@@ -364,7 +366,7 @@ GameEnvironment(GnomesAndFairies()).play()
 ```
 
 **Ask the factory for each product.** `GameEnvironment` does not name
-`Kitty`, `Warrior`, `Puzzle`, or `Weapon` directly. It calls
+`Kitty`, `Warrior`, `Puzzle`, or `Weapon`. It calls
 `make_character()` and `make_obstacle()` on whatever
 `GameElementFactory` it receives. A third concrete factory slots in
 beside `KittiesAndPuzzles` and `WarriorsAndWeapons` with no change to
@@ -434,7 +436,7 @@ raises a `TypeError` at the same construction, before the game runs.
 In `abstract_factory_protocol.py` no class declares that it satisfies
 the protocol, so constructing the factory is legal. The report moves
 to the call that needs the protocol, and the diagnostic names the
-missing method. Nothing guards that version at runtime:
+missing method. Nothing guards that version at runtime.
 `GameEnvironment.__init__()` raises an `AttributeError` when it calls
 `make_obstacle()`.
 
@@ -688,13 +690,13 @@ print(pb.build().toppings)
 invalid `Pizza` cannot exist at any moment. `__post_init__()` runs
 immediately after the constructor assigns every field, and raises a
 `ValueError` before that constructor call returns. The rejection is
-therefore atomic: no code anywhere can hold a reference to a `Pizza`
+therefore atomic. No code anywhere can hold a reference to a `Pizza`
 carrying five toppings. That guarantee is
 [A Type Is a Set of Values](../../Chapters/12_Techniques--Data_Classes_as_Types.md#a-type-is-a-set-of-values)
 again: illegal values are unrepresentable.
 
 **Check before each change.** Placing the check in `topping()`, as
-above, gives `PizzaBuilder` the same guarantee: the fifth `.topping()`
+above, gives `PizzaBuilder` the same guarantee. The fifth `.topping()`
 call raises a `ValueError` before appending, so `self._toppings` holds
 at most four. Placing the check in `build()` instead gives up that
 guarantee. The builder then accepts a fifth, sixth, or tenth
@@ -709,7 +711,7 @@ toppings.
 
 That window is the hazard `stars_class.py` shows. A mutable object
 that checks its rule after the change keeps the illegal value when the
-check fails: `damaged` still prints `Stars(13)` after `f1()` raises a
+check fails. `damaged` still prints `Stars(13)` after `f1()` raises a
 `TypeFailure`. A builder that checks in `build()` raises its
 `ValueError` and still holds five toppings.
 
@@ -869,7 +871,7 @@ expect(KeyError, make, "Triangle")
 
 **Mark the import as deliberate.** The demo does not use the name
 `extra_shapes`, so ruff reports the import as unused and the `noqa`
-comment is the only sign that it is deliberate. That is the shape about
+comment is the only sign that it is deliberate. That is the form about
 which the chapter warns: an import that exists for its side effect. It
 must stay an ordinary import, since a `lazy import` defers the module
 body, and with it the two `class` statements, until the first use of
@@ -961,7 +963,7 @@ With `copy.copy()`, `test_clone_is_independent()` fails first.
 `b.powers.append("curse")` appends to the one list both spawns share,
 so `a.powers` becomes `["bite", "curse"]` and the assertion that it
 equals `["bite"]` fails. `test_prototype_untouched()` fails too, but
-only on its second assertion: `spawned.powers.append("bellow")`
+only on its second assertion. `spawned.powers.append("bellow")`
 mutates the shared list, so `PROTOTYPES["troll"].powers` grows a third
 entry. Its first assertion still holds, because `spawned.hp = 1`
 rebinds an `int` field on the copy rather than mutating a shared
@@ -1276,8 +1278,7 @@ for shape in [Shape.factory(s) for s in shape_name(6)]:
 of `Shape`, so `Shape.__subclasses__()` lists `_Circle` and `_Square`
 and stops. The original `shape_name()` draws only from that list, so no
 seed produces `"Oval"`, and the new `case` in `factory()` is unreachable
-from the demo although `Shape.factory("Oval")` works when called
-directly.
+from the demo although `Shape.factory("Oval")` works when called.
 
 **Walk the whole hierarchy.** `all_subclasses()` yields each direct subclass and then, before moving
 to the next one, recurses into that subclass: depth first, so `Oval`
@@ -1315,7 +1316,8 @@ needs a further filter, `not cls.__subclasses__()`.
 
 [Explicit Registration with a Protocol](../../Chapters/27_Patterns--Factory.md#explicit-registration-with-a-protocol) registers classes with `@make.register`, so a class that omits the decorator is absent from `make.registry`.
 The check walks a module's namespace, keeps the objects that are classes, and tests each against `Shape` with `issubclass()`.
-That test works on a `Protocol` only when it is `@runtime_checkable`; report the classes that pass it and are missing from the registry.
+That test works on a `Protocol` only when it is `@runtime_checkable`.
+Report the classes that pass it and are missing from the registry.
 
 <details>
 <summary>The shape</summary>
@@ -1414,7 +1416,7 @@ print(unregistered(globals()))
 #: ['Hexagon']
 ```
 
-**Leave one class unregistered.** `Hexagon` is a complete `Shape`: the
+**Leave one class unregistered.** `Hexagon` is a complete `Shape`. The
 type checker accepts it wherever code takes a `Shape`, and
 `Hexagon().draw()` works. `make("Hexagon")` fails with a `KeyError`,
 because the table has no entry for it, and the error names the key
@@ -1423,7 +1425,7 @@ omission, since a class that nothing decorates is an ordinary class.
 
 **Report the unregistered classes.** `unregistered()` walks a namespace and keeps every class that
 `issubclass()` accepts as a `Shape` and that `make.registry` lacks.
-`@runtime_checkable` allows the `issubclass()` call; without
+`@runtime_checkable` allows the `issubclass()` call. Without
 it, testing a class against a Protocol raises a `TypeError`. The
 `obj is not Shape` guard drops the Protocol, which passes its own
 test. Calling `unregistered(globals())` at the end of the module, or
@@ -1432,11 +1434,11 @@ from a test, turns a silent absence into a printed name.
 The runtime test is weaker than the checker's. `issubclass()` looks
 for an attribute named `draw` and nothing about its signature, so a
 class whose `draw()` takes an extra parameter passes here and fails
-at `@make.register`. The two checks cover each other: the checker
+at `@make.register`. The two checks cover each other. The checker
 rejects a decorated class that does not fit, and `unregistered()`
 reports a fitting class that is not decorated. `issubclass()`
-against a Protocol also works only when every member is a method;
-if the Protocol has a data attribute, `issubclass()` raises a
+against a Protocol also works only when every member is a method.
+If the Protocol has a data attribute, `issubclass()` raises a
 `TypeError`, and `isinstance()` on an instance is the fallback.
 `unregistered()` also sees one namespace at a time, so a plugin module
 must run it over its own `globals()`.
@@ -1569,15 +1571,15 @@ error[unresolved-attribute]: Object of type `Builder` has no attribute `__name__
 The chapter's `ShapeFactory.register()` in `shape_registry.py` has no such
 problem because it receives a class, and `type[S]` has a `__name__`.
 Pyright accepts `build.__name__`, since it gives every function
-object's attributes to a `Callable`; `ty` does not, and the book
+object's attributes to a `Callable`. `ty` does not, and the book
 checks with `ty`. Passing the name also frees the key from the
 function's name, so you can call the builder `make_goblin()` while
 the key stays `"goblin"`.
 
-The decorated form gains the same openness the registries gain: any
+The decorated form gains the same openness the registries gain. Any
 module can define a prototype, with its name beside its definition, and
 `PROTOTYPES` needs no edit. The key type widens from the chapter's
-`Kind` to `str` for the same reason: an open table cannot list its names
+`Kind` to `str` for the same reason. An open table cannot list its names
 in advance. The builder is also a function, so `goblin()` still produces
 a fresh prototype on demand when a test needs one that nothing has
 touched. The costs are the table literal becoming a decorator plus a

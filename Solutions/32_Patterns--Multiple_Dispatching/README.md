@@ -463,8 +463,8 @@ for module in (table, methods):
 ```
 
 **Check both versions against one mapping.** The two modules are exercise 1's table and exercise 2's methods, the
-two versions that know `Lizard`. `compete()` is the test's helper:
-it looks each class up by name on whichever module it receives, so one
+two versions that know `Lizard`. `compete()` is the test's helper.
+It looks each class up by name on whichever module it receives, so one
 `EXPECTED` drives both sets of classes.
 
 **Compare across separate enumerations.** Each module defines its own
@@ -748,14 +748,14 @@ must put them back in the order the source wrote them.
 `Meters(self.n - other)`, the same body `__sub__()` uses, gives
 `Meters(-7)`: a correct-looking method that quietly returns the
 negative of every reflected subtraction. `__radd__()` hides that swap
-because addition commutes, so the mistake costs nothing there and
-costs the wrong answer here.
+because addition commutes, so the mistake gives the right answer
+there and the wrong answer here.
 
 **Decline an unsupported operand.** `"ten" - Meters(3)` finds no `str.__sub__`, so Python goes
 straight to `Meters.__rsub__`, which returns `NotImplemented` for a
 `str`. With both sides declining, Python raises the `TypeError`, and
 the message names both types. Returning `NotImplemented` rather than
-raising an exception makes that message possible: an exception raised
+raising an exception makes that message possible. An exception raised
 inside `__rsub__()` reports `Meters`'s complaint instead of
 Python's account of which pair of types has no defined subtraction.
 
@@ -899,7 +899,7 @@ print(TolerantOrigami().compete(TolerantRock()))
 **Reproduce the exact-match failure.** The `KeyError` comes from a dictionary probe, which compares keys by
 equality. `Origami` inherits from `Paper` but is not `Paper`, so
 `(Origami, Rock)` is not `(Paper, Rock)`. Inheritance plays no part in
-the lookup: a `dict` hashes the key and compares, and neither step
+the lookup. A `dict` hashes the key and compares, and neither step
 consults an MRO. That is what the chapter's "matches classes exactly"
 means, and exact matching is the property `singledispatch` does not
 share.
@@ -918,8 +918,8 @@ noise. In an inner loop, it matters.
 Order now decides the answer. `(TolerantPaper, TolerantRock)` and
 `(TolerantOrigami, TolerantItem)` could both match. Which one wins
 depends on the order the loops happen to walk, not on anything a
-reader of the table can see. The exact version has no such question:
-either the pair is in the table or it is not.
+reader of the table can see. The exact version has no such question.
+Either the pair is in the table or it is not.
 
 The tolerant version also loses the failure that makes the exact
 version safe, though only for a subclass of a concrete item. An
@@ -1039,11 +1039,11 @@ Project(seed=1).meet(4)
 #: Dwarf (engineer) negotiates with Elf
 ```
 
-**Resolve the receiver's type.** Exercise 7 uses single dispatch, not double:
-`a.interact(b)` resolves on `a`'s type only, and `interact()`
+**Resolve the receiver's type.** Exercise 7 uses single dispatch, not
+double. `a.interact(b)` resolves on `a`'s type only, and `interact()`
 interpolates `other` without inspecting its type. The design becomes
-double dispatch once `interact()`'s behavior must vary by `other`'s type too,
-and exercise 8 adds that dependence.
+double dispatch once `interact()`'s behavior must vary by `other`'s
+type too, and exercise 8 adds that dependence.
 
 **Stage the meetings.** `Project` creates the inhabitants in `gather()` and makes neighbors
 interact in `meet()`.
@@ -1242,12 +1242,12 @@ The solution declares `compete()` on the base,
 which gives that call and every `@override` a method to name.
 
 The listing gives each `Inhabitant` kind two of six weapon types,
-ranked around a cycle: each weapon beats the previous two in the
+ranked around a cycle. Each weapon beats the previous two in the
 ranking and loses to the next two. Six is an even number, so each
 weapon has one opponent left over: its opposite, three steps around
 the circle, and neither beats the other. That pair draws.
 `paper_scissors_rock.py` needs no such case because three items leave
-nothing over: with an odd count every weapon beats half the rest and
+nothing over. With an odd count every weapon beats half the rest and
 loses to the other half. An even count always leaves the opposite pair
 to define.
 
@@ -1464,7 +1464,7 @@ A seventh weapon would add an `eval_*()` method to each of the six classes,
 plus a new class of eight methods.
 Exercise 10 collects the same 36 answers in one place.
 
-The weapon ranking is a genuine cycle: nothing dominates everything,
+The weapon ranking is a genuine cycle. Nothing dominates everything,
 so no group can count on winning. At the group level the same cycle
 appears one level up. An `Elf` beats a `Dwarf` on three of their four
 weapon pairings, a `Troll` beats an `Elf` on three of four, and a
@@ -1643,7 +1643,7 @@ for item1, item2 in [
 **Call what the lookup returns.** `compete()` changes by one pair of parentheses. It still finds the
 cell with a single probe keyed on both types, and now calls what it
 finds instead of returning it. The call site shows none of
-this: `item1.compete(item2)` reads as it does in
+this. `item1.compete(item2)` reads as it does in
 `paper_scissors_rock.py`, where four method definitions per class
 stand behind it. A table of callables keeps the method-call syntax.
 
@@ -1665,12 +1665,12 @@ from the same two objects.
 
 The second reason survives. A subclass still cannot override one
 combination and inherit the rest, because the lookup still matches
-types exactly: an `Origami(Paper)` finds no row, callable or
+types exactly. An `Origami(Paper)` finds no row, callable or
 not, and the fix is to write `Origami`'s rows rather than to override
 one combination. Changing a cell changes it for every `Item`, since `OUTCOME` is
 one shared dictionary. `paper_scissors_rock_subclass.py`'s `DampPaper`
 gets its exception by overriding `compete()` and `eval_rock()`, and
-this version has nothing to override: `Item` defines `compete()` once.
+this version has nothing to override. `Item` defines `compete()` once.
 
 **Narrow the operand's type.** One cost comes with the change. `paper_vs_rock()` and
 `rock_vs_paper()` take two `Item`s, because every cell must, so each
@@ -1916,8 +1916,9 @@ as a grid rather than as 36 dictionary rows.
 Each row of `GRID` holds one weapon's results as the caller,
 against the weapons in `ORDER`,
 and the comprehension turns the grid into the `(caller, opponent)` keys that `compete()` looks up.
-A cell holds what one of exercise 8's `eval_*()` methods returns:
-row `Jargon`, column `Play`, holds the `LOSE` that `Play.eval_jargon()` returns.
+A cell holds what one of exercise 8's `eval_*()` methods returns.
+Row `Jargon`, column `Play`,
+holds the `LOSE` that `Play.eval_jargon()` returns.
 
 **Reuse the game around the table.**
 `Troll2`, `battle()`, and `meeting()` repeat exercise 8's code,

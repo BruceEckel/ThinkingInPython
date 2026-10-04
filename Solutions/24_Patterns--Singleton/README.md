@@ -203,10 +203,10 @@ print(c3 == c1)
 #: True
 ```
 
-**Hold a fixed set of connections.** The change from `singleton_cached_factory.py` is what the one shared object *is*:
-instead of holding a
-single value, it holds a fixed collection of `Connection`s and
-tracks which ones it has handed out.
+**Hold a fixed set of connections.** The change from
+`singleton_cached_factory.py` is what the one shared object *is*.
+Instead of holding a single value, it holds a fixed collection of
+`Connection`s and tracks which ones it has handed out.
 
 **Lend a connection and take it back.** `acquire()` and `release()`
 replace the "get the instance" idea with "borrow one member of a
@@ -343,7 +343,7 @@ points at the original empty dict, so the second print shows `{}`.
 
 Nothing warns you at runtime. The module still imports, the
 assignment succeeds, and the local `settings` holds what you put in
-it. The sharing is simply gone: each module now reads a different
+it. The sharing is simply gone. Each module now reads a different
 dict, with no error to mark the split. Importing the module and
 assigning `config.settings = {...}` replaces the value everyone
 sees, because that assignment rebinds the attribute on the one
@@ -475,8 +475,8 @@ so the lookup and the body both run under one lock,
 and eight racing first calls build one object.
 The cost is that every call takes the lock, not just the first,
 because the wrapper cannot see a hit until it has asked the cache.
-The chapter's `singleton_locked_settings.py` pays the same cost:
-it drops `@cache` and hand-writes the check inside one lock.
+The chapter's `singleton_locked_settings.py` pays the same cost.
+It drops `@cache` and hand-writes the check inside one lock.
 
 **Build the object before the threads start.** Without a lock, the fix is to remove the race rather than to order
 it. A race needs two threads arriving before the object exists, so
@@ -484,7 +484,7 @@ build the object first. The module body calls `primed()` once,
 before any worker thread starts, and by the time the pool exists
 every call is a cache hit. The count is `1`. Priming the cache this
 way is `singleton_eager_factory.py` from the chapter, and it works
-for the same reason the module form does: the import system runs a
+for the same reason the module form does. The import system runs a
 module body once, and a thread that imports the module while the
 body is running waits for the body to finish.
 
@@ -590,7 +590,7 @@ nothing reports the overwrite.
 `Other` do not declare their own, so `self._shared_state` resolves
 to `Borg`'s dict from both, and `Borg.__init__()` points both
 instances' `__dict__` at that one dict. The sharing is per-`Borg`,
-not per-subclass. The class hierarchy hides that sharing:
+not per-subclass. The class hierarchy hides that sharing.
 `Singleton` and `Other` have no visible connection to each other.
 
 **Give a subclass its own storage.** The fix is one line per subclass. `Separate` declares its own
@@ -603,8 +603,9 @@ The trap is the general shape of a mutable `ClassVar` on a base
 class, not a quirk of *Borg*. The base declares one object, and
 every subclass inherits that same one. A subclass that binds its own
 `_shared_state` in its class body, instead of mutating the inherited one,
-gets storage of its own, while the others keep sharing. *Borg* sharpens the trap: mutation is its
-design, so every version of the pattern carries the trap.
+gets storage of its own, while the others keep sharing. *Borg*
+sharpens the trap. Mutation is its design, so every version of the
+pattern carries the trap.
 
 </details>
 </details>

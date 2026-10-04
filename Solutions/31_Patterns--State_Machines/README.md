@@ -128,7 +128,8 @@ print(person.hello())
 `hello()` method. `UnpredictablePerson` names no specific mood, so a
 third mood changes the `Mood` object that `change_to()` installs, and
 no code in `UnpredictablePerson`.
-`UnpredictablePerson` is the *State* surrogate from [*Surrogate*](../../Chapters/26_Patterns--Surrogate.md#state),
+`UnpredictablePerson` is the
+[*State* surrogate](../../Chapters/26_Patterns--Surrogate.md#state),
 applied to a new domain.
 
 </details>
@@ -280,14 +281,14 @@ StateMachine(Happy()).run_all(
 #: Everything is wonderful.
 ```
 
-**Let each state pick its successor.** Each state decides its own successor. `Happy.next()` answers `Annoy`
-with a `Grumpy`, `Grumpy.next()` answers `Calm` with a `Happy`, and
-both answer `TakePill` with a `Prozac` that returns itself for
-everything after. Nothing outside the states holds the transition
-rules, which distinguishes this design from the chapter's
-table-driven one: there the rules live in a dictionary
-a reader can audit in one place, and here they live in the `next()`
-method of whichever state is current.
+**Let each state pick its successor.** Each state decides its own
+successor. `Happy.next()` answers `Annoy` with a `Grumpy`,
+`Grumpy.next()` answers `Calm` with a `Happy`, and both answer
+`TakePill` with a `Prozac` that returns itself for everything after.
+Nothing outside the states holds the transition rules, which
+distinguishes this design from the chapter's table-driven one, where
+the rules live in a dictionary a reader can audit in one place. Here
+they live in the `next()` method of whichever state is current.
 
 Where exercise 1's `UnpredictablePerson` swaps in a whole `Mood`
 object through `change_to()`, this version reaches the same moods by
@@ -800,12 +801,12 @@ own, so the condition reads `load_kg` off the machine, where
 `begin()` recorded it when the cycle started.
 
 **Reject an input with no row.** A second `Start` during `FILLING` finds no row, so `handle()` raises
-`NoTransition`. The press changes nothing: the state is still
+`NoTransition`. The press changes nothing. The state is still
 `FILLING` and `load_kg` is still 3, because the engine finds a row
 before it runs any action.
 
 For a washing machine the caller should
-ignore the press: catch `NoTransition` and carry on, as
+ignore the press, catching `NoTransition` and continuing, as
 `vending_view.py`'s `send()` does. A control panel is a source of
 stray presses, and a cycle that stops because
 someone leans on a button is the worse failure. Raising the
@@ -1096,9 +1097,10 @@ holds three rows, so a single reading leads to heating, cooling, or
 staying idle, and the two conditions decide which, as the exercise
 requires.
 
-**Run until back inside the band.** The running states carry their own two-row groups: a reading
-still outside the band keeps the system running, and one inside the
-band falls through to the unconditional row back to `IDLE`.
+**Run until back inside the band.** The running states carry their own
+two-row groups. A reading still outside the band keeps the system
+running, and one inside the band falls through to the unconditional
+row back to `IDLE`.
 
 Every
 decision in the machine is a condition on the one event type. Every
@@ -1231,7 +1233,7 @@ the exact-type dispatch the chapter describes, and a subclass of an
 event type is how most readers first meet it.
 
 **Fix 1** adds `(state, Nickel)` rows. Those rows work, and they scale
-badly: every new denomination needs a row for every state that accepts
+badly. Every new denomination needs a row for every state that accepts
 money, so a machine with five states and six coins carries thirty rows
 that all do the same thing. Fix 1 is the right fix when the new
 subclass really does behave differently, as `FirstDigit` and

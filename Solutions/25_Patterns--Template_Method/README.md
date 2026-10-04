@@ -232,7 +232,7 @@ that file contains.
 **Give the step its data.** The two forms differ in where the word list
 lives. `Search` stores it in a field, and the lambda closes over the
 local variable `words`. In both, `run()` and `run_file_framework()`
-stay unchanged: a new policy is a new step, and the algorithm that
+stay unchanged. A new policy is a new step, and the algorithm that
 calls the step belongs to the framework.
 
 </details>
@@ -492,7 +492,7 @@ The guarantee comes from the type checker, not the language. `@final`
 sets `__final__ = True` on the function, and nothing in the
 interpreter consults that attribute. The *Template Method*'s central
 guarantee is therefore in the same category as every other annotation
-in this book: a tool enforces it before the program executes, and
+in this book. A tool enforces it before the program executes, and
 only when you run that tool.
 
 `@final` protects a codebase whose build runs a type checker, and

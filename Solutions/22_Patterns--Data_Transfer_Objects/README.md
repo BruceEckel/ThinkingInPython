@@ -48,10 +48,11 @@ print(hasattr(m1, "name"), hasattr(m2, "info"))
 
 Each `Messenger()` call assigns a fresh `dict` to that instance's
 `__dict__`: the one `**kwargs` built from that call's own arguments.
-Every instance gets its own independent dictionary. A class attribute
-from [Class Attributes](../../Chapters/09_Foundations--Class_Attributes.md) works the other way:
-one object shared by every instance until something shadows it. `m1`
-and `m2` share nothing: `m1` has no `name`, and `m2` has no `info`.
+Every instance gets its own independent dictionary. A
+[class attribute](../../Chapters/09_Foundations--Class_Attributes.md)
+works the other way: one object shared by every instance until
+something shadows it. `m1` and `m2` share nothing. `m1` has no
+`name`, and `m2` has no `info`.
 
 </details>
 </details>
@@ -164,9 +165,9 @@ The silent `append()` and the `TypeError` are one fact seen twice. The immutabil
 mutable object hands that object's mutability back. `frozen=True` in
 [Rethinking Objects](../../Chapters/20_Patterns--Rethinking_Objects.md#the-immutability-solution)
 is shallow the same way. Declaring `steps: tuple[str, ...]` fixes
-both at once: the contents stop being editable and the record becomes
-hashable. One declaration fixing both is the clue that they are
-one problem.
+both at once. The contents stop being editable, and the record
+becomes hashable. One declaration fixing both is the clue that they
+are one problem.
 
 </details>
 </details>
@@ -269,7 +270,7 @@ print(mean, count)
 
 **Read the fields by position.** Printing and unpacking still run, because a `NamedTuple` was a tuple
 all along. The line that reads `result.mean` and `result.count` stops
-working: a bare tuple has no `mean` attribute, so the type checker
+working. A bare tuple has no `mean` attribute, so the type checker
 reports the `mean` read, and at runtime that read raises an
 `AttributeError` first.
 The `count` read passes the type checker, because a tuple has a
@@ -280,7 +281,7 @@ The repair is `result[0]` and `result[1]`.
 The call sites lose the names. `print(result)` now writes
 `(4.0, 3)` instead of `Stats(mean=4.0, count=3)`, so the repr no longer
 says which number is which. A reader of the call site must open
-`summarize()` to find out. The call sites also lose attribute access:
+`summarize()` to find out. The call sites also lose attribute access.
 `result.mean` becomes `result[0]`, which holds the same value and no
 longer says what it is. And they lose the type as a name. Nothing can
 carry a `Stats` annotation anymore, so a function accepting a summary
@@ -354,7 +355,7 @@ print(FrozenColor(1, 2, 3) == (1, 2, 3))
 ```
 
 **Compare by position and length.** `Color(1, 2, 3) == Point3(1, 2, 3)` is `True`, the same answer
-`Dimensions` gives, and for the same reason: a `NamedTuple` inherits
+`Dimensions` gives, and for the same reason. A `NamedTuple` inherits
 `tuple.__eq__`, which compares length and elements and consults neither
 class. Adding a third `NamedTuple` adds a third type that compares
 equal to `Color` and `Dimensions`, so the family of things that equal `(1, 2, 3)`
@@ -410,7 +411,7 @@ key, so it must hash, and a `NamedTuple` hashes as long as its fields
 do. A `@dataclass` also hashes by value, but only when frozen (with
 the default `eq=True`), which rules out the mutable `@dataclass`.
 Between a frozen data class and a `NamedTuple` here, the tuple form
-wins on convenience: unpacking a coordinate as `x, y = point` and
+wins on convenience. Unpacking a coordinate as `x, y = point` and
 passing it to code that takes a tuple are both things the scenario
 needs and a frozen data class refuses.
 
@@ -418,7 +419,7 @@ needs and a frozen data class refuses.
 `NamedTuple` as a bare array, so the record goes back out without
 its field names. Given a `@dataclass`, `json.dumps()` raises a `TypeError`
 instead of dropping the names silently. A `@dataclass` also has a place for the
-validation this scenario requires: [Data Classes as
+validation this scenario requires. [Data Classes as
 Types](../../Chapters/12_Techniques--Data_Classes_as_Types.md#a-type-is-a-set-of-values)
 makes `__post_init__()` the method that rejects a value the JSON
 decoder otherwise accepts unchecked. A `TypedDict` matches the shape

@@ -230,14 +230,14 @@ def test_erase_leaves_history_states_untouched() -> None:
     assert before.strokes == ("circle", "beak")
 ```
 
-**Derive the shorter state.** The frozen version's `erase()` follows `draw()`'s shape too: it
-returns a new `Drawing` via `replace()`, this time with the last stroke
-sliced off. `before` keeps its own strokes, so any `History` holding
-`before` as a past state stays safe.
+**Derive the shorter state.** The frozen version's `erase()` follows
+`draw()`'s shape too. It returns a new `Drawing` via `replace()`, this
+time with the last stroke sliced off. `before` keeps its own strokes,
+so any `History` holding `before` as a past state stays safe.
 
-**Prove the history keeps its states.** The history test confirms that safety: after `do(before.erase())`,
-the stored past state `is` the original object, still carrying both
-strokes.
+**Prove the history keeps its states.** The history test confirms
+that safety. After `do(before.erase())`, the stored past state `is`
+the original object, still carrying both strokes.
 
 </details>
 </details>
@@ -323,7 +323,7 @@ print(h.can_undo())
 #: False
 ```
 
-**Report what the past still holds.** `can_undo()` needs no change: it
+**Report what the past still holds.** `can_undo()` needs no change. It
 asks whether `_past` still holds a state. A bounded history empties
 `_past` sooner: after at most `max_depth` undos, rather than one undo
 per `do()` the program made. So `can_undo()` reports `False` while
@@ -373,7 +373,7 @@ class Drawing:
 If you pass `data["strokes"]` to `Drawing` without wrapping it in `tuple(...)`,
 `ty check` still passes, because `json.loads()` returns `Any`,
 and an `Any` satisfies the declared `tuple[str, ...]`.
-The mismatch surfaces only when the program runs:
+The mismatch surfaces only when the program runs.
 `reconstructed == drawing` becomes `False`, since no `list`
 equals a `tuple`, and the `list` costs the `Drawing` the hashability a
 record otherwise supplies (`hash()` raises a `TypeError`,
@@ -414,7 +414,7 @@ representations rather than translating into a shared,
 language-neutral format.
 
 **Restore the declared type.** The reconstruction compensates for what
-JSON loses: it wraps `data["strokes"]` back in `tuple(...)` before
+JSON loses. It wraps `data["strokes"]` back in `tuple(...)` before
 passing it to `Drawing`.
 
 </details>
@@ -544,8 +544,9 @@ class History[S]:
 <summary>Solution</summary>
 
 If you leave out the range check,
-a jump too far raises an `IndexError` partway, after moving some states to `_future`:
-in the demo, `goto(4)` undoes three states before `pop()` fails,
+a jump too far raises an `IndexError` partway,
+after moving some states to `_future`.
+In the demo, `goto(4)` undoes three states before `pop()` fails,
 and the present is `0` rather than `3`.
 The solution checks the distance before it moves anything, so
 a jump that raises an `IndexError` leaves the history where it was,
@@ -606,7 +607,7 @@ print(h.present)
 **Step back through `undo()`.** `goto()` adds no new mechanism. It calls the existing `undo()`
 repeatedly, and each `undo()` pushes the state it leaves onto
 `_future`. Redo therefore works as if you had called `undo()`
-twice: `h.redo()` after `goto(2)` returns `2`, then `3`, retracing
+twice. `h.redo()` after `goto(2)` returns `2`, then `3`, retracing
 the same path forward. Jumping several states back
 "in one call" is a convenience for the caller.
 
@@ -739,14 +740,13 @@ Worth doing in a library; noise in a solution.
 
 **Record the restore as an action.** `restore_field()` must go through `do()` for the reason
 [Restoring Part of a State](../../Chapters/36_Patterns--Memento.md#restoring-part-of-a-state)
-gives, and the listing's last line proves it: the partial restore is
-an action, so it belongs on the timeline. Editing `_past`
-directly rewrites history rather than extending it, leaving the user
-who wanted the strokes back no way to change their mind. Direct
-editing also desynchronizes the caretaker's own bookkeeping: `do()`
-clears `_future`, so a `_past` edited behind the caretaker's back
-leaves a redo stack pointing at states the history can no longer
-reach.
+gives, and the listing's last line proves it. The partial restore is
+an action, so it belongs on the timeline. Editing `_past` rewrites
+history rather than extending it, leaving the user who wanted the
+strokes back no way to change their mind. Editing `_past` also
+desynchronizes the caretaker's own bookkeeping. `do()` clears
+`_future`, so a `_past` edited behind the caretaker's back leaves a
+redo stack pointing at states the history can no longer reach.
 
 </details>
 </details>
@@ -794,7 +794,8 @@ class DrawingV2:
 <summary>Solution</summary>
 
 If you write `DrawingV2` with a bare `@record`, as the chapter writes `Drawing`,
-the default does not appear: reading `restored.layer` raises an `AttributeError`.
+the default does not appear.
+Reading `restored.layer` raises an `AttributeError`.
 A slotted class keeps `layer` in a slot instead of as a class attribute,
 so nothing supplies the value the old bytes lack.
 The solution writes `@record(slots=False)`,
@@ -852,7 +853,7 @@ field with a simple default stores that default as a class attribute,
 so `restored.layer` finds `DrawingV2.layer` by ordinary attribute
 lookup while `restored.__dict__` has no `layer`. With the field
 written `layer: list[str] = field(default_factory=list)`, the default
-disappears: a `default_factory` leaves no class attribute, so the
+disappears. A `default_factory` leaves no class attribute, so the
 loaded object raises an `AttributeError` the first time anything
 reads `layer`.
 
@@ -866,7 +867,7 @@ class written to reject it.
 differently. It goes through `__replace__()`, which constructs a real instance
 and therefore runs `__post_init__()`, so `__post_init__()` catches the
 invalid state the moment anything derives a new state from it. That is
-the general shape: a constructor validates the value that enters your
+the general shape. A constructor validates the value that enters your
 program through it, while a deserializer hands the value straight in.
 `msgspec` and `pydantic` exist to close that gap.
 

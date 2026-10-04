@@ -102,8 +102,8 @@ where `walk()` yields only file paths. Matching also continues
 named `"src"` and a file beneath it named `"src"` can both appear in
 the results.
 
-The second call shows a simpler duplication: `root`
-holds two separate directories named `"src"`, and both come back as
+The second call shows a simpler duplication. `root` holds two
+separate directories named `"src"`, and both come back as
 `root/src`, so a path alone does not say which one matched.
 
 </details>
@@ -121,7 +121,8 @@ holds two separate directories named `"src"`, and both come back as
 <summary>Where to look</summary>
 
 [A Composite of Data Classes](../../Chapters/34_Patterns--Composite_and_Interpreter.md#a-composite-of-data-classes) ends each `match` with `assert_never()`.
-Add a `@record` class to the `Node` union and run the type checker: it reports the unhandled type in each operation that lacks a case.
+Add a `@record` class to the `Node` union and run the type checker.
+It reports the unhandled type in each operation that lacks a case.
 Then decide per operation what a link means, and avoid following the target into a subtree.
 
 <details>
@@ -223,7 +224,7 @@ here. Deciding what a link should do is a judgment call, not
 something the type checker picks for you.
 
 **Avoid counting bytes twice.** `disk_usage()` counts a link
-as free, since the bytes it references get counted wherever
+as zero bytes, since the bytes it references get counted wherever
 the real file lives. Adding the target's size again double-counts those bytes.
 
 **Show a link without following it.** `walk()` reports the link as its own entry, `name -> target`, rather
@@ -503,7 +504,7 @@ exception raised in `simplify()` would report an error in a
 computation that does not run. Leaving `Div(lhs, Num(0))` in the
 tree lets `evaluate()` raise `ZeroDivisionError` when the division
 runs, and not before.
-Python treats `1 / 0` in source the same way: the compiler accepts
+Python treats `1 / 0` in source the same way. The compiler accepts
 it, and the error arrives when the line executes.
 
 </details>
@@ -660,7 +661,7 @@ parens around a lower-precedence `Add`, while `Add`'s children need
 no parens around another `Add`.
 
 **Guard the right operand.** Passing `prec + 1` (rather than
-`prec`) for the right operand is a simple, always-safe rule: it can
+`prec`) for the right operand is a simple, always-safe rule. It can
 occasionally print one redundant pair of parentheses around a
 right-hand child at the *same* precedence as its parent
 (`x + (x + 1)` instead of the fully terse `x + x + 1`), but it keeps
@@ -1015,15 +1016,15 @@ the string in a `Num` without looking at it.
 **Hand the decision back to Python.** Returning `NotImplemented` puts the decision back where it belongs.
 `__radd__()` now answers only for an `int`, so both sides decline and
 Python raises the `TypeError` it raises for any other mismatched pair.
-The message comes from `str`, which is the right source: the left
+The message comes from `str`, which is the right source. The left
 operand is what the caller wrote first, and nothing in this expression
 language claims to extend `str`.
 
 **Guard the forward direction too.** The forward methods need the same guard for the same reason. Without
 it `x + "a"` wraps the string in a `Num` and builds the ill-typed tree
 from the other direction, so all four methods decline what they cannot
-use. The two messages differ because a different object gets the last
-word: `str` reports `"a" + x`, and Python's own fallback reports
+use. The two messages differ because each comes from a different
+source. `str` reports `"a" + x`, and Python's own fallback reports
 `x + "a"`, once both operands have declined.
 
 **Declare the node each method builds.** Each method declares the type it really returns, `Add` or `Mul`,
@@ -1325,7 +1326,7 @@ the exercise bites. Pushing children and popping them in a loop gives
 a pre-order walk that visits every node and computes nothing, because
 an `Add` can combine its children's values only *after* the children
 have produced them. The solution stacks the pending operation behind
-its own children: `work += [Op.ADD, right, left]` puts `Op.ADD`
+its own children. `work += [Op.ADD, right, left]` puts `Op.ADD`
 deepest, so it comes off last, by which point the two values it needs
 are on `values`.
 
@@ -1342,7 +1343,7 @@ case, so `assert_never()` still type-checks. A string marker leaves
 costs more than it appears to. A call from one Python function to
 another uses no C stack, so with the limit raised to `10**9`,
 `evaluate()` walks a million-level tree. Anything that recurses
-through C still stops: `repr()` or `hash()` on that same tree raises
+through C still stops. `repr()` or `hash()` on that same tree raises
 a `RecursionError` that reports a stack overflow, whatever the limit
 says. Each pending level also holds a frame and a fresh `env` dict,
 so memory grows with depth. The limit is global too, so a library
@@ -1468,20 +1469,20 @@ print(root.disk_usage())
 
 What breaks in the closed version is not subtle. `type Node = File |
 Directory` lives in your source, so a plugin cannot extend it. The
-type checker does warn the plugin author: `ty` reports a `Symlink`
+type checker does warn the plugin author. `ty` reports a `Symlink`
 passed to `disk_usage()`, or placed in a `Directory`'s entries, as
 `invalid-argument-type`. The warning leaves the plugin nothing to fix,
 because the union it would need to extend is yours. Unchecked
-code fares worse: its `Symlink` falls through every case to
+code fares worse. Its `Symlink` falls through every case to
 `assert_never()`, which raises an `AssertionError` at runtime. The plugin's alternatives
 are to vendor a patched copy of your module or to persuade you to add
 the case. The open design removes that coupling.
 
 **Move the operation onto the classes.** Moving the operation back onto the classes reverses the trade the
 chapter spent the first two sections making. Adding `Symlink` now
-costs nothing to existing code, while adding a *new operation* costs
+leaves existing code unchanged, while adding a *new operation* takes
 a method in every class, including the ones you do not own. The
-`@abstractmethod` enforces the contract on the plugin: Python refuses to
+`@abstractmethod` enforces the contract on the plugin. Python refuses to
 instantiate a subclass that defines no `disk_usage()`.
 
 For a file system, use the open design. Which node types exist is a
@@ -1493,7 +1494,7 @@ For `expr.py`, use the closed one. The four node types *are* the
 grammar, so a plugin adding a fifth does not extend the language but
 defines a different one. Every walker would then be silently wrong
 rather than helpfully extended. The `assert_never()` that reads as an
-obstacle in the file system reads as the point here: when the grammar
+obstacle in the file system reads as the point here. When the grammar
 does grow a `Neg`, the type checker hands you the list of walkers to
 update.
 

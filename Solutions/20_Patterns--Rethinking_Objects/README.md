@@ -84,9 +84,10 @@ print(leaky.tags)
 #: ['a', 'b', 'z']
 ```
 
-**Expose the internal list.** `tags` leaks for the same reason `numbers` does: the getter hands back
-a reference to the real internal list, so appending to what it returns
-mutates `Leaky`'s own state from outside.
+**Expose the internal list.** `tags` leaks for the same reason
+`numbers` does. The getter hands back a reference to the real internal
+list, so appending to what it returns mutates `Leaky`'s own state from
+outside.
 
 ```python
 # exercise_1b.py
@@ -114,11 +115,11 @@ print(plugged.tags)
 #: ['a', 'b']
 ```
 
-**Isolate the internal list.** `.copy()` closes the leak the same way it does for `numbers`: the
-caller now mutates a throwaway copy, and `plugged`'s real `_tags`
-keeps the items it had. Every new mutable field needs its own
-defensive copy. That repetition is the tedium that motivates freezing
-the data instead.
+**Isolate the internal list.** `.copy()` closes the leak the same way
+it does for `numbers`. The caller now mutates a throwaway copy, and
+`plugged`'s real `_tags` keeps the items it had. Every new mutable
+field needs its own defensive copy. That repetition is the tedium that
+motivates freezing the data instead.
 
 </details>
 </details>
@@ -178,7 +179,7 @@ so none of the code that `frozen=True` generated runs.
 `frozen=True` generates a `__hash__()` that hashes the tuple of field
 values, so hashing an `Immutable` hashes its `Bob`. On a data class
 that compares by value and is not frozen, `@dataclass` sets
-`__hash__` to `None`: a hash computed from fields that can change
+`__hash__` to `None`. A hash computed from fields that can change
 would lose the object inside a dict. Restoring `frozen=True` on `Bob`
 removes the mutation and the hash failure together, the clue that they
 are one problem: a frozen wrapper around a mutable value.
@@ -290,14 +291,15 @@ info:     └── incompatible return types: `Weight` is not assignable to `Pr
 The comment lets the listing pass the book's type check while the call
 still runs and prints `4.5`.
 
-**Give each meaning its own type.** The structural match still holds: `Package.total()` still takes no
-arguments and still returns a float at runtime. The two `NewType`
-declarations add a distinction the shapes lack, so the type
-checker finally sees that a weight is not a price.
+**Give each meaning its own type.** The structural match still holds.
+`Package.total()` still takes no arguments and still returns a float
+at runtime. The two `NewType` declarations add a distinction the
+shapes lack, so the type checker finally sees that a weight is not a
+price.
 
 If someone deletes the annotations, the program behaves as it does
 now. It prints `4.5` and charges the customer for a number of kilograms.
-`NewType` exists only for the type checker: `Weight(2.5)` returns the
+`NewType` exists only for the type checker. `Weight(2.5)` returns the
 `float` `2.5`, and no wrapper survives to run time. The distinction is
 real in the source and absent in the process, and that split is the
 bargain the chapter describes.
@@ -421,7 +423,8 @@ supplies that shape, the same way `PairCoord` adapts `Pair`.
 
 [Pattern Matching on a Union](../../Chapters/20_Patterns--Rethinking_Objects.md#pattern-matching-on-a-union) shows `area()` matching on each member of a closed union.
 Add `Square` to the `type Shape` alias and give `area()` a matching `case` with a class pattern.
-The final `case _` calls `assert_never()`, which requires the type `Never`; remove your new `case` and read the type the checker reports for its argument.
+The final `case _` calls `assert_never()`, which requires the type `Never`.
+Remove your new `case` and read the type the checker reports for its argument.
 
 <details>
 <summary>The shape</summary>
@@ -583,7 +586,7 @@ print(nc.get("a"))
 #: None
 ```
 
-`NullCache` is neutral the same way `NullLogger` is: `set()` does
+`NullCache` is neutral the same way `NullLogger` is. `set()` does
 nothing, and `get()` always reports "not found." A function that takes
 an optional cache can take a required `Cache` instead, defaulting to a
 shared `NullCache()` instance, so no code that uses the cache needs an
@@ -648,8 +651,8 @@ class CountingBox:
 <details>
 <summary>Solution</summary>
 
-If you write `CountingBox.extend()` as `self.items.extend(more)`, the box prints `3 1 1`:
-the two items arrive through the held list's own `extend()`, and `appends` misses them.
+If you write `CountingBox.extend()` as `self.items.extend(more)`, the box prints `3 1 1`.
+The two elements arrive through the held list's own `extend()`, and `appends` misses them.
 Composition moves the bug into a class you can read but does not prevent it,
 as [Prefer Composition to Inheritance](../../Chapters/20_Patterns--Rethinking_Objects.md#prefer-composition-to-inheritance) notes.
 The solution's `extend()` loops over `append()`, so every element passes the counter.

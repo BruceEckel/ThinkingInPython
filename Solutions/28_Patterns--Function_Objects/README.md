@@ -114,23 +114,24 @@ the macro still calls it with `()`, so state alone does not force more
 than a callable. Undo does, because a command now answers two requests,
 `__call__()` and `undo()`, and a callable has only one call.
 
-**Name both requests in one type.** The second operation costs a type rather than a hierarchy.
-`Command`, the chapter's `Callable[[], None]`, has room for one call,
-so a list of undoable commands needs a type with two members,
-`__call__()` and `undo()`, and in Python that type is a `Protocol`.
-`UndoableCommand` above is that `Protocol`: `Macro` annotates
-`self.commands` against it, `Deposit` inherits nothing, and `run()`
-still calls each `Deposit` with `()`, so the function form's habit survives. The *GoF Design Patterns* shape is
-a base class with two `raise NotImplementedError` bodies, and those
-bodies are what the shape costs. A base class pays for itself when
-the commands share implementation, and these commands share none.
+**Name both requests in one type.** `Command`, the chapter's
+`Callable[[], None]`, has room for one call, so a list of undoable
+commands needs a type with two members, `__call__()` and `undo()`, and
+in Python that type is a `Protocol`. `UndoableCommand` above is that
+`Protocol`. `Macro` annotates `self.commands` against it, `Deposit`
+inherits nothing, and `run()` still calls each `Deposit` with `()`, so
+the function form's habit survives. The *GoF Design Patterns* shape is
+a base class with two `raise NotImplementedError` bodies. A base class
+pays for itself when the commands share implementation, and these
+commands share none.
 
-**Remember what to reverse.** `Deposit` must also remember what it did, here the account and the
-amount, so it can reverse that action later: a fresh call to the same
-function cannot know what a previous call changed. `Deposit` is a record,
-like `Repeat`, because neither field changes after construction. The
-record is frozen and the dictionary it references is not, so
-`__call__()` and `undo()` can still update the balance.
+**Remember what to reverse.** `Deposit` must also remember what it
+did, here the account and the amount, so it can reverse that action
+later. A fresh call to the same function cannot know what a previous
+call changed. `Deposit` is a record, like `Repeat`, because neither
+field changes after construction. The record is frozen and the
+dictionary it references is not, so `__call__()` and `undo()` can
+still update the balance.
 
 </details>
 </details>
@@ -295,7 +296,7 @@ that reports its reason needs a failure value with room for the reason.
 `Failed` is that value, a record with one field, and each finder now
 returns `float | Failed`.
 
-**Report each way to fail.** A finder has more than one way to fail:
+**Report each way to fail.** A finder has more than one way to fail.
 `bisection()` gives up at once when the interval holds no sign change,
 and it can also run out of iterations, so each failing `return`
 states its own reason.
@@ -353,7 +354,7 @@ print(by_score_then_name)
 The key function returns a tuple, `(score, name)`, and Python compares
 tuples element by element. `sorted()` therefore orders by score first,
 and among equal scores (`Bob` and `Cid`, both `85`) it compares names.
-`key` is a *Strategy*: `sorted()` provides the algorithm (some
+`key` is a *Strategy*. `sorted()` provides the algorithm (some
 comparison-based sort), and the caller supplies the interchangeable
 policy that decides what "in order" means for this call. `sorted()`
 knows nothing about tuples, scores, or names. Passing a different
@@ -621,17 +622,18 @@ bus.publish(BigDeposit(500))
 #: big deposit 500
 ```
 
-**Ignore a handler that is not subscribed.** `unsubscribe()` guards with `if handler in handlers` rather than calling
-`remove()` outright, since `remove()` raises a `ValueError` for a handler
-not in the list. Whether that case should be silent or loud
-is a design decision: silent matches the bus's habit of letting an
-unmatched event pass without complaint.
+**Ignore a handler that is not subscribed.** `unsubscribe()` guards
+with `if handler in handlers` rather than calling `remove()` outright,
+since `remove()` raises a `ValueError` for a handler not in the list.
+Whether that case should be silent or loud is a design decision. A
+silent `unsubscribe()` matches the bus's habit of letting an unmatched
+event pass without complaint.
 
 **Walk the ancestry, most specific first.** `type(event).__mro__`
 already runs from the class outward to `object`, so iterating it in
 order calls the most specific handlers first and the inherited ones
 after. That order meets the "parents last" requirement. `publish()`
-keeps using `.get()` for the same reason the chapter gives: indexing
+keeps using `.get()` for the same reason the chapter gives. Indexing
 a `defaultdict` on a read inserts an empty list for every class in
 every published event's MRO, `object` included.
 
@@ -747,7 +749,7 @@ the loop has finished and `n` holds 2. Nothing is wrong with the
 lambdas. They read the variable they name, at the moment of the call.
 
 **Capture the value at build time.** The three fixes all work, and all
-work the same way: each one evaluates `n` while the loop is still
+work the same way. Each one evaluates `n` while the loop is still
 running and stores the result. `lambda n=n:` evaluates the default at
 definition. `partial(print, n)` evaluates the argument where it appears.
 `make(n)` gives each lambda its own `n` in its own function scope, and
@@ -761,15 +763,15 @@ lambda forms run their body at the call, so
 `rate()` when the command runs. `partial(print, n * rate())`
 evaluates the product while the loop builds the command.
 
-**Read the variable at call time.** None of the three preserves late lookup of `n`, and that is the point
-of the exercise's closing question. If the command must read `n`
-when it runs, all three fixes are wrong: they freeze the value when the
-loop builds the command. You then want the original behavior, aimed at
-something that outlives the loop, as `report()` does by reading
-`settings` at call time. The late-binding trap and late binding as a
-feature are the same mechanism. Which one you have depends on whether
-the name you close over still means what you wanted when the command
-finally runs.
+**Read the variable at call time.** None of the three preserves late
+lookup of `n`, and that is the point of the exercise's closing
+question. If the command must read `n` when it runs, all three fixes
+are wrong. Each one freezes the value when the loop builds the
+command. You then want the original behavior, aimed at something that
+outlives the loop, as `report()` does by reading `settings` at call
+time. The late-binding trap and late binding as a feature are the same
+mechanism. Which one you have depends on whether the name you close
+over still means what you wanted when the command finally runs.
 
 </details>
 </details>

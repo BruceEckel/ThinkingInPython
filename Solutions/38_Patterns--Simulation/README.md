@@ -108,7 +108,7 @@ def test_rat_keeps_one_claim_and_spawns_the_rest() -> None:
 
 **Stand in for the blackboard.** `Rat` imports only the `Recorder`
 `Protocol`, not `Blackboard`, so `FakeBlackboard` satisfies that
-`Protocol` by shape: it defines `claim()`, `spawn()`, `log()`, and
+`Protocol` by shape. It defines `claim()`, `spawn()`, `log()`, and
 `next_number()`, and none of the four touches a real `Maze` or
 `asyncio.create_task()`.
 
@@ -704,14 +704,14 @@ rats cover the same ground. Nothing goes unexplored. Both rats proceed
 from the shared cell and duplicate each other's work from there, while
 `visited` stays correct, because adding the same cell twice to a set
 changes nothing. That correctness is why `test_rats_and_mazes.py`
-passes on the broken version every time: the test asserts the set of
+passes on the broken version every time. The test asserts the set of
 cells reached. The extra `True` costs the rats wasted effort, two
 tasks tracing overlapping paths. Comparing the count of `True` returns
 with the size of `visited` exposes the collision.
 
 The original `claim()` needs no lock because it has no `await`
 between the test and the add. A coroutine yields control only at an
-`await`, so the two statements run as one uninterruptible unit: the
+`await`, so the two statements run as one uninterruptible unit. The
 event loop can hand control to another rat before the test or after
 the add, but not between them. Adding the `await` opens that
 gap in the middle, and the whole guarantee depends on the gap's absence.
@@ -968,8 +968,9 @@ exercise's file stays a single, runnable unit).
 
 Deriving `Coin` from `Food` instead breaks the maze, and the reason is
 where the factory searches, not what `Coin` inherits. `item_factory()`
-walks `Item.__subclasses__()`, which lists only the *direct* subclasses
-of `Item`, so a `Coin(Food)` is absent from that list. No entry matches
+walks `Item.__subclasses__()`, which lists the *direct* subclasses of
+`Item` and misses their descendants, so a `Coin(Food)` is absent from
+that list. No entry matches
 `$`, and the loop falls through to the factory's last line, which
 treats any unrecognized symbol as a teleport target. So
 `item_factory("$")` returns `Teleport("$")`. The two `$` cells become
@@ -1144,12 +1145,13 @@ Here, running out of rooms is the ordinary way the food loop ends,
 so `solve()` returns `None` and the walrus in the `while` reads it as
 "nothing left to eat."
 
-**Replan after every meal.** The search must run again after every meal because both of its ends
-move. `Food.interact()` replaces the food with an `Empty()`, so the
+**Replan after every meal.** The search must run again after every
+meal because its start and its goal both move.
+`Food.interact()` replaces the food with an `Empty()`, so the
 room the robot just arrived at stops being a goal, and the robot's
 own room is now the new start. A path planned from the entry is no
 use from any other room, so one search at the start yields the first
-leg and no more. Searching again costs little: each search touches at
+leg and no more. Searching again costs little. Each search touches at
 most the maze's 299 rooms that hold no wall.
 
 <!-- vale proselint.GenderBias = NO -->
@@ -1174,7 +1176,7 @@ breadth-first search guarantees.
 The last three exercises all shake the same plate, so this file
 carries the chapter's `chladni.py` once, with one change: `Plate`
 takes the field function as a constructor argument instead of calling
-the module-level `amplitude()` directly. That argument makes exercise
+the module-level `amplitude()`. That argument makes exercise
 7's different physics a second function rather than an edit, so both
 functions can run side by side in one program.
 
@@ -1301,7 +1303,7 @@ so the difference is exactly `0.0` at every point on the plate.
 displacement by the amplitude under that grain, so
 `uniform(-kick, kick) * 0.0` moves nothing, and 1200 steps leave every
 grain where the constructor scattered it. The view shows
-neither chaos nor a figure because no grain moves: it shows the
+neither chaos nor a figure because no grain moves. It shows the
 initial random scatter, frozen. Agitation reads `0.000` from
 the first step, the same number a perfectly settled plate reports, so
 the summary statistic cannot tell "finished" from "never started."
@@ -1457,7 +1459,7 @@ with the physics. The run is not finished, and finishing it
 means more steps than anyone wants to watch.
 
 `kick=0.5` fails differently, and the agitation column hides the
-failure: agitation collapses to `0.00` as convincingly as it does at
+failure. Agitation collapses to `0.00` as convincingly as it does at
 the default kick, and the figure does not appear. A kick of up to
 half the plate, and the full width where the amplitude peaks at 2,
 can throw a grain across the plate in one step, so a grain does not

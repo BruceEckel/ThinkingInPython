@@ -82,7 +82,7 @@ and forwards everything else to the wrapped list through
 The adapter defines no `append()`, so the lookup falls through to
 the list, and both the adapter and the original `pairs` name see
 the new entry.
-The record is frozen, and the list it holds is not: `append()`
+The record is frozen, and the list it holds is not. `append()`
 changes the list and assigns nothing to the adapter.
 
 **Show what forwarding misses.** `len(adapter)` fails although the list has a `__len__()`.
@@ -158,7 +158,7 @@ caller commits to the type: constructing an instance and subclassing.
 `render()` runs outside the recording block and adds nothing to
 `caught`, so code that holds a `Report` runs without a
 warning.
-That is the right split: `TextReport` replaces the type, not the
+That is the right split. `TextReport` replaces the type, not the
 method. A caller who wants to act on the warning must change where
 they get the `Report`, not where they call `render()`.
 
@@ -279,7 +279,7 @@ either sets
 or imports as `import record` and writes `@record.record`.
 
 The class version differs in one way that matters. `Facade` is a
-namespace the language does not treat as one: `Facade.start_car` and
+namespace the language does not treat as one. `Facade.start_car` and
 `shop.start_car` read identically at the call site, but you must
 define the class, import it, and carry it around. `@staticmethod`
 exists only to stop Python passing `self` to functions that do not
@@ -316,32 +316,32 @@ Check whether the wrapper changes the interface, adds behavior to each call, or 
 <summary>Solution</summary>
 
 **The logging wrapper is a *Decorator*.** Its interface is the wrapped
-object's, unchanged, and it adds behavior on the way through. Remove
-it and every call still reaches the same method with the same
+object's, unchanged, and it adds behavior on the way through. If you
+remove it, every call still reaches the same method with the same
 arguments and returns the same result. What you lose is the log. That
-is the *Decorator* row: same interface, added behavior, and the behavior
-disappears.
+is the *Decorator* row: same interface, added behavior, and the
+behavior disappears.
 
 **The `read()` wrapper is an *Adapter*.** Its interface is not the
-wrapped object's. The caller asks for `read()`, and the wrapped
-object offers `next_chunk()` instead, so the wrapper exists to make one
-type fit a caller that expects another. Remove it and you lose only
-the fit, which is enough: the call no longer resolves. An *Adapter*
+wrapped object's. The caller asks for `read()`, and the wrapped object
+offers `next_chunk()` instead, so the wrapper exists to make one type
+fit a caller that expects another. If you remove it, you lose only the
+fit, and without the fit the call no longer resolves. An *Adapter*
 adds no behavior, and that is the test that separates the *Adapter*
 from the *Decorator*. Both wrappers forward, and only the *Adapter*
 changes the name the caller uses.
 
-**The flag-checking wrapper is a *Proxy*.** Its interface is the wrapped
-object's, and it adds no behavior to a call that goes through. What it
-adds is a decision about whether the call proceeds. Remove
-it and every call reaches the implementation, including the ones the
-proxy refuses, so what you lose is control over when and whether a
+**The flag-checking wrapper is a *Proxy*.** Its interface is the
+wrapped object's, and it adds no behavior to a call that goes through.
+What it adds is a decision about whether the call proceeds. If you
+remove it, every call reaches the implementation, including the ones
+the proxy refuses, so what you lose is control over when and whether a
 call proceeds. This wrapper is the
 [protection proxy](../../Chapters/26_Patterns--Surrogate.md#protection-proxy).
 
 None of the three is a *Façade*, because a *Façade* narrows many objects
 to a few names and each of these wraps one object. The
-code does not decide the classification: all three could be the
+code does not decide the classification. All three could be the
 same `__getattr__()` forwarder. What separates them is the answer to
 "what breaks if I delete this," and a name chosen from that answer
 tells the next reader why the wrapper is there.

@@ -140,7 +140,7 @@ field is a different vector of change, one about which this design
 does nothing.
 
 Two things generalize from the example. First, the axis is visible in
-the history rather than in the code: the same function appearing in
+the history rather than in the code. The same function appearing in
 three consecutive commits names the axis for you. Second, absorbing one
 vector says nothing about the others. A design that makes formats
 pluggable and fields painful is the right answer only if formats are
@@ -229,7 +229,7 @@ print(checkout(6.0, flat), checkout(6.0, by_weight))
 ```
 
 Five constructs become one parameter, and the type checker still knows
-what the parameter accepts: `Callable[[float], float]` rejects a
+what the parameter accepts. `Callable[[float], float]` rejects a
 function taking the wrong arguments as surely as an interface rejects
 a class that does not implement it.
 
@@ -257,7 +257,8 @@ intent survives the subtraction. Only the scaffolding disappears.
 
 [Design Principles](../../Chapters/21_Patterns--Design_Patterns.md#design-principles) states *Subtraction* as a test: take one thing away and run the program.
 Choose a class or a level of inheritance that holds a single method and no state.
-If nothing breaks, the piece was scaffolding; if something breaks, you have found the part that carries the design's intent.
+If nothing breaks, the piece was scaffolding.
+If something breaks, you have found the part that carries the design's intent.
 
 <details>
 <summary>The shape</summary>
@@ -329,7 +330,7 @@ is not complete.
 Taking away one more thing changes the answer. If you remove
 `checkout()`'s `shipping` parameter, inlining `5.0` where the call through `shipping` was,
 the program still runs and still prints a number. What stops working is
-the requirement: you can no longer charge by weight without
+the requirement. You can no longer charge by weight without
 editing `checkout()`. Removing the parameter reaches the floor, the
 point where subtraction stops. The parameter is the last piece that carries the design's
 intent, so removing it removes the design rather than its scaffolding.
@@ -357,7 +358,8 @@ you removed is worth keeping and worth naming.
 <summary>Where to look</summary>
 
 [The Reach of a Change](../../Chapters/21_Patterns--Design_Patterns.md#the-reach-of-a-change) compares a design in which `Report` names each writer with one in which it names a protocol.
-In the first version give each writer its own method name; in the second give every writer the same method and declare it in a `Protocol`.
+In the first version give each writer its own method name.
+In the second give every writer the same method and declare it in a `Protocol`.
 Add the Markdown writer to each, then count the existing definitions you opened.
 
 <details>
@@ -428,13 +430,14 @@ def main(kind: str) -> None:
 
 If you add `MdWriter` to the `AnyWriter` alias and to `main()` but miss the `case` in `Report.render()`,
 `main("md")` prints `None`, because no `case` matches and `render()` returns nothing.
-The type checker catches the gap: `ty` reports `invalid-return-type`, since `render()` can implicitly return `None`.
+The type checker catches the gap.
+`ty` reports `invalid-return-type`, since `render()` can implicitly return `None`.
 The first version below makes all three edits,
 and the second takes the other path, leaving `Report` no `case` to miss.
 
 The first version gives each writer its own method name, which is the
-usual reason a class like `Report` ends up naming every writer: it
-must know which method to call on which class.
+usual reason a class like `Report` ends up naming every writer. The
+class must know which method to call on which writer.
 
 ```python
 # exercise_4a.py
@@ -543,7 +546,7 @@ main("md")
 
 Here `MdWriter` edits one existing thing, the `case` that `main()`
 gains. `Report` and `Writer` keep their source, and no writer names
-`Writer`: the type checker matches each class to the protocol when
+`Writer`. The type checker matches each class to the protocol when
 `main()` assigns an instance to `writer`.
 
 The count is the answer, three edits in two parts against one edit in
@@ -551,8 +554,8 @@ one part, but the places matter more than the number. In the first
 version a new format sends you into `Report`, a class whose subject is
 the report's content. In the second, the one edit sits in `main()`,
 the part whose job is to assemble the pieces. The `match` in `main()`
-is the heavy edge that remains, and a registry
-([Self Registration](../../Chapters/27_Patterns--Factory.md#self-registration))
+is the heavy edge that remains, and a
+[registry](../../Chapters/27_Patterns--Factory.md#self-registration)
 moves it out of `main()` as well.
 
 </details>

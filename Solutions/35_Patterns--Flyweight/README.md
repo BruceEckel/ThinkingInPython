@@ -272,7 +272,7 @@ cells, because both versions build the same nested list of references.
 The two versions differ in what one cell costs. A cell in the shared field
 costs one reference into a pool of three `Tile` objects, while a cell
 in the unshared field costs a brand-new `Tile`, roughly six times as
-much memory. The flyweight's saving is therefore per cell: the
+much memory. The flyweight's saving is therefore per cell. The
 multiplier stays near six, and the bytes saved grow with the map.
 
 `Tile` is a record, so each unshared `Tile` is a slotted instance
@@ -293,7 +293,9 @@ then carries a dictionary too.
 <summary>Where to look</summary>
 
 [Freezing the Shared Tile](../../Chapters/35_Patterns--Flyweight.md#freezing-the-shared-tile) explains why a flyweight must be immutable.
-The pool holds one object per kind, so assigning to a field through one cell is visible through every cell that shares it.
+The pool holds one object per kind,
+so assigning to an attribute through one cell
+is visible through every cell that shares it.
 In the test, assign through one cell, then assert on a different cell of the same kind.
 
 <details>
@@ -365,9 +367,7 @@ print(field[0][1].walkable, field[1][0].walkable,
 
 **Expose the shared state.** Setting `walkable = False` on the tile at `(0, 0)` changes `walkable`
 for every other grass cell in the map too, because all four cells
-share one `MutableTile` object. Only one grass tile exists in memory,
-and every cell holds a reference to that one object. This test pins
-down the bug:
+share one `MutableTile` object. This test pins down the bug:
 
 ```python
 # test_ch35_mutation_leak.py
@@ -400,9 +400,9 @@ def test_mutation_without_frozen_leaks_across_cells(
     assert field[1][1].walkable is False  # Bug: cell leaked
 ```
 
-If you restore `@record`, this test stops at its assignment:
+If you restore `@record`, this test stops at its assignment.
 `field[0][0].walkable = False` raises a `FrozenInstanceError`,
-because a record rejects assignment to every field. The assignment
+because a record rejects assignment to every attribute. The assignment
 the bug needs fails, and that refusal makes sharing one
 object safe.
 
@@ -660,8 +660,8 @@ print(len(_pool))
 function, `make_color()`, and a `WeakValueDictionary` for the pool.
 `Color` is a frozen data class, so it gets a generated `__repr__()`,
 `__eq__()`, and `__hash__()`, as the record `Color` in
-`interned_color.py` does. This `Color` writes the `dataclass` call in full for
-the reason `weak_pool.py`'s `Name` does: a weak reference needs
+`interned_color.py` does. Like `weak_pool.py`'s `Name`, this `Color`
+writes the `dataclass` call in full, because a weak reference needs
 `weakref_slot=True`, which `record()` does not forward.
 
 **Empty the pool on release.** Once `del` drops every
@@ -902,7 +902,7 @@ because the enum declares the set once instead of twice.
 
 The enum adds one check. A misspelled or missing member, such as
 `Tile.DOOR`, is an `unresolved-attribute` error. The `Literal` version
-misses the matching mistake: `@cache` hides `tile()`'s `Symbol`
+misses the matching mistake. `@cache` hides `tile()`'s `Symbol`
 parameter from callers, so `tile("+")` passes the type checker and
 fails at runtime with a `KeyError`.
 
@@ -1079,15 +1079,15 @@ computation, a duplicate build costs time but not correctness.
 **Fill the pool eagerly.** The eager fix builds every value before any
 thread exists, so every lookup hits, and only a miss can start a race.
 It is the better answer whenever the whole value set fits in one small
-table, the same condition that makes an `Enum` work. The eager fix
-costs nothing at runtime.
+table, the same condition that makes an `Enum` work. The eager lookup
+is one `dict` index, with no lock to take.
 
-**Guard the factory with a lock.** The lock fix handles an unbounded value set, and its cost is real.
-Every lookup now serializes, including the hits, which are the
-overwhelming majority once the pool is warm. If that serialization matters, lock
-only on the miss path with a hand-written pool, checking the key again
-inside the lock, since another thread may have filled that entry while
-this one waited.
+**Guard the factory with a lock.** The lock fix handles an unbounded
+value set. Every lookup now serializes, including the hits, which are
+the overwhelming majority once the pool is warm. If that serialization
+matters, lock only on the miss path with a hand-written pool, checking
+the key again inside the lock, since another thread may have filled
+that entry while this one waited.
 
 </details>
 </details>

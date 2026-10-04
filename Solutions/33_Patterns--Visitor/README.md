@@ -11,7 +11,8 @@
 <summary>Where to look</summary>
 
 [The Pythonic Visitor: singledispatch](../../Chapters/33_Patterns--Visitor.md#the-pythonic-visitor-singledispatch) adds an operation to a fixed hierarchy from outside it.
-Decide which of `pollinate()` and `eat()` answers differently by flower type; only that one needs `@singledispatch` and `register`.
+Decide which of `pollinate()` and `eat()` answers differently by flower type.
+Only that one needs `@singledispatch` and `register`.
 Then list what the *Visitor* machinery in [The Classic Visitor](../../Chapters/33_Patterns--Visitor.md#the-classic-visitor) exists to do, and what in it has no job left.
 
 <details>
@@ -97,7 +98,7 @@ thing for every flower, so it stays an ordinary function.
 The `Bug` classes hold no state. `Pollinator` and `Predator` each
 exist to name one operation, and `Bee`, `Fly`, and `Worm` exist
 to be types the second dispatch can resolve. Once the operation is a
-function, the call site names it: `pollinate(flower, "Bee")` says what
+function, the call site names it. `pollinate(flower, "Bee")` says what
 `flower.accept(bee)` says with a class and a method.
 
 You lose one thing: holding a visitor in a variable and passing it
@@ -263,8 +264,8 @@ type, because an operation is a whole function and lives in one place.
 Adding `thorns()` is cheap because three of the four flowers accept
 its default. `Rose` needs a distinct answer from every operation, so
 it costs one registration per operation, scattered across the file.
-That difference in cost is the expression problem from
-[Pattern Matching](../../Chapters/13_Techniques--Pattern_Matching.md#the-expression-problem):
+That difference in cost is the
+[expression problem](../../Chapters/13_Techniques--Pattern_Matching.md#the-expression-problem):
 methods on a class make adding a type cheap, functions over a hierarchy
 make adding an operation cheap, and no arrangement makes both cheap at
 once.
@@ -383,8 +384,8 @@ expect(AttributeError, Gladiolus().accept, Beetle())  # type: ignore
 **Declare the visitor's interface.** `Visits` names the one method `accept()` calls, so the parameter
 declares what `accept()` needs instead of accepting anything. `Bee`
 neither mentions `Visits` nor inherits from it, because a `Protocol`
-matches on structure: any class with a compatible `visit()` satisfies
-`Visits`. The `Visitor` classes keep the chapter's form; the listing
+matches on structure. Any class with a compatible `visit()` satisfies
+`Visits`. The `Visitor` classes keep the chapter's form. The listing
 keeps only the pollinating half of them.
 
 The two versions report the `Beetle` mistake at different times. Under
@@ -394,9 +395,10 @@ the call type-checks and the program dies at runtime with the
 before the program runs, because `Beetle` inherits no `visit()` and so
 does not match the protocol.
 
-**Demonstrate the runtime failure.** The `# type: ignore` comment keeps the checker
-quiet about the `Beetle` call so the listing can show the runtime failure;
-without it, `ty` reports an `invalid-argument-type`.
+**Demonstrate the runtime failure.** The `# type: ignore` comment
+keeps the checker quiet about the `Beetle` call so the listing can
+show the runtime failure. Without it, `ty` reports an
+`invalid-argument-type`.
 
 Losing the check on the visitor side is the price the chapter names
 for keeping `Any`. The `Any` moves
