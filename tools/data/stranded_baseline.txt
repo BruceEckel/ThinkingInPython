@@ -78,7 +78,6 @@ Solutions/30_Patterns--Observer/README.md	CODE receives the name the class body 
 Solutions/30_Patterns--Observer/README.md	CODE reuses CODE from CODE unchanged and adds the CODE the exercise asks for
 Solutions/30_Patterns--Observer/README.md	so the demo's CODE and the first test still see the group the exercise asks for
 Solutions/30_Patterns--Observer/README.md	that column and that row have moved one color along
-Solutions/31_Patterns--State_Machines/README.md	catch CODE and carry on
 Solutions/32_Patterns--Multiple_Dispatching/README.md	CODE needs no such case because three items leave nothing over
 Solutions/34_Patterns--Composite_and_Interpreter/README.md	and it costs more than it appears to
 Solutions/34_Patterns--Composite_and_Interpreter/README.md	and not before
