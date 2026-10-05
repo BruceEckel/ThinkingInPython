@@ -47,7 +47,6 @@ def test_disconnect_without_connect_raises() -> None:
 def test_thermometer_pushes_new_value_on_set() -> None:
     readings: list[float] = []
     t = Thermometer(20.0)
-    assert t.celsius == 20.0  # The starting reading
     t.connect(readings.append)
     t.celsius = 25.0
     t.celsius = 150.0

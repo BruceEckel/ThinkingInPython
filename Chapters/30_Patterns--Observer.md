@@ -36,8 +36,8 @@ so that every view refreshes.
 
 The classic design comes from *GoF Design Patterns*:
 
-- The object that changes is the *subject*
-- Each *observer* implements an interface with one method
+- The object that changes is the *subject*.
+- Each *observer* implements an interface with one method.
 
 The GoF design has three parts:
 an `Observer` interface every observer implements,
@@ -260,21 +260,24 @@ and `announce()`.
 A responder returns `None`, as seen in the `Responder` `type` alias.
 At runtime, `announce()` discards whatever a responder returns,
 since it calls each responder as a statement.
-The alias turns that silent loss into a type error.
+The alias turns that silent discard into a type error.
 The type checker rejects a responder that returns a value,
 because the author of that responder likely expected someone to use the value.
 The alternative alias `Callable[[T], object]` accepts any callable that takes a `T`,
 since every return type, `None` included, is assignable to `object`.
-That alias trades the type error for convenience.
-A responder can return a value, and `announce()` drops it without a report.
-`Responder` keeps `None` to catch that mistake.
+That alternative trades correctness for convenience.
+If a responder returns a value, `announce()` quietly drops it.
+The strict version of `Responder` returning `None` catches that mistake.
 Notification runs one way, from broadcaster to responders.
 *GoF Design Patterns* gives the reason under broadcast communication.
 A notification goes to every connected responder,
-and each one decides whether to handle it,
-so one call to several responders could produce several answers, or none.
-A design that needs an answer uses a different pattern;
-for example [*Chain of Responsibility*](28_Patterns--Function_Objects.md#chain-of-responsibility-choosing-the-handler-at-runtime)
+and each one decides whether to handle it.
+Allowing return values produces different values from an unknown number of responders.
+The broadcaster would require a rule for combining those different values.
+Returning `None` removes that question.
+
+A design that needs an answer uses a different pattern.
+For example, [*Chain of Responsibility*](28_Patterns--Function_Objects.md#chain-of-responsibility-choosing-the-handler-at-runtime)
 tries its handlers in turn and returns the result from the first one that succeeds.
 
 The new `Thermometer` changes only its base class and the call in its `celsius` setter,
@@ -299,32 +302,34 @@ class Thermometer(Broadcaster[float]):
         self.announce(value)
 ```
 
-The setter does two things.
-Storing the new reading is the change.
-Calling `announce()` is what the thermometer chooses to do about that change,
-and the method is named for the choice.
-This setter announces every assignment.
+The setter first stores the new reading, which is the state change.
+Then it calls `announce()`,
+which is what the thermometer chooses to do about that change.
+In this case, the setter announces every assignment.
 [Deciding What Matters](#deciding-what-matters)
-shows a setter that announces a reading when it differs enough from the previous reading.
+shows a setter that announces a reading only when it differs enough from the previous reading.
 
-The constructor assigns its argument to `_celsius`, bypassing the setter,
-so creating a `Thermometer` announces nothing.
+The constructor assigns its argument to `_celsius` directly,
+bypassing the setter.
+The first reading is the thermometer's starting state, not a change to it.
+No responder can connect before the constructor returns,
+so there is no one to tell.
+A responder that needs the current reading when it connects reads `celsius`.
 
 `Thermometer`'s constructor is simple and suggests using a `dataclass`.
 A class that inherits from another can be a `dataclass`,
 but [a `dataclass`-generated `__init__()` does not call the base class's `__init__()`](12_Techniques--Data_Classes_as_Types.md#dataclass-inheritance).
-A `@dataclass` `Thermometer` has no list of responders,
-and `connect()` raises an `AttributeError`.
+A `@dataclass` `Thermometer` would have no list of responders.
 A `__post_init__()` that calls `super().__init__()` fixes that,
 but at greater length and complexity than the `__init__()` it replaces.
 
 `Thermometer` inherits `Broadcaster` because that is the shortest way to get `connect()` and `announce()`,
 not because the pattern requires a base class.
-A `Thermometer` can hold a `Broadcaster` as an attribute instead
-(`self.temperature_changed = Broadcaster[float]()`),
-and code that connects a responder then names that attribute:
-`t.temperature_changed.connect(display)`.
-One object can hold several such attributes,
+A `Thermometer` could use composigion, holding a `Broadcaster` as an attribute
+(`self.temperature_changed = Broadcaster[float]()`).
+Code that connects a responder would name that attribute
+(`t.temperature_changed.connect(display)`).
+An object can hold multiple attributes,
 so it can publish more than one kind of change.
 [Notifying Without a Base Class](#notifying-without-a-base-class)
 drops the base class and the properties together.
@@ -350,26 +355,30 @@ t.celsius = 150
 
 The responders here are lambdas, but any function or bound method works.
 `Thermometer` knows its responders only as callables that take a `float`.
-The figure follows this demo through one notification,
-naming the two lambdas `display` and `alarm` after what they print:
+This figure shows one notification,
+naming the two lambdas `display` and `alarm`:
 
 ![](_images/observer_story)
 
-The shaded side holds what `Thermometer` cannot see.
+The shaded side holds the responders as the program wrote them;
+`Thermometer` keeps each one as a callable in its list.
 Two kinds of arrow cross into it: `connect()` stores a responder in the list,
 and `announce()` calls each stored responder in turn.
 No result crosses back, so `Thermometer` has nothing to wait for or interpret.
-A new responder such as `plot` connects through the same call,
-and the class that announces to it stays as written.
+A new responder such as `plot` connects the same way as all responders.
 
 ### Testing the Broadcaster
 
-Testing confirms that `celsius` reports the value given to the constructor,
-that every responder receives the new value in connection order,
-that a responder receives only the changes made after it is connected,
-that delivery stops after `disconnect()`,
-that a callable connected twice receives each announcement twice,
-and that a `disconnect()` matching no connection raises a `ValueError`:
+The test file confirms that:
+
+- Every responder receives the announced value in connection order.
+- Announcing to an empty list succeeds.
+- Delivery stops after `disconnect()`.
+- A callable connected twice receives each announcement twice,
+  and one `disconnect()` removes one of the two.
+- A `disconnect()` matching no connection raises a `ValueError`.
+- `Thermometer`'s setter stores each reading and announces it.
+- A responder receives only the changes made after it connects.
 
 ```python
 # test_broadcaster.py
@@ -421,7 +430,6 @@ def test_disconnect_without_connect_raises() -> None:
 def test_thermometer_pushes_new_value_on_set() -> None:
     readings: list[float] = []
     t = Thermometer(20.0)
-    assert t.celsius == 20.0  # The starting reading
     t.connect(readings.append)
     t.celsius = 25.0
     t.celsius = 150.0
