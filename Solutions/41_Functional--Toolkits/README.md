@@ -29,6 +29,13 @@ def deep_sum(items: list[Nested]) -> int:
 <details>
 <summary>Solution</summary>
 
+If you seed the stack with `items` instead of `list(items)`,
+`deep_sum()` still returns `21`, but the caller's list is empty
+afterward, and printing it shows `[]`. The stack and the argument are
+one list, so every `pop()` drains the caller's data. The solution copies
+`items` with `list()`, which gives the loop a list of its own to
+consume.
+
 ```python
 # exercise_1.py
 type Nested = int | list[Nested]

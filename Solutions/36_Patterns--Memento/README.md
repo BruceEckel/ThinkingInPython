@@ -668,6 +668,15 @@ def restore_field(
 <details>
 <summary>Solution</summary>
 
+If you append the new state to `_past` instead of calling `do()`,
+the restore leaves `history.present` as it was, and the print
+after it shows `strokes=('body', 'beak', 'tail')` again.
+The restored state appears when `undo()` pops it off `_past`,
+so the undo step, rather than the restore, produces
+`strokes=('body',)`.
+The solution calls `do()`, which pushes the present onto `_past`,
+makes the new state the present, and clears `_future`.
+
 ```python
 # exercise_6.py
 import copy

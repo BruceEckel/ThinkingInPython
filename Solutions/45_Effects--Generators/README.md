@@ -139,6 +139,14 @@ def drive_in_order(
 <details>
 <summary>Solution</summary>
 
+If you put `next(answers)` inside the `try`, as `drive_naive()` does, a
+short answer source ends the run quietly: given one answer for three
+questions, `drive_naive()` returns `None`, and `ty` reports nothing. The
+`except StopIteration` meant for the conversation catches the one from
+the exhausted answers and reads it as a finished interview. The
+solution's `drive_in_order()` fetches each reply outside the `try`, so
+the `StopIteration` from the answers reaches the caller.
+
 ```python
 # exercise_2.py
 from collections.abc import Generator, Iterator

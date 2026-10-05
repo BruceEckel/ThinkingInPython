@@ -213,6 +213,14 @@ class CSingleton(metaclass=Singleton):
 <details>
 <summary>Solution</summary>
 
+If you write `super().__call__(*args, **kwargs)`, the usual form in a
+metaclass, the script still prints `True` and `False`, but `ty`
+reports `invalid-super-argument`. The annotation `cls: type[T]` hides
+the fact that `cls` is a `Singleton`, so the type checker cannot
+accept `cls` as the second argument of `super()`. The solution calls
+`type.__call__(cls, *args, **kwargs)` and keeps the `type[T]`
+annotation that types `CSingleton()` as a `CSingleton`.
+
 ```python
 # exercise_3.py
 from typing import Any, ClassVar
@@ -410,6 +418,13 @@ def describe(func: FunctionType) -> None:
 
 <details>
 <summary>Solution</summary>
+
+If you print `doc` without the `or` fallback, `greet` still shows its
+docstring, but the lambda's second line reads `None`, since
+`inspect.getdoc()` returns `None` for a callable with no docstring.
+The type checker accepts that version, because `print()` takes any
+object. The solution writes `doc or "(no docstring)"`, which replaces
+a missing docstring with the message.
 
 ```python
 # exercise_5.py
@@ -723,6 +738,16 @@ class Command:
 
 <details>
 <summary>Solution</summary>
+
+If you end the payload after `print("injected code ran")
+` and leave
+out the triple-quoted line, the script prints nothing and stops with a
+`SyntaxError`, "unterminated string literal". `exec()` compiles the
+whole spliced source before running any of it, and the second splice
+puts a newline inside the `super().__init__("...")` literal, so the
+injected `print()` does not run. The solution's payload ends with
+`Y = """  #`, which opens a string that swallows the second splice,
+so the spliced source compiles.
 
 ```python
 # ch17_exec_injection.py

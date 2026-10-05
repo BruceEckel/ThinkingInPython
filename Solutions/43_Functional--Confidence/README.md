@@ -156,6 +156,14 @@ For the oracle, write an insertion sort slow and simple enough to check by readi
 <details>
 <summary>Solution</summary>
 
+If you write the oracle as `assert sorted(xs) == sorted(xs)`, the test
+passes, and it keeps passing for a sort that drops the last element,
+because both sides of `==` share the bug. The insertion-sort oracle
+fails that broken sort on `xs=[0]`. The solution checks `sorted()`
+against `insertion_sort()`, a separate implementation that cannot share
+its bugs, because a property that restates the implementation tests
+nothing.
+
 ```python
 # test_sorted_laws.py
 from hypothesis import given, strategies

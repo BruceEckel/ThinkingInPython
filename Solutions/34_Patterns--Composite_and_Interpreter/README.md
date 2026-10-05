@@ -161,6 +161,15 @@ def walk(entry: Node, prefix: str = "") -> Iterator[str]:
 <details>
 <summary>Solution</summary>
 
+If you follow the link, resolving `target` to its node and
+recursing into that node, `disk_usage(tree)` prints `10`:
+it counts `a.txt` once as a file and again through `shortcut`.
+A link to an ancestor, such as `Symlink("up", "/root")`,
+sends `disk_usage()` around the loop until Python raises a
+`RecursionError`.
+The solution shows the link as its own entry and counts it as
+zero bytes, so each operation visits every node once.
+
 ```python
 # exercise_2.py
 from collections.abc import Iterator
@@ -944,6 +953,15 @@ def wrap(value: Expr | int) -> Expr:
 <details>
 <summary>Solution</summary>
 
+If you guard the reflected methods and leave `__add__()` and
+`__mul__()` as the chapter writes them, `"a" + x` raises its
+`TypeError`, but `x + "a"` raises no exception.
+`wrap()` passes the string through untouched, so `x + "a"`
+returns `Add(left=Var(name='x'), right='a')`,
+and the listing's second `expected()` block prints nothing.
+The solution guards all four methods, since an expression that
+starts with `x` reaches a forward method first.
+
 ```python
 # exercise_6.py
 from exceptions import expected
@@ -1021,9 +1039,9 @@ operand is what the caller wrote first, and nothing in this expression
 language claims to extend `str`.
 
 **Guard the forward direction too.** The forward methods need the same guard for the same reason. Without
-it `x + "a"` wraps the string in a `Num` and builds the ill-typed tree
-from the other direction, so all four methods decline what they cannot
-use. The two messages differ because each comes from a different
+it `x + "a"` passes the raw string through `wrap()` and builds the
+ill-typed tree `Add(Var('x'), 'a')` from the other direction, so all
+four methods decline what they cannot use. The two messages differ because each comes from a different
 source. `str` reports `"a" + x`, and Python's own fallback reports
 `x + "a"`, once both operands have declined.
 

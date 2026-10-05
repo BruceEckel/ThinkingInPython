@@ -563,6 +563,13 @@ def on_big(event: BigDeposit) -> None:
 <details>
 <summary>Solution</summary>
 
+If you index `self._handlers[cls]` inside the MRO walk, the program
+prints the same four lines, but each read of a missing class inserts an
+empty list. After the demo, `bus._handlers` holds three keys,
+`Deposit`, `BigDeposit`, and `object`, where the solution's bus holds
+two. The solution reads with `.get(cls, [])`, which returns an empty
+list without storing it.
+
 ```python
 # exercise_5.py
 from collections import defaultdict

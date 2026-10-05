@@ -929,6 +929,14 @@ class Coin(Item):
 <details>
 <summary>Solution</summary>
 
+If you derive `Coin` from `Food`, the program prints `0`,
+and `item_factory("$")` returns a `Teleport`.
+`Item.__subclasses__()` lists direct subclasses alone,
+so the factory's search misses `Coin` and treats `$` as a
+teleport target.
+The solution derives `Coin` from `Item`, which puts it on the
+list the factory searches.
+
 ```python
 # exercise_4.py
 from typing import ClassVar, override

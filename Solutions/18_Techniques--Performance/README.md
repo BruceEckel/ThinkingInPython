@@ -758,6 +758,13 @@ Index the list at both positions to see which one is the target's first copy and
 <details>
 <summary>Solution</summary>
 
+If you find the first `5` with `bisect()`, as `bisect_search.py` does
+for its insertion point, `left` comes back as `5`, `xs[left]` prints
+`7`, and `xs[left:right]` prints `[]`. `bisect()` returns the position
+after the last equal element, the right place to insert a duplicate
+and the wrong place to read one. The solution uses `bisect_left()` for
+the first occurrence and keeps `bisect()` for the end of the run.
+
 ```python
 # ch18_bisect_duplicates.py
 import bisect

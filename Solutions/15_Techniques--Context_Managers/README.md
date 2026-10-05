@@ -92,6 +92,16 @@ Then pass a tuple of classes at the call site and watch for the extra pair of pa
 <details>
 <summary>Solution</summary>
 
+If you write `expected(ZeroDivisionError, TypeError)` without the
+inner parentheses, the script stops before printing `before`, with a
+`TypeError` saying that `expected.__init__()` takes from 1 to 2
+positional arguments but 3 were given. Python makes that call before
+the `with` statement enters the manager, so no `__exit__()` runs to
+suppress the error, and `ty` flags the call as
+`too-many-positional-arguments`. The solution wraps the two classes
+in a tuple, so `expected` receives one `types` argument, a shape that
+`issubclass()` accepts.
+
 ```python
 # ch15_expected_types.py
 from exceptions import expected

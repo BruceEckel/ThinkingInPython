@@ -453,6 +453,12 @@ Consider what `holds()` asks for by type, and whether a new instance of that typ
 <details>
 <summary>Solution</summary>
 
+If you give `METAL` a strength of `11` or less, the
+`(METAL, ROBOTIC, True)` row fails with `assert False is True`.
+`holds()` compares with a strict `<`, so a material survives a nailer
+when its strength exceeds the force, not when it matches it. The
+solution picks `20`, which clears both forces with room to spare.
+
 ```python
 # test_ch46_nailer.py
 from typing import Final
@@ -573,6 +579,16 @@ def default(ability: Need[Console]) -> Console:
 
 <details>
 <summary>Solution</summary>
+
+If you return `Console()` in place of `ability.t()`, `greet()` still
+prints its greeting, but `stamped()` fails with
+`AttributeError: 'Console' object has no attribute 'now'`.
+The handler answers the
+`Clock` request too, as it answers every `Need`, and hands it a
+`Console`, while the type checker reports nothing, since `default()`
+declares that it returns a `Console`. The solution calls `ability.t()`,
+which builds the class the request names, so the `Clock` request
+receives a `Clock`.
 
 ```python
 # exercise_6.py
@@ -1183,6 +1199,15 @@ def to_log(name: str) -> Depend[Need[Recorder], None]:
 
 <details>
 <summary>Solution</summary>
+
+If you keep `print()` on both implementations and declare it in both
+`Protocol`s, each implementation satisfies both, and the type checker
+accepts `as_type(Recorder)(Terminal())`. Handing that object to `to_log`
+prints `Hello, Carol!` to the screen while `capture.messages` stays
+`['Hello, Bob!']`, with no diagnostic. Two `Protocol`s that share one
+method name describe one shape under two names, so the solution renames
+the recording method to `record()`, and `Terminal` no longer fits
+`Recorder`.
 
 Three implementations have six orderings, and the prediction is short.
 `supply()` scans its arguments and takes the first that satisfies the

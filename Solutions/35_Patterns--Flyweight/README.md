@@ -988,6 +988,14 @@ def locked_tile(symbol: Symbol) -> Tile:
 <details>
 <summary>Solution</summary>
 
+If you put the lock inside `tile()`, around the sleep and the
+build, the listing's last line prints `4` instead of `1`.
+`@cache` checks the key before the body runs, so all four threads
+miss and then take turns building their own `Tile`.
+The lock orders the builds without preventing any of them.
+The solution wraps the call to `tile()`, so the lookup, the build,
+and the store all run under one lock.
+
 ```python
 # exercise_8.py
 import threading

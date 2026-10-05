@@ -17,6 +17,13 @@ Check which of `b` and `c` names the same list as `a` before you explain the dif
 <details>
 <summary>Solution</summary>
 
+If you write `c = a` instead of `c = a[:]`, the program prints
+`[1, 2, 3, 4, 99] [1, 2, 3, 4, 99]`: `c` is a third name for the
+one list, so appending to it changes what `a` sees, the same way
+`b.append(4)` did. The solution slices, because a slice builds a
+new list, and that is the one line on which the exercise's check
+turns.
+
 ```python
 # exercise_1.py
 a = [1, 2, 3]

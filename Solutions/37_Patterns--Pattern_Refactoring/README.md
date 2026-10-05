@@ -604,6 +604,15 @@ def _(t: Paper) -> str:
 <details>
 <summary>Solution</summary>
 
+If you register `Aluminum` for `strict_hazard()` and skip `Paper`,
+whose answer is "none", `strict_hazard(Paper(1.0))` raises a
+`NotImplementedError` reading "no hazard rule for Paper",
+and the program stops before it reaches the plastic.
+The strict base function refuses every unregistered type,
+harmless ones included.
+The solution registers `Paper` with its "none" answer, which is
+the cost that the exercise's last question names.
+
 ```python
 # exercise_5.py
 from functools import singledispatch

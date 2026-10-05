@@ -48,6 +48,14 @@ def _(flower: Chrysanthemum, eater: str) -> str:
 <details>
 <summary>Solution</summary>
 
+If you make `pollinate()` a `singledispatch` function too, the program
+prints the same four lines, and `pollinate.registry` holds one key,
+`object`, for the default. With no registration to choose among, every
+call runs the default body, so the decorator adds a dispatch step that
+decides nothing. The solution keeps `pollinate()` an ordinary function
+and saves `@singledispatch` for `eat()`, the one operation whose answer
+depends on the flower type.
+
 ```python
 # exercise_1.py
 from functools import singledispatch

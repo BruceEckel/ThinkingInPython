@@ -613,6 +613,13 @@ class Proxy:
 <details>
 <summary>Solution</summary>
 
+If you leave `Proxy` with its `__getattr__()` alone, `len(p)` raises a
+`TypeError`, "object of type 'Proxy' has no len()", although
+`p.__len__()` returns 2 through `__getattr__()`. The type checker
+reports the call as `invalid-argument-type`, since `Proxy` does not
+match `Sized`. The solution defines `__len__()` on the class, where
+`len()` looks for it.
+
 ```python
 # exercise_6.py
 from typing import Any

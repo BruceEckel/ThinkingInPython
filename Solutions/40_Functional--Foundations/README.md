@@ -216,6 +216,14 @@ def square(n: int) -> int:
 <details>
 <summary>Solution</summary>
 
+If you read `compose(square, increment_then_double)` left to right and
+predict that `square` runs first, you expect `(3 * 3 + 1) * 2 = 20`, but
+the program prints `64`. Passing the stages in that order,
+`compose(increment_then_double, square)`, prints `20`, and the type
+checker accepts that call too, since every stage takes and returns an
+`int`. `compose(f, g)` runs `g` first, so the solution traces the call
+from right to left.
+
 ```python
 # exercise_4.py
 from collections.abc import Callable

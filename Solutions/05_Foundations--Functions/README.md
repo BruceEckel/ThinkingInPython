@@ -227,6 +227,15 @@ def report(label, *values, total=False, **options):
 <details>
 <summary>Solution</summary>
 
+If you put `total` ahead of `*values`, as in
+`def report(label, total=False, *values, **options)`, the call
+`report("nums", 1, 2, 3, total=True)` raises a `TypeError`:
+`report() got multiple values for argument 'total'`. In that
+position `total` is an ordinary positional parameter, so the `1`
+fills it before `total=True` arrives as a second value. The solution
+places `total` after `*values`, where no positional argument can
+reach it, so the keyword is the one way to set it.
+
 ```python
 # exercise_4.py
 def report(label, *values, total=False, **options):

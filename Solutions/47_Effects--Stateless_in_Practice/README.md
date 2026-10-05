@@ -527,6 +527,14 @@ class Dead:  # Never available, so every draw fails
 <details>
 <summary>Solution</summary>
 
+If you script a sequence with no `Dead()` sources, such as
+`iter([Solar()])`, the run prints `Solar online`, both hours, and
+`Solar offline`, all from a single request. Every draw succeeds, so
+`run_load()` asks for one source, and the test passes without exercising
+the re-request it exists to check. The solution puts two `Dead()`
+sources ahead of `Solar()`, so the first two draws fail and force two
+re-requests.
+
 ```python
 # exercise_4.py
 from collections.abc import Callable, Iterator
@@ -767,6 +775,15 @@ def research_and_report(
 
 <details>
 <summary>Solution</summary>
+
+If you write `within_limit()` without `@throws`, an article over the
+limit raises a `TooLong` that escapes `catch()` and `run()` as an
+ordinary exception, the way `size()`'s `KeyError` does in exercise 2.
+`ty` flags the mistake first, as an `invalid-yield` at
+`yield from within_limit(article)`, because the undecorated function
+returns a `str` rather than an Effect. The solution decorates
+`within_limit()` with `@throws(TooLong)`, which moves the raised
+exception into the error channel, where `catch()` can see it.
 
 ```python
 # research_long.py
@@ -1172,6 +1189,13 @@ Check the list, check that the balance iterator has nothing left, and compare wh
 
 <details>
 <summary>Solution</summary>
+
+If you script three balances, `[100, 40, 10]`, and forget that the
+refused `50` still reads one, the script runs out at the fourth price.
+`handle()` reads the `StopIteration` as the end of the Effect, so
+`run()` returns `None` and the test fails on `assert None == 2`. Every
+attempt reads a balance, whether or not the purchase succeeds, so
+the solution scripts four balances, with `40` twice.
 
 ```python
 # test_ch47_wallet.py
@@ -1580,6 +1604,13 @@ def scripted_from(
 
 <details>
 <summary>Solution</summary>
+
+If you declare `Random` as an empty class, the way the chapter declares
+`Flip`, the request has nowhere to carry the range. `roll()` fails at
+`Random(low, high)` with a `TypeError`, and `ty` reports
+`too-many-positional-arguments` there and `unresolved-attribute` where
+the handler reads `request.low`. The solution gives `Random` the fields
+`low` and `high`, so the handler reads the range off the request.
 
 ```python
 # exercise_12.py

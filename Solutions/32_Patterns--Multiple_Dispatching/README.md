@@ -700,6 +700,12 @@ class Meters:
 <details>
 <summary>Solution</summary>
 
+If you give `__rsub__()` the body of `__sub__()`, `10 - Meters(3)`
+prints `Meters(n=-7)`, while the other lines print what they should.
+The type checker accepts the variant, since both orders produce a
+`Meters`. The solution computes `other - self.n`, because Python
+passes the left operand to the reflected method as `other`.
+
 ```python
 # exercise_5.py
 from exceptions import expected

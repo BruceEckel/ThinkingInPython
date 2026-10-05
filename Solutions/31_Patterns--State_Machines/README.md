@@ -563,6 +563,14 @@ def mouse_move_generator(
 <details>
 <summary>Solution</summary>
 
+If you pick from every `MouseAction` and ignore `previous`, the seeded
+run prints `RUNS_AWAY TRAPPED APPEARS ENTERS` and
+`APPEARS ESCAPES ESCAPES ESCAPES`. The mouse runs away before it
+appears and escapes three times in a row, and the type checker passes
+the variant, since each move is a valid `MouseAction`. The solution
+looks up the legal successors of `previous` in `NEXT_ACTIONS`, so each
+pick depends on the move before it.
+
 ```python
 # exercise_5.py
 import random
@@ -1037,6 +1045,14 @@ class HVAC(StateMachine):
 
 <details>
 <summary>Solution</summary>
+
+If you put the unconditional `(None, None, HVACState.IDLE)` row first
+under `(IDLE, TemperatureReading)`, every reading prints `IDLE`, from
+`15 IDLE` through `30 IDLE`. `handle()` takes the first row whose
+condition passes, and a row with no condition always passes, so the
+machine stops there and does not reach the `too_cold` and `too_hot`
+rows below it. The solution lists the conditional rows first and keeps
+the unconditional row last, as the fallback.
 
 ```python
 # exercise_8.py

@@ -407,6 +407,16 @@ For the explanation, compare how many items an unstarred target list requires wi
 <details>
 <summary>Solution</summary>
 
+If you index instead, writing
+`first, middle, last = row[0], row[1:-1], row[-1]`, the program
+prints the same `1 [2, 3, 4] 5`, but the line uses the indexing the
+exercise rules out. The two forms differ on a one-item list: the
+indexed version prints `1 [] 1`, counting the one item as both first
+and last, while `first, *middle, last = [1]` raises a `ValueError`
+(`not enough values to unpack`). The solution uses starred targets,
+because one target list states the shape it expects and Python
+checks that shape for you.
+
 ```python
 # exercise_9.py
 
@@ -469,6 +479,14 @@ For the last part, ask what `hash()` must do with each value, and what a `list` 
 
 <details>
 <summary>Solution</summary>
+
+If you build the configuration with `dict(pairs)` instead, the
+program prints `{'host': 'localhost', 'port': 8080}`, and then
+`connections = {config: "primary"}` raises a `TypeError`:
+`cannot use 'dict' as a dict key (unhashable type: 'dict')`. A
+`dict` can change, so it sets `__hash__` to `None`. The solution
+builds a `frozendict`, which cannot change and so is hashable when
+its values are.
 
 ```python
 # exercise_10.py
