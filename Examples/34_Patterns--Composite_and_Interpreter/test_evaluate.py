@@ -18,9 +18,9 @@ def test_one_tree_many_environments() -> None:
     assert evaluate(area, w=2, h=3) == 6
     assert evaluate(area, w=10, h=10) == 100
 
-def test_unbound_variable_raises() -> None:
-    with pytest.raises(KeyError):
+def test_unbound_variable_raises_key_error() -> None:
+    with pytest.raises(KeyError, match="y"):
         evaluate(Var("y"), x=1)
 
-def test_e_is_available_as_a_variable() -> None:
+def test_e_binds_as_a_variable() -> None:
     assert evaluate(Var("e"), e=5) == 5

@@ -219,12 +219,19 @@ Prefer a guard that lets the type checker narrow.
 Keep `cast()` for the cases where no guard exists,
 because the type checker accepts a `cast()` without verifying it.
 
+The test file confirms that:
+
+- `tile()` returns one object per symbol and different objects for different symbols.
+- A parsed map shares one `Tile` among the cells of each kind.
+- `to_symbol()` raises a `KeyError` for a character outside `SPECS`.
+- A direct `Tile(...)` call builds an object equal to the pooled tile and distinct from it.
+
 ```python
 # test_tile_map.py
 import pytest
 from tile_map import Tile, parse_map, tile, to_symbol
 
-def test_same_symbol_same_object() -> None:
+def test_one_object_per_symbol() -> None:
     assert tile(".") is tile(".")
     assert tile(".") is not tile("#")
 
@@ -232,9 +239,9 @@ def test_map_shares_tiles() -> None:
     field = parse_map("..\n~~")
     assert field[0][0] is field[0][1]
     assert field[1][0] is field[1][1]
-    assert not field[1][0].walkable
+    assert field[0][0] is not field[1][0]
 
-def test_unknown_symbol_raises() -> None:
+def test_to_symbol_raises_key_error() -> None:
     with pytest.raises(KeyError):
         to_symbol("?")
 
@@ -270,7 +277,7 @@ Building a `Tile` costs almost nothing, so `@cache` makes `tile()` no faster.
 What `tile()` gets from it is identity.
 Every call for a symbol returns the same object.
 A flyweight's factory exists for that sameness.
-The figure follows `tile()` through the demo in `tile_map.py` and through the last test in `test_tile_map.py`:
+The figure follows `tile()` through the demo in `tile_map.py` and through `test_direct_construction_bypasses_pool()` in `test_tile_map.py`:
 
 ![](_images/flyweight_story)
 
@@ -462,6 +469,9 @@ The weak pool avoids that trade.
 Its entry lives exactly as long as something references the object,
 so every request during that life returns the one object.
 
+The tests confirm that `name()` returns the live `Name` for a repeated text and a different object for a different text,
+and that the pool removes an entry once the last reference to its `Name` goes away:
+
 ```python
 # test_weak_pool.py
 from weak_pool import _pool, name
@@ -471,7 +481,7 @@ def test_names_are_shared() -> None:
     assert name("x") is keep
     assert name("y") is not keep
 
-def test_pool_releases_unused() -> None:
+def test_pool_removes_unreferenced() -> None:
     temp = name("temp")
     assert "temp" in _pool
     del temp

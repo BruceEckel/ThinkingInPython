@@ -959,13 +959,14 @@ print(shallow_spawn("hydra").parts)
 #: {'heads': 1}
 ```
 
-With `copy.copy()`, `test_clone_is_independent()` fails first.
+With `copy.copy()`, `test_spawn_is_independent()` fails first.
 `b.powers.append("curse")` appends to the one list both spawns share,
 so `a.powers` becomes `["bite", "curse"]` and the assertion that it
 equals `["bite"]` fails. `test_prototype_untouched()` fails too, but
-only on its second assertion. `spawned.powers.append("bellow")`
-mutates the shared list, so `PROTOTYPES["troll"].powers` grows a third
-entry. Its first assertion still holds, because `spawned.hp = 1`
+only on its second assertion, which finds that `spawned.powers` is the
+prototype's own list. `spawned.powers.append("bellow")` mutates that
+shared list, so `PROTOTYPES["troll"].powers` grows a third entry.
+Its first assertion still holds, because `spawned.hp = 1`
 rebinds an `int` field on the copy rather than mutating a shared
 object.
 

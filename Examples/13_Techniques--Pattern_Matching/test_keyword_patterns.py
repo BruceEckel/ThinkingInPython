@@ -8,6 +8,6 @@ from point import Point
     (Point(3, 0), "Somewhere on the x-axis"),
     (Point(3, 4), "Just some point"),
 ])
-def test_keyword_patterns(point: Point,
-                          expected: str) -> None:
+def test_describe_by_attribute(point: Point,
+                               expected: str) -> None:
     assert describe(point) == expected

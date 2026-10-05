@@ -2,7 +2,7 @@
 from stateless import handle, run
 from wallet import Cell, ledger, spree
 
-def test_spree_spends_from_its_own_cell() -> None:
+def test_spree_spends_from_the_tests_cell() -> None:
     cell = Cell(100)
     read, write = ledger(cell)
     half = handle(read)(spree)

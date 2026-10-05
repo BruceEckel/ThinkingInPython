@@ -14,6 +14,7 @@ def test_template_method_runs_steps_in_order() -> None:
         def customize2(self) -> None:
             calls.append("two")
 
-    Recorder().run()  # The client starts the engine
-    # Loop runs twice
+    app = Recorder()
+    assert calls == []
+    app.run()
     assert calls == ["one", "two", "one", "two"]

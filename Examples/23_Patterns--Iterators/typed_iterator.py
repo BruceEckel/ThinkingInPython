@@ -7,7 +7,7 @@ from typing import override
 class TypedIterator[T](Iterator[T]):
     imp: Iterator[object]
     expected: type[T]
-    accepted: int = 0  # State a generator can't expose
+    accepted: int = 0  # State a generator cannot expose
 
     @override
     def __next__(self) -> T:

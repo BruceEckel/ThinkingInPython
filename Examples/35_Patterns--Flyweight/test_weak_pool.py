@@ -6,7 +6,7 @@ def test_names_are_shared() -> None:
     assert name("x") is keep
     assert name("y") is not keep
 
-def test_pool_releases_unused() -> None:
+def test_pool_removes_unreferenced() -> None:
     temp = name("temp")
     assert "temp" in _pool
     del temp

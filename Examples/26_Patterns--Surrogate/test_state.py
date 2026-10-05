@@ -9,7 +9,7 @@ class StateB:
     def name(self) -> str:
         return "B"
 
-def test_state_delegates_and_change_swaps() -> None:
+def test_calls_reach_current_and_change_to_swaps() -> None:
     s = Surrogate(StateA())
     assert s.name() == "A"
     s.change_to(StateB())

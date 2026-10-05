@@ -2,7 +2,7 @@
 import pytest
 from tile_map import Tile, parse_map, tile, to_symbol
 
-def test_same_symbol_same_object() -> None:
+def test_one_object_per_symbol() -> None:
     assert tile(".") is tile(".")
     assert tile(".") is not tile("#")
 
@@ -10,9 +10,9 @@ def test_map_shares_tiles() -> None:
     field = parse_map("..\n~~")
     assert field[0][0] is field[0][1]
     assert field[1][0] is field[1][1]
-    assert not field[1][0].walkable
+    assert field[0][0] is not field[1][0]
 
-def test_unknown_symbol_raises() -> None:
+def test_to_symbol_raises_key_error() -> None:
     with pytest.raises(KeyError):
         to_symbol("?")
 

@@ -30,6 +30,6 @@ def test_overdraft_raises(funded: Account) -> None:
     with pytest.raises(InsufficientFunds):
         funded.withdraw(1000)
 
-def test_interest_uses_approx(funded: Account) -> None:
+def test_interest_adds_to_balance(funded: Account) -> None:
     funded.add_interest(0.05)
     assert funded.balance == pytest.approx(105.0)

@@ -32,8 +32,8 @@ def save(
     p.write_text("")
 '''
 
-def facts() -> dict[str, Facts]:
-    match read_module("m", SOURCE):
+def facts(source: str = SOURCE) -> dict[str, Facts]:
+    match read_module("m", source):
         case Ok(found):
             return {f.name: f for f in found}
         case Err(problem):
@@ -87,11 +87,8 @@ def test_a_binding_shadows_the_builtin(
     binding: str,
 ) -> None:
     body = indent(f"{binding}\nstr.upper()", "    ")
-    match read_module("m", f"def f(xs):\n{body}\n"):
-        case Ok(found):
-            assert found[0].calls[-1] == UNRESOLVED
-        case Err(problem):
-            raise AssertionError(problem)
+    calls = facts(f"def f(xs):\n{body}\n")["m.f"].calls
+    assert calls[-1] == UNRESOLVED
 
 def test_a_syntax_error_comes_back_as_a_value() -> None:
     result = read_module("bad", "def f(:\n")

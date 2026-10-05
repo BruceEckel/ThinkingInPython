@@ -339,7 +339,7 @@ def at(moment: datetime) -> Callable[[Now], datetime]:
         return moment
     return fixed
 
-def test_stamp_names_the_supplied_moment() -> None:
+def test_stamp_names_the_handlers_moment() -> None:
     stamped = run(handle(at(MOMENT))(stamp)("started"))
     assert stamped == "[2026-03-14 09:30] started"
 
@@ -347,7 +347,8 @@ def test_stamp_names_the_supplied_moment() -> None:
     (timedelta(hours=23, minutes=59), False),
     (timedelta(hours=24), True),
 ])
-def test_batch_due(elapsed: timedelta, due: bool) -> None:
+def test_batch_due_at_a_full_day(elapsed: timedelta,
+                                 due: bool) -> None:
     moment = MOMENT + elapsed
     is_due = run(handle(at(moment))(batch_due)(MOMENT))
     assert is_due is due
@@ -754,14 +755,14 @@ After the run, the cell holds what the program left.
 Two purchases went through, and 10 remained.
 
 A test calls `ledger()` too, on a `Cell` of its own,
-and asserts on what that cell holds afterward:
+and asserts on the count `spree()` returns and on what that cell holds afterward:
 
 ```python
 # test_wallet.py
 from stateless import handle, run
 from wallet import Cell, ledger, spree
 
-def test_spree_spends_from_its_own_cell() -> None:
+def test_spree_spends_from_the_tests_cell() -> None:
     cell = Cell(100)
     read, write = ledger(cell)
     half = handle(read)(spree)

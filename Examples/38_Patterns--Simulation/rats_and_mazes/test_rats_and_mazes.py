@@ -26,7 +26,7 @@ def flood(maze: Maze, start: Coord) -> set[Coord]:
                   (x, y + 1), (x, y - 1)]
     return seen
 
-def test_rats_map_every_reachable_cell() -> None:
+def test_rats_cover_every_reachable_cell() -> None:
     maze = Maze.from_text(LAYOUT)
     blackboard = Blackboard(maze)
     asyncio.run(blackboard.explore())

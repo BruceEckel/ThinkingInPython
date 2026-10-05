@@ -15,7 +15,7 @@ def test_apply_edits_the_present() -> None:
     assert history.present == "ab"
     assert history.undo() == "a"
 
-def test_new_action_clears_redo() -> None:
+def test_edit_after_undo_discards_redo() -> None:
     history = History("a")
     history.do("ab")
     history.undo()
@@ -23,7 +23,7 @@ def test_new_action_clears_redo() -> None:
     assert not history.can_redo()
     assert history.present == "ax"
 
-def test_bounds_are_reported() -> None:
+def test_can_undo_and_can_redo() -> None:
     history = History(0)
     assert not history.can_undo()
     history.do(1)

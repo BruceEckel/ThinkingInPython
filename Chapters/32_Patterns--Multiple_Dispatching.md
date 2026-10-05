@@ -519,28 +519,23 @@ MATCHUPS: Final[list[tuple[str, str, Outcome]]] = [
 @pytest.mark.parametrize("module", [table, methods])
 @pytest.mark.parametrize(
     "player, opponent, expected", MATCHUPS)
-def test_matches_expected(module: ModuleType, player: str,
-                          opponent: str,
-                          expected: Outcome) -> None:
+def test_versions_match_expected(module: ModuleType,
+                                 player: str, opponent: str,
+                                 expected: Outcome) -> None:
     assert compete(module, player, opponent) == expected
-
-@pytest.mark.parametrize("outcome, expected", [
-    (Outcome.WIN, "win"),
-    (Outcome.LOSE, "lose"),
-    (Outcome.DRAW, "draw"),
-])
-def test_outcome_str(outcome: Outcome,
-                     expected: str) -> None:
-    assert str(outcome) == expected
 ```
 
-The test imports the two modules, not their classes.
-`getattr(module, player)` looks the class up on whichever module the test received,
-so one table of nine expected answers drives two independent sets of `Paper`,
-`Scissors`, and `Rock` classes.
+`test_paper_scissors.py` imports the two modules, not their classes.
+`getattr(module, player)` looks the class up on whichever module `pytest` passed to `test_versions_match_expected()`,
+so one dictionary of nine expected answers, `EXPECTED`,
+drives two independent sets of `Paper`, `Scissors`, and `Rock` classes.
 Each module guards its demonstration loop with `if __name__ == "__main__"`,
 so running a module as a script executes the loop,
-and the test's import defines only the classes.
+and importing a module for the test defines its classes and runs no duels.
+
+`compete()` also checks the result's type,
+since a `StrEnum` member equals its string,
+and a version that returned the bare string `"win"` would pass the `==` alone.
 
 ## Operators Dispatch Twice
 

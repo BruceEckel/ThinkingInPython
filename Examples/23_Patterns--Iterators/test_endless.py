@@ -16,7 +16,8 @@ def counter(limit: int) -> Iterator[int]:
                 f"pulled {limit} values and kept asking")
         yield n
 
-def test_list_of_an_endless_source_never_returns() -> None:
+def test_list_keeps_pulling_from_an_infinite_source(
+) -> None:
     with pytest.raises(Tripwire):
         list(counter(LIMIT))
 

@@ -259,7 +259,8 @@ from plugged import Plugged
 
 def test_defensive_copy_prevents_the_leak() -> None:
     plugged = Plugged([1, 2])
-    plugged.numbers.append(999)  # Mutates only a copy
+    assert plugged.numbers is not plugged._numbers
+    plugged.numbers.append(999)
     assert plugged.numbers == [1, 2]
 ```
 
@@ -291,7 +292,7 @@ if __name__ == "__main__":
 #: Immutable(numbers=(1, 2), bob=Bob(name='Bob'))
 ```
 
-The frozen object refuses mutation:
+Assigning to a field of the frozen `Bob` raises a `FrozenInstanceError`:
 
 ```python
 # test_immutable.py
@@ -299,10 +300,9 @@ import dataclasses
 import pytest
 from immutable import Bob, Immutable
 
-def test_frozen_cannot_be_mutated() -> None:
+def test_frozen_field_refuses_assignment() -> None:
     immutable = Immutable((1, 2), Bob())
     with pytest.raises(dataclasses.FrozenInstanceError):
-        # Frozen, so the assignment fails:
         setattr(immutable.bob, "name", "Ralph")
 ```
 
@@ -945,7 +945,8 @@ The same distinction separates `Priced` from `Weighted` in `protocol_collision.p
 
 `NewType` is only an aid during type checking.
 It builds no wrapper object.
-At runtime `UserId` is the identity function, so `UserId(42)` is `42`:
+At runtime, calling `UserId` returns its argument unchanged,
+so `UserId(42)` equals `42` and is an `int`:
 
 ```python
 # test_newtype_boundary.py

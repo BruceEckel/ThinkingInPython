@@ -14,6 +14,4 @@ def test_first_write(
 def test_second_sees_leftover(
     shared_cache: dict[str, int]
 ) -> None:
-    # The dict test_first_write() left behind,
-    # not a fresh one.
     assert shared_cache == {"seen": 1}

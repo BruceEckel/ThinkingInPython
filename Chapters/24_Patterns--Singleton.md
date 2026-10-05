@@ -615,10 +615,12 @@ A subclass that needs storage of its own declares it:
 The lookup through `self` finds the subclass's dict first,
 and Martelli wrote `self._shared_state` instead of `Borg._shared_state` to allow that override.
 
-The first test below confirms that the objects differ but share one set of state.
+`test_borg_shares_state_but_not_identity` confirms that the objects differ but share one set of state.
 *Borg* has no `cache_clear()`,
 so whatever one test leaves in `_shared_state` is still there for the next.
-A pytest fixture closes that gap by clearing the dict before each test:
+A pytest fixture closes that gap by clearing the dict before each test.
+`test_leaves_an_attribute_behind` writes an attribute into the shared dict,
+and `test_fixture_clears_shared_state` confirms that the next test finds it gone:
 
 ```python
 # test_singleton_borg.py
@@ -633,13 +635,13 @@ def test_borg_shares_state_but_not_identity() -> None:
     x = Singleton("first")
     y = Singleton("second")
     assert x is not y  # Distinct objects
-    assert x.val == y.val  # But sharing one set of state
+    assert x.__dict__ is y.__dict__
     assert x.val == "second"
 
-def test_pollutes_shared_state() -> None:
+def test_leaves_an_attribute_behind() -> None:
     setattr(Singleton("first"), "extra", "leftover")
 
-def test_fixture_cleared_it() -> None:
+def test_fixture_clears_shared_state() -> None:
     y = Singleton("second")
     assert not hasattr(y, "extra")  # Reset ran
 ```
@@ -722,12 +724,12 @@ A caller who believes those arguments took effect holds an object configured by 
 import pytest
 from singleton_class import Registry
 
-def test_isinstance_rejects_the_decorated_name() -> None:
+def test_isinstance_on_the_decorated_name_raises() -> None:
     with pytest.raises(TypeError,
                        match="arg 2 must be a type"):
         isinstance(Registry("primary"), Registry)  # type: ignore
 
-def test_subclassing_the_decorated_name_fails() -> None:
+def test_subclassing_the_decorated_name_raises() -> None:
     with pytest.raises(TypeError,
                        match="takes 2 positional"):
         class Sub(Registry):  # type: ignore

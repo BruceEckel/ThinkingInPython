@@ -580,13 +580,14 @@ so a subclass can configure its own registration.
 so a base further up can take the keywords it declared,
 and an unrecognized keyword becomes an error rather than a silent no-op.
 
-Testing shows that each registry holds only its current leaf classes:
+Testing shows that each registry holds only its current leaf classes,
+and that the two registries share no class:
 
 ```python
 # test_init_subclass.py
 import init_subclass
 
-def test_leaf_registry_tracks_only_leaves() -> None:
+def test_color_registry_holds_only_leaves() -> None:
     leaves = {c.__name__
               for c in init_subclass.Color.registry}
     assert leaves == {"Red", "Green", "PhthaloBlue",
@@ -596,7 +597,7 @@ def test_independent_hierarchies_have_separate_registries(
 ) -> None:
     shapes = {c.__name__
               for c in init_subclass.Shape.registry}
-    # Round is no longer a leaf
+    assert "Round" not in shapes
     assert shapes == {"Square", "Circle"}
     # Neither registry leaks into the other
     assert init_subclass.Shape.registry.isdisjoint(
@@ -1038,15 +1039,20 @@ and returns itself when you read it through the class:
 import set_name
 
 def test_descriptor_learns_its_name() -> None:
+    field = vars(set_name.Point)["x"]
+    assert field.name == "x"
+    assert field.storage == "_x"
+
+def test_values_stored_under_storage_keys() -> None:
     p = set_name.Point()
     p.x = 3
     p.y = 4
     assert (p.x, p.y) == (3, 4)
-    # Stored under the names
     assert p.__dict__ == {"_x": 3, "_y": 4}
 
 def test_descriptor_on_class_returns_itself() -> None:
     assert isinstance(set_name.Point.x, set_name.Field)
+    assert set_name.Point.x is vars(set_name.Point)["x"]
 ```
 
 ### A Descriptor That Validates

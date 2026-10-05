@@ -17,7 +17,7 @@ def test_rows_propagate_up_the_call_chain() -> None:
     )
     assert rows["m.a"] == {"Console"}
 
-def test_mutual_recursion_reaches_a_fixed_point() -> None:
+def test_circular_calls_reach_a_fixed_point() -> None:
     calls = ("m.even", "time.time")
     rows = infer(
         known(

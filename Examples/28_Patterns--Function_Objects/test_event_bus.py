@@ -11,22 +11,21 @@ def test_every_handler_for_the_type_is_called() -> None:
     bus.publish(Deposit(5))
     assert seen == ["a5", "b5"]
 
-def test_only_the_matching_type_is_called() -> None:
-    calls: list[str] = []
+def test_handler_receives_only_its_event_type() -> None:
+    seen: list[str] = []
     bus = EventBus()
     bus.subscribe(Deposit,
-                  lambda e: calls.append("deposit"))
+                  lambda e: seen.append("deposit"))
     bus.subscribe(Withdraw,
-                  lambda e: calls.append("withdraw"))
+                  lambda e: seen.append("withdraw"))
     bus.publish(Withdraw(1))
-    assert calls == ["withdraw"]
+    assert seen == ["withdraw"]
 
-def test_no_handler_is_a_noop() -> None:
+def test_unhandled_event_raises_no_exception() -> None:
     bus = EventBus()
-    bus.publish(Closed("done"))  # Must not raise
+    bus.publish(Closed("done"))
 
-def test_get_leaves_no_stray_handler_list() -> None:
-    # publish() reads with .get(): no stray entry appears
+def test_unhandled_event_leaves_no_stray_entry() -> None:
     bus = EventBus()
     bus.publish(Closed("done"))
     assert Closed not in bus._handlers

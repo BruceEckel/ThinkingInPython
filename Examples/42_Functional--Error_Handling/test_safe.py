@@ -2,10 +2,10 @@
 from result import Err, Ok
 from safe_demo import parse
 
-def test_safe_wraps_a_success() -> None:
+def test_good_input_becomes_an_ok() -> None:
     assert parse("42") == Ok(42)
 
-def test_safe_captures_the_exception() -> None:
+def test_exception_becomes_an_err() -> None:
     match parse("oops"):
         case Err(error):
             assert isinstance(error, ValueError)

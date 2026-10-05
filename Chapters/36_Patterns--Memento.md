@@ -211,7 +211,9 @@ The record makes the attribute that holds it read-only too.
 
 ### Testing the Sketch
 
-Three tests check the copying:
+Three tests check the copying: `restore()` brings back the saved strokes,
+a memento keeps its strokes when the sketch draws more,
+and drawing after a restore leaves the memento as it was:
 
 ```python
 # test_sketch.py
@@ -240,7 +242,7 @@ def test_drawing_after_restore_spares_memento() -> None:
     assert checkpoint.strokes == ()
 ```
 
-The third test checks for the sharing bug.
+`test_drawing_after_restore_spares_memento` checks for the sharing bug.
 If the memento shares a mutable list with the sketch (see exercise 4),
 drawing after a restore appends to the snapshot's list too.
 Both `save()` and `restore()` must copy.
@@ -371,19 +373,19 @@ So does a state whose class belongs to someone else: a widget tree,
 a database row, or any object whose class is theirs to design.
 Everywhere else, prefer the frozen value.
 
-Two tests check that `draw()` leaves the old `Drawing` as it was and that `replace()` carries the fields it does not name:
+Two tests check that `draw()` leaves the old `Drawing` as it was and that `draw()` keeps the title:
 
 ```python
 # test_frozen_sketch.py
 from frozen_sketch import Drawing
 
-def test_draw_returns_new_drawing() -> None:
+def test_draw_leaves_old_drawing() -> None:
     before = Drawing("Duck").draw("circle")
     after = before.draw("beak")
     assert before.strokes == ("circle",)
     assert after.strokes == ("circle", "beak")
 
-def test_replace_carries_other_fields() -> None:
+def test_draw_keeps_title() -> None:
     assert Drawing("Duck").draw("x").title == "Duck"
 ```
 
@@ -509,6 +511,14 @@ print(sketch)
 #: circle
 ```
 
+The test file confirms that:
+
+- `undo()` and `redo()` step back and forward through the recorded states.
+- `apply()` makes the edit's result the present and records it,
+  so `undo()` returns the state before the edit.
+- An edit after an undo discards the undone states, so `can_redo()` is false.
+- `can_undo()` and `can_redo()` report when the past or the future is empty.
+
 ```python
 # test_history.py
 from history import History
@@ -527,7 +537,7 @@ def test_apply_edits_the_present() -> None:
     assert history.present == "ab"
     assert history.undo() == "a"
 
-def test_new_action_clears_redo() -> None:
+def test_edit_after_undo_discards_redo() -> None:
     history = History("a")
     history.do("ab")
     history.undo()
@@ -535,7 +545,7 @@ def test_new_action_clears_redo() -> None:
     assert not history.can_redo()
     assert history.present == "ax"
 
-def test_bounds_are_reported() -> None:
+def test_can_undo_and_can_redo() -> None:
     history = History(0)
     assert not history.can_undo()
     history.do(1)

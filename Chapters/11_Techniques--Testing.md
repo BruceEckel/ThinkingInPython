@@ -67,7 +67,7 @@ def test_hello_is_not_a_palindrome() -> None:
 At this point `palindrome.py` does not exist,
 so running this file fails before a single assertion runs.
 `pytest` cannot import a module that is not there.
-That failure confirms the test catches a missing implementation as well as a wrong one.
+That failure confirms the test catches a missing implementation.
 
 ```python
 # palindrome.py
@@ -131,7 +131,15 @@ class Account:
         self.balance += self.balance * rate
 ```
 
-By convention, tests live in a file whose name starts with `test_`:
+By convention, tests live in a file whose name starts with `test_`.
+The test file confirms that:
+
+- A new account starts empty.
+- A deposit increases the balance.
+- A deposit of zero or less raises a `ValueError`.
+- A withdrawal reduces the balance.
+- An overdraft raises `InsufficientFunds`.
+- Interest adds to the balance.
 
 ```python
 # test_account.py
@@ -166,7 +174,7 @@ def test_overdraft_raises(funded: Account) -> None:
     with pytest.raises(InsufficientFunds):
         funded.withdraw(1000)
 
-def test_interest_uses_approx(funded: Account) -> None:
+def test_interest_adds_to_balance(funded: Account) -> None:
     funded.add_interest(0.05)
     assert funded.balance == pytest.approx(105.0)
 ```
@@ -230,7 +238,7 @@ so the test can confirm which failure occurred and not just its type:
 import pytest
 from account import Account, InsufficientFunds
 
-def test_overdraft_reports_the_shortfall() -> None:
+def test_overdraft_names_amount_keeps_balance() -> None:
     account = Account(100)
     with pytest.raises(InsufficientFunds,
                        match="less than 250"):
@@ -248,7 +256,7 @@ and `pytest.raises()` then absorbs it.
 ## Comparing Floating-Point Values
 
 Testing floating-point results for exact equality is unreliable.
-`test_interest_uses_approx()` compares with `pytest.approx()`,
+`test_interest_adds_to_balance()` compares with `pytest.approx()`,
 which allows a small tolerance: a relative difference of 1e-6,
 unless you pass `rel=` or `abs=`.
 Code outside a test has no `approx()`.
@@ -276,7 +284,7 @@ def test_interest_compounds() -> None:
 Applying 5% five times produces `127.62815624999999`,
 so the same assertion written with `==` against `127.62815625` fails.
 Use `approx()` by default rather than adding it after a comparison fails.
-`test_interest_uses_approx()` does not need it,
+`test_interest_adds_to_balance()` does not need it,
 and you cannot tell by looking which tests do.
 
 ## Parametrizing Tests
@@ -309,8 +317,6 @@ def test_withdraw_leaves_expected_balance(
     assert account.balance == expected
 ```
 
-Each tuple supplies all three arguments for one run,
-so `pytest` builds three independent tests.
 The names in the string line up, in order, with the values in each tuple.
 
 `parametrize` is a *mark*, and three others turn up in any existing suite.
@@ -425,8 +431,6 @@ def test_first_write(
 def test_second_sees_leftover(
     shared_cache: dict[str, int]
 ) -> None:
-    # The dict test_first_write() left behind,
-    # not a fresh one.
     assert shared_cache == {"seen": 1}
 ```
 
@@ -553,7 +557,9 @@ def load(name: str) -> str:
 ```
 
 The tests point `APP_DATA` at a throwaway directory,
-so they leave real data untouched and cannot collide with each other:
+so they leave real data untouched and cannot collide with each other.
+`test_round_trip()` loads back what it saved,
+and `test_missing_file_raises()` confirms that loading an absent file raises a `FileNotFoundError`:
 
 ```python
 # test_storage.py
@@ -688,7 +694,7 @@ def elapsed(start: float,
     return now() - start
 ```
 
-The test hands it a fixed value:
+The test hands it a function that returns a fixed time:
 
 ```python
 # test_clock_injected.py
@@ -739,12 +745,11 @@ import time_machine
 @time_machine.travel("2030-06-15", tick=False)
 def test_current_year_is_frozen() -> None:
     assert event.current_year() == 2030
-    # tick=False: successive readings are identical
     assert datetime.now() == datetime.now()
 ```
 
 `travel` sets the clock to the given moment for the test,
-and `tick=False` holds it there so every reading is identical,
+and `tick=False` holds it there so every reading is equal,
 as the test's second assertion shows.
 `time.monotonic()` and `time.perf_counter()` keep running,
 because they measure elapsed intervals rather than dates.

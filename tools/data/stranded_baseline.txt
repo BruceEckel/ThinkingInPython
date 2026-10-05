@@ -36,7 +36,7 @@ Chapters/20_Patterns--Rethinking_Objects.md	and show that the counts are now cor
 Chapters/22_Patterns--Data_Transfer_Objects.md	passes a package of information around
 Chapters/23_Patterns--Iterators.md	so the type checker carries the element type through
 Chapters/24_Patterns--Singleton.md	People can create as many objects as they like
-Chapters/28_Patterns--Function_Objects.md	and publishing an unhandled event leaves no stray entry behind
+Chapters/28_Patterns--Function_Objects.md	Publishing an unhandled event leaves no stray entry behind
 Chapters/28_Patterns--Function_Objects.md	each handler holding a reference to the next and deciding whether to pass the request along
 Chapters/28_Patterns--Function_Objects.md	otherwise leaves a stray entry behind
 Chapters/29_Patterns--Changing_the_Interface.md	Pyright and mypy need their deprecation rule switched on

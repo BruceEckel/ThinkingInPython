@@ -1,7 +1,7 @@
 # test_mapping_patterns.py
 from mapping_patterns import handle
 
-def test_mapping_patterns() -> None:
+def test_handle_matches_keys() -> None:
     assert handle(
         {"type": "key", "key": "Esc"}) == "Key Esc"
     assert handle(

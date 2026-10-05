@@ -38,6 +38,8 @@ def callee(call: str, types: dict[str, str]) -> str:
         ("f()()", UNRESOLVED),
     ],
 )
-def test_callee(call: str, expected: str) -> None:
+def test_a_call_resolves_to_a_dotted_name(
+    call: str, expected: str
+) -> None:
     types = {"p": "pathlib.Path", "action": UNRESOLVED}
     assert callee(call, types) == expected

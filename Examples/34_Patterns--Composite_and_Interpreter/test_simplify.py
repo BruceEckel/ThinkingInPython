@@ -1,7 +1,7 @@
 # test_simplify.py
 from typing import Final
 import pytest
-from expr import Add, Expr, Mul, Num, Var
+from expr import Expr, Mul, Num, Var
 from simplify import simplify
 
 X: Final[Var] = Var("x")
@@ -12,27 +12,25 @@ X: Final[Var] = Var("x")
     (1 * X, X),
     (X * 1, X),
 ])
-def test_identity_elements_vanish(
+def test_identity_returns_other_operand(
     expr: Expr, expected: Expr,
 ) -> None:
     assert simplify(expr) == expected
 
-def test_zero_absorbs_multiplication() -> None:
-    assert simplify(Var("x") * 0) == Num(0)
-    assert simplify(0 * Var("x")) == Num(0)
+def test_multiplying_by_zero_gives_zero() -> None:
+    assert simplify(X * 0) == Num(0)
+    assert simplify(0 * X) == Num(0)
 
 def test_constant_folding() -> None:
     assert simplify(Num(2) + 3) == Num(5)
     assert simplify(Num(2) * 3 + 4) == Num(10)
 
-def test_rewriting_reaches_every_level() -> None:
-    x = Var("x")
-    assert simplify((x + 0) * (1 * x)) == Mul(x, x)
+def test_rules_compose() -> None:
+    assert simplify((X + 0) * (1 * X)) == Mul(X, X)
 
 def test_already_simple_is_unchanged() -> None:
-    x = Var("x")
-    assert simplify(2 * x + 1) == Add(Mul(Num(2), x),
-                                      Num(1))
+    expr = 2 * X + 1
+    assert simplify(expr) is expr
 
 def test_unchanged_subtrees_are_shared() -> None:
     keep = Var("w") * Var("h")

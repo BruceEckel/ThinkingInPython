@@ -13,5 +13,5 @@ def test_create_builds_by_name() -> None:
 
 def test_sum_value_totals_weight_times_value() -> None:
     items: list[Trash] = [Aluminum(2.0), Paper(5.0)]
-    # 2*1.67 + 5*0.10
-    assert sum_value(items) == pytest.approx(3.84)
+    expected = 2 * Aluminum.value + 5 * Paper.value
+    assert sum_value(items) == pytest.approx(expected)

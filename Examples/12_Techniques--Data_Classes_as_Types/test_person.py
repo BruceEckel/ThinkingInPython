@@ -10,7 +10,7 @@ def test_person_composes_validated_parts() -> None:
     assert person.email.text == "grace@example.com"
 
 @pytest.mark.parametrize("bad", ["Grace", "", "   "])
-def test_full_name_needs_two_parts(bad: str) -> None:
+def test_full_name_needs_first_and_last(bad: str) -> None:
     with pytest.raises(TypeFailure):
         FullName(bad)
 

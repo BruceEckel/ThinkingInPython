@@ -699,7 +699,12 @@ A parameter [annotated](08_Foundations--Static_Types.md#how-much-to-annotate)
 `Stars` states more than a type: the value passed the check.
 
 `test_stars.py` demonstrates that illegal values cannot exist.
-`pytest.raises()` confirms that the constructor rejects values outside the set:
+The test file confirms that:
+
+- `Stars(1)` and `Stars(10)`, the ends of the range, are legal.
+- The constructor rejects values outside the set.
+- `f1()` and `f2()` return legal `Stars`.
+- A result outside the set raises `TypeFailure` when `f2()` builds it.
 
 ```python
 # test_stars.py
@@ -720,12 +725,9 @@ def test_transformations_return_legal_values() -> None:
     assert f1(Stars(2)) == Stars(7)
     assert f2(Stars(2)) == Stars(10)
 
-def test_transformation_can_produce_illegal_value() -> None:
-    # f2 multiplies, so its result can be outside the
-    # legal set. Construction of the returned Stars
-    # catches it: no illegal Stars can ever exist.
-    with pytest.raises(TypeFailure):
-        f2(Stars(4))  # 4 * 5 = 20
+def test_illegal_result_is_rejected() -> None:
+    with pytest.raises(TypeFailure, match=r"Stars\(20\)"):
+        f2(Stars(4))
 ```
 
 ## Composing Types from Types
@@ -777,9 +779,9 @@ if __name__ == "__main__":
 `Person` declares no checks of its own.
 Its annotations require a `FullName` and an `EmailAddress`,
 which the type checker enforces, and neither can exist holding an illegal value.
-The first test builds a `Person` from legal parts and reads them back.
-The other two show you cannot build a `Person` from an illegal name or an illegal email,
-because those values cannot exist:
+`test_person_composes_validated_parts` builds a `Person` from legal parts and reads them back.
+`test_full_name_needs_first_and_last` and `test_email_needs_at_sign` show that an illegal name or email cannot exist,
+so no `Person` can hold one:
 
 ```python
 # test_person.py
@@ -794,7 +796,7 @@ def test_person_composes_validated_parts() -> None:
     assert person.email.text == "grace@example.com"
 
 @pytest.mark.parametrize("bad", ["Grace", "", "   "])
-def test_full_name_needs_two_parts(bad: str) -> None:
+def test_full_name_needs_first_and_last(bad: str) -> None:
     with pytest.raises(TypeFailure):
         FullName(bad)
 
@@ -905,8 +907,8 @@ The member's value is no longer the month number,
 so `Month(7)` raises a `ValueError`.
 `of()` is the replacement lookup.
 
-The tests cover a day past the end of its month,
-and a month number outside the twelve:
+The tests confirm that `Month.of(7)` finds `JULY` in a legal date,
+and that a day past the end of its month and a month number outside the twelve both raise `TypeFailure`:
 
 ```python
 # test_birth_date.py
@@ -914,22 +916,23 @@ import pytest
 from birth_date import BirthDate, Day, Month, Year
 from validation import TypeFailure
 
-def test_valid_date() -> None:
+def test_of_finds_the_month() -> None:
     bd = BirthDate(Month.of(7), Day(8), Year(1957))
     assert bd.month is Month.JULY
 
 @pytest.mark.parametrize("month_n, day_n", [
-    (2, 31),  # February has 28 days
-    (4, 31),  # April has 30
-    (9, 31),  # September has 30
+    (2, 31),
+    (4, 31),
+    (9, 31),
 ])
-def test_day_out_of_range_for_month(month_n: int,
-                                    day_n: int) -> None:
+def test_day_past_end_of_month(month_n: int,
+                               day_n: int) -> None:
+    assert Month.of(month_n).max_days < day_n
     with pytest.raises(TypeFailure):
         BirthDate(Month.of(month_n), Day(day_n), Year(2020))
 
 @pytest.mark.parametrize("bad", [0, 13, -1])
-def test_bad_month_number(bad: int) -> None:
+def test_month_number_outside_twelve(bad: int) -> None:
     with pytest.raises(TypeFailure):
         Month.of(bad)
 ```
@@ -1096,8 +1099,7 @@ def test_the_factory_rejects_illegal_values() -> None:
     with pytest.raises(TypeFailure):
         make_stars(11)
 
-def test_the_type_accepts_them_anyway() -> None:
-    # Calling the type skips the check
+def test_calling_the_type_skips_the_check() -> None:
     assert Stars(11).number == 11
 
 def test_the_check_cannot_move_inside() -> None:
@@ -1111,13 +1113,13 @@ def test_the_check_cannot_move_inside() -> None:
                 return tuple.__new__(cls, (number,))
 ```
 
-The first two tests are `test_stars.py` inverted.
+`test_the_factory_rejects_illegal_values` and `test_calling_the_type_skips_the_check` are `test_stars.py` inverted.
 There, no illegal `Stars` can exist.
 Here, `Stars(11)` builds one,
 because a factory function is advice rather than a gate,
 a limit every factory in [Factory](27_Patterns--Factory.md#hiding-the-concrete-classes)
 shares.
-The third test shows why the check cannot move inside the type.
+`test_the_check_cannot_move_inside` shows why the check cannot move inside the type.
 `NamedTuple` refuses `__new__()`, refuses `__init__()` the same way,
 and no class comes into existence.
 The error arrives while Python is still executing the `class` statement.

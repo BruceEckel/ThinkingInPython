@@ -675,7 +675,6 @@ def test_proxy_counts_only_calls() -> None:
         answer = 42
 
     p = CountingProxy(HasValue())
-    # Non-callable attribute passes through
     assert p.answer == 42
     p2 = CountingProxy(Doubler())
     p2.double(1)
@@ -780,7 +779,9 @@ Annotating `run(b: Behavior)` and passing it `b` is a type error,
 because `Surrogate` defines no `f()` of its own.
 The checker [cannot verify a method that `__getattr__()` supplies](#forwarding-with-getattr).
 
-The test passes the *State* surrogate a small stand-in and confirms that calls reach the current implementation and that `change_to()` swaps it:
+The test passes the *State* surrogate two small stand-ins,
+`StateA` and `StateB`,
+and confirms that calls reach the current implementation and that `change_to()` swaps it:
 
 ```python
 # test_state.py
@@ -794,7 +795,7 @@ class StateB:
     def name(self) -> str:
         return "B"
 
-def test_state_delegates_and_change_swaps() -> None:
+def test_calls_reach_current_and_change_to_swaps() -> None:
     s = Surrogate(StateA())
     assert s.name() == "A"
     s.change_to(StateB())
@@ -809,7 +810,9 @@ The `Any` on the parameters of `__init__()` and `change_to()` is a choice.
 and the checker would then verify every implementation that reaches either method.
 That annotation also ties the surrogate to one Protocol,
 and the generic surrogate exists to avoid that tie.
-`test_state.py` passes the same `Surrogate` a two-state stand-in that has a `name()` and none of `Behavior`'s three methods.
+`test_state.py` passes the same `Surrogate` two stand-ins,
+`StateA` and `StateB`,
+each with a `name()` and none of `Behavior`'s three methods.
 With `Behavior` on those parameters, `ty` rejects that test:
 `type StateA is not assignable to protocol Behavior`.
 Declaring the implementations as `first: Behavior` and `second: Behavior`,

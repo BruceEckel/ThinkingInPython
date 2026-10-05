@@ -439,8 +439,9 @@ set out to remove.
 ### Testing the Registry
 
 Testing confirms that every subclass registers itself,
+that `make()` builds the class registered under each name,
 and that a new subclass needs no change to `make()`.
-Defining a fresh subclass of `Shape` inside the test is enough to put it in the registry:
+Defining a fresh subclass of `Shape` inside `test_new_subclass_registers_itself()` is enough to put it in the registry:
 
 ```python
 # test_registry.py
@@ -448,7 +449,7 @@ from typing import override
 import pytest
 from registry import Circle, Shape, Square, make
 
-def test_subclasses_auto_register() -> None:
+def test_subclasses_register_themselves() -> None:
     assert Shape.registry["Circle"] is Circle
     assert Shape.registry["Square"] is Square
 
@@ -464,15 +465,13 @@ def test_new_subclass_registers_itself() -> None:
     assert Shape.registry["Triangle"] is Triangle
     assert isinstance(make("Triangle"), Triangle)
 
-def test_unknown_name_raises() -> None:
+def test_unknown_name_raises_key_error() -> None:
     with pytest.raises(KeyError):
         make("Hexagon")
 ```
 
-The last test asks for `"Hexagon"` rather than the `"Triangle"` that `registry_demo.py` used,
-because the `Triangle` defined in the previous test is still in the registry.
-A `make("Triangle")` here succeeds,
-because the registry keeps every entry it has taken.
+`test_unknown_name_raises_key_error()` asks for `"Hexagon"` rather than the `"Triangle"` that `registry_demo.py` used,
+because the `Triangle` that `test_new_subclass_registers_itself()` defined is still in the registry.
 
 ### Explicit Registration with a Protocol
 
@@ -580,7 +579,9 @@ Choose the failure you prefer:
 the ABC catches the incomplete class at construction,
 the Protocol at check time.
 
-A factory that is an object also gives each test its own table:
+A factory that is an object also gives each test its own table.
+The test file confirms that `register()` stores the class and returns it,
+that the factory builds a registered class, and that a new factory starts empty:
 
 ```python
 # test_protocol_registry.py
@@ -590,7 +591,7 @@ from shape_registry import ShapeFactory
 class Triangle:
     def draw(self) -> None: ...
 
-def test_register_returns_the_class() -> None:
+def test_register_stores_and_returns_the_class() -> None:
     make = ShapeFactory()
     assert make.register(Triangle) is Triangle
     assert make.registry == {"Triangle": Triangle}
@@ -606,11 +607,11 @@ def test_each_factory_starts_empty() -> None:
         make("Triangle")
 ```
 
-The last test passes although the test before it registered `Triangle`,
+`test_each_factory_starts_empty()` passes although `test_make_builds_a_registered_class()` registered `Triangle`,
 because each test registers with a `ShapeFactory` of its own.
 `test_registry.py` cannot do that.
 `Shape.registry` is one table for the whole process,
-so the last test in `test_registry.py` asks for `"Hexagon"`.
+so `test_unknown_name_raises_key_error()` in `test_registry.py` asks for `"Hexagon"`.
 
 The ordinary Python factory is a dictionary of classes,
 whether you fill it by hand, the classes fill it themselves,
@@ -1107,7 +1108,7 @@ Each spawn must be independent, and the stored prototype must stay unchanged:
 # test_prototype.py
 from prototype_registry import PROTOTYPES, spawn
 
-def test_clone_is_independent() -> None:
+def test_spawn_is_independent() -> None:
     a = spawn("goblin")
     b = spawn("goblin")
     b.powers.append("curse")
@@ -1119,7 +1120,7 @@ def test_prototype_untouched() -> None:
     spawned.hp = 1
     spawned.powers.append("bellow")
     assert PROTOTYPES["troll"].hp == 40
-    # deepcopy: the list is not shared either
+    assert spawned.powers is not PROTOTYPES["troll"].powers
     assert PROTOTYPES["troll"].powers == ["smash", "regen"]
 ```
 
@@ -1232,7 +1233,8 @@ copying the configured state and changing the chosen fields in the copy.
 and works on any object that defines `__replace__()`.
 
 Testing confirms that the two forms produce the same pizza,
-and the single-use hazard:
+that `replace()` changes one field of a copy and keeps the rest,
+and that a builder is single-use:
 
 ```python
 # test_pizza.py

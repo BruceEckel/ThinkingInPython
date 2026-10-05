@@ -2,7 +2,7 @@
 from pathlib import Path
 from parse_trash import parse
 
-def test_parse_reads_and_skips_comments(
+def test_parse_skips_comments_and_blank_lines(
     tmp_path: Path,
 ) -> None:
     data = tmp_path / "trash.dat"

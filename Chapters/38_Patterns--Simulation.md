@@ -457,7 +457,7 @@ def flood(maze: Maze, start: Coord) -> set[Coord]:
                   (x, y + 1), (x, y - 1)]
     return seen
 
-def test_rats_map_every_reachable_cell() -> None:
+def test_rats_cover_every_reachable_cell() -> None:
     maze = Maze.from_text(LAYOUT)
     blackboard = Blackboard(maze)
     asyncio.run(blackboard.explore())
@@ -1049,10 +1049,12 @@ because every route to the `!` passes through a teleport.
 ### Testing the Walk
 
 A test can check the model without opening a window.
-The first test builds the maze, searches it, walks the result,
-and checks that the robot finished on the `!` square.
-The second walks a three-cell maze,
-then reads the string `show_maze()` renders to confirm the robot ate the food:
+`test_search_walks_the_robot_to_the_end()` builds the maze, searches it,
+walks the result, and checks that the robot finished on the `!` square.
+`test_walls_block_and_food_is_eaten()` walks a three-cell maze east twice.
+The first move eats the food, and the second leaves the robot where it was,
+because a wall blocks it.
+A last step back west shows the food cell empty:
 
 ```python
 # robot_explorer/test_robot.py
@@ -1063,21 +1065,21 @@ from solver import solve
 def test_search_walks_the_robot_to_the_end() -> None:
     game = GameBuilder(string_maze)
     game.run(solve(game))
-    room = game.robot.room
     # Finished on the "!"
-    assert isinstance(room.occupant, EndGame)
+    assert isinstance(game.robot.room.occupant, EndGame)
     assert game.robot.finished  # And the model recorded it
 
 def test_walls_block_and_food_is_eaten() -> None:
-    # Robot, food, wall in one row
     game = GameBuilder("R.#")
+    assert game.show_maze() == "R.#"
     start = game.robot.room
     game.run("e")  # East: eat the food and move in
-    assert "." not in game.show_maze()  # Food gone
     assert game.robot.room is not start
     blocked = game.robot.room
     game.run("e")  # East again: a wall, so stay put
     assert game.robot.room is blocked
+    game.run("w")  # Back west: the food cell is empty
+    assert game.show_maze() == "R_#"
 ```
 
 ### Watching the Robot
@@ -1356,7 +1358,7 @@ def test_noise_settles_grains_onto_quiet_lines() -> None:
         plate.step()
     assert plate.agitation() < before / 10
 
-def test_kicks_never_knock_grains_off_the_plate() -> None:
+def test_kicks_keep_grains_on_the_plate() -> None:
     plate = Plate(grains=200, mode=(3, 5), seed=2)
     for _ in range(300):
         plate.step(kick=0.2)

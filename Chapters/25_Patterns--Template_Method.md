@@ -63,6 +63,7 @@ The client supplies `customize1()` and `customize2()` in the derived class.
 `run()` starts the engine that drives the application.
 
 A test supplies steps that record their calls,
+confirms that constructing the subclass calls none of them,
 then checks the order in which `run()` makes them:
 
 ```python
@@ -82,8 +83,9 @@ def test_template_method_runs_steps_in_order() -> None:
         def customize2(self) -> None:
             calls.append("two")
 
-    Recorder().run()  # The client starts the engine
-    # Loop runs twice
+    app = Recorder()
+    assert calls == []
+    app.run()
     assert calls == ["one", "two", "one", "two"]
 ```
 

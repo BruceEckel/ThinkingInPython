@@ -2,7 +2,7 @@
 import pytest
 from object_pool import Connection, Pool
 
-def test_lease_removes_then_returns() -> None:
+def test_lease_takes_then_returns() -> None:
     pool = Pool(Connection(1), Connection(2))
     with pool.lease():
         assert pool.available() == 1
@@ -15,7 +15,7 @@ def test_returned_on_exception() -> None:
             raise RuntimeError("boom")
     assert pool.available() == 1
 
-def test_objects_reused_not_recreated() -> None:
+def test_lease_hands_out_same_object() -> None:
     pool = Pool(Connection(1))
     with pool.lease() as first:
         pass

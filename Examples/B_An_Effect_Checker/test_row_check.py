@@ -16,7 +16,7 @@ def test_an_undeclared_effect_is_a_finding() -> None:
         Finding("m.f", "undeclared Console")
     ]
 
-def test_a_declared_effect_is_not() -> None:
+def test_a_declared_effect_is_no_finding() -> None:
     source = (
         "def f() -> Annotated[None, performs(Console)]:\n"
         "    print('hi')\n"

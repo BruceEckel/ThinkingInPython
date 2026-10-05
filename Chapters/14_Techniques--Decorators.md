@@ -355,7 +355,7 @@ def test_repeat_rejects_times_below_one(times: int) -> None:
 
 `trace` takes no arguments, but `repeat` always does.
 A decorator can support both conventions at once, `@name` and `@name(...)`,
-letting a caller add arguments only when the defaults don't fit.
+letting a caller add arguments only when the defaults do not fit.
 `pytest.fixture` and `click.command` both work this way.
 
 The two forms differ in what Python passes first.
@@ -430,6 +430,8 @@ The `callable(func)` test assumes that only the decorated function can arrive in
 Where a decorator's own argument could be callable,
 checking `func is None` instead of `callable(func)` removes the ambiguity.
 
+The tests decorate one function each way and confirm that both forms keep the result and the name:
+
 ```python
 # test_optional_parens.py
 from optional_parens import label
@@ -483,7 +485,7 @@ Every layer looks like the original function,
 so the layers compose to any depth.
 
 The tests confirm that the name survives two layers of wrapping,
-and that the inner decorator still repeats the body once per outer call:
+and that one call through both layers still runs the body twice:
 
 ```python
 # test_stacking.py
@@ -574,6 +576,10 @@ so its `__init__()` calls `update_wrapper(self, func)`.
 
 Like the function form, the class is generic in `**P` and `R`,
 so `__call__()` keeps the wrapped signature and `add(2, 3)` still type-checks as an `int`.
+
+The class form passes the function form's two tests,
+`test_trace_preserves_name` and `test_trace_returns_original_result`,
+with only the import changed:
 
 ```python
 # test_trace_class.py
@@ -713,6 +719,10 @@ so `result` has a value whether or not the loop runs,
 where `repeat.py` relies on the `times >= 1` check for that.
 With decorator arguments,
 the class form is typically easier to reason about than the [function form](#decorators-that-take-arguments).
+
+`test_repeat_class.py` repeats `test_repeat.py` with only the import changed:
+`test_repeat_call_count` parametrizes over `times`,
+and `test_repeat_rejects_times_below_one` covers the rejection in the constructor:
 
 ```python
 # test_repeat_class.py
@@ -902,6 +912,9 @@ Keying on `cls.__name__` also means two same-named classes from different module
 [Metaprogramming](17_Techniques--Metaprogramming.md#self-registration-of-subclasses)
 shows `__init_subclass__()`,
 which builds a registry like this without a decorator.
+
+The tests confirm that `register()` hands back the class it receives,
+and that `registry` maps each class name to its class:
 
 ```python
 # test_register.py
@@ -1122,7 +1135,7 @@ Both read as a `float`, so both match.
 
 `Topping.__init__()` sets `self.name = type(self).__name__`,
 reading each subclass's own name at construction time instead of repeating it as a string.
-`Garlic`, `Olives`, and `Feta` don't mention their own names.
+`Garlic`, `Olives`, and `Feta` do not mention their own names.
 
 Adding a new topping means adding one class with one line, `add_cost`.
 Changing the price of a topping means changing one number, in one place.
@@ -1149,6 +1162,9 @@ The two examples share a topic, not a type.
 
 A *Decorator* keeps the wrapped object's interface and adds behavior.
 *Proxy*, *Adapter*, and *Façade* wrap the same way and [differ in intent](29_Patterns--Changing_the_Interface.md#distinguishing-the-wrappers).
+
+The tests check the cost and description of a stacked order,
+`Feta(Olives(Margherita()))`, and of a single topping, `Garlic(Margherita())`:
 
 ```python
 # test_pizza_decorator.py

@@ -872,6 +872,8 @@ def test_greet_all(console: Console) -> None:
 
 Two rows, two `Console` implementations,
 and neither `greet_all()` nor `greet_logged()` gains a parameter.
+The test varies the console and checks the log,
+which records the same greeting under either `Console`.
 The parameter-passed version adds a `console` argument to both,
 although `greet()`, one level further down, is the one function that uses it.
 
@@ -1325,7 +1327,6 @@ A test can then supply a clock that never waits:
 
 ```python
 # test_instant_clock.py
-import time
 from dataclasses import field
 from typing import override
 from record import record
@@ -1340,18 +1341,17 @@ class Instant(Time):
     async def sleep(self, seconds: float) -> None:
         self.waited.append(seconds)
 
-def test_delayed_sum() -> None:
+def test_clock_never_waits() -> None:
     clock = Instant()
-    start = time.perf_counter()
     supplied = supply(as_type(Time)(clock))
     assert run(supplied(delayed_sum)([1, 2, 3])) == 6
     assert clock.waited == [0.01, 0.01, 0.01]
-    assert time.perf_counter() - start < 0.5
 ```
 
 `Instant.sleep()` records the request and returns.
-The same three sleeps take at least 30 milliseconds in `real_clock.py`,
-and under a few milliseconds here.
+The same three sleeps take at least 30 milliseconds in `real_clock.py`.
+Here `clock.waited` records all three requests,
+and `Instant` answers each one at once.
 
 `delayed_sum()` stays unchanged and runs the same body with either clock.
 The subclass goes through [`as_type(Time)`](#supplying-an-interface),
@@ -1797,7 +1797,7 @@ Calling it on `"Bob"` carries that failure up to the `run()` call at the program
 which raises it as an ordinary exception,
 like `error_escapes.py` does for a single error.
 
-A test exercises `all_handled()` and `one_unhandled()`:
+`test_all_handled()` and `test_one_unhandled()` exercise the two functions:
 
 ```python
 # test_catch_subset.py
@@ -1815,11 +1815,12 @@ def test_all_handled(name: str, expected: str) -> None:
 
 def test_one_unhandled() -> None:
     assert run(one_unhandled("Alice")) == "Alice: 42"
+    assert run(one_unhandled("Carol")) == "Carol: unknown"
     with pytest.raises(ValueError):
         run(one_unhandled("Bob"))
 ```
 
-The test's assertion for Bob is `pytest.raises(ValueError)`.
+In `test_one_unhandled()`, Bob's assertion is `pytest.raises(ValueError)`.
 The failure the signature declares is the one the caller sees.
 Failures never vanish.
 They relocate.

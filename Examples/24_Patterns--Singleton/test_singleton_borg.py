@@ -10,12 +10,12 @@ def test_borg_shares_state_but_not_identity() -> None:
     x = Singleton("first")
     y = Singleton("second")
     assert x is not y  # Distinct objects
-    assert x.val == y.val  # But sharing one set of state
+    assert x.__dict__ is y.__dict__
     assert x.val == "second"
 
-def test_pollutes_shared_state() -> None:
+def test_leaves_an_attribute_behind() -> None:
     setattr(Singleton("first"), "extra", "leftover")
 
-def test_fixture_cleared_it() -> None:
+def test_fixture_clears_shared_state() -> None:
     y = Singleton("second")
     assert not hasattr(y, "extra")  # Reset ran

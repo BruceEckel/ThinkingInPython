@@ -553,7 +553,8 @@ def test_first_successful_finder_wins() -> None:
     assert tried == ["bisection"]  # The rest never ran
 
 def test_chain_falls_through_to_a_later_method() -> None:
-    # [1.0, 1.3] does not bracket the root: bisection fails
+    assert f(1.0) * f(1.3) > 0  # No bracket
+    assert bisection(f, 1.0, 1.3) is None
     tried: list[str] = []
     chain = [watched(x, tried)
              for x in (bisection, secant, newton)]
@@ -568,12 +569,13 @@ def test_empty_chain_returns_none() -> None:
 def test_all_fail_returns_none() -> None:
     def g(x: float) -> float:
         return x * x + 1  # No real root
-    assert solve(g, 0.0, 2.0, [bisection]) is None
+    chain: list[RootFinder] = [bisection, secant, newton]
+    assert solve(g, 0.0, 2.0, chain) is None
 ```
 
-The first two tests wrap each finder in `watched()`,
-which records the finder's name as it runs.
-The tests can then assert both the root and the names of the finders that ran.
+`test_first_successful_finder_wins()` and `test_chain_falls_through_to_a_later_method()` wrap each finder in `watched()`,
+which records the finder's name as it runs,
+so they assert which finders ran as well as the root.
 
 `watched()` carries a `# type: ignore` because `RootFinder` is a `Callable`,
 and a `Callable` declares no `__name__`.
@@ -686,7 +688,7 @@ The test file confirms that:
 
 - Publishing calls every handler registered for a type.
 - A handler receives only its own event type.
-- An event with no handler calls nothing.
+- Publishing an event with no handler raises no exception.
 - Publishing an unhandled event leaves no stray entry behind.
 
 ```python
@@ -703,22 +705,21 @@ def test_every_handler_for_the_type_is_called() -> None:
     bus.publish(Deposit(5))
     assert seen == ["a5", "b5"]
 
-def test_only_the_matching_type_is_called() -> None:
-    calls: list[str] = []
+def test_handler_receives_only_its_event_type() -> None:
+    seen: list[str] = []
     bus = EventBus()
     bus.subscribe(Deposit,
-                  lambda e: calls.append("deposit"))
+                  lambda e: seen.append("deposit"))
     bus.subscribe(Withdraw,
-                  lambda e: calls.append("withdraw"))
+                  lambda e: seen.append("withdraw"))
     bus.publish(Withdraw(1))
-    assert calls == ["withdraw"]
+    assert seen == ["withdraw"]
 
-def test_no_handler_is_a_noop() -> None:
+def test_unhandled_event_raises_no_exception() -> None:
     bus = EventBus()
-    bus.publish(Closed("done"))  # Must not raise
+    bus.publish(Closed("done"))
 
-def test_get_leaves_no_stray_handler_list() -> None:
-    # publish() reads with .get(): no stray entry appears
+def test_unhandled_event_leaves_no_stray_entry() -> None:
     bus = EventBus()
     bus.publish(Closed("done"))
     assert Closed not in bus._handlers
@@ -890,9 +891,13 @@ The tagged bus gives up the registration-time check of the first version.
 `subscribe(Deposit, on_withdraw)` fails under the type checker because no `E` fits both arguments.
 One argument leaves no pair to compare,
 so a class with the right `__call__()` that skipped `@handler` passes the type checker and fails only when `subscribe()` looks it up.
-Tests cover that refusal and the other three: a non-event published,
-a `@handler` class with no `__call__()`,
-and one whose `__call__()` annotates `int` instead of an `@event` class:
+The test file confirms that:
+
+- A handler receives the events of its own type.
+- `publish()` refuses an object that is not an event.
+- `subscribe()` refuses a class that skipped `@handler`.
+- `@handler` refuses a class with no `__call__()`,
+  and one whose `__call__()` annotates `int` instead of an `@event` class.
 
 ```python
 # test_tagged_bus.py

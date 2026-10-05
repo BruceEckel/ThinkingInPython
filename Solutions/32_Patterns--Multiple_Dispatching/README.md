@@ -473,7 +473,7 @@ equals its string value.
 
 In `test_paper_scissors.py`, the sixteen-entry `EXPECTED` is the one
 change to the test, once its two imports name modules that include
-`Lizard`. `test_matches_expected()` hardcodes no
+`Lizard`. `test_versions_match_expected()` hardcodes no
 number of item types. `pytest` parametrizes it from `MATCHUPS`, which a
 comprehension builds from `EXPECTED`, so the test reports sixteen
 cases per module where it reported nine.

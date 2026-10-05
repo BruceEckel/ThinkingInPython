@@ -13,5 +13,6 @@ def test_all_handled(name: str, expected: str) -> None:
 
 def test_one_unhandled() -> None:
     assert run(one_unhandled("Alice")) == "Alice: 42"
+    assert run(one_unhandled("Carol")) == "Carol: unknown"
     with pytest.raises(ValueError):
         run(one_unhandled("Bob"))

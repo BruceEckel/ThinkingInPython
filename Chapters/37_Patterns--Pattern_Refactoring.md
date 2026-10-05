@@ -136,8 +136,8 @@ def test_create_builds_by_name() -> None:
 
 def test_sum_value_totals_weight_times_value() -> None:
     items: list[Trash] = [Aluminum(2.0), Paper(5.0)]
-    # 2*1.67 + 5*0.10
-    assert sum_value(items) == pytest.approx(3.84)
+    expected = 2 * Aluminum.value + 5 * Paper.value
+    assert sum_value(items) == pytest.approx(expected)
 ```
 
 ### The Data File and Its Parser
@@ -190,14 +190,15 @@ def parse(filename: str | Path) -> list[Trash]:
     return items
 ```
 
-The test parses a small temporary file, so it runs without `trash.dat`:
+The test parses a small temporary file, so it runs without `trash.dat`,
+and confirms that `parse()` skips comment and blank lines and builds each remaining piece by name with its weight:
 
 ```python
 # test_parse_trash.py
 from pathlib import Path
 from parse_trash import parse
 
-def test_parse_reads_and_skips_comments(
+def test_parse_skips_comments_and_blank_lines(
     tmp_path: Path,
 ) -> None:
     data = tmp_path / "trash.dat"

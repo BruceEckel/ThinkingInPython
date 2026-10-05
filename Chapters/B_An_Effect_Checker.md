@@ -142,6 +142,9 @@ Because `names()` builds a row from classes,
 a misspelled Effect in the table is an error the type checker reports.
 A `Row` is a `frozenset[str]` because the checker does not import the code it reads.
 In source text, `performs(Ask)` is the name `Ask`.
+The test file confirms that the first matching pattern wins,
+that a name no pattern matches is `Unknown`,
+and that `names()` reads class names:
 
 ```python
 # test_effect_table.py
@@ -158,7 +161,6 @@ from effect_table import STDLIB, UNKNOWN, lookup, names
         ("time.time", {"Clock"}),
         ("os.path.join", set()),
         ("os.remove", {"FileSystem"}),
-        ("requests.get", {"Unknown"}),
     ],
 )
 def test_first_matching_pattern_wins(
@@ -167,7 +169,7 @@ def test_first_matching_pattern_wins(
     assert lookup(name, STDLIB) == expected
 
 def test_unlisted_name_is_unknown_not_pure() -> None:
-    assert lookup("anything.at_all", {}) == UNKNOWN
+    assert lookup("requests.get", STDLIB) == UNKNOWN
 
 def test_names_reads_class_names() -> None:
     class Ask: ...
@@ -322,6 +324,8 @@ which a pattern in the table matches.
 
 `annotation()` reads a written type.
 It drops the subscript from `list[str]` and looks through `Final[...]` to the type inside.
+The test file confirms that `imports_of()` maps each local name to its full one,
+and that `callee()` resolves each shape of call or answers `UNRESOLVED`:
 
 ```python
 # test_call_names.py
@@ -364,7 +368,9 @@ def callee(call: str, types: dict[str, str]) -> str:
         ("f()()", UNRESOLVED),
     ],
 )
-def test_callee(call: str, expected: str) -> None:
+def test_a_call_resolves_to_a_dotted_name(
+    call: str, expected: str
+) -> None:
     types = {"p": "pathlib.Path", "action": UNRESOLVED}
     assert callee(call, types) == expected
 ```
@@ -372,7 +378,6 @@ def test_callee(call: str, expected: str) -> None:
 The last three cases are the limits.
 `action(x)` calls a parameter, `q.anything()` has a receiver of no known type,
 and `f()()` calls the result of a call.
-Each comes back `UNRESOLVED`.
 
 ## Facts About a Function
 
@@ -628,6 +633,15 @@ and its inferred row says what running the file performs.
 `read_module()` is the one operation here that can fail.
 It returns a [`Result`](42_Functional--Error_Handling.md#a-result-type),
 so a parse failure becomes a value the caller must inspect.
+The test file confirms that:
+
+- Every function, method, and class gets facts, and so does the module.
+- A class calls its `__init__()`.
+- The first parameter of a method resolves to the class.
+- Receivers resolve five ways.
+- `marked()` reads both `performs()` and `hides()`.
+- Each way of binding a name shadows a built-in of that name.
+- A syntax error comes back as an `Err`.
 
 ```python
 # test_function_facts.py
@@ -664,8 +678,8 @@ def save(
     p.write_text("")
 '''
 
-def facts() -> dict[str, Facts]:
-    match read_module("m", SOURCE):
+def facts(source: str = SOURCE) -> dict[str, Facts]:
+    match read_module("m", source):
         case Ok(found):
             return {f.name: f for f in found}
         case Err(problem):
@@ -719,11 +733,8 @@ def test_a_binding_shadows_the_builtin(
     binding: str,
 ) -> None:
     body = indent(f"{binding}\nstr.upper()", "    ")
-    match read_module("m", f"def f(xs):\n{body}\n"):
-        case Ok(found):
-            assert found[0].calls[-1] == UNRESOLVED
-        case Err(problem):
-            raise AssertionError(problem)
+    calls = facts(f"def f(xs):\n{body}\n")["m.f"].calls
+    assert calls[-1] == UNRESOLVED
 
 def test_a_syntax_error_comes_back_as_a_value() -> None:
     result = read_module("bad", "def f(:\n")
@@ -812,7 +823,7 @@ def test_rows_propagate_up_the_call_chain() -> None:
     )
     assert rows["m.a"] == {"Console"}
 
-def test_mutual_recursion_reaches_a_fixed_point() -> None:
+def test_circular_calls_reach_a_fixed_point() -> None:
     calls = ("m.even", "time.time")
     rows = infer(
         known(
@@ -954,7 +965,15 @@ which Appendix A's `tracked_greeting.py` cannot do.
 [Facts About a Function](#facts-about-a-function)
 predicts the first two findings.
 `ask()` and `tell()` perform `Console` and say `Ask` and `Tell`.
-Adding `hides(Console)` to each clears both findings, as this test file shows:
+Adding `hides(Console)` to each clears both findings.
+The test file confirms that:
+
+- An Effect the body performs and the declared row omits is a finding.
+- An Effect the row declares is no finding.
+- `hides()` removes an Effect from the body's row.
+- A function with no written row gets an inferred one and draws no finding.
+- An unresolved call adds `Unknown`.
+- A module that fails to parse becomes a finding under its module name.
 
 ```python
 # test_row_check.py
@@ -975,7 +994,7 @@ def test_an_undeclared_effect_is_a_finding() -> None:
         Finding("m.f", "undeclared Console")
     ]
 
-def test_a_declared_effect_is_not() -> None:
+def test_a_declared_effect_is_no_finding() -> None:
     source = (
         "def f() -> Annotated[None, performs(Console)]:\n"
         "    print('hi')\n"

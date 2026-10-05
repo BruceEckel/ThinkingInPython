@@ -19,6 +19,7 @@ def test_nectar_registered_and_default(
     (Ranunculus(), "strong"),
     (Gladiolus(), "faint"),
     (Chrysanthemum(), "faint"),
+    (Flower(), "faint"),
 ])
 def test_fragrance_registered_and_default(
     flower: Flower, expected: str
@@ -26,8 +27,8 @@ def test_fragrance_registered_and_default(
     assert fragrance(flower) == expected
 
 def test_dispatch_follows_inheritance() -> None:
-    # Unregistered: the nearest registered ancestor wins
     class Hybrid(Gladiolus):
         pass
 
+    assert Hybrid not in nectar.registry
     assert nectar(Hybrid()) == "Hybrid: abundant nectar"

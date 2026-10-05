@@ -143,11 +143,15 @@ A caller learns that the items have run out by asking for one more.
 
 `fibonacci(8)` returns an iterator, which one pass exhausts.
 `Countdown(5)` is an iterable whose `__iter__()` builds a fresh generator for every pass,
-so you can iterate it repeatedly, as the tests below confirm.
+so you can iterate it repeatedly.
 
-These tests collect each source into a list and compare that list with the expected one,
-covering the sequences and their empty edge cases,
-and check that `total()` works on every source:
+The test file confirms that:
+
+- `fibonacci()` produces the expected sequence,
+  including the empty and one-item cases.
+- `Countdown` counts down to 1, and `Countdown(0)` produces nothing.
+- A `Countdown` produces the same values on a second pass.
+- `total()` sums a list, a generator, and a `Countdown`.
 
 ```python
 # test_iterators.py
@@ -171,7 +175,7 @@ def test_countdown_sequence() -> None:
 def test_countdown_is_reiterable() -> None:
     c = Countdown(3)
     assert list(c) == [3, 2, 1]
-    # __iter__() builds a fresh generator
+    assert iter(c) is not iter(c)
     assert list(c) == [3, 2, 1]
 
 def test_total_over_any_iterable() -> None:
@@ -471,6 +475,8 @@ and the hand-written loop has no way to forward them.
 [Generators](45_Effects--Generators.md#yield-from-composes-descriptions)
 uses all three channels: the yielded values, the return value, and `send()`.
 
+`test_flatten()` runs `flatten()` and `flatten_loop()` over the same inputs and expects the same flat list from each:
+
 ```python
 # test_yield_from.py
 from collections.abc import Callable, Iterator, Sequence
@@ -561,7 +567,8 @@ def counter(limit: int) -> Iterator[int]:
                 f"pulled {limit} values and kept asking")
         yield n
 
-def test_list_of_an_endless_source_never_returns() -> None:
+def test_list_keeps_pulling_from_an_infinite_source(
+) -> None:
     with pytest.raises(Tripwire):
         list(counter(LIMIT))
 
@@ -578,11 +585,9 @@ def test_islice_stops_after_its_count() -> None:
     assert list(islice(counter(LIMIT), 3)) == [1, 2, 3]
 ```
 
-The first test is `list(count(1))` with a stopping point built into the source.
-`list()` keeps asking for value after value,
-so the tripwire fires and no list comes back.
-The second test is the `if`-clause lookalike.
-Nothing after `2` satisfies `n < 3`,
+`test_list_keeps_pulling_from_an_infinite_source()` is `list(count(1))` with a stopping point built into the source.
+In `test_the_if_clause_skips_but_never_stops()`,
+nothing after `2` satisfies `n < 3`,
 yet the generator expression keeps pulling from `counter()` to find another match,
 and trips the same wire.
 The `takewhile()` and `islice()` tests stop on their own,
@@ -616,7 +621,7 @@ from typing import override
 class TypedIterator[T](Iterator[T]):
     imp: Iterator[object]
     expected: type[T]
-    accepted: int = 0  # State a generator can't expose
+    accepted: int = 0  # State a generator cannot expose
 
     @override
     def __next__(self) -> T:
@@ -687,6 +692,9 @@ Both take `expected: type[T]`,
 so the type checker carries the element type through.
 `typed(items, int)` is an `Iterator[int]`, not an `Iterator[Any]`.
 
+Each test passes a list of `int` through one wrapper and gets it back unchanged,
+then expects a `TypeError` once a `str` appears:
+
 ```python
 # test_typed.py
 import pytest
@@ -702,7 +710,7 @@ def test_typed_iterator_passes_and_rejects() -> None:
     assert list(TypedIterator(iter([1, 2, 3]),
                               int)) == [1, 2, 3]
     with pytest.raises(TypeError):
-        list(TypedIterator(iter([1, "two"]), int))
+        list(TypedIterator(iter([1, "two", 3]), int))
 ```
 
 ## The Pattern That Disappeared

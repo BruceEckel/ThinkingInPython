@@ -231,19 +231,26 @@ Transforming the subject this way turns a set of comparisons into literal patter
 and literal patterns usually read better than the [guards](#guards)
 you would write otherwise.
 
+`test_summarize_by_length()` checks the empty, one-item, two-item,
+and starred cases, and `test_last_of_binds_init_and_last()` checks a starred name in first position:
+
 ```python
 # test_sequence_patterns.py
 import pytest
-from sequence_patterns import summarize
+from sequence_patterns import last_of, summarize
 
 @pytest.mark.parametrize("items, expected", [
     ([], "Empty"),
     ([5], "One item: 5"),
+    ([3, 4], "Two items: 3, 4"),
     ([1, 2, 3], "1, then 2 more"),
 ])
-def test_sequence_patterns(items: list[int],
-                           expected: str) -> None:
+def test_summarize_by_length(items: list[int],
+                             expected: str) -> None:
     assert summarize(items) == expected
+
+def test_last_of_binds_init_and_last() -> None:
+    assert last_of([1, 2, 3, 4]) == ([1, 2, 3], 4)
 ```
 
 ## Class Patterns
@@ -301,6 +308,9 @@ A positional pattern raises a `TypeError` when `__match_args__` is too short to 
 For an ordinary class `R` that lacks `__match_args__`,
 `case R(1)` reports `TypeError: R() accepts 0 positional sub-patterns (1 given)`.
 
+`test_locate_matches_fields()` checks the origin, a point on each axis,
+and a point on neither:
+
 ```python
 # test_class_patterns.py
 import pytest
@@ -309,11 +319,12 @@ from point import Point
 
 @pytest.mark.parametrize("point, expected", [
     (Point(0, 0), "The origin"),
+    (Point(0, 5), "On the y-axis at y=5"),
     (Point(3, 0), "On the x-axis at x=3"),
     (Point(3, 4), "At (3, 4)"),
 ])
-def test_class_patterns(point: Point,
-                        expected: str) -> None:
+def test_locate_matches_fields(point: Point,
+                               expected: str) -> None:
     assert locate(point) == expected
 ```
 
@@ -356,6 +367,8 @@ so every positional pattern silently starts matching a different field.
 matches any `Point` instance.
 Use it as a type-only check or a final catch-all.
 
+`test_describe_by_attribute()` checks a point on each axis and the `Point()` catch-all:
+
 ```python
 # test_keyword_patterns.py
 import pytest
@@ -367,8 +380,8 @@ from point import Point
     (Point(3, 0), "Somewhere on the x-axis"),
     (Point(3, 4), "Just some point"),
 ])
-def test_keyword_patterns(point: Point,
-                          expected: str) -> None:
+def test_describe_by_attribute(point: Point,
+                               expected: str) -> None:
     assert describe(point) == expected
 ```
 
@@ -536,11 +549,13 @@ When the data has a known shape, parse it into a dataclass first,
 then match on the dataclass.
 You keep the shape test and gain the field types.
 
+`test_handle_matches_keys()` checks a key event and the catch-all for a mapping with no `"type"`:
+
 ```python
 # test_mapping_patterns.py
 from mapping_patterns import handle
 
-def test_mapping_patterns() -> None:
+def test_handle_matches_keys() -> None:
     assert handle(
         {"type": "key", "key": "Esc"}) == "Key Esc"
     assert handle(
@@ -674,16 +689,18 @@ A `match` makes the form of the dispatch explicit.
 
 `Shape` turns the classic OOP "shapes" example into a closed type union instead of a class hierarchy.
 
+`test_area_of_each_shape()` checks the area of one `Circle` and one `Square`,
+so every member of the `Shape` union reaches its own `case`.
 The string `"x"` is no `Shape`,
-so the test's `area("x")` call carries a `# type: ignore`.
-At runtime `assert_never()` catches the string:
+so the `area("x")` call in `test_assert_never_rejects_a_non_shape()` carries a `# type: ignore`.
+At runtime `assert_never()` raises an `AssertionError` for the string:
 
 ```python
 # test_exhaustive.py
 import pytest
 from exhaustive import Circle, Square, area
 
-def test_exhaustive_area() -> None:
+def test_area_of_each_shape() -> None:
     assert round(area(Circle(1.0)), 4) == 3.1416
     assert area(Square(2.0)) == 4.0
 
@@ -881,6 +898,8 @@ print(round(cost(email) + cost(sms) + cost(push), 4))
 
 `render()` and `cost()` each `match` over `Notification` and end with `assert_never()`,
 so the type checker confirms each `match` handles every case.
+
+`test_oo_and_match_agree()` confirms that the two versions render and price each channel alike:
 
 ```python
 # test_notifications.py

@@ -8,7 +8,7 @@ def test_noise_settles_grains_onto_quiet_lines() -> None:
         plate.step()
     assert plate.agitation() < before / 10
 
-def test_kicks_never_knock_grains_off_the_plate() -> None:
+def test_kicks_keep_grains_on_the_plate() -> None:
     plate = Plate(grains=200, mode=(3, 5), seed=2)
     for _ in range(300):
         plate.step(kick=0.2)

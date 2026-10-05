@@ -5,7 +5,7 @@ from shape_registry import ShapeFactory
 class Triangle:
     def draw(self) -> None: ...
 
-def test_register_returns_the_class() -> None:
+def test_register_stores_and_returns_the_class() -> None:
     make = ShapeFactory()
     assert make.register(Triangle) is Triangle
     assert make.registry == {"Triangle": Triangle}

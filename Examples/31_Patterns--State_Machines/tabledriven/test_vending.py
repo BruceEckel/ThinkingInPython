@@ -9,12 +9,11 @@ def feed(vm: VendingMachine, *events: object) -> None:
     for event in events:
         vm.handle(event)
 
-def test_buy_dispenses_and_charges() -> None:
+def test_buy_dispenses_and_spends() -> None:
     vm = VendingMachine()
-    assert vm.state is State.QUIESCENT
-    # Item [0][1], 50c
+    assert vm.items[0][1].price == 50
     feed(vm, Money("quarter", 25), Money("quarter", 25),
-         FirstDigit("A", 0), SecondDigit("two", 1))
+         FirstDigit("A", 0), SecondDigit("col 1", 1))
     assert vm.state is State.WANT_MORE
     assert vm.amount == 0  # 50 in, 50 spent
     # One dispensed from five
@@ -23,20 +22,22 @@ def test_buy_dispenses_and_charges() -> None:
 
 def test_too_expensive_clears_back_to_collecting() -> None:
     vm = VendingMachine()
-    # 50c item, 25c in
+    assert vm.items[0][1].price == 50
+    # 25c in
     feed(vm, Money("quarter", 25),
-         FirstDigit("A", 0), SecondDigit("two", 1))
+         FirstDigit("A", 0), SecondDigit("col 1", 1))
     assert vm.state is State.COLLECTING
     assert vm.amount == 25  # Money kept
     assert vm.items[0][1].quantity == 5  # Nothing dispensed
 
-def test_sold_out_goes_to_unavailable() -> None:
+def test_sold_out_clears_to_unavailable() -> None:
     vm = VendingMachine()
     # [3][0] is sold out
     feed(vm, Money("quarter", 25),
-         FirstDigit("D", 3), SecondDigit("one", 0))
+         FirstDigit("D", 3), SecondDigit("col 0", 0))
     assert vm.state is State.UNAVAILABLE
-    assert vm.items[3][0].quantity == 0
+    assert vm.amount == 25  # Money kept
+    assert vm.items[3][0].quantity == 0  # Nothing dispensed
 
 def test_quit_refunds_and_resets() -> None:
     vm = VendingMachine()
@@ -45,7 +46,7 @@ def test_quit_refunds_and_resets() -> None:
     assert vm.amount == 0
 
 def test_no_transition_raises() -> None:
-    # QUIESCENT has no transition for Quit
     vm = VendingMachine()
+    assert vm.state is State.QUIESCENT
     with pytest.raises(NoTransition):
         vm.handle(Quit())

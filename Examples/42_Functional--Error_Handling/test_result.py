@@ -1,7 +1,7 @@
 # test_result.py
 from result import Err, Ok
 
-def test_success_unwrap() -> None:
+def test_unwrap_returns_the_answer() -> None:
     assert Ok(5).unwrap() == 5
 
 def test_bind_chains_a_success() -> None:

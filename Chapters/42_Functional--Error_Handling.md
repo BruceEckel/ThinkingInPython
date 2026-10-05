@@ -423,13 +423,13 @@ Because failures are values, you can assert on them with no `pytest.raises()`.
 The tests check that `unwrap()` returns the answer,
 and that `bind()` chains a success and short-circuits a failure.
 The last assertion uses `is` rather than `==`,
-proving `bind()` returns the original `Err` object rather than anything the lambda would build:
+proving `bind()` returns the original `Err` object rather than an equal copy:
 
 ```python
 # test_result.py
 from result import Err, Ok
 
-def test_success_unwrap() -> None:
+def test_unwrap_returns_the_answer() -> None:
     assert Ok(5).unwrap() == 5
 
 def test_bind_chains_a_success() -> None:
@@ -440,7 +440,7 @@ def test_bind_short_circuits_a_failure() -> None:
     assert failure.bind(lambda x: Ok(x + 1)) is failure
 ```
 
-`test_composing.py` confirms that the hand-written and `bind()` versions agree on every input:
+`test_composing.py` confirms that the hand-written and `bind()` versions agree on the five inputs the demos use:
 
 ```python
 # test_composing.py
@@ -530,7 +530,7 @@ and each input you add nests one level deeper.
 at the end of this chapter offers do-notation,
 a flatter alternative to this nesting.
 
-`test_combining.py` confirms that `combined()` returns the correct value,
+`test_combining.py` confirms that `combined()` returns the answer,
 or the first failure in the chain:
 
 ```python
@@ -539,16 +539,17 @@ import pytest
 from combining import combined
 from result import Err, Ok, Result
 
-@pytest.mark.parametrize("a, b, expected", [
+@pytest.mark.parametrize("i, j, expected", [
     (7, 5, Ok("add(7 + 5 + 12): 24")),
     (1, 5, Err("func_a(1)")),
     (7, 2, Err("func_b(2)")),
     (2, 1, Err("func_c(3): division by zero")),
+    (1, 2, Err("func_a(1)")),
 ])
-def test_combined(
-    a: int, b: int, expected: Result[str, str]
+def test_combined_returns_answer_or_first_failure(
+    i: int, j: int, expected: Result[str, str]
 ) -> None:
-    assert combined(a, b) == expected
+    assert combined(i, j) == expected
 ```
 
 ## Turning Exceptions into Results
@@ -640,10 +641,10 @@ and that a raised exception becomes an `Err` holding that exception:
 from result import Err, Ok
 from safe_demo import parse
 
-def test_safe_wraps_a_success() -> None:
+def test_good_input_becomes_an_ok() -> None:
     assert parse("42") == Ok(42)
 
-def test_safe_captures_the_exception() -> None:
+def test_exception_becomes_an_err() -> None:
     match parse("oops"):
         case Err(error):
             assert isinstance(error, ValueError)

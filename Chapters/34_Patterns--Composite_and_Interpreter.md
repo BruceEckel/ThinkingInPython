@@ -207,6 +207,10 @@ With the tuple, sharing a subtree is safe.
 The demo builds `src` first, then places it inside `root`,
 and `src` stays as built.
 
+The tests check that `disk_usage()` answers for the whole tree, a subtree,
+and a lone file, that `walk()` yields each file's full path,
+and that an empty directory has size 0 and yields no paths:
+
 ```python
 # test_filesystem.py
 from typing import Final
@@ -466,11 +470,19 @@ which can run thousands of levels.
 The `/` makes `e` [positional-only](05_Foundations--Functions.md#positional-only-and-keyword-only-parameters),
 which keeps the parameter name out of the variable namespace,
 so an expression can use `e` as a variable.
-`e=5` goes into `env`,
-and `test_e_is_available_as_a_variable()` below confirms that it binds the variable.
+`e=5` goes into `env`.
 A `dict[str, int]` parameter passes the same bindings by reference at every call,
 and it would spare both the `/` and this explanation.
 This chapter keeps `**env` for the call site.
+
+The test file confirms that:
+
+- A `Num` evaluates to its value and a `Var` to its binding.
+- The operators build the tree you write by hand,
+  with the integer on either side.
+- One tree evaluates under different bindings.
+- An unbound variable raises a `KeyError` that names the variable.
+- `e` binds as a variable, though it is `evaluate()`'s first parameter.
 
 ```python
 # test_evaluate.py
@@ -493,11 +505,11 @@ def test_one_tree_many_environments() -> None:
     assert evaluate(area, w=2, h=3) == 6
     assert evaluate(area, w=10, h=10) == 100
 
-def test_unbound_variable_raises() -> None:
-    with pytest.raises(KeyError):
+def test_unbound_variable_raises_key_error() -> None:
+    with pytest.raises(KeyError, match="y"):
         evaluate(Var("y"), x=1)
 
-def test_e_is_available_as_a_variable() -> None:
+def test_e_binds_as_a_variable() -> None:
     assert evaluate(Var("e"), e=5) == 5
 ```
 
@@ -644,11 +656,20 @@ The guard tests identity with `is` rather than equality with `==`.
 Sharing means the same object, and a data class's `==` compares whole subtrees,
 so it would walk each subtree again at every level of the recursion.
 
+The test file confirms that:
+
+- Adding zero or multiplying by one returns the other operand.
+- Multiplying by zero returns `Num(0)`.
+- Constant subtrees fold into one `Num`.
+- The rules apply at every level of the tree.
+- An expression with nothing to simplify comes back as the same object.
+- An unchanged subtree is shared with the result.
+
 ```python
 # test_simplify.py
 from typing import Final
 import pytest
-from expr import Add, Expr, Mul, Num, Var
+from expr import Expr, Mul, Num, Var
 from simplify import simplify
 
 X: Final[Var] = Var("x")
@@ -659,27 +680,25 @@ X: Final[Var] = Var("x")
     (1 * X, X),
     (X * 1, X),
 ])
-def test_identity_elements_vanish(
+def test_identity_returns_other_operand(
     expr: Expr, expected: Expr,
 ) -> None:
     assert simplify(expr) == expected
 
-def test_zero_absorbs_multiplication() -> None:
-    assert simplify(Var("x") * 0) == Num(0)
-    assert simplify(0 * Var("x")) == Num(0)
+def test_multiplying_by_zero_gives_zero() -> None:
+    assert simplify(X * 0) == Num(0)
+    assert simplify(0 * X) == Num(0)
 
 def test_constant_folding() -> None:
     assert simplify(Num(2) + 3) == Num(5)
     assert simplify(Num(2) * 3 + 4) == Num(10)
 
-def test_rewriting_reaches_every_level() -> None:
-    x = Var("x")
-    assert simplify((x + 0) * (1 * x)) == Mul(x, x)
+def test_rules_compose() -> None:
+    assert simplify((X + 0) * (1 * X)) == Mul(X, X)
 
 def test_already_simple_is_unchanged() -> None:
-    x = Var("x")
-    assert simplify(2 * x + 1) == Add(Mul(Num(2), x),
-                                      Num(1))
+    expr = 2 * X + 1
+    assert simplify(expr) is expr
 
 def test_unchanged_subtrees_are_shared() -> None:
     keep = Var("w") * Var("h")

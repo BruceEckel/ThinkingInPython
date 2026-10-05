@@ -12,7 +12,6 @@ from effect_table import STDLIB, UNKNOWN, lookup, names
         ("time.time", {"Clock"}),
         ("os.path.join", set()),
         ("os.remove", {"FileSystem"}),
-        ("requests.get", {"Unknown"}),
     ],
 )
 def test_first_matching_pattern_wins(
@@ -21,7 +20,7 @@ def test_first_matching_pattern_wins(
     assert lookup(name, STDLIB) == expected
 
 def test_unlisted_name_is_unknown_not_pure() -> None:
-    assert lookup("anything.at_all", {}) == UNKNOWN
+    assert lookup("requests.get", STDLIB) == UNKNOWN
 
 def test_names_reads_class_names() -> None:
     class Ask: ...

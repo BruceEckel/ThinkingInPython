@@ -16,8 +16,7 @@ def test_the_factory_rejects_illegal_values() -> None:
     with pytest.raises(TypeFailure):
         make_stars(11)
 
-def test_the_type_accepts_them_anyway() -> None:
-    # Calling the type skips the check
+def test_calling_the_type_skips_the_check() -> None:
     assert Stars(11).number == 11
 
 def test_the_check_cannot_move_inside() -> None:
