@@ -519,10 +519,13 @@ and reports that decision as its return value.
 A step below the tolerance is not quite the same as reaching a root,
 so a chain is no more reliable than its handlers.
 
-Testing confirms that the first finder to converge returns the root and the finders after it do not run,
-that a later finder succeeds where an earlier one fails,
-that an empty chain returns `None`,
-and that a chain whose finders all fail returns `None` too:
+The test file confirms that:
+
+- The first finder to converge returns the root,
+  and the finders after it do not run.
+- A later finder succeeds where an earlier one fails.
+- An empty chain returns `None`.
+- A chain whose finders all fail returns `None` too.
 
 ```python
 # test_chain.py
@@ -679,10 +682,12 @@ Walking `type(event).__mro__` and calling every handler along it gives a subclas
 An event then runs the handlers registered for its own type and for every ancestor
 (see exercise 5).
 
-Testing confirms that publishing calls every handler registered for a type,
-a handler receives only its own event type,
-an event with no handler calls nothing,
-and publishing an unhandled event leaves no stray entry behind:
+The test file confirms that:
+
+- Publishing calls every handler registered for a type.
+- A handler receives only its own event type.
+- An event with no handler calls nothing.
+- Publishing an unhandled event leaves no stray entry behind.
 
 ```python
 # test_event_bus.py

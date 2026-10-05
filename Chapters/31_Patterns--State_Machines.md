@@ -782,9 +782,13 @@ The language's first-class functions and its `dict` supply what those mechanisms
 
 Because the machine is deterministic,
 a test can drive it through a sequence of events and check which state it reaches.
-The cases worth testing are a successful purchase, the two conditional branches
-(too expensive and sold out), a refund,
-and the error when no transition matches:
+The cases worth testing are:
+
+- A successful purchase
+- The too-expensive conditional branch
+- The sold-out conditional branch
+- A refund
+- The error when no transition matches
 
 ```python
 # tabledriven/test_vending.py
