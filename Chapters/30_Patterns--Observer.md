@@ -572,8 +572,10 @@ with expected(ValueError):
 #: [ValueError] list.remove(x): x not in list
 ```
 
-Because a `Broadcaster` holds a strong reference to whatever you connect,
-the weak part lives inside the responder.
+A `Broadcaster` holds a strong reference to whatever you `connect()`,
+so `weak_responder.py` puts the weak reference inside the responder.
+A different broadcaster could store weak references for every responder.
+With `Broadcaster`, a responder that needs a weak reference supplies its own.
 An ordinary `weakref.ref(plot.redraw)` is dead the moment it is created.
 Its argument, `plot.redraw`, builds a new bound-method object,
 and the weak reference becomes the one reference to that object.
