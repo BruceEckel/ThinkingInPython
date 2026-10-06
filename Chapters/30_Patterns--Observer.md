@@ -535,7 +535,9 @@ Over a long run the broadcaster accumulates lapsed listeners,
 creating a memory leak.
 Long-lived broadcasters need either disciplined `disconnect()` calls or [weak references](10_Foundations--Cleanup.md#watching-objects-without-holding-them),
 which do not keep the responder alive.
-A weak responder resolves its reference at every call and drops out once its object is gone:
+A weak responder holds its object through a weak reference.
+On each announcement the responder passes the announcement to the object while the object is alive,
+and disconnects itself after Python collects the object:
 
 ```python
 # weak_responder.py
