@@ -120,18 +120,21 @@ commands needs a type with two members, `__call__()` and `undo()`, and
 in Python that type is a `Protocol`. `UndoableCommand` above is that
 `Protocol`. `Macro` annotates `self.commands` against it, `Deposit`
 inherits nothing, and `run()` still calls each `Deposit` with `()`, so
-the function form's habit survives. The *GoF Design Patterns* shape is
-a base class with two `raise NotImplementedError` bodies. A base class
-pays for itself when the commands share implementation, and these
-commands share none.
+the function form's habit survives.
+
+The *GoF Design Patterns* shape is a base class with two
+`raise NotImplementedError` bodies. A base class pays for itself when
+the commands share implementation, and these commands share none.
 
 **Remember what to reverse.** `Deposit` must also remember what it
 did, here the account and the amount, so it can reverse that action
 later. A fresh call to the same function cannot know what a previous
-call changed. `Deposit` is a record, like `Repeat`, because neither
-field changes after construction. The record is frozen and the
-dictionary it references is not, so `__call__()` and `undo()` can
-still update the balance.
+call changed.
+
+`Deposit` is a record, like `Repeat`, because neither field changes
+after construction. The record is frozen and the dictionary it
+references is not, so `__call__()` and `undo()` can still update the
+balance.
 
 </details>
 </details>
@@ -317,9 +320,10 @@ bookkeeping to say which handler ran. That name is why `chain` needs a
 says nothing about a name, so `ty` rejects `finder.__name__` on a
 handler annotated that way (Pyright allows it, inferring the
 attributes of a function object). `Finder` declares `__name__`
-alongside `__call__()`, and a function satisfies both. The listing
-copies the finders from `algorithms.py` rather than importing them,
-because each solution runs on its own.
+alongside `__call__()`, and a function satisfies both.
+
+The listing copies the finders from `algorithms.py` rather than
+importing them, because each solution runs on its own.
 
 </details>
 </details>
@@ -354,6 +358,7 @@ print(by_score_then_name)
 The key function returns a tuple, `(score, name)`, and Python compares
 tuples element by element. `sorted()` therefore orders by score first,
 and among equal scores (`Bob` and `Cid`, both `85`) it compares names.
+
 `key` is a *Strategy*. `sorted()` provides the algorithm (some
 comparison-based sort), and the caller supplies the interchangeable
 policy that decides what "in order" means for this call. `sorted()`
@@ -639,10 +644,12 @@ event pass without complaint.
 **Walk the ancestry, most specific first.** `type(event).__mro__`
 already runs from the class outward to `object`, so iterating over it
 in order calls the most specific handlers first and the inherited ones
-after. That order meets the "parents last" requirement. `publish()`
-keeps using `.get()` for the same reason the chapter gives. Indexing
-a `defaultdict` on a read inserts an empty list for every class in
-every published event's MRO, `object` included.
+after. That order meets the "parents last" requirement.
+
+**Look up handlers read-only.** `publish()` keeps using `.get()` for
+the same reason the chapter gives. Indexing a `defaultdict` on a read
+inserts an empty list for every class in every published event's MRO,
+`object` included.
 
 Adding `unsubscribe()` cannot break an existing caller, which does not
 call it and so behaves as before. The MRO walk can.
@@ -774,9 +781,11 @@ evaluates the product while the loop builds the command.
 lookup of `n`, and that is the point of the exercise's closing
 question. If the command must read `n` when it runs, all three fixes
 are wrong. Each one freezes the value when the loop builds the
-command. You then want the original behavior, aimed at something that
-outlives the loop, as `report()` does by reading `settings` at call
-time. The late-binding trap and late binding as a feature are the same
+command. You then want the original behavior, aimed at something
+that outlives the loop, as `report()` does by reading `settings` at
+call time.
+
+The late-binding trap and late binding as a feature are the same
 mechanism. Which one you have depends on whether the name you close
 over still means what you wanted when the command finally runs.
 

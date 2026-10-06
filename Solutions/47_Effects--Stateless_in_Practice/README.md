@@ -207,6 +207,7 @@ If you put a `print()`, an `open()`, a mutation, or a call to any function that
 does one of those above the `return`, it runs while the caller builds the
 description rather than while `run()` executes it,
 the opposite of what the signature advertises.
+
 A linter can enforce a conservative version of that rule:
 flag any function annotated `Effect[...]`, `Depend[...]`, `Success[...]`, or `Try[...]`
 that contains no `yield` and whose body is more than a single `return` statement.
@@ -458,6 +459,7 @@ expect(Blackout, run, handle(short)(run_load)(17, 6))
 
 **Slot a new source into the order.** The turbine takes the evening hours the battery covered without it, and the battery
 drops back to one hour at 22:00 once the wind stops.
+
 `run_load()` needs no change, and could not have needed one.
 It asks for a `Source` at an hour
 and uses whatever the handler hands back.
@@ -1264,7 +1266,8 @@ print(run(scripted((60, 50, 30, 20))), written)
 **Replay the balances.** The scripted balances are the four the `Cell` version produces:
 `100` before the first purchase, `40` after it, `40` again because `purchase()`
 refuses the `50` and writes nothing, and `10` after the `30` goes through.
-`spree()` attempts all four prices, and the test proves it from both sides.
+
+**Prove every price is attempted.** `spree()` attempts all four prices, and the test proves it from both sides.
 A fifth price exhausts the script, and `handle()` reads the
 `StopIteration` from `read()` as the end of the Effect, the silent trap
 the chapter describes. `run()` returns `None` and the first assertion

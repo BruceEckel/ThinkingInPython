@@ -1136,6 +1136,21 @@ multiple primary concepts, and this makes it confusing."
   chapter 23's "The two wrappers' inputs differ, though." leans on the
   sentence before it.
 
+- Solutions sweep 2026-10-05, 44 files (all but Solutions 30): 63
+  breaks in 38 files, six files unchanged, most files one or two. The
+  solutions split far less than the chapters because R22 had already
+  given each step its own labeled paragraph. A split of a labeled
+  paragraph gave the second half its own label when it covers another
+  group of lines (7 new labels, such as "**Look up handlers
+  read-only.**" in Solutions 28) and no label when it is a remark, a
+  comparison, or what the type checker reports. Six pointer repairs
+  ("Length is not what separates them." -> "... separates the two
+  versions."). Two samples: Solutions 19 exercise 2 broke "This version
+  takes their sum ... because the waits run one after another." from
+  "The list comprehension is not the problem."; Solutions 41 exercise 5
+  broke the tuple-as-cache-key explanation from "Purity is a second,
+  separate requirement."
+
 **Sweep notes.** A seam whose next sentence carries "though", "also",
 "the same way", or a mid-sentence "it"/"one" still leans on the
 paragraph before; the agents' rule covered the opening word alone, so

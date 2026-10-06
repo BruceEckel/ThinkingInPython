@@ -331,12 +331,14 @@ between them:
 
 the rats, starting in the left room, map every cell of that room and
 none of the right room's, so `unreached` is the right room's nine open
-cells. A cell is unreachable when no path of open cells connects it to
-the entry, not when a wall surrounds it. `Maze.entry()`
-scans row by row and returns the first open cell it finds, and every
-rat traces back to that single starting point through `claim()`. No
-rat therefore reaches a cell that has no open-cell path back to the
-entry, however many rats spawn.
+cells.
+
+A cell is unreachable when no path of open cells connects it to the
+entry, not when a wall surrounds it. `Maze.entry()` scans row by row
+and returns the first open cell it finds, and every rat traces back to
+that single starting point through `claim()`. No rat therefore reaches
+a cell that has no open-cell path back to the entry, however many rats
+spawn.
 
 </details>
 </details>
@@ -698,7 +700,8 @@ Both rats reach `await asyncio.sleep(0)` while the same cell still
 looks unclaimed, because neither has added that cell to `visited`
 yet. Both membership tests therefore pass before either rat calls
 `self.visited.add(...)`.
-Each of the two rats believes it alone claimed that cell.
+
+Each of the two rats believes it alone claimed the shared cell.
 Both move into it, and that overlap breaks the invariant that no two
 rats cover the same ground. Nothing goes unexplored. Both rats proceed
 from the shared cell and duplicate each other's work from there, while
@@ -1407,11 +1410,12 @@ subtracting one from the other leaves zeros along the curves where the
 two products agree, which is why the original figures are
 diagonals, crosses, and rings rather than a grid. Those mixed terms
 come from the physics the chapter's formula approximates, a real plate
-with free edges rather than a membrane clamped all around its rim. The
-simulation machinery stays the same across both fields: same grains,
-same random walk, same rule that a grain moves in proportion to the
-vibration under it. Only the field changes, and with it every pattern
-the model produces.
+with free edges rather than a membrane clamped all around its rim.
+
+The simulation machinery stays the same across both fields: same
+grains, same random walk, same rule that a grain moves in proportion
+to the vibration under it. Only the field changes, and with it every
+pattern the model produces.
 
 </details>
 </details>

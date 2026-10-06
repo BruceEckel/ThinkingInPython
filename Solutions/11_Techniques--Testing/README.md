@@ -497,6 +497,7 @@ To make the check, the stub must gain a memory of its calls.
 Here that memory is the list `sent`.
 The stub appends each message to it,
 and the test asserts that the list stays empty.
+
 A stub that records its calls is a mock written by hand.
 `Mock` builds that recording for you, along with the assertions that read it.
 

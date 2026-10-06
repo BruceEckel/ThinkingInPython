@@ -572,10 +572,11 @@ creates nothing. `vars(t)` holds `holder` alone, and reading `t.seat`
 raises an `AttributeError`.
 
 **Create the attribute from outside.** `t.seat = "14C"` creates the attribute on the instance, and the type checker
-checks that assignment against the declared `str`. A bare annotation
-is safe when the code that assigns the attribute runs before any code
-that reads it. The type checker cannot confirm that order, so the
-class depends on its callers to keep it.
+checks that assignment against the declared `str`.
+
+A bare annotation is safe when the code that assigns the attribute
+runs before any code that reads it. The type checker cannot confirm
+that order, so the class depends on its callers to keep it.
 
 </details>
 </details>

@@ -470,11 +470,12 @@ time `test_restore_rewinds_state` calls `sketch.restore(checkpoint)`,
 `checkpoint` has silently absorbed the `"b"` stroke that the copy in
 `save()` exists to keep out. `sketch.strokes == ["a"]` then fails
 immediately, before the test reaches the scenario
-`test_drawing_after_restore_spares_memento` catches. Making `Memento`
-a record prevents reassigning `strokes` after construction, but the
-list inside stays mutable, and every later `draw()` changes it. So
-`save()` must copy into a `tuple`, an immutable container, instead of
-wrapping a mutable list in a record.
+`test_drawing_after_restore_spares_memento` catches.
+
+Making `Memento` a record prevents reassigning `strokes` after
+construction, but the list inside stays mutable, and every later
+`draw()` changes it. So `save()` must copy into a `tuple`, an
+immutable container, instead of wrapping a mutable list in a record.
 
 Two of those failures prove less than they seem. The second and third
 tests compare `checkpoint.strokes` with a tuple, and no `list` equals

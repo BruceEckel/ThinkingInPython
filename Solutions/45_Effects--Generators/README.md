@@ -741,10 +741,12 @@ position and state, the one thing that makes this version readable.
 
 The table pays a fixed cost instead. Adding a state means one new
 `Enum` member and a few new rows. Those rows sit next to the existing
-ones, where you can read the whole machine at once. The generator is
-the better choice for a conversation with a beginning and an end, like
-`interview()`. The table is the better choice for a machine that runs
-forever and can go anywhere from anywhere.
+ones, where you can read the whole machine at once.
+
+The generator is the better choice for a conversation with a
+beginning and an end, like `interview()`. The table is the better
+choice for a machine that runs forever and can go anywhere from
+anywhere.
 
 </details>
 </details>

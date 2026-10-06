@@ -320,8 +320,10 @@ the two remaining parameters stay open in order.
 that needs a `Placeholder`. `partial()` does not inspect the
 signature, so building `partial(clamp, high=100)` succeeds. The call
 is where the partial fails. `high` is positional-only, so it cannot
-arrive by name. Passing `high` positionally means passing `low` and
-`value` first, which is the opposite of leaving them to the caller.
+arrive by name.
+
+Passing `high` positionally means passing `low` and `value` first,
+which is the opposite of leaving them to the caller.
 `partial(clamp, Placeholder, Placeholder, 100)` is the version that
 works, and `Placeholder` exists for that case.
 
@@ -656,9 +658,10 @@ not commute with the filters. Once `to_fahrenheit()` has run, every
 reading carries a Fahrenheit number, and 64.4, 77.0, and 86.9 all pass
 `warmer_than(20.0)` and all fail `colder_than(30.0)`. The predicates
 still read `r.celsius`, so they now compare a Fahrenheit number
-against a Celsius limit and quietly answer the wrong question. Nothing
-raises an exception, because `to_fahrenheit()` and each predicate are
-correct on their own.
+against a Celsius limit and quietly answer the wrong question.
+
+Nothing raises an exception, because `to_fahrenheit()` and each
+predicate are correct on their own.
 The unit lives only in the field name. A stage that changes what a
 value means must run after every stage that reads the old meaning.
 

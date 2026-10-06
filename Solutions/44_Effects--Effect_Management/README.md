@@ -250,10 +250,11 @@ does.
 
 The cost also scales the wrong way. Adding a fourth Effect later means
 walking the same chain again, and the chain is longer in a real
-program than in this one. The alternative most codebases pick, a
-module-level logger, removes the parameter by removing the choice. The
-function no longer says it logs, and a test can no longer bind the
-logger differently.
+program than in this one.
+
+The alternative most codebases pick, a module-level logger,
+removes the parameter by removing the choice. The function no longer
+says it logs, and a test can no longer bind the logger differently.
 
 An Effect Management System collapses the parameter lists and the call
 sites, not the signatures. `format_greeting()` declares in its return
@@ -321,16 +322,17 @@ is why `withdraw(30)` twice returns `70` then `40`, the demonstration
 the [Foundations](../../Chapters/40_Functional--Foundations.md#pure-functions)
 chapter uses to show purity failing.
 [Confidence](../../Chapters/43_Functional--Confidence.md#referential-transparency)
-reuses `withdraw()` to show referential
-transparency failing. Because the three
-conversions in [Converting Effectful to Pure](../../Chapters/44_Effects--Effect_Management.md#converting-effectful-to-pure)
-all manage the exception Effect, none of them applies here. The
-by-hand technique for a side cause and a side effect comes from
+reuses `withdraw()` to show referential transparency failing.
+
+Because the three conversions in
+[Converting Effectful to Pure](../../Chapters/44_Effects--Effect_Management.md#converting-effectful-to-pure)
+all manage the exception Effect, none of them applies to `withdraw()`.
+The by-hand technique for a side cause and a side effect comes from
 [Effects by Hand](../../Chapters/44_Effects--Effect_Management.md#effects-by-hand) instead:
 pass in what the function would otherwise read or write.
-For `withdraw()`, that means taking the balance as a parameter and returning the new one. The same
-inputs then give the same answer, and the caller
-holds the state.
+For `withdraw()`, that means taking the balance as a parameter and
+returning the new one. The same inputs then give the same answer, and
+the caller holds the state.
 
 `Thermometer` has the same pair inside a design pattern. The `celsius`
 setter writes `_celsius`, an instance attribute rather than a global,
@@ -340,6 +342,7 @@ notification is a side effect on the world, since a responder may
 print, record, or fail. Reading `celsius` is a side cause for the same
 reason `withdraw()` reading `balance` is one. The value can change
 between calls, so the answer depends on history rather than arguments.
+
 The functional conversion returns each reading as a value from the
 temperature source, and the caller folds new readings into whatever
 state it keeps. That is what the chapter calls

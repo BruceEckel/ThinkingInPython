@@ -1583,11 +1583,13 @@ module can define a prototype, with its name beside its definition, and
 `Kind` to `str` for the same reason. An open table cannot list its names
 in advance. The builder is also a function, so `goblin()` still produces
 a fresh prototype on demand when a test needs one that nothing has
-touched. The costs are the table literal becoming a decorator plus a
-function for each monster, the name repeated at every definition, and
-the two failures the chapter attaches to registration: an undecorated
-builder is absent from the table, with a `KeyError` from `spawn()` that
-names the key and not the builder, and the decorator on a builder in an
+touched.
+
+The costs are the table literal becoming a decorator plus a function
+for each monster, the name repeated at every definition, and the two
+failures the chapter attaches to registration: an undecorated builder
+is absent from the table, with a `KeyError` from `spawn()` that names
+the key and not the builder, and the decorator on a builder in an
 unimported module does not run. For two monsters in one file, the table
 literal says the same thing in fewer lines.
 

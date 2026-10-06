@@ -134,10 +134,10 @@ print(render(rows, "json"))
 **Hold each format as data.** The third format arrives without touching `render()`. The
 assignment that adds the format can sit in any module that imports
 `STYLES`. `STYLES` absorbs the change because a format is now data.
-Everything the axis does not cover still needs hand edits.
-Adding a field to `Row` touches every entry in `STYLES`, because a
-field is a different vector of change, one about which this design
-does nothing.
+
+Everything the axis does not cover still needs hand edits. Adding a
+field to `Row` touches every entry in `STYLES`, because a field is a
+different vector of change, one about which this design does nothing.
 
 Two things generalize from the example. First, the axis is visible in
 the history rather than in the code. The same function appearing in

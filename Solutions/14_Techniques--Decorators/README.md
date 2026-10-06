@@ -582,10 +582,12 @@ tells them apart by what arrives in `func`. Used bare, `@memo` calls
 `memo(square)`, so `func` is the function and the decoration finishes
 immediately with `decorate(func)`. Used with parentheses,
 `@memo(maxsize=2)` calls `memo(maxsize=2)` first, `func` is `None`,
-and `memo` returns `decorate` for Python to apply to `add`. Making
-`func` the only positional parameter and `maxsize` keyword-only
-keeps the two calls unambiguous. A positional argument always
-binds to `func` and cannot bind to `maxsize`.
+and `memo` returns `decorate` for Python to apply to `add`.
+
+**Keep the forms unambiguous.** Making `func` the only positional
+parameter and `maxsize` keyword-only keeps the two calls
+unambiguous. A positional argument always binds to `func` and
+cannot bind to `maxsize`.
 
 **Key on every argument.** The cache key pairs the positional arguments with the keyword items,
 since `add(1, 2)` and `add(a=1, b=2)` are different keys and both are

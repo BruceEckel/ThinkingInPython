@@ -319,10 +319,11 @@ print(list(nums))
 reports `True`, and stops. Stopping there leaves the generator part-way
 through, not empty. `sum()` continues from `6` and adds `36 + 49 + 64 +
 81`, giving `230` rather than the full `285`. By then `sum()` has
-drained every value, so `list()` gets nothing. A generator holds a
-position rather than a beginning. Each consumer picks up where the
-previous one stopped, and `any()`'s early exit leaves values behind for
-`sum()` to find.
+drained every value, so `list()` gets nothing.
+
+A generator holds a position rather than a beginning. Each consumer
+picks up where the previous one stopped, and `any()`'s early exit
+leaves values behind for `sum()` to find.
 
 </details>
 </details>

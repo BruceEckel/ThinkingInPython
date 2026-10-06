@@ -726,10 +726,11 @@ works.
 **Show the instance store failing.** `Wrong` writes the same intent a
 different way, and fails. `self.built += 1` reads the class attribute,
 adds one, and then tries to store the result on the instance. That
-store is the assignment `frozen=True` refuses. The type checker rejects
-the line before the program runs, reporting `built` as read-only on a
-frozen instance, so the listing carries a `# type: ignore` to
-demonstrate the runtime failure.
+store is the assignment `frozen=True` refuses.
+
+The type checker rejects `self.built += 1` before the program runs,
+reporting `built` as read-only on a frozen instance, so the listing
+carries a `# type: ignore` to demonstrate the runtime failure.
 
 </details>
 </details>

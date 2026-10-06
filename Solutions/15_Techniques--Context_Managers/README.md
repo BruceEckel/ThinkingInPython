@@ -439,7 +439,9 @@ with expected(ValueError):
 **Suppress one exception type.** `__exit__()` decides an exception's fate through its return value:
 truthy suppresses, falsy lets the exception continue. Returning
 `issubclass(exc_type, KeyError)` therefore suppresses `KeyError` and
-propagates everything else. The second block confirms the
+propagates everything else.
+
+**Check that other exceptions propagate.** The second block confirms the
 propagation. The `ValueError` passes through `ignore_missing` and
 reaches the chapter's `expected`, which prints it.
 

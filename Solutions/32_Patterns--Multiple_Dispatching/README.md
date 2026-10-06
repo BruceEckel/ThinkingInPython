@@ -1662,12 +1662,13 @@ a table of answers. Only the cells that need code look like code.
 `item1.wet`. The `(Rock, Paper)` cell consults `item2.wet`, because
 one duel has two orders and each order has its own cell. If the
 `(Rock, Paper)` cell ignored `item2.wet`, a rock that calls
-`compete()` would still beat wet paper. Behavior that reads the
-object's own state is the first of the two reasons the chapter gives
-for preferring the double-dispatch version, and a cell holding a
-function answers that reason. Whatever
-`Paper.eval_rock()` can read, `paper_vs_rock()` can read too,
-from the same two objects.
+`compete()` would still beat wet paper.
+
+Behavior that reads the object's own state is the first of the two
+reasons the chapter gives for preferring the double-dispatch version,
+and a cell holding a function answers that reason. Whatever
+`Paper.eval_rock()` can read, `paper_vs_rock()` can read too, from the
+same two objects.
 
 The second reason survives. A subclass still cannot override one
 combination and inherit the rest, because the lookup still matches

@@ -163,8 +163,9 @@ method. A caller who wants to act on the warning must change where
 they get the `Report`, not where they call `render()`.
 
 **Use the deprecated class on purpose.** The type checker reports both the construction and the subclass, so
-both lines carry `# type: ignore`. The
-subclass warning fires at class-creation time, so it arrives on
+both lines carry `# type: ignore`.
+
+The subclass warning fires at class-creation time, so it arrives on
 import rather than on any call. A library that subclasses a
 deprecated class emits the warning as soon as Python imports that
 library.
@@ -340,8 +341,9 @@ call proceeds. This wrapper is the
 [protection proxy](../../Chapters/26_Patterns--Surrogate.md#protection-proxy).
 
 None of the three is a *Façade*, because a *Façade* narrows many objects
-to a few names and each of these wraps one object. The
-code does not decide the classification. All three could be the
+to a few names and each of these wraps one object.
+
+The code does not decide the classification. All three could be the
 same `__getattr__()` forwarder. What separates them is the answer to
 "what breaks if I delete this," and a name chosen from that answer
 tells the next reader why the wrapper is there.

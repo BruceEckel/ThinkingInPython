@@ -473,6 +473,7 @@ You can put it around the cached call.
 An uncached wrapper function takes the lock and calls the cached `settings()` inside it,
 so the lookup and the body both run under one lock,
 and eight racing first calls build one object.
+
 The cost is that every call takes the lock, not just the first,
 because the wrapper cannot see a hit until it has asked the cache.
 The chapter's `singleton_locked_settings.py` pays the same cost.
@@ -482,11 +483,13 @@ It drops `@cache` and hand-writes the check inside one lock.
 it. A race needs two threads arriving before the object exists, so
 build the object first. The module body calls `primed()` once,
 before any worker thread starts, and by the time the pool exists
-every call is a cache hit. The count is `1`. Priming the cache this
-way is `singleton_eager_factory.py` from the chapter, and it works
-for the same reason the module form does. The import system runs a
-module body once, and a thread that imports the module while the
-body is running waits for the body to finish.
+every call is a cache hit. The count is `1`.
+
+Priming the cache before any worker thread starts is
+`singleton_eager_factory.py` from the chapter, and it works for the
+same reason the module form does. The import system runs a module
+body once, and a thread that imports the module while the body is
+running waits for the body to finish.
 
 The trade is that the module body builds the object whether or not
 anything uses it. For settings that cost is nothing. For a database

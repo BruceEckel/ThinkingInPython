@@ -877,9 +877,11 @@ generator to its end, leaving nothing to resume. `retry()` needs to
 build a fresh Effect per attempt, and only the function that builds
 the Effect can do that.
 So `retry()` decorates the function, calls it once per attempt, and
-hands back a function that takes the same arguments. The Effect the
-returned function builds has a wider type. `retry()` adds the clock on
-which it sleeps and replaces the error with a `RetryError`.
+hands back a function that takes the same arguments.
+
+The Effect the returned function builds has a wider type. `retry()`
+adds the clock on which it sleeps and replaces the error with a
+`RetryError`.
 
 The same reasoning explains `repeat()` and `memoize()`. It also
 explains why storing Effects in a registry, a queue, or a cache is a

@@ -229,11 +229,12 @@ Neither `price()` nor `heaviest()` needs `singledispatch`. `price()`
 reads `t.weight` and `t.value`, and `heaviest()` reads `t.weight`
 alone. Every `Trash` subclass carries both attributes, so the same
 code runs for `Aluminum`, `Plastic`, or any future material. Both are
-in `sum_value()`'s situation. `singledispatch` is for behavior that
-differs by type, such as `recycling_note()` giving `Aluminum` and
-`Glass` their own wording. When a calculation has the same form for
-every type and varies only in the numbers each type carries, write an
-ordinary function.
+in `sum_value()`'s situation.
+
+`singledispatch` is for behavior that differs by type, such as
+`recycling_note()` giving `Aluminum` and `Glass` their own wording.
+When a calculation has the same form for every type and varies only
+in the numbers each type carries, write an ordinary function.
 
 </details>
 </details>

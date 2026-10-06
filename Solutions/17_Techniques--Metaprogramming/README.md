@@ -376,10 +376,12 @@ any ancestor declared itself final. A check of the direct bases in
 `A.__init_subclass__()` refuses the first subclass of a final class as
 Python creates that subclass, so no deeper descendant exists. The walk
 stays because it states the rule as written, "no final class anywhere
-above," in one line. `Open` and `Sub` show that the rest of the
-hierarchy still subclasses freely. `A.__init_subclass__()` raises a
-`TypeError` only for a class whose `__mro__` holds one of the classes in
-`A._final`.
+above," in one line.
+
+**Confirm a sibling stays open.** `Open` and `Sub` show that the
+rest of the hierarchy still subclasses freely. `A.__init_subclass__()`
+raises a `TypeError` only for a class whose `__mro__` holds one of the
+classes in `A._final`.
 
 </details>
 </details>

@@ -64,10 +64,11 @@ The trace splits into two halves that run in opposite directions.
 `gather()` starts its tasks in argument order, so `d` starts last. Each
 task then suspends at its own `await`, and the event loop resumes them
 in the order their timers fire, so the shortest delay wakes first and
-`d` resumes before the other three. The returned list follows the
-argument order, not the finishing order. `gather()` fills each
-position from the coroutine passed in that position, so `'D'` is last
-in the list although `d` finished first.
+`d` resumes before the other three.
+
+The returned list follows the argument order, not the finishing order.
+`gather()` fills each position from the coroutine passed in that
+position, so `'D'` is last in the list although `d` finished first.
 
 </details>
 </details>
@@ -147,10 +148,11 @@ coroutines while the current one waits.
 The timing follows from the trace. `gather()` finishes in about the
 longest delay, 0.03 seconds, because all three waits overlap. This
 version takes their sum, about 0.06 seconds, because the waits run one
-after another. The list comprehension is not the problem. Calling
-`fetch()` builds a coroutine object and starts nothing. Only `gather()`
-or a `TaskGroup` schedules every coroutine as a task before waiting on
-any.
+after another.
+
+The list comprehension is not the problem. Calling `fetch()` builds a
+coroutine object and starts nothing. Only `gather()` or a `TaskGroup`
+schedules every coroutine as a task before waiting on any.
 
 </details>
 </details>
@@ -557,7 +559,9 @@ its own, whose workers would import the module again.
 The error is a guard rail rather than the real failure. Python detects
 that a child process is spawning children during its own bootstrap and
 refuses to start them, instead of letting the recursion consume the
-machine. The `if __name__ == "__main__"` line prevents that recursion.
+machine.
+
+The `if __name__ == "__main__"` line prevents that recursion.
 A worker runs the module under the name `"__mp_main__"` rather
 than `"__main__"`, so the child skips the pool-building code and only
 the process you launched runs it.
@@ -625,15 +629,15 @@ considers switching threads only at a function call or at the jump
 that closes a loop iteration. With the `time.sleep()` call removed, the read and the
 write run back to back, with no function call between them, so the
 interpreter finds no scheduling point at which to hand the GIL to
-another thread mid-sequence. That reliability is luck rather than a
-guarantee. The race stays invisible only because this interpreter
-places its switch points elsewhere. Any function call put back
-between the read and the write, a blocking I/O call, a `print()`, or
-an innocuous-looking helper, reopens the same gap, because the
-read-modify-write sequence is still not atomic. A free-threaded
-interpreter has no GIL to hold through the sequence, so there the race
-needs no function call. The fix is still a lock, not the absence of
-an explicit sleep.
+another thread mid-sequence. That reliability is luck rather than a guarantee.
+
+The race stays invisible only because this interpreter places its
+switch points elsewhere. Any function call put back between the read
+and the write, a blocking I/O call, a `print()`, or an innocuous-looking
+helper, reopens the same gap, because the read-modify-write sequence
+is still not atomic. A free-threaded interpreter has no GIL to hold
+through the sequence, so there the race needs no function call. The
+fix is still a lock, not the absence of an explicit sleep.
 
 </details>
 </details>

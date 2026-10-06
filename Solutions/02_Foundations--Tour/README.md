@@ -288,9 +288,10 @@ print(-9 // 4, -9 % 4)
 C and Java truncate integer division toward zero, so their integer
 `-9 / 4` is `-2` and `-9 % 4` is `-1`. Python floors toward negative
 infinity, so `-9 // 4` is `-3`. The identity
-`a == (a // b) * b + a % b` then forces the remainder to `3`. The rule
-is that the result of `%` takes the sign of the divisor. With a
-positive divisor the remainder is nonnegative, which is why
+`a == (a // b) * b + a % b` then forces the remainder to `3`.
+
+The rule is that the result of `%` takes the sign of the divisor.
+With a positive divisor the remainder is nonnegative, which is why
 `index % len(items)` wraps cleanly in either direction.
 
 </details>

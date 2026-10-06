@@ -285,6 +285,7 @@ StateMachine(Happy()).run_all(
 successor. `Happy.next()` answers `Annoy` with a `Grumpy`,
 `Grumpy.next()` answers `Calm` with a `Happy`, and both answer
 `TakePill` with a `Prozac` that returns itself for everything after.
+
 Nothing outside the states holds the transition rules, which
 distinguishes this design from the chapter's table-driven one, where
 the rules live in a dictionary a reader can audit in one place. Here
@@ -1251,10 +1252,12 @@ event type is how most readers first meet it.
 **Fix 1** adds `(state, Nickel)` rows. Those rows work, and they scale
 badly. Every new denomination needs a row for every state that accepts
 money, so a machine with five states and six coins carries thirty rows
-that all do the same thing. Fix 1 is the right fix when the new
-subclass really does behave differently, as `FirstDigit` and
-`SecondDigit` do in `vending_machine.py`. They exist as separate
-classes so they arrive under different keys.
+that all do the same thing.
+
+Fix 1 is the right fix when the new subclass really does behave
+differently, as `FirstDigit` and `SecondDigit` do in
+`vending_machine.py`. They exist as separate classes so they arrive
+under different keys.
 
 **Fix 2** stops making a class for something that is a value. A nickel
 is not a new kind of money. It is a `Money` whose `value` is 5.

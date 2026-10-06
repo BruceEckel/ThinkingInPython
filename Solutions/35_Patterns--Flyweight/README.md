@@ -802,8 +802,9 @@ def test_out_of_range_component_raises() -> None:
 **Validate before the pool lookup.** The check runs first in `__new__()`, before the pool lookup, so
 `__new__()` raises a `ValueError` for an out-of-range component before
 it can find a pooled instance or build a new one. Every `Color` that
-`__new__()` pools or returns has in-range components. That check is
-the same *parse, don't validate* move
+`__new__()` pools or returns has in-range components.
+
+The check is the same *parse, don't validate* move
 [Data Classes as Types](../../Chapters/12_Techniques--Data_Classes_as_Types.md#parse-dont-validate)
 makes with `__post_init__()`. Here the class validates in `__new__()`
 instead, because interning must intercept construction.

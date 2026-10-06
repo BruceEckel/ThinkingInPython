@@ -128,9 +128,11 @@ info: Function defined here
 The type checker pinpoints the mistake the chapter describes. `"3"`
 is a `str`, not an `int`, so it violates `width: int`. The call still
 runs without error at runtime, because `"3" * 4` is valid string
-repetition. In the book, the `# type: ignore` comment on the
-`area("3", 4)` line lets a deliberately wrong example pass the book's
-build. Removing the comment restores the error.
+repetition.
+
+In the book, the `# type: ignore` comment on the `area("3", 4)` line
+lets a deliberately wrong example pass the book's build. Removing the
+comment restores the error.
 
 </details>
 </details>

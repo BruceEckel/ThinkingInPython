@@ -614,16 +614,19 @@ fallback value. `case FALLBACK:` is a bare name, so it captures. It
 matches `Signal.STOP`, binds it to a local named `FALLBACK` inside
 `act()`, and compares nothing. The module-level constant
 still holds `Signal.CAUTION` afterward, so the mistake is
-easy to miss. Python accepts `case FALLBACK:` only because it is the
-last case. Another case after it fails to compile.
+easy to miss.
+
+Python accepts `case FALLBACK:` only because it is the last case.
+Another case after it fails to compile.
 
 **Compare through a dotted name.** The first fix gives the constant a dotted name by putting it in a
 namespace. `Defaults.FALLBACK` is a value pattern, so `dotted()`
 compares against it and answers "brake" for `Signal.STOP`. Any dotted
-name works, including `Signal.CAUTION`. In a program the constant
-would live in `Defaults` alone, one definition for every use. The
-listing keeps the module-level copy because `act()` and `guarded()`
-need the bare name.
+name works, including `Signal.CAUTION`.
+
+In a program the constant would live in `Defaults` alone, one
+definition for every use. The listing keeps the module-level copy
+because `act()` and `guarded()` need the bare name.
 
 **Compare in a guard.** The second fix keeps the bare constant and moves the comparison into a
 guard, where `FALLBACK` is an ordinary expression rather than a

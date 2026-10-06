@@ -357,11 +357,12 @@ For caching to be possible, `Nested` must describe an immutable
 structure: `type Nested = int | tuple[Nested, ...]`, with the
 parameter annotated `tuple[Nested, ...]` rather than `list[Nested]`.
 Tuples hash by contents, and their contents cannot change, so a tuple
-meets both conditions a cache key needs. Purity is a second, separate
-requirement. The chapter's `cache` entry states that "`@cache` works
-correctly only for pure functions." Hashability constrains the key,
-purity constrains the function, and a function can meet one without
-the other.
+meets both conditions a cache key needs.
+
+Purity is a second, separate requirement. The chapter's `cache` entry
+states that "`@cache` works correctly only for pure functions."
+Hashability constrains the key, purity constrains the function, and a
+function can meet one without the other.
 
 The exception says nothing about purity. `deep_sum()` is pure,
 and caching it would be correct. The obstacle is the

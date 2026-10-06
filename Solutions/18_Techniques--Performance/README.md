@@ -109,14 +109,15 @@ for size in (1, 2, 5, 10, 20, 50, 100, 200, 500):
 On this machine, the `set` wins starting at size `2`. Only at
 size `1` does the `list` edge ahead, and then barely. The
 `set`'s advantage grows steadily as `size` increases, as the
-different growth rates (`O(1)` vs. `O(n)`) predict. The crossover
-point is not a fixed number. It depends on the machine, the Python
-build, and even which values you store, because the race is between
-one hash computation and a short linear scan that costs almost
-nothing until the list grows long. Run the same loop yourself and
-expect a different exact number, though the trend (the `list`'s
-relative advantage, if any, evaporating almost immediately) should
-look similar.
+different growth rates (`O(1)` vs. `O(n)`) predict.
+
+The crossover point is not a fixed number. It depends on the
+machine, the Python build, and even which values you store,
+because the race is between one hash computation and a short
+linear scan that costs almost nothing until the list grows
+long. Run the same loop yourself and expect a different exact
+number, though the trend (the `list`'s relative advantage, if
+any, evaporating almost immediately) should look similar.
 
 </details>
 </details>
@@ -265,7 +266,9 @@ The `"computing noisy(3)"` message prints once, on the first
 call. Every later call with the same argument returns the cached
 result without running the function body again, so the
 `print()` call (and any other side effect) does not run a second
-time. Skipping the body is the reason to cache only pure functions.
+time.
+
+Skipping the body is the reason to cache only pure functions.
 A cache assumes that calling the function again is unnecessary,
 because the answer cannot have changed and the call does nothing
 observable besides computing that answer. An impure
@@ -831,6 +834,7 @@ print(sys._jit.is_available(), sys._jit.is_enabled())
 
 The listing carries no `#:` line, because its output depends on the
 interpreter. The book's build prints `False False`.
+
 The two flags name the state. `False False` means the build
 has no JIT compiled in, so `PYTHON_JIT` does nothing. `True False` is
 the python.org Windows and macOS shape, built with

@@ -392,9 +392,11 @@ expect(AttributeError, Gladiolus().accept, Beetle())  # type: ignore
 **Declare the visitor's interface.** `Visits` names the one method `accept()` calls, so the parameter
 declares what `accept()` needs instead of accepting anything. `Bee`
 neither mentions `Visits` nor inherits from it, because a `Protocol`
-matches on structure. Any class with a compatible `visit()` satisfies
-`Visits`. The `Visitor` classes keep the chapter's form. The listing
-keeps only the pollinating half of them.
+matches on structure. Any class with a compatible `visit()`
+satisfies `Visits`.
+
+The `Visitor` classes keep the chapter's form. The listing keeps only
+the pollinating half of them.
 
 The two versions report the `Beetle` mistake at different times. Under
 `Any`, the type checker has nothing to compare `Beetle` against, so

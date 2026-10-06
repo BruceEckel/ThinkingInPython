@@ -117,9 +117,10 @@ print(plugged.tags)
 
 **Isolate the internal list.** `.copy()` closes the leak the same way
 it does for `numbers`. The caller now mutates a throwaway copy, and
-`plugged`'s real `_tags` keeps the items it had. Every new mutable
-field needs its own defensive copy. That repetition is the tedium that
-motivates freezing the data instead.
+`plugged`'s real `_tags` keeps the items it had.
+
+Every new mutable field needs its own defensive copy. That repetition
+is the tedium that motivates freezing the data instead.
 
 </details>
 </details>
@@ -180,9 +181,11 @@ so none of the code that `frozen=True` generated runs.
 values, so hashing an `Immutable` hashes its `Bob`. On a data class
 that compares by value and is not frozen, `@dataclass` sets
 `__hash__` to `None`. A hash computed from fields that can change
-would lose the object inside a dict. Restoring `frozen=True` on `Bob`
-removes the mutation and the hash failure together, the clue that they
-are one problem: a frozen wrapper around a mutable value.
+would lose the object inside a dict.
+
+Restoring `frozen=True` on `Bob` removes the mutation and the hash
+failure together, the clue that they are one problem: a frozen wrapper
+around a mutable value.
 `frozen_leaky.py` shows the same two symptoms for a `list` field.
 
 Nothing enforces deep immutability, and that is the answer: taking

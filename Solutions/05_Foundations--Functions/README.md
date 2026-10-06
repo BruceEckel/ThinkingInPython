@@ -297,9 +297,11 @@ print(apply_twice(lambda n: n * n, 3))
 The lambda runs twice, on the original value and then on its own
 result, so `"hi"` gains two exclamation points rather than one. The
 second call shows the same shape with numbers. `3` squares to `9`,
-which squares to `81`, not `9`. A function that takes another function
-as an argument needs nothing special to say so. `func` is a parameter
-like any other, and it need only be callable with one argument.
+which squares to `81`, not `9`.
+
+A function that takes another function as an argument needs nothing
+special to say so. `func` is a parameter like any other, and it need
+only be callable with one argument.
 
 </details>
 </details>
@@ -413,9 +415,11 @@ So `"Bob"` goes into `facts`, and the positional `name` stays unfilled.
 The message is therefore
 `describe() missing 1 required positional argument: 'name'`,
 which points at the parameter the caller thought they were filling.
-The mistake is visible without running the code, so the call carries a
-`# type: ignore` telling the type checker the misuse is deliberate,
-the same way `param_markers.py` marks its two bad calls.
+
+**Mark the deliberate mistake.** The mistake is visible without
+running the code, so the call carries a `# type: ignore` telling the
+type checker the misuse is deliberate, the same way `param_markers.py`
+marks its two bad calls.
 
 Without `**facts`, Python reports the mismatch:
 `describe() got some positional-only arguments passed as keyword

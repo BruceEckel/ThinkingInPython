@@ -563,9 +563,11 @@ exception, so "must check that connection back in" becomes a guarantee.
 **Refuse use after release.** `__exit__()` also drops the proxy's reference to the connection, so a
 released proxy cannot keep using a connection that now belongs to
 someone else. The check in `__getattr__()` reports that misuse instead
-of letting two clients share one connection. `ConnectionProxy` is a
-*protection proxy* and a *smart reference* at once. It controls access,
-and it adds an action (the check-in) around each loan of the connection.
+of letting two clients share one connection.
+
+`ConnectionProxy` is a *protection proxy* and a *smart reference* at
+once. It controls access, and it adds an action (the check-in) around
+each loan of the connection.
 
 </details>
 </details>

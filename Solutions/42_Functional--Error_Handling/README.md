@@ -239,11 +239,13 @@ This exercise changes `Ok` and `Err`, so the listing defines its own
 pair and does not import the chapter's. `map_error()` works on the
 side `bind()` skips. `bind()` passes a success to the next step and
 leaves a failure alone, while `map_error()` transforms the failure and
-leaves a success alone. `map_error()` differs from `bind()` in what it
-asks of `func`. `bind()`'s function returns a `Result`.
-`map_error()`'s function returns the new error, and `map_error()`
-wraps it, the way the chapter's `map()` wraps a new answer. The
-`returns` library names this method `alt()`.
+leaves a success alone.
+
+`map_error()` differs from `bind()` in what it asks of `func`.
+`bind()`'s function returns a `Result`. `map_error()`'s function
+returns the new error, and `map_error()` wraps it, the way the
+chapter's `map()` wraps a new answer. The `returns` library names
+this method `alt()`.
 
 **Leave a success alone.** `Ok`'s version is a no-op, since an `Ok`
 holds no error to touch.

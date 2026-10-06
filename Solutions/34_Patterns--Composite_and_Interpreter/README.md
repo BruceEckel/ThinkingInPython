@@ -1034,6 +1034,7 @@ the string in a `Num` without looking at it.
 **Hand the decision back to Python.** Returning `NotImplemented` puts the decision back where it belongs.
 `__radd__()` now answers only for an `int`, so both sides decline and
 Python raises the `TypeError` it raises for any other mismatched pair.
+
 The message comes from `str`, which is the right source. The left
 operand is what the caller wrote first, and nothing in this expression
 language claims to extend `str`.
@@ -1041,8 +1042,10 @@ language claims to extend `str`.
 **Guard the forward direction too.** The forward methods need the same guard for the same reason. Without
 it `x + "a"` passes the raw string through `wrap()` and builds the
 ill-typed tree `Add(Var('x'), 'a')` from the other direction, so all
-four methods decline what they cannot use. The two messages differ because each comes from a different
-source. `str` reports `"a" + x`, and Python's own fallback reports
+four methods decline what they cannot use.
+
+The two messages differ because each comes from a different source.
+`str` reports `"a" + x`, and Python's own fallback reports
 `x + "a"`, once both operands have declined.
 
 **Declare the node each method builds.** Each method declares the type it really returns, `Add` or `Mul`,
@@ -1499,9 +1502,11 @@ the case. The open design removes that coupling.
 **Move the operation onto the classes.** Moving the operation back onto the classes reverses the trade the
 chapter spent the first two sections making. Adding `Symlink` now
 leaves existing code unchanged, while adding a *new operation* takes
-a method in every class, including the ones you do not own. The
-`@abstractmethod` enforces the contract on the plugin. Python refuses to
-instantiate a subclass that defines no `disk_usage()`.
+a method in every class, including the ones you do not own.
+
+**Enforce the contract on plugins.** The `@abstractmethod` enforces
+the contract on the plugin. Python refuses to instantiate a subclass
+that defines no `disk_usage()`.
 
 For a file system, use the open design. Which node types exist is a
 fact about the operating system and about whatever the next version

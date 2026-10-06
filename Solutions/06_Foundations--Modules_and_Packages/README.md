@@ -433,9 +433,10 @@ Without `__all__`, the star import falls back to the underscore
 convention: every top-level name that does not start with an
 underscore arrives. `undeclared` therefore joins `public` and
 `helper`, and `_internal` stays out. Restoring the `__all__` line
-shrinks the surface back to `public` and `helper`. `__all__` and the
-underscore convention compose in one direction only.
-`__all__` can export an underscored name, but without
+shrinks the surface back to `public` and `helper`.
+
+`__all__` and the underscore convention compose in one direction
+only. `__all__` can export an underscored name, but without
 `__all__` an underscore is the only way to keep a name out of a star
 import.
 
