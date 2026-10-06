@@ -532,11 +532,9 @@ A `plot.redraw` that is still connected keeps `plot` in memory,
 and `redraw()` runs on every announcement.
 A responder the program stops using but leaves connected creates a *lapsed listener*.
 Over a long run the broadcaster accumulates lapsed listeners,
-and the memory they hold is a leak.
-Long-lived broadcasters need disciplined `disconnect()` calls,
-or [weak references](10_Foundations--Cleanup.md#watching-objects-without-holding-them),
-which do not keep the responder alive
-(`weakref.WeakMethod` is the bound-method form).
+creating a memory leak.
+Long-lived broadcasters need either disciplined `disconnect()` calls or [weak references](10_Foundations--Cleanup.md#watching-objects-without-holding-them),
+which do not keep the responder alive.
 A weak responder resolves its reference at every call and drops out once its object is gone:
 
 ```python
@@ -574,16 +572,25 @@ with expected(ValueError):
 
 Because a `Broadcaster` holds a strong reference to whatever you connect,
 the weak part lives inside the responder.
-`WeakMethod` stores the instance and the function separately, both weakly,
-and rebuilds the bound method when you call the reference.
 An ordinary `weakref.ref(plot.redraw)` is dead the moment it is created.
-`plot.redraw` builds a new bound-method object that nothing else holds,
-so Python collects it at once and the reference returns `None`.
-While `plot` is alive, `weak` forwards the reading to it.
-Once `plot` is gone, `ref()` returns `None` and `weak` disconnects itself,
-which is safe mid-notification because `announce()` iterates through a copy.
-`disconnect()` finds nothing left to remove,
-so it raises the `ValueError` that confirms the connection is gone.
+Evaluating `plot.redraw` builds a new bound-method object,
+and a weak reference alone points to that object,
+so Python collects the bound method at once.
+`WeakMethod` stores the instance and the function separately, both weakly,
+and rebuilds the bound method each time you call `ref()`.
+
+The first `announce()` runs while `plot` is alive:
+`ref()` returns the bound method, and `weak` calls that method with the reading.
+`del plot` removes the one strong reference to the `Plot` object,
+and Python collects the object.
+During the second `announce()`,
+`ref()` returns `None` and `weak` disconnects itself.
+The copy that `announce()` iterates makes a mid-notification disconnect safe,
+as it does for `once` in `self_removing_responder.py`.
+The listing's last statement tries to disconnect `weak` a second time.
+The broadcaster's list is empty by then,
+so `disconnect()` raises a `ValueError`,
+the evidence that `weak` removed itself.
 
 Most programs can keep strong connections.
 A broadcaster that lives no longer than its responders releases them when it goes away,
