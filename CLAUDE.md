@@ -311,8 +311,10 @@ registers"). `tools/pattern_names.py` checks it (`tip pattern-names`)
 and `tip fix-pattern-names` rewrites the unambiguous cases; the names
 and the excluded phrases (`!State Machines`) are in
 `tools/data/pattern_names.txt`. State/Command/Bridge at a line start
-are listed only with `--sentence-start`, for a human to judge; the
-three in the book ("State the rule...") are the verb. The check has
+are listed only with `--sentence-start`, for a human to judge. As of
+2026-10-06 it lists four lines in `Chapters/` and six in `Solutions/`,
+all the ordinary word: the verb ("State the rule...") in nine and the
+noun ("State that changes with each call") in chapter 17. The check has
 been in `GATE_CHECKS` since 2026-09-16, so `verify`, `gate`, and
 `verify-ch` fail on a plain name. Since 2026-10-06 the gate runs it
 over `Solutions/` too: a hint that links a section by its title
@@ -321,7 +323,7 @@ italicizes the pattern name inside the link text,
 word in its ordinary sense ("Intrinsic and Extrinsic State") gets a
 `!` exclusion. A bold step label that opens with the verb
 ("**State the precondition in the strategy.**") counts as a sentence
-start, like the three in the chapters.
+start and joins that listing.
 
 ## Diagrams: hand-authored SVGs, some generated
 
