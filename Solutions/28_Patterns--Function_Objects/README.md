@@ -9,7 +9,7 @@
 <details>
 <summary>Where to look</summary>
 
-[A Callable Object as a Command](../../Chapters/28_Patterns--Function_Objects.md#a-callable-object-as-a-command) shows a command that carries its own state, which the macro still calls with `()`.
+[A Callable Object as a *Command*](../../Chapters/28_Patterns--Function_Objects.md#a-callable-object-as-a-command) shows a command that carries its own state, which the macro still calls with `()`.
 A command that must answer two requests, running and reversing, needs a type with two members.
 Describe that type with a `Protocol`, and make each command remember what it did so it can reverse it.
 A `Macro` then undoes its list in `reversed()` order.
@@ -152,7 +152,7 @@ balance.
 <details>
 <summary>Where to look</summary>
 
-[Chain of Responsibility: Choosing the Handler at Runtime](../../Chapters/28_Patterns--Function_Objects.md#chain-of-responsibility-choosing-the-handler-at-runtime) uses `None` to mean that a handler failed.
+[*Chain of Responsibility*: Choosing the Handler at Runtime](../../Chapters/28_Patterns--Function_Objects.md#chain-of-responsibility-choosing-the-handler-at-runtime) uses `None` to mean that a handler failed.
 `None` carries no reason, so give each handler a failure value that does, and return `float | Failed`.
 In `solve()`, tell a root from a failure with `match`, print each attempt, and read the handler's name from `__name__`.
 Because `Callable` has no name, the type of the chain needs a `Protocol` that declares `__name__`.
@@ -344,7 +344,7 @@ importing them, because each solution runs on its own.
 <details>
 <summary>Where to look</summary>
 
-[Strategy: Choosing the Algorithm at Runtime](../../Chapters/28_Patterns--Function_Objects.md#strategy-choosing-the-algorithm-at-runtime) shows a caller supplying the interchangeable part of an algorithm as a function.
+[*Strategy*: Choosing the Algorithm at Runtime](../../Chapters/28_Patterns--Function_Objects.md#strategy-choosing-the-algorithm-at-runtime) shows a caller supplying the interchangeable part of an algorithm as a function.
 Have the `key` function return a tuple, since Python compares tuples element by element.
 For the explanation, ask what `sorted()` fixes and what the caller supplies.
 
@@ -387,7 +387,7 @@ Context holding the current strategy is the call to `sorted()`.
 <details>
 <summary>Where to look</summary>
 
-[Strategy: Choosing the Algorithm at Runtime](../../Chapters/28_Patterns--Function_Objects.md#strategy-choosing-the-algorithm-at-runtime) builds a configured *Strategy* from `bisection_within()` and again with `functools.partial`.
+[*Strategy*: Choosing the Algorithm at Runtime](../../Chapters/28_Patterns--Function_Objects.md#strategy-choosing-the-algorithm-at-runtime) builds a configured *Strategy* from `bisection_within()` and again with `functools.partial`.
 Give `newton()` a `tolerance` parameter with a default so existing calls keep working.
 Then write a factory that returns an inner function calling `newton()` with the tolerance, and build a second finder with `partial()` and a keyword argument.
 Both match the `RootFinder` type, which is why `solve()` needs no change.
@@ -524,7 +524,7 @@ function, the way `bisection_within()` writes the tolerance into its
 <details>
 <summary>Where to look</summary>
 
-[An Event Bus: Handlers Keyed by Type](../../Chapters/28_Patterns--Function_Objects.md#an-event-bus-handlers-keyed-by-type) looks handlers up by `type(event)` in a `defaultdict`.
+[An *Event Bus*: Handlers Keyed by Type](../../Chapters/28_Patterns--Function_Objects.md#an-event-bus-handlers-keyed-by-type) looks handlers up by `type(event)` in a `defaultdict`.
 Iterate over `type(event).__mro__` instead, and read each class's handlers with `.get()` so a lookup does not insert keys.
 `unsubscribe()` removes a handler from that list, so decide what it should do with a handler that is not in the list.
 For the last question, compare which change alters what an existing caller receives.

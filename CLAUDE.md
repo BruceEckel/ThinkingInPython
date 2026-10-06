@@ -314,7 +314,12 @@ and the excluded phrases (`!State Machines`) are in
 are listed only with `--sentence-start`, for a human to judge; the
 three in the book ("State the rule...") are the verb. The check has
 been in `GATE_CHECKS` since 2026-09-16, so `verify`, `gate`, and
-`verify-ch` fail on a plain name.
+`verify-ch` fail on a plain name. Since 2026-10-06 the gate runs it
+over `Solutions/` too: a hint that links a section by its title
+italicizes the pattern name inside the link text,
+`[The Classic *Visitor*](...)`, and a title or step label that uses
+the word in its ordinary sense ("Intrinsic and Extrinsic State",
+"**State the precondition in the strategy.**") gets a `!` exclusion.
 
 ## Diagrams: hand-authored SVGs, some generated
 

@@ -426,7 +426,7 @@ from a file, one per line, takes one line of code:
 <details>
 <summary>Where to look</summary>
 
-[Table-Driven State Machine](../../Chapters/31_Patterns--State_Machines.md#table-driven-state-machine) moves every rule out of the state classes and into data.
+[Table-Driven *State Machine*](../../Chapters/31_Patterns--State_Machines.md#table-driven-state-machine) moves every rule out of the state classes and into data.
 Key one `dict` on a `(state, word)` tuple and let its value be the next state.
 The controller then holds no rules, only a lookup.
 

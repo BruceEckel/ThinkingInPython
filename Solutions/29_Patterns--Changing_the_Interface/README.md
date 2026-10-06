@@ -12,7 +12,7 @@
 <details>
 <summary>Where to look</summary>
 
-[Adapter in Python](../../Chapters/29_Patterns--Changing_the_Interface.md#adapter-in-python) shows `__getattr__()` forwarding every attribute the adapter does not define.
+[*Adapter* in Python](../../Chapters/29_Patterns--Changing_the_Interface.md#adapter-in-python) shows `__getattr__()` forwarding every attribute the adapter does not define.
 Add `__getitem__()` to the class for the lookup, then try `len()` on the result.
 Python finds special methods on the class, not through `__getattr__()`, which explains what `len()` does.
 
@@ -184,7 +184,7 @@ library.
 <details>
 <summary>Where to look</summary>
 
-[Façade](../../Chapters/29_Patterns--Changing_the_Interface.md#façade) builds the *Façade* as a class of static methods.
+[*Façade*](../../Chapters/29_Patterns--Changing_the_Interface.md#façade) builds the *Façade* as a class of static methods.
 A module is already a namespace, so the classes can stay in it behind leading-underscore names.
 Expose a function that assembles them, import only that function elsewhere, and list the module's public names with `vars()`.
 

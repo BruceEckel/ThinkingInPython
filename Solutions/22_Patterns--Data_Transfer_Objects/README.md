@@ -9,7 +9,7 @@
 <details>
 <summary>Where to look</summary>
 
-[A Hand-Rolled Messenger](../../Chapters/22_Patterns--Data_Transfer_Objects.md#a-hand-rolled-messenger) shows `__init__()` assigning the keyword arguments to `self.__dict__`.
+[A Hand-Rolled *Messenger*](../../Chapters/22_Patterns--Data_Transfer_Objects.md#a-hand-rolled-messenger) shows `__init__()` assigning the keyword arguments to `self.__dict__`.
 Build two instances with different keywords, then compare what `hasattr()` reports for each name on each instance.
 The question to answer is where each instance keeps its dictionary.
 

@@ -41,7 +41,9 @@ from tools.tool_stamp import UPGRADE_REQUESTED
 # either now fails the gate rather than sitting in a backlog. widths also
 # runs over Solutions/ (a separate step in `gate`), since Solutions
 # listings render on the same small screens. records runs there too:
-# most of the book's frozen data classes are in Solutions/.
+# most of the book's frozen data classes are in Solutions/. pattern-names
+# joined them on 2026-10-06, once the hints' section-title links carried
+# their italics.
 GATE_CHECKS = ("listings widths banned comment-periods comment-caps "
                "comment-spacing anchors footnotes epigraph self-reference "
                "prose-lint pattern-names records").split()
@@ -236,7 +238,8 @@ def gate(v: Vars) -> None:
     py("tools.solution_steps", "--write")
     py("tools.check_all", *GATE_CHECKS)
     py("tools.check_all", "anchors", "--paths", *GATE_DOCS)
-    py("tools.check_all", "widths", "records", "--paths", "Solutions")
+    py("tools.check_all", "widths", "records", "pattern-names",
+       "--paths", "Solutions")
     py("tools.coupling_panels", "--check")
     py("tools.story_figures", "--check")
     py("tools.check_quoted_diagnostics")
@@ -1199,7 +1202,8 @@ def pattern_names(v: Vars) -> None:
     """Every naming of a design pattern is *Capitalized* and italic, on every
     mention, since names like State, Command, and Proxy are ordinary words
     otherwise. The names live in tools/data/pattern_names.txt. In GATE_CHECKS
-    since 2026-09-16, once chapter 28's misses were fixed.
+    since 2026-09-16, once chapter 28's misses were fixed, and run over
+    Solutions/ by the gate since 2026-10-06.
     """
     py("tools.pattern_names", *prose_files(v))
 

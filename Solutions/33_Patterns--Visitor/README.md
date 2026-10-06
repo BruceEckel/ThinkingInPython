@@ -10,10 +10,10 @@
 <details>
 <summary>Where to look</summary>
 
-[The Pythonic Visitor: singledispatch](../../Chapters/33_Patterns--Visitor.md#the-pythonic-visitor-singledispatch) adds an operation to a fixed hierarchy from outside it.
+[The Pythonic *Visitor*: singledispatch](../../Chapters/33_Patterns--Visitor.md#the-pythonic-visitor-singledispatch) adds an operation to a fixed hierarchy from outside it.
 Decide which of `pollinate()` and `eat()` answers differently by flower type.
 Only that one needs `@singledispatch` and `register`.
-Then list what the *Visitor* machinery in [The Classic Visitor](../../Chapters/33_Patterns--Visitor.md#the-classic-visitor) exists to do, and what in it has no job left.
+Then list what the *Visitor* machinery in [The Classic *Visitor*](../../Chapters/33_Patterns--Visitor.md#the-classic-visitor) exists to do, and what in it has no job left.
 
 <details>
 <summary>The shape</summary>
@@ -129,7 +129,7 @@ what the `Visitor` hierarchy provides, without the classes.
 <details>
 <summary>Where to look</summary>
 
-[The Pythonic Visitor: singledispatch](../../Chapters/33_Patterns--Visitor.md#the-pythonic-visitor-singledispatch) builds each operation as one `@singledispatch` function with a default and a `register` per exception.
+[The Pythonic *Visitor*: singledispatch](../../Chapters/33_Patterns--Visitor.md#the-pythonic-visitor-singledispatch) builds each operation as one `@singledispatch` function with a default and a `register` per exception.
 A new class costs the class plus one registration in every operation where its answer differs from the default.
 A new operation costs one function plus a registration for each flower that differs.
 Count both in lines, then compare with [The Expression Problem](../../Chapters/13_Techniques--Pattern_Matching.md#the-expression-problem).

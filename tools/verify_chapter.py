@@ -34,7 +34,8 @@ The steps, in order, mirror `verify` (fixers first, markers before sync):
    from the Markdown, then the drift and orphan checks over both.
 7. The Markdown gates: ``check_all`` on the chapter (every gate check, or
    the ``--checks`` list tools/tasks.py passes from ``GATE_CHECKS``),
-   ``anchors`` and ``widths`` on the Solutions file, quoted ``ty``
+   ``anchors``, ``widths``, ``records``, and ``pattern-names`` on the
+   Solutions file, quoted ``ty``
    diagnostics in both, prose references to numbered exercises in
    both (the ones these two files make; a reference another chapter
    makes to this chapter's exercises needs the whole-book run),
@@ -80,7 +81,7 @@ SOLUTIONS_DIR: Final = ROOT / "Solutions"
 TY_EXTRA_DIRS: Final = ("utils", "06_Foundations--Modules_and_Packages")
 # The Solutions checks the gate runs through check_all (its `banned` and
 # listing checks stay off Solutions/ for the reasons tools/tasks.py gives).
-SOLUTIONS_CHECKS = ["anchors", "widths", "records"]
+SOLUTIONS_CHECKS = ["anchors", "widths", "records", "pattern-names"]
 
 
 def ty_overrides(build_dir: Path) -> list[str]:

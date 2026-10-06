@@ -9,7 +9,7 @@
 <details>
 <summary>Where to look</summary>
 
-[The Classic Composite](../../Chapters/34_Patterns--Composite_and_Interpreter.md#the-classic-composite) and [A Composite of Data Classes](../../Chapters/34_Patterns--Composite_and_Interpreter.md#a-composite-of-data-classes) show `walk()` recursing through a `Directory`, the classic version through overridden methods and the data-class version through `match`.
+[The Classic *Composite*](../../Chapters/34_Patterns--Composite_and_Interpreter.md#the-classic-composite) and [A *Composite* of Data Classes](../../Chapters/34_Patterns--Composite_and_Interpreter.md#a-composite-of-data-classes) show `walk()` recursing through a `Directory`, the classic version through overridden methods and the data-class version through `match`.
 Write `find()` in the same shape, with one case per `Node` type and `yield from` for the recursion.
 A `Directory` case checks its own name before it descends, and it carries the path prefix down.
 
@@ -120,7 +120,7 @@ separate directories named `"src"`, and both come back as
 <details>
 <summary>Where to look</summary>
 
-[A Composite of Data Classes](../../Chapters/34_Patterns--Composite_and_Interpreter.md#a-composite-of-data-classes) ends each `match` with `assert_never()`.
+[A *Composite* of Data Classes](../../Chapters/34_Patterns--Composite_and_Interpreter.md#a-composite-of-data-classes) ends each `match` with `assert_never()`.
 Add a `@record` class to the `Node` union and run the type checker.
 It reports the unhandled type in each operation that lacks a case.
 Then decide per operation what a link means, and avoid following the target into a subtree.
@@ -1389,7 +1389,7 @@ and changes no setting that other code can see.
 <details>
 <summary>Where to look</summary>
 
-[A Composite of Data Classes](../../Chapters/34_Patterns--Composite_and_Interpreter.md#a-composite-of-data-classes) closes `Node` as a union, so every operation is a `match` in your module.
+[A *Composite* of Data Classes](../../Chapters/34_Patterns--Composite_and_Interpreter.md#a-composite-of-data-classes) closes `Node` as a union, so every operation is a `match` in your module.
 To open the set, move `disk_usage()` onto an abstract base class as an `@abstractmethod`, and let each entry type implement it.
 When you choose between the designs, ask who owns the list of node types and who writes new operations.
 

@@ -11,7 +11,7 @@
 <details>
 <summary>Where to look</summary>
 
-[The Classic Memento](../../Chapters/36_Patterns--Memento.md#the-classic-memento) shows `save()` copying the strokes into an immutable `Memento`, and [Immutability](../../Chapters/36_Patterns--Memento.md#immutability) shows a `Drawing` that returns a new state.
+[The Classic *Memento*](../../Chapters/36_Patterns--Memento.md#the-classic-memento) shows `save()` copying the strokes into an immutable `Memento`, and [Immutability](../../Chapters/36_Patterns--Memento.md#immutability) shows a `Drawing` that returns a new state.
 In the mutable sketch, `erase()` pops from the list like `draw()` appends to it.
 In the frozen one, build the new `Drawing` with `replace()` and a sliced tuple.
 Test each by saving first, erasing, then checking the earlier state still holds both strokes.

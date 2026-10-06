@@ -204,7 +204,7 @@ nested in between.
 <details>
 <summary>Where to look</summary>
 
-[The Decorator Pattern](../../Chapters/14_Techniques--Decorators.md#the-decorator-pattern) builds pizzas from a base and wrapper objects that share one interface.
+[The *Decorator* Pattern](../../Chapters/14_Techniques--Decorators.md#the-decorator-pattern) builds pizzas from a base and wrapper objects that share one interface.
 Define a `Protocol` for a drink, plain drink classes that satisfy it, and a wrapper base class that holds one drink and forwards `cost` and `description`.
 Each extra adds its own price and name to what the inner drink reports.
 

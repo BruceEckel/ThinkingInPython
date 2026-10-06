@@ -12,7 +12,7 @@
 <details>
 <summary>Where to look</summary>
 
-[Virtual Proxy](../../Chapters/26_Patterns--Surrogate.md#virtual-proxy) builds `Expensive` inside `__getattr__()`, which runs only when normal lookup fails.
+[Virtual *Proxy*](../../Chapters/26_Patterns--Surrogate.md#virtual-proxy) builds `Expensive` inside `__getattr__()`, which runs only when normal lookup fails.
 Give `Lazy` a property for the cheap attribute, so Python finds it on the class and skips the fallback.
 Increment a counter in that property, and print the counter at the moment the fallback builds the real object.
 
@@ -414,7 +414,7 @@ example) fails the same way on its first attribute access.
 <details>
 <summary>Where to look</summary>
 
-[Protection Proxy](../../Chapters/26_Patterns--Surrogate.md#protection-proxy) shows a surrogate that controls access to an implementation.
+[Protection *Proxy*](../../Chapters/26_Patterns--Surrogate.md#protection-proxy) shows a surrogate that controls access to an implementation.
 Let only a `Pool` class create the `Connection` objects, and have `acquire()` return a proxy that forwards through `__getattr__()`.
 Make the proxy a context manager whose `__exit__()` returns the connection to the pool and drops its own reference.
 

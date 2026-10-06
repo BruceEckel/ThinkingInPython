@@ -11,7 +11,7 @@
 <details>
 <summary>Where to look</summary>
 
-The design is the one [The Pythonic Observer](../../Chapters/30_Patterns--Observer.md#the-pythonic-observer) describes:
+The design is the one [The Pythonic *Observer*](../../Chapters/30_Patterns--Observer.md#the-pythonic-observer) describes:
 a list of callables, one method that appends to it,
 and one that calls each entry with the same arguments.
 Any callable is a responder, a `lambda` included,
@@ -1627,7 +1627,7 @@ one list.
 <summary>Where to look</summary>
 
 A module-level list and a decorator that appends its function and returns it unchanged make every decorated `def` a registration.
-For the comparison, reread the problems the runtime sections raise after [The Pythonic Observer](../../Chapters/30_Patterns--Observer.md#the-pythonic-observer):
+For the comparison, reread the problems the runtime sections raise after [The Pythonic *Observer*](../../Chapters/30_Patterns--Observer.md#the-pythonic-observer):
 disconnecting, a raised exception, lapsed listeners, and re-entrant notification.
 
 <details>
