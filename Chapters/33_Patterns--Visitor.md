@@ -25,6 +25,7 @@ The hierarchy's author must write `accept()` in advance,
 because you cannot add it to a vendor's classes yourself.
 `accept()` calls the visitor's `visit()`, passing `self`.
 The visitor's type chooses which `visit()` runs.
+
 A new `Visitor` subclass that reuses an existing operation, such as `Fly`,
 adds no code to the primary hierarchy.
 In this Python version a new operation whose behavior varies by flower type also needs a new method on `Flower`,
@@ -281,6 +282,7 @@ so every implementation stays in the table.
 
 Nothing edits `Flower`.
 Each operation is a separate function.
+
 Dispatch follows inheritance.
 A subclass resolves to its nearest registered ancestor.
 Every class descends from `object`,
@@ -427,6 +429,7 @@ and the frames differ only in the method the return trip reaches.
 In the third frame no method on `Flower` takes part.
 One lookup in `nectar()`'s table, keyed by the flower's type, finds the answer.
 That one dispatch resolves everything *Visitor*'s two dispatches do.
+
 The second dispatch in the classic pattern exists not because two types are unknown,
 but because the operation must be a method on some class.
 The visitor's type stands in for the operation,

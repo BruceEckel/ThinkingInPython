@@ -108,6 +108,7 @@ print(sorted(words, reverse=True))
 
 `sorted(x)` returns the new list while `x.sort()` returns `None`,
 so `x = x.sort()` binds `None` and loses the list.
+
 Uppercase sorts before lowercase because Python compares strings by code point.
 [Functions](05_Foundations--Functions.md#lambdas)
 shows how a `key=` function changes the ordering.
@@ -160,6 +161,7 @@ print(grid)
 The grid is [Variables and References](02_Foundations--Tour.md#variables-and-references)
 again.
 `*` binds the same object into every slot, and assignment never copies.
+
 The second `grid` comes from a *comprehension*:
 a single expression that produces a new list,
 in place of a loop with `append()`.
@@ -287,6 +289,7 @@ a tuple, a string, a `range`, or the value a call returns,
 as with `*sorted("cab")`.
 Unlike a starred target, any number of operands can carry a star,
 and they mix freely with ordinary elements.
+
 The last two lines use both directions.
 `*rest` collects on the left of the assignment and spreads inside the display,
 so the pair rotates `evens` by one place.
@@ -360,6 +363,7 @@ A `dict` iterates in insertion order, and the language guarantees that order.
 
 A `dict` has three views: `keys()`, `values()`, and `items()`.
 Iterating the `dict` iterates `keys()`, so `for name in ages` walks the names.
+
 `items()` alone yields `(key, value)` pairs,
 and leaving it off is a common slip.
 `for name, age in ages` iterates the keys and tries to unpack each one.
@@ -412,6 +416,7 @@ with `**` spreading each dictionary's entries the way `*` spreads a list's eleme
 and the later entry wins a collision.
 Like a list display, a `dict` display accepts any number of starred operands,
 with ordinary `key: value` entries among them.
+
 The last line feeds `dict()` an iterable of `(key, value)` pairs,
 and `dict()` accepts any iterable that yields such pairs.
 `zip()` pairs up two sequences element by element.
@@ -522,6 +527,7 @@ Single elements move in and out with `add()`, `remove()`, and `discard()`.
 Repeated lookups run faster against a `set` than against a `list`.
 A `list` compares the item you look for against every element in turn.
 A `set` computes one hash and looks in one place.
+
 `timeit()` runs a callable `number` times and returns the total elapsed seconds.
 The [`lambda:`](05_Foundations--Functions.md#lambdas)
 prefix wraps an expression into the callable `timeit()` needs:
@@ -829,6 +835,7 @@ or replace an element by accident,
 so a container of immutable elements needs no defensive copy before you share it.
 An immutable container is safe as a default argument,
 unlike the [mutable default](05_Foundations--Functions.md#the-mutable-default-trap).
+
 A `MappingProxyType` is the one exception to watch.
 It blocks writes through the view, but it is a window onto the original `dict`,
 so changes to that `dict` still show through.

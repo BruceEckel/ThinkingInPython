@@ -102,6 +102,7 @@ and here that value is whatever the handler sent back.
 so the answer to an `Ask` is whatever `scripted()` returns.
 A `Tell` needs no answer,
 which is why `Tell` is `Ability[None]` and `capture()` returns `None`.
+
 `ask()` and `tell()` are *accessors*,
 small functions that each wrap one Ability and declare its answer type.
 `need()` has the same shape,
@@ -522,11 +523,13 @@ def draw(source: Source, hour: int) -> None:
 `Outlet` is an Ability whose handler returns a `Source`,
 and the request carries the hour so the handler can check which sources are available at that hour.
 `Ask` carries a prompt for the same reason.
+
 `Source` carries no `@runtime_checkable`,
 because nothing calls `isinstance()` against it.
 That decorator matters where `supply()` [matches an instance to a requested class](46_Effects--Stateless.md#supplying-an-interface).
 Here `handle()` matches on the Ability's own type, `Outlet`,
 and the `Source` that comes back is only a return value.
+
 `draw()` is the lifting wrapper.
 It asks the source whether it can still supply,
 and `@throws` lifts the refusal into the error channel.
@@ -743,6 +746,7 @@ print(f"remaining: {cell.amount}")
 `purchase()` is the function that uses both.
 It reads, decides, and writes, and the decision sits between the two requests,
 in code that mentions no cell.
+
 `purchase()`'s signature declares the shared state.
 `Depend[Get | Put, bool]` tells a caller this function reads or writes something that outlives it.
 `spree()` composes purchases, and its signature carries the same union.
@@ -885,6 +889,7 @@ def fetch_headline() -> Depend[Need[Feed], str]:
 The decorator adds the error the same way it does for `score()` in [The Error Channel](46_Effects--Stateless.md#the-error-channel).
 `ty` reports `fetch_headline` as `() -> Generator[Need[Feed] | Unavailable, Any, str]`,
 which is `Effect[Need[Feed], Unavailable, str]`.
+
 `research.py` keeps the request and the failure in separate functions,
 because a function that receives everything it uses as arguments is easier to test on its own,
 and because the split keeps the Ability requests in one place.
@@ -1312,6 +1317,7 @@ the checker rejects the `run()` call,
 finding a `Generator[Need[Oven], Any, str]` where it expected an empty Ability channel.
 That is the rejection [Forgetting to Supply](46_Effects--Stateless.md#forgetting-to-supply)
 shows, now arising from a dependency two levels down.
+
 `Oven` and `Toaster` are distinct types,
 so the ambiguity of [When Two Implementations Match](46_Effects--Stateless.md#when-two-implementations-match)
 cannot arise here.
@@ -1431,6 +1437,7 @@ Its annotations do the upcasting,
 so each actor reaches `supply()` as its Protocol type,
 the job `as_type()` does elsewhere.
 Its body is the one place in the program that binds an implementation to an Ability.
+
 `kitties_and_puzzles()` and `warriors_and_weapons()` are what the two concrete factories became.
 Each was a class with a method per product.
 Each is now a function that hands `play()` a matched set.
@@ -2197,6 +2204,7 @@ It resolves a dependency graph at compile time,
 reporting a cycle or a missing provider by name.
 Stateless has no equivalent, so you write the wiring at the edge by hand.
 The type checker verifies that a `supply()` call is complete but says nothing about how you assembled the graph.
+
 The operator set is small in the same way.
 The library has `retry()` and `repeat()`.
 `Schedule` offers a fixed interval and a repeat count,
@@ -2257,6 +2265,7 @@ past any `catch()` the caller wraps around the result.
 The type agrees with the runtime.
 `reveal_type(bad)` under `ty` 0.0.84 reports `(n: int) -> Generator[Need[Executor], Any, Task[int]]`,
 with `Boom` nowhere in it.
+
 The fix is the discipline `catch()` and `catch_all` teach:
 move the failure into the result before you fork.
 Apply `catch_all()` before `@fork`.

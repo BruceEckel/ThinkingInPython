@@ -75,6 +75,7 @@ code you write against the base class works unchanged on any of them.
 That obedience makes polymorphism,
 and patterns like the [*Template Method*](25_Patterns--Template_Method.md),
 safe.
+
 A statically typed compiler can check that an override's signature stays compatible.
 It cannot check whether the override behaves the way the base class declares.
 The base class calls a method and trusts every subclass to stand in for the base.
@@ -401,6 +402,7 @@ When you fetch it from the class instead of from an instance,
 and the call passes `p1` as the first argument.
 `p1.distance_to(p2)` is shorthand for that call.
 The dot fills in `self`.
+
 `distance()` reads the same and computes the same, and it has one advantage.
 It can live outside `Point`.
 The method keeps one advantage of its own.
@@ -464,6 +466,7 @@ if __name__ == "__main__":
 
 `Point` and `PairCoord` share no base class.
 Both have `x` and `y`, and those two attributes are all `distance()` requires.
+
 `Coord` declares `x` and `y` as properties rather than as bare `x: float` annotations.
 A bare annotation in a protocol is a read-write attribute,
 so an implementer must allow assignment to it.
@@ -539,6 +542,7 @@ so no inherited method slips past the counter.
 `CountingBox` forwards each operation it offers by hand.
 `CountingList` inherits dozens it didn't write,
 and more than one of them skips the counter.
+
 Composition still allows the counting bug.
 If you write `extend()` as `self.items.extend(more)` instead of going through `append()`,
 the count is still wrong.

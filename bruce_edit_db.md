@@ -1117,6 +1117,31 @@ multiple primary concepts, and this makes it confusing."
   `WeakMethod`), and "The first `announce()` runs while `plot` is
   alive:" (the listing's run). Claude made the second break during a
   rewrite; Bruce made the first by hand and named the rule.
+- Book sweep 2026-10-05, 48 files (every chapter and appendix but 30,
+  left for its open editing pass): 265 breaks, one Opus agent per
+  chapter, each told to add blank lines and change no wording. Most
+  chapters took 3 to 8; chapters 17, 18, and 19 took 10 to 13, and 39
+  and appendix A took one each. Three samples:
+  `03_Foundations--Containers` broke "A `set` computes one hash and
+  looks in one place." from "`timeit()` runs a callable `number`
+  times" (why the lookup is fast, then how the listing times it);
+  `20_Patterns--Rethinking_Objects` broke the Liskov definition from
+  "A statically typed compiler can check that an override's signature
+  stays compatible."; `44_Effects--Effect_Management` broke the
+  propagation problem from "No PEP proposes Effect tracking today."
+  Nine new paragraphs opened on a pointer and got the noun ("That
+  backstop" -> "The diagnostic backstop", "Both exist on `Ok` alone"
+  -> "`unwrap()` and the `answer` field exist on `Ok` alone", "has a
+  real one" -> "has a real adapter"). One break was undone in review:
+  chapter 23's "The two wrappers' inputs differ, though." leans on the
+  sentence before it.
+
+**Sweep notes.** A seam whose next sentence carries "though", "also",
+"the same way", or a mid-sentence "it"/"one" still leans on the
+paragraph before; the agents' rule covered the opening word alone, so
+read the whole first sentence of each new paragraph. The agents' "close
+calls left whole" lists (about 300 across the book) are the cases this
+rule keeps: a claim with its reason, a contrast, a one-sentence half.
 
 **Home.** cohesion (Accrued patterns).
 

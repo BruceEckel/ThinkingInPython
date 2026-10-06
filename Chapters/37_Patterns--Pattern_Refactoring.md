@@ -105,6 +105,7 @@ Call `create()` as `Trash.create()`.
 `@record` builds `__init__()` from the bare `weight: float` annotation alone.
 The two [`ClassVar` attributes](12_Techniques--Data_Classes_as_Types.md#d-a-real-classvar)
 belong to the class, so they stay out of `__init__()`.
+
 Each subclass's `value` line creates a class attribute of its own,
 separate from `Trash.value` and from its siblings'.
 Each subclass restates `ClassVar[float]`,
@@ -331,6 +332,7 @@ The loop appends two of the four pieces to a bin,
 so the sixty pounds of plastic vanish from the totals the plant uses.
 "Silently drop trash on the floor" means a number that is wrong and looks right,
 not an exception to debug.
+
 The `match` loses the plastic, not the parser.
 `__init_subclass__()` registers `Plastic` the moment its `class` statement runs,
 and without that `class` statement `create()` raises a `KeyError` at the first `Plastic:` line,
@@ -504,6 +506,7 @@ One new question is an edit to all three material classes,
 and the question after it is three more edits.
 Those edits sit in each class body, as `note_methods.py` shows.
 In the real program they go in `trash.py`.
+
 A method belongs in the body of its own class by design.
 You can assign a function onto a class from outside,
 but a reader of the class must then search every module for the behavior assigned onto it.
@@ -564,7 +567,8 @@ Each implementation above takes the [placeholder name `_`](33_Patterns--Visitor.
 `recycling_note()` is a new operation defined outside the `Trash` hierarchy.
 Three materials register a note, and `Paper`, the fourth,
 falls through to the base function.
-That fallback is also the risk.
+
+The fallback is also the risk.
 A forgotten material gets the default answer,
 with no exception at runtime and no report from the type checker.
 Here "no special handling" is a genuine answer for `Paper`,
@@ -618,6 +622,7 @@ but each side is now an addition in one place instead of an edit spread across c
 `singledispatch` is for behavior that differs by type.
 The earlier `sum_value()` does the same thing for every type,
 so it stays an ordinary function.
+
 For an operation that belongs on an object and still varies by type,
 [`functools.singledispatchmethod`](41_Functional--Toolkits.md#singledispatchmethod)
 provides the same dispatch in method form.
@@ -641,6 +646,7 @@ Polymorphism is one way to do that.
 This chapter uses a dictionary keyed by type and a `singledispatch` function.
 The deeper skill is spotting the [*vector of change*](21_Patterns--Design_Patterns.md#the-vector-of-change)
 and choosing the lightest construct that isolates it.
+
 This chapter meets two vectors through a concrete requirement each:
 plastic for new types, and the disposal hazard for new operations.
 Each vector now touches one place.

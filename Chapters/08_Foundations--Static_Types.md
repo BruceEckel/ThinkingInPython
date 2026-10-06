@@ -14,6 +14,7 @@ Python 3.5 (2015) introduced *type hints*,
 which look like the type declarations of statically typed languages.
 The Python runtime never acts on a type hint.
 It stores the hint and evaluates it only when something reads the annotations.
+
 If you want static type checking like you get from a compiler in a typed language,
 you must run a separate type-checking tool.
 Mypy is the original and most widely deployed one,
@@ -36,6 +37,7 @@ Thus, typed and untyped code can coexist,
 and that coexistence is *gradual typing*.
 You can slowly add hints where they earn their keep: the public interfaces,
 the tricky data, the code on which other people depend.
+
 An explicit `Any` indicates that a value is truly dynamic.
 `ty` reports the `Any` that comes from a missing annotation as `Unknown`,
 to distinguish it from an `Any` you wrote yourself.
@@ -234,6 +236,7 @@ The `if` narrows `b.val` to `str`,
 and nothing in the checker's model connects `reset()` to that narrowing,
 so the checker keeps `b.val` narrowed to `str`.
 The `AttributeError` shows the narrowing was stale by the time `upper()` ran.
+
 A narrowing on a local variable holds.
 A narrowing on an attribute can go stale,
 so recheck the attribute after any call that might touch the object.
@@ -339,6 +342,7 @@ The type checker accepts both because each has a `draw()` that takes no argument
 so each matches `Drawable`'s shape.
 The signature is part of that shape.
 A `draw()` that returns an `int`, or that requires an argument, does not match.
+
 A `Protocol` is a checking-time construct,
 so `isinstance(Circle(), Drawable)` raises a `TypeError` instead of answering.
 Decorating the Protocol with `@runtime_checkable` allows the call,
@@ -513,6 +517,7 @@ print(box.get().upper())
 
 Constructing `Box("gift")` binds `T` to `str` for that instance,
 so `get()` returns a `str` and the call to `upper()` checks.
+
 A *bound* limits the parameter.
 `class Box[T: Shape]` accepts `Shape` and its subclasses.
 A *constraint* lists the choices.
@@ -727,6 +732,7 @@ A call that passes `width="6"` draws `invalid-argument-type` from `ty`,
 reporting "Expected `int`, found `Literal["6"]`",
 the same diagnostic a wrongly typed ordinary parameter draws.
 A call that leaves out `width` draws `missing-argument`.
+
 A misspelled keyword is where the checkers disagree.
 Pyright rejects `fill` misspelled as `fil="*"` with `No parameter named "fil"`,
 but `ty` 0.0.84 accepts that call without a diagnostic.
@@ -914,6 +920,7 @@ The abstract container types come from `collections.abc`.
 
 The runtime ignores all of these.
 They exist for the type checker and the reader.
+
 Older code writes some of them differently: `Optional[X]` for `X | None`,
 `Union[X, Y]` for `X | Y`, and `List`, `Dict`, `Set`,
 `Tuple` from `typing` for the lowercase built-ins.

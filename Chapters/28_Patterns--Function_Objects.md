@@ -103,6 +103,7 @@ macro.run()
 The class version takes four classes and a wrapper to say what one list of functions says.
 *GoF Design Patterns* calls commands "an object-oriented replacement for callbacks."
 Because in Python a callback is a function, the replacement is unnecessary.
+
 A `Command` base class is worthwhile when the commands share implementation.
 A second operation alone does not call for one.
 The [undo discussion](#a-callable-object-as-a-command) needs only a type.
@@ -345,6 +346,7 @@ with a `find()` method.
 A "Context" class holds the chosen algorithm.
 A parameter carries a strategy into one call and is gone when the call returns,
 so a Context earns its place when the algorithm must outlast the call.
+
 A view holding a controller is that Context in Smalltalk's MVC,
 and *GoF Design Patterns* names the pair as an example of *Strategy*.
 The controller decides how the view responds to input.
@@ -486,6 +488,7 @@ and success is a non-`None` return.
 This `solve()` reuses the name from `algorithms.py` with the opposite failure contract.
 An exhausted chain returns `None` rather than raising an exception,
 and the caller decides what an empty result means.
+
 The second `solve()` call shows the fall-through.
 Because the interval `[1.0, 1.3]` does not straddle the root,
 bisection fails by returning `None`.
@@ -507,6 +510,7 @@ A finder returns `0.0` for a function whose root is at zero, and `0.0` is falsy,
 so a truthiness test discards a correct answer and calls the next finder.
 The hazard is the truthiness test, not the choice of failure value.
 Whichever value marks failure, compare the result against it with `is`.
+
 `None` is the right failure value here because a root is always a `float`,
 so `float | None` says which result is which.
 A [`sentinel()`](05_Foundations--Functions.md#sentinel-values)
@@ -731,6 +735,7 @@ In `event_bus.py`, the events are records, the handlers are functions,
 and the bus is a `dict`.
 Each `subscribe()` call repeats the event type that the handler's annotation names.
 A second version reads the annotation, so a handler names its event once.
+
 The second version gives each side a decorator, both producing records.
 `@event` registers its class in `EVENTS`.
 `@handler` makes a function object whose fields are its configuration,
@@ -798,6 +803,7 @@ class EventBus:
 `hasattr(cls, "__call__")` cannot make that test,
 because it is true of every class.
 A class is callable, and calling it builds an instance.
+
 The `/` in `Handler` makes `event` positional-only,
 so a handler may give that parameter any name.
 
@@ -891,6 +897,7 @@ The tagged bus gives up the registration-time check of the first version.
 `subscribe(Deposit, on_withdraw)` fails under the type checker because no `E` fits both arguments.
 One argument leaves no pair to compare,
 so a class with the right `__call__()` that skipped `@handler` passes the type checker and fails only when `subscribe()` looks it up.
+
 The test file confirms that:
 
 - A handler receives the events of its own type.

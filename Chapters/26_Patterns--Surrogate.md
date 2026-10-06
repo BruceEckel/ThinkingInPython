@@ -767,6 +767,7 @@ Here the client programmer calls `change_to()`,
 but in a [*State Machine*](31_Patterns--State_Machines.md),
 each implementation chooses its own successor,
 so the surrogate advances without the client asking.
+
 `change_to()` reassigns `__implementation` with no lock.
 While one thread runs a multi-call sequence like `run()`,
 another thread's `change_to()` can run between two of those calls,
@@ -815,6 +816,7 @@ and the generic surrogate exists to avoid that tie.
 each with a `name()` and none of `Behavior`'s three methods.
 With `Behavior` on those parameters, `ty` rejects that test:
 `type StateA is not assignable to protocol Behavior`.
+
 Declaring the implementations as `first: Behavior` and `second: Behavior`,
 as `state_demo.py` does,
 puts the check where it does not restrict the surrogate.
@@ -831,6 +833,7 @@ an object that forwards method calls to an implementation.
 *State* swaps among several implementations to change behavior over time.
 Both are the same few lines of `__getattr__()` delegation,
 with *State* adding a method to change the implementation.
+
 The separate implementation hierarchy in *GoF Design Patterns* matters when other people write the implementations and you need the base class to state which methods an implementation must supply.
 When you write both sides,
 the single generic surrogate in `state_surrogate.py` is simpler and just as flexible.

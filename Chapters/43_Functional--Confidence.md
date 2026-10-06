@@ -304,6 +304,7 @@ and it holds for every input the loop tries.
 That is the shape of every property test:
 a law that states what must always be true,
 and a machine that searches for a counterexample.
+
 A bare `assert` like this one reports a broken law as an `AssertionError`,
 and the traceback shows the assert's source line but not the value that broke it,
 so to find that value you add a `print()` and rerun by hand.
@@ -344,6 +345,7 @@ By default Hypothesis generates a hundred of them,
 a tenth of the hand-written loop's thousand.
 Those hundred strings cover more of the input space,
 because Hypothesis generates boundary values and unusual characters instead of sampling evenly.
+
 When a law fails, Hypothesis reports the failing input,
 the first improvement over `property_check.py`'s bare `assert`.
 It also shrinks that input to the smallest example that still fails,

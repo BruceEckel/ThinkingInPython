@@ -194,6 +194,7 @@ With `Any`, a class that supplies eight of the nine answers passes the type chec
 and Python raises an `AttributeError` at the first duel that calls the ninth.
 Declaring the four methods restores the checking,
 and that declaration repeats every class's method names.
+
 The table version keeps the checking and declares each name once.
 Its answers are rows in one dictionary,
 so a class is complete the moment it inherits `compete()`.
@@ -271,6 +272,7 @@ The method version cuts it into columns and gives one to each class,
 so finding a cell takes two dispatches.
 The table version keeps the grid whole in `OUTCOME`,
 and one lookup finds the same cell.
+
 The dashed fourth item shows what growth costs each version.
 A new class forces a new `eval_*()` method into every existing class,
 while the table takes new rows and leaves the classes untouched.
@@ -368,6 +370,7 @@ It dispatches once on `self` through ordinary method resolution,
 then again on its first argument through `singledispatch`.
 That is the pair of dispatches the `eval_*()` family writes out by hand.
 Like `singledispatch`, it matches on the MRO rather than exactly.
+
 One mistake raises no error and prints a plausible answer.
 A `@singledispatchmethod` declared on a shared base gives every subclass one dispatcher,
 and the resolution on `self` then reaches that same dispatcher for every subclass,
@@ -613,6 +616,7 @@ Python raises the `TypeError` once both sides have declined.
 Raising a `TypeError` inside `__add__()` ends the expression there,
 since the exception propagates immediately.
 Only a returned sentinel makes Python try the right operand's `__radd__()`.
+
 When both operands have the same type, Python tries `__add__()` alone,
 so `__add__()` resolves `Meters + Meters`.
 Adding two instances of a class that implements `__radd__()` alone raises a `TypeError`.

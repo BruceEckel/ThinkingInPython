@@ -35,6 +35,7 @@ and the patterns that supply a collaborator from outside.
 Everything else sits in Other Patterns and Idioms, whose rows share no trait.
 The source and group tables list their rows alphabetically,
 and for the classic patterns that is also GoF's own order.
+
 When this book covers a pattern, its name links to that coverage.
 A name without a link leaves that pattern to the literature.
 

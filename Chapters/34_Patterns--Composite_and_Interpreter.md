@@ -166,6 +166,7 @@ if __name__ == "__main__":
 `Directory` holds a `tuple[Node, ...]`,
 so the alias names itself through one of its own members,
 and that self-reference makes the tree a tree.
+
 `Directory` mentions `Node` above the [`type` statement](08_Foundations--Static_Types.md#the-type-statement)
 that defines `Node`.
 That works because Python evaluates annotations and `type` aliases lazily,
@@ -358,6 +359,7 @@ They build nodes.
 Annotating `self` as `Expr` lets `Add(self, ...)` type-check.
 An implicit `self` means "some subclass of `Operators`,"
 and the `Expr` annotation declares to the type checker that `self` is a member of the union.
+
 `ty` accepts a `self` annotation narrower than the class.
 Pyright and mypy require the declared type of `self` to be a supertype of its class,
 so under either of them the portable form leaves `self` implicit and writes `cast(Expr, self)` at each construction.
@@ -394,6 +396,7 @@ so an expression written with them builds nodes instead of computing.
 `@dataclass` writes its own `__eq__()` onto every node class.
 Attribute lookup finds a class's own method before an inherited one,
 so that generated `__eq__()` shadows anything `Operators` defines.
+
 `expr.py` leaves `==` alone.
 The nodes compare by value,
 and `evaluate.py`'s demo and its tests rely on that comparison.
@@ -466,6 +469,7 @@ so at any moment one dict is live per level of recursion,
 and the live entries total the tree's depth times the number of bound variables.
 The cost matters most on the deep trees about which this chapter warns later,
 which can run thousands of levels.
+
 `**env` is also why the `/` is there.
 The `/` makes `e` [positional-only](05_Foundations--Functions.md#positional-only-and-keyword-only-parameters),
 which keeps the parameter name out of the variable namespace,
@@ -710,6 +714,7 @@ Three walkers over one set of nodes is the pattern pair in full.
 *Interpreter* is the behavior: recursive functions that give the tree meaning.
 Python compresses the pair into records, a union,
 operator methods that build nodes, and `match` functions that walk them.
+
 One practical limit applies.
 Every function here recurses once per level of tree,
 and Python's recursion limit (roughly a thousand frames)

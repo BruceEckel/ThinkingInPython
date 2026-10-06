@@ -113,6 +113,7 @@ If you delete the last `total = 0`,
 the second `running_total()` assertion fails.
 `total` is still 5 from the first call, so the second call returns 10.
 That line is the fixture the impure version needs, and purity removes it.
+
 `slope()` appears again later in the book.
 [Are Exceptions Impure?](44_Effects--Effect_Management.md#are-exceptions-impure)
 asks whether raising an exception breaks its purity.
@@ -154,15 +155,16 @@ The type checker rejects the direct form `p.x = 5` before the program runs.
 To show that the runtime rejects the assignment too,
 the listing writes it as `setattr(p, "x", 5)`, which the type checker accepts.
 The original `p` stays untouched, and `moved` is a separate value.
+
 Restating every field works for a two-field `Point`.
 For a record with many fields,
 [`copy.replace()`](12_Techniques--Data_Classes_as_Types.md#the-general-form-of-replace)
 builds the new value from the old one and the fields that change,
 as in `copy.replace(p, x=p.x + 10)`.
+
 When a value is immutable,
 two parts of a program can share one without coordinating,
 and concurrent code needs no lock to read it.
-
 That safety has a cost, and the cost is copying.
 Python's immutable types share no structure.
 `moved = Point(p.x + 10, p.y)` in `immutability.py` builds a new `Point`,
@@ -210,6 +212,7 @@ The `Sequence[int]` constraint governs `total()`, not the caller.
 It declares that `total()` reads its argument and leaves it as it was.
 The caller keeps its `list` and can append to it at any time,
 including from another thread while `total()` is running.
+
 `Final` freezes the binding, and only the binding.
 If you declare `CONFIG: Final[list[int]] = [...]`,
 `CONFIG.append(...)` still succeeds, for the type checker and at runtime alike.
@@ -648,6 +651,7 @@ print(compose(label, increment_then_double)(10))
 then doubles.
 Each piece stays small and pure,
 and you combine them without changing either one.
+
 The type parameters matter on the second `print()`.
 The type checker verifies that `label` accepts what `increment_then_double` produces,
 and types the composed function `(int) -> str` rather than `(int) -> int`.

@@ -163,6 +163,7 @@ The last two put Effect tracking and generators to work with Stateless,
 a library that builds Effect tracking on generators and brings it to Python today.
 Read these four chapters in order.
 The last two build on the chapters before them.
+
 Two appendices follow.
 [Effect Tracking](A_Effect_Tracking.md)
 asks how far Python's `Annotated` type could carry Effect tracking without a library,
@@ -204,6 +205,7 @@ The short form is the listing's name alone.
 and words after the name go to the program,
 so `tip membership --numbers` passes it the `--numbers` flag.
 When the book says to run a listing, use the short form.
+
 A filename comment that starts with `rust/`,
 like the `# rust/fastcount/demo.py` listing in [Performance](18_Techniques--Performance.md),
 names a file in the repository's `rust/` directory, outside the Python build.
@@ -217,6 +219,7 @@ The book's build system extracts the examples, then type-checks
 (with Astral's `ty`), lints, runs, and tests them.
 The code you read is the code that runs,
 and the output you see is the output it produces.
+
 A few early listings carry a `# type: ignore` comment.
 [Static Types](08_Foundations--Static_Types.md) defines it,
 along with the `# ty:` comments that appear from that chapter on.

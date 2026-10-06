@@ -31,6 +31,7 @@ The simplest patterns are literal values.
 A `case _` at the end is the wildcard.
 It matches anything, like a default.
 Without one, a `match` that fits no pattern does nothing and raises no error.
+
 `match` tries the patterns top to bottom and the first match wins.
 One `case` body runs, then the statement ends.
 Unlike C's `switch`, cases do not fall through,
@@ -144,6 +145,7 @@ print(DEFAULT)
 `case DEFAULT` binds.
 It matches `Signal.GO`, rebinds `DEFAULT` as a local name inside `broken()`,
 and leaves the module-level constant untouched.
+
 Python catches the mistake when a later `case` follows a bare-name capture,
 refusing to compile with `SyntaxError: name capture 'DEFAULT' makes remaining patterns unreachable`.
 When the capture is the last `case`, as here,
@@ -195,6 +197,7 @@ print(last_of([1, 2, 3, 4]))
 
 `summarize()` shows the structural part of "structural pattern matching."
 The pattern `[first, second]` matches only a two-element sequence and pulls both out at once.
+
 The last `case _` is unreachable.
 `[first, *rest]` catches every nonempty list and `[]` the empty one.
 The type checker cannot prove that,
@@ -298,6 +301,7 @@ print(locate(Point(3, 4)))
 
 Despite the call syntax, a class pattern builds nothing.
 It tests the subject's type and reads its attributes.
+
 Positional matching depends on `__match_args__`,
 a class attribute listing field names in order.
 `@dataclass` generates it automatically from the field order,
@@ -363,6 +367,7 @@ so it ignores `y`, and `Point(_, 0)` uses the wildcard to skip `x`.
 Naming the attribute is clearer, and it survives a change to the field order.
 Reordering the fields rewrites `__match_args__`,
 so every positional pattern silently starts matching a different field.
+
 `Point()` with no arguments, keyword or positional,
 matches any `Point` instance.
 Use it as a type-only check or a final catch-all.
@@ -496,6 +501,7 @@ or any call like `len(items) > 3`.
 Repeating a name does not express equality.
 `case [x, x]:` fails with `SyntaxError: multiple assignments to name 'x' in pattern`,
 so an equal-elements test is also a guard, `case [x, y] if x == y:`.
+
 A guard that merely compares one capture to a constant is a literal pattern written the long way.
 The exception is a constant with a bare name,
 such as `DEFAULT` in `value_patterns.py`.

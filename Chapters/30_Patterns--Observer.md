@@ -583,8 +583,8 @@ and the weak reference becomes the single reference to that object.
 A weak reference lets Python collect its target,
 so Python collects the bound method as soon as `weakref.ref()` returns,
 and that leaves the weak reference dead.
-`WeakMethod` stores the instance and the function separately, both weakly,
-and rebuilds the bound method each time you call `ref()`.
+Using `WeakMethod`, you store the instance and the function separately, both weakly,
+and rebuild the bound method each time you call `ref()`.
 
 The first `announce()` runs while `plot` is alive:
 `ref()` returns the bound method, and `weak` calls that method with the reading.

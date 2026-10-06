@@ -177,6 +177,7 @@ The [read-modify-write race](19_Techniques--Concurrency.md#a-single-thread-still
 needs a suspension point inside the update,
 and `claim()` runs from its test to its `add()` as one synchronous stretch
 (see exercise 3).
+
 `next_number()` hands out rat numbers from `itertools.count()`,
 the [endless counter](23_Patterns--Iterators.md#reusable-algorithms).
 `explore()` claims the entry and creates the first rat's task inside an `asyncio.TaskGroup`,
@@ -259,6 +260,7 @@ A `spawn()` before then raises an `AttributeError`.
 The declaration gives the type checker the attribute's type with no `None` placeholder to check.
 The robot example later in this chapter declares `Robot.room` for the same reason,
 with a bare annotation.
+
 The other four `init=False` fields, `visited`, `tasks`, `messages`,
 and `_numbers`, are internal bookkeeping.
 `init=False` keeps them out of the generated signature,
@@ -474,6 +476,7 @@ The canvas shows the walls in gray, then each claimed cell turns green in turn,
 so you watch the pack move through the maze from the entry outward.
 The view records the order by subclassing `Blackboard` and overriding `claim()`,
 so `blackboard.py` stays as written.
+
 Each of this chapter's three views is a separate file holding all the display code,
 the model-view split of [*Observer*](30_Patterns--Observer.md#a-visual-example).
 The subscription half of *Observer* is absent.
@@ -679,6 +682,7 @@ so the runtime skips that import and the cycle exists for the checker alone.
 Every use of `Room` in `items.py` is an annotation (`room: Room`, `-> Room`),
 and Python evaluates an annotation only when something reads it,
 so no line of `items.py` looks `Room` up at runtime.
+
 The rats avoid the same kind of cycle without an import.
 `blackboard.py` imports `Rat`,
 and `rat.py` states what it needs from a blackboard in the `Recorder` `Protocol`,
@@ -699,6 +703,7 @@ so a new kind of item registers itself.
 Once you define the subclass with its symbol, the factory finds it.
 That search is the [registry idea](27_Patterns--Factory.md#the-pythonic-factory-a-dictionary),
 using the class hierarchy as the registry.
+
 `__subclasses__()` reports direct subclasses and misses their descendants,
 so a new item must inherit directly from `Item`.
 If you derive a class from `Food` to inherit its behavior,
@@ -913,6 +918,7 @@ It expands the room reached in the fewest moves first,
 so the first route it finds to the `!` is a shortest one.
 It makes the same `doors.open(urge)` calls `Robot.move()` makes,
 so it works entirely in rooms and the moves between them.
+
 `landing()` decides whether a door is passable by testing the occupant's type with `isinstance()`,
 and that test reproduces what `Room.enter()` gets from `interact()`.
 For a `Wall` or an `Edge`, `landing()` returns `None`,
@@ -1192,6 +1198,7 @@ Physics supplies the formula, an approximation for a plate with free edges.
 Treat it as given.
 Only its shape matters here.
 The field is zero along curves, and those curves are the nodal lines.
+
 A `Grain` is a position.
 All the simulation's logic sits in `step()`.
 Every grain takes one random step,

@@ -67,6 +67,7 @@ assigned inside the `if`, stays visible afterward,
 unlike a variable declared inside braces in C++ or Java.
 New scopes come from functions, classes, modules, and comprehensions,
 not from an `if` or a `for` block.
+
 Python binds a name only when the assignment runs.
 With any answer other than `"yes"`, the `if` skips `val = 1`,
 and `print(val)` raises a `NameError`.
@@ -86,6 +87,7 @@ except NameError as e:
 
 Python skips the body of the `if`, so `val` stays unbound.
 Indentation shows where the assignment sits, not whether it runs.
+
 The type checker sees that `val = 1` cannot run and reports an error on `print(val)`,
 so `# type: ignore` tells it the mistake is deliberate.
 The `try` and `except` catch the exception so the script can print the exception's message and finish.
@@ -95,6 +97,7 @@ covers them.
 Indenting can nest as deeply as you like.
 Four spaces per level is the convention,
 and mixing tabs and spaces inconsistently inside one block raises a `TabError`.
+
 C++ and Java programmers debate where braces go.
 In Python the indentation is the structure,
 so the language settles the question and taste plays no part.
@@ -142,6 +145,7 @@ print(nested)  # The inner list is shared
 Use `==` to ask whether two objects have equal values.
 Use `is` to ask whether two names refer to the same object.
 Reserve `is` for `None` and other singletons.
+
 `a[:]` is a *shallow* copy:
 it duplicates the outer list but not the objects inside it.
 `nested` and `shallow` still share the same inner list,
@@ -178,6 +182,7 @@ Integers have unlimited precision, so they cannot overflow.
 Underscores group digits for readability,
 so `10_000_000` is the same literal as `10000000`.
 Floating point is the usual IEEE double.
+
 The operators are what you expect, with two worth noting:
 `/` on integers always produces a `float`, and `//` is floor division
 (divide, then round down to a whole number).
@@ -218,6 +223,7 @@ An f-string's format spec rounds the same way.
 
 A `bool` is a subtype of `int`, so `True` equals `1` and `False` equals `0`.
 Summing a sequence of comparisons therefore counts how many are true.
+
 The argument to `sum()` is a *generator expression*,
 which hands over one value at a time instead of building a list first.
 [Comprehensions](16_Techniques--Comprehensions.md#generator-expressions)
@@ -342,6 +348,7 @@ if not []:
 so the empty string shows as `''` and not as blank.
 `Bucket` defines no `__bool__()`, so `bool()` falls back to its `__len__()`.
 `Bucket(0)` is false and `Bucket(3)` is true.
+
 `Bucket` is a small class, and [Classes](07_Foundations--Classes.md)
 covers the syntax.
 Its `count: int` and `-> int` are type hints.
@@ -600,6 +607,7 @@ covers the general form.
 Iteration skips empty literal strings,
 so the leading `''` in `message.strings` does not reach the loop.
 That skipping is why a consumer cannot assume that literals and interpolations alternate.
+
 `shout()` uppercases the literal text and leaves the interpolated values in their original case.
 No amount of work on a finished f-string could do that reliably,
 because the finished string no longer says which characters came from where.

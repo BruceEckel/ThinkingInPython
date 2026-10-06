@@ -48,6 +48,7 @@ except StopIteration:
 A `for` loop makes one `iter()` call,
 then calls `next()` until the iterator raises `StopIteration`.
 A loop absorbs `StopIteration` as the normal end rather than an error.
+
 The first `is` shows that calling `iter()` on a list creates a new iterator each time.
 The second `is` shows that calling `iter()` on an iterator returns that iterator.
 The tempting call is `next(nums)`, but `next()` accepts only an iterator,
@@ -82,6 +83,7 @@ You rarely write `__iter__()`/`__next__()` by hand.
 A *generator* writes them.
 A function with a `yield` statement returns an iterator that produces each yielded value in turn,
 pausing and resuming its own state.
+
 The generators in this chapter produce values without receiving any,
 so `Iterator[T]` annotates them.
 That annotation is the short form of a three-part type that also describes what a generator receives and what it returns.
@@ -264,6 +266,7 @@ Calling `squares(6)` runs none of its body.
 The `print()` at the top runs only when something demands the first value.
 It runs once, not on every value.
 Each later `next()` resumes the body just after the `yield` instead of restarting it.
+
 Any validation at the top of a generator inherits this delay.
 A check meant to reject a bad argument raises its exception at the first `next()`,
 far from the call that caused the problem.
@@ -527,6 +530,7 @@ print(list(takewhile(lambda s: s < 50,
 Nothing runs until `list()` pulls the values.
 `islice()` and `takewhile()` decide when to stop,
 so the infinite `count(1)` produces no more than they pull.
+
 `islice()` is also how you slice an iterator.
 A generator defines no `__getitem__()`,
 so the list habit `odd_squares[:5]` raises a `TypeError` instead.
@@ -595,6 +599,7 @@ before reaching the tripwire.
 
 Failing at 1,000 values stands in for how a real program fails.
 A real program stops responding, or it dies when it exhausts memory.
+
 The toolchain lets `list(count(1))` through.
 The type checker accepts it,
 and so does `ruff` with every one of its rules enabled.
@@ -869,15 +874,16 @@ and why `tee` buffered a whole stream in `tee.py`.
 A membership test pays the same way.
 `"c" in letters` pulls items until it finds a match,
 and every item it pulled is gone, the match included.
+
 `DONE` is a [sentinel](05_Foundations--Functions.md#sentinel-values),
 because the answer must differ from every value the source could yield.
 `None` collapses an exhausted source and a source that yields `None` into the same reply.
 The built-in `iter()` uses a sentinel the same way in its two-argument form.
 `iter(callable, DONE)` calls `callable` until it hands back `DONE`.
+
 A `StopIteration` that escapes a generator body becomes a `RuntimeError`
 ([PEP 479](https://peps.python.org/pep-0479/)),
 so an ordinary end of stream reads like a bug somewhere else.
-
 Only a bare `next()` hands you a `StopIteration`.
 With a default, `next()` returns the default,
 and every other construct here absorbs the exception.

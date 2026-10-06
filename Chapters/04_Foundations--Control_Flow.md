@@ -172,7 +172,8 @@ find_factor(13)
 
 The `else` belongs to the `for`, not the `if`.
 A `while` loop can use `else` the same way.
-This `else` is also how you leave two nested loops at once.
+
+The loop `else` is also how you leave two nested loops at once.
 Put `continue` in the inner loop's `else` and a `break` right after it.
 When the inner loop `break`s,
 Python skips its `else` and the outer `break` runs.
@@ -242,6 +243,7 @@ and the loop here unpacks each pair into `index` and `name`.
 but that form names the index and not the item,
 so every line that needs the item repeats the `names[i]` lookup.
 `enumerate()` hands you both.
+
 `zip()` walks several sequences at once:
 
 ```python
@@ -266,6 +268,7 @@ except ValueError as e:
 so it drops the extra score.
 Stopping without an error is convenient when the lengths differ on purpose and a bug when you expect them to match.
 `strict=True` raises a `ValueError` on the mismatch instead.
+
 When you need the index as well, wrap the `zip()` in `enumerate()`.
 The nesting shows up in the loop header, where the inner pair needs parentheses:
 `for i, (name, score) in enumerate(zip(names, scores)):`.
@@ -376,6 +379,7 @@ print(run("dance"))
 
 Only the first matching `case` runs.
 Unlike C, a `case` does not fall through, so it needs no `break`.
+
 The first `case` destructures the split command.
 It matches a two-item list starting with `"go"` and binds the second item to `direction`.
 A bare name in a `case` captures rather than compares.
@@ -442,6 +446,7 @@ The optional `else` runs when the `try` block raises no exception,
 the same shape as the loop `else` that runs when the loop hits no `break`.
 Code in the `else` is outside the reach of the `except` clauses,
 so no `except` clause mistakes an exception from the follow-up work for the failure it expects.
+
 The optional `finally` always runs, and that makes it the place for cleanup.
 A `return`, `break`,
 or `continue` inside `finally` swallows any exception in flight,
@@ -473,6 +478,7 @@ It also catches a bug in the `try` block and makes it look like an expected fail
 `except Exception:` is the broad catch you want instead.
 `KeyboardInterrupt` and `SystemExit` derive from `BaseException` rather than `Exception`,
 so they propagate past that clause and still stop the program.
+
 To handle several types the same way, give a tuple:
 `except (ValueError, TypeError) as e:`.
 Python tries the `except` clauses in order and runs the first whose type matches,
@@ -551,6 +557,7 @@ The handler matches on the class.
 
 `joining_line()` digs the joining sentence out of the formatted traceback,
 so the output above is the text Python prints, not a summary of it.
+
 `from e` sets `__cause__` and produces the "direct cause" line.
 With no `from`, Python still records the earlier exception in `__context__` and produces the "During handling" line.
 `from None` sets `__suppress_context__`,

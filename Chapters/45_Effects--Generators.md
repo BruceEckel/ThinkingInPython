@@ -138,6 +138,7 @@ A `for` loop loses that value,
 because `for` catches the `StopIteration` and discards it along with its `value`.
 To read the `ReturnType`, catch the exception yourself,
 as `interview_generator.py` does.
+
 Python raises that `StopIteration` for the generator.
 The body finishes with `return`.
 A `StopIteration` that escapes the body,
@@ -171,6 +172,7 @@ print(f"{next(interview()) = }")
 
 Each `interview()` call creates a new generator,
 so both lines start from the beginning and produce the first question.
+
 The `# type: ignore` marks a real mismatch.
 `interview()` declares `Answer` as its `SendType`,
 and `None` is not an `Answer`.
@@ -588,6 +590,7 @@ A driver can `throw()` an exception into a generator or `close()` it,
 and `yield from` relays both.
 `throw()` raises its exception inside the innermost generator rather than in the delegating one,
 and `close()` unwinds every frame in the chain.
+
 [A Basic Context Manager](15_Techniques--Context_Managers.md#a-basic-context-manager)
 shows an exception raised at a generator's `yield`,
 described from the `with` block's side:
@@ -754,6 +757,7 @@ task_runner()
 `@task` is the [registering-decorator shape](14_Techniques--Decorators.md#decorating-classes).
 It calls each generator function once at definition time,
 queues the generator that call builds, and hands the function back unchanged.
+
 `task_runner()` gives the front task one `next()` per turn.
 A task that yields moves to the back of the queue.
 One that finishes raises `StopIteration`, and the runner drops it.

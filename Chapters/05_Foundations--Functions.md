@@ -141,6 +141,7 @@ print(connect(port=80, host="web.example.com"))
 
 Passing by name does not require a default.
 `host` has none, and the last call still names it.
+
 At the call site, write every keyword argument after the positional ones.
 `connect(port=80, "web.example.com")` is a `SyntaxError`:
 `positional argument follows keyword argument`.
@@ -345,6 +346,7 @@ so the call raises an `UnboundLocalError`.
 `global` governs rebinding, not reading, so `read_only()` needs no declaration.
 [Closures](40_Functional--Foundations.md#closures) covers `nonlocal`,
 which rebinds a name in an enclosing function the way `global` rebinds a module-level name.
+
 A function that rebinds a global couples every caller to that shared,
 mutable state.
 [Pure Functions](40_Functional--Foundations.md#pure-functions) shows the cost.
@@ -459,6 +461,7 @@ Two markers in a parameter list control how callers may pass arguments.
 The markers also decide how much of a signature you commit to keeping.
 A parameter's name is part of the contract when a caller can write it,
 and stays outside the contract when the caller must pass by position.
+
 A `/` ends the *positional-only* parameters.
 You must pass every parameter before it by position, not by name.
 A `*` begins the *keyword-only* parameters.

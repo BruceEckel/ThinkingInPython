@@ -130,6 +130,7 @@ Each one is an ordinary expression, and `Annotated` keeps its value.
 `Annotated[int, "meters", range(0, 100)]` carries two pieces of metadata,
 a string and a `range` object.
 `Annotated` requires one piece of metadata and accepts any number after it.
+
 The PEP gives tools one rule.
 A tool with no logic for a piece of metadata ignores that piece and treats the annotation as `T`.
 Each tool can therefore put its own object in the list,

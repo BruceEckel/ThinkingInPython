@@ -72,6 +72,7 @@ compares an ABC with a `Protocol`.
 The empty `__slots__` on `WhatIWant` keeps `ProxyAdapter` a slotted [record](18_Techniques--Performance.md#record),
 as `shapes_oo.py` in [Rethinking Objects](20_Patterns--Rethinking_Objects.md#abstract-base-classes)
 explains.
+
 The name `ProxyAdapter` uses the term "[*Proxy*](26_Patterns--Surrogate.md#proxy)" loosely.
 *GoF Design Patterns* requires a *Proxy* to have the same interface as the object to which it forwards.
 
@@ -268,8 +269,9 @@ Because `__getattr__()` runs only for attributes Python does not find normally,
 `getattr_adapter.py` shows the idiomatic Python adapter: a thin wrapper,
 not a hierarchy.
 With no base class above it, `Adapter` is a record.
+
 [Rethinking Objects](20_Patterns--Rethinking_Objects.md#protocols-generalize-composition-adapts)
-has a real one.
+has a real adapter.
 `PairCoord` adapts a `Pair` to the `Coord` protocol.
 `PairCoord` is a [record](18_Techniques--Performance.md#record)
 with two properties,
@@ -288,6 +290,7 @@ then look up `__setstate__()` on it.
 That lookup fails and calls `__getattr__()`, which reads `self.adaptee`.
 No `adaptee` exists yet,
 so `__getattr__()` calls itself until Python raises a `RecursionError`.
+
 `Adapter` avoids the trap because it is a record.
 A frozen, slotted data class defines `__getstate__()` and `__setstate__()`,
 so normal lookup finds `__setstate__()`,
@@ -512,6 +515,7 @@ Once the better interface exists, the old one is still there,
 and callers keep using it until something tells them not to.
 Deleting it breaks them.
 Leaving it unmarked means nobody notices.
+
 `warnings.deprecated()` marks a function, method,
 or class as scheduled for removal
 (Python 3.13 and later; `typing_extensions.deprecated` before that).
@@ -549,6 +553,7 @@ The static half is a `ty` diagnostic on the deprecated call,
 and the caller sees it before running anything.
 The `# type: ignore` silences that diagnostic here,
 since this listing calls the deprecated method on purpose.
+
 The runtime half is a `DeprecationWarning`.
 Python ignores those by default outside `__main__` and test runners,
 and that default is the trap.

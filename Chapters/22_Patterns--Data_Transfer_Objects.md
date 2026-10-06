@@ -60,6 +60,7 @@ The `m: Any` annotation does real work.
 The `Messenger` class declares no attributes,
 so without that annotation the type checker rejects both `m.more = 11` and `m.info`.
 `Any` switches the type checker off for `m`.
+
 You can move that `Any` into the class instead of repeating it at every use site,
 by declaring a [`__getattr__()`](26_Patterns--Surrogate.md#forwarding-with-getattr)
 that returns `Any` and a `__setattr__()` that accepts one.
@@ -68,6 +69,7 @@ With `__getattr__()` alone, the type checker still rejects the write,
 The standard library's type declaration for `SimpleNamespace` has such a pair
 (its read half is `__getattribute__()`, which intercepts every attribute access),
 so the next listing needs no annotation.
+
 With an ad-hoc attribute bag, no type checker knows your attribute names.
 A typo like `m.inof` is a runtime `AttributeError`, not a static error.
 
@@ -317,6 +319,7 @@ with nothing in the code declaring that intent.
 A frozen data class refuses the comparison instead.
 `<` between two `FrozenColor`s raises a `TypeError` unless the decorator receives `order=True`,
 and a comparison between two different frozen types raises one even then.
+
 The listing writes `@dataclass(frozen=True)` in full instead of `@record`,
 so that `order=True` is the one difference between each `Frozen` class and its `Ordered` twin.
 

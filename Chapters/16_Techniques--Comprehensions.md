@@ -397,6 +397,7 @@ A `with` block, unlike a function body, does not create a new scope.
 The assignment to `py_paths` sits inside the `with`,
 but the name is still visible afterward,
 in the `for path in sorted(py_paths):` line below it.
+
 The comprehension finishes building `py_paths`, as strings,
 while the directory still exists.
 The `for` loop runs after the directory disappears,
@@ -657,7 +658,8 @@ so it reads `factor` when `list()` pulls the values rather than when Python crea
 The answer is `[10, 20, 30]` instead of `[2, 4, 6]`.
 A list comprehension has no such gap.
 It reads everything at once.
-That gap is also why `path_walk_comprehension.py` uses brackets.
+
+The gap between creation and consumption is also why `path_walk_comprehension.py` uses brackets.
 With parentheses, Python calls `root.walk()`, its outermost iterable,
 at creation, but the walking and the filtering wait for a consumer that arrives after the directory disappears.
 A `lambda` created in a comprehension reads its variables late for the same reason.

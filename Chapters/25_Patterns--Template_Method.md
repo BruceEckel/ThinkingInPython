@@ -22,6 +22,7 @@ The test runner calls `run()` on the finished object.
 
 A *Template Method* anchors the shape of the algorithm in the base class.
 Subclasses provide the individual steps.
+
 The `typing.final` decorator,
 used on a class in [Making a Class Final](17_Techniques--Metaprogramming.md#making-a-class-final),
 also works on a single method.
@@ -115,6 +116,7 @@ This kind of optional step is a *hook*.
 The `setUp()` and `tearDown()` in the opening example are hooks.
 `TestCase` supplies do-nothing versions,
 so a test class that needs no setup skips them.
+
 The do-nothing default also hides a misspelling.
 `def customise1()` ('s' instead of 'z')
 adds a new method and leaves the base's do-nothing version in place.
@@ -208,10 +210,12 @@ If that attribute carries `__final__`,
 and `@final` stops that replacement only for the type checker.
 The `__final__` check names no method,
 so a second `@final` method in `ApplicationFramework` gets the same protection with no change to `__init_subclass__()`.
+
 Reading the attribute through `getattr()` also keeps the type checker quiet.
 A function's type declares no `__final__`,
 so `ty` reports `ApplicationFramework.run.__final__` as an unresolved attribute,
 while `getattr()` with a default accepts any name.
+
 A name that matches a step, `customize1` or `customize2`,
 is an ordinary override, and a name that resembles none of them,
 like `report()`, is an ordinary new method.
@@ -222,6 +226,7 @@ and the message names the method the author probably meant.
 The `class Typo` statement also raises a `TypeError`,
 so the misspelling fails at import time,
 not later when the framework runs and the step silently does nothing.
+
 Rejecting every new method catches the typo too, but it also forbids `report()`,
 and a framework that bans helper methods in its subclasses is too restrictive.
 The close-match check also rejects legitimate names.
@@ -277,6 +282,7 @@ expect(AttributeError, Greeter, "Robin")
 `Greeter("Robin")` fails with an `AttributeError`.
 `super().__init__()` starts the engine, the engine calls `step()`,
 and `step()` reads `self.name` before the constructor assigns it.
+
 The quick repair is reordering.
 Assign `self.name` first, then call `super().__init__()`.
 That works, but it inverts the convention Python programmers expect,
@@ -388,6 +394,7 @@ If the steps share state, build on each other, or come as a coherent group,
 the subclass is clearer.
 If each step is independent,
 passing functions is lighter and avoids a class hierarchy.
+
 The subclass form also gets optional steps without extra work,
 since the base supplies the `...` default.
 The function form must give each parameter a default of its own.

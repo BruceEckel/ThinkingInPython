@@ -15,6 +15,7 @@ It is not one.
 
 If you then create an instance attribute of the same name,
 that instance attribute *shadows* the class attribute.
+
 In C++ or Java, the language allocates storage for such a field in each object before the constructor runs,
 so a programmer from those languages expects per-object storage here too.
 A Python class attribute corresponds to a C++ or Java `static` field.
@@ -379,6 +380,7 @@ The write creates a fresh `total` on the instance.
 Every `Tally` counts itself once and the shared counter stays at `0`.
 The write through `self` is why `class_var.py` increments through the class name,
 `Tally.total += 1`.
+
 `ClassVar` does catch this mistake, at check time.
 `ty` rejects the augmented form as it rejects a direct `self.total = 5`,
 reporting "Cannot assign to ClassVar `total` from an instance of type `Tally`" for a write like `a.total = 99`,
@@ -488,6 +490,7 @@ The second `Sub()` increments that separate copy to `3`.
 `Base.total` stays at `1`, and the type checker reports no diagnostic.
 The augmented assignment is a valid `ClassVar[int]` update either way,
 and nothing in the annotation says which class name should receive it.
+
 Write the increment through the literal class name, as `class_var.py` does,
 whenever a `ClassVar` must count across every subclass rather than fork one counter per subclass.
 A [`@classmethod`](07_Foundations--Classes.md#static-and-class-methods)
@@ -567,6 +570,7 @@ and neither the runtime nor the type checker complains.
 `b.x = -1` shadows the class attribute for that one instance,
 and an assignment through the class still changes every instance that has not shadowed it,
 the hazard `Stars` demonstrates.
+
 The annotated field in `real_defaults.py` also leaves a class attribute behind.
 As its last line shows, `vars(B)` still holds `x = 100`.
 The difference is the generated `__init__()`,

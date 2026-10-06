@@ -151,6 +151,7 @@ type Result[A, E] = Ok[A] | Err[E]
 so no class can inherit from both.
 An object the type checker finds to be an `Err` therefore cannot also be an `Ok`,
 and a check against one class narrows a `Result` to one side of the union.
+
 `A`, `B`, `E`, and `F` are [type parameters](08_Foundations--Static_Types.md#type-parameters):
 placeholders that take concrete types when you use the class.
 Here they have no bounds or constraints, so any type can fill them.
@@ -190,7 +191,9 @@ To get the answer, the caller must unpack the `Result`.
 `unwrap()`, a name borrowed from Rust, returns the answer an `Ok` holds.
 Reading the `answer` field works the same way.
 Use whichever name reads better in your own code.
-Both exist on `Ok` alone, so the type checker rejects `func_a(i).unwrap()`,
+
+`unwrap()` and the `answer` field exist on `Ok` alone,
+so the type checker rejects `func_a(i).unwrap()`,
 as it rejects using the `Result` as if it were a number.
 The only way to the answer is narrowing to one of the two classes,
 with `isinstance()` as in `composing.py` below,
@@ -760,6 +763,7 @@ each `except` clause along the way can add a line built from its own frame's loc
 which the raiser's frame does not have.
 `add_note()` appends each note to a list, `__notes__`,
 which the first call creates.
+
 The type checker treats `__notes__` as always present, because typeshed,
 the collection of type declarations for the standard library that every checker reads,
 declares it on `BaseException`.
@@ -802,6 +806,7 @@ for field, value in (("age", "42"), ("size", "oops")):
 The note attaches before the exception becomes a value,
 in the one frame that has both the exception and the field name.
 Code that reads the `Err` later can report which field failed without the frame that parsed it.
+
 The note is the chapter's opening argument, applied one level down.
 `Err` says the call failed, the exception says what went wrong,
 and a note says which piece of work produced it.
@@ -810,6 +815,7 @@ The `Err` branch reads `error.__notes__`,
 and that read type-checks because the `match` narrowed the `Result` to `Err`.
 The narrowing works because `Result` is a union of exactly two classes,
 and it works the same way with `isinstance()`.
+
 Reading `error.__notes__` without a default is safe here only because `parse_field()` adds a note on every failure.
 An exception that arrives from code you did not write may carry no notes,
 so read `__notes__` with `getattr(error, "__notes__", [])`.

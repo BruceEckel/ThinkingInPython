@@ -18,6 +18,7 @@ Every `import` after the first produces the same module object.
 A module is a singleton.
 Whatever it defines at module level exists once per interpreter,
 and every importer shares it.
+
 One interpreter, not one machine.
 A process pool or an [`InterpreterPoolExecutor`](19_Techniques--Concurrency.md#subinterpreters)
 gives each worker its own `sys.modules`,
@@ -170,6 +171,7 @@ or accept that you built a cache, not a singleton.
 Nothing stops a caller from writing `Settings()` and getting a second instance.
 Naming the class `_Settings` marks it internal and keeps it out of `from module import *`,
 and that marking is as far as Python goes.
+
 A second underscore adds no strength.
 The compiler [mangles](11_Techniques--Testing.md#white-box-and-black-box-tests)
 names only inside a class body,
@@ -271,6 +273,7 @@ Every thread checks the cache before any of them has filled it,
 so each runs the constructor and hands its caller a different object.
 Only the object from the last thread to finish stays in the cache.
 The other seven are already in the hands of their callers.
+
 The listing prints a comparison instead of the count because the count depends on timing.
 The count is eight when every thread misses the cache,
 and the sleep makes that the usual result without guaranteeing it.
@@ -315,6 +318,7 @@ The rest wait on the lock, and each finds `_instance` filled.
 Under the same eight-thread race,
 the cached version produces more than one object, usually eight.
 The locked version produces one, as the printed count confirms.
+
 The sleep stands in for a constructor that does real work,
 such as opening a file or a connection.
 Without the sleep, the cached version showed no duplicates across twenty trials,
@@ -389,6 +393,7 @@ The outer test runs without the lock,
 so a thread can read `_instance` while another thread is still inside the `with` block.
 A version that assigns `_instance = Settings()` and then fills in `data` hands that reader a half-built object.
 Depending on two such details is a bad trade for saving one lock acquisition.
+
 Eager creation is a better answer when you can build the object at import time:
 
 ```python
@@ -480,6 +485,7 @@ the compiler mangles it to `_OnlyOne__OnlyOne` wherever it appears inside `OnlyO
 `OnlyOne.__OnlyOne`, written from outside the class,
 asks for an attribute that does not exist under that name,
 so it fails at runtime with `AttributeError`, not at type-checking time.
+
 The outer class controls creation through its constructor.
 The first construction of an `OnlyOne` initializes `instance`.
 Every later one reuses that inner object,
@@ -740,6 +746,7 @@ def test_subclassing_the_decorated_name_raises() -> None:
 Its base has type `singleton`, not a class.
 Under mypy, which does not apply a class decorator's return type,
 `Registry` is still a class and `Sub` passes.
+
 At runtime the `class` statement raises a `TypeError`.
 `singleton.__init__()` takes two positional arguments and receives four,
 because a class statement hands the name, bases, and namespace to its metaclass,

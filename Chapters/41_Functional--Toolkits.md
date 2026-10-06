@@ -46,7 +46,8 @@ ready to pass to a fold in place of `lambda a, b: a + b`.
 For addition specifically, `sum()` is the dedicated built-in,
 and `math.prod()` covers multiplication.
 `reduce()` is the tool for every other fold.
-On an empty sequence it raises `TypeError: reduce() of empty iterable with no initial value`,
+
+On an empty sequence `reduce()` raises `TypeError: reduce() of empty iterable with no initial value`,
 because it has nothing to return.
 A third argument supplies that starting value,
 so `reduce(add, [], 0)` returns `0`.
@@ -58,6 +59,7 @@ so a repeated call with the same arguments returns the stored result without run
 `@cache` works correctly only for pure functions.
 A cached function with side effects runs those effects on the first call with each set of arguments,
 and skips them on every repeat.
+
 The cache is a dictionary keyed on the arguments,
 so every argument must be hashable.
 Passing a `list` raises `TypeError: unhashable type: 'list'`.
@@ -86,6 +88,7 @@ where every branch recomputes the whole subtree beneath it.
 [Caching](18_Techniques--Performance.md#caching)
 runs both versions side by side, and [Recursion](#recursion)
 comes back to why the recursive form is worth keeping.
+
 An iterative Fibonacci, `a, b = b, a + b` in a loop,
 needs neither recursion nor a cache.
 The recursive one stays the running example here because it keeps the point about caching small.
@@ -320,6 +323,7 @@ In real code `Weight` would be `@dataclass(frozen=True, order=True)`,
 which generates all five comparison methods from the field order.
 `total_ordering` is the right tool when the class cannot be a dataclass,
 or when the ordering differs from the fields in declaration order.
+
 Each synthesized comparison is slower than a hand-written one,
 because it wraps a call to your `__lt__` or `__eq__`.
 A method that `dataclass` generates compares the fields with no extra call.
@@ -863,6 +867,7 @@ Python pushes a frame for every recursive call, including one in tail position,
 where a language with *tail-call optimization* reuses the caller's frame.
 The stack has a cap, so deep recursion raises a `RecursionError`.
 `sys.setrecursionlimit()` raises that limit when the depth is genuine.
+
 A long flat sequence calls for a loop or one of the `itertools` tools.
 For a countdown like this one, the loop is as short as the recursion and faster,
 since it makes no calls.
@@ -925,6 +930,7 @@ For an even number of players `n`,
 the circle method produces `n - 1` rounds with no repeated pair.
 No schedule can do better,
 because those rounds use every one of the `n * (n - 1) / 2` possible pairs exactly once.
+
 The classical fix for an odd roster is a phantom player.
 Whoever draws the phantom sits out that round.
 
@@ -939,6 +945,7 @@ The best-known case is *Kirkman's schoolgirl problem*,
 fifteen students walking in threes on seven days.
 A perfect trio schedule exists only when the roster size leaves a remainder of 3 when divided by 6,
 so seven students have none.
+
 A given `students` and `size` may have no exact answer,
 so the general version below trades rotation for a greedy search and settles for a good schedule.
 The greedy search builds each group one member at a time,

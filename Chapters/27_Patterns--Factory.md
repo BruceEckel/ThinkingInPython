@@ -166,9 +166,11 @@ The `factory()` argument indicates the type of `Shape` to create.
 Here that argument is a string, but it could be any sort of data.
 Apart from the new subclass,
 `factory()` is the only code that changes when you add a new type of `Shape`.
+
 `factory()` names `_Circle` and `_Square` above the point where the file defines either class.
 Python looks up a name in a function body when the function runs,
 and both classes exist before anything calls `factory()`.
+
 *GoF Design Patterns* defines *Factory Method* as a creation method that [subclasses override](#subclasses-choose-the-type)
 to choose the concrete type.
 This `factory()` is the smallest version of that idea: one class, one method,
@@ -178,6 +180,7 @@ and a `match` where the overrides would be.
 Whereas a factory takes information telling it what to build,
 a generator object does the opposite.
 It holds an internal algorithm and needs no argument to produce the next value.
+
 `shape_name()` takes `n`
 (the maximum number of shapes the generator can produce)
 and returns a generator object.
@@ -340,6 +343,7 @@ Registering through `__init_subclass__()` is why `Shape` is an abstract base cla
 so a class that satisfies a Protocol structurally,
 without inheriting from `Shape`, stays out of the registry.
 Inheritance is the mechanism, and `ABC` adds one guard on top of that.
+
 A subclass registers as its `class` statement executes,
 so a subclass that forgets `draw()` still registers.
 The guard acts when `make()` constructs that class.
@@ -405,6 +409,7 @@ the registration runs before anything calls `make()`,
 but a subclass defined in another module registers itself only when something imports that module.
 The classic failure is a plugin that "never registered": the class is fine,
 the registry is fine, and nothing imported the module that defines the class.
+
 A [lazy import](06_Foundations--Modules_and_Packages.md#lazy-imports)
 produces the same failure even when the import statement is in the file.
 The module body, and with it the registration,
@@ -552,6 +557,7 @@ and no checker sees it.
 `register()` returns `type[S]`, the decorated class's own type,
 so after the decorator runs the checker still knows `Circle` as `Circle`,
 not as `Shape`.
+
 The bound is also why the factory names `Shape` instead of taking a type parameter.
 A generic factory would need `register()`'s bound to name the factory's own type parameter,
 and `ty` rejects a type variable's bound that is generic.
@@ -880,6 +886,7 @@ g2.play()
 `Character` objects interact with `Obstacle` objects,
 but the types of characters and obstacles depend on the game you're playing.
 Choosing a particular `GameElementFactory` determines the game.
+
 The `GameEnvironment` controls the setup and play of the game.
 Setup and play are simple here,
 but the initial conditions and the way the state changes can determine much of a game's outcome.
@@ -1045,6 +1052,7 @@ not because the clone is checked.
 When the variant differs only in field values,
 `copy.replace()` builds it through the constructor, as `knight` shows,
 so a `__post_init__()` check runs on the result.
+
 `copy.replace()` passes every field you do not name by reference,
 so `knight` shares `goblin`'s `powers` list, the same sharing `shallow` shows.
 Pass a fresh list for that field when the variant must own one.

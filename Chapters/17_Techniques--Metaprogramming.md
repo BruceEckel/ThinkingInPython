@@ -90,6 +90,7 @@ but simpler hooks cover almost every case a metaclass handled before those hooks
   transform a class after Python builds it.
 
 Use a metaclass only when these cannot do the job.
+
 Building classes by hand shows what a `class` statement does.
 Then come the simpler hooks, and metaclasses for the jobs that still need them.
 The `inspect` module closes the chapter from the other side,
@@ -454,6 +455,7 @@ so `namespace[class_name]` is `Any` to it.
 `exec()` also drops a `__builtins__` entry into any globals mapping that lacks one,
 and that entry is the second reason `namespace` carries the annotation `dict[str, Any]`.
 `cast(Callable[[], Command], ...)` records the actual no-argument signature at the one place that creates the class.
+
 Unlike `EventMakers`, `make_class()` caches nothing.
 Calling `make_class("Start")` twice builds two distinct classes.
 
@@ -567,6 +569,7 @@ For the same reason, `Round` is missing from the `Shape` registry.
 Creating `Circle`, a subclass of `Round`, removes `Round`,
 leaving `Circle` and `Square`.
 None of this needs a metaclass.
+
 `__init_subclass__()` is implicitly a class method.
 Its first argument is the new subclass.
 `__init_subclass__()` runs for classes derived from the class whose body defines it,
@@ -821,6 +824,7 @@ A third family carries *two real semantics*.
 and separately makes the runtime refuse one.
 [`assert_never()`](13_Techniques--Pattern_Matching.md#exhaustive-matching)
 proves exhaustiveness statically and raises an `AssertionError` at runtime when a lying value reaches it.
+
 The fourth family runs in the other direction.
 Annotations survive into the running program,
 as [The `inspect` Module](#the-inspect-module) shows,
@@ -860,6 +864,7 @@ It believes the declaration without running `model()`,
 so the call checks clean and fails at runtime.
 This `model()` generates nothing, and `object`'s constructor takes no arguments.
 The declaration is a claim, and this one is false.
+
 Libraries like attrs and pydantic make the claim true by generating the methods their `@dataclass_transform` declares,
 and that is how their classes get first-class checking without any checker hard-coding them.
 The shortest `model()` that makes its claim true delegates the generation:
@@ -1317,6 +1322,7 @@ The second `ASingleton()` does not reach `__new__()` or `__init__()`.
 `__call__()` finds the cached instance and returns it without building anything.
 Each class gets its own entry in the `_instances` dictionary,
 so the singletons are independent.
+
 The `[T]` on `__call__()` ties its return type to `cls`,
 so `ty` sees `ASingleton()` as an `ASingleton` instead of `Any`.
 Without the `[T]`, every singleton comes back as `Any` under `ty` and Pyright,
@@ -1464,6 +1470,7 @@ The message names the fix.
 `D`'s metaclass, `MetaC`, must be a subclass of every base's metaclass,
 `MetaA` and `MetaB` both.
 Once `MetaC` exists, `class D(A, B, metaclass=MetaC)` builds cleanly.
+
 Both failures have the same shape:
 an inheritance graph that looks legal until you notice what the bases carry with them.
 That shape is one more reason to avoid metaclasses
@@ -1513,6 +1520,7 @@ It walks `vars(cls)`, the class's own namespace,
 skipping every underscore-prefixed name,
 which for `Color` is the dunder bookkeeping every class carries,
 so it yields the three values the body assigned: `"red"`, `"green"`, `"blue"`.
+
 A class decorator cannot make `for c in Color` work.
 It can add methods that instances see,
 but not a protocol method the class object must answer,
@@ -1550,10 +1558,12 @@ and whatever mapping it returns becomes the namespace for that body.
 Every `def` and every assignment in the body becomes a `__setitem__()` call on that mapping,
 so `NoDuplicates` sees the second `on_open` assigned to a name it already holds.
 Python then hands the finished mapping to `type.__new__()`.
+
 `__prepare__()` must carry `@classmethod`.
 Python calls it on the metaclass before any class object exists,
 so an ordinary method receives the class name as its `self` and leaves `bases` unfilled,
 producing a `TypeError` that says nothing about the real mistake.
+
 No other hook can catch the second `on_open`.
 `__init_subclass__()`, `__set_name__()`,
 and a class decorator all run after the body has finished,

@@ -115,6 +115,7 @@ The annotation describes the object `double()` returns rather than how its body 
 a small class that implements that protocol with its own `send()` and `throw()` methods.
 Its `send()` raises `StopIteration` carrying the value,
 so `run()` gets the result on its first step.
+
 `success()` exists for yield-free functions like `double()`.
 In a generator function, `return value` sets the Effect's `R`.
 `return success(value)` there produces a `Success[R]` where the signature expects an `R`,
@@ -746,6 +747,7 @@ Every function on the path to it gains a `Need[Log]`,
 here `greet_logged()` and its caller `greet_all()`,
 while `greet()` keeps its signature.
 `supply()` now provides both a `Console` and a `Log`.
+
 Stateless leaves you those edits and lists them for you.
 The type checker names each place that needs changing,
 and the check passes once you have fixed the last one.
@@ -934,7 +936,8 @@ because the type checker compares a concrete class by name.
 If a `cast()` forces the static type,
 the run fails with a `MissingAbilityError`.
 A double for the built-in `Console` must therefore inherit from it.
-That `Console` implements `input()` as well as `print()`,
+
+The built-in `Console` implements `input()` as well as `print()`,
 so a double that overrides `print()` and inherits `input()` reads live stdin.
 An interface has no implementation to inherit by accident:
 
@@ -963,6 +966,7 @@ and the second is to separate each Effect's interface from its implementation.
 and `greet()` names neither.
 Because a `Protocol` matches on structure,
 `Recorder` qualifies as a `Console` without inheriting from `Console`.
+
 `supply()` matches requests with `isinstance()`.
 `isinstance()` accepts a `Protocol` marked `@runtime_checkable` and raises a `TypeError` on any other,
 so the Protocol carries that decorator.
@@ -1010,6 +1014,7 @@ passing an implementation to `supply()` at the call site requires `as_type()`.
 That call is what an interface adds at each direct supply.
 [Composing a Program](47_Effects--Stateless_in_Practice.md#composing-a-program)
 declares its Abilities as `Protocol`s and shows the annotation that replaces that call.
+
 Write one boundary function whose parameter annotations name the interface types,
 and call `supply()` inside it.
 The parameter annotation upcasts the argument,
@@ -1119,6 +1124,7 @@ A dictionary matches the key exactly,
 so `get(Console)` never returns a subclass registered under its own name.
 `supply()` takes bare instances and matches a request with `isinstance()` instead,
 so two instances that satisfy one `Need` are [ambiguous](#when-two-implementations-match).
+
 The DI registration key also does the work `as_type(Console)` does for `supply()`.
 `supply()` [reads each Ability from its argument's static type](#supplying-an-interface),
 so `supply(recorder)` is a `Handler[Need[Recorder]]`,
@@ -1558,6 +1564,7 @@ and `throw()` raises the exception at the [innermost suspended `yield`](45_Effec
 That `yield` belongs to the Effect to which the `yield from` delegates.
 The exception propagates out of that Effect as any raised exception does,
 and the `except` clause around the `yield from` catches it.
+
 Catching is different from handling.
 The `KeyError` stays in the channel,
 so the signature keeps declaring a failure that can no longer escape.
@@ -1636,6 +1643,7 @@ expect(KeyError, run, supply(Console())(guarded)("Carol"))
 `guarded()` here is the same function as before,
 except that it also needs a `Console`, which this path does not reach.
 Wrapping it in `supply(Console())` is enough to send the `KeyError` past the `except`.
+
 `catch_score.py`, ahead in [Turning an Error Into a Value](#turning-an-error-into-a-value),
 has the identical shape.
 `supply()` wraps a function `run()` drives.

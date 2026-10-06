@@ -62,6 +62,7 @@ This checker takes the third, a separate declaration, because the first two,
 pure and `Unknown`, are wrong for `print()`.
 `print()` writes to the console,
 and calling it `Unknown` puts `Unknown` in nearly every row.
+
 The declaration cannot go on the function.
 A built-in has no `__annotations__` and no `__dict__` in which to store one,
 so `print.__annotations__ = {}` raises an `AttributeError`.
@@ -127,6 +128,7 @@ Because a dictionary keeps insertion order,
 a specific name goes above the glob that would otherwise match it.
 `"os.path.join"` is pure, and the `"os.*"` below it is `FileSystem`.
 Whole modules take one line each, which keeps the table short.
+
 A name that matches nothing is `UNKNOWN`.
 Because the table lists pure modules explicitly,
 leaving a module out can add an `Unknown` and cannot hide an Effect.
@@ -304,6 +306,7 @@ A `Scope` holds the names the checker has collected at one point in a file.
 `names` maps a local name to its full one, so `rm` becomes `os.remove`.
 `defined` holds the functions and classes the module defines.
 `types` maps a variable to the name of its type.
+
 `name()` searches from the innermost scope outward, as Python does: variables,
 then the module's imports and definitions, then `builtins`.
 A name found in `types` is a variable,
@@ -589,6 +592,7 @@ binds everything after `T` to `extras`,
 and returns the argument names of the first call to `marker`.
 The guard, `if found == marker`, compares a captured name with a parameter,
 which a pattern alone cannot do.
+
 For a function with no such annotation, `marked()` returns `None`,
 which means "inferred."
 An empty row means "pure," so `None` and the empty row must differ.
@@ -746,6 +750,7 @@ def test_a_syntax_error_comes_back_as_a_value() -> None:
 In `save()`, `log` gets its type from a constructor call,
 the string by being a constant, `names` through a `type` alias,
 `LIMIT` through `Final[...]`, and `p` by its annotation.
+
 `test_a_binding_shadows_the_builtin()` binds the name `str` in eight ways.
 Each time, `str.upper()` comes back `UNRESOLVED` instead of resolving to `builtins.str.upper`.
 
@@ -797,6 +802,7 @@ so `lookup()` answers `UNKNOWN`.
 `step()` is a pure function from one set of rows to the next.
 A declared row passes through unchanged, which is how callers come to trust it.
 An undeclared row becomes the union of what its calls perform.
+
 `infer()` is the loop.
 The [walrus operator](04_Foundations--Control_Flow.md#the-walrus-operator)
 lets the `while` condition compute the next rows and compare them in one expression.
@@ -1154,6 +1160,7 @@ and now calls `frozenset().union()`.
 and now tests `name in self.types` in a pattern's guard.
 `load()` called `path.read_text()` inside a comprehension,
 and now calls `read(path)`.
+
 Each change is small, and two of them improved the code.
 All four are what the tool requires.
 You write for it as you write for a type checker,

@@ -131,6 +131,7 @@ app_settings.show()
 and `show()` sees the new value because it looks the name up in its own module every time it runs.
 The local `debug` is a separate binding that `from` set once, at import,
 so it still holds `False`.
+
 Import the module and write `app_settings.debug` when the value can change.
 Use `from ... import` for names that keep the same value,
 such as functions and classes.
@@ -392,6 +393,7 @@ Python names the offending file by its full path, abbreviated here as `...`.
 
 A cycle is a design signal.
 Move the shared piece into a third module both can import.
+
 When the cycle exists only in annotations,
 an `if TYPE_CHECKING:` import breaks it.
 `typing.TYPE_CHECKING` is `False` at runtime,
@@ -574,6 +576,7 @@ tools that read imports miss it,
 and the `import` statement re-runs its `sys.modules` lookup on every call.
 `lazy import` keeps the declaration at the top where a reader and a tool can see it,
 and pays the loading cost once, at first use.
+
 Packages deferred submodule loading before `lazy import` existed,
 by giving `__init__.py` a module-level `__getattr__`
 ([PEP 562](https://peps.python.org/pep-0562/))
@@ -614,6 +617,7 @@ The body of `noisy` runs at `noisy.announce()`, the first access,
 so `noisy module loaded` prints after `before first use`.
 If a lazily imported module is missing or broken,
 the error surfaces at that first use rather than at the import line.
+
 `sys.lazy_modules` holds the names still waiting to load,
 but the standard-library modules CPython loads at startup put lazy imports of their own into that set before your code runs:
 
@@ -644,6 +648,7 @@ Check it for a specific name you marked lazy, rather than reading the whole set.
 `lazy` works with both `import` and `from ... import`, but only at module scope.
 Using it inside a function, a class body, or a `try` block is a `SyntaxError`,
 and Python likewise rejects `lazy from module import *` and a `lazy from __future__` import.
+
 To change which imports are lazy for a whole run without editing source,
 run with `-X lazy_imports=MODE` or set `PYTHON_LAZY_IMPORTS=MODE`.
 Both accept one of two values.

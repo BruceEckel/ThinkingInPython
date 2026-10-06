@@ -40,6 +40,7 @@ print(copied)
 so every later append to `todo` appears in `saved`.
 `list(todo)` makes a real copy,
 and later appends to `todo` leave `copied` as it was.
+
 A one-level copy is enough here because the elements are immutable strings.
 When state nests mutable objects inside mutable objects,
 `copy.deepcopy()` copies every level of nesting:
@@ -70,7 +71,8 @@ so `todo[0].append("cheese")` changes the first element of `shallow` too.
 so `deep` holds inner lists of its own.
 The later `todo[0].append("jam")` changes `todo`'s inner list,
 and `deep`'s keeps its three elements.
-That walk costs time and memory proportional to the whole nested structure it rebuilds,
+
+`copy.deepcopy()` costs time and memory proportional to the whole nested structure it rebuilds,
 however small the change.
 `sketch.py` below copies one level and pays for one level.
 A state that nests containers inside containers copies the whole structure on every save.
@@ -287,6 +289,7 @@ later in this chapter rewind one field and keep the other.
 `draw()` returns a new `Drawing`,
 using `dataclasses.replace()` to change one field and copy the rest.
 Since each call returns a `Drawing`, the calls chain.
+
 Saving means keeping a reference,
 the assignment that aliased in `aliased_snapshot.py`.
 Here that assignment is safe because the object bound to `before` keeps its value as long as it exists,
@@ -320,6 +323,7 @@ The two objects share the stroke strings, not the tuple holding them.
 On a drawing with `n` strokes,
 `draw()` builds a fresh tuple of `n + 1` pointers,
 and that tuple is its whole cost.
+
 The stroke comes from `"".join([...])` because the compiler interns a literal like `"circle"`.
 Every `"circle"` literal in the module is one object,
 so `is` would print `True` whether or not `draw()` kept the caller's string.
@@ -645,6 +649,7 @@ not by the shape that class had at save time.
 If the state class gains, loses, or renames a field before the load,
 `pickle.loads()` still succeeds.
 The error comes later, from whatever reads a field the bytes lack.
+
 `pickle_drift.py` simulates that drift.
 `SketchV1` sits in a module of its own because a real class drifts between two runs of a program:
 
@@ -689,6 +694,7 @@ with expected(AttributeError):
 The dump that builds `blob` runs while `sketch_v1.SketchV1` means the one-field class.
 `sketch_v1.SketchV1 = SketchV2` stands in for an edit and reload of that module,
 with a field added between the save and the load.
+
 `ty` and mypy report that reassignment as unsound,
 so it carries a `# type: ignore`.
 Pyright lets the reassignment pass.
@@ -704,6 +710,7 @@ A record's generated `__setattr__()` raises `FrozenInstanceError`,
 and pickle updates `__dict__` without calling `__setattr__()`.
 The same shortcut skips `__post_init__()`,
 so a memento saved before a field gained its validation loads a value that bypassed the validation.
+
 `title` is absent, since the old bytes lack one.
 `restored.strokes` works because both versions agree on that field.
 `restored.title` raises `AttributeError` when anything reads it,

@@ -218,6 +218,7 @@ test_account.py:11: AssertionError
 The `where` line is the rewriting at work.
 `pytest` keeps the sub-expression `account.balance` and its value,
 which a bare `assert` statement discards.
+
 `Account` is a `@dataclass`,
 so its generated `__repr__()` names the field values.
 A hand-written class with no `__repr__()` prints `<account.Account object at 0x...>` there instead.
@@ -340,6 +341,7 @@ A test that calls `funded()` fails with `Fixture "funded" called directly`.
 
 Each test gets its own freshly built `funded` account,
 so tests cannot leak state into each other.
+
 If a fixture needs cleanup,
 it can `yield` the value and run teardown code after the `yield`.
 A function containing `yield` is a [generator](23_Patterns--Iterators.md#generators),
@@ -375,6 +377,7 @@ so read the error to see which invariant broke.
 A fixture marked `@pytest.fixture(autouse=True)` runs for every test in its scope without any test naming it.
 Autouse suits a fixture whose value is a side effect rather than an object:
 resetting a global registry, or installing a `monkeypatch` every test needs.
+
 Autouse runs the fixture, and only a parameter delivers its value.
 If you mark `funded` autouse and leave it out of the parameter list,
 `funded.withdraw(40)` raises an `AttributeError`.
@@ -515,6 +518,7 @@ print(v._Vault__pin)  # type: ignore
 and `__pin` rewritten to `_Vault__pin` the moment the class body compiled.
 The rewritten name is a real attribute like any other,
 so `v._Vault__pin` reads it successfully.
+
 Mangling exists to stop a subclass from accidentally colliding with a base class's private-looking name,
 not to hide the attribute.
 In Python the distinction between white-box and black-box remains one of discipline,

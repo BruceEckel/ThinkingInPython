@@ -187,6 +187,7 @@ When the last reference to an object goes away, the object goes with it.
 A reference cycle defeats that count.
 `self_link()` returns and its local `node` disappears,
 but the object still refers to itself, so its count stays above zero.
+
 Inside `self_link()`,
 `gc.get_referrers(node)` returns the objects that refer directly to `node`,
 and the call destroys nothing.
@@ -194,6 +195,7 @@ The only referrer is `node`, which confirms the self-reference.
 When a real object won't disappear and you don't know why,
 `gc.get_referrers()` is how you find what still holds it,
 the same way this listing uses it to show its own cycle.
+
 Freeing the node takes the cyclic garbage collector,
 a separate mechanism that runs on allocation counts rather than when the object becomes unreachable.
 `gc.disable()` above keeps that collector from running on its own,
@@ -309,6 +311,7 @@ except RuntimeError as e:
 
 `C opened` has no matching `closed`.
 Nothing releases what `__init__()` acquired before it failed.
+
 One fix keeps `__init__()` free of resources and acquires them in `__enter__()`,
 so a failed construction has nothing to leak.
 `__enter__()` has the same exposure, though.
@@ -356,6 +359,7 @@ so registering the cleanup does not keep the object alive.
 `finalize(self, self.close)` looks tidier and defeats that separation.
 The bound method holds a strong reference to the object,
 so the object survives until the program ends.
+
 `close()` runs the callback immediately.
 The second `close()` does nothing.
 A finalizer runs at most once, and `alive` reports whether it still can.
@@ -495,6 +499,7 @@ Keyed by name, two `Counter` objects that share a name collide,
 and the second displaces the first.
 Reused `id()` values are harmless,
 since the dictionary holds only live objects and no two live objects share an id.
+
 `live_count()` returns the size of that registry,
 so it reports how many `Counter` objects currently exist.
 When an instance loses its last ordinary reference,
@@ -507,9 +512,11 @@ with no `__del__()` and no explicit cleanup call.
 A `dict` or `list` as the registry keeps every instance alive forever,
 so the count never falls.
 The weak reference lets the registry prune itself.
+
 CPython's reference counting makes the count fall immediately.
 On an implementation with a tracing collector, such as PyPy,
 the entries disappear when its collector runs, so the counts fall late.
+
 `cleanup.py` keeps its count inside `__del__()`,
 so that count is correct only if `__del__()` runs and succeeds,
 and [Why `__del__()` Is Not Cleanup](#why-del-is-not-cleanup)
@@ -550,7 +557,8 @@ and its `__del__()` closes the file and reports the leak,
 at the same unpredictable moment as any other `__del__()`.
 On CPython `del f` is that moment.
 The `gc.collect()` call covers an implementation that waits for its collector.
-That backstop exists to catch the mistake, not to be the plan.
+
+The diagnostic backstop exists to catch the mistake, not to be the plan.
 It still depends on the collector reclaiming the object,
 and a reference cycle defers that collection until the cyclic collector runs,
 or forever if `gc.disable()` has stopped it.

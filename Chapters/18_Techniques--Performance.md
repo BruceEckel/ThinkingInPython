@@ -108,6 +108,7 @@ The deterministic tracing profiler becomes `profiling.tracing`,
 and `cProfile` remains an alias.
 3.15 deprecates the old pure-Python `profile` module, and 3.17 removes it,
 so use `profiling.tracing` or `cProfile` for tracing.
+
 The sampling profiler is `profiling.sampling`.
 Instead of tracing every call, it takes periodic snapshots of the call stack,
 so the overhead is near zero and the program runs at full speed while you watch.
@@ -146,6 +147,7 @@ is the interpreter's own instrumentation mechanism,
 the one profilers and debuggers now use.
 You claim a tool identifier, register a callback for an event,
 and name the code to which the event applies.
+
 Registering nothing costs nothing.
 The interpreter specializes the bytecode that has no callback attached,
 so unmonitored code runs at full speed.
@@ -266,6 +268,7 @@ so the following example prints a comparison instead of raw numbers.
 The numbers are one flag away.
 Run any measured listing in this book with [`--numbers`](#numbers-on-your-machine)
 to see what your machine does.
+
 A `list` tests membership by scanning.
 `target in as_list` walks the list from the start,
 comparing each element until it finds a match or reaches the end.
@@ -303,6 +306,7 @@ with no separate `setup` argument needed to build them.
 Leaving `number` out defaults to a million calls,
 which suits a microsecond snippet and is a long wait for anything slower,
 so always set it for a function you have not timed before.
+
 One machine measured the `set` at about 14,000 times faster than the list scan.
 A single lookup costs little either way.
 A million lookups is the difference between instant and minutes.
@@ -614,6 +618,7 @@ building no bound method.
 `append = out.append` builds one, and every call then goes through it.
 One machine measured the hoisted version five percent slower, another twenty.
 Measure it on your own machine before believing either direction.
+
 The threshold is deliberately loose.
 Timing noise on a busy machine easily reaches ten or twenty percent,
 so a claim about a small difference is a claim about the noise.
@@ -677,6 +682,7 @@ while `bisect_left()` returns the position before them
 `bisect_left()` and `bisect_right()` both answer "where does this go,"
 but when the list holds the target, only `bisect_left()` returns its index,
 so a membership test must use it, as `search_comparison.py` does below.
+
 The speed is in the search alone.
 `insort()` still shifts everything after the insertion point.
 Under heavy insert traffic, when the smallest item is all you read,
@@ -883,6 +889,7 @@ On descending data, the kind `heap_corruption.py` uses,
 Timsort detects the existing run and `sorted()` wins outright.
 A heap is not automatically the right choice.
 Measure with data shaped like production data.
+
 `heapq.nsmallest(100, data)`, introduced in `heap_queue.py`,
 answers this top-N question in one call,
 and is the tool to use before hand-rolling either comparison here.
@@ -947,6 +954,7 @@ while the lazy one computes only the handful of values that `islice()` extracts.
 `islice()` replaces the eager version's `evens[:5]`.
 A generator has no `__getitem__`,
 so slicing one raises `TypeError: 'generator' object is not subscriptable`.
+
 When the consumer needs every element and the data fits in memory,
 a list is fine, and you can iterate it twice.
 One pass exhausts a generator.
@@ -1182,6 +1190,7 @@ where a *record* is an immutable class defined by its fields.
 The called form, `@record(slots=False)`,
 is for the class that must keep a `__dict__`,
 and dropping the slots takes a visible flag rather than a missing option.
+
 The two forms follow [Decorators With Optional Parentheses](14_Techniques--Decorators.md#decorators-with-optional-parentheses).
 `cls` is `None` when you call the decorator with arguments,
 and the two `@overload` declarations tell the checker which form it reads.
@@ -1397,6 +1406,7 @@ That is why `data.append(1)` fails here.
 `view` and `payload` are both still alive at that point.
 The fix is to release every view first, explicitly (`view.release()`)
 or by letting them go out of scope, before resizing the buffer they read.
+
 The second trap is about direction, not lifetime.
 A `memoryview` over immutable `bytes` supports reading and slicing,
 but writing through it raises a `TypeError` regardless of whether anything else has it open.
@@ -1512,6 +1522,7 @@ compiles such a function to machine code on its first call:
 and Numba compiles the `fast_count_primes` it returns at the first call.
 Calling `fast_count_primes(1)` first pays the compilation and warm-up cost outside the timed region,
 so the comparison measures steady-state speed.
+
 On numeric code over simple types and NumPy arrays,
 Numba often runs nearly as fast as C.
 The first call pays a compilation delay,
@@ -1727,6 +1738,7 @@ A single call that does significant work wins.
 A million calls that each do a little spend the gain on boundary-crossing overhead.
 Passing millions of small Python objects across the boundary loses it too.
 Numbers, strings, bytes, and NumPy arrays cross cheaply.
+
 The list `collatz_lengths()` takes and returns carries 50,000 integers across the boundary each way,
 which sounds like the thing to avoid.
 But a hundred-odd loop iterations of real work follow each integer,

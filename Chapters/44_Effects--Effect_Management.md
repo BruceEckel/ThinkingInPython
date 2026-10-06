@@ -610,6 +610,7 @@ and a `greet()` that reads two `ContextVar`s states nothing.
 Setting the wrong one, or forgetting to set one, fails at the read,
 in whatever frame reads it.
 The bookkeeping stays, and the type checker can no longer verify it.
+
 An EMS moves the bookkeeping into the type system,
 where a native system maintains it for you, or, with a library like Stateless,
 the type checker verifies every declaration you write.
@@ -676,6 +677,7 @@ Think of a handler as a generalized `except` block.
 An `except` block intercepts exceptions and decides what the program does next.
 A handler intercepts any Effect operation and decides what it means.
 In `main()`, the `with fun ask(prompt)` handler decides that `ask` means "prompt the console and read a line."
+
 Handling an Effect also discharges it.
 `main()`'s row is not `<ask,tell>` but `<console,exn>`.
 The handlers remove `ask` and `tell`,
@@ -941,6 +943,7 @@ The interpreter enforces it,
 and its keyword marks each function that carries the Effect.
 An Effect row must instead reach every library in an ecosystem of untracked code.
 Gradual typing faced the same problem, and took a decade.
+
 No PEP proposes Effect tracking today.
 If one arrives, it will contain the ideas in this chapter.
 [Effect Tracking](A_Effect_Tracking.md) works through one candidate design:
@@ -1001,6 +1004,7 @@ The function signature answers the questions from [Effect Management Systems](#e
 what does this function need, what does it change, what can go wrong.
 The compiler checks every composition,
 comparing each callee's Effects with the caller's declaration at each call.
+
 The languages that do this today are young,
 and the libraries that retrofit it are demanding.
 That was true of every solution to every previous barrier at this stage.

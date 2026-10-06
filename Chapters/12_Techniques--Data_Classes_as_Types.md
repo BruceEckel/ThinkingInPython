@@ -171,6 +171,7 @@ is the practice of checking arguments on entry and results on exit,
 with a class invariant that must hold between calls.
 `f1()` takes no argument, so only the postcondition appears here.
 A method that accepts a second rating needs a precondition for it as well.
+
 The problem with DbC is that the contract spreads across every method that touches the value.
 The invariant is the part this chapter replaces.
 `_validate()` states it, and every mutating method must remember to call it.
@@ -676,6 +677,7 @@ It works, and it says what it does.
 The same call works from outside the class,
 so `frozen=True` stops an accidental assignment,
 not a caller determined to change the value.
+
 The alternative is to refuse the unnormalized value and normalize before construction.
 Which to choose depends on the type.
 Normalizing inside makes `Normalized("A@b.com")` and `Normalized("a@b.com")` the same value,
@@ -779,6 +781,7 @@ if __name__ == "__main__":
 `Person` declares no checks of its own.
 Its annotations require a `FullName` and an `EmailAddress`,
 which the type checker enforces, and neither can exist holding an illegal value.
+
 `test_person_composes_validated_parts` builds a `Person` from legal parts and reads them back.
 `test_full_name_needs_first_and_last` and `test_email_needs_at_sign` show that an illegal name or email cannot exist,
 so no `Person` can hold one:
@@ -1066,6 +1069,7 @@ or `set` produces a type loose enough that `ty` accepts it against any annotatio
 so `ty` does not compare the factory with the field.
 Checkers differ here.
 Pyright infers `set[Unknown]` for this factory and rejects it against `dict[str, str]`.
+
 Subscripting makes the factory's return type concrete,
 and `field(default_factory=dict[int, int])` on this field then draws a type error.
 Use the bare form when the factory and the annotation agree,
@@ -1119,6 +1123,7 @@ Here, `Stars(11)` builds one,
 because a factory function is advice rather than a gate,
 a limit every factory in [Factory](27_Patterns--Factory.md#hiding-the-concrete-classes)
 shares.
+
 `test_the_check_cannot_move_inside` shows why the check cannot move inside the type.
 `NamedTuple` refuses `__new__()`, refuses `__init__()` the same way,
 and no class comes into existence.

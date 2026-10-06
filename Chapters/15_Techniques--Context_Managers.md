@@ -108,6 +108,7 @@ It knows nothing about generators or `@contextmanager`.
 A *context manager* is any object that implements two methods: `__enter__()`,
 which runs at the start of the block, and `__exit__()`, which runs at the end.
 `@contextmanager` manufactures such an object from a generator function.
+
 Every hand-written context manager class in this chapter keeps `__init__()` in longhand rather than becoming a `@dataclass`,
 so every line between the class statement and the two protocol methods reads as ordinary Python:
 
@@ -454,6 +455,7 @@ which makes `expected()` with no argument catch everything.
 `self.types` from `Types | ALL` down to `Types`,
 and the earlier `if exc_type is None or exc is None: return False` narrows `exc_type` to a class and `exc` to an exception,
 so `issubclass(exc_type, self.types)` type-checks.
+
 `__exit__()` also hands the exception to `report()`,
 which prints it as `[Type] message` through `textwrap.fill()` at `WIDTH`,
 so a long message wraps instead of overrunning the listing width.
@@ -511,6 +513,7 @@ wrapped by `textwrap.fill()` when that line is wider than `WIDTH`.
 An exception of another type propagates,
 and a call that raises nothing fails with an `AssertionError`,
 so `expect()` flags a demo that stops failing instead of quietly printing nothing.
+
 The `/` makes `types` and `fn` [positional-only](05_Foundations--Functions.md#positional-only-and-keyword-only-parameters),
 so every keyword argument goes to `fn`.
 [`**P`](14_Techniques--Decorators.md#p-and-r-keep-the-static-interface)
@@ -537,9 +540,11 @@ expect(json.JSONDecodeError, json.loads, "{bad")
 The second call names two types in a tuple and forwards `base=1` as a keyword,
 which `parse()` passes on to `int()`.
 The third call's message is too long for one line, so it wraps.
+
 `aexpect()` is the `async` form.
 It awaits the call instead of making it,
 for a coroutine function whose failure is the demonstration.
+
 Where a demonstration needs several statements or an assignment in the guarded block,
 `expected` remains the right tool.
 `expect()` covers the common case of one call.
@@ -988,6 +993,7 @@ if __name__ == "__main__":
 The `finally` puts it back.
 The second `with` block crashes, and the `finally` still returns the connection,
 so the count is back to two.
+
 `Pool` is generic over the pooled type,
 and it neither creates nor destroys anything.
 Its one job is tracking custody.
@@ -1006,6 +1012,7 @@ The queue does more than store the idle items.
 so a borrower waits until another borrower's `with` block ends and returns an item to the queue.
 When several threads share one pool, the queue limits concurrent use,
 the way a real database connection pool does.
+
 `pool_contention.py` puts the pool under real contention.
 Eight threads share a pool of two connections and lease and release two hundred times each.
 
@@ -1052,6 +1059,7 @@ Across sixteen hundred lease-and-release cycles,
 spread over eight threads competing for two connections,
 `held` stays at or below two.
 A thread that arrives while the pool is empty blocks in `get()` instead of racing past it.
+
 `available()` is a snapshot for the demo, not a synchronization primitive.
 `Queue.qsize()` becomes approximate once more than one thread is borrowing,
 because another thread can lease or return between the count and its use.

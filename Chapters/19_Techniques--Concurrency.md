@@ -244,6 +244,7 @@ The following example compares a task that waits with one that computes,
 writing the same price lookup twice.
 `io_price()` awaits `asyncio.sleep()` as a stand-in for a network call.
 `cpu_price()` counts through a million iterations as a stand-in for heavy computing.
+
 A `Meter` records the peak number of tasks in flight at once.
 `Meter` is a [context manager](15_Techniques--Context_Managers.md).
 `__enter__()` counts the task in flight, `__exit__()` counts it done,
@@ -576,6 +577,7 @@ printing nothing and raising no exception.
 A `TaskGroup` holds its own references until the block exits.
 Outside a `TaskGroup`,
 keep the returned task in a variable or a set that outlives the task.
+
 `c` and `d` raise exceptions at the same 0.03-second mark,
 and the `TaskGroup` responds by cancelling `e` and `f`,
 which are still suspended with far more sleep to go,
@@ -725,6 +727,7 @@ and re-raises the cancellation as it exits.
 Because the cancellation traces back to its own deadline,
 `asyncio.timeout()` converts that `CancelledError` into a `TimeoutError` on its way out,
 so the caller sees an ordinary exception instead of a bare cancellation.
+
 `asyncio.wait_for()` bounds one awaitable the same way.
 [`async_deadlock.py`](#deadlock)
 uses it to cut off the deadlocked wait after 0.5 seconds,
@@ -817,6 +820,7 @@ A task that reaches `async with lock` while another task holds the lock suspends
 This way, only one task runs its read-modify-write at a time,
 no matter how many times the event loop switches to another task in between.
 The counter now reaches 400, the same fix `threading.Lock` produces for threads.
+
 An `asyncio.Lock` orders tasks on one event loop and gives no protection across threads.
 A worker thread reached through `asyncio.to_thread()` needs a `threading.Lock`.
 
@@ -1086,6 +1090,7 @@ if __name__ == "__main__":
 Everything `pool.map()` does is now explicit: starting each worker,
 waiting for it to finish, and reassembling results that can arrive in any order
 (`sorted()` restores the input order, since each result carries its `order`).
+
 *Draining* a queue means reading every item out of it until it is empty.
 Draining after `join()` works here because all five results are small enough for every worker to finish writing with no reader waiting.
 Bulky data changes that.
@@ -1190,6 +1195,7 @@ One run on a 32-core machine produced this:
 Exact timings shift with load and hardware, but the shape holds.
 Wall time drops sharply up to the core count, then flattens or reverses past it,
 as doubling from 32 to 64 tasks did here.
+
 `TOTAL` and `CORE_MULTIPLIER` are the two constants worth changing.
 Raise `TOTAL` for a slower, more dramatic slope on your own machine,
 or lower `CORE_MULTIPLIER` to stop the sweep at the core count instead of past it.
@@ -1232,6 +1238,7 @@ so one thread at a time runs Python bytecode, no matter how many cores sit idle.
 
 A thread waiting on I/O releases the GIL.
 That release is why a thread pool helps with I/O-bound work.
+
 The next two examples, one for waiting and one for computing,
 use the same harness, which runs a price function sequentially and threaded,
 confirms they agree, and times each.
@@ -1305,6 +1312,7 @@ That overlap is `blocking_the_loop.py` turned inside out.
 A blocking call freezes an event loop,
 but a pool of threads absorbs blocking calls.
 That absorption is why `asyncio.to_thread()` hands its blocking work to this kind of pool.
+
 Use a thread pool for I/O when the blocking calls already exist and rewriting them as coroutines is not worth the effort.
 `asyncio` pays off when you have thousands of waits,
 since tasks are far lighter than threads.
@@ -1369,6 +1377,7 @@ Every alternative undid one of the earlier decisions.
 Atomic count updates slow every program to benefit a few.
 A 1996 patch tried fine-grained locks and ran single-threaded code about twice as slow.
 A tracing garbage collector breaks every extension.
+
 In rejecting that 1996 patch,
 Guido van Rossum set the bar that stood for three decades:
 remove the GIL without slowing single-threaded code.
@@ -1477,6 +1486,7 @@ tracked by [PEP 703](https://peps.python.org/pep-0703/) and installed separately
 removed its "experimental" label in 3.14,
 so it is a supported build now rather than a preview,
 still optional and still installed alongside the default one.
+
 The free-threaded build removes the GIL,
 so threads run Python bytecode on separate cores at the same time.
 Under a free-threaded interpreter `gil_threads.py`'s boolean flips to `False`.
@@ -1502,6 +1512,7 @@ Immortality arrived in 3.12 for every build but pays off most in the free-thread
 since it removes the one atomic operation every thread otherwise contests.
 Mutable containers like dictionaries and lists carry individual locks,
 so two threads contend only when they touch the same container.
+
 Single-threaded code pays a small penalty for this machinery.
 On the `pyperformance` benchmark suite the average overhead runs from about one percent to about eight,
 depending on the platform.
@@ -1707,6 +1718,7 @@ asyncio.run(main())
 so `get()` suspends it rather than blocking the thread underneath it.
 `producer()` then runs, sleeps to stand in for slow work, and puts an item.
 That `put()` wakes the waiting consumer.
+
 `asyncio.Queue` needs no locks,
 since the event loop lets one coroutine at a time touch it.
 That guarantee holds within the event loop's own thread alone.
@@ -2170,6 +2182,7 @@ The listing stipulates that stack figure instead of measuring it.
 `STACK_SIZE` is a constant the code sets and reads back,
 standing for a common one-mebibyte default,
 not a number the OS reports for a thread that ran.
+
 A single thread's reserved stack,
 paid before it runs one line of its target function,
 could instead hold hundreds of suspended tasks.

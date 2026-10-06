@@ -88,6 +88,7 @@ that name becomes a class-level attribute instead
 (similar to a static field in C++/Java).
 [Class Attributes](09_Foundations--Class_Attributes.md)
 shows how a class-level attribute behaves when you assign to it.
+
 A bare annotation with no value looks most like a C++ or Java field declaration,
 yet it creates neither kind of attribute.
 It records the type.
@@ -491,6 +492,7 @@ The first access runs the method.
 The second access produces the same result from the stored value.
 The attribute is *lazily initialized*, created on first use,
 so the method runs at the first read rather than when the object is built.
+
 The stored value lives in the instance's [`__dict__`](09_Foundations--Class_Attributes.md#two-dictionaries-one-lookup),
 the dictionary that holds the instance's attributes.
 An instance of a class that declares `__slots__` has no `__dict__`,

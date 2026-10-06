@@ -311,6 +311,7 @@ A `repeat` without that comparison fails silently.
 Python binds `greet` to `decorate`.
 Calling `greet("Bob")` then passes `"Bob"` where `decorate` expects a function and hands back a wrapper,
 and the only symptom is missing output.
+
 The annotations catch the mistake either way,
 at the decoration rather than at the call.
 The type checker reports that `repeat` expected an `int` for `times` and got a function.
@@ -419,6 +420,7 @@ Called bare, `func` is `one`, `callable(func)` is `True`,
 so `label` decorates it immediately by calling `decorate(func)`.
 Called with arguments, `func` stays `None`, `callable(func)` is `False`,
 so `label` returns `decorate` for Python to apply to `two`.
+
 The two `@overload` declarations state for the type checker what the runtime branch does:
 given a function, `label` returns a function of the same signature;
 given only keyword arguments, it returns a decorator.
@@ -480,6 +482,7 @@ if __name__ == "__main__":
 The two `@` lines mean `greet = trace(repeat(times=2)(greet))`.
 `@repeat(times=2)` wraps `greet()` first, then `@trace` wraps that result,
 so a single `greet("Bob")` traces one call whose body runs twice.
+
 Stacking works because each wrapper preserves the interface of what it wraps.
 Every layer looks like the original function,
 so the layers compose to any depth.
@@ -517,6 +520,7 @@ def test_stacked_decorators_repeat_the_call() -> None:
 A decorator is any callable that accepts one argument.
 A class with `__call__()` is a callable,
 so a decorator can be a class instead of a function.
+
 The class form separates the two phases cleanly.
 The constructor runs once, at decoration,
 and `__call__()` runs on every call to the decorated function.
@@ -1005,6 +1009,7 @@ and hands back whatever `greeting()` returned.
 After decoration the name `greeting` refers to that `str`,
 so `greeting()` raises a `TypeError`.
 A `str` is not callable.
+
 `run_once` pays off for a value that needs one-time setup logic but stays constant afterward.
 For anything simpler,
 a module-level constant computed the ordinary way reads better.
@@ -1128,6 +1133,7 @@ The `Pizza` `Protocol` describes that interface.
 Both the plain pizzas and the toppings satisfy it structurally,
 with no shared base class required.
 This is [structural typing](08_Foundations--Static_Types.md#structural-typing-with-protocols).
+
 A read-only `@property` in a `Protocol` requires that reading the name produce the property's return type,
 and says nothing about how.
 `Margherita` supplies `cost` as a class attribute and `Topping` computes it in a property.

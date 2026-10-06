@@ -96,6 +96,7 @@ Because `MouseAction` is a `StrEnum`, each member *is* a `str`,
 and compares equal to and prints as its value.
 That is why `print(event)` in `run_all()` shows `mouse appears` rather than `MouseAction.APPEARS`.
 The members still hash and look up correctly, so they work as dictionary keys.
+
 `MouseAction("mouse appears")` returns the matching member.
 `mouse_trap_states.py` parses each line of the test input with that call.
 
@@ -231,6 +232,7 @@ Each `case` names its member through the class, as in `MouseAction.APPEARS`.
 A dotted name compares the event with that member,
 while a bare `APPEARS` would be a capture pattern that matches every event
 ([Pattern Matching](13_Techniques--Pattern_Matching.md#a-bare-name-captures-a-dotted-name-compares)).
+
 `Waiting.next()` returns `MouseTrap.luring` although the `class MouseTrap` statement comes further down the file.
 Python looks up a name inside a function when the function runs,
 not when its `def` executes.
@@ -275,6 +277,7 @@ but a machine with many states means many `match` statements,
 spread across many classes.
 The second version puts a table inside each `State` object,
 listing the next state for each input.
+
 A state's table cannot sit in that state's class body,
 because the entries name the other states,
 and those states exist only after every class definition has run.
@@ -547,6 +550,7 @@ The engine tries them top to bottom,
 which is how a single input can lead to different states depending on a test.
 A row whose condition is `None` matches every time,
 so it belongs last in its group, as the `else` for the rows above it.
+
 When every condition in a group returns `False`,
 `handle()` raises the same `NoTransition` a missing key raises.
 `NoTransition` derives from `RuntimeError`,

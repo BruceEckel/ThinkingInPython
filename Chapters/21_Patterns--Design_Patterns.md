@@ -269,6 +269,7 @@ on a specific operation, on a platform, on an object's representation,
 on an algorithm, or on each other, which the list calls *tight coupling*.
 The other two, extending by subclassing and being unable to alter a class,
 are about what a dependence costs once it exists.
+
 The glossary defines coupling as "the degree to which software components depend on each other,"
 and that first chapter's two design principles are both instructions to loosen one particular dependence.
 "Program to an interface,
@@ -278,6 +279,7 @@ not an implementation" says stop naming concrete classes.
 a class that holds a reference to an abstract class "refers to a *type* of object,
 not a concrete object."
 Read this way, the catalog is one idea applied twenty-three times.
+
 GoF's own discussion of the behavioral patterns compares four of them by their coupling.
 *Command*, *Observer*, *Mediator*,
 and *Chain of Responsibility* each decouple a sender from a receiver,

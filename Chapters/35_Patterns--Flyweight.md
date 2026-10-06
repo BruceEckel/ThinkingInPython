@@ -181,6 +181,7 @@ Twenty-four cells, three objects.
 so the object count stays at the number of tile kinds however large the grid grows.
 `[*row for row in field]` flattens the grid into one list of cells,
 the [comprehension unpacking](16_Techniques--Comprehensions.md#unpacking-in-comprehensions).
+
 The listing counts `id(t)` rather than `len(set(cells))` on purpose.
 `Tile` is a record, so its generated `__eq__()` compares field values,
 and a set of cells collapses to three with or without sharing.
@@ -209,10 +210,12 @@ so the type checker passes `tile("?")`,
 and the mistake surfaces at runtime as a `KeyError` from `SPECS`.
 The boundary is therefore `to_symbol()`,
 the one function that takes a `str` and returns a `Symbol`.
+
 `to_symbol()` guards on membership in `SPECS` at runtime and raises a `KeyError` for a character outside it.
 The type checker narrows on the same guard.
 `SPECS` has key type `Symbol`, so past the guard `char` is a `Symbol`,
 and `return char` satisfies the declared return type as written.
+
 The narrowing proves what a [`cast()`](08_Foundations--Static_Types.md#typing-decorators-and-directives)
 asserts.
 Prefer a guard that lets the type checker narrow.
@@ -448,6 +451,7 @@ and [`slots=True`](18_Techniques--Performance.md#slots)
 cuts the size of each one,
 so the two are worth combining once memory is the point.
 `Tile` combines them by being a record.
+
 The combination has one catch.
 A weak reference needs a `__weakref__` slot,
 and a slotted class gets one only by declaring it, so with `slots=True` alone,
@@ -552,6 +556,7 @@ Name, symbol, and attribute access all reach the same shared member.
 The enum version also brings iteration, exhaustive `match`,
 and a fixed set of members.
 `Tile("?")` raises a `ValueError`, and `Tile.DOOR` raises an `AttributeError`.
+
 A `match` over `Tile` needs no `case _:` catch-all once every member has a case.
 If you leave a member out of a function that declares a return type,
 the type checker reports the gap before the code runs:
