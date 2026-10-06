@@ -112,7 +112,7 @@ and every other name keeps the old one. The two coincide in
 <summary>Where to look</summary>
 
 In [Watching Objects Without Holding Them](../../Chapters/10_Foundations--Cleanup.md#watching-objects-without-holding-them), a `WeakValueDictionary` reads like a `dict`.
-Iterate `cls._instances.values()` in a `@classmethod`, take each `.name`,
+Iterate over `cls._instances.values()` in a `@classmethod`, take each `.name`,
 and wrap the result in `sorted()` so the order does not depend on insertion.
 
 <details>
@@ -170,7 +170,7 @@ print(Counter.live_names())
 #: ['Alpha', 'Bravo', 'Charlie']
 ```
 
-**Gather the live names.** `cls._instances.values()` iterates the live `Counter` objects
+**Gather the live names.** `cls._instances.values()` yields the live `Counter` objects
 currently tracked, since a `WeakValueDictionary` reads like a normal
 `dict`. The generator expression pulls out each one's `.name`. Sorting
 makes the result independent of creation order, since a dictionary's

@@ -472,7 +472,7 @@ so the whole input stays in memory for as long as the `cycle` object exists.
 
 ### `chain`
 
-Iterates several iterables one after another, as if they were one.
+Iterates over several iterables one after another, as if they were one.
 `chain.from_iterable(iterables)` does the same when the iterables themselves arrive as one lazy sequence,
 rather than as separate arguments.
 Where the iterables come from a loop,

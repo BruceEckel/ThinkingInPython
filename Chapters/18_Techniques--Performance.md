@@ -956,7 +956,7 @@ A generator has no `__getitem__`,
 so slicing one raises `TypeError: 'generator' object is not subscriptable`.
 
 When the consumer needs every element and the data fits in memory,
-a list is fine, and you can iterate it twice.
+a list is fine, and you can iterate over it twice.
 One pass exhausts a generator.
 
 Fitting the whole data set in memory gives you more than a second pass.
@@ -1839,7 +1839,7 @@ give a hint, usually the shape of the code, and a full answer for each exercise.
 9.  `compact_array.py` compares an `array` against a `list` of the same floats.
     Time an element-by-element sum over each with `timeit`.
     The `array` uses a quarter of the memory.
-    Is it also faster to iterate, and why not?
+    Is iterating over the `array` also faster, and why not?
 10. Time `"".join(parts)` against `+=` in a loop for 10,000 short strings,
     then repeat at 100 strings.
     At which size does the difference stop mattering,

@@ -514,7 +514,7 @@ function, the way `bisection_within()` writes the tolerance into its
 <summary>Where to look</summary>
 
 [An Event Bus: Handlers Keyed by Type](../../Chapters/28_Patterns--Function_Objects.md#an-event-bus-handlers-keyed-by-type) looks handlers up by `type(event)` in a `defaultdict`.
-Iterate `type(event).__mro__` instead, and read each class's handlers with `.get()` so a lookup does not insert keys.
+Iterate over `type(event).__mro__` instead, and read each class's handlers with `.get()` so a lookup does not insert keys.
 `unsubscribe()` removes a handler from that list, so decide what it should do with a handler that is not in the list.
 For the last question, compare which change alters what an existing caller receives.
 
@@ -637,8 +637,8 @@ silent `unsubscribe()` matches the bus's habit of letting an unmatched
 event pass without complaint.
 
 **Walk the ancestry, most specific first.** `type(event).__mro__`
-already runs from the class outward to `object`, so iterating it in
-order calls the most specific handlers first and the inherited ones
+already runs from the class outward to `object`, so iterating over it
+in order calls the most specific handlers first and the inherited ones
 after. That order meets the "parents last" requirement. `publish()`
 keeps using `.get()` for the same reason the chapter gives. Indexing
 a `defaultdict` on a read inserts an empty list for every class in

@@ -730,7 +730,7 @@ so the walker is yours to write.
 A [`t`-string](02_Foundations--Tour.md#t-strings) evaluates to a `Template`:
 a stream of two node kinds,
 the literal `str` pieces the author typed and the `Interpolation` objects holding the values.
-Iterating a `Template` is flat.
+Iterating over a `Template` is flat.
 `for piece in template` yields exactly one level of `str` and `Interpolation` objects,
 so the walk is a loop rather than a recursion.
 An interpolation's value can be a `Template`,
@@ -742,7 +742,7 @@ A walker that loops over the top level must therefore also recurse into any valu
 Everything else follows this chapter's walkers: one branch per node kind,
 and a recursive call where a node holds more nodes.
 
-Iterating a `Template` produces `str | Interpolation`,
+Iterating over a `Template` produces `str | Interpolation`,
 a closed union like `Node` with two members,
 so an `isinstance` test narrows it as well as a `match` does.
 The `else` paired with `isinstance(piece, Interpolation)` is the `str` case.
@@ -808,7 +808,7 @@ print(values2)
 so `inner`'s pieces flatten into the same `sql` string and `values` list.
 Every entry in `values2` is then a value a database driver accepts.
 Composing `t`-strings this way builds a nested composite.
-Iterating any one `Template` stays flat.
+Iterating over any one `Template` stays flat.
 
 `to_query()` and `to_shape()` stand in the same relationship as `evaluate()` and `to_infix()`:
 two operations over one structure that mentions neither of them.

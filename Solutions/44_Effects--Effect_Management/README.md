@@ -542,7 +542,7 @@ contain `await`, so `total_price()` becomes `total_price_async()`.
 
 **Collect the results before summing.** The argument to `sum()` gains
 brackets. A generator expression with an `await` inside it is an
-asynchronous generator, which `sum()` cannot iterate. `ty` reports
+asynchronous generator, and `sum()` cannot iterate over it. `ty` reports
 `no-matching-overload`, and the call raises a `TypeError`. The list
 comprehension awaits each price and hands `sum()` a list.
 

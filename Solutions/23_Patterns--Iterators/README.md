@@ -120,14 +120,14 @@ print(len(c))
 #: 5
 print(list(c))
 #: [5, 4, 3, 2, 1]
-print(len(c))  # Still works after iterating
+print(len(c))  # Still works after iterating over c
 #: 5
 ```
 
 **Build a fresh generator per pass.** `Countdown` supports `len()` because it is a reusable iterable,
 not an iterator. Each `for` loop or `list()` call gets a fresh
-generator from a fresh call to `__iter__()`, so iterating leaves
-`c.start` alone.
+generator from a fresh call to `__iter__()`, so iterating over `c`
+leaves `c.start` alone.
 
 **Count without consuming.** `len(c)` computes from `c.start`, any
 number of times, before or after.
@@ -626,8 +626,8 @@ builds `seen` to fake the same ability.
 `seen` holds 50,000 items, and it holds a million after a million.
 `first()` works only if every value stays reachable, so supporting it
 on an endless source costs unbounded memory. Python's `__next__()` has
-no such requirement, which is why `itertools.count()` is safe to
-iterate and impossible to rewind.
+no such requirement, which is why iterating over `itertools.count()`
+is safe and rewinding it is impossible.
 
 </details>
 </details>
@@ -750,7 +750,7 @@ pay. Answering a question about the future means fetching the future.
 <summary>Where to look</summary>
 
 [Delegating with `yield from`](../../Chapters/23_Patterns--Iterators.md#delegating-with-yield-from) shows `flatten()` and its base case.
-Iterating a `str` produces more strings, so the recursion has no base case to stop it.
+Iterating over a `str` produces more strings, so the recursion has no base case to stop it.
 Test for `str` alongside `int` using `isinstance()` with a union, and apply the same test in `flatten_loop()`.
 
 <details>
@@ -814,10 +814,10 @@ print(list(flatten_str([1, ["ab", [2]], 3])))
 
 **Descend until a leaf.** `flatten()` asks one question, "is this an
 `int`?", and recurses into every item that is not one. A `str` is not
-an `int`, so `"ab"` goes to `flatten("ab")`, which iterates it into
-`"a"`. That `"a"` is also not an `int`, so `flatten("ab")` recurses
-into `flatten("a")`, which iterates `"a"` into `"a"`. The string has
-stopped getting shorter. Every other sequence bottoms out because
+an `int`, so `"ab"` goes to `flatten("ab")`, which iterates over it
+and gets `"a"`. That `"a"` is also not an `int`, so `flatten("ab")`
+recurses into `flatten("a")`, which iterates over `"a"` and gets
+`"a"`. The string has stopped getting shorter. Every other sequence bottoms out because
 indexing it eventually yields a non-sequence, and `str` is the one
 built-in exception. A one-character string is still a `Sequence`
 of one-character strings. The recursion has no base case, so it runs
@@ -825,7 +825,7 @@ until Python raises a `RecursionError`.
 
 **Treat a string as a leaf.** The fix widens the base case rather than the recursive one. Testing
 `isinstance(item, int | str)` makes `str` a leaf, so `flatten_str()`
-yields each string whole instead of iterating it. The return type
+yields each string whole instead of iterating over it. The return type
 widens to `Iterator[int | str]` to say so.
 
 `flatten_loop()` takes the identical fix, since `flatten()` and

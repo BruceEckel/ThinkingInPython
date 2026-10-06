@@ -11,7 +11,7 @@ print("Bob" in ages)  # Membership tests the keys
 # A default when the key is missing
 print(ages.get("Dan", 0))
 #: 0
-print(list(ages))  # Iterating a dict yields its keys
+print(list(ages))  # Iterating over a dict yields its keys
 #: ['Alice', 'Bob', 'Carol']
 print(list(ages.values()))
 #: [30, 25, 41]

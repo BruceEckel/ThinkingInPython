@@ -607,7 +607,7 @@ and `sum((n * n for n in nums), 0)` is the fix.
 
 ### A Generator Expression Runs Once
 
-`genexp_consumers.py` can iterate `nums` three times because a `range` is re-iterable.
+`genexp_consumers.py` can iterate over `nums` three times because a `range` is re-iterable.
 Each `for` over it starts again at zero.
 A generator expression is not re-iterable:
 

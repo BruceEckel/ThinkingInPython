@@ -1145,6 +1145,43 @@ rule keeps: a claim with its reason, a contrast, a one-sentence half.
 
 **Home.** cohesion (Accrued patterns).
 
+### R30. "Iterate" takes "over"
+
+**Test.** A form of "iterate" ("iterates", "iterating", "iterated")
+with no "over" (or "through") after it. Where the sentence names what
+the iteration covers, write "iterates over X". Where the object is left
+out ("until you iterate", "while iterating"), supply it ("until you
+iterate over it", "while iterating over `items`"). Listing comments
+count as prose.
+
+**Keep when.** "over" would end the clause on a stranded preposition
+("a generator that nothing iterates over"): restructure instead ("a
+generator, and nothing iterates over it"). A subject that does not
+perform the iteration gets its real verb: a `dict` view "yields" its
+values. A string a program prints stays as written when its `#:` marker
+and the 60-column limit hold it (Solutions 18's "array is slower to
+iterate").
+
+**Sightings.** Rule stated by Bruce 2026-10-05 ("don't say something
+'iterates' by itself as in 'it iterates'; instead it should be 'it
+iterates over'"), after he changed chapter 30's "The copy that
+`announce()` iterates" to "iterates over". Swept the same day: 36 sites
+in 17 files (additive).
+- `03_Foundations--Containers`: "Iterating the `dict` iterates
+  `keys()`" -> "Iterating over the `dict` iterates over `keys()`"; "A
+  `dict` iterates in insertion order" -> "Iterating over a `dict`
+  follows insertion order"
+- `23_Patterns--Iterators`: "computes nothing until you iterate," ->
+  "computes nothing until you iterate over it,"; "When a function
+  iterates more than once" -> "When a function iterates over its
+  argument more than once"
+- `Solutions/27_Patterns--Factory`: "builds a generator that nothing
+  iterates." -> "builds a generator and nothing iterates over it."
+- `Solutions/44_Effects--Effect_Management`: "which `sum()` cannot
+  iterate." -> "and `sum()` cannot iterate over it."
+
+**Home.** this file only.
+
 ### Rulings of 2026-10-04 (Sweep Decisions page)
 
 Bruce decided the book-wide apply report's open questions on https://claude.ai/artifact/HjHyafWs5EDXQkoPmhV9g9:

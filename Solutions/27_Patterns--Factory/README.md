@@ -1200,7 +1200,7 @@ def shape_name(n: int) -> Iterator[str]:
 <details>
 <summary>Solution</summary>
 
-If you call `all_subclasses(sub)` without `yield from`, the call builds a generator that nothing iterates.
+If you call `all_subclasses(sub)` without `yield from`, the call builds a generator and nothing iterates over it.
 `names(all_subclasses(Shape))` then prints `['Circle', 'Square']`, the same list as `Shape.__subclasses__()`,
 and the demo draws no `Oval`.
 Neither the type checker nor ruff reports the dropped keyword.

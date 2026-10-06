@@ -145,7 +145,7 @@ A caller learns that the items have run out by asking for one more.
 
 `fibonacci(8)` returns an iterator, which one pass exhausts.
 `Countdown(5)` is an iterable whose `__iter__()` builds a fresh generator for every pass,
-so you can iterate it repeatedly.
+so you can iterate over it repeatedly.
 
 The test file confirms that:
 
@@ -187,7 +187,7 @@ def test_total_over_any_iterable() -> None:
 ```
 
 Generators are lazy.
-`fibonacci(1_000_000)` computes nothing until you iterate,
+`fibonacci(1_000_000)` computes nothing until you iterate over it,
 and produces one value at a time,
 so it works on streams too large to hold in memory.
 `generator_memory.py` compares the generator's memory with a list holding the same values.
@@ -224,7 +224,7 @@ print(f"generator used far less memory: "
 #: generator used far less memory: True
 ```
 
-Iterating the generator keeps one squared value alive at a time.
+Iterating over the generator keeps one squared value alive at a time.
 Collecting the same million values into a list keeps all of them alive at once,
 so the generator's peak stays under one percent of the list's.
 
@@ -339,7 +339,8 @@ print(twice_collection([0, 1, 2]))
 #: (3, 3)
 ```
 
-When a function iterates more than once, say so in the signature.
+When a function iterates over its argument more than once,
+say so in the signature.
 `Collection[T]` and `Sequence[T]` also require `__len__()`,
 which no generator has,
 so the type checker rejects the generator at the call instead of letting it run wrong.

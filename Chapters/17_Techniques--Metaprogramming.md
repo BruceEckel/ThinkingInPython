@@ -74,7 +74,7 @@ You have used metaclasses without writing one.
 and makes a class with an unimplemented abstract method refuse instantiation.
 `enum.EnumType` builds each `Enum` subclass,
 turning every class-body assignment into a member and making `for c in Color` walk them.
-Iterating a class is behavior on the class object,
+Iterating over a class is behavior on the class object,
 and a metaclass puts behavior there.
 An ordinary class cannot.
 
@@ -1515,7 +1515,7 @@ for c in Color:
 ```
 
 `IterableMeta.__iter__()` fires when you write `for c in Color`,
-iterating the class object, not an instance of it.
+iterating over the class object, not an instance of it.
 It walks `vars(cls)`, the class's own namespace,
 skipping every underscore-prefixed name,
 which for `Color` is the dunder bookkeeping every class carries,

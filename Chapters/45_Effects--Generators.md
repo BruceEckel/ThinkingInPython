@@ -361,7 +361,7 @@ print(list(report(["red", "green", "blue"])))
 ```
 
 `emit()` is a `Generator[str, None, int]`: it yields strings, receives nothing,
-and returns the `int` total it accumulates while iterating.
+and returns the `int` total it accumulates while iterating over `items`.
 
 The return channel delivers a value from a generator to the generator that delegated to it.
 `report()` receives the total `emit()` computed,

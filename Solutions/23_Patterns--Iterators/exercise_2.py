@@ -20,5 +20,5 @@ print(len(c))
 #: 5
 print(list(c))
 #: [5, 4, 3, 2, 1]
-print(len(c))  # Still works after iterating
+print(len(c))  # Still works after iterating over c
 #: 5

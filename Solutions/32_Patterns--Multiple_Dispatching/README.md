@@ -495,7 +495,7 @@ cases per module where it reported nine.
 <details>
 <summary>Where to look</summary>
 
-In [Two Dispatches Through Methods](../../Chapters/32_Patterns--Multiple_Dispatching.md#two-dispatches-through-methods), `item_pair_gen()` is a generator, so its body runs only as you iterate.
+In [Two Dispatches Through Methods](../../Chapters/32_Patterns--Multiple_Dispatching.md#two-dispatches-through-methods), `item_pair_gen()` is a generator, so its body runs only as you iterate over it.
 When the caller passes no `Counter`, create a fresh one so the body has a single path.
 Increment the count for each item inside the loop, before the `yield`, and the caller's own `Counter` fills as the loop consumes the pairs.
 
@@ -565,7 +565,7 @@ def item_pair_gen[T](base: type[T], n: int,
 <summary>Solution</summary>
 
 If you print `counts["Lizard"]` right after calling `item_pair_gen(Item, 100, counts)`,
-without iterating, it prints `0`.
+without iterating over the generator, it prints `0`.
 Calling a generator function runs none of its body,
 so the generator has chosen no item yet, let alone counted one.
 The solution's loop consumes all 100 pairs before it reads the count.

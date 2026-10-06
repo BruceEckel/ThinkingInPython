@@ -596,7 +596,7 @@ except ValueError as e:
 #: unsafe value: "Bob'; rm -rf /"
 ```
 
-Iterating a `Template` produces the pieces in order,
+Iterating over a `Template` produces the pieces in order,
 each either a `str` the author typed or an `Interpolation` carrying a value.
 An `Interpolation` also remembers the source text of the expression that produced it,
 and `piece.expression` reports that text.

@@ -346,7 +346,7 @@ print("Bob" in ages)  # Membership tests the keys
 # A default when the key is missing
 print(ages.get("Dan", 0))
 #: 0
-print(list(ages))  # Iterating a dict yields its keys
+print(list(ages))  # Iterating over a dict yields its keys
 #: ['Alice', 'Bob', 'Carol']
 print(list(ages.values()))
 #: [30, 25, 41]
@@ -359,14 +359,16 @@ for name, age in ages.items():
 
 Use `dict.get()` instead of `[]` to avoid a `KeyError` when a key might be absent.
 
-A `dict` iterates in insertion order, and the language guarantees that order.
+Iterating over a `dict` follows insertion order,
+and the language guarantees that order.
 
 A `dict` has three views: `keys()`, `values()`, and `items()`.
-Iterating the `dict` iterates `keys()`, so `for name in ages` walks the names.
+Iterating over the `dict` iterates over `keys()`,
+so `for name in ages` walks the names.
 
 `items()` alone yields `(key, value)` pairs,
 and leaving it off is a common slip.
-`for name, age in ages` iterates the keys and tries to unpack each one.
+`for name, age in ages` iterates over the keys and tries to unpack each one.
 Unpacking `"Alice"` into two names raises a `ValueError`,
 since the string has more than two characters.
 A two-character key such as `"Bo"` unpacks into its letters and the loop finishes with no error.
@@ -424,7 +426,7 @@ and `dict()` accepts any iterable that yields such pairs.
 covers it with the other loop tools.
 
 The `list` in `remove_while_iterating.py` skips elements and reports nothing.
-Changing a `dict`'s size while iterating it raises a `RuntimeError`:
+Changing a `dict`'s size while iterating over it raises a `RuntimeError`:
 
 ```python
 # dict_iteration_trap.py
