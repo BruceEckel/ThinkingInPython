@@ -9,7 +9,7 @@ def test_new_grid_size_and_banding() -> None:
     # Same (x + y) color band
     assert grid[(0, 1)] == grid[(1, 0)]
 
-def test_next_wraps() -> None:
+def test_next_steps_and_wraps() -> None:
     assert Color.SKYBLUE.next() == Color.PALEGREEN
     assert Color.KHAKI.next() == Color.SKYBLUE
 
@@ -20,7 +20,8 @@ def test_recolored_changes_the_cross() -> None:
     assert all(out[c] == grid[c].next() for c in cross)
     assert all(out[c] == grid[c]
                for c in grid if c not in cross)
-    assert out is not grid  # Pure: a new grid
+    assert out is not grid
+    assert grid == new_grid(3)
 
 def test_corner_selection_stays_on_the_grid() -> None:
     grid = new_grid(3)
@@ -29,12 +30,12 @@ def test_corner_selection_stays_on_the_grid() -> None:
     assert changed == {(0, 0), (1, 0), (0, 1)}
     assert out.keys() == grid.keys()
 
-def test_model_notifies_with_the_new_grid() -> None:
+def test_responders_receive_the_new_grid() -> None:
     model = BoxModel(3)
     before = model.grid[(1, 1)]
     seen: list[Grid] = []
-    # The responder is a callable
     model.connect(seen.append)
     model.select((1, 1))
+    assert len(seen) == 1
     assert seen[-1] is model.grid
     assert model.grid[(1, 1)] != before

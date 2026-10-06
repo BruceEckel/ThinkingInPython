@@ -22,7 +22,8 @@ def test_disconnect_stops_delivery() -> None:
     broadcaster = Broadcaster[object]()
     broadcaster.connect(received.append)
     broadcaster.announce(1)
-    # A new bound method: equal, not identical
+    assert received.append == received.append
+    assert received.append is not received.append
     broadcaster.disconnect(received.append)
     broadcaster.announce(2)
     assert received == [1]
@@ -30,12 +31,11 @@ def test_disconnect_stops_delivery() -> None:
 def test_connecting_twice_notifies_twice() -> None:
     received: list[object] = []
     broadcaster = Broadcaster[object]()
-    record = received.append
-    broadcaster.connect(record)
-    broadcaster.connect(record)
+    broadcaster.connect(received.append)
+    broadcaster.connect(received.append)
     broadcaster.announce(1)
     assert received == [1, 1]
-    broadcaster.disconnect(record)  # Removes one of two
+    broadcaster.disconnect(received.append)  # One of two
     broadcaster.announce(2)
     assert received == [1, 1, 2]
 
@@ -44,7 +44,7 @@ def test_disconnect_without_connect_raises() -> None:
     with pytest.raises(ValueError):
         broadcaster.disconnect(print)
 
-def test_thermometer_pushes_new_value_on_set() -> None:
+def test_thermometer_announces_each_assignment() -> None:
     readings: list[float] = []
     t = Thermometer(20.0)
     t.connect(readings.append)

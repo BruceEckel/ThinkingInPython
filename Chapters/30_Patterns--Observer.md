@@ -405,7 +405,8 @@ def test_disconnect_stops_delivery() -> None:
     broadcaster = Broadcaster[object]()
     broadcaster.connect(received.append)
     broadcaster.announce(1)
-    # A new bound method: equal, not identical
+    assert received.append == received.append
+    assert received.append is not received.append
     broadcaster.disconnect(received.append)
     broadcaster.announce(2)
     assert received == [1]
@@ -413,12 +414,11 @@ def test_disconnect_stops_delivery() -> None:
 def test_connecting_twice_notifies_twice() -> None:
     received: list[object] = []
     broadcaster = Broadcaster[object]()
-    record = received.append
-    broadcaster.connect(record)
-    broadcaster.connect(record)
+    broadcaster.connect(received.append)
+    broadcaster.connect(received.append)
     broadcaster.announce(1)
     assert received == [1, 1]
-    broadcaster.disconnect(record)  # Removes one of two
+    broadcaster.disconnect(received.append)  # One of two
     broadcaster.announce(2)
     assert received == [1, 1, 2]
 
@@ -427,7 +427,7 @@ def test_disconnect_without_connect_raises() -> None:
     with pytest.raises(ValueError):
         broadcaster.disconnect(print)
 
-def test_thermometer_pushes_new_value_on_set() -> None:
+def test_thermometer_announces_each_assignment() -> None:
     readings: list[float] = []
     t = Thermometer(20.0)
     t.connect(readings.append)
@@ -448,22 +448,24 @@ def test_late_responder_misses_earlier_changes() -> None:
 The tests connect a list's `append` to the broadcaster,
 so the list records every announced value.
 
-`disconnect()` matches by equality, and a lambda equals only itself,
-so disconnecting a lambda requires a name bound to the same lambda object that `connect()` received.
+`disconnect()` matches by equality, and a lambda equals only itself.
+That is, you cannot disconnect a lambda using a second lambda with the same text.
+Disconnecting a lambda requires an intermediate name bound to the lambda,
+so you can use that name to both `connect()` and `disconnect()`.
 
 A bound method is different.
 `test_disconnect_stops_delivery()` disconnects `received.append` without storing it first.
-Each `received.append` builds a new bound-method object,
+Each reference to `received.append` builds a new bound-method object,
 so `received.append is received.append` is `False`.
-Two bound methods compare equal when they wrap the same instance and the same function,
-so `disconnect(received.append)` removes the connection that `connect(received.append)` made.
+Two bound methods compare equal when they wrap the same instance and the same function.
+The two `assert` lines before the `disconnect()` call show both facts.
+`disconnect()` relies on equality:
+the bound method it receives equals the one `connect()` stored,
+so it finds that entry and removes it.
 
-The same equality rule explains `test_connecting_twice_notifies_twice()` and `test_disconnect_without_connect_raises()`.
-Connecting one callable twice puts two equal entries in the list,
-so each notification calls it twice and each `disconnect()` removes one entry.
-
-`list.remove()` raises a `ValueError` when it matches nothing,
-so `disconnect()` raises a `ValueError` when its callable is not connected.
+`test_connecting_twice_notifies_twice()` and `test_disconnect_without_connect_raises()` follow from the `list` methods that `connect()` and `disconnect()` call:
+`append()` stores a callable a second time,
+and `remove()` takes out the first equal entry and raises a `ValueError` when none matches.
 
 ### Disconnecting During a Notification
 
@@ -1151,9 +1153,15 @@ and `select()` announces each new grid that `recolored()` produces.
 ### Testing the Model
 
 The model is testable without a GUI.
-Testing confirms that `recolored()` changes the cross and no other cell,
-that a selection in a corner stays on the grid,
-and that responders receive the new grid after a selection:
+The test file confirms that:
+
+- `new_grid()` builds a grid of the requested size,
+  starting from `skyblue` at `(0, 0)`,
+  and cells with the same `x + y` share a color.
+- `Color.next()` steps to the next color and wraps from the last back to the first.
+- `recolored()` changes the cross and no other cell, and returns a new grid.
+- A selection in a corner stays on the grid.
+- Responders receive the new grid once after a selection.
 
 ```python
 # test_box_observer.py
@@ -1167,7 +1175,7 @@ def test_new_grid_size_and_banding() -> None:
     # Same (x + y) color band
     assert grid[(0, 1)] == grid[(1, 0)]
 
-def test_next_wraps() -> None:
+def test_next_steps_and_wraps() -> None:
     assert Color.SKYBLUE.next() == Color.PALEGREEN
     assert Color.KHAKI.next() == Color.SKYBLUE
 
@@ -1178,7 +1186,8 @@ def test_recolored_changes_the_cross() -> None:
     assert all(out[c] == grid[c].next() for c in cross)
     assert all(out[c] == grid[c]
                for c in grid if c not in cross)
-    assert out is not grid  # Pure: a new grid
+    assert out is not grid
+    assert grid == new_grid(3)
 
 def test_corner_selection_stays_on_the_grid() -> None:
     grid = new_grid(3)
@@ -1187,13 +1196,13 @@ def test_corner_selection_stays_on_the_grid() -> None:
     assert changed == {(0, 0), (1, 0), (0, 1)}
     assert out.keys() == grid.keys()
 
-def test_model_notifies_with_the_new_grid() -> None:
+def test_responders_receive_the_new_grid() -> None:
     model = BoxModel(3)
     before = model.grid[(1, 1)]
     seen: list[Grid] = []
-    # The responder is a callable
     model.connect(seen.append)
     model.select((1, 1))
+    assert len(seen) == 1
     assert seen[-1] is model.grid
     assert model.grid[(1, 1)] != before
 ```
