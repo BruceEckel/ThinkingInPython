@@ -1,4 +1,5 @@
 # weak_responder.py
+import gc
 from weakref import WeakMethod
 from broadcaster import Broadcaster
 from exceptions import expected
@@ -23,6 +24,7 @@ broadcaster.announce(25.0)
 #: plot: 25.0C
 
 del plot  # The only strong reference
+gc.collect()
 broadcaster.announce(30.0)  # Prints nothing
 
 with expected(ValueError):

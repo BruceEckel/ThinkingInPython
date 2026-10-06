@@ -292,9 +292,20 @@
   "p_terms": 0.0,
   "asked": "2026-10-05"
  },
+ "3ac5a24604e03f24": {
+  "file": "30_Patterns--Observer.md",
+  "line": 601,
+  "target": "10_Foundations--Cleanup.md",
+  "terms": [
+   "announce"
+  ],
+  "sentence": "An implementation with a [tracing collector](10_Foundations--Cleanup.md#watching-objects-without-holding-them), such as PyPy, collects the object when its collector runs, and the `gc.collect()` call runs that collector before the second `announce()`.",
+  "p_terms": 0.01,
+  "asked": "2026-10-05"
+ },
  "e8e91f728192b79c": {
   "file": "30_Patterns--Observer.md",
-  "line": 1641,
+  "line": 1646,
   "target": "17_Techniques--Metaprogramming.md",
   "terms": [
    "Notifying",

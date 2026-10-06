@@ -541,6 +541,7 @@ and disconnects itself after Python collects the object:
 
 ```python
 # weak_responder.py
+import gc
 from weakref import WeakMethod
 from broadcaster import Broadcaster
 from exceptions import expected
@@ -565,6 +566,7 @@ broadcaster.announce(25.0)
 #: plot: 25.0C
 
 del plot  # The only strong reference
+gc.collect()
 broadcaster.announce(30.0)  # Prints nothing
 
 with expected(ValueError):
@@ -593,13 +595,16 @@ so the weak reference still has its target.
 so the `Plot` object stays alive while `live(celsius)` runs `redraw()` and prints `plot: 25.0C`.
 When `weak` returns, `live` goes away,
 and the responder again holds the `Plot` object through the weak reference alone.
+
 `del plot` removes the one strong reference to the `Plot` object.
-CPython's reference counting collects the object at once,
-so during the second `announce()`,
-`ref()` returns `None` and `weak` disconnects itself.
+CPython's reference counting collects the object at once.
 An implementation with a [tracing collector](10_Foundations--Cleanup.md#watching-objects-without-holding-them),
-such as PyPy, collects the object when its collector next runs,
-and until then `weak` keeps calling `redraw()`.
+such as PyPy, collects the object when its collector runs,
+and the `gc.collect()` call runs that collector before the second `announce()`.
+A program that leaves the timing to the collector sees `weak` keep calling `redraw()` until the collector runs.
+
+During the second `announce()`,
+`ref()` returns `None` and `weak` disconnects itself.
 The copy that `announce()` iterates over makes a mid-notification disconnect safe,
 as it does for `once` in `self_removing_responder.py`.
 The listing's last statement tries to disconnect `weak` a second time.
