@@ -508,28 +508,31 @@ with no exception to say a responder was skipped.
 
 ### Raising an Exception
 
-If a responder raises an exception, `announce()`'s loop ends at that responder,
-and the responders after it in the list miss the notification.
-The exception leaves `announce()` and reaches the code that assigned to `celsius`.
+If a responder raises an exception, it stops the `announce()` loop.
+The remaining responders in the list do not get notified.
+The exception lands in the code that assigned to `celsius`.
 You must decide whether `announce()` should catch, collect, and continue
 (see exercise 3).
 
-Another option keeps the failure inside the responder.
-The responder catches its own exception and [returns the error as a value](42_Functional--Error_Handling.md#return-the-error-as-a-value),
-and `announce()` collects the returned errors for the caller.
+Alternatively, the can responder catch its own exception and [return the error as a value](42_Functional--Error_Handling.md#return-the-error-as-a-value).
+In this approach, `announce()` collects the returned errors for the caller.
 Every responder runs, and every failure arrives as a value.
 However, the `Responder` type becomes a callable that returns a success or an error,
-so a method such as `readings.append()`, which returns `None`,
-needs a wrapper to fit (see exercise 5).
+so a method such as `readings.append()`, which returns `None`, needs a wrapper
+(see exercise 5).
 
 ### Lapsed Listeners
 
 Connections are strong references.
 A bound method holds the object it came from,
 so connecting `plot.redraw` keeps that `plot` in memory for as long as the broadcaster holds the connection.
-When a broadcaster outlives its responders,
-its connections keep every one of them in memory:
-the classic *lapsed listener* leak.
+When the program finishes with `plot`,
+it drops its other references to the object.
+A `plot.redraw` that is still connected keeps `plot` in memory,
+and `redraw()` runs on every announcement.
+A responder that the program has stopped using but left connected is a *lapsed listener*.
+Over a long run the broadcaster accumulates lapsed listeners,
+and the memory they hold is a leak.
 Long-lived broadcasters need disciplined `disconnect()` calls,
 or [weak references](10_Foundations--Cleanup.md#watching-objects-without-holding-them),
 which do not keep the responder alive
