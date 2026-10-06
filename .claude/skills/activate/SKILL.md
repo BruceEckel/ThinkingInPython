@@ -426,3 +426,12 @@ and it becomes part of every future pass.
   leaves the verb dangling.
   A relative clause with the object in front ("the exception it raises",
   "whatever `slope()` raises") is already complete.
+- "A responder that the program has stopped using but left connected is a
+  *lapsed listener*" becomes "A responder the program stops using but leaves
+  connected creates a *lapsed listener*".
+  A present perfect inside a relative clause reads as passive,
+  and so does the "is a" that follows it.
+  Put the clause's verbs in the present and give the main clause a verb that acts.
+  Keep the sentence's subject:
+  when Bruce flags a sentence as passive, change its verbs first,
+  and restructure around a new subject only if the verbs cannot carry it.

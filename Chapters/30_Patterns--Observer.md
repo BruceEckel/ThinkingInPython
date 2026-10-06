@@ -530,7 +530,7 @@ When the program finishes with `plot`,
 it drops its other references to the object.
 A `plot.redraw` that is still connected keeps `plot` in memory,
 and `redraw()` runs on every announcement.
-A program that stops using a responder and leaves it connected creates a *lapsed listener*.
+A responder the program stops using but leaves connected creates a *lapsed listener*.
 Over a long run the broadcaster accumulates lapsed listeners,
 and the memory they hold is a leak.
 Long-lived broadcasters need disciplined `disconnect()` calls,
