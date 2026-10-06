@@ -530,8 +530,7 @@ which does not run.
 Three inputs need three levels of nesting,
 and each input you add nests one level deeper.
 [The returns Library](#the-returns-library)
-at the end of this chapter offers do-notation,
-a flatter alternative to this nesting.
+later in this chapter offers do-notation, a flatter alternative to this nesting.
 
 `test_combining.py` confirms that `combined()` returns the answer,
 or the first failure in the chain:

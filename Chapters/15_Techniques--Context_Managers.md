@@ -460,7 +460,7 @@ so `issubclass(exc_type, self.types)` type-checks.
 which prints it as `[Type] message` through `textwrap.fill()` at `WIDTH`,
 so a long message wraps instead of overrunning the listing width.
 `expect()`, in the same file, prints through `report()` too,
-so every demonstrated exception in the book has one form.
+so every exception the book demonstrates through `expected` or `expect()` has one form.
 
 `suppress` treats the no-argument call the opposite way.
 `suppress()` suppresses nothing,

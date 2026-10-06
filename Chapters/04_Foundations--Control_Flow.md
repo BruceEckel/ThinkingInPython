@@ -316,7 +316,8 @@ and [Comprehensions](16_Techniques--Comprehensions.md) covers that use.
 Changing a container while a `for` loop walks it is the classic control-flow bug.
 [Containers](03_Foundations--Containers.md#two-list-traps)
 shows a `list` skipping items as the loop removes them,
-and a `dict` raising a `RuntimeError` under the same treatment.
+and [a `dict` raising a `RuntimeError`](03_Foundations--Containers.md#dictionaries)
+under the same treatment.
 Lists and dictionaries are the two containers you are most likely to mutate this way,
 and each one fails differently.
 A [list comprehension](#comprehensions) fixes the list case by building a new,

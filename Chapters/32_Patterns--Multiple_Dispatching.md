@@ -190,7 +190,7 @@ Those `Any` annotations turn off static checking.
 `Item` declares `__str__()` alone,
 so the parameter takes `Any` unless something declares all four methods: `Item`,
 as abstract methods, or a `Protocol`.
-With `Any`, a class that supplies eight of the nine answers passes the type checker,
+With `Any`, classes that supply eight of the nine answers pass the type checker,
 and Python raises an `AttributeError` at the first duel that calls the ninth.
 Declaring the four methods restores the checking,
 and that declaration repeats every class's method names.

@@ -495,7 +495,7 @@ so the method runs at the first read rather than when the object is built.
 
 The stored value lives in the instance's [`__dict__`](09_Foundations--Class_Attributes.md#two-dictionaries-one-lookup),
 the dictionary that holds the instance's attributes.
-An instance of a class that declares `__slots__` has no `__dict__`,
+An instance whose class and base classes all declare `__slots__` has no `__dict__`,
 so `cached_property` has nowhere to store the value,
 and the first access raises a `TypeError`
 ([Performance](18_Techniques--Performance.md#when-slots-does-not-fit) shows the failure).

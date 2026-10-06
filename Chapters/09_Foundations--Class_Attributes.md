@@ -44,7 +44,7 @@ print(a.rating, b.rating)  # 'b' reads the class attribute
 
 An instance and its class each have their own attribute dictionary.
 Reading an attribute checks the instance first, then falls back to the class.
-Assigning through an instance always writes to the instance,
+Assigning through an instance writes to the instance,
 creating the instance attribute on first assignment.
 Assigning through the class name, as `Stars.rating = 9` does,
 changes the shared value.
@@ -76,7 +76,8 @@ and that alone.
 
 That instance dictionary is not guaranteed.
 A class that declares [`__slots__`](18_Techniques--Performance.md#slots),
-or a data class built with `slots=True`, has no instance `__dict__`.
+or a data class built with `slots=True`, has no instance `__dict__`,
+provided every base class is slotted too.
 An instance of such a class cannot shadow a class attribute.
 Assigning to that name on the instance raises an `AttributeError`,
 because the instance has no dictionary to hold the new attribute.
@@ -628,7 +629,9 @@ give a hint, usually the shape of the code, and a full answer for each exercise.
     Then fix the class so the shared counter moves,
     without changing the `ClassVar` declaration,
     and explain what the type checker reports when you remove the `# type: ignore` from the broken version.
-8.  Change `class_var_inheritance.py` so `shared` is `ClassVar[list[int]] = []` and `Left` and `Right` both call `.append()` on it.
+8.  Change `class_var_inheritance.py` so `shared` is `ClassVar[list[int]] = []`,
+    delete `Right`'s `shared = 100`,
+    and have `Left` and `Right` both call `.append()` on it.
     Predict what `Base.shared` holds afterwards, then check.
     Give `Right` its own list with `shared = []` in its body and repeat.
 9.  Write a class `Ticket` with a bare annotation `seat: str` and an `__init__()` that stores a `holder` and leaves `seat` unassigned.

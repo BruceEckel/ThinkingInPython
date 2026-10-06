@@ -121,7 +121,7 @@ Attaching makes it the tool for a slowdown that appears in the running process a
 
     uv run python -m profiling.sampling attach 12345
 
-Either form ends with a table ranked by sample count.
+Either form prints a table ranked by sample count.
 Its rows are source lines, where `cProfile`'s are functions,
 so a hot loop shows up as the line inside it.
 The table has `tottime` and `cumtime` columns, estimated from the samples,
@@ -336,7 +336,7 @@ so pass `setup="gc.enable()"` when collection pauses are part of what you compar
 
 ### Numbers on Your Machine {#numbers-on-your-machine}
 
-Every measured listing in this book prints a threshold rather than a measurement,
+Nearly every measured listing in this book prints a threshold rather than a measurement,
 so the book's output is the same on your machine as on mine.
 Each listing still takes its measurements, and one flag prints them:
 
@@ -1033,7 +1033,7 @@ and the collector can reclaim none of them.
 For a value computed once per object,
 use [`functools.cached_property`](07_Foundations--Classes.md#cached-property),
 which stores the result on the instance, so the result dies with the instance.
-A class that declares `__slots__` [cannot use `cached_property`](#when-slots-does-not-fit).
+A class whose `__slots__` leaves out `__dict__` [cannot use `cached_property`](#when-slots-does-not-fit).
 
 ## Reduce Memory Overhead
 

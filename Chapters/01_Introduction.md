@@ -281,4 +281,4 @@ license.
 You may share it unchanged, with attribution, for noncommercial use.
 It is freely readable online.
 Commercial publication requires a contract with me.
-The source repository's `CONTRIBUTING.md` has the details.
+The source repository's `LICENSE.md` has the details.

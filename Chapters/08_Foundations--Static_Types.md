@@ -241,7 +241,7 @@ A narrowing on a local variable holds.
 A narrowing on an attribute can go stale,
 so recheck the attribute after any call that might touch the object.
 Copying the attribute into a local variable before the test avoids the recheck,
-because a called function cannot rebind its caller's local variable
+because a function defined elsewhere cannot rebind its caller's local variable
 (see exercise 9).
 
 ## Constants with Final
@@ -283,7 +283,7 @@ The two forms differ when the initializer says less than you mean.
 so the type checker ignores whatever goes into the list.
 `CACHE: Final[list[str]] = []` says what the list holds,
 and the type checker enforces it.
-The listings in this book write the type out on every `Final`.
+Every other listing in this book writes the type out on `Final`.
 
 ## Structural Typing with Protocols
 
@@ -918,8 +918,10 @@ The abstract container types come from `collections.abc`.
 | `assert_never(x)`, `assert_type(x, T)`, `reveal_type(x)` | Type-checker assertions and aids; `assert_never()` shown in [Pattern Matching](13_Techniques--Pattern_Matching.md#exhaustive-matching) |
 | `TYPE_CHECKING` | A flag that is `True` only to the type checker, for type-only imports, see [Simulation](38_Patterns--Simulation.md#rooms-robots-and-the-item-factory) |
 
-The runtime ignores all of these.
-They exist for the type checker and the reader.
+These exist for the type checker and the reader,
+and at runtime most of them do nothing.
+Two act when a call reaches them: `assert_never()` raises an `AssertionError`,
+and `reveal_type()` prints its argument's runtime type.
 
 Older code writes some of them differently: `Optional[X]` for `X | None`,
 `Union[X, Y]` for `X | Y`, and `List`, `Dict`, `Set`,

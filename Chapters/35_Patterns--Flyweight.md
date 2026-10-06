@@ -276,7 +276,7 @@ A cache saves recomputation.
 It returns a stored result instead of computing that result again,
 and it can forget any entry without changing what the program computes,
 because the next call rebuilds an equal result at the cost of some time.
-Building a `Tile` costs almost nothing, so `@cache` makes `tile()` no faster.
+Building a `Tile` costs almost nothing, so `tile()` has little time to save.
 What `tile()` gets from it is identity.
 Every call for a symbol returns the same object.
 A flyweight's factory exists for that sameness.

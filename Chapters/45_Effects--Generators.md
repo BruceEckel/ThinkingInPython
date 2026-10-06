@@ -149,7 +149,8 @@ shows.
 
 A newly created generator pauses at the top of the function body,
 before any code runs, so no `yield` expression is waiting to receive a value.
-The first call must therefore be `next()`.
+The first call therefore cannot send a value:
+it must be `next()` or `send(None)`.
 `i.send(Answer("Alice"))` at that point raises `TypeError: can't send non-None value to a just-started generator`.
 
 A suspended generator holds its frame:

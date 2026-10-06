@@ -62,7 +62,7 @@ print(xs[::-1])  # Reversed
 #: [50, 40, 30, 20, 10]
 ```
 
-Slicing works on any sequence, including strings and tuples.
+Slicing works on the built-in sequences, including strings and tuples.
 
 ### Growing, Shrinking, and Sorting
 
@@ -252,7 +252,7 @@ except ValueError as e:
 #: too many values to unpack (expected 2, got 3)
 ```
 
-At most one target can carry the star,
+At most one target at each level can carry the star,
 and the starred target always receives a `list`, whether the source is a list,
 a tuple, or a string.
 Without a star the number of names must equal the number of elements,
@@ -563,7 +563,7 @@ Searching for an absent item is the `list`'s worst case,
 since the scan compares all `n` elements before reporting `False`.
 
 A timing depends on the machine that took it,
-so every measured listing in this book prints a comparison rather than a number.
+so nearly every measured listing in this book prints a comparison rather than a number.
 `report()` comes from a small helper the book supplies.
 By default a measured listing prints the comparison alone.
 Running one with [`--numbers`](18_Techniques--Performance.md#numbers-on-your-machine)
@@ -799,8 +799,8 @@ primes = frozenset({2, 3, 5, 7})
 print(5 in primes)
 #: True
 
-# Immutable containers are hashable, so they can be set
-# members or dictionary keys. A plain list or set cannot:
+# A frozenset is hashable, so it can be a set member
+# or a dictionary key. A plain list or set cannot:
 groups = {frozenset({1, 2}), frozenset({3, 4})}
 print(frozenset({1, 2}) in groups)
 #: True

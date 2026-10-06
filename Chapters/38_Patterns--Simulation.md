@@ -1432,7 +1432,7 @@ if __name__ == "__main__":
     show()
 ```
 
-`itertools.cycle()` constructs an infinite iterator from any finite iterable.
+`itertools.cycle()` constructs an infinite iterator from any nonempty finite iterable.
 It yields the source's elements in sequence and starts over when it reaches the end.
 `itertools.count(1)` numbers the frames,
 the same endless counter that numbered the rats.

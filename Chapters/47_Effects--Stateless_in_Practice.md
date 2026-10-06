@@ -644,7 +644,8 @@ and `run_load()` decides when to stop drawing from the source it holds.
 The load's declared dependency stays fixed.
 `Depend[Outlet, None]` says it needs an `Outlet` from the first hour to the last,
 and that type appears once.
-What changes is the object answering the need, four times, mid-run.
+What changes is the object answering the need:
+four objects in turn during the first run.
 A dependency bound before the program starts gives one answer for the whole run,
 and here the right answer changes with the hour.
 In `microgrid.py` the binding is a call to `choose()`,
@@ -1391,7 +1392,9 @@ recommends, the union appears in full rather than as an alias.
 Each Ability needs a shape of its own.
 You could rename `Obstacle.blocks()` to `name()`, which `Hero` already declares.
 `Hero` stays distinct even then, since it also declares `approach()`,
-but each actor you add is another chance for a genuine collision.
+but every hero then satisfies `Obstacle` as well,
+and `play()` supplies the hero first,
+so the hero answers the request for an obstacle.
 Two Protocols with matching methods leave argument order to decide which request each one answers,
 the ambiguity of [When Two Implementations Match](46_Effects--Stateless.md#when-two-implementations-match).
 

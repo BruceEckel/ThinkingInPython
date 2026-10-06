@@ -147,7 +147,7 @@ But an alias creates no new type.
 Any `tuple[str, ...]` in the program satisfies it,
 including one a caretaker builds or unpacks by hand.
 `NewType("Memento", tuple[str, ...])` exists only for the type checker.
-At runtime it is a function that returns its argument,
+At runtime it is a callable that returns its argument,
 so the caretaker still holds a plain tuple it can index, unpack,
 or build from scratch.
 

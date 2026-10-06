@@ -1151,7 +1151,7 @@ because iterating over an enum produces its members in definition order.
 `Color.at(n)` counts `n` places around that cycle,
 and `n % len(members)` wraps a count past the last member back to the start.
 `at()` is a classmethod because it works on the whole set rather than a single member.
-(A class attribute holding the list is not an option, because every assignment in an `Enum` body creates another member).
+(A class attribute holding the list is not an option, because an ordinary assignment in an `Enum` body creates another member).
 Calling `next()` on a member finds that member's position with `index()` then asks `at()` for the position after it,
 so `Color.KHAKI.next()` is `Color.SKYBLUE`.
 

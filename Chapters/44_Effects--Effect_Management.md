@@ -16,7 +16,7 @@ This book has emphasized the benefits of pure functions in numerous places:
   contrasts `double()`, a pure function, with `withdraw()`,
   which depends on state left over from earlier calls.
 - [Performance](18_Techniques--Performance.md#caching)
-  turns naive recursive Fibonacci from 242,785 calls into 26 with `functools.cache`.
+  turns naive recursive Fibonacci from 242,785 runs of its body into 26 with `functools.cache`.
   Caching works only because the cached function is pure.
 - [Rethinking Objects](20_Patterns--Rethinking_Objects.md#polymorphism-without-inheritance)
   turns shapes into immutable data,
@@ -885,7 +885,8 @@ print(asyncio.run(description), ran)
 
 Calling `greet()` builds a [coroutine object](19_Techniques--Concurrency.md#asyncio-mechanics),
 a description of work, and `ran` stays empty.
-The body runs only when something awaits the description or hands it to `asyncio.run()`.
+The body runs only when something drives the description: an `await`, a task,
+or `asyncio.run()`.
 That is the library Effect system model.
 Descriptions compose inside `async def` functions,
 and `asyncio.run()` is the boundary where description becomes action.

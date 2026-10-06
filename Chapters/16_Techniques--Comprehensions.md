@@ -675,12 +675,12 @@ covers the values they receive as well as the ones they produce.
 `path_walk_comprehension.py` flattens a tree with two `for` clauses.
 Python 3.15 ([PEP 798](https://peps.python.org/pep-0798/))
 adds a way to flatten with one `for` clause.
-The unpacking operators `*` and `**` may appear in the output expression of a comprehension or generator expression,
+The unpacking operator `*` may appear in the output expression of a comprehension or generator expression,
+and `**` in a dict comprehension,
 splicing each iterable or mapping into the result.
 PEP 798 extends the [PEP 448](https://peps.python.org/pep-0448/)
 unpacking in displays, `[*a, *b]` and `{**d1, **d2}`
-([Containers](03_Foundations--Containers.md#tuples-and-unpacking)),
-to the comprehension form.
+([Containers](03_Foundations--Containers.md)), to the comprehension form.
 The new form replaces many uses of two-`for` comprehensions,
 `itertools.chain()`, and `itertools.chain.from_iterable()`:
 

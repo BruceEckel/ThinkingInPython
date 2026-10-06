@@ -106,8 +106,8 @@ and counting files or finding an entry by name each needs another.
 The next version moves the operations out of the classes.
 The nodes keep their fields, a union names the closed set of alternatives,
 and each operation becomes a recursive function that matches on that union.
-With no unslotted base class above them,
-the nodes become [records](18_Techniques--Performance.md#record):
+The nodes stay [records](18_Techniques--Performance.md#record),
+now with no base class above them:
 
 ```python
 # filesystem.py
@@ -284,7 +284,7 @@ Representing each construct as a node type turns evaluation into a tree walk.
 In most languages the pattern needs a class per construct and a parser to build the trees.
 Python shrinks the classes and removes the parser, for one specific case:
 sentences written as Python source in which every operator has at least one node operand.
-A data class declares a node in three lines,
+A data class declares a node in three or four lines,
 and operator overloading lets Python's own parser build the trees.
 A GoF *Interpreter* more often parses a rules file, a configuration value,
 or a query a user types at runtime.
@@ -657,8 +657,8 @@ A record blocks every field assignment, so `simplify()` cannot edit its input.
 `simplify()` returns a new tree that shares unchanged subtrees with the original.
 The `is` guard in each `case _` returns the node it received when both children simplified to themselves.
 The guard tests identity with `is` rather than equality with `==`.
-Sharing means the same object, and a data class's `==` compares whole subtrees,
-so it would walk each subtree again at every level of the recursion.
+Sharing means the same object, and `is` answers with one comparison,
+where a data class's `==` compares fields and descends into any subtree that changed.
 
 The test file confirms that:
 

@@ -430,7 +430,7 @@ With a `Callable`, the interface has no name and no file of its own.
 It lives in the caller's signature,
 and any function whose parameters and return type match satisfies it.
 
-The edge a `Protocol` deletes is the one that in C++ or Java is mandatory.
+The edge a `Protocol` deletes is the one that a C++ base class or a Java interface makes mandatory.
 The implementer must name the interface.
 That edge makes every implementer depend on the interface,
 so renaming or moving the interface touches every file that names it.
@@ -553,7 +553,7 @@ It is the right answer for a language missing the piece Python has.
 
 Each pattern chapter from [*Iterator*](23_Patterns--Iterators.md)
 through [*Memento*](36_Patterns--Memento.md)
-opens with a figure of its pattern at work,
+includes a figure of its pattern at work,
 drawn from that chapter's own listings.
 The gallery in [A Pattern Moves an Edge](#a-pattern-moves-an-edge)
 shows which way each dependency points.

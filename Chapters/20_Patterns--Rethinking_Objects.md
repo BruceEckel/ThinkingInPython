@@ -344,7 +344,7 @@ Frozen guards the binding, not the object.
 and attempting to rebind it raises an exception.
 But nothing stops that list from changing, the identical leak `Leaky` has.
 Hashing goes the same way.
-A frozen data class is hashable only when every field it holds is hashable,
+A frozen data class is hashable only when every field it compares is hashable,
 so `hash(fl)` raises a `TypeError` and a `FrozenLeaky` cannot be a dict key.
 That is why `immutable.py` needs both the `tuple` and the frozen `Bob`.
 Immutability lets you share an object safely and use it as a dict key only when it goes all the way down.

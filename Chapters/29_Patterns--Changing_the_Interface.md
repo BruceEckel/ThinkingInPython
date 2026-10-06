@@ -574,7 +574,8 @@ Applied to a single `@overload`,
 the mark deprecates one call signature while the rest stay current.
 A function that now takes a `Path` in place of a string can then warn only the callers still passing a string.
 That form is static only.
-Python discards the overload declarations at runtime and issues no `DeprecationWarning`.
+At runtime every call runs the implementation,
+so Python issues no `DeprecationWarning`.
 `ty`, Pyright, and mypy all report a deprecated overload.
 Pyright and mypy need their deprecation rule switched on,
 as they do for the whole-function form.

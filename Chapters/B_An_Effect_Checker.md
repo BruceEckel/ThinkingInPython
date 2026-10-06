@@ -10,7 +10,7 @@ It is about 450 lines, and most of its pieces come from earlier chapters:
 a `match` over syntax-tree nodes, records for the data,
 a `Result` for the one operation that can fail,
 and a pure core with its Effects at the edge.
-The final listing runs the checker on its own source to confirm that last point.
+A listing near the end runs the checker on its own source to confirm that last point.
 
 ## The Restriction
 
@@ -586,7 +586,8 @@ def read_module(
     return Ok(facts_of(module, tree))
 ```
 
-`marked()` is one nested pattern.
+`marked()` is two nested patterns,
+the second inside a loop over the first one's `extras`.
 It matches a return annotation of the form `Annotated[T, ...]`,
 binds everything after `T` to `extras`,
 and returns the argument names of the first call to `marker`.
@@ -1192,8 +1193,10 @@ so each one appears in a row instead of going unreported:
   or on a name bound by anything but an assignment: a loop, a `with`,
   an `except`, a walrus, a tuple target, or a pattern.
 - A method on a local that two assignments give different types.
-- A receiver annotated with a union,
+- A receiver annotated with an `X | Y` union,
   or with a `type` alias imported from another module.
+- A method on a `staticmethod`'s first parameter,
+  because the first parameter of every method gets the class as its type.
 - An inherited method, because the checker reads no class hierarchy.
 
 A name bound in one of those ways is a variable of no known type,
@@ -1242,7 +1245,7 @@ and a production tool must remove each one:
 - A method that runs without a call expression: an operator, a property,
   a `with` statement, or a `for` loop.
 - A pure pattern in the table, which matches every name beneath it.
-  A receiver annotated `Any`, `object`,
+  A receiver annotated `Any`, `object`, `Optional[...]`, `Union[...]`,
   or `type[...]` resolves under `typing` or `builtins`.
   `p.with_suffix(".bak").write_text(text)` resolves to `pathlib.Path.with_suffix.write_text`,
   which the `with_*` pattern matches.
@@ -1257,10 +1260,9 @@ and a production tool must remove each one:
 - A decorator that wraps a function.
   It changes what calling the function performs,
   and the checker reads the undecorated body.
-- A `staticmethod`, because the first parameter of every method gets the class as its type.
 - `hides()`, which the checker trusts without evidence.
 
-Some of the second list is bookkeeping,
+Some of the limits are bookkeeping,
 such as resolving `Annotated` through the imports and reading the decorator that marks a `staticmethod`.
 Cleverness removes none of the rest, in either list.
 Most are pieces of type inference.

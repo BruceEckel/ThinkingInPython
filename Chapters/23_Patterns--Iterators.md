@@ -892,7 +892,7 @@ and every other construct here absorbs the exception.
 It passes each value through unchanged, though,
 so per-item work such as doubling needs a loop.
 That is why `doubled_ok()` uses `for`,
-and the loop absorbs the exception as every loop in this chapter does.
+and the loop absorbs the exception as every `for` loop in this chapter does.
 The fix is rarely a `try`.
 Let the loop do the asking.
 

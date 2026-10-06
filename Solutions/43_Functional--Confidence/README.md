@@ -327,7 +327,7 @@ that reach is the argument for property testing in one example.
 ## 5. A property test for `group_rounds()`
 
 > Write a property test for `group_rounds()` from [Toolkits](../../Chapters/41_Functional--Toolkits.md#groups-of-any-size):
-> for any roster and any group size,
+> for any roster and any positive group size,
 > every student appears in exactly one group per round.
 > Use a strategy that generates rosters of distinct names.
 > Then break `group_rounds()` on purpose, run the test twice,

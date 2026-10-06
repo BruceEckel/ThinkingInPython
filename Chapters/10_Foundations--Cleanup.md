@@ -527,8 +527,8 @@ The weak registry runs none of your code when an object goes away.
 
 Never release a resource in `__del__()`.
 The standard library's file and socket types bend that rule as a diagnostic backstop.
-`io.IOBase` (so every file object)
-and `socket.socket` each carry a `__del__()` that closes the resource and reports a `ResourceWarning`,
+`io.IOBase` gives every file object a `__del__()` that closes it,
+and a file from `open()` or a `socket.socket` also reports a `ResourceWarning` there,
 catching a forgotten `close()` rather than replacing it:
 
 ```python
@@ -561,7 +561,7 @@ The `gc.collect()` call covers an implementation that waits for its collector.
 The diagnostic backstop exists to catch the mistake, not to be the plan.
 It still depends on the collector reclaiming the object,
 and a reference cycle defers that collection until the cyclic collector runs,
-or forever if `gc.disable()` has stopped it.
+or until interpreter shutdown if `gc.disable()` has stopped it.
 
 Give a class that owns a resource a `close()` method and a `with` block that calls it,
 so the cleanup runs at a point in the program you can see.

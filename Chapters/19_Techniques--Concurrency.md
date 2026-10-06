@@ -2399,7 +2399,7 @@ for example letting only the task with the lower ID give.
   `asyncio` pays off once you have multiple waits that overlap.
 - **A comprehension that awaits is not concurrent.**
   `[await c for c in coroutines]` runs one coroutine at a time.
-  Only `gather()` or `TaskGroup` schedules every coroutine as a task before waiting on any of them.
+  `gather()` and `TaskGroup` schedule every coroutine as a task before waiting on any of them.
 - **Choose `TaskGroup` when a failure should stop the batch,
   `gather(return_exceptions=True)` when it shouldn't.**
   `TaskGroup`'s contract is all-or-cancel.

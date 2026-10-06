@@ -348,7 +348,7 @@ A subclass registers as its `class` statement executes,
 so a subclass that forgets `draw()` still registers.
 The guard acts when `make()` constructs that class.
 The call fails with a `TypeError`,
-where a base class without `ABC` waits for the first `draw()` call.
+where a base class whose `draw()` raises a `NotImplementedError` waits for the first `draw()` call.
 The type checker reports a line that constructs such a class by name,
 but `make()` contains no such line.
 `Shape.registry[name]()` calls a `type[Shape]`,
@@ -1363,7 +1363,7 @@ usually the shape of the code, and a full answer for each exercise.
     Change `spawn()` to use `copy.copy()` instead of `copy.deepcopy()`,
     run `test_prototype.py` with `pytest`
     (`uv run pytest Examples/27_Patterns--Factory/test_prototype.py` from the repository root),
-    and explain which assertion fails and why.
+    and explain which assertions fail and why.
     Then restore `deepcopy()` and add a test that would have caught the bug through `parts` rather than `powers`.
 8.  Recreate the `eval()` dispatcher described after `shape_factory_objects.py`'s listing:
     a `create_shape()` that builds each factory with `eval(f"_{kind}.Factory()")` instead of consulting `FACTORIES`.

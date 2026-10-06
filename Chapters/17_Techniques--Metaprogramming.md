@@ -1361,7 +1361,8 @@ Can a metaclass inherit from more than one class, the way an ordinary class can?
 
 Trying the obvious version fails.
 `type` and `dict` are both built-in types with their own C-level instance layout,
-and CPython allows multiple inheritance only when at most one base carries a nontrivial layout:
+and CPython allows multiple inheritance only when the bases' layouts are compatible,
+one extending the other:
 
 ```python
 # metaclass_layout_conflict.py
@@ -1420,7 +1421,7 @@ An instance of `Sub` is not an instance of `Base`,
 so nothing in its lookup chain reaches `Mixin`.
 A `classmethod` answers on both.
 
-The constraint here is the ordinary "at most one layout-bearing base" rule that governs every Python class,
+The constraint here is the ordinary layout-compatibility rule that governs every Python class,
 not something specific to metaclasses.
 Composing a `dict`, the way `Singleton._instances` does, sidesteps the conflict.
 

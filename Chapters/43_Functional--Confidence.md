@@ -480,7 +480,7 @@ usually the shape of the code, and a full answer for each exercise.
     to see which characters Hypothesis reports,
     and explain what those characters reveal about Unicode case mapping.
 5.  Write a property test for `group_rounds()` from [Toolkits](41_Functional--Toolkits.md#groups-of-any-size):
-    for any roster and any group size,
+    for any roster and any positive group size,
     every student appears in exactly one group per round.
     Use a strategy that generates rosters of distinct names.
     Then break `group_rounds()` on purpose, run the test twice,

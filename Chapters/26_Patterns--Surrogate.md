@@ -286,8 +286,8 @@ A proxy that must forward special methods defines each one in its class body.
 `print(p)` reports no missing method.
 `object` defines `__str__()`,
 so the lookup on `type(p)` finds `object`'s `__str__()` and the proxy prints as a `Proxy` object.
-Whenever `object` defines the dunder, the bypass raises no error.
-The proxy answers with `object`'s version instead of calling the implementation.
+Whenever `object` defines the dunder,
+the proxy answers with `object`'s version instead of calling the implementation.
 
 ### Forwarding Writes
 
@@ -584,7 +584,7 @@ not against a caller who goes around it.
 `hasattr()` catches `AttributeError` and lets every other exception propagate.
 `guest.__getattr__()` raises `PermissionError` instead,
 so `hasattr(guest, "erase")` raises `PermissionError` too,
-where a missing name returns `False`.
+where a missing name on an ordinary object returns `False`.
 A surrogate whose `__getattr__()` can raise something other than `AttributeError` breaks `hasattr()`.
 The surrogate fails `isinstance()` for a [different reason](#a-surrogate-is-not-its-implementation).
 

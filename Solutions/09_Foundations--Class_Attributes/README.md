@@ -431,7 +431,9 @@ and reading `c.total` falls back to that shared value.
 
 ## 8. A mutable `ClassVar` shared down the hierarchy
 
-> Change `class_var_inheritance.py` so `shared` is `ClassVar[list[int]] = []` and `Left` and `Right` both call `.append()` on it.
+> Change `class_var_inheritance.py` so `shared` is `ClassVar[list[int]] = []`,
+> delete `Right`'s `shared = 100`,
+> and have `Left` and `Right` both call `.append()` on it.
 > Predict what `Base.shared` holds afterwards, then check.
 > Give `Right` its own list with `shared = []` in its body and repeat.
 

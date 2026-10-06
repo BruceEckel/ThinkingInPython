@@ -887,7 +887,7 @@ body, and with it the two `class` statements, until the first use of
 > Change `spawn()` to use `copy.copy()` instead of `copy.deepcopy()`,
 > run `test_prototype.py` with `pytest`
 > (`uv run pytest Examples/27_Patterns--Factory/test_prototype.py` from the repository root),
-> and explain which assertion fails and why.
+> and explain which assertions fail and why.
 > Then restore `deepcopy()` and add a test that would have caught the bug through `parts` rather than `powers`.
 
 <details>

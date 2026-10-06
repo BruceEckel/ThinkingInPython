@@ -381,8 +381,8 @@ starting from the base class with its empty hooks:
 
 ![](_images/template_method_story)
 
-The loop box stays the same in all three frames.
-Only the box beneath it changes.
+The loop and its two step slots stay the same in all three frames.
+The box beneath them changes, along with the loop's name in frame 3.
 In the second frame each arrow is a call through `self`,
 so the base calls the subclass's methods.
 In the third the arrows lose `self`.

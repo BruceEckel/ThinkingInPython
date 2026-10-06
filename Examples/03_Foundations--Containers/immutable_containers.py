@@ -7,8 +7,8 @@ primes = frozenset({2, 3, 5, 7})
 print(5 in primes)
 #: True
 
-# Immutable containers are hashable, so they can be set
-# members or dictionary keys. A plain list or set cannot:
+# A frozenset is hashable, so it can be a set member
+# or a dictionary key. A plain list or set cannot:
 groups = {frozenset({1, 2}), frozenset({3, 4})}
 print(frozenset({1, 2}) in groups)
 #: True

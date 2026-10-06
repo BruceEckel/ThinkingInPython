@@ -1375,7 +1375,7 @@ Building and tearing down that loop takes time,
 even for an Effect with no `Async` in it.
 On Windows, `run(success(42))` measured about 650 microseconds
 (about 75 on Linux),
-three to four orders of magnitude above a plain function call.
+four to five orders of magnitude above a plain function call.
 That is the cost behind ["a synchronous program calls it once, at the outermost edge"](#the-simplest-effect).
 `test_nailer.py` starts a loop once per parametrized case,
 which is fine for four rows and worth remembering for a much longer parametrized list.

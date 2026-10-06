@@ -55,7 +55,7 @@ the failure this chapter exists to prevent.
 No flag removes a `raise`.
 
 `eq=False` turns off the generated `__eq__()`, for two reasons.
-A data class that defines `__eq__()` [sets `__hash__` to `None`](#data-classes),
+A mutable data class that defines `__eq__()` [sets `__hash__` to `None`](#data-classes),
 and putting an unhashable exception in a set raises a `TypeError`.
 Identity is the correct comparison for an exception.
 Two failures carrying the same text are still two separate failures.
@@ -1021,7 +1021,7 @@ That rejection is narrower than it looks.
 `@dataclass` refuses a default it recognizes as shared storage,
 which covers `list`, `dict`, and `set`.
 The test is hashability, not mutability,
-so a mutable object of a class you wrote passes as a default and every instance shares it.
+so a mutable object of an ordinary class you wrote passes as a default and every instance shares it.
 That is the same bug the check exists to prevent.
 Use `default_factory` for any default that is not an immutable value.
 
@@ -1461,8 +1461,8 @@ print(lighter, hex(lighter.packed))
 #: Color(64, 128, 128) 0x408080
 ```
 
-`Color` stores no separate fields,
-so `dataclasses.replace()` finds no fields to replace.
+`Color` is an ordinary class with its channels packed into one `int`,
+so `dataclasses.replace()` rejects it with a `TypeError`.
 `__replace__()` unpacks the channels, applies the changes,
 and hands the result back through the constructor.
 Every implementation takes that shape: recover the constructor arguments,
