@@ -123,7 +123,7 @@
  },
  "04acbadd1165eaba": {
   "file": "23_Patterns--Iterators.md",
-  "line": 728,
+  "line": 729,
   "target": "21_Patterns--Design_Patterns.md",
   "terms": [
    "__iter__",
@@ -135,7 +135,7 @@
  },
  "ebf2d05c88d18b4b": {
   "file": "23_Patterns--Iterators.md",
-  "line": 798,
+  "line": 799,
   "target": "20_Patterns--Rethinking_Objects.md",
   "terms": [
    "traverse",
@@ -147,7 +147,7 @@
  },
  "92ea1b2aa8c0d548": {
   "file": "23_Patterns--Iterators.md",
-  "line": 878,
+  "line": 879,
   "target": "05_Foundations--Functions.md",
   "terms": [
    "DONE"
@@ -522,7 +522,7 @@
  },
  "757f33f7028c918e": {
   "file": "47_Effects--Stateless_in_Practice.md",
-  "line": 1321,
+  "line": 1322,
   "target": "46_Effects--Stateless.md",
   "terms": [
    "Oven",
