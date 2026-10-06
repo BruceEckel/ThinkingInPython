@@ -1,7 +1,7 @@
 {
  "43149ef1fb95c029": {
   "file": "02_Foundations--Tour.md",
-  "line": 345,
+  "line": 352,
   "target": "07_Foundations--Classes.md",
   "terms": [
    "Bucket"
@@ -10,83 +10,82 @@
   "p_terms": 0.0,
   "asked": "2026-09-29"
  },
- "37aaf25bd0d28980": {
-  "file": "02_Foundations--Tour.md",
-  "line": 597,
-  "target": "16_Techniques--Comprehensions.md",
-  "terms": [
-   "piece",
-   "arithmetic.py"
-  ],
-  "sentence": "Collecting every `piece.expression` above uses a list comprehension, which has the same kind of `for` clause as the generator expression in `arithmetic.py` but builds a list; [Comprehensions](16_Techniques--Comprehensions.md#list-comprehensions) covers the general form.",
-  "p_terms": 0.0,
-  "asked": "2026-09-27"
- },
- "0817097ab993e16a": {
+ "6105b531c2441ebb": {
   "file": "11_Techniques--Testing.md",
-  "line": 104,
+  "line": 103,
   "target": "12_Techniques--Data_Classes_as_Types.md",
   "terms": [
    "Account"
   ],
-  "sentence": "Most of this chapter's tests check the following `Account` class, a `@dataclass` ([Data Classes as Types](12_Techniques--Data_Classes_as_Types.md) explains the decorator):",
-  "p_terms": 0.0,
-  "asked": "2026-09-27"
+  "sentence": "Most of this chapter's tests check the following `Account` class, a [`@dataclass`](12_Techniques--Data_Classes_as_Types.md#data-classes):",
+  "p_terms": 0.02,
+  "asked": "2026-10-05"
  },
- "d4b3ffe75ef39268": {
+ "58b756be3c8da8fa": {
   "file": "12_Techniques--Data_Classes_as_Types.md",
-  "line": 232,
+  "line": 231,
   "target": "09_Foundations--Class_Attributes.md",
   "terms": [
    "depth"
   ],
-  "sentence": "As [Class Attributes](09_Foundations--Class_Attributes.md) explains, of the three fields only `depth` appears as an attribute, because it has an initialization value.",
-  "p_terms": 0.07,
-  "asked": "2026-09-27"
+  "sentence": "As [Class Attributes](09_Foundations--Class_Attributes.md) explains, `depth` is the one field of the three that appears as an attribute, because it has an initialization value.",
+  "p_terms": 0.06,
+  "asked": "2026-10-05"
  },
- "c7218299e47237e2": {
+ "92d572806e136770": {
   "file": "12_Techniques--Data_Classes_as_Types.md",
-  "line": 1018,
+  "line": 700,
+  "target": "08_Foundations--Static_Types.md",
+  "terms": [
+   "Stars"
+  ],
+  "sentence": "A parameter [annotated](08_Foundations--Static_Types.md#how-much-to-annotate) `Stars` states more than a type: the value passed the check.",
+  "p_terms": 0.01,
+  "asked": "2026-10-05"
+ },
+ "ceda21ecec78c6c4": {
+  "file": "12_Techniques--Data_Classes_as_Types.md",
+  "line": 1014,
   "target": "05_Foundations--Functions.md",
   "terms": [
    "Months"
   ],
-  "sentence": "Python evaluates a default value once, at class definition, so with that default every `Months` reads and writes one list, the trap shown in [Functions](05_Foundations--Functions.md#the-mutable-default-trap).",
-  "p_terms": 0.01,
-  "asked": "2026-09-29"
+  "sentence": "Python evaluates a default value once, at class definition, so with that default every `Months` reads and writes one list, the [mutable-default trap](05_Foundations--Functions.md#the-mutable-default-trap).",
+  "p_terms": 0.0,
+  "asked": "2026-10-05"
  },
- "fa2f1549160e7e2a": {
+ "6cb9321f81198731": {
   "file": "14_Techniques--Decorators.md",
-  "line": 1176,
+  "line": 1195,
   "target": "07_Foundations--Classes.md",
   "terms": [
    "trace"
   ],
-  "sentence": "`@property`, `@cached_property`, `@staticmethod`, and `@classmethod` (see [Properties](07_Foundations--Classes.md#properties) and [Static and Class Methods](07_Foundations--Classes.md#static-and-class-methods)) each wrap a function the same way `trace` does, but return a descriptor instead of a plain wrapper.",
-  "p_terms": 0.03,
-  "asked": "2026-09-27"
+  "sentence": "[`@property`](07_Foundations--Classes.md#properties), `@cached_property`, [`@staticmethod`](07_Foundations--Classes.md#static-and-class-methods), and [`@classmethod`](07_Foundations--Classes.md#static-and-class-methods) each wrap a function the same way `trace` does, but return a descriptor instead of a plain wrapper.",
+  "p_terms": 0.08,
+  "asked": "2026-10-05"
  },
- "a0de1b1b17d13b14": {
+ "0c738529ede5867a": {
   "file": "19_Techniques--Concurrency.md",
   "line": 249,
   "target": "15_Techniques--Context_Managers.md",
   "terms": [
    "Meter"
   ],
-  "sentence": "`Meter` is a [context manager](15_Techniques--Context_Managers.md):",
-  "p_terms": 0.01,
-  "asked": "2026-09-27"
+  "sentence": "`Meter` is a [context manager](15_Techniques--Context_Managers.md).",
+  "p_terms": 0.0,
+  "asked": "2026-10-05"
  },
- "4754b53da37ff3e9": {
+ "0bfdf37ac6c6f194": {
   "file": "19_Techniques--Concurrency.md",
-  "line": 1279,
+  "line": 1282,
   "target": "22_Patterns--Data_Transfer_Objects.md",
   "terms": [
    "Times"
   ],
-  "sentence": "`Times` names them, as [Data Transfer Objects](22_Patterns--Data_Transfer_Objects.md#returning-multiple-values) describes.",
-  "p_terms": 0.01,
-  "asked": "2026-09-27"
+  "sentence": "`Times` [names them](22_Patterns--Data_Transfer_Objects.md#returning-multiple-values).",
+  "p_terms": 0.04,
+  "asked": "2026-10-05"
  },
  "734b3d881649c1ef": {
   "file": "21_Patterns--Design_Patterns.md",
@@ -101,7 +100,7 @@
  },
  "3d7c06bedd459686": {
   "file": "22_Patterns--Data_Transfer_Objects.md",
-  "line": 132,
+  "line": 136,
   "target": "18_Techniques--Performance.md",
   "terms": [
    "NamedTuple"
@@ -112,7 +111,7 @@
  },
  "4925ead030b960dc": {
   "file": "22_Patterns--Data_Transfer_Objects.md",
-  "line": 361,
+  "line": 366,
   "target": "09_Foundations--Class_Attributes.md",
   "terms": [
    "messenger_idiom.py",
@@ -122,9 +121,21 @@
   "p_terms": 0.0,
   "asked": "2026-09-27"
  },
+ "04acbadd1165eaba": {
+  "file": "23_Patterns--Iterators.md",
+  "line": 728,
+  "target": "21_Patterns--Design_Patterns.md",
+  "terms": [
+   "__iter__",
+   "__next__"
+  ],
+  "sentence": "Those four methods [dissolved](21_Patterns--Design_Patterns.md#when-a-pattern-dissolves) into two: `__iter__()` and `__next__()`.",
+  "p_terms": 0.03,
+  "asked": "2026-10-05"
+ },
  "ebf2d05c88d18b4b": {
   "file": "23_Patterns--Iterators.md",
-  "line": 784,
+  "line": 798,
   "target": "20_Patterns--Rethinking_Objects.md",
   "terms": [
    "traverse",
@@ -136,7 +147,7 @@
  },
  "92ea1b2aa8c0d548": {
   "file": "23_Patterns--Iterators.md",
-  "line": 862,
+  "line": 878,
   "target": "05_Foundations--Functions.md",
   "terms": [
    "DONE"
@@ -145,42 +156,53 @@
   "p_terms": 0.01,
   "asked": "2026-09-27"
  },
- "3d2ba10d42a8a605": {
+ "ded4015137e431d6": {
   "file": "24_Patterns--Singleton.md",
-  "line": 174,
+  "line": 176,
   "target": "11_Techniques--Testing.md",
   "terms": [
    "__Settings"
   ],
-  "sentence": "The compiler [mangles](11_Techniques--Testing.md#white-box-and-black-box-tests) names only inside a class body, so at module level `__Settings` is stored under that name, as reachable as any other.",
+  "sentence": "The compiler [mangles](11_Techniques--Testing.md#white-box-and-black-box-tests) names only inside a class body, so at module level `__Settings` keeps its name unmangled, as reachable as any other.",
   "p_terms": 0.01,
-  "asked": "2026-09-29"
+  "asked": "2026-10-05"
  },
- "9912c8ce605b1548": {
+ "a51f08d6349a2b99": {
   "file": "24_Patterns--Singleton.md",
-  "line": 706,
+  "line": 710,
   "target": "26_Patterns--Surrogate.md",
   "terms": [
    "__call__"
   ],
-  "sentence": "To evaluate `obj(...)`, Python looks up `__call__()` on the *type* of `obj` ([*Surrogate*](26_Patterns--Surrogate.md#special-methods-bypass-getattr) examines this type-based lookup in full).",
-  "p_terms": 0.03,
-  "asked": "2026-09-27"
+  "sentence": "To evaluate `obj(...)`, Python [looks up `__call__()` on the *type* of `obj`](26_Patterns--Surrogate.md#special-methods-bypass-getattr).",
+  "p_terms": 0.07,
+  "asked": "2026-10-05"
  },
- "f042b4e197f81a9e": {
+ "c358c8813c054976": {
+  "file": "25_Patterns--Template_Method.md",
+  "line": 204,
+  "target": "07_Foundations--Classes.md",
+  "terms": [
+   "getattr"
+  ],
+  "sentence": "For each name the subclass defines, `getattr(super(cls, cls), name, None)` finds the attribute that the name replaces, searching the classes that follow `cls` in its [method resolution order](07_Foundations--Classes.md#method-resolution-order).",
+  "p_terms": 0.01,
+  "asked": "2026-10-05"
+ },
+ "da48e8605a5ffdf8": {
   "file": "26_Patterns--Surrogate.md",
   "line": 200,
   "target": "11_Techniques--Testing.md",
   "terms": [
    "_Proxy__implementation"
   ],
-  "sentence": "the name [mangles](11_Techniques--Testing.md#white-box-and-black-box-tests) to `_Proxy__implementation`, so it cannot collide with an attribute the implementation defines.",
-  "p_terms": 0.0,
-  "asked": "2026-09-27"
+  "sentence": "The name [mangles](11_Techniques--Testing.md#white-box-and-black-box-tests) to `_Proxy__implementation`, so it cannot collide with an attribute the implementation defines.",
+  "p_terms": 0.01,
+  "asked": "2026-10-05"
  },
  "2e71dc56c76b481b": {
   "file": "26_Patterns--Surrogate.md",
-  "line": 770,
+  "line": 766,
   "target": "31_Patterns--State_Machines.md",
   "terms": [
    "change_to"
@@ -189,20 +211,9 @@
   "p_terms": 0.0,
   "asked": "2026-09-27"
  },
- "04ed39e4b8874f00": {
-  "file": "26_Patterns--Surrogate.md",
-  "line": 775,
-  "target": "19_Techniques--Concurrency.md",
-  "terms": [
-   "change_to"
-  ],
-  "sentence": "While one thread runs a multi-call sequence like `run()`, another thread's `change_to()` can run between two of those calls, splitting the sequence across both implementations; see [Concurrency](19_Techniques--Concurrency.md#the-gil-does-not-prevent-races) for what an unsynchronized swap costs.",
-  "p_terms": 0.0,
-  "asked": "2026-09-27"
- },
  "3711bb4c386a5bfa": {
   "file": "27_Patterns--Factory.md",
-  "line": 178,
+  "line": 179,
   "target": "23_Patterns--Iterators.md",
   "terms": [
    "shape_name"
@@ -213,7 +224,7 @@
  },
  "8ef838d56d0840f4": {
   "file": "28_Patterns--Function_Objects.md",
-  "line": 165,
+  "line": 163,
   "target": "18_Techniques--Performance.md",
   "terms": [
    "Repeat"
@@ -222,33 +233,33 @@
   "p_terms": 0.01,
   "asked": "2026-09-27"
  },
- "87e83a8b57bbc0ae": {
+ "69e6c2b3e73ff7e7": {
   "file": "29_Patterns--Changing_the_Interface.md",
-  "line": 74,
+  "line": 76,
   "target": "26_Patterns--Surrogate.md",
   "terms": [
    "ProxyAdapter"
   ],
-  "sentence": "The name `ProxyAdapter` uses the term \"[*Proxy*](26_Patterns--Surrogate.md#proxy)\" loosely:",
+  "sentence": "The name `ProxyAdapter` uses the term \"[*Proxy*](26_Patterns--Surrogate.md#proxy)\" loosely.",
   "p_terms": 0.0,
-  "asked": "2026-09-27"
+  "asked": "2026-10-05"
  },
- "aa5a7959c6d4d7a1": {
+ "f132a66521cef1cb": {
   "file": "29_Patterns--Changing_the_Interface.md",
-  "line": 166,
+  "line": 168,
   "target": "20_Patterns--Rethinking_Objects.md",
   "terms": [
    "WhatIUse2",
    "WhatIWant",
    "WhatIUse"
   ],
-  "sentence": "a `WhatIUse2` refuses the `WhatIWant` that every `WhatIUse` accepts, and that breaks [substitutability](20_Patterns--Rethinking_Objects.md#liskov-substitution).",
+  "sentence": "A `WhatIUse2` refuses the `WhatIWant` that every `WhatIUse` accepts, and that breaks [substitutability](20_Patterns--Rethinking_Objects.md#liskov-substitution).",
   "p_terms": 0.0,
-  "asked": "2026-09-27"
+  "asked": "2026-10-05"
  },
  "c8b45c3e67ecadbb": {
   "file": "29_Patterns--Changing_the_Interface.md",
-  "line": 272,
+  "line": 276,
   "target": "18_Techniques--Performance.md",
   "terms": [
    "PairCoord",
@@ -261,7 +272,7 @@
  },
  "82bb6893784c05ff": {
   "file": "29_Patterns--Changing_the_Interface.md",
-  "line": 278,
+  "line": 282,
   "target": "26_Patterns--Surrogate.md",
   "terms": [
    "adapter"
@@ -270,20 +281,20 @@
   "p_terms": 0.0,
   "asked": "2026-09-27"
  },
- "1f2521c2404fcd22": {
+ "efad5ab6dc412cd9": {
   "file": "30_Patterns--Observer.md",
-  "line": 502,
-  "target": "42_Functional--Error_Handling.md",
+  "line": 536,
+  "target": "10_Foundations--Cleanup.md",
   "terms": [
-   "announce"
+   "disconnect"
   ],
-  "sentence": "The responder catches its own exception and [returns the error as a value](42_Functional--Error_Handling.md#return-the-error-as-a-value), and `announce()` collects the returned errors for the caller.",
-  "p_terms": 0.01,
-  "asked": "2026-09-29"
+  "sentence": "Long-lived broadcasters need either disciplined `disconnect()` calls or [weak references](10_Foundations--Cleanup.md#watching-objects-without-holding-them), which do not keep the responder alive.",
+  "p_terms": 0.0,
+  "asked": "2026-10-05"
  },
  "e8e91f728192b79c": {
   "file": "30_Patterns--Observer.md",
-  "line": 1591,
+  "line": 1641,
   "target": "17_Techniques--Metaprogramming.md",
   "terms": [
    "Notifying",
@@ -295,7 +306,7 @@
  },
  "299953e2a35786a1": {
   "file": "31_Patterns--State_Machines.md",
-  "line": 231,
+  "line": 232,
   "target": "13_Techniques--Pattern_Matching.md",
   "terms": [
    "APPEARS"
@@ -304,20 +315,20 @@
   "p_terms": 0.02,
   "asked": "2026-09-27"
  },
- "71a9cbdce79c7ed6": {
+ "205dd25052aa15f3": {
   "file": "31_Patterns--State_Machines.md",
-  "line": 240,
+  "line": 242,
   "target": "25_Patterns--Template_Method.md",
   "terms": [
    "StateMachine"
   ],
-  "sentence": "`StateMachine`'s constructor runs the initial state, the construction-starts-the-engine choice that [*Template Method* warns against](25_Patterns--Template_Method.md#dont-start-the-engine-in-the-constructor).",
+  "sentence": "`StateMachine`'s constructor runs the initial state, the construction-starts-the-engine choice that [*Template Method* discourages](25_Patterns--Template_Method.md#dont-start-the-engine-in-the-constructor).",
   "p_terms": 0.0,
-  "asked": "2026-09-27"
+  "asked": "2026-10-05"
  },
  "e3c9c99b35195620": {
   "file": "31_Patterns--State_Machines.md",
-  "line": 491,
+  "line": 495,
   "target": "06_Foundations--Modules_and_Packages.md",
   "terms": [
    "state_machine.py"
@@ -328,7 +339,7 @@
  },
  "e8596ef215d9870a": {
   "file": "31_Patterns--State_Machines.md",
-  "line": 981,
+  "line": 993,
   "target": "26_Patterns--Surrogate.md",
   "terms": [
    "UnpredictablePerson",
@@ -341,7 +352,7 @@
  },
  "8b236a72729572a5": {
   "file": "31_Patterns--State_Machines.md",
-  "line": 993,
+  "line": 1005,
   "target": "23_Patterns--Iterators.md",
   "terms": [
    "mouse_move_generator",
@@ -353,7 +364,7 @@
  },
  "806a7dc7e24cfdff": {
   "file": "33_Patterns--Visitor.md",
-  "line": 116,
+  "line": 117,
   "target": "27_Patterns--Factory.md",
   "terms": [
    "flower_gen",
@@ -365,7 +376,7 @@
  },
  "6e7bf0b5ce335367": {
   "file": "34_Patterns--Composite_and_Interpreter.md",
-  "line": 168,
+  "line": 170,
   "target": "08_Foundations--Static_Types.md",
   "terms": [
    "Directory",
@@ -377,7 +388,7 @@
  },
  "f52e1a4cb81fc818": {
   "file": "34_Patterns--Composite_and_Interpreter.md",
-  "line": 545,
+  "line": 564,
   "target": "33_Patterns--Visitor.md",
   "terms": [
    "to_infix"
@@ -386,20 +397,20 @@
   "p_terms": 0.0,
   "asked": "2026-09-27"
  },
- "d8f5d0b90e5ce17a": {
+ "346bd608b70887ba": {
   "file": "35_Patterns--Flyweight.md",
-  "line": 256,
+  "line": 267,
   "target": "20_Patterns--Rethinking_Objects.md",
   "terms": [
    "Tile"
   ],
-  "sentence": "A record blocks assignment to a field, not mutation inside one, so a `Tile` holding a `list` hands the same mutable list to every cell that shares the tile, the shallow-freezing trap in [Rethinking Objects](20_Patterns--Rethinking_Objects.md#the-immutability-solution).",
-  "p_terms": 0.03,
-  "asked": "2026-09-27"
+  "sentence": "A record blocks assignment to a field, not mutation inside one, so a `Tile` holding a `list` hands the same mutable list to every cell that shares the tile, the [shallow-freezing trap](20_Patterns--Rethinking_Objects.md#the-immutability-solution).",
+  "p_terms": 0.01,
+  "asked": "2026-10-05"
  },
  "1e7bdfa6c4734885": {
   "file": "37_Patterns--Pattern_Refactoring.md",
-  "line": 372,
+  "line": 373,
   "target": "32_Patterns--Multiple_Dispatching.md",
   "terms": [
    "bins"
@@ -410,7 +421,7 @@
  },
  "fc74baefc0b1e835": {
   "file": "37_Patterns--Pattern_Refactoring.md",
-  "line": 372,
+  "line": 373,
   "target": "31_Patterns--State_Machines.md",
   "terms": [
    "bins"
@@ -421,7 +432,7 @@
  },
  "ac09f5e8941b7dcd": {
   "file": "37_Patterns--Pattern_Refactoring.md",
-  "line": 634,
+  "line": 636,
   "target": "07_Foundations--Classes.md",
   "terms": [
    "singledispatch",
@@ -434,7 +445,7 @@
  },
  "5a1e947901d88713": {
   "file": "40_Functional--Foundations.md",
-  "line": 588,
+  "line": 581,
   "target": "05_Foundations--Functions.md",
   "terms": [
    "partial"
@@ -445,7 +456,7 @@
  },
  "d2b75b2af9d16cb3": {
   "file": "41_Functional--Toolkits.md",
-  "line": 625,
+  "line": 627,
   "target": "05_Foundations--Functions.md",
   "terms": [
    "fillvalue"
@@ -456,7 +467,7 @@
  },
  "b0dc91a7cce04574": {
   "file": "42_Functional--Error_Handling.md",
-  "line": 221,
+  "line": 222,
   "target": "12_Techniques--Data_Classes_as_Types.md",
   "terms": [
    "Result"
@@ -465,9 +476,20 @@
   "p_terms": 0.03,
   "asked": "2026-09-27"
  },
+ "73da2fe803454604": {
+  "file": "44_Effects--Effect_Management.md",
+  "line": 886,
+  "target": "19_Techniques--Concurrency.md",
+  "terms": [
+   "greet"
+  ],
+  "sentence": "Calling `greet()` builds a [coroutine object](19_Techniques--Concurrency.md#asyncio-mechanics), a description of work, and `ran` stays empty.",
+  "p_terms": 0.01,
+  "asked": "2026-10-05"
+ },
  "709ba98f5b49d11a": {
   "file": "46_Effects--Stateless.md",
-  "line": 1325,
+  "line": 1330,
   "target": "44_Effects--Effect_Management.md",
   "terms": [
    "Need"
@@ -478,7 +500,7 @@
  },
  "66259d22eeb4fc05": {
   "file": "47_Effects--Stateless_in_Practice.md",
-  "line": 431,
+  "line": 433,
   "target": "44_Effects--Effect_Management.md",
   "terms": [
    "Flip"
@@ -489,7 +511,7 @@
  },
  "757f33f7028c918e": {
   "file": "47_Effects--Stateless_in_Practice.md",
-  "line": 1312,
+  "line": 1321,
   "target": "46_Effects--Stateless.md",
   "terms": [
    "Oven",

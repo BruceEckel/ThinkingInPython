@@ -593,10 +593,13 @@ so the weak reference still has its target.
 so the `Plot` object stays alive while `live(celsius)` runs `redraw()` and prints `plot: 25.0C`.
 When `weak` returns, `live` goes away,
 and the responder again holds the `Plot` object through the weak reference alone.
-`del plot` removes the one strong reference to the `Plot` object,
-and Python collects the object.
-During the second `announce()`,
+`del plot` removes the one strong reference to the `Plot` object.
+CPython's reference counting collects the object at once,
+so during the second `announce()`,
 `ref()` returns `None` and `weak` disconnects itself.
+An implementation with a [tracing collector](10_Foundations--Cleanup.md#watching-objects-without-holding-them),
+such as PyPy, collects the object when its collector next runs,
+and until then `weak` keeps calling `redraw()`.
 The copy that `announce()` iterates over makes a mid-notification disconnect safe,
 as it does for `once` in `self_removing_responder.py`.
 The listing's last statement tries to disconnect `weak` a second time.
