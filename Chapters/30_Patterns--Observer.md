@@ -575,9 +575,11 @@ with expected(ValueError):
 Because a `Broadcaster` holds a strong reference to whatever you connect,
 the weak part lives inside the responder.
 An ordinary `weakref.ref(plot.redraw)` is dead the moment it is created.
-Evaluating `plot.redraw` builds a new bound-method object,
-and a weak reference alone points to that object,
-so Python collects the bound method at once.
+Its argument, `plot.redraw`, builds a new bound-method object,
+and the weak reference becomes the one reference to that object.
+A weak reference lets Python collect its target,
+so Python collects the bound method as soon as `weakref.ref()` returns,
+and that leaves the weak reference dead.
 `WeakMethod` stores the instance and the function separately, both weakly,
 and rebuilds the bound method each time you call `ref()`.
 
