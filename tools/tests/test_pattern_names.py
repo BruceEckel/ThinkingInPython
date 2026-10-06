@@ -64,6 +64,47 @@ def test_ambiguous_name_at_line_start_is_reported_not_fixed() -> None:
     assert codes("- Command defers what to do") == ["sentence-start"]
 
 
+def test_ambiguous_name_opening_a_bold_label_is_sentence_start() -> None:
+    line = "**State the precondition in the strategy.** The rest."
+    new, found = rewrite_line(line, NAMES)
+    assert new == line
+    assert found == [("sentence-start", "State")]
+
+
+def test_bold_label_behind_a_list_lead_is_sentence_start() -> None:
+    line = "- **Command the fleet.** More."
+    new, found = rewrite_line(line, NAMES)
+    assert new == line
+    assert found == [("sentence-start", "Command")]
+
+
+def test_unambiguous_name_opening_a_bold_label_is_plain() -> None:
+    new, found = rewrite_line("**Observer registers here.** More.", NAMES)
+    assert new == "***Observer* registers here.** More."
+    assert found == [("plain", "Observer")]
+
+
+def test_ambiguous_name_later_in_a_bold_label_is_plain() -> None:
+    new, found = rewrite_line("**Keep the State pattern.** More.", NAMES)
+    assert new == "**Keep the *State* pattern.** More."
+    assert found == [("plain", "State")]
+
+
+def test_bold_label_is_listed_only_on_request(tmp_path: Path) -> None:
+    md = tmp_path / "x.md"
+    md.write_text("**State the rule.** More.\n", encoding="utf-8")
+    doc = Document.parse(md)
+    assert list(scan(doc, NAMES)) == []
+    assert [f.code for f in scan(doc, NAMES, sentence_start=True)] == [
+        "sentence-start"]
+
+
+def test_bold_name_alone_is_still_a_bold_finding() -> None:
+    new, found = rewrite_line("**State** is mutable.", NAMES)
+    assert new == "*State* is mutable."
+    assert found == [("bold", "State")]
+
+
 def test_unambiguous_name_at_line_start_is_fixed() -> None:
     new, _ = rewrite_line("Strategy defers how.", NAMES)
     assert new == "*Strategy* defers how."

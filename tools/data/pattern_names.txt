@@ -72,11 +72,5 @@ Object Pool
 !Intrinsic and Extrinsic State
 !The Rat and the Blackboard
 
-# Solutions step labels that open with the verb. A label starts with
-# `**`, so the sentence-start test does not see it.
-!State a fact about every output
-!State the precondition in the strategy
-!State the puzzle as a linear system
-
 # A class name inside a quoted error message.
 !object of type 'Proxy'

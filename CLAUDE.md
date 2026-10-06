@@ -317,9 +317,11 @@ been in `GATE_CHECKS` since 2026-09-16, so `verify`, `gate`, and
 `verify-ch` fail on a plain name. Since 2026-10-06 the gate runs it
 over `Solutions/` too: a hint that links a section by its title
 italicizes the pattern name inside the link text,
-`[The Classic *Visitor*](...)`, and a title or step label that uses
-the word in its ordinary sense ("Intrinsic and Extrinsic State",
-"**State the precondition in the strategy.**") gets a `!` exclusion.
+`[The Classic *Visitor*](...)`, and a section title that uses the
+word in its ordinary sense ("Intrinsic and Extrinsic State") gets a
+`!` exclusion. A bold step label that opens with the verb
+("**State the precondition in the strategy.**") counts as a sentence
+start, like the three in the chapters.
 
 ## Diagrams: hand-authored SVGs, some generated
 

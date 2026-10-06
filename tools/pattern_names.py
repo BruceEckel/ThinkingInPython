@@ -27,7 +27,9 @@ What is reported, and what `--fix` rewrites:
   *Null Object* pattern.
 - ``sentence-start``: a name that is also a common verb or noun (State,
   Command, Bridge) at the start of a line, where "State the rule" and
-  "*State* appears beside *Proxy*" cannot be told apart by shape. Never
+  "*State* appears beside *Proxy*" cannot be told apart by shape. A
+  name that opens a bold step label (``**State the rule.**``) is
+  treated the same way. Never
   rewritten, and listed only with ``--sentence-start``, since the three
   verbs the book opens sentences with would otherwise keep the gate red.
   Run that listing after writing new prose about *State* or *Command*.
@@ -168,6 +170,12 @@ def rewrite_line(line: str, names: tuple[str, ...],
     text = _BOLD.sub(unbold, text)
     lead = _LEAD.match(text)
     start = lead.end() if lead else 0
+    # A bold label's opening "**" is masked, so step past it: the label's
+    # first word starts the sentence.
+    if (start < len(text)
+            and 0 <= (i := ord(text[start]) - _PUA) < len(store)
+            and store[i] == "**"):
+        start += 1
     for name in plain:
         def wrap(m: re.Match[str]) -> str:
             if _inside_italics(text, m.start()):
