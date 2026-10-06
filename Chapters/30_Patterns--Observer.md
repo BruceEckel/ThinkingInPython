@@ -612,10 +612,10 @@ The broadcaster's list is empty by then,
 so `disconnect()` raises a `ValueError`,
 the evidence that `weak` removed itself.
 
-Most programs can keep strong connections.
+For most programs, strong connections are fine.
 A broadcaster that lives no longer than its responders releases them when it goes away,
 and an explicit `disconnect()` covers a responder that leaves early.
-A weak responder earns its extra code only when a long-lived broadcaster holds short-lived responders that nothing disconnects.
+Use a weak responder only when a long-lived broadcaster holds short-lived responders that the program drops while they are still connected.
 
 ### Re-entrant Notification
 
