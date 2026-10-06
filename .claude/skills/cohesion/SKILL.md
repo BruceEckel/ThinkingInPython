@@ -183,3 +183,30 @@ Flow problems Bruce has flagged that the categories above do not name yet.
 When he identifies a new one,
 add it here as a bullet with a before/after pair,
 and it becomes part of every future pass.
+
+- **A paragraph holding two primary concepts under one topic string.**
+  Bruce, 2026-10-05: "a paragraph will hold multiple primary concepts,
+  and this makes it confusing."
+  The subject column can stay on one noun while the paragraph changes
+  what it explains, so the topic-string test passes it.
+  The test for this shape: say in one sentence what the paragraph explains.
+  If that sentence needs "and" to join two explanations,
+  split the paragraph at the seam between them.
+  In chapter 30, one paragraph after `weak_responder.py` held three:
+  where the weak reference goes
+  ("A `Broadcaster` holds a strong reference to whatever you `connect()`,
+  so `weak_responder.py` puts the weak reference inside the responder."),
+  why a bound method needs `WeakMethod`
+  ("An ordinary `weakref.ref(plot.redraw)` is dead the moment it is created."),
+  and what the listing does when it runs
+  ("The first `announce()` runs while `plot` is alive:").
+  Each now opens its own paragraph.
+  The usual seams: a design reason beside a mechanism,
+  a construct's explanation beside a walkthrough of the listing's run,
+  what the code does beside when to use it,
+  one listing's discussion beside the next listing's.
+  Keep together a claim and its reason, the two halves of a contrast,
+  and the steps of one walkthrough.
+  A pronoun or "This" that opens the new paragraph gets its noun,
+  since its antecedent now sits in the paragraph before.
+  `bruce_edit_db.md` R29 has the record and the 2026-10-05 sweep.

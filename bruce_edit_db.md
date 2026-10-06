@@ -1084,6 +1084,42 @@ protocols") stays.
 
 **Home.** CLAUDE.md watch list, inside the `only` bullet (R24).
 
+### R29. One primary concept to a paragraph; split at the seam
+
+**Test.** Say in one sentence what the paragraph explains. If that
+sentence needs "and" to join two explanations, the paragraph holds two
+primary concepts: put a paragraph break at the seam between them. The
+subjects can stay on one noun the whole way (the cohesion pass's
+topic-string test passes such a paragraph), so read for what is being
+explained, not for who the subject is. Usual seams: a design reason
+beside a mechanism, a construct's explanation beside a walkthrough of
+the listing's run, what the code does beside when to use it, one
+listing's discussion beside the next listing's. A pronoun or "This"
+that opens the new paragraph gets its noun.
+
+**Keep when.** The halves need each other: a claim and its reason, the
+two halves of a contrast, the steps of one walkthrough, a rule and the
+one-sentence exception that qualifies it. A paragraph of three sentences
+or fewer rarely splits. Never split inside a list item, a block quote,
+a footnote, or an exercise statement.
+
+**Sightings.** 1 chapter (additive: adds a break, cuts nothing).
+Promoted by Bruce on that evidence, 2026-10-05: "a paragraph will hold
+multiple primary concepts, and this makes it confusing."
+- `30_Patterns--Observer` 2026-10-05, was Claude-written: the paragraph
+  after `weak_responder.py` ran "Because a `Broadcaster` holds a strong
+  reference ... `WeakMethod` stores the instance and the function
+  separately ... While `plot` is alive, `weak` forwards the reading to
+  it ..." as one block. It became three paragraphs, opening "A
+  `Broadcaster` holds a strong reference to whatever you `connect()`,"
+  (where the weak reference goes), "An ordinary
+  `weakref.ref(plot.redraw)` is dead the moment it is created." (why
+  `WeakMethod`), and "The first `announce()` runs while `plot` is
+  alive:" (the listing's run). Claude made the second break during a
+  rewrite; Bruce made the first by hand and named the rule.
+
+**Home.** cohesion (Accrued patterns).
+
 ### Rulings of 2026-10-04 (Sweep Decisions page)
 
 Bruce decided the book-wide apply report's open questions on https://claude.ai/artifact/HjHyafWs5EDXQkoPmhV9g9:

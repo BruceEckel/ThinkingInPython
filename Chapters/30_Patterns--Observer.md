@@ -576,9 +576,10 @@ A `Broadcaster` holds a strong reference to whatever you `connect()`,
 so `weak_responder.py` puts the weak reference inside the responder.
 A different broadcaster could store weak references for every responder.
 With `Broadcaster`, a responder that needs a weak reference supplies its own.
+
 An ordinary `weakref.ref(plot.redraw)` is dead the moment it is created.
 Its argument, `plot.redraw`, builds a new bound-method object,
-and the weak reference becomes the one reference to that object.
+and the weak reference becomes the single reference to that object.
 A weak reference lets Python collect its target,
 so Python collects the bound method as soon as `weakref.ref()` returns,
 and that leaves the weak reference dead.
@@ -591,7 +592,7 @@ The first `announce()` runs while `plot` is alive:
 and Python collects the object.
 During the second `announce()`,
 `ref()` returns `None` and `weak` disconnects itself.
-The copy that `announce()` iterates makes a mid-notification disconnect safe,
+The copy that `announce()` iterates over makes a mid-notification disconnect safe,
 as it does for `once` in `self_removing_responder.py`.
 The listing's last statement tries to disconnect `weak` a second time.
 The broadcaster's list is empty by then,
