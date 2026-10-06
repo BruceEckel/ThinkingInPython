@@ -338,15 +338,15 @@ def test_combined_success_unchanged() -> None:
 failure it meets, this version calls all three functions
 unconditionally. Calling every step regardless
 of earlier failures makes sense only when the steps are independent
-of each other's results. That independence is why `func_c` here takes
-`i + j` rather than a value produced by `func_a` or `func_b`.
+of each other's results. That independence is why `func_c()` here takes
+`i + j` rather than a value produced by `func_a()` or `func_b()`.
 
 **Gather the failures.** `combined()` then inspects the three results, gathering
 every `Err`'s `.error` into one list. `combined(1, 5)` now
 reports a single-item list, `["func_a(1)"]`, because `func_b(5)` and
 `func_c(6)` both succeed. `combined(1, 2)` reports all three failures
-at once: `i=1` fails `func_a`, `j=2` fails `func_b`, and `i+j=3`
-fails `func_c`. The short-circuiting `bind()` chain stops at the
+at once: `i=1` fails `func_a()`, `j=2` fails `func_b()`, and `i+j=3`
+fails `func_c()`. The short-circuiting `bind()` chain stops at the
 first of them, `func_a(1)`.
 
 **Widen the error channel.** One generic pair carries both shapes. The
@@ -460,7 +460,8 @@ expect(TypeError, parse, "oops")
 returns a decorator generic over the function it
 decorates. The `SafeDecorator` protocol says that with a generic `__call__`,
 so `parse` keeps the signature `(text: str) -> Result[int, Exception]`.
-A nested `Callable` annotation types `parse` as precisely.
+
+A nested `Callable` annotation types `parse` as precisely as the protocol does.
 If `safe()` declares `[**P, A]` and returns
 `Callable[[Callable[P, A]], Callable[P, Result[A, Exception]]]`,
 `ty` reveals `parse` as `(text: str) -> Ok[int] | Err[Exception]`,
@@ -475,12 +476,12 @@ the exception types and returns the decorator, instead of being the
 decorator.
 
 **Catch only the named types.** Because the `except catch` clause
-accepts the tuple, `wrapper` changes by one word.
+accepts the tuple, `wrapper()` changes by one word.
 
 **Let everything else propagate.** `parse("42")` still comes back as
 an `Ok`. `parse("oops")` raises a `TypeError`, which
 `@safe(ValueError)` does not catch, so the `TypeError` propagates
-through `wrapper` untouched. `expect()` catches it outside `parse()`
+through `wrapper()` untouched. `expect()` catches it outside `parse()`
 and prints it. Without that catch the caller sees an ordinary
 traceback. Under the chapter's `@safe` that same `TypeError` arrives
 as `Err(TypeError(...))`, indistinguishable from a bad-input failure.
@@ -572,7 +573,7 @@ traceback, because nothing prints one. The exception still holds its
 that would show it.
 
 **Sequence the two loads.** The lambdas ignore their parameter, since
-the second setting does not depend on the first one's value. `bind()`
+the second setting is independent of the first one's value. `bind()`
 reads worst in that case. It exists to pass an answer forward, and
 here it passes an ordering and the lambda discards the answer. The
 `returns` library's

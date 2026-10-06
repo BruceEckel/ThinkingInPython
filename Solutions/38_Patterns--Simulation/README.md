@@ -106,7 +106,7 @@ def test_rat_keeps_one_claim_and_spawns_the_rest() -> None:
         "Rat 1 dead-ends at (0, -1)."]
 ```
 
-**Stand in for the blackboard.** `Rat` depends only on the `Recorder`
+**Stand in for the blackboard.** `Rat` depends on the `Recorder`
 `Protocol`, not on `Blackboard`, so `FakeBlackboard` satisfies that
 `Protocol` by shape. It defines `claim()`, `spawn()`, `log()`, and
 `next_number()`, and none of the four touches a real `Maze` or
@@ -696,7 +696,7 @@ its own first claim.
 `spawn()` stays synchronous, because nothing in it suspends.
 
 **Let two rats claim one cell.** On the chapter's seven-by-nine test maze, `claim()` returns `True` 25
-times for 24 open cells: one pair of rats collided.
+times for 24 open cells. One pair of rats collided.
 Both rats reach `await asyncio.sleep(0)` while the same cell still
 looks unclaimed, because neither has added that cell to `visited`
 yet. Both membership tests therefore pass before either rat calls
@@ -704,13 +704,15 @@ yet. Both membership tests therefore pass before either rat calls
 
 Each of the two rats believes it alone claimed the shared cell.
 Both move into it, and that overlap breaks the invariant that no two
-rats cover the same ground. Nothing goes unexplored. Here the shared
+rats cover the same ground. Every cell is still explored. Here the shared
 cell is `(5, 5)`, where the loop closes, so both rats find every
-neighbor claimed and dead-end there. `visited` stays correct, because
-adding the same cell twice to a set changes nothing. That correctness
-is why `test_rats_and_mazes.py` passes on the broken version every
-time. The test asserts the set of cells reached. The extra `True`
-costs wasted effort: a second rat moves into an occupied cell. Comparing the count of `True` returns
+neighbor claimed and dead-end there.
+
+`visited` stays correct, because adding the same cell twice to a set
+changes nothing. That correctness is why `test_rats_and_mazes.py`
+passes on the broken version every time. The test asserts the set of
+cells reached. The extra `True` costs wasted effort. A second rat
+moves into an occupied cell. Comparing the count of `True` returns
 with the size of `visited` exposes the collision.
 
 The original `claim()` needs no lock because it has no `await`
@@ -981,7 +983,7 @@ exercise's file stays a single, runnable unit).
 
 Deriving `Coin` from `Food` instead breaks the maze, and the reason is
 where the factory searches, not what `Coin` inherits. `item_factory()`
-walks `Item.__subclasses__()`, which lists the *direct* subclasses of
+walks `Item.__subclasses__()`, which lists the direct subclasses of
 `Item` and misses their descendants, so a `Coin(Food)` is absent from
 that list. No entry matches
 `$`, and the loop falls through to the factory's last line, which
@@ -1145,11 +1147,11 @@ print("finished:", game.robot.finished)
 #: finished: True
 ```
 
-**Let the caller define arrival.** `solve()` changes in one place. The `isinstance(room.occupant,
+**Let the caller define arrival.** `solve()`'s search changes in one place. The `isinstance(room.occupant,
 EndGame)` test becomes `arrived(room)`, a predicate the caller
 supplies. Nothing else in the search knows or cares what counts as
-arriving. The `EndGame` version is now one line at the call site,
-`end`, and `food` is another.
+arriving. The `EndGame` version is now a one-line function on the
+caller's side, `end()`, and `food()` is another.
 
 **Report an empty search as `None`.** The other change is the return type.
 The chapter's version raises a `ValueError` when the search runs out
@@ -1471,8 +1473,8 @@ of a bright region needs hundreds of steps to walk anywhere near a
 nodal line. After 1200 steps agitation has fallen from `0.58` to
 `0.38`, roughly a third of the way, while the default kick was
 down to `0.00` by step 400. Rendered, this run still looks
-like noise with a faint trace of structure in it. Nothing is wrong
-with the physics. The run is not finished, and finishing it
+like noise with a faint trace of structure in it. The physics is
+correct. The run is not finished, and finishing it
 means more steps than anyone wants to watch.
 
 `kick=0.5` fails differently, and the agitation column hides the

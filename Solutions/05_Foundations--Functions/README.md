@@ -250,9 +250,9 @@ report("nums", 1, 2, 3, total=True)
 
 `total` sits between `*values` and `**options` in the parameter list,
 so it is keyword-only. Callers must write `total=True`, and neither
-`values` nor `options` can swallow it by accident. Adding the flag
-needs no change to how `report()` collects its positional and
-keyword arguments.
+`values` nor `options` can swallow it by accident. With the flag
+added, `report()` still collects its positional and keyword
+arguments the same way.
 
 </details>
 </details>
@@ -416,8 +416,8 @@ The message is therefore
 `describe() missing 1 required positional argument: 'name'`,
 which points at the parameter the caller thought they were filling.
 
-**Mark the deliberate mistake.** The mistake is visible without
-running the code, so the call carries a `# type: ignore` telling the
+**Mark the deliberate mistake.** The mistake is visible before
+the code runs, so the call carries a `# type: ignore` telling the
 type checker the misuse is deliberate, the same way `param_markers.py`
 marks its two bad calls.
 
@@ -437,8 +437,8 @@ declaring `**kwargs` can forward them to another call as `**kwargs`
 unchanged.
 
 The `/` and `**facts` are also worth using together. `/` hides the
-parameter name `name` from callers, so a later rename breaks no
-caller, while `**facts` accepts any name a caller writes. The `/`
+parameter name `name` from callers, so a later rename leaves every
+caller working, while `**facts` accepts any name a caller writes. The `/`
 also frees the word `name` for the caller's use.
 `describe("Bob", name="Robert")` stores a fact called `name`, where
 without the `/` the same call fails with two values for `name`.
@@ -509,14 +509,14 @@ the assignment in `count += 1` makes `count` local to
 has no value yet.
 
 **Assign after the read.** `rebinds()` fails for the same reason
-although its `print` comes first in time. Python decides which names
+although its `print()` comes first in time. Python decides which names
 are local when it compiles the function body, so the `count = 99`
-below the `print` makes `count` local throughout. The first `print`
+below the `print()` makes `count` local throughout. The first `print()`
 therefore reads the unassigned local, not the module-level name,
-and the second `print` does not run.
+and the second `print()` does not run.
 
 **Mark the deliberate mistakes.** Both mistakes
-are visible without running the code. The type checker and the linter
+are visible before the code runs. The type checker and the linter
 each flag them, so the offending lines carry `# type: ignore` and
 `# noqa` markers saying the misuse is deliberate, the way
 `param_markers.py` marks its two bad calls.

@@ -149,7 +149,7 @@ as `run(greet_all(["Alice", "Bob"]))` does,
 `ty` reports an `invalid-argument-type` at that `run()` call.
 The run raises a `MissingAbilityError` before the first greeting prints.
 The new annotation hands the requirement to every caller,
-so the solution wraps `greet_all` in `supply(Console())` before calling `run()`.
+so the solution wraps `greet_all()` in `supply(Console())` before calling `run()`.
 
 Removing the `# type: ignore` from `undeclared_need.py` produces:
 
@@ -323,7 +323,7 @@ from the yield channel to the return channel, as a value. So the
 `str`, and a caller needing a bare `str` has one case left to handle.
 
 Both functions have handled every error `read_score()` declares. Only
-`all_handled()` has *interpreted* what it caught. `catch()` turns a
+`all_handled()` has interpreted what it caught. `catch()` turns a
 failure into a value, and a `match` turns that value into a result.
 Skipping the `match` leaves the caught error sitting in the return
 type.
@@ -348,7 +348,7 @@ Pass both instances to `supply()` in one call, run the Effect, and assert on eac
 <summary>Solution</summary>
 
 If you declare `Log` as a `Protocol` without `@runtime_checkable`,
-`ty` passes the listing,
+the type checker passes the listing,
 but the run raises a `TypeError` at the first request for a `Log`.
 `supply()` matches each request with `isinstance()`,
 and `isinstance()` raises a `TypeError` on a `Protocol` without that decorator.
@@ -431,7 +431,7 @@ under two different types is the case for which `as_type()` exists.
 
 **Check the greeting and the log together.** Writing both assertions in one test is the payoff. A test holding the
 whole environment can check that the greeting reached the console
-*and* that the log recorded it, in one function, with no capture of
+and that the log recorded it, in one function, with no capture of
 stdout and no temporary file. Both Effects are requests before they
 are actions, so the test decides what performing them means.
 
@@ -651,7 +651,7 @@ type checker reads the same annotation without that reduction,
 subtracts `Need[Console]` from the requirements, and leaves
 `Need[Clock]` in place.
 
-Neither view is wrong about what it describes. `isinstance()` cannot
+Each view is right about what it describes. `isinstance()` cannot
 test a type argument. `Need[Clock]` and `Need[Console]` are the same
 runtime class, so no runtime check tells the two apart. The annotation
 is the only place the distinction exists, and `handle()` uses the annotation
@@ -1205,7 +1205,7 @@ def to_log(name: str) -> Depend[Need[Recorder], None]:
 
 If you keep `print()` on both implementations and declare it in both
 `Protocol`s, each implementation satisfies both, and the type checker
-accepts `as_type(Recorder)(Terminal())`. Handing that object to `to_log`
+accepts `as_type(Recorder)(Terminal())`. Handing that object to `to_log()`
 prints `Hello, Carol!` to the screen while `capture.messages` stays
 `['Hello, Bob!']`, with no diagnostic. Two `Protocol`s that share one
 method name describe one shape under two names, so the solution renames
@@ -1271,7 +1271,7 @@ neither implementation satisfies both, and each Effect names the
 `Protocol` it needs.
 
 That change turns the coin flip into a diagnostic. If you add one
-more line to the end of the listing, handing `to_log` the object that
+more line to the end of the listing, handing `to_log()` the object that
 prints instead of the one that records, `ty` rejects it before the
 program runs:
 
@@ -1290,8 +1290,8 @@ method rather than the missing type, and that is
 what structural typing means: `Terminal` fails not because of what it
 is but because of what it does not do.
 
-One limit remains. Distinct method names remove the ambiguity *between*
-abilities. They do nothing about two implementations of the *same*
+One limit remains. Distinct method names remove the ambiguity between
+abilities. They do nothing about two implementations of the same
 ability. If you add a second recorder, an `Audit` that also defines
 `record()`, supplying `capture` and `audit` both through
 `as_type(Recorder)` is ambiguous again by argument order, with no

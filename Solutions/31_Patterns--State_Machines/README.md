@@ -286,7 +286,7 @@ successor. `Happy.next()` answers `Annoy` with a `Grumpy`,
 `Grumpy.next()` answers `Calm` with a `Happy`, and both answer
 `TakePill` with a `Prozac` that returns itself for everything after.
 
-Nothing outside the states holds the transition rules, which
+The states alone hold the transition rules, which
 distinguishes this design from the chapter's table-driven one, where
 the rules live in a dictionary a reader can audit in one place. Here
 they live in the `next()` method of whichever state is current.
@@ -497,8 +497,8 @@ print(" ".join(history))
 #: locked locked unlocked locked unlocked unlocked locked
 ```
 
-Both versions produce the same history. The per-state design (exercise
-3) puts each state's rules with that state, and reads well when a
+The per-state design (exercise 3) puts each state's rules with that
+state, and reads well when a
 state does more than look a word up. The single-table design puts
 every rule for the whole machine in one dictionary, and is easier to
 audit and edit as a unit. The chapter's own
@@ -1051,7 +1051,7 @@ If you put the unconditional `(None, None, HVACState.IDLE)` row first
 under `(IDLE, TemperatureReading)`, every reading prints `IDLE`, from
 `15 IDLE` through `30 IDLE`. `handle()` takes the first row whose
 condition passes, and a row with no condition always passes, so the
-machine stops there and does not reach the `too_cold` and `too_hot`
+machine stops there and does not reach the `too_cold()` and `too_hot()`
 rows below it. The solution lists the conditional rows first and keeps
 the unconditional row last, as the fallback.
 
@@ -1245,12 +1245,14 @@ and its message names the event class that found no row: `Nickel`.
 `handle()` looks up `(self.state, type(event))`, and
 `type(Nickel("nickel", 5))` is `Nickel`. A dictionary probe compares
 keys by equality, so the `Nickel` key misses the `Money` row although
-`Nickel` subclasses `Money`. Nothing walks the MRO. That lookup is
-the exact-type dispatch the chapter describes, and a subclass of an
-event type is how most readers first meet it.
+`Nickel` subclasses `Money`. Nothing walks the
+[MRO](../../Chapters/07_Foundations--Classes.md#method-resolution-order).
+That lookup is the exact-type dispatch the chapter describes, and a
+subclass of an event type is how most readers first meet it.
 
-**Fix 1** adds `(state, Nickel)` rows. Those rows work, and they scale
-badly. Every new denomination needs a row for every state that accepts
+**Give the subclass its own rows.** Fix 1 adds `(state, Nickel)`
+rows. Those rows work, and they scale badly. Every new denomination
+needs a row for every state that accepts
 money, so a machine with five states and six coins carries thirty rows
 that all do the same thing.
 
@@ -1259,8 +1261,9 @@ differently, as `FirstDigit` and `SecondDigit` do in
 `vending_machine.py`. They exist as separate classes so they arrive
 under different keys.
 
-**Fix 2** stops making a class for something that is a value. A nickel
-is not a new kind of money. It is a `Money` whose `value` is 5.
+**Make the nickel a value.** Fix 2 stops making a class for something
+that is a value. A nickel is not a new kind of money. It is a
+`Money` whose `value` is 5.
 `Money("nickel", 5)` arrives under a key the table has, so the table
 and the classes stay as they are.
 

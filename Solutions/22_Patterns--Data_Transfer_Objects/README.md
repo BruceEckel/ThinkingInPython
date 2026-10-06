@@ -356,8 +356,8 @@ print(FrozenColor(1, 2, 3) == (1, 2, 3))
 
 **Compare by position and length.** `Color(1, 2, 3) == Point3(1, 2, 3)` is `True`, the same answer
 `Dimensions` gives, and for the same reason. A `NamedTuple` inherits
-`tuple.__eq__`, which compares length and elements and consults neither
-class. Adding a third `NamedTuple` adds a third type that compares
+`tuple.__eq__()`, which compares length and elements and ignores both
+classes. Adding a third `NamedTuple` adds a third type that compares
 equal to `Color` and `Dimensions`, so the family of things that equal `(1, 2, 3)`
 grows with every three-integer `NamedTuple` in the program. The field names
 are for you, not for `==`.
@@ -402,8 +402,8 @@ Consider also what `json.dumps()` does with each type.
 runtime, so no fixed set of fields exists to declare. A `@dataclass`
 or `NamedTuple` needs every field named in the class body before any
 instance exists, which this scenario cannot supply. A `TypedDict`
-exists to name the keys for the type checker, and here no key is
-known in advance to name. `SimpleNamespace`
+exists to name the keys for the type checker, and here every key
+arrives at runtime, after the type checker has run. `SimpleNamespace`
 accepts any name at construction or later, which is the looseness the
 scenario needs. The cost is a type checker that cannot catch a typo
 in a key name.
@@ -412,7 +412,7 @@ in a key name.
 key, so it must hash, and a `NamedTuple` hashes as long as its fields
 do. A `@dataclass` also hashes by value when frozen (with the
 default `eq=True`), which rules out the mutable `@dataclass`.
-`SimpleNamespace` and a `TypedDict` both fail as keys:
+`SimpleNamespace` and a `TypedDict` both fail as keys.
 `SimpleNamespace` compares by contents and defines no hash, and a
 `TypedDict` is a `dict` at runtime, which is unhashable.
 Between a frozen data class and a `NamedTuple` here, the tuple form

@@ -132,7 +132,7 @@ Nothing about the handler causes it.
 
 **Make the two strings agree.** `archive_once()` reads the clock one time and derives both strings from that value.
 The mismatch needs two readings that could differ.
-With one reading, the two strings cannot disagree.
+With one reading, the two strings must agree.
 A handler still chooses the moment, and it can choose 23:59:59,
 but both strings then carry that moment.
 No handler can reproduce the bug, because the bug is not in the handler.
@@ -219,7 +219,7 @@ A type checker cannot catch that leak because purity is not a type.
 and Python's type system says what values a function accepts and produces,
 not what its body touches on the way.
 The annotation `Success[int]` describes the returned object,
-and `success(n * 2)` genuinely produces a `Success[int]`, so nothing is inconsistent.
+and `success(n * 2)` genuinely produces a `Success[int]`, so the annotation and the returned object agree.
 A language that tracks Effects puts the side effect in the signature.
 These two chapters simulate that tracking by hand,
 so the guarantee holds only for Effects that go through `yield`.
@@ -264,7 +264,7 @@ return channel, and `caller()`'s `int | KeyError` says the caller is ready for e
 The run does something else.
 `RAW["Bob"]` raises a `KeyError` while `size()` is still building its description,
 before the Effect exists and long before `catch()` has anything to watch,
-so the exception unwinds the stack in the ordinary way and escapes `run()` entirely.
+so the exception unwinds the stack in the ordinary way and escapes `run()`.
 `catch()` cannot catch what never entered the channel.
 
 **Lift the failure into the channel.** The line that restores the guarantee is `@throws(KeyError)`.
@@ -581,7 +581,7 @@ Every question about policy is out of its reach: whether `controller()`
 prefers solar before the battery, whether the battery reports itself
 unavailable once exhausted, whether `controller()` asks about the hour
 for which `run_load()` draws power. The scripted handler ignores
-`request.hour` entirely, and that omission is the source of both its
+`request.hour`, and that omission is the source of both its
 convenience and its blindness.
 The scripted test checks the consumer of the Ability while saying nothing about the producer.
 `controller()` needs its own test, and that test can be an ordinary one.
@@ -1056,8 +1056,8 @@ so another attempt can succeed.
 Distinguishing `Unavailable` from `NotInteresting` needs something the library does not offer:
 a retry that selects on the error type.
 `retry()` here applies to the whole error channel, treating every declared
-failure as transient, because its schedule decides *when* to try again and
-nothing decides *whether* to. ZIO provides the missing piece as `retryWhile`, a
+failure as transient, because its schedule decides when to try again and
+nothing decides whether to try. ZIO provides the missing piece as `retryWhile`, a
 retry taking a predicate on the error. Without it, selective behavior means
 narrowing the channel first: `catch()` the failures that retrying cannot help,
 so they leave the error channel and become values, then apply `retry()` to what
@@ -1133,7 +1133,7 @@ if __name__ == "__main__":
 ```
 
 **Leave the Effect alone.** `squares()` stays the same, character for character. It asks for an `Executor`
-without saying which kind, so a process pool satisfies the request as a
+of any kind, so a process pool satisfies the request as a
 thread pool does.
 
 **Guard the driver.** Two things around `squares()` did change, and neither is in the Effect.
@@ -1192,7 +1192,7 @@ to a boundary between threads or processes.
 
 [State as an Ability](../../Chapters/47_Effects--Stateless_in_Practice.md#state-as-an-ability) reads and writes the balance through `Get` and `Put` requests.
 Write one handler factory that reads from an iterator of balances and another that appends each `Put` to a list, then `handle()` both around `spree()`.
-Check the list, check that the balance iterator has nothing left, and compare what the scripted answers share with each other.
+Check the list, check that the balance iterator has run out, and compare what the scripted answers share with each other.
 
 <details>
 <summary>Solution</summary>
@@ -1272,13 +1272,13 @@ print(run(scripted((60, 50, 30, 20))), written)
 `100` before the first purchase, `40` after it, `40` again because `purchase()`
 refuses the `50` and writes nothing, and `10` after the `30` goes through.
 
-**Prove every price is attempted.** `spree()` attempts all four prices, and the test proves it from both sides.
+**Prove the loop tries every price.** `spree()` attempts all four prices, and the test proves it from both sides.
 A fifth price exhausts the script, and `handle()` reads the
 `StopIteration` from `read()` as the end of the Effect, the silent trap
 the chapter describes. `run()` returns `None` and the first assertion
 fails on `None == 2`. Stopping early leaves a balance unread, and the
-final assertion catches that by checking that the iterator has nothing
-left.
+final assertion catches that by checking that the iterator has
+run out.
 
 **Record each write.** `written` records one entry per successful purchase, `[40, 10]`, so the
 assertions together say that `spree()` tries every price and writes only the
@@ -1428,7 +1428,7 @@ So the type checker verifies the version whose failure travels through a
 `yield`, and trusts the version whose failure starts as a `raise`.
 
 That difference decides between them. Use `throw()` when the Effect
-chooses to fail, and the type checker then verifies the failure. Keep
+chooses to fail, so the type checker verifies the failure. Keep
 `@throws` for ordinary code that raises exceptions, such as `latest()`.
 
 </details>
@@ -1850,8 +1850,8 @@ error[invalid-argument-type]: Argument to function `run` is incorrect
    |                               found `Generator[Need[Toaster], Any, str]`
 ```
 
-**Answer every requirement at the edge.** This one tells you about the dependency two levels down. `supply()` fails to
-subtract `Need[Toaster]`, so it reaches `run()` still in the channel. Nothing in
+**Answer every requirement at the edge.** The second diagnostic tells you about the dependency two levels down. `supply()` leaves
+`Need[Toaster]` in the channel, so the requirement reaches `run()`. Nothing in
 `buttered()`'s body mentions a toaster. The requirement comes from `toast()`,
 which `buttered()` calls, and the error names it at the program's edge, past the
 last place that can answer it.
@@ -2012,13 +2012,13 @@ play(Loud(), Kitty(), Weapon())
 #: Kitty meets the nasty weapon
 ```
 
-**Name the factory's shape.** What the shared signature recovers is the *Abstract Factory*'s *interface*.
+**Name the factory's shape.** What the shared signature recovers is the *Abstract Factory*'s interface.
 `run_season()` accepts anything that can stage a scene and stays ignorant of
 which family it gets, and that ignorance is the property the pattern exists to
-provide. Python gives it away, because a function is already an object with a
+provide. Python provides that property, because a function is already an object with a
 type. Saying so takes no abstract factory class.
 
-**Show the mismatch getting through.** What it does not recover is the guarantee that makes the pattern worth naming.
+**Show the mismatch getting through.** What the shared signature does not recover is the guarantee that makes the pattern worth naming.
 `Cast` says "give me a narrator and I will stage something." It says nothing
 about the actors inside agreeing with each other.
 The listing's last call, `play(Loud(), Kitty(), Weapon())`, is the proof,

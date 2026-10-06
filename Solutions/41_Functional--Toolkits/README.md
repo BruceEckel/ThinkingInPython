@@ -179,7 +179,7 @@ If you build the totals with a list comprehension, `[sum(b) for b in batched(sou
 `ty` reports an `invalid-return-type`.
 A `list[int]` has no `__next__()`, so it is not an `Iterator[int]`.
 If you change the annotation to `list[int]` to match,
-the demo's call does not return,
+the demo's call hangs,
 because the comprehension tries to sum every batch `count(1)` can supply
 and `islice()` gets no total to take.
 The generator expression computes each total only when `islice()` requests it.
@@ -338,7 +338,7 @@ expect(TypeError, deep_sum,
 #: [TypeError] unhashable type: 'list'
 ```
 
-**Show why the call fails.** Because `cache` stores results in a
+**Show why the call fails.** Because `cache()` stores results in a
 dictionary keyed on the arguments, every argument must be hashable. A
 `list` is not hashable, because its contents can change after the
 cache stores it, and a mutated key no longer hashes to the slot
@@ -466,8 +466,8 @@ What the `rng` parameter preserves is determinism. Two callers who
 pass `random.Random(0)` still get identical schedules, so the function
 remains testable by calling it twice and comparing, as before.
 The first round is the same one `pair_rounds.py` prints, because
-`random.Random(0)` is what `seed: int = 0` builds internally. Nothing
-about the algorithm reaches outside its arguments for randomness.
+`random.Random(0)` is what `seed: int = 0` builds internally. The
+algorithm draws its randomness from its arguments alone.
 
 What the `rng` parameter hands to the caller is control of the seed,
 and with it the responsibility for reproducibility. The

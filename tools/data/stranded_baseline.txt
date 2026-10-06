@@ -85,4 +85,3 @@ Solutions/44_Effects--Effect_Management/README.md	CODE rejects negatives but let
 Solutions/45_Effects--Generators/README.md	since nobody sends anything in
 Solutions/47_Effects--Stateless_in_Practice/README.md	**Show the mismatch getting through
 Solutions/47_Effects--Stateless_in_Practice/README.md	and CODE after the CODE goes through
-Solutions/47_Effects--Stateless_in_Practice/README.md	because its schedule decides *when* to try again and nothing decides *whether* to

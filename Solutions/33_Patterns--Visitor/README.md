@@ -50,7 +50,7 @@ def _(flower: Chrysanthemum, eater: str) -> str:
 
 If you make `pollinate()` a `singledispatch` function too, the program
 prints the same four lines, and `pollinate.registry` holds one key,
-`object`, for the default. With no registration to choose among, every
+`object`, for the default. With no registration to choose, every
 call runs the default body, so the decorator adds a dispatch step that
 decides nothing. The solution keeps `pollinate()` an ordinary function
 and saves `@singledispatch` for `eat()`, the one operation whose answer
@@ -267,7 +267,7 @@ a rose.
 **Add an operation.** Adding `thorns()` costs six lines: three for the function and three
 for the one flower that differs. Neither change edits an existing line.
 
-`@singledispatch` makes adding an *operation* cheaper than adding a
+`@singledispatch` makes adding an operation cheaper than adding a
 type, because an operation is a whole function and lives in one place.
 Adding `thorns()` is cheap because three of the four flowers accept
 its default. `Rose` needs a distinct answer from every operation, so
@@ -400,8 +400,8 @@ The `Visitor` classes keep the chapter's form. The listing keeps
 and the eating half.
 
 The two versions report the `Beetle` mistake at different times. Under
-`Any`, the type checker has nothing to compare `Beetle` against, so
-the call type-checks and the program dies at runtime with the
+`Any`, the type checker has no interface against which to compare
+`Beetle`, so the call type-checks and the program dies at runtime with the
 `AttributeError` above. Under `Visits`, the type checker rejects the argument
 before the program runs, because `Beetle` inherits no `visit()` and so
 does not match the protocol.

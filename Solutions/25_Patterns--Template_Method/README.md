@@ -609,15 +609,16 @@ worse of the two. `customize1()` accumulates work for `customize2()`
 to consume, so the pair is a two-step flow. Leaving `customize2()` at
 its default breaks the second half, and the program neither raises an
 exception nor prints anything wrong. `pending` grows on every pass.
-Nothing shows from outside until whatever `pending` feeds runs out of
-memory or reports stale data.
+From outside, the flaw stays hidden until whatever `pending` feeds runs
+out of memory or reports stale data.
 
 `Exploder` and `HalfDone` need different things from a type checker,
 and only one of those things exists.
 
 `HalfDone`'s omission is repairable. The `...` body makes the step
-optional, and that is the base class's decision: it declares that a
-subclass may skip this step. If the base class declares instead that
+optional, and that is the base class's decision. The base class
+declares that a subclass may skip this step.
+If the base class declares instead that
 a subclass may not, by inheriting from `ABC` and marking
 `customize2()` with `@abstractmethod`, Python refuses to construct
 `HalfDone`. The type checker reports the construction too, before the

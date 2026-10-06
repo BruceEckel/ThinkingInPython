@@ -135,7 +135,7 @@ print(render(rows, "json"))
 assignment that adds the format can sit in any module that imports
 `STYLES`. `STYLES` absorbs the change because a format is now data.
 
-Everything the axis does not cover still needs hand edits. Adding a
+Everything outside the axis still needs hand edits. Adding a
 field to `Row` touches every entry in `STYLES`, because a field is a
 different vector of change, one about which this design does nothing.
 
@@ -332,8 +332,8 @@ Taking away one more thing changes the answer. If you remove
 `checkout()`'s `shipping` parameter, inlining `5.0` where the call through `shipping` was
 and dropping the second argument from each call,
 the program still runs and still prints a number. What stops working is
-the requirement. You can no longer charge by weight without
-editing `checkout()`. Removing the parameter reaches the floor, the
+the requirement. Charging by weight now means editing
+`checkout()`. Removing the parameter reaches the floor, the
 point where subtraction stops. The parameter is the last piece that carries the design's
 intent, so removing it removes the design rather than its scaffolding.
 

@@ -144,8 +144,8 @@ asyncio.run(main())
 
 **Await each coroutine in turn.** Each `started` line has its own `resumed` line directly beneath it,
 the signature of no overlap. The comprehension awaits one coroutine at
-a time, and `await` does not return until that coroutine finishes, so
-`b` cannot start until `a` finishes. Nothing schedules the later
+a time, and `await` waits for that coroutine to finish, so `b` starts
+once `a` finishes. Nothing schedules the later
 coroutines while the current one waits.
 
 The timing follows from the trace. `gather()` finishes in about the
@@ -369,7 +369,7 @@ asyncio.run(main())
 ```
 
 **Hold the thread while waiting.** The peak falls from `5` to `1`, the
-same figure the CPU-bound version produced. `time.sleep()` does here
+same figure the CPU-bound version produces. `time.sleep()` does here
 what it does in `blocking_the_loop.py`. The call stops the thread
 instead of suspending the task, and the event loop runs on that
 thread. A coroutine with no `await` gives the loop no chance to start
@@ -379,7 +379,8 @@ begins.
 Waiting does not create overlap. Suspending does. These five tasks
 spend almost all their time waiting and still run one at a time,
 and `cpu_price()` runs one at a time for the same reason, although it
-spends its time computing: it has no `await` to reach. The total run
+spends its time computing. `cpu_price()` has no `await` to reach. The
+total run
 time makes the cost visible. Five blocking sleeps of 0.05 seconds take about a quarter second, while
 five awaited ones take about 0.05.
 
@@ -878,7 +879,7 @@ that no task had an effect before the failure.
 The distinction matters when the tasks do more than sleep. A group of
 six writes where two fail leaves the successful writes in place, so
 recovery is your problem, not the `TaskGroup`'s.
-Recovery is code you write:
+Recovery is code you write.
 [Context Managers](../../Chapters/15_Techniques--Context_Managers.md)
 pairs an action with its cleanup, which releases resources but cannot
 reverse a write that succeeded.
@@ -964,8 +965,8 @@ tick, but the `gather()` future has resolved by then, so
 it. The call loses the four results it was collecting, including `a`
 and `b`, which had succeeded.
 
-**Leave the other tasks running.** `gather()` does not cancel the unfinished tasks, `e` and `f`,
-when the exception propagates, unlike a `TaskGroup`, so `e` and
+**Leave the other tasks running.** Unlike a `TaskGroup`, `gather()` leaves the unfinished tasks, `e` and `f`,
+running when the exception propagates, so `e` and
 `f` are still sleeping when `main()` returns. `asyncio.run()` then
 cancels whatever tasks remain as it shuts the loop down, which is why
 `e` and `f` print nothing further. If `main()` goes on to other work,
@@ -1268,7 +1269,7 @@ because the race is not in the loop body.
 **Take each item unguarded.** `for item in source:` is the `for` statement calling
 `source.__next__()`, and that call runs before control reaches the
 indented block. The `with lock:` inside the body therefore starts
-*after* `next()` has returned a number, and ends before the
+after `next()` has returned a number, and ends before the
 next `next()` begins. Two threads can be inside `__next__()` at the
 same moment, read the same `next_number`, and come away with the same
 ticket, as they do without the lock.
@@ -1365,7 +1366,7 @@ task holds. The first task finishes and releases both locks, and the
 second task then takes each lock with no other task holding it.
 
 The deadlock version makes the waiting circular. Task one holds
-`lock_a` and waits for `lock_b`, task two holds `lock_b` and
+`lock_a` and waits for `lock_b`, while task two holds `lock_b` and
 waits for `lock_a`, so each task's progress depends on the other task's
 progress. A deadlock is that cycle. Acquiring the
 locks in one global order makes such a cycle impossible. Every lock a

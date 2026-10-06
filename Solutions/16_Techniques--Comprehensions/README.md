@@ -22,7 +22,7 @@ The `and` operator stops at the first false operand, so the second test does not
 If you test `e.isdigit()` alone, or before the type test,
 the comprehension raises an `AttributeError` at the first element,
 since the integer `1` has no `isdigit()` method.
-The type checker flags the call before the program runs:
+The type checker flags the call before the program runs.
 `ty` reports `unresolved-attribute`, because `e` is `int | str` at that point.
 The solution tests `isinstance(e, str)` first, and `and` keeps `isdigit()` away from every integer.
 
@@ -123,8 +123,8 @@ ordering matters when the output expression changes the length, as
 `name * 2` does.
 
 **Keep one value per key.** Two names that upper-case to the same string collide, since the
-comprehension builds a `dict` and a later key overwrites an earlier
-one. Adding `"robin"` alongside `"Robin"` produces one `'ROBIN'` entry,
+comprehension builds a `dict`, and a later value replaces the earlier
+one under the same key. Adding `"robin"` alongside `"Robin"` produces one `'ROBIN'` entry,
 not two, and the value comes from whichever name appears last in the
 list.
 
@@ -168,11 +168,11 @@ collapse to `Bob`, `John`, and `Alice`, and `J` joins them.
 **Normalize without truncating.** `"J"` does not collide with `"JOHN"` because the normalization is a
 string transformation, not a truncation. `"J"` becomes `"J"` and
 `"JOHN"` becomes `"John"`. `name[1:]` on a one-character string is the
-empty string, so the concatenation adds nothing to the capital. `"J"`
+empty string, so the concatenation leaves the capital as it is. `"J"`
 and `"John"` are distinct strings, so the set keeps both.
 
 The filter exists to drop the initial `"J"` as noise. Removing the filter
-shows what the set does on its own. It collapses only exact
+shows what the set does on its own. The set collapses only exact
 duplicates of the normalized form, and it has no notion that `"J"`
 might be an abbreviation of `"John"`.
 
@@ -207,7 +207,7 @@ def show(n: int) -> str:
 If you leave `return line` out of `show()`,
 the function returns `None` implicitly,
 and `lines` prints as `[None, None, None]`, the list `comprehension_side_effects.py` builds.
-The type checker catches the omission:
+The type checker catches the omission.
 `ty` reports `invalid-return-type`, because `show()` declares a `str` return type.
 The solution returns the line it printed, so the comprehension collects strings.
 
@@ -278,7 +278,7 @@ print({**d for d in dicts})
 ```
 
 `**` merges the dictionaries in iteration order. When the same key
-appears more than once, the value from the *later* dictionary
+appears more than once, the value from the later dictionary
 overwrites the earlier value. The key `"a"` appears in the first, third,
 and fourth dictionaries (`1`, then `3`, then `5`), so the final value
 is `5`, the last one written. The result orders keys by first
@@ -298,7 +298,7 @@ comes from the last dictionary in the list.
 <summary>Where to look</summary>
 
 [A Generator Expression Runs Once](../../Chapters/16_Techniques--Comprehensions.md#a-generator-expression-runs-once) shows consumers sharing one generator, each taking what remains.
-`any()` stops at its first true value, so the generator keeps its position when it returns.
+`any()` stops at its first true value, so the generator keeps its position when `any()` returns.
 Trace which values each later consumer receives.
 
 <details>
@@ -319,7 +319,7 @@ print(list(nums))
 reports `True`, and stops. Stopping there leaves the generator part-way
 through, not empty. `sum()` continues from `6` and adds `36 + 49 + 64 +
 81`, giving `230` rather than the full `285`. By then `sum()` has
-drained every value, so `list()` gets nothing.
+drained every value, so `list()` returns an empty list.
 
 A generator holds a position rather than a beginning. Each consumer
 picks up where the previous one stopped, and `any()`'s early exit
@@ -380,7 +380,7 @@ to affect, because `built` holds finished numbers and no code that
 still needs to look `factor` up.
 
 The generator expression calls `source()` at the same point, which
-is why the first line of output does not move. The brackets change
+is why the first line of output keeps its place. The brackets change
 when the output expression runs, and with it which value of
 `factor` the expression reads.
 

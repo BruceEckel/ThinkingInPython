@@ -48,8 +48,8 @@ the script still runs and prints the same line,
 but `ty` reports an `unresolved-attribute` error on `OnlyOne.instance.val.append(arg)`,
 because `val` is not defined on `None`.
 In the chapter's version, the guard is the type checker's evidence that `instance` holds an object.
-Once the class body binds the inner instance, `None` is no longer a possible value,
-so the solution drops it from the annotation.
+Once the class body binds the inner instance, `instance` always holds an object,
+so the solution drops `None` from the annotation.
 
 ```python
 # exercise_1.py
@@ -81,10 +81,11 @@ the deferral removes both. `instance` now carries the type
 `ClassVar[__OnlyOne]` rather than `ClassVar[__OnlyOne | None]`, and
 the class body binds it to the inner instance. The bare
 `__OnlyOne()` works there. The qualified `OnlyOne.__OnlyOne()`
-fails, since `OnlyOne` is unbound until its own body finishes.
+fails, since Python binds the name `OnlyOne` after the class
+body finishes.
 
-**Record each caller's argument.** `__init__()` shrinks to the one `append`. Externally nothing
-changes: `x.val` accumulates the same way, `x is y` is still
+**Record each caller's argument.** `__init__()` shrinks to the one `append`. Externally the behavior
+stays the same: `x.val` accumulates the same way, `x is y` is still
 `False`, and `x.instance is y.instance` is still `True`.
 
 The cost
@@ -111,7 +112,7 @@ import builds the object, leaving no first call to race.
 <summary>Where to look</summary>
 
 [When You Want a Class, Cache the Instance](../../Chapters/24_Patterns--Singleton.md#when-you-want-a-class-cache-the-instance) uses `functools.cache` on a zero-argument function to return one object.
-Keep that technique for the pool, and give the pooled object a list of available connections and a set of leased ones.
+Keep that technique for the pool, and give the pool a list of available connections and a set of leased ones.
 `acquire()` moves a connection from one to the other, and `release()` moves it back.
 
 <details>
@@ -204,7 +205,7 @@ print(c3 == c1)
 ```
 
 **Hold a fixed set of connections.** The change from
-`singleton_cached_factory.py` is what the one shared object *is*.
+`singleton_cached_factory.py` is in what the one shared object holds.
 Instead of holding a single value, it holds a fixed collection of
 `Connection`s and tracks which ones it has handed out.
 
@@ -493,7 +494,7 @@ body once, and a thread that imports the module while the body is
 running waits for the body to finish.
 
 The trade is that the module body builds the object whether or not
-anything uses it. For settings that cost is nothing. For a database
+anything uses it. For settings that cost is negligible. For a database
 connection it may be real, and then the hand-written lock is the
 answer.
 
@@ -510,7 +511,7 @@ answer.
 <details>
 <summary>Where to look</summary>
 
-[Borg: Singleton by Inheritance](../../Chapters/24_Patterns--Singleton.md#borg-singleton-by-inheritance) points every instance's `__dict__` at a dict held in a class variable.
+[*Borg*: *Singleton* by Inheritance](../../Chapters/24_Patterns--Singleton.md#borg-singleton-by-inheritance) points every instance's `__dict__` at a dict held in a class variable.
 Check which class owns that dict when a second subclass looks up `_shared_state`.
 A subclass that binds its own `_shared_state` in its class body gets separate storage.
 
@@ -702,7 +703,7 @@ when `hasattr(self, "val")` is true.
 
 The metaclass form in
 [Metaprogramming](../../Chapters/17_Techniques--Metaprogramming.md#intercepting-instance-creation)
-has no such problem. Its `__call__()` runs before `__new__()` and
+runs `__init__()` once. Its `__call__()` runs before `__new__()` and
 `__init__()`, and after the first construction it calls neither.
 
 </details>

@@ -124,7 +124,7 @@ def add(a: int, b: int) -> int:
 <details>
 <summary>Solution</summary>
 
-If `timing`'s wrapper calls `func(*args, **kwargs)` without keeping and returning its value,
+If `timing`'s wrapper calls `func(*args, **kwargs)` and discards its value,
 the timing line still prints, but `add(2, 3)` returns `None`,
 and `trace` prints `<- add = None`.
 `ty` reports an `invalid-return-type`, because the wrapper declares `-> R` and returns nothing.
@@ -181,7 +181,7 @@ wrapper is the outermost layer and `timing`'s is inside it.
 
 **Run the layers outside in.** Calling
 `add(2, 3)` enters `trace`'s wrapper first, which prints the `->` line,
-then calls the *wrapped* function, which is `timing`'s wrapper.
+then calls the wrapped function, which is `timing`'s wrapper.
 `timing`'s wrapper measures and reports the elapsed time around the
 real `add()` call. Control then
 returns outward to `trace`'s wrapper, which prints the `<-` line
@@ -648,7 +648,8 @@ def always_fails() -> str:
 If you re-raise the exception from inside the loop with a bare `raise` on the last attempt,
 `retry` works at runtime, but the type checker cannot tell
 that `wrapper()` always either returns or raises an exception.
-`ty` reports an `invalid-return-type`: `wrapper()` can implicitly return `None`.
+To the type checker, `wrapper()` can implicitly return `None`,
+so `ty` reports an `invalid-return-type`.
 The solution makes the final attempt outside the `try` instead.
 
 ```python
@@ -700,11 +701,11 @@ expect(RuntimeError, always_fails)
 
 **Keep the wrapped function's identity.** `@wraps(func)` keeps the
 identity. `flaky.__name__` reports the wrapped function's name, not
-`wrapper`. Without it, every retried function reports itself as
+`wrapper`. Without `@wraps`, every retried function reports itself as
 `wrapper` to a log line or a test report that reads `__name__`. A
 traceback is the same either way. It names each frame from the code
 object, which `wraps` leaves alone, so the `wrapper` frame appears with
-or without it.
+or without `@wraps`.
 
 **Retry all but the last attempt.** The loop runs `times - 1` attempts inside a `try`, and the final
 attempt sits outside it, with no handler.

@@ -9,7 +9,7 @@
 <details>
 <summary>Where to look</summary>
 
-[Simple Factory Method](../../Chapters/27_Patterns--Factory.md#simple-factory-method) and [Factory Objects](../../Chapters/27_Patterns--Factory.md#factory-objects) each keep the concrete classes behind a single creation point.
+[Simple *Factory Method*](../../Chapters/27_Patterns--Factory.md#simple-factory-method) and [Factory Objects](../../Chapters/27_Patterns--Factory.md#factory-objects) each keep the concrete classes behind a single creation point.
 A new shape needs a class with `draw()` and `erase()`, plus one entry where that creation point chooses by name.
 In the first style that entry is a `case` in `Shape.factory()`.
 In the second it is a nested `Factory` class,
@@ -104,7 +104,7 @@ def create_shape(kind: str) -> Shape:
 If you add the `_Triangle` class and stop there, the type checker accepts both files,
 but with the chapter's seed neither demo finishes.
 `shape_name()` draws from `Shape.__subclasses__()`, which lists `_Triangle` as soon as its `class` statement runs,
-so the demo asks for a `"Triangle"` that the creation point cannot build:
+so the demo asks for a `"Triangle"` that the creation point cannot build.
 `Shape.factory()` raises `ValueError: Bad shape: Triangle`, and `create_shape()` raises `KeyError: 'Triangle'`.
 Each solution therefore adds the class and its entry together.
 
@@ -612,7 +612,7 @@ object, not editing every call site that creates a shape.
 <details>
 <summary>Where to look</summary>
 
-[Builder](../../Chapters/27_Patterns--Factory.md#builder) separates assembling a pizza from the finished `Pizza`.
+[*Builder*](../../Chapters/27_Patterns--Factory.md#builder) separates assembling a pizza from the finished `Pizza`.
 In `pizza_direct.py`, `__post_init__()` runs while the constructor is still executing, so a bad pizza cannot escape it.
 In `pizza_builder.py`, compare what the builder's own list of toppings holds after a fifth `topping()` call when the check sits in `topping()` and when it sits in `build()`.
 
@@ -715,8 +715,8 @@ call raises a `ValueError` before appending, so `self._toppings` holds
 at most four. Placing the check in `build()` instead gives up that
 guarantee. The builder then accepts a fifth, sixth, or tenth
 `.topping()` call without complaint, silently accumulating an overlong
-list, and discovers the problem only when `build()` finally runs,
-leaving a window between the fifth `.topping()` call and that `build()`
+list. It discovers the problem only when `build()` finally runs, which
+leaves a window between the fifth `.topping()` call and that `build()`
 call. During that window the builder's own internal state violates the
 rule the finished `Pizza` must guarantee, though no `Pizza` object
 violates it. Checking in `topping()` closes that window. Checking only
@@ -909,7 +909,7 @@ body, and with it the two `class` statements, until the first use of
 <details>
 <summary>Where to look</summary>
 
-[Prototype](../../Chapters/27_Patterns--Factory.md#prototype) contrasts `copy.deepcopy()`, which follows every reference, with a copy that shares what it holds.
+[*Prototype*](../../Chapters/27_Patterns--Factory.md#prototype) contrasts `copy.deepcopy()`, which follows every reference, with a copy that shares what it holds.
 A shallow copy duplicates the `Monster` but reuses the objects its fields reference.
 Compare an assertion that rebinds a field with one that mutates a list or dictionary in place, and see which of them `test_prototype.py` makes.
 
@@ -1164,7 +1164,7 @@ of the two.
 <details>
 <summary>Where to look</summary>
 
-[Simple Factory Method](../../Chapters/27_Patterns--Factory.md#simple-factory-method) notes that `__subclasses__()` covers only the first level of inheritance.
+[Simple *Factory Method*](../../Chapters/27_Patterns--Factory.md#simple-factory-method) notes that `__subclasses__()` covers only the first level of inheritance.
 Compare that with where `_Oval` sits in the hierarchy.
 Write `all_subclasses()` as a recursive generator: yield each direct subclass, then `yield from` a call on that subclass.
 
@@ -1298,8 +1298,8 @@ seed produces `"Oval"`, and the new `case` in `factory()` is unreachable
 from the demo although `Shape.factory("Oval")` works when called.
 
 **Walk the whole hierarchy.** `all_subclasses()` yields each direct subclass and then, before moving
-to the next one, recurses into that subclass: depth first, so `Oval`
-comes out between `Circle` and `Square`. The generic `T` keeps the
+to the next one, recurses into that subclass. The walk is depth first,
+so `Oval` comes out between `Circle` and `Square`. The generic `T` keeps the
 yielded classes typed as `type[Shape]` when the argument is `Shape`,
 and `names()` requires that type.
 
@@ -1310,8 +1310,8 @@ With the same seed the sequence differs from the chapter's, because
 
 `_Oval` overrides `draw()` and inherits `erase()` from `_Circle`, so
 an `Oval` still erases as a `Circle`. `Circle` stays in the list as
-well, because recursion adds the deeper classes without removing the
-intermediate ones, and a factory that should build only leaf classes
+well, because recursion adds the deeper classes and keeps the
+intermediate ones. A factory that should build only leaf classes
 needs a further filter, `not cls.__subclasses__()`.
 
 </details>
@@ -1448,8 +1448,8 @@ it, testing a class against a Protocol raises a `TypeError`. The
 test. Calling `unregistered(globals())` at the end of the module, or
 from a test, turns a silent absence into a printed name.
 
-The runtime test is weaker than the checker's. `issubclass()` looks
-for an attribute named `draw` and nothing about its signature, so a
+The runtime test is weaker than the checker's. `issubclass()` checks
+for an attribute named `draw` and ignores its signature, so a
 class whose `draw()` takes an extra parameter passes here and fails
 at `@make.register`. The two checks cover each other. The checker
 rejects a decorated class that does not fit, and `unregistered()`
@@ -1476,7 +1476,7 @@ must run it over its own `globals()`.
 <details>
 <summary>Where to look</summary>
 
-[Prototype](../../Chapters/27_Patterns--Factory.md#prototype) keeps ready-made instances in a table, and [Self Registration](../../Chapters/27_Patterns--Factory.md#self-registration) fills a table as definitions execute.
+[*Prototype*](../../Chapters/27_Patterns--Factory.md#prototype) keeps ready-made instances in a table, and [Self Registration](../../Chapters/27_Patterns--Factory.md#self-registration) fills a table as definitions execute.
 `prototype(name)` is a decorator factory: the outer call takes the name and returns a function that stores the builder's result and returns the builder.
 The `__name__` version fails because of what the `Callable` annotation declares, which the type checker's message shows.
 
@@ -1570,7 +1570,7 @@ print(spawn("troll"))
 ```
 
 **Store each builder's prototype.** `prototype()` is a decorator factory, the shape [Decorators](../../Chapters/14_Techniques--Decorators.md#decorators-that-take-arguments)
-introduces: the outer call takes the name and returns `register()`,
+introduces. The outer call takes the name and returns `register()`,
 which runs the builder once, stores the result, and hands the builder
 back unchanged. The table is empty at its declaration and full by the
 time `spawn()` runs, because each `@prototype` line executes as the

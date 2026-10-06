@@ -162,8 +162,8 @@ def walk(entry: Node, prefix: str = "") -> Iterator[str]:
 <summary>Solution</summary>
 
 If you follow the link, resolving `target` to its node and
-recursing into that node, `disk_usage(tree)` prints `10`:
-it counts `a.txt` once as a file and again through `shortcut`.
+recursing into that node, `disk_usage(tree)` prints `10`.
+It counts `a.txt` once as a file and again through `shortcut`.
 A link to an ancestor, such as `Symlink("up", "/root")`,
 sends `disk_usage()` around the loop until Python raises a
 `RecursionError`.
@@ -337,7 +337,7 @@ def simplify(e: Expr) -> Expr:
 
 If you write `__truediv__()`, the one division method the exercise names,
 `x / 2` builds a `Div`, but `1 / x` raises a `TypeError`.
-`int.__truediv__` returns `NotImplemented` for a `Var`, and Python finds no reflected method to try.
+`int.__truediv__()` returns `NotImplemented` for a `Var`, and Python finds no reflected method to try.
 The chapter's `Operators` pairs `__add__()` with `__radd__()` and `__mul__()` with `__rmul__()` for that reason,
 so the solution adds `__rtruediv__()` as well.
 
@@ -496,7 +496,7 @@ print(to_infix(simplify(Neg(Neg(x)) + Num(0))))
 #: x
 ```
 
-**Extend each walker by one case per node.** `evaluate()` and `to_infix()` gain one case per new node, and
+**Add one case per new node.** `evaluate()` and `to_infix()` gain one case per new node, and
 `evaluate()` now returns a `float`, since `/` produces one.
 
 **Fold negations where possible.** `simplify()` is the interesting one. For `Neg`, a constant operand
@@ -899,7 +899,7 @@ exercise.
 <details>
 <summary>Where to look</summary>
 
-[Operators That Build Nodes](../../Chapters/34_Patterns--Composite_and_Interpreter.md#operators-that-build-nodes) explains the four operator methods that `expr.py` defines, and the Multiple Dispatching chapter's [Operators Dispatch Twice](../../Chapters/32_Patterns--Multiple_Dispatching.md#operators-dispatch-twice) shows the idiom.
+[Operators That Build Nodes](../../Chapters/34_Patterns--Composite_and_Interpreter.md#operators-that-build-nodes) explains the four operator methods that `expr.py` defines, and the *Multiple Dispatching* chapter's [Operators Dispatch Twice](../../Chapters/32_Patterns--Multiple_Dispatching.md#operators-dispatch-twice) shows the idiom.
 In each method, test the operand with `isinstance()` and return `NotImplemented` when it is neither an `Expr` nor an `int`.
 Python then tries the reflected method on the other operand and, when that declines too, raises the `TypeError` for you.
 
@@ -1125,8 +1125,8 @@ print(f"<p>{comment}</p>")
 #: <p><script>steal()</script> & run</p>
 ```
 
-**Add an operation beside the others.** `to_html()` is the third operation over `Template`, and it changes
-nothing about `to_query()` and `to_shape()`, the property the chapter
+**Add an operation beside the others.** `to_html()` is the third operation over `Template`, and it leaves
+`to_query()` and `to_shape()` as they were, the property the chapter
 keeps demonstrating on `Expr`. The whole walker is the same loop with
 a different body, because the structure separates the literal
 pieces from the interpolations.
@@ -1341,10 +1341,10 @@ print(evaluate(small, x=3), evaluate_iterative(small, x=3))
 
 The tree is 2000 `Add` nodes deep, and `evaluate()` needs one frame
 per level against a limit of 1000, so it fails before reaching the
-bottom. Nothing about the expression is unusual. Only its shape is.
+bottom. The expression is ordinary apart from its shape.
 
-**Defer the combine behind its children.** The stack version cannot be a straight translation, and this is where
-the exercise bites. Pushing children and popping them in a loop gives
+**Defer the combine behind its children.** The stack version cannot be a straight translation.
+Pushing children and popping them in a loop gives
 a pre-order walk that visits every node and computes nothing, because
 an `Add` can combine its children's values only *after* the children
 have produced them. The solution stacks the pending operation behind
@@ -1489,7 +1489,7 @@ print(root.disk_usage())
 #: 740
 ```
 
-What breaks in the closed version is not subtle. `type Node = File |
+What breaks in the closed version is obvious. `type Node = File |
 Directory` lives in your source, so a plugin cannot extend it. The
 type checker does warn the plugin author. `ty` reports a `Symlink`
 passed to `disk_usage()`, or placed in a `Directory`'s entries, as

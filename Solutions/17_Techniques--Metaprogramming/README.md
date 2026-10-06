@@ -167,7 +167,7 @@ print(p.__dict__)
 #: {'_x': 3, '_y': 4, '_z': 9}
 ```
 
-`z = Field()` needs no change to the `Field` class.
+`z = Field()` leaves the `Field` class as it was.
 `__set_name__()` runs once per descriptor, at class-creation time.
 Python calls it separately for each of `x`, `y`, and `z`, passing each
 one its own attribute name, so `z`'s `Field` instance learns the name
@@ -530,8 +530,7 @@ The runtime message tells you something collided. The static one tells
 you which two bases collided and why, at the moment you type the
 header rather than the moment Python first imports the module. The
 chapter's `metaclass_layout_conflict.py` carries the `# type: ignore`
-because that listing exists to show the `TypeError`, and a suppressed
-diagnostic is the cost of demonstrating a crash on purpose.
+because that listing exists to show the `TypeError`.
 
 </details>
 </details>
@@ -687,9 +686,9 @@ nothing either, since `type.__init__()` checks its arguments and then
 ignores them.
 
 `new_vs_init.py` makes the same point from the other side, with its
-`added_in_init` key. `__new__()` must make every decision about *what
-the class is*: its name, its bases, and the namespace `type` builds it
-from. `__init__()` receives the completed class object and can change
+`added_in_init` key. `__new__()` must make every decision about what
+the class is: its name, its bases, and the namespace from which `type`
+builds it. `__init__()` receives the completed class object and can change
 it in place, which is why `setattr(cls, ...)` still works there.
 
 </details>
@@ -793,8 +792,8 @@ except KeyError:
 #: lookup failed, after the injection ran
 ```
 
-**Break out of the class block.** `print("injected code ran")` is not part of any class body. It runs at
-module level inside `exec()`, and that is the danger: a name that
+**Break out of the class block.** `print("injected code ran")` sits outside every class body. It runs at
+module level inside `exec()`, and that is the danger. A name that
 reaches `make_class()` unchecked becomes source code, and source code
 can do anything the program can do.
 
@@ -833,7 +832,7 @@ the string.
 <summary>Where to look</summary>
 
 [When You Still Need a Metaclass](../../Chapters/17_Techniques--Metaprogramming.md#when-you-still-need-a-metaclass) shows `__prepare__()` supplying the mapping into which a class body writes.
-Subclass `dict` and override `__setitem__()` so a repeated key returns without storing.
+Subclass `dict` and override `__setitem__()` so it discards a repeated key.
 For the explanation, consider which class-creation steps run before the body and which run after it.
 
 <details>

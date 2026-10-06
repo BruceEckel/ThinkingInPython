@@ -369,7 +369,7 @@ holds.
 
 [The `__exit__()` Arguments](../../Chapters/15_Techniques--Context_Managers.md#the-__exit__-arguments) shows that a true return value from `__exit__()` suppresses the exception and a false one lets it continue.
 Write a class whose `__exit__()` returns the result of testing `exc_type` against `KeyError`.
-`exc_type` is `None` when the block raises nothing.
+`exc_type` is `None` when the block finishes cleanly.
 Test the `ValueError` case inside the chapter's `expected()` so it catches and prints the exception.
 
 <details>

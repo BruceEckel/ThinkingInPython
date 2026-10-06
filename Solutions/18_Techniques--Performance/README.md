@@ -204,8 +204,9 @@ so the million-element `squares` list disappears. Peak memory drops
 to about half of the two-list version's. That is as close as an eager
 version gets.
 
-**Measure the remaining gap.** The last line shows how far away the eager version still is:
-the lazy peak is under one percent of the one-list peak. The comprehension must build and
+**Measure the remaining gap.** The last line shows how far away
+the eager version still is. The lazy peak is under one percent of
+the one-list peak. The comprehension must build and
 hold the whole list of half a million even squares before `[:5]`
 discards nearly all of them. Restructuring the eager version cannot
 close that gap, because an eager version computes every value up
@@ -264,9 +265,8 @@ print(noisy(3))
 
 The `"computing noisy(3)"` message prints once, on the first
 call. Every later call with the same argument returns the cached
-result without running the function body again, so the
-`print()` call (and any other side effect) does not run a second
-time.
+result and skips the function body, along with its `print()`
+call and any other side effect.
 
 Skipping the body is the reason to cache only pure functions.
 A cache assumes that calling the function again is unnecessary,
@@ -331,8 +331,8 @@ then leaves a list that is no longer a heap.
 The list still looks unsorted because a heap does not guarantee
 sorted order. A heap guarantees that the element at position `i` is
 no larger than its two children at positions `2i + 1` and `2i + 2`,
-which puts the smallest element at index 0 and says nothing about
-the order of the rest. `heappop()` maintains that weaker property,
+which puts the smallest element at index 0 and leaves the order of
+the rest open. `heappop()` maintains that weaker property,
 and maintaining it is cheap. The last element moves to the front and
 sinks back down through O(log n) comparisons. Sorting the whole list
 on every pop costs far more and gains nothing, since callers read
@@ -508,7 +508,7 @@ runs, including library code you did not write and did not want
 counted, and it pays the callback cost on every one of those functions. Local
 attachment names the code objects you care about and leaves the rest
 running at full speed. Global monitoring answers "what ran."
-Local monitoring answers "how often did *this* run," which is the
+Local monitoring answers "how often did this run," which is the
 question you had when you opened `sys.monitoring` instead of
 a profiler.
 
@@ -573,7 +573,7 @@ time. `tottime` excludes the callees, so it attributes time to the
 frame that is executing.
 
 A function high on `cumtime` and near zero on `tottime` is a
-pass-through: it is slow only because of what it calls, so a faster
+pass-through. It is slow only because of what it calls, so a faster
 body changes nothing and fewer calls to its callees help. The two columns coincide only for a leaf function, one
 that calls nothing else, which is why the two rankings can name
 the same function only at the bottom of a call chain.
@@ -646,7 +646,7 @@ on every single element, eats the advantage of the tighter layout.
 
 That cost is the chapter's NumPy lesson arriving early. A compact
 layout pays off when the loop over it leaves Python. `sum()` over an
-`array` stays in Python and boxes every element. A NumPy `sum` over
+`array` stays in Python and boxes every element. NumPy's `sum()` over
 the same bytes creates no Python object per element, which is why
 vectorizing wins where `array` alone does not.
 
@@ -878,7 +878,9 @@ two runs differ by no more than two runs under the same setting do.
 
 A better subject runs a Python-level loop over Python objects, long
 enough to cross the compiler's threshold and keep going:
-`count_primes()` from the Numba section, at its full `limit`, timed
+`count_primes()` from the
+[Numba section](../../Chapters/18_Techniques--Performance.md#jit-compilation-with-numba),
+at its full `limit`, timed
 with `min(timeit.repeat(...))`. Expect a single-digit percentage
 either way, and run-to-run noise of the same size. That noise is why
 `pyperformance` reports a geometric mean over dozens of benchmarks

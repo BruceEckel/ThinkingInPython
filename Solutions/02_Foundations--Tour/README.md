@@ -129,7 +129,7 @@ and its value, so a quick debugging print needs no separate
 <summary>Where to look</summary>
 
 [Naming Conventions](../../Chapters/02_Foundations--Tour.md#naming-conventions) says what each casing form tells a reader.
-Rename the variables in both styles and run each version to confirm the interpreter does not care.
+Rename the variables in both styles and run each version to confirm the interpreter accepts every form.
 Then run `ruff check` on the camelCase file and see which rule code it reports.
 
 <details>
@@ -291,7 +291,7 @@ infinity, so `-9 // 4` is `-3`. The identity
 `a == (a // b) * b + a % b` then forces the remainder to `3`.
 
 The rule is that the result of `%` takes the sign of the divisor.
-With a positive divisor the remainder is nonnegative, which is why
+With a positive divisor the remainder is zero or positive, which is why
 `index % len(items)` wraps cleanly in either direction.
 
 </details>

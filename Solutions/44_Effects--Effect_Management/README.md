@@ -88,13 +88,13 @@ scripted `ask`, because a book listing that calls `input()` runs with
 no terminal attached. The substitution is the point either way. One
 `Console` instance satisfies both protocols, so you can pass the same
 object for both parameters. You can also replace either parameter with
-a double, and the other one is unaffected.
+a double, and the other parameter keeps its binding.
 
 **Declare what the function needs.** `greet()` requires no change, and
 could not have required one. It names two capabilities it needs and
 calls methods on them. Its body names none of `Console`, `input()`,
-`print()`, or `Scripted`, so changing the binding affects nothing
-there. That is the delayed-binding payoff. The choice of
+`print()`, or `Scripted`, so changing the binding leaves that body
+as it is. That is the delayed-binding payoff. The choice of
 implementation moves to the call site, where a test can choose
 differently from production.
 
@@ -535,8 +535,8 @@ print(type(description).__name__)
 description.close()  # Never awaited, so close it explicitly
 ```
 
-Making the helper `async` forces four changes, and none of them is
-optional.
+Making the helper `async` forces four changes, and you must make
+all four.
 
 **Await the helper from a coroutine.** `price_of_async("apple")` now returns a coroutine instead of
 a `float`, as the last `print()` shows, so `total_price()` cannot sum
@@ -554,7 +554,7 @@ become `async` in turn, and the propagation stops only at `asyncio.run()`,
 the boundary that discharges the Effect.
 
 That propagation is Effect tracking.
-The Effect appears in the type: `ty` reports `price_of_async`'s return
+The Effect appears in the type. `ty` reports `price_of_async`'s return
 as `CoroutineType[Any, Any, float]`, not `float`. A caller that
 forgets `await` then gets a type error rather than a mysterious value.
 The Effect travels outward one caller at a time, as the chapter says
@@ -562,7 +562,7 @@ an Effect propagates, and you cannot leave a caller out. It reaches
 the edge of the program, where a single call runs it. `async` satisfies property 1 of the three-item
 list without anyone calling it an Effect system.
 
-It satisfies neither of the other two.
+`async` satisfies neither of the other two.
 
 It does not **separate the interface from the implementation**.
 `await price_of_async(item)` names no capability. It says "run this

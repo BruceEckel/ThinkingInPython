@@ -79,8 +79,8 @@ print(render(Triangle()))
 
 `Triangle` doesn't mention `Drawable`, the same as `Circle` and
 `Square`. It qualifies because it has a `draw() -> str` method, and
-`Drawable` requires no more than that. Neither `Drawable` nor
-`render()` needs to change to accept a `Triangle`.
+`Drawable` requires no more than that. `Drawable` and `render()`
+accept a `Triangle` as written.
 
 </details>
 </details>
@@ -127,8 +127,7 @@ info: Function defined here
 
 The type checker pinpoints the mistake the chapter describes. `"3"`
 is a `str`, not an `int`, so it violates `width: int`. The call still
-runs without error at runtime, because `"3" * 4` is valid string
-repetition.
+completes at runtime, because `"3" * 4` is valid string repetition.
 
 In the book, the `# type: ignore` comment on the `area("3", 4)` line
 lets a deliberately wrong example pass the book's build. Removing the
@@ -427,7 +426,7 @@ to change the allowed set, against following the name to see what
 the set is.
 
 **Widen the set at its definition.** Adding `"purple"` to the alias removes the error at every
-call. `grid[cell] = color` needs no change, since `Grid`'s values are
+call. `grid[cell] = color` works as written, since `Grid`'s values are
 `str` and every `Color` is a `str`.
 
 </details>
@@ -516,8 +515,8 @@ is `unresolved-attribute` rather than an argument-type error. The type
 checker does not say "you may not append a `Square` here." It says the
 type you declared has no such operation.
 
-The one edit shows both sides of variance. A container you can write
-to is invariant, and giving up the writes makes it covariant. The
+The one edit shows both sides of variance. A writable container is
+invariant, and giving up the writes makes it covariant. The
 practical rule follows: annotate a parameter with the weakest type
 the body needs, because each capability you declare rejects the
 callers whose argument lacks it.
@@ -573,8 +572,8 @@ same as `is not None` does, and `.upper()` is safe in both versions.
 **Send empty values to the fallback.** The change is in which values reach which branch. `is not None` asks
 one question, whether the value is missing. `if text:` asks a
 different one, whether the value is missing or empty, and answers
-both with `"(nothing)"`. The function can no longer tell an empty
-string a caller passed on purpose from no string.
+both with `"(nothing)"`. The function now treats an empty string a
+caller passed on purpose the same as a missing one.
 
 Whether that matters depends on the caller. The type checker cannot
 tell you, because both versions are type-correct. The truthiness test

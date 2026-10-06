@@ -465,6 +465,7 @@ call opens and closes the file again.
 
 That control matters when the file is large enough that holding it
 costs something, or when you read a stream that has no end.
+
 The closing guarantee is not the difference. `read_text()` opens the
 file in a `with` block of its own, so it closes the file too, whether
 or not the read succeeds. For a configuration file of a few kilobytes

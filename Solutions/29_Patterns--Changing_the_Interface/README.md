@@ -281,8 +281,8 @@ or imports the decorator under a private name,
 `from record import record as _record`, and writes `@_record`.
 
 The class version differs in one way that matters. `Facade` is a
-namespace the language does not treat as one. `Facade.start_car` and
-`shop.start_car` read identically at the call site, but you must
+namespace the language does not treat as one. `Facade.start_car()` and
+`shop.start_car()` read identically at the call site, but you must
 define the class, import it, and carry it around. `@staticmethod`
 exists only to stop Python passing `self` to functions that do not
 use it.
@@ -326,8 +326,8 @@ arguments and returns the same result. What you lose is the log. That
 is the *Decorator* row: same interface, added behavior, and the
 behavior disappears.
 
-**The `read()` wrapper is an *Adapter*.** Its interface is not the
-wrapped object's. The caller asks for `read()`, and the wrapped object
+**The `read()` wrapper is an *Adapter*.** Its interface differs from
+the wrapped object's. The caller asks for `read()`, and the wrapped object
 offers `next_chunk()` instead, so the wrapper exists to make one type
 fit a caller that expects another. If you remove it, you lose only the
 fit, and without the fit the call no longer resolves. An *Adapter*
@@ -521,8 +521,8 @@ the type to the union, which an override may do, and it accepts the
 keyword every `WhatIUse` caller uses. The last call passes a
 `WhatIHave` by that keyword and reaches the adapter.
 
-With the `/` in place, as in `adapter.py`, no caller can pass the
-parameter by name, so the override is free to call it `item`.
+With the `/` in place, as in `adapter.py`, every caller must pass
+the parameter by position, so the override is free to call it `item`.
 A positional-only parameter keeps its name out of the interface,
 and an override can then change the name.
 

@@ -245,7 +245,8 @@ def charge(item: Priced) -> float:
 <summary>Solution</summary>
 
 If you change the annotation on `Package.total()` to `Weight` and leave `return self.weight_kg` as it is,
-`ty` reports an `invalid-return-type` error on that line: it expected `Weight` and found `float`.
+`ty` reports an `invalid-return-type` error on that line.
+The type checker expected `Weight` and found `float`.
 A `float` is not a `Weight` until `Weight()` marks it as one.
 The solution wraps the return value in `Weight(...)`, a call that returns the same float at runtime.
 
@@ -542,7 +543,7 @@ a type error instead of a runtime failure.
 <details>
 <summary>Where to look</summary>
 
-[Null Object](../../Chapters/20_Patterns--Rethinking_Objects.md#null-object) shows `NullLogger` standing in for a real logger with the same methods and neutral behavior.
+[*Null Object*](../../Chapters/20_Patterns--Rethinking_Objects.md#null-object) shows `NullLogger` standing in for a real logger with the same methods and neutral behavior.
 Declare a `Cache` protocol with `get()` and `set()`, then write `NullCache` to satisfy it.
 Its `get()` reports a miss, and its `set()` discards the value.
 
@@ -794,7 +795,8 @@ def fill(stack: Stack, count: int) -> int:
 <summary>Solution</summary>
 
 If you have `push()` return `False` when the stack is full,
-`ty` reports an `invalid-method-override` error: `bool` is not assignable to the `None` that `Stack.push()` returns.
+`ty` reports an `invalid-method-override` error.
+The override's `bool` is not assignable to the `None` that `Stack.push()` returns.
 `fill()` ignores the return value, so it returns 2 with no sign that three pushes failed.
 A refusal by return value is still a refusal,
 so the solution's `push()` accepts every item and leaves the question of fullness to `full()`.
@@ -853,7 +855,7 @@ classes without an exception.
 
 You gave up the refusal. The original `BoundedStack` guarantees that
 it accepts at most two items. This version guarantees only that it
-*keeps* at most two. A caller who pushes five items loses three
+keeps at most two. A caller who pushes five items loses three
 of them silently, and `fill()` returns 2 where a caller counting on
 `Stack` expects 5. That loss is the right behavior for a ring buffer of
 recent events and the wrong behavior for a queue of work that must keep

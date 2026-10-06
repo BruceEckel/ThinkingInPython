@@ -155,7 +155,7 @@ leap year.
 
 [Composing Types from Types](../../Chapters/12_Techniques--Data_Classes_as_Types.md#composing-types-from-types) puts the check for `EmailAddress` in `__post_init__()`.
 Strengthen it there with two calls to `check()`: one that counts the `@` characters, and one that splits the text with `str.partition()` and tests both halves.
-The tests feed it each shape the new check should reject.
+The tests feed `EmailAddress` each shape the new check should reject.
 
 <details>
 <summary>The shape</summary>
@@ -619,7 +619,7 @@ stays validated across a replacement for the same reason. Any
 
 [A Real `ClassVar`](../../Chapters/12_Techniques--Data_Classes_as_Types.md#d-a-real-classvar) shows how `@dataclass` treats an annotation marked `ClassVar`.
 It skips that name when it builds the fields and the `__init__()` parameters, so check `fields()` and `inspect.signature()`.
-For the frozen question, compare the target of `Stars.built += 1` with the target of `self.built += 1`, and which of the two `frozen=True` guards (see [Immutability](../../Chapters/12_Techniques--Data_Classes_as_Types.md#immutability)).
+For the frozen question, compare the target of `Stars.built += 1` with the target of `self.built += 1`, and ask which of the two [`frozen=True`](../../Chapters/12_Techniques--Data_Classes_as_Types.md#immutability) guards.
 
 <details>
 <summary>The shape</summary>

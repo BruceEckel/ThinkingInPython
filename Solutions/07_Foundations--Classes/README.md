@@ -103,7 +103,8 @@ to `5.0`, so it computes `5.0 / -2 == -2.5` and the setter rejects
 
 [Static and Class Methods](../../Chapters/07_Foundations--Classes.md#static-and-class-methods) shows `from_fahrenheit()` as a `@classmethod` that converts its argument and returns `cls(...)`.
 Write `from_kelvin()` the same way with the formula from the exercise.
-Compare the two results with `round()`, since floating-point arithmetic can miss by a last digit: `310.0 - 273.15` gives `36.85000000000002`.
+Compare the two results with `round()`, since floating-point arithmetic can miss by a last digit.
+`310.0 - 273.15` gives `36.85000000000002`.
 
 <details>
 <summary>The shape</summary>
@@ -353,9 +354,9 @@ print(n.average)
 message, and stores `30` on the instance.
 
 **Reuse the cached value.** `average`'s body then
-reads `self.total` and gets that stored value. No second
-`"summing"` message appears, because `total` is computed and
-cached before `average` asks for it. If you access `average`
+reads `self.total` and gets that stored value. The `"summing"`
+message appears once, because the `n.total` access computes and
+caches `total` before `average` asks for it. If you access `average`
 first, its body reads `self.total`, which computes `total` the same
 way, on first use instead of in advance.
 
@@ -425,7 +426,8 @@ print(f"{t} is {t!r}")
 
 **Supply the fallback form.** With `__repr__()` defined and no
 `__str__()`, `print(t)` and the printed list both show
-`Temperature(21.0)`. `print()` finds no `__str__()` and falls back to
+`Temperature(21.0)`. `print()` calls the `__str__()` that
+`Temperature` inherits from `object`, and that method calls
 `__repr__()`.
 
 **Add a readable form for users.** Adding `__str__()` makes the two outputs differ.
@@ -499,12 +501,12 @@ Derived().show()
 Nothing overrides anything. `shwo()` is a new method in the subclass,
 and `show()` resolves up the chain to `Base`. Python does not check
 whether you meant a subclass method to replace a base-class method,
-so the misspelling is not an error. `shwo()` is a second method that
+so it accepts the misspelling. `shwo()` is a second method that
 nothing calls.
 
 **Declare the intended override.** With `from typing import override` added and the decorator
 uncommented, the program still prints `Base.show`,
-because the decorator adds no wrapper and changes no behavior. The
+because at run time the decorator returns the method it receives. The
 type checker reports the difference:
 
 ```text

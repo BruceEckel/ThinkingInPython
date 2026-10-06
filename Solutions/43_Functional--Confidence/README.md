@@ -97,7 +97,8 @@ not belong in a `#:` marker in the book.
 <summary>Where to look</summary>
 
 In [Concurrency](../../Chapters/19_Techniques--Concurrency.md#one-executor-interface-three-pools), the pools share one `map()` interface.
-Swap in `ThreadPoolExecutor`; the serial comparison and the core count can go, and smaller limits keep the run short.
+Swap in `ThreadPoolExecutor`.
+The serial comparison and the core count can go, and smaller limits keep the run short.
 Think about what threads share that processes do not, and which function reports an identity per thread.
 
 <details>
@@ -475,7 +476,9 @@ E           )
 Two students cannot fill a group of three, so the empty group the
 guard adds collects nobody and the left side of the assertion is
 `[]`. The report shows that shrunk case rather than whatever wide
-random roster failed first. The names vary from run to run. Hypothesis
+random roster failed first.
+
+The names vary from run to run. Hypothesis
 shrinks a generated string toward a longer run of `a` before it
 reaches a second letter, so `'aa'` arrives as readily as `'b'`. Now
 and then a run stops at a different shape, three students in groups
@@ -565,7 +568,7 @@ print(timeout_pure({"TIMEOUT": "5"}), timeout_pure({}))
 
 Neither impure function assigns to anything, which is the lesson.
 `global` is the loud way to break referential transparency. `stale()`
-and `timeout()` are quiet ones. Both *read* state the caller cannot
+and `timeout()` are quiet ones. Both read state the caller cannot
 see.
 
 **Take the time without declaring it.** The substitution that breaks `stale()` is replacing a call with the

@@ -376,10 +376,12 @@ function version. `singledispatchmethod` routes on the type of the
 first argument after `self`.
 
 **Move the operation onto an object.** What changes is where the operation lives. `recycling_note()`
-is now a method you call as `sorter.recycling_note(t)`. That matters
-if `Sorter` holds state of its own (a log of notes issued, a
-configuration, statistics) alongside the dispatch. When `Sorter`
-carries no such state, as here, the function in `recycling_note.py`
+is now a method you call as `sorter.recycling_note(t)`.
+
+The method form matters if `Sorter` holds state of its own (a log of
+notes issued, a configuration, statistics) alongside the dispatch.
+When `Sorter` carries no such state, as here, the function in
+`recycling_note.py`
 is simpler and does the same job. Use `singledispatchmethod` once the
 operation needs a home on an object.
 
@@ -515,8 +517,9 @@ probe on the exact class, so `CrushedAluminum` is a new key and gets a
 bin of its own.
 
 **Resolve the note through the MRO.** `singledispatch` resolves through the MRO instead, finds no
-registration for `CrushedAluminum`, and takes `Aluminum`'s. Both
-behaviors are deliberate, and neither is a fallback. The sorter must
+registration for `CrushedAluminum`, and takes `Aluminum`'s.
+
+Both behaviors are deliberate, and neither is a fallback. The sorter must
 know exactly what arrived, and the note takes the nearest answer
 anyone has written.
 

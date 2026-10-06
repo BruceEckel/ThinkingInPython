@@ -180,7 +180,7 @@ exercise 4 examines, rejects `bpackage`.
 <summary>Where to look</summary>
 
 [Watching the Deferral](../../Chapters/06_Foundations--Modules_and_Packages.md#watching-the-deferral) runs a `lazy import` of a module that prints when it loads.
-A `lazy import` binds the name without running the module.
+A `lazy import` binds the name and defers running the module.
 The body runs when the name is first used, so order your uses and your `print()` calls to watch the messages appear.
 
 <details>
@@ -238,8 +238,8 @@ print("after both")
 #: after both
 ```
 
-Although the `lazy import noisy` line comes first, `noisy`'s body does
-not run until `noisy.announce()` executes, and that call comes after
+Although the `lazy import noisy` line comes first, `noisy`'s body
+waits for `noisy.announce()`, and that call comes after
 `noisy2.announce()`. Each `lazy import` reserves the name. The module's
 top-level code runs at the first use of that name, so use order, not
 declaration order, decides which module loads first.
@@ -304,7 +304,7 @@ The variable exists for legacy code. Leave it unset in new code.
 A Python environment variable turns the check off, so the check is
 Python's rather than the filesystem's.
 
-None of this arises if you follow the convention.
+Following the convention avoids all of this.
 [File Names](../../Chapters/06_Foundations--Modules_and_Packages.md#file-names)
 recommends `snake_case` for modules, and with an all-lowercase name,
 an import and its file cannot differ in case.
@@ -496,12 +496,12 @@ item.
 
 **Replace the module's list.** The assignment `plugin_list.plugins = []` rebinds the module's
 name to a second list and leaves the script's name on the first, so
-the second `append()` reaches a list to which the script's `plugins`
-does not refer.
+the second `append()` changes the second list and leaves the script's
+list as it was.
 
 `exercise_7.py` is `from_snapshot.py` with a mutable value. The
-`from` import takes no copy, and it does not follow the module's
-name when that name moves. When a module's name can move to a new
+`from` import takes no copy, and its name stays on the original
+object when the module's name moves. When a module's name can move to a new
 list or dict, import the module and read `plugin_list.plugins` each
 time.
 

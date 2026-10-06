@@ -315,7 +315,7 @@ the class the way it did before any assignment. The assignment and the
 `del` both stay on the instance, so the class attribute keeps its
 `100` throughout.
 
-**Show that deletes stop at the instance.** The second `del a.x` fails because the instance dictionary is empty.
+**Show that deletes stop at the instance.** The second `del a.x` raises an `AttributeError` because the instance dictionary is empty.
 `del` stops at the instance, the way assignment does, so
 `vars(A)["x"]` keeps its `100`. Deleting the class attribute takes
 `del A.x`, naming the class. The asymmetry is the same one assignment

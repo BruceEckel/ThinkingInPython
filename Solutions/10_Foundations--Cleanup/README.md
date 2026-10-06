@@ -119,7 +119,7 @@ last `Counter` object alive and `live_count()` stuck at `1`.
 
 In [Watching Objects Without Holding Them](../../Chapters/10_Foundations--Cleanup.md#watching-objects-without-holding-them), a `WeakValueDictionary` reads like a `dict`.
 Iterate over `cls._instances.values()` in a `@classmethod`, take each `.name`,
-and wrap the result in `sorted()` so the order does not depend on insertion.
+and wrap the result in `sorted()` so the order follows the names, not insertion.
 
 <details>
 <summary>The shape</summary>
@@ -431,7 +431,7 @@ End of program
 B closed
 ```
 
-`B closed` now prints *after* `End of program`, where the chapter's
+`B closed` now prints after `End of program`, where the chapter's
 version prints it at the `del b`. The listing has no marker for it
 because the line arrives during interpreter shutdown, after the book's
 output checker has stopped capturing. The rest of the output matches
@@ -607,7 +607,7 @@ and the `Guarded` demo prints `C closed` twice and no `caught boom`.
 `__enter__()` returns `None` instead of failing,
 so the `with` block runs as though the acquisition succeeded,
 and `__exit__()` releases the resource a second time.
-`ty` reports that version as `invalid-return-type`,
+The type checker (`ty`) reports that version as `invalid-return-type`,
 since the method now always implicitly returns `None` where its annotation declares `Guarded`.
 The solution re-raises the exception, so the caller sees `boom` and the `closed` line prints once.
 

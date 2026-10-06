@@ -210,7 +210,7 @@ print(handle({"type": "key", "key": "Enter"}))
 #: Key Enter
 ```
 
-**Match the inner dictionary.** The new `case` nests a mapping pattern inside a mapping pattern:
+**Match the inner dictionary.** The new `case` nests a mapping pattern inside a mapping pattern.
 `{"at": {"x": x, "y": y}}` matches when `"at"` maps to a dictionary
 that has `"x"` and `"y"` keys, binding both in one step.
 
@@ -617,7 +617,7 @@ still holds `Signal.CAUTION` afterward, so the mistake is
 easy to miss.
 
 Python accepts `case FALLBACK:` only because it is the last case.
-Another case after it fails to compile.
+Python rejects another case after it with a `SyntaxError`.
 
 **Compare through a dotted name.** The first fix gives the constant a dotted name by putting it in a
 namespace. `Defaults.FALLBACK` is a value pattern, so `dotted()`

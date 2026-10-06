@@ -920,7 +920,7 @@ usually the shape of the code, and a full answer for each exercise.
 3.  Use `itertools.islice()` to take the first 10 values of `fibonacci(1_000_000)` without computing the rest.
 4.  `generator_lifecycle.py` returns an empty list on its second pass.
     Fix the caller two ways: collect into a list once and reuse it,
-    then instead convert `squares` into a `Countdown`-style iterable class whose `__iter__()` builds a fresh generator.
+    then instead convert `squares()` into a `Countdown`-style iterable class whose `__iter__()` builds a fresh generator.
     Which fix would you choose for a stream of a million items, and why?
 5.  `tee.py` measures two extremes: one branch drained before the other starts,
     and both branches in lockstep.

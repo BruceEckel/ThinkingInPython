@@ -333,7 +333,7 @@ def mutable_tile(symbol: str) -> MutableTile:
 <details>
 <summary>Solution</summary>
 
-If you assert on the cell through which you made the assignment,
+If you assert on the cell whose `walkable` you set,
 the test passes whether or not the cells share a tile.
 With `@cache` removed from `mutable_tile()`,
 `field[0][0].walkable` is still `False` after the assignment, and no bug shows.
@@ -999,7 +999,7 @@ If you put the lock inside `tile()`, around the sleep and the
 build, the listing's last line prints `4` instead of `1`.
 `@cache` checks the key before the body runs, so all four threads
 miss and then take turns building their own `Tile`.
-The lock orders the builds without preventing any of them.
+The lock orders the builds, and all four still run.
 The solution wraps the call to `tile()`, so the lookup, the build,
 and the store all run under one lock.
 
@@ -1082,7 +1082,7 @@ all four results. `@cache` looks up the key, misses, calls the
 function, and stores the result. No lock spans those steps, so four
 threads that all miss on the same cold key all run the body. The last
 store wins the cache, and every later caller gets that one object,
-while the three losing threads hold objects nothing else sees.
+while the three losing threads hold objects outside the cache.
 
 Nothing here is a `@cache` defect. A cache that holds a lock across
 the call serializes every miss in the program, a worse default than

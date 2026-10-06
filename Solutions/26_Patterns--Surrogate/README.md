@@ -152,7 +152,7 @@ If you increment `self.calls[name]` in `__getattr__()` before the `callable()` t
 the demo still prints `2 1`, because each lookup there leads to one call.
 A lookup without a call counts too.
 Evaluating `p.f is p.f` adds two to `f`'s tally.
-The solution counts inside `counted`,
+The solution counts inside `counted()`,
 so the tally advances at the call, as it does in the chapter's `CountingProxy`.
 
 ```python

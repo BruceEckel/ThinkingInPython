@@ -32,7 +32,7 @@ def tally() -> Generator[Prompt, Amount, Total]:
 If you read the total as the result of the last `send()`,
 writing `total: Total = t.send(Amount(12))` with no `try`,
 the script prints the three prompts and then stops with `StopIteration: 42`.
-`ty` rejects that line before it runs.
+The type checker rejects that line before it runs.
 `send()` returns the `YieldType`,
 so `ty` reports an `invalid-assignment` of a `Prompt` to a `Total`.
 A generator's return value arrives only on its `StopIteration`,
@@ -105,7 +105,7 @@ suspensions with no storage anywhere else. The frame is the state.
 <details>
 <summary>Where to look</summary>
 
-[A Generator Is a Description](../../Chapters/45_Effects--Generators.md#a-generator-is-a-description) explains why `interview()` does not care who answers it.
+[A Generator Is a Description](../../Chapters/45_Effects--Generators.md#a-generator-is-a-description) explains why `interview()` accepts answers from any driver.
 Write the new driver as a loop that fetches the next answer, then calls `send()`.
 Both the answer iterator and the generator signal the end with `StopIteration`, so choose carefully which call sits inside the `try`.
 
@@ -140,9 +140,10 @@ def drive_in_order(
 <summary>Solution</summary>
 
 If you put `next(answers)` inside the `try`, as `drive_naive()` does, a
-short answer source ends the run quietly: given one answer for three
-questions, `drive_naive()` returns `None`, and `ty` reports nothing. The
-`except StopIteration` meant for the conversation catches the one from
+short answer source ends the run quietly. Given one answer for three
+questions, `drive_naive()` returns `None`, and the type checker reports
+nothing. The `except StopIteration` meant for the conversation
+catches the one from
 the exhausted answers and reads it as a finished interview. The
 solution's `drive_in_order()` fetches each reply outside the `try`, so
 the `StopIteration` from the answers reaches the caller.
@@ -230,8 +231,8 @@ print(repr(drive_naive(interview(),
 ```
 
 **Reuse the generator unchanged.** Nothing in `interview()` changes, and nothing could have. It yields a
-`Question` and receives an `Answer` without asking about the answer's
-source. That is the separation the chapter teaches:
+`Question` and receives an `Answer`, whatever the answer's source.
+That is the separation the chapter teaches:
 the generator describes the conversation, and the driver interprets it.
 Swapping one interpreter for another leaves the description untouched.
 
@@ -562,7 +563,7 @@ error[invalid-argument-type]: Argument to bound method
 ```
 
 `next()` takes no such argument. It asks for the generator's next
-yielded value and has nothing to say about the `SendType`, so priming
+yielded value and ignores the `SendType`, so priming
 with it type-checks for any generator whatsoever.
 
 The mismatch is real rather than a type checker limitation. A

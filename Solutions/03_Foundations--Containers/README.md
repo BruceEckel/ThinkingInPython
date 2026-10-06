@@ -369,7 +369,7 @@ print(counts)  # The merge built a new dict
 ```
 
 **Build the dictionary.** `dict()` accepts any iterable of two-item pairs, so a list of tuples
-becomes a dictionary with no loop. `dict(zip(names, values))` is the
+becomes a dictionary in one call. `dict(zip(names, values))` is the
 same constructor fed from two parallel sequences.
 
 **Resolve the collision.** `30` ends up under `"c"`, because `|` resolves a collision in favor of
@@ -411,7 +411,7 @@ For the explanation, compare how many items an unstarred target list requires wi
 If you index instead, writing
 `first, middle, last = row[0], row[1:-1], row[-1]`, the program
 prints the same `1 [2, 3, 4] 5`, but the line uses the indexing the
-exercise rules out. The two forms differ on a one-item list: the
+exercise rules out. The two forms differ on a one-item list. The
 indexed version prints `1 [] 1`, counting the one item as both first
 and last, while `first, *middle, last = [1]` raises a `ValueError`
 (`not enough values to unpack`). The solution uses starred targets,
@@ -520,7 +520,7 @@ builds the same object `frozendict(host="localhost", port=8080)`
 would.
 
 **Look up by an equal key.** The lookup with `same` succeeds because a dictionary finds a key by
-hash and equality, so an equal key need not be the same object.
+hash and equality, so an equal key can be a different object.
 `config` and `same` are separate objects built in different entry
 orders, but they hold the same pairs, so they compare equal and hash
 the same. A `frozendict` key gives you that property. Any equal
@@ -535,9 +535,9 @@ listing.
 the objects to which it maps its keys, not what those objects contain,
 so `hash(nested)` must hash a `list` and fails. The immutability is
 shallow, as it is for the `tuple` in `shallow_immutability.py`.
-`frozendict` is hashable *when its values are*, so keep values
-immutable, a `tuple` here instead of a `list`, whenever the mapping
-serves as a key.
+`frozendict` is hashable when its values are, so keep values
+immutable, a `tuple` here instead of a `list`, whenever you use the
+mapping as a key.
 
 </details>
 </details>

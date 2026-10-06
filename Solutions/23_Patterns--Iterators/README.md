@@ -212,7 +212,7 @@ both rely.
 
 > `generator_lifecycle.py` returns an empty list on its second pass.
 > Fix the caller two ways: collect into a list once and reuse it,
-> then instead convert `squares` into a `Countdown`-style iterable class whose `__iter__()` builds a fresh generator.
+> then instead convert `squares()` into a `Countdown`-style iterable class whose `__iter__()` builds a fresh generator.
 > Which fix would you choose for a stream of a million items, and why?
 
 <details>
@@ -220,7 +220,7 @@ both rely.
 
 [An Exhausted Generator Is Silently Empty](../../Chapters/23_Patterns--Iterators.md#an-exhausted-generator-is-silently-empty) shows the second pass returning nothing.
 One fix stores the values with `list()` once.
-The other turns `squares` into a class
+The other turns `squares()` into a class
 whose `__iter__()` builds a new generator on each call.
 Weigh the two by what each keeps in memory and what each recomputes.
 
@@ -368,7 +368,7 @@ print(f"the wider gap buffers more: {far > near}")
 #: the wider gap buffers more: True
 ```
 
-The buffer grows in proportion to `k`. `tee` holds what the leading
+The buffer grows in proportion to `k`. `tee()` holds what the leading
 branch has consumed and the trailing one has not, so a gap of `k` items
 is a buffer of `k` items, whatever the length of the stream. The two
 measurements in `tee.py` are this rule at its limits. Draining one
@@ -376,20 +376,20 @@ branch first stretches the gap to the whole stream, and lockstep
 consumption shrinks it to a single item.
 
 **Hold the gap at `k` items.** `islice(ahead, k)` opens the gap, and the `zip()` loop holds it there.
-Each step takes one item from each branch, so the buffer neither grows
-nor shrinks through the rest of the run.
+Each step takes one item from each branch, so the buffer keeps its
+size through the rest of the run.
 
 **Compare two gap widths.** One machine measured about
 9,400 bytes at `k` of 100 and about 416,000 at `k` of 10,000. A
 hundredfold wider gap costs roughly forty times the memory rather than
-a hundred, because the smaller figure carries a fixed cost that does
-not grow with `k`, and a short gap pays more per item than a long one.
+a hundred, because the smaller figure carries a fixed cost that stays
+the same at every `k`, and a short gap pays more per item than a long one.
 The difference between the two figures, about 41 bytes per
 buffered item, is the part that tracks `k`.
 
 **Report what holds across machines.** The script prints a boolean rather than the byte counts, since the
 sizes shift between machines and Python builds while their ordering
-does not. Pass `--numbers` to see the figures your machine reports.
+holds. Pass `--numbers` to see the figures your machine reports.
 
 </details>
 </details>
@@ -532,7 +532,7 @@ def traverse(it: GoFIterator[int]) -> list[int]:
 <summary>Solution</summary>
 
 If you pass the endless `OverStream` to `traverse()`,
-the call does not return.
+the call runs forever.
 `traverse()` stops only when `is_done()` reports the end, and `count(1)` has none.
 `seen` gains an item on every step for as long as the call runs.
 The solution calls the four methods in a loop of 50,000 steps instead,
@@ -723,8 +723,7 @@ print(it.peek() is DONE)
 
 You cannot write a bare `peek(it)` function. Reading a value requires
 `next()`, `next()` advances, and nothing in the protocol puts a value
-back. The next value does not exist anywhere you can reach
-without advancing the iterator.
+back. Every path to the next value advances the iterator.
 
 **Buffer one item ahead.** `Peekable` stores what a bare iterator does not: one item, pulled
 early. That one stored item is the difference, and it restores
@@ -736,7 +735,7 @@ because it reads a field rather than the source.
 before any caller asks for a value, so the constructor computes an
 expensive first item whether or not anything uses it. A source that
 blocks on its first read blocks at construction. The early pull is the same
-eagerness `tee`, `OverStream`, and this chapter's other lookahead all
+eagerness `tee()`, `OverStream`, and this chapter's other lookahead all
 pay. Answering a question about the future means fetching the future.
 
 </details>
@@ -834,7 +833,7 @@ yields each string whole instead of iterating over it. The return type
 widens to `Iterator[int | str]` to say so.
 
 `flatten_loop()` takes the identical fix, since `flatten()` and
-`flatten_loop()` differ only in how they re-yield: the same
+`flatten_loop()` differ only in how they re-yield. The fix is the same
 `if isinstance(item, int | str)` test in the same place, with the
 `for x in flatten_loop(item)` branch left alone. The bug is in the
 question each version asks, not in the delegation, which is why
@@ -964,10 +963,10 @@ nothing about `"two"` or the `None`.
 For a parsed log file, take the skipping version. A log is an
 append-only record that many processes write, so a malformed line is
 an expected event rather than a broken contract. One truncated line
-should not cost you the rest of the file. The raising version gives
-the caller no way to resume. The exception ends the generator, so
-continuing means parsing the file again and somehow starting past the
-line that failed.
+should not cost you the rest of the file. The version that raises a
+`TypeError` gives the caller no way to resume. The exception ends the
+generator, so continuing means parsing the file again and somehow
+starting past the line that failed.
 
 That choice has a price, and it is the one this chapter keeps
 revisiting. Skipping is silent, so a filter that quietly drops every
@@ -979,10 +978,10 @@ A generator may decline to produce a value. `typed_skipping()` reaches
 an item of the wrong type and does not `yield`, so the `for`
 loop continues. `__next__()` has no such option. Every call must
 return a value or raise `StopIteration`, so `SkippingIterator` needs
-its own loop to keep pulling until a match arrives. A raising
-`__next__()` needs no loop, since it acts on the one item it just
-read. Generators write the state machine for you, and skipping is
-where you notice.
+its own loop to keep pulling until a match arrives. A `__next__()`
+that raises a `TypeError` needs no loop, since it acts on the one item
+it just read. Generators write the state machine for you, and skipping
+is where you notice.
 
 </details>
 </details>

@@ -758,7 +758,6 @@ Solutions/16_Techniques--Comprehensions/README.md	already: which already chooses
 Solutions/16_Techniques--Comprehensions/README.md	even: even when it returns something useful
 Solutions/16_Techniques--Comprehensions/README.md	only: CODE is still the only name the filter drops
 Solutions/16_Techniques--Comprehensions/README.md	only: CODE is the only element that is both a string and made entirely of digits
-Solutions/16_Techniques--Comprehensions/README.md	only: It collapses only exact duplicates of the normalized form
 Solutions/16_Techniques--Comprehensions/README.md	only: Only the literal in the conditional expression changes
 Solutions/16_Techniques--Comprehensions/README.md	only: Two entries collide only if their normalized strings are equal
 Solutions/16_Techniques--Comprehensions/README.md	want: Which shape is right depends on whether you want the list
@@ -779,7 +778,6 @@ Solutions/18_Techniques--Performance/README.md	only: Only at size CODE does the 
 Solutions/18_Techniques--Performance/README.md	only: Skipping the body is the reason to cache only pure functions
 Solutions/18_Techniques--Performance/README.md	only: The two columns coincide only for a leaf function
 Solutions/18_Techniques--Performance/README.md	only: and the JIT compiles only what the interpreter runs
-Solutions/18_Techniques--Performance/README.md	only: it is slow only because of what it calls
 Solutions/18_Techniques--Performance/README.md	only: since callers read only the front element
 Solutions/18_Techniques--Performance/README.md	only: the element the scan reaches only after walking past every other one
 Solutions/18_Techniques--Performance/README.md	only: which is why the two rankings can name the same function only at the bottom of a call chain
@@ -797,7 +795,6 @@ Solutions/19_Techniques--Concurrency/README.md	only: the interpreter considers s
 Solutions/20_Patterns--Rethinking_Objects/README.md	only: CODE exists only for the type checker
 Solutions/20_Patterns--Rethinking_Objects/README.md	only: CODE gets only the methods you write for it
 Solutions/20_Patterns--Rethinking_Objects/README.md	only: The composed version holds a CODE as a field and exposes only methods you write
-Solutions/20_Patterns--Rethinking_Objects/README.md	only: This version guarantees only that it *keeps* at most two
 Solutions/20_Patterns--Rethinking_Objects/README.md	only: Write CODE to hold a CODE and expose CODE and CODE as read-only properties that return the fields you choose
 Solutions/20_Patterns--Rethinking_Objects/README.md	only: because it asks only for those two properties
 Solutions/20_Patterns--Rethinking_Objects/README.md	only: so the caller changes only the copy
@@ -824,7 +821,6 @@ Solutions/24_Patterns--Singleton/README.md	already: A Module Is Already a *Singl
 Solutions/24_Patterns--Singleton/README.md	already: A Module Is Already a *Singleton* explains that Python caches a module in CODE and runs its body once
 Solutions/24_Patterns--Singleton/README.md	already: A Module Is Already a *Singleton* makes that argument at the top of the chapter
 Solutions/24_Patterns--Singleton/README.md	already: Each is already committed to running the body before the first one takes the lock
-Solutions/24_Patterns--Singleton/README.md	is what: The change from CODE is what the one shared object *is*
 Solutions/24_Patterns--Singleton/README.md	only: **Order only the body
 Solutions/24_Patterns--Singleton/README.md	only: **Rebind only the local name
 Solutions/24_Patterns--Singleton/README.md	only: one-and-only-one CODE list to which any part of the program can append
@@ -858,8 +854,6 @@ Solutions/27_Patterns--Factory/README.md	only: CODE against a Protocol also work
 Solutions/27_Patterns--Factory/README.md	only: Checking only in CODE leaves it open for as long as the caller keeps adding toppings
 Solutions/27_Patterns--Factory/README.md	only: That test works on a CODE only when it is CODE
 Solutions/27_Patterns--Factory/README.md	only: The original CODE draws only from that list
-Solutions/27_Patterns--Factory/README.md	only: and a factory that should build only leaf classes needs a further filter
-Solutions/27_Patterns--Factory/README.md	only: and discovers the problem only when CODE finally runs
 Solutions/27_Patterns--Factory/README.md	only: and only when something mutates them in place
 Solutions/27_Patterns--Factory/README.md	only: but only on its second assertion
 Solutions/27_Patterns--Factory/README.md	only: so only the type checker reports the missing CODE
@@ -870,7 +864,6 @@ Solutions/28_Patterns--Function_Objects/README.md	already: CODE's CODE already c
 Solutions/28_Patterns--Function_Objects/README.md	itself: A base class pays for itself when the commands share implementation
 Solutions/28_Patterns--Function_Objects/README.md	never: A CODE is never a root
 Solutions/28_Patterns--Function_Objects/README.md	only: and a callable has only one call
-Solutions/28_Patterns--Function_Objects/README.md	only: and only that fix keeps the value private
 Solutions/28_Patterns--Function_Objects/README.md	want: You then want the original behavior
 Solutions/29_Patterns--Changing_the_Interface/README.md	already: A module is already a namespace
 Solutions/29_Patterns--Changing_the_Interface/README.md	only: A positional-only parameter keeps its name out of the interface
@@ -914,7 +907,6 @@ Solutions/34_Patterns--Composite_and_Interpreter/README.md	itself: The derivativ
 Solutions/34_Patterns--Composite_and_Interpreter/README.md	only: A child gets parentheses only when its own operator binds more loosely than what the parent needs
 Solutions/34_Patterns--Composite_and_Interpreter/README.md	only: A subexpression adds parentheses only when its own precedence is lower than the context in which it sits
 Solutions/34_Patterns--Composite_and_Interpreter/README.md	only: CODE now answers only for an CODE
-Solutions/34_Patterns--Composite_and_Interpreter/README.md	only: Only its shape is
 Solutions/34_Patterns--Composite_and_Interpreter/README.md	only: because an CODE can combine its children's values only *after* the children have produced them
 Solutions/34_Patterns--Composite_and_Interpreter/README.md	only: where CODE yields only file paths
 Solutions/35_Patterns--Flyweight/README.md	itself: and the pool empties itself with no explicit cleanup
@@ -991,7 +983,6 @@ Solutions/45_Effects--Generators/README.md	only: put inside the CODE only the ca
 Solutions/45_Effects--Generators/README.md	want: That is the argument for annotating a local whose value comes from a call whose return type you want to pin down
 Solutions/46_Effects--Stateless/README.md	already: which CODE reads as "already returned
 Solutions/46_Effects--Stateless/README.md	is what: and that is what structural typing means
-Solutions/46_Effects--Stateless/README.md	only: Only CODE has *interpreted* what it caught
 Solutions/46_Effects--Stateless/README.md	only: Only the return type changes
 Solutions/46_Effects--Stateless/README.md	only: Removing the only CODE in the body leaves no CODE anywhere
 Solutions/46_Effects--Stateless/README.md	only: The annotation is the only place the distinction exists

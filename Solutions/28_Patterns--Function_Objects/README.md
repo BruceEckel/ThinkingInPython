@@ -304,9 +304,9 @@ that reports its reason needs a failure value with room for the reason.
 returns `float | Failed`.
 
 **Report each way to fail.** A finder has more than one way to fail.
-`bisection()` gives up at once when the interval holds no sign change,
-and it can also run out of iterations, so each failing `return`
-states its own reason.
+`bisection()` gives up at once when `f` has the same sign at both ends
+of the interval, and it can also run out of iterations, so each
+failing `return` states its own reason.
 
 **Tell a root from a failure.** `solve()` tells a root from a `Failed`
 with `match`. `case Failed(reason)` prints the reason and lets the
@@ -318,8 +318,10 @@ is never a root, so `float | Failed` says which result is which, and
 
 **Name each attempt.** `finder.__name__` reads the function's own name, since every function
 carries its name as an attribute, so the report needs no extra
-bookkeeping to say which handler ran. That name is why `chain` needs a
-`Protocol` here instead of an alias like the chapter's `RootFinder`.
+bookkeeping to say which handler ran.
+
+Reading `finder.__name__` is why `chain` needs a `Protocol` here
+instead of an alias like the chapter's `RootFinder`.
 `Callable[...]` describes what a handler accepts and returns, and
 says nothing about a name, so `ty` rejects `finder.__name__` on a
 handler annotated that way (Pyright allows it, inferring the
@@ -577,7 +579,7 @@ prints the same four lines, but each read of a missing class inserts an
 empty list. After the demo, `bus._handlers` holds three keys,
 `Deposit`, `BigDeposit`, and `object`, where the solution's bus holds
 two. The solution reads with `.get(cls, [])`, which returns an empty
-list without storing it.
+list and leaves `_handlers` as it was.
 
 ```python
 # exercise_5.py
@@ -770,8 +772,9 @@ lambdas. They read the variable they name, at the moment of the call.
 work the same way. Each one evaluates `n` while the loop is still
 running and stores the result. `lambda n=n:` evaluates the default at
 definition. `partial(print, n)` evaluates the argument where it appears.
-`make(n)` gives each lambda its own `n` in its own function scope, and
-only that fix keeps the value private. `lambda n=n:` exposes the value
+`make(n)` gives each lambda its own `n` in its own function scope.
+
+Only `make(n)` keeps the value private. `lambda n=n:` exposes the value
 as a parameter a caller can override, and `partial(print, n)` passes the
 value straight to `print()`.
 

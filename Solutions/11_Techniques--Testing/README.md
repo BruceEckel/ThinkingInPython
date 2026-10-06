@@ -159,7 +159,7 @@ tolerance.
 <summary>Where to look</summary>
 
 [Fixtures Replace Setup and Teardown](../../Chapters/11_Techniques--Testing.md#fixtures-replace-setup-and-teardown) shows a fixture that `yield`s its value, with teardown code after the `yield`.
-Create and fund the `Account` before the `yield`, and put the `assert` on its balance after it.
+Create and fund the `Account` before the `yield`, and put the `assert` on its balance after the `yield`.
 Annotate the fixture as returning an `Iterator[Account]`, then name it as a parameter in two tests.
 
 <details>
@@ -214,12 +214,12 @@ Code after a fixture's `yield` runs as teardown, once the test function
 that uses the fixture finishes, whether it passes or raises an
 exception. Here that teardown is an assertion, so it doubles as a
 check. No matter what either test does to the account,
-`never_negative`'s balance must still be non-negative once the test
+`never_negative`'s balance must still be zero or more once the test
 body returns control to the fixture.
 
 **Share the check across tests.**
 Both tests pass the same
-invariant check, with no assertion duplicated in either test body.
+invariant check, and the assertion appears once, in the fixture.
 
 </details>
 </details>
@@ -395,7 +395,7 @@ def test_injected() -> None:
 ```
 
 **Answer with a canned response.**
-Both tests pass and neither touches the network. The stub is the same
+Both tests pass and stay off the network. The stub is the same
 function in both: a fetcher returning a `BytesIO` that behaves enough
 like a response to satisfy the `with` block and `.read()`.
 
@@ -414,7 +414,7 @@ receives.
 
 That separation is the same lesson exercise 4 draws from the environment
 variable, applied to a different kind of dependency. A patched test
-depends on the *name* of the thing it replaces, in the module where that
+depends on the name of the thing it replaces, in the module where that
 name lives. An injected test depends only on the shape of what it
 passes. Renaming the import, moving the call into a helper module, or
 importing `urlopen` a different way breaks the patched test while

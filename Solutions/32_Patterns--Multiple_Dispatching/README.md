@@ -473,7 +473,7 @@ equals its string value.
 
 In `test_paper_scissors.py`, once its two imports name modules that
 include `Lizard`, the test needs two changes. One is the sixteen-entry
-`EXPECTED`. The other is in the `compete()` helper: each of those
+`EXPECTED`. The other is in the `compete()` helper. Each of those
 modules defines its own `Outcome`, so the chapter's
 `isinstance(result, Outcome)` assertion fails, and the solution's
 `compete()` drops that assertion and returns `str`.
@@ -501,7 +501,7 @@ cases per module where it reported nine.
 
 In the chapter's `arena.py`, `item_pair_gen()` is a generator, so its body runs only as you iterate over it.
 When the caller passes no `Counter`, create a fresh one so the body has a single path.
-Increment the count for each item inside the loop, before the `yield`, and the caller's own `Counter` fills as the loop consumes the pairs.
+Increment the count for each item inside the loop, before the `yield`, so the caller's own `Counter` fills as the loop consumes the pairs.
 
 <details>
 <summary>The shape</summary>
@@ -657,8 +657,8 @@ before, unpacking a plain `(item1, item2)` pair each time.
 caller that wants the tally needs to pass its own `Counter` in. The
 generator then updates that same object in place on every pair it
 produces, one increment per item, so the caller can read
-`counts["Lizard"]` at any point during or after the loop, without
-`item_pair_gen()` needing to change what it yields.
+`counts["Lizard"]` at any point during or after the loop, while
+`item_pair_gen()` keeps yielding the same pairs.
 
 </details>
 </details>
@@ -761,8 +761,8 @@ negative of every reflected subtraction. `__radd__()` hides that swap
 because addition commutes, so the mistake gives the right answer
 there and the wrong answer here.
 
-**Decline an unsupported operand.** `"ten" - Meters(3)` finds no `str.__sub__`, so Python goes
-straight to `Meters.__rsub__`, which returns `NotImplemented` for a
+**Decline an unsupported operand.** `"ten" - Meters(3)` finds no `str.__sub__()`, so Python goes
+straight to `Meters.__rsub__()`, which returns `NotImplemented` for a
 `str`. With both sides declining, Python raises the `TypeError`, and
 the message names both types. Returning `NotImplemented` rather than
 raising an exception makes that message possible. An exception raised
@@ -1245,7 +1245,7 @@ class Project2:
 
 If you leave `compete()` out of `Weapon`,
 the program prints the same two lines, since every weapon class defines its own.
-The type checker does not accept the change:
+The type checker rejects the change.
 `ty` reports an `unresolved-attribute` at `battle()`'s call, because `get_weapon()` returns a `Weapon`,
 and an `invalid-explicit-override` at each of the six `@override` decorators.
 The solution declares `compete()` on the base,
@@ -1459,8 +1459,8 @@ so `Jargon.eval_play()` returns `WIN` because play beats jargon.
 
 **Resolve both weapon types.**
 `battle()` starts the two dispatches.
-`a.get_weapon().compete(...)` resolves the first weapon's type,
-and that class's `compete()` calls the `eval_*()` method named for it on the second weapon,
+`a.get_weapon().compete(...)` resolves the first weapon's type.
+That class's `compete()` calls the `eval_*()` method named for it on the second weapon,
 and that second call resolves the second type.
 
 Six weapons take 42 methods,
@@ -1574,7 +1574,7 @@ OUTCOME: Final[
 If you read `wet` in the two cells without their `isinstance()` tests,
 the demo prints the same five lines,
 because the lookup reaches each cell with a `Paper` in the position it reads.
-The type checker still rejects the access:
+The type checker still rejects the access.
 `ty` reports an `unresolved-attribute` in each cell,
 since a cell's parameters are `Item`s and `Item` has no `wet`.
 The solution keeps the tests so that the type checker sees a `Paper` before the attribute access.

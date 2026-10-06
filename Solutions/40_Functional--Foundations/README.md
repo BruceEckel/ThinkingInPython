@@ -10,7 +10,7 @@
 <summary>Where to look</summary>
 
 [Pure Functions](../../Chapters/40_Functional--Foundations.md#pure-functions) explains why `withdraw()` is impure.
-Write `deposit()` with the same `global` statement, then check each half of the definition against it.
+Write `deposit()` with the same `global` statement, then check `deposit()` against each half of the definition.
 Call it twice with the same argument and compare the two results.
 
 <details>
@@ -445,13 +445,13 @@ print(sorted(words, key=lambda w: w[-1]))
 #: ['banana', 'pie', 'kiwi', 'watermelon']
 ```
 
-**Write the expressions inline.** Both comprehensions say what `map()` and `filter()` said, without the
+**Write the expressions inline.** Both comprehensions say what `map()` and `filter()` say, without the
 lambda, and the chapter's rule of thumb picks the comprehension for an
 expression you write inline.
 
 **Change the sort key.** The last letters `a`, `e`, `i`, and `n`
 ascend in list order, so sorting by last letter hands the word list
-back in its original order, where the chapter's `key=len` put `pie` first.
+back in its original order, where the chapter's `key=len` puts `pie` first.
 Check an order like that rather than assuming it.
 
 Dropping the `list()` is the part that surprises:
@@ -666,7 +666,7 @@ The unit lives only in the field name. A stage that changes what a
 value means must run after every stage that reads the old meaning.
 
 **Show the input untouched.** `report()` and `converted_first()` both
-read `data` and neither writes it, so the Celsius values stay the same
+read `data` and leave it as it was, so the Celsius values stay the same
 after three traversals, and you can run either function again and get
 the same answer.
 

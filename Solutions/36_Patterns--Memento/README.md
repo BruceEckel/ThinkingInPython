@@ -510,7 +510,7 @@ when the assertion runs, because `draw("b")` appended to the one list
 
 In [The Caretaker: a Generic History](../../Chapters/36_Patterns--Memento.md#the-caretaker-a-generic-history), `undo()` moves the present into the future list, which makes redo work.
 Build `goto()` on top of `undo()` in a loop.
-Check the distance against the length of the past before the first step, so a bad request changes nothing.
+Check the distance against the length of the past before the first step, so a bad request leaves the history as it was.
 Raise an `IndexError` for a distance out of range.
 
 <details>
@@ -877,8 +877,9 @@ class written to reject it.
 **Run the validation on replace.** `copy.replace()`, which the chapter's partial restore uses, behaves
 differently. It goes through `__replace__()`, which constructs a real instance
 and therefore runs `__post_init__()`, so `__post_init__()` catches the
-invalid state the moment anything derives a new state from it. That is
-the general shape. A constructor validates the value that enters your
+invalid state the moment anything derives a new state from it.
+
+In general, a constructor validates the value that enters your
 program through it, while a deserializer hands the value straight in.
 `msgspec` and `pydantic` exist to close that gap.
 
