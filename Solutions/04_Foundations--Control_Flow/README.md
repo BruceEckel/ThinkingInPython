@@ -426,7 +426,7 @@ this," and `from` alone fills that one in. `from None` sets
 <details>
 <summary>Where to look</summary>
 
-[Context Managers](../../Chapters/04_Foundations--Control_Flow.md#context-managers) explains what the `with` block does on entry and exit, and names `read_text()` and `write_text()` for small files.
+[Context Managers](../../Chapters/04_Foundations--Control_Flow.md#context-managers) explains what the `with` block does on entry and exit, and names `read_text()` and `write_text()` for reading or writing a whole file in one call.
 Call `read_text()` on the `Path` and split the result into lines.
 To compare the two forms, consider what the file object lets you do between the open and the close.
 

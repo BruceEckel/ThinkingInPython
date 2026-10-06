@@ -370,8 +370,9 @@ print(built)
 #: [2, 4, 6]
 ```
 
-**Compute the products eagerly.** The lines print in the same order as in `genexp_timing.py`, and the
-last one changes from `[10, 20, 30]` to `[2, 4, 6]`. A list
+**Compute the products eagerly.** The lines print in the same order as in `genexp_timing.py`.
+The listing renames the second message to `list created`, and the
+last line changes from `[10, 20, 30]` to `[2, 4, 6]`. A list
 comprehension does all its work on the line where it appears. It
 calls `source()`, reads `factor` while `factor` is `2`, and stores
 the three products in `built`. The later `factor = 10` has nothing

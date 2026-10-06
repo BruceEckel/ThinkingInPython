@@ -101,6 +101,9 @@ class Month(Enum):
         check(day.n <= max_days, f"Day({day.n})",
               f"is past the end of {self.name}")
 
+    def __repr__(self) -> str:
+        return self.name
+
 @dataclass(frozen=True)
 class BirthDate:
     month: Month
@@ -783,6 +786,10 @@ class Subscripted:
 <details>
 <summary>Solution</summary>
 
+The listing cuts `Month` down to `name` and `n`, builds two months in
+place of twelve, and puts the new field on three variants (`Broken`,
+`Bare`, and `Subscripted`) that stand in for the chapter's `Months`.
+
 ```python
 # exercise_7.py
 from dataclasses import dataclass, field
@@ -829,8 +836,8 @@ unhashable object, and raises a `ValueError` naming the fix.
 `Bare` and `Subscripted` both work, and they differ in what `ty`
 sees. For `field(default_factory=dict)` `ty` infers `Unknown`, a type
 that satisfies any annotation, so `ty` does not compare the factory
-against the field. Checkers differ here. Pyright and mypy
-both compare the bare factory and reject a mismatched one.
+against the field. Checkers differ here. Pyright compares the
+bare factory and rejects a mismatched one.
 
 **Give the checker a return type.**
 `dict[str, Month]` is callable too, and its return type is concrete, so

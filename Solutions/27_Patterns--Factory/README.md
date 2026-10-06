@@ -74,9 +74,16 @@ class Shape(ABC):
     @abstractmethod
     def draw(self) -> None: ...
 
+    @abstractmethod
+    def erase(self) -> None: ...
+
 class _Triangle(Shape):
     @override
     def draw(self) -> None:
+        ...
+
+    @override
+    def erase(self) -> None:
         ...
 
     class Factory:
@@ -179,10 +186,17 @@ class Shape(ABC):
     @abstractmethod
     def draw(self) -> None: ...
 
+    @abstractmethod
+    def erase(self) -> None: ...
+
 class _Triangle(Shape):
     @override
     def draw(self) -> None:
         print("Triangle.draw")
+
+    @override
+    def erase(self) -> None:
+        print("Triangle.erase")
 
     class Factory:
         def create(self) -> _Triangle:
@@ -732,7 +746,9 @@ check fails. `damaged` still prints `Stars(13)` after `f1()` raises a
 
 [Self Registration](../../Chapters/27_Patterns--Factory.md#self-registration) fills the registry from `__init_subclass__()`, which runs when a `class` statement executes.
 A class registers itself only when its module runs, so a module that nothing imports contributes nothing.
-To restore the old key list, make `registry_demo.py` import `extra_shapes`, and read [Hazards of Self Registration](../../Chapters/27_Patterns--Factory.md#hazards-of-self-registration) for why that import needs a comment for the linter.
+To restore the old key list, make `registry_demo.py` import `extra_shapes`.
+[Hazards of Self Registration](../../Chapters/27_Patterns--Factory.md#hazards-of-self-registration) says to keep such an import eager, since it exists for its side effect.
+A linter reports that import as unused, so decide what keeps the line in place.
 
 <details>
 <summary>The shape</summary>
@@ -1148,7 +1164,7 @@ of the two.
 <details>
 <summary>Where to look</summary>
 
-[Hiding the Concrete Classes](../../Chapters/27_Patterns--Factory.md#hiding-the-concrete-classes) notes that `__subclasses__()` covers only the first level of inheritance.
+[Simple Factory Method](../../Chapters/27_Patterns--Factory.md#simple-factory-method) notes that `__subclasses__()` covers only the first level of inheritance.
 Compare that with where `_Oval` sits in the hierarchy.
 Write `all_subclasses()` as a recursive generator: yield each direct subclass, then `yield from` a call on that subclass.
 

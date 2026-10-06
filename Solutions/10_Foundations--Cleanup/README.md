@@ -64,13 +64,19 @@ for name in ["First", "Second", "Third"]:
 
 print(Counter.live_count())
 #: 3
+counters.pop()  # Release "Third"
+print(Counter.live_count())
+#: 2
+counters.pop()  # Release "Second"
+print(Counter.live_count())
+#: 1
 counters = []  # Rebind the name instead of calling .clear()
 print(Counter.live_count())
 #: 0
 ```
 
 **Abandon the old list.** `counters.clear()` empties the existing list
-in place, dropping its references to all three `Counter` objects.
+in place, dropping its reference to the last `Counter` object.
 `counters = []` does something different. It points the name
 `counters` at a brand-new, empty list and abandons the old one. Here
 nothing else refers to that old list, so it (and every reference it
@@ -97,7 +103,7 @@ print(other)
 name can see. Rebinding points this one name at a different object,
 and every other name keeps the old one. The two coincide in
 `weak_value.py` because that list has exactly one reference. With two references, rebinding leaves the
-`Counter` objects alive and `live_count()` stuck at `3`.
+last `Counter` object alive and `live_count()` stuck at `1`.
 
 </details>
 </details>
@@ -320,17 +326,19 @@ class Counter:
     def live_count(cls) -> int:
         return len(cls._instances)
 
-counters = [Counter(name)
-            for name in ("First", "Second", "Third")]
+counters = []
+for name in ["First", "Second", "Third"]:
+    counters.append(Counter(name))
+
 print(Counter.live_count())
 #: 3
-counters.pop()
+counters.pop()  # Release "Third"
 print(Counter.live_count())
 #: 3
-counters.pop()
+counters.pop()  # Release "Second"
 print(Counter.live_count())
 #: 3
-counters.clear()
+counters.clear()  # Release "First"
 print(Counter.live_count())
 #: 3
 ```

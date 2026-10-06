@@ -238,7 +238,7 @@ so do the namespaces, since dict equality ignores order.
 <summary>Where to look</summary>
 
 [Returning Multiple Values](../../Chapters/22_Patterns--Data_Transfer_Objects.md#returning-multiple-values) compares a bare tuple with a named record as a return type.
-The broken line reads attributes that a plain tuple lacks, so index it instead.
+The broken line reads the fields by name, and a tuple has no `mean` (its `count` is a method), so index it instead.
 To see what the type checker still catches, try unpacking into the wrong number of names, then swap two names that have different types or the same type.
 
 <details>
@@ -401,15 +401,20 @@ Consider also what `json.dumps()` does with each type.
 **The configuration bag is a `SimpleNamespace`.** Its keys arrive at
 runtime, so no fixed set of fields exists to declare. A `@dataclass`
 or `NamedTuple` needs every field named in the class body before any
-instance exists, which this scenario cannot supply. `SimpleNamespace`
+instance exists, which this scenario cannot supply. A `TypedDict`
+exists to name the keys for the type checker, and here no key is
+known in advance to name. `SimpleNamespace`
 accepts any name at construction or later, which is the looseness the
 scenario needs. The cost is a type checker that cannot catch a typo
 in a key name.
 
 **The grid coordinate is a `NamedTuple`.** It must work as a `dict`
 key, so it must hash, and a `NamedTuple` hashes as long as its fields
-do. A `@dataclass` also hashes by value, but only when frozen (with
-the default `eq=True`), which rules out the mutable `@dataclass`.
+do. A `@dataclass` also hashes by value when frozen (with the
+default `eq=True`), which rules out the mutable `@dataclass`.
+`SimpleNamespace` and a `TypedDict` both fail as keys:
+`SimpleNamespace` compares by contents and defines no hash, and a
+`TypedDict` is a `dict` at runtime, which is unhashable.
 Between a frozen data class and a `NamedTuple` here, the tuple form
 wins on convenience. Unpacking a coordinate as `x, y = point` and
 passing it to code that takes a tuple are both things the scenario
@@ -424,7 +429,9 @@ Types](../../Chapters/12_Techniques--Data_Classes_as_Types.md#a-type-is-a-set-of
 makes `__post_init__()` the method that rejects a value the JSON
 decoder otherwise accepts unchecked. A `TypedDict` matches the shape
 JSON arrives in and names the keys for the type checker, but it is a
-dict at runtime and runs no code, so it cannot validate.
+dict at runtime and runs no code, so it cannot validate. A
+`SimpleNamespace` declares no fields and has no `__post_init__()`, so
+neither the type checker nor the class checks the record.
 
 </details>
 </details>

@@ -11,7 +11,7 @@ with warnings.catch_warnings(record=True) as caught:
     report = Report()  # type: ignore
     class Detailed(Report):  # type: ignore
         pass
-print(report.render())
+    print(report.render())
 #: report
 for entry in caught:
     print(entry.category.__name__, entry.message)

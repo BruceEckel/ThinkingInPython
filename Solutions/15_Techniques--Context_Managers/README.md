@@ -153,7 +153,7 @@ accepts the second form, and that is the design
 <summary>Where to look</summary>
 
 [Combining Context Managers](../../Chapters/15_Techniques--Context_Managers.md#combining-context-managers) shows several managers on one `with` statement, entered left to right.
-Add another `tag("li")` with its own `as` name to the parenthesized list.
+Add another `tag("li")` with its own `as` name to the managers on the `with` line, grouping them in parentheses once they outgrow one line.
 Predict the closing tags before you run it, using the same last-in-first-out rule.
 
 <details>
@@ -533,8 +533,8 @@ runtime, zero included, and a command line is one source of
 such a count.
 
 The `sys.argv` rewrite stays out of the extracted listings, because
-the book's output checker runs every listing inside one process with
-its own arguments, and a script reading `sys.argv` sees the checker's
+the book's output checker runs each listing with `exec()` inside a
+checker process, and a script reading `sys.argv` sees the checker's
 arguments instead. The listing below passes the names to `wrap()`
 as list literals, so the checker can run it, and it shows both cases:
 

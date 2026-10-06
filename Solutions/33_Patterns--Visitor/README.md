@@ -132,7 +132,7 @@ what the `Visitor` hierarchy provides, without the classes.
 [The Pythonic Visitor: singledispatch](../../Chapters/33_Patterns--Visitor.md#the-pythonic-visitor-singledispatch) builds each operation as one `@singledispatch` function with a default and a `register` per exception.
 A new class costs the class plus one registration in every operation where its answer differs from the default.
 A new operation costs one function plus a registration for each flower that differs.
-Count both in lines, then compare with [One Dispatch Is Enough](../../Chapters/33_Patterns--Visitor.md#one-dispatch-is-enough).
+Count both in lines, then compare with [The Expression Problem](../../Chapters/13_Techniques--Pattern_Matching.md#the-expression-problem).
 
 <details>
 <summary>The shape</summary>
@@ -395,8 +395,9 @@ neither mentions `Visits` nor inherits from it, because a `Protocol`
 matches on structure. Any class with a compatible `visit()`
 satisfies `Visits`.
 
-The `Visitor` classes keep the chapter's form. The listing keeps only
-the pollinating half of them.
+The `Visitor` classes keep the chapter's form. The listing keeps
+`Visitor`, `Bug`, `Pollinator`, and `Bee` from them and drops `Fly`
+and the eating half.
 
 The two versions report the `Beetle` mistake at different times. Under
 `Any`, the type checker has nothing to compare `Beetle` against, so

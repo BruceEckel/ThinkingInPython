@@ -9,10 +9,17 @@ class Shape(ABC):
     @abstractmethod
     def draw(self) -> None: ...
 
+    @abstractmethod
+    def erase(self) -> None: ...
+
 class _Triangle(Shape):
     @override
     def draw(self) -> None:
         print("Triangle.draw")
+
+    @override
+    def erase(self) -> None:
+        print("Triangle.erase")
 
     class Factory:
         def create(self) -> _Triangle:

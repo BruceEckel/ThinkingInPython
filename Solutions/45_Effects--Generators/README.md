@@ -179,7 +179,7 @@ def drive_naive(
         answers: Iterator[Answer]) -> Result:
     request = next(conversation)
     while True:
-        try:  # Both next() calls share one except clause
+        try:  # next() and send() share one except clause
             reply = next(answers)
             print(f"{request = }, {reply = }")
             request = conversation.send(reply)
@@ -252,10 +252,10 @@ type is a real hazard when a driver holds both.
 
 **Test a short answer source.** The last two runs show that hazard. Given one answer and three
 questions, `drive_in_order()` lets the `StopIteration` escape, so the
-caller learns the answer source ran dry. `drive_naive()` differs only
-in having `next(answers)` inside the `try`. It catches that same
-exception, reads it as "the conversation finished," and returns
-`stop.value`, which is `None`.
+caller learns the answer source ran dry. `drive_naive()` differs in
+having `next(answers)`, and the `print()` after it, inside the `try`.
+It catches that same exception, reads it as "the conversation
+finished," and returns `stop.value`, which is `None`.
 
 `None` is the wrong answer twice over. The interview did not finish, so
 no `Result` exists, and `None` is not a `Result` in any case. Nothing
@@ -627,7 +627,7 @@ class Digit:
 type Event = Coin | Digit
 type Report = Literal[
     "QUIESCENT", "COLLECTING", "SELECTING",
-    "UNAVAILABLE", "WANT_MORE", "DISPENSED"]
+    "UNAVAILABLE", "NEED_MONEY", "DISPENSED"]
 
 PRICES: Final[dict[str, int]] = {"11": 25, "12": 75}
 STOCK: Final[dict[str, int]] = {"11": 0, "12": 3}
@@ -664,7 +664,7 @@ class Digit:
 type Event = Coin | Digit
 type Report = Literal[
     "QUIESCENT", "COLLECTING", "SELECTING",
-    "UNAVAILABLE", "WANT_MORE", "DISPENSED"]
+    "UNAVAILABLE", "NEED_MONEY", "DISPENSED"]
 
 PRICES: Final[dict[str, int]] = {"11": 25, "12": 75}
 STOCK: Final[dict[str, int]] = {"11": 0, "12": 3}
@@ -688,7 +688,7 @@ def machine() -> Generator[Report, Event]:
         if stock.get(code, 0) == 0:
             event = yield "UNAVAILABLE"
         elif amount < PRICES.get(code, 0):
-            event = yield "WANT_MORE"
+            event = yield "NEED_MONEY"
         else:
             amount -= PRICES[code]
             stock[code] -= 1
@@ -704,7 +704,7 @@ for event in [Coin(25), Digit("1"), Digit("1"), Digit("1"),
 #: Digit(value='1') -> SELECTING
 #: Digit(value='1') -> UNAVAILABLE
 #: Digit(value='1') -> SELECTING
-#: Digit(value='2') -> WANT_MORE
+#: Digit(value='2') -> NEED_MONEY
 #: Coin(cents=50) -> COLLECTING
 #: Digit(value='1') -> SELECTING
 #: Digit(value='2') -> DISPENSED
@@ -731,7 +731,7 @@ the same `Generator` annotation.
 For another state, take the table. The generator's compactness comes
 from the states forming a line, so control flow can express the
 sequence. The two states here that break the line cost something. An
-`if` chain reaches `UNAVAILABLE` and `WANT_MORE`, and each one returns
+`if` chain reaches `UNAVAILABLE` and `NEED_MONEY`, and each one returns
 by looping back to the top, a `goto` written as a `while True`. If you
 add a state reachable from three others, the way the table handles
 `Quit` from every state but `QUIESCENT`, no position in the body

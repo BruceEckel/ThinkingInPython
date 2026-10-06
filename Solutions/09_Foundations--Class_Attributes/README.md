@@ -54,7 +54,7 @@ the class attribute currently holds.
 
 [ClassVar and Inheritance](../../Chapters/09_Foundations--Class_Attributes.md#classvar-and-inheritance) walks one class attribute down a hierarchy.
 A subclass that declares nothing reads through to its base.
-Add `Middle` as a second subclass like `Left`, print all four names at each step, and check which ones move together.
+Add `Middle` as a second subclass like `Left`, print `Middle.shared` beside the others at each step, and check which ones move together.
 
 <details>
 <summary>Solution</summary>
@@ -188,8 +188,8 @@ print(Tally.total)
 ```
 
 **Shadow the class attribute.** `a.total = 99` looks like it should update the shared count, but
-assignment through an instance always writes to the instance, not
-the class. That assignment creates a brand-new instance attribute
+assignment through an instance writes to the instance, not the
+class. That assignment creates a brand-new instance attribute
 named `total` on `a`, which then shadows `Tally.total` for `a`
 specifically.
 
@@ -220,7 +220,7 @@ through an instance.
 <details>
 <summary>Where to look</summary>
 
-[A Shared Mutable Value](../../Chapters/09_Foundations--Class_Attributes.md#a-shared-mutable-value) shows two `Cart` objects appending to one list.
+[A Shared Mutable Value](../../Chapters/09_Foundations--Class_Attributes.md#a-shared-mutable-value) shows two `Cart` objects sharing one list, so one object's append reaches both.
 The fix builds the list per instance with `field(default_factory=list)` from `dataclasses`.
 For the second half, write the bare `[]` default and see whether the `class` statement finishes, and when.
 
@@ -309,7 +309,7 @@ with expected(AttributeError):
 ```
 
 **Remove the shadow.** `del a.x` removes the entry from the instance
-dictionary, which is the only place assignment writes. `vars(a)` is
+dictionary, which is where assignment writes. `vars(a)` is
 empty again, and `a.x` reads `100`, because the lookup falls back to
 the class the way it did before any assignment. The assignment and the
 `del` both stay on the instance, so the class attribute keeps its
@@ -403,7 +403,7 @@ print(vars(c), vars(Counting)["total"])
 **Show where each write went.** `vars(a)` holds `{'total': 1}` and the class still holds `0`, and
 those two facts explain the output. `self.total += 1` expands to
 `self.total = self.total + 1`. The read finds nothing on the instance,
-falls back to the class, and gets `0`. The write then goes where every
+falls back to the class, and gets `0`. The write then goes where a
 write through an instance goes: onto the instance. Each object ends up
 with its own `total` of `1`, shadowing a class attribute that still
 holds `0`.
@@ -491,10 +491,10 @@ what it finds there. `Left.shared is Base.shared` proves they are one
 object, not three equal lists.
 
 Here the mutable-value trap of `shared_mutable.py` meets the
-inheritance rule of `class_var_inheritance.py`. Each is harmless on
-its own. An immutable `ClassVar` survives inheritance because nothing
-can change it in place, and a mutable one in a single class keeps the
-sharing visible. Together they produce a base-class list that every
+inheritance rule of `class_var_inheritance.py`. The inheritance rule
+is harmless on its own. An immutable `ClassVar` survives inheritance
+because nothing can change it in place, and a mutable one in a single
+class keeps the sharing visible. Together they produce a base-class list that every
 subclass writes to and none of them declares.
 
 **Give one subclass its own list.** Giving `Right2` its own `shared = []` splits off `Right2` alone. The

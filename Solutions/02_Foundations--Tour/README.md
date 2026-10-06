@@ -163,17 +163,17 @@ All three forms run, since Python does not enforce a naming convention
 at the language level. What differs is what a reader infers.
 `total` and `flags` say "an ordinary variable that changes,"
 which is what both of these are. `TOTAL_SUM` and `FLAG_BITS` say "a
-constant, fixed for the life of the program," yet the second line of
+constant, fixed for the life of the program," yet the `+=` line of
 `exercise_4_constants.py` changes `TOTAL_SUM`. Neither Python nor
 the linter objects, so the name misleads every reader who trusts it.
 `totalSum` and `flagBits` say nothing about the value. They say the
 author came from Java or JavaScript.
 
-Only the camelCase form breaks
-[Naming Conventions](../../Chapters/02_Foundations--Tour.md#naming-conventions), and it
-is the only one a linter flags. Ruff's PEP 8 checks report `N816`
-for a mixed-case global. The uppercase form is legal style, merely a
-false claim about the value. CapWords stays reserved for class names.
+The camelCase form is the one a linter flags. Ruff's PEP 8 checks
+report `N816` for a mixed-case global. The uppercase form passes the
+linter and still breaks
+[Naming Conventions](../../Chapters/02_Foundations--Tour.md#naming-conventions),
+which reserves uppercase for constants. CapWords stays reserved for class names.
 
 </details>
 </details>

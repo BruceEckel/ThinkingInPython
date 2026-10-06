@@ -345,9 +345,10 @@ Nothing warns you at runtime. The module still imports, the
 assignment succeeds, and the local `settings` holds what you put in
 it. The sharing is simply gone. Each module now reads a different
 dict, with no error to mark the split. Importing the module and
-assigning `config.settings = {...}` replaces the value everyone
-sees, because that assignment rebinds the attribute on the one
-module object rather than a name in your own namespace.
+assigning `config.settings = {...}` replaces the value every reader
+of `config.settings` sees, because that assignment rebinds the
+attribute on the one module object rather than a name in your own
+namespace.
 
 **Silence the deliberate rebinding.** A linter does object, which is why the listing carries
 `# noqa: F811`. Ruff reads the assignment as redefining a name the

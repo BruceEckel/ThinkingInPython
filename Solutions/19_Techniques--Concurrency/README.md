@@ -43,12 +43,15 @@ async def fetch(item: str, delay: float) -> str:
     return item.upper()
 
 async def main() -> None:
+    x = fetch("a", 0.03)
+    print(type(x).__name__)
     results = await asyncio.gather(
-        fetch("a", 0.03), fetch("b", 0.02),
+        x, fetch("b", 0.02),
         fetch("c", 0.01), fetch("d", 0.005))
     print(results)
 
 asyncio.run(main())
+#: coroutine
 #: a: started
 #: b: started
 #: c: started
@@ -151,8 +154,8 @@ version takes their sum, about 0.06 seconds, because the waits run one
 after another.
 
 The list comprehension is not the problem. Calling `fetch()` builds a
-coroutine object and starts nothing. Only `gather()` or a `TaskGroup`
-schedules every coroutine as a task before waiting on any.
+coroutine object and starts nothing. `gather()` and a `TaskGroup`
+schedule every coroutine as a task before waiting on any.
 
 </details>
 </details>
@@ -375,9 +378,9 @@ begins.
 
 Waiting does not create overlap. Suspending does. These five tasks
 spend almost all their time waiting and still run one at a time,
-and `cpu_price()` runs one at a time for the opposite reason: it has no
-`await` to reach. The total run time makes the cost visible. Five
-blocking sleeps of 0.05 seconds take about a quarter second, while
+and `cpu_price()` runs one at a time for the same reason, although it
+spends its time computing: it has no `await` to reach. The total run
+time makes the cost visible. Five blocking sleeps of 0.05 seconds take about a quarter second, while
 five awaited ones take about 0.05.
 
 </details>
@@ -528,9 +531,9 @@ With the guard gone, `parallel_cpu.py` builds its pool at import time:
 ```python
 from concurrent.futures import ProcessPoolExecutor
 
-def cpu_price(order):
+def cpu_price(order: int) -> int:
     total = 0
-    for _ in range(1_000_000):
+    for _ in range(1_000_000):  # Processor work
         total += 1
     return order * 10
 
@@ -540,8 +543,9 @@ with ProcessPoolExecutor() as pool:  # No longer guarded
 print(prices)
 ```
 
-Running it prints a stack of tracebacks, one per worker, each ending in
-the same `RuntimeError`:
+Running it prints one or more tracebacks, one per failing worker, each
+ending in the same `RuntimeError`, above the `BrokenProcessPool` at the
+bottom:
 
     An attempt has been made to start a new process before the
     current process has finished its bootstrapping phase.
@@ -725,7 +729,7 @@ Three workers cover the three producers,
 and `consume()` needs no fourth, because the listing submits it after every producer finishes.
 A run with `max_workers=4` prints the same six lines in the same order.
 
-**Drain in priority order.** The pool may run the three producers on one thread or on two,
+**Drain in priority order.** The pool may run the three producers on one, two, or three threads,
 depending on whether each producer finishes before the pool picks up the next.
 The order in which the six jobs enter the queue can therefore vary, but `PriorityQueue` orders its items by comparing the tuples.
 The drain order is therefore always priority first, `1` before `2`
@@ -874,9 +878,10 @@ that no task had an effect before the failure.
 The distinction matters when the tasks do more than sleep. A group of
 six writes where two fail leaves the successful writes in place, so
 recovery is your problem, not the `TaskGroup`'s.
-[Context Managers](../../Chapters/15_Techniques--Context_Managers.md) and the Effect chapters
-address that recovery from different directions: pairing an action with the cleanup
-that undoes it, so "already finished" still means "still reversible."
+Recovery is code you write:
+[Context Managers](../../Chapters/15_Techniques--Context_Managers.md)
+pairs an action with its cleanup, which releases resources but cannot
+reverse a write that succeeded.
 
 </details>
 </details>
@@ -1391,7 +1396,7 @@ The bridge is `loop.run_in_executor()`, and the `ExceptionGroup` comes from the 
 <details>
 <summary>Solution</summary>
 
-The changed method drops the bridge:
+The changed function drops the bridge:
 
 ```python
 async def process_price(

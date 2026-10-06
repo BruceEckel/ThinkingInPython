@@ -29,7 +29,7 @@ def drive_naive(
         answers: Iterator[Answer]) -> Result:
     request = next(conversation)
     while True:
-        try:  # Both next() calls share one except clause
+        try:  # next() and send() share one except clause
             reply = next(answers)
             print(f"{request = }, {reply = }")
             request = conversation.send(reply)

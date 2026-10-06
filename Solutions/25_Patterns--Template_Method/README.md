@@ -403,7 +403,7 @@ where the timing of a hidden step makes the difference.
 <details>
 <summary>Where to look</summary>
 
-[Hooks and the Misspelled Override](../../Chapters/25_Patterns--Template_Method.md#hooks-and-the-misspelled-override) explains how `@final` marks `run()` as the fixed part of the *Template Method*.
+[The Anchored Algorithm](../../Chapters/25_Patterns--Template_Method.md#the-anchored-algorithm) explains how `@final` marks `run()` as the fixed part of the *Template Method*.
 Override `run()` in a subclass, run the file, then run `ty` over it.
 Compare what each one reports, and ask which of them reads the `@final` marker.
 A `# type: ignore` on the override keeps the listing in the build.
@@ -657,7 +657,7 @@ enforcing it stays where the chapter leaves it: with you.
 <summary>Where to look</summary>
 
 [Hooks and the Misspelled Override](../../Chapters/25_Patterns--Template_Method.md#hooks-and-the-misspelled-override) builds the set of known names inside `__init_subclass__()` from the classes in `cls.__mro__`.
-Add a method to `MyApp`, subclass it with a method name one letter off a known one, and watch which names the check sees.
+Subclass `MyApp`, which defines `report()`, with a method name one letter off a known one, and watch which names the check sees.
 For the narrower version, take the names from `vars(ApplicationFramework)` alone.
 Then test a misspelling of a name that a subclass added.
 

@@ -106,8 +106,8 @@ def test_rat_keeps_one_claim_and_spawns_the_rest() -> None:
         "Rat 1 dead-ends at (0, -1)."]
 ```
 
-**Stand in for the blackboard.** `Rat` imports only the `Recorder`
-`Protocol`, not `Blackboard`, so `FakeBlackboard` satisfies that
+**Stand in for the blackboard.** `Rat` depends only on the `Recorder`
+`Protocol`, not on `Blackboard`, so `FakeBlackboard` satisfies that
 `Protocol` by shape. It defines `claim()`, `spawn()`, `log()`, and
 `next_number()`, and none of the four touches a real `Maze` or
 `asyncio.create_task()`.
@@ -312,7 +312,8 @@ asyncio.run(main())
 ```
 
 **Reuse the chapter's classes.** The classes are the chapter's, trimmed of what the exercise does not
-need: rat numbers, logging, and the file loader.
+need: rat numbers, logging, the task list, `render()`, the
+`Recorder` `Protocol`, and the file loader.
 The structure that matters survives the trim. `claim()` keeps the
 chapter's body word for word, and `explore()` still opens a
 `TaskGroup` and lets `spawn()` add tasks to that group, because new
@@ -703,13 +704,13 @@ yet. Both membership tests therefore pass before either rat calls
 
 Each of the two rats believes it alone claimed the shared cell.
 Both move into it, and that overlap breaks the invariant that no two
-rats cover the same ground. Nothing goes unexplored. Both rats proceed
-from the shared cell and duplicate each other's work from there, while
-`visited` stays correct, because adding the same cell twice to a set
-changes nothing. That correctness is why `test_rats_and_mazes.py`
-passes on the broken version every time. The test asserts the set of
-cells reached. The extra `True` costs the rats wasted effort, two
-tasks tracing overlapping paths. Comparing the count of `True` returns
+rats cover the same ground. Nothing goes unexplored. Here the shared
+cell is `(5, 5)`, where the loop closes, so both rats find every
+neighbor claimed and dead-end there. `visited` stays correct, because
+adding the same cell twice to a set changes nothing. That correctness
+is why `test_rats_and_mazes.py` passes on the broken version every
+time. The test asserts the set of cells reached. The extra `True`
+costs wasted effort: a second rat moves into an occupied cell. Comparing the count of `True` returns
 with the size of `visited` exposes the collision.
 
 The original `claim()` needs no lock because it has no `await`
@@ -968,9 +969,10 @@ class whose `symbol` matches the character it receives, and
 `class Coin(Item)` in `exercise_4.py` puts `Coin` on the list the
 factory searches.
 
-**Act through the shared interface.** `Room` and `GameBuilder` need no change either,
-since both call `occupant.interact(robot, room)` through the
-shared `Item` interface.
+**Act through the shared interface.** `Room` and `GameBuilder` need no change either.
+`Room.enter()` calls `occupant.interact(robot, self)` through the
+shared `Item` interface, and `GameBuilder` gets each occupant from
+`item_factory()`.
 Neither one needs to know which concrete `Item` subclasses exist.
 
 **Give the robot a counter.** `Robot.__init__()` needs one new line, `self.coins = 0`, to have
@@ -1170,8 +1172,10 @@ Nearest-first does not give the shortest tour that eats everything.
 Choosing the closest food each time is a greedy choice made with no
 view of what comes after it, and the maze makes that costly. Two pieces
 of food can sit close together down one dead-end corridor while a
-third sits one step nearer in the opposite direction. Taking the
-single near one first means walking the corridor twice. The shortest
+third sits one step nearer in the opposite direction, with the rest
+of the food far beyond it. Taking the single near one first means
+walking to it, back past the start to the corridor, and out past it
+again. The shortest
 complete tour is a travelling-salesman problem over the food rooms,
 and its first leg is often not the shortest leg available. The greedy
 tour does guarantee that every leg is a shortest path, which is all
@@ -1185,9 +1189,10 @@ breadth-first search guarantees.
 ## 6, 7, and 8: the Chladni plate
 
 The last three exercises all shake the same plate, so this file
-carries the chapter's `chladni.py` once, with one change: `Plate`
+carries the chapter's `chladni.py` once, with two changes: `Plate`
 takes the field function as a constructor argument instead of calling
-the module-level `amplitude()`. That argument makes exercise
+the module-level `amplitude()`, and the module adds `membrane()`
+beside `amplitude()`. That argument makes exercise
 7's different physics a second function rather than an edit, so both
 functions can run side by side in one program.
 
@@ -1436,7 +1441,7 @@ pattern the model produces.
 [The Model](../../Chapters/38_Patterns--Simulation.md#the-model) shows `step()` multiplying the random kick by the amplitude, so a grain slows as it nears a nodal line.
 Loop over the three kick values with a fresh `Plate` for each, and print agitation at the same checkpoints.
 For the large kick, compare a grain's maximum single step with the size of the plate.
-[Watching It Happen](../../Chapters/38_Patterns--Simulation.md#watching-it-happen) shows the rendered figure, which is the check that agitation cannot make.
+[The Model](../../Chapters/38_Patterns--Simulation.md#the-model) shows `render()`'s figure, which is the check that agitation cannot make.
 
 <details>
 <summary>Solution</summary>

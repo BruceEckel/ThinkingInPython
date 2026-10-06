@@ -49,7 +49,7 @@ rosters = strategies.lists(
     min_size=2, max_size=12, unique=True)
 
 @given(rosters,
-       strategies.integers(min_value=2, max_value=5))
+       strategies.integers(min_value=1, max_value=5))
 def test_every_student_appears_once_per_round(
         names: list[str], size: int) -> None:
     for grouping in islice(group_rounds(names, size), 3):

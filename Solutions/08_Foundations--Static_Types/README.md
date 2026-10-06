@@ -443,7 +443,8 @@ call. `grid[cell] = color` needs no change, since `Grid`'s values are
 <summary>Where to look</summary>
 
 [Variance](../../Chapters/08_Foundations--Static_Types.md#variance) shows the checker refusing a `list[Circle]` where the parameter requires a `list[Shape]`.
-Import `Sequence` from `collections.abc` and compare which operations it offers with those of `list`.
+`variance.py` imports `Sequence` from `collections.abc` for `count()`.
+Compare which operations `Sequence` offers with those of `list`.
 The answer to both questions follows from whether you can write to the container.
 
 <details>

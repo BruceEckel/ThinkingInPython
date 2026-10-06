@@ -54,6 +54,10 @@ class Macro:
 <details>
 <summary>Solution</summary>
 
+`command.py`'s commands print a line, and a printed line has nothing
+to undo, so the solution swaps in a command that changes state,
+`Deposit`, and borrows `command_pattern.py`'s `Macro` to hold the list.
+
 If you keep `command.py`'s `Command` alias as the type of the macro's list,
 the script still prints `15` and `0`,
 but `ty` reports `unresolved-attribute` on `c.undo()`,
@@ -728,9 +732,9 @@ for n in range(3):
 def make(n: int) -> Command:
     return lambda: print(n)
 
-by_factory: list[Command] = [
-    make(n) for n in range(3)
-]
+by_factory: list[Command] = []
+for n in range(3):
+    by_factory.append(make(n))
 
 for fixed in (by_default, by_partial, by_factory):
     for command in fixed:

@@ -468,7 +468,7 @@ whether one of them is new.
 That is the same substitution `Console` and `Feed` allow, applied to a choice
 made fresh at every request rather than once at the start.
 
-**Leave an hour with no supplier.** With every source shortened, hour 20 has no supplier, and the `Blackout`
+**Leave an hour with no supplier.** With every other source shortened, hour 20 has no supplier, and the `Blackout`
 surfaces out of `run()`, not out of the Effect.
 `catch(Blackout)` around `run_load()` does not intercept it because `catch()`
 watches the error channel, and this exception stays outside that channel.
@@ -820,21 +820,26 @@ def research() -> Effect[
     return checked
 ```
 
-**Add and declare the failure.** Four edits, and the type checker names one of them.
+**Add and declare the failure.** Four edits in `research.py`, and the
+type checker names one of them. `report()` needs three more.
 
 1. A new exception class, `TooLong`.
 2. A new `@throws(TooLong)` function, `within_limit()`, since `@throws` lifts a raised
    `TooLong` into a failure that can travel.
 3. One new line in `research()`, the `yield from within_limit(article)`.
 4. `research()`'s error parameter, widened to include `TooLong`.
+5. `report()`'s `catch()` call, widened to include `TooLong`.
+6. The `found:` annotation, widened to include `TooLong`.
+7. A new `case TooLong():` branch in `report()`'s `match`.
 
 **Widen the signature to match.** Adding line 3 without line 4 is the one `ty` reports, as an `invalid-yield` at the
 new line rather than at the signature: `expression of type 'TooLong', expected 'Need[Feed] |
 Need[Encyclopedia] | Unavailable | NotInteresting | NoArticle'`.
 Widening the signature then breaks every caller that names the old set. `report()` stops at
 its own `yield from` with the same `invalid-yield`, now carrying `TooLong` in the
-type it did not expect. Once you widen `catch()` and the `found:` annotation to
-match, `assert_never()` reports `TooLong` as an unhandled branch. Every one of
+type it did not expect. Once edits 5 and 6 widen `catch()` and the
+`found:` annotation to match, `assert_never()` reports `TooLong` as an
+unhandled branch until edit 7 adds its case. Every one of
 these stops the type check rather than surprising you in production.
 The type checker walks the change through the program, one edit at a time.
 

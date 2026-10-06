@@ -14,7 +14,7 @@ class Digit:
 type Event = Coin | Digit
 type Report = Literal[
     "QUIESCENT", "COLLECTING", "SELECTING",
-    "UNAVAILABLE", "WANT_MORE", "DISPENSED"]
+    "UNAVAILABLE", "NEED_MONEY", "DISPENSED"]
 
 PRICES: Final[dict[str, int]] = {"11": 25, "12": 75}
 STOCK: Final[dict[str, int]] = {"11": 0, "12": 3}
@@ -38,7 +38,7 @@ def machine() -> Generator[Report, Event]:
         if stock.get(code, 0) == 0:
             event = yield "UNAVAILABLE"
         elif amount < PRICES.get(code, 0):
-            event = yield "WANT_MORE"
+            event = yield "NEED_MONEY"
         else:
             amount -= PRICES[code]
             stock[code] -= 1
@@ -54,7 +54,7 @@ for event in [Coin(25), Digit("1"), Digit("1"), Digit("1"),
 #: Digit(value='1') -> SELECTING
 #: Digit(value='1') -> UNAVAILABLE
 #: Digit(value='1') -> SELECTING
-#: Digit(value='2') -> WANT_MORE
+#: Digit(value='2') -> NEED_MONEY
 #: Coin(cents=50) -> COLLECTING
 #: Digit(value='1') -> SELECTING
 #: Digit(value='2') -> DISPENSED

@@ -755,8 +755,9 @@ an action, so it belongs on the timeline. Editing `_past` rewrites
 history rather than extending it, leaving the user who wanted the
 strokes back no way to change their mind. Editing `_past` also
 desynchronizes the caretaker's own bookkeeping. `do()` clears
-`_future`, so a `_past` edited behind the caretaker's back leaves a
-redo stack pointing at states the history can no longer reach.
+`_future`, so a `_past` edited behind the caretaker's back leaves the
+redo stack in place, and `redo()` replays states that a recorded
+action would have discarded.
 
 </details>
 </details>

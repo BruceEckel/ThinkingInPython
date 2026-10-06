@@ -97,11 +97,16 @@ not belong in a `#:` marker in the book.
 <summary>Where to look</summary>
 
 In [Concurrency](../../Chapters/19_Techniques--Concurrency.md#one-executor-interface-three-pools), the pools share one `map()` interface.
-Swap in `ThreadPoolExecutor` and keep the rest of the program.
+Swap in `ThreadPoolExecutor`; the serial comparison and the core count can go, and smaller limits keep the run short.
 Think about what threads share that processes do not, and which function reports an identity per thread.
 
 <details>
 <summary>Solution</summary>
+
+The listing swaps the executor and trims the previous exercise's
+program. It drops the serial comparison and the core count, which the
+question about IDs does not need, and it uses the twenty-times-smaller
+limits from the end of that exercise, which keep the run short.
 
 ```python
 import os
@@ -277,9 +282,9 @@ E       )
 Because the two sides print almost identically, the failure hides
 until you look at the code points.
 
-Most runs shrink to `'µ'`. Now and then a run stops at `'ß'` instead,
-since the shrinker does not always find the smallest failing
-character. `ß` breaks the law for a different reason, covered below.
+Runs split between `'µ'` and `'ß'`, since the shrinker does not
+always find the smallest failing character. `ß` breaks the law for a
+different reason, covered below.
 Once a run fails, Hypothesis stores the counterexample in
 `.hypothesis/` and replays it first, so later runs report the same
 character until you delete that directory.
@@ -306,8 +311,8 @@ def test_upper_leaves_the_micro_sign_in_the_greek_block(
 Greek letter it resembles. `µ` is lowercase, so `.lower()`
 returns it unchanged. But it has no uppercase form of its own, so
 `.upper()` maps it to U+039C GREEK CAPITAL LETTER MU, and lowering
-that gives U+03BC GREEK SMALL LETTER MU. The round trip ends one
-block away from where it started.
+that gives U+03BC GREEK SMALL LETTER MU. The round trip ends in a
+different Unicode block from the one where it started.
 
 Unicode case mapping is not a pair of inverse functions. It is a
 many-to-one mapping in each direction, over a repertoire containing
@@ -346,7 +351,8 @@ To break the function, remove the step that places leftover students, then rerun
 
 If you compare `placed == names` without sorting either side,
 the property fails against the correct `group_rounds()`,
-and Hypothesis shrinks the failure to `names=['a', 'b'], size=2`.
+and Hypothesis shrinks the failure to a two-name roster with
+`size=1`, such as `names=['a', 'b']`.
 `group_rounds()` shuffles the pool before it forms each round,
 so the students come back in an order of their own.
 The property concerns which students each round places, not their order, so the solution sorts both sides before comparing them.
@@ -403,7 +409,7 @@ rosters = strategies.lists(
     min_size=2, max_size=12, unique=True)
 
 @given(rosters,
-       strategies.integers(min_value=2, max_value=5))
+       strategies.integers(min_value=1, max_value=5))
 def test_every_student_appears_once_per_round(
         names: list[str], size: int) -> None:
     for grouping in islice(group_rounds(names, size), 3):
@@ -458,23 +464,23 @@ Delete the loop that places leftovers:
 group, and the property reports the loss at once:
 
 ```text
-E           AssertionError: assert ['a', 'b'] == ['a', 'aa', 'b']
-E             At index 1 diff: 'b' != 'aa'
-E             Right contains one more item: 'b'
+E           AssertionError: assert [] == ['a', 'b']
+E             Right contains 2 more items, first extra item: 'a'
 E           Failing test case: test_every_student_appears_once_per_round(
-E               names=['a', 'b', 'aa'],
-E               size=2,
+E               names=['a', 'b'],
+E               size=3,
 E           )
 ```
 
-Three students in groups of two leaves one student over, and the
-report shows that shrunk case rather than whatever wide random roster
-failed first. The names vary from run to run. Hypothesis shrinks a
-generated string toward a longer run of `a` before it reaches a third
-letter, so `'aa'` arrives as readily as `'c'` would. Some runs shrink
-to a different shape, a roster too small to fill one group:
-`names=['a', 'aa'], size=3`, where the empty group the guard adds
-collects nobody and the left side of the assertion is `[]`.
+Two students cannot fill a group of three, so the empty group the
+guard adds collects nobody and the left side of the assertion is
+`[]`. The report shows that shrunk case rather than whatever wide
+random roster failed first. The names vary from run to run. Hypothesis
+shrinks a generated string toward a longer run of `a` before it
+reaches a second letter, so `'aa'` arrives as readily as `'b'`. Now
+and then a run stops at a different shape, three students in groups
+of two, such as `names=['a', 'b', 'c'], size=2`, which leaves one
+student over.
 
 A second run reports the identical counterexample, and reports it
 noticeably faster. Hypothesis writes each failing case into
@@ -482,8 +488,8 @@ noticeably faster. Hypothesis writes each failing case into
 anything new, so it re-finds the failure you are in the middle of
 fixing instead of leaving it to chance. The shrunk case therefore
 behaves like a regression test you did not write. It keeps
-failing until you fix the bug, then rejoins the pool of examples and
-comes up again on every later run.
+failing until you fix the bug. The first run after the fix replays it
+once more, sees it pass, and deletes it from the database.
 
 </details>
 </details>
@@ -692,9 +698,10 @@ happens to be correct rather than a branch stating what it matches, so
 a reader must deduce that `result` is an `Err` by ruling out the `Ok`
 branch above.
 
-`ty` reports the same thing about both. Inside the `Ok` it knows
-`float` either way, and in the error branches it knows `Exception`
-narrowed to `ValueError` or `ZeroDivisionError`.
+Inside the `Ok`, `ty` knows `float` either way. In the error
+branches, the `isinstance()` version narrows `result.error` to
+`ValueError` or `ZeroDivisionError`. The `match` patterns bind no
+name there, so `result.error` stays `Exception`.
 
 **Rule out a shared subclass.** The precision behind that agreement
 rests on one decorator: both `Ok` and `Err` carry `@final`, in the

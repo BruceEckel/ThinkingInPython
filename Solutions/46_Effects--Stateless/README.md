@@ -226,7 +226,7 @@ stay silent.
 
 [Turning an Error Into a Value](../../Chapters/46_Effects--Stateless.md#turning-an-error-into-a-value) shows `catch()` moving a declared error out of the failure channel.
 Compare the two result types and ask what remains in each return type after `catch()` has run.
-Then look at what a `match` over the caught value does to that type, and which function in the pair contains one that covers every case.
+Then look at what a `match` over the caught value does to that type, and which function in the pair has a `match` that covers every error `read_score()` declares.
 
 <details>
 <summary>The shape</summary>
@@ -415,9 +415,10 @@ print(recorder.printed, recorder.entries)
 ```
 
 **Fill both roles with one object.** One object satisfies both
-protocols. The concrete-class version could not arrange that. `Log` is
-a `dataclass` holding its own entries, so a test must construct one and
-read `log.entries` afterward. As a
+protocols. The concrete-class version can arrange that only through a
+class that inherits from both. `Log` is a `dataclass` holding its own
+entries, so a test otherwise constructs one and reads `log.entries`
+afterward. As a
 `Protocol`, `Log` is a shape, and a single `Recorder` can have that
 shape and the `Console` shape at once.
 
@@ -1292,8 +1293,9 @@ is but because of what it does not do.
 One limit remains. Distinct method names remove the ambiguity *between*
 abilities. They do nothing about two implementations of the *same*
 ability. If you add a second recorder, an `Audit` that also defines
-`record()`, `supply(capture, audit)` is ambiguous again by argument
-order, with no diagnostic.
+`record()`, supplying `capture` and `audit` both through
+`as_type(Recorder)` is ambiguous again by argument order, with no
+diagnostic.
 [When Two Implementations Match](../../Chapters/46_Effects--Stateless.md#when-two-implementations-match)
 gives its advice in two halves for that reason. No type can enforce
 the second half, "supply one implementation per Ability." Stateless

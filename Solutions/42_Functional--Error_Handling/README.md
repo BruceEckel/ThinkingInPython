@@ -90,9 +90,10 @@ for i in range(5):
 ```
 
 **Insert the new step.** `Result` comes from the chapter's
-`utils/result.py`. Adding a fourth `.bind(func_d)` needs no change to
-`Result`, `Ok`, or `Err`. Because `func_d()` sits before `func_c()` in
-the chain, an `Err` from `func_d()` has a later step to skip.
+`utils/result.py`. Adding a third `.bind()`, for `func_d()`, needs no
+change to `Result`, `Ok`, or `Err`. Because `func_d()` sits before
+`func_c()` in the chain, an `Err` from `func_d()` has a later step to
+skip.
 
 **Make the skipped step visible.** `func_c()` prints a line when it
 runs, and that line confirms the skip. It appears for `0` and `3` and
@@ -243,9 +244,9 @@ leaves a success alone.
 
 `map_error()` differs from `bind()` in what it asks of `func`.
 `bind()`'s function returns a `Result`. `map_error()`'s function
-returns the new error, and `map_error()` wraps it, the way the
-chapter's `map()` wraps a new answer. The `returns` library names
-this method `alt()`.
+returns the new error, and `map_error()` wraps it, the way `map()`,
+the `returns` method the chapter mentions, wraps a new answer. The
+`returns` library names this method `alt()`.
 
 **Leave a success alone.** `Ok`'s version is a no-op, since an `Ok`
 holds no error to touch.
@@ -271,7 +272,7 @@ function that might produce one.
 <details>
 <summary>Where to look</summary>
 
-[Combining Multiple Results](../../Chapters/42_Functional--Error_Handling.md#combining-multiple-results) stops at the first `Err` because each step depends on the one before.
+[Combining Multiple Results](../../Chapters/42_Functional--Error_Handling.md#combining-multiple-results) stops at the first `Err` because each nested `bind()` short-circuits, although the three calls take independent inputs.
 Here the three calls are independent, so call all of them first and keep the results.
 Gather the `.error` of each `Err` into a list, return `Err(errors)` when the list is not empty, and write the three tests before the function.
 
@@ -374,7 +375,7 @@ cannot see that an empty error list means all three succeeded.
 <details>
 <summary>Where to look</summary>
 
-[Turning Exceptions into Results](../../Chapters/42_Functional--Error_Handling.md#turning-exceptions-into-results) shows `@safe` as a decorator that catches every exception.
+[Turning Exceptions into Results](../../Chapters/42_Functional--Error_Handling.md#turning-exceptions-into-results) shows `@safe` as a decorator that catches every `Exception`.
 To take arguments, `safe()` becomes a function that receives the exception types and returns the decorator.
 An `except` clause accepts a tuple of exception types, so the wrapper changes in one place.
 A `Protocol` with a generic `__call__` keeps the decorated function's signature precise.
@@ -562,10 +563,10 @@ hang a note. Notes attach to exceptions, so only the failing path
 carries one, and only the failing path has anything to explain.
 
 **Report without a traceback.** Each failure reports the setting that
-caused it, and the second and third runs differ only in which name
-appears in the note. The note travels inside the `Err` as ordinary
-data, so `report()` can print it long after the frame that knew the
-setting name has returned. `report()` reconstructs nothing from a
+caused it, and the second and third runs differ in which setting and
+which text appear in the note. The note travels inside the `Err` as
+ordinary data, so `report()` can print it long after the frame that
+knew the setting name has returned. `report()` reconstructs nothing from a
 traceback, because nothing prints one. The exception still holds its
 `__traceback__`, and the exception does not propagate to a handler
 that would show it.
@@ -592,7 +593,7 @@ reads better here.
 <details>
 <summary>Where to look</summary>
 
-[Which Failures Get a Result](../../Chapters/42_Functional--Error_Handling.md#which-failures-get-a-result) compares `None` with `Result`, and [Composing by Hand](../../Chapters/42_Functional--Error_Handling.md#composing-by-hand) has the chain to adapt.
+[Reaching the Answer](../../Chapters/42_Functional--Error_Handling.md#reaching-the-answer) compares `None` with `Result`, and [Composing by Hand](../../Chapters/42_Functional--Error_Handling.md#composing-by-hand) has the chain to adapt.
 Return `None` where each function returned an `Err`, and replace each `isinstance` test with `is None`.
 Then compare the outputs for inputs `1`, `2`, and `3` with the `Result` version.
 

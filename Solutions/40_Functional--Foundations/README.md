@@ -650,8 +650,8 @@ into the one-argument callable `filter()` requires.
 **Narrow to the band.** Chaining the two filters keeps `b`, whose 25.0
 Celsius sits inside the band. `a` falls below the band and `c` above
 it. The two filters commute, because each one tests the same untouched
-Celsius value, so swapping the `warm` and `band` lines reports the
-same reading.
+Celsius value, so applying the `colder_than()` filter first reports
+the same reading.
 
 **Reorder the stages.** The empty list from `converted_first()` shows that the `map()` does
 not commute with the filters. Once `to_fahrenheit()` has run, every

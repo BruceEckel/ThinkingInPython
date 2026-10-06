@@ -294,8 +294,8 @@ The first test must know two things about the implementation: that the
 function reads an environment variable, and that the variable's name is
 `APP_CONFIG`. Renaming the variable to `APP_SETTINGS_DIR` breaks the
 test although the function still behaves the same. The failure is a
-`KeyError` from inside the function rather than a message about the
-name.
+`KeyError: 'APP_SETTINGS_DIR'` from inside the function, with no word
+that the test set `APP_CONFIG`.
 
 **Supply the directory as an argument.**
 The second test knows only what the function does: given a

@@ -315,7 +315,7 @@ worth making explicit and easy to audit.
 <details>
 <summary>Where to look</summary>
 
-[A Table Inside Each State](../../Chapters/31_Patterns--State_Machines.md#a-table-inside-each-state) puts a dictionary in each state class and has `next()` consult it.
+[A Table Inside Each State](../../Chapters/31_Patterns--State_Machines.md#a-table-inside-each-state) puts a dictionary in each state object and has `next()` consult it.
 Here the table maps a word to the name of the next state, with a wildcard entry for words the state ignores.
 A controller holding a `dict` of name to state object looks up the current state and asks it for the next name.
 
@@ -521,7 +521,7 @@ makes the same trade-off over the per-state `mouse_trap_states.py`.
 <details>
 <summary>Where to look</summary>
 
-In [One State Class per Behavior](../../Chapters/31_Patterns--State_Machines.md#one-state-class-per-behavior), each `MouseAction` is legal only after certain others.
+In [One State Class per Behavior](../../Chapters/31_Patterns--State_Machines.md#one-state-class-per-behavior), each state's `match` names the `MouseAction` moves that make sense after it.
 Write those legal successors as a `dict` from the previous action to a list of allowed next actions, with a starting key for "nothing yet."
 Loop `count` times, pick from the list with `random.choice()`, and `yield` the pick, which becomes the previous action.
 

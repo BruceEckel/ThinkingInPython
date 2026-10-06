@@ -72,7 +72,7 @@ class Trash:
 
     @classmethod
     def create(cls, name: str, weight: float) -> Trash:
-        return Trash.registry[name](weight)
+        return cls.registry[name](weight)
 
 class Aluminum(Trash):
     value: ClassVar[float] = 1.67
@@ -201,7 +201,7 @@ class Trash:
 
     @classmethod
     def create(cls, name: str, weight: float) -> Trash:
-        return Trash.registry[name](weight)
+        return cls.registry[name](weight)
 
 class Aluminum(Trash):
     value: ClassVar[float] = 1.67
@@ -554,7 +554,7 @@ out.
 <summary>Where to look</summary>
 
 [One `singledispatch` Function per Operation](../../Chapters/37_Patterns--Pattern_Refactoring.md#one-singledispatch-function-per-operation) builds `hazard()` with a base function that answers for any unregistered type.
-For `strict_hazard()`, make the base function raise `NotImplementedError` with a message naming the type, then register every material, including those whose answer is "none".
+For `strict_hazard()`, make the base function raise `NotImplementedError` with a message naming the type, then register each material whose hazard you know, including those whose answer is "none".
 Decide by comparing what a silent default and a stopped program each cost when you forget a registration.
 
 <details>

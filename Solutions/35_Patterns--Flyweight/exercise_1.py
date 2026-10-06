@@ -12,6 +12,9 @@ class Tile:
     name: str
     walkable: bool
 
+    def label(self, row: int, col: int) -> str:
+        return f"{self.name} at ({row}, {col})"
+
 SPECS: Final[dict[Symbol, TileSpec]] = {
     ".": ("grass", True),
     "~": ("water", False),

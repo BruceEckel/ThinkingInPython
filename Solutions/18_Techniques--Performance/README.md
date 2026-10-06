@@ -573,8 +573,8 @@ time. `tottime` excludes the callees, so it attributes time to the
 frame that is executing.
 
 A function high on `cumtime` and near zero on `tottime` is a
-pass-through: it is slow only because of what it calls, and rewriting
-it changes nothing. The two columns coincide only for a leaf function, one
+pass-through: it is slow only because of what it calls, so a faster
+body changes nothing and fewer calls to its callees help. The two columns coincide only for a leaf function, one
 that calls nothing else, which is why the two rankings can name
 the same function only at the bottom of a call chain.
 

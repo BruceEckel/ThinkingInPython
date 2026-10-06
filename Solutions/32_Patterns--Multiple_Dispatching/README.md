@@ -471,9 +471,13 @@ It looks each class up by name on whichever module it receives, so one
 `Outcome`, and the comparison still works, since a `StrEnum` member
 equals its string value.
 
-In `test_paper_scissors.py`, the sixteen-entry `EXPECTED` is the one
-change to the test, once its two imports name modules that include
-`Lizard`. `test_versions_match_expected()` hardcodes no
+In `test_paper_scissors.py`, once its two imports name modules that
+include `Lizard`, the test needs two changes. One is the sixteen-entry
+`EXPECTED`. The other is in the `compete()` helper: each of those
+modules defines its own `Outcome`, so the chapter's
+`isinstance(result, Outcome)` assertion fails, and the solution's
+`compete()` drops that assertion and returns `str`.
+`test_versions_match_expected()` hardcodes no
 number of item types. `pytest` parametrizes it from `MATCHUPS`, which a
 comprehension builds from `EXPECTED`, so the test reports sixteen
 cases per module where it reported nine.
@@ -495,7 +499,7 @@ cases per module where it reported nine.
 <details>
 <summary>Where to look</summary>
 
-In [Two Dispatches Through Methods](../../Chapters/32_Patterns--Multiple_Dispatching.md#two-dispatches-through-methods), `item_pair_gen()` is a generator, so its body runs only as you iterate over it.
+In the chapter's `arena.py`, `item_pair_gen()` is a generator, so its body runs only as you iterate over it.
 When the caller passes no `Counter`, create a fresh one so the body has a single path.
 Increment the count for each item inside the loop, before the `yield`, and the caller's own `Counter` fills as the loop consumes the pairs.
 
@@ -742,9 +746,9 @@ with expected(TypeError):
 line up the same way: a `Meters`, a number, or `NotImplemented` for
 anything else. `__rsub__()` needs only the numeric case, because
 Python asks the left operand first, and `Meters.__sub__()`
-answers `Meters(10) - Meters(3)`. Python tries the reflected form only
-when the left operand declines, and for two `Meters` the left
-operand accepts.
+answers `Meters(10) - Meters(3)`. Python skips the reflected
+form when both operands have the same type, so no call to
+`__rsub__()` receives two `Meters`.
 
 **Undo the swap.** The swap is where subtraction differs from addition. Python calls
 `Meters.__rsub__(Meters(3), 10)` for the expression `10 - Meters(3)`,
@@ -1662,7 +1666,7 @@ a table of answers. Only the cells that need code look like code.
 `item1.wet`. The `(Rock, Paper)` cell consults `item2.wet`, because
 one duel has two orders and each order has its own cell. If the
 `(Rock, Paper)` cell ignored `item2.wet`, a rock that calls
-`compete()` would still beat wet paper.
+`compete()` would still lose to wet paper.
 
 Behavior that reads the object's own state is the first of the two
 reasons the chapter gives for preferring the double-dispatch version,

@@ -21,6 +21,12 @@ for name in ["First", "Second", "Third"]:
 
 print(Counter.live_count())
 #: 3
+counters.pop()  # Release "Third"
+print(Counter.live_count())
+#: 2
+counters.pop()  # Release "Second"
+print(Counter.live_count())
+#: 1
 counters = []  # Rebind the name instead of calling .clear()
 print(Counter.live_count())
 #: 0

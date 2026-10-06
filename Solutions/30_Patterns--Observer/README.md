@@ -636,7 +636,7 @@ there it passes through the loop and stops the notification, which is right for 
 here `gather()` has already turned it into a value, and dropping a value reports nothing.
 
 The synchronous and asynchronous versions now answer the same
-question, and both end in an exception group. The difference is only
+question, and both end in an exception group. The other difference is
 where the loop lives: written by hand in the synchronous version,
 supplied by `gather()` in the async one.
 
@@ -1074,8 +1074,8 @@ cell's first letter, one row per line. After selecting column 1, row
 nine cells are as they were.
 
 Pasting this `recolored()` over the one in `box_observer.py` changes
-what the window does, and `box_view.py` runs as it stands. The view
-touches the model in two places. Its mouse handler calls
+what the window does, and `box_view.py` runs as it stands. Two
+places in the view involve a selection. Its mouse handler calls
 `model.select()` with a coordinate, and its `draw()` receives a whole
 `Grid` and paints every cell. Neither one says which cells a selection
 changes, so the view holds nothing that a new rule could make wrong.
@@ -1591,7 +1591,7 @@ access gets: `Notifying[T]` from the class, `T` from an instance. Without
 them the declared return type is the union, and `t.celsius * 2` fails
 to check. The overloads also check the responder against the
 attribute: `Thermometer.celsius.connect(t, readings.append)` passes
-only because `readings` is a `list[float]`.
+because `readings.append` accepts a `float`.
 
 Pyright rejects `Thermometer.celsius.connect`.
 It reads the constructor's `self.celsius = celsius` as declaring an instance attribute of type `float` beside the descriptor,
@@ -1732,7 +1732,7 @@ The load-time form removes three of the runtime problems:
 
 - `Broadcaster.announce()` copies its list because a responder can disconnect itself mid-notification.
   The registry has no `disconnect()`, so the setter iterates through `RESPONDERS` directly.
-- A lambda cannot be disconnected, a question that disappears along with `disconnect()`.
+- A lambda written inline in `connect()` cannot be disconnected, a question that disappears along with `disconnect()`.
   The `@` form also needs a `def`, so every decorated responder has a name.
 - A lapsed listener is an object kept alive by its connection.
   The registry holds module-level functions,

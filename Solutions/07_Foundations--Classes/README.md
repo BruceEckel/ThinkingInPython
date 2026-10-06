@@ -523,7 +523,7 @@ The typo is easy to spot in a listing this short. The same failure
 arrives silently when someone renames or deletes `Base.show()` a year
 from now. With `@override` on every overriding method in the codebase,
 that rename becomes a list of locations to fix. A decorator that
-does nothing at run time is worth writing when a tool reads it.
+changes no behavior at run time is worth writing when a tool reads it.
 
 </details>
 </details>

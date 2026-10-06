@@ -294,7 +294,7 @@ info:     └── incompatible return types: `Weight` is not assignable to `Pr
 The comment lets the listing pass the book's type check while the call
 still runs and prints `4.5`.
 
-**Give each meaning its own type.** The structural match still holds.
+**Give each meaning its own type.** The runtime shape still matches.
 `Package.total()` still takes no arguments and still returns a float
 at runtime. The two `NewType` declarations add a distinction the
 shapes lack, so the type checker finally sees that a weight is not a
@@ -613,7 +613,7 @@ different matter. A miss is information on which the caller acts, so
 
 [Prefer Composition to Inheritance](../../Chapters/20_Patterns--Rethinking_Objects.md#prefer-composition-to-inheritance) shows `CountingList` missing calls that `list` makes in its own implementation.
 Try `extend()` and `insert()` on the subclass and compare the counts with the contents.
-The composed version holds a `list` as a field and exposes only methods you write, so every mutation passes through a counter.
+The composed version holds a `list` as a field and exposes only methods you write, so every mutation made through the box passes through a counter.
 
 <details>
 <summary>The shape</summary>
@@ -728,7 +728,8 @@ include `+=` and `*=`. A future CPython could add another.
 
 **Route every mutation through a counter.** `CountingBox` reports `3 3 1` because no inherited route into the
 list exists. The class holds a list rather than being one, so every
-mutation goes through a method this class wrote. Nothing inherited
+mutation that goes through `CountingBox` goes through a method this
+class wrote. Nothing inherited
 knows the counters exist, so nothing inherited can bypass them.
 
 `CountingList` gets `sort()`, `index()`, `__len__()`, slicing, and

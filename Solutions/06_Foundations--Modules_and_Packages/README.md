@@ -67,7 +67,8 @@ many of the three import styles you combine. Python caches every
 module in `sys.modules` on its first import, keyed by the module's
 full dotted name. A later `import` of the same module, in any of
 these forms, finds the cached module and skips running its top-level
-code again. It binds a name to the module in the cache. The
+code again. It binds the names the statement requests, taken from the cached
+module. The
 package's `__init__.py` runs once for the same reason.
 
 </details>
@@ -277,7 +278,8 @@ Changing the import back to `import module` while the file is still
 `Module.py` raises
 `ModuleNotFoundError: No module named 'module'. Did you mean: 'Module'?`,
 and it does so on every platform, Windows and macOS included. The
-suggestion shows that Python found the file and declined it.
+suggestion shows that `Module.py` sits on the search path under a
+name that differs in case alone.
 
 The failure on Windows and macOS is the surprising part. Windows's
 NTFS and macOS's default filesystem both open `module.py` and

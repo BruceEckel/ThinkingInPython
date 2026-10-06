@@ -382,8 +382,9 @@ nor shrinks through the rest of the run.
 **Compare two gap widths.** One machine measured about
 9,400 bytes at `k` of 100 and about 416,000 at `k` of 10,000. A
 hundredfold wider gap costs roughly forty times the memory rather than
-a hundred, because the smaller figure is mostly the fixed cost of the
-two branches. The difference between the two figures, about 41 bytes per
+a hundred, because the smaller figure carries a fixed cost that does
+not grow with `k`, and a short gap pays more per item than a long one.
+The difference between the two figures, about 41 bytes per
 buffered item, is the part that tracks `k`.
 
 **Report what holds across machines.** The script prints a boolean rather than the byte counts, since the
@@ -410,6 +411,10 @@ Feed it an endless source that raises an exception after too many pulls, and use
 
 <details>
 <summary>Solution</summary>
+
+The solution repeats `test_endless.py`'s scaffolding in a file of its
+own, so it runs without the chapter's module. In the chapter, you add
+the test function alone.
 
 ```python
 # test_ch23_filter.py

@@ -34,6 +34,9 @@ class Tile:
     name: str
     walkable: bool
 
+    def label(self, row: int, col: int) -> str:
+        ...
+
 SPECS: Final[dict[Symbol, TileSpec]] = {
     ".": ("grass", True),
     "~": ("water", False),
@@ -82,6 +85,9 @@ class Tile:
     symbol: Symbol
     name: str
     walkable: bool
+
+    def label(self, row: int, col: int) -> str:
+        return f"{self.name} at ({row}, {col})"
 
 SPECS: Final[dict[Symbol, TileSpec]] = {
     ".": ("grass", True),
@@ -934,7 +940,7 @@ If the boundary matters, keep a `to_tile()` wrapper that catches the
 <details>
 <summary>Where to look</summary>
 
-[Sharing, Not Caching](../../Chapters/35_Patterns--Flyweight.md#sharing-not-caching) says a flyweight's factory exists to guarantee identity, and `@cache` checks the key and stores the result in separate steps.
+[Sharing, Not Caching](../../Chapters/35_Patterns--Flyweight.md#sharing-not-caching) says a flyweight's factory exists to guarantee identity, and [Interning in the Constructor](../../Chapters/35_Patterns--Flyweight.md#interning-in-the-constructor) says `@cache` checks the key and stores the result in separate steps.
 The `time.sleep()` widens the gap between those steps, so every thread can miss before any thread stores.
 For the fixes, build every `Tile` into a table before starting any thread, and separately wrap the call to `tile()` in a `threading.Lock`.
 

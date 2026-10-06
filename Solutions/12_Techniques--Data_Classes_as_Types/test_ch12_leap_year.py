@@ -67,6 +67,9 @@ class Month(Enum):
         check(day.n <= max_days, f"Day({day.n})",
               f"is past the end of {self.name}")
 
+    def __repr__(self) -> str:
+        return self.name
+
 @dataclass(frozen=True)
 class BirthDate:
     month: Month

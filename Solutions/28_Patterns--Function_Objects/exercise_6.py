@@ -24,9 +24,9 @@ for n in range(3):
 def make(n: int) -> Command:
     return lambda: print(n)
 
-by_factory: list[Command] = [
-    make(n) for n in range(3)
-]
+by_factory: list[Command] = []
+for n in range(3):
+    by_factory.append(make(n))
 
 for fixed in (by_default, by_partial, by_factory):
     for command in fixed:

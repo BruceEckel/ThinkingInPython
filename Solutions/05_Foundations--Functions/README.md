@@ -66,7 +66,7 @@ first call that omits `target` raises an `AttributeError`.
 An immutable default suits a parameter the function reads, as in
 `immutable_default.py`. A function that mutates the parameter needs
 the `None` sentinel. `good_append()` tests for `None` and builds a new
-list inside the function body on every call.
+list inside the function body on every call that omits `target`.
 
 </details>
 </details>

@@ -255,7 +255,8 @@ intent survives the subtraction. Only the scaffolding disappears.
 <details>
 <summary>Where to look</summary>
 
-[Design Principles](../../Chapters/21_Patterns--Design_Patterns.md#design-principles) states *Subtraction* as a test: take one thing away and run the program.
+[Design Principles](../../Chapters/21_Patterns--Design_Patterns.md#design-principles) states *Subtraction*: a design is complete when you cannot take anything else away.
+Use it as a test: take one thing away and run the program.
 Choose a class or a level of inheritance that holds a single method and no state.
 If nothing breaks, the piece was scaffolding.
 If something breaks, you have found the part that carries the design's intent.
@@ -328,7 +329,8 @@ is complete when you cannot take anything else away, the class version
 is not complete.
 
 Taking away one more thing changes the answer. If you remove
-`checkout()`'s `shipping` parameter, inlining `5.0` where the call through `shipping` was,
+`checkout()`'s `shipping` parameter, inlining `5.0` where the call through `shipping` was
+and dropping the second argument from each call,
 the program still runs and still prints a number. What stops working is
 the requirement. You can no longer charge by weight without
 editing `checkout()`. Removing the parameter reaches the floor, the

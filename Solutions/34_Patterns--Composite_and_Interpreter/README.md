@@ -9,7 +9,7 @@
 <details>
 <summary>Where to look</summary>
 
-[The Classic Composite](../../Chapters/34_Patterns--Composite_and_Interpreter.md#the-classic-composite) and [A Composite of Data Classes](../../Chapters/34_Patterns--Composite_and_Interpreter.md#a-composite-of-data-classes) show `walk()` recursing through a `Directory` with `match`.
+[The Classic Composite](../../Chapters/34_Patterns--Composite_and_Interpreter.md#the-classic-composite) and [A Composite of Data Classes](../../Chapters/34_Patterns--Composite_and_Interpreter.md#a-composite-of-data-classes) show `walk()` recursing through a `Directory`, the classic version through overridden methods and the data-class version through `match`.
 Write `find()` in the same shape, with one case per `Node` type and `yield from` for the recursion.
 A `Directory` case checks its own name before it descends, and it carries the path prefix down.
 
@@ -666,8 +666,8 @@ print(to_infix((x + 1) * (x + 2)))
 **Parenthesize by context.** Each recursive call passes down the precedence its *parent* requires.
 A child gets parentheses only when its own operator binds more
 loosely than what the parent needs. `Mul`'s children therefore need
-parens around a lower-precedence `Add`, while `Add`'s children need
-no parens around another `Add`.
+parens around a lower-precedence `Add`, while an `Add` needs no
+parens around another `Add` on its left.
 
 **Guard the right operand.** Passing `prec + 1` (rather than
 `prec`) for the right operand is a simple, always-safe rule. It can
@@ -899,7 +899,7 @@ exercise.
 <details>
 <summary>Where to look</summary>
 
-[Operators That Build Nodes](../../Chapters/34_Patterns--Composite_and_Interpreter.md#operators-that-build-nodes) defines the four operator methods, and the Multiple Dispatching chapter's [Operators Dispatch Twice](../../Chapters/32_Patterns--Multiple_Dispatching.md#operators-dispatch-twice) shows the idiom.
+[Operators That Build Nodes](../../Chapters/34_Patterns--Composite_and_Interpreter.md#operators-that-build-nodes) explains the four operator methods that `expr.py` defines, and the Multiple Dispatching chapter's [Operators Dispatch Twice](../../Chapters/32_Patterns--Multiple_Dispatching.md#operators-dispatch-twice) shows the idiom.
 In each method, test the operand with `isinstance()` and return `NotImplemented` when it is neither an `Expr` nor an `int`.
 Python then tries the reflected method on the other operand and, when that declines too, raises the `TypeError` for you.
 
@@ -1027,13 +1027,14 @@ with expected(TypeError):
 
 Before the change, `"a" + x` produces `Add(Num("a"), Var("x"))`: a
 `Num` whose `value` is a string, and every walker then mishandles
-that `Num`. `str.__add__` declines a `Var`, so Python falls back to
-`Var.__radd__("a")`. The old `__radd__()` accepts anything, wrapping
+that `Num`. Python tries `Var.__radd__("a")` first, because `str`
+handles `+` as sequence concatenation, which Python tries last. The
+old `__radd__()` accepts anything, wrapping
 the string in a `Num` without looking at it.
 
 **Hand the decision back to Python.** Returning `NotImplemented` puts the decision back where it belongs.
-`__radd__()` now answers only for an `int`, so both sides decline and
-Python raises the `TypeError` it raises for any other mismatched pair.
+`__radd__()` now answers only for an `int`, so it declines, and Python
+falls back to `str` concatenation, which raises the `TypeError`.
 
 The message comes from `str`, which is the right source. The left
 operand is what the caller wrote first, and nothing in this expression

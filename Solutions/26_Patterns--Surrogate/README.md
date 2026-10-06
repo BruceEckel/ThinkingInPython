@@ -307,9 +307,9 @@ print(a._box is b._box)
 copies a reference and bumps a count.
 
 **Copy before a shared write.** `append()` copies the data, and only when `owners > 1`. `b.append(4)`
+decrements the shared `Box`'s count (since `b` is leaving it),
 detaches `b` into its own private `Box` holding a fresh copy of the
-data, decrements the shared `Box`'s count (since `b` is no longer one
-of its owners), then appends to that private copy. Since no one called
+data, then appends to that private copy. Since no one called
 `a.append()`, `a` still points at the original, untouched `Box`. The
 first write triggers the copy, and only the list that writes pays for
 it.
@@ -652,9 +652,9 @@ print(len(p))
 does not look the name up on the instance. `len()` asks `type(p)` for
 `__len__()` and calls what it finds there. That lookup skips the
 instance, so no instance lookup fails, and a failed instance lookup is
-the one event that calls `__getattr__()`. Python looks up every
-implicitly invoked special method this way, so the method must exist on
-the proxy's class.
+the one event that calls `__getattr__()`. Python's operators and
+built-in functions look up an implicitly invoked special method this
+way, so the method must exist on the proxy's class.
 
 **Forward the special method explicitly.** `__len__()` here delegates with `len(self.__implementation)` rather
 than `self.__implementation.__len__()`. Both give the same answer, and

@@ -145,7 +145,7 @@ with warnings.catch_warnings(record=True) as caught:
     report = Report()  # type: ignore
     class Detailed(Report):  # type: ignore
         pass
-print(report.render())
+    print(report.render())
 #: report
 for entry in caught:
     print(entry.category.__name__, entry.message)
@@ -155,7 +155,7 @@ for entry in caught:
 
 **Move the warning to the type.** Decorating the class moves the warning to the two places where a
 caller commits to the type: constructing an instance and subclassing.
-`render()` runs outside the recording block and adds nothing to
+`render()` runs inside the recording block and adds nothing to
 `caught`, so code that holds a `Report` runs without a
 warning.
 That is the right split. `TextReport` replaces the type, not the
@@ -277,7 +277,8 @@ public names, the ones `from shop import *` binds. `record` appears because an
 import binds a name in the module too. A real module therefore
 either sets
 [`__all__`](../../Chapters/06_Foundations--Modules_and_Packages.md#what-a-module-exports)
-or imports as `import record` and writes `@record.record`.
+or imports the decorator under a private name,
+`from record import record as _record`, and writes `@_record`.
 
 The class version differs in one way that matters. `Facade` is a
 namespace the language does not treat as one. `Facade.start_car` and
@@ -289,7 +290,9 @@ The module is a namespace from the start, and it comes
 with the underscore convention, `__all__`, and one-time initialization
 built in.
 
-A caller sees nearly the same names in both versions. Neither
+A caller of `facade.py` sees `Engine`, `FuelPump`, `Ignition`, and
+`Facade` as public names; a caller of `shop` sees `start_car`. Both
+also see `record`. Neither
 version enforces anything. The difference is how much ceremony you
 pay to express the same intent, and the module version pays none.
 
