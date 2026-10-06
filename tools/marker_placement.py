@@ -45,8 +45,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from tools.config import (
-    BUILD_DIR, EXAMPLES_TREE, INLINE_NORUN_MARKER, NORUN_FILE,
-    SOLUTIONS_DIR, utils_dir)
+    BUILD_DIR, INLINE_NORUN_MARKER, NORUN_FILE, SOLUTIONS_DIR,
+    utils_dir)
 from tools.pycode import walk_fenced
 from tools.repo import (
     add_jobs_arg, block_slug, chapter_stem, load_glob_list, write_text_lf)
@@ -57,14 +57,25 @@ from tools.validate_output import (
     collect_files, collect_now, encode_output, is_marker, run_location,
     run_watched)
 
-SOLUTIONS_TREE = BUILD_DIR / "solutions"
+
+def examples_tree(build_dir: Path) -> Path:
+    return build_dir / "examples"
 
 
-def tree_for(path: Path) -> Path:
-    """The build tree a Markdown file's listings run from."""
+def solutions_tree(build_dir: Path) -> Path:
+    return build_dir / "solutions"
+
+
+def tree_for(path: Path, build_dir: Path = BUILD_DIR) -> Path:
+    """The build tree a Markdown file's listings run from.
+
+    ``build_dir`` is the directory holding the ``examples`` and
+    ``solutions`` trees: ``build/`` by default, a private directory
+    for a ``tip verify-ch ISOLATED=1`` run.
+    """
     if path.resolve().is_relative_to(SOLUTIONS_DIR):
-        return SOLUTIONS_TREE
-    return EXAMPLES_TREE
+        return solutions_tree(build_dir)
+    return examples_tree(build_dir)
 
 
 @dataclass
@@ -257,9 +268,10 @@ def check_block(
 
 def process(
     path: Path, *, write: bool, skips: list[str],
+    build_dir: Path = BUILD_DIR,
 ) -> tuple[bool | None, str]:
     """Check one Markdown file. True: clean; False: something to report."""
-    tree = tree_for(path)
+    tree = tree_for(path, build_dir)
     chapter = chapter_stem(path)
     lines = path.read_text(encoding="utf-8").splitlines(keepends=True)
     out: list[str] = []
@@ -305,25 +317,33 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--changed-only", action="store_true",
                     help="skip a file unchanged since it last passed "
                          "(see tools/skip_stamps.py)")
+    ap.add_argument("--build-dir", type=Path, default=BUILD_DIR,
+                    metavar="DIR",
+                    help="directory holding the examples/ and "
+                         "solutions/ trees the listings run from "
+                         "(default: build/)")
     add_jobs_arg(ap, "files")
     args = ap.parse_args(argv)
+    build_dir: Path = args.build_dir
     files = [f for f in collect_files(args.targets) if f.suffix == ".md"]
     if not files:
         print("No Markdown files found.")
         return 1
     contexts = {tree: marker_context(tree, utils_dir(tree))
-                for tree in (EXAMPLES_TREE, SOLUTIONS_TREE)}
+                for tree in (examples_tree(build_dir),
+                             solutions_tree(build_dir))}
     unchanged: list[Path] = []
     if args.changed_only and not forced_full():
         unchanged = [f for f in files if markers_current(
-            f, contexts[tree_for(f)], PLACEMENT_STAMP)]
+            f, contexts[tree_for(f, build_dir)], PLACEMENT_STAMP)]
         files = [f for f in files if f not in unchanged]
         if not files:
             print(f"All {len(unchanged)} file(s) unchanged since their "
                   "markers were last in place.")
             return 0
     work = functools.partial(
-        process, write=args.write, skips=load_glob_list(NORUN_FILE))
+        process, write=args.write, skips=load_glob_list(NORUN_FILE),
+        build_dir=build_dir)
     jobs = min(max(1, args.jobs), len(files))
     if jobs == 1:
         outcomes = list(map(work, files))
@@ -338,7 +358,7 @@ def main(argv: list[str] | None = None) -> int:
         if result is False:
             bad += 1
         else:
-            record_markers([path], contexts[tree_for(path)],
+            record_markers([path], contexts[tree_for(path, build_dir)],
                            PLACEMENT_STAMP)
     verb = "rewritten" if args.write else "to fix"
     unchanged_note = (f", {len(unchanged)} unchanged since they last "

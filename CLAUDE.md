@@ -131,6 +131,12 @@ site build. Its ordered step list lives in `tools/verify.py`
 (`VERIFY_TARGETS`), and `tip verify ARGS=--help` lists it without
 running anything. The gate skips work that cannot find anything new
 (`tools/skip_stamps.py`; `tools/CLAUDE.md` has the policy).
+Two `verify-ch` runs at once wipe each other's `build/examples`, so
+parallel runs (agents, several chapters) add `ISOLATED=1`, which
+extracts into `build/verify-ch-NN/` and reads only that tree (since
+2026-10-05, after a twenty-agent sweep spent 5 to 40 retries per
+chapter on the collisions); `build/verify-ch-*` can be deleted at any
+time.
 The marker refresh runs
 *before* the sync, not after: `gate`/`solutions-gate` refresh markers
 too, but only after their own prior sync step already copied the Markdown,

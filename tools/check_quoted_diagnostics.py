@@ -98,7 +98,14 @@ PRAGMA_MENTION = re.compile(r"\bignore\b", re.IGNORECASE)
 PRAGMA_WINDOW = 10
 HEADING = re.compile(r"^#{1,6}\s")
 
-TREES = {"Chapters": BUILD_DIR / "examples", "Solutions": BUILD_DIR / "solutions"}
+def trees_in(build_dir: Path) -> dict[str, Path]:
+    """The extracted trees a quote is checked against, by Markdown folder."""
+    return {"Chapters": build_dir / "examples",
+            "Solutions": build_dir / "solutions"}
+
+
+# main() repoints this at --build-dir; the tests patch entries directly.
+TREES = trees_in(BUILD_DIR)
 
 
 def quoted_blocks(doc: Document) -> Iterator[Block]:
@@ -329,7 +336,13 @@ def main(argv: list[str] | None = None) -> int:
                     help="list quotes made without the listing's "
                          "`# type: ignore` that the prose never mentions "
                          "(report-only, no baseline)")
+    ap.add_argument("--build-dir", type=Path, default=BUILD_DIR,
+                    metavar="DIR",
+                    help="directory holding the examples/ and "
+                         "solutions/ trees to compare against "
+                         "(default: build/)")
     args = ap.parse_args(argv)
+    TREES.update(trees_in(args.build_dir))
     paths = [Path(p) for p in args.paths] or md_files(
         [ROOT / "Chapters", ROOT / "Solutions"])
     if args.pragmas:

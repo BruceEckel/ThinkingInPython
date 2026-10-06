@@ -87,12 +87,20 @@ RUST_PATH_LINE_RE = re.compile(r"^//\s*([\w./\\-]+\.\w+)\s*$")
 def utils_dir(tree: Path) -> Path:
     """Where ``tree``'s listings import shared helpers from.
 
-    The tree's own ``utils/`` when it has one, otherwise the book's
+    The tree's own ``utils/`` when it has one, otherwise the
+    ``utils/`` of the ``examples`` tree beside it, otherwise the book's
     ``SHARED_UTILS`` (``build/examples/utils``), which pyproject already
     names for pytest and ty. ``build/solutions`` has no ``utils/`` of
     its own, so a Solutions listing's ``from exceptions import expect``
     resolves through the fallback under ``validate_output`` and
     ``run_examples`` just as it does under ``ty`` and ``pytest``.
+    The middle case serves a private build directory
+    (``build/verify-ch-28/solutions`` falls back to
+    ``build/verify-ch-28/examples/utils``); in the default layout it is
+    the same path as ``SHARED_UTILS``.
     """
     own = tree / "utils"
-    return own if own.is_dir() else SHARED_UTILS
+    if own.is_dir():
+        return own
+    beside = tree.parent / "examples" / "utils"
+    return beside if beside.is_dir() else SHARED_UTILS

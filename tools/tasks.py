@@ -99,8 +99,15 @@ def verify_ch(v: Vars) -> None:
     checks are the gate's by construction. It writes no gate stamp: a change
     that can reach other chapters (a renamed listing, a utils/ helper, a
     heading others link to) still needs `tip verify`.
+
+    ISOLATED=1 extracts into build/verify-ch-<NN>/ instead of the shared
+    build/examples and build/solutions, so several chapters can run in
+    parallel without wiping each other's trees. Delete build/verify-ch-*
+    whenever you like.
     """
-    py("tools.verify_chapter", *v.words("CH"), "--checks", *GATE_CHECKS)
+    isolated = ["--isolated"] if v.get("ISOLATED") else []
+    py("tools.verify_chapter", *v.words("CH"), *isolated,
+       "--checks", *GATE_CHECKS)
 
 
 also("check-ch", "run-one")
