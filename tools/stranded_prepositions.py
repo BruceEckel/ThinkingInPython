@@ -14,9 +14,12 @@ whose last word is a preposition from `PREPOSITIONS` is a hit, reported
 as `path:line: clause` with the line holding that final word. A clause
 is skipped when it has fewer than three words, when the word before
 the final preposition is a pronoun object (`PRONOUNS`: "turn it on",
-"carry them along", and the `CODE` placeholder: "passes `x` through"),
-or when the last two words are an adverbial idiom (`IDIOMS`: "and so
-on", "as before", "left behind", "built in").
+"carry them along", and the `CODE` placeholder: "passes `x` through")
+and the final word is a particle (`PARTICLES`), or when the last two
+words are an adverbial idiom (`IDIOMS`: "and so on", "as before",
+"left behind", "built in"). A true preposition after a pronoun or a
+code span is reported ("what you compare `x` against", "the namespace
+it builds from").
 
 Skipped input: fenced listings, headings, block quotes, tables, HTML
 lines and comments, link definitions, and `#:` lines. Inline code spans
@@ -83,12 +86,21 @@ PREPOSITIONS: Final[frozenset[str]] = frozenset("""
     to on for from into with about at in of by through over under after
     before between against toward towards onto upon within without
     around across along behind beyond during like
+    among amongst beneath beside
 """.split())
 PRONOUNS: Final[frozenset[str]] = frozenset(
     "it them this that one you me us code".split())
 """Object words before a particle that make a phrasal verb, not a
 stranding: "turn it on", "carry them along". `code` is the placeholder
 a code span becomes, so "passes `x` through" is a phrasal verb too."""
+PARTICLES: Final[frozenset[str]] = frozenset(
+    "on in over through around along across behind by before after"
+    .split())
+"""Final words that read as a verb particle or an adverb after an
+object pronoun or a code span ("turn it on", "passes `x` through",
+"pass it by", "seen it before"). A true preposition after the same
+object ("compare `x` against", "builds it from") is still missing its
+own object."""
 IDIOMS: Final[frozenset[str]] = frozenset("""
     so-on then-on early-on later-on as-before left-behind left-over
     built-in in-between outside-in inside-out back-in all-along
@@ -96,7 +108,7 @@ IDIOMS: Final[frozenset[str]] = frozenset("""
     fell-through moves-on move-on moved-on carries-over
     carry-over carried-over passed-in compiled-in baked-in locked-in
     logged-in signed-in opted-in checked-in cleanup-after here-on
-    and-after everything-after far-along
+    and-after everything-after far-along you-like
 """.split())
 """Trailing bigrams (hyphen-joined) in which the final word is an
 adverb or a fixed idiom, not a preposition missing its object."""
@@ -206,6 +218,8 @@ def stranded(clause: str) -> bool:
         return False
     if f"{word_of(words[-2])}-{word_of(words[-1])}" in IDIOMS:
         return False
+    if word_of(words[-1]) not in PARTICLES:
+        return True
     return word_of(words[-2]) not in PRONOUNS
 
 

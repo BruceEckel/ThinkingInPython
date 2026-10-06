@@ -21,6 +21,11 @@ def hits(text: str) -> list[tuple[int, str]]:
     "Name the field they sit on.",
     "Say what it is for.",
     "This is the tool you look at.",
+    "The type checker has nothing to compare `Beetle` against, "
+    "so it passes.",
+    "The namespace `type` builds it from.",
+    "With no registration to choose among, the call fails.",
+    "A default cannot come before one without.",
 ])
 def test_hit(text: str) -> None:
     assert len(hits(text)) == 1
@@ -33,6 +38,12 @@ def test_hit(text: str) -> None:
     "The class refers to `x`.",
     "A code span ends `up with`.",
     "Look at it.",
+    "Then turn it on.",
+    "The wrapper passes `x` through.",
+    "Carry them along.",
+    "The caller passes it by.",
+    "You may have seen something like it before.",
+    "Run it as many times as you like.",
 ])
 def test_not_a_hit(text: str) -> None:
     assert hits(text) == []
