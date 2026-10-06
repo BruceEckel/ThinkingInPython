@@ -218,12 +218,12 @@ so the language rules it out.
 A tuple does match.
 `case [a, b, c]` accepts `(1, 2, 3)` as readily as `[1, 2, 3]`,
 because the pattern describes a shape, not a concrete type.
-Parentheses group a pattern rather than build a tuple.
-`case (x)` is `case x`, an unconditional capture,
-and `case (x,)` is a one-element sequence pattern.
 The subject must be a sequence, though, not merely iterable.
 `case [a, b]` matches a `range` but not a generator and not a `set`.
 
+Parentheses group a pattern rather than build a tuple.
+`case (x)` is `case x`, an unconditional capture,
+and `case (x,)` is a one-element sequence pattern.
 The brackets are optional in a sequence pattern,
 so `case 0, 0:` and `case [0, 0]:` are the same pattern.
 The subject is any expression, not only a parameter,
@@ -682,6 +682,7 @@ and Java's newer switch expressions check exhaustiveness,
 as an error in Java and Kotlin and a warning in Scala.
 The check applies only when the matched type is a closed set the compiler can see in full:
 a sealed hierarchy or an enum.
+
 The Scala, Kotlin, and Java versions are also expressions,
 producing a value you can assign.
 Python's `match` is a statement, not an expression,

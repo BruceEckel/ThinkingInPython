@@ -3,7 +3,7 @@
 > A loop needs the next item and has no reason to care where that item is stored.
 > An *Iterator* supplies the item and keeps the storage out of sight.
 
-Code written against an *iterator* does not care whether the data comes from a list,
+Code written against an *iterator* works the same whether the data comes from a list,
 a file, a database cursor, or a computation.
 It asks only for the next item.
 That is the communication-first design [Design Patterns](21_Patterns--Design_Patterns.md#design-principles)
@@ -405,18 +405,18 @@ print(f"lockstep buffered far less: "
 ```
 
 Both branches see all five squares,
-so `tee` delivers the second pass the generator could not.
-`tee` buffers every item the leading branch consumes until the trailing one catches up,
+so `tee()` delivers the second pass the generator could not.
+`tee()` buffers every item the leading branch consumes until the trailing one catches up,
 so when `first` drains while `second` waits, the buffer holds the whole stream.
 That is the memory a list uses, and the comparison confirms it
 (one machine measured 4,096,992 bytes buffered against 3,999,992 for the list).
 The last block advances `first2` and `second2` together instead,
-one `zip()` step at a time, so `tee` buffers at most the gap between them.
+one `zip()` step at a time, so `tee()` buffers at most the gap between them.
 That gap stays near zero, and the measurement confirms it.
-Use `tee` when two consumers advance together,
+Use `tee()` when two consumers advance together,
 not when one finishes before the other starts.
 
-`tee` is also single-threaded.
+`tee()` is also single-threaded.
 Its branches share one buffer with no lock,
 so two threads advancing them at the same time can raise a `RuntimeError`.
 [Concurrency](19_Techniques--Concurrency.md#sharing-an-iterator-between-threads)
@@ -813,11 +813,11 @@ The last line of output shows that by the time all four methods work,
 The interface needs more than a buffer.
 It rebuilds the list.
 
-That is the cost the pattern hides.
+Rebuilding the list is the cost the pattern hides.
 `first()` and `current_item()` assume a collection you can re-read and inspect in place,
 so honoring them over a stream means recreating one, item by item.
 The chapter has now reached that conclusion three times: here,
-in `tee`'s buffering,
+in `tee()`'s buffering,
 and in the advice to collect into a list when you must walk data twice.
 Python dropped both methods rather than paying for them everywhere.
 Without them, `advance()` must return the value it reached.
@@ -871,7 +871,7 @@ print(list(doubled_ok(iter([1, 2]))))
 Each question costs an item.
 Nothing in the protocol looks ahead without advancing.
 That is why a peekable iterator must buffer,
-and why `tee` buffered a whole stream in `tee.py`.
+and why `tee()` buffered a whole stream in `tee.py`.
 A membership test pays the same way.
 `"c" in letters` pulls items until it finds a match,
 and every item it pulled is gone, the match included.
@@ -905,7 +905,7 @@ and the only way to find out whether the source has run out is to pull and get n
 `for` and `list()` catch that second answer and report nothing,
 so an exhausted source and an empty one produce identical output.
 The protocol buffers nothing and tells you nothing in advance.
-Every tool in this chapter that does answer in advance, `tee`, `OverStream`,
+Every tool in this chapter that does answer in advance, `tee()`, `OverStream`,
 or a peekable wrapper, pays for the answer with a buffer.
 
 ## Exercises

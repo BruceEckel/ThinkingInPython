@@ -137,9 +137,7 @@ Python supports multiple inheritance, so you can list several classes,
 though [Rethinking Objects](20_Patterns--Rethinking_Objects.md#one-class-many-protocols)
 argues against it in favor of protocols.
 `simple_subclass.py` imports and subclasses `Simple` from the `simple_class` module.
-Ignore the `@override` decorator for now.
-[Marking Overrides with `@override`](#marking-overrides-with-override)
-explains it.
+Ignore the [`@override` decorator](#marking-overrides-with-override) for now.
 
 ```python
 # simple_subclass.py
@@ -286,8 +284,8 @@ Renaming or removing the base method later has the same effect,
 and that bug is easy to miss.
 
 The `@override` decorator from the `typing` module catches that bug.
-A line starting with `@` above a definition applies a *decorator* to it.
-[Decorators](14_Techniques--Decorators.md) shows how they work.
+A line starting with `@` above a definition applies a [*decorator*](14_Techniques--Decorators.md)
+to it.
 `@override` declares that a method replaces one from a base class:
 
 ```python
@@ -343,7 +341,7 @@ and dunders such as `__repr__()` and `__str__()` that replace a default inherite
 ## Properties
 
 With `@property`, you can start with a plain attribute and convert it to a computed one later,
-without changing the calling code:
+and the calling code stays as it was:
 
 ```python
 # properties.py
@@ -491,7 +489,7 @@ print(n.total)
 The first access runs the method.
 The second access produces the same result from the stored value.
 The attribute is *lazily initialized*, created on first use,
-so the method runs at the first read rather than when the object is built.
+so the method runs at the first read rather than when the constructor runs.
 
 The stored value lives in the instance's [`__dict__`](09_Foundations--Class_Attributes.md#two-dictionaries-one-lookup),
 the dictionary that holds the instance's attributes.

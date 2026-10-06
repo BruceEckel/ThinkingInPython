@@ -90,8 +90,7 @@ class MouseAction(StrEnum):
     REMOVED = "mouse removed"
 ```
 
-Each possible move by a mouse is a member of the `MouseAction` enumeration
-([Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#enums-are-types-too) introduces `Enum`).
+Each possible move by a mouse is a member of the `MouseAction` [enumeration](12_Techniques--Data_Classes_as_Types.md#enums-are-types-too).
 Because `MouseAction` is a `StrEnum`, each member *is* a `str`,
 and compares equal to and prints as its value.
 That is why `print(event)` in `run_all()` shows `mouse appears` rather than `MouseAction.APPEARS`.
@@ -230,8 +229,8 @@ a `case` for every input the state recognizes,
 and a `case _` that returns the machine's current state.
 Each `case` names its member through the class, as in `MouseAction.APPEARS`.
 A dotted name compares the event with that member,
-while a bare `APPEARS` would be a capture pattern that matches every event
-([Pattern Matching](13_Techniques--Pattern_Matching.md#a-bare-name-captures-a-dotted-name-compares)).
+while a bare `APPEARS` would be a [capture pattern](13_Techniques--Pattern_Matching.md#a-bare-name-captures-a-dotted-name-compares)
+that matches every event.
 
 `Waiting.next()` returns `MouseTrap.luring` although the `class MouseTrap` statement comes further down the file.
 Python looks up a name inside a function when the function runs,
@@ -286,7 +285,7 @@ and module-level code fills in the tables once every state object exists.
 
 `TableState` supplies `next()` from a `transitions` dict that maps each input to its next state,
 and leaves `run()` abstract for its subclasses.
-It is an `ABC`, the alternative the first version set aside,
+It is an `ABC`, the alternative the first version sets aside,
 because here the base has code to share.
 Every subclass inherits `next()`.
 `TableState`'s `run()` and `next()` have the signatures the `State` Protocol names,
@@ -319,7 +318,7 @@ If you forget to fill a state's table,
 the machine reports `Waiting has no transition for ...` rather than the `AttributeError` a missing `transitions` attribute would produce.
 
 `next()` raises its `RuntimeError` `from None`,
-because the chained `KeyError` would add nothing.
+because the chained `KeyError` would repeat the message.
 Its key is the event the message names.
 
 The subclasses shrink to their `run()` behavior.
@@ -432,7 +431,7 @@ The figure traces the run both versions share, then this one input:
 
 The trace at the top covers the nine shared moves.
 In each row the current state's `next()` picks the successor,
-so the machine moves from object to object without deciding anything.
+so the machine moves from object to object and leaves every decision to the states.
 Below the trace, the one input that splits the versions appears twice,
 once under each policy.
 
@@ -562,7 +561,7 @@ One table now defines the whole machine.
 The machine collects money, takes a two-digit selection,
 then either dispenses the item, reports it sold out,
 or clears a selection that costs more than the money inserted.
-The conditions and actions are ordinary methods, stored directly in the table.
+The conditions and actions are ordinary methods, stored in the table.
 
 ![The vending machine's five states and the inputs that move it between them](_images/vending_story)
 
@@ -745,8 +744,8 @@ The message alone leaves you inferring the condition from the quantity.
 The last three events insert a dime and pick the same sold-out slot again,
 this time with too little money for it as well.
 Both conditions are now true,
-and `too_expensive` comes first in the `(State.SELECTING, SecondDigit)` list,
-so the engine takes the `too_expensive` row.
+and `too_expensive()` comes first in the `(State.SELECTING, SecondDigit)` list,
+so the engine takes the `too_expensive()` row.
 The machine reports `COLLECTING`, as though more money would sell the item,
 although the slot is empty and no amount of money would.
 If you swap the row order, the same input reports `UNAVAILABLE` instead.

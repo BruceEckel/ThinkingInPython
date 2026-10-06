@@ -47,7 +47,7 @@ print(greet.__doc__)
 ```
 
 A docstring documents the function for a reader or a tool,
-not for the interpreter, which stores the text without acting on it.
+not for the interpreter, which stores the text and otherwise ignores it.
 [Metaprogramming](17_Techniques--Metaprogramming.md#the-core-functions)
 reads it back with `inspect.getdoc()`.
 
@@ -148,7 +148,7 @@ At the call site, write every keyword argument after the positional ones.
 The grammar allows a few rarer arrangements that this chapter leaves alone,
 and keeping the keyword arguments last avoids every one of them.
 
-A parameter with a default cannot come before one without.
+A parameter with a default cannot come before one with no default.
 `def f(a=1, b):` is a `SyntaxError`:
 `parameter without a default follows parameter with a default`.
 [Keyword-only parameters](#positional-only-and-keyword-only-parameters)
@@ -230,7 +230,7 @@ Rebinding one does not.
 
 ### Safe Defaults
 
-`good_append()` builds a fresh list on every call,
+`good_append()` builds a fresh list on every call that omits `target`,
 and any function that mutates a parameter with a default must do the same.
 If the function reads the parameter and leaves it as it was,
 use an immutable default such as an empty tuple.
@@ -510,7 +510,7 @@ Only the named form, `total=True`, reaches `total`.
 Calling `divide(a=10, b=2)` is an error,
 because `a` and `b` are positional-only.
 Calling `make_user("Sue", True)` is an error, because `admin` is keyword-only.
-The type checker catches both mistakes without running the code,
+The type checker catches both mistakes before the code runs,
 so each line carries a `# type: ignore` saying the misuse is deliberate.
 
 A signature can use every form at once, in one fixed order: positional-only,

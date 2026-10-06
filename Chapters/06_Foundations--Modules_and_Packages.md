@@ -578,13 +578,13 @@ and the `import` statement re-runs its `sys.modules` lookup on every call.
 and pays the loading cost once, at first use.
 
 Packages deferred submodule loading before `lazy import` existed,
-by giving `__init__.py` a module-level `__getattr__`
+by giving `__init__.py` a module-level `__getattr__()`
 ([PEP 562](https://peps.python.org/pep-0562/))
 that imports and returns a submodule the first time a caller asks for it by name.
 NumPy and SciPy use that technique to keep import time low.
-`lazy import` needs no hand-written `__getattr__`, and defers any imported name,
-not only a package's submodules.
-The `__getattr__` pattern still matters for code that must run on a Python older than 3.15.
+`lazy import` needs no hand-written `__getattr__()`,
+and defers any imported name, not only a package's submodules.
+The `__getattr__()` pattern still matters for code that must run on a Python older than 3.15.
 
 ### Watching the Deferral
 

@@ -36,7 +36,7 @@ A pattern earns its place only when you have the problem it solves.
 If nothing varies, you do not need machinery for isolating variation.
 
 Although they're called "design patterns," they apply beyond design.
-Because a pattern translates directly into code,
+Because a pattern translates into code,
 you might expect it to appear no earlier than low-level design.
 But a pattern embodies a complete idea within a program,
 so it can appear at the analysis phase or high-level design phase,
@@ -183,7 +183,7 @@ and adds a context class to hold the chosen algorithm.
 The `how` parameter replaces all three.
 
 This listing shows only the shape.
-Nobody designs a `Strategy` class hierarchy around calling `max` or `sum`.
+Nobody designs a `Strategy` class hierarchy around calling `max()` or `sum()`.
 [Function Objects](28_Patterns--Function_Objects.md#strategy-choosing-the-algorithm-at-runtime)
 works through a case with a real motivation.
 
@@ -425,7 +425,7 @@ With a `Protocol`, one edge exists in source.
 `Circle` does not mention `Shape`.
 A dotted edge in the figure exists only at check time,
 and neither of its ends names the other.
-Here the type checker draws it when it compares `Circle`'s members with the protocol's.
+Here the type checker draws that edge when it compares `Circle`'s members with the protocol's.
 With a `Callable`, the interface has no name and no file of its own.
 It lives in the caller's signature,
 and any function whose parameters and return type match satisfies it.
@@ -474,7 +474,7 @@ and the rest are here for your own designs.
     (LSP).
     A subtype must work anywhere code expects its base type.
 -   *Law of Demeter*: a.k.a. "Don't talk to strangers."
-    A method should talk only to itself, its own attributes, its parameters,
+    A method should talk to itself, its own attributes, its parameters,
     and objects it creates,
     not to the internals of objects it reached through something else.
     The Law of Demeter is another way to say "minimize coupling."
@@ -557,7 +557,7 @@ includes a figure of its pattern at work,
 drawn from that chapter's own listings.
 The gallery in [A Pattern Moves an Edge](#a-pattern-moves-an-edge)
 shows which way each dependency points.
-Those figures show what happens, in what order,
+Each chapter's figure shows what happens, in what order,
 and which part knows about which.
 
 Part III closes with a [Pattern Catalog](39_Patterns--Pattern_Catalog.md),

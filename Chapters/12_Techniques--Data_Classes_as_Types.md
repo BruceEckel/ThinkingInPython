@@ -736,8 +736,7 @@ def test_illegal_result_is_rejected() -> None:
 
 Once each small type guarantees its own values,
 you can safely build larger types out of them.
-A `Person` made of a valid `FullName` and a valid `EmailAddress` is valid by construction,
-with no extra work:
+A `Person` made of a valid `FullName` and a valid `EmailAddress` is valid by construction:
 
 ```python
 # person.py
@@ -782,8 +781,8 @@ if __name__ == "__main__":
 Its annotations require a `FullName` and an `EmailAddress`,
 which the type checker enforces, and neither can exist holding an illegal value.
 
-`test_person_composes_validated_parts` builds a `Person` from legal parts and reads them back.
-`test_full_name_needs_first_and_last` and `test_email_needs_at_sign` show that an illegal name or email cannot exist,
+`test_person_composes_validated_parts()` builds a `Person` from legal parts and reads them back.
+`test_full_name_needs_first_and_last()` and `test_email_needs_at_sign()` show that an illegal name or email cannot exist,
 so no `Person` can hold one:
 
 ```python
@@ -1023,10 +1022,10 @@ which covers `list`, `dict`, and `set`.
 The test is hashability, not mutability,
 so a mutable object of an ordinary class you wrote passes as a default and every instance shares it.
 That is the same bug the check exists to prevent.
-Use `default_factory` for any default that is not an immutable value.
+Use `default_factory` for any mutable default.
 
 `default_factory` accepts any callable that takes no arguments.
-A named function like `make_months` is one.
+A named function like `make_months()` is one.
 A type is another, which is why `field(default_factory=list)` appears throughout this book.
 Calling `list` builds an empty one.
 A subscripted generic is callable too,
@@ -1117,14 +1116,14 @@ def test_the_check_cannot_move_inside() -> None:
                 return tuple.__new__(cls, (number,))
 ```
 
-`test_the_factory_rejects_illegal_values` and `test_calling_the_type_skips_the_check` are `test_stars.py` inverted.
+`test_the_factory_rejects_illegal_values()` and `test_calling_the_type_skips_the_check()` are `test_stars.py` inverted.
 There, no illegal `Stars` can exist.
 Here, `Stars(11)` builds one,
 because a factory function is advice rather than a gate,
 a limit every factory in [Factory](27_Patterns--Factory.md#hiding-the-concrete-classes)
 shares.
 
-`test_the_check_cannot_move_inside` shows why the check cannot move inside the type.
+`test_the_check_cannot_move_inside()` shows why the check cannot move inside the type.
 `NamedTuple` refuses `__new__()`, refuses `__init__()` the same way,
 and no class comes into existence.
 The error arrives while Python is still executing the `class` statement.

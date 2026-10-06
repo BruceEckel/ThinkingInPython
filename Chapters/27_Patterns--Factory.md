@@ -300,7 +300,7 @@ the same trade [Explicit Registration with a Protocol](#explicit-registration-wi
 makes for a class that forgets `draw()`.
 `Kind` names the two keys in `SHAPES`,
 and the checker rejects a key that `Kind` does not list,
-so `SHAPES` cannot gain a shape name without adding it to the `Literal` first.
+so adding a shape name to `SHAPES` requires adding it to the `Literal` first.
 
 ### Self Registration
 
@@ -338,6 +338,7 @@ def make(name: str) -> Shape:
 lets each subclass register itself.
 Nothing in the listing calls a register function.
 The two `class` statements fill `Shape.registry` on their own.
+
 Registering through `__init_subclass__()` is why `Shape` is an abstract base class rather than a `Protocol`.
 `__init_subclass__()` runs only for classes that inherit from `Shape`,
 so a class that satisfies a Protocol structurally,
@@ -407,13 +408,14 @@ Each class points at the table, and the callers point at `make()` alone.
 When the subclasses sit in the same file as `make()`, as in `registry.py`,
 the registration runs before anything calls `make()`,
 but a subclass defined in another module registers itself only when something imports that module.
-The classic failure is a plugin that "never registered": the class is fine,
-the registry is fine, and nothing imported the module that defines the class.
+The classic failure is a plugin that "never registered."
+The class is fine, the registry is fine,
+and nothing imported the module that defines the class.
 
 A [lazy import](06_Foundations--Modules_and_Packages.md#lazy-imports)
 produces the same failure even when the import statement is in the file.
 The module body, and with it the registration,
-does not run until the first use of the imported name.
+waits for the first use of the imported name.
 An import written only to trigger registration never uses that name.
 Running with `-X lazy_imports=all` makes ordinary imports lazy too,
 so the same failure can appear in a program with no `lazy` keyword in it.
@@ -422,6 +424,7 @@ Import a plugin module eagerly when the import exists for its side effect.
 The registry keys on `cls.__name__` alone, so two classes that share a name,
 from different modules, silently overwrite each other.
 Key on `f"{cls.__module__}.{cls.__qualname__}"` when a collision is possible.
+
 The registry also keeps every entry it receives.
 A class defined inside a function or a test stays in the table,
 and the strong reference keeps the class alive for the rest of the process.
@@ -560,7 +563,7 @@ not as `Shape`.
 
 The bound is also why the factory names `Shape` instead of taking a type parameter.
 A generic factory would need `register()`'s bound to name the factory's own type parameter,
-and `ty` rejects a type variable's bound that is generic.
+and the type checker rejects a type variable's bound that is generic.
 
 Keeping the table in the factory removes two hazards from [Hazards of Self Registration](#hazards-of-self-registration).
 No `cls.registry` lookup walks the MRO,
@@ -909,7 +912,8 @@ before `GameEnvironment.__init__()` calls anything,
 the same way `make()` fails on a `Shape` subclass that forgets `draw()`,
 and `Partial()` does in [*Surrogate*](26_Patterns--Surrogate.md#proxy).
 The type checker reports that construction before the program runs.
-A *Protocol* names the required methods and needs no base class,
+
+A Protocol names the required methods and needs no base class,
 so a Protocol simplifies the *Abstract Factory*:
 
 ```python
@@ -1103,7 +1107,7 @@ if __name__ == "__main__":
 ```
 
 Because `spawn()` returns an independent object every time,
-callers can modify their copy without modifying the prototype.
+callers can modify their copy while the prototype stays as it was.
 Compare `spawn()` with `make()` in `registry.py`.
 There the table holds classes and `make()` calls one.
 Here the table holds instances and `spawn()` copies one.

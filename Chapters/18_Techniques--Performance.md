@@ -902,7 +902,7 @@ Re-sorting after every insertion costs far more than one incremental `heappush()
 A list-building pipeline materializes every intermediate result.
 A [generator pipeline](16_Techniques--Comprehensions.md#generator-expressions)
 computes one item at a time, on demand,
-so memory use doesn't grow with the size of the source,
+so memory use stays flat as the source grows,
 and the pipeline does no work past the point where the consumer stops.
 `tracemalloc` measures the difference:
 
@@ -952,7 +952,7 @@ Both versions produce the same five numbers,
 but the eager one builds a million-element list and a half-million-element list to get them,
 while the lazy one computes only the handful of values that `islice()` extracts.
 `islice()` replaces the eager version's `evens[:5]`.
-A generator has no `__getitem__`,
+A generator has no `__getitem__()`,
 so slicing one raises `TypeError: 'generator' object is not subscriptable`.
 
 When the consumer needs every element and the data fits in memory,
@@ -1299,9 +1299,8 @@ Python lays out a slotted instance as a fixed block of storage,
 and two unrelated classes that both declare non-empty `__slots__` each claim their own incompatible layout,
 so a class cannot inherit from both.
 A class can inherit from one slotted base as long as its other bases declare no slots of their own.
-Exercise 6 covers a fourth trap.
 A subclass that declares no `__slots__` of its own quietly grows a `__dict__` back,
-undoing the saving for every instance of that subclass.
+undoing the saving for every instance of that subclass (see exercise 6).
 
 ### Array Instead of List
 

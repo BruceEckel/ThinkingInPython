@@ -136,7 +136,7 @@ The pattern is a dispatcher.
 One loop waits on many event sources and hands each event to the handler registered for it,
 and the original description of *Reactor* lists *Dispatcher* as another name for it.
 "Reactor" survives because the literature and the libraries use it.
-Both asyncio's `SelectorEventLoop` and Twisted's `reactor` are Reactors.
+Both asyncio's `SelectorEventLoop` and Twisted's `reactor` implement *Reactor*.
 *Proactor* follows the same naming, and asyncio's `ProactorEventLoop`,
 the default on Windows, is one.
 

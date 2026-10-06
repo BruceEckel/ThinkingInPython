@@ -40,9 +40,10 @@ print(reduce(add, [1, 2, 3, 4]))
 #: 10
 ```
 
-`operator.add` is `+` as a function.
+`operator.add()` is `+` as a function.
 The `operator` module supplies a named function for each operator,
 ready to pass to a fold in place of `lambda a, b: a + b`.
+
 For addition specifically, `sum()` is the dedicated built-in,
 and `math.prod()` covers multiplication.
 `reduce()` is the tool for every other fold.
@@ -352,8 +353,8 @@ print(describe("hi"), "|", describe(5))
 #: a str | the number 5
 ```
 
-`singledispatch()` dispatches on the first argument alone,
-so a rule that depends on two types needs [*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md).
+Because `singledispatch()` dispatches on the first argument alone,
+a rule that depends on two types needs [*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md).
 The caller must pass that argument by position.
 `describe(value=5)` raises `TypeError: describe requires at least 1 positional argument`.
 

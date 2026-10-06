@@ -96,7 +96,7 @@ on the `src` subtree, and on a lone file.
 
 Adding a node type is one class.
 A plugin writes it and edits nothing above it.
-Adding an *operation* exposes the weakness.
+Adding an operation exposes the weakness.
 `walk()` needs a method in every class,
 and counting files or finding an entry by name each needs another.
 [*Visitor*](33_Patterns--Visitor.md) exists to solve this problem.
@@ -177,10 +177,10 @@ where it reads as a summary of them rather than as a forward declaration.
 Every function over `Node` repeats the union's recursion.
 `Directory` contains `Node`s,
 so `disk_usage()` and `walk()` call themselves on each entry.
-Each `match` needs one case per member of the union and no more.
+Each `match` needs one case per member of the union.
 
 `disk_usage()` still accepts a lone `File`, a subtree, or the whole tree.
-What changed from `filesystem_classic.py` is only where the operations live.
+What differs from `filesystem_classic.py` is only where the operations live.
 `disk_usage()` and `walk()` are ordinary functions outside the node classes,
 so a new operation is a new function, and the nodes stay unchanged.
 In the classic version a new node type is one class and a new operation is a method in every class.
@@ -284,7 +284,7 @@ Representing each construct as a node type turns evaluation into a tree walk.
 In most languages the pattern needs a class per construct and a parser to build the trees.
 Python shrinks the classes and removes the parser, for one specific case:
 sentences written as Python source in which every operator has at least one node operand.
-A data class declares a node in three or four lines,
+A record declares a node in three or four lines,
 and operator overloading lets Python's own parser build the trees.
 A GoF *Interpreter* more often parses a rules file, a configuration value,
 or a query a user types at runtime.
@@ -373,15 +373,15 @@ Python has parsed it, applying its precedence rules,
 before the interpreter runs.
 
 The reflected methods depend on the operator dispatch from [*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md#operators-dispatch-twice).
-`2 * x` works because `int.__mul__` returns `NotImplemented` and Python turns to `x.__rmul__(2)`.
+`2 * x` works because `int.__mul__()` returns `NotImplemented` and Python turns to `x.__rmul__(2)`.
 Unlike that chapter's `Meters`, though,
 these reflected methods accept any operand.
 `ty` reports `"a" + x` as `unsupported-operator` in source it checks,
-but at runtime `str.__add__` declines, `Var.__radd__` runs,
+but at runtime `Var.__radd__()` runs before `str` tries to concatenate,
 and the result is `Add(Num("a"), x)`,
 an ill-typed tree whose error waits for `evaluate()` to add the `"a"`.
-Exercise 6 makes each operator method return `NotImplemented` for an operand it cannot use,
-so `"a" + x` raises `TypeError` at the `+`.
+If each operator method returns `NotImplemented` for an operand it cannot use,
+`"a" + x` raises a `TypeError` at the `+` (see exercise 6).
 
 SymPy expressions, Polars column arithmetic,
 and SQLAlchemy filter conditions all use this technique.
@@ -393,7 +393,7 @@ Python's grammar sets the limit of the technique.
 You can overload the arithmetic, bitwise, and comparison operators this way,
 so an expression written with them builds nodes instead of computing.
 `==`, though, compares nodes instead of building one.
-`@dataclass` writes its own `__eq__()` onto every node class.
+`@record` writes its own `__eq__()` onto every node class.
 Attribute lookup finds a class's own method before an inherited one,
 so that generated `__eq__()` shadows anything `Operators` defines.
 
@@ -451,7 +451,7 @@ if __name__ == "__main__":
 ```
 
 The demo confirms that the operators build the tree you assemble by hand.
-Data classes generate `__eq__()`,
+Records generate `__eq__()`,
 so `expr == by_hand` compares the two trees by value.
 Printing `expr.left` shows the nesting.
 The `Add` at the root holds a `Mul`, which holds a `Num` and a `Var`.
@@ -658,7 +658,7 @@ A record blocks every field assignment, so `simplify()` cannot edit its input.
 The `is` guard in each `case _` returns the node it received when both children simplified to themselves.
 The guard tests identity with `is` rather than equality with `==`.
 Sharing means the same object, and `is` answers with one comparison,
-where a data class's `==` compares fields and descends into any subtree that changed.
+where a record's `==` compares fields and descends into any subtree that changed.
 
 The test file confirms that:
 
@@ -667,7 +667,7 @@ The test file confirms that:
 - Constant subtrees fold into one `Num`.
 - The rules apply at every level of the tree.
 - An expression with nothing to simplify comes back as the same object.
-- An unchanged subtree is shared with the result.
+- The result shares an unchanged subtree with the input.
 
 ```python
 # test_simplify.py
@@ -744,7 +744,7 @@ and a recursive call where a node holds more nodes.
 
 Iterating over a `Template` produces `str | Interpolation`,
 a closed union like `Node` with two members,
-so an `isinstance` test narrows it as well as a `match` does.
+so an `isinstance()` test narrows it as well as a `match` does.
 The `else` paired with `isinstance(piece, Interpolation)` is the `str` case.
 Iteration skips the empty literal pieces,
 so `t"{a}{b}"` yields two `Interpolation` objects and no strings.

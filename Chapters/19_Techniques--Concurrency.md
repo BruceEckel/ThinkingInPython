@@ -430,7 +430,7 @@ The rule inside `async def` is to `await` instead of blocking.
 If you cannot rewrite a blocking call,
 for example a library function that reads a file or talks to a database,
 you can put it in a thread.
-`await asyncio.to_thread(blocking_call)` moves `blocking_call` into a thread,
+`await asyncio.to_thread(blocking_call)` moves `blocking_call()` into a thread,
 allowing the event loop to keep running:
 
 ```python
@@ -455,7 +455,7 @@ asyncio.run(main())
 #: offloaded sleeps overlap: True
 ```
 
-`offloaded_wait()` calls the same `time.sleep()` that stalled `blocking_the_loop.py`'s `blocking_wait()`,
+`offloaded_wait()` calls the same `time.sleep()` that stalls `blocking_the_loop.py`'s `blocking_wait()`,
 but through `asyncio.to_thread()`,
 which hands the call to a worker thread and awaits its completion.
 `time.sleep()` still blocks, but it blocks a worker thread,
@@ -616,7 +616,7 @@ Cancellation reaches a task by raising `asyncio.CancelledError` inside it,
 at whichever `await` currently suspends it.
 That exception derives from `BaseException` rather than `Exception`,
 and the choice is deliberate.
-A `try`/`except Exception` written inside a task to log and continue does not catch cancellation,
+A `try`/`except Exception` written inside a task to log and continue lets cancellation propagate,
 so the task still stops the way the group intended.
 The real mistake is catching too much.
 A bare `except:` or an `except BaseException:` around an `await` catches the cancellation and keeps the task running,
@@ -1244,7 +1244,7 @@ use the same harness, which runs a price function sequentially and threaded,
 confirms they agree, and times each.
 `compare()` times each variant five times,
 alternating between the two so a stray background load spike slows both,
-and keeps each variant's best with `min`:
+and keeps each variant's best with `min()`:
 
 ```python
 # thread_compare.py
@@ -1341,7 +1341,7 @@ Swapping the loop for a thread pool changes nothing.
 Five threads still take turns holding the one GIL,
 so the threaded run costs the same as the sequential one,
 sometimes a little more because of the added scheduling.
-That is why [Parallelism](#parallelism) used processes instead.
+That is why [Parallelism](#parallelism) uses processes instead.
 Each process gets its own interpreter with its own GIL.
 
 ### Why Python Has a GIL
@@ -1359,7 +1359,7 @@ It also added a cost.
 Every count update is a read-modify-write sequence,
 and the interpreter runs millions of them per second.
 
-In 1991, the C API exposed those counts directly to extension authors.
+In 1991, the C API exposed those counts to extension authors.
 Easy extensions made Python a coordination language for C libraries and eventually produced the scientific Python stack.
 In exchange, reference counting became part of the compiled binary interface.
 Changing how it works breaks every extension.
@@ -2039,7 +2039,7 @@ That bridge is why `process_price()` calls `loop.run_in_executor()` instead of `
 `main()` takes `pool` as a parameter instead of creating it.
 Creating a `ProcessPoolExecutor` sets up its queues and pipes,
 its first `submit()` spawns the workers,
-and `__exit__` joins them through `shutdown(wait=True)`.
+and `__exit__()` joins them through `shutdown(wait=True)`.
 That join is an ordinary blocking call,
 and running it on the thread driving the event loop freezes every task on that loop,
 the same failure `blocking_the_loop.py` demonstrates with `time.sleep()`.
@@ -2084,7 +2084,7 @@ Thus, even a program written as `asyncio` from top to bottom keeps a thread pool
 because the libraries it calls still block.
 
 Free threading leaves I/O-bound work as it was and solves a narrower problem.
-Without the GIL, a thread can genuinely parallelize CPU-bound work from inside one process while sharing memory directly,
+Without the GIL, a thread can genuinely parallelize CPU-bound work from inside one process while sharing memory,
 paying no pickling cost.
 Neither a GIL-bound thread nor a process pool offers that.
 

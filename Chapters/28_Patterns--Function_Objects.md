@@ -320,7 +320,7 @@ def solve(f: Fn, a: float, b: float,
     return root
 ```
 
-`solve()` is the part of the procedure that does not change.
+`solve()` is the part of the procedure that stays fixed.
 It runs a finder and turns a failed search into an exception,
 so a caller receives a root or an exception, not a `None` to check.
 Because each finder is a function with the same signature,
@@ -350,7 +350,7 @@ so a Context earns its place when the algorithm must outlast the call.
 A view holding a controller is that Context in Smalltalk's MVC,
 and *GoF Design Patterns* names the pair as an example of *Strategy*.
 The controller decides how the view responds to input.
-Replacing the controller changes the response without changing the display,
+Replacing the controller changes the response and leaves the display as it was,
 and a controller that ignores input events disables the view.
 [*Observer*](30_Patterns--Observer.md) covers MVC's other half,
 where a model notifies its views.
@@ -437,7 +437,7 @@ Because `bisection_tol()` takes `tolerance` as an ordinary parameter,
 in place of `bisection_within()`'s closure.
 Each `partial` object satisfies `RootFinder`,
 so `solve()` runs it as it runs the closures.
-A positional-only parameter takes no keyword,
+A positional-only parameter must arrive by position,
 so binding one means passing a [`Placeholder`](40_Functional--Foundations.md#leaving-a-gap-with-placeholder)
 in each position the caller fills.
 
@@ -494,6 +494,7 @@ Because the interval `[1.0, 1.3]` does not straddle the root,
 bisection fails by returning `None`.
 The loop continues to a method that needs no bracket.
 Adding, removing, or reordering the handlers means editing the `chain` list.
+
 All three patterns share one shape:
 
 ![](_images/function_objects_story)
@@ -583,7 +584,7 @@ so they assert which finders ran as well as the root.
 
 `watched()` carries a `# type: ignore` because `RootFinder` is a `Callable`,
 and a `Callable` declares no `__name__`.
-`ty` is right about the type.
+The type checker is right about the type.
 A `partial` object is a `RootFinder`, and it has no `__name__`.
 The three finders here are functions, and every function has one.
 A `Protocol` that declares `__name__` beside `__call__()` states that requirement in the type and needs no comment.

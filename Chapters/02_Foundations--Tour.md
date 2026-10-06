@@ -90,9 +90,8 @@ Indentation shows where the assignment sits, not whether it runs.
 
 The type checker sees that `val = 1` cannot run and reports an error on `print(val)`,
 so `# type: ignore` tells it the mistake is deliberate.
-The `try` and `except` catch the exception so the script can print the exception's message and finish.
-[Control Flow](04_Foundations--Control_Flow.md#errors-and-exceptions)
-covers them.
+The [`try` and `except`](04_Foundations--Control_Flow.md#errors-and-exceptions)
+catch the exception so the script can print the exception's message and finish.
 
 Indenting can nest as deeply as you like.
 Four spaces per level is the convention,
@@ -224,10 +223,8 @@ An f-string's format spec rounds the same way.
 A `bool` is a subtype of `int`, so `True` equals `1` and `False` equals `0`.
 Summing a sequence of comparisons therefore counts how many are true.
 
-The argument to `sum()` is a *generator expression*,
+The argument to `sum()` is a [*generator expression*](16_Techniques--Comprehensions.md#generator-expressions),
 which hands over one value at a time instead of building a list first.
-[Comprehensions](16_Techniques--Comprehensions.md#generator-expressions)
-covers the form.
 
 Python has no `++` or `--`.
 Use `+= 1` and `-= 1`.
@@ -349,11 +346,9 @@ so the empty string shows as `''` and not as blank.
 `Bucket` defines no `__bool__()`, so `bool()` falls back to its `__len__()`.
 `Bucket(0)` is false and `Bucket(3)` is true.
 
-`Bucket` is a small class, and [Classes](07_Foundations--Classes.md)
-covers the syntax.
-Its `count: int` and `-> int` are type hints.
+`Bucket` is a small [class](07_Foundations--Classes.md).
+Its `count: int` and `-> int` are [type hints](08_Foundations--Static_Types.md#type-hints).
 They state the types for the reader and the type checker and change nothing about how the code runs.
-[Static Types](08_Foundations--Static_Types.md#type-hints) covers them.
 
 `and` and `or` short-circuit and return one of their operands,
 not a coerced boolean:
@@ -600,10 +595,8 @@ Iterating over a `Template` produces the pieces in order,
 each either a `str` the author typed or an `Interpolation` carrying a value.
 An `Interpolation` also remembers the source text of the expression that produced it,
 and `piece.expression` reports that text.
-Collecting every `piece.expression` above uses a list comprehension,
+Collecting every `piece.expression` above uses a [list comprehension](16_Techniques--Comprehensions.md#list-comprehensions),
 which has the same kind of `for` clause as the generator expression in `arithmetic.py` but builds a list.
-[Comprehensions](16_Techniques--Comprehensions.md#list-comprehensions)
-covers the general form.
 Iteration skips empty literal strings,
 so the leading `''` in `message.strings` does not reach the loop.
 That skipping is why a consumer cannot assume that literals and interpolations alternate.

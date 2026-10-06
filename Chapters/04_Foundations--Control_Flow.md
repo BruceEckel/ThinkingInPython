@@ -116,7 +116,8 @@ print()  # The newline that end=" " left off
 
 The loop prints `0 1 2`, skips `3` with `continue`, prints `4 5`,
 then stops at `6` with `break`, so `6` through `9` never print.
-Both apply to the innermost enclosing loop.
+
+`break` and `continue` both apply to the innermost enclosing loop.
 Python has no labeled `break`, so leaving two loops at once means either a flag,
 a `return` from a function that holds both loops,
 or the loop `else` technique that `nested_break.py` shows below.
@@ -485,6 +486,7 @@ To handle several types the same way, give a tuple:
 Python tries the `except` clauses in order and runs the first whose type matches,
 so a broad clause above a narrow one makes the narrow one unreachable.
 Order them most specific first.
+
 To log an exception and still let it propagate, re-raise it with a bare `raise`.
 
 ### Exception Chaining
@@ -563,6 +565,7 @@ so the output above is the text Python prints, not a summary of it.
 With no `from`, Python still records the earlier exception in `__context__` and produces the "During handling" line.
 `from None` sets `__suppress_context__`,
 and nothing appears above the new exception.
+
 Use `from e` when the earlier exception explains this one,
 and `from None` when the earlier exception distracts from your own message.
 
@@ -650,10 +653,12 @@ so `f` is still in scope afterward and the listing can print `f.closed`.
 Closing the file is cleanup that runs whether or not the block succeeds.
 [Cleanup](10_Foundations--Cleanup.md)
 contrasts that guarantee with leaving the close to Python's garbage collector.
+
 Anything that acquires a resource (a file, a lock, a network connection)
 can be a context manager.
 [Context Managers](15_Techniques--Context_Managers.md)
 shows how to write your own.
+
 For reading or writing a whole file in one call,
 `pathlib` provides `read_text()` and `write_text()`,
 which open the file and close it again.

@@ -1203,7 +1203,7 @@ A `Grain` is a position.
 All the simulation's logic sits in `step()`.
 Every grain takes one random step,
 and the plate's vibration at that grain's location scales the step.
-Grains do not read each other's positions and store their own.
+Each grain stores its own position and reads no other grain's.
 
 ```python
 # chladni_plate/chladni.py
@@ -1271,7 +1271,7 @@ class Plate:
 ```
 
 `bounce()` reflects a kicked grain off the edge instead of letting it leave the plate.
-`agitation()` measures the mean vibration strength directly under the grains.
+`agitation()` measures the mean vibration strength at the grains' positions.
 Grains scattered at random sample the field's average, so agitation starts high.
 A grain resting on a nodal line contributes zero.
 One number says how settled the sand is.
@@ -1351,7 +1351,7 @@ and no line of `step()`, names.
 A test cannot predict where a particular grain ends up after hundreds of random kicks.
 It checks the aggregate instead.
 Four hundred steps must divide agitation by ten,
-and no kick may leave a grain outside the plate.
+and the kicks must keep every grain on the plate.
 Seeding `random.Random` makes any failure reproducible.
 
 ```python

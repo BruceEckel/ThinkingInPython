@@ -253,7 +253,7 @@ except ValueError as error:
 `KeyError('original')` never reaches the `except`.
 `Careless.__exit__()` raises a `ValueError` before `with` can propagate the `KeyError`,
 so the caller sees the cleanup's failure instead of the block's.
-Python does not discard `original`.
+Python keeps `original`.
 It becomes `error.__context__`, the same chaining a nested `except` produces.
 A broken cleanup path that hides the real failure is one of the most common context-manager bugs in practice,
 so write `__exit__()` methods that fail only for reasons worse than the original exception.
@@ -518,7 +518,7 @@ The `/` makes `types` and `fn` [positional-only](05_Foundations--Functions.md#po
 so every keyword argument goes to `fn`.
 [`**P`](14_Techniques--Decorators.md#p-and-r-keep-the-static-interface)
 ties `*args` and `**kwargs` to `fn`'s own signature,
-so the type checker checks the forwarded arguments as if you had called `fn` directly:
+so the type checker checks the forwarded arguments as if you had called `fn`:
 
 ```python
 # demo_expect.py
@@ -590,14 +590,14 @@ if __name__ == "__main__":
 #: === meeting ends ===
 ```
 
-`banner` works both as a decorator for `report` and in a `with` in `__main__`.
+`banner` works both as a decorator for `report()` and in a `with` in `__main__`.
 The parentheses in `@banner("report")` matter.
 The call constructs the manager, which then decorates the function.
 Each call of the decorated function builds a fresh manager,
 so `report()` can run any number of times, each with its own enter and exit.
 The single-use caution from `trace_gen.py` still holds for the manager object you name in a `with`.
 `ContextDecorator` applies [`functools.wraps`](14_Techniques--Decorators.md#wraps-keeps-the-runtime-interface),
-so `report` keeps its name and docstring.
+so `report()` keeps its name and docstring.
 
 ```python
 # banner_cm.py
@@ -829,7 +829,7 @@ Choose these before writing `__enter__()` and `__exit__()` by hand.
   covering the case the `expected` class handles,
   without `expected`'s printing or its catch-everything default.
 - `closing(obj)` calls `obj.close()` on exit,
-  for objects that have `close()` but are not context managers themselves.
+  for objects that have `close()` but are not context managers.
 - `ExitStack` manages a [dynamic or conditional set of managers](#combining-context-managers).
 - `ContextDecorator` lets a context manager double as a decorator,
   as `banner` shows.

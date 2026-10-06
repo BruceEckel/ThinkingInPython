@@ -244,7 +244,7 @@ def test_drawing_after_restore_spares_memento() -> None:
     assert checkpoint.strokes == ()
 ```
 
-`test_drawing_after_restore_spares_memento` checks for the sharing bug.
+`test_drawing_after_restore_spares_memento()` checks for the sharing bug.
 If the memento shares a mutable list with the sketch (see exercise 4),
 drawing after a restore appends to the snapshot's list too.
 Both `save()` and `restore()` must copy.
@@ -400,7 +400,7 @@ since opacity is the pattern's whole point.
 The classic form has that opacity,
 so `History[S]` below holds the classic `Memento` from `sketch.py` as readily as a `Drawing`.
 What immutability removes is the explicit `save()` and `restore()` at every edit,
-since a state that keeps its value serves as its own memento.
+since a state that keeps its value is its own memento.
 Undo and redo are two stacks of past and future states,
 [generic](08_Foundations--Static_Types.md#type-parameters) over the state type:
 
@@ -612,7 +612,8 @@ and every method on `Drawing` works from one.
 `copy.replace()` is the [general version](12_Techniques--Data_Classes_as_Types.md#the-general-form-of-replace)
 of `dataclasses.replace()`.
 Choosing `copy.replace()` over `dataclasses.replace()` keeps the technique available to whatever state type a `History` holds.
-`NamedTuple`, `datetime`, and any class defining `__replace__()` all accept it.
+`NamedTuple`, `datetime`,
+and any class defining `__replace__()` all accept `copy.replace()`.
 
 ## Mementos That Outlive the Process
 

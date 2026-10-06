@@ -25,7 +25,7 @@ and how far those claims can go.
 
 ## Referential Transparency
 
-An expression is *referentially transparent* when you can replace it with its value without changing the program's behavior.
+An expression is *referentially transparent* when you can replace it with its value and the program behaves the same.
 Pure functions have this property, and that is the reason purity matters:
 
 ```python

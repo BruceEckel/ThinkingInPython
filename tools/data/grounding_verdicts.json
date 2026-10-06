@@ -1,14 +1,26 @@
 {
- "43149ef1fb95c029": {
+ "6476eb4778e6007d": {
   "file": "02_Foundations--Tour.md",
-  "line": 352,
+  "line": 349,
   "target": "07_Foundations--Classes.md",
   "terms": [
    "Bucket"
   ],
-  "sentence": "`Bucket` is a small class, and [Classes](07_Foundations--Classes.md) covers the syntax.",
+  "sentence": "`Bucket` is a small [class](07_Foundations--Classes.md).",
+  "p_terms": 0.02,
+  "asked": "2026-10-06"
+ },
+ "6b9909bf303359bf": {
+  "file": "02_Foundations--Tour.md",
+  "line": 598,
+  "target": "16_Techniques--Comprehensions.md",
+  "terms": [
+   "piece",
+   "arithmetic.py"
+  ],
+  "sentence": "Collecting every `piece.expression` above uses a [list comprehension](16_Techniques--Comprehensions.md#list-comprehensions), which has the same kind of `for` clause as the generator expression in `arithmetic.py` but builds a list.",
   "p_terms": 0.0,
-  "asked": "2026-09-29"
+  "asked": "2026-10-06"
  },
  "6105b531c2441ebb": {
   "file": "11_Techniques--Testing.md",
@@ -45,7 +57,7 @@
  },
  "ceda21ecec78c6c4": {
   "file": "12_Techniques--Data_Classes_as_Types.md",
-  "line": 1014,
+  "line": 1013,
   "target": "05_Foundations--Functions.md",
   "terms": [
    "Months"
@@ -56,7 +68,7 @@
  },
  "6cb9321f81198731": {
   "file": "14_Techniques--Decorators.md",
-  "line": 1195,
+  "line": 1196,
   "target": "07_Foundations--Classes.md",
   "terms": [
    "trace"
@@ -315,20 +327,31 @@
   "p_terms": 0.02,
   "asked": "2026-09-27"
  },
- "299953e2a35786a1": {
+ "78a636500356cee9": {
   "file": "31_Patterns--State_Machines.md",
-  "line": 232,
+  "line": 93,
+  "target": "12_Techniques--Data_Classes_as_Types.md",
+  "terms": [
+   "MouseAction"
+  ],
+  "sentence": "Each possible move by a mouse is a member of the `MouseAction` [enumeration](12_Techniques--Data_Classes_as_Types.md#enums-are-types-too).",
+  "p_terms": 0.08,
+  "asked": "2026-10-06"
+ },
+ "18b544f02f389e81": {
+  "file": "31_Patterns--State_Machines.md",
+  "line": 231,
   "target": "13_Techniques--Pattern_Matching.md",
   "terms": [
    "APPEARS"
   ],
-  "sentence": "A dotted name compares the event with that member, while a bare `APPEARS` would be a capture pattern that matches every event ([Pattern Matching](13_Techniques--Pattern_Matching.md#a-bare-name-captures-a-dotted-name-compares)).",
-  "p_terms": 0.02,
-  "asked": "2026-09-27"
+  "sentence": "A dotted name compares the event with that member, while a bare `APPEARS` would be a [capture pattern](13_Techniques--Pattern_Matching.md#a-bare-name-captures-a-dotted-name-compares) that matches every event.",
+  "p_terms": 0.01,
+  "asked": "2026-10-06"
  },
  "205dd25052aa15f3": {
   "file": "31_Patterns--State_Machines.md",
-  "line": 242,
+  "line": 241,
   "target": "25_Patterns--Template_Method.md",
   "terms": [
    "StateMachine"
@@ -339,7 +362,7 @@
  },
  "e3c9c99b35195620": {
   "file": "31_Patterns--State_Machines.md",
-  "line": 495,
+  "line": 494,
   "target": "06_Foundations--Modules_and_Packages.md",
   "terms": [
    "state_machine.py"
@@ -350,7 +373,7 @@
  },
  "e8596ef215d9870a": {
   "file": "31_Patterns--State_Machines.md",
-  "line": 993,
+  "line": 992,
   "target": "26_Patterns--Surrogate.md",
   "terms": [
    "UnpredictablePerson",
@@ -363,7 +386,7 @@
  },
  "8b236a72729572a5": {
   "file": "31_Patterns--State_Machines.md",
-  "line": 1005,
+  "line": 1004,
   "target": "23_Patterns--Iterators.md",
   "terms": [
    "mouse_move_generator",
@@ -467,7 +490,7 @@
  },
  "d2b75b2af9d16cb3": {
   "file": "41_Functional--Toolkits.md",
-  "line": 627,
+  "line": 628,
   "target": "05_Foundations--Functions.md",
   "terms": [
    "fillvalue"
@@ -500,7 +523,7 @@
  },
  "709ba98f5b49d11a": {
   "file": "46_Effects--Stateless.md",
-  "line": 1330,
+  "line": 1331,
   "target": "44_Effects--Effect_Management.md",
   "terms": [
    "Need"

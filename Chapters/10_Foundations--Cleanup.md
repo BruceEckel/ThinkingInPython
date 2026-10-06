@@ -267,13 +267,13 @@ and the `Socket("B")` block shows `close()` running when the body raises an exce
 Compare `cleanup.py`,
 where the cleanup runs at an unknowable moment after the program's last statement.
 [Context Managers](15_Techniques--Context_Managers.md) covers the protocol,
-the `@contextmanager` shorthand, and what `__exit__`'s arguments mean.
+the `@contextmanager` shorthand, and what `__exit__()`'s arguments mean.
 
 `close()` also guards against a second call.
 The explicit `sock.close()` after the `with` block prints nothing,
 because `self.closed` blocks the repeat.
 The `with` protocol calls `close()` for you once.
-Nothing stops your own code from calling it again,
+Your own code can still call it again,
 so a real `close()` must do nothing on a repeat call,
 the way a file object's `close()` does.
 

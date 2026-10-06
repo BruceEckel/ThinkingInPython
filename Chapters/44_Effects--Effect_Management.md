@@ -90,7 +90,7 @@ is not.
 
 The third is an exception,
 which propagates from callee to caller the same way and appears in no signature either.
-People argue about whether an exception makes a function *impure*.
+People argue about whether an exception makes a function impure.
 
 ## Are Exceptions Impure?
 
@@ -615,7 +615,7 @@ An EMS moves the bookkeeping into the type system,
 where a native system maintains it for you, or, with a library like Stateless,
 the type checker verifies every declaration you write.
 Moving the bookkeeping into the type system takes a second channel in the signature,
-one that carries Effect information without occupying the argument list.
+one that carries Effect information outside the argument list.
 
 ### Native Effect Management
 
@@ -925,7 +925,7 @@ That is tracking, interface separation, and delayed binding,
 the three properties of a full EMS, inside Python's existing type system.
 
 The guarantee has a limit.
-Stateless verifies that the Effects you *declare* propagate consistently.
+Stateless verifies that the Effects you declare propagate consistently.
 A function can still call `print()`, next to its carefully declared Effects.
 In Koka, that call changes the function's Effect row, and every caller's row.
 In Python, neither Stateless nor the type checker reports it.

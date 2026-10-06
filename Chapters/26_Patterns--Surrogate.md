@@ -153,7 +153,7 @@ print(isinstance(Partial(), Service))
 With inheritance, the abstract base class rejects an incomplete implementation at construction.
 A `Protocol` instead reports the mismatch statically,
 at a parameter annotated `Service`, and needs no common base.
-One caveat: `isinstance()` against a `@runtime_checkable` Protocol checks only that the methods exist,
+One caveat: `isinstance()` against a `@runtime_checkable` Protocol checks that the methods exist,
 not that their signatures match.
 The static type checker verifies signatures.
 
@@ -775,7 +775,7 @@ splitting the sequence across both implementations.
 See [Concurrency](19_Techniques--Concurrency.md#the-gil-does-not-prevent-races)
 for what an unsynchronized swap costs.
 
-`run(b: Any)` has no alternative.
+`run()` takes `b: Any` because `Behavior` fails as the annotation.
 Annotating `run(b: Behavior)` and passing it `b` is a type error,
 because `Surrogate` defines no `f()` of its own.
 The checker [cannot verify a method that `__getattr__()` supplies](#forwarding-with-getattr).

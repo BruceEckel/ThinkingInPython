@@ -395,7 +395,7 @@ the subclass is clearer.
 If each step is independent,
 passing functions is lighter and avoids a class hierarchy.
 
-The subclass form also gets optional steps without extra work,
+The subclass form also makes each step optional,
 since the base supplies the `...` default.
 The function form must give each parameter a default of its own.
 Without one, omitting `customize2` in `template_function.py` raises a `TypeError`.

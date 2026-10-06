@@ -56,8 +56,8 @@ print(vars(x))
 #: {}
 ```
 
-`x` sees the changes you make to the class *after* `x`'s creation.
-The instance does not change.
+`x` sees the changes you make to the class after `x`'s creation.
+The instance stays as it was.
 The last line shows its instance dictionary still empty.
 Attribute lookup on an instance falls through to its class,
 so a change to a class reaches every object of that class,
@@ -693,7 +693,7 @@ so `dispatch()` passes `self` to the function it finds.
 The listing writes `func.__dict__["event"]` rather than `func.event`,
 and the difference matters to the type checker.
 A function's type declares a fixed set of attributes,
-so `ty` reports `Button.press.event` as an unresolved attribute,
+so the type checker reports `Button.press.event` as an unresolved attribute,
 and it reports the assignment `func.event = event` the same way.
 Every object's type declares `__dict__` as a `dict[str, Any]`,
 so indexing it type-checks.
@@ -1112,7 +1112,7 @@ print(r.area())
 `Rectangle` names the rule twice and writes no checking code of its own.
 `self.width = width` inside `__init__()` routes through `Positive.__set__()` like any other write,
 so the constructor validates its arguments without a line devoted to it.
-The rejected assignment does not reach `_width`,
+The rejected assignment leaves `_width` as it was,
 so `r.area()` still uses the width the constructor stored.
 A `property` protects one attribute the same way,
 but `Rectangle` then carries the check twice, once per attribute.
@@ -1162,7 +1162,7 @@ print(Simple().uses_metaclass())  # type: ignore
 `SimpleMeta.__init__()` runs once, as the `class Simple` statement finishes,
 and patches a new method onto the freshly built class.
 In the `display_object()` output,
-`uses_metaclass(self)` sits alongside `ping` and `pong`,
+`uses_metaclass(self)` sits alongside `ping()` and `pong()`,
 indistinguishable from the methods in the class body.
 The injected value is a lambda,
 but a function is a [descriptor](#learning-a-name-with-__set_name__),
@@ -1203,9 +1203,9 @@ because a broad `Any` also hides genuine mistakes.
 
 Metaclass examples appear to use `__new__()` and `__init__()` interchangeably.
 The difference is timing.
-`__new__()` runs *before* the class object exists, so it can change the name,
+`__new__()` runs before the class object exists, so it can change the name,
 bases, and namespace that Python uses to build it.
-`__init__()` runs *after* the class exists,
+`__init__()` runs after the class exists,
 so changing those arguments has no effect,
 though you can still modify the finished class object:
 
@@ -1260,7 +1260,7 @@ and reserve `__new__()` for a genuine need.
 
 ## Intercepting Instance Creation
 
-A method defined on the metaclass becomes a method of the *class object*,
+A method defined on the metaclass becomes a method of the class object,
 callable on the class but not on its instances.
 Such methods are sometimes called *metamethods*.
 They differ from `classmethod`s.
@@ -1465,7 +1465,7 @@ print(type(D).__name__)
 As with the layout conflict just shown,
 `ty` reports `conflicting-metaclass` and names both `MetaA` and `MetaB`,
 so the line carries a `# type: ignore`.
-The `expected()` helper wraps the message across three lines to fit the page;
+The `expected()` helper wraps the message across three lines to fit the page.
 Python reports it as a single line.
 The message names the fix.
 `D`'s metaclass, `MetaC`, must be a subclass of every base's metaclass,
@@ -1481,7 +1481,7 @@ That shape is one more reason to avoid metaclasses
 
 Use a metaclass when you need to change the class object rather than react to its creation:
 
-- Adding methods *to the class*
+- Adding methods to the class
   (metamethods such as the `__call__()` in `singleton.py`, or the `__iter__()` that lets `EnumType` make `for c in Color` work).
 - Replacing the namespace mapping with `__prepare__()` so the class body populates a custom dictionary.
 - Enforcing an invariant across a family of classes that shares no base class.
@@ -1518,9 +1518,10 @@ for c in Color:
 `IterableMeta.__iter__()` fires when you write `for c in Color`,
 iterating over the class object, not an instance of it.
 It walks `vars(cls)`, the class's own namespace,
-skipping every underscore-prefixed name,
-which for `Color` is the dunder bookkeeping every class carries,
-so it yields the three values the body assigned: `"red"`, `"green"`, `"blue"`.
+and skips every underscore-prefixed name.
+For `Color` those names are the dunder bookkeeping every class carries,
+so `__iter__()` yields the three values the body assigned: `"red"`, `"green"`,
+`"blue"`.
 
 A class decorator cannot make `for c in Color` work.
 It can add methods that instances see,
@@ -1582,7 +1583,7 @@ A class decorator receives the finished class, so it can add, replace,
 or inspect members.
 It cannot change the name, the bases, or the namespace,
 and it cannot give the class object behavior of its own.
-Setting `__call__` from a decorator makes *instances* callable.
+Setting `__call__` from a decorator makes instances callable.
 Only a metaclass makes the class callable in a new way.
 The case for a metaclass rests on that limit.
 The class object needs behavior,
@@ -2186,8 +2187,9 @@ A `@dataclass` produces many of these:
 - `__hash__`, set to `None`
 - `__init__`, `__eq__`, and `__repr__`
 
-The generated `__init__`, `__eq__`, and `__repr__` give `Fraggle` a constructor,
-equality, and a `repr()` that you did not write.
+The generated `__init__()`, `__eq__()`,
+and `__repr__()` give `Fraggle` a constructor, equality,
+and a `repr()` that you did not write.
 
 The rest is the bookkeeping every class carries.
 

@@ -633,7 +633,7 @@ The `**P` parameter carries the wrapped function's whole parameter list through,
 so `parse("42")` type-checks and the checker rejects `parse(42)`.
 `**P` is the technique for [maintaining the wrapped interface](14_Techniques--Decorators.md#p-and-r-keep-the-static-interface),
 and [Decorators](14_Techniques--Decorators.md)
-explains how to write decorators like `@safe`, including `functools.wraps`.
+explains how to write decorators like `@safe`, including `functools.wraps()`.
 
 The tests for `@safe` check that a good input becomes an `Ok`,
 and that a raised exception becomes an `Err` holding that exception:

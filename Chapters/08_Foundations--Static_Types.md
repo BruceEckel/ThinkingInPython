@@ -273,7 +273,7 @@ print(MAX_RETRIES, GREETING, HISTORY)
 `HISTORY.append("first")` checks and runs,
 the same as it does on a non-`Final` list.
 The type checker refuses only an assignment to the name `HISTORY`.
-This is the misconception `Final` invites.
+`Final` invites a misconception.
 The word suggests immutability, but the object stays mutable.
 
 You can give the type explicitly, as in `GREETING`,
@@ -386,6 +386,7 @@ print(type(shape).__name__)
 so the argument's annotation is `type[Shape]`.
 Passing `Circle` works because `Circle` is a subclass of `Shape`.
 Calling `kind()` then produces an instance.
+
 The word `type` plays two roles in this listing:
 the annotation `type[Shape]` names the class to the type checker,
 while the built-in call `type(shape)` in the demo retrieves an object's class at runtime.
@@ -595,6 +596,7 @@ print(counts.top() + 1)
 `words: Stack` names the class without its brackets,
 and the default makes that annotation mean `Stack[str]`,
 so `words.top()` is a `str` and `upper()` checks.
+
 A default matters most for a class whose type parameter is usually the same type.
 Callers who use that type omit the brackets, and the annotation stays precise.
 
@@ -736,8 +738,8 @@ A call that leaves out `width` draws `missing-argument`.
 A misspelled keyword is where the checkers disagree.
 Pyright rejects `fill` misspelled as `fil="*"` with `No parameter named "fil"`,
 but `ty` 0.0.84 accepts that call without a diagnostic.
-At runtime `fil` becomes an extra key in `style`, which `label()` ignores,
-so the fill quietly stays a space.
+At runtime `fil` becomes an extra key in `style`,
+and `label()` ignores that key, so the fill quietly stays a space.
 
 The payoff grows when several functions accept the same options.
 One `TypedDict` declares them once,
@@ -816,12 +818,12 @@ The abstract container types come from `collections.abc`.
 
 | Construct | Meaning |
 |-----------|---------|
-| `list[T]`, `set[T]` | A homogeneous collection of `T`; *invariant*, so `list[Circle]` is not a `list[Shape]`, see [Variance](#variance) |
-| `frozenset[T]` | An immutable homogeneous set of `T`; *covariant*, because nothing can be written into it, so a `frozenset[Circle]` satisfies `frozenset[Shape]`, see [Variance](#variance) |
+| `list[T]`, `set[T]` | A homogeneous collection of `T`; invariant, so `list[Circle]` is not a `list[Shape]`, see [Variance](#variance) |
+| `frozenset[T]` | An immutable homogeneous set of `T`; covariant, because nothing can be written into it, so a `frozenset[Circle]` satisfies `frozenset[Shape]`, see [Variance](#variance) |
 | `dict[K, V]` | A dictionary with keys `K` and values `V`, see [Type Hints](#type-hints) |
 | `tuple[A, B]` | A fixed-length tuple (here a pair), see [Type Hints](#type-hints) |
 | `tuple[T, ...]` | A variable-length tuple of `T`, see [Type Hints](#type-hints) |
-| `Sequence[T]`, `Iterable[T]`, `Iterator[T]`, `Mapping[K, V]` | Read-only abstract shapes from `collections.abc`; *covariant* in their element type, so `list[Circle]` satisfies `Sequence[Shape]` (`Mapping[K, V]`'s `K` stays invariant), see [Variance](#variance) |
+| `Sequence[T]`, `Iterable[T]`, `Iterator[T]`, `Mapping[K, V]` | Read-only abstract shapes from `collections.abc`; covariant in their element type, so `list[Circle]` satisfies `Sequence[Shape]` (`Mapping[K, V]`'s `K` stays invariant), see [Variance](#variance) |
 | `Generator[Y, S, R]` | A generator's yield, send, and return types; `Iterator[T]` is enough when it only produces values, see [Generators](45_Effects--Generators.md#annotating-a-generator) |
 | `Callable[[A, B], R]` | A function taking `A`, `B` and returning `R` (`...` for any parameters) |
 | `type[C]` | The class object `C`, not an instance of it, see [Classes as Values](#classes-as-values-type) |

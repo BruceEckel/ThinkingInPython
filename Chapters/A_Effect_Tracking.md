@@ -54,8 +54,8 @@ computed and checked for every function.
 A system that tracks Effects needs three things:
 
 1. **A place to write the row.**
-   The row must sit in the signature without occupying the argument list,
-   the second channel of [Effects by Hand](44_Effects--Effect_Management.md#effects-by-hand).
+   The row must sit in the signature, outside the argument list,
+   as the second channel of [Effects by Hand](44_Effects--Effect_Management.md#effects-by-hand).
 2. **Something that computes the rule's right side.**
    That means finding every call in a body and the row of every callee.
 3. **Something that compares the computed row with the declared one,** and rejects the program when they differ.
@@ -395,7 +395,7 @@ The four problems before this section apply in full to a separate tool.
 [An Effect Checker](B_An_Effect_Checker.md) builds a small one.
 That checker reports `Unknown` for a call it cannot resolve,
 and that appendix's [closing section](B_An_Effect_Checker.md#what-the-checker-resolves-and-what-it-cannot-see)
-lists the cases the checker passes over with no report.
+lists the cases the checker passes over silently.
 
 The third is the runtime.
 A decorator reads each function's row once with `row()`,

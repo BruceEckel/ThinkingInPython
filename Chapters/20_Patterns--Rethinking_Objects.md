@@ -68,7 +68,7 @@ The *Liskov Substitution Principle* (LSP)
 says that an object of a subtype must work anywhere code expects an object of its base type.
 A subclass may add behavior, but it must honor the base class contract.
 An override may accept more than the base does but never less.
-It returns a result the caller can use where it expects the base's result,
+It returns a result that works wherever the caller expects the base's result,
 and raises no surprising exceptions.
 When subclasses obey the principle,
 code you write against the base class works unchanged on any of them.
@@ -238,7 +238,7 @@ so the caller can still mutate the internals through that reference.
 A fully defensive class must copy on the way in as well.
 
 A `@dataclass` version of `Plugged` trims the constructor,
-but its generated `__repr__` prints `_numbers` and `_bob`,
+but its generated `__repr__()` prints `_numbers` and `_bob`,
 leaking the internals yet again.
 
 The two getters also copy differently, and the difference is its own trap.
@@ -342,7 +342,7 @@ expect(TypeError, hash, fl)
 Frozen guards the binding, not the object.
 `fl.numbers` must keep pointing at the same list,
 and attempting to rebind it raises an exception.
-But nothing stops that list from changing, the identical leak `Leaky` has.
+But that list can still change, the identical leak `Leaky` has.
 Hashing goes the same way.
 A frozen data class is hashable only when every field it compares is hashable,
 so `hash(fl)` raises a `TypeError` and a `FrozenLeaky` cannot be a dict key.
@@ -592,7 +592,7 @@ print({c: "value"}[c])
 #: value
 ```
 
-`Contact` inherits nothing, and gains no methods it did not request.
+`Contact` inherits nothing, and gains only the methods it requests.
 It holds a `Name` and an `Address`, and those types stay usable on their own.
 Changing one city means rebuilding the `Address` and then the `Contact`.
 [The General Form of `replace()`](12_Techniques--Data_Classes_as_Types.md#the-general-form-of-replace)

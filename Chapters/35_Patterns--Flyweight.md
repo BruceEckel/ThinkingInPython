@@ -200,7 +200,7 @@ with the asker supplying the coordinates.
 
 `Symbol` names the closed set of valid map characters,
 so `Tile.symbol` and every key of `SPECS` is one of those characters.
-If you add a kind to `SPECS` without adding it to `Symbol`,
+If you add a kind to `SPECS` and leave `Symbol` as it is,
 the type checker rejects the mismatch.
 `tile()` declares its parameter a `Symbol`,
 but `@cache` hides that declaration from callers.
@@ -274,10 +274,10 @@ Every field here is immutable, so the sharing is safe.
 `@cache` is a caching decorator, but `tile()` uses it for a different job.
 A cache saves recomputation.
 It returns a stored result instead of computing that result again,
-and it can forget any entry without changing what the program computes,
+and it can forget any entry while the program's results stay the same,
 because the next call rebuilds an equal result at the cost of some time.
 Building a `Tile` costs almost nothing, so `tile()` has little time to save.
-What `tile()` gets from it is identity.
+What `tile()` gets from `@cache` is identity.
 Every call for a symbol returns the same object.
 A flyweight's factory exists for that sameness.
 The figure follows `tile()` through the demo in `tile_map.py` and through `test_direct_construction_bypasses_pool()` in `test_tile_map.py`:
@@ -363,6 +363,7 @@ so a `Color` prints its components and works as a dict key.
 A `defaultdict` calls its `default_factory` with no arguments,
 and building a `Color` needs the three components,
 so `_pool` stays a plain dict with an explicit membership test.
+
 `_pool` keys on the components alone, and every subclass shares the one dict,
 so the first request for a set of components builds the object and every later one receives it,
 whether `Color` or a subclass asks.

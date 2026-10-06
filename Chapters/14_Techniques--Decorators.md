@@ -294,8 +294,9 @@ both typed `Callable[P, R]`.
 `repeat(times=3)` returns `decorate`, the real decorator,
 and Python then calls `decorate(greet)`.
 Only now does `decorate`'s own body run, including its `@wraps(func)` line.
-`@wraps(func)` is the same two-step pattern one level down:
-call `wraps(func)` to get a decorator, then apply it to `wrapper`.
+`@wraps(func)` is the same two-step pattern one level down.
+Python calls `wraps(func)` to get a decorator,
+then applies that decorator to `wrapper`.
 The inner decoration runs inside the outer one,
 so `@repeat(times=3)` and `@wraps(func)` are two separate applications of the same two-step pattern,
 not one recursive call.
@@ -868,7 +869,7 @@ bracketing every call with its setup and cleanup code.
 
 ## Decorating Classes
 
-Everything so far decorated a function.
+Every example so far decorates a function.
 A `class` statement takes a decorator the same way,
 and the decorator receives the class object.
 Decorating a class differs from [Decorators as Classes](#decorators-as-classes),
@@ -968,7 +969,7 @@ if __name__ == "__main__":
 ```
 
 `report` requires a callable.
-Where `func` came from does not matter.
+`func` can come from anywhere.
 Calling `report` directly, instead of through `@`,
 decorates the `lambda` in place.
 `@` is convenient sugar for the common case of decorating a fresh `def`,
@@ -1135,7 +1136,7 @@ with no shared base class required.
 This is [structural typing](08_Foundations--Static_Types.md#structural-typing-with-protocols).
 
 A read-only `@property` in a `Protocol` requires that reading the name produce the property's return type,
-and says nothing about how.
+and lets each class choose how.
 `Margherita` supplies `cost` as a class attribute and `Topping` computes it in a property.
 Both read as a `float`, so both match.
 

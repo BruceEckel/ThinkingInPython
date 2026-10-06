@@ -6,12 +6,12 @@
 > handlers for testing and for production, and the operators that combine them.
 
 [Stateless](46_Effects--Stateless.md)
-established the two channels an `Effect[A, E, R]` carries.
+establishes the two channels an `Effect[A, E, R]` carries.
 A dependency is a `Need` that `supply()` answers.
 A failure is an exception that `@throws` lifts into the type and `catch()` takes back out.
 A type checker verifies that every caller either absorbs an Effect or declares it.
 
-Every Ability so far came from the library: the `Need` that `supply()` answers,
+Every Ability so far comes from the library: the `Need` that `supply()` answers,
 and the `Async` that `run()` awaits.
 This chapter opens by writing an Ability from scratch,
 and that Ability turns out to be an ordinary class rather than a special form.
@@ -123,7 +123,7 @@ one line above the `Depend[Ask, str]` that repeats it to callers.
 
 That annotation reads `Depend[Ask, str]`, not `Depend[Need[Ask], str]`,
 the distinction [Waiting on a Coroutine](46_Effects--Stateless.md#waiting-on-a-coroutine)
-drew for `Async`.
+draws for `Async`.
 `Ask` is an Ability, so the channel names it bare.
 The type bound makes the bare name more than a convention.
 The type checker rejects `Depend[Console, None]` at the annotation,
@@ -1005,7 +1005,7 @@ the type checker names the `yield from` that still carries `Need[Feed] | Need[En
 `Wire` and `Library` are structural implementations,
 so `supply(Wire(...), Library(...))` builds handlers for `Need[Wire]` and `Need[Library]`,
 the mismatch that [Supplying an Interface](46_Effects--Stateless.md#supplying-an-interface)
-fixed with `as_type()`.
+fixes with `as_type()`.
 Declaring `outcome()`'s parameters as `Feed` and `Encyclopedia` does the same job at the boundary,
 without a cast.
 
@@ -1221,7 +1221,7 @@ the new failure becomes a value that reaches the caller unexamined.
 `catch_all()` decides for all of them at once.
 
 Two cautions.
-`catch_all` comes from `stateless.effect`,
+`catch_all()` comes from `stateless.effect`,
 since the package root does not export it.
 And `catch_all()` leaves the guarantee where it was.
 It matches the failures `@throws` lifted into the channel,
@@ -1484,7 +1484,7 @@ The fourth run swaps one cast member and captures the output.
 so a test reads the lines back as a list with no `capsys` and no monkeypatching.
 The engine holds no printing to intercept.
 `test_greeter.py` in [Swapping the Implementation](46_Effects--Stateless.md#swapping-the-implementation)
-made the same swap with one Ability rather than three.
+makes the same swap with one Ability rather than three.
 
 ### The Unmatched Cast
 
@@ -1726,7 +1726,7 @@ It wraps the Effect in an object that records the result and replays it rather t
 That wrapper exists because a generator cannot run twice,
 which is the same fact that makes `retry()` decorate the function.
 
-That cache key is only the argument, not the environment.
+That cache key is the argument, not the environment.
 `memoize()` wraps `save_user()` before `supply()` runs,
 so a different `Database` supplied to the same memoized call changes nothing in the cache:
 
@@ -1759,7 +1759,7 @@ or key the cache on the environment too.
 
 `fork()` submits an Effect to an `Executor` and returns a `Task`,
 and `wait()` collects the result.
-This is the same `wait()` that awaited a coroutine in [Waiting on a Coroutine](46_Effects--Stateless.md#waiting-on-a-coroutine).
+This is the same `wait()` that awaits a coroutine in [Waiting on a Coroutine](46_Effects--Stateless.md#waiting-on-a-coroutine).
 It accepts a `Task` as readily as an awaitable:
 
 ```python
@@ -2228,7 +2228,7 @@ and that is different from a platform for building distributed systems.
 ### 6. `fork()` drops the error channel
 
 [Running Effects in Parallel](#running-effects-in-parallel)
-named the one restriction the type checker enforces on a forked function:
+names the one restriction the type checker enforces on a forked function:
 nothing left to supply.
 The checker enforces nothing about how that function can fail.
 Two of `fork()`'s four overloads accept an Effect that still declares an error,
@@ -2269,7 +2269,7 @@ The type agrees with the runtime.
 `reveal_type(bad)` under `ty` 0.0.84 reports `(n: int) -> Generator[Need[Executor], Any, Task[int]]`,
 with `Boom` nowhere in it.
 
-The fix is the discipline `catch()` and `catch_all` teach:
+The fix is the discipline `catch()` and `catch_all()` teach:
 move the failure into the result before you fork.
 Apply `catch_all()` before `@fork`.
 With `bad` left undecorated,
@@ -2279,7 +2279,7 @@ and `wait()` returns `Boom | int` instead of raising the `Boom`.
 ## What Survives the Library
 
 [Effect Management](44_Effects--Effect_Management.md#effects-are-the-next-barrier)
-argued that Effects are the next scaling barrier,
+argues that Effects are the next scaling barrier,
 and that the tracking will eventually move into the language.
 Stateless shows what that looks like inside Python today,
 and that is the value of studying the library,

@@ -340,9 +340,9 @@ and the plugin registries that let a program grow without editing its core.
 [Pattern Matching](13_Techniques--Pattern_Matching.md)
 solves the same `if`/`elif` problem with `match`,
 and `match` and the table differ in one way that decides between them.
-A `match` is code: adding an operator means editing the function,
+A `match` is code, so adding an operator means editing the function,
 and the type checker verifies every case.
-The table is data: adding an operator means adding a row,
+The table is data, so adding an operator means adding a row,
 which another module can do at import time and a test can do at runtime.
 Choose `match` when you know the whole set of cases as you write the function,
 and a table when the set should grow from outside.
@@ -555,7 +555,7 @@ print(square.func.__name__, square.keywords)
 #: power {'exponent': 2}
 ```
 
-`square` and `cube` are specializations of `power`,
+`square` and `cube` are specializations of `power()`,
 each with one argument already supplied.
 The keyword does real work here.
 `partial(power, 2)` binds `base` instead,
@@ -605,13 +605,13 @@ print(percent.args)
 Before 3.14, a hand-written wrapper supplied that specialization.
 A `Placeholder` reserves the position and leaves the value to the caller.
 Calling `percent()` with no argument raises a `TypeError`.
-The library also rejects a *trailing* placeholder, because it would do nothing.
+The library also rejects a trailing placeholder, because it would do nothing.
 `partial()` already appends the call's arguments after the bound ones,
 so `partial(clamp, 0, Placeholder)` would mean the same as `partial(clamp, 0)`.
 
 The `# type: ignore` comments mark a type checker limitation rather than a code problem.
 The stub for `partial()` does not yet describe what `Placeholder` does at runtime,
-so `ty` checks the three arguments in `partial(clamp, 0, Placeholder, 100)` against `clamp`'s declared parameter types.
+so `ty` checks the three arguments in `partial(clamp, 0, Placeholder, 100)` against `clamp()`'s declared parameter types.
 `ty` therefore reports `Placeholder` as a value of the wrong type,
 and types the resulting callable as one that takes no arguments.
 The runtime behaves correctly.
@@ -653,7 +653,7 @@ Each piece stays small and pure,
 and you combine them without changing either one.
 
 The type parameters matter on the second `print()`.
-The type checker verifies that `label` accepts what `increment_then_double` produces,
+The type checker verifies that `label()` accepts what `increment_then_double` produces,
 and types the composed function `(int) -> str` rather than `(int) -> int`.
 
 You grow a composition by adding a stage, and each stage is testable on its own.

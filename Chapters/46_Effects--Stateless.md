@@ -201,7 +201,7 @@ Generator[Need[Console] | KeyError, Any, None]
 Nothing in the union tells a request from a failure.
 Two bounds on the library's type variables do that instead.
 `A`'s bound is `Ability[Any]`, and `E`'s bound is `Exception`.
-The two bounds do not exclude each other.
+The two bounds overlap.
 A class that subclasses both would satisfy each at once,
 and at runtime it would count as a failure.
 No listing here builds one.
@@ -431,7 +431,7 @@ run(fallback(chosen)("Bob"))
 #: [chosen] Hello, Bob!
 ```
 
-`fallback` is an ordinary handler, applied at the edge;
+`fallback` is an ordinary handler, applied at the edge.
 `chosen` is a second handler already applied to `greet`.
 The first run has `fallback` as its one handler, so the default answers.
 The second run wraps `greet()` in its own `supply()` first,
@@ -1146,7 +1146,8 @@ The second succeeds because the binding now exists.
 The two calls are identical, and the types say nothing about registration,
 so the type checker accepts both.
 
-DI meets its goal: the `Console` is swappable.
+DI meets its goal.
+The `Console` is swappable.
 But it relocates a [side cause](44_Effects--Effect_Management.md#what-is-an-effect)
 rather than declaring one, so the type checker does not validate the dependency.
 
@@ -1751,7 +1752,7 @@ The lookup raises a `KeyError` for an unknown name,
 and the conversion raises a `ValueError` for text `int()` rejects,
 like Bob's `"seven"`.
 
-`@throws(KeyError, ValueError)` makes the `read_score` signature:
+`@throws(KeyError, ValueError)` makes `read_score()`'s signature:
 
 ```python
 (str) -> Try[KeyError | ValueError, int]
@@ -1804,8 +1805,6 @@ so its signature must declare that failure.
 Calling it on `"Bob"` carries that failure up to the `run()` call at the program's edge,
 which raises it as an ordinary exception,
 like `error_escapes.py` does for a single error.
-
-`test_all_handled()` and `test_one_unhandled()` exercise the two functions:
 
 ```python
 # test_catch_subset.py

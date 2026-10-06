@@ -25,7 +25,6 @@ Chapters/11_Techniques--Testing.md	When a bug does get through
 Chapters/12_Techniques--Data_Classes_as_Types.md	as it was before
 Chapters/15_Techniques--Context_Managers.md	Write a context manager CODE whose CODE suppresses CODE and lets everything else through
 Chapters/16_Techniques--Comprehensions.md	A list comprehension consists of
-Chapters/16_Techniques--Comprehensions.md	without touching any real files or leaving anything behind
 Chapters/17_Techniques--Metaprogramming.md	CODE checks the value on its way in
 Chapters/17_Techniques--Metaprogramming.md	CODE needs a common base to live on
 Chapters/18_Techniques--Performance.md	so always set it for a function you have not timed before
@@ -40,7 +39,6 @@ Chapters/28_Patterns--Function_Objects.md	Publishing an unhandled event leaves n
 Chapters/28_Patterns--Function_Objects.md	each handler holding a reference to the next and deciding whether to pass the request along
 Chapters/28_Patterns--Function_Objects.md	otherwise leaves a stray entry behind
 Chapters/29_Patterns--Changing_the_Interface.md	Pyright and mypy need their deprecation rule switched on
-Chapters/29_Patterns--Changing_the_Interface.md	and callers keep using it until something tells them not to
 Chapters/30_Patterns--Observer.md	A bound method holds the object it came from
 Chapters/30_Patterns--Observer.md	A responder chooses which notifications to act on
 Chapters/30_Patterns--Observer.md	along with the attribute name to filter by
@@ -70,7 +68,7 @@ Solutions/21_Patterns--Design_Patterns/README.md	a CODE to pass in
 Solutions/23_Patterns--Iterators/README.md	before or after
 Solutions/25_Patterns--Template_Method/README.md	No checker could catch the omission before
 Solutions/28_Patterns--Function_Objects/README.md	now sees more than it did before
-Solutions/28_Patterns--Function_Objects/README.md	so iterating it in order calls the most specific handlers first and the inherited ones after
+Solutions/28_Patterns--Function_Objects/README.md	so iterating over it in order calls the most specific handlers first and the inherited ones after
 Solutions/29_Patterns--Changing_the_Interface/README.md	and it adds behavior on the way through
 Solutions/29_Patterns--Changing_the_Interface/README.md	and it adds no behavior to a call that goes through
 Solutions/30_Patterns--Observer/README.md	CODE gives the single-player scoring the exercise asks for
@@ -82,7 +80,7 @@ Solutions/32_Patterns--Multiple_Dispatching/README.md	CODE needs no such case be
 Solutions/34_Patterns--Composite_and_Interpreter/README.md	and it costs more than it appears to
 Solutions/34_Patterns--Composite_and_Interpreter/README.md	and not before
 Solutions/36_Patterns--Memento/README.md	while a deserializer hands the value straight in
-Solutions/43_Functional--Confidence/README.md	Three students in groups of two leaves one student over
+Solutions/43_Functional--Confidence/README.md	which leaves one student over
 Solutions/44_Effects--Effect_Management/README.md	CODE rejects negatives but lets zero through
 Solutions/45_Effects--Generators/README.md	since nobody sends anything in
 Solutions/47_Effects--Stateless_in_Practice/README.md	**Show the mismatch getting through

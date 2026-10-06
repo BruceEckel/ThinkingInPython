@@ -733,7 +733,7 @@ print(deque_time * 20 < list_time)  # Not close
 
 Use a `deque` for a single-threaded queue.
 Indexing its middle is O(n), though,
-so a `deque` does not replace a `list` you index by position.
+so keep a `list` wherever you index by position.
 A `deque(maxlen=n)` also caps its length,
 discarding from the other end when a new item overflows it.
 That is a sliding window, and a `list` has no equivalent.
@@ -831,7 +831,7 @@ Modifying an immutable container is a type error as well as a runtime error,
 so each line that attempts it carries a `# type: ignore`.
 The comment silences the type checker.
 
-Use the immutable form whenever a container should not change after you build it.
+Use the immutable form whenever a container should stay fixed after you build it.
 Neither you nor the code that receives it can add, remove,
 or replace an element by accident,
 so a container of immutable elements needs no defensive copy before you share it.
@@ -904,7 +904,7 @@ The `tuple` holds the same `list` for its whole life,
 and that `list` stays free to change.
 A container holding an unhashable object is unhashable too.
 Immutability pays off when it goes all the way down,
-because then you can share or hash a value without worrying that something inside it changes.
+because then you can share or hash a value and trust that everything inside it stays the same.
 [Rethinking Objects](20_Patterns--Rethinking_Objects.md#the-immutability-solution)
 shows the same shallow immutability inside a frozen data class.
 

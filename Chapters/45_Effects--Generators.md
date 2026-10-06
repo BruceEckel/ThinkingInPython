@@ -5,7 +5,7 @@
 > Python's generators can do that, and an Effect system is built on it.
 
 [Iterators](23_Patterns--Iterators.md#generators)
-presented generators as a way to produce values lazily:
+presents generators as a way to produce values lazily:
 a function containing `yield`,
 driven by a `for` loop that takes one value at a time.
 Producing values is half of what a generator does.
@@ -149,8 +149,8 @@ shows.
 
 A newly created generator pauses at the top of the function body,
 before any code runs, so no `yield` expression is waiting to receive a value.
-The first call therefore cannot send a value:
-it must be `next()` or `send(None)`.
+The first call therefore cannot send a value.
+It must be `next()` or `send(None)`.
 `i.send(Answer("Alice"))` at that point raises `TypeError: can't send non-None value to a just-started generator`.
 
 A suspended generator holds its frame:
@@ -361,7 +361,8 @@ print(list(report(["red", "green", "blue"])))
 #: ['red', 'green', 'blue', '(12 characters)']
 ```
 
-`emit()` is a `Generator[str, None, int]`: it yields strings, receives nothing,
+`emit()` is a `Generator[str, None, int]`.
+It yields strings, receives nothing,
 and returns the `int` total it accumulates while iterating over `items`.
 
 The return channel delivers a value from a generator to the generator that delegated to it.
@@ -552,7 +553,7 @@ print(drive(survey(),
 ```
 
 The listing imports `interview()` unchanged from `yield_from_delegates.py`,
-where `drive()` drove it.
+where `drive()` drives it.
 Now `survey()` delegates to `interview()`.
 `interview()`'s `Result` arrives as the value of an expression instead of as `stop.value` in the driver.
 Its questions reach `drive()` through three frames rather than two,
@@ -841,7 +842,7 @@ You have run a driver like `drive()` many times.
 [Concurrency](19_Techniques--Concurrency.md#asyncio-mechanics)
 describes `await` as suspending a task until the event loop resumes it,
 without showing the protocol underneath.
-The mechanism is the two halves `task_runner_send.py` just combined:
+The mechanism is the two halves `task_runner_send.py` combines:
 `task_runner()`'s turn-taking and `drive()`'s question-answering, in one loop.
 A coroutine object offers `send()`, `throw()`, and `close()`,
 as a generator does.

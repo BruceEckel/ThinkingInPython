@@ -66,7 +66,7 @@ def test_hello_is_not_a_palindrome() -> None:
 
 At this point `palindrome.py` does not exist,
 so running this file fails before a single assertion runs.
-`pytest` cannot import a module that is not there.
+`pytest` cannot import a missing module.
 That failure confirms the test catches a missing implementation.
 
 ```python
@@ -335,7 +335,7 @@ JUnit-style frameworks give each test class a `setUp()` and `tearDown()`.
 You declare fixtures as parameters to a test,
 and each parameter name tells `pytest` to call that fixture and pass its result to the test.
 
-The `funded` function in `test_account.py` is a fixture.
+The `funded()` function in `test_account.py` is a fixture.
 Only `pytest` calls it.
 A test that calls `funded()` fails with `Fixture "funded" called directly`.
 
@@ -413,8 +413,8 @@ def preloaded(request: pytest.FixtureRequest) -> Account:
 `pytest` builds the session-scoped `bank_name` fixture once and reuses it,
 and that reuse suits expensive resources.
 The reuse is the risk as well as the point.
-Every test receives the same object,
-so one test that mutates it changes what the next test sees.
+Because every test receives the same object,
+one test that mutates it changes what the next test sees.
 A session fixture that returns a mutable object shows the leak:
 
 ```python
@@ -529,13 +529,14 @@ If you test the public surface, the methods a caller should use,
 you can change the internals without rewriting the tests.
 The `Account` tests are black-box.
 They read no private attributes.
-When you do need a white-box test for a tricky internal, nothing stops you,
+When you do need a white-box test for a tricky internal,
+Python lets you write one,
 but treat each one as a test that may break when you refactor.
 
 ## Isolating Tests from the World
 
-Good tests do not depend on the real filesystem, environment,
-random number generation, clock, or network.
+Good tests stay independent of the real filesystem, environment,
+random number generation, clock, and network.
 `pytest` includes built-in fixtures for this.
 `tmp_path` gives each test a private temporary directory.
 `monkeypatch` sets and restores environment variables and attributes,
@@ -650,8 +651,8 @@ def test_roll_with_seeded_rng() -> None:
     assert dice_rng.roll(random.Random(0)) == 4
 ```
 
-The function takes its source of randomness as an argument,
-so production code hands it a fresh `random.Random()` while the test hands it a seeded one.
+Because the function takes its source of randomness as an argument,
+production code hands it a fresh `random.Random()` while the test hands it a seeded one.
 The randomness is now an input, not a hidden dependency.
 This technique is *dependency injection*:
 the caller hands the function its dependencies,
@@ -880,7 +881,7 @@ since a function that is hard to test usually goes looking for something no call
 To find out what you have not tested, run the suite under `coverage.py`,
 which the `pytest-cov` plugin wires up when you pass `--cov`.
 Read the result as a list of lines nothing exercised, not as a score.
-A line a test happened to execute is not the same as a line a test checks.
+A line a test happened to execute differs from a line a test checks.
 
 ## Exercises
 

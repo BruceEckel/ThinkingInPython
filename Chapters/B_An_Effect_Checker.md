@@ -606,7 +606,7 @@ and a plain assignment whose right side has an evident type.
 a `with` or `except` target, a walrus target, a name inside a tuple target,
 and a name a pattern captures.
 Each alternative of the or-pattern binds `name`, as an or-pattern requires.
-Such a name gets `UNRESOLVED`,
+A name bound in any of those ways gets `UNRESOLVED`,
 and so does a name that two assignments give different types.
 An annotation overrides `UNRESOLVED` in both cases.
 `ast.walk()` visits an assignment before its target,
@@ -961,7 +961,7 @@ for finding in report.findings:
 ```
 
 The demo prints each nonempty row, then each finding.
-Appendix A's `row(shout)` read `[]`, because `shout()` declares nothing.
+Appendix A's `row(shout)` reads `[]`, because `shout()` declares nothing.
 The checker infers `['Tell']` from the call to `tell()`.
 `quiet()` declares itself pure and calls `shout()`,
 and the checker reports `quiet()`,

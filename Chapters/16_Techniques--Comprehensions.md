@@ -384,7 +384,7 @@ for path in sorted(py_paths):  # Sorted for stable output
 that creates a scratch directory and deletes it, and everything in it,
 when the `with` block exits.
 The scratch directory gives the example a throwaway file tree to walk,
-without touching any real files or leaving anything behind.
+and leaves the file system as the example found it.
 
 In the `py_paths` comprehension,
 the first `for` walks the directories and the second `for` walks the files in each,
@@ -393,7 +393,7 @@ The filter tests `f.endswith(".py")` on the bare filename rather than building a
 Testing the bare filename avoids constructing a `Path` for every file in the tree,
 including the ones the filter skips.
 
-A `with` block, unlike a function body, does not create a new scope.
+A `with` block, unlike a function body, runs in the enclosing scope.
 The assignment to `py_paths` sits inside the `with`,
 but the name is still visible afterward,
 in the `for path in sorted(py_paths):` line below it.
@@ -404,14 +404,15 @@ The `for` loop runs after the directory disappears,
 and by then nothing needs the files.
 If you turn the comprehension's brackets into parentheses,
 the program prints nothing and raises no exception.
-A generator expression does not start walking until `sorted()` pulls on it,
+A generator expression starts walking when `sorted()` pulls on it,
 and that pull comes outside the `with`.
 By then the context manager has deleted the directory,
 and `Path.walk()` ignores the error unless you pass `on_error`.
 
 `root.rglob("*.py")` finds the same two files in one line,
 with no explicit walk and no comprehension.
-Try `rglob()` first: a glob pattern says what you want.
+Try `rglob()` first.
+A glob pattern says what you want.
 `walk()` earns its place when the filter needs more than a glob pattern can express,
 a file's size or its contents rather than its name, say,
 or when the comprehension needs the directory structure,
@@ -551,7 +552,7 @@ print(list(islice(squares, 3)))
 #: [4, 9, 16]
 ```
 
-The generator computes no square until you pull a value.
+The generator computes a square each time you pull a value.
 `next()` produces them one at a time,
 and `itertools.islice()` takes a few without building the million-element list.
 

@@ -409,7 +409,8 @@ if __name__ == "__main__":
 ```
 
 The recursion works because `Corsage` and `Flower` both define `accept()`.
-The loop in `Corsage.accept()` calls `accept()` on each element without checking whether the element is a flower or another corsage.
+The loop in `Corsage.accept()` calls `accept()` on each element the same way,
+whether the element is a flower or another corsage.
 In `flower_visitors.py` the loop that calls `accept()` sits outside the hierarchy,
 in the main block, and takes one flower at a time from `flower_gen()`.
 In `recursive_accept.py` the loop runs inside `accept()`,

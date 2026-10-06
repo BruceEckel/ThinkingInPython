@@ -405,7 +405,7 @@ It is writing one where you meant a per-object default.
 ## ClassVar and Inheritance
 
 Subclasses inherit a `ClassVar` declared on a base class like any other class attribute.
-A subclass that doesn't declare its own copy reads straight through to the base's value,
+A subclass that doesn't declare its own copy reads through to the base's value,
 via the normal [method resolution order](07_Foundations--Classes.md#method-resolution-order).
 A subclass that assigns its own value creates a separate class attribute,
 independent of the base and of sibling subclasses:
@@ -537,8 +537,7 @@ and `self.x = x` runs on every construction,
 giving each object its own storage before anything can read it.
 
 Python still builds the [default value](05_Foundations--Functions.md#the-mutable-default-trap)
-once, at definition time,
-so a mutable default argument brings the sharing straight back.
+once, at definition time, so a mutable default argument brings the sharing back.
 `100` is immutable, so this default is safe.
 
 A `@dataclass` reads the annotated class-body declarations as a template and generates a constructor from them.

@@ -226,7 +226,7 @@ use(ObjectAdapter(WhatIHave()))
 The adaptee does not qualify.
 If you call `use(WhatIHave())`, the type checker rejects the argument,
 because `WhatIHave` defines no `f()`.
-The check that inheritance provided in `adapter.py` is still there,
+The check that inheritance provides in `adapter.py` is still there,
 and the base class is gone.
 
 The common adapter need is "forward most calls unchanged,
@@ -473,7 +473,7 @@ That `__init__.py` is the idiomatic place for a façade that fronts a whole subs
 GoF's usual case for the pattern.
 
 *Façade* has a failure mode.
-An advanced caller who needs a name the façade does not expose has two bad options:
+An advanced caller who needs a name the façade keeps private has two bad options:
 use the underscored name despite the convention,
 or wait for the façade's author to expose the name.
 If you expose enough names, the façade stops simplifying anything.
@@ -512,7 +512,7 @@ Name a wrapper for why it is there, not for its shape.
 Replacing an interface you own takes two steps,
 and writing the new interface is the first.
 Once the better interface exists, the old one is still there,
-and callers keep using it until something tells them not to.
+and callers keep using it until something tells them to stop.
 Deleting it breaks them.
 Leaving it unmarked means nobody notices.
 
