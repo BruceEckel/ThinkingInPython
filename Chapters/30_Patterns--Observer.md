@@ -586,9 +586,13 @@ and that leaves the weak reference dead.
 Using `WeakMethod`, you store the instance and the function separately,
 both weakly, and rebuild the bound method each time you call `ref()`.
 
-The first `announce()` runs while `plot` is alive.
-`ref()` returns the bound method `plot.redraw`, and `weak` stores it in `live`.
-Calling `live(celsius)` runs `plot.redraw(25.0)`, which prints `plot: 25.0C`.
+The first `announce()` runs while `plot` is alive,
+so the weak reference still has its target.
+`ref()` rebuilds the bound method `plot.redraw`, and `weak` stores it in `live`.
+`live` is a strong reference,
+so the `Plot` object stays alive while `live(celsius)` runs `redraw()` and prints `plot: 25.0C`.
+When `weak` returns, `live` goes away,
+and the responder again holds the `Plot` object through the weak reference alone.
 `del plot` removes the one strong reference to the `Plot` object,
 and Python collects the object.
 During the second `announce()`,
