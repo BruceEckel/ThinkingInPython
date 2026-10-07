@@ -962,23 +962,20 @@ passing the new class as `cls`
 and at this point `Thermometer` has its annotation, no `__init__()`,
 and no class attribute named `celsius`.
 
-The first line of `__init_subclass__()`'s body passes the new class to `dataclass(eq=False)`.
+The first line of `__init_subclass__()` passes the new class to `dataclass(eq=False)`.
 `dataclass()` with arguments returns a decorator,
-and applying that decorator to `cls` does what `@dataclass(eq=False)` above the subclass would do:
-it reads the bare annotations, `celsius: float` here,
+and applying that decorator to `cls` reads the bare annotations
+(e.g. `celsius: float`),
 and writes an `__init__()` and a `__repr__()` onto the class.
 `__init__()` takes one parameter per field and assigns each to the attribute of the same name.
-`eq=False` keeps identity equality,
-since two thermometers at the same reading are different subjects,
-and it leaves the instances hashable,
-so a thermometer can be a `set` member or a dictionary key.
+`eq=False` keeps identity equality and also leaves the instances hashable.
 Without slots, `dataclass()` modifies the class in place and returns it,
 and the line binds that result to `built`.
 
 The second line asks `fields()` for the class's dataclass fields,
 one `Field` object per annotation, each carrying the field's name.
-`fields()` accepts a dataclass type,
-and the type checker knows `built` is one because `dataclass()` returned it.
+`fields()` accepts a dataclass type, and `dataclass()` returned `built`,
+so the type checker knows `built` as a dataclass type.
 `cls` is the class as declared, and the checker rejects `fields(cls)`,
 which is why the first line binds the result instead of discarding it.
 
