@@ -959,22 +959,48 @@ so `thermometer.celsius` reaches the property and the stored value stays behind 
 The getter and setter are the pair `thermometer.py` writes by hand,
 built once per field.
 
-Python calls `__init_subclass__()` [for every new subclass](17_Techniques--Metaprogramming.md#self-registration-of-subclasses).
-First, it passes the subclass to `dataclass()`,
-which reads the bare annotations and generates `__init__()` and `__repr__()`.
-Then it replaces each field's class attribute with the property from `announcing()`.
+`__init_subclass__()` runs once per subclass, at the moment Python creates it.
+When the `class Thermometer(Broadcasting[float]):` statement finishes running its body,
+Python builds the class object and then calls `__init_subclass__()` on its base,
+passing the new class as `cls`
+([Self-Registration of Subclasses](17_Techniques--Metaprogramming.md#self-registration-of-subclasses)).
+The method is implicitly a class method,
+and at this point `Thermometer` has its annotation, no `__init__()`,
+and no class attribute named `celsius`.
 
-`@dataclass_transform` on the base class tells the type checker that every subclass is dataclass-like
-([`@dataclass_transform` Is a Claim](17_Techniques--Metaprogramming.md#dataclass-transform)),
-so the checker synthesizes the same `__init__()` that `dataclass()` builds at runtime.
-`eq=False` keeps identity equality:
-two thermometers at the same reading are different subjects.
-It also leaves the instances hashable,
-so a thermometer can be a `set` member or a dictionary key,
-and `eq_default=False` makes the same claim to the checker.
-`fields()` needs a dataclass type,
-which is why `__init_subclass__()` binds the result of `dataclass()` and passes that.
-`cls` is the class as declared, and the type checker rejects `fields(cls)`.
+The first line passes the new class to `dataclass(eq=False)`.
+`dataclass()` with arguments returns a decorator,
+and applying that decorator to `cls` does what `@dataclass(eq=False)` above the subclass would do:
+it reads the bare annotations, `celsius: float` here,
+and writes an `__init__()` and a `__repr__()` onto the class.
+`__init__()` takes one parameter per field and assigns each to the attribute of the same name.
+`eq=False` keeps identity equality,
+since two thermometers at the same reading are different subjects,
+and it leaves the instances hashable,
+so a thermometer can be a `set` member or a dictionary key.
+Without slots, `dataclass()` modifies the class in place and returns it,
+and the line binds that result to `built`.
+
+The second line asks `fields()` for the class's dataclass fields,
+one `Field` object per annotation, each carrying the field's name.
+`fields()` accepts a dataclass type,
+and the type checker knows `built` is one because `dataclass()` returned it.
+`cls` is the class as declared, and the checker rejects `fields(cls)`,
+which is why the first line binds the result instead of discarding it.
+
+The third line installs the property.
+`setattr(cls, field.name, announcing(field.name))` puts the property on the class under the field's own name,
+so `Thermometer.celsius` is now a property and every `thermometer.celsius` read or write goes through `read()` or `write()`.
+The generated `__init__()` captured any default the field declared when the first line ran,
+so replacing the class attribute now changes nothing about construction.
+From here the subclass behaves as if its author had written `thermometer.py`'s constructor and property pair.
+
+`@dataclass_transform` on the base class is the type checker's side of the first line
+([`@dataclass_transform` Is a Claim](17_Techniques--Metaprogramming.md#dataclass-transform)).
+It tells the checker that every subclass is dataclass-like,
+so the checker synthesizes the same `__init__()` that `dataclass()` builds at runtime,
+and `Thermometer(100)` type-checks against a parameter `celsius: float`.
+`eq_default=False` makes the checker's claim match the runtime `eq=False`.
 
 [The Pythonic *Observer*](#the-pythonic-observer)
 notes that a `dataclass`-generated `__init__()` skips the base class's `__init__()`.
