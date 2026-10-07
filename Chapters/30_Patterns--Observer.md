@@ -793,6 +793,9 @@ class WeatherStation:
     def connect(self, responder: AttrResponder) -> None:
         self._responders.append(responder)
 
+    def disconnect(self, responder: AttrResponder) -> None:
+        self._responders.remove(responder)
+
     def __setattr__(
         self, name: str, value: object
     ) -> None:
@@ -810,16 +813,18 @@ print(changes)
 #: [('celsius', 25.0), ('humidity', 0.5)]
 ```
 
-Python routes every assignment to an attribute of the instance through `__setattr__()`,
-the constructor's own assignments included.
-The first statement of `__setattr__()` reads `self._responders`,
+`connect()` and `disconnect()` are `Broadcaster`'s pair,
+taking the wider responder type.
+The new part is `__setattr__()`.
+Python routes every assignment to an attribute of the instance through `__setattr__()`.
+This includes assignments within the constructor.
+The first line in `__setattr__()` reads `self._responders`,
 so an ordinary `self._responders = []` in the constructor reads the list before it creates it,
-and that read raises an `AttributeError`.
-The `_responders` property creates the list instead, at its first read,
-through `setdefault()` on the instance `__dict__`,
-and keeps it there under its own name.
+which raises an `AttributeError`.
+To prevent this, the `_responders` property creates the list upon first read,
+using `setdefault()` on the instance `__dict__`.
 A property takes precedence over an instance attribute of the same name,
-so every later read also goes through the getter and finds the stored list.
+so every later read also goes through the getter and finds the existing list.
 
 The constructor's two assignments go through `__setattr__()`.
 Each notifies an empty list,
@@ -885,6 +890,8 @@ thermometer.celsius = 150
 
 The `respond()` decorator method appends the function to the thermometer's list and returns the function unchanged,
 so `report` stays callable by name.
+`disconnect()` takes that name back out,
+matching by equality as `Broadcaster`'s does.
 
 To minimize application code, all common behaviors are captured in the library.
 The library's first piece builds the property that announces a field:
@@ -950,6 +957,9 @@ class Broadcasting[T]:
     def respond(self, fn: Responder[T]) -> Responder[T]:
         self._responders.append(fn)
         return fn
+
+    def disconnect(self, fn: Responder[T]) -> None:
+        self._responders.remove(fn)
 
     def announce(self, data: T) -> None:
         for responder in list(self._responders):

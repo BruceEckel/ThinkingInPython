@@ -22,6 +22,9 @@ class Broadcasting[T]:
         self._responders.append(fn)
         return fn
 
+    def disconnect(self, fn: Responder[T]) -> None:
+        self._responders.remove(fn)
+
     def announce(self, data: T) -> None:
         for responder in list(self._responders):
             responder(data)

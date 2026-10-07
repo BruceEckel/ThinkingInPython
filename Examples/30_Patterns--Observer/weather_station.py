@@ -17,6 +17,9 @@ class WeatherStation:
     def connect(self, responder: AttrResponder) -> None:
         self._responders.append(responder)
 
+    def disconnect(self, responder: AttrResponder) -> None:
+        self._responders.remove(responder)
+
     def __setattr__(
         self, name: str, value: object
     ) -> None:
