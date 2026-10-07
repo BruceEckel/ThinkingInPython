@@ -921,6 +921,12 @@ built once per field.
 so its two closures read and write `self.__dict__[name]` and are typed `Any`;
 the type checker types the attribute from the subclass's annotation instead.
 The closures go through `__dict__` because the class attribute of that name is now the property.
+`property` is the class behind `@property`,
+one of the lowercase classes [Decorators as Classes](14_Techniques--Decorators.md#decorators-as-classes)
+describes, and [Properties](07_Foundations--Classes.md#properties)
+introduces it in decorator form.
+Called directly, it takes the getter and the setter as its two arguments,
+which is how a factory builds a property for a name it learns at runtime.
 
 `@dataclass_transform` on the base class tells the type checker that every subclass is dataclass-like
 ([`@dataclass_transform` Is a Claim](17_Techniques--Metaprogramming.md#dataclass-transform)),
