@@ -810,10 +810,11 @@ print(changes)
 #: [('celsius', 25.0), ('humidity', 0.5)]
 ```
 
-`__setattr__()` copies `_responders` before it stores the new value,
-so the constructor cannot create the list with an ordinary `self._responders = []`:
-that assignment calls `__setattr__()`,
-which reads a list that does not exist yet and raises an `AttributeError`.
+Python routes every assignment to an attribute of the instance through `__setattr__()`,
+the constructor's own assignments included.
+The first statement of `__setattr__()` reads `self._responders`,
+so an ordinary `self._responders = []` in the constructor reads the list before it creates it,
+and that read raises an `AttributeError`.
 The `_responders` property creates the list instead, at its first read,
 through `setdefault()` on the instance `__dict__`,
 and keeps it there under its own name.
