@@ -780,16 +780,15 @@ from collections.abc import Callable
 type AttrResponder = Callable[[str, object], None]
 
 class WeatherStation:
-    _responders: list[AttrResponder]  # Bare annotation
-
     def __init__(
         self, celsius: float, humidity: float
     ) -> None:
-        # __setattr__() reads _responders before it
-        # stores, so no assignment can create it
-        self.__dict__["_responders"] = []
         self.celsius = celsius
         self.humidity = humidity
+
+    @property
+    def _responders(self) -> list[AttrResponder]:
+        return self.__dict__.setdefault("_responders", [])
 
     def connect(self, responder: AttrResponder) -> None:
         self._responders.append(responder)
@@ -812,34 +811,26 @@ print(changes)
 ```
 
 `__setattr__()` copies `_responders` before it stores the new value,
-so an ordinary `self._responders = []` raises an `AttributeError`.
-The copy reads an attribute that does not exist yet.
-The constructor therefore writes `_responders` through `self.__dict__`,
-which bypasses `__setattr__()`.
-The two assignments after that line go through `__setattr__()`.
+so the constructor cannot create the list with an ordinary `self._responders = []`:
+that assignment calls `__setattr__()`,
+which reads a list that does not exist yet and raises an `AttributeError`.
+The `_responders` property creates the list instead, at its first read,
+through `setdefault()` on the instance `__dict__`,
+and keeps it there under its own name.
+A property takes precedence over an instance attribute of the same name,
+so every later read also goes through the getter and finds the stored list.
+
+The constructor's two assignments go through `__setattr__()`.
 Each notifies an empty list,
 since callers can connect responders only after the constructor returns.
 `super().__setattr__()` does the storing,
 because an ordinary assignment inside `__setattr__()` calls `__setattr__()` again.
 
-In a class body, a name with a type and no initialization value [declares an attribute rather than creating one](09_Foundations--Class_Attributes.md#a-bare-annotation-declares-it-does-not-create).
-Such a name is a *bare annotation*.
-It looks like a class variable, but a class variable needs a value.
-`_responders` creates no attribute anywhere,
-and the constructor gives each `WeatherStation` its own `_responders` list.
-The same line with `= []` creates a class attribute,
-a single list shared by every `WeatherStation`.
-[Class Attributes](09_Foundations--Class_Attributes.md#a-classvar-with-no-value-declares-too)
-covers the difference between declaring an attribute and creating one,
-for instance attributes and class variables both.
-
 The type checker infers an instance attribute and its type from an assignment like `self.celsius = celsius`,
 which is why `celsius` and `humidity` need no declaration.
-For `_responders`, the constructor writes `self.__dict__["_responders"] = []`,
-and the checker treats that as a write to a dictionary,
-not an assignment to an attribute.
-The bare annotation supplies the attribute and its type instead.
-Without it, `ty` reports an `unresolved-attribute` error in each method that reads the list.
+`_responders` gets its type from the property's return annotation,
+since the checker reads the `setdefault()` call as a write to a dictionary,
+not as an assignment to an attribute.
 
 One method for every attribute costs the precision of a property per attribute,
 in three ways:
@@ -975,7 +966,7 @@ and no class attribute named `celsius`.
 
 `[1]` passes the new class to `dataclass(eq=False)`.
 `dataclass()` with arguments returns a decorator,
-and applying that decorator to `cls` reads the bare annotations
+and applying that decorator to `cls` reads the [bare annotations](09_Foundations--Class_Attributes.md#a-bare-annotation-declares-it-does-not-create)
 (e.g. `celsius: float`),
 and writes an `__init__()` and a `__repr__()` onto the class.
 `__init__()` takes one parameter per field and assigns each to the attribute of the same name.
@@ -1007,16 +998,9 @@ and `Thermometer(100)` type-checks against a parameter `celsius: float`.
 [The Pythonic *Observer*](#the-pythonic-observer)
 notes that a `dataclass`-generated `__init__()` skips the base class's `__init__()`.
 `Broadcasting` has no `__init__()` to skip.
-The `_responders` property creates the list on first use,
-through `setdefault()` on the instance `__dict__`,
-and keeps it there under its own name.
-A property takes precedence over an instance attribute of the same name,
-so each later read also goes through the getter and finds the stored list.
-`WeatherStation` also writes its list straight into the instance `__dict__`,
-because its constructor must keep that assignment away from its own `__setattr__()`.
-`Broadcasting` has no constructor,
-so the property does that work at the first read instead.
-The generated `__init__()` writes `self.celsius = celsius` through the property,
+Its `_responders` property does what `weather_station.py`'s does,
+creating the list at the first read.
+The generated `__init__()` writes `self.celsius = celsius` through the field's property,
 which calls `announce()` on an empty list, so construction announces to no one,
 as in `thermometer.py`.
 

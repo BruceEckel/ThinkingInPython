@@ -4,16 +4,15 @@ from collections.abc import Callable
 type AttrResponder = Callable[[str, object], None]
 
 class WeatherStation:
-    _responders: list[AttrResponder]  # Bare annotation
-
     def __init__(
         self, celsius: float, humidity: float
     ) -> None:
-        # __setattr__() reads _responders before it
-        # stores, so no assignment can create it
-        self.__dict__["_responders"] = []
         self.celsius = celsius
         self.humidity = humidity
+
+    @property
+    def _responders(self) -> list[AttrResponder]:
+        return self.__dict__.setdefault("_responders", [])
 
     def connect(self, responder: AttrResponder) -> None:
         self._responders.append(responder)
