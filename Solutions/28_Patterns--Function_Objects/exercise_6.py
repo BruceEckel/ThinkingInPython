@@ -28,8 +28,8 @@ by_factory: list[Command] = []
 for n in range(3):
     by_factory.append(make(n))
 
-for fixed in (by_default, by_partial, by_factory):
-    for command in fixed:
+for bound in (by_default, by_partial, by_factory):
+    for command in bound:
         command()
 #: 0
 #: 1

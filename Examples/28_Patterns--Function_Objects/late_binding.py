@@ -13,10 +13,10 @@ for command in commands:
 #: step 2
 #: step 2
 
-fixed: list[Command] = [
+bound: list[Command] = [
     partial(print, f"step {n}") for n in range(3)
 ]
-for command in fixed:
+for command in bound:
     command()
 #: step 0
 #: step 1
