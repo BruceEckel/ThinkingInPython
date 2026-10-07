@@ -1,6 +1,6 @@
 # object_pool.py
 from collections.abc import Iterator
-from contextlib import contextmanager, suppress
+from contextlib import contextmanager
 from dataclasses import dataclass
 from queue import Queue
 
@@ -27,17 +27,3 @@ class Pool[R]:
 
     def available(self) -> int:
         return self._available.qsize()
-
-if __name__ == "__main__":
-    pool = Pool(Connection(1), Connection(2))
-    with pool.lease() as conn:
-        print(conn.query("SELECT name FROM users"))
-        print("available during lease:", pool.available())
-    print("available after lease:", pool.available())
-    with suppress(RuntimeError), pool.lease():
-        raise RuntimeError("crash during query")
-    print("available after crash:", pool.available())
-#: connection 1: SELECT name FROM users
-#: available during lease: 1
-#: available after lease: 2
-#: available after crash: 2
