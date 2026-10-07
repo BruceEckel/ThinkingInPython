@@ -977,16 +977,16 @@ one `Field` object per annotation, each carrying the field's name.
 `fields()` accepts a dataclass type, and `dataclass()` returned `built`,
 so the type checker knows `built` as a dataclass type.
 `cls` is the class as declared, and the checker rejects `fields(cls)`,
-which is why the first line binds the result instead of discarding it.
+which is why the `dataclass()` line binds its result instead of discarding it.
 
 The `setattr()` call inside the loop installs the property.
 `setattr(cls, field.name, announcing(field.name))` puts the property on the class under the field's own name,
 so `Thermometer.celsius` is now a property and every `thermometer.celsius` read or write goes through `read()` or `write()`.
-The generated `__init__()` captured any default the field declared when the first line ran,
+The generated `__init__()` captured any default the field declared when `dataclass()` ran,
 so replacing the class attribute now changes nothing about construction.
 From here the subclass behaves as if its author had written `thermometer.py`'s constructor and property pair.
 
-`@dataclass_transform` on the base class is the type checker's side of the first line
+`@dataclass_transform` on the base class is the type checker's side of the `dataclass()` call
 ([`@dataclass_transform` Is a Claim](17_Techniques--Metaprogramming.md#dataclass-transform)).
 It tells the checker that every subclass is dataclass-like,
 so the checker synthesizes the same `__init__()` that `dataclass()` builds at runtime,
