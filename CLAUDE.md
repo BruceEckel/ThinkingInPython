@@ -132,7 +132,10 @@ site build. Its ordered step list lives in `tools/verify.py`
 running anything. The gate skips work that cannot find anything new
 (`tools/skip_stamps.py`; `tools/CLAUDE.md` has the policy).
 Two `verify-ch` runs at once wipe each other's `build/examples`, so
-parallel runs (agents, several chapters) add `ISOLATED=1`, which
+parallel runs (agents, several chapters) add `ISOLATED=1` as a tip
+variable after the task name, `uv run tip verify-ch CH=NN ISOLATED=1`
+(an `ISOLATED=1` environment-variable prefix is ignored and the run
+uses the shared tree), which
 extracts into `build/verify-ch-NN/` and reads only that tree (since
 2026-10-05, after a twenty-agent sweep spent 5 to 40 retries per
 chapter on the collisions); `build/verify-ch-*` can be deleted at any
