@@ -693,31 +693,66 @@ class VendingMachine(StateMachine):
     def refund(self, event: object) -> None:
         self.message = f"Returning {self.amount}"
         self.amount = 0
+```
 
-if __name__ == "__main__":
-    events = [
-        Money("quarter", 25), Money("quarter", 25),
-        Money("dollar", 100),
-        # Buy [0][1]
-        FirstDigit("A", 0), SecondDigit("col 1", 1),
-        # Buy it again
-        FirstDigit("A", 0), SecondDigit("col 1", 1),
-        # Too expensive
-        FirstDigit("C", 2), SecondDigit("col 2", 2),
-        # Sold out
-        FirstDigit("D", 3), SecondDigit("col 0", 0),
-        Quit(),  # Refund and reset
-        # Row D, col 0 is both too expensive (a dime
-        # isn't 25 cents) and sold out (quantity 0);
-        # too_expensive is listed first, so it wins:
-        Money("dime", 10),
-        FirstDigit("D", 3), SecondDigit("col 0", 0),
-    ]
-    machine = VendingMachine()
-    for event in events:
-        machine.handle(event)
-        print(f"{event}: {machine.message} "
-              f"[{machine.state.name}]")
+The engine's lookup keys on `type(event)` exactly,
+one dictionary lookup rather than an `isinstance()` test against each row.
+The table keys separate rows on `FirstDigit` and `SecondDigit`,
+two subclasses of `Digit` that differ only in their class.
+The same exactness excludes a further subclass.
+An event whose class derives from `Money` matches none of `Money`'s rows,
+because the key is the event's exact class.
+
+The table goes in `__init__()` rather than in the class body,
+because each entry is a bound method.
+`self.add_money` holds a reference to this machine,
+so each `VendingMachine`'s table calls methods that read and write its own `amount` and `items`.
+
+The engine passes the event to both the condition and the action,
+so `refund()` takes an argument it ignores.
+The `Callable[..., bool]` and `Callable[..., None]` annotations leave the parameters as `...` because each method declares the specific event type it handles,
+and those types differ from row to row.
+With that `...`, the type checker accepts any callable in any row,
+whatever event class the key names.
+If you pair a `SecondDigit` key with a method written for a `FirstDigit`,
+the table type-checks clean and does the wrong thing at runtime.
+
+Adding a state or an input is now a local change:
+an entry in the table and a method or two.
+Nothing here needs a `switch`, reflection,
+or a `Condition`/`Transition` class hierarchy.
+The language's first-class functions and its `dict` supply what those mechanisms exist to provide.
+
+`vending_demo.py` feeds a `VendingMachine` a list of events and prints each event with the resulting message and state:
+
+```python
+# tabledriven/vending_demo.py
+from vending_machine import (FirstDigit, Money, Quit,
+                             SecondDigit, VendingMachine)
+
+events = [
+    Money("quarter", 25), Money("quarter", 25),
+    Money("dollar", 100),
+    # Buy [0][1]
+    FirstDigit("A", 0), SecondDigit("col 1", 1),
+    # Buy it again
+    FirstDigit("A", 0), SecondDigit("col 1", 1),
+    # Too expensive
+    FirstDigit("C", 2), SecondDigit("col 2", 2),
+    # Sold out
+    FirstDigit("D", 3), SecondDigit("col 0", 0),
+    Quit(),  # Refund and reset
+    # Row D, col 0 is both too expensive (a dime
+    # isn't 25 cents) and sold out (quantity 0);
+    # too_expensive is listed first, so it wins:
+    Money("dime", 10),
+    FirstDigit("D", 3), SecondDigit("col 0", 0),
+]
+machine = VendingMachine()
+for event in events:
+    machine.handle(event)
+    print(f"{event}: {machine.message} "
+          f"[{machine.state.name}]")
 #: quarter: Total = 25 [COLLECTING]
 #: quarter: Total = 50 [COLLECTING]
 #: dollar: Total = 150 [COLLECTING]
@@ -752,34 +787,6 @@ If you swap the row order, the same input reports `UNAVAILABLE` instead.
 Both results follow from the engine's [ordering rule](#the-engine).
 The first row whose condition passes wins,
 whether or not a lower row matters more.
-
-The engine's lookup keys on `type(event)` exactly,
-one dictionary lookup rather than an `isinstance()` test against each row.
-The table keys separate rows on `FirstDigit` and `SecondDigit`,
-two subclasses of `Digit` that differ only in their class.
-The same exactness excludes a further subclass.
-An event whose class derives from `Money` matches none of `Money`'s rows,
-because the key is the event's exact class.
-
-The table goes in `__init__()` rather than in the class body,
-because each entry is a bound method.
-`self.add_money` holds a reference to this machine,
-so each `VendingMachine`'s table calls methods that read and write its own `amount` and `items`.
-
-The engine passes the event to both the condition and the action,
-so `refund()` takes an argument it ignores.
-The `Callable[..., bool]` and `Callable[..., None]` annotations leave the parameters as `...` because each method declares the specific event type it handles,
-and those types differ from row to row.
-With that `...`, the type checker accepts any callable in any row,
-whatever event class the key names.
-If you pair a `SecondDigit` key with a method written for a `FirstDigit`,
-the table type-checks clean and does the wrong thing at runtime.
-
-Adding a state or an input is now a local change:
-an entry in the table and a method or two.
-Nothing here needs a `switch`, reflection,
-or a `Condition`/`Transition` class hierarchy.
-The language's first-class functions and its `dict` supply what those mechanisms exist to provide.
 
 ### Testing the Vending Machine
 
@@ -853,7 +860,7 @@ def test_no_transition_raises() -> None:
 Because the actions set `vm.message`,
 `VendingMachine` leaves all output to its caller.
 The same machine can therefore drive more than one view.
-The text demo in `vending_machine.py` reads `message` and prints it.
+The text demo in `vending_demo.py` reads `message` and prints it.
 Contrast `run_all()` in the first design,
 which prints its input from inside the framework.
 Printing there is convenient for a book listing and wrong for a reusable machine,

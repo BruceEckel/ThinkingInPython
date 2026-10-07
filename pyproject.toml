@@ -171,7 +171,6 @@ lines-after-imports = 1
 "**/dunder_modes.py" = ["I001"]
 "**/effect_table.py" = ["I001"]
 "**/effect_variable.py" = ["I001"]
-"**/microgrid.py" = ["I001"]
 "**/plastic_dropped.py" = ["I001"]
 "**/report.py" = ["I001"]
 "**/research_by_hand.py" = ["I001"]
@@ -180,6 +179,7 @@ lines-after-imports = 1
 "**/test_vending.py" = ["I001"]
 "**/test_visitor.py" = ["I001"]
 "**/two_games.py" = ["I001"]
+"**/vending_demo.py" = ["I001"]
 "**/vending_view.py" = ["I001"]
 
 # Examples run with cwd set to their chapter dir; adding the tree's utils/
