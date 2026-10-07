@@ -380,7 +380,8 @@ def editor_pin(v: Vars) -> None:
 @task("House-style lint with Vale (CH=29 for one chapter; needs vale binary)")
 def prose(v: Vars) -> None:
     """House-style lint with Vale: no em-dashes and no filler phrases, then
-    the report-only stranded-preposition and watch-word scans. Run one
+    the report-only stranded-preposition, watch-word, and internal-name
+    scans (the last reads the whole book). Run one
     chapter with CH= (e.g. `tip prose CH=29`) or a path with DOCS=.
     Vale is a standalone binary (not uv-managed; `tip tools-check-full`
     says how to install it). Its style packages (.vale.ini's Packages)
@@ -392,6 +393,7 @@ def prose(v: Vars) -> None:
     run(["vale", *prose_files(v)])
     py("tools.stranded_prepositions", *prose_files(v))
     py("tools.watch_words", *prose_files(v))
+    py("tools.internal_names")
 
 
 @task("Report new clauses ending on a stranded preposition "
@@ -410,6 +412,26 @@ def stranded(v: Vars) -> None:
       "stale entries", secondary=True)
 def stranded_accept(v: Vars) -> None:
     py("tools.stranded_prepositions", "--accept")
+
+
+@task("Report public class names that only their class uses "
+      "(report-only; accept with `tip internal-names-accept`)")
+def internal_names(v: Vars) -> None:
+    """Report public class names (methods, properties, class
+    attributes, `self.x` stores) that nothing outside their own class
+    uses, in code or in a prose code span, candidates for a leading
+    underscore; record fields are skipped by design. It
+    reports and never gates; `tip prose` runs it last. Hits judged keeps
+    live in tools/data/internal_names_baseline.txt, so the run prints
+    only new ones; ARGS=--all lists every hit.
+    """
+    py("tools.internal_names", *v.words("ARGS"))
+
+
+@task("Add new internal-name hits to the baseline and drop stale "
+      "entries", secondary=True)
+def internal_names_accept(v: Vars) -> None:
+    py("tools.internal_names", "--accept")
 
 
 @task("Report new uses of the style guide's watch words "

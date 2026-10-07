@@ -1,0 +1,38 @@
+# Public class names that only their own class uses, which a
+# human read and judged to keep public: stored constructor
+# data, table-driven names, double-dispatch legs, demos that
+# introspect. An entry is not an exemption from the rule.
+# path::Class.name, with no line number, so a line shift leaves
+# an entry alone. Rewritten by `tip internal-names-accept`; read
+# the delta with `tip internal-names` before accepting.
+# See tools/internal_names.py.
+Examples/08_Foundations--Static_Types/generic_box.py::Box.content
+Examples/14_Techniques--Decorators/pizza_decorator.py::Topping.pizza
+Examples/15_Techniques--Context_Managers/banner_cm.py::banner.title
+Examples/15_Techniques--Context_Managers/expected_one.py::expected_one.kind
+Examples/17_Techniques--Metaprogramming/demo_display_object.py::Fraggle.g
+Examples/17_Techniques--Metaprogramming/demo_display_object.py::Fraggle.h
+Examples/17_Techniques--Metaprogramming/marked_methods.py::Button.glow
+Examples/17_Techniques--Metaprogramming/prepare_namespace.py::Handlers.on_close
+Examples/17_Techniques--Metaprogramming/validating_descriptor.py::Rectangle.height
+Examples/24_Patterns--Singleton/singleton_class.py::singleton.constructor
+Examples/27_Patterns--Factory/pizza_builder.py::PizzaBuilder.no_cheese
+Examples/31_Patterns--State_Machines/tabledriven/vending_machine.py::VendingMachine.choose_row
+Examples/31_Patterns--State_Machines/tabledriven/vending_machine.py::VendingMachine.clear
+Examples/31_Patterns--State_Machines/tabledriven/vending_machine.py::VendingMachine.dispense
+Examples/31_Patterns--State_Machines/tabledriven/vending_machine.py::VendingMachine.sold_out
+Examples/33_Patterns--Visitor/recursive_accept.py::Corsage.elements
+Examples/41_Functional--Toolkits/functools_total_ordering.py::Weight.kg
+Solutions/14_Techniques--Decorators/decorated_methods.py::Counter.total
+Solutions/14_Techniques--Decorators/exercise_1.py::Point.y
+Solutions/14_Techniques--Decorators/exercise_3.py::Extra.drink
+Solutions/26_Patterns--Surrogate/exercise_5.py::Connection.number
+Solutions/31_Patterns--State_Machines/exercise_6.py::WashingMachine.log_msg
+Solutions/31_Patterns--State_Machines/exercise_7.py::Elevator.arrive
+Solutions/31_Patterns--State_Machines/exercise_7.py::Elevator.set_target
+Solutions/31_Patterns--State_Machines/exercise_8.py::HVAC.band
+Solutions/31_Patterns--State_Machines/exercise_9.py::Machine.add
+Solutions/32_Patterns--Multiple_Dispatching/exercise_8.py::Edict.eval_edict
+Solutions/32_Patterns--Multiple_Dispatching/exercise_8.py::InventFeature.eval_invent_feature
+Solutions/32_Patterns--Multiple_Dispatching/exercise_8.py::Schedule.eval_schedule
+Solutions/32_Patterns--Multiple_Dispatching/exercise_8.py::SellImaginaryProduct.eval_sell_imaginary_product

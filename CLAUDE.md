@@ -182,13 +182,20 @@ raised where none is expected still fails the gate; only marker text is
 auto-corrected. A lone bare `#: ` with nothing after it is always treated
 as a not-yet-filled-in placeholder and filled in, even without `--update`.
 
-Two report-only
+Three report-only
 prose checks run in `tip prose`, never in a gate, each with a baseline
 of judged keeps in `tools/data/` so only new hits print (since
 2026-10-03): `tip stranded` (`tools/stranded_prepositions.py`, a clause
 ending on a preposition whose object moved) and `tip watch-words`
 (`tools/watch_words.py`, the style guide's don't-use and avoid tiers).
-`tip stranded-accept` and `tip watch-words-accept` add the current new
+`tip internal-names` (`tools/internal_names.py`, 2026-10-07) lists each
+public class name, in code under `Examples/` and `Solutions/`, that no
+code outside its class and no prose code span uses, a candidate for a
+leading underscore; its baseline holds the judged keeps (stored
+constructor data, table-driven names, double-dispatch legs,
+introspection demos), and record fields are skipped by design.
+`tip stranded-accept`, `tip watch-words-accept`, and
+`tip internal-names-accept` add the current new
 hits to the baseline after a human read; `ARGS=--all` lists every hit.
 The 2026-10-03 sweeps read every hit: 87 strandings fixed and 84
 accepted, 610 watch words fixed and 220 accepted (a `want` with a
