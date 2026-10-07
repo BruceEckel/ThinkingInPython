@@ -1527,8 +1527,8 @@ class Notifying[T]:
     def __set_name__(
         self, owner: type, name: str
     ) -> None:
-        self.storage = f"_{name}"
-        self.responders = f"_responders_{name}"
+        self._storage = f"_{name}"
+        self._responders = f"_responders_{name}"
 
     @overload
     def __get__(self, obj: None,
@@ -1540,17 +1540,17 @@ class Notifying[T]:
                 owner: type) -> T | Notifying[T]:
         if obj is None:
             return self  # Thermometer.celsius
-        return getattr(obj, self.storage)
+        return getattr(obj, self._storage)
 
     def __set__(self, obj: object, value: T) -> None:
-        setattr(obj, self.storage, value)
-        for responder in getattr(obj, self.responders, ()):
+        setattr(obj, self._storage, value)
+        for responder in getattr(obj, self._responders, ()):
             responder(value)
 
     def connect(self, obj: object,
                 responder: Responder[T]) -> None:
         obj.__dict__.setdefault(
-            self.responders, []).append(responder)
+            self._responders, []).append(responder)
 
 class Thermometer:
     celsius = Notifying[float]()
