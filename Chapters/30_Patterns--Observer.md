@@ -972,14 +972,14 @@ and writes an `__init__()` and a `__repr__()` onto the class.
 Without slots, `dataclass()` modifies the class in place and returns it,
 and the line binds that result to `built`.
 
-The second line asks `fields()` for the class's dataclass fields,
+The `for` loop asks `fields()` for the class's dataclass fields,
 one `Field` object per annotation, each carrying the field's name.
 `fields()` accepts a dataclass type, and `dataclass()` returned `built`,
 so the type checker knows `built` as a dataclass type.
 `cls` is the class as declared, and the checker rejects `fields(cls)`,
 which is why the first line binds the result instead of discarding it.
 
-The third line installs the property.
+The `setattr()` call inside the loop installs the property.
 `setattr(cls, field.name, announcing(field.name))` puts the property on the class under the field's own name,
 so `Thermometer.celsius` is now a property and every `thermometer.celsius` read or write goes through `read()` or `write()`.
 The generated `__init__()` captured any default the field declared when the first line ran,
