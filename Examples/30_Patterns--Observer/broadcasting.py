@@ -14,13 +14,14 @@ class Broadcasting[T]:
             prop = announcing(field.name)  # [3]
             setattr(cls, field.name, prop)  # [4]
 
-    def responders(self) -> list[Responder[T]]:
+    @property
+    def _responders(self) -> list[Responder[T]]:
         return self.__dict__.setdefault("_responders", [])
 
     def respond(self, fn: Responder[T]) -> Responder[T]:
-        self.responders().append(fn)
+        self._responders.append(fn)
         return fn
 
     def announce(self, data: T) -> None:
-        for responder in list(self.responders()):
+        for responder in list(self._responders):
             responder(data)

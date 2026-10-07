@@ -951,15 +951,16 @@ class Broadcasting[T]:
             prop = announcing(field.name)  # [3]
             setattr(cls, field.name, prop)  # [4]
 
-    def responders(self) -> list[Responder[T]]:
+    @property
+    def _responders(self) -> list[Responder[T]]:
         return self.__dict__.setdefault("_responders", [])
 
     def respond(self, fn: Responder[T]) -> Responder[T]:
-        self.responders().append(fn)
+        self._responders.append(fn)
         return fn
 
     def announce(self, data: T) -> None:
-        for responder in list(self.responders()):
+        for responder in list(self._responders):
             responder(data)
 ```
 
@@ -1006,8 +1007,11 @@ and `Thermometer(100)` type-checks against a parameter `celsius: float`.
 [The Pythonic *Observer*](#the-pythonic-observer)
 notes that a `dataclass`-generated `__init__()` skips the base class's `__init__()`.
 `Broadcasting` has no `__init__()` to skip.
-`responders()` creates the list on first use,
-through `setdefault()` on the instance `__dict__`.
+The `_responders` property creates the list on first use,
+through `setdefault()` on the instance `__dict__`,
+and keeps it there under its own name.
+A property takes precedence over an instance attribute of the same name,
+so each later read also goes through the getter and finds the stored list.
 The generated `__init__()` writes `self.celsius = celsius` through the property,
 which calls `announce()` on an empty list, so construction announces to no one,
 as in `thermometer.py`.
