@@ -1,6 +1,6 @@
 ---
 name: edit-done
-description: Close an editing pass opened by `/edit-start`. Diffs the chapter from its `edit-start-NN` tag to the working tree, runs `/bruce-edit-capture` over that diff, runs the verify loop and commits what it changes, then deletes the tag. Use when Bruce says he is done, finished, or through editing a chapter. The argument names the chapter by number or name; with no argument, the single open tag is used.
+description: Close an editing pass opened by `/edit-start`. Diffs the chapter from its `edit-start-NN` tag to the working tree, runs `/bruce-edit-capture` over that diff, runs the verify loop, lists new positional pointers, commits what it changes, then deletes the tag. Use when Bruce says he is done, finished, or through editing a chapter. The argument names the chapter by number or name; with no argument, the single open tag is used.
 ---
 
 # Closing an editing pass on a chapter
@@ -150,6 +150,34 @@ marker the prose contradicts) is reported with its output, and the fix
 is proposed, not applied, unless Bruce asks. His edits are the
 authority on what the chapter should say.
 
+## Step 4b: positional pointers
+
+Prose that walks a listing points at a line with a `[n]` tag, never with
+a position or an ordinal ("the first `announce()`", "the last four
+lines", "the `for` loop" when the listing has two). `tip positional`
+(`tools/positional_refs.py`, report-only, never in a gate) lists the new
+hits, so a pointer Bruce or I wrote during the pass is caught here,
+before the pass closes. Run it after the verify loop and read the lines
+for this chapter and its Solutions file:
+
+```
+tip positional
+```
+
+For each NEW hit in those two files: if the sentence points at a line of
+the listing above it, replace the pointer with the construct itself when
+the listing has one of it (`announce(30.0)` for "the second
+`announce()`"), or add a `# [n]` tag to the code line and cite it as
+`` `[n]` `` for an ordered walk (the "Listing tags" section of `CLAUDE.md`
+has the rules and `tip listing-tags` gates them). If the ordinal names
+something other than a line (an argument, a version, a runtime call,
+output, data), it is a false positive: `tip positional-accept` adds the
+current new hits to the baseline, so run it only after every real hit is
+fixed and the remaining ones have been read. The fixes join the Step 4
+commit, so rerun `tip verify-ch CH=NN` after them. The 2026-10-07 review
+of chapter 30 found six such pointers written during its pass, which is
+why this step exists.
+
 ## Step 5: delete the tag
 
 Only after the capture round is complete (the store written, or Bruce
@@ -167,4 +195,5 @@ the next `/edit-done` will start from the same place.
 - the pass: chapter, number of commits, whether the tree was dirty;
 - the capture's counts and what was written to `bruce_edit_db.md`;
 - the verify result and the commit made, if any;
+- the positional hits: how many were fixed and how many accepted;
 - that the tag is gone, or why it stayed.
