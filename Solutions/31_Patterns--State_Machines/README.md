@@ -363,14 +363,14 @@ from typing import ClassVar
 
 class Controller:
     def __init__(self, initial: str) -> None:
-        self.states: dict[str, WordState] = {}
+        self._states: dict[str, WordState] = {}
         self.current = initial
 
     def register(self, name: str, state: WordState) -> None:
-        self.states[name] = state
+        self._states[name] = state
 
     def process(self, word: str) -> None:
-        state = self.states[self.current]
+        state = self._states[self.current]
         self.current = state.next_state(word)
 
 class WordState:
