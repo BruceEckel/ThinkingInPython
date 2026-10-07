@@ -1,9 +1,9 @@
-# watched.py
+# weather_station.py
 from collections.abc import Callable
 
 type AttrResponder = Callable[[str, object], None]
 
-class Watched:
+class WeatherStation:
     _responders: list[AttrResponder]  # Bare annotation
 
     def __init__(
@@ -26,10 +26,10 @@ class Watched:
         for responder in responders:
             responder(name, value)
 
-w = Watched(20.0, 0.4)
+station = WeatherStation(20.0, 0.4)
 changes: list[tuple[str, object]] = []
-w.connect(lambda n, v: changes.append((n, v)))
-w.celsius = 25.0
-w.humidity = 0.5
+station.connect(lambda n, v: changes.append((n, v)))
+station.celsius = 25.0
+station.humidity = 0.5
 print(changes)
 #: [('celsius', 25.0), ('humidity', 0.5)]

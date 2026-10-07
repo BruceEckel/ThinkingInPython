@@ -770,16 +770,16 @@ A program can choose its responders at any of four points:
 `Thermometer` writes a getter and a setter for each attribute it publishes,
 and inherits `connect()` and `announce()` from `Broadcaster`.
 We can simplify this using `__setattr__()`.
-Python calls it on every attribute assignment,
+Python calls it for every attribute assignment,
 so one method covers every attribute of the class:
 
 ```python
-# watched.py
+# weather_station.py
 from collections.abc import Callable
 
 type AttrResponder = Callable[[str, object], None]
 
-class Watched:
+class WeatherStation:
     _responders: list[AttrResponder]  # Bare annotation
 
     def __init__(
@@ -802,11 +802,11 @@ class Watched:
         for responder in responders:
             responder(name, value)
 
-w = Watched(20.0, 0.4)
+station = WeatherStation(20.0, 0.4)
 changes: list[tuple[str, object]] = []
-w.connect(lambda n, v: changes.append((n, v)))
-w.celsius = 25.0
-w.humidity = 0.5
+station.connect(lambda n, v: changes.append((n, v)))
+station.celsius = 25.0
+station.humidity = 0.5
 print(changes)
 #: [('celsius', 25.0), ('humidity', 0.5)]
 ```
@@ -826,9 +826,9 @@ In a class body, a name with a type and no initialization value [declares an att
 Such a name is a *bare annotation*.
 It looks like a class variable, but a class variable needs a value.
 `_responders` creates no attribute anywhere,
-and the constructor gives each `Watched` its own `_responders` list.
+and the constructor gives each `WeatherStation` its own `_responders` list.
 The same line with `= []` creates a class attribute,
-a single list shared by every `Watched`.
+a single list shared by every `WeatherStation`.
 [Class Attributes](09_Foundations--Class_Attributes.md#a-classvar-with-no-value-declares-too)
 covers the difference between declaring an attribute and creating one,
 for instance attributes and class variables both.
@@ -844,7 +844,7 @@ Without it, `ty` reports an `unresolved-attribute` error in each method that rea
 One method for every attribute costs the precision of a property per attribute,
 in three ways:
 
-1.  `Watched`'s responders have a wider signature.
+1.  `WeatherStation`'s responders have a wider signature.
     Each takes the attribute name along with the value,
     and filters by name to act on one attribute.
     `Thermometer` publishes one attribute and is a `Broadcaster[float]`,
@@ -1012,7 +1012,7 @@ through `setdefault()` on the instance `__dict__`,
 and keeps it there under its own name.
 A property takes precedence over an instance attribute of the same name,
 so each later read also goes through the getter and finds the stored list.
-`Watched` also writes its list straight into the instance `__dict__`,
+`WeatherStation` also writes its list straight into the instance `__dict__`,
 because its constructor must keep that assignment away from its own `__setattr__()`.
 `Broadcasting` has no constructor,
 so the property does that work at the first read instead.
@@ -1022,7 +1022,7 @@ as in `thermometer.py`.
 
 `Broadcasting` has one type parameter, so a subclass publishes one value.
 A class that declares `celsius` and `humidity` would send both readings to the same responders with no name attached.
-A class with several published attributes uses `Watched`'s name-and-value signature,
+A class with several published attributes uses `WeatherStation`'s name-and-value signature,
 or gives each attribute its own responders with the descriptor in exercise 10.
 
 ## Observer and I/O
@@ -1629,7 +1629,7 @@ Measuring is the thermometer's own job, and *Observer* adds the other two.
 The code for notifying can leave the class.
 `Broadcaster` holds the responder list and the notification loop,
 and `Thermometer` inherits them.
-`watched.py` uses no base class and calls its responders from `__setattr__()`,
+`weather_station.py` uses no base class and calls its responders from `__setattr__()`,
 so one method covers every attribute.
 Either way the object still notifies its responders,
 but the loop that calls them is written once,
@@ -1648,7 +1648,7 @@ and the responders stay out of date until it does.
 Push sends the value, so the thermometer decides what each responder receives.
 Pull sends the thermometer,
 so each responder reads the attributes it needs from the thermometer and depends on the thermometer's interface.
-`watched.py` leaves the choice to its responders.
+`weather_station.py` leaves the choice to its responders.
 Two states, `celsius` and `humidity`, share one channel,
 so every responder receives both kinds of change,
 along with the attribute name to filter by.
@@ -1723,7 +1723,7 @@ Repeating the comparison in each responder works for a question about *how much*
 because each responder sets its own threshold.
 *Which kind* is a different question, and repetition handles it poorly,
 because every kind of change arrives on one channel and each responder sorts them itself.
-A responder in `watched.py` receives every attribute's changes,
+A responder in `weather_station.py` receives every attribute's changes,
 so each responder that cares about one attribute repeats the same filter by name.
 [Function Objects](28_Patterns--Function_Objects.md#an-event-bus-handlers-keyed-by-type)
 removes that repetition.
