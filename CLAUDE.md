@@ -325,6 +325,30 @@ word in its ordinary sense ("Intrinsic and Extrinsic State") gets a
 ("**State the precondition in the strategy.**") counts as a sentence
 start and joins that listing.
 
+## Listing tags: `# [n]` in code, `` `[n]` `` in prose
+
+Prose that walks a listing line by line points at a line with a tag,
+not with "the first line" or "the `for` loop" (Bruce, 2026-10-07: a
+positional phrase makes the reader count, and a construct name fails
+when the listing has two of that construct). The tag is a trailing
+comment `# [1]`, `# [2]`, ... on the code line, numbered from 1 in
+order within one listing, and the prose refers to it as a code span,
+`` `[1]` ``, never bare: the EPUB and PDF concatenate the chapters, so
+one stray `[1]:` definition anywhere would turn every bare `[1]` into
+a link. Name the construct instead when the listing has one of it and
+the prose mentions it once; tags are for an ordered walk. The tag
+counts toward the 60-column width, so a tagged line near the limit is
+split (`prop = announcing(...)  # [3]` then `setattr(...)  # [4]`) or
+carries the tag on its own line above it, which refers to the line
+below. `tools/listing_tags.py` gates it (`tip listing-tags`, in
+`GATE_CHECKS`): tags run 1..n in order, every tag is referenced in the
+prose before the next listing or heading, every `` `[n]` `` resolves
+to a tag in the nearest listing above, and a bare `[n]` in prose is a
+finding. Chapter 30's `broadcasting.py` is the first tagged listing.
+`# [1]` passes ruff as configured and under `--preview` (pycodestyle's
+E262 rejects `#1`, `#(1)`, and `#<1>`, every form with no space after
+the hash), which is why the bracket form was chosen over them.
+
 ## Diagrams: hand-authored SVGs, some generated
 
 A figure is an SVG in `resources/images/`, referenced as `![caption](_images/<name>)`.

@@ -79,7 +79,7 @@ element away without a name). `[_, *_]` matches one or more elements.
 The first `_` matches the first element, and `*_` collects the rest,
 including an empty rest. So `[_, *_]` also fits a singleton, and order
 matters. `[_]` must come before `[_, *_]`, or the general pattern
-claims `[1]` first and the "singleton" case is unreachable.
+claims the one-element list first and the "singleton" case is unreachable.
 
 **Test the type alone.** `Point()` matches any `Point`
 instance without binding its fields, since `classify()` doesn't need

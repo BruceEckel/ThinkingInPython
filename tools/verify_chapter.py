@@ -81,7 +81,8 @@ SOLUTIONS_DIR: Final = ROOT / "Solutions"
 TY_EXTRA_DIRS: Final = ("utils", "06_Foundations--Modules_and_Packages")
 # The Solutions checks the gate runs through check_all (its `banned` and
 # listing checks stay off Solutions/ for the reasons tools/tasks.py gives).
-SOLUTIONS_CHECKS = ["anchors", "widths", "records", "pattern-names"]
+SOLUTIONS_CHECKS = ["anchors", "widths", "records", "pattern-names",
+                    "listing-tags"]
 
 
 def ty_overrides(build_dir: Path) -> list[str]:

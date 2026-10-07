@@ -44,9 +44,11 @@ from tools.tool_stamp import UPGRADE_REQUESTED
 # most of the book's frozen data classes are in Solutions/. pattern-names
 # joined them on 2026-10-06, once the hints' section-title links carried
 # their italics.
-GATE_CHECKS = ("listings widths banned comment-periods comment-caps "
-               "comment-spacing anchors footnotes epigraph self-reference "
-               "prose-lint pattern-names records").split()
+GATE_CHECKS = ("listings widths banned comment-periods "
+               "comment-caps comment-spacing anchors "
+               "footnotes listing-tags epigraph "
+               "self-reference prose-lint pattern-names "
+               "records").split()
 
 # Markdown outside Chapters/ that still carries intra-document links worth
 # gating. Only `anchors` runs over it: `banned` would fire on the tooling
@@ -239,7 +241,7 @@ def gate(v: Vars) -> None:
     py("tools.check_all", *GATE_CHECKS)
     py("tools.check_all", "anchors", "--paths", *GATE_DOCS)
     py("tools.check_all", "widths", "records", "pattern-names",
-       "--paths", "Solutions")
+       "listing-tags", "--paths", "Solutions")
     py("tools.coupling_panels", "--check")
     py("tools.story_figures", "--check")
     py("tools.check_quoted_diagnostics")
@@ -1009,6 +1011,20 @@ def footnotes(v: Vars) -> None:
     silently replaced; the site, one page per chapter, never shows it.
     """
     py("tools.footnote_labels")
+
+
+@task("Fail if a listing tag # [n] is out of order, "
+      "uncited, or cited wrongly")
+def listing_tags(v: Vars) -> None:
+    """Fail if a listing's # [n] tags do not run 1, 2,
+    ..., n, if the prose below a listing (up to the next
+    block or heading) leaves a tag uncited, if a `[n]` code
+    span names no tag in the listing above it, or if prose
+    holds a bare [n] outside a code span. The EPUB and PDF
+    concatenate every chapter, so one stray [n]: definition
+    would turn every bare [n] into a link.
+    """
+    py("tools.listing_tags")
 
 
 @task("Fail if a chapter does not open with its epigraph")
