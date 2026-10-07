@@ -711,7 +711,7 @@ and a lapsed listener is a connection that outlives the program's use of its res
 Decoupling and dynamism are separate properties.
 A decoupled subject knows its observers only as callables.
 A dynamic subject lets the set of observers change after the subject exists.
-A broadcaster whose constructor fixes its responders for its lifetime is decoupled but not dynamic:
+A broadcaster whose constructor sets its responders for its lifetime is decoupled but not dynamic:
 
 ```python
 # fixed_broadcaster.py
@@ -740,7 +740,7 @@ print(log)
 ```
 
 `FixedBroadcaster` is a record whose `responders` field holds a tuple.
-The record fixes the field, and the tuple fixes its contents,
+The record freezes the field, and the tuple freezes its contents,
 so the constructor sets the responders for good.
 `announce()` iterates through the tuple without copying it,
 because the set stays the same throughout a notification.

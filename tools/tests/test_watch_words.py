@@ -179,9 +179,11 @@ T1_TEXT = "The value is only set once.\n"
 def test_tier_1_words() -> None:
     words = [h[2] for h in hits(
         "It may happen. That is what it does. It used to work. "
-        "She had to go. It runs exactly once, itself.")]
+        "She had to go. It runs exactly once, itself. "
+        "The record fixes the field.")]
     assert sorted(words) == sorted([
-        "happen", "is what", "used to", "had to", "exactly", "itself"])
+        "happen", "is what", "used to", "had to", "exactly", "itself",
+        "fixes"])
 
 
 @pytest.mark.parametrize("text", [
