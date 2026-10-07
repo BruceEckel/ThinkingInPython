@@ -380,8 +380,9 @@ def editor_pin(v: Vars) -> None:
 @task("House-style lint with Vale (CH=29 for one chapter; needs vale binary)")
 def prose(v: Vars) -> None:
     """House-style lint with Vale: no em-dashes and no filler phrases, then
-    the report-only stranded-preposition, watch-word, and internal-name
-    scans (the last reads the whole book). Run one
+    the report-only stranded-preposition, watch-word,
+    positional-reference, and internal-name scans (the last reads the
+    whole book). Run one
     chapter with CH= (e.g. `tip prose CH=29`) or a path with DOCS=.
     Vale is a standalone binary (not uv-managed; `tip tools-check-full`
     says how to install it). Its style packages (.vale.ini's Packages)
@@ -393,6 +394,7 @@ def prose(v: Vars) -> None:
     run(["vale", *prose_files(v)])
     py("tools.stranded_prepositions", *prose_files(v))
     py("tools.watch_words", *prose_files(v))
+    py("tools.positional_refs", *prose_files(v))
     py("tools.internal_names")
 
 
@@ -452,6 +454,27 @@ def watch_words(v: Vars) -> None:
       "entries", secondary=True)
 def watch_words_accept(v: Vars) -> None:
     py("tools.watch_words", "--accept")
+
+
+@task("Report new prose that points at a listing line by position or "
+      "by a repeated construct (report-only; accept with "
+      "`tip positional-accept`)")
+def positional(v: Vars) -> None:
+    """Report prose that points at a listing line by position ("the
+    second `print()`", "the last line", "line 3") or by a construct the
+    listing holds more than once ("the `for` loop"), where a numbered
+    tag belongs. It reports and never gates; `tip prose` runs it after
+    the watch-word scan. CH= picks one chapter and its Solutions file.
+    Hits judged keeps live in tools/data/positional_refs_baseline.txt,
+    so the run prints only new ones; ARGS=--all lists every hit.
+    """
+    py("tools.positional_refs", *prose_files(v), *v.words("ARGS"))
+
+
+@task("Add new positional-reference hits to the baseline and drop "
+      "stale entries", secondary=True)
+def positional_accept(v: Vars) -> None:
+    py("tools.positional_refs", "--accept")
 
 
 also("checks", "pattern-names")

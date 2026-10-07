@@ -185,7 +185,7 @@ raised where none is expected still fails the gate; only marker text is
 auto-corrected. A lone bare `#: ` with nothing after it is always treated
 as a not-yet-filled-in placeholder and filled in, even without `--update`.
 
-Three report-only
+Four report-only
 prose checks run in `tip prose`, never in a gate, each with a baseline
 of judged keeps in `tools/data/` so only new hits print (since
 2026-10-03): `tip stranded` (`tools/stranded_prepositions.py`, a clause
@@ -197,14 +197,25 @@ code outside its class and no prose code span uses, a candidate for a
 leading underscore; its baseline holds the judged keeps (stored
 constructor data, table-driven names, double-dispatch legs,
 introspection demos), and record fields are skipped by design.
-`tip stranded-accept`, `tip watch-words-accept`, and
-`tip internal-names-accept` add the current new
-hits to the baseline after a human read; `ARGS=--all` lists every hit.
+`tip positional` (`tools/positional_refs.py`, 2026-10-07) lists prose
+after a listing that points at a line by position ("the second
+`print()`", "the last line", "line 3") or by a construct the listing
+holds more than once ("the `for` loop" with two `for`s), the shapes
+the tag convention replaces; a sentence that already cites a `[n]`
+tag is skipped. Its baseline was seeded from the 2026-10-07 tag sweep,
+which read every hit, so a new hit is a pointer to tag or a false
+positive to accept (an ordinal naming an argument, a version, a
+runtime call, output, or data).
+`tip stranded-accept`, `tip watch-words-accept`,
+`tip internal-names-accept`, and `tip positional-accept` add the
+current new hits to the baseline after a human read; `ARGS=--all`
+lists every hit.
 The 2026-10-03 sweeps read every hit: 87 strandings fixed and 84
 accepted, 610 watch words fixed and 220 accepted (a `want` with a
 human subject, an arithmetic `even`, a `never` that is the claim, a
 heading echoed in link text). Chapter 30's hits were left for its open
-editing pass and are not in either baseline.
+editing pass and are kept out of the watch-words and positional
+baselines, so they stay NEW until that pass closes.
 
 ## Exercise statements in Solutions/ are generated
 
