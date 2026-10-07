@@ -188,7 +188,7 @@ Both versions below keep the read of `subject.celsius` and repair the type,
 the first by widening the parameter again and the second by changing the protocol.
 
 **Declare the widest subject type.** The protocol here is `classic_observer.py`'s, unchanged.
-`update()` declares the widest type `attach()` can hand it,
+`update()` declares the widest type `notify()` can hand it,
 `Subject[float]`, and narrows that to a `Thermometer` before reading
 `celsius`:
 
@@ -947,9 +947,11 @@ new color and have joined the patch.
 **Score the game.** `game.moves` gives the
 single-player scoring the exercise asks for:
 the moves it takes to make the whole field one color.
-Two players can share the same `select()`
-method, alternating whose turn supplies the next color, and after a
-set number of rounds whoever owns the larger patch wins.
+`FloodGame` holds one `origin` and one `owned` set,
+so a two-player version gives each player an origin of their own,
+in opposite corners, and an owned set of their own, over one grid.
+The players alternate turns, each recoloring their own patch,
+and after a set number of rounds whoever owns the larger patch wins.
 
 `FloodGame`
 can also inherit from `Broadcaster[Grid]`, as `BoxModel` does, and

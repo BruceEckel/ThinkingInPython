@@ -269,8 +269,8 @@ That alternative trades correctness for convenience.
 If a responder returns a value, `announce()` quietly drops it.
 The strict version of `Responder` returning `None` catches that mistake.
 Notification runs one way, from broadcaster to responders.
-*GoF Design Patterns* gives the reason under broadcast communication.
-A notification goes to every connected responder,
+*GoF Design Patterns* supplies the premise under broadcast communication:
+a notification goes to every connected responder,
 and each one decides whether to handle it.
 Allowing return values produces different values from an unknown number of responders.
 The broadcaster would require a rule for combining those different values.
@@ -327,7 +327,7 @@ gets a generated `__init__()` and the list another way.
 
 `Thermometer` inherits `Broadcaster` because that is the shortest way to get `connect()` and `announce()`,
 not because the pattern requires a base class.
-A `Thermometer` could use composigion, holding a `Broadcaster` as an attribute
+A `Thermometer` could use composition, holding a `Broadcaster` as an attribute
 (`self.temperature_changed = Broadcaster[float]()`).
 Code that connects a responder would name that attribute
 (`t.temperature_changed.connect(display)`).
@@ -364,7 +364,8 @@ naming the two lambdas `display` and `alarm`:
 
 The shaded side holds the responders as the program wrote them;
 `Thermometer` keeps each one as a callable in its list.
-Two kinds of arrow cross into it: `connect()` stores a responder in the list,
+Two kinds of arrow cross the boundary, in opposite directions:
+`connect()` carries a responder into the list,
 and `announce()` calls each stored responder in turn.
 No result crosses back, so `Thermometer` has nothing to wait for or interpret.
 A new responder such as `plot` connects the same way as all responders.
@@ -503,7 +504,7 @@ so `once` still gets this notification but no later ones.
 `always` receives both.
 Without the copy, `announce()`'s `for` loop reads the list that `disconnect()` changes.
 `once` is at index 0 and `always` at index 1.
-Removing `once` moves `always` to index 0, which the loop has already visited,
+Removing `once` moves `always` to index 0, which the loop has visited,
 so the loop looks for index 1, finds the list ended there, and stops.
 `always` misses the first change, and `seen` ends as `['once: 1', 'always: 2']`,
 with no exception to say a responder was skipped.
@@ -512,11 +513,11 @@ with no exception to say a responder was skipped.
 
 If a responder raises an exception, it stops the `announce()` loop.
 The remaining responders in the list do not get notified.
-The exception lands in the code that assigned to `celsius`.
+The exception propagates to the code that assigned to `celsius`.
 You must decide whether `announce()` should catch, collect, and continue
 (see exercise 3).
 
-Alternatively, the can responder catch its own exception and [return the error as a value](42_Functional--Error_Handling.md#return-the-error-as-a-value).
+Alternatively, the responder can catch its own exception and [return the error as a value](42_Functional--Error_Handling.md#return-the-error-as-a-value).
 In this approach, `announce()` collects the returned errors for the caller.
 Every responder runs, and every failure arrives as a value.
 However, the `Responder` type becomes a callable that returns a success or an error,
@@ -590,7 +591,7 @@ and that leaves the weak reference dead.
 Using `WeakMethod`, you store the instance and the function separately,
 both weakly, and rebuild the bound method each time you call `ref()`.
 
-The first `announce()` runs while `plot` is alive,
+`announce(25.0)` runs while `plot` is alive,
 so the weak reference still has its target.
 `ref()` rebuilds the bound method `plot.redraw`, and `weak` stores it in `live`.
 `live` is a strong reference,
@@ -602,11 +603,10 @@ and the responder again holds the `Plot` object through the weak reference alone
 CPython's reference counting collects the object at once.
 An implementation with a [tracing collector](10_Foundations--Cleanup.md#watching-objects-without-holding-them),
 such as PyPy, collects the object when its collector runs,
-and the `gc.collect()` call runs that collector before the second `announce()`.
+and the `gc.collect()` call runs that collector before `announce(30.0)`.
 A program that leaves the timing to the collector sees `weak` keep calling `redraw()` until the collector runs.
 
-During the second `announce()`,
-`ref()` returns `None` and `weak` disconnects itself.
+During `announce(30.0)`, `ref()` returns `None` and `weak` disconnects itself.
 The copy that `announce()` iterates over makes a mid-notification disconnect safe,
 as it does for `once` in `self_removing_responder.py`.
 The listing's last statement tries to disconnect `weak` a second time.
@@ -815,8 +815,8 @@ print(changes)
 
 Python routes every assignment to an attribute of the instance through `__setattr__()`.
 This includes assignments within the constructor.
-The first line in `__setattr__()` reads `self._responders`,
-so an ordinary `self._responders = []` in the constructor reads the list via `__setattr__()` before that list is created,
+`__setattr__()` begins by reading `self._responders`,
+so an ordinary `self._responders = []` in the constructor would reach that read before the list exists,
 raising an `AttributeError`.
 To prevent this, the `_responders` property creates the list upon first read,
 using `setdefault()` on the instance `__dict__`.
@@ -840,11 +840,12 @@ One `__setattr__()` for every attribute gives up three things that `Thermometer`
     A responder that sorts its own notifications means the subject has left the decision to its responders.
 2.  Every assignment reaches the responders, including the internal ones.
     A cached result or a hit counter broadcasts like a published attribute,
-    unless the class writes it through `self.__dict__` as the constructor does.
+    unless the class writes it through `self.__dict__`,
+    as the `_responders` property does.
 3.  `__setattr__()` accepts any name,
     so the type checker stops checking assignments.
-    The type checker passes `w.celcius = 25.0`, a misspelling of `celsius`,
-    which quietly creates a new attribute.
+    The type checker passes `station.celcius = 25.0`,
+    a misspelling of `celsius`, which quietly creates a new attribute.
     The same misspelling on a `Thermometer` produces an `unresolved-attribute` error.
     `Thermometer` defines no `__setattr__()`,
     so the type checker checks each assignment against the attributes the class declares.
@@ -885,7 +886,7 @@ The `respond()` decorator method appends the function to the thermometer's list 
 so `report` stays callable by name.
 `disconnect()` takes that name back out,
 matching by equality as `Broadcaster`'s does,
-so the last assignment reaches `report` alone.
+so `thermometer.celsius = 200` reaches `report` alone.
 
 To minimize application code, all common behaviors are captured in the library.
 The first piece builds the property that announces a field:
@@ -1166,7 +1167,7 @@ print(seen)
 `once` disconnects itself while `gather()` is running it,
 and `always` still receives the change,
 because `gather()` held both coroutines before either ran.
-The next `announce()` builds its tuple from the shortened list,
+`announce(2)` builds its tuple from the shortened list,
 so only `always` receives the second change.
 
 ### A Failing Responder Orphans the Rest
@@ -1288,8 +1289,9 @@ because iterating over an enum produces its members in definition order.
 `Color.at(n)` counts `n` places around that cycle,
 and `n % len(members)` wraps a count past the last member back to the start.
 `at()` is a classmethod because it works on the whole set rather than a single member.
-(A class attribute holding the list is not an option, because an ordinary assignment in an `Enum` body creates another member).
-Calling `next()` on a member finds that member's position with `index()` then asks `at()` for the position after it,
+(A class attribute holding the list is not an option, because an ordinary assignment in an `Enum` body creates another member.)
+Calling `next()` on a member finds that member's position with `index()`,
+then asks `at()` for the position after it,
 so `Color.KHAKI.next()` is `Color.SKYBLUE`.
 
 A `Grid` maps each `(column, row)` coordinate to a `Color`.
@@ -1573,7 +1575,7 @@ One thing moves.
 `key()` leaves `View` for `StepKeys`, and the model reference goes with it.
 The MVC `View` keeps `draw()` and `StepKeys` gets `key()`, one job each.
 
-The last four lines of `model_view_controller.py` show what that move gives you.
+Swapping in `NoKeys` at the end of `model_view_controller.py` shows what that move gives you.
 `NoKeys` satisfies `Keys` and ignores every key,
 so assigning it to `control` makes the program ignore input while `View` and the model work as before.
 *GoF Design Patterns* gives this example for the separation:
@@ -1704,7 +1706,7 @@ each threshold sits with the responder that needs it.
 `log` appends whatever arrives, and the setter announces every assignment again.
 The thermometer knows nothing about tolerance,
 and each responder that filters by size repeats the same comparison.
-`async_thermometer_demo.py`'s `alarm` already works this way,
+`async_thermometer_demo.py`'s `alarm` works this way,
 returning at once for a reading below 100 degrees.
 
 Repeating the comparison in each responder works for a question about *how much*,
