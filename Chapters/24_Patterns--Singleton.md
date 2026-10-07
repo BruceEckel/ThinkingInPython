@@ -687,20 +687,6 @@ class Registry:
         self.name = name
         self.limit = limit
         self.items: list[str] = []
-
-first = Registry("primary", limit=3)
-#: singleton.__call__(('primary',), {'limit': 3})
-#: constructing Registry
-#: Registry.__init__(primary, 3)
-first.items.append("spam")
-first.items.append("eggs")
-second = Registry("secondary", limit=99)
-#: singleton.__call__(('secondary',), {'limit': 99})
-#: using cached Registry
-#: discarding ('secondary',), {'limit': 99}
-print(first is second, second.name,
-      second.limit, second.items)
-#: True primary 3 ['spam', 'eggs']
 ```
 
 `@singleton` on `Registry` runs `Registry = singleton(Registry)`.
@@ -717,6 +703,25 @@ so the same parentheses run `singleton.__call__()` instead,
 and the wrapped class's constructor runs only when that method decides to call it.
 `__call__()` forwards `*args` and `**kwargs` to the constructor of the wrapped class,
 so `Registry("primary", limit=3)` reaches the real constructor unchanged.
+
+```python
+# singleton_class_demo.py
+from singleton_class import Registry
+
+first = Registry("primary", limit=3)
+#: singleton.__call__(('primary',), {'limit': 3})
+#: constructing Registry
+#: Registry.__init__(primary, 3)
+first.items.append("spam")
+first.items.append("eggs")
+second = Registry("secondary", limit=99)
+#: singleton.__call__(('secondary',), {'limit': 99})
+#: using cached Registry
+#: discarding ('secondary',), {'limit': 99}
+print(first is second, second.name,
+      second.limit, second.items)
+#: True primary 3 ['spam', 'eggs']
+```
 
 Only the first call constructs a `Registry`.
 Every later constructor call returns the cached instance and discards the constructor arguments,
