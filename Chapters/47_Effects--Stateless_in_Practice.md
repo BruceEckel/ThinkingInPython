@@ -540,9 +540,8 @@ Here is the consumer and the handler that feeds it:
 # microgrid.py
 from collections.abc import Callable, Iterator
 from contextlib import contextmanager
-from power import (Backup, Battery, Drained, Grid, Outlet,
-                   Solar, Source, draw, plug)
-from stateless import Depend, catch, handle, run
+from power import Drained, Outlet, Source, draw, plug
+from stateless import Depend, catch
 
 class Blackout(Exception):
     pass
@@ -581,6 +580,37 @@ def run_load(start: int,
                 print(f"  {hour}:00")
                 hour += 1
                 remaining -= 1
+```
+
+Read `run_load()` from the outside in.
+The outer loop obtains a source, the inner one draws from it hour after hour,
+and `connected()` brackets the pair.
+`draw()` returns `None` on success,
+so anything else in `failure` is the `Drained` that ends the inner loop.
+The outer loop then calls `plug()` again for a replacement.
+The hour stays put on that path,
+so the replacement supplies the hour the failed source refused.
+
+`connected()` is an ordinary context manager,
+and its `with` block sits inside the generator body.
+Acquiring and releasing within one Effect works,
+since the block opens and closes between two `yield from` expressions in the same function.
+Stateless provides no way to acquire a resource in one Effect and release it after a later Effect finishes.
+[Running Effects in Parallel](#running-effects-in-parallel) revisits that limit.
+
+One thing stays outside the types.
+`choose()` raises a `Blackout` when no source can supply the hour,
+and that is ordinary code raising an ordinary exception.
+No `@throws` lifts it,
+so it propagates out of `run()` and no signature mentions it.
+`catch()` matches values an Effect yields, and a handler runs in the driver,
+outside the Effect, so a `catch()` around this program lets the `Blackout` through.
+
+```python
+# microgrid_demo.py
+from microgrid import controller, run_load
+from power import Backup, Battery, Grid, Solar
+from stateless import handle, run
 
 def site() -> tuple[Solar, Battery, Grid, Backup]:
     return (Solar(), Battery(40), Grid(range(22, 24)),
@@ -616,15 +646,6 @@ run(handle(battery_first)(run_load)(17, 4))
 #: Grid offline
 ```
 
-Read `run_load()` from the outside in.
-The outer loop obtains a source, the inner one draws from it hour after hour,
-and `connected()` brackets the pair.
-`draw()` returns `None` on success,
-so anything else in `failure` is the `Drained` that ends the inner loop.
-The outer loop then calls `plug()` again for a replacement.
-The hour stays put on that path,
-so the replacement supplies the hour the failed source refused.
-
 The first trace is an evening.
 Solar covers two hours and stops at sunset.
 The battery covers two more and stops when its charge falls below the threshold.
@@ -654,21 +675,6 @@ which checks each source's `available()` at each request.
 swaps an implementation between runs.
 `microgrid.py` swaps one during a run.
 The consumer names no source, so nothing in it changes.
-
-`connected()` is an ordinary context manager,
-and its `with` block sits inside the generator body.
-Acquiring and releasing within one Effect works,
-since the block opens and closes between two `yield from` expressions in the same function.
-Stateless provides no way to acquire a resource in one Effect and release it after a later Effect finishes.
-[Running Effects in Parallel](#running-effects-in-parallel) revisits that limit.
-
-One thing stays outside the types.
-`choose()` raises a `Blackout` when no source can supply the hour,
-and that is ordinary code raising an ordinary exception.
-No `@throws` lifts it,
-so it propagates out of `run()` and no signature mentions it.
-`catch()` matches values an Effect yields, and a handler runs in the driver,
-outside the Effect, so a `catch()` around this program lets the `Blackout` through.
 
 ## State as an Ability
 
