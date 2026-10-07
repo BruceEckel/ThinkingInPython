@@ -703,10 +703,10 @@ which is the behavior you want when a responder counts readings rather than modi
 `connect()` and `disconnect()` make `Broadcaster` dynamic.
 Its list of responders can change at any moment,
 including in the middle of an `announce()`.
-That dynamism causes the problems the preceding sections solve:
+Three earlier sections each handle a consequence of that dynamism:
 the copy in `announce()` guards against a `disconnect()` call during the loop,
 a lambda written inline in `connect()` stays connected for good,
-and a lapsed listener is a connection that nobody removed.
+and a lapsed listener is a connection that outlives the program's use of its responder.
 
 Decoupling and dynamism are separate properties.
 A subject is decoupled when it knows its observers only as callables,
