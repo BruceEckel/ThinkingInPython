@@ -906,18 +906,18 @@ def announcing(name: str) -> property:
         return self.__dict__[name]
 
     def write(self: Any, value: Any) -> None:
-        self.__dict__[name] = value
-        self.announce(value)
+        self.__dict__[name] = value  # [1]
+        self.announce(value)  # [2]
 
-    return property(read, write)
+    return property(read, write)  # [3]
 ```
 
 `announcing()` takes a field name and builds the two functions a property needs.
-`read()` returns the value stored under that name in the instance's `__dict__`,
-and `write()` stores a new value there and then calls `announce()` with it,
+`read()` returns the value stored under that name in the instance's `__dict__`.
+`write()` stores a new value there at `[1]` and then calls `announce()` with it at `[2]`,
 so every assignment to the field notifies the responders.
 Both are closures over `name` so they take `self` and `value` as `Any`.
-The last line passes the pair to `property()`.
+`[3]` passes the pair to `property()`.
 `property` is the class behind [`@property`](07_Foundations--Classes.md#properties).
 Called directly, it returns a class attribute that intercepts every read and write of that name on an instance,
 routing the read through `read()` and the write through `write()`.

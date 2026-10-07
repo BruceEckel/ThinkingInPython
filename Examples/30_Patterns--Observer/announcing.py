@@ -6,7 +6,7 @@ def announcing(name: str) -> property:
         return self.__dict__[name]
 
     def write(self: Any, value: Any) -> None:
-        self.__dict__[name] = value
-        self.announce(value)
+        self.__dict__[name] = value  # [1]
+        self.announce(value)  # [2]
 
-    return property(read, write)
+    return property(read, write)  # [3]
