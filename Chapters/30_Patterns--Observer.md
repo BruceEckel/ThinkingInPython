@@ -703,16 +703,15 @@ which is the behavior you want when a responder counts readings rather than modi
 `connect()` and `disconnect()` make `Broadcaster` dynamic.
 Its list of responders can change at any moment,
 including in the middle of an `announce()`.
-Three earlier sections each handle a consequence of that dynamism:
+Three earlier sections handle a consequence of that dynamism:
 the copy in `announce()` guards against a `disconnect()` call during the loop,
 a lambda written inline in `connect()` stays connected for good,
 and a lapsed listener is a connection that outlives the program's use of its responder.
 
 Decoupling and dynamism are separate properties.
-A subject is decoupled when it knows its observers only as callables,
-and it is dynamic when that set can change after the subject exists.
-A broadcaster that receives its responders when you create it, and keeps them,
-is decoupled but not dynamic:
+A decoupled subject knows its observers only as callables.
+A dynamic subject lets the set of observers change after the subject exists.
+A broadcaster whose constructor fixes its responders for its lifetime is decoupled but not dynamic:
 
 ```python
 # fixed_broadcaster.py
