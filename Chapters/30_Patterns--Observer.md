@@ -998,7 +998,7 @@ and `Thermometer(100)` type-checks against a parameter `celsius: float`.
 [The Pythonic *Observer*](#the-pythonic-observer)
 notes that a `dataclass`-generated `__init__()` skips the base class's `__init__()`.
 `Broadcasting` has no `__init__()` to skip.
-Its `_responders` property does what `weather_station.py`'s does,
+Its `_responders` property does what `weather_station.py`'s does in [Notifying Without a Base Class](#notifying-without-a-base-class),
 creating the list at the first read.
 The generated `__init__()` writes `self.celsius = celsius` through the field's property,
 which calls `announce()` on an empty list, so construction announces to no one,
