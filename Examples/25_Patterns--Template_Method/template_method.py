@@ -1,15 +1,6 @@
 # template_method.py
-from typing import final, override
-
-class ApplicationFramework:
-    @final
-    def run(self) -> None:
-        for _ in range(2):
-            self.customize1()
-            self.customize2()
-
-    def customize1(self) -> None: ...
-    def customize2(self) -> None: ...
+from typing import override
+from framework import ApplicationFramework
 
 # Create an application by filling in the steps:
 class MyApp(ApplicationFramework):

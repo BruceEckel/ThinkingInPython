@@ -30,8 +30,8 @@ It declares that no subclass may override the template method.
 Here, `@final` on `run()` makes the type checker reject any subclass that overrides it:
 
 ```python
-# template_method.py
-from typing import final, override
+# framework.py
+from typing import final
 
 class ApplicationFramework:
     @final
@@ -42,6 +42,14 @@ class ApplicationFramework:
 
     def customize1(self) -> None: ...
     def customize2(self) -> None: ...
+```
+
+`MyApp` imports the framework and supplies the two steps:
+
+```python
+# template_method.py
+from typing import override
+from framework import ApplicationFramework
 
 # Create an application by filling in the steps:
 class MyApp(ApplicationFramework):
@@ -70,7 +78,7 @@ then checks the order in which `run()` makes them:
 ```python
 # test_template_method.py
 from typing import override
-from template_method import ApplicationFramework
+from framework import ApplicationFramework
 
 def test_template_method_runs_steps_in_order() -> None:
     calls: list[str] = []
@@ -306,17 +314,8 @@ or performs the step on one pass and skips the next:
 
 ```python
 # faithless_step.py
-from typing import final, override
-
-class ApplicationFramework:
-    @final
-    def run(self) -> None:
-        for _ in range(2):
-            self.customize1()
-            self.customize2()
-
-    def customize1(self) -> None: ...
-    def customize2(self) -> None: ...
+from typing import override
+from framework import ApplicationFramework
 
 class OnlyOnce(ApplicationFramework):
     def __init__(self) -> None:

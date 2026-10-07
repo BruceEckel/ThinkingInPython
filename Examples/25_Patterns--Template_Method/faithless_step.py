@@ -1,15 +1,6 @@
 # faithless_step.py
-from typing import final, override
-
-class ApplicationFramework:
-    @final
-    def run(self) -> None:
-        for _ in range(2):
-            self.customize1()
-            self.customize2()
-
-    def customize1(self) -> None: ...
-    def customize2(self) -> None: ...
+from typing import override
+from framework import ApplicationFramework
 
 class OnlyOnce(ApplicationFramework):
     def __init__(self) -> None:

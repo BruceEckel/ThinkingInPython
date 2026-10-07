@@ -1,6 +1,6 @@
 # test_template_method.py
 from typing import override
-from template_method import ApplicationFramework
+from framework import ApplicationFramework
 
 def test_template_method_runs_steps_in_order() -> None:
     calls: list[str] = []
