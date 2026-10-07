@@ -867,8 +867,57 @@ in three ways:
 `thermometer.py` inherits its list of responders and writes a getter and a setter by hand for the one attribute it announces.
 `Watched` drops the property pair but announces every attribute,
 and gives up the type checker's attribute checking in return.
-A third form generates the property pair from a bare annotation,
-so the class body declares the attribute it publishes and a base class supplies the rest:
+A third form generates the property pair from a bare annotation.
+The class body declares the attribute it publishes,
+and each responder registers with a decorator:
+
+```python
+# broadcasting_demo.py
+from broadcasting import Broadcasting
+
+class Thermometer(Broadcasting[float]):
+    celsius: float
+
+thermometer = Thermometer(100)
+
+@thermometer.respond
+def report(celsius: float) -> None:
+    print(f"report: {celsius}C")
+
+@thermometer.respond
+def alarm(celsius: float) -> None:
+    print("alarm!" if celsius > 100 else "ok")
+
+thermometer.celsius = 90
+#: report: 90C
+#: ok
+thermometer.celsius = 150
+#: report: 150C
+#: alarm!
+```
+
+`Thermometer` is one annotation.
+The base class generates the constructor that `Thermometer(100)` calls and the property that announces each assignment to `celsius`,
+so the class body of `thermometer.py` shrinks to one line,
+and a class that publishes a different reading is one different annotation.
+The type checker knows the generated constructor's signature and the attribute's type:
+it rejects `Thermometer("hot")` and reports the misspelling `thermometer.celcius = 90` as an `unresolved-attribute`,
+as it does for `thermometer.py`.
+
+`respond()` is a decorator method.
+It appends the function to the thermometer's own list and returns the function unchanged,
+so `report` stays callable by name,
+the shape of `register()` in [Decorating Classes](14_Techniques--Decorators.md#decorating-classes)
+and of exercise 11's `@responds`.
+The difference from exercise 11 is the owner of the list.
+Each thermometer keeps its own responders,
+so a second `Thermometer` has an empty list until something responds to it,
+and the registry stays out of module scope.
+The checker sees `respond()`'s parameter type through the base class's type argument,
+so it rejects a responder that takes a `str` and a responder that returns a value,
+each as an `invalid-argument-type`.
+
+The base class that generates all of this is short:
 
 ```python
 # broadcasting.py
@@ -949,43 +998,6 @@ The generated `__init__()` writes `self.celsius = celsius` through the property,
 which calls `announce()` on an empty list, so construction announces to no one,
 as in `thermometer.py`.
 
-A subclass declares its field, and each responder registers with a decorator:
-
-```python
-# broadcasting_demo.py
-from broadcasting import Broadcasting
-
-class Thermometer(Broadcasting[float]):
-    celsius: float
-
-thermometer = Thermometer(100)
-
-@thermometer.respond
-def report(celsius: float) -> None:
-    print(f"report: {celsius}C")
-
-@thermometer.respond
-def alarm(celsius: float) -> None:
-    print("alarm!" if celsius > 100 else "ok")
-
-thermometer.celsius = 90
-#: report: 90C
-#: ok
-thermometer.celsius = 150
-#: report: 150C
-#: alarm!
-```
-
-`respond()` is a decorator method.
-It appends the function to the thermometer's own list and returns the function unchanged,
-so `report` stays callable by name,
-the shape of `register()` in [Decorating Classes](14_Techniques--Decorators.md#decorating-classes)
-and of exercise 11's `@responds`.
-The difference from exercise 11 is the owner of the list.
-Each thermometer keeps its own responders,
-so a second `Thermometer` has an empty list until something responds to it,
-and the registry stays out of module scope.
-
 A `@broadcasting` class decorator could do everything `__init_subclass__()` does and attach `respond()` to the class as well,
 and the program would run.
 The type checker, though, sees the class as its body declares it,
@@ -999,10 +1011,7 @@ It would then inherit `Watched`'s third cost:
 a class with `__setattr__()` accepts any name,
 so the checker passes `thermometer.celcius = 90`.
 With the generated properties the class declares `celsius` alone,
-and the checker reports the misspelling as an `unresolved-attribute`.
-It also rejects a responder that takes a `str`,
-a responder that returns a value, and `Thermometer("hot")`,
-each as an `invalid-argument-type`.
+which is why the checker catches the misspelling in `broadcasting_demo.py`.
 
 `Broadcasting` has one type parameter, so a subclass publishes one value.
 A class that declares `celsius` and `humidity` would send both readings to the same responders with no name attached.
