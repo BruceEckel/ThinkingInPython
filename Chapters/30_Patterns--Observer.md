@@ -1012,6 +1012,10 @@ through `setdefault()` on the instance `__dict__`,
 and keeps it there under its own name.
 A property takes precedence over an instance attribute of the same name,
 so each later read also goes through the getter and finds the stored list.
+`Watched` also writes its list straight into the instance `__dict__`,
+because its constructor must keep that assignment away from its own `__setattr__()`.
+`Broadcasting` has no constructor,
+so the property does that work at the first read instead.
 The generated `__init__()` writes `self.celsius = celsius` through the property,
 which calls `announce()` on an empty list, so construction announces to no one,
 as in `thermometer.py`.
