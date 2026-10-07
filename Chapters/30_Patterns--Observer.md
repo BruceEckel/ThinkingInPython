@@ -827,13 +827,7 @@ The constructor's two assignments go through `__setattr__()`.
 Each notifies an empty list,
 since callers can connect responders only after the constructor returns.
 `super().__setattr__()` does the storing,
-because an ordinary assignment inside `__setattr__()` calls `__setattr__()` again.
-
-The type checker infers an instance attribute and its type from an assignment like `self.celsius = celsius`,
-which is why `celsius` and `humidity` need no declaration.
-`_responders` gets its type from the property's return annotation,
-since the checker reads the `setdefault()` call as a write to a dictionary,
-not as an assignment to an attribute.
+because an ordinary assignment inside `__setattr__()` calls `__setattr__()`.
 
 One method for every attribute costs the precision of a property per attribute,
 in three ways:
