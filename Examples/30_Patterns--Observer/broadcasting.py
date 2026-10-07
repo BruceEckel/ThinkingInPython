@@ -9,9 +9,10 @@ type Responder[T] = Callable[[T], None]
 @dataclass_transform(eq_default=False)
 class Broadcasting[T]:
     def __init_subclass__(cls) -> None:
-        built = dataclass(eq=False)(cls)
-        for field in fields(built):
-            setattr(cls, field.name, announcing(field.name))
+        built = dataclass(eq=False)(cls)  # [1]
+        for field in fields(built):  # [2]
+            prop = announcing(field.name)  # [3]
+            setattr(cls, field.name, prop)  # [4]
 
     def responders(self) -> list[Responder[T]]:
         return self.__dict__.setdefault("_responders", [])
