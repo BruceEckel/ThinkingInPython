@@ -750,8 +750,8 @@ A program can choose its responders at any of four points:
 1.  **Source time.**
     The subject's code calls each responder by name,
     as a setter that calls `display.update()` and then `alarm.update()`.
-    The subject knows every observer,
-    so this is the coupling *Observer* removes rather than a form of the pattern.
+    The subject names every responder,
+    which is the coupling *Observer* exists to remove.
 2.  **Load time.**
     Each responder registers itself with a decorator as Python imports its module.
     Django's `@receiver` decorator and `atexit.register()` work this way.
