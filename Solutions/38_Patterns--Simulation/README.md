@@ -1342,7 +1342,7 @@ share that one feature no matter which `(m, n)` produced them.
 
 > Change the physics.
 > Replace the body of `amplitude()` with `abs(math.sin(m * math.pi * x) * math.sin(n * math.pi * y))`,
-> the standing waves of a membrane fixed at its edges, like a drumhead.
+> the standing waves of a membrane clamped at its edges, like a drumhead.
 > Predict the figures before you run the view.
 > Why are the nodal lines now straight?
 

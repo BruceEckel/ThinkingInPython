@@ -346,7 +346,7 @@ importing them, because each solution runs on its own.
 
 [*Strategy*: Choosing the Algorithm at Runtime](../../Chapters/28_Patterns--Function_Objects.md#strategy-choosing-the-algorithm-at-runtime) shows a caller supplying the interchangeable part of an algorithm as a function.
 Have the `key` function return a tuple, since Python compares tuples element by element.
-For the explanation, ask what `sorted()` fixes and what the caller supplies.
+For the explanation, ask what `sorted()` keeps constant and what the caller supplies.
 
 <details>
 <summary>Solution</summary>

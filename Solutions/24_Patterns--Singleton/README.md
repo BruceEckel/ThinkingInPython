@@ -152,7 +152,7 @@ If you give `pool()` a `size` parameter with a default of 2,
 In that version `pool()`, `pool(2)`, and `pool(size=2)` return three different pools,
 and after two `acquire()` calls exhaust the first, `pool(2).acquire()` lends a third connection.
 [When You Want a Class, Cache the Instance](../../Chapters/24_Patterns--Singleton.md#when-you-want-a-class-cache-the-instance) shows the same failure with `settings(env)`,
-so the solution keeps `pool()`'s signature empty and fixes the size in its body.
+so the solution keeps `pool()`'s signature empty and sets the size in its body.
 
 ```python
 # exercise_2.py

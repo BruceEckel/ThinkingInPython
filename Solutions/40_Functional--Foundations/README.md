@@ -561,7 +561,7 @@ complains about an unintended local variable in `increment()`.
 <details>
 <summary>Where to look</summary>
 
-[Putting the Pieces Together](../../Chapters/40_Functional--Foundations.md#putting-the-pieces-together) chains `filter()` and `map()` over `Reading` values, with `partial()` fixing the limit.
+[Putting the Pieces Together](../../Chapters/40_Functional--Foundations.md#putting-the-pieces-together) chains `filter()` and `map()` over `Reading` values, with `partial()` binding the limit.
 Chain a second `filter()` onto the first, each with its own `partial()`.
 In the second version of `report()`, check which field the predicates read and what unit `map()` has put in it.
 

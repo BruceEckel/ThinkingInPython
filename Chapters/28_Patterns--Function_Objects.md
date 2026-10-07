@@ -810,7 +810,7 @@ so a handler may give that parameter any name.
 
 Each decorator registers `built`, the class that `dataclass()` returns,
 and not the `cls` it received.
-Python fixes a class's slots when it creates the class,
+Python sets a class's slots when it creates the class,
 so `slots=True` makes `dataclass()` build a new class and return it.
 Registering `cls` puts a class in `EVENTS` of which no event is an instance.
 `publish()` then refuses every event,

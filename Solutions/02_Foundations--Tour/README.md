@@ -163,7 +163,7 @@ All three forms run, since Python does not enforce a naming convention
 at the language level. What differs is what a reader infers.
 `total` and `flags` say "an ordinary variable that changes,"
 which is what both of these are. `TOTAL_SUM` and `FLAG_BITS` say "a
-constant, fixed for the life of the program," yet the `+=` line of
+constant, the same for the life of the program," yet the `+=` line of
 `exercise_4_constants.py` changes `TOTAL_SUM`. Neither Python nor
 the linter objects, so the name misleads every reader who trusts it.
 `totalSum` and `flagBits` say nothing about the value. They say the

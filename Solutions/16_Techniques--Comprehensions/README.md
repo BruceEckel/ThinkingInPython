@@ -265,7 +265,7 @@ printing.
 
 [Unpacking in Comprehensions](../../Chapters/16_Techniques--Comprehensions.md#unpacking-in-comprehensions) shows `**d` inside a dictionary display, merging each `d` as the loop reaches it.
 A repeated key keeps the value written last.
-A key keeps the position of its first insertion, which fixes the print order.
+A key keeps the position of its first insertion, which decides the print order.
 
 <details>
 <summary>Solution</summary>
