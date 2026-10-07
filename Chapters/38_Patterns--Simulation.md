@@ -1208,17 +1208,9 @@ Treat it as given.
 Only its shape matters here.
 The field is zero along curves, and those curves are the nodal lines.
 
-A `Grain` is a position.
-All the simulation's logic sits in `step()`.
-Every grain takes one random step,
-and the plate's vibration at that grain's location scales the step.
-Each grain stores its own position and reads no other grain's.
-
 ```python
-# chladni_plate/chladni.py
+# chladni_plate/standing_wave.py
 import math
-import random
-from dataclasses import dataclass
 
 type Mode = tuple[int, int]  # Vibration pattern (m, n)
 
@@ -1229,6 +1221,19 @@ def amplitude(x: float, y: float, mode: Mode) -> float:
         * math.cos(n * math.pi * y)
         - math.cos(n * math.pi * x)
         * math.cos(m * math.pi * y))
+```
+
+A `Grain` is a position.
+All the simulation's logic sits in `step()`.
+Every grain takes one random step,
+and the plate's vibration at that grain's location scales the step.
+Each grain stores its own position and reads no other grain's.
+
+```python
+# chladni_plate/chladni.py
+import random
+from dataclasses import dataclass
+from standing_wave import Mode, amplitude
 
 def bounce(v: float) -> float:
     if v < 0.0:
@@ -1398,7 +1403,8 @@ The order belongs not to the grains but to the field on which they sit.
 import itertools
 import tkinter as tk
 from typing import Final
-from chladni import Mode, Plate
+from chladni import Plate
+from standing_wave import Mode
 
 SIZE: Final[int] = 560
 DOT: Final[int] = 3

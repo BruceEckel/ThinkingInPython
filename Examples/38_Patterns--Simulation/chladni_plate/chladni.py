@@ -1,17 +1,7 @@
 # chladni_plate/chladni.py
-import math
 import random
 from dataclasses import dataclass
-
-type Mode = tuple[int, int]  # Vibration pattern (m, n)
-
-def amplitude(x: float, y: float, mode: Mode) -> float:
-    m, n = mode
-    return abs(
-        math.cos(m * math.pi * x)
-        * math.cos(n * math.pi * y)
-        - math.cos(n * math.pi * x)
-        * math.cos(m * math.pi * y))
+from standing_wave import Mode, amplitude
 
 def bounce(v: float) -> float:
     if v < 0.0:

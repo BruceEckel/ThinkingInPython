@@ -1191,7 +1191,8 @@ breadth-first search guarantees.
 ## 6, 7, and 8: the Chladni plate
 
 The last three exercises all shake the same plate, so this file
-carries the chapter's `chladni.py` once, with two changes: `Plate`
+carries the chapter's `standing_wave.py` and `chladni.py` as one
+file, with two changes: `Plate`
 takes the field function as a constructor argument instead of calling
 the module-level `amplitude()`, and the module adds `membrane()`
 beside `amplitude()`. That argument makes exercise

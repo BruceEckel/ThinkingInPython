@@ -2,7 +2,8 @@
 import itertools
 import tkinter as tk
 from typing import Final
-from chladni import Mode, Plate
+from chladni import Plate
+from standing_wave import Mode
 
 SIZE: Final[int] = 560
 DOT: Final[int] = 3
