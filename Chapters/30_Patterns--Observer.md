@@ -886,12 +886,16 @@ thermometer.celsius = 90
 thermometer.celsius = 150
 #: report: 150C
 #: alarm!
+thermometer.disconnect(alarm)
+thermometer.celsius = 200
+#: report: 200C
 ```
 
 The `respond()` decorator method appends the function to the thermometer's list and returns the function unchanged,
 so `report` stays callable by name.
 `disconnect()` takes that name back out,
-matching by equality as `Broadcaster`'s does.
+matching by equality as `Broadcaster`'s does,
+so the last assignment reaches `report` alone.
 
 To minimize application code, all common behaviors are captured in the library.
 The library's first piece builds the property that announces a field:

@@ -20,3 +20,6 @@ thermometer.celsius = 90
 thermometer.celsius = 150
 #: report: 150C
 #: alarm!
+thermometer.disconnect(alarm)
+thermometer.celsius = 200
+#: report: 200C
