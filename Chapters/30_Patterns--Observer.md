@@ -621,9 +621,8 @@ Use a weak responder only when a long-lived broadcaster holds short-lived respon
 
 A responder that writes back to the broadcaster re-enters `announce()` from inside `announce()`.
 Two-way bindings are the usual source.
-The view edits the model, the model notifies the view, the view edits the model.
-The setter announces every assignment,
-so without a guard a responder that writes back on every notification recurses until Python raises a `RecursionError`:
+The view edits the model, the model notifies the view, the view edits the model,
+and it continues until you get a `RecursionError`:
 
 ```python
 # reentrant_announce.py
@@ -642,7 +641,8 @@ class TwoWay(Broadcaster[int]):
     @value.setter
     def value(self, new: int) -> None:
         self._value = new
-        self.announce(new)  # Re-enters if written back
+        # A responder that sets value re-enters this setter
+        self.announce(new)
 
 model = TwoWay()
 model.connect(
@@ -652,10 +652,8 @@ with expected(RecursionError):
 #: [RecursionError] maximum recursion depth exceeded
 ```
 
-The setter calls `announce()`,
-the responder writes back through the same setter,
-and each write calls `announce()` again.
-To break the cycle, the setter returns early when the new value equals the stored one:
+To prevent this, you need a guard.
+Here, the setter returns early when the new value equals the stored one:
 
 ```python
 # reentrant_announce_fixed.py

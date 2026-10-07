@@ -14,7 +14,8 @@ class TwoWay(Broadcaster[int]):
     @value.setter
     def value(self, new: int) -> None:
         self._value = new
-        self.announce(new)  # Re-enters if written back
+        # A responder that sets value re-enters this setter
+        self.announce(new)
 
 model = TwoWay()
 model.connect(
