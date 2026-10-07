@@ -804,16 +804,16 @@ print(values2)
 #: [18]
 ```
 
+`to_query()` and `to_shape()` stand in the same relationship as `evaluate()` and `to_infix()`:
+two operations over one structure that mentions neither of them.
+Adding a third changes none of the existing code.
+
 `outer` interpolates `inner`, another `Template`, rather than a plain value.
 `to_query()` checks for that case and recurses,
 so `inner`'s pieces flatten into the same `sql` string and `values` list.
 Every entry in `values2` is then a value a database driver accepts.
 Composing `t`-strings this way builds a nested composite.
 Iterating over any one `Template` stays flat.
-
-`to_query()` and `to_shape()` stand in the same relationship as `evaluate()` and `to_infix()`:
-two operations over one structure that mentions neither of them.
-Adding a third changes none of the existing code.
 
 `to_query()` uses the walk to keep user values out of the query text.
 `name` holds an injection attempt,
