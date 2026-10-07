@@ -864,12 +864,7 @@ in three ways:
 
 ### Generating the Broadcaster
 
-`thermometer.py` inherits its list of responders and writes a getter and a setter by hand for the one attribute it announces.
-`Watched` drops the property pair but announces every attribute,
-and gives up the type checker's attribute checking in return.
-A third form generates the property pair from a bare annotation.
-The class body declares the attribute it publishes,
-and each responder registers with a decorator:
+We can simplify and automate the attachment of responders to broadcasters by using decorators:
 
 ```python
 # broadcasting_demo.py
@@ -896,28 +891,10 @@ thermometer.celsius = 150
 #: alarm!
 ```
 
-`Thermometer` is one annotation.
-The base class generates the constructor that `Thermometer(100)` calls and the property that announces each assignment to `celsius`,
-so the class body of `thermometer.py` shrinks to one line,
-and a class that publishes a different reading is one different annotation.
-The type checker knows the generated constructor's signature and the attribute's type:
-it rejects `Thermometer("hot")` and reports the misspelling `thermometer.celcius = 90` as an `unresolved-attribute`,
-as it does for `thermometer.py`.
+The `respond()` decorator method appends the function to the thermometer's list and returns the function unchanged,
+so `report` stays callable by name.
 
-`respond()` is a decorator method.
-It appends the function to the thermometer's own list and returns the function unchanged,
-so `report` stays callable by name,
-the shape of `register()` in [Decorating Classes](14_Techniques--Decorators.md#decorating-classes)
-and of exercise 11's `@responds`.
-The difference from exercise 11 is the owner of the list.
-Each thermometer keeps its own responders,
-so a second `Thermometer` has an empty list until something responds to it,
-and the registry stays out of module scope.
-The checker sees `respond()`'s parameter type through the base class's type argument,
-so it rejects a responder that takes a `str` and a responder that returns a value,
-each as an `invalid-argument-type`.
-
-The base class that generates all of this is short:
+To minimize application code, all common behaviors are captured in the library:
 
 ```python
 # broadcasting.py
@@ -956,26 +933,36 @@ class Broadcasting[T]:
             responder(data)
 ```
 
-`Broadcasting` does its work when Python creates a subclass.
-Python calls `__init_subclass__()` for every new subclass
-([Self-Registration of Subclasses](17_Techniques--Metaprogramming.md#self-registration-of-subclasses)),
-and this one has two jobs.
-First it passes the subclass to `dataclass()`,
-which reads the bare annotations and generates `__init__()` and `__repr__()`.
-Then it replaces each field with a property from `announcing()`,
-whose setter stores the value and calls `announce()`.
-The getter and setter are the pair `thermometer.py` writes by hand,
-built once per field.
-`announcing()` knows the field by name alone,
-so its two closures read and write `self.__dict__[name]` and are typed `Any`;
+`announcing()` takes a field name and builds the two functions a property needs.
+`read()` returns the value stored under that name in the instance's `__dict__`,
+and `write()` stores a new value there and then calls `announce()` with it,
+so every assignment to the field notifies the responders.
+Both are closures over `name`, the one piece of information the factory has,
+so they take `self` and `value` as `Any`;
 the type checker types the attribute from the subclass's annotation instead.
-The closures go through `__dict__` because the class attribute of that name is now the property.
+The last line passes the pair to `property()`.
 `property` is the class behind `@property`,
 one of the lowercase classes [Decorators as Classes](14_Techniques--Decorators.md#decorators-as-classes)
-describes, and [Properties](07_Foundations--Classes.md#properties)
-introduces it in decorator form.
-Called directly, it takes the getter and the setter as its two arguments,
-which is how a factory builds a property for a name it learns at runtime.
+describes.
+[Properties](07_Foundations--Classes.md#properties) uses it in decorator form,
+where `@property` receives the getter and `@celsius.setter` the setter.
+Called directly, it takes both as arguments and returns the same kind of object:
+a class attribute that intercepts every read and write of that name on an instance,
+routing the read through `read()` and the write through `write()`.
+The decorator form needs a `def` in the class body for each attribute,
+with the name written out.
+The factory builds the property for a name it learns at runtime,
+so one function serves every field of every subclass.
+The closures store the value in the instance `__dict__` under the field's own name,
+and a property with a setter takes precedence over an instance attribute of the same name,
+so `thermometer.celsius` reaches the property and the stored value stays behind it.
+The getter and setter are the pair `thermometer.py` writes by hand,
+built once per field.
+
+Python calls `__init_subclass__()` [for every new subclass](17_Techniques--Metaprogramming.md#self-registration-of-subclasses).
+First, it passes the subclass to `dataclass()`,
+which reads the bare annotations and generates `__init__()` and `__repr__()`.
+Then it replaces each field's class attribute with the property from `announcing()`.
 
 `@dataclass_transform` on the base class tells the type checker that every subclass is dataclass-like
 ([`@dataclass_transform` Is a Claim](17_Techniques--Metaprogramming.md#dataclass-transform)),
@@ -997,21 +984,6 @@ through `setdefault()` on the instance `__dict__`.
 The generated `__init__()` writes `self.celsius = celsius` through the property,
 which calls `announce()` on an empty list, so construction announces to no one,
 as in `thermometer.py`.
-
-A `@broadcasting` class decorator could do everything `__init_subclass__()` does and attach `respond()` to the class as well,
-and the program would run.
-The type checker, though, sees the class as its body declares it,
-so every `@thermometer.respond` would draw an `unresolved-attribute`.
-A method the checker must see comes from a base class,
-and once the base class exists, `__init_subclass__()` does the decorator's work.
-
-`Broadcasting` could also announce from a `__setattr__()`, as `Watched` does,
-and skip the properties.
-It would then inherit `Watched`'s third cost:
-a class with `__setattr__()` accepts any name,
-so the checker passes `thermometer.celcius = 90`.
-With the generated properties the class declares `celsius` alone,
-which is why the checker catches the misspelling in `broadcasting_demo.py`.
 
 `Broadcasting` has one type parameter, so a subclass publishes one value.
 A class that declares `celsius` and `humidity` would send both readings to the same responders with no name attached.
