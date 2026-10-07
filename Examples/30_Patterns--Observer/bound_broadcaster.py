@@ -1,9 +1,9 @@
-# fixed_broadcaster.py
+# bound_broadcaster.py
 from broadcaster import Responder
 from record import record
 
 @record
-class FixedBroadcaster[T]:
+class BoundBroadcaster[T]:
     responders: tuple[Responder[T], ...]
 
     def announce(self, data: T) -> None:
@@ -11,7 +11,7 @@ class FixedBroadcaster[T]:
             responder(data)
 
 log: list[float] = []
-broadcaster = FixedBroadcaster[float]((
+broadcaster = BoundBroadcaster[float]((
     log.append,
     lambda c: print("alarm!" if c > 100 else "ok"),
 ))

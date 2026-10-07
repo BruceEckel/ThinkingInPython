@@ -714,12 +714,12 @@ A dynamic subject lets the set of observers change after the subject exists.
 A broadcaster whose constructor binds its responders for its lifetime is decoupled but not dynamic:
 
 ```python
-# fixed_broadcaster.py
+# bound_broadcaster.py
 from broadcaster import Responder
 from record import record
 
 @record
-class FixedBroadcaster[T]:
+class BoundBroadcaster[T]:
     responders: tuple[Responder[T], ...]
 
     def announce(self, data: T) -> None:
@@ -727,7 +727,7 @@ class FixedBroadcaster[T]:
             responder(data)
 
 log: list[float] = []
-broadcaster = FixedBroadcaster[float]((
+broadcaster = BoundBroadcaster[float]((
     log.append,
     lambda c: print("alarm!" if c > 100 else "ok"),
 ))
@@ -739,13 +739,13 @@ print(log)
 #: [25.0, 150.0]
 ```
 
-`FixedBroadcaster` is a record whose `responders` field holds a tuple.
+`BoundBroadcaster` is a record whose `responders` field holds a tuple.
 The record freezes the field, and the tuple freezes its contents,
 so the constructor sets the responders for good.
 `announce()` iterates through the tuple without copying it,
 because the set stays the same throughout a notification.
 The lambda can go inline in the constructor call,
-since `FixedBroadcaster` has no `disconnect()` to match it.
+since `BoundBroadcaster` has no `disconnect()` to match it.
 The broadcaster holds strong references to its responders,
 but the set is complete at construction,
 so the broadcaster keeps alive only the responders it started with.
@@ -767,7 +767,7 @@ A program can choose its responders at any of four points:
     but the set is normally complete once the imports finish (see exercise 11).
 3.  **Construction time.**
     The subject receives its responders when you create it,
-    as `FixedBroadcaster` does.
+    as `BoundBroadcaster` does.
 4.  **Runtime.**
     Responders connect and disconnect at any moment, as with `Broadcaster`.
 
@@ -1462,7 +1462,7 @@ In every case the responder is a callable,
 and the broadcaster holds responders and calls each one when its state changes.
 The point at which the broadcaster receives its responders varies.
 All four scenarios connect their responders at runtime,
-`FixedBroadcaster` takes its responders at construction,
+`BoundBroadcaster` takes its responders at construction,
 and exercise 11's registry collects them as Python imports a module.
 The pattern requires no interface, no `update()` method, no class per reaction,
 and no `disconnect()`.
