@@ -859,7 +859,7 @@ usually the shape of the code, and a full answer for each exercise.
 4.  In `counting_proxy.py`,
     misspell `self._impl` as `self._imp` inside `__getattr__()` and run it.
     Use the fallback behavior this chapter describes to explain why the failure reports as `RecursionError` rather than an `AttributeError` naming the typo.
-5.  Create a program similar to a DBMS that allows only a fixed number of connections at a time.
+5.  Create a program similar to a DBMS that allows only a set number of connections at a time.
     Implement this with a system modeled on [*Singleton*](24_Patterns--Singleton.md)
     that controls the number of "connection" objects it creates.
     When a user finishes with a connection,

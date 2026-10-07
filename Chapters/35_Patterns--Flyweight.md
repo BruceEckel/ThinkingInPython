@@ -35,7 +35,7 @@ print(low is low2, high is high2)
 
 Both `int("256")` calls return the same cached object.
 Each `int("100000")` call builds a fresh one.
-The cache covers a fixed range of values chosen at CPython build time.
+The cache covers a set range of values chosen at CPython build time.
 The range usually quoted is `-5` through `256`, but each build picks its own.
 This build caches up to 1024,
 so the example that needs a fresh object uses `100000` rather than `257`.
@@ -302,7 +302,7 @@ If you want callers to construct objects with an ordinary class call such as `Co
 hide the pool inside `__new__()` instead.
 [*Singleton*](24_Patterns--Singleton.md#the-classic-implementations)
 keeps its pool in `__new__()` the same way.
-Here the pool keys on the constructor arguments instead of a single fixed key.
+Here the pool keys on the constructor arguments instead of a single constant key.
 A pool of singletons keyed this way is sometimes called *Multiton*.
 A *Multiton*'s objects can be mutable, and a flyweight's cannot,
 so `Color` is a record:
@@ -493,7 +493,7 @@ def test_pool_removes_unreferenced() -> None:
     assert "temp" not in _pool
 ```
 
-## A Fixed Set: Enum
+## A Known Set: Enum
 
 When you know the full set of shared values as you write the program,
 you need no pool at runtime.
@@ -555,7 +555,7 @@ so `__new__()` must assign to that exact name rather than a name of its own such
 
 Name, symbol, and attribute access all reach the same shared member.
 The enum version also brings iteration, exhaustive `match`,
-and a fixed set of members.
+and a closed set of members.
 `Tile("?")` raises a `ValueError`, and `Tile.DOOR` raises an `AttributeError`.
 
 A `match` over `Tile` needs no `case _:` catch-all once every member has a case.

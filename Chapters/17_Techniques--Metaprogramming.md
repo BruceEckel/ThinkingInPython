@@ -473,7 +473,7 @@ and `klass` splices `class_name` into source text as-is.
 An unvalidated name containing a newline and a second statement could then break out of the `class` block and run anything,
 the same way an unescaped value breaks out of a hand-built SQL query.
 The `KNOWN_COMMANDS` check closes that hole.
-Only three fixed names reach the template.
+Only three known names reach the template.
 `EventMakers` carries no such risk,
 because `type(class_name, (Event,), ...)` treats `class_name` as a string value,
 not as source code.
@@ -692,7 +692,7 @@ so `dispatch()` passes `self` to the function it finds.
 
 The listing writes `func.__dict__["event"]` rather than `func.event`,
 and the difference matters to the type checker.
-A function's type declares a fixed set of attributes,
+A function's type declares a closed set of attributes,
 so the type checker reports `Button.press.event` as an unresolved attribute,
 and it reports the assignment `func.event = event` the same way.
 Every object's type declares `__dict__` as a `dict[str, Any]`,
@@ -1185,7 +1185,7 @@ Here `cls` is the class object under construction, `Simple`.
 As with any subclass, call the base-class version first through `super()`.
 
 Metaprogramming and static typing pull against each other.
-A type describes a fixed set of attributes and signatures,
+A type describes a known set of attributes and signatures,
 but a metaclass changes that structure at runtime,
 adding attributes the class does not declare and replacing methods like `__new__()`.
 The type checker cannot follow those changes,

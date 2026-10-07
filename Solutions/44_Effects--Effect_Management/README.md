@@ -584,7 +584,7 @@ a handler.
 So `async` is an Effect-tracking system rather than a full EMS, in the
 same sense as most of the AI languages in
 [Custom AI Languages with Effects](../../Chapters/44_Effects--Effect_Management.md#custom-ai-languages-with-effects).
-It tracks one fixed Effect, chosen by the language, with the
+It tracks one Effect, chosen by the language, with the
 implementation set at the call site. That is also why the propagation
 feels like a nuisance rather than a benefit. You get the bookkeeping
 cost of Effect tracking without the delayed binding that would repay

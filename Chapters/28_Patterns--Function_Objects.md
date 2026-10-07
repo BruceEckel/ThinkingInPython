@@ -15,7 +15,7 @@ Each pattern defers something:
 
 - *Command* defers *what* to do, so you can store the action and run it later.
 - *Strategy* defers *how*.
-  The job stays fixed, and the caller picks the algorithm that performs it.
+  The job stays the same, and the caller picks the algorithm that performs it.
 - *Chain of Responsibility* defers *which* handler takes the job,
   trying candidates until one accepts.
 
@@ -320,7 +320,7 @@ def solve(f: Fn, a: float, b: float,
     return root
 ```
 
-`solve()` is the part of the procedure that stays fixed.
+`solve()` is the part of the procedure that stays the same.
 It runs a finder and turns a failed search into an exception,
 so a caller receives a root or an exception, not a `None` to check.
 Because each finder is a function with the same signature,
@@ -968,7 +968,7 @@ Stop at the first form that supports what you need:
     `account.deposit` is a command with its instance attached
     (`bound_method.py`).
 3.  A closure or a `functools.partial()`,
-    when the state is a fixed configuration
+    when the state is a configuration set at creation
     (`configured_strategy.py`, `partial_bisection.py`).
 4.  A callable object, when that configuration needs a name and a `repr`
     (`callable_command.py`).

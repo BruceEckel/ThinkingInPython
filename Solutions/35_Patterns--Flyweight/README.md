@@ -829,7 +829,7 @@ instead, because interning must intercept construction.
 <details>
 <summary>Where to look</summary>
 
-[A Fixed Set: Enum](../../Chapters/35_Patterns--Flyweight.md#a-fixed-set-enum) lets the language hold the pool, so `Tile(symbol)` is the lookup.
+[A Known Set: Enum](../../Chapters/35_Patterns--Flyweight.md#a-known-set-enum) lets the language hold the pool, so `Tile(symbol)` is the lookup.
 Move the spec table into the member values and delete `to_symbol()`.
 For the comparison, consider where each version reports a wrong symbol: a misspelled member, and a symbol that arrives as data.
 

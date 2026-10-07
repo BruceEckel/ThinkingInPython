@@ -949,7 +949,7 @@ single-player scoring the exercise asks for:
 the moves it takes to make the whole field one color.
 Two players can share the same `select()`
 method, alternating whose turn supplies the next color, and after a
-fixed number of rounds whoever owns the larger patch wins.
+set number of rounds whoever owns the larger patch wins.
 
 `FloodGame`
 can also inherit from `Broadcaster[Grid]`, as `BoxModel` does, and

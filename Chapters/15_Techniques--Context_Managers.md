@@ -935,7 +935,7 @@ Each of those is an object with the two `a`-prefixed methods.
 
 Some objects are expensive to create or rationed by the outside world:
 database connections, worker processes, licensed sessions.
-The *Object Pool* pattern creates a fixed group of these expensive objects and lends them out.
+The *Object Pool* pattern creates a set number of these expensive objects and lends them out.
 Lending is the dangerous half.
 Every borrower must return the object on every path out of their code,
 including the exception path,

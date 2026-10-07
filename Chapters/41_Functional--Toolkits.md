@@ -405,7 +405,7 @@ This section is the catalog.
 
 ### `repeat`
 
-Yields the same object over and over, forever or a fixed number of times.
+Yields the same object over and over, forever or a set number of times.
 
 ```python
 # itertools_repeat.py
@@ -417,7 +417,7 @@ print(list(map(pow, range(5), repeat(2))))
 #: [0, 1, 4, 9, 16]
 ```
 
-The fixed form replaces the list you would write as `["x"] * 3`.
+The counted form replaces the list you would write as `["x"] * 3`.
 The infinite form is the reason to import `repeat()`.
 It supplies a constant argument for as many calls as `map()` makes,
 and it holds one object in memory however many calls there are.
@@ -446,7 +446,7 @@ A list slice leaves the list as it was.
 
 ### `count`
 
-Counts up (or down) forever from a start value, with a fixed step.
+Counts up (or down) forever from a start value, with a constant step.
 
 ```python
 # itertools_count.py
@@ -926,7 +926,7 @@ The *circle method* solves the pairs-only version exactly,
 by direct construction.
 The method holds one player in place and arranges the rest in a circle.
 Each round, it pairs players sitting across from each other,
-then rotates everyone but the fixed player by one seat.
+then rotates everyone but the stationary player by one seat.
 For an even number of players `n`,
 the circle method produces `n - 1` rounds with no repeated pair.
 No schedule can do better,
@@ -1030,7 +1030,7 @@ print(len(meetings) - len(distinct), "repeat meetings")
 
 Called with `size=2`,
 `group_rounds()` covers all `21` possible pairs across the seven rounds,
-with no rotation and no fixed player: a shuffle,
+with no rotation and no stationary player: a shuffle,
 then a greedy choice repeated until the pool is empty.
 The coverage costs `14` repeat meetings.
 An odd roster leaves one player over,

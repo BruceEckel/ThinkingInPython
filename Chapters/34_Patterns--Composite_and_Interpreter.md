@@ -562,7 +562,8 @@ an `int` in one walk and a `str` in the other.
 The tree carries no meaning of its own, so a new operation is one more walker.
 
 Adding `to_infix()` without editing a node class is the ability [*Visitor*](33_Patterns--Visitor.md)
-exists to provide: new operations over a fixed hierarchy, defined outside it.
+exists to provide: new operations over an existing hierarchy,
+defined outside it.
 The `match` version needs no `accept()` method and no visitor classes.
 Unlike `singledispatch`, it binds the nodes' fields in the patterns.
 

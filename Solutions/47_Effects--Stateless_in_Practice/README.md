@@ -2,7 +2,8 @@
 
 ## 1. An advancing handler, and the fix it cannot break
 
-> `crossing` in `midnight.py` walks a fixed list, so it answers two requests.
+> `crossing` in `midnight.py` walks a scripted list,
+> so it answers two requests.
 > Write a handler that instead advances a stored moment by one second at each request,
 > and confirm `archive()` still crosses midnight under it.
 > Then rewrite `archive()` so the file name and the stamp cannot disagree,
@@ -11,7 +12,7 @@
 <details>
 <summary>Where to look</summary>
 
-[A Clock That Crosses Midnight](../../Chapters/47_Effects--Stateless_in_Practice.md#a-clock-that-crosses-midnight) walks a fixed list inside a handler.
+[A Clock That Crosses Midnight](../../Chapters/47_Effects--Stateless_in_Practice.md#a-clock-that-crosses-midnight) walks a scripted list inside a handler.
 A handler can be a closure.
 Keep the stored moment in the enclosing scope
 and update it with `nonlocal`.
@@ -391,12 +392,12 @@ def run_load(
                 remaining -= 1
 ```
 
-`Turbine` is the only addition: a source available during a fixed range of hours,
+`Turbine` is the only addition: a source available during a set range of hours,
 depleting nothing, since wind costs no fuel.
 
 ## 3. A wind turbine between solar and the battery
 
-> Add a wind turbine to `power.py` that is available only during a fixed windy stretch of the evening,
+> Add a wind turbine to `power.py` that is available only during a set windy stretch of the evening,
 > put it between solar and the battery in the `sun_first` order,
 > and confirm `run_load()` needs no change.
 > Then shorten every source until some hour has no supplier,
@@ -490,8 +491,8 @@ and `plug()` declares the failure it can produce.
 
 ## 4. A scripted outlet
 
-> Write a handler for `Outlet` that ignores `request.hour` and hands out a fixed sequence of sources,
-> the way `scripted` hands out a fixed sequence of tosses.
+> Write a handler for `Outlet` that ignores `request.hour` and hands out a preset sequence of sources,
+> the way `scripted` hands out a preset sequence of tosses.
 > Use it to test that `run_load()` re-requests after a failure,
 > without modeling weather, a clock, or a battery.
 > Then say what such a test cannot tell you about `controller()`.
@@ -499,7 +500,7 @@ and `plug()` declares the failure it can produce.
 <details>
 <summary>Where to look</summary>
 
-[Scripting an Unpredictable Source](../../Chapters/47_Effects--Stateless_in_Practice.md#scripting-an-unpredictable-source) shows `scripted` answering each `Flip` from a fixed sequence.
+[Scripting an Unpredictable Source](../../Chapters/47_Effects--Stateless_in_Practice.md#scripting-an-unpredictable-source) shows `scripted` answering each `Flip` from a preset sequence.
 Write a handler factory that closes over an iterator and returns `next()` on each request, ignoring the request's fields.
 Supply a source whose `available()` is always false so the first draws fail.
 Then list what the handler ignores, and what `controller()` therefore keeps to itself.
@@ -1182,7 +1183,7 @@ to a boundary between threads or processes.
 
 > `wallet.py` runs `spree()` against a `Cell`.
 > Script it instead.
-> Write a `Get` handler that answers from a fixed sequence of balances and a `Put` handler that appends every request to a list,
+> Write a `Get` handler that answers from a preset sequence of balances and a `Put` handler that appends every request to a list,
 > the way `scripted` feeds `Flip`.
 > Assert that `spree()` attempts every price and writes once per purchase.
 > Then say what this test cannot detect that the `Cell` version can.

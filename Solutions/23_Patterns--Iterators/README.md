@@ -311,7 +311,7 @@ the source, as with a network response.
 <summary>Where to look</summary>
 
 [What `tee()` Buffers](../../Chapters/23_Patterns--Iterators.md#what-tee-buffers) gives the rule for what `tee()` holds.
-Use `islice()` to advance one branch `k` items, then walk both with `zip()` so the gap stays fixed.
+Use `islice()` to advance one branch `k` items, then walk both with `zip()` so the gap stays the same.
 Measure the peak with `tracemalloc` for two values of `k`, and compare the growth to the size of the gap.
 
 <details>
@@ -382,7 +382,7 @@ size through the rest of the run.
 **Compare two gap widths.** One machine measured about
 9,400 bytes at `k` of 100 and about 416,000 at `k` of 10,000. A
 hundredfold wider gap costs roughly forty times the memory rather than
-a hundred, because the smaller figure carries a fixed cost that stays
+a hundred, because the smaller figure carries a cost that stays
 the same at every `k`, and a short gap pays more per item than a long one.
 The difference between the two figures, about 41 bytes per
 buffered item, is the part that tracks `k`.

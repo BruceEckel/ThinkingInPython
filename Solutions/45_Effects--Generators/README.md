@@ -740,7 +740,7 @@ corresponds to it. The new state becomes a flag, or a check repeated at
 several `yield`s, and either one breaks the correspondence between
 position and state, the one thing that makes this version readable.
 
-The table pays a fixed cost instead. Adding a state means one new
+The table pays a constant cost instead. Adding a state means one new
 `Enum` member and a few new rows. Those rows sit next to the existing
 ones, where you can read the whole machine at once.
 

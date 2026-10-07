@@ -1,6 +1,6 @@
 # Template Method
 
-> An algorithm runs a fixed sequence of steps,
+> An algorithm runs the same sequence of steps every time,
 > and some of those steps differ from one use to the next.
 > A *Template Method* sets the sequence and lets you supply the steps that vary.
 

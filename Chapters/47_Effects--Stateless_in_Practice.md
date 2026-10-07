@@ -223,7 +223,7 @@ An `if` condition is none of those,
 so `if yield from flip():` is a syntax error.
 
 Two handlers feed the same function.
-`scripted` walks an iterator over a fixed sequence,
+`scripted` walks an iterator over a preset sequence,
 so the sequence decides the five tosses before the program runs and the count is `3`.
 `coin` calls `random.random()`, so ten thousand tosses come out near half heads.
 `count_heads()` cannot distinguish the two,
@@ -312,7 +312,7 @@ print(run(handle(tomorrow)(batch_due)(LAUNCH)))
 ```
 
 `frozen()` reports a single moment over and over,
-so `stamp()` produces a fixed string a test can compare.
+so `stamp()` produces a known string a test can compare.
 `tomorrow` reports a moment a day later,
 and `batch_due()` returns `True` at once.
 The schedule logic runs against whatever moment the handler names,
@@ -415,7 +415,7 @@ Both handlers answer the same two requests.
 They differ in whether midnight falls between the two requests.
 
 `crossing` follows the same pattern as `scripted` in `coin_toss.py`.
-It walks a fixed list, so it holds state between requests,
+It walks a scripted list, so it holds state between requests,
 which is how it answers the same question two ways.
 A supplied instance answers every request the same way,
 and so do `frozen` and `tomorrow`,
@@ -641,7 +641,7 @@ Priority lives in `controller()`,
 thresholds and the outage schedule in the sources themselves,
 and `run_load()` decides when to stop drawing from the source it holds.
 
-The load's declared dependency stays fixed.
+The load's declared dependency stays the same.
 `Depend[Outlet, None]` says it needs an `Outlet` from the first hour to the last,
 and that type appears once.
 What changes is the object answering the need:
@@ -1530,7 +1530,7 @@ Retry is the one to study, because of what it does to the type.
 
 ### `retry()` and a Flaky Database
 
-`Database` fails a fixed number of times before working,
+`Database` fails a set number of times before working,
 so the example is repeatable:
 
 ```python
@@ -1599,7 +1599,7 @@ print(type(outcome).__name__)
 
 The first run is the baseline: one attempt, no retry, and it fails.
 `three` comes from the only two schedule combinators the library has.
-`spaced()` yields a fixed interval forever,
+`spaced()` yields the same interval forever,
 and `recurs()` stops it after `n` yields.
 Three attempts against a database that fails twice succeed on the third,
 and three attempts against one that always fails produce a `RetryError` holding every failure.
@@ -2210,7 +2210,7 @@ The type checker verifies that a `supply()` call is complete but says nothing ab
 
 The operator set is small in the same way.
 The library has `retry()` and `repeat()`.
-`Schedule` offers a fixed interval and a repeat count,
+`Schedule` offers a regular interval and a repeat count,
 with no exponential backoff and no jitter.
 `retry()` retries every declared error alike,
 with no way to name the one worth retrying.
@@ -2359,7 +2359,8 @@ It is a language that does the encoding for you.
 This chapter's [solutions](../Solutions/47_Effects--Stateless_in_Practice/)
 give a hint, usually the shape of the code, and a full answer for each exercise.
 
-1.  `crossing` in `midnight.py` walks a fixed list, so it answers two requests.
+1.  `crossing` in `midnight.py` walks a scripted list,
+    so it answers two requests.
     Write a handler that instead advances a stored moment by one second at each request,
     and confirm `archive()` still crosses midnight under it.
     Then rewrite `archive()` so the file name and the stamp cannot disagree,
@@ -2372,14 +2373,14 @@ give a hint, usually the shape of the code, and a full answer for each exercise.
     wrap it in `catch(KeyError)`, and run it on a failing input.
     Explain what the types claim, what the run does,
     and which line restores the guarantee.
-3.  Add a wind turbine to `power.py` that is available only during a fixed windy stretch of the evening,
+3.  Add a wind turbine to `power.py` that is available only during a set windy stretch of the evening,
     put it between solar and the battery in the `sun_first` order,
     and confirm `run_load()` needs no change.
     Then shorten every source until some hour has no supplier,
     run `run_load()` again,
     and say where the `Blackout` propagates to and why `catch(Blackout)` around `run_load()` does not intercept it.
-4.  Write a handler for `Outlet` that ignores `request.hour` and hands out a fixed sequence of sources,
-    the way `scripted` hands out a fixed sequence of tosses.
+4.  Write a handler for `Outlet` that ignores `request.hour` and hands out a preset sequence of sources,
+    the way `scripted` hands out a preset sequence of tosses.
     Use it to test that `run_load()` re-requests after a failure,
     without modeling weather, a clock, or a battery.
     Then say what such a test cannot tell you about `controller()`.
@@ -2404,7 +2405,7 @@ give a hint, usually the shape of the code, and a full answer for each exercise.
     and record what the type checker says.
 9.  `wallet.py` runs `spree()` against a `Cell`.
     Script it instead.
-    Write a `Get` handler that answers from a fixed sequence of balances and a `Put` handler that appends every request to a list,
+    Write a `Get` handler that answers from a preset sequence of balances and a `Put` handler that appends every request to a list,
     the way `scripted` feeds `Flip`.
     Assert that `spree()` attempts every price and writes once per purchase.
     Then say what this test cannot detect that the `Cell` version can.

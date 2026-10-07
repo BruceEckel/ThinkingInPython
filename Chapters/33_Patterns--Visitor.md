@@ -205,7 +205,7 @@ but the type checker cannot see which method a string names.
 
 ## The Pythonic Visitor: singledispatch
 
-Python can add an operation to a fixed hierarchy from outside,
+Python can add an operation to an existing hierarchy from outside,
 using `functools.singledispatch`.
 `singledispatch` turns a plain function into one that dispatches on the type of its first argument,
 with per-type implementations registered from anywhere.

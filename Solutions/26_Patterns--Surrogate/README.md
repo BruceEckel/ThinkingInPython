@@ -403,7 +403,7 @@ example) fails the same way on its first attribute access.
 
 ## 5. A connection pool that hands out proxies
 
-> Create a program similar to a DBMS that allows only a fixed number of connections at a time.
+> Create a program similar to a DBMS that allows only a set number of connections at a time.
 > Implement this with a system modeled on [*Singleton*](../../Chapters/24_Patterns--Singleton.md)
 > that controls the number of "connection" objects it creates.
 > When a user finishes with a connection,
@@ -766,7 +766,7 @@ The type checker cannot make this decision. The decision compares
 the type of the implementation the surrogate holds right now with the type of
 the argument, and the checker knows neither. Both are `Any`, because
 `__getattr__()` delegation deliberately leaves the implementation's
-type untracked. Annotating both against a `Protocol` states a fixed
+type untracked. Annotating both against a `Protocol` states a set
 shape that every implementation must meet, a different guarantee. A
 `Protocol` cannot express "at least what the last implementation had,"
 because that comparison relates two runtime values rather than two

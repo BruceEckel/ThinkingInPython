@@ -186,7 +186,7 @@ except TypeError as e:
 
 A `set` hashes each element once, at insertion, so every element must
 be hashable. `frozenset` is hashable because it is immutable. Its
-contents stay fixed after creation, so its hash stays valid. A `list`
+contents stay the same after creation, so its hash stays valid. A `list`
 is mutable, so Python refuses to hash it, and an object with no hash
 cannot be a set member or a dictionary key.
 

@@ -820,7 +820,7 @@ Make the type guarantee its own values.
 
 ## Enums Are Types Too
 
-When the set of values is small and fixed, the clearest type is an `Enum`.
+When the set of values is small and known, the clearest type is an `Enum`.
 An *enumeration* lists its members by name in the class body,
 and those members are the only values the type has.
 As an example, a `BirthDate` contains a month, day, and year.
@@ -1002,7 +1002,7 @@ if __name__ == "__main__":
 so its `months` field needs `field(default_factory=make_months)` rather than a default value.
 
 Choose the tool that makes the legal set easiest to express.
-For a small fixed set, that is an `Enum`.
+For a small known set, that is an `Enum`.
 
 ## Defaults Built Fresh, Not Shared {#defaults-built-not-shared}
 

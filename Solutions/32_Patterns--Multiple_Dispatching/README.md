@@ -1659,7 +1659,7 @@ stand behind it. A table of callables keeps the method-call syntax.
 
 **Wrap the constant answers.** `always()` keeps the table readable. It returns a closure
 over one `Outcome` that ignores both operands, so the seven
-combinations with a fixed answer stay one line each and still read as
+combinations with a constant answer stay one line each and still read as
 a table of answers. Only the cells that need code look like code.
 
 **Read the state in both orders.** The `(Paper, Rock)` cell receives both items, so it can consult
@@ -1944,7 +1944,7 @@ The grid holds in six lines the answers that exercise 8 spreads across 42 method
 A seventh weapon adds an empty class, a row, and a column,
 where exercise 8 needs a method in every existing class and an eight-method class.
 [Methods or Table](../../Chapters/32_Patterns--Multiple_Dispatching.md#methods-or-table)
-reaches the same conclusion: for a ruleset that is a fixed set of
+reaches the same conclusion: for a ruleset that is a known set of
 answers, the table is shorter and easier to maintain.
 Exercise 8's version keeps one advantage.
 Its `eval_*()` methods receive the competing objects,

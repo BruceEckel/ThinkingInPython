@@ -527,7 +527,7 @@ you to confirm.
 The empty run is the more interesting one. Nothing opens, so nothing
 closes, and `with ExitStack() as stack:` still enters and exits
 correctly around a body whose stack stays empty. That degenerate case
-shows why `ExitStack` exists. A fixed `with a, b, c:` line settles its
+shows why `ExitStack` exists. A written-out `with a, b, c:` line settles its
 count in the source. `ExitStack` accepts a count settled only at
 runtime, zero included, and a command line is one source of
 such a count.

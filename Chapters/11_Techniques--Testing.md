@@ -598,7 +598,7 @@ is most of what makes a module testable.
 ### Random Numbers
 
 Code that calls `random` produces a different value each run,
-so a test cannot assert a fixed result:
+so a test cannot assert a known result:
 
 ```python
 # dice.py
@@ -674,7 +674,7 @@ def elapsed(start: float) -> float:
     return time.time() - start
 ```
 
-`monkeypatch` pins `time.time()` to a fixed value the same way it does for `randint()`:
+`monkeypatch` pins `time.time()` to a known value the same way it does for `randint()`:
 
 ```python
 # test_stopwatch.py
@@ -699,7 +699,7 @@ def elapsed(start: float,
     return now() - start
 ```
 
-The test hands it a function that returns a fixed time:
+The test hands it a function that returns the same time on every call:
 
 ```python
 # test_clock_injected.py

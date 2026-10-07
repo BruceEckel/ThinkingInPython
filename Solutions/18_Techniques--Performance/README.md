@@ -111,7 +111,7 @@ size `1` does the `list` edge ahead, and then barely. The
 `set`'s advantage grows steadily as `size` increases, as the
 different growth rates (`O(1)` vs. `O(n)`) predict.
 
-The crossover point is not a fixed number. It depends on the
+The crossover point varies. It depends on the
 machine, the Python build, and even which values you store,
 because the race is between one hash computation and a short
 linear scan that costs almost nothing until the list grows

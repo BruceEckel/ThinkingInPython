@@ -610,7 +610,7 @@ The compiler enforces the [same-names rule](#alternatives-and-capture).
 Adding a third alternative `| Point(1, 1)`, which binds nothing,
 fails with `SyntaxError: alternative patterns bind different names`.
 
-Nesting has a fixed depth, the depth you write into the pattern.
+Nesting has a set depth, the depth you write into the pattern.
 A self-referential type such as a tree needs recursion instead:
 a function whose `match` takes one level apart and calls the function again on the parts.
 [*Composite* and *Interpreter*](34_Patterns--Composite_and_Interpreter.md#evaluation-is-a-tree-walk)
@@ -620,7 +620,7 @@ and its body recurses into that node's children.
 
 ## Exhaustive Matching
 
-When a value is one of a fixed set of types,
+When a value is one of a known set of types,
 define that set as a union using the [`type` statement](08_Foundations--Static_Types.md#the-type-statement).
 Then `match` on that union.
 When you end with `case _: assert_never(value)`,

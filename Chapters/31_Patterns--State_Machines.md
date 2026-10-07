@@ -1,6 +1,6 @@
 # State Machines
 
-> Many systems are in one of a fixed set of states at any moment,
+> Many systems are in one of a known set of states at any moment,
 > and each input, together with the current state, decides the next state.
 > A *State Machine* names the states and the transitions between them.
 
@@ -938,8 +938,9 @@ so the GUI shows a message instead of the traceback `tkinter` would otherwise pr
 The button loop builds sixteen commands with `partial(select, r, c)` rather than a lambda.
 Sixteen lambdas closing over `r` and `c` would all read the loop's final values,
 the [late-binding trap](28_Patterns--Function_Objects.md#the-late-binding-trap).
-The three fixed buttons use lambdas safely, since the one name they capture,
-`send`, keeps one value for the life of the window.
+The three coin and refund buttons use lambdas safely,
+since the one name they capture, `send`,
+keeps one value for the life of the window.
 
 ## Which Design Should You Use?
 

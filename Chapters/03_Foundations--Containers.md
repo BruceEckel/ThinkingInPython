@@ -831,7 +831,7 @@ Modifying an immutable container is a type error as well as a runtime error,
 so each line that attempts it carries a `# type: ignore`.
 The comment silences the type checker.
 
-Use the immutable form whenever a container should stay fixed after you build it.
+Use the immutable form whenever a container should stay the same after you build it.
 Neither you nor the code that receives it can add, remove,
 or replace an element by accident,
 so a container of immutable elements needs no defensive copy before you share it.
@@ -912,7 +912,7 @@ shows the same shallow immutability inside a frozen data class.
 
 Choosing a container comes down to one question: what do you do with it most?
 Ordered items you walk through are a `list`.
-A fixed record whose positions mean different things is a `tuple` or a `namedtuple`.
+A record of set length whose positions mean different things is a `tuple` or a `namedtuple`.
 Lookup by key is a `dict`.
 Uniqueness and membership are a `set`.
 Go past those four only when a measurement or a specific job calls for it,

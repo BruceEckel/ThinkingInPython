@@ -513,7 +513,7 @@ Calling `make_user("Sue", True)` is an error, because `admin` is keyword-only.
 The type checker catches both mistakes before the code runs,
 so each line carries a `# type: ignore` saying the misuse is deliberate.
 
-A signature can use every form at once, in one fixed order: positional-only,
+A signature can use every form at once, in one set order: positional-only,
 positional-or-keyword, `*args`, keyword-only, `**kwargs`:
 
 ```python

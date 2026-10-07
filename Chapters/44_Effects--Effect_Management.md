@@ -387,7 +387,7 @@ and each kind yields its own benefit:
   Failures turn into values whose type the checker verifies,
   and a test checks for an `Err` as easily as an `Ok`.
 - **Side causes** become replaceable inputs.
-  A test substitutes a fixed clock for the real one,
+  A test substitutes a constant clock for the real one,
   or a seeded generator for true randomness,
   and the function under test becomes repeatable.
 - **Side effects** become replaceable outputs.
@@ -470,7 +470,7 @@ and in Python's `async`,
 which [Effect Management for Python?](#effect-management-for-python) examines.
 
 The third item names *delayed binding*.
-Delayed binding exists so that one fixed codebase can serve many contexts
+Delayed binding exists so that the same codebase can serve many contexts
 (test, production, retry-wrapped) without edits.
 When a hundred functions declare "I need something that can read from storage,"
 none of them names a storage implementation.
@@ -683,7 +683,7 @@ Handling an Effect also discharges it.
 The handlers remove `ask` and `tell`,
 and the row that remains holds the Effects the handler bodies perform:
 `console` from the printing and reading, `exn` because `readline()` can fail.
-A test installs a different handler, one that returns a fixed name,
+A test installs a different handler, one that returns a known name,
 and `greet()` runs unchanged.
 
 Separating the request from its fulfillment is the core of every Effect system.

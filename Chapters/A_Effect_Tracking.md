@@ -343,7 +343,7 @@ with handling(Ask, Scripted()):
 ```
 
 `Scripted`, the test stand-in from `ask_tell.py`,
-answers every prompt with a fixed name.
+answers every prompt with the same name.
 Inside that block the tool would remove `Ask` from the row.
 The subtraction is sound if the handler intercepts the Effect,
 and that interception requires `ask()` to consult the installed handler instead of calling `input()`.

@@ -18,7 +18,7 @@
 
 [Passing the Steps as Functions](../../Chapters/25_Patterns--Template_Method.md#passing-the-steps-as-functions) shows the same algorithm anchored in a function that takes the varying step as an argument.
 The subclass form is in [The Anchored Algorithm](../../Chapters/25_Patterns--Template_Method.md#the-anchored-algorithm).
-Put the fixed loop (read each input, apply the step, write the output) in one `run()` and one function, and leave `process()` as the one open step.
+Put the shared loop (read each input, apply the step, write the output) in one `run()` and one function, and leave `process()` as the one open step.
 The search policy needs the word list, so store it on the subclass and close over it in the function form.
 
 <details>
@@ -403,7 +403,7 @@ where the timing of a hidden step makes the difference.
 <details>
 <summary>Where to look</summary>
 
-[The Anchored Algorithm](../../Chapters/25_Patterns--Template_Method.md#the-anchored-algorithm) explains how `@final` marks `run()` as the fixed part of the *Template Method*.
+[The Anchored Algorithm](../../Chapters/25_Patterns--Template_Method.md#the-anchored-algorithm) explains how `@final` marks `run()` as the part of the *Template Method* that stays the same.
 Override `run()` in a subclass, run the file, then run `ty` over it.
 Compare what each one reports, and ask which of them reads the `@final` marker.
 A `# type: ignore` on the override keeps the listing in the build.

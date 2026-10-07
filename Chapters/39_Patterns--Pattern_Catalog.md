@@ -18,7 +18,7 @@ and several exist only to work around limits of a particular language.
 [*State*](26_Patterns--Surrogate.md#state)
 and [*State Machine*](31_Patterns--State_Machines.md) are one overlapping pair.
 *State* changes an object's behavior when its internal state changes.
-*State Machine* drives an object through a fixed set of states in response to inputs.
+*State Machine* drives an object through a known set of states in response to inputs.
 *State Machine* builds on *State*.
 The machine chooses each successor,
 so the object advances without the client choosing.
@@ -56,7 +56,7 @@ so use this section's table when you know the problem but not the name.
 | Encapsulating a request as an object | *Command* |
 | Passing a request along a chain until something handles it | *Chain of Responsibility* |
 | Changing behavior when an object's internal state changes | *State* |
-| Driving an object through a fixed set of states | *State Machine* |
+| Driving an object through a known set of states | *State Machine* |
 | Adding an operation without changing the classes it visits | *Visitor* |
 | Resolving behavior from the runtime types of two objects | *Double Dispatch* |
 | Structuring recursive or tree-shaped data | *Composite*, *Interpreter*, *Visitor* |
@@ -128,7 +128,7 @@ so use this section's table when you know the problem but not the name.
 | [*Producer-Consumer*](19_Techniques--Concurrency.md#coordinating-threads-with-queues) | Decouple work creation from processing through a shared queue. |
 | *Reactor* | Dispatch incoming requests to handlers synchronously as they arrive. |
 | *Read-Write Lock* | Allow concurrent readers but exclusive writers. |
-| [*Thread Pool*](19_Techniques--Concurrency.md#one-executor-interface-three-pools) | Reuse a fixed set of worker threads across many tasks. |
+| [*Thread Pool*](19_Techniques--Concurrency.md#one-executor-interface-three-pools) | Reuse a set number of worker threads across many tasks. |
 | [*Thread-Specific Storage*](19_Techniques--Concurrency.md#context-that-follows-the-call-chain) | Give each thread its own copy of a value, as `threading.local` does; `ContextVar` scopes the value to the context instead. |
 
 *Reactor* is a name that hides its job.
@@ -250,7 +250,7 @@ the default on Windows, is one.
 | [*Null Object*](20_Patterns--Rethinking_Objects.md#null-object) | Use an object with neutral behavior in place of null. |
 | [*Object Pool*](15_Techniques--Context_Managers.md#an-object-pool) | Reuse expensive objects from a managed pool. |
 | *Specification* | Encapsulate a rule as a predicate that combines with others. |
-| [*State Machine*](31_Patterns--State_Machines.md) | Drive an object through a fixed set of states in response to inputs. |
+| [*State Machine*](31_Patterns--State_Machines.md) | Drive an object through a known set of states in response to inputs. |
 | [*Surrogate*](26_Patterns--Surrogate.md) | Put a stand-in in front of the object that does the work; *Proxy* and *State* are both forms of *Surrogate*. |
 | *Type Object* | Represent a "kind of" thing as data rather than a subclass. |
 

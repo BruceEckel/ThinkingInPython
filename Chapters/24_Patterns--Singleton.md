@@ -816,7 +816,7 @@ usually the shape of the code, and a full answer for each exercise.
     and which failure from [Tests, Threads, and Locks](#tests-threads-and-locks)
     can no longer occur?
 2.  Using `singleton_cached_factory.py` as a starting point,
-    create a factory that manages a fixed pool of objects
+    create a factory that manages a pool holding a set number of objects
     (say, database connections) and hands them out,
     rather than a single instance.
 3.  Rewrite one of the class-based singletons above as a module,

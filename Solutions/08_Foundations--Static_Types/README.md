@@ -273,7 +273,7 @@ a `LoudTally`, `Self` means `LoudTally`, so `t.bump().bump()`
 type-checks as a `LoudTally` and `.report()` is available on the
 result. The `.report()` call resolves to `LoudTally.report()`, because Python
 starts method lookup at the object's own class. If `bump()`'s return
-annotation is the fixed type `Tally` instead of `Self`, the type
+annotation is the concrete type `Tally` instead of `Self`, the type
 checker rejects `.report()` on the chained result, since `Tally` has
 no `report()` method.
 

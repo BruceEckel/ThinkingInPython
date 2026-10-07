@@ -466,7 +466,7 @@ The last two lines read the captured values with `inspect.getclosurevars()`.
 A closure is the functional answer to "an object with one method and some stored data."
 
 `multiply()` reads `factor` rather than receiving it, yet it stays pure.
-`factor` stays fixed after capture,
+`factor` stays the same after capture,
 so the same argument always produces the same answer.
 `withdraw()` is unpredictable because every call changes the global `balance`.
 Nothing changes `factor` after capture.
@@ -546,7 +546,7 @@ from functools import partial
 def power(base: int, exponent: int) -> int:
     return base ** exponent
 
-# Fix the exponent to build new single-argument functions:
+# Bind the exponent to build new single-argument functions:
 square = partial(power, exponent=2)
 cube = partial(power, exponent=3)
 print(square(5), cube(5))

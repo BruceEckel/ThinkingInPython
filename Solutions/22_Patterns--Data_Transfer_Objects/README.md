@@ -399,7 +399,7 @@ Consider also what `json.dumps()` does with each type.
 <summary>Solution</summary>
 
 **The configuration bag is a `SimpleNamespace`.** Its keys arrive at
-runtime, so no fixed set of fields exists to declare. A `@dataclass`
+runtime, so the set of fields stays open while you write the code. A `@dataclass`
 or `NamedTuple` needs every field named in the class body before any
 instance exists, which this scenario cannot supply. A `TypedDict`
 exists to name the keys for the type checker, and here every key

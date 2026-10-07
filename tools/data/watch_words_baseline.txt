@@ -222,7 +222,7 @@ Chapters/17_Techniques--Metaprogramming.md	only: CODE and CODE normally run only
 Chapters/17_Techniques--Metaprogramming.md	only: Generating classes programmatically with CODE pays off when a family of classes differs only by name
 Chapters/17_Techniques--Metaprogramming.md	only: Now the end user needs only to write and maintain the schedule file
 Chapters/17_Techniques--Metaprogramming.md	only: Only a metaclass makes the class callable in a new way
-Chapters/17_Techniques--Metaprogramming.md	only: Only three fixed names reach the template
+Chapters/17_Techniques--Metaprogramming.md	only: Only three known names reach the template
 Chapters/17_Techniques--Metaprogramming.md	only: Testing shows that each registry holds only its current leaf classes
 Chapters/17_Techniques--Metaprogramming.md	only: The comment suppresses the diagnostic only because provoking that crash is educational
 Chapters/17_Techniques--Metaprogramming.md	only: Use a metaclass only when these cannot do the job
@@ -396,7 +396,7 @@ Chapters/26_Patterns--Surrogate.md	itself: CODE calls itself when the name it re
 Chapters/26_Patterns--Surrogate.md	itself: Extend CODE's CODE so it answers one cheap attribute itself
 Chapters/26_Patterns--Surrogate.md	itself: so a CODE that reads CODE calls itself forever
 Chapters/26_Patterns--Surrogate.md	only: A guest reaches only the names in CODE
-Chapters/26_Patterns--Surrogate.md	only: Create a program similar to a DBMS that allows only a fixed number of connections at a time
+Chapters/26_Patterns--Surrogate.md	only: Create a program similar to a DBMS that allows only a set number of connections at a time
 Chapters/26_Patterns--Surrogate.md	only: Only a call to CODE increments the tally
 Chapters/26_Patterns--Surrogate.md	only: Only the surrogate's current implementation changes
 Chapters/26_Patterns--Surrogate.md	only: Python calls it only after normal lookup fails
@@ -649,7 +649,7 @@ Chapters/47_Effects--Stateless_in_Practice.md	never: CODE never runs
 Chapters/47_Effects--Stateless_in_Practice.md	never: and the driver never resumes the generator
 Chapters/47_Effects--Stateless_in_Practice.md	never: and this one never propagates
 Chapters/47_Effects--Stateless_in_Practice.md	nothing more: and here a scenario is nothing more than arguments to CODE
-Chapters/47_Effects--Stateless_in_Practice.md	only: Add a wind turbine to CODE that is available only during a fixed windy stretch of the evening
+Chapters/47_Effects--Stateless_in_Practice.md	only: Add a wind turbine to CODE that is available only during a set windy stretch of the evening
 Chapters/47_Effects--Stateless_in_Practice.md	only: CODE comes from the only two schedule combinators the library has
 Chapters/47_Effects--Stateless_in_Practice.md	only: CODE's signature is also the only place its failures appear
 Chapters/47_Effects--Stateless_in_Practice.md	only: Memoize a function only where one environment serves the memoized call for its whole lifetime
@@ -928,7 +928,7 @@ Solutions/37_Patterns--Pattern_Refactoring/README.md	only: The CODE test fills i
 Solutions/37_Patterns--Pattern_Refactoring/README.md	only: When a calculation has the same form for every type and varies only in the numbers each type carries
 Solutions/38_Patterns--Simulation/README.md	even: since even a heavily scaled step is still big enough to leave the neighborhood into which the grain is settling
 Solutions/38_Patterns--Simulation/README.md	exactly: so the difference is exactly CODE at every point on the plate
-Solutions/38_Patterns--Simulation/README.md	itself: Scripting CODE's return values in a fixed sequence decides which neighbor the rat keeps for itself and into which cells it spawns new rats
+Solutions/38_Patterns--Simulation/README.md	itself: Scripting CODE's return values in a preset sequence decides which neighbor the rat keeps for itself and into which cells it spawns new rats
 Solutions/38_Patterns--Simulation/README.md	itself: To see why the factory finds CODE by itself
 Solutions/38_Patterns--Simulation/README.md	never: so the summary statistic cannot tell "finished" from "never started
 Solutions/38_Patterns--Simulation/README.md	only: A coroutine gives up control only at an CODE

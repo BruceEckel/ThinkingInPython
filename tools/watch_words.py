@@ -11,8 +11,9 @@ place: `already`, `even`, `honest`, `buy`, `hooks`, `never`, `anyway`,
 legitimate uses that the author checks every time: `happen`, `is what`,
 `and nothing else`, `nothing more`, `nothing but`, `does it`, `ever`,
 `only`, `exactly`, `has to` (with `have to` and `had to`), `actually`,
-`itself`, `was to`, `used to`, `fix` (every form; the repair sense
-stays, the hold-constant sense goes). A Tier 3 hit is a defect to fix unless a
+`itself`, `was to`, `used to`, `fix` (every form; the repair sense,
+the hyphenated compounds, and "fixed point" stay, the hold-constant
+sense goes, adjective included). A Tier 3 hit is a defect to fix unless a
 human reads it as literal ("a person wants a refund"); a Tier 2 hit is
 kept where the word changes the meaning; a Tier 1 hit is a prompt to
 try a rewrite, and most stay.

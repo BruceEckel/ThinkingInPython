@@ -10,7 +10,7 @@
 <details>
 <summary>Where to look</summary>
 
-[The Pythonic *Visitor*: singledispatch](../../Chapters/33_Patterns--Visitor.md#the-pythonic-visitor-singledispatch) adds an operation to a fixed hierarchy from outside it.
+[The Pythonic *Visitor*: singledispatch](../../Chapters/33_Patterns--Visitor.md#the-pythonic-visitor-singledispatch) adds an operation to an existing hierarchy from outside it.
 Decide which of `pollinate()` and `eat()` answers differently by flower type.
 Only that one needs `@singledispatch` and `register`.
 Then list what the *Visitor* machinery in [The Classic *Visitor*](../../Chapters/33_Patterns--Visitor.md#the-classic-visitor) exists to do, and what in it has no job left.

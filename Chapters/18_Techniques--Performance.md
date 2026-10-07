@@ -1042,14 +1042,14 @@ Three tools reduce that overhead.
 A smaller instance means fewer bytes for the allocator and garbage collector to manage,
 more instances fitting in the CPU cache at once, and,
 for `__slots__` specifically,
-attribute access through a fixed offset instead of a `__dict__` lookup.
+attribute access through a known offset instead of a `__dict__` lookup.
 The byte counts below show what each tool saves.
 Multiply by a population in the millions to see why it matters.
 
 ### Slots
 
 By default each instance stores its attributes in a `__dict__`.
-Declaring `__slots__` replaces that dict with a fixed set of fields,
+Declaring `__slots__` replaces that dict with a closed set of fields,
 which shrinks each instance:
 
 ```python
@@ -1295,7 +1295,7 @@ The same is true of weak references.
 Add `"__weakref__"` to `__slots__` if some other object needs to hold one
 (`weakref_slot=True` adds it to a data class).
 Multiple inheritance is the sharpest edge.
-Python lays out a slotted instance as a fixed block of storage,
+Python lays out a slotted instance as a block of storage with a set layout,
 and two unrelated classes that both declare non-empty `__slots__` each claim their own incompatible layout,
 so a class cannot inherit from both.
 A class can inherit from one slotted base as long as its other bases declare no slots of their own.

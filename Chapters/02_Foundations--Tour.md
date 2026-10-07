@@ -284,8 +284,8 @@ print(bin(flags))
 ```
 
 The `bin()` function converts an integer to a binary string for display.
-Because Python integers have no fixed width,
-`~` has no fixed number of bits to flip.
+Because a Python integer grows as wide as its value needs,
+`~` has no set number of bits to flip.
 `~x` produces `-x - 1`,
 the value that flipping every bit gives in two's complement.
 `bin()` prints that as a sign followed by a magnitude,

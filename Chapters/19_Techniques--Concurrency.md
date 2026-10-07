@@ -46,8 +46,9 @@ The heap reserves no space in advance.
 It starts essentially empty and grows only as the program asks for more,
 one allocation at a time.
 A stack is the reverse.
-Creating the thread sets its maximum size, and that size stays fixed.
-The amount used out of that fixed allotment varies at runtime.
+Creating the thread sets its maximum size,
+and that size holds for the life of the thread.
+The amount used out of that constant allotment varies at runtime.
 If a chain of function calls needs more room than the maximum,
 the stack overflows instead of growing to fit.
 Code reaches a heap allocation only through a reference,
@@ -691,7 +692,7 @@ Keeping siblings alive past a failure means catching exceptions inside each task
 
 ### Bounding a Wait with `asyncio.timeout()` {#bounding-a-wait-with-asynciotimeout}
 
-Every delay in this chapter so far has a fixed length or, in `network_io.py`,
+Every delay in this chapter so far has a set length or, in `network_io.py`,
 waits on a server in the same process, so nothing has needed a time limit.
 A call to a remote server carries no such guarantee.
 `asyncio.timeout()` (3.11) bounds how long a block of code may run,
@@ -826,7 +827,7 @@ A worker thread reached through `asyncio.to_thread()` needs a `threading.Lock`.
 
 ### Semaphores
 
-A *semaphore* generalizes a lock from a single lock-holder to a fixed number of them.
+A *semaphore* generalizes a lock from a single lock-holder to a set number of them.
 Where a lock admits one task,
 `asyncio.Semaphore(n)` admits up to `n` at once and suspends the rest:
 
@@ -869,7 +870,7 @@ so a stray `release()` turns a semaphore of one into a semaphore of two.
 `asyncio.BoundedSemaphore` closes that gap.
 A `release()` beyond its starting count raises a `ValueError`.
 Deliberately choosing a count above one makes the semaphore a throttle on a limited resource,
-such as a fixed number of database connections.
+such as a set number of database connections.
 
 ## Context That Follows the Call Chain {#context-that-follows-the-call-chain}
 
@@ -1118,7 +1119,7 @@ Use `multiprocessing` when the job is a different shape:
 ### Measuring the Speedup
 
 You can test the claim that wall-clock time falls toward a single task's time as you add more cores.
-`task_scaling.py` splits a fixed amount of work into a growing number of tasks,
+`task_scaling.py` splits a set amount of work into a growing number of tasks,
 keeps the pool warm across every measurement,
 and shows how the time changes once task count passes the number of cores:
 
@@ -1507,7 +1508,7 @@ Usually only one thread touches an object, the one that created it.
 non-atomic arithmetic.
 Only other threads pay for an atomic operation.
 Permanent objects like `None`, `True`, and small integers become *immortal*.
-Their counts stay fixed.
+Their counts stay constant.
 Immortality arrived in 3.12 for every build but pays off most in the free-threaded one,
 since it removes the one atomic operation every thread otherwise contests.
 Mutable containers like dictionaries and lists carry individual locks,

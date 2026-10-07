@@ -113,7 +113,7 @@ def test_rat_keeps_one_claim_and_spawns_the_rest() -> None:
 `asyncio.create_task()`.
 
 **Script the rat's choices.** Scripting `claim()`'s return values in a
-fixed sequence decides which neighbor the rat keeps for itself and
+preset sequence decides which neighbor the rat keeps for itself and
 into which cells it spawns new rats: the first cell the loop finds
 open, `(0, -1)`, and every open one after that, here `(1, 0)` alone.
 

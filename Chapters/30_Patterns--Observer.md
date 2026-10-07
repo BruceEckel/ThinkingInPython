@@ -711,7 +711,7 @@ and a lapsed listener is a connection that outlives the program's use of its res
 Decoupling and dynamism are separate properties.
 A decoupled subject knows its observers only as callables.
 A dynamic subject lets the set of observers change after the subject exists.
-A broadcaster whose constructor sets its responders for its lifetime is decoupled but not dynamic:
+A broadcaster whose constructor binds its responders for its lifetime is decoupled but not dynamic:
 
 ```python
 # fixed_broadcaster.py

@@ -104,7 +104,7 @@ import builds the object, leaving no first call to race.
 ## 2. A pool of connections instead of one instance
 
 > Using `singleton_cached_factory.py` as a starting point,
-> create a factory that manages a fixed pool of objects
+> create a factory that manages a pool holding a set number of objects
 > (say, database connections) and hands them out,
 > rather than a single instance.
 
@@ -204,9 +204,9 @@ print(c3 == c1)
 #: True
 ```
 
-**Hold a fixed set of connections.** The change from
+**Hold a closed set of connections.** The change from
 `singleton_cached_factory.py` is in what the one shared object holds.
-Instead of holding a single value, it holds a fixed collection of
+Instead of holding a single value, it holds a set number of
 `Connection`s and tracks which ones it has handed out.
 
 **Lend a connection and take it back.** `acquire()` and `release()`

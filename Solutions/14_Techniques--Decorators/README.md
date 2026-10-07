@@ -173,7 +173,7 @@ add(2, 3)
 ```
 
 **Keep the output reproducible.** In real code you would print the raw `elapsed`.
-The listing prints a deterministic check instead, because a fixed
+The listing prints a deterministic check instead, because a constant
 marker cannot capture a number that changes every run.
 
 **Stack the layers.** `@trace` above `@timing` means `add = trace(timing(add))`, so `trace`'s

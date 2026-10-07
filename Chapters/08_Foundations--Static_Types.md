@@ -439,7 +439,7 @@ A `Literal` union is the lightest way to close a set of values.
 Once those values need behavior or an identity of their own,
 an `Enum` is the better fit.
 [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#enums-are-types-too)
-makes the case for an `Enum` whenever the set of values is small and fixed,
+makes the case for an `Enum` whenever the set of values is small and closed,
 then shows when an `Enum` beats a data class.
 
 An alias can also name a union of types.
@@ -836,7 +836,7 @@ The abstract container types come from `collections.abc`.
 |-----------|---------|
 | `X` \| `Y` | A union: either type, see [Type Hints](#type-hints) |
 | `X` \| `None` | Optional: `X` or `None`, see [Type Hints](#type-hints) |
-| `Literal[...]` | One of a fixed set of constant values, e.g. `Literal["r", "w"]`, see [The `type` Statement](#the-type-statement) |
+| `Literal[...]` | One of a closed set of constant values, e.g. `Literal["r", "w"]`, see [The `type` Statement](#the-type-statement) |
 
 ### Aliases and Distinct Types
 
