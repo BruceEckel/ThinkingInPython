@@ -180,6 +180,7 @@ lines-after-imports = 1
 "**/test_visitor.py" = ["I001"]
 "**/two_games.py" = ["I001"]
 "**/vending_demo.py" = ["I001"]
+"**/function_facts.py" = ["I001"]
 "**/vending_view.py" = ["I001"]
 
 # Examples run with cwd set to their chapter dir; adding the tree's utils/

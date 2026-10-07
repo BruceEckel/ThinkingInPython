@@ -703,8 +703,9 @@ and how it was measured.
   `result.Ok.bind ['Unknown']`. The prose says every core function is
   absent from that output, which is the appendix's claim that the core
   is pure. An edit to any checker listing (`effect_table.py`,
-  `call_names.py`, `function_facts.py`, `infer_rows.py`,
-  `row_check.py`) or to chapter 42's `utils/result.py` can add an
+  `call_names.py`, `function_facts.py`, `local_types.py`,
+  `infer_rows.py`, `row_check.py`) or to chapter 42's `utils/result.py`
+  can add an
   unresolvable call: a method on a loop variable, on a record's field,
   or on an imported constant. `validate_output.py --update` then adds
   the new `Unknown` rows to the marker and the gate stays green while

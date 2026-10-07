@@ -417,13 +417,12 @@ the arrangement PEP 593 exists to allow.
 ```python
 # function_facts.py
 import ast
-from typing import TypeIs
-from call_names import UNRESOLVED, Scope, imports_of
+from call_names import Scope
 from effect_table import PURE, Row
+from local_types import (Def, assigned, is_def, is_function,
+                         module_scope, parameters)
 from record import record
 from result import Err, Ok, Result
-
-type Def = ast.FunctionDef | ast.AsyncFunctionDef
 
 @record
 class Facts:
@@ -449,47 +448,6 @@ def marked(func: Def, marker: str) -> Row | None:
                             if isinstance(a, ast.Name)
                         )
     return None
-
-def assigned(
-    body: list[ast.stmt], scope: Scope
-) -> dict[str, str]:
-    types: dict[str, str] = {}
-    written: dict[str, str] = {}
-    values: dict[ast.AST, str] = {}
-    nodes = (n for stmt in body for n in ast.walk(stmt))
-    for node in nodes:
-        match node:
-            case ast.AnnAssign(
-                target=ast.Name(id=name), annotation=note
-            ):
-                written[name] = scope.annotation(note)
-            case ast.Assign(targets=[target], value=value):
-                values[target] = scope.type_of(value)
-            case (
-                ast.Name(id=name, ctx=ast.Store())
-                | ast.MatchAs(name=str(name))
-                | ast.MatchStar(name=str(name))
-                | ast.ExceptHandler(name=str(name))
-            ):
-                found = values.get(node, UNRESOLVED)
-                if types.setdefault(name, found) != found:
-                    types[name] = UNRESOLVED
-    return types | written
-
-def parameters(
-    func: Def, scope: Scope, owner: str
-) -> dict[str, str]:
-    args = func.args
-    every = args.posonlyargs + args.args + args.kwonlyargs
-    types = {
-        arg.arg: scope.annotation(arg.annotation)
-        if arg.annotation
-        else UNRESOLVED
-        for arg in every
-    }
-    if owner and args.args:
-        types[args.args[0].arg] = owner
-    return types
 
 def calls_in(
     body: list[ast.stmt], scope: Scope
@@ -518,37 +476,6 @@ def function_facts(
         marked(func, "hides") or PURE,
         calls_in(func.body, scope),
     )
-
-def is_function(node: ast.stmt) -> TypeIs[Def]:
-    kinds = ast.FunctionDef | ast.AsyncFunctionDef
-    return isinstance(node, kinds)
-
-def is_def(
-    node: ast.stmt,
-) -> TypeIs[Def | ast.ClassDef]:
-    if isinstance(node, ast.ClassDef):
-        return True
-    return is_function(node)
-
-def module_scope(module: str, tree: ast.Module) -> Scope:
-    defined = frozenset(
-        node.name for node in tree.body if is_def(node)
-    )
-    bare = Scope(module, imports_of(tree), defined, {})
-    aliases = {
-        node.name.id: bare.annotation(node.value)
-        for node in tree.body
-        if isinstance(node, ast.TypeAlias)
-    }
-    named = Scope(module, bare.names | aliases, defined, {})
-    top = [
-        node
-        for node in tree.body
-        if not is_def(node)
-        and not isinstance(node, ast.TypeAlias)
-    ]
-    types = assigned(top, named)
-    return Scope(module, named.names, defined, types)
 
 def class_facts(
     node: ast.ClassDef, base: Scope
@@ -599,6 +526,108 @@ which means "inferred."
 An empty row means "pure," so `None` and the empty row must differ.
 `Row | None` is an ordinary optional, with no assertion anywhere to unwrap it.
 
+`calls_in()` collects the third fact.
+`ast.walk()` yields a statement and every node beneath it,
+and `callee()` names each `ast.Call` among them.
+The walk descends into a nested function or a `lambda`,
+so the calls inside one count toward the function that contains it.
+
+`facts_of()` records every top-level function,
+every method under `module.Class.method`, and each class under its own name.
+The class's entry holds a call to its `__init__()` when the class defines one,
+so `Log()` performs what `Log.__init__()` performs.
+The module's top-level statements become a function named `module.<module>`.
+It is the program's edge and declares no row,
+so the checker has nothing to compare,
+and its inferred row says what running the file performs.
+
+`read_module()` is the one operation here that can fail.
+It returns a [`Result`](42_Functional--Error_Handling.md#a-result-type),
+so a parse failure becomes a value the caller must inspect.
+
+The local-type helpers that `function_facts.py` imports fill a `Scope` from a function's own parameters and assignments:
+
+```python
+# local_types.py
+import ast
+from typing import TypeIs
+from call_names import UNRESOLVED, Scope, imports_of
+
+type Def = ast.FunctionDef | ast.AsyncFunctionDef
+
+def assigned(
+    body: list[ast.stmt], scope: Scope
+) -> dict[str, str]:
+    types: dict[str, str] = {}
+    written: dict[str, str] = {}
+    values: dict[ast.AST, str] = {}
+    nodes = (n for stmt in body for n in ast.walk(stmt))
+    for node in nodes:
+        match node:
+            case ast.AnnAssign(
+                target=ast.Name(id=name), annotation=note
+            ):
+                written[name] = scope.annotation(note)
+            case ast.Assign(targets=[target], value=value):
+                values[target] = scope.type_of(value)
+            case (
+                ast.Name(id=name, ctx=ast.Store())
+                | ast.MatchAs(name=str(name))
+                | ast.MatchStar(name=str(name))
+                | ast.ExceptHandler(name=str(name))
+            ):
+                found = values.get(node, UNRESOLVED)
+                if types.setdefault(name, found) != found:
+                    types[name] = UNRESOLVED
+    return types | written
+
+def parameters(
+    func: Def, scope: Scope, owner: str
+) -> dict[str, str]:
+    args = func.args
+    every = args.posonlyargs + args.args + args.kwonlyargs
+    types = {
+        arg.arg: scope.annotation(arg.annotation)
+        if arg.annotation
+        else UNRESOLVED
+        for arg in every
+    }
+    if owner and args.args:
+        types[args.args[0].arg] = owner
+    return types
+
+def is_function(node: ast.stmt) -> TypeIs[Def]:
+    kinds = ast.FunctionDef | ast.AsyncFunctionDef
+    return isinstance(node, kinds)
+
+def is_def(
+    node: ast.stmt,
+) -> TypeIs[Def | ast.ClassDef]:
+    if isinstance(node, ast.ClassDef):
+        return True
+    return is_function(node)
+
+def module_scope(module: str, tree: ast.Module) -> Scope:
+    defined = frozenset(
+        node.name for node in tree.body if is_def(node)
+    )
+    bare = Scope(module, imports_of(tree), defined, {})
+    aliases = {
+        node.name.id: bare.annotation(node.value)
+        for node in tree.body
+        if isinstance(node, ast.TypeAlias)
+    }
+    named = Scope(module, bare.names | aliases, defined, {})
+    top = [
+        node
+        for node in tree.body
+        if not is_def(node)
+        and not isinstance(node, ast.TypeAlias)
+    ]
+    types = assigned(top, named)
+    return Scope(module, named.names, defined, types)
+```
+
 `parameters()` and `assigned()` fill a scope's `types`: an annotated parameter,
 the first parameter of a method (the class), an annotated assignment,
 and a plain assignment whose right side has an evident type.
@@ -620,24 +649,6 @@ which would otherwise record an alias's name as a variable.
 Because `is_function()` and `is_def()` return [`TypeIs`](08_Foundations--Static_Types.md#type-narrowing),
 a comprehension filtered by one yields nodes whose narrowed type has a `name`.
 
-`calls_in()` collects the third fact.
-`ast.walk()` yields a statement and every node beneath it,
-and `callee()` names each `ast.Call` among them.
-The walk descends into a nested function or a `lambda`,
-so the calls inside one count toward the function that contains it.
-
-`facts_of()` records every top-level function,
-every method under `module.Class.method`, and each class under its own name.
-The class's entry holds a call to its `__init__()` when the class defines one,
-so `Log()` performs what `Log.__init__()` performs.
-The module's top-level statements become a function named `module.<module>`.
-It is the program's edge and declares no row,
-so the checker has nothing to compare,
-and its inferred row says what running the file performs.
-
-`read_module()` is the one operation here that can fail.
-It returns a [`Result`](42_Functional--Error_Handling.md#a-result-type),
-so a parse failure becomes a value the caller must inspect.
 The test file confirms that:
 
 - Every function, method, and class gets facts, and so does the module.
@@ -1124,6 +1135,7 @@ FILES: Final[list[str]] = [
     "effect_table.py",
     "call_names.py",
     "function_facts.py",
+    "local_types.py",
     "infer_rows.py",
     "row_check.py",
     "check_files.py",
@@ -1137,10 +1149,10 @@ show(check(load([Path(name) for name in FILES])))
 #: result.Ok.bind ['Unknown']
 ```
 
-The demo runs the checker on six of its own source files and on `utils/result.py`,
+The demo runs the checker on seven of its own source files and on `utils/result.py`,
 and prints every nonempty row.
 Because the output names no function from `effect_table.py`, `call_names.py`,
-`function_facts.py`, `infer_rows.py`, or `row_check.py`,
+`function_facts.py`, `local_types.py`, `infer_rows.py`, or `row_check.py`,
 the checker confirms that its core is pure.
 `FileSystem` and `Console` appear in three functions at the edge and in the module that calls them.
 [Effect Management](44_Effects--Effect_Management.md#a-program-can-never-be-pure)

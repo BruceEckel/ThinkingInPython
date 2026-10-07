@@ -28,6 +28,7 @@ FILES: Final[list[str]] = [
     "effect_table.py",
     "call_names.py",
     "function_facts.py",
+    "local_types.py",
     "infer_rows.py",
     "row_check.py",
     "check_files.py",
