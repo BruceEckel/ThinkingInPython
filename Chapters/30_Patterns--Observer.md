@@ -829,8 +829,7 @@ since callers can connect responders only after the constructor returns.
 `super().__setattr__()` does the storing,
 because an ordinary assignment inside `__setattr__()` calls `__setattr__()`.
 
-One method for every attribute costs the precision of a property per attribute,
-in three ways:
+One `__setattr__()` for every attribute gives up three things that `Thermometer`'s property per attribute keeps:
 
 1.  `WeatherStation`'s responders have a wider signature.
     Each takes the attribute name along with the value,
@@ -906,27 +905,35 @@ def announcing(name: str) -> property:
     return property(read, write)  # [3]
 ```
 
-`announcing()` takes a field name and builds the two functions a property needs.
-`read()` returns the value stored under that name in the instance's `__dict__`.
-`write()` stores a new value there at `[1]` and then calls `announce()` with it at `[2]`,
-so every assignment to the field notifies the responders.
-Both are closures over `name` so they take `self` and `value` as `Any`.
-`[3]` passes the pair to `property()`.
 `property` is the class behind [`@property`](07_Foundations--Classes.md#properties).
 Called directly, it returns a class attribute that intercepts every read and write of that name on an instance,
-routing the read through `read()` and the write through `write()`.
-The decorator form needs a `def` in the class body for each attribute,
-with the name written out.
+routing the read through `read()` and the write through `write()`
+(these function names can be anything).
+The decorator form needs a `def` in the class body for each attribute.
 
-The factory builds the property for a name it learns at runtime,
+`announcing()` takes a field name and builds the two functions a `property` needs.
+`read()` returns the value stored under that name in the instance's `__dict__`.
+`write()` stores a new value (`[1]`) and then calls `announce()` with it
+(`[2]`), so every assignment to the field notifies the responders.
+Nothing in this file defines `announce()`.
+It is a method of `Broadcasting`, the class that will own the property,
+and `announcing()` reaches it through `self`, which is annotated `Any`,
+so the type checker accepts the call and the runtime finds the method on the thermometer when `write()` runs.
+`value` is `Any` for the same reason:
+`announcing()` knows the field by name alone,
+and the type checker types `thermometer.celsius` from the subclass's annotation,
+not from this property.
+`[3]` returns the pair as a `property()`.
+
+`announcing()` builds the property for a name it learns at runtime,
 so one function serves every field of every subclass.
-The closures store the value in the instance `__dict__` under the field's own name,
-and a property with a setter takes precedence over an instance attribute of the same name,
-so `thermometer.celsius` reaches the property and the stored value stays behind it.
-The getter and setter are the pair `thermometer.py` writes by hand,
-built once per field.
+`Broadcasting` installs that property on the class under the field's name,
+and `write()` stores each value in the instance `__dict__` under the same name.
+Python looks up a data descriptor on the class before it looks in the instance `__dict__`,
+so `thermometer.celsius` always reaches the property,
+and the property reads or writes the `__dict__` entry behind it.
 
-The base class installs that property on each subclass and holds the responders:
+`Broadcasting` installs that property on each subclass and holds the responders:
 
 ```python
 # broadcasting.py
@@ -962,7 +969,7 @@ class Broadcasting[T]:
 ```
 
 `__init_subclass__()` runs once, at the moment Python creates the subclass.
-When the `class Thermometer(Broadcasting[float]):` statement finishes running its body,
+After the body of `class Thermometer(Broadcasting[float]):` runs,
 Python builds the class object and then calls `__init_subclass__()` on its base,
 passing the new class as `cls`
 ([Self-Registration of Subclasses](17_Techniques--Metaprogramming.md#self-registration-of-subclasses)).
@@ -1000,15 +1007,6 @@ It tells the checker that every subclass is dataclass-like,
 so the checker synthesizes the same `__init__()` that `dataclass()` builds at runtime,
 and `Thermometer(100)` type-checks against a parameter `celsius: float`.
 `eq_default=False` makes the checker's claim match the runtime `eq=False`.
-
-[The Pythonic *Observer*](#the-pythonic-observer)
-notes that a `dataclass`-generated `__init__()` skips the base class's `__init__()`.
-`Broadcasting` has no `__init__()` to skip.
-Its `_responders` property does what `weather_station.py`'s does in [Notifying Without a Base Class](#notifying-without-a-base-class),
-creating the list at the first read.
-The generated `__init__()` writes `self.celsius = celsius` through the field's property,
-which calls `announce()` on an empty list, so construction announces to no one,
-as in `thermometer.py`.
 
 `Broadcasting` has one type parameter, so a subclass publishes one value.
 A class that declares `celsius` and `humidity` would send both readings to the same responders with no name attached.
