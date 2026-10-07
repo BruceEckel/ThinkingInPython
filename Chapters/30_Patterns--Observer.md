@@ -937,20 +937,14 @@ class Broadcasting[T]:
 `read()` returns the value stored under that name in the instance's `__dict__`,
 and `write()` stores a new value there and then calls `announce()` with it,
 so every assignment to the field notifies the responders.
-Both are closures over `name`, the one piece of information the factory has,
-so they take `self` and `value` as `Any`;
-the type checker types the attribute from the subclass's annotation instead.
+Both are closures over `name` so they take `self` and `value` as `Any`.
 The last line passes the pair to `property()`.
-`property` is the class behind `@property`,
-one of the lowercase classes [Decorators as Classes](14_Techniques--Decorators.md#decorators-as-classes)
-describes.
-[Properties](07_Foundations--Classes.md#properties) uses it in decorator form,
-where `@property` receives the getter and `@celsius.setter` the setter.
-Called directly, it takes both as arguments and returns the same kind of object:
-a class attribute that intercepts every read and write of that name on an instance,
+`property` is the class behind [`@property`](07_Foundations--Classes.md#properties).
+Called directly, it returns a class attribute that intercepts every read and write of that name on an instance,
 routing the read through `read()` and the write through `write()`.
 The decorator form needs a `def` in the class body for each attribute,
 with the name written out.
+
 The factory builds the property for a name it learns at runtime,
 so one function serves every field of every subclass.
 The closures store the value in the instance `__dict__` under the field's own name,
@@ -959,16 +953,16 @@ so `thermometer.celsius` reaches the property and the stored value stays behind 
 The getter and setter are the pair `thermometer.py` writes by hand,
 built once per field.
 
-`__init_subclass__()` runs once per subclass, at the moment Python creates it.
+`__init_subclass__()` runs once, at the moment Python creates the subclass.
 When the `class Thermometer(Broadcasting[float]):` statement finishes running its body,
 Python builds the class object and then calls `__init_subclass__()` on its base,
 passing the new class as `cls`
 ([Self-Registration of Subclasses](17_Techniques--Metaprogramming.md#self-registration-of-subclasses)).
-The method is implicitly a class method,
+`__init_subclass__()` is implicitly a class method,
 and at this point `Thermometer` has its annotation, no `__init__()`,
 and no class attribute named `celsius`.
 
-The first line passes the new class to `dataclass(eq=False)`.
+The first line of `__init_subclass__()`'s body passes the new class to `dataclass(eq=False)`.
 `dataclass()` with arguments returns a decorator,
 and applying that decorator to `cls` does what `@dataclass(eq=False)` above the subclass would do:
 it reads the bare annotations, `celsius: float` here,
