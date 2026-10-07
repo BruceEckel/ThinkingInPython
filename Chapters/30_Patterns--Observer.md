@@ -813,14 +813,11 @@ print(changes)
 #: [('celsius', 25.0), ('humidity', 0.5)]
 ```
 
-`connect()` and `disconnect()` are `Broadcaster`'s pair,
-taking the wider responder type.
-The new part is `__setattr__()`.
 Python routes every assignment to an attribute of the instance through `__setattr__()`.
 This includes assignments within the constructor.
 The first line in `__setattr__()` reads `self._responders`,
-so an ordinary `self._responders = []` in the constructor reads the list before it creates it,
-which raises an `AttributeError`.
+so an ordinary `self._responders = []` in the constructor reads the list via `__setattr__()` before that list is created,
+raising an `AttributeError`.
 To prevent this, the `_responders` property creates the list upon first read,
 using `setdefault()` on the instance `__dict__`.
 A property takes precedence over an instance attribute of the same name,
