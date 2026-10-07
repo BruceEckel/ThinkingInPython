@@ -888,7 +888,7 @@ matching by equality as `Broadcaster`'s does,
 so the last assignment reaches `report` alone.
 
 To minimize application code, all common behaviors are captured in the library.
-The library's first piece builds the property that announces a field:
+The first piece builds the property that announces a field:
 
 ```python
 # announcing.py
