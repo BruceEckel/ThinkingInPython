@@ -1,29 +1,9 @@
 # scenarios.py
-from dataclasses import dataclass
 from typing import Final, assert_never
+from newswire import DeadWire, Library, Wire
 from research import (Encyclopedia, Feed, NoArticle,
                       NotInteresting, Unavailable, research)
 from stateless import Depend, Need, catch, run, supply
-
-@dataclass
-class Wire:
-    headline: str
-    def latest(self) -> str:
-        print("feed: fetching")
-        return self.headline
-
-class DeadWire:
-    def latest(self) -> str:
-        raise Unavailable("offline")
-
-@dataclass
-class Library:
-    articles: dict[str, str]
-    def article(self, topic: str) -> str:
-        print(f"library: looking up {topic}")
-        if topic not in self.articles:
-            raise NoArticle(topic)
-        return self.articles[topic]
 
 def report() -> Depend[
     Need[Feed] | Need[Encyclopedia], str

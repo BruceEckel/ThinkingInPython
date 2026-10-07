@@ -595,7 +595,7 @@ from an `Outlet` to a `Source`, and no Effect takes part.
 
 ## Shared code: the research pipeline
 
-The chapter's `research.py` and the doubles from `scenarios.py` appear here
+The chapter's `research.py` and the doubles from `newswire.py` appear here
 without their demos, so the listings that follow can import them:
 
 ```python
@@ -1181,7 +1181,7 @@ to a boundary between threads or processes.
 
 ## 9. A scripted wallet
 
-> `wallet.py` runs `spree()` against a `Cell`.
+> `test_wallet.py` runs `spree()` against a `Cell`.
 > Script it instead.
 > Write a `Get` handler that answers from a preset sequence of balances and a `Put` handler that appends every request to a list,
 > the way `scripted` feeds `Flip`.

@@ -2,7 +2,7 @@
 from collections.abc import Callable
 from dataclasses import dataclass
 from record import record
-from stateless import Ability, Depend, handle, run
+from stateless import Ability, Depend
 
 class Get(Ability[int]):
     pass
@@ -46,12 +46,3 @@ def ledger(cell: Cell) -> tuple[
     def write(request: Put) -> None:
         cell.amount = request.amount
     return read, write
-
-cell = Cell(100)
-read, write = ledger(cell)
-half = handle(read)(spree)
-shop = handle(write)(half)
-print(run(shop((60, 50, 30, 20))))
-#: 2
-print(f"remaining: {cell.amount}")
-#: remaining: 10

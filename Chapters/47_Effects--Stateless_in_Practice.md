@@ -693,7 +693,7 @@ and writing carries a new value and answers with nothing.
 from collections.abc import Callable
 from dataclasses import dataclass
 from record import record
-from stateless import Ability, Depend, handle, run
+from stateless import Ability, Depend
 
 class Get(Ability[int]):
     pass
@@ -737,15 +737,6 @@ def ledger(cell: Cell) -> tuple[
     def write(request: Put) -> None:
         cell.amount = request.amount
     return read, write
-
-cell = Cell(100)
-read, write = ledger(cell)
-half = handle(read)(spree)
-shop = handle(write)(half)
-print(run(shop((60, 50, 30, 20))))
-#: 2
-print(f"remaining: {cell.amount}")
-#: remaining: 10
 ```
 
 `Get` has `Flip`'s shape: no payload, and the answer type is its whole content.
@@ -761,11 +752,9 @@ in code that mentions no cell.
 The handlers own the cell.
 `ledger()` builds `read()` and `write()` from one `Cell`,
 the way `at()` builds a clock from a moment.
-The run chains that pair through the named stages of [Abilities Are Not Special](#abilities-are-not-special).
-After the run, the cell holds what the program left.
-Two purchases went through, and 10 remained.
 
-A test calls `ledger()` too, on a `Cell` of its own,
+A test calls `ledger()` on a `Cell` of its own,
+chains the pair through the named stages of [Abilities Are Not Special](#abilities-are-not-special),
 and asserts on the count `spree()` returns and on what that cell holds afterward:
 
 ```python
@@ -782,9 +771,10 @@ def test_spree_spends_from_the_tests_cell() -> None:
     assert cell.amount == 10
 ```
 
+After the run, the cell holds what the program left.
+Two purchases went through, and 10 remained.
 The test asserts on the cell it built,
 so nothing needs resetting between tests and two tests can run in either order.
-`spree()` and `purchase()` are the same functions `wallet.py`'s run used.
 
 When one function owns a number, a local variable is the right tool,
 and `count_heads()` keeps its count in one.
@@ -902,15 +892,12 @@ because a function that receives everything it uses as arguments is easier to te
 and because the split keeps the Ability requests in one place.
 Either shape type-checks and either propagates correctly.
 
-Now supply `research()`'s environment:
+`newswire.py` defines two feeds and an encyclopedia to supply:
 
 ```python
-# scenarios.py
+# newswire.py
 from dataclasses import dataclass
-from typing import Final, assert_never
-from research import (Encyclopedia, Feed, NoArticle,
-                      NotInteresting, Unavailable, research)
-from stateless import Depend, Need, catch, run, supply
+from research import NoArticle, Unavailable
 
 @dataclass
 class Wire:
@@ -931,6 +918,22 @@ class Library:
         if topic not in self.articles:
             raise NoArticle(topic)
         return self.articles[topic]
+```
+
+`Wire` and `Library` are structural implementations,
+so `supply(Wire(...), Library(...))` builds handlers for `Need[Wire]` and `Need[Library]`,
+the mismatch that [Supplying an Interface](46_Effects--Stateless.md#supplying-an-interface)
+fixes with `as_type()`.
+
+Now supply `research()`'s environment:
+
+```python
+# scenarios.py
+from typing import Final, assert_never
+from newswire import DeadWire, Library, Wire
+from research import (Encyclopedia, Feed, NoArticle,
+                      NotInteresting, Unavailable, research)
+from stateless import Depend, Need, catch, run, supply
 
 def report() -> Depend[
     Need[Feed] | Need[Encyclopedia], str
@@ -1008,11 +1011,7 @@ If you annotate `report()` as `Success[str]`,
 the type checker names the `yield from` that still carries `Need[Feed] | Need[Encyclopedia]`.
 `supply()` empties that half, and `run()` accepts what remains.
 
-`Wire` and `Library` are structural implementations,
-so `supply(Wire(...), Library(...))` builds handlers for `Need[Wire]` and `Need[Library]`,
-the mismatch that [Supplying an Interface](46_Effects--Stateless.md#supplying-an-interface)
-fixes with `as_type()`.
-Declaring `outcome()`'s parameters as `Feed` and `Encyclopedia` does the same job at the boundary,
+Declaring `outcome()`'s parameters as `Feed` and `Encyclopedia` does the job of `as_type()` at the boundary,
 without a cast.
 
 ## The Success Path
@@ -2409,7 +2408,7 @@ give a hint, usually the shape of the code, and a full answer for each exercise.
     Without it the pool breaks before any work starts.
     Then try to fork an Effect that still declares a `Need`,
     and record what the type checker says.
-9.  `wallet.py` runs `spree()` against a `Cell`.
+9.  `test_wallet.py` runs `spree()` against a `Cell`.
     Script it instead.
     Write a `Get` handler that answers from a preset sequence of balances and a `Put` handler that appends every request to a list,
     the way `scripted` feeds `Flip`.
