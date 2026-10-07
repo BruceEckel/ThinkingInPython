@@ -759,15 +759,9 @@ A program can choose its responders at any of four points:
     but the set is normally complete once the imports finish (see exercise 11).
 3.  **Construction time.**
     The subject receives its responders when you create it,
-    as `BoundBroadcaster` does.
+    as in `BoundBroadcaster`.
 4.  **Runtime.**
     Responders connect and disconnect at any moment, as with `Broadcaster`.
-
-Each later point adds flexibility,
-along with some of the problems this chapter covers.
-Use the runtime form when responders come and go,
-as views do when windows open and close.
-When you know the responders by the time the subject exists, pass them in.
 
 ### Notifying Without a Base Class
 
