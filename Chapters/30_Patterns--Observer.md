@@ -688,22 +688,23 @@ print(seen)
 #: [1]
 ```
 
-`echo` writes back the value the model now stores,
+`echo` writes back the value,
 so the setter returns before it reaches `announce()` a second time.
-`announce()` runs once, for the original assignment.
+`announce()` runs only once, for the original assignment.
+
 The alternative is a re-entry flag, set before `announce()` and cleared after,
 with the setter returning early while the flag is set.
 The flag breaks the cycle without comparing values,
 so a second write of the same reading still reaches the responders,
-which is the behavior you want when a responder counts readings rather than changes.
+which is the behavior you want when a responder counts readings rather than modifications.
 
 ### Setting the Responders at Construction
 
 `connect()` and `disconnect()` make `Broadcaster` dynamic.
 Its list of responders can change at any moment,
 including in the middle of an `announce()`.
-Several of the preceding sections exist because of that.
-The copy in `announce()` guards against a `disconnect()` call during the loop,
+That dynamism causes the problems the preceding sections solve:
+the copy in `announce()` guards against a `disconnect()` call during the loop,
 a lambda written inline in `connect()` stays connected for good,
 and a lapsed listener is a connection that nobody removed.
 
