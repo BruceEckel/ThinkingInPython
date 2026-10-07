@@ -851,30 +851,6 @@ class GameBuilder:
                  "e": Urge.EAST, "w": Urge.WEST}
         for char in "".join(solution.split()):
             self.robot.move(moves[char])
-
-string_maze = """
-###############################
-#R#.____#____.#_______#_______#
-#_###_#_###_#_#_#_#####_#####_#
-#___#_#___#_#_#_#.#__b__#___#_#
-###_#_###_#_#_###_#_#####_#_#_#
-#.#_#_#.__#_#__.#_#__b__#_#___#
-#_#_#_#_###_###_#_#####_#_#####
-#_#_#_#__.#_#_#_____#___#_____#
-#_#_#_###_#_#_#_#####_#######_#
-#.#___#___#_#___#____.#_____#_#
-#_#####_###_#_###_#####_#_###_#
-#___#a__#.__#.__#__.#___#_#___#
-#_#_#_###_#####_###_###_###_#_#
-#_#.#_#___#!______#_____#___#_#
-#_#_#_###_#############_#_###_#
-#_#_#__a#_______________#___#_#
-#_#####_###_###########_###_#_#
-#_____#.__#_#___#_____#_#___#_#
-#_#_#####_###_#_#_###_###_###_#
-#.#___________#___#____.__#___#
-###############################
-""".strip()
 ```
 
 Stage 3 pairs the teleports.
@@ -902,6 +878,36 @@ The `Robot` branch builds `Room(Empty())` rather than `Room(occupant)`.
 The robot is the one item that moves,
 so its cell gets an `Empty` occupant and behaves like any other empty room once the robot moves away.
 `show_maze()` draws the `R` by checking which room the robot is in rather than reading an occupant.
+
+`robot_maze.py` holds the maze as text in `string_maze`, which the demo,
+the tests, and the view import:
+
+```python
+# robot_explorer/robot_maze.py
+string_maze = """
+###############################
+#R#.____#____.#_______#_______#
+#_###_#_###_#_#_#_#####_#####_#
+#___#_#___#_#_#_#.#__b__#___#_#
+###_#_###_#_#_###_#_#####_#_#_#
+#.#_#_#.__#_#__.#_#__b__#_#___#
+#_#_#_#_###_###_#_#####_#_#####
+#_#_#_#__.#_#_#_____#___#_____#
+#_#_#_###_#_#_#_#####_#######_#
+#.#___#___#_#___#____.#_____#_#
+#_#####_###_#_###_#####_#_###_#
+#___#a__#.__#.__#__.#___#_#___#
+#_#_#_###_#####_###_###_###_#_#
+#_#.#_#___#!______#_____#___#_#
+#_#_#_###_#############_#_###_#
+#_#_#__a#_______________#___#_#
+#_#####_###_###########_###_#_#
+#_____#.__#_#___#_____#_#___#_#
+#_#_#####_###_#_#_###_###_###_#
+#.#___________#___#____.__#___#
+###############################
+""".strip()
+```
 
 ### Choosing the Path
 
@@ -983,7 +989,8 @@ The path `solve()` returns is the string `run()` expects:
 
 ```python
 # robot_explorer/robot_demo.py
-from game import GameBuilder, string_maze
+from game import GameBuilder
+from robot_maze import string_maze
 from solver import solve
 
 game = GameBuilder(string_maze)
@@ -1064,8 +1071,9 @@ A last step back west shows the food cell empty:
 
 ```python
 # robot_explorer/test_robot.py
-from game import GameBuilder, string_maze
+from game import GameBuilder
 from items import EndGame
+from robot_maze import string_maze
 from solver import solve
 
 def test_search_walks_the_robot_to_the_end() -> None:
@@ -1101,8 +1109,9 @@ and no module of the model imports it.
 # robot_explorer/maze_view.py
 import tkinter as tk
 from typing import Final
-from game import GameBuilder, string_maze
+from game import GameBuilder
 from items import Urge
+from robot_maze import string_maze
 from solver import solve
 
 CELL: Final[int] = 20

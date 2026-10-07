@@ -1,5 +1,6 @@
 # robot_explorer/robot_demo.py
-from game import GameBuilder, string_maze
+from game import GameBuilder
+from robot_maze import string_maze
 from solver import solve
 
 game = GameBuilder(string_maze)

@@ -1,8 +1,9 @@
 # robot_explorer/maze_view.py
 import tkinter as tk
 from typing import Final
-from game import GameBuilder, string_maze
+from game import GameBuilder
 from items import Urge
+from robot_maze import string_maze
 from solver import solve
 
 CELL: Final[int] = 20

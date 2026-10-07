@@ -1,6 +1,7 @@
 # robot_explorer/test_robot.py
-from game import GameBuilder, string_maze
+from game import GameBuilder
 from items import EndGame
+from robot_maze import string_maze
 from solver import solve
 
 def test_search_walks_the_robot_to_the_end() -> None:
