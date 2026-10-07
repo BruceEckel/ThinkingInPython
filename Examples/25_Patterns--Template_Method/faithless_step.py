@@ -13,12 +13,12 @@ class ApplicationFramework:
 
 class OnlyOnce(ApplicationFramework):
     def __init__(self) -> None:
-        self.ran = False
+        self._ran = False
 
     @override
     def customize1(self) -> None:
-        if not self.ran:  # The second pass does nothing
-            self.ran = True
+        if not self._ran:  # The second pass does nothing
+            self._ran = True
             print("Nudge, nudge, wink, wink!")
 
 OnlyOnce().run()

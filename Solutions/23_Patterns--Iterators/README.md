@@ -694,17 +694,17 @@ DONE = sentinel("DONE")
 class Peekable[T](Iterator[T]):
     def __init__(self, source: Iterable[T]) -> None:
         self.source: Iterator[T] = iter(source)
-        self.stored: T | DONE = next(self.source, DONE)
+        self._stored: T | DONE = next(self.source, DONE)
 
     def peek(self) -> T | DONE:
-        return self.stored  # Reports without consuming
+        return self._stored  # Reports without consuming
 
     @override
     def __next__(self) -> T:
-        if self.stored is DONE:
+        if self._stored is DONE:
             raise StopIteration
-        item = self.stored
-        self.stored = next(self.source, DONE)
+        item = self._stored
+        self._stored = next(self.source, DONE)
         return item
 
 it = Peekable(x * 2 for x in [1, 2, 3])
