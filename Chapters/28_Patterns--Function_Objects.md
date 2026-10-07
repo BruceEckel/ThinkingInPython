@@ -639,6 +639,25 @@ class EventBus:
     def publish(self, event: object) -> None:
         for handler in self._handlers.get(type(event), []):
             handler(event)
+```
+
+`subscribe()` is generic on the event type `E`,
+which appears in both parameters.
+The type checker must therefore find one `E` that satisfies the event type and the handler together.
+No such `E` exists for a `Deposit` paired with a handler that takes a `Withdraw`,
+so the type checker reports a type error.
+The check runs once, at registration.
+The stored `defaultdict`, though,
+mixes handlers for every event type in one structure.
+Its lists cannot name a single event class,
+so their element type is `Handler[Any]`.
+
+The demo subscribes two handlers for `Deposit` and one for `Withdraw`,
+then publishes one event of each of the three types:
+
+```python
+# event_bus_demo.py
+from event_bus import Closed, Deposit, EventBus, Withdraw
 
 def on_deposit(event: Deposit) -> None:
     print(f"+ deposit {event.amount}")
@@ -663,17 +682,6 @@ bus.publish(Withdraw(30))
 # No handler: nothing happens
 bus.publish(Closed("inactivity"))
 ```
-
-`subscribe()` is generic on the event type `E`,
-which appears in both parameters.
-The type checker must therefore find one `E` that satisfies the event type and the handler together.
-No such `E` exists for `subscribe(Deposit, on_withdraw)`,
-so the type checker reports a type error.
-The check runs once, at registration.
-The stored `defaultdict`, though,
-mixes handlers for every event type in one structure.
-Its lists cannot name a single event class,
-so their element type is `Handler[Any]`.
 
 `subscribe()` indexes `self._handlers`,
 letting the `defaultdict` build each event type's list on first use.

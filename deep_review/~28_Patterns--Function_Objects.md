@@ -61,7 +61,7 @@ Solutions:
 ## Considered and declined
 
 - `command_pattern.py`'s `Macro` and the two `EventBus` classes keep their hand-written `__init__()`. Each creates an empty container and takes no parameter, and the dataclass form needs `field(default_factory=...)`, a second topic in listings about something else.
-- `chain.py` and `event_bus.py` each hold a library function and a demo, and a test imports each. Splitting them the way `tagged_bus.py` was split would add two listings to show what four lines of demo show now. The demos print during the test import and nothing depends on that output.
+- `chain.py` and `event_bus.py` each hold a library function and a demo, and a test imports each. Splitting them the way `tagged_bus.py` was split would add two listings to show what four lines of demo show now. The demos print during the test import and nothing depends on that output. (Reversed for `event_bus.py` on 2026-10-07: the author's book-wide split sweep moved its 22-line demo to `event_bus_demo.py`; `chain.py` stays.)
 - `command_pattern.py`'s base class keeps `raise NotImplementedError`. The listing shows the classic form, and the solution to exercise 1 refers to those bodies.
 - The `*what*`, `*how*`, `*which*` italics in the opening list stay. They name the three things deferred, and the rest of the chapter returns to them.
 - Exercise 6's closing question still presupposes that one fix works and the solution still answers that none does for `n`. The 2026-08-11 review recorded the pair as deliberate.
