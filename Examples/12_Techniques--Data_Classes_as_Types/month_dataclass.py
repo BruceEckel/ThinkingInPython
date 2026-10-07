@@ -1,13 +1,7 @@
 # month_dataclass.py
 from dataclasses import dataclass, field
+from birth_date import Day
 from validation import check
-
-@dataclass(frozen=True)
-class Day:
-    n: int
-
-    def __post_init__(self) -> None:
-        check(1 <= self.n <= 31, f"Day({self.n})")
 
 @dataclass(frozen=True)
 class Month:
