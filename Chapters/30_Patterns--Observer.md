@@ -711,7 +711,7 @@ and a lapsed listener is a connection that outlives the program's use of its res
 Decoupling and dynamism are separate properties.
 A decoupled subject knows its observers only as callables.
 A dynamic subject lets the set of observers change after the subject exists.
-A broadcaster whose constructor binds its responders for its lifetime is decoupled but not dynamic:
+A broadcaster whose constructor permanently binds its responders is decoupled but not dynamic:
 
 ```python
 # bound_broadcaster.py
@@ -739,24 +739,16 @@ print(log)
 #: [25.0, 150.0]
 ```
 
-`BoundBroadcaster` is a record whose `responders` field holds a tuple.
+`BoundBroadcaster` is a `@record` whose `responders` field holds a tuple.
 The record freezes the field, and the tuple freezes its contents,
-so the constructor sets the responders for good.
-`announce()` iterates through the tuple without copying it,
-because the set stays the same throughout a notification.
-The lambda can go inline in the constructor call,
-since `BoundBroadcaster` has no `disconnect()` to match it.
-The broadcaster holds strong references to its responders,
-but the set is complete at construction,
-so the broadcaster keeps alive only the responders it started with.
-Two problems remain:
-a responder that raises an exception still stops `announce()`,
-and a responder that writes back to its subject still re-enters `announce()`.
+so the responders can't change.
+`announce()` iterates through the tuple but does not need to copy it.
+The broadcaster holds strong references to its responders.
 
 A program can choose its responders at any of four points:
 
 1.  **Source time.**
-    The subject's code calls each reaction by name,
+    The subject's code calls each responder by name,
     as a setter that calls `display.update()` and then `alarm.update()`.
     The subject knows every observer,
     so this is the coupling *Observer* removes rather than a form of the pattern.
@@ -1464,7 +1456,7 @@ The point at which the broadcaster receives its responders varies.
 All four scenarios connect their responders at runtime,
 `BoundBroadcaster` takes its responders at construction,
 and exercise 11's registry collects them as Python imports a module.
-The pattern requires no interface, no `update()` method, no class per reaction,
+The pattern requires no interface, no `update()` method, no class per responder,
 and no `disconnect()`.
 
 ## Deciding What Matters
