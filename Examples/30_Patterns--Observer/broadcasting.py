@@ -1,19 +1,10 @@
 # broadcasting.py
 from collections.abc import Callable
 from dataclasses import dataclass, fields
-from typing import Any, dataclass_transform
+from typing import dataclass_transform
+from announcing import announcing
 
 type Responder[T] = Callable[[T], None]
-
-def announcing(name: str) -> property:
-    def read(self: Any) -> Any:
-        return self.__dict__[name]
-
-    def write(self: Any, value: Any) -> None:
-        self.__dict__[name] = value
-        self.announce(value)
-
-    return property(read, write)
 
 @dataclass_transform(eq_default=False)
 class Broadcasting[T]:

@@ -894,15 +894,12 @@ thermometer.celsius = 150
 The `respond()` decorator method appends the function to the thermometer's list and returns the function unchanged,
 so `report` stays callable by name.
 
-To minimize application code, all common behaviors are captured in the library:
+To minimize application code, all common behaviors are captured in the library.
+The library's first piece builds the property that announces a field:
 
 ```python
-# broadcasting.py
-from collections.abc import Callable
-from dataclasses import dataclass, fields
-from typing import Any, dataclass_transform
-
-type Responder[T] = Callable[[T], None]
+# announcing.py
+from typing import Any
 
 def announcing(name: str) -> property:
     def read(self: Any) -> Any:
@@ -913,24 +910,6 @@ def announcing(name: str) -> property:
         self.announce(value)
 
     return property(read, write)
-
-@dataclass_transform(eq_default=False)
-class Broadcasting[T]:
-    def __init_subclass__(cls) -> None:
-        built = dataclass(eq=False)(cls)
-        for field in fields(built):
-            setattr(cls, field.name, announcing(field.name))
-
-    def responders(self) -> list[Responder[T]]:
-        return self.__dict__.setdefault("_responders", [])
-
-    def respond(self, fn: Responder[T]) -> Responder[T]:
-        self.responders().append(fn)
-        return fn
-
-    def announce(self, data: T) -> None:
-        for responder in list(self.responders()):
-            responder(data)
 ```
 
 `announcing()` takes a field name and builds the two functions a property needs.
@@ -952,6 +931,36 @@ and a property with a setter takes precedence over an instance attribute of the 
 so `thermometer.celsius` reaches the property and the stored value stays behind it.
 The getter and setter are the pair `thermometer.py` writes by hand,
 built once per field.
+
+The base class installs that property on each subclass and holds the responders:
+
+```python
+# broadcasting.py
+from collections.abc import Callable
+from dataclasses import dataclass, fields
+from typing import dataclass_transform
+from announcing import announcing
+
+type Responder[T] = Callable[[T], None]
+
+@dataclass_transform(eq_default=False)
+class Broadcasting[T]:
+    def __init_subclass__(cls) -> None:
+        built = dataclass(eq=False)(cls)
+        for field in fields(built):
+            setattr(cls, field.name, announcing(field.name))
+
+    def responders(self) -> list[Responder[T]]:
+        return self.__dict__.setdefault("_responders", [])
+
+    def respond(self, fn: Responder[T]) -> Responder[T]:
+        self.responders().append(fn)
+        return fn
+
+    def announce(self, data: T) -> None:
+        for responder in list(self.responders()):
+            responder(data)
+```
 
 `__init_subclass__()` runs once, at the moment Python creates the subclass.
 When the `class Thermometer(Broadcasting[float]):` statement finishes running its body,

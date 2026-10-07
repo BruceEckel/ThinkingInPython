@@ -34,8 +34,6 @@ Chapters/Multiple_Dispatching	Multiple_Dispatching	9	A table of callables
 Chapters/Observer	Observer	10	A descriptor per watched attribute
 Chapters/Observer	Observer	11	Responders registered at load time
 Chapters/Observer	Observer	11	Responders registered at load time
-Chapters/Observer	Observer	11	Responders registered at load time
-Chapters/Observer	Observer	11	Responders registered at load time
 Chapters/Observer	Observer	3	An `announce()` that survives a failing responder
 Chapters/Observer	Observer	3	An `announce()` that survives a failing responder
 Chapters/Observer	Observer	3	An `announce()` that survives a failing responder
