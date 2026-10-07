@@ -3,9 +3,9 @@ from point import Point
 
 def survey(points: list[Point]) -> str:
     match points:
-        case [Point(0, 0) as start, *rest]:
+        case [Point(0, 0) as start, *rest]:  # [1]
             return f"{start} then {len(rest)} more"
-        case [Point(0, n) | Point(n, 0)]:
+        case [Point(0, n) | Point(n, 0)]:  # [2]
             return f"one axis point, offset {n}"
         case [Point(), Point()]:
             return "two points"

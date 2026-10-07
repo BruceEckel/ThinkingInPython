@@ -23,6 +23,6 @@ print(total_price(basket))
 print(asyncio.run(total_price_async(basket)))
 #: 3.5
 description = price_of_async("apple")
-print(type(description).__name__)
+print(type(description).__name__)  # [1]
 #: coroutine
 description.close()  # Never awaited, so close it explicitly

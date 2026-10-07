@@ -300,22 +300,22 @@ a = A()
 a.x = 1
 print(vars(a), a.x)
 #: {'x': 1} 1
-del a.x
+del a.x  # [1]
 print(vars(a), a.x)
 #: {} 100
 with expected(AttributeError):
-    del a.x
+    del a.x  # [2]
 #: [AttributeError] 'A' object has no attribute 'x'
 ```
 
-**Remove the shadow.** `del a.x` removes the entry from the instance
-dictionary, which is where assignment writes. `vars(a)` is
+**Remove the shadow.** `del a.x` (`[1]`) removes the entry from the
+instance dictionary, which is where assignment writes. `vars(a)` is
 empty again, and `a.x` reads `100`, because the lookup falls back to
 the class the way it did before any assignment. The assignment and the
 `del` both stay on the instance, so the class attribute keeps its
 `100` throughout.
 
-**Show that deletes stop at the instance.** The second `del a.x` raises an `AttributeError` because the instance dictionary is empty.
+**Show that deletes stop at the instance.** The second `del a.x` (`[2]`) raises an `AttributeError` because the instance dictionary is empty.
 `del` stops at the instance, the way assignment does, so
 `vars(A)["x"]` keeps its `100`. Deleting the class attribute takes
 `del A.x`, naming the class. The asymmetry is the same one assignment
@@ -643,10 +643,10 @@ class Sub(Base):
 Base()
 print(vars(Sub).get("total"))
 #: None
-Sub()
+Sub()  # [1]
 print(vars(Sub).get("total"))
 #: 2
-Sub()
+Sub()  # [2]
 print(vars(Sub).get("total"))
 #: 3
 print(Base.total, Sub.total)
@@ -674,12 +674,13 @@ print(Counted.total, SubCounted.total)
 #: 3 3
 ```
 
-**Watch the subclass fork the counter.** Before the first `Sub()`,
-`vars(Sub)` has no `total`, so `Sub` reads `Base`'s. The first `Sub()`
-runs `type(self).total += 1` with `type(self)` as `Sub`. The read
-falls back to `Base.total`, which is `1`, and the write stores `2` in
-`Sub`'s own dictionary. From then on `Sub` has its own counter, and
-the second `Sub()` moves it to `3` while `Base.total` stays at `1`.
+**Watch the subclass fork the counter.** Before the first `Sub()`
+(`[1]`), `vars(Sub)` has no `total`, so `Sub` reads `Base`'s. The
+`Sub()` at `[1]` runs `type(self).total += 1` with `type(self)` as
+`Sub`. The read falls back to `Base.total`, which is `1`, and the
+write stores `2` in `Sub`'s own dictionary. From then on `Sub` has its
+own counter, and the second `Sub()` (`[2]`) moves it to `3` while
+`Base.total` stays at `1`.
 
 **Keep one counter for the hierarchy.** `Counted` names the class on the left, so every construction reads
 and writes `Counted`'s dictionary. `vars(SubCounted)` holds no `total`

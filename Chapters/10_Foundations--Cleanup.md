@@ -342,9 +342,9 @@ a = Connection("A")
 #: A opened
 b = Connection("B")
 #: B opened
-a.close()
+a.close()  # [1]
 #: A closed
-a.close()
+a.close()  # [2]
 print(a.closer.alive, b.closer.alive)
 #: False True
 del b
@@ -360,8 +360,8 @@ so registering the cleanup does not keep the object alive.
 The bound method holds a strong reference to the object,
 so the object survives until the program ends.
 
-`close()` runs the callback immediately.
-The second `close()` does nothing.
+The `close()` at `[1]` runs the callback immediately.
+The second `close()`, at `[2]`, does nothing.
 A finalizer runs at most once, and `alive` reports whether it still can.
 `b` holds the only reference to its `Connection`,
 so `del b` destroys the object here, where the `del c` in `cleanup.py` does not.

@@ -392,11 +392,11 @@ class Paper(Item):
 class Rock(Item):
     pass
 
-@Paper.compete.register  # type: ignore
+@Paper.compete.register  # type: ignore  # [1]
 def _(self: Item, item: Rock) -> str:
     return "paper wins"
 
-@Rock.compete.register  # type: ignore
+@Rock.compete.register  # type: ignore  # [2]
 def _(self: Item, item: Rock) -> str:
     return "rock draws"
 
@@ -408,7 +408,7 @@ print(Rock().compete(Rock()))
 
 Both registrations attach to `Item.compete`,
 the attribute `Paper` and `Rock` both inherit,
-so the second `@register` silently overwrites the first's entry for `Rock`.
+so the `@register` at `[2]` silently overwrites the entry `[1]` made for `Rock`.
 The `singledispatch` lookup ignores `self`'s type,
 so both duels return the same answer,
 although each registration went through its own class.

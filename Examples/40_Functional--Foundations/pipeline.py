@@ -23,5 +23,5 @@ data = [Reading("a", 18.0), Reading("b", 25.0),
         Reading("c", 30.5)]
 print(report(data))
 #: ['b 77.0', 'c 86.9']
-print(data[0])
+print(data[0])  # [1]
 #: Reading(sensor='a', celsius=18.0)

@@ -203,11 +203,11 @@ Chapters/16_Techniques--Comprehensions.md	want: A CODE loop when you want the si
 Chapters/16_Techniques--Comprehensions.md	want: A glob pattern says what you want
 Chapters/16_Techniques--Comprehensions.md	want: Brackets when you want a list
 Chapters/16_Techniques--Comprehensions.md	want: and append the ones you want
-Chapters/17_Techniques--Metaprogramming.md	already: so CODE sees the second CODE assigned to a name it already holds
+Chapters/17_Techniques--Metaprogramming.md	already: so CODE sees the CODE at CODE assigned to a name it already holds
 Chapters/17_Techniques--Metaprogramming.md	even: even an empty one
 Chapters/17_Techniques--Metaprogramming.md	exactly: CODE generalizes exactly one shape
 Chapters/17_Techniques--Metaprogramming.md	hook: Every hook in this chapter is an ordinary function that Python calls at a known moment during class construction
-Chapters/17_Techniques--Metaprogramming.md	hook: No other hook can catch the second CODE
+Chapters/17_Techniques--Metaprogramming.md	hook: No other hook can catch the CODE at CODE
 Chapters/17_Techniques--Metaprogramming.md	hook: The one hook missing from its trace is CODE
 Chapters/17_Techniques--Metaprogramming.md	hook: an CODE hook
 Chapters/17_Techniques--Metaprogramming.md	hooks: Then come the simpler hooks

@@ -5,7 +5,7 @@ def describe(value: object) -> str:
     # return value.upper()
     if isinstance(value, str):
         return value.upper()
-    return repr(value)
+    return repr(value)  # [1]
 
 print(describe("hi"))
 #: HI

@@ -119,14 +119,14 @@ def square(n: int) -> int:
 square(1)
 square(2)
 square(3)  # Evicts 1, the least recently used
-square(2)
-square(1)
+square(2)  # [1]
+square(1)  # [2]
 print(square.cache_info())
 #: CacheInfo(hits=1, misses=4, maxsize=2, currsize=2)
 ```
 
-The single hit is the second `square(2)`, which is still in the cache.
-The second `square(1)` is a fourth miss,
+The single hit is the second `square(2)` (`[1]`), which is still in the cache.
+The second `square(1)` (`[2]`) is a fourth miss,
 although `1` was the first value computed,
 and that miss proves the cache evicted `1`.
 The cache discards the least recently used entry before it stores a new one,
@@ -665,11 +665,12 @@ from itertools import groupby
 data = ["a", "a", "b", "b", "b", "c"]
 print([(k, list(g)) for k, g in groupby(data)])
 #: [('a', ['a', 'a']), ('b', ['b', 'b', 'b']), ('c', ['c'])]
+# [1]
 print([(k, list(g)) for k, g in groupby(["b", "a", "b"])])
 #: [('b', ['b']), ('a', ['a']), ('b', ['b'])]
 ```
 
-The second `print()` shows what unsorted input does.
+The `print()` at `[1]` shows what unsorted input does.
 `"b"` comes back as two separate groups, and no error reports it.
 `groupby(sorted(data, key=keyfunc), key=keyfunc)` is the fix,
 with the same key function both times.
@@ -775,13 +776,13 @@ batches = batched(squares, 3)
 totals = (sum(b) for b in batches)
 print(list(takewhile(lambda t: t < 500, totals)))
 #: [14, 77, 194, 365]
-print(list(islice(squares, 3)))
+print(list(islice(squares, 3)))  # [1]
 #: [256, 289, 324]
 ```
 
 The pipeline stacks four stages on an infinite source,
 and none of them runs until `list()` pulls.
-The second `print()` shows the source resuming at `n` = 16 rather than 13,
+The `print()` at `[1]` shows the source resuming at `n` = 16 rather than 13,
 because `takewhile()` pulls one more total,
 the 590 from the batch `(169, 196, 225)`, finds it over the limit,
 and discards it.

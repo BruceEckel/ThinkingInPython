@@ -10,7 +10,7 @@ def summarize(items: list[int]) -> str:
             return f"Two items: {first}, {second}"
         case [first, *rest]:
             return f"{first}, then {len(rest)} more"
-        case _:
+        case _:  # [1]
             return "Unreachable"
 
 def last_of(items: list[int]) -> tuple[list[int], int]:

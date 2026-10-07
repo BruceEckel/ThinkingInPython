@@ -44,9 +44,9 @@ This script runs with `python if.py`:
 response = "yes"
 if response == "yes":
     print("affirmative")
-    val = 1
+    val = 1  # [1]
 #: affirmative
-print("continuing...")
+print("continuing...")  # [2]
 #: continuing...
 print(val)
 #: 1
@@ -59,8 +59,9 @@ The conditional clause ends with a colon.
 A group of indented statements follows: the "then" part of the `if` statement.
 The `print()` function sends its arguments to standard output,
 separated by spaces and followed by a newline.
-The next line assigns to a variable named `val`.
-The next statement returns to the left margin, and that return ends the `if`.
+The line at `[1]` assigns to a variable named `val`.
+The statement at `[2]` returns to the left margin,
+and that return ends the `if`.
 
 An indented block groups statements without creating a scope, so `val`,
 assigned inside the `if`, stays visible afterward,

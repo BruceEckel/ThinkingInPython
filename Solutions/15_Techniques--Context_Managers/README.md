@@ -251,8 +251,8 @@ class Pool[R]:
 
 def test_both_leased_at_once() -> None:
     pool = Pool(Connection(1), Connection(2))
-    with pool.lease() as first:
-        with pool.lease() as second:
+    with pool.lease() as first:  # [1]
+        with pool.lease() as second:  # [2]
             assert second is not first
             assert pool.available() == 0
     assert pool.available() == 2
@@ -262,8 +262,8 @@ The solutions tree cannot import the chapter's `object_pool.py`, so
 the file carries its own copy of `Connection` and `Pool`. In the
 chapter's `test_object_pool.py` you add the test function alone.
 
-**Hold both connections at once.** The first `lease()` takes one connection out of the queue, and the
-nested second `lease()` takes the other, so `pool.available()` is `0`
+**Hold both connections at once.** The `lease()` at `[1]` takes one connection out of the queue, and the
+nested `lease()` at `[2]` takes the other, so `pool.available()` is `0`
 inside the inner `with`. The `0` confirms the pool has no
 built-in limit of "one lease at a time." The pool holds the items you
 gave its constructor, and it hands out as many concurrent leases as
@@ -271,8 +271,8 @@ it has items. A third nested `lease()` would block forever in
 `get()`, since this one thread holds both connections and nothing can
 return one.
 
-**Check that both connections come back.** Exiting the inner `with` puts `second`
-back, then exiting the outer `with` puts `first` back,
+**Check that both connections come back.** Exiting the inner `with` (`[2]`) puts `second`
+back, then exiting the outer `with` (`[1]`) puts `first` back,
 restoring `pool.available()` to `2`.
 
 </details>

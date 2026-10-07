@@ -27,8 +27,8 @@ class Pool[R]:
 
 def test_both_leased_at_once() -> None:
     pool = Pool(Connection(1), Connection(2))
-    with pool.lease() as first:
-        with pool.lease() as second:
+    with pool.lease() as first:  # [1]
+        with pool.lease() as second:  # [2]
             assert second is not first
             assert pool.available() == 0
     assert pool.available() == 2

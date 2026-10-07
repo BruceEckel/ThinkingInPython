@@ -445,7 +445,7 @@ if __name__ == "__main__":
     expr = 2 * x + 1
     by_hand = Add(Mul(Num(2), x), Num(1))
     print(expr == by_hand, expr.left)
-    print(evaluate(expr, x=3), evaluate(expr, x=10))
+    print(evaluate(expr, x=3), evaluate(expr, x=10))  # [1]
 #: True Mul(left=Num(value=2), right=Var(name='x'))
 #: 7 21
 ```
@@ -455,7 +455,7 @@ Records generate `__eq__()`,
 so `expr == by_hand` compares the two trees by value.
 Printing `expr.left` shows the nesting.
 The `Add` at the root holds a `Mul`, which holds a `Num` and a `Var`.
-The second `print()` line evaluates that same `expr` twice,
+The `print()` at `[1]` evaluates that same `expr` twice,
 once with `x=3` and once with `x=10`.
 Building `2 * x + 1` does not compute a number.
 It builds a tree, so `expr` is a value you can pass to `evaluate()` under different variable bindings,

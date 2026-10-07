@@ -8,7 +8,7 @@ name, age, height = person
 print(name, age, height)
 #: Alice 30 1.65
 # Now also reachable by name
-print(person.name, person.height)
+print(person.name, person.height)  # [1]
 #: Alice 1.65
 print(person[0], type(person[0]).__name__)
 #: Alice str

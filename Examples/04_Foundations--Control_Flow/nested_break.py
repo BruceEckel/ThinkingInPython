@@ -7,11 +7,11 @@ def locate(target):
         for cell in row:
             if cell == target:
                 print(f"found {cell}")
-                break
-        else:
+                break  # [1]
+        else:  # [2]
             continue
-        break
-    else:
+        break  # [3]
+    else:  # [4]
         print("not found")
 
 locate(3)

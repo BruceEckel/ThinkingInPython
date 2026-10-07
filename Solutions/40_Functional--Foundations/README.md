@@ -462,9 +462,9 @@ numbers = [1, 2, 3, 4, 5]
 raw = map(lambda n: n * n, numbers)
 print(type(raw).__name__)
 #: map
-print(list(raw))
+print(list(raw))  # [1]
 #: [1, 4, 9, 16, 25]
-print(list(raw))
+print(list(raw))  # [2]
 #: []
 ```
 
@@ -473,10 +473,11 @@ shows `<map object at 0x...>` rather than any values, because `map()`
 returns a lazy iterator that has computed nothing yet, so its `repr()`
 shows only the type and an address.
 
-**Exhaust the iterator.** The second `list(raw)` is the more dangerous
-half. It returns `[]` and raises no error. The first `list(raw)`
-consumed the iterator, and nothing rewinds it, so any later pass sees
-an exhausted object and silently produces nothing. A comprehension
+**Exhaust the iterator.** The second `list(raw)`, at `[2]`, is the
+more dangerous half. It returns `[]` and raises no error. The first
+`list(raw)`, at `[1]`, consumed the iterator, and nothing rewinds it,
+so any later pass sees an exhausted object and silently produces
+nothing. A comprehension
 hands back a finished list, which you can walk as many times as you
 like.
 

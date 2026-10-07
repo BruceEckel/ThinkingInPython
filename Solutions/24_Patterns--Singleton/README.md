@@ -324,13 +324,14 @@ from config import settings
 
 #: config body runs
 settings = {"theme": "dark"}  # noqa: F811
-print(settings)
+print(settings)  # [1]
 #: {'theme': 'dark'}
-print(config.settings)
+print(config.settings)  # [2]
 #: {}
 ```
 
-The two prints disagree, and the exercise turns on why.
+The prints at `[1]` and `[2]` disagree, and the exercise turns on
+why.
 
 **Give one dict two names.** `from config import settings` copies a binding: two names, this
 module's `settings` and `config.settings`, initially pointing at
@@ -340,7 +341,8 @@ reference, so both see the change.
 
 **Rebind only the local name.** Assigning to `settings` points
 this module's name at a new dict. The name in `config` still
-points at the original empty dict, so the second print shows `{}`.
+points at the original empty dict, so the print at `[2]` shows
+`{}`.
 
 Nothing warns you at runtime. The module still imports, the
 assignment succeeds, and the local `settings` holds what you put in

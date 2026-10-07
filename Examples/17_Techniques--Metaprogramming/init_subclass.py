@@ -23,7 +23,7 @@ class PhthaloBlue(Blue):
     pass
 class CeruleanBlue(Blue):
     pass
-print(sorted(c.__name__ for c in Color.registry))
+print(sorted(c.__name__ for c in Color.registry))  # [1]
 #: ['CeruleanBlue', 'Green', 'PhthaloBlue', 'Red']
 
 # A second, independent hierarchy keeps its own registry:

@@ -191,11 +191,11 @@ def locate(target):
         for cell in row:
             if cell == target:
                 print(f"found {cell}")
-                break
-        else:
+                break  # [1]
+        else:  # [2]
             continue
-        break
-    else:
+        break  # [3]
+    else:  # [4]
         print("not found")
 
 locate(3)
@@ -204,12 +204,13 @@ locate(9)
 #: not found
 ```
 
-`locate(3)` walks the first row to the end,
-so the inner `else` runs its `continue` and the outer loop moves on to the second row.
-There the `3` matches, the inner `break` skips the `else`,
-and the outer `break` runs right after.
+`locate(3)` walks the first row to the end, so the inner `else` (`[2]`)
+runs its `continue` and the outer loop moves on to the second row.
+There the `3` matches, the inner `break` (`[1]`) skips the `else`,
+and the outer `break` (`[3]`) runs right after.
 `locate(9)` breaks neither loop,
-so the inner `else` continues on each row and the outer `else` prints `"not found"`.
+so the inner `else` continues on each row and the outer `else` (`[4]`)
+prints `"not found"`.
 
 `locate()` is a function so the listing can run two searches.
 Inside a function, a `return` at the match leaves both loops in one step.

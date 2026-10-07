@@ -7,9 +7,9 @@ def writes_global():
     count += 1  # type: ignore  # noqa: F823, F841
 
 def rebinds():
-    print(count)  # type: ignore  # noqa: F823
+    print(count)  # type: ignore  # noqa: F823  # [1]
     count = 99
-    print(count)
+    print(count)  # [2]
 
 expect(UnboundLocalError, writes_global)
 #: [UnboundLocalError] cannot access local variable 'count'

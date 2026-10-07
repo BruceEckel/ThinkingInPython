@@ -86,7 +86,7 @@ Here, too, keyword arguments become attributes in the instance's `__dict__`:
 from types import SimpleNamespace
 
 m = SimpleNamespace(info="Spam", tags=["urgent", "todo"])
-print(vars(m))
+print(vars(m))  # [1]
 #: {'info': 'Spam', 'tags': ['urgent', 'todo']}
 m.more = 11
 print(m)
@@ -97,7 +97,7 @@ print(m == SimpleNamespace(info="Spam",
 #: True
 ```
 
-The first `print()` shows the same instance `__dict__` the hand-rolled version has.
+The `print()` at `[1]` shows the same instance `__dict__` the hand-rolled version has.
 `SimpleNamespace` adds a readable `repr()` and equality by contents.
 `Messenger` prints as `<__main__.Messenger object at 0x...>`,
 and two `Messenger`s with identical attributes compare unequal,

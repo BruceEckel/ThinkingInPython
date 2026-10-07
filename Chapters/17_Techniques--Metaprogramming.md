@@ -537,7 +537,7 @@ class PhthaloBlue(Blue):
     pass
 class CeruleanBlue(Blue):
     pass
-print(sorted(c.__name__ for c in Color.registry))
+print(sorted(c.__name__ for c in Color.registry))  # [1]
 #: ['CeruleanBlue', 'Green', 'PhthaloBlue', 'Red']
 
 # A second, independent hierarchy keeps its own registry:
@@ -562,7 +562,7 @@ print(sorted(c.__name__ for c in Shape.registry))
 For each new subclass,
 `__init_subclass__()` adds it to the registry and removes its base classes,
 so only the current leaves remain.
-That is why `Blue` is absent from the second `Color` print.
+That is why `Blue` is absent from the `Color` print at `[1]`.
 Creating `PhthaloBlue` and `CeruleanBlue` removes their base `Blue`,
 leaving those two leaves beside `Green` and `Red`.
 For the same reason, `Round` is missing from the `Shape` registry.
@@ -1306,7 +1306,7 @@ class BSingleton(metaclass=Singleton):
 
 a = ASingleton()
 #: building ASingleton
-b = ASingleton()
+b = ASingleton()  # [1]
 #: reusing ASingleton
 assert a is b
 
@@ -1318,7 +1318,7 @@ assert c is d
 assert a is not c
 ```
 
-The second `ASingleton()` does not reach `__new__()` or `__init__()`.
+The `ASingleton()` call at `[1]` does not reach `__new__()` or `__init__()`.
 `__call__()` finds the cached instance and returns it without building anything.
 Each class gets its own entry in the `_instances` dictionary,
 so the singletons are independent.
@@ -1549,16 +1549,16 @@ class Strict(type):
 
 with expected(TypeError):
     class Handlers(metaclass=Strict):
-        def on_open(self) -> None: ...
+        def on_open(self) -> None: ...  # [1]
         def on_close(self) -> None: ...
-        def on_open(self) -> None: ...  # noqa: F811
+        def on_open(self) -> None: ...  # noqa: F811  # [2]
 #: [TypeError] on_open defined twice
 ```
 
 `__prepare__()` runs before the class body does,
 and whatever mapping it returns becomes the namespace for that body.
 Every `def` and every assignment in the body becomes a `__setitem__()` call on that mapping,
-so `NoDuplicates` sees the second `on_open` assigned to a name it already holds.
+so `NoDuplicates` sees the `on_open` at `[2]` assigned to a name it already holds.
 Python then hands the finished mapping to `type.__new__()`.
 
 `__prepare__()` must carry `@classmethod`.
@@ -1566,10 +1566,10 @@ Python calls it on the metaclass before any class object exists,
 so an ordinary method receives the class name as its `self` and leaves `bases` unfilled,
 producing a `TypeError` that says nothing about the real mistake.
 
-No other hook can catch the second `on_open`.
+No other hook can catch the `on_open` at `[2]`.
 `__init_subclass__()`, `__set_name__()`,
 and a class decorator all run after the body has finished,
-by which time the second definition has overwritten the first.
+by which time `[2]` has overwritten `[1]`.
 The static half of the check is ruff's report of the same mistake,
 and the `# noqa: F811` suppresses it so the listing can run.
 `__prepare__()` catches the mistake at run time,
@@ -2100,7 +2100,7 @@ class Fraggle:
     def h(self, s: str) -> str:
         return f"h({s})"
 
-display_object(Fraggle)
+display_object(Fraggle)  # [1]
 #: [Attributes]
 #:   • y: float = 1.14659 [CV]
 #:   • z: str = 'blivet' [CV]
@@ -2109,7 +2109,7 @@ display_object(Fraggle)
 #:   • g(self, x: int) -> float
 #:   • h(self, s: str) -> str
 
-display_object(Fraggle(9, 2.3))
+display_object(Fraggle(9, 2.3))  # [2]
 #: [Attributes]
 #:   • x: int = 9
 #:   • y: float = 2.3
@@ -2120,7 +2120,7 @@ display_object(Fraggle(9, 2.3))
 #:   • h(self, s: str) -> str
 
 # ALL_DUNDERS also reveals what @dataclass generated:
-display_object(Fraggle(9, 2.3), dunder=ALL_DUNDERS)
+display_object(Fraggle(9, 2.3), dunder=ALL_DUNDERS)  # [3]
 #: [Attributes]
 #:   • __annotations_cache__ = {'x': <class 'int'>, ... [CV]
 #:   • __class__ = <attribute '__class__'> [CV]
@@ -2166,7 +2166,7 @@ display_object(Fraggle(9, 2.3), dunder=ALL_DUNDERS)
 #:   • h(self, s: str) -> str
 ```
 
-The first two calls show the same class from two angles.
+The calls at `[1]` and `[2]` show the same class from two angles.
 `display_object(Fraggle)` inspects the class object.
 It lists `y` and `z`, the fields with defaults.
 `x`'s declaration is `x: int` with no default,
@@ -2177,7 +2177,7 @@ and `getmembers_static()` skips it.
 whose attributes hold its field values, so `x` now appears beside `y` and `z`.
 The method list is the same either way, because methods live on the class.
 
-The third call passes `ALL_DUNDERS`.
+The call at `[3]` passes `ALL_DUNDERS`.
 A `@dataclass` produces many of these:
 
 - `__dataclass_fields__`

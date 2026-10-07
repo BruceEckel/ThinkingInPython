@@ -17,9 +17,9 @@ _instance: Settings | None = None
 
 def settings() -> Settings:
     global _instance
-    if _instance is None:
+    if _instance is None:  # [1]
         with _lock:
-            if _instance is None:
+            if _instance is None:  # [2]
                 _instance = Settings()
     return _instance
 

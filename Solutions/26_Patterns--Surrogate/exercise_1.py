@@ -31,9 +31,9 @@ for _ in range(3):
 #: a slow query
 #: a slow query
 #: a slow query
-print(p.query())
+print(p.query())  # [1]
 #: 3 answered before build
 #: Expensive built
 #: result
-print(p.query())
+print(p.query())  # [2]
 #: result

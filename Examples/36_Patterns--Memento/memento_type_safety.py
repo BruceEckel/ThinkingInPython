@@ -7,7 +7,7 @@ def restore_tuple(strokes: tuple[str, ...]) -> None:
     print(strokes)
 
 def restore_memento(memento: Memento) -> None:
-    print(memento.strokes)
+    print(memento.strokes)  # [1]
 
 sketch = Sketch()
 sketch.draw("circle")

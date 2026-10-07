@@ -19,6 +19,6 @@ with expected():  # No argument means ALL
 print("survived")
 #: survived
 
-with expected() as x:
+with expected() as x:  # [1]
     print(f"{x = }")
 #: x = None

@@ -4,5 +4,6 @@ from itertools import groupby
 data = ["a", "a", "b", "b", "b", "c"]
 print([(k, list(g)) for k, g in groupby(data)])
 #: [('a', ['a', 'a']), ('b', ['b', 'b', 'b']), ('c', ['c'])]
+# [1]
 print([(k, list(g)) for k, g in groupby(["b", "a", "b"])])
 #: [('b', ['b']), ('a', ['a']), ('b', ['b'])]

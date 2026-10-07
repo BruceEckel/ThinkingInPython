@@ -16,7 +16,7 @@ class Strict(type):
 
 with expected(TypeError):
     class Handlers(metaclass=Strict):
-        def on_open(self) -> None: ...
+        def on_open(self) -> None: ...  # [1]
         def on_close(self) -> None: ...
-        def on_open(self) -> None: ...  # noqa: F811
+        def on_open(self) -> None: ...  # noqa: F811  # [2]
 #: [TypeError] on_open defined twice

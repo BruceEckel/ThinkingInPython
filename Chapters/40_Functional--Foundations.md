@@ -103,14 +103,13 @@ assert slope(10, 2) == 5.0
 # The impure one needs a reset before each check:
 total = 0
 assert running_total(5) == 5
-total = 0
-assert running_total(5) == 5
+total = 0  # [1]
+assert running_total(5) == 5  # [2]
 print("ok")
 #: ok
 ```
 
-If you delete the last `total = 0`,
-the second `running_total()` assertion fails.
+If you delete the reset at `[1]`, the assertion at `[2]` fails.
 `total` is still 5 from the first call, so the second call returns 10.
 That line is the fixture the impure version needs, and purity removes it.
 
@@ -643,7 +642,7 @@ def label(n: int) -> str:
 increment_then_double = compose(double, increment)
 print(increment_then_double(10))
 #: 22
-print(compose(label, increment_then_double)(10))
+print(compose(label, increment_then_double)(10))  # [1]
 #: <22>
 ```
 
@@ -652,7 +651,7 @@ then doubles.
 Each piece stays small and pure,
 and you combine them without changing either one.
 
-The type parameters matter on the second `print()`.
+The type parameters matter at `[1]`.
 The type checker verifies that `label()` accepts what `increment_then_double` produces,
 and types the composed function `(int) -> str` rather than `(int) -> int`.
 
@@ -695,7 +694,7 @@ data = [Reading("a", 18.0), Reading("b", 25.0),
         Reading("c", 30.5)]
 print(report(data))
 #: ['b 77.0', 'c 86.9']
-print(data[0])
+print(data[0])  # [1]
 #: Reading(sensor='a', celsius=18.0)
 ```
 
@@ -703,7 +702,7 @@ Five of the chapter's ideas work at once: a record for the value,
 `Sequence` to state that `report()` leaves its input unchanged,
 two pure functions, `partial()` to turn a two-argument predicate into the one-argument callable `filter()` requires,
 and `map()` and `filter()` for the traversal.
-The second `print()` shows what the discipline gives you.
+The `print()` at `[1]` shows what the discipline gives you.
 The input list stays unchanged, so you can recompute the whole report, cache it,
 or run it on another core with no coordination.
 

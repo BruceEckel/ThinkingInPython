@@ -47,7 +47,7 @@ class BrokenFactory:
 g1 = GameEnvironment(KittiesAndPuzzles())
 g2 = GameEnvironment(WarriorsAndWeapons())
 # ty: expected "GameElementFactory", found "BrokenFactory":
-# GameEnvironment(BrokenFactory())
+# GameEnvironment(BrokenFactory())  # [1]
 g1.play()
 #: Kitty encounters a Puzzle
 g2.play()

@@ -491,7 +491,7 @@ print(make_user("Sue", admin=True))
 def tally(label, *values, total=False):
     print(label, values, total)
 
-tally("nums", 1, 2, True)
+tally("nums", 1, 2, True)  # [1]
 #: nums (1, 2, True) False
 tally("nums", 1, 2, total=True)
 #: nums (1, 2) True
@@ -504,7 +504,7 @@ expect(TypeError, make_user, "Sue", True)  # type: ignore
 #: were given
 ```
 
-The `True` in the first `tally()` call joins `values` like any other positional argument.
+The `True` in the `tally()` call at `[1]` joins `values` like any other positional argument.
 Only the named form, `total=True`, reaches `total`.
 
 Calling `divide(a=10, b=2)` is an error,

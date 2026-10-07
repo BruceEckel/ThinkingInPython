@@ -177,7 +177,7 @@ def restore_tuple(strokes: tuple[str, ...]) -> None:
     print(strokes)
 
 def restore_memento(memento: Memento) -> None:
-    print(memento.strokes)
+    print(memento.strokes)  # [1]
 
 sketch = Sketch()
 sketch.draw("circle")
@@ -205,7 +205,8 @@ with expected(FrozenInstanceError):
 `restore_tuple()` accepts either tuple, since both are `tuple[str, ...]`.
 `restore_memento()` accepts the checkpoint,
 and the type checker reports the plain tuple before the program runs.
-At run time, the program raises `AttributeError` at the first line that reads `.strokes`.
+At run time, the program raises `AttributeError` at `[1]`,
+the first line that reads `.strokes`.
 The checker rejects the assignment to `checkpoint.strokes` too,
 and the runtime raises `FrozenInstanceError`.
 The `strokes` tuple is immutable on its own.

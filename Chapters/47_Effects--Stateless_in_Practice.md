@@ -962,25 +962,25 @@ EMPTY: Final[Library] = Library({})
 def outcome(feed: Feed, book: Encyclopedia) -> str:
     return run(supply(feed, book)(report)())
 
-print(outcome(STOCKS, SHELF))
+print(outcome(STOCKS, SHELF))  # [1]
 #: feed: fetching
 #: library: looking up stock market
 #: a history
-print(outcome(WEATHER, SHELF))
+print(outcome(WEATHER, SHELF))  # [2]
 #: feed: fetching
 #: nothing worth researching
-print(outcome(STOCKS, EMPTY))
+print(outcome(STOCKS, EMPTY))  # [3]
 #: feed: fetching
 #: library: looking up stock market
 #: no article on that topic
-print(outcome(DeadWire(), SHELF))
+print(outcome(DeadWire(), SHELF))  # [4]
 #: no headline today
 ```
 
 Four runs of one program, differing in what you supply.
-The first finds its article.
-The second exercises `NotInteresting`, the third `NoArticle`,
-and the fourth `Unavailable`,
+The run at `[1]` finds its article.
+The run at `[2]` exercises `NotInteresting`, `[3]` exercises `NoArticle`,
+and `[4]` exercises `Unavailable`,
 so the runs cover every failure the signature declares.
 [Effect Oriented Programming](https://effectorientedprogramming.com/)
 calls each such set of bindings a *scenario*,
@@ -989,7 +989,7 @@ and here a scenario is nothing more than arguments to `supply()`.
 Every printed line in that trace comes from a supplied implementation,
 because the pipeline holds no output of its own,
 so the trace also records where each run stopped.
-The second run stops after `feed: fetching`.
+The run at `[2]` stops after `feed: fetching`.
 `topic_of()` yields a `NotInteresting`,
 and that failure ends `research()` where it stands.
 The `need(Encyclopedia)` on the next line does not run,
@@ -999,9 +999,9 @@ which is why the run still prints a message.
 A failure ends the remaining steps the way a raised exception does,
 and no step tests for it.
 Where the run stops depends on where the failure arises.
-The fourth run prints no trace,
+The run at `[4]` prints no trace,
 since `DeadWire.latest()` raises `Unavailable` without printing anything.
-The third reaches the library and fails there.
+The run at `[3]` reaches the library and fails there.
 
 `report()` handles the two channels differently.
 `catch()` empties the error channel, so `report()` cannot fail.

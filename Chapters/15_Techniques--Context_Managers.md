@@ -490,7 +490,7 @@ with expected():  # No argument means ALL
 print("survived")
 #: survived
 
-with expected() as x:
+with expected() as x:  # [1]
     print(f"{x = }")
 #: x = None
 ```
@@ -499,7 +499,7 @@ The `1 / 0` raises an exception, `__exit__()` prints the exception it caught,
 then returns `True`,
 and the `with` statement absorbs the error so `survived` still prints.
 
-In the third `with`, `x` receives the return value of `__enter__()`,
+In the `with` at `[1]`, `x` receives the return value of `__enter__()`,
 which for `expected()` is `None`.
 
 ### The `expect()` Function
@@ -530,16 +530,16 @@ def parse(text: str, *, base: int = 10) -> int:
 
 expect(ValueError, parse, "ff")
 #: [ValueError] invalid literal for int() with base 10: 'ff'
-expect((ValueError, TypeError), parse, "ff", base=1)
+expect((ValueError, TypeError), parse, "ff", base=1)  # [1]
 #: [ValueError] int() base must be >= 2 and <= 36, or 0
-expect(json.JSONDecodeError, json.loads, "{bad")
+expect(json.JSONDecodeError, json.loads, "{bad")  # [2]
 #: [JSONDecodeError] Expecting property name enclosed in
 #: double quotes: line 1 column 2 (char 1)
 ```
 
-The second call names two types in a tuple and forwards `base=1` as a keyword,
+The call at `[1]` names two types in a tuple and forwards `base=1` as a keyword,
 which `parse()` passes on to `int()`.
-The third call's message is too long for one line, so it wraps.
+The message from `[2]` is too long for one line, so it wraps.
 
 `aexpect()` is the `async` form.
 It awaits the call instead of making it,

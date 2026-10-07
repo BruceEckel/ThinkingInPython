@@ -21,8 +21,8 @@ def greet(name: str) -> None:
     console: Console = get(Console)
     console.print(f"Hello, {name}!")
 
-expect(NotRegistered, greet, "Alice")
+expect(NotRegistered, greet, "Alice")  # [1]
 #: [NotRegistered] Console
 register(Console, Console())
-greet("Alice")
+greet("Alice")  # [2]
 #: Hello, Alice!

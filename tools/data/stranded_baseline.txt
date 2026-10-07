@@ -14,7 +14,7 @@ Chapters/01_Introduction.md	along with the CODE comments that appear from that c
 Chapters/03_Foundations--Containers.md	Entries come out as easily as they go in
 Chapters/03_Foundations--Containers.md	so changes to that CODE still show through
 Chapters/03_Foundations--Containers.md	write one slice expression for each of
-Chapters/04_Foundations--Control_Flow.md	and the outer CODE runs right after
+Chapters/04_Foundations--Control_Flow.md	and the outer CODE (CODE) runs right after
 Chapters/05_Foundations--Functions.md	Nothing checks the arguments on the way in
 Chapters/06_Foundations--Modules_and_Packages.md	That silent failure is also why CODE is an experiment to run rather than a setting to leave on
 Chapters/09_Foundations--Class_Attributes.md	The annotated field in CODE also leaves a class attribute behind
@@ -44,7 +44,6 @@ Chapters/30_Patterns--Observer.md	A responder chooses which notifications to act
 Chapters/30_Patterns--Observer.md	along with the attribute name to filter by
 Chapters/30_Patterns--Observer.md	set before CODE and cleared after
 Chapters/30_Patterns--Observer.md	so every listing asks you to decode which end you are looking at
-Chapters/30_Patterns--Observer.md	so the broadcaster keeps alive only the responders it started with
 Chapters/38_Patterns--Simulation.md	The teleports are not shortcuts but the only way through
 Chapters/41_Functional--Toolkits.md	An odd roster leaves one player over
 Chapters/41_Functional--Toolkits.md	CODE saves each element the first time through
@@ -79,6 +78,7 @@ Solutions/30_Patterns--Observer/README.md	that column and that row have moved on
 Solutions/32_Patterns--Multiple_Dispatching/README.md	CODE needs no such case because three items leave nothing over
 Solutions/34_Patterns--Composite_and_Interpreter/README.md	and it costs more than it appears to
 Solutions/34_Patterns--Composite_and_Interpreter/README.md	and not before
+Solutions/35_Patterns--Flyweight/README.md	one with CODE and one without
 Solutions/36_Patterns--Memento/README.md	while a deserializer hands the value straight in
 Solutions/43_Functional--Confidence/README.md	which leaves one student over
 Solutions/44_Effects--Effect_Management/README.md	CODE rejects negatives but lets zero through

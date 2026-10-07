@@ -48,6 +48,7 @@ for cls in materials:
 #: Aluminum: crush and bale | hazard: sharp edges
 #: Glass: sort by color, then crush | hazard: sharp edges
 #: Cardboard: flatten and bundle | hazard: none
-edited = [c for c in materials if "hazard" in c.__dict__]
+edited = [c for c in materials  # [1]
+          if "hazard" in c.__dict__]
 print(f"classes edited for one operation: {len(edited)}")
 #: classes edited for one operation: 3

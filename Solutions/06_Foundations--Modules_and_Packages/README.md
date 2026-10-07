@@ -482,7 +482,7 @@ print(plugins)
 print(plugins is plugin_list.plugins)
 #: True
 plugin_list.plugins = []
-plugin_list.plugins.append("word count")
+plugin_list.plugins.append("word count")  # [1]
 print(plugins, plugin_list.plugins)
 #: ['spell check'] ['word count']
 print(plugins is plugin_list.plugins)
@@ -496,7 +496,7 @@ item.
 
 **Replace the module's list.** The assignment `plugin_list.plugins = []` rebinds the module's
 name to a second list and leaves the script's name on the first, so
-the second `append()` changes the second list and leaves the script's
+the `append()` at `[1]` changes the second list and leaves the script's
 list as it was.
 
 `exercise_7.py` is `from_snapshot.py` with a mutable value. The

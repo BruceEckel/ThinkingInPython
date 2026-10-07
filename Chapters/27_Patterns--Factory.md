@@ -966,7 +966,7 @@ class BrokenFactory:
 g1 = GameEnvironment(KittiesAndPuzzles())
 g2 = GameEnvironment(WarriorsAndWeapons())
 # ty: expected "GameElementFactory", found "BrokenFactory":
-# GameEnvironment(BrokenFactory())
+# GameEnvironment(BrokenFactory())  # [1]
 g1.play()
 #: Kitty encounters a Puzzle
 g2.play()
@@ -978,14 +978,14 @@ A `GameElementFactory` must supply `make_character()` and `make_obstacle()`,
 a `Character` must supply `interact_with()`,
 and an `Obstacle` must supply `description()`.
 `BrokenFactory` supplies `make_character()` and omits `make_obstacle()`.
-If you uncomment the line that passes a `BrokenFactory` to `GameEnvironment`,
+If you uncomment `[1]`, which passes a `BrokenFactory` to `GameEnvironment`,
 the checker reports `protocol member make_obstacle is not defined on type BrokenFactory`.
 
 Both versions report the omission before the program runs, at different places.
 With the abstract base classes in `abstract_factory_abc.py`,
 the checker reports the line that constructs the incomplete factory.
 With the Protocol, constructing a `BrokenFactory` is legal,
-and the checker reports the line that passes it to `GameEnvironment`.
+and the checker reports `[1]`, which passes it to `GameEnvironment`.
 The two differ more at runtime.
 The abstract base class refuses to construct the factory,
 while the Protocol has no runtime guard.

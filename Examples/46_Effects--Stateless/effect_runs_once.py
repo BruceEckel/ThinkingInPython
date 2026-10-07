@@ -4,9 +4,9 @@ from stateless import run, success, supply
 
 bound = supply(Console())(greet)
 description = bound("Alice")
-run(description)
+run(description)  # [1]
 #: Hello, Alice!
-print(repr(run(description)))
+print(repr(run(description)))  # [2]
 #: None
 run(bound("Alice"))
 #: Hello, Alice!

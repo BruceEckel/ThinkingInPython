@@ -385,7 +385,7 @@ try:
 except BadNumber as e:
     for chunk in textwrap.wrap(joining_line(e), 55):
         print(" ", chunk)
-    print(type(e.__cause__).__name__,
+    print(type(e.__cause__).__name__,  # [1]
           type(e.__context__).__name__)
 #:   The above exception was the direct cause of the
 #:   following exception:
@@ -399,11 +399,11 @@ Python builds the traceback that `joining_line()` searches from
 report the same way a caught one does. `from` takes an expression, not a name
 bound by `except`.
 
-**Compare the cause with the context.** The second `print()` shows that both
-attributes hold an exception, and different ones. `__cause__` is the
-`ArithmeticError` you supplied, and `__context__` is still the
-`ValueError` Python recorded on its own when `raise` ran inside a
-handler. Python reports the cause when one exists, so the
+**Compare the cause with the context.** The second `print()` (`[1]`)
+shows that both attributes hold an exception, and different ones.
+`__cause__` is the `ArithmeticError` you supplied, and `__context__`
+is still the `ValueError` Python recorded on its own when `raise` ran
+inside a handler. Python reports the cause when one exists, so the
 context is present but invisible.
 
 `__context__` answers "what was the `except` block handling when

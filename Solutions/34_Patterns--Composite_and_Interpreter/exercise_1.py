@@ -37,5 +37,5 @@ root = Directory("root", (
 
 print(list(find(root, "main.py")))
 #: ['root/src/main.py']
-print(list(find(root, "src")))
+print(list(find(root, "src")))  # [1]
 #: ['root/src', 'root/src']

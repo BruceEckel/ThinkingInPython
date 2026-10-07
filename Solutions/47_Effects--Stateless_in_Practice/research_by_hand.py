@@ -26,7 +26,7 @@ def research_and_report(
         topic = topic_of(headline)
     except NotInteresting:
         return "nothing worth researching"
-    try:
+    try:  # [1]
         return within_limit(book.article(topic))
     except NoArticle:
         return "no article on that topic"

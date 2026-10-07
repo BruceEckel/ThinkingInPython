@@ -14,7 +14,7 @@ assert slope(10, 2) == 5.0
 # The impure one needs a reset before each check:
 total = 0
 assert running_total(5) == 5
-total = 0
-assert running_total(5) == 5
+total = 0  # [1]
+assert running_total(5) == 5  # [2]
 print("ok")
 #: ok

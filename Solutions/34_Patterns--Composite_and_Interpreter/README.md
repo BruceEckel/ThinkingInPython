@@ -88,7 +88,7 @@ root = Directory("root", (
 
 print(list(find(root, "main.py")))
 #: ['root/src/main.py']
-print(list(find(root, "src")))
+print(list(find(root, "src")))  # [1]
 #: ['root/src', 'root/src']
 ```
 
@@ -102,7 +102,7 @@ where `walk()` yields only file paths. Matching also continues
 named `"src"` and a file beneath it named `"src"` can both appear in
 the results.
 
-The second call shows a simpler duplication. `root` holds two
+The call at `[1]` shows a simpler duplication. `root` holds two
 separate directories named `"src"`, and both come back as
 `root/src`, so a path alone does not say which one matched.
 

@@ -319,7 +319,7 @@ name, age, height = person
 print(name, age, height)
 #: Alice 30 1.65
 # Now also reachable by name
-print(person.name, person.height)
+print(person.name, person.height)  # [1]
 #: Alice 1.65
 print(person[0], type(person[0]).__name__)
 #: Alice str
@@ -328,10 +328,10 @@ print(person[0], type(person[0]).__name__)
 The unpacking line stays the same, because a `namedtuple` is a tuple
 subclass. The `namedtuple` unpacks by position like any other tuple.
 
-The names add the second `print()`, where `person.height` says what
-`person[2]` means. Unpacking and `person[0]` still work beside the
-names, so a heterogeneous tuple that outlives one function is usually
-better as a `namedtuple` or a data class.
+The names add the second `print()` (`[1]`), where `person.height`
+says what `person[2]` means. Unpacking and `person[0]` still work
+beside the names, so a heterogeneous tuple that outlives one function
+is usually better as a `namedtuple` or a data class.
 
 </details>
 </details>

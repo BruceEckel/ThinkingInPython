@@ -236,6 +236,11 @@ not next to the line that produced it.
 The build verifies these markers against a real run,
 so they always match what the code prints.
 
+When the text walks through a listing line by line,
+a trailing comment such as `# [1]` tags a line,
+and the text names the line by its bracketed number.
+Tags count up from one within each listing.
+
 If you find a mistake, please send a correction.
 See `CONTRIBUTING.md` in the source repository.
 

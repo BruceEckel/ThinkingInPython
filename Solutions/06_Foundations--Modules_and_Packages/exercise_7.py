@@ -8,7 +8,7 @@ print(plugins)
 print(plugins is plugin_list.plugins)
 #: True
 plugin_list.plugins = []
-plugin_list.plugins.append("word count")
+plugin_list.plugins.append("word count")  # [1]
 print(plugins, plugin_list.plugins)
 #: ['spell check'] ['word count']
 print(plugins is plugin_list.plugins)

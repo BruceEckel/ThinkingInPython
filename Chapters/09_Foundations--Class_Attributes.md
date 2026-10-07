@@ -161,7 +161,7 @@ print(a.items, b.items)
 It reads `items`, finds nothing on `a`, falls back to the class,
 and mutates the one list stored there.
 The mutation creates no instance attribute, so `b` sees the apple too.
-The next line does assign,
+`a.items = ["pear"]` does assign,
 and that assignment creates `a.items` on the instance and shadows the class list,
 leaving `b` still reading the shared one.
 Because shadowing starts with an assignment and `.append()` makes none,
@@ -475,19 +475,19 @@ class Base:
 class Sub(Base):
     pass
 
-Base()
-Sub()
-Sub()
+Base()  # [1]
+Sub()  # [2]
+Sub()  # [3]
 print(Base.total, Sub.total)
 #: 1 3
 ```
 
 `type(self)` is `Base` for the one `Base()` call and `Sub` for both `Sub()` calls.
-`Base()` increments `Base.total` to `1`.
-The first `Sub()` reads through to that `1`, adds one,
+`Base()` (`[1]`) increments `Base.total` to `1`.
+The first `Sub()` (`[2]`) reads through to that `1`, adds one,
 and the assignment creates `Sub.total = 2` on `Sub` alone,
 the same shadowing `Right` demonstrates in `class_var_inheritance.py`.
-The second `Sub()` increments that separate copy to `3`.
+The second `Sub()` (`[3]`) increments that separate copy to `3`.
 `Base.total` stays at `1`, and the type checker reports no diagnostic.
 The augmented assignment is a valid `ClassVar[int]` update either way,
 and nothing in the annotation says which class name should receive it.

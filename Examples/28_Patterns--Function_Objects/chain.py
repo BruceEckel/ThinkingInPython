@@ -21,6 +21,6 @@ print(f"{r1:.6f}" if r1 is not None else "no root")
 # No bracket in [1.0, 1.3]: bisection fails, secant works:
 print(bisection(f, 1.0, 1.3))
 #: None
-r2 = solve(f, 1.0, 1.3, chain)
+r2 = solve(f, 1.0, 1.3, chain)  # [1]
 print(f"{r2:.6f}" if r2 is not None else "no root")
 #: 1.414214

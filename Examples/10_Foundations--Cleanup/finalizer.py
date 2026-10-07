@@ -14,9 +14,9 @@ a = Connection("A")
 #: A opened
 b = Connection("B")
 #: B opened
-a.close()
+a.close()  # [1]
 #: A closed
-a.close()
+a.close()  # [2]
 print(a.closer.alive, b.closer.alive)
 #: False True
 del b

@@ -32,16 +32,16 @@ EMPTY: Final[Library] = Library({})
 def outcome(feed: Feed, book: Encyclopedia) -> str:
     return run(supply(feed, book)(report)())
 
-print(outcome(STOCKS, SHELF))
+print(outcome(STOCKS, SHELF))  # [1]
 #: feed: fetching
 #: library: looking up stock market
 #: a history
-print(outcome(WEATHER, SHELF))
+print(outcome(WEATHER, SHELF))  # [2]
 #: feed: fetching
 #: nothing worth researching
-print(outcome(STOCKS, EMPTY))
+print(outcome(STOCKS, EMPTY))  # [3]
 #: feed: fetching
 #: library: looking up stock market
 #: no article on that topic
-print(outcome(DeadWire(), SHELF))
+print(outcome(DeadWire(), SHELF))  # [4]
 #: no headline today

@@ -4,7 +4,7 @@ from config import settings
 
 #: config body runs
 settings = {"theme": "dark"}  # noqa: F811
-print(settings)
+print(settings)  # [1]
 #: {'theme': 'dark'}
-print(config.settings)
+print(config.settings)  # [2]
 #: {}

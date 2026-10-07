@@ -18,7 +18,7 @@ print(make_user("Sue", admin=True))
 def tally(label, *values, total=False):
     print(label, values, total)
 
-tally("nums", 1, 2, True)
+tally("nums", 1, 2, True)  # [1]
 #: nums (1, 2, True) False
 tally("nums", 1, 2, total=True)
 #: nums (1, 2) True

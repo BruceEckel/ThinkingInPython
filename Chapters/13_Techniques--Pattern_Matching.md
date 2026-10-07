@@ -173,7 +173,7 @@ def summarize(items: list[int]) -> str:
             return f"Two items: {first}, {second}"
         case [first, *rest]:
             return f"{first}, then {len(rest)} more"
-        case _:
+        case _:  # [1]
             return "Unreachable"
 
 def last_of(items: list[int]) -> tuple[list[int], int]:
@@ -198,7 +198,7 @@ print(last_of([1, 2, 3, 4]))
 `summarize()` shows the structural part of "structural pattern matching."
 The pattern `[first, second]` matches only a two-element sequence and pulls both out at once.
 
-The last `case _` is unreachable.
+The `case _` at `[1]` is unreachable.
 `[first, *rest]` catches every nonempty list and `[]` the empty one.
 The type checker cannot prove that,
 so the wildcard stays to satisfy the declared return type.
@@ -578,9 +578,9 @@ from point import Point
 
 def survey(points: list[Point]) -> str:
     match points:
-        case [Point(0, 0) as start, *rest]:
+        case [Point(0, 0) as start, *rest]:  # [1]
             return f"{start} then {len(rest)} more"
-        case [Point(0, n) | Point(n, 0)]:
+        case [Point(0, n) | Point(n, 0)]:  # [2]
             return f"one axis point, offset {n}"
         case [Point(), Point()]:
             return "two points"
@@ -597,13 +597,13 @@ print(survey([Point(1, 2), Point(3, 4)]))
 #: two points
 ```
 
-The first case is a sequence pattern holding a class pattern holding two literals,
+The case at `[1]` is a sequence pattern holding a class pattern holding two literals,
 with a starred capture beside the class pattern.
 `as` binds whatever its sub-pattern matched,
 so `start` is the whole `Point` while `0, 0` checks its fields.
 Without `as` you must choose between testing the shape and keeping the object.
 
-The second case alternates two class patterns and binds `n` from either,
+The case at `[2]` alternates two class patterns and binds `n` from either,
 inside a one-element sequence pattern.
 `survey([Point(0, 5)])` matches, but a list of two points does not.
 The compiler enforces the [same-names rule](#alternatives-and-capture).

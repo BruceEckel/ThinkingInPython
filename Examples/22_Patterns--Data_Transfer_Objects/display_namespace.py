@@ -2,7 +2,7 @@
 from types import SimpleNamespace
 
 m = SimpleNamespace(info="Spam", tags=["urgent", "todo"])
-print(vars(m))
+print(vars(m))  # [1]
 #: {'info': 'Spam', 'tags': ['urgent', 'todo']}
 m.more = 11
 print(m)

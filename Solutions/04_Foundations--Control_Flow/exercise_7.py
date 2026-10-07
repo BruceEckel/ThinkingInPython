@@ -25,7 +25,7 @@ try:
 except BadNumber as e:
     for chunk in textwrap.wrap(joining_line(e), 55):
         print(" ", chunk)
-    print(type(e.__cause__).__name__,
+    print(type(e.__cause__).__name__,  # [1]
           type(e.__context__).__name__)
 #:   The above exception was the direct cause of the
 #:   following exception:

@@ -35,7 +35,7 @@ row(f) = the Effects f performs directly
        - the Effects f handles
 ```
 
-The second line makes the rule recursive,
+The `row(g)` line makes the rule recursive,
 and that recursion is the propagation [Effect Management](44_Effects--Effect_Management.md#native-effect-management)
 describes.
 

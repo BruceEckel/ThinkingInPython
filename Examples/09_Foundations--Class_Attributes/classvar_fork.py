@@ -10,8 +10,8 @@ class Base:
 class Sub(Base):
     pass
 
-Base()
-Sub()
-Sub()
+Base()  # [1]
+Sub()  # [2]
+Sub()  # [3]
 print(Base.total, Sub.total)
 #: 1 3

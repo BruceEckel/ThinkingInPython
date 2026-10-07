@@ -461,9 +461,9 @@ from stateless import run, success, supply
 
 bound = supply(Console())(greet)
 description = bound("Alice")
-run(description)
+run(description)  # [1]
 #: Hello, Alice!
-print(repr(run(description)))
+print(repr(run(description)))  # [2]
 #: None
 run(bound("Alice"))
 #: Hello, Alice!
@@ -472,8 +472,9 @@ print(run(constant), run(constant))
 #: 42 42
 ```
 
-The first run exhausted the generator,
-so the second `run()` of the same object gets an immediate `StopIteration` whose value is `None`.
+The `run()` at `[1]` exhausts the generator, so `[2]`,
+the second `run()` of the same object,
+gets an immediate `StopIteration` whose value is `None`.
 The function does not resume, so it greets nobody and produces `None`.
 Calling `bound("Alice")` again builds a fresh description, and that one runs.
 An Effect from `success()` can run more than once,
@@ -1109,10 +1110,10 @@ def greet(name: str) -> None:
     console: Console = get(Console)
     console.print(f"Hello, {name}!")
 
-expect(NotRegistered, greet, "Alice")
+expect(NotRegistered, greet, "Alice")  # [1]
 #: [NotRegistered] Console
 register(Console, Console())
-greet("Alice")
+greet("Alice")  # [2]
 #: Hello, Alice!
 ```
 
@@ -1141,8 +1142,8 @@ apart from `console: Console = get(Console)` in place of `console = yield from n
 Its signature matches the `untyped_greet.py` version in [Declaring a Dependency](#declaring-a-dependency).
 Both read `(str) -> None`, and neither names the `Console` it uses.
 
-The first `greet("Alice")` fails at runtime because nothing has registered a `Console` yet.
-The second succeeds because the binding now exists.
+The `greet("Alice")` call at `[1]` fails at runtime because nothing has registered a `Console` yet.
+The second, at `[2]`, succeeds because the binding now exists.
 The two calls are identical, and the types say nothing about registration,
 so the type checker accepts both.
 

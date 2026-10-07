@@ -86,11 +86,11 @@ for _ in range(3):
 #: a slow query
 #: a slow query
 #: a slow query
-print(p.query())
+print(p.query())  # [1]
 #: 3 answered before build
 #: Expensive built
 #: result
-print(p.query())
+print(p.query())  # [2]
 #: result
 ```
 
@@ -98,10 +98,10 @@ print(p.query())
 calling `__getattr__()`, and the three reads build nothing. Each one
 increments `_answered`.
 
-**Build the real object on demand.** The first `query()` is the first name the proxy
-lacks, so `__getattr__()` runs, reports the count, and builds the real
-object. The second `query()` finds `_real` set and forwards without
-reporting or building.
+**Build the real object on demand.** The first `query()` (`[1]`) is
+the first name the proxy lacks, so `__getattr__()` runs, reports the
+count, and builds the real object. The second `query()` (`[2]`) finds
+`_real` set and forwards without reporting or building.
 
 The counter records how much work the proxy saved: three
 requests served from a string the proxy held from the start, with the

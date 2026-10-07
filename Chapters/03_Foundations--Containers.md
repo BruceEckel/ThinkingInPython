@@ -148,21 +148,22 @@ so a grid built that way has one row under three names:
 ```python
 # list_traps.py
 
-grid = [[0]] * 3  # Three names for one inner list
+grid = [[0]] * 3  # Three names for one inner list  # [1]
 grid[0][0] = 1
 print(grid)
 #: [[1], [1], [1]]
+# [2]
 grid = [[0] for _ in range(3)]  # Three separate lists
 grid[0][0] = 1
 print(grid)
 #: [[1], [0], [0]]
 ```
 
-The grid is [Variables and References](02_Foundations--Tour.md#variables-and-references)
+The grid at `[1]` is [Variables and References](02_Foundations--Tour.md#variables-and-references)
 again.
 `*` binds the same object into every slot, and assignment never copies.
 
-The second `grid` comes from a *comprehension*:
+The second `grid` (`[2]`) comes from a *comprehension*:
 a single expression that produces a new list,
 in place of a loop with `append()`.
 The comprehension evaluates `[0]` three times,

@@ -29,7 +29,7 @@ def describe(
         return f"{text}: Not a number"
     if isinstance(result.error, ZeroDivisionError):
         return f"{text}: Cannot divide by zero"
-    return f"{text}: {type(result.error).__name__}"
+    return f"{text}: {type(result.error).__name__}"  # [1]
 
 for sample in ("4", "0", "OOPS"):
     print(describe(sample, compute(sample)))

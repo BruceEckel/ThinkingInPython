@@ -19,7 +19,7 @@ if __name__ == "__main__":
     p1, p2 = Point(3, 0), Point(0, 4)
     print(p1.distance_to(p2))
     # The method, as a function
-    print(Point.distance_to(p1, p2))
+    print(Point.distance_to(p1, p2))  # [1]
     print(distance(p1, p2))
 #: 5.0
 #: 5.0

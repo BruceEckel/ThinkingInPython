@@ -34,5 +34,5 @@ missing = outcome(Bulletin("genome mapped"), BareShelf())
 print(type(missing).__name__)
 #: NoArticle
 long = outcome(Bulletin("genome mapped"), LongShelf())
-print(type(long).__name__)
+print(type(long).__name__)  # [1]
 #: TooLong

@@ -478,7 +478,7 @@ print(f"{r1:.6f}" if r1 is not None else "no root")
 # No bracket in [1.0, 1.3]: bisection fails, secant works:
 print(bisection(f, 1.0, 1.3))
 #: None
-r2 = solve(f, 1.0, 1.3, chain)
+r2 = solve(f, 1.0, 1.3, chain)  # [1]
 print(f"{r2:.6f}" if r2 is not None else "no root")
 #: 1.414214
 ```
@@ -489,7 +489,7 @@ This `solve()` reuses the name from `algorithms.py` with the opposite failure co
 An exhausted chain returns `None` rather than raising an exception,
 and the caller decides what an empty result means.
 
-The second `solve()` call shows the fall-through.
+The second `solve()` call (`[1]`) shows the fall-through.
 Because the interval `[1.0, 1.3]` does not straddle the root,
 bisection fails by returning `None`.
 The loop continues to a method that needs no bracket.

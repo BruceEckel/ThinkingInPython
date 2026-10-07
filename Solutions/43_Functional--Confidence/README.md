@@ -677,7 +677,7 @@ def describe(
         return f"{text}: Not a number"
     if isinstance(result.error, ZeroDivisionError):
         return f"{text}: Cannot divide by zero"
-    return f"{text}: {type(result.error).__name__}"
+    return f"{text}: {type(result.error).__name__}"  # [1]
 
 for sample in ("4", "0", "OOPS"):
     print(describe(sample, compute(sample)))
@@ -688,14 +688,14 @@ for sample in ("4", "0", "OOPS"):
 
 The two versions produce identical output. Counting lines favors the
 `isinstance()` version by two. It needs no `match result:` line, and
-its final `return` replaces a `case` line and its body.
+its final `return` (`[1]`) replaces a `case` line and its body.
 
 Length is not what separates the two versions. The `match` reads as
 one description of four shapes while the `isinstance()` version reads
 as four separate questions. The difference shows in what each version
 repeats. `result.error` appears three times in `describe_isinstance.py`
 and nowhere in the `match`, because each `case` matches on the error
-instead of reading it back off `result`. The final `return` is also
+instead of reading it back off `result`. The `return` at `[1]` is also
 weaker than the `match`'s `case Err(error)`. It is a fallthrough that
 happens to be correct rather than a branch stating what it matches, so
 a reader must deduce that `result` is an `Err` by ruling out the `Ok`

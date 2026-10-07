@@ -6,5 +6,5 @@ batches = batched(squares, 3)
 totals = (sum(b) for b in batches)
 print(list(takewhile(lambda t: t < 500, totals)))
 #: [14, 77, 194, 365]
-print(list(islice(squares, 3)))
+print(list(islice(squares, 3)))  # [1]
 #: [256, 289, 324]

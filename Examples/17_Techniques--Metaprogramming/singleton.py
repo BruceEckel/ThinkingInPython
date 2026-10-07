@@ -23,7 +23,7 @@ class BSingleton(metaclass=Singleton):
 
 a = ASingleton()
 #: building ASingleton
-b = ASingleton()
+b = ASingleton()  # [1]
 #: reusing ASingleton
 assert a is b
 

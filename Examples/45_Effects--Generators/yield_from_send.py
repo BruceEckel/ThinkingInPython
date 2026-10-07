@@ -2,13 +2,13 @@
 from collections.abc import Generator
 
 def collect(name: str) -> Generator[str, int]:
-    first = yield f"{name} needs a value"
+    first = yield f"{name} needs a value"  # [1]
     second = yield f"{name} needs another"
     print(f"{name} got {first} and {second}")
 
 def both() -> Generator[str, int]:
-    yield from collect("alpha")
-    yield from collect("beta")
+    yield from collect("alpha")  # [2]
+    yield from collect("beta")  # [3]
 
 g = both()
 print(next(g))

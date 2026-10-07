@@ -19,5 +19,5 @@ def label(n: int) -> str:
 increment_then_double = compose(double, increment)
 print(increment_then_double(10))
 #: 22
-print(compose(label, increment_then_double)(10))
+print(compose(label, increment_then_double)(10))  # [1]
 #: <22>

@@ -13,10 +13,10 @@ class Sub(Base):
 Base()
 print(vars(Sub).get("total"))
 #: None
-Sub()
+Sub()  # [1]
 print(vars(Sub).get("total"))
 #: 2
-Sub()
+Sub()  # [2]
 print(vars(Sub).get("total"))
 #: 3
 print(Base.total, Sub.total)

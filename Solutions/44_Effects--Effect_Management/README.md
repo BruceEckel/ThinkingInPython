@@ -530,7 +530,7 @@ print(total_price(basket))
 print(asyncio.run(total_price_async(basket)))
 #: 3.5
 description = price_of_async("apple")
-print(type(description).__name__)
+print(type(description).__name__)  # [1]
 #: coroutine
 description.close()  # Never awaited, so close it explicitly
 ```
@@ -539,7 +539,7 @@ Making the helper `async` forces four changes, and you must make
 all four.
 
 **Await the helper from a coroutine.** `price_of_async("apple")` now returns a coroutine instead of
-a `float`, as the last `print()` shows, so `total_price()` cannot sum
+a `float`, as `[1]` shows, so `total_price()` cannot sum
 the results until each call has an `await`. Only an `async def` may
 contain `await`, so `total_price()` becomes `total_price_async()`.
 

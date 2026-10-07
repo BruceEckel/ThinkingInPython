@@ -192,7 +192,7 @@ def describe(value: object) -> str:
     # return value.upper()
     if isinstance(value, str):
         return value.upper()
-    return repr(value)
+    return repr(value)  # [1]
 
 print(describe("hi"))
 #: HI
@@ -201,7 +201,7 @@ print(describe(42))
 ```
 
 Inside the `if`, `value` is a `str`, so `upper()` checks.
-`repr()` accepts every object, so the last line needs no test.
+`repr()` accepts every object, so the `return` at `[1]` needs no test.
 With `Any` in place of `object`, the commented-out line checks too,
 and `describe(42)` then fails at runtime with an `AttributeError`.
 

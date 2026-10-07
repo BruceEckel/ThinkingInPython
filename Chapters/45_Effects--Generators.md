@@ -385,13 +385,13 @@ A generator that receives values and returns `None` can leave the `ReturnType` a
 from collections.abc import Generator
 
 def collect(name: str) -> Generator[str, int]:
-    first = yield f"{name} needs a value"
+    first = yield f"{name} needs a value"  # [1]
     second = yield f"{name} needs another"
     print(f"{name} got {first} and {second}")
 
 def both() -> Generator[str, int]:
-    yield from collect("alpha")
-    yield from collect("beta")
+    yield from collect("alpha")  # [2]
+    yield from collect("beta")  # [3]
 
 g = both()
 print(next(g))
@@ -418,14 +418,14 @@ so the annotation shortens to `Generator[str, int]`.
 because `yield from` passes the inner generator's yield and send channels through to the driver.
 
 `yield from` delivers each number to the `yield` that produced the prompt.
-The value from `g.send(1)` becomes the result of the first `yield` inside `collect("alpha")`,
+The value from `g.send(1)` becomes the result of the `yield` at `[1]` inside `collect("alpha")`,
 two frames below the driver.
 `both()` needs no forwarding code of its own,
 because `yield from` does the forwarding.
 
 `g.send(2)` supplies alpha's second value, so `collect("alpha")` finishes.
-That finish completes the first `yield from`,
-so `both()` starts the second `yield from`.
+That finish completes the `yield from` at `[2]`,
+so `both()` starts the `yield from` at `[3]`.
 A single `send()` therefore ends one inner generator and produces the first prompt of the next.
 The driver sees `StopIteration` only when `both()` finishes its last delegation.
 

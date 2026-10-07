@@ -36,8 +36,8 @@ settings: dict[str, str] = {}
 
 ```python
 # module_singleton.py
-import config
-import config as again
+import config  # [1]
+import config as again  # [2]
 
 #: config body runs
 print(config is again, config.settings is again.settings)
@@ -45,8 +45,9 @@ print(config is again, config.settings is again.settings)
 ```
 
 Two `import` statements, but `config body runs` prints once.
-The first `import` runs `config.py` top to bottom and files the resulting module object in `sys.modules` under the name `config`.
-The second finds it there and skips the work,
+The first `import` (`[1]`)
+runs `config.py` top to bottom and files the resulting module object in `sys.modules` under the name `config`.
+The second (`[2]`) finds it there and skips the work,
 so the body runs once and builds one `settings` dict.
 That is the singleton: not a rule a class enforces,
 but a lookup the import system performs.
@@ -370,9 +371,9 @@ _instance: Settings | None = None
 
 def settings() -> Settings:
     global _instance
-    if _instance is None:
+    if _instance is None:  # [1]
         with _lock:
-            if _instance is None:
+            if _instance is None:  # [2]
                 _instance = Settings()
     return _instance
 
@@ -382,8 +383,8 @@ print(len({id(s) for s in built}))
 #: 1
 ```
 
-The inner test is the one note 3 requires.
-The outer test exists to skip the lock once the object is there.
+The inner test (`[2]`) is the one note 3 requires.
+The outer test (`[1]`) exists to skip the lock once the object is there.
 Double-checked locking works, but it depends on two details.
 If you drop the inner test,
 every thread that passed the outer test before the first assignment builds its own object,

@@ -833,7 +833,7 @@ type checker names one of them. `report()` needs three more.
 6. The `found:` annotation, widened to include `TooLong`.
 7. A new `case TooLong():` branch in `report()`'s `match`.
 
-**Widen the signature to match.** Adding line 3 without line 4 is the one `ty` reports, as an `invalid-yield` at the
+**Widen the signature to match.** Adding edit 3 without edit 4 is the one `ty` reports, as an `invalid-yield` at the
 new line rather than at the signature: `expression of type 'TooLong', expected 'Need[Feed] |
 Need[Encyclopedia] | Unavailable | NotInteresting | NoArticle'`.
 Widening the signature then breaks every caller that names the old set. `report()` stops at
@@ -875,7 +875,7 @@ def research_and_report(
         topic = topic_of(headline)
     except NotInteresting:
         return "nothing worth researching"
-    try:
+    try:  # [1]
         return within_limit(book.article(topic))
     except NoArticle:
         return "no article on that topic"
@@ -894,7 +894,7 @@ In the Effect version, the type checker tells you where to go.
 It flags the undeclared failure at the delegation that introduces it,
 then the widened union at every caller that claims to handle everything.
 In the by-hand version nothing tells you anything.
-Adding `except TooLong` to the third `try` is a choice you make by reading the
+Adding `except TooLong` to the `try` at `[1]` is a choice you make by reading the
 code. If you forget it, a `TooLong` escapes `research_and_report()`, whose
 signature still says it returns a `str` no matter what.
 Both versions run. Only one of them has a tool that knows the set of failures
@@ -1524,7 +1524,7 @@ missing = outcome(Bulletin("genome mapped"), BareShelf())
 print(type(missing).__name__)
 #: NoArticle
 long = outcome(Bulletin("genome mapped"), LongShelf())
-print(type(long).__name__)
+print(type(long).__name__)  # [1]
 #: TooLong
 ```
 
@@ -1535,7 +1535,7 @@ and the declared
 `str | Unavailable | NotInteresting | NoArticle` no longer covers it.
 `ty` reports an `invalid-return-type` on the `return run(...)` line, naming
 `TooLong` as the member that does not fit. Adding `| TooLong` to the annotation
-fixes it, and the third `print()` above exercises the new branch.
+fixes it, and the `print()` at `[1]` exercises the new branch.
 
 Removing `outcome()`'s return annotation makes the error disappear, and that is
 the interesting half. `ty` infers no return type from the body.

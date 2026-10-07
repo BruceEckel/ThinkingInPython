@@ -480,17 +480,19 @@ def jit_state() -> str:
         return "JIT built in, switched off"
     return "JIT enabled"
 
+# [1]
 print(sys._jit.is_available() or not sys._jit.is_enabled())
 #: True
-print(jit_state())
+print(jit_state())  # [2]
 ```
 
 `is_enabled()` implies `is_available()`,
 so testing `is_available()` first and `is_enabled()` second names a build's three possible states.
-The first `print()` tests that implication, and it shows `True` on every build.
+The `print()` at `[1]` tests that implication,
+and it shows `True` on every build.
 
 Most listings in this book print the same line on every machine.
-The second `print()` here changes with your interpreter,
+The `print()` at `[2]` changes with your interpreter,
 so it carries no `#:` line.
 The book's build has no JIT compiled in,
 so `tip jit_status` reports the first state:

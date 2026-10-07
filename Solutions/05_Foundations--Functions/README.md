@@ -489,9 +489,9 @@ def writes_global():
     count += 1  # type: ignore  # noqa: F823, F841
 
 def rebinds():
-    print(count)  # type: ignore  # noqa: F823
+    print(count)  # type: ignore  # noqa: F823  # [1]
     count = 99
-    print(count)
+    print(count)  # [2]
 
 expect(UnboundLocalError, writes_global)
 #: [UnboundLocalError] cannot access local variable 'count'
@@ -511,9 +511,9 @@ has no value yet.
 **Assign after the read.** `rebinds()` fails for the same reason
 although its `print()` comes first in time. Python decides which names
 are local when it compiles the function body, so the `count = 99`
-below the `print()` makes `count` local throughout. The first `print()`
-therefore reads the unassigned local, not the module-level name,
-and the second `print()` does not run.
+below the `print()` makes `count` local throughout. The `print()` at
+`[1]` therefore reads the unassigned local, not the module-level name,
+and the `print()` at `[2]` does not run.
 
 **Mark the deliberate mistakes.** Both mistakes
 are visible before the code runs. The type checker and the linter
