@@ -1760,6 +1760,16 @@ The load-time form also costs three things that `Broadcaster` does not:
   A test that decorates a responder leaves it registered for every test that runs after it,
   unless the test removes it from `RESPONDERS`.
 
+The first of those costs, the shared registry, comes from where the list lives rather than from the decorator.
+[Generating the Broadcaster](../../Chapters/30_Patterns--Observer.md#generating-the-broadcaster) keeps registration by decorator and moves the list onto each instance.
+`Broadcasting` is a base class whose `respond()` method is a decorator,
+so `@thermometer.respond` appends a function to that thermometer's own list and returns the function unchanged.
+In that form, `room` and `oven` each announce to their own responders.
+A test creates its own thermometer and registers against it,
+so the shared-registry cost in tests goes away too.
+The import cost stays: a responder registers when Python runs its `def`,
+so a responder in a module nothing imports still registers nothing.
+
 </details>
 </details>
 </details>

@@ -322,6 +322,8 @@ but [a `dataclass`-generated `__init__()` does not call the base class's `__init
 A `@dataclass` `Thermometer` would have no list of responders.
 A `__post_init__()` that calls `super().__init__()` fixes that,
 but at greater length and complexity than the `__init__()` it replaces.
+[Generating the Broadcaster](#generating-the-broadcaster)
+gets a generated `__init__()` and the list another way.
 
 `Thermometer` inherits `Broadcaster` because that is the shortest way to get `connect()` and `announce()`,
 not because the pattern requires a base class.
@@ -859,6 +861,147 @@ in three ways:
     The same misspelling on a `Thermometer` produces an `unresolved-attribute` error.
     `Thermometer` defines no `__setattr__()`,
     so the type checker checks each assignment against the attributes the class declares.
+
+### Generating the Broadcaster
+
+`thermometer.py` inherits its list of responders and writes a getter and a setter by hand for the one attribute it announces.
+`Watched` drops the property pair but announces every attribute,
+and gives up the type checker's attribute checking in return.
+A third form generates the property pair from a bare annotation,
+so the class body declares the attribute it publishes and a base class supplies the rest:
+
+```python
+# broadcasting.py
+from collections.abc import Callable
+from dataclasses import dataclass, fields
+from typing import Any, dataclass_transform
+
+type Responder[T] = Callable[[T], None]
+
+def announcing(name: str) -> property:
+    def read(self: Any) -> Any:
+        return self.__dict__[name]
+
+    def write(self: Any, value: Any) -> None:
+        self.__dict__[name] = value
+        self.announce(value)
+
+    return property(read, write)
+
+@dataclass_transform(eq_default=False)
+class Broadcasting[T]:
+    def __init_subclass__(cls) -> None:
+        built = dataclass(eq=False)(cls)
+        for field in fields(built):
+            setattr(cls, field.name, announcing(field.name))
+
+    def responders(self) -> list[Responder[T]]:
+        return self.__dict__.setdefault("_responders", [])
+
+    def respond(self, fn: Responder[T]) -> Responder[T]:
+        self.responders().append(fn)
+        return fn
+
+    def announce(self, data: T) -> None:
+        for responder in list(self.responders()):
+            responder(data)
+```
+
+`Broadcasting` does its work when Python creates a subclass.
+Python calls `__init_subclass__()` for every new subclass
+([Self-Registration of Subclasses](17_Techniques--Metaprogramming.md#self-registration-of-subclasses)),
+and this one has two jobs.
+First it passes the subclass to `dataclass()`,
+which reads the bare annotations and generates `__init__()` and `__repr__()`.
+Then it replaces each field with a property from `announcing()`,
+whose setter stores the value and calls `announce()`.
+The getter and setter are the pair `thermometer.py` writes by hand,
+built once per field.
+`announcing()` knows the field by name alone,
+so its two closures read and write `self.__dict__[name]` and are typed `Any`;
+the type checker types the attribute from the subclass's annotation instead.
+The closures go through `__dict__` because the class attribute of that name is now the property.
+
+`@dataclass_transform` on the base class tells the type checker that every subclass is dataclass-like
+([`@dataclass_transform` Is a Claim](17_Techniques--Metaprogramming.md#dataclass-transform)),
+so the checker synthesizes the same `__init__()` that `dataclass()` builds at runtime.
+`eq=False` keeps identity equality:
+two thermometers at the same reading are different subjects.
+It also leaves the instances hashable,
+so a thermometer can be a `set` member or a dictionary key,
+and `eq_default=False` makes the same claim to the checker.
+`fields()` needs a dataclass type,
+which is why `__init_subclass__()` binds the result of `dataclass()` and passes that.
+`cls` is the class as declared, and the type checker rejects `fields(cls)`.
+
+[The Pythonic *Observer*](#the-pythonic-observer)
+notes that a `dataclass`-generated `__init__()` skips the base class's `__init__()`.
+`Broadcasting` has no `__init__()` to skip.
+`responders()` creates the list on first use,
+through `setdefault()` on the instance `__dict__`.
+The generated `__init__()` writes `self.celsius = celsius` through the property,
+which calls `announce()` on an empty list, so construction announces to no one,
+as in `thermometer.py`.
+
+A subclass declares its field, and each responder registers with a decorator:
+
+```python
+# broadcasting_demo.py
+from broadcasting import Broadcasting
+
+class Thermometer(Broadcasting[float]):
+    celsius: float
+
+thermometer = Thermometer(100)
+
+@thermometer.respond
+def report(celsius: float) -> None:
+    print(f"report: {celsius}C")
+
+@thermometer.respond
+def alarm(celsius: float) -> None:
+    print("alarm!" if celsius > 100 else "ok")
+
+thermometer.celsius = 90
+#: report: 90C
+#: ok
+thermometer.celsius = 150
+#: report: 150C
+#: alarm!
+```
+
+`respond()` is a decorator method.
+It appends the function to the thermometer's own list and returns the function unchanged,
+so `report` stays callable by name,
+the shape of `register()` in [Decorating Classes](14_Techniques--Decorators.md#decorating-classes)
+and of exercise 11's `@responds`.
+The difference from exercise 11 is the owner of the list.
+Each thermometer keeps its own responders,
+so a second `Thermometer` has an empty list until something responds to it,
+and the registry stays out of module scope.
+
+A `@broadcasting` class decorator could do everything `__init_subclass__()` does and attach `respond()` to the class as well,
+and the program would run.
+The type checker, though, sees the class as its body declares it,
+so every `@thermometer.respond` would draw an `unresolved-attribute`.
+A method the checker must see comes from a base class,
+and once the base class exists, `__init_subclass__()` does the decorator's work.
+
+`Broadcasting` could also announce from a `__setattr__()`, as `Watched` does,
+and skip the properties.
+It would then inherit `Watched`'s third cost:
+a class with `__setattr__()` accepts any name,
+so the checker passes `thermometer.celcius = 90`.
+With the generated properties the class declares `celsius` alone,
+and the checker reports the misspelling as an `unresolved-attribute`.
+It also rejects a responder that takes a `str`,
+a responder that returns a value, and `Thermometer("hot")`,
+each as an `invalid-argument-type`.
+
+`Broadcasting` has one type parameter, so a subclass publishes one value.
+A class that declares `celsius` and `humidity` would send both readings to the same responders with no name attached.
+A class with several published attributes uses `Watched`'s name-and-value signature,
+or gives each attribute its own responders with the descriptor in exercise 10.
 
 ## Observer and I/O
 
@@ -1449,6 +1592,7 @@ and the broadcaster holds responders and calls each one when its state changes.
 The point at which the broadcaster receives its responders varies.
 All four scenarios connect their responders at runtime,
 `BoundBroadcaster` takes its responders at construction,
+`Broadcasting` collects each instance's responders as Python runs their decorated `def` statements,
 and exercise 11's registry collects them as Python imports a module.
 The pattern requires no interface, no `update()` method, no class per responder,
 and no `disconnect()`.
