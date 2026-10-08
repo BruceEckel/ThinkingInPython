@@ -23,7 +23,7 @@ CW = 10.2  # Width of one character at the comprehension's 17
 TITLE = ("The list comprehension [e ** 2 for e in a_list if "
          "isinstance(e, int)] with its parts numbered by the order Python "
          "evaluates them, a_list first, then for each element the variable, "
-         "the predicate, and last the output expression, and a table that "
+         "the filter, and last the output expression, and a table that "
          "runs a_list = [1, \"4\", 9, \"a\", 0, 4] through those steps to "
          "give [1, 81, 0, 16]")
 
@@ -67,14 +67,14 @@ def comprehension() -> str:
     b += arrow((list_x, 28), (list_x, top), MUTED, "lc-muted")
     b += arrow((e_x, bottom + 26), (e_x, bottom), MUTED, "lc-muted")
     b += step(e_x, bottom + 42, 2, "Variable")
-    # A bracket under the whole predicate.
+    # A bracket under the whole filter.
     b += line((C_X + 4, bottom + 6), (C_X + 4, bottom + 11), MUTED, 1.2)
     b += line((C_X + C_W - 4, bottom + 6), (C_X + C_W - 4, bottom + 11),
               MUTED, 1.2)
     b += line((C_X + 4, bottom + 11), (C_X + C_W - 4, bottom + 11), MUTED,
               1.2)
     b += line((c_x, bottom + 11), (c_x, bottom + 26), MUTED, 1.2)
-    b += step(c_x, bottom + 42, 3, "Optional Predicate")
+    b += step(c_x, bottom + 42, 3, "Optional Filter")
     return b
 
 
@@ -104,7 +104,7 @@ def trace() -> str:
                   stroke=INK, width=1.1)
         b += text(col_x(i), ROW1_Y, v, 13, INK, "middle")
     b += text(LABEL_X, 230, "then per element, left to right:", 11, MUTED)
-    # The strings fail the predicate; their columns stop at step 3.
+    # The strings fail the filter; their columns stop at step 3.
     for i, ok in enumerate(IS_INT):
         if not ok:
             b += region(COL_X + COL_W * i + 6, 240, COL_W - 12, 96,

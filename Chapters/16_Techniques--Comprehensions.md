@@ -22,8 +22,8 @@ A list comprehension consists of:
 
 -   An input sequence.
 -   A variable representing members of the input sequence.
--   An optional predicate expression.
--   An output expression that builds one element of the output list from each member that satisfies the predicate.
+-   An optional filter expression.
+-   An output expression that builds one element of the output list from each member that passes the filter.
 
 The first examples take their input from a list that mixes integers and strings:
 
@@ -47,7 +47,7 @@ print(squared_ints)
 ![The parts of a list comprehension, numbered in the order Python evaluates them](_images/listComprehensions)
 
 -   The iterator walks through each member `e` of the input sequence `a_list`.
--   The predicate checks if the member is an integer.
+-   The filter checks whether the member is an integer.
 -   If the member is an integer,
     the output expression squares it and the result joins the output list.
 
@@ -317,7 +317,7 @@ as the `for row in matrix:` loop in `identity_matrix.py` does,
 the first clause iterates over that stale `row`,
 and the comprehension produces a wrong list with no exception.
 
-## Feeding the Iterator Clause
+## Supplying the Input Sequence
 
 Everything to the right of `in` is an ordinary iterable expression,
 so anything that produces one works there.
@@ -747,9 +747,9 @@ give a hint, usually the shape of the code, and a full answer for each exercise.
 1.  Using `a_list` from `a_list.py` (`[1, "4", 9, "a", 0, 4]`),
     write a list comprehension that finds the string elements made only of digits
     (`e.isdigit()`), converts each to `int` with `int(e)`, and squares it.
-    The predicate must reject `"a"` before `int()` sees it.
+    The filter must reject `"a"` before `int()` sees it.
     Of the types in `a_list`, only `str` has `isdigit()`,
-    so the predicate must test `isinstance(e, str)` before calling it.
+    so the filter must test `isinstance(e, str)` before calling it.
 2.  In `identity_matrix.py`,
     change the comprehension to put `2` on the diagonal instead of `1`,
     without adding a second pass over the result.

@@ -5,9 +5,9 @@
 > Using `a_list` from `a_list.py` (`[1, "4", 9, "a", 0, 4]`),
 > write a list comprehension that finds the string elements made only of digits
 > (`e.isdigit()`), converts each to `int` with `int(e)`, and squares it.
-> The predicate must reject `"a"` before `int()` sees it.
+> The filter must reject `"a"` before `int()` sees it.
 > Of the types in `a_list`, only `str` has `isdigit()`,
-> so the predicate must test `isinstance(e, str)` before calling it.
+> so the filter must test `isinstance(e, str)` before calling it.
 
 <details>
 <summary>Where to look</summary>

@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 388"
      font-family="'JetBrains Mono', Consolas, monospace">
-  <title>The list comprehension [e ** 2 for e in a_list if isinstance(e, int)] with its parts numbered by the order Python evaluates them, a_list first, then for each element the variable, the predicate, and last the output expression, and a table that runs a_list = [1, "4", 9, "a", 0, 4] through those steps to give [1, 81, 0, 16]</title>
+  <title>The list comprehension [e ** 2 for e in a_list if isinstance(e, int)] with its parts numbered by the order Python evaluates them, a_list first, then for each element the variable, the filter, and last the output expression, and a table that runs a_list = [1, "4", 9, "a", 0, 4] through those steps to give [1, 81, 0, 16]</title>
   <defs>
     <marker id="lc-muted" viewBox="0 0 18 12" refX="5" refY="6"
             markerWidth="18" markerHeight="12" orient="auto" markerUnits="userSpaceOnUse">
@@ -28,8 +28,8 @@
   <line x1="658" y1="112" x2="658" y2="117" stroke="#7a6e62" stroke-width="1.2"/>
   <line x1="376" y1="117" x2="658" y2="117" stroke="#7a6e62" stroke-width="1.2"/>
   <line x1="517" y1="117" x2="517" y2="132" stroke="#7a6e62" stroke-width="1.2"/>
-  <text x="443.2" y="150" font-size="18" fill="#8b1a1a" font-weight="bold" text-anchor="start">3</text>
-  <text x="461.2" y="148" font-size="12" fill="#1a1612" font-weight="bold" text-anchor="start">Optional Predicate</text>
+  <text x="454" y="150" font-size="18" fill="#8b1a1a" font-weight="bold" text-anchor="start">3</text>
+  <text x="472" y="148" font-size="12" fill="#1a1612" font-weight="bold" text-anchor="start">Optional Filter</text>
   <line x1="24" y1="160" x2="696" y2="160" stroke="#c8bfb0" stroke-width="0.8"/>
   <text x="24" y="198" font-size="18" fill="#8b1a1a" font-weight="bold" text-anchor="start">1</text>
   <text x="42" y="196" font-size="12" fill="#1a1612" text-anchor="start">a_list, once</text>
