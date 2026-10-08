@@ -42,6 +42,7 @@ shows how `print()` and `str()` reach a class's `__str__()`.
 
 The `if` exists because you can also use any file as a library module within another program.
 In that case, you want its definitions and none of the code at the bottom of the file.
+Python programmers call this check the *main guard*.
 The condition is true only when you run this file as a script.
 That is, `__name__` is `"__main__"` when you use the command line:
 
@@ -184,7 +185,8 @@ A package is a directory that contains multiple modules,
 and it forms its own namespace with the name of that directory.
 
 To make a directory a package, you put a special file named `__init__.py` in it.
-`__init__.py` runs once, before any module inside the package loads.
+`__init__.py` runs once,
+the first time a program imports the package or any module inside it.
 An empty `__init__.py`, the common case,
 only flags the directory as a package.^[The name `__init__.py` often confuses people. In hindsight, it might have been better to name the file `__package__.py`.]
 An `__init__.py` with content usually re-exports the package's public names.
@@ -362,8 +364,8 @@ print(function4())
 
 `module4` finds its sibling without naming `a_package`,
 so renaming the package breaks nothing inside it.
-Two dots (`..module1`) reach the parent package,
-so `b_package/module3.py` could import from `a_package` that way.
+Two dots reach the parent package,
+so `b_package/module3.py` could import from `a_package` with `from .. import module1` or `from ..module1 import function1`.
 The absolute form `from a_package.module1 import function1` works from inside the package too,
 and is the better choice when the import crosses a package boundary.
 Keep relative imports for a package's own submodules.
