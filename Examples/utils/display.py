@@ -1,5 +1,6 @@
 # utils/display.py
 import inspect
+from annotationlib import Format
 from collections.abc import Callable, Sequence
 from typing import Final
 
@@ -11,7 +12,8 @@ INTERESTING_DUNDERS: Final[tuple[str, ...]] = (
 
 def _annotations(cls: type) -> dict[str, object]:
     # Annotations declared on the class or any of its bases:
-    return {**inspect.get_annotations(base)
+    return {**inspect.get_annotations(
+                base, format=Format.FORWARDREF)
             for base in reversed(cls.__mro__)}
 
 def _type_name(annotation: object) -> str:

@@ -579,9 +579,13 @@ so neither `Color` nor `Shape` appears in its own registry.
 The keyword arguments come from the subclass header.
 Writing `class Blue(Color, shade="cool"):` delivers `shade="cool"` to `__init_subclass__()`,
 so a subclass can configure its own registration.
+The base that declares the keyword names it as a parameter,
+`def __init_subclass__(cls, shade: str = "", **kwargs: object)`,
+so it never reaches `kwargs`.
 `super().__init_subclass__(**kwargs)` passes the rest up the chain,
 so a base further up can take the keywords it declared,
-and an unrecognized keyword becomes an error rather than a silent no-op.
+and a keyword no base declares reaches `object.__init_subclass__()`,
+which accepts none and raises a `TypeError`.
 
 Testing shows that each registry holds only its current leaf classes,
 and that the two registries share no class:
@@ -638,15 +642,16 @@ def on[F: Callable[..., object]](
     return mark
 
 class Widget:
-    handlers: ClassVar[dict[str, Callable[..., Any]]]
+    handlers: ClassVar[dict[str, Callable[..., Any]]] = {}
 
     def __init_subclass__(cls, **kwargs: object) -> None:
         super().__init_subclass__(**kwargs)
-        cls.handlers = {
+        marked = {
             attr.__dict__["event"]: attr
             for attr in vars(cls).values()
             if "event" in getattr(attr, "__dict__", {})
         }
+        cls.handlers = {**cls.handlers, **marked}
 
     def dispatch(self, event: str) -> None:
         self.handlers[event](self)
@@ -663,8 +668,15 @@ class Button(Widget):
     def label(self) -> str:
         return "OK"
 
+class SubmitButton(Button):
+    @on("submit")
+    def send(self) -> None:
+        print("sent")
+
 print(sorted(Button.handlers))
 #: ['click', 'hover']
+print(sorted(SubmitButton.handlers))
+#: ['click', 'hover', 'submit']
 Button().dispatch("click")
 #: pressed
 print(Button.press.__dict__)
@@ -684,6 +696,10 @@ When the `class Button` statement finishes,
 `__init_subclass__()` walks `vars(cls)`, the new class's own namespace,
 and files each function that carries an `"event"` key under its event.
 `label()` carries no mark, so `handlers` leaves it out.
+On the right side of the assignment,
+`cls.handlers` still resolves to the base class's dictionary,
+so each new table starts from the inherited handlers:
+`SubmitButton` keeps `click` and `hover` and adds `submit`.
 The namespace also holds the bookkeeping entries every class carries,
 such as `__module__`, a string with no `__dict__`,
 and the `{}` default in `getattr()` passes over them.
@@ -1667,7 +1683,9 @@ printed with the signature that `inspect.signature()` reports,
 or `(...)` when a built-in has no inspectable signature.
 Everything else becomes an attribute, printed as `name: type = value`.
 The declared type comes from the class annotations,
-gathered across the whole inheritance chain with `inspect.get_annotations()`.
+gathered across the whole inheritance chain with `inspect.get_annotations()` in `FORWARDREF` format,
+so a name the module never defined prints as a `ForwardRef` instead of raising a `NameError`
+([Reading Annotations Before Their Names Exist](#reading-annotations-before-their-names-exist) explains the formats).
 An attribute with no annotation, such as one assigned dynamically,
 prints as `name = value`.
 The value is the member's `repr()`,
@@ -1858,6 +1876,7 @@ where any chapter can import it:
 ```python
 # utils/display.py
 import inspect
+from annotationlib import Format
 from collections.abc import Callable, Sequence
 from typing import Final
 
@@ -1869,7 +1888,8 @@ INTERESTING_DUNDERS: Final[tuple[str, ...]] = (
 
 def _annotations(cls: type) -> dict[str, object]:
     # Annotations declared on the class or any of its bases:
-    return {**inspect.get_annotations(base)
+    return {**inspect.get_annotations(
+                base, format=Format.FORWARDREF)
             for base in reversed(cls.__mro__)}
 
 def _type_name(annotation: object) -> str:
