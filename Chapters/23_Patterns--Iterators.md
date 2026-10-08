@@ -939,9 +939,9 @@ usually the shape of the code, and a full answer for each exercise.
     confirm `traverse()` drives it with no changes to `traverse()`,
     and explain why it needs no `seen` list.
     Then build an `OverStream` over `itertools.count(1)`.
-    `traverse()` runs forever on an endless source,
+    `traverse()` runs forever on an infinite source,
     so drive the four methods yourself for 50,000 steps and report `len(stream.seen)`.
-    What has `first()` cost you on an endless source?
+    What has `first()` cost you on an infinite source?
 8.  Write `peek(it)` that reports an iterator's next value without consuming it.
     You cannot, so write a `Peekable` wrapper that can,
     and name what it stores that a bare iterator does not.

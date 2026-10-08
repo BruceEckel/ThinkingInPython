@@ -462,9 +462,9 @@ no such chance. It receives values one at a time and can answer
 > confirm `traverse()` drives it with no changes to `traverse()`,
 > and explain why it needs no `seen` list.
 > Then build an `OverStream` over `itertools.count(1)`.
-> `traverse()` runs forever on an endless source,
+> `traverse()` runs forever on an infinite source,
 > so drive the four methods yourself for 50,000 steps and report `len(stream.seen)`.
-> What has `first()` cost you on an endless source?
+> What has `first()` cost you on an infinite source?
 
 <details>
 <summary>Where to look</summary>
