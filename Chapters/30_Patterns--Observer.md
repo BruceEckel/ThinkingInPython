@@ -985,8 +985,13 @@ and `[1]` binds that result to `built`.
 
 `[2]` asks `fields()` for the class's dataclass fields,
 one `Field` per annotation, each carrying its name.
-`[1]` binds `dataclass()`'s result as `built` because the type checker rejects `fields(cls)`:
-`cls` is the class as declared, before `dataclass()` made it one.
+At runtime `cls` and `built` are therefore one class.
+The type checker tells them apart.
+To the checker, `cls` is still the class the `class` statement declared,
+with no dataclass fields, so it rejects `fields(cls)`.
+`built` is the class as `dataclass()` returned it,
+and `ty` lets `fields()` take that (Pyright rejects both calls),
+so `[1]` keeps the return value instead of discarding it.
 
 `[3]` builds the property for the field's name,
 and `[4]` installs it on the class under that same name,
