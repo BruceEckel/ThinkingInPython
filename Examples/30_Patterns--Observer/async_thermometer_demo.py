@@ -15,10 +15,14 @@ async def main() -> None:
     t = Thermometer(15.0)
     t.connect(alarm)
     t.connect(log_reading)
+    print("set 20:")
     await t.set_celsius(20)  # Below the alarm threshold
+    print("set 150:")
     await t.set_celsius(150)  # Triggers the alarm too
 
 asyncio.run(main())
+#: set 20:
 #: logged: 20C
+#: set 150:
 #: logged: 150C
 #: alarm sent: 150C
