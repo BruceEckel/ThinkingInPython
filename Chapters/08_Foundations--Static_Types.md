@@ -50,6 +50,11 @@ but `object` guarantees nothing about the value once you have it,
 so the type checker rejects every operation beyond `object`'s own.
 `Any` permits every operation instead,
 so it opts out of checking rather than describing a wide set of values.
+`object` is the base of every class,
+so the type checker treats an `object` value as a checked value with the methods every class shares,
+while `Any` switches the checker off for that one value.
+Choose `object` for a value you store or pass along untouched,
+and `Any` for one whose operations you would rather check by hand.
 
 ## Type Hints
 
@@ -176,6 +181,9 @@ print(shout(None))
 Inside the `if`, the type checker *narrows* `text` from `str | None` to `str`,
 so `.upper()` needs no cast.
 Outside the `if`, `text` is still the full `str | None`.
+A truthiness test, `if text:`, narrows the same way, since `None` is falsy,
+but it sends the empty string to the other branch along with `None`,
+so test `is not None` when an empty value counts as supplied (see exercise 8).
 The same narrowing follows an `isinstance()` check, an equality test,
 or an identity test against a specific value such as `is not SOME_SENTINEL`.
 
@@ -519,10 +527,12 @@ print(box.get().upper())
 Constructing `Box("gift")` binds `T` to `str` for that instance,
 so `get()` returns a `str` and the call to `upper()` checks.
 
-A *bound* limits the parameter.
-`class Box[T: Shape]` accepts `Shape` and its subclasses.
-A *constraint* lists the choices.
-With `[T: (int, str)]`, `T` is `int` or `str`.
+A *bound* limits the parameter to one hierarchy:
+`class Box[T: Shape]` accepts `Shape` and its subclasses,
+and `T` keeps the subclass it was given.
+A *constraint* lists unrelated choices: with `[T: (int, str)]`,
+`T` is `int` or `str`,
+and an argument of a subclass of `int` binds `T` to `int`.
 
 ### Variance {#variance}
 
