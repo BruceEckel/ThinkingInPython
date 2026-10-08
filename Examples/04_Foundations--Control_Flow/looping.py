@@ -11,3 +11,9 @@ for index, name in enumerate(names):
 #: 1 Bob
 #: 2 Carol
 #: 3 Ted
+for n, name in enumerate(names, start=1):
+    print(n, name)
+#: 1 Alice
+#: 2 Bob
+#: 3 Carol
+#: 4 Ted

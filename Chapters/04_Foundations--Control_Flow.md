@@ -237,6 +237,12 @@ for index, name in enumerate(names):
 #: 1 Bob
 #: 2 Carol
 #: 3 Ted
+for n, name in enumerate(names, start=1):
+    print(n, name)
+#: 1 Alice
+#: 2 Bob
+#: 3 Carol
+#: 4 Ted
 ```
 
 `enumerate()` yields `(index, item)` pairs counting from zero,
@@ -246,8 +252,7 @@ but that form names the index and not the item,
 so every line that needs the item repeats the `names[i]` lookup.
 `enumerate()` hands you both.
 For output that people read, which usually counts from one,
-`enumerate(names, start=1)` begins the index at one,
-so the loop body adds nothing to it.
+`start=1` begins the index at one, so the loop body adds nothing to it.
 
 `zip()` walks several sequences at once:
 
