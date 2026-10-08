@@ -47,6 +47,8 @@ Run the reader's file before you say anything about its design.
 1. Run the file: `uv run python their_file.py`.
 2. Compare its output with the `#:` markers in the solution.
 3. Run `uv run ty check their_file.py` and `uv run ruff check their_file.py`.
+   Both read `pyproject.toml`, and `ty` also needs the extracted tree `build/examples/`.
+   A fresh clone has no such tree, so if `ty` reports that `build/examples/utils` is missing, run `uv run tip extract` once; it writes only under `build/`.
 4. If the solution carries a `test_` function or file, run it against the reader's code, adapting the names.
 
 Then compare the reader's design with the criteria the chapter states, in the section the exercise names.
@@ -72,6 +74,7 @@ Solutions written in these conventions are easier to compare with the book's.
 - `#:` marks expected output, placed directly after the statement that prints it.
 - A listing's first line is a `# name.py` path comment.
 - `utils/` holds shared helpers that a listing may import.
+  At run time Python finds them through `build/examples/utils`, so a reader's file that imports one (`from record import record`) runs with that directory on `PYTHONPATH`, after `uv run tip extract` has written it.
 
 ## What you do not touch
 
@@ -81,7 +84,7 @@ Leave `Chapters/`, `Examples/`, and `Solutions/` as they are.
 `Chapters/` and the `README.md` files are the book.
 The `.py` files under `Examples/` and `Solutions/` are generated copies, and `uv run tip sync` overwrites them.
 
-Run only three kinds of `tip` task: `hint`, `sync`, and the per-file checks above.
+Run only these `tip` tasks: `hint`, `extract`, `sync`, and the per-file checks above.
 
 ## Deleting this file
 
