@@ -905,7 +905,8 @@ def published(name: str) -> property:
 ```
 
 `property` is the class behind [`@property`](07_Foundations--Classes.md#properties).
-Called directly, it returns a class attribute that intercepts every read and write of that name on an instance,
+Called directly (`[3]`),
+it returns a class attribute that intercepts every read and write of that name on an instance,
 routing the read through `read()` and the write through `write()`
 (these function names can be anything).
 The decorator form needs a `def` in the class body for each attribute.
@@ -917,7 +918,7 @@ The decorator form needs a `def` in the class body for each attribute.
 Nothing in this file defines `announce()`.
 It is a method of `Broadcasting`, the class that will own the property,
 and `published()` reaches it through `self`, which is annotated `Any`,
-so the type checker accepts the call and the runtime finds the method on the thermometer when `write()` runs.
+so the type checker accepts the call and the runtime finds the method on the instance when `write()` runs.
 `value` is `Any` for the same reason:
 `published()` knows the field by name alone,
 and the type checker types `thermometer.celsius` from the subclass's annotation,
