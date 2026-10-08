@@ -1007,15 +1007,15 @@ and accepts `Thermometer(100)` because `100` fits that parameter.
 
 `Broadcasting` has one type parameter, so a subclass publishes one value.
 A class that declares `celsius` and `humidity` would send both readings to the same responders with no name attached.
-A class with several published attributes uses `WeatherStation`'s name-and-value signature,
-or gives each attribute its own responders with the descriptor in exercise 10.
+A class with several published attributes uses `WeatherStation`'s name-and-value signature
+(exercise 12), or gives each attribute its own responders with the descriptor in exercise 10.
 
 ## Observer and I/O
 
 So far, every responder finishes at once.
 Each prints, appends, or writes back, then returns.
-If a responder calls a network service or writes to a database,
-notifying responders one at a time delays every responder after that one.
+`announce()` notifies the responders one at a time,
+so a responder that calls a network service or writes to a database holds up every responder after it.
 
 If responders are coroutines,
 `announce()` awaits them together with `asyncio.gather()`,
@@ -1796,3 +1796,10 @@ usually the shape of the code, and a full answer for each exercise.
     and create two thermometers.
     Say which of the problems in this chapter's runtime sections the load-time form keeps,
     which it removes, and what it costs that `Broadcaster` does not.
+12. Give `Broadcasting` the name-and-value signature of `weather_station.py`:
+    `published()`'s setter announces the field's name along with the new value,
+    and `Responder[T]` becomes `Callable[[str, T], None]`.
+    Declare a subclass with `celsius` and `humidity` fields,
+    and attach one responder that reports `celsius` readings and lets `humidity` pass.
+    Show that an assignment to either field reaches that responder,
+    so filtering by name is the responder's job, as it is for `WeatherStation`.

@@ -1775,3 +1775,161 @@ so a responder in a module nothing imports still registers nothing.
 </details>
 </details>
 </details>
+
+## 12. A name with each announcement
+
+> Give `Broadcasting` the name-and-value signature of `weather_station.py`:
+> `published()`'s setter announces the field's name along with the new value,
+> and `Responder[T]` becomes `Callable[[str, T], None]`.
+> Declare a subclass with `celsius` and `humidity` fields,
+> and attach one responder that reports `celsius` readings and lets `humidity` pass.
+> Show that an assignment to either field reaches that responder,
+> so filtering by name is the responder's job, as it is for `WeatherStation`.
+
+<details>
+<summary>Where to look</summary>
+
+`published()` receives the field's name when `__init_subclass__()` builds each property,
+so `write()` can pass that name to `announce()` along with the value.
+Widen `Responder[T]` and `announce()` to carry the name.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_12.py
+from collections.abc import Callable
+from dataclasses import dataclass, fields
+from typing import Any, dataclass_transform
+
+type Responder[T] = Callable[[str, T], None]
+
+def published(name: str) -> property:
+    ...
+
+@dataclass_transform(eq_default=False)
+class Broadcasting[T]:
+    def __init_subclass__(cls) -> None:
+        ...
+
+    @property
+    def _responders(self) -> list[Responder[T]]:
+        ...
+
+    def respond(self, fn: Responder[T]) -> Responder[T]:
+        ...
+
+    def disconnect(self, fn: Responder[T]) -> None:
+        ...
+
+    def announce(self, name: str, data: T) -> None:
+        ...
+
+class Station(Broadcasting[float]):
+    celsius: float
+    humidity: float
+
+@station.respond
+def report(name: str, value: float) -> None:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
+
+The change sits in two places.
+`published()` closes over the field's name,
+so `write()` has the name at hand and calls `self.announce(name, value)`.
+`Broadcasting` widens `Responder[T]` to `Callable[[str, T], None]`
+and gives `announce()` a `name` parameter that it passes to each responder.
+`__init_subclass__()`, `respond()`, and `disconnect()` stay as the chapter writes them.
+
+```python
+# exercise_12.py
+from collections.abc import Callable
+from dataclasses import dataclass, fields
+from typing import Any, dataclass_transform
+
+type Responder[T] = Callable[[str, T], None]
+
+def published(name: str) -> property:
+    def read(self: Any) -> Any:
+        return self.__dict__[name]
+
+    def write(self: Any, value: Any) -> None:
+        self.__dict__[name] = value
+        self.announce(name, value)
+
+    return property(read, write)
+
+@dataclass_transform(eq_default=False)
+class Broadcasting[T]:
+    def __init_subclass__(cls) -> None:
+        built = dataclass(eq=False)(cls)
+        for field in fields(built):
+            prop = published(field.name)
+            setattr(cls, field.name, prop)
+
+    @property
+    def _responders(self) -> list[Responder[T]]:
+        return self.__dict__.setdefault("_responders", [])
+
+    def respond(self, fn: Responder[T]) -> Responder[T]:
+        self._responders.append(fn)
+        return fn
+
+    def disconnect(self, fn: Responder[T]) -> None:
+        self._responders.remove(fn)
+
+    def announce(self, name: str, data: T) -> None:
+        for responder in list(self._responders):
+            responder(name, data)
+
+class Station(Broadcasting[float]):
+    celsius: float
+    humidity: float
+
+station = Station(20.0, 0.4)
+calls: list[str] = []
+
+@station.respond
+def report(name: str, value: float) -> None:
+    calls.append(name)
+    if name == "celsius":
+        print(f"report: {value}C")
+
+station.celsius = 25.0
+#: report: 25.0C
+station.humidity = 0.5
+print(calls)
+#: ['celsius', 'humidity']
+```
+
+**Announce the name from the property.** `__init_subclass__()` calls `published(field.name)` once per field,
+and each `write()` closes over its own `name`.
+An assignment to `station.humidity` runs the `humidity` property's `write()`,
+which announces `"humidity"`,
+so `Broadcasting` needs no lookup to learn which field changed.
+
+**Filter in the responder.** `announce()` calls every responder for every field,
+as `WeatherStation.__setattr__()` does.
+`report()` appends each name it receives to `calls`
+and prints when the name is `"celsius"`.
+The one `report:` line shows the `celsius` reading reported,
+and `calls` shows that both assignments reached `report()`,
+including the one to `humidity`.
+
+**Share one type across the fields.** `Broadcasting[float]` gives every field's responders the same `T`,
+so `celsius` and `humidity` are both `float`.
+A subclass whose fields have different types declares `Broadcasting[object]`,
+the value type of `WeatherStation`'s `AttrResponder`,
+and its responders narrow the value after checking the name.
+
+The generated `__init__()` assigns both fields through their properties,
+so constructing `station` announces twice.
+The responder list is still empty then,
+so `calls` holds the two assignments that follow `@station.respond`.
+
+</details>
+</details>
+</details>
