@@ -503,8 +503,8 @@ print(f"classes edited for one operation: {len(edited)}")
 ```
 
 `[1]` counts the edits.
-One new question is an edit to all three material classes,
-and the question after it is three more edits.
+One new operation is an edit to all three material classes,
+and the operation after it is three more edits.
 Those edits sit in each class body, as `note_methods.py` shows.
 In the real program they go in `trash.py`.
 
@@ -613,7 +613,7 @@ print(f"classes edited for one operation: {len(edited)}")
 
 The loop reads every material from the registry, `hazard()` answers for each,
 and `trash.py` stays untouched.
-A third question and a fourth are one more file each,
+A third operation and a fourth are one more file each,
 where `note_methods.py` needs one edit per material every time.
 Adding a `Plastic` material means defining the class,
 plus one registration for each operation that must answer differently for plastic.
