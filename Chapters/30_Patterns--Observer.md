@@ -972,7 +972,7 @@ and at this point `Thermometer` has its annotation, no `__init__()`,
 and no class attribute named `celsius`.
 
 `[1]` passes the new class to `dataclass(eq=False)`.
-`dataclass()` with arguments returns a decorator,
+This returns a decorator,
 and applying that decorator to `cls` reads the [bare annotations](09_Foundations--Class_Attributes.md#a-bare-annotation-declares-it-does-not-create)
 (e.g. `celsius: float`),
 and writes an `__init__()` and a `__repr__()` onto the class.
@@ -980,7 +980,7 @@ That `__init__()` has one parameter per field,
 so `Thermometer`'s is `__init__(self, celsius: float)`,
 and its body assigns `self.celsius = celsius`.
 `eq=False` keeps identity equality and also leaves the instances hashable.
-Without slots, `dataclass()` modifies the class in place and returns it,
+`dataclass()` modifies the class in place and returns it,
 and `[1]` binds that result to `built`.
 
 `[2]` asks `fields()` for the class's dataclass fields,
