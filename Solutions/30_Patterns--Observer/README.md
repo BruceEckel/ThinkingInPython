@@ -1763,7 +1763,7 @@ The load-time form also costs three things that `Broadcaster` does not:
   unless the test removes it from `RESPONDERS`.
 
 The first of those costs, the shared registry, comes from where the list lives rather than from the decorator.
-[Announcing Fields by Annotation](../../Chapters/30_Patterns--Observer.md#announcing-fields-by-annotation) keeps registration by decorator and moves the list onto each instance.
+[Decorating Responders](../../Chapters/30_Patterns--Observer.md#decorating-responders) keeps registration by decorator and moves the list onto each instance.
 `Broadcasting` is a base class whose `respond()` method is a decorator,
 so `@thermometer.respond` appends a function to that thermometer's own list and returns the function unchanged.
 In that form, `room` and `oven` each announce to their own responders.
