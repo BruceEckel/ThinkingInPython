@@ -96,6 +96,16 @@ the Markdown, discarding any edits you made to them. Each `README.md` is the
 source and is not overwritten. Experiment in the generated files freely, but
 keep anything you want to save outside them.
 
+If you work with an AI coding agent in the clone, `AGENTS.md` at the repo
+root is written for it (Codex, Cursor, and others read the file on their own;
+`CLAUDE.md` sends Claude Code to it). While a solution's Solution step is
+closed, the file has the agent coach: it asks what you have tried, gives the
+smallest hint, and withholds the answer. Once you open the step, the agent
+reviews: it runs your file and the exercise's checks first, then compares
+your design with the chapter's criteria, treating the book's solution as one
+correct design rather than the only one. The rules are there for your
+learning, not the book's; delete the file if you want an unguarded assistant.
+
 ## Setup
 
 You'll need to do this to experiment with the examples and exercises.

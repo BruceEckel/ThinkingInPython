@@ -260,6 +260,9 @@ Solutions live in the `Solutions/` directory of the source repository.
 Try the exercise yourself before reading the solution.
 The value is in the prediction and the surprise when you are wrong,
 not in the code you produce.
+If you keep an AI assistant open while you work,
+the repository's `AGENTS.md` asks it to coach you toward your own answer while a solution is closed,
+and to review your answer against the book's criteria once you open it.
 
 ## Resources
 

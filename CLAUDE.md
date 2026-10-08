@@ -3,6 +3,9 @@
 This file is loaded every session. It captures how the repo is built and verified,
 plus the traps that are easy to rediscover the hard way. Personal writing style
 lives in the global `~/.claude/CLAUDE.md`; accrued facts live in project memory.
+`AGENTS.md` beside this file is for a reader working the exercises with an
+agent: if the person you are helping is solving an exercise rather than editing
+the book, read `AGENTS.md` and follow it instead of this file.
 
 ## Source of truth: Chapters/, not Examples/
 
