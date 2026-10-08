@@ -721,9 +721,8 @@ A program can choose its responders at any of four points:
     and the set stays the same for as long as the broadcaster lives.
     The rest of this section builds that broadcaster.
 
-`Broadcaster` is the runtime choice.
-`connect()` and `disconnect()` make it dynamic:
-its list of responders can change at any moment,
+`Broadcaster`'s `connect()` and `disconnect()` make it dynamic.
+Its list of responders can change at any moment,
 including in the middle of an `announce()`.
 Three earlier sections handle a consequence of that dynamism:
 the copy in `announce()` guards against a `disconnect()` call during the loop,
@@ -772,7 +771,7 @@ The broadcaster holds strong references to its responders.
 and inherits `connect()` and `announce()` from `Broadcaster`.
 We can simplify this using `__setattr__()`.
 Python calls it for every attribute assignment,
-so one method covers every attribute of the class:
+so one `__setattr__()` covers every attribute of the class:
 
 ```python
 # weather_station.py
@@ -814,8 +813,8 @@ print(changes)
 #: [('celsius', 25.0), ('humidity', 0.5)]
 ```
 
-Python routes every assignment to an attribute of the instance through `__setattr__()`.
-This includes assignments within the constructor.
+Python routes every attribute assignment through `__setattr__()`,
+including assignments within the constructor.
 `__setattr__()` begins by reading `self._responders`,
 so an ordinary `self._responders = []` in the constructor reaches that read before the list exists,
 raising an `AttributeError`.
@@ -827,7 +826,8 @@ so every later read also goes through the getter and finds the existing list.
 The constructor's two assignments go through `__setattr__()`.
 Each notifies an empty list,
 since callers can connect responders only after the constructor returns.
-`super().__setattr__()` does the storing,
+
+In `__setattr__()`, `super().__setattr__()` does the storing,
 because an ordinary assignment inside `__setattr__()` calls `__setattr__()`.
 
 One `__setattr__()` for every attribute gives up three things that `Thermometer`'s property per attribute keeps:

@@ -1,10 +1,3 @@
-General check for consistent use of terminology
-
-3. The report's top item needs no prose change to the book:
-Draft a reader-facing AGENTS.md for the ThinkingInPython repo following the tutor rules in reports/Further learning techniques for Solutions.md: hint-only while a Solution rung is closed, reviewer once open, the reference is one correct design, run the exercise's tests first, and carry the book's conventions (ty, @record, 60-column listings, #: markers). Keep the root CLAUDE.md author-facing and say in one line how an agent tells the two apart.
-
----
-
 Implementation is Friction
 
 How can I improve the process on this book?
