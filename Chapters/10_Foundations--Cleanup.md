@@ -203,7 +203,8 @@ and `gc.collect()` then forces a run,
 so the `a finalized` line marks the moment of destruction.
 In a real program nothing tells you when the collector runs.
 Before Python 3.4 the collector refused to finalize a cycle containing a `__del__()`,
-leaving the objects in `gc.garbage`.
+leaving the objects in `gc.garbage` as *uncollectable* garbage,
+the term older documentation uses for them.
 [PEP 442](https://peps.python.org/pep-0442/) removed that restriction,
 so a cycle now costs only the delay.
 
@@ -412,6 +413,8 @@ because `Leaky` is not part of an unreachable cycle.
 `finalize()` keeps every callback in a registry,
 and the callback `self.close` holds the object,
 so the registry keeps `Leaky` reachable.
+A bound method is a small object that stores its instance in its `__self__` attribute,
+so whatever holds `self.close` holds `Leaky` through it.
 `Leaky` printed nothing, because its callback did not run and nothing failed.
 With `atexit` left on, the callback runs as the program exits,
 and a late `L closed` is the one sign of the leak.
@@ -446,6 +449,9 @@ expect(TypeError, finalize, Slotted("x"), print, "closed")
 `__slots__` removes the instance `__dict__` and, by default,
 the `__weakref__` slot along with it,
 so `finalize()` has nowhere to attach a reference.
+The same `TypeError` meets `ref()`, `weakref.proxy()`,
+and the `WeakValueDictionary` in the next section,
+since every weak reference attaches there.
 Listing `__weakref__` among the slots opts back in.
 
 ## Watching Objects Without Holding Them
