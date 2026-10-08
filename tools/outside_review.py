@@ -6,8 +6,15 @@ end, in one headless call: the review instructions from
 `tools/data/outside_review_prompt.md`, then the chapter's full Markdown.
 The reply is saved as `outside_review/<chapter stem>.md`, under a first
 line that records the chapter, the model, and the date. The tool never
-edits a chapter. Applying a review is a separate step, done in a Claude
-session that tests each item against the chapter before editing.
+edits a chapter. `outside_review/` is tracked, like `deep_review/`.
+Applying a review is a separate step, done in a Claude session that
+tests each item against the chapter and a run under `uv run` before
+editing, applies what passes, and appends a `## Verdicts` section to
+the review file: one line per item, applied or rejected, with the
+evidence and the commit. The first runs showed why the test matters:
+every item of the first reply was wrong for Python 3.15, and the
+corrected reply still claimed a `TypeError` that `type.__new__()` never
+raises.
 
 The message travels on stdin as one line of NDJSON, and `agy` answers
 with NDJSON events on stdout; the last is a `result` event whose

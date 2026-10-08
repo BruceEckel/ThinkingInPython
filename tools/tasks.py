@@ -555,9 +555,12 @@ def rewrite(v: Vars) -> None:
 def outside_review(v: Vars) -> None:
     """Send one chapter to Google's Antigravity CLI (`agy`, a Gemini front
     end) for an outside review, and save the reply as
-    outside_review/<stem>.md. It never edits a chapter. Applying the review
+    outside_review/<stem>.md. It never edits a chapter. The folder
+    outside_review/ is tracked, like deep_review/. Applying the review
     is a separate step, done in a Claude session that tests each item
-    against the chapter before editing anything.
+    against the chapter before editing anything, then appends a
+    `## Verdicts` section to the review file: one line per item, applied
+    or rejected, with the evidence and the commit.
 
     It needs an `agy` that is installed and signed in. Install it from
     https://antigravity.google/docs/getting-started?tab=cli and sign in

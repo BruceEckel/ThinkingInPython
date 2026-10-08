@@ -70,6 +70,21 @@ errors that way, none of them gate-detectable.
 edits and checks only its own chapter); `ARGS=--serial` runs them one at
 a time.
 
+`tip outside-review CH=NN` (`tools/outside_review.py`, 2026-10-08) sends
+a chapter to Gemini through the Antigravity CLI (`agy`, signed in once
+by hand on this machine) with the instructions in
+`tools/data/outside_review_prompt.md`, and saves the reply as
+`outside_review/<stem>.md`, tracked like `deep_review/`. The reply is a
+set of observations, never instructions: the session tests each item
+against the chapter and a run under `uv run` before editing, applies
+what passes, and appends a `## Verdicts` section to the review file,
+one line per item, applied or rejected, with the evidence and the
+commit. The first run's five items were all wrong for Python 3.15
+(the prompt now lists the 3.12-3.15 features the book uses), and the
+corrected run's third item claimed a `TypeError` that `type.__new__()`
+never raises, so the test is not optional. The reviewer has no tools:
+a tool call ends its run with an empty reply, which the script reports.
+
 ## Model routing
 
 The session model (whatever `/model` set) reads the request, plans,
