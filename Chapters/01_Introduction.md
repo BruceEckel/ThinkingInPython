@@ -186,8 +186,8 @@ Some are modules that another listing imports,
 and `pytest` runs each `test_*.py` file.
 These files live in the `Examples/` directory of the [source repository](https://github.com/BruceEckel/ThinkingInPython),
 one folder per chapter,
-so the code block starting with `# tracer.py` in the [Decorators](14_Techniques--Decorators.md#maintaining-the-wrapped-interface)
-chapter is the file `Examples/14_Techniques--Decorators/tracer.py`.
+so the code block starting with `# tracer.py` in [Decorators](14_Techniques--Decorators.md#maintaining-the-wrapped-interface)
+is the file `Examples/14_Techniques--Decorators/tracer.py`.
 A helper that more than one chapter uses carries a `utils/` path in its filename comment instead,
 like `# utils/result.py`,
 and lives in `Examples/utils/` rather than in a chapter folder.
@@ -221,7 +221,7 @@ The code you read is the code that runs,
 and the output you see is the output it produces.
 
 A few early listings carry a `# type: ignore` comment.
-The [Static Types](08_Foundations--Static_Types.md) chapter defines it,
+[Static Types](08_Foundations--Static_Types.md) defines it,
 along with the `# ty:` comments that appear from that chapter on.
 Until then, the comment marks a line a type checker would flag.
 
