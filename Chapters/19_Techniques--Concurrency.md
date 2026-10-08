@@ -188,7 +188,7 @@ asyncio.run(main())
 #: ['A', 'B', 'C']
 ```
 
-The first printed line proves that calling a coroutine runs nothing.
+The first printed line proves that calling a coroutine function runs nothing.
 `main()`'s first line calls `fetch("a", 0.03)`, yet no "started" line appears,
 only the type of object the call built: `coroutine`.
 `gather()` schedules the work when it receives that object.
@@ -769,11 +769,11 @@ asyncio.run(main())
 #: 50
 ```
 
-Eight coroutines each add 50, so `counter` should reach 400.
+Eight tasks each add 50, so `counter` should reach 400.
 Instead it stops at 50.
 Every `await asyncio.sleep(0)` releases control to the event loop before the write.
 (The `sleep(0)` is a stand-in for a database query or an HTTP call.)
-In each round all eight coroutines read the same value before any of them writes,
+In each round all eight tasks read the same value before any of them writes,
 so eight additions collapse into one.
 
 [The GIL Does Not Prevent Races](#the-gil-does-not-prevent-races)
@@ -1476,7 +1476,7 @@ and a final line that reports every update preserved rather than updates lost.
 Eight threads still take turns,
 but now no two of them read the same value before either writes,
 so `counter` reaches 400 every time,
-the same fix `asyncio.Lock` gives the coroutines in `async_locks.py`.
+the same fix `asyncio.Lock` gives the tasks in `async_locks.py`.
 
 ### Free Threading
 
@@ -1665,7 +1665,7 @@ and it wakes the instant `put()` adds an item, with no polling in between.
 This listing's queue holds every job by the time `consume()` starts,
 so its first `get()` returns immediately,
 but the same code runs unchanged whether the queue is empty or stocked.
-The [*Object Pool*](15_Techniques--Context_Managers.md#an-empty-pool-blocks-the-caller)
+The [*Object Pool*](15_Techniques--Context_Managers.md#an-empty-pool-blocks-the-borrower)
 in Context Managers uses the same `Queue` as a throttle.
 
 A consumer parked in `get()` still needs a way to stop.
@@ -1721,7 +1721,7 @@ so `get()` suspends it rather than blocking the thread underneath it.
 That `put()` wakes the waiting consumer.
 
 `asyncio.Queue` needs no locks,
-since the event loop lets one coroutine at a time touch it.
+since the event loop lets one task at a time touch it.
 That guarantee holds within the event loop's own thread alone.
 A call from another thread has no protection, so the class is not thread-safe.
 
@@ -2386,7 +2386,7 @@ although the event loop keeps both tasks busy the whole time.
 
 A real livelock looks busy on a monitor,
 with CPU time spent and state visibly changing.
-A deadlock looks idle, with tasks parked and waiting.
+A deadlock looks idle, with tasks suspended and waiting.
 In both cases, nothing finishes.
 The usual fix is to break the symmetry,
 for example letting only the task with the lower ID give.

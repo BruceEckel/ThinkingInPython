@@ -497,7 +497,7 @@ with expected() as x:  # [1]
 
 The `1 / 0` raises an exception, `__exit__()` prints the exception it caught,
 then returns `True`,
-and the `with` statement absorbs the error so `survived` still prints.
+and the `with` statement suppresses the error so `survived` still prints.
 
 In the `with` at `[1]`, `x` receives the return value of `__enter__()`,
 which for `expected()` is `None`.
@@ -1014,7 +1014,7 @@ A pooled object is usually mutable or stateful,
 so the pool lends it to one borrower at a time,
 and the lease exists to take it back.
 
-### An Empty Pool Blocks the Caller
+### An Empty Pool Blocks the Borrower
 
 The queue does more than store the idle items.
 `Queue` is thread-safe, and `get()` blocks while the pool is empty,
