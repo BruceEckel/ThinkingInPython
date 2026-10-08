@@ -1,3 +1,6 @@
+Overnight:
+Run tip outside-review over chapters 18-47 and the two appendices on the Pro model, serially, in the background, and tell me when the reviews are in. Then apply them one chapter at a time the way chapter 17 was done, Verdicts section included, committing each chapter separately.
+
 Implementation is Friction
 
 How can I improve the process on this book?
