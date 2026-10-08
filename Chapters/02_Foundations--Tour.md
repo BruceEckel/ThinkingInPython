@@ -251,6 +251,7 @@ print(alias, items)
 
 Augmented assignment on a mutable object changes it in place,
 so every other name for it sees the change.
+For a list, `+=` does what `extend()` does.
 `items = items + [4]` instead builds a new list and rebinds `items` to it,
 which leaves `alias` bound to the old one.
 For an `int`, both forms rebind the name,
@@ -461,6 +462,8 @@ print(s.strip()[0:5])
 ```
 
 String methods return new values rather than changing the original.
+`replace()` replaces every occurrence, as `XbXbXb` shows;
+an optional third argument caps how many it replaces.
 
 `strip()` and its one-sided forms `lstrip()` and `rstrip()` take an optional argument,
 but it is a set of characters, not a prefix or suffix.
@@ -535,7 +538,8 @@ F-strings replaced them.
 
 An f-string produces a finished `str`,
 deciding how each value becomes text before anything else sees it.
-A *t-string* produces a `Template` instead,
+A *t-string* (Python 3.14, [PEP 750](https://peps.python.org/pep-0750/))
+produces a `Template` instead,
 which keeps the literal pieces and the interpolated values apart for a consumer to assemble.
 
 The reason to care is safety.
@@ -632,7 +636,8 @@ begins with a capital letter, and no underscores separate them.
 For example: `ThisIsMyClass`.
 
 When users call a class the way they call a function,
-that class may use `snake_case` instead.
+that class may use `snake_case` instead,
+so the name reads as the action the call performs and the caller treats it as a function.
 The standard library names `contextlib.suppress`, `functools.partial`,
 and the built-ins `property` and `staticmethod` that way.
 Name every other class `CapWords`.
