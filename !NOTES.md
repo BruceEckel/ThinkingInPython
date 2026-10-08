@@ -1,9 +1,17 @@
+General check for consistent use of terminology
+
+3. The report's top item needs no prose change to the book:
+Draft a reader-facing AGENTS.md for the ThinkingInPython repo following the tutor rules in reports/Further learning techniques for Solutions.md: hint-only while a Solution rung is closed, reviewer once open, the reference is one correct design, run the exercise's tests first, and carry the book's conventions (ty, @record, 60-column listings, #: markers). Keep the root CLAUDE.md author-facing and say in one line how an agent tells the two apart.
+
+---
+
 Implementation is Friction
 
 How can I improve the process on this book?
 
 Check for any unresolved issues in deep_review and readability directories
 Clean up after deep review and readability (add necessary info to the *_db.md files and delete deep_review and readability directories)
+What other LLM might produce a valuable review of the book?
 
 Fable: Review the book to find and fix consistency issues
 
