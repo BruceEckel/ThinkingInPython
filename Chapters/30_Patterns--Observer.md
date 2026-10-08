@@ -1066,8 +1066,10 @@ A responder must return an awaitable, produced by calling an `async` function.
 
 Because `announce()` awaits, it must also be a coroutine,
 and its caller must `await` it in turn.
-An assignment such as `t.celsius = value` cannot await anything,
-so a property setter cannot call this `announce()`.
+A property setter cannot await the asynchronous `announce()`.
+The assignment `t.celsius = value` calls the setter and discards whatever it returns,
+so an `async def` setter would hand back a coroutine that nothing runs,
+and an `await` inside an ordinary `def` is a `SyntaxError`.
 The asynchronous `Thermometer` therefore replaces the setter with a coroutine method,
 `set_celsius()`, and a caller writes `await t.set_celsius(value)`:
 
