@@ -66,8 +66,11 @@ def test_hello_is_not_a_palindrome() -> None:
 
 At this point `palindrome.py` does not exist,
 so running this file fails before a single assertion runs.
-`pytest` cannot import a missing module.
-That failure confirms the test catches a missing implementation.
+`pytest` cannot import a missing module,
+so it reports a `ModuleNotFoundError` as a collection error,
+with no test run and no assertion failed.
+That error, rather than a failing assertion,
+confirms the test catches a missing implementation.
 
 ```python
 # palindrome.py
@@ -560,6 +563,9 @@ def save(name: str, value: str) -> None:
 def load(name: str) -> str:
     return (data_dir() / name).read_text(encoding="utf-8")
 ```
+
+`Path()` keeps a leading `~` as written,
+so a variable that may hold `~/data` needs `.expanduser()` on the result.
 
 The tests point `APP_DATA` at a throwaway directory,
 so they leave real data untouched and cannot collide with each other.
