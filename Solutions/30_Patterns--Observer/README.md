@@ -1077,7 +1077,7 @@ nine cells are as they were.
 
 Pasting this `recolored()` over the one in `box_observer.py` changes
 what the window does, and `box_view.py` runs as it stands. Two
-places in the view involve a selection. Its mouse handler calls
+places in the view involve a selection. Its mouse responder calls
 `model.select()` with a coordinate, and its `draw()` receives a whole
 `Grid` and paints every cell. Neither one says which cells a selection
 changes, so the view holds nothing that a new rule could make wrong.
