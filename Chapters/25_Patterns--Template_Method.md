@@ -444,7 +444,7 @@ give a hint, usually the shape of the code, and a full answer for each exercise.
 
 1.  Create a framework that takes a list of file names.
     It opens every file but the last for reading, and the last one for writing.
-    It processes each input file by a policy the customization supplies,
+    It processes each input file by a step the subclass or the function supplies,
     and writes the output to the last file.
     Supply each of these policies twice,
     once by subclassing and once by passing a function:
