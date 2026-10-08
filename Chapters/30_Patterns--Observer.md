@@ -336,7 +336,7 @@ so it can publish more than one kind of change.
 [Notifying Without a Base Class](#notifying-without-a-base-class)
 drops the base class and the properties together.
 Event-heavy programs have mature libraries (signal/slot systems),
-but for most cases the *Observer* pattern is only a list of callbacks.
+but for most cases the *Observer* pattern is only a list of responders.
 
 Connected callables react to every `celsius` assignment:
 
@@ -707,12 +707,12 @@ Its list of responders can change at any moment,
 including in the middle of an `announce()`.
 Three earlier sections handle a consequence of that dynamism:
 the copy in `announce()` guards against a `disconnect()` call during the loop,
-a lambda written inline in `connect()` stays connected for good,
+a lambda written inline in `connect()` cannot be disconnected,
 and a lapsed listener is a connection that outlives the program's use of its responder.
 
 Decoupling and dynamism are separate properties.
-A decoupled subject knows its observers only as callables.
-A dynamic subject lets the set of observers change after the subject exists.
+A decoupled broadcaster knows its responders only as callables.
+A dynamic broadcaster lets the set of responders change after the broadcaster exists.
 A broadcaster whose constructor permanently binds its responders is decoupled but not dynamic:
 
 ```python
@@ -750,9 +750,9 @@ The broadcaster holds strong references to its responders.
 A program can choose its responders at any of four points:
 
 1.  **Source time.**
-    The subject's code calls each responder by name,
+    The broadcaster's code calls each responder by name,
     as a setter that calls `display.update()` and then `alarm.update()`.
-    The subject names every responder,
+    The broadcaster names every responder,
     and *Observer* replaces those names with a list of callables.
 2.  **Load time.**
     Each responder registers itself with a decorator as Python imports its module.
@@ -760,7 +760,7 @@ A program can choose its responders at any of four points:
     Registration runs at runtime,
     but the set is normally complete once the imports finish (see exercise 11).
 3.  **Construction time.**
-    The subject receives its responders when you create it,
+    The broadcaster receives its responders when you create it,
     as in `BoundBroadcaster`.
 4.  **Runtime.**
     Responders connect and disconnect at any moment, as with `Broadcaster`.
@@ -816,7 +816,7 @@ print(changes)
 Python routes every assignment to an attribute of the instance through `__setattr__()`.
 This includes assignments within the constructor.
 `__setattr__()` begins by reading `self._responders`,
-so an ordinary `self._responders = []` in the constructor would reach that read before the list exists,
+so an ordinary `self._responders = []` in the constructor reaches that read before the list exists,
 raising an `AttributeError`.
 To prevent this, the `_responders` property creates the list upon first read,
 using `setdefault()` on the instance `__dict__`.
@@ -837,7 +837,7 @@ One `__setattr__()` for every attribute gives up three things that `Thermometer`
     `Thermometer` publishes one attribute and is a `Broadcaster[float]`,
     so each responder takes the `float` reading as its one argument.
     [Deciding What Matters](#deciding-what-matters) revisits that name filter.
-    A responder that sorts its own notifications means the subject has left the decision to its responders.
+    A responder that sorts its own notifications means the broadcaster has left the decision to its responders.
 2.  Every assignment reaches the responders, including the internal ones.
     A cached result or a hit counter broadcasts like a published attribute,
     unless the class writes it through `self.__dict__`,
@@ -1435,10 +1435,10 @@ Otherwise, each notification adds another `size * size` rectangles on top of the
 The window looks the same but the canvas's list of items grows without limit,
 the same quiet accumulation as a [lapsed listener](#lapsed-listeners).
 
-`canvas.bind()` registers the lambda as the handler for `"<Button-1>"`,
+`canvas.bind()` registers the lambda as the responder for `"<Button-1>"`,
 a press of the left mouse button.
 When you press the left button over the canvas,
-`tkinter` calls the handler with an event `e`.
+`tkinter` calls the responder with an event `e`.
 `e.x` and `e.y` give the click's position in pixels,
 measured from the canvas's top-left corner.
 Floor division by `cell_px` converts that position to a cell.
@@ -1446,7 +1446,7 @@ With 60-pixel cells, a click at `e.x == 130` is in column `130 // 60`,
 which is `2`.
 A click on the canvas becomes a `select()` on the model,
 and the resulting notification repaints the view.
-The handler calls the model, and `draw()`, run by that notification,
+The responder calls the model, and `draw()`, run by that notification,
 does all the painting.
 So the view handles the mouse as well as the screen,
 folding the controller's job into the view.
@@ -1566,7 +1566,7 @@ print(model.count)
 ```
 
 The two versions share three things: the `Counter` model,
-the `model.connect(view.draw)` call that registers the view with the model,
+the `model.connect(view.draw)` call that connects the view to the model,
 and the printed output for the same input, `"++-x"`.
 *Observer* does the same work either way,
 which is why the chapter's opening calls the two architectures nearly equivalent.
@@ -1718,8 +1718,8 @@ so each responder that cares about one attribute repeats the same filter by name
 [Function Objects](28_Patterns--Function_Objects.md#an-event-bus-handlers-keyed-by-type)
 removes that repetition.
 One list becomes a dictionary of lists keyed by event type,
-so an announcement carries the type of thing that happened and each handler subscribes to the type it handles.
-The publisher then decides which event it is publishing, something it knows,
+so an announcement carries the type of thing that happened and each responder connects to the one type it handles.
+The broadcaster then decides which event it is announcing, something it knows,
 instead of guessing which responders need the event.
 
 ## Exercises
