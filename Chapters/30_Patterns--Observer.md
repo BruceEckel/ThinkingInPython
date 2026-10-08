@@ -702,8 +702,28 @@ which is the behavior you want when a responder counts readings rather than modi
 
 ### Setting the Responders at Construction
 
-`connect()` and `disconnect()` make `Broadcaster` dynamic.
-Its list of responders can change at any moment,
+A program can choose its responders at any of four points:
+
+1.  **Source time.**
+    The broadcaster's code calls each responder by name,
+    as a setter that calls `display.update()` and then `alarm.update()`.
+    The broadcaster names every responder,
+    and *Observer* replaces those names with a list of callables.
+2.  **Load time.**
+    Each responder registers itself with a decorator as Python imports its module.
+    Django's `@receiver` decorator and `atexit.register()` work this way.
+    Registration runs at runtime,
+    but the set is normally complete once the imports finish (see exercise 11).
+3.  **Runtime.**
+    Responders connect and disconnect at any moment, as with `Broadcaster`.
+4.  **Construction time.**
+    The broadcaster receives its responders when you create it,
+    and the set stays the same for as long as the broadcaster lives.
+    The rest of this section builds that broadcaster.
+
+`Broadcaster` is the runtime choice.
+`connect()` and `disconnect()` make it dynamic:
+its list of responders can change at any moment,
 including in the middle of an `announce()`.
 Three earlier sections handle a consequence of that dynamism:
 the copy in `announce()` guards against a `disconnect()` call during the loop,
@@ -713,7 +733,7 @@ and a lapsed listener is a connection that outlives the program's use of its res
 Decoupling and dynamism are separate properties.
 A decoupled broadcaster knows its responders only as callables.
 A dynamic broadcaster lets the set of responders change after the broadcaster exists.
-A broadcaster whose constructor permanently binds its responders is decoupled but not dynamic:
+A broadcaster that receives its responders at construction is decoupled but not dynamic:
 
 ```python
 # bound_broadcaster.py
@@ -741,29 +761,10 @@ print(log)
 #: [25.0, 150.0]
 ```
 
-`BoundBroadcaster` is a `@record` whose `responders` field holds a tuple.
-The record freezes the field, and the tuple freezes its contents,
+The `@record` freezes the field, and the tuple freezes its contents,
 so the responders can't change.
 `announce()` iterates through the tuple but does not need to copy it.
 The broadcaster holds strong references to its responders.
-
-A program can choose its responders at any of four points:
-
-1.  **Source time.**
-    The broadcaster's code calls each responder by name,
-    as a setter that calls `display.update()` and then `alarm.update()`.
-    The broadcaster names every responder,
-    and *Observer* replaces those names with a list of callables.
-2.  **Load time.**
-    Each responder registers itself with a decorator as Python imports its module.
-    Django's `@receiver` decorator and `atexit.register()` work this way.
-    Registration runs at runtime,
-    but the set is normally complete once the imports finish (see exercise 11).
-3.  **Construction time.**
-    The broadcaster receives its responders when you create it,
-    as in `BoundBroadcaster`.
-4.  **Runtime.**
-    Responders connect and disconnect at any moment, as with `Broadcaster`.
 
 ### Notifying Without a Base Class
 
