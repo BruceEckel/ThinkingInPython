@@ -322,7 +322,7 @@ but [a `dataclass`-generated `__init__()` does not call the base class's `__init
 A `@dataclass` `Thermometer` would have no list of responders.
 A `__post_init__()` that calls `super().__init__()` fixes that,
 but at greater length and complexity than the `__init__()` it replaces.
-[Decorating Responders](#decorating-responders)
+[Decorated Responders](#decorated-responders)
 gets a generated `__init__()` and the list another way.
 
 `Thermometer` inherits `Broadcaster` because that is the shortest way to get `connect()` and `announce()`,
@@ -851,7 +851,7 @@ One `__setattr__()` for every attribute gives up three things that `Thermometer`
     `Thermometer` defines no `__setattr__()`,
     so the type checker checks each assignment against the attributes the class declares.
 
-### Decorating Responders
+### Decorated Responders
 
 Using decorators, we can simplify and automate the attachment of responders to broadcasters:
 
@@ -883,11 +883,8 @@ thermometer.celsius = 200
 #: report: 200C
 ```
 
-The `respond()` decorator method appends the function to the thermometer's list and returns the function unchanged,
+The `respond()` decorator method appends the function to the `thermometer` list and returns the function unchanged,
 so `report` stays callable by name.
-`disconnect()` takes that name back out,
-matching by equality as `Broadcaster`'s does,
-so `thermometer.celsius = 200` reaches `report` alone.
 
 To minimize application code, all common behaviors are captured in the library.
 The first piece builds the property that announces a field:
