@@ -983,15 +983,10 @@ and its body assigns `self.celsius = celsius`.
 `dataclass()` modifies the class in place and returns it,
 and `[1]` binds that result to `built`.
 
-`[2]` asks `fields()` for the class's dataclass fields,
-one `Field` per annotation, each carrying its name.
-At runtime `cls` and `built` are therefore one class.
-The type checker tells them apart.
-To the checker, `cls` is still the class the `class` statement declared,
-with no dataclass fields, so it rejects `fields(cls)`.
-`built` is the class as `dataclass()` returned it,
-and `ty` lets `fields()` take that (Pyright rejects both calls),
-so `[1]` keeps the return value instead of discarding it.
+`[2]` asks `fields()` for the dataclass fields, one `Field` per annotation,
+each carrying its name.
+It passes `built` rather than `cls` to satisfy the type checker,
+which still sees `cls` as the class the `class` statement declared and rejects `fields(cls)`.
 
 `[3]` builds the property for the field's name,
 and `[4]` installs it on the class under that same name,
