@@ -42,6 +42,9 @@ The `@hijack` above `cheese()` means:
 
     cheese = hijack(cheese)
 
+The `@` line is *syntactic sugar* for that assignment:
+the same call and the same rebinding,
+written above the function instead of after it.
 `hijack` returns `doesnt_matter`, which Python assigns to the name `cheese`,
 so `cheese` now refers to `doesnt_matter`.
 Calling `cheese()` runs `doesnt_matter`,
@@ -168,7 +171,9 @@ if __name__ == "__main__":
 ### `wraps` Keeps the Runtime Interface
 
 `functools.wraps` copies the original function's metadata onto the wrapper:
-its name, docstring, and other attributes.
+`__module__`, `__name__`, `__qualname__`, `__doc__`, `__annotate__`,
+and `__type_params__`, the tuple `functools.WRAPPER_ASSIGNMENTS`,
+and it merges the original's `__dict__` into the wrapper's.
 Without it, the decorated `add` reports its name as `wrapper` and loses its docstring,
 misleading debuggers, `help()`, and documentation tools.
 `wraps` is optional, and reasons to omit it are rare.
@@ -242,6 +247,10 @@ so `result` holds that coroutine object rather than the value the coroutine will
 The trace line then prints `<- add = <coroutine object add at 0x...>`.
 A wrapper over a coroutine function must be [`async def`](19_Techniques--Concurrency.md#asyncio-mechanics)
 and `await func(*args, **kwargs)`.
+The annotations change to match: `func` is a `Callable[P, Awaitable[R]]`,
+the wrapper is `async def wrapper(...) -> R`,
+and the decorator returns a `Callable[P, Coroutine[Any, Any, R]]`,
+since calling an `async def` function produces a coroutine rather than an `R`.
 
 ## Decorators That Take Arguments
 
