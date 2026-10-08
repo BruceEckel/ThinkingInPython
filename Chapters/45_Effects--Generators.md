@@ -572,7 +572,7 @@ However deep you stack delegations, the number of drivers stays at one.
 The generator yields a `Question`, `drive()` looks it up,
 and no other code receives it.
 `yield from` answers nothing.
-It relays the request upward and passes the reply back down intact,
+It relays the request upward and passes the answer back down intact,
 so `survey()` contains no code that reads a `Question`.
 
 `StopIteration` divides `drive()` and `yield from` along that same line.
