@@ -1012,7 +1012,7 @@ A class with several published attributes uses `WeatherStation`'s name-and-value
 
 ## Observer and I/O
 
-All the examples so far assume that every responder finishes at once.
+All the examples so far assume that every responder finishes immediately.
 Each prints, appends, or writes back, then returns.
 `announce()` calls the responders one at a time, in connection order,
 so a responder that calls a network service or writes to a database makes the responders connected after it wait for that call to finish,
@@ -1021,8 +1021,8 @@ and the setter that announced the change waits for all of them.
 An asynchronous `Broadcaster` removes the wait between responders.
 Its responders are coroutines,
 and its `announce()` awaits them together with `asyncio.gather()`,
-so one state change notifies every responder concurrently,
-and each finishes on its own schedule.
+so one state change notifies all responders at once,
+and each one finishes on its own schedule.
 `gather()` waits for all of them,
 so `announce()` returns only after every responder finishes.
 
@@ -1060,19 +1060,13 @@ class Broadcaster[T]:
 `gather()` takes one awaitable per argument rather than an iterable of them,
 so `announce()` calls the responders in a generator expression and [unpacks](05_Foundations--Functions.md#unpacking-arguments)
 that generator with `*`, turning each coroutine into its own argument.
-`_responders` is a list assigned in the constructor, as in `broadcaster.py`.
-The `_responders` property in `weather_station.py` and `broadcasting.py` exists because their `__setattr__()` reads the list before the constructor assigns it,
-and this class has no `__setattr__()`.
 
 The `AsyncResponder` `type` alias makes the type checker reject a plain function as a responder.
-A responder must return an awaitable,
-and calling an `async` function produces one.
-The type checker also rejects the reverse mistake,
-an `async` function connected to the synchronous `Broadcaster`.
+A responder must return an awaitable, produce by calling an `async` function.
 
-An `announce()` that awaits is a coroutine,
-and its caller must `await` it in turn,
-so the setter that calls it must also be `async`.
+Because `announce()` awaits, it must also be a coroutine,
+and its caller must `await` it in turn.
+The setter that calls it must also be `async`.
 The asynchronous `Thermometer` changes `celsius` with an awaitable method,
 `set_celsius()`, rather than an assignment `t.celsius = value`:
 
