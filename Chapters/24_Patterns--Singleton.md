@@ -815,7 +815,7 @@ This chapter's [solutions](../Solutions/24_Patterns--Singleton/) give a hint,
 usually the shape of the code, and a full answer for each exercise.
 
 1.  `singleton_pattern.py` waits for the first construction to build its inner object.
-    Modify it to use *eager initialization*,
+    Modify it to use eager creation,
     creating the inner instance in the class body,
     and remove the sentinel and the guard.
     What did the change cost,
@@ -831,7 +831,7 @@ usually the shape of the code, and a full answer for each exercise.
     `settings = {"theme": "dark"}`,
     and add `import config` plus `print(config.settings)` at the end.
     Predict both printed values before running it,
-    and explain the difference using the [binding-versus-mutation distinction](#a-module-is-already-a-singleton).
+    and explain the difference using the [mutate-versus-rebind distinction](#a-module-is-already-a-singleton).
 5.  Add a `threading.Lock` *inside* `settings()` in `singleton_cached_race.py`,
     wrapping only the body of the cached function, and run it.
     Explain why the object count does not drop to one,

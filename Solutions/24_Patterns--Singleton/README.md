@@ -3,7 +3,7 @@
 ## 1. `singleton_pattern.py` rewritten to eager initialization
 
 > `singleton_pattern.py` waits for the first construction to build its inner object.
-> Modify it to use *eager initialization*,
+> Modify it to use eager creation,
 > creating the inner instance in the class body,
 > and remove the sentinel and the guard.
 > What did the change cost,
@@ -299,7 +299,7 @@ Absent that requirement, a module is the simpler tool.
 > `settings = {"theme": "dark"}`,
 > and add `import config` plus `print(config.settings)` at the end.
 > Predict both printed values before running it,
-> and explain the difference using the [binding-versus-mutation distinction](../../Chapters/24_Patterns--Singleton.md#a-module-is-already-a-singleton).
+> and explain the difference using the [mutate-versus-rebind distinction](../../Chapters/24_Patterns--Singleton.md#a-module-is-already-a-singleton).
 
 <details>
 <summary>Where to look</summary>
