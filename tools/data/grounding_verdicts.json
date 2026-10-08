@@ -1,7 +1,7 @@
 {
  "6476eb4778e6007d": {
   "file": "02_Foundations--Tour.md",
-  "line": 349,
+  "line": 351,
   "target": "07_Foundations--Classes.md",
   "terms": [
    "Bucket"
@@ -12,7 +12,7 @@
  },
  "6b9909bf303359bf": {
   "file": "02_Foundations--Tour.md",
-  "line": 598,
+  "line": 603,
   "target": "16_Techniques--Comprehensions.md",
   "terms": [
    "piece",
@@ -24,7 +24,7 @@
  },
  "6105b531c2441ebb": {
   "file": "11_Techniques--Testing.md",
-  "line": 103,
+  "line": 106,
   "target": "12_Techniques--Data_Classes_as_Types.md",
   "terms": [
    "Account"
@@ -35,7 +35,7 @@
  },
  "58b756be3c8da8fa": {
   "file": "12_Techniques--Data_Classes_as_Types.md",
-  "line": 231,
+  "line": 234,
   "target": "09_Foundations--Class_Attributes.md",
   "terms": [
    "depth"
@@ -46,7 +46,7 @@
  },
  "92d572806e136770": {
   "file": "12_Techniques--Data_Classes_as_Types.md",
-  "line": 700,
+  "line": 703,
   "target": "08_Foundations--Static_Types.md",
   "terms": [
    "Stars"
@@ -57,7 +57,7 @@
  },
  "ceda21ecec78c6c4": {
   "file": "12_Techniques--Data_Classes_as_Types.md",
-  "line": 1013,
+  "line": 1010,
   "target": "05_Foundations--Functions.md",
   "terms": [
    "Months"
@@ -68,7 +68,7 @@
  },
  "6cb9321f81198731": {
   "file": "14_Techniques--Decorators.md",
-  "line": 1196,
+  "line": 1205,
   "target": "07_Foundations--Classes.md",
   "terms": [
    "trace"
@@ -79,7 +79,7 @@
  },
  "0c738529ede5867a": {
   "file": "19_Techniques--Concurrency.md",
-  "line": 249,
+  "line": 250,
   "target": "15_Techniques--Context_Managers.md",
   "terms": [
    "Meter"
@@ -90,7 +90,7 @@
  },
  "0bfdf37ac6c6f194": {
   "file": "19_Techniques--Concurrency.md",
-  "line": 1282,
+  "line": 1283,
   "target": "22_Patterns--Data_Transfer_Objects.md",
   "terms": [
    "Times"
@@ -170,7 +170,7 @@
  },
  "ded4015137e431d6": {
   "file": "24_Patterns--Singleton.md",
-  "line": 176,
+  "line": 177,
   "target": "11_Techniques--Testing.md",
   "terms": [
    "__Settings"
@@ -181,7 +181,7 @@
  },
  "a51f08d6349a2b99": {
   "file": "24_Patterns--Singleton.md",
-  "line": 710,
+  "line": 697,
   "target": "26_Patterns--Surrogate.md",
   "terms": [
    "__call__"
@@ -192,7 +192,7 @@
  },
  "c358c8813c054976": {
   "file": "25_Patterns--Template_Method.md",
-  "line": 204,
+  "line": 212,
   "target": "07_Foundations--Classes.md",
   "terms": [
    "getattr"
@@ -295,7 +295,7 @@
  },
  "efad5ab6dc412cd9": {
   "file": "30_Patterns--Observer.md",
-  "line": 536,
+  "line": 539,
   "target": "10_Foundations--Cleanup.md",
   "terms": [
    "disconnect"
@@ -304,20 +304,20 @@
   "p_terms": 0.0,
   "asked": "2026-10-05"
  },
- "3ac5a24604e03f24": {
+ "fa774505d1fd8381": {
   "file": "30_Patterns--Observer.md",
-  "line": 601,
+  "line": 604,
   "target": "10_Foundations--Cleanup.md",
   "terms": [
    "announce"
   ],
-  "sentence": "An implementation with a [tracing collector](10_Foundations--Cleanup.md#watching-objects-without-holding-them), such as PyPy, collects the object when its collector runs, and the `gc.collect()` call runs that collector before the second `announce()`.",
+  "sentence": "An implementation with a [tracing collector](10_Foundations--Cleanup.md#watching-objects-without-holding-them), such as PyPy, collects the object when its collector runs, and the `gc.collect()` call runs that collector before `announce(30.0)`.",
   "p_terms": 0.01,
-  "asked": "2026-10-05"
+  "asked": "2026-10-08"
  },
  "e8e91f728192b79c": {
   "file": "30_Patterns--Observer.md",
-  "line": 1646,
+  "line": 1782,
   "target": "17_Techniques--Metaprogramming.md",
   "terms": [
    "Notifying",
@@ -373,7 +373,7 @@
  },
  "e8596ef215d9870a": {
   "file": "31_Patterns--State_Machines.md",
-  "line": 992,
+  "line": 1000,
   "target": "26_Patterns--Surrogate.md",
   "terms": [
    "UnpredictablePerson",
@@ -386,7 +386,7 @@
  },
  "8b236a72729572a5": {
   "file": "31_Patterns--State_Machines.md",
-  "line": 1004,
+  "line": 1012,
   "target": "23_Patterns--Iterators.md",
   "terms": [
    "mouse_move_generator",
@@ -420,16 +420,16 @@
   "p_terms": 0.23,
   "asked": "2026-10-02"
  },
- "f52e1a4cb81fc818": {
+ "3b88b8b75b629801": {
   "file": "34_Patterns--Composite_and_Interpreter.md",
   "line": 564,
   "target": "33_Patterns--Visitor.md",
   "terms": [
    "to_infix"
   ],
-  "sentence": "Adding `to_infix()` without editing a node class is the ability [*Visitor*](33_Patterns--Visitor.md) exists to provide: new operations over a fixed hierarchy, defined outside it.",
+  "sentence": "Adding `to_infix()` without editing a node class is the ability [*Visitor*](33_Patterns--Visitor.md) exists to provide: new operations over an existing hierarchy, defined outside it.",
   "p_terms": 0.0,
-  "asked": "2026-09-27"
+  "asked": "2026-10-08"
  },
  "346bd608b70887ba": {
   "file": "35_Patterns--Flyweight.md",
@@ -466,7 +466,7 @@
  },
  "ac09f5e8941b7dcd": {
   "file": "37_Patterns--Pattern_Refactoring.md",
-  "line": 636,
+  "line": 637,
   "target": "07_Foundations--Classes.md",
   "terms": [
    "singledispatch",
@@ -479,7 +479,7 @@
  },
  "5a1e947901d88713": {
   "file": "40_Functional--Foundations.md",
-  "line": 581,
+  "line": 580,
   "target": "05_Foundations--Functions.md",
   "terms": [
    "partial"
@@ -523,7 +523,7 @@
  },
  "709ba98f5b49d11a": {
   "file": "46_Effects--Stateless.md",
-  "line": 1331,
+  "line": 1332,
   "target": "44_Effects--Effect_Management.md",
   "terms": [
    "Need"
@@ -545,7 +545,7 @@
  },
  "757f33f7028c918e": {
   "file": "47_Effects--Stateless_in_Practice.md",
-  "line": 1322,
+  "line": 1327,
   "target": "46_Effects--Stateless.md",
   "terms": [
    "Oven",
