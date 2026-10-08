@@ -550,6 +550,30 @@ def rewrite(v: Vars) -> None:
     py("tools.rewrite", *v.words("CH"), *model, *v.words("ARGS"))
 
 
+@task("Outside review of a chapter by Gemini through the Antigravity CLI "
+      "(CH=17; MODEL=; ARGS=--dry-run)")
+def outside_review(v: Vars) -> None:
+    """Send one chapter to Google's Antigravity CLI (`agy`, a Gemini front
+    end) for an outside review, and save the reply as
+    outside_review/<stem>.md. It never edits a chapter. Applying the review
+    is a separate step, done in a Claude session that tests each item
+    against the chapter before editing anything.
+
+    It needs an `agy` that is installed and signed in. Install it from
+    https://antigravity.google/docs/getting-started?tab=cli and sign in
+    once by running `agy`. The default model is gemini-3.1-pro-high;
+    MODEL= picks another, such as gemini-3.8-flash-high.
+
+    CH="17 18" reviews several chapters one after another, in the order
+    given. ARGS=--dry-run prints each command, the output path, and the
+    message length, and calls nothing. It costs tokens and is
+    nondeterministic, so it is never part of verify/gate/ci and refuses
+    to run under CI.
+    """
+    model = ["--model", v.get("MODEL")] if v.get("MODEL") else []
+    py("tools.outside_review", *v.words("CH"), *model, *v.words("ARGS"))
+
+
 section("Code examples (build/examples/, build/solutions/)")
 
 
