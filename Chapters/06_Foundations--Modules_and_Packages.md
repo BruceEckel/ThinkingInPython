@@ -136,7 +136,7 @@ Import the module and write `app_settings.debug` when the value can change.
 Use `from ... import` for names that keep the same value,
 such as functions and classes.
 
-You can rename a module's namespace during an import with the `as` keyword:
+The `as` keyword binds the imported module to a name you choose:
 
 ```python
 # using_as.py
