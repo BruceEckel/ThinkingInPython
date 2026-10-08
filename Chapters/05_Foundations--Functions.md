@@ -305,6 +305,10 @@ Create a sentinel once and share that name.
 Two `sentinel()` calls with the same name build two different objects,
 so `default is sentinel("MISSING")` compares against a second object and is always false.
 
+Code written before 3.15 builds the same marker as `MISSING = object()`:
+a bare `object()` is unique, so `is` tells it apart from every other value,
+but it prints as `<object object at 0x...>` where `sentinel()`'s value prints its name.
+
 ## Names Inside a Function
 
 A function can read a module-level name,
@@ -340,9 +344,13 @@ print(count)
 ```
 
 `rebinds()` leaves the module-level `count` alone.
-If you drop the `global` from `writes_global()`,
-`count += 1` reads a local before assigning it,
-so the call raises an `UnboundLocalError`.
+Python decides which names are local when it compiles the function,
+before any of it runs:
+a name assigned anywhere in the body is local throughout the body.
+`+=` is an assignment, so if you drop the `global` from `writes_global()`,
+the compiler marks `count` local for the whole function,
+and the read half of `count += 1` looks up a local that has no value yet.
+The call raises an `UnboundLocalError`.
 `global` governs rebinding, not reading, so `read_only()` needs no declaration.
 [Closures](40_Functional--Foundations.md#closures) covers `nonlocal`,
 which rebinds a name in an enclosing function the way `global` rebinds a module-level name.
@@ -569,7 +577,9 @@ For anything more complicated, write a separate function.
 For a key that reads an index or an attribute,
 `operator.itemgetter()` and `operator.attrgetter()` name the same operation without a lambda.
 `sorted(words, key=operator.itemgetter(-1))` replaces `key=lambda w: w[-1]` in `lambdas.py`.
-Write a lambda when the key needs an expression that neither getter builds.
+For a key that calls a method on each element,
+`operator.methodcaller("lower")` replaces `lambda w: w.lower()`.
+Write a lambda when the key needs an expression that none of the three builds.
 
 ## Exercises
 
