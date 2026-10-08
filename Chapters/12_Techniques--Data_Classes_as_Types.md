@@ -53,6 +53,9 @@ Python strips every `assert` when you run with `-O` or `-OO`,
 which silently disables every validation this chapter builds,
 the failure this chapter exists to prevent.
 No flag removes a `raise`.
+`assert` is a debugging aid for an invariant the program's own logic guarantees,
+which is why the optimizer may remove it;
+a value that arrives from outside the program needs a check that stays.
 
 `eq=False` turns off the generated `__eq__()`, for two reasons.
 A mutable data class that defines `__eq__()` [sets `__hash__` to `None`](#data-classes),
@@ -1225,6 +1228,13 @@ c = Logged("localhost", "db")
 print(c.host, c.name)
 #: localhost db
 ```
+
+A default in the base class is the one snag.
+If `host` had a default, `name` would follow it with none,
+and `@dataclass` refuses that order
+([More Data Class Tools](#more-data-class-tools) has the rule).
+`kw_only=True` on `Logged` makes `name` keyword-only,
+and the rule stops applying.
 
 ## Frozen and Plain Data Classes Do Not Mix
 
