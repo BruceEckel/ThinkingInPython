@@ -1012,20 +1012,23 @@ A class with several published attributes uses `WeatherStation`'s name-and-value
 
 ## Observer and I/O
 
-So far, every responder finishes at once.
+All the examples so far assume that every responder finishes at once.
 Each prints, appends, or writes back, then returns.
-`announce()` notifies the responders one at a time,
-so a responder that calls a network service or writes to a database holds up every responder after it.
+`announce()` calls the responders one at a time, in connection order,
+so a responder that calls a network service or writes to a database makes the responders connected after it wait for that call to finish,
+and the setter that announced the change waits for all of them.
 
-If responders are coroutines,
-`announce()` awaits them together with `asyncio.gather()`,
-so one state change notifies every responder concurrently.
-A slow responder doesn't delay the others.
+An asynchronous `Broadcaster` removes the wait between responders.
+Its responders are coroutines,
+and its `announce()` awaits them together with `asyncio.gather()`,
+so one state change notifies every responder concurrently,
+and each finishes on its own schedule.
 `gather()` waits for all of them,
-so `announce()` returns once every responder finishes.
+so `announce()` returns only after every responder finishes.
 
 [Concurrency](19_Techniques--Concurrency.md#asyncio-mechanics)
-covers the `asyncio` mechanics (`async def`, `await`, `gather()`, `run()`):
+covers the mechanics (`async def`, `await`, `gather()`, `run()`)
+the `asyncio` `Broadcaster` uses:
 
 ```python
 # async_broadcaster.py
@@ -1057,6 +1060,9 @@ class Broadcaster[T]:
 `gather()` takes one awaitable per argument rather than an iterable of them,
 so `announce()` calls the responders in a generator expression and [unpacks](05_Foundations--Functions.md#unpacking-arguments)
 that generator with `*`, turning each coroutine into its own argument.
+`_responders` is a list assigned in the constructor, as in `broadcaster.py`.
+The `_responders` property in `weather_station.py` and `broadcasting.py` exists because their `__setattr__()` reads the list before the constructor assigns it,
+and this class has no `__setattr__()`.
 
 The `AsyncResponder` `type` alias makes the type checker reject a plain function as a responder.
 A responder must return an awaitable,
