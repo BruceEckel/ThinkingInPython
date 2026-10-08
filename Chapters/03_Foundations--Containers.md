@@ -847,7 +847,7 @@ writing to `settings` changes what `config` reports.
 
 ### `frozendict`
 
-A `MappingProxyType` is a window onto a `dict` that still exists and can change.
+A `MappingProxyType` is a view onto a `dict` that still exists and can change.
 A `frozendict` owns its contents.
 This listing requires Python 3.15:
 
