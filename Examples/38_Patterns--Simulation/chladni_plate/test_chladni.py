@@ -1,7 +1,7 @@
 # chladni_plate/test_chladni.py
 from chladni import Plate
 
-def test_noise_settles_grains_onto_quiet_lines() -> None:
+def test_noise_settles_grains_onto_nodal_lines() -> None:
     plate = Plate(grains=500, mode=(2, 3), seed=1)
     before = plate.agitation()
     for _ in range(400):

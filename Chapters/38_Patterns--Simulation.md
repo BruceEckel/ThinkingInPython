@@ -1348,7 +1348,7 @@ Agitation collapses toward zero, and the picture shows why.
 The grains have gathered on the nodal lines of mode `(2, 3)`.
 Nothing steered them there.
 In a loud region the kicks stay large,
-so a grain keeps moving until a random step puts it near a quiet line,
+so a grain keeps moving until a random step puts it near a nodal line,
 where the kicks shrink toward zero.
 Noise can carry a grain into a quiet place.
 It cannot carry the grain back out.
@@ -1372,7 +1372,7 @@ Seeding `random.Random` makes any failure reproducible.
 # chladni_plate/test_chladni.py
 from chladni import Plate
 
-def test_noise_settles_grains_onto_quiet_lines() -> None:
+def test_noise_settles_grains_onto_nodal_lines() -> None:
     plate = Plate(grains=500, mode=(2, 3), seed=1)
     before = plate.agitation()
     for _ in range(400):
