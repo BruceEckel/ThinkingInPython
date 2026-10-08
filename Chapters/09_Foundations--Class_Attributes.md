@@ -71,6 +71,9 @@ print(vars(A)["x"])
 
 The listing subscripts `vars(A)` instead of printing it whole,
 because a class's dictionary is a read-only `mappingproxy` that carries the compiler's own bookkeeping alongside `x`.
+Assigning through the class name changes the entry, as `Stars.rating = 9` does,
+and `setattr(A, "x", 5)` does the same when the name arrives as a string;
+writing to the proxy raises a `TypeError`.
 The instance dictionary is a plain `dict` holding what the code assigned,
 and that alone.
 
@@ -289,7 +292,7 @@ so the first read raises an `AttributeError`.
 The type checker (`ty`) reports nothing here,
 for the reason it reports nothing for `label`.
 It trusts the declaration rather than tracking which code runs first.
-Pyright agrees, and its optional `reportUninitializedInstanceVariable` covers a bare instance annotation,
+Pyright agrees: its optional `reportUninitializedInstanceVariable` rule checks instance variables,
 not a `ClassVar`, so neither checker catches this read.
 `Registry.count = 0` creates the attribute on the class,
 and an instance finds it by fallback.
