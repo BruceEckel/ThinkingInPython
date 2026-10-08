@@ -883,17 +883,17 @@ thermometer.celsius = 200
 #: report: 200C
 ```
 
-The `respond()` decorator method appends the function to the `thermometer` list and returns the function unchanged,
+The `respond()` decorator method appends its function to the `thermometer` list and returns the function unchanged,
 so `report` stays callable by name.
 
 To minimize application code, all common behaviors are captured in the library.
-The first piece builds the property that announces a field:
+The first piece builds the property that publishes a field:
 
 ```python
-# announcing.py
+# published.py
 from typing import Any
 
-def announcing(name: str) -> property:
+def published(name: str) -> property:
     def read(self: Any) -> Any:
         return self.__dict__[name]
 
@@ -910,21 +910,21 @@ routing the read through `read()` and the write through `write()`
 (these function names can be anything).
 The decorator form needs a `def` in the class body for each attribute.
 
-`announcing()` takes a field name and builds the two functions a `property` needs.
+`published()` takes a field name and builds the two functions a `property` needs.
 `read()` returns the value stored under that name in the instance's `__dict__`.
 `write()` stores a new value (`[1]`) and then calls `announce()` with it
 (`[2]`), so every assignment to the field notifies the responders.
 Nothing in this file defines `announce()`.
 It is a method of `Broadcasting`, the class that will own the property,
-and `announcing()` reaches it through `self`, which is annotated `Any`,
+and `published()` reaches it through `self`, which is annotated `Any`,
 so the type checker accepts the call and the runtime finds the method on the thermometer when `write()` runs.
 `value` is `Any` for the same reason:
-`announcing()` knows the field by name alone,
+`published()` knows the field by name alone,
 and the type checker types `thermometer.celsius` from the subclass's annotation,
 not from this property.
 `[3]` returns the pair as a `property()`.
 
-`announcing()` builds the property for a name it learns at runtime,
+`published()` builds the property for a name it learns at runtime,
 so one function serves every field of every subclass.
 `Broadcasting` installs that property on the class under the field's name,
 and `write()` stores each value in the instance `__dict__` under the same name.
@@ -939,7 +939,7 @@ and the property reads or writes the `__dict__` entry behind it.
 from collections.abc import Callable
 from dataclasses import dataclass, fields
 from typing import dataclass_transform
-from announcing import announcing
+from published import published
 
 type Responder[T] = Callable[[T], None]
 
@@ -948,7 +948,7 @@ class Broadcasting[T]:
     def __init_subclass__(cls) -> None:
         built = dataclass(eq=False)(cls)  # [1]
         for field in fields(built):  # [2]
-            prop = announcing(field.name)  # [3]
+            prop = published(field.name)  # [3]
             setattr(cls, field.name, prop)  # [4]
 
     @property

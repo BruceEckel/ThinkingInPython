@@ -2,7 +2,7 @@
 from collections.abc import Callable
 from dataclasses import dataclass, fields
 from typing import dataclass_transform
-from announcing import announcing
+from published import published
 
 type Responder[T] = Callable[[T], None]
 
@@ -11,7 +11,7 @@ class Broadcasting[T]:
     def __init_subclass__(cls) -> None:
         built = dataclass(eq=False)(cls)  # [1]
         for field in fields(built):  # [2]
-            prop = announcing(field.name)  # [3]
+            prop = published(field.name)  # [3]
             setattr(cls, field.name, prop)  # [4]
 
     @property

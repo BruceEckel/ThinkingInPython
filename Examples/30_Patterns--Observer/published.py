@@ -1,7 +1,7 @@
-# announcing.py
+# published.py
 from typing import Any
 
-def announcing(name: str) -> property:
+def published(name: str) -> property:
     def read(self: Any) -> Any:
         return self.__dict__[name]
 
