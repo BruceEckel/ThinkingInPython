@@ -328,7 +328,9 @@ an integer derived from the key's contents.
 Python reduces that integer to the slot where the entry lives.
 A key whose hash changed after insertion would send the next lookup to a different slot,
 and the lookup would miss the entry.
-So keys must be *hashable*: able to produce a hash that stays the same.
+So keys must be *hashable*: able to produce a hash that stays the same,
+and comparable with `==`,
+since lookup checks that the key stored in the slot equals the one it was given.
 Strings, numbers, and tuples of hashable values are hashable.
 The mutable built-in containers (`list`, `dict`, `set`) are not,
 because their contents can change, so they cannot be keys.
@@ -765,8 +767,9 @@ print(height)
 
 A `namedtuple` is a fixed-length record like the tuple in `heterogeneous.py`,
 but its fields are self-documenting.
-`typing.NamedTuple` is the class form of the same idea.
-It declares a type for each field instead of listing bare names,
+`typing.NamedTuple` is the class form of the same idea:
+you write `class Person(NamedTuple):` and annotate each field in the body,
+`name: str`, instead of listing bare names,
 so a type checker knows what each one holds.
 For a record that must be mutable,
 use a [data class](12_Techniques--Data_Classes_as_Types.md#data-classes).
