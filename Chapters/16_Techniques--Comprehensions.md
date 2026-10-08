@@ -242,6 +242,10 @@ Inverting assumes the values are unique.
 `Arthur` and `Robin` both sit at seat `1`.
 `Robin`, entered later, overwrites `Arthur` at key `1`,
 the same rule any duplicate dictionary key follows.
+To keep both names, group instead of inverting:
+a `for` loop over `seat_of.items()` that appends each name to a [`defaultdict(list)`](03_Foundations--Containers.md#defaultdict)
+keyed by seat produces `{1: ['Arthur', 'Robin'], 2: ['Galahad']}`,
+a shape a comprehension cannot accumulate.
 
 ## Nested Comprehensions
 
@@ -625,6 +629,10 @@ print(list(nums))
 
 A generator expression runs once,
 and after something consumes its values it is empty.
+The generator keeps its place between calls, and once its body has finished,
+every further `next()` raises `StopIteration`
+([Iterators](23_Patterns--Iterators.md#iteration-comes-built-in) has the protocol),
+which `sum()`, `any()`, and `list()` each read as the end.
 `sum()` drains `nums`,
 so `any()` sees no elements and reports `False` instead of `True`,
 with no exception to say the question went unasked.
