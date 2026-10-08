@@ -984,11 +984,9 @@ and its body assigns `self.celsius = celsius`.
 and `[1]` binds that result to `built`.
 
 `[2]` asks `fields()` for the class's dataclass fields,
-one `Field` object per annotation, each carrying the field's name.
-`fields()` accepts a dataclass type, and `dataclass()` returned `built`,
-so the type checker knows `built` as a dataclass type.
-`cls` is the class as declared, and the checker rejects `fields(cls)`,
-which is why `[1]` binds its result instead of discarding it.
+one `Field` per annotation, each carrying its name.
+`[1]` binds `dataclass()`'s result as `built` because the type checker rejects `fields(cls)`:
+`cls` is the class as declared, before `dataclass()` made it one.
 
 `[3]` builds the property for the field's name,
 and `[4]` installs it on the class under that same name,
