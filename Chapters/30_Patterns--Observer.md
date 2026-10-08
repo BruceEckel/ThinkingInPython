@@ -921,7 +921,7 @@ and `published()` reaches it through `self`, which is annotated `Any`,
 so the type checker accepts the call and the runtime finds the method on the instance when `write()` runs.
 `value` is `Any` for the same reason:
 `published()` knows the field by name alone,
-and the type checker types `thermometer.celsius` from the subclass's annotation,
+and the type checker types each field from the subclass's annotation,
 not from this property.
 `[3]` returns the pair as a `property()`.
 
@@ -930,7 +930,7 @@ so one function serves every field of every subclass.
 `Broadcasting` installs that property on the class under the field's name,
 and `write()` stores each value in the instance `__dict__` under the same name.
 Python looks up a data descriptor on the class before it looks in the instance `__dict__`,
-so `thermometer.celsius` always reaches the property,
+so every read or write of the field reaches the property,
 and the property reads or writes the `__dict__` entry behind it.
 
 `Broadcasting` installs that property on each subclass and holds the responders:
