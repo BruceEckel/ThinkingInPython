@@ -909,7 +909,9 @@ Called directly (`[3]`),
 it returns a class attribute that intercepts every read and write of that name on an instance,
 routing the read through `read()` and the write through `write()`
 (these function names can be anything).
-The decorator form needs a `def` in the class body for each attribute.
+The `@property` form needs a method written in the class body for each attribute,
+where `published()` builds the pair as nested functions, once,
+for any field name.
 
 `published()` takes a field name and builds the two functions a `property` needs.
 `read()` returns the value stored under that name in the instance's `__dict__`.
