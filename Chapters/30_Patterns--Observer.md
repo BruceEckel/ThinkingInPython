@@ -989,20 +989,20 @@ It passes `built` rather than `cls` to satisfy the type checker,
 which still sees `cls` as the class the `class` statement declared and rejects `fields(cls)`.
 
 `[3]` builds the property for the field's name,
-and `[4]` installs it on the class under that same name,
+and `[4]` installs it on the class under that name,
 so `Thermometer.celsius` is now a property.
 Python looks up a data descriptor on the class before it looks in the instance `__dict__`,
 so every `thermometer.celsius` read or write reaches the property,
 which reads or writes the `__dict__` entry of the same name behind it.
-The generated `__init__()` captured any default the field declared at `[1]`,
+The generated `__init__()` captures any default the field declares at `[1]`,
 so replacing the class attribute at `[4]` changes nothing about construction.
-From here the subclass behaves as if its author had written `thermometer.py`'s constructor and property pair.
+Now the subclass behaves as if its author had written `thermometer.py`'s constructor and property pair.
 
 `@dataclass_transform` on the base class is the type checker's side of `[1]`
 ([`@dataclass_transform` Is a Claim](17_Techniques--Metaprogramming.md#dataclass-transform)).
 It tells the checker that every subclass is dataclass-like,
-so the checker synthesizes the same `__init__()` that `dataclass()` builds at runtime,
-and `Thermometer(100)` type-checks against a parameter `celsius: float`.
+so the checker synthesizes the same `__init__(self, celsius: float)` that `dataclass()` builds at runtime,
+and accepts `Thermometer(100)` because `100` fits that parameter.
 `eq_default=False` makes the checker's claim match the runtime `eq=False`.
 
 `Broadcasting` has one type parameter, so a subclass publishes one value.
