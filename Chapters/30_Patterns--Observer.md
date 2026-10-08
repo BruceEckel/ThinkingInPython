@@ -837,7 +837,7 @@ One `__setattr__()` for every attribute gives up three things that `Thermometer`
     and filters by name to act on one attribute.
     `Thermometer` publishes one attribute and is a `Broadcaster[float]`,
     so each responder takes the `float` reading as its one argument.
-    [Deciding What Matters](#deciding-what-matters) revisits that name filter.
+    This issue is revisited in [Deciding What Matters](#deciding-what-matters).
     A responder that sorts its own notifications means the broadcaster has left the decision to its responders.
 2.  Every assignment reaches the responders, including the internal ones.
     A cached result or a hit counter broadcasts like a published attribute,
@@ -853,10 +853,10 @@ One `__setattr__()` for every attribute gives up three things that `Thermometer`
 
 ### Generating the Broadcaster
 
-We can simplify and automate the attachment of responders to broadcasters by using decorators:
+Using decorators, we can simplify and automate the attachment of responders to broadcasters:
 
 ```python
-# broadcasting_demo.py
+# generated_thermometer.py
 from broadcasting import Broadcasting
 
 class Thermometer(Broadcasting[float]):

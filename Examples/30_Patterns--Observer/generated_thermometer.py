@@ -1,4 +1,4 @@
-# broadcasting_demo.py
+# generated_thermometer.py
 from broadcasting import Broadcasting
 
 class Thermometer(Broadcasting[float]):
