@@ -1062,13 +1062,14 @@ so `announce()` calls the responders in a generator expression and [unpacks](05_
 that generator with `*`, turning each coroutine into its own argument.
 
 The `AsyncResponder` `type` alias makes the type checker reject a plain function as a responder.
-A responder must return an awaitable, produce by calling an `async` function.
+A responder must return an awaitable, produced by calling an `async` function.
 
 Because `announce()` awaits, it must also be a coroutine,
 and its caller must `await` it in turn.
-The setter that calls it must also be `async`.
-The asynchronous `Thermometer` changes `celsius` with an awaitable method,
-`set_celsius()`, rather than an assignment `t.celsius = value`:
+An assignment such as `t.celsius = value` cannot await anything,
+so a property setter cannot call this `announce()`.
+The asynchronous `Thermometer` therefore replaces the setter with a coroutine method,
+`set_celsius()`, and a caller writes `await t.set_celsius(value)`:
 
 ```python
 # async_thermometer.py
