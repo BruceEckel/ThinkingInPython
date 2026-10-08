@@ -95,7 +95,8 @@ except ValueError as error:
 ```
 
 Without the `try`/`finally`,
-Python resumes the generator by raising the block's exception at the `yield`,
+`@contextmanager`'s `__exit__()` calls the generator's `throw()` method,
+which resumes the generator by raising the block's exception at the `yield`,
 so the code after the `yield`, `exit A` included, never runs.
 Nothing warns you.
 The generator silently skips the cleanup on the one path where it matters most.
@@ -266,6 +267,9 @@ When it raises an exception, they hold the exception's class, its instance,
 and its traceback object.
 `Trace.__exit__()` in `trace_cm.py` types `exc` and `tb` as `object`,
 the most general type, since it ignores both.
+A manager that reads them types `exc` as `BaseException | None`,
+as `expected_one` below does, and `tb` as `TracebackType | None`,
+with `TracebackType` imported from `types`.
 
 The return value decides that exception's fate.
 A falsy value lets it propagate.
@@ -1021,6 +1025,10 @@ The queue does more than store the idle items.
 so a borrower waits until another borrower's `with` block ends and returns an item to the queue.
 When several threads share one pool, the queue limits concurrent use,
 the way a real database connection pool does.
+That blocking is for threads.
+In an `asyncio` program a blocking `get()` stalls the event loop,
+so an async pool holds an `asyncio.Queue`, awaits its `get()`,
+and builds `lease()` with `asynccontextmanager`.
 
 `pool_contention.py` puts the pool under real contention.
 Eight threads share a pool of two connections and lease and release two hundred times each.
