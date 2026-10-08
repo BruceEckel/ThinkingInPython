@@ -938,7 +938,7 @@ Whoever draws the phantom sits out that round.
 
 ### Groups of Any Size
 
-Rotation is a pairs-only method.
+The circle method is pairs-only.
 The circle method is a closed-form answer to one narrow question:
 how do you split every possible pair into rounds in which each player appears exactly once?
 Pairs are the only group size where that question has a tidy rotation-based answer.
