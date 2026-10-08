@@ -1543,6 +1543,9 @@ A class decorator cannot make `for c in Color` work.
 It can add methods that instances see,
 but not a protocol method the class object must answer,
 which is why `Color` needs a metaclass, not a decorator.
+Python looks up a special method such as `__iter__()` on the object's type and skips the object's own namespace,
+so `for c in Color` consults `type(Color)`.
+An `__iter__` that a decorator assigns onto `Color` serves instances of `Color` and leaves the class without one.
 
 `__prepare__()` is the one with no simpler substitute:
 
@@ -1659,6 +1662,9 @@ The `ALL_DUNDERS` listing in [The Tool in Use](#the-tool-in-use)
 shows that machinery on a class.
 `__annotate_func__` is the code that computes the annotations,
 and `__annotations_cache__` holds the result after the first request.
+`__annotate__`, the name PEP 649 gives the function,
+is a descriptor on `type` that reads `__annotate_func__`,
+so it lives on the metaclass rather than in the class's own namespace.
 
 `display_object()` relies on `inspect` functions.
 `getmembers_static()` finds the members, `signature()` renders each method,
