@@ -245,7 +245,7 @@ so `console` takes its type from that `ReturnType`,
 not from the `Any` in the SendType.
 
 Taking the type from the `ReturnType` is why every request in this chapter uses `yield from` rather than `yield`,
-and why the custom abilities of [Abilities Are Not Special](47_Effects--Stateless_in_Practice.md#abilities-are-not-special)
+and why the custom Abilities of [Abilities Are Not Special](47_Effects--Stateless_in_Practice.md#abilities-are-not-special)
 get a small function of their own.
 
 ## Built-in Dependencies {#builtin-dependencies}
@@ -1193,19 +1193,19 @@ Having no container has three consequences:
    DI leaves that information in the bodies that ask for it.
    You must read the implementation to learn what a DI function needs.
    `holds()` declares `Need[Material] | Need[Nailer]` in its signature,
-   and a caller that does not supply them inherits the requirement.
+   and a caller that does not supply them inherits both Abilities.
 
 ### Churn in Every Signature
 
-A requirement that every caller inherits is also a drawback.
-[Adding a dependency](#retrofitting-an-effect)
+An Ability that every caller inherits is also a drawback.
+[Adding an Ability](#retrofitting-an-effect)
 such as `Need[Log]` to a working function rewrites the return type of every function above it.
 DI takes the same change with no signature recording it.
 
 Type checking is the earliest practical time to discover a forgotten dependency,
 so the objection concerns churn and coupling rather than correctness.
 A pass-through function such as `greet_all()` still names `Need[Log]` in its type,
-and taking that dependency back out later changes every signature on the path a second time.
+and taking that Ability back out later changes every signature on the path a second time.
 People made the same complaint against [Java's checked exceptions](44_Effects--Effect_Management.md#catch-the-exception-you-expect),
 which failed this way.
 That complaint is why [Effects Propagate, and the Type Checker Verifies It](#effects-propagate-and-the-type-checker-verifies-it)
@@ -1237,7 +1237,7 @@ print(run(report("http://example.com")))
 ```
 
 `Depend[Async, str]` needs `Async`, cannot fail, and produces a `str`.
-Every dependency so far read `Depend[Need[...], ...]`,
+Every signature so far read `Depend[Need[...], ...]`,
 while this one names the Ability with no `Need` around it.
 The rule is the same in both cases.
 The channel holds Abilities.
