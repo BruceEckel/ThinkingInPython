@@ -927,14 +927,6 @@ and the type checker types each field from the subclass's annotation,
 not from this property.
 `[3]` returns the pair as a `property()`.
 
-`published()` builds the property for a name it learns at runtime,
-so one function serves every field of every subclass.
-`Broadcasting` installs that property on the class under the field's name,
-and `write()` stores each value in the instance `__dict__` under the same name.
-Python looks up a data descriptor on the class before it looks in the instance `__dict__`,
-so every read or write of the field reaches the property,
-and the property reads or writes the `__dict__` entry behind it.
-
 `Broadcasting` installs that property on each subclass and holds the responders:
 
 ```python
@@ -998,7 +990,10 @@ which is why `[1]` binds its result instead of discarding it.
 
 `[3]` builds the property for the field's name,
 and `[4]` installs it on the class under that same name,
-so `Thermometer.celsius` is now a property and every `thermometer.celsius` read or write goes through `read()` or `write()`.
+so `Thermometer.celsius` is now a property.
+Python looks up a data descriptor on the class before it looks in the instance `__dict__`,
+so every `thermometer.celsius` read or write reaches the property,
+which reads or writes the `__dict__` entry of the same name behind it.
 The generated `__init__()` captured any default the field declared at `[1]`,
 so replacing the class attribute at `[4]` changes nothing about construction.
 From here the subclass behaves as if its author had written `thermometer.py`'s constructor and property pair.
