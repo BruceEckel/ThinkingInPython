@@ -158,7 +158,7 @@ The type checker rejects that list, because `None` is not a `Command`.
 
 An object can be callable.
 When a class defines `__call__()`,
-its instances [carry state](14_Techniques--Decorators.md#a-class-decorator-with-state)
+its instances [carry state](14_Techniques--Decorators.md#a-class-form-decorator-with-state)
 and still satisfy `Command`.
 Here, `Repeat` is a [record](18_Techniques--Performance.md#record),
 so its configuration cannot change after construction:
@@ -687,7 +687,7 @@ bus.publish(Closed("inactivity"))
 letting the `defaultdict` build each event type's list on first use.
 `publish()` reads with `.get(type(event), [])` instead of indexing,
 because indexing a `defaultdict` inserts an empty list as a side effect.
-Every published event type with no subscriber, such as `Closed`,
+Every published event type with no handler, such as `Closed`,
 otherwise leaves a stray entry behind.
 
 The lookup uses `type(event)`, which matches the class and no ancestor.

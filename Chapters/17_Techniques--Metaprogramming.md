@@ -710,7 +710,7 @@ so a mark applied beneath a decorator written with `@wraps` survives that decora
 A mark suits data that describes the function and that other code reads later,
 as `handlers` does here.
 State that changes with each call, such as a call count,
-belongs in a closure variable or on a [callable object](14_Techniques--Decorators.md#a-class-decorator-with-state),
+belongs in a closure variable or on a [callable object](14_Techniques--Decorators.md#a-class-form-decorator-with-state),
 where the type checker can see it.
 
 ## Making a Class Final

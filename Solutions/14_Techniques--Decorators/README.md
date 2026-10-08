@@ -333,7 +333,7 @@ wraps.
 <details>
 <summary>Where to look</summary>
 
-[A Class Decorator with State](../../Chapters/14_Techniques--Decorators.md#a-class-decorator-with-state) keeps `count` on each instance, which is one instance per decorated function.
+[A Class-Form Decorator with State](../../Chapters/14_Techniques--Decorators.md#a-class-form-decorator-with-state) keeps `count` on each instance, which is one instance per decorated function.
 A `ClassVar` on the decorator class is one value that every instance reads and writes through the class name.
 Increment both counters in `__call__()`, and use `update_wrapper()` so the instance keeps the function's name.
 

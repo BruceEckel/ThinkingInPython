@@ -531,7 +531,7 @@ because a decorator reads like a function at the call site.
 `property`, `staticmethod`,
 and `functools.partial` are all lowercase classes for that reason.
 
-### A Stateless Class Decorator
+### A Stateless Class-Form Decorator
 
 The class version of `trace`:
 
@@ -605,7 +605,7 @@ def test_trace_returns_original_result() -> None:
     assert add(2, 3) == 5
 ```
 
-### A Class Decorator with State
+### A Class-Form Decorator with State
 
 Because the instance can hold attributes, it can carry state between calls.
 This decorator counts calls and keeps the count on the instance:
@@ -677,7 +677,7 @@ so call state goes in a closure or an instance.
 [Attributes on a Function](17_Techniques--Metaprogramming.md#attributes-on-a-function)
 shows what a function's `__dict__` does suit.
 
-### A Class Decorator with Arguments
+### A Class-Form Decorator with Arguments
 
 The class form pays off when the decorator takes arguments.
 Without arguments, the constructor receives the function.

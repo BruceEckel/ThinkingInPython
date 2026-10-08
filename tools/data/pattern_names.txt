@@ -63,7 +63,7 @@ Object Pool
 # has its ordinary sense: the state an object holds, a Python decorator,
 # an iterator object, the blackboard object the rats share.
 !Declaring Shared State
-!A Class Decorator with State
+!A Class-Form Decorator with State
 !Context Manager as Decorator
 !A Type-Checking Iterator
 !Each State Decides
