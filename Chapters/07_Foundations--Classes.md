@@ -221,6 +221,9 @@ A helper object or a module-level function is almost always clearer.
 the class's *method resolution order* (MRO).
 The MRO names the classes Python searches for a name,
 starting with the class and ending at `object`.
+Python builds that list with *C3 linearization*,
+the algorithm that also decides the order when two base classes share an ancestor
+([Rethinking Objects](20_Patterns--Rethinking_Objects.md#one-class-many-protocols) returns to that case).
 `Derived.__mro__` is `(Derived, Simple, object)`.
 With a single base class the order is obvious.
 When two base classes define the same name,
@@ -497,6 +500,9 @@ An instance whose class and base classes all declare `__slots__` has no `__dict_
 so `cached_property` has nowhere to store the value,
 and the first access raises a `TypeError`
 ([Performance](18_Techniques--Performance.md#when-slots-does-not-fit) shows the failure).
+A `"__dict__"` entry in `__slots__` gives the dictionary back,
+and `cached_property` with it,
+at the cost of the per-instance dictionary that slots exist to remove.
 
 `cached_property` trades freshness for speed, so if `n.values` changes,
 `total` becomes stale, as the appended `20` in `cached_property_demo.py` shows.
@@ -615,9 +621,12 @@ so `type(r).__name__` reports `'Reading'`.
 Naming the class, `return Temperature(...)`,
 hard-codes `Temperature` into every subclass, including `Reading`.
 
-`is_freezing()` also works as a module-level function.
-Inside the class it sits where a reader looks for it,
-and a subclass can replace it like any other method.
+`is_freezing()` also works as a module-level function,
+and that is the usual choice:
+a function that uses neither `self` nor `cls` has no need of the class.
+Make it a `@staticmethod` when it belongs with the class's interface,
+where a reader looks for it,
+or when a subclass should be able to replace it like any other method.
 
 ## Exercises
 
