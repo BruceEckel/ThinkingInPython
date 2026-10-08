@@ -245,6 +245,9 @@ and the loop here unpacks each pair into `index` and `name`.
 but that form names the index and not the item,
 so every line that needs the item repeats the `names[i]` lookup.
 `enumerate()` hands you both.
+For output that people read, which usually counts from one,
+`enumerate(names, start=1)` begins the index at one,
+so the loop body adds nothing to it.
 
 `zip()` walks several sequences at once:
 
@@ -657,6 +660,9 @@ contrasts that guarantee with leaving the close to Python's garbage collector.
 
 Anything that acquires a resource (a file, a lock, a network connection)
 can be a context manager.
+An object becomes one by defining two methods, `__enter__()` and `__exit__()`:
+`with` calls `__enter__()` at the top of the block and `__exit__()` as control leaves it,
+and the cleanup lives in `__exit__()`.
 [Context Managers](15_Techniques--Context_Managers.md)
 shows how to write your own.
 
