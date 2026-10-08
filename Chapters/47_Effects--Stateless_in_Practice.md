@@ -2381,7 +2381,7 @@ give a hint, usually the shape of the code, and a full answer for each exercise.
 3.  Add a wind turbine to `power.py` that is available only during a set windy stretch of the evening,
     put it between solar and the battery in the `sun_first` order,
     and confirm `run_load()` needs no change.
-    Then shorten every source until some hour has no supplier,
+    Then shorten every source until some hour has no source,
     run `run_load()` again,
     and say where the `Blackout` propagates to and why `catch(Blackout)` around `run_load()` does not intercept it.
 4.  Write a handler for `Outlet` that ignores `request.hour` and hands out a preset sequence of sources,
