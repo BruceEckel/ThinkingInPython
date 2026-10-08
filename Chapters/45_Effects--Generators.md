@@ -826,7 +826,7 @@ task_runner()
 since `send(None)` and `next()` are equivalent.
 On every later turn the same call delivers the runner's answer.
 
-`Job`'s `SendType` is `str`, not `str | None`,
+The generator a `Job` returns has `str` as its `SendType`, not `str | None`,
 so the priming call needs the `# type: ignore` from `send_none_is_next.py` again.
 `to_send.pop(job)` returns `str | None`,
 and no annotation ties the `None` to a generator's first turn.
