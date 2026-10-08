@@ -322,7 +322,7 @@ but [a `dataclass`-generated `__init__()` does not call the base class's `__init
 A `@dataclass` `Thermometer` would have no list of responders.
 A `__post_init__()` that calls `super().__init__()` fixes that,
 but at greater length and complexity than the `__init__()` it replaces.
-[Inheriting the Broadcaster](#inheriting-the-broadcaster)
+[Announcing Fields by Annotation](#announcing-fields-by-annotation)
 gets a generated `__init__()` and the list another way.
 
 `Thermometer` inherits `Broadcaster` because that is the shortest way to get `connect()` and `announce()`,
@@ -851,7 +851,7 @@ One `__setattr__()` for every attribute gives up three things that `Thermometer`
     `Thermometer` defines no `__setattr__()`,
     so the type checker checks each assignment against the attributes the class declares.
 
-### Inheriting the Broadcaster
+### Announcing Fields by Annotation
 
 Using decorators, we can simplify and automate the attachment of responders to broadcasters:
 
