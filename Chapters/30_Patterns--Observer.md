@@ -1121,16 +1121,12 @@ asyncio.run(main())
 #: alarm sent: 150C
 ```
 
-`alarm` is connected before `log_reading`,
-yet at 150 degrees the log prints first.
-Awaiting the responders in sequence prints in connection order, alarm first.
-Concurrent fan-out lets each responder finish as soon as its own wait ends,
+Even though `alarm` is connected before `log_reading`,
+at 150 degrees the log prints first.
+Concurrency means each responder finishes as soon as its own wait ends,
 so the faster responder prints first.
-The results `gather()` returns stay in argument order;
+The results from `gather()` stay in argument order;
 only the side effects interleave.
-
-A responder chooses which notifications to act on.
-Below its threshold, the alarm returns at once.
 
 ### Disconnecting During an Async Notification
 
