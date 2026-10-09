@@ -1332,7 +1332,7 @@ The model is testable without a GUI:
   and returns a new grid.
 - A selection in a corner changes the corner and its two neighbors.
   The two cross coordinates outside the grid are dropped,
-  so the result has the same keys as the original.
+  so the result is still a 3x3 grid.
 - Responders receive the new grid after a selection.
 
 ```python
