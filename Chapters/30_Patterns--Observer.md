@@ -1467,9 +1467,9 @@ reads `size` and `grid`, and calls `select()`.
 ## Document-View and MVC
 
 This chapter opened by saying Document-View folds the controller into the view.
-The next two listings isolate that fold:
-both share one model and one notification,
-and they differ only in where the input handling lives.
+We'll look at two approaches that share one model and one notification,
+the count the model announces after each step,
+and differ only in where the input handling lives.
 The model is a counter:
 
 ```python
