@@ -37,6 +37,7 @@ Usage:
     python -m tools.outside_review 17 --dry-run      # print, run nothing
     python -m tools.outside_review 17 --model gemini-3.8-flash-high
     python -m tools.outside_review 17 --timeout 1800 --out-dir /tmp/r
+    python -m tools.outside_review 17 --suffix .r2   # a second round, saved as 17_....r2.md beside the first
 """
 
 import argparse
@@ -145,6 +146,7 @@ def review_chapter(
     model: str,
     out_dir: Path,
     timeout: int,
+    suffix: str = "",
 ) -> bool:
     """Send one chapter to `agy` and save the reply; False on failure."""
     tag = chapter.stem.split("_", 1)[0]
@@ -192,7 +194,7 @@ def review_chapter(
         return False
 
     out_dir.mkdir(parents=True, exist_ok=True)
-    out = out_dir / f"{chapter.stem}.md"
+    out = out_dir / f"{chapter.stem}{suffix}.md"
     header = (f"<!-- outside review of {chapter.as_posix()}, "
               f"model {model}, {date.today().isoformat()} -->")
     write_text_lf(out, f"{header}\n\n{response.strip()}\n")
@@ -225,6 +227,10 @@ def main() -> int:
     parser.add_argument("--timeout", type=int, default=DEFAULT_TIMEOUT,
                         metavar="SECONDS",
                         help=f"per chapter (default: {DEFAULT_TIMEOUT})")
+    parser.add_argument("--suffix", default="", metavar="TEXT",
+                        help="appended to the output stem, so a second "
+                             "round is kept beside the first (.r2 writes "
+                             "<stem>.r2.md)")
     parser.add_argument("--dry-run", action="store_true",
                         help="print the argv, output path, and message "
                              "length for each chapter; run nothing")
@@ -249,14 +255,15 @@ def main() -> int:
     failed: list[str] = []
     for chapter in chapters:
         message = build_message(prompt, chapter)
-        out = args.out_dir / f"{chapter.stem}.md"
+        out = args.out_dir / f"{chapter.stem}{args.suffix}.md"
         if args.dry_run:
             print(subprocess.list2cmdline(argv))
             print(f"  output: {out}")
             print(f"  message: {len(message)} characters")
             continue
         if not review_chapter(chapter, argv, message, args.model,
-                              args.out_dir, args.timeout):
+                              args.out_dir, args.timeout,
+                              args.suffix):
             failed.append(chapter.as_posix())
     if failed:
         print(f"outside_review: failed: {', '.join(failed)}")

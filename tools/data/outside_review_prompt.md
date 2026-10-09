@@ -19,8 +19,12 @@ Treat these as valid and do not flag them:
 - Template strings, `t"..."` (PEP 750, Python 3.14).
 - Deferred evaluation of annotations (PEP 649 and PEP 749, Python 3.14), so a forward reference needs no quotes and no `__future__` import.
 - `type X = ...` aliases and `def f[T](...)` or `class C[T]:` generics (PEP 695, Python 3.12), `@override` (Python 3.12), `copy.replace()` and `warnings.deprecated` (Python 3.13), free-threaded builds (Python 3.13 and later).
+- `functools.Placeholder`, and `functools.partial` as a method descriptor with `__get__()` (both Python 3.14); the `LOAD_SMALL_INT` opcode (Python 3.14); `sys.monitoring.events.NO_EVENTS`; `multiprocessing`'s default start method is `forkserver` on Linux and `spawn` on macOS and Windows (Python 3.14).
+- A class pattern on a built-in type takes one positional sub-pattern, as in `case int(answer):` (PEP 634); `type(name, bases, namespace)` picks the most derived metaclass from `bases`; a class's own namespace holds `__annotate_func__`, read through the `__annotate__` descriptor; `Annotated[...].__metadata__` is the documented way to read the metadata.
+- In the type system, `Any` is assignable in both directions, so a `Callable[[Any], None]` accepts a function whose one parameter has any type; typeshed's `NotImplementedType` subclasses `Any`; `functools._lru_cache_wrapper` and `_SingleDispatchCallable` declare `__call__()` with `*args`, not a `ParamSpec`; `types.SimpleNamespace` declares `__getattribute__()`.
 
 If you still believe a construct is invalid, say which Python version you are assuming.
+A name you do not recognize is more likely new than wrong.
 
 Produce a short list of technical and structural refinements, three to five items, in the format below.
 Every item must pass these tests:
@@ -31,6 +35,7 @@ Every item must pass these tests:
 2. Not already there.
    Before proposing a sentence, search the whole chapter for it.
    If the chapter already says it, in the same section or in a section it links to by name, leave the item out.
+   A link in or beside the target sentence means the linked section carries that topic's full treatment, its mechanism and its limits, so do not propose a caveat about a linked topic.
    A duplicate item is worse than no item.
 3. Verifiable.
    Quote the exact sentence or line you want changed, verbatim from the source, so the author can find it with a text search.
@@ -42,6 +47,17 @@ Every item must pass these tests:
 5. Honest about certainty.
    If an item depends on a Python version or a library's behavior, name the version you are assuming.
    If you are unsure, say so in the Issue line instead of asserting.
+6. Every listing already runs.
+   Each listing in the book passes `ty` and `ruff`, runs in the book's build, and prints the `#:` output lines shown under its statements.
+   An item saying a listing fails the type checker, raises an exception it does not show, or prints something other than its markers is wrong, unless it names a specific input the listing never runs, and then test 7 applies.
+7. Stay inside the listing's own input.
+   A listing is a teaching example for the input it shows.
+   Do not propose a guard, a clamp, a fallback, or a caveat for an input the listing never receives: a comment line in a file that has none, an empty iterator the demo never passes, a subclass no listing defines, float rounding in a simulation's prices.
+   Propose a code change only when the listing's own run produces wrong output or contradicts the prose beside it.
+8. Prefer the shape that survives.
+   The items the author keeps are nearly all one shape: a sentence that misdescribes what its own listing does, or a listing whose behavior differs from the prose beside it.
+   Read each sentence about a listing against that listing's code and output.
+   An item of this shape outranks any caveat, alternative API, or equivalent rewrite; swapping `copy.replace()` for `dataclasses.replace()`, hoisting a call out of a loop, or writing `Num()` for `Num(_)` is a style comment.
 
 Format each item as:
 

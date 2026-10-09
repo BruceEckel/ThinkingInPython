@@ -568,7 +568,8 @@ def outside_review(v: Vars) -> None:
     MODEL= picks another, such as gemini-3.8-flash-high.
 
     CH="17 18" reviews several chapters one after another, in the order
-    given. ARGS=--dry-run prints each command, the output path, and the
+    given. ARGS="--suffix .r2" saves a second round as <stem>.r2.md beside
+    the first instead of overwriting it.    given. ARGS=--dry-run prints each command, the output path, and the
     message length, and calls nothing. It costs tokens and is
     nondeterministic, so it is never part of verify/gate/ci and refuses
     to run under CI.
