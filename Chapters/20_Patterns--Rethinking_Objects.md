@@ -78,7 +78,7 @@ safe.
 
 A statically typed compiler can check that an override's signature stays compatible.
 It cannot check whether the override behaves the way the base class declares.
-The base class calls a method and trusts every subclass to stand in for the base.
+Code written against the base class calls a method and trusts every subclass to stand in for the base.
 
 Python has no such compiler,
 but the line between what a tool checks and what it cannot falls in the same place.
