@@ -1141,9 +1141,7 @@ only the side effects interleave.
 
 The async `announce()` needs no `list()` copy.
 The `*` unpacks the generator into a tuple of coroutines before `gather()` runs,
-so a `disconnect()` call during the fan-out cannot skip a responder.
-The next listing is an async counterpart to `self_removing_responder.py`,
-with a responder that disconnects itself mid-notification:
+so a `disconnect()` call during the fan-out cannot skip a responder:
 
 ```python
 # async_self_removing_responder.py
@@ -1172,11 +1170,11 @@ print(seen)
 #: ['once: 1', 'always: 1', 'always: 2']
 ```
 
-`once` disconnects itself while `gather()` is running it,
-and `always` still receives the change,
-because `gather()` held both coroutines before either ran.
+`once` disconnects itself during `announce(1)`,
+and `always` still receives that change,
+because `announce(1)` built its tuple of coroutines before either one ran.
 `announce(2)` builds its tuple from the shortened list,
-so only `always` receives the second change.
+so `always` alone receives the second change.
 
 ### A Failing Responder Orphans the Rest
 
