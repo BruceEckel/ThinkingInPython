@@ -21,8 +21,7 @@ class View:
             case _:
                 pass
 
-model = Counter()
-view = View(model)
+view = View(Counter())
 for char in "++-x":
     view.key(char)
 #: count: 1

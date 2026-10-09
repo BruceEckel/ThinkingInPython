@@ -6,12 +6,18 @@ from record import record
 class KeyHandler(Protocol):
     def key(self, char: str) -> None: ...
 
-class View:  # Draws, and holds no model
+@record
+class View:  # Draws
+    model: Counter
+
+    def __post_init__(self) -> None:
+        self.model.connect(self.draw)
+
     def draw(self, count: int) -> None:
         print(f"count: {count}")
 
 @record
-class Controller:  # Interprets, and holds the model
+class Controller:  # Interprets
     model: Counter
 
     def key(self, char: str) -> None:
@@ -27,8 +33,7 @@ class IgnoringController:  # Reads input, changes nothing
     def key(self, char: str) -> None: ...
 
 model = Counter()
-view = View()
-model.connect(view.draw)
+view = View(model)
 controller: KeyHandler = Controller(model)
 for char in "++-x":
     controller.key(char)
