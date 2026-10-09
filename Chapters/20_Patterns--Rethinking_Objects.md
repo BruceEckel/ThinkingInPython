@@ -37,7 +37,7 @@ fit naturally.
 Everything is an object, and you act on objects only by sending messages,
 always late-bound.
 Smalltalk was emphatically dynamic.
-You built a program at runtime by finding the closest existing object and inheriting from it to add behavior.
+You built a program at runtime by finding the closest existing class and inheriting from it to add behavior.
 That style guarantees nothing about substitutability.
 
 *C++* drew from Simula.
@@ -124,8 +124,10 @@ expect(OverflowError, fill, BoundedStack(), 5)
 #: [OverflowError] Stack is full
 ```
 
-Because `BoundedStack.push()` takes the same argument and returns the same type,
-`@override` holds and the type checker reports nothing.
+`BoundedStack.push()` takes the same argument and returns the same type as `Stack.push()`,
+so the signatures match,
+and `@override` finds a `push()` in `Stack` to override.
+The type checker reports nothing.
 `fill()` takes a `Stack`, whose `push()` always succeeds,
 so a `BoundedStack` handed to it raises an exception on the third item.
 The subclass matches the signature and breaks the contract behind it.
@@ -1082,7 +1084,7 @@ Doing nothing is behavior, and behavior belongs in an object.
 
 The *Null Object* pattern replaces "absent" with an object whose behavior is neutral.
 If you give the do-nothing case a class,
-the optional parameter becomes required, with a default:
+an instance of that class replaces `None` as the default:
 
 ```python
 # null_logger.py
