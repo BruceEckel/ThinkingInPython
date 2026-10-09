@@ -72,7 +72,7 @@ so use this section's table when you know the problem but not the name.
 | Modeling a value, amount, or special case instead of null | *Value Object*, *Money*, *Special Case*, *Null Object* |
 | Routing or transforming a message | *Content-Based Router*, *Message Router*, *Splitter*, *Aggregator* |
 | Connecting an application to a messaging system | *Message*, *Message Channel*, *Message Endpoint*, *Point-to-Point Channel* |
-| Supplying a collaborator from outside, an application of Inversion of Control | *Dependency Injection*, *Service Locator*, *Strategy* |
+| Supplying a collaborator from outside, or looking one up in a registry | *Dependency Injection*, *Service Locator*, *Strategy* |
 
 ## Creational (GoF)
 
@@ -171,7 +171,7 @@ the default on Windows, is one.
 | [*Registry*](27_Patterns--Factory.md#the-pythonic-factory-a-dictionary) | Keep one well-known object where the rest of the program looks up services or data. |
 | *Repository* | Stand between the domain and the data store, presenting stored objects as a queryable collection. |
 | *Service Layer* | Define an application boundary as a set of operations. |
-| [*Special Case*](20_Patterns--Rethinking_Objects.md#null-object) | Supply a subclass for a special case instead of a null check at every use. |
+| [*Special Case*](20_Patterns--Rethinking_Objects.md#null-object) | Supply a subclass for a particular case, such as a missing or unknown customer, instead of a conditional at every use. |
 | *Table Module* | Let one class handle all rows of a table. |
 | *Transaction Script* | Organize logic as one procedure per request. |
 | *Unit of Work* | Track changes in a transaction and commit them together. |
@@ -234,7 +234,7 @@ the default on Windows, is one.
 | Pattern | Intent |
 |---------|--------|
 | [*Dependency Injection*](11_Techniques--Testing.md#isolating-tests-from-the-world) | Supply an object's collaborators from outside it. |
-| [*Inversion of Control*](25_Patterns--Template_Method.md#the-anchored-algorithm) | Let a framework call your code rather than the reverse. *Dependency Injection* and *Service Locator* each implement *Inversion of Control*. |
+| [*Inversion of Control*](25_Patterns--Template_Method.md#the-anchored-algorithm) | Let a framework call your code rather than the reverse. *Dependency Injection* applies *Inversion of Control* to an object's collaborators. *Service Locator*, the usual alternative to *Dependency Injection*, keeps control in your code, which asks a registry for each collaborator. |
 | [*Service Locator*](46_Effects--Stateless.md#dependency-injection) | Look up dependencies through a central registry. |
 
 ## Other Patterns and Idioms
