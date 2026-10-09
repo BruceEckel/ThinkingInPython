@@ -89,6 +89,10 @@ and the two modules silently diverge.
 while your code now talks to a private one.
 To replace the whole value, go through the module: `import config`,
 then `config.settings = {...}`.
+That rebinding reaches the code that reads `config.settings`.
+A module that ran `from config import settings` earlier keeps its name on the old dict,
+so when such modules exist,
+replace the contents in place with `settings.clear()` and `settings.update()`.
 Mutate through any name.
 Rebind only through the module.
 
@@ -496,6 +500,12 @@ Python calls it only when ordinary attribute lookup fails,
 so a name the wrapper does not have, such as `val`,
 falls through to the inner object.
 The distinct `OnlyOne` instances all proxy to the same `__OnlyOne` object.
+The proxying covers reads.
+An assignment such as `x.val = []` goes into the wrapper's own `__dict__`.
+The shared list stays as it was,
+and later reads of `x.val` find the wrapper's copy.
+[Forwarding Writes](26_Patterns--Surrogate.md#forwarding-writes)
+adds the `__setattr__()` that sends assignments through.
 
 `__getattr__()` returns `Any`, and that `Any` stays.
 `instance` is one declared field and can say `__OnlyOne | None`,
