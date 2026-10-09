@@ -10,10 +10,13 @@ class View:
         print(f"count: {count}")
 
     def key(self, char: str) -> None:
-        if char == "+":
-            self.model.add(1)
-        elif char == "-":
-            self.model.add(-1)
+        match char:
+            case "+":
+                self.model.add(1)
+            case "-":
+                self.model.add(-1)
+            case _:
+                pass
 
 model = Counter()
 view = View(model)

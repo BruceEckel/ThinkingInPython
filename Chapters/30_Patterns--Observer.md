@@ -1501,10 +1501,13 @@ class View:
         print(f"count: {count}")
 
     def key(self, char: str) -> None:
-        if char == "+":
-            self.model.add(1)
-        elif char == "-":
-            self.model.add(-1)
+        match char:
+            case "+":
+                self.model.add(1)
+            case "-":
+                self.model.add(-1)
+            case _:
+                pass
 
 model = Counter()
 view = View(model)
@@ -1519,7 +1522,7 @@ for char in "++-x":
 `draw()` is the output and `key()` is the input,
 and `View` holds the model because `key()` needs somewhere to send the request.
 `draw()` uses the count the model pushes to it, so only `key()` needs `model`.
-`x` falls through both branches, so `key()` returns without touching the model,
+`x` matches the wildcard case, so `key()` returns without touching the model,
 and the four characters of `"++-x"` print three counts.
 
 MVC splits that class in two:
@@ -1542,10 +1545,13 @@ class StepKeys:  # Interprets, and holds the model
     model: Counter
 
     def key(self, char: str) -> None:
-        if char == "+":
-            self.model.add(1)
-        elif char == "-":
-            self.model.add(-1)
+        match char:
+            case "+":
+                self.model.add(1)
+            case "-":
+                self.model.add(-1)
+            case _:
+                pass
 
 class NoKeys:  # Reads input and changes nothing
     def key(self, char: str) -> None: ...

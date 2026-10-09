@@ -15,10 +15,13 @@ class StepKeys:  # Interprets, and holds the model
     model: Counter
 
     def key(self, char: str) -> None:
-        if char == "+":
-            self.model.add(1)
-        elif char == "-":
-            self.model.add(-1)
+        match char:
+            case "+":
+                self.model.add(1)
+            case "-":
+                self.model.add(-1)
+            case _:
+                pass
 
 class NoKeys:  # Reads input and changes nothing
     def key(self, char: str) -> None: ...
