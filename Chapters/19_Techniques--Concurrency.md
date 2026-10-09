@@ -1157,8 +1157,8 @@ if __name__ == "__main__":
     print(f"cores = {cores}, total = {TOTAL}")
 
     with ProcessPoolExecutor() as pool:
-        # Warm up, not timed
-        list(pool.map(work_chunk, [1]))
+        # Start every worker, not timed
+        list(pool.map(time.sleep, [1] * cores))
         baseline: float | None = None
         for tasks in task_counts:
             elapsed = timed_split(pool, TOTAL, tasks)
@@ -1171,10 +1171,17 @@ if __name__ == "__main__":
 
 The only difference between one run and another is how finely the listing splits the total work.
 
-The listing creates the pool once and warms it up with a throwaway call before any measurement starts,
+The listing creates the pool once and starts its workers before any measurement starts,
 so no timed result includes process startup.
 Each later call reuses that same pool,
 so only the split changes from one line of output to the next.
+
+By default, a `ProcessPoolExecutor` starts a new worker when a task arrives and every running worker is busy.
+A warm-up of one quick task would start one worker,
+and the timed runs would include the startup of the rest.
+Each warm-up task sleeps for a second,
+so every worker is still busy when the next task arrives,
+and the pool starts a worker for each of the `cores` tasks.
 
 Wall time drops sharply as the split grows toward one task per core.
 Past that point the curve flattens,
@@ -1185,13 +1192,13 @@ so the sweep covers well below, at, and beyond the number of cores available.
 One run on a 32-core machine produced this:
 
     cores = 32, total = 20000000
-      1 tasks:  0.600s (1.00x)
-      2 tasks:  0.367s (1.64x)
-      4 tasks:  0.247s (2.43x)
-      8 tasks:  0.186s (3.22x)
-     16 tasks:  0.145s (4.14x)
-     32 tasks:  0.103s (5.85x)
-     64 tasks:  0.111s (5.42x)
+      1 tasks:  0.669s (1.00x)
+      2 tasks:  0.385s (1.74x)
+      4 tasks:  0.192s (3.48x)
+      8 tasks:  0.125s (5.34x)
+     16 tasks:  0.105s (6.39x)
+     32 tasks:  0.078s (8.57x)
+     64 tasks:  0.084s (7.93x)
 
 Exact timings shift with load and hardware, but the shape holds.
 Wall time drops sharply up to the core count, then flattens or reverses past it,
@@ -2383,6 +2390,8 @@ and both still see the other wanting the resource, so both give.
 Thus `a_wants` and `b_wants` both stay `True` for the next round.
 Two equally polite tasks make no progress,
 although the event loop keeps both tasks busy the whole time.
+A real livelock repeats these rounds forever.
+`range(3)` stops the listing after three rounds so it can report `resolved: False`.
 
 A real livelock looks busy on a monitor,
 with CPU time spent and state visibly changing.

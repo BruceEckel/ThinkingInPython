@@ -31,8 +31,8 @@ if __name__ == "__main__":
     print(f"cores = {cores}, total = {TOTAL}")
 
     with ProcessPoolExecutor() as pool:
-        # Warm up, not timed
-        list(pool.map(work_chunk, [1]))
+        # Start every worker, not timed
+        list(pool.map(time.sleep, [1] * cores))
         baseline: float | None = None
         for tasks in task_counts:
             elapsed = timed_split(pool, TOTAL, tasks)
