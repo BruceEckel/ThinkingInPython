@@ -9,7 +9,7 @@ class View:
     def draw(self, count: int) -> None:
         print(f"count: {count}")
 
-    def key(self, char: str) -> None:
+    def key(self, char: str) -> None:  # The controller
         match char:
             case "+":
                 self.model.increment()

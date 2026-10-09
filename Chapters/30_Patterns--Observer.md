@@ -1506,7 +1506,7 @@ class View:
     def draw(self, count: int) -> None:
         print(f"count: {count}")
 
-    def key(self, char: str) -> None:
+    def key(self, char: str) -> None:  # The controller
         match char:
             case "+":
                 self.model.increment()
@@ -1525,7 +1525,8 @@ for char in "++-x":
 #: count: 1
 ```
 
-`draw()` is the output and `key()` is the input,
+`draw()` is the output and `key()` is the input: `key()` is the controller,
+folded into `View` as a method,
 and `View` holds the model because `key()` needs somewhere to send the request.
 `draw()` uses the count the model pushes to it, so only `key()` needs `model`.
 `x` matches the wildcard case, so `key()` returns without touching the model,
