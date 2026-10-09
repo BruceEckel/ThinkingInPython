@@ -884,9 +884,8 @@ thermometer.celsius = 200
 
 The `respond()` decorator method appends its function to the `thermometer` list and returns the function unchanged,
 so `report` stays callable by name.
-A decorator's result replaces the decorated name, so `Broadcaster.connect()`,
-which returns `None`, cannot serve as one;
-`respond()` returns its function for that reason.
+`Broadcaster.connect()` returns `None`, so it cannot serve as a decorator
+(see exercise 11).
 
 The two listings that follow hold the shared machinery,
 so a subclass such as `Thermometer` declares its fields and inherits the rest.

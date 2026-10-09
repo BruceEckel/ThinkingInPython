@@ -18,7 +18,7 @@ The chapter's own claims all held, including the three added since the last revi
 
 Chapter, teaching:
 
-- "Decorated Responders": added the near-miss. A decorator's result replaces the decorated name, so `Broadcaster.connect()`, which returns `None`, cannot serve as one; that is why `respond()` exists and returns its function. Solutions exercise 11 runs the failure; the chapter now says why the method has its own name.
+- "Decorated Responders": one sentence now says `Broadcaster.connect()` returns `None` and so cannot serve as a decorator, with a pointer to exercise 11. The reasoning (a decorator's result replaces the decorated name, so `respond()` exists to return the function) sits in Solutions exercise 11 beside the failure it already runs; the chapter states the rule once. An earlier form of this run put three lines of reasoning in the chapter, and you chose the shorter form.
 
 Chapter, prose:
 

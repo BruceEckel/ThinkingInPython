@@ -1678,6 +1678,10 @@ The decorator's result replaces the name, though,
 so the name `display` refers to `None`, and calling `display(5.0)` raises a `TypeError`.
 The type checker catches the mistake before any run: with `-> Responder` declared, `responds()` draws an `invalid-return-type`.
 Returning `fn` keeps each decorated name bound to its function.
+The same rule separates `Broadcasting.respond()` from the chapter's `Broadcaster.connect()`:
+`connect()` appends and returns `None`,
+so `@thermometer.connect` above a `def` would bind that name to `None`,
+and `respond()` exists to return the function.
 
 ```python
 # exercise_11.py
