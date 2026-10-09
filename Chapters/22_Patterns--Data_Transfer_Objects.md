@@ -318,7 +318,7 @@ Sorting a list of `Color`s orders them by `r`, then `g`, then `b`,
 with nothing in the code declaring that intent.
 A frozen data class refuses the comparison instead.
 `<` between two `FrozenColor`s raises a `TypeError` unless the decorator receives `order=True`,
-and a comparison between two different frozen types raises one even then.
+and between two different frozen types it raises one even then.
 
 The listing writes `@dataclass(frozen=True)` in full instead of `@record`,
 so that `order=True` is the one difference between each `Frozen` class and its `Ordered` twin.
