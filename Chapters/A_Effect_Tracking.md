@@ -125,7 +125,8 @@ and that compiler analyzes every function in the program.
 
 PEP 593 added `Annotated[T, x, y, ...]` to `typing` in Python 3.9.
 `T` is a type.
-The arguments after it are *metadata*, and they are values, not types.
+The arguments after it are *metadata*,
+and the type checker reads each one as a value, even when it is a class.
 Each one is an ordinary expression, and `Annotated` keeps its value.
 `Annotated[int, "meters", range(0, 100)]` carries two pieces of metadata,
 a string and a `range` object.
@@ -177,7 +178,9 @@ An annotation belongs to a parameter or to the return value,
 and no annotation belongs to the function as a whole.
 A row describes a call, and every call produces the return value,
 so `row()` reads the row from the return annotation.
-Stateless and ZIO put their rows in the same place.
+Stateless and ZIO put their rows in the return annotation too.
+A Stateless `Depend[A, R]` is a `Generator`,
+and its row `A` is that generator's yield type.
 
 Here is the greeting program with its rows declared:
 
@@ -403,7 +406,10 @@ A decorator reads each function's row once with `row()`,
 and a `ContextVar` holds the Effects the running code may perform:
 the running function's row, plus the Effect of each enclosing `handling` block.
 On each decorated call,
-the decorator raises an exception when the callee's row holds an Effect outside that set.
+the decorator raises an exception when the callee's row holds an Effect outside that set,
+and otherwise sets the `ContextVar` to the callee's row until the call returns.
+That step bounds each function the callee calls by the callee's row,
+not by the caller's wider set.
 A function that handles `Ask` leaves `Ask` out of its own row,
 so the set needs the `handling` term for the `greet()` call inside its `handling(Ask, Scripted())` block to pass.
 Call resolution disappears as a problem, because running a call resolves it.
