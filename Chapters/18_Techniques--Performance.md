@@ -58,7 +58,7 @@ You run `cProfile` on a script from the command line:
 
 `cProfile`'s report is a table, one row per function.
 This section's report profiles a small script, `prof_demo.py`,
-built with one obvious hot spot and one function called too many times:
+built with one obvious hot spot and one generator expression that `cProfile` counts as a call per element:
 
 ```python
 # prof_demo.py
@@ -818,7 +818,7 @@ keeps it, which is not sorted order.
 Use the heap version of every operation.
 The list's own `pop(0)` returns the smallest value the first time,
 but it also destroys the heap ordering,
-so a second `pop(0)` returns 6 while 4 is still in the list:
+so `heap[0]` holds 6 while 4 is still in the list:
 
 ```python
 # heap_corruption.py
@@ -1672,8 +1672,11 @@ fn fastcount(m: &Bound<'_, PyModule>) -> PyResult<()> {
 }
 ```
 
-`maturin develop` compiles and installs `fastcount`,
-and Python sees a normal module with both functions attached:
+`maturin develop --release` compiles and installs `fastcount`.
+The `--release` flag selects Cargo's optimized profile;
+`maturin develop` alone builds the unoptimized debug profile,
+the wrong build to time.
+Python sees a normal module with both functions attached:
 
 ```python
 # rust/fastcount/demo.py
