@@ -900,19 +900,19 @@ expect(TypeError, bus.publish, "Deposit")
 ```
 
 `publish()` keeps its `object` parameter,
-because no static type means "a class `@event` decorated",
+because no static type means "an instance of a class decorated with `@event`",
 so a stray string reaches the bus and `EVENTS` rejects it there.
 
 The tagged bus gives up the registration-time check of the first version.
 `subscribe(Deposit, on_withdraw)` fails under the type checker because no `E` fits both arguments.
 One argument leaves no pair to compare,
-so a class with the right `__call__()` that skipped `@handler` passes the type checker and fails only when `subscribe()` looks it up.
+so an instance of a class with the right `__call__()` that skipped `@handler` passes the type checker and fails only when `subscribe()` looks it up.
 
 The test file confirms that:
 
 - A handler receives the events of its own type.
 - `publish()` refuses an object that is not an event.
-- `subscribe()` refuses a class that skipped `@handler`.
+- `subscribe()` refuses an instance of a class that skipped `@handler`.
 - `@handler` refuses a class with no `__call__()`,
   and one whose `__call__()` annotates `int` instead of an `@event` class.
 
