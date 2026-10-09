@@ -180,14 +180,17 @@ print(apply([3, 1, 2], max), apply([3, 1, 2], sum))
 The classic form declares a `Strategy` interface,
 writes one class per algorithm,
 and adds a context class to hold the chosen algorithm.
-The `how` parameter replaces all three.
+Here the `Callable` annotation on `how` replaces the interface,
+existing functions such as `max()` and `sum()` replace the algorithm classes,
+and `apply()` replaces the context class,
+holding the chosen algorithm in `how` for one call.
 
 This listing shows only the shape.
 Nobody designs a `Strategy` class hierarchy around calling `max()` or `sum()`.
 [Function Objects](28_Patterns--Function_Objects.md#strategy-choosing-the-algorithm-at-runtime)
 works through a case with a real motivation.
 
-Because one parameter can replace a pattern's interface and classes,
+Because a function with a `Callable` parameter can replace a pattern's interface and classes,
 the chapters ahead keep asking the question [Rethinking Objects](20_Patterns--Rethinking_Objects.md#guidelines)
 poses: how much of each pattern's machinery does Python still need,
 and how much of it becomes functions, data, and protocols?
@@ -328,7 +331,7 @@ An abstract base class is a class you write and every implementer inherits.
 A `Protocol` is a class you write and no implementer inherits,
 and a `Callable` annotation is not a class.
 Those two free rungs are the mechanism behind [When a Pattern Dissolves](#when-a-pattern-dissolves).
-In a language whose only rungs are a part's internals and its name,
+In a language where every implementer must name its interface,
 a pattern exists to build a declared interface.
 In a language that supplies the `Protocol` and `Callable` rungs,
 that pattern has nothing left to build.
@@ -474,8 +477,8 @@ and the rest are here for your own designs.
     (LSP).
     A subtype must work anywhere code expects its base type.
 -   *Law of Demeter*: a.k.a. "Don't talk to strangers."
-    A method should talk to itself, its own attributes, its parameters,
-    and objects it creates,
+    A method should talk to its own object (`self`), that object's attributes,
+    its parameters, and objects it creates,
     not to the internals of objects it reached through something else.
     The Law of Demeter is another way to say "minimize coupling."
 -   *Independence* or *Orthogonality*.
