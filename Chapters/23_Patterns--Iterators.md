@@ -298,7 +298,8 @@ Only `produce()` waits.
 ### An Exhausted Generator Is Silently Empty
 
 The second surprise in `generator_lifecycle.py` is its second call to `list(sq)`.
-An exhausted generator produces nothing and raises nothing,
+An exhausted generator raises `StopIteration` at the first `next()`,
+which `list()` absorbs as the normal end,
 so the empty `list(sq)` leaves no error to point at the bug.
 
 When you must walk data twice, collect it into a list once,
@@ -551,7 +552,9 @@ because its lookalike is the `if` clause of a generator expression
 The `if` version skips nonmatching values but keeps looking,
 so once values stop matching, a `list()` around it runs forever.
 `takewhile()` stops at the first failure.
-Skipping and stopping look the same on finite data and behave nothing alike on infinite data.
+On finite data whose values stop matching for good, as the rising squares do,
+skipping and stopping give the same result.
+On infinite data they behave nothing alike.
 
 A test can demonstrate that difference, but not by writing `list(count(1))`.
 That call runs forever, and so does the test.
