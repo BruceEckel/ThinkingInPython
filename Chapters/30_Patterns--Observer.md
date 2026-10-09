@@ -1174,7 +1174,7 @@ print(seen)
 so `always` stays in the tuple after `once` disconnects itself,
 and receives the first change.
 `announce(2)` builds its tuple from the shortened list,
-so `always` alone receives the second change.
+so `always` is the one responder left to receive the second change.
 
 ### A Failing Responder Orphans the Rest
 
