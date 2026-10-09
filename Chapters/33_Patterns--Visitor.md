@@ -28,7 +28,8 @@ The visitor's type chooses which `visit()` runs.
 
 A new `Visitor` subclass that reuses an existing operation, such as `Fly`,
 adds no code to the primary hierarchy.
-In this Python version a new operation whose behavior varies by flower type also needs a new method on `Flower`,
+In this Python form of the pattern,
+a new operation whose behavior varies by flower type also needs a new method on `Flower`,
 for a reason [The Price of the Empty Base](#the-price-of-the-empty-base)
 explains below.
 In the listing, bugs visit flowers:
