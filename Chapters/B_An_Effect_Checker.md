@@ -1190,7 +1190,8 @@ Here, in one place, is what the checker resolves:
 - A method on a receiver whose type the source writes out:
   an annotated parameter, an annotated assignment,
   the first parameter of a method, a module-level constant
-  (through `Final[...]`), or a `type` alias defined in the same module.
+  (through `Final[...]`),
+  or a parameter or variable annotated with a `type` alias defined in the same module.
 - A method on a receiver whose type is evident: a string, an f-string, a list,
   dictionary, set, or tuple literal, a list, dictionary, or set comprehension,
   or a local assigned from a call, which takes the callee's name as its type.
