@@ -1540,7 +1540,7 @@ from typing import Protocol
 from counter_model import Counter
 from record import record
 
-class Controller(Protocol):
+class KeyHandler(Protocol):
     def key(self, char: str) -> None: ...
 
 class View:  # Draws, and holds no model
@@ -1548,7 +1548,7 @@ class View:  # Draws, and holds no model
         print(f"count: {count}")
 
 @record
-class StepController:  # Interprets, and holds the model
+class Controller:  # Interprets, and holds the model
     model: Counter
 
     def key(self, char: str) -> None:
@@ -1566,7 +1566,7 @@ class IgnoringController:  # Reads input, changes nothing
 model = Counter()
 view = View()
 model.connect(view.draw)
-controller: Controller = StepController(model)
+controller: KeyHandler = Controller(model)
 for char in "++-x":
     controller.key(char)
 #: count: 1
@@ -1586,22 +1586,19 @@ and the printed output for the same input, `"++-x"`.
 which is why the chapter's opening calls the two architectures nearly equivalent.
 
 One thing moves.
-`key()` leaves `View` for `StepController`,
-and the model reference goes with it.
-The MVC `View` keeps `draw()` and `StepController` gets `key()`, one job each.
-The `Controller` protocol names the third role of MVC,
-the one Document-View folds into the view,
-and `StepController` is named for what its keys do:
-each one steps the counter by one, through `increment()` or `decrement()`.
+`key()` leaves `View` for `Controller`, and the model reference goes with it.
+The MVC `View` keeps `draw()` and `Controller` gets `key()`, one job each.
+`Controller` is the third role of MVC,
+the one Document-View folds into the view, and here it is a class of its own.
 
 Swapping in `IgnoringController` at the end of `model_view_controller.py` shows what that move gives you.
-`IgnoringController` satisfies `Controller` and ignores every key,
+`IgnoringController` satisfies `KeyHandler` and ignores every key,
 so assigning it to `controller` makes the program ignore input while `View` and the model work as before.
 *GoF Design Patterns* gives this example for the separation:
 a controller that ignores input disables a view's input.
-`StepController` needs only a `Counter`, so a test can build a `StepController`,
+`Controller` needs only a `Counter`, so a test can build a `Controller`,
 call `key()`, and read `model.count`.
-Supporting a different set of keys means writing a third class that satisfies `Controller`,
+Supporting a different set of keys means writing a third class that satisfies `KeyHandler`,
 with `View` and the model unchanged.
 
 MVC separates drawing from input handling,
