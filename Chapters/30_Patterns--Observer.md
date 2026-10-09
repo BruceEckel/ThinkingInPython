@@ -1712,40 +1712,32 @@ print(log)
 #: [20.9, 22.0]
 ```
 
-`_delta` is the thermometer's field and its responders' business.
-Half a degree is a judgment about what a display needs,
-and `display` prints whatever it receives.
-Half a degree is the wrong judgment for `log`,
-which exists to record every reading,
-and the thermometer announces two of the four readings.
-`log` loses the other two for good,
-and nothing in `ThresholdThermometer` says which responder the half degree serves.
-[`reentrant_announce_fixed.py`](#re-entrant-notification)
-makes a smaller version of the same decision:
-its setter returns early when the new value equals the current reading,
-so a responder that counts readings rather than changes misses that repeated reading.
+`_delta` is the thermometer's field,
+but the half degree is a judgment about what `display` needs.
+For `log`, which exists to record every reading, the same half degree is wrong:
+the thermometer announces two of the four readings,
+and `log` loses the other two.
+Nothing in `ThresholdThermometer` says which responder the threshold serves.
 
-If the comparison moves into the responders,
-each threshold sits with the responder that needs it.
-`display` then remembers the last value it drew and skips a reading close to it,
-`log` appends whatever arrives, and the setter announces every assignment again.
-The thermometer knows nothing about tolerance,
-and each responder that filters by size repeats the same comparison.
-`async_thermometer_demo.py`'s `alarm` works this way,
-returning at once for a reading below 100 degrees.
+Moving the comparison into the responders puts each threshold with the responder that needs it.
+The setter announces every assignment, `log` appends every reading,
+and `display` remembers the last value it drew and skips a reading close to it.
+The thermometer knows nothing about tolerance.
+The cost is repetition:
+every responder that filters by size writes the same comparison.
 
-Repeating the comparison in each responder works for a question about *how much*,
-because each responder sets its own threshold.
-*Which kind* is a different question, and repetition handles it poorly,
-because every kind of change arrives on one channel and each responder sorts them itself.
-A responder in `weather_station.py` receives every attribute's changes,
-so each responder that cares about one attribute repeats the same filter by name.
+That repetition is acceptable for a question of *how much*,
+since each responder's threshold is its own.
+It is a poor answer to *which kind*.
+In `weather_station.py` every attribute's changes arrive on one channel,
+so each responder that cares about one attribute filters by name,
+and all of them write the same filter.
 [Function Objects](28_Patterns--Function_Objects.md#an-event-bus-handlers-keyed-by-type)
-removes that repetition.
-One list becomes a dictionary of lists keyed by event type,
-so an announcement carries the type of thing that happened and each responder connects to the one type it handles.
-The broadcaster then decides which event it is announcing, something it knows,
-instead of guessing which responders need the event.
+removes that repetition with a dictionary of responder lists keyed by event type:
+an announcement carries its type,
+and each responder connects to the type it handles.
+The broadcaster then states which event it is announcing, which it knows,
+instead of guessing which responders need it.
 
 ## Exercises
 
