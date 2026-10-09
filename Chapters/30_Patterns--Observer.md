@@ -1170,9 +1170,9 @@ print(seen)
 #: ['once: 1', 'always: 1', 'always: 2']
 ```
 
-`once` disconnects itself during `announce(1)`,
-and `always` still receives that change,
-because `announce(1)` built its tuple of coroutines before either one ran.
+`announce(1)` builds its tuple of coroutines before either one runs,
+so `always` stays in the tuple after `once` disconnects itself,
+and receives the first change.
 `announce(2)` builds its tuple from the shortened list,
 so `always` alone receives the second change.
 
