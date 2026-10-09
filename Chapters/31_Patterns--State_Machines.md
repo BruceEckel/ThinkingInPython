@@ -978,6 +978,10 @@ The states shrink to `Enum` members, bare names,
 so an action that runs on every entry into one state must live in the table.
 The action repeats on every row that leads to that state,
 or routes through a helper you write yourself.
+Startup bypasses the table.
+The first design's constructor calls the initial state's `run()`,
+but the constructor in `table_machine.py` stores `initial` and returns,
+so an action the machine needs at startup is a call you make before the first event.
 
 The deciding question is which you would rather read: one state's transitions,
 gathered in that state, or the whole machine's, gathered in one table.
