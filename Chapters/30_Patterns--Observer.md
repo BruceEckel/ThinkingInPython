@@ -1589,6 +1589,8 @@ which is why the chapter's opening calls the two architectures nearly equivalent
 One thing moves.
 `key()` leaves `View` for `StepKeys`, and the model reference goes with it.
 The MVC `View` keeps `draw()` and `StepKeys` gets `key()`, one job each.
+`StepKeys` is named for what its keys do: each one steps the counter by one,
+through `increment()` or `decrement()`.
 
 Swapping in `NoKeys` at the end of `model_view_controller.py` shows what that move gives you.
 `NoKeys` satisfies `Keys` and ignores every key,
