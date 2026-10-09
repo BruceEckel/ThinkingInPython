@@ -747,7 +747,8 @@ A second version reads the annotation, so a handler names its event once.
 
 The second version gives each side a decorator, both producing records.
 `@event` registers its class in `EVENTS`.
-`@handler` makes a function object whose fields are its configuration,
+`@handler` makes a class whose instances are function objects,
+with fields that hold their configuration,
 and stores in `HANDLES` the event its `__call__()` accepts.
 `Handler` becomes a `Protocol` whose one method is `__call__()`,
 because the handlers are now objects rather than functions.
