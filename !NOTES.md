@@ -83,6 +83,8 @@ Appendix perhaps containing learning resources, ask Claude to find the best ones
 
 ---
 Potential Pycon talks:
+Testing unpredictable functions
+Python's built-in design patterns
 Concurrency for beginners
 
 ---

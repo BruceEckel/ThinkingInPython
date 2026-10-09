@@ -1627,35 +1627,20 @@ and both views connect their own `display()` to the model in `__post_init__()`.
 Its `draw()` paints, its `bind()` lambda handles the click,
 and both are defined inside `show()`.
 
-## Four Scenarios, One Shape
-
-*Observer* appears in four scenarios in this chapter:
-a thermometer whose responders print a reading,
-the same thermometer whose coroutine responders run concurrently,
-a grid model whose responder repaints a canvas,
-and a counter wired as Document-View and as MVC.
-In every case the responder is a callable,
-and the broadcaster holds responders and calls each one when its state changes.
-The point at which the broadcaster receives its responders varies.
-All four scenarios connect their responders at runtime,
-`BoundBroadcaster` takes its responders at construction,
-`Broadcasting` collects each instance's responders as Python runs their decorated `def` statements,
-and exercise 11's registry collects them as Python imports a module.
-The pattern requires no interface, no `update()` method, no class per responder,
-and no `disconnect()`.
-
 ## Deciding What Matters
 
-`Thermometer` has three jobs: it measures, it decides which changes to announce,
-and it notifies the responders.
 [Cohesion](21_Patterns--Design_Patterns.md#design-principles)
 means one job per class.
-Measuring is the thermometer's own job, and *Observer* adds the other two.
-The code for notifying can leave the class.
-`Broadcaster` holds the responder list and the notification loop,
+`Thermometer` has three jobs: it measures, it decides which changes to announce,
+and it notifies the responders.
+Measuring is the thermometer's actual job, and *Observer* adds the other two.
+The notification code can be extracted in more than one way:
+
+- `Broadcaster` holds the responder list and the notification loop,
 and `Thermometer` inherits them.
-`weather_station.py` uses no base class and calls its responders from `__setattr__()`,
+- `weather_station.py` uses no base class and calls its responders from `__setattr__()`,
 so one method covers every attribute.
+
 Either way the object still notifies its responders,
 but the loop that calls them is written once,
 in `Broadcaster` or in `__setattr__()`, apart from the code that measures.
