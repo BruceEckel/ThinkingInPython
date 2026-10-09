@@ -263,8 +263,8 @@ All three are concrete classes rather than interfaces.
 Being concrete constrains what a test double for one of them can be.
 [Supplying an Interface](#supplying-an-interface) works through the limit.
 
-`read_file()` is also the library's own example of both channels at once.
-Its accessor carries `@throws(FileNotFoundError, PermissionError)` on a function that already returns an Effect,
+The `read_file()` accessor in `stateless.files` is also the library's own example of both channels at once.
+It carries `@throws(FileNotFoundError, PermissionError)` on a function that already returns an Effect,
 so its type declares an Ability and two failures together.
 [The Error Channel](#the-error-channel) introduces that decorator.
 
@@ -490,7 +490,8 @@ Stateless has `repeat()` and `retry()` too,
 but each takes a schedule and returns a decorator of type `Callable[P, Effect[...]] -> Callable[P, Effect[...]]`.
 They decorate the function,
 because the function can produce a second description.
-`catch()`, `throws()`, and `supply()` take functions for the same reason.
+`catch()`, `throws()`,
+and `supply()` return decorators over functions for the same reason.
 
 <!-- The "---" below is the author's own em-dash. Leave it. House.EmDash
      exists to catch em-dashes the author did not write. -->
@@ -844,7 +845,7 @@ One test function covers four environments.
 `holds()` takes no arguments.
 `supply()` binds `material` and `nailer` instead,
 so the table reads as a matrix of environments rather than a list of arguments.
-A new `Material` is a new row.
+A new `Material` adds one row for each nailer.
 
 Dependencies as parameters serve this test as well,
 because `holds(material, nailer)` is easy to call four times.
@@ -1848,7 +1849,8 @@ Emptying a channel takes one of two vocabularies, and a third case needs none:
 
 The vocabularies differ, and the operation underneath them is the same.
 Both subtract from the type.
-`supply()` removes an Ability and leaves `Never` in its place.
+`supply()` removes an Ability from the union,
+and the channel reads `Never` once the last Ability is answered.
 `catch()` removes an error and moves it into the result,
 where a `match` must account for it.
 An Effect with both channels emptied is a `Success`.
