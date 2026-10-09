@@ -409,6 +409,15 @@ The guard also makes the proxy work with `copy` and `pickle`,
 which look up `__setstate__()` on an instance whose `__init__()` has not run.
 Both get an `AttributeError`, which those modules handle, instead of recursing.
 
+The guard has a cost.
+The proxy stops forwarding every name that starts with an underscore,
+so an implementation's `_helper()`,
+or an explicit `p.__len__()` like the one in `dunder_bypass.py`,
+raises an `AttributeError`.
+A narrower guard, `if name == "_implementation"`,
+keeps forwarding those names and still works with `copy` and `pickle`,
+but a typo like `self._imp` recurses again.
+
 This chapter's other `__getattr__()` proxies do not include the guard,
 so each listing shows one idea.
 
@@ -822,6 +831,16 @@ as `state_demo.py` does,
 puts the check where it does not restrict the surrogate.
 The type checker verifies that `Implementation1` and `Implementation2` supply everything the Protocol declares,
 and reports a missing method.
+
+A type parameter, `class Surrogate[T]`, removes the tie to one Protocol,
+but the type checker infers `T` from the first implementation's class.
+`Surrogate(StateA())` is a `Surrogate[StateA]`,
+so `ty` rejects `change_to(StateB())`.
+With that surrogate, `state_demo.py` fails the same way:
+`ty` narrows `first` to `Implementation1` despite its `Behavior` declaration,
+and rejects `b.change_to(second)`.
+Every caller then writes the parameter out, as in `Surrogate[StateA | StateB]`,
+so the listing keeps `Any`.
 
 ## One Surrogate, Two Intents
 
