@@ -198,8 +198,7 @@ The rest of this chapter uses names you can tell apart at a glance:
 
 The last row has no method name on the right.
 A responder is a callable, so the receiving end needs no specially-named method.
-Sending a change and receiving it share one name, `announce()`,
-where GoF has two.
+Broadcasting a change takes one method name, `announce()`, where GoF uses two.
 
 GoF calls the pattern *Observer*,
 and Java and the reactive libraries use the older nouns.
@@ -1143,8 +1142,8 @@ only the side effects interleave.
 The async `announce()` needs no `list()` copy.
 The `*` unpacks the generator into a tuple of coroutines before `gather()` runs,
 so a `disconnect()` call during the fan-out cannot skip a responder.
-The tuple also means a responder that disconnects itself mid-notification still receives this change,
-an async counterpart to `self_removing_responder.py`:
+The next listing is an async counterpart to `self_removing_responder.py`,
+with a responder that disconnects itself mid-notification:
 
 ```python
 # async_self_removing_responder.py
