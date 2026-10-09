@@ -1204,8 +1204,10 @@ asyncio.run(main())
 #: slow finished: 1
 ```
 
-The failure prints the moment `loud()` raises its `ValueError`.
-`slow` is still sleeping at that point, with nothing left awaiting it.
+The failure appears the moment `loud()` raises its `ValueError`.
+`slow` is still sleeping at that point.
+The event loop keeps running its task, but the `gather()` call has returned,
+so no `await` remains to collect the task's result.
 Its line appears because `main()` sleeps for 0.25 seconds afterward,
 long enough for `slow` to finish.
 A real caller rarely adds that wait.
