@@ -1467,7 +1467,9 @@ reads `size` and `grid`, and calls `select()`.
 ## Document-View and MVC
 
 This chapter opened by saying Document-View folds the controller into the view.
-We'll look at two approaches that differ only in where the input handling lives.
+We'll look at two approaches that differ only in where the input handling lives:
+the Document-View `View` has a `key()` method,
+and MVC gives `key()` to a `Controller` class.
 They share the same model, a counter:
 
 ```python
@@ -1599,8 +1601,9 @@ Both classes hold the model,
 `View` so that `__post_init__()` can connect `draw()`,
 and `Controller` so that `key()` has somewhere to send the request.
 The MVC `View` keeps `draw()` and `Controller` gets `key()`, one job each.
-`Controller` is the third role of MVC,
-the one Document-View folds into the view, and here it is a class of its own.
+`Controller` is the third role of MVC.
+Document-View folds that role into `View` as the `key()` method,
+and MVC gives it a class of its own.
 
 Swapping in `IgnoringController` at the end of `model_view_controller.py` shows what that move gives you.
 `IgnoringController` satisfies `KeyHandler` and ignores every key,
