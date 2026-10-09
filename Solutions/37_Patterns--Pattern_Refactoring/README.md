@@ -396,7 +396,7 @@ too.
 
 ## 4. Exact-type bins against MRO dispatch
 
-> Derive `CrushedAluminum` from `Aluminum`,
+> Derive `CrushedAluminum` from `Aluminum` in `trash.py`,
 > add it to the data `recycle_dict.py` reads,
 > then run `recycle_dict.py` and `recycling_note.py`.
 > Explain why `CrushedAluminum` gets its own bin but not its own note.

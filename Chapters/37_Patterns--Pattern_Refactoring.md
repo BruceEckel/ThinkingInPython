@@ -502,9 +502,11 @@ print(f"classes edited for one operation: {len(edited)}")
 #: classes edited for one operation: 3
 ```
 
-`[1]` counts the edits.
-One new operation is an edit to all three material classes,
-and the operation after it is three more edits.
+`[1]` counts the material classes that the new operation edits.
+The `Trash` base takes an edit too,
+because the type checker accepts `t.hazard()` on a `Trash`,
+such as a piece from `parse()`, once the base declares the method.
+So one new operation is four edits, and the operation after it is four more.
 Those edits sit in each class body, as `note_methods.py` shows.
 In the real program they go in `trash.py`.
 
@@ -614,7 +616,7 @@ print(f"classes edited for one operation: {len(edited)}")
 The loop reads every material from the registry, `hazard()` answers for each,
 and `trash.py` stays untouched.
 A third operation and a fourth are one more file each,
-where `note_methods.py` needs one edit per material every time.
+where `note_methods.py` needs an edit to the base and to each material every time.
 Adding a `Plastic` material means defining the class,
 plus one registration for each operation that must answer differently for plastic.
 Python still has the expression problem,
@@ -674,7 +676,7 @@ give a hint, usually the shape of the code, and a full answer for each exercise.
     Decide for each whether it needs `singledispatch`.
 3.  Replace the `recycling_note()` single-dispatch function with a `singledispatchmethod` on a `Sorter` class,
     and explain what changed.
-4.  Derive `CrushedAluminum` from `Aluminum`,
+4.  Derive `CrushedAluminum` from `Aluminum` in `trash.py`,
     add it to the data `recycle_dict.py` reads,
     then run `recycle_dict.py` and `recycling_note.py`.
     Explain why `CrushedAluminum` gets its own bin but not its own note.
