@@ -365,9 +365,9 @@ Adding an `Item` means adding cases, not registering a function elsewhere.
 ### The `singledispatchmethod` Trap
 
 [`functools.singledispatchmethod`](41_Functional--Toolkits.md#singledispatchmethod)
-combines the two dispatches in one decorator.
-It dispatches once on `self` through ordinary method resolution,
-then again on its first argument through `singledispatch`.
+supplies the second dispatch for a method.
+Ordinary method resolution dispatches on `self` and finds the decorated method,
+which then dispatches on the first argument after `self` through `singledispatch`.
 That is the pair of dispatches the `eval_*()` family writes out by hand.
 Like `singledispatch`, it matches on the MRO rather than exactly.
 
@@ -465,6 +465,9 @@ print(DampPaper().compete(Scissors()))
 `DampPaper`'s own result against `Rock` comes from `Rock.eval_paper()`,
 a method `DampPaper` cannot change,
 so its `compete()` answers before making that call.
+That answer takes one `isinstance()` test,
+one rung of the ladder that double dispatch replaces,
+because `Rock` has no `eval_damp_paper()` method to dispatch to.
 `Rock`'s result against a `DampPaper` comes from `DampPaper.eval_rock()`,
 an ordinary override.
 Both overrides are necessary.
@@ -552,7 +555,7 @@ not the lookalike `NotImplementedError` exception,
 and returning it hands the operation to the other operand for the interpreter to try next.
 The first call dispatches on `a`'s type, the fallback on `b`'s.
 That is double dispatching, built into the language.
-The fallback is how a type written decades after `int` can add itself to an `int` on the left.
+The fallback is how a type written decades after `int` can sit to the right of an `int` in a sum.
 
 Every binary arithmetic and bitwise operator has a reflected form,
 named by inserting an `r` before the operator's name: `__rsub__()`,
@@ -595,7 +598,7 @@ print(4 + Meters(3))
 #: __radd__(Meters(n=3), 4)
 #: Meters(n=7)
 with expected(TypeError):
-    Meters(3) + "four"  # Both sides decline
+    Meters(3) + "four"  # Left declines; no str.__radd__()
 #: __add__(Meters(n=3), 'four')
 #: [TypeError] unsupported operand type(s) for +: 'Meters'
 #: and 'str'
@@ -611,7 +614,8 @@ whose trace line shows the operands in swapped order.
 The last case shows why the sentinel exists.
 `Meters.__add__()` runs and declines the string,
 and `str` defines no `__radd__()`.
-Python raises the `TypeError` once both sides have declined.
+With the left operand declining and no reflected method to try,
+Python raises the `TypeError`.
 
 Raising a `TypeError` inside `__add__()` ends the expression there,
 since the exception propagates immediately.

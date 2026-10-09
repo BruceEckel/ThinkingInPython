@@ -31,7 +31,7 @@ print(4 + Meters(3))
 #: __radd__(Meters(n=3), 4)
 #: Meters(n=7)
 with expected(TypeError):
-    Meters(3) + "four"  # Both sides decline
+    Meters(3) + "four"  # Left declines; no str.__radd__()
 #: __add__(Meters(n=3), 'four')
 #: [TypeError] unsupported operand type(s) for +: 'Meters'
 #: and 'str'
