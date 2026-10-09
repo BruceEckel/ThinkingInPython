@@ -174,7 +174,7 @@ and the caller must unpack it to reach the number.
 
 If you catch and handle the exception within the function,
 the exception stays inside that function, so it is not an Effect.
-`slope()` can catch the one exception it names and turn the failure into an ordinary `float`,
+`slope()` can catch `ZeroDivisionError` and turn the failure into an ordinary `float`,
 its existing return type, instead of introducing a new type:
 
 ```python
@@ -216,7 +216,9 @@ Knowing every one of them is the tracking problem an Effect Management System so
 
 C++ and Java tried to track exceptions with *exception specifications*,
 a list of exceptions written by hand on each function.
-The compiler did not infer that list from the functions a body called,
+Java's compiler checks the list,
+while C++ checked it at runtime and ended the program on an exception the list left out.
+Neither language inferred the list from the functions a body called,
 so an exception introduced three levels down meant editing every signature above it by hand.
 Programmers usually avoided that work by widening the specification until it permitted every exception.
 The specifications exposed implementation details,
@@ -318,7 +320,7 @@ for text in ["2", "0"]:
 
 `parse_run()` is the only place that can fail,
 and `@safe` turns that failure into a `Result` its caller must unpack.
-Past that one `match`, `slope()` checks nothing.
+Once the `match` unpacks an `Ok`, `slope()` checks nothing.
 `NonZero` guarantees `run.value` isn't 0.
 The `Result` handles the input a caller doesn't trust,
 and `NonZero` lets every function downstream trust what it receives.
@@ -900,7 +902,7 @@ and so must its callers, all the way up to the edge.
 If you replace "async" with "network access" or "database write" in that sentence,
 you have described Effect tracking.
 Python demonstrates that the machinery can work,
-and hard-codes it to a single Effect, concurrency,
+and hard-codes it to a single Effect, asynchrony,
 rather than letting you declare your own.
 
 Third-party libraries supply pieces of the rest.
