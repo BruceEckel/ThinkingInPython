@@ -35,15 +35,16 @@ def parameters(
     func: Def, scope: Scope, owner: str
 ) -> dict[str, str]:
     args = func.args
-    every = args.posonlyargs + args.args + args.kwonlyargs
+    positional = args.posonlyargs + args.args
+    every = positional + args.kwonlyargs
     types = {
         arg.arg: scope.annotation(arg.annotation)
         if arg.annotation
         else UNRESOLVED
         for arg in every
     }
-    if owner and args.args:
-        types[args.args[0].arg] = owner
+    if owner and positional:
+        types[positional[0].arg] = owner
     return types
 
 def is_function(node: ast.stmt) -> TypeIs[Def]:
