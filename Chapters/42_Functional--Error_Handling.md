@@ -313,10 +313,10 @@ if __name__ == "__main__":
 #: 4 Ok(answer=4)
 ```
 
-`composed()` returns early when a step returns an `Err`.
-The check names `Err`, one of the two concrete classes,
-because `Result` is a `type` alias rather than a class.
-The type checker rejects `isinstance(a, Result)`,
+`composed()` returns early when a step returns an `Err`,
+so each check tests for `Err`, the failure class.
+`Result` is a `type` alias rather than a class,
+so the type checker rejects `isinstance(a, Result)`,
 and at runtime the call raises a `TypeError`.
 
 `composed()` works, and it keeps errors as values,
@@ -492,7 +492,7 @@ so `a` is still visible inside the inner lambda that receives `b`.
 A flat sequence of `bind()` calls drops the earlier answer from scope,
 because each step's function receives one argument, the previous answer.
 
-A third input adds a third level:
+A third step adds a third level:
 
 ```python
 # combining.py
@@ -526,14 +526,14 @@ Short-circuiting is right for a dependent chain,
 where each step needs the previous step's answer,
 as in `composing_with_bind.py` above.
 `func_a()`, `func_b()`,
-and `func_c()` in `combining.py` take independent inputs,
+and `func_c()` in `combining.py` take their inputs from `i` and `j` rather than from an earlier step's answer,
 so stopping at the first `Err` discards whatever the later steps would have found
 (see exercise 3).
 The exception in `exceptions_lose_data.py` does the same to `func_a(4)`,
 which does not run.
 
-Three inputs need three levels of nesting,
-and each input you add nests one level deeper.
+Three steps need three levels of nesting,
+and each step you add nests one level deeper.
 [The returns Library](#the-returns-library)
 later in this chapter offers do-notation, a flatter alternative to this nesting.
 
@@ -816,9 +816,10 @@ The note is the chapter's opening argument, applied one level down.
 and a note says which piece of work produced it.
 
 The `Err` branch reads `error.__notes__`,
-and that read type-checks because the `match` narrowed the `Result` to `Err`.
-The narrowing works because `Result` is a union of exactly two classes,
-and it works the same way with `isinstance()`.
+and that read type-checks because the `match` narrows the `Result` to `Err[Exception]`,
+so the type checker knows `error` is an `Exception`,
+and typeshed declares `__notes__` on its base class, `BaseException`.
+The narrowing works the same way with `isinstance()`.
 
 Reading `error.__notes__` without a default is safe here only because `parse_field()` adds a note on every failure.
 An exception that arrives from code you did not write may carry no notes,
