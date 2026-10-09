@@ -707,8 +707,8 @@ The input list stays unchanged, so you can recompute the whole report, cache it,
 or run it on another core with no coordination.
 
 `to_fahrenheit()` returns a `Reading` whose `celsius` field holds a Fahrenheit number.
-The field name matches its contents up to that stage, so `report()` converts last,
-after `warmer_than()` reads the field as Celsius.
+The field name matches its contents up to that stage,
+so `report()` converts last, after `warmer_than()` reads the field as Celsius.
 
 `pipeline.py` is ordinary Python,
 written so that each piece depends on its arguments alone.
