@@ -1494,7 +1494,7 @@ class Counter(Broadcaster[int]):
         self.announce(self._count)
 ```
 
-In Document-View, one class draws and interprets input:
+In Document-View, a single class both displays and interprets input:
 
 ```python
 # document_view.py
@@ -1506,9 +1506,9 @@ class View:
     model: Counter
 
     def __post_init__(self) -> None:
-        self.model.connect(self.draw)
+        self.model.connect(self.display)
 
-    def draw(self, count: int) -> None:
+    def display(self, count: int) -> None:
         print(f"count: {count}")
 
     def key(self, char: str) -> None:  # The controller
@@ -1528,12 +1528,12 @@ for char in "++-x":
 #: count: 1
 ```
 
-`draw()` is the output and `key()` is the input: `key()` is the controller,
+`display()` is the output and `key()` is the input: `key()` is the controller,
 folded into `View` as a method,
 and `View` holds the model because `key()` needs somewhere to send the request.
-`__post_init__()` connects `draw()` to that model,
+`__post_init__()` connects `display()` to that model,
 as `show()` does in `grid_view.py`, so a `View` is wired as soon as it exists.
-`draw()` works from the count the model pushes to it.
+`display()` works from the count the model pushes to it.
 `x` matches the wildcard case, so `key()` returns without touching the model,
 and the four characters of `"++-x"` print three counts.
 
@@ -1549,13 +1549,13 @@ class KeyHandler(Protocol):
     def key(self, char: str) -> None: ...
 
 @record
-class View:  # Draws
+class View:  # Displays
     model: Counter
 
     def __post_init__(self) -> None:
-        self.model.connect(self.draw)
+        self.model.connect(self.display)
 
-    def draw(self, count: int) -> None:
+    def display(self, count: int) -> None:
         print(f"count: {count}")
 
 @record
@@ -1589,7 +1589,8 @@ print(model.count)
 #: 1
 ```
 
-The two versions share the `Counter` model, the count it announces to `draw()`,
+The two versions share the `Counter` model,
+the count it announces to `display()`,
 and the printed output for the same input, `"++-x"`.
 *Observer* does the same work either way,
 which is why the chapter's opening calls the two architectures nearly equivalent.
@@ -1598,9 +1599,9 @@ One thing moves.
 `key()` leaves `View` for `Controller`,
 which gets its own reference to the model.
 Both classes hold the model,
-`View` so that `__post_init__()` can connect `draw()`,
+`View` so that `__post_init__()` can connect `display()`,
 and `Controller` so that `key()` has somewhere to send the request.
-The MVC `View` keeps `draw()` and `Controller` gets `key()`, one job each.
+The MVC `View` keeps `display()` and `Controller` gets `key()`, one job each.
 `Controller` is the third role of MVC.
 Document-View folds that role into `View` as the `key()` method,
 and MVC gives it a class of its own.
@@ -1615,9 +1616,9 @@ call `key()`, and read `model.count`.
 Supporting a different set of keys means writing a third class that satisfies `KeyHandler`,
 with `View` and the model unchanged.
 
-MVC separates drawing from input handling,
+MVC separates display from input handling,
 the two jobs `document_view.py` gives one class,
-and both views connect their own `draw()` to the model in `__post_init__()`.
+and both views connect their own `display()` to the model in `__post_init__()`.
 `grid_view.py` has the Document-View shape.
 Its `draw()` paints, its `bind()` lambda handles the click,
 and both are defined inside `show()`.

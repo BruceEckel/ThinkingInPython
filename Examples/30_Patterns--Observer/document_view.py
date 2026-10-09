@@ -7,9 +7,9 @@ class View:
     model: Counter
 
     def __post_init__(self) -> None:
-        self.model.connect(self.draw)
+        self.model.connect(self.display)
 
-    def draw(self, count: int) -> None:
+    def display(self, count: int) -> None:
         print(f"count: {count}")
 
     def key(self, char: str) -> None:  # The controller

@@ -7,13 +7,13 @@ class KeyHandler(Protocol):
     def key(self, char: str) -> None: ...
 
 @record
-class View:  # Draws
+class View:  # Displays
     model: Counter
 
     def __post_init__(self) -> None:
-        self.model.connect(self.draw)
+        self.model.connect(self.display)
 
-    def draw(self, count: int) -> None:
+    def display(self, count: int) -> None:
         print(f"count: {count}")
 
 @record
