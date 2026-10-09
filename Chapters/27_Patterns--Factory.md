@@ -563,7 +563,7 @@ not as `Shape`.
 
 The bound is also why the factory names `Shape` instead of taking a type parameter.
 A generic factory would need `register()`'s bound to name the factory's own type parameter,
-and the type checker rejects a type variable's bound that is generic.
+and the type checker rejects a bound that contains another type parameter.
 
 Keeping the table in the factory removes two hazards from [Hazards of Self Registration](#hazards-of-self-registration).
 No `cls.registry` lookup walks the MRO,
@@ -723,8 +723,10 @@ Dispatching through `eval()` is unnecessary, and it makes things worse.
 `create_shape()` then compiles and runs any string it receives,
 so a configuration file, a request,
 or a command line can hand it arbitrary code instead of a shape name.
-Using the dictionary lookup gives you type safety.
-You get either a factory or a `KeyError`.
+The dictionary lookup runs no code from the string.
+You get either a factory or a `KeyError`,
+and the type checker knows the factory as a `ShapeMaker`,
+where `eval()` returns `Any`.
 
 ## Subclasses Choose the Type
 
@@ -1246,7 +1248,7 @@ and works on any object that defines `__replace__()`.
 
 Testing confirms that the two forms produce the same pizza,
 that `replace()` changes one field of a copy and keeps the rest,
-and that a builder is single-use:
+and that a second `build()` on the same builder carries the first pizza's toppings:
 
 ```python
 # test_pizza.py
