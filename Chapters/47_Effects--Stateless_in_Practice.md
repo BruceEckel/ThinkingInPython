@@ -606,6 +606,13 @@ so it propagates out of `run()` and no signature mentions it.
 `catch()` matches values an Effect yields, and a handler runs in the driver,
 outside the Effect, so a `catch()` around this program lets the `Blackout` through.
 
+The `Blackout` also leaves `run_load()` suspended at its `plug()` request,
+since the exception propagates out through `handle()` and bypasses the generator.
+In this program the `with` block has closed by then,
+because `plug()` sits outside it.
+A handler that raises an exception while a `with` block is open leaves that block's exit waiting until Python reclaims the abandoned generator,
+which can come after the `except` clause that handled the exception has finished.
+
 ```python
 # microgrid_demo.py
 from microgrid import controller, run_load
