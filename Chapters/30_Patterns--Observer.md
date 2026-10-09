@@ -1328,7 +1328,8 @@ The model is testable without a GUI:
   Cells with the same `x + y` share a color.
 - `Color.next()` steps to the next color,
   and on the last color it returns the first.
-- `recolored()` changes the cross and no other cell, and returns a new grid.
+- `recolored()` changes the cross, leaves every other cell as it was,
+  and returns a new grid.
 - A selection in a corner stays on the grid.
 - Responders receive the new grid once after a selection.
 
