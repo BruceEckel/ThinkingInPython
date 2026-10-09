@@ -218,10 +218,13 @@ If that attribute carries `__final__`,
 and `@final` stops that replacement only for the type checker.
 The `__final__` check names no method,
 so a second `@final` instance method in `ApplicationFramework` gets the same protection with no change to `__init_subclass__()`.
-The check misses a `@final` on a `@classmethod`, `@staticmethod`,
-or `@property`.
-For those, `getattr()` on the class returns a bound method, the bare function,
-or the property object, and none of them carries `__final__`.
+The check misses a `@final` on a `@property`,
+and a `@final` written above `@classmethod` or `@staticmethod`.
+For those, `getattr()` on the class returns the property object, a bound method,
+or the bare function, and none of them carries `__final__`.
+Written below `@classmethod` or `@staticmethod`,
+`@final` marks the function that `getattr()` returns,
+and the check catches the override.
 
 Reading the attribute through `getattr()` also keeps the type checker quiet.
 A function's type declares no `__final__`,
@@ -340,7 +343,7 @@ The name, the parameters, and the return type all match the base,
 so the type checker accepts `@override` and reports nothing.
 The base states its algorithm in the loop, not in any type.
 Each pass calls the step, so each pass must perform it.
-An unexpected exception, an empty step,
+An unexpected exception, an empty step the flow needs,
 and a skipped pass each corrupt the anchored algorithm.
 The `...` defaults make a step optional,
 and nothing distinguishes "deliberately empty" from "forgotten."
@@ -385,7 +388,9 @@ starting from the base class with its empty hooks:
 ![](_images/template_method_story)
 
 The loop and its two step slots stay the same in all three frames.
-The box beneath them changes, along with the loop's name in frame 3.
+The box beneath them changes,
+along with the name of the function that holds the loop,
+`run_framework()` in frame 3.
 In the second frame each arrow is a call through `self`,
 so the base calls the subclass's methods.
 In the third the arrows lose `self`.
@@ -433,7 +438,7 @@ Each of this chapter's four anchors guards against a different way of breaking t
 - The interpreter, via `__init_subclass__()`.
   It refuses an offending subclass at its `class` statement,
   whether the subclass overrides `run()` or misspells a hook.
-  This holds at runtime, whereas `@final` is only a type-checking attribute.
+  This holds at runtime, whereas the type checker alone enforces `@final`.
 - Discipline, via the Liskov Substitution Principle.
   This governs whether each step is a faithful substitute.
   `@abstractmethod` checks that a required step exists,
