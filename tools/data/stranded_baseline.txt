@@ -40,7 +40,6 @@ Chapters/28_Patterns--Function_Objects.md	each handler holding a reference to th
 Chapters/28_Patterns--Function_Objects.md	otherwise leaves a stray entry behind
 Chapters/29_Patterns--Changing_the_Interface.md	Pyright and mypy need their deprecation rule switched on
 Chapters/30_Patterns--Observer.md	A bound method holds the object it came from
-Chapters/30_Patterns--Observer.md	A responder chooses which notifications to act on
 Chapters/30_Patterns--Observer.md	along with the attribute name to filter by
 Chapters/30_Patterns--Observer.md	set before CODE and cleared after
 Chapters/30_Patterns--Observer.md	so every listing asks you to decode which end you are looking at

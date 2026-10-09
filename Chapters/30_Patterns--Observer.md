@@ -163,8 +163,8 @@ A `notify()` call therefore reaches every observer in `_observers` at the moment
 If `detach()` removes an observer from `_observers` partway through a `notify()` call,
 the copy still holds that observer,
 so the observer receives the call's notification.
-Attaching an observer during the call does not attach to the copy,
-so the new observer isn't part of the `notify()` on the copy.
+An observer attached during the call joins `_observers` alone,
+so its first notification comes from the next `notify()` call.
 [Disconnecting During a Notification](#disconnecting-during-a-notification)
 runs a responder that disconnects itself,
 and shows index by index which responder the loop skips without the copy.
@@ -256,7 +256,7 @@ Its type parameter `T` sets the type of each notification,
 and a class that inherits `Broadcaster` gets `connect()`, `disconnect()`,
 and `announce()`.
 
-A responder returns `None`, as seen in the `Responder` `type` alias.
+A responder returns `None`, as the `Responder` `type` alias declares.
 At runtime, `announce()` discards whatever a responder returns,
 since it calls each responder as a statement.
 The alias turns that silent discard into a type error.
@@ -884,8 +884,12 @@ thermometer.celsius = 200
 
 The `respond()` decorator method appends its function to the `thermometer` list and returns the function unchanged,
 so `report` stays callable by name.
+A decorator's result replaces the decorated name, so `Broadcaster.connect()`,
+which returns `None`, cannot serve as one;
+`respond()` returns its function for that reason.
 
-To minimize application code, all common behaviors are captured in the library.
+The two listings that follow hold the shared machinery,
+so a subclass such as `Thermometer` declares its fields and inherits the rest.
 The first piece builds the property that publishes a field:
 
 ```python
@@ -904,8 +908,9 @@ def published(name: str) -> property:
 ```
 
 `property` is the class behind [`@property`](07_Foundations--Classes.md#properties).
-Called directly (`[3]`),
-it returns a class attribute that intercepts every read and write of that name on an instance,
+Called directly (`[3]`), it returns a property object that,
+once installed as a class attribute,
+intercepts every read and write of that name on an instance,
 routing the read through `read()` and the write through `write()`
 (these function names can be anything).
 The `@property` form needs a method written in the class body for each attribute,
@@ -976,10 +981,10 @@ One of those bases is `Generic`, which `class Broadcasting[T]` adds,
 and its `__init_subclass__()` records that `Thermometer` takes no type parameter.
 If you leave the call out, the runtime accepts `Thermometer[int]`.
 
-`[1]` passes the new class to `dataclass(eq=False)`.
-This returns a decorator,
-and applying that decorator to `cls` reads the [bare annotations](09_Foundations--Class_Attributes.md#a-bare-annotation-declares-it-does-not-create)
-(e.g. `celsius: float`),
+`[1]` calls `dataclass(eq=False)`, which returns a decorator,
+and applies that decorator to `cls`.
+The decorator reads the [bare annotations](09_Foundations--Class_Attributes.md#a-bare-annotation-declares-it-does-not-create)
+(e.g. `celsius: float`)
 and writes an `__init__()` and a `__repr__()` onto the class.
 That `__init__()` has one parameter per field,
 so `Thermometer`'s is `__init__(self, celsius: float)`,

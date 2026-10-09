@@ -64,8 +64,8 @@ print(calls)
 #: [('A', 42), ('B', 42)]
 ```
 
-**Collect the responders.** Like `broadcaster.py`, this solution has no separate `Observer` class at
-all. Any callable, here two `lambda`s, is a responder. `connect()`
+**Collect the responders.** Like `broadcaster.py`, this solution has no separate `Observer` class.
+Any callable, here two `lambda`s, is a responder. `connect()`
 collects them in a list.
 
 **Deliver one update to every responder.** `announce()` then hands its own arguments to
@@ -606,7 +606,7 @@ def test_a_cancelled_responder_is_reported() -> None:
 **Run every responder to completion.** `return_exceptions=True` changes `gather()` from "re-raise the first
 failure immediately" to "run everything and hand back a list." That
 one keyword does what the synchronous version needed a `try` inside a
-loop to do, because `gather()` is already the loop.
+loop to do, because `gather()` is the loop.
 
 **Pick out the failures.** The results come back in argument order, so the list is a record of
 which responder produced what. This version needs the failures alone,
@@ -633,7 +633,7 @@ and the second test confirms that the cancelled responder is reported and the la
 Exercise 3's synchronous version keeps `except Exception`,
 and the difference is where a `BaseException` goes:
 there it passes through the loop and stops the notification, which is right for a `KeyboardInterrupt`;
-here `gather()` has already turned it into a value, and dropping a value reports nothing.
+here `gather()` has turned it into a value, and dropping a value reports nothing.
 
 The synchronous and asynchronous versions now answer the same
 question, and both end in an exception group. The other difference is
@@ -770,8 +770,7 @@ a `Responder[int]` must return a `Result`.
 `succeeds()` adapts any `None`-returning callable
 by calling it and returning `Ok(None)`.
 The adapter assumes the wrapped callable cannot fail;
-if the callable raises an exception anyway,
-that exception leaves `announce()` as it did in the chapter's version.
+an exception the callable does raise leaves `announce()` as it did in the chapter's version.
 
 Returning errors as values works when you write the responders.
 For a broadcaster that accepts arbitrary callables,
@@ -1261,7 +1260,9 @@ Neither one names the other, and neither names the model's rule.
 and `announce()` calls both views in connection order. They read the
 same `Grid` object, so the letters and the counts describe one state
 of the model: the first selection advances the five cells of the
-cross, which moves two cells out of `skyblue` and two into `khaki`.
+cross, two from `skyblue` to `palegreen`, two from `palegreen` to
+`khaki`, and the center from `khaki` to `skyblue`, so the tally
+drops `skyblue` by one and raises `khaki` by one.
 The corner selection that follows has three cells inside the grid
 rather than five.
 
@@ -1431,7 +1432,7 @@ no count of selections reaches that color.
 full rank, so every color is reachable from any starting grid. At 4x4
 the rank is 14 of 16, and at 8x8 it is 60 of 64: the missing
 dimensions are combinations of cells that no selection can change, so
-the starting grid must already agree with the target on each of them.
+the starting grid must agree with the target on each of them.
 The 4x4 banded grid agrees for all three colors, and the 8x8 grid for
 `palegreen` alone, which is the puzzle the window poses. At 5x5 three
 dimensions are missing and no color satisfies them, so no sequence of
