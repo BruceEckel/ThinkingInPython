@@ -739,7 +739,11 @@ Every later constructor call returns the cached instance and discards the constr
 so `Registry("secondary", limit=99)` creates no new object.
 A caller who believes those arguments took effect holds an object configured by someone else.
 
-`isinstance(first, Registry)` and `class Sub(Registry)` both raise a `TypeError`:
+`isinstance()` requires a class, a tuple of classes,
+or a union as its second argument,
+and `Registry` now names a `singleton` object.
+So `isinstance(first, Registry)` raises a `TypeError`,
+and so does `class Sub(Registry)`:
 
 ```python
 # test_singleton_class.py
@@ -785,13 +789,13 @@ A metaclass can also intercept construction.
 [Metaprogramming](17_Techniques--Metaprogramming.md#intercepting-instance-creation)
 shows that singleton.
 Its metaclass overrides `__call__()`,
-and that override skips `__init__()` on every later construction,
+and that override skips `__new__()` and `__init__()` on every later construction,
 so the first call's arguments win.
 In a class that overrides `__new__()` instead,
 as `singleton_class_variable.py` does, `__new__()` still runs on every call,
 unlike the metaclass form.
-That listing puts its work inside `__new__()`,
-so later calls append to the shared instance instead of overwriting it.
+That listing's `__new__()` creates `val` on the first call and appends to it on every call,
+so each later argument joins the shared list instead of being discarded.
 [Metaprogramming](17_Techniques--Metaprogramming.md)
 also covers `__init_subclass__()` and `__set_name__()`,
 the simpler methods that replace most metaclasses.
