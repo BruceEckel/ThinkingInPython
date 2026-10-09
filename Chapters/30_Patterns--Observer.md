@@ -1637,13 +1637,16 @@ Measuring is the thermometer's actual job, and *Observer* adds the other two.
 The notification code can be extracted in more than one way:
 
 - `Broadcaster` holds the responder list and the notification loop,
-and `Thermometer` inherits them.
+  and `Thermometer` inherits them.
 - `weather_station.py` uses no base class and calls its responders from `__setattr__()`,
-so one method covers every attribute.
+  so one method covers every attribute.
+- `broadcasting.py` holds the list and the loop like `Broadcaster`,
+  and its generated properties make the `announce()` call as well,
+  so the `Thermometer` body is one annotation.
 
-Either way the object still notifies its responders,
-but the loop that calls them is written once,
-in `Broadcaster` or in `__setattr__()`, apart from the code that measures.
+In each case the object still notifies its responders,
+but the loop that calls them is written once, in `Broadcaster`,
+in `__setattr__()`, or in `Broadcasting`, apart from the code that measures.
 
 The second job *Observer* adds is deciding which changes to announce.
 That decision belongs to the object whose state changes, or to whoever calls it.
