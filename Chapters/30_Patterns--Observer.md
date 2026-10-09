@@ -1467,10 +1467,8 @@ reads `size` and `grid`, and calls `select()`.
 ## Document-View and MVC
 
 This chapter opened by saying Document-View folds the controller into the view.
-We'll look at two approaches that share one model and one notification,
-the count the model announces after each step,
-and differ only in where the input handling lives.
-The model is a counter:
+We'll look at two approaches that differ only in where the input handling lives.
+They share the same model, a counter:
 
 ```python
 # counter_model.py
@@ -1541,7 +1539,7 @@ from typing import Protocol
 from counter_model import Counter
 from record import record
 
-class Keys(Protocol):
+class Controller(Protocol):
     def key(self, char: str) -> None: ...
 
 class View:  # Draws, and holds no model
@@ -1549,7 +1547,7 @@ class View:  # Draws, and holds no model
         print(f"count: {count}")
 
 @record
-class StepKeys:  # Interprets, and holds the model
+class StepController:  # Interprets, and holds the model
     model: Counter
 
     def key(self, char: str) -> None:
@@ -1561,21 +1559,21 @@ class StepKeys:  # Interprets, and holds the model
             case _:
                 pass
 
-class NoKeys:  # Reads input and changes nothing
+class IgnoringController:  # Reads input, changes nothing
     def key(self, char: str) -> None: ...
 
 model = Counter()
 view = View()
 model.connect(view.draw)
-control: Keys = StepKeys(model)
+controller: Controller = StepController(model)
 for char in "++-x":
-    control.key(char)
+    controller.key(char)
 #: count: 1
 #: count: 2
 #: count: 1
-control = NoKeys()  # View and model untouched
+controller = IgnoringController()  # View and model stay
 for char in "+++":
-    control.key(char)
+    controller.key(char)
 print(model.count)
 #: 1
 ```
@@ -1587,19 +1585,22 @@ and the printed output for the same input, `"++-x"`.
 which is why the chapter's opening calls the two architectures nearly equivalent.
 
 One thing moves.
-`key()` leaves `View` for `StepKeys`, and the model reference goes with it.
-The MVC `View` keeps `draw()` and `StepKeys` gets `key()`, one job each.
-`StepKeys` is named for what its keys do: each one steps the counter by one,
-through `increment()` or `decrement()`.
+`key()` leaves `View` for `StepController`,
+and the model reference goes with it.
+The MVC `View` keeps `draw()` and `StepController` gets `key()`, one job each.
+The `Controller` protocol names the third role of MVC,
+the one Document-View folds into the view,
+and `StepController` is named for what its keys do:
+each one steps the counter by one, through `increment()` or `decrement()`.
 
-Swapping in `NoKeys` at the end of `model_view_controller.py` shows what that move gives you.
-`NoKeys` satisfies `Keys` and ignores every key,
-so assigning it to `control` makes the program ignore input while `View` and the model work as before.
+Swapping in `IgnoringController` at the end of `model_view_controller.py` shows what that move gives you.
+`IgnoringController` satisfies `Controller` and ignores every key,
+so assigning it to `controller` makes the program ignore input while `View` and the model work as before.
 *GoF Design Patterns* gives this example for the separation:
 a controller that ignores input disables a view's input.
-`StepKeys` needs only a `Counter`, so a test can build a `StepKeys`,
+`StepController` needs only a `Counter`, so a test can build a `StepController`,
 call `key()`, and read `model.count`.
-Supporting a different set of keys means writing a third class that satisfies `Keys`,
+Supporting a different set of keys means writing a third class that satisfies `Controller`,
 with `View` and the model unchanged.
 
 MVC separates drawing from input handling,

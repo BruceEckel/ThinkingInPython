@@ -3,7 +3,7 @@ from typing import Protocol
 from counter_model import Counter
 from record import record
 
-class Keys(Protocol):
+class Controller(Protocol):
     def key(self, char: str) -> None: ...
 
 class View:  # Draws, and holds no model
@@ -11,7 +11,7 @@ class View:  # Draws, and holds no model
         print(f"count: {count}")
 
 @record
-class StepKeys:  # Interprets, and holds the model
+class StepController:  # Interprets, and holds the model
     model: Counter
 
     def key(self, char: str) -> None:
@@ -23,20 +23,20 @@ class StepKeys:  # Interprets, and holds the model
             case _:
                 pass
 
-class NoKeys:  # Reads input and changes nothing
+class IgnoringController:  # Reads input, changes nothing
     def key(self, char: str) -> None: ...
 
 model = Counter()
 view = View()
 model.connect(view.draw)
-control: Keys = StepKeys(model)
+controller: Controller = StepController(model)
 for char in "++-x":
-    control.key(char)
+    controller.key(char)
 #: count: 1
 #: count: 2
 #: count: 1
-control = NoKeys()  # View and model untouched
+controller = IgnoringController()  # View and model stay
 for char in "+++":
-    control.key(char)
+    controller.key(char)
 print(model.count)
 #: 1
