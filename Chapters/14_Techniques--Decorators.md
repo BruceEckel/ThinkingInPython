@@ -688,7 +688,7 @@ shows what a function's `__dict__` does suit.
 
 ### A Class-Form Decorator with Arguments
 
-The class form is the better choice when the decorator takes arguments.
+The class form is a better choice when the decorator takes arguments.
 Without arguments, the constructor receives the function.
 With arguments, the constructor receives the arguments,
 and `__call__()` receives the function and returns the wrapper:

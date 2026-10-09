@@ -190,7 +190,7 @@ Chapters/15_Techniques--Context_Managers.md	only: so write CODE methods that fai
 Chapters/15_Techniques--Context_Managers.md	want: Write a manager once you want the CODE syntax at the call site
 Chapters/15_Techniques--Context_Managers.md	want: once you have decided you want one
 Chapters/15_Techniques--Context_Managers.md	want: so name the types you expect unless you want a block that nothing escapes
-Chapters/16_Techniques--Comprehensions.md	already: CODE and CODE are the better choice when the function already exists
+Chapters/16_Techniques--Comprehensions.md	already: CODE and CODE are a better choice when the function already exists
 Chapters/16_Techniques--Comprehensions.md	only: A generator expression needs no parentheses of its own when it is a function's only argument
 Chapters/16_Techniques--Comprehensions.md	only: and pays it only for the values the consumer pulls
 Chapters/16_Techniques--Comprehensions.md	only: but only when its predicate is a named function annotated to return CODE or CODE rather than CODE

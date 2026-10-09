@@ -1323,7 +1323,7 @@ but a pool of threads absorbs blocking calls.
 That absorption is why `asyncio.to_thread()` hands its blocking work to this kind of pool.
 
 Use a thread pool for I/O when the blocking calls already exist and rewriting them as coroutines is not worth the effort.
-`asyncio` is the better choice when you have thousands of waits,
+`asyncio` is a better choice when you have thousands of waits,
 since tasks are far lighter than threads.
 
 In contrast, a thread that is computing gains nothing when the GIL changes hands:
@@ -2407,7 +2407,7 @@ for example letting only the task with the lower ID give.
   Explore [Performance](18_Techniques--Performance.md)
   before deciding you require a concurrent solution.
 - **Don't wrap a lone wait in `async`/`await` machinery.**
-  `asyncio` is worth its machinery once you have multiple waits that overlap.
+  `asyncio` is justified once you have multiple waits that overlap.
 - **A comprehension that awaits is not concurrent.**
   `[await c for c in coroutines]` runs one coroutine at a time.
   `gather()` and `TaskGroup` schedule every coroutine as a task before waiting on any of them.

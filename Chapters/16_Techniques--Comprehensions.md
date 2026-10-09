@@ -95,7 +95,7 @@ The `map()`/`filter()` form funnels every element through `lambda` calls,
 and is harder to read.
 The comprehension inlines the test and the expression,
 and its brackets show at a glance that it produces a list.
-`map()` and `filter()` are the better choice when the function already exists:
+`map()` and `filter()` are a better choice when the function already exists:
 `map(str.strip, lines)` rather than `[line.strip() for line in lines]`.
 So the `lambda` makes `map_and_filter.py` worse, not `map()`.
 [Functional Foundations](40_Functional--Foundations.md) returns to the choice.

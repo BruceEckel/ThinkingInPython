@@ -207,7 +207,10 @@ and it becomes part of every future pass.
 - "The split pays off when you swap the controller" becomes
   "Splitting the controller out lets you swap it" (`e5613e31`).
   "Pays off" and "pays for itself" are a cost figure: write what is
-  gained ("saves time", "delivers its speedup"), or "is worth its
-  cost when" / "is the better choice when" where the sentence weighs
-  the construct against an alternative. Tier 3 in `tip watch-words`
-  since 2026-10-09; the fourteen in the book were fixed that day.
+  gained ("saves time", "delivers its speedup"), or "beneficial",
+  "justified", or "a better choice" where the sentence weighs the
+  construct against an alternative. Bruce's rulings (2026-10-09):
+  "worth its cost" and "worth its machinery" keep the cost figure,
+  "worth having" is awkward, and it is "a better choice", never
+  "the better choice". Tier 3 in `tip watch-words` since that day,
+  when the fourteen in the book were fixed.

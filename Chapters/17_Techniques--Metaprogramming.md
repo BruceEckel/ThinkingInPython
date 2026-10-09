@@ -1079,7 +1079,7 @@ def test_descriptor_on_class_returns_itself() -> None:
 ### A Descriptor That Validates
 
 `Field` shows the protocol and stores whatever you hand it.
-A descriptor is worth its cost when the write must do more than store.
+A descriptor is justified when the write must do more than store.
 `Positive` checks the value on its way in,
 so every attribute declared with one enforces the same rule:
 
