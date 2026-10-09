@@ -1330,7 +1330,8 @@ The model is testable without a GUI:
   and on the last color it returns the first.
 - `recolored()` changes the cross, leaves every other cell as it was,
   and returns a new grid.
-- A selection in a corner stays on the grid.
+- A selection in a corner changes the corner and its two neighbors,
+  and the result has the same cells as the original.
 - Responders receive the new grid once after a selection.
 
 ```python
