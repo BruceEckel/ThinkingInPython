@@ -1485,8 +1485,12 @@ class Counter(Broadcaster[int]):
     def count(self) -> int:
         return self._count
 
-    def add(self, delta: int) -> None:
-        self._count += delta
+    def increment(self) -> None:
+        self._count += 1
+        self.announce(self._count)
+
+    def decrement(self) -> None:
+        self._count -= 1
         self.announce(self._count)
 ```
 
@@ -1507,9 +1511,9 @@ class View:
     def key(self, char: str) -> None:
         match char:
             case "+":
-                self.model.add(1)
+                self.model.increment()
             case "-":
-                self.model.add(-1)
+                self.model.decrement()
             case _:
                 pass
 
@@ -1551,9 +1555,9 @@ class StepKeys:  # Interprets, and holds the model
     def key(self, char: str) -> None:
         match char:
             case "+":
-                self.model.add(1)
+                self.model.increment()
             case "-":
-                self.model.add(-1)
+                self.model.decrement()
             case _:
                 pass
 

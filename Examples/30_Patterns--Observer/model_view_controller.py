@@ -17,9 +17,9 @@ class StepKeys:  # Interprets, and holds the model
     def key(self, char: str) -> None:
         match char:
             case "+":
-                self.model.add(1)
+                self.model.increment()
             case "-":
-                self.model.add(-1)
+                self.model.decrement()
             case _:
                 pass
 

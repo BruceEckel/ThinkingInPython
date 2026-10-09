@@ -10,6 +10,10 @@ class Counter(Broadcaster[int]):
     def count(self) -> int:
         return self._count
 
-    def add(self, delta: int) -> None:
-        self._count += delta
+    def increment(self) -> None:
+        self._count += 1
+        self.announce(self._count)
+
+    def decrement(self) -> None:
+        self._count -= 1
         self.announce(self._count)
