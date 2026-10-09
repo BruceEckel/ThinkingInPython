@@ -688,7 +688,7 @@ shows what a function's `__dict__` does suit.
 
 ### A Class-Form Decorator with Arguments
 
-The class form pays off when the decorator takes arguments.
+The class form is the better choice when the decorator takes arguments.
 Without arguments, the constructor receives the function.
 With arguments, the constructor receives the arguments,
 and `__call__()` receives the function and returns the wrapper:
@@ -1020,7 +1020,7 @@ After decoration the name `greeting` refers to that `str`,
 so `greeting()` raises a `TypeError`.
 A `str` is not callable.
 
-`run_once` pays off for a value that needs one-time setup logic but stays constant afterward.
+`run_once` suits a value that needs one-time setup logic but stays constant afterward.
 For anything simpler,
 a module-level constant computed the ordinary way reads better.
 

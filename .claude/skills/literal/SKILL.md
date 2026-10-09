@@ -204,3 +204,10 @@ and it becomes part of every future pass.
   "each implementation chooses one behavior or the other" (`40323f50`).
   These three are R10 in `bruce_edit_db.md`: a judgment or figure about a
   mechanism becomes the mechanism.
+- "The split pays off when you swap the controller" becomes
+  "Splitting the controller out lets you swap it" (`e5613e31`).
+  "Pays off" and "pays for itself" are a cost figure: write what is
+  gained ("saves time", "delivers its speedup"), or "is worth its
+  cost when" / "is the better choice when" where the sentence weighs
+  the construct against an alternative. Tier 3 in `tip watch-words`
+  since 2026-10-09; the fourteen in the book were fixed that day.

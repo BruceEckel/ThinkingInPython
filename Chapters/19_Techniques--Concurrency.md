@@ -1323,7 +1323,7 @@ but a pool of threads absorbs blocking calls.
 That absorption is why `asyncio.to_thread()` hands its blocking work to this kind of pool.
 
 Use a thread pool for I/O when the blocking calls already exist and rewriting them as coroutines is not worth the effort.
-`asyncio` pays off when you have thousands of waits,
+`asyncio` is the better choice when you have thousands of waits,
 since tasks are far lighter than threads.
 
 In contrast, a thread that is computing gains nothing when the GIL changes hands:
@@ -1517,7 +1517,7 @@ non-atomic arithmetic.
 Only other threads pay for an atomic operation.
 Permanent objects like `None`, `True`, and small integers become *immortal*.
 Their counts stay constant.
-Immortality arrived in 3.12 for every build but pays off most in the free-threaded one,
+Immortality arrived in 3.12 for every build but matters most in the free-threaded one,
 since it removes the one atomic operation every thread otherwise contests.
 Mutable containers like dictionaries and lists carry individual locks,
 so two threads contend only when they touch the same container.
@@ -1530,7 +1530,7 @@ Removing the lock also removes three decades of accidental protection for C exte
 whose authors assumed that threads run one at a time.
 The free-threaded build comes with a safety net.
 Loading an extension that has not declared itself thread-safe re-enables the GIL for the whole process and emits a warning.
-Free threading pays off only when every extension you load has passed an audit,
+Free threading delivers its speedup only when every extension you load has passed an audit,
 so check compatibility before switching a project.
 
 Free threading also rewards a particular program shape.
@@ -2407,7 +2407,7 @@ for example letting only the task with the lower ID give.
   Explore [Performance](18_Techniques--Performance.md)
   before deciding you require a concurrent solution.
 - **Don't wrap a lone wait in `async`/`await` machinery.**
-  `asyncio` pays off once you have multiple waits that overlap.
+  `asyncio` is worth its machinery once you have multiple waits that overlap.
 - **A comprehension that awaits is not concurrent.**
   `[await c for c in coroutines]` runs one coroutine at a time.
   `gather()` and `TaskGroup` schedule every coroutine as a task before waiting on any of them.

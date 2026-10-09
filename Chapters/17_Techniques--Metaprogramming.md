@@ -169,7 +169,7 @@ Printing the class of the class produces the metaclass.
 
 ### A Family of Generated Classes
 
-Generating classes programmatically with `type()` pays off when a family of classes differs only by name.
+Generating classes programmatically with `type()` suits a family of classes that differ only by name.
 A greenhouse controller runs scheduled events, one class per kind of event,
 and a dict comprehension builds all of them:
 
@@ -1079,7 +1079,7 @@ def test_descriptor_on_class_returns_itself() -> None:
 ### A Descriptor That Validates
 
 `Field` shows the protocol and stores whatever you hand it.
-A descriptor pays for itself when the write must do more than store.
+A descriptor is worth its cost when the write must do more than store.
 `Positive` checks the value on its way in,
 so every attribute declared with one enforces the same rule:
 

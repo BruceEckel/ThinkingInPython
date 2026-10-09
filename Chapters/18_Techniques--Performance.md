@@ -623,7 +623,7 @@ print(f"hoisting did not halve the time: "
 #: hoisting did not halve the time: True
 ```
 
-Here the hoist does not pay off, and it can cost.
+Here the hoist saves nothing, and it can cost.
 `out.append(i)` compiles to a method load that pushes the function and its `self` separately,
 building no bound method.
 `append = out.append` builds one, and every call then goes through it.

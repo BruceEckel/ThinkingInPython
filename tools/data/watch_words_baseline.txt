@@ -190,7 +190,7 @@ Chapters/15_Techniques--Context_Managers.md	only: so write CODE methods that fai
 Chapters/15_Techniques--Context_Managers.md	want: Write a manager once you want the CODE syntax at the call site
 Chapters/15_Techniques--Context_Managers.md	want: once you have decided you want one
 Chapters/15_Techniques--Context_Managers.md	want: so name the types you expect unless you want a block that nothing escapes
-Chapters/16_Techniques--Comprehensions.md	already: CODE and CODE pay off when the function already exists
+Chapters/16_Techniques--Comprehensions.md	already: CODE and CODE are the better choice when the function already exists
 Chapters/16_Techniques--Comprehensions.md	only: A generator expression needs no parentheses of its own when it is a function's only argument
 Chapters/16_Techniques--Comprehensions.md	only: and pays it only for the values the consumer pulls
 Chapters/16_Techniques--Comprehensions.md	only: but only when its predicate is a named function annotated to return CODE or CODE rather than CODE
@@ -215,11 +215,9 @@ Chapters/17_Techniques--Metaprogramming.md	hooks: and you write one when the sim
 Chapters/17_Techniques--Metaprogramming.md	hooks: but simpler hooks cover almost every case a metaclass handled before those hooks existed
 Chapters/17_Techniques--Metaprogramming.md	is what: That is what a distinct subclass adds
 Chapters/17_Techniques--Metaprogramming.md	is what: and the shared metaclass is what such a family has instead
-Chapters/17_Techniques--Metaprogramming.md	itself: A descriptor pays for itself when the write must do more than store
 Chapters/17_Techniques--Metaprogramming.md	itself: Extend CODE so a class declares itself final with a keyword in its header
 Chapters/17_Techniques--Metaprogramming.md	itself: and returns itself when you read it through the class
 Chapters/17_Techniques--Metaprogramming.md	only: CODE and CODE normally run only because the default CODE calls them
-Chapters/17_Techniques--Metaprogramming.md	only: Generating classes programmatically with CODE pays off when a family of classes differs only by name
 Chapters/17_Techniques--Metaprogramming.md	only: Now the end user needs only to write and maintain the schedule file
 Chapters/17_Techniques--Metaprogramming.md	only: Only a metaclass makes the class callable in a new way
 Chapters/17_Techniques--Metaprogramming.md	only: Only three known names reach the template
@@ -273,7 +271,6 @@ Chapters/19_Techniques--Concurrency.md	only: But "one at a time" protects only t
 Chapters/19_Techniques--Concurrency.md	only: CODE switches only at an CODE
 Chapters/19_Techniques--Concurrency.md	only: CODE unifies backends that share only a result that arrives later
 Chapters/19_Techniques--Concurrency.md	only: Code reaches a heap allocation only through a reference
-Chapters/19_Techniques--Concurrency.md	only: Free threading pays off only when every extension you load has passed an audit
 Chapters/19_Techniques--Concurrency.md	only: Independent processes that communicate only over explicit
 Chapters/19_Techniques--Concurrency.md	only: It is a suspended function that runs only when the event loop resumes it
 Chapters/19_Techniques--Concurrency.md	only: It starts essentially empty and grows only as the program asks for more
@@ -861,7 +858,6 @@ Solutions/27_Patterns--Factory/README.md	only: so ruff reports the import as unu
 Solutions/27_Patterns--Factory/README.md	only: the table is the only acceptable version of the two
 Solutions/28_Patterns--Function_Objects/README.md	already: CODE already runs from the class outward to CODE
 Solutions/28_Patterns--Function_Objects/README.md	already: CODE's CODE already carries its configuration
-Solutions/28_Patterns--Function_Objects/README.md	itself: A base class pays for itself when the commands share implementation
 Solutions/28_Patterns--Function_Objects/README.md	never: A CODE is never a root
 Solutions/28_Patterns--Function_Objects/README.md	only: and a callable has only one call
 Solutions/28_Patterns--Function_Objects/README.md	want: You then want the original behavior

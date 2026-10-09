@@ -127,7 +127,7 @@ inherits nothing, and `run()` still calls each `Deposit` with `()`, so
 the function form's habit survives.
 
 The *GoF Design Patterns* shape is a base class with two
-`raise NotImplementedError` bodies. A base class pays for itself when
+`raise NotImplementedError` bodies. A base class is worth its cost when
 the commands share implementation, and these commands share none.
 
 **Remember what to reverse.** `Deposit` must also remember what it

@@ -5,7 +5,8 @@ The global style guide keeps three lists of words that are usually a
 defect. Tier 3 ("Don't use") is metaphor standing in for a literal
 statement: `ships`, `lands`, `fuse`, `load-bearing`, `part ways`,
 `rides on`, `near-miss`, `the way out`, `in the first place`, `wants`,
-`spelling`. Tier 2 ("Avoid if possible") is a word that must earn its
+`spelling`, `pays off`, `pays for itself` (a cost figure for "is worth
+its cost when", or for the gain, "saves time"). Tier 2 ("Avoid if possible") is a word that must earn its
 place: `already`, `even`, `honest`, `buy`, `hooks`, `never`, `anyway`,
 `at all`, `promise`. Tier 1 ("Consider rewriting") is a word with
 legitimate uses that the author checks every time: `happen`, `is what`,
@@ -122,6 +123,8 @@ RULES: Final[tuple[tuple[int, re.Pattern[str]], ...]] = tuple(
         (3, r"rides? on|rode on"),
         (3, r"near[- ]miss"),
         (3, r"the way out"),
+        (3, r"pays? off|paid off|paying off"),
+        (3, r"pays? for (?:it|them)sel(?:f|ves)|paid for itself"),
         (3, r"wants?"),
         (3, r"spellings?"),
         (2, r"already"),

@@ -592,7 +592,7 @@ the same function only at the bottom of a call chain.
 <details>
 <summary>Where to look</summary>
 
-[Array Instead of List](../../Chapters/18_Techniques--Performance.md#array-instead-of-list) measures the memory saving of `array`, and [Vectorize with NumPy](../../Chapters/18_Techniques--Performance.md#vectorize-with-numpy) shows where a compact layout pays off.
+[Array Instead of List](../../Chapters/18_Techniques--Performance.md#array-instead-of-list) measures the memory saving of `array`, and [Vectorize with NumPy](../../Chapters/18_Techniques--Performance.md#vectorize-with-numpy) shows where a compact layout saves time.
 Time `sum()` over the `list` and over the `array`, taking the `min()` of several `timeit.repeat()` rounds.
 For the why, consider what Python must hand to your code for each element of each container.
 
@@ -645,7 +645,7 @@ builds a fresh `float` object to hand to Python. That allocation,
 on every single element, eats the advantage of the tighter layout.
 
 That cost is the chapter's NumPy lesson arriving early. A compact
-layout pays off when the loop over it leaves Python. `sum()` over an
+layout saves time when the loop over it leaves Python. `sum()` over an
 `array` stays in Python and boxes every element. NumPy's `sum()` over
 the same bytes creates no Python object per element, which is why
 vectorizing wins where `array` alone does not.

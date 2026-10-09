@@ -907,7 +907,7 @@ except TypeError as e:
 The `tuple` holds the same `list` for its whole life,
 and that `list` stays free to change.
 A container holding an unhashable object is unhashable too.
-Immutability pays off when it goes all the way down,
+Immutability is worth having when it goes all the way down,
 because then you can share or hash a value and trust that everything inside it stays the same.
 [Rethinking Objects](20_Patterns--Rethinking_Objects.md#the-immutability-solution)
 shows the same shallow immutability inside a frozen data class.
