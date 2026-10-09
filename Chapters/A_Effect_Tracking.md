@@ -246,8 +246,9 @@ must solve five problems, and each one is larger than it first appears.
 
 To compute a row, the tool lists every call in a body and finds each callee's declaration.
 A direct call to a module-level function is the easy case.
-The `ast` module finds `tell(message.upper())` in `shout()`,
-and the name `tell` resolves in the module's scope.
+The `ast` module finds `tell(message.upper())` in `shout()` and leaves name binding to the tool,
+which looks `tell` up in `shout()`'s local names and then at the module's top level,
+where `tell()` is defined.
 
 A method call is the ordinary case, and it is hard.
 For `console.print(message)` the tool needs the type of `console`.
@@ -399,9 +400,12 @@ lists the cases the checker passes over silently.
 
 The third is the runtime.
 A decorator reads each function's row once with `row()`,
-and a `ContextVar` holds the row of the function now running.
+and a `ContextVar` holds the Effects the running code may perform:
+the running function's row, plus the Effect of each enclosing `handling` block.
 On each decorated call,
-the decorator compares the two rows and raises an exception when the callee's is not a subset of the caller's.
+the decorator raises an exception when the callee's row holds an Effect outside that set.
+A function that handles `Ask` leaves `Ask` out of its own row,
+so the set needs the `handling` term for the `greet()` call inside its `handling(Ask, Scripted())` block to pass.
 Call resolution disappears as a problem, because running a call resolves it.
 The loss is coverage.
 A runtime check covers the paths a run executes,
