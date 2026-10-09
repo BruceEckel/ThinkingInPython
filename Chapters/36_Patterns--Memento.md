@@ -758,6 +758,15 @@ The `__dict__` shows two entries.
 The loaded object is `==` to a `SketchV1` built with strokes alone,
 so every later comparison treats them as the same.
 
+These listings use `@record(slots=False)` so the loaded object has a `__dict__` to hold the ghost.
+A slotted record pickles its field values as a list in field order,
+and the load assigns that list to the current class's fields by position.
+When the deleted field is the last one, the load drops its value.
+A field deleted from the middle shifts every later value into the wrong field,
+so a `title`, `strokes`,
+`color` record that loses `strokes` loads the old strokes tuple as its `color`,
+and the load still raises nothing.
+
 ### Schema Migrations and Safer Formats
 
 Databases have the same drift, and its remedy there has a name.
