@@ -940,7 +940,8 @@ type Responder[T] = Callable[[T], None]
 
 @dataclass_transform(eq_default=False)
 class Broadcasting[T]:
-    def __init_subclass__(cls) -> None:
+    def __init_subclass__(cls, **kwargs: object) -> None:
+        super().__init_subclass__(**kwargs)
         built = dataclass(eq=False)(cls)  # [1]
         for field in fields(built):  # [2]
             prop = published(field.name)  # [3]
@@ -971,6 +972,11 @@ passing the new class as `cls`
 and at this point `Thermometer` has its annotation, no `__init__()`,
 and no class attribute named `celsius`.
 
+`super().__init_subclass__(**kwargs)` lets each base above `Broadcasting` run its own `__init_subclass__()`.
+One of those bases is `Generic`, which `class Broadcasting[T]` adds,
+and its `__init_subclass__()` records that `Thermometer` takes no type parameter.
+If you leave the call out, the runtime accepts `Thermometer[int]`.
+
 `[1]` passes the new class to `dataclass(eq=False)`.
 This returns a decorator,
 and applying that decorator to `cls` reads the [bare annotations](09_Foundations--Class_Attributes.md#a-bare-annotation-declares-it-does-not-create)
@@ -996,7 +1002,11 @@ so every `thermometer.celsius` read or write reaches the property,
 which reads or writes the `__dict__` entry of the same name behind it.
 The generated `__init__()` captures any default the field declares at `[1]`,
 so replacing the class attribute at `[4]` changes nothing about construction.
-Now the subclass behaves as if its author had written `thermometer.py`'s constructor and property pair.
+Now the subclass behaves like `thermometer.py`'s constructor and property pair,
+with one difference.
+The generated `__init__()` assigns through the property,
+so construction calls `announce()`,
+which finds no responders yet and notifies no one.
 
 `@dataclass_transform` on the base class is the type checker's side of `[1]`
 ([`@dataclass_transform` Is a Claim](17_Techniques--Metaprogramming.md#dataclass-transform)).

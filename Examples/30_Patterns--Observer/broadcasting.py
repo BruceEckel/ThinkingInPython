@@ -8,7 +8,8 @@ type Responder[T] = Callable[[T], None]
 
 @dataclass_transform(eq_default=False)
 class Broadcasting[T]:
-    def __init_subclass__(cls) -> None:
+    def __init_subclass__(cls, **kwargs: object) -> None:
+        super().__init_subclass__(**kwargs)
         built = dataclass(eq=False)(cls)  # [1]
         for field in fields(built):  # [2]
             prop = published(field.name)  # [3]

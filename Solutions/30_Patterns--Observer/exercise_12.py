@@ -17,7 +17,8 @@ def published(name: str) -> property:
 
 @dataclass_transform(eq_default=False)
 class Broadcasting[T]:
-    def __init_subclass__(cls) -> None:
+    def __init_subclass__(cls, **kwargs: object) -> None:
+        super().__init_subclass__(**kwargs)
         built = dataclass(eq=False)(cls)
         for field in fields(built):
             prop = published(field.name)
