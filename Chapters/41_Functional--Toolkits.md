@@ -286,7 +286,7 @@ print(sorted(words, key=cmp_to_key(by_length_desc)))
 
 This ordering has a key.
 `sorted(words, key=len, reverse=True)` gives the same list,
-and a key function is a better choice whenever one exists.
+and a key function is a better choice when one exists.
 `cmp_to_key()` is for a comparator that arrives from older code,
 and for an ordering with no per-element key,
 where the rule is a comparison between two elements.
