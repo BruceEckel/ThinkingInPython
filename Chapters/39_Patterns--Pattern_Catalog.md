@@ -67,7 +67,7 @@ so use this section's table when you know the problem but not the name.
 | Keeping a program running when a dependency fails | *Circuit Breaker*, *Retry*, *Bulkhead*, *Timeout*, *Dead Letter Channel* |
 | Returning several named values from one call | *Messenger*, *Data Transfer Object* |
 | Moving data across a boundary | *Data Transfer Object*, *Message Translator*, *Gateway*, *Data Mapper* |
-| Persisting domain objects to a database | *Active Record*, *Repository*, *Table Module*, *Lazy Load*, *Unit of Work*, *Identity Map* |
+| Persisting domain objects to a database | *Active Record*, *Data Mapper*, *Repository*, *Table Module*, *Lazy Load*, *Unit of Work*, *Identity Map* |
 | Organizing application logic by request or use case | *Transaction Script*, *Domain Model*, *Service Layer*, *Front Controller* |
 | Modeling a value, amount, or special case instead of null | *Value Object*, *Money*, *Special Case*, *Null Object* |
 | Routing or transforming a message | *Content-Based Router*, *Message Router*, *Splitter*, *Aggregator* |
@@ -128,6 +128,7 @@ so use this section's table when you know the problem but not the name.
 | [*Producer-Consumer*](19_Techniques--Concurrency.md#coordinating-threads-with-queues) | Decouple work creation from processing through a shared queue. |
 | *Reactor* | Dispatch incoming requests to handlers synchronously as they arrive. |
 | *Read-Write Lock* | Allow concurrent readers but exclusive writers. |
+| [*Structured Concurrency*](19_Techniques--Concurrency.md#structured-concurrency-with-taskgroup) | Tie concurrent tasks to a scope that exits only after every task finishes, cancelling the rest when one fails. |
 | [*Thread Pool*](19_Techniques--Concurrency.md#one-executor-interface-three-pools) | Reuse a set number of worker threads across many tasks. |
 | [*Thread-Specific Storage*](19_Techniques--Concurrency.md#context-that-follows-the-call-chain) | Give each thread its own copy of a value, as `threading.local` does; `ContextVar` scopes the value to the context instead. |
 
@@ -267,9 +268,9 @@ Python includes the piece their inventors set out to supply.
 | [*Factory Method*](27_Patterns--Factory.md#the-pythonic-factory-a-dictionary) | A dictionary of classes, since a class is an object |
 | [*Prototype*](27_Patterns--Factory.md#prototype) | `copy.deepcopy()` and `copy.replace()` |
 | [*Strategy*](28_Patterns--Function_Objects.md#strategy-choosing-the-algorithm-at-runtime) | A function passed as an argument |
-| [*Command*](28_Patterns--Function_Objects.md#command-choosing-the-operation-at-runtime) | A function stored in a list |
+| [*Command*](28_Patterns--Function_Objects.md#command-choosing-the-operation-at-runtime) | A function saved to run later |
 | [*Chain of Responsibility*](28_Patterns--Function_Objects.md#chain-of-responsibility-choosing-the-handler-at-runtime) | A list of functions, tried in order |
-| [*Visitor*](33_Patterns--Visitor.md#the-pythonic-visitor-singledispatch) | `functools.singledispatch` |
+| [*Visitor*](33_Patterns--Visitor.md#the-pythonic-visitor-singledispatch) | `functools.singledispatch`, or a `match` over a union of types |
 | [*Flyweight*](35_Patterns--Flyweight.md#python-uses-flyweights) | Interned strings and cached small integers |
 
 Subtracting Python's share leaves the intent, not the structure.
