@@ -630,7 +630,7 @@ so Python adds them to `5` before any node exists.
 `simplify()` would receive `5 * x` with the fold already done.
 `Num(2)` is a node, so `+` dispatches to `Operators.__add__()` and builds an `Add` for `simplify()` to fold back down.
 `2 + 3` shows the limit of using the host parser.
-An operator builds a node when either operand is one,
+An operator builds a node when either operand is a node,
 and does plain arithmetic otherwise.
 
 The patterns read like the algebra they implement.
@@ -739,7 +739,7 @@ built by nesting one `t`-string inside another.
 `+` concatenates `t`-strings into one flat `Template`,
 as the `query` in the listing below shows,
 so nesting is the one way to produce a `Template`-valued interpolation.
-A walker that loops over the top level must therefore also recurse into any value that is a `Template`.
+A walker that needs the pieces at every level must therefore also recurse into any value that is a `Template`.
 Everything else follows this chapter's walkers: one branch per node kind,
 and a recursive call where a node holds more nodes.
 
