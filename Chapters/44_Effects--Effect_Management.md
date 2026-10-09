@@ -78,7 +78,7 @@ One call up, it is invisible.
 
 The second is a *side cause*, the counterpart of a side effect:
 what the environment does to the function.
-Suppose your function reads the time of day, or a random number.
+Suppose your function reads the time of day.
 The read changes nothing in the environment,
 yet the result differs from one call to the next.
 Information a function uses beyond its arguments is a side cause whenever it can change between calls.
@@ -216,7 +216,7 @@ Knowing every one of them is the tracking problem an Effect Management System so
 
 C++ and Java tried to track exceptions with *exception specifications*,
 a list of exceptions written by hand on each function.
-The compiler did not compute that list from the functions a body called,
+The compiler did not infer that list from the functions a body called,
 so an exception introduced three levels down meant editing every signature above it by hand.
 Programmers usually avoided that work by widening the specification until it permitted every exception.
 The specifications exposed implementation details,
@@ -607,8 +607,10 @@ That is the automatic propagation the parameter list lacks,
 but the `ContextVar` removes the parameter along with the one benefit the parameter provided.
 `greet(ask, tell)` states its Effects in its signature,
 and a `greet()` that reads two `ContextVar`s states nothing.
-Setting the wrong one, or forgetting to set one, fails at the read,
-in whatever frame reads it.
+Setting the wrong one, or forgetting to set one,
+raises a `LookupError` at the read, in whatever frame reads it.
+A `ContextVar` created with a default returns that default instead,
+so the mistake surfaces later, in whatever result the default produces.
 The bookkeeping stays, and the type checker can no longer verify it.
 
 An EMS moves the bookkeeping into the type system,
