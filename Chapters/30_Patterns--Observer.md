@@ -1599,7 +1599,7 @@ and the `connect()` call stays the same.
 Its `draw()` paints, its `bind()` lambda handles the click,
 and both are defined inside `show()`.
 
-## What Stays Constant
+## Four Scenarios, One Shape
 
 *Observer* appears in four scenarios in this chapter:
 a thermometer whose responders print a reading,
