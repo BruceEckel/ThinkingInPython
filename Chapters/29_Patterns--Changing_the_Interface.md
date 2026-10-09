@@ -342,11 +342,13 @@ If you have a confusing collection of classes and interactions,
 create an interface that presents only what the client programmer needs.
 
 A *Façade* is often a [*Singleton*](24_Patterns--Singleton.md)
-[*Abstract Factory*](27_Patterns--Factory.md#abstract-factories).
+that also creates the subsystem's objects.
 GoF supplies both halves of that combination.
 One *Façade* object is usually enough, which makes it a *Singleton*,
-and an *Abstract Factory* creates the subsystem's objects for it.
-A class containing static factory methods covers both halves:
+and an [*Abstract Factory*](27_Patterns--Factory.md#abstract-factories)
+can work with a *Façade* to create the subsystem's objects without naming their concrete classes.
+When one set of concrete classes is enough,
+a class containing static factory methods covers both halves:
 
 ```python
 # facade.py
@@ -406,7 +408,7 @@ and the difference sits in the middle column.
 *Adapter* puts a class there that turns one call into others,
 so the caller keeps calling `f()`.
 *Façade* puts a class there that takes over construction,
-so the caller stops naming `Engine` and `FuelPump`.
+so the caller names `Facade` in place of `Ignition`, `FuelPump`, and `Engine`.
 
 The cleaner Python façade is a module.
 A module presents a curated set of names over any confusing collection of classes behind it.
@@ -503,7 +505,7 @@ takes the looser view of the first row:
 a surrogate forwarding to its implementation is a *Proxy* whether or not the interfaces match.
 Under that reading the same-interface rule no longer separates a *Proxy* from an *Adapter*,
 so the `ProxyAdapter` in `adapter.py` answers to both names.
-That leaves the "What it adds" column to separate them:
+That leaves the last two columns to separate them:
 a *Proxy* controls access to one implementation,
 an *Adapter* makes one type fit a caller that expects another.
 Name a wrapper for why it is there, not for its shape.
