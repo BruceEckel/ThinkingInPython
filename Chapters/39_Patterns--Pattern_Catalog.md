@@ -149,7 +149,7 @@ the default on Windows, is one.
 | *Broker* | Coordinate requests and replies between distributed components. |
 | *Layers* | Stack responsibilities so each layer uses only the one beneath it. |
 | *Microkernel* | Keep a minimal core and add capability through plug-ins. |
-| [*Model-View-Controller* (MVC)](30_Patterns--Observer.md#where-the-controller-goes) | Separate data, presentation, and input handling. |
+| [*Model-View-Controller* (MVC)](30_Patterns--Observer.md#document-view-and-mvc) | Separate data, presentation, and input handling. |
 | [*Pipes and Filters*](23_Patterns--Iterators.md#reusable-algorithms) | Process a stream through a chain of independent transforms. |
 | *Presentation-Abstraction-Control* (PAC) | Build interactive systems from cooperating agents, each split three ways. |
 | [*Reflection*](17_Techniques--Metaprogramming.md) | Let a program inspect and adjust its own structure at runtime. |

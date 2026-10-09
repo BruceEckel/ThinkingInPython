@@ -4393,8 +4393,8 @@
   "file": "39_Patterns--Pattern_Catalog.md",
   "line": 151,
   "target": "30_Patterns--Observer.md",
-  "anchor": "where-the-controller-goes",
-  "sentence": "| [*Model-View-Controller* (MVC)](30_Patterns--Observer.md#where-the-controller-goes) | Separate data, presentation, and input handling. |",
+  "anchor": "document-view-and-mvc",
+  "sentence": "| [*Model-View-Controller* (MVC)](30_Patterns--Observer.md#document-view-and-mvc) | Separate data, presentation, and input handling. |",
   "verdict": "supports",
   "confidence": 0.69,
   "asked": "2026-10-08"

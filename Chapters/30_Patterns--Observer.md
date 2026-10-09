@@ -1381,7 +1381,7 @@ def test_responders_receive_the_new_grid() -> None:
 
 ### The View
 
-The view is the one part of the example that draws on the screen.
+The view draws the grid on the screen.
 Run `tip grid_view` to play.
 Because `grid_view.py` opens a window, the example harness skips it
 (see `tools/data/norun.txt`).
@@ -1425,21 +1425,20 @@ so every change repaints.
 `draw()` is defined inside `show()`,
 so it is a [closure](40_Functional--Foundations.md#closures)
 that reads `canvas` and `cell_px`.
-For each cell it paints one rectangle,
-whose pixel corners come from multiplying the cell's column and row by `cell_px`.
+It paints one rectangle per cell.
+The pixel corners come from multiplying the cell's column and row by `cell_px`.
 It takes a `Grid` and returns `None`,
 the shape `connect()` requires of a responder.
 When the window opens,
 `show()` calls `draw(model.grid)` once to paint the starting grid.
 
-`draw()` starts with `canvas.delete("all")`,
-which clears the canvas before repainting.
+`draw()` starts with `canvas.delete("all")` to clear the canvas before repainting.
 Otherwise, each notification adds another `size * size` rectangles on top of the previous ones.
 The window looks the same but the canvas's list of items grows without limit,
 the same quiet accumulation as a [lapsed listener](#lapsed-listeners).
 
 `canvas.bind()` registers the lambda as the responder for `"<Button-1>"`,
-a press of the left mouse button.
+the left mouse button.
 When you press the left button over the canvas,
 `tkinter` calls the responder with an event `e`.
 `e.x` and `e.y` give the click's position in pixels,
@@ -1449,9 +1448,8 @@ With 60-pixel cells, a click at `e.x == 130` is in column `130 // 60`,
 which is `2`.
 A click on the canvas becomes a `select()` on the model,
 and the resulting notification repaints the view.
-The responder calls the model, and `draw()`, run by that notification,
-does all the painting.
-So the view handles the mouse as well as the screen,
+The responder calls the model, and `draw()` does the painting.
+The view handles the mouse as well as the screen,
 folding the controller's job into the view.
 `select()` takes a cell rather than a mouse event, so a keypress, a touch,
 or a test call drives the model the way a click does.
@@ -1459,10 +1457,10 @@ or a test call drives the model the way a click does.
 The model reaches a view only through the responders it calls,
 so you can connect a second view to the same model and keep both views in step
 (see exercise 8).
-Only the view uses the model's names: `grid_view.py` imports `GridModel`,
+The view alone uses the model's names: `grid_view.py` imports `GridModel`,
 reads `size` and `grid`, and calls `select()`.
 
-## Where the Controller Goes
+## Document-View and MVC
 
 This chapter opened by saying Document-View folds the controller into the view.
 The next two listings isolate that fold:
