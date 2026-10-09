@@ -31,7 +31,7 @@ Chapter, prose:
 Solutions:
 
 - Exercise 8: "moves two cells out of `skyblue` and two into `khaki`" was the gross flow, while the tally printed above it (3/3/3 to 2/3/4) shows a net change of one each; the center cell goes from `khaki` to `skyblue`. The sentence now lists all five moves and the net effect.
-- Watch words with no change in meaning: "at all" (exercise 1), "already" (exercises 4 and 9, twice), "anyway" (exercise 5, the sentence restated).
+- Watch words with no change in meaning: "at all" (exercise 1), "already" (exercises 4, 8, and 9, four in all), "anyway" (exercise 5, the sentence restated).
 
 Tooling: `tools/data/stranded_baseline.txt` carried a stale chapter 30 entry ("A responder chooses which notifications to act on", a sentence cut on 2026-10-08); dropped.
 

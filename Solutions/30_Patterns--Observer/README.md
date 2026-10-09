@@ -1267,8 +1267,8 @@ The corner selection that follows has three cells inside the grid
 rather than five.
 
 Adding a third view means one more `connect()` call. `grid_view.py`'s
-`draw()` is such a view, and `show(model)` connects it to a model that
-already has `letters()` and `tally()`, so the window and the terminal
+`draw()` is such a view, and `show(model)` connects it to a model with
+`letters()` and `tally()` connected, so the window and the terminal
 report the same grid. Running that combination means `show()` takes
 over with `root.mainloop()`, so call `show()` last.
 
