@@ -1468,8 +1468,8 @@ reads `size` and `grid`, and calls `select()`.
 
 This chapter opened by saying Document-View folds the controller into the view.
 We'll look at two approaches that differ only in where the input handling lives:
-the Document-View `View` has a `key()` method,
-and MVC gives `key()` to a `Controller` class.
+`View` has a `key()` method as a controller in Document-View,
+while MVC gives `key()` to a `Controller` class.
 They share the same model, a counter:
 
 ```python
@@ -1528,16 +1528,15 @@ for char in "++-x":
 #: count: 1
 ```
 
-`display()` is the output and `key()` is the input: `key()` is the controller,
-folded into `View` as a method,
-and `View` holds the model because `key()` needs somewhere to send the request.
+`key()` is the controller, folded into `View` as a method.
+`View` holds the model because `key()` needs somewhere to send the request.
 `__post_init__()` connects `display()` to that model,
-as `show()` does in `grid_view.py`, so a `View` is wired as soon as it exists.
-`display()` works from the count the model pushes to it.
-`x` matches the wildcard case, so `key()` returns without touching the model,
-and the four characters of `"++-x"` print three counts.
+so a `View` is wired as soon as it exists.
+The model pushes its count to `display()`.
+In the wildcard case matched by `x`, `key()` returns without touching the model,
+so the four characters of `"++-x"` print three counts.
 
-MVC splits that class in two:
+MVC uses two classes for Document-View's one:
 
 ```python
 # model_view_controller.py
@@ -1549,7 +1548,7 @@ class KeyHandler(Protocol):
     def key(self, char: str) -> None: ...
 
 @record
-class View:  # Displays
+class View:
     model: Counter
 
     def __post_init__(self) -> None:
@@ -1559,7 +1558,7 @@ class View:  # Displays
         print(f"count: {count}")
 
 @record
-class Controller:  # Interprets
+class Controller:  # Interprets but doesn't display
     model: Counter
 
     def key(self, char: str) -> None:
@@ -1571,7 +1570,7 @@ class Controller:  # Interprets
             case _:
                 pass
 
-class IgnoringController:  # Reads input, changes nothing
+class IgnoringController:  # Ignores input, needs no model
     def key(self, char: str) -> None: ...
 
 model = Counter()
@@ -1582,7 +1581,7 @@ for char in "++-x":
 #: count: 1
 #: count: 2
 #: count: 1
-controller = IgnoringController()  # View and model stay
+controller = IgnoringController()  # Disables input
 for char in "+++":
     controller.key(char)
 print(model.count)
@@ -1606,11 +1605,16 @@ The MVC `View` keeps `display()` and `Controller` gets `key()`, one job each.
 Document-View folds that role into `View` as the `key()` method,
 and MVC gives it a class of its own.
 
-Swapping in `IgnoringController` at the end of `model_view_controller.py` shows what that move gives you.
-`IgnoringController` satisfies `KeyHandler` and ignores every key,
-so assigning it to `controller` makes the program ignore input while `View` and the model work as before.
-*GoF Design Patterns* gives this example for the separation:
-a controller that ignores input disables a view's input.
+The split pays off when you swap the controller.
+*GoF Design Patterns* gives the example:
+a controller that ignores input disables a view's input,
+with the view and the model untouched.
+`IgnoringController` is that controller.
+Its `key()` ignores every character, so it holds no model:
+it has nothing to send.
+The swap at the end of `model_view_controller.py` type-checks because `controller` is declared `KeyHandler`,
+which both classes satisfy,
+and the three `+` keys that follow leave the count at 1.
 `Controller` needs only a `Counter`, so a test can build a `Controller`,
 call `key()`, and read `model.count`.
 Supporting a different set of keys means writing a third class that satisfies `KeyHandler`,

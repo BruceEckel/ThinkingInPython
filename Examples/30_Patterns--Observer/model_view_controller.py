@@ -7,7 +7,7 @@ class KeyHandler(Protocol):
     def key(self, char: str) -> None: ...
 
 @record
-class View:  # Displays
+class View:
     model: Counter
 
     def __post_init__(self) -> None:
@@ -17,7 +17,7 @@ class View:  # Displays
         print(f"count: {count}")
 
 @record
-class Controller:  # Interprets
+class Controller:  # Interprets but doesn't display
     model: Counter
 
     def key(self, char: str) -> None:
@@ -29,7 +29,7 @@ class Controller:  # Interprets
             case _:
                 pass
 
-class IgnoringController:  # Reads input, changes nothing
+class IgnoringController:  # Ignores input, needs no model
     def key(self, char: str) -> None: ...
 
 model = Counter()
@@ -40,7 +40,7 @@ for char in "++-x":
 #: count: 1
 #: count: 2
 #: count: 1
-controller = IgnoringController()  # View and model stay
+controller = IgnoringController()  # Disables input
 for char in "+++":
     controller.key(char)
 print(model.count)
