@@ -190,6 +190,8 @@ which the operating system places on separate cores.
 The `assert` passes on every run,
 because a pure call returns the same answer whichever process runs it,
 and whenever.
+`pool.map()` also returns the answers in the order of `limits`, as `map()` does,
+so the two lists match position by position, in whatever order the calls finish.
 
 The limits in `parallel_pure.py` are large enough for the difference to show.
 [`report()`](18_Techniques--Performance.md#numbers-on-your-machine)
