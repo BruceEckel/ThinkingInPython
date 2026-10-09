@@ -1638,6 +1638,8 @@ The notification code can be extracted in more than one way:
 
 - `Broadcaster` holds the responder list and the notification loop,
   and `Thermometer` inherits them.
+  `BoundBroadcaster` and the async `Broadcaster` are the same extraction,
+  with responders set at construction or a loop that runs concurrently.
 - `weather_station.py` uses no base class and calls its responders from `__setattr__()`,
   so one method covers every attribute.
 - `broadcasting.py` holds the list and the loop like `Broadcaster`,
