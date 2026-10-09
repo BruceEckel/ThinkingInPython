@@ -955,8 +955,8 @@ explore it further.
 
 ## Exercises
 
-This chapter's [solutions](../Solutions/13_Techniques--Pattern_Matching/)
-give a hint, usually the shape of the code, and a full answer for each exercise.
+The [solutions](../Solutions/13_Techniques--Pattern_Matching/)
+are in the book's repository.
 
 1.  Write `classify(value)` that uses `match` to return `"empty list"`,
     `"singleton"`, or `"longer list"` for lists, `"point"` for a `Point`,

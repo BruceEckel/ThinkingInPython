@@ -257,6 +257,9 @@ A few chapters in the Patterns part keep larger exercises,
 because a pattern shows its value only in a program you build yourself.
 
 Solutions live in the `Solutions/` directory of the source repository.
+Each solution opens in steps: a hint,
+then the shape of the code with its bodies left out, then the full answer,
+so you can take as little help as you need.
 Try the exercise yourself before reading the solution.
 The value is in the prediction and the surprise when you are wrong,
 not in the code you produce.

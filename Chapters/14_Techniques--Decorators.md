@@ -1238,8 +1238,8 @@ and stacking decorators multiplies both by the number of layers.
 
 ## Exercises
 
-This chapter's [solutions](../Solutions/14_Techniques--Decorators/) give a hint,
-usually the shape of the code, and a full answer for each exercise.
+The [solutions](../Solutions/14_Techniques--Decorators/)
+are in the book's repository.
 
 1.  Write a class decorator `announce` that prints the name of each class it decorates and returns it unchanged,
     then apply it to two small classes.

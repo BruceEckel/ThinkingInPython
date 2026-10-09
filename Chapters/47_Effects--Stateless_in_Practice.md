@@ -2372,8 +2372,8 @@ It is a language that does the encoding for you.
 
 ## Exercises
 
-This chapter's [solutions](../Solutions/47_Effects--Stateless_in_Practice/)
-give a hint, usually the shape of the code, and a full answer for each exercise.
+The [solutions](../Solutions/47_Effects--Stateless_in_Practice/)
+are in the book's repository.
 
 1.  `crossing` in `midnight.py` walks a scripted list,
     so it answers two requests.

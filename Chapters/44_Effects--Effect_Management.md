@@ -1026,8 +1026,8 @@ puts the library to work.
 
 ## Exercises
 
-This chapter's [solutions](../Solutions/44_Effects--Effect_Management/)
-give a hint, usually the shape of the code, and a full answer for each exercise.
+The [solutions](../Solutions/44_Effects--Effect_Management/)
+are in the book's repository.
 
 1.  Write the production bindings for `ask_tell.py`:
     a `Console` class whose `ask()` calls `input()` and whose `tell()` calls `print()`,

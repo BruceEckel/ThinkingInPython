@@ -1230,8 +1230,8 @@ or whether immutable data, a function, and a protocol solve the problem.
 
 ## Exercises
 
-This chapter's [solutions](../Solutions/20_Patterns--Rethinking_Objects/)
-give a hint, usually the shape of the code, and a full answer for each exercise.
+The [solutions](../Solutions/20_Patterns--Rethinking_Objects/)
+are in the book's repository.
 
 1.  In `leaky.py`, add a `tags: list[str]` field to `Leaky`,
     exposed through a `@property` the same way `numbers` is,

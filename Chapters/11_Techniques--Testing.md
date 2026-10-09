@@ -891,8 +891,8 @@ A line a test happened to execute differs from a line a test checks.
 
 ## Exercises
 
-This chapter's [solutions](../Solutions/11_Techniques--Testing/) give a hint,
-usually the shape of the code, and a full answer for each exercise.
+The [solutions](../Solutions/11_Techniques--Testing/)
+are in the book's repository.
 
 1.  Add a `transfer(other: Account, amount: float)` method to `Account` and write its tests first:
     a successful transfer, and an overdraft that leaves both accounts unchanged.

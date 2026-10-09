@@ -583,8 +583,8 @@ Write a lambda when the key needs an expression that none of the three builds.
 
 ## Exercises
 
-This chapter's [solutions](../Solutions/05_Foundations--Functions/) give a hint,
-usually the shape of the code, and a full answer for each exercise.
+The [solutions](../Solutions/05_Foundations--Functions/)
+are in the book's repository.
 
 1.  In `mutable_default.py`,
     call `bad_append(3)` a third time and predict the result before checking it.

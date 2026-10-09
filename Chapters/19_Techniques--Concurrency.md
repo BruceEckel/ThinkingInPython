@@ -2517,8 +2517,8 @@ is a small corner of the territory.
 
 ## Exercises
 
-This chapter's [solutions](../Solutions/19_Techniques--Concurrency/)
-give a hint, usually the shape of the code, and a full answer for each exercise.
+The [solutions](../Solutions/19_Techniques--Concurrency/)
+are in the book's repository.
 
 1.  In `async_mechanics.py`, add a fourth call, `fetch("d", 0.005)`,
     to the `gather()` line.
