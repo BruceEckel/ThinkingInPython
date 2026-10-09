@@ -69,8 +69,8 @@ But their elements are the same inner lists,
 so `todo[0].append("cheese")` changes the first element of `shallow` too.
 `copy.deepcopy()` walks the whole structure and copies every nested container,
 so `deep` holds inner lists of its own.
-The later `todo[0].append("jam")` changes `todo`'s inner list,
-and `deep`'s keeps its three elements.
+The later `todo[0].append("jam")` grows `todo[0]` to four elements,
+and `deep[0]` keeps its three.
 
 `copy.deepcopy()` costs time and memory proportional to the whole nested structure it rebuilds,
 however small the change.
