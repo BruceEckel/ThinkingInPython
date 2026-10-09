@@ -451,7 +451,8 @@ The table-driven engine in `tabledriven/table_machine.py` raises an exception fo
 
 ## Table-Driven State Machine
 
-The each-state-decides design keeps each state's transitions inside the state class.
+The each-state-decides design keeps each state's transitions with that state,
+in its `next()` or in its table.
 A fully table-driven design represents the entire machine as a single transition table.
 All the behavior is then in one place,
 so you can build and maintain the table from a state-transition diagram.
@@ -565,7 +566,7 @@ The conditions and actions are ordinary methods, stored in the table.
 
 ![The vending machine's five states and the inputs that move it between them](_images/vending_story)
 
-`Money` moves the machine to `COLLECTING` and keeps it there,
+`Money` moves the machine from `QUIESCENT` to `COLLECTING` and more `Money` keeps it there,
 a first digit moves it to `SELECTING`,
 and a second digit moves it to one of three states, decided by price and stock.
 `Quit` refunds from any of the other states back to `QUIESCENT`.
