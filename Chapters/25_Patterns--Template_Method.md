@@ -217,7 +217,11 @@ If that attribute carries `__final__`,
 `class Hijack` fails because a subclass that replaces the anchor moves the algorithm out of the base class,
 and `@final` stops that replacement only for the type checker.
 The `__final__` check names no method,
-so a second `@final` method in `ApplicationFramework` gets the same protection with no change to `__init_subclass__()`.
+so a second `@final` instance method in `ApplicationFramework` gets the same protection with no change to `__init_subclass__()`.
+The check misses a `@final` on a `@classmethod`, `@staticmethod`,
+or `@property`.
+For those, `getattr()` on the class returns a bound method, the bare function,
+or the property object, and none of them carries `__final__`.
 
 Reading the attribute through `getattr()` also keeps the type checker quiet.
 A function's type declares no `__final__`,
