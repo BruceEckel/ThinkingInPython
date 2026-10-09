@@ -823,7 +823,7 @@ instead, because interning must intercept construction.
 
 > Rewrite `tile_map.py` on top of `tile_enum.py`'s `Tile`,
 > so `parse_map()` returns `list[list[Tile]]` of enum members and `to_symbol()` disappears.
-> What does the type checker now catch that the `Literal` version caught,
+> What does the type checker still catch that the `Literal` version caught,
 > and what does it catch that the `Literal` version did not?
 
 <details>

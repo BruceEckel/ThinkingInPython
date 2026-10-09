@@ -49,8 +49,9 @@ as in `high is 100000`.
 Parsing at runtime builds the integer after compilation,
 so any sharing that remains comes from the cache.
 
-String *interning* keeps one copy of identifier-like strings.
-`sys.intern()` adds a string to the pool,
+String *interning* keeps one copy of each distinct string in a pool.
+CPython interns identifier-like string constants automatically,
+and `sys.intern()` adds any string to the pool,
 or returns the pooled copy if one exists:
 
 ```python
@@ -362,7 +363,7 @@ The record also generates `__repr__()`, `__eq__()`, and `__hash__()`,
 so a `Color` prints its components and works as a dict key.
 
 A `defaultdict` calls its `default_factory` with no arguments,
-and building a `Color` needs the three components,
+and `super().__new__(cls)` needs the class that asked,
 so `_pool` stays a plain dict with an explicit membership test.
 
 `_pool` keys on the components alone, and every subclass shares the one dict,
@@ -674,7 +675,7 @@ usually the shape of the code, and a full answer for each exercise.
     and write a test for it.
 7.  Rewrite `tile_map.py` on top of `tile_enum.py`'s `Tile`,
     so `parse_map()` returns `list[list[Tile]]` of enum members and `to_symbol()` disappears.
-    What does the type checker now catch that the `Literal` version caught,
+    What does the type checker still catch that the `Literal` version caught,
     and what does it catch that the `Literal` version did not?
 8.  Make `tile()`'s body slow,
     with a `time.sleep(0.05)` before it builds the `Tile`,
