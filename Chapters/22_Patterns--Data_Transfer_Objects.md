@@ -48,7 +48,7 @@ The constructor replaces the object's `__dict__` with the `dict` that the `**kwa
 and its output shows that the attributes and the keyword arguments are one dict.
 `m.more = 11` adds a key, as passing `more=11` to the constructor does.
 
-Because `**kwargs` is the only parameter,
+Because `**kwargs` is the only parameter after `self`,
 `Messenger` accepts keyword arguments alone.
 `Messenger("Spam")` raises a `TypeError`,
 and the `*` marker from [Positional-Only and Keyword-Only Parameters](05_Foundations--Functions.md#positional-only-and-keyword-only-parameters)
