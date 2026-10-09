@@ -1858,7 +1858,7 @@ so an `Async` request or a declared failure can still remain in its type when yo
 
 The channels resolve differently:
 
-- `unsupplied.py` shows `run()` refusing an Effect that still declares an Ability,
+- `unsupplied.py` shows the type checker rejecting a `run()` call whose Effect still declares an Ability,
   before the program starts.
 - `error_escapes.py` shows `run()` accepting an Effect that still declares a failure,
   then raising that failure at the edge.
