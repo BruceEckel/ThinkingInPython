@@ -272,8 +272,9 @@ print("__main__.Proxy object" in str(p))
 ```
 
 `p.__len__()` and `len(p)` look interchangeable and are not.
-`p.__len__()` is ordinary attribute access,
-so the failed instance lookup falls through to `__getattr__()`, which delegates.
+`p.__len__()` is ordinary attribute access.
+That lookup searches the instance and `Proxy`, finds no `__len__()`,
+and falls through to `__getattr__()`, which delegates.
 `len(p)` looks up `__len__()` on `type(p)`, skips the instance, finds none,
 and reports that `Proxy` has no `len()`.
 `ty` and Pyright reject `len(p)` statically for the same reason,
