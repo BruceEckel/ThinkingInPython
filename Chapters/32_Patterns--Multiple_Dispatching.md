@@ -635,9 +635,11 @@ makes `ty` reject `(Meters(1) + Meters(2)).n`,
 since the sentinel branch has no `n`.
 Pyright and mypy accept the access,
 because that inheritance from `Any` makes any attribute access on the sentinel branch type-check.
-The sentinel is a signal to the interpreter,
-and no `+` expression evaluates to it,
-so an annotation that names it describes the wrong thing.
+The sentinel is a signal to the interpreter.
+A direct call such as `Meters(3).__add__("four")` does return it,
+but the type checker also uses the annotation as the type of the `+` expression that calls `__add__()`,
+and no `+` expression evaluates to the sentinel.
+An annotation that names it fits the rare direct call and misdescribes every sum.
 Widening the return to `Any` describes nothing and turns off checking for every caller.
 
 [*Composite* and *Interpreter*](34_Patterns--Composite_and_Interpreter.md#interpreter)
