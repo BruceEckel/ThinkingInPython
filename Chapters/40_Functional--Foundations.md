@@ -391,7 +391,9 @@ Returning a function is the other half of the definition.
 The `list()` calls do real work.
 `map()` and `filter()` return [one-shot iterators](23_Patterns--Iterators.md#generators).
 `print(map(...))` therefore shows `<map object at 0x...>` instead of values,
-and a second pass over the same object silently produces nothing.
+since `print()` displays the iterator's `repr()` and leaves its values uncomputed.
+Once a `list()` call or a `for` loop has consumed the iterator,
+a second pass over the same object silently produces nothing.
 `sorted()` must read every element before it can order any of them,
 so it returns a list rather than an iterator.
 It is also the pure counterpart of [`list.sort()`](03_Foundations--Containers.md),
@@ -506,11 +508,14 @@ Each call to `make_counter()` builds an independent counter with its own `count`
 When state must exist,
 a closure is one way to let exactly one function change it.
 
-The privacy is Python's usual kind, a convention.
+A closure's privacy is stronger than a leading underscore's,
+and still short of a guarantee.
+Code outside `make_counter()` has no name that reaches `count`,
+because the compiler resolves `count` inside `make_counter()` alone,
+while any code can write `obj._field`.
+Introspection still reaches the variable:
 `inspect.getclosurevars(tally).nonlocals` reports `{'count': 3}`,
 and `tally.__closure__[0].cell_contents = 100` rewrites `count`.
-Like the single leading underscore,
-a closure states an intention that the language does not enforce.
 
 The `nonlocal` statement lets `increment()` assign to the captured variable.
 Reading a captured name, as `multiply()` reads `factor`, needs no declaration.
@@ -694,8 +699,8 @@ data = [Reading("a", 18.0), Reading("b", 25.0),
         Reading("c", 30.5)]
 print(report(data))
 #: ['b 77.0', 'c 86.9']
-print(data[0])  # [1]
-#: Reading(sensor='a', celsius=18.0)
+print(data[1])  # [1]
+#: Reading(sensor='b', celsius=25.0)
 ```
 
 Five of the chapter's ideas work at once: a record for the value,
@@ -703,6 +708,8 @@ Five of the chapter's ideas work at once: a record for the value,
 two pure functions, `partial()` to turn a two-argument predicate into the one-argument callable `filter()` requires,
 and `map()` and `filter()` for the traversal.
 The `print()` at `[1]` shows what the discipline gives you.
+Sensor `"b"` passed through `to_fahrenheit()` and appears as 77.0 in the report,
+yet its record in `data` still holds 25.0 Celsius.
 The input list stays unchanged, so you can recompute the whole report, cache it,
 or run it on another core with no coordination.
 
