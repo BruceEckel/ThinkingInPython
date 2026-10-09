@@ -29,7 +29,7 @@ which take one registered function per type.
 
 ### `reduce`
 
-Folds a sequence into a single value by repeatedly applying a two-argument function.
+Folds an iterable into a single value by repeatedly applying a two-argument function.
 
 ```python
 # functools_reduce.py
@@ -48,7 +48,7 @@ For addition specifically, `sum()` is the dedicated built-in,
 and `math.prod()` covers multiplication.
 `reduce()` is the tool for every other fold.
 
-On an empty sequence `reduce()` raises `TypeError: reduce() of empty iterable with no initial value`,
+On an empty iterable `reduce()` raises `TypeError: reduce() of empty iterable with no initial value`,
 because it has nothing to return.
 A third argument supplies that starting value,
 so `reduce(add, [], 0)` returns `0`.
@@ -222,8 +222,8 @@ A first access from two threads at once is a race.
 `cached_property` takes no lock,
 so both threads can find no stored value and both run the property's code.
 
-The stored value goes in the instance's `__dict__`, so the class must have one.
-A record is slotted and has none.
+The stored value goes in the instance's `__dict__`, so each instance needs one.
+A record is slotted, so its instances have none.
 The first access to a `cached_property` on a `@record` raises a `TypeError`,
 as `slots_limits.py` in [When Slots Does Not Fit](18_Techniques--Performance.md#when-slots-does-not-fit)
 shows.
@@ -939,7 +939,7 @@ Whoever draws the phantom sits out that round.
 ### Groups of Any Size
 
 The circle method is pairs-only.
-The circle method is a closed-form answer to one narrow question:
+It is a closed-form answer to one narrow question:
 how do you split every possible pair into rounds in which each player appears exactly once?
 Pairs are the only group size where that question has a tidy rotation-based answer.
 Groups of three are far harder to schedule so that every pair meets exactly once.
