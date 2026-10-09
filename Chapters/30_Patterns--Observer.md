@@ -1605,7 +1605,7 @@ The MVC `View` keeps `display()` and `Controller` gets `key()`, one job each.
 Document-View folds that role into `View` as the `key()` method,
 and MVC gives it a class of its own.
 
-The split pays off when you swap the controller.
+Splitting the controller out lets you swap it.
 *GoF Design Patterns* gives the example:
 a controller that ignores input disables a view's input,
 with the view and the model untouched.
