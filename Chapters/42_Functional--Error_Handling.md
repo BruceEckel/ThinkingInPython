@@ -153,7 +153,12 @@ An object the type checker finds to be an `Err` therefore cannot also be an `Ok`
 and a check against one class narrows a `Result` to one side of the union.
 
 `A`, `B`, `E`, and `F` are [type parameters](08_Foundations--Static_Types.md#type-parameters):
-placeholders that take concrete types when you use the class.
+placeholders for concrete types.
+`Ok[A]` declares `A` on its class and `Err[E]` declares `E`,
+so those two take concrete types when you use the class.
+Each `bind()` declares its own type parameters after its name, so `B`, `F`,
+and the `E` of `Ok.bind()`, a separate parameter from `Err`'s,
+take concrete types at each call.
 Here they have no bounds or constraints, so any type can fill them.
 
 Ignore `bind()` for the moment.
