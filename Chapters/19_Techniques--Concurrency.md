@@ -197,8 +197,14 @@ If you discard that coroutine object without handing it to `gather()`
 and Python points this out with a `RuntimeWarning: coroutine 'fetch' was never awaited` when the garbage collector reclaims it.
 
 `gather()` wraps each coroutine in a *task*,
-the event loop's unit of scheduling, and starts the tasks in the order given.
-Each runs until it reaches its `await`, so the started lines print as a, b, c.
+the event loop's unit of scheduling, and schedules the tasks in the order given.
+Scheduling does not mean running.
+`gather()` returns an awaitable without running any task body.
+The bodies execute after `main()` suspends at its `await`,
+which returns control to the event loop.
+
+Each task runs until it reaches its own `await`,
+so the started lines print as a, b, c.
 At the `await` each task *suspends*.
 It stops executing, remembers its place in the function,
 and hands control back to the event loop.
@@ -229,14 +235,6 @@ Beware a list comprehension that awaits.
 Each `await` runs its coroutine to completion before the next one starts,
 so nothing overlaps and the delays add.
 `gather()` is concurrent because it wraps and schedules every coroutine as a task before it waits for any of them.
-
-Scheduling does not mean running.
-`gather()` returns an awaitable without running any task body.
-The bodies execute after `main()` suspends at its `await`,
-which returns control to the event loop.
-Each runs until its first `await`, which the trace's `started` lines record.
-The comprehension keeps at most one coroutine in flight.
-It starts the next coroutine only after the previous one has finished.
 
 ## Overlapping the Waits
 
@@ -571,11 +569,11 @@ asyncio.run(main())
 
 `tg.create_task()` schedules a task immediately,
 so all six are in flight together.
-Holding the task objects is essential bookkeeping.
-The event loop keeps only weak references to its tasks,
+The `tasks` dict holds the task objects so the loop after the block can read each outcome.
+The `TaskGroup` holds its own strong references until the block exits.
+Those references matter because the event loop keeps only weak references to its tasks,
 so a task that loses its last strong reference can disappear mid-execution,
 printing nothing and raising no exception.
-A `TaskGroup` holds its own references until the block exits.
 Outside a `TaskGroup`,
 keep the returned task in a variable or a set that outlives the task.
 
@@ -1036,7 +1034,10 @@ and all three surface in `parallel_cpu.py`:
    with the worker's own `RuntimeError` traceback printed above it by the failing child process.
    Before 3.14 the guard was a Windows and macOS concern only,
    because Linux forked the parent process instead of importing anything.
-   Since 3.14 no platform forks by default,
+   Since 3.14 no platform forks the parent by default.
+   Linux now uses `forkserver`,
+   which forks each worker from a server process that has imported this module,
+   and macOS and Windows use `spawn`, which starts each worker fresh,
    so every platform requires the guard.
 2. Work crosses the process boundary by *pickling*.
    One process serializes each argument and each return value,
