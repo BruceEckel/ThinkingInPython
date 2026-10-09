@@ -372,7 +372,8 @@ and neither function names the driver.
 Any iterable can follow `yield from`,
 and the expression takes its value from the `StopIteration` that ends the iteration.
 A generator's `return` sets that value.
-A list's iterator sets none,
+A list's iterator ends with a bare `StopIteration`,
+whose `value` defaults to `None`,
 so `v = yield from [1, 2, 3]` yields the three items and sets `v` to `None`.
 
 ### The Send Channel
