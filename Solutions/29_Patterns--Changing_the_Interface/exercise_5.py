@@ -35,7 +35,7 @@ class Renamed(WhatIUse):
             case WhatIWant():
                 super().op(item)
             case WhatIHave():
-                ProxyAdapter(item).f()
+                super().op(ProxyAdapter(item))
 
 class WhatIUse2(WhatIUse):
     @override
@@ -46,7 +46,7 @@ class WhatIUse2(WhatIUse):
             case WhatIWant():
                 super().op(what_i_want)
             case WhatIHave():
-                ProxyAdapter(what_i_want).f()
+                super().op(ProxyAdapter(what_i_want))
 
 def run(user: WhatIUse) -> None:
     user.op(what_i_want=ProxyAdapter(WhatIHave()))

@@ -97,7 +97,7 @@ class WhatIUse2(WhatIUse):
             case WhatIWant():
                 super().op(item)
             case WhatIHave():
-                ProxyAdapter(item).f()
+                super().op(ProxyAdapter(item))
 
 # Approach 3: build adapter into WhatIHave:
 class WhatIHave2(WhatIHave, WhatIWant):
@@ -158,7 +158,8 @@ and the override accepts a `WhatIWant` or a `WhatIHave`.
 An override may widen what it accepts.
 Every call that is legal on a `WhatIUse` is still legal on a `WhatIUse2`,
 so code holding a `WhatIUse` can safely receive a `WhatIUse2`.
-The `match` passes a `WhatIWant` to the inherited `op()` and adapts a `WhatIHave`.
+The `match` sends both cases to the inherited `op()`,
+a `WhatIWant` as it is and a `WhatIHave` wrapped in a `ProxyAdapter`.
 
 An override cannot narrow what it accepts.
 The commented-out signature in `adapter_variations.py` takes a `WhatIHave` alone,
