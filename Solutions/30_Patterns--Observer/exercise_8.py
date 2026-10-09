@@ -42,7 +42,7 @@ class Broadcaster[T]:
         for responder in list(self._responders):
             responder(data)
 
-class BoxModel(Broadcaster[Grid]):
+class GridModel(Broadcaster[Grid]):
     def __init__(self, size: int) -> None:
         super().__init__()
         self.size = size
@@ -52,7 +52,7 @@ class BoxModel(Broadcaster[Grid]):
         self.grid = recolored(self.grid, cell)
         self.announce(self.grid)
 
-model = BoxModel(3)
+model = GridModel(3)
 
 def letters(grid: Grid) -> None:
     for y in range(model.size):

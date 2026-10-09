@@ -1208,9 +1208,8 @@ The failure appears the moment `loud()` raises its `ValueError`.
 `slow` is still sleeping at that point.
 The event loop keeps running its task, but the `gather()` call has returned,
 so no `await` remains to collect the task's result.
-Its line appears because `main()` sleeps for 0.25 seconds afterward,
-long enough for `slow` to finish.
-A real caller rarely adds that wait.
+`main()` sleeps for 0.25 seconds afterward, long enough for `slow` to finish,
+but a real caller rarely adds that wait.
 The program moves on before the orphan finishes,
 and an exception from the orphan is discarded without a report.
 `gather(*coros, return_exceptions=True)` returns the failures as data,
@@ -1220,24 +1219,20 @@ but not here.
 A `TaskGroup` cancels a failing task's siblings,
 so a single broken responder cancels the others mid-notification.
 
-Use the async fan-out only when the responders are I/O-bound.
-For in-memory responders the synchronous `Broadcaster` from `broadcaster.py` is simpler and needs no event loop.
-
 ## A Visual Example
 
 This example emphasizes the model-view split.
-The *model*, `box_observer.py`,
-is a grid of colored boxes and the rule that decides what a selection changes.
-It manipulates `Grid`s and leaves displaying them to the view.
-The *view*, `box_view.py`,
-displays the boxes using the standard library's `tkinter`.
+The *model*, `grid_observer.py`,
+is a grid of colored boxes and the rule that decides what changes for a selection event.
+It only manipulates `Grid`s;
+they are displayed independently by `grid_view.py` using `tkinter` from the standard library.
 Clicking a box advances it to the next color, along with the boxes above, below,
 left, and right of it.
 
 One click changes up to five boxes, which makes the window a puzzle:
 try to turn every box `palegreen`.
-Only `palegreen` works; on the 8x8 grid that `box_view.py` opens,
-no sequence of clicks turns every box `skyblue` or every box `khaki`.
+Only `palegreen` works; on the 8x8 grid that `grid_view.py` opens,
+no sequence of clicks turns every box `skyblue` or `khaki`.
 The size decides that, and a 3x3 grid reaches all three colors (see exercise 9).
 
 ### The Model
@@ -1245,7 +1240,7 @@ The size decides that, and a 3x3 grid reaches all three colors (see exercise 9).
 The model knows nothing about how it is displayed:
 
 ```python
-# box_observer.py
+# grid_observer.py
 from enum import StrEnum
 from broadcaster import Broadcaster
 
@@ -1276,7 +1271,7 @@ def recolored(grid: Grid, selected: Coord) -> Grid:
     return grid | {cell: grid[cell].next()
                    for cell in cross if cell in grid}
 
-class BoxModel(Broadcaster[Grid]):
+class GridModel(Broadcaster[Grid]):
     def __init__(self, size: int) -> None:
         super().__init__()
         self.size = size
@@ -1324,7 +1319,7 @@ Every key on the right is also in `grid`, and for a key in both,
 the result takes the right operand's value.
 The new grid is a copy of `grid` that differs in the cells of the cross.
 
-`BoxModel` is a `Broadcaster[Grid]`,
+`GridModel` is a `Broadcaster[Grid]`,
 and `select()` announces each new grid that `recolored()` produces.
 
 ### Testing the Model
@@ -1341,8 +1336,8 @@ The test file confirms that:
 - Responders receive the new grid once after a selection.
 
 ```python
-# test_box_observer.py
-from box_observer import (BoxModel, Color, Grid,
+# test_grid_observer.py
+from grid_observer import (Color, Grid, GridModel,
                           new_grid, recolored)
 
 def test_new_grid_size_and_banding() -> None:
@@ -1374,7 +1369,7 @@ def test_corner_selection_stays_on_the_grid() -> None:
     assert out.keys() == grid.keys()
 
 def test_responders_receive_the_new_grid() -> None:
-    model = BoxModel(3)
+    model = GridModel(3)
     before = model.grid[(1, 1)]
     seen: list[Grid] = []
     model.connect(seen.append)
@@ -1387,16 +1382,16 @@ def test_responders_receive_the_new_grid() -> None:
 ### The View
 
 The view is the only code that displays on the screen.
-Run `tip box_view` to play.
-Because `box_view.py` opens a window, the example harness skips it
+Run `tip grid_view` to play.
+Because `grid_view.py` opens a window, the example harness skips it
 (see `tools/data/norun.txt`).
 
 ```python
-# box_view.py
+# grid_view.py
 import tkinter as tk
-from box_observer import BoxModel, Grid
+from grid_observer import Grid, GridModel
 
-def show(model: BoxModel, cell_px: int = 60) -> None:
+def show(model: GridModel, cell_px: int = 60) -> None:
     root = tk.Tk()
     root.title("ColorBoxes")
     canvas = tk.Canvas(root, highlightthickness=0,
@@ -1420,7 +1415,7 @@ def show(model: BoxModel, cell_px: int = 60) -> None:
     root.mainloop()
 
 if __name__ == "__main__":
-    show(BoxModel(8))
+    show(GridModel(8))
 ```
 
 `show()` makes a square canvas, `model.size` cells on a side,
@@ -1464,7 +1459,7 @@ or a test call drives the model the way a click does.
 The model reaches a view only through the responders it calls,
 so you can connect a second view to the same model and keep both views in step
 (see exercise 8).
-Only the view uses the model's names: `box_view.py` imports `BoxModel`,
+Only the view uses the model's names: `grid_view.py` imports `GridModel`,
 reads `size` and `grid`, and calls `select()`.
 
 ## Where the Controller Goes
@@ -1596,7 +1591,7 @@ with `View` and the model unchanged.
 MVC separates drawing from input handling,
 the two jobs `document_view.py` gives one class,
 and the `connect()` call stays the same.
-`box_view.py` has the Document-View shape.
+`grid_view.py` has the Document-View shape.
 Its `draw()` paints, its `bind()` lambda handles the click,
 and both are defined inside `show()`.
 
@@ -1766,24 +1761,24 @@ usually the shape of the code, and a full answer for each exercise.
     Write an adapter that lets a responder returning `None`,
     such as `received.append`, be connected.
     Write a test in which the first responder fails and the second still records its notification.
-6.  Turn `box_observer.py` into a simple game:
+6.  Turn `grid_observer.py` into a simple game:
     you own the contiguous patch of same-colored squares containing the top-left corner,
     and selecting any square recolors your patch to that square's color,
     absorbing neighbors that now match.
     Write the neighbor test yourself, and count diagonal squares as neighbors.
     Track the moves it takes to make the whole field one color.
     For competition, alternate turns between players.
-7.  Change the rule for a selection in `box_observer.py`:
+7.  Change the rule for a selection in `grid_observer.py`:
     make `recolored()` advance every box in the selected box's row and column.
-    Run `box_view.py` without editing it,
+    Run `grid_view.py` without editing it,
     and explain why the view needed no change.
-8.  Add a second view to `box_observer.py`'s `BoxModel`.
+8.  Add a second view to `grid_observer.py`'s `GridModel`.
     Write one view that prints a letter per cell and another that prints how many cells each color holds,
     connect both to the same model,
     and show that one `select()` updates the pair.
     Keep both views textual so the example runs without a window,
-    and leave the model as `box_observer.py` has it.
-9.  Work out which colors the whole grid can reach from `new_grid(size)` under `box_observer.py`'s rule.
+    and leave the model as `grid_observer.py` has it.
+9.  Work out which colors the whole grid can reach from `new_grid(size)` under `grid_observer.py`'s rule.
     Selecting a cell advances up to five cells by one, modulo three,
     and selections commute, so this is a linear system over the integers mod 3:
     the unknowns are how many times you select each cell.

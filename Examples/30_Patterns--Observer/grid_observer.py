@@ -1,4 +1,4 @@
-# box_observer.py
+# grid_observer.py
 from enum import StrEnum
 from broadcaster import Broadcaster
 
@@ -29,7 +29,7 @@ def recolored(grid: Grid, selected: Coord) -> Grid:
     return grid | {cell: grid[cell].next()
                    for cell in cross if cell in grid}
 
-class BoxModel(Broadcaster[Grid]):
+class GridModel(Broadcaster[Grid]):
     def __init__(self, size: int) -> None:
         super().__init__()
         self.size = size

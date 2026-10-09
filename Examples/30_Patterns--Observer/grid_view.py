@@ -1,8 +1,8 @@
-# box_view.py
+# grid_view.py
 import tkinter as tk
-from box_observer import BoxModel, Grid
+from grid_observer import Grid, GridModel
 
-def show(model: BoxModel, cell_px: int = 60) -> None:
+def show(model: GridModel, cell_px: int = 60) -> None:
     root = tk.Tk()
     root.title("ColorBoxes")
     canvas = tk.Canvas(root, highlightthickness=0,
@@ -26,4 +26,4 @@ def show(model: BoxModel, cell_px: int = 60) -> None:
     root.mainloop()
 
 if __name__ == "__main__":
-    show(BoxModel(8))
+    show(GridModel(8))

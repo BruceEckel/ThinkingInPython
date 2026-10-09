@@ -9,8 +9,8 @@ module holds the machinery they use and the command line:
     tip verify                 run a task
     tip verify-ch CH=28        NAME=value sets a variable, as with make
     tip check output-check     several tasks, in order
-    tip run-one box_view       a task's positional word (here, F)
-    tip box_view --flag        run one listing (.py optional; 18/exercise_1
+    tip run-one grid_view       a task's positional word (here, F)
+    tip grid_view --flag        run one listing (.py optional; 18/exercise_1
                                picks a Solutions answer); the words after
                                it are the program's own
 

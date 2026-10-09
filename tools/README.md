@@ -296,7 +296,7 @@ each task runs at most once per invocation, so `tip ty lint` extracts
 once. A variable takes the `NAME=value` form (`tip verify-ch CH=28`),
 and a value with spaces splits into separate arguments, so `CH="25 28"`
 names two chapters. A task with a positional variable also takes a bare
-word: `tip run-one box_view` binds `box_view` to `F`. Every step runs
+word: `tip run-one grid_view` binds `grid_view` to `F`. Every step runs
 through `uv run` from the repository root, whatever the caller's
 directory, and is echoed before it runs; the first step that fails
 stops the run with its exit status. An unknown task name gets a "Did

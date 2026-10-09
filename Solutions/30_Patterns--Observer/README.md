@@ -781,9 +781,9 @@ exercise 3's catch-and-collect protects the loop from code you did not write.
 </details>
 </details>
 
-## 6. Turning `box_observer.py` into a flood-fill game
+## 6. Turning `grid_observer.py` into a flood-fill game
 
-> Turn `box_observer.py` into a simple game:
+> Turn `grid_observer.py` into a simple game:
 > you own the contiguous patch of same-colored squares containing the top-left corner,
 > and selecting any square recolors your patch to that square's color,
 > absorbing neighbors that now match.
@@ -931,7 +931,7 @@ print("solved in", game.moves, "moves")
 #: solved in 6 moves
 ```
 
-**Reuse the model's grid.** `FloodGame` reuses `new_grid()` from `box_observer.py` unchanged and
+**Reuse the model's grid.** `FloodGame` reuses `new_grid()` from `grid_observer.py` unchanged and
 adds the `adjacent()` the exercise asks for.
 
 **Find the owned patch.** `_flood()` is a plain graph search (depth-first, using a stack)
@@ -954,11 +954,11 @@ The players alternate turns, each recoloring their own patch,
 and after a set number of rounds whoever owns the larger patch wins.
 
 `FloodGame`
-can also inherit from `Broadcaster[Grid]`, as `BoxModel` does, and
+can also inherit from `Broadcaster[Grid]`, as `GridModel` does, and
 call `self.announce(self.grid)` at the end of a successful `select()`.
-`box_view.py`'s existing view then repaints after every move. The
+`grid_view.py`'s existing view then repaints after every move. The
 drawing code needs no change, but `show()`'s parameter annotation does:
-it names `BoxModel`, and a `FloodGame` is not one. Widening it to a
+it names `GridModel`, and a `FloodGame` is not one. Widening it to a
 Protocol (or to `Broadcaster[Grid]` plus `size`, `grid`, and
 `select()`) lets the same view draw either model.
 
@@ -968,16 +968,16 @@ Protocol (or to `Broadcaster[Grid]` plus `size`, `grid`, and
 
 ## 7. A new selection rule, and the same view
 
-> Change the rule for a selection in `box_observer.py`:
+> Change the rule for a selection in `grid_observer.py`:
 > make `recolored()` advance every box in the selected box's row and column.
-> Run `box_view.py` without editing it,
+> Run `grid_view.py` without editing it,
 > and explain why the view needed no change.
 
 <details>
 <summary>Where to look</summary>
 
 In [The Model](../../Chapters/30_Patterns--Observer.md#the-model), `recolored()` alone decides which cells change;
-`BoxModel.select()` calls it and announces the result.
+`GridModel.select()` calls it and announces the result.
 Build the new `Grid` from every cell that shares the selection's `x` or its `y`.
 For why the view needs no change, see what `draw()` receives in [The View](../../Chapters/30_Patterns--Observer.md#the-view).
 
@@ -1064,7 +1064,7 @@ print(initials(recolored(grid, (1, 2)), 4))
 #: s k k s
 ```
 
-**Advance the selection's row and column.** `Color` and `new_grid()` come from `box_observer.py` unchanged, and
+**Advance the selection's row and column.** `Color` and `new_grid()` come from `grid_observer.py` unchanged, and
 `recolored()` is the one function that differs. It keeps every cell
 whose column matches the selection's `x` or whose row matches its `y`,
 and advances each one. The cells come from `grid`, so none lies
@@ -1075,13 +1075,13 @@ cell's first letter, one row per line. After selecting column 1, row
 2, that column and that row have moved one color along, and the other
 nine cells are as they were.
 
-Pasting this `recolored()` over the one in `box_observer.py` changes
-what the window does, and `box_view.py` runs as it stands. Two
+Pasting this `recolored()` over the one in `grid_observer.py` changes
+what the window does, and `grid_view.py` runs as it stands. Two
 places in the view involve a selection. Its mouse responder calls
 `model.select()` with a coordinate, and its `draw()` receives a whole
 `Grid` and paints every cell. Neither one says which cells a selection
 changes, so the view holds nothing that a new rule could make wrong.
-The rule sits in `recolored()`, `BoxModel.select()` calls it, and
+The rule sits in `recolored()`, `GridModel.select()` calls it, and
 `announce()` delivers the result. `initials()` makes the same point
 from the other side: it is a second view of a `Grid`, written without
 knowing the rule.
@@ -1092,12 +1092,12 @@ knowing the rule.
 
 ## 8. Two views on one model
 
-> Add a second view to `box_observer.py`'s `BoxModel`.
+> Add a second view to `grid_observer.py`'s `GridModel`.
 > Write one view that prints a letter per cell and another that prints how many cells each color holds,
 > connect both to the same model,
 > and show that one `select()` updates the pair.
 > Keep both views textual so the example runs without a window,
-> and leave the model as `box_observer.py` has it.
+> and leave the model as `grid_observer.py` has it.
 
 <details>
 <summary>Where to look</summary>
@@ -1148,7 +1148,7 @@ class Broadcaster[T]:
     def announce(self, data: T) -> None:
         ...
 
-class BoxModel(Broadcaster[Grid]):
+class GridModel(Broadcaster[Grid]):
     def __init__(self, size: int) -> None:
         ...
 
@@ -1210,7 +1210,7 @@ class Broadcaster[T]:
         for responder in list(self._responders):
             responder(data)
 
-class BoxModel(Broadcaster[Grid]):
+class GridModel(Broadcaster[Grid]):
     def __init__(self, size: int) -> None:
         super().__init__()
         self.size = size
@@ -1220,7 +1220,7 @@ class BoxModel(Broadcaster[Grid]):
         self.grid = recolored(self.grid, cell)
         self.announce(self.grid)
 
-model = BoxModel(3)
+model = GridModel(3)
 
 def letters(grid: Grid) -> None:
     for y in range(model.size):
@@ -1245,10 +1245,10 @@ model.select((0, 0))
 #: s:3 p:4 k:2
 ```
 
-**Reuse the chapter's model.** The model is `box_observer.py`'s, copied here so the solution runs on
+**Reuse the chapter's model.** The model is `grid_observer.py`'s, copied here so the solution runs on
 its own: `Color`, `new_grid()`, and `recolored()` unchanged, and a
 `Broadcaster` trimmed to the two methods this example calls.
-`BoxModel` is the chapter's, and the exercise adds nothing to it.
+`GridModel` is the chapter's, and the exercise adds nothing to it.
 
 **Write each view as a responder.** `letters()` and `tally()` are the two views. Each takes a `Grid` and
 returns `None`, the shape `connect()` requires, so each is a
@@ -1265,7 +1265,7 @@ cross, which moves two cells out of `skyblue` and two into `khaki`.
 The corner selection that follows has three cells inside the grid
 rather than five.
 
-Adding a third view means one more `connect()` call. `box_view.py`'s
+Adding a third view means one more `connect()` call. `grid_view.py`'s
 `draw()` is such a view, and `show(model)` connects it to a model that
 already has `letters()` and `tally()`, so the window and the terminal
 report the same grid. Running that combination means `show()` takes
@@ -1277,7 +1277,7 @@ over with `root.mainloop()`, so call `show()` last.
 
 ## 9. Which colors a grid can reach
 
-> Work out which colors the whole grid can reach from `new_grid(size)` under `box_observer.py`'s rule.
+> Work out which colors the whole grid can reach from `new_grid(size)` under `grid_observer.py`'s rule.
 > Selecting a cell advances up to five cells by one, modulo three,
 > and selections commute, so this is a linear system over the integers mod 3:
 > the unknowns are how many times you select each cell.
@@ -1439,7 +1439,7 @@ selections turns that board one color.
 
 `Color` is a `StrEnum`, so its members go straight into
 `", ".join(reachable(size))` with no conversion, the same property
-that lets `box_view.py` hand a `Color` to `tkinter`.
+that lets `grid_view.py` hand a `Color` to `tkinter`.
 
 </details>
 </details>

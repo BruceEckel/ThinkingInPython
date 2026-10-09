@@ -1,5 +1,5 @@
-# test_box_observer.py
-from box_observer import (BoxModel, Color, Grid,
+# test_grid_observer.py
+from grid_observer import (Color, Grid, GridModel,
                           new_grid, recolored)
 
 def test_new_grid_size_and_banding() -> None:
@@ -31,7 +31,7 @@ def test_corner_selection_stays_on_the_grid() -> None:
     assert out.keys() == grid.keys()
 
 def test_responders_receive_the_new_grid() -> None:
-    model = BoxModel(3)
+    model = GridModel(3)
     before = model.grid[(1, 1)]
     seen: list[Grid] = []
     model.connect(seen.append)
