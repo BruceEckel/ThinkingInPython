@@ -656,8 +656,8 @@ That order is how the demo's `((1 * x) + (0 * y))` collapses to `x`.
 
 A record blocks every field assignment, so `simplify()` cannot edit its input.
 `simplify()` returns a new tree that shares unchanged subtrees with the original.
-The `is` guard in each `case _` returns the node it received when both children simplified to themselves.
-The guard tests identity with `is` rather than equality with `==`.
+The `if` inside each `case _` returns the node it received when both children simplified to themselves.
+That `if` tests identity with `is` rather than equality with `==`.
 Sharing means the same object, and `is` answers with one comparison,
 where a record's `==` compares fields and descends into any subtree that changed.
 

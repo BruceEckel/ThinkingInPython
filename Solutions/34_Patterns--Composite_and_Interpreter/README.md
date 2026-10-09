@@ -502,7 +502,7 @@ print(to_infix(simplify(Neg(Neg(x)) + Num(0))))
 **Fold negations where possible.** `simplify()` is the interesting one. For `Neg`, a constant operand
 folds (`Neg(Num(a))` → `Num(-a)`), and a double negation cancels
 (`Neg(Neg(inner))` → `inner`). Every case keeps the chapter's `is`
-guard, so an unchanged subtree is still shared.
+test, so an unchanged subtree is still shared.
 
 **Leave division for evaluation.** For `Div`, `simplify()` folds nothing. A quotient of two `int`s is
 usually not an `int`, so it does not fit in a `Num`, and division by
