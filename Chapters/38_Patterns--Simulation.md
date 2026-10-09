@@ -260,6 +260,9 @@ A `spawn()` before then raises an `AttributeError`.
 The declaration gives the type checker the attribute's type with no `None` placeholder to check.
 The robot example later in this chapter declares `Robot.room` for the same reason,
 with a bare annotation.
+`Robot` is an ordinary class.
+In a data class, a bare annotation adds a parameter to the generated `__init__()`,
+so `group` needs `field(init=False)`.
 
 The other four `init=False` fields, `visited`, `tasks`, `messages`,
 and `_numbers`, are internal bookkeeping.
@@ -409,7 +412,8 @@ The entry has two open neighbors,
 so rat 1 keeps one neighbor and spawns rat 2 at the other.
 `CountingBlackboard` tallies every `claim()` rejected on an open cell.
 Seven of the nine rejections are backtracking.
-Each rat tests the cell from which it came, once per cell other than the entry,
+In every cell but the entry,
+the rat standing there tests the cell from which it came,
 and `len(blackboard.visited) - 1` counts those cells.
 The other two belong to the loop's closing edge, tested from both ends.
 Rat 1 dead-ends at `(2, 3)` because rat 2 claimed `(3, 3)` first,
