@@ -119,7 +119,8 @@ and an Effect's send type is `Any`.
 With `name` typed `Any`, a mistake such as `name + 1` passes the check.
 The accessor adds a name for the request and one place to state that answer type:
 the `answer: str` binding inside `ask()`,
-one line above the `Depend[Ask, str]` that repeats it to callers.
+one line below the signature's `Depend[Ask, str]`,
+which states the same type to callers.
 
 That annotation reads `Depend[Ask, str]`, not `Depend[Need[Ask], str]`,
 the distinction [Waiting on a Coroutine](46_Effects--Stateless.md#waiting-on-a-coroutine)
@@ -993,9 +994,10 @@ so the runs cover every failure the signature declares.
 calls each such set of bindings a *scenario*,
 and here a scenario is nothing more than arguments to `supply()`.
 
-Every printed line in that trace comes from a supplied implementation,
-because the pipeline holds no output of its own,
-so the trace also records where each run stopped.
+Each run's last line is the outcome that `report()` returns.
+Every line above it comes from a supplied implementation,
+because the pipeline prints nothing of its own,
+so those lines record where each run stopped.
 The run at `[2]` stops after `feed: fetching`.
 `topic_of()` yields a `NotInteresting`,
 and that failure ends `research()` where it stands.
@@ -1006,8 +1008,8 @@ which is why the run still prints a message.
 A failure ends the remaining steps the way a raised exception does,
 and no step tests for it.
 Where the run stops depends on where the failure arises.
-The run at `[4]` prints no trace,
-since `DeadWire.latest()` raises `Unavailable` without printing anything.
+The run at `[4]` prints its outcome alone,
+since `DeadWire.latest()` raises `Unavailable` and prints nothing.
 The run at `[3]` reaches the library and fails there.
 
 `report()` handles the two channels differently.
@@ -1830,8 +1832,8 @@ and `squares()` asks for the general one.
 
 The type checker enforces one restriction.
 A forked Effect must have nothing left to supply.
-`fork()`'s four overloads accept an Effect whose Ability channel holds `Never`,
-an exception type, or `Async`,
+`fork()`'s four overloads accept an Effect whose Ability channel holds `Never` or `Async`,
+and whose error channel holds `Never` or an exception type,
 because `fork()` runs the Effect with `run()` inside the worker.
 If you decorate a function that still declares a `Need`, the checker rejects it,
 listing the overloads it failed to match.
@@ -1894,9 +1896,11 @@ rewriting the type that function declares:
 Three rows carry a caveat.
 `fork` needs a function whose Effect has nothing left to supply,
 so supply first, then fork.
-`@throws` is an entry point rather than a transformation.
-It decorates an ordinary function that raises exceptions,
-turning it into one that returns an Effect.
+`@throws` also accepts an ordinary function that raises exceptions,
+turning it into one that returns an Effect,
+so it serves as an entry point as well as a transformation.
+On a function that already returns an Effect, as in `fetch_effectful.py`,
+it adds each `E` to that Effect's error channel.
 `throw()` instead builds the failure as a description.
 And `catch_all` comes from `stateless.effect`,
 since the package root does not export it.
