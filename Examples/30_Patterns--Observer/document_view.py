@@ -6,6 +6,9 @@ from record import record
 class View:
     model: Counter
 
+    def __post_init__(self) -> None:
+        self.model.connect(self.draw)
+
     def draw(self, count: int) -> None:
         print(f"count: {count}")
 
@@ -20,7 +23,6 @@ class View:
 
 model = Counter()
 view = View(model)
-model.connect(view.draw)
 for char in "++-x":
     view.key(char)
 #: count: 1

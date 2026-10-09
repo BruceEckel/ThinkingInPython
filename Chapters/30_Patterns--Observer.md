@@ -1503,6 +1503,9 @@ from record import record
 class View:
     model: Counter
 
+    def __post_init__(self) -> None:
+        self.model.connect(self.draw)
+
     def draw(self, count: int) -> None:
         print(f"count: {count}")
 
@@ -1517,7 +1520,6 @@ class View:
 
 model = Counter()
 view = View(model)
-model.connect(view.draw)
 for char in "++-x":
     view.key(char)
 #: count: 1
@@ -1528,7 +1530,9 @@ for char in "++-x":
 `draw()` is the output and `key()` is the input: `key()` is the controller,
 folded into `View` as a method,
 and `View` holds the model because `key()` needs somewhere to send the request.
-`draw()` uses the count the model pushes to it, so only `key()` needs `model`.
+`__post_init__()` connects `draw()` to that model,
+as `show()` does in `grid_view.py`, so a `View` is wired as soon as it exists.
+`draw()` works from the count the model pushes to it.
 `x` matches the wildcard case, so `key()` returns without touching the model,
 and the four characters of `"++-x"` print three counts.
 
@@ -1579,14 +1583,15 @@ print(model.count)
 #: 1
 ```
 
-The two versions share three things: the `Counter` model,
-the `model.connect(view.draw)` call that connects the view to the model,
+The two versions share the `Counter` model, the count it announces to `draw()`,
 and the printed output for the same input, `"++-x"`.
 *Observer* does the same work either way,
 which is why the chapter's opening calls the two architectures nearly equivalent.
 
-One thing moves.
+Two things move.
 `key()` leaves `View` for `Controller`, and the model reference goes with it.
+The `connect()` call leaves `__post_init__()` for the module,
+since a `View` that holds no model cannot connect itself.
 The MVC `View` keeps `draw()` and `Controller` gets `key()`, one job each.
 `Controller` is the third role of MVC,
 the one Document-View folds into the view, and here it is a class of its own.
@@ -1603,7 +1608,9 @@ with `View` and the model unchanged.
 
 MVC separates drawing from input handling,
 the two jobs `document_view.py` gives one class,
-and the `connect()` call stays the same.
+and the view reaches the model through `connect()` either way:
+the Document-View `View` connects itself,
+and the module connects the MVC `View`.
 `grid_view.py` has the Document-View shape.
 Its `draw()` paints, its `bind()` lambda handles the click,
 and both are defined inside `show()`.
