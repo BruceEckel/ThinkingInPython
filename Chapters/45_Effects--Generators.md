@@ -510,8 +510,8 @@ which arrives as the value of the `yield` expression and binds to `answer`.
 As the `ReturnType` it is the value `ask()` returns when it finishes,
 which becomes the value of the whole `yield from` expression,
 so `interview()`'s three assignments read like ordinary ones.
-The inner generator yields one question and returns one answer,
-so both channels carry an `Answer`.
+The inner generator receives one answer and returns it,
+so its send and return channels both carry an `Answer`.
 `interview()` keeps `Result` as its `ReturnType`,
 because the sentence it builds from three answers is not an answer to any one question.
 
@@ -770,7 +770,7 @@ though neither names the other and no threads exist.
 
 `task_runner()` calls `next()` and takes turns.
 `drive()` calls `send()` and answers questions.
-Giving each job a question combines turn-taking and answering in one loop:
+Letting each job ask a question combines turn-taking and answering in one loop:
 
 ```python
 # task_runner_send.py
@@ -822,7 +822,7 @@ task_runner()
 ```
 
 `to_send` holds the value each job receives on its next turn:
-`None` until the runner has answered that job's most recent request.
+`None` for a fresh job, then the runner's answer to that job's latest request.
 `job.send(to_send.pop(job))` primes a fresh job the same way `next(job)` does,
 since `send(None)` and `next()` are equivalent.
 On every later turn the same call delivers the runner's answer.
