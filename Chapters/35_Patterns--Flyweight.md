@@ -43,8 +43,9 @@ so the example that needs a fresh object uses `100000` rather than `257`.
 The listing parses each value from a string because the compiler pools equal constants within one code object.
 With literals, `high, high2 = 100000, 100000` makes `high is high2` print `True`.
 That sharing comes from the pooling, not from the integer cache.
-Because the result of `is` on a literal depends on details like this pooling,
-Python emits a `SyntaxWarning` for it.
+Because the result of `is` depends on details like this pooling,
+Python emits a `SyntaxWarning` when a literal is an operand of `is`,
+as in `high is 100000`.
 Parsing at runtime builds the integer after compilation,
 so any sharing that remains comes from the cache.
 
