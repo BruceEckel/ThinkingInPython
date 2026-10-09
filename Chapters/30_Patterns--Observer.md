@@ -1319,18 +1319,15 @@ Every key on the right is also in `grid`, and for a key in both,
 the result takes the right operand's value.
 The new grid is a copy of `grid` that differs in the cells of the cross.
 
-`GridModel` is a `Broadcaster[Grid]`,
-and `select()` announces each new grid that `recolored()` produces.
-
 ### Testing the Model
 
-The model is testable without a GUI.
-The test file confirms that:
+The model is testable without a GUI:
 
 - `new_grid()` builds a grid of the requested size,
-  starting from `skyblue` at `(0, 0)`,
-  and cells with the same `x + y` share a color.
-- `Color.next()` steps to the next color and wraps from the last back to the first.
+  starting from `skyblue` at `(0, 0)`.
+  Cells with the same `x + y` share a color.
+- `Color.next()` steps to the next color,
+  and on the last color it returns the first.
 - `recolored()` changes the cross and no other cell, and returns a new grid.
 - A selection in a corner stays on the grid.
 - Responders receive the new grid once after a selection.
