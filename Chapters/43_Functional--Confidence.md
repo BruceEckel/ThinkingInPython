@@ -51,7 +51,8 @@ You can reason about the code by replacing a call with its value,
 the move you make in algebra, and so check parts of a program,
 and sometimes prove them correct.
 
-Substitution stops working the moment a function reads or writes outside itself.
+Substitution stops working the moment a function reads something that can change,
+or writes outside itself.
 [`withdraw()`](40_Functional--Foundations.md#pure-functions) does both,
 reading and writing the module-level `balance`:
 
@@ -342,7 +343,8 @@ def test_roundtrip(sample: str) -> None:
 The listing repeats the two functions rather than importing them,
 because importing `property_check.py` runs its thousand-iteration loop inside the test run.
 
-`@given(strategies.text())` calls `test_roundtrip()` once per generated string.
+`@given(strategies.text())` wraps `test_roundtrip()`,
+and each call to the wrapper runs the original body once per generated string.
 By default Hypothesis generates a hundred of them,
 a tenth of the hand-written loop's thousand.
 Those hundred strings cover more of the input space,
@@ -360,8 +362,8 @@ The framework automates falsification.
 `property_check.py` and `test_property.py` both pass,
 and shrinking needs a failure.
 The next codec has a bug,
-and the bug is the unusual-Unicode case [The Same Law in Hypothesis](#the-same-law-in-hypothesis)
-mentions:
+and the unusual Unicode that [The Same Law in Hypothesis](#the-same-law-in-hypothesis)
+mentions exposes it:
 
 ```python
 # shrinking.py
@@ -404,7 +406,7 @@ treating `decode()` as opaque throughout.
 
 `derandomize=True` seeds the search from a hash of the test function so this book gets the same answer every run,
 the job `random.seed(42)` does in the hand-written loop.
-`database=None` discards the example database,
+`database=None` turns off the example database,
 so every run searches from scratch.
 A real test keeps the defaults.
 
