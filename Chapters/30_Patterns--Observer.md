@@ -1381,7 +1381,7 @@ def test_responders_receive_the_new_grid() -> None:
 
 ### The View
 
-The view is the only code that displays on the screen.
+The view is the one part of the example that draws on the screen.
 Run `tip grid_view` to play.
 Because `grid_view.py` opens a window, the example harness skips it
 (see `tools/data/norun.txt`).
