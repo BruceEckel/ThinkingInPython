@@ -96,7 +96,7 @@ Inheritance lets you express differences in behavior
 (that's what stays the same).
 [Composition](20_Patterns--Rethinking_Objects.md#prefer-composition-to-inheritance)
 also qualifies as a pattern, since it lets you change,
-dynamically or statically, the objects that implement your class,
+dynamically or statically, the objects to which your class delegates,
 and thus the way that class works.
 
 Another pattern that appears in *GoF Design Patterns* is the [*Iterator*](23_Patterns--Iterators.md).
@@ -325,7 +325,7 @@ and the type checker reports each place that passes it to a caller.
 
 The `Protocol` and `Callable` rungs come free in Python.
 An abstract base class is a class you write and every implementer inherits.
-A `Protocol` is a class you write and nothing inherits,
+A `Protocol` is a class you write and no implementer inherits,
 and a `Callable` annotation is not a class.
 Those two free rungs are the mechanism behind [When a Pattern Dissolves](#when-a-pattern-dissolves).
 In a language whose only rungs are a part's internals and its name,
@@ -354,7 +354,7 @@ so adding an algorithm changes nothing that exists.
 *Observer* has one, and it points from the observer to the subject.
 An observer names its subject's class in `update()`,
 whose `subject` parameter receives the subject that changed.
-The subject knows no observer:
+The subject knows no concrete observer:
 "All a subject knows is that it has a list of observers,
 each conforming to the simple interface of the abstract `Observer` class."
 The heavy edge points at the part that changes least,
