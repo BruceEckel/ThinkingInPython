@@ -118,14 +118,13 @@ if __name__ == "__main__":
 `flower_gen()` reads the concrete classes from `Flower.__subclasses__()`,
 the same registry-free enumeration as [Factory](27_Patterns--Factory.md#simple-factory-method).
 
-The `accept()`/`visit()` pair is the *double dispatch*.
-`accept()` passes the concrete flower to the visitor,
+In the classic pattern the `accept()`/`visit()` pair is the *double dispatch*.
+Every element class overrides `accept()`,
+the override resolves the element's type,
+and the `visit()` call inside it resolves the visitor's type.
+In `flower_visitors.py` one inherited `accept()` passes the concrete flower to the visitor,
 `visit()` resolves the visitor's type,
-and the `pollinate()` or `eat()` call inside `visit()` resolves the flower's type.
-In the classic pattern every element class overrides `accept()`,
-and the override resolves the element's type.
-In `flower_visitors.py` one inherited `accept()` is enough,
-because the `pollinate()` or `eat()` call resolves the flower's type a step later.
+and the `pollinate()` or `eat()` call inside `visit()` resolves the flower's type a step later.
 
 The last line of output is the one where both dispatches change the result,
 because `Chrysanthemum` overrides `eat()`
@@ -432,7 +431,7 @@ In the third frame no method on `Flower` takes part.
 One lookup in `nectar()`'s table, keyed by the flower's type, finds the answer.
 That one dispatch resolves everything *Visitor*'s two dispatches do.
 
-The second dispatch in the classic pattern exists not because two types are unknown,
+The dispatch on the visitor's type exists not because two types are unknown,
 but because the operation must be a method on some class.
 The visitor's type stands in for the operation,
 so the language must resolve that type at runtime along with the element's type.
