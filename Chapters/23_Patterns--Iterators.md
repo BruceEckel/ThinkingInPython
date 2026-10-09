@@ -349,6 +349,12 @@ and that is why the listing leaves it out.
 Every chapter listing must type-check.
 `total()` in `iterators.py` stays `Iterable[int]` because it sums once.
 
+`Collection[T]` also rejects `Countdown`, which survives any number of passes.
+`Countdown` defines `__iter__()` and lacks the `__len__()` and `__contains__()` a `Collection` requires.
+`collections.abc` has no protocol for "iterable more than once,"
+so `Collection[T]` is the closest annotation,
+and a reiterable class passes it by adding those two methods.
+
 ### What `tee()` Buffers
 
 `itertools.tee(it, 2)` splits one iterator into two independent ones.
@@ -697,6 +703,11 @@ The type checker rejects the second form.
 Both take `expected: type[T]`,
 so the type checker carries the element type through.
 `typed(items, int)` is an `Iterator[int]`, not an `Iterator[Any]`.
+
+`expected` must be a class such as `list`.
+The type checker also accepts a parameterized generic such as `list[int]`,
+but `isinstance()` raises a `TypeError` when it receives one,
+so either wrapper fails at the first item.
 
 Each test passes a list of `int` through one wrapper and gets it back unchanged,
 then expects a `TypeError` once a `str` appears:
