@@ -79,7 +79,7 @@
  },
  "0c738529ede5867a": {
   "file": "19_Techniques--Concurrency.md",
-  "line": 250,
+  "line": 248,
   "target": "15_Techniques--Context_Managers.md",
   "terms": [
    "Meter"
@@ -90,7 +90,7 @@
  },
  "0bfdf37ac6c6f194": {
   "file": "19_Techniques--Concurrency.md",
-  "line": 1283,
+  "line": 1291,
   "target": "22_Patterns--Data_Transfer_Objects.md",
   "terms": [
    "Times"
@@ -99,9 +99,20 @@
   "p_terms": 0.04,
   "asked": "2026-10-05"
  },
+ "b83bb8f4243cf73d": {
+  "file": "21_Patterns--Design_Patterns.md",
+  "line": 193,
+  "target": "20_Patterns--Rethinking_Objects.md",
+  "terms": [
+   "Callable"
+  ],
+  "sentence": "Because a function with a `Callable` parameter can replace a pattern's interface and classes, the chapters ahead keep asking the question [Rethinking Objects](20_Patterns--Rethinking_Objects.md#guidelines) poses: how much of each pattern's machinery does Python still need, and how much of it becomes functions, data, and protocols?",
+  "p_terms": 0.0,
+  "asked": "2026-10-09"
+ },
  "734b3d881649c1ef": {
   "file": "21_Patterns--Design_Patterns.md",
-  "line": 504,
+  "line": 507,
   "target": "20_Patterns--Rethinking_Objects.md",
   "terms": [
    "Need"
@@ -135,7 +146,7 @@
  },
  "04acbadd1165eaba": {
   "file": "23_Patterns--Iterators.md",
-  "line": 729,
+  "line": 743,
   "target": "21_Patterns--Design_Patterns.md",
   "terms": [
    "__iter__",
@@ -147,7 +158,7 @@
  },
  "ebf2d05c88d18b4b": {
   "file": "23_Patterns--Iterators.md",
-  "line": 799,
+  "line": 813,
   "target": "20_Patterns--Rethinking_Objects.md",
   "terms": [
    "traverse",
@@ -159,7 +170,7 @@
  },
  "92ea1b2aa8c0d548": {
   "file": "23_Patterns--Iterators.md",
-  "line": 879,
+  "line": 893,
   "target": "05_Foundations--Functions.md",
   "terms": [
    "DONE"
@@ -170,7 +181,7 @@
  },
  "ded4015137e431d6": {
   "file": "24_Patterns--Singleton.md",
-  "line": 177,
+  "line": 181,
   "target": "11_Techniques--Testing.md",
   "terms": [
    "__Settings"
@@ -181,7 +192,7 @@
  },
  "a51f08d6349a2b99": {
   "file": "24_Patterns--Singleton.md",
-  "line": 697,
+  "line": 707,
   "target": "26_Patterns--Surrogate.md",
   "terms": [
    "__call__"
@@ -214,7 +225,7 @@
  },
  "2e71dc56c76b481b": {
   "file": "26_Patterns--Surrogate.md",
-  "line": 766,
+  "line": 776,
   "target": "31_Patterns--State_Machines.md",
   "terms": [
    "change_to"
@@ -258,7 +269,7 @@
  },
  "f132a66521cef1cb": {
   "file": "29_Patterns--Changing_the_Interface.md",
-  "line": 168,
+  "line": 169,
   "target": "20_Patterns--Rethinking_Objects.md",
   "terms": [
    "WhatIUse2",
@@ -271,7 +282,7 @@
  },
  "c8b45c3e67ecadbb": {
   "file": "29_Patterns--Changing_the_Interface.md",
-  "line": 276,
+  "line": 277,
   "target": "18_Techniques--Performance.md",
   "terms": [
    "PairCoord",
@@ -284,7 +295,7 @@
  },
  "82bb6893784c05ff": {
   "file": "29_Patterns--Changing_the_Interface.md",
-  "line": 282,
+  "line": 283,
   "target": "26_Patterns--Surrogate.md",
   "terms": [
    "adapter"
@@ -295,7 +306,7 @@
  },
  "efad5ab6dc412cd9": {
   "file": "30_Patterns--Observer.md",
-  "line": 539,
+  "line": 538,
   "target": "10_Foundations--Cleanup.md",
   "terms": [
    "disconnect"
@@ -306,7 +317,7 @@
  },
  "fa774505d1fd8381": {
   "file": "30_Patterns--Observer.md",
-  "line": 604,
+  "line": 603,
   "target": "10_Foundations--Cleanup.md",
   "terms": [
    "announce"
@@ -317,7 +328,7 @@
  },
  "e8e91f728192b79c": {
   "file": "30_Patterns--Observer.md",
-  "line": 1782,
+  "line": 1794,
   "target": "17_Techniques--Metaprogramming.md",
   "terms": [
    "Notifying",
@@ -362,7 +373,7 @@
  },
  "e3c9c99b35195620": {
   "file": "31_Patterns--State_Machines.md",
-  "line": 494,
+  "line": 495,
   "target": "06_Foundations--Modules_and_Packages.md",
   "terms": [
    "state_machine.py"
@@ -373,7 +384,7 @@
  },
  "e8596ef215d9870a": {
   "file": "31_Patterns--State_Machines.md",
-  "line": 1000,
+  "line": 1005,
   "target": "26_Patterns--Surrogate.md",
   "terms": [
    "UnpredictablePerson",
@@ -386,7 +397,7 @@
  },
  "8b236a72729572a5": {
   "file": "31_Patterns--State_Machines.md",
-  "line": 1012,
+  "line": 1017,
   "target": "23_Patterns--Iterators.md",
   "terms": [
    "mouse_move_generator",
@@ -398,7 +409,7 @@
  },
  "806a7dc7e24cfdff": {
   "file": "33_Patterns--Visitor.md",
-  "line": 117,
+  "line": 118,
   "target": "27_Patterns--Factory.md",
   "terms": [
    "flower_gen",
@@ -433,7 +444,7 @@
  },
  "346bd608b70887ba": {
   "file": "35_Patterns--Flyweight.md",
-  "line": 267,
+  "line": 269,
   "target": "20_Patterns--Rethinking_Objects.md",
   "terms": [
    "Tile"
@@ -466,7 +477,7 @@
  },
  "ac09f5e8941b7dcd": {
   "file": "37_Patterns--Pattern_Refactoring.md",
-  "line": 637,
+  "line": 639,
   "target": "07_Foundations--Classes.md",
   "terms": [
    "singledispatch",
@@ -479,7 +490,7 @@
  },
  "5a1e947901d88713": {
   "file": "40_Functional--Foundations.md",
-  "line": 580,
+  "line": 585,
   "target": "05_Foundations--Functions.md",
   "terms": [
    "partial"
@@ -501,7 +512,7 @@
  },
  "b0dc91a7cce04574": {
   "file": "42_Functional--Error_Handling.md",
-  "line": 222,
+  "line": 227,
   "target": "12_Techniques--Data_Classes_as_Types.md",
   "terms": [
    "Result"
@@ -512,7 +523,7 @@
  },
  "73da2fe803454604": {
   "file": "44_Effects--Effect_Management.md",
-  "line": 886,
+  "line": 890,
   "target": "19_Techniques--Concurrency.md",
   "terms": [
    "greet"
@@ -523,7 +534,7 @@
  },
  "709ba98f5b49d11a": {
   "file": "46_Effects--Stateless.md",
-  "line": 1332,
+  "line": 1333,
   "target": "44_Effects--Effect_Management.md",
   "terms": [
    "Need"
@@ -534,7 +545,7 @@
  },
  "66259d22eeb4fc05": {
   "file": "47_Effects--Stateless_in_Practice.md",
-  "line": 433,
+  "line": 434,
   "target": "44_Effects--Effect_Management.md",
   "terms": [
    "Flip"
@@ -545,7 +556,7 @@
  },
  "757f33f7028c918e": {
   "file": "47_Effects--Stateless_in_Practice.md",
-  "line": 1327,
+  "line": 1336,
   "target": "46_Effects--Stateless.md",
   "terms": [
    "Oven",
