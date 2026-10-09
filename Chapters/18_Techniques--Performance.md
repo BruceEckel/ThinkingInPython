@@ -152,7 +152,8 @@ Registering nothing costs nothing.
 The interpreter specializes the bytecode that has no callback attached,
 so unmonitored code runs at full speed.
 `sys.settrace()`, by contrast, slows every Python function its thread runs,
-since its trace function runs on each call and then on each line:
+since its trace function runs on each call,
+and the local trace function it returns runs on each line:
 
 ```python
 # monitoring_counts.py
@@ -306,6 +307,14 @@ with no separate `setup` argument needed to build them.
 Leaving `number` out defaults to a million calls,
 which suits a microsecond snippet and is a long wait for anything slower,
 so always set it for a function you have not timed before.
+
+Each timing includes the cost of calling the lambda.
+A set lookup takes nanoseconds, so that call is a sizable share of `t_set`,
+and the ratio understates the set's lead.
+When a snippet is that small and the ratio matters,
+pass `timeit` a string of code with `globals=globals()`.
+`timeit` compiles the string into the body of its timing loop,
+so each pass runs the snippet directly.
 
 One machine measured the `set` at about 14,000 times faster than the list scan.
 A single lookup costs little either way.
