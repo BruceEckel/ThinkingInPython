@@ -286,7 +286,7 @@ print(sorted(words, key=cmp_to_key(by_length_desc)))
 
 This ordering has a key.
 `sorted(words, key=len, reverse=True)` gives the same list,
-and a key function is the better choice whenever one exists.
+and a key function is a better choice whenever one exists.
 `cmp_to_key()` is for a comparator that arrives from older code,
 and for an ordering with no per-element key,
 where the rule is a comparison between two elements.
@@ -873,7 +873,7 @@ The stack has a cap, so deep recursion raises a `RecursionError`.
 A long flat sequence calls for a loop or one of the `itertools` tools.
 For a countdown like this one, the loop is as short as the recursion and faster,
 since it makes no calls.
-Recursion is the better choice once the problem branches rather than repeats,
+Recursion is a better choice if the problem branches rather than repeats,
 as `nested_sum.py` shows.
 
 Branching adds a problem of its own.

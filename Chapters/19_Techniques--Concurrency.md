@@ -2407,7 +2407,7 @@ for example letting only the task with the lower ID give.
   Explore [Performance](18_Techniques--Performance.md)
   before deciding you require a concurrent solution.
 - **Don't wrap a lone wait in `async`/`await` machinery.**
-  `asyncio` is justified once you have multiple waits that overlap.
+  `asyncio` is justified if you have multiple waits that overlap.
 - **A comprehension that awaits is not concurrent.**
   `[await c for c in coroutines]` runs one coroutine at a time.
   `gather()` and `TaskGroup` schedule every coroutine as a task before waiting on any of them.

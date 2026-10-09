@@ -406,7 +406,7 @@ the [comprehension](16_Techniques--Comprehensions.md).
 `[n * n for n in numbers]` says what `map()` plus a fresh lambda says,
 with no lambda and no function call,
 and `[n for n in numbers if n % 2 == 0]` replaces the `filter()` call the same way.
-`map()` and `filter()` are the better choice when the function already exists.
+`map()` and `filter()` are a better choice when the function already exists.
 `map(str.strip, lines)` reads better than `[line.strip() for line in lines]`,
 because `str.strip` names the operation once, with no loop variable to invent.
 

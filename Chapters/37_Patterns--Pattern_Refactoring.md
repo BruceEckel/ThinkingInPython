@@ -518,7 +518,7 @@ A plant whose material classes come from a supplier has no class body to edit.
 The method form is a real option, not an example built to fail.
 This hierarchy is small and the book owns every subclass,
 so `note()` on each material is a fair choice here.
-The method is the better choice while you own the hierarchy and the operations stay few.
+The method is a better choice while you own the hierarchy and the operations stay few.
 Each subclass defines its own answer,
 with no separate table to keep in step with the class list.
 It is the worse choice once the hierarchy belongs to someone else,

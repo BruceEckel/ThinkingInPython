@@ -516,7 +516,7 @@ Chapters/38_Patterns--Simulation.md	only: which only a count like exercise 3's c
 Chapters/39_Patterns--Pattern_Catalog.md	only: and several exist only to work around limits of a particular language
 Chapters/39_Patterns--Pattern_Catalog.md	only: not only the original *Design Patterns* (GoF) set
 Chapters/40_Functional--Foundations.md	already: CODE already appends the call's arguments after the bound ones
-Chapters/40_Functional--Foundations.md	already: CODE and CODE are the better choice when the function already exists
+Chapters/40_Functional--Foundations.md	already: CODE and CODE are a better choice when the function already exists
 Chapters/40_Functional--Foundations.md	already: already correct on the edge case you would otherwise miss
 Chapters/40_Functional--Foundations.md	already: each with one argument already supplied
 Chapters/40_Functional--Foundations.md	already: use the higher-order form when the function already exists

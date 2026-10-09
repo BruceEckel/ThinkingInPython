@@ -452,7 +452,7 @@ path.unlink()
 
 `read_text()` opens the file, reads all of it, and closes it, so the
 one-liner is shorter and has no block. For a small file read in one
-go, the one-liner is the better choice, and the chapter names `read_text()` and
+go, the one-liner is a better choice, and the chapter names `read_text()` and
 `write_text()` for that case.
 
 The `with` form gives you control over the code between the open and
@@ -469,7 +469,7 @@ costs something, or when you read a stream that has no end.
 The closing guarantee is not the difference. `read_text()` opens the
 file in a `with` block of its own, so it closes the file too, whether
 or not the read succeeds. For a configuration file of a few kilobytes
-read once at startup, `read_text()` is the better choice.
+read once at startup, `read_text()` is a better choice.
 
 </details>
 </details>

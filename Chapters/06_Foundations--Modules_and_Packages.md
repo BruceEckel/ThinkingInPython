@@ -367,7 +367,7 @@ so renaming the package breaks nothing inside it.
 Two dots reach the parent package,
 so `b_package/module3.py` could import from `a_package` with `from .. import module1` or `from ..module1 import function1`.
 The absolute form `from a_package.module1 import function1` works from inside the package too,
-and is the better choice when the import crosses a package boundary.
+and is a better choice when the import crosses a package boundary.
 Keep relative imports for a package's own submodules.
 
 A relative import needs a package context, and a file run as a script has none.
