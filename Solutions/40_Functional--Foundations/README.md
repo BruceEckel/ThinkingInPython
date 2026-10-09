@@ -263,7 +263,7 @@ a third stage. Wrapping one composed function inside another
 
 > In `placeholder.py`, build a second partial, `at_least_ten`,
 > that presets `low` to 10 and leaves both other arguments to the caller.
-> Then try, without a `Placeholder`,
+> Then try, with `partial()` and no `Placeholder`,
 > to preset `high` and leave `low` and `value` open,
 > and explain why that is impossible.
 

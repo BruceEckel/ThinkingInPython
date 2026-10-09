@@ -706,6 +706,10 @@ The `print()` at `[1]` shows what the discipline gives you.
 The input list stays unchanged, so you can recompute the whole report, cache it,
 or run it on another core with no coordination.
 
+`to_fahrenheit()` returns a `Reading` whose `celsius` field holds a Fahrenheit number.
+The field name matches its contents up to that stage, so `report()` converts last,
+after `warmer_than()` reads the field as Celsius.
+
 `pipeline.py` is ordinary Python,
 written so that each piece depends on its arguments alone.
 The chapters ahead build on that single property.
@@ -727,7 +731,7 @@ give a hint, usually the shape of the code, and a full answer for each exercise.
     Predict `increment_then_double_then_square(3)` before running it.
 5.  In `placeholder.py`, build a second partial, `at_least_ten`,
     that presets `low` to 10 and leaves both other arguments to the caller.
-    Then try, without a `Placeholder`,
+    Then try, with `partial()` and no `Placeholder`,
     to preset `high` and leave `low` and `value` open,
     and explain why that is impossible.
 6.  In `immutable_types.py`,
