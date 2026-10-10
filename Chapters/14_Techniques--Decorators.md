@@ -239,7 +239,7 @@ Pyright and mypy both accept the attribute here.
 ### A Coroutine Function Needs an `async` Wrapper {#coroutine-needs-async-wrapper}
 
 `trace` assumes `func` runs to completion inside the call that invokes it,
-which is true of an ordinary function and false of an `async def` function.
+which is true of an ordinary function and false of a generator function or an `async def` function.
 Decorating a coroutine function raises no exception.
 `func(*args, **kwargs)` returns a coroutine object immediately,
 without running the coroutine's body,
