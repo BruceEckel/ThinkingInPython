@@ -262,6 +262,8 @@ Solutions live in the `Solutions/` directory of the source repository.
 Each solution opens in steps: a hint,
 then the shape of the code with its bodies left out, then the full answer,
 so you can take as little help as you need.
+`tip hint CH=30 N=3` prints the same steps one per run,
+`CH` naming the chapter and `N` the exercise.
 Try the exercise yourself before reading the solution.
 The value is in the prediction and the surprise when you are wrong,
 not in the code you produce.
