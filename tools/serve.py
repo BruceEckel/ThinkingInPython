@@ -4,11 +4,18 @@
 `tip serve` runs this with `--watch --copy-on-select` on the existing
 `build/site/`. `tip local` builds the site first and adds `--open`.
 
-With `--watch`, a background thread polls `Chapters/*.md` (and the few
-files the whole site is rendered from: `template.html`, the static
-assets, and the figures in `resources/images/`). A changed chapter takes `build_site.rebuild_chapter()`'s
-incremental path, one pandoc run rather than the ~46 of a full build; a
-changed template or asset rebuilds everything. Each served page carries
+With `--watch`, a background thread polls `Chapters/*.md` and
+`Solutions/*/README.md` (and the few files the whole site is rendered
+from: `template.html`, the static assets, and the figures in
+`resources/images/`). A changed chapter takes
+`build_site.rebuild_chapter()`'s incremental path, one pandoc run
+rather than the ~46 of a full build, and a changed solutions file takes
+the same path through its chapter, since that one run also rewrites
+the chapter's solutions page (before 2026-10-10 the watcher listed
+`Chapters/` alone, so a solutions edit never reached the browser). A
+changed template or asset rebuilds everything. A rebuild that raises
+an exception prints its traceback in the server's terminal and leaves
+the page as it was; the next save tries again. Each served page carries
 a small script that polls `/__reload` and reloads once the rebuild
 lands, so an edit in the editor becomes a refreshed browser page with
 nothing to press.
@@ -51,13 +58,14 @@ import subprocess
 import sys
 import threading
 import time
+import traceback
 import webbrowser
 from pathlib import Path
 
 from tools import build_site
 from tools.config import BUILD_SITE_DIR as SITE
-from tools.config import ROOT
-from tools.repo import md_files
+from tools.config import CHAPTERS_DIR, ROOT, SOLUTIONS_DIR
+from tools.repo import chapter_stem, is_solutions_file, md_files
 
 POLL_SECONDS = 1.0
 RELOAD_PATH = "/__reload"
@@ -148,9 +156,28 @@ COPY_SCRIPT = """
 """
 
 
+def watched_sources() -> list[Path]:
+    """Every file a built page depends on: both Markdown trees, the
+    whole-site inputs, and the figures."""
+    return [*md_files([CHAPTERS_DIR, SOLUTIONS_DIR]), *GLOBAL_INPUTS,
+            *IMAGES.iterdir()]
+
+
+def source_chapter(md: Path) -> Path:
+    """The chapter whose pages a Markdown edit changes.
+
+    A chapter is its own; a solutions file maps to the chapter it
+    belongs to, since `rebuild_chapter()` renders the chapter page and
+    its solutions page in one run.
+    """
+    if is_solutions_file(md):
+        return CHAPTERS_DIR / f"{chapter_stem(md)}.md"
+    return md
+
+
 def snapshot() -> dict[Path, float]:
     """Modification times of every file a built page depends on."""
-    watched = [*md_files(), *GLOBAL_INPUTS, *IMAGES.iterdir()]
+    watched = watched_sources()
     out: dict[Path, float] = {}
     for path in watched:
         with contextlib.suppress(OSError):
@@ -181,8 +208,17 @@ class Watcher:
     def _loop(self) -> None:
         while True:
             time.sleep(POLL_SECONDS)
-            with contextlib.suppress(Exception):
-                self._check()
+            self.tick()
+
+    def tick(self) -> None:
+        """One poll. A failed rebuild is reported, never hidden: the
+        thread goes on polling, and the next save tries again."""
+        try:
+            self._check()
+        except Exception:
+            traceback.print_exc()
+            print("Rebuild failed; the page was not updated. "
+                  "Save again to retry.")
 
     def _check(self) -> None:
         now = snapshot()
@@ -191,8 +227,10 @@ class Watcher:
         self._seen = now
         if not changed and not removed:
             return
-        chapters = [p for p in changed if p.suffix == ".md"]
-        full = bool(removed) or len(chapters) != len(changed)
+        markdown = [p for p in changed if p.suffix == ".md"]
+        # A chapter and its solutions file changed together rebuild once.
+        chapters = list(dict.fromkeys(source_chapter(p) for p in markdown))
+        full = bool(removed) or len(markdown) != len(changed)
         with self.lock:
             if full or not chapters:
                 print("Rebuilding the whole site...")
