@@ -374,6 +374,8 @@ print(10 if count is None else count)  # Keeps the 0
 
 `and` stops at its first falsy operand and returns it,
 so Python skips `items[0]` on the empty list.
+When every operand is truthy, `and` returns the last one,
+so the same expression on a nonempty list yields `items[0]`.
 `x or default` is a common way to supply a fallback,
 and it replaces every falsy `x`.
 A legitimate `0` or `""` gets the fallback the same as a missing value does.
