@@ -78,8 +78,8 @@ print(sys.modules["use_module"] is use_module)
 ```
 
 `use_module`'s body runs once, although two `import` statements name it.
-The first `import` stores the finished module object in `sys.modules`,
-a dict keyed by dotted module name.
+The first `import` creates the module object, stores it in `sys.modules`,
+a dict keyed by dotted module name, and then runs the file's body to fill it.
 Every later `import` of that name, from any file in the program,
 finds it there and binds the same object instead of re-running the file,
 so `use_module` and `second` are one object.
@@ -400,8 +400,11 @@ When the cycle exists only in annotations,
 an `if TYPE_CHECKING:` import breaks it.
 `typing.TYPE_CHECKING` is `False` at runtime,
 so the import under it runs for the type checker alone.
-The annotations still work at runtime,
-because Python does not evaluate them at import time.
+The module still imports,
+because Python evaluates an annotation only when something reads it.
+Reading one of these at runtime,
+through `__annotations__` or `typing.get_type_hints()`, raises a `NameError`,
+so the guard suits names that appear in annotations alone.
 [A robot in a maze](38_Patterns--Simulation.md#rooms-robots-and-the-item-factory)
 imports `Room` that way, and every use of the name is an annotation.
 
