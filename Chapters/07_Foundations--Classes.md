@@ -221,6 +221,9 @@ A helper object or a module-level function is almost always clearer.
 the class's *method resolution order* (MRO).
 The MRO names the classes Python searches for a name,
 starting with the class and ending at `object`.
+`super()` searches the same list,
+starting with the class after the one whose method calls it,
+so `super().show(msg)` in `Derived` reaches `Simple`'s `show()`.
 Python builds that list with *C3 linearization*,
 the algorithm that also decides the order when two base classes share an ancestor
 ([Rethinking Objects](20_Patterns--Rethinking_Objects.md#one-class-many-protocols) returns to that case).
@@ -416,7 +419,7 @@ expect(ValueError, Circle, -1)
 The two lines that read `c.radius` and `c.area` are the ones from `properties.py`,
 unchanged.
 Code outside the class reads both versions the same way,
-and that is why you can wait to add a setter until you need one.
+and that is why you can wait to convert an attribute into a property until you need the validation.
 
 The property owns the name `radius` on the class,
 so the value goes into a separate attribute.
