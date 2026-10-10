@@ -606,7 +606,9 @@ Collecting every `piece.expression` above uses a [list comprehension](16_Techniq
 which has the same kind of `for` clause as the generator expression in `arithmetic.py` but builds a list.
 Iteration skips empty literal strings,
 so the leading `''` in `message.strings` does not reach the loop.
-That skipping is why a consumer cannot assume that literals and interpolations alternate.
+That skipping is why a consumer cannot assume that literals and interpolations alternate:
+two interpolations side by side, as in `t"{first}{last}"`,
+arrive as two `Interpolation`s in a row.
 
 `shout()` uppercases the literal text and leaves the interpolated values in their original case.
 No amount of work on a finished f-string could do that reliably,
@@ -640,8 +642,8 @@ For example: `ThisIsMyClass`.
 When users call a class the way they call a function,
 that class may use `snake_case` instead,
 so the name reads as the action the call performs and the caller treats it as a function.
-The standard library names `contextlib.suppress`, `functools.partial`,
-and the built-ins `property` and `staticmethod` that way.
+The standard library names `contextlib.suppress`, `contextlib.redirect_stdout`,
+and `functools.partial` that way.
 Name every other class `CapWords`.
 
 [PEP 8](https://peps.python.org/pep-0008/#naming-conventions)
