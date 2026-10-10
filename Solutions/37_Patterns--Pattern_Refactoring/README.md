@@ -180,7 +180,7 @@ def heaviest(items: list[Trash]) -> Trash:
 <summary>Solution</summary>
 
 If you call `max(items)` without the `key=` argument,
-`heaviest()` raises a `TypeError`: "'>' not supported between instances of 'Aluminum' and 'Plastic'".
+`heaviest()` raises a `TypeError`: `'>' not supported between instances of 'Aluminum' and 'Plastic'`.
 `ty` reports the same call as an `invalid-argument-type`, because a record defines no ordering for `max()` to use.
 The solution passes `key=lambda t: t.weight`, so `max()` compares the weights and returns the whole piece.
 
@@ -557,7 +557,7 @@ out.
 <summary>Where to look</summary>
 
 [One `singledispatch` Function per Operation](../../Chapters/37_Patterns--Pattern_Refactoring.md#one-singledispatch-function-per-operation) builds `hazard()` with a base function that answers for any unregistered type.
-For `strict_hazard()`, make the base function raise `NotImplementedError` with a message naming the type, then register each material whose hazard you know, including those whose answer is "none".
+For `strict_hazard()`, make the base function raise `NotImplementedError` with a message naming the type, then register each material whose hazard you know, including those whose answer is `"none"`.
 Decide by comparing what a silent default and a stopped program each cost when you forget a registration.
 
 <details>
@@ -609,12 +609,12 @@ def _(t: Paper) -> str:
 <summary>Solution</summary>
 
 If you register `Aluminum` for `strict_hazard()` and skip `Paper`,
-whose answer is "none", `strict_hazard(Paper(1.0))` raises a
-`NotImplementedError` reading "no hazard rule for Paper",
+whose answer is `"none"`, `strict_hazard(Paper(1.0))` raises a
+`NotImplementedError` reading `no hazard rule for Paper`,
 and the program stops before it reaches the plastic.
 The strict base function refuses every unregistered type,
 harmless ones included.
-The solution registers `Paper` with its "none" answer, which is
+The solution registers `Paper` with its `"none"` answer, which is
 the cost that the exercise's last question names.
 
 ```python
@@ -668,15 +668,15 @@ expect(NotImplementedError, strict_hazard, Plastic(1.0))
 #: [NotImplementedError] no hazard rule for Plastic
 ```
 
-**Fall back to a default answer.** `hazard()` answers "none" for the plastic. That answer is wrong and
-looks like every correct "none" beside it. The forgotten registration
+**Fall back to a default answer.** `hazard()` answers `"none"` for the plastic. That answer is wrong and
+looks like every correct `"none"` beside it. The forgotten registration
 produces no exception and no report from the type checker.
 
 **Refuse an unregistered type.** `strict_hazard()` raises a `NotImplementedError` that names the
 material at the first call.
 
 **Register every material.** The strict form costs one registration
-for every material, including each one whose answer is "none".
+for every material, including each one whose answer is `"none"`.
 `Paper` needs three lines to say what `hazard()`'s base function
 answers without a registration.
 

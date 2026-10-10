@@ -507,7 +507,7 @@ that same position-0 element. The second `2` slides down into slot 0,
 which the loop has passed, so the next iteration looks at position 1
 and finds `1`. The loop does not visit the survivor.
 
-The prediction covers more than "one survives". It says which item
+The prediction covers more than "one survives." It says which item
 and where. The survivor is whatever slides into a slot the loop has
 passed, so its final position depends on the data. In the chapter's
 `[1, 2, 2, 3]` the survivor sits mid-list. Here it sits first. The

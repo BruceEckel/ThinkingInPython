@@ -1378,7 +1378,7 @@ def unregistered(namespace: dict[str, object]) -> list[str]:
 
 If you leave `@runtime_checkable` off `Shape`, `Hexagon().draw()` still works and `make("Hexagon")` still raises a `KeyError`,
 but `unregistered(globals())` raises a `TypeError` at its `issubclass()` call:
-"Instance and class checks can only be used with @runtime_checkable protocols".
+`Instance and class checks can only be used with @runtime_checkable protocols`.
 `ty` reports the same call before the program runs, as `isinstance-against-protocol`.
 The solution decorates the Protocol because `issubclass()` rejects a Protocol that is not runtime-checkable.
 

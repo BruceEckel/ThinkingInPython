@@ -358,7 +358,7 @@ def broken(data: int) -> None:
 If you catch each exception and move on without keeping it,
 every responder runs, but `announce()` returns normally.
 The demo's `except*` block does not run, so the script prints nothing,
-and the test's `pytest.raises(ExceptionGroup)` fails with "DID NOT RAISE".
+and the test's `pytest.raises(ExceptionGroup)` fails with `DID NOT RAISE`.
 The solution keeps each exception in a list and raises the list as one `ExceptionGroup` once the loop ends.
 
 ```python

@@ -816,8 +816,8 @@ print(list(flatten_str([1, ["ab", [2]], 3])))
 #: [1, 'ab', 2, 3]
 ```
 
-**Descend until a leaf.** `flatten()` asks one question, "is this an
-`int`?", and recurses into every item that is not one. A `str` is not
+**Descend until a leaf.** `flatten()` asks of each item whether it
+is an `int`, and recurses into every item that is not one. A `str` is not
 an `int`, so `"ab"` goes to `flatten("ab")`, which iterates over it
 and gets `"a"`. That `"a"` is also not an `int`, so `flatten("ab")`
 recurses into `flatten("a")`, which iterates over `"a"` and gets

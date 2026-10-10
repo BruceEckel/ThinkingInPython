@@ -418,8 +418,9 @@ def quadrant(p: Point) -> str:
 
 If you write the second version without its final `case _`, the
 script still prints the same two lines, but `ty` reports
-`invalid-return-type`: "Function can implicitly return `None`, which
-is not assignable to return type `str`". The six cases cover all nine
+`invalid-return-type`, since the function can implicitly return
+`None`, which is not assignable to its return type `str`.
+The six cases cover all nine
 pairs of signs, but to the type checker `sign()` returns any `int`,
 so a pair such as `(2, 5)` matches none of them. The solution keeps
 an unreachable `case _` so every path returns a `str`.

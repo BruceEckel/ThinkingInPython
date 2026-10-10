@@ -743,7 +743,7 @@ class Command:
 If you end the payload after `print("injected code ran")
 ` and leave
 out the triple-quoted line, the script prints nothing and stops with a
-`SyntaxError`, "unterminated string literal". `exec()` compiles the
+`SyntaxError`, `unterminated string literal`. `exec()` compiles the
 whole spliced source before running any of it, and the second splice
 puts a newline inside the `super().__init__("...")` literal, so the
 injected `print()` does not run. The solution's payload ends with
