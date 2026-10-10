@@ -33,7 +33,7 @@ class Counter(Broadcaster[int]):
         self.announce(self._count)
 
 @record
-class View:
+class CountView:
     model: Counter
 
     def __post_init__(self) -> None:
@@ -66,7 +66,7 @@ class VimController:  # k is up, j is down
                 pass
 
 model = Counter()
-view = View(model)
+view = CountView(model)
 bar = BarView(model)
 vim = VimController(model)
 for char in "kkj":

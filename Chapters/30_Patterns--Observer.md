@@ -24,7 +24,7 @@ when you create the subject.
 
 The classic example is Smalltalk's *Model-View-Controller* (MVC),
 or the nearly-equivalent *Document-View* architecture,
-which folds the controller into the view.
+which combines the controller with the view.
 In both, *Observer* connects the state change to its views.
 One subject keeps a list of views and accepts any view that has the update method it calls.
 This way, a *document* can have more than one way to view it,
@@ -1466,11 +1466,12 @@ reads `size` and `grid`, and calls `select()`.
 
 ## Document-View and MVC
 
-This chapter opened by saying Document-View folds the controller into the view.
+This chapter opened by saying Document-View combines the controller with the view.
 We'll look at two approaches that differ only in where the input handling lives:
-`View` has a `key()` method as a controller in Document-View,
+with Document-View, `View` has a `key()` method as a controller,
 while MVC gives `key()` to a `Controller` class.
-They share the same model, a counter:
+They share two models.
+The first is a counter:
 
 ```python
 # counter_model.py
@@ -1494,57 +1495,99 @@ class Counter(Broadcaster[int]):
         self.announce(self._count)
 ```
 
+The second records every key pressed,
+and announces the keys so far as one string:
+
+```python
+# history_model.py
+from broadcaster import Broadcaster
+
+class History(Broadcaster[str]):
+    def __init__(self) -> None:
+        super().__init__()
+        self._history: list[str] = []
+
+    @property
+    def history(self) -> str:
+        return "".join(self._history)
+
+    def add(self, char: str) -> None:
+        self._history.append(char)
+        self.announce(self.history)
+```
+
+Each model announces its own kind of data,
+an `int` from `Counter` and a `str` from `History`,
+so a responder connects to one model or the other.
+
 In Document-View, a single class both displays and interprets input:
 
 ```python
 # document_view.py
 from counter_model import Counter
+from history_model import History
 from record import record
 
 @record
 class View:
-    model: Counter
+    counter: Counter
+    history: History
 
     def __post_init__(self) -> None:
-        self.model.connect(self.display)
+        self.counter.connect(self.display_count)
+        self.history.connect(self.display_history)
 
-    def display(self, count: int) -> None:
+    def display_count(self, count: int) -> None:
         print(f"count: {count}")
 
+    def display_history(self, keys: str) -> None:
+        print(f"keys: {keys}")
+
     def key(self, char: str) -> None:  # The controller
+        self.history.add(char)
         match char:
             case "+":
-                self.model.increment()
+                self.counter.increment()
             case "-":
-                self.model.decrement()
+                self.counter.decrement()
             case _:
                 pass
 
-view = View(Counter())
+view = View(Counter(), History())
 for char in "++-x":
     view.key(char)
+#: keys: +
 #: count: 1
+#: keys: ++
 #: count: 2
+#: keys: ++-
 #: count: 1
+#: keys: ++-x
 ```
 
 `key()` is the controller, contained within `View` as a method.
-`__post_init__()` connects `display()` to the model,
+`__post_init__()` connects a display method to each model,
 so a `View` is wired as soon as it exists.
-`key()` sends a request to the model,
-which then pushes its count to `display()`.
-In the wildcard case matched by `x`, `key()` returns without touching the model,
-so the four characters of `"++-x"` print three counts.
+`key()` records the character in the history and sends a request to the counter,
+and each model pushes its new state to the display method connected to it.
+In the wildcard case matched by `x`, `key()` leaves the counter alone,
+so the four characters of `"++-x"` print four histories and three counts.
 
-MVC uses separate classes for the view and the controller:
+Because `key()` writes to both models, `View` holds both,
+and because `View` is the one class that displays,
+both display methods sit beside `key()`.
+A third model means a third field and a third display method in the same class.
+
+MVC uses separate classes for the views and the controller:
 
 ```python
 # model_view_controller.py
 from counter_model import Counter
+from history_model import History
 from record import record
 
 @record
-class View:
+class CountView:
     model: Counter
 
     def __post_init__(self) -> None:
@@ -1554,82 +1597,114 @@ class View:
         print(f"count: {count}")
 
 @record
+class HistoryView:
+    model: History
+
+    def __post_init__(self) -> None:
+        self.model.connect(self.display)
+
+    def display(self, keys: str) -> None:
+        print(f"keys: {keys}")
+
+@record
 class Controller:  # Interprets but doesn't display
-    model: Counter
+    counter: Counter
+    history: History
 
     def key(self, char: str) -> None:
+        self.history.add(char)
         match char:
             case "+":
-                self.model.increment()
+                self.counter.increment()
             case "-":
-                self.model.decrement()
+                self.counter.decrement()
             case _:
                 pass
 
 @record
 class VimController:  # k is up, j is down
-    model: Counter
+    counter: Counter
+    history: History
 
     def key(self, char: str) -> None:
+        self.history.add(char)
         match char:
             case "k":
-                self.model.increment()
+                self.counter.increment()
             case "j":
-                self.model.decrement()
+                self.counter.decrement()
             case _:
                 pass
 
-model = Counter()
-view = View(model)
-controller = Controller(model)
+counter = Counter()
+history = History()
+count_view = CountView(counter)
+history_view = HistoryView(history)
+controller = Controller(counter, history)
 for char in "++-x":
     controller.key(char)
+#: keys: +
 #: count: 1
+#: keys: ++
 #: count: 2
+#: keys: ++-
 #: count: 1
-vim = VimController(model)  # Same model, same view
+#: keys: ++-x
+vim = VimController(counter, history)  # Same models
 for char in "kkj":
     vim.key(char)
+#: keys: ++-xk
 #: count: 2
+#: keys: ++-xkk
 #: count: 3
+#: keys: ++-xkkj
 #: count: 2
 ```
 
-In MVC, the View and the Controller never directly interact;
-they only communicate through the model.
-`Controller.key()` calls `increment()` or `decrement()`,
-the model announces its new count, and `View.display()` prints it.
-Neither class holds a reference to the other.
-Each holds the model, and the model knows neither of them:
+In MVC, the views and the controller never directly interact;
+they communicate through the models.
+`Controller.key()` adds the key to the history and calls `increment()` or `decrement()`,
+each model announces its new state,
+and the view connected to that model prints it.
+No view holds a reference to the controller, and the controller holds no view.
+The controller holds both models because it writes to both,
+while each view holds the one model it displays:
+`CountView` knows nothing of `History`,
+and `HistoryView` knows nothing of `Counter`.
+Each model knows none of them:
 it announces to whatever responders are connected.
 
 That one-way flow is the benefit of the split.
-Because the view hears from the model alone,
-you can replace the controller and the view keeps working.
+Because each view hears from its model alone,
+you can replace the controller and the views keep working.
 `VimController` reads `k` and `j` where `Controller` reads `+` and `-`.
-It takes the same `model`,
-and the `view` built earlier goes on printing each count,
-since the announcements it receives come from the model,
+It takes the same two models, and the views built earlier go on printing,
+since the announcements they receive come from the models,
 whichever controller sent the request.
+The history carries across the swap as well: `vim`'s first key prints `++-xk`,
+because the keys live in `History` rather than in the controller that recorded them.
 Which keys mean up and down is the controller's decision alone,
-and a new key scheme is a new class, with `View` and `Counter` untouched.
+and a new key scheme is a new class, with the views and the models untouched.
 The same holds in the other direction:
-a second view connects to the model and both views print,
+a second view connects to a model and both views print,
 with no change to either controller (see exercise 13).
-Testing follows the same lines.
-A `Controller` needs a `Counter`, so a test builds one, calls `key()`,
-and reads `model.count`, with no view and no output to capture.
+A third model is a new view class and one more field in each controller,
+with `CountView` and `HistoryView` untouched.
+Testing benefits in the same way.
+A `Controller` needs a `Counter` and a `History`, so a test builds both,
+calls `key()`, and reads `counter.count` and `history.history`,
+with no view and no output to capture.
 
 In Document-View, one class contains both the Controller and the View,
-interpreting the keys and displaying the count.
-`View.key()` and `View.display()` share an instance,
+interpreting the keys and displaying every model the keys touch.
+`View.key()` and the display methods share an instance,
 so a different set of keys means editing `View` or subclassing it,
 and the display code comes along either way.
-A counter has one key handler and one display,
+`View` has one key handler and two displays,
 and `grid_view.py` has the same shape:
 `draw()` paints and the `bind()` lambda handles the click, both inside `show()`.
 Split the controller out when input handling varies on its own,
-when the same display must answer to more than one input scheme,
+when the same displays must answer to more than one input scheme,
 or when interpreting input deserves tests that draw nothing.
 
 ## Deciding What Matters
@@ -1829,7 +1904,7 @@ Try each exercise before opening its [solution](../Solutions/30_Patterns--Observ
     so filtering by name is the responder's job, as it is for `WeatherStation`.
 13. Connect a second view to `model_view_controller.py`'s `Counter`:
     one that prints a bar of asterisks as long as the count,
-    beside the `View` that prints the number.
+    beside the `CountView` that prints the number.
     Drive both with `VimController` and show that one key updates the pair.
     Then say what each class knows about the others,
     and which of them a third view would require you to change.

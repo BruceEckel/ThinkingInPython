@@ -1944,7 +1944,7 @@ so `calls` holds the two assignments that follow `@station.respond`.
 
 > Connect a second view to `model_view_controller.py`'s `Counter`:
 > one that prints a bar of asterisks as long as the count,
-> beside the `View` that prints the number.
+> beside the `CountView` that prints the number.
 > Drive both with `VimController` and show that one key updates the pair.
 > Then say what each class knows about the others,
 > and which of them a third view would require you to change.
@@ -1952,7 +1952,7 @@ so `calls` holds the two assignments that follow `@station.respond`.
 <details>
 <summary>Where to look</summary>
 
-In [Document-View and MVC](../../Chapters/30_Patterns--Observer.md#document-view-and-mvc), `View` connects its `display()` to the model in `__post_init__()`.
+In [Document-View and MVC](../../Chapters/30_Patterns--Observer.md#document-view-and-mvc), `CountView` connects its `display()` to the model in `__post_init__()`.
 A second view does the same with its own display method,
 and `VimController` needs no change to feed both.
 
@@ -1991,7 +1991,7 @@ class Counter(Broadcaster[int]):
         ...
 
 @record
-class View:
+class CountView:
     model: Counter
 
     def __post_init__(self) -> None:
@@ -2057,7 +2057,7 @@ class Counter(Broadcaster[int]):
         self.announce(self._count)
 
 @record
-class View:
+class CountView:
     model: Counter
 
     def __post_init__(self) -> None:
@@ -2090,7 +2090,7 @@ class VimController:  # k is up, j is down
                 pass
 
 model = Counter()
-view = View(model)
+view = CountView(model)
 bar = BarView(model)
 vim = VimController(model)
 for char in "kkj":
@@ -2108,6 +2108,10 @@ Each key press reaches both views through the model.
 and the `Counter` announces its new count to every connected responder.
 The views print in the order they connected.
 The controller holds no reference to either view.
+
+This copy of `VimController` leaves out the chapter's `History` model,
+since the exercise concerns views on the `Counter`;
+connecting a second view to `History` works the same way.
 
 `Counter` knows a list of responders and nothing about views or controllers.
 Each view knows the `Counter` to which it connects.
