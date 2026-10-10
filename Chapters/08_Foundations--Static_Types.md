@@ -180,7 +180,8 @@ print(shout(None))
 
 Inside the `if`, the type checker *narrows* `text` from `str | None` to `str`,
 so `.upper()` needs no cast.
-Outside the `if`, `text` is still the full `str | None`.
+After the `if`, `text` is `None`, since the branch returned for every `str`;
+without that `return`, it would be the full `str | None` again.
 A truthiness test, `if text:`, narrows the same way, since `None` is falsy,
 but it sends the empty string to the other branch along with `None`,
 so test `is not None` when an empty value counts as supplied (see exercise 8).
@@ -571,8 +572,8 @@ If you pass `circles`,
 The type checker refuses the call to prevent that.
 A read-only container has no such problem,
 so `Sequence[Shape]` accepts a `list[Circle]`.
-Annotating a parameter `Sequence[T]` instead of `list[T]` declares that the function reads its argument and leaves it as it was,
-so the function accepts arguments that a `list[T]` parameter rejects.
+Annotating a parameter `Sequence[Shape]` instead of `list[Shape]` declares that the function reads its argument and leaves it as it was,
+so the function accepts arguments that a `list[Shape]` parameter rejects.
 A `list[T]` is *invariant* in `T`, and a `Sequence[T]` is *covariant*.
 
 ### Type Parameter Defaults {#type-parameter-defaults}
