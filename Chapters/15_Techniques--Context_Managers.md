@@ -547,7 +547,7 @@ which `parse()` passes on to `int()`.
 The message from `[2]` is too long for one line, so it wraps.
 
 `aexpect()` is the `async` form.
-It awaits the call instead of making it,
+It calls `fn` and awaits the coroutine the call returns,
 for a coroutine function whose failure is the demonstration.
 
 Where a demonstration needs several statements or an assignment in the guarded block,
@@ -895,11 +895,10 @@ and `sys.stdout`, open, as the caller expects.
 ## The Async Protocol
 
 `with` calls `__enter__()` and `__exit__()`.
-`async with` calls `__aenter__()` and `__aexit__()`, which are coroutines,
+`async with` calls `__aenter__()` and `__aexit__()` and awaits what they return,
 so the setup and the cleanup can both await.
 `contextlib.asynccontextmanager` builds such a manager from an async generator,
-the same way `@contextmanager` builds the synchronous form,
-and `AsyncExitStack` is the `ExitStack` equivalent:
+the same way `@contextmanager` builds the synchronous form:
 
 ```python
 # async_manager.py
@@ -934,7 +933,8 @@ Everything this chapter says about ordering, the three exception arguments,
 and suppression through a truthy return applies unchanged.
 The Concurrency chapter uses `async with` throughout, for `asyncio.TaskGroup`,
 locks, and semaphores.
-Each of those is an object with the two `a`-prefixed methods.
+Each of those is an object with the two `a`-prefixed methods,
+and `AsyncExitStack` is the `ExitStack` equivalent for holding several of them.
 
 ## An Object Pool
 
