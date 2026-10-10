@@ -152,7 +152,7 @@ A parameter with a default cannot come before one with no default.
 `def f(a=1, b):` is a `SyntaxError`:
 `parameter without a default follows parameter with a default`.
 [Keyword-only parameters](#positional-only-and-keyword-only-parameters)
-are exempt, because the caller names them.
+are exempt: `def f(*, a=1, b):` is legal, because the caller names `b`.
 
 ### The Mutable Default Trap
 
@@ -343,11 +343,9 @@ print(count)
 #: 1
 ```
 
-`rebinds()` leaves the module-level `count` alone.
-Python decides which names are local when it compiles the function,
-before any of it runs:
-a name assigned anywhere in the body is local throughout the body.
-`+=` is an assignment, so if you drop the `global` from `writes_global()`,
+`rebinds()` leaves the module-level `count` alone,
+because its `count = 99` binds a local.
+`+=` is an assignment too, so if you drop the `global` from `writes_global()`,
 the compiler marks `count` local for the whole function,
 and the read half of `count += 1` looks up a local that has no value yet.
 The call raises an `UnboundLocalError`.
@@ -543,6 +541,9 @@ such as `dict.get(key, default=None, /)`.
 Marking a parameter positional-only also keeps its name out of the method's contract.
 That matters when a subclass overrides a method.
 The subclass can rename the parameter, and the type checker accepts the rename.
+The marker also frees the name for `**kwargs`:
+with `def trace(func, /, *args, **kwargs)`,
+a caller's `func=` keyword lands in `kwargs` instead of clashing with the parameter.
 
 ## Lambdas
 
@@ -578,7 +579,8 @@ For a key that reads an index or an attribute,
 `operator.itemgetter()` and `operator.attrgetter()` name the same operation without a lambda.
 `sorted(words, key=operator.itemgetter(-1))` replaces `key=lambda w: w[-1]` in `lambdas.py`.
 For a key that calls a method on each element,
-`operator.methodcaller("lower")` replaces `lambda w: w.lower()`.
+`operator.methodcaller("lower")` replaces `lambda w: w.lower()`,
+and when every element is a `str`, so does `str.lower`.
 Write a lambda when the key needs an expression that none of the three builds.
 
 ## Exercises
