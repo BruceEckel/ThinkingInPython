@@ -1,7 +1,3 @@
-1. The outside-review tool could retry the two Flash failure shapes itself instead of needing three manual reruns.
-In tools/outside_review.py, add a --retries N option (default 2) that reruns a chapter whose result is status ERROR with "exceeded the output token limit" or an empty response from a denied tool call, logging each attempt, and update the docstring and the tip task help.
-2. Chapters 1 through 16 have never had an outside review, and the improved prompt now rejects far less.
-Run tip outside-review over chapters 1-16 on the Pro model, serially, in the background, and apply them one chapter at a time the way chapters 18-47 were done, Verdicts section included, committing each chapter separately.
 3. Chapter 34's figure and listing disagree on the call form.
 In chapter 34, the composite_tree figure and the opening sentence write disk_usage(root) as a function while filesystem_classic.py calls root.disk_usage(). Decide which form the section teaches first, make the figure spec in tools/story_figures/ and the sentence agree with it, regenerate the figure, and commit.
 
