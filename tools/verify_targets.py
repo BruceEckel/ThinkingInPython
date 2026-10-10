@@ -12,8 +12,15 @@ list to keep in sync. A handful of targets never run, regardless of tier:
     nothing for a subprocess call to wait on.
   * verify-targets -- the target that runs this script; testing it would
     recurse.
-  * check-ch -- takes a CH= chapter selector and exits with a usage error
-    without one; there is no chapter this script could pick for it.
+  * check-ch, editor-load, editor-apply, editor-pin -- take a CH=
+    chapter selector and exit with a usage error without one; there is
+    no chapter this script could pick for them.
+  * edit-patterns -- needs an edit range (--since or --range) or an open
+    edit-start tag, which is local state another checkout lacks.
+  * grounding-triage and link-support, on a machine with no
+    TYPESAFE_API_KEY (the WSL clone, 2026-10-10) -- they ask TypeSafe a
+    question, and a missing key is the environment, not their wiring,
+    so they are skipped there and run where the key is set.
   * pyright -- the raw run over both trees, which prints every
     disagreement with ty (all of them in tools/data/pyright_baseline.txt)
     and exits nonzero by design; pyright-review, which runs here, is
@@ -76,6 +83,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import cast
 
+from tools.judgments import API_KEY_ENV, registry_key
 from tools.tip import tip_argv
 from tools.tip_help import entries
 from tools.config import ROOT
@@ -98,6 +106,10 @@ EXCLUDED: dict[str, str] = {
     "preview-check": "needs node, and the network to install jsdom",
     "verify-targets": "this is the target that runs this script",
     "rewrite": "runs headless claude passes that cost tokens and edit prose",
+    **{name: "takes a CH= chapter and exits with a usage error without one"
+       for name in ("editor-load", "editor-apply", "editor-pin")},
+    "edit-patterns": "needs --since/--range or an open edit-start tag, "
+                     "local state another checkout lacks",
     "prompt-facts": "asks Gemini through agy; costs tokens and takes minutes",
     "outside-review": "sends a chapter to Gemini through agy; costs tokens "
                       "and needs a signed-in agy",
@@ -110,6 +122,27 @@ EXCLUDED: dict[str, str] = {
        for name in ("rust-all", "rust-sync", "rust-build", "rust-test",
                     "rust-clean")},
 }
+
+# Targets that ask TypeSafe a question. With no key on this machine they
+# are skipped, not failed: the key is the environment, not the wiring.
+NEEDS_TYPESAFE_KEY: frozenset[str] = frozenset({
+    "grounding-triage", "link-support",
+})
+
+
+def typesafe_key_present() -> bool:
+    """Whether a TypeSafe key is set, in the environment or the registry."""
+    return bool(os.environ.get(API_KEY_ENV) or registry_key())
+
+
+def exclusions() -> dict[str, str]:
+    """EXCLUDED, plus the TypeSafe targets when no key is set here."""
+    excluded = dict(EXCLUDED)
+    if not typesafe_key_present():
+        for name in sorted(NEEDS_TYPESAFE_KEY):
+            excluded[name] = f"asks TypeSafe, and no {API_KEY_ENV} is set here"
+    return excluded
+
 
 # name -> the completion line an advisory target prints last, whatever
 # it found. check_links ends with "88 ok, 1 failing.".
@@ -287,10 +320,11 @@ def main(argv: list[str] | None = None) -> int:
         wanted = set(args.only)
         targets = [t for t in targets if t in wanted]
 
-    skipped = [t for t in targets if t in EXCLUDED]
+    excluded = exclusions()
+    skipped = [t for t in targets if t in excluded]
     worktree = [t for t in targets if t in WORKTREE_TARGETS]
     direct = [
-        t for t in targets if t not in EXCLUDED and t not in WORKTREE_TARGETS
+        t for t in targets if t not in excluded and t not in WORKTREE_TARGETS
     ]
 
     results: list[Result] = []
@@ -314,7 +348,7 @@ def main(argv: list[str] | None = None) -> int:
     if skipped:
         print("\nNever run (see the module docstring for why):")
         for name in skipped:
-            print(f"  {name}: {EXCLUDED[name]}")
+            print(f"  {name}: {excluded[name]}")
 
     failed = [r for r in results if not r.ok]
     print(f"\n{len(results)} target(s) tested, {len(failed)} failed, "

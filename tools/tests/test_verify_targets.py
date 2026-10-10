@@ -4,8 +4,12 @@ A failed target's summary shows the log's tail, which for Vale is a
 screen of warnings and a count. The excerpt also shows the error lines
 above the tail, so the cause appears without opening the log.
 """
+import pytest
+
+from tools import verify_targets
 from tools.tip_help import entries
-from tools.verify_targets import WORKTREE_TARGETS, excerpt
+from tools.verify_targets import (
+    EXCLUDED, NEEDS_TYPESAFE_KEY, WORKTREE_TARGETS, excerpt, exclusions)
 
 VALE = """
  Chapters/31_Patterns--State.md
@@ -50,3 +54,23 @@ def test_every_accept_target_runs_in_the_worktree() -> None:
 def test_every_worktree_target_is_a_task() -> None:
     names = {name for name, _ in entries() if name}
     assert WORKTREE_TARGETS <= names
+
+
+def test_every_excluded_target_is_a_task() -> None:
+    names = {name for name, _ in entries() if name}
+    assert set(EXCLUDED) <= names
+    assert NEEDS_TYPESAFE_KEY <= names
+    assert {"editor-load", "editor-apply", "editor-pin",
+            "edit-patterns"} <= set(EXCLUDED)
+
+
+def test_typesafe_targets_are_skipped_without_a_key(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.delenv(verify_targets.API_KEY_ENV, raising=False)
+    monkeypatch.setattr(verify_targets, "registry_key", lambda: None)
+    excluded = exclusions()
+    assert NEEDS_TYPESAFE_KEY <= set(excluded)
+    assert "TYPESAFE_API_KEY" in excluded["link-support"]
+    monkeypatch.setenv(verify_targets.API_KEY_ENV, "x")
+    assert not NEEDS_TYPESAFE_KEY & set(exclusions())
