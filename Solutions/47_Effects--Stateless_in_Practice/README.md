@@ -393,7 +393,7 @@ def run_load(
 ```
 
 `Turbine` is the only addition: a source available during a set range of hours,
-depleting nothing, since wind costs no fuel.
+depleting nothing, since a turbine burns no fuel.
 
 ## 3. A wind turbine between solar and the battery
 
@@ -1046,7 +1046,7 @@ three identical failures.
 Retrying is the wrong behavior because this failure is deterministic.
 `WEATHER`'s headline is the same on every attempt, and `TOPICS` holds the same
 two topics, so `topic_of()` returns the same answer however many times it runs.
-The retry costs three fetches and three sleeps to arrive at the answer the first
+The retry makes three fetches and three sleeps to arrive at the answer the first
 attempt had, since `retry()` sleeps after every failed attempt, the last
 included. It also turns a clear `NotInteresting` into a `RetryError`
 that the caller must unwrap.
@@ -2036,7 +2036,7 @@ accident, because it does not see the actors. `play()` is still there
 and still accepts any of them.
 
 Adding a fourth actor to the chapter's three-actor version shows where the
-cost falls. `quest.py` gains a `Protocol`, a member in `encounter()`'s `Need[...]`
+edits fall. `quest.py` gains a `Protocol`, a member in `encounter()`'s `Need[...]`
 union, a `yield from`, and a line that uses the new actor, so four edits.
 `casts.py` gains a name in its `from quest import` line, a parameter on
 `play()`, an argument in the `supply()` call, a class for each family, and an

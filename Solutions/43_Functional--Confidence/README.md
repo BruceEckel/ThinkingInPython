@@ -225,12 +225,11 @@ disagree on every list of two or more.
 Because `insertion_sort()` is slow and simple enough to check by
 reading, asserting that it agrees with `sorted()` pins down the
 elements, their multiplicities, and their order at once. The oracle
-earns its place because it repeats no part of `sorted()`'s
-implementation. It arrives at the same answer by a different route.
-That independence makes an oracle worth having, and makes
-`assert sorted(xs) == sorted(xs)` worthless. Capping the list length
-keeps the quadratic oracle cheap, since the bugs it catches show up on
-short inputs.
+repeats no part of `sorted()`'s implementation. It arrives at the
+same answer by a different route. That independence makes an oracle
+worth having, and makes `assert sorted(xs) == sorted(xs)` worthless.
+Capping the list length keeps the quadratic oracle fast, since the
+bugs it catches show up on short inputs.
 
 </details>
 </details>

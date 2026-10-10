@@ -216,14 +216,14 @@ advances the source by three.
 
 > `groupby()` on unsorted input silently returns the same key more than once.
 > Write `grouped(data, key)` returning a `dict[K, list[V]]` that cannot make that mistake,
-> and say what it costs relative to `groupby()`.
+> and say what it loses compared with `groupby()`.
 
 <details>
 <summary>Where to look</summary>
 
 [`groupby`](../../Chapters/41_Functional--Toolkits.md#groupby) shows why `groupby()` repeats a key when equal items are not adjacent.
 Accumulate into a `defaultdict(list)` keyed by `key(item)` instead, so each key exists once by construction.
-The cost follows from what the loop must finish before it can return anything.
+What `grouped()` loses follows from what the loop must finish before it can return anything.
 
 <details>
 <summary>The shape</summary>
@@ -272,9 +272,9 @@ unsorted input cannot occur. The two `"b"` entries go into the same
 list no matter how far apart they arrive, and the caller needs no
 `sorted()` call to group them.
 
-The cost is the streaming `groupby()` provides. `grouped()` reads the
-whole input before returning anything, so an infinite source makes it
-loop forever, and a finite one sits entirely in memory. `groupby()`
+`grouped()` loses the streaming that `groupby()` provides. It reads
+the whole input before returning anything, so an infinite source makes
+it loop forever, and a finite one sits entirely in memory. `groupby()`
 yields each group as it arrives and keeps only the current one, which
 is why it can stream a file larger than memory. It also preserves the
 input's order, while `grouped()` reports groups in first-appearance

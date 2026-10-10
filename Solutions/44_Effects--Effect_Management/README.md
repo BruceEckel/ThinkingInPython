@@ -241,16 +241,16 @@ helper that uses the `Log`. You must edit four existing signatures.
 
 **Hand the Effect down the call chain.** `session()`, `menu()`, and `main()` each
 gain a `log` parameter that they hand to the next function.
-Three of the five name a `Log` they do not use. Those functions
-sit between the Effect's user and the call site that binds it, and
-they pay for an Effect whose sole use in their bodies is forwarding
+Three of the five name a `Log` they do not use. Those functions sit
+between the Effect's user and the call site that binds it, and they
+take a `log` parameter whose sole use in their bodies is forwarding
 it. Their signatures now describe a capability they do not exercise,
 so a reader of `menu()` learns something false about what `menu()`
 does.
 
-The cost also scales the wrong way. Adding a fourth Effect later means
-walking the same chain again, and the chain is longer in a real
-program than in this one.
+The forwarding also grows with the program. Adding a fourth Effect
+later means walking the same chain again, and the chain is longer in
+a real program than in this one.
 
 The alternative most codebases pick, a module-level logger,
 removes the parameter by removing the choice. The function no longer
@@ -441,7 +441,7 @@ brought with them. A `PositiveInt` cannot hold zero, so the
 either, so the call to `validate()` goes, and `validate()` along with
 it. Only the division remains.
 
-**Fail at the construction site.** The cost moves rather than vanishing. `PositiveInt(bad)` still raises
+**Fail at the construction site.** The failure moves rather than vanishing. `PositiveInt(bad)` still raises
 an exception, at the boundary where an untrusted number enters the
 program, and a caller reading from a file or a form must still
 handle it. The count changes: one construction site instead of every
@@ -586,9 +586,9 @@ same sense as most of the AI languages in
 [Custom AI Languages with Effects](../../Chapters/44_Effects--Effect_Management.md#custom-ai-languages-with-effects).
 It tracks one Effect, chosen by the language, with the
 implementation set at the call site. That is also why the propagation
-feels like a nuisance rather than a benefit. You get the bookkeeping
-cost of Effect tracking without the delayed binding that would repay
-it.
+feels like a nuisance rather than a benefit. You do the bookkeeping
+of Effect tracking, an `await` and an `async def` in every caller,
+without the delayed binding that makes that bookkeeping useful.
 
 </details>
 </details>

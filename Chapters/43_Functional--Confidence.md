@@ -204,7 +204,7 @@ At smaller limits the serial run finishes before a pool has started its workers,
 so if you shrink the limits far enough,
 the parallel run takes longer than the serial one.
 Purity makes parallel safe.
-Whether parallel pays at a given size is a separate question,
+Whether parallel runs faster at a given size is a separate question,
 and the timing answers it.
 
 Sending the calls to a worker adds requirements of its own.
@@ -268,7 +268,7 @@ You decide how far up the spectrum to go.
    What this rung adds to rung 3 is expressiveness, not certainty.
    A type states what shape a value has.
    A property can state a fact about the value's behavior,
-   at the cost of checking a sample of inputs instead of every one.
+   but it checks a sample of inputs instead of every one.
 5. At the top is formal proof.
    In a dependently typed language such as Lean, Idris, or Rocq (formerly Coq),
    you prove a program correct for every possible input,
@@ -440,7 +440,7 @@ Hypothesis can rerun and shrink freely because each call depends on its argument
 Two caveats limit the chapter's argument.
 First, proof works on imperative code too.
 Hoare logic and tools like Dafny verify it.
-What purity changes is the cost.
+Purity changes the length of the proof.
 With no mutable state to track, each step of the reasoning is shorter.
 Functional programming does not make correctness provable so much as it makes the proof affordable.
 Second, most functional code stops well below the top rung.

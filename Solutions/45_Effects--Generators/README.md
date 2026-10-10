@@ -245,7 +245,7 @@ generator asking the questions for which the driver has replies,
 in that order. Both satisfy the same type. The type says what
 travels, not what the driver knows.
 
-**Keep the two endings apart.** One detail in `drive_in_order()` earns its comment. `next(answers)` sits
+**Keep the two endings apart.** One detail in `drive_in_order()` needs its comment. `next(answers)` sits
 outside the `try` because the `except StopIteration` meant for the
 conversation otherwise catches a `StopIteration` raised by an
 exhausted answer list. Two different iterators raising one exception
@@ -731,18 +731,19 @@ the same `Generator` annotation.
 
 For another state, take the table. The generator's compactness comes
 from the states forming a line, so control flow can express the
-sequence. The two states here that break the line cost something. An
-`if` chain reaches `UNAVAILABLE` and `NEED_MONEY`, and each one returns
-by looping back to the top, a `goto` written as a `while True`. If you
-add a state reachable from three others, the way the table handles
-`Quit` from every state but `QUIESCENT`, no position in the body
-corresponds to it. The new state becomes a flag, or a check repeated at
-several `yield`s, and either one breaks the correspondence between
-position and state, the one thing that makes this version readable.
+sequence. The two states here that break the line need extra control
+flow. An `if` chain reaches `UNAVAILABLE` and `NEED_MONEY`, and each
+one returns by looping back to the top, a `goto` written as a
+`while True`. If you add a state reachable from three others, the way the
+table handles `Quit` from every state but `QUIESCENT`, no position in
+the body corresponds to it. The new state becomes a flag, or a check
+repeated at several `yield`s, and either one breaks the correspondence
+between position and state, the one thing that makes this version
+readable.
 
-The table pays a constant cost instead. Adding a state means one new
-`Enum` member and a few new rows. Those rows sit next to the existing
-ones, where you can read the whole machine at once.
+With the table, adding any state means one new `Enum` member and a
+few new rows. Those rows sit next to the existing ones, where you can
+read the whole machine at once.
 
 The generator is the better choice for a conversation with a
 beginning and an end, like `interview()`. The table is the better

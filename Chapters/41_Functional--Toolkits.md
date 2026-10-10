@@ -99,7 +99,7 @@ One trap: decorating a method with `@cache` keys every entry on `self`,
 so the cache holds a strong reference to each instance forever.
 That is *Observer*'s [*lapsed listener* leak](30_Patterns--Observer.md#lapsed-listeners)
 in cache form.
-For the usual case, one expensive value per instance,
+For the usual case, one slow computation per instance,
 use [`@cached_property`](#cached_property).
 It stores the result in the instance's `__dict__`,
 so the result goes away with the instance.
@@ -1033,7 +1033,7 @@ Called with `size=2`,
 `group_rounds()` covers all `21` possible pairs across the seven rounds,
 with no rotation and no stationary player: a shuffle,
 then a greedy choice repeated until the pool is empty.
-The coverage costs `14` repeat meetings.
+The seven rounds also hold `14` repeat meetings.
 An odd roster leaves one player over,
 so each round adds that player to an existing pair.
 A triple holds three meetings where a pair holds one,
@@ -1142,7 +1142,7 @@ Try each exercise before opening its [solution](../Solutions/41_Functional--Tool
     Show that it stays lazy by passing it `count(1)` and taking five values.
 4.  `groupby()` on unsorted input silently returns the same key more than once.
     Write `grouped(data, key)` returning a `dict[K, list[V]]` that cannot make that mistake,
-    and say what it costs relative to `groupby()`.
+    and say what it loses compared with `groupby()`.
 5.  Decorate `deep_sum()` with `@cache` and explain the exception.
     What must change about the `Nested` alias for caching to be possible?
 6.  `group_rounds()` takes a `seed` and builds its own `random.Random`.

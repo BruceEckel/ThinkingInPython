@@ -164,15 +164,14 @@ as in `copy.replace(p, x=p.x + 10)`.
 When a value is immutable,
 two parts of a program can share one without coordinating,
 and concurrent code needs no lock to read it.
-That safety has a cost, and the cost is copying.
+That safety requires copying.
 Python's immutable types share no structure.
 `moved = Point(p.x + 10, p.y)` in `immutability.py` builds a new `Point`,
 and changing one field of a large tuple or frozen dataclass means rebuilding the whole value,
 not patching one slot in place.
 Copying a two-field `Point` takes so little time that you can ignore it.
 A large structure that changes often copies the whole value on every change.
-That time and memory are the price of sharing without coordination.
-Languages built around immutability answer this with *persistent* data structures,
+Languages built around immutability avoid that full copy with *persistent* data structures,
 which share every part a change leaves alone.
 Python's standard library has none,
 so a large value that changes often is the one place a mutable structure,
@@ -251,7 +250,7 @@ with expected(TypeError):
 #: [TypeError] unhashable type: 'list'
 ```
 
-What costs a type its hash is contents-based equality, not mutability alone.
+Contents-based equality, not mutability alone, makes a type unhashable.
 A plain class instance is mutable and still hashes, by identity,
 so it works as a dictionary key.
 A `list` and an unfrozen `@dataclass` both compare by contents,
