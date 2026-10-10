@@ -1616,6 +1616,24 @@ def verify_targets(v: Vars) -> None:
     py("tools.verify_targets")
 
 
+@task("Smoke-test every task in the WSL clone, fast-forwarded to this "
+      "checkout's master first (LIMIT=40; ARGS=--only gate)")
+def verify_targets_wsl(v: Vars) -> None:
+    """The same smoke test, run in the WSL clone (~/ThinkingInPython), where
+    it takes seven minutes against most of an hour here. Fetches this
+    checkout's master into the clone over /mnt/<drive> (no push needed),
+    resets the clone's tracked files and fast-forwards it, then runs
+    verify-targets there with its output streamed here: the summary and
+    each failed target's excerpt come at the end. The clone is for
+    running, never for editing: a working-tree edit there is reset, and
+    a commit there fails the fast-forward. Refuses to start without wsl
+    on PATH; LIMIT= is the whole run's cap in minutes (default 40, the
+    measured run times six), and ARGS= goes to verify-targets.
+    """
+    limit = ["--limit", v.get("LIMIT")] if v.get("LIMIT") else []
+    py("tools.verify_targets_wsl", *limit, *v.words("ARGS"))
+
+
 @task("Report when the dev tools were last upgraded, and whether PyPI has"
       " newer releases")
 def tools_status(v: Vars) -> None:

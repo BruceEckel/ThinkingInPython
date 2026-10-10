@@ -11,7 +11,8 @@ list to keep in sync. A handful of targets never run, regardless of tier:
   * serve, local -- start an HTTP server that runs until Ctrl+C; there is
     nothing for a subprocess call to wait on.
   * verify-targets -- the target that runs this script; testing it would
-    recurse.
+    recurse. verify-targets-wsl runs it in the WSL clone (the fast
+    place for it, tools/verify_targets_wsl.py), so the same.
   * check-ch, editor-load, editor-apply, editor-pin -- take a CH=
     chapter selector and exit with a usage error without one; there is
     no chapter this script could pick for them.
@@ -105,6 +106,7 @@ EXCLUDED: dict[str, str] = {
     "by-hand": "opens every GUI example and waits for a human to close it",
     "preview-check": "needs node, and the network to install jsdom",
     "verify-targets": "this is the target that runs this script",
+    "verify-targets-wsl": "runs this script in the WSL clone, for minutes",
     "rewrite": "runs headless claude passes that cost tokens and edit prose",
     **{name: "takes a CH= chapter and exits with a usage error without one"
        for name in ("editor-load", "editor-apply", "editor-pin")},
