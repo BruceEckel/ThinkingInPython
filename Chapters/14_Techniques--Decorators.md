@@ -440,7 +440,9 @@ and the overloads narrow that back down at every call site.
 
 The `callable(func)` test assumes that only the decorated function can arrive in that first position.
 Where a decorator's own argument could be callable,
-checking `func is None` instead of `callable(func)` removes the ambiguity.
+keep the arguments keyword-only, as `label` does,
+and check `func is None` instead of `callable(func)`;
+a callable passed positionally would land in `func` and pass either test.
 
 The tests decorate one function each way and confirm that both forms keep the result and the name:
 
@@ -766,8 +768,9 @@ def test_repeat_rejects_times_below_one(times: int) -> None:
 
 ### A Limitation: Methods Need a Descriptor
 
-The class form has one limitation.
-A method decorated this way becomes an instance rather than a function,
+The class form has one limitation,
+when the instance replaces the function it decorates.
+A method decorated that way becomes an instance rather than a function,
 and the call then fails.
 `trace_class.py` and `count_calls.py` decorate bare functions on purpose:
 
@@ -945,7 +948,8 @@ def test_registry_looks_up_by_name() -> None:
 ## What `@` Does Not Require
 
 `@` constrains the statement below it.
-A decorator line must sit directly above a `def` or a `class`.
+A decorator line must sit directly above a `def`, an `async def`, a `class`,
+or another decorator line.
 `@decorator` above a bare assignment, or above a `type` alias,
 is a syntax error rather than a decorator applied to something unusual.
 Past that, `@` places no requirement on the callable it passes to the decorator.
@@ -1051,7 +1055,7 @@ A reader who sees `def fib_table()` expects a function and finds a list.
 The type checker loses track too.
 The lambda's parameter has no annotation,
 so `ty` reports `fib_table` as `Unknown`,
-where the generic `run_once` carries `T` through to `str`.
+where the generic `run_once` carries `T` through to `greeting`'s `str`.
 If you want the run-once idiom, use the named decorator.
 
 A decorator can replace a class the same way.
