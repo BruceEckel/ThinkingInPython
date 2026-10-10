@@ -658,7 +658,8 @@ def test_roll_with_seeded_rng() -> None:
 ```
 
 Because the function takes its source of randomness as an argument,
-production code hands it a fresh `random.Random()` while the test hands it a seeded one.
+production code hands it a `random.Random()` seeded from the operating system,
+while the test hands it `Random(0)`.
 The randomness is now an input, not a hidden dependency.
 This technique is *dependency injection*:
 the caller hands the function its dependencies,
