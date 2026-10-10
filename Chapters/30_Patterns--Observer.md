@@ -1529,14 +1529,13 @@ for char in "++-x":
 ```
 
 `key()` is the controller, contained within `View` as a method.
-`View` holds the model because `key()` needs somewhere to send the request.
-`__post_init__()` connects `display()` to that model,
+`__post_init__()` connects `display()` to the model,
 so a `View` is wired as soon as it exists.
-The model pushes its count to `display()`.
+`key()` sends a request to the model, which then pushes its count to `display()`.
 In the wildcard case matched by `x`, `key()` returns without touching the model,
 so the four characters of `"++-x"` print three counts.
 
-MVC uses two classes for Document-View's one:
+MVC uses separate classes for the view and the controller:
 
 ```python
 # model_view_controller.py
@@ -1588,11 +1587,18 @@ print(model.count)
 #: 1
 ```
 
-The two versions share the `Counter` model,
+In MVC, the View and the Controller never directly interact; they only communicate through the model.
+[[This seems like the essence of how the two approaches differ, so I'd like to expand on this in terms
+of the benefit it produces. It is also the reason I'm having trouble seeing the usefulness of IgnoringController,
+because if the point is that the V and C communicate through the M, what's the point of a C that has no model?]]
+
+[[I find the rest of this subsection fairly unhelpful]]
+
+MVC and Document-View share the `Counter` model,
 the count it announces to `display()`,
 and the printed output for the same input, `"++-x"`.
 *Observer* does the same work either way,
-which is why the chapter's opening calls the two architectures nearly equivalent.
+which is why the chapter's opening calls the two architectures nearly equivalent. [[this seems like it just recapitulates the code in the example]]
 
 One thing moves.
 `key()` leaves `View` for `Controller`,
@@ -1603,7 +1609,7 @@ and `Controller` so that `key()` has somewhere to send the request.
 The MVC `View` keeps `display()` and `Controller` gets `key()`, one job each.
 `Controller` is the third role of MVC.
 Document-View folds that role into `View` as the `key()` method,
-and MVC gives it a class of its own.
+and MVC gives it a class of its own. [[This is mostly captured by my sentence 1590]]
 
 Splitting the controller out lets you swap it.
 *GoF Design Patterns* gives the example:
@@ -1611,7 +1617,7 @@ a controller that ignores input disables a view's input,
 with the view and the model untouched.
 `IgnoringController` is that controller.
 Its `key()` ignores every character, so it holds no model:
-it has nothing to send.
+it has nothing to send. [[which seems like it makes it a degenerate case rather than a demonstrative one]]
 The swap at the end of `model_view_controller.py` type-checks because `controller` is declared `KeyHandler`,
 which both classes satisfy,
 and the three `+` keys that follow leave the count at 1.
