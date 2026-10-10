@@ -611,7 +611,9 @@ def run_one(v: Vars) -> None:
     same as F=deque_timing (`positional="F"` binds the word to F).
     `tip deque_timing` is the short form: a first word that names no task
     and names a listing runs it, with or without .py, and every word after
-    it goes to the program (`tip membership --numbers`). Solutions answers
+    it goes to the program (`tip membership --numbers`). A test_*.py file
+    runs through pytest instead, with the words after it as pytest's
+    (`tip test_account -q`). Solutions answers
     are searched too; pieces of the path pick one out (`tip 18/exercise_1`,
     `tip Solutions/47/research_by_hand`).
     """

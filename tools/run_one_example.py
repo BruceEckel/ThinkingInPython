@@ -25,6 +25,10 @@ its path:
     python -m tools.run_one_example 18/exercise_1         # a Solutions answer
     python -m tools.run_one_example Solutions/47/research_by_hand
 
+A ``test_*.py`` file is run through pytest instead of as a script,
+since pytest is what runs its tests (as a script it runs to the end
+and prints nothing); the words after the spec are pytest's then.
+
 Each piece before the last is found, in order, inside a directory name,
 the tree's included (``Solutions`` picks out ``Solutions/``,
 ``18`` the chapter directory). The last piece is the file: a name equal to
@@ -163,10 +167,24 @@ def display_path(path: Path) -> str:
         return str(path)
 
 
+def is_test_file(path: Path) -> bool:
+    """Whether `path` is a pytest file, which pytest runs, not python."""
+    return path.name.startswith("test_") and path.suffix == ".py"
+
+
+def command(path: Path, extra: list[str]) -> list[str]:
+    """The command that runs `path`: pytest for a test file, python
+    otherwise, with `extra` as its own arguments."""
+    if is_test_file(path):
+        return [sys.executable, "-m", "pytest", path.name, *extra]
+    return [sys.executable, path.name, *extra]
+
+
 def show_manual_form(path: Path, tree: Path | None,
                      extra: list[str]) -> None:
     """Print the two or three commands this run is standing in for."""
-    run = " ".join(["uv run python", path.name, *extra])
+    tool = "uv run pytest" if is_test_file(path) else "uv run python"
+    run = " ".join([tool, path.name, *extra])
     lines = [f"cd {display_path(path.parent)}"]
     if tree is not None:
         utils = os.path.relpath(TREES[tree], path.parent)
@@ -212,8 +230,7 @@ def main(argv: list[str] | None = None) -> int:
     if is_unattended(path, tree):
         print("This example opens a window, waits for input, or runs "
               "until you stop it.\n", file=sys.stderr)
-    proc = subprocess.run([sys.executable, path.name, *extra],
-                          cwd=path.parent, env=env)
+    proc = subprocess.run(command(path, extra), cwd=path.parent, env=env)
     return proc.returncode
 
 

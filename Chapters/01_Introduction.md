@@ -205,8 +205,7 @@ The short form is the listing's name alone.
 and words after the name go to the program,
 so `tip membership --numbers` passes it the `--numbers` flag.
 When the book says to run a listing, use the short form.
-A `test_*.py` file is the exception: the short form runs it as a script,
-which runs to the end and prints nothing, so run it with `pytest`,
+For a `test_*.py` file the short form runs `pytest` on it,
 as [Testing](11_Techniques--Testing.md#pytest) shows.
 
 A filename comment that starts with `rust/`,

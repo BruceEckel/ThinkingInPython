@@ -87,3 +87,24 @@ def test_a_solution_uses_the_chapter_trees_utils(trees: Path) -> None:
     tree = roe.tree_root(path)
     assert tree is not None and tree == trees / "Solutions"
     assert roe.TREES[tree] == trees / "Examples/utils"
+
+
+def test_a_test_file_runs_through_pytest(tmp_path: Path) -> None:
+    test = tmp_path / "test_account.py"
+    listing = tmp_path / "account.py"
+    assert roe.command(test, ["-q"]) == [
+        roe.sys.executable, "-m", "pytest", "test_account.py", "-q"]
+    assert roe.command(listing, ["-q"]) == [
+        roe.sys.executable, "account.py", "-q"]
+
+
+def test_the_manual_form_names_pytest_for_a_test_file(
+        trees: Path, capsys: pytest.CaptureFixture[str]) -> None:
+    chapter = trees / "Examples/11_Techniques--Testing"
+    chapter.mkdir()
+    path = chapter / "test_account.py"
+    path.write_text("", encoding="utf-8")
+    roe.show_manual_form(path, trees / "Examples", [])
+    err = capsys.readouterr().err
+    assert "uv run pytest test_account.py" in err
+    assert "uv run python" not in err
