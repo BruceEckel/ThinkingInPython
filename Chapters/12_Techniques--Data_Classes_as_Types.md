@@ -270,7 +270,8 @@ which produces the class name and the named argument values.
 `replace()` returns a copy with some fields changed, leaving the original alone.
 Copying instead of mutating reduces errors.
 [`copy.replace()`](#the-general-form-of-replace)
-does the same for anything immutable, not only for data classes.
+does the same for any object that defines `__replace__()`,
+not only for data classes.
 
 `display_object()` shows the attributes with their declared types:
 
