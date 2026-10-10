@@ -7,7 +7,8 @@ import pytest
 
 from tools import outside_review
 from tools.outside_review import (
-    OUTPUT_LIMIT_ERROR, STREAM_INTERRUPTED, review_with_retries)
+    OUTPUT_LIMIT_ERROR, SERVER_ERROR, STREAM_INTERRUPTED,
+    review_with_retries)
 
 CHAPTER = Path("Chapters/30_Patterns--Observer.md")
 
@@ -38,6 +39,12 @@ INTERRUPTED_WITH_REPLY = result_line({
     "error": f"{STREAM_INTERRUPTED}. Please continue the task.",
     "response": "## Review\n\n1. fine\n",
     "usage": {},
+})
+SERVER_500 = result_line({
+    "status": "ERROR",
+    "error": f"API error (attempt 2): INTERNAL ({SERVER_ERROR}): "
+             "Internal error encountered.",
+    "response": "## Review\n\n1. cut sho",
 })
 INTERRUPTED_EMPTY = result_line({
     "status": "ERROR",
@@ -165,3 +172,14 @@ def test_an_interrupted_stream_with_no_reply_is_rerun(
     install(monkeypatch, fake)
     assert review(tmp_path, retries=2)
     assert fake.calls == 2
+
+
+def test_a_server_error_is_rerun_and_its_partial_reply_dropped(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    fake = FakeAgy([SERVER_500, SUCCESS])
+    install(monkeypatch, fake)
+    assert review(tmp_path, retries=2)
+    assert fake.calls == 2
+    text = (tmp_path / "30_Patterns--Observer.md").read_text("utf-8")
+    assert "cut sho" not in text and text.endswith("1. fine\n")

@@ -31,10 +31,13 @@ interrupted", can arrive after the whole reply has streamed (chapter
 06's Flash round, 2026-10-10, carried four complete items under it):
 with a non-empty response the reply is saved, with a second header
 line saying the stream was interrupted so the reader checks its tail,
-and with an empty one the attempt is rerun. Every other failure, a
-nonzero exit, a timeout, a missing result event, or an `ERROR` of
-another kind, is final for that chapter, and the run continues with
-the next chapter.
+and with an empty one the attempt is rerun. A server error, an
+`ERROR` whose text carries "code 500" (chapter 13's Flash round,
+2026-10-10: "API error (attempt 2): INTERNAL (code 500)", with a reply
+cut short), is transient and rerun. Every other failure, a nonzero
+exit, a timeout, a missing result event, or an `ERROR` of another
+kind, is final for that chapter, and the run continues with the next
+chapter.
 Chapters run one after another in the order given.
 
 This is not a gate. Each run costs tokens, the reply is
@@ -78,6 +81,8 @@ DEFAULT_RETRIES = 2
 OUTPUT_LIMIT_ERROR = "exceeded the output token limit"
 # The error text of an `ERROR` result that may still carry the reply.
 STREAM_INTERRUPTED = "The stream was interrupted"
+# The error text of a server-side failure, which a rerun usually clears.
+SERVER_ERROR = "code 500"
 
 INSTALL_NOTE = (
     "install it from "
@@ -219,6 +224,9 @@ def review_chapter(
         why = ""  # The reply streamed before the stream broke: keep it
     elif interrupted:
         why = f"result status 'ERROR': {STREAM_INTERRUPTED}, no reply"
+        retry = True
+    elif status == "ERROR" and SERVER_ERROR in str(result.get("error", "")):
+        why = f"result status 'ERROR': server error, {result.get('error')}"
         retry = True
     elif status != "SUCCESS":
         why = f"result status {status!r}"

@@ -574,8 +574,8 @@ def outside_review(v: Vars) -> None:
     result because the reply exceeded the output token limit, or an
     empty response after agy denied a tool call. An ERROR result that
     says the stream was interrupted keeps the reply it carries, flagged
-    in the file's second line, and is rerun when it carries none.
-    ARGS="--retries N"
+    in the file's second line, and is rerun when it carries none; a
+    server error (code 500) is rerun too. ARGS="--retries N"
     changes the count, and ARGS="--retries 0" makes one attempt. Other
     failures (a timeout, a nonzero exit, another kind of ERROR) are final
     for that chapter. ARGS=--dry-run prints each command, the output
