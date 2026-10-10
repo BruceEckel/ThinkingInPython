@@ -1620,7 +1620,8 @@ Testing follows the same lines.
 A `Controller` needs a `Counter`, so a test builds one, calls `key()`,
 and reads `model.count`, with no view and no output to capture.
 
-Document-View gives both jobs to one class.
+Document-View gives one class both jobs,
+displaying the count and interpreting the keys.
 `View.key()` and `View.display()` share an instance,
 so a different set of keys means editing `View` or subclassing it,
 and the display code comes along either way.
