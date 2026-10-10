@@ -171,8 +171,8 @@ print(y)  # type: ignore  # noqa: F821
 
 The two directives on the `print(y)` line silence the type checker and the linter,
 neither of which can see a name that appears only as a dict key.
-Losing both checks on that name is the cost of creating names this way,
-and a reason to keep it rare.
+Creating names this way loses both checks on that name,
+which is a reason to keep it rare.
 Assigning into `globals()` matters whenever code needs to define a module-level name known only at runtime,
 such as a class built dynamically under a computed name.
 [Metaprogramming](17_Techniques--Metaprogramming.md) builds classes that way,
@@ -552,7 +552,7 @@ Python 3.15 ([PEP 810](https://peps.python.org/pep-0810/))
 adds the `lazy` soft keyword: a keyword only inside an `import` statement,
 the way `match` is a keyword only inside a [`match` statement](04_Foundations--Control_Flow.md#pattern-matching).
 A `lazy import` defers loading the module until the first time you use the imported name,
-so a run pays only for the modules it uses,
+so a run loads only the modules it uses,
 while all imports stay at the top of the file:
 
 ```python
@@ -574,13 +574,13 @@ The output is the same either way, so this listing cannot show the deferral.
 
 ### Deferring an Import Before 3.15
 
-Before 3.15, deferring a costly import meant moving it inside the function that needed it.
+Before 3.15, deferring a slow import meant moving it inside the function that needed it.
 That works, but it hides the dependency:
 nothing at the top of the file mentions the module,
 tools that read imports miss it,
 and the `import` statement re-runs its `sys.modules` lookup on every call.
 `lazy import` keeps the declaration at the top where a reader and a tool can see it,
-and pays the loading cost once, at first use.
+and loads the module once, at first use.
 
 Packages deferred submodule loading before `lazy import` existed,
 by giving `__init__.py` a module-level `__getattr__()`

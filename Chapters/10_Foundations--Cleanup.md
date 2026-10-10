@@ -121,7 +121,7 @@ and shutdown is the precarious moment the warning describes.
 but nothing guarantees the teardown order that allowed it.
 Make `__del__()` do as little as possible, and do not depend on it.
 
-The swallowed exception is the failure that costs most in production:
+The swallowed exception is the failure most likely to go unnoticed in production:
 
 ```python
 # del_swallows.py
@@ -206,7 +206,7 @@ Before Python 3.4 the collector refused to finalize a cycle containing a `__del_
 leaving the objects in `gc.garbage` as *uncollectable* garbage,
 the term older documentation uses for them.
 [PEP 442](https://peps.python.org/pep-0442/) removed that restriction,
-so a cycle now costs only the delay.
+so a cycle now delays finalization until the collector runs.
 
 Cycles are one more reason to keep cleanup out of `__del__()`.
 One back-reference between two objects is enough to postpone `__del__()`,

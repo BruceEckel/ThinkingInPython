@@ -355,8 +355,8 @@ which rebinds a name in an enclosing function the way `global` rebinds a module-
 
 A function that rebinds a global couples every caller to that shared,
 mutable state.
-[Pure Functions](40_Functional--Foundations.md#pure-functions) shows the cost.
-To understand one call, you must trace every call before it.
+To understand one call, you must trace every call before it,
+as [Pure Functions](40_Functional--Foundations.md#pure-functions) shows.
 [Effect Management](44_Effects--Effect_Management.md#what-is-an-effect)
 classifies rebinding a global as a side effect and reading one as a side cause.
 
@@ -543,7 +543,7 @@ That matters when a subclass overrides a method.
 The subclass can rename the parameter, and the type checker accepts the rename.
 The marker also frees the name for `**kwargs`:
 with `def trace(func, /, *args, **kwargs)`,
-a caller's `func=` keyword lands in `kwargs` instead of clashing with the parameter.
+a caller's `func=` keyword goes into `kwargs` instead of clashing with the parameter.
 
 ## Lambdas
 

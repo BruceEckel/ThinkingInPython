@@ -35,7 +35,7 @@ The type checker treats it as the type `Any`,
 which is compatible with everything.
 Thus, typed and untyped code can coexist,
 and that coexistence is *gradual typing*.
-You can slowly add hints where they earn their keep: the public interfaces,
+You can slowly add hints where they help most: the public interfaces,
 the tricky data, the code on which other people depend.
 
 An explicit `Any` indicates that a value is truly dynamic.
@@ -355,7 +355,7 @@ A `draw()` that returns an `int`, or that requires an argument, does not match.
 A `Protocol` is a checking-time construct,
 so `isinstance(Circle(), Drawable)` raises a `TypeError` instead of answering.
 Decorating the Protocol with `@runtime_checkable` allows the call,
-at the cost of a [weaker check](26_Patterns--Surrogate.md#what-the-implementation-supplies).
+but `isinstance()` then makes a [weaker check](26_Patterns--Surrogate.md#what-the-implementation-supplies).
 
 `Drawable` appears in one place, the annotation on `render()`'s parameter.
 If you pass an object without a `draw()` to `render()`,

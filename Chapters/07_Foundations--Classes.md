@@ -460,7 +460,7 @@ A method expresses that intent better.
 ### Caching with `cached_property` {#cached-property}
 
 A `@property` reruns its code on every access.
-When the computation is expensive and the answer cannot change,
+When the computation is slow and the answer cannot change,
 `functools.cached_property` runs it once, on first access,
 and stores the result:
 
@@ -506,7 +506,7 @@ and the first access raises a `TypeError`
 ([Performance](18_Techniques--Performance.md#when-slots-does-not-fit) shows the failure).
 A `"__dict__"` entry in `__slots__` gives the dictionary back,
 and `cached_property` with it,
-at the cost of the per-instance dictionary that slots exist to remove.
+but every instance then carries the per-instance dictionary that slots exist to remove.
 
 `cached_property` trades freshness for speed, so if `n.values` changes,
 `total` becomes stale, as the appended `20` in `cached_property_demo.py` shows.

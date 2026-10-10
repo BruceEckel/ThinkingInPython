@@ -463,8 +463,8 @@ the entire contents before you see any of it. The `with` form also
 lets several operations share one open file, while each `read_text()`
 call opens and closes the file again.
 
-That control matters when the file is large enough that holding it
-costs something, or when you read a stream that has no end.
+That control matters when the file is large enough that holding all
+of it strains memory, or when you read a stream that has no end.
 
 The closing guarantee is not the difference. `read_text()` opens the
 file in a `with` block of its own, so it closes the file too, whether
