@@ -191,7 +191,7 @@ f(Different())
 ```
 
 `Derived` inherits from `Simple`.
-In the constructor, `super().__init__()` calls the base-class constructor.
+In the constructor, `super().__init__(text)` calls the base-class constructor.
 `display()` calls `show()` as a method of `self`.
 When you override a method but still want the base-class version,
 call it through `super()`, as `Derived`'s `show()` does.
@@ -261,7 +261,8 @@ and `C().show()` then runs `B`'s version.
 ### Calling the Base Constructor
 
 The base-class constructor runs because `Derived`'s constructor calls it.
-Unlike C++ and Java, Python never calls a base-class constructor on its own.
+Unlike C++ and Java,
+Python adds no call to the base-class constructor when a derived class defines its own.
 If you remove the `super().__init__(text)` line, nothing creates `self.s`,
 so the first method that reads it raises an `AttributeError`.
 
@@ -451,9 +452,9 @@ expect(RecursionError, Circle, 10)
 #: [RecursionError] maximum recursion depth exceeded
 ```
 
-The getter and setter are independent,
-so you choose the access you want by defining one or both.
-A write-only property is possible but rare.
+A getter alone gives a read-only property.
+The setter is written second because `@radius.setter` needs the property the getter created.
+A write-only property, built with `property(fset=...)`, is possible but rare.
 A method expresses that intent better.
 
 ### Caching with `cached_property` {#cached-property}
@@ -567,7 +568,8 @@ The fallback runs in one direction.
 `repr()` ignores `__str__()`.
 A container builds its own display from the `__repr__()` of its elements,
 and that is why the list prints `Point(3, 4)` rather than `(3, 4)`.
-In an f-string, `{p}` selects `__str__()` and `{p!r}` selects `__repr__()`.
+In an f-string, `{p!r}` selects `__repr__()`,
+and `{p}` or `{p!s}` selects `__str__()` for a class that defines no `__format__()`.
 By convention `__repr__()` returns the call that rebuilds the object,
 so it reads `Point(3, 4)`.
 
