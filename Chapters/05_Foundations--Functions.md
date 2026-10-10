@@ -381,7 +381,7 @@ report("point", 3, 4, color="red", size=10)
 
 The names `args` and `kwargs` are convention.
 The `*` and `**` do the collecting,
-so `*values` and `**options` behave identically.
+so `*values` and `**options` behave like `*args` and `**kwargs`.
 
 ## Unpacking Arguments
 
@@ -456,9 +456,9 @@ expect(TypeError, trace, report, *nums, **opts)
 ```
 
 `opts` carries a `"label"` key, and `trace()` forwards it as `label=`.
-The same `func(*args, **kwargs)` call spreads `nums` positionally,
-so `report()`'s first parameter, `label`, also receives `1`,
-and no parameter can take two values.
+The same `func(*args, **kwargs)` call spreads `args`,
+which holds the items of `nums`, positionally, so `report()`'s first parameter,
+`label`, also receives `1`, and no parameter can take two values.
 `trace()` knows nothing about the signature of the function it calls,
 so it cannot detect the clash.
 The error arrives one level down, when `trace()` calls `report()`.
@@ -474,8 +474,8 @@ A `/` ends the *positional-only* parameters.
 You must pass every parameter before it by position, not by name.
 A `*` begins the *keyword-only* parameters.
 You must pass every parameter after it by name.
-A `*args` parameter has the same effect as a bare `*`.
-`*args` absorbs every remaining positional argument,
+A `*args` parameter also begins the keyword-only parameters:
+it absorbs every remaining positional argument,
 so a parameter declared after it can arrive by name alone.
 
 ```python
