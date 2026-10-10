@@ -83,7 +83,7 @@ Containers and optional types read the way you say them: `list[int]`,
 and `str | None` for "a string or nothing."
 A tuple annotation names one type per position,
 so `tuple[int, str]` is a pair and `tuple[int]` is a tuple of one `int`.
-The `...` in `tuple[int, ...]` means any number of `int`s.
+The `...` in `tuple[int, ...]` means zero or more `int`s.
 A function that returns nothing declares `-> None`,
 and that is why every `__init__()` in this chapter's listings carries that annotation.
 
