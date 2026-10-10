@@ -416,7 +416,7 @@ def preloaded(request: pytest.FixtureRequest) -> Account:
 ```
 
 `pytest` builds the session-scoped `bank_name` fixture once and reuses it,
-and that reuse suits expensive resources.
+and that reuse suits resources that are slow to build.
 The reuse is the risk as well as the point.
 Because every test receives the same object,
 one test that mutates it changes what the next test sees.
@@ -729,7 +729,7 @@ you widen every signature along the way,
 or introduce a context object to carry the parameter.
 `monkeypatch` skips that plumbing.
 It patches the name in place,
-at the cost of a process-wide patch that stands until teardown restores the name.
+and the patch applies process-wide until teardown restores the name.
 Choose injection when the parameter sits near the boundary.
 Choose `monkeypatch` when threading it through touches more code than the test is worth.
 

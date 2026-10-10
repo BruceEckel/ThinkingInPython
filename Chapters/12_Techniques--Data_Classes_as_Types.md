@@ -186,9 +186,9 @@ a connection's open-or-closed state, a running total.
 You cannot always replace one with a fresh instance on every change.
 The accepted answer for those is a validating setter that checks before assigning,
 the fix that `stars_class.py`'s `f1()` skips.
-Pay DbC's scattering cost, because the value must stay mutable.
+Accept DbC's scattered checks, because the value must stay mutable.
 [Immutability](#immutability) covers the case the rest of this chapter prefers,
-where a fresh, validated instance replacing the old one is cheap enough.
+where a fresh, validated instance can replace the old one.
 
 ## Data Classes
 
@@ -504,7 +504,7 @@ Passing `frozen=True` makes the data class immutable.
 Assigning to a field raises `FrozenInstanceError`.
 A frozen instance is also hashable,
 so you can use it as a dictionary key or put it in a set.
-`frozen=True` removes the mutability that cost `Messenger` its `__hash__`,
+`frozen=True` removes the mutability that left `Messenger`'s `__hash__` as `None`,
 so `@dataclass` generates one from the fields:
 
 ```python
@@ -1596,24 +1596,24 @@ and `stars_class.py` spreads them across every method that changes one.
 `stars.py` puts them in the constructor, where they run once,
 for every value the program constructs.
 
-That trade has a price, and the price is at the edges.
+Checking in the constructor moves work to the edges of the program.
 Every place data enters your program now needs a constructor call:
 the parsed JSON, the database row, the form field, the command-line argument.
 `from_json()` is that boundary written out.
 It reads untrusted text and hands the pieces to `FullName` and `EmailAddress`,
-and that boundary is the last point where a bad value is cheap to reject.
+and that boundary is the last point where you can reject a bad value before the rest of the program sees it.
 Past that line your code holds types rather than raw data,
 and a function receiving one does its work without asking whether the value makes sense.
 
-The price also shows up away from the boundaries, in memory and time.
+Away from the boundaries, the types also use more memory and time.
 Every value is now an object:
 a constructor call and attribute access where a bare `int` or `str` needs neither.
 `copy.replace()` re-validates the whole object on every change,
 even when only one field moved.
 For a hot path, or a structure nesting many values
 (many `Point`s inside a `Line`),
-that cost is [worth measuring](18_Techniques--Performance.md)
-before you pay it everywhere.
+the overhead is [worth measuring](18_Techniques--Performance.md)
+before you adopt the types everywhere.
 
 ## Exercises
 

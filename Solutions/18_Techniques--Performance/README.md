@@ -332,11 +332,10 @@ The list still looks unsorted because a heap does not guarantee
 sorted order. A heap guarantees that the element at position `i` is
 no larger than its two children at positions `2i + 1` and `2i + 2`,
 which puts the smallest element at index 0 and leaves the order of
-the rest open. `heappop()` maintains that weaker property,
-and maintaining it is cheap. The last element moves to the front and
-sinks back down through O(log n) comparisons. Sorting the whole list
-on every pop costs far more and gains nothing, since callers read
-only the front element.
+the rest open. `heappop()` maintains that weaker property in
+O(log n) comparisons. The last element moves to the front and sinks
+back down. Sorting the whole list on every pop costs far more and
+gains nothing, since callers read only the front element.
 
 </details>
 </details>
@@ -407,7 +406,7 @@ alongside it.
 reading that attribute makes the subclass look slotted while it still
 carries a `__dict__`.
 
-`Point3D` quietly loses the memory saving. Every instance pays for
+`Point3D` quietly loses the memory saving. Every instance holds
 both the two slots and a dictionary. A subclass of a slotted class must
 declare `__slots__`, using an empty tuple when it adds no
 fields of its own.
@@ -505,8 +504,8 @@ The two local attachments above produce the identical `Counter`, and
 that agreement is an artifact of the example's size. In a real
 program `set_events()` reports every Python function the process
 runs, including library code you did not write and did not want
-counted, and it pays the callback cost on every one of those functions. Local
-attachment names the code objects you care about and leaves the rest
+counted, and it runs the callback on every one of those functions.
+Local attachment names the code objects you care about and leaves the rest
 running at full speed. Global monitoring answers "what ran."
 Local monitoring answers "how often did this run," which is the
 question you had when you opened `sys.monitoring` instead of
@@ -866,9 +865,9 @@ runs.
 
 The program is too short to get hot. The JIT compiles a code path
 after it has run often enough to look worth compiling. A script that
-starts, times two lookups, and exits pays the tracing and
-compilation cost on whatever it does reach, then exits before that
-machine code earns the cost back.
+starts, times two lookups, and exits spends time tracing and
+compiling whatever it does reach, then exits before the compiled
+code has saved as much time as the compiling took.
 
 The listing prints a ratio, not a duration. `set at least 100x
 faster` compares the two lookups against each other, so anything

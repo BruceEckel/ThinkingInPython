@@ -417,14 +417,14 @@ and `Path.walk()` ignores the error unless you pass `on_error`.
 with no explicit walk and no comprehension.
 Try `rglob()` first.
 A glob pattern says what you want.
-`walk()` earns its place when the filter needs more than a glob pattern can express,
+Use `walk()` when the filter needs more than a glob pattern can express,
 a file's size or its contents rather than its name, say,
 or when the comprehension needs the directory structure,
 not just the files at the bottom of it.
 
 ## Breaking Up a Complex Comprehension
 
-A comprehension earns its place when you can read it in one pass.
+A comprehension is the right choice when you can read it in one pass.
 You can nest more `for` and `if` clauses,
 or wrap the whole comprehension in another call,
 but each one you add makes the expression harder to read.
@@ -743,9 +743,9 @@ A `for` loop when you want the side effect rather than the collection.
 
 The delimiters also decide when the work runs.
 Every form but the parenthesized one runs to completion before the next statement,
-so you pay the cost of a comprehension where you wrote it.
-A generator expression defers that cost to whoever consumes it,
-and pays it only for the values the consumer pulls.
+so a comprehension does all its work where you wrote it.
+A generator expression defers that work to whoever consumes it,
+and computes only the values the consumer pulls.
 
 ## Exercises
 

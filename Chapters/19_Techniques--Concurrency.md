@@ -95,7 +95,7 @@ If it knew, it could switch contexts faster.
 In addition, each thread reserves a stack large enough to serve virtually any program,
 although some tasks need only a fraction of that.
 Engineers learned tricks to make programs run faster despite these disadvantages,
-but these tricks made the resulting programs more expensive to create and maintain.
+but these tricks made the resulting programs harder to create and maintain.
 
 *Asynchrony*, implemented with *coroutines*,
 moves the context switch out of the OS and into the program.
@@ -1348,7 +1348,7 @@ print(f"threads no faster: {thr > seq * 0.9}")
 
 Swapping the loop for a thread pool changes nothing.
 Five threads still take turns holding the one GIL,
-so the threaded run costs the same as the sequential one,
+so the threaded run takes as long as the sequential one,
 sometimes a little more because of the added scheduling.
 That is why [Parallelism](#parallelism) uses processes instead.
 Each process gets its own interpreter with its own GIL.
@@ -1364,8 +1364,7 @@ Every object carries a count of the references to it.
 When the count reaches zero, the interpreter frees the object immediately.
 Reference counting gave Python deterministic cleanup with no collector pauses.
 
-It also added a cost.
-Every count update is a read-modify-write sequence,
+Every count update, though, is a read-modify-write sequence,
 and the interpreter runs millions of them per second.
 
 In 1991, the C API exposed those counts to extension authors.
@@ -1377,10 +1376,10 @@ In 1992, threads arrived, for I/O concurrency rather than for multi-core speed.
 Now two threads could update the same count at once and lose one of the updates,
 freeing an object still in use or leaking it forever.
 
-One interpreter-wide lock was the cheapest fix that fit the three earlier decisions.
+One interpreter-wide lock was the simplest fix that fit the three earlier decisions.
 It made every count update, every dict and list mutation,
 and every existing extension safe at once.
-Single-threaded code paid almost nothing.
+Single-threaded code kept nearly all its speed.
 
 Every alternative undid one of the earlier decisions.
 Atomic count updates slow every program to benefit a few.
@@ -1510,11 +1509,11 @@ The number is one machine's actual output.)
 CPython's default build, convert this indented block to a real, fenced,
 tested example. -->
 
-Free threading finally cleared the 1996 bar by making reference counting cheap without a global lock.
+Free threading finally cleared the 1996 bar by making reference counting fast without a global lock.
 Usually only one thread touches an object, the one that created it.
 *Biased reference counting* lets that owning thread update the count with ordinary,
 non-atomic arithmetic.
-Only other threads pay for an atomic operation.
+A thread that updates another thread's object uses an atomic operation.
 Permanent objects like `None`, `True`, and small integers become *immortal*.
 Their counts stay constant.
 Immortality arrived in 3.12 for every build but matters most in the free-threaded one,
@@ -1522,7 +1521,7 @@ since it removes the one atomic operation every thread otherwise contests.
 Mutable containers like dictionaries and lists carry individual locks,
 so two threads contend only when they touch the same container.
 
-Single-threaded code pays a small penalty for this machinery.
+This machinery slows single-threaded code slightly.
 On the `pyperformance` benchmark suite the average overhead runs from about one percent to about eight,
 depending on the platform.
 
@@ -1551,7 +1550,7 @@ and they share memory without a process pool's pickling between processes.
 Subinterpreters work on standard Python, and do not need free threading.
 The process pool in [Parallelism](#parallelism)
 gets its speedup by giving each worker its own interpreter,
-and thus its own GIL, but it pays with an operating-system process per worker.
+and thus its own GIL, but it starts an operating-system process per worker.
 
 Since 3.12, CPython can create additional interpreters inside the same process
 ([PEP 684](https://peps.python.org/pep-0684/)), each with its own GIL,
@@ -2094,7 +2093,7 @@ because the libraries it calls still block.
 
 Free threading leaves I/O-bound work as it was and solves a narrower problem.
 Without the GIL, a thread can genuinely parallelize CPU-bound work from inside one process while sharing memory,
-paying no pickling cost.
+with no data to pickle.
 Neither a GIL-bound thread nor a process pool offers that.
 
 Under the standard build, then, a thread no longer structures your concurrency.
@@ -2110,8 +2109,8 @@ Race conditions become easier to hit.
 
 `asyncio` switches only at an `await`,
 and that makes it easier to [reason about interleaving](#a-single-thread-still-races).
-A thread costs an OS stack and an OS scheduling entity that free threading does not remove,
-while an `asyncio` task is cheap enough to run in the thousands.
+A thread needs an OS stack and an OS scheduling entity that free threading does not remove,
+while an `asyncio` task is small enough to run in the thousands.
 [`TaskGroup`](#structured-concurrency-with-taskgroup)'s structured,
 cancellable batches have no thread equivalent.
 Python still offers no safe way to cancel a running thread.
@@ -2192,8 +2191,8 @@ The listing stipulates that stack figure instead of measuring it.
 standing for a common one-mebibyte default,
 not a number the OS reports for a thread that ran.
 
-A single thread's reserved stack,
-paid before it runs one line of its target function,
+A single thread's stack,
+reserved before it runs one line of its target function,
 could instead hold hundreds of suspended tasks.
 The stack figure is address space set aside whether the thread touches every byte or not.
 The task figure is heap measured by `tracemalloc`.

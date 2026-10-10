@@ -420,7 +420,7 @@ passes. Renaming the import, moving the call into a helper module, or
 importing `urlopen` a different way breaks the patched test while
 `current_temp()` still works.
 
-`monkeypatch` earns its place where you cannot change the code:
+Use `monkeypatch` where you cannot change the code:
 someone else's library, or a function you are not ready to refactor.
 Where you can change the signature, injection turns the dependency into
 part of the contract. The function then receives what it needs instead

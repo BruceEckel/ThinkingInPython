@@ -360,8 +360,8 @@ values, so the call checks only when the cases above it have
 eliminated every member of the union. The inferred type spells out
 what survives those cases: a `Webhook` that is none of the three
 handled types. A `Webhook` can still reach the `assert_never()` call,
-so the check fails. Two diagnostics for one new channel is the cost the
-chapter describes: adding a type touches every operation.
+so the check fails. One new channel draws two diagnostics because, as
+the chapter describes, adding a type touches every operation.
 
 </details>
 </details>
@@ -501,10 +501,10 @@ and a missing combination is visible at a glance. The `|` alternation
 then handles both axis cases in one line, which no guard arrangement
 does as briefly.
 
-The cost is the `sign()` helper and one extra layer of indirection.
-The `match` no longer mentions `Point`. That trade is usually worth it
-when the guards all test the same handful of derived facts, and
-not worth it when each guard asks a different question.
+The second version adds the `sign()` helper and one layer of
+indirection: the `match` no longer mentions `Point`. That trade is
+usually worth it when the guards all test the same handful of derived
+facts, and not worth it when each guard asks a different question.
 
 **Give every path a return.** The final `case _` is unreachable, since the six cases above it cover
 all nine pairs of signs. The type checker sees only that `sign()`

@@ -380,9 +380,9 @@ Waiting does not create overlap. Suspending does. These five tasks
 spend almost all their time waiting and still run one at a time,
 and `cpu_price()` runs one at a time for the same reason, although it
 spends its time computing. `cpu_price()` has no `await` to reach. The
-total run
-time makes the cost visible. Five blocking sleeps of 0.05 seconds take about a quarter second, while
-five awaited ones take about 0.05.
+total run time shows the blocking tasks running in turn. Five blocking
+sleeps of 0.05 seconds take about a quarter second, while five awaited
+ones take about 0.05.
 
 </details>
 </details>

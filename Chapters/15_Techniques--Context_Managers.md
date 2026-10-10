@@ -938,9 +938,9 @@ and `AsyncExitStack` is the `ExitStack` equivalent for holding several of them.
 
 ## An Object Pool
 
-Some objects are expensive to create or rationed by the outside world:
+Some objects are slow to create or rationed by the outside world:
 database connections, worker processes, licensed sessions.
-The *Object Pool* pattern creates a set number of these expensive objects and lends them out.
+The *Object Pool* pattern creates a set number of these objects up front and lends them out.
 Lending is the dangerous half.
 Every borrower must return the object on every path out of their code,
 including the exception path,

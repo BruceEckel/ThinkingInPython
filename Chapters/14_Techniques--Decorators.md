@@ -442,7 +442,7 @@ The `callable(func)` test assumes that only the decorated function can arrive in
 Where a decorator's own argument could be callable,
 keep the arguments keyword-only, as `label` does,
 and check `func is None` instead of `callable(func)`;
-a callable passed positionally would land in `func` and pass either test.
+a callable passed positionally would bind to `func` and pass either test.
 
 The tests decorate one function each way and confirm that both forms keep the result and the name:
 
@@ -1167,7 +1167,7 @@ summing each topping's `add_cost` and joining its name,
 solves the same combinatorial problem, with no wrapping and no `Protocol`.
 Here, where a topping contributes data (a number and a name),
 that list is the simpler design.
-The *Decorator* pattern earns its structure when a topping needs behavior,
+The *Decorator* pattern becomes the simpler design when a topping needs behavior,
 not just data: a topping that changes how `cost` rounds,
 adds a description only under some condition,
 or must be handed elsewhere as a `Pizza`.
@@ -1230,11 +1230,11 @@ The one piece of machinery left for later is the descriptor protocol that `@prop
 [Metaprogramming](17_Techniques--Metaprogramming.md#learning-a-name-with-__set_name__)
 takes it up.
 
-Every decorator costs two things `wraps` does not remove,
+Every decorator adds two things that survive `wraps`,
 since `wraps` copies metadata and leaves the extra call in place.
 A traceback through a decorated function shows `wrapper`,
 one more frame than the caller and the original body alone show.
-Each call also pays for an extra Python-level function call, the wrapper's own,
+Each call also makes an extra Python-level function call, the wrapper's own,
 before the real body runs.
 Neither matters for a function called occasionally.
 Both add up for one called in a tight loop,

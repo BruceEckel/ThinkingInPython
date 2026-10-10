@@ -17,7 +17,7 @@ Computer programming projects have a long history of *premature optimization*:
 optimizing before any measurement shows where the time goes.
 Often people decide ahead of time, based on biases,
 that runtime performance will be insufficient.
-They then build elaborate, expensive designs that solve nonexistent problems.
+They then build elaborate designs that solve nonexistent problems.
 
 Python can be surprising.
 A program coded in the most straightforward way,
@@ -31,7 +31,7 @@ A program that works in the small may not scale.
 A run over a hundred records says nothing about a million,
 because costs grow at different rates.
 An algorithm that revisits its data looks instant at one size and takes hours at another,
-and every layer of abstraction hides costs
+and every layer of abstraction hides work
 (a copy per call, a query behind an attribute)
 that only a realistic load reveals.
 So "try it out" means try it at the size you expect in production,
@@ -97,7 +97,7 @@ burns most of the time.
 `ncalls` decides how to attack it.
 `slow()` spends most of the total in a single call,
 so it needs a better algorithm.
-`<genexpr>`'s ten thousand calls show `helper()` paying per-element overhead,
+`<genexpr>`'s ten thousand calls show `helper()` spending its time on per-element overhead,
 where fewer calls help more than a faster body.
 
 ### The Sampling Profiler
@@ -140,7 +140,7 @@ Sometimes you have a narrow one.
 How many times does this function run during a request,
 and does that branch run?
 A counter added to the function changes the code you study,
-and a full profiler costs more than the answer is worth.
+and a full profiler times every function to answer a question about one.
 
 `sys.monitoring` ([PEP 669](https://peps.python.org/pep-0669/))
 is the interpreter's own instrumentation mechanism,
@@ -148,7 +148,6 @@ the one profilers and debuggers now use.
 You claim a tool identifier, register a callback for an event,
 and name the code to which the event applies.
 
-Registering nothing costs nothing.
 The interpreter specializes the bytecode that has no callback attached,
 so unmonitored code runs at full speed.
 `sys.settrace()`, by contrast, slows every Python function its thread runs,
@@ -197,8 +196,7 @@ and that is why `square()` is absent from the count although it ran.
 The event does not spread to whatever that code calls,
 so a helper that `fib()` invokes goes uncounted as well.
 The global form is `set_events()`,
-which fires for every Python function in the process,
-and that is where the two differ in cost.
+which fires for every Python function in the process.
 When one function is the question,
 `set_events()` collects data you discard and slows the run you are measuring.
 
@@ -340,7 +338,8 @@ and an optimization tuned to toy input can behave badly in production.
 
 `timeit` also turns the garbage collector off while it measures,
 so its runs stay repeatable.
-For a benchmark that allocates heavily, that hides a cost production pays,
+For a benchmark that allocates heavily,
+that hides the collection pauses a production run includes,
 so pass `setup="gc.enable()"` when collection pauses are part of what you compare.
 
 ### Numbers on Your Machine {#numbers-on-your-machine}
@@ -389,7 +388,7 @@ Seeing your own number is the point of running it.
 If your program is too slow, try the simplest remedy first.
 That might be enough, and if it is, you save time and money.
 
-The cheapest platform change is a newer CPython.
+The simplest platform change is a newer CPython.
 3.11 alone measured 1.25x faster than 3.10 across the `pyperformance` suite,
 a range of 10-60% depending on the workload,
 and later releases have continued that work.
@@ -467,7 +466,7 @@ Three switches stand between your program and that machine code:
 2. The process must *enable* it, through the `PYTHON_JIT` environment variable.
 3. The code must get *hot*.
    A script that runs briefly exits before it reaches the threshold,
-   so it pays the compiler's warm-up and collects nothing.
+   so the JIT compiles none of its code.
 
 Since 3.14, the official python.org Windows and macOS binaries use `--enable-experimental-jit=yes-off`,
 which compiles the JIT in and leaves it switched off,
@@ -533,10 +532,9 @@ and change nothing else.
 Numba's [`@njit`](#jit-compilation-with-numba) is also a just-in-time compiler,
 and the two make opposite trades.
 The CPython JIT asks nothing of you,
-applies to whatever code turns out to be hot, and pays in percentages.
-`@njit` applies only to numeric functions,
-costs a decorator and a compilation pause on the first call,
-and pays in multiples.
+applies to whatever code turns out to be hot, and speeds it up by percentages.
+`@njit` applies only to numeric functions, requires a decorator,
+pauses to compile on the first call, and speeds code up by multiples.
 Neither one rescues a quadratic algorithm.
 
 [PEP 836](https://peps.python.org/pep-0836/) sets the bar the JIT must clear:
@@ -623,7 +621,7 @@ print(f"hoisting did not halve the time: "
 #: hoisting did not halve the time: True
 ```
 
-Here the hoist saves nothing, and it can cost.
+Here the hoist saves nothing, and it can slow the loop.
 `out.append(i)` compiles to a method load that pushes the function and its `self` separately,
 building no bound method.
 `append = out.append` builds one, and every call then goes through it.
@@ -1738,7 +1736,7 @@ NumPy alone handles the parts of a problem that reduce to whole-array arithmetic
 `@njit` compiles the untranslatable loop on its first call, from inside Python.
 Rust compiles that loop ahead of time,
 removing both the warm-up and the runtime Numba dependency,
-at the cost of a second language and a build step.
+and requires a second language and a build step.
 On both sample runs above, Numba matches or beats Rust
 (15.9x against 12.2x on `count_primes`, 54.4x against 34.3x on `collatz_lengths`),
 so Rust is not the faster option here.
@@ -1750,7 +1748,7 @@ Keep the interface coarse.
 A single call that does significant work wins.
 A million calls that each do a little spend the gain on boundary-crossing overhead.
 Passing millions of small Python objects across the boundary loses it too.
-Numbers, strings, bytes, and NumPy arrays cross cheaply.
+Numbers, strings, bytes, and NumPy arrays cross with little overhead.
 
 The list `collatz_lengths()` takes and returns carries 50,000 integers across the boundary each way,
 which sounds like the thing to avoid.
@@ -1788,10 +1786,9 @@ A program mostly waiting on a database, a socket, or a subprocess is I/O-bound,
 and steps 2 through 9 below do not help it much.
 Skip to step 10 and restructure around `asyncio` instead.
 A program mostly consuming CPU is compute-bound,
-and the list below targets that case, cheapest change first.
-Every performance optimization costs something in effort, complexity,
-or dependencies.
-Work down this list from the cheapest change to the most involved,
+and the list below targets that case, simplest change first.
+Every performance optimization adds effort, complexity, or dependencies.
+Work down this list from the simplest change to the most involved,
 stopping when the program is fast enough:
 
 1. Run the straightforward version.
@@ -1812,7 +1809,7 @@ After every change, measure again.
 Optimizations interact, the bottleneck moves,
 and yesterday's hot spot may be irrelevant today.
 The goal is not the fastest possible program.
-It is a program that is fast enough, at the lowest cost in clarity.
+It is a program that is fast enough and gives up as little clarity as possible.
 
 Step 4 on that list, fixing the algorithm, is usually the biggest win,
 because it changes which curve your program follows,

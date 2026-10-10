@@ -943,8 +943,9 @@ every existing subclass in the object version needs a new method.
 In the match version, you write one new function with its own `match`,
 and the existing classes and functions stay untouched.
 
-Adding a type is cheaper with inheritance.
-Adding an operation is cheaper with pattern matching.
+Inheritance confines a new type to one new subclass.
+Pattern matching confines a new operation to one new function.
+The other kind of change touches every existing subclass or every existing `match`.
 That is the open-set-versus-closed-set tradeoff from [When Not to Match](#when-not-to-match),
 worked out concretely.
 It also has a name: the *expression problem*.
