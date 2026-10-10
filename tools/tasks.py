@@ -1418,14 +1418,16 @@ def todos(v: Vars) -> None:
 
 
 @task("Ask Gemini whether each fact in the outside-review prompt is still "
-      "disputed (MODEL=; ARGS=--dry-run)")
+      "disputed, and log the answers (MODEL=; ARGS=--dry-run)")
 def prompt_facts(v: Vars) -> None:
     """Send the bullets under "Treat these as valid" in
     tools/data/outside_review_prompt.md to Gemini through `agy`, without
     the prompt's framing, and ask whether each statement is true. The
     table shows a verdict per bullet. A "no" row is a bullet the model
     still disputes, so it still earns its place in the prompt. A "yes"
-    row is a candidate to drop once a later run agrees.
+    row is a candidate to drop once a later run agrees. Each run's table
+    is appended to tools/data/prompt_facts_runs.md (--save, passed
+    here), the tracked log the next run is read against; commit it.
 
     The default model is gemini-3.8-flash-high, the one whose reviews
     prompted the bullets; MODEL= picks another. ARGS=--raw prints the
@@ -1435,7 +1437,7 @@ def prompt_facts(v: Vars) -> None:
     under CI. It needs a signed-in agy; see the outside-review task.
     """
     model = ["--model", v.get("MODEL")] if v.get("MODEL") else []
-    py("tools.prompt_facts_probe", *model, *v.words("ARGS"))
+    py("tools.prompt_facts_probe", "--save", *model, *v.words("ARGS"))
 
 
 @task("List cross-chapter links whose text makes an unchecked claim")

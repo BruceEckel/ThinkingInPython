@@ -98,6 +98,7 @@ EXCLUDED: dict[str, str] = {
     "preview-check": "needs node, and the network to install jsdom",
     "verify-targets": "this is the target that runs this script",
     "rewrite": "runs headless claude passes that cost tokens and edit prose",
+    "prompt-facts": "asks Gemini through agy; costs tokens and takes minutes",
     "outside-review": "sends a chapter to Gemini through agy; costs tokens "
                       "and needs a signed-in agy",
     "check-ch": "needs a CH= chapter selector this smoke test cannot supply",

@@ -8,10 +8,12 @@ from tools import prompt_facts_probe as probe
 from tools.config import ROOT
 from tools.prompt_facts_probe import (
     HEADING,
+    RUNS_INTRO,
     build_message,
     parse_facts,
     parse_verdicts,
     report_lines,
+    save_run,
 )
 
 FIXTURE = f"""Review the chapter.
@@ -154,3 +156,32 @@ def test_refuses_under_ci(
     monkeypatch.setattr(sys, "argv", ["probe", "--prompt", str(prompt)])
     assert probe.main() == 1
     assert fake.calls == 0
+
+
+def test_save_run_starts_the_file_once_and_appends_each_run(
+    tmp_path: Path,
+) -> None:
+    log = tmp_path / "runs.md"
+    save_run(log, "model-a", ["row 1", "summary"])
+    save_run(log, "model-b", ["row 1", "summary"])
+    text = log.read_text(encoding="utf-8")
+    assert text.startswith(RUNS_INTRO)
+    assert text.count("# Prompt facts probe runs") == 1
+    assert text.index("## model-a, ") < text.index("## model-b, ")
+    assert text.count("```\nrow 1\nsummary\n```") == 2
+    assert "\r" not in log.read_bytes().decode("utf-8")
+
+
+def test_save_option_appends_the_table(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    fake = FakeAgy([REPLY])
+    monkeypatch.setattr(probe.subprocess, "run", fake)
+    log = tmp_path / "runs.md"
+    assert run_main(monkeypatch, tmp_path, "--save", str(log)) == 0
+    text = log.read_text(encoding="utf-8")
+    assert "1 of 3 statements still disputed" in text
+    assert f"## {probe.DEFAULT_MODEL}, " in text
+    assert f"appended to {log}" in capsys.readouterr().out

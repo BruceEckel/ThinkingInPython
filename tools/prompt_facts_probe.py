@@ -20,6 +20,12 @@ earns its place. A `yes` row is a candidate to drop, once a later run
 agrees. The last line counts the disputed statements (FALSE, UNSURE,
 or missing).
 
+The answers differ from run to run, and the drop rule needs two runs
+to agree, so `--save` appends the run's model, date, and table to
+`tools/data/prompt_facts_runs.md`, a tracked log the next run is read
+against. `tip prompt-facts` passes `--save`; a bare `--save` writes
+that file, and `--save FILE` another.
+
 The call reuses the helpers of `tools/outside_review.py`: the `agy`
 lookup, the command line, the NDJSON message, and the result event.
 There is no retry. The tool is a report, not a gate: it returns 0
@@ -32,6 +38,7 @@ Usage:
     python -m tools.prompt_facts_probe                # the table
     python -m tools.prompt_facts_probe --dry-run      # print, run nothing
     python -m tools.prompt_facts_probe --raw          # reply, then table
+    python -m tools.prompt_facts_probe --save         # append the table
     python -m tools.prompt_facts_probe --model gemini-3.1-pro-high
     python -m tools.prompt_facts_probe --prompt other.md --timeout 1200
 """
@@ -41,8 +48,10 @@ import os
 import re
 import subprocess
 import sys
+from datetime import date
 from pathlib import Path
 from tools.config import ROOT
+from tools.repo import write_text_lf
 from tools.outside_review import (
     DEFAULT_PROMPT,
     INSTALL_NOTE,
@@ -56,6 +65,15 @@ from tools.outside_review import (
 
 DEFAULT_MODEL = "gemini-3.8-flash-high"
 DEFAULT_TIMEOUT = 600
+RUNS_FILE = ROOT / "tools" / "data" / "prompt_facts_runs.md"
+RUNS_INTRO = """# Prompt facts probe runs
+
+Each `tip prompt-facts` run appends its table here: the model, the
+date, and a verdict per bullet of `outside_review_prompt.md`'s
+"Treat these as valid" list. A `no` row is a bullet the model still
+disputes. Drop a bullet after two runs mark it `yes`; keep every
+other one. The runs are nondeterministic, so read two before acting.
+"""
 HEADING = "Treat these as valid and do not flag them:"
 FACT_WIDTH = 50
 
@@ -141,6 +159,16 @@ def report_lines(
     return lines
 
 
+def save_run(path: Path, model: str, lines: list[str]) -> None:
+    """Append the run's table under a heading; start the file if new."""
+    heading = f"## {model}, {date.today().isoformat()}"
+    block = "\n".join(["", heading, "", "```", *lines, "```", ""])
+    text = path.read_text(encoding="utf-8") if path.is_file() else ""
+    if not text:
+        text = RUNS_INTRO
+    write_text_lf(path, text.rstrip("\n") + "\n" + block)
+
+
 def ask(argv: list[str], message: str, timeout: int) -> str | None:
     """One `agy` call; the reply text, or None after a report."""
     try:
@@ -205,6 +233,10 @@ def main() -> int:
                              "and the message; call nothing")
     parser.add_argument("--raw", action="store_true",
                         help="print the model's reply before the table")
+    parser.add_argument("--save", nargs="?", const=RUNS_FILE, type=Path,
+                        metavar="FILE",
+                        help="append the model, date, and table to FILE "
+                             "(default: tools/data/prompt_facts_runs.md)")
     args = parser.parse_args()
 
     if os.environ.get("CI"):
@@ -243,8 +275,12 @@ def main() -> int:
     if args.raw:
         print(reply.strip())
         print()
-    for line in report_lines(facts, parse_verdicts(reply, len(facts))):
+    lines = report_lines(facts, parse_verdicts(reply, len(facts)))
+    for line in lines:
         print(line)
+    if args.save is not None:
+        save_run(args.save, args.model, lines)
+        print(f"  appended to {args.save}")
     return 0
 
 
