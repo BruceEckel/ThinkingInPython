@@ -1519,7 +1519,7 @@ Each model announces its own kind of data,
 an `int` from `Counter` and a `str` from `History`,
 so a responder connects to one model or the other.
 
-In Document-View, a single class both displays and interprets input:
+In Document-View, a single class interprets input and displays results:
 
 ```python
 # document_view.py
@@ -1566,16 +1566,15 @@ for char in "++-x":
 
 `key()` is the controller, contained within `View` as a method.
 `__post_init__()` connects a display method to each model,
-so a `View` is wired as soon as it exists.
-`key()` records the character in the history and sends a request to the counter,
-and each model pushes its new state to the display method connected to it.
+so a `View` is configured as soon as it exists.
+`key()` records the character in the history model and sends a request to the counter model,
+and each model pushes its new state to its display method.
 In the wildcard case matched by `x`, `key()` leaves the counter alone,
 so the four characters of `"++-x"` print four histories and three counts.
 
-Because `key()` writes to both models, `View` holds both,
-and because `View` is the one class that displays,
-both display methods sit beside `key()`.
-A third model means a third field and a third display method in the same class.
+`key()` writes to both models, so `View` holds a field for each.
+`View` is also the one class that displays,
+so each model's display method sits in `View` beside `key()`.
 
 MVC uses separate classes for the views and the controller:
 
