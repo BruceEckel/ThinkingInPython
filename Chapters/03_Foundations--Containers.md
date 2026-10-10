@@ -293,7 +293,8 @@ and they mix freely with ordinary elements.
 
 The last two lines use both directions.
 `*rest` collects on the left of the assignment and spreads inside the display,
-so the pair rotates `evens` by one place.
+so the pair builds a new list holding `evens` rotated by one place,
+and `evens` stays as it was.
 `+` joins two lists as well, but both operands must be lists,
 and `[0, 2] + (1, 3)` raises a `TypeError`.
 [Functions](05_Foundations--Functions.md#unpacking-arguments)
@@ -374,7 +375,8 @@ and leaving it off is a common slip.
 `for name, age in ages` iterates over the keys and tries to unpack each one.
 Unpacking `"Alice"` into two names raises a `ValueError`,
 since the string has more than two characters.
-A two-character key such as `"Bo"` unpacks into its letters and the loop finishes with no error.
+A two-character key such as `"Bo"` unpacks into its letters with no error,
+so a dictionary whose keys are all that length hides the slip.
 
 `keys()` is also set-like, and so is `items()` when every value is hashable.
 Each supports `&`, `|`, `-`,
@@ -735,15 +737,15 @@ print(deque_time * 20 < list_time)  # Not close
 #: True
 ```
 
-Use a `deque` for a single-threaded queue.
+Use a `deque` for a queue.
 Indexing its middle is O(n), though,
 so keep a `list` wherever you index by position.
 A `deque(maxlen=n)` also caps its length,
 discarding from the other end when a new item overflows it.
 That is a sliding window, and a `list` has no equivalent.
-For a queue shared between threads,
+When one thread must wait for another to supply the next item,
 use [`queue.Queue`](19_Techniques--Concurrency.md#coordinating-threads-with-queues),
-and for a priority queue, `heapq`.
+whose `get()` blocks until an item arrives, and for a priority queue, `heapq`.
 
 ### `namedtuple`
 
@@ -907,7 +909,7 @@ except TypeError as e:
 
 The `tuple` holds the same `list` for its whole life,
 and that `list` stays free to change.
-A container holding an unhashable object is unhashable too.
+An immutable container holding an unhashable object is unhashable too.
 Immutability is beneficial when it goes all the way down,
 because then you can share or hash a value and trust that everything inside it stays the same.
 [Rethinking Objects](20_Patterns--Rethinking_Objects.md#the-immutability-solution)
