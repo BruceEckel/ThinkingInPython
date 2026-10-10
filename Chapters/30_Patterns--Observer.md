@@ -1026,7 +1026,7 @@ A class with several published attributes uses `WeatherStation`'s name-and-value
 ## Observer and I/O
 
 All the examples so far assume that every responder finishes immediately.
-Each prints, appends, or writes back, then returns.
+Each displays, appends, or writes back, then returns.
 `announce()` calls the responders one at a time, in connection order,
 so a responder that calls a network service or writes to a database makes the responders connected after it wait for that call to finish,
 and the setter that announced the change waits for all of them.
@@ -1570,7 +1570,7 @@ so a `View` is configured as soon as it exists.
 `key()` records the character in the history model and sends a request to the counter model,
 and each model pushes its new state to its display method.
 In the wildcard case matched by `x`, `key()` leaves the counter alone,
-so the four characters of `"++-x"` print four histories and three counts.
+so the four characters of `"++-x"` display four histories and three counts.
 
 `key()` writes to both models, so `View` holds a field for each.
 `View` is also the one class that displays,
@@ -1647,10 +1647,10 @@ for char in "kkj":
 ```
 
 In MVC, the views and the controller never directly interact;
-they communicate through the models.
+they communicate through a model.
 `Controller.key()` adds the key to the history and calls `increment()` or `decrement()`,
 each model announces its new state,
-and the view connected to that model prints it.
+and the view connected to that model displays it.
 No view holds a reference to the controller, and the controller holds no view.
 The controller holds both models because it writes to both,
 while each view holds the one model it displays:
@@ -1666,17 +1666,17 @@ you can replace the controller and the views keep working.
 and `key()` compares the character with them through [value patterns](13_Techniques--Pattern_Matching.md#a-bare-name-captures-a-dotted-name-compares),
 since `self.up` is a dotted name.
 The second `Controller` reads `k` and `j` where the first reads `+` and `-`.
-It takes the same two models, and the views built earlier go on printing,
+It takes the same two models, and the views built earlier go on displaying,
 since the announcements they receive come from the models,
 whichever controller sent the request.
-The history carries across the swap as well: `vim`'s first key prints `++-xk`,
+The history carries across the swap as well: `vim`'s first key displays `++-xk`,
 because the keys live in `History` rather than in the controller that recorded them.
 Which keys mean up and down is the controller's business alone.
 A new key scheme is two constructor arguments, and a new kind of key,
 say one that resets the count, is an edit to `Controller`,
 with the views and the models untouched either way.
 The same holds in the other direction:
-a second view connects to a model and both views print,
+a second view connects to a model and both views display,
 with no change to either controller (see exercise 13).
 A third model is a new view class and one more field in the controller,
 with `CountView` and `HistoryView` untouched.
