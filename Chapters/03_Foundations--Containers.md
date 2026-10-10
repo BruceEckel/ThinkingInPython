@@ -34,7 +34,7 @@ for x in odds:
 ```
 
 The first line creates a `list`.
-`append()` adds new elements to `odds`.
+`append()` adds a new element to `odds`.
 The `list` grows automatically.
 The `for` statement iterates through `odds`,
 so `x` takes on each value in the `list`.
@@ -112,7 +112,7 @@ so `x = x.sort()` binds `None` and loses the list.
 Uppercase sorts before lowercase because Python compares strings by code point.
 [Functions](05_Foundations--Functions.md#lambdas)
 shows how a `key=` function changes the ordering.
-`key=str.lower` folds the case here.
+`sorted(words, key=str.lower)` folds the case and puts `apple` first.
 
 ### Mixed Element Types
 
@@ -419,7 +419,8 @@ so `"y"` comes out as `20`.
 `{**a, **b}` builds the same merged `dict`,
 with `**` spreading each dictionary's entries the way `*` spreads a list's elements,
 and the later entry wins a collision.
-Like a list display, a `dict` display accepts any number of starred operands,
+Like a list display,
+a `dict` display accepts any number of double-starred operands,
 with ordinary `key: value` entries among them.
 
 The last line feeds `dict()` an iterable of `(key, value)` pairs,
