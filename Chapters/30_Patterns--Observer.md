@@ -1620,12 +1620,13 @@ Testing follows the same lines.
 A `Controller` needs a `Counter`, so a test builds one, calls `key()`,
 and reads `model.count`, with no view and no output to capture.
 
-Document-View gives one class both jobs,
-displaying the count and interpreting the keys.
+In Document-View, one class contains both the Controller and the View,
+interpreting the keys and displaying the count.
 `View.key()` and `View.display()` share an instance,
 so a different set of keys means editing `View` or subclassing it,
 and the display code comes along either way.
-For a counter that is a small cost, and `grid_view.py` accepts it:
+A counter has one key handler and one display,
+and `grid_view.py` has the same shape:
 `draw()` paints and the `bind()` lambda handles the click, both inside `show()`.
 Split the controller out when input handling varies on its own,
 when the same display must answer to more than one input scheme,
@@ -1727,8 +1728,7 @@ Moving the comparison into the responders puts each threshold with the responder
 The setter announces every assignment, `log` appends every reading,
 and `display` remembers the last value it drew and skips a reading close to it.
 The thermometer knows nothing about tolerance.
-The cost is repetition:
-every responder that filters by size writes the same comparison.
+Every responder that filters by size writes the same comparison.
 
 That repetition is acceptable for a question of *how much*,
 since each responder's threshold is its own.
