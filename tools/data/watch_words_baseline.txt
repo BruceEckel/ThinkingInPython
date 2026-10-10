@@ -71,16 +71,12 @@ Chapters/06_Foundations--Modules_and_Packages.md	only: neither of which can see 
 Chapters/06_Foundations--Modules_and_Packages.md	only: not only a package's submodules
 Chapters/06_Foundations--Modules_and_Packages.md	only: only flags the directory as a package.^[The name CODE often confuses people
 Chapters/06_Foundations--Modules_and_Packages.md	only: only the listed names arrive
-Chapters/06_Foundations--Modules_and_Packages.md	only: so a run pays only for the modules it uses
 Chapters/06_Foundations--Modules_and_Packages.md	only: the way CODE is a keyword only inside a CODE statement
 Chapters/06_Foundations--Modules_and_Packages.md	want: you want its definitions and none of the code at the bottom of the file
-Chapters/07_Foundations--Classes.md	never: Python never calls a base-class constructor on its own
-Chapters/07_Foundations--Classes.md	only: A write-only property is possible but rare
 Chapters/07_Foundations--Classes.md	only: Cache only what cannot change
 Chapters/07_Foundations--Classes.md	only: and add CODE only when users see the output
 Chapters/07_Foundations--Classes.md	only: you often inherit only to establish a common interface
 Chapters/07_Foundations--Classes.md	want: When you override a method but still want the base-class version
-Chapters/07_Foundations--Classes.md	want: so you choose the access you want by defining one or both
 Chapters/08_Foundations--Static_Types.md	even: Explain why the empty string now takes the other branch even though the type checker accepts either version
 Chapters/08_Foundations--Static_Types.md	even: even though CODE is a valid CODE
 Chapters/08_Foundations--Static_Types.md	never: The Python runtime never acts on a type hint
@@ -111,7 +107,6 @@ Chapters/10_Foundations--Cleanup.md	only: CODE runs only after CODE returns (see
 Chapters/10_Foundations--Cleanup.md	only: That list holds the only remaining references
 Chapters/10_Foundations--Cleanup.md	only: The only referrer is CODE
 Chapters/10_Foundations--Cleanup.md	only: since the dictionary holds only live objects and no two live objects share an id
-Chapters/10_Foundations--Cleanup.md	only: so a cycle now costs only the delay
 Chapters/10_Foundations--Cleanup.md	only: so that count is correct only if CODE runs and succeeds
 Chapters/11_Techniques--Testing.md	exactly: CODE is exactly CODE on any IEEE double
 Chapters/11_Techniques--Testing.md	exactly: that CODE ran exactly once
@@ -147,7 +142,9 @@ Chapters/12_Techniques--Data_Classes_as_Types.md	only: so each report lists only
 Chapters/12_Techniques--Data_Classes_as_Types.md	only: so only the postcondition appears here
 Chapters/12_Techniques--Data_Classes_as_Types.md	want: Subscript the factory when you want that agreement checked
 Chapters/13_Techniques--Pattern_Matching.md	and nothing else: and nothing else changes
-Chapters/13_Techniques--Pattern_Matching.md	only: That case matches only a dictionary whose CODE is CODE
+Chapters/13_Techniques--Pattern_Matching.md	cost: Every channel also has a rough cost to send a message
+Chapters/13_Techniques--Pattern_Matching.md	cost: so its cost grows with the number of cases
+Chapters/13_Techniques--Pattern_Matching.md	costs: A dictionary lookup costs the same at any size
 Chapters/13_Techniques--Pattern_Matching.md	only: The case matches only when the pattern fits and the guard is true
 Chapters/13_Techniques--Pattern_Matching.md	only: The check applies only when the matched type is a closed set the compiler can see in full
 Chapters/13_Techniques--Pattern_Matching.md	only: The pattern CODE matches only a two-element sequence and pulls both out at once
@@ -158,7 +155,12 @@ Chapters/13_Techniques--Pattern_Matching.md	only: not only a parameter
 Chapters/13_Techniques--Pattern_Matching.md	only: not only at the end
 Chapters/13_Techniques--Pattern_Matching.md	only: they act as keywords only inside this statement
 Chapters/13_Techniques--Pattern_Matching.md	only: which matches only an empty sequence
+Chapters/13_Techniques--Pattern_Matching.md	price: CODE confirms that the two versions render and price each channel alike
 Chapters/13_Techniques--Pattern_Matching.md	want: Use CODE for a closed set of cases you want to handle in one place
+Chapters/14_Techniques--Decorators.md	cost: A plain pizza knows its own cost and description
+Chapters/14_Techniques--Decorators.md	cost: The tests check the cost and description of a stacked order
+Chapters/14_Techniques--Decorators.md	cost: adds to the cost
+Chapters/14_Techniques--Decorators.md	cost: then print its cost and description
 Chapters/14_Techniques--Decorators.md	even: even after the decorator has returned
 Chapters/14_Techniques--Decorators.md	never: The CODE instance never arrives
 Chapters/14_Techniques--Decorators.md	never: The original body of CODE never runs
@@ -174,6 +176,8 @@ Chapters/14_Techniques--Decorators.md	only: and the only symptom is missing outp
 Chapters/14_Techniques--Decorators.md	only: given only keyword arguments
 Chapters/14_Techniques--Decorators.md	only: only CODE
 Chapters/14_Techniques--Decorators.md	only: so a function arrives as the only argument
+Chapters/14_Techniques--Decorators.md	price: Changing the price of a topping means changing one number
+Chapters/14_Techniques--Decorators.md	price: where a price change touches every class that includes that topping
 Chapters/14_Techniques--Decorators.md	want: If you want the run-once idiom
 Chapters/14_Techniques--Decorators.md	want: Sometimes you want to choose later
 Chapters/15_Techniques--Context_Managers.md	even: even if the block raises an exception
@@ -191,14 +195,15 @@ Chapters/15_Techniques--Context_Managers.md	want: Write a manager once you want 
 Chapters/15_Techniques--Context_Managers.md	want: once you have decided you want one
 Chapters/15_Techniques--Context_Managers.md	want: so name the types you expect unless you want a block that nothing escapes
 Chapters/16_Techniques--Comprehensions.md	already: CODE and CODE are a better choice when the function already exists
+Chapters/16_Techniques--Comprehensions.md	costs: but the throwaway list costs time and memory that the set comprehension avoids
 Chapters/16_Techniques--Comprehensions.md	only: A generator expression needs no parentheses of its own when it is a function's only argument
-Chapters/16_Techniques--Comprehensions.md	only: and pays it only for the values the consumer pulls
 Chapters/16_Techniques--Comprehensions.md	only: but only when its predicate is a named function annotated to return CODE or CODE rather than CODE
 Chapters/16_Techniques--Comprehensions.md	only: especially if you consume the result only once
 Chapters/16_Techniques--Comprehensions.md	only: keeping only the names longer than three characters
 Chapters/16_Techniques--Comprehensions.md	only: only CODE has CODE
 Chapters/16_Techniques--Comprehensions.md	only: splicing only the outer iterable
 Chapters/16_Techniques--Comprehensions.md	only: write a list comprehension that finds the string elements made only of digits (CODE)
+Chapters/16_Techniques--Comprehensions.md	paying: paying attention to which value wins for the key CODE
 Chapters/16_Techniques--Comprehensions.md	want: A CODE loop when you want the side effect rather than the collection
 Chapters/16_Techniques--Comprehensions.md	want: A glob pattern says what you want
 Chapters/16_Techniques--Comprehensions.md	want: Brackets when you want a list
@@ -217,6 +222,8 @@ Chapters/17_Techniques--Metaprogramming.md	is what: That is what a distinct subc
 Chapters/17_Techniques--Metaprogramming.md	is what: and the shared metaclass is what such a family has instead
 Chapters/17_Techniques--Metaprogramming.md	itself: Extend CODE so a class declares itself final with a keyword in its header
 Chapters/17_Techniques--Metaprogramming.md	itself: and returns itself when you read it through the class
+Chapters/17_Techniques--Metaprogramming.md	never: so a name the module never defined prints as a CODE instead of raising a CODE (Reading Annotations Before Their Names Exist explains the formats)
+Chapters/17_Techniques--Metaprogramming.md	never: so it never reaches CODE
 Chapters/17_Techniques--Metaprogramming.md	only: CODE and CODE normally run only because the default CODE calls them
 Chapters/17_Techniques--Metaprogramming.md	only: Now the end user needs only to write and maintain the schedule file
 Chapters/17_Techniques--Metaprogramming.md	only: Only a metaclass makes the class callable in a new way
@@ -233,6 +240,19 @@ Chapters/17_Techniques--Metaprogramming.md	only: whose class exists only as text
 Chapters/17_Techniques--Metaprogramming.md	spelling: You might expect to parameterize[^parameterize-spelling] the class
 Chapters/17_Techniques--Metaprogramming.md	want: and you configure them to produce the objects you want
 Chapters/18_Techniques--Performance.md	already: so a frozen instance already cannot grow
+Chapters/18_Techniques--Performance.md	cost: Calling CODE first pays the compilation and warm-up cost outside the timed region
+Chapters/18_Techniques--Performance.md	cost: Each timing includes the cost of calling the lambda
+Chapters/18_Techniques--Performance.md	cost: How much does a hardware upgrade cost compared to paying programmers to solve the performance problem
+Chapters/18_Techniques--Performance.md	cost: The size comparison shows the cost of boxing
+Chapters/18_Techniques--Performance.md	cost: insulating the measurement from startup cost and clock granularity
+Chapters/18_Techniques--Performance.md	cost: so the conversion cost is small beside that work
+Chapters/18_Techniques--Performance.md	cost: so the same 100 extractions cost roughly O(n + 100 log n)
+Chapters/18_Techniques--Performance.md	costing: costing O(n log n) no matter how few items you then take
+Chapters/18_Techniques--Performance.md	costs: A single lookup costs little either way
+Chapters/18_Techniques--Performance.md	costs: Re-sorting after every insertion costs far more than one incremental CODE/CODE pair
+Chapters/18_Techniques--Performance.md	costs: because costs grow at different rates
+Chapters/18_Techniques--Performance.md	costs: so pulling it costs only O(log n) each time
+Chapters/18_Techniques--Performance.md	costs: then each CODE costs only O(log n)
 Chapters/18_Techniques--Performance.md	even: halve an even value or triple-and-increment an odd one
 Chapters/18_Techniques--Performance.md	is what: so that is what the heap needs to beat
 Chapters/18_Techniques--Performance.md	only: CODE applies only to numeric functions
@@ -248,8 +268,17 @@ Chapters/18_Techniques--Performance.md	only: since it needs only one hash and on
 Chapters/18_Techniques--Performance.md	only: so pulling it costs only O(log n) each time
 Chapters/18_Techniques--Performance.md	only: then each CODE costs only O(log n)
 Chapters/18_Techniques--Performance.md	only: while the lazy one computes only the handful of values that CODE extracts
+Chapters/18_Techniques--Performance.md	paying: How much does a hardware upgrade cost compared to paying programmers to solve the performance problem
+Chapters/18_Techniques--Performance.md	pays: CODE pays O(n) once
+Chapters/18_Techniques--Performance.md	pays: Calling CODE first pays the compilation and warm-up cost outside the timed region
+Chapters/18_Techniques--Performance.md	pays: The first call pays a compilation delay
 Chapters/19_Techniques--Concurrency.md	already: Threads already distributed computing resources
 Chapters/19_Techniques--Concurrency.md	already: Use a thread pool for I/O when the blocking calls already exist and rewriting them as coroutines is not worth the effort
+Chapters/19_Techniques--Concurrency.md	cost: A million tiny results can cost more to pickle than the parallelism saves
+Chapters/19_Techniques--Concurrency.md	cost: Then the per-task cost of pickling and reassembling catches up
+Chapters/19_Techniques--Concurrency.md	cost: avoiding the per-worker process cost
+Chapters/19_Techniques--Concurrency.md	costs: You can support the claim that a thread costs far more memory than a task
+Chapters/19_Techniques--Concurrency.md	costs: and can turn back upward once pickling one more chunk costs more than the better load balancing saves
 Chapters/19_Techniques--Concurrency.md	even: Even when you understand the problems produced by shared mutable state
 Chapters/19_Techniques--Concurrency.md	even: even a program written as CODE from top to bottom keeps a thread pool underneath
 Chapters/19_Techniques--Concurrency.md	even: since finer chunks even out the load across workers
@@ -274,12 +303,9 @@ Chapters/19_Techniques--Concurrency.md	only: Code reaches a heap allocation only
 Chapters/19_Techniques--Concurrency.md	only: Independent processes that communicate only over explicit
 Chapters/19_Techniques--Concurrency.md	only: It is a suspended function that runs only when the event loop resumes it
 Chapters/19_Techniques--Concurrency.md	only: It starts essentially empty and grows only as the program asks for more
-Chapters/19_Techniques--Concurrency.md	only: It starts the next coroutine only after the previous one has finished
-Chapters/19_Techniques--Concurrency.md	only: Only other threads pay for an atomic operation
 Chapters/19_Techniques--Concurrency.md	only: People continue to work toward better ways of concurrent programming.[^libraries] Only in the last decade or so have programmers widely adopted advances such as async/await and structured concurrency
 Chapters/19_Techniques--Concurrency.md	only: Since 3.10 the interpreter switches threads only at a function call or at the jump that closes a loop iteration
 Chapters/19_Techniques--Concurrency.md	only: Tasks run one at a time and switch only at an CODE
-Chapters/19_Techniques--Concurrency.md	only: The event loop keeps only weak references to its tasks
 Chapters/19_Techniques--Concurrency.md	only: The only difference between one run and another is how finely the listing splits the total work
 Chapters/19_Techniques--Concurrency.md	only: This chapter makes concurrency look (somewhat) easy because it has touched only the surface of shared mutable state problems
 Chapters/19_Techniques--Concurrency.md	only: Typically a thread runs only a few milliseconds at a time
@@ -298,9 +324,10 @@ Chapters/19_Techniques--Concurrency.md	only: only the type of object the call bu
 Chapters/19_Techniques--Concurrency.md	only: so only the split changes from one line of output to the next
 Chapters/19_Techniques--Concurrency.md	only: so two threads contend only when they touch the same container
 Chapters/19_Techniques--Concurrency.md	only: while a coroutine yields only at an CODE you chose to write
+Chapters/19_Techniques--Concurrency.md	price: which runs a price function sequentially and threaded
+Chapters/19_Techniques--Concurrency.md	price: writing the same price lookup twice
 Chapters/19_Techniques--Concurrency.md	want: and that is what you want
 Chapters/20_Patterns--Rethinking_Objects.md	is what: *Subtype polymorphism* is what the four subsections below demonstrate
-Chapters/20_Patterns--Rethinking_Objects.md	is what: the question is what Python delivers and what it costs
 Chapters/20_Patterns--Rethinking_Objects.md	never: An override may accept more than the base does but never less
 Chapters/20_Patterns--Rethinking_Objects.md	only: And these copies plug only the outbound leak
 Chapters/20_Patterns--Rethinking_Objects.md	only: But a method is only a function whose first argument is the object
@@ -316,6 +343,7 @@ Chapters/20_Patterns--Rethinking_Objects.md	only: and expose only what you meant
 Chapters/20_Patterns--Rethinking_Objects.md	only: and the only validity check comes at runtime
 Chapters/20_Patterns--Rethinking_Objects.md	only: and you act on objects only by sending messages
 Chapters/20_Patterns--Rethinking_Objects.md	only: expose it only through methods you control
+Chapters/20_Patterns--Rethinking_Objects.md	price: silently treating a weight as a price
 Chapters/20_Patterns--Rethinking_Objects.md	promise: The first OOP promise is encapsulation
 Chapters/20_Patterns--Rethinking_Objects.md	promise: The fourth OOP promise is polymorphism
 Chapters/20_Patterns--Rethinking_Objects.md	promise: The second OOP promise is behavior inside the object
@@ -330,16 +358,15 @@ Chapters/21_Patterns--Design_Patterns.md	itself: by letting the new class regist
 Chapters/21_Patterns--Design_Patterns.md	itself: once each subclass registers itself as its CODE statement runs
 Chapters/21_Patterns--Design_Patterns.md	only: *Once and once only*
 Chapters/21_Patterns--Design_Patterns.md	only: A dotted edge in the figure exists only at check time
-Chapters/21_Patterns--Design_Patterns.md	only: A pattern earns its place only when you have the problem it solves
-Chapters/21_Patterns--Design_Patterns.md	only: In a language whose only rungs are a part's internals and its name
 Chapters/21_Patterns--Design_Patterns.md	only: This listing shows only the shape
 Chapters/21_Patterns--Design_Patterns.md	only: This usually appears only after you apply a standard design several times
-Chapters/22_Patterns--Data_Transfer_Objects.md	even: and a comparison between two different frozen types raises one even then
+Chapters/22_Patterns--Data_Transfer_Objects.md	even: and between two different frozen types it raises one even then
 Chapters/22_Patterns--Data_Transfer_Objects.md	itself: CODE names the fields and documents itself at each call site
-Chapters/22_Patterns--Data_Transfer_Objects.md	only: Because CODE is the only parameter
 Chapters/22_Patterns--Data_Transfer_Objects.md	only: The hand-rolled CODE is worth writing only to show how CODE works underneath
 Chapters/22_Patterns--Data_Transfer_Objects.md	only: and the CODE marker from Positional-Only and Keyword-Only Parameters is unnecessary here
 Chapters/22_Patterns--Data_Transfer_Objects.md	want: When you want the fields named and checked
+Chapters/23_Patterns--Iterators.md	cost: What has CODE cost you on an infinite source
+Chapters/23_Patterns--Iterators.md	costs: Both surprises in The Costs of Laziness come from the same rule
 Chapters/23_Patterns--Iterators.md	ever: No type checker can read the code and decide whether an iterator ever ends
 Chapters/23_Patterns--Iterators.md	itself: Its CODE returns itself
 Chapters/23_Patterns--Iterators.md	only: CODE shows only the stream version
@@ -386,11 +413,11 @@ Chapters/25_Patterns--Template_Method.md	only: and CODE stops that replacement o
 Chapters/25_Patterns--Template_Method.md	only: and only its steps come from outside
 Chapters/25_Patterns--Template_Method.md	only: only one that nearly matches an inherited name produces a CODE
 Chapters/25_Patterns--Template_Method.md	only: so a subclass overrides only the steps that matter to it
-Chapters/25_Patterns--Template_Method.md	only: whereas CODE is only a type-checking attribute
 Chapters/25_Patterns--Template_Method.md	want: If you want the interpreter to refuse an override
 Chapters/26_Patterns--Surrogate.md	even: even when the implementation defines a CODE of its own
+Chapters/26_Patterns--Surrogate.md	expensive: A *virtual proxy* delays building an expensive object until something asks for it
+Chapters/26_Patterns--Surrogate.md	expensive: Provides "lazy initialization" to create expensive objects on demand
 Chapters/26_Patterns--Surrogate.md	itself: CODE calls itself when the name it reads is also missing
-Chapters/26_Patterns--Surrogate.md	itself: Extend CODE's CODE so it answers one cheap attribute itself
 Chapters/26_Patterns--Surrogate.md	itself: so a CODE that reads CODE calls itself forever
 Chapters/26_Patterns--Surrogate.md	only: A guest reaches only the names in CODE
 Chapters/26_Patterns--Surrogate.md	only: Create a program similar to a DBMS that allows only a set number of connections at a time
@@ -428,7 +455,6 @@ Chapters/28_Patterns--Function_Objects.md	only: The CODE in CODE makes CODE posi
 Chapters/28_Patterns--Function_Objects.md	only: The undo discussion needs only a type
 Chapters/28_Patterns--Function_Objects.md	only: and the type checker rejects CODE as an assignment to a read-only property
 Chapters/28_Patterns--Function_Objects.md	only: so a class was the only form available
-Chapters/28_Patterns--Function_Objects.md	only: so a class with the right CODE that skipped CODE passes the type checker and fails only when CODE looks it up
 Chapters/28_Patterns--Function_Objects.md	want: or do you now want an object
 Chapters/29_Patterns--Changing_the_Interface.md	itself: so CODE calls itself until Python raises a CODE
 Chapters/29_Patterns--Changing_the_Interface.md	only: A function that now takes a CODE in place of a string can then warn only the callers still passing a string
@@ -440,9 +466,14 @@ Chapters/29_Patterns--Changing_the_Interface.md	only: The rename is legal becaus
 Chapters/29_Patterns--Changing_the_Interface.md	only: and import only those from a second file
 Chapters/29_Patterns--Changing_the_Interface.md	only: and their required assembly order appears only inside CODE
 Chapters/29_Patterns--Changing_the_Interface.md	only: create an interface that presents only what the client programmer needs
+Chapters/31_Patterns--State_Machines.md	costs: or clears a selection that costs more than the money inserted
 Chapters/31_Patterns--State_Machines.md	exactly: The engine's lookup keys on CODE exactly
+Chapters/31_Patterns--State_Machines.md	expensive: The sold-out and too-expensive clears both print CODE and end in different states
+Chapters/31_Patterns--State_Machines.md	expensive: The too-expensive conditional branch
+Chapters/31_Patterns--State_Machines.md	expensive: Too expensive returns to CODE with the money still inserted
 Chapters/31_Patterns--State_Machines.md	only: and those states exist only after every class definition has run
 Chapters/31_Patterns--State_Machines.md	only: two subclasses of CODE that differ only in their class
+Chapters/31_Patterns--State_Machines.md	price: decided by price and stock
 Chapters/31_Patterns--State_Machines.md	want: or want the mechanism visible in your own code
 Chapters/32_Patterns--Multiple_Dispatching.md	even: so even elaborate behavior fits the table
 Chapters/32_Patterns--Multiple_Dispatching.md	even: so even elaborate behavior fits the table (see exercise 9)
@@ -450,7 +481,6 @@ Chapters/32_Patterns--Multiple_Dispatching.md	exactly: It matches classes exactl
 Chapters/32_Patterns--Multiple_Dispatching.md	exactly: The lookup matches classes exactly
 Chapters/32_Patterns--Multiple_Dispatching.md	exactly: it matches on the MRO rather than exactly
 Chapters/32_Patterns--Multiple_Dispatching.md	exactly: while the table matches the class exactly
-Chapters/32_Patterns--Multiple_Dispatching.md	itself: The fallback is how a type written decades after CODE can add itself to an CODE on the left
 Chapters/32_Patterns--Multiple_Dispatching.md	only: CODE needs only the CODE and CODE cases
 Chapters/32_Patterns--Multiple_Dispatching.md	only: Only a returned sentinel makes Python try the right operand's CODE
 Chapters/32_Patterns--Multiple_Dispatching.md	only: That is why one method call can resolve only one unknown type
@@ -462,8 +492,11 @@ Chapters/33_Patterns--Visitor.md	itself: *Multiple Dispatching* is the end in it
 Chapters/33_Patterns--Visitor.md	only: CODE is the conventional placeholder for a name that exists only to satisfy CODE
 Chapters/33_Patterns--Visitor.md	only: Only mypy rejects it
 Chapters/33_Patterns--Visitor.md	only: and the frames differ only in the method the return trip reaches
+Chapters/33_Patterns--Visitor.md	price: for a reason The Price of the Empty Base explains below
 Chapters/34_Patterns--Composite_and_Interpreter.md	already: CODE would receive CODE with the fold already done
 Chapters/34_Patterns--Composite_and_Interpreter.md	already: Each rule is a nested pattern over a pair of already-simplified children
+Chapters/34_Patterns--Composite_and_Interpreter.md	cost: The cost matters most on the deep trees about which this chapter warns later
+Chapters/34_Patterns--Composite_and_Interpreter.md	cost: and that convenience has a memory cost
 Chapters/34_Patterns--Composite_and_Interpreter.md	even: CODE fails type checking even with a case for every node
 Chapters/34_Patterns--Composite_and_Interpreter.md	exactly: CODE yields exactly one level of CODE and CODE objects
 Chapters/34_Patterns--Composite_and_Interpreter.md	itself: so the alias names itself through one of its own members
@@ -477,6 +510,10 @@ Chapters/35_Patterns--Flyweight.md	only: Only identity proves sharing
 Chapters/35_Patterns--Flyweight.md	only: and a slotted class gets one only by declaring it
 Chapters/35_Patterns--Flyweight.md	only: but only a handful of tile kinds
 Chapters/35_Patterns--Flyweight.md	want: If you want callers to construct objects with an ordinary class call such as CODE
+Chapters/36_Patterns--Memento.md	cost: Two thousand edits held in a CODE cost about two million pointers
+Chapters/36_Patterns--Memento.md	cost: so CODE edits held in the history cost CODE pointers in total
+Chapters/36_Patterns--Memento.md	costs: CODE costs time and memory proportional to the whole nested structure it rebuilds
+Chapters/36_Patterns--Memento.md	costs: The final CODE alone costs two thousand
 Chapters/36_Patterns--Memento.md	itself: Change CODE so CODE holds the list itself instead of a tuple copy
 Chapters/36_Patterns--Memento.md	itself: an opaque snapshot of itself
 Chapters/36_Patterns--Memento.md	only: A parameter typed CODE accepts only a CODE
@@ -501,6 +538,7 @@ Chapters/38_Patterns--Simulation.md	itself: it keeps the first for itself and sp
 Chapters/38_Patterns--Simulation.md	itself: not to itself
 Chapters/38_Patterns--Simulation.md	itself: so a new kind of item registers itself
 Chapters/38_Patterns--Simulation.md	itself: so each view drives or replays its model itself
+Chapters/38_Patterns--Simulation.md	never: because a maze character is one character long and never equals CODE's empty CODE
 Chapters/38_Patterns--Simulation.md	only: A single CODE would await only the tasks in the list at the moment of the call
 Chapters/38_Patterns--Simulation.md	only: Because CODE depends only on the CODE CODE
 Chapters/38_Patterns--Simulation.md	only: CODE is CODE only for a type checker reading the file and CODE at runtime
@@ -546,7 +584,6 @@ Chapters/41_Functional--Toolkits.md	only: *Lazy evaluation* computes a value onl
 Chapters/41_Functional--Toolkits.md	only: A perfect trio schedule exists only when the roster size leaves a remainder of 3 when divided by 6
 Chapters/41_Functional--Toolkits.md	only: CODE works correctly only for pure functions
 Chapters/41_Functional--Toolkits.md	only: Pairs are the only group size where that question has a tidy rotation-based answer
-Chapters/41_Functional--Toolkits.md	only: Rotation is a pairs-only method
 Chapters/41_Functional--Toolkits.md	only: The *circle method* solves the pairs-only version exactly
 Chapters/41_Functional--Toolkits.md	only: and it holds only the few items in flight
 Chapters/41_Functional--Toolkits.md	only: built only from CODE pieces and a generator expression
@@ -557,14 +594,12 @@ Chapters/41_Functional--Toolkits.md	only: you can describe an infinite sequence 
 Chapters/41_Functional--Toolkits.md	want: CODE is the right choice when equal lengths are an invariant you want checked
 Chapters/41_Functional--Toolkits.md	want: CODE to take as many of them as you want
 Chapters/41_Functional--Toolkits.md	want: and keeping one is right when you want each pair of distinct elements once
-Chapters/42_Functional--Error_Handling.md	exactly: The narrowing works because CODE is a union of exactly two classes
 Chapters/42_Functional--Error_Handling.md	only: Reading CODE without a default is safe here only because CODE adds a note on every failure
 Chapters/42_Functional--Error_Handling.md	only: The only way to the answer is narrowing to one of the two classes
 Chapters/42_Functional--Error_Handling.md	only: so only the value's runtime type says which side you received
 Chapters/42_Functional--Error_Handling.md	wants: so a caller who wants the original must read it from the new exception's CODE (set by CODE) or CODE (set when a handler raises an exception without CODE)
 Chapters/43_Functional--Confidence.md	even: and perhaps some should even be mathematically provable
 Chapters/43_Functional--Confidence.md	exactly: every student appears in exactly one group per round
-Chapters/43_Functional--Confidence.md	itself: Substitution stops working the moment a function reads or writes outside itself
 Chapters/43_Functional--Confidence.md	only: CODE prints the two times only when you run the listing with CODE
 Chapters/43_Functional--Confidence.md	only: Narrow CODE to compare only the counts
 Chapters/43_Functional--Confidence.md	only: so the theorem holds only as far as the annotations reach
@@ -589,6 +624,7 @@ Chapters/44_Effects--Effect_Management.md	only: Caching works only because the c
 Chapters/44_Effects--Effect_Management.md	only: It shares only its name with the TypeScript library
 Chapters/44_Effects--Effect_Management.md	only: Only a runtime failure verifies the wiring
 Chapters/44_Effects--Effect_Management.md	only: yet each must name both parameters only to pass them to the function below it
+Chapters/44_Effects--Effect_Management.md	price: The function it calls computes a total price
 Chapters/44_Effects--Effect_Management.md	want: You annotate explicitly when you want a constraint
 Chapters/45_Effects--Generators.md	itself: Nothing prints the CODE itself
 Chapters/45_Effects--Generators.md	only: A driver holding only the outermost generator can still stop and clean up every frame beneath it
@@ -600,8 +636,9 @@ Chapters/45_Effects--Generators.md	only: so only the CODE call sits there
 Chapters/46_Effects--Stateless.md	already: A function that already returns an Effect needs no CODE
 Chapters/46_Effects--Stateless.md	already: CODE is a second handler already applied to CODE
 Chapters/46_Effects--Stateless.md	already: CODE is already CODE
-Chapters/46_Effects--Stateless.md	already: Its accessor carries CODE on a function that already returns an Effect
+Chapters/46_Effects--Stateless.md	already: It carries CODE on a function that already returns an Effect
 Chapters/46_Effects--Stateless.md	already: which raises a CODE because a loop is already running
+Chapters/46_Effects--Stateless.md	cost: That is the cost behind "a synchronous program calls it once
 Chapters/46_Effects--Stateless.md	even: CODE must declare the CODE even though no CODE appears in its body
 Chapters/46_Effects--Stateless.md	even: and even then it is the bare union CODE rather than a wrapper object
 Chapters/46_Effects--Stateless.md	even: even for an Effect with no CODE in it
@@ -635,7 +672,12 @@ Chapters/46_Effects--Stateless.md	only: so looking up a name is the only step an
 Chapters/46_Effects--Stateless.md	only: so today the parent contributes only the name CODE matches
 Chapters/46_Effects--Stateless.md	wants: A caller who wants to redirect the output
 Chapters/47_Effects--Stateless_in_Practice.md	already: CODE and CODE already share a signature
+Chapters/47_Effects--Stateless_in_Practice.md	already: On a function that already returns an Effect
 Chapters/47_Effects--Stateless_in_Practice.md	already: which CODE already declares
+Chapters/47_Effects--Stateless_in_Practice.md	cost: at least twenty times the cost of CODE
+Chapters/47_Effects--Stateless_in_Practice.md	cost: so it pays that cost on every CODE
+Chapters/47_Effects--Stateless_in_Practice.md	costs: CODE reuses the running loop and costs little beyond the Effect
+Chapters/47_Effects--Stateless_in_Practice.md	costs: Running the listing with CODE prints both per-call costs
 Chapters/47_Effects--Stateless_in_Practice.md	even: CODE stays distinct even then
 Chapters/47_Effects--Stateless_in_Practice.md	even: CODE type-checks even though its CODE claim is false
 Chapters/47_Effects--Stateless_in_Practice.md	even: then say why it differs from CODE's even though both fail the same way
@@ -662,6 +704,9 @@ Chapters/47_Effects--Stateless_in_Practice.md	only: and the only types it mentio
 Chapters/47_Effects--Stateless_in_Practice.md	only: and the window for the mistake is only as wide as the gap between the two reads
 Chapters/47_Effects--Stateless_in_Practice.md	only: and whose body is only the success path
 Chapters/47_Effects--Stateless_in_Practice.md	only: so the only evidence is a bug report saying the log file is occasionally short by a few lines
+Chapters/47_Effects--Stateless_in_Practice.md	pays: so it pays that cost on every CODE
+Chapters/47_Effects--Stateless_in_Practice.md	price: Assert that CODE attempts every price and writes once per purchase
+Chapters/A_Effect_Tracking.md	even: even when it is a class
 Chapters/A_Effect_Tracking.md	only: and the PEP directs every consumer to act only on the objects it recognizes
 Chapters/A_Effect_Tracking.md	only: so a caller declares only what remains unhandled
 Chapters/A_Effect_Tracking.md	want: You write a row when you want a constraint
@@ -671,6 +716,10 @@ Chapters/B_An_Effect_Checker.md	itself: CODE declares itself pure and calls CODE
 Solutions/02_Foundations--Tour/README.md	is what: What differs is what a reader infers
 Solutions/02_Foundations--Tour/README.md	is what: which is what both of these are
 Solutions/02_Foundations--Tour/README.md	only: A post-processor has only the characters
+Solutions/03_Foundations--Containers/README.md	cost: At large CODE the quadratic cost of the list dominates and the CODE wins by a wide and growing margin
+Solutions/03_Foundations--Containers/README.md	cost: CODE compares the cost of operations at the left end of a CODE and of a CODE
+Solutions/03_Foundations--Containers/README.md	costs: so the CODE loop costs O(n)
+Solutions/03_Foundations--Containers/README.md	costs: so the whole loop costs O(n²)
 Solutions/03_Foundations--Containers/README.md	is what: The rest is what CODE supplies after the tally
 Solutions/03_Foundations--Containers/README.md	only: Only an empty list falls short
 Solutions/03_Foundations--Containers/README.md	only: but only the set version commutes
@@ -748,6 +797,9 @@ Solutions/14_Techniques--Decorators/README.md	only: The only effect is the side 
 Solutions/14_Techniques--Decorators/README.md	only: since each layer knows only about the drink it wraps
 Solutions/14_Techniques--Decorators/README.md	only: so CODE and CODE track only their own function's calls
 Solutions/14_Techniques--Decorators/README.md	only: so the failure appears only when the program runs
+Solutions/14_Techniques--Decorators/README.md	price: Each extra adds its own price and name to what the inner drink reports
+Solutions/14_Techniques--Decorators/README.md	price: keep the price
+Solutions/14_Techniques--Decorators/README.md	price: so CODE changes the description and leaves the price alone
 Solutions/15_Techniques--Context_Managers/README.md	only: CODE accepts a count settled only at runtime
 Solutions/15_Techniques--Context_Managers/README.md	only: The CODE is the only difference between the two listings
 Solutions/15_Techniques--Context_Managers/README.md	only: and only then does the exception leave the CODE statement and reach the CODE
@@ -767,6 +819,9 @@ Solutions/17_Techniques--Metaprogramming/README.md	only: Creating CODE adds it t
 Solutions/17_Techniques--Metaprogramming/README.md	only: Restoring the CODE check closes the hole at the only point that works
 Solutions/18_Techniques--Performance/README.md	already: A CODE of floats stores pointers to CODE objects that already exist
 Solutions/18_Techniques--Performance/README.md	already: CODE means the JIT is already running
+Solutions/18_Techniques--Performance/README.md	cost: That cost is the chapter's NumPy lesson arriving early
+Solutions/18_Techniques--Performance/README.md	costs: Sorting the whole list on every pop costs far more and gains nothing
+Solutions/18_Techniques--Performance/README.md	costs: because the race is between one hash computation and a short linear scan that costs almost nothing until the list grows long
 Solutions/18_Techniques--Performance/README.md	does it: The answer to "at which size does it stop mattering" is therefore not a size where the two versions become equally fast
 Solutions/18_Techniques--Performance/README.md	even: The comprehension must build and hold the whole list of half a million even squares before CODE discards nearly all of them
 Solutions/18_Techniques--Performance/README.md	even: and even which values you store
@@ -789,18 +844,26 @@ Solutions/19_Techniques--Concurrency/README.md	only: The equivalence is only as 
 Solutions/19_Techniques--Concurrency/README.md	only: The race stays invisible only because this interpreter places its switch points elsewhere
 Solutions/19_Techniques--Concurrency/README.md	only: so the child skips the pool-building code and only the process you launched runs it
 Solutions/19_Techniques--Concurrency/README.md	only: the interpreter considers switching threads only at a function call or at the jump that closes a loop iteration
+Solutions/19_Techniques--Concurrency/README.md	price: At runtime the line raises a CODE before any price comes back
 Solutions/20_Patterns--Rethinking_Objects/README.md	only: CODE exists only for the type checker
 Solutions/20_Patterns--Rethinking_Objects/README.md	only: CODE gets only the methods you write for it
 Solutions/20_Patterns--Rethinking_Objects/README.md	only: The composed version holds a CODE as a field and exposes only methods you write
 Solutions/20_Patterns--Rethinking_Objects/README.md	only: Write CODE to hold a CODE and expose CODE and CODE as read-only properties that return the fields you choose
 Solutions/20_Patterns--Rethinking_Objects/README.md	only: because it asks only for those two properties
 Solutions/20_Patterns--Rethinking_Objects/README.md	only: so the caller changes only the copy
+Solutions/20_Patterns--Rethinking_Objects/README.md	price: so the type checker finally sees that a weight is not a price
 Solutions/21_Patterns--Design_Patterns/README.md	only: A design that makes formats pluggable and fields painful is the right answer only if formats are what keep changing
 Solutions/21_Patterns--Design_Patterns/README.md	only: Only the scaffolding disappears
 Solutions/21_Patterns--Design_Patterns/README.md	only: only an argument to pass
 Solutions/21_Patterns--Design_Patterns/README.md	shipping: The design is the same shipping calculation
 Solutions/22_Patterns--Data_Transfer_Objects/README.md	only: 'list')CODERecipe` is hashable only when every field is
 Solutions/22_Patterns--Data_Transfer_Objects/README.md	want: Which one is right depends on whether you want your three numbers to travel as data or to mean something
+Solutions/23_Patterns--Iterators/README.md	cost: because the smaller figure carries a cost that stays the same at every CODE
+Solutions/23_Patterns--Iterators/README.md	costs: **Measure what rewinding costs
+Solutions/23_Patterns--Iterators/README.md	costs: A hundredfold wider gap costs roughly forty times the memory rather than a hundred
+Solutions/23_Patterns--Iterators/README.md	costs: The Costs of Laziness explains that creating a generator runs none of its body
+Solutions/23_Patterns--Iterators/README.md	costs: The endless source shows what the faking costs
+Solutions/23_Patterns--Iterators/README.md	costs: so supporting it on an endless source costs unbounded memory
 Solutions/23_Patterns--Iterators/README.md	exactly: CODE asks for exactly ten
 Solutions/23_Patterns--Iterators/README.md	have to: and what CODE would have to do to learn a count
 Solutions/23_Patterns--Iterators/README.md	only: A generator's body runs only as far as the next CODE
@@ -810,7 +873,6 @@ Solutions/23_Patterns--Iterators/README.md	only: CODE stops only when CODE repor
 Solutions/23_Patterns--Iterators/README.md	only: CODE works only if every value stays reachable
 Solutions/23_Patterns--Iterators/README.md	only: If CODE drops the loop and tests only the one item it reads
 Solutions/23_Patterns--Iterators/README.md	only: Only CODE stops
-Solutions/23_Patterns--Iterators/README.md	only: The list wins only when a pass is expensive and you know the data is small
 Solutions/23_Patterns--Iterators/README.md	only: The only way to learn how many values remain is to consume them
 Solutions/23_Patterns--Iterators/README.md	only: since CODE and CODE differ only in how they re-yield
 Solutions/23_Patterns--Iterators/README.md	only: so the loss shows only when the program runs
@@ -838,13 +900,11 @@ Solutions/26_Patterns--Surrogate/README.md	only: CODE runs only when normal look
 Solutions/26_Patterns--Surrogate/README.md	only: Let only a CODE class create the CODE objects
 Solutions/26_Patterns--Surrogate/README.md	only: Special Methods Bypass CODE explains why CODE fails on a proxy that forwards only through CODE
 Solutions/26_Patterns--Surrogate/README.md	only: The Recursion Trap and Forwarding with CODE describe a method that Python calls only after normal lookup fails
-Solutions/26_Patterns--Surrogate/README.md	only: and only the list that writes pays for it
 Solutions/26_Patterns--Surrogate/README.md	only: and only when CODE
 Solutions/26_Patterns--Surrogate/README.md	only: which runs only when normal lookup fails
 Solutions/27_Patterns--Factory/README.md	even: so even the table entry disappears
 Solutions/27_Patterns--Factory/README.md	itself: A class registers itself only when its module runs
 Solutions/27_Patterns--Factory/README.md	itself: Each class registers itself
-Solutions/27_Patterns--Factory/README.md	only: "Instance and class checks can only be used with @runtime_checkable protocols"
 Solutions/27_Patterns--Factory/README.md	only: A class registers itself only when its module runs
 Solutions/27_Patterns--Factory/README.md	only: A dictionary lookup treats the same string only as a key
 Solutions/27_Patterns--Factory/README.md	only: CODE against a Protocol also works only when every member is a method
@@ -877,6 +937,8 @@ Solutions/31_Patterns--State_Machines/README.md	only: A nickel differs from a qu
 Solutions/31_Patterns--State_Machines/README.md	only: only a lookup
 Solutions/31_Patterns--State_Machines/README.md	only: which leads only to CODE
 Solutions/31_Patterns--State_Machines/README.md	want: so create one when you want a separate row and not when you want a separate value
+Solutions/32_Patterns--Multiple_Dispatching/README.md	cost: that cost vanishes into the noise
+Solutions/32_Patterns--Multiple_Dispatching/README.md	costs: so a miss now costs the product of the two depths instead of a single hash
 Solutions/32_Patterns--Multiple_Dispatching/README.md	even: An even count always leaves the opposite pair to define
 Solutions/32_Patterns--Multiple_Dispatching/README.md	even: remembering that an even count leaves each weapon an opposite that draws
 Solutions/32_Patterns--Multiple_Dispatching/README.md	exactly: That is what the chapter's "matches classes exactly" means
@@ -897,6 +959,7 @@ Solutions/32_Patterns--Multiple_Dispatching/README.md	want: Which behavior you w
 Solutions/32_Patterns--Multiple_Dispatching/README.md	wants: Only a caller that wants the tally needs to pass its own CODE in
 Solutions/33_Patterns--Visitor/README.md	only: Only CODE is a CODE function
 Solutions/33_Patterns--Visitor/README.md	only: Only that one needs CODE and CODE
+Solutions/33_Patterns--Visitor/README.md	price: The Price of the Empty Base shows a CODE with a single CODE method as the type of the CODE parameter
 Solutions/34_Patterns--Composite_and_Interpreter/README.md	ever: since following it could loop forever if a link ever pointed back at one of its own ancestors
 Solutions/34_Patterns--Composite_and_Interpreter/README.md	is what: The left operand is what the caller wrote first
 Solutions/34_Patterns--Composite_and_Interpreter/README.md	itself: The derivative of CODE is CODE with respect to itself and CODE with respect to every other variable
@@ -905,6 +968,9 @@ Solutions/34_Patterns--Composite_and_Interpreter/README.md	only: A subexpression
 Solutions/34_Patterns--Composite_and_Interpreter/README.md	only: CODE now answers only for an CODE
 Solutions/34_Patterns--Composite_and_Interpreter/README.md	only: because an CODE can combine its children's values only *after* the children have produced them
 Solutions/34_Patterns--Composite_and_Interpreter/README.md	only: where CODE yields only file paths
+Solutions/35_Patterns--Flyweight/README.md	costs: A cell in the shared field costs one reference into a pool of three CODE objects
+Solutions/35_Patterns--Flyweight/README.md	costs: The two versions differ in what one cell costs
+Solutions/35_Patterns--Flyweight/README.md	costs: while a cell in the unshared field costs a brand-new CODE
 Solutions/35_Patterns--Flyweight/README.md	itself: and the pool empties itself with no explicit cleanup
 Solutions/35_Patterns--Flyweight/README.md	never: so an invalid CODE never reaches the pool
 Solutions/35_Patterns--Flyweight/README.md	only: and only a miss can start a race
@@ -942,6 +1008,7 @@ Solutions/40_Functional--Foundations/README.md	only: and only one of them needs 
 Solutions/40_Functional--Foundations/README.md	only: because each CODE is reachable only through the one function that captured it
 Solutions/40_Functional--Foundations/README.md	only: so its CODE shows only the type and an address
 Solutions/40_Functional--Foundations/README.md	only: then consider how a caller can supply a positional-only parameter
+Solutions/41_Functional--Toolkits/README.md	costs: Sorting first to make CODE safe costs the same memory as CODE
 Solutions/41_Functional--Toolkits/README.md	exactly: and CODE then pulls exactly five totals
 Solutions/41_Functional--Toolkits/README.md	exactly: so CODE yields exactly fifteen integers in all
 Solutions/41_Functional--Toolkits/README.md	is what: because CODE is what CODE builds internally
@@ -972,6 +1039,10 @@ Solutions/44_Effects--Effect_Management/README.md	only: Only the division remain
 Solutions/44_Effects--Effect_Management/README.md	only: and only two of them use it
 Solutions/44_Effects--Effect_Management/README.md	only: and the propagation stops only at CODE
 Solutions/44_Effects--Effect_Management/README.md	only: so CODE needs only methods with matching signatures
+Solutions/44_Effects--Effect_Management/README.md	price: CODE has no equivalent of writing a function against "something awaitable that yields a price" and choosing the implementation later
+Solutions/44_Effects--Effect_Management/README.md	price: The list comprehension awaits each price and hands CODE a list
+Solutions/44_Effects--Effect_Management/README.md	prices: A test that needs fake prices must still inject CODE
+Solutions/44_Effects--Effect_Management/README.md	prices: CODE receives a list of coroutines rather than prices
 Solutions/45_Effects--Generators/README.md	only: A generator's return value arrives only on its CODE
 Solutions/45_Effects--Generators/README.md	only: and CODE is the only value it accepts
 Solutions/45_Effects--Generators/README.md	only: and every CODE expression whose value the generator uses as an CODE must then handle a CODE that arrives only once
@@ -1003,3 +1074,8 @@ Solutions/47_Effects--Stateless_in_Practice/README.md	only: since past the acces
 Solutions/47_Effects--Stateless_in_Practice/README.md	only: so the assertions together say that CODE tries every price and writes only the affordable ones
 Solutions/47_Effects--Stateless_in_Practice/README.md	only: so the guarantee holds only for Effects that go through CODE
 Solutions/47_Effects--Stateless_in_Practice/README.md	only: so the run prints only the message
+Solutions/47_Effects--Stateless_in_Practice/README.md	price: **Prove the loop tries every price
+Solutions/47_Effects--Stateless_in_Practice/README.md	price: A fifth price exhausts the script
+Solutions/47_Effects--Stateless_in_Practice/README.md	price: so the assertions together say that CODE tries every price and writes only the affordable ones
+Solutions/47_Effects--Stateless_in_Practice/README.md	price: the script runs out at the fourth price
+Solutions/47_Effects--Stateless_in_Practice/README.md	prices: CODE attempts all four prices
