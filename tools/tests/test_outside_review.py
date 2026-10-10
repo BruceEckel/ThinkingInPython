@@ -6,7 +6,8 @@ from pathlib import Path
 import pytest
 
 from tools import outside_review
-from tools.outside_review import OUTPUT_LIMIT_ERROR, review_with_retries
+from tools.outside_review import (
+    OUTPUT_LIMIT_ERROR, STREAM_INTERRUPTED, review_with_retries)
 
 CHAPTER = Path("Chapters/30_Patterns--Observer.md")
 
@@ -32,6 +33,17 @@ SUCCESS = result_line({
     "duration_seconds": 3,
 })
 QUOTA = result_line({"status": "ERROR", "error": "quota"})
+INTERRUPTED_WITH_REPLY = result_line({
+    "status": "ERROR",
+    "error": f"{STREAM_INTERRUPTED}. Please continue the task.",
+    "response": "## Review\n\n1. fine\n",
+    "usage": {},
+})
+INTERRUPTED_EMPTY = result_line({
+    "status": "ERROR",
+    "error": f"{STREAM_INTERRUPTED}. Please continue the task.",
+    "response": "",
+})
 
 
 class FakeAgy:
@@ -128,3 +140,28 @@ def test_nonzero_exit_is_final_even_with_a_good_reply(
     install(monkeypatch, fake)
     assert not review(tmp_path, retries=2)
     assert fake.calls == 1
+
+
+def test_an_interrupted_stream_with_a_reply_is_saved_and_flagged(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    fake = FakeAgy([INTERRUPTED_WITH_REPLY, SUCCESS])
+    install(monkeypatch, fake)
+    assert review(tmp_path, retries=2)
+    assert fake.calls == 1
+    text = (tmp_path / "30_Patterns--Observer.md").read_text("utf-8")
+    assert text.startswith("<!-- outside review of ")
+    assert "<!-- the stream was interrupted" in text.splitlines()[1]
+    assert text.endswith("1. fine\n")
+    assert "stream interrupted; check the tail" in capsys.readouterr().out
+
+
+def test_an_interrupted_stream_with_no_reply_is_rerun(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    fake = FakeAgy([INTERRUPTED_EMPTY, SUCCESS])
+    install(monkeypatch, fake)
+    assert review(tmp_path, retries=2)
+    assert fake.calls == 2

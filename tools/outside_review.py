@@ -26,9 +26,15 @@ rerun, up to `--retries` more times (default 2), each attempt logged
 with its number: a result whose status is `ERROR` because the reply
 exceeded the output token limit, and an empty response after `agy`
 denied a tool call (the model tried to act instead of answering, and
-usually answers on the next run). Every other failure, a nonzero exit,
-a timeout, a missing result event, or an `ERROR` of another kind, is
-final for that chapter, and the run continues with the next chapter.
+usually answers on the next run). A third `ERROR`, "The stream was
+interrupted", can arrive after the whole reply has streamed (chapter
+06's Flash round, 2026-10-10, carried four complete items under it):
+with a non-empty response the reply is saved, with a second header
+line saying the stream was interrupted so the reader checks its tail,
+and with an empty one the attempt is rerun. Every other failure, a
+nonzero exit, a timeout, a missing result event, or an `ERROR` of
+another kind, is final for that chapter, and the run continues with
+the next chapter.
 Chapters run one after another in the order given.
 
 This is not a gate. Each run costs tokens, the reply is
@@ -70,6 +76,8 @@ DEFAULT_RETRIES = 2
 
 # The error text of an `ERROR` result that a rerun can clear.
 OUTPUT_LIMIT_ERROR = "exceeded the output token limit"
+# The error text of an `ERROR` result that may still carry the reply.
+STREAM_INTERRUPTED = "The stream was interrupted"
 
 INSTALL_NOTE = (
     "install it from "
@@ -198,12 +206,19 @@ def review_chapter(
     response = result.get("response")
     status = result.get("status")
     retry = False
+    interrupted = (status == "ERROR"
+                   and STREAM_INTERRUPTED in str(result.get("error", "")))
     if done.returncode != 0:
         why = f"agy exited {done.returncode}"
     elif event is None:
         why = "no result event in the output"
     elif status == "ERROR" and OUTPUT_LIMIT_ERROR in json.dumps(result):
         why = f"result status 'ERROR': the reply {OUTPUT_LIMIT_ERROR}"
+        retry = True
+    elif interrupted and isinstance(response, str) and response.strip():
+        why = ""  # The reply streamed before the stream broke: keep it
+    elif interrupted:
+        why = f"result status 'ERROR': {STREAM_INTERRUPTED}, no reply"
         retry = True
     elif status != "SUCCESS":
         why = f"result status {status!r}"
@@ -226,11 +241,16 @@ def review_chapter(
     out = out_dir / f"{chapter.stem}{suffix}.md"
     header = (f"<!-- outside review of {chapter.as_posix()}, "
               f"model {model}, {date.today().isoformat()} -->")
-    write_text_lf(out, f"{header}\n\n{response.strip()}\n")
+    note = ""
+    if interrupted:
+        note = ("<!-- the stream was interrupted after this reply "
+                "streamed; check that its last item is whole -->\n")
+    write_text_lf(out, f"{header}\n{note}\n{response.strip()}\n")
     usage = as_dict(result.get("usage"))
     seconds = result.get("duration_seconds")
     shown = round(seconds) if isinstance(seconds, (int, float)) else "?"
-    print(f"  wrote {out}: {shown} s, tokens in "
+    flag = " (stream interrupted; check the tail)" if interrupted else ""
+    print(f"  wrote {out}{flag}: {shown} s, tokens in "
           f"{usage.get('input_tokens', '?')}, out "
           f"{usage.get('output_tokens', '?')}, thinking "
           f"{usage.get('thinking_tokens', '?')}", flush=True)

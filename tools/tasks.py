@@ -572,7 +572,10 @@ def outside_review(v: Vars) -> None:
     the first instead of overwriting it. A transient failure is rerun up
     to two more times, each attempt logged with its number: an ERROR
     result because the reply exceeded the output token limit, or an
-    empty response after agy denied a tool call. ARGS="--retries N"
+    empty response after agy denied a tool call. An ERROR result that
+    says the stream was interrupted keeps the reply it carries, flagged
+    in the file's second line, and is rerun when it carries none.
+    ARGS="--retries N"
     changes the count, and ARGS="--retries 0" makes one attempt. Other
     failures (a timeout, a nonzero exit, another kind of ERROR) are final
     for that chapter. ARGS=--dry-run prints each command, the output
