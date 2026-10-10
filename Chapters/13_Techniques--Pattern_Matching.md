@@ -13,8 +13,8 @@ match event:
         ...
 ```
 
-That case matches only a dictionary whose `"type"` is `"click"`,
-and it binds `x` and `y` from that dictionary as it matches.
+That case matches only a mapping whose `"type"` is `"click"`,
+and it binds `x` and `y` from that mapping as it matches.
 `match` becomes valuable once the patterns do more than test equality.
 
 Pattern matching first appears in [Control Flow](04_Foundations--Control_Flow.md#pattern-matching).
