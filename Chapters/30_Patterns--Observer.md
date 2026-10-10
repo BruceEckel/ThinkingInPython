@@ -1615,7 +1615,7 @@ Which keys mean up and down is the controller's decision alone,
 and a new key scheme is a new class, with `View` and `Counter` untouched.
 The same holds in the other direction:
 a second view connects to the model and both views print,
-with no change to either controller.
+with no change to either controller (see exercise 13).
 Testing follows the same lines.
 A `Controller` needs a `Counter`, so a test builds one, calls `key()`,
 and reads `model.count`, with no view and no output to capture.
@@ -1826,3 +1826,9 @@ Try each exercise before opening its [solution](../Solutions/30_Patterns--Observ
     and attach one responder that reports `celsius` readings and lets `humidity` pass.
     Show that an assignment to either field reaches that responder,
     so filtering by name is the responder's job, as it is for `WeatherStation`.
+13. Connect a second view to `model_view_controller.py`'s `Counter`:
+    one that prints a bar of asterisks as long as the count,
+    beside the `View` that prints the number.
+    Drive both with `VimController` and show that one key updates the pair.
+    Then say what each class knows about the others,
+    and which of them a third view would require you to change.

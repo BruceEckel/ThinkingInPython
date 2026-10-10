@@ -1939,3 +1939,187 @@ so `calls` holds the two assignments that follow `@station.respond`.
 </details>
 </details>
 </details>
+
+## 13. A second view on the counter
+
+> Connect a second view to `model_view_controller.py`'s `Counter`:
+> one that prints a bar of asterisks as long as the count,
+> beside the `View` that prints the number.
+> Drive both with `VimController` and show that one key updates the pair.
+> Then say what each class knows about the others,
+> and which of them a third view would require you to change.
+
+<details>
+<summary>Where to look</summary>
+
+In [Document-View and MVC](../../Chapters/30_Patterns--Observer.md#document-view-and-mvc), `View` connects its `display()` to the model in `__post_init__()`.
+A second view does the same with its own display method,
+and `VimController` needs no change to feed both.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_13.py
+from collections.abc import Callable
+from record import record
+
+type Responder[T] = Callable[[T], None]
+
+class Broadcaster[T]:
+    def __init__(self) -> None:
+        ...
+
+    def connect(self, responder: Responder[T]) -> None:
+        ...
+
+    def announce(self, data: T) -> None:
+        ...
+
+class Counter(Broadcaster[int]):
+    def __init__(self) -> None:
+        ...
+
+    @property
+    def count(self) -> int:
+        ...
+
+    def increment(self) -> None:
+        ...
+
+    def decrement(self) -> None:
+        ...
+
+@record
+class View:
+    model: Counter
+
+    def __post_init__(self) -> None:
+        ...
+
+    def display(self, count: int) -> None:
+        ...
+
+@record
+class BarView:
+    model: Counter
+
+    def __post_init__(self) -> None:
+        ...
+
+    def display(self, count: int) -> None:
+        ...
+
+@record
+class VimController:  # k is up, j is down
+    model: Counter
+
+    def key(self, char: str) -> None:
+        ...
+```
+
+<details>
+<summary>Solution</summary>
+
+```python
+# exercise_13.py
+from collections.abc import Callable
+from record import record
+
+type Responder[T] = Callable[[T], None]
+
+class Broadcaster[T]:
+    def __init__(self) -> None:
+        self._responders: list[Responder[T]] = []
+
+    def connect(self, responder: Responder[T]) -> None:
+        self._responders.append(responder)
+
+    def announce(self, data: T) -> None:
+        for responder in list(self._responders):
+            responder(data)
+
+class Counter(Broadcaster[int]):
+    def __init__(self) -> None:
+        super().__init__()
+        self._count = 0
+
+    @property
+    def count(self) -> int:
+        return self._count
+
+    def increment(self) -> None:
+        self._count += 1
+        self.announce(self._count)
+
+    def decrement(self) -> None:
+        self._count -= 1
+        self.announce(self._count)
+
+@record
+class View:
+    model: Counter
+
+    def __post_init__(self) -> None:
+        self.model.connect(self.display)
+
+    def display(self, count: int) -> None:
+        print(f"count: {count}")
+
+@record
+class BarView:
+    model: Counter
+
+    def __post_init__(self) -> None:
+        self.model.connect(self.display)
+
+    def display(self, count: int) -> None:
+        print(f"[{'*' * count}]")
+
+@record
+class VimController:  # k is up, j is down
+    model: Counter
+
+    def key(self, char: str) -> None:
+        match char:
+            case "k":
+                self.model.increment()
+            case "j":
+                self.model.decrement()
+            case _:
+                pass
+
+model = Counter()
+view = View(model)
+bar = BarView(model)
+vim = VimController(model)
+for char in "kkj":
+    vim.key(char)
+#: count: 1
+#: [*]
+#: count: 2
+#: [**]
+#: count: 1
+#: [*]
+```
+
+Each key press reaches both views through the model.
+`VimController.key()` calls `increment()` or `decrement()`,
+and the `Counter` announces its new count to every connected responder.
+The views print in the order they connected.
+The controller holds no reference to either view.
+
+`Counter` knows a list of responders and nothing about views or controllers.
+Each view knows the `Counter` to which it connects.
+The controller knows the `Counter` to which it sends requests.
+Each view and the controller hold the model, and none of them holds another.
+
+A third view leaves every existing class as it is.
+The new view connects in its own `__post_init__()`,
+and `Counter`, both views, and `VimController` need no edit.
+In `document_view.py` the controller is a method of the one view,
+so a second view either duplicates `key()` or has no input of its own.
+
+</details>
+</details>
+</details>
