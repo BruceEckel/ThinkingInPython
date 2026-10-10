@@ -175,7 +175,8 @@ The `else` belongs to the `for`, not the `if`.
 A `while` loop can use `else` the same way.
 
 The loop `else` is also how you leave two nested loops at once.
-Put `continue` in the inner loop's `else` and a `break` right after it.
+Put `continue` in the inner loop's `else`, and a `break` after the inner loop,
+at the outer loop's level.
 When the inner loop `break`s,
 Python skips its `else` and the outer `break` runs.
 When the inner loop runs to the end,
@@ -277,7 +278,9 @@ except ValueError as e:
 `zip()` produces one item from each sequence and stops when the shortest runs out,
 so it drops the extra score.
 Stopping without an error is convenient when the lengths differ on purpose and a bug when you expect them to match.
-`strict=True` raises a `ValueError` on the mismatch instead.
+`strict=True` raises a `ValueError` instead,
+at the point where iteration finds one argument exhausted and another not,
+which is why the listing consumes the `zip()` with `list()`.
 
 When you need the index as well, wrap the `zip()` in `enumerate()`.
 The nesting shows up in the loop header, where the inner pair needs parentheses:
@@ -361,7 +364,8 @@ Adding the key changes the dictionary's size,
 and the dictionary raises a `RuntimeError` instead of skipping silently.
 The fix is the same for both.
 Build a new container with a comprehension,
-or collect what to remove first and remove it after the loop.
+loop over a snapshot such as `list(ages)` while changing the original,
+or collect the changes first and apply them after the loop.
 
 ## Pattern Matching
 
