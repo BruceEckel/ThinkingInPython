@@ -273,7 +273,7 @@ the `@contextmanager` shorthand, and what `__exit__()`'s arguments mean.
 `close()` also guards against a second call.
 The explicit `sock.close()` after the `with` block prints nothing,
 because `self.closed` blocks the repeat.
-The `with` protocol calls `close()` for you once.
+`__exit__()` calls `close()` for you once.
 Your own code can still call it again,
 so a real `close()` must do nothing on a repeat call,
 the way a file object's `close()` does.
@@ -534,7 +534,7 @@ The weak registry runs none of your code when an object goes away.
 Never release a resource in `__del__()`.
 The standard library's file and socket types bend that rule as a diagnostic backstop.
 `io.IOBase` gives every file object a `__del__()` that closes it,
-and a file from `open()` or a `socket.socket` also reports a `ResourceWarning` there,
+and a file from `open()` or a `socket.socket` also reports a `ResourceWarning` when it is reclaimed still open,
 catching a forgotten `close()` rather than replacing it:
 
 ```python
