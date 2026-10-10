@@ -1531,7 +1531,8 @@ for char in "++-x":
 `key()` is the controller, contained within `View` as a method.
 `__post_init__()` connects `display()` to the model,
 so a `View` is wired as soon as it exists.
-`key()` sends a request to the model, which then pushes its count to `display()`.
+`key()` sends a request to the model,
+which then pushes its count to `display()`.
 In the wildcard case matched by `x`, `key()` returns without touching the model,
 so the four characters of `"++-x"` print three counts.
 
@@ -1539,12 +1540,8 @@ MVC uses separate classes for the view and the controller:
 
 ```python
 # model_view_controller.py
-from typing import Protocol
 from counter_model import Counter
 from record import record
-
-class KeyHandler(Protocol):
-    def key(self, char: str) -> None: ...
 
 @record
 class View:
@@ -1569,69 +1566,69 @@ class Controller:  # Interprets but doesn't display
             case _:
                 pass
 
-class IgnoringController:  # Ignores input, needs no model
-    def key(self, char: str) -> None: ...
+@record
+class VimController:  # k is up, j is down
+    model: Counter
+
+    def key(self, char: str) -> None:
+        match char:
+            case "k":
+                self.model.increment()
+            case "j":
+                self.model.decrement()
+            case _:
+                pass
 
 model = Counter()
 view = View(model)
-controller: KeyHandler = Controller(model)
+controller = Controller(model)
 for char in "++-x":
     controller.key(char)
 #: count: 1
 #: count: 2
 #: count: 1
-controller = IgnoringController()  # Disables input
-for char in "+++":
-    controller.key(char)
-print(model.count)
-#: 1
+vim = VimController(model)  # Same model, same view
+for char in "kkj":
+    vim.key(char)
+#: count: 2
+#: count: 3
+#: count: 2
 ```
 
-In MVC, the View and the Controller never directly interact; they only communicate through the model.
-[[This seems like the essence of how the two approaches differ, so I'd like to expand on this in terms
-of the benefit it produces. It is also the reason I'm having trouble seeing the usefulness of IgnoringController,
-because if the point is that the V and C communicate through the M, what's the point of a C that has no model?]]
+In MVC, the View and the Controller never directly interact;
+they only communicate through the model.
+`Controller.key()` calls `increment()` or `decrement()`,
+the model announces its new count, and `View.display()` prints it.
+Neither class holds a reference to the other.
+Each holds the model, and the model knows neither of them:
+it announces to whatever responders are connected.
 
-[[I find the rest of this subsection fairly unhelpful]]
+That one-way flow is the benefit of the split.
+Because the view hears from the model alone,
+you can replace the controller and the view keeps working.
+`VimController` reads `k` and `j` where `Controller` reads `+` and `-`.
+It takes the same `model`,
+and the `view` built earlier goes on printing each count,
+since the announcements it receives come from the model,
+whichever controller sent the request.
+Which keys mean up and down is the controller's decision alone,
+and a new key scheme is a new class, with `View` and `Counter` untouched.
+The same holds in the other direction:
+a second view connects to the model and both views print,
+with no change to either controller.
+Testing follows the same lines.
+A `Controller` needs a `Counter`, so a test builds one, calls `key()`,
+and reads `model.count`, with no view and no output to capture.
 
-MVC and Document-View share the `Counter` model,
-the count it announces to `display()`,
-and the printed output for the same input, `"++-x"`.
-*Observer* does the same work either way,
-which is why the chapter's opening calls the two architectures nearly equivalent. [[this seems like it just recapitulates the code in the example]]
-
-One thing moves.
-`key()` leaves `View` for `Controller`,
-which gets its own reference to the model.
-Both classes hold the model,
-`View` so that `__post_init__()` can connect `display()`,
-and `Controller` so that `key()` has somewhere to send the request.
-The MVC `View` keeps `display()` and `Controller` gets `key()`, one job each.
-`Controller` is the third role of MVC.
-Document-View folds that role into `View` as the `key()` method,
-and MVC gives it a class of its own. [[This is mostly captured by my sentence 1590]]
-
-Splitting the controller out lets you swap it.
-*GoF Design Patterns* gives the example:
-a controller that ignores input disables a view's input,
-with the view and the model untouched.
-`IgnoringController` is that controller.
-Its `key()` ignores every character, so it holds no model:
-it has nothing to send. [[which seems like it makes it a degenerate case rather than a demonstrative one]]
-The swap at the end of `model_view_controller.py` type-checks because `controller` is declared `KeyHandler`,
-which both classes satisfy,
-and the three `+` keys that follow leave the count at 1.
-`Controller` needs only a `Counter`, so a test can build a `Controller`,
-call `key()`, and read `model.count`.
-Supporting a different set of keys means writing a third class that satisfies `KeyHandler`,
-with `View` and the model unchanged.
-
-MVC separates display from input handling,
-the two jobs `document_view.py` gives one class,
-and both views connect their own `display()` to the model in `__post_init__()`.
-`grid_view.py` has the Document-View shape.
-Its `draw()` paints, its `bind()` lambda handles the click,
-and both are defined inside `show()`.
+Document-View gives both jobs to one class.
+`View.key()` and `View.display()` share an instance,
+so a different set of keys means editing `View` or subclassing it,
+and the display code comes along either way.
+For a counter that is a small cost, and `grid_view.py` accepts it:
+`draw()` paints and the `bind()` lambda handles the click, both inside `show()`.
+Split the controller out when input handling varies on its own,
+when the same display must answer to more than one input scheme,
+or when interpreting input deserves tests that draw nothing.
 
 ## Deciding What Matters
 
