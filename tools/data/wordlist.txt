@@ -9,6 +9,7 @@ adaptee
 affordances
 aggregator
 amdahl
+app
 async
 asynchrony
 asyncio
@@ -72,7 +73,9 @@ desynchronizes
 dict
 dicts
 discoverability
+django
 docstring
+docstrings
 doorless
 dunder
 dunders
@@ -157,9 +160,11 @@ metaclasses
 metadata
 metamethod
 metamethods
+metaprogram
 metaprogramming
 microbenchmark
 microgrid
+misdescribes
 mixin
 mixins
 modulo
@@ -180,6 +185,7 @@ natively
 newline
 newlines
 nondeterminism
+nonlocal
 nonmatching
 noopener
 numba
@@ -202,6 +208,7 @@ pluggable
 polars
 polymorphically
 postcondition
+pragma
 pre
 precompute
 prepends
@@ -209,6 +216,7 @@ proactor
 profiler
 profilers
 programmatically
+proxying
 py
 pycon
 pycons
@@ -229,7 +237,9 @@ reframed
 reframes
 reframing
 reimplementing
+reiterable
 rel
+replan
 repr
 requeued
 resize
@@ -243,6 +253,7 @@ savepoints
 scala
 simula
 singledispatch
+solvability
 stateful
 stdin
 stdlib
@@ -252,6 +263,7 @@ strawman
 stringified
 subclassed
 subclassing
+subexpression
 subinterpreter
 subinterpreters
 sublist
@@ -292,9 +304,11 @@ typeshed
 unawaited
 unboxed
 uncached
+uncollectable
 uncomment
 uncommented
 uncommenting
+uncomputed
 unconstructable
 undoable
 undos
@@ -305,7 +319,9 @@ unhashable
 unimported
 uninterruptible
 unlifted
+unmangled
 unnormalized
+unoptimized
 unpickle
 unprefixed
 unprint
