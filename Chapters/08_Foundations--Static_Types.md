@@ -942,8 +942,7 @@ The forms above are the modern ones.
 
 ## Exercises
 
-The [solutions](../Solutions/08_Foundations--Static_Types/)
-are in the book's repository.
+Try each exercise before opening its [solution](../Solutions/08_Foundations--Static_Types/).
 
 1.  In `protocols.py`, add a class `Triangle` with its own `draw()`,
     and pass an instance to `render()` without changing `Drawable` or `render()`.

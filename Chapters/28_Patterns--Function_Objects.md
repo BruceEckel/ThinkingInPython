@@ -1000,8 +1000,7 @@ The named operation puts the GoF form at entry 5 rather than entry 4.
 
 ## Exercises
 
-The [solutions](../Solutions/28_Patterns--Function_Objects/)
-are in the book's repository.
+Try each exercise before opening its [solution](../Solutions/28_Patterns--Function_Objects/).
 
 1.  Add an "undo" capability to `command.py`.
     What do the commands need to become, and is a function still enough,

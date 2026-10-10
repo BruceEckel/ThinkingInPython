@@ -592,8 +592,7 @@ Without the mark, nothing tells them.
 
 ## Exercises
 
-The [solutions](../Solutions/29_Patterns--Changing_the_Interface/)
-are in the book's repository.
+Try each exercise before opening its [solution](../Solutions/29_Patterns--Changing_the_Interface/).
 
 1.  Write a `PairsAdapter` that wraps a list of `(key, value)` tuples,
     following the shape of `getattr_adapter.py`.

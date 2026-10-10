@@ -1487,8 +1487,7 @@ Run it.
 
 ## Exercises
 
-The [solutions](../Solutions/38_Patterns--Simulation/)
-are in the book's repository.
+Try each exercise before opening its [solution](../Solutions/38_Patterns--Simulation/).
 
 1.  Test a `Rat` with a fake blackboard.
     Because `Rat` depends only on the `Recorder` `Protocol`,

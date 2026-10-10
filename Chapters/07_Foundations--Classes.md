@@ -630,8 +630,7 @@ or when a subclass should be able to replace it like any other method.
 
 ## Exercises
 
-The [solutions](../Solutions/07_Foundations--Classes/)
-are in the book's repository.
+Try each exercise before opening its [solution](../Solutions/07_Foundations--Classes/).
 
 1.  Add a method `shrink(self, factor)` to `Circle` in `property_setter.py` that sets `self.radius = self.radius / factor`,
     going through the existing setter.

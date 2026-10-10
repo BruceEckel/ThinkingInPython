@@ -711,8 +711,7 @@ generator expressions, and when to write a loop instead.
 
 ## Exercises
 
-The [solutions](../Solutions/04_Foundations--Control_Flow/)
-are in the book's repository.
+Try each exercise before opening its [solution](../Solutions/04_Foundations--Control_Flow/).
 
 1.  In `loop_else.py`, call `find_factor(97)`.
     Predict whether the `for` loop's `else` clause runs before you check,

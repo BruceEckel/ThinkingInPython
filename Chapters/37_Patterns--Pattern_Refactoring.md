@@ -663,8 +663,7 @@ Keep a pattern where it does more than a language feature does.
 
 ## Exercises
 
-The [solutions](../Solutions/37_Patterns--Pattern_Refactoring/)
-are in the book's repository.
+Try each exercise before opening its [solution](../Solutions/37_Patterns--Pattern_Refactoring/).
 
 1.  Add a `Plastic` material to `trash.py`,
     then point `recycle_dict.py` at `plastic.dat` and run it.

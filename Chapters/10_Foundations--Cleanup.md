@@ -578,8 +578,7 @@ so the registry cannot become the leak it exists to catch.
 
 ## Exercises
 
-The [solutions](../Solutions/10_Foundations--Cleanup/)
-are in the book's repository.
+Try each exercise before opening its [solution](../Solutions/10_Foundations--Cleanup/).
 
 1.  In `weak_value.py`, replace the final `counters.clear()` with `counters = []`
     (rebinding the name) and confirm `live_count()` still reaches `0`.

@@ -121,8 +121,8 @@ def solutions_targets(stem: str) -> tuple[str, str]:
 
 def solutions_sentence(stem: str) -> str:
     """The default sentence that links a chapter to its Solutions folder."""
-    return (f"The [solutions](../Solutions/{stem}/) "
-            f"are in the book's repository.")
+    return (f"Try each exercise before opening its "
+            f"[solution](../Solutions/{stem}/).")
 
 
 def intro_span(doc: Document) -> tuple[int, int] | None:

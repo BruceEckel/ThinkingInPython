@@ -1616,8 +1616,7 @@ before you pay it everywhere.
 
 ## Exercises
 
-The [solutions](../Solutions/12_Techniques--Data_Classes_as_Types/)
-are in the book's repository.
+Try each exercise before opening its [solution](../Solutions/12_Techniques--Data_Classes_as_Types/).
 
 1.  Add leap-year support to `Month`,
     so February allows 29 days when the `BirthDate`'s `Year` is a leap year.

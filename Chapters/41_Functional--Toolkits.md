@@ -1127,8 +1127,7 @@ A chain of pure functions leaves that question open.
 
 ## Exercises
 
-The [solutions](../Solutions/41_Functional--Toolkits/)
-are in the book's repository.
+Try each exercise before opening its [solution](../Solutions/41_Functional--Toolkits/).
 
 1.  Rewrite `deep_sum()` from `nested_sum.py` without recursion,
     using a list as an explicit stack.

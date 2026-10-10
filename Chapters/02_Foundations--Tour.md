@@ -648,8 +648,7 @@ Tools such as ruff point out violations and fix many of them automatically.
 
 ## Exercises
 
-The [solutions](../Solutions/02_Foundations--Tour/)
-are in the book's repository.
+Try each exercise before opening its [solution](../Solutions/02_Foundations--Tour/).
 
 1.  In `references.py`, add a line after `c = a[:]` that appends `99` to `c`.
     Print `a` and `c` and confirm that `c` changed and `a` still holds `[1, 2, 3, 4]`,

@@ -2221,8 +2221,7 @@ The rest is the bookkeeping every class carries.
 
 ## Exercises
 
-The [solutions](../Solutions/17_Techniques--Metaprogramming/)
-are in the book's repository.
+Try each exercise before opening its [solution](../Solutions/17_Techniques--Metaprogramming/).
 
 1.  In `init_subclass.py`, add a class `Yellow(Color)` and then `Gold(Yellow)`.
     Predict `Color.registry` after each new class, then confirm.

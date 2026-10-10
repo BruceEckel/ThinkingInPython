@@ -861,8 +861,7 @@ That is the question the next chapter puts into the type system.
 
 ## Exercises
 
-The [solutions](../Solutions/45_Effects--Generators/)
-are in the book's repository.
+Try each exercise before opening its [solution](../Solutions/45_Effects--Generators/).
 
 1.  Write `tally()`, a generator that yields a prompt string,
     receives an `int` for each prompt, and returns the total once it has three.

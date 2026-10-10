@@ -797,8 +797,7 @@ Whenever you see rewind, rollback, or restore, something produces mementos.
 
 ## Exercises
 
-The [solutions](../Solutions/36_Patterns--Memento/)
-are in the book's repository.
+Try each exercise before opening its [solution](../Solutions/36_Patterns--Memento/).
 
 1.  Add `erase()` to both sketches.
     It removes the last stroke.

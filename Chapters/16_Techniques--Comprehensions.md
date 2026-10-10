@@ -749,8 +749,7 @@ and pays it only for the values the consumer pulls.
 
 ## Exercises
 
-The [solutions](../Solutions/16_Techniques--Comprehensions/)
-are in the book's repository.
+Try each exercise before opening its [solution](../Solutions/16_Techniques--Comprehensions/).
 
 1.  Using `a_list` from `a_list.py` (`[1, "4", 9, "a", 0, 4]`),
     write a list comprehension that finds the string elements made only of digits

@@ -669,8 +669,7 @@ Everywhere else you choose between writing a second dispatch in methods and repl
 
 ## Exercises
 
-The [solutions](../Solutions/32_Patterns--Multiple_Dispatching/)
-are in the book's repository.
+Try each exercise before opening its [solution](../Solutions/32_Patterns--Multiple_Dispatching/).
 
 1.  Add a fourth `Item`, `Lizard`, to `paper_scissors_rock_table.py`.
     Lizard beats Paper and Scissors, and loses to Rock.

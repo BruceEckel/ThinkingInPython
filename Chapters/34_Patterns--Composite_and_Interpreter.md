@@ -833,8 +833,7 @@ Here it keeps a decision available to whoever should make it.
 
 ## Exercises
 
-The [solutions](../Solutions/34_Patterns--Composite_and_Interpreter/)
-are in the book's repository.
+Try each exercise before opening its [solution](../Solutions/34_Patterns--Composite_and_Interpreter/).
 
 1.  Add `find(entry, name)` to `filesystem.py`:
     a generator yielding the path of every entry whose name matches.

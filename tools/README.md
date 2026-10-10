@@ -750,8 +750,8 @@ marks a deliberate link to a neighboring file.
 
 The check runs the other way too. Each chapter with exercises links its own
 Solutions folder from the Exercises section, so a reader browsing `Chapters/` on
-GitHub can click through: `The [solutions](../Solutions/<chapter
-stem>/) are in the book's repository.` (The hint, shape, and answer
+GitHub can click through: `Try each exercise before opening its
+[solution](../Solutions/<chapter stem>/).` (The hint, shape, and answer
 steps are described once, in the Introduction.) The check reports a chapter with
 no such link between the last `## Exercises` heading and the first exercise, and
 a link that names another folder, which a chapter rename leaves behind. It holds

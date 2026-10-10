@@ -860,8 +860,7 @@ reuses this `Result` machinery to convert Effects.
 
 ## Exercises
 
-The [solutions](../Solutions/42_Functional--Error_Handling/)
-are in the book's repository.
+Try each exercise before opening its [solution](../Solutions/42_Functional--Error_Handling/).
 
 1.  Add a `func_d()` that returns a `Result[int, str]`,
     and extend the `bind()` chain in `composing_with_bind.py` to include it.
