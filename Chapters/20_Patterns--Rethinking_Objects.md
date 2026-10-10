@@ -144,7 +144,7 @@ Substitutability is one thing OOP promised that no tool can check.
 OOP made four promises: encapsulation,
 behavior bundled into the object as methods, reuse through inheritance,
 and polymorphism.
-For each one, the question is what Python delivers and what it costs.
+For each one, the question is what Python delivers and where it falls short.
 
 ## Encapsulation Leaks
 
@@ -232,7 +232,7 @@ if __name__ == "__main__":
 #: [1, 2] Bob(name='Bob')
 ```
 
-Now the internals are safe, but at a cost: private fields, getters,
+Now the internals are safe, but the class needs private fields, getters,
 and defensive copies, all to stop other code from changing your data.
 And these copies plug only the outbound leak.
 The constructor stores the caller's own list,

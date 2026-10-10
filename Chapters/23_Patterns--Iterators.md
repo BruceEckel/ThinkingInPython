@@ -827,13 +827,13 @@ The last line of output shows that by the time all four methods work,
 The interface needs more than a buffer.
 It rebuilds the list.
 
-Rebuilding the list is the cost the pattern hides.
+The GoF interface hides that rebuild.
 `first()` and `current_item()` assume a collection you can re-read and inspect in place,
 so honoring them over a stream means recreating one, item by item.
 The chapter has now reached that conclusion three times: here,
 in `tee()`'s buffering,
 and in the advice to collect into a list when you must walk data twice.
-Python dropped both methods rather than paying for them everywhere.
+Python dropped both methods rather than make every iterator buffer its stream.
 Without them, `advance()` must return the value it reached.
 That method is `__next__()`.
 
@@ -882,11 +882,11 @@ print(list(doubled_ok(iter([1, 2]))))
 #: [2, 4]
 ```
 
-Each question costs an item.
+Each question consumes an item.
 Nothing in the protocol looks ahead without advancing.
 That is why a peekable iterator must buffer,
 and why `tee()` buffered a whole stream in `tee.py`.
-A membership test pays the same way.
+A membership test consumes items the same way.
 `"c" in letters` pulls items until it finds a match,
 and every item it pulled is gone, the match included.
 
@@ -920,7 +920,7 @@ and the only way to find out whether the source has run out is to pull and get n
 so an exhausted source and an empty one produce identical output.
 The protocol buffers nothing and tells you nothing in advance.
 Every tool in this chapter that does answer in advance, `tee()`, `OverStream`,
-or a peekable wrapper, pays for the answer with a buffer.
+or a peekable wrapper, holds a buffer to give that answer.
 
 ## Exercises
 

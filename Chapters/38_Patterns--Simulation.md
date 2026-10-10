@@ -559,7 +559,7 @@ A stack of frontiers, popped and pushed in a loop, visits the same 139 cells.
 `asyncio` provides control flow.
 Each rat's own path through the maze stays one `while` loop in `run()`,
 instead of a stack of pending frontiers that one function pushes and pops by hand.
-The cost is the event loop,
+The design adds an event loop,
 a component whose one job here is to hand the turn from rat to rat.
 
 Jeremy Meyer wrote the original Java version of this example.

@@ -277,8 +277,8 @@ Every field here is immutable, so the sharing is safe.
 A cache saves recomputation.
 It returns a stored result instead of computing that result again,
 and it can forget any entry while the program's results stay the same,
-because the next call rebuilds an equal result at the cost of some time.
-Building a `Tile` costs almost nothing, so `tile()` has little time to save.
+because the next call rebuilds an equal result, which takes a little time.
+Building a `Tile` is fast, so `tile()` has little time to save.
 What `tile()` gets from `@cache` is identity.
 Every call for a symbol returns the same object.
 A flyweight's factory exists for that sameness.
@@ -402,7 +402,7 @@ Both pools so far hold their objects forever.
 `@cache` keeps strong references to every argument and result,
 and `Color._pool` grows with every new color.
 A map has a handful of tile kinds and a program usually draws from a small palette,
-so holding them forever costs little.
+so holding them forever uses little memory.
 When the set of values keeps growing, such as symbols in a long-running parser,
 the pool becomes a memory leak.
 `weakref.WeakValueDictionary`,

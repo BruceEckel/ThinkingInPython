@@ -1471,7 +1471,7 @@ must run it over its own `globals()`.
 > so that the decorator stores each decorated function's result under `name`.
 > Explain why the decorator takes the name as an argument rather than reading the function's `__name__`.
 > Write that version and read what `ty` reports.
-> Then say what the decorated form gains over the table and what it costs.
+> Then say what the decorated form gains over the table and what it loses.
 
 <details>
 <summary>Where to look</summary>
@@ -1601,12 +1601,13 @@ in advance. The builder is also a function, so `goblin()` still produces
 a fresh prototype on demand when a test needs one that nothing has
 touched.
 
-The costs are the table literal becoming a decorator plus a function
-for each monster, the name repeated at every definition, and the two
-failures the chapter attaches to registration: an undecorated builder
-is absent from the table, with a `KeyError` from `spawn()` that names
-the key and not the builder, and the decorator on a builder in an
-unimported module does not run. For two monsters in one file, the table
+Against that, the decorated form turns the table literal into a
+decorator plus a function for each monster, repeats the name at
+every definition, and brings the two failures the chapter attaches
+to registration: an undecorated builder is absent from the table,
+with a `KeyError` from `spawn()` that names the key and not the
+builder, and the decorator on a builder in an unimported module does
+not run. For two monsters in one file, the table
 literal says the same thing in fewer lines.
 
 </details>

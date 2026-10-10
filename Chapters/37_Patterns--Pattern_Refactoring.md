@@ -432,7 +432,7 @@ while the `match` in `recycle_rtti.py` and `plastic_dropped.py` would need a new
 
 ## Adding Operations: Visitor, and Why Python Skips It
 
-So far a new *type* has cost one class definition and no other edit.
+So far adding a new *type* means writing one class definition and editing nothing else.
 The other axis of change is adding new *operations*.
 A design that adds a type without editing existing code ordinarily adds an operation only by editing every type.
 That trade is the [expression problem](13_Techniques--Pattern_Matching.md#the-expression-problem).
@@ -687,4 +687,4 @@ Try each exercise before opening its [solution](../Solutions/37_Patterns--Patter
     Then write `strict_hazard()`,
     whose base function raises `NotImplementedError`,
     and call it on the same piece.
-    What does the strict form cost the materials whose hazard is "none"?
+    What does the strict form require for the materials whose hazard is "none"?

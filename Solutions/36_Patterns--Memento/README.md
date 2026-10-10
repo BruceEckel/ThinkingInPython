@@ -375,9 +375,8 @@ If you pass `data["strokes"]` to `Drawing` without wrapping it in `tuple(...)`,
 and an `Any` satisfies the declared `tuple[str, ...]`.
 The mismatch surfaces only when the program runs.
 `reconstructed == drawing` becomes `False`, since no `list`
-equals a `tuple`, and the `list` costs the `Drawing` the hashability a
-record otherwise supplies (`hash()` raises a `TypeError`,
-`unhashable type: 'list'`).
+equals a `tuple`, and the `list` makes the record unhashable:
+`hash()` raises a `TypeError`, `unhashable type: 'list'`.
 The solution converts the field back, so the rebuilt `Drawing` equals the original.
 
 ```python

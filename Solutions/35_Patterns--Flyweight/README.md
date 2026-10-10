@@ -1087,7 +1087,8 @@ while the three losing threads hold objects outside the cache.
 Nothing here is a `@cache` defect. A cache that holds a lock across
 the call serializes every miss in the program, a worse default than
 occasionally building a value twice. For an ordinary memoized
-computation, a duplicate build costs time but not correctness.
+computation, a duplicate build wastes time and leaves the results
+correct.
 *Flyweight* raises the stakes, because its whole point is that
 `tile("^") is tile("^")`.
 

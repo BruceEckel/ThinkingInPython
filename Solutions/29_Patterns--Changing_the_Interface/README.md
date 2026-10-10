@@ -293,8 +293,9 @@ built in.
 A caller of `facade.py` sees `Engine`, `FuelPump`, `Ignition`, and
 `Facade` as public names; a caller of `shop` sees `start_car`. Both
 also see `record`. Neither
-version enforces anything. The difference is how much ceremony you
-pay to express the same intent, and the module version pays none.
+version enforces anything. The difference is how much ceremony each
+version needs to express the same intent, and the module version
+needs none.
 
 </details>
 </details>

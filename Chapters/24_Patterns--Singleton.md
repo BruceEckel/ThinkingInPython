@@ -202,7 +202,7 @@ Defining the class inside `settings()` leaves the module no name for it,
 since `@cache` runs that body once and the class lives in the function's locals.
 `type(settings())` still recovers the class.
 
-Nesting costs the return annotation as well.
+Nesting also breaks the return annotation.
 `def settings() -> Settings` still parses and runs,
 because an annotation evaluates only when something reads it,
 so a clean run proves nothing about the name.
@@ -513,8 +513,7 @@ while `__getattr__()` answers for every name Python fails to find on the wrapper
 so its return type is whatever the inner object holds under that name,
 an open set no annotation can list.
 Delegation gives up static knowledge to forward every name,
-the cost [*Surrogate*](26_Patterns--Surrogate.md#forwarding-with-getattr)
-pays throughout.
+as it does throughout [*Surrogate*](26_Patterns--Surrogate.md#forwarding-with-getattr).
 
 The laziness is a choice.
 When the inner object needs nothing from that first call,
@@ -773,9 +772,9 @@ because a class statement hands the name, bases, and namespace to its metaclass,
 and Python takes that metaclass from the type of the base, which is `singleton`.
 Nothing in `class Sub(Registry)` mentions `singleton`,
 so the error names a class that does not appear in the failing line.
-That is the confusion a class decorator costs you.
+The class decorator causes that confusion.
 
-The decorator costs static checking as well.
+The decorator weakens static checking as well.
 Under `ty` and Pyright,
 `Registry("primary", limit=3)` is a call to `singleton.__call__()`,
 which accepts any arguments and returns `Any`.
@@ -831,7 +830,7 @@ Try each exercise before opening its [solution](../Solutions/24_Patterns--Single
     Modify it to use eager creation,
     creating the inner instance in the class body,
     and remove the sentinel and the guard.
-    What did the change cost,
+    What does the change give up,
     and which failure from [Tests, Threads, and Locks](#tests-threads-and-locks)
     can no longer occur?
 2.  Using `singleton_cached_factory.py` as a starting point,

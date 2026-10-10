@@ -551,14 +551,14 @@ out.
 > Then write `strict_hazard()`,
 > whose base function raises `NotImplementedError`,
 > and call it on the same piece.
-> What does the strict form cost the materials whose hazard is "none"?
+> What does the strict form require for the materials whose hazard is "none"?
 
 <details>
 <summary>Where to look</summary>
 
 [One `singledispatch` Function per Operation](../../Chapters/37_Patterns--Pattern_Refactoring.md#one-singledispatch-function-per-operation) builds `hazard()` with a base function that answers for any unregistered type.
 For `strict_hazard()`, make the base function raise `NotImplementedError` with a message naming the type, then register each material whose hazard you know, including those whose answer is `"none"`.
-Decide by comparing what a silent default and a stopped program each cost when you forget a registration.
+Decide by comparing what goes wrong with a silent default and with a stopped program when you forget a registration.
 
 <details>
 <summary>The shape</summary>
@@ -614,8 +614,8 @@ whose answer is `"none"`, `strict_hazard(Paper(1.0))` raises a
 and the program stops before it reaches the plastic.
 The strict base function refuses every unregistered type,
 harmless ones included.
-The solution registers `Paper` with its `"none"` answer, which is
-the cost that the exercise's last question names.
+The solution registers `Paper` with its `"none"` answer, which
+answers the exercise's last question.
 
 ```python
 # exercise_5.py
@@ -675,12 +675,12 @@ produces no exception and no report from the type checker.
 **Refuse an unregistered type.** `strict_hazard()` raises a `NotImplementedError` that names the
 material at the first call.
 
-**Register every material.** The strict form costs one registration
+**Register every material.** The strict form requires one registration
 for every material, including each one whose answer is `"none"`.
 `Paper` needs three lines to say what `hazard()`'s base function
 answers without a registration.
 
-Choose by which mistake costs more. A
+Choose by which mistake does more harm. A
 default is right when it is a true answer for most types and a
 forgotten registration does little harm. A base function that raises
 an exception is right when a wrong answer is worse than a stopped

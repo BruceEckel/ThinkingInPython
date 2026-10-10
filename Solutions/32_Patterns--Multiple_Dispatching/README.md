@@ -134,7 +134,7 @@ if __name__ == "__main__":
 ```
 
 **Answer every ordered pair.** Sixteen entries cover the four types against each other (4 × 4), the
-same shape as the original nine (3 × 3). Adding a fourth `Item` costs
+same shape as the original nine (3 × 3). Adding a fourth `Item` requires
 one class declaration and seven new dictionary rows (the six new
 ordered pairs `Lizard` forms with the other three, plus
 `(Lizard, Lizard)`). `compete()` needs no change.
@@ -339,7 +339,7 @@ if __name__ == "__main__":
 #: win win lose draw
 ```
 
-**Retrofit every existing class.** This version costs far more to extend. Every existing class
+**Retrofit every existing class.** Every existing class
 (`Paper`, `Scissors`, `Rock`) needs a new `eval_lizard()` method.
 
 **Give the new class both dispatches.** The new `Lizard` class needs a `compete()` plus four
@@ -351,10 +351,10 @@ combinations.
 
 **Guard the demonstration.** The `__main__` guard serves exercise 3, as in exercise 1.
 
-The table costs one class and seven dictionary rows to extend. The
-method version costs one class and five new methods, plus retrofitting
-a method onto every existing class. That cost grows with
-each item type you add. The chapter therefore recommends the table by
+Extending the table takes one class and seven dictionary rows.
+Extending the method version takes one class and five new methods,
+plus a method retrofitted onto every existing class, and each item
+type you add lengthens that list of retrofits. The chapter therefore recommends the table by
 default, and reserves the method version for behavior that belongs to
 the class: a combination that reads the object's own state, or one a
 subclass should override while inheriting the rest.
@@ -1466,9 +1466,8 @@ and that second call resolves the second type.
 Six weapons take 42 methods,
 a `compete()` and six `eval_*()` methods in each class,
 and more than a hundred lines hold 36 answers.
-That length is the cost
 [Methods or Table](../../Chapters/32_Patterns--Multiple_Dispatching.md#methods-or-table)
-weighs, at four times the chapter's nine answers.
+weighs that length against a table, here with four times the chapter's nine answers.
 The answers grow with the square of the number of weapons.
 A seventh weapon would add an `eval_*()` method to each of the six classes,
 plus a new class of eight methods.
@@ -1683,7 +1682,7 @@ one shared dictionary. `paper_scissors_rock_subclass.py`'s `DampPaper`
 gets its exception by overriding `compete()` and `eval_rock()`, and
 this version has nothing to override. `Item` defines `compete()` once.
 
-**Narrow the operand's type.** One cost comes with the change. `paper_vs_rock()` and
+**Narrow the operand's type.** `paper_vs_rock()` and
 `rock_vs_paper()` take two `Item`s, because every cell must, so each
 recovers `Paper` with an `isinstance()` test. That is the type test
 about which the chapter warns in the ladder version. Here the test sits

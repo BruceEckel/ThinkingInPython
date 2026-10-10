@@ -868,7 +868,7 @@ Try each exercise before opening its [solution](../Solutions/34_Patterns--Compos
     which walks the same tree with an explicit stack and no recursion,
     and check that the two agree on a small expression.
     Raising the limit with `sys.setrecursionlimit()` also avoids the error.
-    Say what it costs.
+    Name its drawbacks.
 9.  A plugin package needs to add its own entry types to `filesystem.py` without editing your code.
     Sketch what breaks, then write the version of `disk_usage()` that supports the plugin's entry types.
     Which of the two designs,

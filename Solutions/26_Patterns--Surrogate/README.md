@@ -2,7 +2,7 @@
 
 ## 1. A virtual proxy that answers the cheap requests itself
 
-> Extend `virtual_proxy.py`'s `Lazy` so it answers one cheap attribute itself,
+> Extend `virtual_proxy.py`'s `Lazy` so it answers one attribute itself,
 > a `description` string given at construction, without building `Expensive`.
 > Count the accesses it answers that way,
 > and report the count when `Lazy` builds `Expensive`.
@@ -13,7 +13,7 @@
 <summary>Where to look</summary>
 
 [Virtual *Proxy*](../../Chapters/26_Patterns--Surrogate.md#virtual-proxy) builds `Expensive` inside `__getattr__()`, which runs only when normal lookup fails.
-Give `Lazy` a property for the cheap attribute, so Python finds it on the class and skips the fallback.
+Give `Lazy` a property for `description`, so Python finds it on the class and skips the fallback.
 Increment a counter in that property, and print the counter at the moment the fallback builds the real object.
 
 <details>
@@ -94,7 +94,7 @@ print(p.query())  # [2]
 #: result
 ```
 
-**Answer the cheap request without building.** `description` is a property on the proxy, so Python finds it without
+**Answer `description` without building.** `description` is a property on the proxy, so Python finds it without
 calling `__getattr__()`, and the three reads build nothing. Each one
 increments `_answered`.
 
@@ -203,7 +203,7 @@ forwarding. The single `calls` integer becomes a `Counter`. The final
 
 > Create a simple copy-on-write list.
 > Its `share()` returns a second list over the same data,
-> at the cost of incrementing a reference count,
+> and increments a reference count,
 > and the first `append()` through a shared list copies the data before changing it.
 > Confirm that the two lists share their data before the write and not after it.
 
@@ -311,7 +311,7 @@ decrements the shared `Box`'s count (since `b` is leaving it),
 detaches `b` into its own private `Box` holding a fresh copy of the
 data, then appends to that private copy. Since no one called
 `a.append()`, `a` still points at the original, untouched `Box`. The
-first write triggers the copy, and only the list that writes pays for
+first write triggers the copy, and the list that writes receives
 it.
 
 </details>

@@ -391,7 +391,7 @@ you want your three numbers to travel as data or to mean something.
 <details>
 <summary>Where to look</summary>
 
-[Which Should You Use?](../../Chapters/22_Patterns--Data_Transfer_Objects.md#which-should-you-use) lists what each type offers and what it costs.
+[Which Should You Use?](../../Chapters/22_Patterns--Data_Transfer_Objects.md#which-should-you-use) lists what each type offers and when to choose it.
 For each scenario, find the one requirement that rules out the others: keys unknown in advance, a hashable value, or code that checks fields on construction.
 Consider also what `json.dumps()` does with each type.
 
@@ -405,8 +405,7 @@ instance exists, which this scenario cannot supply. A `TypedDict`
 exists to name the keys for the type checker, and here every key
 arrives at runtime, after the type checker has run. `SimpleNamespace`
 accepts any name at construction or later, which is the looseness the
-scenario needs. The cost is a type checker that cannot catch a typo
-in a key name.
+scenario needs. The type checker cannot catch a typo in a key name.
 
 **The grid coordinate is a `NamedTuple`.** It must work as a `dict`
 key, so it must hash, and a `NamedTuple` hashes as long as its fields

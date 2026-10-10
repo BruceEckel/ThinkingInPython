@@ -123,15 +123,15 @@ what the `Visitor` hierarchy provides, without the classes.
 
 > Add a `Rose` to `visitor_singledispatch.py` with abundant nectar and a strong fragrance,
 > then add a third operation, `thorns()`, over all four flowers.
-> Count the lines each change costs,
-> and say which of the two changes `@singledispatch` makes cheaper.
+> Count the lines each change adds,
+> and say which of the two changes `@singledispatch` makes shorter.
 
 <details>
 <summary>Where to look</summary>
 
 [The Pythonic *Visitor*: singledispatch](../../Chapters/33_Patterns--Visitor.md#the-pythonic-visitor-singledispatch) builds each operation as one `@singledispatch` function with a default and a `register` per exception.
-A new class costs the class plus one registration in every operation where its answer differs from the default.
-A new operation costs one function plus a registration for each flower that differs.
+A new class requires the class plus one registration in every operation where its answer differs from the default.
+A new operation requires one function plus a registration for each flower that differs.
 Count both in lines, then compare with [The Expression Problem](../../Chapters/13_Techniques--Pattern_Matching.md#the-expression-problem).
 
 <details>
@@ -260,23 +260,23 @@ print(thorns(Gladiolus()))
 #: none
 ```
 
-**Add a type.** Adding `Rose` costs eight lines: two for the class and three for each
+**Add a type.** `Rose` needs eight lines: two for the class and three for each
 of its two registrations, one per operation whose default is wrong for
 a rose.
 
-**Add an operation.** Adding `thorns()` costs six lines: three for the function and three
+**Add an operation.** `thorns()` needs six lines: three for the function and three
 for the one flower that differs. Neither change edits an existing line.
 
-`@singledispatch` makes adding an operation cheaper than adding a
+Under `@singledispatch`, an operation takes fewer lines to add than a
 type, because an operation is a whole function and lives in one place.
-Adding `thorns()` is cheap because three of the four flowers accept
-its default. `Rose` needs a distinct answer from every operation, so
-it costs one registration per operation, scattered across the file.
-That difference in cost is the
+`thorns()` stays short because three of the four flowers accept its
+default. `Rose` needs a distinct answer from every operation, so it
+needs one registration per operation, scattered across the file.
+That difference is the
 [expression problem](../../Chapters/13_Techniques--Pattern_Matching.md#the-expression-problem):
-methods on a class make adding a type cheap, functions over a hierarchy
-make adding an operation cheap, and no arrangement makes both cheap at
-once.
+methods on a class keep a new type in one place, functions over a
+hierarchy keep a new operation in one place, and no arrangement does
+both at once.
 
 </details>
 </details>
@@ -411,10 +411,10 @@ keeps the checker quiet about the `Beetle` call so the listing can
 show the runtime failure. Without it, `ty` reports an
 `invalid-argument-type`.
 
-Losing the check on the visitor side is the price the chapter names
-for keeping `Any`. The `Any` moves
+Keeping `Any` gives up the check on the visitor side, as the chapter
+says. The `Any` moves
 an error a type checker can catch into the run. The chapter's version
-pays that price because its `Visitor` base is empty. Either fix
+keeps the `Any` because its `Visitor` base is empty. Either fix
 restores the check: declaring `visit()` abstract on that base, as the
 classic pattern does, or writing the `Visits` protocol above.
 

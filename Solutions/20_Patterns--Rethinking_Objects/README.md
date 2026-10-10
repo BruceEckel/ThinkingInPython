@@ -305,8 +305,8 @@ If someone deletes the annotations, the program behaves as it does
 now. It prints `4.5` and charges the customer for a number of kilograms.
 `NewType` exists only for the type checker. `Weight(2.5)` returns the
 `float` `2.5`, and no wrapper survives to run time. The distinction is
-real in the source and absent in the process, and that split is the
-bargain the chapter describes.
+real in the source and absent in the process, and the chapter
+describes that split.
 
 </details>
 </details>

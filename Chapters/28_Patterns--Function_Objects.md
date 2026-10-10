@@ -345,7 +345,7 @@ each algorithm becomes a class derived from a `FindRoot` interface,
 with a `find()` method.
 A "Context" class holds the chosen algorithm.
 A parameter carries a strategy into one call and is gone when the call returns,
-so a Context earns its place when the algorithm must outlast the call.
+so you need a Context when the algorithm must outlast the call.
 
 A view holding a controller is that Context in Smalltalk's MVC,
 and *GoF Design Patterns* names the pair as an example of *Strategy*.

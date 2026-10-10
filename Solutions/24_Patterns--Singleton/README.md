@@ -6,7 +6,7 @@
 > Modify it to use eager creation,
 > creating the inner instance in the class body,
 > and remove the sentinel and the guard.
-> What did the change cost,
+> What does the change give up,
 > and which failure from [Tests, Threads, and Locks](../../Chapters/24_Patterns--Singleton.md#tests-threads-and-locks)
 > can no longer occur?
 
@@ -88,8 +88,7 @@ body finishes.
 stays the same: `x.val` accumulates the same way, `x is y` is still
 `False`, and `x.instance is y.instance` is still `True`.
 
-The cost
-is that Python builds the inner object at class definition, during
+Python now builds the inner object at class definition, during
 module import, whether or not anything constructs an
 `OnlyOne`. Removing the deferral also removes the first-call race from
 [Tests, Threads, and Locks](../../Chapters/24_Patterns--Singleton.md#tests-threads-and-locks):
@@ -478,9 +477,9 @@ An uncached wrapper function takes the lock and calls the cached `settings()` in
 so the lookup and the body both run under one lock,
 and eight racing first calls build one object.
 
-The cost is that every call takes the lock, not just the first,
+The wrapper takes the lock on every call, not just the first,
 because the wrapper cannot see a hit until it has asked the cache.
-The chapter's `singleton_locked_settings.py` pays the same cost.
+The chapter's `singleton_locked_settings.py` takes the lock on every call too.
 It drops `@cache` and hand-writes the check inside one lock.
 
 **Build the object before the threads start.** Without a lock, the fix is to remove the race rather than to order
@@ -496,9 +495,9 @@ body once, and a thread that imports the module while the body is
 running waits for the body to finish.
 
 The trade is that the module body builds the object whether or not
-anything uses it. For settings that cost is negligible. For a database
-connection it may be real, and then the hand-written lock is the
-answer.
+anything uses it. For settings an unused object does no harm. For a
+database connection it may hold a resource nobody asked for, and then
+the hand-written lock is the answer.
 
 </details>
 </details>

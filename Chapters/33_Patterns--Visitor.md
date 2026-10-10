@@ -461,8 +461,8 @@ Try each exercise before opening its [solution](../Solutions/33_Patterns--Visito
     Which classes and which methods disappear?
 2.  Add a `Rose` to `visitor_singledispatch.py` with abundant nectar and a strong fragrance,
     then add a third operation, `thorns()`, over all four flowers.
-    Count the lines each change costs,
-    and say which of the two changes `@singledispatch` makes cheaper.
+    Count the lines each change adds,
+    and say which of the two changes `@singledispatch` makes shorter.
 3.  Rewrite `flower_visitors.py` with the `Visits` protocol in place of `Any`,
     so `accept()` declares what it needs.
     Then add a `Beetle(Bug)` with no `visit()` method and pass it to `accept()`.

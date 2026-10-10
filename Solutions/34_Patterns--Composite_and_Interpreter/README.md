@@ -1156,7 +1156,7 @@ renderer can still make.
 > which walks the same tree with an explicit stack and no recursion,
 > and check that the two agree on a small expression.
 > Raising the limit with `sys.setrecursionlimit()` also avoids the error.
-> Say what it costs.
+> Name its drawbacks.
 
 <details>
 <summary>Where to look</summary>
@@ -1361,8 +1361,8 @@ language adds.
 case, so `assert_never()` still type-checks. A string marker leaves
 `case _` reachable and the guarantee gone.
 
-`sys.setrecursionlimit()` avoids the error for `evaluate()`, and it
-costs more than it appears to. A call from one Python function to
+`sys.setrecursionlimit()` avoids the error for `evaluate()`, but it
+has three drawbacks. A call from one Python function to
 another uses no C stack, so with the limit raised to `10**9`,
 `evaluate()` walks a million-level tree. Anything that recurses
 through C still stops. `repr()` or `hash()` on that same tree raises

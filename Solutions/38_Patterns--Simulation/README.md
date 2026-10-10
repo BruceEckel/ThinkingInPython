@@ -711,7 +711,7 @@ neighbor claimed and dead-end there.
 `visited` stays correct, because adding the same cell twice to a set
 changes nothing. That correctness is why `test_rats_and_mazes.py`
 passes on the broken version every time. The test asserts the set of
-cells reached. The extra `True` costs wasted effort. A second rat
+cells reached. The extra `True` wastes effort. A second rat
 moves into an occupied cell. Comparing the count of `True` returns
 with the size of `visited` exposes the collision.
 
@@ -1166,13 +1166,14 @@ meal because its start and its goal both move.
 room the robot just arrived at stops being a goal, and the robot's
 own room is now the new start. A path planned from the entry is no
 use from any other room, so one search at the start yields the first
-leg and no more. Searching again costs little. Each search touches at
-most the maze's 299 rooms that hold no wall.
+leg and no more. Each search touches at most the maze's 299 rooms
+that hold no wall, so searching again is quick.
 
 <!-- vale proselint.GenderBias = NO -->
 Nearest-first does not give the shortest tour that eats everything.
 Choosing the closest food each time is a greedy choice made with no
-view of what comes after it, and the maze makes that costly. Two pieces
+view of what comes after it, and the maze can turn that choice into a
+longer walk. Two pieces
 of food can sit close together down one dead-end corridor while a
 third sits one step nearer in the opposite direction, with the rest
 of the food far beyond it. Taking the single near one first means

@@ -410,8 +410,7 @@ The guard also makes the proxy work with `copy` and `pickle`,
 which look up `__setstate__()` on an instance whose `__init__()` has not run.
 Both get an `AttributeError`, which those modules handle, instead of recursing.
 
-The guard has a cost.
-The proxy stops forwarding every name that starts with an underscore,
+The guard also rejects every name that starts with an underscore,
 so an implementation's `_helper()`,
 or an explicit `p.__len__()` like the one in `dunder_bypass.py`,
 raises an `AttributeError`.
@@ -783,7 +782,7 @@ While one thread runs a multi-call sequence like `run()`,
 another thread's `change_to()` can run between two of those calls,
 splitting the sequence across both implementations.
 See [Concurrency](19_Techniques--Concurrency.md#the-gil-does-not-prevent-races)
-for what an unsynchronized swap costs.
+for the races an unsynchronized swap allows.
 
 `run()` takes `b: Any` because `Behavior` fails as the annotation.
 Annotating `run(b: Behavior)` and passing it `b` is a type error,
@@ -862,7 +861,7 @@ the single generic surrogate in `state_surrogate.py` is simpler and just as flex
 
 Try each exercise before opening its [solution](../Solutions/26_Patterns--Surrogate/).
 
-1.  Extend `virtual_proxy.py`'s `Lazy` so it answers one cheap attribute itself,
+1.  Extend `virtual_proxy.py`'s `Lazy` so it answers one attribute itself,
     a `description` string given at construction, without building `Expensive`.
     Count the accesses it answers that way,
     and report the count when `Lazy` builds `Expensive`.
@@ -872,7 +871,7 @@ Try each exercise before opening its [solution](../Solutions/26_Patterns--Surrog
     Confirm the tally reports `f` called twice and `g` called once.
 3.  Create a simple copy-on-write list.
     Its `share()` returns a second list over the same data,
-    at the cost of incrementing a reference count,
+    and increments a reference count,
     and the first `append()` through a shared list copies the data before changing it.
     Confirm that the two lists share their data before the write and not after it.
 4.  In `counting_proxy.py`,

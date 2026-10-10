@@ -94,8 +94,8 @@ print(render(rows, "csv"))
 
 **Branch on the format.** Nothing absorbs the change. Each new format means opening `render()`
 and adding a `case`, so the third request edits the same function the
-first two did. The `match` reads well and hides the cost, which is why
-this shape survives as long as it does. It is not wrong, but every new
+first two did. The `match` reads well, which is why this shape
+survives as long as it does. It is not wrong, but every new
 format is an edit you make by hand.
 
 Naming the axis says what to do about it. If the format varies, the
@@ -234,8 +234,8 @@ function taking the wrong arguments as surely as an interface rejects
 a class that does not implement it.
 
 The sentence that remains is the pattern. Everything crossed out is
-the cost of expressing the pattern in a language where a method cannot
-travel without an object around it. Python supplies the missing piece,
+what the pattern requires in a language where a method cannot travel
+without an object around it. Python supplies the missing piece,
 a function that travels on its own, and
 [When a Pattern Dissolves](../../Chapters/21_Patterns--Design_Patterns.md#when-a-pattern-dissolves)
 describes that case as the language having the piece all along. The

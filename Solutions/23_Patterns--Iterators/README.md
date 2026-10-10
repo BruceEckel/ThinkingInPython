@@ -134,12 +134,11 @@ number of times, before or after.
 
 A generator cannot support `len()`. Once you call a generator
 function, you have the iterator, and an iterator's whole state
-is "how far through have I gotten." That makes counting its
-remaining items expensive. The only way to learn how many values
-remain is to consume them, which uses them up. No `start` field
+is "how far through have I gotten." The only way to learn how many
+values remain is to consume them, which uses them up. No `start` field
 remains to inspect, and nothing can ask a paused generator "how many
 more times will you yield?" without running it to exhaustion.
-`Countdown` escapes that expense because it is a container that
+`Countdown` counts without consuming because it is a container that
 produces a generator on demand. The container keeps the value
 `len()` reads, and reading it consumes nothing.
 
@@ -278,9 +277,10 @@ print(list(sq))
 #: [0, 1, 4, 9, 16]
 ```
 
-Both fixes survive a second pass, and they pay differently. The list holds
-every value for as long as the name lives, so a million items is a
-million items in memory, and the second pass costs nothing. `Squares`
+Both fixes survive a second pass, one by storing and one by
+recomputing. The list holds every value for as long as the name lives,
+so a million items is a million items in memory, and the second pass
+reads them back without recomputing. `Squares`
 holds one integer, `n`, and each pass recomputes from scratch.
 
 For a stream of a million items, choose `Squares`. Memory is the
@@ -288,8 +288,8 @@ resource that fails catastrophically, as
 [Performance](../../Chapters/18_Techniques--Performance.md#lazy-evaluation-with-generators)
 describes. A data set that fits runs at full speed, and one that does
 not falls off a cliff into swapping or a `MemoryError`. Recomputation
-merely costs time, in proportion. The list wins only when a pass is
-expensive and you know the data is small, or when nothing can replay
+merely takes longer, in proportion. The list wins only when a pass is
+slow and you know the data is small, or when nothing can replay
 the source, as with a network response.
 
 </details>
@@ -383,7 +383,7 @@ size through the rest of the run.
 9,400 bytes at `k` of 100 and about 416,000 at `k` of 10,000. A
 hundredfold wider gap costs roughly forty times the memory rather than
 a hundred, because the smaller figure carries a cost that stays
-the same at every `k`, and a short gap pays more per item than a long one.
+the same at every `k`, and a short gap uses more bytes per item than a long one.
 The difference between the two figures, about 41 bytes per
 buffered item, is the part that tracks `k`.
 
@@ -731,12 +731,12 @@ the `current_item()` that GoF had and Python dropped. `peek()` is
 now free and repeatable, as the three identical `2`s show,
 because it reads a field rather than the source.
 
-**Fill the buffer at construction.** The cost appears in the constructor. `Peekable` pulls from the source
-before any caller asks for a value, so the constructor computes an
-expensive first item whether or not anything uses it. A source that
-blocks on its first read blocks at construction. The early pull is the same
-eagerness `tee()`, `OverStream`, and this chapter's other lookahead all
-pay. Answering a question about the future means fetching the future.
+**Fill the buffer at construction.** `Peekable` pulls from the source
+before any caller asks for a value, so the constructor computes the
+first item, however slow, whether or not anything uses it. A source
+that blocks on its first read blocks at construction. `tee()`,
+`OverStream`, and this chapter's other lookahead pull early the same
+way. Answering a question about the future means fetching the future.
 
 </details>
 </details>
@@ -954,23 +954,23 @@ print(list(SkippingIterator(iter(items), int)))
 ```
 
 **Skip a mismatch and keep going.** `typed()` and `typed_skipping()` ask the same `isinstance()` question
-and act differently on a no, and that difference decides what a bad
-item costs. `typed()` ends the stream. The consumer receives the `1`
-before `"two"` and nothing after it. The caller gets an exception
-instead of a list. `typed_skipping()` delivers `[1, 3, 4]` and says
-nothing about `"two"` or the `None`.
+and act differently on a no, and that difference decides what
+happens after a bad item. `typed()` ends the stream. The consumer
+receives the `1` before `"two"` and nothing after it. The caller gets
+an exception instead of a list. `typed_skipping()` delivers
+`[1, 3, 4]` and says nothing about `"two"` or the `None`.
 
 For a parsed log file, take the skipping version. A log is an
 append-only record that many processes write, so a malformed line is
 an expected event rather than a broken contract. One truncated line
-should not cost you the rest of the file. The version that raises a
+should leave the rest of the file readable. The version that raises a
 `TypeError` gives the caller no way to resume. The exception ends the
 generator, so continuing means parsing the file again and somehow
 starting past the line that failed.
 
-That choice has a price, and it is the one this chapter keeps
-revisiting. Skipping is silent, so a filter that quietly drops every
-line looks the same as a file with nothing to report. If you take the
+Skipping hides what it drops, the problem this chapter keeps
+revisiting: a filter that quietly drops every line looks the same as
+a file with nothing to report. If you take the
 skipping version, count what it drops and report the count.
 
 **Keep pulling until a match.** The skipping version is harder to write as a class.

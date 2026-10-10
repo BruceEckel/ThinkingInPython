@@ -392,7 +392,7 @@ since a name becomes valid the moment some module defines the class,
 so the check moves to runtime.
 
 The figure sets the opening problem from `shapes_naive.py` beside the registry,
-so you can compare what adding `Triangle` costs before and after the factory:
+so you can compare the edits that adding `Triangle` requires before and after the factory:
 
 ![](_images/factory_story)
 
@@ -1394,4 +1394,4 @@ Try each exercise before opening its [solution](../Solutions/27_Patterns--Factor
     so that the decorator stores each decorated function's result under `name`.
     Explain why the decorator takes the name as an argument rather than reading the function's `__name__`.
     Write that version and read what `ty` reports.
-    Then say what the decorated form gains over the table and what it costs.
+    Then say what the decorated form gains over the table and what it loses.

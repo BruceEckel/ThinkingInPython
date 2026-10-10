@@ -74,7 +74,8 @@ and `deep[0]` keeps its three.
 
 `copy.deepcopy()` costs time and memory proportional to the whole nested structure it rebuilds,
 however small the change.
-`sketch.py` below copies one level and pays for one level.
+`sketch.py` below copies one level,
+so its time and memory grow with that level alone.
 A state that nests containers inside containers copies the whole structure on every save.
 
 ## The Classic Memento
@@ -130,7 +131,7 @@ The copy's `strokes` is the same list as `sketch.strokes`,
 the alias from `aliased_snapshot.py` one level down.
 `save()`'s one-level copy is enough because a stroke is a string.
 An originator holding containers inside containers needs `copy.deepcopy()` in `save()`,
-and pays the [cost of a deep copy](#a-snapshot-is-not-a-reference).
+and each save then [rebuilds the whole nested structure](#a-snapshot-is-not-a-reference).
 
 The caretaker's side of the contract is to store `checkpoint` and return it,
 without reading or assigning its `strokes`.
@@ -323,7 +324,7 @@ print(after.strokes is before.strokes, len(after.strokes))
 The two objects share the stroke strings, not the tuple holding them.
 On a drawing with `n` strokes,
 `draw()` builds a fresh tuple of `n + 1` pointers,
-and that tuple is its whole cost.
+and that tuple is the one object it allocates.
 
 The stroke comes from `"".join([...])` because the compiler interns a literal like `"circle"`.
 Every `"circle"` literal in the module is one object,

@@ -273,7 +273,7 @@ so finding a cell takes two dispatches.
 The table version keeps the grid whole in `OUTCOME`,
 and one lookup finds the same cell.
 
-The dashed fourth item shows what growth costs each version.
+The dashed fourth item shows what adding a class requires of each version.
 A new class forces a new `eval_*()` method into every existing class,
 while the table takes new rows and leaves the classes untouched.
 
@@ -418,7 +418,7 @@ although each registration went through its own class.
 The version most programmers write first is neither the methods nor the table.
 It is an `isinstance()` ladder inside `compete()`,
 testing the opponent's type case by case.
-It works, and it keeps the method version's cost without its benefit.
+It works.
 The type tests repeat in every class,
 as the `eval_*()` methods do in the method version,
 and the programmer resolves by hand what dispatch would resolve on its own.

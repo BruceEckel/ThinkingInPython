@@ -32,7 +32,7 @@ That completeness has a failure mode.
 Once you know a catalog of patterns,
 that catalog tempts you to treat it as a checklist,
 and to install patterns as proof of sophistication.
-A pattern earns its place only when you have the problem it solves.
+A pattern belongs in your program only when you have the problem it solves.
 If nothing varies, you do not need machinery for isolating variation.
 
 Although they're called "design patterns," they apply beyond design.
@@ -50,7 +50,8 @@ Whenever you abstract something, you isolate particular details.
 One of the most compelling motivations for abstraction is to *separate things that change from things that stay the same*.
 Once you find a part of your program that's likely to change,
 patterns can prevent those changes from causing secondary effects throughout your code.
-That isolation makes the code cheaper to maintain and usually simpler to understand.
+That isolation confines each change to one place,
+which makes the code easier to maintain and usually simpler to understand.
 
 ### What an Abstraction Erases
 
@@ -65,18 +66,18 @@ The art of design lies in guessing well about which details you can hide and whi
 
 Erased details are also the source of scaling limits.
 Every abstraction hides some work (a copy, a sort, a lookup behind an attribute)
-that costs nothing at the size you built it.
-A growing system eventually reaches the size where one hidden cost dominates,
+that takes no noticeable time at the size you built it.
+A growing system eventually reaches the size where one piece of hidden work dominates the running time,
 and the layer that made the code simple now stands between you and the fix.
-That hidden cost is one reason [Performance](18_Techniques--Performance.md)
+That hidden work is one reason [Performance](18_Techniques--Performance.md)
 tells you to measure at a realistic size rather than trust a small trial.
 
 ### The Vector of Change
 
-Often, the most difficult part of developing an elegant and cheap-to-maintain design is discovering what I call "the vector of change"
+Often, the most difficult part of developing an elegant and easy-to-maintain design is discovering what I call "the vector of change"
 (here, "vector" means a direction of change, not an array of numbers).
 You look for the most important thing that changes,
-because that is where your greatest cost lies.
+because that change is where most of your maintenance effort goes.
 Once you discover the vector of change,
 you have the focal point around which to structure your design.
 
@@ -271,7 +272,7 @@ Six of the eight are a dependence of one part on another: on a class name,
 on a specific operation, on a platform, on an object's representation,
 on an algorithm, or on each other, which the list calls *tight coupling*.
 The other two, extending by subclassing and being unable to alter a class,
-are about what a dependence costs once it exists.
+are about what a dependence makes hard once it exists.
 
 The glossary defines coupling as "the degree to which software components depend on each other,"
 and that first chapter's two design principles are both instructions to loosen one particular dependence.
@@ -386,7 +387,7 @@ while adding an element type means changing every visitor.
 and the diagram shows what you are trading.
 
 Seen this way, the patterns differ less in how much coupling they carry than in where they put it and which way it points.
-A heavy edge is acceptable when it sits in a part that is cheap to change,
+A heavy edge is acceptable when it sits in a part that is easy to change,
 or points at a part that rarely changes.
 That is the content of the *Managed Coupling* principle in [Design Principles](#design-principles):
 coupling you can see and have placed on purpose.
@@ -471,8 +472,7 @@ and the rest are here for your own designs.
     The more random rules you pile onto the programmer,
     rules that have nothing to do with solving the problem at hand,
     the slower the programmer works.
-    The cost does not grow one rule at a time.
-    The rules interact.
+    The slowdown grows faster than the rule count, because the rules interact.
 -   [*Liskov Substitution Principle*](20_Patterns--Rethinking_Objects.md#liskov-substitution)
     (LSP).
     A subtype must work anywhere code expects its base type.
