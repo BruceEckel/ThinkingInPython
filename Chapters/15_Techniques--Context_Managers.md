@@ -219,8 +219,8 @@ An `__enter__()` that acquires several things must clean up its own partial work
 is the standard tool for that.
 When a later entry fails, `ExitStack` unwinds the managers it entered earlier.
 A `with` naming several managers applies the same rule per manager.
-The ones that entered still exit,
-and the failing one alone gets no `__exit__()` call.
+The ones that entered still exit, the failing one gets no `__exit__()` call,
+and the statement stops there, so the managers listed after it are left alone.
 
 `Fragile.__exit__(self, *exc: object)` collects the three arguments into a tuple the method ignores,
 the shorter form for a cleanup that ignores why the block ended.
@@ -280,7 +280,8 @@ and execution continues after the block.
 
 Any truthy value suppresses, not `True` alone.
 An `__exit__()` that returns the result of its last cleanup call,
-such as a count or a status string, swallows every exception its block raises.
+such as a count or a status string,
+swallows the block's exception whenever that result is truthy.
 Annotate `__exit__()` as `-> None`, the way `Trace` does,
 unless suppressing is the manager's job.
 The type checker then rejects any value the method returns.
