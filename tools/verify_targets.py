@@ -31,7 +31,13 @@ most of the others): reflow alone would reformat most of the book's
 prose on every run, since it is not covered by any gate. Those
 run inside a disposable `git worktree` checked out at HEAD instead, so
 this working tree is never touched. The clean-* targets run there too,
-since they remove build/, which holds this script's own logs. That worktree reflects the last
+since they remove build/, which holds this script's own logs. So do
+the *-accept targets (stranded-accept, watch-words-accept, and the
+rest) and spell-add: each adds every NEW hit to its baseline, so run
+here they accept hits a human has not read. On 2026-10-10 a run in
+this tree accepted chapter 30's watch-word, stranded, and positional
+hits, which are held out of the baselines until its editing pass
+closes. That worktree reflects the last
 commit, not any uncommitted changes, so it tests each target's own wiring
 rather than whether running it right now would leave your draft clean.
 
@@ -117,12 +123,18 @@ ADVISORY: dict[str, re.Pattern[str]] = {
 # script's own logs live under build/, so run in this tree they wiped
 # every log written before them (make clean was added 2026-08-29, after
 # this script) and the final failure report then crashed reading a log
-# that no longer existed.
+# that no longer existed. The *-accept targets add every NEW hit to a
+# baseline, hits nobody has read, so they belong here too; a run in
+# this tree on 2026-10-10 accepted chapter 30's held-out hits.
 WORKTREE_TARGETS: frozenset[str] = frozenset({
-    "verify", "reflow", "spell-add", "fix-imports", "fix-listings",
+    "verify", "everything", "reflow", "spell-add", "fix-imports",
+    "fix-listings", "fix-checks",
     "fix-comment-periods", "fix-comment-caps", "fix-comment-spacing",
     "fix-pattern-names", "fix-coupling-panels", "cover",
     "output",
+    "stranded-accept", "watch-words-accept", "internal-names-accept",
+    "positional-accept", "pyright-accept", "quoted-diagnostics-accept",
+    "exercise-refs-accept",
     "clean", "clean-examples", "clean-solutions", "clean-site",
     "clean-epub", "clean-pdf",
 })

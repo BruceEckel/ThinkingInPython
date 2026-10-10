@@ -4,7 +4,8 @@ A failed target's summary shows the log's tail, which for Vale is a
 screen of warnings and a count. The excerpt also shows the error lines
 above the tail, so the cause appears without opening the log.
 """
-from tools.verify_targets import excerpt
+from tools.tip_help import entries
+from tools.verify_targets import WORKTREE_TARGETS, excerpt
 
 VALE = """
  Chapters/31_Patterns--State.md
@@ -36,3 +37,16 @@ def test_error_lines_are_capped() -> None:
     out = excerpt(text, lines=1, max_errors=4)
     assert out.count("FAILED") == 4
     assert "16 more error line(s)" in out
+
+
+def test_every_accept_target_runs_in_the_worktree() -> None:
+    accepting = {name for name, _ in entries()
+                 if name and name.endswith("-accept")}
+    assert accepting, "no *-accept task found in tools/tasks.py"
+    assert accepting <= WORKTREE_TARGETS
+    assert {"spell-add", "fix-checks", "everything"} <= WORKTREE_TARGETS
+
+
+def test_every_worktree_target_is_a_task() -> None:
+    names = {name for name, _ in entries() if name}
+    assert WORKTREE_TARGETS <= names
