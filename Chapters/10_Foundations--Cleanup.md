@@ -569,8 +569,9 @@ It still depends on the collector reclaiming the object,
 and a reference cycle defers that collection until the cyclic collector runs,
 or until interpreter shutdown if `gc.disable()` has stopped it.
 
-Give a class that owns a resource a `close()` method and a `with` block that calls it,
-so the cleanup runs at a point in the program you can see.
+Give a class that owns a resource a `close()` method and an `__exit__()` that calls it,
+so the cleanup runs as a `with` block ends,
+at a point in the program you can see.
 Where a callback must still run if the caller forgets,
 add `weakref.finalize()` as the backstop, not as the plan.
 To track objects without owning them, hold them weakly,
