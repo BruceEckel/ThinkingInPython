@@ -336,7 +336,7 @@ def test_locate_matches_fields(point: Point,
 
 A keyword pattern such as `Point(x=0, y=y)` matches by attribute name,
 through attribute access, not through `__match_args__`.
-Keyword patterns also work on any object with the named attributes,
+Keyword patterns also work on an instance of any class with the named attributes,
 data class or not, and let you match a subset of attributes while ignoring the rest:
 
 ```python
@@ -516,8 +516,8 @@ so it dispatches cleanly on JSON-shaped data.
 Ignoring unmentioned keys also makes `case {}` a catch-all for any mapping rather than a test for an empty one,
 the opposite of `case []`, which matches only an empty sequence.
 Test for an empty dictionary with a guard, `case {} if not event:`.
-A `**rest` at the end binds whatever keys the pattern did not mention,
-the mapping counterpart of `*rest` in a sequence pattern.
+A `**rest` at the end binds the pairs whose keys the pattern did not mention,
+as a `dict`, the mapping counterpart of `*rest` in a sequence pattern.
 
 ```python
 # mapping_patterns.py
@@ -935,7 +935,8 @@ you write one new subclass with its own `render()` and `cost()`,
 and nothing else changes.
 In the match version,
 you add a `Webhook` data class to the `Notification` union,
-and the type checker flags `assert_never()` in both `render()` and `cost()` until you add a `case Webhook(...)` to each.
+and the type checker flags `assert_never()` in both `render()` and `cost()` until you add a `Webhook` case to each,
+`case Webhook(url):` in `render()` and `case Webhook():` in `cost()`.
 
 If you add a new operation, `priority()`, that ranks channels by urgency,
 every existing subclass in the object version needs a new method.
@@ -971,8 +972,9 @@ Try each exercise before opening its [solution](../Solutions/13_Techniques--Patt
     and read the errors.
     Then add both cases and confirm `ty` passes.
 5.  Rewrite `guards.py`'s `quadrant()` so it handles the third and fourth quadrants too.
-    Then write it a second time with one `case` per sign combination,
-    using `|` alternations and no guards, and say which version reads better.
+    Then write it a second time matching on `sign(p.x), sign(p.y)`,
+    with one `case` per quadrant, a `|` alternation for the axes, and no guards,
+    and say which version reads better.
 6.  Give `value_patterns.py`'s `Signal` a third member,
     and write `act()` so that it compares against a module-level `FALLBACK: Final[Signal]`.
     Run it and confirm that the constant captures instead of comparing.

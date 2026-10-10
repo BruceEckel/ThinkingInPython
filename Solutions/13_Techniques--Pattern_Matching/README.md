@@ -370,8 +370,9 @@ chapter describes: adding a type touches every operation.
 ## 5. Quadrants with guards, and without them
 
 > Rewrite `guards.py`'s `quadrant()` so it handles the third and fourth quadrants too.
-> Then write it a second time with one `case` per sign combination,
-> using `|` alternations and no guards, and say which version reads better.
+> Then write it a second time matching on `sign(p.x), sign(p.y)`,
+> with one `case` per quadrant, a `|` alternation for the axes, and no guards,
+> and say which version reads better.
 
 <details>
 <summary>Where to look</summary>
