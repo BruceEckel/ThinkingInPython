@@ -373,6 +373,8 @@ Everything before the `yield` is setup.
 Everything after it runs once the test finishes,
 whether the test passes or fails.
 Close files, release locks, or check a final invariant after the `yield`.
+Do the cleanup first, as the listing withdraws before it asserts,
+so a failing check cannot skip it.
 A failing check there surfaces as an error, not as a test failure.
 `pytest` prints `1 passed, 1 error`,
 so read the error to see which invariant broke.
@@ -922,7 +924,8 @@ Try each exercise before opening its [solution](../Solutions/11_Techniques--Test
     or `-ise` in the UK and Commonwealth countries.
     The two choices are independent,
     giving `parametrize`, `parametrise`, `parameterize`, and `parameterise`.
-    This book follows pytest's own spelling for `@pytest.mark.parametrize`,
+    This book follows pytest's own spelling, `parametrize`,
+    for the mark and for the fixtures and tests it builds,
     and uses "parameterize" everywhere else,
     for the general sense of a class or function taking a parameter.
 
