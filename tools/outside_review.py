@@ -20,9 +20,16 @@ The message travels on stdin as one line of NDJSON, and `agy` answers
 with NDJSON events on stdout; the last is a `result` event whose
 `response` is the review. A run succeeds when `agy` exits 0 and the
 result event reports `SUCCESS` with a non-empty response. A failed
-chapter prints stderr (where `agy` reports notices such as a tool it
-denied) and the tail of stdout, and the run continues with the next
-chapter. Chapters run one after another in the order given.
+attempt prints stderr (where `agy` reports notices such as a tool it
+denied) and the tail of stdout. Two failures are transient and are
+rerun, up to `--retries` more times (default 2), each attempt logged
+with its number: a result whose status is `ERROR` because the reply
+exceeded the output token limit, and an empty response after `agy`
+denied a tool call (the model tried to act instead of answering, and
+usually answers on the next run). Every other failure, a nonzero exit,
+a timeout, a missing result event, or an `ERROR` of another kind, is
+final for that chapter, and the run continues with the next chapter.
+Chapters run one after another in the order given.
 
 This is not a gate. Each run costs tokens, the reply is
 nondeterministic, and it needs an `agy` signed in on this machine, so
@@ -37,6 +44,7 @@ Usage:
     python -m tools.outside_review 17 --dry-run      # print, run nothing
     python -m tools.outside_review 17 --model gemini-3.8-flash-high
     python -m tools.outside_review 17 --timeout 1800 --out-dir /tmp/r
+    python -m tools.outside_review 17 --retries 0     # one attempt, no reruns
     python -m tools.outside_review 17 --suffix .r2   # a second round, saved as 17_....r2.md beside the first
 """
 
@@ -47,6 +55,7 @@ import shutil
 import subprocess
 import sys
 from datetime import date
+from enum import Enum
 from pathlib import Path
 
 from tools.config import ROOT
@@ -57,6 +66,10 @@ DEFAULT_MODEL = "gemini-3.1-pro-high"
 DEFAULT_PROMPT = ROOT / "tools" / "data" / "outside_review_prompt.md"
 DEFAULT_OUT_DIR = ROOT / "outside_review"
 DEFAULT_TIMEOUT = 900
+DEFAULT_RETRIES = 2
+
+# The error text of an `ERROR` result that a rerun can clear.
+OUTPUT_LIMIT_ERROR = "exceeded the output token limit"
 
 INSTALL_NOTE = (
     "install it from "
@@ -66,6 +79,14 @@ INSTALL_NOTE = (
 
 # How many trailing stdout lines a failure shows.
 TAIL_LINES = 8
+
+
+class Outcome(Enum):
+    """What one attempt at a chapter produced."""
+
+    OK = "ok"  # The reply is saved
+    RETRY = "retry"  # A transient failure: rerun if attempts remain
+    FAIL = "fail"  # A failure a rerun would repeat
 
 
 def find_agy() -> str | None:
@@ -147,11 +168,13 @@ def review_chapter(
     out_dir: Path,
     timeout: int,
     suffix: str = "",
-) -> bool:
-    """Send one chapter to `agy` and save the reply; False on failure."""
+    attempt: int = 1,
+    attempts: int = 1,
+) -> Outcome:
+    """Send one chapter to `agy` once and save the reply."""
     tag = chapter.stem.split("_", 1)[0]
     print(f"[{tag}] outside review of {chapter.as_posix()} "
-          f"with {model} ...", flush=True)
+          f"with {model}, attempt {attempt}/{attempts} ...", flush=True)
     try:
         done = subprocess.run(
             argv,
@@ -165,20 +188,25 @@ def review_chapter(
         )
     except subprocess.TimeoutExpired:
         print(f"  FAILED: no reply within {timeout} s (--timeout)")
-        return False
+        return Outcome.FAIL
     except OSError as exc:
         print(f"  FAILED: could not start agy: {exc}")
-        return False
+        return Outcome.FAIL
 
     event = result_event(done.stdout)
     result = as_dict(event.get("result")) if event else {}
     response = result.get("response")
+    status = result.get("status")
+    retry = False
     if done.returncode != 0:
         why = f"agy exited {done.returncode}"
     elif event is None:
         why = "no result event in the output"
-    elif result.get("status") != "SUCCESS":
-        why = f"result status {result.get('status')!r}"
+    elif status == "ERROR" and OUTPUT_LIMIT_ERROR in json.dumps(result):
+        why = f"result status 'ERROR': the reply {OUTPUT_LIMIT_ERROR}"
+        retry = True
+    elif status != "SUCCESS":
+        why = f"result status {status!r}"
     elif not isinstance(response, str) or not response.strip():
         why = "the response is empty"
         denied = result.get("denied_actions")
@@ -187,11 +215,12 @@ def review_chapter(
                               for d in denied)
             why += (f"; agy denied a tool call ({names}), so the model "
                     "tried to act instead of answering")
+            retry = True
     else:
         why = ""
     if why or not isinstance(response, str):
         print(diagnose(done.stdout, done.stderr, why or "bad response"))
-        return False
+        return Outcome.RETRY if retry else Outcome.FAIL
 
     out_dir.mkdir(parents=True, exist_ok=True)
     out = out_dir / f"{chapter.stem}{suffix}.md"
@@ -205,7 +234,33 @@ def review_chapter(
           f"{usage.get('input_tokens', '?')}, out "
           f"{usage.get('output_tokens', '?')}, thinking "
           f"{usage.get('thinking_tokens', '?')}", flush=True)
-    return True
+    return Outcome.OK
+
+
+def review_with_retries(
+    chapter: Path,
+    argv: list[str],
+    message: str,
+    model: str,
+    out_dir: Path,
+    timeout: int,
+    suffix: str,
+    retries: int,
+) -> bool:
+    """Review a chapter, rerunning a transient failure up to `retries` times."""
+    attempts = retries + 1
+    for attempt in range(1, attempts + 1):
+        outcome = review_chapter(chapter, argv, message, model, out_dir,
+                                 timeout, suffix, attempt, attempts)
+        if outcome is Outcome.OK:
+            return True
+        if outcome is Outcome.FAIL:
+            return False
+        if attempt == attempts:
+            print(f"  giving up after {attempts} attempt(s) (--retries)")
+            return False
+        print(f"  rerunning ({attempt + 1}/{attempts}) ...", flush=True)
+    return False
 
 
 def main() -> int:
@@ -227,6 +282,13 @@ def main() -> int:
     parser.add_argument("--timeout", type=int, default=DEFAULT_TIMEOUT,
                         metavar="SECONDS",
                         help=f"per chapter (default: {DEFAULT_TIMEOUT})")
+    parser.add_argument("--retries", type=int, default=DEFAULT_RETRIES,
+                        metavar="N",
+                        help="reruns of a chapter after a transient "
+                             "failure: an ERROR result that exceeded the "
+                             "output token limit, or an empty response "
+                             f"after a denied tool call (default: "
+                             f"{DEFAULT_RETRIES})")
     parser.add_argument("--suffix", default="", metavar="TEXT",
                         help="appended to the output stem, so a second "
                              "round is kept beside the first (.r2 writes "
@@ -235,6 +297,8 @@ def main() -> int:
                         help="print the argv, output path, and message "
                              "length for each chapter; run nothing")
     args = parser.parse_args()
+    if args.retries < 0:
+        parser.error("--retries must be 0 or more")
 
     if os.environ.get("CI"):
         print("outside_review: refusing to run under CI "
@@ -261,9 +325,9 @@ def main() -> int:
             print(f"  output: {out}")
             print(f"  message: {len(message)} characters")
             continue
-        if not review_chapter(chapter, argv, message, args.model,
-                              args.out_dir, args.timeout,
-                              args.suffix):
+        if not review_with_retries(chapter, argv, message, args.model,
+                                   args.out_dir, args.timeout,
+                                   args.suffix, args.retries):
             failed.append(chapter.as_posix())
     if failed:
         print(f"outside_review: failed: {', '.join(failed)}")

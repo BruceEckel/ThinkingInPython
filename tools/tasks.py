@@ -551,7 +551,7 @@ def rewrite(v: Vars) -> None:
 
 
 @task("Outside review of a chapter by Gemini through the Antigravity CLI "
-      "(CH=17; MODEL=; ARGS=--dry-run)")
+      "(CH=17; MODEL=; ARGS=\"--retries 0\"; ARGS=--dry-run)")
 def outside_review(v: Vars) -> None:
     """Send one chapter to Google's Antigravity CLI (`agy`, a Gemini front
     end) for an outside review, and save the reply as
@@ -569,10 +569,16 @@ def outside_review(v: Vars) -> None:
 
     CH="17 18" reviews several chapters one after another, in the order
     given. ARGS="--suffix .r2" saves a second round as <stem>.r2.md beside
-    the first instead of overwriting it.    given. ARGS=--dry-run prints each command, the output path, and the
-    message length, and calls nothing. It costs tokens and is
-    nondeterministic, so it is never part of verify/gate/ci and refuses
-    to run under CI.
+    the first instead of overwriting it. A transient failure is rerun up
+    to two more times, each attempt logged with its number: an ERROR
+    result because the reply exceeded the output token limit, or an
+    empty response after agy denied a tool call. ARGS="--retries N"
+    changes the count, and ARGS="--retries 0" makes one attempt. Other
+    failures (a timeout, a nonzero exit, another kind of ERROR) are final
+    for that chapter. ARGS=--dry-run prints each command, the output
+    path, and the message length, and calls nothing. It costs tokens and
+    is nondeterministic, so it is never part of verify/gate/ci and
+    refuses to run under CI.
     """
     model = ["--model", v.get("MODEL")] if v.get("MODEL") else []
     py("tools.outside_review", *v.words("CH"), *model, *v.words("ARGS"))
