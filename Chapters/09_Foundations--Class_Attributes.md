@@ -225,7 +225,7 @@ as `class_attribute_confusion.py` shows.
 `total: ClassVar[int] = 0` has the `= 0`,
 so it exists on `Tally` before any instance exists.
 `label: str` has no `=`, so the class stores nothing under that name.
-The annotation records, in `Tally.__annotations__`,
+The annotation records, in `Tally.__annotations__` beside `total`'s,
 that a `Tally` will carry a `label`.
 `display_object()` reports attributes that exist,
 so the declaration stays out of its report.
@@ -305,9 +305,11 @@ and an instance finds it by fallback.
 
 In every case the value creates the attribute.
 An annotation states the type, and `ClassVar` adds where the attribute belongs,
-while the `= 0` brings it into existence.
-That holds for `label: str`, for `total: ClassVar[int] = 0`,
-and for the `count` in `declared_classvar.py`.
+while an assigned value brings it into existence.
+That holds for `label: str`,
+which `self.label = label` creates on each instance,
+for `total: ClassVar[int] = 0`,
+and for the `count` that `Registry.count = 0` creates in `declared_classvar.py`.
 
 ### A Base Class Declares, a Subclass Supplies
 
@@ -506,8 +508,9 @@ whenever a `ClassVar` must count across every subclass rather than fork one coun
 A [`@classmethod`](07_Foundations--Classes.md#static-and-class-methods)
 that writes `cls.total += 1` forks the same way,
 because `cls` is the class that received the call.
-[Pattern Refactoring](37_Patterns--Pattern_Refactoring.md#the-trash-hierarchy)'s registry sidesteps the fork by mutating `Trash.registry` in place,
-instead of reassigning it through `cls`.
+[Pattern Refactoring](37_Patterns--Pattern_Refactoring.md#the-trash-hierarchy)'s registry sidesteps the fork by mutating the shared dictionary in place:
+`Trash.registry[cls.__name__] = cls` assigns into the dictionary,
+not to an attribute of `cls`, so no subclass acquires a registry of its own.
 
 ## Real Per-Object Defaults
 
