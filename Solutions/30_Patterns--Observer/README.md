@@ -1945,7 +1945,8 @@ so `calls` holds the two assignments that follow `@station.respond`.
 > Connect a second view to `model_view_controller.py`'s `Counter`:
 > one that prints a bar of asterisks as long as the count,
 > beside the `CountView` that prints the number.
-> Drive both with `VimController` and show that one key updates the pair.
+> Drive both with a `Controller` whose keys are `k` and `j`,
+> and show that one key updates the pair.
 > Then say what each class knows about the others,
 > and which of them a third view would require you to change.
 
@@ -1954,7 +1955,7 @@ so `calls` holds the two assignments that follow `@station.respond`.
 
 In [Document-View and MVC](../../Chapters/30_Patterns--Observer.md#document-view-and-mvc), `CountView` connects its `display()` to the model in `__post_init__()`.
 A second view does the same with its own display method,
-and `VimController` needs no change to feed both.
+and the `Controller` needs no change to feed both.
 
 <details>
 <summary>The shape</summary>
@@ -2011,8 +2012,10 @@ class BarView:
         ...
 
 @record
-class VimController:  # k is up, j is down
+class Controller:
     model: Counter
+    up: str = "+"
+    down: str = "-"
 
     def key(self, char: str) -> None:
         ...
@@ -2077,14 +2080,16 @@ class BarView:
         print(f"[{'*' * count}]")
 
 @record
-class VimController:  # k is up, j is down
+class Controller:
     model: Counter
+    up: str = "+"
+    down: str = "-"
 
     def key(self, char: str) -> None:
         match char:
-            case "k":
+            case self.up:
                 self.model.increment()
-            case "j":
+            case self.down:
                 self.model.decrement()
             case _:
                 pass
@@ -2092,7 +2097,7 @@ class VimController:  # k is up, j is down
 model = Counter()
 view = CountView(model)
 bar = BarView(model)
-vim = VimController(model)
+vim = Controller(model, up="k", down="j")
 for char in "kkj":
     vim.key(char)
 #: count: 1
@@ -2104,12 +2109,12 @@ for char in "kkj":
 ```
 
 Each key press reaches both views through the model.
-`VimController.key()` calls `increment()` or `decrement()`,
+`Controller.key()` calls `increment()` or `decrement()`,
 and the `Counter` announces its new count to every connected responder.
 The views print in the order they connected.
 The controller holds no reference to either view.
 
-This copy of `VimController` leaves out the chapter's `History` model,
+This copy of `Controller` leaves out the chapter's `History` model,
 since the exercise concerns views on the `Counter`;
 connecting a second view to `History` works the same way.
 
@@ -2120,7 +2125,7 @@ Each view and the controller hold the model, and none of them holds another.
 
 A third view leaves every existing class as it is.
 The new view connects in its own `__post_init__()`,
-and `Counter`, both views, and `VimController` need no edit.
+and `Counter`, both views, and `Controller` need no edit.
 In `document_view.py` the controller is a method of the one view,
 so a second view either duplicates `key()` or has no input of its own.
 

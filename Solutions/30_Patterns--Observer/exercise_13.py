@@ -53,14 +53,16 @@ class BarView:
         print(f"[{'*' * count}]")
 
 @record
-class VimController:  # k is up, j is down
+class Controller:
     model: Counter
+    up: str = "+"
+    down: str = "-"
 
     def key(self, char: str) -> None:
         match char:
-            case "k":
+            case self.up:
                 self.model.increment()
-            case "j":
+            case self.down:
                 self.model.decrement()
             case _:
                 pass
@@ -68,7 +70,7 @@ class VimController:  # k is up, j is down
 model = Counter()
 view = CountView(model)
 bar = BarView(model)
-vim = VimController(model)
+vim = Controller(model, up="k", down="j")
 for char in "kkj":
     vim.key(char)
 #: count: 1

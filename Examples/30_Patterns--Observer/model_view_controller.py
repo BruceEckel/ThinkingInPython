@@ -27,28 +27,15 @@ class HistoryView:
 class Controller:  # Interprets but doesn't display
     counter: Counter
     history: History
+    up: str = "+"
+    down: str = "-"
 
     def key(self, char: str) -> None:
         self.history.add(char)
         match char:
-            case "+":
+            case self.up:
                 self.counter.increment()
-            case "-":
-                self.counter.decrement()
-            case _:
-                pass
-
-@record
-class VimController:  # k is up, j is down
-    counter: Counter
-    history: History
-
-    def key(self, char: str) -> None:
-        self.history.add(char)
-        match char:
-            case "k":
-                self.counter.increment()
-            case "j":
+            case self.down:
                 self.counter.decrement()
             case _:
                 pass
@@ -67,7 +54,7 @@ for char in "++-x":
 #: keys: ++-
 #: count: 1
 #: keys: ++-x
-vim = VimController(counter, history)  # Same models
+vim = Controller(counter, history, up="k", down="j")
 for char in "kkj":
     vim.key(char)
 #: keys: ++-xk

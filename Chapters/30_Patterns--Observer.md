@@ -1495,8 +1495,7 @@ class Counter(Broadcaster[int]):
         self.announce(self._count)
 ```
 
-The second records every key pressed,
-and announces the keys so far as one string:
+The second records every key pressed, and announces the history as a string:
 
 ```python
 # history_model.py
@@ -1610,28 +1609,15 @@ class HistoryView:
 class Controller:  # Interprets but doesn't display
     counter: Counter
     history: History
+    up: str = "+"
+    down: str = "-"
 
     def key(self, char: str) -> None:
         self.history.add(char)
         match char:
-            case "+":
+            case self.up:
                 self.counter.increment()
-            case "-":
-                self.counter.decrement()
-            case _:
-                pass
-
-@record
-class VimController:  # k is up, j is down
-    counter: Counter
-    history: History
-
-    def key(self, char: str) -> None:
-        self.history.add(char)
-        match char:
-            case "k":
-                self.counter.increment()
-            case "j":
+            case self.down:
                 self.counter.decrement()
             case _:
                 pass
@@ -1650,7 +1636,7 @@ for char in "++-x":
 #: keys: ++-
 #: count: 1
 #: keys: ++-x
-vim = VimController(counter, history)  # Same models
+vim = Controller(counter, history, up="k", down="j")
 for char in "kkj":
     vim.key(char)
 #: keys: ++-xk
@@ -1677,18 +1663,23 @@ it announces to whatever responders are connected.
 That one-way flow is the benefit of the split.
 Because each view hears from its model alone,
 you can replace the controller and the views keep working.
-`VimController` reads `k` and `j` where `Controller` reads `+` and `-`.
+`Controller` takes its keys as two fields, `up` and `down`,
+and `key()` compares the character with them through [value patterns](13_Techniques--Pattern_Matching.md#a-bare-name-captures-a-dotted-name-compares),
+since `self.up` is a dotted name.
+The second `Controller` reads `k` and `j` where the first reads `+` and `-`.
 It takes the same two models, and the views built earlier go on printing,
 since the announcements they receive come from the models,
 whichever controller sent the request.
 The history carries across the swap as well: `vim`'s first key prints `++-xk`,
 because the keys live in `History` rather than in the controller that recorded them.
-Which keys mean up and down is the controller's decision alone,
-and a new key scheme is a new class, with the views and the models untouched.
+Which keys mean up and down is the controller's business alone.
+A new key scheme is two constructor arguments, and a new kind of key,
+say one that resets the count, is an edit to `Controller`,
+with the views and the models untouched either way.
 The same holds in the other direction:
 a second view connects to a model and both views print,
 with no change to either controller (see exercise 13).
-A third model is a new view class and one more field in each controller,
+A third model is a new view class and one more field in the controller,
 with `CountView` and `HistoryView` untouched.
 Testing benefits in the same way.
 A `Controller` needs a `Counter` and a `History`, so a test builds both,
@@ -1698,7 +1689,7 @@ with no view and no output to capture.
 In Document-View, one class contains both the Controller and the View,
 interpreting the keys and displaying every model the keys touch.
 `View.key()` and the display methods share an instance,
-so a different set of keys means editing `View` or subclassing it,
+so a new kind of key means editing `View` or subclassing it,
 and the display code comes along either way.
 `View` has one key handler and two displays,
 and `grid_view.py` has the same shape:
@@ -1905,6 +1896,7 @@ Try each exercise before opening its [solution](../Solutions/30_Patterns--Observ
 13. Connect a second view to `model_view_controller.py`'s `Counter`:
     one that prints a bar of asterisks as long as the count,
     beside the `CountView` that prints the number.
-    Drive both with `VimController` and show that one key updates the pair.
+    Drive both with a `Controller` whose keys are `k` and `j`,
+    and show that one key updates the pair.
     Then say what each class knows about the others,
     and which of them a third view would require you to change.
