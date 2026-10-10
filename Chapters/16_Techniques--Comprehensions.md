@@ -681,7 +681,7 @@ covers the values they receive as well as the ones they produce.
 
 ## Unpacking in Comprehensions
 
-`path_walk_comprehension.py` flattens a tree with two `for` clauses.
+`flatten.py` flattens nested lists with two `for` clauses.
 Python 3.15 ([PEP 798](https://peps.python.org/pep-0798/))
 adds a way to flatten with one `for` clause.
 The unpacking operator `*` may appear in the output expression of a comprehension or generator expression,
@@ -737,7 +737,7 @@ works the same way ([Concurrency](19_Techniques--Concurrency.md#asyncio-mechanic
 The four forms are one expression with different delimiters,
 so learning the list form teaches all four.
 Brackets when you want a list.
-Braces for a set, or for a dict when a colon separates a key from a value.
+Braces for a set, or for a dict when a colon separates a key from a value or `**` splices in a mapping.
 Parentheses when the consumer takes values one at a time and does not need them all at once.
 A `for` loop when you want the side effect rather than the collection.
 
