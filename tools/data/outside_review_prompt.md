@@ -16,6 +16,7 @@ Treat these as valid and do not flag them:
 - `sentinel()` is a builtin in Python 3.15 (PEP 661), and a sentinel value may appear in an annotation, as in `Sequence[str] | MISSING`; the type checker accepts that.
 - `{**mapping for ...}` and `[*items for ...]` unpack inside a comprehension (PEP 798, Python 3.15).
 - `lazy import` (PEP 810, Python 3.15).
+- `frozendict` is a built-in type (PEP 814, Python 3.15), and a class pattern `case frozendict(d):` binds the whole value, as it does for `dict` and the other special-cased built-ins.
 - Template strings, `t"..."` (PEP 750, Python 3.14).
 - Deferred evaluation of annotations (PEP 649 and PEP 749, Python 3.14), so a forward reference needs no quotes and no `__future__` import.
 - `type X = ...` aliases and `def f[T](...)` or `class C[T]:` generics (PEP 695, Python 3.12), `@override` (Python 3.12), `copy.replace()` and `warnings.deprecated` (Python 3.13), free-threaded builds (Python 3.13 and later).
