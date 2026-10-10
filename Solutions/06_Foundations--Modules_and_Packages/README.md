@@ -254,7 +254,7 @@ declaration order, decides which module loads first.
 > change `use_module.py` to `import Module`,
 > and update its call to `Module.useful_function()`.
 > Run it.
-> Then change the import back to `import module`,
+> Then change the import and its call back to `module`,
 > leaving the file named `Module.py`, and run it again.
 > Predict the result before you run it, then explain what you see,
 > given that Windows and macOS open `module.py` and `Module.py` as the same file.
