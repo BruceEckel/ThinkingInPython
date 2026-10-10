@@ -79,3 +79,12 @@ prompt_facts_probe: 10 of 15 statements still disputed (FALSE, UNSURE, or missin
        All four clauses accurately describe the type system's bi-directional assignability of `Any` and the definitions maintained in typeshed.
 prompt_facts_probe: 8 of 15 statements still disputed (FALSE, UNSURE, or missing)
 ```
+
+## Dropped 2026-10-10
+
+After the two runs above agreed, four bullets left the prompt: the
+`finally` SyntaxWarning (6), `copy.replace()` (8), `TabError` scope
+(9), and deferred annotations (11). PEP 695 constraints (5) and the
+3.12-3.14 feature list (12) stay for one more run, since run 2 is the
+first to accept 5 and the two name the same syntax. The list now has
+eleven bullets, so later tables number them 1 to 11.
