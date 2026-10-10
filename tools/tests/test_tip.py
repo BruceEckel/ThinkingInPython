@@ -234,3 +234,35 @@ def test_python_m_tools_tip_runs_a_task() -> None:
         env={**__import__("os").environ, NESTED: "1"})
     assert "no task named" not in out.stderr
     assert out.returncode == 0, out.stderr
+
+
+def test_spell_runs_every_step_and_fails_at_the_end(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str],
+) -> None:
+    """A failing prose_lint must not hide spellcheck's findings: all
+    three steps run, and the task fails afterward if any did."""
+    import tools.tasks as tasks
+
+    ran: list[str] = []
+
+    def fake_tool(name: str, *args: str) -> None:
+        ran.append(name)
+
+    def fake_py(module: str, *args: str) -> None:
+        ran.append(module)
+        if module == "tools.prose_lint":
+            raise StepFailed(3)
+
+    monkeypatch.setattr(tasks, "tool", fake_tool)
+    monkeypatch.setattr(tasks, "py", fake_py)
+    with pytest.raises(StepFailed) as failed:
+        tasks.spell(Vars({"CH": "30"}))
+    assert ran == ["codespell", "tools.prose_lint", "tools.spellcheck"]
+    assert failed.value.code == 1
+    out = capsys.readouterr().out
+    assert "prose_lint failed (exit 3); continuing." in out
+    assert "tip spell: 1 step(s) failed: prose_lint" in out
+    ran.clear()
+    monkeypatch.setattr(tasks, "py", lambda module, *args: ran.append(module))
+    tasks.spell(Vars())
+    assert len(ran) == 3

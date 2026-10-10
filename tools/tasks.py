@@ -316,11 +316,26 @@ def spell(v: Vars) -> None:
     catches known misspellings (prose and code comments); prose_lint catches
     spacing/blank-line/punctuation slips; spellcheck.py is a full-dictionary
     check of the prose, with accepted terms in tools/data/wordlist.txt. Run one
-    chapter with CH= (e.g. `tip spell CH=29`) or a path with DOCS=.
+    chapter with CH= (e.g. `tip spell CH=29`) or a path with DOCS=. All
+    three run whether or not an earlier one failed, and the task fails at
+    the end if any did: on 2026-10-10 twelve prose_lint findings hid
+    sixteen unknown words from the dictionary check for a day.
     """
-    tool("codespell", *prose_files(v))
-    py("tools.prose_lint", *prose_files(v))
-    py("tools.spellcheck", *prose_files(v))
+    files = prose_files(v)
+    failed: list[str] = []
+    for name, step in (
+        ("codespell", lambda: tool("codespell", *files)),
+        ("prose_lint", lambda: py("tools.prose_lint", *files)),
+        ("spellcheck", lambda: py("tools.spellcheck", *files)),
+    ):
+        try:
+            step()
+        except StepFailed as fail:
+            print(f"{name} failed (exit {fail.code}); continuing.")
+            failed.append(name)
+    if failed:
+        print(f"tip spell: {len(failed)} step(s) failed: {', '.join(failed)}")
+        raise StepFailed(1)
 
 
 @task("Accept every unknown word: spellcheck's into wordlist.txt, "
