@@ -1528,7 +1528,7 @@ for char in "++-x":
 #: count: 1
 ```
 
-`key()` is the controller, folded into `View` as a method.
+`key()` is the controller, contained within `View` as a method.
 `View` holds the model because `key()` needs somewhere to send the request.
 `__post_init__()` connects `display()` to that model,
 so a `View` is wired as soon as it exists.
