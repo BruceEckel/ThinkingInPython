@@ -98,8 +98,9 @@ assigning `a.show = something` shadows the method for `a` alone.
 One kind of class attribute follows a different rule.
 A [`@property`](07_Foundations--Classes.md#properties)
 owns its name on the class,
-so reading calls its getter and assigning calls its setter,
-and neither one touches the instance dictionary.
+so for that name reading calls its getter and assigning calls its setter in place of the instance dictionary.
+Whatever the setter stores, such as the `_radius` behind `Circle`'s `radius`,
+goes into that dictionary under its own name.
 
 ### The Bug Surfaces Far from Its Cause
 
@@ -169,10 +170,15 @@ and that assignment creates `a.items` on the instance and shadows the class list
 leaving `b` still reading the shared one.
 Because shadowing starts with an assignment and `.append()` makes none,
 a read followed by a mutation slips past the rule.
+An augmented assignment does both:
+`a.items += ["pear"]` mutates the shared list through `__iadd__()` and then assigns that same list to `a`,
+so `b` sees the pear too.
 A type checker accepts the line too.
 `a.items.append("apple")` is a correct call on a `list[str]`.
 
-A mutable default belongs in a `@dataclass` field with a [`default_factory`](12_Techniques--Data_Classes_as_Types.md#defaults-built-not-shared).
+A per-object list belongs in `__init__()`,
+as [Real Per-Object Defaults](#real-per-object-defaults) shows,
+or in a `@dataclass` field with a [`default_factory`](12_Techniques--Data_Classes_as_Types.md#defaults-built-not-shared).
 
 ## Declaring Shared State with ClassVar
 
