@@ -9,7 +9,11 @@ statement: `ships`, `lands`, `fuse`, `load-bearing`, `part ways`,
 "beneficial", "justified", "a better choice", or the gain, "saves
 time"; "worth its cost" keeps the figure). Tier 2 ("Avoid if possible") is a word that must earn its
 place: `already`, `even`, `honest`, `buy`, `hooks`, `never`, `anyway`,
-`at all`, `promise`. Tier 1 ("Consider rewriting") is a word with
+`at all`, `promise`, and the commerce family (`cost`, `price`,
+`cheap`, `expensive`, `pay`, `earn`, `bargain`, every form), a figure
+standing for a consequence that the sentence should name (edit
+database rule R2; a measured cost, time, memory, or a line count,
+stays). Tier 1 ("Consider rewriting") is a word with
 legitimate uses that the author checks every time: `happen`, `is what`,
 `and nothing else`, `nothing more`, `nothing but`, `does it`, `ever`,
 `only`, `exactly`, `has to` (with `have to` and `had to`), `actually`,
@@ -137,6 +141,13 @@ RULES: Final[tuple[tuple[int, re.Pattern[str]], ...]] = tuple(
         (2, r"anyway"),
         (2, r"at all"),
         (2, r"promis(?:e|es|ed|ing)"),
+        (2, r"costs?|costly|costing"),
+        (2, r"prices?|priced|pricing"),
+        (2, r"cheap(?:er|est|ly)?"),
+        (2, r"expensive(?:ly)?"),
+        (2, r"pays?|paid|paying"),
+        (2, r"earns?|earned|earning"),
+        (2, r"bargains?"),
     ]
 )
 EVEN_AFTER: Final = re.compile(
