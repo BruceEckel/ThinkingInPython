@@ -205,6 +205,9 @@ The short form is the listing's name alone.
 and words after the name go to the program,
 so `tip membership --numbers` passes it the `--numbers` flag.
 When the book says to run a listing, use the short form.
+A `test_*.py` file is the exception: the short form runs it as a script,
+which runs to the end and prints nothing, so run it with `pytest`,
+as [Testing](11_Techniques--Testing.md#pytest) shows.
 
 A filename comment that starts with `rust/`,
 like the `# rust/fastcount/demo.py` listing in [Performance](18_Techniques--Performance.md),
@@ -216,7 +219,7 @@ has the instructions, including how to install `tip`,
 and `tools/README.md` explains how to build the book and run the examples yourself.
 
 The book's build system extracts the examples, then type-checks
-(with Astral's `ty`), lints, runs, and tests them.
+(with Astral's `ty`), lints (with `ruff`), runs, and tests them.
 The code you read is the code that runs,
 and the output you see is the output it produces.
 
@@ -249,9 +252,9 @@ See `CONTRIBUTING.md` in the source repository.
 Most chapters end with a short "Exercises" section.
 These come from workshops, where pairs work through them at a keyboard.
 They are short enough to do on your own, and they are worth doing that way.
-They usually ask you to change a small,
-working example from that chapter and observe the result: add a class,
-break an invariant on purpose, extend a table, rewrite one function two ways.
+They usually ask you to copy a small, working example from that chapter,
+change it, and observe the result: add a class, break an invariant on purpose,
+extend a table, rewrite one function two ways.
 The point is to touch the code, predict what it does, then run it and check.
 A few chapters in the Patterns part keep larger exercises,
 because a pattern shows its value only in a program you build yourself.
@@ -280,6 +283,7 @@ Other resources:
   the release notes for the version this book targets
 - [The Python type system specification](https://typing.python.org/en/latest/spec/),
   the reference behind the annotations the book uses throughout
+- [pytest](https://docs.pytest.org/), the test framework the book uses
 - [Python Bytes](https://pythonbytes.fm/), podcast and newsletter
 - [Planet Python](https://planetpython.org/),
   an aggregator of Python articles from around the web
