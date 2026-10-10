@@ -314,7 +314,7 @@ so `if n := len(text) > 3:` gives `n` the result of the comparison, `True`,
 and not the length.
 
 The `while` loop is where the walrus helps most.
-The header pops a value, names it, and tests it,
+The header checks that the stack has an item, pops it, names it, and tests it,
 so the body starts with that value in hand.
 The walrus also collapses `while_true.py` into its loop header:
 `while (value := values.pop(0)) != 0:`.
@@ -357,7 +357,8 @@ The list loop walks by position.
 Removing an item shifts the next one down into the slot the loop has passed,
 so the loop skips it and one of the two `2`s survives,
 with no exception to tell you.
-The dictionary raises a `RuntimeError` instead of skipping silently.
+Adding the key changes the dictionary's size,
+and the dictionary raises a `RuntimeError` instead of skipping silently.
 The fix is the same for both.
 Build a new container with a comprehension,
 or collect what to remove first and remove it after the loop.
@@ -451,7 +452,7 @@ divide_and_report(1, 1)
 ```
 
 `checked_divide()` raises a `ValueError` rather than letting Python's own `ZeroDivisionError` through.
-Raise your own exception that way when the caller should hear about the bad argument rather than the failed arithmetic.
+Choose the exception that way when the caller should hear about the bad argument rather than the failed arithmetic.
 
 The optional `else` runs when the `try` block raises no exception,
 the same shape as the loop `else` that runs when the loop hits no `break`.
