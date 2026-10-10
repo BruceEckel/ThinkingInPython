@@ -365,7 +365,7 @@ print(function4())
 `module4` finds its sibling without naming `a_package`,
 so renaming the package breaks nothing inside it.
 Two dots reach the parent package,
-so `b_package/module3.py` could import from `a_package` with `from .. import module1` or `from ..module1 import function1`.
+so `a_package/b_package/module3.py` could import from `a_package` with `from .. import module1` or `from ..module1 import function1`.
 The absolute form `from a_package.module1 import function1` works from inside the package too,
 and is a better choice when the import crosses a package boundary.
 Keep relative imports for a package's own submodules.
@@ -520,7 +520,7 @@ Python searches `sys.path`, a list of directories it builds at startup.
 Its first entry is the directory of the script you ran
 (the current directory when you use `-m` or the REPL),
 and that entry is why `use_module.py` can `import module` with no setup.
-The entries from `PYTHONPATH` come next,
+The entries from `PYTHONPATH` come next, then the standard library,
 and installed packages sit further down.
 Running with `-P` drops that first entry,
 so a local `random.py` no longer shadows the standard library.
@@ -700,7 +700,7 @@ Try each exercise before opening its [solution](../Solutions/06_Foundations--Mod
     change `use_module.py` to `import Module`,
     and update its call to `Module.useful_function()`.
     Run it.
-    Then change the import back to `import module`,
+    Then change the import and its call back to `module`,
     leaving the file named `Module.py`, and run it again.
     Predict the result before you run it, then explain what you see,
     given that Windows and macOS open `module.py` and `Module.py` as the same file.
