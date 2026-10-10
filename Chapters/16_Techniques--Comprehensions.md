@@ -20,8 +20,8 @@ and one line replaces several lines of loop bookkeeping.
 
 A list comprehension consists of:
 
--   An input sequence.
--   A variable representing members of the input sequence.
+-   An input iterable.
+-   A variable representing members of the input iterable.
 -   An optional filter expression.
 -   An output expression that builds one element of the output list from each member that passes the filter.
 
@@ -55,7 +55,7 @@ print(squared_ints)
 
 The built-in functions `map()` and `filter()`, each given a `lambda`,
 produce the same list that `list_comprehension.py` builds.
-`filter()` applies a predicate to a sequence and retains the members that pass it.
+`filter()` applies a predicate to an iterable and retains the members that pass it.
 It produces a lazy iterator, which `list()` expands into a `list`:
 
 ```python
@@ -326,7 +326,7 @@ and the comprehension produces a wrong list with no exception.
 Everything to the right of `in` is an ordinary iterable expression,
 so anything that produces one works there.
 
-`zip()` walks two sequences together, taking one element from each:
+`zip()` walks two iterables together, taking one element from each:
 
 ```python
 # zip_pairs.py
@@ -336,7 +336,7 @@ print([f"{n}={v}" for n, v in zip(names, values)])
 #: ['a=1', 'b=2', 'c=3']
 ```
 
-`zip()` stops at the end of the shorter sequence.
+`zip()` stops at the end of the shorter iterable.
 Pass `strict=True` to make a length mismatch raise a `ValueError` instead of silently truncating.
 
 The `for` clause's target can unpack a tuple,
@@ -636,8 +636,8 @@ which `sum()`, `any()`, and `list()` each read as the end.
 `sum()` drains `nums`,
 so `any()` sees no elements and reports `False` instead of `True`,
 with no exception to say the question went unasked.
-When you must traverse something twice,
-either materialize it with `list()` or write the generator expression again.
+When you must traverse something twice, either materialize it with `list()` or,
+over a re-iterable source such as `range`, write the generator expression again.
 
 ### The Gap Between Creation and Consumption
 
