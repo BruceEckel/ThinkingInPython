@@ -1748,10 +1748,12 @@ Two states, `celsius` and `humidity`, share one channel,
 so every responder receives both kinds of change,
 along with the attribute name to filter by.
 
-*Observer* therefore removes one coupling and keeps another.
-The object that changes knows its responders only as callables,
-yet it still decides what they hear.
-A threshold makes that concrete.
+*Observer* removes one coupling and keeps another.
+The thermometer knows its responders only as callables,
+so connecting a new responder changes nothing in the thermometer.
+The responders still depend on which changes the thermometer announces,
+since a responder acts on what it receives.
+A threshold shows the kept coupling.
 This thermometer announces a reading only when it differs from the reading before it by at least `_delta`:
 
 ```python
