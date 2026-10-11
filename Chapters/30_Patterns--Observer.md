@@ -1727,11 +1727,11 @@ or to the client that changes the state.
 The decision never belongs to a responder,
 whose choice is limited to filtering the changes it receives.
 `Thermometer`'s setter announces every assignment,
-which says that every change matters to everyone.
-[Leaving that call to the client](#push-or-pull)
+which assumes that every change matters to everyone.
+[Moving the `announce()` call out of the setter and into the client](#push-or-pull)
 lets several changes coalesce into one announcement,
-but then every caller must make that call,
-and the responders stay out of date until it does.
+but then every client that changes the thermometer must also call `announce()`,
+and the responders hold stale data until that client does.
 Push sends the value, so the thermometer decides what each responder receives.
 Pull sends the thermometer,
 so each responder reads the attributes it needs from the thermometer and depends on the thermometer's interface.
