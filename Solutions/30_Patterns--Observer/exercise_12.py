@@ -3,7 +3,7 @@ from collections.abc import Callable
 from dataclasses import dataclass, fields
 from typing import Any, dataclass_transform
 
-type Responder[T] = Callable[[str, T], None]
+type Responder[T] = Callable[[tuple[str, T]], None]
 
 def published(name: str) -> property:
     def read(self: Any) -> Any:
@@ -11,7 +11,7 @@ def published(name: str) -> property:
 
     def write(self: Any, value: Any) -> None:
         self.__dict__[name] = value
-        self.announce(name, value)
+        self.announce((name, value))
 
     return property(read, write)
 
@@ -35,9 +35,9 @@ class Broadcasting[T]:
     def disconnect(self, fn: Responder[T]) -> None:
         self._responders.remove(fn)
 
-    def announce(self, name: str, data: T) -> None:
+    def announce(self, data: tuple[str, T]) -> None:
         for responder in list(self._responders):
-            responder(name, data)
+            responder(data)
 
 class Station(Broadcasting[float]):
     celsius: float
@@ -47,7 +47,8 @@ station = Station(20.0, 0.4)
 calls: list[str] = []
 
 @station.respond
-def report(name: str, value: float) -> None:
+def report(change: tuple[str, float]) -> None:
+    name, value = change
     calls.append(name)
     if name == "celsius":
         print(f"report: {value}C")

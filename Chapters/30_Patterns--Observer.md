@@ -250,6 +250,11 @@ The call inside the loop changes as well.
 `Broadcaster.announce()` calls `responder(data)`,
 so a function serves as a responder.
 `announce()` passes the data alone, so `Broadcaster` uses the push model.
+An announcement carries one argument.
+When a change has two parts to report,
+such as an attribute's name and its new value,
+the broadcaster packs them in a tuple and each responder unpacks it,
+and a responder that needs no data ignores the argument it receives.
 
 `Broadcaster` knows nothing about what it announces.
 Its type parameter `T` sets the type of each notification,
@@ -774,9 +779,9 @@ so one `__setattr__()` covers every attribute of the class:
 
 ```python
 # weather_station.py
-from collections.abc import Callable
+from broadcaster import Responder
 
-type AttrResponder = Callable[[str, object], None]
+type Change = tuple[str, object]
 
 class WeatherStation:
     def __init__(
@@ -786,13 +791,15 @@ class WeatherStation:
         self.humidity = humidity
 
     @property
-    def _responders(self) -> list[AttrResponder]:
+    def _responders(self) -> list[Responder[Change]]:
         return self.__dict__.setdefault("_responders", [])
 
-    def connect(self, responder: AttrResponder) -> None:
+    def connect(self, responder: Responder[Change]) -> None:
         self._responders.append(responder)
 
-    def disconnect(self, responder: AttrResponder) -> None:
+    def disconnect(
+        self, responder: Responder[Change]
+    ) -> None:
         self._responders.remove(responder)
 
     def __setattr__(
@@ -801,11 +808,11 @@ class WeatherStation:
         responders = list(self._responders)
         super().__setattr__(name, value)
         for responder in responders:
-            responder(name, value)
+            responder((name, value))
 
 station = WeatherStation(20.0, 0.4)
-changes: list[tuple[str, object]] = []
-station.connect(lambda n, v: changes.append((n, v)))
+changes: list[Change] = []
+station.connect(changes.append)
 station.celsius = 25.0
 station.humidity = 0.5
 print(changes)
@@ -831,8 +838,8 @@ because an ordinary assignment inside `__setattr__()` calls `__setattr__()`.
 
 One `__setattr__()` for every attribute gives up three things that `Thermometer`'s property per attribute keeps:
 
-1.  `WeatherStation`'s responders have a wider signature.
-    Each takes the attribute name along with the value,
+1.  `WeatherStation`'s responders receive a pair.
+    Each takes the attribute name and the value as one tuple,
     and filters by name to act on one attribute.
     `Thermometer` publishes one attribute and is a `Broadcaster[float]`,
     so each responder takes the `float` reading as its one argument.
@@ -1020,7 +1027,7 @@ and accepts `Thermometer(100)` because `100` fits that parameter.
 
 `Broadcasting` has one type parameter, so a subclass publishes one value.
 A class that declares `celsius` and `humidity` would send both readings to the same responders with no name attached.
-A class with several published attributes uses `WeatherStation`'s name-and-value signature
+A class with several published attributes uses `WeatherStation`'s name-and-value pair
 (exercise 12), or gives each attribute its own responders with the descriptor in exercise 10.
 
 ## Observer and I/O
@@ -1715,8 +1722,7 @@ The notification code can be separated from the measuring code in different ways
   and its generated properties make the `announce()` call as well,
   so the `Thermometer` body is a single annotation.
 
-In each design,
-the responders hear from the object whose state changes,
+In each design, the responders hear from the object whose state changes,
 but the loop that calls them is written once, in `Broadcaster`,
 in `__setattr__()`, or in `Broadcasting`, distinct from the code that measures.
 
@@ -1886,9 +1892,9 @@ Try each exercise before opening its [solution](../Solutions/30_Patterns--Observ
     and create two thermometers.
     Say which of the problems in this chapter's runtime sections the load-time form keeps,
     which it removes, and what it costs that `Broadcaster` does not.
-12. Give `Broadcasting` the name-and-value signature of `weather_station.py`:
-    `published()`'s setter announces the field's name along with the new value,
-    and `Responder[T]` becomes `Callable[[str, T], None]`.
+12. Give `Broadcasting` the name-and-value pair of `weather_station.py`:
+    `published()`'s setter announces the field's name paired with the new value,
+    so each responder receives a `tuple[str, T]`.
     Declare a subclass with `celsius` and `humidity` fields,
     and attach one responder that reports `celsius` readings and lets `humidity` pass.
     Show that an assignment to either field reaches that responder,

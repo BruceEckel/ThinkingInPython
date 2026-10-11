@@ -1,7 +1,7 @@
 # weather_station.py
-from collections.abc import Callable
+from broadcaster import Responder
 
-type AttrResponder = Callable[[str, object], None]
+type Change = tuple[str, object]
 
 class WeatherStation:
     def __init__(
@@ -11,13 +11,15 @@ class WeatherStation:
         self.humidity = humidity
 
     @property
-    def _responders(self) -> list[AttrResponder]:
+    def _responders(self) -> list[Responder[Change]]:
         return self.__dict__.setdefault("_responders", [])
 
-    def connect(self, responder: AttrResponder) -> None:
+    def connect(self, responder: Responder[Change]) -> None:
         self._responders.append(responder)
 
-    def disconnect(self, responder: AttrResponder) -> None:
+    def disconnect(
+        self, responder: Responder[Change]
+    ) -> None:
         self._responders.remove(responder)
 
     def __setattr__(
@@ -26,11 +28,11 @@ class WeatherStation:
         responders = list(self._responders)
         super().__setattr__(name, value)
         for responder in responders:
-            responder(name, value)
+            responder((name, value))
 
 station = WeatherStation(20.0, 0.4)
-changes: list[tuple[str, object]] = []
-station.connect(lambda n, v: changes.append((n, v)))
+changes: list[Change] = []
+station.connect(changes.append)
 station.celsius = 25.0
 station.humidity = 0.5
 print(changes)

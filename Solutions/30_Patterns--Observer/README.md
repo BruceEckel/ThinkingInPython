@@ -13,7 +13,7 @@
 
 The design is the one [The Pythonic *Observer*](../../Chapters/30_Patterns--Observer.md#the-pythonic-observer) describes:
 a list of callables, one method that appends to it,
-and one that calls each entry with the same arguments.
+and one that calls each entry with the same argument.
 Any callable is a responder, a `lambda` included,
 so the demonstration needs no observer class.
 
@@ -23,16 +23,17 @@ so the demonstration needs no observer class.
 ```python
 # The shape of exercise_1.py
 from collections.abc import Callable
-from typing import Any
 
-class Broadcaster:
+class Broadcaster[T]:
     def __init__(self) -> None:
         ...
 
-    def connect(self, responder: Callable) -> None:
+    def connect(
+        self, responder: Callable[[T], None]
+    ) -> None:
         ...
 
-    def announce(self, *args: Any) -> None:
+    def announce(self, data: T) -> None:
         ...
 ```
 
@@ -42,21 +43,22 @@ class Broadcaster:
 ```python
 # exercise_1.py
 from collections.abc import Callable
-from typing import Any
 
-class Broadcaster:
+class Broadcaster[T]:
     def __init__(self) -> None:
-        self._responders: list[Callable] = []
+        self._responders: list[Callable[[T], None]] = []
 
-    def connect(self, responder: Callable) -> None:
+    def connect(
+        self, responder: Callable[[T], None]
+    ) -> None:
         self._responders.append(responder)
 
-    def announce(self, *args: Any) -> None:
+    def announce(self, data: T) -> None:
         for responder in self._responders:
-            responder(*args)
+            responder(data)
 
 calls: list[tuple[str, int]] = []
-broadcaster = Broadcaster()
+broadcaster = Broadcaster[int]()
 broadcaster.connect(lambda v: calls.append(("A", v)))
 broadcaster.connect(lambda v: calls.append(("B", v)))
 broadcaster.announce(42)
@@ -68,8 +70,8 @@ print(calls)
 Any callable, here two `lambda`s, is a responder. `connect()`
 collects them in a list.
 
-**Deliver one update to every responder.** `announce()` then hands its own arguments to
-each one in turn, so every connected responder sees the same update,
+**Deliver one update to every responder.** `announce()` then hands its one argument to
+each responder in turn, so every connected responder sees the same update,
 in connection order.
 
 </details>
@@ -1783,9 +1785,9 @@ so a responder in a module nothing imports still registers nothing.
 
 ## 12. A name with each announcement
 
-> Give `Broadcasting` the name-and-value signature of `weather_station.py`:
-> `published()`'s setter announces the field's name along with the new value,
-> and `Responder[T]` becomes `Callable[[str, T], None]`.
+> Give `Broadcasting` the name-and-value pair of `weather_station.py`:
+> `published()`'s setter announces the field's name paired with the new value,
+> so each responder receives a `tuple[str, T]`.
 > Declare a subclass with `celsius` and `humidity` fields,
 > and attach one responder that reports `celsius` readings and lets `humidity` pass.
 > Show that an assignment to either field reaches that responder,
@@ -1795,8 +1797,9 @@ so a responder in a module nothing imports still registers nothing.
 <summary>Where to look</summary>
 
 `published()` receives the field's name when `__init_subclass__()` builds each property,
-so `write()` can pass that name to `announce()` along with the value.
-Widen `Responder[T]` and `announce()` to carry the name.
+so `write()` can pair that name with the value and pass the pair to `announce()`.
+Make the payload a `tuple[str, T]`,
+so `Responder[T]` takes that tuple and `announce()` passes the pair through unchanged.
 
 <details>
 <summary>The shape</summary>
@@ -1807,7 +1810,7 @@ from collections.abc import Callable
 from dataclasses import dataclass, fields
 from typing import Any, dataclass_transform
 
-type Responder[T] = Callable[[str, T], None]
+type Responder[T] = Callable[[tuple[str, T]], None]
 
 def published(name: str) -> property:
     ...
@@ -1827,7 +1830,7 @@ class Broadcasting[T]:
     def disconnect(self, fn: Responder[T]) -> None:
         ...
 
-    def announce(self, name: str, data: T) -> None:
+    def announce(self, data: tuple[str, T]) -> None:
         ...
 
 class Station(Broadcasting[float]):
@@ -1835,7 +1838,7 @@ class Station(Broadcasting[float]):
     humidity: float
 
 @station.respond
-def report(name: str, value: float) -> None:
+def report(change: tuple[str, float]) -> None:
     ...
 ```
 
@@ -1844,9 +1847,10 @@ def report(name: str, value: float) -> None:
 
 The change sits in two places.
 `published()` closes over the field's name,
-so `write()` has the name at hand and calls `self.announce(name, value)`.
-`Broadcasting` widens `Responder[T]` to `Callable[[str, T], None]`
-and gives `announce()` a `name` parameter that it passes to each responder.
+so `write()` has the name at hand and calls `self.announce((name, value))`.
+In `Broadcasting` the payload becomes a `tuple[str, T]`:
+`Responder[T]` becomes `Callable[[tuple[str, T]], None]`,
+and `announce()` passes the pair through to each responder unchanged.
 `__init_subclass__()`, `respond()`, and `disconnect()` stay as the chapter writes them.
 
 ```python
@@ -1855,7 +1859,7 @@ from collections.abc import Callable
 from dataclasses import dataclass, fields
 from typing import Any, dataclass_transform
 
-type Responder[T] = Callable[[str, T], None]
+type Responder[T] = Callable[[tuple[str, T]], None]
 
 def published(name: str) -> property:
     def read(self: Any) -> Any:
@@ -1863,7 +1867,7 @@ def published(name: str) -> property:
 
     def write(self: Any, value: Any) -> None:
         self.__dict__[name] = value
-        self.announce(name, value)
+        self.announce((name, value))
 
     return property(read, write)
 
@@ -1887,9 +1891,9 @@ class Broadcasting[T]:
     def disconnect(self, fn: Responder[T]) -> None:
         self._responders.remove(fn)
 
-    def announce(self, name: str, data: T) -> None:
+    def announce(self, data: tuple[str, T]) -> None:
         for responder in list(self._responders):
-            responder(name, data)
+            responder(data)
 
 class Station(Broadcasting[float]):
     celsius: float
@@ -1899,7 +1903,8 @@ station = Station(20.0, 0.4)
 calls: list[str] = []
 
 @station.respond
-def report(name: str, value: float) -> None:
+def report(change: tuple[str, float]) -> None:
+    name, value = change
     calls.append(name)
     if name == "celsius":
         print(f"report: {value}C")
@@ -1919,7 +1924,8 @@ so `Broadcasting` needs no lookup to learn which field changed.
 
 **Filter in the responder.** `announce()` calls every responder for every field,
 as `WeatherStation.__setattr__()` does.
-`report()` appends each name it receives to `calls`
+`report()` unpacks each pair it receives,
+appends the name to `calls`,
 and prints when the name is `"celsius"`.
 The one `report:` line shows the `celsius` reading reported,
 and `calls` shows that both assignments reached `report()`,
@@ -1928,7 +1934,7 @@ including the one to `humidity`.
 **Share one type across the fields.** `Broadcasting[float]` gives every field's responders the same `T`,
 so `celsius` and `humidity` are both `float`.
 A subclass whose fields have different types declares `Broadcasting[object]`,
-the value type of `WeatherStation`'s `AttrResponder`,
+the value type in `WeatherStation`'s `Change` tuple, `tuple[str, object]`,
 and its responders narrow the value after checking the name.
 
 The generated `__init__()` assigns both fields through their properties,
