@@ -1461,7 +1461,7 @@ A click on the canvas becomes a `select()` on the model,
 and the resulting notification repaints the view.
 The responder calls the model, and `draw()` does the painting.
 The view handles the mouse as well as the screen,
-folding the controller's job into the view.
+so the controller's job is contained within the view.
 `select()` takes a cell rather than a mouse event, so a keypress, a touch,
 or a test call drives the model the way a click does.
 
@@ -1671,8 +1671,8 @@ you can replace the controller and the views keep working.
 `Controller` takes its keys as two fields, `up` and `down`,
 and `key()` compares the character with them through [value patterns](13_Techniques--Pattern_Matching.md#a-bare-name-captures-a-dotted-name-compares),
 since `self.up` is a dotted name.
-The second `Controller` reads `k` and `j` where the first reads `+` and `-`.
-It takes the same two models, and the views built earlier go on displaying,
+`vim` reads `k` and `j` where `controller` reads `+` and `-`.
+`vim` takes the same two models, and the views built earlier go on displaying,
 since the announcements they receive come from the models,
 whichever controller sent the request.
 `vim`'s first key displays `++-xk`,
