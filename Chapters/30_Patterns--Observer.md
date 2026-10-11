@@ -1751,7 +1751,7 @@ The thermometer knows its responders only as callables,
 so connecting a new responder changes nothing in the thermometer.
 The responders still depend on which changes the thermometer announces,
 since a responder acts on what it receives.
-A threshold shows the kept coupling.
+A threshold in the thermometer makes that dependence visible.
 This thermometer announces a reading only when it differs from the reading before it by at least `_delta`:
 
 ```python
