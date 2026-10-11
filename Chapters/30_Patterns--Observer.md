@@ -1718,8 +1718,8 @@ The notification code can be separated from the measuring code in different ways
   so the `Thermometer` body is a single annotation.
 
 In each of the three designs,
-the object whose state changes still notifies its responders,
-but the loop that calls those responders is written once, in `Broadcaster`,
+the responders still hear from the object whose state changes,
+but the loop that calls them is written once, in `Broadcaster`,
 in `__setattr__()`, or in `Broadcasting`, distinct from the code that measures.
 
 The second job *Observer* adds is deciding which changes to announce.
@@ -1732,7 +1732,7 @@ which assumes that every change matters to everyone.
 [Moving the `announce()` call out of the setter and into the client](#push-or-pull)
 lets several changes coalesce into one announcement,
 but then every client that changes the thermometer must also call `announce()`,
-and the responders hold stale data until that client does.
+and the responders hold stale data until that happens.
 Push sends the value, so the thermometer decides what each responder receives.
 Pull sends the thermometer,
 so each responder reads the attributes it needs from the thermometer and depends on the thermometer's interface.
