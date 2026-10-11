@@ -1727,8 +1727,8 @@ but the loop that calls them is written once, in `Broadcaster`,
 in `__setattr__()`, or in `Broadcasting`, distinct from the code that measures.
 
 The second job *Observer* adds is deciding which changes to announce.
-Push keeps that decision on the sending side,
-with the object whose state changes or with the client that changes the state.
+With push, that decision is on the sending side.
+It resides with the object whose state changes or with the client that changes the state.
 The announcement carries the value,
 so the thermometer also decides what each responder receives.
 `Thermometer`'s setter announces every assignment,
@@ -1738,17 +1738,15 @@ allows multiple changes to coalesce into one announcement,
 but then every client that changes the thermometer must also call `announce()`,
 and the responders hold stale data until that happens.
 
-Pull sends the thermometer,
-so each responder reads the attributes it needs from the thermometer and depends on the thermometer's interface.
-Pull leaves the decision of which changes to announce with the thermometer;
-a responder's choice is limited to what it reads and which announcements it acts on.
-`weather_station.py` pushes a pair but, like pull,
-leaves that choice to its responders.
-Two states, `celsius` and `humidity`, share one channel,
-so every responder receives both kinds of change,
-along with the attribute name to filter by.
+With pull, a broadcast sends the thermometer.
+Each responder reads the attributes it needs from the thermometer and depends on the thermometer's interface.
+Pull leaves the decision of which changes to announce with the thermometer.
+A responder's choice is limited to what it reads and which announcements it acts on.
+`weather_station.py` pushes a pair and leaves that choice to its responders.
+`celsius` and `humidity` share one channel,
+so every responder receives both kinds of change, along with the attribute name.
 
-*Observer* removes one coupling and keeps another.
+*Observer* decouples the thermometer from its responders and leaves the responders coupled to the thermometer.
 The thermometer knows its responders only as callables,
 so connecting a new responder changes nothing in the thermometer.
 The responders still depend on which changes the thermometer announces,
