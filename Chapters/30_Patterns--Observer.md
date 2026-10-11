@@ -1727,20 +1727,23 @@ but the loop that calls them is written once, in `Broadcaster`,
 in `__setattr__()`, or in `Broadcasting`, distinct from the code that measures.
 
 The second job *Observer* adds is deciding which changes to announce.
-That decision belongs to the object whose state changes,
-or to the client that changes the state.
-The decision never belongs to a responder,
-whose choice is limited to filtering the changes it receives.
+Push keeps that decision on the sending side,
+with the object whose state changes or with the client that changes the state.
+The announcement carries the value,
+so the thermometer also decides what each responder receives.
 `Thermometer`'s setter announces every assignment,
 which assumes that every change matters to everyone.
 [Moving the `announce()` call out of the setter and into the client](#push-or-pull)
 allows multiple changes to coalesce into one announcement,
 but then every client that changes the thermometer must also call `announce()`,
 and the responders hold stale data until that happens.
-Push sends the value, so the thermometer decides what each responder receives.
+
 Pull sends the thermometer,
 so each responder reads the attributes it needs from the thermometer and depends on the thermometer's interface.
-`weather_station.py` leaves the choice to its responders.
+Pull leaves the decision of which changes to announce with the thermometer;
+a responder's choice is limited to what it reads and which announcements it acts on.
+`weather_station.py` pushes a pair but, like pull,
+leaves that choice to its responders.
 Two states, `celsius` and `humidity`, share one channel,
 so every responder receives both kinds of change,
 along with the attribute name to filter by.
