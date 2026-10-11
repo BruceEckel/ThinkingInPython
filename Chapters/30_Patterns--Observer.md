@@ -1717,7 +1717,8 @@ The notification code can be separated from the measuring code in different ways
   and its generated properties make the `announce()` call as well,
   so the `Thermometer` body is a single annotation.
 
-The object always notifies its responders,
+In each of the three designs,
+the object whose state changes still notifies its responders,
 but the loop that calls those responders is written once, in `Broadcaster`,
 in `__setattr__()`, or in `Broadcasting`, distinct from the code that measures.
 
