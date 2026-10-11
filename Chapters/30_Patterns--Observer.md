@@ -696,7 +696,7 @@ print(seen)
 
 `echo` writes back the value,
 so the setter returns before it reaches `announce()` a second time.
-`announce()` runs only once, for the original assignment.
+`announce()` runs once, for the original assignment.
 
 The alternative is a re-entry flag, set before `announce()` and cleared after,
 with the setter returning early while the flag is set.

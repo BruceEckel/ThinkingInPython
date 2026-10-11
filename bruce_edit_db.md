@@ -966,6 +966,13 @@ text.
   class, setting `__final__ = True`"
 - `46_Effects--Stateless`: "Failures never vanish. They only relocate."
   -> "They relocate."
+- `30_Patterns--Observer` 2026-10-11, was Bruce-written (4841947b,
+  2026-10-05): "`announce()` runs only once, for the original
+  assignment." -> "runs once, for the original assignment." Raised as
+  a conflict at the pass's capture, since the `only` had read as
+  marking the contrast with the re-entrant run; Bruce's ruling: "'on
+  the first call' is enough to imply 'only' in this case," so the
+  delete shape stands and the sentence followed it.
 
 **Home.** CLAUDE.md watch list (global, Writing Style), a dedicated
 bullet beside the "nothing else" family, written 2026-10-04. The
@@ -1391,10 +1398,21 @@ first time the reader meets the fact. Write X as a statement and attach
 Y with "so", or as its own sentence followed by "Thus, Y". The mirror of
 R4, which fronts an already-established X with "Because".
 
-**Keep when.** X was established earlier, so R4 applies.
+**Keep when.** X was established earlier, so R4 applies. Narrowed
+2026-10-11 (Bruce, at chapter 30's capture): when the claim's subject
+is the paragraph's topic, the claim leads and the premise follows
+with "because", even though the premise is new information.
 
-**Sightings.** 3, all `27_Patterns--Factory` 2026-08-31 (same chapter,
-so not yet independent):
+**Sightings.** 4, 2 chapters (the second a narrowing rather than a
+match, so not yet promoted):
+- `30_Patterns--Observer` 2026-09-27 (`5d98cbbf`), from Bruce's
+  paragraph note, the narrowing: "Iterating over an enum produces its
+  members in definition order, so `list(Color)` is the cycle of
+  colors." -> "`list(Color)` is the cycle of colors, because iterating
+  over an enum produces its members in definition order." The
+  paragraph is about `Color`'s cycle, so the claim leads.
+- `27_Patterns--Factory` 2026-08-31, three (same chapter, so not yet
+  independent):
 - (`2b18eed8`), was Bruce-written (older draft): "If your program must
   call this factory whenever it needs one of your objects, then you
   change only the factory" -> "Your program must call this factory
