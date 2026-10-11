@@ -1707,18 +1707,16 @@ and *Observer* adds deciding and notification.
 
 The notification code can be separated from the measuring code in different ways:
 
-- `Broadcaster` holds the responder list and the notification loop,
+- `Broadcaster`, `BoundBroadcaster` and `async Broadcaster` holds the responder list and the notification loop,
   and `Thermometer` inherits them.
-  `BoundBroadcaster` and the `async Broadcaster` are the same extraction,
-  with responders configured at construction or a loop that runs concurrently.
 - `weather_station.py` uses no base class and calls its responders from `__setattr__()`,
   so one method covers every attribute.
 - `broadcasting.py` holds the list and the loop like `Broadcaster`,
   and its generated properties make the `announce()` call as well,
   so the `Thermometer` body is a single annotation.
 
-In each of the three designs,
-the responders still hear from the object whose state changes,
+In each design,
+the responders hear from the object whose state changes,
 but the loop that calls them is written once, in `Broadcaster`,
 in `__setattr__()`, or in `Broadcasting`, distinct from the code that measures.
 
@@ -1730,7 +1728,7 @@ whose choice is limited to filtering the changes it receives.
 `Thermometer`'s setter announces every assignment,
 which assumes that every change matters to everyone.
 [Moving the `announce()` call out of the setter and into the client](#push-or-pull)
-lets several changes coalesce into one announcement,
+allows multiple changes to coalesce into one announcement,
 but then every client that changes the thermometer must also call `announce()`,
 and the responders hold stale data until that happens.
 Push sends the value, so the thermometer decides what each responder receives.
