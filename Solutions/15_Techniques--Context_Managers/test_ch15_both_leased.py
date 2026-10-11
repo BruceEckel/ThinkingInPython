@@ -1,5 +1,5 @@
 # test_ch15_both_leased.py
-from collections.abc import Iterator
+from collections.abc import Generator
 from contextlib import contextmanager
 from dataclasses import dataclass
 from queue import Queue
@@ -15,7 +15,7 @@ class Pool[R]:
             self._available.put(item)
 
     @contextmanager
-    def lease(self) -> Iterator[R]:
+    def lease(self) -> Generator[R]:
         item = self._available.get()
         try:
             yield item

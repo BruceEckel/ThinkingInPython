@@ -286,7 +286,7 @@ demo so the two listings can import it:
 
 ```python
 # grid.py
-from collections.abc import Callable, Iterator
+from collections.abc import Callable, Generator
 from contextlib import contextmanager
 from dataclasses import dataclass
 from typing import Protocol
@@ -366,7 +366,7 @@ def controller(
     return choose
 
 @contextmanager
-def connected(source: Source) -> Iterator[Source]:
+def connected(source: Source) -> Generator[Source]:
     name = type(source).__name__
     print(f"{name} online")
     try:

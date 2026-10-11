@@ -34,11 +34,11 @@ A context manager needs nothing beyond that shape.
 
 ```python
 # trace_gen.py
-from collections.abc import Iterator
+from collections.abc import Generator
 from contextlib import contextmanager
 
 @contextmanager
-def trace(name: str) -> Iterator[str]:
+def trace(name: str) -> Generator[str]:
     print(f"enter {name}")  # Setup
     try:
         yield name  # The block runs here
@@ -76,11 +76,11 @@ Leaving the `try`/`finally` out is the common mistake:
 
 ```python
 # no_finally.py
-from collections.abc import Iterator
+from collections.abc import Generator
 from contextlib import contextmanager
 
 @contextmanager
-def careless(name: str) -> Iterator[str]:
+def careless(name: str) -> Generator[str]:
     print(f"enter {name}")
     yield name
     print(f"exit {name}")
@@ -290,11 +290,11 @@ A generator manager suppresses by catching:
 
 ```python
 # suppress_in_generator.py
-from collections.abc import Iterator
+from collections.abc import Generator
 from contextlib import contextmanager
 
 @contextmanager
-def ignoring(kind: type[BaseException]) -> Iterator[None]:
+def ignoring(kind: type[BaseException]) -> Generator[None]:
     try:
         yield
     except kind as error:
@@ -568,11 +568,11 @@ although `ContextDecorator` is absent from `context_decorator.py`:
 
 ```python
 # context_decorator.py
-from collections.abc import Iterator
+from collections.abc import Generator
 from contextlib import contextmanager
 
 @contextmanager
-def banner(title: str) -> Iterator[None]:
+def banner(title: str) -> Generator[None]:
     print(f"=== {title} ===")
     try:
         yield
@@ -668,11 +668,11 @@ On 3.15 the context opens at the first `next()` and closes after the generator's
 
 ```python
 # decorated_generator.py
-from collections.abc import Iterator
+from collections.abc import Generator, Iterator
 from contextlib import contextmanager
 
 @contextmanager
-def banner(title: str) -> Iterator[None]:
+def banner(title: str) -> Generator[None]:
     print(f"=== {title} ===")
     try:
         yield
@@ -717,11 +717,11 @@ They enter left to right and exit in reverse:
 
 ```python
 # multiple.py
-from collections.abc import Iterator
+from collections.abc import Generator
 from contextlib import contextmanager
 
 @contextmanager
-def tag(name: str) -> Iterator[str]:
+def tag(name: str) -> Generator[str]:
     print(f"<{name}>")
     try:
         yield name
@@ -749,11 +749,11 @@ When you do not know the number of managers until runtime,
 
 ```python
 # exit_stack.py
-from collections.abc import Iterator
+from collections.abc import Generator
 from contextlib import ExitStack, contextmanager
 
 @contextmanager
-def tag(name: str) -> Iterator[str]:
+def tag(name: str) -> Generator[str]:
     print(f"open {name}")
     try:
         yield name
@@ -793,12 +793,12 @@ The first two unwind, and the third's cleanup does not run:
 
 ```python
 # exit_stack_fails.py
-from collections.abc import Iterator
+from collections.abc import Generator
 from contextlib import ExitStack, contextmanager
 from exceptions import expected
 
 @contextmanager
-def tag(name: str, fail: bool = False) -> Iterator[str]:
+def tag(name: str, fail: bool = False) -> Generator[str]:
     print(f"open {name}")
     if fail:
         raise RuntimeError(f"{name} failed to open")
@@ -903,11 +903,11 @@ the same way `@contextmanager` builds the synchronous form:
 ```python
 # async_manager.py
 import asyncio
-from collections.abc import AsyncIterator
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 
 @asynccontextmanager
-async def session(name: str) -> AsyncIterator[str]:
+async def session(name: str) -> AsyncGenerator[str]:
     print(f"open {name}")
     await asyncio.sleep(0.01)  # Setup that waits
     try:
@@ -950,7 +950,7 @@ In Python, a pool is a queue plus a `@contextmanager` method:
 
 ```python
 # object_pool.py
-from collections.abc import Iterator
+from collections.abc import Generator
 from contextlib import contextmanager
 from dataclasses import dataclass
 from queue import Queue
@@ -969,7 +969,7 @@ class Pool[R]:
             self._available.put(item)
 
     @contextmanager
-    def lease(self) -> Iterator[R]:
+    def lease(self) -> Generator[R]:
         item = self._available.get()
         try:
             yield item

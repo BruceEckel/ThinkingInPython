@@ -1,9 +1,9 @@
 # decorated_generator.py
-from collections.abc import Iterator
+from collections.abc import Generator, Iterator
 from contextlib import contextmanager
 
 @contextmanager
-def banner(title: str) -> Iterator[None]:
+def banner(title: str) -> Generator[None]:
     print(f"=== {title} ===")
     try:
         yield

@@ -1,10 +1,10 @@
 # async_manager.py
 import asyncio
-from collections.abc import AsyncIterator
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 
 @asynccontextmanager
-async def session(name: str) -> AsyncIterator[str]:
+async def session(name: str) -> AsyncGenerator[str]:
     print(f"open {name}")
     await asyncio.sleep(0.01)  # Setup that waits
     try:

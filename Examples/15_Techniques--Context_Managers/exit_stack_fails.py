@@ -1,10 +1,10 @@
 # exit_stack_fails.py
-from collections.abc import Iterator
+from collections.abc import Generator
 from contextlib import ExitStack, contextmanager
 from exceptions import expected
 
 @contextmanager
-def tag(name: str, fail: bool = False) -> Iterator[str]:
+def tag(name: str, fail: bool = False) -> Generator[str]:
     print(f"open {name}")
     if fail:
         raise RuntimeError(f"{name} failed to open")

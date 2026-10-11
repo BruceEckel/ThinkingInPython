@@ -1,5 +1,5 @@
 # microgrid.py
-from collections.abc import Callable, Iterator
+from collections.abc import Callable, Generator
 from contextlib import contextmanager
 from power import Drained, Outlet, Source, draw, plug
 from stateless import Depend, catch
@@ -18,7 +18,7 @@ def controller(
     return choose
 
 @contextmanager
-def connected(source: Source) -> Iterator[Source]:
+def connected(source: Source) -> Generator[Source]:
     name = type(source).__name__
     print(f"{name} online")
     try:

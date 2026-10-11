@@ -708,7 +708,7 @@ name there, so `result.error` stays `Exception`.
 **Rule out a shared subclass.** The precision behind that agreement
 rests on one decorator: both `Ok` and `Err` carry `@final`, in the
 listing above and in `utils/result.py`. Without that decorator `ty`
-0.0.84 allows for a class inheriting from both, so the intersection of
+0.0.86 allows for a class inheriting from both, so the intersection of
 the two stays alive and the value in the `Ok` comes back as
 `float | Unknown` rather than plain `float`. The `match` and the
 `isinstance()` tests lose that precision together. `result.answer`

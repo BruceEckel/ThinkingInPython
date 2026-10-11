@@ -539,7 +539,7 @@ Here is the consumer and the handler that feeds it:
 
 ```python
 # microgrid.py
-from collections.abc import Callable, Iterator
+from collections.abc import Callable, Generator
 from contextlib import contextmanager
 from power import Drained, Outlet, Source, draw, plug
 from stateless import Depend, catch
@@ -558,7 +558,7 @@ def controller(
     return choose
 
 @contextmanager
-def connected(source: Source) -> Iterator[Source]:
+def connected(source: Source) -> Generator[Source]:
     name = type(source).__name__
     print(f"{name} online")
     try:
@@ -1211,7 +1211,7 @@ Two failures from two different sources come back as values through the one `cat
 and both the runtime and the type checker accept either order.
 A handler passes error values upward untouched,
 so `supply()`'s driver relays the failures to the catch either way.
-Under `ty` 0.0.84 both orders infer the same result type.
+Under `ty` 0.0.86 both orders infer the same result type.
 The Ability channel is where the orders differ.
 `supply(feed, book)(catch_all(research))` comes back with `Never` there,
 and `catch_all(supply(feed, book)(research))` with `Unknown`:
@@ -2068,7 +2068,7 @@ if __name__ == "__main__":
     reveal_type(full)
 ```
 
-Under `ty` 0.0.84, `ty check nested_handle.py` reads the two forms the same way:
+Under `ty` 0.0.86, `ty check nested_handle.py` reads the two forms the same way:
 
 ```text
 info[revealed-type]: Revealed type
@@ -2282,7 +2282,7 @@ so a raised failure crosses the thread boundary as an ordinary exception.
 `wait()` raises it again when it awaits the `Task`'s future,
 past any `catch()` the caller wraps around the result.
 The type agrees with the runtime.
-`reveal_type(bad)` under `ty` 0.0.84 reports `(n: int) -> Generator[Need[Executor], Any, Task[int]]`,
+`reveal_type(bad)` under `ty` 0.0.86 reports `(n: int) -> Generator[Need[Executor], Any, Task[int]]`,
 with `Boom` nowhere in it.
 
 The fix is the discipline `catch()` and `catch_all()` teach:

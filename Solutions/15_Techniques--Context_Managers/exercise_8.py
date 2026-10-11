@@ -1,9 +1,9 @@
 # exercise_8.py
-from collections.abc import Iterator
+from collections.abc import Generator
 from contextlib import contextmanager
 
 @contextmanager
-def careful(name: str) -> Iterator[str]:
+def careful(name: str) -> Generator[str]:
     print(f"enter {name}")
     try:
         yield name

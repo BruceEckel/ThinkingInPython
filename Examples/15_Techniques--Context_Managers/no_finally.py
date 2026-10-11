@@ -1,9 +1,9 @@
 # no_finally.py
-from collections.abc import Iterator
+from collections.abc import Generator
 from contextlib import contextmanager
 
 @contextmanager
-def careless(name: str) -> Iterator[str]:
+def careless(name: str) -> Generator[str]:
     print(f"enter {name}")
     yield name
     print(f"exit {name}")

@@ -1,9 +1,9 @@
 # exercise_3.py
-from collections.abc import Iterator
+from collections.abc import Generator
 from contextlib import contextmanager
 
 @contextmanager
-def tag(name: str) -> Iterator[str]:
+def tag(name: str) -> Generator[str]:
     print(f"<{name}>")
     try:
         yield name

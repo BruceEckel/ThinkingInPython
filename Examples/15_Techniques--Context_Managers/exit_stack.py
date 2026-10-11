@@ -1,9 +1,9 @@
 # exit_stack.py
-from collections.abc import Iterator
+from collections.abc import Generator
 from contextlib import ExitStack, contextmanager
 
 @contextmanager
-def tag(name: str) -> Iterator[str]:
+def tag(name: str) -> Generator[str]:
     print(f"open {name}")
     try:
         yield name

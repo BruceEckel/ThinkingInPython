@@ -1,9 +1,9 @@
 # suppress_in_generator.py
-from collections.abc import Iterator
+from collections.abc import Generator
 from contextlib import contextmanager
 
 @contextmanager
-def ignoring(kind: type[BaseException]) -> Iterator[None]:
+def ignoring(kind: type[BaseException]) -> Generator[None]:
     try:
         yield
     except kind as error:

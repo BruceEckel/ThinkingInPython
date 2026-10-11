@@ -344,17 +344,19 @@ A [`Protocol`](08_Foundations--Static_Types.md#structural-typing-with-protocols)
 declares its attributes in the same form, an annotation with no value,
 since it describes what a class must have and leaves the value to the class.
 
-`ty` 0.0.84 enforces less than the declaration states.
-Nothing requires `Blob` to supply a `sides`,
-and a subclass `Bad` that writes `sides = "four"` draws no report.
-`ty` reads that assignment as a fresh declaration and types `Bad.sides` as `str`,
-so the error surfaces later, wherever the code requires an `int`.
-Pyright rejects the assignment where it sits,
-and the typing specification agrees with Pyright.
+`ty` 0.0.86 enforces most of what the declaration states.
+A subclass `Bad` that writes `sides = "four"` draws `invalid-assignment` where it sits,
+since the value is checked against the declared `ClassVar[int]`,
+and one that redeclares the attribute as `sides: ClassVar[str] = "four"` draws `invalid-attribute-override`.
+
+Two gaps remain.
+Nothing requires `Blob` to supply a `sides`:
+the declaration says the attribute exists, and the checker takes it at its word.
+And a subclass that narrows the type, `sides: ClassVar[bool] = True`, passes,
+where Pyright rejects it.
 A mutable attribute's type is [invariant](08_Foundations--Static_Types.md#variance),
-so a subclass may neither widen nor narrow it.
-The gap is `ty`'s, and a known one.
-`ty` tracks the check under "Enforce the Liskov Substitution Principle for non-methods"
+so a subclass may neither widen nor narrow it;
+`ty` tracks that half under "Enforce the Liskov Substitution Principle for non-methods"
 (`astral-sh/ty` issue 2158).
 Treat the base declaration as documentation that a checker reads,
 not as a guarantee that the attribute exists.

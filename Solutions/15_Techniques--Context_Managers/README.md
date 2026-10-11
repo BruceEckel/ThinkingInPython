@@ -161,11 +161,11 @@ Predict the closing tags before you run it, using the same last-in-first-out rul
 
 ```python
 # The shape of exercise_3.py
-from collections.abc import Iterator
+from collections.abc import Generator
 from contextlib import contextmanager
 
 @contextmanager
-def tag(name: str) -> Iterator[str]:
+def tag(name: str) -> Generator[str]:
     ...
 ```
 
@@ -174,11 +174,11 @@ def tag(name: str) -> Iterator[str]:
 
 ```python
 # exercise_3.py
-from collections.abc import Iterator
+from collections.abc import Generator
 from contextlib import contextmanager
 
 @contextmanager
-def tag(name: str) -> Iterator[str]:
+def tag(name: str) -> Generator[str]:
     print(f"<{name}>")
     try:
         yield name
@@ -223,7 +223,7 @@ Check the count again after both blocks exit.
 
 ```python
 # test_ch15_both_leased.py
-from collections.abc import Iterator
+from collections.abc import Generator
 from contextlib import contextmanager
 from dataclasses import dataclass
 from queue import Queue
@@ -239,7 +239,7 @@ class Pool[R]:
             self._available.put(item)
 
     @contextmanager
-    def lease(self) -> Iterator[R]:
+    def lease(self) -> Generator[R]:
         item = self._available.get()
         try:
             yield item
@@ -294,11 +294,11 @@ Each call of the function then enters the managers in the order of the wrapping.
 
 ```python
 # The shape of exercise_5.py
-from collections.abc import Iterator
+from collections.abc import Generator
 from contextlib import contextmanager
 
 @contextmanager
-def banner(title: str) -> Iterator[None]:
+def banner(title: str) -> Generator[None]:
     ...
 
 @banner("outer")
@@ -312,11 +312,11 @@ def report() -> None:
 
 ```python
 # exercise_5.py
-from collections.abc import Iterator
+from collections.abc import Generator
 from contextlib import contextmanager
 
 @contextmanager
-def banner(title: str) -> Iterator[None]:
+def banner(title: str) -> Generator[None]:
     print(f"=== {title} ===")
     try:
         yield
@@ -477,11 +477,11 @@ Run it with no names and with three, and compare the close order with the open o
 
 ```python
 # The shape of exercise_7.py
-from collections.abc import Iterator
+from collections.abc import Generator
 from contextlib import ExitStack, contextmanager
 
 @contextmanager
-def tag(name: str) -> Iterator[str]:
+def tag(name: str) -> Generator[str]:
     ...
 
 def wrap(names: list[str]) -> None:
@@ -540,11 +540,11 @@ as list literals, so the checker can run it, and it shows both cases:
 
 ```python
 # exercise_7.py
-from collections.abc import Iterator
+from collections.abc import Generator
 from contextlib import ExitStack, contextmanager
 
 @contextmanager
-def tag(name: str) -> Iterator[str]:
+def tag(name: str) -> Generator[str]:
     print(f"open {name}")
     try:
         yield name
@@ -591,11 +591,11 @@ Decide whether the `finally` body runs before or after the `except` clause outsi
 
 ```python
 # The shape of exercise_8.py
-from collections.abc import Iterator
+from collections.abc import Generator
 from contextlib import contextmanager
 
 @contextmanager
-def careful(name: str) -> Iterator[str]:
+def careful(name: str) -> Generator[str]:
     ...
 ```
 
@@ -604,11 +604,11 @@ def careful(name: str) -> Iterator[str]:
 
 ```python
 # exercise_8.py
-from collections.abc import Iterator
+from collections.abc import Generator
 from contextlib import contextmanager
 
 @contextmanager
-def careful(name: str) -> Iterator[str]:
+def careful(name: str) -> Generator[str]:
     print(f"enter {name}")
     try:
         yield name
