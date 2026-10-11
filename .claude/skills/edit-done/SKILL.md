@@ -76,8 +76,17 @@ docstring has the mechanics). While the tag still exists:
    he wanted all four approved. Write the proposals to
    `build/fault_review/proposals.json` as a JSON object from pair key
    to fault line (or that object).
+   The capture step's rule proposals (at most eight) go on the same
+   page, not in the transcript (since 2026-10-11, at Bruce's request).
+   Write them to `build/fault_review/rules.json` as a JSON list of
+   objects with the fields `label` ("P1"), `kind` ("Promotion",
+   "Widening", "New candidate", or "New candidate, additive"),
+   `title`, `rule`, `test`, `keep`, `home`, and `evidence`. An
+   evidence item has a `where` and either `before` and `after` (a
+   sentence pair) or `text` (a description).
 3. Run `uv run python -m tools.fault_review seed --since
-   edit-start-NN --proposals build/fault_review/proposals.json`.
+   edit-start-NN --proposals build/fault_review/proposals.json
+   --rules build/fault_review/rules.json`.
 4. Copy `.claude/skills/edit-done/fault_review.html` to
    `build/fault_review/fault_review_NN.html` and publish the copy, with
    no `url`, `capabilities: {"db": {}}`, and icon `edit`. Each pass
@@ -88,9 +97,17 @@ docstring has the mechanics). While the tag still exists:
 5. Read the cards back with `ArtifactData` `list` on `cards`,
    `query.limit` 1000, `out_dir` `build/fault_review/read`, then run
    `uv run python -m tools.fault_review apply
-   build/fault_review/read/cards`. It writes each approved line
+   build/fault_review/read/cards --rules-dir
+   build/fault_review/read/proposals`. It writes each approved line
    (edited or not) into `edit_pairs.json`, clears the ones marked
    Local edit, and lists the undecided.
+   Read the rule proposals back the same way, with `ArtifactData`
+   `list` on `proposals` and the same `out_dir`. The command prints
+   one line per proposal with Bruce's decision and note. It never
+   writes `bruce_edit_db.md`. Write that file yourself from the
+   printed decisions: an approval as proposed, a narrowing as
+   narrowed in his note, and a rejection to Retired with his note as
+   the reason.
 6. Run `tip edit-patterns` (needs `TYPESAFE_API_KEY`; about five
    minutes). Report each searched pair's hit count and its strongest
    few hits from `build/edit_patterns.md`, and each `unclear` pair,

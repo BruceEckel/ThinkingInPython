@@ -162,6 +162,8 @@ Report in this order:
    contradicts.
 
 Bruce approves, narrows, or rejects each item.
+Inside `/edit-done` the proposals go on the fault-review page
+(its step 3b) rather than the transcript.
 Write `bruce_edit_db.md` only after that.
 A rejected proposal goes to Retired with his reason in his terms.
 A narrowed one is written as narrowed, not as proposed.

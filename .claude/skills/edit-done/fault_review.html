@@ -100,6 +100,27 @@ button.local[aria-pressed="true"] { background: var(--local-soft); border-color:
 button.clear { color: var(--muted); }
 button:disabled { opacity: .5; cursor: default; }
 .empty { color: var(--muted); font-style: italic; }
+section.block { display: grid; gap: 12px; }
+section.block h2 { font-family: var(--serif); font-weight: 600; font-size: 1.25rem; margin: 8px 0 0; }
+.cards { display: grid; gap: 16px; }
+.card[data-decision="narrow"] { border-color: var(--accent); }
+.card[data-decision="reject"] { border-color: var(--del); }
+.card.proposal h3 { font-family: var(--serif); font-weight: 600; font-size: 1.1rem; margin: 0; line-height: 1.35; }
+.pill.kind { background: var(--accent-soft); color: var(--accent); }
+.pill.narrow { background: var(--accent-soft); color: var(--accent); }
+.pill.reject { background: var(--del-soft); color: var(--del); }
+.rule { font-family: var(--serif); font-size: 1.05rem; line-height: 1.6; margin: 0; }
+.kv { display: grid; gap: 6px; margin: 0; font-size: .92rem; }
+.kv div { display: grid; grid-template-columns: 6.5em 1fr; gap: 8px; }
+.kv dt { font-size: .78rem; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); padding-top: 2px; }
+.kv dd { margin: 0; }
+.evidence { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; }
+.evidence li { border-left: 3px solid var(--rule); padding-left: 10px; }
+.evidence .diff { font-size: .98rem; white-space: pre-wrap; }
+.evidence .who { display: block; font-family: var(--mono); font-size: .74rem; color: var(--muted); margin-top: 2px; }
+.evidence .text { font-family: var(--serif); margin: 0; }
+button.narrow[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); font-weight: 600; }
+button.reject[aria-pressed="true"] { background: var(--del-soft); border-color: var(--del); color: var(--del); font-weight: 600; }
 @media (prefers-reduced-motion: reduce) { .bar > span { transition: none; } }
 </style>
 
@@ -114,14 +135,24 @@ button:disabled { opacity: .5; cursor: default; }
     </div>
     <div class="status" id="status" role="status">Loading the pass…</div>
   </header>
-  <main id="cards"></main>
+  <section class="block" id="proposals-block" hidden>
+    <h2>Rule proposals</h2>
+    <p class="lede">Each card is a change I propose to the rule store from this pass: a promotion, a widening, or a new candidate. Approve it as written, Narrow it and say how in the box, or Reject it and say why; a rejection goes to Retired with your reason, so it is never proposed again.</p>
+    <div class="cards" id="proposals"></div>
+  </section>
+  <section class="block">
+    <h2 id="cards-heading" hidden>Fault lines</h2>
+    <main id="cards" class="cards"></main>
+  </section>
 </div>
 
 <script>
 const $ = (s) => document.querySelector(s);
-const state = { cards: new Map(), meta: null, db: null, readOnly: false, onlyOpen: false };
-const drafts = new Map();   // id -> text typed but not yet saved
-const chains = new Map();   // id -> promise, so each card writes one at a time
+const state = { cards: new Map(), proposals: new Map(), meta: null, db: null, readOnly: false, onlyOpen: false };
+const drafts = new Map();   // "coll/id" -> text typed but not yet saved
+const chains = new Map();   // "coll/id" -> promise, so each card writes one at a time
+const COLLS = { cards: { map: () => state.cards, field: "fault" }, proposals: { map: () => state.proposals, field: "note" } };
+const docOf = (coll, id) => COLLS[coll].map().get(id);
 const timers = new Map();
 
 try { state.onlyOpen = localStorage.getItem("fault-review-only-open") === "1"; } catch (e) {}
@@ -170,7 +201,7 @@ function contextHtml(card) {
 // old scroll position after a finished card disappeared left the next
 // card partly above the screen.
 const els = new Map();
-let emptyEl = null;
+const empties = new Map();  // container -> its empty-state element
 
 function autosize(t) {
   t.style.height = "auto";
@@ -204,7 +235,8 @@ function reconcile(main, items, order, emptyText) {
     item.update(el);
     prev = el;
   }
-  if (!emptyEl) { emptyEl = document.createElement("p"); emptyEl.className = "empty"; }
+  let emptyEl = empties.get(main);
+  if (!emptyEl) { emptyEl = document.createElement("p"); emptyEl.className = "empty"; empties.set(main, emptyEl); }
   if (items.length) emptyEl.remove();
   else { emptyEl.textContent = emptyText; main.appendChild(emptyEl); }
   const anchor = anchorKey && els.get(anchorKey);
@@ -214,14 +246,80 @@ function reconcile(main, items, order, emptyText) {
   }
 }
 
-function faultText(id, card) {
-  return drafts.has(id) ? drafts.get(id) : (card.fault || "");
+function draftText(coll, id, doc) {
+  const key = coll + "/" + id;
+  return drafts.has(key) ? drafts.get(key) : (doc[COLLS[coll].field] || "");
+}
+
+function reconcileProposals(main, items, order) {
+  reconcile(main, items, order, "Every proposal has a decision.");
+}
+
+function proposalBlock(p) {
+  const ev = (p.evidence || []).map((e) => e.before !== undefined
+    ? `<li><p class="diff">${diffHtml(e.before, e.after)}</p><span class="who">${esc(e.where || "")}</span></li>`
+    : `<li><p class="text">${esc(e.text || "")}</p><span class="who">${esc(e.where || "")}</span></li>`).join("");
+  return `
+    <h3>${esc(p.title)}</h3>
+    <p class="rule">${esc(p.rule)}</p>
+    <dl class="kv">
+      <div><dt>Test</dt><dd>${esc(p.test)}</dd></div>
+      <div><dt>Keep when</dt><dd>${esc(p.keep)}</dd></div>
+      <div><dt>Home</dt><dd>${esc(p.home)}</dd></div>
+    </dl>
+    <details open><summary>Evidence</summary><ul class="evidence">${ev}</ul></details>`;
+}
+
+function buildProposal(id, p) {
+  const el = document.createElement("article");
+  el.className = "card proposal";
+  el.dataset.id = id;
+  el.dataset.coll = "proposals";
+  el.innerHTML = `
+    <div class="where"><span>${esc(p.label)}</span><span class="pill kind">${esc(p.kind)}</span><span class="pills"></span></div>
+    ${proposalBlock(p)}
+    <div class="fault">
+      <label for="p-${esc(id)}">Your narrowing, or the reason to reject</label>
+      <textarea id="p-${esc(id)}" rows="2" placeholder="How to narrow it, or why it should not be a rule"></textarea>
+      <div class="hint empty-line">Narrow and Reject need a note; Approve takes the proposal as written.</div>
+    </div>
+    <div class="choices">
+      <button class="approve" data-decide="approve">Approve</button>
+      <button class="narrow" data-decide="narrow">Narrow</button>
+      <button class="reject" data-decide="reject">Reject</button>
+      <button class="clear" data-decide="">Clear</button>
+    </div>`;
+  return el;
+}
+
+function updateProposal(el, id, p) {
+  const t = el.querySelector("textarea");
+  if (document.activeElement !== t) {
+    const text = draftText("proposals", id, p);
+    if (t.value !== text) t.value = text;
+  }
+  const text = t.value;
+  el.dataset.decision = p.decision || "";
+  const labels = { approve: ["approve", "Approved"], narrow: ["narrow", "Narrowed"], reject: ["reject", "Rejected"] };
+  el.querySelector(".pills").innerHTML = p.decision && labels[p.decision]
+    ? `<span class="pill ${labels[p.decision][0]}">${labels[p.decision][1]}</span>` : "";
+  el.querySelector(".hint.empty-line").hidden = !!text.trim();
+  const dis = state.readOnly;
+  t.disabled = dis;
+  for (const b of el.querySelectorAll("button[data-decide]")) {
+    const d = b.dataset.decide;
+    b.disabled = dis || ((d === "narrow" || d === "reject") && !text.trim());
+    b.setAttribute("aria-pressed", String(!!d && p.decision === d));
+    if (d === "") b.hidden = !p.decision;
+  }
+  autosize(t);
 }
 
 function buildCard(id, c) {
   const el = document.createElement("article");
   el.className = "card";
   el.dataset.id = id;
+  el.dataset.coll = "cards";
   el.innerHTML = `
     <div class="where"><span>${esc(c.file)}:${c.line}</span><span class="pills"></span></div>
     <div><div class="label">Your rewrite</div>
@@ -243,7 +341,7 @@ function buildCard(id, c) {
 function updateCard(el, id, c) {
   const t = el.querySelector("textarea");
   if (document.activeElement !== t) {
-    const text = faultText(id, c);
+    const text = draftText("cards", id, c);
     if (t.value !== text) t.value = text;
   }
   const text = t.value;
@@ -272,15 +370,26 @@ function updateCard(el, id, c) {
 
 function render() {
   const focused = document.activeElement;
-  const focusId = focused && focused.matches("textarea") ? focused.closest(".card").dataset.id : null;
+  const focusKey = focused && focused.matches("textarea")
+    ? focused.closest(".card").dataset.coll + "/" + focused.closest(".card").dataset.id : null;
   const all = [...state.cards.entries()].sort((x, y) => x[1].order - y[1].order);
-  const visible = all.filter(([id, c]) => !state.onlyOpen || !c.decision || id === focusId);
+  const visible = all.filter(([id, c]) => !state.onlyOpen || !c.decision || "cards/" + id === focusKey);
   reconcile($("#cards"),
-    visible.map(([id, c]) => ({ key: id, build: () => buildCard(id, c), update: (el) => updateCard(el, id, c) })),
-    all.map(([id]) => id),
+    visible.map(([id, c]) => ({ key: "cards/" + id, build: () => buildCard(id, c), update: (el) => updateCard(el, id, c) })),
+    all.map(([id]) => "cards/" + id),
     state.cards.size ? "Every card has a decision." : "No rewrites are loaded yet.");
-  const total = state.cards.size;
-  const done = [...state.cards.values()].filter((c) => c.decision).length;
+  const props = [...state.proposals.entries()].sort((x, y) => x[1].order - y[1].order);
+  $("#proposals-block").hidden = !props.length;
+  $("#cards-heading").hidden = !props.length;
+  if (props.length) {
+    const shown = props.filter(([id, p]) => !state.onlyOpen || !p.decision || "proposals/" + id === focusKey);
+    reconcileProposals($("#proposals"),
+      shown.map(([id, p]) => ({ key: "proposals/" + id, build: () => buildProposal(id, p), update: (el) => updateProposal(el, id, p) })),
+      props.map(([id]) => "proposals/" + id));
+  }
+  const total = state.cards.size + state.proposals.size;
+  const done = [...state.cards.values()].filter((c) => c.decision).length
+    + [...state.proposals.values()].filter((p) => p.decision).length;
   $("#count").textContent = `${done} of ${total} decided`;
   $("#fill").style.width = total ? `${(100 * done) / total}%` : "0";
   if (state.meta) {
@@ -289,9 +398,10 @@ function render() {
   }
 }
 
-function write(id, fields) {
-  const prev = chains.get(id) || Promise.resolve();
-  const next = prev.then(() => state.db.doc(`cards/${id}`).update(fields))
+function write(coll, id, fields) {
+  const key = coll + "/" + id;
+  const prev = chains.get(key) || Promise.resolve();
+  const next = prev.then(() => state.db.doc(key).update(fields))
     .then(() => { $("#status").textContent = "Saved."; })
     .catch((e) => {
       if (e && e.code === "invalid_argument") {
@@ -302,48 +412,51 @@ function write(id, fields) {
         $("#status").textContent = "A change didn't save. Try again in a moment.";
       }
     });
-  chains.set(id, next);
+  chains.set(key, next);
   return next;
 }
 
-function flushDraft(id) {
-  clearTimeout(timers.get(id));
-  timers.delete(id);
-  if (!drafts.has(id)) return Promise.resolve();
-  const text = drafts.get(id);
-  drafts.delete(id);
-  const card = state.cards.get(id);
-  if (!card || (card.fault || "") === text) return Promise.resolve();
-  card.fault = text;
-  return write(id, { fault: text });
+function flushDraft(coll, id) {
+  const key = coll + "/" + id;
+  clearTimeout(timers.get(key));
+  timers.delete(key);
+  if (!drafts.has(key)) return Promise.resolve();
+  const text = drafts.get(key);
+  drafts.delete(key);
+  const doc = docOf(coll, id);
+  const field = COLLS[coll].field;
+  if (!doc || (doc[field] || "") === text) return Promise.resolve();
+  doc[field] = text;
+  return write(coll, id, { [field]: text });
 }
 
 document.addEventListener("input", (ev) => {
   const t = ev.target.closest("textarea");
   if (!t || state.readOnly) return;
-  const id = t.closest(".card").dataset.id;
-  drafts.set(id, t.value);
+  const { coll, id } = t.closest(".card").dataset;
+  const key = coll + "/" + id;
+  drafts.set(key, t.value);
   render();
-  clearTimeout(timers.get(id));
-  timers.set(id, setTimeout(() => flushDraft(id), 900));
+  clearTimeout(timers.get(key));
+  timers.set(key, setTimeout(() => flushDraft(coll, id), 900));
 });
 
 document.addEventListener("focusout", (ev) => {
   const t = ev.target.closest && ev.target.closest("textarea");
-  if (t) flushDraft(t.closest(".card").dataset.id);
+  if (t) flushDraft(t.closest(".card").dataset.coll, t.closest(".card").dataset.id);
 });
 
 document.addEventListener("click", async (ev) => {
   const btn = ev.target.closest("button[data-decide]");
   if (!btn || !state.db || state.readOnly) return;
-  const id = btn.closest(".card").dataset.id;
-  const card = state.cards.get(id);
+  const { coll, id } = btn.closest(".card").dataset;
+  const card = docOf(coll, id);
   const decision = btn.dataset.decide || null;
-  await flushDraft(id);
+  await flushDraft(coll, id);
   if (card.decision === decision) return;
   card.decision = decision;
   render();
-  write(id, { decision });
+  write(coll, id, { decision });
 });
 
 $("#only-open").addEventListener("change", (ev) => {
@@ -370,13 +483,24 @@ async function start() {
       const local = state.cards.get(d.id);
       const body = { ...d.data() };
       // A change made here and not yet confirmed wins over the echo.
-      if (local && chains.has(d.id) && snap.metadata.hasPendingWrites) Object.assign(body, { decision: local.decision, fault: local.fault });
+      if (local && chains.has("cards/" + d.id) && snap.metadata.hasPendingWrites) Object.assign(body, { decision: local.decision, fault: local.fault });
       next.set(d.id, body);
     }
     state.cards = next;
     $("#status").textContent = next.size ? "Changes save as you go." : "No rewrites are loaded yet.";
     render();
   }, () => { $("#status").textContent = "Lost the connection to the review."; });
+  db.collection("proposals").onSnapshot((snap) => {
+    const next = new Map();
+    for (const d of snap.docs) {
+      const local = state.proposals.get(d.id);
+      const body = { ...d.data() };
+      if (local && chains.has("proposals/" + d.id) && snap.metadata.hasPendingWrites) Object.assign(body, { decision: local.decision, note: local.note });
+      next.set(d.id, body);
+    }
+    state.proposals = next;
+    render();
+  }, () => {});
 }
 start();
 </script>
