@@ -504,7 +504,8 @@ and how it was measured.
   2026-09-13, so a `python3` command now fails as "not recognized".
 - **CPython's small-int cache is wider on the pinned 3.15 than the
   textbook `-5..256` range.** Confirmed cached up to at least 1024 on
-  the beta and again on 3.15.0 final (2026-10-11). An example meant to show an "uncached" int needs a value safely
+  the beta and again on 3.15.0 final (2026-10-11). An example meant to
+  show an "uncached" int needs a value safely
   above that (100000+), not just above 256, or the demo silently proves the
   opposite of what the prose claims. See project memory
   (`small-int-cache-extended-py315`) for the chapter-36 case this broke.

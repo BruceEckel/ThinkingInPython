@@ -4,12 +4,16 @@ Chapter 34 says Python's recursion limit caps how deep a
 tree its recursive functions can walk, and its exercise 8
 has the reader confirm that `evaluate()`, which forwards
 `**env`, raises a `RecursionError` on a deep tree. On
-CPython 3.15.0rc2 a recursive function that forwards
-`**kwargs` can run past the limit: `count_down_kw()` below
-does, while the same function without them stops at it.
-That looks like a
-release-candidate bug, so the prose stays as written and
-this file watches for the fix.
+CPython 3.15.0 (rc2 and the final release alike, checked
+2026-10-11) a recursive function that forwards `*args` or
+`**kwargs`, empty or not, can run past the limit:
+`count_down_kw()` below reaches 100,000 frames, while the
+same function without them stops at 1000. The chapter's
+`evaluate()` forwards `**env` too and still stops, the
+difference being two self-calls per frame against this
+function's one; the cause is unknown. The prose stays as
+written, since the listing it describes behaves as it
+says, and this file watches the narrower case.
 
 The second test is an expected failure today. When it
 reports XPASS, recheck chapter 34's recursion-limit
@@ -39,7 +43,7 @@ def test_plain_recursion_stops_at_the_limit() -> None:
 
 @pytest.mark.xfail(
     strict=False,
-    reason="CPython 3.15.0rc2 lets a recursive call that "
+    reason="CPython 3.15.0 lets a recursive call that "
            "forwards **kwargs run past the recursion "
            "limit. On XPASS, recheck chapter 34's "
            "recursion-limit paragraph and exercise 8, and "
