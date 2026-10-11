@@ -113,7 +113,7 @@ The Python documentation warns:
      gate checks: it is prose, not a `#:` marker, because it arrives after
      the program's last statement. If CPython changes the order
      list_dealloc drops its items, this block goes stale silently. Verified
-     against 3.15.0rc2. -->
+     against 3.15.0 (final, 2026-10-11). -->
 
 In the direct run, shutdown destroys the objects,
 and shutdown is the precarious moment the warning describes.

@@ -77,6 +77,39 @@ Moved from `CLAUDE.md`, which keeps the rule that you never start an upgrade you
   the `# type: ignore` too. The five remaining pinned claims and the
   `record(cls)` gap re-probed unchanged, and all 40 quoted diagnostics
   matched (two `verify-claims-opus` agents, about 80k and 130k tokens).
+  The 0.0.84 to 0.0.86 upgrade (2026-10-11, the day Python 3.15.0 final
+  replaced rc2, with ruff 0.16.9 to 0.17.0, numpy 2.5.3 to 2.5.4,
+  hypothesis 6.168.3 to 6.169.0, and uv 0.12.20 to 0.13.0) had no gate
+  failure and one prose casualty. Python first, alone: `tip
+  python-upgrade` needed the new uv to see the 3.15.0 download, and the
+  whole-book verify was green with no marker or reflow drift; chapter
+  10's shutdown transcript and the small-int cache note re-verified.
+  Then `tip tools-upgrade`: `tip sweep` green, the pyright delta empty,
+  all 43 quoted diagnostics matching (one `verify-claims-opus` agent,
+  about 130k tokens, four minutes), and the "Python 3.15 is under
+  development" warning gone. The new noise: typeshed deprecates the
+  `Iterator` overload of `contextmanager`, so every `@contextmanager`
+  generator annotated `-> Iterator[T]` drew `warning[deprecated]` (17
+  listings in chapters 15 and 47 and their Solutions); a warning does
+  not fail the gate, and the fix was `-> Generator[T]` and
+  `-> AsyncGenerator[T]` throughout (PEP 696 defaults make the one-
+  argument form valid). The casualty: chapter 09's "`ty` enforces less
+  than the declaration states" paragraph. 0.0.86 reports a subclass's
+  `sides = "four"` under a base `sides: ClassVar[int]` as
+  `invalid-assignment`, and a redeclared `sides: ClassVar[str]` as
+  `invalid-attribute-override`; it still accepts a narrowing
+  `sides: ClassVar[bool] = True`, which Pyright rejects, and still
+  needs no value from a subclass. The paragraph now states those two
+  gaps. The other six pinned claims and the `record(cls)` gap re-probed
+  unchanged (one `verify-claims-opus` agent, about 90k tokens). Two
+  traps from the run: the probing agent's cleanup, `find build -name
+  'probe_*.py' -delete`, also removed 46 older scratch files under
+  `build/claims-scratch/` (gitignored, so harmless, but delete by
+  listed path); and a Python `write_text()` on Windows turns `\n` into
+  CRLF, so a script that rewrites Markdown passes `newline="\n"` or
+  `tip fix-eol` runs before the commit. winget's pandoc step failed to
+  uninstall 3.11 (exit 1603), so pandoc stays at 3.11 with 3.12.1
+  available; typst 0.15.1 and vale 3.24.0 were current.
   **Sweep `Solutions/` for quoted diagnostics too, not just `Chapters/`.**
   The 2026-09-02 exercise pass found ten stale `ty` quotes, every one of
   them in `Solutions/` and not one in `Chapters/`: wrong line numbers,
@@ -234,6 +267,24 @@ Added 2026-09-29, with chapter 08's "Typing `**kwargs` with a `TypedDict`".
   sentence about `fil` becoming an extra key in `style` at run time is
   the part that stays) and drop the version string.
   If `ty` keeps accepting it, bump the version string to the new release.
+
+## Probe: a subclass under a bare `ClassVar` declaration
+
+Added 2026-10-11, when `ty` 0.0.86 started reporting half of what
+chapter 09 said it missed.
+
+  Chapter 09's "A Base Class Declares, a Subclass Supplies" pins to a
+  `ty` version what the checker enforces of `sides: ClassVar[int]` in a
+  base. On 0.0.86: a subclass `sides = "four"` draws `invalid-assignment`
+  against the declared type; `sides: ClassVar[str] = "four"` draws
+  `invalid-attribute-override`; `sides: ClassVar[bool] = True` passes,
+  though the attribute is mutable and so invariant (Pyright rejects it,
+  `reportIncompatibleVariableOverride`; `ty` tracks it under issue
+  2158); and a subclass with no `sides` draws nothing. Probe all four in
+  a scratch copy of `required_classvar.py` in `build/examples/09_*/`.
+  The day the narrowing is reported, or a missing value is, rewrite the
+  paragraph's "Two gaps remain" and check whether issue 2158 closed;
+  otherwise bump the version string.
 
 ## Pyright: a periodic review, never a gate
 
