@@ -1800,7 +1800,7 @@ and `log` loses the other two.
 Nothing in `ThresholdThermometer` says which responder the threshold serves.
 
 The alternative moves the comparison out of the thermometer and into `display`,
-the one responder that applies a threshold.
+the responder that the threshold serves.
 The setter announces every assignment, `log` appends every reading,
 and `display` remembers the last value it drew and skips a reading close to it.
 The thermometer knows nothing about tolerance.
