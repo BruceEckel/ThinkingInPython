@@ -1656,10 +1656,9 @@ The controller holds both models because it writes to both,
 while each view holds the one model it displays:
 `CountView` knows nothing of `History`,
 and `HistoryView` knows nothing of `Counter`.
-Each model knows none of them:
-it announces to whatever responders are connected.
+Each model announces to whatever responders are connected.
 
-That one-way flow is the benefit of the split.
+That one-way flow is the benefit.
 Because each view hears from its model alone,
 you can replace the controller and the views keep working.
 `Controller` takes its keys as two fields, `up` and `down`,
@@ -1669,18 +1668,20 @@ The second `Controller` reads `k` and `j` where the first reads `+` and `-`.
 It takes the same two models, and the views built earlier go on displaying,
 since the announcements they receive come from the models,
 whichever controller sent the request.
-The history carries across the swap as well: `vim`'s first key displays `++-xk`,
-because the keys live in `History` rather than in the controller that recorded them.
-Which keys mean up and down is the controller's business alone.
-A new key scheme is two constructor arguments, and a new kind of key,
-say one that resets the count, is an edit to `Controller`,
-with the views and the models untouched either way.
-The same holds in the other direction:
-a second view connects to a model and both views display,
+`vim`'s first key displays `++-xk`,
+because the keys live in the `History` model,
+not in the controller that recorded them.
+The meaning of the keys is only defined in the controller.
+A new key scheme is two constructor arguments.
+A new kind of key, say one that resets the count, is an edit to `Controller`.
+
+The same flexibility is created in the other direction:
+a second view connects to a model, both views display,
 with no change to either controller (see exercise 13).
 A third model is a new view class and one more field in the controller,
 with `CountView` and `HistoryView` untouched.
-Testing benefits in the same way.
+
+Testing benefits from this design decoupling.
 A `Controller` needs a `Counter` and a `History`, so a test builds both,
 calls `key()`, and reads `counter.count` and `history.history`,
 with no view and no output to capture.
@@ -1690,9 +1691,7 @@ interpreting the keys and displaying every model the keys touch.
 `View.key()` and the display methods share an instance,
 so a new kind of key means editing `View` or subclassing it,
 and the display code comes along either way.
-`View` has one key handler and two displays,
-and `grid_view.py` has the same shape:
-`draw()` paints and the `bind()` lambda handles the click, both inside `show()`.
+
 Split the controller out when input handling varies on its own,
 when the same displays must answer to more than one input scheme,
 or when interpreting input deserves tests that draw nothing.
@@ -1703,26 +1702,29 @@ or when interpreting input deserves tests that draw nothing.
 means one job per class.
 `Thermometer` has three jobs: it measures, it decides which changes to announce,
 and it notifies the responders.
-Measuring is the thermometer's actual job, and *Observer* adds the other two.
-The notification code can be extracted in more than one way:
+Measuring is the thermometer's actual job,
+and *Observer* adds deciding and notification.
+
+The notification code can be separated from the measuring code in different ways:
 
 - `Broadcaster` holds the responder list and the notification loop,
   and `Thermometer` inherits them.
-  `BoundBroadcaster` and the async `Broadcaster` are the same extraction,
-  with responders set at construction or a loop that runs concurrently.
+  `BoundBroadcaster` and the `async Broadcaster` are the same extraction,
+  with responders configured at construction or a loop that runs concurrently.
 - `weather_station.py` uses no base class and calls its responders from `__setattr__()`,
   so one method covers every attribute.
 - `broadcasting.py` holds the list and the loop like `Broadcaster`,
   and its generated properties make the `announce()` call as well,
-  so the `Thermometer` body is one annotation.
+  so the `Thermometer` body is a single annotation.
 
-In each case the object still notifies its responders,
-but the loop that calls them is written once, in `Broadcaster`,
-in `__setattr__()`, or in `Broadcasting`, apart from the code that measures.
+The object always notifies its responders,
+but the loop that calls those responders is written once, in `Broadcaster`,
+in `__setattr__()`, or in `Broadcasting`, distinct from the code that measures.
 
 The second job *Observer* adds is deciding which changes to announce.
-That decision belongs to the object whose state changes, or to whoever calls it.
-It never belongs to a responder,
+That decision belongs to the object whose state changes,
+or to the client that changes the state.
+The decision never belongs to a responder,
 whose choice is limited to filtering the changes it receives.
 `Thermometer`'s setter announces every assignment,
 which says that every change matters to everyone.
