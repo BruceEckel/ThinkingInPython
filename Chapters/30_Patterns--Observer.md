@@ -1799,7 +1799,7 @@ the thermometer announces two of the four readings,
 and `log` loses the other two.
 Nothing in `ThresholdThermometer` says which responder the threshold serves.
 
-Moving the comparison into the responders puts each threshold with the responder that needs it.
+Moving the comparison into the responders puts the threshold in the responder that applies it.
 The setter announces every assignment, `log` appends every reading,
 and `display` remembers the last value it drew and skips a reading close to it.
 The thermometer knows nothing about tolerance.
