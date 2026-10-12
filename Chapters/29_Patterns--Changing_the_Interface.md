@@ -391,7 +391,6 @@ Facade.start_car()
 ```
 
 Turning the key primes the pump, and priming starts the engine.
-Each constructor takes the object its method calls.
 The fields `pump: FuelPump` in `Ignition` and `engine: Engine` in `FuelPump` make a caller build the three from the inside out,
 as `Ignition(FuelPump(Engine()))`.
 These three classes are the "confusing collection of classes and interactions,"
