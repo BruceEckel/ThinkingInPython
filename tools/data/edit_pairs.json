@@ -184,13 +184,13 @@
   "similarity": 0.802,
   "source": "2e61b3e7..HEAD",
   "added": "2026-10-11",
-  "fault": "'X, so Y' where X was stated in an earlier sentence of the passage; the cause fronts as 'Because X, Y'.",
-  "status": "unclear",
+  "fault": "The sentence reports what the constructor does ('calls `super().__init__()` to run it') where the passage's point is that it must, and the reason trails in a 'so' clause after the action instead of leading with 'Because'.",
+  "status": "searchable",
   "heading": "The Classic Observer: an Interface to Implement",
   "paragraph": "`Thermometer` holds the list and names no observer type, so a `Plot` or a `Table` attaches the same way `Display` does. `Subject.__init__()` creates that list, so `Thermometer`'s constructor calls [`super().__init__()`](07_Foundations--Classes.md#calling-the-base-constructor) to run it. If you remove that call, a `Thermometer` has no `_observers` attribute, and `attach()` raises an `AttributeError`.",
   "check": {
-   "before": 0.38,
-   "after": 0.24
+   "before": 0.84,
+   "after": 0.06
   }
  },
  "42d3b2c1b1497975": {
@@ -336,13 +336,13 @@
   "similarity": 0.596,
   "source": "2e61b3e7..HEAD",
   "added": "2026-10-11",
-  "fault": "'In Python' scopes a claim the chapter already scopes, and two definitions share one sentence.",
-  "status": "unclear",
+  "fault": "'In Python' scopes a claim to the language the whole book is about, with no other language in view, so the phrase adds nothing.",
+  "status": "searchable",
   "heading": "The Pythonic Observer: Callables in a List",
   "paragraph": "In Python a listener is any callable that takes a notification and returns `None`, and a broadcaster announces each change to a list of those callables. A `@property` setter is the place to send the notification when state changes, because a setter runs at every assignment to its attribute:",
   "check": {
-   "before": 0.67,
-   "after": 0.1
+   "before": 0.75,
+   "after": 0.05
   }
  },
  "44f2a6bb02ae5fb6": {
@@ -412,13 +412,13 @@
   "similarity": 0.605,
   "source": "2e61b3e7..HEAD",
   "added": "2026-10-11",
-  "fault": "A hypothetical ('A @dataclass Thermometer has no list') is in the indicative and goes on to its downstream exception.",
-  "status": "unclear",
+  "fault": "An alternative the listing does not take ('A `@dataclass` `Thermometer`') is described in the indicative ('has no list') as if it were the code on the page, instead of the conditional ('would have no list'); the exception that alternative would raise is cut with it.",
+  "status": "searchable",
   "heading": "The Pythonic Observer: Callables in a List",
   "paragraph": "`Thermometer`'s constructor is simple and suggests using a `dataclass`. Inheriting does not stop a class from being a `dataclass`, but [a `dataclass`-generated `__init__()` does not call the base class's `__init__()`](12_Techniques--Data_Classes_as_Types.md#dataclass-inheritance). A `@dataclass` `Thermometer` has no list of listeners, and `subscribe()` raises an `AttributeError`. A `__post_init__()` that calls `super().__init__()` fixes that, but at greater length and complexity than the `__init__()` it replaces.",
   "check": {
-   "before": 0.52,
-   "after": 0.39
+   "before": 0.8,
+   "after": 0.47
   }
  },
  "e32763198e88fbbd": {
@@ -678,13 +678,13 @@
   "similarity": 0.654,
   "source": "2e61b3e7..HEAD",
   "added": "2026-10-11",
-  "fault": "'The next announce()' points at a call by position instead of by its argument, and 'calls always alone' hides that always is the one responder left.",
-  "status": "unclear",
+  "fault": "The sentence states the result of a call ('calls `always` alone') and leaves out the state that produces it (the list now holds `always` only), so the reader infers the mechanism from the result.",
+  "status": "searchable",
   "heading": "Unsubscribing During an Async Notification",
   "paragraph": "`once` unsubscribes while `gather()` is running it, and `always` still receives the change, because `gather()` held both coroutines before either ran. The next `announce()` builds its tuple from the shortened list and calls `always` alone.",
   "check": {
-   "before": 0.6,
-   "after": 0.09
+   "before": 0.77,
+   "after": 0.2
   }
  },
  "5bc1e7edeafc4e8f": {
@@ -944,13 +944,13 @@
   "similarity": 0.872,
   "source": "2e61b3e7..HEAD",
   "added": "2026-10-11",
-  "fault": "'and that is three' restates a count the previous sentence gave.",
-  "status": "unclear",
+  "fault": "A trailing clause tallies the items the previous sentence just listed ('and that is three'), a count the reader has already made.",
+  "status": "searchable",
   "heading": "Deciding What Matters",
   "paragraph": "A thermometer measures temperature. `Thermometer` measures, decides which changes to announce, and tells the listeners. [Cohesion](21_Patterns--Design_Patterns.md#design-principles) is one job per class, and that is three. Of the two additions, only the telling moves out of the class. `Broadcaster` holds the list and the loop in a base class, and `watched.py` drops the base class and announces from `__setattr__()`, so one method covers every attribute. The job still belongs to the object either way, and its code lives elsewhere.",
   "check": {
-   "before": 0.69,
-   "after": 0.04
+   "before": 0.77,
+   "after": 0.05
   }
  },
  "0108bbcb91f38da5": {

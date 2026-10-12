@@ -246,7 +246,7 @@ so a subclass that calls it gets an instance of the subclass with no override.
 
 A factory turns data, such as a name, into an object,
 so constructor calls stay in one place.
-In Python a class is a first-class object.
+A class is a first-class object.
 You can store it in a variable and call it to construct an instance.
 You saw this in [`defaultdict(list)`](03_Foundations--Containers.md#defaultdict)
 and [`field(default_factory=list)`](12_Techniques--Data_Classes_as_Types.md#defaults-built-not-shared).

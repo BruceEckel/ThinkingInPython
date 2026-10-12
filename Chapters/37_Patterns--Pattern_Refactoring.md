@@ -534,7 +534,7 @@ all to work around a statically typed language that cannot add a method to a cla
 `functools.singledispatch` selects the same implementation in one call.
 Any module can register an implementation for a new type.
 
-In Python, a single-dispatch function does *Visitor*'s job:
+A single-dispatch function does *Visitor*'s job:
 
 ```python
 # recycling_note.py
