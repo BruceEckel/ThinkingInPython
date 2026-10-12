@@ -55,7 +55,8 @@ for command in macro:
 ```
 
 `Command` names the signature every entry must have.
-Each entry takes no arguments and returns `None`.
+Its definition, `type Command = Callable[[], None]`,
+describes an entry that takes no arguments and returns `None`.
 The classic object form turns that name into a base class and wraps each action in a `Command` subclass with an `execute()` method:
 
 ```python
