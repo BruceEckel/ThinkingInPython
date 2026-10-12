@@ -1458,7 +1458,7 @@ that lets `grid_view.py` hand a `Color` to `tkinter`.
 > Connecting needs the descriptor, not the value it stores,
 > so `__get__()` returns the descriptor for an access through the class,
 > and `Thermometer.celsius.connect(t, readings.append)` reaches it.
-> Show that an assignment to one attribute calls no responder of the other.
+> Show that an assignment to one attribute calls that attribute's responders alone.
 
 <details>
 <summary>Where to look</summary>

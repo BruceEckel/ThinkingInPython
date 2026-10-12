@@ -145,7 +145,7 @@ The alternative leaves the call to the client,
 the code that changes the subject.
 The client makes all its changes and then calls `notify()` once,
 so the observers receive one notification for the whole batch.
-In exchange, every client must make that call.
+That alternative requires every client to make the call.
 Until it does, the observers hold stale data.
 
 ### Why `notify()` Copies the List
@@ -246,7 +246,7 @@ class Broadcaster[T]:
 `Broadcaster` is `classic_observer.py`'s `Subject` with its three methods renamed:
 GoF's `attach()`, `detach()`, and `notify()` become `connect()`, `disconnect()`,
 and `announce()`.
-The call inside the loop changes as well.
+The call inside `announce()`'s `for` loop changes as well.
 `Broadcaster.announce()` calls `responder(data)`,
 so a function serves as a responder.
 `announce()` passes the data alone, so `Broadcaster` uses the push model.
@@ -256,7 +256,7 @@ such as an attribute's name and its new value,
 the broadcaster packs them in a tuple and each responder unpacks it,
 and a responder that needs no data ignores the argument it receives.
 
-`Broadcaster` knows nothing about what it announces.
+`Broadcaster` announces data of any type.
 Its type parameter `T` sets the type of each notification,
 and a class that inherits `Broadcaster` gets `connect()`, `disconnect()`,
 and `announce()`.
@@ -281,8 +281,9 @@ The broadcaster would require a rule for combining those different values.
 Returning `None` removes that question.
 
 A design that needs an answer uses a different pattern.
-For example, [*Chain of Responsibility*](28_Patterns--Function_Objects.md#chain-of-responsibility-choosing-the-handler-at-runtime)
-tries its handlers in turn and returns the result from the first one that succeeds.
+[*Chain of Responsibility*](28_Patterns--Function_Objects.md#chain-of-responsibility-choosing-the-handler-at-runtime)
+is the pattern for a design that needs an answer:
+it tries its handlers in turn and returns the result from the first one that succeeds.
 
 The new `Thermometer` changes only its base class and the call in its `celsius` setter,
 `announce()` in place of `notify()`:
@@ -371,7 +372,8 @@ The shaded side holds the responders as the program wrote them;
 Two kinds of arrow cross the boundary, in opposite directions:
 `connect()` carries a responder into the list,
 and `announce()` calls each stored responder in turn.
-No result crosses back, so `Thermometer` has nothing to wait for or interpret.
+Each call returns `None`,
+so `Thermometer` goes on to the next responder as soon as the call returns.
 A new responder such as `plot` connects the same way as all responders.
 
 ### Testing the Broadcaster
@@ -516,7 +518,7 @@ with no exception to say a responder was skipped.
 ### Raising an Exception
 
 If a responder raises an exception, it stops the `announce()` loop.
-The remaining responders in the list do not get notified.
+The responders after the failing one miss that announcement.
 The exception propagates to the code that assigned to `celsius`.
 You must decide whether `announce()` should catch, collect, and continue
 (see exercise 3).
@@ -924,7 +926,7 @@ where `published()` builds the pair as nested functions, once,
 for any field name.
 
 `published()` takes a field name and builds the two functions a `property` needs.
-`read()` returns the value stored under that name in the instance's `__dict__`.
+`read()` returns `self.__dict__[name]`, the value stored under that name.
 `write()` stores a new value (`[1]`) and then calls `announce()` with it
 (`[2]`), so every assignment to the field notifies the responders.
 Nothing in this file defines `announce()`.
@@ -1325,9 +1327,8 @@ so `recolored()` needs no grid size.
 The comprehension maps each cell that passes the test to its color's `next()`.
 The [dictionary merge](03_Foundations--Containers.md#dictionaries)
 builds the new grid.
-`|` produces a new dictionary holding the keys of both operands.
-Every key on the right is also in `grid`, and for a key in both,
-the result takes the right operand's value.
+Every key on the right is also in `grid`,
+so the new grid has the same keys as `grid`.
 The new grid is a copy of `grid` that differs in the cells of the cross.
 
 ### Testing the Model
@@ -1747,8 +1748,8 @@ A responder's choice is limited to what it reads and which announcements it acts
 so every responder receives both kinds of change, along with the attribute name.
 
 *Observer* decouples the thermometer from its responders and leaves the responders coupled to the thermometer.
-The thermometer knows its responders only as callables,
-so connecting a new responder changes nothing in the thermometer.
+The thermometer treats every responder as a callable,
+so connecting a new responder leaves the thermometer's code as it was.
 The responders still depend on which changes the thermometer announces,
 since a responder acts on what it receives.
 A threshold in the thermometer makes that dependence visible.
@@ -1797,13 +1798,14 @@ but the half degree is a judgment about what `display` needs.
 For `log`, which exists to record every reading, the same half degree is wrong:
 the thermometer announces two of the four readings,
 and `log` loses the other two.
-Nothing in `ThresholdThermometer` says which responder the threshold serves.
+`ThresholdThermometer` applies `_delta` to every responder alike,
+and its code hides that the threshold serves `display`.
 
 The alternative moves the comparison out of the thermometer and into `display`,
 the responder that the threshold serves.
 The setter announces every assignment, `log` appends every reading,
 and `display` remembers the last value it drew and skips a reading close to it.
-The thermometer knows nothing about tolerance.
+The tolerance belongs to `display`.
 Every responder that filters by size writes the same comparison.
 
 That repetition is acceptable for a question of *how much*,
@@ -1887,7 +1889,7 @@ Try each exercise before opening its [solution](../Solutions/30_Patterns--Observ
     Connecting needs the descriptor, not the value it stores,
     so `__get__()` returns the descriptor for an access through the class,
     and `Thermometer.celsius.connect(t, readings.append)` reaches it.
-    Show that an assignment to one attribute calls no responder of the other.
+    Show that an assignment to one attribute calls that attribute's responders alone.
 11. Write a load-time version of `Broadcaster`:
     a module-level list of responders and a `@responds` decorator that appends a function to it and returns the function unchanged.
     Each responder then registers when Python runs its `def` statement,
