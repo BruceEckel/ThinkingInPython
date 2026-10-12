@@ -102,7 +102,7 @@ because every subclass writes to `Trash.registry` and none defines a `registry` 
 so `cls.registry` always resolves to that one table.
 Call `create()` as `Trash.create()`.
 
-`@record` builds `__init__()` from the bare `weight: float` annotation alone.
+`@record` reads the bare `weight: float` annotation and generates `__init__(self, weight: float)`.
 The two [`ClassVar` attributes](12_Techniques--Data_Classes_as_Types.md#d-a-real-classvar)
 belong to the class, so they stay out of `__init__()`.
 
@@ -113,7 +113,7 @@ which keeps [the check](09_Foundations--Class_Attributes.md#classvar-and-inherit
 that makes the type checker reject `Aluminum(1.0).value = 2.0`.
 
 A new recyclable type registers itself, and `create()` builds it.
-`sum_value()` needs no edit for it either.
+`sum_value()` also handles the new type as written.
 That ordinary function reads `t.value` and `t.weight` polymorphically,
 without checking the type of a piece.
 
