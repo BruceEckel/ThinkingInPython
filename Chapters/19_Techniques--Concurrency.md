@@ -2044,7 +2044,8 @@ so both are awaitable and neither blocks anything.
 It submits to the executor and returns an `asyncio.Future` that resolves when the executor's own future does.
 That bridge is why `process_price()` calls `loop.run_in_executor()` instead of `pool.submit()`.
 
-`main()` takes `pool` as a parameter instead of creating it.
+`main(pool: ProcessPoolExecutor)` receives its pool as a parameter,
+and `with ProcessPoolExecutor() as pool:` creates the pool outside `main`.
 Creating a `ProcessPoolExecutor` sets up its queues and pipes,
 its first `submit()` spawns the workers,
 and `__exit__()` joins them through `shutdown(wait=True)`.
