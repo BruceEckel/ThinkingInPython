@@ -830,13 +830,13 @@
   "similarity": 0.458,
   "source": "2e61b3e7..HEAD",
   "added": "2026-10-11",
-  "fault": "Prose describes what a generated method does instead of showing its signature and body in code spans.",
+  "fault": "A sentence paraphrases a method's signature or one statement of its body in words ('takes `arg`', 'accepts any arguments and returns `Any`', 'assigns `self.x`', 'builds `grid` from `size`') where a short code span of the actual signature or statement (`__init__(self, celsius: float)`, `self.celsius = celsius`) would show it. Not this fault: a sentence that already quotes that code or cites a `[n]` tag, one that states only what the method achieves or raises, or an exercise that specifies a method for the reader to write.",
   "status": "searchable",
   "heading": "The Model",
   "paragraph": "Neither function needs a `BoxModel`, so both are defined at module level and not inside the class. A test calls them directly, and a second model can reuse them. `BoxModel` is a `Broadcaster[Grid]`. Its `__init__()` calls `Broadcaster.__init__()` as `Thermometer`'s does, then builds `grid` from `size`. `BoxModel.select()` makes the next grid with `recolored()` and passes it to `announce()`.",
   "check": {
-   "before": 0.84,
-   "after": 0.64
+   "before": 0.79,
+   "after": 0.09
   }
  },
  "04b10067be177c8a": {
