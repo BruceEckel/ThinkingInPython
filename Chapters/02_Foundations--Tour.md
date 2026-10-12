@@ -15,7 +15,6 @@ Find supplementary information in [the official language documentation](https://
 Python exists to improve your productivity.
 The language aims to aid you as much as possible.
 It tries to hinder you as little as possible.
-It does not impose arbitrary rules or force a particular set of features.
 
 People often call Python a scripting language,
 but scripting languages tend to limit you,
