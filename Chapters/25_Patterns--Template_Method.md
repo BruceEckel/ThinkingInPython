@@ -134,8 +134,8 @@ The type checker then rejects a method that overrides nothing.
 That check depends on the decorator.
 If you leave `@override` off the misspelled method,
 the checker accepts it as a new method.
-No typing construct forbids a subclass from adding methods,
-so the checker cannot catch this case.
+The typing rules let a subclass add any method,
+so this case is beyond what the checker can catch.
 The interpreter can.
 The base class's `__init_subclass__()` runs at each subclass's `class` statement,
 and the standard library's `difflib` finds names that nearly match:
