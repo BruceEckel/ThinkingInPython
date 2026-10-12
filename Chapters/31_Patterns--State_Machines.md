@@ -176,45 +176,6 @@ class MouseTrap(StateMachine):
         super().__init__(MouseTrap.waiting)
 ```
 
-The demo file runs the trap through the nine moves:
-
-```python
-# mouse_trap_states_demo.py
-from mouse_action import MouseAction
-from mouse_moves import MOVES
-from mouse_trap_states import MouseTrap
-
-MouseTrap().run_all(MOVES)
-#: Broadcasting cheese smell
-#: Waiting mouse appears -> Luring
-#: Presenting Cheese, door open
-#: Luring mouse runs away -> Waiting
-#: Broadcasting cheese smell
-#: Waiting mouse appears -> Luring
-#: Presenting Cheese, door open
-#: Luring mouse enters trap -> Trapping
-#: Closing door
-#: Trapping mouse escapes -> Waiting
-#: Broadcasting cheese smell
-#: Waiting mouse appears -> Luring
-#: Presenting Cheese, door open
-#: Luring mouse enters trap -> Trapping
-#: Closing door
-#: Trapping mouse trapped -> Holding
-#: Mouse caught
-#: Holding mouse removed -> Waiting
-#: Broadcasting cheese smell
-
-# ESCAPES has no case in Waiting, so case _
-# fires and the machine stays at Waiting:
-trap = MouseTrap()
-#: Broadcasting cheese smell
-trap.run_all([MouseAction.ESCAPES])
-#: Waiting mouse escapes -> Waiting
-#: Broadcasting cheese smell
-```
-
-`mouse_trap_states_demo.py` builds a `MouseTrap` and runs it through every move in `MOVES`.
 `MouseTrap` holds all the possible states as class attributes and sets up the initial state.
 A state class stores nothing, so each state can be one shared object.
 A single `Waiting` serves every `MouseTrap` and every visit to that state.
@@ -263,6 +224,44 @@ creating an instance of a subclass that defines `run()` alone raises a `TypeErro
 The type checker reports that construction too,
 so the `ABC` and the Protocol both report the missing method before the program runs.
 The empty base and the `NotImplementedError` base report it at the call.
+
+`mouse_trap_states_demo.py` builds a `MouseTrap` and runs it through every move in `MOVES`:
+
+```python
+# mouse_trap_states_demo.py
+from mouse_action import MouseAction
+from mouse_moves import MOVES
+from mouse_trap_states import MouseTrap
+
+MouseTrap().run_all(MOVES)
+#: Broadcasting cheese smell
+#: Waiting mouse appears -> Luring
+#: Presenting Cheese, door open
+#: Luring mouse runs away -> Waiting
+#: Broadcasting cheese smell
+#: Waiting mouse appears -> Luring
+#: Presenting Cheese, door open
+#: Luring mouse enters trap -> Trapping
+#: Closing door
+#: Trapping mouse escapes -> Waiting
+#: Broadcasting cheese smell
+#: Waiting mouse appears -> Luring
+#: Presenting Cheese, door open
+#: Luring mouse enters trap -> Trapping
+#: Closing door
+#: Trapping mouse trapped -> Holding
+#: Mouse caught
+#: Holding mouse removed -> Waiting
+#: Broadcasting cheese smell
+
+# ESCAPES has no case in Waiting, so case _
+# fires and the machine stays at Waiting:
+trap = MouseTrap()
+#: Broadcasting cheese smell
+trap.run_all([MouseAction.ESCAPES])
+#: Waiting mouse escapes -> Waiting
+#: Broadcasting cheese smell
+```
 
 ### A Table Inside Each State
 
