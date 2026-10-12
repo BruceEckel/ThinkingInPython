@@ -37,19 +37,7 @@ An input to the machine is an event: something that happened outside it,
 such as a mouse appearing or a coin dropping.
 The parameter takes that name because `input` belongs to a builtin.
 
-Python does not require this Protocol.
-The Protocol's few lines do two things.
-They give annotations a type to name.
-They also let the type checker reject a state class that leaves a method out,
-wherever the program uses that class as a `State`, before anything runs.
-
-The `StateMachine` keeps track of the current state,
-which the constructor initializes.
-`run_all(self, inputs: Iterable[object]) -> None` takes the inputs as any iterable.
-For each one it asks the current state for the next state, moves there,
-and calls that state's `run()`.
-That loop is the *State* pattern plus the transition.
-What `run()` does depends on which state the machine occupies:
+The `StateMachine` holds the current state and moves it on each input:
 
 ```python
 # state_machine.py
@@ -69,8 +57,15 @@ class StateMachine:
             self.current_state.run()
 ```
 
+The constructor sets the initial state and runs it.
+`run_all(self, inputs: Iterable[object]) -> None` takes the inputs as any iterable.
+For each one it reports the input, asks the current state for the next state,
+moves there, and calls that state's `run()`.
+That loop is the *State* pattern plus the transition.
+What `run()` does depends on which state the machine occupies.
+
 `run_all()` is the template method.
-It defines the flow (report the input, transition, run the new state),
+It defines the flow,
 while each `State`'s `run()` and `next()` supply the varying behavior.
 [*Template Method*](25_Patterns--Template_Method.md)
 puts the varying steps in a subclass.
