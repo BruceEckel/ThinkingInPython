@@ -248,9 +248,7 @@ A *bare annotation*, one with no assigned value,
 is a declaration rather than a placeholder.
 It states that instances of this class carry a `label` attribute of type `str`,
 set somewhere.
-Here that somewhere is `__init__()`,
-and its `self.label = label` produces the attribute `display_object(a)` finds.
-If you leave that assignment out of `__init__()`, no attribute exists,
+If no method assigns `self.label`, no attribute exists,
 on the instance or the class.
 The type checker trusts the annotation rather than checking that some method sets the attribute,
 so the check passes.
@@ -368,8 +366,6 @@ It records that `total` belongs to the class,
 and turns the accidental shadowing from `class_attribute_confusion.py` into a check-time error.
 Python's own attribute lookup ignores the hint.
 `@dataclass` does read it at runtime.
-It [leaves a `ClassVar` field out](12_Techniques--Data_Classes_as_Types.md#d-a-real-classvar)
-of the constructor it generates.
 
 At runtime an assignment does the same thing with or without `ClassVar`:
 
@@ -579,7 +575,7 @@ print(vars(b), B().x)  # The same shadowing as Stars
 ```
 
 The name stays an ordinary shared class attribute,
-the generated `__init__()` takes no `x`,
+the generated `__init__()` is `__init__(self)`,
 and neither the runtime nor the type checker complains.
 `b.x = -1` shadows the class attribute for that one instance,
 and an assignment through the class still changes every instance that has not shadowed it,
@@ -588,7 +584,7 @@ the hazard `Stars` demonstrates.
 The annotated field in `real_defaults.py` also leaves a class attribute behind.
 As its last line shows, `vars(B)` still holds `x = 100`.
 The difference is the generated `__init__()`,
-which assigns `self.x` on every construction,
+which runs `self.x = x` on every construction,
 so each object shadows the class attribute immediately and never reads the shared one.
 [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#data-classes)
 covers the details.
