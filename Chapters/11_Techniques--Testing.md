@@ -223,7 +223,7 @@ The `where` line is the rewriting at work.
 which a bare `assert` statement discards.
 
 `Account` is a `@dataclass`,
-so its generated `__repr__()` names the field values.
+so its generated `__repr__()` prints `Account(balance=100.0)`.
 A hand-written class with no `__repr__()` prints `<account.Account object at 0x...>` there instead.
 
 ## Testing for Exceptions
