@@ -9,7 +9,7 @@ class StateMachine:
     # Template method:
     def run_all(self, inputs: Iterable[object]) -> None:
         for input_ in inputs:
-            print(type(self.current_state).__name__, input_)
-            self.current_state = (
-                self.current_state.next(input_))
+            state = self.current_state
+            print(type(state).__name__, input_)
+            self.current_state = state.next(input_)
             self.current_state.run()

@@ -1,7 +1,7 @@
 # State Machines
 
 > Many systems are in one of a known set of states at any moment.
-> Each input, together with the current state, decides the next state.
+> The current state together with an input decides the next state.
 > A *State Machine* names the states and defines their transitions.
 
 Recall [*State*](26_Patterns--Surrogate.md#state):
@@ -50,9 +50,9 @@ class StateMachine:
     # Template method:
     def run_all(self, inputs: Iterable[object]) -> None:
         for input_ in inputs:
-            print(type(self.current_state).__name__, input_)
-            self.current_state = (
-                self.current_state.next(input_))
+            state = self.current_state
+            print(type(state).__name__, input_)
+            self.current_state = state.next(input_)
             self.current_state.run()
 ```
 
