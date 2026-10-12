@@ -226,8 +226,9 @@ class StateMachine:
     def run_all(self, inputs: Iterable[object]) -> None:
         for input_ in inputs:
             state = self.current_state
-            print(type(state).__name__, input_)
             self.current_state = state.next(input_)
+            print(type(state).__name__, input_, "->",
+                  type(self.current_state).__name__)
             self.current_state.run()
 
 class TakePill:
@@ -271,13 +272,13 @@ class Prozac:
 StateMachine(Happy()).run_all(
     [Annoy(), Calm(), TakePill(), Annoy()])
 #: Great to see you!
-#: Happy Annoy
+#: Happy Annoy -> Grumpy
 #: What do you want?
-#: Grumpy Calm
+#: Grumpy Calm -> Happy
 #: Great to see you!
-#: Happy TakePill
+#: Happy TakePill -> Prozac
 #: Everything is wonderful.
-#: Prozac Annoy
+#: Prozac Annoy -> Prozac
 #: Everything is wonderful.
 ```
 

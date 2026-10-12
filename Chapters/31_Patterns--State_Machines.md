@@ -51,28 +51,26 @@ class StateMachine:
     def run_all(self, inputs: Iterable[object]) -> None:
         for input_ in inputs:
             state = self.current_state
-            print(type(state).__name__, input_)
             self.current_state = state.next(input_)
+            print(type(state).__name__, input_, "->",
+                  type(self.current_state).__name__)
             self.current_state.run()
 ```
 
 The constructor sets the initial state and runs it.
 `run_all(self, inputs: Iterable[object]) -> None` takes the inputs as any iterable.
-For each one it prints the state's name and the input,
-asks the state for its successor, moves there,
-and calls the new state's `run()`.
-That loop is the *State* pattern plus the transition.
-What `run()` does depends on which state the machine occupies.
+For each one it asks the state for its successor and moves there.
+It then prints the transition (the old state, the input, and the new state)
+and calls `run()` for the new state.
+This is the *State* pattern combined with automated transitions,
+producing *State Machine*.
 
-`run_all()` is the template method.
-It defines the flow,
+The behavior of `run()` depends on the current state.
+`run_all()` defines the flow,
 while each `State`'s `run()` and `next()` supply the varying behavior.
-[*Template Method*](25_Patterns--Template_Method.md)
-puts the varying steps in a subclass.
-Here they come from the `State` objects the machine holds.
 
 In this style of *State Machine*, each state decides the next state.
-As an example, here's a fancy mousetrap that can move through several states while trapping a mouse.
+As an example, consider a mousetrap that can move through several states while trapping a mouse.
 The possible moves a mouse can make are the inputs to the state machine:
 
 ```python
@@ -88,14 +86,10 @@ class MouseAction(StrEnum):
     REMOVED = "mouse removed"
 ```
 
-Each possible move by a mouse is a member of the `MouseAction` [enumeration](12_Techniques--Data_Classes_as_Types.md#enums-are-types-too).
-Because `MouseAction` is a `StrEnum`, each member *is* a `str`,
-and compares equal to and prints as its value.
-That is why `run_all()` prints `mouse appears` rather than `MouseAction.APPEARS`.
-The members still hash and look up correctly, so they work as dictionary keys.
-
-`MouseAction("mouse appears")` returns the matching member.
-`mouse_trap_states.py` parses each line of the test input with that call.
+Each mouse move is a `MouseAction` [enumeration](12_Techniques--Data_Classes_as_Types.md#enums-are-types-too).
+Because `MouseAction` is a `StrEnum`, each member is a `str`.
+`MouseAction("mouse appears")` returns `MouseAction.APPEARS`.
+`run_all()` prints `mouse appears` rather than `MouseAction.APPEARS`.
 
 A text file supplies the sequence of mouse inputs.
 Its nine moves exercise every transition in the trap:
@@ -115,9 +109,8 @@ mouse removed
 
 ### One State Class per Behavior
 
-Here's the first version of the mousetrap program.
-Each state class defines its `run()` behavior,
-and establishes its next state with a `match` statement:
+In this first version of the mousetrap program,
+each state class defines its `run()` behavior and decides its next state with a `match` statement:
 
 ```python
 # mouse_trap_states.py
@@ -129,7 +122,7 @@ from state_machine import StateMachine
 
 class Waiting:
     def run(self) -> None:
-        print("Waiting: Broadcasting cheese smell")
+        print("Broadcasting cheese smell")
 
     def next(self, input_: object) -> State:
         match input_:
@@ -140,7 +133,7 @@ class Waiting:
 
 class Luring:
     def run(self) -> None:
-        print("Luring: Presenting Cheese, door open")
+        print("Presenting Cheese, door open")
 
     def next(self, input_: object) -> State:
         match input_:
@@ -153,7 +146,7 @@ class Luring:
 
 class Trapping:
     def run(self) -> None:
-        print("Trapping: Closing door")
+        print("Closing door")
 
     def next(self, input_: object) -> State:
         match input_:
@@ -166,7 +159,7 @@ class Trapping:
 
 class Holding:
     def run(self) -> None:
-        print("Holding: Mouse caught")
+        print("Mouse caught")
 
     def next(self, input_: object) -> State:
         match input_:
@@ -188,33 +181,33 @@ text = Path("mouse_moves.txt").read_text()
 moves = [line.strip() for line in text.splitlines()
          if line.strip() and not line.startswith("#")]
 MouseTrap().run_all([MouseAction(m) for m in moves])
-#: Waiting: Broadcasting cheese smell
-#: Waiting mouse appears
-#: Luring: Presenting Cheese, door open
-#: Luring mouse runs away
-#: Waiting: Broadcasting cheese smell
-#: Waiting mouse appears
-#: Luring: Presenting Cheese, door open
-#: Luring mouse enters trap
-#: Trapping: Closing door
-#: Trapping mouse escapes
-#: Waiting: Broadcasting cheese smell
-#: Waiting mouse appears
-#: Luring: Presenting Cheese, door open
-#: Luring mouse enters trap
-#: Trapping: Closing door
-#: Trapping mouse trapped
-#: Holding: Mouse caught
-#: Holding mouse removed
-#: Waiting: Broadcasting cheese smell
+#: Broadcasting cheese smell
+#: Waiting mouse appears -> Luring
+#: Presenting Cheese, door open
+#: Luring mouse runs away -> Waiting
+#: Broadcasting cheese smell
+#: Waiting mouse appears -> Luring
+#: Presenting Cheese, door open
+#: Luring mouse enters trap -> Trapping
+#: Closing door
+#: Trapping mouse escapes -> Waiting
+#: Broadcasting cheese smell
+#: Waiting mouse appears -> Luring
+#: Presenting Cheese, door open
+#: Luring mouse enters trap -> Trapping
+#: Closing door
+#: Trapping mouse trapped -> Holding
+#: Mouse caught
+#: Holding mouse removed -> Waiting
+#: Broadcasting cheese smell
 
 # ESCAPES has no case in Waiting, so case _
 # fires and the machine stays at Waiting:
 trap = MouseTrap()
-#: Waiting: Broadcasting cheese smell
+#: Broadcasting cheese smell
 trap.run_all([MouseAction.ESCAPES])
-#: Waiting mouse escapes
-#: Waiting: Broadcasting cheese smell
+#: Waiting mouse escapes -> Waiting
+#: Broadcasting cheese smell
 ```
 
 The code at the bottom of the file builds a `MouseTrap` and runs it through every move read from the text file.
@@ -334,22 +327,22 @@ from table_state import TableState
 class Waiting(TableState):
     @override
     def run(self) -> None:
-        print("Waiting: Broadcasting cheese smell")
+        print("Broadcasting cheese smell")
 
 class Luring(TableState):
     @override
     def run(self) -> None:
-        print("Luring: Presenting Cheese, door open")
+        print("Presenting Cheese, door open")
 
 class Trapping(TableState):
     @override
     def run(self) -> None:
-        print("Trapping: Closing door")
+        print("Closing door")
 
 class Holding(TableState):
     @override
     def run(self) -> None:
-        print("Holding: Mouse caught")
+        print("Mouse caught")
 
 class MouseTrap(StateMachine):
     waiting: ClassVar[TableState] = Waiting()
@@ -381,31 +374,30 @@ text = Path("mouse_moves.txt").read_text()
 moves = [line.strip() for line in text.splitlines()
          if line.strip() and not line.startswith("#")]
 MouseTrap().run_all([MouseAction(m) for m in moves])
-#: Waiting: Broadcasting cheese smell
-#: Waiting mouse appears
-#: Luring: Presenting Cheese, door open
-#: Luring mouse runs away
-#: Waiting: Broadcasting cheese smell
-#: Waiting mouse appears
-#: Luring: Presenting Cheese, door open
-#: Luring mouse enters trap
-#: Trapping: Closing door
-#: Trapping mouse escapes
-#: Waiting: Broadcasting cheese smell
-#: Waiting mouse appears
-#: Luring: Presenting Cheese, door open
-#: Luring mouse enters trap
-#: Trapping: Closing door
-#: Trapping mouse trapped
-#: Holding: Mouse caught
-#: Holding mouse removed
-#: Waiting: Broadcasting cheese smell
+#: Broadcasting cheese smell
+#: Waiting mouse appears -> Luring
+#: Presenting Cheese, door open
+#: Luring mouse runs away -> Waiting
+#: Broadcasting cheese smell
+#: Waiting mouse appears -> Luring
+#: Presenting Cheese, door open
+#: Luring mouse enters trap -> Trapping
+#: Closing door
+#: Trapping mouse escapes -> Waiting
+#: Broadcasting cheese smell
+#: Waiting mouse appears -> Luring
+#: Presenting Cheese, door open
+#: Luring mouse enters trap -> Trapping
+#: Closing door
+#: Trapping mouse trapped -> Holding
+#: Mouse caught
+#: Holding mouse removed -> Waiting
+#: Broadcasting cheese smell
 
 # ESCAPES is not a key in Waiting.transitions:
 trap2 = MouseTrap()
-#: Waiting: Broadcasting cheese smell
+#: Broadcasting cheese smell
 expect(RuntimeError, trap2.run_all, [MouseAction.ESCAPES])
-#: Waiting mouse escapes
 #: [RuntimeError] Waiting has no transition for mouse
 #: escapes
 ```
@@ -421,7 +413,7 @@ Every one of the nine moves in the file matches a transition out of the current 
 So both listings end with one more call,
 which feeds `MouseAction.ESCAPES` to a fresh trap in `Waiting`.
 Neither `Waiting`'s `match` nor its table names that input.
-Version 1 prints `Waiting: Broadcasting cheese smell` a second time.
+Version 1 prints `Broadcasting cheese smell` a second time.
 Version 2 raises `RuntimeError: Waiting has no transition for mouse escapes`.
 The figure traces the run both versions share, then this one input:
 
@@ -866,7 +858,7 @@ Because the actions set `vm.message`,
 The same machine can therefore drive more than one view.
 The text demo in `vending_demo.py` reads `message` and prints it.
 Contrast `run_all()` in the first design,
-which prints each state and input from inside the framework.
+which prints each transition from inside the framework.
 Printing there is convenient for a book listing and wrong for a reusable machine,
 because the `print()` call sits in the engine,
 where every user of `run_all()` gets its output.

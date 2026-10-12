@@ -7,7 +7,7 @@ from state_machine import StateMachine
 
 class Waiting:
     def run(self) -> None:
-        print("Waiting: Broadcasting cheese smell")
+        print("Broadcasting cheese smell")
 
     def next(self, input_: object) -> State:
         match input_:
@@ -18,7 +18,7 @@ class Waiting:
 
 class Luring:
     def run(self) -> None:
-        print("Luring: Presenting Cheese, door open")
+        print("Presenting Cheese, door open")
 
     def next(self, input_: object) -> State:
         match input_:
@@ -31,7 +31,7 @@ class Luring:
 
 class Trapping:
     def run(self) -> None:
-        print("Trapping: Closing door")
+        print("Closing door")
 
     def next(self, input_: object) -> State:
         match input_:
@@ -44,7 +44,7 @@ class Trapping:
 
 class Holding:
     def run(self) -> None:
-        print("Holding: Mouse caught")
+        print("Mouse caught")
 
     def next(self, input_: object) -> State:
         match input_:
@@ -66,30 +66,30 @@ text = Path("mouse_moves.txt").read_text()
 moves = [line.strip() for line in text.splitlines()
          if line.strip() and not line.startswith("#")]
 MouseTrap().run_all([MouseAction(m) for m in moves])
-#: Waiting: Broadcasting cheese smell
-#: Waiting mouse appears
-#: Luring: Presenting Cheese, door open
-#: Luring mouse runs away
-#: Waiting: Broadcasting cheese smell
-#: Waiting mouse appears
-#: Luring: Presenting Cheese, door open
-#: Luring mouse enters trap
-#: Trapping: Closing door
-#: Trapping mouse escapes
-#: Waiting: Broadcasting cheese smell
-#: Waiting mouse appears
-#: Luring: Presenting Cheese, door open
-#: Luring mouse enters trap
-#: Trapping: Closing door
-#: Trapping mouse trapped
-#: Holding: Mouse caught
-#: Holding mouse removed
-#: Waiting: Broadcasting cheese smell
+#: Broadcasting cheese smell
+#: Waiting mouse appears -> Luring
+#: Presenting Cheese, door open
+#: Luring mouse runs away -> Waiting
+#: Broadcasting cheese smell
+#: Waiting mouse appears -> Luring
+#: Presenting Cheese, door open
+#: Luring mouse enters trap -> Trapping
+#: Closing door
+#: Trapping mouse escapes -> Waiting
+#: Broadcasting cheese smell
+#: Waiting mouse appears -> Luring
+#: Presenting Cheese, door open
+#: Luring mouse enters trap -> Trapping
+#: Closing door
+#: Trapping mouse trapped -> Holding
+#: Mouse caught
+#: Holding mouse removed -> Waiting
+#: Broadcasting cheese smell
 
 # ESCAPES has no case in Waiting, so case _
 # fires and the machine stays at Waiting:
 trap = MouseTrap()
-#: Waiting: Broadcasting cheese smell
+#: Broadcasting cheese smell
 trap.run_all([MouseAction.ESCAPES])
-#: Waiting mouse escapes
-#: Waiting: Broadcasting cheese smell
+#: Waiting mouse escapes -> Waiting
+#: Broadcasting cheese smell

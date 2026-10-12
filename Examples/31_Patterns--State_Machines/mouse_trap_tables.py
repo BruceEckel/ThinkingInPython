@@ -9,22 +9,22 @@ from table_state import TableState
 class Waiting(TableState):
     @override
     def run(self) -> None:
-        print("Waiting: Broadcasting cheese smell")
+        print("Broadcasting cheese smell")
 
 class Luring(TableState):
     @override
     def run(self) -> None:
-        print("Luring: Presenting Cheese, door open")
+        print("Presenting Cheese, door open")
 
 class Trapping(TableState):
     @override
     def run(self) -> None:
-        print("Trapping: Closing door")
+        print("Closing door")
 
 class Holding(TableState):
     @override
     def run(self) -> None:
-        print("Holding: Mouse caught")
+        print("Mouse caught")
 
 class MouseTrap(StateMachine):
     waiting: ClassVar[TableState] = Waiting()
@@ -56,30 +56,29 @@ text = Path("mouse_moves.txt").read_text()
 moves = [line.strip() for line in text.splitlines()
          if line.strip() and not line.startswith("#")]
 MouseTrap().run_all([MouseAction(m) for m in moves])
-#: Waiting: Broadcasting cheese smell
-#: Waiting mouse appears
-#: Luring: Presenting Cheese, door open
-#: Luring mouse runs away
-#: Waiting: Broadcasting cheese smell
-#: Waiting mouse appears
-#: Luring: Presenting Cheese, door open
-#: Luring mouse enters trap
-#: Trapping: Closing door
-#: Trapping mouse escapes
-#: Waiting: Broadcasting cheese smell
-#: Waiting mouse appears
-#: Luring: Presenting Cheese, door open
-#: Luring mouse enters trap
-#: Trapping: Closing door
-#: Trapping mouse trapped
-#: Holding: Mouse caught
-#: Holding mouse removed
-#: Waiting: Broadcasting cheese smell
+#: Broadcasting cheese smell
+#: Waiting mouse appears -> Luring
+#: Presenting Cheese, door open
+#: Luring mouse runs away -> Waiting
+#: Broadcasting cheese smell
+#: Waiting mouse appears -> Luring
+#: Presenting Cheese, door open
+#: Luring mouse enters trap -> Trapping
+#: Closing door
+#: Trapping mouse escapes -> Waiting
+#: Broadcasting cheese smell
+#: Waiting mouse appears -> Luring
+#: Presenting Cheese, door open
+#: Luring mouse enters trap -> Trapping
+#: Closing door
+#: Trapping mouse trapped -> Holding
+#: Mouse caught
+#: Holding mouse removed -> Waiting
+#: Broadcasting cheese smell
 
 # ESCAPES is not a key in Waiting.transitions:
 trap2 = MouseTrap()
-#: Waiting: Broadcasting cheese smell
+#: Broadcasting cheese smell
 expect(RuntimeError, trap2.run_all, [MouseAction.ESCAPES])
-#: Waiting mouse escapes
 #: [RuntimeError] Waiting has no transition for mouse
 #: escapes

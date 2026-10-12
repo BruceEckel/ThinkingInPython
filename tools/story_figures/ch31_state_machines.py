@@ -3,7 +3,7 @@
 A trace, not a structure: the four state objects head four columns,
 each row is one pass of `run_all()`'s loop, and a dot marks the state
 the machine occupies after that input. The red arrows are the calls to
-`next(event)`, so the reader sees the current state, not the machine,
+`next(input_)`, so the reader sees the current state, not the machine,
 pick each successor, and the machine's position move by itself from
 object to object. The right column is what each new state's `run()`
 prints. Below the trace, one unexpected input (`mouse escapes` in
@@ -23,7 +23,7 @@ from tools.story_figures import (INK, MUTED, RED, Point, arrow, cross,
 
 STEM = "state_story"
 W = 740
-EX = 20  # The event column
+EX = 20  # The input column
 CX = (212, 294, 376, 458)  # The four state columns' centers
 BW, BH = 72, 26  # A state's header box
 OX = 510  # The column of printed lines
@@ -32,10 +32,10 @@ R0, RH = 104, 25  # The first row's center, the row pitch
 DOT = 5
 STATES = ("Waiting", "Luring", "Trapping", "Holding")
 RUN = {
-    "Waiting": "Waiting: Broadcasting cheese smell",
-    "Luring": "Luring: Presenting Cheese, door open",
-    "Trapping": "Trapping: Closing door",
-    "Holding": "Holding: Mouse caught",
+    "Waiting": "Broadcasting cheese smell",
+    "Luring": "Presenting Cheese, door open",
+    "Trapping": "Closing door",
+    "Holding": "Mouse caught",
 }
 # (input, the state next(input) returns), from mouse_moves.txt.
 MOVES = (
@@ -50,7 +50,7 @@ MOVES = (
     ("mouse removed", "Waiting"),
 )
 TITLE = ("The mousetrap's nine inputs as a trace: in each row the current "
-         "state's next(event) picks the next of four state objects, whose "
+         "state's next(input_) picks the next of four state objects, whose "
          "run() prints a line; below, an input Waiting does not name keeps "
          "the match version in Waiting and makes the table version raise "
          "a RuntimeError")
@@ -74,9 +74,9 @@ def edge(a: Point, b: Point) -> str:
 def trace() -> tuple[str, float]:
     """The header, the grid, and the nine rows; the bottom's y."""
     b = text(EX, 22, "MouseTrap().run_all(moves)", 12, bold=True)
-    b += text(EX, 38, "each row: current_state.next(event) returns the "
+    b += text(EX, 38, "each row: current_state.next(input_) returns the "
               "next state (red), and run() on it prints", 10, MUTED)
-    b += text(EX, HY + 18, "event", 11, MUTED)
+    b += text(EX, HY + 18, "input", 11, MUTED)
     b += text(OX, HY + 18, "run() prints", 11, MUTED)
     last = R0 + len(MOVES) * RH
     for x, s in zip(CX, STATES):
@@ -87,10 +87,10 @@ def trace() -> tuple[str, float]:
     b += text(EX, R0 + 4, "MouseTrap()", 10.5, MUTED)
     here = (col["Waiting"], R0)
     b += dot(here) + text(OX, R0 + 4, RUN["Waiting"], 10)
-    for i, (event, state) in enumerate(MOVES, 1):
+    for i, (input_, state) in enumerate(MOVES, 1):
         y = R0 + i * RH
         there = (col[state], y)
-        b += text(EX, y + 4, event, 10.5)
+        b += text(EX, y + 4, input_, 10.5)
         b += edge(here, there) + dot(there)
         b += text(OX, y + 4, RUN[state], 10)
         here = there
