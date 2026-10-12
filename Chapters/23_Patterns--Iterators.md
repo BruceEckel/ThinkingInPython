@@ -271,8 +271,7 @@ Any validation at the top of a generator inherits this delay.
 A check meant to reject a bad argument raises its exception at the first `next()`,
 far from the call that caused the problem.
 
-To validate eagerly,
-check the arguments in a plain function and have it return an inner generator:
+Here, `squares()` is a plain function that checks its argument and returns an inner generator:
 
 ```python
 # eager_validation.py
