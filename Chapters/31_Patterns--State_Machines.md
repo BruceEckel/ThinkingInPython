@@ -177,7 +177,8 @@ class MouseTrap(StateMachine):
 ```
 
 `MouseTrap` holds all the possible states as class attributes and sets up the initial state.
-A state class stores nothing, so each state can be one shared object.
+Each of the four classes consists of its two methods,
+so one shared instance can serve as that state.
 A single `Waiting` serves every `MouseTrap` and every visit to that state.
 
 Each `next()` is a `match` on the input:
