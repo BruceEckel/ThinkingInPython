@@ -48,7 +48,7 @@ since it does the job of constructors in other OOP languages.
 This book follows that practice.
 
 Python calls the constructor automatically when it creates an object.
-In the demo, creating an object looks like calling a function named after the class.
+In the demo, `Simple("Constructor argument")` creates an object with what looks like a call to a function named after the class.
 
 Ordinary methods require a reference to the current object.
 When you define a method you must explicitly specify the reference as the first parameter.
@@ -86,8 +86,6 @@ The assignment creates space for that attribute when the method runs.
 If you assign to a name in the class body, C++/Java style,
 that name becomes a class-level attribute instead
 (similar to a static field in C++/Java).
-[Class Attributes](09_Foundations--Class_Attributes.md)
-shows how a class-level attribute behaves when you assign to it.
 
 A bare annotation with no value looks most like a C++ or Java field declaration,
 yet it creates neither kind of attribute.
@@ -263,8 +261,7 @@ and `C().show()` then runs `B`'s version.
 The base-class constructor runs because `Derived`'s constructor calls it.
 Unlike C++ and Java,
 Python adds no call to the base-class constructor when a derived class defines its own.
-If you remove the `super().__init__(text)` line, nothing creates `self.s`,
-so the first method that reads it raises an `AttributeError`.
+Without the `super().__init__(text)` line, nothing creates `self.s`.
 
 ```python
 # missing_super.py
