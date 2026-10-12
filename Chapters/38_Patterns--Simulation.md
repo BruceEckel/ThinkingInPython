@@ -110,10 +110,11 @@ class Rat:
 
 `number` comes from a call to `blackboard.next_number()`,
 which advances a counter, so no static default can supply it.
-`field(init=False)` leaves `number` out of the generated `__init__()`.
-The generated `__init__()` calls `__post_init__()` as its last step,
-when `blackboard`, `x`, and `y` hold their values,
-so `__post_init__()` fills in `number` and logs the rat's start.
+With `field(init=False)` on `number`,
+the generated `__init__()` is `__init__(self, blackboard: Recorder, x: int, y: int)`.
+The generated `__init__()` assigns `self.blackboard`, `self.x`, and `self.y`,
+then calls `self.__post_init__()`,
+which fills in `number` and logs the rat's start.
 
 The maze is a grid of characters.
 A `*` is a wall and a space is an opening.
@@ -687,7 +688,7 @@ Every use of `Room` in `items.py` is an annotation (`room: Room`, `-> Room`),
 and Python evaluates an annotation only when something reads it,
 so no line of `items.py` looks `Room` up at runtime.
 
-The rats avoid the same kind of cycle without an import.
+The rats avoid the same kind of cycle with a `Protocol`.
 `blackboard.py` imports `Rat`,
 and `rat.py` states what it needs from a blackboard in the `Recorder` `Protocol`,
 so it imports nothing from `blackboard.py`.
@@ -1111,7 +1112,7 @@ The same model drives a graphical view.
 draws each room as a colored cell,
 and steps the robot along that route on a timer.
 The view is the only part that touches the screen,
-and no module of the model imports it.
+and the imports point one way, from `maze_view.py` into the model's modules.
 
 ```python
 # robot_explorer/maze_view.py
