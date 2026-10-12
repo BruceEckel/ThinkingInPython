@@ -1,14 +1,14 @@
 # State Machines
 
-> Many systems are in one of a known set of states at any moment,
-> and each input, together with the current state, decides the next state.
-> A *State Machine* names the states and the transitions between them.
+> Many systems are in one of a known set of states at any moment.
+> Each input, together with the current state, decides the next state.
+> A *State Machine* names the states and defines their transitions.
 
 Recall [*State*](26_Patterns--Surrogate.md#state):
-a surrogate object that forwards calls to a swappable implementation.
-*State* lets the client programmer swap the implementation.
-*State Machine* adds a structure that swaps it automatically,
-from one object to the next.
+a surrogate forwards calls to one of several implementations,
+and the client programmer chooses which one.
+*State Machine* adds a structure that makes the switch automatically,
+from one implementation to the next.
 Each implementation represents one state the system can occupy,
 so the system behaves differently as it moves from state to state.
 
