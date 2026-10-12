@@ -690,12 +690,16 @@ sighting (C20 -> R18).
 **Test.** Two consecutive sentences where the second says the first
 again at a different altitude (abstract after concrete, or a claim
 after its example); or a section's first sentence that restates the
-chapter's opening claim. Keep the concrete one, or the opening.
+chapter's opening claim; or (widened 2026-10-11) a paragraph or a
+closing section whose every sentence restates what a listing on the
+page or an earlier paragraph already established. Keep the concrete
+one, or the opening; cut the recap.
 
-**Keep when.** The second sentence adds a consequence or a mechanism
-the first did not state.
+**Keep when.** The second sentence, or the recap, adds a consequence or
+a mechanism the earlier text did not state. A contrast drawn across
+several listings that no one listing shows is such a consequence.
 
-**Sightings.** 6, 2 chapters
+**Sightings.** 9, 3 chapters
 - `27_Patterns--Factory` 2026-09-15 (`a9ca27eb`), was Claude-written:
   "Builder chains have a second use, starting from an existing
   configuration and varying it, covered by `dataclasses.replace()`."
@@ -719,10 +723,16 @@ the first did not state.
   got "this", and you need "that", *Adapter* solves the problem." ->
   deleted from the Adapter section's opening; the chapter's first
   sentence already says "I don't have the interface I need."
+- `30_Patterns--Observer` 2026-10-11 (the pass 2e61b3e7..HEAD), Bruce's
+  hand, the recap shape: the "Four Scenarios, One Shape" section
+  deleted whole; the binding-times advice paragraph at the chapter's
+  end cut; two MVC paragraphs marked "[[just recapitulates the code]]"
+  and then cut.
 
 **Home.** this file only. Promoted 2026-09-17 on the second chapter's
 sighting, widened from consecutive sentences to the section-opening
-restatement (C8 -> R19).
+restatement (C8 -> R19); widened 2026-10-11 to the recap paragraph and
+section, approved on the fault-review page.
 
 ### R20. Say when the earlier state held instead of "used to"
 
@@ -1204,6 +1214,36 @@ in 17 files (additive).
 
 **Home.** this file only.
 
+### R31. Point at the adjacent listing with a leading "Here,"
+
+**Test.** A sentence that introduces the listing directly below it and
+points at that listing with "X below" ("`Repeat` below is ..."), with a
+demonstrative subject ("This thermometer announces ..."), or with a
+purpose clause ("To break the cycle, the setter returns early"). Write
+"Here, X ...".
+
+**Keep when.** The sentence states a general property rather than one
+of the adjacent listing (C16); "Here," belongs on a claim about that
+listing only.
+
+**Sightings.** 4 (additive), 2 chapters
+- `28_Patterns--Function_Objects` 2026-09-16, was Claude-written:
+  "`Repeat` below is a frozen data class" -> "Here, `Repeat` is a
+  frozen data class"; "`Handler` below names their signature, not an
+  interface:" -> "Here, `Handler` names their signature, not an
+  interface:"
+- `30_Patterns--Observer` 2026-10-11, Bruce's hand: "This thermometer
+  announces a reading only when it differs from the reading before it
+  by at least `_delta`:" -> "Here, the thermometer announces a reading
+  only when it differs from the reading before it by at least
+  `_delta`:"; "To break the cycle, the setter returns early" -> "Here,
+  the setter returns early"
+
+**Home.** this file only. Promoted 2026-10-11 on the second chapter's
+sighting (C22 -> R31), widened from the trailing "below" to the
+demonstrative subject and the purpose clause; approved on the
+fault-review page.
+
 ### Rulings of 2026-10-04 (Sweep Decisions page)
 
 Bruce decided the book-wide apply report's open questions on https://claude.ai/artifact/HjHyafWs5EDXQkoPmhV9g9:
@@ -1464,21 +1504,6 @@ Claude-written:
   *Strategy*'s function form gets the same fuller listing. ... and the
   list becomes an *event bus*.") -> deleted
 
-### C22. Point at the adjacent listing with a leading "Here," rather than a trailing "below"
-
-**Test.** "X below is ..." or "X below names ..." where X is defined in
-the listing that follows. Write "Here, X is ...".
-
-**Keep when.** None seen yet. Runs beside C16: "Here," belongs on a
-claim about the adjacent listing, not on a general one.
-
-**Sightings.** 2 (additive), both `28_Patterns--Function_Objects` 2026-09-16,
-was Claude-written (same chapter, so not yet independent):
-- "`Repeat` below is a frozen data class" -> "Here, `Repeat` is a
-  frozen data class"
-- "`Handler` below names their signature, not an interface:" -> "Here,
-  `Handler` names their signature, not an interface:"
-
 ### C23. Factor a property shared by two parallel sentences into one clause before them
 
 **Test.** Consecutive sentences about parallel items that each restate
@@ -1601,6 +1626,127 @@ candidate at the capture's suggestion:
 - `25_Patterns--Template_Method`: "should expect to rename an occasional
   legitimate method, not only to catch misspellings" -> "should expect to
   catch typos and also to rename an occasional legitimate method"
+
+### C30. An enumeration of clause-length items becomes a list
+
+**Test.** One sentence holds three or more parallel items joined by
+commas and "that" or "and", and each item is a clause with its own
+verb ("confirms that X, that Y, and that Z"; "First, ... Second, ...
+Third, ..." across sentences). Write the lead-in with a colon and one
+item per bullet, numbered when the order matters.
+
+**Keep when.** The items are short phrases rather than clauses: "has
+three jobs: it measures, it decides which changes to announce, and it
+notifies the responders" stayed inline.
+
+**Sightings.** 4, one chapter (`30_Patterns--Observer`, the pass
+2e61b3e7..HEAD, approved on the fault-review page 2026-10-11)
+- Bruce's hand, twice: "Testing confirms that X, that Y, that Z." ->
+  "The test file confirms that:" with one bullet per clause
+- Bruce's hand: the paragraph listing the extraction designs -> bullets
+- "less precise ... in three ways. First, ... Second, ... Third, ..."
+  -> a numbered list, the compared things named in the lead-in
+
+**Home.** this file; the deep-review skill (structural) if promoted.
+
+### C31. Show the code the prose describes (additive)
+
+**Test.** A sentence describes code in words ("becomes an awaitable
+method", "the generated constructor takes the fields", "clears the
+canvas") when the actual call or signature fits in a code span. Write
+the code span: "a caller writes `await t.set_celsius(value)`".
+
+**Keep when.** The code is longer than a line, or the listing holding
+it sits directly beside the sentence.
+
+**Sightings.** 3, one chapter (`30_Patterns--Observer`, 2026-10-11)
+- "becomes an awaitable method" -> "a caller writes
+  `await t.set_celsius(value)`"
+- "the generated constructor takes the fields" -> "the generated
+  `__init__(self, celsius: float)`"
+- Bruce's hand: "clears the canvas" -> "calls `canvas.delete(\"all\")`"
+
+**Home.** this file; the deep-review skill (teaching) if promoted.
+
+### C32. An untaken design alternative is conditional, and its downstream exception is cut
+
+**Test.** A sentence describes a design the listing on the page does
+not take, in the indicative ("has no list of listeners", "can hold a
+`Broadcaster`"), or follows a hypothetical failure past its first
+consequence to the exception that then fires ("and `attach()` raises
+an `AttributeError`"). Write "would" or "could", and end at the first
+consequence.
+
+**Keep when.** The exception is the point: the sentence exists to show
+which error the reader sees.
+
+**Sightings.** 3, one chapter (`30_Patterns--Observer`, 2026-10-11)
+- Bruce's hand: "A `@dataclass` `Thermometer` has no list of listeners,
+  and `subscribe()` raises an `AttributeError`" -> "A `@dataclass`
+  `Thermometer` would have no list of responders"
+- Bruce's hand: "can hold a `Broadcaster`" -> "could use composition"
+- "If you remove that call, ..., and `attach()` raises" -> the second
+  half cut
+
+**Home.** this file.
+
+### C33. A sentence that counts names the items
+
+**Test.** A sentence says "one X and another", "of the two", or "three
+things" and names the items only in a later sentence or not at all, so
+the reader has to find them. Name them in the same sentence, or
+introduce them with a colon.
+
+**Keep when.** The count introduces the items in the same sentence, as
+"gives up three things that ... keeps:" does.
+
+**Sightings.** 2, one chapter (`30_Patterns--Observer`, 2026-10-11)
+- Bruce: "vague". "*Observer* removes one coupling and keeps another."
+  -> "*Observer* decouples the thermometer from its responders and
+  leaves the responders coupled to the thermometer."
+- "Of the two additions, only the telling moves out" -> the sentence
+  names the two additions, the comparison and the announcement, and
+  which one moves
+
+**Home.** this file; a cousin of R9 (name the concrete thing).
+
+### C34. Lay out a compressed consequence as steps (additive)
+
+**Test.** A sentence carries a situation, what it would require, and
+what follows, in one chain ("so one call to several responders could
+produce several answers, or none"), or states an obligation as a lapse
+("a caller can forget to make the call"). Write the situation, then
+what it requires, then what follows until that is met.
+
+**Keep when.** The consequence is one step, and the sentence states it.
+
+**Sightings.** 3, one chapter (`30_Patterns--Observer`, 2026-10-11)
+- Bruce's hand: "so one call to several responders could produce
+  several answers, or none" -> three sentences: the situation, the
+  rule a return value would require, and what returning `None` removes
+- "a caller can forget to make the call" -> the obligation (the client
+  must call `announce()`) and "Until it does, the responders hold
+  stale data."
+- Bruce's hand: the `fields()` paragraph laid out runtime first, then
+  the checker's view
+
+**Home.** this file; the deep-review skill (teaching) if promoted.
+
+### C35. A concrete instance in parentheses beside an abstract noun (additive)
+
+**Test.** An example sentence uses an abstract noun ("a widget", "its
+event") with no concrete instance in the sentence. Add one in
+parentheses: "a widget (like a button)".
+
+**Keep when.** The noun is a term the chapter defines, so the reader
+already has its instances.
+
+**Sightings.** 1 (`30_Patterns--Observer`, 2026-10-11, Bruce's hand;
+thin): "a widget keeps a list of handlers and calls each one when its
+event arrives" -> "a widget (like a button) keeps a list of handlers
+and calls each one when its event (a button press) arrives"
+
+**Home.** this file.
 
 ## Retired
 

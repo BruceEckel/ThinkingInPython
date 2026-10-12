@@ -109,7 +109,13 @@ docstring has the mechanics). While the tag still exists:
    narrowed in his note, and a rejection to Retired with his note as
    the reason.
 6. Run `tip edit-patterns` (needs `TYPESAFE_API_KEY`; about five
-   minutes). Report each searched pair's hit count and its strongest
+   minutes). A plain run diffs from the tag, so when the capture read
+   a later range (a capture already ran mid-pass, as chapter 30's did
+   on 2026-09-27), the tag diff records a pile of unmatched pairs
+   marked "needs fault" and searches none of the approved ones; run
+   `tip edit-patterns ARGS="--pair KEY --pair KEY ..."` with the
+   approved pairs' keys instead, and drop any "needs fault" pairs a
+   plain run added. Report each searched pair's hit count and its strongest
    few hits from `build/edit_patterns.md`, and each `unclear` pair,
    whose fault line needs rewording before it can be searched. The
    hits are a worklist for Bruce; do not apply them. A long list is
