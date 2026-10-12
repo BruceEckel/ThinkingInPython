@@ -161,7 +161,7 @@ print(grid)
 
 The grid at `[1]` is [Variables and References](02_Foundations--Tour.md#variables-and-references)
 again.
-`*` binds the same object into every slot, and assignment never copies.
+`*` binds the same object into every slot.
 
 The second `grid` (`[2]`) comes from a *comprehension*:
 a single expression that produces a new list,
