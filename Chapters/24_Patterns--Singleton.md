@@ -776,8 +776,7 @@ The class decorator causes that confusion.
 
 The decorator weakens static checking as well.
 Under `ty` and Pyright,
-`Registry("primary", limit=3)` is a call to `singleton.__call__()`,
-which accepts any arguments and returns `Any`.
+`Registry("primary", limit=3)` is a call to `singleton.__call__(self, *args: Any, **kwargs: Any) -> Any`.
 A wrong argument type passes the check,
 and so does a misspelled attribute on the result.
 Under mypy the name is still the class, so mypy catches both.
@@ -793,7 +792,7 @@ so the first call's arguments win.
 In a class that overrides `__new__()` instead,
 as `singleton_class_variable.py` does, `__new__()` still runs on every call,
 unlike the metaclass form.
-That listing's `__new__()` creates `val` on the first call and appends to it on every call,
+That listing's `__new__()` sets `val = []` on the first call and runs `val.append(arg)` on every call,
 so each later argument joins the shared list instead of being discarded.
 [Metaprogramming](17_Techniques--Metaprogramming.md)
 also covers `__init_subclass__()` and `__set_name__()`,
@@ -853,7 +852,6 @@ Try each exercise before opening its [solution](../Solutions/24_Patterns--Single
     and change the code so the two subclasses keep separate shared state.
 7.  In `singleton_class_variable.py`,
     remove the two lines of `__new__()` that use `val`.
-    Add an `__init__()` that takes `arg`, prints it,
-    and sets `self.val = [arg]`.
+    Add an `__init__(self, arg: str)` that prints `arg` and sets `self.val = [arg]`.
     Predict what `x.val` holds after the three constructions, then run it.
     Explain the result using what `__new__()` returns.

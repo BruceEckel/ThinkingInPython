@@ -621,8 +621,7 @@ pattern carries the trap.
 
 > In `singleton_class_variable.py`,
 > remove the two lines of `__new__()` that use `val`.
-> Add an `__init__()` that takes `arg`, prints it,
-> and sets `self.val = [arg]`.
+> Add an `__init__(self, arg: str)` that prints `arg` and sets `self.val = [arg]`.
 > Predict what `x.val` holds after the three constructions, then run it.
 > Explain the result using what `__new__()` returns.
 
