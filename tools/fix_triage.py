@@ -25,7 +25,9 @@ writes. `apply` reads the cards back (as `ArtifactData`'s `list` with
 `out_dir` saves them) and edits each chapter: the sentence is found by
 its words with any whitespace between them, since the Markdown breaks
 lines within it, and replaced or removed. Reflow is left to `tip
-verify-ch`.
+verify-ch`. `apply` refuses a directory holding a card outside the
+current `hits.json`, since a read into a directory that already holds an
+earlier page's cards leaves them in place.
 """
 
 import argparse
@@ -146,8 +148,24 @@ def pattern(sentence: str) -> re.Pattern[str]:
 
 
 def apply(read_dir: Path) -> int:
+    hits_file = OUT / "hits.json"
+    if not hits_file.exists():
+        print("fix_triage: no hits.json; run export first")
+        return 1
+    known = {h["id"] for h in json.loads(
+        hits_file.read_text(encoding="utf-8"))["hits"]}
+    paths = sorted(read_dir.glob("*.json"))
+    stale = sorted(p.stem for p in paths if p.stem not in known)
+    if stale:
+        print(f"fix_triage: {len(stale)} stale card(s) in {read_dir}, "
+              "not in hits.json:")
+        for name in stale:
+            print(f"  {name}")
+        print("delete them or re-read the page's cards into an empty "
+              "directory")
+        return 1
     cards = []
-    for path in sorted(read_dir.glob("*.json")):
+    for path in paths:
         doc = json.loads(path.read_text(encoding="utf-8"))
         cards.append(doc.get("data", doc))
     tally: dict[str, collections.Counter[str]] = collections.defaultdict(
