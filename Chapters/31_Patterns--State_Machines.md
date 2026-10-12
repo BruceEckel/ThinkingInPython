@@ -33,6 +33,10 @@ class State(Protocol):
     def next(self, event: object) -> State: ...
 ```
 
+An input to the machine is an event: something that happened outside it,
+such as a mouse appearing or a coin dropping.
+The parameter takes that name because `input` belongs to a builtin.
+
 Python does not require this Protocol.
 The Protocol's few lines do two things.
 They give annotations a type to name.
