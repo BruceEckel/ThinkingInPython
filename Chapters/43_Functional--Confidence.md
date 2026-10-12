@@ -211,7 +211,8 @@ Sending the calls to a worker adds requirements of its own.
 Each argument and each result pickles to cross the process boundary.
 The function pickles as its qualified name,
 so `count_primes()` must sit at the top level of a module a worker can import.
-A `lambda` or a closure fails with a `PicklingError`,
+A `lambda` or a [closure](40_Functional--Foundations.md#closures)
+fails with a `PicklingError`,
 and that rules out two shapes these chapters use often.
 A `functools.partial` pickles as its wrapped function plus its bound arguments.
 The `if __name__ == "__main__"` guard exists for the same reason.
