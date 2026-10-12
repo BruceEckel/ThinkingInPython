@@ -20,7 +20,8 @@ In C++ or Java, the language allocates storage for such a field in each object b
 so a programmer from those languages expects per-object storage here too.
 A Python class attribute corresponds to a C++ or Java `static` field.
 No syntax in a Python class body allocates a per-object field.
-Assigning through `self` inside a method creates that storage instead.
+An assignment through `self` inside a method,
+such as `self.x = x` in a constructor, creates that storage instead.
 
 ```python
 # class_attribute_confusion.py
@@ -543,6 +544,7 @@ print(vars(B)["x"], vars(B())["x"])
 and the two behave in opposite ways.
 In `inside_objects.py` the `100` lives on the class and every instance reads it.
 In `real_defaults.py` it is a default argument,
+`__init__(self, x: int = 100) -> None`,
 and `self.x = x` runs on every construction,
 giving each object its own storage before anything can read it.
 
