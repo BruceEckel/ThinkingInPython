@@ -680,8 +680,6 @@ def test_counts_are_independent_per_function() -> None:
 
 The function form can keep a count too,
 in a variable of the decorator's body that `wrapper()` updates through [`nonlocal`](40_Functional--Foundations.md#closures).
-That variable is visible only inside the closure,
-while `hello.count` is an attribute any caller can read.
 The wrapper's own `__dict__` could hold the count as well,
 but the type checker reports every dotted access to an attribute stored there,
 so call state goes in a closure or an instance.
@@ -1084,7 +1082,7 @@ Instead, the toppings become decorators.
 A plain pizza knows its own cost and description.
 A topping wraps a pizza at runtime, adds to the cost,
 and adds to the description.
-Because a topping is a pizza, you can wrap a topping in another topping.
+A topping can wrap another topping, because a topping is a pizza.
 
 ![Each topping wraps a Pizza and is itself a Pizza](_images/decorator_pattern)
 
@@ -1165,8 +1163,8 @@ where a price change touches every class that includes that topping.
 A `Pizza` with a `toppings: list[Topping]` field,
 summing each topping's `add_cost` and joining its name,
 solves the same combinatorial problem, with no wrapping and no `Protocol`.
-Here, where a topping contributes data (a number and a name),
-that list is the simpler design.
+That list is the simpler design here, where a topping contributes data
+(a number and a name).
 The *Decorator* pattern becomes the simpler design when a topping needs behavior,
 not just data: a topping that changes how `cost` rounds,
 adds a description only under some condition,
