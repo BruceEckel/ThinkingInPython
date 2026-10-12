@@ -364,7 +364,9 @@ def test_repeat_rejects_times_below_one(times: int) -> None:
 
 ## Decorators With Optional Parentheses
 
-`trace` takes no arguments, but `repeat` always does.
+`trace(func: Callable[P, R])` is applied bare, as `@trace`,
+but `repeat(times: int)` is always applied with arguments,
+as `@repeat(times=3)`.
 A decorator can support both conventions at once, `@name` and `@name(...)`,
 letting a caller add arguments only when the defaults do not fit.
 `pytest.fixture` and `click.command` both work this way.
@@ -425,7 +427,9 @@ if __name__ == "__main__":
 The second overload returns the shape `repeat.py` takes apart,
 now under the name `Decorator[P, R]`:
 a generic alias whose parameters are the wrapped function's.
-`func` defaults to `None`, and the body branches on `callable(func)`.
+The implementation declares `func: Callable[P, R] | None = None`,
+and its last line, `return decorate(func) if callable(func) else decorate`,
+branches on `callable(func)`.
 Called bare, `func` is `one`, `callable(func)` is `True`,
 so `label` decorates it immediately by calling `decorate(func)`.
 Called with arguments, `func` stays `None`, `callable(func)` is `False`,
