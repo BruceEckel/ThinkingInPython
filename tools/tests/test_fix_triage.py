@@ -191,3 +191,35 @@ def test_direct_commit_skips_a_failed_gate(
     assert "gate failed: 30" in out
     assert "  boom" in out
     assert "Observers run." in chapter.read_text(encoding="utf-8")
+
+
+def test_one_failed_gate_holds_every_commit(
+        chapter: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+        capsys: pytest.CaptureFixture[str]) -> None:
+    direct_setup(chapter, tmp_path, monkeypatch, flag=True)
+    other = tmp_path / "31_C--D.md"
+    other.write_text("A sentence to rewrite.\n", encoding="utf-8")
+    out = tmp_path / "out"
+    hits = json.loads((out / "hits.json").read_text(encoding="utf-8"))
+    hits["hits"].append({"id": "c", "pair": "p", "file": "31_C--D.md",
+                         "line": 1, "sentence": "A sentence to rewrite."})
+    (out / "hits.json").write_text(json.dumps(hits), encoding="utf-8",
+                                   newline="\n")
+    props = json.loads((out / "proposals.json").read_text(encoding="utf-8"))
+    props["c"] = {"rewrite": "A rewritten sentence."}
+    (out / "proposals.json").write_text(json.dumps(props), encoding="utf-8",
+                                        newline="\n")
+    commits: list[str] = []
+    monkeypatch.setattr(
+        fix_triage, "run_gate",
+        lambda nn: (1, "boom\n") if nn == "31" else (0, ""))
+    monkeypatch.setattr(
+        fix_triage, "commit_chapter",
+        lambda file, message: commits.append(file) or "x")
+    assert fix_triage.direct(commit=True) == 1
+    assert commits == []
+    out_text = capsys.readouterr().out
+    assert "gate failed: 31" in out_text
+    assert "1 gate(s) failed; nothing committed" in out_text
+    assert "Observers run." in chapter.read_text(encoding="utf-8")
+    assert other.read_text(encoding="utf-8") == "A rewritten sentence.\n"

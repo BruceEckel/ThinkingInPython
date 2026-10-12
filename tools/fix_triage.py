@@ -34,8 +34,10 @@ earlier page's cards leaves them in place.
 A pair marked `"direct": true` in `edit_pairs.json` skips the page. The
 flag is set after a page where Bruce applied the proposals wholesale.
 `direct` applies the proposed rewrites to the chapters. With `--commit`
-it gates each edited chapter with `tip verify-ch` and commits it, one
-chapter per commit, so Bruce reviews the git diff. Deletions and
+it gates every edited chapter with `tip verify-ch` and, once all the
+gates pass, commits them one chapter per commit, so Bruce reviews the
+git diff; one failed gate holds every commit, so the batch is never
+half committed. Deletions and
 proposals without a rewrite are listed and left for the session, which
 reads the next sentence for a lost antecedent. A pair without the flag
 is refused.
@@ -342,14 +344,19 @@ def direct(commit: bool = False, trailer: str = "",
     with concurrent.futures.ThreadPoolExecutor(max(1, jobs)) as pool:
         results = list(pool.map(
             lambda f: run_gate(chapter_number(f)), files))
-    for file, (code, output) in zip(files, results):
+    bad = [(chapter_number(f), out)
+           for f, (code, out) in zip(files, results) if code != 0]
+    for nn, output in bad:
+        print(f"gate failed: {nn}")
+        for line in output.splitlines()[-30:]:
+            print(f"  {line}")
+    if bad:
+        # Every edit stays in the working tree, so one fix and one
+        # rerun finish the batch with no chapter committed ahead of it.
+        print(f"{len(bad)} gate(s) failed; nothing committed")
+        return 1
+    for file in files:
         nn = chapter_number(file)
-        if code != 0:
-            print(f"gate failed: {nn}")
-            for line in output.splitlines()[-30:]:
-                print(f"  {line}")
-            status = 1
-            continue
         message = commit_message(nn, done[file], used[file], pairs,
                                  trailer)
         print(f"committed {nn}: {commit_chapter(file, message)}")
