@@ -8,7 +8,7 @@
 A test you wrote last week starts failing about one run in five.
 The function it calls computes a total price, and the math is right.
 Three calls down, a helper that formats currency reads a configuration service and writes to an audit log.
-None of that is in any signature on the path.
+Every signature on the path hides the read and the write.
 
 This book has emphasized the benefits of pure functions in numerous places:
 
@@ -260,7 +260,8 @@ The check runs once, in `__post_init__()`,
 when `NonZero(...)` builds the instance.
 Every function that receives a `NonZero`, including `slope()`,
 inherits that guarantee.
-`slope()` cannot divide by zero, so it needs no `try` and no `Result` to say so.
+`slope()` cannot divide by zero, so it returns `rise / run.value` directly,
+as a `float` rather than a `Result`.
 
 ### Combine the First and Third
 
