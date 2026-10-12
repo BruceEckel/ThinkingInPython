@@ -157,6 +157,15 @@ docstring has the mechanics). While the tag still exists:
    25 and edited two, so a hit below 0.8 is as real as one above it,
    and a pair's `floor` is raised only when a page shows the lower
    band skipped.
+   A pair marked `"direct": true` in `edit_pairs.json` (set, with a
+   `direct_basis`, after a page where Bruce applied the proposals
+   wholesale) skips the page. Run `export`, have the agents write
+   `proposals.json` as usual, then run
+   `uv run python -m tools.fix_triage direct --commit --trailer
+   "Co-Authored-By: ..."` with the session's attribution line. It
+   gates each chapter with `tip verify-ch` and commits one chapter
+   per commit. Read the deletions it lists, repair any seam
+   yourself, and report the commits so Bruce reviews the diff.
 
 ## Step 4: verify and commit
 

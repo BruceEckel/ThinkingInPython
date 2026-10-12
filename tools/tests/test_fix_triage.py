@@ -101,3 +101,93 @@ def test_cards_all_in_hits_json_are_applied(
          sentence="The subject calls them.", rewrite="Observers run.")
     assert fix_triage.apply(tmp_path / "cards") == 0
     assert "Observers run.\n" in chapter.read_text(encoding="utf-8")
+
+
+def direct_setup(chapter: Path, tmp_path: Path,
+                 monkeypatch: pytest.MonkeyPatch,
+                 flag: bool) -> None:
+    pair = {"file": "30_A--B.md", "line": 1,
+            "fault": "A first claim. A second claim."}
+    if flag:
+        pair["direct"] = True
+    monkeypatch.setattr(
+        fix_triage.judgments, "load", lambda path: {"p": pair})
+    hits = [
+        {"id": "a", "pair": "p", "file": "30_A--B.md", "line": 4,
+         "sentence": "The subject calls them."},
+        {"id": "b", "pair": "p", "file": "30_A--B.md", "line": 3,
+         "sentence": "This paragraph says what the text does."}]
+    out = tmp_path / "out"
+    (out / "hits.json").write_text(json.dumps(
+        {"faults": {}, "hits": hits}), encoding="utf-8", newline="\n")
+    (out / "proposals.json").write_text(json.dumps({
+        "a": {"rewrite": "Observers run."},
+        "b": {"delete": True}}), encoding="utf-8", newline="\n")
+
+
+def test_direct_refuses_a_pair_without_the_flag(
+        chapter: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+        capsys: pytest.CaptureFixture[str]) -> None:
+    before = chapter.read_text(encoding="utf-8")
+    direct_setup(chapter, tmp_path, monkeypatch, flag=False)
+    assert fix_triage.direct() == 1
+    assert "not marked direct" in capsys.readouterr().out
+    assert chapter.read_text(encoding="utf-8") == before
+
+
+def test_direct_applies_rewrites_and_leaves_deletions(
+        chapter: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+        capsys: pytest.CaptureFixture[str]) -> None:
+    direct_setup(chapter, tmp_path, monkeypatch, flag=True)
+    assert fix_triage.direct() == 0
+    text = chapter.read_text(encoding="utf-8")
+    assert "Observers run." in text
+    assert "This paragraph says what the text does." in text
+    out = capsys.readouterr().out
+    assert "left for the session (deletion)" in out
+    assert "direct: 1 rewrite(s) in 1 chapter(s), 1 left" in out
+
+
+def test_direct_commit_runs_the_gate_per_chapter(
+        chapter: Path, tmp_path: Path,
+        monkeypatch: pytest.MonkeyPatch) -> None:
+    direct_setup(chapter, tmp_path, monkeypatch, flag=True)
+    gates: list[str] = []
+    commits: list[tuple[str, str]] = []
+
+    def gate(nn: str) -> tuple[int, str]:
+        gates.append(nn)
+        return 0, ""
+
+    def commit(file: str, message: str) -> str:
+        commits.append((file, message))
+        return "abc1234"
+
+    monkeypatch.setattr(fix_triage, "run_gate", gate)
+    monkeypatch.setattr(fix_triage, "commit_chapter", commit)
+    assert fix_triage.direct(commit=True, trailer="Co-Authored-By: X") == 0
+    assert gates == ["30"]
+    [(file, message)] = commits
+    assert file == "30_A--B.md"
+    assert message.startswith(
+        "Chapter 30: 1 sentence from the direct fault search")
+    assert "Fault: A first claim." in message
+    assert message.splitlines()[-1] == "Co-Authored-By: X"
+
+
+def test_direct_commit_skips_a_failed_gate(
+        chapter: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+        capsys: pytest.CaptureFixture[str]) -> None:
+    direct_setup(chapter, tmp_path, monkeypatch, flag=True)
+    commits: list[str] = []
+    monkeypatch.setattr(
+        fix_triage, "run_gate", lambda nn: (1, "boom\n"))
+    monkeypatch.setattr(
+        fix_triage, "commit_chapter",
+        lambda file, message: commits.append(file) or "x")
+    assert fix_triage.direct(commit=True) == 1
+    assert commits == []
+    out = capsys.readouterr().out
+    assert "gate failed: 30" in out
+    assert "  boom" in out
+    assert "Observers run." in chapter.read_text(encoding="utf-8")

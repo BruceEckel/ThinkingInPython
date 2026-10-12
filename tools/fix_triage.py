@@ -13,6 +13,8 @@ them per fault so the pair's floor can be revisited.
     uv run python -m tools.fix_triage export PAIR [PAIR ...]
     uv run python -m tools.fix_triage seed
     uv run python -m tools.fix_triage apply build/fix_triage/read/cards
+    uv run python -m tools.fix_triage direct [--commit] [--trailer TEXT]
+        [--jobs N]
 
 `export` writes `build/fix_triage/hits.json`, every hit at or above
 each pair's floor, with a stable id per hit. PAIR is a pair key from
@@ -28,13 +30,24 @@ lines within it, and replaced or removed. Reflow is left to `tip
 verify-ch`. `apply` refuses a directory holding a card outside the
 current `hits.json`, since a read into a directory that already holds an
 earlier page's cards leaves them in place.
+
+A pair marked `"direct": true` in `edit_pairs.json` skips the page. The
+flag is set after a page where Bruce applied the proposals wholesale.
+`direct` applies the proposed rewrites to the chapters. With `--commit`
+it gates each edited chapter with `tip verify-ch` and commits it, one
+chapter per commit, so Bruce reviews the git diff. Deletions and
+proposals without a rewrite are listed and left for the session, which
+reads the next sentence for a lost antecedent. A pair without the flag
+is refused.
 """
 
 import argparse
 import collections
+import concurrent.futures
 import hashlib
 import json
 import re
+import subprocess
 import sys
 from pathlib import Path
 from typing import Any
@@ -147,6 +160,40 @@ def pattern(sentence: str) -> re.Pattern[str]:
     return re.compile(r"\s+".join(re.escape(w) for w in sentence.split()))
 
 
+def edit_chapters(
+        edits: dict[str, list[tuple[str, str, int]]]) -> list[str]:
+    """Replace sentences in chapters; return the `file:line` misses.
+
+    `edits` maps a chapter file to (sentence, new text, line) triples.
+    New text "" deletes the sentence.
+    """
+    failed = []
+    for file, todo in sorted(edits.items()):
+        path = CHAPTERS_DIR / file
+        text = path.read_text(encoding="utf-8")
+        edited = 0
+        for sentence, new, line in todo:
+            m = pattern(sentence).search(text)
+            if m is None:
+                failed.append(f"{file}:{line}")
+                continue
+            start, end = m.start(), m.end()
+            if not new:
+                # Take the separating whitespace after the sentence too,
+                # or a blank remains where it stood.
+                while end < len(text) and text[end] in " \t":
+                    end += 1
+                if end < len(text) and text[end] == "\n" and (
+                        start == 0 or text[start - 1] == "\n"):
+                    end += 1
+            text = text[:start] + new + text[end:]
+            edited += 1
+        if edited:
+            path.write_text(text, encoding="utf-8", newline="\n")
+            print(f"{file}: {edited} edit(s)")
+    return failed
+
+
 def apply(read_dir: Path) -> int:
     hits_file = OUT / "hits.json"
     if not hits_file.exists():
@@ -175,29 +222,12 @@ def apply(read_dir: Path) -> int:
         tally[c["pair"]][c.get("decision") or "undecided"] += 1
         if c.get("decision") in ("apply", "delete"):
             edits[c["file"]].append(c)
-    failed = []
-    for file, todo in sorted(edits.items()):
-        path = CHAPTERS_DIR / file
-        text = path.read_text(encoding="utf-8")
-        for c in todo:
-            m = pattern(c["sentence"]).search(text)
-            if m is None:
-                failed.append(f"{file}:{c['line']}")
-                continue
-            new = ("" if c["decision"] == "delete"
-                   else " ".join(c["rewrite"].split()))
-            start, end = m.start(), m.end()
-            if not new:
-                # Take the separating whitespace after the sentence too,
-                # or a blank remains where it stood.
-                while end < len(text) and text[end] in " \t":
-                    end += 1
-                if end < len(text) and text[end] == "\n" and (
-                        start == 0 or text[start - 1] == "\n"):
-                    end += 1
-            text = text[:start] + new + text[end:]
-        path.write_text(text, encoding="utf-8", newline="\n")
-        print(f"{file}: {len(todo)} edit(s)")
+    failed = edit_chapters({
+        file: [(c["sentence"],
+                "" if c["decision"] == "delete"
+                else " ".join(c["rewrite"].split()), c["line"])
+               for c in todo]
+        for file, todo in edits.items()})
     pairs = judgments.load(PAIRS_FILE)
     for k, counts in tally.items():
         p = pairs.get(k)
@@ -207,6 +237,123 @@ def apply(read_dir: Path) -> int:
     for where in failed:
         print(f"not found, left alone: {where}")
     return 1 if failed else 0
+
+
+def run_gate(nn: str) -> tuple[int, str]:
+    """Run the chapter gate; return its exit code and output."""
+    r = subprocess.run(
+        ["uv", "run", "tip", "verify-ch", f"CH={nn}", "ISOLATED=1"],
+        capture_output=True, text=True, cwd=ROOT)
+    return r.returncode, r.stdout + r.stderr
+
+
+def commit_chapter(file: str, message: str) -> str:
+    """Commit one chapter file alone; return the short sha."""
+    rel = f"Chapters/{file}"
+    subprocess.run(["git", "add", "--", rel], check=True, cwd=ROOT)
+    subprocess.run(["git", "commit", "-q", "-m", message, "--", rel],
+                   check=True, cwd=ROOT)
+    r = subprocess.run(["git", "rev-parse", "--short", "HEAD"],
+                       check=True, capture_output=True, text=True,
+                       cwd=ROOT)
+    return r.stdout.strip()
+
+
+def chapter_number(file: str) -> str:
+    return file.split("_", 1)[0]
+
+
+def commit_message(nn: str, n: int, keys: list[str],
+                   pairs: dict[str, dict[str, Any]],
+                   trailer: str) -> str:
+    noun = "sentence" if n == 1 else "sentences"
+    paras = [f"Chapter {nn}: {n} {noun} from the direct fault search"]
+    for k in keys:
+        p = pairs[k]
+        fault = p.get("fault", "")
+        first = fault.split(". ", 1)[0] + "." if ". " in fault else fault
+        paras.append(
+            f"Pair {k} ({p['file']}:{p['line']}), applied without a "
+            f"page because the pair is marked direct. Fault: {first}")
+    if trailer:
+        paras.append(trailer)
+    return "\n\n".join(paras)
+
+
+def direct(commit: bool = False, trailer: str = "",
+           jobs: int = 4) -> int:
+    hits_file = OUT / "hits.json"
+    props_file = OUT / "proposals.json"
+    if not hits_file.exists():
+        print("fix_triage: no hits.json; run export first")
+        return 1
+    if not props_file.exists():
+        print("fix_triage: no proposals.json")
+        return 1
+    hits = json.loads(hits_file.read_text(encoding="utf-8"))["hits"]
+    proposals = json.loads(props_file.read_text(encoding="utf-8"))
+    pairs = judgments.load(PAIRS_FILE)
+    refused = False
+    for k in dict.fromkeys(h["pair"] for h in hits):
+        p = pairs.get(k, {})
+        if not p.get("direct"):
+            where = f"{p['file']}:{p['line']}" if p else k
+            print(f"fix_triage: pair {where} is not marked direct in "
+                  "edit_pairs.json; use seed and a page")
+            refused = True
+    if refused:
+        return 1
+    edits: dict[str, list[tuple[str, str, int]]] = (
+        collections.defaultdict(list))
+    used: dict[str, list[str]] = collections.defaultdict(list)
+    left: list[str] = []
+    for h in hits:
+        prop = proposals.get(h["id"])
+        where = f"{h['file']}:{h['line']}  {h['sentence'][:60]}"
+        if prop is None:
+            left.append(f"no proposal: {where}")
+        elif prop.get("delete"):
+            left.append(f"left for the session (deletion): {where}")
+        elif prop.get("not_fault") or not isinstance(
+                prop.get("rewrite"), str) or not prop["rewrite"].strip():
+            left.append(f"left for the session (no rewrite): {where}")
+        else:
+            edits[h["file"]].append((
+                h["sentence"], " ".join(prop["rewrite"].split()),
+                h["line"]))
+            if h["pair"] not in used[h["file"]]:
+                used[h["file"]].append(h["pair"])
+    failed = edit_chapters(edits)
+    for where in failed:
+        print(f"not found, left alone: {where}")
+    missed: collections.Counter[str] = collections.Counter(
+        f.rpartition(":")[0] for f in failed)
+    counts = {f: len(todo) - missed[f] for f, todo in edits.items()}
+    done = {f: n for f, n in counts.items() if n > 0}
+    for line in left:
+        print(line)
+    total = sum(done.values())
+    print(f"direct: {total} rewrite(s) in {len(done)} chapter(s), "
+          f"{len(left)} left for the session")
+    status = 1 if failed else 0
+    if not commit or not done:
+        return status
+    files = sorted(done)
+    with concurrent.futures.ThreadPoolExecutor(max(1, jobs)) as pool:
+        results = list(pool.map(
+            lambda f: run_gate(chapter_number(f)), files))
+    for file, (code, output) in zip(files, results):
+        nn = chapter_number(file)
+        if code != 0:
+            print(f"gate failed: {nn}")
+            for line in output.splitlines()[-30:]:
+                print(f"  {line}")
+            status = 1
+            continue
+        message = commit_message(nn, done[file], used[file], pairs,
+                                 trailer)
+        print(f"committed {nn}: {commit_chapter(file, message)}")
+    return status
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -220,6 +367,14 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("seed", help="join hits and proposals into cards")
     a = sub.add_parser("apply", help="edit the chapters from the cards")
     a.add_argument("read_dir", type=Path)
+    d = sub.add_parser(
+        "direct", help="apply the proposals without a page")
+    d.add_argument("--commit", action="store_true",
+                   help="gate and commit each chapter")
+    d.add_argument("--trailer", default="",
+                   help="last paragraph of each commit message")
+    d.add_argument("--jobs", type=int, default=4,
+                   help="gates to run at once (default 4)")
     ap.add_argument("--dir", type=Path, default=OUT,
                     help="working directory for this batch (default "
                          "build/fix_triage)")
@@ -229,6 +384,8 @@ def main(argv: list[str] | None = None) -> int:
         return export(args.pairs)
     if args.command == "seed":
         return seed()
+    if args.command == "direct":
+        return direct(args.commit, args.trailer, args.jobs)
     return apply(args.read_dir)
 
 

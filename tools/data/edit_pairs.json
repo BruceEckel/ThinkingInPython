@@ -839,7 +839,9 @@
    "after": 0.09
   },
   "floor": 0.7,
-  "floor_basis": "fix triage 2026-10-12: all 25 hits at 0.70 or more (22 of them below 0.8) were applied, two with small wording edits, so the default 0.7 holds; a 0.8 floor would have dropped 22 real hits"
+  "floor_basis": "fix triage 2026-10-12: all 25 hits at 0.70 or more (22 of them below 0.8) were applied, two with small wording edits, so the default 0.7 holds; a 0.8 floor would have dropped 22 real hits",
+  "direct": true,
+  "direct_basis": "set 2026-10-12: the 2026-10-12 page applied all 25 proposals, two with small wording edits, and skipped none"
  },
  "04b10067be177c8a": {
   "file": "30_Patterns--Observer.md",
