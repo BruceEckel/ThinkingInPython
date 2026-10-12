@@ -559,7 +559,8 @@ Each makes one call per node, leaf or group,
 and each node's result flows up to its parent.
 Only the value a node returns differs,
 an `int` in one walk and a `str` in the other.
-The tree carries no meaning of its own, so a new operation is one more walker.
+The tree holds the structure and each walker supplies the meaning,
+so a new operation is one more walker.
 
 Adding `to_infix()` without editing a node class is the ability [*Visitor*](33_Patterns--Visitor.md)
 exists to provide: new operations over an existing hierarchy,
