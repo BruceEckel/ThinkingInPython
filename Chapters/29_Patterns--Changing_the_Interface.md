@@ -152,7 +152,8 @@ A checker that accepts the rename, as mypy does,
 compares the types in an override and skips the name of any parameter a caller can also pass by position.
 
 The rename is the smaller of the two changes.
-`WhatIUse2.op()` also changes the parameter's type.
+`WhatIUse2.op()` also changes the parameter's type,
+from `what_i_want: WhatIWant` to `item: WhatIWant | WhatIHave`.
 The base version accepts a `WhatIWant`,
 and the override accepts a `WhatIWant` or a `WhatIHave`.
 An override may widen what it accepts.
