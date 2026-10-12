@@ -212,7 +212,8 @@ print(4_000 < heads < 6_000)
 #: True
 ```
 
-`count_heads()` needs a `Flip` and produces an `int`.
+`count_heads()` declares `-> Depend[Flip, int]`,
+so it needs a `Flip` and produces an `int`.
 Its body does not call `random`, and no parameter carries a seed or a source.
 `Ask` and `Tell` each carry a payload the request delivers,
 whereas `Flip`'s whole content is its type and the `bool` it produces.
@@ -1578,7 +1579,7 @@ def save_user(user: str) -> Effect[
     return result
 ```
 
-`retry()` takes a `Schedule` and decorates a function that returns an Effect:
+`retry(schedule: Schedule[A])` builds a decorator for a function that returns an Effect:
 
 ```python
 # retrying.py
