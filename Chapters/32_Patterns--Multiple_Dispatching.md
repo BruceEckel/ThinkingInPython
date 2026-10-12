@@ -198,8 +198,9 @@ and that declaration repeats every class's method names.
 The table version keeps the checking and declares each name once.
 Its answers are rows in one dictionary,
 so a class is complete the moment it inherits `compete()`.
-Its `Item` declares the one method the dispatch needs, `compete()`,
-so the opponent parameter takes `Item`.
+Its `Item` declares the one method the dispatch needs,
+so the opponent parameter is typed `Item`:
+`compete(self, item: Item) -> Outcome`.
 
 ## One Lookup in a Table
 
