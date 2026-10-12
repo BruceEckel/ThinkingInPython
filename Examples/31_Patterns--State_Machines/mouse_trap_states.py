@@ -1,7 +1,6 @@
 # mouse_trap_states.py
 from typing import ClassVar
 from mouse_action import MouseAction
-from mouse_moves import MOVES
 from state import State
 from state_machine import StateMachine
 
@@ -61,32 +60,3 @@ class MouseTrap(StateMachine):
 
     def __init__(self) -> None:
         super().__init__(MouseTrap.waiting)
-
-MouseTrap().run_all(MOVES)
-#: Broadcasting cheese smell
-#: Waiting mouse appears -> Luring
-#: Presenting Cheese, door open
-#: Luring mouse runs away -> Waiting
-#: Broadcasting cheese smell
-#: Waiting mouse appears -> Luring
-#: Presenting Cheese, door open
-#: Luring mouse enters trap -> Trapping
-#: Closing door
-#: Trapping mouse escapes -> Waiting
-#: Broadcasting cheese smell
-#: Waiting mouse appears -> Luring
-#: Presenting Cheese, door open
-#: Luring mouse enters trap -> Trapping
-#: Closing door
-#: Trapping mouse trapped -> Holding
-#: Mouse caught
-#: Holding mouse removed -> Waiting
-#: Broadcasting cheese smell
-
-# ESCAPES has no case in Waiting, so case _
-# fires and the machine stays at Waiting:
-trap = MouseTrap()
-#: Broadcasting cheese smell
-trap.run_all([MouseAction.ESCAPES])
-#: Waiting mouse escapes -> Waiting
-#: Broadcasting cheese smell

@@ -14,7 +14,8 @@ version's `next()` raises a `RuntimeError`.
 This complements the chapter's other figure, `vending_story.svg`, which
 draws the vending machine's states and transitions as a static graph.
 The names, inputs, and printed lines come from `mouse_action.py`,
-`mouse_moves.py`, `mouse_trap_states.py`, and `mouse_trap_tables.py`
+`mouse_moves.py`, `mouse_trap_states.py`, `mouse_trap_tables.py`,
+`mouse_trap_states_demo.py`, and `mouse_trap_tables_demo.py`
 and their `#:` markers.
 """
 
@@ -73,7 +74,7 @@ def edge(a: Point, b: Point) -> str:
 
 def trace() -> tuple[str, float]:
     """The header, the grid, and the nine rows; the bottom's y."""
-    b = text(EX, 22, "MouseTrap().run_all(moves)", 12, bold=True)
+    b = text(EX, 22, "MouseTrap().run_all(MOVES)", 12, bold=True)
     b += text(EX, 38, "each row: current_state.next(input_) returns the "
               "next state (red), and run() on it prints", 10, MUTED)
     b += text(EX, HY + 18, "input", 11, MUTED)

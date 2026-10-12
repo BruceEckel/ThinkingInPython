@@ -115,7 +115,6 @@ each state class defines its `run()` behavior and decides its next state with a 
 # mouse_trap_states.py
 from typing import ClassVar
 from mouse_action import MouseAction
-from mouse_moves import MOVES
 from state import State
 from state_machine import StateMachine
 
@@ -175,6 +174,15 @@ class MouseTrap(StateMachine):
 
     def __init__(self) -> None:
         super().__init__(MouseTrap.waiting)
+```
+
+The demo file runs the trap through the nine moves:
+
+```python
+# mouse_trap_states_demo.py
+from mouse_action import MouseAction
+from mouse_moves import MOVES
+from mouse_trap_states import MouseTrap
 
 MouseTrap().run_all(MOVES)
 #: Broadcasting cheese smell
@@ -206,7 +214,7 @@ trap.run_all([MouseAction.ESCAPES])
 #: Broadcasting cheese smell
 ```
 
-The code at the bottom of the file builds a `MouseTrap` and runs it through every move in `MOVES`.
+`mouse_trap_states_demo.py` builds a `MouseTrap` and runs it through every move in `MOVES`.
 `MouseTrap` holds all the possible states as class attributes and sets up the initial state.
 A state class stores nothing, so each state can be one shared object.
 A single `Waiting` serves every `MouseTrap` and every visit to that state.
@@ -314,9 +322,7 @@ The tables filled in at the bottom of the file hold the transitions:
 ```python
 # mouse_trap_tables.py
 from typing import ClassVar, override
-from exceptions import expect
 from mouse_action import MouseAction
-from mouse_moves import MOVES
 from state_machine import StateMachine
 from table_state import TableState
 
@@ -365,6 +371,16 @@ MouseTrap.trapping.transitions = {
 MouseTrap.holding.transitions = {
     MouseAction.REMOVED: MouseTrap.waiting,
 }
+```
+
+The demo file differs in how it treats the unexpected input:
+
+```python
+# mouse_trap_tables_demo.py
+from exceptions import expect
+from mouse_action import MouseAction
+from mouse_moves import MOVES
+from mouse_trap_tables import MouseTrap
 
 MouseTrap().run_all(MOVES)
 #: Broadcasting cheese smell
@@ -388,9 +404,9 @@ MouseTrap().run_all(MOVES)
 #: Broadcasting cheese smell
 
 # ESCAPES is not a key in Waiting.transitions:
-trap2 = MouseTrap()
+trap = MouseTrap()
 #: Broadcasting cheese smell
-expect(RuntimeError, trap2.run_all, [MouseAction.ESCAPES])
+expect(RuntimeError, trap.run_all, [MouseAction.ESCAPES])
 #: [RuntimeError] Waiting has no transition for mouse
 #: escapes
 ```
@@ -402,8 +418,8 @@ the tables read more easily than the `match` statements.
 
 The two versions also differ on an unexpected input,
 one the current state does not name.
-Every one of the nine moves in the file matches a transition out of the current state.
-So both listings end with one more call,
+Every one of the nine moves in `MOVES` matches a transition out of the current state.
+So both demo files end with one more call,
 which feeds `MouseAction.ESCAPES` to a fresh trap in `Waiting`.
 Neither `Waiting`'s `match` nor its table names that input.
 Version 1 prints `Broadcasting cheese smell` a second time.

@@ -7,7 +7,7 @@
       <path d="M0.5,0.5 L17.4,6 L0.5,11.5 L5,6 Z" fill="#8b1a1a" stroke="#8b1a1a" stroke-width="0.8" stroke-linejoin="round"/>
     </marker>
   </defs>
-  <text x="20" y="22" font-size="12" fill="#1a1612" font-weight="bold" text-anchor="start">MouseTrap().run_all(moves)</text>
+  <text x="20" y="22" font-size="12" fill="#1a1612" font-weight="bold" text-anchor="start">MouseTrap().run_all(MOVES)</text>
   <text x="20" y="38" font-size="10" fill="#7a6e62" text-anchor="start">each row: current_state.next(input_) returns the next state (red), and run() on it prints</text>
   <text x="20" y="68" font-size="11" fill="#7a6e62" text-anchor="start">input</text>
   <text x="510" y="68" font-size="11" fill="#7a6e62" text-anchor="start">run() prints</text>
