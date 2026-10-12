@@ -738,7 +738,7 @@ The four forms are one expression with different delimiters,
 so learning the list form teaches all four.
 Brackets when you want a list.
 Braces for a set, or for a dict when a colon separates a key from a value or `**` splices in a mapping.
-Parentheses when the consumer takes values one at a time and does not need them all at once.
+Parentheses when the consumer takes values one at a time.
 A `for` loop when you want the side effect rather than the collection.
 
 The delimiters also decide when the work runs.
