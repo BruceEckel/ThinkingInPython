@@ -708,8 +708,9 @@ so a new kind of item registers itself.
 Once you define the subclass with its symbol, the factory finds it.
 That search is the [registry idea](27_Patterns--Factory.md#the-pythonic-factory-a-dictionary),
 using the class hierarchy as the registry.
-The factory builds the item by calling `item_type()` with no arguments,
-so a new item's `__init__()` must accept none.
+The factory builds the item with `return item_type()`,
+so a new item's `__init__()` must accept no arguments,
+as `Robot`'s `__init__(self) -> None` does.
 `Teleport` requires a target letter, and the loop passes over it,
 because a maze character is one character long and never equals `Teleport`'s empty `symbol`.
 
