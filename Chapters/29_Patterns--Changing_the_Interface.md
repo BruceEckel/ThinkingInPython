@@ -163,7 +163,8 @@ The `match` sends both cases to the inherited `op()`,
 a `WhatIWant` as it is and a `WhatIHave` wrapped in a `ProxyAdapter`.
 
 An override cannot narrow what it accepts.
-The commented-out signature in `adapter_variations.py` takes a `WhatIHave` alone,
+The commented-out signature in `adapter_variations.py`,
+`op(self, item: WhatIHave) -> None`, accepts a `WhatIHave` alone,
 which is all Approach 2 needs for its own callers.
 If you use that signature in place of the union,
 a type checker rejects the override.
@@ -391,8 +392,8 @@ Facade.start_car()
 
 Turning the key primes the pump, and priming starts the engine.
 Each constructor takes the object its method calls.
-`Ignition` takes a `FuelPump`, and `FuelPump` takes an `Engine`,
-so a caller must build the three from the inside out.
+The fields `pump: FuelPump` in `Ignition` and `engine: Engine` in `FuelPump` make a caller build the three from the inside out,
+as `Ignition(FuelPump(Engine()))`.
 These three classes are the "confusing collection of classes and interactions,"
 small enough to read in one glance here.
 In real code, constructing three or thirty classes in the right order is knowledge no caller should need.
