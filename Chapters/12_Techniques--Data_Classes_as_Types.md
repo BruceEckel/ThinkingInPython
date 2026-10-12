@@ -42,7 +42,8 @@ def check(condition: bool, subject: str,
 ```
 
 An exception is a value like any other, and the values it carries deserve names.
-[`@dataclass`](#data-classes) generates the constructor that stores them.
+[`@dataclass`](#data-classes) generates the constructor that stores them,
+`__init__(self, subject: str, reason: str = "")`.
 `subject` is the rejected value as the caller rendered it, such as `Stars(11)`.
 `reason` explains the rejection when the name alone does not,
 such as `needs an @`.
@@ -179,7 +180,8 @@ The problem with DbC is that the contract spreads across every method that touch
 The invariant is the part this chapter replaces.
 `_validate()` states it, and every mutating method must remember to call it.
 That is the same scattering of checks as before, but moved inside the class.
-The class encapsulates the value without constraining it to a set of legal values.
+The class encapsulates the value, but `_number` can still hold any `int`,
+legal or not.
 
 Some values must change in place over their lifetime: a counter,
 a connection's open-or-closed state, a running total.
@@ -265,7 +267,7 @@ print(m)
 ```
 
 `print(m)` uses the generated `__repr__()`,
-which produces the class name and the named argument values.
+which produces the class name followed by each field as `name=value`.
 
 `replace()` returns a copy with some fields changed, leaving the original alone.
 Copying instead of mutating reduces errors.
@@ -421,13 +423,11 @@ With no `__init__()`, `show(B())` keeps finding `x` and `s` on the class,
 tagged `[CV]`, no matter how many `B` instances exist.
 
 `C` starts from the same bare annotations as `A`.
-`@dataclass` reads them to learn what fields exist and in what order,
-then uses that to write the parameter list of `__init__()` and the assignments inside it.
+`@dataclass` reads them, in order, and writes one parameter (`x: int`)
+and one assignment (`self.x = x`) per field.
 `dataclasses.fields()` reports the field list `@dataclass` recorded.
 `@dataclass` stores no value for a field on the class.
 `x` is still absent from `C.__dict__` after decoration, as it was before.
-The generated `__init__()` fulfills the declaration when it runs,
-once per instance.
 That is the difference from `A`: not that `@dataclass` changes the annotations,
 but that it builds an `__init__()` to act on them.
 
@@ -478,14 +478,10 @@ since no instance owns either of them yet.
 and what `@dataclass` generates for each field decides which one keeps the tag.
 
 `x` is an ordinary field.
-`__init__()` takes it as a parameter and runs `self.x = x`,
-so each new `D` gets its own copy at construction.
 That is why `show(D())`'s `x: int = 99` carries no tag.
 It now lives in that instance's own `__dict__`, not on the class.
 
 `s`, declared `ClassVar[str]`, behaves differently.
-`@dataclass` treats a `ClassVar` field as belonging to the class,
-not to any instance, and leaves it out of `__init__()`.
 `__init__(self, x: int = 99) -> None` has no `s` parameter,
 so no constructor call can assign one.
 `s` stays on `D` and keeps its `[CV]` tag no matter how many `D` objects exist.
@@ -565,7 +561,6 @@ then validating it at construction makes it valid for its lifetime.
 
 If you make `Stars` a frozen data class,
 you can guarantee that every `Stars` object is legal.
-`__post_init__()` validates a `Stars` after its fields receive their values.
 The generated `__init__()` calls `__post_init__()` automatically:
 
 ```python
@@ -828,7 +823,7 @@ When the set of values is small and known, the clearest type is an `Enum`.
 An *enumeration* lists its members by name in the class body,
 and those members are the only values the type has.
 As an example, a `BirthDate` contains a month, day, and year.
-A year has twelve months, so `Month` is an `Enum`.
+`Month` is an `Enum`, because a year has a known set of twelve months.
 Each month carries its length and knows how to check a `Day` against it.
 A `BirthDate` then validates across its fields.
 The day must fit the month.
@@ -1143,7 +1138,8 @@ When it need not, a `NamedTuple` is a fine [immutable record](22_Patterns--Data_
 
 ## Inheritance and the Generated `__init__()` {#dataclass-inheritance}
 
-A data class builds its `__init__()` from its fields and assigns them.
+A data class generates an `__init__()` with one parameter per field,
+and its body assigns each one (`self.name = name`).
 It does not call the base class `__init__()`,
 because it cannot know what arguments that constructor expects.
 If you inherit from an ordinary class that sets up state in its own constructor,
@@ -1170,7 +1166,6 @@ print(hasattr(c, "host"), hasattr(c, "url"))
 #: False False
 ```
 
-The generated `__init__()` assigns `name` and stops.
 Because nothing calls `Connection.__init__()`, neither `host` nor `url` exists.
 The omission is easy to miss because `Logged("db")` still succeeds.
 
@@ -1200,9 +1195,8 @@ print(c.url, c.name)
 ```
 
 No field declaration produces `url`.
-`Connection.__init__()` derives it from `host`,
-so printing `url` proves that `__post_init__()` called the base initializer.
-If you delete `__post_init__()`, the same line raises an `AttributeError`.
+If you delete `__post_init__()`,
+`print(c.url, c.name)` raises an `AttributeError`.
 
 If a base `__init__()` instead replaces `self.__dict__`,
 calling it from `__post_init__()` discards the fields the data class just assigned.
@@ -1467,9 +1461,7 @@ print(lighter, hex(lighter.packed))
 
 `Color` is an ordinary class with its channels packed into one `int`,
 so `dataclasses.replace()` rejects it with a `TypeError`.
-`__replace__()` unpacks the channels, applies the changes,
-and hands the result back through the constructor.
-Every implementation takes that shape: recover the constructor arguments,
+Every implementation takes the same shape: recover the constructor arguments,
 override the named ones, rebuild.
 `__init__()` packs a channel dictionary using `SHIFTS`,
 and `channels` unpacks one with the same table, so the two are inverses.
