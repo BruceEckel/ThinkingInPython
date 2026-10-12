@@ -534,8 +534,7 @@ The weak registry runs none of your code when an object goes away.
 Never release a resource in `__del__()`.
 The standard library's file and socket types bend that rule as a diagnostic backstop.
 `io.IOBase` gives every file object a `__del__()` that closes it,
-and a file from `open()` or a `socket.socket` also reports a `ResourceWarning` when it is reclaimed still open,
-catching a forgotten `close()` rather than replacing it:
+and a file from `open()` or a `socket.socket` also reports a `ResourceWarning` when it is reclaimed still open:
 
 ```python
 # resource_warning.py
