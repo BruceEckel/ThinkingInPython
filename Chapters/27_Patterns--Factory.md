@@ -181,9 +181,8 @@ Whereas a factory takes information telling it what to build,
 a generator object does the opposite.
 It holds an internal algorithm and needs no argument to produce the next value.
 
-`shape_name()` takes `n`
-(the maximum number of shapes the generator can produce)
-and returns a generator object.
+`shape_name(n: int) -> Iterator[str]` returns a generator object,
+and `n` is the maximum number of shapes it can produce.
 That object produces names on demand.
 Those names are the arguments to `Shape.factory()`.
 Normally the initialization data comes from outside the system rather than through random generation.
