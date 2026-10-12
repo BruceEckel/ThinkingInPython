@@ -40,8 +40,9 @@ connect your class to the language's operators and built-in functions.
 [Classes](07_Foundations--Classes.md)
 shows how `print()` and `str()` reach a class's `__str__()`.
 
-The `if` exists because you can also use any file as a library module within another program.
-In that case, you want its definitions and none of the code at the bottom of the file.
+When another program imports this file as a library module,
+the `if` keeps the code at the bottom of the file from running,
+so the importer gets the definitions alone.
 Python programmers call this check the *main guard*.
 The condition is true only when you run this file as a script.
 That is, `__name__` is `"__main__"` when you use the command line:
@@ -91,7 +92,7 @@ so restarting is the reliable choice.
 
 ## Importing Names with `from` and `as`
 
-To bring a name into the current namespace, use the `from` keyword:
+Here, the `from` keyword brings `useful_function` into the current namespace:
 
 ```python
 # using_from.py
@@ -465,7 +466,8 @@ which hides the source of each name from a reader and from the tools.
 Name what you import,
 and keep the star for experiments at the interactive prompt.
 
-Neither the underscore nor `__all__` stops `module._name`.
+Code outside the module can still read `module._name`,
+whatever the underscore or `__all__` says.
 Both say which names a caller should use,
 and that agreement lets a module serve as a [façade](29_Patterns--Changing_the_Interface.md#façade)
 over its internals or as a shared single instance
