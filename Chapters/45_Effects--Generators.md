@@ -262,12 +262,12 @@ so only the `send()` call sits there.
 Any other code that could raise it belongs outside,
 such as `next()` on an exhausted answer source.
 
-`interview()` names no source for its answers.
+`interview()` accepts its answers from any driver that calls `send()`.
 Its body is three questions and a `return`,
 with no dictionary and no `input()` call.
 It yields each question and suspends until `send()` supplies the answer.
 `drive()` decides how to answer those questions,
-and it takes the answers as a parameter.
+and it receives the answers through its `answers: dict[Question, Answer]` parameter.
 Swapping the dictionary for a database changes a single argument.
 
 `interview()` and `drive()` form an EMS in miniature.
