@@ -599,7 +599,7 @@ If you hold a `Stars`, it is legal.
 You know it without checking.
 
 That guarantee changes how you write the functions.
-`f1()` and `f2()` take a `Stars` and return a `Stars`.
+`f1()` and `f2()` both declare `(s: Stars) -> Stars`.
 They do not check their argument, because every `Stars` is legal.
 They do not test their result,
 because building the returned `Stars` runs the check.
@@ -1017,7 +1017,8 @@ so a mutable object of an ordinary class you wrote passes as a default and every
 That is the same bug the check exists to prevent.
 Use `default_factory` for any mutable default.
 
-`default_factory` accepts any callable that takes no arguments.
+`field()` types its parameter as `default_factory: Callable[[], _T]`,
+so it accepts any callable that takes no arguments.
 A named function like `make_months()` is one.
 A type is another, which is why `field(default_factory=list)` appears throughout this book.
 Calling `list` builds an empty one.
