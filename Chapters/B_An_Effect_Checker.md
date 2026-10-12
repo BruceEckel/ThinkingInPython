@@ -124,8 +124,8 @@ def lookup(name: str, table: Table) -> Row:
 A key is an `fnmatch` pattern, the wildcard notation of a shell,
 in which `*` matches any run of characters, dots included.
 `lookup()` returns the row of the first pattern that matches.
-Because a dictionary keeps insertion order,
-a specific name goes above the glob that would otherwise match it.
+A specific name goes above the glob that would otherwise match it,
+because a dictionary keeps insertion order.
 `"os.path.join"` is pure, and the `"os.*"` below it is `FileSystem`.
 Whole modules take one line each, which keeps the table short.
 
@@ -983,8 +983,9 @@ which Appendix A's `tracked_greeting.py` cannot do.
 
 [Facts About a Function](#facts-about-a-function)
 predicts the first two findings.
-`ask()` and `tell()` perform `Console` and say `Ask` and `Tell`.
-Adding `hides(Console)` to each clears both findings.
+`tell()` has the shape that section gives `ask()`:
+it declares `Tell` and performs `Console`.
+Adding `hides(Console)` to `ask()` and `tell()` clears both findings.
 The test file confirms that:
 
 - An Effect the body performs and the declared row omits is a finding.
