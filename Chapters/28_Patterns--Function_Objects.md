@@ -203,7 +203,8 @@ so no action needs an inverse.
 
 ### The Late-Binding Trap
 
-Building commands in a loop can produce Python's best-known closure mistake:
+Building commands in a loop can produce Python's best-known [closure](40_Functional--Foundations.md#closures)
+mistake:
 
 ```python
 # late_binding.py
