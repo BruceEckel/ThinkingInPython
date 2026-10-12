@@ -59,7 +59,7 @@ p.g()
 
 ### What the Implementation Supplies
 
-`Implementation` need not have the same interface as `Proxy`.
+`Implementation` can have an interface different from `Proxy`'s.
 `Proxy` qualifies as long as code calls it in place of the implementation.
 That is a looser definition than in *GoF Design Patterns*,
 and relies only on intent.
@@ -191,7 +191,7 @@ p.h()
 ```
 
 `__getattr__()` makes the forwarding generic.
-Because `Proxy` names no methods in `Implementation`,
+Because `Proxy` passes every name it lacks to the implementation,
 it keeps working when you add a method to the implementation.
 `Implementation` here has an `h()` that `proxy_forwarding.py`'s lacks,
 and the proxy forwards `p.h()` with no change to `Proxy`.
