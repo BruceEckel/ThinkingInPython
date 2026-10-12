@@ -874,8 +874,8 @@ expect(TypeError, User, "Guido", 30)
 #: [TypeError] User() takes no arguments
 ```
 
-The checker synthesizes a `User.__init__()` from the field declarations,
-with `name` required and `age` defaulted, as it does for `@dataclass`.
+The checker synthesizes `User.__init__(self, name: str, age: int = 0)` from the field declarations,
+as it does for `@dataclass`.
 It believes the declaration without running `model()`,
 so the call checks clean and fails at runtime.
 This `model()` generates nothing, and `object`'s constructor takes no arguments.
