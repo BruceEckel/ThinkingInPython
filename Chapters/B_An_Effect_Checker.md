@@ -920,7 +920,8 @@ def check(
     return Report(rows, findings)
 ```
 
-`check()` takes source text in a dictionary and a table, and returns a `Report`.
+`check(sources: dict[str, str], table: Table = STDLIB) -> Report` receives each module's source text keyed by module name,
+plus a table.
 It reads no file and prints nothing,
 so a test passes it a string and checks the returned value,
 with no files to create or output to capture.
