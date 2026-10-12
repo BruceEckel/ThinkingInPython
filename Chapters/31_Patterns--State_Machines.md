@@ -182,8 +182,8 @@ so one instance of each is enough.
 Every `MouseTrap` shares that one `Waiting`,
 and a trap that returns to `Waiting` returns to the same object.
 
-Each `next()` is a `match` on the input:
-a `case` for every input the state recognizes,
+Each `next()` performs a `match` on the input,
+providing a `case` for every input the state recognizes,
 and a `case _` that returns the machine's current state.
 Each `case` names its member through the class, as in `MouseAction.APPEARS`.
 A dotted name compares the input with that member,
