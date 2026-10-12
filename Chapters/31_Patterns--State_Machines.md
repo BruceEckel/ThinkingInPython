@@ -13,12 +13,12 @@ The system behaves differently as it moves from state to state.
 
 A [*Template Method*](25_Patterns--Template_Method.md)
 is often used to change states.
-You call `run()` on a state to perform its behavior,
-and you call `next()` with an event to get the state that follows.
+You call `run()` on a state to perform its behavior.
+Providing an input to `next()` moves the machine into its subsequent state.
 
-The chapter shows two designs that differ in one way.
+We look at two designs.
 In the first, each `State` object decides its own next state.
-In the second, a single table holds every transition.
+In the second, a single table holds all transitions.
 
 ## Each State Decides
 
