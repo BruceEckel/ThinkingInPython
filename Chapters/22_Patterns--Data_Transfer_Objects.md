@@ -310,7 +310,7 @@ with expected(TypeError):
 yet `Color(1, 2, 3) == Dimensions(1, 2, 3)` is `True`.
 Equal tuples hash alike, so the two are also the same `dict` key.
 The frozen data classes tell the two apart,
-because a data class's generated `__eq__()` checks the class before the fields.
+because a data class's generated `__eq__()` tests `other.__class__ is self.__class__` before it compares the fields.
 
 A `NamedTuple` inherits ordering from `tuple` the same way,
 and that ordering is as type-blind as equality.
