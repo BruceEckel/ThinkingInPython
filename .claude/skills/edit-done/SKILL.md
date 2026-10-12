@@ -152,6 +152,11 @@ docstring has the mechanics). While the tag still exists:
    deletion: seven of the 16 lost their antecedent ("In that case",
    "that assignment", "For example"), and those seams are repaired
    in the chapter's commit, not put back on the page.
+   The third page (2026-10-12, the narrowed signature-paraphrase
+   fault, 25 hits at 0.70 to 0.85) went the same way: he applied all
+   25 and edited two, so a hit below 0.8 is as real as one above it,
+   and a pair's `floor` is raised only when a page shows the lower
+   band skipped.
 
 ## Step 4: verify and commit
 
