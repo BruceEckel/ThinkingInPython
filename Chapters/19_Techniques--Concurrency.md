@@ -1369,7 +1369,7 @@ and the interpreter runs millions of them per second.
 
 In 1991, the C API exposed those counts to extension authors.
 Easy extensions made Python a coordination language for C libraries and eventually produced the scientific Python stack.
-In exchange, reference counting became part of the compiled binary interface.
+That exposure also made reference counting part of the compiled binary interface.
 Changing how it works breaks every extension.
 
 In 1992, threads arrived, for I/O concurrency rather than for multi-core speed.
