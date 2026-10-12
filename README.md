@@ -369,54 +369,52 @@ I began going back through my Pycon presentations and blog posts and adding thos
 
 For my own bookkeeping.
 
-| Chapter | Edit State |
-|---------|:------:|
-| 01_Introduction.md                        | |
-| 02_Foundations--Tour.md                   | |
-| 03_Foundations--Containers.md             | |
-| 04_Foundations--Control_Flow.md           | |
-| 05_Foundations--Functions.md              | |
-| 06_Foundations--Modules_and_Packages.md   | |
-| 07_Foundations--Classes.md                | |
-| 08_Foundations--Static_Types.md           | |
-| 09_Foundations--Class_Attributes.md       | |
-| 10_Foundations--Cleanup.md                | |
-| 11_Techniques--Testing.md                 | |
-| 12_Techniques--Data_Classes_as_Types.md   | |
-| 13_Techniques--Pattern_Matching.md        | |
-| 14_Techniques--Decorators.md              | |
-| 15_Techniques--Context_Managers.md        | |
-| 16_Techniques--Comprehensions.md          | |
-| 17_Techniques--Metaprogramming.md         | |
-| 18_Techniques--Performance.md             | |
-| 19_Techniques--Concurrency.md             | |
-| 20_Patterns--Rethinking_Objects.md        | |
-| 21_Patterns--Design_Patterns.md           | |
-| 22_Patterns--Data_Transfer_Objects.md     | |
-| 23_Patterns--Iterators.md                 | |
-| 24_Patterns--Singleton.md                 | |
-| 25_Patterns--Template_Method.md           |X|
-| 26_Patterns--Surrogate.md                 |X|
-| 27_Patterns--Factory.md                   |X|
-| 28_Patterns--Function_Objects.md          |X|
-| 29_Patterns--Changing_the_Interface.md    |X|
-| 30_Patterns--Observer.md                  |_|
-| 31_Patterns--State_Machines.md            | |
-| 32_Patterns--Multiple_Dispatching.md      | |
-| 33_Patterns--Visitor.md                   | |
-| 34_Patterns--Composite_and_Interpreter.md | |
-| 35_Patterns--Flyweight.md                 | |
-| 36_Patterns--Memento.md                   | |
-| 37_Patterns--Pattern_Refactoring.md       | |
-| 38_Patterns--Simulation.md                | |
-| 39_Patterns--Pattern_Catalog.md           | |
-| 40_Functional--Foundations.md             | |
-| 41_Functional--Toolkits.md                | |
-| 42_Functional--Error_Handling.md          | |
-| 43_Functional--Confidence.md              | |
-| 44_Effects--Effect_Management.md          | |
-| 45_Effects--Generators.md                 | |
-| 46_Effects--Stateless.md                  | |
-| 47_Effects--Stateless_in_Practice.md      | |
-| A_Effect_Tracking.md                      | |
-| B_An_Effect_Checker.md                    | |
+- ⬜ 01_Introduction.md                        | |
+- ⬜ 02_Foundations--Tour.md                   | |
+- ⬜ 03_Foundations--Containers.md             | |
+- ⬜ 04_Foundations--Control_Flow.md           | |
+- ⬜ 05_Foundations--Functions.md              | |
+- ⬜ 06_Foundations--Modules_and_Packages.md   | |
+- ⬜ 07_Foundations--Classes.md                | |
+- ⬜ 08_Foundations--Static_Types.md           | |
+- ⬜ 09_Foundations--Class_Attributes.md       | |
+- ⬜ 10_Foundations--Cleanup.md                | |
+- ⬜ 11_Techniques--Testing.md                 | |
+- ⬜ 12_Techniques--Data_Classes_as_Types.md   | |
+- ⬜ 13_Techniques--Pattern_Matching.md        | |
+- ⬜ 14_Techniques--Decorators.md              | |
+- ⬜ 15_Techniques--Context_Managers.md        | |
+- ⬜ 16_Techniques--Comprehensions.md          | |
+- ⬜ 17_Techniques--Metaprogramming.md         | |
+- ⬜ 18_Techniques--Performance.md             | |
+- ⬜ 19_Techniques--Concurrency.md             | |
+- ⬜ 20_Patterns--Rethinking_Objects.md        | |
+- ⬜ 21_Patterns--Design_Patterns.md           | |
+- ⬜ 22_Patterns--Data_Transfer_Objects.md     | |
+- ⬜ 23_Patterns--Iterators.md                 | |
+- ⬜ 24_Patterns--Singleton.md                 | |
+- ✅ 25_Patterns--Template_Method.md           |X|
+- ✅ 26_Patterns--Surrogate.md                 |X|
+- ✅ 27_Patterns--Factory.md                   |X|
+- ✅ 28_Patterns--Function_Objects.md          |X|
+- ✅ 29_Patterns--Changing_the_Interface.md    |X|
+- ✅ 30_Patterns--Observer.md                  ||
+- 🚧 31_Patterns--State_Machines.md            | |
+- ⬜ 32_Patterns--Multiple_Dispatching.md      | |
+- ⬜ 33_Patterns--Visitor.md                   | |
+- ⬜ 34_Patterns--Composite_and_Interpreter.md | |
+- ⬜ 35_Patterns--Flyweight.md                 | |
+- ⬜ 36_Patterns--Memento.md                   | |
+- ⬜ 37_Patterns--Pattern_Refactoring.md       | |
+- ⬜ 38_Patterns--Simulation.md                | |
+- ⬜ 39_Patterns--Pattern_Catalog.md           | |
+- ⬜ 40_Functional--Foundations.md             | |
+- ⬜ 41_Functional--Toolkits.md                | |
+- ⬜ 42_Functional--Error_Handling.md          | |
+- ⬜ 43_Functional--Confidence.md              | |
+- ⬜ 44_Effects--Effect_Management.md          | |
+- ⬜ 45_Effects--Generators.md                 | |
+- ⬜ 46_Effects--Stateless.md                  | |
+- ⬜ 47_Effects--Stateless_in_Practice.md      | |
+- ⬜ A_Effect_Tracking.md                      | |
+- ⬜ B_An_Effect_Checker.md                    | |
