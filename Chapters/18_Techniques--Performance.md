@@ -783,9 +783,9 @@ After `heapify()` the smallest element sits at index 0.
 Through Python 3.13, `heapq` built only a min-heap.
 Getting a max-heap meant negating every value going in and out.
 Python 3.14 added `_max` variants
-(`heapify_max()`, `heappush_max()`, `heappop_max()`, and friends)
-that keep the largest item at index 0 instead,
-so the negation trick is no longer necessary:
+(`heapify_max()`, `heappush_max()`, `heappop_max()`, and others)
+that keep the largest item at index 0,
+so a max-heap now stores its values as they are:
 
 ```python
 # max_heap_queue.py
