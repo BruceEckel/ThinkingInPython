@@ -12,7 +12,8 @@ from one object to the next.
 Each implementation represents one state the system can occupy,
 so the system behaves differently as it moves from state to state.
 
-The code that moves the system from one state to the next is often a [*Template Method*](25_Patterns--Template_Method.md),
+A [*Template Method*](25_Patterns--Template_Method.md)
+often moves the system from one state to the next,
 as the following framework for a basic state machine shows.
 You call `run()` on a state to perform its behavior,
 and you pass an "input" object to the state's `next()`,
@@ -36,9 +37,10 @@ class State(Protocol):
 ```
 
 Python does not require this Protocol.
-The Protocol's few lines do two things: annotations can name `State` as a type,
-and a state class that leaves a method out fails the type check wherever the program uses it as a `State`,
-before anything runs.
+The Protocol's few lines do two things.
+They give annotations a type to name.
+They also let the type checker reject a state class that leaves a method out,
+wherever the program uses that class as a `State`, before anything runs.
 
 The `StateMachine` keeps track of the current state,
 which the constructor initializes.
@@ -68,7 +70,7 @@ class StateMachine:
 
 `run_all()` is the template method.
 It defines the flow (report the input, transition, run the new state),
-while the varying behavior lives in each `State`'s `run()` and `next()`.
+while each `State`'s `run()` and `next()` supply the varying behavior.
 [*Template Method*](25_Patterns--Template_Method.md)
 puts the varying steps in a subclass.
 Here they come from the `State` objects the machine holds.
@@ -99,8 +101,8 @@ The members still hash and look up correctly, so they work as dictionary keys.
 `MouseAction("mouse appears")` returns the matching member.
 `mouse_trap_states.py` parses each line of the test input with that call.
 
-A text file supplies the sequence of mouse inputs,
-nine moves that between them exercise every transition in the trap:
+A text file supplies the sequence of mouse inputs.
+Its nine moves exercise every transition in the trap:
 
 ```text
 # mouse_moves.txt
@@ -219,10 +221,10 @@ trap.run_all([MouseAction.ESCAPES])
 #: Waiting: Broadcasting cheese smell
 ```
 
+The code at the bottom of the file builds a `MouseTrap` and runs it through every move read from the text file.
 `MouseTrap` holds all the possible states as class attributes and sets up the initial state.
 A state class stores nothing, so each state can be one shared object.
 A single `Waiting` serves every `MouseTrap` and every visit to that state.
-The code at the bottom of the file builds a `MouseTrap` and runs it through the whole sequence of moves read from the text file.
 
 Each `next()` is a `match` on the event:
 a `case` for every input the state recognizes,
@@ -239,7 +241,8 @@ By the time anything calls `next()`,
 the whole module has run and `MouseTrap` exists.
 
 `StateMachine`'s constructor runs the initial state,
-the construction-starts-the-engine choice that [*Template Method* discourages](25_Patterns--Template_Method.md#dont-start-the-engine-in-the-constructor).
+so constructing the machine starts the engine.
+[*Template Method* discourages that choice](25_Patterns--Template_Method.md#dont-start-the-engine-in-the-constructor).
 Two facts make that choice safe here:
 `MouseTrap.__init__()` assigns nothing after its `super().__init__()` call,
 and no state's `run()` reads anything off the machine.
@@ -255,16 +258,15 @@ A base class could also give the annotations a type to name:
 
 With that base, the type checker rejects the engine,
 since `State` declares neither the `run()` nor the `next()` the engine calls.
-At runtime, Python builds a derived class that defines `run()` alone without complaint,
+At runtime, Python accepts a derived class that defines `run()` alone,
 and the machine runs an instance of it.
-The error waits until `run_all()` calls the missing `next()` and Python raises an `AttributeError`.
+The program fails when `run_all()` calls the missing `next()` and Python raises an `AttributeError`.
 A base whose methods `raise NotImplementedError` satisfies the checker.
 The call to the missing method then raises that `NotImplementedError` from the base,
 with whatever message you write there.
 [*Surrogate*](26_Patterns--Surrogate.md#proxy) shows one more option.
 If you make `State` an `ABC` with `@abstractmethod` on both methods,
-the error moves to the constructor,
-which raises a `TypeError` for a subclass that defines `run()` alone.
+creating an instance of a subclass that defines `run()` alone raises a `TypeError`.
 The type checker reports that construction too,
 so the `ABC` and the Protocol both report the missing method before the program runs.
 The empty base and the `NotImplementedError` base report it at the call.
@@ -277,7 +279,7 @@ spread across many classes.
 The second version puts a table inside each `State` object,
 listing the next state for each input.
 
-A state's table cannot sit in that state's class body,
+A state's class body cannot build that state's table,
 because the entries name the other states,
 and those states exist only after every class definition has run.
 So the classes come first,
@@ -289,8 +291,7 @@ It is an `ABC`, the alternative the first version sets aside,
 because here the base has code to share.
 Every subclass inherits `next()`.
 `TableState`'s `run()` and `next()` have the signatures the `State` Protocol names,
-so the `StateMachine` class from `state_machine.py` drives every `TableState`,
-with no change to that class:
+so the unchanged `StateMachine` class from `state_machine.py` drives every `TableState`:
 
 ```python
 # table_state.py
@@ -314,15 +315,16 @@ class TableState(ABC):
 ```
 
 `TableState.__init__()` starts every state with an empty dict.
-If you forget to fill a state's table,
+If you forget to fill `Waiting`'s table,
 the machine reports `Waiting has no transition for ...` rather than the `AttributeError` a missing `transitions` attribute would produce.
 
-`next()` raises its `RuntimeError` `from None`,
-because the chained `KeyError` would repeat the message.
-Its key is the event the message names.
+The `KeyError` that `next()` catches carries the event as its key,
+and the `RuntimeError` message already names that event.
+So `next()` raises its `RuntimeError` [`from None`](04_Foundations--Control_Flow.md#exception-chaining),
+which drops the chained `KeyError` and its repeat of the event.
 
-The subclasses shrink to their `run()` behavior.
-The transitions live in the tables filled in at the bottom of the file:
+Each subclass now defines `run()` and inherits `next()`.
+The tables filled in at the bottom of the file hold the transitions:
 
 ```python
 # mouse_trap_tables.py
@@ -419,10 +421,10 @@ the tables read more easily than the `match` statements.
 
 The two versions also differ on an unexpected input,
 one the current state does not name.
-None of the nine moves in the file produces one,
-so both listings end with one more call:
-feeding `MouseAction.ESCAPES` to a fresh trap in `Waiting`,
-where neither the `match` nor the table names that input.
+Every one of the nine moves in the file matches a transition out of the current state.
+So both listings end with one more call,
+which feeds `MouseAction.ESCAPES` to a fresh trap in `Waiting`.
+Neither `Waiting`'s `match` nor its table names that input.
 Version 1 prints `Waiting: Broadcasting cheese smell` a second time.
 Version 2 raises `RuntimeError: Waiting has no transition for mouse escapes`.
 The figure traces the run both versions share, then this one input:
@@ -430,14 +432,14 @@ The figure traces the run both versions share, then this one input:
 ![](_images/state_story)
 
 The trace at the top covers the nine shared moves.
-In each row the current state's `next()` picks the successor,
+In each row the current state's `next()` returns the successor,
 so the machine moves from object to object and leaves every decision to the states.
-Below the trace, the one input that splits the versions appears twice,
+Below the trace, the one input on which the versions differ appears twice,
 once under each policy.
 
 Version 1's `case _` arms return the current state,
-so an unrecognized input keeps the machine where it is.
-Staying in the same state still does something.
+so an unrecognized input keeps the machine in its current state.
+Staying in the same state has a visible effect.
 `run_all()` calls `run()` on whatever state `next()` returns,
 so returning the current state runs that state's action a second time.
 Version 2's table holds the explicit transitions alone,
@@ -456,8 +458,8 @@ in its `next()` or in its table.
 A fully table-driven design represents the entire machine as a single transition table.
 All the behavior is then in one place,
 so you can build and maintain the table from a state-transition diagram.
-The example is a vending machine, built in two steps:
-an engine with no vending-specific code in it, then the machine's table.
+The example is a vending machine, built in two steps: a general-purpose engine,
+then the vending machine's table.
 
 For a given current state and input, a transition row records three things:
 whether a condition must pass, what action runs during the transition,
@@ -486,8 +488,8 @@ Every member of one enum also shares that enum's class,
 so `type(event)` is the same key for all of them.
 
 This design reuses two names with new meanings.
-`tabledriven/table_machine.py` holds a different `StateMachine` from the one in `state_machine.py`,
-and `State` is now an `Enum` of names rather than a `Protocol` the state classes satisfy.
+`tabledriven/table_machine.py` holds a different `StateMachine` from the one in `state_machine.py`.
+`State` is now an `Enum` of names rather than a `Protocol` the state classes satisfy.
 The states in this design are bare names.
 The table holds all the behavior.
 
@@ -538,9 +540,9 @@ class StateMachine:
             f"on {type(event).__name__}")
 ```
 
-The listing writes `StateMachine` by hand rather than as a `@dataclass`,
-because a generated `__init__()` names each parameter after its field,
-so it would be `__init__(self, state: Enum, table: Table)`.
+The listing writes `StateMachine` by hand rather than as a `@dataclass`.
+A generated `__init__()` names each parameter after its field,
+so a `@dataclass` would generate `__init__(self, state: Enum, table: Table)`.
 The hand-written `__init__(self, initial: Enum, table: Table)` assigns `self.state = initial`.
 The caller passes `initial`, but the attribute is `state`,
 which `handle()` updates.
@@ -548,7 +550,7 @@ which `handle()` updates.
 Several candidate transitions can share one `(state, input)` key.
 Their conditions tell them apart.
 The engine tries them top to bottom,
-which is how a single input can lead to different states depending on a test.
+so a single input can lead to different states depending on a test.
 A row whose condition is `None` matches every time,
 so it belongs last in its group, as the `else` for the rows above it.
 
@@ -560,23 +562,26 @@ so a caller can catch the specific failure instead of every `RuntimeError` an ac
 ### A Vending Machine
 
 One table now defines the whole machine.
+The conditions and actions are ordinary methods, stored in the table.
 The machine collects money, takes a two-digit selection,
 then either dispenses the item, reports it sold out,
 or clears a selection that costs more than the money inserted.
-The conditions and actions are ordinary methods, stored in the table.
 
 ![The vending machine's five states and the inputs that move it between them](_images/vending_story)
 
-`Money` moves the machine from `QUIESCENT` to `COLLECTING` and more `Money` keeps it there,
-a first digit moves it to `SELECTING`,
-and a second digit moves it to one of three states, decided by price and stock.
+`Money` moves the machine from `QUIESCENT` to `COLLECTING`,
+and more `Money` keeps it there.
+A first digit moves it to `SELECTING`.
+A second digit moves it to one of three states, decided by price and stock.
 `Quit` refunds from any of the other states back to `QUIESCENT`.
 
 The states are an `Enum`,
 so the type checker reports a misspelled state name before the program runs.
-A misspelled string would pass every check and surface as a `NoTransition` at runtime.
+A misspelled string would pass every check,
+and the engine would raise a `NoTransition` at runtime.
 `MouseAction` is a `StrEnum` because its values must match lines of the input file.
-These states stay inside the program, so a plain `Enum` with `auto()` serves:
+These states never appear in an input file,
+so a plain `Enum` with `auto()` serves:
 
 ```python
 # tabledriven/vending_machine.py
@@ -697,9 +702,9 @@ class VendingMachine(StateMachine):
         self.amount = 0
 ```
 
-The engine's lookup keys on `type(event)` exactly,
-one dictionary lookup rather than an `isinstance()` test against each row.
-The table keys separate rows on `FirstDigit` and `SecondDigit`,
+The engine's lookup keys on the exact `type(event)`,
+so finding the rows takes one dictionary lookup rather than an `isinstance()` test against each row.
+That exactness lets the table keys separate rows on `FirstDigit` and `SecondDigit`,
 two subclasses of `Digit` that differ only in their class.
 The same exactness excludes a further subclass.
 An event whose class derives from `Money` matches none of `Money`'s rows,
@@ -712,12 +717,13 @@ so each `VendingMachine`'s table calls methods that read and write its own `amou
 
 The engine passes the event to both the condition and the action,
 so `refund()` takes an argument it ignores.
-The `Callable[..., bool]` and `Callable[..., None]` annotations leave the parameters as `...` because each method declares the specific event type it handles,
+Each method declares the specific event type it handles,
 and those types differ from row to row.
+So the `Callable[..., bool]` and `Callable[..., None]` annotations leave the parameters as `...`.
 With that `...`, the type checker accepts any callable in any row,
 whatever event class the key names.
 If you pair a `SecondDigit` key with a method written for a `FirstDigit`,
-the table type-checks clean and does the wrong thing at runtime.
+the table type-checks clean, and at runtime that method runs on a `SecondDigit`.
 
 Adding a state or an input is now a local change:
 an entry in the table and a method or two.
@@ -780,14 +786,14 @@ The message alone leaves you inferring the condition from the quantity.
 
 The last three events insert a dime and pick the same sold-out slot again,
 this time with too little money for it as well.
-Both conditions are now true,
-and `too_expensive()` comes first in the `(State.SELECTING, SecondDigit)` list,
+Both conditions are now true.
+`too_expensive()` comes first in the `(State.SELECTING, SecondDigit)` list,
 so the engine takes the `too_expensive()` row.
 The machine reports `COLLECTING`, as though more money would sell the item,
 although the slot is empty and no amount of money would.
 If you swap the row order, the same input reports `UNAVAILABLE` instead.
 Both results follow from the engine's [ordering rule](#the-engine).
-The first row whose condition passes wins,
+The engine runs the first row whose condition passes,
 whether or not a lower row matters more.
 
 ### Testing the Vending Machine
@@ -866,8 +872,8 @@ The text demo in `vending_demo.py` reads `message` and prints it.
 Contrast `run_all()` in the first design,
 which prints its input from inside the framework.
 Printing there is convenient for a book listing and wrong for a reusable machine,
-because it puts the `print()` call in the engine,
-where every user of `run_all()` gets it.
+because the `print()` call sits in the engine,
+where every user of `run_all()` gets its output.
 
 A `tkinter` GUI is a second view of the same vending machine.
 The GUI reads `amount`, the stock, and `message` and shows them on screen.
@@ -940,16 +946,16 @@ if __name__ == "__main__":
     show()
 ```
 
-`send()` hands each event to `handle()` and catches the `NoTransition` that a rejected click raises
-(a selection before any money, say),
-so the GUI shows a message instead of the traceback `tkinter` would otherwise print.
+`send()` passes each event to `handle()` and catches the `NoTransition` that `handle()` raises for a rejected click,
+such as a selection before any money.
+The GUI then shows a message instead of the traceback `tkinter` would otherwise print.
 
 The button loop builds sixteen commands with `partial(select, r, c)` rather than a lambda.
 Sixteen lambdas closing over `r` and `c` would all read the loop's final values,
 the [late-binding trap](28_Patterns--Function_Objects.md#the-late-binding-trap).
 The three coin and refund buttons use lambdas safely,
-since the one name they capture, `send`,
-keeps one value for the life of the window.
+because each lambda captures one name, `send`,
+and `send` keeps one value for the life of the window.
 
 ## Which Design Should You Use?
 
@@ -961,29 +967,33 @@ The state class holds both the action and the transitions,
 so reading `mouse_trap_states.py`'s `Luring` tells you what luring does and which states can follow it.
 Adding a state is one class.
 The design reads best when the transitions are obvious from the state's own name.
+
 An action that must run on every entry into one state belongs in that state's `run()`,
 written once.
 Sounding a chime whenever the trap reaches `Holding` is such an action.
 
-Inside that design, `match` statements and per-state tables differ in which code handles an unrecognized input.
+Inside the each-state-decides design,
+`match` statements and per-state tables differ in which code handles an unrecognized input.
 With `match`, each state's `case _` sets its own policy, in the method you read.
 With tables, `TableState.next()` sets one policy for every state,
-and each class shrinks to its `run()`.
+and each class defines `run()` and inherits `next()`.
 The tables read better as the states multiply,
-because every state's transitions have the same shape and sit together at the bottom of the file.
+because every state's transitions have the same shape and appear together at the bottom of the file.
 
 One-table suits a machine you build from a diagram, whose inputs carry data,
 or whose transitions need conditions.
 Everything is in one place, in the same order as the diagram.
 Adding a state or an input is an entry in the table and a method or two.
-The states shrink to `Enum` members, bare names,
-so an action that runs on every entry into one state must live in the table.
-The action repeats on every row that leads to that state,
-or routes through a helper you write yourself.
-Startup bypasses the table.
+
+In the one-table design the states are `Enum` members, bare names,
+so an action that runs on every entry into one state must go in the table.
+You repeat the action on every row that leads to that state,
+or write a helper that those rows call.
+
 The first design's constructor calls the initial state's `run()`,
-but the constructor in `table_machine.py` stores `initial` and returns,
-so an action the machine needs at startup is a call you make before the first event.
+but the constructor in `table_machine.py` stores `initial` and returns.
+In the one-table design,
+an action the machine needs at startup is a call you make before the first event.
 
 The deciding question is which you would rather read: one state's transitions,
 gathered in that state, or the whole machine's, gathered in one table.
@@ -993,7 +1003,7 @@ and a machine you drew as a diagram first belongs in the table.
 With either design you write for yourself what a library supplies.
 Mature libraries such as `transitions` and `python-statemachine` supply guards,
 callbacks, and hierarchical states.
-Using one adds a dependency.
+Using a library adds a dependency.
 Choose one of the two designs here when you cannot take that dependency,
 or want the mechanism visible in your own code.
 Choose a library once the machine needs more than a page of code.
