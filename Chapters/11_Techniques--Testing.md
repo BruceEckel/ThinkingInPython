@@ -697,7 +697,8 @@ def test_elapsed(monkeypatch: pytest.MonkeyPatch) -> None:
 ```
 
 As with randomness, injecting the clock is cleaner still.
-The same computation takes `now` as an argument instead of going looking for it:
+The same computation becomes `elapsed(start: float, now: Callable[[], float]) -> float`,
+which receives the clock as an argument instead of looking for it:
 
 ```python
 # clock_injected.py
