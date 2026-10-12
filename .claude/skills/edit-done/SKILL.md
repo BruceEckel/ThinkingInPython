@@ -140,6 +140,18 @@ docstring has the mechanics). While the tag still exists:
    sentence that is the only lead-in to a bulleted list or a table.
    Proposing agents are cautious by default; "when unsure, prefer
    not_fault" was the wrong instruction for this fault.
+   The second page (2026-10-11, the chapter 30 round: 117 hits across
+   18 faults) settled it for every fault: of the 41 cards the agents
+   marked "not this fault", he deleted 13 and skipped 28 and kept
+   none as a non-fault, and he applied 72 of the 74 proposed rewrites
+   unchanged. So a proposing agent never marks `not_fault`: it
+   proposes a rewrite or a deletion for every hit and puts its doubt
+   in the note, and a brief that says "expect many `not_fault`" for
+   a fault is wrong. Skip, a sentence that has the fault and stays,
+   is his call alone. After `apply`, read the sentence after each
+   deletion: seven of the 16 lost their antecedent ("In that case",
+   "that assignment", "For example"), and those seams are repaired
+   in the chapter's commit, not put back on the page.
 
 ## Step 4: verify and commit
 
