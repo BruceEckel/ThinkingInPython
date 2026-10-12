@@ -398,7 +398,7 @@ if __name__ == "__main__":
 #: 5.0
 ```
 
-The call at `[1]` shows the method called as if it were a free function.
+At `[1]`, `Point.distance_to(p1, p2)` calls the method as if it were a free function.
 When you fetch it from the class instead of from an instance,
 `distance_to` is an ordinary function,
 and the call passes `p1` as the first argument.
