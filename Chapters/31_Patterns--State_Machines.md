@@ -51,7 +51,7 @@ class StateMachine:
     # Template method:
     def run_all(self, inputs: Iterable[object]) -> None:
         for event in inputs:
-            print(event)
+            print(type(self.current_state).__name__, event)
             self.current_state = (
                 self.current_state.next(event))
             self.current_state.run()
@@ -59,8 +59,9 @@ class StateMachine:
 
 The constructor sets the initial state and runs it.
 `run_all(self, inputs: Iterable[object]) -> None` takes the inputs as any iterable.
-For each one it reports the input, asks the current state for the next state,
-moves there, and calls that state's `run()`.
+For each one it prints the state's name and the input,
+asks the state for its successor, moves there,
+and calls the new state's `run()`.
 That loop is the *State* pattern plus the transition.
 What `run()` does depends on which state the machine occupies.
 
@@ -91,7 +92,7 @@ class MouseAction(StrEnum):
 Each possible move by a mouse is a member of the `MouseAction` [enumeration](12_Techniques--Data_Classes_as_Types.md#enums-are-types-too).
 Because `MouseAction` is a `StrEnum`, each member *is* a `str`,
 and compares equal to and prints as its value.
-That is why `print(event)` in `run_all()` shows `mouse appears` rather than `MouseAction.APPEARS`.
+That is why `run_all()` prints `mouse appears` rather than `MouseAction.APPEARS`.
 The members still hash and look up correctly, so they work as dictionary keys.
 
 `MouseAction("mouse appears")` returns the matching member.
@@ -189,23 +190,23 @@ moves = [line.strip() for line in text.splitlines()
          if line.strip() and not line.startswith("#")]
 MouseTrap().run_all([MouseAction(m) for m in moves])
 #: Waiting: Broadcasting cheese smell
-#: mouse appears
+#: Waiting mouse appears
 #: Luring: Presenting Cheese, door open
-#: mouse runs away
+#: Luring mouse runs away
 #: Waiting: Broadcasting cheese smell
-#: mouse appears
+#: Waiting mouse appears
 #: Luring: Presenting Cheese, door open
-#: mouse enters trap
+#: Luring mouse enters trap
 #: Trapping: Closing door
-#: mouse escapes
+#: Trapping mouse escapes
 #: Waiting: Broadcasting cheese smell
-#: mouse appears
+#: Waiting mouse appears
 #: Luring: Presenting Cheese, door open
-#: mouse enters trap
+#: Luring mouse enters trap
 #: Trapping: Closing door
-#: mouse trapped
+#: Trapping mouse trapped
 #: Holding: Mouse caught
-#: mouse removed
+#: Holding mouse removed
 #: Waiting: Broadcasting cheese smell
 
 # ESCAPES has no case in Waiting, so case _
@@ -213,7 +214,7 @@ MouseTrap().run_all([MouseAction(m) for m in moves])
 trap = MouseTrap()
 #: Waiting: Broadcasting cheese smell
 trap.run_all([MouseAction.ESCAPES])
-#: mouse escapes
+#: Waiting mouse escapes
 #: Waiting: Broadcasting cheese smell
 ```
 
@@ -382,30 +383,30 @@ moves = [line.strip() for line in text.splitlines()
          if line.strip() and not line.startswith("#")]
 MouseTrap().run_all([MouseAction(m) for m in moves])
 #: Waiting: Broadcasting cheese smell
-#: mouse appears
+#: Waiting mouse appears
 #: Luring: Presenting Cheese, door open
-#: mouse runs away
+#: Luring mouse runs away
 #: Waiting: Broadcasting cheese smell
-#: mouse appears
+#: Waiting mouse appears
 #: Luring: Presenting Cheese, door open
-#: mouse enters trap
+#: Luring mouse enters trap
 #: Trapping: Closing door
-#: mouse escapes
+#: Trapping mouse escapes
 #: Waiting: Broadcasting cheese smell
-#: mouse appears
+#: Waiting mouse appears
 #: Luring: Presenting Cheese, door open
-#: mouse enters trap
+#: Luring mouse enters trap
 #: Trapping: Closing door
-#: mouse trapped
+#: Trapping mouse trapped
 #: Holding: Mouse caught
-#: mouse removed
+#: Holding mouse removed
 #: Waiting: Broadcasting cheese smell
 
 # ESCAPES is not a key in Waiting.transitions:
 trap2 = MouseTrap()
 #: Waiting: Broadcasting cheese smell
 expect(RuntimeError, trap2.run_all, [MouseAction.ESCAPES])
-#: mouse escapes
+#: Waiting mouse escapes
 #: [RuntimeError] Waiting has no transition for mouse
 #: escapes
 ```
@@ -866,7 +867,7 @@ Because the actions set `vm.message`,
 The same machine can therefore drive more than one view.
 The text demo in `vending_demo.py` reads `message` and prints it.
 Contrast `run_all()` in the first design,
-which prints its input from inside the framework.
+which prints each state and input from inside the framework.
 Printing there is convenient for a book listing and wrong for a reusable machine,
 because the `print()` call sits in the engine,
 where every user of `run_all()` gets its output.

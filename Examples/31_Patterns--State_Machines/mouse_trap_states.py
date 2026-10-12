@@ -67,23 +67,23 @@ moves = [line.strip() for line in text.splitlines()
          if line.strip() and not line.startswith("#")]
 MouseTrap().run_all([MouseAction(m) for m in moves])
 #: Waiting: Broadcasting cheese smell
-#: mouse appears
+#: Waiting mouse appears
 #: Luring: Presenting Cheese, door open
-#: mouse runs away
+#: Luring mouse runs away
 #: Waiting: Broadcasting cheese smell
-#: mouse appears
+#: Waiting mouse appears
 #: Luring: Presenting Cheese, door open
-#: mouse enters trap
+#: Luring mouse enters trap
 #: Trapping: Closing door
-#: mouse escapes
+#: Trapping mouse escapes
 #: Waiting: Broadcasting cheese smell
-#: mouse appears
+#: Waiting mouse appears
 #: Luring: Presenting Cheese, door open
-#: mouse enters trap
+#: Luring mouse enters trap
 #: Trapping: Closing door
-#: mouse trapped
+#: Trapping mouse trapped
 #: Holding: Mouse caught
-#: mouse removed
+#: Holding mouse removed
 #: Waiting: Broadcasting cheese smell
 
 # ESCAPES has no case in Waiting, so case _
@@ -91,5 +91,5 @@ MouseTrap().run_all([MouseAction(m) for m in moves])
 trap = MouseTrap()
 #: Waiting: Broadcasting cheese smell
 trap.run_all([MouseAction.ESCAPES])
-#: mouse escapes
+#: Waiting mouse escapes
 #: Waiting: Broadcasting cheese smell

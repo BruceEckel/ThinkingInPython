@@ -225,7 +225,7 @@ class StateMachine:
         self.current_state.run()
     def run_all(self, inputs: Iterable[object]) -> None:
         for event in inputs:
-            print(event)
+            print(type(self.current_state).__name__, event)
             self.current_state = (
                 self.current_state.next(event))
             self.current_state.run()
@@ -271,13 +271,13 @@ class Prozac:
 StateMachine(Happy()).run_all(
     [Annoy(), Calm(), TakePill(), Annoy()])
 #: Great to see you!
-#: Annoy
+#: Happy Annoy
 #: What do you want?
-#: Calm
+#: Grumpy Calm
 #: Great to see you!
-#: TakePill
+#: Happy TakePill
 #: Everything is wonderful.
-#: Annoy
+#: Prozac Annoy
 #: Everything is wonderful.
 ```
 
