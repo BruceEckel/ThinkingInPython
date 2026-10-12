@@ -14,7 +14,7 @@ version's `next()` raises a `RuntimeError`.
 This complements the chapter's other figure, `vending_story.svg`, which
 draws the vending machine's states and transitions as a static graph.
 The names, inputs, and printed lines come from `mouse_action.py`,
-`mouse_moves.txt`, `mouse_trap_states.py`, and `mouse_trap_tables.py`
+`mouse_moves.py`, `mouse_trap_states.py`, and `mouse_trap_tables.py`
 and their `#:` markers.
 """
 
@@ -37,7 +37,7 @@ RUN = {
     "Trapping": "Closing door",
     "Holding": "Mouse caught",
 }
-# (input, the state next(input) returns), from mouse_moves.txt.
+# (input, the state next(input) returns), from mouse_moves.py.
 MOVES = (
     ("mouse appears", "Luring"),
     ("mouse runs away", "Waiting"),

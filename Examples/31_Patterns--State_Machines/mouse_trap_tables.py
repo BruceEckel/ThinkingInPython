@@ -1,8 +1,8 @@
 # mouse_trap_tables.py
-from pathlib import Path
 from typing import ClassVar, override
 from exceptions import expect
 from mouse_action import MouseAction
+from mouse_moves import MOVES
 from state_machine import StateMachine
 from table_state import TableState
 
@@ -52,10 +52,7 @@ MouseTrap.holding.transitions = {
     MouseAction.REMOVED: MouseTrap.waiting,
 }
 
-text = Path("mouse_moves.txt").read_text()
-moves = [line.strip() for line in text.splitlines()
-         if line.strip() and not line.startswith("#")]
-MouseTrap().run_all([MouseAction(m) for m in moves])
+MouseTrap().run_all(MOVES)
 #: Broadcasting cheese smell
 #: Waiting mouse appears -> Luring
 #: Presenting Cheese, door open

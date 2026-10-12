@@ -88,23 +88,22 @@ class MouseAction(StrEnum):
 
 Each mouse move is a `MouseAction` [enumeration](12_Techniques--Data_Classes_as_Types.md#enums-are-types-too).
 Because `MouseAction` is a `StrEnum`, each member is a `str`.
-`MouseAction("mouse appears")` returns `MouseAction.APPEARS`.
 `run_all()` prints `mouse appears` rather than `MouseAction.APPEARS`.
 
-A text file supplies the sequence of mouse inputs.
-Its nine moves exercise every transition in the trap:
+`mouse_moves.py` holds the sequence of mouse inputs.
+Its nine moves exercise every transition in the trap,
+and the type checker rejects a misspelled member before the program runs:
 
-```text
-# mouse_moves.txt
-mouse appears
-mouse runs away
-mouse appears
-mouse enters trap
-mouse escapes
-mouse appears
-mouse enters trap
-mouse trapped
-mouse removed
+```python
+# mouse_moves.py
+from typing import Final
+from mouse_action import MouseAction as M
+
+MOVES: Final[list[M]] = [
+    M.APPEARS, M.RUNS_AWAY, M.APPEARS, M.ENTERS,
+    M.ESCAPES, M.APPEARS, M.ENTERS, M.TRAPPED,
+    M.REMOVED,
+]
 ```
 
 ### One State Class per Behavior
@@ -114,9 +113,9 @@ each state class defines its `run()` behavior and decides its next state with a 
 
 ```python
 # mouse_trap_states.py
-from pathlib import Path
 from typing import ClassVar
 from mouse_action import MouseAction
+from mouse_moves import MOVES
 from state import State
 from state_machine import StateMachine
 
@@ -177,10 +176,7 @@ class MouseTrap(StateMachine):
     def __init__(self) -> None:
         super().__init__(MouseTrap.waiting)
 
-text = Path("mouse_moves.txt").read_text()
-moves = [line.strip() for line in text.splitlines()
-         if line.strip() and not line.startswith("#")]
-MouseTrap().run_all([MouseAction(m) for m in moves])
+MouseTrap().run_all(MOVES)
 #: Broadcasting cheese smell
 #: Waiting mouse appears -> Luring
 #: Presenting Cheese, door open
@@ -210,7 +206,7 @@ trap.run_all([MouseAction.ESCAPES])
 #: Broadcasting cheese smell
 ```
 
-The code at the bottom of the file builds a `MouseTrap` and runs it through every move read from the text file.
+The code at the bottom of the file builds a `MouseTrap` and runs it through every move in `MOVES`.
 `MouseTrap` holds all the possible states as class attributes and sets up the initial state.
 A state class stores nothing, so each state can be one shared object.
 A single `Waiting` serves every `MouseTrap` and every visit to that state.
@@ -317,10 +313,10 @@ The tables filled in at the bottom of the file hold the transitions:
 
 ```python
 # mouse_trap_tables.py
-from pathlib import Path
 from typing import ClassVar, override
 from exceptions import expect
 from mouse_action import MouseAction
+from mouse_moves import MOVES
 from state_machine import StateMachine
 from table_state import TableState
 
@@ -370,10 +366,7 @@ MouseTrap.holding.transitions = {
     MouseAction.REMOVED: MouseTrap.waiting,
 }
 
-text = Path("mouse_moves.txt").read_text()
-moves = [line.strip() for line in text.splitlines()
-         if line.strip() and not line.startswith("#")]
-MouseTrap().run_all([MouseAction(m) for m in moves])
+MouseTrap().run_all(MOVES)
 #: Broadcasting cheese smell
 #: Waiting mouse appears -> Luring
 #: Presenting Cheese, door open
@@ -567,8 +560,10 @@ The states are an `Enum`,
 so the type checker reports a misspelled state name before the program runs.
 A misspelled string would pass every check,
 and the engine would raise a `NoTransition` at runtime.
-`MouseAction` is a `StrEnum` because its values must match lines of the input file.
-These states never appear in an input file,
+`MouseAction` is a `StrEnum` so that the trace prints each input as its value,
+`mouse appears`.
+The vending machine's states need no value,
+since the demo prints a state by its `name`,
 so a plain `Enum` with `auto()` serves:
 
 ```python

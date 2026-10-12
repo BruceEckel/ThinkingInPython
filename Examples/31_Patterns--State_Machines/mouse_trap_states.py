@@ -1,7 +1,7 @@
 # mouse_trap_states.py
-from pathlib import Path
 from typing import ClassVar
 from mouse_action import MouseAction
+from mouse_moves import MOVES
 from state import State
 from state_machine import StateMachine
 
@@ -62,10 +62,7 @@ class MouseTrap(StateMachine):
     def __init__(self) -> None:
         super().__init__(MouseTrap.waiting)
 
-text = Path("mouse_moves.txt").read_text()
-moves = [line.strip() for line in text.splitlines()
-         if line.strip() and not line.startswith("#")]
-MouseTrap().run_all([MouseAction(m) for m in moves])
+MouseTrap().run_all(MOVES)
 #: Broadcasting cheese smell
 #: Waiting mouse appears -> Luring
 #: Presenting Cheese, door open
