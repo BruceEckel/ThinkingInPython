@@ -42,7 +42,7 @@ before anything runs.
 
 The `StateMachine` keeps track of the current state,
 which the constructor initializes.
-The `run_all()` method takes a sequence of input objects.
+`run_all(self, inputs: Iterable[object]) -> None` takes the inputs as any iterable.
 For each one it asks the current state for the next state, moves there,
 and calls that state's `run()`.
 That loop is the *State* pattern plus the transition.
