@@ -230,8 +230,8 @@ Each takes data and returns an instance,
 and each raises an exception for data it does not recognize.
 For `Month`, that is a number outside one through twelve.
 `of()` needs no `match`.
-The `Enum` holds every member `of()` could return,
-so the method indexes `list(Month)` instead of naming a class.
+The method indexes `list(Month)` instead of naming a class,
+because the `Enum` holds every member `of()` could return.
 A factory over a closed set of products reduces to a lookup.
 
 [`from_fahrenheit()`](07_Foundations--Classes.md#static-and-class-methods)
@@ -291,7 +291,7 @@ make("Square").draw()
 # make("Hexagon").draw()
 ```
 
-Because the `dict` values are classes, `type[Shape]` is their type,
+The `dict` values have the type `type[Shape]` because they are classes,
 and calling one constructs an instance.
 Adding a `Triangle` means one new class and one new line in `SHAPES`,
 and one new member in `Kind`.
@@ -339,7 +339,7 @@ lets each subclass register itself.
 Nothing in the listing calls a register function.
 The two `class` statements fill `Shape.registry` on their own.
 
-Registering through `__init_subclass__()` is why `Shape` is an abstract base class rather than a `Protocol`.
+`Shape` is an abstract base class rather than a `Protocol` because it registers subclasses through `__init_subclass__()`.
 `__init_subclass__()` runs only for classes that inherit from `Shape`,
 so a class that satisfies a Protocol structurally,
 without inheriting from `Shape`, stays out of the registry.
