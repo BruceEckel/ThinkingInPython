@@ -6,18 +6,15 @@
 
 Recall [*State*](26_Patterns--Surrogate.md#state):
 a surrogate forwards calls to one of several implementations,
-and the client programmer chooses which one.
+and the client programmer chooses an implementation.
 *State Machine* adds a structure that makes the switch automatically,
 from one implementation to the next.
-Each implementation represents one state the system can occupy,
-so the system behaves differently as it moves from state to state.
+The system behaves differently as it moves from state to state.
 
 A [*Template Method*](25_Patterns--Template_Method.md)
-often moves the system from one state to the next,
-as the following framework for a basic state machine shows.
+is often used to change states.
 You call `run()` on a state to perform its behavior,
-and you pass an "input" object to the state's `next()`,
-which returns the state to enter next.
+and you call `next()` with an event to get the state that follows.
 
 The chapter shows two designs that differ in one way.
 In the first, each `State` object decides its own next state.
