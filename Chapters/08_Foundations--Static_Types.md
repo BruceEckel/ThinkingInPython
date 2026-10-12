@@ -347,10 +347,11 @@ print(render(Square()))
 ```
 
 Neither `Circle` nor `Square` mentions `Drawable`.
-The type checker accepts both because each has a `draw()` that takes no arguments and returns a `str`,
+The type checker accepts both because each has a `draw(self) -> str`,
 so each matches `Drawable`'s shape.
 The signature is part of that shape.
-A `draw()` that returns an `int`, or that requires an argument, does not match.
+A `draw()` whose signature differs from `draw(self) -> str`,
+by returning an `int` or by requiring an argument, does not match.
 
 A `Protocol` is a checking-time construct,
 so `isinstance(Circle(), Drawable)` raises a `TypeError` instead of answering.
