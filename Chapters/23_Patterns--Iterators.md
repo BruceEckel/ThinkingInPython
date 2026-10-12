@@ -130,8 +130,8 @@ print(total(Countdown(5)))  # and a custom iterable
 #: 15
 ```
 
-`total()` takes an `Iterable`, so it works equally well on the generator,
-the list, and the custom `Countdown`.
+`total(numbers: Iterable[int]) -> int` accepts any `Iterable`,
+so it works equally well on the generator, the list, and the custom `Countdown`.
 The figure follows one loop over `nums` through the protocol,
 then puts `total()` in the loop's place:
 
