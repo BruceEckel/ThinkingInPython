@@ -660,7 +660,7 @@ The battery covers two more and stops when its charge falls below the threshold.
 The grid covers one and stops when the outage begins at 22:00.
 The backup covers the last.
 
-`run_load()` names none of the four sources,
+`run_load()` draws from whichever source `plug()` hands it,
 and that is why the second run prints a different trace from the same code.
 `battery_first` puts the battery ahead of the sun,
 so the charge drains first and the grid supplies the load from 19:00.
@@ -805,8 +805,9 @@ so under `fork()` the cell is as exposed as any Python global.
 
 ## Composing a Program
 
-This small application fetches a headline,
-finds a topic worth researching within that headline, and looks up that topic.
+This small application takes three steps: it fetches a headline,
+it finds a topic worth researching within that headline,
+and it looks up that topic.
 Each step needs something or can fail, and no step names an implementation:
 
 ```python
@@ -1001,8 +1002,8 @@ so those lines record where each run stopped.
 The run at `[2]` stops after `feed: fetching`.
 `topic_of()` yields a `NotInteresting`,
 and that failure ends `research()` where it stands.
-The `need(Encyclopedia)` on the next line does not run,
-and nothing calls `Library.article()`.
+The stop comes before the `need(Encyclopedia)` on the next line,
+and so before any call to `Library.article()`.
 `catch()` receives that failure and `report()` matches on it as a value,
 which is why the run still prints a message.
 A failure ends the remaining steps the way a raised exception does,
@@ -1459,9 +1460,8 @@ Its body is the one place in the program that binds an implementation to an Abil
 Each was a class with a method per product.
 Each is now a function that hands `play()` a matched set.
 No parallel hierarchy remains.
-`Kitty` does not extend a `Character` base class,
-`Puzzle` does not extend an `Obstacle` base class,
-and the engine names no class:
+`Kitty` and `Puzzle` match the `Hero` and `Obstacle` Protocols by structure,
+and the engine works with the three Protocols alone:
 
 ```python
 # two_games.py
@@ -1530,9 +1530,9 @@ matches arguments
 The call still runs correctly, since the implementation is variadic,
 but the type checker no longer verifies the call.
 Two chained handlers keep the checking.
-`supply()` some of the actors, apply that handler to the Effect,
-then `supply()` the rest to what remains,
-the layered supply of [Layering Handlers](46_Effects--Stateless.md#layering-handlers).
+[Layering Handlers](46_Effects--Stateless.md#layering-handlers)
+shows how to chain them,
+and each `supply()` in the chain stays within nine actors.
 An Effect that asks for ten separate things is usually two Effects.
 
 ## Adding Behavior to an Existing Effect
