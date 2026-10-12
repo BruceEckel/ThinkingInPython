@@ -539,8 +539,9 @@ class StateMachine:
 ```
 
 The listing writes `StateMachine` by hand rather than as a `@dataclass`,
-because a generated `__init__()` names each parameter after its field.
-This constructor renames what it stores.
+because a generated `__init__()` names each parameter after its field,
+so it would be `__init__(self, state: Enum, table: Table)`.
+The hand-written `__init__(self, initial: Enum, table: Table)` assigns `self.state = initial`.
 The caller passes `initial`, but the attribute is `state`,
 which `handle()` updates.
 
