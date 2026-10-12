@@ -314,8 +314,7 @@ In this case, the setter announces every assignment.
 [Deciding What Matters](#deciding-what-matters)
 shows a setter that announces a reading only when it differs enough from the previous reading.
 
-The constructor assigns its argument to `_celsius` directly,
-bypassing the setter.
+The constructor's `self._celsius = celsius` bypasses the setter.
 The first reading is the thermometer's starting state, not a change to it.
 No responder can connect before the constructor returns,
 so there is no one to tell.
@@ -361,7 +360,9 @@ t.celsius = 150
 ```
 
 The responders here are lambdas, but any function or bound method works.
-`Thermometer` knows its responders only as callables that take a `float`.
+`Thermometer` is a `Broadcaster[float]`,
+so it knows its responders only as `Responder[float]`,
+a `Callable[[float], None]`.
 This figure shows one notification,
 naming the two lambdas `display` and `alarm`:
 
@@ -841,7 +842,7 @@ because an ordinary assignment inside `__setattr__()` calls `__setattr__()`.
 One `__setattr__()` for every attribute gives up three things that `Thermometer`'s property per attribute keeps:
 
 1.  `WeatherStation`'s responders receive a pair.
-    Each takes the attribute name and the value as one tuple,
+    Each is a `Responder[Change]`, called as `responder((name, value))`,
     and filters by name to act on one attribute.
     `Thermometer` publishes one attribute and is a `Broadcaster[float]`,
     so each responder takes the `float` reading as its one argument.
@@ -1439,8 +1440,7 @@ so it is a [closure](40_Functional--Foundations.md#closures)
 that reads `canvas` and `cell_px`.
 It paints one rectangle per cell.
 The pixel corners come from multiplying the cell's column and row by `cell_px`.
-It takes a `Grid` and returns `None`,
-the shape `connect()` requires of a responder.
+`draw(grid: Grid) -> None` is the shape `connect()` requires of a responder.
 When the window opens,
 `show()` calls `draw(model.grid)` once to paint the starting grid.
 
