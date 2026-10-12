@@ -55,24 +55,24 @@ class WashingMachine(StateMachine):
         self.load_kg = start.load_kg
         self.log.append("filling")
 
-    def too_heavy(self, event: RinseDone) -> bool:
+    def too_heavy(self, input_: RinseDone) -> bool:
         return self.load_kg > 6
 
     def log_msg(
             self, msg: str) -> Callable[[object], None]:
-        def action(event: object) -> None:
+        def action(input_: object) -> None:
             self.log.append(msg)
         return action
 
 cycle = [Full(), WashDone(), RinseDone(), SpinDone()]
 heavy = WashingMachine()
-for event in [Start(8), *cycle]:
-    heavy.handle(event)
+for input_ in [Start(8), *cycle]:
+    heavy.handle(input_)
 print(heavy.log)
 #: ['filling', 'washing', 'rinsing', 'slow spin', 'done']
 light = WashingMachine()
-for event in [Start(3), *cycle]:
-    light.handle(event)
+for input_ in [Start(3), *cycle]:
+    light.handle(input_)
 print(light.log)
 #: ['filling', 'washing', 'rinsing', 'fast spin', 'done']
 

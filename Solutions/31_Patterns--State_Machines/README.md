@@ -15,24 +15,24 @@ type Transition = tuple[
 type Table = dict[tuple[Enum, type], list[Transition]]
 
 class NoTransition(RuntimeError):
-    "No table row matched this state and event."
+    "No table row matched this state and input."
 
 class StateMachine:
     def __init__(self, initial: Enum, table: Table) -> None:
         self.state = initial
         self.table = table
 
-    def handle(self, event: object) -> None:
+    def handle(self, input_: object) -> None:
         for condition, action, next_state in self.table.get(
-                (self.state, type(event)), []):
-            if condition is None or condition(event):
+                (self.state, type(input_)), []):
+            if condition is None or condition(input_):
                 if action is not None:
-                    action(event)
+                    action(input_)
                 self.state = next_state
                 return
         raise NoTransition(
             f"no transition from {self.state!r} "
-            f"on {type(event).__name__}")
+            f"on {type(input_).__name__}")
 ```
 
 ## 1. `UnpredictablePerson` with a `Prozac` mood
@@ -158,7 +158,7 @@ from typing import Protocol
 
 class State(Protocol):
     def run(self) -> None: ...
-    def next(self, event: object) -> State: ...
+    def next(self, input_: object) -> State: ...
 
 class StateMachine:
     def __init__(self, initial_state: State) -> None:
@@ -181,19 +181,19 @@ class Calm:
 class Happy:
     def run(self) -> None:
         ...
-    def next(self, event: object) -> State:
+    def next(self, input_: object) -> State:
         ...
 
 class Grumpy:
     def run(self) -> None:
         ...
-    def next(self, event: object) -> State:
+    def next(self, input_: object) -> State:
         ...
 
 class Prozac:
     def run(self) -> None:
         ...
-    def next(self, event: object) -> State:
+    def next(self, input_: object) -> State:
         ...
 ```
 
@@ -217,17 +217,17 @@ from typing import Protocol
 # The chapter's state.py and state_machine.py, inlined:
 class State(Protocol):
     def run(self) -> None: ...
-    def next(self, event: object) -> State: ...
+    def next(self, input_: object) -> State: ...
 
 class StateMachine:
     def __init__(self, initial_state: State) -> None:
         self.current_state = initial_state
         self.current_state.run()
     def run_all(self, inputs: Iterable[object]) -> None:
-        for event in inputs:
-            print(type(self.current_state).__name__, event)
+        for input_ in inputs:
+            print(type(self.current_state).__name__, input_)
             self.current_state = (
-                self.current_state.next(event))
+                self.current_state.next(input_))
             self.current_state.run()
 
 class TakePill:
@@ -245,27 +245,27 @@ class Calm:
 class Happy:
     def run(self) -> None:
         print("Great to see you!")
-    def next(self, event: object) -> State:
-        if isinstance(event, Annoy):
+    def next(self, input_: object) -> State:
+        if isinstance(input_, Annoy):
             return Grumpy()
-        if isinstance(event, TakePill):
+        if isinstance(input_, TakePill):
             return Prozac()
         return self
 
 class Grumpy:
     def run(self) -> None:
         print("What do you want?")
-    def next(self, event: object) -> State:
-        if isinstance(event, Calm):
+    def next(self, input_: object) -> State:
+        if isinstance(input_, Calm):
             return Happy()
-        if isinstance(event, TakePill):
+        if isinstance(input_, TakePill):
             return Prozac()
         return self
 
 class Prozac:
     def run(self) -> None:
         print("Everything is wonderful.")
-    def next(self, event: object) -> State:
+    def next(self, input_: object) -> State:
         return self
 
 StateMachine(Happy()).run_all(
@@ -648,7 +648,7 @@ table is the stricter of the two.
 <details>
 <summary>Where to look</summary>
 
-[The Engine](../../Chapters/31_Patterns--State_Machines.md#the-engine) tries the rows under a `(state, event type)` key in order and takes the first whose condition passes.
+[The Engine](../../Chapters/31_Patterns--State_Machines.md#the-engine) tries the rows under a `(state, input type)` key in order and takes the first whose condition passes.
 Put a guarded row for the heavy load ahead of an unconditional row, and let the condition read the load from the machine.
 For the stray `Start`, see how [A View for the Vending Machine](../../Chapters/31_Patterns--State_Machines.md#a-view-for-the-vending-machine) treats a rejected click, then weigh a control panel's stray presses against a cycle that stops.
 
@@ -691,7 +691,7 @@ class WashingMachine(StateMachine):
     def begin(self, start: Start) -> None:
         ...
 
-    def too_heavy(self, event: RinseDone) -> bool:
+    def too_heavy(self, input_: RinseDone) -> bool:
         ...
 
     def log_msg(
@@ -766,24 +766,24 @@ class WashingMachine(StateMachine):
         self.load_kg = start.load_kg
         self.log.append("filling")
 
-    def too_heavy(self, event: RinseDone) -> bool:
+    def too_heavy(self, input_: RinseDone) -> bool:
         return self.load_kg > 6
 
     def log_msg(
             self, msg: str) -> Callable[[object], None]:
-        def action(event: object) -> None:
+        def action(input_: object) -> None:
             self.log.append(msg)
         return action
 
 cycle = [Full(), WashDone(), RinseDone(), SpinDone()]
 heavy = WashingMachine()
-for event in [Start(8), *cycle]:
-    heavy.handle(event)
+for input_ in [Start(8), *cycle]:
+    heavy.handle(input_)
 print(heavy.log)
 #: ['filling', 'washing', 'rinsing', 'slow spin', 'done']
 light = WashingMachine()
-for event in [Start(3), *cycle]:
-    light.handle(event)
+for input_ in [Start(3), *cycle]:
+    light.handle(input_)
 print(light.log)
 #: ['filling', 'washing', 'rinsing', 'fast spin', 'done']
 
@@ -801,11 +801,11 @@ print(busy.state.name, busy.load_kg)
 holds the two rows the exercise requires, told apart by
 `too_heavy()`. A load over six kilograms takes the slow spin, and
 anything lighter falls through to the unconditional fast-spin row
-below it. The rest of the cycle is a straight line, one event type
+below it. The rest of the cycle is a straight line, one input type
 per state, and the machine is still the chapter's
 `table_machine.py` engine unchanged.
 
-**Record what later conditions need.** A `RinseDone` event carries no data of its
+**Record what later conditions need.** A `RinseDone` input carries no data of its
 own, so the condition reads `load_kg` off the machine, where
 `begin()` recorded it when the cycle started.
 
@@ -836,9 +836,9 @@ a report.
 <details>
 <summary>Where to look</summary>
 
-[The Engine](../../Chapters/31_Patterns--State_Machines.md#the-engine) lets several rows share one `(state, event type)` key, tried in order.
-Under the doors-closing state and a sensor event, put the obstruction condition on the first row and leave the second row unconditional.
-The condition is a method that reads the event, so the table stays data.
+[The Engine](../../Chapters/31_Patterns--State_Machines.md#the-engine) lets several rows share one `(state, input type)` key, tried in order.
+Under the doors-closing state and a sensor input, put the obstruction condition on the first row and leave the second row unconditional.
+The condition is a method that reads the input, so the table stays data.
 
 <details>
 <summary>The shape</summary>
@@ -882,7 +882,7 @@ class Elevator(StateMachine):
     def set_target(self, call: CallButton) -> None:
         ...
 
-    def arrive(self, event: object) -> None:
+    def arrive(self, input_: object) -> None:
         ...
 
     def obstructed(self, sensor: DoorSensor) -> bool:
@@ -961,7 +961,7 @@ class Elevator(StateMachine):
     def set_target(self, call: CallButton) -> None:
         self.target = call.floor
 
-    def arrive(self, event: object) -> None:
+    def arrive(self, input_: object) -> None:
         self.floor = self.target
 
     def obstructed(self, sensor: DoorSensor) -> bool:
@@ -1120,7 +1120,7 @@ running, and one inside the band falls through to the unconditional
 row back to `IDLE`.
 
 Every
-decision in the machine is a condition on the one event type. Every
+decision in the machine is a condition on the one input type. Every
 action slot here holds `None`, and the fall-through rows leave the
 condition slot `None` too, so both slots are optional per row.
 
@@ -1140,8 +1140,8 @@ condition slot `None` too, so both slots are optional per row.
 <details>
 <summary>Where to look</summary>
 
-[A Vending Machine](../../Chapters/31_Patterns--State_Machines.md#a-vending-machine) explains that the engine looks up `type(event)` as the key, so a subclass of an event type has no row of its own.
-Read the `NoTransition` message to see which class it reports, then fix it once by adding keys and once by choosing what the event is.
+[A Vending Machine](../../Chapters/31_Patterns--State_Machines.md#a-vending-machine) explains that the engine looks up `type(input_)` as the key, so a subclass of an input type has no row of its own.
+Read the `NoTransition` message to see which class it reports, then fix it once by adding keys and once by choosing what the input is.
 Compare how many rows each fix needs as denominations and states multiply.
 
 <details>
@@ -1172,7 +1172,7 @@ class Machine(StateMachine):
                  accept_nickels: bool = False) -> None:
         ...
 
-    def add(self, event: Money) -> None:
+    def add(self, input_: Money) -> None:
         ...
 
 NICKEL = Money("nickel", 5)
@@ -1215,8 +1215,8 @@ class Machine(StateMachine):
             table[(State.COLLECTING, Nickel)] = rows
         super().__init__(State.QUIESCENT, table)
 
-    def add(self, event: Money) -> None:
-        self.amount += event.value
+    def add(self, input_: Money) -> None:
+        self.amount += input_.value
 
 m = Machine()
 m.handle(Money("quarter", 25))
@@ -1241,14 +1241,14 @@ print(m2.amount)
 ```
 
 **Reproduce the failure.** The exception is `NoTransition`, not a `TypeError` or a silent no-op,
-and its message names the event class that found no row: `Nickel`.
-`handle()` looks up `(self.state, type(event))`, and
+and its message names the input class that found no row: `Nickel`.
+`handle()` looks up `(self.state, type(input_))`, and
 `type(Nickel("nickel", 5))` is `Nickel`. A dictionary probe compares
 keys by equality, so the `Nickel` key misses the `Money` row although
 `Nickel` subclasses `Money`. Nothing walks the
 [MRO](../../Chapters/07_Foundations--Classes.md#method-resolution-order).
 That lookup is the exact-type dispatch the chapter describes, and a
-subclass of an event type is how most readers first meet it.
+subclass of an input type is how most readers first meet it.
 
 **Give the subclass its own rows.** Fix 1 adds `(state, Nickel)`
 rows. Those rows work, and they scale badly. Every new denomination

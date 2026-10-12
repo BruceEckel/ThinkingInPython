@@ -2,7 +2,7 @@
 from vending_machine import (FirstDigit, Money, Quit,
                              SecondDigit, VendingMachine)
 
-events = [
+inputs = [
     Money("quarter", 25), Money("quarter", 25),
     Money("dollar", 100),
     # Buy [0][1]
@@ -21,9 +21,9 @@ events = [
     FirstDigit("D", 3), SecondDigit("col 0", 0),
 ]
 machine = VendingMachine()
-for event in events:
-    machine.handle(event)
-    print(f"{event}: {machine.message} "
+for input_ in inputs:
+    machine.handle(input_)
+    print(f"{input_}: {machine.message} "
           f"[{machine.state.name}]")
 #: quarter: Total = 25 [COLLECTING]
 #: quarter: Total = 50 [COLLECTING]

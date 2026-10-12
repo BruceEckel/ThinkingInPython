@@ -31,8 +31,8 @@ class Machine(StateMachine):
             table[(State.COLLECTING, Nickel)] = rows
         super().__init__(State.QUIESCENT, table)
 
-    def add(self, event: Money) -> None:
-        self.amount += event.value
+    def add(self, input_: Money) -> None:
+        self.amount += input_.value
 
 m = Machine()
 m.handle(Money("quarter", 25))

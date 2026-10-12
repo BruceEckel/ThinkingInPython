@@ -5,9 +5,9 @@ from vending_machine import (FirstDigit, Money, Quit,
                              SecondDigit, State,
                              VendingMachine)
 
-def feed(vm: VendingMachine, *events: object) -> None:
-    for event in events:
-        vm.handle(event)
+def feed(vm: VendingMachine, *inputs: object) -> None:
+    for input_ in inputs:
+        vm.handle(input_)
 
 def test_buy_dispenses_and_spends() -> None:
     vm = VendingMachine()

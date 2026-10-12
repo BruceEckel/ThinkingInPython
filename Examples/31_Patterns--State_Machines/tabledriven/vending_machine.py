@@ -111,6 +111,6 @@ class VendingMachine(StateMachine):
         self.message = (
             f"Dispensing; remaining {self.amount}")
 
-    def refund(self, event: object) -> None:
+    def refund(self, input_: object) -> None:
         self.message = f"Returning {self.amount}"
         self.amount = 0

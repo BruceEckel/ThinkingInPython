@@ -24,9 +24,9 @@ def show() -> None:
                     text=f"{r}{c}\n{slot.price}c\n{qty}",
                     state="disabled" if out else "normal")
 
-    def send(event: object) -> None:
+    def send(input_: object) -> None:
         try:
-            vm.handle(event)
+            vm.handle(input_)
         except NoTransition:
             vm.message = "not allowed yet"
         render()

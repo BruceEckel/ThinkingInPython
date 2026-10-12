@@ -60,7 +60,7 @@ class Elevator(StateMachine):
     def set_target(self, call: CallButton) -> None:
         self.target = call.floor
 
-    def arrive(self, event: object) -> None:
+    def arrive(self, input_: object) -> None:
         self.floor = self.target
 
     def obstructed(self, sensor: DoorSensor) -> bool:

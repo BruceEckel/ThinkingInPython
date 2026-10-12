@@ -5,17 +5,17 @@ from typing import Protocol
 # The chapter's state.py and state_machine.py, inlined:
 class State(Protocol):
     def run(self) -> None: ...
-    def next(self, event: object) -> State: ...
+    def next(self, input_: object) -> State: ...
 
 class StateMachine:
     def __init__(self, initial_state: State) -> None:
         self.current_state = initial_state
         self.current_state.run()
     def run_all(self, inputs: Iterable[object]) -> None:
-        for event in inputs:
-            print(type(self.current_state).__name__, event)
+        for input_ in inputs:
+            print(type(self.current_state).__name__, input_)
             self.current_state = (
-                self.current_state.next(event))
+                self.current_state.next(input_))
             self.current_state.run()
 
 class TakePill:
@@ -33,27 +33,27 @@ class Calm:
 class Happy:
     def run(self) -> None:
         print("Great to see you!")
-    def next(self, event: object) -> State:
-        if isinstance(event, Annoy):
+    def next(self, input_: object) -> State:
+        if isinstance(input_, Annoy):
             return Grumpy()
-        if isinstance(event, TakePill):
+        if isinstance(input_, TakePill):
             return Prozac()
         return self
 
 class Grumpy:
     def run(self) -> None:
         print("What do you want?")
-    def next(self, event: object) -> State:
-        if isinstance(event, Calm):
+    def next(self, input_: object) -> State:
+        if isinstance(input_, Calm):
             return Happy()
-        if isinstance(event, TakePill):
+        if isinstance(input_, TakePill):
             return Prozac()
         return self
 
 class Prozac:
     def run(self) -> None:
         print("Everything is wonderful.")
-    def next(self, event: object) -> State:
+    def next(self, input_: object) -> State:
         return self
 
 StateMachine(Happy()).run_all(

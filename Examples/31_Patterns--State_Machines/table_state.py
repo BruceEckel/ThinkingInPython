@@ -9,10 +9,10 @@ class TableState(ABC):
     @abstractmethod
     def run(self) -> None: ...
 
-    def next(self, event: object) -> State:
+    def next(self, input_: object) -> State:
         try:
-            return self.transitions[event]
+            return self.transitions[input_]
         except KeyError:
             raise RuntimeError(
                 f"{type(self).__name__} has no transition "
-                f"for {event}") from None
+                f"for {input_}") from None

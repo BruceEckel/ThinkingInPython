@@ -22,7 +22,7 @@ In the second, a single table holds all transitions.
 
 ## Each State Decides
 
-A `State` runs its operation and, given an event, names the next `State`:
+A `State` runs its operation and, given an input, names the next `State`:
 
 ```python
 # state.py
@@ -30,14 +30,13 @@ from typing import Protocol
 
 class State(Protocol):
     def run(self) -> None: ...
-    def next(self, event: object) -> State: ...
+    def next(self, input_: object) -> State: ...
 ```
 
-An input to the machine is an event: something that happened outside it,
-such as a mouse appearing or a coin dropping.
-The parameter takes that name because `input` belongs to a builtin.
+The parameter is `input_`, with a trailing underscore,
+because a bare `input` would shadow the builtin `input()`.
 
-The `StateMachine` holds the current state and moves it on each input:
+The `StateMachine` holds the current state and advances it on each input:
 
 ```python
 # state_machine.py
@@ -50,10 +49,10 @@ class StateMachine:
         self.current_state.run()
     # Template method:
     def run_all(self, inputs: Iterable[object]) -> None:
-        for event in inputs:
-            print(type(self.current_state).__name__, event)
+        for input_ in inputs:
+            print(type(self.current_state).__name__, input_)
             self.current_state = (
-                self.current_state.next(event))
+                self.current_state.next(input_))
             self.current_state.run()
 ```
 
@@ -132,8 +131,8 @@ class Waiting:
     def run(self) -> None:
         print("Waiting: Broadcasting cheese smell")
 
-    def next(self, event: object) -> State:
-        match event:
+    def next(self, input_: object) -> State:
+        match input_:
             case MouseAction.APPEARS:
                 return MouseTrap.luring
             case _:
@@ -143,8 +142,8 @@ class Luring:
     def run(self) -> None:
         print("Luring: Presenting Cheese, door open")
 
-    def next(self, event: object) -> State:
-        match event:
+    def next(self, input_: object) -> State:
+        match input_:
             case MouseAction.RUNS_AWAY:
                 return MouseTrap.waiting
             case MouseAction.ENTERS:
@@ -156,8 +155,8 @@ class Trapping:
     def run(self) -> None:
         print("Trapping: Closing door")
 
-    def next(self, event: object) -> State:
-        match event:
+    def next(self, input_: object) -> State:
+        match input_:
             case MouseAction.ESCAPES:
                 return MouseTrap.waiting
             case MouseAction.TRAPPED:
@@ -169,8 +168,8 @@ class Holding:
     def run(self) -> None:
         print("Holding: Mouse caught")
 
-    def next(self, event: object) -> State:
-        match event:
+    def next(self, input_: object) -> State:
+        match input_:
             case MouseAction.REMOVED:
                 return MouseTrap.waiting
             case _:
@@ -223,13 +222,13 @@ The code at the bottom of the file builds a `MouseTrap` and runs it through ever
 A state class stores nothing, so each state can be one shared object.
 A single `Waiting` serves every `MouseTrap` and every visit to that state.
 
-Each `next()` is a `match` on the event:
+Each `next()` is a `match` on the input:
 a `case` for every input the state recognizes,
 and a `case _` that returns the machine's current state.
 Each `case` names its member through the class, as in `MouseAction.APPEARS`.
-A dotted name compares the event with that member,
+A dotted name compares the input with that member,
 while a bare `APPEARS` would be a [capture pattern](13_Techniques--Pattern_Matching.md#a-bare-name-captures-a-dotted-name-compares)
-that matches every event.
+that matches every input.
 
 `Waiting.next()` returns `MouseTrap.luring` although the `class MouseTrap` statement comes further down the file.
 Python looks up a name inside a function when the function runs,
@@ -302,23 +301,23 @@ class TableState(ABC):
     @abstractmethod
     def run(self) -> None: ...
 
-    def next(self, event: object) -> State:
+    def next(self, input_: object) -> State:
         try:
-            return self.transitions[event]
+            return self.transitions[input_]
         except KeyError:
             raise RuntimeError(
                 f"{type(self).__name__} has no transition "
-                f"for {event}") from None
+                f"for {input_}") from None
 ```
 
 `TableState.__init__()` starts every state with an empty dict.
 If you forget to fill `Waiting`'s table,
 the machine reports `Waiting has no transition for ...` rather than the `AttributeError` a missing `transitions` attribute would produce.
 
-The `KeyError` that `next()` catches carries the event as its key,
-and the `RuntimeError` message already names that event.
+The `KeyError` that `next()` catches carries the input as its key,
+and the `RuntimeError` message already names that input.
 So `next()` raises its `RuntimeError` [`from None`](04_Foundations--Control_Flow.md#exception-chaining),
-which drops the chained `KeyError` and its repeat of the event.
+which drops the chained `KeyError` and its repeat of the input.
 
 Each subclass now defines `run()` and inherits `next()`.
 The tables filled in at the bottom of the file hold the transitions:
@@ -443,7 +442,7 @@ Version 2's table holds the explicit transitions alone,
 and its `next()` raises an exception on every other input.
 
 Either policy can be right, so choose one on purpose.
-Staying in the same state suits a machine fed from a source that includes events meant for something else.
+Staying in the same state suits a machine fed from a source that includes inputs meant for something else.
 Raising an exception suits a table you are still building,
 where a missing entry is a bug the exception reports.
 The table-driven engine in `tabledriven/table_machine.py` raises an exception for the same reason.
@@ -482,7 +481,7 @@ An enum is the wrong shape here for two reasons.
 You set its members when you write it,
 so its values are the ones you knew about then.
 Every member of one enum also shares that enum's class,
-so `type(event)` is the same key for all of them.
+so `type(input_)` is the same key for all of them.
 
 This design reuses two names with new meanings.
 `tabledriven/table_machine.py` holds a different `StateMachine` from the one in `state_machine.py`.
@@ -497,7 +496,7 @@ with no error.
 
 ### The Engine
 
-For the current state and the type of the incoming event,
+For the current state and the type of the incoming input,
 the engine tries the candidate transitions in order,
 takes the first whose condition passes (or has no condition),
 runs that transition's action, and moves to the next state:
@@ -517,24 +516,24 @@ type Transition = tuple[
 type Table = dict[tuple[Enum, type], list[Transition]]
 
 class NoTransition(RuntimeError):
-    "No table row matched this state and event."
+    "No table row matched this state and input."
 
 class StateMachine:
     def __init__(self, initial: Enum, table: Table) -> None:
         self.state = initial
         self.table = table
 
-    def handle(self, event: object) -> None:
+    def handle(self, input_: object) -> None:
         for condition, action, next_state in self.table.get(
-                (self.state, type(event)), []):
-            if condition is None or condition(event):
+                (self.state, type(input_)), []):
+            if condition is None or condition(input_):
                 if action is not None:
-                    action(event)
+                    action(input_)
                 self.state = next_state
                 return
         raise NoTransition(
             f"no transition from {self.state!r} "
-            f"on {type(event).__name__}")
+            f"on {type(input_).__name__}")
 ```
 
 The listing writes `StateMachine` by hand rather than as a `@dataclass`.
@@ -694,31 +693,31 @@ class VendingMachine(StateMachine):
         self.message = (
             f"Dispensing; remaining {self.amount}")
 
-    def refund(self, event: object) -> None:
+    def refund(self, input_: object) -> None:
         self.message = f"Returning {self.amount}"
         self.amount = 0
 ```
 
-The engine's lookup keys on the exact `type(event)`,
+The engine's lookup keys on the exact `type(input_)`,
 so finding the rows takes one dictionary lookup rather than an `isinstance()` test against each row.
 That exactness lets the table keys separate rows on `FirstDigit` and `SecondDigit`,
 two subclasses of `Digit` that differ only in their class.
 The same exactness excludes a further subclass.
-An event whose class derives from `Money` matches none of `Money`'s rows,
-because the key is the event's exact class.
+An input whose class derives from `Money` matches none of `Money`'s rows,
+because the key is the input's exact class.
 
 The table goes in `__init__()` rather than in the class body,
 because each entry is a bound method.
 `self.add_money` holds a reference to this machine,
 so each `VendingMachine`'s table calls methods that read and write its own `amount` and `items`.
 
-The engine passes the event to both the condition and the action,
+The engine passes the input to both the condition and the action,
 so `refund()` takes an argument it ignores.
-Each method declares the specific event type it handles,
+Each method declares the specific input type it handles,
 and those types differ from row to row.
 So the `Callable[..., bool]` and `Callable[..., None]` annotations leave the parameters as `...`.
 With that `...`, the type checker accepts any callable in any row,
-whatever event class the key names.
+whatever input class the key names.
 If you pair a `SecondDigit` key with a method written for a `FirstDigit`,
 the table type-checks clean, and at runtime that method runs on a `SecondDigit`.
 
@@ -728,14 +727,14 @@ Nothing here needs a `switch`, reflection,
 or a `Condition`/`Transition` class hierarchy.
 The language's first-class functions and its `dict` supply what those mechanisms exist to provide.
 
-`vending_demo.py` feeds a `VendingMachine` a list of events and prints each event with the resulting message and state:
+`vending_demo.py` feeds a `VendingMachine` a list of inputs and prints each input with the resulting message and state:
 
 ```python
 # tabledriven/vending_demo.py
 from vending_machine import (FirstDigit, Money, Quit,
                              SecondDigit, VendingMachine)
 
-events = [
+inputs = [
     Money("quarter", 25), Money("quarter", 25),
     Money("dollar", 100),
     # Buy [0][1]
@@ -754,9 +753,9 @@ events = [
     FirstDigit("D", 3), SecondDigit("col 0", 0),
 ]
 machine = VendingMachine()
-for event in events:
-    machine.handle(event)
-    print(f"{event}: {machine.message} "
+for input_ in inputs:
+    machine.handle(input_)
+    print(f"{input_}: {machine.message} "
           f"[{machine.state.name}]")
 #: quarter: Total = 25 [COLLECTING]
 #: quarter: Total = 50 [COLLECTING]
@@ -781,7 +780,7 @@ while sold out goes to `UNAVAILABLE`.
 The state names the condition.
 The message alone leaves you inferring the condition from the quantity.
 
-The last three events insert a dime and pick the same sold-out slot again,
+The last three inputs insert a dime and pick the same sold-out slot again,
 this time with too little money for it as well.
 Both conditions are now true.
 `too_expensive()` comes first in the `(State.SELECTING, SecondDigit)` list,
@@ -796,7 +795,7 @@ whether or not a lower row matters more.
 ### Testing the Vending Machine
 
 Because the machine is deterministic,
-a test can drive it through a sequence of events and check which state it reaches.
+a test can drive it through a sequence of inputs and check which state it reaches.
 The cases worth testing are:
 
 - A successful purchase
@@ -813,9 +812,9 @@ from vending_machine import (FirstDigit, Money, Quit,
                              SecondDigit, State,
                              VendingMachine)
 
-def feed(vm: VendingMachine, *events: object) -> None:
-    for event in events:
-        vm.handle(event)
+def feed(vm: VendingMachine, *inputs: object) -> None:
+    for input_ in inputs:
+        vm.handle(input_)
 
 def test_buy_dispenses_and_spends() -> None:
     vm = VendingMachine()
@@ -874,7 +873,7 @@ where every user of `run_all()` gets its output.
 
 A `tkinter` GUI is a second view of the same vending machine.
 The GUI reads `amount`, the stock, and `message` and shows them on screen.
-Its coin, refund, and item buttons turn presses into events for `handle()`.
+Its coin, refund, and item buttons turn presses into inputs for `handle()`.
 Because this listing requires user interaction, the harness skips it
 (`tools/data/norun.txt`):
 
@@ -905,9 +904,9 @@ def show() -> None:
                     text=f"{r}{c}\n{slot.price}c\n{qty}",
                     state="disabled" if out else "normal")
 
-    def send(event: object) -> None:
+    def send(input_: object) -> None:
         try:
-            vm.handle(event)
+            vm.handle(input_)
         except NoTransition:
             vm.message = "not allowed yet"
         render()
@@ -943,7 +942,7 @@ if __name__ == "__main__":
     show()
 ```
 
-`send()` passes each event to `handle()` and catches the `NoTransition` that `handle()` raises for a rejected click,
+`send()` passes each input to `handle()` and catches the `NoTransition` that `handle()` raises for a rejected click,
 such as a selection before any money.
 The GUI then shows a message instead of the traceback `tkinter` would otherwise print.
 
@@ -990,7 +989,7 @@ or write a helper that those rows call.
 The first design's constructor calls the initial state's `run()`,
 but the constructor in `table_machine.py` stores `initial` and returns.
 In the one-table design,
-an action the machine needs at startup is a call you make before the first event.
+an action the machine needs at startup is a call you make before the first input.
 
 The deciding question is which you would rather read: one state's transitions,
 gathered in that state, or the whole machine's, gathered in one table.
