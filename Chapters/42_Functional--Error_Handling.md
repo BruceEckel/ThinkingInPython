@@ -529,8 +529,8 @@ as in `composing_with_bind.py` above.
 and `func_c()` in `combining.py` take their inputs from `i` and `j` rather than from an earlier step's answer,
 so stopping at the first `Err` discards whatever the later steps would have found
 (see exercise 3).
-The exception in `exceptions_lose_data.py` does the same to `func_a(4)`,
-which does not run.
+The exception in `exceptions_lose_data.py` does the same:
+it ends the comprehension at `func_a(3)`, before `func_a(4)` runs.
 
 Three steps need three levels of nesting,
 and each step you add nests one level deeper.
