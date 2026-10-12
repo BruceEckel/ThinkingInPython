@@ -213,7 +213,6 @@ and the outer `break` (`[3]`) runs right after.
 so the inner `else` continues on each row and the outer `else` (`[4]`)
 prints `"not found"`.
 
-`locate()` is a function so the listing can run two searches.
 Inside a function, a `return` at the match leaves both loops in one step.
 The `else` form serves loops at the top level of a module,
 and a function with more work to do after the search.
