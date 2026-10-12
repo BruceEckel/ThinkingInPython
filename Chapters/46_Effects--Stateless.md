@@ -966,8 +966,8 @@ and the second is to separate each Effect's interface from its implementation.
 `Console` as a `Protocol` holds no implementation.
 `Terminal` is one implementation and `Recorder` is another,
 and `greet()` names neither.
-Because a `Protocol` matches on structure,
-`Recorder` qualifies as a `Console` without inheriting from `Console`.
+`Recorder` qualifies as a `Console` without inheriting from `Console`,
+because a `Protocol` matches on structure.
 
 `supply()` matches requests with `isinstance()`.
 `isinstance()` accepts a `Protocol` marked `@runtime_checkable` and raises a `TypeError` on any other,
@@ -1368,7 +1368,8 @@ as `Recorder` goes through `as_type(Console)`.
 
 In `Instant`, `waited` is a field because `Time` is a frozen data class and a subclass must be frozen too,
 and the record drops its slots because `Time` declares none.
-Freezing prevents rebinding `waited`, not appending to the list it holds.
+Freezing prevents rebinding `waited`,
+and `sleep()` can still append to the list it holds.
 
 ## Where to Call `run()`
 
@@ -1798,7 +1799,7 @@ def one_unhandled(name: str) -> Try[ValueError, str]:
 `both` is `(str) -> Success[int | KeyError | ValueError]`.
 Every failure moves into the result, so nothing remains in the error channel.
 `all_handled()` returns `Success[str]`.
-No failure escapes as a thrown exception.
+Every failure reaches the `match` in `all_handled()` as a value.
 
 `one` is `(str) -> Try[ValueError, int | KeyError]`.
 The caught error moves to the result and the uncaught one remains.
