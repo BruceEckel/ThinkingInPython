@@ -1,7 +1,6 @@
 # composing_with_bind.py
-from composing import func_b, func_c
 from result import Result
-from returning_result import func_a
+from steps import func_a, func_b, func_c
 
 def composed(i: int) -> Result[int, str]:
     return func_a(i).bind(func_b).bind(func_c)

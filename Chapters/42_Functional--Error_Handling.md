@@ -78,9 +78,6 @@ def func_a(i: int) -> int | str:
     return i
 
 outputs = [func_a(i) for i in range(5)]
-print(outputs)
-#: [0, 1, 2, 'func_a(3)', 4]
-
 for r in outputs:
     match r:
         case int(answer):
@@ -208,11 +205,8 @@ or with `match` as in `safe_demo.py`.
 ```python
 # must_unwrap.py
 from exceptions import expected
-from result import Err, Ok
 from returning_result import func_a
 
-print(hasattr(Ok(1), "unwrap"), hasattr(Err("x"), "unwrap"))
-#: True False
 with expected(AttributeError):
     func_a(1).unwrap()  # type: ignore
 #: [AttributeError] 'Err' object has no attribute 'unwrap'
@@ -277,12 +271,18 @@ Real programs chain steps.
 With a `Result`, each step can fail,
 so you must check each call before the next one runs.
 You can catch an exception from existing code and turn it into an `Err`,
-so the failure becomes data rather than control flow:
+so the failure becomes data rather than control flow.
+`func_c()` does that with a `ZeroDivisionError`.
+`steps.py` gathers the three steps the rest of the chapter chains,
+and lists `func_a()` in `__all__` beside its own two,
+so a listing imports all three from one module:
 
 ```python
-# composing.py
+# steps.py
 from result import Err, Ok, Result
 from returning_result import func_a
+
+__all__ = ["func_a", "func_b", "func_c"]
 
 def func_b(i: int) -> Result[int, str]:
     if i == 2:
@@ -297,6 +297,14 @@ def func_c(i: int) -> Result[int, str]:
         # The exception becomes a value:
         return Err(f"func_c({i}): {e}")
     return Ok(i)
+```
+
+`composed()` runs the three steps in order and checks each `Result` by hand:
+
+```python
+# composing.py
+from result import Err, Result
+from steps import func_a, func_b, func_c
 
 def composed(i: int) -> Result[int, str]:
     a = func_a(i)
@@ -383,9 +391,8 @@ because each later `bind()` returns that same `Err`:
 
 ```python
 # composing_with_bind.py
-from composing import func_b, func_c
 from result import Result
-from returning_result import func_a
+from steps import func_a, func_b, func_c
 
 def composed(i: int) -> Result[int, str]:
     return func_a(i).bind(func_b).bind(func_c)
@@ -469,40 +476,12 @@ def test_manual_and_bind_agree(i: int) -> None:
 
 `bind()` passes one value from each step to the next.
 When you have several independent inputs,
-nest the binds so each answer stays in scope for the next step.
-
-```python
-# combining_two.py
-from composing import func_b
-from result import Ok, Result
-from returning_result import func_a
-
-def pair(i: int, j: int) -> Result[str, str]:
-    return func_a(i).bind(
-        lambda a: func_b(j).bind(
-            lambda b: Ok(f"{a} and {b}")))
-
-if __name__ == "__main__":
-    for args in [(7, 5), (1, 5), (7, 2)]:
-        print(args, pair(*args))
-#: (7, 5) Ok(answer='7 and 5')
-#: (1, 5) Err(error='func_a(1)')
-#: (7, 2) Err(error='func_b(2)')
-```
-
-Each lambda's parameter is the previous step's answer.
-The nesting keeps every earlier answer in scope,
-so `a` is still visible inside the inner lambda that receives `b`.
-A flat sequence of `bind()` calls drops the earlier answer from scope,
-because each step's function receives one argument, the previous answer.
-
-A third step adds a third level:
+nest the binds so each answer stays in scope for the next step:
 
 ```python
 # combining.py
-from composing import func_b, func_c
 from result import Ok, Result
-from returning_result import func_a
+from steps import func_a, func_b, func_c
 
 def add(a: int, b: int, c: int) -> str:
     return f"add({a} + {b} + {c}): {a + b + c}"
@@ -522,6 +501,12 @@ if __name__ == "__main__":
 #: (1, 2) Err(error='func_a(1)')
 #: (7, 5) Ok(answer='add(7 + 5 + 12): 24')
 ```
+
+Each lambda's parameter is the previous step's answer.
+The nesting keeps every earlier answer in scope,
+so `a` and `b` are still visible inside the innermost lambda that receives `c`.
+A flat sequence of `bind()` calls drops the earlier answers from scope,
+because each step's function receives one argument, the previous answer.
 
 An `Err` anywhere short-circuits to the end.
 `(7, 5)` is the one input of the five that passes all three steps,
@@ -567,7 +552,7 @@ def test_combined_returns_answer_or_first_failure(
 
 ## Turning Exceptions into Results
 
-In `composing.py`, `func_c()` puts a `try`/`except` around a division that can raise a `ZeroDivisionError` and returns an `Err` by hand.
+In `steps.py`, `func_c()` puts a `try`/`except` around a division that can raise a `ZeroDivisionError` and returns an `Err` by hand.
 A decorator can capture that pattern.
 `@safe` takes a function that raises an exception and produces one that returns a `Result`,
 with the exception as the `Err` value.
@@ -624,7 +609,7 @@ which is all a bare `except Exception` says.
 `@safe` names `Exception` because it writes one `try`/`except` for every function it wraps,
 and the base class is the one type that covers whatever those functions raise.
 A wrapper written by hand can be narrower.
-`func_c()` in `composing.py` catches `ZeroDivisionError` alone,
+`func_c()` in `steps.py` catches `ZeroDivisionError` alone,
 and a `parse()` that catches `ValueError` the same way can return `Result[int, ValueError]`.
 Write the wrapper yourself when the narrower type matters more than the convenience.
 
@@ -675,10 +660,7 @@ Each kind of failure gets its own branch:
 # matching_errors.py
 from result import Err, Ok, Result
 from safe import safe
-
-@safe
-def parse(text: str) -> int:
-    return int(text)
+from safe_demo import parse
 
 @safe
 def reciprocal(n: int) -> float:
@@ -708,7 +690,8 @@ if __name__ == "__main__":
 #: OOPS: Not a number
 ```
 
-`@safe` wraps both `parse()` and `reciprocal()`, so `bind()` chains them.
+`@safe` wraps both `parse()`, imported from `safe_demo.py`, and `reciprocal()`,
+so `bind()` chains them.
 A `ValueError` from a bad number and a `ZeroDivisionError` from dividing by zero each become the `error` field of an ordinary `Err`.
 `compute()` returns a `Result`, a value the caller keeps after the call returns,
 so the dict comprehension computes all three results before `describe()` matches any of them.

@@ -1,7 +1,6 @@
 # combining.py
-from composing import func_b, func_c
 from result import Ok, Result
-from returning_result import func_a
+from steps import func_a, func_b, func_c
 
 def add(a: int, b: int, c: int) -> str:
     return f"add({a} + {b} + {c}): {a + b + c}"

@@ -1,10 +1,7 @@
 # matching_errors.py
 from result import Err, Ok, Result
 from safe import safe
-
-@safe
-def parse(text: str) -> int:
-    return int(text)
+from safe_demo import parse
 
 @safe
 def reciprocal(n: int) -> float:
