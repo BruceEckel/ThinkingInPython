@@ -2,7 +2,7 @@
 from collections.abc import Callable
 from functools import wraps
 
-def trace(
+def passthrough(
     func: Callable[[str], str]
 ) -> Callable[[str], str]:
     @wraps(func)
@@ -10,7 +10,7 @@ def trace(
         return func(name)
     return wrapper
 
-@trace
+@passthrough
 def greet(name: str) -> str:
     "Say hello."
     return f"Hello, {name}!"

@@ -20,3 +20,7 @@ print(x.squared)  # No second "computing"
 x.n = 10  # Doesn't change the cached result
 print(x.squared)
 #: 25
+del x.squared  # [1]
+print(x.squared)
+#: computing
+#: 100

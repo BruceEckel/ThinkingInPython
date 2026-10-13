@@ -1,5 +1,5 @@
 # recursion.py
-import sys
+from exceptions import expect
 
 def factorial(n: int) -> int:
     # Base case stops the recursion:
@@ -10,6 +10,5 @@ def factorial(n: int) -> int:
 
 print(factorial(5))
 #: 120
-# Python caps how deep recursion can go:
-print(sys.getrecursionlimit())
-#: 1000
+expect(RecursionError, factorial, 5000)
+#: [RecursionError] maximum recursion depth exceeded

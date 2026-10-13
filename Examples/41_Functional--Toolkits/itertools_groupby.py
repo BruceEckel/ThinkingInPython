@@ -7,3 +7,7 @@ print([(k, list(g)) for k, g in groupby(data)])
 # [1]
 print([(k, list(g)) for k, g in groupby(["b", "a", "b"])])
 #: [('b', ['b']), ('a', ['a']), ('b', ['b'])]
+# [2]
+print([(k, list(g))
+       for k, g in groupby(sorted(["b", "a", "b"]))])
+#: [('a', ['a']), ('b', ['b', 'b'])]

@@ -210,13 +210,18 @@ print(x.squared)  # No second "computing"
 x.n = 10  # Doesn't change the cached result
 print(x.squared)
 #: 25
+del x.squared  # [1]
+print(x.squared)
+#: computing
+#: 100
 ```
 
 The stored result stays when an input changes.
 `x.n = 10` leaves `squared` at `25`.
-`del x.squared` resets it.
+`del x.squared` at `[1]` resets it.
 Deleting the cached attribute discards the stored value,
-and the next access recomputes it from the current state.
+and the next access recomputes it from the current state,
+so the last access prints `computing` again and then `100`.
 
 A first access from two threads at once is a race.
 `cached_property` takes no lock,
@@ -241,7 +246,7 @@ copies the same metadata onto a wrapper that is a class instance.
 from collections.abc import Callable
 from functools import wraps
 
-def trace(
+def passthrough(
     func: Callable[[str], str]
 ) -> Callable[[str], str]:
     @wraps(func)
@@ -249,7 +254,7 @@ def trace(
         return func(name)
     return wrapper
 
-@trace
+@passthrough
 def greet(name: str) -> str:
     "Say hello."
     return f"Hello, {name}!"
@@ -669,12 +674,18 @@ print([(k, list(g)) for k, g in groupby(data)])
 # [1]
 print([(k, list(g)) for k, g in groupby(["b", "a", "b"])])
 #: [('b', ['b']), ('a', ['a']), ('b', ['b'])]
+# [2]
+print([(k, list(g))
+       for k, g in groupby(sorted(["b", "a", "b"]))])
+#: [('a', ['a']), ('b', ['b', 'b'])]
 ```
 
 The `print()` at `[1]` shows what unsorted input does.
 `"b"` comes back as two separate groups, and no error reports it.
-`groupby(sorted(data, key=keyfunc), key=keyfunc)` is the fix,
-with the same key function both times.
+Sorting first is the fix,
+and at `[2]` the two `"b"` elements come back as one group.
+With a key function, pass the same one to both calls,
+as in `groupby(sorted(data, key=keyfunc), key=keyfunc)`.
 `sorted()` returns a new list and leaves `data` as it was,
 so `groupby()` must receive what `sorted()` returns.
 
@@ -849,7 +860,7 @@ Each recursive function needs a *base case* that stops the recursion and a *recu
 
 ```python
 # recursion.py
-import sys
+from exceptions import expect
 
 def factorial(n: int) -> int:
     # Base case stops the recursion:
@@ -860,15 +871,15 @@ def factorial(n: int) -> int:
 
 print(factorial(5))
 #: 120
-# Python caps how deep recursion can go:
-print(sys.getrecursionlimit())
-#: 1000
+expect(RecursionError, factorial, 5000)
+#: [RecursionError] maximum recursion depth exceeded
 ```
 
 A `for` loop computes this same factorial in about the same number of lines and stays in one frame at any `n`.
 Python pushes a frame for every recursive call, including one in tail position,
 where a language with *tail-call optimization* reuses the caller's frame.
-The stack has a cap, so deep recursion raises a `RecursionError`.
+The stack has a cap, 1000 frames by default,
+so `factorial(5000)` raises a `RecursionError`.
 `sys.setrecursionlimit()` raises that limit when the depth is genuine.
 
 A long flat sequence calls for a loop or one of the `itertools` tools.
