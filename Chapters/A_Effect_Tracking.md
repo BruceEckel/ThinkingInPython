@@ -36,8 +36,8 @@ row(f) = the Effects f performs directly
 ```
 
 The `row(g)` line makes the rule recursive,
-and that recursion is the propagation [Effect Management](44_Effects--Effect_Management.md#native-effect-management)
-describes.
+and that recursion is the propagation [Effect Management](44_Effects--Effect_Management.md#effect-management-for-python)
+calls the hard part.
 
 Koka and the other native systems compute this rule as part of algebraic effects,
 the design [Native Effect Management](44_Effects--Effect_Management.md#native-effect-management)
@@ -125,20 +125,21 @@ and that compiler analyzes every function in the program.
 
 PEP 593 added `Annotated[T, x, y, ...]` to `typing` in Python 3.9.
 `T` is a type.
-The arguments after it are *metadata*,
-and the type checker reads each one as a value, even when it is a class.
+The arguments after it are *metadata*.
 Each one is an ordinary expression, and `Annotated` keeps its value.
+The type checker treats a class in that position as a value, not as a type.
 `Annotated[int, "meters", range(0, 100)]` carries two pieces of metadata,
 a string and a `range` object.
-`Annotated` requires one piece of metadata and accepts any number after it.
+`Annotated` requires at least one piece of metadata.
 
 The PEP gives tools one rule.
 A tool with no logic for a piece of metadata ignores that piece and treats the annotation as `T`.
 Each tool can therefore put its own object in the list,
 and every other tool reads past it.
-So metadata changes nothing for a type checker,
-and the runtime can read it back with `get_type_hints()`.
-That makes `Annotated` a candidate for the first role, a place to write the row:
+So metadata changes nothing for a type checker.
+At runtime, your code reads it back with `get_type_hints()`.
+Those two facts make `Annotated` a candidate for the first role,
+a place to write the row:
 
 ```python
 # utils/effect_rows.py
@@ -168,7 +169,7 @@ The listing lives in `utils/` because [An Effect Checker](B_An_Effect_Checker.md
 imports it too.
 `Performs` wraps the row because every tool shares the metadata.
 A validation library may put its own objects in the same `Annotated`,
-and the PEP directs every consumer to act only on the objects it recognizes.
+and the PEP directs every consumer to act on the objects it recognizes and pass over the rest.
 The `isinstance()` test in `row()` does that.
 `include_extras=True` keeps the metadata,
 which `get_type_hints()` otherwise strips.
@@ -237,6 +238,9 @@ The list alone does not separate a function declared pure from [one that declare
 `ask()` calls `input()` in its own body, with no handler in between.
 `Ask` is a label here.
 It has no methods, and nothing can substitute another implementation for it.
+The row tracks the Effect,
+and [Tracking Is Not Management](#tracking-is-not-management)
+explains why a row alone cannot manage it.
 
 ## What a Checker for the Row Must Do
 
@@ -251,7 +255,7 @@ To compute a row, the tool lists every call in a body and finds each callee's de
 A direct call to a module-level function is the easy case.
 The `ast` module finds `tell(message.upper())` in `shout()` and leaves name binding to the tool,
 which looks `tell` up in `shout()`'s local names and then at the module's top level,
-where `tell()` is defined.
+which defines `tell()`.
 
 A method call is the ordinary case, and it is hard.
 For `console.print(message)` the tool needs the type of `console`.
@@ -410,8 +414,10 @@ the decorator raises an exception when the callee's row holds an Effect outside 
 and otherwise sets the `ContextVar` to the callee's row until the call returns.
 That step bounds each function the callee calls by the callee's row,
 not by the caller's wider set.
-A function that handles `Ask` leaves `Ask` out of its own row,
-so the set needs the `handling` term for the `greet()` call inside its `handling(Ask, Scripted())` block to pass.
+A function that handles `Ask` leaves `Ask` out of its own row.
+Inside that function's `handling(Ask, Scripted())` block,
+the `handling` term puts `Ask` back in the set,
+so the `greet()` call there passes.
 Call resolution disappears as a problem, because running a call resolves it.
 The loss is coverage.
 A runtime check covers the paths a run executes,
