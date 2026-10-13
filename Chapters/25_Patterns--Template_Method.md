@@ -365,12 +365,11 @@ you can also pass the steps as arguments:
 ```python
 # template_function.py
 from collections.abc import Callable
-from exceptions import expect
 
 type Step = Callable[[], None]
 
 def run_framework(customize1: Step,
-                  customize2: Step) -> None:
+                  customize2: Step = lambda: None) -> None:
     for _ in range(2):  # The anchored algorithm
         customize1()
         customize2()
@@ -384,9 +383,9 @@ run_framework(
 #: Nudge, nudge, wink, wink!
 #: Say no more, say no more!
 
-expect(TypeError, run_framework, lambda: print("one"))  # type: ignore
-#: [TypeError] run_framework() missing 1 required positional
-#: argument: 'customize2'
+run_framework(lambda: print("one"))
+#: one
+#: one
 ```
 
 The figure lays the subclass form and the function form side by side,
@@ -412,9 +411,12 @@ passing functions is lighter and avoids a class hierarchy.
 
 The subclass form also makes each step optional,
 since the base supplies the `...` default.
-The function form must give each parameter a default of its own.
-Without one, omitting `customize2` in `template_function.py` raises a `TypeError`.
-A do-nothing default such as `lambda: None` makes a step optional and keeps the loop free of `None` tests.
+The function form makes a step optional by giving its parameter a default.
+In `template_function.py`,
+`customize2` defaults to the do-nothing `lambda: None`,
+so the closing `run_framework()` call passes one step and the loop prints `one` twice.
+The do-nothing default keeps the loop free of `None` tests.
+`customize1` has no default, so the type checker reports a call that omits it.
 
 The function version also needs no `@final`.
 That decorator stops an override only when the type checker runs.
