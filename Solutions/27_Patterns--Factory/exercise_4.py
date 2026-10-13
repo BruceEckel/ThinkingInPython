@@ -1,24 +1,27 @@
 # exercise_4.py
 from abc import ABC, abstractmethod
 from typing import Literal, Protocol, override
+from record import record
 
 type Thickness = Literal["thick", "thin"]
 
 class Shape(ABC):
+    __slots__ = ()
+
     @abstractmethod
     def draw(self) -> None: ...
 
+@record
 class Circle(Shape):
-    def __init__(self, thickness: Thickness) -> None:
-        self.thickness = thickness
+    thickness: Thickness
 
     @override
     def draw(self) -> None:
         print(f"{self.thickness} Circle.draw")
 
+@record
 class Square(Shape):
-    def __init__(self, thickness: Thickness) -> None:
-        self.thickness = thickness
+    thickness: Thickness
 
     @override
     def draw(self) -> None:

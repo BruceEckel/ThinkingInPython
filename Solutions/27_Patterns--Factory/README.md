@@ -411,10 +411,11 @@ info: └── protocol member `make_obstacle` is not defined on type
 ```
 
 The two halves fail at different places. In `abstract_factory_abc.py`
-the base class declares `make_obstacle()` as an `@abstractmethod`, so a
-factory that omits it defines without complaint. The type checker reports
-the line that constructs that factory, and a program that ignores the report
-raises a `TypeError` at the same construction, before the game runs.
+the base class declares `make_obstacle()` as an `@abstractmethod`, so
+Python accepts the definition of a factory that omits it. The type
+checker reports the line that constructs that factory, and a program
+that ignores the report raises a `TypeError` at the same construction,
+before the game runs.
 In `abstract_factory_protocol.py` no class declares that it satisfies
 the protocol, so constructing the factory is legal. The report moves
 to the call that needs the protocol, and the diagnostic names the
@@ -445,24 +446,27 @@ Declare a `Protocol` with one creation method per shape, write one factory class
 # The shape of exercise_4.py
 from abc import ABC, abstractmethod
 from typing import Literal, Protocol, override
+from record import record
 
 type Thickness = Literal["thick", "thin"]
 
 class Shape(ABC):
+    __slots__ = ()
+
     @abstractmethod
     def draw(self) -> None: ...
 
+@record
 class Circle(Shape):
-    def __init__(self, thickness: Thickness) -> None:
-        ...
+    thickness: Thickness
 
     @override
     def draw(self) -> None:
         ...
 
+@record
 class Square(Shape):
-    def __init__(self, thickness: Thickness) -> None:
-        ...
+    thickness: Thickness
 
     @override
     def draw(self) -> None:
@@ -497,24 +501,27 @@ def build_shapes(factory: ShapeFactory) -> list[Shape]:
 # exercise_4.py
 from abc import ABC, abstractmethod
 from typing import Literal, Protocol, override
+from record import record
 
 type Thickness = Literal["thick", "thin"]
 
 class Shape(ABC):
+    __slots__ = ()
+
     @abstractmethod
     def draw(self) -> None: ...
 
+@record
 class Circle(Shape):
-    def __init__(self, thickness: Thickness) -> None:
-        self.thickness = thickness
+    thickness: Thickness
 
     @override
     def draw(self) -> None:
         print(f"{self.thickness} Circle.draw")
 
+@record
 class Square(Shape):
-    def __init__(self, thickness: Thickness) -> None:
-        self.thickness = thickness
+    thickness: Thickness
 
     @override
     def draw(self) -> None:
@@ -865,7 +872,7 @@ body, and with it the two `class` statements, until the first use of
 </details>
 </details>
 
-## 7. What `copy.copy()` costs a prototype registry
+## 7. What `copy.copy()` breaks in a prototype registry
 
 > Give `Monster` in `prototype_registry.py` a `parts: dict[str, int]` field and add a prototype that uses it.
 > Change `spawn()` to use `copy.copy()` instead of `copy.deepcopy()`,

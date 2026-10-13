@@ -11,12 +11,12 @@ Adding a type then means writing one subclass,
 with no changes to existing code ... or so it seems.
 But something must still create an object of the new type,
 and that creation code names the concrete class.
-If object creation is spread throughout your application,
+If your application creates objects in many places,
 adding a type means finding and editing every place that names a concrete class.
 
 Here `Triangle` has just joined the hierarchy.
 Two call sites build shapes by calling `Circle()` or `Square()`,
-and neither has been updated for `Triangle`:
+and neither handles `Triangle` yet:
 
 ```python
 # shapes_naive.py
@@ -166,13 +166,11 @@ This `factory()` is the smallest version of that idea: one class, one method,
 and a `match` where the overrides would be.
 
 `shape_name()` is a [*generator*](23_Patterns--Iterators.md#generators).
-Whereas a factory takes information telling it what to build,
-a generator object does the opposite.
-It holds an internal algorithm and needs no argument to produce the next value.
+A factory takes information that tells it what to build.
+A generator object needs no argument to produce its next value,
+because it holds the algorithm that decides what comes next.
 
-`shape_name(n: int) -> Iterator[str]` returns a generator object,
-and `n` is the maximum number of shapes it can produce.
-That object produces names on demand.
+`shape_name(n: int) -> Iterator[str]` returns a generator object that produces `n` names on demand.
 Those names are the arguments to `Shape.factory()`.
 Normally the initialization data comes from outside the system rather than through random generation.
 
@@ -281,6 +279,12 @@ make("Square").draw()
 
 The `dict` values have the type `type[Shape]` because they are classes,
 and calling one constructs an instance.
+If the table held instances instead, as in `{"Circle": Circle()}`,
+`make()` would return the stored object,
+and every caller would share one `Circle`.
+[*Prototype*](#prototype)
+keeps a table of instances on purpose and copies one for each caller.
+
 Adding a `Triangle` means one new class and one new line in `SHAPES`,
 and one new member in `Kind`.
 Typing `kind` as the closed `Literal` instead of `str` moves a bad name from a runtime `KeyError` to a check-time error,
@@ -293,7 +297,8 @@ so adding a shape name to `SHAPES` requires adding it to the `Literal` first.
 ### Self Registration
 
 Better still, a new `Shape` subclass can register itself with no edit to existing code.
-In this case, a closed `Literal` complicates things by requiring an edit for every new subclass.
+That rules out a closed `Literal`, which needs an edit for every new subclass,
+so `make()` here takes a `str`.
 
 ```python
 # registry.py
@@ -345,7 +350,7 @@ and any of those may be a concrete subclass, so the checker accepts it.
 [Explicit Registration with a Protocol](#explicit-registration-with-a-protocol)
 moves that report to the check.
 
-To add a `Triangle` is a single class definition,
+Adding a `Triangle` takes a single class definition,
 and `make()` builds it with no change to the factory.
 `Shape.__subclasses__()` can build the table instead,
 but it stops at direct subclasses,
@@ -471,7 +476,7 @@ because the `Triangle` that `test_new_subclass_registers_itself()` defined is st
 
 ### Explicit Registration with a Protocol
 
-The ABC in `registry.py` exists so that `__init_subclass__()` has a class from which to run.
+`registry.py` needs a base class because Python calls the base class's `__init_subclass__()` each time a subclass is defined.
 If registration is explicit instead, `Shape` can be a Protocol,
 with a class decorator doing the registering.
 The table then needs no class on which to live,
@@ -555,7 +560,7 @@ and the type checker rejects a bound that contains another type parameter.
 
 Keeping the table in the factory removes two hazards from [Hazards of Self Registration](#hazards-of-self-registration).
 No `cls.registry` lookup walks the MRO,
-and no `@classmethod` needs a class on which to sit,
+and no shape class carries a `make()` that a call like `Circle.make("Square")` could misuse,
 since the table belongs to `make` rather than to a class in the hierarchy.
 An intermediate class also stays out of the table unless something decorates it.
 Under `__init_subclass__()`,
@@ -572,9 +577,9 @@ because the subclass line is the registration.
 The runtime guard is weaker too.
 A class that ignores the checker's report still registers,
 and fails with an `AttributeError` at its first `draw()` call rather than a `TypeError` at construction.
-Choose the failure you prefer:
-the ABC catches the incomplete class at construction,
-the Protocol at check time.
+Choose the failure you prefer.
+The ABC registers every subclass and catches an incomplete one at construction.
+The Protocol catches an incomplete class at check time and leaves registration to you.
 
 A factory that is an object also gives each test its own table.
 The test file confirms that `register()` stores the class and returns it,
@@ -695,16 +700,13 @@ so the two nested `Factory` classes conform without naming it.
 `FACTORIES` maps each kind's name to an instance of its factory,
 and `create_shape()` looks up that factory and calls its `create()`.
 
-A more complex design returns the factory object to the caller,
-who keeps it to construct objects later.
-Much of the time, however, a single static method in the base class
-(as in `shape_factory_method.py`) is enough.
-
 Python does not need a `Factory` class nested in every shape.
 `shape_factory_objects.py` includes one because a language that cannot store a class in a dictionary must wrap each constructor in an object.
 The registry in `registry.py` does the same job with no nested classes.
-Use a separate factory class when object creation needs work beyond calling a constructor,
-such as pooling, caching, or consulting external configuration.
+
+A separate factory object is worth writing when it holds state of its own,
+such as a pool, a cache, or loaded configuration,
+or when the caller keeps the factory to construct objects later.
 
 You could eliminate `FACTORIES` by dispatching through `eval(f"_{kind}.Factory()")`.
 Dispatching through `eval()` is unnecessary, and it makes things worse.
@@ -794,7 +796,7 @@ The example in *GoF Design Patterns* makes one program work across several graph
 You create a factory object for the GUI you use,
 and from then on when you ask that factory for a menu, button, or slider,
 the factory creates the version of that item suited to that GUI.
-Switching from one GUI to another then touches only a single place in the code,
+Switching from one GUI to another then changes one place in the code,
 most likely via startup configuration.
 
 As another example, suppose you are creating a general-purpose gaming environment that supports different types of games.
@@ -1192,7 +1194,7 @@ if __name__ == "__main__":
 You can chain the calls because each setter returns `self`.
 `build()` freezes the accumulated settings into an immutable `Pizza`.
 
-The builder is quietly single-use.
+A `PizzaBuilder` keeps its settings after `build()` returns.
 `build()` reads `self._toppings` without clearing it,
 so a second `build()` on the same builder returns a pizza carrying the first pizza's toppings,
 and every `.topping()` call in between adds to that same list.
@@ -1202,8 +1204,7 @@ Making the builder reusable means resetting the fields in `build()`,
 and that reset removes the other reasonable use:
 configuring a builder once and building from it twice.
 
-Apart from the single-use hazard,
-the builder class solves a problem Python does not have.
+Apart from that hazard, the builder class solves a problem Python does not have.
 Keyword arguments with defaults are Python's built-in builder:
 
 ```python
@@ -1271,7 +1272,7 @@ The (unrelated) [*Decorator* pattern](14_Techniques--Decorators.md#the-decorator
 has its own `Pizza`,
 modeling toppings as wrapper objects instead of builder-collected fields.
 
-*Builder* remains useful in Python when construction is genuinely a process.
+*Builder* remains useful in Python when construction is a process rather than a single call.
 The steps must come in order, later steps depend on earlier ones,
 and some rules apply across several steps.
 `GameBuilder` in [Simulation](38_Patterns--Simulation.md#building-the-maze-in-stages)
@@ -1310,15 +1311,18 @@ Match the machinery to what varies:
 - When the choice is which arguments to pass, not which class,
   write an alternative constructor,
   a `@classmethod` that ends with `return cls(...)`.
-- When construction takes real work beyond calling a constructor
+- When construction does more than call a constructor
   (pooling, caching, consulting configuration), write a factory function,
   and a factory class only when that work has state of its own.
+- When a class does work that needs a product and each subclass picks the product,
+  override a factory method,
+  as `CircleSketch` and `SquareSketch` do in `shape_sketch.py`.
 - When you must choose several products together as a matched set,
   use *Abstract Factory*, expressed as a `Protocol` rather than a base class.
 - When the interesting part of an object is its configured state rather than its type,
   keep a prototype and copy it.
   For a record, `replace()` is that copy.
-- When construction is a genuine process with ordered steps and rules that apply across several of them,
+- When construction is a process with ordered steps and rules that apply across several of them,
   use *Builder*.
   When each builder call sets one optional value,
   keyword arguments are the builder.
