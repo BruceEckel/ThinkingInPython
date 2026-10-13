@@ -22,17 +22,14 @@ Chapters/02_Foundations--Tour.md	even: CODE breaks a tie to the nearest even val
 Chapters/02_Foundations--Tour.md	only: Python binds a name only when the assignment runs
 Chapters/02_Foundations--Tour.md	only: Use a t-string only when a consumer must inspect
 Chapters/03_Foundations--Containers.md	already: CODE returns the list already stored under CODE
-Chapters/03_Foundations--Containers.md	never: and assignment never copies
 Chapters/03_Foundations--Containers.md	only: A CODE is fast only at its append end
 Chapters/03_Foundations--Containers.md	only: Go past those four only when a measurement or a specific job calls for it
 Chapters/03_Foundations--Containers.md	only: Only the CODE hides the mistake
 Chapters/03_Foundations--Containers.md	only: is a read-only *view* onto a CODE you still hold
 Chapters/04_Foundations--Control_Flow.md	even: even if the body raises an exception
 Chapters/04_Foundations--Control_Flow.md	never: so CODE through CODE never print
-Chapters/04_Foundations--Control_Flow.md	only: All three raise the same exception and differ only in that report
 Chapters/04_Foundations--Control_Flow.md	only: Catch an exception only when you can do something about it
 Chapters/04_Foundations--Control_Flow.md	only: Only the first matching CODE runs
-Chapters/04_Foundations--Control_Flow.md	only: The CODE block asks the only question that matters
 Chapters/04_Foundations--Control_Flow.md	only: You can give only the type
 Chapters/04_Foundations--Control_Flow.md	only: and only the EAFP form is safe against that
 Chapters/04_Foundations--Control_Flow.md	only: they are keywords only in this statement
@@ -57,7 +54,6 @@ Chapters/06_Foundations--Modules_and_Packages.md	ever: not names your program ev
 Chapters/06_Foundations--Modules_and_Packages.md	itself: create a directory called CODE whose CODE announces itself
 Chapters/06_Foundations--Modules_and_Packages.md	itself: with its own CODE and a top-level CODE so the module announces itself when it loads
 Chapters/06_Foundations--Modules_and_Packages.md	only: Assigning into CODE matters whenever code needs to define a module-level name known only at runtime
-Chapters/06_Foundations--Modules_and_Packages.md	only: CODE binds only the name CODE in this file
 Chapters/06_Foundations--Modules_and_Packages.md	only: For a large program that imports many modules but uses only some of them on any given run
 Chapters/06_Foundations--Modules_and_Packages.md	only: The condition is true only when you run this file as a script
 Chapters/06_Foundations--Modules_and_Packages.md	only: The submodule becomes an attribute of the package only when something imports it by name
@@ -72,7 +68,6 @@ Chapters/06_Foundations--Modules_and_Packages.md	only: not only a package's subm
 Chapters/06_Foundations--Modules_and_Packages.md	only: only flags the directory as a package.^[The name CODE often confuses people
 Chapters/06_Foundations--Modules_and_Packages.md	only: only the listed names arrive
 Chapters/06_Foundations--Modules_and_Packages.md	only: the way CODE is a keyword only inside a CODE statement
-Chapters/06_Foundations--Modules_and_Packages.md	want: you want its definitions and none of the code at the bottom of the file
 Chapters/07_Foundations--Classes.md	only: Cache only what cannot change
 Chapters/07_Foundations--Classes.md	only: and add CODE only when users see the output
 Chapters/07_Foundations--Classes.md	only: you often inherit only to establish a common interface
@@ -162,14 +157,12 @@ Chapters/14_Techniques--Decorators.md	cost: The tests check the cost and descrip
 Chapters/14_Techniques--Decorators.md	cost: adds to the cost
 Chapters/14_Techniques--Decorators.md	cost: then print its cost and description
 Chapters/14_Techniques--Decorators.md	even: even after the decorator has returned
-Chapters/14_Techniques--Decorators.md	never: The CODE instance never arrives
 Chapters/14_Techniques--Decorators.md	never: The original body of CODE never runs
 Chapters/14_Techniques--Decorators.md	only: A read-only CODE in a CODE requires that reading the name produce the property's return type
 Chapters/14_Techniques--Decorators.md	only: CODE runs with CODE as its only argument
 Chapters/14_Techniques--Decorators.md	only: Only now does CODE's own body run
 Chapters/14_Techniques--Decorators.md	only: Only the body of CODE waits for the call
 Chapters/14_Techniques--Decorators.md	only: Python binds a class attribute to an instance only when that attribute is a *descriptor*
-Chapters/14_Techniques--Decorators.md	only: That variable is visible only inside the closure
 Chapters/14_Techniques--Decorators.md	only: The CODE test assumes that only the decorated function can arrive in that first position
 Chapters/14_Techniques--Decorators.md	only: adds a description only under some condition
 Chapters/14_Techniques--Decorators.md	only: and the only symptom is missing output
@@ -324,6 +317,7 @@ Chapters/19_Techniques--Concurrency.md	only: only the type of object the call bu
 Chapters/19_Techniques--Concurrency.md	only: so only the split changes from one line of output to the next
 Chapters/19_Techniques--Concurrency.md	only: so two threads contend only when they touch the same container
 Chapters/19_Techniques--Concurrency.md	only: while a coroutine yields only at an CODE you chose to write
+Chapters/19_Techniques--Concurrency.md	price: CODE gives each run of a price function its own CODE
 Chapters/19_Techniques--Concurrency.md	price: which runs a price function sequentially and threaded
 Chapters/19_Techniques--Concurrency.md	price: writing the same price lookup twice
 Chapters/19_Techniques--Concurrency.md	want: and that is what you want
@@ -467,12 +461,10 @@ Chapters/29_Patterns--Changing_the_Interface.md	only: and import only those from
 Chapters/29_Patterns--Changing_the_Interface.md	only: and their required assembly order appears only inside CODE
 Chapters/29_Patterns--Changing_the_Interface.md	only: create an interface that presents only what the client programmer needs
 Chapters/31_Patterns--State_Machines.md	costs: or clears a selection that costs more than the money inserted
-Chapters/31_Patterns--State_Machines.md	exactly: The engine's lookup keys on CODE exactly
-Chapters/31_Patterns--State_Machines.md	expensive: The sold-out and too-expensive clears both print CODE and end in different states
+Chapters/31_Patterns--State_Machines.md	expensive: The sold-out and too-expensive clears both start from CODE on a column
 Chapters/31_Patterns--State_Machines.md	expensive: The too-expensive conditional branch
 Chapters/31_Patterns--State_Machines.md	expensive: Too expensive returns to CODE with the money still inserted
 Chapters/31_Patterns--State_Machines.md	only: and those states exist only after every class definition has run
-Chapters/31_Patterns--State_Machines.md	only: two subclasses of CODE that differ only in their class
 Chapters/31_Patterns--State_Machines.md	price: decided by price and stock
 Chapters/31_Patterns--State_Machines.md	want: or want the mechanism visible in your own code
 Chapters/32_Patterns--Multiple_Dispatching.md	even: so even elaborate behavior fits the table
@@ -495,14 +487,11 @@ Chapters/33_Patterns--Visitor.md	only: and the frames differ only in the method 
 Chapters/33_Patterns--Visitor.md	price: for a reason The Price of the Empty Base explains below
 Chapters/34_Patterns--Composite_and_Interpreter.md	already: CODE would receive CODE with the fold already done
 Chapters/34_Patterns--Composite_and_Interpreter.md	already: Each rule is a nested pattern over a pair of already-simplified children
-Chapters/34_Patterns--Composite_and_Interpreter.md	cost: The cost matters most on the deep trees about which this chapter warns later
-Chapters/34_Patterns--Composite_and_Interpreter.md	cost: and that convenience has a memory cost
 Chapters/34_Patterns--Composite_and_Interpreter.md	even: CODE fails type checking even with a case for every node
 Chapters/34_Patterns--Composite_and_Interpreter.md	exactly: CODE yields exactly one level of CODE and CODE objects
 Chapters/34_Patterns--Composite_and_Interpreter.md	itself: so the alias names itself through one of its own members
 Chapters/34_Patterns--Composite_and_Interpreter.md	only: Only the value a node returns differs
 Chapters/34_Patterns--Composite_and_Interpreter.md	only: Rewrite it to emit only the parentheses that precedence requires
-Chapters/34_Patterns--Composite_and_Interpreter.md	only: The CODE makes CODE positional-only
 Chapters/35_Patterns--Flyweight.md	does it: and what does it catch that the CODE version did not
 Chapters/35_Patterns--Flyweight.md	exactly: Its entry lives exactly as long as something references the object
 Chapters/35_Patterns--Flyweight.md	itself: A first design gives each cell everything it knows about itself
@@ -574,7 +563,6 @@ Chapters/40_Functional--Foundations.md	want: A closure fits when you want to con
 Chapters/41_Functional--Toolkits.md	does it: and which one does it leave to the caller
 Chapters/41_Functional--Toolkits.md	exactly: Groups of three are far harder to schedule so that every pair meets exactly once
 Chapters/41_Functional--Toolkits.md	exactly: The *circle method* solves the pairs-only version exactly
-Chapters/41_Functional--Toolkits.md	exactly: because CODE asks for exactly five
 Chapters/41_Functional--Toolkits.md	exactly: because those rounds use every one of the CODE possible pairs exactly once
 Chapters/41_Functional--Toolkits.md	exactly: how do you split every possible pair into rounds in which each player appears exactly once
 Chapters/41_Functional--Toolkits.md	itself: *Recursion* expresses a repeated computation as a function that calls itself

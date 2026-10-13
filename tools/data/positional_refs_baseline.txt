@@ -38,7 +38,7 @@ Chapters/15_Techniques--Context_Managers.md	The second `with`	The second `with` 
 Chapters/15_Techniques--Context_Managers.md	the `for` loop	The banner opens when the `for` loop asks for the first value, and it stays open each time the body resumes after a `yield`.
 Chapters/15_Techniques--Context_Managers.md	the `with` statement	The `1 / 0` raises an exception, `__exit__()` prints the exception it caught, then returns `True`, and the `with` statement suppresses the error so `survived` still prints.
 Chapters/15_Techniques--Context_Managers.md	the earlier `if exc_type is None or exc is None: return False`	`self.types is not ALL` [narrows](08_Foundations--Static_Types.md#narrowing) `self.types` from `Types | ALL` down to `Types`, and the earlier `if exc_type is None or exc is None: return False` narrows `exc_type` to a class and `exc` to an exception, so `issubclass(exc_type, self.types)` type-checks.
-Chapters/15_Techniques--Context_Managers.md	the first `next()`	On 3.15 the context opens at the first `next()` and closes after the generator's last `yield`:
+Chapters/15_Techniques--Context_Managers.md	the first `next()`	On 3.15 the context opens at the first `next()` and closes after the generator's last `yield`.
 Chapters/15_Techniques--Context_Managers.md	the first `with`	Calling `stale.query()` after the first `with` block ended works as if `second` had called it, because they are the same object.
 Chapters/16_Techniques--Comprehensions.md	The `for` loop	The `for` loop runs after the directory disappears, and by then nothing needs the files.
 Chapters/16_Techniques--Comprehensions.md	The inner `for col`	The inner `for col` sits to the left of the outer `for row` but runs inside it.
@@ -51,23 +51,24 @@ Chapters/16_Techniques--Comprehensions.md	the second `for`	In the `py_paths` com
 Chapters/17_Techniques--Metaprogramming.md	The last call	The last call drops that row, for the same reason `comparison.py` in [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#comparing-ordinary-classes-and-data-classes) passes `exclude=("__hash__",)`.
 Chapters/17_Techniques--Metaprogramming.md	The last line	The last line performs by hand what `p.greet()` does automatically.
 Chapters/17_Techniques--Metaprogramming.md	The last line	The last line shows its instance dictionary still empty.
+Chapters/17_Techniques--Metaprogramming.md	The next lookup	The next lookup of that name finds the stored class directly.
 Chapters/18_Techniques--Performance.md	the first call	`@njit` applies only to numeric functions, requires a decorator, pauses to compile on the first call, and speeds code up by multiples.
 Chapters/19_Techniques--Concurrency.md	The last line	The last line shows the other direction.
-Chapters/19_Techniques--Concurrency.md	the first `await`	Here, the first `await` comes after both updates, so the task keeps control through them and needs no lock.
 Chapters/20_Patterns--Rethinking_Objects.md	the second call	Without the `# type: ignore`, the type checker rejects the second call.
 Chapters/23_Patterns--Iterators.md	The last block	The last block advances `first2` and `second2` together instead, one `zip()` step at a time, so `tee()` buffers at most the gap between them.
 Chapters/23_Patterns--Iterators.md	The last line	The last line of output shows that by the time all four methods work, `seen` holds the entire stream.
-Chapters/24_Patterns--Singleton.md	the `with` block	The outer test runs without the lock, so a thread can read `_instance` while another thread is still inside the `with` block.
 Chapters/24_Patterns--Singleton.md	the first assignment	If you drop the inner test, every thread that passed the outer test before the first assignment builds its own object, one after another.
 Chapters/24_Patterns--Singleton.md	the first call	Its metaclass overrides `__call__()`, and that override skips `__new__()` and `__init__()` on every later construction, so the first call's arguments win.
 Chapters/24_Patterns--Singleton.md	the first call	Only the first call constructs a `Registry`.
 Chapters/24_Patterns--Singleton.md	the first call	That listing's `__new__()` sets `val = []` on the first call and runs `val.append(arg)` on every call, so each later argument joins the shared list instead of being discarded.
 Chapters/25_Patterns--Template_Method.md	The second `Say no more, say no more!`	The second `Say no more, say no more!` has no `Nudge, nudge, wink, wink!` before it.
+Chapters/25_Patterns--Template_Method.md	the closing `run_framework()`	In `template_function.py`, `customize2` defaults to the do-nothing `lambda: None`, so the closing `run_framework()` call passes one step and the loop prints `one` twice.
 Chapters/26_Patterns--Surrogate.md	The next `p.level`	The next `p.level` lookup succeeds without calling `__getattr__()`.
 Chapters/26_Patterns--Surrogate.md	the first call	Because `Partial` omits `g()`, constructing a `Partial` raises a `TypeError` before the first call.
 Chapters/26_Patterns--Surrogate.md	the second call	With the guard, the second call to `__getattr__()` reports the typo by name.
 Chapters/27_Patterns--Factory.md	the first `draw()`	The call fails with a `TypeError`, where a base class whose `draw()` raises a `NotImplementedError` waits for the first `draw()` call.
 Chapters/27_Patterns--Factory.md	the line that	With the abstract base classes in `abstract_factory_abc.py`, the checker reports the line that constructs the incomplete factory.
+Chapters/29_Patterns--Changing_the_Interface.md	the first line	The approaches differ in where the adaptation lives, and the first line of each trace names that place: `ProxyAdapter.f()` for the object adapter and Approach 2, `WhatIHave2.f()` for Approach 3.
 Chapters/32_Patterns--Multiple_Dispatching.md	The last case	The last case shows why the sentinel exists.
 Chapters/33_Patterns--Visitor.md	The last line	The last line of output is the one where both dispatches change the result, because `Chrysanthemum` overrides `eat()` (chrysanthemums really do produce a natural insecticide).
 Chapters/33_Patterns--Visitor.md	the next `def _`	`@nectar.register` stores the function in its dispatch table before the next `def _` rebinds the name, so every implementation stays in the table.
@@ -84,9 +85,11 @@ Chapters/38_Patterns--Simulation.md	the next line	If you remove the check, the b
 Chapters/40_Functional--Foundations.md	the first call	`total` is still 5 from the first call, so the second call returns 10.
 Chapters/40_Functional--Foundations.md	the next call	`withdraw()` does not, because each call changes `balance` and the next call reads the new value.
 Chapters/40_Functional--Foundations.md	the second call	`total` is still 5 from the first call, so the second call returns 10.
-Chapters/41_Functional--Toolkits.md	The fifth `computing square`	The fifth `computing square` line is the last, because `islice()` asks for exactly five.
 Chapters/41_Functional--Toolkits.md	The last case	The last case asks for groups of five from a roster of two:
+Chapters/41_Functional--Toolkits.md	The third `computing square`	The third `computing square` line is the last, because `islice()` asks for three.
 Chapters/41_Functional--Toolkits.md	the final `1`	`dropwhile()` stops testing once the predicate fails, so it yields the final `1`, where `filterfalse()` tests every element and returns `[3, 4]`.
+Chapters/41_Functional--Toolkits.md	the first `got`	An eager function would print every `computing square` line before the first `got`.
+Chapters/41_Functional--Toolkits.md	the later `"a": 3`	On two dictionaries `|` is a union in which the right operand's values win, so the later `"a": 3` replaces `"a": 1`.
 Chapters/41_Functional--Toolkits.md	the outer `list()`	`list(groupby(data))` therefore returns three keys paired with three empty iterators, because the outer `list()` walks all the way to the end before anything reads a group.
 Chapters/42_Functional--Error_Handling.md	the `except` clause	The exception inside still holds its `__traceback__`, but the `except` clause that caught it returned it as a value, so the exception reaches no handler.
 Chapters/42_Functional--Error_Handling.md	the first `Err`	`func_a()`, `func_b()`, and `func_c()` in `combining.py` take their inputs from `i` and `j` rather than from an earlier step's answer, so stopping at the first `Err` discards whatever the later steps would have found.
@@ -95,7 +98,7 @@ Chapters/43_Functional--Confidence.md	The first `withdraw(30)`	The first `withdr
 Chapters/43_Functional--Confidence.md	The second call	The second call is a cache hit, so `withdraw()` runs once, subtracts one `30`, and hands back the stored `70` the second time.
 Chapters/45_Effects--Generators.md	The `for` loop	The `for` loop then resumes `collect()` with `next()`, so both of `collect()`'s `yield` expressions produce `None`.
 Chapters/45_Effects--Generators.md	The first call	The first call therefore cannot send a value.
-Chapters/45_Effects--Generators.md	The first line	The first line of output describes what `interview()` produced: an ordinary `generator` object whose `__name__` is the function's name.
+Chapters/45_Effects--Generators.md	The first line	The first line of output shows the state of the generator `interview()` returned.
 Chapters/45_Effects--Generators.md	The last `send()`	The last `send()` resumes the body, which reaches `return` instead of another `yield`, so the generator returns its `Result`.
 Chapters/45_Effects--Generators.md	the `yield` expression	As the `SendType` it is the value the driver sends in, which arrives as the value of the `yield` expression and binds to `answer`.
 Chapters/45_Effects--Generators.md	the first `Question`	`drive()` uses all three type parameters: `next()` produces the first `Question`, `send()`'s argument supplies the `Answer`, and `stop.value` in the `except` clause becomes the `Result` that `drive()` returns.
