@@ -280,6 +280,11 @@ class EventMakers(dict[str, EventMaker | NOT_CREATED]):
             self[class_name] = maker
         return maker
 
+    def built(self) -> str:
+        made = sum(m is not NOT_CREATED
+                   for m in self.values())
+        return f"{made} of {len(self)} event classes built"
+
 @dataclass
 class Event:
     action: str
@@ -359,7 +364,7 @@ An unknown name raises a `KeyError`, as a missing key in any `dict` does,
 so a `try: ... except KeyError` around a lookup catches it.
 
 Running the schedule prints a line for each class as `EventMakers` builds it,
-then the events in time order:
+then a count of the classes built, then the events in time order:
 
 ```python
 # greenhouse_demo.py
@@ -370,6 +375,8 @@ Event.load_schedule(Path("schedule.txt"))
 #: Creating LightOff
 #: Creating LightOn
 #: Creating RingBell
+print(Event._event_maker.built())
+#: 3 of 7 event classes built
 Event.run_events()
 #: 1:00: LightOn
 #: 2:00: LightOff
@@ -378,7 +385,8 @@ Event.run_events()
 ```
 
 The schedule names three of the seven declared event types.
-`EventMakers` builds those three: seven classes declared, three built.
+`built()` counts the values that are no longer `NOT_CREATED`,
+so its line states the result: seven classes declared, three built.
 
 `run_events()` puts the type distinction to work.
 It fetches the `RingBell` class through `_event_maker`,
@@ -435,15 +443,14 @@ class {class_name}(Command):
         return cast(Callable[[], Command],
                     namespace[class_name])
 
-if __name__ == "__main__":
-    for name in ("Start", "Stop", "Pause"):
-        command_class = Command.make_class(name)
-        print(command_class().run())
-    with expected(ValueError):
-        Command.make_class("Reset")
+for name in ("Start", "Stop", "Pause"):
+    command_class = Command.make_class(name)
+    print(command_class().run())
 #: Running Start
 #: Running Stop
 #: Running Pause
+with expected(ValueError):
+    Command.make_class("Reset")
 #: [ValueError] Unknown command: 'Reset'
 ```
 
@@ -1121,15 +1128,15 @@ with expected(ValueError):
     r.width = -1.0
 #: [ValueError] -1.0 is not positive
 
-print(r.area())
-#: 12.0
+print(r.width)
+#: 3.0
 ```
 
 `Rectangle` names the rule twice and writes no checking code of its own.
 `self.width = width` inside `__init__()` routes through `Positive.__set__()` like any other write,
 so the constructor validates its arguments without a line devoted to it.
 The rejected assignment leaves `_width` as it was,
-so `r.area()` still uses the width the constructor stored.
+so `r.width` still reads the `3.0` the constructor stored.
 A `property` protects one attribute the same way,
 but `Rectangle` then carries the check twice, once per attribute.
 With a descriptor, the rule lives in one class,
@@ -1154,8 +1161,8 @@ from display import display_object
 
 class SimpleMeta(type):
     def __init__(cls, name: str, bases: tuple[type, ...],
-                 nmspc: dict[str, Any]) -> None:
-        super().__init__(name, bases, nmspc)
+                 namespace: dict[str, Any]) -> None:
+        super().__init__(name, bases, namespace)
         setattr(cls, "uses_metaclass", lambda self: "Yes!")
 
 class Simple(metaclass=SimpleMeta):
@@ -1235,17 +1242,17 @@ class Tag:
 
 class Meta(type):
     def __new__(mcls, name: str, bases: tuple[type, ...],
-                nmspc: dict[str, Any]) -> type:
+                namespace: dict[str, Any]) -> type:
         # Before creation: these changes take effect
-        nmspc["added_in_new"] = 42
+        namespace["added_in_new"] = 42
         bases += (Tag,)
-        return super().__new__(mcls, name, bases, nmspc)
+        return super().__new__(mcls, name, bases, namespace)
 
     def __init__(cls, name: str, bases: tuple[type, ...],
-                 nmspc: dict[str, Any]) -> None:
-        super().__init__(name, bases, nmspc)
+                 namespace: dict[str, Any]) -> None:
+        super().__init__(name, bases, namespace)
         # No effect: the class is already built
-        nmspc["added_in_init"] = 99
+        namespace["added_in_init"] = 99
         # Effect: this modifies the finished class
         setattr(cls, "patched_in_init", 3.14)
 
@@ -1264,7 +1271,7 @@ print("has Tag base:", Tag in Built.__bases__)
 #: has Tag base: True
 ```
 
-`added_in_init` is missing from the output because `type.__new__()` copies `nmspc` into the new class's own `__dict__` as it builds the class.
+`added_in_init` is missing from the output because `type.__new__()` copies `namespace` into the new class's own `__dict__` as it builds the class.
 By the time `__init__()` runs, the two mappings are independent,
 so mutating the original dict changes nothing the class can see.
 `setattr(cls, ...)` still works because it modifies the class object.
@@ -1416,10 +1423,10 @@ class Mixin:
     def helper(self) -> str:
         return "hi"
 
-class Base(type, Mixin):
+class HelperMeta(type, Mixin):
     pass
 
-class Sub(metaclass=Base):
+class Sub(metaclass=HelperMeta):
     pass
 
 print(Sub.helper())
@@ -1433,7 +1440,7 @@ with expected(AttributeError):  # A metamethod: class only
 `helper()` arrives through the metaclass,
 so `Sub` has it and a `Sub` instance does not.
 The `AttributeError` comes from the metamethod rule at the start of [Intercepting Instance Creation](#intercepting-instance-creation).
-An instance of `Sub` is not an instance of `Base`,
+An instance of `Sub` is not an instance of `HelperMeta`,
 so nothing in its lookup chain reaches `Mixin`.
 A `classmethod` answers on both.
 
@@ -1801,15 +1808,15 @@ class Meta(type):
         return {}
 
     def __new__(mcls, name: str, bases: tuple[type, ...],
-                nmspc: dict[str, Any]) -> type:
+                namespace: dict[str, Any]) -> type:
         print(f"__new__ {name} enter")
-        cls = super().__new__(mcls, name, bases, nmspc)
+        cls = super().__new__(mcls, name, bases, namespace)
         print(f"__new__ {name} exit")
         return cls
 
     def __init__(cls, name: str, bases: tuple[type, ...],
-                 nmspc: dict[str, Any]) -> None:
-        super().__init__(name, bases, nmspc)
+                 namespace: dict[str, Any]) -> None:
+        super().__init__(name, bases, namespace)
         print(f"__init__ {name}")
 
 def tag[T](cls: type[T]) -> type[T]:

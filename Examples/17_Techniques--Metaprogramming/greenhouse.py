@@ -26,6 +26,11 @@ class EventMakers(dict[str, EventMaker | NOT_CREATED]):
             self[class_name] = maker
         return maker
 
+    def built(self) -> str:
+        made = sum(m is not NOT_CREATED
+                   for m in self.values())
+        return f"{made} of {len(self)} event classes built"
+
 @dataclass
 class Event:
     action: str

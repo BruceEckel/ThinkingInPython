@@ -35,5 +35,5 @@ with expected(ValueError):
     r.width = -1.0
 #: [ValueError] -1.0 is not positive
 
-print(r.area())
-#: 12.0
+print(r.width)
+#: 3.0

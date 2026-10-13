@@ -29,13 +29,12 @@ class {class_name}(Command):
         return cast(Callable[[], Command],
                     namespace[class_name])
 
-if __name__ == "__main__":
-    for name in ("Start", "Stop", "Pause"):
-        command_class = Command.make_class(name)
-        print(command_class().run())
-    with expected(ValueError):
-        Command.make_class("Reset")
+for name in ("Start", "Stop", "Pause"):
+    command_class = Command.make_class(name)
+    print(command_class().run())
 #: Running Start
 #: Running Stop
 #: Running Pause
+with expected(ValueError):
+    Command.make_class("Reset")
 #: [ValueError] Unknown command: 'Reset'

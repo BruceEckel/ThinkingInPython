@@ -5,10 +5,10 @@ class Mixin:
     def helper(self) -> str:
         return "hi"
 
-class Base(type, Mixin):
+class HelperMeta(type, Mixin):
     pass
 
-class Sub(metaclass=Base):
+class Sub(metaclass=HelperMeta):
     pass
 
 print(Sub.helper())

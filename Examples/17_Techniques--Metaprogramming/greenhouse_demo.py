@@ -6,6 +6,8 @@ Event.load_schedule(Path("schedule.txt"))
 #: Creating LightOff
 #: Creating LightOn
 #: Creating RingBell
+print(Event._event_maker.built())
+#: 3 of 7 event classes built
 Event.run_events()
 #: 1:00: LightOn
 #: 2:00: LightOff

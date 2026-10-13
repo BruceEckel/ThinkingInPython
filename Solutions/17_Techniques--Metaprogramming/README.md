@@ -639,7 +639,7 @@ class Tag:
 
 class Meta(type):
     def __init__(cls, name: str, bases: tuple[type, ...],
-                 nmspc: dict[str, Any]) -> None:
+                 namespace: dict[str, Any]) -> None:
         # Rebinds a local name, nothing else
         ...
 
@@ -662,10 +662,10 @@ class Tag:
 
 class Meta(type):
     def __init__(cls, name: str, bases: tuple[type, ...],
-                 nmspc: dict[str, Any]) -> None:
+                 namespace: dict[str, Any]) -> None:
         # Rebinds a local name, nothing else
         bases += (Tag,)
-        super().__init__(name, bases, nmspc)
+        super().__init__(name, bases, namespace)
 
 class Demo(metaclass=Meta):
     pass

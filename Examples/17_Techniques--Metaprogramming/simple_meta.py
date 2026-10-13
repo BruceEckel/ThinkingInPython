@@ -4,8 +4,8 @@ from display import display_object
 
 class SimpleMeta(type):
     def __init__(cls, name: str, bases: tuple[type, ...],
-                 nmspc: dict[str, Any]) -> None:
-        super().__init__(name, bases, nmspc)
+                 namespace: dict[str, Any]) -> None:
+        super().__init__(name, bases, namespace)
         setattr(cls, "uses_metaclass", lambda self: "Yes!")
 
 class Simple(metaclass=SimpleMeta):

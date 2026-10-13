@@ -7,17 +7,17 @@ class Tag:
 
 class Meta(type):
     def __new__(mcls, name: str, bases: tuple[type, ...],
-                nmspc: dict[str, Any]) -> type:
+                namespace: dict[str, Any]) -> type:
         # Before creation: these changes take effect
-        nmspc["added_in_new"] = 42
+        namespace["added_in_new"] = 42
         bases += (Tag,)
-        return super().__new__(mcls, name, bases, nmspc)
+        return super().__new__(mcls, name, bases, namespace)
 
     def __init__(cls, name: str, bases: tuple[type, ...],
-                 nmspc: dict[str, Any]) -> None:
-        super().__init__(name, bases, nmspc)
+                 namespace: dict[str, Any]) -> None:
+        super().__init__(name, bases, namespace)
         # No effect: the class is already built
-        nmspc["added_in_init"] = 99
+        namespace["added_in_init"] = 99
         # Effect: this modifies the finished class
         setattr(cls, "patched_in_init", 3.14)
 

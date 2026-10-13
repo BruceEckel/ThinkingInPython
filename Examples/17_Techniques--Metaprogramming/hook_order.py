@@ -13,15 +13,15 @@ class Meta(type):
         return {}
 
     def __new__(mcls, name: str, bases: tuple[type, ...],
-                nmspc: dict[str, Any]) -> type:
+                namespace: dict[str, Any]) -> type:
         print(f"__new__ {name} enter")
-        cls = super().__new__(mcls, name, bases, nmspc)
+        cls = super().__new__(mcls, name, bases, namespace)
         print(f"__new__ {name} exit")
         return cls
 
     def __init__(cls, name: str, bases: tuple[type, ...],
-                 nmspc: dict[str, Any]) -> None:
-        super().__init__(name, bases, nmspc)
+                 namespace: dict[str, Any]) -> None:
+        super().__init__(name, bases, namespace)
         print(f"__init__ {name}")
 
 def tag[T](cls: type[T]) -> type[T]:
