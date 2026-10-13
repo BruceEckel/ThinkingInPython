@@ -172,19 +172,22 @@ Here is the whole of a *Strategy* in Python:
 from collections.abc import Callable
 
 def apply(nums: list[int],
-          how: Callable[[list[int]], int]) -> int:
-    return how(nums)
-print(apply([3, 1, 2], max), apply([3, 1, 2], sum))
-#: 3 6
+          strategy: Callable[[list[int]], int]) -> int:
+    return strategy(nums)
+nums = [3, 1, 2]
+for strategy in (max, sum):
+    print(strategy.__name__, apply(nums, strategy))
+#: max 3
+#: sum 6
 ```
 
 The classic form declares a `Strategy` interface,
 writes one class per algorithm,
 and adds a context class to hold the chosen algorithm.
-Here the `Callable` annotation on `how` replaces the interface,
+Here the `Callable` annotation on `strategy` replaces the interface,
 existing functions such as `max()` and `sum()` replace the algorithm classes,
 and `apply()` replaces the context class,
-holding the chosen algorithm in `how` for one call.
+holding the chosen algorithm in `strategy` for one call.
 
 This listing shows only the shape.
 Nobody designs a `Strategy` class hierarchy around calling `max()` or `sum()`.

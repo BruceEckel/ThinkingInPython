@@ -2,7 +2,10 @@
 from collections.abc import Callable
 
 def apply(nums: list[int],
-          how: Callable[[list[int]], int]) -> int:
-    return how(nums)
-print(apply([3, 1, 2], max), apply([3, 1, 2], sum))
-#: 3 6
+          strategy: Callable[[list[int]], int]) -> int:
+    return strategy(nums)
+nums = [3, 1, 2]
+for strategy in (max, sum):
+    print(strategy.__name__, apply(nums, strategy))
+#: max 3
+#: sum 6
