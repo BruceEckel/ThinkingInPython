@@ -28,6 +28,7 @@ A *Messenger* is an object with attributes corresponding to the names of the dat
 ```python
 # messenger_idiom.py
 from typing import Any
+from exceptions import expected
 
 class Messenger:
     def __init__(self, **kwargs: Any) -> None:
@@ -41,6 +42,10 @@ print(m.info, m.tags, m.more)
 #: Spam ['urgent', 'todo'] 11
 print(vars(m))
 #: {'info': 'Spam', 'tags': ['urgent', 'todo'], 'more': 11}
+with expected(AttributeError):
+    m.inof
+#: [AttributeError] 'Messenger' object has no attribute
+#: 'inof'
 ```
 
 The constructor replaces the object's `__dict__` with the `dict` that the `**kwargs` parameter automatically creates.
@@ -71,7 +76,9 @@ The standard library's type declaration for `SimpleNamespace` has such a pair
 so the next listing needs no annotation.
 
 With an ad-hoc attribute bag, no type checker knows your attribute names.
-A typo like `m.inof` is a runtime `AttributeError`, not a static error.
+The `expected(AttributeError)` block reads `m.inof`, a typo for `m.info`.
+The type checker accepts it because `m` is `Any`,
+and the read raises an `AttributeError` at runtime.
 
 ## The Standard-Library Versions
 
@@ -203,7 +210,7 @@ The underscore marks `NamedTuple`'s own members, and says nothing about privacy.
 A function that computes two results can return them in a `NamedTuple`:
 
 ```python
-# fetch_stats.py
+# summarize_stats.py
 from typing import NamedTuple
 
 class Stats(NamedTuple):
@@ -221,6 +228,9 @@ print(result.mean, result.count)
 mean, count = summarize([1.0, 3.0])  # Unpacks like a tuple
 print(mean, count)
 #: 2.0 2
+count, mean = summarize([1.0, 3.0])
+print(f"{mean=} {count=}")
+#: mean=2 count=2.0
 ```
 
 Without `Stats` you annotate the return as `tuple[float, int]` and return a bare tuple.
@@ -229,8 +239,9 @@ a fact the code states nowhere.
 `Stats` names the fields and documents itself at each call site,
 and because a `NamedTuple` is a tuple, you can unpack it.
 Unpacking goes by position, so it brings the bare tuple's hazard back.
-`count, mean = summarize(data)` runs, passes the type checker,
-and binds each name to the other's value.
+`count, mean = summarize([1.0, 3.0])` runs, passes the type checker,
+and binds each name to the other's value,
+as `mean=2 count=2.0` in the output shows.
 Reading `result.mean` has no order to get wrong.
 
 Unpacking is the part a data class lacks.
@@ -300,6 +311,8 @@ class OrderedDimensions:
     height: int
     depth: int
 
+print(OrderedColor(1, 2, 3) < OrderedColor(1, 2, 4))
+#: True
 with expected(TypeError):
     OrderedColor(1, 2, 3) < OrderedDimensions(1, 2, 4)  # type: ignore
 #: [TypeError] '<' not supported between instances of
@@ -376,7 +389,7 @@ Try each exercise before opening its [solution](../Solutions/22_Patterns--Data_T
     then add it by assignment after the existing `m.more = 11` instead.
     Confirm `vars(m)` reports the same four attributes either way,
     and note whether they come out in the same order.
-5.  In `fetch_stats.py`,
+5.  In `summarize_stats.py`,
     change `summarize()` to return a bare `tuple[float, int]`,
     and repair the one line that stops working.
     What do the call sites lose,

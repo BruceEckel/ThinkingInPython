@@ -51,6 +51,8 @@ class OrderedDimensions:
     height: int
     depth: int
 
+print(OrderedColor(1, 2, 3) < OrderedColor(1, 2, 4))
+#: True
 with expected(TypeError):
     OrderedColor(1, 2, 3) < OrderedDimensions(1, 2, 4)  # type: ignore
 #: [TypeError] '<' not supported between instances of

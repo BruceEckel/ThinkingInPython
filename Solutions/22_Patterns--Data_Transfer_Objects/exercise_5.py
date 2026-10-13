@@ -10,3 +10,6 @@ print(result[0], result[1])
 mean, count = summarize([1.0, 3.0])
 print(mean, count)
 #: 2.0 2
+count, mean = summarize([1.0, 3.0])
+print(f"{mean=} {count=}")
+#: mean=2 count=2.0

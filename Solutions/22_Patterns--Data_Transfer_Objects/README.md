@@ -228,7 +228,7 @@ so do the namespaces, since dict equality ignores order.
 
 ## 5. Returning a bare `tuple[float, int]`
 
-> In `fetch_stats.py`,
+> In `summarize_stats.py`,
 > change `summarize()` to return a bare `tuple[float, int]`,
 > and repair the one line that stops working.
 > What do the call sites lose,
@@ -266,6 +266,9 @@ print(result[0], result[1])
 mean, count = summarize([1.0, 3.0])
 print(mean, count)
 #: 2.0 2
+count, mean = summarize([1.0, 3.0])
+print(f"{mean=} {count=}")
+#: mean=2 count=2.0
 ```
 
 **Read the fields by position.** Printing and unpacking still run, because a `NamedTuple` was a tuple
@@ -298,7 +301,8 @@ The checker cannot catch the mistake this exercise examines:
 swapping `mean` and `count`. `mean, count = summarize(data)` and
 `count, mean = summarize(data)` destructure the same
 `tuple[float, int]` into two names. The second type-checks cleanly and
-misnames both values. With `Stats` you write `result.count`, so the
+misnames both values, as the listing's `mean=2 count=2.0` output shows.
+With `Stats` you write `result.count`, so the
 code does not depend on the order. A parameter annotated `Stats` also
 rejects a hand-built tuple in either order, because a
 `tuple[float, int]` is not a `Stats`.
