@@ -384,6 +384,7 @@ The test file confirms that:
 - Every responder receives the announced value in connection order.
 - Announcing to an empty list succeeds.
 - Delivery stops after `disconnect()`.
+- Two references to one list's `append()` compare equal and are distinct objects.
 - A callable connected twice receives each announcement twice,
   and one `disconnect()` removes one of the two.
 - A `disconnect()` matching no connection raises a `ValueError`.
@@ -415,11 +416,14 @@ def test_disconnect_stops_delivery() -> None:
     broadcaster = Broadcaster[object]()
     broadcaster.connect(received.append)
     broadcaster.announce(1)
-    assert received.append == received.append
-    assert received.append is not received.append
     broadcaster.disconnect(received.append)
     broadcaster.announce(2)
     assert received == [1]
+
+def test_bound_methods_compare_equal() -> None:
+    received: list[object] = []
+    assert received.append == received.append
+    assert received.append is not received.append
 
 def test_connecting_twice_notifies_twice() -> None:
     received: list[object] = []
@@ -468,7 +472,7 @@ A bound method is different.
 Each reference to `received.append` builds a new bound-method object,
 so `received.append is received.append` is `False`.
 Two bound methods compare equal when they wrap the same instance and the same function.
-The two `assert` lines before the `disconnect()` call show both facts.
+`test_bound_methods_compare_equal()` checks both facts.
 `disconnect()` relies on equality:
 the bound method it receives equals the one `connect()` stored,
 so it finds that entry and removes it.
@@ -874,26 +878,26 @@ class Thermometer(Broadcasting[float]):
 thermometer = Thermometer(100)
 
 @thermometer.respond
-def report(celsius: float) -> None:
-    print(f"report: {celsius}C")
+def display(celsius: float) -> None:
+    print(f"display: {celsius}C")
 
 @thermometer.respond
 def alarm(celsius: float) -> None:
     print("alarm!" if celsius > 100 else "ok")
 
 thermometer.celsius = 90
-#: report: 90C
+#: display: 90C
 #: ok
 thermometer.celsius = 150
-#: report: 150C
+#: display: 150C
 #: alarm!
 thermometer.disconnect(alarm)
 thermometer.celsius = 200
-#: report: 200C
+#: display: 200C
 ```
 
 The `respond()` decorator method appends its function to the `thermometer` list and returns the function unchanged,
-so `report` stays callable by name.
+so `display` stays callable by name.
 `Broadcaster.connect()` returns `None`, so it cannot serve as a decorator
 (see exercise 11).
 

@@ -22,11 +22,14 @@ def test_disconnect_stops_delivery() -> None:
     broadcaster = Broadcaster[object]()
     broadcaster.connect(received.append)
     broadcaster.announce(1)
-    assert received.append == received.append
-    assert received.append is not received.append
     broadcaster.disconnect(received.append)
     broadcaster.announce(2)
     assert received == [1]
+
+def test_bound_methods_compare_equal() -> None:
+    received: list[object] = []
+    assert received.append == received.append
+    assert received.append is not received.append
 
 def test_connecting_twice_notifies_twice() -> None:
     received: list[object] = []
