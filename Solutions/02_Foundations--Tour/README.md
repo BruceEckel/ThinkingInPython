@@ -11,17 +11,18 @@
 <summary>Where to look</summary>
 
 [Variables and References](../../Chapters/02_Foundations--Tour.md#variables-and-references) shows that assignment copies a reference, not the list.
-A slice builds a new list object, so `a` and `c` stop sharing.
+A slice builds a new list object, so `a` and `c` name different lists.
 Check which of `b` and `c` names the same list as `a` before you explain the difference.
 
 <details>
 <summary>Solution</summary>
 
 If you write `c = a` instead of `c = a[:]`, the program prints
-`[1, 2, 3, 4, 99] [1, 2, 3, 4, 99]`: `c` is a third name for the
-one list, so appending to it changes what `a` sees, the same way
-`b.append(4)` did. The solution keeps the slice, which builds a new
-list, and the exercise's check depends on that one line.
+`[1, 2, 3, 4, 99] [1, 2, 3, 4, 99]`.
+`c` is then a third name for the one list,
+so appending to `c` changes the list `a` names, as `b.append(4)` did.
+The solution keeps the slice.
+`c = a[:]` builds a new list, so `a` still holds `[1, 2, 3, 4]`.
 
 ```python
 # exercise_1.py
@@ -34,10 +35,9 @@ print(a, c)
 #: [1, 2, 3, 4] [1, 2, 3, 4, 99]
 ```
 
-`b.append(4)` changes `a` too, because `b` and `a` name the same list
-object. `c = a[:]` makes a new list with the same elements, so
-`c.append(99)` changes `c` and leaves `a` alone. Slicing copies.
-Assignment does not.
+`b.append(4)` changes `a` too, because `b` and `a` name the same list object.
+`c = a[:]` makes a new list with the same elements,
+so `c.append(99)` changes `c` and leaves `a` alone.
 
 </details>
 </details>
@@ -73,9 +73,9 @@ for value in [0, 1, "", "hi", [], [1], None, {}, {"k": 1}]:
 #: {'k': 1} -> True
 ```
 
-An empty dictionary is falsy, the same as an empty list or an empty
-string. A dictionary with one or more entries is truthy. The rule is
-the same for every container: falsy when empty, truthy otherwise.
+An empty dictionary is falsy, the same as an empty list or an empty string.
+A dictionary with one or more entries is truthy.
+The rule is the same for every container: falsy when empty, truthy otherwise.
 
 </details>
 </details>
@@ -108,8 +108,8 @@ print(f"{score = }")
 
 `.2f` always shows two digits after the decimal point, a trailing
 zero included. `{score = }` prints both the expression's source text
-and its value, so a quick debugging print needs no separate
-`print("score", score)`.
+and its value,
+so one field replaces a debugging `print("score", score)`.
 
 </details>
 </details>
@@ -129,7 +129,8 @@ and its value, so a quick debugging print needs no separate
 
 [Naming Conventions](../../Chapters/02_Foundations--Tour.md#naming-conventions) says what each casing form tells a reader.
 Rename the variables in both styles and run each version to confirm the interpreter accepts every form.
-Then run `ruff check` on the camelCase file inside the book's repository, which turns on ruff's naming rules, and see which rule code it reports.
+The book's `pyproject.toml` turns on ruff's naming rules,
+so run `ruff check` on the camelCase file inside the book's repository and see which rule code ruff reports.
 
 <details>
 <summary>Solution</summary>
@@ -158,23 +159,24 @@ print(TOTAL_SUM, bin(FLAG_BITS))
 #: 5 0b1010
 ```
 
-All three forms run, since Python does not enforce a naming convention
-at the language level. What differs is what a reader infers.
+All three forms run, since Python accepts any valid identifier as a name.
+What differs is what a reader infers.
 `total` and `flags` say "an ordinary variable that changes,"
-which is what both of these are. `TOTAL_SUM` and `FLAG_BITS` say "a
-constant, the same for the life of the program," yet the `+=` line of
-`exercise_4_constants.py` changes `TOTAL_SUM`. Neither Python nor
-the linter objects, so the name misleads every reader who trusts it.
-`totalSum` and `flagBits` say nothing about the value. They say the
-author came from Java or JavaScript.
+which describes both variables.
+`TOTAL_SUM` and `FLAG_BITS` say "a constant, the same for the life of the program,"
+yet `exercise_4_constants.py` reassigns both, with `+=` and `|=`.
+Python and the linter both accept the reassignment,
+so the name misleads every reader who trusts it.
+`totalSum` and `flagBits` say nothing about the value.
+They say the author came from Java or JavaScript.
 
-The camelCase form is the one a linter flags. Ruff's pep8-naming
-rules report `N816` for a mixed-case global. Ruff leaves those rules
-off by default, and this book's `pyproject.toml` turns them on with
-the `N` in its `select` list. The uppercase form passes the linter
-and still breaks
+The camelCase form is the one a linter flags.
+Ruff's pep8-naming rules report `N816` for a mixed-case global.
+Ruff leaves those rules off by default,
+and this book's `pyproject.toml` turns them on with the `N` in its `select` list.
+The uppercase form passes the linter and still violates
 [Naming Conventions](../../Chapters/02_Foundations--Tour.md#naming-conventions),
-which reserves uppercase for constants. CapWords stays reserved for class names.
+which reserves uppercase for constants and CapWords for class names.
 
 </details>
 </details>
@@ -209,8 +211,8 @@ def quoted(template: Template) -> str:
 
 If you build each value with `str(piece.value)`, the way the chapter's `safe()` does,
 the output reads `'Alice' scored '91.5'%`.
-The value drops the template's `:.0f`,
-because `str()` receives the value alone and the `Interpolation` keeps the spec separately, in `piece.format_spec`.
+The template's `:.0f` stays behind in `piece.format_spec`,
+because `str()` receives the value alone.
 The solution passes the value and its spec to `format()`, as `shout()` does, so `score` still prints as `'92'`.
 
 ```python
@@ -235,23 +237,25 @@ print(quoted(message))
 #: 'Alice' scored '92'%
 ```
 
-**Tell values from literal text.** `quoted()` is `shout()` with the
-two branches swapped over. The `Interpolation` branch is the one that
-changes something, and the literal branch passes its text through.
-The `isinstance()` test does all the work. Each piece arrives labelled
-as text the author typed or as a value the program supplied, so
-deciding what to do with each is a two-line `if` rather than a parsing
-problem.
+**Tell values from literal text.** `quoted()` reverses the roles of
+`shout()`'s two branches.
+`shout()` changes the literal text and passes each value through,
+while `quoted()` changes each value and passes the literal text through.
+The `isinstance()` test decides which branch each piece takes.
+Iterating over a template yields a `str` for text the author typed
+and an `Interpolation` for a value the program supplied,
+so a two-branch `if`, rather than a parser, decides what to do with each piece.
 
-You cannot post-process an f-string this way, because the string it
-produces carries no label. `f"{name} scored {score:.0f}%"` evaluates to
-the single string `Alice scored 92%`, and nothing in that string records
+You cannot post-process an f-string this way, because an f-string
+produces a finished `str`, with each value merged into the text.
+`f"{name} scored {score:.0f}%"` evaluates to the single string `Alice scored 92%`.
+The evaluation discards the record
 that `Alice` came from a variable and ` scored ` came from the source.
-A post-processor has only the characters, so it must guess
-which spans to quote by matching them against the values. The guess
-fails as soon as a literal looks like a value. With
-`name = "scored"`, the finished string reads `scored scored 92%`, and
-nothing in it says which of the two words is the value.
+A post-processor has only the characters,
+so it must guess which spans to quote by matching them against the values.
+The guess fails as soon as a literal matches a value.
+With `name = "scored"`, the finished string reads `scored scored 92%`,
+and either of the two words could be the value.
 
 That failed guess is the argument for `Template` in one example.
 Quoting is a harmless demonstration, but the same reasoning covers
@@ -286,14 +290,14 @@ print(-9 // 4, -9 % 4)
 #: -3 3
 ```
 
-C and Java truncate integer division toward zero, so their integer
-`-9 / 4` is `-2` and `-9 % 4` is `-1`. Python floors toward negative
-infinity, so `-9 // 4` is `-3`. The identity
-`a == (a // b) * b + a % b` then forces the remainder to `3`.
+C and Java truncate integer division toward zero,
+so their integer `-9 / 4` is `-2` and `-9 % 4` is `-1`.
+Python floors toward negative infinity, so `-9 // 4` is `-3`.
+The identity `a == (a // b) * b + a % b` then forces the remainder to `3`.
 
-The rule is that the result of `%` takes the sign of the divisor.
+The result of `%` takes the sign of the divisor.
 With a positive divisor the remainder is zero or positive, which is why
-`index % len(items)` wraps cleanly in either direction.
+`index % len(items)` wraps to a valid index in either direction.
 
 </details>
 </details>
