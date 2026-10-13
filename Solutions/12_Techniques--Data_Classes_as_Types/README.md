@@ -20,7 +20,7 @@ Write the `pytest` tests first, covering a leap year, a year that is not leap, t
 If you drop the `% 400` clause from `is_leap()`,
 every century year counts as common,
 and `test_feb_29_allowed_in_2000` fails when `check_day()` raises a `TypeFailure` for `Day(29)`.
-A test for divisibility by 4 alone passes all four tests,
+An `is_leap()` that tests divisibility by 4 alone passes all four tests,
 because 2000 is the one century year `Year` accepts.
 The solution still writes the full rule,
 because `Year`'s upper bound follows `date.today()`,
@@ -137,9 +137,8 @@ divisible by 4 and not by 100. 2000 is divisible by 100 and also by
 accepts.
 
 **Reject a day past the cap.** `Year(2021)` is not leap, so
-`check_day()` rejects the same day. `check_day()` rejects February 30
-regardless of the year, because `max_days` is 29 at most, even in a
-leap year.
+`check_day()` rejects February 29. February 30 fails in every year,
+because a leap year lifts `max_days` to 29 and no further.
 
 </details>
 </details>
@@ -351,8 +350,8 @@ print(copy.replace(Stars(5), number=99))
 **Validate in a subclass.**
 `typing.NamedTuple` refuses a `__new__()` in its own class body but
 accepts one in a subclass, so `Stars(11)` now raises a `TypeFailure`.
-The chapter's factory function cannot stop that call, since a caller
-can construct `Stars` without calling `make_stars()`.
+The chapter's `make_stars()` checks the callers that use it, while
+a `__new__()` in the subclass runs on every call to `Stars`.
 
 **Test the replacement path.** The guarantee still leaks. `_replace()` builds the new tuple through
 `tuple.__new__()` rather than through `cls.__new__()`, so it skips

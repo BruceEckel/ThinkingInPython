@@ -154,7 +154,8 @@ print(damaged)
 A read-only `@property` keeps users from assigning to `number`,
 but the object still mutates `_number`,
 so `f1()` must re-check the result before returning it.
-That check runs after the mutation, not instead of it.
+That check runs after the mutation,
+so it reports the damage instead of preventing it.
 `Stars(8).f1()` sets `_number` to 13, then raises `TypeFailure`,
 and the object goes on holding that illegal value.
 Catching the exception does not undo the damage.
@@ -226,9 +227,11 @@ display_object(Messenger, INTERESTING_DUNDERS)
 `@dataclass` generates the dunder methods,
 and the constructor arguments cover all the fields in `Messenger`.
 The trailing `...` is `display_object()` trimming that line to its report width.
+
 `__hash__` is `None`.
 A `@dataclass` compares by value with `__eq__()`,
 so it gives up hashability rather than let you put a mutable instance in a `set` or use it as a `dict` key.
+
 As [Class Attributes](09_Foundations--Class_Attributes.md) explains,
 `depth` is the one field of the three that appears as an attribute,
 because it has an initialization value.
@@ -285,8 +288,8 @@ display_object(Messenger("iris", 12, 3.14))
 #:   None
 ```
 
-The default `display_object()` omits the generated `__init__()`, `__repr__()`,
-and `__eq__()`.
+Called without a list of dunders, `display_object()` leaves out every dunder,
+including the generated `__init__()`, `__repr__()`, and `__eq__()`.
 
 ## Comparing Ordinary Classes and Data Classes
 
@@ -338,9 +341,9 @@ print(A.__annotations__)
 #: {'x': <class 'int'>, 's': <class 'str'>}
 ```
 
-`A` does not override `__init__()`, `__repr__()`, `__eq__()`, or `__hash__()`,
-so every one of them is `object`'s generic version,
-and `show(A())` reports none as redefined.
+`A` inherits `__init__()`, `__repr__()`, `__eq__()`,
+and `__hash__()` from `object`,
+so `show(A())` reports none of them as redefined.
 
 `x` and `s` in `A` are *bare annotations*: declared, but not assigned a value.
 A [bare annotation](09_Foundations--Class_Attributes.md#a-bare-annotation-declares-it-does-not-create)
@@ -471,9 +474,9 @@ since no instance owns either of them yet.
 `show(D())` tags only one,
 and what `@dataclass` generates for each field decides which one keeps the tag.
 
-`x` is an ordinary field.
-That is why `show(D())`'s `x: int = 99` carries no tag.
-It now lives in that instance's own `__dict__`, not on the class.
+`x` is an ordinary field,
+so the generated `__init__()` assigns it to each instance.
+`show(D())` finds `x: int = 99` in that instance's own `__dict__` and gives it no tag.
 
 `s`, declared `ClassVar[str]`, behaves differently.
 `__init__(self, x: int = 99) -> None` has no `s` parameter,
@@ -580,8 +583,9 @@ def f2(s: Stars) -> Stars:
 
 `Stars` now constrains `number` to a set of values:
 the integers one through ten.
-The only way to make a `Stars` is through the constructor,
+Your code makes a `Stars` by calling the constructor,
 and the constructor refuses anything outside that set.
+(Copying and unpickling [skip the constructor](#copy-skips-the-constructor), a gap a later section examines.)
 If you hold a `Stars`, it is legal.
 You know it without checking.
 
@@ -1039,8 +1043,9 @@ Nothing objects to `Unchecked`.
 and the declaration says `dict[str, str]`, so every reader expects a dict.
 What arrives is a `set`, and the mistake surfaces at the first item assignment,
 which can be far from the declaration that caused it.
-A bare `list`, `dict`,
-or `set` produces a type loose enough that `ty` accepts it against any annotation,
+For a bare `list`, `dict`, or `set` factory,
+`ty` infers `Unknown` for the `field()` call,
+a type that satisfies any annotation,
 so `ty` does not compare the factory with the field.
 Checkers differ here.
 Pyright infers `set[Unknown]` for this factory and rejects it against `dict[str, str]`.
@@ -1113,9 +1118,9 @@ That gets past the prohibition and moves the hole rather than closing it.
 so `copy.replace()` on a validated instance quietly produces an unvalidated one.
 
 A frozen data class runs `__post_init__()` on every construction,
-including the ones you did not anticipate,
-and replacement has no such back door.
-[`copy.replace()`](#the-general-form-of-replace) goes through the constructor.
+including the ones you did not anticipate.
+[`copy.replace()`](#the-general-form-of-replace) is one of them,
+because it builds the copy through the constructor.
 That is the deciding difference whenever a type must guarantee its own values.
 When it need not, a `NamedTuple` is a fine [immutable record](22_Patterns--Data_Transfer_Objects.md#the-standard-library-versions).
 
@@ -1562,8 +1567,8 @@ and a function receiving one does its work without asking whether the value make
 Away from the boundaries, the types also use more memory and time.
 Every value is now an object:
 a constructor call and attribute access where a bare `int` or `str` needs neither.
-`copy.replace()` re-validates the whole object on every change,
-even when only one field moved.
+`copy.replace()` re-runs every check in `__post_init__()` on every change,
+including the checks on fields it copied unchanged.
 For a hot path, or a structure nesting many values
 (many `Point`s inside a `Line`),
 the overhead is [worth measuring](18_Techniques--Performance.md)
