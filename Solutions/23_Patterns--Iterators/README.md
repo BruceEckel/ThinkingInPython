@@ -47,11 +47,11 @@ print(total(evens(5)))
 ```
 
 `evens()` is a generator function with the same shape as
-`fibonacci()`: a function containing `yield`, so calling it returns an
-iterator rather than running the body immediately. `total()` calls
-`sum()` on whatever iterable it receives, so `total()` sums
-`evens(5)`'s values without needing to know that a new kind of
-generator now exists alongside `fibonacci()` and `Countdown`.
+`fibonacci()`.
+Because `evens()` contains `yield`, calling it returns an
+iterator rather than running the body immediately.
+`total()` passes whatever iterable it receives to `sum()`,
+so it sums `evens(5)` with no change, as it sums `fibonacci(8)` and `Countdown(5)` in the chapter.
 
 </details>
 </details>
@@ -93,8 +93,8 @@ class Countdown:
 
 If `__len__()` returns `self.start` alone,
 `len(Countdown(-1))` raises a `ValueError`, since `len()` rejects a negative length.
-So does `list(Countdown(-1))`, because `list()` calls `__len__()` to size its result,
-though a `for` loop over the same object runs zero times without complaint.
+So does `list(Countdown(-1))`, because `list()` calls `__len__()` to size its result.
+A `for` loop over the same object runs zero times and raises no exception.
 The solution returns `max(self.start, 0)`, so the length matches the zero values that iteration produces.
 
 ```python
@@ -129,18 +129,18 @@ not an iterator. Each `for` loop or `list()` call gets a fresh
 generator from a fresh call to `__iter__()`, so iterating over `c`
 leaves `c.start` alone.
 
-**Count without consuming.** `len(c)` computes from `c.start`, any
-number of times, before or after.
+**Count from the `start` field.** `len(c)` computes its answer from `c.start`,
+so it returns the same count any number of times, before iterating or after.
 
 A generator cannot support `len()`. Once you call a generator
 function, you have the iterator, and an iterator's whole state
-is "how far through have I gotten." The only way to learn how many
-values remain is to consume them, which uses them up. No `start` field
-remains to inspect, and nothing can ask a paused generator "how many
-more times will you yield?" without running it to exhaustion.
-`Countdown` counts without consuming because it is a container that
+is "how far through have I gotten."
+The generator holds no `start` field to inspect,
+so to learn how many values remain, you must consume them.
+
+`Countdown` can count because it is a container that
 produces a generator on demand. The container keeps the value
-`len()` reads, and reading it consumes nothing.
+`len()` reads, and reading that value consumes nothing.
 
 </details>
 </details>
@@ -155,7 +155,7 @@ produces a generator on demand. The container keeps the value
 
 [What Laziness Hides](../../Chapters/23_Patterns--Iterators.md#what-laziness-hides) explains that creating a generator runs none of its body.
 Wrap the generator in `itertools.islice()` with a stop of 10.
-`islice()` pulls only as many values as you request, so the rest stay uncomputed.
+`islice()` stops pulling once it has the number you request, so the generator's loop runs that many iterations.
 
 <details>
 <summary>The shape</summary>
@@ -175,8 +175,8 @@ def fibonacci(n: int) -> Iterator[int]:
 If you slice the generator the way you would a list,
 `fibonacci(1_000_000)[:10]` raises a `TypeError`, because a generator defines no `__getitem__()`.
 The type checker rejects the slice before the program runs, and `ty` reports it as `not-subscriptable`.
-`islice()` slices an iterator by pulling from it,
-as [Reusable Algorithms](../../Chapters/23_Patterns--Iterators.md#reusable-algorithms) notes.
+As [Reusable Algorithms](../../Chapters/23_Patterns--Iterators.md#reusable-algorithms) notes,
+`islice()` slices an iterator by pulling from it.
 
 ```python
 # exercise_3.py
@@ -194,14 +194,13 @@ print(list(islice(fibonacci(1_000_000), 10)))
 ```
 
 `fibonacci(1_000_000)` builds a generator ready to yield a million
-values, but building it computes nothing. A generator's body runs only
-as far as the next `yield`, each time something asks it for a value.
+values, but building it computes nothing. Each time something asks a
+generator for a value, its body runs to the next `yield` and pauses there.
 `islice(..., 10)` asks for ten, so `fibonacci()`'s loop runs
-ten iterations and leaves the other 999,990 uncomputed, the same
-laziness on which
+ten iterations and leaves the other 999,990 uncomputed.
 [Comprehensions](../../Chapters/16_Techniques--Comprehensions.md#generator-expressions) and
 [Performance](../../Chapters/18_Techniques--Performance.md#lazy-evaluation-with-generators)
-both rely.
+both rely on the same laziness.
 
 </details>
 </details>
@@ -217,7 +216,7 @@ both rely.
 <details>
 <summary>Where to look</summary>
 
-[An Exhausted Generator Is Silently Empty](../../Chapters/23_Patterns--Iterators.md#an-exhausted-generator-is-silently-empty) shows the second pass returning nothing.
+[An Exhausted Generator Is Silently Empty](../../Chapters/23_Patterns--Iterators.md#an-exhausted-generator-is-silently-empty) shows the second pass returning an empty list.
 One fix stores the values with `list()` once.
 The other turns `squares()` into a class
 whose `__iter__()` builds a new generator on each call.
@@ -277,20 +276,21 @@ print(list(sq))
 #: [0, 1, 4, 9, 16]
 ```
 
-Both fixes survive a second pass, one by storing and one by
-recomputing. The list holds every value for as long as the name lives,
-so a million items is a million items in memory, and the second pass
-reads them back without recomputing. `Squares`
-holds one integer, `n`, and each pass recomputes from scratch.
+Both fixes produce the values again on a second pass, one by storing and one by
+recomputing.
+The list's second pass reads the stored values back.
+The list holds every value for as long as the name lives,
+so a million items is a million items in memory.
+`Squares` holds one integer, `n`, and each pass recomputes from scratch.
 
-For a stream of a million items, choose `Squares`. Memory is the
-resource that fails catastrophically, as
-[Performance](../../Chapters/18_Techniques--Performance.md#lazy-evaluation-with-generators)
-describes. A data set that fits runs at full speed, and one that does
-not falls off a cliff into swapping or a `MemoryError`. Recomputation
-merely takes longer, in proportion. The list wins only when a pass is
-slow and you know the data is small, or when nothing can replay
-the source, as with a network response.
+For a stream of a million items, choose `Squares`.
+As [Performance](../../Chapters/18_Techniques--Performance.md#lazy-evaluation-with-generators) describes,
+memory is the resource that fails catastrophically.
+A data set that fits runs at full speed,
+and one that outgrows memory swaps pages to disk or fails with a `MemoryError`.
+Recomputation, by contrast, takes longer in proportion to the work. The list is a better choice only when a pass is
+slow and you know the data is small, or when the source delivers
+its data once, as a network response does.
 
 </details>
 </details>
@@ -368,8 +368,8 @@ print(f"the wider gap buffers more: {far > near}")
 #: the wider gap buffers more: True
 ```
 
-The buffer grows in proportion to `k`. `tee()` holds what the leading
-branch has consumed and the trailing one has not, so a gap of `k` items
+The buffer grows in proportion to `k`. `tee()` buffers every item the leading
+branch consumes until the trailing branch catches up, so a gap of `k` items
 is a buffer of `k` items, whatever the length of the stream. The two
 measurements in `tee.py` are this rule at its limits. Draining one
 branch first stretches the gap to the whole stream, and lockstep
@@ -380,12 +380,12 @@ Each step takes one item from each branch, so the buffer keeps its
 size through the rest of the run.
 
 **Compare two gap widths.** One machine measured about
-9,800 bytes at `k` of 100 and about 416,000 at `k` of 10,000. A
-hundredfold wider gap costs roughly forty times the memory rather than
-a hundred, because the smaller figure carries a cost that stays
-the same at every `k`, and a short gap uses more bytes per item than a long one.
-The difference between the two figures, about 41 bytes per
-buffered item, is the part that tracks `k`.
+9,800 bytes at `k` of 100 and about 416,000 at `k` of 10,000.
+A gap a hundred times wider takes roughly forty times the memory rather than a hundred,
+because the smaller figure includes overhead that stays the same at every `k`,
+and a short gap uses more bytes per item than a long one.
+The difference between the two figures tracks `k`:
+about 41 bytes per buffered item.
 
 **Report what holds across machines.** The script prints a boolean rather than the byte counts, since the
 sizes shift between machines and Python builds while their ordering
@@ -412,9 +412,9 @@ Feed it an endless source that raises an exception after too many pulls, and use
 <details>
 <summary>Solution</summary>
 
-The solution repeats `test_endless.py`'s scaffolding in a file of its
-own, so it runs without the chapter's module. In the chapter, you add
-the test function alone.
+The solution repeats `test_endless.py`'s scaffolding in a separate
+file, so the file runs on its own.
+To add the test to `test_endless.py`, copy the test function alone.
 
 ```python
 # test_ch23_filter.py
@@ -443,14 +443,15 @@ def test_filter_skips_but_never_stops() -> None:
 The test should resemble
 `test_the_if_clause_skips_but_never_stops()`, because `filter()` and
 the generator expression's `if` clause are the same operation written
-two ways. Both skip what does not match and both keep asking forever,
-so both trip the wire. `takewhile()` stops at the first failure.
+two ways. Both drop each value the predicate rejects and keep asking,
+so both raise `Tripwire`.
+`takewhile()`, by contrast, stops at the first value its predicate rejects.
 
-Writing this test confirms the pairing the prose asserts. A
+Writing this test confirms the pairing the chapter asserts. A
 reader might reasonably guess that `filter()`, being a function rather
-than a clause, gets a chance to decide when to stop. `filter()` gets
-no such chance. It receives values one at a time and can answer
-"keep" or "skip" about the value in front of it, not "stop."
+than a clause, can stop early.
+But `filter()` stops only when its source stops.
+Its predicate receives one value at a time and answers "keep" or "skip" for that value, not "stop."
 
 </details>
 </details>
@@ -535,7 +536,7 @@ If you pass the endless `OverStream` to `traverse()`,
 the call runs forever.
 `traverse()` stops only when `is_done()` reports the end, and `count(1)` has none.
 `seen` gains an item on every step for as long as the call runs.
-The solution calls the four methods in a loop of 50,000 steps instead,
+The solution calls `is_done()`, `current_item()`, and `advance()` in a loop of 50,000 steps instead,
 so the run ends and the listing prints `len(endless.seen)`.
 
 ```python
@@ -619,20 +620,21 @@ print(len(endless.seen))
 **Match by methods, not by base.** `traverse()` needs no change, because its parameter names the
 `GoFIterator` protocol rather than a class. `OverSequence` and
 `OverStream` share no base class, and neither names the protocol.
-Defining its four methods is enough to satisfy it.
+Defining the protocol's four methods satisfies it.
 
-**Read without consuming.** `OverSequence` needs no `seen` list because its `items` sequence
+**Index a stored sequence.** `OverSequence` needs no `seen` list because its `items` sequence
 holds every value. A caller can index that sequence
-repeatedly, in any order, without consuming it, and the GoF
-interface assumes a collection allows that. `OverStream`
-builds `seen` to fake the same ability.
+repeatedly, in any order, and every value stays in place.
+The GoF interface assumes every collection allows that kind of access,
+and `OverStream` builds `seen` to imitate a stored sequence.
 
-**Measure what rewinding costs.** The endless source shows what the faking costs. After 50,000 steps
-`seen` holds 50,000 items, and it holds a million after a million.
+**Measure what rewinding needs.** The endless source shows the memory that imitation takes.
+After 50,000 steps `seen` holds 50,000 items, and after a million steps it holds a million.
 `first()` works only if every value stays reachable, so supporting it
-on an endless source costs unbounded memory. Python's `__next__()` has
-no such requirement, which is why iterating over `itertools.count()`
-is safe and rewinding it is impossible.
+on an endless source takes unbounded memory.
+Python's iterator protocol has no `first()`,
+so `itertools.count()` holds one number, the next value it returns.
+Iterating over `count()` takes constant memory, and rewinding it is impossible.
 
 </details>
 </details>
@@ -678,11 +680,11 @@ class Peekable[T](Iterator[T]):
 
 If you write `peek(it)` as `return next(it, DONE)`
 and call it on the demo's `(x * 2 for x in [1, 2, 3])`,
-it reports the `2` and consumes it.
+`peek()` reports the `2` and consumes it.
 The following `next(it)` returns `4`.
-The type checker accepts that version, so the loss shows only when the program runs.
+The type checker accepts that version, so you find the lost value only by running the program.
 `Peekable` keeps the pulled item in a field,
-where `peek()` can read it any number of times and `__next__()` can still hand it out.
+where `peek()` can read it any number of times and `__next__()` can still return it.
 
 ```python
 # exercise_8.py
@@ -725,19 +727,20 @@ You cannot write a bare `peek(it)` function. Reading a value requires
 `next()`, `next()` advances, and nothing in the protocol puts a value
 back. Every path to the next value advances the iterator.
 
-**Buffer one item ahead.** `Peekable` stores what a bare iterator does not: one item, pulled
-early. That one stored item is the difference, and it restores
-the `current_item()` that GoF had and Python dropped. `peek()` is
-now free and repeatable, as the three identical `2`s show,
-because it reads a field rather than the source.
+**Buffer one item ahead.** `Peekable` adds one piece of state to a bare iterator: the next item, pulled
+early. That stored item restores
+the `current_item()` that GoF had and Python dropped.
+`peek()` reads a field rather than the source,
+so it consumes nothing and gives the same answer each time, as the three identical `2`s show.
 
 **Fill the buffer at construction.** `Peekable` pulls from the source
 before any caller asks for a value, so the constructor computes the
 first item, however slow, whether or not anything uses it. A source
 that blocks on its first read blocks at construction. `OverStream`
-pulls early the same way: its `is_done()` reads the next item before
-`current_item()` asks for it. Answering a question about the future
-means fetching the future.
+pulls early the same way.
+Its `is_done()` reads the next item before
+`current_item()` asks for it.
+Answering a question about the next item means fetching that item.
 
 </details>
 </details>
@@ -817,15 +820,17 @@ print(list(flatten_str([1, ["ab", [2]], 3])))
 #: [1, 'ab', 2, 3]
 ```
 
-**Descend until a leaf.** `flatten()` asks of each item whether it
-is an `int`, and recurses into every item that is not one. A `str` is not
-an `int`, so `"ab"` goes to `flatten("ab")`, which iterates over it
-and gets `"a"`. That `"a"` is also not an `int`, so `flatten("ab")`
+**Descend until a leaf.** `flatten()` yields each item that
+is an `int` and recurses into every other item. `"ab"` is a `str`,
+so it goes to `flatten("ab")`, which iterates over it
+and gets `"a"`. That `"a"` is a `str` too, so `flatten("ab")`
 recurses into `flatten("a")`, which iterates over `"a"` and gets
-`"a"`. The string has stopped getting shorter. Every other sequence bottoms out because
-indexing it eventually yields a non-sequence, and `str` is the one
-built-in sequence whose items are again strings. A one-character string is still a `Sequence`
-of one-character strings. The recursion has no base case, so it runs
+`"a"` again. From here on the string stays one character long.
+A nested list ends because each level holds one less level of nesting, until the items are `int`s.
+A `str` keeps descending.
+Iterating over a string yields strings,
+and a one-character string is a `Sequence` of one-character strings.
+The recursion has no base case, so it runs
 until Python raises a `RecursionError`.
 
 **Treat a string as a leaf.** The fix widens the base case rather than the recursive one. Testing
@@ -835,18 +840,19 @@ widens to `Iterator[int | str]` to say so.
 
 `flatten_loop()` takes the identical fix, since `flatten()` and
 `flatten_loop()` differ only in how they re-yield. The fix is the same
-`if isinstance(item, int | str)` test in the same place, with the
-`for x in flatten_loop(item)` branch left alone. The bug is in the
-question each version asks, not in the delegation, which is why
-`yield from` neither causes the bug nor cures it.
+`if isinstance(item, int | str)` test in the same place,
+and the `for x in flatten_loop(item)` branch stays as it is.
+The bug is in the test each version applies, not in the delegation,
+so `yield from` and the explicit `for` loop fail alike and take the same repair.
 
-The annotation does not help. `Nested` reads as though a leaf must
-be an `int`, and `ty` enforces that much. It rejects a `float` in
-the same list. It accepts `"ab"`, because a `str` is a
+`ty` accepts the list that triggers the bug. `Nested` reads as though a leaf must
+be an `int`, and `ty` enforces that much.
+`ty` rejects a `float` in the same list.
+But `ty` accepts `"ab"`, because a `str` is a
 `Sequence[str]`, and each of those strings is again a
 `Sequence[str]`. The string satisfies the alias's second arm by the
 same endless descent that breaks `flatten()`. Pyright rejects the
-string. Under `ty` the failure arrives as a `RecursionError` at
+string. Under `ty` the failure is a `RecursionError` at
 runtime rather than an error at the assignment.
 
 </details>
@@ -866,7 +872,7 @@ runtime rather than an error at the assignment.
 <summary>Where to look</summary>
 
 [A Type-Checking Iterator](../../Chapters/23_Patterns--Iterators.md#a-type-checking-iterator) shows `typed()` and `TypedIterator`.
-In a generator, `typed_skipping()` does not `yield` a mismatched item.
+In a generator, `typed_skipping()` yields each item that matches and moves past the others.
 In a class, `__next__()` must return a value or raise `StopIteration`, so it needs a loop that keeps pulling until an item matches.
 
 <details>
@@ -902,10 +908,10 @@ class SkippingIterator[T](Iterator[T]):
 <details>
 <summary>Solution</summary>
 
-If `SkippingIterator.__next__()` drops the loop and tests only the one item it reads,
+If `SkippingIterator.__next__()` reads one item and tests it, with no loop,
 a mismatch falls off the end of the method, which returns `None`.
 Over the demo's `items`, the class produces `[1, None, 3, None, 4]`.
-`ty` catches that version with an `invalid-return-type`, since the method can implicitly return `None`.
+`ty` reports an `invalid-return-type` on that version, since the method can implicitly return `None`.
 The solution loops until an item matches,
 so every call returns a value or raises `StopIteration`.
 
@@ -955,35 +961,37 @@ print(list(SkippingIterator(iter(items), int)))
 ```
 
 **Skip a mismatch and keep going.** `typed()` and `typed_skipping()` ask the same `isinstance()` question
-and act differently on a no, and that difference decides what
-happens after a bad item. `typed()` ends the stream. A consumer
-that iterates item by item receives the `1` before `"two"` and
-nothing after it, and a caller that wraps it in `list()` gets an
-exception instead of a list. `typed_skipping()` delivers
-`[1, 3, 4]` and says nothing about `"two"` or the `None`.
+and differ in what they do with a no.
+`typed()` raises a `TypeError`, which ends the stream.
+A consumer that iterates item by item receives the `1` and then the exception.
+A caller that wraps `typed()` in `list()` gets the exception instead of a list. `typed_skipping()` delivers
+`[1, 3, 4]` and drops `"two"` and the `None` silently.
 
 For a parsed log file, take the skipping version. A log is an
 append-only record that many processes write, so a malformed line is
-an expected event rather than a broken contract. One truncated line
-should leave the rest of the file readable. The version that raises a
-`TypeError` gives the caller no way to resume. The exception ends the
-generator, so continuing means parsing the file again and somehow
+a routine event rather than a broken contract. One truncated line
+should leave the rest of the file readable. With the version that raises a
+`TypeError`, the exception ends the generator,
+so the caller resumes by parsing the file again and somehow
 starting past the line that failed.
 
-Skipping hides what it drops, the problem this chapter keeps
-revisiting: a filter that quietly drops every line looks the same as
+Skipping hides what it drops, and the chapter keeps returning to that problem.
+A filter that quietly drops every line looks the same as
 a file with nothing to report. If you take the
 skipping version, count what it drops and report the count.
 
 **Keep pulling until a match.** The skipping version is harder to write as a class.
-A generator may decline to produce a value. `typed_skipping()` reaches
-an item of the wrong type and does not `yield`, so the `for`
-loop continues. `__next__()` has no such option. Every call must
-return a value or raise `StopIteration`, so `SkippingIterator` needs
-its own loop to keep pulling until a match arrives. A `__next__()`
-that raises a `TypeError` needs no loop, since it acts on the one item
-it just read. Generators write the state machine for you, and skipping
-is where you notice.
+A generator can pass over an item.
+When `typed_skipping()` reaches
+an item of the wrong type, it skips the `yield` and its `for` loop moves on.
+A generator pauses inside its `for` loop at each `yield` and resumes there on the next call,
+so the loop that skips is the loop that yields.
+A class resumes at the top of `__next__()` on every call,
+and every call must return a value or raise `StopIteration`,
+so `SkippingIterator` needs a loop written into the method
+to keep pulling until a match arrives.
+A `__next__()` that raises a `TypeError` is straight-line code.
+It reads one item and either returns that item or raises the exception.
 
 </details>
 </details>
