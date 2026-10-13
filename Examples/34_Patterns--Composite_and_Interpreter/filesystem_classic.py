@@ -34,12 +34,13 @@ class Directory(Node):
 
     @override
     def disk_usage(self) -> int:
-        return sum(e.disk_usage() for e in self.entries)
+        return sum(entry.disk_usage()
+                   for entry in self.entries)
 
     @override
     def walk(self, prefix: str = "") -> Iterator[str]:
-        for e in self.entries:
-            yield from e.walk(f"{prefix}{self.name}/")
+        for entry in self.entries:
+            yield from entry.walk(f"{prefix}{self.name}/")
 
 src = Directory("src", (
     File("main.py", 400), File("util.py", 250)))

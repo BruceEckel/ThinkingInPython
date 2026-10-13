@@ -25,7 +25,8 @@ def disk_usage(entry: Node) -> int:
         case File(_, size):
             return size
         case Directory(_, entries):
-            return sum(disk_usage(e) for e in entries)
+            return sum(disk_usage(child)
+                       for child in entries)
         case Symlink():
             # A link contributes no size of its own
             return 0
@@ -37,8 +38,8 @@ def walk(entry: Node, prefix: str = "") -> Iterator[str]:
         case File(name, _):
             yield prefix + name
         case Directory(name, entries):
-            for e in entries:
-                yield from walk(e, f"{prefix}{name}/")
+            for child in entries:
+                yield from walk(child, f"{prefix}{name}/")
         case Symlink(name, target):
             yield f"{prefix}{name} -> {target}"
         case _:

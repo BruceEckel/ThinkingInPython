@@ -21,7 +21,7 @@ if __name__ == "__main__":
     x = Var("x")
     expr = 2 * x + 1
     by_hand = Add(Mul(Num(2), x), Num(1))
-    print(expr == by_hand, expr.left)
+    print(expr == by_hand, type(expr).__name__, expr.left)
     print(evaluate(expr, x=3), evaluate(expr, x=10))  # [1]
-#: True Mul(left=Num(value=2), right=Var(name='x'))
+#: True Add Mul(left=Num(value=2), right=Var(name='x'))
 #: 7 21

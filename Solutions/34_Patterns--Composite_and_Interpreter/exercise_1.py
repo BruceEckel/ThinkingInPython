@@ -24,8 +24,9 @@ def find(entry: Node, name: str,
         case Directory(n, entries):
             if n == name:
                 yield prefix + n
-            for e in entries:
-                yield from find(e, name, f"{prefix}{n}/")
+            for child in entries:
+                yield from find(
+                    child, name, f"{prefix}{n}/")
         case _:
             assert_never(entry)
 

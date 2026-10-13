@@ -26,7 +26,8 @@ class Directory(Entry):
 
     @override
     def disk_usage(self) -> int:
-        return sum(e.disk_usage() for e in self.entries)
+        return sum(entry.disk_usage()
+                   for entry in self.entries)
 
 # A plugin package adds a node type, editing nothing above:
 @record

@@ -68,12 +68,13 @@ class Directory(Node):
 
     @override
     def disk_usage(self) -> int:
-        return sum(e.disk_usage() for e in self.entries)
+        return sum(entry.disk_usage()
+                   for entry in self.entries)
 
     @override
     def walk(self, prefix: str = "") -> Iterator[str]:
-        for e in self.entries:
-            yield from e.walk(f"{prefix}{self.name}/")
+        for entry in self.entries:
+            yield from entry.walk(f"{prefix}{self.name}/")
 
 src = Directory("src", (
     File("main.py", 400), File("util.py", 250)))
@@ -132,7 +133,8 @@ def disk_usage(entry: Node) -> int:
         case File(_, size):
             return size
         case Directory(_, entries):
-            return sum(disk_usage(e) for e in entries)
+            return sum(disk_usage(child)
+                       for child in entries)
         case _:
             assert_never(entry)
 
@@ -141,8 +143,8 @@ def walk(entry: Node, prefix: str = "") -> Iterator[str]:
         case File(name, _):
             yield prefix + name
         case Directory(name, entries):
-            for e in entries:
-                yield from walk(e, f"{prefix}{name}/")
+            for child in entries:
+                yield from walk(child, f"{prefix}{name}/")
         case _:
             assert_never(entry)
 
@@ -444,16 +446,16 @@ if __name__ == "__main__":
     x = Var("x")
     expr = 2 * x + 1
     by_hand = Add(Mul(Num(2), x), Num(1))
-    print(expr == by_hand, expr.left)
+    print(expr == by_hand, type(expr).__name__, expr.left)
     print(evaluate(expr, x=3), evaluate(expr, x=10))  # [1]
-#: True Mul(left=Num(value=2), right=Var(name='x'))
+#: True Add Mul(left=Num(value=2), right=Var(name='x'))
 #: 7 21
 ```
 
 The demo confirms that the operators build the tree you assemble by hand.
 Records generate `__eq__()`,
 so `expr == by_hand` compares the two trees by value.
-Printing `expr.left` shows the nesting.
+Printing the root's type and then `expr.left` shows the nesting.
 The `Add` at the root holds a `Mul`, which holds a `Num` and a `Var`.
 The `print()` at `[1]` evaluates that same `expr` twice,
 once with `x=3` and once with `x=10`.
