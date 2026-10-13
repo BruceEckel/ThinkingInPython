@@ -114,36 +114,34 @@ print(run(
 #: ('log-2026-01-01.txt', '[2026-01-01] ok')
 ```
 
-**Keep the moment between requests.** `ticking()` is a handler factory.
-It stores a moment.
-The handler answers each request with the current value,
+**Keep the moment between requests.** `ticking()` is a handler factory that stores a moment.
+The handler it returns answers each request with the current value,
 then advances the stored moment by `step`.
 `nonlocal` makes the handler stateful.
-`crossing` in `midnight.py` walks a two-element list and stops there,
-while `ticking()` answers any number of requests,
+Where `crossing` in `midnight.py` walks a two-element list and stops there,
+`ticking()` answers any number of requests,
 so the same handler serves an Effect that reads the clock three times or thirty.
 Each call to `ticking()` builds a fresh handler with its own stored moment,
 so both runs in the listing start at 23:59:59.
 
 **Reproduce the bug under the new handler.** `archive_twice()` is the original function.
 The first request names the file for January 1 and the second stamps the entry January 2,
-so the bug survives the change of handler.
-It should.
-Nothing about the handler causes it.
+so the new handler reproduces the bug.
+It should, because the bug is in the function, not in the handler.
 
 **Make the two strings agree.** `archive_once()` reads the clock one time and derives both strings from that value.
 The mismatch needs two readings that could differ.
 With one reading, the two strings must agree.
 A handler still chooses the moment, and it can choose 23:59:59,
 but both strings then carry that moment.
-No handler can reproduce the bug, because the bug is not in the handler.
-It is in a function that asks twice and treats the answers as one.
+No handler can reproduce the bug,
+because the bug belongs to a function that asks twice and treats the answers as one.
 
-That is the general shape of a clock bug.
+Asking twice and treating the answers as one is the general shape of a clock bug.
 Reading a clock twice reads a changing value twice,
 and two readings are two facts rather than one.
 Naming the clock as an Ability makes the failure reproducible.
-Deriving both strings from a single reading removes it.
+Deriving both strings from a single reading removes the failure.
 
 </details>
 </details>
@@ -163,8 +161,8 @@ Deriving both strings from a single reading removes it.
 <details>
 <summary>Where to look</summary>
 
-[Nothing stops an undeclared Effect](../../Chapters/47_Effects--Stateless_in_Practice.md#nothing-stops-an-undeclared-effect) explains why a signature cannot see what a body does before it returns.
-For the error side, ask when a `KeyError` raised in an ordinary function body fires relative to when `catch()` starts watching the channel.
+[Nothing stops an undeclared Effect](../../Chapters/47_Effects--Stateless_in_Practice.md#nothing-stops-an-undeclared-effect) explains why a signature cannot describe what a body does before it returns.
+For the error side, ask whether an ordinary function body raises its `KeyError` before or after `catch()` starts handling the failures in the channel.
 `@throws` is the decorator that moves a raised exception into the channel.
 
 <details>
@@ -204,28 +202,29 @@ def double(n: int) -> Success[int]:
     return success(n * 2)  # Nothing above this line
 ```
 
-If you put a `print()`, an `open()`, a mutation, or a call to any function that
-does one of those above the `return`, it runs while the caller builds the
-description rather than while `run()` executes it,
+A line above the `return` runs while the caller builds the description,
+not while `run()` executes it.
+If that line is a `print()`, an `open()`, a mutation, or a call to a function that does one of those,
+the side effect occurs at build time,
 the opposite of what the signature advertises.
 
 A linter can enforce a conservative version of that rule:
 flag any function annotated `Effect[...]`, `Depend[...]`, `Success[...]`, or `Try[...]`
 that contains no `yield` and whose body is more than a single `return` statement.
 That rule has false positives, since a pure local computation above the `return` is harmless,
-but the shape it looks for is the shape a leak takes.
+but every leak has the shape it flags.
 
 A type checker cannot catch that leak because purity is not a type.
-`print()` is a call returning `None`, legal in any function,
-and Python's type system says what values a function accepts and produces,
-not what its body touches on the way.
+`print()` is a call returning `None`, legal in any function.
+Python's type system says what values a function accepts and produces,
+not what its body does before it returns.
 The annotation `Success[int]` describes the returned object,
 and `success(n * 2)` produces a `Success[int]`, so the annotation and the returned object agree.
 A language that tracks Effects puts the side effect in the signature.
-These two chapters simulate that tracking by hand,
-so the guarantee holds only for Effects that go through `yield`.
+[Stateless](../../Chapters/46_Effects--Stateless.md) and [Stateless in Practice](../../Chapters/47_Effects--Stateless_in_Practice.md) simulate that tracking by hand,
+so the guarantee holds only for Effects that the body requests with `yield`.
 
-The error side has the same hole:
+The error side has the same limit:
 
 ```python
 # exercise_2.py
@@ -264,15 +263,16 @@ print(type(run(fixed())).__name__)
 return channel, and `caller()`'s `int | KeyError` says the caller is ready for either.
 The run does something else.
 `RAW["Bob"]` raises a `KeyError` while `size()` is still building its description,
-before the Effect exists and long before `catch()` has anything to watch,
-so the exception unwinds the stack in the ordinary way and escapes `run()`.
+before the Effect exists and before `catch()` receives any failure from it.
+The exception unwinds the stack in the ordinary way and propagates out of `run()`.
 `catch()` cannot catch what never entered the channel.
 
 **Lift the failure into the channel.** The line that restores the guarantee is `@throws(KeyError)`.
 It turns `declared_size()` into a function that yields its failure instead of
-raising it, so the exception becomes a value travelling the error channel.
+raising it, so the exception reaches `catch()` as a value yielded on the error channel.
 `catch()` then does what its type says.
 `run(fixed())` returns the `KeyError` rather than raising it.
+
 `success()` is for a value you already have. `@throws` is for work that can fail.
 
 </details>
@@ -392,8 +392,8 @@ def run_load(
                 remaining -= 1
 ```
 
-`Turbine` is the only addition: a source available during a set range of hours,
-depleting nothing, since a turbine burns no fuel.
+`Turbine` is the only addition: a source available during a set range of hours.
+Its `deplete()` is empty, since a turbine burns no fuel.
 
 ## 3. A wind turbine between solar and the battery
 
@@ -409,15 +409,15 @@ depleting nothing, since a turbine burns no fuel.
 
 [Switching Implementations Mid-Run](../../Chapters/47_Effects--Stateless_in_Practice.md#switching-implementations-mid-run) shows `run_load()` asking for a `Source` and using whatever the handler returns.
 Add a source class with the same two methods and place it in the tuple that `controller()` receives.
-For the blackout, trace which frame the handler's `raise` crosses as it unwinds, and whether any `yield` lies between it and `run()`.
+For the blackout, trace which frames the handler's `Blackout` unwinds, and whether any `yield` lies between the handler's `raise` and `run()`.
 
 <details>
 <summary>Solution</summary>
 
 If you wrap `run_load()` in `catch(Blackout)` to turn the blackout into a value,
-the program still type-checks and the run prints the same trace through `Turbine offline`.
-Then the `Blackout` escapes `run()` uncaught, and the traceback ends with `grid.Blackout: 20`.
-The wrapper changes nothing, so the solution leaves `run_load()` unwrapped
+the program type-checks and the run prints the same trace through `Turbine offline`.
+Then the `Blackout` escapes `run()`, and the traceback ends with `grid.Blackout: 20`.
+The wrapper changes nothing, so the solution drops it
 and uses `expect()` to show the `Blackout` arriving at `run()`.
 
 ```python
@@ -458,32 +458,33 @@ expect(Blackout, run, handle(short)(run_load)(17, 6))
 #: [Blackout] 20
 ```
 
-**Slot a new source into the order.** The turbine takes the evening hours the battery covered without it, and the battery
-drops back to one hour at 22:00 once the wind stops.
+**Slot a new source into the order.** The turbine takes the evening hours the battery covers in the chapter's `sun_first` run.
+The battery supplies one hour, 22:00, after the windy range ends.
 
-`run_load()` needs no change, and could not have needed one.
+`run_load()` needs no change.
 It asks for a `Source` at an hour
-and uses whatever the handler hands back.
-The handler decides which sources exist, which order it prefers them in, and
-whether one of them is new.
-That is the same substitution `Console` and `Feed` allow, applied to a choice
+and uses whatever source the handler returns.
+The handler decides which sources exist, the order in which it prefers them,
+and whether one of them is new.
+Choosing the source in the handler is the same substitution `Console` and `Feed` allow, applied to a choice
 made fresh at every request rather than once at the start.
 
-**Leave an hour with no supplier.** With every other source shortened, hour 20 has no supplier, and the `Blackout`
-surfaces out of `run()`, not out of the Effect.
-`catch(Blackout)` around `run_load()` does not intercept it because `catch()`
-watches the error channel, and this exception stays outside that channel.
-`choose()`, the handler, raises the `Blackout`, and a handler answers each
-request from inside the driver.
+**Leave an hour with no supplier.** With every other source shortened, hour 20 has no supplier,
+and the `Blackout` propagates out of `run()` instead of arriving on the Effect's error channel.
+`catch(Blackout)` around `run_load()` does not intercept it,
+because `catch()` handles the failures an Effect yields on its error channel,
+and `choose()`, the handler, raises this one.
+A handler answers each request from inside the driver.
 No `yield` sits between the `raise` and `run()`'s own stack frame,
-so the exception unwinds the driver in the ordinary Python way,
-past the suspended Effect rather than through it.
+so the exception unwinds the driver's frames in the ordinary Python way.
+The driver never throws it into the suspended Effect.
 
 Exercise 2 draws the same distinction from the other side.
-A failure is part of the Effect only if it travels as a value,
-and a `raise` in code the driver calls is outside the description.
-Making a `Blackout` catchable means giving the Ability a failure type,
-so the handler returns a value rather than raising an exception,
+A failure is part of the Effect only if the Effect yields it as a value.
+A `raise` in code the driver calls is outside the description.
+
+Making a `Blackout` catchable means giving the Ability a failure type.
+The handler then returns a value rather than raising an exception,
 and `plug()` declares the failure it can produce.
 
 </details>
@@ -503,7 +504,7 @@ and `plug()` declares the failure it can produce.
 [Scripting an Unpredictable Source](../../Chapters/47_Effects--Stateless_in_Practice.md#scripting-an-unpredictable-source) shows `scripted` answering each `Flip` from a preset sequence.
 Write a handler factory that closes over an iterator and returns `next()` on each request, ignoring the request's fields.
 Supply a source whose `available()` is always false so the first draws fail.
-Then list what the handler ignores, and what `controller()` therefore keeps to itself.
+Then list what the handler ignores, and which of `controller()`'s decisions the test therefore leaves unchecked.
 
 <details>
 <summary>The shape</summary>
@@ -530,7 +531,7 @@ class Dead:  # Never available, so every draw fails
 <details>
 <summary>Solution</summary>
 
-If you script a sequence with no `Dead()` sources, such as
+If you script working sources alone, such as
 `iter([Solar()])`, the run prints `Solar online`, both hours, and
 `Solar offline`, all from a single request. Every draw succeeds, so
 `run_load()` asks for one source, and the test passes without exercising
@@ -570,24 +571,27 @@ run(handle(scripted(sequence))(run_load)(10, 2))
 #: Solar offline
 ```
 
-**Force a re-request.** Three requests for two hours of power. The first two hand back a `Dead` source
-that fails immediately, and `run_load()` responds by breaking out of the inner
-loop, leaving the `connected` block, and asking for another source.
+**Force a re-request.** The run makes three requests for two hours of power.
+The first two return a `Dead` source that fails immediately.
+Each time, `run_load()` breaks out of the inner loop,
+leaves the `connected` block, and asks for another source.
 The third request produces a working one, which then covers both hours.
-The test pins down that re-request behavior with a handler that answers from a list
+The test checks that re-request behavior with a handler that answers from a list
 instead of weather, a clock, or a battery.
 
 What the test cannot tell you is whether `controller()` is right.
-Every question about policy is out of its reach: whether `controller()`
+The test leaves every question about policy unchecked: whether `controller()`
 prefers solar before the battery, whether the battery reports itself
 unavailable once exhausted, whether `controller()` asks about the hour
 for which `run_load()` draws power. The scripted handler ignores
-`request.hour`, and that omission is the source of both its
-convenience and its blindness.
-The scripted test checks the consumer of the Ability while saying nothing about the producer.
+`request.hour`.
+Ignoring the hour makes the handler simple to write
+and also means the test exercises none of the choices `controller()` makes by the hour.
+The scripted test checks the consumer of the Ability and leaves the producer untested.
+
 `controller()` needs its own test, and that test can be an ordinary one.
 `controller()` builds an ordinary function
-from an `Outlet` to a `Source`, and no Effect takes part.
+from an `Outlet` to a `Source`, and a test can call that function with an `Outlet` and check which `Source` it returns.
 
 </details>
 </details>
@@ -727,7 +731,7 @@ def report() -> Depend[
 
 [Composing a Program](../../Chapters/47_Effects--Stateless_in_Practice.md#composing-a-program) builds `research()` from `yield from` steps, and [The Success Path](../../Chapters/47_Effects--Stateless_in_Practice.md#the-success-path) writes the same pipeline with ordinary calls.
 In the Effect version, add a `@throws` function for the new check and widen the error parameter of the signature until `ty` reports nothing.
-In the by-hand version, look for the tool that reports the changes, or the lack of one.
+In the by-hand version, ask which tool, if any, reports the changes.
 
 <details>
 <summary>The shape</summary>
@@ -786,7 +790,7 @@ ordinary exception, the way `size()`'s `KeyError` does in exercise 2.
 `yield from within_limit(article)`, because the undecorated function
 returns a `str` rather than an Effect. The solution decorates
 `within_limit()` with `@throws(TooLong)`, which moves the raised
-exception into the error channel, where `catch()` can see it.
+exception into the error channel, where `catch()` handles it.
 
 ```python
 # research_long.py
@@ -821,30 +825,30 @@ def research() -> Effect[
     return checked
 ```
 
-**Add and declare the failure.** Four edits in `research.py`, and the
+**Add and declare the failure.** `research.py` takes four edits, and the
 type checker names one of them. `report()` needs three more.
 
 1. A new exception class, `TooLong`.
 2. A new `@throws(TooLong)` function, `within_limit()`, since `@throws` lifts a raised
-   `TooLong` into a failure that can travel.
+   `TooLong` into a failure the Effect yields.
 3. One new line in `research()`, the `yield from within_limit(article)`.
 4. `research()`'s error parameter, widened to include `TooLong`.
 5. `report()`'s `catch()` call, widened to include `TooLong`.
 6. The `found:` annotation, widened to include `TooLong`.
 7. A new `case TooLong():` branch in `report()`'s `match`.
 
-**Widen the signature to match.** Adding edit 3 without edit 4 is the one `ty` reports, as an `invalid-yield` at the
+**Widen the signature to match.** If you make edit 3 without edit 4, `ty` reports an `invalid-yield` at the
 new line rather than at the signature: `expression of type 'TooLong', expected 'Need[Feed] |
 Need[Encyclopedia] | Unavailable | NotInteresting | NoArticle'`.
-Widening the signature then breaks every caller that names the old set. `report()` stops at
-its own `yield from` with the same `invalid-yield`, now carrying `TooLong` in the
-type it did not expect. Once edits 5 and 6 widen `catch()` and the
+Widening the signature then breaks every caller that names the old set.
+`ty` reports the same `invalid-yield` at `report()`'s own `yield from`,
+now with `TooLong` in the yielded type. Once edits 5 and 6 widen `catch()` and the
 `found:` annotation to match, `assert_never()` reports `TooLong` as an
-unhandled branch until edit 7 adds its case. Every one of
-these stops the type check rather than surprising you in production.
-The type checker walks the change through the program, one edit at a time.
+unhandled branch until edit 7 adds its case.
+Each missing edit fails the type check before the program runs, instead of failing in production.
+The type checker reports each line the change requires, one edit at a time.
 
-The by-hand version takes a comparable edit and reports none of it:
+The by-hand version needs a comparable edit, and no tool reports any of it:
 
 ```python
 # research_by_hand.py
@@ -890,15 +894,15 @@ print(research_and_report(
 #: short enough
 ```
 
-In the Effect version, the type checker tells you where to go.
+In the Effect version, the type checker reports where to edit.
 It flags the undeclared failure at the delegation that introduces it,
-then the widened union at every caller that claims to handle everything.
-In the by-hand version nothing tells you anything.
-Adding `except TooLong` to the `try` at `[1]` is a choice you make by reading the
-code. If you forget it, a `TooLong` escapes `research_and_report()`, whose
-signature still says it returns a `str` no matter what.
-Both versions run. Only one of them has a tool that knows the set of failures
-changed.
+then the widened union at every caller whose annotations name the old set of failures.
+In the by-hand version,
+adding `except TooLong` to the `try` at `[1]` is a choice you make by reading the
+code. If you forget `except TooLong`, a `TooLong` escapes `research_and_report()`, whose
+signature still says it returns a `str`.
+Both versions run.
+Only in the Effect version does a tool report that the set of failures changed.
 
 </details>
 </details>
@@ -952,18 +956,18 @@ print(outcome(StaleWire(), SHELF))
 The prediction is two lines: `feed: fetching`, then `no headline today`.
 
 `StaleWire` and `DeadWire` fail the same way.
-Each `latest()` raises `Unavailable`, `@throws` on `fetch()` sends it into the
-error channel, `research()` stops there, and `report()` matches it and returns
-`"no headline today"`.
+Each `latest()` raises `Unavailable`,
+and `@throws` on `fetch()` sends it into the error channel.
+`research()` stops there, before `need(Encyclopedia)`,
+so neither trace has a `library:` line.
+`report()` matches the failure and returns `"no headline today"`.
 The difference is where inside `latest()` the failure arises.
 `StaleWire.latest()` prints its trace line
 before it raises the exception, so `feed: fetching` appears.
 `DeadWire.latest()` raises the exception on its first line,
 so the run prints only the message.
-The trace shows how far each supplied implementation got before it failed,
-which the value `report()` returns cannot show.
-Neither run reaches `need(Encyclopedia)`, so no `library:` line prints in
-either.
+The trace shows how far each supplied implementation got before it failed.
+The value `report()` returns is the same for both.
 
 </details>
 </details>
@@ -1039,30 +1043,35 @@ if isinstance(outcome, RetryError):
 #:   NotInteresting: mild and cloudy
 ```
 
-**Run out of attempts.** Under `WEATHER`, `fetch()` reads the feed three times, each attempt fails with
-the same `NotInteresting`, and the retry gives up with a `RetryError` carrying
+**Run out of attempts.** Under `WEATHER`, `fetch()` reads the feed three times,
+and each attempt fails with the same `NotInteresting`.
+`retry()` stops with a `RetryError` carrying
 three identical failures.
 
 Retrying is the wrong behavior because this failure is deterministic.
 `WEATHER`'s headline is the same on every attempt, and `TOPICS` holds the same
 two topics, so `topic_of()` returns the same answer however many times it runs.
-The retry makes three fetches and three sleeps to arrive at the answer the first
-attempt had, since `retry()` sleeps after every failed attempt, the last
-included. It also turns a clear `NotInteresting` into a `RetryError`
+`retry()` sleeps after every failed attempt, the last included,
+so the retry makes three fetches and three sleeps.
+It ends with the answer the first attempt produced.
+It also turns a clear `NotInteresting` into a `RetryError`
 that the caller must unwrap.
+
 `Unavailable` is the failure worth retrying.
 A feed that is offline now may be online in a moment,
 so another attempt can succeed.
-
 Distinguishing `Unavailable` from `NotInteresting` needs something the library does not offer:
 a retry that selects on the error type.
 `retry()` here applies to the whole error channel, treating every declared
 failure as transient, because its schedule decides when to try again and
-nothing decides whether to try. ZIO provides the missing piece as `retryWhile`, a
-retry taking a predicate on the error. Without it, selective behavior means
-narrowing the channel first: `catch()` the failures that retrying cannot help,
-so they leave the error channel and become values, then apply `retry()` to what
-remains. That narrowing takes more machinery than a predicate,
+nothing decides whether to try. ZIO provides that retry as `retryWhile`, which
+takes a predicate on the error.
+
+In Stateless, selective behavior means
+narrowing the channel first.
+`catch()` the failures that retrying cannot help,
+so they leave the error channel as values.
+Then apply `retry()` to what remains. That narrowing takes more machinery than a predicate,
 and it changes the result type.
 
 </details>
@@ -1085,7 +1094,7 @@ and it changes the result type.
 
 [Running Effects in Parallel](../../Chapters/47_Effects--Stateless_in_Practice.md#running-effects-in-parallel) forks work onto an `Executor`.
 Swap in a `ProcessPoolExecutor`, and protect the driver with the `__main__` guard because each worker re-imports the module.
-For the `Need`, consider where the forked work runs and which handlers can reach it there.
+For the `Need`, consider where the forked work runs and whether a handler can answer its requests there.
 
 <details>
 <summary>Solution</summary>
@@ -1094,7 +1103,7 @@ If you leave out the `__main__` guard, each worker re-imports the module,
 reaches the `with` block, and tries to start a pool of its own before it has finished starting.
 The workers die with a `RuntimeError` about their bootstrapping phase,
 and the driver's `run()` fails with a `BrokenProcessPool` instead of printing the squares.
-The guard keeps the driver out of the import, so a worker loads `slow_square()` without running the driver.
+Under the guard, the driver runs in the main process alone, so a worker loads `slow_square()` without running the driver.
 
 ```python
 import time
@@ -1137,18 +1146,20 @@ if __name__ == "__main__":
 of any kind, so a process pool satisfies the request as a
 thread pool does.
 
-**Guard the driver.** The code around `squares()` did change, and none of it
-is in the Effect: the executor class, the timing the chapter's version
+**Guard the driver.** The code around `squares()` did change, all of it
+outside the Effect: the executor class, the timing the chapter's version
 prints, and the `__main__` guard.
 The guard is now required, because a process pool starts workers by
-re-importing the module, and without the guard each worker builds another pool.
-`slow_square()` needs nothing new.
+re-importing the module.
+Without the guard, each worker builds another pool.
+
+`slow_square()` stays as it was.
 `fork()` checks for a `ProcessPoolExecutor` and serializes the function and
-its arguments with `cloudpickle`, which carries a function defined in the
-running script by value,
+its arguments with `cloudpickle`.
+`cloudpickle` serializes a function defined in the running script by value,
 so a worker receives `slow_square()` without importing it by name.
 
-Forking an Effect that still declares a `Need` does not type-check:
+Forking an Effect that still declares a `Need` fails the type check:
 
 ```python
 @fork
@@ -1171,12 +1182,12 @@ info:            -> ((**P) -> Generator[Need[Executor], Any, Task[R]])
 ```
 
 **Keep requests out of forked work.** Every overload accepts an Effect whose yield channel holds errors, `Async`, or
-nothing, and none accepts one that still holds a `Need`. The forked work
-leaves the driver. It runs in a worker with no access to the handler
-stack that would answer a request. So you must remove the requirement
+nothing, and none accepts one that still holds a `Need`.
+The forked work runs in a worker,
+outside the driver and the handler stack that answers requests. So you must remove the requirement
 before the fork. Supply it first and fork the bound function. The type
-system enforces a rule about where a handler can answer a request, and
-that rule is the same guarantee running through both chapters, applied
+system enforces a rule about where a handler can answer a request.
+That rule is the guarantee on which [Stateless](../../Chapters/46_Effects--Stateless.md) and [Stateless in Practice](../../Chapters/47_Effects--Stateless_in_Practice.md) rely, applied
 to a boundary between threads or processes.
 
 </details>
@@ -1205,7 +1216,7 @@ If you script three balances, `[100, 40, 10]`, and forget that the
 refused `50` still reads one, the script runs out at the fourth price.
 `handle()` reads the `StopIteration` as the end of the Effect, so
 `run()` returns `None` and the test fails on `assert None == 2`. Every
-attempt reads a balance, whether or not the purchase succeeds, so
+attempt reads a balance, whether the purchase succeeds or fails, so
 the solution scripts four balances, with `40` twice.
 
 ```python
@@ -1277,10 +1288,11 @@ print(run(scripted((60, 50, 30, 20))), written)
 refuses the `50` and writes nothing, and `10` after the `30` goes through.
 
 **Prove the loop tries every price.** `spree()` attempts all four prices, and the test proves it from both sides.
-A fifth price exhausts the script, and `handle()` reads the
-`StopIteration` from `read()` as the end of the Effect, the silent trap
-the chapter describes. `run()` returns `None` and the first assertion
-fails on `None == 2`. Stopping early leaves a balance unread, and the
+A fifth `Get` request would exhaust the script.
+`handle()` reads the `StopIteration` from `read()` as the end of the Effect,
+the silent failure the chapter describes,
+so `run()` would return `None` and the first assertion would fail on `None == 2`.
+Stopping early leaves a balance unread, and the
 final assertion catches that by checking that the iterator has
 run out.
 
@@ -1290,15 +1302,15 @@ affordable ones.
 
 What this test cannot check is whether the `Get` and `Put` handlers agree. The `Cell`
 version has one piece of state, so the next `Get` returns whatever the last
-`Put` wrote. Here the test scripts the balances independently of the writes, so
-nothing in it checks that a balance read is the amount the last `Put` wrote.
+`Put` wrote. Here the test scripts the balances independently of the writes.
 The script says 40 follows the first purchase because the test's author did that
 subtraction. A `spree()` that writes the wrong amount, say `funds` instead of
 `funds - price`, still fails, at `written == [40, 10]`.
+
 The scripted test checks the Effect's shape: which requests the Effect makes, in
 which order, with which payloads.
 The `Cell` test checks that the requests compose into correct arithmetic.
-Both are worth having, and each one's blind spot is the other's subject.
+Each test checks what the other leaves unchecked, so a suite needs both.
 
 </details>
 </details>
@@ -1423,15 +1435,15 @@ exercise 2 finds. If you change `throw(Empty())` to `throw(ValueError())`, the t
 reports it at that line. The yielded type is `ValueError`, and the
 annotation allows `Need[Ticker] | Unavailable | Empty`. If you change
 `lifted()`'s `raise Empty()` to `raise ValueError()` while its
-decorator still says `@throws(Empty)`, the checker reports nothing,
-and the `ValueError` goes past `catch(Unavailable, Empty)` and out of
+decorator still says `@throws(Empty)`, the checker reports nothing.
+At runtime the `ValueError` propagates through `catch(Unavailable, Empty)` and out of
 `run()` as an ordinary exception.
 The decorator's argument is a claim about the function, not a check on it,
 and no type checker compares a `raise` with a decorator's arguments.
-So the type checker verifies the version whose failure travels through a
-`yield`, and trusts the version whose failure starts as a `raise`.
+So the type checker verifies the version that yields its failure,
+and accepts the version that raises its failure without checking the `raise`.
 
-That difference decides between them. Use `throw()` when the Effect
+That difference decides which one to use. Use `throw()` when the Effect
 chooses to fail, so the type checker verifies the failure. Keep
 `@throws` for ordinary code that raises exceptions, such as `latest()`.
 
@@ -1531,35 +1543,34 @@ print(type(long).__name__)  # [1]
 #: TooLong
 ```
 
-**Widen the annotation with the channel.** The prediction is that `outcome()`'s return annotation breaks.
+**Widen the annotation with the channel.** The prediction is that `outcome()`'s return annotation fails the type check.
 `catch_all()` moves the entire error channel into the return type, so widening
-`research()`'s failures to include `TooLong` widens what `catch_all()` returns,
-and the declared
-`str | Unavailable | NotInteresting | NoArticle` no longer covers it.
+`research()`'s failures to include `TooLong` widens what `catch_all()` returns.
+The declared `str | Unavailable | NotInteresting | NoArticle` is now too narrow.
 `ty` reports an `invalid-return-type` on the `return run(...)` line, naming
 `TooLong` as the member that does not fit. Adding `| TooLong` to the annotation
 fixes it, and the `print()` at `[1]` exercises the new branch.
 
-Removing `outcome()`'s return annotation makes the error disappear, and that is
-the interesting half. `ty` infers no return type from the body.
+Removing `outcome()`'s return annotation makes the error disappear.
+`ty` infers no return type from the body.
 `reveal_type(outcome)` reports `-> Unknown`, and `Unknown` is compatible with
 every type, so the returned value contradicts nothing.
-Pyright does infer the union from the body, and under it the function
+Pyright does infer the union from the body, and under Pyright the function
 changes its type every time `research()`'s error set changes.
 
 What `ty` stops checking is the correspondence between the annotation and the
 Effect. The annotation is where a human writes down which failures this program
 expects, and `ty`'s job is to confirm that the Effect agrees.
 Once you delete the annotation, the type checker has one description instead of
-two, so it can no longer notice a disagreement.
+two, so it can no longer report a disagreement.
 Callers lose their check too.
 Under `ty` the result is `Unknown`,
-so a caller that treats it as a `str`
-type-checks, and under Pyright the new member propagates outward until it
-reaches something with an annotation.
-That is the same reason exercise 4 of
+so a caller that treats it as a `str` type-checks.
+Under Pyright, each unannotated caller's inferred type gains
+the new member, up to the first caller with an annotation.
+Exercise 4 of
 [Generators](../../Chapters/45_Effects--Generators.md) needs a declared type to
-catch a missing `yield from`.
+catch a missing `yield from` for the same reason.
 A type checker verifies claims, and an inferred type is not a claim.
 
 </details>
@@ -1669,22 +1680,24 @@ the request. That is why this Ability is a record with fields, where the
 chapter's `Flip` is an empty class. The fields are the parameters of the
 question.
 
-**Run one game under two handlers.** You write `game()` once, and it runs under both handlers unchanged. The scripted
-handler is the testable one, and it is a closure over an iterator rather than a
-class, because a handler is an ordinary function.
+**Run one game under two handlers.** You write `game()` once, and it runs under both handlers unchanged. The scripted handler is the testable one.
+It is a closure over an iterator rather than a class,
+because a handler is an ordinary function.
 
 Deleting `low: int` from the accessor changes nothing that the type checker reports about
 this file. It changes what the checker reports about callers. With the annotation,
-`roll("a", 6)` is `error[invalid-argument-type]`. Without it, the parameter has
-no type, `roll("a", 6)` type-checks, and the mistake surfaces at runtime inside
-`random.randint()`, which the handler calls from the driver.
+`roll("a", 6)` is `error[invalid-argument-type]`. Without it, the parameter's type is `Unknown`,
+and `roll("a", 6)` type-checks.
+At runtime, `random.randint()` raises a `TypeError`
+when the handler calls it from the driver.
 The traceback names `real()` and the library, and neither `roll()` nor
 `game()`. The accessor
-is the only place where the type checker checks a caller's arguments, since past the accessor
-the arguments are fields on a request that only the handler reads.
+is the only place where the type checker checks a caller's arguments,
+since once the accessor builds the request,
+the arguments are fields that the handler alone reads.
 
-Deleting the annotation on the handler's parameter fails much louder, and
-earlier:
+Deleting the annotation on the handler's parameter produces an exception with an explicit message,
+and it comes earlier:
 
 ```text
 ValueError: Not enough annotated arguments to handler function
@@ -1695,10 +1708,13 @@ abilities, so the argument to '<function ...>' must be annotated.
 
 `handle()` raises that `ValueError` as soon as you call it, before any Effect
 runs, because `handle()` reads `get_type_hints()` on the handler to learn which
-Ability the handler answers. The two annotations therefore do different jobs:
-the accessor's is for the type checker, and the handler's is data the library
-reads at runtime. Only one of them is optional, and it is not the one that looks
-like bookkeeping.
+Ability the handler answers.
+
+The two annotations therefore do different jobs.
+The accessor's is for the type checker, and the handler's is data the library
+reads at runtime.
+Only the accessor's is optional,
+though the handler's is the one that looks like bookkeeping.
 
 </details>
 </details>
@@ -1760,7 +1776,7 @@ def toast() -> Depend[
 
 [Dependencies That Need Dependencies](../../Chapters/47_Effects--Stateless_in_Practice.md#dependencies-that-need-dependencies) shows `Need[...]` unions growing as one Effect delegates to another with `yield from`.
 Write the first signature with the new appliance alone
-and read where `ty` points.
+and read which line `ty` reports.
 Then compare that diagnostic with the one `run()` reports when `supply()` leaves a requirement unanswered.
 
 <details>
@@ -1819,8 +1835,7 @@ print(run(kitchen(buttered)()))
 #: buttered toasted loaf of rye dough
 ```
 
-Writing the signature as `Depend[Need[Butter], str]` first is the instructive
-half:
+Writing the signature as `Depend[Need[Butter], str]` first produces this diagnostic:
 
 ```text
 error[invalid-yield]: Yield expression type does not match annotation
@@ -1836,10 +1851,10 @@ error[invalid-yield]: Yield expression type does not match annotation
 ```
 
 **Declare every inherited requirement.** The diagnostic points at the `yield from`, not at the signature, and it prints
-the whole union that arrived. That union is the answer to "what does
+the whole union that `toast()` yields. That union is the answer to "what does
 `buttered()` need," and the fix is to write it down. `buttered()` names
-`Dough` and `Oven` in its type without mentioning either in its body, which is
-the propagation the chapter describes: a caller inherits every requirement of
+`Dough` and `Oven` in its type, and its body reaches them through `toast()`.
+That is the propagation the chapter describes: a caller inherits every requirement of
 every Effect to which it delegates.
 
 Removing `Toaster(3)` from `supply()` produces the second diagnostic, and it is
@@ -1856,14 +1871,14 @@ error[invalid-argument-type]: Argument to function `run` is incorrect
 
 **Answer every requirement at the edge.** The second diagnostic tells you about the dependency two levels down. `supply()` leaves
 `Need[Toaster]` in the channel, so the requirement reaches `run()`. Nothing in
-`buttered()`'s body mentions a toaster. The requirement comes from `toast()`,
-which `buttered()` calls, and the error names it at the program's edge, past the
-last place that can answer it.
+`buttered()`'s body mentions a toaster. The requirement comes from `toast()`, which `buttered()` calls.
+`ty` reports it at `run()`, the program's edge,
+where no handler remains to answer it.
 
-The two diagnostics divide the work cleanly. `invalid-yield` catches an
+The two diagnostics divide the work. `invalid-yield` catches an
 under-declared signature at the delegation that breaks it. `invalid-argument-type`
-at `run()` catches an under-supplied environment at the program's edge. Neither
-one requires a comment or a docstring to say what depends on what.
+at `run()` catches an under-supplied environment at the program's edge.
+In both, the type checker reads what depends on what from the types.
 
 </details>
 </details>
@@ -2017,43 +2032,42 @@ play(Loud(), Kitty(), Weapon())
 ```
 
 **Name the factory's shape.** What the shared signature recovers is the *Abstract Factory*'s interface.
-`run_season()` accepts anything that can stage a scene and stays ignorant of
-which family it gets, and that ignorance is the property the pattern exists to
-provide. Python provides that property, because a function is already an object with a
+`run_season()` accepts any function that stages a scene, and its body names no family of actors.
+Independence from the family is the property the pattern exists to provide. Python provides that property, because a function is already an object with a
 type. Saying so takes no abstract factory class.
 
 **Show the mismatch getting through.** What the shared signature does not recover is the guarantee that makes the pattern worth naming.
 `Cast` says "give me a narrator and I will stage something." It says nothing
 about the actors inside agreeing with each other.
-The listing's last call, `play(Loud(), Kitty(), Weapon())`, is the proof,
-and the chapter runs the same line in `two_games.py`. `play()` accepts a
-`Kitty` facing a `Weapon`, both satisfy their `Protocol`s, and nothing
-objects. An *Abstract Factory* in a language with a family type expresses "these
-come from one world" in the type. Here the matching lives inside
-`kitties()`'s body, a fact about how someone wrote that function, and nothing
-checks it.
+The listing's last call, `play(Loud(), Kitty(), Weapon())`,
+the same line the chapter runs in `two_games.py`, is the proof.
+`play()` accepts a `Kitty` facing a `Weapon`.
+Both satisfy their `Protocol`s, so the type checker reports nothing. An *Abstract Factory* in a language with a family type expresses "these
+come from one world" in the type. Here the matching is in
+`kitties()`'s body, a fact about how someone wrote that function.
+Nothing checks it.
 
-So the shared signature narrows the loss without closing it. A caller
+So the shared signature prevents some mismatches and permits others. A caller
 that takes a `Cast` can no longer assemble a mismatched set by
-accident, because it does not see the actors. `play()` is still there
-and still accepts any of them.
+accident, because it receives a whole cast and names no actor. `play()` is still there
+and still accepts any three actors.
 
-Adding a fourth actor to the chapter's three-actor version shows where the
-edits fall. `quest.py` gains a `Protocol`, a member in `encounter()`'s `Need[...]`
+Adding a fourth actor to the chapter's three-actor version shows which files
+need the edits. `quest.py` gains a `Protocol`, a member in `encounter()`'s `Need[...]`
 union, a `yield from`, and a line that uses the new actor, so four edits.
 `casts.py` gains a name in its `from quest import` line, a parameter on
 `play()`, an argument in the `supply()` call, a class for each family, and an
-argument in each of the two factory calls, so seven. `two_games.py` needs two
-edits, its direct `play()` call and the `from casts import` list that supplies
-the new actor, and none for its two factory calls. The
-`Cast` alias does not change, because the new actor stays inside the
+argument in each of the two factory calls, so seven. `two_games.py` needs two edits:
+its direct `play()` call and the `from casts import` list that supplies the new actor.
+Its two factory calls stay as they are. The
+`Cast` alias keeps its signature, because the new actor stays inside the
 factories.
 
 That distribution is the argument for the factory. The functions that name a
-whole cast absorb the change, and the code that calls a factory to stage a
-scene does not change. The same distribution is why the chapter uses a
-factory function rather than more `supply()` arguments. `supply()` tops
-out at nine overloads, and a wide cast is what a positional interface
+whole cast take the edits, and the code that calls a factory to stage a
+scene stays the same. The same distribution is why the chapter uses a
+factory function rather than more `supply()` arguments. One `supply()`
+call can type-check at most nine actors, and a wide cast is what a positional interface
 handles worst.
 
 </details>
