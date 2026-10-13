@@ -124,7 +124,7 @@ for flower in flower_gen(4):
 #: Chrysanthemum is toxic to Worm
 ```
 
-In the classic pattern the `accept()`/`visit()` pair is the *double dispatch*.
+In the classic pattern the `accept()`/`visit()` pair is the double dispatch.
 Every element class overrides `accept()`,
 the override resolves the element's type,
 and the `visit()` call inside it resolves the visitor's type.
@@ -206,8 +206,10 @@ and the one implementation must still branch on the argument's type.
 and the visitors choose between them.
 So `flower_visitors.py`'s primary hierarchy holds the operations the pattern exists to keep out of it.
 A Python visitor can keep them instead by building the method name from the element's class,
-as `ast.NodeVisitor` does with `getattr(self, "visit_" + node.__class__.__name__)`,
-but the type checker cannot see which method a string names.
+as `ast.NodeVisitor` does.
+Its `visit()` calls `getattr(self, "visit_" + node.__class__.__name__, self.generic_visit)`,
+so a node class with no matching method falls back to `generic_visit()`.
+The type checker cannot see which method a string names.
 
 ## The Pythonic Visitor: singledispatch
 
@@ -269,6 +271,9 @@ if __name__ == "__main__":
 #: Chrysanthemum: a little nectar | fragrance: faint
 ```
 
+Nothing edits `Flower`.
+Each operation is a separate function.
+
 `@nectar.register` reads the annotation on the implementation's first parameter.
 `flower: Gladiolus` stores that implementation in the dispatch table under the key `Gladiolus`.
 A union annotation, `flower: Gladiolus | Ranunculus`,
@@ -281,9 +286,6 @@ since a call to `nectar()` finds that implementation through the dispatch table.
 Reusing `_` for every registration is safe.
 `@nectar.register` stores the function in its dispatch table before the next `def _` rebinds the name,
 so every implementation stays in the table.
-
-Nothing edits `Flower`.
-Each operation is a separate function.
 
 Dispatch follows inheritance.
 A subclass resolves to its nearest registered ancestor.
@@ -435,6 +437,9 @@ In `bug_visits.py` the loop that calls `accept()` sits outside the hierarchy,
 at module level, and takes one flower at a time from `flower_gen()`.
 In `recursive_accept.py` the loop runs inside `accept()`,
 the situation where the classic pattern still fits.
+Every visitor reuses that one loop.
+A new visitor defines `visit()` for a single flower,
+and `Corsage.accept()` carries it through every nested element.
 
 ## One Dispatch Is Enough
 
@@ -468,7 +473,7 @@ Two objects must interact, and both their types stay unknown until runtime,
 as in `paper_scissors_rock.py`.
 `singledispatch` resolves one argument's type,
 and the *Multiple Dispatching* problem needs two.
-When two types must genuinely resolve together,
+When both types must resolve together at runtime,
 use the table keyed by a tuple of types from [*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md#one-type-or-many).
 
 ## Exercises

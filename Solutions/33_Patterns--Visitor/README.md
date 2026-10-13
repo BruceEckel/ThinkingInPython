@@ -99,10 +99,6 @@ annotation the chapter explains. `Flower` also loses `pollinate()` and
 `Chrysanthemum`'s `eat()` override becomes a registration. Two
 functions and one registration remain.
 
-**Dispatch where the flower type matters.** Only `eat()` is a `singledispatch` function, because `eat()`
-answers differently for one flower type. `pollinate()` does the same
-thing for every flower, so it stays an ordinary function.
-
 The `Bug` classes hold no state. `Pollinator` and `Predator` each
 exist to name one operation, and `Bee`, `Fly`, and `Worm` exist
 to be types the second dispatch can resolve. Once the operation is a
@@ -267,11 +263,11 @@ a rose.
 **Add an operation.** `thorns()` needs six lines: three for the function and three
 for the one flower that differs. Neither change edits an existing line.
 
-Under `@singledispatch`, an operation takes fewer lines to add than a
-type, because an operation is a whole function and lives in one place.
-`thorns()` stays short because three of the four flowers accept its
-default. `Rose` needs a distinct answer from every operation, so it
-needs one registration per operation, scattered across the file.
+Here the operation takes fewer lines to add than the type. `thorns()`
+needs one registration, because three of the four flowers accept its
+default. `Rose` differs from the default in both existing operations,
+so it needs a registration in each. The new operation also sits in one
+place, while the new type's registrations scatter across the file.
 That difference is the
 [expression problem](../../Chapters/13_Techniques--Pattern_Matching.md#the-expression-problem):
 methods on a class keep a new type in one place, functions over a
