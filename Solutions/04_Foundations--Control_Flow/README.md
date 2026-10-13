@@ -39,9 +39,10 @@ find_factor(97)
 #: 97 is prime
 ```
 
-The loop tries every `d` from 2 up to 96 and finds no factor, so it
-does not reach `break`. The `for`'s `else` clause runs when the loop
-finishes without a `break`, so it prints `97 is prime`.
+The loop tries every `d` from 2 up to 96, finds no factor,
+and so runs to the end of its `range()` without reaching `break`.
+A `for` loop's `else` clause runs when the loop ends that way,
+so the `else` clause prints `97 is prime`.
 
 </details>
 </details>
@@ -74,8 +75,9 @@ def collatz_sequence(n):
 If you keep the chapter's one-line conditional expression and add `if n % 2 == 1: odd_count += 1` after it,
 the test sees the new `n`, not the value `n` held when the step began.
 The count then includes the `1` that ends the sequence, and `collatz_sequence(10)` returns `(6, 2)`.
-The solution splits the conditional expression into an `if`/`else` statement,
-so the odd case has a branch of its own and the count shares the test that chooses `3 * n + 1`.
+The solution splits the conditional expression into an `if`/`else` statement.
+The odd case then has a branch of its own,
+and the increment runs under the same test that chooses `3 * n + 1`.
 
 ```python
 # exercise_2.py
@@ -102,9 +104,10 @@ print(collatz_sequence(10))
 #: (6, 1)
 ```
 
-Six steps total, and only one of them (`5 -> 16`) starts from an odd
-`n`. `odd_count` increments in the `else` branch, the one that takes
-`3 * n + 1`, and that branch runs only when `n` is odd.
+The sequence takes six steps,
+and one of them (`5 -> 16`) starts from an odd `n`.
+`odd_count` increments in the `else` branch,
+which computes `3 * n + 1` and runs only when `n` is odd.
 
 </details>
 </details>
@@ -139,13 +142,13 @@ print()
 #: 0 1 2 4 5
 ```
 
-The output is the same as with the original order. The two `if`
-blocks test mutually exclusive values of `n` (`6` and `3`), so on
-any given iteration at most one of them can be true. Neither block's
-outcome depends on whether the other runs first, so checking them in
-either order produces the same result. Order matters only when two
-conditions can both be true for the same value and send execution
-down different paths. Here they cannot.
+The output matches the original order's.
+The two `if` blocks test for different values of `n` (`6` and `3`),
+so at most one of them is true on any iteration,
+and each block's outcome stays the same whichever runs first.
+Order matters only when one value satisfies both conditions
+and the two blocks do different things with it,
+as when one ends the loop and the other skips to the next iteration.
 
 </details>
 </details>
@@ -161,7 +164,7 @@ down different paths. Here they cannot.
 
 [Errors and Exceptions](../../Chapters/04_Foundations--Control_Flow.md#errors-and-exceptions) shows how `except` selects which exception types it catches, and when `finally` and `else` run.
 Trace which clauses run when the exception type matches none of the `except` clauses.
-To see the escape in a listing, wrap the call in a `try` that names the exception type.
+To show the exception reaching the caller in a listing, wrap the call in a `try` that names the exception type.
 
 <details>
 <summary>The shape</summary>
@@ -206,19 +209,22 @@ except TypeError as e:
 **Let an unmatched exception through.** `divide_and_report(1, "x")`
 raises `TypeError` inside `checked_divide()`, because Python cannot
 divide an `int` by a `str`. The `except` clause names
-`ValueError`, so the `TypeError` passes it by. The `finally` block
-still runs. `finally` runs whatever kind of exception is in flight.
-The `else` clause does not run here. It belongs to the case where the
-`try` block finishes cleanly.
+`ValueError`, so the `TypeError` propagates past it.
+The `finally` block still runs,
+since `finally` runs whatever exception is propagating.
+The `else` clause runs only when the `try` block finishes without an exception,
+so the two lines of output come from `finally` and from the caller.
 
-**Catch the escape at the caller.** The `TypeError` keeps
-propagating up past `divide_and_report()`, so this listing wraps the
+**Catch the exception at the caller.** Because the `TypeError`
+propagates up past `divide_and_report()`, this listing wraps the
 call in its own `try`/`except TypeError` to show the exception
-escaping. Without that wrapper, `finally always runs` prints first,
+reaching the caller.
+If you call `divide_and_report(1, "x")` at the top level instead,
+`finally always runs` prints first,
 and then the traceback appears, ending in
 `TypeError: unsupported operand type(s) for /: 'int' and 'str'`.
-Above that last line, the traceback lists each call on the
-exception's path, from your call at the top down to the `/` in
+Above that last line, the traceback lists the calls the
+exception passed on its way out, from your call at the top down to the `/` in
 `checked_divide()`.
 
 </details>
@@ -236,7 +242,7 @@ exception's path, from your call at the top down to the `/` in
 
 [Pattern Matching](../../Chapters/04_Foundations--Control_Flow.md#pattern-matching) shows sequence patterns matching a split command.
 A list pattern matches only a sequence of its own length, so count the items in `"go north 3"` against each existing `case`.
-Put the three-item pattern where it cannot shadow another, and bind `direction` and `distance` by name.
+Put the three-item pattern where Python tries it before any `case` that also matches a three-item list, and bind `direction` and `distance` by name.
 
 <details>
 <summary>The shape</summary>
@@ -253,8 +259,8 @@ def run(command):
 If you add the new `case` at the bottom of the `match`, below `case _`,
 Python rejects the file before running any of it:
 `SyntaxError: wildcard makes remaining patterns unreachable`.
-A wildcard matches every value, so no `case` after it could run,
-and Python treats that as an error rather than as dead code.
+A wildcard matches every value, so it takes every input before a later `case` sees it.
+Python treats that unreachable `case` as an error rather than as dead code.
 The solution puts the three-item pattern first, above the wildcard.
 
 ```python
@@ -285,7 +291,8 @@ The longer pattern gives a three-item list a `case` of its own.
 
 **Arrange the patterns.** Order matters only between patterns that
 could both match the same value.
-The two `go` patterns cannot, so either arrangement works here.
+The two `go` patterns match lists of different lengths,
+so either arrangement works here.
 
 </details>
 </details>
@@ -319,8 +326,10 @@ print(evens)
 The loop takes four lines instead of one, and until it finishes the
 name `evens` holds a partial result. The comprehension states the
 contents of the list. The loop says how to build it, and the reader
-runs the loop in their head to learn the contents. The loop version
-wins when the body grows past one condition and one expression, since
+traces the loop to learn the contents.
+For `evens`, the comprehension is the easier read six months from now.
+
+The loop version is a better choice when the body grows past one condition and one expression, since
 a comprehension with two filters and a nested loop is harder to read
 than the nested `for` loops it replaces.
 
@@ -397,25 +406,28 @@ except BadNumber as e:
 ```
 
 **Chain from a constructed cause.** The prediction is the "direct cause" line, the same one `explicit()`
-produces. `from` sets `__cause__` to whatever object follows it, and
-Python builds the traceback that `joining_line()` searches from
-`__cause__`. An exception constructed in the `raise` statement joins the
-report the same way a caught one does. `from` takes an expression, not a name
-bound by `except`.
+produces. `from` sets `__cause__` to whatever object follows it.
+When `__cause__` holds an exception,
+Python joins the two tracebacks with the "direct cause" line that `joining_line()` finds.
+An exception constructed in the `raise` statement joins the
+report the same way a caught one does.
+`from` accepts any expression that produces an exception,
+and a name bound by `except` is one such expression.
 
-**Compare the cause with the context.** The second `print()` (`[1]`)
+**Compare the cause with the context.** The `print()` at `[1]`
 shows that both attributes hold an exception, and different ones.
 `__cause__` is the `ArithmeticError` you supplied, and `__context__`
 is still the `ValueError` Python recorded on its own when `raise` ran
-inside a handler. Python reports the cause when one exists, so the
-context is present but invisible.
+inside a handler.
+The traceback reports the cause when one exists,
+so the context stays in its attribute and out of the report.
 
 `__context__` answers "what was the `except` block handling when
-`raise` ran," and Python fills that attribute in whether you want it
-or not. `__cause__` answers "what do you, the author, say explains
-this," and `from` alone fills that one in. `from None` sets
-`__suppress_context__`, hiding the `__context__` answer, and leaves
-`__cause__` as `None`.
+`raise` ran," and Python fills that attribute in automatically.
+`__cause__` answers "what do you, the author, say explains
+this," and `from` alone fills that one in.
+`from None` leaves `__cause__` as `None` and sets `__suppress_context__`,
+so the traceback omits the `__context__` exception.
 
 </details>
 </details>
@@ -454,25 +466,25 @@ for line in path.read_text().splitlines():
 path.unlink()
 ```
 
-`read_text()` opens the file, reads all of it, and closes it, so the
-one-liner is shorter and has no block. For a small file read in one
-go, the one-liner is a better choice, and the chapter names `read_text()` and
-`write_text()` for that case.
+`read_text()` opens the file, reads all of it, and closes it,
+so one call does the work of the whole `with` block.
+For a small file read in one go, the one-liner is the better choice.
+The chapter names `read_text()` and `write_text()` for that case.
 
 The `with` form gives you control over the code between the open and
-the close. Two things follow from that control. The `with` form hands
-you the file object, so you can iterate over it lazily, line by line,
-without the whole file in memory. `read_text()` builds one string of
+the close. Two things follow from that control. The `with` form binds
+the file object to `f`, so you can iterate over it lazily,
+holding one line in memory at a time. `read_text()` builds one string of
 the entire contents before you see any of it. The `with` form also
 lets several operations share one open file, while each `read_text()`
 call opens and closes the file again.
 
-That control matters when the file is large enough that holding all
-of it strains memory, or when you read a stream that has no end.
+That control matters when the file is too large to hold in memory
+as one string, or when you read a stream that has no end.
 
-The closing guarantee is not the difference. `read_text()` opens the
-file in a `with` block of its own, so it closes the file too, whether
-or not the read succeeds.
+Both forms guarantee the close.
+`read_text()` opens the file in a `with` block of its own,
+so it closes the file whether the read succeeds or raises an exception.
 
 </details>
 </details>
@@ -506,17 +518,20 @@ print(scores)
 
 One `2` survives again, but this time at the front. At position 0 the
 loop sees `2` and `remove()` deletes the first equal item, which is
-that same position-0 element. The second `2` slides down into slot 0,
+that same position-0 element. The second `2` shifts down into slot 0,
 which the loop has passed, so the next iteration looks at position 1
-and finds `1`. The loop does not visit the survivor.
+and finds `1`. The loop leaves the survivor behind in slot 0.
 
 The prediction covers more than "one survives." It says which item
-and where. The survivor is whatever slides into a slot the loop has
-passed, so its final position depends on the data. In the chapter's
-`[1, 2, 2, 3]` the survivor sits mid-list. Here it sits first. The
-symptom moves with the input. For that reason each of the chapter's
-three fixes leaves the list the loop walks unchanged, instead of
-reasoning its way around the mutation.
+and where. The survivor is whatever shifts into a slot the loop has
+passed, so its final position depends on the data.
+In the chapter's `[1, 2, 2, 3]` the survivor sits mid-list,
+and here it sits first.
+A prediction of each shifted item's new position therefore holds for one list at a time.
+
+The chapter's three fixes hold for every list.
+Each one keeps the list the loop walks as it was,
+so the loop sees every item.
 
 </details>
 </details>
@@ -566,10 +581,10 @@ digits, the same rule that makes `10_000_000` a valid literal.
 and the underscore each fail it.
 
 Each new disagreement calls for another test in `look_first()`: one
-for a sign, one for whitespace, one for underscores, and one to turn
-away `"²"`. Those tests together are a second parser, written to
-predict what `int()` will do, and it is right only where it repeats
-`int()`'s rules. `parse_int()` asks `int()` and reads the answer, so
+for a sign, one for whitespace, one for underscores, and one to reject `"²"`.
+Those tests together are a second parser, written to predict what `int()` will do.
+That parser is right only where it repeats `int()`'s rules.
+`parse_int()` calls `int()` and catches the `ValueError`, so
 it agrees with `int()` on every string, including strings you have
 not tried.
 
