@@ -315,10 +315,11 @@ from `Drink`, and nothing needs to. The type checker matches the
 
 **Change the name, keep the price.** `Decaf`'s `add_cost` is `0.0`, so `Decaf` changes
 the description and leaves the price alone. A class-per-combination
-design still needs a separate class for every decaf variant. Adding a
-fourth extra means one class with one number in it, and the extras
-compose in any order, since each layer knows only about the drink it
-wraps.
+design still needs a separate class for every decaf variant.
+
+Adding a fourth extra means one class with one number in it, and the
+extras compose in any order, since each layer knows only about the
+drink it wraps.
 
 </details>
 </details>
@@ -594,9 +595,10 @@ parameter and `maxsize` keyword-only keeps the two calls
 unambiguous. A positional argument always binds to `func` and
 cannot bind to `maxsize`.
 
-**Key on every argument.** The cache key pairs the positional arguments with the keyword items,
-since `add(1, 2)` and `add(a=1, b=2)` are different keys and both are
-legal calls.
+**Key on every argument.** The cache key pairs the positional
+arguments with the keyword items, since a caller can pass the same
+argument either way. `add(1, 2)` and `add(a=1, b=2)` therefore make
+different keys, and `memo` computes and caches each one separately.
 
 **Drop the oldest entry.** A dictionary preserves insertion order,
 so `next(iter(cache))` is the oldest key. Evicting the oldest
@@ -701,10 +703,11 @@ expect(RuntimeError, always_fails)
 #: [RuntimeError] no luck
 ```
 
-**Keep the wrapped function's identity.** `@wraps(func)` keeps the
-identity. `flaky.__name__` reports the wrapped function's name, not
-`wrapper`. Without `@wraps`, every retried function reports itself as
-`wrapper` to a log line or a test report that reads `__name__`. A
+**Keep the wrapped function's identity.** `@wraps(func)` copies the
+wrapped function's metadata onto `wrapper`, so `flaky.__name__`
+reports `flaky`, not `wrapper`. Without `@wraps`, every retried
+function reports itself as `wrapper` to a log line or a test report
+that reads `__name__`. A
 traceback is the same either way. It names each frame from the code
 object, which `wraps` leaves alone, so the `wrapper` frame appears with
 or without `@wraps`.
@@ -852,8 +855,9 @@ refers to `wrapper`, not to it.
 
 **Store an instance that cannot bind.** `@logged` stores the `logged` instance in the class. That
 instance has no `__get__()`, so `counter.peek` hands it back unbound
-and `counter.peek()` calls `peek()` with no `self`, the `TypeError`
-`method_decoration.py` shows.
+and `counter.peek()` calls `peek()` with no `self`. That is the
+failure `method_decoration.py` shows, here as a `TypeError` for the
+missing `self`.
 
 **Call through an instance.** `counter.bump(2)` works. The body runs
 three times with `counter` as `self`, and the total reaches `6`.

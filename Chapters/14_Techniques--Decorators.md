@@ -126,18 +126,18 @@ That lets `cheese()`, called long after decoration finished,
 still reach the original `cheese` function through `func`.
 
 Decoration is a simple kind of [metaprogramming](17_Techniques--Metaprogramming.md).
-The same idea appears in design patterns as the *Decorator* pattern:
+The same idea appears in design patterns as the [*Decorator* pattern](#the-decorator-pattern):
 wrap an object to add responsibilities to it,
 while keeping the wrapped object's interface so the wrapping stays invisible to the code that uses it.
 
 ## Maintaining the Wrapped Interface
 
 The wrappers so far declare no parameters,
-so `add_behavior` is limited to functions that take none.
+so `add_behavior` works only on functions that take none.
 With `add_behavior` on a `def add(a, b)`,
 the call `add(2, 3)` raises a `TypeError`.
 The wrapper takes zero positional arguments, and the call passes two.
-A wrapper that must handle any function collects the call with `*args, **kwargs` and forwards it unchanged,
+A wrapper that must handle any function collects the arguments with `*args, **kwargs` and forwards them unchanged,
 the [argument-unpacking pattern](05_Foundations--Functions.md#unpacking-arguments).
 This decorator traces calls, and its `wrapper()` takes that shape:
 
@@ -177,6 +177,7 @@ and it merges the original's `__dict__` into the wrapper's.
 Without it, the decorated `add` reports its name as `wrapper` and loses its docstring,
 misleading debuggers, `help()`, and documentation tools.
 `wraps` is optional, and reasons to omit it are rare.
+
 `wraps` also sets `__wrapped__` on the wrapper, pointing at the original,
 so `add.__wrapped__(2, 3)` calls the function without the tracing,
 and `inspect.signature()` follows that chain automatically.
@@ -245,6 +246,7 @@ Decorating a coroutine function raises no exception.
 without running the coroutine's body,
 so `result` holds that coroutine object rather than the value the coroutine will eventually produce.
 The trace line then prints `<- add = <coroutine object add at 0x...>`.
+
 A wrapper over a coroutine function must be [`async def`](19_Techniques--Concurrency.md#asyncio-mechanics)
 and `await func(*args, **kwargs)`.
 The annotations change to match: `func` is a `Callable[P, Awaitable[R]]`,
@@ -371,7 +373,7 @@ The two forms differ in what Python passes first.
 `@label` calls `label(one)`, so a function arrives as the only argument.
 `@label(prefix="TAG")` calls `label(prefix="TAG")` first, with no function,
 then applies the result to `two`.
-Checking whether that first argument is callable tells the two calls apart:
+Checking whether a first argument arrived tells the two calls apart:
 
 ```python
 # optional_parens.py
@@ -405,7 +407,7 @@ def label[**P, R](
             print(f"[{prefix}] {f.__name__}")  # type: ignore
             return f(*args, **kwargs)
         return wrapper
-    return decorate(func) if callable(func) else decorate
+    return decorate if func is None else decorate(func)
 
 @label
 def one() -> None: ...
@@ -424,12 +426,12 @@ The second overload returns the shape `repeat.py` takes apart,
 now under the name `Decorator[P, R]`:
 a generic alias whose parameters are the wrapped function's.
 The implementation declares `func: Callable[P, R] | None = None`,
-and its last line, `return decorate(func) if callable(func) else decorate`,
-branches on `callable(func)`.
-Called bare, `func` is `one`, `callable(func)` is `True`,
-so `label` decorates it immediately by calling `decorate(func)`.
-Called with arguments, `func` stays `None`, `callable(func)` is `False`,
-so `label` returns `decorate` for Python to apply to `two`.
+and its last line, `return decorate if func is None else decorate(func)`,
+branches on `func is None`.
+Called bare, `func` is `one`, so `func is None` is `False`,
+and the line returns `decorate(func)`, decorating `one` immediately.
+Called with arguments, `func` stays `None`,
+so the line returns `decorate` for Python to apply to `two`.
 
 The two `@overload` declarations state for the type checker what the runtime branch does:
 given a function, `label` returns a function of the same signature;
@@ -438,11 +440,19 @@ The implementation must satisfy both overloads,
 so it declares the widest return type, `Any`,
 and the overloads narrow that back down at every call site.
 
-The `callable(func)` test assumes that only the decorated function can arrive in that first position.
-Where a decorator's own argument could be callable,
-keep the arguments keyword-only, as `label` does,
-and check `func is None` instead of `callable(func)`;
-a callable passed positionally would bind to `func` and pass either test.
+A `callable(func)` test would also tell the two calls apart,
+but it asks what kind of value arrived rather than whether one arrived,
+and that fails silently when a caller passes a prefix positionally.
+With `callable(func)`,
+`@label("TAG")` decorates the function with the default `LOG` prefix and drops `"TAG"`.
+With `func is None`, the same call raises an `AttributeError` at decoration:
+`decorate("TAG")` wraps the string,
+and when Python applies that wrapper to the function,
+the wrapper reads `"TAG".__name__`.
+A decorator whose own argument could be callable, such as a `key` function,
+has the same problem with either test,
+which is why `label` makes its arguments keyword-only,
+so a caller must name them.
 
 The tests decorate one function each way and confirm that both forms keep the result and the name:
 
@@ -498,6 +508,16 @@ so a single `greet("Bob")` traces one call whose body runs twice.
 Stacking works because each wrapper preserves the interface of what it wraps.
 Every layer looks like the original function,
 so the layers compose to any depth.
+
+Each layer also adds two things that survive `wraps`,
+since `wraps` copies metadata and leaves the extra call in place.
+A traceback through a decorated function shows a `wrapper` frame for each layer,
+on top of the frames for the caller and the original body.
+Each call also makes an extra Python-level function call per layer,
+the wrapper's own, before the real body runs.
+Neither matters for a function called occasionally.
+Both add up for one called in a tight loop,
+and they grow with the number of stacked layers.
 
 The tests confirm that the name survives two layers of wrapping,
 and that one call through both layers still runs the body twice:
@@ -689,7 +709,8 @@ shows what a function's `__dict__` does suit.
 
 ### A Class-Form Decorator with Arguments
 
-The class form is a better choice when the decorator takes arguments.
+When the decorator takes arguments,
+the class form is easier to follow than the [function form](#decorators-that-take-arguments).
 Without arguments, the constructor receives the function.
 With arguments, the constructor receives the arguments,
 and `__call__()` receives the function and returns the wrapper:
@@ -732,8 +753,6 @@ in the constructor rather than in the outer function.
 Its `wrapper()` makes the first call before the loop,
 so `result` has a value whether or not the loop runs,
 where `repeat.py` relies on the `times >= 1` check for that.
-With decorator arguments,
-the class form is typically easier to reason about than the [function form](#decorators-that-take-arguments).
 
 `test_repeat_class.py` repeats `test_repeat.py` with only the import changed:
 `test_repeat_call_count` parametrizes over `times`,
@@ -767,7 +786,9 @@ The class form has one limitation,
 when the instance replaces the function it decorates.
 A method decorated that way becomes an instance rather than a function,
 and the call then fails.
-`trace_class.py` and `count_calls.py` decorate bare functions on purpose:
+`trace_class.py` and `count_calls.py` decorate module-level functions for that reason.
+`logged` has the same shape as those two classes,
+and decorating a method with it fails at the call:
 
 ```python
 # method_decoration.py
@@ -808,7 +829,7 @@ The `TypeError` blames a missing `x`,
 with no hint that the real cause is a missing `__get__()`.
 [Metaprogramming](17_Techniques--Metaprogramming.md#learning-a-name-with-__set_name__)
 shows the descriptor protocol,
-which a class-based decorator must implement to work on methods.
+the `__get__()` that `logged` would need to work on methods.
 
 Because a function is a descriptor,
 `wrapper()` in the function form binds to an instance like any other method:
@@ -838,6 +859,7 @@ so the same decoration that failed as a class works here with no descriptor of y
 For the same reason, `repeat_class.repeat` escapes the limitation.
 Its `__call__()` returns `wrapper`, an ordinary function,
 so a method decorated with `@repeat(times=3)` is still a function.
+
 With a fully typed class-based decorator, like `trace_class.trace`,
 the type checker reports a missing argument and a type mismatch on a call like `ex.method(5)`,
 catching the same problem.
@@ -1025,6 +1047,14 @@ A `str` is not callable.
 For anything simpler,
 a module-level constant computed the ordinary way reads better.
 
+A decorator can replace a class the same way.
+[*Singleton*](24_Patterns--Singleton.md#singleton-by-class-decorator)
+replaces a class with a callable object that stands in for it.
+The first call constructs one instance,
+and every later call returns that same instance.
+The name that follows `class` then refers to that callable object,
+not to a class.
+
 Since Python 3.9 (PEP 614), the expression after `@` can be any expression,
 so you can write `run_once` inline as `@lambda`:
 
@@ -1049,19 +1079,15 @@ The module gains one name, `fib_table`, holding the finished list.
 
 Treat `@lambda` as a curiosity and avoid it.
 A reader who sees `def fib_table()` expects a function and finds a list.
+
 The type checker loses track too.
 The lambda's parameter has no annotation,
 so `ty` reports `fib_table` as `Unknown`,
 where the generic `run_once` carries `T` through to `greeting`'s `str`.
+Pyright keeps the type of the `def`, `() -> list[int]`,
+so it accepts `fib_table()`, which raises a `TypeError` at runtime,
+and rejects `fib_table[0]`, which works.
 If you want the run-once idiom, use the named decorator.
-
-A decorator can replace a class the same way.
-[*Singleton*](24_Patterns--Singleton.md#singleton-by-class-decorator)
-replaces a class with a callable object that stands in for it.
-The first call constructs one instance,
-and every later call returns that same instance.
-The name that follows `class` then refers to that callable object,
-not to a class.
 
 ## The Decorator Pattern
 
@@ -1204,11 +1230,12 @@ Several decorators elsewhere in this book use this mechanism.
 [`@property`](07_Foundations--Classes.md#properties), `@cached_property`,
 [`@staticmethod`](07_Foundations--Classes.md#static-and-class-methods),
 and [`@classmethod`](07_Foundations--Classes.md#static-and-class-methods)
-each wrap a function the same way `trace` does,
-but return a descriptor instead of a plain wrapper.
+are class-form decorators like `trace_class.trace`: each is a class,
+and decorating a function stores that function in a new instance.
+Unlike `logged`, each of these classes also implements `__get__()`,
+so its instances are descriptors.
 That lets them change how attribute access behaves,
-and makes them work on methods,
-where a `__call__`-based class like `logged` fails.
+and makes them work on methods, where `logged` fails.
 [`@dataclass`](12_Techniques--Data_Classes_as_Types.md#data-classes)
 is a class decorator like `register`,
 except it mutates the class instead of leaving it unchanged,
@@ -1224,16 +1251,6 @@ The one piece of machinery left for later is the descriptor protocol that `@prop
 `@cached_property`, `@staticmethod`, and `@classmethod` implement.
 [Metaprogramming](17_Techniques--Metaprogramming.md#learning-a-name-with-__set_name__)
 takes it up.
-
-Every decorator adds two things that survive `wraps`,
-since `wraps` copies metadata and leaves the extra call in place.
-A traceback through a decorated function shows `wrapper`,
-one more frame than the caller and the original body alone show.
-Each call also makes an extra Python-level function call, the wrapper's own,
-before the real body runs.
-Neither matters for a function called occasionally.
-Both add up for one called in a tight loop,
-and stacking decorators multiplies both by the number of layers.
 
 ## Exercises
 

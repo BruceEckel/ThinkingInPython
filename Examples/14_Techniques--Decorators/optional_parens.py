@@ -29,7 +29,7 @@ def label[**P, R](
             print(f"[{prefix}] {f.__name__}")  # type: ignore
             return f(*args, **kwargs)
         return wrapper
-    return decorate(func) if callable(func) else decorate
+    return decorate if func is None else decorate(func)
 
 @label
 def one() -> None: ...
