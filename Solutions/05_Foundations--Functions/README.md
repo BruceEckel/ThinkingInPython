@@ -54,14 +54,14 @@ expect(AttributeError, tuple_append, 1)
 #: [AttributeError] 'tuple' object has no attribute 'append'
 ```
 
-**Accumulate in the shared default.** Each call keeps appending to the same list. Python creates the
-default once, when it defines the function, and every call that
-omits `target` reuses that same object.
+**Accumulate in the shared default.** Each call keeps appending to the same list.
+Python creates the default once, when it defines the function.
+Every call that omits `target` reuses that object.
 
-**Try an immutable default.** Changing the default to `()` trades one failure for another. The
-function's job is to append, and a tuple has no `append()`, so the
-first call that omits `target` raises an `AttributeError`.
-`tuple_append()` is `bad_append()` with that one change.
+**Try an immutable default.** `tuple_append()` is `bad_append()` with its default changed to `()`.
+That change removes the shared list and causes a different failure.
+The function appends to `target`, and a tuple has no `append()`.
+The first call that omits `target` therefore raises an `AttributeError`.
 
 An immutable default suits a parameter the function reads, as in
 `immutable_default.py`. A function that mutates the parameter needs
@@ -132,11 +132,12 @@ print(get(prefs, "theme", None))
 **Tell an omitted default from `None`.** The two calls ask for different things. The first supplies no
 default, so a missing key is an error. The second supplies `None` as
 the default, so a missing key produces `None`. With `default=None` as
-the sentinel, `get()` receives the same `None` in both calls and
-cannot tell them apart. It must raise an exception for both or return
-`None` for both. `MISSING` is an object no caller passes as data, so
-`default is MISSING` is true only when the caller supplied no default.
-The built-in `getattr()` draws the same line. `getattr(obj, "x")`
+the sentinel, `get()` receives the same `None` in both calls,
+so the two calls look identical to it. `get()` must raise an exception for both or return
+`None` for both. `MISSING` is a marker object reserved for the omitted argument,
+so `default is MISSING` identifies the call that omits `default`.
+
+The built-in `getattr()` makes the same distinction. `getattr(obj, "x")`
 raises an `AttributeError` when `obj` has no `x`, and
 `getattr(obj, "x", None)` returns `None`.
 
@@ -156,7 +157,8 @@ raises an `AttributeError` when `obj` has no `x`, and
 
 [Positional-Only and Keyword-Only Parameters](../../Chapters/05_Foundations--Functions.md#positional-only-and-keyword-only-parameters) explains the `/` and `*` markers.
 Place the new parameter after the `*`, and keep the `/` where it is.
-The `TypeError` comes from the call having one more positional argument than the signature accepts.
+The `TypeError` comes from the extra positional argument.
+The call passes one more than the signature accepts.
 
 <details>
 <summary>The shape</summary>
@@ -173,9 +175,9 @@ def divide(a, b, /, *, label="result"):
 <summary>Solution</summary>
 
 If you add `label` after the `/` without a `*`, as `def divide(a, b, /, label="result")`,
-`label` is positional-or-keyword,
-and `divide(10, 2, "half")` returns `half: 5.0` instead of raising a `TypeError`.
-The solution adds the `*` so that `label` can arrive by name alone.
+`label` is positional-or-keyword.
+Then `divide(10, 2, "half")` returns `half: 5.0` instead of raising a `TypeError`.
+The solution adds the `*`, so a caller must pass `label` by name.
 
 ```python
 # exercise_3.py
@@ -192,8 +194,8 @@ expect(TypeError, divide, 10, 2, "half")  # type: ignore
 #: were given
 ```
 
-`a` and `b` stay positional-only (from the original `/`), and the new
-`*` marks everything after it, here `label` alone, as keyword-only.
+`a` and `b` stay positional-only because of the original `/`.
+The new `*` marks `label`, the one parameter after it, as keyword-only.
 Calling `divide(10, 2, "half")` passes three positional arguments to
 a function that accepts two, so Python raises a `TypeError` before
 the function body runs.
@@ -232,9 +234,10 @@ If you put `total` ahead of `*values`, as in
 `report("nums", 1, 2, 3, total=True)` raises a `TypeError`:
 `report() got multiple values for argument 'total'`. In that
 position `total` is an ordinary positional parameter, so the `1`
-fills it before `total=True` arrives as a second value. The solution
-places `total` after `*values`, where no positional argument can
-reach it, so the keyword is the one way to set it.
+fills it before `total=True` arrives as a second value.
+The solution places `total` after `*values`.
+`*values` collects every remaining positional argument,
+so a keyword is the one way to set `total`.
 
 ```python
 # exercise_4.py
@@ -249,10 +252,12 @@ report("nums", 1, 2, 3, total=True)
 ```
 
 `total` sits between `*values` and `**options` in the parameter list,
-so it is keyword-only. Callers must write `total=True`, and neither
-`values` nor `options` can swallow it by accident. With the flag
-added, `report()` still collects its positional and keyword
-arguments the same way.
+so it is keyword-only. Callers must write `total=True`.
+Every positional argument goes to `values`.
+The keyword `total=True` binds to `total` by name,
+and any other keywords go to `**options`. With the flag
+added, `report()` collects its positional and keyword
+arguments as before.
 
 </details>
 </details>
@@ -296,12 +301,12 @@ print(apply_twice(lambda n: n * n, 3))
 
 The lambda runs twice, on the original value and then on its own
 result, so `"hi"` gains two exclamation points rather than one. The
-second call shows the same shape with numbers. `3` squares to `9`,
-which squares to `81`, not `9`.
+`apply_twice()` call on `3` shows the same shape with numbers. `3` squares to `9`,
+which squares to `81`.
 
-A function that takes another function as an argument needs nothing
-special to say so. `func` is a parameter like any other, and it need
-only be callable with one argument.
+A function that takes another function as an argument declares that
+parameter like any other. `func` has one requirement: it must be
+callable with one argument.
 
 </details>
 </details>
@@ -317,7 +322,8 @@ only be callable with one argument.
 <summary>Where to look</summary>
 
 [Unpacking Arguments](../../Chapters/05_Foundations--Functions.md#unpacking-arguments) shows `*` spreading a sequence and `**` spreading a dictionary at a call site.
-Pass each container with its own star, and let the position of each element decide which parameter receives it.
+Pass each container with its own star.
+Python assigns each element of the tuple to a parameter by its position.
 The first element of the tuple fills `label`, and the rest collect into `values`.
 
 <details>
@@ -350,12 +356,11 @@ report(*args, **opts)
 #: point (3, 4) {'color': 'red'}
 ```
 
-One `*` and one `**` do the whole job. `*args` spreads the tuple into
+`*args` spreads the tuple into
 three positional arguments, so `"point"` fills `label` and the
-remaining two collect into `values`. `**opts` spreads the dictionary
-into keyword arguments, which `**options` collects again. The first
-element of `args` is not special to the caller. It becomes `label`
-only because of where it sits in the sequence.
+remaining two collect into `values`.
+`**opts` spreads the dictionary
+into keyword arguments, which `**options` collects again.
 
 </details>
 </details>
@@ -408,40 +413,41 @@ expect(TypeError, describe, name="Bob")  # type: ignore
 #: argument: 'name'
 ```
 
-**Reject a keyword for `name`.** The `/` causes the `TypeError`. `name` is positional-only, so
-`name="Bob"` cannot reach it. `**facts` accepts any keyword the
-parameters do not claim, and after the `/` no parameter claims `name`.
-So `facts` collects `name="Bob"`, and the positional `name` stays unfilled.
+**Reject a keyword for `name`.** The `/` causes the `TypeError`.
+`name` is positional-only, so it takes its value by position.
+The keyword `name="Bob"` is therefore a leftover, and `**facts` collects leftover keywords.
+`facts` receives `name="Bob"`, and the parameter `name` stays empty.
 The message is therefore
 `describe() missing 1 required positional argument: 'name'`,
-which points at the parameter the caller thought they were filling.
+which names the parameter the caller thought they were filling.
 
-**Mark the deliberate mistake.** The mistake is visible before
-the code runs, so the call carries a `# type: ignore` telling the
-type checker the misuse is deliberate, the same way `param_markers.py`
-marks its two bad calls.
+**Mark the deliberate mistake.** The type checker reports the mistake
+before the code runs.
+The call therefore carries a `# type: ignore` saying the misuse is deliberate,
+the same way `param_markers.py` marks its two bad calls.
 
-Without `**facts`, Python reports the mismatch:
+Without `**facts`, Python reports the mismatch,
+the same error `divide(a=10, b=2)` raises in `param_markers.py`:
 `describe() got some positional-only arguments passed as keyword
-arguments: 'name'`, the same error `divide(a=10, b=2)` raises in
-`param_markers.py`. Catch-all keywords hide that message, because
-the stray name now has somewhere to go. Without the `/`,
+arguments: 'name'`.
+`**facts` replaces that message with the
+missing-argument one, because `**facts` collects the stray keyword
+and leaves the parameter `name` empty. Without the `/`,
 `describe(name="Bob")` succeeds and `facts` stays empty.
 
-`**facts` is the opposite direction from exercise 6. There, `**opts`
+`**facts` works in the opposite direction from exercise 6. There, `**opts`
 at the call site spreads a dictionary into separate keyword arguments.
 Here, `**facts` in the parameter list collects separate keyword
-arguments back into a dictionary. The two forms use the same `**` and
-are inverses of each other, and that inversion is why a function
-declaring `**kwargs` can forward them to another call as `**kwargs`
-unchanged.
+arguments back into a dictionary. The two forms share the `**` and
+invert each other. That inversion lets a function that declares
+`**kwargs` pass them through to another call as `**kwargs`.
 
-The `/` and `**facts` are also worth using together. `/` hides the
-parameter name `name` from callers, so a later rename leaves every
-caller working, while `**facts` accepts any name a caller writes. The `/`
-also frees the word `name` for the caller's use.
-`describe("Bob", name="Robert")` stores a fact called `name`, where
-without the `/` the same call fails with two values for `name`.
+The `/` and `**facts` are also worth using together.
+`/` makes `name` positional-only.
+Because callers pass it by position, a later rename of the parameter leaves every caller working.
+`**facts` accepts any name a caller writes, and the `/` adds `name` to those names.
+`describe("Bob", name="Robert")` stores a fact called `name`.
+Without the `/`, the same call fails with two values for `name`.
 
 </details>
 </details>
@@ -460,7 +466,7 @@ without the `/` the same call fails with two values for `name`.
 
 [Names Inside a Function](../../Chapters/05_Foundations--Functions.md#names-inside-a-function) explains how Python decides whether a name is local or global.
 Python makes that decision for the whole function body when it compiles the function, not line by line as the code runs.
-Apply it to `count += 1` in the first case and to the later `count = 99` in the second.
+Apply that decision to `count += 1` in the first case and to the later `count = 99` in the second.
 
 <details>
 <summary>The shape</summary>
@@ -505,21 +511,20 @@ expect(UnboundLocalError, rebinds)
 'count' where it is not associated with a value`,
 which the listing prints in full. Without `global`,
 the assignment in `count += 1` makes `count` local to
-`writes_global()`, so the read half of `+=` looks for a local that
-has no value yet.
+`writes_global()`, so the read half of `+=` reads that local
+before any assignment gives it a value.
 
 **Assign after the read.** `rebinds()` fails for the same reason
-although its `print()` comes first in time. Python decides which names
+although its `print()` runs before the assignment. Python decides which names
 are local when it compiles the function body, so the `count = 99`
-below the `print()` makes `count` local throughout. The `print()` at
-`[1]` therefore reads the unassigned local, not the module-level name,
-and the `print()` at `[2]` does not run.
+below the `print()` at `[1]` makes `count` local throughout.
+The `print()` at `[1]` therefore reads the unassigned local, not the module-level name.
+The exception ends the call before the `print()` at `[2]`.
 
-**Mark the deliberate mistakes.** Both mistakes
-are visible before the code runs. The type checker and the linter
-each flag them, so the offending lines carry `# type: ignore` and
-`# noqa` markers saying the misuse is deliberate, the way
-`param_markers.py` marks its two bad calls.
+**Mark the deliberate mistakes.** The type checker and the linter
+each flag both mistakes before the code runs.
+The offending lines therefore carry `# type: ignore` and `# noqa` markers
+saying the misuse is deliberate, the way `param_markers.py` marks its two bad calls.
 
 </details>
 </details>
@@ -536,7 +541,7 @@ each flag them, so the offending lines carry `# type: ignore` and
 <summary>Where to look</summary>
 
 [The Mutable Default Trap](../../Chapters/05_Foundations--Functions.md#the-mutable-default-trap) shows `rebind()` and `append_all()` in `mutating_arguments.py`.
-A parameter is a second name for the caller's object, so assigning to it moves only the local name.
+A parameter is a second name for the caller's object, so assigning to it rebinds the local name and leaves the caller's object as it was.
 Calling a method on it changes the one object that both names share.
 
 <details>
@@ -577,14 +582,16 @@ Only `clear_by_method()` empties the caller's list. When a call
 begins, `target` and `mine` are two names for one list.
 
 **Rebind the local name.** The assignment in `clear_by_assignment()` binds `target` to a new empty
-list, which the function prints, and `mine` still names the original.
+list, which the function prints.
+`mine` still names the original.
 
-**Change the shared list.** `target.clear()` rebinds nothing. It calls a method on the one list
-both names share, so the caller sees the list empty.
+**Change the shared list.** `target.clear()` empties the one list both names share.
+Because both names stay bound to that list,
+`mine` names an empty list after the call.
 
-`clear_by_assignment()` and `clear_by_method()` are `rebind()` and
-`append_all()` from `mutating_arguments.py` with the same operation,
-emptying a list, written both ways.
+`clear_by_assignment()` works like `rebind()` in `mutating_arguments.py`,
+and `clear_by_method()` works like `append_all()`.
+Here both functions attempt the same operation, emptying a list.
 
 </details>
 </details>
@@ -624,9 +631,9 @@ def positional_trace(func, /, *args, **kwargs):
 <summary>Solution</summary>
 
 If you predicted a `calling report` line before the error, compare
-`forwarding_collision.py`. There `trace()` runs and the clash comes
-one level down, in `report()`. Here the clash is in `trace()`'s own
-arguments, so Python raises the `TypeError` before the body runs.
+`forwarding_collision.py`. There `trace()` runs, and the clash is in
+the arguments `trace()` passes to `report()`. Here the clash is in `trace()`'s own
+arguments, so Python raises the `TypeError` before `trace()`'s body runs.
 
 ```python
 # exercise_10.py
@@ -658,11 +665,11 @@ two values. The listing calls through `expect()` and marks the line
 with `# type: ignore`, since the type checker reports the clash
 before the code runs.
 
-**Make `func` positional-only.** After the `/`, a caller can fill
-`func` by position alone, so no parameter accepts the keyword `func`.
-`**kwargs` collects it, `trace()` forwards it, and `report()`'s
-`**options` collects it again. The listing names the second version
+**Make `func` positional-only.** The listing names this version
 `positional_trace()` so that both versions run in one file.
+After the `/`, a caller must fill `func` by position, so the keyword `func="f"` is a leftover.
+`**kwargs` collects it, `positional_trace()` forwards it, and `report()`'s
+`**options` collects it again.
 
 </details>
 </details>
