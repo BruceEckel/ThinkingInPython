@@ -1,5 +1,11 @@
 # itertools_dropwhile.py
-from itertools import dropwhile
+from itertools import dropwhile, filterfalse
 
-print(list(dropwhile(lambda n: n < 3, [1, 2, 3, 4, 1])))
+def small(n: int) -> bool:
+    return n < 3
+
+data = [1, 2, 3, 4, 1]
+print(list(dropwhile(small, data)))
 #: [3, 4, 1]
+print(list(filterfalse(small, data)))
+#: [3, 4]

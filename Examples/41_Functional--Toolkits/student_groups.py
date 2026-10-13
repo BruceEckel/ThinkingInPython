@@ -1,4 +1,4 @@
-# student_pairs.py
+# student_groups.py
 import random
 from collections import Counter
 from collections.abc import Iterator

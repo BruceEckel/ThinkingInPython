@@ -1,6 +1,6 @@
 # pair_rounds.py
 from itertools import combinations, islice
-from student_pairs import group_rounds
+from student_groups import group_rounds
 
 students = ["Ana", "Bo", "Cy", "Di", "Eve", "Fi", "Gia"]
 rounds = list(islice(group_rounds(students, 2),

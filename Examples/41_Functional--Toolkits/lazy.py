@@ -9,11 +9,11 @@ def squares() -> Iterator[int]:
         yield n * n
 
 # count() is infinite; islice() pulls only what's needed:
-first_five = list(islice(squares(), 5))
+for sq in islice(squares(), 3):
+    print("got", sq)
 #: computing square 1
+#: got 1
 #: computing square 2
+#: got 4
 #: computing square 3
-#: computing square 4
-#: computing square 5
-print(first_five)
-#: [1, 4, 9, 16, 25]
+#: got 9

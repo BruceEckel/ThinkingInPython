@@ -34,24 +34,26 @@ Folds an iterable into a single value by repeatedly applying a two-argument func
 ```python
 # functools_reduce.py
 from functools import reduce
-from operator import add
+from operator import or_
 
-print(reduce(add, [1, 2, 3, 4]))
-#: 10
+print(reduce(or_, [{"a": 1}, {"b": 2}, {"a": 3}], {}))
+#: {'a': 3, 'b': 2}
 ```
 
-`operator.add()` is `+` as a function.
+`operator.or_()` is `|` as a function.
+On two dictionaries `|` is a union in which the right operand's values win,
+so the later `"a": 3` replaces `"a": 1`.
 The `operator` module supplies a named function for each operator,
-ready to pass to a fold in place of `lambda a, b: a + b`.
+ready to pass to a fold in place of `lambda a, b: a | b`.
 
-For addition specifically, `sum()` is the dedicated built-in,
+For addition, `sum()` is the dedicated built-in,
 and `math.prod()` covers multiplication.
-`reduce()` is the tool for every other fold.
+`reduce()` is the tool for every other fold, such as this dictionary union.
 
 On an empty iterable `reduce()` raises `TypeError: reduce() of empty iterable with no initial value`,
 because it has nothing to return.
-A third argument supplies that starting value,
-so `reduce(add, [], 0)` returns `0`.
+The third argument, `{}` in the listing, supplies that starting value,
+so `reduce(or_, [], {})` returns `{}`.
 
 ### `cache`
 
@@ -246,10 +248,15 @@ copies the same metadata onto a wrapper that is a class instance.
 from collections.abc import Callable
 from functools import wraps
 
-def passthrough(
-    func: Callable[[str], str]
-) -> Callable[[str], str]:
+type StrFn = Callable[[str], str]
+
+def passthrough(func: StrFn) -> StrFn:
     @wraps(func)
+    def wrapper(name: str) -> str:
+        return func(name)
+    return wrapper
+
+def bare(func: StrFn) -> StrFn:
     def wrapper(name: str) -> str:
         return func(name)
     return wrapper
@@ -259,15 +266,22 @@ def greet(name: str) -> str:
     "Say hello."
     return f"Hello, {name}!"
 
+@bare
+def greet_bare(name: str) -> str:
+    "Say hello."
+    return f"Hello, {name}!"
+
 print(greet.__name__, "-", greet.__doc__)
 #: greet - Say hello.
+print(greet_bare.__name__, "-", greet_bare.__doc__)
+#: wrapper - None
 ```
 
-If you delete the `@wraps(func)` line,
-that same `print()` reports `wrapper - None`,
-and every tool that reports a function by its name or docstring,
+`bare()` is `passthrough()` without the `@wraps(func)` line,
+and `greet_bare` reports `wrapper - None`.
+Every tool that reports a function by its name or docstring,
 `help()` among them, reports the wrapper too.
-The name `greet` refers to `wrapper` either way.
+Both names refer to a function called `wrapper`.
 `wraps()` copies the original's name and docstring onto `wrapper`.
 `wraps()` also sets `greet.__wrapped__` to the original function,
 so a tool that needs the original, such as `inspect.signature()`, can reach it.
@@ -281,19 +295,29 @@ A comparator takes two values and returns negative, zero, or positive.
 # functools_cmp_to_key.py
 from functools import cmp_to_key
 
-def by_length_desc(a: str, b: str) -> int:
-    return len(b) - len(a)
+def larger_first(a: str, b: str) -> int:
+    return (b + a > a + b) - (b + a < a + b)
 
-words = ["a", "ccc", "bb"]
-print(sorted(words, key=cmp_to_key(by_length_desc)))
-#: ['ccc', 'bb', 'a']
+numbers = ["3", "30", "34", "5", "9"]
+ordered = sorted(numbers, key=cmp_to_key(larger_first))
+print("".join(ordered))
+#: 9534330
 ```
 
-This ordering has a key.
-`sorted(words, key=len, reverse=True)` gives the same list,
-and a key function is a better choice when one exists.
+`larger_first()` puts first whichever of two strings forms the larger number when the two are concatenated.
+`"3"` goes before `"30"` because `"330"` is larger than `"303"`.
+Subtracting one comparison from the other turns the two booleans into the negative,
+zero, or positive result a comparator returns.
+Joined, the sorted strings form the largest number the five pieces can make.
+
+The rule compares two strings at a time,
+so where `"3"` belongs depends on the string beside it.
+A per-element key for this order is far from obvious,
+and the comparator states the rule directly.
+When a key function exists, it is the better choice:
+`sorted(words, key=len, reverse=True)` orders words by length with no comparator.
 `cmp_to_key()` is for a comparator that arrives from older code,
-and for an ordering with no per-element key,
+and for an ordering like this one,
 where the rule is a comparison between two elements.
 
 ### `total_ordering`
@@ -567,13 +591,19 @@ Yields elements while a predicate holds, then stops at the first failure.
 # itertools_takewhile.py
 from itertools import takewhile
 
-print(list(takewhile(lambda n: n < 3, [1, 2, 3, 4, 1])))
+def small(n: int) -> bool:
+    return n < 3
+
+data = [1, 2, 3, 4, 1]
+print(list(takewhile(small, data)))
 #: [1, 2]
+print(list(filter(small, data)))
+#: [1, 2, 1]
 ```
 
 The input carries a trailing `1` to separate `takewhile()` from `filter()`.
-`filter(lambda n: n < 3, ...)` returns `[1, 2, 1]`,
-because `filter()` skips a failing element and tests the next.
+`filter()` returns `[1, 2, 1]`,
+because it skips a failing element and tests the next.
 `takewhile()` stops at the first failure, before it reaches the last element.
 On finite data the distinction is a detail.
 On an infinite source it decides whether the program terminates.
@@ -586,10 +616,16 @@ Skips elements while a predicate holds, then yields everything after.
 
 ```python
 # itertools_dropwhile.py
-from itertools import dropwhile
+from itertools import dropwhile, filterfalse
 
-print(list(dropwhile(lambda n: n < 3, [1, 2, 3, 4, 1])))
+def small(n: int) -> bool:
+    return n < 3
+
+data = [1, 2, 3, 4, 1]
+print(list(dropwhile(small, data)))
 #: [3, 4, 1]
+print(list(filterfalse(small, data)))
+#: [3, 4]
 ```
 
 The same trailing `1` marks the same distinction from the other direction.
@@ -820,24 +856,26 @@ def squares() -> Iterator[int]:
         yield n * n
 
 # count() is infinite; islice() pulls only what's needed:
-first_five = list(islice(squares(), 5))
+for sq in islice(squares(), 3):
+    print("got", sq)
 #: computing square 1
+#: got 1
 #: computing square 2
+#: got 4
 #: computing square 3
-#: computing square 4
-#: computing square 5
-print(first_five)
-#: [1, 4, 9, 16, 25]
+#: got 9
 ```
 
 `squares()` yields squares without end,
-yet the program terminates because `islice()` requests five values.
-Each `computing square N` line appears the moment `islice()` pulls that value,
-one at a time, the same way any `for` loop consumes a generator.
-The fifth `computing square` line is the last,
-because `islice()` asks for exactly five.
+yet the program terminates because `islice()` requests three values.
+The output alternates.
+Each `computing square N` line appears the moment the loop over `islice()` pulls that value,
+and the loop body prints `got` before the generator computes the next square.
+An eager function would print every `computing square` line before the first `got`.
+The third `computing square` line is the last,
+because `islice()` asks for three.
 
-`list(squares())[:5]` looks equivalent and is a different program.
+`list(squares())[:3]` looks equivalent and is a different program.
 It builds the whole list before slicing, so it asks `squares()` for every value.
 `squares()` has no last value,
 so `list()` keeps asking for more and the program stalls before the slice.
@@ -968,7 +1006,7 @@ Those meeting counts come from a running history,
 updated at the end of every round:
 
 ```python
-# student_pairs.py
+# student_groups.py
 import random
 from collections import Counter
 from collections.abc import Iterator
@@ -1019,7 +1057,7 @@ The first demo schedules seven students in pairs for seven rounds and counts who
 ```python
 # pair_rounds.py
 from itertools import combinations, islice
-from student_pairs import group_rounds
+from student_groups import group_rounds
 
 students = ["Ana", "Bo", "Cy", "Di", "Eve", "Fi", "Gia"]
 rounds = list(islice(group_rounds(students, 2),
@@ -1057,7 +1095,7 @@ Trios come from the same seven students:
 ```python
 # trio_rounds.py
 from itertools import islice
-from student_pairs import group_rounds
+from student_groups import group_rounds
 
 students = ["Ana", "Bo", "Cy", "Di", "Eve", "Fi", "Gia"]
 trios = list(islice(group_rounds(students, 3), 3))
@@ -1076,7 +1114,7 @@ The last case asks for groups of five from a roster of two:
 
 ```python
 # small_roster.py
-from student_pairs import group_rounds
+from student_groups import group_rounds
 
 print(next(group_rounds(["Ana", "Bo"], 5)))
 #: [('Ana', 'Bo')]

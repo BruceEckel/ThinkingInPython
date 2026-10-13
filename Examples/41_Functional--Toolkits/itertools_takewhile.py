@@ -1,5 +1,11 @@
 # itertools_takewhile.py
 from itertools import takewhile
 
-print(list(takewhile(lambda n: n < 3, [1, 2, 3, 4, 1])))
+def small(n: int) -> bool:
+    return n < 3
+
+data = [1, 2, 3, 4, 1]
+print(list(takewhile(small, data)))
 #: [1, 2]
+print(list(filter(small, data)))
+#: [1, 2, 1]
