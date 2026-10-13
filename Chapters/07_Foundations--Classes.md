@@ -82,7 +82,7 @@ so the call carries a `# type: ignore` to say the mistake is deliberate.
 In C++ or Java you declare object-level fields inside the class body but outside the methods.
 In Python an object attribute comes into being when a method assigns to it through `self`
 (typically in the constructor, but not always).
-The assignment creates space for that attribute when the method runs.
+The attributes an object carries therefore depend on which of its methods have run.
 If you assign to a name in the class body, C++/Java style,
 that name becomes a class-level attribute instead
 (similar to a static field in C++/Java).
@@ -287,14 +287,13 @@ A derived class that defines no constructor of its own inherits and runs the bas
 
 ## Marking Overrides with `@override`
 
-When you override a method,
-nothing requires the name to match a method in the base class.
-If you misspell the name, you define a new method instead of overriding one,
-and Python reports nothing.
+Python accepts any method name in a subclass.
+If you misspell the name of a method you mean to override,
+you define a new method instead, and Python reports nothing.
 Renaming or removing the base method later has the same effect,
 and that bug is easy to miss.
 
-The `@override` decorator from the `typing` module catches that bug.
+The `@override` decorator from the `typing` module lets a type checker catch that bug.
 A line starting with `@` above a definition applies a [*decorator*](14_Techniques--Decorators.md)
 to it.
 `@override` declares that a method replaces one from a base class:
@@ -426,6 +425,19 @@ unchanged.
 Code outside the class reads both versions the same way,
 and that is why you can wait to convert an attribute into a property until you need the validation.
 
+The decorators combine the two methods named `radius` into one property.
+`@property` turns the getter into a property object and binds it to the name `radius` in the class body.
+`@radius.setter` reads that object,
+and its `setter()` method returns a new property holding both the getter and the setter.
+Python binds that new property to `radius`, the name of the setter's `def`.
+That is why the getter comes first:
+`@radius.setter` needs the property the getter created.
+
+The setter's `def` must also use the name `radius`.
+Under another name, such as `def set_radius(self, value)`,
+the new property binds to `set_radius`, while `radius` keeps the getter alone.
+The assignment in the constructor then raises an `AttributeError` reporting that the property `radius` has no setter.
+
 The property owns the name `radius` on the class,
 so the value goes into a separate attribute.
 A single leading underscore marks `_radius` as internal to the class,
@@ -456,9 +468,8 @@ expect(RecursionError, Circle, 10)
 #: [RecursionError] maximum recursion depth exceeded
 ```
 
-A getter alone gives a read-only property.
-The setter is written second because `@radius.setter` needs the property the getter created.
-A write-only property, built with `property(fset=...)`, is possible but rare.
+The reverse of a getter-only property,
+a write-only one built with `property(fset=...)`, is possible but rare.
 A method expresses that intent better.
 
 ### Caching with `cached_property` {#cached-property}
@@ -504,6 +515,9 @@ so the method runs at the first read rather than when the constructor runs.
 
 The stored value lives in the instance's [`__dict__`](09_Foundations--Class_Attributes.md#two-dictionaries-one-lookup),
 the dictionary that holds the instance's attributes.
+Reading an attribute checks the instance first,
+so a later `n.total` finds the stored value and leaves the method in the class alone.
+
 An instance whose class and base classes all declare `__slots__` has no `__dict__`,
 so `cached_property` has nowhere to store the value,
 and the first access raises a `TypeError`
@@ -514,6 +528,8 @@ but every instance then carries the per-instance dictionary that slots exist to 
 
 `cached_property` trades freshness for speed, so if `n.values` changes,
 `total` becomes stale, as the appended `20` in `cached_property_demo.py` shows.
+`del n.total` removes the stored value from `__dict__`,
+and reading `n.total` again runs the method.
 A plain `@property` recomputes every time, so its answer is always current.
 Cache only what cannot change.
 
@@ -574,7 +590,7 @@ A container builds its own display from the `__repr__()` of its elements,
 and that is why the list prints `Point(3, 4)` rather than `(3, 4)`.
 In an f-string, `{p!r}` selects `__repr__()`,
 and `{p}` or `{p!s}` selects `__str__()` for a class that defines no `__format__()`.
-By convention `__repr__()` returns the call that rebuilds the object,
+By convention `__repr__()` returns the text of a call that rebuilds the object,
 so it reads `Point(3, 4)`.
 
 Define `__repr__()` on classes you debug,
@@ -623,12 +639,11 @@ print(type(r).__name__)
 `from_fahrenheit()` builds its result with `cls(...)` rather than `Temperature(...)`.
 Called on a subclass, `from_fahrenheit()` receives that subclass as `cls`,
 so the alternative constructor produces the right kind of object.
-The subclass inherits the method unchanged.
-`Reading.from_fahrenheit(212)` proves it.
-`cls` is `Reading` there, not `Temperature`,
+`Reading` inherits the method unchanged,
+and `Reading.from_fahrenheit(212)` passes `Reading` as `cls`,
 so `type(r).__name__` reports `'Reading'`.
-Naming the class, `return Temperature(...)`,
-hard-codes `Temperature` into every subclass, including `Reading`.
+Writing `return Temperature(...)` instead hard-codes the class,
+and `Reading.from_fahrenheit()` would then return a `Temperature`.
 
 `is_freezing()` also works as a module-level function,
 and that is the usual choice:
@@ -669,4 +684,4 @@ Try each exercise before opening its [solution](../Solutions/07_Foundations--Cla
     then run the type checker
     ([Static Types](08_Foundations--Static_Types.md#the-type-checker-ty) sets one up)
     and read what it says.
-    Remove `@override` and confirm the type checker goes quiet while the program's behavior does not change.
+    Remove `@override` and confirm the type checker goes quiet while the program's behavior stays the same.

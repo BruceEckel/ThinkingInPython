@@ -78,10 +78,10 @@ expect(ValueError, c.shrink, -2)
 #: [ValueError] radius cannot be negative
 ```
 
-**Route the change through the setter.** `shrink()` does not touch `self._radius`. It assigns to
-`self.radius`, which goes through `@radius.setter`, so the
-existing validation applies to every method that changes the radius
-this way.
+**Route the change through the setter.** `shrink()` assigns to
+`self.radius` rather than `self._radius`, so the assignment goes
+through `@radius.setter`, and the existing validation applies to
+every method that changes the radius this way.
 
 **Confirm the setter rejects a negative result.** `shrink(-2)` runs after `shrink(2)` has brought the radius
 to `5.0`, so it computes `5.0 / -2 == -2.5` and the setter rejects
@@ -298,7 +298,7 @@ the messages appear in derived-to-base order, twice.
 
 [Caching with `cached_property`](../../Chapters/07_Foundations--Classes.md#cached-property) shows `total` computed once and then stored on the instance.
 Decorate `average` with `@cached_property` and read `self.total` in its body.
-A cached property is an ordinary attribute access from inside another property, so look for the `summing` message to print once.
+Inside `average`, reading `self.total` is an ordinary attribute access, so look for the `summing` message to print once.
 
 <details>
 <summary>The shape</summary>
@@ -453,7 +453,7 @@ in output a user reads.
 > then run the type checker
 > ([Static Types](../../Chapters/08_Foundations--Static_Types.md#the-type-checker-ty) sets one up)
 > and read what it says.
-> Remove `@override` and confirm the type checker goes quiet while the program's behavior does not change.
+> Remove `@override` and confirm the type checker goes quiet while the program's behavior stays the same.
 
 <details>
 <summary>Where to look</summary>
@@ -498,11 +498,10 @@ Derived().show()
 ```
 
 **Miss the base-class method.** The program prints `Base.show`.
-Nothing overrides anything. `shwo()` is a new method in the subclass,
-and `show()` resolves up the chain to `Base`. Python does not check
-whether you meant a subclass method to replace a base-class method,
-so it accepts the misspelling. `shwo()` is a second method that
-nothing calls.
+`shwo()` is a new method in the subclass that nothing calls, so
+`show()` resolves up the chain to `Base`. Python accepts any method
+name in a subclass and keeps no record of which ones you meant as
+overrides.
 
 **Declare the intended override.** With `from typing import override` added and the decorator
 uncommented, the program still prints `Base.show`,
