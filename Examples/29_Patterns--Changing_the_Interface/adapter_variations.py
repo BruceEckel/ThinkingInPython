@@ -19,15 +19,19 @@ class WhatIUse2(WhatIUse):
 class WhatIHave2(WhatIHave, WhatIWant):
     @override
     def f(self) -> None:
+        print("WhatIHave2.f()")
         self.g()
         self.h()
 
 WhatIUse2().op(WhatIHave())  # Approach 2
+#: ProxyAdapter.f()
 #: WhatIHave.g()
 #: WhatIHave.h()
 WhatIUse2().op(ProxyAdapter(WhatIHave()))
+#: ProxyAdapter.f()
 #: WhatIHave.g()
 #: WhatIHave.h()
 WhatIUse().op(WhatIHave2())  # Approach 3
+#: WhatIHave2.f()
 #: WhatIHave.g()
 #: WhatIHave.h()

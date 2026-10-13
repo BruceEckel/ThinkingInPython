@@ -11,6 +11,7 @@ class ObjectAdapter:
     adaptee: WhatIHave
 
     def f(self) -> None:
+        print("ObjectAdapter.f()")
         self.adaptee.g()
         self.adaptee.h()
 
@@ -18,5 +19,6 @@ def use(what_i_want: WhatIWant, /) -> None:
     what_i_want.f()
 
 use(ObjectAdapter(WhatIHave()))
+#: ObjectAdapter.f()
 #: WhatIHave.g()
 #: WhatIHave.h()

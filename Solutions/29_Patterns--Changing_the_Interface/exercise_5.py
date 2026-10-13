@@ -19,6 +19,7 @@ class ProxyAdapter(WhatIWant):
 
     @override
     def f(self) -> None:
+        print("ProxyAdapter.f()")
         self.adaptee.g()
         self.adaptee.h()
 
@@ -52,14 +53,17 @@ def run(user: WhatIUse) -> None:
     user.op(what_i_want=ProxyAdapter(WhatIHave()))
 
 run(WhatIUse())
+#: ProxyAdapter.f()
 #: WhatIHave.g()
 #: WhatIHave.h()
 expect(TypeError, run, Renamed())
 #: [TypeError] Renamed.op() got an unexpected keyword
 #: argument 'what_i_want'
 run(WhatIUse2())
+#: ProxyAdapter.f()
 #: WhatIHave.g()
 #: WhatIHave.h()
 WhatIUse2().op(what_i_want=WhatIHave())
+#: ProxyAdapter.f()
 #: WhatIHave.g()
 #: WhatIHave.h()

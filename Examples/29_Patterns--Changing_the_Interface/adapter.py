@@ -18,6 +18,7 @@ class ProxyAdapter(WhatIWant):
 
     @override
     def f(self) -> None:
+        print("ProxyAdapter.f()")
         # Implement behavior using WhatIHave:
         self.adaptee.g()
         self.adaptee.h()
@@ -29,5 +30,6 @@ class WhatIUse:
 if __name__ == "__main__":
     adapter = ProxyAdapter(WhatIHave())
     WhatIUse().op(adapter)
+#: ProxyAdapter.f()
 #: WhatIHave.g()
 #: WhatIHave.h()

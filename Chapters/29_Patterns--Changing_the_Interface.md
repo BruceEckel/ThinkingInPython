@@ -47,6 +47,7 @@ class ProxyAdapter(WhatIWant):
 
     @override
     def f(self) -> None:
+        print("ProxyAdapter.f()")
         # Implement behavior using WhatIHave:
         self.adaptee.g()
         self.adaptee.h()
@@ -58,6 +59,7 @@ class WhatIUse:
 if __name__ == "__main__":
     adapter = ProxyAdapter(WhatIHave())
     WhatIUse().op(adapter)
+#: ProxyAdapter.f()
 #: WhatIHave.g()
 #: WhatIHave.h()
 ```
@@ -103,25 +105,31 @@ class WhatIUse2(WhatIUse):
 class WhatIHave2(WhatIHave, WhatIWant):
     @override
     def f(self) -> None:
+        print("WhatIHave2.f()")
         self.g()
         self.h()
 
 WhatIUse2().op(WhatIHave())  # Approach 2
+#: ProxyAdapter.f()
 #: WhatIHave.g()
 #: WhatIHave.h()
 WhatIUse2().op(ProxyAdapter(WhatIHave()))
+#: ProxyAdapter.f()
 #: WhatIHave.g()
 #: WhatIHave.h()
 WhatIUse().op(WhatIHave2())  # Approach 3
+#: WhatIHave2.f()
 #: WhatIHave.g()
 #: WhatIHave.h()
 ```
 
 Counting the object adapter in `adapter.py`,
 three structures produce one behavior.
-Each approach calls the same two methods on a `WhatIHave`,
-and the output is the same.
-The approaches differ in where the adaptation lives.
+Each call ends in the same `g()` and `h()` on a `WhatIHave`.
+The approaches differ in where the adaptation lives,
+and the first line of each trace names that place:
+`ProxyAdapter.f()` for the object adapter and Approach 2,
+`WhatIHave2.f()` for Approach 3.
 
 *GoF Design Patterns* names two families of adapter.
 `ProxyAdapter` is an *object adapter*:
@@ -214,6 +222,7 @@ class ObjectAdapter:
     adaptee: WhatIHave
 
     def f(self) -> None:
+        print("ObjectAdapter.f()")
         self.adaptee.g()
         self.adaptee.h()
 
@@ -221,6 +230,7 @@ def use(what_i_want: WhatIWant, /) -> None:
     what_i_want.f()
 
 use(ObjectAdapter(WhatIHave()))
+#: ObjectAdapter.f()
 #: WhatIHave.g()
 #: WhatIHave.h()
 ```
