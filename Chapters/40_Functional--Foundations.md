@@ -111,7 +111,8 @@ print("ok")
 
 If you delete the reset at `[1]`, the assertion at `[2]` fails.
 `total` is still 5 from the first call, so the second call returns 10.
-That line is the fixture the impure version needs, and purity removes it.
+The reset at `[1]` is the fixture the impure version needs,
+and purity removes it.
 
 `slope()` appears again later in the book.
 [Are Exceptions Impure?](44_Effects--Effect_Management.md#are-exceptions-impure)
@@ -124,8 +125,9 @@ Tuples, strings, `frozenset`, and frozen dataclasses are immutable.
 Each freezes only its own top level.
 The tuple `([1], 2)` always holds that same list,
 and anyone can still append to the list.
-An immutable value stays what you last read, whatever code ran in between,
-and that guarantee is why removing shared mutable state is the practical core of the functional style.
+A value that is immutable all the way down, such as a tuple of strings,
+stays what you last read, whatever code ran in between.
+That guarantee is why removing shared mutable state is the practical core of the functional style.
 
 Instead of modifying an object, you build a new one from the old:
 
@@ -170,7 +172,8 @@ Python's immutable types share no structure.
 and changing one field of a large tuple or frozen dataclass means rebuilding the whole value,
 not patching one slot in place.
 Copying a two-field `Point` takes so little time that you can ignore it.
-A large structure that changes often copies the whole value on every change.
+For a large structure that changes often,
+those copies add up in time and memory.
 Languages built around immutability avoid that full copy with *persistent* data structures,
 which share every part a change leaves alone.
 Python's standard library has none,
@@ -398,7 +401,7 @@ Once a `list()` call or a `for` loop has consumed the iterator,
 a second pass over the same object silently produces nothing.
 `sorted()` must read every element before it can order any of them,
 so it returns a list rather than an iterator.
-It is also the pure counterpart of [`list.sort()`](03_Foundations--Containers.md),
+It is also the pure counterpart of [`list.sort()`](03_Foundations--Containers.md#growing-shrinking-and-sorting),
 which reorders the list in place and returns `None`.
 `sorted()` builds a new list and leaves its input as it was.
 
@@ -464,15 +467,15 @@ print(inspect.getclosurevars(triple).nonlocals)
 
 `multiplier()` returns `multiply()`,
 and each returned function holds its own `factor`.
-The last two lines read the captured values with `inspect.getclosurevars()`.
+The two `inspect.getclosurevars()` calls read the captured values.
 `double` and `triple` are the same code holding different captured values.
 A closure is the functional answer to "an object with one method and some stored data."
 
 `multiply()` reads `factor` rather than receiving it, yet it stays pure.
 `factor` stays the same after capture,
 so the same argument always produces the same answer.
-`withdraw()` is unpredictable because every call changes the global `balance`.
-Nothing changes `factor` after capture.
+`withdraw()` also reads a name from outside, but each call changes that name,
+the global `balance`, so each result depends on every call before it.
 
 A closure fits when you want to configure behavior once, reuse it,
 and keep its configuration private.
@@ -609,7 +612,6 @@ print(percent(150), percent(-5), percent(42))
 
 `percent` presets the bounds and leaves the middle argument open.
 Before 3.14, a hand-written wrapper supplied that specialization.
-A `Placeholder` reserves the position and leaves the value to the caller.
 Calling `percent()` with no argument raises a `TypeError`.
 The library also rejects a trailing placeholder, because it would do nothing.
 `partial()` already appends the call's arguments after the bound ones,

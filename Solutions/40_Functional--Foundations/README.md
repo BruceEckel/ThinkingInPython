@@ -176,7 +176,7 @@ Each call to `multiplier()` creates a new `multiply` closure with its
 own private `factor`. `quadruple` remembers `4` independently of
 `double`'s `2` and `triple`'s `3`, the same way `double` and `triple`
 are independent of each other. The three closures share
-nothing, because each `factor` is reachable only through the one
+nothing, because each `factor` has a name only inside the one
 function that captured it.
 
 </details>
@@ -378,8 +378,8 @@ the binding alone. `MAX_SIZE = 200` is the operation `Final` exists to
 reject, because it points the name at a different object.
 
 **Suppress the rebinding error.** The reassignment carries a `# type: ignore` so the listing passes the
-book's build. With that comment removed, `ty` reports one error here,
-not two, and the one it reports is the assignment:
+book's build. With that comment removed, `ty` reports the
+reassignment and accepts the append:
 
 ```
 error[invalid-assignment]: Reassignment of `Final` symbol `MAX_SIZE` is not allowed
