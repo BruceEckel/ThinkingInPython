@@ -572,10 +572,12 @@ time. `tottime` excludes the callees, so it attributes time to the
 frame that is executing.
 
 A function high on `cumtime` and near zero on `tottime` is a
-pass-through. It is slow only because of what it calls, so a faster
-body changes nothing and fewer calls to its callees help. The two columns coincide only for a leaf function, one
-that calls nothing else, which is why the two rankings can name
-the same function only at the bottom of a call chain.
+pass-through. It is slow because of what it calls, so a faster
+body changes nothing and fewer calls to its callees help.
+The two columns hold the same value only for a leaf function, one
+that calls nothing else. The top of the `cumtime` ranking is the
+outermost frame, which calls everything and does almost none of the
+work, so the two rankings usually open on different functions.
 
 </details>
 </details>
@@ -865,7 +867,7 @@ runs.
 
 The program is too short to get hot. The JIT compiles a code path
 after it has run often enough to look worth compiling. A script that
-starts, times two lookups, and exits spends time tracing and
+starts, times two kinds of lookup, and exits spends time tracing and
 compiling whatever it does reach, then exits before the compiled
 code has saved as much time as the compiling took.
 

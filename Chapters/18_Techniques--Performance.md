@@ -246,8 +246,9 @@ print(len(results), calls["used"], calls["unused"])
 
 Returning `monitoring.DISABLE` tells the interpreter to stop reporting this event at this location until someone calls `restart_events()`.
 `used()` ran a thousand times and the callback ran for it once.
-`DISABLE` makes coverage measurement affordable.
-The question is "was this reached," so the second answer is worthless,
+`DISABLE` keeps coverage measurement fast.
+The question is "was this reached,"
+so a second report from the same location adds nothing,
 and after the first hit the monitored code returns to full speed.
 
 A profiler gives you a ranked table with no code to write.
@@ -327,6 +328,15 @@ A slow run means something stole the CPU,
 so averaging folds that theft into your answer,
 while the fastest run is the closest you get to measuring your code alone.
 
+The near-miss is a hand-rolled timer:
+`start = time.time()` before one call and a subtraction after it.
+`time.time()` reads the wall clock,
+which can jump when the system corrects its time,
+and one call is one sample with all of its interference.
+`timeit` times with `time.perf_counter()`,
+a high-resolution clock that moves forward steadily.
+When you time code by hand, use that clock and repeat the run.
+
 `timeit` also has a command-line form for one-off questions:
 
     uv run python -m timeit -s "s = set(range(100_000))" "99_999 in s"
@@ -396,8 +406,9 @@ Two more speedups need no new code: the tail-calling interpreter,
 and the experimental just-in-time compiler inside CPython.
 
 Alternative interpreters for Python exist, notably PyPy,
-which claims about a 3x speedup on average.
-PyPy typically trails CPython's newest language version,
+whose site reports it about four times faster than CPython 3.11 on average.
+PyPy trails CPython's newest language version
+(it supports Python 3.12 while CPython is at 3.15),
 so confirm it supports the features and third-party packages you need.
 
 For a parallel, CPU-bound workload,
@@ -514,9 +525,8 @@ and a smaller one than the tail-calling interpreter's on Windows.
 On the `pyperformance` suite,
 3.15 measures 7-8% faster on x86-64 Linux against the standard optimized build,
 and 11-12% faster on AArch64 macOS against the tail-calling interpreter.
-Those are geometric means over dozens of benchmarks,
-and the What's New that reports them is still a draft.
-The report sets aside one microbenchmark, `unpack_sequence`,
+Those geometric means, from the 3.15 What's New, cover dozens of benchmarks.
+That report sets aside one microbenchmark, `unpack_sequence`,
 and the rest range from roughly 15% slower to more than twice as fast,
 so the mean predicts your program poorly.
 To measure your own program,
@@ -748,7 +758,8 @@ and hashing at about five times faster than `bisect`.
 ### Heap
 
 When you repeatedly need the smallest or largest item,
-a *heap* keeps that item reachable in O(log n).
+a *heap* keeps that item at the front, where reading it is O(1)
+and removing it is O(log n).
 The `heapq` module treats a `list` as a binary heap:
 
 ```python
@@ -1021,8 +1032,9 @@ print(fib_cached(25), fib_cached.cache_info().misses)
 
 `cache_info().misses` counts the calls that found nothing stored and ran the body,
 one for each `n` from 0 through 25.
-Every avoided call is work the cached version skips,
-and the gap widens as `n` grows.
+`fib_plain()` ran 242,785 times for the same answer.
+Each step up in `n` multiplies that count by about 1.6 and adds one to the cached count,
+so the gap widens as `n` grows.
 
 `cache` holds every result forever,
 but `functools.lru_cache(maxsize=n)` bounds the memory by discarding the least recently used entry.
@@ -1248,8 +1260,9 @@ A class that needs an option `record()` lacks keeps `@dataclass` written out:
 
 ### When Slots Does Not Fit {#when-slots-does-not-fit}
 
-`__slots__` removes more than `__dict__`.
-It removes everything that dict would have held:
+`__slots__` changes more than where the fields live.
+A slotted instance has no `__dict__`, no `__weakref__` slot,
+and a set memory layout, and each of the three breaks a feature:
 
 ```python
 # slots_limits.py
@@ -1527,7 +1540,8 @@ compiles such a function to machine code on its first call:
     print(f"Numba speedup: {t_python / t_numba:.1f}x")
     # Sample run: Numba speedup: 15.9x
 
-`njit(count_primes)` wraps the same function `@njit` decorates,
+`njit(count_primes)` is the call that `@njit` above the `def` would make.
+Calling it directly keeps the original `count_primes()` as the Python baseline,
 and Numba compiles the `fast_count_primes` it returns at the first call.
 Calling `fast_count_primes(1)` first pays the compilation and warm-up cost outside the timed region,
 so the comparison measures steady-state speed.
@@ -1793,7 +1807,7 @@ stopping when the program is fast enough:
    This can produce order-of-magnitude improvements.
 5. Make pipelines lazy with generators.
 6. Cache the pure functions.
-7. Cut per-object memory with `slots=True`, `array`, and `memoryview`.
+7. Reduce memory overhead with `slots=True`, `array`, and `memoryview`.
 8. Vectorize with NumPy, or JIT-compile the loop with Numba.
 9. Rewrite the proven-hot function in Rust.
 10. Restructure for [async or parallelism](19_Techniques--Concurrency.md).
