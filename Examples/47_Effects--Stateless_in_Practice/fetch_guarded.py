@@ -1,5 +1,5 @@
 # fetch_guarded.py
-from dataclasses import dataclass
+from newswire import Wire
 from research import Feed, Unavailable, fetch
 from stateless import (Effect, Need, catch, need, run,
                        supply, throw)
@@ -16,17 +16,13 @@ def fetch_nonempty() -> Effect[
         yield from throw(Empty())
     return headline
 
-@dataclass
-class Ticker:
-    headline: str
-    def latest(self) -> str:
-        return self.headline
-
 def edge(feed: Feed) -> str | Unavailable | Empty:
     guarded = catch(Unavailable, Empty)(fetch_nonempty)
     return run(supply(feed)(guarded)())
 
-print(edge(Ticker("markets close mixed")))
+print(edge(Wire("markets close mixed")))
+#: feed: fetching
 #: markets close mixed
-print(type(edge(Ticker(""))).__name__)
+print(type(edge(Wire(""))).__name__)
+#: feed: fetching
 #: Empty

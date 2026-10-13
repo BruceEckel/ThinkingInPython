@@ -1109,7 +1109,7 @@ with `Never` recording that no value can come out of it.
 
 ```python
 # fetch_guarded.py
-from dataclasses import dataclass
+from newswire import Wire
 from research import Feed, Unavailable, fetch
 from stateless import (Effect, Need, catch, need, run,
                        supply, throw)
@@ -1126,19 +1126,15 @@ def fetch_nonempty() -> Effect[
         yield from throw(Empty())
     return headline
 
-@dataclass
-class Ticker:
-    headline: str
-    def latest(self) -> str:
-        return self.headline
-
 def edge(feed: Feed) -> str | Unavailable | Empty:
     guarded = catch(Unavailable, Empty)(fetch_nonempty)
     return run(supply(feed)(guarded)())
 
-print(edge(Ticker("markets close mixed")))
+print(edge(Wire("markets close mixed")))
+#: feed: fetching
 #: markets close mixed
-print(type(edge(Ticker(""))).__name__)
+print(type(edge(Wire(""))).__name__)
+#: feed: fetching
 #: Empty
 ```
 
@@ -1173,21 +1169,11 @@ A failure that enters through `throw()` is in the type system from the moment it
 
 ```python
 # catch_everything.py
-from dataclasses import dataclass
+from newswire import Library, Wire
 from research import (Encyclopedia, Feed, NoArticle,
                       NotInteresting, Unavailable, research)
 from stateless import run, supply
 from stateless.effect import catch_all
-
-@dataclass
-class Bulletin:
-    headline: str
-    def latest(self) -> str:
-        return self.headline
-
-class BareShelf:
-    def article(self, topic: str) -> str:
-        raise NoArticle(topic)
 
 def outcome(
     feed: Feed, book: Encyclopedia
@@ -1195,10 +1181,13 @@ def outcome(
     bound = supply(feed, book)(research)
     return run(catch_all(bound)())
 
-dull = outcome(Bulletin("mild and cloudy"), BareShelf())
+dull = outcome(Wire("mild and cloudy"), Library({}))
+#: feed: fetching
 print(type(dull).__name__)
 #: NotInteresting
-missing = outcome(Bulletin("genome mapped"), BareShelf())
+missing = outcome(Wire("genome mapped"), Library({}))
+#: feed: fetching
+#: library: looking up genome
 print(type(missing).__name__)
 #: NoArticle
 ```
@@ -1752,11 +1741,11 @@ from stateless import memoize, run, supply
 
 db1 = Database(failures=0)
 db2 = Database(failures=0)
-m = memoize(save_user)
-print(run(supply(db1)(m)("Morty")))
+memoized = memoize(save_user)
+print(run(supply(db1)(memoized)("Morty")))
 #: attempt 1: saving Morty
 #: Morty saved
-print(run(supply(db2)(m)("Morty")))
+print(run(supply(db2)(memoized)("Morty")))
 #: Morty saved
 print(db1.attempts, db2.attempts)
 #: 1 0
@@ -1930,33 +1919,32 @@ If you call it from inside a running loop (the shape of any async web handler),
 import asyncio
 import time
 from benchmark import report
+from exceptions import expected
 from stateless import Success, run, run_async, success
 
-def bound(n: int) -> Success[int]:
+def trivial(n: int) -> Success[int]:
     return success(n)
 
-async def inside_loop() -> str:
-    try:
-        run(bound(1))
-    except RuntimeError as e:
-        return str(e)
-    return "no error"
+async def inside_loop() -> None:
+    with expected(RuntimeError):
+        run(trivial(1))
 
-print(asyncio.run(inside_loop()))
-#: asyncio.run() cannot be called from a running event loop
+asyncio.run(inside_loop())
+#: [RuntimeError] asyncio.run() cannot be called from a
+#: running event loop
 
 ROUNDS = 2000
 
 def time_run() -> float:
     start = time.perf_counter()
     for _ in range(ROUNDS):
-        run(bound(1))
+        run(trivial(1))
     return (time.perf_counter() - start) / ROUNDS
 
 async def time_run_async() -> float:
     start = time.perf_counter()
     for _ in range(ROUNDS):
-        await run_async(bound(1))
+        await run_async(trivial(1))
     return (time.perf_counter() - start) / ROUNDS
 
 per_run = time_run()
@@ -2117,6 +2105,7 @@ Here `supply()` answers one `Need` of two:
 
 ```python
 # partial_handling.py
+from exceptions import expected
 from greeter import Console
 from stateless import Depend, Need, need, run, supply
 from stateless.errors import MissingAbilityError
@@ -2132,11 +2121,9 @@ def work() -> Depend[Need[Console] | Need[Log], None]:
     log.write("worked")
 
 half = supply(Console())(work)
-try:
+with expected(MissingAbilityError):
     run(half())  # type: ignore
-except MissingAbilityError as e:
-    print(e)
-#: Need(t=<class '__main__.Log'>)
+#: [MissingAbilityError] Need(t=<class '__main__.Log'>)
 ```
 
 `half` is `() -> Depend[Need[Log], None]`,
@@ -2145,9 +2132,9 @@ because the handler subtracts the `Console` and leaves the `Log`.
 
 ```text
 error[invalid-argument-type]: Argument to function `run` is incorrect
-  --> partial_handling.py:18:9
+  --> partial_handling.py:19:9
    |
-18 |     run(half())
+19 |     run(half())
    |         ^^^^^^ Expected
    |         `Generator[Async | Exception, Any, Unknown]`, found
    |         `Generator[Need[Log], Any, None]`

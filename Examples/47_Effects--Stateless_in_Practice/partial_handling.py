@@ -1,4 +1,5 @@
 # partial_handling.py
+from exceptions import expected
 from greeter import Console
 from stateless import Depend, Need, need, run, supply
 from stateless.errors import MissingAbilityError
@@ -14,8 +15,6 @@ def work() -> Depend[Need[Console] | Need[Log], None]:
     log.write("worked")
 
 half = supply(Console())(work)
-try:
+with expected(MissingAbilityError):
     run(half())  # type: ignore
-except MissingAbilityError as e:
-    print(e)
-#: Need(t=<class '__main__.Log'>)
+#: [MissingAbilityError] Need(t=<class '__main__.Log'>)

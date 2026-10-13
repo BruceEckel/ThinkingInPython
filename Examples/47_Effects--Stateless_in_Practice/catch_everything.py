@@ -1,19 +1,9 @@
 # catch_everything.py
-from dataclasses import dataclass
+from newswire import Library, Wire
 from research import (Encyclopedia, Feed, NoArticle,
                       NotInteresting, Unavailable, research)
 from stateless import run, supply
 from stateless.effect import catch_all
-
-@dataclass
-class Bulletin:
-    headline: str
-    def latest(self) -> str:
-        return self.headline
-
-class BareShelf:
-    def article(self, topic: str) -> str:
-        raise NoArticle(topic)
 
 def outcome(
     feed: Feed, book: Encyclopedia
@@ -21,9 +11,12 @@ def outcome(
     bound = supply(feed, book)(research)
     return run(catch_all(bound)())
 
-dull = outcome(Bulletin("mild and cloudy"), BareShelf())
+dull = outcome(Wire("mild and cloudy"), Library({}))
+#: feed: fetching
 print(type(dull).__name__)
 #: NotInteresting
-missing = outcome(Bulletin("genome mapped"), BareShelf())
+missing = outcome(Wire("genome mapped"), Library({}))
+#: feed: fetching
+#: library: looking up genome
 print(type(missing).__name__)
 #: NoArticle
