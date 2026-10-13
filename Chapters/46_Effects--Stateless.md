@@ -465,8 +465,8 @@ run(description)  # [1]
 #: Hello, Alice!
 print(repr(run(description)))  # [2]
 #: None
-run(bound("Alice"))
-#: Hello, Alice!
+run(bound("Bob"))
+#: Hello, Bob!
 constant = success(42)
 print(run(constant), run(constant))
 #: 42 42
@@ -476,7 +476,8 @@ The `run()` at `[1]` exhausts the generator, so `[2]`,
 the second `run()` of the same object,
 gets an immediate `StopIteration` whose value is `None`.
 The function does not resume, so it greets nobody and produces `None`.
-Calling `bound("Alice")` again builds a fresh description, and that one runs.
+Calling `bound("Bob")` builds a fresh description, and that one runs.
+A second `bound("Alice")` would build a fresh one too.
 An Effect from `success()` can run more than once,
 because `success()` builds no generator.
 Its small object's `send()` reports the value every time,
@@ -736,11 +737,12 @@ def greet_all(
     for name in names:
         yield from greet_logged(name)
 
-log = Log()
-run(supply(Console(), log)(greet_all)(["Alice", "Bob"]))
+if __name__ == "__main__":
+    log = Log()
+    run(supply(Console(), log)(greet_all)(["Alice", "Bob"]))
+    print(log.entries)
 #: Hello, Alice!
 #: Hello, Bob!
-print(log.entries)
 #: ['greeted Alice', 'greeted Bob']
 ```
 

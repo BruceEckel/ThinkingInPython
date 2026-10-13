@@ -8,8 +8,8 @@ run(description)  # [1]
 #: Hello, Alice!
 print(repr(run(description)))  # [2]
 #: None
-run(bound("Alice"))
-#: Hello, Alice!
+run(bound("Bob"))
+#: Hello, Bob!
 constant = success(42)
 print(run(constant), run(constant))
 #: 42 42

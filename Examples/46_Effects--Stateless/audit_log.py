@@ -22,9 +22,10 @@ def greet_all(
     for name in names:
         yield from greet_logged(name)
 
-log = Log()
-run(supply(Console(), log)(greet_all)(["Alice", "Bob"]))
+if __name__ == "__main__":
+    log = Log()
+    run(supply(Console(), log)(greet_all)(["Alice", "Bob"]))
+    print(log.entries)
 #: Hello, Alice!
 #: Hello, Bob!
-print(log.entries)
 #: ['greeted Alice', 'greeted Bob']
