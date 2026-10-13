@@ -136,8 +136,7 @@ all three results. The cache evicts nothing, so the repeat calls to
 The difference from the chapter's `maxsize=2` run is the second
 `square(1)`. Under `maxsize=2` that call is a fourth miss, because
 computing `square(3)` has pushed `1` out to make room. One extra slot
-converts that miss into a hit, and that conversion is the whole of
-what `maxsize` controls. With three slots the cache keeps every
+turns that miss into a hit. With three slots the cache keeps every
 result, so `functools_lru_cache.py`'s comment, "Evicts 1, the least
 recently used," stops being true here.
 

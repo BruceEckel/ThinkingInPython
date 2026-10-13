@@ -7,7 +7,7 @@
 
 [Foundations](40_Functional--Foundations.md) builds behavior from small, pure,
 composable pieces.
-`functools` operates on functions themselves.
+`functools` operates on functions.
 `itertools` assembles lazy iterators from composable parts.
 This chapter tours both toolkits,
 then turns to two techniques that pair naturally with them:
@@ -134,6 +134,10 @@ and that miss proves the cache evicted `1`.
 The cache discards the least recently used entry before it stores a new one,
 so `currsize` stays at or below `maxsize`.
 
+Written bare, `@lru_cache` keeps its default `maxsize=128`,
+so a function you meant to cache without limit starts evicting at its 129th distinct argument.
+`@cache` is `lru_cache(maxsize=None)`, the unbounded form.
+
 ### `partial`
 
 Presets some of a function's arguments and returns a new function that expects the rest.
@@ -183,6 +187,10 @@ so writing `zero_pad = partial(pad, fill="0")` here works.
 the order a method expects.
 `partial` passes the bound arguments first and the instance after them,
 so `partial(pad, 5)` calls `pad(5, instance)` and fails with `AttributeError: 'int' object has no attribute 'value'`.
+The type checker reports the mistake before the run.
+`pad()`'s first parameter is `self`,
+so `partial(pad, 5)` draws `invalid-argument-type`: expected `Text`,
+found `Literal[5]`.
 Use `partialmethod` inside a class body and `partial` everywhere else.
 
 ### `cached_property`
@@ -240,8 +248,8 @@ shows.
 
 Copies a wrapped function's name and docstring onto its wrapper,
 so a tool that reads those attributes reports the original.
-Its sibling, [`update_wrapper()`](14_Techniques--Decorators.md#decorators-as-classes),
-copies the same metadata onto a wrapper that is a class instance.
+`@wraps(func)` runs [`update_wrapper()`](14_Techniques--Decorators.md#decorators-as-classes),
+which a decorator written as a class calls directly to copy the same metadata onto its instance.
 
 ```python
 # functools_wraps.py
@@ -277,12 +285,15 @@ print(greet_bare.__name__, "-", greet_bare.__doc__)
 #: wrapper - None
 ```
 
-`bare()` is `passthrough()` without the `@wraps(func)` line,
-and `greet_bare` reports `wrapper - None`.
-Every tool that reports a function by its name or docstring,
+`bare()` is `passthrough()` without the `@wraps(func)` line.
+Both decorators return the function they define as `wrapper`,
+so `greet` and `greet_bare` each name a wrapper.
+In `passthrough()`, `wraps()` copies the original's name and docstring onto `wrapper`,
+so `greet` reports the original's name and docstring.
+`greet_bare` reports `wrapper - None`,
+and every tool that reports a function by its name or docstring,
 `help()` among them, reports the wrapper too.
-Both names refer to a function called `wrapper`.
-`wraps()` copies the original's name and docstring onto `wrapper`.
+
 `wraps()` also sets `greet.__wrapped__` to the original function,
 so a tool that needs the original, such as `inspect.signature()`, can reach it.
 
@@ -355,9 +366,10 @@ which generates all five comparison methods from the field order.
 or when the ordering differs from the fields in declaration order.
 
 Each synthesized comparison is slower than a hand-written one,
-because it wraps a call to your `__lt__` or `__eq__`.
-For `Weight`, the `__lt__()` that `@dataclass(order=True)` generates returns `(self.kg,) < (other.kg,)`,
-with no extra call.
+because it calls your methods.
+The `__le__()` that `total_ordering` supplies for `Weight` calls your `__lt__()`,
+then calls `__eq__()` too when `__lt__()` returns `False`.
+The `__le__()` that `@dataclass(order=True)` generates returns `(self.kg,) <= (other.kg,)` and calls no other method.
 
 ### `singledispatch`
 
@@ -469,7 +481,8 @@ print(list(islice(range(10), 2, 8, 2)))
 
 Two differences from a list slice.
 `islice()` rejects negative indices with a `ValueError`,
-since a negative index counts back from the end, and an iterable may have none.
+since a negative index counts back from the end,
+and an iterator may have no end.
 And it consumes every element it passes.
 An iterator you pass to `islice()` resumes where the slice stopped.
 A list slice leaves the list as it was.
@@ -504,8 +517,8 @@ so the whole input stays in memory for as long as the `cycle` object exists.
 ### `chain`
 
 Iterates over several iterables one after another, as if they were one.
-`chain.from_iterable(iterables)` does the same when the iterables themselves arrive as one lazy sequence,
-rather than as separate arguments.
+`chain.from_iterable(iterables)` does the same when the iterables arrive inside one outer iterable instead of as separate arguments.
+It reads that outer iterable lazily, so a generator of iterables works too.
 Where the iterables come from a loop,
 [unpacking in a comprehension](16_Techniques--Comprehensions.md#unpacking-in-comprehensions)
 says the same thing without the import.
@@ -877,8 +890,9 @@ because `islice()` asks for three.
 
 `list(squares())[:3]` looks equivalent and is a different program.
 It builds the whole list before slicing, so it asks `squares()` for every value.
-`squares()` has no last value,
-so `list()` keeps asking for more and the program stalls before the slice.
+`squares()` has no last value, so `list()` keeps asking for more,
+printing `computing square` lines and growing its list until memory runs out.
+The slice waits on `list()` the whole time.
 Slicing lazily lets the source be infinite.
 Slicing a list requires a source that ends.
 [Lazy Evaluation with Generators](18_Techniques--Performance.md#lazy-evaluation-with-generators)
@@ -913,7 +927,7 @@ expect(RecursionError, factorial, 5000)
 #: [RecursionError] maximum recursion depth exceeded
 ```
 
-A `for` loop computes this same factorial in about the same number of lines and stays in one frame at any `n`.
+A `for` loop computes this same factorial in one frame at any `n`.
 Python pushes a frame for every recursive call, including one in tail position,
 where a language with *tail-call optimization* reuses the caller's frame.
 The stack has a cap, 1000 frames by default,
@@ -933,9 +947,9 @@ That recomputation is why the recursive `fib()` under [`cache`](#cache)
 gets a decorator rather than a rewrite as a loop.
 The recursion states the definition, and the cache removes the repetition.
 
-Self-similar problems, such as walking a tree,
-are a different reason to recurse.
-In a tree walk each subproblem occurs once, and a cache would save nothing.
+A tree walk branches too, but each subproblem occurs once,
+so a cache would save nothing.
+The reason to recurse there is shape.
 Code that walks a tree, nested data,
 or a directory reads best when its shape matches the data's shape.
 The function handles one node and calls itself for the rest:
@@ -973,8 +987,7 @@ an infinite generator for the rounds,
 `combinations()` for the pairs inside a group,
 and a seeded random source that makes the whole schedule reproducible.
 
-The *circle method* solves the pairs-only version exactly,
-by direct construction.
+The *circle method* solves the pairs-only version by direct construction.
 The method holds one player in place and arranges the rest in a circle.
 Each round, it pairs players sitting across from each other,
 then rotates everyone but the stationary player by one seat.
@@ -1136,6 +1149,7 @@ so it looks like the place for [`@cache`](#cache).
 If you add `@cache`, the first call raises a `TypeError`,
 because `met()` takes a `list` and a `list` is unhashable.
 If you pass a tuple instead, the calls succeed and the schedule gets worse.
+The seven rounds `pair_rounds.py` schedules then cover 20 of the 21 pairs instead of all 21.
 `met()` reads `history`, which changes at the end of every round.
 An answer cached in round 0 therefore comes back unchanged in a later round,
 after the counts it summed have grown.
