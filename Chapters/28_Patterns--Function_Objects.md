@@ -192,7 +192,13 @@ for command in macro:
 #: Ni!
 #: Ni!
 #: Ni!
+print(macro[1])
+#: Repeat(text='Ni!', times=3)
 ```
+
+Printing `macro[1]` shows the `repr` that `@record` generates,
+so the command's configuration reads from outside the object.
+A closure's `repr` shows its function's name and a memory address.
 
 A callable alone cannot express a second operation, `undo()`.
 `Command` describes one call,
@@ -336,10 +342,11 @@ def f(x: float) -> float:
     return x * x - 2  # Root at the square root of 2
 
 for finder in (bisection, newton, secant):
-    print(f"{solve(f, 0.0, 2.0, finder):.6f}")
-#: 1.414214
-#: 1.414214
-#: 1.414214
+    root = solve(f, 0.0, 2.0, finder)
+    print(f"{finder.__name__}: {root:.6f}")
+#: bisection: 1.414214
+#: newton: 1.414214
+#: secant: 1.414214
 ```
 
 In the classic form,
@@ -927,11 +934,11 @@ from tagged_bus import EventBus, handler
 def test_handler_receives_its_event() -> None:
     seen: list[int] = []
     @handler
-    class Record:
+    class Collect:
         def __call__(self, event: Deposit) -> None:
             seen.append(event.amount)
     bus = EventBus()
-    bus.subscribe(Record())
+    bus.subscribe(Collect())
     bus.publish(Deposit(5))
     bus.publish(Withdraw(1))
     assert seen == [5]

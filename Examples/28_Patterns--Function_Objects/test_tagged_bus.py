@@ -6,11 +6,11 @@ from tagged_bus import EventBus, handler
 def test_handler_receives_its_event() -> None:
     seen: list[int] = []
     @handler
-    class Record:
+    class Collect:
         def __call__(self, event: Deposit) -> None:
             seen.append(event.amount)
     bus = EventBus()
-    bus.subscribe(Record())
+    bus.subscribe(Collect())
     bus.publish(Deposit(5))
     bus.publish(Withdraw(1))
     assert seen == [5]

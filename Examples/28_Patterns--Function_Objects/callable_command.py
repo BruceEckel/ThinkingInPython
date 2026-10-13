@@ -25,3 +25,5 @@ for command in macro:
 #: Ni!
 #: Ni!
 #: Ni!
+print(macro[1])
+#: Repeat(text='Ni!', times=3)
