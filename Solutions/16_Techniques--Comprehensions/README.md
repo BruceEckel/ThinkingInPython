@@ -14,7 +14,7 @@
 
 [List Comprehensions](../../Chapters/16_Techniques--Comprehensions.md#list-comprehensions) shows the trailing `if` clause that filters elements before the output expression runs.
 Combine two tests in that clause with `and`.
-The `and` operator stops at the first false operand, so the second test does not run on an element the first rejected.
+The `and` operator stops at the first false operand, so the second test runs only on the elements the first one accepted.
 
 <details>
 <summary>Solution</summary>
@@ -24,7 +24,7 @@ the comprehension raises an `AttributeError` at the first element,
 since the integer `1` has no `isdigit()` method.
 The type checker flags the call before the program runs.
 `ty` reports `unresolved-attribute`, because `e` is `int | str` at that point.
-The solution tests `isinstance(e, str)` first, and `and` keeps `isdigit()` away from every integer.
+The solution tests `isinstance(e, str)` first, so `and` calls `isdigit()` only on strings.
 
 ```python
 # exercise_1.py
@@ -36,11 +36,11 @@ print(result)
 ```
 
 The predicate has two parts, `isinstance(e, str)` and `e.isdigit()`,
-both of which must be true before `int(e)` runs. `"a"` fails
-`isdigit()`, so it does not reach `int()`, which otherwise raises a
-`ValueError`. `"4"` is the only element that is both a string and made
-entirely of digits, so it is the one the comprehension converts and
-squares.
+and `int(e)` runs when both are true.
+`"a"` fails `isdigit()`,
+so the comprehension drops it before `int()` can raise a `ValueError` on it.
+`"4"` is the only element that is both a string and all digits,
+so `result` holds its square, `16`.
 
 </details>
 </details>
@@ -55,7 +55,7 @@ squares.
 <summary>Where to look</summary>
 
 [Nested Comprehensions](../../Chapters/16_Techniques--Comprehensions.md#nested-comprehensions) builds the matrix with an inner comprehension inside an outer one.
-The diagonal comes from a conditional expression in the output position, which already chooses between two values.
+The diagonal comes from a conditional expression in the output position, which chooses between two values.
 Change what that expression yields, and leave the loops alone.
 
 <details>
@@ -79,9 +79,9 @@ for row in matrix:
 #: [0, 0, 0, 0, 0, 2]
 ```
 
-The literal in the conditional expression is the one change, from `1`
-to `2`. Two nested comprehensions still produce a list of lists, with a different
-value on the diagonal.
+The one change is the literal in the conditional expression, from `1` to `2`.
+The two nested comprehensions still produce a list of lists,
+now with `2` on the diagonal.
 
 </details>
 </details>
@@ -97,7 +97,8 @@ value on the diagonal.
 
 [Dictionary Comprehensions](../../Chapters/16_Techniques--Comprehensions.md#dictionary-comprehensions) shows a key expression and a value expression with an `if` filter at the end.
 The filter runs on the loop variable, before either expression runs.
-The comprehension builds a `dict`, which holds one value per key, so a later name whose key matches an earlier one replaces that entry.
+The comprehension builds a `dict`, which holds one value per key.
+A later name whose key matches an earlier one replaces that entry.
 
 <details>
 <summary>Solution</summary>
@@ -115,17 +116,19 @@ print(lengths["GALAHAD"], "NI" in lengths)
 #: 7 False
 ```
 
-**Filter before building each entry.** `"Galahad"` is seven characters, so it passes the `len(name) > 3`
-filter and adds one entry. `"Ni"` is still the only name the filter
-drops. The filter runs before the output expression, so it tests the
-original name, not the upper-cased key. That ordering matters when the output expression changes the length, as
-`name * 2` does.
+**Filter before building each entry.** `"Galahad"` has seven characters,
+so it passes the `len(name) > 3` filter and adds one entry.
+The filter drops `"Ni"`, as before, and keeps the other five names.
+The filter runs before the output expression,
+so it tests the original name, not the upper-cased key.
+That ordering matters when the output expression changes the length,
+as `name * 2` does.
 
-**Keep one value per key.** Two names that upper-case to the same string collide, since the
-comprehension builds a `dict`, and a later value replaces the earlier
-one under the same key. Adding `"robin"` alongside `"Robin"` produces one `'ROBIN'` entry,
-not two, and the value comes from whichever name appears last in the
-list.
+**Keep one value per key.** Two names that upper-case to the same string collide.
+The comprehension builds a `dict`,
+so the later value replaces the earlier one under the shared key.
+Adding `"robin"` alongside `"Robin"` produces one `'ROBIN'` entry, not two.
+Its value comes from whichever of the two names appears later in the list.
 
 </details>
 </details>
@@ -162,18 +165,22 @@ print(sorted(unique))
 **Collapse the repeats.** The set holds four entries, one more than the filtered version. The
 seven names normalize to `Bob`, `John`, `Alice`, `Bob`, `Alice`, `J`,
 `Bob`. A set keeps one of each, so the duplicates and the case variants
-collapse to `Bob`, `John`, and `Alice`, and `J` joins them.
+collapse to `Bob`, `John`, and `Alice`.
+`J` makes the fourth.
 
-**Normalize without truncating.** `"J"` does not collide with `"JOHN"` because the normalization is a
-string transformation, not a truncation. `"J"` becomes `"J"` and
-`"JOHN"` becomes `"John"`. `name[1:]` on a one-character string is the
-empty string, so the concatenation leaves the capital as it is. `"J"`
-and `"John"` are distinct strings, so the set keeps both.
+**Change the case and keep every character.** `"J"` stays apart from `"JOHN"`
+because the normalization changes case and keeps every character.
+`"JOHN"` becomes `"John"`.
+`"J"` stays `"J"`,
+because `name[1:]` on a one-character string is the empty string,
+so the concatenation leaves the capital as it is.
+`"J"` and `"John"` are distinct strings, so the set keeps both.
 
-The filter exists to drop the initial `"J"` as noise. Removing the filter
-shows what the set does on its own. The set collapses only exact
-duplicates of the normalized form, and it has no notion that `"J"`
-might be an abbreviation of `"John"`.
+The filter exists to drop the initial `"J"` as noise.
+Removing the filter shows what the set does on its own.
+The set collapses exact duplicates of the normalized form.
+It treats `"J"` and `"John"` as two distinct strings,
+so a `"J"` that abbreviates `"John"` stays a separate entry.
 
 </details>
 </details>
@@ -204,10 +211,9 @@ def show(n: int) -> str:
 <summary>Solution</summary>
 
 If you leave `return line` out of `show()`,
-the function returns `None` implicitly,
-and `lines` prints as `[None, None, None]`, the list `comprehension_side_effects.py` builds.
-The type checker catches the omission.
-`ty` reports `invalid-return-type`, because `show()` declares a `str` return type.
+the function returns `None` implicitly.
+`lines` then prints as `[None, None, None]`, the list `comprehension_side_effects.py` builds.
+`ty` reports the omission as `invalid-return-type`, because `show()` declares a `str` return type.
 The solution returns the line it printed, so the comprehension collects strings.
 
 ```python
@@ -231,23 +237,28 @@ for n in [1, 2, 3]:  # Printing alone stays a loop
 #: item 3
 ```
 
-**Give the output expression a value.** The original comprehension collects `print()`'s return value, which is
-always `None`, so the list it builds is worthless and the brackets
-mislead the reader. Giving the output expression something to return
-fixes both. `show()` prints and hands back the line, so `lines` holds
-the three strings a caller can check, write to a file, or join.
+**Give the output expression a value.** The original comprehension collects `print()`'s return value,
+which is always `None`.
+The resulting list holds three `None`s.
+The brackets tell the reader that the list matters,
+but the printing is the purpose.
+Giving the output expression a value to return replaces the `None`s and makes the list the point.
+`show()` prints the line and returns it,
+so `lines` holds the three strings a caller can check, write to a file, or join.
 
-**Choose the shape by the result.** Which shape is right depends on whether you want the list. Here the
-comprehension is correct, because `lines` is the point and the printing
-is incidental. The `for` loop at the end is the right shape for
-`comprehension_side_effects.py`, where printing is the purpose. The rule from the
-chapter decides it: use a comprehension when you want the collection it
-produces, and a loop when you want the side effect.
+**Choose the shape by the result.** The right shape depends on whether you want the list.
+Here the comprehension is correct,
+because `lines` is the point and the printing is incidental.
+The `for` loop at the end suits `comprehension_side_effects.py`,
+where printing is the purpose.
+The chapter's rule decides both cases:
+use a comprehension when you want the collection it produces,
+and a loop when you want the side effect alone.
 
-A comprehension whose output expression has a side effect is still
-worth a second look, even when it returns something useful. `show()`
-does two jobs, and a reader must open it to learn that one of them is
-printing.
+A comprehension whose output expression has a side effect
+still deserves a second look when it returns something useful.
+`show()` does two jobs,
+and a reader must open it to learn that one of them is printing.
 
 </details>
 </details>
@@ -262,7 +273,7 @@ printing.
 <details>
 <summary>Where to look</summary>
 
-[Unpacking in Comprehensions](../../Chapters/16_Techniques--Comprehensions.md#unpacking-in-comprehensions) shows `**d` inside a dictionary display, merging each `d` as the loop reaches it.
+[Unpacking in Comprehensions](../../Chapters/16_Techniques--Comprehensions.md#unpacking-in-comprehensions) shows `**d` inside a dictionary display, merging each `d` in the order the loop produces it.
 A repeated key keeps the value written last.
 A key keeps the position of its first insertion, which decides the print order.
 
@@ -280,9 +291,12 @@ print({**d for d in dicts})
 appears more than once, the value from the later dictionary
 overwrites the earlier value. The key `"a"` appears in the first, third,
 and fourth dictionaries (`1`, then `3`, then `5`), so the final value
-is `5`, the last one written. The result orders keys by first
-insertion, which is why `"a"` still prints first although its value
-comes from the last dictionary in the list.
+is `5`, the last one written.
+
+The key `"a"` takes its value from the last dictionary
+but its position from the first.
+The result orders keys by first insertion,
+so `"a"` prints first, ahead of `"b"` and `"c"`.
 
 </details>
 </details>
@@ -316,13 +330,9 @@ print(list(nums))
 
 `any()` pulls values until one matches, so it consumes `0` through `5`,
 reports `True`, and stops. Stopping there leaves the generator part-way
-through, not empty. `sum()` continues from `6` and adds `36 + 49 + 64 +
-81`, giving `230` rather than the full `285`. By then `sum()` has
-drained every value, so `list()` returns an empty list.
-
-A generator holds a position rather than a beginning. Each consumer
-picks up where the previous one stopped, and `any()`'s early exit
-leaves values behind for `sum()` to find.
+through, not empty. `sum()` continues from `6` and adds `36 + 49 + 64 + 81`,
+giving `230` of the full range's `285`.
+By then `sum()` has consumed every value, so `list()` returns an empty list.
 
 </details>
 </details>
@@ -369,19 +379,15 @@ print(built)
 #: [2, 4, 6]
 ```
 
-**Compute the products eagerly.** The lines print in the same order as in `genexp_timing.py`.
-The listing renames the second message to `list created`, and the
-last line changes from `[10, 20, 30]` to `[2, 4, 6]`. A list
-comprehension does all its work on the line where it appears. It
-calls `source()`, reads `factor` while `factor` is `2`, and stores
-the three products in `built`. The later `factor = 10` has nothing
-to affect, because `built` holds finished numbers and no code that
-still needs to look `factor` up.
-
-The generator expression calls `source()` at the same point, which
-is why the first line of output keeps its place. The brackets change
-when the output expression runs, and with it which value of
-`factor` the expression reads.
+**Compute the products eagerly.** The lines print in the same order as in `genexp_timing.py`,
+because the generator expression there also calls `source()` on the line where it appears.
+`exercise_8.py` renames the second message to `list created`.
+The last line changes from `[10, 20, 30]` to `[2, 4, 6]`,
+because a list comprehension does all its work on the line where it appears.
+The comprehension calls `source()`, reads `factor` while `factor` is still `2`,
+and stores the three products in `built`.
+The later `factor = 10` leaves `built` as it was,
+because `built` holds computed numbers rather than code that reads `factor`.
 
 </details>
 </details>
@@ -440,19 +446,20 @@ print(calls)
 ```
 
 **One call per element with the walrus.** `cubes` calls
-`cube_if_even()` once for each of the six values in `data`, and the
-output expression reads the result back from `y`, so `calls` holds six
-arguments.
+`cube_if_even()` once for each of the six values in `data`,
+so `calls` holds six arguments.
+The output expression reads each result back from `y` instead of calling again.
 
 **A second call for each element that passes.** `again` calls
 `cube_if_even()` in the filter for all six values, then calls it again
-in the output expression for the three that pass. `calls` shows the
-order: `0`, `2`, and `4` each appear twice in a row, filter first and
-output second, while `1`, `3`, and `5` appear once, since the filter
-rejects them before the output expression runs. Six plus three makes
-nine calls for the same three cubes.
+in the output expression for the three that pass.
+`calls` shows the order.
+`0`, `2`, and `4` each appear twice in a row,
+once for the filter and then once for the output expression.
+`1`, `3`, and `5` appear once,
+because the filter rejects them before the output expression runs.
+Six plus three makes nine calls for the same three cubes.
 
-The extra calls grow with the number of elements that pass the filter.
 `cube_if_even()` returns in a moment, but for a function that reads a
 file or queries a server, the walrus halves the calls for every
 element that passes.
