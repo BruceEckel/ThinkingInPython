@@ -88,17 +88,23 @@ def add_item(cart: list[str], item: str) -> list[str]:
     return cart
 
 cart: list[str] = ["milk"]
-add_item(cart, "eggs")
+first = add_item(cart, "eggs")
 add_item(cart, "eggs")
 print(cart)
 #: ['milk', 'eggs', 'eggs']
+cart = ["milk"]
+first = ["milk", "eggs"]  # [1]
+add_item(cart, "eggs")
+print(cart)
+#: ['milk', 'eggs']
 ```
 
 Each call to `add_item()` returns the same list the caller passed in,
 so replacing the call with that list looks safe.
 It is not.
 The call also appends to `cart`, and the list put in its place appends nothing.
-If you substitute the list for either call, `cart` ends with one `'eggs'` fewer.
+The rest of the listing puts the returned list in place of the `add_item()` call that produced it
+(`[1]`), and `cart` ends with one `'eggs'` fewer.
 
 Referential transparency makes [`lru_cache`](41_Functional--Toolkits.md#lru_cache)
 safe.
@@ -128,12 +134,15 @@ print(withdraw(30), withdraw(30))
 #: 70 70
 print(f"balance: {balance}")
 #: balance: 70
+print(withdraw.cache_info())
+#: CacheInfo(hits=1, misses=1, maxsize=128, currsize=1)
 ```
 
 Two withdrawals of `30` should leave `balance` at `40`.
 The second call is a cache hit, so `withdraw()` runs once, subtracts one `30`,
 and hands back the stored `70` the second time.
-Nothing reports the skipped subtraction.
+`cache_info()` counts that one miss and one hit when you ask for them,
+and nothing warns you about the skipped subtraction.
 `lru_cache` returns the stored result for any repeated arguments,
 and nothing in the language checks that the function it wraps is referentially transparent.
 

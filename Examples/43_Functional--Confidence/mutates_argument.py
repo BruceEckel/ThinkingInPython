@@ -4,7 +4,12 @@ def add_item(cart: list[str], item: str) -> list[str]:
     return cart
 
 cart: list[str] = ["milk"]
-add_item(cart, "eggs")
+first = add_item(cart, "eggs")
 add_item(cart, "eggs")
 print(cart)
 #: ['milk', 'eggs', 'eggs']
+cart = ["milk"]
+first = ["milk", "eggs"]  # [1]
+add_item(cart, "eggs")
+print(cart)
+#: ['milk', 'eggs']
