@@ -12,12 +12,12 @@ Use `def` to create methods inside the indented class body:
 class Simple:
     def __init__(self, text):
         print("Inside the Simple constructor")
-        self.s = text
+        self.text = text
     def show(self, msg=""):
         if msg:
-            print(f"{msg}:", self.s)
+            print(f"{msg}:", self.text)
         else:
-            print(self.s)
+            print(self.text)
     def show_twice(self):
         self.show()
         self.show()
@@ -106,13 +106,13 @@ x = Simple("Constructor argument")
 #: Inside the Simple constructor
 display_object(x)
 #: [Attributes]
-#:   • s = 'Constructor argument'
+#:   • text = 'Constructor argument'
 #: [Methods]
 #:   • show(self, msg='')
 #:   • show_twice(self)
 ```
 
-The instance carries one attribute, `s`,
+The instance carries one attribute, `text`,
 while the two methods belong to the class.
 Because the constructor `__init__()` is a dunder,
 `display_object()` hides it by default.
@@ -171,9 +171,6 @@ x = Derived("Derived constructor argument")
 x.display()
 #: Overridden show() method
 #: Called from display(): Derived constructor argument
-x.show()
-#: Overridden show() method
-#: Derived constructor argument
 x.show_twice()  # Inherited from Simple
 #: Overridden show() method
 #: Derived constructor argument
@@ -261,7 +258,7 @@ and `C().show()` then runs `B`'s version.
 The base-class constructor runs because `Derived`'s constructor calls it.
 Unlike C++ and Java,
 Python adds no call to the base-class constructor when a derived class defines its own.
-Without the `super().__init__(text)` line, nothing creates `self.s`.
+Without the `super().__init__(text)` line, nothing creates `self.text`.
 
 ```python
 # missing_super.py
@@ -273,7 +270,7 @@ class Broken(Simple):
         pass  # Forgot super().__init__(text)
 
 expect(AttributeError, Broken("ignored").show)
-#: [AttributeError] 'Broken' object has no attribute 's'
+#: [AttributeError] 'Broken' object has no attribute 'text'
 ```
 
 A derived class that defines no constructor of its own inherits and runs the base version.
@@ -593,8 +590,8 @@ class Temperature:
 
     @classmethod
     # An alternative constructor
-    def from_fahrenheit(cls, f):
-        return cls((f - 32) * 5 / 9)
+    def from_fahrenheit(cls, fahrenheit):
+        return cls((fahrenheit - 32) * 5 / 9)
 
     @staticmethod
     def is_freezing(celsius):  # Needs no self or cls
@@ -641,7 +638,7 @@ Try each exercise before opening its [solution](../Solutions/07_Foundations--Cla
     which would divide the radius down to `-2.5`,
     and confirm the setter raises its `ValueError` instead of silently storing a negative radius.
 2.  In `class_methods.py`, add a second alternative constructor,
-    `from_kelvin(cls, k)`, using `celsius = k - 273.15`.
+    `from_kelvin(cls, kelvin)`, using `celsius = kelvin - 273.15`.
     Add a call that builds a `Temperature` both ways for the same physical temperature and confirms they agree,
     within rounding.
 3.  In `simple_subclass.py`, add a third class, `MoreDerived(Derived)`,

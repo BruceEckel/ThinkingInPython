@@ -94,7 +94,7 @@ to `5.0`, so it computes `5.0 / -2 == -2.5` and the setter rejects
 ## 2. A second alternative constructor, `from_kelvin()`
 
 > In `class_methods.py`, add a second alternative constructor,
-> `from_kelvin(cls, k)`, using `celsius = k - 273.15`.
+> `from_kelvin(cls, kelvin)`, using `celsius = kelvin - 273.15`.
 > Add a call that builds a `Temperature` both ways for the same physical temperature and confirms they agree,
 > within rounding.
 
@@ -116,11 +116,11 @@ class Temperature:
         ...
 
     @classmethod
-    def from_fahrenheit(cls, f):
+    def from_fahrenheit(cls, fahrenheit):
         ...
 
     @classmethod
-    def from_kelvin(cls, k):
+    def from_kelvin(cls, kelvin):
         ...
 
     @staticmethod
@@ -139,12 +139,12 @@ class Temperature:
         self.celsius = celsius
 
     @classmethod
-    def from_fahrenheit(cls, f):
-        return cls((f - 32) * 5 / 9)
+    def from_fahrenheit(cls, fahrenheit):
+        return cls((fahrenheit - 32) * 5 / 9)
 
     @classmethod
-    def from_kelvin(cls, k):
-        return cls(k - 273.15)
+    def from_kelvin(cls, kelvin):
+        return cls(kelvin - 273.15)
 
     @staticmethod
     def is_freezing(celsius):
@@ -233,13 +233,13 @@ from typing import override
 
 class Simple:
     def __init__(self, text):
-        self.s = text
+        self.text = text
 
     def show(self, msg=""):
         if msg:
-            print(f"{msg}:", self.s)
+            print(f"{msg}:", self.text)
         else:
-            print(self.s)
+            print(self.text)
 
     def show_twice(self):
         self.show()

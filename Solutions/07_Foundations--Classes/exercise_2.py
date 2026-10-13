@@ -5,12 +5,12 @@ class Temperature:
         self.celsius = celsius
 
     @classmethod
-    def from_fahrenheit(cls, f):
-        return cls((f - 32) * 5 / 9)
+    def from_fahrenheit(cls, fahrenheit):
+        return cls((fahrenheit - 32) * 5 / 9)
 
     @classmethod
-    def from_kelvin(cls, k):
-        return cls(k - 273.15)
+    def from_kelvin(cls, kelvin):
+        return cls(kelvin - 273.15)
 
     @staticmethod
     def is_freezing(celsius):

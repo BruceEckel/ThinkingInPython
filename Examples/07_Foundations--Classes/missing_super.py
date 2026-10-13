@@ -7,4 +7,4 @@ class Broken(Simple):
         pass  # Forgot super().__init__(text)
 
 expect(AttributeError, Broken("ignored").show)
-#: [AttributeError] 'Broken' object has no attribute 's'
+#: [AttributeError] 'Broken' object has no attribute 'text'

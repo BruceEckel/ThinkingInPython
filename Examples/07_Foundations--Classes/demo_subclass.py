@@ -7,9 +7,6 @@ x = Derived("Derived constructor argument")
 x.display()
 #: Overridden show() method
 #: Called from display(): Derived constructor argument
-x.show()
-#: Overridden show() method
-#: Derived constructor argument
 x.show_twice()  # Inherited from Simple
 #: Overridden show() method
 #: Derived constructor argument

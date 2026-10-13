@@ -6,8 +6,8 @@ class Temperature:
 
     @classmethod
     # An alternative constructor
-    def from_fahrenheit(cls, f):
-        return cls((f - 32) * 5 / 9)
+    def from_fahrenheit(cls, fahrenheit):
+        return cls((fahrenheit - 32) * 5 / 9)
 
     @staticmethod
     def is_freezing(celsius):  # Needs no self or cls

@@ -6,7 +6,7 @@ x = Simple("Constructor argument")
 #: Inside the Simple constructor
 display_object(x)
 #: [Attributes]
-#:   • s = 'Constructor argument'
+#:   • text = 'Constructor argument'
 #: [Methods]
 #:   • show(self, msg='')
 #:   • show_twice(self)
