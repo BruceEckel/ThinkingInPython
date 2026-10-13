@@ -22,15 +22,12 @@ def add(a: int, b: int, c: int) -> str:
     return f"add({a} + {b} + {c}): {a + b + c}"
 
 def combined(i: int, j: int) -> Result[str, list[str]]:
-    a, b, c = func_a(i), func_b(j), func_c(i + j)
-    errors = [r.error for r in (a, b, c)
-              if isinstance(r, Err)]
-    if errors:
-        return Err(errors)
-    assert isinstance(a, Ok)
-    assert isinstance(b, Ok)
-    assert isinstance(c, Ok)
-    return Ok(add(a.answer, b.answer, c.answer))
+    match func_a(i), func_b(j), func_c(i + j):
+        case Ok(a), Ok(b), Ok(c):
+            return Ok(add(a, b, c))
+        case results:
+            return Err([r.error for r in results
+                        if isinstance(r, Err)])
 
 def test_combined_collects_every_failure() -> None:
     assert combined(1, 2) == Err(

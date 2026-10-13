@@ -273,8 +273,9 @@ function that might produce one.
 <summary>Where to look</summary>
 
 [Combining Multiple Results](../../Chapters/42_Functional--Error_Handling.md#combining-multiple-results) stops at the first `Err` because each nested `bind()` short-circuits, although the three calls take independent inputs.
-Here the three calls are independent, so call all of them first and keep the results.
-Gather the `.error` of each `Err` into a list, return `Err(errors)` when the list is not empty, and write the three tests before the function.
+Call all three first, then `match` on the three results together.
+One `case` takes three `Ok`s, and any other combination gathers the `.error` of each `Err` into a list.
+Write the three tests before the function.
 
 <details>
 <summary>Solution</summary>
@@ -312,15 +313,12 @@ def add(a: int, b: int, c: int) -> str:
     return f"add({a} + {b} + {c}): {a + b + c}"
 
 def combined(i: int, j: int) -> Result[str, list[str]]:
-    a, b, c = func_a(i), func_b(j), func_c(i + j)
-    errors = [r.error for r in (a, b, c)
-              if isinstance(r, Err)]
-    if errors:
-        return Err(errors)
-    assert isinstance(a, Ok)
-    assert isinstance(b, Ok)
-    assert isinstance(c, Ok)
-    return Ok(add(a.answer, b.answer, c.answer))
+    match func_a(i), func_b(j), func_c(i + j):
+        case Ok(a), Ok(b), Ok(c):
+            return Ok(add(a, b, c))
+        case results:
+            return Err([r.error for r in results
+                        if isinstance(r, Err)])
 
 def test_combined_collects_every_failure() -> None:
     assert combined(1, 2) == Err(
@@ -341,8 +339,10 @@ of earlier failures makes sense only when the steps are independent
 of each other's results. That independence is why `func_c()` here takes
 `i + j` rather than a value produced by `func_a()` or `func_b()`.
 
-**Gather the failures.** `combined()` then inspects the three results, gathering
-every `Err`'s `.error` into one list. `combined(1, 5)` now
+**Gather the failures.** `combined()` matches the three results as
+one tuple. When all three are `Ok`s, `case Ok(a), Ok(b), Ok(c)` binds
+their answers. Every other combination falls to `case results`, which gathers every
+`Err`'s `.error` into one list. `combined(1, 5)` now
 reports a single-item list, `["func_a(1)"]`, because `func_b(5)` and
 `func_c(6)` both succeed. `combined(1, 2)` reports all three failures
 at once: `i=1` fails `func_a()`, `j=2` fails `func_b()`, and `i+j=3`
@@ -356,11 +356,15 @@ or a list of error strings. `Ok` and `Err` take whatever type
 parameters each call needs.
 
 **Narrow for the type checker.** The type checker follows the
-widening. `isinstance(r, Err)` narrows the comprehension to
-`list[str]`, and the three `assert isinstance` lines narrow each
-success to `Ok[int]` so `.answer` is an `int`. The asserts document
-what the `if errors:` return has already established, since a checker
-cannot see that an empty error list means all three succeeded.
+widening. The `Ok(a), Ok(b), Ok(c)` pattern narrows each result to
+`Ok[int]`, so `a`, `b`, and `c` are `int`s, and `isinstance(r, Err)`
+narrows the comprehension to `list[str]`.
+
+If you build the error list first and return early when it holds
+anything, the type checker rejects a later `a.answer`: it cannot see
+that an empty error list means all three succeeded. The tuple pattern
+states that condition in the `case`, so the listing needs no `assert`
+to restate it.
 
 </details>
 </details>
@@ -557,7 +561,7 @@ report(load_setting("timeout", "30").bind(
 #:   setting 'retries' received 'many'
 ```
 
-**Note only the failing path.** The successful call has no note to lose. A successful
+**Note only the failing path.** The successful call carries no note. A successful
 `load_setting()` returns from inside the `try` block, so it does not
 reach `add_note()`, and an `Ok` carries no exception on which to
 hang a note. Notes attach to exceptions, so only the failing path

@@ -17,11 +17,13 @@ And forgetting to handle one is easy.
 
 Returning the failure as a value addresses all three.
 Failure appears in the return type,
-so the type checker forces a caller to check for the failure before reading the answer,
-and a reviewer sees it without reading the body.
-Control flow stays local.
-The failure returns to the immediate caller, the way any value does.
-The check at each step is where you handle every failure.
+so a reviewer sees it without reading the body,
+and the type checker forces a caller to check for the failure before reading the answer.
+
+Control flow also stays local.
+The failure returns to the immediate caller, the way any value does,
+so a failure in one call leaves the results of the others intact,
+and each caller handles the failure next to the call that produced it.
 
 This material comes from my PyCon 2024 talk,
 [Functional Error Handling](https://github.com/BruceEckel/functional_error_handling).
@@ -212,11 +214,11 @@ with expected(AttributeError):
 #: [AttributeError] 'Err' object has no attribute 'unwrap'
 ```
 
-The `# type: ignore` is the point of the listing.
-The type checker rejects the bare line,
+The `# type: ignore` silences the type checker so the listing can reach the runtime failure.
+Without the comment, the type checker rejects the line,
 reporting that `Err[str]` in the union has no `unwrap`,
-so a reader who writes that line in their own code sees that report first,
-at check time.
+so a reader who writes that line in their own code sees that report at check time,
+before any `AttributeError` at runtime.
 
 `Result` is the same idea as in [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#parse-dont-validate):
 put the meaning in the type.
@@ -239,10 +241,12 @@ the return type does not name that outcome.
 Python lets a `Result`-returning function raise an exception as well,
 and the type checker cannot report that,
 so totality is a discipline the function's author keeps.
+
 The caller's side has the same limit.
 A statement that calls the function and discards the `Result` passes the checker.
-The type checker catches a misread of a `Result`, but ignoring one is up to you.
-The listing holds one gap of each kind:
+The type checker catches a misread `Result`,
+and noticing an ignored one is up to you.
+The listing holds one gap of each kind, the caller's and the author's:
 
 ```python
 # totality_gap.py
@@ -262,8 +266,10 @@ with expected(RuntimeError):
 
 `func_a(1)` returns a `Result` that the listing discards,
 and `lies()` raises an exception instead of returning the `Result` its signature declares.
-The type checker accepts both,
-because a function that always raises an exception satisfies any declared return type.
+The type checker accepts both.
+Discarding a return value is legal Python,
+and a function that always raises an exception satisfies any declared return type,
+since the checker finds no returned value to compare with that type.
 
 ## Composing by Hand
 
@@ -274,8 +280,9 @@ You can catch an exception from existing code and turn it into an `Err`,
 so the failure becomes data rather than control flow.
 `func_c()` does that with a `ZeroDivisionError`.
 `steps.py` gathers the three steps the rest of the chapter chains,
-and lists `func_a()` in `__all__` beside its own two,
-so a listing imports all three from one module:
+so a listing imports all three from one module.
+It imports `func_a()` and names it in [`__all__`](06_Foundations--Modules_and_Packages.md#what-a-module-exports)
+beside its own two, which declares the imported name to be part of the module's public interface:
 
 ```python
 # steps.py
@@ -351,7 +358,7 @@ def func_b(i: int) -> int:
     return i
 
 def func_c(i: int) -> int:
-    _ = 1 / (i - 3)  # Raises when i == 3
+    _ = 1 / (i - 3)  # Raises ZeroDivisionError when i == 3
     return i
 
 def composed(i: int) -> int:
@@ -554,7 +561,7 @@ def test_combined_returns_answer_or_first_failure(
 
 In `steps.py`, `func_c()` puts a `try`/`except` around a division that can raise a `ZeroDivisionError` and returns an `Err` by hand.
 A decorator can capture that pattern.
-`@safe` takes a function that raises an exception and produces one that returns a `Result`,
+`@safe` takes a function that can raise an exception and produces one that returns a `Result`,
 with the exception as the `Err` value.
 Like `result.py`, it lives in `utils/` and any chapter can import it:
 
@@ -603,9 +610,10 @@ if __name__ == "__main__":
 `parse()` still reads like a normal function that returns an `int`,
 but `@safe` has changed its return type to `Result[int, Exception]`,
 so the caller must unpack the `Result` to reach the number.
+
 That error type, `Exception`, is the base of the ordinary exception hierarchy,
 so the signature says that something can go wrong and not what,
-which is all a bare `except Exception` says.
+which is all an `except Exception` clause says.
 `@safe` names `Exception` because it writes one `try`/`except` for every function it wraps,
 and the base class is the one type that covers whatever those functions raise.
 A wrapper written by hand can be narrower.
@@ -691,7 +699,7 @@ if __name__ == "__main__":
 ```
 
 `@safe` wraps both `parse()`, imported from `safe_demo.py`, and `reciprocal()`,
-so `bind()` chains them.
+so each returns a `Result` and `bind()` chains them.
 A `ValueError` from a bad number and a `ZeroDivisionError` from dividing by zero each become the `error` field of an ordinary `Err`.
 `compute()` returns a `Result`, a value the caller keeps after the call returns,
 so the dict comprehension computes all three results before `describe()` matches any of them.
@@ -816,7 +824,7 @@ so read `__notes__` with `getattr(error, "__notes__", [])`.
 A library can supply `Result` for you.
 The [returns](https://github.com/dry-python/returns)
 library provides a `Result` type whose two cases are `Success` and `Failure`,
-the same `@safe` decorator you built in `safe.py`, and do-notation,
+a `@safe` decorator like the one in `safe.py`, and do-notation,
 which combines multiple results in one flat expression instead of nested binds.
 Its `@safe` takes an `exceptions` argument naming the types to catch,
 the production form that exercise 4 builds.
