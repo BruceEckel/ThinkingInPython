@@ -60,8 +60,8 @@ def render(rows: list[Row], style: str) -> str:
 <summary>Solution</summary>
 
 The example is a small report writer. It prints plain text, then must
-emit CSV for a spreadsheet, then JSON for a web front end. Three
-changes along one axis, the output format. Everything else stays put
+emit CSV for a spreadsheet, then JSON for a web front end. All three
+changes run along one axis, the output format. Everything else stays the same
 through all three: the rows, their source, what the numbers mean.
 
 Here is the version that survived the first two changes:
@@ -94,11 +94,12 @@ print(render(rows, "csv"))
 
 **Branch on the format.** Nothing absorbs the change. Each new format means opening `render()`
 and adding a `case`, so the third request edits the same function the
-first two did. The `match` reads well, which is why this shape
-survives as long as it does. It is not wrong, but every new
+first two did.
+The branching shape survives as long as it does because the `match` reads well.
+The shape works, but every new
 format is an edit you make by hand.
 
-Naming the axis says what to do about it. If the format varies, the
+Naming the axis says what to do about those hand edits. If the format varies, the
 format must become a value the program can hold, rather than a
 branch in a function:
 
@@ -131,20 +132,21 @@ print(render(rows, "json"))
 #: {"name": "paper", "amount": 7}
 ```
 
-**Hold each format as data.** The third format arrives without touching `render()`. The
-assignment that adds the format can sit in any module that imports
-`STYLES`. `STYLES` absorbs the change because a format is now data.
+**Hold each format as data.** Adding the third format takes one assignment, and `render()` stays as it was.
+`STYLES` absorbs the change because a format is now data.
+The assignment that adds the format can sit in any module that imports
+`STYLES`.
 
-Everything outside the axis still needs hand edits. Adding a
-field to `Row` touches every entry in `STYLES`, because a field is a
-different vector of change, one about which this design does nothing.
+Everything outside the axis still needs hand edits. Printing a new
+field of `Row` means editing every entry in `STYLES`.
+`STYLES` absorbs the format, and a field is a different vector of change.
 
 Two things generalize from the example. First, the axis is visible in
-the history rather than in the code. The same function appearing in
-three consecutive commits names the axis for you. Second, absorbing one
-vector says nothing about the others. A design that makes formats
-pluggable and fields painful is the right answer only if formats are
-what keep changing.
+the history rather than in the code. When the same function appears in
+three consecutive commits, the history names the axis for you. Second, absorbing one
+vector says nothing about the others. In this design a new format is
+one assignment and a new field is an edit to every format,
+so the design is the right answer only if formats are what keep changing.
 
 </details>
 </details>
@@ -203,9 +205,9 @@ Now cross out what Python supplies:
   without declaring a type.
 - The concrete classes go. Each holds one method and no state, so each
   becomes one function.
-- The context class goes, along with its field and its setter. Nothing
-  remains to hold, only an argument to pass.
-- The `new` goes with the classes. A function needs no instantiation.
+- The context class goes, along with its field and its setter. The
+  strategy becomes an argument to pass rather than a field to hold.
+- The `new` goes with the classes. You pass a function by its name.
 
 One sentence remains: make the varying step a parameter.
 
@@ -233,13 +235,15 @@ what the parameter accepts. `Callable[[float], float]` rejects a
 function taking the wrong arguments as surely as an interface rejects
 a class that does not implement it.
 
-The sentence that remains is the pattern. Everything crossed out is
-what the pattern requires in a language where a method cannot travel
-without an object around it. Python supplies the missing piece,
-a function that travels on its own, and
-[When a Pattern Dissolves](../../Chapters/21_Patterns--Design_Patterns.md#when-a-pattern-dissolves)
-describes that case as the language having the piece all along. The
-intent survives the subtraction. Only the scaffolding disappears.
+The sentence that remains is the pattern.
+The subtraction keeps the pattern's intent and removes the supporting code.
+Everything crossed out
+serves a language where a method belongs to a class.
+In such a language, passing a behavior means passing an object,
+and the crossed-out parts build that object.
+Python has had the
+[missing piece](../../Chapters/21_Patterns--Design_Patterns.md#when-a-pattern-dissolves)
+all along, since a function is a value you can pass.
 
 </details>
 </details>
@@ -256,10 +260,10 @@ intent survives the subtraction. Only the scaffolding disappears.
 <summary>Where to look</summary>
 
 [Design Principles](../../Chapters/21_Patterns--Design_Patterns.md#design-principles) states *Subtraction*: a design is complete when you cannot take anything else away.
-Use it as a test: take one thing away and run the program.
+Use *Subtraction* as a test: take one thing away and run the program.
 Choose a class or a level of inheritance that holds a single method and no state.
-If nothing breaks, the piece was scaffolding.
-If something breaks, you have found the part that carries the design's intent.
+If nothing breaks, the piece you removed was supporting code.
+If something breaks, you have found the part that expresses the design's intent.
 
 <details>
 <summary>The shape</summary>
@@ -323,25 +327,26 @@ If you remove the abstract base and turn both subclasses into
 functions, you have exercise 2's version. What stops working? Nothing.
 The numbers are identical, the type checker still rejects a wrongly-shaped argument,
 and adding a third rule is still one new definition. `Flat` and
-`ByWeight` each carry a single method and no state, so the hierarchy is a container
-for functions that do not need containing. By the rule that a design
+`ByWeight` each carry a single method and no state, so each class is a
+wrapper around one function. By the rule that a design
 is complete when you cannot take anything else away, the class version
-is not complete.
+has three classes left to take away.
 
-Taking away one more thing changes the answer. If you remove
-`checkout()`'s `shipping` parameter, inlining `5.0` where the call through `shipping` was
-and dropping the second argument from each call,
-the program still runs and still prints a number. What stops working is
+Taking away one more thing changes the answer.
+Removing `checkout()`'s `shipping` parameter means inlining `5.0` where the call through `shipping` was
+and dropping the second argument from each call.
+The program still runs and still prints a number. What stops working is
 the requirement. Charging by weight now means editing
-`checkout()`. Removing the parameter reaches the floor, the
-point where subtraction stops. The parameter is the last piece that carries the design's
-intent, so removing it removes the design rather than its scaffolding.
+`checkout()`. Subtraction stops at the parameter. The parameter is the
+last piece that expresses the design's intent, so removing it removes
+the design rather than its supporting code.
 
-Both outcomes are the exercise working correctly. Subtraction is a test
-you run rather than a direction in which you push: take something away, run
-the program, and read the result. Nothing broke means the piece was
-scaffolding. Something broke means you found the floor, and the thing
-you removed is worth keeping and worth naming.
+Both outcomes, a removal that broke nothing and one that broke the requirement,
+are the exercise working correctly. Subtraction is a test
+you run, not a rule to remove as much as you can.
+Take something away, run the program, and read the result. If nothing broke, the piece was
+supporting code. If something broke, the piece you removed expresses the
+design, and that piece is worth keeping and worth naming.
 
 </details>
 </details>
@@ -361,7 +366,7 @@ you removed is worth keeping and worth naming.
 
 [The Reach of a Change](../../Chapters/21_Patterns--Design_Patterns.md#the-reach-of-a-change) compares a design in which `Report` names each writer with one in which it names a protocol.
 In the first version give each writer its own method name.
-In the second give every writer the same method and declare it in a `Protocol`.
+In the second give every writer the same method and declare that method in a `Protocol`.
 Add the Markdown writer to each, then count the existing definitions you opened.
 
 <details>
@@ -430,12 +435,16 @@ def main(kind: str) -> None:
 <details>
 <summary>Solution</summary>
 
-If you add `MdWriter` to the `AnyWriter` alias and to `main()` but miss the `case` in `Report.render()`,
-`main("md")` prints `None`, because no `case` matches and `render()` returns nothing.
-The type checker catches the gap.
-`ty` reports `invalid-return-type`, since `render()` can implicitly return `None`.
-The first version below makes all three edits,
-and the second takes the other path, leaving `Report` no `case` to miss.
+If you add `MdWriter` to the `AnyWriter` alias and to `main()` but leave `Report.render()` as it was,
+`main("md")` prints `None`.
+The writer falls through every `case`,
+and `render()` reaches its end, where Python returns `None` implicitly.
+`ty` reports that path as `invalid-return-type`,
+since `render()` declares that it returns `str`.
+The first version below makes all three edits.
+In the second version,
+`Report.render()` calls `write()` on every writer,
+so `Report` stays the same when you add a writer.
 
 The first version gives each writer its own method name, which is the
 usual reason a class like `Report` ends up naming every writer. The
@@ -491,12 +500,13 @@ main("md")
 #: **Q3 sales**
 ```
 
-`MdWriter` is new code, so it does not count. Adding it edits three
+`MdWriter` is new code, so it stays out of the count. Adding it edits three
 existing things: the `AnyWriter` alias gains a member, `Report.render()`
-gains a `case`, and `main()` gains a `case`. `render()` belongs to
-`Report`, and the alias lists the writers `Report` accepts, so the
-change reaches two parts, `Report` and `main`, as the left half of the
-chapter's figure shows.
+gains a `case`, and `main()` gains a `case`. Two of those edits belong to
+`Report`.
+`render()` is its method, and the alias lists the writers `Report` accepts.
+The change therefore reaches two parts,
+as the left half of the chapter's figure shows: `Report` and `main`.
 
 The second version gives every writer the same method and lets
 `Report` name that method through a protocol:
@@ -552,13 +562,13 @@ Here adding `MdWriter` edits one existing thing, the `case` that
 `Writer`. The type checker matches each class to the protocol when
 `main()` assigns an instance to `writer`.
 
-The count is the answer, three edits in two parts against one edit in
-one part, but the places matter more than the number. In the first
-version a new format sends you into `Report`, a class whose subject is
-the report's content. In the second, the one edit sits in `main()`,
+The count gives the answer: three edits in two parts against one edit in
+one part. The places matter more than the number, though. In the first
+version a new format means editing `Report`, a class whose subject is
+the report's content. In the second, the one edit is in `main()`,
 the part whose job is to assemble the pieces. The `match` in `main()`
-names every writer class, so its heavy edges are the ones that remain,
-and a [registry](../../Chapters/27_Patterns--Factory.md#self-registration)
+names every writer class, so `main()`'s heavy edges are the ones that remain.
+A [registry](../../Chapters/27_Patterns--Factory.md#self-registration)
 moves them out of `main()` as well.
 
 </details>
