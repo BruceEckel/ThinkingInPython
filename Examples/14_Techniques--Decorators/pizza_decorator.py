@@ -40,10 +40,8 @@ class Feta(Topping):
     add_cost = 1.25
 
 if __name__ == "__main__":
-    order = Feta(Olives(Margherita()))
-    print(f"{order.description}: ${order.cost:.2f}")
-
-    haw = Garlic(Feta(Hawaiian()))
-    print(f"{haw.description}: ${haw.cost:.2f}")
+    for order in (Feta(Olives(Margherita())),
+                  Garlic(Feta(Hawaiian()))):
+        print(f"{order.description}: ${order.cost:.2f}")
 #: Margherita + Olives + Feta: $10.00
 #: Hawaiian + Feta + Garlic: $11.25

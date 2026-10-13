@@ -341,12 +341,8 @@ so `result` always holds a value of type `R` to return.
 import pytest
 from repeat import repeat
 
-@pytest.mark.parametrize("times, expected", [
-    (3, 3),
-    (1, 1),
-])
-def test_repeat_call_count(times: int,
-                           expected: int) -> None:
+@pytest.mark.parametrize("times", [3, 1])
+def test_repeat_call_count(times: int) -> None:
     calls: list[str] = []
 
     @repeat(times=times)
@@ -354,7 +350,7 @@ def test_repeat_call_count(times: int,
         calls.append("call")
 
     record()
-    assert len(calls) == expected
+    assert len(calls) == times
 
 @pytest.mark.parametrize("times", [0, -1])
 def test_repeat_rejects_times_below_one(times: int) -> None:
@@ -568,9 +564,9 @@ class trace[**P, R]:
         positional = [repr(a) for a in args]
         named = [f"{k}={v!r}" for k, v in kwargs.items()]
         arglist = ", ".join(positional + named)
-        print(f"-> {self.func.__name__}({arglist})")  # type: ignore
+        print(f"-> {self.__name__}({arglist})")
         result = self.func(*args, **kwargs)
-        print(f"<- {self.func.__name__} = {result!r}")  # type: ignore
+        print(f"<- {self.__name__} = {result!r}")
         return result
 
 @trace
@@ -593,6 +589,8 @@ and calling `add(2, 3)` invokes `__call__()`.
 `@wraps(func)` above `def wrapper` runs `update_wrapper(wrapper, func)`.
 The class form has no inner function to decorate, only `self`,
 so its `__init__()` calls `update_wrapper(self, func)`.
+The `__name__: str` declaration tells the type checker about the attribute `update_wrapper()` sets,
+so `__call__()` prints `self.__name__` with no `# type: ignore`.
 
 Like the function form, the class is generic in `**P` and `R`,
 so `__call__()` keeps the wrapped signature and `add(2, 3)` still type-checks as an `int`.
@@ -631,6 +629,8 @@ from collections.abc import Callable
 from functools import update_wrapper
 
 class count_calls[**P, R]:
+    __name__: str  # Set by update_wrapper(), not __init__
+
     def __init__(self, func: Callable[P, R]) -> None:
         self.func = func
         self.count = 0
@@ -639,7 +639,7 @@ class count_calls[**P, R]:
     def __call__(self, *args: P.args,
                  **kwargs: P.kwargs) -> R:
         self.count += 1
-        print(f"call {self.count} of {self.func.__name__}")  # type: ignore
+        print(f"call {self.count} of {self.__name__}")
         return self.func(*args, **kwargs)
 
 @count_calls
@@ -747,12 +747,8 @@ and `test_repeat_rejects_times_below_one` covers the rejection in the constructo
 import pytest
 from repeat_class import repeat
 
-@pytest.mark.parametrize("times, expected", [
-    (3, 3),
-    (1, 1),
-])
-def test_repeat_call_count(times: int,
-                           expected: int) -> None:
+@pytest.mark.parametrize("times", [3, 1])
+def test_repeat_call_count(times: int) -> None:
     calls: list[str] = []
 
     @repeat(times=times)
@@ -760,7 +756,7 @@ def test_repeat_call_count(times: int,
         calls.append("call")
 
     record()
-    assert len(calls) == expected
+    assert len(calls) == times
 
 @pytest.mark.parametrize("times", [0, -1])
 def test_repeat_rejects_times_below_one(times: int) -> None:
@@ -787,6 +783,7 @@ class logged:
 
     def __call__(self, *args: object,
                  **kwargs: object) -> object:
+        print(f"logged: args={args}")
         return self.func(*args, **kwargs)
 
 class Ex:
@@ -796,6 +793,7 @@ class Ex:
 
 ex = Ex()
 expect(TypeError, ex.method, 5)
+#: logged: args=(5,)
 #: [TypeError] Ex.method() missing 1 required positional
 #: argument: 'x'
 ```
@@ -806,9 +804,9 @@ an object with a `__get__()` method, and every ordinary function is one.
 A `logged` instance has no `__get__()`,
 so `ex.method` hands back the `logged` instance unbound,
 and `ex.method(5)` really calls `logged.__call__(logged_instance, 5)`.
+The printed `args=(5,)` shows what arrives: `5`, and no `Ex` instance.
 `self.func` runs with `5` as its only argument,
 so `5` fills `method`'s own `self` parameter and leaves nothing for `x`.
-The `Ex` instance never arrives.
 The `TypeError` blames a missing `x`,
 with no hint that the real cause is a missing `__get__()`.
 [Metaprogramming](17_Techniques--Metaprogramming.md#learning-a-name-with-__set_name__)
@@ -1133,11 +1131,9 @@ class Feta(Topping):
     add_cost = 1.25
 
 if __name__ == "__main__":
-    order = Feta(Olives(Margherita()))
-    print(f"{order.description}: ${order.cost:.2f}")
-
-    haw = Garlic(Feta(Hawaiian()))
-    print(f"{haw.description}: ${haw.cost:.2f}")
+    for order in (Feta(Olives(Margherita())),
+                  Garlic(Feta(Hawaiian()))):
+        print(f"{order.description}: ${order.cost:.2f}")
 #: Margherita + Olives + Feta: $10.00
 #: Hawaiian + Feta + Garlic: $11.25
 ```

@@ -3,6 +3,8 @@ from collections.abc import Callable
 from functools import update_wrapper
 
 class count_calls[**P, R]:
+    __name__: str  # Set by update_wrapper(), not __init__
+
     def __init__(self, func: Callable[P, R]) -> None:
         self.func = func
         self.count = 0
@@ -11,7 +13,7 @@ class count_calls[**P, R]:
     def __call__(self, *args: P.args,
                  **kwargs: P.kwargs) -> R:
         self.count += 1
-        print(f"call {self.count} of {self.func.__name__}")  # type: ignore
+        print(f"call {self.count} of {self.__name__}")
         return self.func(*args, **kwargs)
 
 @count_calls

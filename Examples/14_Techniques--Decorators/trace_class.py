@@ -15,9 +15,9 @@ class trace[**P, R]:
         positional = [repr(a) for a in args]
         named = [f"{k}={v!r}" for k, v in kwargs.items()]
         arglist = ", ".join(positional + named)
-        print(f"-> {self.func.__name__}({arglist})")  # type: ignore
+        print(f"-> {self.__name__}({arglist})")
         result = self.func(*args, **kwargs)
-        print(f"<- {self.func.__name__} = {result!r}")  # type: ignore
+        print(f"<- {self.__name__} = {result!r}")
         return result
 
 @trace

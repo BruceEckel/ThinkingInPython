@@ -6,6 +6,7 @@ from typing import ClassVar
 class trace_counting[**P, R]:
     # Shared by every decorated function:
     total_calls: ClassVar[int] = 0
+    __name__: str  # Set by update_wrapper(), not __init__
 
     def __init__(self, func: Callable[P, R]) -> None:
         self.func = func
@@ -19,9 +20,9 @@ class trace_counting[**P, R]:
         positional = [repr(a) for a in args]
         named = [f"{k}={v!r}" for k, v in kwargs.items()]
         arglist = ", ".join(positional + named)
-        print(f"-> {self.func.__name__}({arglist})")  # type: ignore
+        print(f"-> {self.__name__}({arglist})")
         result = self.func(*args, **kwargs)
-        print(f"<- {self.func.__name__} = {result!r}")  # type: ignore
+        print(f"<- {self.__name__} = {result!r}")
         return result
 
 @trace_counting

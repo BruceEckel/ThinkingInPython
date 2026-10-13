@@ -26,6 +26,7 @@ class logged:
 
     def __call__(self, *args: object,
                  **kwargs: object) -> object:
+        print(f"logged: args={args}")
         return self.func(*args, **kwargs)
 
 @dataclass

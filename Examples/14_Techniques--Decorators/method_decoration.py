@@ -8,6 +8,7 @@ class logged:
 
     def __call__(self, *args: object,
                  **kwargs: object) -> object:
+        print(f"logged: args={args}")
         return self.func(*args, **kwargs)
 
 class Ex:
@@ -17,5 +18,6 @@ class Ex:
 
 ex = Ex()
 expect(TypeError, ex.method, 5)
+#: logged: args=(5,)
 #: [TypeError] Ex.method() missing 1 required positional
 #: argument: 'x'
