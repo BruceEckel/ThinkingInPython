@@ -90,17 +90,26 @@ def flower_gen(n: int) -> Iterator[Flower]:
     flowers = Flower.__subclasses__()
     for _ in range(n):
         yield random.choice(flowers)()
+```
 
-# Now perform Bug operations on the flowers:
-if __name__ == "__main__":
-    bee = Bee()
-    fly = Fly()
-    worm = Worm()
-    random.seed(47)  # Reproducible flower sequence
-    for flower in flower_gen(4):
-        flower.accept(bee)
-        flower.accept(fly)
-        flower.accept(worm)
+`flower_gen()` reads the concrete classes from `Flower.__subclasses__()`,
+the same registry-free enumeration as [Factory](27_Patterns--Factory.md#simple-factory-method).
+
+`bug_visits.py` sends each bug to four random flowers:
+
+```python
+# bug_visits.py
+import random
+from flower_visitors import Bee, Fly, Worm, flower_gen
+
+bee = Bee()
+fly = Fly()
+worm = Worm()
+random.seed(47)  # Reproducible flower sequence
+for flower in flower_gen(4):
+    flower.accept(bee)
+    flower.accept(fly)
+    flower.accept(worm)
 #: Ranunculus pollinated by Bee
 #: Ranunculus pollinated by Fly
 #: Ranunculus eaten by Worm
@@ -114,9 +123,6 @@ if __name__ == "__main__":
 #: Chrysanthemum pollinated by Fly
 #: Chrysanthemum is toxic to Worm
 ```
-
-`flower_gen()` reads the concrete classes from `Flower.__subclasses__()`,
-the same registry-free enumeration as [Factory](27_Patterns--Factory.md#simple-factory-method).
 
 In the classic pattern the `accept()`/`visit()` pair is the *double dispatch*.
 Every element class overrides `accept()`,
@@ -135,7 +141,7 @@ and the flower's type chooses which `eat()` runs.
 If you delete the override, every flower resolves to the same `Flower.eat()`,
 and the visitor's type alone decides which method runs.
 
-`flower_visitors.py`'s output shows results, not mechanism.
+`bug_visits.py`'s output shows results, not mechanism.
 Printing the qualified name of the method to which each dispatch resolves makes both dispatches visible:
 
 ```python
@@ -158,7 +164,7 @@ because `Worm` inherits the operation from the class that defines it.
 For `Chrysanthemum` the second dispatch resolves to the override,
 and for `Gladiolus` to the inherited `Flower.eat`.
 The trace shows that flower-side choice,
-which `flower_visitors.py`'s output leaves implicit.
+which `bug_visits.py`'s output leaves implicit.
 
 ## The Price of the Empty Base
 
@@ -258,14 +264,9 @@ if __name__ == "__main__":
     for flower in flowers:
         print(nectar(flower), "| fragrance:",
               fragrance(flower))
-    print(sorted(cls.__name__ for cls in nectar.registry))
-    print(nectar.dispatch(Ranunculus)
-          is nectar.dispatch(Flower))
 #: Gladiolus: abundant nectar | fragrance: faint
 #: Ranunculus: no nectar | fragrance: strong
 #: Chrysanthemum: a little nectar | fragrance: faint
-#: ['Chrysanthemum', 'Gladiolus', 'object']
-#: True
 ```
 
 `@nectar.register` reads the annotation on the implementation's first parameter.
@@ -290,7 +291,19 @@ Every class descends from `object`,
 and `@singledispatch` registers the base implementation under `object`,
 so a type with no other registered ancestor gets the default.
 
-`visitor_singledispatch.py`'s last two output lines inspect the dispatch table the decorator built.
+`dispatch_table.py` inspects the dispatch table the decorator built:
+
+```python
+# dispatch_table.py
+from visitor_singledispatch import Ranunculus, nectar
+
+print(sorted(cls.__name__ for cls in nectar.registry))
+#: ['Chrysanthemum', 'Gladiolus', 'object']
+print(nectar.dispatch(Ranunculus)
+      is nectar.registry[object])
+#: True
+```
+
 `nectar.registry` maps each registered type to its implementation,
 and `nectar.dispatch(cls)` reports the implementation to which `cls` resolves.
 Nothing registers `Ranunculus`,
@@ -418,8 +431,8 @@ so the type checker reports an element that lacks `accept()`,
 such as `Corsage("rose")`, before the program runs.
 The loop in `Corsage.accept()` calls `accept()` on each element the same way,
 whether the element is a flower or another corsage.
-In `flower_visitors.py` the loop that calls `accept()` sits outside the hierarchy,
-in the main block, and takes one flower at a time from `flower_gen()`.
+In `bug_visits.py` the loop that calls `accept()` sits outside the hierarchy,
+at module level, and takes one flower at a time from `flower_gen()`.
 In `recursive_accept.py` the loop runs inside `accept()`,
 the situation where the classic pattern still fits.
 

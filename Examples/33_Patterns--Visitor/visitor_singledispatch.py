@@ -40,11 +40,6 @@ if __name__ == "__main__":
     for flower in flowers:
         print(nectar(flower), "| fragrance:",
               fragrance(flower))
-    print(sorted(cls.__name__ for cls in nectar.registry))
-    print(nectar.dispatch(Ranunculus)
-          is nectar.dispatch(Flower))
 #: Gladiolus: abundant nectar | fragrance: faint
 #: Ranunculus: no nectar | fragrance: strong
 #: Chrysanthemum: a little nectar | fragrance: faint
-#: ['Chrysanthemum', 'Gladiolus', 'object']
-#: True
