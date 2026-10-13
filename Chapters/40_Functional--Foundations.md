@@ -591,20 +591,20 @@ presetting the third argument meant presetting the first two as well.
 `functools.Placeholder` (Python 3.14 and later)
 is a marker that reserves a position for the caller.
 The type checker does not follow `Placeholder`,
-so the listing carries two `# type: ignore` comments:
+so the listing declares the type of the function it builds and carries one `# type: ignore` on the construction:
 
 ```python
 # placeholder.py
+from collections.abc import Callable
 from functools import Placeholder, partial
 
 def clamp(low: int, value: int, high: int, /) -> int:
     return max(low, min(value, high))
 
+percent: Callable[[int], int]
 percent = partial(clamp, 0, Placeholder, 100)  # type: ignore
-print(percent(150), percent(-5), percent(42))  # type: ignore
+print(percent(150), percent(-5), percent(42))
 #: 100 0 42
-print(percent.args)
-#: (0, Placeholder, 100)
 ```
 
 `percent` presets the bounds and leaves the middle argument open.
@@ -615,12 +615,19 @@ The library also rejects a trailing placeholder, because it would do nothing.
 `partial()` already appends the call's arguments after the bound ones,
 so `partial(clamp, 0, Placeholder)` would mean the same as `partial(clamp, 0)`.
 
-The `# type: ignore` comments mark a type checker limitation rather than a code problem.
+The `# type: ignore` comment marks a type checker limitation rather than a code problem.
 The stub for `partial()` does not yet describe what `Placeholder` does at runtime,
 so `ty` checks the three arguments in `partial(clamp, 0, Placeholder, 100)` against `clamp()`'s declared parameter types.
 `ty` therefore reports `Placeholder` as a value of the wrong type,
-and types the resulting callable as one that takes no arguments.
+and types the resulting callable as one that takes no arguments,
+which it then refuses to assign to the declared `Callable[[int], int]`.
+Both reports fall on the assignment line, so one comment covers them.
 The runtime behaves correctly.
+
+The declaration on its own line states the shape that `Placeholder` builds.
+`ty` takes the type of `percent` from that declaration and checks the three calls against it.
+A call to `percent()` with no argument draws a `missing-argument` report,
+so `ty` catches the `TypeError` case before the program runs.
 
 ## Composing Functions
 
