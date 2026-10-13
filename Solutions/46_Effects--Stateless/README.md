@@ -427,7 +427,8 @@ requests. `supply()` reads the Ability from each argument's declared
 type, so `supply(recorder, recorder)` builds a handler for
 `Need[Recorder]`, an Ability neither Effect requests. Each wrapper
 names the role this instance fills. Supplying the same object twice
-under two different types is the case for which `as_type()` exists.
+under two different types takes `as_type()`, since a bare `supply()`
+can see only one static type for the object.
 
 **Check the greeting and the log together.** Writing both assertions in one test is the payoff. A test holding the
 whole environment can check that the greeting reached the console
@@ -1270,7 +1271,7 @@ Effect per `Protocol`. The two `Protocol`s no longer overlap, so
 neither implementation satisfies both, and each Effect names the
 `Protocol` it needs.
 
-That change turns the coin flip into a diagnostic. If you add one
+That change turns the silent choice into a diagnostic. If you add one
 more line to the end of the listing, handing `to_log()` the object that
 prints instead of the one that records, `ty` rejects it before the
 program runs:

@@ -256,7 +256,8 @@ Stateless also provides three dependencies of its own:
 - `Console` in `stateless.console`,
   whose `print_line()` and `read_line()` accessors call its `print()` and `input()` methods,
 - `Files` in `stateless.files` that reads a whole file,
-- `Time` that [Adding Behavior to an Existing Effect](47_Effects--Stateless_in_Practice.md#adding-behavior-to-an-existing-effect)
+- `Time` in `stateless.time`,
+  which [Adding Behavior to an Existing Effect](47_Effects--Stateless_in_Practice.md#adding-behavior-to-an-existing-effect)
   supplies to `retry()`.
 
 All three are concrete classes rather than interfaces.
@@ -311,9 +312,9 @@ except StopIteration:
 #: greet() finished
 ```
 
-`need(Console)` builds a `Need[Console]`,
-a frozen data class whose `t` field holds the requested class,
-and `yield from` yields that `Need` out of the function body.
+`need(Console)` builds a small generator that yields a `Need[Console]`,
+a frozen data class whose `t` field holds the requested class.
+`yield from` passes that `Need` out of `greet()`'s body.
 `next()` runs `greet()` up to that request and produces it.
 Nothing has printed at that point,
 because `greet()` has suspended at the `yield` inside `need()`.
@@ -1135,9 +1136,12 @@ so `supply(recorder)` is a `Handler[Need[Recorder]]`,
 and no `Need[Console]` matches it.
 
 `DI_CONTAINER` holds instances of unrelated types,
-so `Any` is the one type its values share.
-The key carries the type information,
-but a homogeneous `dict` types every value alike.
+and a `dict` gives every value the same type.
+The key carries the type information.
+With `object` as the value type,
+the type checker rejects `get()`'s `return DI_CONTAINER[t]`,
+because an `object` is not a `T`.
+`Any` passes as a `T`, so the values are `Any`.
 The invariant "the value under key `type[T]` is a `T`" therefore lives in `register()`'s signature rather than in the container.
 
 `greet()`'s body matches `greeter.py`'s `greet()` line for line,
@@ -1210,7 +1214,7 @@ so the objection concerns churn and coupling rather than correctness.
 A pass-through function such as `greet_all()` still names `Need[Log]` in its type,
 and taking that Ability back out later changes every signature on the path a second time.
 People made the same complaint against [Java's checked exceptions](44_Effects--Effect_Management.md#catch-the-exception-you-expect),
-which failed this way.
+where an exception added three levels down meant editing every signature above it.
 That complaint is why [Effects Propagate, and the Type Checker Verifies It](#effects-propagate-and-the-type-checker-verifies-it)
 compares the propagation to `async`.
 
@@ -1220,7 +1224,8 @@ compares the propagation to `async`.
 which names `Async` because `run()` answers that request.
 No listing has made one.
 `wait()` puts `Async` into a signature deliberately.
-`yield from wait()` accepts any awaitable and produces the value that awaitable produces:
+It accepts any awaitable,
+and `yield from wait(...)` produces the value that awaitable produces:
 
 ```python
 # stateless_coroutine.py
@@ -1252,7 +1257,7 @@ so the type checker rejects `Depend[Console, None]` at the annotation.
 [Abilities Are Not Special](47_Effects--Stateless_in_Practice.md#abilities-are-not-special)
 writes an Ability from scratch and takes that type bound apart.
 
-An `Async` request carries a coroutine and asks the driver to await it.
+An `Async` request carries an awaitable and asks the driver to await it.
 `run()` does that with the event loop it starts.
 So nothing supplies `Async`.
 The driver answers it, and `supply()` handles only a `Need`.
@@ -1368,8 +1373,9 @@ and `Instant` answers each one at once.
 The subclass goes through [`as_type(Time)`](#supplying-an-interface),
 as `Recorder` goes through `as_type(Console)`.
 
-In `Instant`, `waited` is a field because `Time` is a frozen data class and a subclass must be frozen too,
-and the record drops its slots because `Time` declares none.
+`Instant` is a record because `Time` is a frozen data class,
+and a data class that inherits from a frozen one must be frozen too.
+The record drops its slots because `Time` declares none.
 Freezing prevents rebinding `waited`,
 and `sleep()` can still append to the list it holds.
 
@@ -1381,7 +1387,7 @@ Building and tearing down that loop takes time,
 even for an Effect with no `Async` in it.
 On Windows, `run(success(42))` measured about 650 microseconds
 (about 75 on Linux),
-four to five orders of magnitude above a plain function call.
+three to four orders of magnitude above a plain function call.
 That is the cost behind ["a synchronous program calls it once, at the outermost edge"](#the-simplest-effect).
 `test_nailer.py` starts a loop once per parametrized case,
 which is fine for four rows and worth remembering for a much longer parametrized list.
@@ -1853,7 +1859,7 @@ Emptying a channel takes one of two vocabularies, and a third case needs none:
 The vocabularies differ, and the operation underneath them is the same.
 Both subtract from the type.
 `supply()` removes an Ability from the union,
-and the channel reads `Never` once the last Ability is answered.
+and the channel reads `Never` once a handler answers the last Ability.
 `catch()` removes an error and moves it into the result,
 where a `match` must account for it.
 An Effect with both channels emptied is a `Success`.
