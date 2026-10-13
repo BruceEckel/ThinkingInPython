@@ -528,14 +528,6 @@ class Tile(Enum):
         member._value_ = symbol
         member.walkable = walkable
         return member
-
-if __name__ == "__main__":
-    print(Tile.GRASS is Tile["GRASS"] is Tile("."))
-    print(Tile.WATER.value, Tile.WATER.walkable)
-    print([t.value for t in Tile])
-#: True
-#: ~ False
-#: ['.', '~', '#']
 ```
 
 `walkable` is a bare annotation, not a `ClassVar`.
@@ -560,6 +552,21 @@ skipping `Tile.__new__()` so the call does not recurse.
 `_value_` is a name Enum's metaclass reads,
 to build the `Tile(".")` lookup table and the member's `repr()`,
 so `__new__()` must assign to that exact name rather than a name of its own such as `_symbol_`.
+
+`tile_enum_demo.py` looks up one member by name, by symbol, and by attribute,
+then reads a member's fields:
+
+```python
+# tile_enum_demo.py
+from tile_enum import Tile
+
+print(Tile.GRASS is Tile["GRASS"] is Tile("."))
+#: True
+print(Tile.WATER.value, Tile.WATER.walkable)
+#: ~ False
+print([t.value for t in Tile])
+#: ['.', '~', '#']
+```
 
 Name, symbol, and attribute access all reach the same shared member.
 The enum version also brings iteration, exhaustive `match`,
