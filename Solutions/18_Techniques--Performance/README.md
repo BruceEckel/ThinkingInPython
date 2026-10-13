@@ -60,17 +60,16 @@ print(f"set faster on average-case targets too: "
 #: set faster on average-case targets too: True
 ```
 
-The conclusion does not change. `target = n - 1` in the original
-measures the single worst case for a `list` scan: the element the
-scan reaches only after walking past every other one. Random targets
-cover every position instead, including targets near the front that a
-`list` finds quickly. The `set`'s O(1) hash lookup still beats the
-`list`'s O(n) scan by a wide margin (thousands of times faster in
-this run), because the scan for an average target still walks about
-half the `list`, far more work than one hash lookup. The worst case
-and the average case tell the same story here.
-They diverge when most real lookups cluster near
-the front of the list.
+The conclusion stays the same.
+`target = n - 1` in the original measures the single worst case for a `list` scan:
+the element the scan reaches last, after walking past every other one.
+Random targets cover every position instead,
+including targets near the front that a `list` finds quickly.
+The scan for an average target walks about half the `list`,
+far more work than one hash lookup.
+The `set`'s O(1) lookup therefore still beats the `list`'s O(n) scan by a wide margin,
+thousands of times faster in this run.
+The worst case and the average case diverge when most real lookups cluster near the front of the list.
 
 </details>
 </details>
@@ -106,18 +105,17 @@ for size in (1, 2, 5, 10, 20, 50, 100, 200, 500):
     print(size, winner)
 ```
 
-On this machine, the `set` wins starting at size `2`. Only at
-size `1` does the `list` edge ahead, and then barely. The
-`set`'s advantage grows steadily as `size` increases, as the
-different growth rates (`O(1)` vs. `O(n)`) predict.
+On this machine, the `list` is faster at size `1`, by a small margin.
+The `set` wins from size `2` on,
+and its advantage grows steadily as `size` increases,
+as the different growth rates (`O(1)` vs. `O(n)`) predict.
 
-The crossover point varies. It depends on the
-machine, the Python build, and even which values you store,
-because the race is between one hash computation and a short
-linear scan that costs almost nothing until the list grows
-long. Run the same loop yourself and expect a different exact
-number, though the trend (the `list`'s relative advantage, if
-any, evaporating almost immediately) should look similar.
+The crossover point depends on the machine, the Python build, and the values you store,
+because the timing compares one hash computation against a short linear scan
+that stays fast until the list grows long.
+Run the same loop yourself and expect a different number,
+though the trend should look similar.
+The `set` should win within the first few sizes.
 
 </details>
 </details>
@@ -131,7 +129,7 @@ any, evaporating almost immediately) should look similar.
 <summary>Where to look</summary>
 
 [Lazy Evaluation with Generators](../../Chapters/18_Techniques--Performance.md#lazy-evaluation-with-generators) compares an eager two-list version with a lazy pipeline.
-Fold the squaring and the evenness test into one comprehension, so no intermediate `squares` list exists.
+Fold the squaring and the evenness test into one comprehension, so it builds one list instead of two.
 Measure each version's peak with `tracemalloc.get_traced_memory()`, and compare both against the lazy version.
 
 <details>
@@ -198,20 +196,19 @@ print(f"lazy peak under 1% of one list: "
 #: lazy peak under 1% of one list: True
 ```
 
-**Skip the intermediate list.** `one_list()` filters `x * x` instead
+**Build one list.** `one_list()` filters `x * x` instead
 of first building a `squares` list and then an `evens` list from it,
-so the million-element `squares` list disappears. Peak memory drops
-to about half of the two-list version's. That is as close as an eager
-version gets.
+so the million-element `squares` list disappears.
+Peak memory drops to about half of the two-list version's.
+That is as close as an eager version gets.
 
-**Measure the remaining gap.** The last line shows how far away
-the eager version still is. The lazy peak is under one percent of
-the one-list peak. The comprehension must build and
-hold the whole list of half a million even squares before `[:5]`
-discards nearly all of them. Restructuring the eager version cannot
-close that gap, because an eager version computes every value up
-front. The lazy generator pipeline stops when `islice()` has its
-five values, so it builds no large collection.
+**Measure the remaining gap.** The last line shows that the lazy peak is under one percent of the one-list peak.
+The comprehension must build and hold the whole list of half a million even squares
+before `[:5]` discards nearly all of them.
+Restructuring the eager version cannot close that gap,
+because an eager version computes every value up front.
+The lazy generator pipeline stops when `islice()` has its five values,
+so it computes nine squares and stores the five even ones it returns.
 
 </details>
 </details>
@@ -269,13 +266,12 @@ result and skips the function body, along with its `print()`
 call and any other side effect.
 
 Skipping the body is the reason to cache only pure functions.
-A cache assumes that calling the function again is unnecessary,
-because the answer cannot have changed and the call does nothing
-observable besides computing that answer. An impure
-function breaks that assumption. The function performs any side
-effect, such as printing, writing a file, or incrementing a
-counter, on the first call with a given argument, and the cache
-silently skips it on every repeat.
+A cache assumes its stored answer can stand in for a repeat call,
+because the same argument gives the same answer
+and computing that answer is all the call does.
+An impure function breaks that assumption.
+It prints, writes a file, or increments a counter on the first call with a given argument,
+and the cache silently skips that side effect on every repeat.
 
 </details>
 </details>
@@ -302,7 +298,7 @@ If you keep `heap.pop(0)` from the original,
 the three pops return `3`, `6`, and `4`,
 and the check prints `False` after the first and the third.
 Removing the front element shifts the rest of the list one place left,
-and the shifted list no longer satisfies the heap ordering.
+and the shifted list breaks the heap ordering.
 The solution calls `heappop()`, which restores that ordering after every removal,
 so `heap[0]` stays the smallest value.
 
@@ -323,19 +319,22 @@ for _ in range(3):
 #: 5 [6, 7, 8, 9, 10] True
 ```
 
-**Check the invariant after each pop.** Each pop returns the true smallest remaining value: `3`, then `4`,
-then `5`. After every pop, `heap[0]` is still the minimum. Compare
-`heap.pop(0)` in the original, which returns the right value once and
-then leaves a list that is no longer a heap.
+**Check the invariant after each pop.** Each pop returns the true smallest remaining value: `3`, then `4`, then `5`.
+After every pop, `heap[0]` is the minimum.
+`heap.pop(0)` in the original returns the right value on the first pop,
+but it shifts `6` to the front, ahead of the smaller `4`,
+so the second pop returns `6`.
 
-The list still looks unsorted because a heap does not guarantee
-sorted order. A heap guarantees that the element at position `i` is
-no larger than its two children at positions `2i + 1` and `2i + 2`,
-which puts the smallest element at index 0 and leaves the order of
-the rest open. `heappop()` maintains that weaker property in
-O(log n) comparisons. The last element moves to the front and sinks
-back down. Sorting the whole list on every pop costs far more and
-gains nothing, since callers read only the front element.
+The list still looks unsorted because a heap guarantees a weaker order than sorting.
+A heap guarantees that the element at position `i` is less than or equal to both of its children
+at positions `2i + 1` and `2i + 2`,
+which puts the smallest element at index 0 and leaves the order of the rest open.
+
+`heappop()` maintains that weaker property in O(log n) comparisons.
+The last element moves to index 0,
+then moves down the tree past each smaller child until the heap property holds again.
+Sorting the whole list on every pop does far more work,
+and the extra order goes unused, since callers read only the front element.
 
 </details>
 </details>
@@ -392,24 +391,23 @@ print(Point3D.__slots__)
 #: ('x', 'y')
 ```
 
-**Locate the new attribute's storage.** `Point` refuses `p.z = 3` with an `AttributeError`, but `Point3D`
-accepts it, and `vars(p)` shows where the value went: an instance
-`__dict__` that the base class does not have.
-Declaring `__slots__` does not disable the instance dictionary for a
-whole hierarchy. It omits the `__dict__` from the declaring class alone.
-Any subclass that does not declare its own `__slots__` gets the
-default behavior, a `__dict__`, and inherits the parent's slots
-alongside it.
+**Locate the new attribute's storage.** `Point` rejects `p.z = 3` with an `AttributeError`, but `Point3D`
+accepts it.
+`vars(p)` shows what holds the value:
+an instance `__dict__`, which `Point` instances do not have.
+Declaring `__slots__` removes the `__dict__` from the declaring class alone.
+A subclass that declares no `__slots__` of its own gets the default `__dict__`,
+alongside the slots it inherits.
 
-**Expose the inherited `__slots__`.** The last line shows the trap.
-`Point3D.__slots__` reads `('x', 'y')`, inherited from `Point`, so
-reading that attribute makes the subclass look slotted while it still
-carries a `__dict__`.
+**Expose the inherited `__slots__`.** The last line shows why the subclass's `__dict__` is easy to miss.
+`Point3D.__slots__` reads `('x', 'y')`, inherited from `Point`,
+so reading that attribute makes the subclass look slotted
+while it still carries a `__dict__`.
 
-`Point3D` quietly loses the memory saving. Every instance holds
-both the two slots and a dictionary. A subclass of a slotted class must
-declare `__slots__`, using an empty tuple when it adds no
-fields of its own.
+`Point3D` loses the memory saving silently.
+Every instance holds both the two slots and a dictionary.
+A subclass of a slotted class must declare `__slots__`,
+using an empty tuple when it inherits all its fields.
 
 </details>
 </details>
@@ -494,23 +492,24 @@ print(counts)
 #: Counter({'fib': 177, 'square': 1})
 ```
 
-With `set_events()` in place of the local attachment, the new entry
-is `'square': 1`. Nothing else appears, because `PY_START` fires when
-a Python code object starts running, and the module's own frame
-starts before the tool attaches. CPython implements `print()` in C,
-so it starts no Python frame, and a program this small has no
-other candidates.
+With `set_events()` in place of the local attachment,
+the new entry is `'square': 1`.
+Nothing else appears,
+because the interpreter reports `PY_START` when a Python code object starts running,
+and the module's own frame starts before the tool attaches.
+CPython implements `print()` in C, so it starts no Python frame.
+A program this small has no other candidates.
 
-The two local attachments above produce the identical `Counter`, and
-that agreement is an artifact of the example's size. In a real
-program `set_events()` reports every Python function the process
-runs, including library code you did not write and did not want
-counted, and it runs the callback on every one of those functions.
-Local attachment names the code objects you care about and leaves the rest
-running at full speed. Global monitoring answers "what ran."
-Local monitoring answers "how often did this run," which is the
-question you had when you opened `sys.monitoring` instead of
-a profiler.
+The two local attachments above produce the same `Counter`,
+and that agreement is an artifact of the example's size.
+In a real program `set_events()` reports every Python function the process runs,
+so library code fills the `Counter` beside your own functions,
+and the callback runs on every call to each of those functions.
+Local attachment names the code objects you care about
+and leaves the rest running at full speed.
+Global monitoring answers "what ran."
+Local monitoring answers "how often did this run,"
+which is the question you had when you opened `sys.monitoring` instead of a profiler.
 
 </details>
 </details>
@@ -544,7 +543,8 @@ def outer() -> int:
 <details>
 <summary>Solution</summary>
 
-Any script works. This one makes the two columns disagree on purpose:
+Any script works.
+Here, `exercise_8.py` makes the two columns disagree on purpose:
 
 ```python
 # exercise_8.py
@@ -558,27 +558,28 @@ print(outer() > 0)
 #: True
 ```
 
-Run `uv run python -m cProfile -s cumulative exercise_8.py`. The
-largest
-`cumtime` belongs to `exec`, then `<module>`, then `outer`. The
-largest `tottime` belongs to `{built-in method builtins.sum}`, with
-the generator expression inside `inner()` second: the largest of the
-script's own Python frames, where the arithmetic runs.
+Run `uv run python -m cProfile -s cumulative exercise_8.py`.
+The largest `cumtime` belongs to `exec`, then `<module>`, then `outer`.
+The largest `tottime` belongs to `{built-in method builtins.sum}`.
+The generator expression inside `inner()` comes second.
+It is the largest of the script's own Python frames, because the arithmetic runs there.
 
 The two columns pick different functions because they measure different things.
 `cumtime` is the time from entering a function to leaving it,
-including everything it called, so a caller's `cumtime` always covers
-the work beneath it. Every caller on the path accumulates the same
-time. `tottime` excludes the callees, so it attributes time to the
-frame that is executing.
+including everything it called,
+so a caller's `cumtime` always covers the work beneath it.
+Every caller on the path accumulates the same time.
+`tottime` excludes the callees,
+so it attributes time to the frame that is executing.
 
-A function high on `cumtime` and near zero on `tottime` is a
-pass-through. It is slow because of what it calls, so a faster
-body changes nothing and fewer calls to its callees help.
-The two columns hold the same value only for a leaf function, one
-that calls nothing else. The top of the `cumtime` ranking is the
-outermost frame, which calls everything and does almost none of the
-work, so the two rankings usually open on different functions.
+A function high on `cumtime` and near zero on `tottime` is a pass-through.
+It is slow because of what it calls,
+so the gains are in its callees, and in how often it calls them.
+
+The two columns hold the same value only for a leaf function, one that calls nothing else.
+The top of the `cumtime` ranking is the outermost frame,
+which calls everything and does almost none of the work,
+so the two rankings usually open on different functions.
 
 </details>
 </details>
@@ -636,21 +637,21 @@ print(f"array is slower to iterate: {t_array > t_list}")
 #: array is slower to iterate: True
 ```
 
-Not faster: on one machine the `array` took about 1.4 times as long
-as the `list`. The memory saving is real (the chapter measures
-325,176 bytes against 80,080). The speed saving does not exist.
+Not faster: on one machine the `array` took about 1.4 times as long as the `list`.
+The memory saving is real (the chapter measures 325,176 bytes against 80,080),
+but the `array` is the slower of the two.
 
-A `list` of floats stores pointers to `float` objects that already
-exist, so reading an element hands back a reference. An `array` stores raw
-eight-byte doubles instead of objects, so reading an element
-builds a fresh `float` object to hand to Python. That allocation,
-on every single element, eats the advantage of the tighter layout.
+A `list` of floats stores pointers to existing `float` objects,
+so reading an element hands back a reference.
+An `array` stores raw eight-byte doubles instead of objects,
+so reading an element builds a fresh `float` object to hand to Python.
+That allocation, on every element, outweighs the advantage of the tighter layout.
 
-That cost is the chapter's NumPy lesson arriving early. A compact
-layout saves time when the loop over it leaves Python. `sum()` over an
-`array` stays in Python and boxes every element. NumPy's `sum()` over
-the same bytes creates no Python object per element, which is why
-vectorizing wins where `array` alone does not.
+The per-element allocation previews the chapter's NumPy lesson.
+A compact layout saves time when the loop over it reads raw values instead of Python objects.
+`sum()` over an `array` works on Python objects and boxes every element.
+NumPy's `sum()` adds the same raw doubles in a C loop,
+which is why vectorizing is faster and `array` alone is not.
 
 </details>
 </details>
@@ -722,25 +723,26 @@ print(f"both under 50 microseconds per call at 100 parts: "
 #: both under 50 microseconds per call at 100 parts: True
 ```
 
-The ratio does not go away. One machine measured `join` about 19
-times faster at 10,000 parts and about 7 times faster at 100. What
-goes away is the amount at stake. At 100 short strings both versions
-finish in a couple of microseconds, so the loop must run thousands
-of times before the choice shows up in a profile.
+The ratio persists.
+One machine measured `join` about 19 times faster at 10,000 parts and about 7 times faster at 100.
+What shrinks is the absolute time.
+At 100 short strings both versions finish in a couple of microseconds,
+so `build_join()` and `build_concat()` must run thousands of times before the choice shows up in a profile.
 
-The answer to "at which size does it stop mattering" is therefore not
-a size where the two versions become equally fast, but a size where both
-are fast enough that the difference is below anything you would
-measure.
+The difference therefore stops mattering once both versions run fast enough
+that the gap falls below anything you would measure,
+not once the two run equally fast.
 
-Still, write `join()`. It is one line instead of three, it says what
-the result is rather than how it accumulates, and it is the version
-that keeps working when the 100 parts turn into 100,000. CPython
-does special-case `out += p` when `out` has a single reference,
-resizing in place instead of copying, which is why the loop is merely
-slower rather than quadratic. That optimization is an implementation
-detail, and it disappears the moment a second name refers to the
-string the loop is building.
+Write `join()` at either size.
+It is one line instead of three,
+it says what the result is rather than how the parts accumulate,
+and it stays fast when the 100 parts turn into 100,000.
+
+The `+=` loop is merely slower rather than quadratic
+because CPython special-cases `out += p` when `out` has a single reference,
+resizing in place instead of copying.
+That optimization is an implementation detail.
+CPython stops applying it as soon as a second name refers to the string the loop is building.
 
 </details>
 </details>
@@ -763,12 +765,13 @@ Index the list at both positions to see which one is the target's first copy and
 <details>
 <summary>Solution</summary>
 
-If you find the first `5` with `bisect()`, as `bisect_search.py` does
-for its insertion point, `left` comes back as `5`, `xs[left]` prints
-`7`, and `xs[left:right]` prints `[]`. `bisect()` returns the position
-after the last equal element, the right place to insert a duplicate
-and the wrong place to read one. The solution uses `bisect_left()` for
-the first occurrence and keeps `bisect()` for the end of the run.
+`bisect_search.py` calls `bisect()` to find an insertion point.
+If you call `bisect()` to find the first `5` instead,
+`left` comes back as `5`, `xs[left]` prints `7`, and `xs[left:right]` prints `[]`.
+`bisect()` returns the position after the last equal element,
+the right place to insert a duplicate and the wrong place to read one.
+The solution uses `bisect_left()` for the first occurrence
+and keeps `bisect()` for the end of the run.
 
 ```python
 # ch18_bisect_duplicates.py
@@ -791,20 +794,21 @@ print(xs)
 #: [1, 3, 5, 5, 5, 5, 7, 9]
 ```
 
-**Find the start of the run.** `bisect_left()` finds the first occurrence. It returns the position
-before any equal elements, so `xs[left]` is the target when the
-target is present, which is what a membership test needs and what
-`search_comparison.py` assumes.
+**Find the start of the run.** `bisect_left()` finds the first occurrence.
+It returns the position before any equal elements,
+so `xs[left]` is the target when the target is present.
+A membership test needs that, and `search_comparison.py` relies on it.
 
 **Find the end of the run.** `bisect()`, the alias for `bisect_right()`, returns the position
-after the last equal element. That is the position at which
-to insert a new duplicate after the existing ones. It is the
-wrong index to read. `xs[right]` is the next larger value, or an
-`IndexError` when the target is the largest element in the list.
+after the last equal element.
+That position is where a new duplicate goes, after the existing ones,
+and it is the wrong index to read.
+`xs[right]` is the next larger value,
+or an `IndexError` when the target is the largest element in the list.
 
-**Recover the whole run.** The pair together answers a third question the chapter does not
-raise. `xs[left:right]` is the run of equal values, and
-`right - left` counts them, both in O(log n) with no scan.
+**Recover the whole run.** `left` and `right` together answer a third question, one the chapter leaves unasked.
+`xs[left:right]` is the run of equal values,
+and `right - left` counts them, both in O(log n) with no scan.
 
 </details>
 </details>
@@ -834,58 +838,56 @@ import sys
 print(sys._jit.is_available(), sys._jit.is_enabled())
 ```
 
-The listing carries no `#:` line, because its output depends on the
-interpreter. The book's build prints `False False`.
+The listing carries no `#:` line, because its output depends on the interpreter.
+The book's build prints `False False`.
 
-The two flags name the state. `False False` means the build
-has no JIT compiled in, so `PYTHON_JIT` does nothing. `True False` is
-the python.org Windows and macOS shape, built with
-`--enable-experimental-jit=yes-off`. The compiler sits in the binary,
-waiting for `PYTHON_JIT=1`. `True True` means the JIT is already
-running, and `PYTHON_JIT=0` switches it back off.
+The two flags name the state.
+`False False` means the build has no JIT compiled in, so `PYTHON_JIT` does nothing.
+The python.org Windows and macOS builds report `True False`,
+because python.org compiles them with `--enable-experimental-jit=yes-off`.
+A `True False` binary contains the JIT compiler,
+and `PYTHON_JIT=1` turns it on.
+`True True` means the JIT is already running,
+and `PYTHON_JIT=0` switches it back off.
 
-On a `True False` build, the comparison is two runs of the same file
-with nothing else changed. `tip` and `uv run` use the project's own
-interpreter, which has no JIT, so run the file with the `True False`
-build's `python`, from the chapter directory with `utils/` on the import path
+On a `True False` build,
+the comparison is two runs of the same file that differ in `PYTHON_JIT` alone.
+`tip` and `uv run` use the project's own interpreter, which has no JIT.
+Run the file with the `True False` build's `python` instead, from the chapter directory with `utils/` on the import path
 (`tip membership` prints those commands in your shell's syntax):
 
     $ cd Examples/18_Techniques--Performance
     $ PYTHON_JIT=0 PYTHONPATH=../utils python membership.py --numbers
     $ PYTHON_JIT=1 PYTHONPATH=../utils python membership.py --numbers
 
-`membership.py` is a poor subject for that comparison, for three
-reasons.
+`membership.py` is a poor subject for that comparison, for three reasons.
 
-The measured work runs in C, not in bytecode. `target in as_list`
-and `target in as_set` both run their loops in the interpreter's own
-C code, so almost none of the time the listing reports is time the
-JIT could compile. The advice in [Write Idiomatic
-Python](../../Chapters/18_Techniques--Performance.md#write-idiomatic-python) speeds
-a program up for the same reason. Work handed to C is work the
-interpreter skips, and the JIT compiles only what the interpreter
-runs.
+The measured work runs in C, not in bytecode.
+`target in as_list` and `target in as_set` both do their work in the interpreter's C code.
+Work done in C runs no bytecode,
+and the JIT compiles only the bytecode the interpreter runs,
+so the JIT could speed up almost none of the time the listing reports.
+The advice in [Write Idiomatic Python](../../Chapters/18_Techniques--Performance.md#write-idiomatic-python) speeds a program up for the same reason.
 
-The program is too short to get hot. The JIT compiles a code path
-after it has run often enough to look worth compiling. A script that
-starts, times two kinds of lookup, and exits spends time tracing and
-compiling whatever it does reach, then exits before the compiled
-code has saved as much time as the compiling took.
+The program is too short to get hot.
+The JIT compiles a code path after the path has run enough times to cross a threshold,
+and the JIT spends time tracing and compiling whatever code crosses that threshold.
+`membership.py` starts, times two kinds of lookup,
+and exits before the compiled code has saved as much time as the compiling took.
 
-The listing prints a ratio, not a duration. `set at least 100x
-faster` compares the two lookups against each other, so anything
-that speeds up or slows down both of them equally leaves that ratio
-alone. On a python.org 3.15 build, the `--numbers` lines from the
-two runs differ by no more than two runs under the same setting do.
+The listing prints a ratio, not a duration.
+`set at least 100x faster` compares the two lookups against each other,
+so anything that speeds up or slows down both of them equally leaves that ratio as it was.
+On a python.org 3.15 build, the `--numbers` lines from the two runs
+differ by about as much as two runs under the same setting.
 
-A better subject runs a Python-level loop over Python objects, long
-enough to cross the compiler's threshold and keep going:
+A better subject runs a Python-level loop over Python objects,
+long enough to cross the compiler's threshold and keep going:
 `count_primes()` from the
 [Numba section](../../Chapters/18_Techniques--Performance.md#jit-compilation-with-numba),
-at its full `limit`, timed
-with `min(timeit.repeat(...))`. Expect a single-digit percentage
-either way, and run-to-run noise of the same size. That noise is why
-`pyperformance` reports a geometric mean over dozens of benchmarks
+at its full `limit`, timed with `min(timeit.repeat(...))`.
+Expect a single-digit percentage either way, and run-to-run noise of the same size.
+That noise is why `pyperformance` reports a geometric mean over dozens of benchmarks
 instead of one number from one program.
 
 </details>
