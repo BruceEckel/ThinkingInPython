@@ -44,15 +44,12 @@ to distinguish it from an `Any` you wrote yourself.
 They behave the same.
 Both are compatible with everything.
 
-`Any` and `object` differ.
-Both accept every value,
-but `object` guarantees nothing about the value once you have it,
-so the type checker rejects every operation beyond `object`'s own.
-`Any` permits every operation instead,
-so it opts out of checking rather than describing a wide set of values.
+`Any` and `object` differ, though both accept every value.
 `object` is the base of every class,
-so the type checker treats an `object` value as a checked value with the methods every class shares,
-while `Any` switches the checker off for that one value.
+so an `object` value carries the methods every class shares,
+and the type checker rejects every operation beyond `object`'s own.
+`Any` permits every operation instead,
+so it switches the checker off for that value rather than describing a wide set of values.
 Choose `object` for a value you store or pass along untouched,
 and `Any` for one whose operations you would rather check by hand.
 
@@ -188,10 +185,10 @@ so test `is not None` when an empty value counts as supplied (see exercise 8).
 The same narrowing follows an `isinstance()` check, an equality test,
 or an identity test against a specific value such as `is not SOME_SENTINEL`.
 
-An `object` parameter depends on narrowing.
+Narrowing also makes an `object` parameter usable.
 [Gradual Typing](#gradual-typing)
 says the type checker rejects every operation on an `object` beyond `object`'s own,
-so the function needs an `isinstance()` test before it can do more with the value:
+so a function needs an `isinstance()` test before it can do more with the value:
 
 ```python
 # object_narrowing.py
@@ -216,7 +213,7 @@ and `describe(42)` then fails at runtime with an `AttributeError`.
 
 Narrowing an attribute is riskier than narrowing a local variable.
 A call between the check and the use can reset that attribute,
-and the type checker has no way to see inside that call:
+and the type checker assumes the call leaves the attribute as it was:
 
 ```python
 # narrowing_attribute.py
@@ -278,12 +275,15 @@ print(MAX_RETRIES, GREETING, HISTORY)
 #: 3 hello ['first']
 ```
 
-`Final` blocks rebinding the name, not mutation of the object the name holds.
+`Final` invites a misconception.
+The word suggests immutability, but `Final` blocks rebinding the name,
+not mutation of the object the name holds.
 `HISTORY.append("first")` checks and runs,
 the same as it does on a non-`Final` list.
 The type checker refuses only an assignment to the name `HISTORY`.
-`Final` invites a misconception.
-The word suggests immutability, but the object stays mutable.
+For a collection that must stay as it is,
+hold a tuple or a `frozenset` under the `Final` name,
+since neither type has a method that changes its contents (see exercise 10).
 
 You can give the type explicitly, as in `GREETING`,
 or let the type checker infer it from the value, as with `MAX_RETRIES`.
@@ -311,9 +311,8 @@ Dynamic typing and structural typing are the same idea checked at different mome
 Dynamic typing trusts the object once the code is running,
 while structural typing proves the shape beforehand.
 
-A *Protocol* expresses shape.
 Some statically typed languages make you declare up front that a class "is a" `Drawable` by inheriting from it.
-A `Protocol` instead describes a required shape.
+A *Protocol* instead describes a required shape.
 Any object with that shape qualifies, without inheriting from a base class:
 
 ```python
@@ -353,11 +352,6 @@ The signature is part of that shape.
 A `draw()` whose signature differs from `draw(self) -> str`,
 by returning an `int` or by requiring an argument, does not match.
 
-A `Protocol` is a checking-time construct,
-so `isinstance(Circle(), Drawable)` raises a `TypeError` instead of answering.
-Decorating the Protocol with `@runtime_checkable` allows the call,
-but `isinstance()` then makes a [weaker check](26_Patterns--Surrogate.md#what-the-implementation-supplies).
-
 `Drawable` appears in one place, the annotation on `render()`'s parameter.
 If you pass an object without a `draw()` to `render()`,
 the type checker rejects the call.
@@ -365,6 +359,12 @@ the type checker rejects the call.
 It draws, in the everyday sense, but the method's name is `paint()`,
 and a protocol matches on names and signatures rather than on intent.
 Protocols preserve the flexibility of dynamic typing but add the early warning of static type checking.
+
+A `Protocol` is a checking-time construct,
+so `isinstance(Circle(), Drawable)` raises a `TypeError` instead of answering.
+Decorating the Protocol with `@runtime_checkable` allows the call,
+but `isinstance()` then makes a [weaker check](26_Patterns--Surrogate.md#what-the-implementation-supplies):
+it confirms that each method exists and ignores its signature.
 
 ## Classes as Values: `type[C]` {#classes-as-values-type}
 
@@ -670,6 +670,24 @@ uses `**P` to give a wrapper the same signature as the function it wraps.
 
 Before Python 3.12 you wrote type parameters with `TypeVar` and `Generic`,
 which you still see in older code.
+The older form creates each type parameter as a module-level `TypeVar` object and lists `Generic[T]` among a generic class's bases:
+
+```python
+from typing import Generic, TypeVar
+
+T = TypeVar("T")
+
+def first(items: list[T]) -> T:
+    return items[0]
+
+class Box(Generic[T]):
+    def __init__(self, content: T) -> None:
+        self.content = content
+```
+
+These `first()` and `Box` mean the same as the bracket versions in `generics.py` and `generic_box.py`.
+The bracket form needs no separate declaration,
+and its `T` belongs to the function or class that declares it.
 
 ## The `Self` Return Type {#the-self-type}
 
@@ -709,8 +727,8 @@ and the result has `report()`.
 If `bump()` declares `-> Tally`, the type checker rejects `report()`,
 because `Tally` has no such method.
 Alternative constructors benefit the same way.
-A `@classmethod` that ends with `return cls(...)` returns `Self`,
-so a call on a subclass produces an instance of that subclass, not of the base.
+A `@classmethod` that ends with `return cls(...)` declares `-> Self`,
+so a call on a subclass has the subclass's type, not the base's.
 
 ## Typing `**kwargs` with a `TypedDict` {#typed-kwargs}
 
@@ -794,7 +812,7 @@ Let the type checker infer the rest.
 A local variable whose type is obvious from its initializer gains nothing from an annotation,
 and `count: int = 0` says no more than `count = 0` does, at greater length.
 (The `total: int = 0` in this chapter's first listing shows the syntax, not a recommendation.)
-The value of a hint is proportional to the distance between a value's creation and its use.
+A hint helps in proportion to the distance between a value's creation and its use.
 A value born and consumed three lines later needs no help.
 A value that arrives from another module, inside a container,
 is worth annotating precisely.
@@ -824,7 +842,7 @@ The abstract container types come from `collections.abc`.
 |-----------|---------|
 | `int`, `str`, `float`, `bool`, `bytes`, `complex` | The built-in types, annotated by name alone, with no type parameter; the type checker accepts an `int` where a declaration says `float`, and an `int` or `float` where it says `complex`, but not the reverse (`bytes` and `complex` are not used as annotations elsewhere in this book) |
 | `None` | The value `None`; the return type of a function that returns nothing |
-| `object` | Any object, but with no behavior assumed (safer than `Any`) |
+| `object` | Any object, with the methods every class shares and no others (safer than `Any`) |
 | `Any` | Opts out of checking; compatible with every type, see [Gradual Typing](#gradual-typing) |
 | `Never`, `NoReturn` | The "impossible" type, which no value has; `NoReturn` marks a function that never returns (it always raises an exception or exits), and `Never` is the same type under a name that also suits other positions |
 | `LiteralString` | A `str` built only from literals, for injection-sensitive APIs |
@@ -836,7 +854,7 @@ The abstract container types come from `collections.abc`.
 | Construct | Meaning |
 |-----------|---------|
 | `list[T]`, `set[T]` | A homogeneous collection of `T`; invariant, so `list[Circle]` is not a `list[Shape]`, see [Variance](#variance) |
-| `frozenset[T]` | An immutable homogeneous set of `T`; covariant, because nothing can be written into it, so a `frozenset[Circle]` satisfies `frozenset[Shape]`, see [Variance](#variance) |
+| `frozenset[T]` | An immutable homogeneous set of `T`; covariant, because it has no method that adds an element, so a `frozenset[Circle]` satisfies `frozenset[Shape]`, see [Variance](#variance) |
 | `dict[K, V]` | A dictionary with keys `K` and values `V`, see [Type Hints](#type-hints) |
 | `tuple[A, B]` | A fixed-length tuple (here a pair), see [Type Hints](#type-hints) |
 | `tuple[T, ...]` | A variable-length tuple of `T`, see [Type Hints](#type-hints) |
@@ -977,3 +995,8 @@ Try each exercise before opening its [solution](../Solutions/08_Foundations--Sta
     Replace the `expect()` call with `print(show(box))` for a `Box` named `box`,
     then print `box.val`.
     Explain why the `AttributeError` disappears although `reset()` still runs.
+10. In `final_constants.py`, annotate `HISTORY` as `Final[tuple[str, ...]]`,
+    start it as an empty tuple, and run `ty check`.
+    Read what the type checker reports for the `append()` call.
+    Then change the listing so `HISTORY` holds `"first"`,
+    and explain why the entry must go into the definition of `HISTORY`.

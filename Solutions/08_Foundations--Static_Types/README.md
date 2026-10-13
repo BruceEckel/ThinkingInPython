@@ -662,3 +662,54 @@ the program does. In the chapter's version the verdict concerns
 </details>
 </details>
 </details>
+
+## 10. A `Final` tuple
+
+> In `final_constants.py`, annotate `HISTORY` as `Final[tuple[str, ...]]`,
+> start it as an empty tuple, and run `ty check`.
+> Read what the type checker reports for the `append()` call.
+> Then change the listing so `HISTORY` holds `"first"`,
+> and explain why the entry must go into the definition of `HISTORY`.
+
+<details>
+<summary>Where to look</summary>
+
+[Constants with Final](../../Chapters/08_Foundations--Static_Types.md#constants-with-final) separates rebinding a name from changing the object the name holds.
+A tuple has no `append()`, and `Final` forbids rebinding `HISTORY`,
+so consider where a tuple's contents get set.
+
+<details>
+<summary>Solution</summary>
+
+If you keep the `append()` call, `ty check` reports `unresolved-attribute`, since a tuple has no `append()`,
+and the call fails at run time with an `AttributeError`.
+Rebuilding the tuple with `HISTORY = HISTORY + ("first",)` runs,
+but the type checker rejects it as a reassignment of a `Final` name.
+The solution puts the entry into the tuple at the definition of `HISTORY`.
+
+```python
+# exercise_10.py
+from typing import Final
+
+MAX_RETRIES: Final = 3
+GREETING: Final[str] = "hello"
+HISTORY: Final[tuple[str, ...]] = ("first",)
+
+# ty: tuple has no attribute "append":
+# HISTORY.append("second")
+# ty: cannot assign to final name "HISTORY":
+# HISTORY = HISTORY + ("second",)
+
+print(MAX_RETRIES, GREETING, HISTORY)
+#: 3 hello ('first',)
+```
+
+**Freeze the name and the contents.** On a list, `Final` guards the name and leaves
+the contents open to any code that reaches the list. On a tuple, the
+name and the contents both stay as the definition sets them: `Final`
+stops a rebinding, and the tuple type has no method that changes its
+contents. The definition is therefore the one place a value can enter
+the constant, which is also where a reader looks for it.
+
+</details>
+</details>
