@@ -1,17 +1,6 @@
 # slope_nonzero.py
 from exceptions import expected
-from record import record
-
-@record
-class NonZero:
-    value: int
-
-    def __post_init__(self) -> None:
-        if self.value == 0:
-            raise ValueError("NonZero cannot hold 0")
-
-def slope(rise: int, run: NonZero) -> float:
-    return rise / run.value
+from nonzero import NonZero, slope
 
 print(slope(10, NonZero(2)))
 #: 5.0

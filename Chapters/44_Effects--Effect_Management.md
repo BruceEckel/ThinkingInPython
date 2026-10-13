@@ -234,8 +234,7 @@ If you give `run` a type that excludes zero,
 the check moves out of `slope()` and into the type:
 
 ```python
-# slope_nonzero.py
-from exceptions import expected
+# nonzero.py
 from record import record
 
 @record
@@ -248,6 +247,14 @@ class NonZero:
 
 def slope(rise: int, run: NonZero) -> float:
     return rise / run.value
+```
+
+`slope_nonzero.py` builds a valid `NonZero` and then tries to build one that holds 0:
+
+```python
+# slope_nonzero.py
+from exceptions import expected
+from nonzero import NonZero, slope
 
 print(slope(10, NonZero(2)))
 #: 5.0
@@ -290,20 +297,9 @@ and every function past that boundary takes `NonZero` and stays total:
 
 ```python
 # slope_edge.py
-from record import record
+from nonzero import NonZero, slope
 from result import Err, Ok
 from safe import safe
-
-@record
-class NonZero:
-    value: int
-
-    def __post_init__(self) -> None:
-        if self.value == 0:
-            raise ValueError("NonZero cannot hold 0")
-
-def slope(rise: int, run: NonZero) -> float:
-    return rise / run.value
 
 @safe
 def parse_run(text: str) -> NonZero:
@@ -312,11 +308,11 @@ def parse_run(text: str) -> NonZero:
 for text in ["2", "0"]:
     match parse_run(text):
         case Ok(run):
-            print(slope(10, run))
+            print(f"{text!r}: {slope(10, run)}")
         case Err(error):
-            print(f"{text!r}: {type(error).__name__}")
-#: 5.0
-#: '0': ValueError
+            print(f"{text!r}: {error}")
+#: '2': 5.0
+#: '0': NonZero cannot hold 0
 ```
 
 `parse_run()` is the only place that can fail,
