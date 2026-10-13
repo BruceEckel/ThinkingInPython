@@ -257,10 +257,11 @@ def start_car() -> _Ignition:
 import shop
 from shop import start_car
 
-start_car()
+print(start_car())
 #: _Ignition.turn_key()
 #: _FuelPump.prime()
 #: _Engine.start()
+#: _Ignition(pump=_FuelPump(engine=_Engine()))
 print([name for name in vars(shop)
        if not name.startswith("_")])
 #: ['record', 'start_car']
@@ -391,7 +392,7 @@ class WhatIWant:
 
 @record
 class ProxyAdapter(WhatIWant):
-    what_i_have: WhatIHave
+    adaptee: WhatIHave
 
     @override
     def f(self) -> None:
@@ -447,12 +448,12 @@ class WhatIWant:
 
 @record
 class ProxyAdapter(WhatIWant):
-    what_i_have: WhatIHave
+    adaptee: WhatIHave
 
     @override
     def f(self) -> None:
-        self.what_i_have.g()
-        self.what_i_have.h()
+        self.adaptee.g()
+        self.adaptee.h()
 
 class WhatIUse:
     def op(self, what_i_want: WhatIWant) -> None:

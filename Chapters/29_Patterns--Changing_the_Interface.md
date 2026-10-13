@@ -43,21 +43,21 @@ class WhatIWant:
 
 @record
 class ProxyAdapter(WhatIWant):
-    what_i_have: WhatIHave
+    adaptee: WhatIHave
 
     @override
     def f(self) -> None:
         # Implement behavior using WhatIHave:
-        self.what_i_have.g()
-        self.what_i_have.h()
+        self.adaptee.g()
+        self.adaptee.h()
 
 class WhatIUse:
     def op(self, what_i_want: WhatIWant, /) -> None:
         what_i_want.f()
 
 if __name__ == "__main__":
-    adapt = ProxyAdapter(WhatIHave())
-    WhatIUse().op(adapt)
+    adapter = ProxyAdapter(WhatIHave())
+    WhatIUse().op(adapter)
 #: WhatIHave.g()
 #: WhatIHave.h()
 ```
@@ -211,11 +211,11 @@ class WhatIWant(Protocol):
 
 @record
 class ObjectAdapter:
-    what_i_have: WhatIHave
+    adaptee: WhatIHave
 
     def f(self) -> None:
-        self.what_i_have.g()
-        self.what_i_have.h()
+        self.adaptee.g()
+        self.adaptee.h()
 
 def use(what_i_want: WhatIWant, /) -> None:
     what_i_want.f()
@@ -261,10 +261,8 @@ if __name__ == "__main__":
     a = Adapter(WhatIHave())
     print(a.f(3))  # Adapted method
     print(a.g(5))  # Forwarded to the adaptee unchanged
-    print(a.h(7))
 #: fffggghhh
 #: ggggg
-#: hhhhhhh
 ```
 
 Because `__getattr__()` runs only for attributes Python does not find normally,
@@ -384,10 +382,11 @@ class Facade:
         ignition.turn_key()
         return ignition
 
-Facade.start_car()
+print(Facade.start_car())
 #: Ignition.turn_key()
 #: FuelPump.prime()
 #: Engine.start()
+#: Ignition(pump=FuelPump(engine=Engine()))
 ```
 
 Turning the key primes the pump, and priming starts the engine.
@@ -398,7 +397,7 @@ small enough to read in one glance here.
 In real code, constructing three or thirty classes in the right order is knowledge no caller should need.
 `Facade.start_car()` is the static factory method.
 One call runs the constructors in the right order, starts the car,
-and returns the assembled `Ignition`.
+and returns the assembled `Ignition`, which the last output line shows.
 
 The figure shows each pattern as a before-and-after pair:
 
@@ -539,8 +538,6 @@ class Report:
         return self.render()
 
 report = Report()
-print(report.render())
-#: report
 with warnings.catch_warnings(record=True) as caught:
     warnings.simplefilter("always")
     print(report.to_string())  # type: ignore

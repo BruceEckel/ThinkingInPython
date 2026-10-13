@@ -15,12 +15,12 @@ class WhatIWant:
 
 @record
 class ProxyAdapter(WhatIWant):
-    what_i_have: WhatIHave
+    adaptee: WhatIHave
 
     @override
     def f(self) -> None:
-        self.what_i_have.g()
-        self.what_i_have.h()
+        self.adaptee.g()
+        self.adaptee.h()
 
 class WhatIUse:
     def op(self, what_i_want: WhatIWant) -> None:

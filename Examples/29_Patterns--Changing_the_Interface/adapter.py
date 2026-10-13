@@ -14,20 +14,20 @@ class WhatIWant:
 
 @record
 class ProxyAdapter(WhatIWant):
-    what_i_have: WhatIHave
+    adaptee: WhatIHave
 
     @override
     def f(self) -> None:
         # Implement behavior using WhatIHave:
-        self.what_i_have.g()
-        self.what_i_have.h()
+        self.adaptee.g()
+        self.adaptee.h()
 
 class WhatIUse:
     def op(self, what_i_want: WhatIWant, /) -> None:
         what_i_want.f()
 
 if __name__ == "__main__":
-    adapt = ProxyAdapter(WhatIHave())
-    WhatIUse().op(adapt)
+    adapter = ProxyAdapter(WhatIHave())
+    WhatIUse().op(adapter)
 #: WhatIHave.g()
 #: WhatIHave.h()

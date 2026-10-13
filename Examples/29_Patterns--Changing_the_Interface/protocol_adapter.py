@@ -8,11 +8,11 @@ class WhatIWant(Protocol):
 
 @record
 class ObjectAdapter:
-    what_i_have: WhatIHave
+    adaptee: WhatIHave
 
     def f(self) -> None:
-        self.what_i_have.g()
-        self.what_i_have.h()
+        self.adaptee.g()
+        self.adaptee.h()
 
 def use(what_i_want: WhatIWant, /) -> None:
     what_i_want.f()

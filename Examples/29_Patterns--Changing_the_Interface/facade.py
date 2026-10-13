@@ -29,7 +29,8 @@ class Facade:
         ignition.turn_key()
         return ignition
 
-Facade.start_car()
+print(Facade.start_car())
 #: Ignition.turn_key()
 #: FuelPump.prime()
 #: Engine.start()
+#: Ignition(pump=FuelPump(engine=Engine()))

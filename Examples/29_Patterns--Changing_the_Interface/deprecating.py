@@ -11,8 +11,6 @@ class Report:
         return self.render()
 
 report = Report()
-print(report.render())
-#: report
 with warnings.catch_warnings(record=True) as caught:
     warnings.simplefilter("always")
     print(report.to_string())  # type: ignore

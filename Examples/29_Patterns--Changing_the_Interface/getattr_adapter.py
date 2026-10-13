@@ -22,7 +22,5 @@ if __name__ == "__main__":
     a = Adapter(WhatIHave())
     print(a.f(3))  # Adapted method
     print(a.g(5))  # Forwarded to the adaptee unchanged
-    print(a.h(7))
 #: fffggghhh
 #: ggggg
-#: hhhhhhh
