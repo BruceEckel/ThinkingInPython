@@ -4,7 +4,7 @@
 > `match` tests the shape, takes the value apart,
 > and binds the parts in one statement.
 
-The `match` statement compares a value against a series of *patterns* and runs the first one that fits.
+The `match` statement compares a value against a series of *patterns* and runs the body of the first `case` whose pattern fits.
 No C-style `switch` can express this case:
 
 ```python
@@ -71,6 +71,9 @@ a [dictionary is often shorter](#when-not-to-match).
 
 `|` joins several patterns in one `case`,
 and the case matches when any one of them fits.
+A pattern has no `or`.
+Writing `case "up" or "u":`, as you would in an `if` condition,
+fails with a bare `SyntaxError: invalid syntax`.
 
 A bare name is a *capture pattern*.
 Like `_`, it matches any value unconditionally.
@@ -143,13 +146,19 @@ print(DEFAULT)
 
 `case Signal.GO` compares.
 `case DEFAULT` binds.
-It matches `Signal.GO`, rebinds `DEFAULT` as a local name inside `broken()`,
+It matches `Signal.GO`, binds it to a local name `DEFAULT` inside `broken()`,
 and leaves the module-level constant untouched.
 
 Python catches the mistake when a later `case` follows a bare-name capture,
 refusing to compile with `SyntaxError: name capture 'DEFAULT' makes remaining patterns unreachable`.
 When the capture is the last `case`, as here,
-Python compiles it without a warning, and neither `ty` nor `ruff` reports it.
+Python compiles it without a warning, and `ty` accepts it.
+`ruff` flags the line only when its pep8-naming rules are enabled:
+N806 reports `DEFAULT` as an uppercase variable inside a function.
+That message is about naming style rather than the capture,
+and a constant with a lowercase name draws no diagnostic.
+This book's `ruff` configuration turns N806 off for `value_patterns.py`,
+since the capture is the mistake the listing exists to show.
 
 `act()` also shows why an enum is worth the trouble.
 `Signal` is a closed set,
@@ -284,10 +293,10 @@ For an ordinary class `R` that lacks `__match_args__`,
 
 ### Keyword Patterns
 
-A keyword pattern such as `Point(x=0, y=y)` matches by attribute name,
-through attribute access, not through `__match_args__`.
-Keyword patterns also work on an instance of any class with the named attributes,
-data class or not, and let you match a subset of attributes while ignoring the rest:
+A keyword pattern such as `Point(x=0, y=y)` matches by attribute name.
+It reads each named attribute directly,
+so it needs no `__match_args__` and works with any class, data class or not.
+It also lets you match a subset of attributes while ignoring the rest:
 
 ```python
 # keyword_patterns.py
@@ -421,7 +430,9 @@ Once `case Point(x, y) if x > 0 and y > 0` has failed,
 left over from the failed guard in the case above it.
 A case that does not rebind a name inherits whatever an earlier,
 failed case left behind.
-That holds for a failed guard, where the pattern matched and made its bindings.
+
+A failed guard always leaves its bindings,
+because the pattern matched and made them before the guard ran.
 A pattern that fails partway is different.
 The language reference leaves it to the implementation whether the captures made before the failure stay bound.
 Use a captured name only in the `case` that captured it.
@@ -484,8 +495,8 @@ the same as every other value the dictionary could hold.
 because `Point` declares its fields that way.
 The shape test is precise,
 but each binding takes the dictionary's one declared value type.
-When the data has a known shape, parse it into a dataclass first,
-then match on the dataclass.
+When the data has a known shape, parse it into a data class first,
+then match on the data class.
 You keep the shape test and gain the field types.
 
 ## Patterns Nest
@@ -593,7 +604,7 @@ which is not a `str`.
 A `match` whose cases return nothing gets no such check,
 so there a missing `case` passes unnoticed.
 `assert_never()` covers both kinds of `match`,
-and it reports the error at the `match` instead of at the function's signature.
+and it reports the error at the `assert_never()` call inside the `match` instead of at the function's return type.
 
 A `switch` in C, JavaScript, or traditional Java has no such check.
 Nothing forces you to add a case, and an unhandled value falls through silently.
@@ -852,7 +863,8 @@ you write one new subclass with its own `render()` and `cost()`,
 and nothing else changes.
 In the match version,
 you add a `Webhook` data class to the `Notification` union,
-and the type checker flags `assert_never()` in both `render()` and `cost()` until you add a `Webhook` case to each,
+and the type checker flags `assert_never()` in both `render()` and `cost()`.
+Each function needs a `Webhook` case to pass:
 `case Webhook(url):` in `render()` and `case Webhook():` in `cost()`.
 
 If you add a new operation, `priority()`, that ranks channels by urgency,

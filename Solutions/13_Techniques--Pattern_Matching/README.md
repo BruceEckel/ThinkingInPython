@@ -9,7 +9,7 @@
 <details>
 <summary>Where to look</summary>
 
-[Sequence Patterns](../../Chapters/13_Techniques--Pattern_Matching.md#sequence-patterns) covers matching by shape, including a star pattern for the rest of a sequence.
+[Sequence Patterns](../../Chapters/13_Techniques--Pattern_Matching.md#sequence-patterns) covers matching by shape, including a starred name for the rest of a sequence.
 Then [Class Patterns](../../Chapters/13_Techniques--Pattern_Matching.md#class-patterns) shows how to test for a `Point` without binding its fields.
 `match` tries cases top to bottom, so put the narrow list shapes before the wider one.
 
@@ -166,7 +166,7 @@ runtime.
 <summary>Where to look</summary>
 
 [Mapping Patterns](../../Chapters/13_Techniques--Pattern_Matching.md#mapping-patterns) matches a dictionary by the keys it must contain.
-A value inside a mapping pattern can itself be a pattern, as [Patterns Nest](../../Chapters/13_Techniques--Pattern_Matching.md#patterns-nest) shows.
+The value position in a mapping pattern holds a pattern, so it can hold another mapping pattern, as [Patterns Nest](../../Chapters/13_Techniques--Pattern_Matching.md#patterns-nest) shows.
 Put a mapping pattern inside the `"at"` entry, and keep the flat click case so both shapes still work.
 
 <details>
@@ -507,11 +507,6 @@ indirection: the `match` no longer mentions `Point`. That trade is
 usually worth it when the guards all test the same handful of derived
 facts, and not worth it when each guard asks a different question.
 
-**Give every path a return.** The final `case _` is unreachable, since the six cases above it cover
-all nine pairs of signs. The type checker sees only that `sign()`
-returns an `int`, so without that case it reports that `quadrant()`
-can return `None`.
-
 </details>
 </details>
 </details>
@@ -633,9 +628,10 @@ because `act()` and `guarded()` need the bare name.
 
 **Compare in a guard.** The second fix keeps the bare constant and moves the comparison into a
 guard, where `FALLBACK` is an ordinary expression rather than a
-pattern. `case other if other is FALLBACK:` is more verbose than the
-dotted name, but it is what you want when the test is more than
-equality.
+pattern. `case other if other is FALLBACK:` is longer than the
+dotted name. A value pattern always compares with `==`, while a
+guard holds any expression: `is`, as here, a membership test, or a
+call. Choose the guard when the test needs one of those.
 
 </details>
 </details>
