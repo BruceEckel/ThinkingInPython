@@ -8,10 +8,6 @@ print([*row for row in rows])
 print({**d for d in dicts})
 #: {'a': 3, 'b': 2}
 
-flat = (*row for row in rows)
-print(list(flat))
-#: [1, 2, 3, 4, 5]
-
 print([*row for row in [[1, [2, 3]], [4]]])
 #: [1, [2, 3], 4]
 print({*s for s in [{1, 2}, {3}]})

@@ -107,7 +107,22 @@ The comprehension's `if isinstance(e, int)` does narrow,
 so `list_comprehension.py` needs no `# type: ignore` comment.
 `filter()` can narrow,
 but only when its predicate is a named function annotated to return [`TypeIs[int]` or `TypeGuard[int]`](08_Foundations--Static_Types.md#type-narrowing)
-rather than `bool`.
+rather than `bool`:
+
+```python
+# filter_typeis.py
+from typing import TypeIs
+from a_list import a_list
+
+def is_int(e: object) -> TypeIs[int]:
+    return isinstance(e, int)
+
+print(list(map(lambda e: e ** 2, filter(is_int, a_list))))
+#: [1, 81, 0, 16]
+```
+
+`is_int()` tells the type checker that every element passing it is an `int`,
+so the `lambda` inside `map()` receives an `int` and the listing needs no `# type: ignore` comment.
 `filter(None, items)` is the other narrowing form.
 It drops the falsy values, and the type checker knows no `None` survives.
 
@@ -121,10 +136,6 @@ e = "outer"
 squares = [e ** 2 for e in range(4)]
 print(squares, e)
 #: [0, 1, 4, 9] outer
-total = 0
-running = [(total := total + n) for n in range(5)]
-print(running, total)
-#: [0, 1, 3, 6, 10] 10
 ```
 
 A comprehension's loop variable belongs to the comprehension.
@@ -141,7 +152,16 @@ With `base = 3` in the class body,
 The outermost iterable is the one part Python evaluates in the enclosing scope,
 so `[n for n in range(base)]` works.
 
-The walrus operator escapes the comprehension's scope.
+The walrus operator escapes the comprehension's scope:
+
+```python
+# walrus_running_sum.py
+total = 0
+running = [(total := total + n) for n in range(5)]
+print(running, total)
+#: [0, 1, 3, 6, 10] 10
+```
+
 `total := total + n` assigns in the enclosing scope,
 so `total` holds the running sum after the comprehension finishes.
 That leak is deliberate.
@@ -711,10 +731,6 @@ print([*row for row in rows])
 print({**d for d in dicts})
 #: {'a': 3, 'b': 2}
 
-flat = (*row for row in rows)
-print(list(flat))
-#: [1, 2, 3, 4, 5]
-
 print([*row for row in [[1, [2, 3]], [4]]])
 #: [1, [2, 3], 4]
 print({*s for s in [{1, 2}, {3}]})
@@ -731,6 +747,7 @@ merging each mapping with later keys winning.
 With braces, `*` builds a set and `**` builds a dict.
 Everywhere else the colon decides between the two.
 Here neither form has a colon, so the unpacking operator decides.
+In parentheses, `(*row for row in rows)` is a generator expression that produces the same spliced values one at a time.
 The asynchronous generator form (`(*a async for a in agen())`)
 works the same way ([Concurrency](19_Techniques--Concurrency.md#asyncio-mechanics) introduces `async` syntax).
 
