@@ -19,7 +19,7 @@ with ThreadPoolExecutor() as pool:
     )
 
 cores = os.cpu_count() or 1
-target = min(1.5, cores * 0.7)  # Two cores cannot give 1.5x
+target = min(1.5, cores * 0.7)  # Lower on one or two cores
 report(sequential=t_seq, threads=t_thr, cores=cores)
 print(f"threads run in parallel: {t_seq > t_thr * target}")
 #: threads run in parallel: False

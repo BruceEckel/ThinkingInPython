@@ -423,8 +423,8 @@ asyncio.run(main())
 `start_server()` opens a listening socket on an OS-assigned port
 (port `0` asks the OS to choose one)
 and hands each new connection to `handle_client()`.
-`open_connection()` opens the client side of that same socket.
-Both awaits suspend their task the way `asyncio.sleep()` does,
+`open_connection()` opens a client socket connected to that server.
+Each `await` on a reader suspends its task the way `asyncio.sleep()` does,
 except the wake-up condition is now "the socket has bytes to read," not a timer.
 Two clients connect at once,
 and `gather()` returns their replies in argument order, `a` then `b`,
@@ -577,6 +577,7 @@ asyncio.run(main())
 
 `tg.create_task()` schedules a task immediately,
 so all six are in flight together.
+
 The `tasks` dict holds the task objects so the loop after the block can read each outcome.
 The `TaskGroup` holds its own strong references until the block exits.
 Those references matter because the event loop keeps only weak references to its tasks,
@@ -589,6 +590,7 @@ keep the returned task in a variable or a set that outlives the task.
 and the `TaskGroup` responds by cancelling `e` and `f`,
 which are still suspended with far more sleep to go,
 so neither reaches its `fetched` print.
+
 The shared deadline puts both failures in the group.
 The loop runs every timer due at one instant in the same turn,
 so `c` and `d` both raise their exceptions before the group's own callback runs and starts cancelling.
@@ -876,6 +878,142 @@ A `release()` beyond its starting count raises a `ValueError`.
 Deliberately choosing a count above one makes the semaphore a throttle on a limited resource,
 such as a set number of database connections.
 
+## Deadlock and Livelock
+
+A lock fixes a race, but a program that takes two locks can stop altogether.
+Shared mutable state, not threads, is the source of deadlock and livelock,
+and `asyncio` shares it just as readily as threads do.
+Removing the OS thread scheduler moves where these failures arise and leaves the failures themselves in place.
+With threads, a failure can arise anywhere the OS decides to preempt you.
+`asyncio` narrows those places to the `await` points you wrote yourself.
+
+### Deadlock
+
+In a *deadlock*, two or more tasks each hold a resource the other needs,
+so neither can proceed.
+Four conditions must all hold at once:
+
+1. Exclusive access to each resource
+2. Holding one resource while waiting for another
+3. No way to force a task to give up what it holds
+4. A cycle of tasks each waiting on the next
+
+If you break any one of the four, deadlock becomes impossible.
+None of these conditions mentions threads or an OS scheduler,
+so `asyncio` can also produce deadlock.
+This example has two tasks and two `asyncio.Lock` objects.
+The two tasks acquire the locks in opposite order:
+
+```python
+# async_deadlock.py
+import asyncio
+
+lock_a = asyncio.Lock()
+lock_b = asyncio.Lock()
+
+async def worker(
+    first: asyncio.Lock, second: asyncio.Lock
+) -> None:
+    async with first:
+        # Let the other task grab its lock
+        await asyncio.sleep(0.01)
+        async with second:
+            pass  # Never reached
+
+async def main() -> None:
+    try:
+        await asyncio.wait_for(
+            asyncio.gather(
+                worker(lock_a, lock_b),
+                worker(lock_b, lock_a),
+            ),
+            timeout=0.5,
+        )
+    except TimeoutError:
+        print("deadlock detected")
+
+asyncio.run(main())
+#: deadlock detected
+```
+
+The first task takes `lock_a` then tries to acquire `lock_b`.
+The second takes `lock_b` then tries to acquire `lock_a`.
+The `sleep(0.01)` gives each task time to grab its first lock before either asks for its second.
+The deadlock depends on that `await`.
+Tasks run one at a time and switch only at an `await`,
+and acquiring a free lock does not suspend the task.
+Without the sleep, the first task takes both locks and releases them before the second task starts,
+and the program prints nothing.
+
+Once both hold their first lock,
+each task's `async with second:` suspends on a lock the other task keeps holding.
+A real deadlock has no `timeout`.
+Both tasks wait forever, the event loop included,
+since nothing remains that can wake them.
+Here, `asyncio.wait_for()` bounds the wait.
+When its deadline passes, it cancels the `gather()` and raises a `TimeoutError`,
+so the example reports the deadlock instead of hanging.
+
+The fix is the same one that works for threads:
+have every task acquire shared locks in the same global order.
+If both tasks acquire `lock_a` first,
+the second task waits for `lock_a` while holding nothing,
+so the first task takes `lock_b`, finishes, and releases both.
+
+### Livelock
+
+A *livelock* blocks nothing.
+Tasks keep running and keep changing state, but none of them makes progress,
+the way two people in a hallway each step aside for the other, forever.
+No lock takes part and no task waits to acquire anything,
+so a lock-acquisition timeout, which can break a deadlock,
+has no wait to cut short:
+
+```python
+# async_livelock.py
+import asyncio
+
+wants: dict[str, bool] = {"a": True, "b": True}
+
+async def giver(me: str, other: str) -> None:
+    for _ in range(3):
+        if wants[other]:
+            print(f"{me}: gives")
+        else:
+            print(f"{me}: proceeds")
+            wants[me] = False
+        await asyncio.sleep(0)
+
+async def main() -> None:
+    await asyncio.gather(giver("a", other="b"),
+                         giver("b", other="a"))
+    print(f"resolved: {not any(wants.values())}")
+
+asyncio.run(main())
+#: a: gives
+#: b: gives
+#: a: gives
+#: b: gives
+#: a: gives
+#: b: gives
+#: resolved: False
+```
+
+Each round, `a` checks `wants["b"]` and `b` checks `wants["a"]`,
+and both still see the other wanting the resource, so both give.
+Thus both entries in `wants` stay `True` for the next round.
+Two equally polite tasks make no progress,
+although the event loop keeps both tasks busy the whole time.
+A real livelock repeats these rounds forever.
+`range(3)` stops the listing after three rounds so it can report `resolved: False`.
+
+A real livelock looks busy on a monitor,
+with CPU time spent and state visibly changing.
+A deadlock looks idle, with tasks suspended and waiting.
+In both cases, nothing finishes.
+The usual fix is to break the symmetry,
+for example letting only the task with the lower ID give.
+
 ## Context That Follows the Call Chain {#context-that-follows-the-call-chain}
 
 Some values are not the subject of the work but the circumstances of it:
@@ -996,7 +1134,7 @@ With several cores, it can.
 `ProcessPoolExecutor` runs each call in one of its worker processes,
 each with its own interpreter and its own [*Global Interpreter Lock*](#the-gil-and-free-threading)
 (GIL), the interpreter-wide lock that lets one thread at a time run Python bytecode.
-Here, each interpreter has its own,
+No process waits on another process's GIL,
 so the operating system can place these processes on different cores and run them at the same time.
 
 The rest of the chapter runs one CPU-bound workload on several backends,
@@ -1223,7 +1361,7 @@ Wall time drops sharply up to the core count, then flattens or reverses past it,
 as doubling from 32 to 64 tasks did here.
 
 `TOTAL` and `CORE_MULTIPLIER` are the two constants worth changing.
-Raise `TOTAL` for a slower, more dramatic slope on your own machine,
+Increase `TOTAL` for a slower, more dramatic slope on your own machine,
 or lower `CORE_MULTIPLIER` to stop the sweep at the core count instead of past it.
 
 ### Why Speedup Isn't Linear
@@ -1334,10 +1472,11 @@ Five 50-millisecond waits finish in about the time of one.
 Each sleeping thread releases the GIL,
 so the operating system runs another thread while the sleeping one waits,
 the same overlap `asyncio` achieves with suspended tasks.
-That overlap is `blocking_the_loop.py` turned inside out.
+`blocking_the_loop.py` shows the opposite result.
 A blocking call freezes an event loop,
-but a pool of threads absorbs blocking calls.
-That absorption is why `asyncio.to_thread()` hands its blocking work to this kind of pool.
+while a thread pool gives each blocking call its own thread,
+so the calls wait side by side.
+That is why `asyncio.to_thread()` hands its blocking work to this kind of pool.
 
 Use a thread pool for I/O when the blocking calls already exist and rewriting them as coroutines is not worth the effort.
 `asyncio` is a better choice when you have thousands of waits,
@@ -1500,8 +1639,8 @@ the same fix `asyncio.Lock` gives the tasks in `async_locks.py`.
 ### Free Threading
 
 Since 3.13, CPython also provides a *free-threaded* build,
-tracked by [PEP 703](https://peps.python.org/pep-0703/) and installed separately
-(`python3.15t` rather than `python3.15`).
+specified in [PEP 703](https://peps.python.org/pep-0703/)
+and installed separately (`python3.15t` rather than `python3.15`).
 [PEP 779](https://peps.python.org/pep-0779/)
 removed its "experimental" label in 3.14,
 so it is a supported build now rather than a preview,
@@ -1541,7 +1680,7 @@ Removing the lock also removes three decades of accidental protection for C exte
 whose authors assumed that threads run one at a time.
 The free-threaded build comes with a safety net.
 Loading an extension that has not declared itself thread-safe re-enables the GIL for the whole process and emits a warning.
-Free threading delivers its speedup only when every extension you load has passed an audit,
+Free threading delivers its speedup only when every extension you load declares free-threading support,
 so check compatibility before switching a project.
 
 Free threading also rewards a particular program shape.
@@ -1553,20 +1692,20 @@ and pipeline stages connected by queues.
 
 Fine-grained sharing loses.
 A counter with a lock around every increment serializes the threads all over again,
-and adds lock overhead the GIL never charged.
+and every increment now also acquires and releases that lock.
 On a free-threaded interpreter, threads alone are enough for CPU-bound work,
 and they share memory without a process pool's pickling between processes.
 
 ## Subinterpreters
 
-Subinterpreters work on standard Python, and do not need free threading.
+Subinterpreters run on the standard build, the one with the GIL.
 The process pool in [Parallelism](#parallelism)
 gets its speedup by giving each worker its own interpreter,
 and thus its own GIL, but it starts an operating-system process per worker.
 
 Since 3.12, CPython can create additional interpreters inside the same process
 ([PEP 684](https://peps.python.org/pep-0684/)), each with its own GIL,
-avoiding the per-worker process cost.
+without starting a process per worker.
 `InterpreterPoolExecutor` (added in 3.14)
 runs each call in one of these subinterpreters.
 Within a single process, multiple interpreters run in parallel:
@@ -1593,14 +1732,14 @@ with InterpreterPoolExecutor() as pool:
     )
 
 cores = os.cpu_count() or 1
-target = min(1.5, cores * 0.7)  # Two cores cannot give 1.5x
+target = min(1.5, cores * 0.7)  # Lower on one or two cores
 report(sequential=t_seq, subinterpreters=t_sub, cores=cores)
 print(f"subinterpreters run in parallel: "
       f"{t_seq > t_sub * target}")
 #: subinterpreters run in parallel: True
 ```
 
-Unlike a thread pool, subinterpreters genuinely overlap computing.
+Subinterpreters overlap computing, where a thread pool takes turns.
 Each worker interpreter holds its own GIL,
 so several of them run on separate cores at once instead of taking turns.
 The interpreters share the process's memory,
@@ -2044,7 +2183,7 @@ That bridge is why `process_price()` calls `loop.run_in_executor()` instead of `
 `main(pool: ProcessPoolExecutor)` receives its pool as a parameter,
 and `with ProcessPoolExecutor() as pool:` creates the pool outside `main`.
 Creating a `ProcessPoolExecutor` sets up its queues and pipes,
-its first `submit()` spawns the workers,
+each `submit()` that finds no idle worker spawns another worker process,
 and `__exit__()` joins them through `shutdown(wait=True)`.
 That join is an ordinary blocking call,
 and running it on the thread driving the event loop freezes every task on that loop,
@@ -2090,14 +2229,14 @@ Thus, even a program written as `asyncio` from top to bottom keeps a thread pool
 because the libraries it calls still block.
 
 Free threading leaves I/O-bound work as it was and solves a narrower problem.
-Without the GIL, a thread can genuinely parallelize CPU-bound work from inside one process while sharing memory,
+Without the GIL, a thread can parallelize CPU-bound work from inside one process while sharing memory,
 with no data to pickle.
 Neither a GIL-bound thread nor a process pool offers that.
 
 Under the standard build, then, a thread no longer structures your concurrency.
 `asyncio` does that.
-A thread's remaining job is to absorb a blocking call,
-so the wait cannot freeze the event loop.
+A thread's remaining job is to run a blocking call away from the event loop's thread,
+so the wait cannot freeze the loop.
 
 The GIL [does not prevent races](#the-gil-does-not-prevent-races).
 It doesn't protect a read-modify-write spanning a function call.
@@ -2256,142 +2395,10 @@ each parked on a `threading.Event` that nothing sets,
 started in about four seconds with room to spare.
 A laptop with far less memory can fail at a fraction of that.
 To find your own machine's number,
-start threads that park on a `threading.Event` that nothing sets and raise the count until `start()` raises an exception.
-Tasks have no equivalent ceiling,
-because a task consumes none of the OS resources that limit threads.
-
-## Deadlock and Livelock
-
-Shared mutable state, not threads, is the source of deadlock and livelock,
-and `asyncio` shares it just as readily as threads do.
-Removing the OS thread scheduler moves where these failures arise and leaves the failures themselves in place.
-With threads, that point is anywhere the OS decides to preempt you.
-`asyncio` narrows this to the `await` points you wrote yourself.
-
-### Deadlock
-
-In a *deadlock*, two or more tasks each hold a resource the other needs,
-so neither can proceed.
-Four conditions must all hold at once:
-
-1. Exclusive access to each resource
-2. Holding one resource while waiting for another
-3. No way to force a task to give up what it holds
-4. A cycle of tasks each waiting on the next
-
-If you break any one of the four, deadlock becomes impossible.
-None of these conditions mentions threads or an OS scheduler,
-so `asyncio` can also produce deadlock.
-This example has two tasks and two `asyncio.Lock` objects.
-The two tasks acquire the locks in opposite order:
-
-```python
-# async_deadlock.py
-import asyncio
-
-lock_a = asyncio.Lock()
-lock_b = asyncio.Lock()
-
-async def worker(
-    first: asyncio.Lock, second: asyncio.Lock
-) -> None:
-    async with first:
-        # Let the other task grab its lock
-        await asyncio.sleep(0.01)
-        async with second:
-            pass  # Never reached
-
-async def main() -> None:
-    try:
-        await asyncio.wait_for(
-            asyncio.gather(
-                worker(lock_a, lock_b),
-                worker(lock_b, lock_a),
-            ),
-            timeout=0.5,
-        )
-    except TimeoutError:
-        print("deadlock detected")
-
-asyncio.run(main())
-#: deadlock detected
-```
-
-The first task takes `lock_a` then tries to acquire `lock_b`.
-The second takes `lock_b` then tries to acquire `lock_a`.
-The `sleep(0.01)` gives each task time to grab its first lock before either asks for its second.
-The deadlock depends on that `await`.
-Tasks run one at a time and switch only at an `await`,
-and acquiring a free lock does not suspend the task.
-Without the sleep, the first task takes both locks and releases them before the second task starts,
-and the program prints nothing.
-
-Once both hold their first lock,
-each task's `async with second:` suspends on a lock the other task keeps holding.
-A real deadlock has no `timeout`.
-Both tasks wait forever, the event loop included,
-since nothing remains that can wake them.
-Here, `asyncio.wait_for()` bounds the wait.
-When its deadline passes, it cancels the `gather()` and raises a `TimeoutError`,
-so the example reports the deadlock instead of hanging.
-
-The fix is the same one that works for threads:
-have every task acquire shared locks in the same global order.
-If both tasks acquire `lock_a` first,
-the second task waits for `lock_a` while holding nothing,
-so the first task takes `lock_b`, finishes, and releases both.
-
-### Livelock
-
-A *livelock* blocks nothing.
-Tasks keep running and keep changing state, but none of them makes progress,
-the way two people in a hallway each step aside for the other, forever.
-No lock takes part, no task waits to acquire anything, so no timeout can fix it:
-
-```python
-# async_livelock.py
-import asyncio
-
-wants: dict[str, bool] = {"a": True, "b": True}
-
-async def giver(me: str, other: str) -> None:
-    for _ in range(3):
-        if wants[other]:
-            print(f"{me}: gives")
-        else:
-            print(f"{me}: proceeds")
-            wants[me] = False
-        await asyncio.sleep(0)
-
-async def main() -> None:
-    await asyncio.gather(giver("a", other="b"),
-                         giver("b", other="a"))
-    print(f"resolved: {not any(wants.values())}")
-
-asyncio.run(main())
-#: a: gives
-#: b: gives
-#: a: gives
-#: b: gives
-#: a: gives
-#: b: gives
-#: resolved: False
-```
-
-Each round, `a` checks `wants["b"]` and `b` checks `wants["a"]`,
-and both still see the other wanting the resource, so both give.
-Thus both entries in `wants` stay `True` for the next round.
-Two equally polite tasks make no progress,
-although the event loop keeps both tasks busy the whole time.
-A real livelock repeats these rounds forever.
-`range(3)` stops the listing after three rounds so it can report `resolved: False`.
-
-A real livelock looks busy on a monitor,
-with CPU time spent and state visibly changing.
-A deadlock looks idle, with tasks suspended and waiting.
-In both cases, nothing finishes.
-The usual fix is to break the symmetry,
-for example letting only the task with the lower ID give.
+start threads that park on a `threading.Event` that nothing sets and increase the count until `start()` raises an exception.
+A task's limit is heap memory alone,
+because a task uses none of the per-thread OS resources,
+a stack reservation and a scheduler entry, that limit threads.
 
 ## Guidelines
 
@@ -2399,7 +2406,7 @@ for example letting only the task with the lower ID give.
   Explore [Performance](18_Techniques--Performance.md)
   before deciding you require a concurrent solution.
 - **Don't wrap a lone wait in `async`/`await` machinery.**
-  `asyncio` is justified if you have multiple waits that overlap.
+  `asyncio` helps when several waits can overlap.
 - **A comprehension that awaits is not concurrent.**
   `[await c for c in coroutines]` runs one coroutine at a time.
   `gather()` and `TaskGroup` schedule every coroutine as a task before waiting on any of them.
@@ -2409,7 +2416,7 @@ for example letting only the task with the lower ID give.
   `gather()` can hand back errors as data alongside the successes.
 - **A read-modify-write that spans an `await` still races,
   with no thread in sight.**
-  Guard it with `asyncio.Lock`, the same fix a lock gives for threads.
+  Guard it with `asyncio.Lock`, the same fix `threading.Lock` gives threads.
 - **Never call a blocking function inside a coroutine.**
   `time.sleep()` freezes every task on the loop, not just its own.
   Use `asyncio.sleep()`, or hand the blocking call to `asyncio.to_thread()`.
@@ -2428,8 +2435,9 @@ for example letting only the task with the lower ID give.
   `queue.Queue` blocks a thread,
   `multiprocessing.Queue` pickles across processes,
   `asyncio.Queue` suspends a task and needs no locking.
-- **An iterator handed to several threads is not thread-safe,
-  and it fails quietly.**
+- **An iterator handed to several threads needs a lock around `__next__()`.**
+  A class-based iterator hands out duplicates with no error,
+  and a generator raises a `ValueError`.
   Wrap one you have with `threading.serialize_iterator()`,
   wrap the generator function that makes them with `threading.synchronized_iterator()`,
   and use `threading.concurrent_tee()` when every worker needs the whole stream.
@@ -2444,8 +2452,8 @@ for example letting only the task with the lower ID give.
   whether one task failed or several.
 - **Cancellation is a `BaseException`, not an `Exception`.**
   `except Exception:` inside a task lets it through, and that is what you want.
-  Catching `asyncio.CancelledError` and not re-raising it strands the `TaskGroup` that asked the task to stop.
-- **A shared lock prevents deadlock only if every user agrees on the order.**
+  Catching `asyncio.CancelledError` and not re-raising it leaves the `TaskGroup` waiting on a task it told to stop.
+- **Several locks avoid deadlock when every task acquires them in one agreed order.**
   Acquire shared locks in the same sequence everywhere.
   When two units keep yielding to each other instead,
   break the symmetry so one of them gives way and the other goes ahead.
@@ -2484,6 +2492,7 @@ is a small corner of the territory.
 
 - **Barriers:** Make a group of threads or tasks wait until every one of them arrives,
   then release them together.
+  Python provides `threading.Barrier` and `asyncio.Barrier` (3.11).
   Unlike `gather()` or `TaskGroup`,
   a barrier is a rendezvous point where the running code arrives and blocks,
   often reused across repeated phases,
@@ -2537,7 +2546,7 @@ Try each exercise before opening its [solution](../Solutions/19_Techniques--Conc
 6.  Remove the `if __name__ == "__main__"` guard from `parallel_cpu.py`,
     so its body runs unconditionally, and run it.
     Read the error, whose useful part is the `RuntimeError` traceback each failing child process printed above the `BrokenProcessPool` at the bottom,
-    then explain it with the import mechanics described in [Parallelism](#what-a-process-pool-requires):
+    then explain it with the import mechanics described in [What a Process Pool Requires](#what-a-process-pool-requires):
     what did each worker process do when it imported the module?
 7.  In `gil_race.py`, remove the `time.sleep(0.000_001)` call and run the script several times.
     Explain, using [The GIL Does Not Prevent Races](#the-gil-does-not-prevent-races),
@@ -2580,21 +2589,22 @@ Try each exercise before opening its [solution](../Solutions/19_Techniques--Conc
     why one shared acquisition order removes the cycle.
 15. In `mixed_await.py`,
     replace the body of `process_price()` with `return await pool.submit(cpu_price, order)`.
-    Run `ty` on the changed file, then run it, and read the two errors.
+    Run `ty` on the changed file, then run the file, and read the two errors.
     Explain, using [One Task, Many Backends](#one-task-many-backends),
     why you cannot await `pool.submit()`'s return value,
     what `loop.run_in_executor()` returns instead,
     and why the runtime `TypeError` arrives wrapped in an `ExceptionGroup`.
 
-[^concurrency-def]: Pike's definition from that talk clarifies what he meant.
+[^concurrency-def]: Pike's definition, from his
+    [2012 talk](https://go.dev/blog/waza-talk) at Heroku's Waza conference,
+    clarifies what he meant.
     Concurrency is the composition of independently executing computations.
     Parallelism is running those computations at the same time.
     You can have concurrency without parallelism.
     The `asyncio` examples in this chapter show it.
     Coroutines interleave on a single thread, and no two of them ever execute at the same instant.
 
-    The distinction goes back further than
-    [Pike's 2012 talk](https://go.dev/blog/waza-talk) at Heroku's Waza conference.
+    The distinction goes back further than Pike's talk.
     Edsger Dijkstra's 1965 paper,
     "[Solution of a Problem in Concurrent Programming Control](https://repositories.lib.utexas.edu/items/84831631-07fe-484b-a45c-3cff9f6b1f43),"
     started the formal study of concurrent programs.

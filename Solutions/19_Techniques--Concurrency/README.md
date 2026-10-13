@@ -171,8 +171,8 @@ schedule every coroutine as a task before waiting on any.
 <details>
 <summary>Where to look</summary>
 
-[I/O-Bound vs CPU-Bound](../../Chapters/19_Techniques--Concurrency.md#io-bound-vs-cpu-bound) and [Overlapping the Waits](../../Chapters/19_Techniques--Concurrency.md#overlapping-the-waits) measure overlap with `meter.peak`.
-A task counts as active while it sits inside the `with meter:` block, including while it is suspended.
+[Overlapping the Waits](../../Chapters/19_Techniques--Concurrency.md#overlapping-the-waits) measures overlap with `meter.peak`, and [I/O-Bound vs CPU-Bound](../../Chapters/19_Techniques--Concurrency.md#io-bound-vs-cpu-bound) names the two kinds of work `mixed_price()` combines.
+A task counts as active while it sits inside the `with meter:` block, including while it waits at an `await` there.
 Look at where the `await` falls relative to that block, and whether the other four tasks get a chance to start at it.
 
 <details>
@@ -464,7 +464,7 @@ reintroduces the race the lock is there to prevent.
 > Remove the `if __name__ == "__main__"` guard from `parallel_cpu.py`,
 > so its body runs unconditionally, and run it.
 > Read the error, whose useful part is the `RuntimeError` traceback each failing child process printed above the `BrokenProcessPool` at the bottom,
-> then explain it with the import mechanics described in [Parallelism](../../Chapters/19_Techniques--Concurrency.md#what-a-process-pool-requires):
+> then explain it with the import mechanics described in [What a Process Pool Requires](../../Chapters/19_Techniques--Concurrency.md#what-a-process-pool-requires):
 > what did each worker process do when it imported the module?
 
 <details>
@@ -472,7 +472,7 @@ reintroduces the race the lock is there to prevent.
 
 [What a Process Pool Requires](../../Chapters/19_Techniques--Concurrency.md#what-a-process-pool-requires) describes how a worker process finds the function it must run.
 The worker imports your module, and importing executes every top-level statement.
-Read the `RuntimeError` text for what a worker tries to do during that import, and for the name `__mp_main__` that the guard tests.
+Read the `RuntimeError` traceback for what a worker tries to do during that import, and for the name `__mp_main__` that the guard tests.
 
 <details>
 <summary>Solution</summary>
@@ -678,7 +678,7 @@ A run with `max_workers=4` prints the same six lines in the same order.
 **Drain in priority order.** The pool may run the three producers on one, two, or three threads,
 depending on whether each producer finishes before the pool picks up the next.
 The order in which the six jobs enter the queue can therefore vary, but `PriorityQueue` orders its items by comparing the tuples.
-The drain order is therefore always priority first, `1` before `2`
+The drain order is always priority first, `1` before `2`
 before `3`, then alphabetically by the description within a priority
 (the tuple's second field): `"alert"` before `"page oncall"` before
 `"zzz"`, and `"aaa"` before `"backup"`. The thread that submits a job
@@ -689,7 +689,7 @@ after all three producers finish.
 </details>
 </details>
 
-## 9. A task that finishes before the failures land
+## 9. A task that finishes before the failures arrive
 
 > In `utils/fetch_demo.py`,
 > change `("e", 0.2)` in `PAIRS` to `("e", 0.005)` so `e` finishes before `c` and `d` fail,
@@ -862,13 +862,6 @@ async def main() -> None:
 <details>
 <summary>Solution</summary>
 
-If you leave out the `return` in the `except` block,
-the handler prints its line and execution falls through to `print(results)`.
-`results` is unbound at that point,
-so the line raises an `UnboundLocalError` right after the `gather raised` line.
-The type checker passes that version, so the failure shows up at run time.
-The solution returns from the handler, so the code after the `try` statement runs when `gather()` returns a list.
-
 ```python
 # exercise_10.py
 import asyncio
@@ -901,6 +894,13 @@ Two `fetched` lines print, `a` and `b`, the two whose timers fire
 before `c` fails at `0.03`. `e` and `f` print nothing, and
 `print(results)` does not run, because the `await` raises the
 `ValueError` instead of returning a value.
+
+The `return` in the `except` block ends `main()` there.
+If you leave it out,
+the handler prints its line and execution falls through to `print(results)`.
+`results` is unbound at that point,
+so the line raises an `UnboundLocalError` right after the `gather raised` line.
+The type checker passes that version, so the failure shows up at run time.
 
 **Propagate the first failure.** Without `return_exceptions=True`, the first child exception propagates
 out of the `await` immediately, and `gather()` reports that one
@@ -1072,7 +1072,7 @@ with ThreadPoolExecutor() as pool:
     )
 
 cores = os.cpu_count() or 1
-target = min(1.5, cores * 0.7)  # Two cores cannot give 1.5x
+target = min(1.5, cores * 0.7)  # Lower on one or two cores
 report(sequential=t_seq, threads=t_thr, cores=cores)
 print(f"threads run in parallel: {t_seq > t_thr * target}")
 #: threads run in parallel: False
@@ -1212,7 +1212,7 @@ next `next()` begins. Two threads can be inside `__next__()` at the
 same moment, read the same `next_number`, and come away with the same
 ticket, as they do without the lock.
 
-**Lock the loop body.** The lock does cover `out.append(item)`, which
+**See what the lock does cover.** It covers `out.append(item)`, which
 needs no lock. `out` is a local list, one per worker, so no other
 thread can touch it.
 
@@ -1319,7 +1319,7 @@ and "later" never loops back to "earlier."
 
 > In `mixed_await.py`,
 > replace the body of `process_price()` with `return await pool.submit(cpu_price, order)`.
-> Run `ty` on the changed file, then run it, and read the two errors.
+> Run `ty` on the changed file, then run the file, and read the two errors.
 > Explain, using [One Task, Many Backends](../../Chapters/19_Techniques--Concurrency.md#one-task-many-backends),
 > why you cannot await `pool.submit()`'s return value,
 > what `loop.run_in_executor()` returns instead,
