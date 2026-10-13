@@ -155,12 +155,12 @@ def performs(*effects: type) -> Performs:
 
 def row(f: Callable[..., object]) -> list[str]:
     hints = get_type_hints(f, include_extras=True)
-    result = hints.get("return")
+    annotation = hints.get("return")
     return sorted(
         effect.__name__
-        for extra in getattr(result, "__metadata__", ())
-        if isinstance(extra, Performs)
-        for effect in extra.effects
+        for piece in getattr(annotation, "__metadata__", ())
+        if isinstance(piece, Performs)
+        for effect in piece.effects
     )
 ```
 
