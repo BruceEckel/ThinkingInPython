@@ -214,8 +214,12 @@ The `else` clause does not run here. It belongs to the case where the
 **Catch the escape at the caller.** The `TypeError` keeps
 propagating up past `divide_and_report()`, so this listing wraps the
 call in its own `try`/`except TypeError` to show the exception
-escaping. An interactive session or an outer caller sees the
-`TypeError` escape the same way.
+escaping. Without that wrapper, `finally always runs` prints first,
+and then the traceback appears, ending in
+`TypeError: unsupported operand type(s) for /: 'int' and 'str'`.
+Above that last line, the traceback lists each call on the
+exception's path, from your call at the top down to the `/` in
+`checked_divide()`.
 
 </details>
 </details>
@@ -272,14 +276,15 @@ print(run("go north"))
 #: moving north
 ```
 
-**Give the longer command a case.** Before the new `case` exists, `run("go north 3")` returns `unknown
-command`. A list pattern matches on length as well as content, so
+**Give the longer command a case.** Before the new `case` exists,
+`run("go north 3")` returns `unknown command`. A list pattern
+matches on length as well as content, so
 `["go", direction]` matches only a list of two items. The three-item
 split matches neither of the original patterns and reaches `case _`.
 The longer pattern gives a three-item list a `case` of its own.
 
-**Arrange the patterns.** Order
-matters only between patterns that could both match the same value.
+**Arrange the patterns.** Order matters only between patterns that
+could both match the same value.
 The two `go` patterns cannot, so either arrangement works here.
 
 </details>
@@ -315,10 +320,9 @@ The loop takes four lines instead of one, and until it finishes the
 name `evens` holds a partial result. The comprehension states the
 contents of the list. The loop says how to build it, and the reader
 runs the loop in their head to learn the contents. The loop version
-wins when the body
-grows past one condition and one expression, since a comprehension
-with two filters and a nested loop is harder to read than the nested `for`
-loops it replaces.
+wins when the body grows past one condition and one expression, since
+a comprehension with two filters and a nested loop is harder to read
+than the nested `for` loops it replaces.
 
 </details>
 </details>
@@ -468,8 +472,7 @@ of it strains memory, or when you read a stream that has no end.
 
 The closing guarantee is not the difference. `read_text()` opens the
 file in a `with` block of its own, so it closes the file too, whether
-or not the read succeeds. For a configuration file of a few kilobytes
-read once at startup, `read_text()` is a better choice.
+or not the read succeeds.
 
 </details>
 </details>
@@ -511,9 +514,65 @@ The prediction covers more than "one survives." It says which item
 and where. The survivor is whatever slides into a slot the loop has
 passed, so its final position depends on the data. In the chapter's
 `[1, 2, 2, 3]` the survivor sits mid-list. Here it sits first. The
-symptom moves with the input, and for that reason the chapter says to
-build a new container instead of reasoning your way around the
-mutation.
+symptom moves with the input. For that reason each of the chapter's
+three fixes leaves the list the loop walks unchanged, instead of
+reasoning its way around the mutation.
 
+</details>
+</details>
+
+## 10. Strings `isdigit()` rejects and `int()` accepts
+
+> In `eafp.py`, predict what `look_first()` and `int()` each return for `" 42 "`
+> (with a space on each side) and for `"4_2"`, then run both.
+> Say what the results tell you about adding more tests to `look_first()`.
+
+<details>
+<summary>Where to look</summary>
+
+[Ask Forgiveness, Not Permission](../../Chapters/04_Foundations--Control_Flow.md#ask-forgiveness-not-permission) shows `isdigit()` and `int()` disagreeing on `"-5"` and `"²"`.
+`isdigit()` tests each character on its own, while `int()` reads the whole string as a number, so ask which characters besides digits a number can carry.
+For each string, ask whether `look_first()` would need a new test to agree with `int()`.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_10.py
+def look_first(text):
+    ...
+```
+
+<details>
+<summary>Solution</summary>
+
+```python
+# exercise_10.py
+def look_first(text):
+    if text.isdigit():
+        return int(text)
+    return None
+
+for text in (" 42 ", "4_2"):
+    print(repr(text), look_first(text), int(text))
+#: ' 42 ' None 42
+#: '4_2' None 42
+```
+
+`int()` accepts both strings and `look_first()` rejects both. `int()`
+strips surrounding whitespace, and it allows an underscore between
+digits, the same rule that makes `10_000_000` a valid literal.
+`isdigit()` asks whether every character is a digit, so the spaces
+and the underscore each fail it.
+
+Each new disagreement calls for another test in `look_first()`: one
+for a sign, one for whitespace, one for underscores, and one to turn
+away `"²"`. Those tests together are a second parser, written to
+predict what `int()` will do, and it is right only where it repeats
+`int()`'s rules. `parse_int()` asks `int()` and reads the answer, so
+it agrees with `int()` on every string, including strings you have
+not tried.
+
+</details>
 </details>
 </details>

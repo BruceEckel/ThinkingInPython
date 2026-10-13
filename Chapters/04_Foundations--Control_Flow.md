@@ -27,8 +27,17 @@ print(grade)
 #: ok
 ```
 
+`0 < x < 10` means `0 < x and x < 10`,
+except that Python evaluates the middle operand once.
+A C or C++ compiler reads the same expression as `(0 < x) < 10`,
+which compares a `0` or `1` against `10`, so it is always true.
+Java rejects the expression at compile time.
+
 The example also shows a *conditional expression*:
 a one-line `if`/`else` that produces a value.
+It does the job of the `?:` operator in C++ and Java,
+with the condition in the middle: first the value when the test is true,
+then `if` and the test, then `else` and the value when the test is false.
 
 Adding `elif` to an `if` statement tests several conditions in order:
 
@@ -117,14 +126,14 @@ print()  # The newline that end=" " left off
 The loop prints `0 1 2`, skips `3` with `continue`, prints `4 5`,
 then stops at `6` with `break`, so `6` through `9` never print.
 
+`print()` ends with a newline by default.
+`end=" "` replaces that newline with a space, so the numbers print on one line,
+and a bare `print()` emits the missing newline afterward.
+
 `break` and `continue` both apply to the innermost enclosing loop.
 Python has no labeled `break`, so leaving two loops at once means either a flag,
 a `return` from a function that holds both loops,
 or the loop `else` technique that `nested_break.py` shows below.
-
-`print()` ends with a newline by default.
-`end=" "` replaces that newline with a space, so the numbers print on one line,
-and a bare `print()` emits the missing newline afterward.
 
 Python has no `do`/`while` statement.
 When the test belongs in the middle or at the bottom of the body,
@@ -363,7 +372,7 @@ so the loop skips it and one of the two `2`s survives,
 with no exception to tell you.
 Adding the key changes the dictionary's size,
 and the dictionary raises a `RuntimeError` instead of skipping silently.
-The fix is the same for both.
+The same three fixes work for both.
 Build a new container with a comprehension,
 loop over a snapshot such as `list(ages)` while changing the original,
 or collect the changes first and apply them after the loop.
@@ -489,10 +498,12 @@ Python also flags the `return` in `finally` at compile time.
 Running the listing prints `SyntaxWarning: 'return' in a 'finally' block` to standard error before `swallowed`.
 
 Catch an exception only when you can do something about it.
-A bare `except:` with no type catches everything,
+A broad catch takes a bug in the `try` block along with the failure you expected,
+and makes the bug look like that failure.
+A bare `except:` with no type is the broadest of all.
+It catches everything,
 including the `KeyboardInterrupt` you press to stop a runaway program.
-It also catches a bug in the `try` block and makes it look like an expected failure.
-`except Exception:` is the broad catch you want instead.
+When you do need a broad catch, write `except Exception:`.
 `KeyboardInterrupt` and `SystemExit` derive from `BaseException` rather than `Exception`,
 so they propagate past that clause and still stop the program.
 
@@ -583,7 +594,7 @@ and `from None` when the earlier exception distracts from your own message.
 
 ### Ask Forgiveness, Not Permission
 
-Python's culture leans on "easier to ask forgiveness than permission,"
+Python style favors "easier to ask forgiveness than permission,"
 abbreviated EAFP.
 Try the operation and handle the exception,
 rather than checking every precondition first.
@@ -738,3 +749,6 @@ Try each exercise before opening its [solution](../Solutions/04_Foundations--Con
     so a `2` sits in the first slot.
     Use the shifting-slots explanation to predict what the loop leaves in `scores`,
     then run it to check.
+10. In `eafp.py`, predict what `look_first()` and `int()` each return for `" 42 "`
+    (with a space on each side) and for `"4_2"`, then run both.
+    Say what the results tell you about adding more tests to `look_first()`.
