@@ -1030,25 +1030,21 @@ print(goblin)
 #: Monster(name='Goblin', hp=10, powers=['bite'])
 print(captain)
 #: Monster(name='Captain', hp=20, powers=['bite', 'rally'])
+# Rebuild through the constructor with new field values:
+knight = copy.replace(goblin, name="Knight", hp=30)
+print(knight)
+#: Monster(name='Knight', hp=30, powers=['bite'])
+print(knight.powers is goblin.powers)
+#: True
 shallow = copy.copy(goblin)
 shallow.powers.append("shared")
 print(goblin.powers)  # The original changed too
 #: ['bite', 'shared']
-# Rebuild through the constructor with new field values:
-knight = copy.replace(goblin, name="Knight", hp=30)
-print(knight)
-#: Monster(name='Knight', hp=30, powers=['bite', 'shared'])
-print(knight.powers is goblin.powers)
-#: True
 ```
 
 Because the `clone()` method wraps `copy.deepcopy()`,
 `captain` gets its own `powers` list,
 and appending to it leaves `goblin.powers` unchanged.
-The `shallow` lines are a warning, not an example to follow.
-`copy.copy()` duplicates the `Monster` and shares its `powers` list,
-so changing that list through one object changes it for the other,
-with no error to signal the sharing.
 
 `deepcopy()` restores the clone's state without running the constructor,
 so a clone [skips the `__post_init__()` check](12_Techniques--Data_Classes_as_Types.md#copy-skips-the-constructor).
@@ -1059,8 +1055,14 @@ When the variant differs only in field values,
 so a `__post_init__()` check runs on the result.
 
 `copy.replace()` passes every field you do not name by reference,
-so `knight` shares `goblin`'s `powers` list, the same sharing `shallow` shows.
+so `knight` shares `goblin`'s `powers` list.
 Pass a fresh list for that field when the variant must own one.
+
+The `shallow` lines are a warning, not an example to follow.
+`copy.copy()` duplicates the `Monster` and shares its `powers` list,
+as `copy.replace()` does for `knight`.
+Changing that list through one object changes it for the other,
+with no error to signal the sharing.
 
 `deepcopy()` copies everything it can reach,
 and it has no way to copy an open file, a socket, or a lock,
