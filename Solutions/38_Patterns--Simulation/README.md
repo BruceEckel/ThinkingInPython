@@ -107,8 +107,8 @@ def test_rat_keeps_one_claim_and_spawns_the_rest() -> None:
 **Stand in for the blackboard.** `Rat` depends on the `Recorder`
 `Protocol`, not on `Blackboard`, so `FakeBlackboard` satisfies that
 `Protocol` by shape. It defines `claim()`, `spawn()`, `log()`, and
-`next_number()`, and none of the four touches a real `Maze` or
-`asyncio.create_task()`.
+`next_number()`, and none of the four touches a real `Maze` or a
+`TaskGroup`.
 
 **Script the rat's choices.** Scripting `claim()`'s return values in a
 preset sequence decides which neighbor the rat keeps for itself and
@@ -333,7 +333,9 @@ none of the right room's, so `unreached` is the right room's nine open
 cells.
 
 A cell is unreachable when no path of open cells connects it to the
-entry, not when a wall surrounds it. `Maze.entry()` scans row by row
+entry. Walls on all four sides of one cell are the smallest case, but
+every cell of the right room has open neighbors, and the wall between
+the rooms still cuts each one off. `Maze.entry()` scans row by row
 and returns the first open cell it finds, and every rat traces back to
 that single starting point through `claim()`. No rat therefore reaches
 a cell that has no open-cell path back to the entry, however many rats
@@ -435,122 +437,6 @@ class Blackboard:
 
 async def main() -> None:
     ...
-```
-
-```python
-# The shape of robot_world.py
-from enum import Enum, auto
-from itertools import groupby
-from typing import ClassVar, Final, override
-
-class Urge(Enum):
-    NORTH = auto()
-    SOUTH = auto()
-    EAST = auto()
-    WEST = auto()
-
-class Item:
-    symbol: ClassVar[str] = ""
-
-    def interact(self, robot: Robot, room: Room) -> Room:
-        ...
-
-    def __str__(self) -> str:
-        ...
-
-class Robot(Item):
-    symbol: ClassVar[str] = "R"
-    # Set by the builder when the robot is placed
-    room: Room
-
-    def __init__(self) -> None:
-        ...
-
-    def move(self, urge: Urge) -> None:
-        ...
-
-class Wall(Item):
-    symbol: ClassVar[str] = "#"
-
-    @override
-    def interact(self, robot: Robot, room: Room) -> Room:
-        ...
-
-class Food(Item):
-    symbol: ClassVar[str] = "."
-
-    @override
-    def interact(self, robot: Robot, room: Room) -> Room:
-        ...
-
-class Teleport(Item):
-    symbol: ClassVar[str] = ""  # Shown as its target letter
-    target_room: Room  # Paired up by the builder
-
-    def __init__(self, target: str) -> None:
-        ...
-
-    @override
-    def interact(self, robot: Robot, room: Room) -> Room:
-        ...
-
-    @override
-    def __str__(self) -> str:
-        ...
-
-class Empty(Item):
-    symbol: ClassVar[str] = "_"
-
-class Edge(Item):
-    symbol: ClassVar[str] = "/"
-
-    @override
-    def interact(self, robot: Robot, room: Room) -> Room:
-        # The void outside the maze: stay put
-        ...
-
-class EndGame(Item):
-    symbol: ClassVar[str] = "!"
-
-    @override
-    def interact(self, robot: Robot, room: Room) -> Room:
-        ...
-
-def item_factory(symbol: str) -> Item:
-    ...
-
-type Coord = tuple[int, int]
-type RoomMap = dict[Coord, Room]
-
-class Room:
-    def __init__(self, occupant: Item) -> None:
-        ...
-
-    def enter(self, robot: Robot) -> Room:
-        ...
-
-    def __repr__(self) -> str:
-        ...
-
-class Doors:
-    def __init__(self) -> None:
-        ...
-
-    def connect(self, row: int, col: int,
-                rooms: RoomMap) -> None:
-        ...
-
-    def open(self, urge: Urge) -> Room:
-        ...
-
-EDGE: Final[Room] = Room(Edge())
-
-class GameBuilder:
-    def __init__(self, maze: str) -> None:
-        ...
-
-    def run(self, solution: str) -> None:
-        ...
 ```
 
 <details>
@@ -677,7 +563,7 @@ asyncio.run(main())
 #: cells visited: 24
 ```
 
-**Carry the `async` to every caller.** The one requested change drags three more edits with it, and that
+**Carry the `async` to every caller.** The one requested change forces three more edits, and that
 spread is the exercise's quiet lesson: `async` is contagious.
 Once `claim()` is an `async def`, the `Recorder` protocol must declare
 it `async` too, `Rat.run()`'s comprehension needs
@@ -711,6 +597,12 @@ between the test and the add. A coroutine yields control only at an
 event loop can hand control to another rat before the test or after
 the add, but not between them. Adding the `await` opens that
 gap in the middle, and the whole guarantee depends on the gap's absence.
+
+</details>
+</details>
+</details>
+
+## 4 and 5: the robot world
 
 Exercises 4 and 5 both build on the same `robot_explorer` world,
 so `robot_world.py` holds that shared apparatus once (`Item` and its
@@ -881,10 +773,6 @@ class GameBuilder:
             self.robot.move(moves[char])
 ```
 
-</details>
-</details>
-</details>
-
 ## 4. A `Coin` item
 
 > Add a new kind of `Item` to the robot maze.
@@ -979,10 +867,9 @@ that list. No entry matches
 `$`, and the loop falls through to the factory's last line, which
 treats any unrecognized symbol as a teleport target. So
 `item_factory("$")` returns `Teleport("$")`. The two `$` cells become
-a teleport pair, the robot walks into a teleporter where the maze
-should hold a coin, the topology changes underneath the hard-coded
-route, and `game.robot.coins` stays
-`0`. A one-word change to a class header moves a character out of
+a teleport pair, so the route `"ee"` sends the robot through a
+teleporter where the maze should hold a coin, and `game.robot.coins`
+stays `0`. A one-word change to a class header moves a character out of
 the factory's search and silently substitutes a different `Item`.
 
 </details>
@@ -1155,7 +1042,7 @@ so `solve()` returns `None` and the walrus in the `while` reads it as
 **Replan after every meal.** The search must run again after every
 meal because its start and its goal both move.
 `Food.interact()` replaces the food with an `Empty()`, so the
-room the robot just arrived at stops being a goal, and the robot's
+room where the robot arrived stops being a goal, and the robot's
 own room is now the new start. A path planned from the entry is no
 use from any other room, so one search at the start yields the first
 leg and no more. Each search touches at most the maze's 299 rooms
@@ -1169,8 +1056,9 @@ longer walk. Two pieces
 of food can sit close together down one dead-end corridor while a
 third sits one step nearer in the opposite direction, with the rest
 of the food far beyond it. Taking the single near one first means
-walking to it, back past the start to the corridor, and out past it
-again. The shortest
+walking to it, back past the start to the corridor, and then past the
+start again toward the rest, so the robot walks the stretch between
+the start and the single piece three times. The shortest
 complete tour is a travelling-salesman problem over the food rooms,
 and its first leg is often not the shortest leg available. The greedy
 tour does guarantee that every leg is a shortest path, which is all
@@ -1317,7 +1205,7 @@ displacement by the amplitude under that grain, so
 grain where the constructor scattered it. The view shows
 neither chaos nor a figure because no grain moves. It shows the
 initial random scatter, frozen. Agitation reads `0.000` from
-the first step, the same number a perfectly settled plate reports, so
+the start, the same number a perfectly settled plate reports, so
 the summary statistic cannot tell "finished" from "never started."
 
 **Probe a point on the diagonal.** The main diagonal in every figure follows from the same two terms.

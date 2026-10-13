@@ -31,7 +31,8 @@ A *blackboard* is the shared surface on which every rat writes.
 *Blackboard* is a classic coordination pattern.
 Independent agents read from and write to one common data structure instead of calling each other's methods.
 Here the blackboard owns the maze, records which cells the rats have explored,
-hands out rat numbers, and creates the task for each new rat.
+hands out rat numbers, collects the rats' log messages,
+and creates the task for each new rat.
 The rats run as cooperative `asyncio` tasks.
 They take turns, one at a time,
 and each rat finishes its update before the next one runs,
@@ -362,7 +363,7 @@ the race that `claim()`'s atomicity resolves.
 
 ### Contention on a Loop
 
-A maze with a loop closes a second path between two cells,
+A maze with a loop holds two paths between some pairs of cells,
 so two different rats can reach the same open cell from opposite directions.
 Eight open cells around one wall block are enough to force the race:
 
@@ -583,7 +584,7 @@ The occupants are `Item`s.
 `Room.enter()` calls `occupant.interact()` and returns the room in which the robot ends up.
 A wall returns the robot's current room,
 food replaces itself with `Empty` and returns its own room,
-a teleport returns its paired room.
+and a teleport returns its paired room.
 No `if` or `elif` on the type of occupant appears in the movement code:
 
 ```python
@@ -722,7 +723,7 @@ If you derive a class from `Food` to inherit its behavior,
 that class is a grandchild of `Item`.
 `Item.__subclasses__()` leaves it out,
 so the loop finds no match and the function's last line builds a `Teleport`.
-The same chapter's [Simple *Factory Method*](27_Patterns--Factory.md#simple-factory-method)
+[Factory](27_Patterns--Factory.md#simple-factory-method)
 describes the recursion for deeper hierarchies,
 and that chapter's exercise 9 writes the recursion.
 
@@ -731,7 +732,7 @@ Doors that lead nowhere point at one shared `EDGE` room,
 the void outside the maze,
 so the robot can try any direction without a special case.
 `EDGE` is a [*Null Object*](20_Patterns--Rethinking_Objects.md#null-object).
-It takes `enter()` like any other room,
+`Robot.move()` calls its `enter()` as it does any other room's,
 and its `Edge` occupant's `interact()` returns `robot.room`,
 so the robot stays where it was.
 
@@ -782,7 +783,7 @@ class Doors:
 EDGE: Final[Room] = Room(Edge())
 ```
 
-The `Coord` here counts `(row, col)`,
+The `Coord` here is `(row, col)`,
 the opposite order from the rats example's `(column, row)`,
 because `GameBuilder` walks the maze text line by line.
 
@@ -1216,11 +1217,11 @@ Bowing a different spot rings the plate in a different mode and draws a differen
 
 ### The Model
 
-`amplitude()` is the standing-wave field of a square plate ringing in mode `(m, n)`.
+`amplitude()` returns how strongly a square plate ringing in mode `(m, n)` vibrates at the point `(x, y)`.
 Physics supplies the formula, an approximation for a plate with free edges.
 Treat it as given.
 Only its shape matters here.
-The field is zero along curves, and those curves are the nodal lines.
+The vibration is zero along curves, and those curves are the nodal lines.
 
 ```python
 # chladni_plate/standing_wave.py
