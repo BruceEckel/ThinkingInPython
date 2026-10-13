@@ -43,7 +43,7 @@ def find(entry: Node, name: str,
 <summary>Solution</summary>
 
 If you copy `walk()` and add a name test to the `File` case alone,
-`find(root, "main.py")` still works, but `find(root, "src")` returns an empty list.
+`find(root, "main.py")` still works, but `find(root, "src")` yields nothing.
 A `Directory` case that descends without a name test omits its own path.
 The exercise says a directory can match,
 so the solution's `Directory` case tests its own name before it descends.
@@ -163,7 +163,7 @@ def walk(entry: Node, prefix: str = "") -> Iterator[str]:
 <summary>Solution</summary>
 
 If you follow the link, resolving `target` to its node and
-recursing into that node, `disk_usage(tree)` prints `10`.
+recursing into that node, `disk_usage(tree)` returns `10`.
 It counts `a.txt` once as a file and again through `shortcut`.
 A link to an ancestor, such as `Symlink("up", "/root")`,
 sends `disk_usage()` around the loop until Python raises a
@@ -505,8 +505,8 @@ print(to_infix(simplify(Neg(Neg(x)) + Num(0))))
 
 **Fold negations where possible.** `simplify()` is the interesting one. For `Neg`, a constant operand
 folds (`Neg(Num(a))` → `Num(-a)`), and a double negation cancels
-(`Neg(Neg(inner))` → `inner`). Every case keeps the chapter's `is`
-test, so an unchanged subtree is still shared.
+(`Neg(Neg(inner))` → `inner`). Both new cases keep the chapter's
+`is` test, so an unchanged subtree is still shared.
 
 **Leave division for evaluation.** For `Div`, `simplify()` folds nothing. A quotient of two `int`s is
 usually not an `int`, so it does not fit in a `Num`, and division by
@@ -1371,16 +1371,17 @@ case, so `assert_never()` still type-checks. A string marker leaves
 `case _` reachable and the guarantee gone.
 
 `sys.setrecursionlimit()` avoids the error for `evaluate()`, but it
-has three drawbacks. A call from one Python function to
-another uses no C stack, so with the limit raised to `10**9`,
-`evaluate()` walks a million-level tree. Anything that recurses
-through C still stops. `repr()` or `hash()` on that same tree raises
-a `RecursionError` that reports a stack overflow, whatever the limit
-says. Each pending level also holds a frame,
-so memory grows with depth. The limit is global too, so a library
-that raises it changes the behavior of code that did not ask for a
-higher limit. The iterative walk keeps its pending work in one list
-and changes no setting that other code can see.
+has three drawbacks. First, it lifts the limit for Python calls
+alone. A call from one Python function to another uses no C stack,
+so with the limit raised to `10**9`, `evaluate()` walks a
+million-level tree. Anything that recurses through C still stops:
+`repr()` or `hash()` on that same tree raises a `RecursionError`
+that reports a stack overflow, whatever the limit says. Second,
+each pending level holds a frame, so memory grows with depth.
+Third, the limit is global, so a library that raises it changes the
+behavior of code that did not ask for a higher limit. The iterative
+walk keeps its pending work in one list and changes no setting that
+other code can see.
 
 </details>
 </details>
@@ -1499,7 +1500,7 @@ print(root.disk_usage())
 #: 740
 ```
 
-What breaks in the closed version is obvious. `type Node = File |
+The closed version breaks at the union. `type Node = File |
 Directory` lives in your source, so a plugin cannot extend it. The
 type checker does warn the plugin author. `ty` reports a `Symlink`
 passed to `disk_usage()`, or placed in a `Directory`'s entries, as

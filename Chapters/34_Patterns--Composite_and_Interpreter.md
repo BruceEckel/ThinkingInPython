@@ -239,8 +239,9 @@ applies to node types.
 A file and a directory are both a `Path`,
 which makes `pathlib` look like a *Composite*.
 `pathlib` has the uniform interface.
-`name`, `exists()`, and `stat()` work on either kind of entry,
-and `iterdir()` and `rglob()` walk the tree without asking which kind they hold.
+`name`, `exists()`, and `stat()` work on either kind of entry.
+`iterdir()` lists one directory and `rglob()` walks the whole tree,
+and both yield a `Path` for each entry, whatever its kind.
 `pathlib` lacks the structure.
 A `Path` is an immutable value that names a location and holds no entries.
 The tree lives in the operating system's filesystem,
@@ -394,24 +395,27 @@ Overloaded operators build an expression tree,
 and a library interprets that tree later, symbolically, over a whole column,
 or as SQL.
 
-Python's grammar sets the limit of the technique.
 You can overload the arithmetic, bitwise, and comparison operators this way,
 so an expression written with them builds nodes instead of computing.
-`==`, though, compares nodes instead of building one.
+`==` is the exception in `expr.py`,
+where it compares nodes instead of building one.
 `@record` writes its own `__eq__()` onto every node class.
 Attribute lookup finds a class's own method before an inherited one,
 so that generated `__eq__()` shadows anything `Operators` defines.
 
-`expr.py` leaves `==` alone.
+Leaving `==` alone suits `expr.py`.
 The nodes compare by value,
 and `build_tree.py` and the chapter's tests rely on that comparison.
-When a library's `==` must build a node, as SQLAlchemy's `col == 5` does,
-the library sets `eq=False` on the dataclass, giving up structural comparison,
-and writes its own `__eq__()`.
+SQLAlchemy's `col == 5` builds a node,
+so its column classes define their own `__eq__()` and give up `==` as a structural comparison.
+A data class that builds a node from `==` sets `eq=False`,
+which keeps the generated `__eq__()` from shadowing an inherited one.
 This chapter keeps structural comparison.
 A class gets either that or an `==` that builds a node, not both.
 
-`and`, `or`, and `not` belong to Python alone.
+Python's grammar sets a harder limit.
+`and`, `or`, and `not` belong to Python alone,
+and no special method makes them build a node.
 Python tests the operand's truth value.
 Then `and` and `or` return one of the two objects, and `not` returns a `bool`.
 `x and y` evaluates to `y`, builds nothing, and reports no error.
@@ -699,11 +703,12 @@ operator methods that build nodes, and `match` functions that walk them.
 
 One practical limit applies.
 Every function here recurses once per level of tree,
-and Python's recursion limit (roughly a thousand frames)
+and Python's recursion limit (1000 frames by default)
 caps how deep a tree they can walk.
 Realistic expressions stay far below it.
 A machine-generated chain of thousands of nested nodes exceeds the limit.
-The alternative is an iterative walk with an explicit stack of pending nodes.
+The alternative is an iterative walk with an explicit stack of pending nodes
+(see exercise 8).
 
 ## A Template Is a Tree {#a-template-is-a-tree}
 
@@ -713,7 +718,7 @@ A [`t`-string](02_Foundations--Tour.md#t-strings) evaluates to a `Template`:
 a stream of two node kinds,
 the literal `str` pieces the author typed and the `Interpolation` objects holding the values.
 Iterating over a `Template` is flat.
-`for piece in template` yields exactly one level of `str` and `Interpolation` objects,
+`for piece in template` yields one level of `str` and `Interpolation` objects,
 so the walk is a loop rather than a recursion.
 An interpolation's value can be a `Template`,
 built by nesting one `t`-string inside another.
