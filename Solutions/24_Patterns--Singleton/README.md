@@ -44,10 +44,11 @@ class OnlyOne:
 <summary>Solution</summary>
 
 If you remove the guard but keep the annotation `ClassVar[__OnlyOne | None]`,
-the script still runs and prints the same line,
-but `ty` reports an `unresolved-attribute` error on `OnlyOne.instance.val.append(arg)`,
-because `val` is not defined on `None`.
-In the chapter's version, the guard is the type checker's evidence that `instance` holds an object.
+the script still runs and prints the same line.
+`ty`, though, reports an `unresolved-attribute` error on `OnlyOne.instance.val.append(arg)`,
+because `None` has no `val` attribute.
+In the chapter's version, the guard narrows `instance` to the inner class,
+so the type checker accepts the `append()` call after it.
 Once the class body binds the inner instance, `instance` always holds an object,
 so the solution drops `None` from the annotation.
 
@@ -88,11 +89,14 @@ body finishes.
 stays the same: `x.val` accumulates the same way, `x is y` is still
 `False`, and `x.instance is y.instance` is still `True`.
 
+The change gives up the deferral.
 Python now builds the inner object at class definition, during
 module import, whether or not anything constructs an
-`OnlyOne`. Removing the deferral also removes the first-call race from
-[Tests, Threads, and Locks](../../Chapters/24_Patterns--Singleton.md#tests-threads-and-locks):
-two threads racing the first construction could each see the `None`
+`OnlyOne`.
+
+Removing the deferral also removes the first-call race from
+[Tests, Threads, and Locks](../../Chapters/24_Patterns--Singleton.md#tests-threads-and-locks).
+In the chapter's version, two threads racing the first construction could each see the `None`
 sentinel and each build an inner object. The class body runs once,
 during the import, so no first call remains to race.
 
@@ -112,7 +116,7 @@ during the import, so no first call remains to race.
 
 [When You Want a Class, Cache the Instance](../../Chapters/24_Patterns--Singleton.md#when-you-want-a-class-cache-the-instance) uses `functools.cache` on a zero-argument function to return one object.
 Keep that technique for the pool, and give the pool a list of available connections and a set of leased ones.
-`acquire()` moves a connection from one to the other, and `release()` moves it back.
+`acquire()` moves a connection from the available list to the leased set, and `release()` moves it back.
 
 <details>
 <summary>The shape</summary>
@@ -148,8 +152,8 @@ def pool() -> ConnectionPool:
 
 If you give `pool()` a `size` parameter with a default of 2,
 `@cache` builds one pool for each way a caller writes the call.
-In that version `pool()`, `pool(2)`, and `pool(size=2)` return three different pools,
-and after two `acquire()` calls exhaust the first, `pool(2).acquire()` lends a third connection.
+In that version, `pool()`, `pool(2)`, and `pool(size=2)` return three different pools.
+After two `acquire()` calls exhaust the pool from `pool()`, `pool(2).acquire()` still lends a third connection.
 [When You Want a Class, Cache the Instance](../../Chapters/24_Patterns--Singleton.md#when-you-want-a-class-cache-the-instance) shows the same failure with `settings(env)`,
 so the solution keeps `pool()`'s signature empty and sets the size in its body.
 
@@ -203,28 +207,28 @@ print(c3 == c1)
 #: True
 ```
 
-**Hold a closed set of connections.** The change from
-`singleton_cached_factory.py` is in what the one shared object holds.
-Instead of holding a single value, it holds a set number of
-`Connection`s and tracks which ones it has handed out.
+**Hold a limited number of connections.** The pool keeps the shape of
+`singleton_cached_factory.py` and changes the contents of the one shared object.
+That object holds a set number of `Connection`s instead of a single value,
+and tracks which ones it has handed out.
 
 **Lend a connection and take it back.** `acquire()` and `release()`
 replace the "get the instance" idea with "borrow one member of a
-pool and give it back,"
-similar in spirit to [Context Managers](../../Chapters/15_Techniques--Context_Managers.md#an-object-pool)'s
-`Pool.lease()`, but without the automatic return a context manager
-guarantees. Here a caller must remember to call `release()`, and
+pool and give it back."
+[Context Managers](../../Chapters/15_Techniques--Context_Managers.md#an-object-pool)'s
+`Pool.lease()` does the same, but puts the member back automatically
+when the `with` block ends. Here a caller must remember to call `release()`, and
 to call it once.
 
 **Refuse a second release.** `release()` removes the connection from `_leased`
 with `remove()`, which raises a `KeyError` for a connection that is
 not on lease. With `discard()` there, a second `release()` would
-put the same connection into `_available` twice, and the pool would
+put the same connection into `_available` twice, so the pool would
 hand one connection to two callers.
 
-**Share one pool.** `@cache` on the zero-argument `pool()` constructor function still
-yields one `ConnectionPool` object (`p1 is p2`), the same technique
-`singleton_cached_factory.py` uses for `Settings`.
+**Share one pool.** The zero-argument `pool()` constructor function still
+returns one `ConnectionPool` object (`p1 is p2`), because `@cache` stores its first result.
+`singleton_cached_factory.py` uses the same technique for `Settings`.
 
 </details>
 </details>
@@ -239,7 +243,7 @@ yields one `ConnectionPool` object (`p1 is p2`), the same technique
 <summary>Where to look</summary>
 
 [A Module Is Already a *Singleton*](../../Chapters/24_Patterns--Singleton.md#a-module-is-already-a-singleton) explains that Python caches a module in `sys.modules` and runs its body once.
-Put the shared list at module level, add a function that appends to it, and use it from a second file.
+Put the shared list at module level, add a function that appends to it, and use the module from a second file.
 For the argument, weigh the code each form needs against what only a class can offer.
 
 <details>
@@ -274,19 +278,20 @@ print(only_one.val)
 
 The module behaves like `OnlyOne` from
 `singleton_pattern.py`: a shared, one-and-only-one `val` list to
-which any part of the program can append. The module is the single
-shared object Python caches in `sys.modules`, so the solution drops
-the chapter's machinery: the wrapper class, the nested private
-class, the `ClassVar` sentinel, and the `__getattr__()` delegation.
+which any part of the program can append.
+Python caches the module in `sys.modules`, so the module is the single shared object.
+The solution therefore drops the chapter's machinery:
+the wrapper class, the nested private class, the `ClassVar` sentinel, and the `__getattr__()` delegation.
 
-For real code, prefer the module. It is less code, has no
-indirection to follow, and gets the same guarantee.
-[A Module Is Already a *Singleton*](../../Chapters/24_Patterns--Singleton.md#a-module-is-already-a-singleton)
-makes that argument at the top of the chapter. The class-based
-versions are worth their complexity when something needs the shape
-of a class, such as participating in an interface other code
-expects, or needing `__new__()`-level control over construction.
-Absent that requirement, a module is the simpler tool.
+For real code, prefer the module,
+as [A Module Is Already a *Singleton*](../../Chapters/24_Patterns--Singleton.md#a-module-is-already-a-singleton)
+argues at the top of the chapter.
+The module is less code, lets the caller
+read the list as a module attribute, and gets the same guarantee.
+The class-based versions are a better choice when the singleton must be a class:
+when it must satisfy an interface other code expects,
+or when it needs `__new__()`-level control over construction.
+Everywhere else, the module is the simpler tool.
 
 </details>
 </details>
@@ -330,17 +335,17 @@ print(config.settings)  # [2]
 ```
 
 The listing puts `import config` at the top, where ruff expects
-every import. Its position changes nothing: whichever import comes
+every import. Either order gives the same output. Whichever import comes
 first runs the body, and the other finds `config` in `sys.modules`.
 
 The prints at `[1]` and `[2]` disagree, and the exercise turns on
 why.
 
-**Give one dict two names.** `from config import settings` copies a binding: two names, this
-module's `settings` and `config.settings`, initially pointing at
-one dict. Mutating through either name, as the original
-`settings["theme"] = "dark"` does, changes the object both names
-reference, so both see the change.
+**Give one dict two names.** `from config import settings` copies a binding.
+This module's `settings` and `config.settings` start out as two names for one dict.
+The original `settings["theme"] = "dark"` mutates that dict through one of them.
+A mutation through either name changes the object both names reference,
+so a read through either name returns the changed dict.
 
 **Rebind only the local name.** Assigning to `settings` points
 this module's name at a new dict. The name in `config` still
@@ -349,21 +354,21 @@ points at the original empty dict, so the print at `[2]` shows
 
 Nothing warns you at runtime. The module still imports, the
 assignment succeeds, and the local `settings` holds what you put in
-it. The sharing is simply gone. Each module now reads a different
-dict, with no error to mark the split. Importing the module and
-assigning `config.settings = {...}` replaces the value every reader
-of `config.settings` sees, because that assignment rebinds the
-attribute on the one module object rather than a name in your own
-namespace.
+it. But each module now reads a different dict, and the sharing has ended.
 
-**Silence the deliberate rebinding.** A linter does object, which is why the listing carries
+**Silence the deliberate rebinding.** A linter does report the rebinding, which is why the listing carries
 `# noqa: F811`. Ruff reads the assignment as redefining a name the
 module just imported, and flags it as an unused import followed by a
 shadowing binding. That rule exists because rebinding an imported
 name is far more often a mistake than an intention. Here the
-rebinding is deliberate, so the solution silences the warning, but
-in ordinary code the warning is the one automatic signal you get
+rebinding is deliberate, so the solution silences the warning.
+In ordinary code that warning is the one automatic signal
 that code has rebound a shared name.
+
+To replace the shared dict, assign through the module.
+`config.settings = {...}` rebinds the attribute on the one module object
+rather than a name in your own namespace,
+so every later read of `config.settings` returns the new dict.
 
 A name and the object it refers to are different things, and every
 singleton built on module state depends on that difference. Mutate
@@ -457,51 +462,53 @@ print(len({id(s) for s in shared}))
 #: 1
 ```
 
-**Order only the body.** The count does not drop, because the lock guards the wrong step. A
+**Order only the body.** The count stays above one because the lock guards the wrong step. A
 call to `settings()` takes two steps: `@cache` looks for a stored
 result, and, on a miss, the body runs. The lock sits inside the
 body, so it orders only the second step. All eight threads reach
 the lookup before any of them has stored anything, so all eight
-miss. Each is already committed to running the body before the
-first one takes the lock.
+miss. Each thread that missed then waits for the lock and runs the
+body in turn.
 
 **Race eight first calls.** The lock changes the timing, not the outcome. Without it the eight
 constructors overlap and the whole run takes about 50 milliseconds.
 With it they queue, and the run takes about 400. Each thread still
 builds its own `Settings` and still returns the one it built.
 `@cache` keeps whichever finished last, so seven callers hold
-objects the cache no longer holds. The lock makes the program
+objects the cache has overwritten. The lock makes the program
 slower and fixes nothing.
 
-You cannot put the lock inside `functools.cache`,
-where the check and the store live and where a per-key lock would sit,
-because you do not own that code.
-You can put it around the cached call.
-An uncached wrapper function takes the lock and calls the cached `settings()` inside it,
-so the lookup and the body both run under one lock,
-and eight racing first calls build one object.
+The check and the store run inside `functools.cache`,
+which is where a per-key lock would go.
+`functools.cache` belongs to the standard library, so you cannot add a lock there.
+You can put one around the cached call.
+An uncached wrapper function takes the lock, then calls the cached `settings()` while holding it.
+The lookup and the body then both run under one lock,
+so eight racing first calls build one object.
 
-The wrapper takes the lock on every call, not just the first,
-because the wrapper cannot see a hit until it has asked the cache.
+The wrapper takes the lock on every call, cache hits included,
+because the cache lookup runs inside `settings()`,
+which the wrapper calls with the lock held.
 The chapter's `singleton_locked_settings.py` takes the lock on every call too.
 It drops `@cache` and hand-writes the check inside one lock.
 
 **Build the object before the threads start.** Without a lock, the fix is to remove the race rather than to order
 it. A race needs two threads arriving before the object exists, so
 build the object first. The module body calls `primed()` once,
-before any worker thread starts, and by the time the pool exists
-every call is a cache hit. The count is `1`.
+before any worker thread starts.
+By the time the second `ThreadPoolExecutor` starts its workers,
+every call to `primed()` is a cache hit. The count is `1`.
 
-Priming the cache before any worker thread starts is
-`singleton_eager_factory.py` from the chapter, and it works for the
-same reason the module form does. The import system runs a module
+The chapter's `singleton_eager_factory.py` uses the same technique.
+It primes the cache at import, before any thread can ask.
+Priming works for the same reason the module form does. The import system runs a module
 body once, and a thread that imports the module while the body is
 running waits for the body to finish.
 
-The trade is that the module body builds the object whether or not
-anything uses it. For settings an unused object does no harm. For a
-database connection it may hold a resource nobody requested, and then
-the hand-written lock is the answer.
+The module body builds the object whether or not
+anything uses it. For `Settings`, an object that sits idle is fine.
+A database connection, though, would open at import, before any caller asks for it.
+For a connection, the hand-written lock is the answer.
 
 </details>
 </details>
@@ -597,24 +604,27 @@ unrelated subclass overwrites a value belonging to `Singleton`, and
 nothing reports the overwrite.
 
 **Inherit the base's one dict.** `_shared_state` is one dict, and it lives on `Borg`. `Singleton` and
-`Other` do not declare their own, so `self._shared_state` resolves
-to `Borg`'s dict from both, and `Borg.__init__()` points both
-instances' `__dict__` at that one dict. The sharing is per-`Borg`,
+`Other` inherit it, so `self._shared_state` resolves
+to `Borg`'s dict from both.
+`Borg.__init__()` then points both instances' `__dict__` at that one dict. The sharing is per-`Borg`,
 not per-subclass. The class hierarchy hides that sharing.
-`Singleton` and `Other` have no visible connection to each other.
+Read separately, `Singleton` and `Other` look like independent siblings.
 
 **Give a subclass its own storage.** The fix is one line per subclass. `Separate` declares its own
-`_shared_state`, so the lookup stops there instead of reaching `Borg`,
-and its instances share with each other and with nobody else. Martelli
+`_shared_state`, so the lookup finds `Separate`'s dict before `Borg`'s.
+`Separate`'s instances share that dict among themselves. Martelli
 makes the same point in the article the chapter links: a subclass that
-needs state of its own says so.
+needs state of its own declares it.
 
 The trap is the general shape of a mutable `ClassVar` on a base
 class, not a quirk of *Borg*. The base declares one object, and
-every subclass inherits that same one. A subclass that binds its own
-`_shared_state` in its class body, instead of mutating the inherited one,
-gets storage of its own, while the others keep sharing. *Borg*
-sharpens the trap, because every *Borg* instance writes its
+every subclass inherits that same one.
+A subclass gets separate storage when its class body binds a new `_shared_state`
+instead of mutating the inherited one.
+The subclasses that leave it alone keep sharing the inherited one.
+
+*Borg*
+makes the trap worse, because every *Borg* instance writes its
 attributes into the shared dict by design. Any subclass that leaves
 `_shared_state` alone writes into `Borg`'s dict, beside every other
 such subclass.
@@ -695,13 +705,13 @@ is a `SingletonClassVar`, the class under construction, so Python
 runs `__init__()` on it after every call to `__new__()`.
 
 **Reset the state on every construction.** The trace
-shows three runs. Each one rebinds `val` to a new one-item list,
-and the lists from the first two constructions are gone. The
+shows three runs. Each run rebinds `val` to a new one-item list,
+discarding the list before it. The
 object is single, and every caller who constructs it resets its
 state.
 
-The chapter's listing avoids the reset by defining no `__init__()`.
-Its `__new__()` does the work, and the `None` test there separates
+The chapter's listing inherits `object.__init__()` and does all its work in `__new__()`.
+There the `None` test separates
 the first construction, which creates `val`, from the later ones,
 which append to it. A singleton that keeps an `__init__()` must
 make it safe to run repeatedly, for example by returning at once
@@ -709,8 +719,8 @@ when `hasattr(self, "val")` is true.
 
 The metaclass form in
 [Metaprogramming](../../Chapters/17_Techniques--Metaprogramming.md#intercepting-instance-creation)
-runs `__init__()` once. Its `__call__()` runs before `__new__()` and
-`__init__()`, and after the first construction it calls neither.
+runs `__init__()` once. Its `__call__()` runs before `__new__()` and `__init__()`.
+After the first construction, `__call__()` returns the stored instance from `_instances`.
 
 </details>
 </details>
