@@ -69,11 +69,11 @@ print(deque_time < list_time)
 `deque_time < list_time` holds at `n = 2_000`, `20_000`, and `200_000`.
 But the margin grows with `n`. Each `list.insert(0, x)` or
 `list.pop(0)` shifts every remaining element, so the whole loop costs
-O(n²). Each `deque` operation is O(1), so the `deque` loop costs O(n). At a few
-dozen items the constant-factor overhead of a `deque` nearly closes the
-gap, though by `n = 2_000` the `deque` finishes several times faster.
-At large `n` the quadratic cost of the list dominates and the `deque`
-wins by a wide and growing margin.
+O(n²). Each `deque` operation is O(1), so the `deque` loop costs O(n).
+At a few dozen items the constant-factor overhead of a `deque` makes the two times nearly equal,
+though by `n = 2_000` the `deque` finishes several times faster.
+At large `n` the list's quadratic term dominates,
+so the list falls further behind the `deque` as `n` grows.
 
 </details>
 </details>
@@ -113,10 +113,9 @@ print(dict(counts))
 ```
 
 `defaultdict(int)` supplies `0` the first time the loop reads a key,
-because `int()` returns `0`. That default turns `counts[kind] += 1`
-into working code with no "does this key exist yet" check, the same
-way `defaultdict(list)` removes the check for appending to a fresh
-list.
+because `int()` returns `0`.
+That default lets `counts[kind] += 1` work with no "does this key exist yet" check.
+`defaultdict(list)` removes the same check before appending to a fresh list.
 
 </details>
 </details>
@@ -185,10 +184,10 @@ except TypeError as e:
 ```
 
 A `set` hashes each element once, at insertion, so every element must
-be hashable. `frozenset` is hashable because it is immutable. Its
-contents stay the same after creation, so its hash stays valid. A `list`
-is mutable, so Python refuses to hash it, and an object with no hash
-cannot be a set member or a dictionary key.
+be hashable. `frozenset` is hashable because it is immutable.
+Because its contents stay the same after creation, its hash stays valid.
+A `list` is mutable, so the `list` class sets `__hash__` to `None`.
+A set member or a dictionary key needs a hash, so a `list` can be neither.
 
 </details>
 </details>
@@ -209,9 +208,9 @@ A negative `step` also reverses in a single slice, but then `start` and `stop` s
 <details>
 <summary>Solution</summary>
 
-If you fold the two slices into one as `xs[1:4:-1]`, you get an empty list.
-A negative `step` walks left from `start`,
-and index `1` lies left of the stop at `4`,
+If you fold `xs[1:4][::-1]` into one slice as `xs[1:4:-1]`, you get an empty list.
+A negative `step` counts down from `start`,
+and index `1` is less than the stop at `4`,
 so the slice ends before it takes an item.
 The one-slice form in the solution swaps the bounds to `xs[3:0:-1]`.
 
@@ -229,11 +228,11 @@ print(xs[3:0:-1])  # The same three, in one slice
 ```
 
 A negative `start` counts from the end, so `xs[-2:]` needs no length.
-`xs[1:-1]` trims one from each end. The reversed middle has two
-forms: slice, then reverse the copy, or walk backwards with a
+`xs[1:-1]` trims one item from each end. The reversed middle has two
+forms: slice, then reverse the copy, or count the indices down with a
 negative `step`. The one-slice form is harder to read because the
 bounds swap roles. `3` is now the first index visited and `0` is the
-excluded stop, so the element at index `0` does not appear.
+stop, so the slice ends at index `1`.
 
 </details>
 </details>
@@ -256,9 +255,9 @@ Then reproduce `most_common()` with `sorted()` and a `key` function, and notice 
 If you leave the minus sign out of the `key` function,
 `sorted()` ranks the lowest counts first,
 and the slice prints `[('dog', 0), ('sat', 1)]`.
-The `'dog'` entry is the `0` that the earlier `counts["dog"]` read stored.
-`most_common()` ranks from the highest count down,
-so the key negates each count to put the largest first.
+Reading `counts["dog"]` earlier stored that `0` under `'dog'`.
+The minus sign negates each count, so `sorted()` puts the largest count first,
+matching `most_common()`, which ranks from the highest count down.
 
 ```python
 # exercise_6.py
@@ -281,9 +280,10 @@ counts an iterable inside its constructor, while `defaultdict(int)`
 removes the "does this key exist yet" check and leaves the counting to
 you.
 
-**Default a missing key to zero.** A read of a missing key also leaves a `Counter` alone, while
-`defaultdict(int)` stores a `0` for `"dog"`, so their contents differ
-after the `counts["dog"]` line.
+**Default a missing key to zero.** Both containers read a missing key as `0`.
+A `Counter` leaves its contents as they were,
+while `defaultdict(int)` stores a `0` for `"dog"`,
+so their contents differ after the `counts["dog"]` line.
 
 **Rebuild the reporting.** The rest is what `Counter` supplies after
 the tally. `most_common()` becomes a `sorted()` call with a key
@@ -302,7 +302,7 @@ conversion.
 <summary>Where to look</summary>
 
 [`namedtuple`](../../Chapters/03_Foundations--Containers.md#namedtuple) builds a tuple subclass with named fields.
-Because the result is still a tuple, the unpacking from [Tuples and Unpacking](../../Chapters/03_Foundations--Containers.md#tuples-and-unpacking) works by position.
+Because each instance is still a tuple, the unpacking from [Tuples and Unpacking](../../Chapters/03_Foundations--Containers.md#tuples-and-unpacking) works by position.
 Create the class with `namedtuple()`, keep the unpacking line as it was, and add a line that reads a field by name.
 
 <details>
@@ -328,9 +328,10 @@ print(person[0], type(person[0]).__name__)
 The unpacking line stays the same, because a `namedtuple` is a tuple
 subclass. The `namedtuple` unpacks by position like any other tuple.
 
-The names add the second `print()` (`[1]`), where `person.height`
-says what `person[2]` means. Unpacking and `person[0]` still work
-beside the names, so a heterogeneous tuple that outlives one function
+Line `[1]` reads fields by name,
+and `person.height` names the field that `person[2]` reads by position.
+Unpacking and `person[0]` still work beside the names,
+so a heterogeneous tuple that passes between functions
 is usually better as a `namedtuple` or a data class.
 
 </details>
@@ -348,7 +349,8 @@ is usually better as a `namedtuple` or a data class.
 
 [Dictionaries](../../Chapters/03_Foundations--Containers.md#dictionaries) shows the `dict` constructor and the merge operators in `dict_ops.py`.
 The `dict()` constructor accepts an iterable of pairs.
-The `|` operator builds a new `dict`, so decide from `update()` which operand supplies the value when both hold the same key.
+The `|` operator builds a new `dict`.
+To decide which operand supplies the value when both hold the same key, compare `|` with `update()`, which writes its argument's entries over the dictionary's own.
 
 <details>
 <summary>Solution</summary>
@@ -373,20 +375,21 @@ becomes a dictionary in one call. `dict(zip(names, values))` is the
 same constructor fed from two parallel sequences.
 
 **Resolve the collision.** `30` ends up under `"c"`, because `|` resolves a collision in favor of
-the right operand. The rule follows from what a merge must be. The
-result is one value per key, and the two dictionaries disagree about
-`"c"`, so one of them must lose. The right intuition for `a | b` is
-"start from `a`, then apply `b`", and that reading matches
-`a.update(b)`, which has always worked that way.
+the right operand.
+A merge holds one value per key, and the two dictionaries hold different values for `"c"`,
+so the merge must drop one of them.
+The right operand wins because `a | b` reads as "start from `a`, then apply `b`,"
+the same order `a.update(b)` has always used.
 
-**Leave the left operand unchanged.** `|=` updates the left dictionary in place, while
-`|` builds a new one and leaves the left operand alone, as the last
-`print(counts)` above confirms.
+**Build a new dictionary.** `|` builds a new dictionary and leaves the left operand alone,
+so `counts` prints unchanged after the merge.
+`|=` instead updates the left dictionary in place.
 
-Letting the right operand win makes `|` on dictionaries asymmetric,
-unlike `|` on sets, where `a | b` and `b | a` are the same set. The
-two uses share one operator because both mean "combine," but only the
-set version commutes.
+Letting the right operand win makes `|` on dictionaries depend on operand order.
+`a | b` and `b | a` differ when the two dictionaries hold different values for a shared key.
+On sets, `a | b` and `b | a` are the same set.
+The two uses share one operator because both mean "combine,"
+but the set version alone commutes.
 
 </details>
 </details>
@@ -402,7 +405,7 @@ set version commutes.
 <summary>Where to look</summary>
 
 [Tuples and Unpacking](../../Chapters/03_Foundations--Containers.md#tuples-and-unpacking) shows a starred target collecting the leftover items into a `list`.
-Put the star on the target that should absorb the middle, or at either end.
+Put the star on the target that should collect the middle, or at either end.
 For the explanation, compare how many items an unstarred target list requires with how many a starred one allows.
 
 <details>
@@ -410,8 +413,8 @@ For the explanation, compare how many items an unstarred target list requires wi
 
 If you index instead, writing
 `first, middle, last = row[0], row[1:-1], row[-1]`, the program
-prints the same `1 [2, 3, 4] 5`, but the line uses the indexing the
-exercise rules out. The two forms differ on a one-item list. The
+prints the same `1 [2, 3, 4] 5`.
+That line uses the indexing the exercise rules out. The indexed line and the starred unpacking differ on a one-item list. The
 indexed version prints `1 [] 1`, counting the one item as both first
 and last, while `first, *middle, last = [1]` raises a `ValueError`
 (`not enough values to unpack`). The solution uses starred targets,
@@ -438,7 +441,7 @@ except ValueError as e:
 #: too many values to unpack (expected 2, got 5)
 ```
 
-**Absorb the remaining items.** A starred target absorbs however many items remain, so one assignment
+**Collect the remaining items.** A starred target collects however many items remain, so one assignment
 reaches any of the three positions without an index. The star may
 appear anywhere in the target list, so `first, *middle, last = row`
 works. `first` and `last` each take one item and `middle` takes the
@@ -452,11 +455,10 @@ The same error appears in the other direction, as
 target list.
 
 `a, *b = row` states a minimum instead: at least one item for `a`, and
-the rest, possibly none, for `b`. So the assignment accepts a
-five-item list, a one-item list, and everything between. Only an
-empty list falls short. The star turns a fixed-shape assertion into a
-flexible one, and the same flexibility lets `*args` work in a
-function signature.
+the rest, zero or more, for `b`. So the assignment accepts a
+five-item list, a one-item list, and everything between.
+Only an empty list has too few items. The star turns a fixed-shape assertion into a flexible one.
+The same flexibility lets `*args` work in a function signature.
 
 </details>
 </details>
@@ -482,12 +484,12 @@ For the last part, ask what `hash()` must do with each value, and what a `list` 
 <summary>Solution</summary>
 
 If you build the configuration with `dict(pairs)` instead, the
-program prints `{'host': 'localhost', 'port': 8080}`, and then
-`connections = {config: "primary"}` raises a `TypeError`:
+program prints `{'host': 'localhost', 'port': 8080}`.
+Then `connections = {config: "primary"}` raises a `TypeError`:
 `cannot use 'dict' as a dict key (unhashable type: 'dict')`. A
-`dict` can change, so it sets `__hash__` to `None`. The solution
-builds a `frozendict`, which cannot change and so is hashable when
-its values are.
+`dict` can change, so the `dict` class sets `__hash__` to `None`. The solution
+builds a `frozendict`, whose entries stay the same after creation,
+so the `frozendict` is hashable when its values are.
 
 ```python
 # exercise_10.py
@@ -515,29 +517,28 @@ except TypeError as e:
 ```
 
 **Build the configuration.** `frozendict` takes the same arguments `dict` does: an iterable of
-two-item pairs, keyword arguments, or another mapping. So `pairs`
-builds the same object `frozendict(host="localhost", port=8080)`
-would.
+two-item pairs, keyword arguments, or another mapping.
+So `frozendict(pairs)` equals `frozendict(host="localhost", port=8080)`.
 
 **Look up by an equal key.** The lookup with `same` succeeds because a dictionary finds a key by
-hash and equality, so an equal key can be a different object.
-`config` and `same` are separate objects built in different entry
-orders, but they hold the same pairs, so they compare equal and hash
-the same. A `frozendict` key gives you that property. Any equal
-configuration reaches the same entry, whoever built it and whenever.
+hash and equality, not by identity.
+`config` and `same` are separate objects built in different entry orders.
+They hold the same pairs, so they compare equal and hash the same.
+With a `frozendict` key, any equal configuration reaches the same entry,
+whoever built it and whenever.
 
-**Catch the rejected assignment.** Assigning to an entry raises a `TypeError` rather than quietly
-succeeding, and the type checker rejects the assignment too. The
+**Catch the rejected assignment.** Assigning to an entry raises a `TypeError` at runtime,
+and the type checker rejects the assignment too. The
 line carries a `# type: ignore` because the listing makes the
 assignment on purpose, to show the runtime exception.
 
-**Find the limit of immutability.** `nested` shows how far that immutability reaches. A `frozendict` freezes
-the objects to which it maps its keys, not what those objects contain,
-so `hash(nested)` must hash a `list` and fails. The immutability is
-shallow, as it is for the `tuple` in `shallow_immutability.py`.
-`frozendict` is hashable when its values are, so keep values
-immutable, a `tuple` here instead of a `list`, whenever you use the
-mapping as a key.
+**Find the limit of immutability.** `nested` shows how far a `frozendict`'s immutability reaches. A `frozendict` freezes
+the objects to which it maps its keys, not what those objects contain.
+To hash `nested`, `hash()` must hash its `list` value, and hashing a `list` raises a `TypeError`.
+The immutability is shallow, as it is for the `tuple` in `shallow_immutability.py`.
+Because a `frozendict` is hashable when its values are,
+keep its values immutable whenever you use the mapping as a key:
+a `tuple` here instead of a `list`.
 
 </details>
 </details>
