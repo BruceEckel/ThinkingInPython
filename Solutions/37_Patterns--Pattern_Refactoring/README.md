@@ -11,7 +11,7 @@
 <details>
 <summary>Where to look</summary>
 
-[Let a Dictionary Do the Sorting](../../Chapters/37_Patterns--Pattern_Refactoring.md#let-a-dictionary-do-the-sorting) shows the loop keying each bin on `type(t)`, and [The First Cut: Checking Every Type](../../Chapters/37_Patterns--Pattern_Refactoring.md#the-first-cut-checking-every-type) shows a `match` with no case for a new material.
+[Let a Dictionary Do the Sorting](../../Chapters/37_Patterns--Pattern_Refactoring.md#let-a-dictionary-do-the-sorting) shows the loop keying each bin on `type(piece)`, and [The First Cut: Checking Every Type](../../Chapters/37_Patterns--Pattern_Refactoring.md#the-first-cut-checking-every-type) shows a `match` with no case for a new material.
 A subclass of `Trash` registers itself when its `class` statement runs, so compare what each script does with a key it has not seen.
 For the failing test, read what `test_trash.py` pins about the registry.
 
@@ -406,7 +406,7 @@ too.
 <details>
 <summary>Where to look</summary>
 
-[Let a Dictionary Do the Sorting](../../Chapters/37_Patterns--Pattern_Refactoring.md#let-a-dictionary-do-the-sorting) keys each bin on `type(t)`, an exact-class lookup, while `singledispatch` in [One `singledispatch` Function per Operation](../../Chapters/37_Patterns--Pattern_Refactoring.md#one-singledispatch-function-per-operation) walks the MRO.
+[Let a Dictionary Do the Sorting](../../Chapters/37_Patterns--Pattern_Refactoring.md#let-a-dictionary-do-the-sorting) keys each bin on `type(piece)`, an exact-class lookup, while `singledispatch` in [One `singledispatch` Function per Operation](../../Chapters/37_Patterns--Pattern_Refactoring.md#one-singledispatch-function-per-operation) walks the MRO.
 To let a subclass share its parent's bin, give `Trash` a class variable that names the bin's key, defaulted for each class in `__init_subclass__()`.
 A subclass overrides it, and the loop indexes by that attribute instead of `type(t)`.
 
@@ -520,8 +520,8 @@ bin of its own.
 registration for `CrushedAluminum`, and takes `Aluminum`'s.
 
 Both behaviors are deliberate, and neither is a fallback. The sorter must
-know exactly what arrived, and the note takes the nearest answer
-anyone has written.
+know the exact class that arrived, and the note takes the nearest
+answer anyone has written.
 
 **Give each class a default bin.** To share a parent's bin without naming a material in the loop, choose
 your own key instead of accepting `type(t)`. A `bin` class variable

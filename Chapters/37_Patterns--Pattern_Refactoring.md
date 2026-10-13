@@ -17,7 +17,7 @@ and `functools.singledispatch` adds an operation from outside a class,
 so some of those patterns become unnecessary.
 
 The example is a trash sorting simulation, and it evolves across the chapter:
-one design, then a requirement that makes it report wrong totals,
+one design, then a requirement that makes it leave trash out of its report,
 then a reshaping that absorbs the change,
 then a second axis of change that the reshaped design leaves unsolved.
 Read that evolution as a template for your own designs,
@@ -37,8 +37,6 @@ The base class keeps a `registry` of its subclasses,
 which `__init_subclass__()` fills automatically.
 The base class's `create()` method is the [dictionary factory](27_Patterns--Factory.md#the-pythonic-factory-a-dictionary).
 It builds an instance from a material name.
-
-![A new material registers itself and gets its own bin, with no edit to the parser or the sorter](_images/trash_sorter)
 
 ```python
 # trash.py
@@ -120,8 +118,10 @@ A new recyclable type registers itself, and `create()` builds it.
 `sum_value()` also handles the new type as written.
 That ordinary function reads `piece.value` and `piece.weight` polymorphically,
 without checking the type of a piece.
-`report()` prints one line per bin, the material's name beside its total,
-so each sorter in the chapter ends with `report(bins)`.
+`report()` prints one line per bin, the material's name beside its total.
+A dictionary keeps its keys in insertion order,
+so the material that appears first in the data prints first.
+Each sorter in the chapter ends with `report(bins)`.
 
 The tests confirm that each subclass registers itself,
 `create()` builds one by name,
@@ -327,7 +327,8 @@ The parser builds two `Plastic` objects, the `match` lets both fall through,
 and the report totals the trash the `match` recognized.
 The loop appends two of the four pieces to a bin,
 so the sixty pounds of plastic vanish from the totals the plant uses.
-"Silently drop trash on the floor" means a number that is wrong and looks right,
+Each total in the report is right for the pieces it covers.
+"Silently drop trash on the floor" means a report that looks complete and leaves out a material,
 not an exception to debug.
 
 The `match` loses the plastic, not the parser.
@@ -413,6 +414,13 @@ The sorting line, `bins[type(piece)].append(piece)`,
 reads the same as in `recycle_dict.py`,
 while the `match` in `recycle_rtti.py` and `plastic_dropped.py` would need a new `case`.
 
+Here is the path each line of `plastic.dat` takes through `recycle_dict_plastic.py`:
+
+![A new material registers itself and gets its own bin, with no edit to the parser or the sorter](_images/trash_sorter)
+
+The `Plastic` class statement is the one new piece of code on that path.
+The registry, `create()`, and the sorting line all predate plastic.
+
 ## Adding Operations: Visitor, and Why Python Skips It
 
 So far adding a new *type* means writing one class definition and editing nothing else.
@@ -475,12 +483,14 @@ print(f"classes edited for one operation: {len(edited)}")
 ```
 
 `[1]` counts the material classes that the new operation edits.
-The `Trash` base takes an edit too,
-because the type checker accepts `piece.hazard()` on a `Trash`,
-such as a piece from `parse()`, once the base declares the method.
+The `Trash` base takes an edit too.
+Its `hazard()` supplies the default answer that `Cardboard` inherits,
+and it lets the type checker accept `piece.hazard()` on a piece typed as `Trash`,
+such as one from `parse()`.
 So one new operation is three edits: the base,
 plus each material whose answer differs from the base's.
-The operation after it edits the base and those classes again.
+The next operation edits the base again,
+along with each material whose answer to it differs.
 Those edits sit in each class body, as `note_methods.py` shows.
 In the real program they go in `trash.py`.
 
@@ -554,7 +564,7 @@ When the default answer would be wrong for an unregistered material,
 the *Visitor* chapter advises making the base function raise `NotImplementedError`,
 so a forgotten registration fails at the first call (see exercise 5).
 
-Now write the safety officer's question the same way.
+The safety officer's disposal hazard becomes a second `singledispatch` function.
 It goes in its own file,
 which imports the material classes and leaves them as written:
 
