@@ -1,6 +1,6 @@
 # exercise_5.py
 from typing import Any, Final, Self
-from exceptions import expect
+from exceptions import expect, expected
 
 POOL_SIZE: Final[int] = 2
 
@@ -65,3 +65,6 @@ with pool.acquire() as c1:
 #: inner released: 1
 print("outer released:", pool.available())
 #: outer released: 2
+with expected(RuntimeError):
+    c1.query("select 3")
+#: [RuntimeError] connection already released

@@ -212,11 +212,14 @@ so a `__getattribute__()` that reads `self.__implementation` calls itself foreve
 Writing a `__getattribute__()` means calling `object.__getattribute__()` for every internal access,
 machinery a surrogate rarely needs.
 
-`proxy_interface.py`'s abstract base class still guards the implementation side.
-Its `Proxy` takes a `Service` parameter,
-so the type checker verifies that whatever you provide has the necessary methods.
+The implementation side can keep its static check.
+`proxy_getattr.py` annotates `impl` as `Any`,
+but a `__getattr__()` proxy can annotate it `Service`,
+as `proxy_interface.py`'s `Proxy` does,
+and the type checker then verifies that whatever you provide has the necessary methods.
 A `Protocol` on that parameter guards the implementation side structurally,
 and `proxy_protocol.py`'s `isinstance()` is the runtime half of that check.
+
 Calls on the proxy get no such check.
 Because `__getattr__()` resolves `p.f()` and returns `Any`,
 the checker cannot verify that call.
@@ -225,6 +228,7 @@ and fails at runtime with the implementation's `AttributeError`.
 With explicit forwarding, as in `proxy_forwarding.py`,
 `p.f()` reaches a declared method with a declared return type,
 and the checker verifies the call.
+
 `proxy_interface.py`'s `Proxy` also passes as a `Service`.
 Because it inherits `Service`, code typed against `Service` accepts it.
 `__getattr__()` gives up that check so it can forward every method,
@@ -423,7 +427,7 @@ A narrower guard, `if name == "_implementation"`,
 keeps forwarding those names and still works with `copy` and `pickle`,
 but a typo like `self._imp` recurses again.
 
-This chapter's other `__getattr__()` proxies do not include the guard,
+This chapter's other `__getattr__()` proxies leave the guard out,
 so each listing shows one idea.
 
 ### A Surrogate Is Not Its Implementation
@@ -512,10 +516,11 @@ The standard library's `weakref.proxy()` is a transparent forwarding wrapper too
 but it solves none of these four.
 It forwards to a weakly referenced object and raises `ReferenceError` once nothing else holds a strong reference to that object.
 [Cleanup](10_Foundations--Cleanup.md#reliable-alternatives)
-uses `weakref.ref()`,
+uses `weakref.finalize()` and `weakref.ref()`,
 and its [Watching Objects Without Holding Them](10_Foundations--Cleanup.md#watching-objects-without-holding-them)
 section uses a `WeakValueDictionary`.
-Both come from the same module, and neither needs `weakref.proxy()`.
+All three come from the same module,
+and neither section needs `weakref.proxy()`.
 
 ### Virtual Proxy
 
@@ -884,9 +889,8 @@ Try each exercise before opening its [solution](../Solutions/26_Patterns--Surrog
 2.  Change `CountingProxy` in `counting_proxy.py` to keep a per-method tally in a `collections.Counter` instead of a single total.
     Confirm the tally reports `f` called twice and `g` called once.
 3.  Create a simple copy-on-write list.
-    Its `share()` returns a second list over the same data,
-    and increments a reference count,
-    and the first `append()` through a shared list copies the data before changing it.
+    Its `share()` returns a second list over the same data and increments a reference count.
+    The first `append()` through a shared list copies the data before changing it.
     Confirm that the two lists share their data before the write and not after it.
 4.  In `counting_proxy.py`,
     misspell `self._impl` as `self._imp` inside `__getattr__()` and run `counting_demo.py`.

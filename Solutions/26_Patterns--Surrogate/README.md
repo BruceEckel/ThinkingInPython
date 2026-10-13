@@ -94,7 +94,7 @@ print(p.query())  # [2]
 #: result
 ```
 
-**Answer `description` without building.** `description` is a property on the proxy, so Python finds it without
+**Answer `description` without building.** `description` is a property of `Lazy`, so Python finds it on the class without
 calling `__getattr__()`, and the three reads build nothing. Each one
 increments `_answered`.
 
@@ -202,9 +202,8 @@ forwarding. The single `calls` integer becomes a `Counter`. The final
 ## 3. A simple copy-on-write list
 
 > Create a simple copy-on-write list.
-> Its `share()` returns a second list over the same data,
-> and increments a reference count,
-> and the first `append()` through a shared list copies the data before changing it.
+> Its `share()` returns a second list over the same data and increments a reference count.
+> The first `append()` through a shared list copies the data before changing it.
 > Confirm that the two lists share their data before the write and not after it.
 
 <details>
@@ -424,7 +423,7 @@ Make the proxy a context manager whose `__exit__()` returns the connection to th
 ```python
 # The shape of exercise_5.py
 from typing import Any, Final, Self
-from exceptions import expect
+from exceptions import expect, expected
 
 POOL_SIZE: Final[int] = 2
 
@@ -479,7 +478,7 @@ The solution clears the reference, so a released proxy raises a `RuntimeError` i
 ```python
 # exercise_5.py
 from typing import Any, Final, Self
-from exceptions import expect
+from exceptions import expect, expected
 
 POOL_SIZE: Final[int] = 2
 
@@ -544,6 +543,9 @@ with pool.acquire() as c1:
 #: inner released: 1
 print("outer released:", pool.available())
 #: outer released: 2
+with expected(RuntimeError):
+    c1.query("select 3")
+#: [RuntimeError] connection already released
 ```
 
 **Limit who creates connections.** `Pool` builds every `Connection` in its constructor, and nothing else
@@ -562,8 +564,9 @@ exception, so "must check that connection back in" becomes a guarantee.
 
 **Refuse use after release.** `__exit__()` also drops the proxy's reference to the connection, so a
 released proxy cannot keep using a connection that now belongs to
-someone else. The check in `__getattr__()` reports that misuse instead
-of letting two clients share one connection.
+someone else. The check in `__getattr__()` reports that misuse, as
+`c1.query()` after both blocks shows, instead of letting two clients
+share one connection.
 
 `ConnectionProxy` is a *protection proxy* and a *smart reference* at
 once. It controls access, and it adds an action (the check-in) around
@@ -764,9 +767,9 @@ after the rejected swap.
 
 The type checker cannot make this decision. The decision compares
 the type of the implementation the surrogate holds right now with the type of
-the argument, and the checker knows neither. Both are `Any`, because
-`__getattr__()` delegation deliberately leaves the implementation's
-type untracked. Annotating both against a `Protocol` states a set
+the argument, and the checker knows neither. Both are `Any`, the
+choice `state_surrogate.py` makes so that one surrogate accepts any
+implementation. Annotating both against a `Protocol` states one
 shape that every implementation must meet, a different guarantee. A
 `Protocol` cannot express "at least what the last implementation had,"
 because that comparison relates two runtime values rather than two
