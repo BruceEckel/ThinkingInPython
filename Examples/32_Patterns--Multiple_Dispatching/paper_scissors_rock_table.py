@@ -1,7 +1,5 @@
 # paper_scissors_rock_table.py
-import random
 from typing import Final
-from arena import duel, item_pair_gen
 from outcome import Outcome
 
 class Item:
@@ -30,18 +28,3 @@ OUTCOME: Final[Table] = {
     (Rock, Paper): Outcome.LOSE,
     (Rock, Rock): Outcome.DRAW,
 }
-
-if __name__ == "__main__":
-    random.seed(47)  # Reproducible pairs
-    for item1, item2 in item_pair_gen(Item, 10):
-        duel(item1, item2)
-#: Scissors <--> Paper : win
-#: Scissors <--> Rock : lose
-#: Scissors <--> Rock : lose
-#: Scissors <--> Scissors : draw
-#: Rock <--> Scissors : win
-#: Scissors <--> Rock : lose
-#: Paper <--> Scissors : lose
-#: Rock <--> Paper : lose
-#: Paper <--> Paper : draw
-#: Scissors <--> Scissors : draw

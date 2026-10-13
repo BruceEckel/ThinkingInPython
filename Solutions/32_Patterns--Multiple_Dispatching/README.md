@@ -140,7 +140,7 @@ ordered pairs `Lizard` forms with the other three, plus
 `(Lizard, Lizard)`). `compete()` needs no change.
 
 **Guard the demonstration.** The `__main__` guard lets exercise 3 import this module without
-running its demonstration, as the chapter's own two versions do.
+running its demonstration, as the chapter's `paper_scissors_rock.py` does.
 
 </details>
 </details>
@@ -478,9 +478,8 @@ modules defines its own `Outcome`, so the chapter's
 `isinstance(result, Outcome)` assertion fails, and the solution's
 `compete()` drops that assertion and returns `str`.
 `test_versions_match_expected()` hardcodes no
-number of item types. `pytest` parametrizes it from `MATCHUPS`, which a
-comprehension builds from `EXPECTED`, so the test reports sixteen
-cases per module where it reported nine.
+number of item types. `pytest` parametrizes it with the keys of `EXPECTED`, so the test
+reports sixteen cases per module where it reported nine.
 
 </details>
 </details>

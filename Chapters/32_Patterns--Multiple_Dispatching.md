@@ -212,9 +212,7 @@ Making the table explicit can be more sensible, like this:
 
 ```python
 # paper_scissors_rock_table.py
-import random
 from typing import Final
-from arena import duel, item_pair_gen
 from outcome import Outcome
 
 class Item:
@@ -243,22 +241,9 @@ OUTCOME: Final[Table] = {
     (Rock, Paper): Outcome.LOSE,
     (Rock, Rock): Outcome.DRAW,
 }
-
-if __name__ == "__main__":
-    random.seed(47)  # Reproducible pairs
-    for item1, item2 in item_pair_gen(Item, 10):
-        duel(item1, item2)
-#: Scissors <--> Paper : win
-#: Scissors <--> Rock : lose
-#: Scissors <--> Rock : lose
-#: Scissors <--> Scissors : draw
-#: Rock <--> Scissors : win
-#: Scissors <--> Rock : lose
-#: Paper <--> Scissors : lose
-#: Rock <--> Paper : lose
-#: Paper <--> Paper : draw
-#: Scissors <--> Scissors : draw
 ```
+
+The same seeded loop over these classes prints the same ten duels that `paper_scissors_rock.py` prints.
 
 Dictionary keys are flexible.
 A tuple works as a key, the same as a single object.
@@ -519,16 +504,12 @@ def compete(module: ModuleType, player: str,
     assert isinstance(result, Outcome)
     return result
 
-MATCHUPS: Final[list[tuple[str, str, Outcome]]] = [
-    (p, o, r) for (p, o), r in EXPECTED.items()
-]
-
 @pytest.mark.parametrize("module", [table, methods])
-@pytest.mark.parametrize(
-    "player, opponent, expected", MATCHUPS)
+@pytest.mark.parametrize("player, opponent", EXPECTED)
 def test_versions_match_expected(module: ModuleType,
-                                 player: str, opponent: str,
-                                 expected: Outcome) -> None:
+                                 player: str,
+                                 opponent: str) -> None:
+    expected = EXPECTED[player, opponent]
     assert compete(module, player, opponent) == expected
 ```
 
@@ -536,9 +517,12 @@ def test_versions_match_expected(module: ModuleType,
 `getattr(module, player)` looks the class up on whichever module `pytest` passed to `test_versions_match_expected()`,
 so one dictionary of nine expected answers, `EXPECTED`,
 drives two independent sets of `Paper`, `Scissors`, and `Rock` classes.
-Each module guards its demonstration loop with `if __name__ == "__main__"`,
-so running a module as a script executes the loop,
-and importing a module for the test defines its classes and runs no duels.
+`paper_scissors_rock.py` guards its demonstration loop with `if __name__ == "__main__"`,
+so running it as a script executes the loop,
+and importing it for the test defines its classes and runs no duels.
+Iterating `EXPECTED` yields its keys,
+so `pytest` parametrizes the test with the nine `(player, opponent)` pairs,
+and the test reads each expected answer from `EXPECTED`.
 
 `compete()` also checks the result's type,
 since a `StrEnum` member equals its string,
