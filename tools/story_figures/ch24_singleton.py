@@ -11,7 +11,7 @@ in time, one layout per frame: the importing file on the left, the
 1. `import config` finds no entry, so `config.py` runs (printing
    `config body runs`) and is filed under `'config'`.
 2. `import config as again` finds the entry; the body does not run, and
-   both names reach the same module (`True True`).
+   both names and the entry are one module (`True`).
 3. `shared_config.py` mutates the one `settings` dict through its own
    name (`{'theme': 'dark'}`).
 4. Rebinding that name, `settings = {}`, points it at a new dict and
@@ -121,7 +121,7 @@ def render() -> str:
                                 "same module"),
                "module_singleton.py",
                (("import config", INK), ("import config as again", RED)))
-    b += prints(y0, ("True True",))
+    b += prints(y0, ("True",))
     b += text(OX + 12, y0 + 64, "body not run again", 10.5, MUTED)
     b += settings(y0, "{}")
     b += slot(y0, 0, "config")

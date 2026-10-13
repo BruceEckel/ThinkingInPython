@@ -11,13 +11,3 @@ class Singleton(Borg):
     def __init__(self, arg: str) -> None:
         super().__init__()
         self.val = arg
-
-    def __str__(self) -> str:
-        return self.val
-
-x = Singleton("sausage")
-y = Singleton("eggs")
-z = Singleton("spam")
-# Last write wins: distinct objects, one shared __dict__:
-print(x.val, x is y, x.__dict__ is y.__dict__ is z.__dict__)
-#: spam False True

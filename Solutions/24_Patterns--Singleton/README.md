@@ -496,7 +496,7 @@ running waits for the body to finish.
 
 The trade is that the module body builds the object whether or not
 anything uses it. For settings an unused object does no harm. For a
-database connection it may hold a resource nobody asked for, and then
+database connection it may hold a resource nobody requested, and then
 the hand-written lock is the answer.
 
 </details>

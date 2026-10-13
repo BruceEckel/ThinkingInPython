@@ -2,21 +2,18 @@
 from typing import Any
 
 class singleton:
-    def __init__(self, constructor: type) -> None:
-        self.constructor = constructor
+    def __init__(self, wrapped: type) -> None:
+        self.wrapped = wrapped
         self.instance: Any = None
 
     def __call__(self, *args: Any, **kwargs: Any) -> Any:
         print(f"singleton.__call__({args}, {kwargs})")
+        name = self.wrapped.__name__
         if self.instance is None:
-            print(
-                f"constructing {self.constructor.__name__}")
-            self.instance = self.constructor(
-                *args, **kwargs)
+            print(f"constructing {name}")
+            self.instance = self.wrapped(*args, **kwargs)
         else:
-            print(
-                f"using cached {self.constructor.__name__}")
-            print(f"discarding {args}, {kwargs}")
+            print(f"cached {name}: arguments discarded")
         return self.instance
 
 @singleton

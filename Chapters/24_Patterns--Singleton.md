@@ -36,19 +36,21 @@ settings: dict[str, str] = {}
 
 ```python
 # module_singleton.py
+import sys
 import config  # [1]
 import config as again  # [2]
 
 #: config body runs
-print(config is again, config.settings is again.settings)
-#: True True
+print(config is again is sys.modules["config"])
+#: True
 ```
 
-Two `import` statements, but `config body runs` prints once.
-The first `import` (`[1]`)
+Two imports of `config`, but `config body runs` prints once.
+The first import of `config` (`[1]`)
 runs `config.py` top to bottom and files the resulting module object in `sys.modules` under the name `config`.
 The second (`[2]`) finds it there and skips the work,
 so the body runs once and builds one `settings` dict.
+The printed `True` shows that both names and the `sys.modules` entry are one object.
 That is the singleton: not a rule a class enforces,
 but a lookup the import system performs.
 
@@ -505,7 +507,7 @@ An assignment such as `x.val = []` goes into the wrapper's own `__dict__`.
 The shared list stays as it was,
 and later reads of `x.val` find the wrapper's copy.
 [Forwarding Writes](26_Patterns--Surrogate.md#forwarding-writes)
-adds the `__setattr__()` that sends assignments through.
+adds the `__setattr__()` that forwards assignments.
 
 `__getattr__()` returns `Any`, and that `Any` stays.
 `instance` is one declared field and can say `__OnlyOne | None`,
@@ -597,9 +599,13 @@ class Singleton(Borg):
     def __init__(self, arg: str) -> None:
         super().__init__()
         self.val = arg
+```
 
-    def __str__(self) -> str:
-        return self.val
+`singleton_borg_demo.py` constructs three `Singleton` objects:
+
+```python
+# singleton_borg_demo.py
+from singleton_borg import Singleton
 
 x = Singleton("sausage")
 y = Singleton("eggs")
@@ -672,21 +678,18 @@ can wrap a class so that calling it returns a cached instance:
 from typing import Any
 
 class singleton:
-    def __init__(self, constructor: type) -> None:
-        self.constructor = constructor
+    def __init__(self, wrapped: type) -> None:
+        self.wrapped = wrapped
         self.instance: Any = None
 
     def __call__(self, *args: Any, **kwargs: Any) -> Any:
         print(f"singleton.__call__({args}, {kwargs})")
+        name = self.wrapped.__name__
         if self.instance is None:
-            print(
-                f"constructing {self.constructor.__name__}")
-            self.instance = self.constructor(
-                *args, **kwargs)
+            print(f"constructing {name}")
+            self.instance = self.wrapped(*args, **kwargs)
         else:
-            print(
-                f"using cached {self.constructor.__name__}")
-            print(f"discarding {args}, {kwargs}")
+            print(f"cached {name}: arguments discarded")
         return self.instance
 
 @singleton
@@ -726,8 +729,7 @@ first.items.append("spam")
 first.items.append("eggs")
 second = Registry("secondary", limit=99)
 #: singleton.__call__(('secondary',), {'limit': 99})
-#: using cached Registry
-#: discarding ('secondary',), {'limit': 99}
+#: cached Registry: arguments discarded
 print(first is second, second.name,
       second.limit, second.items)
 #: True primary 3 ['spam', 'eggs']
@@ -735,7 +737,8 @@ print(first is second, second.name,
 
 Only the first call constructs a `Registry`.
 Every later constructor call returns the cached instance and discards the constructor arguments,
-so `Registry("secondary", limit=99)` creates no new object.
+which appear once in the trace, on the `singleton.__call__()` line.
+`Registry("secondary", limit=99)` creates no new object.
 A caller who believes those arguments took effect holds an object configured by someone else.
 
 `isinstance()` requires a class, a tuple of classes,

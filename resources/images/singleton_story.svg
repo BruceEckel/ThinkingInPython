@@ -58,7 +58,7 @@
   <text x="705" y="204" font-size="10" fill="#7a6e62" text-anchor="end">module object</text>
   <line x1="470" y1="226" x2="503.6" y2="226.0" stroke="#1a1612" stroke-width="1.3" marker-end="url(#ss-ink)"/>
   <text x="150" y="262" font-size="10" fill="#7a6e62" text-anchor="start">prints</text>
-  <text x="150" y="278" font-size="10.5" fill="#8b1a1a" text-anchor="start">True True</text>
+  <text x="150" y="278" font-size="10.5" fill="#8b1a1a" text-anchor="start">True</text>
   <text x="532" y="234" font-size="10.5" fill="#7a6e62" text-anchor="start">body not run again</text>
   <text x="532" y="266" font-size="10" fill="#7a6e62" text-anchor="start">settings</text>
   <rect x="532" y="272" width="171" height="28" fill="none" stroke="#1a1612" stroke-width="1.1" rx="3"/>
