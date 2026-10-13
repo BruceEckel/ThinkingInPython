@@ -46,7 +46,7 @@ print(squared_ints)
 
 ![The parts of a list comprehension, numbered in the order Python evaluates them](_images/listComprehensions)
 
--   The iterator walks through each member `e` of the input sequence `a_list`.
+-   The `for` clause walks through each member `e` of the input sequence `a_list`.
 -   The filter checks whether the member is an integer.
 -   If the member is an integer,
     the output expression squares it and the result joins the output list.
@@ -91,7 +91,7 @@ print(list(map(lambda e: e ** 2,  # type: ignore
 #: [1, 81, 0, 16]
 ```
 
-The `map()`/`filter()` form funnels every element through `lambda` calls,
+The `map()`/`filter()` form passes every element through `lambda` calls,
 and is harder to read.
 The comprehension inlines the test and the expression,
 and its brackets show at a glance that it produces a list.
@@ -152,7 +152,9 @@ With `base = 3` in the class body,
 The outermost iterable is the one part Python evaluates in the enclosing scope,
 so `[n for n in range(base)]` works.
 
-The walrus operator escapes the comprehension's scope:
+Inside a comprehension,
+the [walrus operator](04_Foundations--Control_Flow.md#the-walrus-operator)
+binds its name in the enclosing scope:
 
 ```python
 # walrus_running_sum.py
@@ -166,7 +168,9 @@ print(running, total)
 so `total` holds the running sum after the comprehension finishes.
 That leak is deliberate.
 It lets a comprehension accumulate a value without a separate loop.
-Three uses are a `SyntaxError`:
+
+The walrus has three restrictions inside a comprehension.
+Each of these uses is a `SyntaxError`:
 a walrus that rebinds the comprehension's own iteration variable,
 a walrus inside the iterable expression that follows `in`,
 and a walrus in a comprehension inside a class body.
@@ -193,7 +197,7 @@ and the `if` tests that same result.
 The output expression then reuses `y`.
 Without the walrus, the filter and the output each need their own call,
 `cube_if_even(x) is not None` and `cube_if_even(x)`,
-calling `cube_if_even()` twice for every element that passes.
+calling `cube_if_even()` twice for every element that passes (see exercise 9).
 
 ## Set Comprehensions
 
@@ -297,6 +301,12 @@ The outer comprehension supplies `row`.
 For each `row`, the inner comprehension runs the full `col` loop and produces one sub-list.
 The inner `for col` sits to the left of the outer `for row` but runs inside it.
 The output expression sits first but runs last, once per innermost iteration.
+
+The inner comprehension runs once per `row`, so each row is a new list.
+`[[0] * SIZE] * SIZE` looks like a shorter start on the same matrix,
+but multiplying the outer list repeats one row object `SIZE` times,
+so setting one diagonal element sets it in every row
+([Two List Traps](03_Foundations--Containers.md#two-list-traps)).
 
 `1 if col == row else 0` is a conditional expression, not a filter.
 It sits in the output position, before the `for`,
@@ -412,6 +422,7 @@ and leaves the file system as the example found it.
 In the `py_paths` comprehension,
 the first `for` walks the directories and the second `for` walks the files in each,
 flattening the tree into one list of paths.
+
 The filter tests `filename.endswith(".py")` on the bare filename rather than building a `Path` and reading its `.suffix`.
 Testing the bare filename avoids constructing a `Path` for every file in the tree,
 including the ones the filter skips.
@@ -427,10 +438,8 @@ The `for` loop runs after the directory disappears,
 and by then nothing needs the files.
 If you turn the comprehension's brackets into parentheses,
 the program prints nothing and raises no exception.
-A generator expression starts walking when `sorted()` pulls on it,
-and that pull comes outside the `with`.
-By then the context manager has deleted the directory,
-and `Path.walk()` ignores the error unless you pass `on_error`.
+[The Gap Between Creation and Consumption](#the-gap-between-creation-and-consumption)
+explains why.
 
 `root.rglob("*.py")` finds the same two files in one line,
 with no explicit walk and no comprehension.
@@ -439,7 +448,7 @@ A glob pattern says what you want.
 Use `walk()` when the filter needs more than a glob pattern can express,
 a file's size or its contents rather than its name, say,
 or when the comprehension needs the directory structure,
-not just the files at the bottom of it.
+not just a list of the files in it.
 
 ## Breaking Up a Complex Comprehension
 
@@ -697,11 +706,18 @@ It reads everything at once.
 
 The gap between creation and consumption is also why `path_walk_comprehension.py` uses brackets.
 With parentheses, Python calls `root.walk()`, its outermost iterable,
-at creation, but the walking and the filtering wait for a consumer that arrives after the directory disappears.
-A `lambda` created in a comprehension reads its variables late for the same reason.
-Its body runs when something calls it.
+at creation, but the walking and the filtering wait for a consumer.
+That consumer is `sorted()`,
+which runs after the `with` block exits and the context manager deletes the directory.
+`Path.walk()` then fails to scan the missing directory,
+and it ignores that error unless you pass `on_error`,
+so the generator produces no paths.
+
+A `lambda` created in a comprehension reads its variables late by the same mechanism:
+its body runs when something calls it, not when the comprehension creates it.
 [Function Objects](28_Patterns--Function_Objects.md#the-late-binding-trap)
 demonstrates that trap.
+
 [Iterators](23_Patterns--Iterators.md#generators) explores generators further,
 and [Generators](45_Effects--Generators.md)
 covers the values they receive as well as the ones they produce.
@@ -740,13 +756,15 @@ print({*s for s in [{1, 2}, {3}]})
 `[*row for row in rows]` reads as "splice each `row` in,"
 and produces the same flat list as the two-`for` `[x for row in rows for x in row]`,
 with one `for` clause instead of two.
-It is a shallow flatten, splicing only the outer iterable,
+It is a shallow flatten, splicing each `row` one level deep,
 so the nested `[2, 3]` above comes through unflattened.
+
 `**` does the same for dictionaries,
 merging each mapping with later keys winning.
 With braces, `*` builds a set and `**` builds a dict.
 Everywhere else the colon decides between the two.
 Here neither form has a colon, so the unpacking operator decides.
+
 In parentheses, `(*row for row in rows)` is a generator expression that produces the same spliced values one at a time.
 The asynchronous generator form (`(*a async for a in agen())`)
 works the same way ([Concurrency](19_Techniques--Concurrency.md#asyncio-mechanics) introduces `async` syntax).
@@ -774,7 +792,7 @@ Try each exercise before opening its [solution](../Solutions/16_Techniques--Comp
     write a list comprehension that finds the string elements made only of digits
     (`e.isdigit()`), converts each to `int` with `int(e)`, and squares it.
     The filter must reject `"a"` before `int()` sees it.
-    Of the types in `a_list`, only `str` has `isdigit()`,
+    `isdigit()` is a `str` method, and `a_list` also holds integers,
     so the filter must test `isinstance(e, str)` before calling it.
 2.  In `identity_matrix.py`,
     change the comprehension to put `2` on the diagonal instead of `1`,
@@ -798,3 +816,8 @@ Try each exercise before opening its [solution](../Solutions/16_Techniques--Comp
     turn the generator expression into a list comprehension and name the result `built`.
     Predict the three printed lines, and their order, before running it.
     Explain which value of `factor` the result uses.
+9.  In `walrus_filter.py`,
+    make `cube_if_even()` append each argument it receives to a list,
+    then add a second comprehension that produces the same cubes without the walrus.
+    Predict how many calls each comprehension makes over `range(6)`,
+    and which arguments the second one passes twice.

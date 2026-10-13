@@ -6,7 +6,7 @@
 > write a list comprehension that finds the string elements made only of digits
 > (`e.isdigit()`), converts each to `int` with `int(e)`, and squares it.
 > The filter must reject `"a"` before `int()` sees it.
-> Of the types in `a_list`, only `str` has `isdigit()`,
+> `isdigit()` is a `str` method, and `a_list` also holds integers,
 > so the filter must test `isinstance(e, str)` before calling it.
 
 <details>
@@ -79,8 +79,8 @@ for row in matrix:
 #: [0, 0, 0, 0, 0, 2]
 ```
 
-Only the literal in the conditional expression changes, from `1` to
-`2`. Two nested loops still produce a list of lists, with a different
+The literal in the conditional expression is the one change, from `1`
+to `2`. Two nested comprehensions still produce a list of lists, with a different
 value on the diagonal.
 
 </details>
@@ -117,9 +117,8 @@ print(lengths["GALAHAD"], "NI" in lengths)
 
 **Filter before building each entry.** `"Galahad"` is seven characters, so it passes the `len(name) > 3`
 filter and adds one entry. `"Ni"` is still the only name the filter
-drops. The filter tests the original name, not the upper-cased key, so
-the filter judges a name before the output expression runs. That
-ordering matters when the output expression changes the length, as
+drops. The filter runs before the output expression, so it tests the
+original name, not the upper-cased key. That ordering matters when the output expression changes the length, as
 `name * 2` does.
 
 **Keep one value per key.** Two names that upper-case to the same string collide, since the
@@ -383,6 +382,80 @@ The generator expression calls `source()` at the same point, which
 is why the first line of output keeps its place. The brackets change
 when the output expression runs, and with it which value of
 `factor` the expression reads.
+
+</details>
+</details>
+</details>
+
+## 9. Counting the calls the walrus saves
+
+> In `walrus_filter.py`,
+> make `cube_if_even()` append each argument it receives to a list,
+> then add a second comprehension that produces the same cubes without the walrus.
+> Predict how many calls each comprehension makes over `range(6)`,
+> and which arguments the second one passes twice.
+
+<details>
+<summary>Where to look</summary>
+
+[Scope and the Walrus Operator](../../Chapters/16_Techniques--Comprehensions.md#scope-and-the-walrus-operator) shows the filter and the output expression sharing one call through `y`.
+Without the walrus, the filter runs for every element and the output expression runs again for each element that passes.
+Count the elements that pass the filter, and add that number to the length of `data`.
+
+<details>
+<summary>The shape</summary>
+
+```python
+# The shape of exercise_9.py
+def cube_if_even(n: int) -> int | None:
+    ...
+```
+
+<details>
+<summary>Solution</summary>
+
+```python
+# exercise_9.py
+calls: list[int] = []
+
+def cube_if_even(n: int) -> int | None:
+    calls.append(n)
+    return n ** 3 if n % 2 == 0 else None
+
+data = range(6)
+cubes = [
+    y for x in data if (y := cube_if_even(x)) is not None
+]
+print(cubes, len(calls))
+#: [0, 8, 64] 6
+calls.clear()
+again = [
+    cube_if_even(x) for x in data
+    if cube_if_even(x) is not None
+]
+print(again, len(calls))
+#: [0, 8, 64] 9
+print(calls)
+#: [0, 0, 1, 2, 2, 3, 4, 4, 5]
+```
+
+**One call per element with the walrus.** `cubes` calls
+`cube_if_even()` once for each of the six values in `data`, and the
+output expression reads the result back from `y`, so `calls` holds six
+arguments.
+
+**A second call for each element that passes.** `again` calls
+`cube_if_even()` in the filter for all six values, then calls it again
+in the output expression for the three that pass. `calls` shows the
+order: `0`, `2`, and `4` each appear twice in a row, filter first and
+output second, while `1`, `3`, and `5` appear once, since the filter
+rejects them before the output expression runs. Six plus three makes
+nine calls for the same three cubes.
+
+The extra calls grow with the number of elements that pass the filter.
+`cube_if_even()` returns in a moment, but for a function that reads a
+file or queries a server, the walrus halves the calls for every
+element that passes.
 
 </details>
 </details>
