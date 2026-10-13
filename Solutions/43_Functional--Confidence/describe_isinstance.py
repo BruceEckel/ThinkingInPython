@@ -20,19 +20,17 @@ def compute(text: str) -> Result[float, Exception]:
     except (ValueError, ZeroDivisionError) as e:
         return Err(e)
 
-def describe(
-    text: str, result: Result[float, Exception]
-) -> str:
+def describe(result: Result[float, Exception]) -> str:
     if isinstance(result, Ok):
-        return f"{text}: {result.answer}"
+        return str(result.answer)
     if isinstance(result.error, ValueError):
-        return f"{text}: Not a number"
+        return "Not a number"
     if isinstance(result.error, ZeroDivisionError):
-        return f"{text}: Cannot divide by zero"
-    return f"{text}: {type(result.error).__name__}"  # [1]
+        return "Cannot divide by zero"
+    return type(result.error).__name__  # [1]
 
 for sample in ("4", "0", "OOPS"):
-    print(describe(sample, compute(sample)))
+    print(f"{sample}: {describe(compute(sample))}")
 #: 4: 0.25
 #: 0: Cannot divide by zero
 #: OOPS: Not a number

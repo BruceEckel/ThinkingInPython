@@ -33,17 +33,16 @@ Pure functions have this property, and that is the reason purity matters:
 def add(a: int, b: int) -> int:
     return a + b
 
-# The call add(2, 3) always equals 5, so the call and the
-# value 5 are interchangeable everywhere in the program.
 x = add(2, 3) + add(2, 3)
 y = 5 + 5
 print(x, y, x == y)
 #: 10 10 True
 ```
 
-Because `add(2, 3)` and `5` are interchangeable,
-an implementation may cache the call, run the two calls in either order,
-or skip the second.
+`add(2, 3)` always returns `5`,
+so the call and the value are interchangeable everywhere in the program.
+An implementation may therefore cache the call,
+run the two calls in either order, or skip the second.
 The language has no way to mark `add()` as pure,
 so CPython leaves all three to you.
 The same substitution serves your reasoning as well as the machine's optimization.
@@ -110,9 +109,10 @@ Referential transparency makes [`lru_cache`](41_Functional--Toolkits.md#lru_cach
 safe.
 A memoizer can return a stored result because the call is interchangeable with its value.
 Every optimization that skips or reuses work,
-from a cache to a database query planner, benefits the same way,
-and the more of your program is referentially transparent,
-the more of it a machine, or a proof, can verify.
+from a cache to a database query planner,
+depends on the same interchangeability.
+The more of your program is referentially transparent,
+the more of it a machine can optimize and a proof can cover.
 
 Caching an impure function returns wrong values and raises no exception.
 Because `withdraw()` reads and writes `balance`,
@@ -224,13 +224,14 @@ A `lambda` or a [closure](40_Functional--Foundations.md#closures)
 fails with a `PicklingError`,
 and that rules out two shapes these chapters use often.
 A `functools.partial` pickles as its wrapped function plus its bound arguments.
-The `if __name__ == "__main__"` guard exists for the same reason.
+
+The `if __name__ == "__main__"` guard follows from the same import.
 Each worker imports this module to find `count_primes()`,
 and without the guard each worker re-runs the pool-building code,
 which fails in the worker with a `RuntimeError` and in the parent with `BrokenProcessPool`.
 [Concurrency](19_Techniques--Concurrency.md#parallelism)
 covers the pickling boundary and the guard,
-along with the reasons Python parallelism uses processes rather than threads.
+along with why CPU-bound work goes to processes rather than threads unless the interpreter is free-threaded.
 
 ## A Confidence Spectrum
 
@@ -288,20 +289,22 @@ You decide how far up the spectrum to go.
 ## Property-Based Testing
 
 The functions under test are an encoder and its decoder,
-in a module of their own so that every test can import them:
+in a module of their own so that every test can import them.
+`encode()` writes the text's UTF-8 bytes as hexadecimal digits.
+That encoding is reversible, and `encode()` is not its own inverse,
+so a test that encodes and then decodes exercises two different functions:
 
 ```python
 # codec.py
 def encode(text: str) -> str:
-    # Reversible, and not its own inverse:
     return text.encode().hex()
 
 def decode(encoded: str) -> str:
     return bytes.fromhex(encoded).decode()
 ```
 
-You can write a property check by hand,
-looping over random inputs and asserting the law:
+A hand-written property check loops over random inputs and asserts the *roundtrip* law:
+decoding an encoding returns the original.
 
 ```python
 # property_check.py
@@ -319,14 +322,13 @@ print("1000 random cases passed")
 #: 1000 random cases passed
 ```
 
-The law is "decoding an encoding returns the original,"
-and it holds for every input the loop tries.
+The roundtrip law holds for every input the loop tries.
 That is the shape of every property test:
 a law that states what must always be true,
 and a machine that searches for a counterexample.
 
-A bare `assert` like this one reports a broken law as an `AssertionError`,
-and the traceback shows the assert's source line but not the value that broke it,
+A bare `assert` like this one reports a broken law as an `AssertionError`.
+The traceback shows the assert's source line and leaves out the value that broke it,
 so to find that value you add a `print()` and rerun by hand.
 A tool like [Hypothesis](https://hypothesis.readthedocs.io/en/latest/)
 runs the same search with inputs it chooses at boundaries and unusual values,
@@ -339,8 +341,9 @@ You describe the inputs with a *strategy*,
 Hypothesis's name for an input generator, and state the law once,
 as a normal `test_` function.
 The framework supplies the cases.
-It draws on every character UTF-8 can encode rather than `property_check.py`'s five-letter alphabet,
-so it reaches inputs outside the loop's alphabet, such as unusual Unicode:
+It draws on every character UTF-8 can encode,
+so it reaches inputs that `property_check.py`'s five-letter alphabet keeps out,
+such as unusual Unicode:
 
 ```python
 # test_property.py
@@ -424,7 +427,7 @@ and the listing calls it inside a `try`.
 
 ### A Family of Property Shapes
 
-The *roundtrip* law is one member of a small family of reusable property shapes,
+The roundtrip law is one member of a small family of reusable property shapes,
 and knowing the family is most of the skill.
 An *invariant* states a fact about every output.
 Sorting produces an ordered list.
@@ -437,11 +440,13 @@ The simple version you can check by reading matches the fast one.
 Avoid a property that restates the implementation.
 Asserting `encode(text) == text.encode().hex()` tests nothing,
 because the test and the code share any bug.
-A good law, like the roundtrip,
+A good law, like the roundtrip law,
 constrains the function's behavior without repeating its body.
 
 Every shape in the family requires purity.
 Hypothesis can rerun and shrink freely because each call depends on its arguments alone.
+A test whose outcome also depends on hidden state can pass when Hypothesis replays the failing input,
+and Hypothesis then raises a `FlakyFailure` in place of a shrunk counterexample.
 
 ## Affordable Proof
 
@@ -451,6 +456,7 @@ Hoare logic and tools like Dafny verify it.
 Purity changes the length of the proof.
 With no mutable state to track, each step of the reasoning is shorter.
 Functional programming does not make correctness provable so much as it makes the proof affordable.
+
 Second, most functional code stops well below the top rung.
 Haskell programmers rely on types and on reasoning by substitution,
 and write a full proof for the few places that need one.
@@ -485,11 +491,11 @@ Try each exercise before opening its [solution](../Solutions/43_Functional--Conf
     Then add the oracle property that `sorted(xs)` agrees with a hand-written insertion sort on short lists.
 4.  State a law that is false and watch Hypothesis falsify it:
     `@given(strategies.text())` with `assert s.upper().lower() == s.lower()`.
-    Report the counterexample Hypothesis finds after shrinking,
-    run the test a few times,
+    Report the counterexample Hypothesis finds after shrinking.
+    Run the test a few times,
     deleting the `.hypothesis/` directory before each run,
-    to see which characters Hypothesis reports,
-    and explain what those characters reveal about Unicode case mapping.
+    to see which characters Hypothesis reports.
+    Then explain what those characters reveal about Unicode case mapping.
 5.  Write a property test for `group_rounds()` from [Toolkits](41_Functional--Toolkits.md#groups-of-any-size):
     for any roster and any positive group size,
     every student appears in exactly one group per round.
@@ -497,7 +503,8 @@ Try each exercise before opening its [solution](../Solutions/43_Functional--Conf
     Then break `group_rounds()` on purpose, run the test twice,
     and confirm Hypothesis reports the same counterexample both times.
     Hypothesis records a failing case under `.hypothesis/` and replays it first on the next run.
-6.  Write two functions that are *not* referentially transparent without using `global`:
+6.  Without using `global`,
+    write two functions that break referential transparency:
     one that reads `datetime.now()`, and one that reads an environment variable.
     For each, name the substitution that changes the program's behavior,
     then rewrite the function so the value arrives as an argument.

@@ -51,9 +51,10 @@ if __name__ == "__main__":
     main()
 ```
 
-**Keep the worker function importable.** `ProcessPoolExecutor` needs `count_primes` picklable and importable
-from `__main__` in a worker process. Only a real script file meets
-that requirement, not a fenced block executed in place.
+**Keep the worker function importable.** `ProcessPoolExecutor`
+pickles `count_primes()` by name, and each worker finds it by
+importing the script, so the listing must run as a script file. A
+fenced block executed in place has no file for a worker to import.
 
 **Check that the answers agree.** The assertion compares the counts
 alone, since the serial run carries the parent's process ID and the
@@ -132,14 +133,15 @@ if __name__ == "__main__":
     main()
 ```
 
-The thread pool reports exactly `1`. Threads share their process, so
+The thread pool reports `1`. Threads share their process, so
 `os.getpid()` returns the same value in every one of them. Counting
 distinct process IDs revealed process parallelism in the previous
 exercise, and it says nothing about thread parallelism.
 `threading.get_ident()` is the equivalent for threads.
-`ProcessPoolExecutor` and `ThreadPoolExecutor`
-present the identical `map()` interface and differ this fundamentally
-underneath. That contrast is the substitutable-backend point from
+`ProcessPoolExecutor` and `ThreadPoolExecutor` share one `map()`
+interface, and underneath one runs the calls in separate processes
+while the other runs them in threads of one process. That contrast
+is the substitutable-backend point from
 [Concurrency](../../Chapters/19_Techniques--Concurrency.md#one-executor-interface-three-pools).
 
 </details>
@@ -238,11 +240,11 @@ bugs it catches show up on short inputs.
 
 > State a law that is false and watch Hypothesis falsify it:
 > `@given(strategies.text())` with `assert s.upper().lower() == s.lower()`.
-> Report the counterexample Hypothesis finds after shrinking,
-> run the test a few times,
+> Report the counterexample Hypothesis finds after shrinking.
+> Run the test a few times,
 > deleting the `.hypothesis/` directory before each run,
-> to see which characters Hypothesis reports,
-> and explain what those characters reveal about Unicode case mapping.
+> to see which characters Hypothesis reports.
+> Then explain what those characters reveal about Unicode case mapping.
 
 <details>
 <summary>Where to look</summary>
@@ -498,7 +500,8 @@ once more, sees it pass, and deletes it from the database.
 
 ## 6. Two impure functions with no `global` in sight
 
-> Write two functions that are *not* referentially transparent without using `global`:
+> Without using `global`,
+> write two functions that break referential transparency:
 > one that reads `datetime.now()`, and one that reads an environment variable.
 > For each, name the substitution that changes the program's behavior,
 > then rewrite the function so the value arrives as an argument.
@@ -635,9 +638,7 @@ type Result[A, E] = Ok[A] | Err[E]
 def compute(text: str) -> Result[float, Exception]:
     ...
 
-def describe(
-    text: str, result: Result[float, Exception]
-) -> str:
+def describe(result: Result[float, Exception]) -> str:
     ...
 ```
 
@@ -667,19 +668,17 @@ def compute(text: str) -> Result[float, Exception]:
     except (ValueError, ZeroDivisionError) as e:
         return Err(e)
 
-def describe(
-    text: str, result: Result[float, Exception]
-) -> str:
+def describe(result: Result[float, Exception]) -> str:
     if isinstance(result, Ok):
-        return f"{text}: {result.answer}"
+        return str(result.answer)
     if isinstance(result.error, ValueError):
-        return f"{text}: Not a number"
+        return "Not a number"
     if isinstance(result.error, ZeroDivisionError):
-        return f"{text}: Cannot divide by zero"
-    return f"{text}: {type(result.error).__name__}"  # [1]
+        return "Cannot divide by zero"
+    return type(result.error).__name__  # [1]
 
 for sample in ("4", "0", "OOPS"):
-    print(describe(sample, compute(sample)))
+    print(f"{sample}: {describe(compute(sample))}")
 #: 4: 0.25
 #: 0: Cannot divide by zero
 #: OOPS: Not a number
