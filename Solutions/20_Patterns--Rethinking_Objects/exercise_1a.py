@@ -14,6 +14,14 @@ class Leaky:
         self._tags = tags
 
     @property
+    def numbers(self) -> list[int]:
+        return self._numbers
+
+    @property
+    def bob(self) -> Bob:
+        return self._bob
+
+    @property
     def tags(self) -> list[str]:
         return self._tags
 

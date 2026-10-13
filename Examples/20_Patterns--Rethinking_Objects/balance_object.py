@@ -11,9 +11,8 @@ class Account:
     def withdraw(self, amount: float) -> None:
         self.balance -= amount
 
-if __name__ == "__main__":
-    account = Account(100.0)
-    account.deposit(50.0)
-    account.withdraw(30.0)
-    print(account.balance)
+account = Account(100.0)
+account.deposit(50.0)
+account.withdraw(30.0)
+print(account.balance)
 #: 120.0

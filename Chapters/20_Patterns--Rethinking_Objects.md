@@ -134,9 +134,9 @@ so a `BoundedStack` handed to it raises an exception on the third item.
 The subclass matches the signature and breaks the contract behind it.
 
 No tool catches this, but a test can.
-Two later tests pin down runtime guarantees:
-`test_plugged.py` pins down that a getter's copy holds,
-and `test_immutable.py` pins down that a frozen field refuses assignment.
+Two later tests check runtime guarantees:
+`test_plugged.py` confirms that a getter's copy holds,
+and `test_immutable.py` confirms that a frozen field refuses assignment.
 The same pattern covers substitutability.
 A test written against `Stack`'s contract, run against `BoundedStack` too,
 catches `fill()` failing on the third item.
@@ -189,8 +189,8 @@ print(leaky.numbers, leaky.bob)
 
 Encapsulation with private fields and getters still leaks.
 The `is` check shows the mechanism.
-The getter returns no view or snapshot of the list, but a reference to the list,
-the identical object the underscore hides.
+The getter returns a reference to the same list the underscore hides,
+not a view or a snapshot of it.
 Python's `return` hands out references, not copies.
 The property blocks reassigning `numbers`,
 but cannot stop the caller from mutating the list it returns.
@@ -347,7 +347,7 @@ Frozen guards the binding, not the object.
 `fl.numbers` must keep pointing at the same list,
 and attempting to rebind it raises an exception.
 But that list can still change, the identical leak `Leaky` has.
-Hashing goes the same way.
+The same list field breaks hashing.
 A frozen data class is hashable only when every field it compares is hashable,
 so `hash(fl)` raises a `TypeError` and a `FrozenLeaky` cannot be a dict key.
 That is why `immutable.py` needs both the `tuple` and the frozen `Bob`.
@@ -407,7 +407,7 @@ and the call passes `p1` as the first argument.
 The dot fills in `self`.
 
 `distance()` reads the same and computes the same, and it has one advantage.
-It can live outside `Point`.
+It can live outside `Point`, so it can serve any type that has an `x` and a `y`.
 The method keeps one advantage of its own.
 `p1.` shows every operation `Point` supports,
 a discoverability the free function does not offer.
@@ -707,9 +707,8 @@ class Circle(Shape):
     def area(self) -> float:
         return math.pi * self.radius**2
 
-if __name__ == "__main__":
-    for shape in [Circle(1.0), Rectangle(3.0, 4.0)]:
-        print(round(shape.area(), 4))
+for shape in [Circle(1.0), Rectangle(3.0, 4.0)]:
+    print(round(shape.area(), 4))
 #: 3.1416
 #: 12.0
 ```
@@ -794,9 +793,8 @@ class Displayable(Protocol):
 def show(t: Displayable) -> str:
     return t.display()
 
-if __name__ == "__main__":
-    for item in (Bicycle("Bob"), Glider(65)):
-        print(show(item))
+for item in (Bicycle("Bob"), Glider(65)):
+    print(show(item))
 #: Bicycle Bob
 #: Glider 65
 ```
@@ -813,10 +811,12 @@ A protocol is *structural*, so it works with any type that has matching members,
 including types in libraries you cannot edit.
 The type's author need not hear that your protocol exists.
 That independence is why this chapter emphasizes protocols.
+Protocols connect pieces without requiring any piece to change.
+
+The same independence hides membership.
 Nothing in a class's own source names the protocols it satisfies,
 so you cannot grep a codebase for every type that implements one,
 the way you can search for subclasses of a base class.
-Protocols connect pieces without requiring any piece to change.
 
 #### One Class, Many Protocols
 
@@ -916,9 +916,8 @@ class Package:
 def charge(item: Priced) -> float:
     return item.total()
 
-if __name__ == "__main__":
-    package = Package(4.5)
-    print(charge(package))  # Silently treated as a price
+package = Package(4.5)
+print(charge(package))  # Silently treated as a price
 #: 4.5
 ```
 
@@ -966,10 +965,11 @@ def test_newtype_has_no_runtime_effect() -> None:
 ```
 
 Nothing in that test can fail.
-Passing a raw `int` where a signature says `UserId` raises no exception.
+Passing a raw `int` where a signature says `UserId` raises no exception either.
 In `newtype_boundary.py`,
 the `# type: ignore` silences the type checker's diagnostic,
-which lets the rejected call run.
+and at runtime `lookup(42)` prints `user-42`, the same as `lookup(UserId(42))`.
+
 [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#composing-types-from-types)
 takes the other route.
 A frozen data class with a validating `__post_init__()` enforces the distinction at runtime too,
@@ -1022,10 +1022,9 @@ def area(shape: Shape) -> float:
         case _:
             assert_never(shape)
 
-if __name__ == "__main__":
-    shapes: list[Shape] = [Circle(1.0), Rectangle(3.0, 4.0)]
-    for shape in shapes:
-        print(round(area(shape), 4))
+shapes: list[Shape] = [Circle(1.0), Rectangle(3.0, 4.0)]
+for shape in shapes:
+    print(round(area(shape), 4))
 #: 3.1416
 #: 12.0
 ```
@@ -1203,11 +1202,10 @@ class Account:
     def withdraw(self, amount: float) -> None:
         self.balance -= amount
 
-if __name__ == "__main__":
-    account = Account(100.0)
-    account.deposit(50.0)
-    account.withdraw(30.0)
-    print(account.balance)
+account = Account(100.0)
+account.deposit(50.0)
+account.withdraw(30.0)
+print(account.balance)
 #: 120.0
 ```
 

@@ -32,12 +32,21 @@ class Leaky:
         ...
 
     @property
+    def numbers(self) -> list[int]:
+        ...
+
+    @property
+    def bob(self) -> Bob:
+        ...
+
+    @property
     def tags(self) -> list[str]:
         ...
 ```
 
 ```python
 # The shape of exercise_1b.py
+from copy import deepcopy
 from dataclasses import dataclass
 
 @dataclass
@@ -48,6 +57,14 @@ class Plugged:
     def __init__(
         self, numbers: list[int], tags: list[str]
     ) -> None:
+        ...
+
+    @property
+    def numbers(self) -> list[int]:
+        ...
+
+    @property
+    def bob(self) -> Bob:
         ...
 
     @property
@@ -75,6 +92,14 @@ class Leaky:
         self._tags = tags
 
     @property
+    def numbers(self) -> list[int]:
+        return self._numbers
+
+    @property
+    def bob(self) -> Bob:
+        return self._bob
+
+    @property
     def tags(self) -> list[str]:
         return self._tags
 
@@ -91,6 +116,7 @@ outside.
 
 ```python
 # exercise_1b.py
+from copy import deepcopy
 from dataclasses import dataclass
 
 @dataclass
@@ -106,6 +132,14 @@ class Plugged:
         self._tags = tags
 
     @property
+    def numbers(self) -> list[int]:
+        return self._numbers.copy()
+
+    @property
+    def bob(self) -> Bob:
+        return deepcopy(self._bob)
+
+    @property
     def tags(self) -> list[str]:
         return self._tags.copy()
 
@@ -116,8 +150,9 @@ print(plugged.tags)
 ```
 
 **Isolate the internal list.** `.copy()` closes the leak the same way
-it does for `numbers`. The caller now mutates a throwaway copy, and
-`plugged`'s real `_tags` keeps the items it had.
+it does for `numbers`, and `deepcopy()` still guards `bob`. The caller
+now mutates a throwaway copy, and `plugged`'s real `_tags` keeps the
+items it had.
 
 Every new mutable field needs its own defensive copy. That repetition
 is the tedium that motivates freezing the data instead.
@@ -139,8 +174,8 @@ is the tedium that motivates freezing the data instead.
 <details>
 <summary>Where to look</summary>
 
-[The Immutability Solution](../../Chapters/20_Patterns--Rethinking_Objects.md#the-immutability-solution) explains what `frozen=True` generates for a data class.
-Consider which operations it guards: rebinding a field, or changing the object to which the field refers.
+[The Immutability Solution](../../Chapters/20_Patterns--Rethinking_Objects.md#the-immutability-solution) shows `frozen=True` on a class with a `list` field.
+Consider which of two operations it guards: rebinding a field, or changing the object to which the field refers.
 The generated `__hash__()` hashes the field values, so look at what it must hash when one value is mutable.
 
 <details>
@@ -552,7 +587,7 @@ Its `get()` reports a miss, and its `set()` discards the value.
 
 ```python
 # The shape of exercise_6.py
-from typing import Protocol
+from typing import Final, Protocol
 
 class Cache(Protocol):
     def get(self, key: str) -> str | None: ...
@@ -564,6 +599,11 @@ class NullCache:
 
     def set(self, key: str, value: str) -> None:
         ...
+
+NO_CACHE: Final[NullCache] = NullCache()
+
+def render(key: str, cache: Cache = NO_CACHE) -> str:
+    ...
 ```
 
 <details>
@@ -571,7 +611,7 @@ class NullCache:
 
 ```python
 # exercise_6.py
-from typing import Protocol
+from typing import Final, Protocol
 
 class Cache(Protocol):
     def get(self, key: str) -> str | None: ...
@@ -584,19 +624,30 @@ class NullCache:
     def set(self, key: str, value: str) -> None:
         pass
 
-nc = NullCache()
-nc.set("a", "apple")
-print(nc.get("a"))
+NO_CACHE: Final[NullCache] = NullCache()
+
+def render(key: str, cache: Cache = NO_CACHE) -> str:
+    cached = cache.get(key)
+    if cached is not None:  # A miss is information
+        return cached
+    page = f"<p>{key}</p>"
+    cache.set(key, page)
+    return page
+
+NO_CACHE.set("a", "apple")
+print(NO_CACHE.get("a"))
 #: None
+print(render("home"))
+#: <p>home</p>
 ```
 
 `NullCache` is neutral the same way `NullLogger` is. `set()` does
-nothing, and `get()` always reports "not found." A function that takes
-an optional cache can take a required `Cache` instead, defaulting to a
-shared `NullCache()` instance, so no code that uses the cache needs an
-`is None` branch on the cache. The `None` that `get()` returns is a
-different matter. A miss is information on which the caller acts, so
-`None` stays in the return type.
+nothing, and `get()` always reports "not found." `render()` takes a
+required `Cache` that defaults to the shared `NO_CACHE`, the way
+`total()` defaults to `SILENT`, so it has no `is None` branch on the
+cache. The `None` that `get()` returns is a different matter. A miss
+is information on which the caller acts, so `None` stays in the return
+type, and `render()` tests `cached` before using it.
 
 </details>
 </details>
@@ -612,7 +663,7 @@ different matter. A miss is information on which the caller acts, so
 <details>
 <summary>Where to look</summary>
 
-[Prefer Composition to Inheritance](../../Chapters/20_Patterns--Rethinking_Objects.md#prefer-composition-to-inheritance) shows `CountingList` missing calls that `list` makes in its own implementation.
+[Prefer Composition to Inheritance](../../Chapters/20_Patterns--Rethinking_Objects.md#prefer-composition-to-inheritance) shows `list.extend()` adding items without calling the overridden `append()`.
 Try `extend()` and `insert()` on the subclass and compare the counts with the contents.
 The composed version holds a `list` as a field and exposes only methods you write, so every mutation made through the box passes through a counter.
 
@@ -721,11 +772,12 @@ print(len(box.items), box.appends, box.sets)
 overloads that method, once for an index and once for a slice, and the
 counter treats both alike.
 
-**Find the routes past the overrides.** The subclass counts one append out of three and misses `insert()`
-entirely. `extend()` and `insert()` both add elements through `list`'s
-own C implementation, which calls neither the Python-level `append()`
-nor `__setitem__()` you overrode. Other routes past the counters
-include `+=` and `*=`. A future CPython could add another.
+**Find the routes past the overrides.** The subclass counts one
+append out of three and misses `insert()`. `extend()` and `insert()`
+both add elements through `list`'s own C implementation, which calls
+neither the Python-level `append()` nor `__setitem__()` you overrode.
+Other routes past the counters include `+=` and `*=`. A future CPython
+could add another.
 
 **Route every mutation through a counter.** `CountingBox` reports `3 3 1` because no inherited route into the
 list exists. The class holds a list rather than being one, so every

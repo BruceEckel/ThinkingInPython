@@ -27,8 +27,7 @@ class Circle(Shape):
     def area(self) -> float:
         return math.pi * self.radius**2
 
-if __name__ == "__main__":
-    for shape in [Circle(1.0), Rectangle(3.0, 4.0)]:
-        print(round(shape.area(), 4))
+for shape in [Circle(1.0), Rectangle(3.0, 4.0)]:
+    print(round(shape.area(), 4))
 #: 3.1416
 #: 12.0

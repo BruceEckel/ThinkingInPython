@@ -23,9 +23,8 @@ def area(shape: Shape) -> float:
         case _:
             assert_never(shape)
 
-if __name__ == "__main__":
-    shapes: list[Shape] = [Circle(1.0), Rectangle(3.0, 4.0)]
-    for shape in shapes:
-        print(round(area(shape), 4))
+shapes: list[Shape] = [Circle(1.0), Rectangle(3.0, 4.0)]
+for shape in shapes:
+    print(round(area(shape), 4))
 #: 3.1416
 #: 12.0

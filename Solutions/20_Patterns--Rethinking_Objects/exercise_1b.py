@@ -1,4 +1,5 @@
 # exercise_1b.py
+from copy import deepcopy
 from dataclasses import dataclass
 
 @dataclass
@@ -12,6 +13,14 @@ class Plugged:
         self._numbers = numbers
         self._bob = Bob()
         self._tags = tags
+
+    @property
+    def numbers(self) -> list[int]:
+        return self._numbers.copy()
+
+    @property
+    def bob(self) -> Bob:
+        return deepcopy(self._bob)
 
     @property
     def tags(self) -> list[str]:

@@ -8,8 +8,7 @@ class Displayable(Protocol):
 def show(t: Displayable) -> str:
     return t.display()
 
-if __name__ == "__main__":
-    for item in (Bicycle("Bob"), Glider(65)):
-        print(show(item))
+for item in (Bicycle("Bob"), Glider(65)):
+    print(show(item))
 #: Bicycle Bob
 #: Glider 65
