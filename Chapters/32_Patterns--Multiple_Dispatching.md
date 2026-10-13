@@ -16,7 +16,7 @@ Python dispatches on one type at a time.
 When two objects of unknown type interact,
 a method call resolves its receiver's type alone.
 You end up testing the other type by hand,
-writing out the dispatch the language performed for the receiver.
+writing out the dispatch the language performs for the receiver.
 
 That dispatch is one form of [polymorphism](20_Patterns--Rethinking_Objects.md#what-is-polymorphism),
 which broadly means that a function accepts arguments of more than one type.
@@ -187,20 +187,22 @@ This game ignores the argument,
 since the outcome depends on the two types alone.
 
 Those `Any` annotations turn off static checking.
-`Item` declares `__str__()` alone,
-so the parameter takes `Any` unless something declares all four methods: `Item`,
-as abstract methods, or a `Protocol`.
+`Item` declares `__str__()` alone, so the parameter takes `Any`.
+A precise type needs a declaration of all four methods,
+either on `Item` as abstract methods or in a `Protocol`.
 With `Any`, classes that supply eight of the nine answers pass the type checker,
 and Python raises an `AttributeError` at the first duel that calls the ninth.
 Declaring the four methods restores the checking,
 and that declaration repeats every class's method names.
 
 The table version keeps the checking and declares each name once.
-Its answers are rows in one dictionary,
-so a class is complete the moment it inherits `compete()`.
 Its `Item` declares the one method the dispatch needs,
-so the opponent parameter is typed `Item`:
+so `compete()` takes its opponent as an `Item`:
 `compete(self, item: Item) -> Outcome`.
+Its answers are rows in one dictionary,
+so a new class inherits `compete()` and adds rows instead of methods.
+A missing row escapes the type checker the way a missing method does, though.
+A table that holds eight of the nine answers fails at the first duel that needs the ninth.
 
 ## One Lookup in a Table
 
@@ -243,10 +245,9 @@ OUTCOME: Final[Table] = {
 }
 ```
 
+A tuple works as a dictionary key, the same as a single object,
+so each key in `OUTCOME` is a pair of classes.
 The same seeded loop over these classes prints the same ten duels that `paper_scissors_rock.py` prints.
-
-Dictionary keys are flexible.
-A tuple works as a key, the same as a single object.
 
 Both versions now hold the same nine answers, one for each pair of types:
 
@@ -294,7 +295,8 @@ except KeyError as e:
 ```
 
 A dictionary probe compares keys by equality,
-so `Origami` is not `Paper` however closely the two relate.
+so `(Origami, Rock)` and `(Paper, Rock)` are different keys,
+however closely the two classes relate.
 The lookup ignores the [MRO](07_Foundations--Classes.md#method-resolution-order).
 
 ## One Type or Many
@@ -348,6 +350,12 @@ Unlike `singledispatch`, every case sits together in one block,
 closed the way the table is.
 Adding an `Item` means adding cases, not registering a function elsewhere.
 
+`match` tries its cases from the top and takes the first that matches,
+where `singledispatch` picks the most specific registered class.
+A case for `Origami` must therefore come before the `Paper()` case.
+Placed after it, the `Origami` case is dead code,
+because the `Paper()` pattern matches the subclass first.
+
 ### The `singledispatchmethod` Trap
 
 [`functools.singledispatchmethod`](41_Functional--Toolkits.md#singledispatchmethod)
@@ -357,9 +365,9 @@ which then dispatches on the first argument after `self` through `singledispatch
 That is the pair of dispatches the `eval_*()` family writes out by hand.
 Like `singledispatch`, it matches on the MRO rather than exactly.
 
-One mistake raises no error and prints a plausible answer.
-A `@singledispatchmethod` declared on a shared base gives every subclass one dispatcher,
-and the resolution on `self` then reaches that same dispatcher for every subclass,
+One mistake runs cleanly and prints a plausible answer.
+A `@singledispatchmethod` declared on a shared base is one dispatcher that every subclass inherits.
+Resolving `self` reaches that same dispatcher whatever the subclass,
 so each class needs its own `@singledispatchmethod`.
 Here is the mistake:
 
@@ -649,7 +657,7 @@ The methods perform the second dispatch through a second method call that you wr
 and distribute the answers across the classes.
 The table replaces both dispatches with a single lookup,
 and collects the answers in one place.
-The operators are the one case where Python performs the second dispatch.
+The operators are the one case where the interpreter performs the second dispatch.
 Everywhere else you choose between writing a second dispatch in methods and replacing both dispatches with one lookup in data.
 
 ## Exercises

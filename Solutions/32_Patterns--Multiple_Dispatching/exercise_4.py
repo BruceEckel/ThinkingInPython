@@ -50,8 +50,6 @@ OUTCOME: Final[Table] = {
 def duel(item1: Any, item2: Any) -> None:
     print(f"{item1} <--> {item2} : {item1.compete(item2)}")
 
-random.seed(47)
-
 def item_pair_gen[T](base: type[T], n: int,
                      counts: Counter[str] | None = None
                      ) -> Iterator[tuple[T, T]]:
@@ -65,6 +63,7 @@ def item_pair_gen[T](base: type[T], n: int,
         counts[type(b).__name__] += 1
         yield a, b
 
+random.seed(47)
 counts: Counter[str] = Counter()
 for item1, item2 in item_pair_gen(Item, 100, counts):
     pass  # duel(item1, item2) in the real version

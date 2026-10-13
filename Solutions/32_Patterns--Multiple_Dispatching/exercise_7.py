@@ -7,7 +7,7 @@ class Inhabitant:
         raise NotImplementedError
 
     def __str__(self) -> str:
-        return self.__class__.__name__
+        return type(self).__name__
 
 class Dwarf(Inhabitant):
     def interact(self, other: Any) -> str:

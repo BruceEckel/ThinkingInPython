@@ -26,8 +26,10 @@ EXPECTED: Final[dict[tuple[str, str], Outcome]] = {
 
 def compete(module: ModuleType, player: str,
             opponent: str) -> str:
-    return getattr(module, player)().compete(
+    result = getattr(module, player)().compete(
         getattr(module, opponent)())
+    assert isinstance(result, module.Outcome)
+    return result
 
 for module in (table, methods):
     wrong = [pair for pair, result in EXPECTED.items()

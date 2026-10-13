@@ -450,8 +450,10 @@ EXPECTED: Final[dict[tuple[str, str], Outcome]] = {
 
 def compete(module: ModuleType, player: str,
             opponent: str) -> str:
-    return getattr(module, player)().compete(
+    result = getattr(module, player)().compete(
         getattr(module, opponent)())
+    assert isinstance(result, module.Outcome)
+    return result
 
 for module in (table, methods):
     wrong = [pair for pair, result in EXPECTED.items()
@@ -475,8 +477,11 @@ In `test_paper_scissors.py`, once its two imports name modules that
 include `Lizard`, the test needs two changes. One is the sixteen-entry
 `EXPECTED`. The other is in the `compete()` helper. Each of those
 modules defines its own `Outcome`, so the chapter's
-`isinstance(result, Outcome)` assertion fails, and the solution's
-`compete()` drops that assertion and returns `str`.
+`isinstance(result, Outcome)` assertion fails. The solution's
+`compete()` asserts against `module.Outcome` instead, the enumeration
+of the module that produced the result, so a version that returns the
+bare string `"win"` still fails the check. The helper returns `str`,
+since no one `Outcome` describes both modules' results.
 `test_versions_match_expected()` hardcodes no
 number of item types. `pytest` parametrizes it with the keys of `EXPECTED`, so the test
 reports sixteen cases per module where it reported nine.
@@ -626,8 +631,6 @@ OUTCOME: Final[Table] = {
 def duel(item1: Any, item2: Any) -> None:
     print(f"{item1} <--> {item2} : {item1.compete(item2)}")
 
-random.seed(47)
-
 def item_pair_gen[T](base: type[T], n: int,
                      counts: Counter[str] | None = None
                      ) -> Iterator[tuple[T, T]]:
@@ -641,6 +644,7 @@ def item_pair_gen[T](base: type[T], n: int,
         counts[type(b).__name__] += 1
         yield a, b
 
+random.seed(47)
 counts: Counter[str] = Counter()
 for item1, item2 in item_pair_gen(Item, 100, counts):
     pass  # duel(item1, item2) in the real version
@@ -926,7 +930,7 @@ noise. In an inner loop, it matters.
 
 Order now decides the answer. `(TolerantPaper, TolerantRock)` and
 `(TolerantOrigami, TolerantItem)` could both match. Which one wins
-depends on the order the loops happen to walk, not on anything a
+depends on the order the loops walk, not on anything a
 reader of the table can see. The exact version has no such question.
 Either the pair is in the table or it is not.
 
@@ -1015,7 +1019,7 @@ class Inhabitant:
         raise NotImplementedError
 
     def __str__(self) -> str:
-        return self.__class__.__name__
+        return type(self).__name__
 
 class Dwarf(Inhabitant):
     def interact(self, other: Any) -> str:
@@ -1683,8 +1687,8 @@ this version has nothing to override. `Item` defines `compete()` once.
 
 **Narrow the operand's type.** `paper_vs_rock()` and
 `rock_vs_paper()` take two `Item`s, because every cell must, so each
-recovers `Paper` with an `isinstance()` test. That is the type test
-about which the chapter warns in the ladder version. Here the test sits
+recovers `Paper` with an `isinstance()` test, the kind of test the
+chapter's ladder version repeats in every class. Here the test sits
 inside one cell rather than running through every class, so you write
 it once instead of editing it for every new `Item`.
 
