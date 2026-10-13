@@ -93,8 +93,8 @@ in connection order.
 <summary>Where to look</summary>
 
 [Push or Pull](../../Chapters/30_Patterns--Observer.md#push-or-pull) describes the pull model.
-The type problem is that a parameter is contravariant:
-an `update()` that narrows `subject` to `Thermometer` accepts less than `Observer[float]` requires.
+The type problem is that a parameter is contravariant.
+An `update()` that narrows `subject` to `Thermometer` accepts less than `Observer[float]` requires.
 The first version keeps the protocol and narrows at runtime with `isinstance()`.
 The second gives the protocol a second type parameter for the subject,
 and `Subject.attach()` asks for an `Observer[Self, T]`.
@@ -185,8 +185,8 @@ If you declare `subject: Thermometer` in `Display.update()` and keep the classic
 the program still prints `display: 25C`,
 but the type checker rejects `t.attach(Display())`.
 A parameter is contravariant,
-so an `update()` that accepts only a `Thermometer` cannot stand in for one that accepts any `Subject[float]`.
-Both versions below keep the read of `subject.celsius` and repair the type,
+so an `update()` that accepts only a `Thermometer` cannot substitute for one that accepts any `Subject[float]`.
+Both versions below keep the read of `subject.celsius` and make `t.attach(Display())` type-check,
 the first by widening the parameter again and the second by changing the protocol.
 
 **Declare the widest subject type.** The protocol here is `classic_observer.py`'s, unchanged.
@@ -241,11 +241,11 @@ t.celsius = 25
 #: display: 25C
 ```
 
-**Narrow the subject at runtime.** The `assert` runs on every notification, and it states
-a requirement the protocol cannot: this `Display` works for a
-`Thermometer` and fails on any other `Subject[float]`, at the moment
-of the first notification rather than at the `attach()` call the type
-checker reads.
+**Narrow the subject at runtime.** The `assert` runs on every notification.
+It states a requirement the protocol cannot express:
+this `Display` works for a `Thermometer` and fails on any other `Subject[float]`.
+That failure arrives at the first notification,
+not at the `attach()` call the type checker reads.
 
 **Let the subject supply its own type.** The second version moves the subject's type into the protocol.
 `Observer[S, T]` takes the subject's type as a parameter, and `Subject` supplies its
@@ -299,16 +299,17 @@ t.celsius = 25
 ```
 
 **Name the subject the observer reads.** `Display.update()` now declares `subject: Thermometer` and
-`t.attach(Display())` type-checks. The restriction moves to the other end: each observer's type names
-the subject it watches, so a display written for a `Thermometer`
-cannot attach to a different `Subject[float]`. A parameter is
-contravariant, so an observer that declares the wider `Subject[float]`
-still attaches to any `Subject[float]`, and an observer that reads `celsius` is
-the one that gives up that freedom.
+`t.attach(Display())` type-checks.
+The requirement the first version's `assert` stated now sits in the observer's type, which names the subject the observer watches.
+A display written for a `Thermometer` therefore cannot attach to a different `Subject[float]`.
+An observer that declares the wider `Subject[float]` still attaches to any `Subject[float]`,
+because a parameter is contravariant.
+An observer that reads `celsius` must declare `Thermometer`,
+and it attaches to a `Thermometer` alone.
 
-Both versions print the same line, and neither needs `arg`. Under
-pull, the subject decides nothing about what its observers read, so
-each observer must know what it is watching.
+Both versions print the same line, and both ignore `arg`. Under
+pull, each observer's own code selects what to read from the subject, so
+each observer must name the type of the subject it watches.
 
 </details>
 </details>
@@ -328,7 +329,7 @@ each observer must know what it is watching.
 
 [Raising an Exception](../../Chapters/30_Patterns--Observer.md#raising-an-exception) shows one failing responder stopping the loop in `announce()`.
 Put a `try` inside the loop, append each exception to a list,
-and after the loop raise an `ExceptionGroup` when the list is not empty.
+and after the loop raise an `ExceptionGroup` if the list holds any exceptions.
 The test catches it with `pytest.raises(ExceptionGroup)`.
 
 <details>
@@ -357,9 +358,9 @@ def broken(data: int) -> None:
 <details>
 <summary>Solution</summary>
 
-If you catch each exception and move on without keeping it,
+If you catch each exception and discard it,
 every responder runs, but `announce()` returns normally.
-The demo's `except*` block does not run, so the script prints nothing,
+The demo's `print()` sits inside its `except*` block, so the script prints nothing,
 and the test's `pytest.raises(ExceptionGroup)` fails with `DID NOT RAISE`.
 The solution keeps each exception in a list and raises the list as one `ExceptionGroup` once the loop ends.
 
@@ -422,25 +423,25 @@ def test_later_responder_still_runs_after_a_failure(
     assert received == [1]
 ```
 
-**Keep the loop going past a failure.** The loop catches each failure and keeps going, so connection order
-stops deciding who hears the change.
+**Keep the loop going past a failure.** The loop catches each failure and keeps going, so every responder
+receives the notification, wherever it sits in the connection order.
 
-**Catch any ordinary failure.** Catching bare `Exception` here is deliberate: `announce()` has no idea
-what its responders do, so it cannot name their failure modes. Catching
-`Exception` still lets `BaseException` through, so a
-`KeyboardInterrupt` or an `asyncio.CancelledError` passing through a
+**Catch any ordinary failure.** Catching bare `Exception` here is deliberate.
+`announce()` calls arbitrary callables, so its code cannot list the exceptions they raise. Catching
+`Exception` lets a `BaseException` propagate, so a
+`KeyboardInterrupt` or an `asyncio.CancelledError` raised in a
 responder stops the notification instead of joining `failures`.
 
-**Record each failure.** Collecting the exceptions rather
-than discarding them matters as much as catching them: a responder that fails silently
-is worse than one that stops the loop, because nothing reports the
-failure.
+**Record each failure.** Keeping the exceptions matters as much as catching them.
+A responder that fails silently is worse than one that stops the loop.
+The stopped loop raises an exception the caller sees;
+the silent failure leaves the caller believing every responder succeeded.
 
 **Report every failure together.** `ExceptionGroup` is the right container because more than one responder
 can fail on a single notification, and the caller needs every failure,
 not the first. `except*` then lets a caller handle one kind of failure
-and re-raise the rest, something a plain `except` on a single
-re-raised exception cannot do.
+and re-raise the rest.
+A plain `except` receives a single exception, with no group to split.
 
 </details>
 </details>
@@ -457,10 +458,10 @@ re-raised exception cannot do.
 <details>
 <summary>Where to look</summary>
 
-[A Failing Responder Orphans the Rest](../../Chapters/30_Patterns--Observer.md#a-failing-responder-orphans-the-rest) shows `gather()` abandoning the other coroutines on the first failure.
+[A Failing Responder Orphans the Rest](../../Chapters/30_Patterns--Observer.md#a-failing-responder-orphans-the-rest) shows `gather()` raising the first failure while the other coroutines keep running with nothing awaiting them.
 With `return_exceptions=True`, `gather()` returns every result, exceptions among them.
 Keep the results that are exceptions and raise them as one group.
-A responder that was cancelled comes back as a `CancelledError`, a `BaseException`, so the filter and the group must admit one.
+A cancelled responder comes back as a `CancelledError`, a `BaseException`, so the filter and the group must accept one.
 
 <details>
 <summary>The shape</summary>
@@ -498,13 +499,13 @@ async def main() -> None:
 <summary>Solution</summary>
 
 If you leave out `return_exceptions=True`,
-`gather()` re-raises the first failure as a bare `RuntimeError`,
-and the test fails because `pytest.raises(ExceptionGroup)` does not match it.
-The demo still prints `1 [7]`:
+`gather()` re-raises the first failure as a bare `RuntimeError`.
+`pytest.raises(ExceptionGroup)` lets that `RuntimeError` propagate, which fails the test.
+The demo still prints `1 [7]`.
 `except*` wraps a bare exception in a group,
 and `record()` finishes before `main()` resumes.
-A slower responder keeps running with nothing awaiting it, as [A Failing Responder Orphans the Rest](../../Chapters/30_Patterns--Observer.md#a-failing-responder-orphans-the-rest) shows,
-so the solution passes the keyword and `gather()` waits for every responder.
+A slower responder, though, keeps running with nothing awaiting it, as [A Failing Responder Orphans the Rest](../../Chapters/30_Patterns--Observer.md#a-failing-responder-orphans-the-rest) shows.
+The solution passes the keyword, so `gather()` waits for every responder.
 
 ```python
 # exercise_4.py
@@ -606,41 +607,38 @@ def test_a_cancelled_responder_is_reported() -> None:
 ```
 
 **Run every responder to completion.** `return_exceptions=True` changes `gather()` from "re-raise the first
-failure immediately" to "run everything and hand back a list." That
-one keyword does what the synchronous version needed a `try` inside a
-loop to do, because `gather()` is the loop.
+failure immediately" to "run everything and return a list."
+The synchronous version needs a `try` inside its loop to keep going past a failure.
+Here that one keyword does the same job, because `gather()` runs the loop over the responders.
 
-**Pick out the failures.** The results come back in argument order, so the list is a record of
+**Pick out the failures.** The results come back in argument order, so the list shows
 which responder produced what. This version needs the failures alone,
 so its comprehension keeps each result for which
-`isinstance(r, BaseException)` is true. A successful responder returned
-`None`, which fails that test and stays out of `failures`.
+`isinstance(r, BaseException)` is true. A successful responder returns
+`None`, and the comprehension drops it.
 
 **Report a cancelled responder too.** If another task cancels the awaiting task while `gather()` waits,
-`gather()` cancels every responder,
-and `asyncio.CancelledError` reaches the awaiting task before `announce()` has any results to filter,
-so that cancellation needs nothing from the filter.
-The cancellation that `return_exceptions=True` does hand back is a responder's own:
+`gather()` cancels every responder.
+`asyncio.CancelledError` then reaches the awaiting task before `announce()` has any results to filter,
+so that cancellation bypasses the filter.
+The cancellation that `return_exceptions=True` does return is a responder's own:
 a `CancelledError` raised inside the responder, which is what a cancelled `await` propagates.
-An `isinstance(r, Exception)` filter drops that result from `failures` with no report,
-because `CancelledError` derives from `BaseException`,
-so this version filters on `BaseException`.
-`ExceptionGroup` cannot hold a `BaseException`:
-with the wider filter, `ty` reports an `invalid-argument-type` at an `ExceptionGroup(...)` call.
-The listing raises a `BaseExceptionGroup` instead,
-and that constructor returns an `ExceptionGroup` when every member is an `Exception`,
-so the demo's `except* RuntimeError` and the first test still see the group the exercise asks for.
-When a cancellation is among the failures, the group is a `BaseExceptionGroup`,
-and the second test confirms that the cancelled responder is reported and the later responder still runs.
-Exercise 3's synchronous version keeps `except Exception`,
-and the difference is where a `BaseException` goes:
-there it passes through the loop and stops the notification, which is right for a `KeyboardInterrupt`;
-here `gather()` has turned it into a value, and dropping a value reports nothing.
+Because `CancelledError` derives from `BaseException` and not from `Exception`,
+an `isinstance(r, Exception)` filter drops that result from `failures` silently.
+This version filters on `BaseException` instead.
 
-The synchronous and asynchronous versions now answer the same
-question, and both end in an exception group. The other difference is
-where the loop lives: written by hand in the synchronous version,
-supplied by `gather()` in the async one.
+**Hold a cancellation in the group.** `ExceptionGroup` cannot hold a `BaseException`.
+With the wider filter, `ty` reports an `invalid-argument-type` at an `ExceptionGroup(...)` call.
+The listing raises a `BaseExceptionGroup` instead.
+That constructor returns an `ExceptionGroup` when every member is an `Exception`,
+so the demo's `except* RuntimeError` and the first test still see the group the exercise asks for.
+When a cancellation is among the failures, the group is a `BaseExceptionGroup`.
+The second test confirms that this group reports the cancelled responder and that the later responder still runs.
+
+Exercise 3's synchronous version keeps `except Exception`.
+The two versions differ in where a `BaseException` goes.
+In the synchronous version it propagates out of the loop and stops the notification, which is right for a `KeyboardInterrupt`.
+Here `gather()` has turned it into a value, and a filter that drops the value hides the failure.
 
 </details>
 </details>
@@ -758,25 +756,25 @@ def test_later_responder_runs_after_an_err() -> None:
     assert received == [1]
 ```
 
-**Collect the failures as values.** No responder raises an exception, so `announce()` needs no `try`.
+**Collect the failures as values.** Each responder reports a failure by returning an `Err`, so `announce()` needs no `try`.
 It calls every responder and keeps each result that is an `Err`.
 The caller receives the failures as an ordinary list
 and decides what to do with them,
-where exercise 3's caller had to catch an `ExceptionGroup`.
+where exercise 3's caller must catch an `ExceptionGroup`.
 An empty list means every responder succeeded.
 
-**Adapt a `None`-returning callable.** The type change reaches every responder.
+**Adapt a `None`-returning callable.** The type change applies to every responder.
 `received.append` returns `None`,
-so the type checker rejects `broadcaster.connect(received.append)`:
-a `Responder[int]` must return a `Result`.
+and a `Responder[int]` must return a `Result`,
+so the type checker rejects `broadcaster.connect(received.append)`.
 `succeeds()` adapts any `None`-returning callable
 by calling it and returning `Ok(None)`.
-The adapter assumes the wrapped callable cannot fail;
-an exception the callable does raise leaves `announce()` as it did in the chapter's version.
+The adapter assumes the wrapped callable always succeeds.
+An exception the callable does raise propagates out of `announce()` as it does in the chapter's version.
 
 Returning errors as values works when you write the responders.
 For a broadcaster that accepts arbitrary callables,
-exercise 3's catch-and-collect protects the loop from code you did not write.
+exercise 3's catch-and-collect keeps the loop running when a responder someone else wrote raises an exception.
 
 </details>
 </details>
@@ -849,7 +847,7 @@ class FloodGame:
 <details>
 <summary>Solution</summary>
 
-If you repaint the patch and stop there, `owned` holds only `(0, 0)`,
+If you repaint the patch and stop there, `owned` stays `{(0, 0)}`,
 which the demo's first move recolors to match the first unowned cell.
 Every later `select()` picks that same cell, finds that its color matches the patch, and returns `False`,
 so the `while` loop runs forever.
@@ -935,19 +933,19 @@ print("solved in", game.moves, "moves")
 **Reuse the model's grid.** `FloodGame` reuses `new_grid()` from `grid_observer.py` unchanged and
 adds the `adjacent()` the exercise asks for.
 
-**Find the owned patch.** `_flood()` is a depth-first graph search, using a stack,
-starting from `origin` and walking from each cell to every neighbor
-`adjacent()` reports, as long as that neighbor is still the same color.
+**Find the owned patch.** `_flood()` is a depth-first search that keeps its pending cells on a stack.
+It starts at `origin` and walks from each cell to every neighbor
+`adjacent()` reports, as long as that neighbor has the patch's color.
 
-**Grow the patch by recoloring.** `select()` is the game
-move: it repaints
-every cell in the *currently owned* patch to the selected cell's color,
-then re-runs `_flood()` to pick up the neighbors that now match that
-new color and have joined the patch.
+**Grow the patch by recoloring.** `select()` is the game move.
+It repaints every cell in the currently owned patch to the selected cell's color,
+then re-runs `_flood()`, which absorbs the neighbors that now match the
+new color.
 
 **Score the game.** `game.moves` gives the
 single-player scoring the exercise asks for:
 the moves it takes to make the whole field one color.
+
 `FloodGame` holds one `origin` and one `owned` set,
 so a two-player version gives each player an origin of their own,
 in opposite corners, and an owned set of their own, over one grid.
@@ -958,10 +956,11 @@ and after a set number of rounds whoever owns the larger patch wins.
 can also inherit from `Broadcaster[Grid]`, as `GridModel` does, and
 call `self.announce(self.grid)` at the end of a successful `select()`.
 `grid_view.py`'s existing view then repaints after every move. The
-drawing code needs no change, but `show()`'s parameter annotation does:
-it names `GridModel`, and a `FloodGame` is not one. Widening it to a
-Protocol (or to `Broadcaster[Grid]` plus `size`, `grid`, and
-`select()`) lets the same view draw either model.
+drawing code needs no change, but `show()`'s parameter annotation does.
+That annotation names `GridModel`, and a `FloodGame` is not one.
+Widening the annotation lets the same view draw either model.
+The wider type can be a Protocol,
+or `Broadcaster[Grid]` plus `size`, `grid`, and `select()`.
 
 </details>
 </details>
@@ -977,7 +976,7 @@ Protocol (or to `Broadcaster[Grid]` plus `size`, `grid`, and
 <details>
 <summary>Where to look</summary>
 
-In [The Model](../../Chapters/30_Patterns--Observer.md#the-model), `recolored()` alone decides which cells change;
+In [The Model](../../Chapters/30_Patterns--Observer.md#the-model), `recolored()` alone decides which cells change.
 `GridModel.select()` calls it and announces the result.
 Build the new `Grid` from every cell that shares the selection's `x` or its `y`.
 For why the view needs no change, see what `draw()` receives in [The View](../../Chapters/30_Patterns--Observer.md#the-view).
@@ -1068,24 +1067,23 @@ print(initials(recolored(grid, (1, 2)), 4))
 **Advance the selection's row and column.** `Color` and `new_grid()` come from `grid_observer.py` unchanged, and
 `recolored()` is the one function that differs. It keeps every cell
 whose column matches the selection's `x` or whose row matches its `y`,
-and advances each one. The cells come from `grid`, so none lies
-outside it and the `in grid` test goes away.
+and advances each one. The cells come from `grid`, so every one lies
+inside it and the comprehension needs no `in grid` test.
 
 **Show the grid as text.** `initials()` prints each
-cell's first letter, one row per line. After selecting column 1, row
-2, that column and that row have moved one color along, and the other
-nine cells are as they were.
+cell's first letter, one row per line.
+After the selection at column 1, row 2, that column and that row have advanced one color,
+and the other nine cells are as they were.
 
 Pasting this `recolored()` over the one in `grid_observer.py` changes
 what the window does, and `grid_view.py` runs as it stands. Two
 places in the view involve a selection. Its mouse responder calls
 `model.select()` with a coordinate, and its `draw()` receives a whole
-`Grid` and paints every cell. Neither one says which cells a selection
-changes, so the view holds nothing that a new rule could make wrong.
-The rule sits in `recolored()`, `GridModel.select()` calls it, and
-`announce()` delivers the result. `initials()` makes the same point
-from the other side: it is a second view of a `Grid`, written without
-knowing the rule.
+`Grid` and paints every cell. Both leave the choice of cells to the
+model, so the view stays correct under any rule.
+`recolored()` holds the rule, `GridModel.select()` calls it, and
+`announce()` delivers the result. `initials()` shows the same separation.
+It is a second view of a `Grid`, and it prints whatever `Grid` the rule produces.
 
 </details>
 </details>
@@ -1249,7 +1247,7 @@ model.select((0, 0))
 **Reuse the chapter's model.** The model is `grid_observer.py`'s, copied here so the solution runs on
 its own: `Color`, `new_grid()`, and `recolored()` unchanged, and a
 `Broadcaster` trimmed to the two methods this example calls.
-`GridModel` is the chapter's, and the exercise adds nothing to it.
+`GridModel` stays as the chapter writes it, which the exercise requires.
 
 **Write each view as a responder.** `letters()` and `tally()` are the two views. Each takes a `Grid` and
 returns `None`, the shape `connect()` requires, so each is a
@@ -1261,18 +1259,20 @@ Neither one names the other, and neither names the model's rule.
 **Update both views from one change.** `model.select((1, 1))` calls `recolored()` once and `announce()` once,
 and `announce()` calls both views in connection order. They read the
 same `Grid` object, so the letters and the counts describe one state
-of the model: the first selection advances the five cells of the
-cross, two from `skyblue` to `palegreen`, two from `palegreen` to
-`khaki`, and the center from `khaki` to `skyblue`, so the tally
-drops `skyblue` by one and raises `khaki` by one.
+of the model.
+
+The first selection advances the five cells of the cross:
+two from `skyblue` to `palegreen`, two from `palegreen` to `khaki`,
+and the center from `khaki` to `skyblue`.
+The tally therefore drops `skyblue` by one and raises `khaki` by one.
 The corner selection that follows has three cells inside the grid
 rather than five.
 
 Adding a third view means one more `connect()` call. `grid_view.py`'s
-`draw()` is such a view, and `show(model)` connects it to a model with
-`letters()` and `tally()` connected, so the window and the terminal
-report the same grid. Running that combination means `show()` takes
-over with `root.mainloop()`, so call `show()` last.
+`draw()` is such a view, and `show(model)` connects it beside
+`letters()` and `tally()`, so the window and the terminal
+report the same grid. `show()` ends in `root.mainloop()`,
+which runs the window's event loop until the window closes, so call `show()` last.
 
 </details>
 </details>
@@ -1412,37 +1412,38 @@ for size in range(3, 9):
 ```
 
 **State the puzzle as a linear system.** Selecting a cell adds one, modulo three, to that cell and to each
-neighbor `cross()` finds, and selecting it twice adds two. The order
-of the selections makes no difference, so a whole sequence of them is
-a count per cell, and the puzzle becomes one linear system: `M v = b`,
-over the integers mod 3. `M` records which cells each selection
+neighbor `cross()` finds, and selecting it twice adds two. Selections
+commute, so a whole sequence of them reduces to a count per cell.
+The puzzle then becomes one linear system over the integers mod 3: `M v = b`.
+`M` records which cells each selection
 advances, `v` counts the selections, and `b` is how far each cell must
 advance to reach the target color. `system()` builds `M` and `b` together,
 one row per cell, with `b` in the last column.
 
-**Decide solvability by elimination.** `solvable()` answers whether that system has a solution, and never
-computes one: the question is which colors are reachable, not how.
+**Decide solvability by elimination.** `solvable()` answers whether that system has a solution,
+which is all the question asks: which colors are reachable, not how.
 It is Gaussian elimination, with two changes for arithmetic mod 3.
 Dividing by a pivot is multiplying by its inverse, which `pow(x, -1,
-MOD)` supplies, and every subtraction ends in `% MOD`. Elimination
-either finds a pivot in a column or leaves that column free; what
-decides the answer is the rows that survive with every coefficient
-zero. Such a row states `0 == row[-1]`, so a nonzero last column means
+MOD)` supplies, and every subtraction ends in `% MOD`.
+
+**Check the zero rows.** Elimination either finds a pivot in a column or leaves that column free.
+The rows whose coefficients are all zero after elimination determine the answer.
+Such a row states `0 == row[-1]`, so a nonzero last column means
 no count of selections reaches that color.
 
 **Report the reachable colors.** The six sizes split three ways. At 3x3, 6x6, and 7x7 the matrix has
 full rank, so every color is reachable from any starting grid. At 4x4
-the rank is 14 of 16, and at 8x8 it is 60 of 64: the missing
-dimensions are combinations of cells that no selection can change, so
-the starting grid must agree with the target on each of them.
+the rank is 14 of 16, and at 8x8 it is 60 of 64.
+Each missing dimension is a combination of cells that no selection can change,
+so the starting grid must agree with the target on each such combination.
 The 4x4 banded grid agrees for all three colors, and the 8x8 grid for
 `palegreen` alone, which is the puzzle the window poses. At 5x5 three
 dimensions are missing and no color satisfies them, so no sequence of
 selections turns that board one color.
 
-`Color` is a `StrEnum`, so its members go straight into
-`", ".join(reachable(size))` with no conversion, the same property
-that lets `grid_view.py` hand a `Color` to `tkinter`.
+`Color` is a `StrEnum`, so its members are strings and go straight into
+`", ".join(reachable(size))`.
+String members also let `grid_view.py` pass a `Color` to `tkinter`.
 
 </details>
 </details>
@@ -1463,10 +1464,11 @@ that lets `grid_view.py` hand a `Color` to `tkinter`.
 <details>
 <summary>Where to look</summary>
 
-A descriptor's `__set_name__()` ([A Descriptor That Validates](../../Chapters/17_Techniques--Metaprogramming.md#a-descriptor-that-validates)) receives the attribute's name,
+As [A Descriptor That Validates](../../Chapters/17_Techniques--Metaprogramming.md#a-descriptor-that-validates) shows,
+a descriptor's `__set_name__()` receives the attribute's name,
 from which it can derive one storage name and one responder-list name per attribute.
 `__set__()` stores the value and then calls that attribute's responders.
-`__get__()` returns `self` when `obj` is `None`, so `Thermometer.celsius.connect()` reaches it,
+`__get__()` returns `self` when `obj` is `None`, so `Thermometer.celsius.connect()` reaches the descriptor,
 and two `@overload`s tell the type checker which result each access gets.
 
 <details>
@@ -1517,8 +1519,8 @@ class Thermometer:
 If `__get__()` always returns the stored value, as a validating descriptor's does,
 `Thermometer.celsius` runs `getattr(None, "_celsius")`
 and raises an `AttributeError` before the call to `connect()`.
-The type checker passes that version, since the overloads still declare that class access returns the descriptor,
-so the failure appears only when the program runs.
+The type checker passes that version, since the overloads still declare that class access returns the descriptor.
+The failure appears only when the program runs.
 The solution tests for `obj is None` and returns the descriptor.
 
 ```python
@@ -1580,21 +1582,22 @@ print(t.celsius, t.humidity)
 #: 150.0 0.5
 ```
 
-**Give each attribute its own storage.** `__set_name__()` receives the name the class body binds each
-descriptor to, so `celsius` and `humidity` derive different attribute
+**Give each attribute its own storage.** `__set_name__()` receives the name each descriptor has in the class body,
+so `celsius` and `humidity` derive different attribute
 names: `_celsius` and `_responders_celsius` for one, `_humidity` and
 `_responders_humidity` for the other. Two `Notifying` instances in one
-class therefore share no storage and no responder list, so the two
-attributes are independent. `Broadcaster` keeps one list for
+class therefore keep separate storage and separate responder lists,
+so each attribute has its own watchers. `Broadcaster` keeps one list for
 the whole object; a descriptor keeps one per attribute.
 
 **Return the descriptor on class access.** Class access is the part a validating descriptor never needs.
 `Thermometer.celsius` calls `__get__()` with `obj` set to `None`, and
-returning the descriptor there puts `connect()` within reach. The
-two `@overload` declarations tell the type checker which result each
-access gets: `Notifying[T]` from the class, `T` from an instance. Without
-them the declared return type is the union, and `t.celsius * 2` fails
-to check. The overloads also check the responder against the
+returning the descriptor there lets `Thermometer.celsius.connect()` call the descriptor's method.
+
+**Type each kind of access.** The two `@overload` declarations tell the type checker which result each
+access gets: `Notifying[T]` from the class, `T` from an instance. If you
+remove them, the declared return type is the union, and the type checker
+rejects `t.celsius * 2`. The overloads also check the responder against the
 attribute: `Thermometer.celsius.connect(t, readings.append)` passes
 because `readings.append` accepts a `float`.
 
@@ -1603,14 +1606,14 @@ It reads the constructor's `self.celsius = celsius` as declaring an instance att
 so it types the class access as `Notifying[float] | float` and reports that `float` has no `connect`.
 `ty` types the class access from the `__get__()` overload alone.
 A codebase on Pyright looks the descriptor up in `type(obj).__dict__` instead,
-which draws no complaint from Pyright.
+which Pyright accepts.
 
 **Announce on assignment.** `__set__()` stores the value and then calls each responder connected
-to that attribute, the work `Thermometer`'s property setter did with
-`self.announce(value)`.
+to that attribute.
+`Thermometer`'s property setter does the same work with `self.announce(value)`.
 
 **Keep each instance's responders apart.** `connect()` writes the responder list into the instance's `__dict__`
-rather than declaring it on the class, where every instance shares
+rather than declaring it on the class, where every instance would share
 one list.
 
 </details>
@@ -1678,9 +1681,11 @@ If `responds()` appends the function and returns nothing,
 the demo still prints its three lines, because `RESPONDERS` holds each function.
 The decorator's result replaces the name, though,
 so the name `display` refers to `None`, and calling `display(5.0)` raises a `TypeError`.
-The type checker catches the mistake before any run: with `-> Responder` declared, `responds()` draws an `invalid-return-type`.
+The type checker catches the mistake before any run.
+With `-> Responder` declared, it reports an `invalid-return-type` on `responds()`.
 Returning `fn` keeps each decorated name bound to its function.
-The same rule separates `Broadcasting.respond()` from the chapter's `Broadcaster.connect()`:
+
+The return value also separates `Broadcasting.respond()` from the chapter's `Broadcaster.connect()`.
 `connect()` appends and returns `None`,
 so `@thermometer.connect` above a `def` would bind that name to `None`,
 and `respond()` exists to return the function.
@@ -1735,48 +1740,49 @@ For a module-level function, that is while Python imports the module,
 so the registry is complete before any thermometer exists.
 
 **Keep the function callable.** `responds()` returns `fn` unchanged,
-so `display` is still a function you can call directly.
+so `display` is still a function you can call by name.
 
 The load-time form removes three of the runtime problems:
 
 - `Broadcaster.announce()` copies its list because a responder can disconnect itself mid-notification.
-  The registry has no `disconnect()`, so the setter iterates through `RESPONDERS` directly.
-- A lambda written inline in `connect()` cannot be disconnected, a question that disappears along with `disconnect()`.
+  The registry has no `disconnect()`, so the setter iterates over `RESPONDERS` and skips the copy.
+- A lambda written inline in `connect()` leaves its caller nothing to pass to `disconnect()`, and that problem goes away with `disconnect()`.
   The `@` form also needs a `def`, so every decorated responder has a name.
 - A lapsed listener is an object kept alive by its connection.
   The registry holds module-level functions,
-  which their module keeps alive for the whole program,
-  so the strong references keep nothing alive that Python would otherwise collect.
+  and their module keeps them alive for the whole program.
+  The registry's strong references therefore keep nothing alive that Python would otherwise collect.
 
 Two problems remain.
 A responder that raises an exception stops the loop,
-and the exception reaches the assignment to `celsius`.
+and the exception propagates to the assignment to `celsius`.
 A responder that assigns to `celsius` re-enters the setter.
 
 The load-time form also brings three problems that `Broadcaster` avoids:
 
 - The registry is global.
   `room` and `oven` announce to the same two responders,
-  and `alarm` cannot tell which thermometer changed.
+  and `alarm` receives a reading with no reference to the thermometer that changed.
   `Broadcaster` keeps one list per instance.
   Sending the thermometer along with the reading tells the responders the source,
   but every responder still receives every thermometer's changes.
 - A responder registers only if Python imports its module.
   A responder in a module that nothing imports does not run, and nothing reports its absence.
-  Django's documentation meets this by importing an app's signal handlers from its `AppConfig.ready()` method,
+  Django's documentation handles this by importing an app's signal handlers from its `AppConfig.ready()` method,
   which Django calls at startup.
 - Tests share the registry.
-  A test that decorates a responder leaves it registered for every test that runs after it,
-  unless the test removes it from `RESPONDERS`.
+  A test that decorates a responder leaves that responder registered for every later test,
+  so the test must remove the responder from `RESPONDERS` before it ends.
 
-The first of those problems, the shared registry, comes from where the list lives rather than from the decorator.
+The first of those problems, the shared registry, comes from storing the list at module level rather than from the decorator.
 [Decorated Responders](../../Chapters/30_Patterns--Observer.md#decorated-responders) keeps registration by decorator and moves the list onto each instance.
 `Broadcasting` is a base class whose `respond()` method is a decorator,
 so `@thermometer.respond` appends a function to that thermometer's own list and returns the function unchanged.
 In that form, `room` and `oven` each announce to their own responders.
 A test creates its own thermometer and registers against it,
-so tests stop sharing a registry too.
-The import problem stays: a responder registers when Python runs its `def`,
+so each test has a registry of its own too.
+The import problem stays.
+A responder registers when Python runs its `def`,
 so a responder in a module nothing imports still registers nothing.
 
 </details>
@@ -1849,10 +1855,10 @@ def report(change: tuple[str, float]) -> None:
 <details>
 <summary>Solution</summary>
 
-The change sits in two places.
+The solution changes two places.
 `published()` closes over the field's name,
-so `write()` has the name at hand and calls `self.announce((name, value))`.
-In `Broadcasting` the payload becomes a `tuple[str, T]`:
+so `write()` reads `name` from the closure and calls `self.announce((name, value))`.
+In `Broadcasting` the payload becomes a `tuple[str, T]`.
 `Responder[T]` becomes `Callable[[tuple[str, T]], None]`,
 and `announce()` passes the pair through to each responder unchanged.
 `__init_subclass__()`, `respond()`, and `disconnect()` stay as the chapter writes them.
@@ -1926,22 +1932,22 @@ print(calls)
 and each `write()` closes over its own `name`.
 An assignment to `station.humidity` runs the `humidity` property's `write()`,
 which announces `"humidity"`,
-so `Broadcasting` needs no lookup to learn which field changed.
+so the closure tells `Broadcasting` which field changed.
 
 **Filter in the responder.** `announce()` calls every responder for every field,
 as `WeatherStation.__setattr__()` does.
 `report()` unpacks each pair it receives,
 appends the name to `calls`,
 and prints when the name is `"celsius"`.
-The one `report:` line shows the `celsius` reading reported,
-and `calls` shows that both assignments reached `report()`,
+The one `report:` line comes from the `celsius` assignment,
+and `calls` shows that both assignments called `report()`,
 including the one to `humidity`.
 
 **Share one type across the fields.** `Broadcasting[float]` gives every field's responders the same `T`,
 so `celsius` and `humidity` are both `float`.
 A subclass whose fields have different types declares `Broadcasting[object]`,
-the value type in `WeatherStation`'s `Change` tuple, `tuple[str, object]`,
 and its responders narrow the value after checking the name.
+`object` is also the value type in `WeatherStation`'s `Change` tuple, `tuple[str, object]`.
 
 The generated `__init__()` assigns both fields through their properties,
 so constructing `station` announces twice.
@@ -1967,7 +1973,7 @@ so `calls` holds the two assignments that follow `@station.respond`.
 
 In [Document-View and MVC](../../Chapters/30_Patterns--Observer.md#document-view-and-mvc), `CountView` connects its `display()` to the model in `__post_init__()`.
 A second view does the same with its own display method,
-and the `Controller` needs no change to feed both.
+and the `Controller` feeds both as it stands.
 
 <details>
 <summary>The shape</summary>
@@ -2120,15 +2126,16 @@ for char in "kkj":
 #: [*]
 ```
 
-Each key press reaches both views through the model.
+Each key press updates both views through the model.
 `Controller.key()` calls `increment()` or `decrement()`,
 and the `Counter` announces its new count to every connected responder.
 The views print in the order they connected.
 The controller holds no reference to either view.
 
-This copy of `Controller` leaves out the chapter's `History` model,
-since the exercise concerns views on the `Counter`;
-connecting a second view to `History` works the same way.
+This copy of `Controller` drives the `Counter` alone,
+since the exercise concerns views on the `Counter`.
+The chapter's `Controller` also records each key in a `History` model,
+and a second view connects to `History` the same way.
 
 `Counter` knows a list of responders and nothing about views or controllers.
 Each view knows the `Counter` to which it connects.
@@ -2136,8 +2143,7 @@ The controller knows the `Counter` to which it sends requests.
 Each view and the controller hold the model, and none of them holds another.
 
 A third view leaves every existing class as it is.
-The new view connects in its own `__post_init__()`,
-and `Counter`, both views, and `Controller` need no edit.
+The new view connects in its own `__post_init__()`.
 In `document_view.py` the controller is a method of the one view,
 so a second view either duplicates `key()` or has no input of its own.
 
