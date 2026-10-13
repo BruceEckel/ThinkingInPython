@@ -89,6 +89,7 @@ But `settings = {}` in your module rebinds only your module's name,
 and the two modules silently diverge.
 `config.settings` still holds the old dict,
 while your code now talks to a private one.
+
 To replace the whole value, go through the module: `import config`,
 then `config.settings = {...}`.
 That rebinding reaches the code that reads `config.settings`.
@@ -108,8 +109,8 @@ Keep singleton state in a module you import, not in the script you run.
 ## When You Want a Class, Cache the Instance
 
 A module's state is a set of loose names.
-When the shared thing has fields and methods that belong together,
-or other code needs a type to name in an annotation, it is a class.
+When the shared state has fields and methods that belong together,
+or other code needs a type to name in an annotation, you need a class.
 Every construction should then return the same object.
 The simplest approach hides construction behind a cached factory:
 `functools.cache` applied to a *constructor function*,
@@ -228,7 +229,7 @@ uncached `Settings`.
    The cached factory offers a reset the classic forms lack.
    `settings.cache_clear()` discards the instance, so each test can start fresh.
 
-2. Every lazy singleton has a first-call race under threads.
+2. Every lazy singleton faces a first-call race under threads.
    Concurrent first calls can each run the constructor,
    and each caller can end up holding a different object.
    The cache keeps one of those objects.
@@ -352,7 +353,7 @@ Declare only what you rebind.
 Every call to the locked `settings()` acquires the lock,
 including the thousands that arrive long after the object exists.
 
-The classic escape is *double-checked locking*:
+The classic workaround is *double-checked locking*:
 test `_instance` before taking the lock,
 take it when the test finds the object missing, then test again inside:
 
@@ -387,7 +388,7 @@ And the assignment to `_instance` must be the last step of construction.
 The outer test runs without the lock,
 so a thread can read `_instance` while another thread is still inside the `with` block.
 A version that assigns `_instance = Settings()` and then fills in `data` hands that reader a half-built object.
-Depending on two such details is a bad trade for saving one lock acquisition.
+Skipping one lock acquisition per call rarely justifies two details that must both stay right.
 
 Eager creation is a better answer when you can build the object at import time:
 
@@ -479,7 +480,7 @@ Because the inner class's name starts with a double underscore,
 the compiler mangles it to `_OnlyOne__OnlyOne` wherever it appears inside `OnlyOne`'s body.
 `OnlyOne.__OnlyOne`, written from outside the class,
 asks for an attribute that does not exist under that name,
-so it fails at runtime with `AttributeError`, not at type-checking time.
+so it fails at runtime with an `AttributeError`, not at type-checking time.
 
 The outer class controls creation through its constructor.
 The first construction of an `OnlyOne` initializes `instance`.
@@ -693,6 +694,7 @@ class Registry:
 `@singleton` on `Registry` runs `Registry = singleton(Registry)`.
 The name `Registry` now refers to a `singleton` object that holds the class,
 not to the class.
+
 Why does `__call__()` intercept the constructor for a `Registry`?
 To evaluate `obj(...)`,
 Python [looks up `__call__()` on the *type* of `obj`](26_Patterns--Surrogate.md#special-methods-bypass-getattr).
@@ -785,6 +787,7 @@ as `singleton_class_variable.py` does, `__new__()` still runs on every call,
 unlike the metaclass form.
 That listing's `__new__()` sets `val = []` on the first call and runs `val.append(arg)` on every call,
 so each later argument joins the shared list instead of being discarded.
+
 [Metaprogramming](17_Techniques--Metaprogramming.md)
 also covers `__init_subclass__()` and `__set_name__()`,
 the simpler methods that replace most metaclasses.
@@ -799,7 +802,8 @@ Use the lightest tool that fits:
   It is the default Python singleton and needs no class.
 - If you want a class, hide construction behind a cached factory (`@cache`),
   or override `__new__()` as `singleton_class_variable.py` does.
-  Under threads, prime the factory at import time or use the module form.
+  Both create the instance on the first call,
+  so under threads build it once at import time or use the module form.
 - If you really want many handles sharing one set of state, use *Borg*,
   but only when something needs those handles to be objects:
   an existing class-based interface, an `isinstance()` check, or subclassing.

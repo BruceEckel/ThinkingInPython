@@ -93,8 +93,8 @@ module import, whether or not anything constructs an
 `OnlyOne`. Removing the deferral also removes the first-call race from
 [Tests, Threads, and Locks](../../Chapters/24_Patterns--Singleton.md#tests-threads-and-locks):
 two threads racing the first construction could each see the `None`
-sentinel and each build an inner object. The single-threaded
-import builds the object, leaving no first call to race.
+sentinel and each build an inner object. The class body runs once,
+during the import, so no first call remains to race.
 
 </details>
 </details>
@@ -328,6 +328,10 @@ print(settings)  # [1]
 print(config.settings)  # [2]
 #: {}
 ```
+
+The listing puts `import config` at the top, where ruff expects
+every import. Its position changes nothing: whichever import comes
+first runs the body, and the other finds `config` in `sys.modules`.
 
 The prints at `[1]` and `[2]` disagree, and the exercise turns on
 why.
@@ -610,8 +614,10 @@ class, not a quirk of *Borg*. The base declares one object, and
 every subclass inherits that same one. A subclass that binds its own
 `_shared_state` in its class body, instead of mutating the inherited one,
 gets storage of its own, while the others keep sharing. *Borg*
-sharpens the trap. Mutation is its design, so every version of the
-pattern carries the trap.
+sharpens the trap, because every *Borg* instance writes its
+attributes into the shared dict by design. Any subclass that leaves
+`_shared_state` alone writes into `Borg`'s dict, beside every other
+such subclass.
 
 </details>
 </details>
