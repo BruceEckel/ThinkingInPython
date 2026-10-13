@@ -115,9 +115,8 @@ def policy(x0: float, y0: float, name: str, file: str,
         cx = tx + 10
         b += line((bx + BW, mid), (cx - 10, mid), RED, 1.5)
         b += cross(cx, mid)
-        b += text(bx, by + BH + 22, "RuntimeError: Waiting has no", 10,
-                  RED)
-        b += text(bx, by + BH + 36, "transition for mouse escapes", 10,
+        b += text(bx, by + BH + 22, "RuntimeError: Waiting:", 10, RED)
+        b += text(bx, by + BH + 36, "no transition on mouse escapes", 10,
                   RED)
     else:
         b += arrow((bx + BW, mid), (tx, mid), RED, "ss-red", width=1.5)

@@ -29,5 +29,4 @@ MouseTrap().run_all(MOVES)
 trap = MouseTrap()
 #: Broadcasting cheese smell
 expect(RuntimeError, trap.run_all, [MouseAction.ESCAPES])
-#: [RuntimeError] Waiting has no transition for mouse
-#: escapes
+#: [RuntimeError] Waiting: no transition on mouse escapes

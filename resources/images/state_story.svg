@@ -81,6 +81,6 @@
   <text x="527" y="440" font-size="10" fill="#1a1612" text-anchor="middle">mouse escapes</text>
   <line x1="462" y1="446" x2="592" y2="446" stroke="#8b1a1a" stroke-width="1.5"/>
   <path d="M596,440 L608,452 M596,452 L608,440" stroke="#8b1a1a" stroke-width="2" fill="none"/>
-  <text x="390" y="481" font-size="10" fill="#8b1a1a" text-anchor="start">RuntimeError: Waiting has no</text>
-  <text x="390" y="495" font-size="10" fill="#8b1a1a" text-anchor="start">transition for mouse escapes</text>
+  <text x="390" y="481" font-size="10" fill="#8b1a1a" text-anchor="start">RuntimeError: Waiting:</text>
+  <text x="390" y="495" font-size="10" fill="#8b1a1a" text-anchor="start">no transition on mouse escapes</text>
 </svg>

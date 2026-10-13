@@ -14,5 +14,5 @@ class TableState(ABC):
             return self.transitions[input_]
         except KeyError:
             raise RuntimeError(
-                f"{type(self).__name__} has no transition "
-                f"for {input_}") from None
+                f"{type(self).__name__}: no transition "
+                f"on {input_}") from None

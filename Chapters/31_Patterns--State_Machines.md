@@ -192,10 +192,8 @@ and no state's `run()` reads anything off the machine.
 None of the four state classes inherits from `State`.
 Each satisfies the Protocol by defining `run()` and `next()`,
 and a class that leaves one out fails the type checker where the program uses it as a `State`.
-An `ABC` with both methods abstract reports the omission when you construct an instance.
-An empty base class lets the program run until `run_all()` calls the missing method and Python raises an `AttributeError`.
 
-`mouse_trap_states_demo.py` builds a `MouseTrap` and runs it through every move in `MOVES`:
+`mouse_trap_states_demo.py` runs a `MouseTrap` through every move in `MOVES`:
 
 ```python
 # mouse_trap_states_demo.py
@@ -238,22 +236,14 @@ trap.run_all([MouseAction.ESCAPES])
 The `match` statements inside `next()` work,
 but a machine with many states means many `match` statements,
 spread across many classes.
-The second version puts a table inside each `State` object,
-listing the next state for each input.
+A second approach puts a table inside each `State` object,
+mapping the input object to the next state.
 
 A state's class body cannot build that state's table,
 because the entries name the other states,
 and those states exist only after every class definition has run.
 So the classes come first,
-and module-level code fills in the tables once every state object exists.
-
-`TableState` supplies `next()` from a `transitions` dict that maps each input to its next state,
-and leaves `run()` abstract for its subclasses.
-It is an `ABC`, the alternative the first version sets aside,
-because here the base has code to share.
-Every subclass inherits `next()`.
-`TableState`'s `run()` and `next()` have the signatures the `State` Protocol names,
-so the unchanged `StateMachine` class from `state_machine.py` drives every `TableState`:
+and module-level code fills in the tables once every state object exists:
 
 ```python
 # table_state.py
@@ -272,13 +262,21 @@ class TableState(ABC):
             return self.transitions[input_]
         except KeyError:
             raise RuntimeError(
-                f"{type(self).__name__} has no transition "
-                f"for {input_}") from None
+                f"{type(self).__name__}: no transition "
+                f"on {input_}") from None
 ```
+
+`TableState` supplies `next()` from a `transitions` dict that maps each input to its next state,
+and leaves `run()` abstract for its subclasses.
+It is an `ABC`, the alternative the first version sets aside,
+because here the base has code to share.
+Every subclass inherits `next()`.
+`TableState`'s `run()` and `next()` have the signatures the `State` Protocol names,
+so the unchanged `StateMachine` class from `state_machine.py` drives every `TableState`.
 
 `TableState.__init__()` starts every state with an empty dict.
 If you forget to fill `Waiting`'s table,
-the machine reports `Waiting has no transition for ...` rather than the `AttributeError` a missing `transitions` attribute would produce.
+the machine reports `Waiting: no transition on ...` rather than the `AttributeError` a missing `transitions` attribute would produce.
 
 The `KeyError` that `next()` catches carries the input as its key,
 and the `RuntimeError` message already names that input.
@@ -376,8 +374,7 @@ MouseTrap().run_all(MOVES)
 trap = MouseTrap()
 #: Broadcasting cheese smell
 expect(RuntimeError, trap.run_all, [MouseAction.ESCAPES])
-#: [RuntimeError] Waiting has no transition for mouse
-#: escapes
+#: [RuntimeError] Waiting: no transition on mouse escapes
 ```
 
 With many `State` classes to maintain,
@@ -392,7 +389,7 @@ So both demo files end with one more call,
 which feeds `MouseAction.ESCAPES` to a fresh trap in `Waiting`.
 Neither `Waiting`'s `match` nor its table names that input.
 Version 1 prints `Broadcasting cheese smell` a second time.
-Version 2 raises `RuntimeError: Waiting has no transition for mouse escapes`.
+Version 2 raises `RuntimeError: Waiting: no transition on mouse escapes`.
 The figure traces the run both versions share, then this one input:
 
 ![](_images/state_story)
@@ -884,7 +881,7 @@ def show() -> None:
         render()
 
     def select(r: int, c: int) -> None:
-        send(FirstDigit(f"row {r}", r))
+        send(FirstDigit("ABCD"[r], r))
         send(SecondDigit(f"col {c}", c))
 
     tk.Button(root, text="+25c",

@@ -32,7 +32,7 @@ def show() -> None:
         render()
 
     def select(r: int, c: int) -> None:
-        send(FirstDigit(f"row {r}", r))
+        send(FirstDigit("ABCD"[r], r))
         send(SecondDigit(f"col {c}", c))
 
     tk.Button(root, text="+25c",
