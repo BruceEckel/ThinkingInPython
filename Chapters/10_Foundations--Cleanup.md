@@ -22,16 +22,8 @@ class Counter:
         Counter.count += 1
 
     def __del__(self) -> None:
-        print(self.name, "deleted")
         Counter.count -= 1
-        if Counter.count == 0:
-            print("Last Counter object deleted")
-        else:
-            print(Counter.count,
-                  "Counter objects remaining")
-
-    def __repr__(self) -> str:
-        return f"Counter({self.name!r} {self.count})"
+        print(self.name, "deleted,", Counter.count, "left")
 
 counters = []
 for name in ["First", "Second", "Third"]:
@@ -41,11 +33,9 @@ for name in ["First", "Second", "Third"]:
 #: Third created
 
 for c in counters:
-    print(c)
     del c
-#: Counter('First' 3)
-#: Counter('Second' 3)
-#: Counter('Third' 3)
+print(Counter.count)
+#: 3
 print("End of delete loop")
 #: End of delete loop
 ```
@@ -55,7 +45,7 @@ It unbinds the name `c` and drops the one reference that name held.
 The `counters` list still references each `Counter`,
 so no `Counter`'s reference count reaches zero during the loop.
 That is why no `deleted` lines appear while the loop runs,
-why every `__repr__()` reports a count of `3`,
+why `Counter.count` still reads `3` after the loop,
 and why `End of delete loop` prints before any deletion.
 
 Python destroys the objects later, at interpreter shutdown,
@@ -65,14 +55,11 @@ the objects it holds go with it.
 The listing ends at `End of delete loop`, the program's last statement,
 and each `__del__()` prints afterward.
 If you run `cleanup.py` as a standalone program,
-three more pairs of lines follow `End of delete loop`:
+three more lines follow `End of delete loop`:
 
-    Third deleted
-    2 Counter objects remaining
-    Second deleted
-    1 Counter objects remaining
-    First deleted
-    Last Counter object deleted
+    Third deleted, 2 left
+    Second deleted, 1 left
+    First deleted, 0 left
 
 That was one run on one machine.
 This book's output checker,
@@ -554,22 +541,16 @@ and a file from `open()` or a `socket.socket` also reports a `ResourceWarning` w
 ```python
 # resource_warning.py
 import gc
-import tempfile
+import os
 import warnings
-from pathlib import Path
-
-path = Path(tempfile.gettempdir()) / "leaky.txt"
-path.write_text("data")
 
 with warnings.catch_warnings(record=True) as caught:
     warnings.simplefilter("always")
-    f = open(path)
-    f.read(1)
+    f = open(os.devnull)
     del f
     gc.collect()
     print(caught[0].category.__name__)
 #: ResourceWarning
-path.unlink()
 ```
 
 Losing the last reference to an open file finalizes it,

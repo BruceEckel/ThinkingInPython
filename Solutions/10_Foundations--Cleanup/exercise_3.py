@@ -10,16 +10,8 @@ class Counter:
         Counter.count += 1
 
     def __del__(self) -> None:
-        print(self.name, "deleted")
         Counter.count -= 1
-        if Counter.count == 0:
-            print("Last Counter object deleted")
-        else:
-            print(Counter.count,
-                  "Counter objects remaining")
-
-    def __repr__(self) -> str:
-        return f"Counter({self.name!r} {self.count})"
+        print(self.name, "deleted,", Counter.count, "left")
 
 counters = [Counter(name)
             for name in ["First", "Second", "Third"]]
@@ -28,10 +20,8 @@ counters = [Counter(name)
 #: Third created
 
 for c in counters:
-    print(c)
     del c
-#: Counter('First' 3)
-#: Counter('Second' 3)
-#: Counter('Third' 3)
+print(Counter.count)
+#: 3
 print("End of delete loop")
 #: End of delete loop
