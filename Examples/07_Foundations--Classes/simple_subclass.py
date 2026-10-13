@@ -15,7 +15,3 @@ class Derived(Simple):
         # Call the base-class method from inside
         # the overridden method:
         super().show(msg)
-
-class Different:
-    def show(self):
-        print("Not derived from Simple")

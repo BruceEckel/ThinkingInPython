@@ -1,5 +1,5 @@
 # demo_subclass.py
-from simple_subclass import Derived, Different
+from simple_subclass import Derived
 
 x = Derived("Derived constructor argument")
 #: Inside Derived constructor
@@ -12,10 +12,3 @@ x.show_twice()  # Inherited from Simple
 #: Derived constructor argument
 #: Overridden show() method
 #: Derived constructor argument
-def f(obj):  # Works on any obj with a show()
-    obj.show()
-f(x)
-#: Overridden show() method
-#: Derived constructor argument
-f(Different())
-#: Not derived from Simple

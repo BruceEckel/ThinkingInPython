@@ -155,15 +155,11 @@ class Derived(Simple):
         # Call the base-class method from inside
         # the overridden method:
         super().show(msg)
-
-class Different:
-    def show(self):
-        print("Not derived from Simple")
 ```
 
 ```python
 # demo_subclass.py
-from simple_subclass import Derived, Different
+from simple_subclass import Derived
 
 x = Derived("Derived constructor argument")
 #: Inside Derived constructor
@@ -176,13 +172,6 @@ x.show_twice()  # Inherited from Simple
 #: Derived constructor argument
 #: Overridden show() method
 #: Derived constructor argument
-def f(obj):  # Works on any obj with a show()
-    obj.show()
-f(x)
-#: Overridden show() method
-#: Derived constructor argument
-f(Different())
-#: Not derived from Simple
 ```
 
 `Derived` inherits from `Simple`.
@@ -197,11 +186,32 @@ The lookup starts at the class of the object,
 not at the class that defines the calling method,
 so base-class code reaches a method the subclass replaced.
 
+`f()` in `any_show.py` demonstrates dynamic typing.
+It requires one thing of `obj`, a `show()` it can call.
 The class `Different` also has a method named `show()`,
-but does not derive from `Simple`.
-`f()` in `demo_subclass.py` demonstrates dynamic typing.
-It requires one thing of `obj`, a `show()` it can call,
-so it accepts a `Derived` and a `Different` alike.
+but does not derive from `Simple`:
+
+```python
+# any_show.py
+from simple_subclass import Derived
+
+class Different:
+    def show(self):
+        print("Not derived from Simple")
+
+def f(obj):  # Works on any obj with a show()
+    obj.show()
+
+f(Derived("Derived constructor argument"))
+#: Inside Derived constructor
+#: Inside the Simple constructor
+#: Overridden show() method
+#: Derived constructor argument
+f(Different())
+#: Not derived from Simple
+```
+
+`f()` accepts a `Derived` and a `Different` alike.
 
 An `import` inside a class body binds the imported name like any other assignment,
 so importing a module-level function there attaches it to the class as a method,
