@@ -20,12 +20,7 @@ def get(
     url: str,
 ) -> Annotated[object, performs(Network)]: ...
 '''
-
-def problems(sources: dict[str, str]) -> list[str]:
-    return [f"{f.where} {f.problem}"
-            for f in check(sources).findings]
-
-print(problems({"app": APP}))
-#: ['app.fetch undeclared Unknown']
-print(problems({"app": APP, "requests": STUB}))
+print(check({"app": APP}).findings)
+#: [Undeclared(where='app.fetch', effect='Unknown')]
+print(check({"app": APP, "requests": STUB}).findings)
 #: []

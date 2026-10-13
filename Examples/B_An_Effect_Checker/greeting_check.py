@@ -34,7 +34,7 @@ for name, row in report.rows.items():
 #: greeting.greet ['Ask', 'Tell']
 #: greeting.shout ['Tell']
 for finding in report.findings:
-    print(finding.where, finding.problem)
-#: greeting.ask undeclared Console
-#: greeting.tell undeclared Console
-#: greeting.quiet undeclared Tell
+    print(finding)
+#: Undeclared(where='greeting.ask', effect='Console')
+#: Undeclared(where='greeting.tell', effect='Console')
+#: Undeclared(where='greeting.quiet', effect='Tell')

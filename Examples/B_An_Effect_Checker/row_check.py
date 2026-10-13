@@ -6,9 +6,16 @@ from record import record
 from result import Err, Ok
 
 @record
-class Finding:
+class Undeclared:
     where: str
-    problem: str
+    effect: str
+
+@record
+class Unparsed:
+    where: str
+    message: str
+
+type Finding = Undeclared | Unparsed
 
 @record
 class Report:
@@ -22,7 +29,7 @@ def undeclared(
         return []
     body = body_row(facts, rows, table) - facts.hidden
     return [
-        Finding(facts.name, f"undeclared {effect}")
+        Undeclared(facts.name, effect)
         for effect in sorted(body - facts.declared)
     ]
 
@@ -36,7 +43,7 @@ def check(
             case Ok(found):
                 known |= {f.name: f for f in found}
             case Err(problem):
-                findings.append(Finding(module, problem))
+                findings.append(Unparsed(module, problem))
     rows = infer(known, table)
     for facts in known.values():
         findings += undeclared(facts, rows, table)

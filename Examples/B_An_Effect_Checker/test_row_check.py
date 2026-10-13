@@ -1,6 +1,6 @@
 # test_row_check.py
 from typing import Final
-from row_check import Finding, check
+from row_check import Finding, Undeclared, Unparsed, check
 
 HEAD: Final[str] = "from typing import Annotated\n"
 
@@ -13,7 +13,7 @@ def test_an_undeclared_effect_is_a_finding() -> None:
         "    print('hi')\n"
     )
     assert findings(source) == [
-        Finding("m.f", "undeclared Console")
+        Undeclared("m.f", "Console")
     ]
 
 def test_a_declared_effect_is_no_finding() -> None:
@@ -43,9 +43,10 @@ def test_an_unresolved_call_is_unknown() -> None:
         "    action()\n"
     )
     assert findings(source) == [
-        Finding("m.f", "undeclared Unknown")
+        Undeclared("m.f", "Unknown")
     ]
 
 def test_a_broken_module_is_a_finding() -> None:
-    report = check({"bad": "def f(:\n"})
-    assert [f.where for f in report.findings] == ["bad"]
+    [finding] = check({"bad": "def f(:\n"}).findings
+    assert isinstance(finding, Unparsed)
+    assert finding.where == "bad"

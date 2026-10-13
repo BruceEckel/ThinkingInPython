@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Annotated, Final
 from effect_names import Console, FileSystem
 from effect_rows import performs
-from row_check import Report, check
+from row_check import Report, Undeclared, Unparsed, check
 
 def read(
     path: Path,
@@ -22,7 +22,11 @@ def show(
         if row := report.rows[name]:
             print(name, sorted(row))
     for finding in report.findings:
-        print("!", finding.where, finding.problem)
+        match finding:
+            case Undeclared(where, effect):
+                print("!", where, "undeclared", effect)
+            case Unparsed(where, message):
+                print("!", where, message)
 
 FILES: Final[list[str]] = [
     "effect_table.py",

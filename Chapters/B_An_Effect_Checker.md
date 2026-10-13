@@ -886,9 +886,16 @@ from record import record
 from result import Err, Ok
 
 @record
-class Finding:
+class Undeclared:
     where: str
-    problem: str
+    effect: str
+
+@record
+class Unparsed:
+    where: str
+    message: str
+
+type Finding = Undeclared | Unparsed
 
 @record
 class Report:
@@ -902,7 +909,7 @@ def undeclared(
         return []
     body = body_row(facts, rows, table) - facts.hidden
     return [
-        Finding(facts.name, f"undeclared {effect}")
+        Undeclared(facts.name, effect)
         for effect in sorted(body - facts.declared)
     ]
 
@@ -916,7 +923,7 @@ def check(
             case Ok(found):
                 known |= {f.name: f for f in found}
             case Err(problem):
-                findings.append(Finding(module, problem))
+                findings.append(Unparsed(module, problem))
     rows = infer(known, table)
     for facts in known.values():
         findings += undeclared(facts, rows, table)
@@ -928,8 +935,10 @@ plus a table.
 It reads no file and prints nothing,
 so a test passes it a string and checks the returned value,
 with no files to create or output to capture.
-The `match` on `read_module()`'s result turns a parse failure into a finding,
-beside the findings about rows.
+The `match` on `read_module()`'s result turns a parse failure into an `Unparsed` finding,
+and `undeclared()` reports each Effect a row omits as an `Undeclared` finding.
+`Finding` is the union of the two records,
+so a caller matches on the kind of finding and reads the Effect name from its own field.
 
 Here is the checker on Appendix A's greeting program, with one function added:
 
@@ -970,10 +979,10 @@ for name, row in report.rows.items():
 #: greeting.greet ['Ask', 'Tell']
 #: greeting.shout ['Tell']
 for finding in report.findings:
-    print(finding.where, finding.problem)
-#: greeting.ask undeclared Console
-#: greeting.tell undeclared Console
-#: greeting.quiet undeclared Tell
+    print(finding)
+#: Undeclared(where='greeting.ask', effect='Console')
+#: Undeclared(where='greeting.tell', effect='Console')
+#: Undeclared(where='greeting.quiet', effect='Tell')
 ```
 
 The demo prints each nonempty row, then each finding.
@@ -1002,7 +1011,7 @@ The test file confirms that:
 ```python
 # test_row_check.py
 from typing import Final
-from row_check import Finding, check
+from row_check import Finding, Undeclared, Unparsed, check
 
 HEAD: Final[str] = "from typing import Annotated\n"
 
@@ -1015,7 +1024,7 @@ def test_an_undeclared_effect_is_a_finding() -> None:
         "    print('hi')\n"
     )
     assert findings(source) == [
-        Finding("m.f", "undeclared Console")
+        Undeclared("m.f", "Console")
     ]
 
 def test_a_declared_effect_is_no_finding() -> None:
@@ -1045,12 +1054,13 @@ def test_an_unresolved_call_is_unknown() -> None:
         "    action()\n"
     )
     assert findings(source) == [
-        Finding("m.f", "undeclared Unknown")
+        Undeclared("m.f", "Unknown")
     ]
 
 def test_a_broken_module_is_a_finding() -> None:
-    report = check({"bad": "def f(:\n"})
-    assert [f.where for f in report.findings] == ["bad"]
+    [finding] = check({"bad": "def f(:\n"}).findings
+    assert isinstance(finding, Unparsed)
+    assert finding.where == "bad"
 ```
 
 ## Effects for Code You Don't Own
@@ -1083,14 +1093,9 @@ def get(
     url: str,
 ) -> Annotated[object, performs(Network)]: ...
 '''
-
-def problems(sources: dict[str, str]) -> list[str]:
-    return [f"{f.where} {f.problem}"
-            for f in check(sources).findings]
-
-print(problems({"app": APP}))
-#: ['app.fetch undeclared Unknown']
-print(problems({"app": APP, "requests": STUB}))
+print(check({"app": APP}).findings)
+#: [Undeclared(where='app.fetch', effect='Unknown')]
+print(check({"app": APP, "requests": STUB}).findings)
 #: []
 ```
 
@@ -1117,7 +1122,7 @@ from pathlib import Path
 from typing import Annotated, Final
 from effect_names import Console, FileSystem
 from effect_rows import performs
-from row_check import Report, check
+from row_check import Report, Undeclared, Unparsed, check
 
 def read(
     path: Path,
@@ -1136,7 +1141,11 @@ def show(
         if row := report.rows[name]:
             print(name, sorted(row))
     for finding in report.findings:
-        print("!", finding.where, finding.problem)
+        match finding:
+            case Undeclared(where, effect):
+                print("!", where, "undeclared", effect)
+            case Unparsed(where, message):
+                print("!", where, message)
 
 FILES: Final[list[str]] = [
     "effect_table.py",
