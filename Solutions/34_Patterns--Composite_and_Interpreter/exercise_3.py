@@ -1,4 +1,5 @@
 # exercise_3.py
+from collections.abc import Mapping
 from typing import assert_never
 from record import record
 
@@ -58,23 +59,23 @@ type Expr = Num | Var | Add | Mul | Neg | Div
 def wrap(value: Expr | int) -> Expr:
     return Num(value) if isinstance(value, int) else value
 
-def evaluate(e: Expr, /, **env: int) -> float:
+def evaluate(e: Expr, env: Mapping[str, int]) -> float:
     match e:
         case Num(value):
             return value
         case Var(name):
             return env[name]
         case Add(left, right):
-            return (evaluate(left, **env)
-                    + evaluate(right, **env))
+            return (evaluate(left, env)
+                    + evaluate(right, env))
         case Mul(left, right):
-            return (evaluate(left, **env)
-                    * evaluate(right, **env))
+            return (evaluate(left, env)
+                    * evaluate(right, env))
         case Neg(operand):
-            return -evaluate(operand, **env)
+            return -evaluate(operand, env)
         case Div(left, right):
-            return (evaluate(left, **env)
-                    / evaluate(right, **env))
+            return (evaluate(left, env)
+                    / evaluate(right, env))
         case _:
             assert_never(e)
 
@@ -146,7 +147,7 @@ x = Var("x")
 expr = (2 * x + 1) / -x
 print(to_infix(expr))
 #: (((2 * x) + 1) / -x)
-print(evaluate(expr, x=3))
+print(evaluate(expr, {"x": 3}))
 #: -2.3333333333333335
 print(to_infix(simplify(Neg(Neg(x)) + Num(0))))
 #: x

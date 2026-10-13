@@ -4,8 +4,8 @@ from evaluate import evaluate
 from expr import Add, Mul, Num, Var
 
 def test_literal_and_variable() -> None:
-    assert evaluate(Num(42)) == 42
-    assert evaluate(Var("x"), x=3) == 3
+    assert evaluate(Num(42), {}) == 42
+    assert evaluate(Var("x"), {"x": 3}) == 3
 
 def test_operators_build_the_tree() -> None:
     x = Var("x")
@@ -15,12 +15,9 @@ def test_operators_build_the_tree() -> None:
 
 def test_one_tree_many_environments() -> None:
     area = Var("w") * Var("h")
-    assert evaluate(area, w=2, h=3) == 6
-    assert evaluate(area, w=10, h=10) == 100
+    assert evaluate(area, {"w": 2, "h": 3}) == 6
+    assert evaluate(area, {"w": 10, "h": 10}) == 100
 
 def test_unbound_variable_raises_key_error() -> None:
     with pytest.raises(KeyError, match="y"):
-        evaluate(Var("y"), x=1)
-
-def test_e_binds_as_a_variable() -> None:
-    assert evaluate(Var("e"), e=5) == 5
+        evaluate(Var("y"), {"x": 1})

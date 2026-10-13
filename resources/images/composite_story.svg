@@ -63,7 +63,7 @@
   <text x="430" y="305" font-size="10.5" fill="#8b1a1a" text-anchor="middle">1</text>
   <text x="195" y="357" font-size="10.5" fill="#8b1a1a" text-anchor="middle">2</text>
   <text x="295" y="357" font-size="10.5" fill="#8b1a1a" text-anchor="middle">3</text>
-  <text x="496" y="230" font-size="11" fill="#1a1612" text-anchor="start">evaluate(expr, x=3)</text>
+  <text x="496" y="230" font-size="11" fill="#1a1612" text-anchor="start">evaluate(expr, {"x": 3})</text>
   <text x="496" y="248" font-size="10" fill="#7a6e62" text-anchor="start">returns</text>
   <text x="496" y="276" font-size="20" fill="#8b1a1a" font-weight="bold" text-anchor="start">7</text>
   <text x="496" y="308" font-size="10" fill="#7a6e62" text-anchor="start">with x=10 the same</text>

@@ -14,8 +14,9 @@ showed only which functions name which classes. The chapter's
 `composite_tree.svg` (`ch34_composite_tree.py`) walks the filesystem
 tree, so this figure walks the expression tree. The names come from `expr.py` (`Num`,
 `Var`, `Add`, `Mul`, `__rmul__()`, `__add__()`, `wrap()`),
-`evaluate.py` (`x = Var("x")`, `expr = 2 * x + 1`, the `expr.left`
-repr, `evaluate(expr, x=3)` and its `7`, `x=10` and its `21`), and
+`build_tree.py` (`x = Var("x")`, `expr = 2 * x + 1`, the `expr.left`
+repr), `evaluate.py` (`evaluate(expr, {"x": 3})` and its `7`, `x` bound
+to 10 and its `21`), and
 `infix.py` (`to_infix()` and `((2 * x) + 1)`).
 """
 
@@ -134,7 +135,7 @@ def render() -> str:
     for key, s in (("add", "7"), ("mul", "6"), ("one", "1"),
                    ("two", "2"), ("x", "3")):
         b += result(y0, key, s)
-    b += text(PX, y0 + 40, "evaluate(expr, x=3)", 11)
+    b += text(PX, y0 + 40, 'evaluate(expr, {"x": 3})', 11)
     b += text(PX, y0 + 58, "returns", 10, MUTED)
     b += text(PX, y0 + 86, "7", 20, RED, bold=True)
     b += text(PX, y0 + 118, "with x=10 the same", 10, MUTED)

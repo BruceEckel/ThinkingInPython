@@ -265,6 +265,7 @@ For `simplify()`, consider what rewrite is safe for `Div` and which input to lea
 
 ```python
 # The shape of exercise_3.py
+from collections.abc import Mapping
 from typing import assert_never
 from record import record
 
@@ -324,7 +325,7 @@ type Expr = Num | Var | Add | Mul | Neg | Div
 def wrap(value: Expr | int) -> Expr:
     ...
 
-def evaluate(e: Expr, /, **env: int) -> float:
+def evaluate(e: Expr, env: Mapping[str, int]) -> float:
     ...
 
 def to_infix(e: Expr) -> str:
@@ -345,6 +346,7 @@ so the solution adds `__rtruediv__()` as well.
 
 ```python
 # exercise_3.py
+from collections.abc import Mapping
 from typing import assert_never
 from record import record
 
@@ -404,23 +406,23 @@ type Expr = Num | Var | Add | Mul | Neg | Div
 def wrap(value: Expr | int) -> Expr:
     return Num(value) if isinstance(value, int) else value
 
-def evaluate(e: Expr, /, **env: int) -> float:
+def evaluate(e: Expr, env: Mapping[str, int]) -> float:
     match e:
         case Num(value):
             return value
         case Var(name):
             return env[name]
         case Add(left, right):
-            return (evaluate(left, **env)
-                    + evaluate(right, **env))
+            return (evaluate(left, env)
+                    + evaluate(right, env))
         case Mul(left, right):
-            return (evaluate(left, **env)
-                    * evaluate(right, **env))
+            return (evaluate(left, env)
+                    * evaluate(right, env))
         case Neg(operand):
-            return -evaluate(operand, **env)
+            return -evaluate(operand, env)
         case Div(left, right):
-            return (evaluate(left, **env)
-                    / evaluate(right, **env))
+            return (evaluate(left, env)
+                    / evaluate(right, env))
         case _:
             assert_never(e)
 
@@ -492,7 +494,7 @@ x = Var("x")
 expr = (2 * x + 1) / -x
 print(to_infix(expr))
 #: (((2 * x) + 1) / -x)
-print(evaluate(expr, x=3))
+print(evaluate(expr, {"x": 3}))
 #: -2.3333333333333335
 print(to_infix(simplify(Neg(Neg(x)) + Num(0))))
 #: x
@@ -1172,6 +1174,7 @@ For the `sys.setrecursionlimit()` question, consider what the interpreter's own 
 
 ```python
 # The shape of exercise_8.py
+from collections.abc import Mapping
 from enum import Enum
 from typing import assert_never
 from exceptions import expect
@@ -1215,14 +1218,15 @@ type Expr = Num | Var | Add | Mul
 def wrap(value: Expr | int) -> Expr:
     ...
 
-def evaluate(e: Expr, /, **env: int) -> int:
+def evaluate(e: Expr, env: Mapping[str, int]) -> int:
     ...
 
 class Op(Enum):
     ADD = "+"
     MUL = "*"
 
-def evaluate_iterative(e: Expr, /, **env: int) -> int:
+def evaluate_iterative(e: Expr,
+                       env: Mapping[str, int]) -> int:
     ...
 ```
 
@@ -1230,13 +1234,14 @@ def evaluate_iterative(e: Expr, /, **env: int) -> int:
 <summary>Solution</summary>
 
 If you push an `Add` or `Mul` node's two children with no marker behind them,
-`evaluate_iterative(2 * x + 1, x=3)` returns `1` instead of `7`.
+`evaluate_iterative(2 * x + 1, {"x": 3})` returns `1` instead of `7`.
 `values` collects the three leaves, and the function returns the last one it reached.
 The solution pushes an `Op` beneath each pair of children,
 so the combine runs once both values are on `values`.
 
 ```python
 # exercise_8.py
+from collections.abc import Mapping
 from enum import Enum
 from typing import assert_never
 from exceptions import expect
@@ -1280,18 +1285,18 @@ type Expr = Num | Var | Add | Mul
 def wrap(value: Expr | int) -> Expr:
     return Num(value) if isinstance(value, int) else value
 
-def evaluate(e: Expr, /, **env: int) -> int:
+def evaluate(e: Expr, env: Mapping[str, int]) -> int:
     match e:
         case Num(value):
             return value
         case Var(name):
             return env[name]
         case Add(left, right):
-            return (evaluate(left, **env)
-                    + evaluate(right, **env))
+            return (evaluate(left, env)
+                    + evaluate(right, env))
         case Mul(left, right):
-            return (evaluate(left, **env)
-                    * evaluate(right, **env))
+            return (evaluate(left, env)
+                    * evaluate(right, env))
         case _:
             assert_never(e)
 
@@ -1300,7 +1305,8 @@ class Op(Enum):
     ADD = "+"
     MUL = "*"
 
-def evaluate_iterative(e: Expr, /, **env: int) -> int:
+def evaluate_iterative(e: Expr,
+                       env: Mapping[str, int]) -> int:
     work: list[Expr | Op] = [e]
     values: list[int] = []
     while work:
@@ -1330,14 +1336,15 @@ deep: Expr = Num(0)
 for n in range(1, 2001):
     deep = deep + Num(n)
 
-expect(RecursionError, evaluate, deep)
+expect(RecursionError, evaluate, deep, {})
 #: [RecursionError] maximum recursion depth exceeded
-print(evaluate_iterative(deep))
+print(evaluate_iterative(deep, {}))
 #: 2001000
 
 x = Var("x")
 small = 2 * x + 1
-print(evaluate(small, x=3), evaluate_iterative(small, x=3))
+print(evaluate(small, {"x": 3}),
+      evaluate_iterative(small, {"x": 3}))
 #: 7 7
 ```
 
@@ -1369,7 +1376,7 @@ another uses no C stack, so with the limit raised to `10**9`,
 `evaluate()` walks a million-level tree. Anything that recurses
 through C still stops. `repr()` or `hash()` on that same tree raises
 a `RecursionError` that reports a stack overflow, whatever the limit
-says. Each pending level also holds a frame and a fresh `env` dict,
+says. Each pending level also holds a frame,
 so memory grows with depth. The limit is global too, so a library
 that raises it changes the behavior of code that did not ask for a
 higher limit. The iterative walk keeps its pending work in one list

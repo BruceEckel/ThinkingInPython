@@ -147,21 +147,6 @@ def walk(entry: Node, prefix: str = "") -> Iterator[str]:
                 yield from walk(child, f"{prefix}{name}/")
         case _:
             assert_never(entry)
-
-if __name__ == "__main__":
-    src = Directory("src", (
-        File("main.py", 400), File("util.py", 250)))
-    root = Directory("root", (
-        File("readme.md", 90), src, File("data.csv", 1200)))
-    print(disk_usage(root), disk_usage(src),
-          disk_usage(File("lone.txt", 10)))
-    for path in walk(root):
-        print(path)
-#: 1940 650 10
-#: root/readme.md
-#: root/src/main.py
-#: root/src/util.py
-#: root/data.csv
 ```
 
 `Node` is a *recursive* union.
@@ -207,8 +192,8 @@ and the list it holds keeps its `append()`,
 as [Rethinking Objects](20_Patterns--Rethinking_Objects.md#the-immutability-solution)
 demonstrates.
 With the tuple, sharing a subtree is safe.
-The demo builds `src` first, then places it inside `root`,
-and `src` stays as built.
+`test_filesystem.py` builds `SUB` first, then places it inside `TREE`,
+and `SUB` stays as built.
 
 The tests check that `disk_usage()` answers for the whole tree, a subtree,
 and a lone file, that `walk()` yields each file's full path,
@@ -373,6 +358,24 @@ and `wrap()` promotes an integer on the right to a `Num` node.
 `2 * x + 1` is therefore a valid sentence in the little language.
 Python has parsed it, applying its precedence rules,
 before the interpreter runs.
+Compare the tree the operators build with one assembled by hand:
+
+```python
+# build_tree.py
+from expr import Add, Mul, Num, Var
+
+x = Var("x")
+expr = 2 * x + 1
+by_hand = Add(Mul(Num(2), x), Num(1))
+print(expr == by_hand, type(expr).__name__, expr.left)
+#: True Add Mul(left=Num(value=2), right=Var(name='x'))
+```
+
+The operators build the same tree you assemble by hand.
+Records generate `__eq__()`,
+so `expr == by_hand` compares the two trees by value.
+Printing the root's type and then `expr.left` shows the nesting.
+The `Add` at the root holds a `Mul`, which holds a `Num` and a `Var`.
 
 The reflected methods depend on the operator dispatch from [*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md#operators-dispatch-twice).
 `2 * x` works because `int.__mul__()` returns `NotImplemented` and Python turns to `x.__rmul__(2)`.
@@ -401,7 +404,7 @@ so that generated `__eq__()` shadows anything `Operators` defines.
 
 `expr.py` leaves `==` alone.
 The nodes compare by value,
-and `evaluate.py`'s demo and its tests rely on that comparison.
+and `build_tree.py` and the chapter's tests rely on that comparison.
 When a library's `==` must build a node, as SQLAlchemy's `col == 5` does,
 the library sets `eq=False` on the dataclass, giving up structural comparison,
 and writes its own `__eq__()`.
@@ -420,66 +423,45 @@ The parentheses change the parse.
 ## Evaluation Is a Tree Walk
 
 Evaluation is a recursive `match` function.
-Variables need values, which the caller supplies as keyword arguments:
+Variables need values,
+which the caller supplies in a mapping from each name to its value.
+Every recursive call passes that same `env` along:
 
 ```python
 # evaluate.py
+from collections.abc import Mapping
 from typing import assert_never
 from expr import Add, Expr, Mul, Num, Var
 
-def evaluate(e: Expr, /, **env: int) -> int:
+def evaluate(e: Expr, env: Mapping[str, int]) -> int:
     match e:
         case Num(value):
             return value
         case Var(name):
             return env[name]
         case Add(left, right):
-            return (evaluate(left, **env)
-                    + evaluate(right, **env))
+            return (evaluate(left, env)
+                    + evaluate(right, env))
         case Mul(left, right):
-            return (evaluate(left, **env)
-                    * evaluate(right, **env))
+            return (evaluate(left, env)
+                    * evaluate(right, env))
         case _:
             assert_never(e)
 
 if __name__ == "__main__":
     x = Var("x")
     expr = 2 * x + 1
-    by_hand = Add(Mul(Num(2), x), Num(1))
-    print(expr == by_hand, type(expr).__name__, expr.left)
-    print(evaluate(expr, x=3), evaluate(expr, x=10))  # [1]
-#: True Add Mul(left=Num(value=2), right=Var(name='x'))
+    print(evaluate(expr, {"x": 3}),
+          evaluate(expr, {"x": 10}))
 #: 7 21
 ```
 
-The demo confirms that the operators build the tree you assemble by hand.
-Records generate `__eq__()`,
-so `expr == by_hand` compares the two trees by value.
-Printing the root's type and then `expr.left` shows the nesting.
-The `Add` at the root holds a `Mul`, which holds a `Num` and a `Var`.
-The `print()` at `[1]` evaluates that same `expr` twice,
-once with `x=3` and once with `x=10`.
+The demo evaluates one `expr` twice,
+once with `x` bound to 3 and once with `x` bound to 10.
 Building `2 * x + 1` does not compute a number.
 It builds a tree, so `expr` is a value you can pass to `evaluate()` under different variable bindings,
 as many times as you like.
 An unbound variable raises a `KeyError`, naming the variable.
-
-`**env` gives the call site `evaluate(expr, x=3)` rather than `evaluate(expr, {"x": 3})`,
-and that convenience has a memory cost.
-Each recursive call packs a fresh dict from `**env`,
-so at any moment one dict is live per level of recursion,
-and the live entries total the tree's depth times the number of bound variables.
-The cost matters most on the deep trees about which this chapter warns later,
-which can run thousands of levels.
-
-`**env` is also why the `/` is there.
-The `/` makes `e` [positional-only](05_Foundations--Functions.md#positional-only-and-keyword-only-parameters),
-which keeps the parameter name out of the variable namespace,
-so an expression can use `e` as a variable.
-`e=5` goes into `env`.
-A `dict[str, int]` parameter passes the same bindings by reference at every call,
-and it would spare both the `/` and this explanation.
-This chapter keeps `**env` for the call site.
 
 The test file confirms that:
 
@@ -488,7 +470,6 @@ The test file confirms that:
   with the integer on either side.
 - One tree evaluates under different bindings.
 - An unbound variable raises a `KeyError` that names the variable.
-- `e` binds as a variable, though it is `evaluate()`'s first parameter.
 
 ```python
 # test_evaluate.py
@@ -497,8 +478,8 @@ from evaluate import evaluate
 from expr import Add, Mul, Num, Var
 
 def test_literal_and_variable() -> None:
-    assert evaluate(Num(42)) == 42
-    assert evaluate(Var("x"), x=3) == 3
+    assert evaluate(Num(42), {}) == 42
+    assert evaluate(Var("x"), {"x": 3}) == 3
 
 def test_operators_build_the_tree() -> None:
     x = Var("x")
@@ -508,15 +489,12 @@ def test_operators_build_the_tree() -> None:
 
 def test_one_tree_many_environments() -> None:
     area = Var("w") * Var("h")
-    assert evaluate(area, w=2, h=3) == 6
-    assert evaluate(area, w=10, h=10) == 100
+    assert evaluate(area, {"w": 2, "h": 3}) == 6
+    assert evaluate(area, {"w": 10, "h": 10}) == 100
 
 def test_unbound_variable_raises_key_error() -> None:
     with pytest.raises(KeyError, match="y"):
-        evaluate(Var("y"), x=1)
-
-def test_e_binds_as_a_variable() -> None:
-    assert evaluate(Var("e"), e=5) == 5
+        evaluate(Var("y"), {"x": 1})
 ```
 
 ## New Operations, Same Tree

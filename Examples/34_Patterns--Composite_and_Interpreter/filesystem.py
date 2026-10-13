@@ -34,18 +34,3 @@ def walk(entry: Node, prefix: str = "") -> Iterator[str]:
                 yield from walk(child, f"{prefix}{name}/")
         case _:
             assert_never(entry)
-
-if __name__ == "__main__":
-    src = Directory("src", (
-        File("main.py", 400), File("util.py", 250)))
-    root = Directory("root", (
-        File("readme.md", 90), src, File("data.csv", 1200)))
-    print(disk_usage(root), disk_usage(src),
-          disk_usage(File("lone.txt", 10)))
-    for path in walk(root):
-        print(path)
-#: 1940 650 10
-#: root/readme.md
-#: root/src/main.py
-#: root/src/util.py
-#: root/data.csv
