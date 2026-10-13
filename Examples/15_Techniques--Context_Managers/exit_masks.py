@@ -1,6 +1,6 @@
 # exit_masks.py
 
-class Careless:
+class BrokenCleanup:
     def __enter__(self) -> None:
         return None
 
@@ -8,7 +8,7 @@ class Careless:
         raise ValueError("cleanup error")
 
 try:
-    with Careless():
+    with BrokenCleanup():
         raise KeyError("original")
 except ValueError as error:
     print("caught:", repr(error))

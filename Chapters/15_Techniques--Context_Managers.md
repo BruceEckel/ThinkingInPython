@@ -48,9 +48,20 @@ def trace(name: str) -> Generator[str]:
 if __name__ == "__main__":
     with trace("A") as t:
         print(f"inside {t}")
+    manager = trace("B")
+    with manager:
+        pass
+    try:
+        with manager:  # [1]
+            pass
+    except AttributeError as error:
+        print(error)
 #: enter A
 #: inside A
 #: exit A
+#: enter B
+#: exit B
+#: '_GeneratorContextManager' object has no attribute 'args'
 ```
 
 `with trace("A") as t:` runs the body of `trace()` up to the `yield`,
@@ -59,10 +70,10 @@ printing `enter A`.
 The block under the `with` then runs.
 When it finishes, `trace()` resumes just after the `yield` and prints `exit A`.
 
-The manager object `trace("A")` returns is single-use.
+The manager object `trace()` returns is single-use.
 Its generator runs once,
-so reusing the same object in a second `with` fails with a message that names nothing useful:
-`AttributeError: '_GeneratorContextManager' object has no attribute 'args'`.
+so the `with manager:` at `[1]` raises an `AttributeError`,
+and the message it prints names nothing useful.
 Construct a fresh manager for each `with` statement.
 Nor does a loop around the `yield` make the manager reusable.
 `@contextmanager` allows one `yield`,
@@ -234,7 +245,7 @@ and the original survives only as the new exception's `__context__`:
 ```python
 # exit_masks.py
 
-class Careless:
+class BrokenCleanup:
     def __enter__(self) -> None:
         return None
 
@@ -242,7 +253,7 @@ class Careless:
         raise ValueError("cleanup error")
 
 try:
-    with Careless():
+    with BrokenCleanup():
         raise KeyError("original")
 except ValueError as error:
     print("caught:", repr(error))
@@ -252,7 +263,7 @@ except ValueError as error:
 ```
 
 `KeyError('original')` never reaches the `except`.
-`Careless.__exit__()` raises a `ValueError` before `with` can propagate the `KeyError`,
+`BrokenCleanup.__exit__()` raises a `ValueError` before `with` can propagate the `KeyError`,
 so the caller sees the cleanup's failure instead of the block's.
 Python keeps `original`.
 It becomes `error.__context__`, the same chaining a nested `except` produces.
