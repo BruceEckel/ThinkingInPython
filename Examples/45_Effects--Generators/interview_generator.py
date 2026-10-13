@@ -7,23 +7,22 @@ Answer = NewType("Answer", str)
 Result = NewType("Result", str)
 
 def interview() -> Generator[Question, Answer, Result]:
-    # Ask the world for the name
     name = yield Question("name")
-    # Ask the world for the town
     town = yield Question("town")
-    friend = yield Question("friend")  # Ask for a friend
+    friend = yield Question("friend")
     return Result(f"{name} of {town}, friend {friend}")
 
 if __name__ == "__main__":
-    i = interview()
-    question1: Question = next(i)
+    conversation = interview()
+    question1: Question = next(conversation)
     print(f"{question1 = }")
-    question2: Question = i.send(Answer("Alice"))
+    question2: Question = conversation.send(Answer("Alice"))
     print(f"{question2 = }")
-    question3: Question = i.send(Answer("Wonderland"))
+    question3: Question = conversation.send(
+        Answer("Wonderland"))
     print(f"{question3 = }")
     try:
-        i.send(Answer("Rabbit"))
+        conversation.send(Answer("Rabbit"))
     except StopIteration as stop:
         result: Result = stop.value
     print(f"{result = }")

@@ -12,11 +12,11 @@ def survey() -> Generator[Question, Answer, Result]:
 print(drive(survey(),
             ANSWERS | {Question("color"): Answer("blue")}))
 #: request = 'name', answer = 'Alice'
-#: ask(question = 'name') -> answer = 'Alice'
+#:   ask() received Alice
 #: request = 'town', answer = 'Wonderland'
-#: ask(question = 'town') -> answer = 'Wonderland'
+#:   ask() received Wonderland
 #: request = 'friend', answer = 'Rabbit'
-#: ask(question = 'friend') -> answer = 'Rabbit'
+#:   ask() received Rabbit
 #: request = 'color', answer = 'blue'
-#: ask(question = 'color') -> answer = 'blue'
+#:   ask() received blue
 #: Alice of Wonderland, friend Rabbit, color blue

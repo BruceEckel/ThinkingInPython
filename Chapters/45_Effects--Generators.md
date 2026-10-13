@@ -81,23 +81,22 @@ Answer = NewType("Answer", str)
 Result = NewType("Result", str)
 
 def interview() -> Generator[Question, Answer, Result]:
-    # Ask the world for the name
     name = yield Question("name")
-    # Ask the world for the town
     town = yield Question("town")
-    friend = yield Question("friend")  # Ask for a friend
+    friend = yield Question("friend")
     return Result(f"{name} of {town}, friend {friend}")
 
 if __name__ == "__main__":
-    i = interview()
-    question1: Question = next(i)
+    conversation = interview()
+    question1: Question = next(conversation)
     print(f"{question1 = }")
-    question2: Question = i.send(Answer("Alice"))
+    question2: Question = conversation.send(Answer("Alice"))
     print(f"{question2 = }")
-    question3: Question = i.send(Answer("Wonderland"))
+    question3: Question = conversation.send(
+        Answer("Wonderland"))
     print(f"{question3 = }")
     try:
-        i.send(Answer("Rabbit"))
+        conversation.send(Answer("Rabbit"))
     except StopIteration as stop:
         result: Result = stop.value
     print(f"{result = }")
@@ -125,8 +124,8 @@ All three `question` variables receive an `Answer` where their declarations say 
 `Generator[str, str, str]` accepts the reversal without complaint.
 
 Driving the generator by hand sends one `Answer` at a time.
-`next(i)` starts the generator and produces a `Question`.
-`i.send(Answer("Alice"))` provides an answer and produces the next question.
+`next(conversation)` starts the generator and produces a `Question`.
+`conversation.send(Answer("Alice"))` provides an answer and produces the next question.
 That single expression carries both directions of the channel.
 The last `send()` resumes the body,
 which reaches `return` instead of another `yield`,
@@ -151,7 +150,7 @@ A newly created generator pauses at the top of the function body,
 before any code runs, so no `yield` expression is waiting to receive a value.
 The first call therefore cannot send a value.
 It must be `next()` or `send(None)`.
-`i.send(Answer("Alice"))` at that point raises `TypeError: can't send non-None value to a just-started generator`.
+`conversation.send(Answer("Alice"))` at that point raises `TypeError: can't send non-None value to a just-started generator`.
 
 A suspended generator holds its frame:
 the position in the body and every local variable.
@@ -159,7 +158,7 @@ the position in the body and every local variable.
 because resuming continues an existing computation.
 The frame holds them, and the frame is the generator's state.
 
-`next(i)` is equivalent to `i.send(None)`:
+`next(conversation)` is equivalent to `conversation.send(None)`:
 
 ```python
 # send_none_is_next.py
@@ -481,7 +480,7 @@ def ask(
     question: Question
 ) -> Generator[Question, Answer, Answer]:
     answer = yield question
-    print(f"ask({question = }) -> {answer = }")
+    print(f"  ask() received {answer}")
     return answer
 
 def interview() -> Generator[Question, Answer, Result]:
@@ -493,11 +492,11 @@ def interview() -> Generator[Question, Answer, Result]:
 if __name__ == "__main__":
     print(drive(interview(), ANSWERS))
 #: request = 'name', answer = 'Alice'
-#: ask(question = 'name') -> answer = 'Alice'
+#:   ask() received Alice
 #: request = 'town', answer = 'Wonderland'
-#: ask(question = 'town') -> answer = 'Wonderland'
+#:   ask() received Wonderland
 #: request = 'friend', answer = 'Rabbit'
-#: ask(question = 'friend') -> answer = 'Rabbit'
+#:   ask() received Rabbit
 #: Alice of Wonderland, friend Rabbit
 ```
 
@@ -543,13 +542,13 @@ def survey() -> Generator[Question, Answer, Result]:
 print(drive(survey(),
             ANSWERS | {Question("color"): Answer("blue")}))
 #: request = 'name', answer = 'Alice'
-#: ask(question = 'name') -> answer = 'Alice'
+#:   ask() received Alice
 #: request = 'town', answer = 'Wonderland'
-#: ask(question = 'town') -> answer = 'Wonderland'
+#:   ask() received Wonderland
 #: request = 'friend', answer = 'Rabbit'
-#: ask(question = 'friend') -> answer = 'Rabbit'
+#:   ask() received Rabbit
 #: request = 'color', answer = 'blue'
-#: ask(question = 'color') -> answer = 'blue'
+#:   ask() received blue
 #: Alice of Wonderland, friend Rabbit, color blue
 ```
 
