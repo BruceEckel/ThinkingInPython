@@ -36,11 +36,10 @@ def persist(item: Serializable) -> str:
 def audit(item: Describable) -> str:
     return item.describe()
 
-if __name__ == "__main__":
-    invoice = Invoice(19.99, "Ada")
-    print(charge(invoice))
-    print(persist(invoice))
-    print(audit(invoice))
+invoice = Invoice(19.99, "Ada")
+print(charge(invoice))
 #: 19.99
+print(persist(invoice))
 #: {"amount": 19.99, "customer": "Ada"}
+print(audit(invoice))
 #: Invoice for Ada

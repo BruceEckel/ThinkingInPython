@@ -18,13 +18,12 @@ class Leaky:
     def bob(self) -> Bob:
         return self._bob
 
-if __name__ == "__main__":
-    leaky = Leaky([1, 2])
-    # The same object
-    print(leaky.numbers is leaky._numbers)
-    # Both mutate "private" internals through the getters:
-    leaky.numbers.append(999)
-    leaky.bob.name = "Ralph"
-    print(leaky.numbers, leaky.bob)
+leaky = Leaky([1, 2])
+# The same object
+print(leaky.numbers is leaky._numbers)
 #: True
+# Both mutate "private" internals through the getters:
+leaky.numbers.append(999)
+leaky.bob.name = "Ralph"
+print(leaky.numbers, leaky.bob)
 #: [1, 2, 999] Bob(name='Ralph')

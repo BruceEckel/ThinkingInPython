@@ -19,9 +19,10 @@ def total(prices: list[float],
         logger.log(f"added {price}, total {result}")
     return result
 
-if __name__ == "__main__":
-    print(total([1.5, 2.5]))
-    logger = ListLogger()
-    print(total([1.5, 2.5], logger), len(logger.lines))
+print(total([1.5, 2.5]))
 #: 4.0
-#: 4.0 2
+logger = ListLogger()
+print(total([1.5, 2.5], logger))
+#: 4.0
+print(logger.lines)
+#: ['added 1.5, total 1.5', 'added 2.5, total 4.0']

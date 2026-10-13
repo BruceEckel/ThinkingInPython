@@ -31,6 +31,6 @@ twin = Contact(
 )
 print(c == twin)  # Value equality, field by field
 #: True
-# Hashable, so it works as a dict key
-print({c: "value"}[c])
-#: value
+# An equal key finds the entry
+print({c: "found"}[twin])
+#: found

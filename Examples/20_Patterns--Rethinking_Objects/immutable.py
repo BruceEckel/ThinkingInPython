@@ -1,5 +1,6 @@
 # immutable.py
-from dataclasses import dataclass
+from dataclasses import FrozenInstanceError, dataclass
+from exceptions import expect
 
 @dataclass(frozen=True)
 class Bob:
@@ -13,6 +14,7 @@ class Immutable:
 if __name__ == "__main__":
     immutable = Immutable((1, 2), Bob())
     print(immutable)
-    # immutable.numbers is a tuple, so it has no append,
-    # and .bob.name = "Ralph" raises FrozenInstanceError.
+    expect(FrozenInstanceError, setattr,
+           immutable.bob, "name", "Ralph")
 #: Immutable(numbers=(1, 2), bob=Bob(name='Bob'))
+#: [FrozenInstanceError] cannot assign to field 'name'

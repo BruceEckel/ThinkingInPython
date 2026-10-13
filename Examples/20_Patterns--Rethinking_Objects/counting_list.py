@@ -14,5 +14,5 @@ class CountingList(list[int]):
 counted = CountingList()
 counted.append(1)
 counted.extend([2, 3])
-print(len(counted), counted.appends)
-#: 3 1
+print(f"{len(counted)=}, {counted.appends=}")
+#: len(counted)=3, counted.appends=1

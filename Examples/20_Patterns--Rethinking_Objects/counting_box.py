@@ -17,5 +17,5 @@ class CountingBox:
 box = CountingBox()
 box.append(1)
 box.extend([2, 3])
-print(len(box.items), box.appends)
-#: 3 3
+print(f"{len(box.items)=}, {box.appends=}")
+#: len(box.items)=3, box.appends=3

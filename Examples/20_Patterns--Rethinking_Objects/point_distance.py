@@ -14,13 +14,12 @@ class Point:
 def distance(a: Point, b: Point) -> float:
     return sqrt((b.x - a.x) ** 2 + (b.y - a.y) ** 2)
 
-if __name__ == "__main__":
-    # A 3-4-5 right triangle
-    p1, p2 = Point(3, 0), Point(0, 4)
-    print(p1.distance_to(p2))
-    # The method, as a function
-    print(Point.distance_to(p1, p2))  # [1]
-    print(distance(p1, p2))
+# A 3-4-5 right triangle
+p1, p2 = Point(3, 0), Point(0, 4)
+print(p1.distance_to(p2))
 #: 5.0
+# The method, as a function
+print(Point.distance_to(p1, p2))  # [1]
 #: 5.0
+print(distance(p1, p2))
 #: 5.0

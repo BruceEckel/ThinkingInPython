@@ -17,7 +17,8 @@ class BoundedStack(Stack):
     @override
     def push(self, item: int) -> None:
         if len(self.items) >= self.limit:
-            raise OverflowError("Stack is full")
+            raise OverflowError(
+                f"Stack is full at {self.limit}")
         super().push(item)
 
 def fill(stack: Stack, count: int) -> int:
@@ -28,4 +29,4 @@ def fill(stack: Stack, count: int) -> int:
 print(fill(Stack(), 5))
 #: 5
 expect(OverflowError, fill, BoundedStack(), 5)
-#: [OverflowError] Stack is full
+#: [OverflowError] Stack is full at 2

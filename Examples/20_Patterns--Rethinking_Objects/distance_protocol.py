@@ -35,9 +35,8 @@ class PairCoord:
     def y(self) -> float:
         return self.pair.b
 
-if __name__ == "__main__":
-    print(distance(Point(3, 0), Point(0, 4)))
-    print(distance(PairCoord(Pair(3, 0)),
-                   PairCoord(Pair(0, 4))))
+print(distance(Point(3, 0), Point(0, 4)))
 #: 5.0
+print(distance(PairCoord(Pair(3, 0)),
+               PairCoord(Pair(0, 4))))
 #: 5.0

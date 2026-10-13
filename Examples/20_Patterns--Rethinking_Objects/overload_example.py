@@ -12,8 +12,7 @@ def stringify(value: int | list[int]) -> str | list[str]:
         return [str(v) for v in value]
     return str(value)
 
-if __name__ == "__main__":
-    print(stringify(42))
-    print(stringify([1, 2, 3]))
+print(stringify(42))
 #: 42
+print(stringify([1, 2, 3]))
 #: ['1', '2', '3']

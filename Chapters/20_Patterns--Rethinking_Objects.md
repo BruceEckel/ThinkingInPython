@@ -110,7 +110,8 @@ class BoundedStack(Stack):
     @override
     def push(self, item: int) -> None:
         if len(self.items) >= self.limit:
-            raise OverflowError("Stack is full")
+            raise OverflowError(
+                f"Stack is full at {self.limit}")
         super().push(item)
 
 def fill(stack: Stack, count: int) -> int:
@@ -121,7 +122,7 @@ def fill(stack: Stack, count: int) -> int:
 print(fill(Stack(), 5))
 #: 5
 expect(OverflowError, fill, BoundedStack(), 5)
-#: [OverflowError] Stack is full
+#: [OverflowError] Stack is full at 2
 ```
 
 `BoundedStack.push()` takes the same argument and returns the same type as `Stack.push()`,
@@ -175,15 +176,14 @@ class Leaky:
     def bob(self) -> Bob:
         return self._bob
 
-if __name__ == "__main__":
-    leaky = Leaky([1, 2])
-    # The same object
-    print(leaky.numbers is leaky._numbers)
-    # Both mutate "private" internals through the getters:
-    leaky.numbers.append(999)
-    leaky.bob.name = "Ralph"
-    print(leaky.numbers, leaky.bob)
+leaky = Leaky([1, 2])
+# The same object
+print(leaky.numbers is leaky._numbers)
 #: True
+# Both mutate "private" internals through the getters:
+leaky.numbers.append(999)
+leaky.bob.name = "Ralph"
+print(leaky.numbers, leaky.bob)
 #: [1, 2, 999] Bob(name='Ralph')
 ```
 
@@ -276,7 +276,8 @@ The fields are public, with no getters and no copies:
 
 ```python
 # immutable.py
-from dataclasses import dataclass
+from dataclasses import FrozenInstanceError, dataclass
+from exceptions import expect
 
 @dataclass(frozen=True)
 class Bob:
@@ -290,12 +291,17 @@ class Immutable:
 if __name__ == "__main__":
     immutable = Immutable((1, 2), Bob())
     print(immutable)
-    # immutable.numbers is a tuple, so it has no append,
-    # and .bob.name = "Ralph" raises FrozenInstanceError.
+    expect(FrozenInstanceError, setattr,
+           immutable.bob, "name", "Ralph")
 #: Immutable(numbers=(1, 2), bob=Bob(name='Bob'))
+#: [FrozenInstanceError] cannot assign to field 'name'
 ```
 
-Assigning to a field of the frozen `Bob` raises a `FrozenInstanceError`:
+Assigning to a field of the frozen `Bob` raises a `FrozenInstanceError`.
+The demo goes through `setattr()` because the type checker rejects `immutable.bob.name = "Ralph"`.
+`frozen=True` is the defense that holds at runtime,
+against code outside the type checker's view.
+A test pins down the same guarantee:
 
 ```python
 # test_immutable.py
@@ -308,10 +314,6 @@ def test_frozen_field_refuses_assignment() -> None:
     with pytest.raises(dataclasses.FrozenInstanceError):
         setattr(immutable.bob, "name", "Ralph")
 ```
-
-The test goes through `setattr()` because the type checker rejects `immutable.bob.name = "Ralph"`.
-`frozen=True` is the defense that holds at runtime,
-against code outside the type checker's view.
 
 Two quiet changes in `immutable.py` do as much work as `frozen=True`:
 `numbers` is a `tuple`, not a `list`, and `Bob` carries `frozen=True` too.
@@ -386,15 +388,14 @@ class Point:
 def distance(a: Point, b: Point) -> float:
     return sqrt((b.x - a.x) ** 2 + (b.y - a.y) ** 2)
 
-if __name__ == "__main__":
-    # A 3-4-5 right triangle
-    p1, p2 = Point(3, 0), Point(0, 4)
-    print(p1.distance_to(p2))
-    # The method, as a function
-    print(Point.distance_to(p1, p2))  # [1]
-    print(distance(p1, p2))
+# A 3-4-5 right triangle
+p1, p2 = Point(3, 0), Point(0, 4)
+print(p1.distance_to(p2))
 #: 5.0
+# The method, as a function
+print(Point.distance_to(p1, p2))  # [1]
 #: 5.0
+print(distance(p1, p2))
 #: 5.0
 ```
 
@@ -458,11 +459,10 @@ class PairCoord:
     def y(self) -> float:
         return self.pair.b
 
-if __name__ == "__main__":
-    print(distance(Point(3, 0), Point(0, 4)))
-    print(distance(PairCoord(Pair(3, 0)),
-                   PairCoord(Pair(0, 4))))
+print(distance(Point(3, 0), Point(0, 4)))
 #: 5.0
+print(distance(PairCoord(Pair(3, 0)),
+               PairCoord(Pair(0, 4))))
 #: 5.0
 ```
 
@@ -500,8 +500,8 @@ class CountingList(list[int]):
 counted = CountingList()
 counted.append(1)
 counted.extend([2, 3])
-print(len(counted), counted.appends)
-#: 3 1
+print(f"{len(counted)=}, {counted.appends=}")
+#: len(counted)=3, counted.appends=1
 ```
 
 `list.extend()` appends its items without calling `append()`,
@@ -535,8 +535,8 @@ class CountingBox:
 box = CountingBox()
 box.append(1)
 box.extend([2, 3])
-print(len(box.items), box.appends)
-#: 3 3
+print(f"{len(box.items)=}, {box.appends=}")
+#: len(box.items)=3, box.appends=3
 ```
 
 Nothing arrives from a base class,
@@ -589,9 +589,9 @@ twin = Contact(
 )
 print(c == twin)  # Value equality, field by field
 #: True
-# Hashable, so it works as a dict key
-print({c: "value"}[c])
-#: value
+# An equal key finds the entry
+print({c: "found"}[twin])
+#: found
 ```
 
 `Contact` inherits nothing, and gains only the methods it requests.
@@ -599,8 +599,9 @@ It holds a `Name` and an `Address`, and those types stay usable on their own.
 Changing one city means rebuilding the `Address` and then the `Contact`.
 [The General Form of `replace()`](12_Techniques--Data_Classes_as_Types.md#the-general-form-of-replace)
 makes that rebuild routine.
-Two contacts built from equal parts are equal, and the whole structure hashes,
-because value equality and hashing follow from the fields rather than from a base class.
+Two contacts built from equal parts are equal and hash alike,
+so `twin` finds the entry stored under `c`.
+Value equality and hashing follow from the fields rather than from a base class.
 
 ## Polymorphism Without Inheritance
 
@@ -654,10 +655,9 @@ def stringify(value: int | list[int]) -> str | list[str]:
         return [str(v) for v in value]
     return str(value)
 
-if __name__ == "__main__":
-    print(stringify(42))
-    print(stringify([1, 2, 3]))
+print(stringify(42))
 #: 42
+print(stringify([1, 2, 3]))
 #: ['1', '2', '3']
 ```
 
@@ -740,6 +740,7 @@ and the only validity check comes at runtime, when the call runs:
 ```python
 # dynamic_typing.py
 from typing import Any
+from exceptions import expect
 from record import record
 
 @record
@@ -762,14 +763,16 @@ def show(t: Any) -> str:
 if __name__ == "__main__":
     for item in (Bicycle("Bob"), Glider(65)):
         print(show(item))
+    expect(AttributeError, show, 42)
 #: Bicycle Bob
 #: Glider 65
+#: [AttributeError] 'int' object has no attribute 'display'
 ```
 
 `show()` accepts anything because `t`'s type is `Any`,
 a different thing from `object`.
-If you pass it something without a `display()` method,
-the call raises an exception when the line runs.
+The `expect()` call passes `show()` an `int`, which has no `display()` method,
+so the call raises an `AttributeError` when the line runs.
 If you use `t: object` (the safe top type),
 `show()` fails the type checker because `object` has no `display()` method.
 `Any` switches the type checker off for `t`, so any type passes.
@@ -873,13 +876,12 @@ def persist(item: Serializable) -> str:
 def audit(item: Describable) -> str:
     return item.describe()
 
-if __name__ == "__main__":
-    invoice = Invoice(19.99, "Ada")
-    print(charge(invoice))
-    print(persist(invoice))
-    print(audit(invoice))
+invoice = Invoice(19.99, "Ada")
+print(charge(invoice))
 #: 19.99
+print(persist(invoice))
 #: {"amount": 19.99, "customer": "Ada"}
+print(audit(invoice))
 #: Invoice for Ada
 ```
 
@@ -1072,9 +1074,11 @@ def total(prices: list[float],
 if __name__ == "__main__":
     print(total([1.5, 2.5]))
     logger = ListLogger()
-    print(total([1.5, 2.5], logger), len(logger.lines))
+    print(total([1.5, 2.5], logger))
+    print(logger.lines)
 #: 4.0
-#: 4.0 2
+#: 4.0
+#: ['added 1.5, total 1.5', 'added 2.5, total 4.0']
 ```
 
 The type checker requires the guard.
@@ -1108,12 +1112,13 @@ def total(prices: list[float],
         logger.log(f"added {price}, total {result}")
     return result
 
-if __name__ == "__main__":
-    print(total([1.5, 2.5]))
-    logger = ListLogger()
-    print(total([1.5, 2.5], logger), len(logger.lines))
+print(total([1.5, 2.5]))
 #: 4.0
-#: 4.0 2
+logger = ListLogger()
+print(total([1.5, 2.5], logger))
+#: 4.0
+print(logger.lines)
+#: ['added 1.5, total 1.5', 'added 2.5, total 4.0']
 ```
 
 `total()` decides nothing about logging.
@@ -1170,17 +1175,20 @@ def withdraw(balance: float, amount: float) -> float:
         raise ValueError("Insufficient funds")
     return balance - amount
 
-if __name__ == "__main__":
-    balance = 100.0
-    balance = deposit(balance, 50.0)
-    balance = withdraw(balance, 30.0)
-    print(balance)
+balance = 100.0
+balance = deposit(balance, 50.0)
+balance = withdraw(balance, 30.0)
+print(balance)
+#: 120.0
+withdraw(balance, 30.0)  # [1]
+print(balance)
 #: 120.0
 ```
 
 Every call threads `balance` through,
 and every call site must remember to capture the return value.
-If you drop one reassignment, the next call silently uses the old balance.
+The call at `[1]` drops its result,
+so `balance` keeps its value and prints `120.0` again.
 An object closes that gap:
 
 ```python
