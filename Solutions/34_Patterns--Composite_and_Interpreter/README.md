@@ -44,7 +44,8 @@ def find(entry: Node, name: str,
 
 If you copy `walk()` and add a name test to the `File` case alone,
 `find(root, "main.py")` still works, but `find(root, "src")` yields nothing.
-A `Directory` case that descends without a name test omits its own path.
+That `Directory` case descends straight into its children,
+so every path it yields lies beneath the directory.
 The exercise says a directory can match,
 so the solution's `Directory` case tests its own name before it descends.
 
@@ -99,7 +100,7 @@ entries.
 
 **Match a directory, then descend.** A `Directory` can match `name`,
 where `walk()` yields only file paths. Matching also continues
-*into* a matched directory rather than stopping there, so a directory
+*into* a matched directory, so a directory
 named `"src"` and a file beneath it named `"src"` can both appear in
 the results.
 
@@ -123,8 +124,9 @@ separate directories named `"src"`, and both come back as
 
 [A *Composite* of Data Classes](../../Chapters/34_Patterns--Composite_and_Interpreter.md#a-composite-of-data-classes) ends each `match` with `assert_never()`.
 Add a `@record` class to the `Node` union and run the type checker.
-It reports the unhandled type in each operation that lacks a case.
-Then decide per operation what a link means, and avoid following the target into a subtree.
+The type checker reports the new type at each operation's `assert_never()` call.
+Then decide per operation what a link means.
+Treating the link as a leaf keeps each walk to one visit per node.
 
 <details>
 <summary>The shape</summary>
@@ -164,9 +166,9 @@ def walk(entry: Node, prefix: str = "") -> Iterator[str]:
 
 If you follow the link, resolving `target` to its node and
 recursing into that node, `disk_usage(tree)` returns `10`.
-It counts `a.txt` once as a file and again through `shortcut`.
+`disk_usage()` counts `a.txt` once as a file and again through `shortcut`.
 A link to an ancestor, such as `Symlink("up", "/root")`,
-sends `disk_usage()` around the loop until Python raises a
+makes `disk_usage()` recurse into that ancestor again and again until Python raises a
 `RecursionError`.
 The solution shows the link as its own entry and counts it as
 zero bytes, so each operation visits every node once.
@@ -227,20 +229,23 @@ print(list(walk(tree)))
 #: ['root/a.txt', 'root/shortcut -> /root/a.txt']
 ```
 
-**Extend the union.** Adding `Symlink` to the union makes every `match` whose `case _` calls
-`assert_never()` fail type checking, as the chapter says.
-In both `disk_usage()` and `walk()`, the type checker reports that `entry` could
-be a `Symlink` that no case handles, until you add the case shown
-here. Deciding what a link should do is a judgment call, not
-something the type checker picks for you.
+**Extend the union.** Once `Symlink` joins the union,
+the type checker rejects every `match` whose `case _` calls `assert_never()`,
+as the chapter says.
+In both `disk_usage()` and `walk()`,
+it reports that `entry` can still be a `Symlink` at the `assert_never()` call.
+The `Symlink` case in each function clears that report.
+Deciding what a link should do is a judgment call.
+The type checker reports where a case belongs, and you write what the case does.
 
-**Avoid counting bytes twice.** `disk_usage()` counts a link
-as zero bytes, since the bytes it references get counted wherever
-the real file lives. Adding the target's size again double-counts those bytes.
+**Count each byte once.** `disk_usage()` counts a link
+as zero bytes, since the target file's own entry counts its bytes.
+Adding the target's size again double-counts those bytes.
 
-**Show a link without following it.** `walk()` reports the link as its own entry, `name -> target`, rather
-than following it into the target's subtree, since following it could
-loop forever if a link ever pointed back at one of its own ancestors.
+**Stop at the link.** `walk()` reports the link as its own entry, `name -> target`,
+and stops there.
+If `walk()` followed a link back to one of its own ancestors,
+it would re-enter that ancestor until Python raised a `RecursionError`.
 
 </details>
 </details>
@@ -503,22 +508,26 @@ print(to_infix(simplify(Neg(Neg(x)) + Num(0))))
 **Add one case per new node.** `evaluate()` and `to_infix()` gain one case per new node, and
 `evaluate()` now returns a `float`, since `/` produces one.
 
-**Fold negations where possible.** `simplify()` is the interesting one. For `Neg`, a constant operand
-folds (`Neg(Num(a))` → `Num(-a)`), and a double negation cancels
-(`Neg(Neg(inner))` → `inner`). Both new cases keep the chapter's
-`is` test, so an unchanged subtree is still shared.
+**Fold negations where possible.** `simplify()` gains real rewrites. For `Neg`, it folds a constant operand
+(`Neg(Num(a))` → `Num(-a)`) and cancels a double negation
+(`Neg(Neg(inner))` → `inner`).
+The `Neg` case keeps the chapter's `is` test,
+so an unchanged subtree stays shared.
 
-**Leave division for evaluation.** For `Div`, `simplify()` folds nothing. A quotient of two `int`s is
-usually not an `int`, so it does not fit in a `Num`, and division by
-`Num(0)` produces no value to fold. Nor should `simplify()` raise the
-`ZeroDivisionError`. It rewrites a tree without evaluating it,
-and a caller can simplify an expression and then discard it, so an
-exception raised in `simplify()` would report an error in a
-computation that does not run. Leaving `Div(lhs, Num(0))` in the
-tree lets `evaluate()` raise `ZeroDivisionError` when the division
-runs, and not before.
+**Leave division for evaluation.** For `Div`, `simplify()` simplifies both operands and keeps the division,
+with the same `is` test. A quotient of two `int`s is
+usually a fraction, and a `Num` holds an `int`. Division by
+`Num(0)` produces no value to fold.
+
+`simplify()` should leave the `ZeroDivisionError` to `evaluate()`.
+`simplify()` rewrites a tree, and `evaluate()` computes the tree's value.
+A caller can simplify an expression and then discard it, so an
+exception raised in `simplify()` could report an error in a
+division the program throws away. Leaving `Div(lhs, Num(0))` in the
+tree lets `evaluate()` raise `ZeroDivisionError` at the moment the division
+runs.
 Python treats `1 / 0` in source the same way. The compiler accepts
-it, and the error arrives when the line executes.
+it, and Python raises the `ZeroDivisionError` when the line executes.
 
 </details>
 </details>
@@ -535,7 +544,7 @@ it, and the error arrives when the line executes.
 
 [New Operations, Same Tree](../../Chapters/34_Patterns--Composite_and_Interpreter.md#new-operations-same-tree) builds `to_infix()` as one more walker over `Expr`.
 Give each operator a precedence number and pass the enclosing operator's precedence down the recursion.
-A subexpression adds parentheses only when its own precedence is lower than the context in which it sits.
+A subexpression adds parentheses only when its own precedence is lower than the precedence its parent passes down.
 
 <details>
 <summary>The shape</summary>
@@ -669,16 +678,15 @@ print(to_infix((x + 1) * (x + 2)))
 
 **Parenthesize by context.** Each recursive call passes down the precedence its *parent* requires.
 A child gets parentheses only when its own operator binds more
-loosely than what the parent needs. `Mul`'s children therefore need
-parens around a lower-precedence `Add`, while an `Add` needs no
-parens around another `Add` on its left.
+loosely than what the parent needs. A `Mul` therefore parenthesizes
+an `Add` child, while an `Add` leaves another `Add` on its left bare.
 
-**Guard the right operand.** Passing `prec + 1` (rather than
-`prec`) for the right operand is a simple, always-safe rule. It can
-occasionally print one redundant pair of parentheses around a
-right-hand child at the *same* precedence as its parent
-(`x + (x + 1)` instead of the fully terse `x + x + 1`), but it keeps
-every pair that the expression's meaning requires.
+**Guard the right operand.** Passing `prec + 1` for the right operand,
+rather than `prec`, is simple and always safe.
+The rule can print one redundant pair of parentheses
+around a right-hand child at the *same* precedence as its parent,
+as in `x + (x + 1)` where `x + x + 1` would do.
+It still keeps every pair that the expression's meaning requires.
 
 </details>
 </details>
@@ -875,17 +883,20 @@ instead of a number or a string. A `Num` is constant, so its
 derivative is always `0`. The derivative of `Var(n)` is `1` with
 respect to itself and `0` with respect to every other variable.
 
-**Combine the children's derivatives.** `Add`'s case is the sum rule. `Mul`'s case is the product rule, which
-keeps both the derivative *and* the original, undifferentiated
-subtree on each side, because the rule multiplies one by the other.
+**Combine the children's derivatives.** `Add`'s case is the sum rule.
+`Mul`'s case is the product rule.
+Each of its two terms multiplies one factor's derivative by the other factor as written,
+so the original, undifferentiated subtrees stay in the result.
 
 Running the raw result through `simplify()` turns `((1 * x) + (x * 1))`
-into the much more readable `(x + x)` (reaching `2 * x` takes a further
-rule, "combine like terms," that this `simplify()` does not
-implement). A full `Expr` that also includes `Neg` and `Div`
-(exercise 3's additions) needs a quotient rule for `Div`, which
-produces a squared denominator beyond what `simplify()`'s current
-rules handle, so this solution leaves that rule for a further
+into the much more readable `(x + x)`.
+Reaching `2 * x` takes a further rule, "combine like terms,"
+that this `simplify()` does not implement.
+
+Exercise 3 adds `Neg` and `Div` to `Expr`,
+and differentiating a `Div` needs the quotient rule.
+That rule produces a squared denominator beyond what `simplify()`'s current
+rules handle, so this solution leaves differentiating a `Div` for a further
 exercise.
 
 </details>
@@ -903,7 +914,8 @@ exercise.
 <details>
 <summary>Where to look</summary>
 
-[Operators That Build Nodes](../../Chapters/34_Patterns--Composite_and_Interpreter.md#operators-that-build-nodes) explains the four operator methods that `expr.py` defines, and the *Multiple Dispatching* chapter's [Operators Dispatch Twice](../../Chapters/32_Patterns--Multiple_Dispatching.md#operators-dispatch-twice) shows the idiom.
+[Operators That Build Nodes](../../Chapters/34_Patterns--Composite_and_Interpreter.md#operators-that-build-nodes) explains the four operator methods that `expr.py` defines.
+The *Multiple Dispatching* chapter's [Operators Dispatch Twice](../../Chapters/32_Patterns--Multiple_Dispatching.md#operators-dispatch-twice) shows the idiom.
 In each method, test the operand with `isinstance()` and return `NotImplemented` when it is neither an `Expr` nor an `int`.
 Python then tries the reflected method on the other operand and, when that declines too, raises the `TypeError` for you.
 
@@ -959,8 +971,8 @@ def wrap(value: Expr | int) -> Expr:
 
 If you guard the reflected methods and leave `__add__()` and
 `__mul__()` as the chapter writes them, `"a" + x` raises its
-`TypeError`, but `x + "a"` raises no exception.
-`wrap()` passes the string through untouched, so `x + "a"`
+`TypeError`, but `x + "a"` succeeds.
+`wrap()` passes the string through, so `x + "a"`
 returns `Add(left=Var(name='x'), right='a')`,
 and the listing's second `expected()` block prints nothing.
 The solution guards all four methods, since an expression that
@@ -1029,25 +1041,25 @@ with expected(TypeError):
 #: 'str'
 ```
 
-Before the change, `"a" + x` produces `Add(Num("a"), Var("x"))`: a
-`Num` whose `value` is a string, and every walker then mishandles
-that `Num`. Python tries `Var.__radd__("a")` first, because `str`
-handles `+` as sequence concatenation, which Python tries last. The
-old `__radd__()` accepts anything, wrapping
-the string in a `Num` without looking at it.
+Before the change, `"a" + x` produces `Add(Num("a"), Var("x"))`.
+Python tries `Var.__radd__("a")` first, because `str`
+handles `+` as sequence concatenation, which Python tries last.
+The old `__radd__()` accepts anything and wraps whatever arrives in a `Num`,
+so this `Num` holds a string,
+and every walker mishandles it.
 
-**Hand the decision back to Python.** Returning `NotImplemented` puts the decision back where it belongs.
-`__radd__()` now answers only for an `int`, so it declines, and Python
+**Hand the decision back to Python.** Returning `NotImplemented` tells Python to try the next method.
+`__radd__()` now answers for an `int` alone, so it declines the string, and Python
 falls back to `str` concatenation, which raises the `TypeError`.
 
 The message comes from `str`, which is the right source. The left
-operand is what the caller wrote first, and nothing in this expression
-language claims to extend `str`.
+operand is what the caller wrote first, and no method in this expression
+language accepts a `str`.
 
-**Guard the forward direction too.** The forward methods need the same guard for the same reason. Without
-it `x + "a"` passes the raw string through `wrap()` and builds the
-ill-typed tree `Add(Var('x'), 'a')` from the other direction, so all
-four methods decline what they cannot use.
+**Guard the forward direction too.** The forward methods need the same guard for the same reason.
+The old `__add__()` passes the raw string through `wrap()`, so `x + "a"` builds the
+ill-typed tree `Add(Var('x'), 'a')` from the other direction.
+Guarding all four methods makes each one decline an operand it cannot use.
 
 The two messages differ because each comes from a different source.
 `str` reports `"a" + x`, and Python's own fallback reports
@@ -1060,13 +1072,13 @@ explains the convention: typeshed gives the sentinel a type
 inheriting `Any`, so returning it satisfies any declared return type.
 The declaration also lets `(2 * x + 1).right` resolve for a caller.
 
-`NotImplemented` closes a runtime hole, not a type-checking one.
+`NotImplemented` adds a check at runtime, not at type-checking time.
 The type checker rejects
-`"a" + x` in source it can see, which is why the listing's `"a" + x`
-line carries a `# type: ignore` to keep `exercise_6.py` in the build. The runtime hole
-is the gap between what the checker sees and what runs. Closing it matters
-when a program builds the expression from data the type checker cannot
-see, the case an interpreter exists to handle.
+`"a" + x` and `x + "a"` in the source it checks,
+so both lines carry a `# type: ignore` to keep `exercise_6.py` in the build.
+The runtime check matters when a program builds the expression from data
+it reads while running, after the type checker has finished.
+An interpreter exists to handle that case.
 
 </details>
 </details>
@@ -1104,8 +1116,8 @@ def to_html(template: Template) -> str:
 If you build the page with an f-string and pass the finished string to `escape()`,
 the `<script>` tag comes out escaped, but so do the author's `<p>` tags,
 and the output begins `&lt;p&gt;`.
-A finished string no longer records which characters the author typed.
-The exercise asks for the literal pieces unchanged,
+In a finished string, the characters the author typed and the characters the value supplied look the same.
+The exercise asks for the literal pieces as written,
 so the solution escapes each interpolation's value and copies each string piece as it is.
 
 ```python
@@ -1129,22 +1141,24 @@ print(f"<p>{comment}</p>")
 #: <p><script>steal()</script> & run</p>
 ```
 
-**Add an operation beside the others.** `to_html()` is the third operation over `Template`, and it leaves
-`to_query()` and `to_shape()` as they were, the property the chapter
-keeps demonstrating on `Expr`. The whole walker is the same loop with
+**Add an operation beside the others.** `to_html()` is the third operation over `Template`.
+Adding it leaves `to_query()` and `to_shape()` as they were,
+in the same way that each walker the chapter adds over `Expr`
+leaves the earlier walkers as they were.
+The whole walker is the same loop with
 a different body, because the structure separates the literal
 pieces from the interpolations.
 
 **Escape the interpolated values.** `html.escape()` replaces the characters, so the exercise's
 real content is *where* `to_html()` calls it: on the interpolated
-values. The `<p>` and `</p>` the author typed pass through untouched,
-so the output is valid HTML rather than a document with its own tags
-escaped.
+values. The `<p>` and `</p>` the author typed pass through as written,
+so the browser sees the author's paragraph with the comment's markup
+escaped inside it.
 
-The f-string on the last line is the comparison. It produces a
-`<script>` tag that a browser runs, and nothing downstream can
-intervene, because by the time a function receives that string the
-tag and the paragraph markup are the same kind of text. The template
+The f-string on the last line produces a `<script>` tag that a browser runs.
+A later function that escapes the tag escapes the paragraph markup with it,
+because by the time a function receives that string,
+the tag and the paragraph markup are the same kind of text. The template
 version keeps the distinction, so escaping is a decision the
 renderer can still make.
 
@@ -1348,14 +1362,16 @@ print(evaluate(small, {"x": 3}),
 #: 7 7
 ```
 
-The tree is 2000 `Add` nodes deep, and `evaluate()` needs one frame
-per level against a limit of 1000, so it fails before reaching the
-bottom. The expression is ordinary apart from its shape.
+The `deep` expression is ordinary apart from its shape.
+Its tree is 2000 `Add` nodes deep.
+`evaluate()` needs one frame per level against a limit of 1000,
+so it fails before reaching the bottom.
 
-**Defer the combine behind its children.** The stack version cannot be a straight translation.
-Pushing children and popping them in a loop gives
-a pre-order walk that visits every node and computes nothing, because
-an `Add` can combine its children's values only *after* the children
+**Defer the combine behind its children.** The recursive `evaluate()` combines two values when its two calls return,
+and a stack version must arrange that moment explicitly.
+A loop that pushes children and pops them gives a pre-order walk.
+That walk visits every node and combines nothing,
+because an `Add` combines its children's values *after* the children
 have produced them. The solution stacks the pending operation behind
 its own children. `work += [Op.ADD, right, left]` puts `Op.ADD`
 deepest, so it comes off last, by which point the two values it needs
@@ -1367,21 +1383,21 @@ language adds.
 
 **Keep the match exhaustive.** `Op` is an enum rather than a string so the `match` stays exhaustive.
 `work` holds `Expr | Op`, and every member of both types has its own
-case, so `assert_never()` still type-checks. A string marker leaves
-`case _` reachable and the guarantee gone.
+case, so `assert_never()` type-checks. A string marker leaves
+`case _` reachable, and the type checker then rejects the `assert_never()` call.
 
 `sys.setrecursionlimit()` avoids the error for `evaluate()`, but it
 has three drawbacks. First, it lifts the limit for Python calls
 alone. A call from one Python function to another uses no C stack,
 so with the limit raised to `10**9`, `evaluate()` walks a
-million-level tree. Anything that recurses through C still stops:
+million-level tree. Anything that recurses through C stops.
 `repr()` or `hash()` on that same tree raises a `RecursionError`
 that reports a stack overflow, whatever the limit says. Second,
 each pending level holds a frame, so memory grows with depth.
 Third, the limit is global, so a library that raises it changes the
-behavior of code that did not ask for a higher limit. The iterative
-walk keeps its pending work in one list and changes no setting that
-other code can see.
+behavior of every other module in the process. The iterative
+walk keeps its pending work in one list and leaves every global
+setting as it was.
 
 </details>
 </details>
@@ -1499,24 +1515,26 @@ print(root.disk_usage())
 ```
 
 The closed version breaks at the union. `type Node = File |
-Directory` lives in your source, so a plugin cannot extend it. The
-type checker does warn the plugin author. `ty` reports a `Symlink`
-passed to `disk_usage()`, or placed in a `Directory`'s entries, as
-`invalid-argument-type`. The warning leaves the plugin nothing to fix,
-because the union it would need to extend is yours. Unchecked
-code fares worse. Its `Symlink` falls through every case to
-`assert_never()`, which raises an `AssertionError` at runtime. The plugin's alternatives
+Directory` lives in your source, so extending it means editing your file. The
+type checker does warn the plugin author.
+When a plugin passes a `Symlink` to `disk_usage()`
+or places one in a `Directory`'s entries,
+`ty` reports `invalid-argument-type`. The fix the warning calls for belongs in your file,
+because the union it would need to extend is yours.
+At runtime, a `Symlink` falls through every case to
+`assert_never()`, which raises an `AssertionError`. The plugin's alternatives
 are to vendor a patched copy of your module or to persuade you to add
 the case. The open design removes that coupling.
 
-**Move the operation onto the classes.** Moving the operation back onto the classes reverses the trade the
-chapter spent the first two sections making. Adding `Symlink` now
-leaves existing code unchanged, while adding a *new operation* takes
-a method in every class, including the ones you do not own.
+**Move the operation onto the classes.** Moving the operation back onto the classes undoes
+[A *Composite* of Data Classes](../../Chapters/34_Patterns--Composite_and_Interpreter.md#a-composite-of-data-classes),
+which moves each operation off the classes and into a `match`. Adding `Symlink` now
+leaves existing code as it was, while adding a *new operation* takes
+a method in every class, including the classes a plugin owns.
 
 **Enforce the contract on plugins.** The `@abstractmethod` enforces
-the contract on the plugin. Python refuses to instantiate a subclass
-that defines no `disk_usage()`.
+the contract on the plugin. Python raises a `TypeError` when you
+instantiate a subclass that leaves `disk_usage()` abstract.
 
 For a file system, use the open design. Which node types exist is a
 fact about the operating system and about whatever the next version
@@ -1528,8 +1546,8 @@ grammar, so a plugin adding a fifth does not extend the language but
 defines a different one. Every walker would then be silently wrong
 rather than helpfully extended. The `assert_never()` that reads as an
 obstacle in the file system reads as the point here. When the grammar
-does grow a `Neg`, the type checker hands you the list of walkers to
-update.
+does grow a `Neg`, the type checker reports each walker that
+needs a case for it.
 
 </details>
 </details>
