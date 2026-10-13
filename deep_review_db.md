@@ -142,11 +142,12 @@ has thirteen `*Proxy*`. This is house convention, not the
 italics-for-emphasis violation it resembles.
 
 **41_Functional--Toolkits: `recursion.py` teaches two things on purpose.** The
-listing carries both the base-case/recursive-case lesson and
-`sys.getrecursionlimit()`, with an `import sys` serving only the second. That
-breaks "one new thing per listing". Splitting it would leave a two-line second
-listing, which is worse, and the depth limit is discussed in the very next
-paragraph.
+listing carries both the base-case/recursive-case lesson and the depth limit,
+shown since 2026-10-13 as `expect(RecursionError, factorial, 5000)` (it was a
+`sys.getrecursionlimit()` call with an `import sys` serving only that line).
+That breaks "one new thing per listing". Splitting it would leave a two-line
+second listing, which is worse, and the depth limit is discussed in the very
+next paragraph.
 
 **34_Patterns--Composite_and_Interpreter: the three-walker paragraph is not a misplaced
 conclusion.** "Three walkers over one set of nodes is the pattern pair in
@@ -180,9 +181,10 @@ make the chapter wrong. Verified on the pinned interpreter:
 `#: MISSING` marker are correct; do not "correct" them.
 
 **17_Techniques--Metaprogramming: the sentinel unions name values, not the class.**
-`greenhouse.py` and `utils/display.py` annotate `EventMaker | NOT_CREATED` and
-`Sequence[str] | ALL_DUNDERS | REDEFINED_DUNDERS` rather than the generic
-`sentinel` class. That is what makes `ty` narrow the other branch. Also
+`utils/display.py` annotates `Sequence[str] | ALL_DUNDERS | REDEFINED_DUNDERS`
+rather than the generic `sentinel` class (`greenhouse.py` carried an
+`EventMaker | NOT_CREATED` union of the same shape until the `NOT_CREATED`
+sentinel left that listing; the rule still stands for any sentinel union). That is what makes `ty` narrow the other branch. Also
 `_redefined()` restricts its comparison to `INTERESTING_DUNDERS` on purpose.
 Both are recorded in `CLAUDE.md`.
 
