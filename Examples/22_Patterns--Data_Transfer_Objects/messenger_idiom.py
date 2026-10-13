@@ -7,8 +7,6 @@ class Messenger:
         self.__dict__ = kwargs
 
 m: Any = Messenger(info="Spam", tags=["urgent", "todo"])
-print(vars(m))
-#: {'info': 'Spam', 'tags': ['urgent', 'todo']}
 m.more = 11
 print(m.info, m.tags, m.more)
 #: Spam ['urgent', 'todo'] 11

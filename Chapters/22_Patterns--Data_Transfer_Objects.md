@@ -35,8 +35,6 @@ class Messenger:
         self.__dict__ = kwargs
 
 m: Any = Messenger(info="Spam", tags=["urgent", "todo"])
-print(vars(m))
-#: {'info': 'Spam', 'tags': ['urgent', 'todo']}
 m.more = 11
 print(m.info, m.tags, m.more)
 #: Spam ['urgent', 'todo'] 11
@@ -104,7 +102,8 @@ print(m == SimpleNamespace(info="Spam",
 #: True
 ```
 
-The `print()` at `[1]` shows the same instance `__dict__` the hand-rolled version has.
+The `print()` at `[1]` shows the keyword arguments stored in the instance `__dict__`,
+as in the hand-rolled version.
 `SimpleNamespace` adds a readable `repr()` and equality by contents.
 `Messenger` prints as `<__main__.Messenger object at 0x...>`,
 and two `Messenger`s with identical attributes compare unequal,
