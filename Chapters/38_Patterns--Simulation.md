@@ -82,12 +82,11 @@ class Rat:
     x: int
     y: int
     number: int = field(init=False)
+    start: tuple[int, int] = field(init=False)
 
     def __post_init__(self) -> None:
         self.number = self.blackboard.next_number()
-        self.blackboard.log(
-            f"Rat {self.number} starts at "
-            f"{(self.x, self.y)}.")
+        self.start = (self.x, self.y)
 
     async def run(self) -> None:
         while True:
@@ -98,8 +97,8 @@ class Rat:
                      if self.blackboard.claim(*pos)]
             if not moves:
                 self.blackboard.log(
-                    f"Rat {self.number} dead-ends "
-                    f"at {(self.x, self.y)}.")
+                    f"Rat {self.number} ran {self.start} "
+                    f"to {(self.x, self.y)}.")
                 return
             for branch in moves[1:]:
                 self.blackboard.spawn(*branch)
@@ -110,11 +109,13 @@ class Rat:
 
 `number` comes from a call to `blackboard.next_number()`,
 which advances a counter, so no static default can supply it.
-With `field(init=False)` on `number`,
+With `field(init=False)` on `number` and `start`,
 the generated `__init__()` is `__init__(self, blackboard: Recorder, x: int, y: int)`.
 The generated `__init__()` assigns `self.blackboard`, `self.x`, and `self.y`,
 then calls `self.__post_init__()`,
-which fills in `number` and logs the rat's start.
+which fills in `number` and records the rat's start cell.
+A rat writes to the log once, when it dead-ends,
+and that line names its start cell and its end cell.
 
 The maze is a grid of characters.
 A `*` is a wall and a space is an opening.
@@ -296,8 +297,7 @@ The rest is the maze.
 *********************
 ```
 
-The demo awaits `explore()`,
-then prints the first eight log messages and the mapped maze:
+The demo awaits `explore()`, then prints the log and the mapped maze:
 
 ```python
 # rats_and_mazes/rats_and_mazes.py
@@ -309,7 +309,7 @@ async def main() -> None:
     maze = Maze.from_file("amaze.txt")
     blackboard = Blackboard(maze)
     await blackboard.explore()
-    for message in blackboard.messages[:8]:
+    for message in blackboard.messages:
         print(message)
     print("Mapped maze (# wall, . visited):")
     print(blackboard.render())
@@ -317,14 +317,15 @@ async def main() -> None:
           f"{len(blackboard.visited)} cells.")
 
 asyncio.run(main())
-#: Rat 1 starts at (1, 1).
-#: Rat 2 starts at (6, 3).
-#: Rat 1 dead-ends at (7, 5).
-#: Rat 3 starts at (6, 1).
-#: Rat 2 dead-ends at (3, 3).
-#: Rat 4 starts at (18, 1).
-#: Rat 3 dead-ends at (15, 1).
-#: Rat 5 starts at (12, 13).
+#: Rat 1 ran (1, 1) to (7, 5).
+#: Rat 2 ran (6, 3) to (3, 3).
+#: Rat 3 ran (6, 1) to (15, 1).
+#: Rat 5 ran (12, 13) to (19, 13).
+#: Rat 6 ran (8, 9) to (9, 11).
+#: Rat 9 ran (16, 5) to (17, 5).
+#: Rat 8 ran (15, 6) to (13, 5).
+#: Rat 7 ran (10, 9) to (13, 9).
+#: Rat 4 ran (18, 1) to (1, 13).
 #: Mapped maze (# wall, . visited):
 #: #####################
 #: #.#...........#.....#
@@ -346,9 +347,10 @@ asyncio.run(main())
 
 The log shows what the map cannot: the order of events.
 `__post_init__()` assigns each number at spawn time,
-so the numbers follow spawn order, and the rats finish in a different order.
-Rat 4 starts in the sixth message and is the last of the nine to dead-end.
-The full log runs to eighteen messages, two per rat.
+so the numbers follow spawn order.
+Each rat logs its line when it dead-ends, so the lines follow finish order.
+Rat 4 spawns fourth and finishes last,
+at `(1, 13)` in the maze's bottom-left corner.
 
 `amaze.txt` is a *perfect maze*, one with no loop:
 exactly one path connects any two of its open cells.
@@ -404,10 +406,8 @@ async def main() -> None:
           f"{contested} contested.")
 
 asyncio.run(main())
-#: Rat 1 starts at (1, 1).
-#: Rat 2 starts at (2, 1).
-#: Rat 1 dead-ends at (2, 3).
-#: Rat 2 dead-ends at (3, 3).
+#: Rat 1 ran (1, 1) to (2, 3).
+#: Rat 2 ran (2, 1) to (3, 3).
 #: 9 rejections: 7 backtracking, 2 contested.
 ```
 

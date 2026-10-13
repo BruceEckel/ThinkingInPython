@@ -19,12 +19,11 @@ class Rat:
     x: int
     y: int
     number: int = field(init=False)
+    start: tuple[int, int] = field(init=False)
 
     def __post_init__(self) -> None:
         self.number = self.blackboard.next_number()
-        self.blackboard.log(
-            f"Rat {self.number} starts at "
-            f"{(self.x, self.y)}.")
+        self.start = (self.x, self.y)
 
     async def run(self) -> None:
         while True:
@@ -35,8 +34,8 @@ class Rat:
                      if self.blackboard.claim(*pos)]
             if not moves:
                 self.blackboard.log(
-                    f"Rat {self.number} dead-ends "
-                    f"at {(self.x, self.y)}.")
+                    f"Rat {self.number} ran {self.start} "
+                    f"to {(self.x, self.y)}.")
                 return
             for branch in moves[1:]:
                 self.blackboard.spawn(*branch)

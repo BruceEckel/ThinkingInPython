@@ -37,8 +37,6 @@ async def main() -> None:
           f"{contested} contested.")
 
 asyncio.run(main())
-#: Rat 1 starts at (1, 1).
-#: Rat 2 starts at (2, 1).
-#: Rat 1 dead-ends at (2, 3).
-#: Rat 2 dead-ends at (3, 3).
+#: Rat 1 ran (1, 1) to (2, 3).
+#: Rat 2 ran (2, 1) to (3, 3).
 #: 9 rejections: 7 backtracking, 2 contested.
