@@ -1,8 +1,9 @@
-
 # Accepted words for tools/spellcheck.py (the full-dictionary prose check).
-# One lowercase word per line; '#' starts a comment.
 # Terms, names, and coined words that are not in the English dictionary but
 # used in the book. Add new terms here; fix real typos in the prose instead.
+# One lowercase word per line; '#' starts a comment.
+
+accessor
 accessor
 accessors
 adaptee
