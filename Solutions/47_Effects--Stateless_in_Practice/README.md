@@ -220,7 +220,7 @@ A type checker cannot catch that leak because purity is not a type.
 and Python's type system says what values a function accepts and produces,
 not what its body touches on the way.
 The annotation `Success[int]` describes the returned object,
-and `success(n * 2)` genuinely produces a `Success[int]`, so the annotation and the returned object agree.
+and `success(n * 2)` produces a `Success[int]`, so the annotation and the returned object agree.
 A language that tracks Effects puts the side effect in the signature.
 These two chapters simulate that tracking by hand,
 so the guarantee holds only for Effects that go through `yield`.
@@ -402,7 +402,7 @@ depleting nothing, since a turbine burns no fuel.
 > and confirm `run_load()` needs no change.
 > Then shorten every source until some hour has no source,
 > run `run_load()` again,
-> and say where the `Blackout` propagates to and why `catch(Blackout)` around `run_load()` does not intercept it.
+> and say where the `Blackout` propagates and why `catch(Blackout)` around `run_load()` does not intercept it.
 
 <details>
 <summary>Where to look</summary>
@@ -1137,13 +1137,16 @@ if __name__ == "__main__":
 of any kind, so a process pool satisfies the request as a
 thread pool does.
 
-**Guard the driver.** Two things around `squares()` did change, and neither is in the Effect.
-The `__main__` guard is now required, because a process pool starts workers by
+**Guard the driver.** The code around `squares()` did change, and none of it
+is in the Effect: the executor class, the timing the chapter's version
+prints, and the `__main__` guard.
+The guard is now required, because a process pool starts workers by
 re-importing the module, and without the guard each worker builds another pool.
-This book's output checker also skips the listing, for the same reason.
-`slow_square()` must be picklable by name from an importable module,
-and code executed inside another program's process
-is not importable that way.
+`slow_square()` needs nothing new.
+`fork()` checks for a `ProcessPoolExecutor` and serializes the function and
+its arguments with `cloudpickle`, which carries a function defined in the
+running script by value,
+so a worker receives `slow_square()` without importing it by name.
 
 Forking an Effect that still declares a `Need` does not type-check:
 

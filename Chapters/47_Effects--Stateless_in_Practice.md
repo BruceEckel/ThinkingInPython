@@ -38,7 +38,7 @@ so the answer can differ at every request.
 
 An Ability subclasses `Ability[T]`, where `T` is the type its handler returns.
 `Ability` declares no `__slots__`,
-so you decorate an Ability with [`@record(slots=False)`](18_Techniques--Performance.md#record).
+so you decorate an Ability that carries fields with [`@record(slots=False)`](18_Techniques--Performance.md#record).
 The base gives every instance its `__dict__` back,
 and the flag says so at the class.
 Here is the Stateless version of `Ask` and `Tell` from [Effect Management](44_Effects--Effect_Management.md#effects-by-hand):
@@ -125,10 +125,9 @@ but the answer then has the type `Any`.
 A generator's send type is all the checker knows about a bare `yield`,
 and an Effect's send type is `Any`.
 With `name` typed `Any`, a mistake such as `name + 1` passes the check.
-The accessor adds a name for the request and one place to state that answer type:
-the `answer: str` binding inside `ask()`,
-one line below the signature's `Depend[Ask, str]`,
-which states the same type to callers.
+The accessor gives the request a name and keeps its answer type in one function.
+The signature's `Depend[Ask, str]` states that type to callers,
+and the `answer: str` binding inside `ask()` states it again.
 
 That annotation reads `Depend[Ask, str]`, not `Depend[Need[Ask], str]`,
 the distinction [Waiting on a Coroutine](46_Effects--Stateless.md#waiting-on-a-coroutine)
@@ -150,13 +149,12 @@ Naming the two stages also gives the type checker a place to report what remains
 as [The type checker decides what survives handling](#the-type-checker-decides-what-survives-handling)
 shows.
 
-Now compare these two listings to `ask_tell.py` again.
+Now compare these two listings to `ask_tell.py` in [Effect Management](44_Effects--Effect_Management.md#effects-by-hand).
 The by-hand version puts two objects in every signature.
 The Stateless version threads nothing.
 `greet()` takes no arguments,
 and the two Effects live in the return type where a type checker verifies them.
-That second channel in the signature is the one [Effect Management](44_Effects--Effect_Management.md#effects-by-hand)
-says an EMS needs.
+That second channel in the signature is the one Effect Management says an EMS needs.
 
 The whole library is visible in `two_way_generator.py` from [Generators](45_Effects--Generators.md#a-generator-is-a-description).
 An Effect is a generator, so you can drive one yourself,
@@ -1330,7 +1328,7 @@ error[invalid-yield]: Yield expression type does not match annotation
 The type checker checks the other end too.
 If you leave `Oven(220)` out of `supply()`,
 the checker rejects the `run()` call,
-finding a `Generator[Need[Oven], Any, str]` where it expected an empty Ability channel.
+finding a `Generator[Need[Oven], Any, str]` where it expected a yield channel holding only `Async` and errors.
 That is the rejection [Forgetting to Supply](46_Effects--Stateless.md#forgetting-to-supply)
 shows, now arising from a dependency two levels down.
 
@@ -1405,7 +1403,7 @@ As [Retrofitting an Effect](46_Effects--Stateless.md#retrofitting-an-effect)
 recommends, the union appears in full rather than as an alias.
 
 Each Ability needs a shape of its own.
-You could rename `Obstacle.blocks()` to `name()`, which `Hero` already declares.
+You could rename `Obstacle.blocks()` to `name()`, which `Hero` declares too.
 `Hero` stays distinct even then, since it also declares `approach()`,
 but every hero then satisfies `Obstacle` as well,
 and `play()` supplies the hero first,
@@ -1651,7 +1649,7 @@ Three attempts fetch the headline three times and collect three identical `NotIn
 Retry what can change between attempts,
 and let `catch()` take a deterministic failure out before it reaches `retry()`.
 
-### What Retry Costs the Signature
+### What Retry Does to the Signature
 
 `save_user()` is `(str) -> Effect[Need[Database], Crashed, str]`.
 Under `reveal_type()`, `retried` is:
@@ -1739,10 +1737,16 @@ print(f"attempts: {db.attempts}")
 #: attempts: 1
 ```
 
-`memoize()` caches by argument the way `functools.lru_cache` does.
+`memoize()` caches by argument through `functools.lru_cache`.
 It wraps the Effect in an object that records the result and replays it rather than driving the spent generator again.
 That wrapper exists because a generator cannot run twice,
 which is the same fact that makes `retry()` decorate the function.
+
+Because the cache is an `lru_cache`, every argument must be hashable,
+and an unhashable one such as a `list` raises a `TypeError` at the call.
+The cache also has no size limit by default,
+so it keeps every result as long as the memoized function exists.
+`memoize(maxsize=128)` bounds it.
 
 That cache key is the argument, not the environment.
 `memoize()` wraps `save_user()` before `supply()` runs,
@@ -1843,8 +1847,8 @@ If you decorate a function that still declares a `Need`, the checker rejects it,
 listing the overloads it failed to match.
 Supply first, then fork.
 
-That restriction is the only one the checker enforces.
-The restriction says nothing about a declared error.
+That restriction is the only one the checker enforces,
+and it says nothing about a declared error.
 Two of those same four overloads accept an Effect that declares one,
 and both return a `Task` with [no error type on it](#fork-drops-the-error-channel).
 
@@ -1902,7 +1906,7 @@ Three rows carry a caveat.
 so supply first, then fork.
 `@throws` also accepts an ordinary function that raises exceptions,
 turning it into one that returns an Effect,
-so it serves as an entry point as well as a transformation.
+so it is both an entry point and a transformation.
 On a function that already returns an Effect, as in `fetch_effectful.py`,
 it adds each `E` to that Effect's error channel.
 `throw()` instead builds the failure as a description.
@@ -1974,7 +1978,7 @@ print(f"run() at least 20x slower: "
 at least twenty times the cost of `run_async()`, by the listing's own measure.
 Running the listing with [`--numbers`](18_Techniques--Performance.md#numbers-on-your-machine)
 prints both per-call costs.
-Synchronous code has no loop to reuse, so it pays that cost on every `run()`.
+Synchronous code has no loop to reuse, so each of its `run()` calls builds one.
 From inside a running loop,
 `run_async()` is both the one that works and the one that is fast.
 
@@ -2116,8 +2120,8 @@ That `Unknown` hides no unsupplied `Need`.
 A `Need` left unsupplied stays named through `catch_all()`,
 `run()` rejects the Effect with an `invalid-argument-type`,
 and a run raises a `MissingAbilityError` naming the same `Need`.
-`Unknown` in a revealed type is still `ty` not finishing the subtraction,
-and `reveal_type()` on the intermediate shows which channel it left unfinished.
+An `Unknown` in a revealed type means `ty` left the subtraction unfinished,
+and `reveal_type()` on the intermediate shows which channel it left.
 
 The type checker verifies the subtraction,
 including where you answer part of what an Effect declares.
@@ -2401,7 +2405,7 @@ Try each exercise before opening its [solution](../Solutions/47_Effects--Statele
     and confirm `run_load()` needs no change.
     Then shorten every source until some hour has no source,
     run `run_load()` again,
-    and say where the `Blackout` propagates to and why `catch(Blackout)` around `run_load()` does not intercept it.
+    and say where the `Blackout` propagates and why `catch(Blackout)` around `run_load()` does not intercept it.
 4.  Write a handler for `Outlet` that ignores `request.hour` and hands out a preset sequence of sources,
     the way `scripted` hands out a preset sequence of tosses.
     Use it to test that `run_load()` re-requests after a failure,
