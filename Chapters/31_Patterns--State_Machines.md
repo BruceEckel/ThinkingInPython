@@ -270,15 +270,11 @@ so a state whose table you forget to fill reports `Waiting: no transition on ...
 The `KeyError` that `next()` catches carries the input as its key,
 and the `RuntimeError` message names that input.
 So `next()` raises its `RuntimeError` [`from None`](04_Foundations--Control_Flow.md#exception-chaining),
-which drops the chained `KeyError` and its repeat of the input.
+which drops the chained `KeyError` and its repeat of the input. [[would a custom exception be a better choice here?]]
 
-Each mousetrap state class now defines `run()` alone,
-and its transitions are data.
-A state's class body cannot build that state's table,
-because the entries name the other states,
-and those states exist only after every class definition has run.
-So the state classes and the `MouseTrap` that instantiates them come first,
-and module-level code fills in the tables once every state object exists:
+The state classes and the `MouseTrap` that instantiates them must be defined before the state tables,
+so that the table entries can name the other states.
+Module-level code fills in the tables once every state object exists:
 
 ```python
 # mouse_trap_tables.py
@@ -333,8 +329,8 @@ MouseTrap.holding.transitions = {
 }
 ```
 
-The demo feeds the same nine moves and prints the same trace.
-Its second call shows what a table does with an input it lacks:
+The demo uses the same nine `MOVES` as the prior example.
+The second call shows what a table does with an input it lacks:
 
 ```python
 # mouse_trap_tables_demo.py
@@ -376,10 +372,8 @@ the tables read more easily than the `match` statements.
 
 ### An Unexpected Input
 
-The two versions also differ on an unexpected input,
-one the current state does not name.
 Every one of the nine moves in `MOVES` matches a transition out of the current state.
-So both demo files end with one more call,
+Both demo files end with one more call,
 which feeds `MouseAction.ESCAPES` to a fresh trap in `Waiting`.
 Neither `Waiting`'s `match` nor its table names that input.
 Version 1 prints `Broadcasting cheese smell` a second time.
