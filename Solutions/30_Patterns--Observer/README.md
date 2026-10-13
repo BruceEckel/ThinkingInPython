@@ -1839,6 +1839,8 @@ class Station(Broadcasting[float]):
     celsius: float
     humidity: float
 
+station = Station(20.0, 0.4)
+
 @station.respond
 def report(change: tuple[str, float]) -> None:
     ...

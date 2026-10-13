@@ -58,8 +58,11 @@ tags are generated, and every run rewrites them in full, the way
 listing named `# path.py` on its first line, except a `test_*.py` file,
 is reduced to its declarations: imports, `type` aliases, constants
 (an assignment whose target is written in capitals), classes, and
-functions, with every function body replaced by `...` and every other
-top-level statement, the demonstration and its `#:` markers, dropped.
+functions, with every function body replaced by `...`. An assignment
+to a lowercase name stays when a kept line reads the name, as
+`monitoring = sys.monitoring` does above constants written in terms of
+it. Every other top-level statement, the demonstration and its `#:`
+markers, is dropped.
 A constant whose value is a string literal spanning more than
 `LONG_LITERAL` lines, a maze layout or a data table, keeps its name
 and annotation and has the literal replaced by `...`, so a shape
@@ -221,18 +224,61 @@ def _collect(nodes: list[ast.stmt], lines: list[str],
     return elided
 
 
-def _kept(node: ast.stmt) -> bool:
-    """Whether a top-level statement is part of the shape."""
+def _declared(node: ast.stmt) -> bool:
+    """Whether a top-level statement is a declaration in its own right."""
     if isinstance(node, (ast.Import, ast.ImportFrom, ast.ClassDef,
                          ast.FunctionDef, ast.AsyncFunctionDef,
                          ast.TypeAlias)):
         return True
+    name = _assigned_name(node)
+    return name is not None and bool(CONSTANT.match(name))
+
+
+def _assigned_name(node: ast.stmt) -> str | None:
+    """The name a simple assignment binds, or None for anything else."""
     if isinstance(node, ast.AnnAssign) and isinstance(node.target, ast.Name):
-        return bool(CONSTANT.match(node.target.id))
-    if isinstance(node, ast.Assign) and len(node.targets) == 1:
-        target = node.targets[0]
-        return isinstance(target, ast.Name) and bool(CONSTANT.match(target.id))
-    return False
+        return node.target.id
+    if (isinstance(node, ast.Assign) and len(node.targets) == 1
+            and isinstance(node.targets[0], ast.Name)):
+        return node.targets[0].id
+    return None
+
+
+def _shown_names(node: ast.AST) -> set[str]:
+    """The names `node` reads in the lines a shape block shows.
+
+    A function's body becomes `...`, so the names in it are left out;
+    its decorators, signature, and return annotation stay in view.
+    """
+    if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+        shown: list[ast.AST] = [*node.decorator_list, node.args,
+                                *node.type_params]
+        if node.returns is not None:
+            shown.append(node.returns)
+        return set().union(*(_shown_names(part) for part in shown))
+    names = ({node.id} if isinstance(node, ast.Name)
+             and isinstance(node.ctx, ast.Load) else set())
+    for child in ast.iter_child_nodes(node):
+        names |= _shown_names(child)
+    return names
+
+
+def _kept(body: list[ast.stmt]) -> list[ast.stmt]:
+    """The top-level statements that make up the shape, in order.
+
+    Declarations stay, and so does a simple assignment to a lowercase
+    name that a kept statement reads, such as
+    `monitoring = sys.monitoring` above constants written in terms of
+    it. Every other assignment is demonstration and is dropped.
+    """
+    kept = [node for node in body if _declared(node)]
+    while True:
+        needed = set().union(*(_shown_names(node) for node in kept))
+        grown = [node for node in body
+                 if node in kept or _assigned_name(node) in needed]
+        if len(grown) == len(kept):
+            return kept
+        kept = grown
 
 
 def shape(listing: Sequence[str]) -> list[str] | None:
@@ -249,7 +295,7 @@ def shape(listing: Sequence[str]) -> list[str] | None:
     except SyntaxError:
         return None
     lines = source.split("\n")
-    kept = [node for node in tree.body if _kept(node)]
+    kept = _kept(tree.body)
     edits: list[tuple[int, int, list[str]]] = []
     if not _collect(kept, lines, edits):
         return None

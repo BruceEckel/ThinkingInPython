@@ -22,6 +22,10 @@ After the third `send()`, the generator finishes, and the total is the `value` o
 from collections.abc import Generator
 from typing import NewType
 
+Prompt = NewType("Prompt", str)
+Amount = NewType("Amount", int)
+Total = NewType("Total", int)
+
 def tally() -> Generator[Prompt, Amount, Total]:
     ...
 ```
@@ -116,6 +120,10 @@ Both the answer iterator and the generator signal the end with `StopIteration`, 
 # The shape of exercise_2.py
 from collections.abc import Generator, Iterator
 from typing import NewType
+
+Question = NewType("Question", str)
+Answer = NewType("Answer", str)
+Result = NewType("Result", str)
 
 def interview() -> Generator[Question, Answer, Result]:
     ...

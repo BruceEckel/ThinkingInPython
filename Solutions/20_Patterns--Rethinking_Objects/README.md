@@ -259,6 +259,9 @@ For the runtime question, consider what `Weight(2.5)` returns when the program r
 from typing import NewType, Protocol
 from record import record
 
+Price = NewType("Price", float)
+Weight = NewType("Weight", float)
+
 class Priced(Protocol):
     def total(self) -> Price: ...
 

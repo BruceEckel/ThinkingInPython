@@ -1319,6 +1319,8 @@ class ShapeFactory:
     def __call__(self, name: str) -> Shape:
         ...
 
+make = ShapeFactory()
+
 @make.register
 class Circle:
     def draw(self) -> None: ...

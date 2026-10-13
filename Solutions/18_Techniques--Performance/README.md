@@ -439,6 +439,7 @@ from collections import Counter
 from types import CodeType
 from typing import Final
 
+monitoring = sys.monitoring
 TOOL: Final[int] = monitoring.PROFILER_ID
 PY_START: Final[int] = monitoring.events.PY_START
 NO_EVENTS: Final[int] = monitoring.events.NO_EVENTS

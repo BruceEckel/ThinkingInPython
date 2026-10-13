@@ -104,6 +104,19 @@ def test_a_long_string_constant_is_elided_to_its_name() -> None:
     assert out[-2:] == ["def f() -> None:", "    ..."]
 
 
+def test_an_assignment_a_kept_line_reads_stays() -> None:
+    listing = ["# a.py", "import sys", "from typing import Final", "",
+               "monitoring = sys.monitoring",
+               "TOOL: Final[int] = monitoring.PROFILER_ID",
+               "helper = len",
+               "def f(n: int) -> int:", "    return helper(n)",
+               "count = f(3)", "print(count)"]
+    out = shape(listing) or []
+    assert "monitoring = sys.monitoring" in out
+    assert "helper = len" not in out  # Read only in an elided body.
+    assert "count = f(3)" not in out
+
+
 def test_a_one_line_body_too_wide_for_the_ellipsis_breaks() -> None:
     sig = "def a_function_with_a_much_longer_name(args: int) -> int:"
     assert len(sig) + len(" ...") > 60
