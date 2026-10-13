@@ -10,8 +10,8 @@
 
 [Test-Driven Development (TDD)](../../Chapters/11_Techniques--Testing.md#test-driven-development-tdd) has you write the failing test before the code that satisfies it.
 Write both tests first, then build `transfer()` from the existing `withdraw()` and `deposit()` methods.
-The order of those two calls decides whether a failed transfer leaves the other account untouched.
-The overdraft test checks it with `pytest.raises()`, as in [Testing for Exceptions](../../Chapters/11_Techniques--Testing.md#testing-for-exceptions).
+The order of those two calls decides whether the other account keeps its balance when a transfer fails.
+The overdraft test checks the failing transfer with `pytest.raises()`, as in [Testing for Exceptions](../../Chapters/11_Techniques--Testing.md#testing-for-exceptions).
 
 <details>
 <summary>Solution</summary>
@@ -137,14 +137,15 @@ and `pytest` reports each run as `test_add_interest_rates[0.0]`,
 `test_add_interest_rates[0.05]`, and so on.
 
 **Allow for rounding.**
-The test uses `pytest.approx()`
-because the two sides of the assertion, `100 + 100 * rate` in the method
-and `100 * (1 + rate)` in the test, can round differently, not because
-these four rates round. For `0.0`, `0.05`, `0.5`, and `1.0` on a balance
-of `100`, the two sides are bit-identical and `==` passes just as
-well. A rate such as `0.1`, where the two sides differ by one bit, or
-interest applied more than once, is where the assertion needs the
-tolerance.
+The method computes `100 + 100 * rate`,
+and the test expects `100 * (1 + rate)`.
+Those two expressions can round differently,
+so the test compares them with `pytest.approx()`.
+For `0.0`, `0.05`, `0.5`, and `1.0` on a balance of `100`,
+the two sides are bit-identical and `==` passes just as well.
+The assertion needs the tolerance for a rate such as `0.1`,
+where the two sides differ by one bit,
+or for interest applied more than once.
 
 </details>
 </details>
@@ -212,14 +213,15 @@ def test_never_negative_after_deposit(
 **Check the invariant at teardown.**
 Code after a fixture's `yield` runs as teardown, once the test function
 that uses the fixture finishes, whether it passes or raises an
-exception. Here that teardown is an assertion, so it doubles as a
-check. No matter what either test does to the account,
-`never_negative`'s balance must still be zero or more once the test
+exception.
+Here that teardown is an assertion on the account's balance.
+Whatever either test does to the account,
+the balance must be zero or more once the test
 body returns control to the fixture.
 
 **Share the check across tests.**
-Both tests pass the same
-invariant check, and the assertion appears once, in the fixture.
+Both tests get the same invariant check
+from one assertion in the fixture.
 
 </details>
 </details>
@@ -290,25 +292,26 @@ def test_settings_path_in_takes_the_directory(
 ```
 
 **Supply the directory through the environment.**
-The first test must know two things about the implementation: that the
+The first test depends on two facts about the implementation: that the
 function reads an environment variable, and that the variable's name is
 `APP_CONFIG`. Renaming the variable to `APP_SETTINGS_DIR` breaks the
-test although the function still behaves the same. The failure is a
-`KeyError: 'APP_SETTINGS_DIR'` from inside the function, with no word
-that the test set `APP_CONFIG`.
+test while the function behaves as before.
+The failure is a `KeyError: 'APP_SETTINGS_DIR'` raised inside the function.
+Its message names the variable the function now reads, not the `APP_CONFIG` the test set.
 
 **Supply the directory as an argument.**
-The second test knows only what the function does: given a
-directory, it returns the settings file inside it. That test survives
-the rename, and it survives dropping the environment variable.
-`tmp_path` is still worth taking in the second test, although
-nothing touches the disk, because it supplies a real, valid path
+The second test depends on one fact about behavior: given a
+directory, the function returns the settings file inside it. That test survives
+the rename, and it survives a program that drops the environment variable.
+
+The second test takes `tmp_path` as well, although nothing touches the disk.
+`tmp_path` supplies a real, valid path,
 where a hard-coded one differs across operating systems.
 
-The trade is that injection moves the decision outward. Somebody must
-read `APP_CONFIG` and pass in the directory. That somebody is
-usually one function at the program's edge, and that function is the
-one place a patching test is worth writing.
+Injection moves the environment lookup out of the function and into a caller.
+That caller must read `APP_CONFIG` and pass in the directory.
+It is usually one function at the program's edge,
+and that function is the one place a patching test is worth writing.
 
 </details>
 </details>
@@ -324,10 +327,10 @@ one place a patching test is worth writing.
 <details>
 <summary>Where to look</summary>
 
-[Network Calls](../../Chapters/11_Techniques--Testing.md#network-calls) replaces `urlopen()` with `monkeypatch.setattr()` so the test stays off the network.
+[Network Calls](../../Chapters/11_Techniques--Testing.md#network-calls) replaces `urlopen()` with `monkeypatch.setattr()` so the test opens no network connection.
 For the second function, accept a `Callable` that opens the URL, and pass a plain function returning an `io.BytesIO`.
 Both tests can share that one stub.
-The rename shows how each test refers to the thing it replaces.
+The rename shows how each test refers to the function it replaces.
 
 <details>
 <summary>The shape</summary>
@@ -395,37 +398,38 @@ def test_injected() -> None:
 ```
 
 **Answer with a canned response.**
-Both tests pass and stay off the network. The stub is the same
+Both tests pass, and neither opens a network connection. The stub is the same
 function in both: a fetcher returning a `BytesIO` that behaves enough
 like a response to satisfy the `with` block and `.read()`.
 
 **Replace the dependency by name.**
-Renaming `urlopen` to `fetch` in `ch11_weather.py` separates the two
-tests.
+Renaming `urlopen` to `fetch` in `ch11_weather.py` makes one test fail
+and leaves the other passing.
 `test_patched()` fails with `AttributeError: <module
 'ch11_weather' from '...'> has no attribute 'urlopen'`, because
 `monkeypatch.setattr()` looks the name up by string and the string is
 now wrong.
 
 **Pass the dependency in.**
-`test_injected()` still passes, because it does not name the dependency.
-It passes one in, and `current_temp_with()` calls whatever it
-receives.
+`test_injected()` still passes, because it hands the dependency in instead of naming it,
+and `current_temp_with()` calls whatever it receives.
 
-That separation is the same lesson exercise 4 draws from the environment
-variable, applied to a different kind of dependency. A patched test
-depends on the name of the thing it replaces, in the module where that
-name lives. An injected test depends only on the shape of what it
-passes. Renaming the import, moving the call into a helper module, or
-importing `urlopen` a different way breaks the patched test while
-`current_temp()` still works.
+Exercise 4 draws the same lesson from the environment variable.
+Here the lesson applies to a different kind of dependency.
+A patched test depends on the name of the function it replaces,
+in the module where that name lives.
+So a patched test breaks under changes that leave `current_temp()` working:
+renaming the import, moving the call into a helper module, or
+importing `urlopen` a different way.
+An injected test depends only on the shape of what it passes.
 
-Use `monkeypatch` where you cannot change the code:
-someone else's library, or a function you are not ready to refactor.
+Use `monkeypatch` on code you must leave as it is:
+someone else's library, or a function you mean to refactor later.
 Where you can change the signature, injection turns the dependency into
-part of the contract. The function then receives what it needs instead
-of going looking for something no caller handed it, the chapter's
-description of a function that is hard to test.
+part of the contract.
+The function then receives what it needs from its caller.
+A function that is [hard to test](../../Chapters/11_Techniques--Testing.md#making-code-testable) usually does the opposite.
+It fetches a dependency instead of accepting it as a parameter.
 
 </details>
 </details>
@@ -443,17 +447,19 @@ description of a function that is hard to test.
 <summary>Where to look</summary>
 
 [Stubs and Mocks](../../Chapters/11_Techniques--Testing.md#stubs-and-mocks) checks a call with a `Mock`, and `assert_not_called()` checks the opposite case.
-Test a balance of zero as well as a positive one, since zero is where the boundary lies, and use `parametrize` to cover both.
+Test a balance of zero as well as a positive one, since zero is where the boundary lies.
+Use `parametrize` to cover both.
 A hand-written stub needs somewhere to keep what it receives, so the test has something to inspect afterward.
 
 <details>
 <summary>Solution</summary>
 
 If you test only a positive balance,
-a mistaken `balance <= 0` in `notify_negative_balance()` goes unnoticed.
-Both tests pass at `50`.
-`<` and `<=` disagree only at zero,
-so the solution adds `0` to the `parametrize` list, and with the mistaken `<=` both zero cases fail.
+both tests pass with a mistaken `balance <= 0` in `notify_negative_balance()`,
+because at `50` both comparisons are false.
+`<` and `<=` disagree at one balance, zero,
+so the solution adds `0` to the `parametrize` list.
+With the mistaken `<=`, both zero cases fail.
 
 ```python
 # test_ch11_silent_notifier.py
@@ -484,15 +490,16 @@ def test_stub_not_called(balance: float) -> None:
 ```
 
 **Check the silence with a mock.**
-`assert_not_called()` passes only if `send` received no call,
-so it fails the zero case if a mistaken `<=` sends there.
+`assert_not_called()` fails if `send` received any call,
+so a mistaken `<=` that sends at zero fails the zero case.
 
 **Record the calls by hand.**
-A stub like exercise 5's `fake_fetch()` cannot make this check.
-It records nothing, so the test would pass whether or not `send` ran,
-and a `notify_negative_balance()` that always sent would go unnoticed.
-To make the check, the stub must gain a memory of its calls.
-Here that memory is the list `sent`.
+A stub like exercise 5's `fake_fetch()` answers each call and forgets it.
+A `send` stub built that way gives the test nothing to inspect.
+The test would then pass whether or not `send` ran,
+including against a `notify_negative_balance()` that always sent.
+To make the check, the stub must gain a record of its calls.
+Here that record is the list `sent`.
 The stub appends each message to it,
 and the test asserts that the list stays empty.
 
@@ -501,10 +508,10 @@ A stub that records its calls is a mock written by hand.
 
 The hand-written version has one advantage.
 Its signature is `(message: str) -> None`,
-so the type checker checks it against `Callable[[str], None]`,
-and a change to the real signature shows up as a type error.
-A `Mock` accepts any call,
-and the chapter closes that gap with `create_autospec()`.
+so the type checker checks it against `Callable[[str], None]`
+and reports a type error when either side changes.
+A `Mock` accepts any call.
+The chapter's `create_autospec()` builds a mock that checks each call against the real function's signature.
 
 </details>
 </details>
