@@ -118,90 +118,89 @@ Chapters/47_Effects--Stateless_in_Practice.md	the next line	The stop comes befor
 Chapters/B_An_Effect_Checker.md	the first assignment	If it kept the first assignment's type, `path.read_text()` would resolve to `builtins.str.read_text`.
 Chapters/B_An_Effect_Checker.md	the first call	It matches a return annotation of the form `Annotated[T, ...]`, binds everything after `T` to `extras`, and returns the argument names of the first call to `marker`.
 Chapters/B_An_Effect_Checker.md	the third line	`hides()` is the third line of Appendix A's rule, "the Effects f handles," in the weakest form you can write without handlers.
-Solutions/03_Foundations--Containers/README.md	the last `print(counts)`	**Leave the left operand unchanged.** `|=` updates the left dictionary in place, while `|` builds a new one and leaves the left operand alone, as the last `print(counts)` above confirms.
-Solutions/04_Foundations--Control_Flow/README.md	The `except` clause	The `except` clause names `ValueError`, so the `TypeError` passes it by.
-Solutions/04_Foundations--Control_Flow/README.md	The `finally` block	The `finally` block still runs.
-Solutions/04_Foundations--Control_Flow/README.md	The second `2`	The second `2` slides down into slot 0, which the loop has passed, so the next iteration looks at position 1 and finds `1`.
-Solutions/04_Foundations--Control_Flow/README.md	the `except` block	`__context__` answers "what was the `except` block handling when `raise` ran," and Python fills that attribute in whether you want it or not.
-Solutions/04_Foundations--Control_Flow/README.md	the `try` block	It belongs to the case where the `try` block finishes cleanly.
-Solutions/05_Foundations--Functions/README.md	The second call	The second call shows the same shape with numbers.
-Solutions/05_Foundations--Functions/README.md	the first call	The function's job is to append, and a tuple has no `append()`, so the first call that omits `target` raises an `AttributeError`.
-Solutions/08_Foundations--Static_Types/README.md	the second line	**Narrow a name no call can rebind.** `reset()` still runs and still sets the attribute to `None`, as the second line of output shows.
+Solutions/04_Foundations--Control_Flow/README.md	The `except` clause	The `except` clause names `ValueError`, so the `TypeError` propagates past it.
+Solutions/04_Foundations--Control_Flow/README.md	The `finally` block	The `finally` block still runs, since `finally` runs whatever exception is propagating.
+Solutions/04_Foundations--Control_Flow/README.md	The second `2`	The second `2` shifts down into slot 0, which the loop has passed, so the next iteration looks at position 1 and finds `1`.
+Solutions/04_Foundations--Control_Flow/README.md	the `except` block	`__context__` answers "what was the `except` block handling when `raise` ran," and Python fills that attribute in automatically.
+Solutions/04_Foundations--Control_Flow/README.md	the `try` block	The `else` clause runs only when the `try` block finishes without an exception, so the two lines of output come from `finally` and from the caller.
+Solutions/05_Foundations--Functions/README.md	The first call	The first call that omits `target` therefore raises an `AttributeError`.
+Solutions/08_Foundations--Static_Types/README.md	the second line	**Narrow a name the function owns.** `reset()` still runs and still sets the attribute to `None`, as the second line of output shows.
 Solutions/10_Foundations--Cleanup/README.md	The `with` statement	The `with` statement calls `__exit__()` only for a block it has entered, and it enters the block only after `__enter__()` returns.
 Solutions/10_Foundations--Cleanup/README.md	the last `Counter`	**Abandon the old list.** `counters.clear()` empties the existing list in place, dropping its reference to the last `Counter` object.
-Solutions/10_Foundations--Cleanup/README.md	the last `Counter`	With two references, rebinding leaves the last `Counter` object alive and `live_count()` stuck at `1`.
-Solutions/12_Techniques--Data_Classes_as_Types/README.md	The second check	**Require text on both halves.** The second check splits on `@` and requires text on both sides, so it rejects `"@x.com"` and `"b@"`.
-Solutions/12_Techniques--Data_Classes_as_Types/README.md	the first `@`	`partition()` splits at the first `@`, and the domain half, `"@x.com"`, is not empty.
+Solutions/10_Foundations--Cleanup/README.md	the last `Counter`	With two references, rebinding leaves the last `Counter` object alive, and `live_count()` still returns `1`.
+Solutions/12_Techniques--Data_Classes_as_Types/README.md	the first `@`	`partition()` splits at the first `@`, and the domain half, `"@x.com"`, holds text.
 Solutions/13_Techniques--Pattern_Matching/README.md	The first `_`	The first `_` matches the first element, and `*_` collects the rest, including an empty rest.
-Solutions/13_Techniques--Pattern_Matching/README.md	at line 43	The second is identical, at line 43 in `cost()`.
-Solutions/13_Techniques--Pattern_Matching/README.md	the last case	Python accepts `case FALLBACK:` only because it is the last case.
+Solutions/13_Techniques--Pattern_Matching/README.md	at line 43	The second is the same diagnostic at line 43, in `cost()`.
+Solutions/13_Techniques--Pattern_Matching/README.md	the final `case _`	If you delete the final `case _` from the second version, the script prints the same two lines, but `ty` reports `invalid-return-type`.
+Solutions/13_Techniques--Pattern_Matching/README.md	the last case	Python accepts `case FALLBACK:` because it is the last case.
 Solutions/14_Techniques--Decorators/README.md	The last call	**Make the last attempt unguarded.** The last call, outside the `try`, satisfies both requirements at once.
 Solutions/14_Techniques--Decorators/README.md	The outermost decorator	The outermost decorator prints first and last, and each inner layer's output appears nested in between.
-Solutions/14_Techniques--Decorators/README.md	the final `print()`	Both `decorating` lines still print, but the final `print()` raises an `AttributeError`, since `None` has no `__name__`, and `ty` reports an `invalid-return-type` on `announce` before the program runs.
+Solutions/14_Techniques--Decorators/README.md	the final `print()`	Both `decorating` lines still print, but the final `print()` raises an `AttributeError`, since `None` has no `__name__`.
 Solutions/14_Techniques--Decorators/README.md	the first call	If you key the cache on `(args, kwargs)`, the first call, `square(4)`, raises a `TypeError`.
-Solutions/14_Techniques--Decorators/README.md	the last line	If you increment the shared counter with `self.total_calls += 1`, the assignment creates an instance attribute on each `trace_counting` instance, which shadows the class attribute, so `trace_counting.total_calls` stays at `0` and the last line prints `2 1 0`.
-Solutions/15_Techniques--Context_Managers/README.md	The second block	**Check that other exceptions propagate.** The second block confirms the propagation.
+Solutions/14_Techniques--Decorators/README.md	the last line	That instance attribute shadows the class attribute, so `trace_counting.total_calls` stays at `0` and the last line prints `2 1 0`.
 Solutions/15_Techniques--Context_Managers/README.md	The second block	**Check that the original type still matches.** The second block shows that the tuple still covers the original exception.
-Solutions/16_Techniques--Comprehensions/README.md	The `for` loop	The `for` loop at the end is the right shape for `comprehension_side_effects.py`, where printing is the purpose.
-Solutions/16_Techniques--Comprehensions/README.md	The later `factor = 10`	The later `factor = 10` has nothing to affect, because `built` holds finished numbers and no code that still needs to look `factor` up.
-Solutions/16_Techniques--Comprehensions/README.md	the first line	The generator expression calls `source()` at the same point, which is why the first line of output keeps its place.
-Solutions/16_Techniques--Comprehensions/README.md	the last line	The listing renames the second message to `list created`, and the last line changes from `[10, 20, 30]` to `[2, 4, 6]`.
-Solutions/16_Techniques--Comprehensions/README.md	the line where	A list comprehension does all its work on the line where it appears.
+Solutions/16_Techniques--Comprehensions/README.md	The `for` loop	The `for` loop at the end suits `comprehension_side_effects.py`, where printing is the purpose.
+Solutions/16_Techniques--Comprehensions/README.md	The last line	The last line changes from `[10, 20, 30]` to `[2, 4, 6]`, because a list comprehension does all its work on the line where it appears.
+Solutions/16_Techniques--Comprehensions/README.md	The later `factor = 10`	The later `factor = 10` leaves `built` as it was, because `built` holds computed numbers rather than code that reads `factor`.
+Solutions/16_Techniques--Comprehensions/README.md	the line where	**Compute the products eagerly.** The lines print in the same order as in `genexp_timing.py`, because the generator expression there also calls `source()` on the line where it appears.
+Solutions/16_Techniques--Comprehensions/README.md	the line where	The last line changes from `[10, 20, 30]` to `[2, 4, 6]`, because a list comprehension does all its work on the line where it appears.
 Solutions/17_Techniques--Metaprogramming/README.md	the first definition	No class decorator can keep the first definition, and neither can `__init_subclass__()` or `__set_name__()`.
-Solutions/17_Techniques--Metaprogramming/README.md	the second `on_open`	`KeepFirst` returns instead, so Python builds the second `on_open` function, hands it to `__setitem__()`, and the mapping discards it.
-Solutions/18_Techniques--Performance/README.md	The last line	**Expose the inherited `__slots__`.** The last line shows the trap.
-Solutions/18_Techniques--Performance/README.md	The last line	**Measure the remaining gap.** The last line shows how far away the eager version still is.
+Solutions/17_Techniques--Metaprogramming/README.md	the second `on_open`	Python still builds the second `on_open` function and passes it to `__setitem__()`, and the early return discards it.
+Solutions/18_Techniques--Performance/README.md	The last line	**Expose the inherited `__slots__`.** The last line shows why the subclass's `__dict__` is easy to miss.
+Solutions/18_Techniques--Performance/README.md	The last line	**Measure the remaining gap.** The last line shows that the lazy peak is under one percent of the one-list peak.
+Solutions/18_Techniques--Performance/README.md	the first call	It prints, writes a file, or increments a counter on the first call with a given argument, and the cache silently skips that side effect on every repeat.
 Solutions/18_Techniques--Performance/README.md	the first call	The `"computing noisy(3)"` message prints once, on the first call.
-Solutions/18_Techniques--Performance/README.md	the first call	The function performs any side effect, such as printing, writing a file, or incrementing a counter, on the first call with a given argument, and the cache silently skips it on every repeat.
 Solutions/19_Techniques--Concurrency/README.md	the `for` statement	**Take each item unguarded.** `for item in source:` is the `for` statement calling `source.__next__()`, and that call runs before control reaches the indented block.
 Solutions/19_Techniques--Concurrency/README.md	the line before	`ty` rejects the line before anything runs:
 Solutions/19_Techniques--Concurrency/README.md	the next `next()`	The `with lock:` inside the body therefore starts after `next()` has returned a number, and ends before the next `next()` begins.
 Solutions/19_Techniques--Concurrency/README.md	the third `pool.submit(enqueue, ...)`	**Add a third producer.** The one change is the third `pool.submit(enqueue, ...)`.
 Solutions/20_Patterns--Rethinking_Objects/README.md	the last line	Without the `# type: ignore` on the last line, `ty` rejects the call:
-Solutions/22_Patterns--Data_Transfer_Objects/README.md	The line that	The line that reads `result.mean` and `result.count` stops working.
+Solutions/22_Patterns--Data_Transfer_Objects/README.md	The line that	The line that reads `result.mean` and `result.count` breaks.
 Solutions/23_Patterns--Iterators/README.md	The following `next(it)`	The following `next(it)` returns `4`.
-Solutions/23_Patterns--Iterators/README.md	the `for` loop	`typed_skipping()` reaches an item of the wrong type and does not `yield`, so the `for` loop continues.
-Solutions/23_Patterns--Iterators/README.md	the line that	The exception ends the generator, so continuing means parsing the file again and somehow starting past the line that failed.
-Solutions/23_Patterns--Iterators/README.md	the next `yield`	A generator's body runs only as far as the next `yield`, each time something asks it for a value.
+Solutions/23_Patterns--Iterators/README.md	the line that	With the version that raises a `TypeError`, the exception ends the generator, so the caller resumes by parsing the file again and somehow starting past the line that failed.
+Solutions/23_Patterns--Iterators/README.md	the next `yield`	Each time something asks a generator for a value, its body runs to the next `yield` and pauses there.
+Solutions/23_Patterns--Iterators/README.md	the next call	A generator pauses inside its `for` loop at each `yield` and resumes there on the next call, so the loop that skips is the loop that yields.
+Solutions/24_Patterns--Singleton/README.md	the second `ThreadPoolExecutor`	By the time the second `ThreadPoolExecutor` starts its workers, every call to `primed()` is a cache hit.
 Solutions/26_Patterns--Surrogate/README.md	The final `print()`	The final `print()` shows `f` called twice and `g` once.
-Solutions/26_Patterns--Surrogate/README.md	The first write	The first write triggers the copy, and the list that writes receives it.
-Solutions/26_Patterns--Surrogate/README.md	the first `query()`	The counter stays at zero, so the first `query()` reports `0 answered before build`.
+Solutions/26_Patterns--Surrogate/README.md	The first `query()`	The first `query()` then reports `0 answered before build`.
+Solutions/26_Patterns--Surrogate/README.md	the first `query()`	The proxy served three requests from a string it held from the start and deferred the slow construction until the first `query()`.
 Solutions/27_Patterns--Factory/README.md	The fifth `.topping()`	The fifth `.topping()` call raises a `ValueError` before appending, so `self._toppings` holds at most four.
-Solutions/27_Patterns--Factory/README.md	The outer call	The outer call takes the name and returns `register()`, which runs the builder once, stores the result, and hands the builder back unchanged.
-Solutions/27_Patterns--Factory/README.md	the fifth `.topping()`	It discovers the problem only when `build()` finally runs, which leaves a window between the fifth `.topping()` call and that `build()` call.
-Solutions/27_Patterns--Factory/README.md	the first `make()`	It imports `Shape` and `make` from `registry`, which no longer defines a single subclass, so without a change it prints `[]` and the first `make()` call raises a `KeyError`.
-Solutions/27_Patterns--Factory/README.md	the line that	The type checker reports the line that constructs that factory, and a program that ignores the report raises a `TypeError` at the same construction, before the game runs.
-Solutions/28_Patterns--Function_Objects/README.md	a few lines earlier	`handler()` then raises `TypeError: Announce: not an @event`, although `Deposit` went through `@event` a few lines earlier.
+Solutions/27_Patterns--Factory/README.md	The outer call	The outer call takes the name and returns `register()`, which runs the builder once, stores the result, and returns the builder unchanged.
+Solutions/27_Patterns--Factory/README.md	the fifth `.topping()`	That builder checks the count when `build()` runs, so a window opens between the fifth `.topping()` call and that `build()` call.
+Solutions/27_Patterns--Factory/README.md	the line that	The type checker reports the line that constructs that factory.
+Solutions/28_Patterns--Function_Objects/README.md	a few lines earlier	`EVENTS` holds the original class instead, so `handler()` raises `TypeError: Announce: not an @event`, although `Deposit` went through `@event` a few lines earlier.
 Solutions/28_Patterns--Function_Objects/README.md	the first `@handler`	**Refuse the first handler.** The import stops at the first `@handler`, on `Announce`.
 Solutions/28_Patterns--Function_Objects/README.md	the first handler	**Refuse the first handler.** The import stops at the first `@handler`, on `Announce`.
-Solutions/29_Patterns--Changing_the_Interface/README.md	The last call	The last call passes a `WhatIHave` by that keyword and reaches the adapter.
 Solutions/31_Patterns--State_Machines/README.md	the final `return self`	If you leave out the final `return self` in `Happy.next()`, `ty` reports an `invalid-return-type`, because the method can fall off its end and return `None`.
 Solutions/31_Patterns--State_Machines/README.md	the following call	Each time `list()` calls `next()` on the generator, the generator picks a legal successor and remembers it for the following call.
-Solutions/34_Patterns--Composite_and_Interpreter/README.md	the last line	The f-string on the last line is the comparison.
+Solutions/32_Patterns--Multiple_Dispatching/README.md	the first `next()`	Calling a generator function returns a generator object, and the body starts at the first `next()`.
+Solutions/34_Patterns--Composite_and_Interpreter/README.md	the last line	The f-string on the last line produces a `<script>` tag that a browser runs.
 Solutions/35_Patterns--Flyweight/README.md	the first `make_color()`	If you keep `@record` on `Color`, the first `make_color()` call raises a `TypeError` at `_pool[key] = found`, because the `WeakValueDictionary` cannot create a weak reference to a slotted `Color` with no `__weakref__` slot.
 Solutions/35_Patterns--Flyweight/README.md	the first `tracemalloc.stop()`	If you leave out the first `tracemalloc.stop()`, tracing runs straight through both builds, and the ratio comes out larger at every size.
 Solutions/37_Patterns--Pattern_Refactoring/README.md	the first call	**Refuse an unregistered type.** `strict_hazard()` raises a `NotImplementedError` that names the material at the first call.
+Solutions/38_Patterns--Simulation/README.md	The `while` loop	The `while` loop's `is not None` test then ends the loop once the robot has eaten the last food.
 Solutions/40_Functional--Foundations/README.md	the first `tally()`	Running the program raises an `UnboundLocalError` at the first `tally()` call: "cannot access local variable 'count' where it is not associated with a value." The type checker points at the assignment that went wrong.
-Solutions/40_Functional--Foundations/README.md	the line that	`ty` reports `positional-only-parameter-as-kwarg` on `partial(clamp, high=100)`, the line that builds the partial, where the runtime waits for the call.
-Solutions/41_Functional--Toolkits/README.md	The second `"b"`	The second `"b"` group replaces the first under the same key, so one item disappears with no error, and the type checker passes the function.
+Solutions/40_Functional--Foundations/README.md	the line that	`ty` reports `positional-only-parameter-as-kwarg` on `partial(clamp, high=100)`, the line that builds the partial, while the runtime raises its `TypeError` at the call.
+Solutions/41_Functional--Toolkits/README.md	The second `"b"`	The second `"b"` group replaces the first under the same key, so the result holds one of the two `"b"` items.
 Solutions/41_Functional--Toolkits/README.md	the second `square(1)`	The difference from the chapter's `maxsize=2` run is the second `square(1)`.
+Solutions/41_Functional--Toolkits/README.md	the second `square(1)`	With a third slot the cache keeps every result, so `square(3)` evicts nothing and the second `square(1)` becomes a hit.
 Solutions/43_Functional--Confidence/README.md	the second line	**Count the processes that answered.** The interesting number is the second line.
-Solutions/45_Effects--Generators/README.md	The final line	The final line interpolates the object's repr into the sentence where an answer belonged.
-Solutions/45_Effects--Generators/README.md	The third `send()`	The third `send()` finds no fourth `yield`, so the loop ends and `tally()` returns.
-Solutions/45_Effects--Generators/README.md	the first `send()`	A generator's `SendType` describes what a suspended `yield` expression can receive, and a just-started generator has no suspended `yield`, so nothing receives the value handed to the first `send()`.
+Solutions/45_Effects--Generators/README.md	The third `send()`	The third `send()` resumes the last `yield`, so the loop ends and `tally()` returns.
+Solutions/45_Effects--Generators/README.md	the first `send()`	A just-started generator has no suspended `yield`, so nothing receives the value handed to the first `send()`.
 Solutions/45_Effects--Generators/README.md	the first `yield`	`next(t)` runs the body up to the first `yield` and produces the first prompt.
 Solutions/45_Effects--Generators/README.md	the first call	An annotation cannot express "`None` for the first call, `Answer` afterward," because a single `SendType` covers every call.
 Solutions/45_Effects--Generators/README.md	the first call	So the first call is special in both directions, and `None` is the only value it accepts.
+Solutions/45_Effects--Generators/README.md	the first line	The call `interview()` returns a generator object, suspended before the first line of its body.
 Solutions/45_Effects--Generators/README.md	the last `send()`	If you read the total as the result of the last `send()`, writing `total: Total = t.send(Amount(12))` with no `try`, the script prints the three prompts and then stops with `StopIteration: 42`.
+Solutions/45_Effects--Generators/README.md	the last `yield`	The third `send()` resumes the last `yield`, so the loop ends and `tally()` returns.
 Solutions/45_Effects--Generators/README.md	the next `"12"`	After three `"12"` sales, by any mix of machines, a fresh `machine()` answers the next `"12"` order with `UNAVAILABLE`.
 Solutions/45_Effects--Generators/README.md	the second `yield from`	The count travels through the `ReturnType`: `emit()` returns it, `yield from` delivers it into `report()`'s `size`, `report()` returns it again, and the second `yield from` delivers it into `summarize()`'s `counted`.
-Solutions/45_Effects--Generators/README.md	the second `yield from`	`report()` returns `None`, and the second `yield from` delivers that `None` into `counted`.
+Solutions/45_Effects--Generators/README.md	two lines later	The runtime output shows a consequence two lines later, in the `return` statement, where the f-string formats the object.
 Solutions/46_Effects--Stateless/README.md	on line 29	The error appears on line 29, the `yield from` that introduces the undeclared failure, not on the signature and not at the call site.
-Solutions/46_Effects--Stateless/README.md	the next line	Assigning `need(Console)` binds a generator to a name the next line then uses as a `Console`, so the mistake reaches an operation the type checker can evaluate.
-Solutions/46_Effects--Stateless/README.md	the second `info`	In the second `info` line, the type checker names the missing method rather than the missing type, and that is what structural typing means: `Terminal` fails not because of what it is but because of what it does not do.
-Solutions/46_Effects--Stateless/README.md	the second `run()`	The type checker believes the handler answers `Need[Console]` and leaves `Need[Clock]` open, so the second `run()` needs a `# type: ignore`.
+Solutions/46_Effects--Stateless/README.md	the next line	Assigning `need(Console)` binds a generator to `console`, and the next line calls `print()` on it as if it were a `Console`.
+Solutions/46_Effects--Stateless/README.md	the second `info`	In the second `info` line, the type checker names the missing method rather than the missing type.
+Solutions/46_Effects--Stateless/README.md	the second `run()`	The type checker removes `Need[Console]` from the requirements and leaves `Need[Clock]` open, so the second `run()` needs a `# type: ignore`.
 Solutions/47_Effects--Stateless_in_Practice/README.md	The line that	**Lift the failure into the channel.** The line that restores the guarantee is `@throws(KeyError)`.
-Solutions/47_Effects--Stateless_in_Practice/README.md	the inner loop	The first two hand back a `Dead` source that fails immediately, and `run_load()` responds by breaking out of the inner loop, leaving the `connected` block, and asking for another source.
-Solutions/47_Effects--Stateless_in_Practice/README.md	the last `Put`	Here the test scripts the balances independently of the writes, so nothing in it checks that a balance read is the amount the last `Put` wrote.
+Solutions/47_Effects--Stateless_in_Practice/README.md	the inner loop	Each time, `run_load()` breaks out of the inner loop, leaves the `connected` block, and asks for another source.
 Solutions/47_Effects--Stateless_in_Practice/README.md	the last `Put`	The `Cell` version has one piece of state, so the next `Get` returns whatever the last `Put` wrote.
 Solutions/47_Effects--Stateless_in_Practice/README.md	the next `Get`	The `Cell` version has one piece of state, so the next `Get` returns whatever the last `Put` wrote.

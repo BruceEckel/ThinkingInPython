@@ -44,32 +44,28 @@ Chapters/46_Effects--Stateless.md	CODE puts an instance in
 Chapters/47_Effects--Stateless_in_Practice.md	Two purchases went through
 Chapters/47_Effects--Stateless_in_Practice.md	building a fresh event loop for the call and tearing it down after
 Chapters/a.md	Name the field they sit on
-Solutions/02_Foundations--Tour/README.md	CODE is CODE with the two branches swapped over
-Solutions/02_Foundations--Tour/README.md	and the literal branch passes its text through
+Solutions/02_Foundations--Tour/README.md	CODE changes the literal text and passes each value through
+Solutions/02_Foundations--Tour/README.md	while CODE changes each value and passes the literal text through
 Solutions/03_Foundations--Containers/README.md	and everything between
 Solutions/04_Foundations--Control_Flow/README.md	**Let an unmatched exception through
 Solutions/11_Techniques--Testing/README.md	**Pass the dependency in
-Solutions/14_Techniques--Decorators/README.md	and nothing needs to
 Solutions/14_Techniques--Decorators/README.md	so work out which layer prints before and which after
 Solutions/16_Techniques--Comprehensions/README.md	Stopping there leaves the generator part-way through
 Solutions/21_Patterns--Design_Patterns/README.md	a CODE to pass in
-Solutions/23_Patterns--Iterators/README.md	before or after
-Solutions/25_Patterns--Template_Method/README.md	No checker could catch the omission before
-Solutions/28_Patterns--Function_Objects/README.md	now sees more than it did before
+Solutions/23_Patterns--Iterators/README.md	before iterating or after
+Solutions/28_Patterns--Function_Objects/README.md	now receives more events than before
 Solutions/28_Patterns--Function_Objects/README.md	so iterating over it in order calls the most specific handlers first and the inherited ones after
-Solutions/29_Patterns--Changing_the_Interface/README.md	and it adds behavior on the way through
 Solutions/29_Patterns--Changing_the_Interface/README.md	and it adds no behavior to a call that goes through
 Solutions/30_Patterns--Observer/README.md	CODE gives the single-player scoring the exercise asks for
-Solutions/30_Patterns--Observer/README.md	CODE receives the name the class body binds each descriptor to
 Solutions/30_Patterns--Observer/README.md	CODE reuses CODE from CODE unchanged and adds the CODE the exercise asks for
 Solutions/30_Patterns--Observer/README.md	so the demo's CODE and the first test still see the group the exercise asks for
-Solutions/30_Patterns--Observer/README.md	that column and that row have moved one color along
-Solutions/32_Patterns--Multiple_Dispatching/README.md	CODE needs no such case because three items leave nothing over
-Solutions/34_Patterns--Composite_and_Interpreter/README.md	and not before
+Solutions/34_Patterns--Composite_and_Interpreter/README.md	CODE passes the string through
 Solutions/35_Patterns--Flyweight/README.md	one with CODE and one without
-Solutions/36_Patterns--Memento/README.md	while a deserializer hands the value straight in
+Solutions/35_Patterns--Flyweight/README.md	so CODE changes what the square refers to
+Solutions/38_Patterns--Simulation/README.md	so any class with the right methods can stand in
+Solutions/41_Functional--Toolkits/README.md	A caller who wants this function to share a program-wide random stream cannot pass that stream in
 Solutions/43_Functional--Confidence/README.md	which leaves one student over
 Solutions/44_Effects--Effect_Management/README.md	CODE rejects negatives but lets zero through
-Solutions/45_Effects--Generators/README.md	since nobody sends anything in
+Solutions/44_Effects--Effect_Management/README.md	and the CODE catches zero but lets negatives through
 Solutions/47_Effects--Stateless_in_Practice/README.md	**Show the mismatch getting through
 Solutions/47_Effects--Stateless_in_Practice/README.md	and CODE after the CODE goes through
