@@ -14,7 +14,7 @@
 
 [Adding a Setter](../../Chapters/07_Foundations--Classes.md#adding-a-setter) shows the `@radius.setter` that validates every assignment to `radius`.
 Write `shrink()` so it assigns to the public `radius` property instead of the underscore attribute.
-The setter then runs on the computed value, and the test catches its `ValueError`.
+The setter then runs on the computed value, and the test catches the setter's `ValueError`.
 
 <details>
 <summary>The shape</summary>
@@ -43,11 +43,11 @@ class Circle:
 <summary>Solution</summary>
 
 If you write `shrink()` to assign `self._radius`,
-the setter does not run.
-`shrink(-2)` then stores `-2.5` without complaint,
+the assignment bypasses the setter.
+`shrink(-2)` then stores `-2.5`,
 and `expect()` fails with `AssertionError: no exception raised`.
 The solution assigns to `self.radius`,
-so every change to the radius passes the setter's check.
+so the setter checks every change to the radius.
 
 ```python
 # exercise_1.py
@@ -78,14 +78,15 @@ expect(ValueError, c.shrink, -2)
 #: [ValueError] radius cannot be negative
 ```
 
-**Route the change through the setter.** `shrink()` assigns to
-`self.radius` rather than `self._radius`, so the assignment goes
-through `@radius.setter`, and the existing validation applies to
+**Route the change through the setter.** Because `shrink()` assigns to
+`self.radius` rather than `self._radius`,
+the assignment calls the `@radius.setter` method.
+The existing validation then applies to
 every method that changes the radius this way.
 
-**Confirm the setter rejects a negative result.** `shrink(-2)` runs after `shrink(2)` has brought the radius
-to `5.0`, so it computes `5.0 / -2 == -2.5` and the setter rejects
-`-2.5`, the same as it rejects `c.radius = -2.5` written by hand.
+**Confirm the setter rejects a negative result.** `shrink(-2)` runs after `shrink(2)` has set the radius
+to `5.0`, so it computes `5.0 / -2 == -2.5`.
+The setter rejects `-2.5`, just as it rejects `c.radius = -2.5` written by hand.
 
 </details>
 </details>
@@ -103,7 +104,7 @@ to `5.0`, so it computes `5.0 / -2 == -2.5` and the setter rejects
 
 [Static and Class Methods](../../Chapters/07_Foundations--Classes.md#static-and-class-methods) shows `from_fahrenheit()` as a `@classmethod` that converts its argument and returns `cls(...)`.
 Write `from_kelvin()` the same way with the formula from the exercise.
-Compare the two results with `round()`, since floating-point arithmetic can miss by a last digit.
+Compare the two results with `round()`, since floating-point arithmetic can be off in the last digit.
 `310.0 - 273.15` gives `36.85000000000002`.
 
 <details>
@@ -164,8 +165,8 @@ does, with a different formula for `celsius`.
 point), so both alternative constructors produce `100.0`. The exercise
 asks for agreement within rounding, so the `print()` call passes each
 `celsius` through `round()`.
-These inputs carry no floating-point noise (the unrounded values compare equal),
-but other inputs do. `from_kelvin(300.15)` stores `27.0`, while
+For these inputs the unrounded values compare equal,
+but other inputs produce a floating-point rounding error. `from_kelvin(300.15)` stores `27.0`, while
 `from_fahrenheit(80.6)`, the same temperature, stores `26.999999999999996`.
 Rounded to two places, both print `27.0`.
 
@@ -186,7 +187,8 @@ Rounded to two places, both print `27.0`.
 
 [Inheritance](../../Chapters/07_Foundations--Classes.md#inheritance) shows `Derived.show()` printing a message and then calling `super().show(msg)`.
 Give `MoreDerived` a `show()` with the same shape and its own message.
-`MoreDerived` inherits `show_twice()`, which calls `self.show()`, so the lookup starts at the class of the object and each `super()` call moves one class up.
+`MoreDerived` inherits `show_twice()`, which calls `self.show()`, so the lookup starts at the class of `self`.
+Each `super()` call then runs the base class's `show()`.
 
 <details>
 <summary>The shape</summary>
@@ -221,11 +223,10 @@ class MoreDerived(Derived):
 
 If you leave `super().show(msg)` out of `MoreDerived.show()`,
 the chain stops at `MoreDerived`.
-`show_twice()` then prints `MoreDerived show() method` twice,
-and neither `Derived`'s message nor `x` appears.
-Python calls no base-class method on its own,
-as [Calling the Base Constructor](../../Chapters/07_Foundations--Classes.md#calling-the-base-constructor) shows for `__init__()`,
-so each override in the solution passes the call up with `super()`.
+`show_twice()` then prints two lines, both `MoreDerived show() method`.
+Python runs a base-class method only when an override calls it,
+the same rule [Calling the Base Constructor](../../Chapters/07_Foundations--Classes.md#calling-the-base-constructor) shows for `__init__()`.
+Each override in the solution therefore calls its base-class method with `super()`.
 
 ```python
 # exercise_3.py
@@ -271,17 +272,17 @@ This solution copies `Simple` and `Derived` without their constructor
 `MoreDerived` to `simple_subclass.py`, as the exercise says, the two
 constructor lines print first.
 
-**Dispatch on the object's class.** `MoreDerived` inherits `show_twice()` unchanged from `Simple`, and
-`show_twice()` calls `self.show()` twice. Because `self` is a
-`MoreDerived`, each call resolves to `MoreDerived.show()` first (the lookup
-starts at the class of the object).
+**Dispatch on the object's class.** `MoreDerived` inherits `show_twice()` from `Simple`, and
+`show_twice()` calls `self.show()` twice.
+The lookup starts at the class of the object, and `self` is a `MoreDerived`,
+so each call resolves to `MoreDerived.show()` first.
 
 **Pass each call up the chain.** `MoreDerived.show()` prints its own
 message, then calls `super().show(msg)`, which runs `Derived.show()`.
 `Derived.show()` prints its message and calls `super().show(msg)`
-again, which runs `Simple.show()`, and `Simple.show()` finally prints
-`x`. Each `super()` call hands off to the next class up the chain, so
-the messages appear in derived-to-base order, twice.
+again, which runs `Simple.show()`.
+`Simple.show()` finally prints `x`. Each `super()` call runs the `show()` of the class one step
+closer to `Simple`, so the messages appear in derived-to-base order, twice.
 
 </details>
 </details>
@@ -298,7 +299,7 @@ the messages appear in derived-to-base order, twice.
 
 [Caching with `cached_property`](../../Chapters/07_Foundations--Classes.md#cached-property) shows `total` computed once and then stored on the instance.
 Decorate `average` with `@cached_property` and read `self.total` in its body.
-Inside `average`, reading `self.total` is an ordinary attribute access, so look for the `summing` message to print once.
+Inside `average`, `self.total` is an ordinary attribute access that returns the stored value, so the `summing` message should print once.
 
 <details>
 <summary>The shape</summary>
@@ -350,15 +351,15 @@ print(n.average)
 #: 10.0
 ```
 
-**Compute on first access.** Accessing `n.total` first runs its body once, prints the `"summing"`
+**Compute on first access.** The first access to `n.total` runs its body, prints the `"summing"`
 message, and stores `30` on the instance.
 
 **Reuse the cached value.** `average`'s body then
 reads `self.total` and gets that stored value. The `"summing"`
 message appears once, because the `n.total` access computes and
-caches `total` before `average` asks for it. If you access `average`
-first, its body reads `self.total`, which computes `total` the same
-way, on first use instead of in advance.
+caches `total` before `average` reads it. If you access `average`
+first, its read of `self.total` computes and caches `total` at that
+moment, and `"summing"` still appears once.
 
 </details>
 </details>
@@ -374,7 +375,7 @@ way, on first use instead of in advance.
 <details>
 <summary>Where to look</summary>
 
-[String Representation](../../Chapters/07_Foundations--Classes.md#string-representation) shows `print()` and a list choosing between `__repr__()` and `__str__()`.
+[String Representation](../../Chapters/07_Foundations--Classes.md#string-representation) shows which method `print()` calls, `__repr__()` or `__str__()`, and which one a list calls for its elements.
 Define `__repr__()` first and print one object and a list, then add `__str__()` and print both again.
 Notice which method `print()` uses for the object and which one the list uses for its elements.
 
@@ -399,8 +400,8 @@ class Temperature:
 
 If you define `__str__()` alone, `print(t)` shows `21.0C`,
 but the list shows the default `<__main__.Temperature object at 0x...>` for each element.
-A container formats its elements with `repr()`, which ignores `__str__()`.
-The solution defines `__repr__()` for that form and adds `__str__()` for the readable one.
+A container formats its elements with `repr()`, which calls `__repr__()` and leaves `__str__()` unused.
+The solution defines `__repr__()` for the form a container shows and adds `__str__()` for the readable one.
 
 ```python
 # exercise_5.py
@@ -430,15 +431,15 @@ print(f"{t} is {t!r}")
 `Temperature` inherits from `object`, and that method calls
 `__repr__()`.
 
-**Add a readable form for users.** Adding `__str__()` makes the two outputs differ.
-`print(t)` and `f"{t}"` take the readable form, while the list keeps
-showing `Temperature(21.0)` for each element, because a container
+**Add a readable form for users.** Adding `__str__()` makes `print(t)` and the printed list differ.
+`print(t)` and `f"{t}"` show the readable form.
+The list keeps showing `Temperature(21.0)` for each element, because a container
 formats its elements with `repr()`, not `str()`. `{t!r}`
-asks for the same `Temperature(21.0)` form inside an f-string.
+calls `repr()`, producing the same `Temperature(21.0)` form inside an f-string.
 
-The two forms answer different questions. `Temperature(21.0)` says
-what rebuilds this object, the form you want in a traceback or a
-debugger. `21.0C` says what the value means, the form you want
+The two forms serve different readers. `Temperature(21.0)` is the
+expression that rebuilds this object, the form you want in a traceback or a
+debugger. `21.0C` is the value with its unit, the form you want
 in output a user reads.
 
 </details>
@@ -459,7 +460,8 @@ in output a user reads.
 <summary>Where to look</summary>
 
 [Marking Overrides with `@override`](../../Chapters/07_Foundations--Classes.md#marking-overrides-with-override) shows the decorator from `typing` on a method that replaces a base-class method.
-Python compares no method names between a subclass and its base, so the misspelling creates a new method and `show()` resolves to `Base`.
+Python accepts any method name in a subclass, so the misspelling creates a new method.
+A call to `show()` still finds `Base.show()`.
 The decorator is for the type checker.
 Run the type checker with and without `@override` and compare.
 
@@ -498,15 +500,15 @@ Derived().show()
 ```
 
 **Miss the base-class method.** The program prints `Base.show`.
-`shwo()` is a new method in the subclass that nothing calls, so
-`show()` resolves up the chain to `Base`. Python accepts any method
+`shwo()` is a new method beside the inherited `show()`, so
+`Derived().show()` finds `show()` in `Base`. Python accepts any method
 name in a subclass and keeps no record of which ones you meant as
 overrides.
 
 **Declare the intended override.** With `from typing import override` added and the decorator
 uncommented, the program still prints `Base.show`,
 because at run time the decorator returns the method it receives. The
-type checker reports the difference:
+type checker reports the mismatch:
 
 ```text
 error[invalid-explicit-override]: Method `shwo` is decorated with
@@ -514,16 +516,17 @@ error[invalid-explicit-override]: Method `shwo` is decorated with
 info: No `shwo` definitions were found on any superclasses of `Derived`
 ```
 
-Without the decorator the type checker goes quiet, and the program's
-behavior is the same at every step of the exercise. The feature has
+If you remove the decorator, the type checker reports no error.
+The program prints `Base.show` at every step of the exercise. The feature has
 three parts: `@override` states an intention, the type checker
 verifies it, and the running program ignores it.
 
-The value of `@override` is in what the type checker catches later.
-The typo is easy to spot in a listing this short. The same failure
-arrives silently when someone renames or deletes `Base.show()` a year
-from now. With `@override` on every overriding method in the codebase,
-that rename becomes a list of locations to fix. A decorator that
+In a listing this short, the typo is easy to spot.
+`@override` matters most after the base class changes.
+Suppose someone renames or deletes `Base.show()` a year from now.
+Every override of it becomes an unrelated new method, and Python reports nothing.
+With `@override` on every overriding method in the codebase,
+the type checker reports every method that overrode `Base.show()` before the change. A decorator that
 changes no behavior at run time is worth writing when a tool reads it.
 
 </details>
