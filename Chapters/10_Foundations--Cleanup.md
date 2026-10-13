@@ -201,7 +201,7 @@ and the code that creates the cycle often lives far from the code that owns the 
 
 ## Reliable Alternatives
 
-Two approaches are more reliable:
+Two approaches are more reliable than `__del__()`.
 
 ### An Explicit `close()` and a `with` Block
 
@@ -344,6 +344,12 @@ print("End of program")
 ```
 
 `finalize()` registers `print(name, "closed")` to run when Python destroys the `Connection`.
+To learn when that happens,
+`finalize()` refers to the `Connection` through a *weak reference*,
+which lets the object be destroyed.
+A variable, a list slot, or an attribute holds a *strong reference*,
+which keeps its object alive.
+
 The callback receives `name`, not the `Connection`,
 so registering the cleanup does not keep the object alive.
 `finalize(self, self.close)` looks tidier and defeats that separation.
@@ -353,7 +359,8 @@ so the object survives until the program ends.
 The `close()` at `[1]` runs the callback immediately.
 The second `close()`, at `[2]`, does nothing.
 A finalizer runs at most once, and `alive` reports whether it still can.
-`b` holds the only reference to its `Connection`,
+
+`b` holds the only strong reference to its `Connection`,
 so `del b` destroys the object here, where the `del c` in `cleanup.py` does not.
 Nobody calls `close()`, but the callback still runs,
 and it runs before interpreter shutdown rather than during it.
@@ -393,11 +400,12 @@ print("Safe alive:", safe() is not None)
 #: Safe alive: False
 ```
 
-A `ref()` is a weak reference.
-It watches its object without keeping it alive,
-and it reports `None` once the object disappears.
-`Safe` printed `S closed` at the `ref()` line.
-Reference counting reclaimed it there, before `gc.collect()` ran.
+`ref()` creates a weak reference of your own.
+Calling the weak reference returns the object while the object lives,
+and `None` once the object is gone.
+`Safe` prints `S closed` at the `ref()` line.
+Reference counting reclaims it there, before `gc.collect()` runs.
+
 `gc.collect()` cannot reclaim `Leaky`,
 because `Leaky` is not part of an unreachable cycle.
 `finalize()` keeps every callback in a registry,
@@ -405,7 +413,11 @@ and the callback `self.close` holds the object,
 so the registry keeps `Leaky` reachable.
 A bound method is a small object that stores its instance in its `__self__` attribute,
 so whatever holds `self.close` holds `Leaky` through it.
-`Leaky` printed nothing, because its callback did not run and nothing failed.
+A lambda that uses `self`, such as `lambda: print(self.name, "closed")`,
+holds the object the same way.
+
+`Leaky` prints nothing, since its callback has not run,
+and no error reports the leak.
 With `atexit` left on, the callback runs as the program exits,
 and a late `L closed` is the one sign of the leak.
 The listing turns `atexit` off on `Leaky`'s finalizer,
@@ -447,9 +459,9 @@ finalize(WeakSlot("y"), print, "y", "closed")
 `__slots__` removes the instance `__dict__` and, by default,
 the `__weakref__` slot along with it,
 so `finalize()` has nowhere to attach a reference.
-The same `TypeError` meets `ref()`, `weakref.proxy()`,
-and the `WeakValueDictionary` in the next section,
-since every weak reference attaches there.
+`ref()`, `weakref.proxy()`,
+and `WeakValueDictionary` raise the same `TypeError` on a `Slot`,
+since every weak reference attaches to the `__weakref__` slot.
 
 `WeakSlot` lists `__weakref__` among its slots and opts back in.
 `finalize()` accepts the `WeakSlot` instance,
@@ -510,7 +522,7 @@ since the dictionary holds only live objects and no two live objects share an id
 
 `live_count()` returns the size of that registry,
 so it reports how many `Counter` objects currently exist.
-When an instance loses its last ordinary reference,
+When an instance loses its last strong reference,
 in this case when `pop()` or `clear()` removes it from the `counters` list,
 the interpreter collects it at once,
 and the dictionary drops that instance's entry on its own.

@@ -79,9 +79,9 @@ print(Counter.live_count())
 in place, dropping its reference to the last `Counter` object.
 `counters = []` does something different. It points the name
 `counters` at a brand-new, empty list and abandons the old one. Here
-nothing else refers to that old list, so it (and every reference it
-held) becomes collectible immediately, and both forms reach
-`live_count() == 0`.
+nothing else refers to that old list, so CPython frees it at once,
+which drops its reference to the one remaining `Counter`. Both forms
+reach `live_count() == 0`.
 
 The two forms stop agreeing once a second name refers to the list:
 
@@ -102,8 +102,9 @@ print(other)
 **Look through a second name.** `clear()` changes the object every
 name can see. Rebinding points this one name at a different object,
 and every other name keeps the old one. The two coincide in
-`weak_value.py` because that list has exactly one reference. With two references, rebinding leaves the
-last `Counter` object alive and `live_count()` stuck at `1`.
+`weak_value.py` because that list has exactly one reference. With two
+references, rebinding leaves the last `Counter` object alive and
+`live_count()` stuck at `1`.
 
 </details>
 </details>
@@ -523,7 +524,7 @@ reclaims both together when it runs. A cycle through two objects
 behaves like a cycle through one. The self-reference in
 `cycle.py` is the smallest case.
 
-**Pause the automatic collector.** Removing the `gc.disable()`/`gc.enable()` pair takes away the
+**Let the collector run on its own.** Removing the `gc.disable()`/`gc.enable()` pair takes away the
 guarantee about when the finalizers run. The collector is then free to
 run on its own schedule, triggered by allocation counts rather than by
 your call, so an automatic pass could in principle reclaim the cycle at
@@ -536,9 +537,8 @@ guarantee, not in what this run prints.
 
 `gc.disable()` is in the chapter's listing only to keep the output
 predictable. It is not advice. It produces a deterministic transcript
-for a demonstration whose entire subject is the absence of
-determinism, so the listing turns the collector back on immediately
-afterward.
+for a demonstration about unpredictable timing, so the listing turns
+the collector back on immediately afterward.
 
 </details>
 </details>
