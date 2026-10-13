@@ -233,8 +233,7 @@ trap.run_all([MouseAction.ESCAPES])
 
 ### A Table Inside Each State
 
-The `match` statements inside `next()` work,
-but a machine with many states means many `match` statements,
+A machine with many states means many `match` statements,
 spread across many classes.
 A second approach puts a table inside each `State` object,
 mapping the input object to the next state.
@@ -263,11 +262,8 @@ class TableState(ABC):
 ```
 
 `TableState` is an `ABC` rather than a Protocol because the base has code to share.
-Its `next()` looks the input up in the `transitions` dict,
-and every subclass inherits it.
-`run()` stays abstract, since each state's behavior is its own.
-Both methods have the signatures the `State` Protocol names,
-so the unchanged `StateMachine` from `state_machine.py` drives every `TableState`.
+Both `next()` and `run()` have the signatures the `State` Protocol names,
+so the unchanged `StateMachine` from `state_machine.py` drives a `TableState`.
 
 The constructor starts each state with an empty dict,
 so a state whose table you forget to fill reports `Waiting: no transition on ...` rather than an `AttributeError` for a missing attribute.
