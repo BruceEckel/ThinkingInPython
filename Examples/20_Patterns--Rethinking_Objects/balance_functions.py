@@ -3,8 +3,6 @@ def deposit(balance: float, amount: float) -> float:
     return balance + amount
 
 def withdraw(balance: float, amount: float) -> float:
-    if amount > balance:
-        raise ValueError("Insufficient funds")
     return balance - amount
 
 balance = 100.0

@@ -1171,8 +1171,6 @@ def deposit(balance: float, amount: float) -> float:
     return balance + amount
 
 def withdraw(balance: float, amount: float) -> float:
-    if amount > balance:
-        raise ValueError("Insufficient funds")
     return balance - amount
 
 balance = 100.0
@@ -1203,8 +1201,6 @@ class Account:
         self.balance += amount
 
     def withdraw(self, amount: float) -> None:
-        if amount > self.balance:
-            raise ValueError("Insufficient funds")
         self.balance -= amount
 
 if __name__ == "__main__":
