@@ -75,11 +75,11 @@ class Middle(Base):
 class Right(Base):
     shared = 100  # Its own class attr, separate from Base's
 
-print(Left.shared, Middle.shared, Right.shared)
-#: 0 0 100
+print(Base.shared, Left.shared, Middle.shared, Right.shared)
+#: 0 0 0 100
 Base.shared = 9
-print(Left.shared, Middle.shared, Right.shared)
-#: 9 9 100
+print(Base.shared, Left.shared, Middle.shared, Right.shared)
+#: 9 9 9 100
 Left.shared = 5
 print(Base.shared, Left.shared, Middle.shared, Right.shared)
 #: 9 5 9 100
@@ -326,7 +326,7 @@ has: reads fall back to the class, writes and deletes do not.
 
 ## 7. Why `self.total += 1` leaves the class counter at zero
 
-> In `counter_near_miss.py`,
+> In `self_increment.py`,
 > print `vars(a)` and `vars(Tally)["total"]` after constructing both instances,
 > and use them to explain the `1 1 0` output.
 > Then fix the class so the shared counter moves,

@@ -59,16 +59,19 @@ class A:
     x = 100
 
 a = A()
-print(vars(A)["x"])  # The attribute lives in the class dict
-#: 100
-print(vars(a))  # The instance has no attributes yet
-#: {}
+print(vars(a), a.x)  # Empty, so a.x comes from the class
+#: {} 100
 a.x = 1
-print(vars(a))  # Assignment created it on the instance
-#: {'x': 1}
-print(vars(A)["x"])
+print(vars(a), a.x)  # Assignment created it on the instance
+#: {'x': 1} 1
+print(vars(A)["x"])  # The class entry is unchanged
 #: 100
 ```
+
+Before the assignment, `vars(a)` is empty,
+so `a.x` falls back to the class and reads `100`.
+After `a.x = 1`, the instance's own entry shadows the class entry,
+and `a.x` reads `1` while `vars(A)["x"]` still holds `100`.
 
 The listing subscripts `vars(A)` instead of printing it whole,
 because a class's dictionary is a read-only `mappingproxy` that carries the compiler's own bookkeeping alongside `x`.
@@ -157,25 +160,32 @@ a, b = Cart(), Cart()
 a.items.append("apple")  # Mutates, does not assign
 print(a.items, b.items)
 #: ['apple'] ['apple']
-a.items = ["pear"]  # Assignment shadows, as before
+a.items += ["pear"]  # Mutates, then assigns
 print(a.items, b.items)
-#: ['pear'] ['apple']
+#: ['apple', 'pear'] ['apple', 'pear']
+a.items = ["plum"]  # Rebinds a's own attribute
+print(a.items, b.items)
+#: ['plum'] ['apple', 'pear']
 ```
 
 `a.items.append("apple")` does not assign to `a.items`.
 It reads `items`, finds nothing on `a`, falls back to the class,
 and mutates the one list stored there.
 The mutation creates no instance attribute, so `b` sees the apple too.
-`a.items = ["pear"]` does assign,
-and that assignment creates `a.items` on the instance and shadows the class list,
-leaving `b` still reading the shared one.
 Because shadowing starts with an assignment and `.append()` makes none,
 a read followed by a mutation slips past the rule.
-An augmented assignment does both:
-`a.items += ["pear"]` mutates the shared list through `__iadd__()` and then assigns that same list to `a`,
-so `b` sees the pear too.
 A type checker accepts the line too.
 `a.items.append("apple")` is a correct call on a `list[str]`.
+
+An augmented assignment does both.
+`a.items += ["pear"]` mutates the shared list through `__iadd__()`,
+so `b` sees the pear too.
+It then assigns that same list to `a.items`,
+which creates an instance attribute that shadows the class list.
+Both attributes refer to one list, so the two printed values match.
+The plain assignment shows the split:
+`a.items = ["plum"]` rebinds `a`'s own attribute to a new list,
+and `b` still reads the shared one.
 
 A per-object list belongs in `__init__()`,
 as [Real Per-Object Defaults](#real-per-object-defaults) shows,
@@ -371,7 +381,7 @@ Python's own attribute lookup ignores the hint.
 At runtime an assignment does the same thing with or without `ClassVar`:
 
 ```python
-# counter_near_miss.py
+# self_increment.py
 from typing import ClassVar
 
 class Tally:
@@ -433,20 +443,20 @@ class Left(Base):
 class Right(Base):
     shared = 100  # Its own class attr, separate from Base's
 
-print(Left.shared, Right.shared)
-#: 0 100
-# Only affects subclasses that haven't overridden
+print(Base.shared, Left.shared, Right.shared)
+#: 0 0 100
 Base.shared = 9
-print(Left.shared, Right.shared)
-#: 9 100
-# Creates Left's own attribute, doesn't touch Base
+print(Base.shared, Left.shared, Right.shared)
+#: 9 9 100
 Left.shared = 5
 print(Base.shared, Left.shared, Right.shared)
 #: 9 5 100
 ```
 
+Each line prints `Base`, `Left`, and `Right` in that order.
 `Left` has no `shared` of its own,
-so it tracks `Base.shared` until something assigns to `Left.shared`.
+so its column follows `Base.shared` until `Left.shared = 5` creates `Left`'s own attribute,
+which leaves `Base.shared` at `9`.
 `Right` overrides `shared` at class-definition time,
 so it keeps `100` when `Base.shared` changes.
 `ClassVar` leaves all of that alone.
@@ -465,7 +475,7 @@ Restating `ClassVar[int]` on an override keeps the check under either checker.
 
 ### `type(self)` Forks the Counter
 
-The mistake in `counter_near_miss.py` has a subclass form.
+The mistake in `self_increment.py` has a subclass form.
 `class_var.py` increments `Tally.total` through the literal class name.
 Writing that same increment through `type(self)`,
 a common idiom for naming the instance's class from a method,
@@ -633,7 +643,7 @@ Try each exercise before opening its [solution](../Solutions/09_Foundations--Cla
     Predict both before running.
     Then run `del a.x` a second time and explain the exception,
     given what `vars(A)` still holds.
-7.  In `counter_near_miss.py`,
+7.  In `self_increment.py`,
     print `vars(a)` and `vars(Tally)["total"]` after constructing both instances,
     and use them to explain the `1 1 0` output.
     Then fix the class so the shared counter moves,

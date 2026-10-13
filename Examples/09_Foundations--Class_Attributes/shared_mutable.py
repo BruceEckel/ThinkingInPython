@@ -7,6 +7,9 @@ a, b = Cart(), Cart()
 a.items.append("apple")  # Mutates, does not assign
 print(a.items, b.items)
 #: ['apple'] ['apple']
-a.items = ["pear"]  # Assignment shadows, as before
+a.items += ["pear"]  # Mutates, then assigns
 print(a.items, b.items)
-#: ['pear'] ['apple']
+#: ['apple', 'pear'] ['apple', 'pear']
+a.items = ["plum"]  # Rebinds a's own attribute
+print(a.items, b.items)
+#: ['plum'] ['apple', 'pear']
