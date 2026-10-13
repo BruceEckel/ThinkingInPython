@@ -10,7 +10,7 @@
 
 [Structural Typing with Protocols](../../Chapters/08_Foundations--Static_Types.md#structural-typing-with-protocols) shows `Circle` and `Square` passing as `Drawable` without naming it.
 A class qualifies by having the members the `Protocol` declares.
-Write `Triangle` with a `draw()` that has the same signature, and leave `Drawable` and `render()` untouched.
+Write `Triangle` with a `draw()` that has the same signature, and leave `Drawable` and `render()` as they are.
 
 <details>
 <summary>The shape</summary>
@@ -77,10 +77,10 @@ print(render(Triangle()))
 #: triangle
 ```
 
-`Triangle` doesn't mention `Drawable`, the same as `Circle` and
-`Square`. It qualifies because it has a `draw() -> str` method, and
-`Drawable` requires no more than that. `Drawable` and `render()`
-accept a `Triangle` as written.
+Like `Circle` and `Square`, `Triangle` doesn't mention `Drawable`.
+It qualifies because it has a `draw() -> str` method,
+and that method is all `Drawable` requires.
+`Drawable` and `render()` accept a `Triangle` as written.
 
 </details>
 </details>
@@ -96,7 +96,7 @@ accept a `Triangle` as written.
 
 [Catching Mistakes](../../Chapters/08_Foundations--Static_Types.md#catching-mistakes) shows the comment silencing the error on a call that passes `area()` a `str`.
 Remove the comment, run `ty check` on the file, and read which argument and which parameter the diagnostic marks.
-Then consider what the call does at run time without the checker.
+Then consider what Python does with the call at run time.
 
 <details>
 <summary>Solution</summary>
@@ -108,9 +108,8 @@ def area(width: int, height: int) -> int:
 print(area("3", 4))
 ```
 
-That is the function and the call from the chapter's `area.py`,
-without its comments. Running `ty check` on that file with the
-`# type: ignore` comment removed reports:
+The listing repeats the function and the call from the chapter's `area.py`, minus its comments.
+With the `# type: ignore` comment removed, `ty check` on `area.py` reports:
 
 ```
 error[invalid-argument-type]: Argument to function `area` is incorrect
@@ -125,9 +124,9 @@ info: Function defined here
   |     ^^^^ ---------- Parameter declared here
 ```
 
-The type checker pinpoints the mistake the chapter describes. `"3"`
-is a `str`, not an `int`, so it violates `width: int`. The call still
-completes at runtime, because `"3" * 4` is valid string repetition.
+The diagnostic marks the mistake the chapter describes. `"3"`
+is a `str`, not an `int`, so it violates `width: int`. At run time
+the call returns `"3333"`, because `"3" * 4` is valid string repetition.
 
 In the book, the `# type: ignore` comment on the `area("3", 4)` line
 lets a deliberately wrong example pass the book's build. Removing the
@@ -167,7 +166,7 @@ def last[T](items: list[T]) -> T:
 If you annotate `last()` the way the chapter annotates `first_any()`,
 with a bare `list` parameter and an `Any` return,
 `ty check` accepts `.upper()` on the result of `last([10, 20, 30])`.
-The call then fails at run time with an `AttributeError`: `'int' object has no attribute 'upper'`.
+The `.upper()` call then fails at run time with an `AttributeError`: `'int' object has no attribute 'upper'`.
 The solution shares one type parameter `T` between the argument and the return type,
 so each call's result keeps the list's element type.
 
@@ -186,9 +185,10 @@ print(last(["a", "b", "c"]))
 ```
 
 `last()` mirrors `first()`: one type parameter `T`, inferred from
-whatever `list[T]` the caller passes. Calling `last()` on a `list[int]`
-makes `T` `int` for that call, and on a `list[str]` makes `T` `str`,
-the same as `first()` does. The type checker therefore knows that
+whatever `list[T]` the caller passes.
+A call on a `list[int]` binds `T` to `int` for that call,
+and a call on a `list[str]` binds `T` to `str`, as with `first()`.
+The type checker therefore infers that
 `last([10, 20, 30])` returns an `int` and `last(["a", "b", "c"])`
 returns a `str`.
 
@@ -270,12 +270,14 @@ print(t.bump().bump().report())
 **Keep the subclass type through the chain.** `Tally` declares `bump()` with return type `Self`, which the type
 checker resolves to the class of the object receiving the call. On
 a `LoudTally`, `Self` means `LoudTally`, so `t.bump().bump()`
-type-checks as a `LoudTally` and `.report()` is available on the
-result. The `.report()` call resolves to `LoudTally.report()`, because Python
-starts method lookup at the object's own class. If `bump()`'s return
-annotation is the concrete type `Tally` instead of `Self`, the type
-checker rejects `.report()` on the chained result, since `Tally` has
-no `report()` method.
+type-checks as a `LoudTally`.
+The checker therefore accepts `.report()` on the result.
+If `bump()`'s return annotation is the concrete type `Tally` instead of `Self`,
+the type checker rejects `.report()` on the chained result,
+since `report()` first appears on `NamedTally`.
+
+At run time, the `.report()` call resolves to `LoudTally.report()`,
+because Python starts method lookup at the object's own class.
 
 </details>
 </details>
@@ -291,10 +293,10 @@ no `report()` method.
 <details>
 <summary>Where to look</summary>
 
-[Type Parameter Defaults](../../Chapters/08_Foundations--Static_Types.md#type-parameter-defaults) gives `Stack` a default for `T` so a bare `Stack` annotation still means something.
+[Type Parameter Defaults](../../Chapters/08_Foundations--Static_Types.md#type-parameter-defaults) gives `Stack` a default for `T` so a bare `Stack` annotation means `Stack[str]`.
 Use `reveal_type()` from `typing` on `words.top()` with and without the default, and compare what the checker reports.
-The question is what the checker knows
-about an expression whose type parameter stays unsolved.
+The question is what type the checker infers
+for an expression whose type parameter stays unsolved.
 
 <details>
 <summary>The shape</summary>
@@ -340,13 +342,16 @@ print(words.top().upper())
 
 With `= str` in place, `ty check` reports `str` for
 `reveal_type(words.top())`. Without the default, `ty` reports
-`Unknown` and still finds no errors in the file. An unsolved type
-parameter does not fail the check. It switches the check off for
-every expression built on it. `words.top().upper()` passes either
-way. Without the default, so does `words.top().no_such_method()`.
-A default turns a bare annotation that checks nothing into one that
-checks, and that is the reason to give a default to a class whose
-parameter is usually the same type.
+`Unknown` and finds no errors in the file.
+An unsolved type parameter becomes `Unknown`.
+The checker accepts any operation on an `Unknown` value,
+so every expression built on that value passes.
+`words.top().upper()` passes either way.
+With the default removed, so does `words.top().no_such_method()`.
+
+A default turns a bare annotation that accepts every operation
+into one that checks each operation against `str`.
+That is the reason to give a default to a class whose parameter is usually the same type.
 
 </details>
 </details>
@@ -402,7 +407,7 @@ print(grid)
 #: {(2, 3): 'purple'}
 ```
 
-Before `"purple"` joins `Color`, the call runs and stores the string,
+Before you add `"purple"` to `Color`, the call runs and stores the string,
 because a `Literal` constrains nothing at run time. `ty check`
 reports:
 
@@ -419,11 +424,10 @@ info: Function defined here
   |     ^^^^^                          ------------ Parameter declared here
 ```
 
-The diagnostic names the alias rather than the union behind it, so
-you read `Color` and find the four permitted strings in the `type`
-statement. An alias makes that trade: a short message and one place
-to change the allowed set, against following the name to see what
-the set is.
+The diagnostic names the alias rather than the union behind it,
+so you follow `Color` to its `type` statement to find the four permitted strings.
+The alias also keeps the message short
+and puts the allowed set in one place to change.
 
 **Widen the set at its definition.** Adding `"purple"` to the alias removes the error at every
 call. `grid[cell] = color` works as written, since `Grid`'s values are
@@ -503,23 +507,23 @@ print(count(circles))
 ```
 
 **Widen what the parameter accepts.** The type checker accepts the call because `Sequence` is covariant in its element
-type. A `Sequence[Shape]` declares only that you can read `Shape`s out
-of it, and every `Circle` you read out is a `Shape`, so a
-`list[Circle]` meets that requirement. `list[Shape]` refuses the same
+type. A `Sequence[Shape]` declares that you can read `Shape`s out
+of it, not that you can put them in.
+Every `Circle` is a `Shape`, so a `list[Circle]` meets that requirement. `list[Shape]` refuses the same
 argument because `list` is invariant.
 
-**Give up the write operations.** `shapes.append(...)` stops
-type-checking for the reason the widening works. `Sequence` has no
-`append()`. It is a read-only abstract base class, so the diagnostic
-is `unresolved-attribute` rather than an argument-type error. The type
+**Give up the write operations.** `shapes.append(...)` draws a
+diagnostic for the reason the widening works.
+`Sequence` is a read-only abstract base class, so it has no `append()`,
+and the diagnostic is `unresolved-attribute` rather than an argument-type error. The type
 checker does not say "you may not append a `Square` here." It says the
 type you declared has no such operation.
 
 The one edit shows both sides of variance. A writable container is
-invariant, and giving up the writes makes it covariant. The
+invariant, and a read-only type is covariant. The
 practical rule follows: annotate a parameter with the weakest type
-the body needs, because each capability you declare rejects the
-callers whose argument lacks it.
+the body needs, because each caller's argument must supply
+every capability you declare.
 
 </details>
 </details>
@@ -535,7 +539,7 @@ callers whose argument lacks it.
 
 [Narrowing](../../Chapters/08_Foundations--Static_Types.md#narrowing) shows `is not None` removing `None` from a `str | None` before `shout()` calls `.upper()`.
 A truthiness test narrows the same way, so the checker accepts it.
-Feed the function `None`, a normal string, and the empty string, and compare which values each test sends to which branch.
+Call the function with `None`, a normal string, and the empty string, and compare which values each test sends to which branch.
 
 <details>
 <summary>The shape</summary>
@@ -567,13 +571,15 @@ print(shout(""))  # The empty string is falsy
 
 **Narrow out the missing value.** The type checker accepts either version, because truthiness narrows too. `None`
 is falsy, so inside `if text:` the type checker rules out `None` the
-same as `is not None` does, and `.upper()` is safe in both versions.
+same as `is not None` does.
+`.upper()` is therefore safe in both versions.
 
-**Send empty values to the fallback.** The change is in which values reach which branch. `is not None` asks
-one question, whether the value is missing. `if text:` asks a
-different one, whether the value is missing or empty, and answers
-both with `"(nothing)"`. The function now treats an empty string a
-caller passed on purpose the same as a missing one.
+**Send empty values to the fallback.** The change is in which values reach which branch. `is not None` tests
+one condition, whether the value is missing. `if text:` tests
+whether the value is missing or empty, and the function returns `"(nothing)"`
+for both.
+The function now treats an empty string the same as a missing value,
+including one a caller passed on purpose.
 
 Whether that matters depends on the caller. The type checker cannot
 tell you, because both versions are type-correct. The truthiness test
@@ -623,8 +629,8 @@ def show(b: Box) -> str:
 
 If you copy `b.val` into `val` and test `val` but still call `b.val.upper()`,
 the test narrows the local and leaves the attribute at `str | None`.
-`ty check` then reports an `unresolved-attribute` on `b.val.upper()`,
-and the call fails at run time with an `AttributeError`, because `reset()` has set the attribute to `None`.
+`ty check` then reports an `unresolved-attribute` on `b.val.upper()`.
+The call also fails at run time with an `AttributeError`, because `reset()` has set the attribute to `None`.
 The solution calls `upper()` on the local, the name the test narrowed.
 
 ```python
@@ -651,8 +657,8 @@ print(box.val)
 #: None
 ```
 
-**Narrow a name no call can rebind.** `reset()` still runs and still sets the attribute to `None`, as the
-second line of output shows. The call cannot change `val`, though.
+**Narrow a name the function owns.** `reset()` still runs and still sets the attribute to `None`, as the
+second line of output shows. The call leaves `val` as it was, though.
 `val` is a second name for the string `"hi"`, and `reset()` rebinds
 `b.val`, not the local. The narrowing of `val` to `str` therefore
 holds through the call, and the type checker's verdict matches what
@@ -681,8 +687,8 @@ so consider where a tuple's contents get set.
 <details>
 <summary>Solution</summary>
 
-If you keep the `append()` call, `ty check` reports `unresolved-attribute`, since a tuple has no `append()`,
-and the call fails at run time with an `AttributeError`.
+If you keep the `append()` call, `ty check` reports `unresolved-attribute`, since a tuple has no `append()`.
+The call also fails at run time with an `AttributeError`.
 Rebuilding the tuple with `HISTORY = HISTORY + ("first",)` runs,
 but the type checker rejects it as a reassignment of a `Final` name.
 The solution puts the entry into the tuple at the definition of `HISTORY`.
@@ -704,12 +710,12 @@ print(MAX_RETRIES, GREETING, HISTORY)
 #: 3 hello ('first',)
 ```
 
-**Freeze the name and the contents.** On a list, `Final` guards the name and leaves
-the contents open to any code that reaches the list. On a tuple, the
-name and the contents both stay as the definition sets them: `Final`
+**Freeze the name and the contents.** On a list, `Final` forbids rebinding the name,
+and any code holding a reference to the list can still change its contents. On a tuple, the
+name and the contents both stay as the definition sets them. `Final`
 stops a rebinding, and the tuple type has no method that changes its
-contents. The definition is therefore the one place a value can enter
-the constant, which is also where a reader looks for it.
+contents. The definition is therefore the one place to put a value
+into the constant. A reader looks for the value there too.
 
 </details>
 </details>
