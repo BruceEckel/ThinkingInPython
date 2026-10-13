@@ -6,22 +6,16 @@
             markerWidth="18" markerHeight="12" orient="auto" markerUnits="userSpaceOnUse">
       <path d="M0.5,0.5 L17.4,6 L0.5,11.5 L5,6 Z" fill="#1a1612" stroke="#1a1612" stroke-width="0.8" stroke-linejoin="round"/>
     </marker>
-    <marker id="rc-solid-red" viewBox="0 0 18 12" refX="5" refY="6"
-            markerWidth="18" markerHeight="12" orient="auto" markerUnits="userSpaceOnUse">
-      <path d="M0.5,0.5 L17.4,6 L0.5,11.5 L5,6 Z" fill="#8b1a1a" stroke="#8b1a1a" stroke-width="0.8" stroke-linejoin="round"/>
-    </marker>
     <marker id="rc-hollow-muted" viewBox="0 0 18 12" refX="1" refY="6"
             markerWidth="18" markerHeight="12" orient="auto" markerUnits="userSpaceOnUse">
       <path d="M1,1 L17.4,6 L1,11 Z" fill="none" stroke="#7a6e62" stroke-width="1.2" stroke-linejoin="round"/>
     </marker>
   </defs>
   <text x="10" y="22" font-size="13" font-weight="bold" fill="#1a1612" text-anchor="start">Report names each writer</text>
-  <rect x="10" y="50" width="80" height="36" fill="#8b1a1a" fill-opacity="0.13" rx="4"/>
-  <rect x="10" y="50" width="80" height="36" fill="none" stroke="#8b1a1a" stroke-width="1.6" rx="4"/>
-  <text x="50.0" y="72.2" font-size="12" font-weight="bold" fill="#1a1612" text-anchor="middle">main</text>
-  <rect x="130" y="50" width="90" height="36" fill="#8b1a1a" fill-opacity="0.13" rx="4"/>
-  <rect x="130" y="50" width="90" height="36" fill="none" stroke="#8b1a1a" stroke-width="1.6" rx="4"/>
-  <text x="175.0" y="72.2" font-size="12" font-weight="bold" fill="#1a1612" text-anchor="middle">Report</text>
+  <rect x="10" y="50" width="80" height="36" fill="#eeeeee" stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
+  <text x="50.0" y="72.2" font-size="12" fill="#1a1612" text-anchor="middle">main</text>
+  <rect x="130" y="50" width="90" height="36" fill="#eeeeee" stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
+  <text x="175.0" y="72.2" font-size="12" fill="#1a1612" text-anchor="middle">Report</text>
   <rect x="10" y="150" width="90" height="34" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
   <text x="55.0" y="170.7" font-size="10.5" fill="#1a1612" text-anchor="middle">PdfWriter</text>
   <rect x="120" y="150" width="90" height="34" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
@@ -31,17 +25,16 @@
   <line x1="92.0" y1="68.0" x2="113.6" y2="68" stroke="#1a1612" stroke-width="3.8" marker-end="url(#rc-solid)"/>
   <line x1="150.8" y1="88" x2="100.8" y2="137.3" stroke="#1a1612" stroke-width="3.8" marker-end="url(#rc-solid)"/>
   <line x1="173.0" y1="88.0" x2="168.4" y2="133.7" stroke="#1a1612" stroke-width="3.8" marker-end="url(#rc-solid)"/>
-  <line x1="196.2" y1="88.0" x2="248.7" y2="137.5" stroke="#8b1a1a" stroke-width="3.8" marker-end="url(#rc-solid-red)"/>
+  <line x1="196.2" y1="88.0" x2="248.7" y2="137.5" stroke="#1a1612" stroke-width="3.8" marker-end="url(#rc-solid)"/>
   <line x1="51.0" y1="88.0" x2="53.3" y2="133.6" stroke="#1a1612" stroke-width="3.8" marker-end="url(#rc-solid)"/>
   <line x1="73.2" y1="88.0" x2="131.2" y2="137.9" stroke="#1a1612" stroke-width="3.8" marker-end="url(#rc-solid)"/>
-  <path d="M92,86.1 Q167.2,88.3 222.2,137.5" fill="none" stroke="#8b1a1a" stroke-width="3.8" marker-end="url(#rc-solid-red)"/>
+  <path d="M92,86.1 Q167.2,88.3 222.2,137.5" fill="none" stroke="#1a1612" stroke-width="3.8" marker-end="url(#rc-solid)"/>
   <line x1="350" y1="10" x2="350" y2="200" stroke="#c8bfb0" stroke-width="1" stroke-dasharray="4,4"/>
   <text x="370" y="22" font-size="13" font-weight="bold" fill="#1a1612" text-anchor="start">Report names a protocol</text>
-  <rect x="370" y="50" width="80" height="36" fill="#8b1a1a" fill-opacity="0.13" rx="4"/>
-  <rect x="370" y="50" width="80" height="36" fill="none" stroke="#8b1a1a" stroke-width="1.6" rx="4"/>
-  <text x="410.0" y="72.2" font-size="12" font-weight="bold" fill="#1a1612" text-anchor="middle">main</text>
-  <rect x="490" y="50" width="90" height="36" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
-  <text x="535.0" y="72.2" font-size="12" fill="#1a1612" text-anchor="middle">Report</text>
+  <rect x="370" y="50" width="80" height="36" fill="#eeeeee" stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
+  <text x="410.0" y="72.2" font-size="12" fill="#1a1612" text-anchor="middle">main</text>
+  <rect x="490" y="50" width="90" height="36" fill="none" stroke="#8b1a1a" stroke-width="1.6" rx="4"/>
+  <text x="535.0" y="72.2" font-size="12" font-weight="bold" fill="#1a1612" text-anchor="middle">Report</text>
   <rect x="370" y="150" width="90" height="34" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
   <text x="415.0" y="170.7" font-size="10.5" fill="#1a1612" text-anchor="middle">PdfWriter</text>
   <rect x="480" y="150" width="90" height="34" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
@@ -57,5 +50,5 @@
   <line x1="660" y1="148" x2="660" y2="106.4" stroke="#7a6e62" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#rc-hollow-muted)"/>
   <line x1="411.0" y1="88.0" x2="413.3" y2="133.6" stroke="#1a1612" stroke-width="3.8" marker-end="url(#rc-solid)"/>
   <line x1="433.2" y1="88" x2="479.5" y2="137" stroke="#1a1612" stroke-width="3.8" marker-end="url(#rc-solid)"/>
-  <path d="M452,86.1 Q527.2,88.3 582.2,137.5" fill="none" stroke="#8b1a1a" stroke-width="3.8" marker-end="url(#rc-solid-red)"/>
+  <path d="M452,86.1 Q527.2,88.3 582.2,137.5" fill="none" stroke="#1a1612" stroke-width="3.8" marker-end="url(#rc-solid)"/>
 </svg>

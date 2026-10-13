@@ -406,7 +406,8 @@ Then a Markdown writer arrives.
 
 The dashed box is the new class.
 The shaded parts are the existing ones whose source changes when `MdWriter` arrives,
-and each red edge is a new place that names `MdWriter`.
+and each heavy edge into the dashed box is a new place that names `MdWriter`.
+As in the gallery, the red box marks the part the change leaves alone.
 On the left, `Report` gains a branch and `main` gains a case.
 On the right, `Report` keeps its source,
 because the new writer satisfies the protocol and `Report` names no writer.
