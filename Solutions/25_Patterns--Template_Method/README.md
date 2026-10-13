@@ -630,7 +630,8 @@ the base class could have recorded that difference.
 `Exploder`'s exception is not repairable this way. For a type
 checker to catch `Exploder`, the base class must state which
 exceptions a step may raise, and the checker must hold every
-override to that list, the mechanism Java's `throws` clause provides. Python has no such declaration, and no
+override to that list, the mechanism Java's `throws` clause provides
+for checked exceptions. Python has no such declaration, and no
 annotation expresses "this raises nothing." An exception type in a
 docstring is a note to a human. Only discipline, review, or a test
 catches `Exploder`.
