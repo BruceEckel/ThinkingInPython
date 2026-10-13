@@ -279,8 +279,9 @@ so a state whose table you forget to fill has a table rather than a missing attr
 `next()` checks for that empty table before the lookup and raises `EmptyTable`,
 whose message names the state,
 so the state reports the mistake at its first input.
-An input that a filled table lacks is the other failure,
-and the `except` clause reports it as `NoTransition`.
+When the table is filled but has no entry for the input,
+the lookup raises a `KeyError`,
+and the `except` clause reports that as `NoTransition`.
 Both derive from `RuntimeError`, `EmptyTable` through `NoTransition`,
 so a caller can catch one failure, both,
 or every `RuntimeError` an action might raise.
