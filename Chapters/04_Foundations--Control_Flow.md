@@ -198,11 +198,14 @@ def locate(target):
         break  # [3]
     else:  # [4]
         print("not found")
+    print(f"searched for {target}")  # [5]
 
 locate(3)
 #: found 3
+#: searched for 3
 locate(9)
 #: not found
+#: searched for 9
 ```
 
 `locate(3)` walks the first row to the end, so the inner `else` (`[2]`)
@@ -213,9 +216,10 @@ and the outer `break` (`[3]`) runs right after.
 so the inner `else` continues on each row and the outer `else` (`[4]`)
 prints `"not found"`.
 
-Inside a function, a `return` at the match leaves both loops in one step.
-The `else` form serves loops at the top level of a module,
-and a function with more work to do after the search.
+Each call ends at `[5]`, after both loops, whichever way the search went.
+A `return` at the match would leave both loops in one step and skip `[5]` along with them.
+The `else` form keeps the function running past the search,
+and it also serves loops at the top level of a module, outside any function.
 
 ### `range()`, `enumerate()`, and `zip()`
 
@@ -237,12 +241,8 @@ for index, name in enumerate(names):
 #: 1 Bob
 #: 2 Carol
 #: 3 Ted
-for n, name in enumerate(names, start=1):
-    print(n, name)
-#: 1 Alice
-#: 2 Bob
-#: 3 Carol
-#: 4 Ted
+print(list(enumerate(names, start=1)))
+#: [(1, 'Alice'), (2, 'Bob'), (3, 'Carol'), (4, 'Ted')]
 ```
 
 `enumerate()` yields `(index, item)` pairs counting from zero,
@@ -252,7 +252,9 @@ but that form names the index and not the item,
 so every line that needs the item repeats the `names[i]` lookup.
 `enumerate()` hands you both.
 For output that people read, which usually counts from one,
-`start=1` begins the index at one, so the loop body adds nothing to it.
+`start=1` begins the index at one, so a loop body can print it as it comes.
+`list()` collects the pairs that the `start=1` form yields,
+each index one higher than in the loop.
 
 `zip()` walks several sequences at once:
 
@@ -513,12 +515,12 @@ Python reports both, and `from` decides how the two connect:
 | `raise X from e` | The above exception was the direct cause of the following exception: |
 | `raise X from None` | Nothing: only `X` appears |
 
-All three raise the same exception and differ only in that report:
+All three raise the same exception.
+They differ in three attributes of that exception,
+which Python reads to build the report:
 
 ```python
 # exception_chaining.py
-import textwrap
-import traceback
 
 class BadNumber(Exception):
     pass
@@ -541,29 +543,18 @@ def suppressed(text):
     except ValueError:
         raise BadNumber(text) from None
 
-def joining_line(e):
-    for part in traceback.format_exception(e):
-        line = part.strip()
-        if (line.endswith("exception occurred:")
-            or line.endswith("following exception:")):
-            return line
-    return "nothing shown above it"
+def name(e):
+    return None if e is None else type(e).__name__
 
 for parse in (implicit, explicit, suppressed):
     try:
         parse("seven")
     except BadNumber as e:
-        print(f"{parse.__name__}:")
-        for chunk in textwrap.wrap(joining_line(e), 55):
-            print(" ", chunk)
-#: implicit:
-#:   During handling of the above exception, another
-#:   exception occurred:
-#: explicit:
-#:   The above exception was the direct cause of the
-#:   following exception:
-#: suppressed:
-#:   nothing shown above it
+        print(parse.__name__, name(e.__cause__),
+              name(e.__context__), e.__suppress_context__)
+#: implicit None ValueError False
+#: explicit ValueError ValueError True
+#: suppressed None ValueError True
 ```
 
 `BadNumber` is a custom exception type: a class derived from `Exception`.
@@ -571,13 +562,21 @@ Its body is `pass` because it needs no behavior of its own.
 The handler matches on the class.
 [Classes](07_Foundations--Classes.md) covers class definitions in full.
 
-`joining_line()` digs the joining sentence out of the formatted traceback,
-so the output above is the text Python prints, not a summary of it.
+Each output line names a function, then shows the `__cause__`, `__context__`,
+and `__suppress_context__` of the `BadNumber` it raised.
+`name()` gives an attribute's exception class,
+or `None` when the attribute is empty.
 
-`from e` sets `__cause__` and produces the "direct cause" line.
-With no `from`, Python still records the earlier exception in `__context__` and produces the "During handling" line.
-`from None` sets `__suppress_context__`,
-and nothing appears above the new exception.
+In all three functions,
+Python records the handled `ValueError` in `__context__`.
+With no `from`, that is the only link,
+and Python prints it with the "During handling" line.
+`from` with any argument sets `__suppress_context__` to `True`,
+which hides `__context__` from the report.
+`from e` also sets `__cause__`,
+and Python prints the cause with the "direct cause" line.
+`from None` leaves `__cause__` as `None`,
+so nothing appears above the new exception.
 
 Use `from e` when the earlier exception explains this one,
 and `from None` when the earlier exception distracts from your own message.
@@ -594,32 +593,27 @@ and it breaks whenever the test and the operation disagree:
 ```python
 # eafp.py
 
-def careful(text):
+def look_first(text):
     if text.isdigit():
         return int(text)
     return None
 
-def forgiving(text):
-    try:
-        return int(text)
-    except ValueError:
-        return None
-
-print(careful("-5"), forgiving("-5"))
+print(look_first("-5"), int("-5"))
 #: None -5
 try:
-    careful("\N{SUPERSCRIPT TWO}")
+    look_first("\N{SUPERSCRIPT TWO}")
 except ValueError as e:
-    print("careful:", e)
-#: careful: invalid literal for int() with base 10: '²'
-print(forgiving("\N{SUPERSCRIPT TWO}"))
-#: None
+    print("look_first:", e)
+#: look_first: invalid literal for int() with base 10: '²'
 ```
 
 `isdigit()` and `int()` disagree in both directions.
 `isdigit()` rejects `"-5"`, which `int()` converts fine,
-and `isdigit()` accepts `"²"`, which `int()` refuses.
-The `try` block asks the only question that matters: does this conversion work?
+and `isdigit()` accepts `"²"`, which `int()` refuses with a `ValueError`.
+`parse_int()` in `demonstrate_exceptions.py` is the EAFP version of `look_first()`.
+Its `try` block asks the only question that matters: does this conversion work?
+It returns `-5` for `"-5"` and `None` for `"²"`,
+the two answers `look_first()` gets wrong.
 The world can also change between the test and the operation.
 A file that exists at the `if` can disappear before the `open()`,
 and only the EAFP form is safe against that.
@@ -736,7 +730,7 @@ Try each exercise before opening its [solution](../Solutions/04_Foundations--Con
     then say which version you would rather read six months from now.
 7.  In `exception_chaining.py`,
     add a fourth function that catches the `ValueError` and raises `BadNumber` from a *different* exception object it constructs.
-    Predict which line `joining_line()` prints before you run it.
+    Predict which line the traceback shows above `BadNumber` before you run it.
 8.  Rewrite `context_manager.py`'s reading half using `path.read_text()`.
     Say what the `with` form gives you that the one-liner does not,
     and when that matters.

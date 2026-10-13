@@ -327,7 +327,7 @@ loops it replaces.
 
 > In `exception_chaining.py`,
 > add a fourth function that catches the `ValueError` and raises `BadNumber` from a *different* exception object it constructs.
-> Predict which line `joining_line()` prints before you run it.
+> Predict which line the traceback shows above `BadNumber` before you run it.
 
 <details>
 <summary>Where to look</summary>
