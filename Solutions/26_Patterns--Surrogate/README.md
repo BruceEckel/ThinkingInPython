@@ -321,7 +321,7 @@ it.
 ## 4. Why the typo reports as `RecursionError`
 
 > In `counting_proxy.py`,
-> misspell `self._impl` as `self._imp` inside `__getattr__()` and run it.
+> misspell `self._impl` as `self._imp` inside `__getattr__()` and run `counting_demo.py`.
 > Use the fallback behavior this chapter describes to explain why the failure reports as `RecursionError` rather than an `AttributeError` naming the typo.
 
 <details>

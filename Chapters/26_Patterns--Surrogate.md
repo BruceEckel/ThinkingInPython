@@ -261,14 +261,18 @@ class Words:
     def __len__(self) -> int:
         return len(self.items)
 
-p = Proxy(Words())
+    def __str__(self) -> str:
+        return " ".join(self.items)
+
+w = Words()
+p = Proxy(w)
 print(p.__len__())  # The explicit call delegates
 #: 2
 # Special-method lookup skips the instance:
 expect(TypeError, len, p)  # type: ignore
 #: [TypeError] object of type 'Proxy' has no len()
-print("__main__.Proxy object" in str(p))
-#: True
+print(w, "|", str(p).split(" at ")[0])
+#: spam eggs | <__main__.Proxy object
 ```
 
 `p.__len__()` and `len(p)` look interchangeable and are not.
@@ -284,9 +288,10 @@ so `len(p)` passes the check and fails only at runtime.
 A proxy that must forward special methods defines each one in its class body.
 
 `len(p)` reports the missing method because `object` defines no `__len__()`.
-`print(p)` reports no missing method.
+`str(p)` reports no missing method.
 `object` defines `__str__()`,
-so the lookup on `type(p)` finds `object`'s `__str__()` and the proxy prints as a `Proxy` object.
+so the lookup on `type(p)` finds `object`'s `__str__()`.
+`w` prints as `spam eggs` and the proxy prints as `<__main__.Proxy object at ...>`.
 Whenever `object` defines the dunder,
 the proxy answers with `object`'s version instead of calling the implementation.
 
@@ -540,11 +545,14 @@ print("proxy ready")
 print(p.query())
 #: Expensive built
 #: result
+print(p.query())  # [1]
+#: result
 ```
 
 Building `Lazy` prints nothing.
 `__getattr__()` builds `Expensive` on the first forwarded access,
-and every later access reuses that same instance.
+and every later access reuses that same instance,
+so the `query()` at `[1]` prints `result` alone.
 
 ### Protection Proxy
 
@@ -619,22 +627,28 @@ class CountingProxy:
                 return attr(*args, **kwargs)
             return counted
         return attr
+```
+
+The demo wraps an `Implementation` with two methods and calls through the proxy:
+
+```python
+# counting_demo.py
+from counting_proxy import CountingProxy
 
 class Implementation:
     def f(self) -> None: print("f()")
     def g(self) -> None: print("g()")
 
-if __name__ == "__main__":
-    p = CountingProxy(Implementation())
-    p.f()
-    p.g()
-    p.f()
-    print(p.f is p.f, p.f.__name__)
-    print("calls:", p.calls)
+p = CountingProxy(Implementation())
+p.f()
 #: f()
+p.g()
 #: g()
+p.f()
 #: f()
+print(p.f is p.f, p.f.__name__)
 #: False counted
+print("calls:", p.calls)
 #: calls: 3
 ```
 
@@ -649,7 +663,7 @@ Two lookups of the same name therefore produce two different objects,
 and the wrapper reports its own name, `counted`, rather than `f`.
 Building a `counted` increments nothing.
 Only a call to `counted` increments the tally,
-so the three lookups in the `print()` leave the tally at three.
+so the `p.f is p.f` test and the `__name__` read leave the tally at three.
 
 This proxy names its implementation `_impl`, with one underscore,
 and so gives up the mangling that keeps `proxy_getattr.py`'s attribute from colliding.
@@ -739,31 +753,31 @@ class Implementation2:
     def h(self) -> None:
         print("We do routines and chorus scenes")
 
-def run(b: Any) -> None:
-    b.f()
-    b.g()
-    b.h()
-    b.g()
+def run(surrogate: Any) -> None:
+    surrogate.f()
+    surrogate.g()
+    surrogate.h()
+    surrogate.g()
 
 first: Behavior = Implementation1()
 second: Behavior = Implementation2()
-b = Surrogate(first)
-run(b)
+surrogate = Surrogate(first)
+run(surrogate)
 #: Fiddle de dum, Fiddle de dee,
 #: Eric the half a bee.
 #: Ho ho ho, tee hee hee,
 #: Eric the half a bee.
-b.change_to(second)
-run(b)
+surrogate.change_to(second)
+run(surrogate)
 #: We're Knights of the Round Table.
 #: We dance whene'er we're able.
 #: We do routines and chorus scenes
 #: We dance whene'er we're able.
 ```
 
-The two calls to `run(b)` print different verses,
-though neither `run()` nor `b` changes between them.
-The figure follows `b.f()` through each step:
+The two calls to `run(surrogate)` print different verses,
+though neither `run()` nor `surrogate` changes between them.
+The figure follows `surrogate.f()` through each step:
 
 ![](_images/surrogate_story)
 
@@ -784,8 +798,8 @@ splitting the sequence across both implementations.
 See [Concurrency](19_Techniques--Concurrency.md#the-gil-does-not-prevent-races)
 for the races an unsynchronized swap allows.
 
-`run()` takes `b: Any` because `Behavior` fails as the annotation.
-Annotating `run(b: Behavior)` and passing it `b` is a type error,
+`run()` takes `surrogate: Any` because `Behavior` fails as the annotation.
+Annotating `run(surrogate: Behavior)` and passing it `surrogate` is a type error,
 because `Surrogate` defines no `f()` of its own.
 The checker [cannot verify a method that `__getattr__()` supplies](#forwarding-with-getattr).
 
@@ -838,7 +852,7 @@ but the type checker infers `T` from the first implementation's class.
 so `ty` rejects `change_to(StateB())`.
 With that surrogate, `state_demo.py` fails the same way:
 `ty` narrows `first` to `Implementation1` despite its `Behavior` declaration,
-and rejects `b.change_to(second)`.
+and rejects `surrogate.change_to(second)`.
 Every caller then writes the parameter out, as in `Surrogate[StateA | StateB]`,
 so the listing keeps `Any`.
 
@@ -875,7 +889,7 @@ Try each exercise before opening its [solution](../Solutions/26_Patterns--Surrog
     and the first `append()` through a shared list copies the data before changing it.
     Confirm that the two lists share their data before the write and not after it.
 4.  In `counting_proxy.py`,
-    misspell `self._impl` as `self._imp` inside `__getattr__()` and run it.
+    misspell `self._impl` as `self._imp` inside `__getattr__()` and run `counting_demo.py`.
     Use the fallback behavior this chapter describes to explain why the failure reports as `RecursionError` rather than an `AttributeError` naming the typo.
 5.  Create a program similar to a DBMS that allows only a set number of connections at a time.
     Implement this with a system modeled on [*Singleton*](24_Patterns--Singleton.md)

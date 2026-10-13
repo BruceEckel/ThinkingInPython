@@ -21,3 +21,5 @@ print("proxy ready")
 print(p.query())
 #: Expensive built
 #: result
+print(p.query())  # [1]
+#: result

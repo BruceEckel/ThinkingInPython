@@ -23,22 +23,22 @@ class Implementation2:
     def h(self) -> None:
         print("We do routines and chorus scenes")
 
-def run(b: Any) -> None:
-    b.f()
-    b.g()
-    b.h()
-    b.g()
+def run(surrogate: Any) -> None:
+    surrogate.f()
+    surrogate.g()
+    surrogate.h()
+    surrogate.g()
 
 first: Behavior = Implementation1()
 second: Behavior = Implementation2()
-b = Surrogate(first)
-run(b)
+surrogate = Surrogate(first)
+run(surrogate)
 #: Fiddle de dum, Fiddle de dee,
 #: Eric the half a bee.
 #: Ho ho ho, tee hee hee,
 #: Eric the half a bee.
-b.change_to(second)
-run(b)
+surrogate.change_to(second)
+run(surrogate)
 #: We're Knights of the Round Table.
 #: We dance whene'er we're able.
 #: We do routines and chorus scenes

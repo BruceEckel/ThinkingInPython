@@ -1,18 +1,21 @@
 """Chapter 26, Surrogate: one call path, before and after a swap.
 
-Three frames of one layout, from `state_demo.py`: `run(b)` calls `b.f()`,
-and `Surrogate`, which defines no `f()`, forwards it through
-`__getattr__()` to `first`; `b.change_to(second)` rebinds
-`__implementation`; the same `run(b)` on the same `b` now prints
-`second`'s line. Frame 1 alone is a *Proxy*, and frames 2 and 3 add what
-*State* adds, so the storyboard shows the chapter's claim that the two
-patterns are one surrogate with two intents. A storyboard suits this
-pattern because its point is a change over time that the caller cannot
-see; the coupling panel it replaces showed only who names whom. The
-names come from `state_surrogate.py` (`Surrogate`, `__implementation`,
-`__getattr__()`, `change_to()`) and `state_demo.py` (`run()`, `b`,
-`first`, `second`, `Implementation1`, `Implementation2`, and the first
-line each `f()` prints).
+Three frames of one layout, from `state_demo.py`: `run(surrogate)`
+calls `surrogate.f()`, and `Surrogate`, which defines no `f()`, forwards
+it through `__getattr__()` to `first`; `surrogate.change_to(second)`
+rebinds `__implementation`; the same `run(surrogate)` on the same
+`surrogate` now prints `second`'s line. Frame 1 alone is a *Proxy*,
+and frames 2 and 3 add what *State* adds, so the storyboard shows the
+chapter's claim that the two patterns are one surrogate with two
+intents. A storyboard suits this pattern because its point is a change
+over time that the caller cannot see; the coupling panel it replaces
+showed only who names whom. The names come from `state_surrogate.py`
+(`Surrogate`, `__implementation`, `__getattr__()`, `change_to()`) and
+`state_demo.py` (`run()`, `surrogate`, `first`, `second`,
+`Implementation1`, `Implementation2`, and the first line each `f()`
+prints). The Surrogate box carries no instance label: the caller box
+names the instance `surrogate`, and that label beside the class name
+would overlap it.
 """
 
 from tools.story_figures import (INK, MUTED, RED, Point, arrow, cross,
@@ -26,11 +29,12 @@ SX, SW, SH = 298, 150, 112  # The Surrogate box
 LX, LW, LH = SX + 12, 126, 26  # The __implementation slot inside it
 IX, IW, IH = 530, 180, 44  # The two implementations
 IMPL_Y = (18, 76)
-CALLS = ("b.f()", "b.g()", "b.h()", "b.g()")
-TITLE = ("Three steps of a Surrogate: run(b) calls b.f() and __getattr__() "
-         "forwards it to first, b.change_to(second) rebinds the "
-         "implementation, and the same run(b) on the same b then reaches "
-         "second")
+CALLS = ("surrogate.f()", "surrogate.g()", "surrogate.h()",
+         "surrogate.g()")
+TITLE = ("Three steps of a Surrogate: run(surrogate) calls surrogate.f() "
+         "and __getattr__() forwards it to first, "
+         "surrogate.change_to(second) rebinds the implementation, and the "
+         "same run(surrogate) on the same surrogate then reaches second")
 
 
 def slot_end(y0: float) -> Point:
@@ -51,7 +55,6 @@ def frame(i: int, y0: float, name: str, lines: tuple[str, ...],
     out += rect(CX, y0 + 18, CW, CH, stroke=edge)
     out += rect(SX, y0 + 18, SW, SH, stroke=edge)
     out += text(SX + 12, y0 + 38, "Surrogate", 13, bold=True)
-    out += text(SX + SW - 12, y0 + 38, "b", 12, MUTED, "end")
     out += rect(LX, y0 + 52, LW, LH, stroke=INK, width=1.1, rx=3)
     out += text(LX + LW / 2, y0 + 69, "__implementation", 10, MUTED,
                 "middle")
@@ -73,8 +76,8 @@ def frame(i: int, y0: float, name: str, lines: tuple[str, ...],
 
 
 def run_call(y0: float, k: int, printed: str) -> str:
-    """`run(b)` calls `b.f()`, which reaches implementation `k`."""
-    out = text(CX + 12, y0 + 38, "run(b)", 12, bold=True)
+    """`run(surrogate)` calls `surrogate.f()`, which reaches `k`."""
+    out = text(CX + 12, y0 + 38, "run(surrogate)", 12, bold=True)
     for j, s in enumerate(CALLS):
         out += text(CX + 12, y0 + 60 + j * 16, s, 10.5,
                     RED if j == 0 else MUTED)
@@ -104,8 +107,9 @@ def render() -> str:
     b += frame(1, y0, "swap",
                ("change_to()", "rebinds the", "slot; only State",
                 "takes this step"), False)
-    b += text(CX + 12, y0 + 60, "b.change_to(", 10.5, RED)
-    b += text(CX + 36, y0 + 76, "second)", 10.5, RED)
+    b += text(CX + 12, y0 + 60, "surrogate", 10.5, RED)
+    b += text(CX + 24, y0 + 76, ".change_to(", 10.5, RED)
+    b += text(CX + 36, y0 + 92, "second)", 10.5, RED)
     b += arrow((CX + CW, y0 + 56), (SX, y0 + 56), RED, "ss-red",
                width=1.6)
     a = slot_end(y0)
@@ -116,9 +120,9 @@ def render() -> str:
 
     y0 = y[2]
     b += frame(2, y0, "again",
-               ("same run(b),", "same b,", "new output"), True)
+               ("same run(),", "same surrogate,", "new output"), True)
     b += run_call(y0, 1, "We're Knights of the Round Table.")
-    b += text(CX, y0 + 150, "run() and b", 11, RED)
+    b += text(CX, y0 + 150, "run() and surrogate", 11, RED)
     b += text(CX, y0 + 165, "unchanged", 11, RED)
 
     defs = markers(**{"ss-red": ("filled", RED),

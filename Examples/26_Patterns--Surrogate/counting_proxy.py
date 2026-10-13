@@ -14,20 +14,3 @@ class CountingProxy:
                 return attr(*args, **kwargs)
             return counted
         return attr
-
-class Implementation:
-    def f(self) -> None: print("f()")
-    def g(self) -> None: print("g()")
-
-if __name__ == "__main__":
-    p = CountingProxy(Implementation())
-    p.f()
-    p.g()
-    p.f()
-    print(p.f is p.f, p.f.__name__)
-    print("calls:", p.calls)
-#: f()
-#: g()
-#: f()
-#: False counted
-#: calls: 3

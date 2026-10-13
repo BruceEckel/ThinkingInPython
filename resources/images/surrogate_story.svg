@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 730 550"
      font-family="'JetBrains Mono', Consolas, monospace">
-  <title>Three steps of a Surrogate: run(b) calls b.f() and __getattr__() forwards it to first, b.change_to(second) rebinds the implementation, and the same run(b) on the same b then reaches second</title>
+  <title>Three steps of a Surrogate: run(surrogate) calls surrogate.f() and __getattr__() forwards it to first, surrogate.change_to(second) rebinds the implementation, and the same run(surrogate) on the same surrogate then reaches second</title>
   <defs>
     <marker id="ss-red" viewBox="0 0 18 12" refX="5" refY="6"
             markerWidth="18" markerHeight="12" orient="auto" markerUnits="userSpaceOnUse">
@@ -14,7 +14,6 @@
   <rect x="135" y="28" width="128" height="112" fill="none" stroke="#1a1612" stroke-width="1.3" rx="4"/>
   <rect x="298" y="28" width="150" height="112" fill="none" stroke="#1a1612" stroke-width="1.3" rx="4"/>
   <text x="310" y="48" font-size="13" fill="#1a1612" font-weight="bold" text-anchor="start">Surrogate</text>
-  <text x="436" y="48" font-size="12" fill="#7a6e62" text-anchor="end">b</text>
   <rect x="310" y="62" width="126" height="26" fill="none" stroke="#1a1612" stroke-width="1.1" rx="3"/>
   <text x="373" y="79" font-size="10" fill="#7a6e62" text-anchor="middle">__implementation</text>
   <text x="310" y="112" font-size="11" fill="#8b1a1a" text-anchor="start">__getattr__()</text>
@@ -31,11 +30,11 @@
   <text x="22" y="111" font-size="10.5" fill="#7a6e62" text-anchor="start">no f(), so</text>
   <text x="22" y="126" font-size="10.5" fill="#7a6e62" text-anchor="start">__getattr__()</text>
   <text x="22" y="141" font-size="10.5" fill="#7a6e62" text-anchor="start">forwards it</text>
-  <text x="147" y="48" font-size="12" fill="#1a1612" font-weight="bold" text-anchor="start">run(b)</text>
-  <text x="147" y="70" font-size="10.5" fill="#8b1a1a" text-anchor="start">b.f()</text>
-  <text x="147" y="86" font-size="10.5" fill="#7a6e62" text-anchor="start">b.g()</text>
-  <text x="147" y="102" font-size="10.5" fill="#7a6e62" text-anchor="start">b.h()</text>
-  <text x="147" y="118" font-size="10.5" fill="#7a6e62" text-anchor="start">b.g()</text>
+  <text x="147" y="48" font-size="12" fill="#1a1612" font-weight="bold" text-anchor="start">run(surrogate)</text>
+  <text x="147" y="70" font-size="10.5" fill="#8b1a1a" text-anchor="start">surrogate.f()</text>
+  <text x="147" y="86" font-size="10.5" fill="#7a6e62" text-anchor="start">surrogate.g()</text>
+  <text x="147" y="102" font-size="10.5" fill="#7a6e62" text-anchor="start">surrogate.h()</text>
+  <text x="147" y="118" font-size="10.5" fill="#7a6e62" text-anchor="start">surrogate.g()</text>
   <line x1="263" y1="66" x2="281.6" y2="66.0" stroke="#8b1a1a" stroke-width="1.6" marker-end="url(#ss-red)"/>
   <line x1="436" y1="75" x2="514.2" y2="54.2" stroke="#8b1a1a" stroke-width="1.6" marker-end="url(#ss-red)"/>
   <text x="483" y="54.5" font-size="10.5" fill="#8b1a1a" text-anchor="middle">f()</text>
@@ -45,7 +44,6 @@
   <rect x="135" y="208" width="128" height="112" fill="none" stroke="#1a1612" stroke-width="1.3" rx="4"/>
   <rect x="298" y="208" width="150" height="112" fill="none" stroke="#1a1612" stroke-width="1.3" rx="4"/>
   <text x="310" y="228" font-size="13" fill="#1a1612" font-weight="bold" text-anchor="start">Surrogate</text>
-  <text x="436" y="228" font-size="12" fill="#7a6e62" text-anchor="end">b</text>
   <rect x="310" y="242" width="126" height="26" fill="none" stroke="#1a1612" stroke-width="1.1" rx="3"/>
   <text x="373" y="259" font-size="10" fill="#7a6e62" text-anchor="middle">__implementation</text>
   <text x="310" y="292" font-size="11" fill="#7a6e62" text-anchor="start">__getattr__()</text>
@@ -62,8 +60,9 @@
   <text x="22" y="291" font-size="10.5" fill="#7a6e62" text-anchor="start">rebinds the</text>
   <text x="22" y="306" font-size="10.5" fill="#7a6e62" text-anchor="start">slot; only State</text>
   <text x="22" y="321" font-size="10.5" fill="#7a6e62" text-anchor="start">takes this step</text>
-  <text x="147" y="250" font-size="10.5" fill="#8b1a1a" text-anchor="start">b.change_to(</text>
-  <text x="171" y="266" font-size="10.5" fill="#8b1a1a" text-anchor="start">second)</text>
+  <text x="147" y="250" font-size="10.5" fill="#8b1a1a" text-anchor="start">surrogate</text>
+  <text x="159" y="266" font-size="10.5" fill="#8b1a1a" text-anchor="start">.change_to(</text>
+  <text x="171" y="282" font-size="10.5" fill="#8b1a1a" text-anchor="start">second)</text>
   <line x1="263" y1="246" x2="281.6" y2="246.0" stroke="#8b1a1a" stroke-width="1.6" marker-end="url(#ss-red)"/>
   <line x1="436" y1="255" x2="514.2" y2="234.2" stroke="#7a6e62" stroke-width="1.3" stroke-dasharray="4,3" marker-end="url(#ss-muted)"/>
   <path d="M477,236.5 L489,248.5 M477,248.5 L489,236.5" stroke="#8b1a1a" stroke-width="2" fill="none"/>
@@ -72,7 +71,6 @@
   <rect x="135" y="388" width="128" height="112" fill="none" stroke="#8b1a1a" stroke-width="1.3" rx="4"/>
   <rect x="298" y="388" width="150" height="112" fill="none" stroke="#8b1a1a" stroke-width="1.3" rx="4"/>
   <text x="310" y="408" font-size="13" fill="#1a1612" font-weight="bold" text-anchor="start">Surrogate</text>
-  <text x="436" y="408" font-size="12" fill="#7a6e62" text-anchor="end">b</text>
   <rect x="310" y="422" width="126" height="26" fill="none" stroke="#1a1612" stroke-width="1.1" rx="3"/>
   <text x="373" y="439" font-size="10" fill="#7a6e62" text-anchor="middle">__implementation</text>
   <text x="310" y="472" font-size="11" fill="#8b1a1a" text-anchor="start">__getattr__()</text>
@@ -85,19 +83,19 @@
   <text x="542" y="480" font-size="10.5" fill="#7a6e62" text-anchor="start">Implementation2()</text>
   <text x="22" y="414" font-size="30" fill="#8b1a1a" font-weight="bold" text-anchor="start">3</text>
   <text x="22" y="436" font-size="13" fill="#1a1612" font-weight="bold" text-anchor="start">again</text>
-  <text x="22" y="456" font-size="10.5" fill="#7a6e62" text-anchor="start">same run(b),</text>
-  <text x="22" y="471" font-size="10.5" fill="#7a6e62" text-anchor="start">same b,</text>
+  <text x="22" y="456" font-size="10.5" fill="#7a6e62" text-anchor="start">same run(),</text>
+  <text x="22" y="471" font-size="10.5" fill="#7a6e62" text-anchor="start">same surrogate,</text>
   <text x="22" y="486" font-size="10.5" fill="#7a6e62" text-anchor="start">new output</text>
-  <text x="147" y="408" font-size="12" fill="#1a1612" font-weight="bold" text-anchor="start">run(b)</text>
-  <text x="147" y="430" font-size="10.5" fill="#8b1a1a" text-anchor="start">b.f()</text>
-  <text x="147" y="446" font-size="10.5" fill="#7a6e62" text-anchor="start">b.g()</text>
-  <text x="147" y="462" font-size="10.5" fill="#7a6e62" text-anchor="start">b.h()</text>
-  <text x="147" y="478" font-size="10.5" fill="#7a6e62" text-anchor="start">b.g()</text>
+  <text x="147" y="408" font-size="12" fill="#1a1612" font-weight="bold" text-anchor="start">run(surrogate)</text>
+  <text x="147" y="430" font-size="10.5" fill="#8b1a1a" text-anchor="start">surrogate.f()</text>
+  <text x="147" y="446" font-size="10.5" fill="#7a6e62" text-anchor="start">surrogate.g()</text>
+  <text x="147" y="462" font-size="10.5" fill="#7a6e62" text-anchor="start">surrogate.h()</text>
+  <text x="147" y="478" font-size="10.5" fill="#7a6e62" text-anchor="start">surrogate.g()</text>
   <line x1="263" y1="426" x2="281.6" y2="426.0" stroke="#8b1a1a" stroke-width="1.6" marker-end="url(#ss-red)"/>
   <line x1="436" y1="435" x2="514.5" y2="462.6" stroke="#8b1a1a" stroke-width="1.6" marker-end="url(#ss-red)"/>
   <text x="483" y="443.5" font-size="10.5" fill="#8b1a1a" text-anchor="middle">f()</text>
   <text x="710" y="508" font-size="10" fill="#7a6e62" text-anchor="end">second.f() prints</text>
   <text x="710" y="524" font-size="10" fill="#8b1a1a" text-anchor="end">We're Knights of the Round Table.</text>
-  <text x="135" y="520" font-size="11" fill="#8b1a1a" text-anchor="start">run() and b</text>
+  <text x="135" y="520" font-size="11" fill="#8b1a1a" text-anchor="start">run() and surrogate</text>
   <text x="135" y="535" font-size="11" fill="#8b1a1a" text-anchor="start">unchanged</text>
 </svg>

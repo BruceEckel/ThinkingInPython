@@ -16,11 +16,15 @@ class Words:
     def __len__(self) -> int:
         return len(self.items)
 
-p = Proxy(Words())
+    def __str__(self) -> str:
+        return " ".join(self.items)
+
+w = Words()
+p = Proxy(w)
 print(p.__len__())  # The explicit call delegates
 #: 2
 # Special-method lookup skips the instance:
 expect(TypeError, len, p)  # type: ignore
 #: [TypeError] object of type 'Proxy' has no len()
-print("__main__.Proxy object" in str(p))
-#: True
+print(w, "|", str(p).split(" at ")[0])
+#: spam eggs | <__main__.Proxy object
