@@ -14,7 +14,7 @@ take.
 Frames 1-3 follow the chapter's written-out form of `for x in nums:`
 and `basic_iteration.py` (`nums = [1, 2]`, `it = iter(nums)`, the
 values `1 2`, "StopIteration ends the loop"). Frame 4's names and totals
-come from `iterators.py` (`total()`, `fibonacci(8)`, `Countdown(5)`,
+come from `iterators_demo.py` (`total()`, `fibonacci(8)`, `Countdown(5)`,
 and the printed 10, 33, and 15).
 """
 

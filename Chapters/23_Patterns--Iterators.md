@@ -103,7 +103,6 @@ def fibonacci(n: int) -> Iterator[int]:
         yield a
         a, b = b, a + b
 
-# __iter__() makes a class iterable. Often a generator:
 @dataclass
 class Countdown:
     start: int
@@ -114,9 +113,15 @@ class Countdown:
             yield n
             n -= 1
 
-# A function using an iterable is decoupled from its source:
 def total(numbers: Iterable[int]) -> int:
     return sum(numbers)
+```
+
+`iterators_demo.py` builds each source and passes it to `total()`:
+
+```python
+# iterators_demo.py
+from iterators import Countdown, fibonacci, total
 
 print(list(fibonacci(8)))
 #: [0, 1, 1, 2, 3, 5, 8, 13]
@@ -190,43 +195,15 @@ Generators are lazy.
 `fibonacci(1_000_000)` computes nothing until you iterate over it,
 and produces one value at a time,
 so it works on streams too large to hold in memory.
-`generator_memory.py` compares the generator's memory with a list holding the same values.
-Its `squares()` returns a [generator expression](16_Techniques--Comprehensions.md#generator-expressions),
-the one-line form of a generator:
+Iterating over a generator keeps one value alive at a time,
+while collecting the same million values into a list keeps all of them alive at once.
+In [Performance](18_Techniques--Performance.md#lazy-evaluation-with-generators),
+`lazy_pipeline.py` measures the difference with `tracemalloc`,
+and the generator pipeline's peak stays under one percent of the list version's.
 
-```python
-# generator_memory.py
-import tracemalloc
-from collections.abc import Iterator
-from typing import Final
-from benchmark import report
-
-def squares(n: int) -> Iterator[int]:
-    return (i * i for i in range(n))
-
-N: Final[int] = 1_000_000
-
-tracemalloc.start()
-total = 0
-for x in squares(N):
-    total += x
-_, lazy_peak = tracemalloc.get_traced_memory()
-tracemalloc.stop()
-
-tracemalloc.start()
-collected = list(squares(N))
-_, eager_peak = tracemalloc.get_traced_memory()
-tracemalloc.stop()
-
-report(lazy_bytes=lazy_peak, eager_bytes=eager_peak)
-print(f"generator used far less memory: "
-      f"{lazy_peak < eager_peak * 0.01}")
-#: generator used far less memory: True
-```
-
-Iterating over the generator keeps one squared value alive at a time.
-Collecting the same million values into a list keeps all of them alive at once,
-so the generator's peak stays under one percent of the list's.
+A [generator expression](16_Techniques--Comprehensions.md#generator-expressions)
+such as `(i * i for i in range(n))` is the one-line form of a generator,
+and it is lazy in the same way.
 
 A generator can be *infinite*.
 A `while True` loop that yields forever, or `itertools.count()`,
@@ -374,28 +351,22 @@ and a reiterable class passes it by adding those two methods.
 
 `itertools.tee(it, 2)` splits one iterator into two independent ones.
 That looks like a third way to walk data twice,
-and it rarely saves memory over collecting a list.
-The `squares()` below is the plain-function form from `eager_validation.py`,
-with the generator expression standing in for `produce()`:
+and it rarely saves memory over collecting a list:
 
 ```python
 # tee.py
 import tracemalloc
-from collections.abc import Iterator
 from itertools import tee
 from typing import Final
 from benchmark import report
 
-def squares(n: int) -> Iterator[int]:
-    return (i * i for i in range(n))
-
 # Two independent readers, one source
-a, b = tee(squares(5))
+a, b = tee(i * i for i in range(5))
 print(list(a), list(b))
 #: [0, 1, 4, 9, 16] [0, 1, 4, 9, 16]
 
 N: Final[int] = 100_000
-first, second = tee(squares(N))
+first, second = tee(i * i for i in range(N))
 tracemalloc.start()
 for _ in first:  # Drain one branch; second has not started
     pass
@@ -403,7 +374,7 @@ buffered, _ = tracemalloc.get_traced_memory()
 tracemalloc.stop()
 
 tracemalloc.start()
-collected = list(squares(N))
+collected = [i * i for i in range(N)]
 listed, _ = tracemalloc.get_traced_memory()
 tracemalloc.stop()
 report(tee_bytes=buffered, list_bytes=listed)
@@ -412,7 +383,7 @@ print(f"tee held as much as the list: "
 #: tee held as much as the list: True
 
 # Same N, but both branches advance together:
-first2, second2 = tee(squares(N))
+first2, second2 = tee(i * i for i in range(N))
 tracemalloc.start()
 for x, y in zip(first2, second2,
                 strict=True):
@@ -472,12 +443,21 @@ def flatten(nested: Sequence[Nested]) -> Iterator[int]:
         else:
             # The same loop, delegated
             yield from flatten(item)
+```
+
+`yield_from_demo.py` flattens one nested list,
+then checks that both functions agree on it:
+
+```python
+# yield_from_demo.py
+from collections.abc import Sequence
+from yield_from import Nested, flatten, flatten_loop
 
 data: Sequence[Nested] = [1, [2, 3], [4, [5, 6]], 7]
-print(list(flatten_loop(data)))
-#: [1, 2, 3, 4, 5, 6, 7]
 print(list(flatten(data)))
 #: [1, 2, 3, 4, 5, 6, 7]
+print(list(flatten_loop(data)) == list(flatten(data)))
+#: True
 ```
 
 Both functions call themselves on each nested sequence,
@@ -485,7 +465,7 @@ and both pass each value from the recursive call out to the caller.
 `flatten_loop()` passes the values out by hand.
 It starts the recursive call, then re-yields each value that call produces.
 `flatten()` replaces those two lines with `yield from`,
-and the matching output shows the substitution is exact.
+and the `True` in `yield_from_demo.py` shows the substitution is exact.
 
 `flatten_loop()` carries a `# noqa` because ruff's `UP028` rule reports a `for` loop whose body is a lone `yield` of the loop variable,
 and tells you to write `yield from` instead.
@@ -868,41 +848,21 @@ Python makes that question part of `__next__()`,
 so the only way to ask is to take.
 The answer arrives as a `StopIteration` exception that the `for` loop swallows on your behalf.
 You can catch that exception yourself,
-or hand `next()` a default and compare against it,
+or hand `next()` a default to return at the end,
 but neither restores the free query of the GoF *Iterator*:
 
 ```python
 # asking_costs.py
-from collections.abc import Iterator
-from exceptions import expect
-
 DONE = sentinel("DONE")
 
-def doubled(source: Iterator[int]) -> Iterator[int]:
-    # The exception escapes when the source runs out:
-    while True:
-        yield next(source) * 2
-
-def doubled_ok(source: Iterator[int]) -> Iterator[int]:
-    for n in source:  # The loop absorbs the exception
-        yield n * 2
-
 numbers = iter([1, 2])
-print(next(numbers, DONE) is DONE)  # Asking consumes the 1
-#: False
-print(next(numbers, DONE) is DONE)  # Asking consumes the 2
-#: False
-print(next(numbers, DONE) is DONE)  # No more left
-#: True
+print(next(numbers, DONE), next(numbers, DONE),
+      next(numbers, DONE))
+#: 1 2 DONE
 letters = iter("abcd")
 # A membership test consumes too:
 print("c" in letters, list(letters))
 #: True ['d']
-
-expect(RuntimeError, list, doubled(iter([1, 2])))
-#: [RuntimeError] generator raised StopIteration
-print(list(doubled_ok(iter([1, 2]))))
-#: [2, 4]
 ```
 
 Each question consumes an item.
@@ -918,6 +878,30 @@ because the answer must differ from every value the source could yield.
 `None` collapses an exhausted source and a source that yields `None` into the same reply.
 The built-in `iter()` uses a sentinel the same way in its two-argument form.
 `iter(callable, DONE)` calls `callable` until it hands back `DONE`.
+
+`escaped_stop.py` doubles the items of a stream in two ways,
+once asking with a bare `next()` and once letting a `for` loop ask:
+
+```python
+# escaped_stop.py
+from collections.abc import Iterator
+from exceptions import expect
+
+def doubled(source: Iterator[int]) -> Iterator[int]:
+    # The exception escapes when the source runs out:
+    while True:
+        yield next(source) * 2
+
+expect(RuntimeError, list, doubled(iter([1, 2])))
+#: [RuntimeError] generator raised StopIteration
+
+def doubled_ok(source: Iterator[int]) -> Iterator[int]:
+    for n in source:  # The loop absorbs the exception
+        yield n * 2
+
+print(list(doubled_ok(iter([1, 2]))))
+#: [2, 4]
+```
 
 A `StopIteration` that escapes a generator body becomes a `RuntimeError`
 ([PEP 479](https://peps.python.org/pep-0479/)),

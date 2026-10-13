@@ -8,7 +8,6 @@ def fibonacci(n: int) -> Iterator[int]:
         yield a
         a, b = b, a + b
 
-# __iter__() makes a class iterable. Often a generator:
 @dataclass
 class Countdown:
     start: int
@@ -19,17 +18,5 @@ class Countdown:
             yield n
             n -= 1
 
-# A function using an iterable is decoupled from its source:
 def total(numbers: Iterable[int]) -> int:
     return sum(numbers)
-
-print(list(fibonacci(8)))
-#: [0, 1, 1, 2, 3, 5, 8, 13]
-print(list(Countdown(5)))
-#: [5, 4, 3, 2, 1]
-print(total(fibonacci(8)))  # Works on a generator
-#: 33
-print(total([1, 2, 3, 4]))  # and a list
-#: 10
-print(total(Countdown(5)))  # and a custom iterable
-#: 15

@@ -19,9 +19,3 @@ def flatten(nested: Sequence[Nested]) -> Iterator[int]:
         else:
             # The same loop, delegated
             yield from flatten(item)
-
-data: Sequence[Nested] = [1, [2, 3], [4, [5, 6]], 7]
-print(list(flatten_loop(data)))
-#: [1, 2, 3, 4, 5, 6, 7]
-print(list(flatten(data)))
-#: [1, 2, 3, 4, 5, 6, 7]
