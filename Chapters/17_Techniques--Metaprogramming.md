@@ -23,35 +23,15 @@ display_object(Clay)
 #:   None
 
 x = Clay()
-display_object(x)
-#: [Attributes]
-#:   None
-#: [Methods]
-#:   None
-
 Clay.n = 42  # type: ignore
-display_object(Clay)
-#: [Attributes]
-#:   • n = 42 [CV]
-#: [Methods]
-#:   None
-
 Clay.m = lambda self: f"{self.n = }"  # type: ignore
-display_object(Clay)
+display_object(x)
 #: [Attributes]
 #:   • n = 42 [CV]
 #: [Methods]
 #:   • m(self)
-
 print(x.m())  # type: ignore
 #: self.n = 42
-
-display_object(x)
-#: [Attributes]
-#:   • n = 42 [CV]
-#: [Methods]
-#:   • m(self)
-
 print(vars(x))
 #: {}
 ```
@@ -249,41 +229,37 @@ The dict comprehension in `eager_event_classes.py` builds all seven classes whet
 Seven classes are few enough to build up front.
 With hundreds, the schedule uses few of the classes the comprehension builds.
 So the next version delays building each class until the first lookup asks for it.
-Delaying the build takes a `dict` subclass and a placeholder for the classes not yet built:
+Delaying the build takes a `dict` subclass that builds a class when a lookup misses:
 
 ```python
 # greenhouse.py
 from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
-from typing import ClassVar, cast
+from typing import ClassVar, Final, cast
 
 type EventMaker = Callable[[int, int], Event]
-NOT_CREATED = sentinel("NOT_CREATED")
+NAMES: Final[frozenset[str]] = frozenset({
+    "ThermostatDay", "ThermostatNight", "LightOn",
+    "LightOff", "WaterOn", "WaterOff", "RingBell",
+})
 
-class EventMakers(dict[str, EventMaker | NOT_CREATED]):
-    def __getitem__(self, class_name: str) -> EventMaker:
-        if class_name not in self:
-            raise KeyError(
-                f"Unknown event class: {class_name!r}")
-        maker = super().__getitem__(class_name)
-        if maker is NOT_CREATED:
-            print(f"Creating {class_name}")
-            # Local function to pass to type constructor:
-            def init(self: Event,
-                     hour: int, minute: int) -> None:
-                Event.__init__(
-                    self, class_name, hour, minute)
-            new_cls = type(class_name, (Event,),
-                           {"__init__": init})
-            maker = new_cls
-            self[class_name] = maker
-        return maker
+class EventMakers(dict[str, EventMaker]):
+    def __missing__(self, name: str) -> EventMaker:
+        if name not in NAMES:
+            raise KeyError(f"Unknown event class: {name!r}")
+        print(f"Creating {name}")
+        # Local function to pass to type constructor:
+        def init(self: Event,
+                 hour: int, minute: int) -> None:
+            Event.__init__(self, name, hour, minute)
+        new_cls = type(name, (Event,), {"__init__": init})
+        self[name] = new_cls
+        return new_cls
 
     def built(self) -> str:
-        made = sum(m is not NOT_CREATED
-                   for m in self.values())
-        return f"{made} of {len(self)} event classes built"
+        return (f"{len(self)} of {len(NAMES)}"
+                " event classes built")
 
 @dataclass
 class Event:
@@ -292,15 +268,7 @@ class Event:
     minute: int
     # Registry of all Events
     events: ClassVar[list[Event]] = []
-    _event_maker: ClassVar[EventMakers] = EventMakers({
-        name : NOT_CREATED  # Dict key : value
-        for name in (
-            "ThermostatDay", "ThermostatNight",
-            "LightOn", "LightOff",
-            "WaterOn", "WaterOff",
-            "RingBell",
-        )
-    })
+    _event_maker: ClassVar[EventMakers] = EventMakers()
 
     def __post_init__(self) -> None:
         Event.events.append(self)
@@ -330,18 +298,19 @@ class Event:
 ```
 
 `EventMakers` subclasses `dict` so the laziness is invisible at the call site.
-`Event._event_maker[class_name]` reads as an ordinary lookup,
-and the overridden `__getitem__()` decides whether that lookup returns a class or builds one first.
+`Event._event_maker[class_name]` reads as an ordinary lookup.
+When the key is absent,
+`dict.__getitem__()` calls `__missing__()` and returns its result,
+so `__missing__()` builds the class, stores it under its name,
+and hands it back.
+The next lookup of that name finds the stored class directly.
 The alternative, a `make_event()` function,
-pushes that decision into every caller.
+pushes the build-or-fetch decision into every caller.
 
-`Event._event_maker` starts out holding the seven legitimate event names,
-each paired with the `NOT_CREATED` sentinel as a placeholder.
-Populating that dict reserves the names and builds nothing yet,
-so `EventMakers.__getitem__()` can check a `class_name` against those names before building anything.
-The dict's value type is `EventMaker | NOT_CREATED`,
-naming the sentinel value rather than the generic `sentinel` class,
-so ruling out one member with `maker is NOT_CREATED` leaves `EventMaker` in the other branch.
+`Event._event_maker` starts out empty,
+and `NAMES` beside it holds the seven legitimate event names.
+`__missing__()` checks a name against `NAMES` before building anything,
+so every key the dict acquires names a real event.
 
 Now the end user needs only to write and maintain the schedule file:
 
@@ -385,7 +354,7 @@ Event.run_events()
 ```
 
 The schedule names three of the seven declared event types.
-`built()` counts the values that are no longer `NOT_CREATED`,
+`built()` compares the classes in the dict with the names in `NAMES`,
 so its line states the result: seven classes declared, three built.
 
 `run_events()` puts the type distinction to work.
@@ -482,7 +451,7 @@ the same way an unescaped value breaks out of a hand-built SQL query.
 The `KNOWN_COMMANDS` check closes that hole.
 Only three known names reach the template.
 `EventMakers` carries no such risk,
-because `type(class_name, (Event,), ...)` treats `class_name` as a string value,
+because `type(name, (Event,), ...)` treats `name` as a string value,
 not as source code.
 Treat `exec()` and `eval()` like string-built SQL:
 safe on values you've validated,
@@ -1235,7 +1204,6 @@ though you can still modify the finished class object:
 ```python
 # new_vs_init.py
 from typing import Any
-from display import display_object
 
 class Tag:
     pass
@@ -1259,19 +1227,17 @@ class Meta(type):
 class Built(metaclass=Meta):
     pass
 
-display_object(Built(), dunder=["__new__", "__init__"])
-#: [Attributes]
-#:   • added_in_new = 42 [CV]
-#:   • patched_in_init = 3.14 [CV]
-#: [Methods]
-#:   • __init__(self, /, *args, **kwargs)
-#:   • __new__(*args, **kwargs)
-
+for attr in ("added_in_new", "added_in_init",
+             "patched_in_init"):
+    print(attr, hasattr(Built, attr))
+#: added_in_new True
+#: added_in_init False
+#: patched_in_init True
 print("has Tag base:", Tag in Built.__bases__)
 #: has Tag base: True
 ```
 
-`added_in_init` is missing from the output because `type.__new__()` copies `namespace` into the new class's own `__dict__` as it builds the class.
+`added_in_init` reports `False` because `type.__new__()` copies `namespace` into the new class's own `__dict__` as it builds the class.
 By the time `__init__()` runs, the two mappings are independent,
 so mutating the original dict changes nothing the class can see.
 `setattr(cls, ...)` still works because it modifies the class object.
@@ -2017,8 +1983,8 @@ Without either, `from display import display_object` fails with `ModuleNotFoundE
 ### Choosing Which Dunders to Show
 
 `display_object()` hides standard dunder members by default.
-Pass their names in `dunder` to keep specific ones,
-as `new_vs_init.py` does to show `__new__` and `__init__`.
+Pass their names in `dunder` to keep specific ones.
+`dunder=["__init__"]` shows `__init__` and hides the other dunders.
 Pass the `ALL_DUNDERS` sentinel instead to keep every dunder member,
 including the interpreter's own machinery.
 `dunder`'s type is `Sequence[str] | ALL_DUNDERS | REDEFINED_DUNDERS`,
