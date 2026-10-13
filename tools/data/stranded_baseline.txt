@@ -12,7 +12,6 @@ Chapters/01_Introduction.md	You can read straight through
 Chapters/01_Introduction.md	You should be comfortable with
 Chapters/01_Introduction.md	along with the CODE comments that appear from that chapter on
 Chapters/03_Foundations--Containers.md	Entries come out as easily as they go in
-Chapters/03_Foundations--Containers.md	so changes to that CODE still show through
 Chapters/03_Foundations--Containers.md	write one slice expression for each of
 Chapters/04_Foundations--Control_Flow.md	and the outer CODE (CODE) runs right after
 Chapters/05_Foundations--Functions.md	Nothing checks the arguments on the way in
@@ -37,7 +36,6 @@ Chapters/23_Patterns--Iterators.md	so the type checker carries the element type 
 Chapters/24_Patterns--Singleton.md	People can create as many objects as they like
 Chapters/28_Patterns--Function_Objects.md	Publishing an unhandled event leaves no stray entry behind
 Chapters/28_Patterns--Function_Objects.md	each handler holding a reference to the next and deciding whether to pass the request along
-Chapters/28_Patterns--Function_Objects.md	otherwise leaves a stray entry behind
 Chapters/29_Patterns--Changing_the_Interface.md	Pyright and mypy need their deprecation rule switched on
 Chapters/30_Patterns--Observer.md	A bound method holds the object it came from
 Chapters/30_Patterns--Observer.md	A responder's choice is limited to what it reads and which announcements it acts on

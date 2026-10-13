@@ -10,7 +10,6 @@ Examples/08_Foundations--Static_Types/generic_box.py::Box.content
 Examples/12_Techniques--Data_Classes_as_Types/copy_replace_protocol.py::Color.blue
 Examples/12_Techniques--Data_Classes_as_Types/copy_replace_protocol.py::Color.green
 Examples/14_Techniques--Decorators/pizza_decorator.py::Topping.pizza
-Examples/15_Techniques--Context_Managers/banner_cm.py::banner.title
 Examples/15_Techniques--Context_Managers/expected_one.py::expected_one.kind
 Examples/17_Techniques--Metaprogramming/demo_display_object.py::Fraggle.g
 Examples/17_Techniques--Metaprogramming/demo_display_object.py::Fraggle.h
