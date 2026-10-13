@@ -10,7 +10,7 @@
 <summary>Where to look</summary>
 
 [Simple *Factory Method*](../../Chapters/27_Patterns--Factory.md#simple-factory-method) and [Factory Objects](../../Chapters/27_Patterns--Factory.md#factory-objects) each keep the concrete classes behind a single creation point.
-A new shape needs a class with `draw()` and `erase()`, plus one entry where that creation point chooses by name.
+A new shape needs a class that implements `Shape`'s abstract methods, plus one entry where that creation point chooses by name.
 In the first style that entry is a `case` in `Shape.factory()`.
 In the second it is a nested `Factory` class,
 registered by name in the `FACTORIES` table.
@@ -27,9 +27,6 @@ class Shape(ABC):
     @abstractmethod
     def draw(self) -> None: ...
 
-    @abstractmethod
-    def erase(self) -> None: ...
-
     @staticmethod
     def factory(kind: str) -> Shape:
         ...
@@ -39,26 +36,14 @@ class _Circle(Shape):
     def draw(self) -> None:
         ...
 
-    @override
-    def erase(self) -> None:
-        ...
-
 class _Square(Shape):
     @override
     def draw(self) -> None:
         ...
 
-    @override
-    def erase(self) -> None:
-        ...
-
 class _Triangle(Shape):
     @override
     def draw(self) -> None:
-        ...
-
-    @override
-    def erase(self) -> None:
         ...
 ```
 
@@ -119,9 +104,6 @@ class Shape(ABC):
     @abstractmethod
     def draw(self) -> None: ...
 
-    @abstractmethod
-    def erase(self) -> None: ...
-
     @staticmethod
     def factory(kind: str) -> Shape:
         match kind:
@@ -139,33 +121,19 @@ class _Circle(Shape):
     def draw(self) -> None:
         print("Circle.draw")
 
-    @override
-    def erase(self) -> None:
-        print("Circle.erase")
-
 class _Square(Shape):
     @override
     def draw(self) -> None:
         print("Square.draw")
-
-    @override
-    def erase(self) -> None:
-        print("Square.erase")
 
 class _Triangle(Shape):
     @override
     def draw(self) -> None:
         print("Triangle.draw")
 
-    @override
-    def erase(self) -> None:
-        print("Triangle.erase")
-
 s = Shape.factory("Triangle")
 s.draw()
 #: Triangle.draw
-s.erase()
-#: Triangle.erase
 ```
 
 `shape_factory_objects.py`'s factory-object version instead needs a `_Triangle`
@@ -1181,8 +1149,6 @@ from typing import override
 class Shape(ABC):
     @abstractmethod
     def draw(self) -> None: ...
-    @abstractmethod
-    def erase(self) -> None: ...
     @staticmethod
     def factory(kind: str) -> Shape:
         ...
@@ -1190,14 +1156,10 @@ class Shape(ABC):
 class _Circle(Shape):
     @override
     def draw(self) -> None: ...
-    @override
-    def erase(self) -> None: ...
 
 class _Square(Shape):
     @override
     def draw(self) -> None: ...
-    @override
-    def erase(self) -> None: ...
 
 class _Oval(_Circle):
     @override
@@ -1232,8 +1194,6 @@ from typing import override
 class Shape(ABC):
     @abstractmethod
     def draw(self) -> None: ...
-    @abstractmethod
-    def erase(self) -> None: ...
     @staticmethod
     def factory(kind: str) -> Shape:
         match kind:
@@ -1249,14 +1209,10 @@ class Shape(ABC):
 class _Circle(Shape):
     @override
     def draw(self) -> None: print("Circle.draw")
-    @override
-    def erase(self) -> None: print("Circle.erase")
 
 class _Square(Shape):
     @override
     def draw(self) -> None: print("Square.draw")
-    @override
-    def erase(self) -> None: print("Square.erase")
 
 class _Oval(_Circle):
     @override
@@ -1308,9 +1264,7 @@ sequence, so `shape_name()` materializes the generator with `list()`.
 With the same seed the sequence differs from the chapter's, because
 `choice()` now picks from three classes instead of two.
 
-`_Oval` overrides `draw()` and inherits `erase()` from `_Circle`, so
-an `Oval` still erases as a `Circle`. `Circle` stays in the list as
-well, because recursion adds the deeper classes and keeps the
+`Circle` stays in the list, because recursion adds the deeper classes and keeps the
 intermediate ones. A factory that should build only leaf classes
 needs a further filter, `not cls.__subclasses__()`.
 
