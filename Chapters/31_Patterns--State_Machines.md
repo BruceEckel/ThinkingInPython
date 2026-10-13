@@ -286,9 +286,10 @@ Both derive from `RuntimeError`, `EmptyTable` through `NoTransition`,
 so a caller can catch one failure, both,
 or every `RuntimeError` an action might raise.
 The `KeyError` that `next()` catches carries the input as its key,
-and the `NoTransition` message names that input.
-So `next()` raises `NoTransition` [`from None`](04_Foundations--Control_Flow.md#exception-chaining),
-which drops the chained `KeyError` and its repeat of the input.
+and the `NoTransition` message includes the same input,
+so a chained traceback would show it twice.
+`next()` raises `NoTransition` [`from None`](04_Foundations--Control_Flow.md#exception-chaining),
+which drops the chained `KeyError`.
 
 The state classes and the `MouseTrap` that instantiates them must be defined before the state tables,
 so that the table entries can name the other states.
