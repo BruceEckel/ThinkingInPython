@@ -7,7 +7,7 @@
       <path d="M0.5,0.5 L17.4,6 L0.5,11.5 L5,6 Z" fill="#7a6e62" stroke="#7a6e62" stroke-width="0.8" stroke-linejoin="round"/>
     </marker>
   </defs>
-  <text x="44" y="182" font-size="12" fill="#1a1612" font-weight="bold" text-anchor="start">string_maze</text>
+  <text x="44" y="182" font-size="12" fill="#1a1612" font-weight="bold" text-anchor="start">MAZE</text>
   <text x="70" y="204" font-size="10" fill="#7a6e62" text-anchor="middle">19</text>
   <text x="94" y="204" font-size="10" fill="#7a6e62" text-anchor="middle">20</text>
   <text x="118" y="204" font-size="10" fill="#7a6e62" text-anchor="middle">21</text>

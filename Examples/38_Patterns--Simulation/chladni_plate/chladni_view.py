@@ -13,7 +13,8 @@ MODES: Final[list[Mode]] = [(1, 2), (2, 3), (3, 4), (3, 5)]
 
 def show(grains: int = 1200, step_ms: int = 30,
          frames_per_mode: int = 200) -> None:
-    plate = Plate(grains, MODES[0])
+    modes = itertools.cycle(MODES)
+    plate = Plate(grains, next(modes))
     root = tk.Tk()
     root.title(f"Chladni Plate {plate.mode}")
     canvas = tk.Canvas(root, width=SIZE, height=SIZE,
@@ -25,7 +26,6 @@ def show(grains: int = 1200, step_ms: int = 30,
         canvas.create_oval(0, 0, DOT, DOT, outline="",
                            fill=next(palette))
         for _ in plate.grains]
-    modes = itertools.cycle(MODES[1:] + MODES[:1])
     frames = itertools.count(1)
 
     def frame() -> None:

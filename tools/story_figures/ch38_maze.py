@@ -8,7 +8,7 @@ the code makes: `GameBuilder` builds a `Room` for every character,
 walls included, so a wall is a room whose occupant sends the robot
 back, not a gap in the graph.
 
-The left panel is a real piece of `string_maze` in `game.py`, rows 0-5
+The left panel is a real piece of `MAZE` in `robot_maze.py`, rows 0-5
 and columns 19-23, which holds the `b` teleport pair and a stretch of
 the top border. The right panel is the graph `GameBuilder` makes of
 it, one node per character in the same place: stage 1's rooms, stage
@@ -17,7 +17,7 @@ a door into a wall room is drawn gray), and stage 3's teleport link
 between the two `b` rooms. Row 0 has no neighbor to the north, so
 `Doors.open(Urge.NORTH)` returns the shared `EDGE` room there. Stubs
 at the other three sides show that the maze continues. `FRAGMENT`
-holds rows 0-6 and columns 18-24 of `string_maze` so the stubs can
+holds rows 0-6 and columns 18-24 of `MAZE` so the stubs can
 tell a wall neighbor from an open one; recheck it if the maze changes.
 """
 
@@ -26,7 +26,7 @@ from tools.story_figures import (BOX, INK, MUTED, RED, SHADE, arrow, line,
 
 STEM = "maze_graph"
 W, H = 720, 560
-# string_maze rows 0-6, columns 18-24; the figure draws rows 0-5 and
+# MAZE rows 0-6, columns 18-24; the figure draws rows 0-5 and
 # columns 19-23, and uses the outer ring only for the stubs.
 FRAGMENT = [
     "#######",
@@ -135,7 +135,7 @@ def edge_room() -> str:
 
 
 def maze_text() -> str:
-    b = text(TX - 26, TY - 44, "string_maze", 12, INK, bold=True)
+    b = text(TX - 26, TY - 44, "MAZE", 12, INK, bold=True)
     for col in COLS:
         b += text(TX + (col - COLS[0]) * TS, TY - 22, str(col), 10, MUTED,
                   "middle")

@@ -1,9 +1,9 @@
 # robot_explorer/robot_demo.py
 from game import GameBuilder
-from robot_maze import string_maze
+from robot_maze import MAZE
 from solver import solve
 
-game = GameBuilder(string_maze)
+game = GameBuilder(MAZE)
 print("start:")
 #: start:
 print(game.show_maze())

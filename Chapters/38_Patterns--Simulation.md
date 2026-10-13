@@ -382,13 +382,13 @@ RING: Final[str] = """\
 class CountingBlackboard(Blackboard):
     def __init__(self, maze: Maze) -> None:
         super().__init__(maze)
-        self.taken = 0
+        self.rejections = 0
 
     @override
     def claim(self, x: int, y: int) -> bool:
         won = super().claim(x, y)
         if not won and self.maze.is_open(x, y):
-            self.taken += 1
+            self.rejections += 1
         return won
 
 async def main() -> None:
@@ -398,15 +398,17 @@ async def main() -> None:
     for message in blackboard.messages:
         print(message)
     backtracks = len(blackboard.visited) - 1
-    print(f"{blackboard.taken} rejections, "
-          f"{backtracks} from backtracking alone.")
+    contested = blackboard.rejections - backtracks
+    print(f"{blackboard.rejections} rejections: "
+          f"{backtracks} backtracking, "
+          f"{contested} contested.")
 
 asyncio.run(main())
 #: Rat 1 starts at (1, 1).
 #: Rat 2 starts at (2, 1).
 #: Rat 1 dead-ends at (2, 3).
 #: Rat 2 dead-ends at (3, 3).
-#: 9 rejections, 7 from backtracking alone.
+#: 9 rejections: 7 backtracking, 2 contested.
 ```
 
 The entry has two open neighbors,
@@ -889,12 +891,14 @@ The robot is the one item that moves,
 so its cell gets an `Empty` occupant and behaves like any other empty room once the robot moves away.
 `show_maze()` draws the `R` by checking which room the robot is in rather than reading an occupant.
 
-`robot_maze.py` holds the maze as text in `string_maze`, which the demo,
-the tests, and the view import:
+`robot_maze.py` holds the maze as text in `MAZE`, which the demo, the tests,
+and the view import:
 
 ```python
 # robot_explorer/robot_maze.py
-string_maze = """
+from typing import Final
+
+MAZE: Final[str] = """
 ###############################
 #R#.____#____.#_______#_______#
 #_###_#_###_#_#_#_#####_#####_#
@@ -1000,10 +1004,10 @@ The path `solve()` returns is the string `run()` expects:
 ```python
 # robot_explorer/robot_demo.py
 from game import GameBuilder
-from robot_maze import string_maze
+from robot_maze import MAZE
 from solver import solve
 
-game = GameBuilder(string_maze)
+game = GameBuilder(MAZE)
 print("start:")
 #: start:
 print(game.show_maze())
@@ -1083,11 +1087,11 @@ A last step back west shows the food cell empty:
 # robot_explorer/test_robot.py
 from game import GameBuilder
 from items import EndGame
-from robot_maze import string_maze
+from robot_maze import MAZE
 from solver import solve
 
 def test_search_walks_the_robot_to_the_end() -> None:
-    game = GameBuilder(string_maze)
+    game = GameBuilder(MAZE)
     game.run(solve(game))
     # Finished on the "!"
     assert isinstance(game.robot.room.occupant, EndGame)
@@ -1121,7 +1125,7 @@ import tkinter as tk
 from typing import Final
 from game import GameBuilder
 from items import Urge
-from robot_maze import string_maze
+from robot_maze import MAZE
 from solver import solve
 
 CELL: Final[int] = 20
@@ -1132,7 +1136,7 @@ MOVES: Final[dict[str, Urge]] = {
     "n": Urge.NORTH, "s": Urge.SOUTH,
     "e": Urge.EAST, "w": Urge.WEST}
 
-def show(maze: str = string_maze,
+def show(maze: str = MAZE,
          step_ms: int = 80) -> None:
     game = GameBuilder(maze)
     moves = solve(game)
@@ -1424,7 +1428,8 @@ MODES: Final[list[Mode]] = [(1, 2), (2, 3), (3, 4), (3, 5)]
 
 def show(grains: int = 1200, step_ms: int = 30,
          frames_per_mode: int = 200) -> None:
-    plate = Plate(grains, MODES[0])
+    modes = itertools.cycle(MODES)
+    plate = Plate(grains, next(modes))
     root = tk.Tk()
     root.title(f"Chladni Plate {plate.mode}")
     canvas = tk.Canvas(root, width=SIZE, height=SIZE,
@@ -1436,7 +1441,6 @@ def show(grains: int = 1200, step_ms: int = 30,
         canvas.create_oval(0, 0, DOT, DOT, outline="",
                            fill=next(palette))
         for _ in plate.grains]
-    modes = itertools.cycle(MODES[1:] + MODES[:1])
     frames = itertools.count(1)
 
     def frame() -> None:

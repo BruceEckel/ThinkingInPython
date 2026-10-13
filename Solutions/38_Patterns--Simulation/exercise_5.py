@@ -40,7 +40,7 @@ def food(room: Room) -> bool:
 def end(room: Room) -> bool:
     return isinstance(room.occupant, EndGame)
 
-string_maze = """
+MAZE: Final[str] = """
 ###############################
 #R#.____#____.#_______#_______#
 #_###_#_###_#_#_#_#####_#####_#
@@ -64,7 +64,7 @@ string_maze = """
 ###############################
 """.strip()
 
-game = GameBuilder(string_maze)
+game = GameBuilder(MAZE)
 meals = 0
 moves = 0
 while (leg := solve(game, food)) is not None:

@@ -1,11 +1,11 @@
 # robot_explorer/test_robot.py
 from game import GameBuilder
 from items import EndGame
-from robot_maze import string_maze
+from robot_maze import MAZE
 from solver import solve
 
 def test_search_walks_the_robot_to_the_end() -> None:
-    game = GameBuilder(string_maze)
+    game = GameBuilder(MAZE)
     game.run(solve(game))
     # Finished on the "!"
     assert isinstance(game.robot.room.occupant, EndGame)

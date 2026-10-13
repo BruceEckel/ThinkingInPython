@@ -3,7 +3,7 @@ import tkinter as tk
 from typing import Final
 from game import GameBuilder
 from items import Urge
-from robot_maze import string_maze
+from robot_maze import MAZE
 from solver import solve
 
 CELL: Final[int] = 20
@@ -14,7 +14,7 @@ MOVES: Final[dict[str, Urge]] = {
     "n": Urge.NORTH, "s": Urge.SOUTH,
     "e": Urge.EAST, "w": Urge.WEST}
 
-def show(maze: str = string_maze,
+def show(maze: str = MAZE,
          step_ms: int = 80) -> None:
     game = GameBuilder(maze)
     moves = solve(game)

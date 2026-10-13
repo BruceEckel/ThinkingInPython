@@ -1,5 +1,7 @@
 # robot_explorer/robot_maze.py
-string_maze = """
+from typing import Final
+
+MAZE: Final[str] = """
 ###############################
 #R#.____#____.#_______#_______#
 #_###_#_###_#_#_#_#####_#####_#
