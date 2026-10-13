@@ -62,13 +62,14 @@ print(function5())
 #: function5 in module5 in a_package
 ```
 
-The `"importing module5..."` message prints once, no matter how
+The `"importing module5..."` message prints once, however
 many of the three import styles you combine. Python caches every
 module in `sys.modules` on its first import, keyed by the module's
 full dotted name. A later `import` of the same module, in any of
-these forms, finds the cached module and skips running its top-level
-code again. It binds the names the statement requests, taken from the
-cached module. The package's `__init__.py` runs once for the same
+these forms, takes the module from the cache instead of running its
+top-level code again,
+and then binds the names it requests.
+The package's `__init__.py` runs once for the same
 reason.
 
 </details>
@@ -87,7 +88,7 @@ reason.
 <summary>Where to look</summary>
 
 [Imports Within a Package](../../Chapters/06_Foundations--Modules_and_Packages.md#imports-within-a-package) covers a module that imports a sibling, and [Nested Packages](../../Chapters/06_Foundations--Modules_and_Packages.md#nested-packages) shows the two-level import.
-`module6` reaches `module5` across a package boundary, so write the import with its full `a_package.` path.
+`module6` imports `module5` from its parent package, so write the import with its full `a_package.` path.
 For the rename, compare `bPackage` with the naming advice in [File Names](../../Chapters/06_Foundations--Modules_and_Packages.md#file-names).
 
 <details>
@@ -107,7 +108,7 @@ def function6():
 If you write the import as `from module5 import function5`, dropping the `a_package.` prefix,
 both packages initialize and then `use_module6.py` stops with `ModuleNotFoundError: No module named 'module5'`.
 Python looks for a top-level `module5` on `sys.path`,
-and no directory there holds a `module5.py`, because the file lives inside `a_package`.
+but `module5.py` sits one level down, inside the `a_package` directory.
 The full dotted path names `module5` through the package that contains it,
 so the solution writes `from a_package.module5 import function5`.
 
@@ -141,27 +142,28 @@ print(function6())
 #: function6 calls function5 in module5 in a_package
 ```
 
-**Reach the parent package's module.** The import crosses a package boundary, from `b_package` up to
-`a_package`, so the absolute form is the right choice here. The
+**Import from the parent package.** `module6` is in `b_package` and imports a module from
+`a_package`, its parent, so the absolute form is the right choice here. The
 relative equivalent, `from ..module5 import function5`, works too.
-Prefer the relative form only for siblings within one package.
+Keep the relative form for siblings within one package.
 
 **Load the import chain first.** Python initializes both packages before it runs `module6`. `module5`
-then loads before `module6` finishes loading, because `module6`'s
-own import runs while its body is executing. All four messages
+then loads before `module6` finishes loading, because the import at
+the top of `module6` runs before the rest of its body. All four messages
 therefore print before the script's own `print()` runs.
 
 After you rename the directory to `bPackage` and update the import to
 `a_package.bPackage.module6`, the script still runs. Python accepts
-any valid identifier as a package name. The rename gives up what
-the convention provides.
+any valid identifier as a package name, so the rename breaks a
+convention, not a rule.
+
 [File Names](../../Chapters/06_Foundations--Modules_and_Packages.md#file-names) calls
 for short, all-lowercase package names, so `bPackage` stands out as
 something other than a package to anyone scanning an import line.
 Its capital letter also makes the name easy to mistype. On a
 case-insensitive filesystem the shell and the editor accept `bpackage`
-as well, and Python's case-sensitive import check, the one
-exercise 4 examines, rejects `bpackage`.
+as well, but Python's import check compares case and rejects `bpackage`.
+Exercise 4 examines that check.
 
 </details>
 </details>
@@ -239,7 +241,7 @@ print("after both")
 ```
 
 Although the `lazy import noisy` line comes first, `noisy`'s body
-waits for `noisy.announce()`, and that call comes after
+runs at `noisy.announce()`, and that call comes after
 `noisy2.announce()`. Each `lazy import` binds the name and defers the
 load. The module's top-level code runs at the first use of that name,
 so use order, not declaration order, decides which module loads
@@ -265,50 +267,51 @@ first.
 <summary>Where to look</summary>
 
 [File Names](../../Chapters/06_Foundations--Modules_and_Packages.md#file-names) explains how Python compares an import name with the file name on disk.
-The filesystem may treat the two names as one file, but the import system reads the directory listing and decides for itself.
-The `PYTHONCASEOK` environment variable switches that comparison off, which tests your explanation.
+The filesystem may treat the two names as one file, but the import system reads the directory listing and makes its own comparison.
+The `PYTHONCASEOK` environment variable switches that comparison off, so setting it tests your explanation.
 
 <details>
 <summary>Solution</summary>
 
 The `import Module` statement resolves, because the name and the file
-agree, and the call in the body becomes `Module.useful_function()` to
-match. Left as `module.useful_function()`, the call raises a
+agree.
+The call in `use_module.py` becomes `Module.useful_function()` to match. Left as `module.useful_function()`, the call raises a
 `NameError`.
 Changing the import back to `import module` while the file is still
 `Module.py` raises
-`ModuleNotFoundError: No module named 'module'. Did you mean: 'Module'?`,
-and it does so on every platform, Windows and macOS included. The
+`ModuleNotFoundError: No module named 'module'. Did you mean: 'Module'?`
+on every platform, Windows and macOS included. The
 suggestion shows that `Module.py` sits on the search path under a
 name that differs in case alone.
 
 The failure on Windows and macOS is the surprising part. Windows's
 NTFS and macOS's default filesystem both open `module.py` and
-`Module.py` as the same file, so the filesystem would hand Python
-the file under either name. Python declines it.
+`Module.py` as the same file, so an open by either name would succeed.
+Python checks the module name before it opens anything.
 Its import machinery reads the directory listing and compares the
-module name against the name on disk case-sensitively, so
-`"module" + ".py"` does not match the stored `Module.py` and the
-search moves on.
+module name against the name on disk case-sensitively.
+To that comparison, `"module" + ".py"` and the stored `Module.py` differ,
+so Python moves on to the next directory on `sys.path`.
 
 The case check is deliberate, and
-[PEP 235](https://peps.python.org/pep-0235/) says why. Without it, a
+[PEP 235](https://peps.python.org/pep-0235/) says why. Without the check, a
 program written on Windows imports cleanly there and fails the first
 time it runs on Linux, where the two names really are different
-files. Making the case rule the same everywhere turns a portability
-bug that surfaces in someone else's CI into one that surfaces on your
-own machine.
+files. Because the case rule is the same everywhere, an import whose
+case differs from its file fails on your own machine instead of in
+someone else's CI.
 
 Setting `PYTHONCASEOK` in the environment turns the check off on a
 case-insensitive platform, and `import module` then finds `Module.py`.
-A variable that Python reads switches the check off, which confirms
-the check belongs to Python rather than to the filesystem. The
+Python reads that variable, and the filesystem ignores it.
+The variable's effect therefore confirms that Python, not the
+filesystem, compares the names. The
 variable exists for legacy code, so leave it unset in new code.
 
-Following the convention avoids all of this.
+Following the naming convention prevents the mismatch.
 [File Names](../../Chapters/06_Foundations--Modules_and_Packages.md#file-names)
 recommends `snake_case` for modules, and with an all-lowercase name,
-an import and its file cannot differ in case.
+an import and its file always match in case.
 
 </details>
 </details>
@@ -325,7 +328,7 @@ an import and its file cannot differ in case.
 
 [Imports Within a Package](../../Chapters/06_Foundations--Modules_and_Packages.md#imports-within-a-package) shows `module4`'s relative import, and [`PYTHONPATH`](../../Chapters/06_Foundations--Modules_and_Packages.md#pythonpath) describes where Python searches for top-level names.
 A relative import needs the module's `__package__`, and a file run as a script has none.
-An absolute import needs the project root on `sys.path`, which depends on the source of the first entry.
+An absolute import needs the project root on `sys.path`, and the command you run decides the path's first entry.
 Compare what `python file.py` and `python -m package.module` put there.
 
 <details>
@@ -333,8 +336,8 @@ Compare what `python file.py` and `python -m package.module` put there.
 
 Changing `a_package/module4.py` to
 `from a_package.module1 import function1` leaves `use_module4.py`
-working as before. Both forms find the same function. They
-differ only in how they name it.
+working as before. Both forms find the same function and
+differ in how they name it.
 
 Running the module as a script fails either way, with different errors.
 With the relative import, `python a_package/module4.py` reports:
@@ -353,21 +356,23 @@ With the absolute import, the same command reports:
 ModuleNotFoundError: No module named 'a_package'. Did you mean: 'b_package'?
 ```
 
-The name is now fully qualified, so the parent question does not
-arise. But `sys.path[0]` is the directory of the script you ran,
-`a_package/`. The project root is nowhere on the path, so the
-search for a top-level package called `a_package` fails. Python is
-inside the package, looking for it. The suggestion names `b_package`,
+The name is now fully qualified, so Python resolves it from
+`sys.path` alone. But `sys.path[0]` is the directory of the script you ran,
+`a_package/`,
+so Python searches the `a_package/` directory for `a_package`.
+The project root is nowhere on the path, so the
+search for a top-level package called `a_package` fails.
+The suggestion names `b_package`,
 the one package Python does find on that path.
 
-`python -m a_package.module4` works with either form, and fixes both
+`python -m a_package.module4` works with either form and fixes both
 problems at once. `-m` sets `sys.path[0]` to the current directory
-rather than the script's, so `a_package` is findable. It also imports
-the module as a member of its package rather than running a loose
-file, so `__package__` holds `a_package` and the dot resolves.
+rather than the script's, so Python finds `a_package`. `-m` also imports
+the module as a member of its package rather than running the file
+by its path, so `__package__` holds `a_package` and the dot resolves.
 
-A module inside a package is not a script. `-m` is how you run a
-package module, and a file you intend to run with `python file.py`
+Because a module inside a package runs as a member of that package,
+you run it with `-m`. A file you intend to run with `python file.py`
 belongs at the top level, outside any package.
 
 </details>
@@ -432,14 +437,15 @@ print(sorted(n for n in dir() if not n.startswith("__")))
 ```
 
 Without `__all__`, the star import falls back to the underscore
-convention: every top-level name that does not start with an
-underscore arrives. `undeclared` therefore joins `public` and
+convention.
+The star import binds every top-level name that does not start with an
+underscore. `undeclared` therefore joins `public` and
 `helper`, and `_internal` stays out. Restoring the `__all__` line
-shrinks the surface back to `public` and `helper`.
+limits the star import to `public` and `helper` again.
 
-When a module defines `__all__`, the star import ignores the
-underscore convention. A listed name arrives with or without a
-leading underscore, and an unlisted name stays out. Without
+When a module defines `__all__`, that list replaces the
+underscore convention. The star import binds each listed name,
+leading underscore or not, and leaves every other name in the module. Without
 `__all__`, the underscore is the one way to keep a name out of a star
 import.
 
@@ -496,15 +502,17 @@ object. Appending changes that object, and both names show the new
 item.
 
 **Replace the module's list.** The assignment `plugin_list.plugins = []` rebinds the module's
-name to a second list and leaves the script's name on the first, so
+name to a second list.
+The script's name still references the first list, so
 the `append()` at `[1]` changes the second list and leaves the script's
 list as it was.
 
 `exercise_7.py` is `from_snapshot.py` with a mutable value. The
-`from` import takes no copy, and its name stays on the original
-object when the module's name moves. When a module's name can move to a new
-list or dict, import the module and read `plugin_list.plugins` each
-time.
+`from` import shares the module's object.
+After the module rebinds its own name, the script's name still
+references the original object. When a module may rebind a name to a new
+list or dict, import the module and read the name through it each
+time, as in `plugin_list.plugins`.
 
 </details>
 </details>
