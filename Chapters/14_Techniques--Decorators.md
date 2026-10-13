@@ -643,8 +643,7 @@ class count_calls[**P, R]:
         return self.func(*args, **kwargs)
 
 @count_calls
-def hello() -> None:
-    print("hello")
+def hello() -> None: ...
 
 if __name__ == "__main__":
     hello()
@@ -652,9 +651,7 @@ if __name__ == "__main__":
     # The state lives on the decorator instance
     print(hello.count)
 #: call 1 of hello
-#: hello
 #: call 2 of hello
-#: hello
 #: 2
 ```
 
