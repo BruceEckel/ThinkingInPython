@@ -49,10 +49,11 @@ def _(flower: Chrysanthemum, eater: str) -> str:
 <summary>Solution</summary>
 
 If you make `pollinate()` a `singledispatch` function too, the program
-prints the same four lines, and `pollinate.registry` holds one key,
-`object`, for the default. With no registration to choose, every
-call runs the default body, so the decorator adds a dispatch step that
-decides nothing. The solution keeps `pollinate()` an ordinary function
+prints the same four lines.
+`pollinate.registry` then holds one key, `object`, for the default,
+so every call runs the default body.
+The decorator's one effect is a registry lookup on each call.
+The solution keeps `pollinate()` an ordinary function
 and saves `@singledispatch` for `eat()`, the one operation whose answer
 depends on the flower type.
 
@@ -91,8 +92,8 @@ for flower in (Ranunculus(), Chrysanthemum()):
 #: Chrysanthemum is toxic to Worm
 ```
 
-Everything on the visitor side disappears: the `Visitor` base, `Bug`,
-`Pollinator`, `Predator`, `Bee`, `Fly`, and `Worm`, and the two
+Everything on the visitor side disappears: seven classes (`Visitor`,
+`Bug`, `Pollinator`, `Predator`, `Bee`, `Fly`, `Worm`) and their two
 `visit()` methods. `Flower` loses `accept()`, and with it the `Any`
 annotation the chapter explains. `Flower` also loses `pollinate()` and
 `eat()`, which become functions outside the hierarchy.
@@ -100,16 +101,18 @@ annotation the chapter explains. `Flower` also loses `pollinate()` and
 functions and one registration remain.
 
 The `Bug` classes hold no state. `Pollinator` and `Predator` each
-exist to name one operation, and `Bee`, `Fly`, and `Worm` exist
-to be types the second dispatch can resolve. Once the operation is a
+exist to name one operation.
+`Bee`, `Fly`, and `Worm` exist to be types for the `visit()` dispatch to resolve. Once the operation is a
 function, the call site names it. `pollinate(flower, "Bee")` says what
 `flower.accept(bee)` says with a class and a method.
 
 You lose one thing: holding a visitor in a variable and passing it
-around as an object. When that matters, the function is still a value.
-`op = eat` works, and a `dict[str, Callable[[Flower, str], str]]` keyed by
-operation name recovers the "choose an operation at runtime" half of
-what the `Visitor` hierarchy provides, without the classes.
+around as an object. When that matters, pass the function instead, since a function is a value too.
+`op = eat` works.
+A `dict[str, Callable[[Flower, str], str]]` keyed by
+operation name lets a program choose an operation at runtime,
+as a `Visitor` hierarchy does,
+without the classes.
 
 </details>
 </details>
@@ -190,10 +193,10 @@ def _(flower: Rose) -> str:  # 3 lines
 <details>
 <summary>Solution</summary>
 
-If you add the `Rose` class without registering it with `nectar()` and `fragrance()`,
-both operations fall back to their defaults,
+If you add the `Rose` class alone,
+`nectar()` and `fragrance()` both fall back to their defaults,
 and the demo prints `Rose: no nectar / faint / sharp`.
-Neither the interpreter nor the type checker reports the omission, so the wrong answer goes unnoticed.
+The interpreter and the type checker both accept that version, so the wrong answer arrives as ordinary output.
 The solution registers `Rose` with every operation whose default is wrong for a rose.
 
 ```python
@@ -261,18 +264,22 @@ of its two registrations, one per operation whose default is wrong for
 a rose.
 
 **Add an operation.** `thorns()` needs six lines: three for the function and three
-for the one flower that differs. Neither change edits an existing line.
+for the one flower that differs.
 
+Both changes add lines and leave every existing line as it was.
 Here the operation takes fewer lines to add than the type. `thorns()`
 needs one registration, because three of the four flowers accept its
 default. `Rose` differs from the default in both existing operations,
-so it needs a registration in each. The new operation also sits in one
-place, while the new type's registrations scatter across the file.
+so it needs a registration in each.
+
+The new operation also sits in one
+place, while the new type's two registrations sit in two places,
+each beside the operation it extends.
 That difference is the
-[expression problem](../../Chapters/13_Techniques--Pattern_Matching.md#the-expression-problem):
-methods on a class keep a new type in one place, functions over a
-hierarchy keep a new operation in one place, and no arrangement does
-both at once.
+[expression problem](../../Chapters/13_Techniques--Pattern_Matching.md#the-expression-problem).
+Methods on a class keep a new type in one place,
+and functions over a hierarchy keep a new operation in one place.
+No arrangement does both at once.
 
 </details>
 </details>
@@ -289,8 +296,8 @@ both at once.
 <summary>Where to look</summary>
 
 [Two Departures from the Classic Shape](../../Chapters/33_Patterns--Visitor.md#two-departures-from-the-classic-shape) shows a `Protocol` with a single `visit()` method as the type of the `accept()` parameter.
-Because a `Protocol` matches by structure, `Bee` needs no change.
-Run the `Beetle` call through the type checker and then through the interpreter, and note which one objects and at what point.
+Because a `Protocol` matches by structure, `Bee` stays as it is.
+Run the `Beetle` call through the type checker and then through the interpreter, and note which one reports the mistake, and when.
 
 <details>
 <summary>The shape</summary>
@@ -338,8 +345,8 @@ class Beetle(Bug):  # Inherits no visit()
 If you annotate the `accept()` parameter as `Visitor` instead of `Visits`,
 `ty` reports an `unresolved-attribute` on `visitor.visit`,
 because the empty `Visitor` base declares no `visit()`.
-The `Beetle` call then passes the checker, since `Beetle` is a `Visitor`,
-and fails at runtime with the same `AttributeError` as under `Any`.
+The `Beetle` call then passes the checker, since `Beetle` is a `Visitor`.
+At runtime the call raises the same `AttributeError` as it does under `Any`.
 The solution annotates the parameter with `Visits`, which names the method `accept()` calls.
 
 ```python
@@ -386,33 +393,34 @@ expect(AttributeError, Gladiolus().accept, Beetle())  # type: ignore
 ```
 
 **Declare the visitor's interface.** `Visits` names the one method `accept()` calls, so the parameter
-declares what `accept()` needs instead of accepting anything. `Bee`
-neither mentions `Visits` nor inherits from it, because a `Protocol`
-matches on structure. Any class with a compatible `visit()`
-satisfies `Visits`.
+declares what `accept()` needs instead of accepting anything.
+A `Protocol` matches on structure,
+so `Bee` matches `Visits` through the `visit()` it inherits from `Pollinator`.
+Any class with a compatible `visit()`
+satisfies `Visits`, whatever its base classes.
 
-The `Visitor` classes keep the chapter's form. The listing keeps
-`Visitor`, `Bug`, `Pollinator`, and `Bee` from them and drops `Fly`
-and the eating half.
+The listing keeps the chapter's `Visitor`, `Bug`, `Pollinator`, and
+`Bee` as they are. It drops `Fly`, `Ranunculus`, and the eating half:
+`eat()`, `Chrysanthemum`, `Predator`, and `Worm`.
 
-The two versions report the `Beetle` mistake at different times. Under
-`Any`, the type checker has no interface against which to compare
-`Beetle`, so the call type-checks and the program dies at runtime with the
-`AttributeError` above. Under `Visits`, the type checker rejects the argument
-before the program runs, because `Beetle` inherits no `visit()` and so
-does not match the protocol.
+The `Any` and `Visits` versions report the `Beetle` mistake at different times. Under
+`Any`, the type checker accepts every argument, so the call type-checks.
+At runtime `accept()` raises the `AttributeError` above.
+Under `Visits`, the type checker rejects the argument before the program runs,
+because `Visits` requires a `visit()` method and `Beetle` inherits none.
 
 **Demonstrate the runtime failure.** The `# type: ignore` comment
-keeps the checker quiet about the `Beetle` call so the listing can
-show the runtime failure. Without it, `ty` reports an
+suppresses the checker's report on the `Beetle` call so the listing can
+show the runtime failure. If you remove the comment, `ty` reports an
 `invalid-argument-type`.
 
-Keeping `Any` gives up the check on the visitor side, as the chapter
-says. The `Any` moves
-an error a type checker can catch into the run. The chapter's version
-keeps the `Any` because its `Visitor` base is empty. Either fix
-restores the check: declaring `visit()` abstract on that base, as the
-classic pattern does, or writing the `Visits` protocol above.
+As the chapter says, `Any` gives up every check on the visitor side,
+so a bad visitor that the type checker could report before the program runs
+shows up as a runtime `AttributeError` instead.
+The chapter's version needs the `Any` because its `Visitor` base is empty.
+Two fixes restore the check:
+declaring `visit()` abstract on that base, as the classic pattern does,
+or annotating the parameter with the `Visits` protocol, as this solution does.
 
 </details>
 </details>
