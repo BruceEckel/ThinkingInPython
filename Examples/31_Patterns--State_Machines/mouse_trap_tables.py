@@ -33,8 +33,7 @@ class MouseTrap(StateMachine):
     def __init__(self) -> None:
         super().__init__(MouseTrap.waiting)
 
-# Every state object now exists, so each table can name
-# its next states directly:
+# Each table can name its next states directly:
 MouseTrap.waiting.transitions = {
     MouseAction.APPEARS: MouseTrap.luring,
 }

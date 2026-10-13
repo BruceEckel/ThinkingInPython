@@ -651,7 +651,7 @@ table is the stricter of the two.
 
 [The Engine](../../Chapters/31_Patterns--State_Machines.md#the-engine) tries the rows under a `(state, input type)` key in order and takes the first whose condition passes.
 Put a guarded row for the heavy load ahead of an unconditional row, and let the condition read the load from the machine.
-For the stray `Start`, see how [A View for the Vending Machine](../../Chapters/31_Patterns--State_Machines.md#a-view-for-the-vending-machine) treats a rejected click, then weigh a control panel's stray presses against a cycle that stops.
+For the stray `Start`, see how [An Unexpected Input](../../Chapters/31_Patterns--State_Machines.md#an-unexpected-input) weighs staying in the same state against raising an exception, then weigh a control panel's stray presses against a cycle that stops.
 
 <details>
 <summary>The shape</summary>
@@ -816,8 +816,8 @@ own, so the condition reads `load_kg` off the machine, where
 before it runs any action.
 
 For a washing machine the caller should
-ignore the press, catching `NoTransition` and continuing, as
-`vending_view.py`'s `send()` does. A control panel is a source of
+ignore the press, catching `NoTransition` and continuing.
+A control panel is a source of
 stray presses, and a cycle that stops because
 someone leans on a button is the worse failure. Raising the
 exception is still the right default for the engine. A caller can
@@ -986,7 +986,7 @@ print(elevator.state)
 ```
 
 **Choose a direction from the call.** The `(IDLE, CallButton)` key holds three candidate rows, in the vending machine's
-`(State.SELECTING, SecondDigit)` shape: candidate transitions share
+`(State.SELECTING, Column)` shape: candidate transitions share
 one key, `handle()` tries them in order, and the first whose condition
 passes wins. `above()` and `below()` pick `MOVING_UP` or
 `MOVING_DOWN`, and a call for the current floor falls through both
@@ -1258,7 +1258,7 @@ money, so a machine with five states and six coins carries thirty rows
 that all do the same thing.
 
 Fix 1 is the right fix when the new subclass really does behave
-differently, as `FirstDigit` and `SecondDigit` do in
+differently, as `Row` and `Column` do in
 `vending_machine.py`. They exist as separate classes so they arrive
 under different keys.
 

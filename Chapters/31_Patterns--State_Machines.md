@@ -272,7 +272,7 @@ so the unchanged `StateMachine` from `state_machine.py` drives every `TableState
 The constructor starts each state with an empty dict,
 so a state whose table you forget to fill reports `Waiting: no transition on ...` rather than an `AttributeError` for a missing attribute.
 The `KeyError` that `next()` catches carries the input as its key,
-and the `RuntimeError` message already names that input.
+and the `RuntimeError` message names that input.
 So `next()` raises its `RuntimeError` [`from None`](04_Foundations--Control_Flow.md#exception-chaining),
 which drops the chained `KeyError` and its repeat of the input.
 
@@ -439,7 +439,7 @@ and the table is an ordinary `dict`.
 The inputs change shape too.
 The mousetrap's inputs are `MouseAction` members, bare names.
 The vending machine's inputs carry values: what a coin is worth,
-which digit the user pressed.
+which row or column the user pressed.
 So each input becomes an object of its own class,
 and the table keys on that class rather than on a value.
 An enum is the wrong shape here for two reasons.
@@ -524,7 +524,7 @@ so a caller can catch the specific failure instead of every `RuntimeError` an ac
 
 One table now defines the whole machine.
 The conditions and actions are ordinary methods, stored in the table.
-The machine collects money, takes a two-digit selection,
+The machine collects money, takes a selection as a row and then a column,
 then either dispenses the item, reports it sold out,
 or clears a selection that costs more than the money inserted.
 
@@ -532,8 +532,8 @@ or clears a selection that costs more than the money inserted.
 
 `Money` moves the machine from `QUIESCENT` to `COLLECTING`,
 and more `Money` keeps it there.
-A first digit moves it to `SELECTING`.
-A second digit moves it to one of three states, decided by price and stock.
+A `Row` moves it to `SELECTING`.
+A `Column` moves it to one of three states, decided by price and stock.
 `Quit` refunds from any of the other states back to `QUIESCENT`.
 
 The states are an `Enum`,
@@ -572,17 +572,16 @@ class Quit:
         return "Quit"
 
 @dataclass
-class Digit:
-    name: str
+class Key:
     value: int
 
+class Row(Key):
     def __str__(self) -> str:
-        return self.name
+        return "ABCD"[self.value]
 
-class FirstDigit(Digit):
-    pass
-class SecondDigit(Digit):
-    pass
+class Column(Key):
+    def __str__(self) -> str:
+        return f"col {self.value}"
 
 @dataclass
 class ItemSlot:
@@ -592,8 +591,8 @@ class ItemSlot:
 class VendingMachine(StateMachine):
     def __init__(self) -> None:
         self.amount = 0  # Money inserted, in cents
-        self.row = 0  # The first selection digit
-        # Last action, for a view to display
+        self.row = 0  # The selected row
+        # Last action, for the caller to show
         self.message = ""
         # A 4x4 grid; column c costs (c + 1) * 25 cents:
         self.items = [[ItemSlot((c + 1) * 25, 5)
@@ -608,11 +607,11 @@ class VendingMachine(StateMachine):
                 [(None, self.add_money, State.COLLECTING)],
             (State.COLLECTING, Quit):
                 [(None, self.refund, State.QUIESCENT)],
-            (State.COLLECTING, FirstDigit):
+            (State.COLLECTING, Row):
                 [(None, self.choose_row, State.SELECTING)],
             (State.SELECTING, Quit):
                 [(None, self.refund, State.QUIESCENT)],
-            (State.SELECTING, SecondDigit): [
+            (State.SELECTING, Column): [
                 (self.too_expensive, self.clear,
                  State.COLLECTING),
                 (self.sold_out, self.clear,
@@ -621,39 +620,42 @@ class VendingMachine(StateMachine):
             ],
             (State.UNAVAILABLE, Quit):
                 [(None, self.refund, State.QUIESCENT)],
-            (State.UNAVAILABLE, FirstDigit):
+            (State.UNAVAILABLE, Row):
                 [(None, self.choose_row, State.SELECTING)],
             (State.WANT_MORE, Quit):
                 [(None, self.refund, State.QUIESCENT)],
-            (State.WANT_MORE, FirstDigit):
+            (State.WANT_MORE, Row):
                 [(None, self.choose_row, State.SELECTING)],
         }
         super().__init__(State.QUIESCENT, table)
 
-    def _slot(self, col: SecondDigit) -> ItemSlot:
+    def _slot(self, col: Column) -> ItemSlot:
         return self.items[self.row][col.value]
 
     # Conditions:
-    def too_expensive(self, col: SecondDigit) -> bool:
+    def too_expensive(self, col: Column) -> bool:
         return self._slot(col).price > self.amount
 
-    def sold_out(self, col: SecondDigit) -> bool:
+    def sold_out(self, col: Column) -> bool:
         return self._slot(col).quantity == 0
 
     def add_money(self, money: Money) -> None:
         self.amount += money.value
         self.message = f"Total = {self.amount}"
 
-    def choose_row(self, digit: FirstDigit) -> None:
-        self.row = digit.value
-        self.message = f"Row {digit}"
+    def choose_row(self, row: Row) -> None:
+        self.row = row.value
+        prices = [slot.price
+                  for slot in self.items[self.row]]
+        self.message = (f"Row {row}: {min(prices)}c "
+                        f"to {max(prices)}c")
 
-    def clear(self, col: SecondDigit) -> None:
+    def clear(self, col: Column) -> None:
         slot = self._slot(col)
-        self.message = (f"Cleared: costs {slot.price}, "
-                        f"quantity {slot.quantity}")
+        self.message = (f"Cleared: {slot.price}c, "
+                        f"{slot.quantity} left")
 
-    def dispense(self, col: SecondDigit) -> None:
+    def dispense(self, col: Column) -> None:
         slot = self._slot(col)
         slot.quantity -= 1
         self.amount -= slot.price
@@ -667,8 +669,8 @@ class VendingMachine(StateMachine):
 
 The engine's lookup keys on the exact `type(input_)`,
 so finding the rows takes one dictionary lookup rather than an `isinstance()` test against each row.
-That exactness lets the table keys separate rows on `FirstDigit` and `SecondDigit`,
-two subclasses of `Digit` that differ only in their class.
+That exactness lets the table keep separate entries for `Row` and `Column`,
+two subclasses of `Key` that carry the same `value` field.
 The same exactness excludes a further subclass.
 An input whose class derives from `Money` matches none of `Money`'s rows,
 because the key is the input's exact class.
@@ -685,8 +687,8 @@ and those types differ from row to row.
 So the `Callable[..., bool]` and `Callable[..., None]` annotations leave the parameters as `...`.
 With that `...`, the type checker accepts any callable in any row,
 whatever input class the key names.
-If you pair a `SecondDigit` key with a method written for a `FirstDigit`,
-the table type-checks clean, and at runtime that method runs on a `SecondDigit`.
+If you pair a `Column` key with a method written for a `Row`,
+the table type-checks clean, and at runtime that method runs on a `Column`.
 
 Adding a state or an input is now a local change:
 an entry in the table and a method or two.
@@ -694,63 +696,68 @@ Nothing here needs a `switch`, reflection,
 or a `Condition`/`Transition` class hierarchy.
 The language's first-class functions and its `dict` supply what those mechanisms exist to provide.
 
-`vending_demo.py` feeds a `VendingMachine` a list of inputs and prints each input with the resulting message and state:
+`vending_demo.py` feeds a `VendingMachine` a list of inputs.
+For each input it prints the transition in the mousetrap's form,
+the state before, the input, and the state after,
+followed by the message the action left:
 
 ```python
 # tabledriven/vending_demo.py
-from vending_machine import (FirstDigit, Money, Quit,
-                             SecondDigit, VendingMachine)
+from vending_machine import (Column, Money, Quit, Row,
+                             VendingMachine)
 
 inputs = [
     Money("quarter", 25), Money("quarter", 25),
     Money("dollar", 100),
     # Buy [0][1]
-    FirstDigit("A", 0), SecondDigit("col 1", 1),
+    Row(0), Column(1),
     # Buy it again
-    FirstDigit("A", 0), SecondDigit("col 1", 1),
+    Row(0), Column(1),
     # Too expensive
-    FirstDigit("C", 2), SecondDigit("col 2", 2),
+    Row(2), Column(2),
     # Sold out
-    FirstDigit("D", 3), SecondDigit("col 0", 0),
+    Row(3), Column(0),
     Quit(),  # Refund and reset
     # Row D, col 0 is both too expensive (a dime
     # isn't 25 cents) and sold out (quantity 0);
     # too_expensive is listed first, so it wins:
     Money("dime", 10),
-    FirstDigit("D", 3), SecondDigit("col 0", 0),
+    Row(3), Column(0),
 ]
 machine = VendingMachine()
 for input_ in inputs:
+    before = machine.state
     machine.handle(input_)
-    print(f"{input_}: {machine.message} "
-          f"[{machine.state.name}]")
-#: quarter: Total = 25 [COLLECTING]
-#: quarter: Total = 50 [COLLECTING]
-#: dollar: Total = 150 [COLLECTING]
-#: A: Row A [SELECTING]
-#: col 1: Dispensing; remaining 100 [WANT_MORE]
-#: A: Row A [SELECTING]
-#: col 1: Dispensing; remaining 50 [WANT_MORE]
-#: C: Row C [SELECTING]
-#: col 2: Cleared: costs 75, quantity 5 [COLLECTING]
-#: D: Row D [SELECTING]
-#: col 0: Cleared: costs 25, quantity 0 [UNAVAILABLE]
-#: Quit: Returning 50 [QUIESCENT]
-#: dime: Total = 10 [COLLECTING]
-#: D: Row D [SELECTING]
-#: col 0: Cleared: costs 25, quantity 0 [COLLECTING]
+    print(f"{before.name} {input_} -> "
+          f"{machine.state.name}: {machine.message}")
+#: QUIESCENT quarter -> COLLECTING: Total = 25
+#: COLLECTING quarter -> COLLECTING: Total = 50
+#: COLLECTING dollar -> COLLECTING: Total = 150
+#: COLLECTING A -> SELECTING: Row A: 25c to 100c
+#: SELECTING col 1 -> WANT_MORE: Dispensing; remaining 100
+#: WANT_MORE A -> SELECTING: Row A: 25c to 100c
+#: SELECTING col 1 -> WANT_MORE: Dispensing; remaining 50
+#: WANT_MORE C -> SELECTING: Row C: 25c to 100c
+#: SELECTING col 2 -> COLLECTING: Cleared: 75c, 5 left
+#: COLLECTING D -> SELECTING: Row D: 25c to 100c
+#: SELECTING col 0 -> UNAVAILABLE: Cleared: 25c, 0 left
+#: UNAVAILABLE Quit -> QUIESCENT: Returning 50
+#: QUIESCENT dime -> COLLECTING: Total = 10
+#: COLLECTING D -> SELECTING: Row D: 25c to 100c
+#: SELECTING col 0 -> COLLECTING: Cleared: 25c, 0 left
 ```
 
-The sold-out and too-expensive clears both print `Cleared` and end in different states.
+The sold-out and too-expensive clears both start from `SELECTING` on a column,
+both print `Cleared`, and end in different states.
 Too expensive returns to `COLLECTING` with the money still inserted,
 while sold out goes to `UNAVAILABLE`.
-The state names the condition.
+The state after the arrow names the condition.
 The message alone leaves you inferring the condition from the quantity.
 
 The last three inputs insert a dime and pick the same sold-out slot again,
 this time with too little money for it as well.
 Both conditions are now true.
-`too_expensive()` comes first in the `(State.SELECTING, SecondDigit)` list,
+`too_expensive()` comes first in the `(State.SELECTING, Column)` list,
 so the engine takes the `too_expensive()` row.
 The machine reports `COLLECTING`, as though more money would sell the item,
 although the slot is empty and no amount of money would.
@@ -775,9 +782,8 @@ The cases worth testing are:
 # tabledriven/test_vending.py
 import pytest
 from table_machine import NoTransition
-from vending_machine import (FirstDigit, Money, Quit,
-                             SecondDigit, State,
-                             VendingMachine)
+from vending_machine import (Column, Money, Quit, Row,
+                             State, VendingMachine)
 
 def feed(vm: VendingMachine, *inputs: object) -> None:
     for input_ in inputs:
@@ -787,7 +793,7 @@ def test_buy_dispenses_and_spends() -> None:
     vm = VendingMachine()
     assert vm.items[0][1].price == 50
     feed(vm, Money("quarter", 25), Money("quarter", 25),
-         FirstDigit("A", 0), SecondDigit("col 1", 1))
+         Row(0), Column(1))
     assert vm.state is State.WANT_MORE
     assert vm.amount == 0  # 50 in, 50 spent
     # One dispensed from five
@@ -798,8 +804,7 @@ def test_too_expensive_clears_back_to_collecting() -> None:
     vm = VendingMachine()
     assert vm.items[0][1].price == 50
     # 25c in
-    feed(vm, Money("quarter", 25),
-         FirstDigit("A", 0), SecondDigit("col 1", 1))
+    feed(vm, Money("quarter", 25), Row(0), Column(1))
     assert vm.state is State.COLLECTING
     assert vm.amount == 25  # Money kept
     assert vm.items[0][1].quantity == 5  # Nothing dispensed
@@ -807,8 +812,7 @@ def test_too_expensive_clears_back_to_collecting() -> None:
 def test_sold_out_clears_to_unavailable() -> None:
     vm = VendingMachine()
     # [3][0] is sold out
-    feed(vm, Money("quarter", 25),
-         FirstDigit("D", 3), SecondDigit("col 0", 0))
+    feed(vm, Money("quarter", 25), Row(3), Column(0))
     assert vm.state is State.UNAVAILABLE
     assert vm.amount == 25  # Money kept
     assert vm.items[3][0].quantity == 0  # Nothing dispensed

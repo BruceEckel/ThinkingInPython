@@ -1,42 +1,43 @@
 # tabledriven/vending_demo.py
-from vending_machine import (FirstDigit, Money, Quit,
-                             SecondDigit, VendingMachine)
+from vending_machine import (Column, Money, Quit, Row,
+                             VendingMachine)
 
 inputs = [
     Money("quarter", 25), Money("quarter", 25),
     Money("dollar", 100),
     # Buy [0][1]
-    FirstDigit("A", 0), SecondDigit("col 1", 1),
+    Row(0), Column(1),
     # Buy it again
-    FirstDigit("A", 0), SecondDigit("col 1", 1),
+    Row(0), Column(1),
     # Too expensive
-    FirstDigit("C", 2), SecondDigit("col 2", 2),
+    Row(2), Column(2),
     # Sold out
-    FirstDigit("D", 3), SecondDigit("col 0", 0),
+    Row(3), Column(0),
     Quit(),  # Refund and reset
     # Row D, col 0 is both too expensive (a dime
     # isn't 25 cents) and sold out (quantity 0);
     # too_expensive is listed first, so it wins:
     Money("dime", 10),
-    FirstDigit("D", 3), SecondDigit("col 0", 0),
+    Row(3), Column(0),
 ]
 machine = VendingMachine()
 for input_ in inputs:
+    before = machine.state
     machine.handle(input_)
-    print(f"{input_}: {machine.message} "
-          f"[{machine.state.name}]")
-#: quarter: Total = 25 [COLLECTING]
-#: quarter: Total = 50 [COLLECTING]
-#: dollar: Total = 150 [COLLECTING]
-#: A: Row A [SELECTING]
-#: col 1: Dispensing; remaining 100 [WANT_MORE]
-#: A: Row A [SELECTING]
-#: col 1: Dispensing; remaining 50 [WANT_MORE]
-#: C: Row C [SELECTING]
-#: col 2: Cleared: costs 75, quantity 5 [COLLECTING]
-#: D: Row D [SELECTING]
-#: col 0: Cleared: costs 25, quantity 0 [UNAVAILABLE]
-#: Quit: Returning 50 [QUIESCENT]
-#: dime: Total = 10 [COLLECTING]
-#: D: Row D [SELECTING]
-#: col 0: Cleared: costs 25, quantity 0 [COLLECTING]
+    print(f"{before.name} {input_} -> "
+          f"{machine.state.name}: {machine.message}")
+#: QUIESCENT quarter -> COLLECTING: Total = 25
+#: COLLECTING quarter -> COLLECTING: Total = 50
+#: COLLECTING dollar -> COLLECTING: Total = 150
+#: COLLECTING A -> SELECTING: Row A: 25c to 100c
+#: SELECTING col 1 -> WANT_MORE: Dispensing; remaining 100
+#: WANT_MORE A -> SELECTING: Row A: 25c to 100c
+#: SELECTING col 1 -> WANT_MORE: Dispensing; remaining 50
+#: WANT_MORE C -> SELECTING: Row C: 25c to 100c
+#: SELECTING col 2 -> COLLECTING: Cleared: 75c, 5 left
+#: COLLECTING D -> SELECTING: Row D: 25c to 100c
+#: SELECTING col 0 -> UNAVAILABLE: Cleared: 25c, 0 left
+#: UNAVAILABLE Quit -> QUIESCENT: Returning 50
+#: QUIESCENT dime -> COLLECTING: Total = 10
+#: COLLECTING D -> SELECTING: Row D: 25c to 100c
+#: SELECTING col 0 -> COLLECTING: Cleared: 25c, 0 left
