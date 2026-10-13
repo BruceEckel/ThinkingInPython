@@ -5,23 +5,16 @@ from typing import override
 
 @dataclass(eq=False)
 class TypedIterator[T](Iterator[T]):
-    imp: Iterator[object]
+    source: Iterator[object]
     expected: type[T]
     accepted: int = 0  # State a generator cannot expose
 
     @override
     def __next__(self) -> T:
-        obj = next(self.imp)
-        if not isinstance(obj, self.expected):
+        item = next(self.source)
+        if not isinstance(item, self.expected):
             raise TypeError(
                 f"TypedIterator for {self.expected} "
-                f"encountered {type(obj).__name__}")
+                f"encountered {type(item).__name__}")
         self.accepted += 1
-        return obj
-
-if __name__ == "__main__":
-    checked = TypedIterator(iter([1, 2, 3]), int)
-    print(next(checked), next(checked))
-    print(checked.accepted)  # Read mid-stream
-#: 1 2
-#: 2
+        return item

@@ -2,6 +2,18 @@
 from collections.abc import Iterator
 from exceptions import expect
 
+def lazy_squares(n: int) -> Iterator[int]:
+    if n < 0:
+        raise ValueError(f"n must not be negative: {n}")
+    for i in range(n):
+        yield i * i
+
+gen = lazy_squares(-1)
+print("no error yet")
+#: no error yet
+expect(ValueError, next, gen)
+#: [ValueError] n must not be negative: -1
+
 def squares(n: int) -> Iterator[int]:
     if n < 0:
         raise ValueError(f"n must not be negative: {n}")

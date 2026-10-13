@@ -271,12 +271,25 @@ Any validation at the top of a generator inherits this delay.
 A check meant to reject a bad argument raises its exception at the first `next()`,
 far from the call that caused the problem.
 
-Here, `squares()` is a plain function that checks its argument and returns an inner generator:
+Here, `lazy_squares()` shows the delay,
+and `squares()` removes it as a plain function that checks its argument and returns an inner generator:
 
 ```python
 # eager_validation.py
 from collections.abc import Iterator
 from exceptions import expect
+
+def lazy_squares(n: int) -> Iterator[int]:
+    if n < 0:
+        raise ValueError(f"n must not be negative: {n}")
+    for i in range(n):
+        yield i * i
+
+gen = lazy_squares(-1)
+print("no error yet")
+#: no error yet
+expect(ValueError, next, gen)
+#: [ValueError] n must not be negative: -1
 
 def squares(n: int) -> Iterator[int]:
     if n < 0:
@@ -291,6 +304,8 @@ expect(ValueError, squares, -1)
 #: [ValueError] n must not be negative: -1
 ```
 
+`lazy_squares()` contains a `yield`,
+so the call `lazy_squares(-1)` runs none of its body and the check waits for `next()`.
 `squares()` has no `yield`, so calling it runs the check immediately.
 Only `produce()` waits.
 
@@ -633,26 +648,19 @@ from typing import override
 
 @dataclass(eq=False)
 class TypedIterator[T](Iterator[T]):
-    imp: Iterator[object]
+    source: Iterator[object]
     expected: type[T]
     accepted: int = 0  # State a generator cannot expose
 
     @override
     def __next__(self) -> T:
-        obj = next(self.imp)
-        if not isinstance(obj, self.expected):
+        item = next(self.source)
+        if not isinstance(item, self.expected):
             raise TypeError(
                 f"TypedIterator for {self.expected} "
-                f"encountered {type(obj).__name__}")
+                f"encountered {type(item).__name__}")
         self.accepted += 1
-        return obj
-
-if __name__ == "__main__":
-    checked = TypedIterator(iter([1, 2, 3]), int)
-    print(next(checked), next(checked))
-    print(checked.accepted)  # Read mid-stream
-#: 1 2
-#: 2
+        return item
 ```
 
 `collections.abc.Iterator` supplies `__iter__()` to its subclasses,
@@ -675,23 +683,39 @@ A generator wraps an iterator just as well, and in fewer lines:
 from collections.abc import Iterable, Iterator
 
 def typed[T](
-    it: Iterable[object], expected: type[T]
+    items: Iterable[object], expected: type[T]
 ) -> Iterator[T]:
-    for obj in it:
-        if not isinstance(obj, expected):
+    for item in items:
+        if not isinstance(item, expected):
             raise TypeError(
                 f"expected {expected}, "
-                f"got {type(obj).__name__}")
-        yield obj
+                f"got {type(item).__name__}")
+        yield item
+```
 
-if __name__ == "__main__":
-    print(list(typed([1, 2, 3], int)))
+`typed_demo.py` runs both wrappers,
+then hands `typed()` a `str` where it expects an `int`:
+
+```python
+# typed_demo.py
+from exceptions import expect
+from typed_generator import typed
+from typed_iterator import TypedIterator
+
+checked = TypedIterator(iter([1, 2, 3]), int)
+print(next(checked), next(checked))
+#: 1 2
+print(checked.accepted)  # Read mid-stream
+#: 2
+print(list(typed([1, 2, 3], int)))
 #: [1, 2, 3]
+expect(TypeError, list, typed([1, "two"], int))
+#: [TypeError] expected <class 'int'>, got str
 ```
 
 Use the class when the wrapper needs its own state or extra methods,
 such as `accepted` in `typed_iterator.py`.
-A caller reads `accepted` mid-stream,
+`typed_demo.py` reads `accepted` mid-stream,
 while a generator's local variables have no name a caller can use.
 Use the generator when it does not.
 Either way, the wrapper plugs into every place that accepts an iterator,

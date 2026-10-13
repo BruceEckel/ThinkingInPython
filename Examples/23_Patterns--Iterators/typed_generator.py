@@ -2,15 +2,11 @@
 from collections.abc import Iterable, Iterator
 
 def typed[T](
-    it: Iterable[object], expected: type[T]
+    items: Iterable[object], expected: type[T]
 ) -> Iterator[T]:
-    for obj in it:
-        if not isinstance(obj, expected):
+    for item in items:
+        if not isinstance(item, expected):
             raise TypeError(
                 f"expected {expected}, "
-                f"got {type(obj).__name__}")
-        yield obj
-
-if __name__ == "__main__":
-    print(list(typed([1, 2, 3], int)))
-#: [1, 2, 3]
+                f"got {type(item).__name__}")
+        yield item

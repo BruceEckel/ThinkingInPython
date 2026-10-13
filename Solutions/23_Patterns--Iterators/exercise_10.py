@@ -5,32 +5,32 @@ from typing import override
 from exceptions import expect
 
 def typed[T](
-    it: Iterable[object], expected: type[T]
+    items: Iterable[object], expected: type[T]
 ) -> Iterator[T]:
-    for obj in it:
-        if not isinstance(obj, expected):
+    for item in items:
+        if not isinstance(item, expected):
             raise TypeError(
                 f"expected {expected}, "
-                f"got {type(obj).__name__}")
-        yield obj
+                f"got {type(item).__name__}")
+        yield item
 
 def typed_skipping[T](
-    it: Iterable[object], expected: type[T]
+    items: Iterable[object], expected: type[T]
 ) -> Iterator[T]:
-    for obj in it:
-        if isinstance(obj, expected):
-            yield obj
+    for item in items:
+        if isinstance(item, expected):
+            yield item
 
 @dataclass(eq=False)
 class SkippingIterator[T](Iterator[T]):
-    imp: Iterator[object]
+    source: Iterator[object]
     expected: type[T]
 
     @override
     def __next__(self) -> T:
-        for obj in self.imp:  # Pull until one matches
-            if isinstance(obj, self.expected):
-                return obj
+        for item in self.source:  # Pull until one matches
+            if isinstance(item, self.expected):
+                return item
         raise StopIteration
 
 items: list[object] = [1, "two", 3, None, 4]
