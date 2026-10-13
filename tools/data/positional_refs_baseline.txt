@@ -10,7 +10,6 @@
 # See tools/positional_refs.py.
 Chapters/03_Foundations--Containers.md	The first line	The first line creates a `list`.
 Chapters/03_Foundations--Containers.md	The last line	The last line feeds `dict()` an iterable of `(key, value)` pairs, and `dict()` accepts any iterable that yields such pairs.
-Chapters/04_Foundations--Control_Flow.md	The `try` block	The `try` block asks the only question that matters: does this conversion work?
 Chapters/04_Foundations--Control_Flow.md	The first `case`	The first `case` destructures the split command.
 Chapters/04_Foundations--Control_Flow.md	the `for` clause	Every form has the same order: the expression that produces each item, the `for` clause that supplies the values, and an optional `if` that filters them.
 Chapters/04_Foundations--Control_Flow.md	the `try` block	The optional `else` runs when the `try` block raises no exception, the same shape as the loop `else` that runs when the loop hits no `break`.
@@ -55,7 +54,6 @@ Chapters/17_Techniques--Metaprogramming.md	The last line	The last line shows its
 Chapters/18_Techniques--Performance.md	the first call	`@njit` applies only to numeric functions, requires a decorator, pauses to compile on the first call, and speeds code up by multiples.
 Chapters/19_Techniques--Concurrency.md	The last line	The last line shows the other direction.
 Chapters/19_Techniques--Concurrency.md	the first `await`	Here, the first `await` comes after both updates, so the task keeps control through them and needs no lock.
-Chapters/20_Patterns--Rethinking_Objects.md	the next call	If you drop one reassignment, the next call silently uses the old balance.
 Chapters/20_Patterns--Rethinking_Objects.md	the second call	Without the `# type: ignore`, the type checker rejects the second call.
 Chapters/23_Patterns--Iterators.md	The last block	The last block advances `first2` and `second2` together instead, one `zip()` step at a time, so `tee()` buffers at most the gap between them.
 Chapters/23_Patterns--Iterators.md	The last line	The last line of output shows that by the time all four methods work, `seen` holds the entire stream.
@@ -64,6 +62,7 @@ Chapters/24_Patterns--Singleton.md	the first assignment	If you drop the inner te
 Chapters/24_Patterns--Singleton.md	the first call	Its metaclass overrides `__call__()`, and that override skips `__new__()` and `__init__()` on every later construction, so the first call's arguments win.
 Chapters/24_Patterns--Singleton.md	the first call	Only the first call constructs a `Registry`.
 Chapters/24_Patterns--Singleton.md	the first call	That listing's `__new__()` sets `val = []` on the first call and runs `val.append(arg)` on every call, so each later argument joins the shared list instead of being discarded.
+Chapters/25_Patterns--Template_Method.md	The second `Say no more, say no more!`	The second `Say no more, say no more!` has no `Nudge, nudge, wink, wink!` before it.
 Chapters/26_Patterns--Surrogate.md	The next `p.level`	The next `p.level` lookup succeeds without calling `__getattr__()`.
 Chapters/26_Patterns--Surrogate.md	the first call	Because `Partial` omits `g()`, constructing a `Partial` raises a `TypeError` before the first call.
 Chapters/26_Patterns--Surrogate.md	the second call	With the guard, the second call to `__getattr__()` reports the typo by name.
@@ -90,7 +89,7 @@ Chapters/41_Functional--Toolkits.md	The last case	The last case asks for groups 
 Chapters/41_Functional--Toolkits.md	the final `1`	`dropwhile()` stops testing once the predicate fails, so it yields the final `1`, where `filterfalse()` tests every element and returns `[3, 4]`.
 Chapters/41_Functional--Toolkits.md	the outer `list()`	`list(groupby(data))` therefore returns three keys paired with three empty iterators, because the outer `list()` walks all the way to the end before anything reads a group.
 Chapters/42_Functional--Error_Handling.md	the `except` clause	The exception inside still holds its `__traceback__`, but the `except` clause that caught it returned it as a value, so the exception reaches no handler.
-Chapters/42_Functional--Error_Handling.md	the first `Err`	`func_a()`, `func_b()`, and `func_c()` in `combining.py` take their inputs from `i` and `j` rather than from an earlier step's answer, so stopping at the first `Err` discards whatever the later steps would have found (see exercise 3).
+Chapters/42_Functional--Error_Handling.md	the first `Err`	`func_a()`, `func_b()`, and `func_c()` in `combining.py` take their inputs from `i` and `j` rather than from an earlier step's answer, so stopping at the first `Err` discards whatever the later steps would have found.
 Chapters/42_Functional--Error_Handling.md	the first call	`add_note()` appends each note to a list, `__notes__`, which the first call creates.
 Chapters/43_Functional--Confidence.md	The first `withdraw(30)`	The first `withdraw(30)` evaluates to `70`, so substituting `70` for it ought to change nothing.
 Chapters/43_Functional--Confidence.md	The second call	The second call is a cache hit, so `withdraw()` runs once, subtracts one `30`, and hands back the stored `70` the second time.
