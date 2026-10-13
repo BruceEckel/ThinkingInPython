@@ -1,12 +1,6 @@
 # property_check.py
 import random
-
-def encode(text: str) -> str:
-    # Reversible, and not its own inverse:
-    return text.encode().hex()
-
-def decode(text: str) -> str:
-    return bytes.fromhex(text).decode()
+from codec import decode, encode
 
 random.seed(42)  # A failing search must be reproducible
 alphabet = "abcde"

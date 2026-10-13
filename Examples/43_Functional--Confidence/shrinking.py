@@ -1,11 +1,9 @@
 # shrinking.py
+from codec import encode
 from hypothesis import given, settings, strategies
 
-def encode(text: str) -> str:
-    return text.encode().hex()
-
-def decode(text: str) -> str:
-    return bytes.fromhex(text).decode("latin-1")
+def decode(encoded: str) -> str:
+    return bytes.fromhex(encoded).decode("latin-1")
 
 @settings(derandomize=True, database=None)
 @given(strategies.text())

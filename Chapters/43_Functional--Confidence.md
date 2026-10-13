@@ -287,19 +287,26 @@ You decide how far up the spectrum to go.
 
 ## Property-Based Testing
 
+The functions under test are an encoder and its decoder,
+in a module of their own so that every test can import them:
+
+```python
+# codec.py
+def encode(text: str) -> str:
+    # Reversible, and not its own inverse:
+    return text.encode().hex()
+
+def decode(encoded: str) -> str:
+    return bytes.fromhex(encoded).decode()
+```
+
 You can write a property check by hand,
 looping over random inputs and asserting the law:
 
 ```python
 # property_check.py
 import random
-
-def encode(text: str) -> str:
-    # Reversible, and not its own inverse:
-    return text.encode().hex()
-
-def decode(text: str) -> str:
-    return bytes.fromhex(text).decode()
+from codec import decode, encode
 
 random.seed(42)  # A failing search must be reproducible
 alphabet = "abcde"
@@ -337,21 +344,13 @@ so it reaches inputs outside the loop's alphabet, such as unusual Unicode:
 
 ```python
 # test_property.py
+from codec import decode, encode
 from hypothesis import given, strategies
-
-def encode(text: str) -> str:
-    return text.encode().hex()
-
-def decode(text: str) -> str:
-    return bytes.fromhex(text).decode()
 
 @given(strategies.text())
 def test_roundtrip(sample: str) -> None:
     assert decode(encode(sample)) == sample
 ```
-
-The listing repeats the two functions rather than importing them,
-because importing `property_check.py` runs its thousand-iteration loop inside the test run.
 
 `@given(strategies.text())` wraps `test_roundtrip()`,
 and each call to the wrapper runs the original body once per generated string.
@@ -377,13 +376,11 @@ mentions exposes it:
 
 ```python
 # shrinking.py
+from codec import encode
 from hypothesis import given, settings, strategies
 
-def encode(text: str) -> str:
-    return text.encode().hex()
-
-def decode(text: str) -> str:
-    return bytes.fromhex(text).decode("latin-1")
+def decode(encoded: str) -> str:
+    return bytes.fromhex(encoded).decode("latin-1")
 
 @settings(derandomize=True, database=None)
 @given(strategies.text())
@@ -399,8 +396,9 @@ except AssertionError as e:
 #: )
 ```
 
-`encode()` still turns text into UTF-8 bytes,
-but `decode()` now reads those bytes back as Latin-1 instead of UTF-8.
+`shrinking.py` imports `encode()` from `codec.py`,
+so text still becomes UTF-8 bytes,
+but its own `decode()` reads those bytes back as Latin-1 instead of UTF-8.
 UTF-8 and Latin-1 agree on the 128 ASCII code points,
 and `property_check.py`'s five-letter alphabet sits inside those.
 Every string its loop builds decodes the same way under both,
