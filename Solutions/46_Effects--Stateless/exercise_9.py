@@ -9,7 +9,7 @@ async def fetch(url: str) -> str:
 
 def report(url: str) -> Depend[Async, str]:
     body = yield from wait(fetch(url))
-    return f"{body = }, {len(body) = }"
+    return f"{body = }"
 
 def report_all(urls: list[str]) -> Depend[Async, list[str]]:
     reports: list[str] = []
@@ -26,6 +26,6 @@ async def main() -> None:
 asyncio.run(main())
 #: [RuntimeError] asyncio.run() cannot be called from a
 #: running event loop
-#: body = 'fetched a', len(body) = 9
-#: body = 'fetched b', len(body) = 9
-#: body = 'fetched c', len(body) = 9
+#: body = 'fetched a'
+#: body = 'fetched b'
+#: body = 'fetched c'

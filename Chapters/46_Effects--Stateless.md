@@ -1231,10 +1231,10 @@ async def fetch(url: str) -> str:
 
 def report(url: str) -> Depend[Async, str]:
     body = yield from wait(fetch(url))
-    return f"{body = }, {len(body) = }"
+    return f"{body = }"
 
 print(run(report("http://example.com")))
-#: body = 'fetched http://example.com', len(body) = 26
+#: body = 'fetched http://example.com'
 ```
 
 `Depend[Async, str]` needs `Async`, cannot fail, and produces a `str`.
