@@ -46,11 +46,12 @@ class Lazy:
 <summary>Solution</summary>
 
 If you store `description` as an ordinary instance attribute,
-normal lookup finds it and the three reads build nothing,
-but no code runs on a read.
-The counter stays at zero, so the first `query()` reports `0 answered before build`.
-A property runs a method on each read,
-so the solution counts there without reaching `__getattr__()`.
+normal lookup finds it, and the three reads build nothing.
+Each read returns the stored string, though, so the counter stays at zero.
+The first `query()` then reports `0 answered before build`.
+A property also ends the lookup before `__getattr__()`, at the class,
+and it runs a method on each read,
+so the solution counts inside that method.
 
 ```python
 # exercise_1.py
@@ -94,20 +95,21 @@ print(p.query())  # [2]
 #: result
 ```
 
-**Answer `description` without building.** `description` is a property of `Lazy`, so Python finds it on the class without
-calling `__getattr__()`, and the three reads build nothing. Each one
-increments `_answered`.
+**Answer `description` without building.** `description` is a property of `Lazy`, so normal lookup finds it on the class and stops there.
+The three reads build nothing, and each one increments `_answered`.
 
-**Build the real object on demand.** The first `query()` (`[1]`) is
-the first name the proxy lacks, so `__getattr__()` runs, reports the
-count, and builds the real object. The second `query()` (`[2]`) finds
-`_real` set and forwards without reporting or building.
+**Build the real object on demand.** At `[1]`, `query` is the first
+name missing from the proxy, so `__getattr__()` runs, reports the
+count, and builds the real object. At `[2]`, `__getattr__()` runs
+again, finds `_real` set, and forwards the lookup with no report and
+no build.
 
-The counter records how much work the proxy saved: three
-requests served from a string the proxy held from the start, with the
-slow construction pushed past all of them. GoF's image proxy is the
-same design, answering an image's size from stored numbers while the
-pixels stay unloaded until something draws them.
+The counter records how much work the proxy saved.
+The proxy served three requests from a string it held from the start
+and deferred the slow construction until the first `query()`. GoF's image proxy is the
+same design.
+It answers an image's size from stored numbers and loads
+the pixels when something first draws the image.
 
 </details>
 </details>
@@ -122,7 +124,7 @@ pixels stay unloaded until something draws them.
 <summary>Where to look</summary>
 
 [Smart Reference](../../Chapters/26_Patterns--Surrogate.md#smart-reference) wraps each forwarded call to count it.
-`__getattr__()` receives the attribute name, so use it as the key into a `collections.Counter` in place of the single total.
+`__getattr__()` receives the attribute name, so use the name as the key into a `collections.Counter` in place of the single total.
 Increment the entry inside the wrapper, before forwarding the call.
 
 <details>
@@ -150,8 +152,8 @@ class CountingProxy:
 
 If you increment `self.calls[name]` in `__getattr__()` before the `callable()` test,
 the demo still prints `2 1`, because each lookup there leads to one call.
-A lookup without a call counts too.
-Evaluating `p.f is p.f` adds two to `f`'s tally.
+That version counts lookups rather than calls,
+so evaluating `p.f is p.f` adds two to `f`'s tally.
 The solution counts inside `counted()`,
 so the tally advances at the call, as it does in the chapter's `CountingProxy`.
 
@@ -189,11 +191,11 @@ print(p.calls["f"], p.calls["g"])
 #: 2 1
 ```
 
-**Tally each call by name.** Where the chapter's `CountingProxy` keeps one total, this one tallies
-per method name. `__getattr__()` receives the name of the
-attribute, so the wrapper charges the count to that name before
-forwarding. The single `calls` integer becomes a `Counter`. The final
-`print()` shows `f` called twice and `g` once.
+**Tally each call by name.** Where the chapter's `CountingProxy` keeps one total in an integer `calls`,
+this one keeps a `Counter` keyed by method name.
+`__getattr__()` receives the name of the attribute,
+so the wrapper adds one to that name's entry before forwarding the call.
+The final `print()` shows `f` called twice and `g` once.
 
 </details>
 </details>
@@ -210,7 +212,7 @@ forwarding. The single `calls` integer becomes a `Counter`. The final
 <summary>Where to look</summary>
 
 [Smart Reference](../../Chapters/26_Patterns--Surrogate.md#smart-reference) shows a surrogate doing extra work around each use of an implementation.
-Keep the data and a count of owners together in one small shared object, and let `share()` hand out the same object with the count raised.
+Keep the data and a count of owners together in one small shared object, and let `share()` hand out the same object after adding one to the count.
 Have `append()` check the count and, when more than one owner exists, copy the data into a new object first.
 
 <details>
@@ -252,7 +254,7 @@ If you build the private `Box` around `self._box.data` without the `list(...)` c
 `b.append(4)` then changes `a` too.
 The demo prints `[1, 2, 3, 4] [1, 2, 3, 4]`
 while `a._box is b._box` reports `False`.
-A new `Box` gives `b` its own owner count but not its own data,
+A new `Box` gives `b` its own owner count and leaves the data shared,
 so the solution copies the list before the write.
 
 ```python
@@ -301,17 +303,15 @@ print(a._box is b._box)
 #: False
 ```
 
-**Share the data and count its owners.** `a` and `b` start out sharing one `Box`, the same underlying list, with
-`owners` tracking how many `CowList`s point at that `Box`. `share()`
-copies a reference and bumps a count.
+**Share the data and count its owners.** `a` and `b` start out sharing one `Box`, and through it one list.
+`owners` counts the `CowList`s that point at that `Box`.
+`share()` copies a reference to the `Box` and increments `owners`.
 
-**Copy before a shared write.** `append()` copies the data, and only when `owners > 1`. `b.append(4)`
-decrements the shared `Box`'s count (since `b` is leaving it),
-detaches `b` into its own private `Box` holding a fresh copy of the
-data, then appends to that private copy. Since no one called
-`a.append()`, `a` still points at the original, untouched `Box`. The
-first write triggers the copy, and the list that writes receives
-it.
+**Copy before a shared write.** `append()` copies the data only when `owners > 1`. `b.append(4)`
+decrements the shared `Box`'s count, since `b` stops referring to that `Box`.
+Then `append()` points `b` at a private `Box` holding a fresh copy of the
+data and appends to that private copy. `a` still points at the
+original `Box`, whose list still holds `[1, 2, 3]`.
 
 </details>
 </details>
@@ -327,7 +327,7 @@ it.
 <summary>Where to look</summary>
 
 [The Recursion Trap](../../Chapters/26_Patterns--Surrogate.md#the-recursion-trap) and [Forwarding with `__getattr__()`](../../Chapters/26_Patterns--Surrogate.md#forwarding-with-getattr) describe a method that Python calls only after normal lookup fails.
-Trace what Python does when the first line inside that method reads a name that does not exist.
+Trace what Python does when the first line inside that method reads a missing name.
 Use `expected()` from `exceptions` to catch the failure in the listing.
 
 <details>
@@ -381,20 +381,22 @@ with expected(RecursionError):
 ```
 
 Python finds no `f` on the instance or on `BrokenProxy`, so it calls
-`__getattr__("f")`. That call starts by reading `self._imp`, which does
-not exist either, so Python calls `__getattr__("_imp")`, which starts
-by reading `self._imp`. Each attempt to report the missing attribute
-creates another missing-attribute lookup, and the stack runs out before
-Python can raise an `AttributeError`.
+`__getattr__("f")`. That call starts by reading `self._imp`, another
+missing name, so Python calls `__getattr__("_imp")`, which starts
+by reading `self._imp`. Each call to `__getattr__()` starts another
+missing-attribute lookup, so the calls nest until they exceed Python's
+recursion limit.
+Python then raises a `RecursionError` before any
+`AttributeError` can name the typo.
 
 The trap is specific to the fallback method. `__getattr__()` runs only
-when normal lookup fails, so any missing name it touches sends Python
-straight back into `__getattr__()`. Reading `self._impl`, which
-`__init__()` did assign, resolves normally without reaching
-`__getattr__()`. That normal lookup is why the chapter's working
-version is safe and `BrokenProxy` is not. A proxy whose `__init__()`
-did not run (an instance built through `object.__new__()`, for
-example) fails the same way on its first attribute access.
+when normal lookup fails, so any missing name it reads makes Python
+call `__getattr__()` again.
+
+The chapter's working version is safe because `__init__()` assigns `self._impl`,
+so normal lookup finds `_impl` on the instance and returns it.
+A proxy built through `object.__new__()` skips `__init__()`,
+so it fails the same way on its first lookup that falls through to `__getattr__()`.
 
 </details>
 </details>
@@ -470,8 +472,8 @@ class ConnectionProxy:
 
 If you leave out the line in `__exit__()` that sets `_connection` to `None`,
 the pool gets each connection back, but the proxy keeps its reference.
-After both blocks end, `c1.query()` answers through connection 0,
-and when a later `acquire()` lends connection 0 to another client,
+After both blocks end, `c1.query()` still answers through connection 0.
+When a later `acquire()` lends connection 0 to another client,
 both proxies query through it.
 The solution clears the reference, so a released proxy raises a `RuntimeError` instead.
 
@@ -550,23 +552,24 @@ with expected(RuntimeError):
 
 **Limit who creates connections.** `Pool` builds every `Connection` in its constructor, and nothing else
 creates one. `Pool` controls creation as a *Singleton* class does, with
-the limit raised from one object to `POOL_SIZE`.
+the limit set at `POOL_SIZE` objects instead of one.
 
-**Hand out a stand-in.** The client holds no `Connection`. `acquire()` hands back a
-`ConnectionProxy`, which forwards `query()` through `__getattr__()`
-and owns the one job the connection cannot do for itself: returning
+**Hand out a stand-in.** `acquire()` hands the client a
+`ConnectionProxy` in place of a `Connection`.
+The proxy forwards `query()` through `__getattr__()`
+and adds one action of its own: returning
 that connection to the pool.
 
-**Return the connection on exit.** The proxy is also a context manager
-([Context Managers](../../Chapters/15_Techniques--Context_Managers.md)).
+**Return the connection on exit.** The proxy is also a
+[context manager](../../Chapters/15_Techniques--Context_Managers.md).
 `__exit__()` runs whether the block ends normally or raises an
 exception, so "must check that connection back in" becomes a guarantee.
 
-**Refuse use after release.** `__exit__()` also drops the proxy's reference to the connection, so a
-released proxy cannot keep using a connection that now belongs to
-someone else. The check in `__getattr__()` reports that misuse, as
-`c1.query()` after both blocks shows, instead of letting two clients
-share one connection.
+**Refuse use after release.** `__exit__()` also drops the proxy's reference to the connection,
+which the pool may lend to someone else.
+The check in `__getattr__()` then raises a `RuntimeError` on any later use of the proxy,
+so each connection serves one client at a time.
+The call to `c1.query()` after both blocks shows that error.
 
 `ConnectionProxy` is a *protection proxy* and a *smart reference* at
 once. It controls access, and it adds an action (the check-in) around
@@ -586,9 +589,9 @@ each loan of the connection.
 <details>
 <summary>Where to look</summary>
 
-[Special Methods Bypass `__getattr__()`](../../Chapters/26_Patterns--Surrogate.md#special-methods-bypass-getattr) explains why `len(p)` fails on a proxy that forwards only through `__getattr__()`.
+[Special Methods Bypass `__getattr__()`](../../Chapters/26_Patterns--Surrogate.md#special-methods-bypass-getattr) explains why `len(p)` fails on a proxy that forwards through `__getattr__()` alone.
 Define `__len__()` on the proxy class and have it call `len()` on the implementation.
-For the explanation, consider where `len()` looks for the method.
+For the explanation, consider where `len()` looks for `__len__()`.
 
 <details>
 <summary>The shape</summary>
@@ -618,9 +621,9 @@ class Proxy:
 <details>
 <summary>Solution</summary>
 
-If you leave `Proxy` with its `__getattr__()` alone, `len(p)` raises a
-`TypeError`, `object of type 'Proxy' has no len()`, although
-`p.__len__()` returns 2 through `__getattr__()`. The type checker
+If `Proxy` forwards through `__getattr__()` alone,
+`p.__len__()` returns 2 through `__getattr__()`,
+but `len(p)` raises a `TypeError`: `object of type 'Proxy' has no len()`. The type checker
 reports the call as `invalid-argument-type`, since `Proxy` does not
 match `Sized`. The solution defines `__len__()` on the class, where
 `len()` looks for it.
@@ -651,18 +654,19 @@ print(len(p))
 #: 2
 ```
 
-`__getattr__()` could not have supplied `__len__()` because `len()`
-does not look the name up on the instance. `len()` asks `type(p)` for
-`__len__()` and calls what it finds there. That lookup skips the
-instance, so no instance lookup fails, and a failed instance lookup is
-the one event that calls `__getattr__()`. Python's operators and
+`__getattr__()` could not have supplied `__len__()`, because `len()`
+looks up `__len__()` on `type(p)` and calls what it finds there.
+That lookup bypasses the instance, and with it `__getattr__()`,
+which Python calls after a failed lookup on the instance. Python's operators and
 built-in functions look up an implicitly invoked special method this
 way, so the method must exist on the proxy's class.
 
 **Forward the special method explicitly.** `__len__()` here delegates with `len(self.__implementation)` rather
 than `self.__implementation.__len__()`. Both give the same answer, and
-`len()` reads better. To forward many dunders, you write one such
-method per dunder, or generate them in a loop over a list of names and
+`len()` reads better.
+
+To forward many dunders, you write one forwarding method per dunder,
+or generate the methods in a loop over a list of names and
 assign them onto the class.
 
 </details>
@@ -767,10 +771,13 @@ after the rejected swap.
 
 The type checker cannot make this decision. The decision compares
 the type of the implementation the surrogate holds right now with the type of
-the argument, and the checker knows neither. Both are `Any`, the
+`new`.
+The checker sees `Any` for both. `Any` is the
 choice `state_surrogate.py` makes so that one surrogate accepts any
-implementation. Annotating both against a `Protocol` states one
-shape that every implementation must meet, a different guarantee. A
+implementation.
+
+Annotating the stored implementation and `new` against a `Protocol` gives a different guarantee:
+one shape that every implementation must meet. A
 `Protocol` cannot express "at least what the last implementation had,"
 because that comparison relates two runtime values rather than two
 declarations.
