@@ -80,6 +80,7 @@ def test_both_markers_are_read() -> None:
         "match xs:\n  case [str]: pass",
         "match xs:\n  case [*str]: pass",
         "try: pass\nexcept OSError as str: pass",
+        "key = lambda str: str",
         "str = 'text'\nstr = list(xs)",
     ],
 )

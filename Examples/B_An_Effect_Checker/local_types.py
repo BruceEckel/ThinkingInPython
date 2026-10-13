@@ -25,6 +25,7 @@ def assigned(
                 | ast.MatchAs(name=str(name))
                 | ast.MatchStar(name=str(name))
                 | ast.ExceptHandler(name=str(name))
+                | ast.arg(arg=name)
             ):
                 found = values.get(node, UNRESOLVED)
                 if types.setdefault(name, found) != found:

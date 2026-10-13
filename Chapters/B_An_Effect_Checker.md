@@ -123,13 +123,17 @@ def lookup(name: str, table: Table) -> Row:
 
 A key is an `fnmatch` pattern, the wildcard notation of a shell,
 in which `*` matches any run of characters, dots included.
+`lookup()` calls `fnmatchcase()` instead of `fnmatch()`,
+because `fnmatch()` follows the operating system's rule for file names,
+and on Windows that rule ignores case.
+Python names are case-sensitive, so the table's patterns must be too.
 `lookup()` returns the row of the first pattern that matches.
 A specific name goes above the glob that would otherwise match it,
 because a dictionary keeps insertion order.
 `"os.path.join"` is pure, and the `"os.*"` below it is `FileSystem`.
 Whole modules take one line each, which keeps the table short.
 
-A name that matches nothing is `UNKNOWN`.
+A name that matches no pattern gets `UNKNOWN`.
 Because the table lists pure modules explicitly,
 leaving a module out can add an `Unknown` and cannot hide an Effect.
 
@@ -578,6 +582,7 @@ def assigned(
                 | ast.MatchAs(name=str(name))
                 | ast.MatchStar(name=str(name))
                 | ast.ExceptHandler(name=str(name))
+                | ast.arg(arg=name)
             ):
                 found = values.get(node, UNRESOLVED)
                 if types.setdefault(name, found) != found:
@@ -637,7 +642,7 @@ the first parameter of a method (the class), an annotated assignment,
 and a plain assignment whose right side has an evident type.
 `assigned()` also records every other name a body binds: a loop variable,
 a `with` or `except` target, a walrus target, a name inside a tuple target,
-and a name a pattern captures.
+a name a pattern captures, and a parameter of a nested function or a `lambda`.
 Each alternative of the or-pattern binds `name`, as an or-pattern requires.
 A name bound in any of those ways gets `UNRESOLVED`,
 and so does a name that two assignments give different types.
@@ -746,6 +751,7 @@ def test_both_markers_are_read() -> None:
         "match xs:\n  case [str]: pass",
         "match xs:\n  case [*str]: pass",
         "try: pass\nexcept OSError as str: pass",
+        "key = lambda str: str",
         "str = 'text'\nstr = list(xs)",
     ],
 )
@@ -767,7 +773,7 @@ In `save()`, `log` gets its type from a constructor call,
 the string by being a constant, `names` through a `type` alias,
 `LIMIT` through `Final[...]`, and `p` by its annotation.
 
-`test_a_binding_shadows_the_builtin()` binds the name `str` in eight ways.
+`test_a_binding_shadows_the_builtin()` binds the name `str` in nine ways.
 Each time, `str.upper()` comes back `UNRESOLVED` instead of resolving to `builtins.str.upper`.
 
 ## Rows to a Fixed Point
@@ -938,7 +944,8 @@ with no files to create or output to capture.
 The `match` on `read_module()`'s result turns a parse failure into an `Unparsed` finding,
 and `undeclared()` reports each Effect a row omits as an `Undeclared` finding.
 `Finding` is the union of the two records,
-so a caller matches on the kind of finding and reads the Effect name from its own field.
+so a caller matches on the kind of finding and reads the fields of that kind:
+the Effect name of an `Undeclared`, the parse error of an `Unparsed`.
 
 Here is the checker on Appendix A's greeting program, with one function added:
 
@@ -1102,8 +1109,7 @@ print(check({"app": APP, "requests": STUB}).findings)
 Without the stub, `requests.get` matches nothing in the table and reads `Unknown`,
 so `fetch()` draws a finding.
 With it, `requests.get` is a declared function like any other.
-The checker's existing rule covers `requests.get`.
-Callers trust a declared row.
+Callers trust a declared row, so `fetch()` draws no finding.
 The stub's body is `...`, which calls nothing,
 so its body row is empty and stays within its declaration.
 Type checkers solve the same problem the same way,
@@ -1218,9 +1224,10 @@ so each one appears in a row instead of going unreported:
 
 - A call of a parameter, or of a local that holds a function.
 - A call of a call's result, as in `dataclass(frozen=True)(cls)`.
-- A method on a record's field,
+- A method on an attribute, such as a record's field,
   or on a name bound by anything but an assignment: a loop, a `with`,
-  an `except`, a walrus, a tuple target, or a pattern.
+  an `except`, a walrus, a tuple target, a pattern,
+  or a parameter of a nested function or a `lambda`.
 - A method on a local that two assignments give different types.
 - A receiver annotated with an `X | Y` union,
   or with a `type` alias imported from another module.
@@ -1292,9 +1299,10 @@ and a production tool must remove each one:
 - `hides()`, which the checker trusts without evidence.
 
 Some of the limits are bookkeeping,
-such as resolving `Annotated` through the imports and reading the decorator that marks a `staticmethod`.
-Cleverness removes none of the rest, in either list.
-Most are pieces of type inference.
+such as resolving `Annotated` through the imports,
+reading the decorator that marks a `staticmethod`,
+and collecting the calls in a class body.
+Most of the rest, in either list, are pieces of type inference.
 An operator runs a method that its operands' types select,
 and a method on a call's result needs the type the call returns.
 A callback needs the Effect variable of [Effect Tracking](A_Effect_Tracking.md#propagate-through-callbacks).
