@@ -22,9 +22,10 @@ def get(
 '''
 
 def problems(sources: dict[str, str]) -> list[str]:
-    return [f.problem for f in check(sources).findings]
+    return [f"{f.where} {f.problem}"
+            for f in check(sources).findings]
 
 print(problems({"app": APP}))
-#: ['undeclared Unknown']
+#: ['app.fetch undeclared Unknown']
 print(problems({"app": APP, "requests": STUB}))
 #: []

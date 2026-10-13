@@ -1,5 +1,6 @@
 # function_facts.py
 import ast
+from typing import Literal
 from call_names import Scope
 from effect_table import PURE, Row
 from local_types import (Def, assigned, is_def, is_function,
@@ -14,7 +15,9 @@ class Facts:
     hidden: Row
     calls: tuple[str, ...]
 
-def marked(func: Def, marker: str) -> Row | None:
+def marked(
+    func: Def, marker: Literal["performs", "hides"]
+) -> Row | None:
     match func.returns:
         case ast.Subscript(
             value=ast.Name(id="Annotated"),

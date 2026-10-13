@@ -417,6 +417,7 @@ the arrangement PEP 593 exists to allow.
 ```python
 # function_facts.py
 import ast
+from typing import Literal
 from call_names import Scope
 from effect_table import PURE, Row
 from local_types import (Def, assigned, is_def, is_function,
@@ -431,7 +432,9 @@ class Facts:
     hidden: Row
     calls: tuple[str, ...]
 
-def marked(func: Def, marker: str) -> Row | None:
+def marked(
+    func: Def, marker: Literal["performs", "hides"]
+) -> Row | None:
     match func.returns:
         case ast.Subscript(
             value=ast.Name(id="Annotated"),
@@ -1082,10 +1085,11 @@ def get(
 '''
 
 def problems(sources: dict[str, str]) -> list[str]:
-    return [f.problem for f in check(sources).findings]
+    return [f"{f.where} {f.problem}"
+            for f in check(sources).findings]
 
 print(problems({"app": APP}))
-#: ['undeclared Unknown']
+#: ['app.fetch undeclared Unknown']
 print(problems({"app": APP, "requests": STUB}))
 #: []
 ```
