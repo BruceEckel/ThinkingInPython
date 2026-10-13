@@ -1,11 +1,9 @@
 # note_methods.py
-from typing import ClassVar
 from record import record
 
 @record
 class Trash:
     weight: float
-    value: ClassVar[float] = 0.0
 
     def note(self) -> str:
         return f"{type(self).__name__}: nothing special"
@@ -15,8 +13,6 @@ class Trash:
         return "none"
 
 class Aluminum(Trash):
-    value: ClassVar[float] = 1.67
-
     def note(self) -> str:
         return "Aluminum: crush and bale"
 
@@ -24,8 +20,6 @@ class Aluminum(Trash):
         return "sharp edges"
 
 class Glass(Trash):
-    value: ClassVar[float] = 0.23
-
     def note(self) -> str:
         return "Glass: sort by color, then crush"
 
@@ -33,15 +27,13 @@ class Glass(Trash):
         return "sharp edges"
 
 class Cardboard(Trash):
-    value: ClassVar[float] = 0.79
-
     def note(self) -> str:
         return "Cardboard: flatten and bundle"
 
 materials = [Aluminum, Glass, Cardboard]
-for cls in materials:
-    t = cls(1.0)
-    print(f"{t.note()} | hazard: {t.hazard()}")
+for material in materials:
+    piece = material(1.0)
+    print(f"{piece.note()} | hazard: {piece.hazard()}")
 #: Aluminum: crush and bale | hazard: sharp edges
 #: Glass: sort by color, then crush | hazard: sharp edges
 #: Cardboard: flatten and bundle | hazard: none

@@ -74,10 +74,14 @@ class Glass(Trash):
 class Cardboard(Trash):
     value: ClassVar[float] = 0.79
 
-def sum_value(items: list[Trash]) -> float:
-    total = sum(t.weight * t.value for t in items)
-    print(f"Total value = {total:.2f}")
-    return total
+def sum_value(contents: list[Trash]) -> float:
+    return sum(piece.weight * piece.value
+               for piece in contents)
+
+def report(bins: Bins) -> None:
+    for material, contents in bins.items():
+        total = sum_value(contents)
+        print(f"{material.__name__}: {total:.2f}")
 ```
 
 `Bins` names the shape the sorting sections use,
@@ -114,8 +118,10 @@ that makes the type checker reject `Aluminum(1.0).value = 2.0`.
 
 A new recyclable type registers itself, and `create()` builds it.
 `sum_value()` also handles the new type as written.
-That ordinary function reads `t.value` and `t.weight` polymorphically,
+That ordinary function reads `piece.value` and `piece.weight` polymorphically,
 without checking the type of a piece.
+`report()` prints one line per bin, the material's name beside its total,
+so each sorter in the chapter ends with `report(bins)`.
 
 The tests confirm that each subclass registers itself,
 `create()` builds one by name,
@@ -226,30 +232,24 @@ The most obvious way to sort is to test each piece for its type using `match`
 from collections import defaultdict
 from parse_trash import parse
 from trash import (Aluminum, Bins, Cardboard, Glass,
-                   Paper, sum_value)
+                   Paper, report)
 
 bins: Bins = defaultdict(list)
-for t in parse("trash.dat"):
-    match t:
+for piece in parse("trash.dat"):
+    match piece:
         case Aluminum():
-            bins[Aluminum].append(t)
+            bins[Aluminum].append(piece)
         case Paper():
-            bins[Paper].append(t)
+            bins[Paper].append(piece)
         case Glass():
-            bins[Glass].append(t)
+            bins[Glass].append(piece)
         case Cardboard():
-            bins[Cardboard].append(t)
-for kind, items in bins.items():
-    print(f"--- {kind.__name__} ---")
-    sum_value(items)
-#: --- Glass ---
-#: Total value = 88.78
-#: --- Paper ---
-#: Total value = 21.20
-#: --- Aluminum ---
-#: Total value = 584.50
-#: --- Cardboard ---
-#: Total value = 120.08
+            bins[Cardboard].append(piece)
+report(bins)
+#: Glass: 88.78
+#: Paper: 21.20
+#: Aluminum: 584.50
+#: Cardboard: 120.08
 ```
 
 `recycle_rtti.py` satisfies the requirement, but it has a classic flaw.
@@ -265,7 +265,7 @@ may expect `assert_never()` to make the type checker report the missed case.
 Exhaustiveness checking needs a *closed* union against which to compare the cases,
 but `Trash` is deliberately open.
 The registry exists to accept new subclasses.
-With `case _: assert_never(t)` added,
+With `case _: assert_never(piece)` added,
 the type checker reports the call although the `match` names all four materials,
 because a `Trash` or a subclass defined later can still reach the wildcard.
 A report that appears whether or not a `case` is missing cannot find the missing one.
@@ -273,11 +273,12 @@ A report that appears whether or not a `case` is missing cannot find the missing
 warns against this shape: a `match` over an open set.
 
 A `case _:` wildcard could catch a new material.
-`case _: raise ValueError(f"unsorted {type(t).__name__}")` turns the silent drop into a `ValueError`.
+`case _: raise ValueError(f"unsorted {type(piece).__name__}")` turns the silent drop into a `ValueError`.
 The wildcard is worth adding, and the flaw remains.
 Every new material means editing this `match`.
 A sorter over an open set must let each piece choose its own bin,
-and [`bins[type(t)]`](#let-a-dictionary-do-the-sorting) does that with no edit.
+and [`bins[type(piece)]`](#let-a-dictionary-do-the-sorting)
+does that with no edit.
 
 Now the plant starts accepting plastic,
 so the data gains some new lines and the program gains a new material class:
@@ -296,30 +297,26 @@ from collections import defaultdict
 from typing import ClassVar
 from parse_trash import parse
 from trash import (Aluminum, Bins, Cardboard, Glass, Paper,
-                   Trash, sum_value)
+                   Trash, report)
 
 class Plastic(Trash):
     value: ClassVar[float] = 0.15
 
 pieces = parse("plastic.dat")
 bins: Bins = defaultdict(list)
-for t in pieces:
-    match t:
+for piece in pieces:
+    match piece:
         case Aluminum():
-            bins[Aluminum].append(t)
+            bins[Aluminum].append(piece)
         case Paper():
-            bins[Paper].append(t)
+            bins[Paper].append(piece)
         case Glass():
-            bins[Glass].append(t)
+            bins[Glass].append(piece)
         case Cardboard():
-            bins[Cardboard].append(t)
-for kind, items in bins.items():
-    print(f"--- {kind.__name__} ---")
-    sum_value(items)
-#: --- Glass ---
-#: Total value = 2.30
-#: --- Aluminum ---
-#: Total value = 50.10
+            bins[Cardboard].append(piece)
+report(bins)
+#: Glass: 2.30
+#: Aluminum: 50.10
 binned = sum(len(v) for v in bins.values())
 print(f"parsed {len(pieces)}, binned {binned}")
 #: parsed 4, binned 2
@@ -347,30 +344,22 @@ A dictionary keyed by type replaces the `match`:
 # recycle_dict.py
 from collections import defaultdict
 from parse_trash import parse
-from trash import Bins, sum_value
+from trash import Bins, report
 
 bins: Bins = defaultdict(list)
-
-for t in parse("trash.dat"):
-    bins[type(t)].append(t)  # Bin chosen by the trash piece
-
-for kind, items in bins.items():
-    print(f"--- {kind.__name__} ---")
-    sum_value(items)
-#: --- Glass ---
-#: Total value = 88.78
-#: --- Paper ---
-#: Total value = 21.20
-#: --- Aluminum ---
-#: Total value = 584.50
-#: --- Cardboard ---
-#: Total value = 120.08
+for piece in parse("trash.dat"):
+    bins[type(piece)].append(piece)  # Piece picks its bin
+report(bins)
+#: Glass: 88.78
+#: Paper: 21.20
+#: Aluminum: 584.50
+#: Cardboard: 120.08
 ```
 
-`type(t)` is the right key because every new class is a new key,
+`type(piece)` is the right key because every new class is a new key,
 including one defined at runtime.
 The loop has no list of materials to maintain and no case to forget.
-`bins[type(t)]` is the same dictionary-probe dispatch as the tables in [State Machines](31_Patterns--State_Machines.md#the-engine)
+`bins[type(piece)]` is the same dictionary-probe dispatch as the tables in [State Machines](31_Patterns--State_Machines.md#the-engine)
 and [*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md#one-lookup-in-a-table).
 That dispatch first appeared in an [event bus keyed by type](28_Patterns--Function_Objects.md#an-event-bus-handlers-keyed-by-type).
 
@@ -398,25 +387,19 @@ and defines `Plastic` the same way `plastic_dropped.py` does:
 from collections import defaultdict
 from typing import ClassVar
 from parse_trash import parse
-from trash import Bins, Trash, sum_value
+from trash import Bins, Trash, report
 
 class Plastic(Trash):
     value: ClassVar[float] = 0.15
 
 pieces = parse("plastic.dat")
 bins: Bins = defaultdict(list)
-for t in pieces:
-    bins[type(t)].append(t)  # Bin chosen by the trash piece
-
-for kind, items in bins.items():
-    print(f"--- {kind.__name__} ---")
-    sum_value(items)
-#: --- Glass ---
-#: Total value = 2.30
-#: --- Plastic ---
-#: Total value = 9.00
-#: --- Aluminum ---
-#: Total value = 50.10
+for piece in pieces:
+    bins[type(piece)].append(piece)  # Piece picks its bin
+report(bins)
+#: Glass: 2.30
+#: Plastic: 9.00
+#: Aluminum: 50.10
 binned = sum(len(v) for v in bins.values())
 print(f"parsed {len(pieces)}, binned {binned}")
 #: parsed 4, binned 4
@@ -426,7 +409,7 @@ The loop bins every piece, plastic included: `parsed 4, binned 4`.
 Handling plastic takes two changes to `recycle_dict.py`:
 the `Plastic` definition and the data file's name.
 The last two lines count the pieces for the comparison with `plastic_dropped.py`.
-The sorting line, `bins[type(t)].append(t)`,
+The sorting line, `bins[type(piece)].append(piece)`,
 reads the same as in `recycle_dict.py`,
 while the `match` in `recycle_rtti.py` and `plastic_dropped.py` would need a new `case`.
 
@@ -447,13 +430,11 @@ The obvious place for it is a method on each material class:
 
 ```python
 # note_methods.py
-from typing import ClassVar
 from record import record
 
 @record
 class Trash:
     weight: float
-    value: ClassVar[float] = 0.0
 
     def note(self) -> str:
         return f"{type(self).__name__}: nothing special"
@@ -463,8 +444,6 @@ class Trash:
         return "none"
 
 class Aluminum(Trash):
-    value: ClassVar[float] = 1.67
-
     def note(self) -> str:
         return "Aluminum: crush and bale"
 
@@ -472,8 +451,6 @@ class Aluminum(Trash):
         return "sharp edges"
 
 class Glass(Trash):
-    value: ClassVar[float] = 0.23
-
     def note(self) -> str:
         return "Glass: sort by color, then crush"
 
@@ -481,15 +458,13 @@ class Glass(Trash):
         return "sharp edges"
 
 class Cardboard(Trash):
-    value: ClassVar[float] = 0.79
-
     def note(self) -> str:
         return "Cardboard: flatten and bundle"
 
 materials = [Aluminum, Glass, Cardboard]
-for cls in materials:
-    t = cls(1.0)
-    print(f"{t.note()} | hazard: {t.hazard()}")
+for material in materials:
+    piece = material(1.0)
+    print(f"{piece.note()} | hazard: {piece.hazard()}")
 #: Aluminum: crush and bale | hazard: sharp edges
 #: Glass: sort by color, then crush | hazard: sharp edges
 #: Cardboard: flatten and bundle | hazard: none
@@ -501,7 +476,7 @@ print(f"classes edited for one operation: {len(edited)}")
 
 `[1]` counts the material classes that the new operation edits.
 The `Trash` base takes an edit too,
-because the type checker accepts `t.hazard()` on a `Trash`,
+because the type checker accepts `piece.hazard()` on a `Trash`,
 such as a piece from `parse()`, once the base declares the method.
 So one new operation is three edits: the base,
 plus each material whose answer differs from the base's.
@@ -541,23 +516,23 @@ from functools import singledispatch
 from trash import Aluminum, Cardboard, Glass, Trash
 
 @singledispatch
-def recycling_note(t: Trash) -> str:
-    return f"{type(t).__name__}: no special handling"
+def recycling_note(piece: Trash) -> str:
+    return f"{type(piece).__name__}: no special handling"
 
 @recycling_note.register
-def _(t: Aluminum) -> str:
+def _(piece: Aluminum) -> str:
     return "Aluminum: crush and bale"
 
 @recycling_note.register
-def _(t: Glass) -> str:
+def _(piece: Glass) -> str:
     return "Glass: sort by color, then crush"
 
 @recycling_note.register
-def _(t: Cardboard) -> str:
+def _(piece: Cardboard) -> str:
     return "Cardboard: flatten and bundle"
 
-for cls in Trash.registry.values():
-    print(recycling_note(cls(1.0)))
+for material in Trash.registry.values():
+    print(recycling_note(material(1.0)))
 #: Aluminum: crush and bale
 #: Paper: no special handling
 #: Glass: sort by color, then crush
@@ -589,19 +564,19 @@ from functools import singledispatch
 from trash import Aluminum, Glass, Trash
 
 @singledispatch
-def hazard(t: Trash) -> str:
+def hazard(piece: Trash) -> str:
     return "none"
 
 @hazard.register
-def _(t: Aluminum) -> str:
+def _(piece: Aluminum) -> str:
     return "sharp edges"
 
 @hazard.register
-def _(t: Glass) -> str:
+def _(piece: Glass) -> str:
     return "sharp edges"
 
-for cls in Trash.registry.values():
-    print(f"{cls.__name__}: {hazard(cls(1.0))}")
+for material in Trash.registry.values():
+    print(f"{material.__name__}: {hazard(material(1.0))}")
 #: Aluminum: sharp edges
 #: Paper: none
 #: Glass: sharp edges
@@ -634,7 +609,7 @@ shows `singledispatchmethod` in use, along with the one mistake it makes easy.
 A `@singledispatchmethod` on a shared base gives every subclass the same dispatcher.
 
 The chapter now holds two kinds of dispatch that treat subclasses differently.
-`bins[type(t)]` keys on the exact class,
+`bins[type(piece)]` keys on the exact class,
 so a `CrushedAluminum` derived from `Aluminum` gets a bin of its own.
 `singledispatch` resolves through the [MRO](07_Foundations--Classes.md#method-resolution-order),
 so `recycling_note()` returns `Aluminum`'s note for that same piece.
@@ -653,7 +628,7 @@ and choosing the lightest construct that isolates it.
 This chapter meets two vectors through a concrete requirement each:
 plastic for new types, and the disposal hazard for new operations.
 Each vector now touches one place.
-`bins[type(t)]` absorbs a new material,
+`bins[type(piece)]` absorbs a new material,
 one `@recycling_note.register` adds that material's answer to an existing operation,
 and a new operation is one `singledispatch` function in its own file.
 None of the three is a pattern in the GoF sense.

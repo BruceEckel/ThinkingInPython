@@ -3,23 +3,23 @@ from functools import singledispatch
 from trash import Aluminum, Cardboard, Glass, Trash
 
 @singledispatch
-def recycling_note(t: Trash) -> str:
-    return f"{type(t).__name__}: no special handling"
+def recycling_note(piece: Trash) -> str:
+    return f"{type(piece).__name__}: no special handling"
 
 @recycling_note.register
-def _(t: Aluminum) -> str:
+def _(piece: Aluminum) -> str:
     return "Aluminum: crush and bale"
 
 @recycling_note.register
-def _(t: Glass) -> str:
+def _(piece: Glass) -> str:
     return "Glass: sort by color, then crush"
 
 @recycling_note.register
-def _(t: Cardboard) -> str:
+def _(piece: Cardboard) -> str:
     return "Cardboard: flatten and bundle"
 
-for cls in Trash.registry.values():
-    print(recycling_note(cls(1.0)))
+for material in Trash.registry.values():
+    print(recycling_note(material(1.0)))
 #: Aluminum: crush and bale
 #: Paper: no special handling
 #: Glass: sort by color, then crush

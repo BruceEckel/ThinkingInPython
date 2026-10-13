@@ -7,17 +7,18 @@ the four materials and a `bins` box but not the run that makes the claim
 true. This one follows `recycle_dict_plastic.py` over `plastic.dat`: the
 `class Plastic(Trash)` statement adds `"Plastic"` to `Trash.registry`
 through `__init_subclass__()`; each data line becomes an object through
-`Trash.create()`, which reads that registry; and `bins[type(t)]` drops
-each object into the bin for its exact class, so `Plastic` gets a bin of
-its own. Everything that says Plastic is red, the one thing the reader
-follows; nothing else in the drawing names it, which is the point: the
-parser and the sorting line stay as they are.
+`Trash.create()`, which reads that registry; and `bins[type(piece)]`
+drops each object into the bin for its exact class, so `Plastic` gets a
+bin of its own. Everything that says Plastic is red, the one thing the
+reader follows; nothing else in the drawing names it, which is the
+point: the parser and the sorting line stay as they are.
 
 Names and values come from `trash.py` (the registry, `create()`, the
 four materials), `plastic.dat`, `parse_trash.py`, and
-`recycle_dict_plastic.py`, whose `#:` output supplies the bin headers,
-the totals, and `parsed 4, binned 4`. The object labels are the
-`@record` reprs (`weight` is parsed as a float).
+`recycle_dict_plastic.py`, whose `#:` output supplies the line
+`report()` prints for each bin (`Glass: 2.30`) and `parsed 4, binned 4`.
+The object labels are the `@record` reprs (`weight` is parsed as a
+float).
 """
 
 from tools.story_figures import (BOX, INK, MUTED, RED, arrow, markers,
@@ -26,9 +27,10 @@ from tools.story_figures import (BOX, INK, MUTED, RED, arrow, markers,
 STEM = "trash_sorter"
 W, H = 730, 395
 TITLE = ("The four lines of plastic.dat pass through Trash.create(), which "
-         "reads Trash.registry, and bins[type(t)], which files each piece "
-         "under its exact class; the new Plastic class registers itself "
-         "and gets its own bin with no edit to the parser or the sorter")
+         "reads Trash.registry, and bins[type(piece)], which files each "
+         "piece under its exact class; the new Plastic class registers "
+         "itself and gets its own bin with no edit to the parser or the "
+         "sorter")
 
 PIECES = [("Glass:10", "Glass(weight=10.0)", 0),
           ("Plastic:20", "Plastic(weight=20.0)", 1),
@@ -82,8 +84,8 @@ def render() -> str:
     b += text(ox, head_y + 15, "registry[name](weight)", 10, MUTED,
               "middle")
     sx = (OBJ_X + OBJ_W + BIN_X) / 2
-    b += text(sx, head_y, "bins[type(t)].append(t)", 11.5, INK, "middle",
-              bold=True)
+    b += text(sx, head_y, "bins[type(piece)].append(piece)", 11.5, INK,
+              "middle", bold=True)
     b += text(sx, head_y + 15, "no case per material", 10, MUTED,
               "middle")
     # create() looks up each name in the registry.
@@ -112,8 +114,7 @@ def render() -> str:
         c = color(name)
         b += rect(BIN_X, y, BIN_W, BIN_H, stroke=c,
                   width=1.6 if c == RED else 1.1)
-        b += text(BIN_X + 12, y + 19, f"--- {name} ---", 11, c, bold=True)
-        b += text(BIN_X + 12, y + 36, f"Total value = {total}", 10.5, c)
+        b += text(BIN_X + 12, y + 28, f"{name}: {total}", 11, c, bold=True)
     b += text(BIN_X, BIN_Y[-1] + BIN_H + 26, "parsed 4, binned 4", 11.5,
               INK, bold=True)
 

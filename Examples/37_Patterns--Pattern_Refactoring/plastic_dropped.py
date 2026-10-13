@@ -3,30 +3,26 @@ from collections import defaultdict
 from typing import ClassVar
 from parse_trash import parse
 from trash import (Aluminum, Bins, Cardboard, Glass, Paper,
-                   Trash, sum_value)
+                   Trash, report)
 
 class Plastic(Trash):
     value: ClassVar[float] = 0.15
 
 pieces = parse("plastic.dat")
 bins: Bins = defaultdict(list)
-for t in pieces:
-    match t:
+for piece in pieces:
+    match piece:
         case Aluminum():
-            bins[Aluminum].append(t)
+            bins[Aluminum].append(piece)
         case Paper():
-            bins[Paper].append(t)
+            bins[Paper].append(piece)
         case Glass():
-            bins[Glass].append(t)
+            bins[Glass].append(piece)
         case Cardboard():
-            bins[Cardboard].append(t)
-for kind, items in bins.items():
-    print(f"--- {kind.__name__} ---")
-    sum_value(items)
-#: --- Glass ---
-#: Total value = 2.30
-#: --- Aluminum ---
-#: Total value = 50.10
+            bins[Cardboard].append(piece)
+report(bins)
+#: Glass: 2.30
+#: Aluminum: 50.10
 binned = sum(len(v) for v in bins.values())
 print(f"parsed {len(pieces)}, binned {binned}")
 #: parsed 4, binned 2

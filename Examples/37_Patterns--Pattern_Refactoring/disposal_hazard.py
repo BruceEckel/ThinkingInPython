@@ -3,19 +3,19 @@ from functools import singledispatch
 from trash import Aluminum, Glass, Trash
 
 @singledispatch
-def hazard(t: Trash) -> str:
+def hazard(piece: Trash) -> str:
     return "none"
 
 @hazard.register
-def _(t: Aluminum) -> str:
+def _(piece: Aluminum) -> str:
     return "sharp edges"
 
 @hazard.register
-def _(t: Glass) -> str:
+def _(piece: Glass) -> str:
     return "sharp edges"
 
-for cls in Trash.registry.values():
-    print(f"{cls.__name__}: {hazard(cls(1.0))}")
+for material in Trash.registry.values():
+    print(f"{material.__name__}: {hazard(material(1.0))}")
 #: Aluminum: sharp edges
 #: Paper: none
 #: Glass: sharp edges

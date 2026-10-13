@@ -31,7 +31,11 @@ class Glass(Trash):
 class Cardboard(Trash):
     value: ClassVar[float] = 0.79
 
-def sum_value(items: list[Trash]) -> float:
-    total = sum(t.weight * t.value for t in items)
-    print(f"Total value = {total:.2f}")
-    return total
+def sum_value(contents: list[Trash]) -> float:
+    return sum(piece.weight * piece.value
+               for piece in contents)
+
+def report(bins: Bins) -> None:
+    for material, contents in bins.items():
+        total = sum_value(contents)
+        print(f"{material.__name__}: {total:.2f}")

@@ -2,27 +2,21 @@
 from collections import defaultdict
 from parse_trash import parse
 from trash import (Aluminum, Bins, Cardboard, Glass,
-                   Paper, sum_value)
+                   Paper, report)
 
 bins: Bins = defaultdict(list)
-for t in parse("trash.dat"):
-    match t:
+for piece in parse("trash.dat"):
+    match piece:
         case Aluminum():
-            bins[Aluminum].append(t)
+            bins[Aluminum].append(piece)
         case Paper():
-            bins[Paper].append(t)
+            bins[Paper].append(piece)
         case Glass():
-            bins[Glass].append(t)
+            bins[Glass].append(piece)
         case Cardboard():
-            bins[Cardboard].append(t)
-for kind, items in bins.items():
-    print(f"--- {kind.__name__} ---")
-    sum_value(items)
-#: --- Glass ---
-#: Total value = 88.78
-#: --- Paper ---
-#: Total value = 21.20
-#: --- Aluminum ---
-#: Total value = 584.50
-#: --- Cardboard ---
-#: Total value = 120.08
+            bins[Cardboard].append(piece)
+report(bins)
+#: Glass: 88.78
+#: Paper: 21.20
+#: Aluminum: 584.50
+#: Cardboard: 120.08

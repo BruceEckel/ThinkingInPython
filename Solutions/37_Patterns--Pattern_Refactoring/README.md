@@ -100,7 +100,7 @@ for kind, group in bins.items():
 with no further wiring.
 
 **Bin each piece by its class.** `recycle_dict.py`'s sorting loop needs no
-change because `bins[type(t)].append(t)` keys on the class of each
+change because `bins[type(piece)].append(piece)` keys on the class of each
 piece. `Plastic` is a key the dictionary has not seen, and
 `defaultdict` creates its bin the way it creates every other. The one
 edit to `recycle_dict.py` is the filename, since the script hardcodes
@@ -112,7 +112,7 @@ names no material. One optional step remains. `Plastic` gets a
 `plastic_dropped.py` parses four pieces and bins two. Its `match` has
 no `case` for `Plastic` and no `case _`, so the twenty-pound and
 forty-pound pieces fall through and the loop moves on. Sixty pounds
-at 0.15 a pound is the `Total value = 9.00` that
+at 0.15 a pound is the `Plastic: 9.00` that
 `recycle_dict_plastic.py` prints and `plastic_dropped.py` omits. The
 report shows no sign of the loss. The two totals it prints are correct
 for the pieces they cover.
