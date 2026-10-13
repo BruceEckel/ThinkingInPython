@@ -202,9 +202,8 @@ with expected(TypeError):
 
 with expected(TypeError):
     class Weird(ApplicationFramework):
-        def customized_report(self) -> None: ...
-#: [TypeError] Weird.customized_report: did you mean
-#: customize2?
+        def customer(self) -> None: ...
+#: [TypeError] Weird.customer: did you mean customize2?
 ```
 
 `inherited` collects every non-dunder name the base classes define,
@@ -245,9 +244,10 @@ not later when the framework runs and the step silently does nothing.
 Rejecting every new method catches the typo too, but it also forbids `report()`,
 and a framework that bans helper methods in its subclasses is too restrictive.
 The close-match check also rejects legitimate names.
-`class Weird` fails too,
-because `customized_report()` shares enough letters with `customize2` for `get_close_matches()` to flag it,
-although it is not a typo.
+`class Weird` fails too, although `customer()` is not a typo.
+`customer` and `customize2` share the six letters `custom` and an `e`,
+a similarity of 0.78,
+and `get_close_matches()` flags any name that scores 0.6 or higher.
 A team that adopts this check should expect to catch typos and also to rename an occasional legitimate method.
 
 If every subclass must supply a step,
@@ -334,11 +334,18 @@ class OnlyOnce(ApplicationFramework):
             self._ran = True
             print("Nudge, nudge, wink, wink!")
 
+    @override
+    def customize2(self) -> None:
+        print("Say no more, say no more!")
+
 OnlyOnce().run()
 #: Nudge, nudge, wink, wink!
+#: Say no more, say no more!
+#: Say no more, say no more!
 ```
 
-`run()` calls `customize1()` twice, and `OnlyOnce` prints once.
+The second `Say no more, say no more!` has no `Nudge, nudge, wink, wink!` before it.
+`run()` calls `customize1()` twice, and `OnlyOnce` performs the step once.
 The name, the parameters, and the return type all match the base,
 so the type checker accepts `@override` and reports nothing.
 The base states its algorithm in the loop, not in any type.

@@ -12,5 +12,11 @@ class OnlyOnce(ApplicationFramework):
             self._ran = True
             print("Nudge, nudge, wink, wink!")
 
+    @override
+    def customize2(self) -> None:
+        print("Say no more, say no more!")
+
 OnlyOnce().run()
 #: Nudge, nudge, wink, wink!
+#: Say no more, say no more!
+#: Say no more, say no more!

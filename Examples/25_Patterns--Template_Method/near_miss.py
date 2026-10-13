@@ -59,6 +59,5 @@ with expected(TypeError):
 
 with expected(TypeError):
     class Weird(ApplicationFramework):
-        def customized_report(self) -> None: ...
-#: [TypeError] Weird.customized_report: did you mean
-#: customize2?
+        def customer(self) -> None: ...
+#: [TypeError] Weird.customer: did you mean customize2?
