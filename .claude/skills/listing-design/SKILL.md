@@ -228,3 +228,20 @@ Record each calibration run here with its date and result.
   second pass with only the new cards; `tip prune` by one agent
   deletes another chapter's orphan, which is harmless; a card's
   column count is often one or two off, so the agent wraps.
+- **2026-10-13, the held cards decided by Jev, then the confident set
+  applied.** Bruce asked for Jev (TypeSafe's System One model) to
+  decide the 194 held cards; `build/listing-design/jev_decide.py`
+  asked a Choice (apply/leave) and a risk Choice per card, with the
+  book's rules and Bruce's eight overrides as state. Jev said apply
+  on 149 and leave on 45, median confidence 0.56; it named "teaching"
+  as the main risk on 66 of its applies and exercise or order on 11.
+  Bruce chose the confident-and-safe subset: apply with p_apply at
+  least 0.7 and a risk other than exercise or order, which was 103
+  cards in 39 chapters. One Opus agent per chapter applied them all
+  (none skipped), with the usual two-line corrections (a column
+  count, a figure label no card named, a Solutions sentence outside a
+  code block), and the whole-book `tip verify` passed. The second
+  pass's lesson: a brief copied with `sed` on a Windows path kept the
+  old `apply\` directory, so the first wave re-read the first pass's
+  files and found everything in place; check the brief's paths with
+  `grep` before launching.
