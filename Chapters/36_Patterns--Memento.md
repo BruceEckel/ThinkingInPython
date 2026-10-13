@@ -72,11 +72,8 @@ so `deep` holds inner lists of its own.
 The later `todo[0].append("jam")` grows `todo[0]` to four elements,
 and `deep[0]` keeps its three.
 
-`copy.deepcopy()` costs time and memory proportional to the whole nested structure it rebuilds,
+`copy.deepcopy()` takes time and memory proportional to the whole nested structure it rebuilds,
 however small the change.
-`sketch.py` below copies one level,
-so its time and memory grow with that level alone.
-A state that nests containers inside containers copies the whole structure on every save.
 
 ## The Classic Memento
 
@@ -211,8 +208,7 @@ with expected(FrozenInstanceError):
 `restore_tuple()` accepts either tuple, since both are `tuple[str, ...]`.
 `restore()` accepts the checkpoint,
 and the type checker reports the plain tuple before the program runs.
-At run time, `restore()` raises an `AttributeError` at `memento.strokes`,
-where the code reads `.strokes`.
+At runtime, `restore()` raises an `AttributeError` when it reads `memento.strokes`.
 The checker rejects the assignment to `checkpoint.strokes` too,
 and the runtime raises `FrozenInstanceError`.
 The `strokes` tuple is immutable on its own.
@@ -331,10 +327,9 @@ print(after.strokes is before.strokes, len(after.strokes))
 
 The two objects share the stroke strings, not the tuple holding them.
 On a drawing with `n` strokes,
-`draw()` builds a fresh tuple of `n + 1` pointers,
-and that tuple is the one object it allocates.
+`draw()` builds a new `Drawing` around a fresh tuple of `n + 1` pointers and copies none of the strings.
 
-A single `draw()` allocates one tuple.
+Each `draw()` builds one such tuple.
 A caretaker that keeps every past state, the `History` class in `history.py`,
 keeps every one of those tuples alive.
 Once a field grows by one element per edit, the way `strokes` does,
@@ -401,12 +396,10 @@ def test_draw_keeps_title() -> None:
 
 The caretaker reads no field of the states it holds,
 since opacity is the pattern's whole point.
-The classic form has that opacity,
-so `History[S]` below holds the classic `Memento` from `sketch.py` as readily as a `Drawing`.
-What immutability removes is the explicit `save()` and `restore()` at every edit,
-since a state that keeps its value is its own memento.
-Undo and redo are two stacks of past and future states,
-[generic](08_Foundations--Static_Types.md#type-parameters) over the state type:
+A caretaker that reads no field can hold any type of state,
+so `History` is [generic](08_Foundations--Static_Types.md#type-parameters)
+over the state type.
+Undo and redo are two stacks of past and future states:
 
 ![](_images/memento_history)
 
@@ -480,12 +473,12 @@ and make the popped state the present.
 `apply()` exists because `do()` alone leaves work to the caller.
 `do()` takes a finished state,
 so every call site must build that state from `history.present` and then pass the result to `do()`.
-If you build a new state and keep it in a variable of your own,
+If a call site builds the new state and forgets to pass it to `do()`,
 the history stays as it was.
 Nothing mutates, so every other state stays valid,
 and the program runs on with the history one state short.
 `apply()` takes the edit instead of its result.
-It reads `present` in place of the caller and passes whatever the edit returns unchanged to `do()`,
+It reads `present` for the caller and passes whatever the edit returns to `do()`,
 so no call site can build a state and forget to record it.
 `do()` stays public for a state built some other way than by editing the present,
 such as the `Sketch` mementos that `history_classic.py` passes to it below.
@@ -616,8 +609,8 @@ print(history.undo())
 since the state it names keeps its value.
 The restore takes the strokes from that past state and the title from the present one,
 producing a state new to the history.
-The restore goes through `apply()` like any other action, and so is undoable,
-as the last line shows.
+The restore goes through `apply()` like any other action,
+so `history.undo()` takes it back.
 The edit that `apply()` receives is a lambda here because a partial restore combines two states,
 and every method on `Drawing` works from one.
 
@@ -736,8 +729,8 @@ Matching the class on load to the class on save is your job.
 Deleting a field raises no exception.
 The old bytes load, and every later read succeeds.
 `pickle.loads()` writes the dropped name into the object's `__dict__` as a ghost attribute.
-The class declares no such field, so `getattr()` finds it, `repr()` omits it,
-and `==` ignores it.
+The class declares no such field, so `repr()` omits it and `==` ignores it,
+while `getattr()` still finds it in `__dict__`.
 The loaded object equals one built fresh from `SketchV1` and hashes the same.
 The added-field drift in `pickle_drift.py` raises `AttributeError` when something reads the new field.
 The deleted-field drift raises nothing, and the data is wrong.

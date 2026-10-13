@@ -12,7 +12,7 @@
 <summary>Where to look</summary>
 
 [The Classic *Memento*](../../Chapters/36_Patterns--Memento.md#the-classic-memento) shows `save()` copying the strokes into an immutable `Memento`, and [Immutability](../../Chapters/36_Patterns--Memento.md#immutability) shows a `Drawing` that returns a new state.
-In the mutable sketch, `erase()` pops from the list like `draw()` appends to it.
+In the mutable sketch, `erase()` pops from the list the way `draw()` appends to it.
 In the frozen one, build the new `Drawing` with `replace()` and a sliced tuple.
 Test each by saving first, erasing, then checking the earlier state still holds both strokes.
 
@@ -214,8 +214,7 @@ class History[S]:
         self.past.append(self.present)
         self.present = new_state
 
-def test_erase_returns_new_drawing_leaving_original(
-) -> None:
+def test_erase_leaves_original_drawing() -> None:
     before = Drawing("Duck").draw("circle").draw("beak")
     after = before.erase()
     assert before.strokes == ("circle", "beak")  # Untouched
@@ -253,14 +252,16 @@ the original object, still carrying both strokes.
 <summary>Where to look</summary>
 
 [The Caretaker: a Generic History](../../Chapters/36_Patterns--Memento.md#the-caretaker-a-generic-history) keeps the past as a list to which `do()` appends.
-After the append, check the length against a `max_depth` and drop the oldest entry with `pop(0)`.
-For `can_undo()`, ask what the list holds now, not what the program once pushed.
+[Containers](../../Chapters/03_Foundations--Containers.md#deque) shows a `deque` with a `maxlen`, which discards its oldest entry when an append overflows it.
+For `can_undo()`, ask what the past holds now, not what the program once pushed.
 
 <details>
 <summary>The shape</summary>
 
 ```python
 # The shape of exercise_2.py
+from collections import deque
+
 class History[S]:
     def __init__(self, initial: S, max_depth: int) -> None:
         ...
@@ -283,21 +284,20 @@ rather than looking at `_past`,
 it reports `True` once the bound has discarded a state the count still includes.
 In the demo it reports `True` after the two undos, with `_past` empty,
 and the `undo()` it approves raises an `IndexError` from `pop()`.
-The solution keeps the chapter's `bool(self._past)`, which asks what the list holds now.
+The solution keeps the chapter's `bool(self._past)`, which asks what the past holds now.
 
 ```python
 # exercise_2.py
+from collections import deque
+
 class History[S]:
     def __init__(self, initial: S, max_depth: int) -> None:
         self._present = initial
-        self._past: list[S] = []
+        self._past: deque[S] = deque(maxlen=max_depth)
         self._future: list[S] = []
-        self._max_depth = max_depth
 
     def do(self, new_state: S) -> None:
         self._past.append(self._present)
-        if len(self._past) > self._max_depth:
-            self._past.pop(0)  # Discard the oldest
         self._present = new_state
         self._future.clear()
 
@@ -316,12 +316,20 @@ h.do(2)
 # Past would be [0, 1, 2]; the bound discards 0
 h.do(3)
 print(h._past)
-#: [1, 2]
+#: deque([1, 2], maxlen=2)
 print(h.undo(), h.undo())
 #: 2 1
 print(h.can_undo())
 #: False
 ```
+
+**Bound the past with a `deque`.** A `deque(maxlen=max_depth)`
+discards its leftmost entry, the oldest state, when `append()`
+overflows it. `do()` therefore keeps the chapter's three lines, and
+the bound is one constructor argument. A list would need a length
+check after every append and a `pop(0)`, which shifts every
+remaining element. `undo()` still calls `pop()`, which takes the
+newest state from the right end.
 
 **Report what the past still holds.** `can_undo()` needs no change. It
 asks whether `_past` still holds a state. A bounded history empties
@@ -448,6 +456,7 @@ class Sketch:
     def save(self) -> Memento:
         # No copy: same list object
         return Memento(self.strokes)
+
     def restore(self, memento: Memento) -> None:
         self.strokes = memento.strokes    # Also no copy
 ```
@@ -749,8 +758,9 @@ Worth doing in a library; noise in a solution.
 
 **Record the restore as an action.** `restore_field()` must go through `do()` for the reason
 [Restoring Part of a State](../../Chapters/36_Patterns--Memento.md#restoring-part-of-a-state)
-gives, and the listing's last line proves it. The partial restore is
-an action, so it belongs on the timeline. Editing `_past` rewrites
+gives, and the `history.undo()` that ends the listing proves it.
+The partial restore is an action, so it belongs on the timeline.
+Editing `_past` rewrites
 history rather than extending it, leaving the user who wanted the
 strokes back no way to change their mind. Editing `_past` also
 desynchronizes the caretaker's own bookkeeping. `do()` clears
@@ -804,10 +814,13 @@ class DrawingV2:
 <summary>Solution</summary>
 
 If you write `DrawingV2` with a bare `@record`, as the chapter writes `Drawing`,
-the default does not appear.
-Reading `restored.layer` raises an `AttributeError`.
+the load goes wrong twice.
+A slotted record's generated `__setstate__()` assigns the saved state to the fields by position,
+and the old bytes hold a `__dict__`, so each field receives one of its keys:
+`restored.title` is `'title'` and `restored.strokes` is `'strokes'`.
+The default does not appear either.
 A slotted class keeps `layer` in a slot instead of as a class attribute,
-so nothing supplies the value the old bytes lack.
+so reading `restored.layer` raises an `AttributeError`.
 The solution writes `@record(slots=False)`,
 which keeps the default on the class and gives each instance the `__dict__` the listing inspects.
 

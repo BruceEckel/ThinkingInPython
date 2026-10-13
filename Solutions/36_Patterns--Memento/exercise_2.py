@@ -1,15 +1,14 @@
 # exercise_2.py
+from collections import deque
+
 class History[S]:
     def __init__(self, initial: S, max_depth: int) -> None:
         self._present = initial
-        self._past: list[S] = []
+        self._past: deque[S] = deque(maxlen=max_depth)
         self._future: list[S] = []
-        self._max_depth = max_depth
 
     def do(self, new_state: S) -> None:
         self._past.append(self._present)
-        if len(self._past) > self._max_depth:
-            self._past.pop(0)  # Discard the oldest
         self._present = new_state
         self._future.clear()
 
@@ -28,7 +27,7 @@ h.do(2)
 # Past would be [0, 1, 2]; the bound discards 0
 h.do(3)
 print(h._past)
-#: [1, 2]
+#: deque([1, 2], maxlen=2)
 print(h.undo(), h.undo())
 #: 2 1
 print(h.can_undo())

@@ -23,8 +23,7 @@ class History[S]:
         self.past.append(self.present)
         self.present = new_state
 
-def test_erase_returns_new_drawing_leaving_original(
-) -> None:
+def test_erase_leaves_original_drawing() -> None:
     before = Drawing("Duck").draw("circle").draw("beak")
     after = before.erase()
     assert before.strokes == ("circle", "beak")  # Untouched
