@@ -1,15 +1,12 @@
 # list.py
 
-odds = [1, 3, 5, 7, 9, 11]
+odds = [1, 3, 5]
 print(odds)
-#: [1, 3, 5, 7, 9, 11]
-odds.append(13)
+#: [1, 3, 5]
+odds.append(7)
 for x in odds:
     print(x)
 #: 1
 #: 3
 #: 5
 #: 7
-#: 9
-#: 11
-#: 13

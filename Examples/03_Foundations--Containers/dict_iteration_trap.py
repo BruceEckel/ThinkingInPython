@@ -7,3 +7,10 @@ try:
 except RuntimeError as e:
     print(e)
 #: dictionary changed size during iteration
+s = {1, 2, 3}
+try:
+    for x in s:
+        s.discard(x)
+except RuntimeError as e:
+    print(e)
+#: Set changed size during iteration

@@ -157,7 +157,7 @@ member of all three sets.
 
 ## 4. Why a `list` cannot join a set of `frozenset`s
 
-> In `immutable_containers.py`, add a line that tries `groups.add([1, 2])`
+> In `frozen_containers.py`, add a line that tries `groups.add([1, 2])`
 > (a plain list, not a `frozenset`) and catch the exception it raises.
 > Explain, in terms of hashability,
 > why a `frozenset` works as a set member but a `list` does not.

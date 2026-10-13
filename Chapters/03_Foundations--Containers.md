@@ -18,19 +18,16 @@ The `for` statement iterates through the elements of a list rather than counting
 ```python
 # list.py
 
-odds = [1, 3, 5, 7, 9, 11]
+odds = [1, 3, 5]
 print(odds)
-#: [1, 3, 5, 7, 9, 11]
-odds.append(13)
+#: [1, 3, 5]
+odds.append(7)
 for x in odds:
     print(x)
 #: 1
 #: 3
 #: 5
 #: 7
-#: 9
-#: 11
-#: 13
 ```
 
 The first line creates a `list`.
@@ -180,7 +177,10 @@ Removing items from a `list` while iterating over it is the second surprise:
 
 xs = [1, 2, 3, 4]
 for x in xs:
+    print(x)
     xs.remove(x)
+#: 1
+#: 3
 print(xs)
 #: [2, 4]
 ```
@@ -188,6 +188,7 @@ print(xs)
 Each `remove()` slides the following elements one place to the left,
 and the loop then advances its index,
 so it steps over the element that moved into the vacated slot.
+The loop prints `1` and `3`, the values it visits, and skips `2` and `4`.
 Skipping every other element leaves half of `xs`,
 and no exception reports the skip.
 Build a new list instead, with a comprehension that keeps the items you need,
@@ -209,9 +210,10 @@ x, y = point  # Unpacking
 print(x, y)
 #: 3 4
 # A one-element tuple needs the trailing comma
+number = (42)
 single = (42,)
-print(len(single))
-#: 1
+print(type(number).__name__, type(single).__name__)
+#: int tuple
 print(tuple([1, 2, 3]))
 #: (1, 2, 3)
 print(tuple("abc"))
@@ -225,7 +227,8 @@ print(low, high)
 #: 1 9
 ```
 
-Without its comma, `(42)` is the integer `42` inside parentheses.
+Without its comma, `(42)` is the integer `42` inside parentheses,
+so `number` is an `int`.
 The empty tuple `()` is the exception to the comma rule,
 because it has nothing to separate.
 
@@ -309,12 +312,9 @@ person = ("Alice", 30, 1.65)  # Name, age, height
 name, age, height = person
 print(name, age, height)
 #: Alice 30 1.65
-print(person[0], type(person[0]).__name__)
-#: Alice str
-print(person[1], type(person[1]).__name__)
-#: 30 int
-print(person[2], type(person[2]).__name__)
-#: 1.65 float
+print(type(name).__name__, type(age).__name__,
+      type(height).__name__)
+#: str int float
 ```
 
 A tuple used this way is a fixed-length immutable record,
@@ -432,7 +432,7 @@ and `dict()` accepts any iterable that yields such pairs.
 covers it with the other loop tools.
 
 The `list` in `remove_while_iterating.py` skips elements and reports nothing.
-Changing a `dict`'s size while iterating over it raises a `RuntimeError`:
+Changing the size of a `dict` or a `set` while iterating over it raises a `RuntimeError`:
 
 ```python
 # dict_iteration_trap.py
@@ -444,10 +444,17 @@ try:
 except RuntimeError as e:
     print(e)
 #: dictionary changed size during iteration
+s = {1, 2, 3}
+try:
+    for x in s:
+        s.discard(x)
+except RuntimeError as e:
+    print(e)
+#: Set changed size during iteration
 ```
 
-A `set` raises the same exception,
-with the message `Set changed size during iteration`.
+`discard()` removes an element from a `set`; [Sets](#sets)
+covers it with the other set methods.
 Only the `list` hides the mistake.
 The `dict` and the `set` both report it.
 
@@ -488,7 +495,10 @@ print(2 in a)
 The order these sets print comes from CPython's hashing, not from any guarantee,
 so do not write code, or a test, that depends on it.
 
-Every set-algebra operator in `sets.py` has a named method.
+Every set-algebra operator in `sets.py` has a named method:
+`intersection()` for `&`, `union()` for `|`, `difference()` for `-`,
+`symmetric_difference()` for `^`, `issubset()` for `<=`,
+and `issuperset()` for `>=`.
 The methods are more flexible.
 They accept any iterable where the operators need a set on both sides,
 and `union()`, `intersection()`,
@@ -501,23 +511,10 @@ and `difference()` take several arguments at once.
 a = {1, 2, 3}
 b = {3, 4, 5}
 
-print(a.intersection(b))  # Same as a & b
-#: {3}
-print(a.union(b))  # Same as a | b
-#: {1, 2, 3, 4, 5}
-print(a.difference(b))  # Same as a - b
-#: {1, 2}
-print(a.symmetric_difference(b))  # Same as a ^ b
-#: {1, 2, 4, 5}
 print(a.intersection([2, 3, 9]))  # Arg can be any iterable
 #: {2, 3}
 print(a.union(b, [6, 7]))  # Several args
 #: {1, 2, 3, 4, 5, 6, 7}
-c = {1, 2}
-print(c.issubset(a))  # Same as c <= a
-#: True
-print(a.issuperset(c))  # Same as a >= c
-#: True
 print(a.isdisjoint({8, 9}))  # No operator form
 #: True
 ```
@@ -794,44 +791,25 @@ completes the trio: a built-in,
 hashable mapping that rejects changes after creation.
 `MappingProxyType`, from the `types` module,
 is a read-only *view* onto a `dict` you still hold, not a container of its own.
-A tuple, a frozenset, and a `MappingProxyType` each reject changes:
+A `frozenset` is hashable, so it can be a set member or a dictionary key.
+A `list` or a `set` is unhashable, so it can be neither.
+A `frozenset` also has no `add()` method,
+so calling `add()` on one raises an `AttributeError`:
 
 ```python
-# immutable_containers.py
-from types import MappingProxyType
+# frozen_containers.py
 
-# The immutable list is tuple; the immutable set, frozenset:
-nums = (1, 2, 3)
 primes = frozenset({2, 3, 5, 7})
 print(5 in primes)
 #: True
-
-# A frozenset is hashable, so it can be a set member
-# or a dictionary key. A plain list or set cannot:
 groups = {frozenset({1, 2}), frozenset({3, 4})}
 print(frozenset({1, 2}) in groups)
 #: True
-
-# MappingProxyType wraps a dict in a read-only view:
-settings = {"debug": False, "level": 3}
-config = MappingProxyType(settings)
-print(config["level"])
-#: 3
-settings["level"] = 4  # The view is live, not a copy
-print(config["level"])
-#: 4
-
-# Mutating any of them is an error:
 try:
     primes.add(11)  # type: ignore
 except AttributeError as e:
     print(e)
 #: 'frozenset' object has no attribute 'add'
-try:
-    config["level"] = 9  # type: ignore
-except TypeError as e:
-    print(e)
-#: 'mappingproxy' object does not support item assignment
 ```
 
 Modifying an immutable container is a type error as well as a runtime error,
@@ -847,9 +825,29 @@ unlike the [mutable default](05_Foundations--Functions.md#the-mutable-default-tr
 
 A `MappingProxyType` is the one exception to watch.
 It blocks writes through the view, but it is a window onto the original `dict`,
-so changes to that `dict` still show through.
-In `immutable_containers.py`,
-writing to `settings` changes what `config` reports.
+so changes to that `dict` still show through:
+
+```python
+# mapping_proxy.py
+from types import MappingProxyType
+
+settings = {"debug": False, "level": 3}
+config = MappingProxyType(settings)
+print(config["level"])
+#: 3
+settings["level"] = 4
+print(config["level"])
+#: 4
+try:
+    config["level"] = 9  # type: ignore
+except TypeError as e:
+    print(e)
+#: 'mappingproxy' object does not support item assignment
+```
+
+The view is live, not a copy,
+so writing to `settings` changes what `config` reports.
+Writing through `config` raises a `TypeError`.
 
 ### `frozendict`
 
@@ -942,7 +940,7 @@ Try each exercise before opening its [solution](../Solutions/03_Foundations--Con
     and print the result.
 3.  In `set_methods.py`,
     add a set `d = {1, 5, 9}` and print `a.union(b, d)` and `a.intersection(b, d)`.
-4.  In `immutable_containers.py`, add a line that tries `groups.add([1, 2])`
+4.  In `frozen_containers.py`, add a line that tries `groups.add([1, 2])`
     (a plain list, not a `frozenset`) and catch the exception it raises.
     Explain, in terms of hashability,
     why a `frozenset` works as a set member but a `list` does not.

@@ -7,9 +7,10 @@ x, y = point  # Unpacking
 print(x, y)
 #: 3 4
 # A one-element tuple needs the trailing comma
+number = (42)
 single = (42,)
-print(len(single))
-#: 1
+print(type(number).__name__, type(single).__name__)
+#: int tuple
 print(tuple([1, 2, 3]))
 #: (1, 2, 3)
 print(tuple("abc"))
