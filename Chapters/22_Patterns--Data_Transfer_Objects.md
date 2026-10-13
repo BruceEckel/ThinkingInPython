@@ -48,7 +48,8 @@ with expected(AttributeError):
 
 The constructor replaces the object's `__dict__` with the `dict` that the `**kwargs` parameter automatically creates.
 `vars(m)` returns that same `__dict__`,
-and its output shows that the attributes and the keyword arguments are one dict.
+so its output lists every attribute `m` holds:
+the two keyword arguments and `more`.
 `m.more = 11` adds a key, as passing `more=11` to the constructor does.
 
 Because `**kwargs` is the only parameter after `self`,
@@ -61,10 +62,11 @@ since a named parameter must follow a bare `*`.
 
 The `m: Any` annotation does real work.
 The `Messenger` class declares no attributes,
-so without that annotation the type checker rejects both `m.more = 11` and `m.info`.
+so without that annotation the type checker rejects the write `m.more = 11` and every read,
+such as `m.info`.
 `Any` switches the type checker off for `m`.
 
-You can move that `Any` into the class instead of repeating it at every use site,
+You can move that `Any` into the class instead of annotating every variable that holds a `Messenger`,
 by declaring a [`__getattr__()`](26_Patterns--Surrogate.md#forwarding-with-getattr)
 that returns `Any` and a `__setattr__()` that accepts one.
 With `__getattr__()` alone, the type checker still rejects the write,
@@ -111,9 +113,8 @@ because `Messenger` inherits `object`'s identity-based equality.
 
 A `SimpleNamespace` also accepts any name you invent,
 so no type checker knows which names to expect.
-Its type declaration says so.
-Reading any attribute yields `Any`,
-so `m.inof` passes the type checker here too.
+Its type declaration gives every attribute read the type `Any`,
+so a typo such as `m.inof` passes the type checker here too.
 
 ### `@dataclass`
 
@@ -180,12 +181,12 @@ print(red._asdict(), Color._fields)
 
 Printing a `NamedTuple` gives the same readable output as a data class.
 A bare tuple prints `(255, 0, 0)` and leaves you counting positions.
-Assigning to a field raises an `AttributeError`,
-and the type checker reports the assignment as well.
 An attribute bag accepts every write.
-A `NamedTuple` rejects this one, at runtime and in the checker.
-Because no field can change, `_replace()` is the way to change one.
-It produces an updated copy.
+A `NamedTuple` rejects a write to a field twice:
+the type checker reports `red.r = 9` before the script runs,
+and at runtime the assignment raises an `AttributeError`.
+Because no field can change,
+`_replace()` builds an updated copy with one field replaced.
 [`copy.replace()`](12_Techniques--Data_Classes_as_Types.md#the-general-form-of-replace)
 does the same job for a `NamedTuple`, a frozen data class,
 and any other type that defines `__replace__()`.
@@ -359,7 +360,11 @@ compatibility with code that expects a tuple.
 Choose a [frozen data class](12_Techniques--Data_Classes_as_Types.md#immutability)
 when the value should be a distinct type that equals instances of its own class alone.
 This book writes it as `@record`.
-Choose it too when inherited ordering and array-shaped JSON are wrong rather than convenient.
+Choose it too when inherited ordering and array-shaped JSON are wrong rather than convenient,
+or when the type must check its own values.
+A frozen data class runs [`__post_init__()`](12_Techniques--Data_Classes_as_Types.md#a-type-is-a-set-of-values)
+on every construction, so its values are legal and not merely typed,
+while [a `NamedTuple` cannot validate itself](12_Techniques--Data_Classes_as_Types.md#namedtuple-cannot-validate).
 
 When the data must stay a dict,
 because it arrives as JSON or goes back out as JSON,
@@ -367,8 +372,6 @@ a [`TypedDict`](08_Foundations--Static_Types.md#dictionary-and-record-shapes)
 names the keys and their types for the type checker while the value stays a real dict.
 When the data becomes a dict for output alone,
 `_asdict()` on a `NamedTuple` and `dataclasses.asdict()` on a data class each produce one.
-To make a `@dataclass` guarantee that its values are legal, not merely typed,
-see [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#a-type-is-a-set-of-values).
 
 ## Exercises
 

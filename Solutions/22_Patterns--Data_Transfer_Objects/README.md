@@ -116,7 +116,7 @@ with no other code to update.
 <details>
 <summary>Where to look</summary>
 
-[A `NamedTuple` Is Still a Tuple](../../Chapters/22_Patterns--Data_Transfer_Objects.md#a-namedtuple-is-still-a-tuple) shows that a `NamedTuple` inherits its behavior from `tuple`, including how it hashes.
+[`NamedTuple`](../../Chapters/22_Patterns--Data_Transfer_Objects.md#namedtuple) says how far a `NamedTuple`'s immutability reaches, and why it hashes.
 Call a mutating method on the `list` field, which assigns nothing to the record.
 For the `dict` key, ask what hashing a tuple does with each of its elements.
 
@@ -306,8 +306,8 @@ With `Stats` you write `result.count`, so the
 code does not depend on the order. A parameter annotated `Stats` also
 rejects a hand-built tuple in either order, because a
 `tuple[float, int]` is not a `Stats`.
-Position is something the type checker can verify and a reader cannot.
-A name is something both can.
+A position tells the type checker an element's type and tells a
+reader nothing. A name tells both of them what the element is.
 
 </details>
 </details>
@@ -413,8 +413,9 @@ scenario needs. The type checker cannot catch a typo in a key name.
 
 **The grid coordinate is a `NamedTuple`.** It must work as a `dict`
 key, so it must hash, and a `NamedTuple` hashes as long as its fields
-do. A `@dataclass` also hashes by value when frozen (with the
-default `eq=True`), which rules out the mutable `@dataclass`.
+do. A frozen `@dataclass` also hashes by value (with the default
+`eq=True`). A mutable `@dataclass` sets `__hash__` to `None`, so it
+fails as a key.
 `SimpleNamespace` and a `TypedDict` both fail as keys.
 `SimpleNamespace` compares by contents and defines no hash, and a
 `TypedDict` is a `dict` at runtime, which is unhashable.
@@ -423,14 +424,19 @@ wins on convenience. Unpacking a coordinate as `x, y = point` and
 passing it to code that takes a tuple are both things the scenario
 needs and a frozen data class refuses.
 
-**The JSON record is a `@dataclass`.** `json.dumps()` writes a
+**The JSON record is a frozen data class.** `json.dumps()` writes a
 `NamedTuple` as a bare array, so the record goes back out without
 its field names. Given a `@dataclass`, `json.dumps()` raises a `TypeError`
 instead of dropping the names silently. A `@dataclass` also has a place for the
 validation this scenario requires. [Data Classes as
 Types](../../Chapters/12_Techniques--Data_Classes_as_Types.md#a-type-is-a-set-of-values)
 makes `__post_init__()` the method that rejects a value the JSON
-decoder otherwise accepts unchecked. A `TypedDict` matches the shape
+decoder otherwise accepts unchecked. Freezing the data class makes
+that check final, since no later assignment can change a field. A
+`NamedTuple` refuses an override of `__new__()` or `__init__()`, so
+[its check lives in a factory
+function](../../Chapters/12_Techniques--Data_Classes_as_Types.md#namedtuple-cannot-validate)
+that a caller can bypass. A `TypedDict` matches the shape
 JSON arrives in and names the keys for the type checker, but it is a
 dict at runtime and runs no code, so it cannot validate. A
 `SimpleNamespace` declares no fields and has no `__post_init__()`, so
