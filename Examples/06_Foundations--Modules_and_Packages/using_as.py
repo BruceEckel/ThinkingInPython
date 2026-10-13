@@ -1,6 +1,5 @@
 # using_as.py
 import module as m
 
-if __name__ == "__main__":
-    print(m.useful_function())
+print(m.useful_function())
 #: I'm being useful!

@@ -98,8 +98,7 @@ Here, the `from` keyword brings `useful_function` into the current namespace:
 # using_from.py
 from module import useful_function
 
-if __name__ == "__main__":
-    print(useful_function())
+print(useful_function())
 #: I'm being useful!
 ```
 
@@ -144,8 +143,7 @@ The `as` keyword binds the imported module to a name you choose:
 # using_as.py
 import module as m
 
-if __name__ == "__main__":
-    print(m.useful_function())
+print(m.useful_function())
 #: I'm being useful!
 ```
 
@@ -562,43 +560,9 @@ adds the `lazy` soft keyword: a keyword only inside an `import` statement,
 the way `match` is a keyword only inside a [`match` statement](04_Foundations--Control_Flow.md#pattern-matching).
 A `lazy import` defers loading the module until the first time you use the imported name,
 so a run loads only the modules it uses,
-while all imports stay at the top of the file:
-
-```python
-# lazy_imports.py
-lazy import json
-lazy from pathlib import Path
-
-print(json.dumps({"a": 1}))
-#: {"a": 1}
-print(Path("report/data.txt").suffix)
-#: .txt
-```
-
+while all imports stay at the top of the file.
 A `lazy import` looks like an ordinary one, with `lazy` in front,
 and once loaded the names behave like eagerly imported ones.
-`json` and `pathlib` load at the `json.dumps()` and `Path(...)` calls.
-The output is the same either way, so this listing cannot show the deferral.
-`lazy_noisy.py`, in [Watching the Deferral](#watching-the-deferral), does.
-
-### Deferring an Import Before 3.15
-
-Before 3.15, deferring a slow import meant moving it inside the function that needed it.
-That works, but it hides the dependency:
-nothing at the top of the file mentions the module,
-tools that read imports miss it,
-and the `import` statement re-runs its `sys.modules` lookup on every call.
-`lazy import` keeps the declaration at the top where a reader and a tool can see it,
-and loads the module once, at first use.
-
-Packages deferred submodule loading before `lazy import` existed,
-by giving `__init__.py` a module-level `__getattr__()`
-([PEP 562](https://peps.python.org/pep-0562/))
-that imports and returns a submodule the first time a caller asks for it by name.
-NumPy and SciPy use that technique to keep import time low.
-`lazy import` needs no hand-written `__getattr__()`,
-and defers any imported name, not only a package's submodules.
-The `__getattr__()` pattern still matters for code that must run on a Python older than 3.15.
 
 ### Watching the Deferral
 
@@ -632,19 +596,22 @@ so `noisy module loaded` prints after `before first use`.
 If a lazily imported module is missing or broken,
 the error surfaces at that first use rather than at the import line.
 
+The `from` form takes `lazy` too.
+`lazy from noisy import announce` defers loading `noisy` until the first use of `announce`.
+
 `sys.lazy_modules` holds the names still waiting to load,
 but the standard-library modules CPython loads at startup put lazy imports of their own into that set before your code runs:
 
 ```python
 # lazy_modules_check.py
 import sys
-lazy import noisy
+lazy from noisy import announce
 
 print(len(sys.lazy_modules) > 1)
 #: True
 print("noisy" in sys.lazy_modules)
 #: True
-noisy.announce()
+announce()
 #: noisy module loaded
 #: noisy.announce() called
 print("noisy" in sys.lazy_modules)
@@ -653,9 +620,28 @@ print("noisy" in sys.lazy_modules)
 
 This script marks one import lazy and the set holds more than one name,
 so `sys.lazy_modules` is not a clean "what my program deferred" list.
-`noisy` leaves the set once `noisy.announce()` loads it,
+`noisy` leaves the set once `announce()` loads it,
 so the set tracks names still waiting, not names your program ever deferred.
 Check it for a specific name you marked lazy, rather than reading the whole set.
+
+### Deferring an Import Before 3.15
+
+Before 3.15, deferring a slow import meant moving it inside the function that needed it.
+That works, but it hides the dependency:
+nothing at the top of the file mentions the module,
+tools that read imports miss it,
+and the `import` statement re-runs its `sys.modules` lookup on every call.
+`lazy import` keeps the declaration at the top where a reader and a tool can see it,
+and loads the module once, at first use.
+
+Packages deferred submodule loading before `lazy import` existed,
+by giving `__init__.py` a module-level `__getattr__()`
+([PEP 562](https://peps.python.org/pep-0562/))
+that imports and returns a submodule the first time a caller asks for it by name.
+NumPy and SciPy use that technique to keep import time low.
+`lazy import` needs no hand-written `__getattr__()`,
+and defers any imported name, not only a package's submodules.
+The `__getattr__()` pattern still matters for code that must run on a Python older than 3.15.
 
 ### Limits of `lazy`
 
