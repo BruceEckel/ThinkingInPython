@@ -11,6 +11,3 @@ show(B())
 #:   • x: int = 42 [CV]
 #: [Methods]
 #:   None
-
-print(B.__annotations__)
-#: {'x': <class 'int'>, 's': <class 'str'>}

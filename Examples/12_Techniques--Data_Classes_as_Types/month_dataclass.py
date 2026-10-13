@@ -37,7 +37,8 @@ class Months:
               f"Month({month_number})")
         return self.months[month_number - 1]
 
-if __name__ == "__main__":
-    months = Months()
-    print(months.of(7))
+months = Months()
+print(months.of(7))
 #: Month(name='July', n=7, max_days=31)
+print(Month("Smarch", 7, 30))
+#: Month(name='Smarch', n=7, max_days=30)

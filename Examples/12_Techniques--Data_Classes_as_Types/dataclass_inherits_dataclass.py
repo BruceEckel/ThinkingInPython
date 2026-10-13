@@ -6,9 +6,9 @@ class Connection:
     host: str
 
 @dataclass
-class Logged(Connection):
+class NamedConnection(Connection):
     name: str
 
-c = Logged("localhost", "db")
+c = NamedConnection("localhost", "db")
 print(c.host, c.name)
 #: localhost db

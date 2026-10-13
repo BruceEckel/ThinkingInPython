@@ -142,16 +142,12 @@ class Stars:
         self._validate()  # Postcondition
         return self._number
 
-if __name__ == "__main__":
-    rating = Stars(4)
-    print(rating)
-    print(rating.f1())
-    damaged = Stars(8)
-    expect(TypeFailure, damaged.f1)
-    print(damaged)
-#: Stars(4)
-#: 9
+damaged = Stars(8)
+print(damaged)
+#: Stars(8)
+expect(TypeFailure, damaged.f1)
 #: [TypeFailure] Stars(13)
+print(damaged)
 #: Stars(13)
 ```
 
@@ -246,8 +242,6 @@ from messenger import Messenger
 m = Messenger("iris", 12, 3.14)
 print(m)
 #: Messenger(name='iris', number=12, depth=3.14)
-print(m.name, m.number, m.depth)
-#: iris 12 3.14
 
 # The generated __eq__ compares by field value:
 print(Messenger("iris", 1) == Messenger("iris", 1))
@@ -378,9 +372,6 @@ show(B())
 #:   • x: int = 42 [CV]
 #: [Methods]
 #:   None
-
-print(B.__annotations__)
-#: {'x': <class 'int'>, 's': <class 'str'>}
 ```
 
 The `[CV]` tags in `show(B())` mark both as class variables.
@@ -393,7 +384,7 @@ so every `B` object reads the same two values straight from the class attributes
 
 ```python
 # plain_dataclass.py
-from dataclasses import dataclass
+from dataclasses import dataclass, fields
 from comparison import show
 
 @dataclass
@@ -410,8 +401,8 @@ show(C(11, "this is C"))
 #:   • __init__(self, x: int, s: str) -> None
 #:   • __repr__(self)
 
-print(C.__annotations__)
-#: {'x': <class 'int'>, 's': <class 'str'>}
+print("x" in C.__dict__, [f.name for f in fields(C)])
+#: False ['x', 's']
 ```
 
 `show(C(11, "this is C"))` finds the same two names as `show(B())`.
@@ -440,6 +431,7 @@ but that it builds an `__init__()` to act on them.
 from dataclasses import dataclass
 from typing import ClassVar
 from comparison import show
+from exceptions import expect
 
 @dataclass
 class D:
@@ -470,6 +462,8 @@ for k, v in D.__annotations__.items():
 #: 'x': <class 'int'>
 #: 's': typing.ClassVar[str]
 #: 'f': typing.ClassVar[float]
+expect(AttributeError, getattr, D, "f")
+#: [AttributeError] type object 'D' has no attribute 'f'
 ```
 
 `show(D)` tags both attributes `[CV]`,
@@ -490,7 +484,8 @@ so no constructor call can assign one.
 It has no initializer, so it is a bare annotation,
 as `x` and `s` are back in `A`: a declaration recorded in `D.__annotations__`,
 with no value stored anywhere to report.
-`D.f` raises `AttributeError`, for the same reason `A().x` does.
+`expect()` shows that `D.f` raises an `AttributeError`,
+for the same reason `A().x` does.
 Assigning a value creates the attribute.
 Declaring it `ClassVar` does not.
 
@@ -581,14 +576,6 @@ def f1(s: Stars) -> Stars:
 
 def f2(s: Stars) -> Stars:
     return Stars(s.number * 5)
-
-if __name__ == "__main__":
-    print(Stars(4))
-    print(f1(Stars(2)))
-    print(f2(Stars(2)))
-#: Stars(number=4)
-#: Stars(number=7)
-#: Stars(number=10)
 ```
 
 `Stars` now constrains `number` to a set of values:
@@ -764,16 +751,6 @@ class EmailAddress:
 class Person:
     name: FullName
     email: EmailAddress
-
-if __name__ == "__main__":
-    person = Person(
-        FullName("Grace Hopper"),
-        EmailAddress("grace@example.com"),
-    )
-    print(person.name)
-    print(person.email)
-#: FullName(text='Grace Hopper')
-#: EmailAddress(text='grace@example.com')
 ```
 
 `Person` declares no checks of its own.
@@ -985,11 +962,16 @@ class Months:
               f"Month({month_number})")
         return self.months[month_number - 1]
 
-if __name__ == "__main__":
-    months = Months()
-    print(months.of(7))
+months = Months()
+print(months.of(7))
 #: Month(name='July', n=7, max_days=31)
+print(Month("Smarch", 7, 30))
+#: Month(name='Smarch', n=7, max_days=30)
 ```
+
+`Month("Smarch", 7, 30)` passes every `check()`,
+so the data class accepts an invented month and a second July.
+The `Enum` defines no such value.
 
 `Months` carries a list of its twelve `Month`s,
 so its `months` field needs `field(default_factory=make_months)` rather than a default value.
@@ -1156,10 +1138,10 @@ class Connection:
         self.url = f"tcp://{host}:5432"
 
 @dataclass
-class Logged(Connection):
+class NamedConnection(Connection):
     name: str
 
-c = Logged("db")
+c = NamedConnection("db")
 print(c.name)
 #: db
 # Connection.__init__ never ran, so host and url are unset:
@@ -1168,7 +1150,7 @@ print(hasattr(c, "host"), hasattr(c, "url"))
 ```
 
 Because nothing calls `Connection.__init__()`, neither `host` nor `url` exists.
-The omission is easy to miss because `Logged("db")` still succeeds.
+The omission is easy to miss because `NamedConnection("db")` still succeeds.
 
 To run the base initializer, call it yourself from `__post_init__()`,
 which runs after the generated `__init__()` assigns the fields:
@@ -1183,14 +1165,14 @@ class Connection:
         self.url = f"tcp://{host}:5432"
 
 @dataclass
-class Logged(Connection):
+class NamedConnection(Connection):
     host: str
     name: str
 
     def __post_init__(self) -> None:
         super().__init__(self.host)
 
-c = Logged("localhost", "db")
+c = NamedConnection("localhost", "db")
 print(c.url, c.name)
 #: tcp://localhost:5432 db
 ```
@@ -1217,10 +1199,10 @@ class Connection:
     host: str
 
 @dataclass
-class Logged(Connection):
+class NamedConnection(Connection):
     name: str
 
-c = Logged("localhost", "db")
+c = NamedConnection("localhost", "db")
 print(c.host, c.name)
 #: localhost db
 ```
@@ -1229,7 +1211,7 @@ A default in the base class is the one snag.
 If `host` had a default, `name` would follow it with none,
 and `@dataclass` refuses that order
 ([More Data Class Tools](#more-data-class-tools) has the rule).
-`kw_only=True` on `Logged` makes `name` keyword-only,
+`kw_only=True` on `NamedConnection` makes `name` keyword-only,
 and the rule stops applying.
 
 ## Frozen and Plain Data Classes Do Not Mix

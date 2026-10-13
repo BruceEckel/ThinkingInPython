@@ -24,13 +24,3 @@ class EmailAddress:
 class Person:
     name: FullName
     email: EmailAddress
-
-if __name__ == "__main__":
-    person = Person(
-        FullName("Grace Hopper"),
-        EmailAddress("grace@example.com"),
-    )
-    print(person.name)
-    print(person.email)
-#: FullName(text='Grace Hopper')
-#: EmailAddress(text='grace@example.com')

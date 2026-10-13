@@ -24,14 +24,10 @@ class Stars:
         self._validate()  # Postcondition
         return self._number
 
-if __name__ == "__main__":
-    rating = Stars(4)
-    print(rating)
-    print(rating.f1())
-    damaged = Stars(8)
-    expect(TypeFailure, damaged.f1)
-    print(damaged)
-#: Stars(4)
-#: 9
+damaged = Stars(8)
+print(damaged)
+#: Stars(8)
+expect(TypeFailure, damaged.f1)
 #: [TypeFailure] Stars(13)
+print(damaged)
 #: Stars(13)

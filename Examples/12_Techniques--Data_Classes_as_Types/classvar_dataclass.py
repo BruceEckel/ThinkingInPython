@@ -2,6 +2,7 @@
 from dataclasses import dataclass
 from typing import ClassVar
 from comparison import show
+from exceptions import expect
 
 @dataclass
 class D:
@@ -32,3 +33,5 @@ for k, v in D.__annotations__.items():
 #: 'x': <class 'int'>
 #: 's': typing.ClassVar[str]
 #: 'f': typing.ClassVar[float]
+expect(AttributeError, getattr, D, "f")
+#: [AttributeError] type object 'D' has no attribute 'f'

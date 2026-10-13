@@ -7,13 +7,13 @@ class Connection:
         self.url = f"tcp://{host}:5432"
 
 @dataclass
-class Logged(Connection):
+class NamedConnection(Connection):
     host: str
     name: str
 
     def __post_init__(self) -> None:
         super().__init__(self.host)
 
-c = Logged("localhost", "db")
+c = NamedConnection("localhost", "db")
 print(c.url, c.name)
 #: tcp://localhost:5432 db

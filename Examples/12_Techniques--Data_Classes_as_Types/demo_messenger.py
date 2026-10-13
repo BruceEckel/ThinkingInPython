@@ -5,8 +5,6 @@ from messenger import Messenger
 m = Messenger("iris", 12, 3.14)
 print(m)
 #: Messenger(name='iris', number=12, depth=3.14)
-print(m.name, m.number, m.depth)
-#: iris 12 3.14
 
 # The generated __eq__ compares by field value:
 print(Messenger("iris", 1) == Messenger("iris", 1))

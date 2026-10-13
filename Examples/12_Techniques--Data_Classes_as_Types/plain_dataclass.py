@@ -1,5 +1,5 @@
 # plain_dataclass.py
-from dataclasses import dataclass
+from dataclasses import dataclass, fields
 from comparison import show
 
 @dataclass
@@ -16,5 +16,5 @@ show(C(11, "this is C"))
 #:   • __init__(self, x: int, s: str) -> None
 #:   • __repr__(self)
 
-print(C.__annotations__)
-#: {'x': <class 'int'>, 's': <class 'str'>}
+print("x" in C.__dict__, [f.name for f in fields(C)])
+#: False ['x', 's']

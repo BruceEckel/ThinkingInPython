@@ -7,10 +7,10 @@ class Connection:
         self.url = f"tcp://{host}:5432"
 
 @dataclass
-class Logged(Connection):
+class NamedConnection(Connection):
     name: str
 
-c = Logged("db")
+c = NamedConnection("db")
 print(c.name)
 #: db
 # Connection.__init__ never ran, so host and url are unset:
