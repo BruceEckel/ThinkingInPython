@@ -196,7 +196,7 @@ and a set of cells collapses to three with or without sharing.
 Only identity proves sharing.
 The listing shows the object count, not the memory behind it (see exercise 2).
 
-The last two lines of `tile_map_demo.py` call `label()` on one object,
+The two `label()` calls in `tile_map_demo.py` go to one object,
 the shared water tile, and get two answers,
 because each caller passes in the position.
 The shared object holds the state common to every use,
@@ -387,7 +387,7 @@ The bookkeeping exists for that guarantee, or for the constructor syntax.
 When you need neither,
 the `@cache` factory from `tile_map.py` does the same job.
 
-One more property carries over from [*Singleton*](24_Patterns--Singleton.md#the-first-call-race)'s cached factory.
+One more hazard carries over from [*Singleton*](24_Patterns--Singleton.md#the-first-call-race)'s cached factory.
 Every lazy check-then-insert pool races under threads.
 Two threads asking for the same new color can each build "the" shared object.
 The second store overwrites the first,
@@ -479,7 +479,7 @@ and an `is` comparison between them answers `False`.
 Use `lru_cache` where a stored result saves recomputation,
 not as a flyweight factory.
 The weak pool avoids that trade.
-Its entry lives exactly as long as something references the object,
+Its entry lives as long as something references the object,
 so every request during that life returns the one object.
 
 The tests confirm that `name()` returns the live `Name` for a repeated text and a different object for a different text,
@@ -553,8 +553,8 @@ skipping `Tile.__new__()` so the call does not recurse.
 to build the `Tile(".")` lookup table and the member's `repr()`,
 so `__new__()` must assign to that exact name rather than a name of its own such as `_symbol_`.
 
-`tile_enum_demo.py` looks up one member by name, by symbol, and by attribute,
-then reads a member's fields:
+`tile_enum_demo.py` reaches one member by attribute, by name, and by symbol,
+reads a member's value and walkability, and iterates over the members:
 
 ```python
 # tile_enum_demo.py
@@ -611,8 +611,9 @@ the member the `match` leaves out, and adding that case clears the diagnostic.
 
 The enum gives up loading at runtime.
 `tile()` could load `SPECS` from a file, but `Tile.GRASS` is source code.
+
 The [table-driven state machine](31_Patterns--State_Machines.md#table-driven-state-machine)
-builds on an `Enum` the same way, using the enum's members as shared,
+also uses an `Enum` as a flyweight pool, with its members serving as shared,
 comparable states.
 
 ## Choosing a Flyweight and Its Pool
@@ -654,8 +655,8 @@ Dataframe libraries such as pandas and Polars offer categorical types.
 A column of a million country names stores small integer codes that index into a pool of distinct strings.
 Text systems share one glyph object per character and font,
 with each occurrence supplying its own position.
-The benefit is the same in all three:
-memory proportional to the number of distinct values, not the number of uses.
+In all three, memory grows with the number of distinct values,
+not with the number of uses.
 When every instance of a type comes from the pool,
 you can write its equality checks as `is`.
 

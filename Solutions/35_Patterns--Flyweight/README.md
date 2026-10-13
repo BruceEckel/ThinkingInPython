@@ -275,11 +275,12 @@ for size in (50, 100, 200):
 **Compare the peaks across sizes.** The ratio holds near six at every size: about 6x at a 50x50 map,
 close to 7x at 200x200. Both peaks grow with the number of
 cells, because both versions build the same nested list of references.
-The two versions differ in what one cell costs. A cell in the shared field
-costs one reference into a pool of three `Tile` objects, while a cell
-in the unshared field costs a brand-new `Tile`, roughly six times as
-much memory. The flyweight's saving is therefore per cell. The
-multiplier stays near six, and the bytes saved grow with the map.
+The two versions differ in the memory one cell takes. A cell in the
+shared field takes one reference into a pool of three `Tile` objects,
+while a cell in the unshared field takes a reference plus a brand-new
+`Tile`, roughly six times as much memory. The flyweight's saving is
+therefore per cell. The multiplier stays near six, and the bytes saved
+grow with the map.
 
 `Tile` is a record, so each unshared `Tile` is a slotted instance
 with no `__dict__`. With `@dataclass(frozen=True)` in place of `@record` the
@@ -589,7 +590,7 @@ at that one instead.
 <summary>Where to look</summary>
 
 [A Pool That Does Not Leak](../../Chapters/35_Patterns--Flyweight.md#a-pool-that-does-not-leak) holds its flyweights in a `WeakValueDictionary` behind a factory function.
-Apply that shape to `Color`, and remember that a weak reference needs a slot for it, which `record()` does not forward.
+Apply that shape to `Color`, and remember that a weak reference needs a `__weakref__` slot, which `weakref_slot=True` adds and `record()` does not forward.
 To see what the rewrite gives up, compare how callers construct a `Color` here with [Interning in the Constructor](../../Chapters/35_Patterns--Flyweight.md#interning-in-the-constructor).
 
 <details>
@@ -682,8 +683,9 @@ direct `Tile(...)` makes in the chapter. Weak references do not force
 that trade. `__new__()` can look in a `WeakValueDictionary` as easily
 as in a `dict`, as
 [Choosing a *Flyweight* and Its Pool](../../Chapters/35_Patterns--Flyweight.md#choosing-a-flyweight-and-its-pool)
-says, on a `Color` declared with the same
-`@dataclass(frozen=True, slots=True, weakref_slot=True)` line.
+says. That `Color` keeps its constructor syntax and needs the same
+`@dataclass(frozen=True, slots=True, weakref_slot=True)` line as this
+one.
 
 </details>
 </details>
@@ -699,7 +701,7 @@ says, on a `Color` declared with the same
 <summary>Where to look</summary>
 
 [Interning in the Constructor](../../Chapters/35_Patterns--Flyweight.md#interning-in-the-constructor) puts the pool lookup in `__new__()`.
-Check each component against the range at the top of `__new__()`, before the lookup, so an invalid `Color` never reaches the pool.
+Check each component against the range at the top of `__new__()`, before the lookup, so an invalid `Color` stays out of the pool.
 The test uses `pytest.raises(ValueError)` once for a component above the range and once for one below it.
 
 <details>
@@ -1089,8 +1091,8 @@ the call serializes every miss in the program, a worse default than
 occasionally building a value twice. For an ordinary memoized
 computation, a duplicate build wastes time and leaves the results
 correct.
-*Flyweight* raises the stakes, because its whole point is that
-`tile("^") is tile("^")`.
+For a *Flyweight* the duplicate is a bug, because the pattern exists
+to make `tile("^") is tile("^")` hold.
 
 **Fill the pool eagerly.** The eager fix builds every value before any
 thread exists, so every lookup hits, and only a miss can start a race.
