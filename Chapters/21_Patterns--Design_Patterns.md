@@ -17,7 +17,7 @@ along with one or more examples for each,
 typically in C++ but sometimes in Smalltalk.
 Many of those examples inspired the ones in this part of the book.
 This chapter introduces the concepts.
-One listing makes the point,
+Its one listing shows a pattern shrinking to a function,
 and the chapters that follow supply the rest of the code.
 
 ## What Is a Pattern?
@@ -202,7 +202,7 @@ and how much of it becomes functions, data, and protocols?
 ## Pattern Taxonomy
 
 *GoF Design Patterns* discusses 23 patterns and sorts them under three purposes,
-each named for the aspect that can vary:
+each named for what its patterns do:
 
 1.  **Creational**: how to create an object.
     When you isolate the details of object creation,
@@ -301,9 +301,8 @@ and become a few moves applied to one kind of diagram.
 ### What One Part Knows About Another
 
 Coupling has degrees.
-The question is not whether one part depends on another,
-since a program whose parts do not depend on each other does nothing,
-but how much of the other part the dependence reaches.
+Every working program has parts that depend on each other,
+so the question is how much of the other part a dependence reaches.
 
 ![Six degrees of what one part knows about another](_images/coupling_ladder)
 
@@ -367,7 +366,7 @@ each conforming to the simple interface of the abstract `Observer` class."
 The heavy edge points at the part that changes least,
 which is where a heavy edge belongs.
 
-*Factory Method* does not remove the heavy edge either.
+*Factory Method* keeps a heavy edge too.
 Something must name a class to construct it.
 The pattern moves that name out of the client and into a creator,
 a part whose whole job is to hold the name and on which nothing else depends.
@@ -405,8 +404,9 @@ Then a Markdown writer arrives.
 
 ![What adding a Markdown writer changes in two designs of Report](_images/coupling_reach)
 
-The shaded parts are the ones whose source changes when `MdWriter` arrives,
-and the red edges are the ones the change adds.
+The dashed box is the new class.
+The shaded parts are the existing ones whose source changes when `MdWriter` arrives,
+and each red edge is a new place that names `MdWriter`.
 On the left, `Report` gains a branch and `main` gains a case.
 On the right, `Report` keeps its source,
 because the new writer satisfies the protocol and `Report` names no writer.
@@ -415,13 +415,13 @@ A [registry factory](27_Patterns--Factory.md#self-registration)
 takes that last change out too,
 by letting the new class register itself as its `class` statement runs.
 
-A design's coupling is its heavy edges, and a pattern moves them:
+A change travels along a design's heavy edges, and a pattern moves those edges:
 usually out of the parts that change often and into one part you can find.
 
 ### The Edge Python Deletes
 
 One more diagram explains why so many of the pattern chapters subtract code as they go.
-Take a caller that needs an `area()` from whatever it receives,
+Take a caller, a function `area()` that needs the area of whatever it receives,
 and write the same dependence three ways.
 
 ![One dependency written three ways](_images/coupling_edges)
@@ -488,7 +488,7 @@ and the rest are here for your own designs.
     Express independent ideas independently.
     Orthogonality complements separating what varies from what stays the same,
     and is part of the Low-Coupling-High-Cohesion message.
-    *Coupling* is the degree to which one part depends on another,
+    Coupling is the degree to which one part depends on another,
     so low coupling means few connections between parts.
     *Cohesion* is the degree to which the contents of one part serve a single subject,
     so high cohesion means one subject per part.

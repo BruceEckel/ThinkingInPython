@@ -1,8 +1,8 @@
 # Design Patterns: Solutions
 
 The first three exercises ask about your own experience, so no answer
-here can be the answer. Each solution works a single example through
-instead. The method is the transferable part: name the axis, subtract
+here can be the answer. Each of those solutions works a single example
+through instead. The method is the transferable part: name the axis, subtract
 Python's share, then take away one more thing and see whether anything
 breaks. The last exercise has an answer you can check against the chapter's
 figure.
@@ -493,9 +493,10 @@ main("md")
 
 `MdWriter` is new code, so it does not count. Adding it edits three
 existing things: the `AnyWriter` alias gains a member, `Report.render()`
-gains a `case`, and `main()` gains a `case`. The alias and `render()`
-both belong to `Report`, so the change reaches two parts, `Report` and
-`main`, as the left half of the chapter's figure shows.
+gains a `case`, and `main()` gains a `case`. `render()` belongs to
+`Report`, and the alias lists the writers `Report` accepts, so the
+change reaches two parts, `Report` and `main`, as the left half of the
+chapter's figure shows.
 
 The second version gives every writer the same method and lets
 `Report` name that method through a protocol:
@@ -546,8 +547,8 @@ main("md")
 #: **Q3 sales**
 ```
 
-Here `MdWriter` edits one existing thing, the `case` that `main()`
-gains. `Report` and `Writer` keep their source, and no writer names
+Here adding `MdWriter` edits one existing thing, the `case` that
+`main()` gains. `Report` and `Writer` keep their source, and no writer names
 `Writer`. The type checker matches each class to the protocol when
 `main()` assigns an instance to `writer`.
 
@@ -556,9 +557,9 @@ one part, but the places matter more than the number. In the first
 version a new format sends you into `Report`, a class whose subject is
 the report's content. In the second, the one edit sits in `main()`,
 the part whose job is to assemble the pieces. The `match` in `main()`
-is the heavy edge that remains, and a
-[registry](../../Chapters/27_Patterns--Factory.md#self-registration)
-moves it out of `main()` as well.
+names every writer class, so its heavy edges are the ones that remain,
+and a [registry](../../Chapters/27_Patterns--Factory.md#self-registration)
+moves them out of `main()` as well.
 
 </details>
 </details>
