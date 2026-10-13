@@ -527,9 +527,9 @@ the same. A `frozendict` key gives you that property. Any equal
 configuration reaches the same entry, whoever built it and whenever.
 
 **Catch the rejected assignment.** Assigning to an entry raises a `TypeError` rather than quietly
-succeeding, and the type checker rejects the assignment too, so the
-line carries a `# type: ignore`. The runtime exception is the point of the
-listing.
+succeeding, and the type checker rejects the assignment too. The
+line carries a `# type: ignore` because the listing makes the
+assignment on purpose, to show the runtime exception.
 
 **Find the limit of immutability.** `nested` shows how far that immutability reaches. A `frozendict` freezes
 the objects to which it maps its keys, not what those objects contain,

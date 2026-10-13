@@ -30,7 +30,7 @@ for x in odds:
 #: 7
 ```
 
-The first line creates a `list`.
+The literal `[1, 3, 5]` creates a `list`.
 `append()` adds a new element to `odds`.
 The `list` grows automatically.
 The `for` statement iterates through `odds`,
@@ -57,7 +57,13 @@ print(xs[::2])  # Every second item
 #: [10, 30, 50]
 print(xs[::-1])  # Reversed
 #: [50, 40, 30, 20, 10]
+print(xs[3:99])  # A slice stops at the end
+#: [40, 50]
 ```
+
+An index past the end raises an `IndexError`,
+but a slice clips its bounds to the list,
+so `xs[3:99]` returns the two items that exist.
 
 Slicing works on the built-in sequences, including strings and tuples.
 
@@ -294,7 +300,7 @@ as with `*sorted("cab")`.
 Unlike a starred target, any number of operands can carry a star,
 and they mix freely with ordinary elements.
 
-The last two lines use both directions.
+`first, *rest = evens` and the display after it use both directions.
 `*rest` collects on the left of the assignment and spreads inside the display,
 so the pair builds a new list holding `evens` rotated by one place,
 and `evens` stays as it was.
@@ -366,10 +372,12 @@ Use `dict.get()` instead of `[]` to avoid a `KeyError` when a key might be absen
 Iterating over a `dict` follows insertion order,
 and the language guarantees that order.
 
-A `dict` has three views: `keys()`, `values()`, and `items()`.
+`keys()`, `values()`, and `items()` each return a *view*:
+an object that reads the `dict`'s current contents each time you use it,
+rather than a copy, so a view also shows the entries added after you made it.
+
 Iterating over the `dict` iterates over `keys()`,
 so `for name in ages` walks the names.
-
 `items()` alone yields `(key, value)` pairs,
 and leaving it off is a common slip.
 `for name, age in ages` iterates over the keys and tries to unpack each one.
@@ -425,11 +433,11 @@ Like a list display,
 a `dict` display accepts any number of double-starred operands,
 with ordinary `key: value` entries among them.
 
-The last line feeds `dict()` an iterable of `(key, value)` pairs,
-and `dict()` accepts any iterable that yields such pairs.
-`zip()` pairs up two sequences element by element.
+`zip()` pairs up two sequences element by element,
+so `zip("abc", [1, 2, 3])` yields `("a", 1)`, `("b", 2)`, and `("c", 3)`.
+`dict()` accepts any iterable of `(key, value)` pairs and builds a `dict` from them.
 [Control Flow](04_Foundations--Control_Flow.md#range-enumerate-and-zip)
-covers it with the other loop tools.
+covers `zip()` with the other loop tools.
 
 The `list` in `remove_while_iterating.py` skips elements and reports nothing.
 Changing the size of a `dict` or a `set` while iterating over it raises a `RuntimeError`:
@@ -455,8 +463,12 @@ except RuntimeError as e:
 
 `discard()` removes an element from a `set`; [Sets](#sets)
 covers it with the other set methods.
-Only the `list` hides the mistake.
-The `dict` and the `set` both report it.
+The `list` hides the mistake, while the `dict` and the `set` both report it.
+
+Assigning a new value to an existing key leaves the size the same,
+so a loop can update a `dict`'s values safely.
+To delete entries as you go, iterate over a copy of the keys,
+`for k in list(d):`, as `for x in xs[:]` does for a `list`.
 
 ## Sets
 
@@ -526,7 +538,8 @@ The augmented assignments `|=`, `&=`, `-=`, and `^=` modify a set in place.
 They match the `update()`, `intersection_update()`, `difference_update()`,
 and `symmetric_difference_update()` methods.
 Single elements move in and out with `add()`, `remove()`, and `discard()`.
-`remove()` raises a `KeyError` on a missing element.
+`remove()` raises a `KeyError` on a missing element,
+where a `list`'s `remove()` raises a `ValueError`.
 `discard()` stays silent.
 
 Repeated lookups run faster against a `set` than against a `list`.
@@ -557,10 +570,15 @@ print(large_gap > small_gap)  # The gap widens
 #: True
 ```
 
+O(n) (read "order n") describes work that grows in proportion to `n`,
+the number of elements.
+O(1) describes work that stays the same however large `n` gets.
 Searching the `list` is O(n) and searching the `set` is O(1),
 so the gap widens without limit as `n` grows.
-At ten times the size the ratio is bigger rather than the same,
+At ten times the size the `list` search takes roughly ten times as long,
+while the `set` search takes about the same time,
 so `large_gap` comes out bigger than `small_gap`.
+
 The probe value is missing on purpose.
 Searching for an absent item is the `list`'s worst case,
 since the scan compares all `n` elements before reporting `False`.
@@ -575,8 +593,7 @@ also prints the measurements behind the comparison.
 ## Specialized Containers
 
 The `collections` module in the standard library includes container types built for specific jobs.
-Four of these show up consistently: `Counter`, `defaultdict`, `deque`,
-and `namedtuple`.
+Four of them come up often: `Counter`, `defaultdict`, `deque`, and `namedtuple`.
 
 ### `Counter`
 
@@ -658,8 +675,7 @@ A `defaultdict` states the default once, where you create the dictionary.
 ### `deque`
 
 A `deque` (double-ended queue)
-adds and removes items at either end in constant time.
-A `list` is fast only at its append end:
+adds and removes items at either end in constant time:
 
 ```python
 # deque.py
@@ -701,9 +717,11 @@ print(lst)
 #: [1, 2, 3]
 ```
 
-A `list` can stand in for a `deque`,
+A `list` can stand in for a `deque`.
+`append()` and `pop()` at its end are O(1),
 but `insert(0, x)` and `pop(0)` must shift every remaining element,
-so both are O(n) instead of O(1).
+so both are O(n).
+Timing `n` insertions and removals at the start of each container shows the difference:
 
 ```python
 # deque_timing.py
@@ -734,15 +752,19 @@ print(deque_time * 20 < list_time)  # Not close
 #: True
 ```
 
+The comparison holds with room to spare:
+the `deque` finishes more than twenty times faster.
 Use a `deque` for a queue.
 Indexing its middle is O(n), though,
 so keep a `list` wherever you index by position.
-A `deque(maxlen=n)` also caps its length,
-discarding from the other end when a new item overflows it.
-That is a sliding window, and a `list` has no equivalent.
 When one thread must wait for another to supply the next item,
 use [`queue.Queue`](19_Techniques--Concurrency.md#coordinating-threads-with-queues),
 whose `get()` blocks until an item arrives, and for a priority queue, `heapq`.
+
+The `window` in `deque.py` shows `maxlen`.
+A `deque(maxlen=n)` caps its length,
+discarding from the opposite end when an append overflows it.
+That is a sliding window, and a `list` has no equivalent.
 
 ### `namedtuple`
 
@@ -789,8 +811,7 @@ A `tuple` is an immutable `list`, and a `frozenset` is an immutable `set`.
 Since Python 3.15, `frozendict` ([PEP 814](https://peps.python.org/pep-0814/))
 completes the trio: a built-in,
 hashable mapping that rejects changes after creation.
-`MappingProxyType`, from the `types` module,
-is a read-only *view* onto a `dict` you still hold, not a container of its own.
+
 A `frozenset` is hashable, so it can be a set member or a dictionary key.
 A `list` or a `set` is unhashable, so it can be neither.
 A `frozenset` also has no `add()` method,
@@ -812,9 +833,9 @@ except AttributeError as e:
 #: 'frozenset' object has no attribute 'add'
 ```
 
-Modifying an immutable container is a type error as well as a runtime error,
-so each line that attempts it carries a `# type: ignore`.
-The comment silences the type checker.
+The type checker reports an attempt to modify an immutable container before the program runs,
+so each line that attempts it carries a `# type: ignore` comment,
+which silences the type checker for that line.
 
 Use the immutable form whenever a container should stay the same after you build it.
 Neither you nor the code that receives it can add, remove,
@@ -823,9 +844,11 @@ so a container of immutable elements needs no defensive copy before you share it
 An immutable container is safe as a default argument,
 unlike the [mutable default](05_Foundations--Functions.md#the-mutable-default-trap).
 
-A `MappingProxyType` is the one exception to watch.
-It blocks writes through the view, but it is a window onto the original `dict`,
-so changes to that `dict` still show through:
+`MappingProxyType`, from the `types` module,
+is read-only without being immutable.
+It is a view onto a `dict` you still hold, not a container of its own.
+Like the `dict` views, it reads that `dict`'s current contents,
+so it reflects every change to the `dict`:
 
 ```python
 # mapping_proxy.py
@@ -851,8 +874,8 @@ Writing through `config` raises a `TypeError`.
 
 ### `frozendict`
 
-A `MappingProxyType` is a view onto a `dict` that still exists and can change.
-A `frozendict` owns its contents.
+Where a `MappingProxyType` reads a `dict` that can still change,
+a `frozendict` holds its own entries, copied in when you build it.
 This listing requires Python 3.15:
 
 ```python

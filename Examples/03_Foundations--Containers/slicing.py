@@ -13,3 +13,5 @@ print(xs[::2])  # Every second item
 #: [10, 30, 50]
 print(xs[::-1])  # Reversed
 #: [50, 40, 30, 20, 10]
+print(xs[3:99])  # A slice stops at the end
+#: [40, 50]
