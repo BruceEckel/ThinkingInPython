@@ -265,8 +265,9 @@ with expected(ValueError):
 **Fail at class definition.** `@dataclass` raises the `ValueError` at class-definition time, not at first use, and
 the full message ends with the remedy: `use default_factory`.
 `@dataclass` detects the mistake because it inspects every default
-before generating the constructor. Nobody inspects a plain class body,
-so `shared_mutable.py`'s `Cart` builds without complaint.
+before generating the constructor. Without the decorator, Python
+runs the class body as written, so `shared_mutable.py`'s `Cart`
+builds without complaint.
 
 </details>
 </details>
@@ -363,14 +364,6 @@ class Counting:
 <details>
 <summary>Solution</summary>
 
-If you fix the increment with `type(self).total += 1`,
-this listing prints `2 2 2` too, because `Counting` has no subclass.
-Once a subclass exists, the counter forks
-the way `classvar_fork.py` forks it for `Sub`.
-Constructing an empty subclass twice leaves `Counting.total` at `2`
-and gives the subclass its own `total` of `4`.
-The solution names the class, so every write goes to one dictionary.
-
 ```python
 # exercise_7.py
 from typing import ClassVar
@@ -408,7 +401,7 @@ write through an instance goes: onto the instance. Each object ends up
 with its own `total` of `1`, shadowing a class attribute that still
 holds `0`.
 
-**Silence the checker's report.** With the `# type: ignore` removed, the type checker (`ty`) reports
+**Read the checker's report.** With the `# type: ignore` removed, the type checker (`ty`) reports
 `invalid-attribute-access`, naming the type of `self`. The augmented
 form expands to an assignment through `self`, and the type checker
 treats that assignment the way it treats a write like `a.total = 99`
@@ -424,6 +417,13 @@ what the write does at runtime.
 writes the same class dictionary, so both instances report `2`.
 `vars(c)` is empty because the constructor writes only to the class,
 and reading `c.total` falls back to that shared value.
+
+Writing the fix as `type(self).total += 1` also prints `2 2 2`
+here, because `Counting` has no subclass. Once a subclass exists,
+the counter forks the way `classvar_fork.py` forks it for `Sub`:
+constructing an empty subclass twice after `c` and `d` leaves
+`Counting.total` at `2` and gives the subclass its own `total` of
+`4`. Naming the class sends every write to one dictionary.
 
 </details>
 </details>
@@ -491,8 +491,8 @@ what it finds there. `Left.shared is Base.shared` proves they are one
 object, not three equal lists.
 
 Here the mutable-value trap of `shared_mutable.py` meets the
-inheritance rule of `class_var_inheritance.py`. The inheritance rule
-is harmless on its own. An immutable `ClassVar` survives inheritance
+inheritance rule of `class_var_inheritance.py`. Each rule is
+harmless on its own. An immutable `ClassVar` survives inheritance
 because nothing can change it in place, and a mutable one in a single
 class keeps the sharing visible. Together they produce a base-class list that every
 subclass writes to and none of them declares.

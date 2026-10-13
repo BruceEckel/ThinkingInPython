@@ -49,7 +49,7 @@ Assigning through an instance writes to the instance,
 creating the instance attribute on first assignment.
 Assigning through the class name, as `Stars.rating = 9` does,
 changes the shared value.
-`vars()` returns an object's own attribute dictionary,
+`vars()` returns an object's own attribute dictionary, its `__dict__`,
 so inspecting the class with `vars(A)` and the instance with `vars(a)` shows the split:
 
 ```python
@@ -174,8 +174,8 @@ and mutates the one list stored there.
 The mutation creates no instance attribute, so `b` sees the apple too.
 Because shadowing starts with an assignment and `.append()` makes none,
 a read followed by a mutation slips past the rule.
-A type checker accepts the line too.
-`a.items.append("apple")` is a correct call on a `list[str]`.
+The type checker accepts the line too,
+since `a.items.append("apple")` is a correct call on a `list[str]`.
 
 An augmented assignment does both.
 `a.items += ["pear"]` mutates the shared list through `__iadd__()`,
@@ -193,7 +193,7 @@ or in a `@dataclass` field with a [`default_factory`](12_Techniques--Data_Classe
 
 ## Declaring Shared State with ClassVar
 
-When you genuinely want one shared value, say so with `ClassVar` from `typing`.
+When you intend one shared value, say so with `ClassVar` from `typing`.
 The type checker then treats the attribute as class-wide,
 and rejects the instance assignment that shadows it:
 
@@ -322,8 +322,7 @@ and for the `count` that `Registry.count = 0` creates in `declared_classvar.py`.
 
 ### A Base Class Declares, a Subclass Supplies
 
-Declaring a `ClassVar` and leaving the value elsewhere is deliberate,
-and the common case is a base class naming what its subclasses must supply:
+The common reason to declare a `ClassVar` and leave its value elsewhere is a base class that names what its subclasses must supply:
 
 ```python
 # required_classvar.py
@@ -355,7 +354,7 @@ since it describes what a class must have and leaves the value to the class.
 
 `ty` 0.0.86 enforces most of what the declaration states.
 A subclass `Bad` that writes `sides = "four"` draws `invalid-assignment` where it sits,
-since the value is checked against the declared `ClassVar[int]`,
+since the checker compares the value with the declared `ClassVar[int]`,
 and one that redeclares the attribute as `sides: ClassVar[str] = "four"` draws `invalid-attribute-override`.
 
 Two gaps remain.
@@ -376,7 +375,8 @@ not as a guarantee that the attribute exists.
 It records that `total` belongs to the class,
 and turns the accidental shadowing from `class_attribute_confusion.py` into a check-time error.
 Python's own attribute lookup ignores the hint.
-`@dataclass` does read it at runtime.
+`@dataclass` does read it at runtime,
+and leaves a `ClassVar` out of the fields it generates.
 
 At runtime an assignment does the same thing with or without `ClassVar`:
 
@@ -467,11 +467,10 @@ one level up.
 `Left` reads through to `Base` until an assignment gives `Left` its own copy,
 the way `a` reads through to `Stars` until `a.rating = 1`.
 
-`Right` writes `shared = 100` without repeating the annotation.
-Under `ty`, that bare override loses the guard against instance assignment.
-`ty` rejects `Left().shared = 5` and accepts `Right().shared = 5`.
-Pyright carries the base's declaration to the override and rejects both.
-Restating `ClassVar[int]` on an override keeps the check under either checker.
+`Right` writes `shared = 100` without repeating the annotation,
+and the override is still a `ClassVar`.
+The type checker carries the base's declaration down to the override,
+so it rejects `Right().shared = 5` as it rejects `Left().shared = 5`.
 
 ### `type(self)` Forks the Counter
 
