@@ -25,7 +25,7 @@ If you call `next(self.claim_results)` without the `False` default,
 the fake works for the rat's first turn and fails on its second.
 The fifth `claim()` finds the script empty, so `next()` raises a `StopIteration` inside the coroutine,
 and Python turns it into a `RuntimeError` ("coroutine raised StopIteration") that fails the test.
-The default lets the fake answer `False` once the script runs out,
+The default lets the fake return `False` once the script runs out,
 so the rat dead-ends the way it would against walls.
 
 ```python
@@ -105,18 +105,18 @@ def test_rat_keeps_one_claim_and_spawns_the_rest() -> None:
 ```
 
 **Stand in for the blackboard.** `Rat` depends on the `Recorder`
-`Protocol`, not on `Blackboard`, so `FakeBlackboard` satisfies that
-`Protocol` by shape. It defines `claim()`, `spawn()`, `log()`, and
-`next_number()`, and none of the four touches a real `Maze` or a
-`TaskGroup`.
+`Protocol`, not on `Blackboard`, so any class with the right methods can stand in.
+`FakeBlackboard` defines `claim()`, `spawn()`, `log()`, and
+`next_number()`, which satisfies the `Protocol` by shape.
+None of the four uses a real `Maze` or a `TaskGroup`.
 
-**Script the rat's choices.** Scripting `claim()`'s return values in a
-preset sequence decides which neighbor the rat keeps for itself and
-into which cells it spawns new rats: the first cell the loop finds
-open, `(0, -1)`, and every open one after that, here `(1, 0)` alone.
+**Script the rat's choices.** The scripted return values from `claim()` decide
+which neighbor the rat keeps and where it spawns new rats.
+The rat keeps the first cell the loop finds open, `(0, -1)`,
+and spawns a rat at every open cell after that, here `(1, 0)` alone.
 
-**Stop the rat when the script ends.** Once the script runs out, `claim()` answers
-`False` to everything, so the rat dead-ends on its second turn and
+**Stop the rat when the script ends.** Once the script runs out, `claim()` returns
+`False` for every cell, so the rat dead-ends on its second turn and
 `run()` returns. The test needs no randomness and no real maze.
 
 </details>
@@ -133,9 +133,9 @@ open, `(0, -1)`, and every open one after that, here `(1, 0)` alone.
 <details>
 <summary>Where to look</summary>
 
-[Running the Maze](../../Chapters/38_Patterns--Simulation.md#running-the-maze) shows `explore()` starting every rat from one entry cell and recording what the rats claim in `blackboard.visited`.
+[Running the Maze](../../Chapters/38_Patterns--Simulation.md#running-the-maze) shows `explore()` starting the exploration from one entry cell and recording what the rats claim in `blackboard.visited`.
 Build a set of every open cell in the `Maze` and subtract `visited` from it.
-To make the difference non-empty, draw a maze whose open cells split into regions that no open path joins.
+To leave cells in the difference, draw a maze whose walls split the open cells into separate regions.
 Then ask where every rat begins.
 
 <details>
@@ -309,16 +309,16 @@ asyncio.run(main())
 #: 9 (5, 1) (7, 3)
 ```
 
-**Reuse the chapter's classes.** The classes are the chapter's, trimmed of what the exercise does not
-need: rat numbers, logging, the task list, `render()`, the
+**Reuse the chapter's classes.** The classes are the chapter's, with six parts removed:
+rat numbers, logging, the task list, `render()`, the
 `Recorder` `Protocol`, and the file loader.
-The structure that matters survives the trim. `claim()` keeps the
-chapter's body word for word, and `explore()` still opens a
+The removals leave the exploration logic as the chapter wrote it. `claim()` keeps the
+chapter's body word for word.
+`explore()` still opens a
 `TaskGroup` and lets `spawn()` add tasks to that group, because new
 rats keep arriving after the block begins.
 
-**Split the open cells into two regions.** For a maze built with two separate rooms and no connecting opening
-between them:
+**Split the open cells into two regions.** Build a maze with two rooms and a solid wall between them:
 
 ```
 *********
@@ -328,18 +328,20 @@ between them:
 *********
 ```
 
-the rats, starting in the left room, map every cell of that room and
-none of the right room's, so `unreached` is the right room's nine open
-cells.
+The rats start in the left room.
+They map every cell of that room,
+so `unreached` holds the right room's nine open cells.
 
-A cell is unreachable when no path of open cells connects it to the
-entry. Walls on all four sides of one cell are the smallest case, but
-every cell of the right room has open neighbors, and the wall between
-the rooms still cuts each one off. `Maze.entry()` scans row by row
-and returns the first open cell it finds, and every rat traces back to
-that single starting point through `claim()`. No rat therefore reaches
-a cell that has no open-cell path back to the entry, however many rats
-spawn.
+A cell is unreachable when every route to it from the entry crosses a wall.
+Walls on all four sides of one cell are the smallest case.
+Every cell of the right room has open neighbors,
+yet the wall between the rooms separates each one from the entry.
+
+`Maze.entry()` scans row by row and returns the first open cell it finds.
+The first rat starts there,
+and every later rat starts on an open cell next to one that a rat occupies.
+The rats therefore stay inside the region of open cells joined to the entry,
+however many of them spawn.
 
 </details>
 </details>
@@ -366,7 +368,7 @@ spawn.
 <summary>Where to look</summary>
 
 [Contention on a Loop](../../Chapters/38_Patterns--Simulation.md#contention-on-a-loop) shows two rats reaching one unclaimed cell, and [The Rat and the Blackboard](../../Chapters/38_Patterns--Simulation.md#the-rat-and-the-blackboard) shows the `claim()` you are changing.
-Making `claim()` an `async def` means each caller must `await` it, which spreads through the `Protocol`, the comprehension, and `explore()`.
+Making `claim()` an `async def` means each caller must `await` it, so the `Protocol`, the comprehension, and `explore()` all change.
 Count the `True` results in a field on the `Blackboard` and compare the count with `len(visited)`.
 A coroutine gives up control only at an `await`, which decides whether `claim()` needs a lock.
 
@@ -444,9 +446,9 @@ async def main() -> None:
 
 If you test the broken `claim()` on `amaze.txt`,
 the count of `True` returns equals `len(visited)` on every run,
-and the gap looks harmless.
+and the inserted `await` looks harmless.
 A perfect maze offers one path to each cell,
-so no two rats reach one unclaimed cell.
+so each cell has one rat approaching it.
 The solution uses the seven-by-nine maze from `test_rats_and_mazes.py`,
 whose loop lets two rats approach one cell from opposite directions.
 
@@ -563,40 +565,43 @@ asyncio.run(main())
 #: cells visited: 24
 ```
 
-**Carry the `async` to every caller.** The one requested change forces three more edits, and that
-spread is the exercise's quiet lesson: `async` is contagious.
+**Carry the `async` to every caller.** The one requested change forces three more edits,
+because a caller must `await` an `async def` to get its result.
 Once `claim()` is an `async def`, the `Recorder` protocol must declare
 it `async` too, `Rat.run()`'s comprehension needs
 `if await self.blackboard.claim(*pos)`, and `explore()` must `await`
 its own first claim.
-`spawn()` stays synchronous, because nothing in it suspends.
+`spawn()` stays synchronous, because `create_task()` schedules the new rat and returns at once.
 
 **Let two rats claim one cell.** On the chapter's seven-by-nine test maze, `claim()` returns `True` 25
-times for 24 open cells. One pair of rats collided.
-Both rats reach `await asyncio.sleep(0)` while the same cell still
-looks unclaimed, because neither has added that cell to `visited`
-yet. Both membership tests therefore pass before either rat calls
-`self.visited.add(...)`.
+times for 24 open cells, because two rats claimed the same cell.
+The first rat to test the shared cell finds it unclaimed
+and suspends at `await asyncio.sleep(0)` before adding it to `visited`.
+The second rat runs during that pause, finds the cell still unclaimed,
+and passes the same test.
+Both rats then add the cell and return `True`.
 
-Each of the two rats believes it alone claimed the shared cell.
-Both move into it, and that overlap breaks the invariant that no two
-rats cover the same ground. Every cell is still explored. Here the shared
-cell is `(5, 5)`, where the loop closes, so both rats find every
+Each of the two rats acts on its `True` as if it alone held the shared cell.
+Both move into it, and that overlap breaks the invariant of one rat per cell.
+The extra `True` sends the second rat into a cell another rat has claimed,
+so the second rat explores nothing new.
+Here the shared cell is `(5, 5)`, where the loop closes, so both rats find every
 neighbor claimed and dead-end there.
 
-`visited` stays correct, because adding the same cell twice to a set
-changes nothing. That correctness is why `test_rats_and_mazes.py`
-passes on the broken version every time. The test asserts the set of
-cells reached. The extra `True` wastes effort. A second rat
-moves into an occupied cell. Comparing the count of `True` returns
-with the size of `visited` exposes the collision.
+Every cell still gets explored.
+`visited` stays correct too, because adding a cell to a set a second time
+leaves the set as it was.
+`test_rats_and_mazes.py` asserts the set of cells reached,
+so it passes on the broken version every time.
+Comparing the count of `True` returns
+with the size of `visited` exposes the double claim.
 
 The original `claim()` needs no lock because it has no `await`
 between the test and the add. A coroutine yields control only at an
-`await`, so the two statements run as one uninterruptible unit. The
+`await`, so the two statements run as one atomic step. The
 event loop can hand control to another rat before the test or after
-the add, but not between them. Adding the `await` opens that
-gap in the middle, and the whole guarantee depends on the gap's absence.
+the add, but not between them. Adding the `await` lets the event loop
+run another rat between the test and the add, and that interleaving breaks the guarantee.
 
 </details>
 </details>
@@ -605,9 +610,9 @@ gap in the middle, and the whole guarantee depends on the gap's absence.
 ## 4 and 5: the robot world
 
 Exercises 4 and 5 both build on the same `robot_explorer` world,
-so `robot_world.py` holds that shared apparatus once (`Item` and its
-subclasses, `Room`, `Doors`, `GameBuilder`), and each exercise imports
-the module:
+so `robot_world.py` holds that shared apparatus once,
+and each exercise imports the module.
+The module defines `Item` and its subclasses, `Room`, `Doors`, and `GameBuilder`:
 
 ```python
 # robot_world.py
@@ -815,9 +820,8 @@ class Coin(Item):
 
 If you derive `Coin` from `Food`, the program prints `0`,
 and `item_factory("$")` returns a `Teleport`.
-`Item.__subclasses__()` lists direct subclasses alone,
-so the factory's search misses `Coin` and treats `$` as a
-teleport target.
+`Item.__subclasses__()` returns `Food` and leaves its subclass `Coin` off the list,
+so the factory treats `$` as a teleport target.
 The solution derives `Coin` from `Item`, which puts it on the
 list the factory searches.
 
@@ -842,35 +846,36 @@ print(game.robot.coins)
 #: 2
 ```
 
-**Register the item by subclassing.** `item_factory()` needs
-no change. It searches `Item.__subclasses__()` for a
-class whose `symbol` matches the character it receives, and
-`__subclasses__()` reports the subclasses that exist right now, so
+**Register the item by subclassing.** `item_factory()` stays
+as it is. It searches `Item.__subclasses__()` for a
+class whose `symbol` matches the character it receives.
+`__subclasses__()` reports the subclasses that exist at the time of the call, so
 `class Coin(Item)` in `exercise_4.py` puts `Coin` on the list the
 factory searches.
 
-**Act through the shared interface.** `Room` and `GameBuilder` need no change either.
+**Act through the shared interface.** `Room` and `GameBuilder` stay as they are too.
 `Room.enter()` calls `occupant.interact(robot, self)` through the
 shared `Item` interface, and `GameBuilder` gets each occupant from
 `item_factory()`.
-Neither one needs to know which concrete `Item` subclasses exist.
+`GameBuilder` singles out `Robot` and `Teleport`, which need extra wiring,
+and accepts every other item as the factory returns it.
 
-**Give the robot a counter.** `Robot.__init__()` needs one new line, `self.coins = 0`, to have
-somewhere to count (folded into `robot_world.py` above so this
-exercise's file stays a single, runnable unit).
+**Give the robot a counter.** `Robot.__init__()` needs one new line, `self.coins = 0`, to hold the count.
+`robot_world.py` above carries that line,
+so `exercise_4.py` holds the `Coin` class and the demo.
 
-Deriving `Coin` from `Food` instead breaks the maze, and the reason is
-where the factory searches, not what `Coin` inherits. `item_factory()`
+Deriving `Coin` from `Food` instead breaks the maze.
+The cause is where the factory searches, not what `Coin` inherits. `item_factory()`
 walks `Item.__subclasses__()`, which lists the direct subclasses of
-`Item` and misses their descendants, so a `Coin(Food)` is absent from
-that list. No entry matches
-`$`, and the loop falls through to the factory's last line, which
-treats any unrecognized symbol as a teleport target. So
+`Item` and leaves out their descendants, `Coin(Food)` among them.
+The loop runs to its end and falls through to the factory's last line,
+which treats every other symbol as a teleport target. So
 `item_factory("$")` returns `Teleport("$")`. The two `$` cells become
-a teleport pair, so the route `"ee"` sends the robot through a
+a teleport pair.
+The route `"ee"` sends the robot through a
 teleporter where the maze should hold a coin, and `game.robot.coins`
-stays `0`. A one-word change to a class header moves a character out of
-the factory's search and silently substitutes a different `Item`.
+stays `0`. A one-word change to a class header moves `Coin` out of
+the factory's search, and the factory silently substitutes a different `Item`.
 
 </details>
 </details>
@@ -937,9 +942,9 @@ MAZE: Final[str] = ...
 <summary>Solution</summary>
 
 If you keep the chapter's final `raise ValueError`,
-the food loop cannot end normally.
+the food loop ends in a traceback.
 After the last meal, the search for more food raises the `ValueError`,
-and the script stops with a traceback before the walk to the `!` and before either `print()`.
+and the script stops before the walk to the `!` and before either `print()`.
 Returning `None` makes an empty search the loop's ordinary exit.
 
 ```python
@@ -1027,40 +1032,45 @@ print("finished:", game.robot.finished)
 ```
 
 **Let the caller define arrival.** `solve()`'s search changes in one place. The `isinstance(room.occupant,
-EndGame)` test becomes `arrived(room)`, a predicate the caller
-supplies. Nothing else in the search knows or cares what counts as
+EndGame)` test becomes `arrived(room)`, a call to a predicate the caller
+supplies.
+That predicate alone decides what counts as
 arriving. The `EndGame` version is now a one-line function on the
 caller's side, `end()`, and `food()` is another.
 
 **Report an empty search as `None`.** The other change is the return type.
 The chapter's version raises a `ValueError` when the search runs out
-of rooms, because a maze with no reachable `!` is a broken maze.
+of rooms, because a working maze always has a reachable `!`.
 Here, running out of rooms is the ordinary way the food loop ends,
-so `solve()` returns `None` and the walrus in the `while` reads it as
-"nothing left to eat."
+so `solve()` returns `None`.
+The `while` loop's `is not None` test then ends the loop once the robot has eaten the last food.
 
 **Replan after every meal.** The search must run again after every
-meal because its start and its goal both move.
+meal because each meal changes both the search's start and its goal.
 `Food.interact()` replaces the food with an `Empty()`, so the
-room where the robot arrived stops being a goal, and the robot's
-own room is now the new start. A path planned from the entry is no
-use from any other room, so one search at the start yields the first
-leg and no more. Each search touches at most the maze's 299 rooms
-that hold no wall, so searching again is quick.
+room where the robot arrived stops being a goal.
+The robot now stands in that room, so the next search starts there.
+A path holds moves from the room where its search began,
+so the search at the start plans only the first leg.
+Each later leg needs a search of its own. Each search visits at most the maze's 299 open rooms,
+so searching again is quick.
 
 <!-- vale proselint.GenderBias = NO -->
 Nearest-first does not give the shortest tour that eats everything.
-Choosing the closest food each time is a greedy choice made with no
-view of what comes after it, and the maze can turn that choice into a
-longer walk. Two pieces
+Choosing the closest food each time is a greedy choice.
+It compares the lengths of the next leg alone.
+In some mazes the closest food leads to a longer total walk. Two pieces
 of food can sit close together down one dead-end corridor while a
 third sits one step nearer in the opposite direction, with the rest
-of the food far beyond it. Taking the single near one first means
+of the food far beyond it. Taking the single near piece first means
 walking to it, back past the start to the corridor, and then past the
-start again toward the rest, so the robot walks the stretch between
-the start and the single piece three times. The shortest
-complete tour is a travelling-salesman problem over the food rooms,
-and its first leg is often not the shortest leg available. The greedy
+start again toward the rest.
+The robot walks the stretch between
+the start and the single piece three times.
+
+Finding the shortest
+complete tour is a travelling-salesman problem over the food rooms.
+That tour's first leg is often longer than the shortest leg available. The greedy
 tour does guarantee that every leg is a shortest path, which is all
 breadth-first search guarantees.
 <!-- vale proselint.GenderBias = YES -->
@@ -1071,9 +1081,10 @@ breadth-first search guarantees.
 
 ## 6, 7, and 8: the Chladni plate
 
-The last three exercises all shake the same plate, so this file
-carries the chapter's `standing_wave.py` and `chladni.py` as one
-file, with two changes: `Plate`
+The last three exercises all shake the same plate.
+Here, `chladni.py` combines the chapter's `standing_wave.py` and `chladni.py`
+into one file that all three import.
+The file makes two changes: `Plate`
 takes the field function as a constructor argument instead of calling
 the module-level `amplitude()`, and the module adds `membrane()`
 beside `amplitude()`. That argument makes exercise
@@ -1195,27 +1206,29 @@ print(amplitude(0.37, 0.37, (1, 2)))
 
 **Probe the field at `m == n`.** With `m == n`, `amplitude()` returns zero everywhere. Its two terms
 become `cos(mπx)cos(mπy)` and `cos(mπx)cos(mπy)`, the same product
-written twice, and the function subtracts one from the other. Not
-approximately zero: the two multiplications produce identical floats,
-so the difference is exactly `0.0` at every point on the plate.
+written twice, and the function subtracts one from the other.
+The two multiplications produce identical floats,
+so the difference is exactly `0.0` at every point on the plate, not approximately zero.
 
-**Confirm that no grain moves.** A zero field means a zero kick. `step()` scales each grain's random
+**Confirm that every grain stays put.** A zero field means a zero kick. `step()` scales each grain's random
 displacement by the amplitude under that grain, so
-`uniform(-kick, kick) * 0.0` moves nothing, and 1200 steps leave every
-grain where the constructor scattered it. The view shows
+`uniform(-kick, kick) * 0.0` moves nothing.
+After 1200 steps every grain sits where the constructor scattered it. The view shows
 neither chaos nor a figure because no grain moves. It shows the
-initial random scatter, frozen. Agitation reads `0.000` from
+initial random scatter, frozen.
+
+Agitation reads `0.000` from
 the start, the same number a perfectly settled plate reports, so
 the summary statistic cannot tell "finished" from "never started."
 
 **Probe a point on the diagonal.** The main diagonal in every figure follows from the same two terms.
 Swapping `x` and `y` turns the first term into the second and the
 second into the first, so the swap reverses the subtraction inside
-`amplitude()`'s `abs()`. On the line `x == y` the swap changes
-nothing, so the subtraction there must equal its own negation, which
-forces that value to zero. Every mode in which this plate can ring therefore
+`amplitude()`'s `abs()`. On the line `x == y` the swap leaves the
+point where it was, so the subtraction there must equal its own negation.
+The one number equal to its own negation is zero. Every mode in which this plate can ring therefore
 has a nodal line straight down the main diagonal, and the figures all
-share that one feature no matter which `(m, n)` produced them.
+share that one feature whichever `(m, n)` produced them.
 
 </details>
 </details>
@@ -1285,20 +1298,24 @@ filled in as well.
 
 The nodal lines are straight because the new field is a product of one
 function of `x` and one function of `y`. The product vanishes when
-either factor does, and `sin(mπx)` is zero at `x = 0, 1/2, 1` for
-`m = 2`, regardless of `y`. Those three zeros give vertical lines.
-`sin(nπy)` is zero at `y = 0, 1/3, 2/3, 1` for `n = 3`, regardless of
-`x`, giving horizontal lines. Every nodal point lies on one of those
-seven lines, and the interior lines number `m - 1` vertical and
-`n - 1` horizontal, so the mode numbers are readable straight off the
+either factor does.
+For `m = 2`, `sin(mπx)` is zero at `x = 0, 1/2, 1`, whatever `y` is,
+and those three zeros give vertical lines.
+For `n = 3`, `sin(nπy)` is zero at `y = 0, 1/3, 2/3, 1`, whatever `x` is,
+giving horizontal lines. Every nodal point lies on one of those
+seven lines.
+The interior lines number `m - 1` vertical and
+`n - 1` horizontal, so you can read the mode numbers straight off the
 picture.
 
-The plate's own field does not separate into a factor in `x` times a
-factor in `y`. Each of its two terms mixes `x` and `y`, and
-subtracting one from the other leaves zeros along the curves where the
+The plate's own field subtracts one product from another,
+`cos(mπx)cos(nπy)` minus `cos(nπx)cos(mπy)`.
+Each product separates on its own,
+but their difference does not factor into a function of `x` times a function of `y`.
+Its zeros lie along the curves where the
 two products agree, which is why the original figures are
-diagonals, crosses, and rings rather than a grid. Those mixed terms
-come from the physics the chapter's formula approximates, a real plate
+diagonals, crosses, and rings rather than a grid.
+The subtraction comes from the physics the chapter's formula approximates, a real plate
 with free edges rather than a membrane clamped all around its rim.
 
 The simulation machinery stays the same across both fields: same
@@ -1351,27 +1368,29 @@ for kick in (0.005, 0.05, 0.5):
 
 `kick=0.005` produces order too slowly. Each step displaces a grain by
 at most one percent of the plate, so a grain starting in the middle
-of a bright region needs hundreds of steps to walk anywhere near a
+of a loud region needs hundreds of steps to walk anywhere near a
 nodal line. After 1200 steps agitation has fallen from `0.58` to
 `0.38`, roughly a third of the way, while the default kick was
 down to `0.00` by step 400. Rendered, this run still looks
 like noise with a faint trace of structure in it. The physics is
-correct. The run is not finished, and finishing it
-means more steps than anyone wants to watch.
+correct, but the run needs more steps to finish,
+more than anyone wants to watch.
 
-`kick=0.5` fails differently, and the agitation column hides the
-failure. Agitation collapses to `0.00` as convincingly as it does at
-the default kick, and the figure does not appear. A kick of up to
-half the plate, and the full width where the amplitude peaks at 2,
-can throw a grain across the plate in one step, so a grain does not
-walk toward the nearest nodal line. It jumps somewhere unrelated
+`kick=0.5` fails differently, and its agitation readings look like a
+successful run's. Agitation falls to `0.00` as convincingly as it does at
+the default kick, and the figure does not appear.
+One kick moves a grain up to half the plate,
+or the full width where the amplitude peaks at 2,
+so a single step can carry a grain across the plate.
+Instead of walking toward the nearest nodal line, the grain jumps to a random spot
 and stays only if that spot is quiet. The spots that hold a grain
 best are the two corners where the main diagonal ends. At `(0, 0)`
 and `(1, 1)` the field is zero and also flat, so it stays weak over
 a whole patch, where along a nodal line it is weak only in a thin
 strip. Rendered, the run shows nearly every grain in those two
-corners and the nodal lines between them empty. The plate reports
-settled sand in the wrong places.
+corners and the nodal lines between them empty.
+The low agitation is accurate.
+The sand has settled, in the wrong places.
 
 Agitation measures whether the grains sit where the field is weak,
 not whether the figure is right, so one number cannot distinguish a
@@ -1379,17 +1398,18 @@ sharp pattern from two blobs. The render is the check the number
 cannot perform.
 
 An intermediate kick avoids both failures because the amplitude scaling
-in `step()` is a feedback loop, and the loop works within a range
-of step sizes and fails outside it.
+in `step()` is a feedback loop.
+The loop works within a range of step sizes and fails outside it.
 A grain in a loud region gets a large kick and moves
 fast. As it nears a nodal line the amplitude shrinks and so does its
-step, so it slows down and stops without overshooting. Too small a kick
-starves the loop's first half, and the grain barely travels. Too large a
-kick breaks the second half, since even a heavily scaled step is still
-big enough to leave the neighborhood into which the grain is settling. The
-default `0.05` sits where both halves work: at most a tenth of the
-plate where the amplitude peaks, and vanishingly small once a grain
-arrives.
+step, so the grain slows down and settles on the line. Too small a kick
+keeps the step small in a loud region too, and the grain barely travels.
+Too large a kick keeps the step large near a nodal line,
+since a heavily scaled step can still carry the grain out of the neighborhood
+in which it was settling.
+With the default `0.05`, both halves work.
+A step is at most a tenth of the plate where the amplitude peaks,
+and vanishingly small once a grain arrives.
 
 </details>
 </details>
