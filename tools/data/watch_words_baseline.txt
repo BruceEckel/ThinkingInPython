@@ -331,7 +331,6 @@ Chapters/32_Patterns--Multiple_Dispatching.md	want: You want to say CODE
 Chapters/33_Patterns--Visitor.md	itself: *Multiple Dispatching* is the end in itself
 Chapters/33_Patterns--Visitor.md	only: CODE is the conventional placeholder for a name that exists only to satisfy CODE
 Chapters/33_Patterns--Visitor.md	only: Only mypy rejects it
-Chapters/33_Patterns--Visitor.md	price: The Price of the Empty Base explains why
 Chapters/34_Patterns--Composite_and_Interpreter.md	already: CODE would receive CODE with the fold already done
 Chapters/34_Patterns--Composite_and_Interpreter.md	already: Each rule is a nested pattern over a pair of already-simplified children
 Chapters/34_Patterns--Composite_and_Interpreter.md	even: CODE fails type checking even with a case for every node
@@ -732,7 +731,6 @@ Solutions/32_Patterns--Multiple_Dispatching/README.md	only: though only for a su
 Solutions/32_Patterns--Multiple_Dispatching/README.md	want: Which behavior you want depends on whether a subclass is a new competitor or a variation on an existing one
 Solutions/32_Patterns--Multiple_Dispatching/README.md	wants: Only a caller that wants the tally needs to pass its own CODE in
 Solutions/33_Patterns--Visitor/README.md	only: Only that one needs CODE and CODE
-Solutions/33_Patterns--Visitor/README.md	price: The Price of the Empty Base shows a CODE with a single CODE method as the type of the CODE parameter
 Solutions/34_Patterns--Composite_and_Interpreter/README.md	ever: since following it could loop forever if a link ever pointed back at one of its own ancestors
 Solutions/34_Patterns--Composite_and_Interpreter/README.md	is what: The left operand is what the caller wrote first
 Solutions/34_Patterns--Composite_and_Interpreter/README.md	itself: The derivative of CODE is CODE with respect to itself and CODE with respect to every other variable

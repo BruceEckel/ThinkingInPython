@@ -40,7 +40,7 @@ The anchor becomes `#what-the-python-form-gives-up`; the two links to it are the
 Alternative: `## What the Empty Base Gives Up`, which matches the first paragraph's wording but repeats the old title's mismatch with the second paragraph.
 This is a block because it retitles your heading against an earlier decline.
 
-[] Reject
+Applied 2026-10-13 with the title Bruce chose: `## Two Departures from the Classic Shape`.
 
 ## Considered and declined
 

@@ -220,6 +220,8 @@ paragraphs.** The heading names only the first paragraph. Retitling
 declined: the second paragraph ends on the line that motivates the whole
 `singledispatch` section, so it sits last regardless; a retitle makes the
 heading vaguer, and a new heading adds an anchor for two paragraphs.
+(Retitled 2026-10-13 to `## Two Departures from the Classic Shape`, which
+names both paragraphs; the commerce rule R2 settled the "Price" question.)
 
 **33_Patterns--Visitor, "The output above shows results, not mechanism."** Flagged as §70
 metadiscourse. Declined by the block's own criterion: "mechanism" is

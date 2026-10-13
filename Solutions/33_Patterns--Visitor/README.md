@@ -288,7 +288,7 @@ both at once.
 <details>
 <summary>Where to look</summary>
 
-[The Price of the Empty Base](../../Chapters/33_Patterns--Visitor.md#the-price-of-the-empty-base) shows a `Protocol` with a single `visit()` method as the type of the `accept()` parameter.
+[Two Departures from the Classic Shape](../../Chapters/33_Patterns--Visitor.md#two-departures-from-the-classic-shape) shows a `Protocol` with a single `visit()` method as the type of the `accept()` parameter.
 Because a `Protocol` matches by structure, `Bee` needs no change.
 Run the `Beetle` call through the type checker and then through the interpreter, and note which one objects and at what point.
 

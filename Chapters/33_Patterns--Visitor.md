@@ -28,7 +28,8 @@ A new `Visitor` subclass such as `Fly` reuses an existing operation,
 so it leaves the primary hierarchy as it is.
 In this Python form of the pattern,
 a new operation whose behavior varies by flower type also needs a new method on `Flower`.
-[The Price of the Empty Base](#the-price-of-the-empty-base) explains why.
+[Two Departures from the Classic Shape](#two-departures-from-the-classic-shape)
+explains why.
 Here, bugs visit flowers:
 
 ```python
@@ -160,7 +161,7 @@ because `Worm` inherits the operation from the class that defines it.
 For `Chrysanthemum` the second dispatch resolves to the override,
 and for `Gladiolus` to the inherited `Flower.eat`.
 
-## The Price of the Empty Base
+## Two Departures from the Classic Shape
 
 One annotation in `flower_visitors.py` looks like a shortcut,
 but the empty base class requires it.
