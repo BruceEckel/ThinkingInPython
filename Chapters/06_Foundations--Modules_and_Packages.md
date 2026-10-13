@@ -41,8 +41,8 @@ connect your class to the language's operators and built-in functions.
 shows how `print()` and `str()` reach a class's `__str__()`.
 
 When another program imports this file as a library module,
-the `if` keeps the code at the bottom of the file from running,
-so the importer gets the definitions alone.
+the `if` skips the code at the bottom of the file,
+the part meant for a command-line run.
 Python programmers call this check the *main guard*.
 The condition is true only when you run this file as a script.
 That is, `__name__` is `"__main__"` when you use the command line:
@@ -82,9 +82,11 @@ print(sys.modules["use_module"] is use_module)
 The first `import` creates the module object, stores it in `sys.modules`,
 a dict keyed by dotted module name, and then runs the file's body to fill it.
 Every later `import` of that name, from any file in the program,
-finds it there and binds the same object instead of re-running the file,
+finds it there and binds the same object instead of re-running the file.
+The `as second` clause binds that object under a second name
+([covered next](#importing-names-with-from-and-as)),
 so `use_module` and `second` are one object.
-One consequence: editing a module's file changes nothing in a program that has imported it.
+One consequence: editing a module's file changes nothing in a running program that has imported it.
 Restart the program, or call `importlib.reload(use_module)`,
 which re-runs the body into the existing module object.
 Reloading leaves every name bound by a `from ... import` pointing at the old objects,
@@ -370,6 +372,11 @@ print(function4())
 
 `module4` finds its sibling without naming `a_package`,
 so renaming the package breaks nothing inside it.
+A dotless `from module1 import function1` looks for a top-level module named `module1` on the [search path](#pythonpath),
+the way `use_module.py` looks for `module`.
+`module1.py` sits inside `a_package`,
+so `use_module4.py` then stops with `ModuleNotFoundError: No module named 'module1'`.
+
 Two dots reach the parent package,
 so `a_package/b_package/module3.py` could import from `a_package` with `from .. import module1` or `from ..module1 import function1`.
 The absolute form `from a_package.module1 import function1` works from inside the package too,
@@ -393,7 +400,8 @@ wherever the second module first uses a name the first module has not defined ye
 
 The "circular import" wording appears when the module's file comes from anywhere but the directory of the script you ran,
 which includes every module inside a package.
-When the file sits in that directory (`sys.path[0]`),
+When the file sits in that directory
+(the first entry of [`sys.path`](#pythonpath)),
 the usual case for two modules beside your script,
 Python suspects a name collision with a library instead of a cycle:
 `ImportError: cannot import name 'f' from 'modx' (consider renaming '.../modx.py' if it has the same name as a library you intended to import)`.
@@ -402,7 +410,7 @@ Python names the offending file by its full path, abbreviated here as `...`.
 A cycle is a design signal.
 Move the shared piece into a third module both can import.
 
-When the cycle exists only in annotations,
+When the cycle exists only in [annotations](08_Foundations--Static_Types.md#type-hints),
 an `if TYPE_CHECKING:` import breaks it.
 `typing.TYPE_CHECKING` is `False` at runtime,
 so the import under it runs for the type checker alone.
@@ -466,8 +474,8 @@ everything not underscored.
 With it, only the listed names arrive,
 and the star import skips `_internal` either way.
 
-The `# noqa: F403` silences the linter's objection to the star import,
-which hides the source of each name from a reader and from the tools.
+The `# noqa: F403` silences the linter's objection to the star import.
+A star import hides the source of each name from a reader and from the tools.
 Name what you import,
 and keep the star for experiments at the interactive prompt.
 
@@ -497,7 +505,8 @@ the style called `snake_case`.
 but convention discourages underscores.
 Prefer a single run-together word when you can.
 
-- Good: `mypackage`, and underscores only when they genuinely help (`a_package`)
+- Good: `mypackage`, and underscores only when they aid readability
+  (`a_package`)
 
 **Tests** follow pytest's discovery convention: `test_*.py` (or `*_test.py`).
 This book uses `test_*.py`, e.g. `test_result.py`.
@@ -506,8 +515,9 @@ Don't shadow standard-library modules.
 A file named `random.py`, `string.py`,
 or `weakref.py` can hide the stdlib one and break imports,
 because Python [searches the script's directory before the standard library](#pythonpath).
-Give a shared module a distinctive name for the same reason.
-The first `config.py` imported anywhere in the process is the one every later `import config` gets.
+Give a shared module a distinctive name too.
+Python caches modules by name in `sys.modules`,
+so the first `config.py` imported anywhere in the process is the one every later `import config` gets.
 
 Windows and macOS default to case-insensitive filesystems,
 so `module.py` and `Module.py` name the same file there.
@@ -546,7 +556,8 @@ and the install puts it on the search path with no environment variable.
 With `uv` (this book's tool of choice), you run `uv sync`,
 or `uv pip install -e .` for an editable install.
 The package resolves by name from anywhere,
-and edits to its source take effect immediately, without reinstalling.
+and edits to its source take effect the next time you run a program that imports it,
+without reinstalling.
 
 ## Lazy Imports
 

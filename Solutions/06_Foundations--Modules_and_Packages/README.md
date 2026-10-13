@@ -67,9 +67,9 @@ many of the three import styles you combine. Python caches every
 module in `sys.modules` on its first import, keyed by the module's
 full dotted name. A later `import` of the same module, in any of
 these forms, finds the cached module and skips running its top-level
-code again. It binds the names the statement requests, taken from the cached
-module. The
-package's `__init__.py` runs once for the same reason.
+code again. It binds the names the statement requests, taken from the
+cached module. The package's `__init__.py` runs once for the same
+reason.
 
 </details>
 </details>
@@ -240,9 +240,10 @@ print("after both")
 
 Although the `lazy import noisy` line comes first, `noisy`'s body
 waits for `noisy.announce()`, and that call comes after
-`noisy2.announce()`. Each `lazy import` reserves the name. The module's
-top-level code runs at the first use of that name, so use order, not
-declaration order, decides which module loads first.
+`noisy2.announce()`. Each `lazy import` binds the name and defers the
+load. The module's top-level code runs at the first use of that name,
+so use order, not declaration order, decides which module loads
+first.
 
 </details>
 </details>
@@ -292,7 +293,7 @@ search moves on.
 
 The case check is deliberate, and
 [PEP 235](https://peps.python.org/pep-0235/) says why. Without it, a
-program written on Windows imports happily there and fails the first
+program written on Windows imports cleanly there and fails the first
 time it runs on Linux, where the two names really are different
 files. Making the case rule the same everywhere turns a portability
 bug that surfaces in someone else's CI into one that surfaces on your
@@ -300,9 +301,9 @@ own machine.
 
 Setting `PYTHONCASEOK` in the environment turns the check off on a
 case-insensitive platform, and `import module` then finds `Module.py`.
-The variable exists for legacy code. Leave it unset in new code.
-A Python environment variable turns the check off, so the check is
-Python's rather than the filesystem's.
+A variable that Python reads switches the check off, which confirms
+the check belongs to Python rather than to the filesystem. The
+variable exists for legacy code, so leave it unset in new code.
 
 Following the convention avoids all of this.
 [File Names](../../Chapters/06_Foundations--Modules_and_Packages.md#file-names)
@@ -367,8 +368,8 @@ the module as a member of its package rather than running a loose
 file, so `__package__` holds `a_package` and the dot resolves.
 
 A module inside a package is not a script. `-m` is how you run a
-package module, and a file you intend to run both ways belongs at the
-top level, outside any package.
+package module, and a file you intend to run with `python file.py`
+belongs at the top level, outside any package.
 
 </details>
 </details>
@@ -437,9 +438,10 @@ underscore arrives. `undeclared` therefore joins `public` and
 `helper`, and `_internal` stays out. Restoring the `__all__` line
 shrinks the surface back to `public` and `helper`.
 
-`__all__` and the underscore convention compose in one direction
-only. `__all__` can export an underscored name, but without
-`__all__` an underscore is the only way to keep a name out of a star
+When a module defines `__all__`, the star import ignores the
+underscore convention. A listed name arrives with or without a
+leading underscore, and an unlisted name stays out. Without
+`__all__`, the underscore is the one way to keep a name out of a star
 import.
 
 </details>
