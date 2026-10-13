@@ -10,5 +10,6 @@ class Settings:
 def settings(env: str = "prod") -> Settings:
     return Settings()
 
-print(settings("prod") is settings("dev"))
-#: False
+print(len({id(settings()), id(settings("prod")),
+           id(settings(env="prod"))}))
+#: 3

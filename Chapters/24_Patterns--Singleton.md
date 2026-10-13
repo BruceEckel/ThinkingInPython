@@ -146,7 +146,7 @@ print(b)
 
 Giving the constructor function a parameter breaks the guarantee.
 `functools.cache` keys its cache on the arguments,
-so each distinct argument value gets its own entry and its own instance:
+so each distinct set of arguments gets its own entry and its own instance:
 
 ```python
 # singleton_cached_factory_footgun.py
@@ -161,15 +161,15 @@ class Settings:
 def settings(env: str = "prod") -> Settings:
     return Settings()
 
-print(settings("prod") is settings("dev"))
-#: False
+print(len({id(settings()), id(settings("prod")),
+           id(settings(env="prod"))}))
+#: 3
 ```
 
 One parameter turns "one singleton" into one singleton per argument value.
 A default does not help.
 The cache keys on the arguments as the call writes them and does not fill in a default,
-so `settings()`, `settings("prod")`,
-and `settings(env="prod")` build three objects for one environment.
+so the three calls in the listing build three objects for one environment.
 Keep the constructor function's signature empty,
 or accept that you built a cache, not a singleton.
 
@@ -249,14 +249,15 @@ uncached `Settings`.
 
 ### The First-Call Race
 
-The first-call race is easy to see with a wide enough window:
+The first-call race is easy to see with a wide enough window.
+The three race listings in this chapter share a slow `Settings` and a `distinct_objects()` helper that calls a factory from eight threads at once and counts the distinct objects they get back:
 
 ```python
-# singleton_cached_race.py
+# race_settings.py
 import time
+from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
-from functools import cache
 
 @dataclass
 class Settings:
@@ -265,13 +266,28 @@ class Settings:
     def __post_init__(self) -> None:
         time.sleep(0.05)  # Widen the first-call window
 
+def distinct_objects(factory: Callable[[], object]) -> int:
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        futures = [pool.submit(factory) for _ in range(8)]
+    return len({id(f.result()) for f in futures})
+```
+
+The sleep stands in for a constructor that does real work,
+such as opening a file or a connection.
+Without the sleep, the cached version below showed no duplicates across twenty trials,
+and that silence is the more dangerous case.
+A window too narrow to reproduce is still a window.
+
+```python
+# singleton_cached_race.py
+from functools import cache
+from race_settings import Settings, distinct_objects
+
 @cache
 def settings() -> Settings:
     return Settings()
 
-with ThreadPoolExecutor(max_workers=8) as pool:
-    built = list(pool.map(lambda _: settings(), range(8)))
-print(len({id(s) for s in built}) > 1)
+print(distinct_objects(settings) > 1)
 #: True
 ```
 
@@ -292,17 +308,8 @@ so the version below drops `@cache` and writes the check by hand:
 ```python
 # singleton_locked_settings.py
 import threading
-import time
-from concurrent.futures import ThreadPoolExecutor
-from dataclasses import dataclass, field
 from typing import Final
-
-@dataclass
-class Settings:
-    data: dict[str, str] = field(default_factory=dict)
-
-    def __post_init__(self) -> None:
-        time.sleep(0.05)  # Widen the first-call window
+from race_settings import Settings, distinct_objects
 
 _lock: Final[threading.Lock] = threading.Lock()
 _instance: Settings | None = None
@@ -314,9 +321,7 @@ def settings() -> Settings:
             _instance = Settings()
     return _instance
 
-with ThreadPoolExecutor(max_workers=8) as pool:
-    built = list(pool.map(lambda _: settings(), range(8)))
-print(len({id(s) for s in built}))
+print(distinct_objects(settings))
 #: 1
 ```
 
@@ -325,12 +330,6 @@ The rest wait on the lock, and each finds `_instance` filled.
 Under the same eight-thread race,
 the cached version produces more than one object, usually eight.
 The locked version produces one, as the printed count confirms.
-
-The sleep stands in for a constructor that does real work,
-such as opening a file or a connection.
-Without the sleep, the cached version showed no duplicates across twenty trials,
-and that silence is the more dangerous case.
-A window too narrow to reproduce is still a window.
 
 `settings()` declares `global` for `_instance` and leaves `_lock` undeclared.
 The [mutate-versus-rebind distinction](#a-module-is-already-a-singleton)
@@ -360,17 +359,8 @@ take it when the test finds the object missing, then test again inside:
 ```python
 # singleton_double_checked.py
 import threading
-import time
-from concurrent.futures import ThreadPoolExecutor
-from dataclasses import dataclass, field
 from typing import Final
-
-@dataclass
-class Settings:
-    data: dict[str, str] = field(default_factory=dict)
-
-    def __post_init__(self) -> None:
-        time.sleep(0.05)  # Widen the first-call window
+from race_settings import Settings, distinct_objects
 
 _lock: Final[threading.Lock] = threading.Lock()
 _instance: Settings | None = None
@@ -383,9 +373,7 @@ def settings() -> Settings:
                 _instance = Settings()
     return _instance
 
-with ThreadPoolExecutor(max_workers=8) as pool:
-    built = list(pool.map(lambda _: settings(), range(8)))
-print(len({id(s) for s in built}))
+print(distinct_objects(settings))
 #: 1
 ```
 
