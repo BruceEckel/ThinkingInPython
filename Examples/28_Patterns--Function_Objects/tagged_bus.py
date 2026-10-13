@@ -1,8 +1,9 @@
 # tagged_bus.py
 import inspect
 from collections import defaultdict
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Any, Final, Protocol, dataclass_transform
+from typing import Any, Final, dataclass_transform
 
 EVENTS: Final[set[type]] = set()
 HANDLES: Final[dict[type, type]] = {}
@@ -13,8 +14,7 @@ def event[E](cls: type[E]) -> type[E]:
     EVENTS.add(built)
     return built
 
-class Handler[E](Protocol):
-    def __call__(self, event: E, /) -> None: ...
+type Handler[E] = Callable[[E], None]
 
 @dataclass_transform(frozen_default=True)
 def handler[H](cls: type[H]) -> type[H]:

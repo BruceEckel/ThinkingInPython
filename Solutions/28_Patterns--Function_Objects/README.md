@@ -113,7 +113,7 @@ print(account["balance"])
 ```
 
 A bare function is no longer enough, though not because of state.
-`callable_command.py`'s `Repeat` already carries its configuration, and
+`callable_command.py`'s `Repeat` carries its configuration, and
 the macro still calls it with `()`, so state alone does not force more
 than a callable. Undo does, because a command now answers two requests,
 `__call__()` and `undo()`, and a callable has only one call.
@@ -380,7 +380,7 @@ Context holding the current strategy is the call to `sorted()`.
 
 > Following `bisection_within()`,
 > add a `tolerance` parameter to `newton()` in `algorithms.py` and build a configured strategy from it two ways:
-> with a closure, and with `functools.partial`.
+> with a closure, and with `functools.partial()`.
 > Confirm that `chain.py`'s `first_root()` runs a chain holding either one,
 > with no change to `first_root()`.
 
@@ -426,8 +426,9 @@ def f(x: float) -> float:
 
 If you leave out the keyword and write `partial(newton, 0.6)`,
 `partial()` binds `0.6` to `f`, the first positional parameter.
-`ty` rejects the assignment to `RootFinder` with `invalid-assignment`,
-and at run time calling the finder raises a `TypeError` when `newton()` adds the function in `a` to a float.
+`ty` reports `invalid-argument-type` on the `0.6`, which is not an `Fn`,
+and `invalid-assignment` on the assignment to `RootFinder`.
+At run time, calling the finder raises a `TypeError` when `newton()` adds the function in `a` to a float.
 The solution binds `tolerance` by keyword, as `partial_bisection.py` does.
 
 ```python
@@ -648,7 +649,7 @@ silent `unsubscribe()` matches the bus's habit of letting an unmatched
 event pass without complaint.
 
 **Walk the ancestry, most specific first.** `type(event).__mro__`
-already runs from the class outward to `object`, so iterating over it
+runs from the class outward to `object`, so iterating over it
 in order calls the most specific handlers first and the inherited ones
 after. That order meets the "parents last" requirement.
 
@@ -676,7 +677,8 @@ did before.
 > Build a list of three commands in a `for` loop (not a comprehension)
 > with `lambda: print(n)`.
 > Call them and explain the output.
-> Fix the loop three ways: with a default argument, with `functools.partial`,
+> Fix the loop three ways: with a default argument,
+> with `functools.partial()`,
 > and with a factory function that takes `n` and returns the command.
 > Which one still works if you must compute the value at call time rather than at build time?
 
@@ -775,8 +777,9 @@ definition. `partial(print, n)` evaluates the argument where it appears.
 `make(n)` gives each lambda its own `n` in its own function scope.
 
 Only `make(n)` keeps the value private. `lambda n=n:` exposes the value
-as a parameter a caller can override, and `partial(print, n)` passes the
-value straight to `print()`.
+as a parameter a caller can override, and `partial(print, n)` stores it
+in the `partial` object's public `args` attribute, where
+`by_partial[0].args` is `(0,)`.
 
 A value computed from the frozen `n` separates the fixes. The two
 lambda forms run their body at the call, so

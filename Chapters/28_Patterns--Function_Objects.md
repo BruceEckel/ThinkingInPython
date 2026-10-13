@@ -197,7 +197,7 @@ print(macro[1])
 ```
 
 Printing `macro[1]` shows the `repr` that `@record` generates,
-so the command's configuration reads from outside the object.
+so you can read the command's configuration from outside the object.
 A closure's `repr` shows its function's name and a memory address.
 
 A callable alone cannot express a second operation, `undo()`.
@@ -414,7 +414,7 @@ Each call to `bisection_within()` returns a new finder whose closure holds that 
 The coarse strategy stops within a tenth and reports 1.406250.
 The fine one agrees with the true root to six places.
 Because both satisfy `RootFinder`, `solve()` accepts either unchanged,
-and so does `first_root()` in `chain.py`.
+and so does `chain.py`'s `first_root()`, which the next section introduces.
 
 Because `bisection_tol()` takes the setting as an ordinary parameter,
 `functools.partial()` can replace the closure.
@@ -504,17 +504,6 @@ bisection fails by returning `None`.
 The loop in `first_root()` continues to a method that needs no bracket.
 Adding, removing, or reordering the handlers means editing the `chain` list.
 
-All three patterns share one shape:
-
-![](_images/function_objects_story)
-
-In every lane the call site stays the same short loop or call,
-and it depends on the signature alone.
-The patterns differ in how many of the chosen callables the call site runs:
-all of them in turn, one per call, or the first that succeeds.
-That count, rather than a class structure, separates *Command*, *Strategy*,
-and *Chain of Responsibility* in Python.
-
 The test in `first_root()` is `root is not None`, not `if root`.
 A finder returns `0.0` for a function whose root is at zero, and `0.0` is falsy,
 so a truthiness test discards a correct answer and calls the next finder.
@@ -597,6 +586,17 @@ The type checker is right about the type.
 A `partial` object is a `RootFinder`, and it has no `__name__`.
 The three finders here are functions, and every function has one.
 A `Protocol` that declares `__name__` beside `__call__()` states that requirement in the type and needs no comment.
+
+All three patterns share one shape:
+
+![](_images/function_objects_story)
+
+In every lane the call site stays the same short loop or call,
+and it depends on the signature alone.
+The patterns differ in how many of the chosen callables the call site runs:
+all of them in turn, one per call, or the first that succeeds.
+That count, rather than a class structure, separates *Command*, *Strategy*,
+and *Chain of Responsibility* in Python.
 
 ## An Event Bus: Handlers Keyed by Type
 
@@ -696,8 +696,8 @@ bus.publish(Closed("inactivity"))
 letting the `defaultdict` build each event type's list on first use.
 `publish()` reads with `.get(type(event), [])` instead of indexing,
 because indexing a `defaultdict` inserts an empty list as a side effect.
-Every published event type with no handler, such as `Closed`,
-otherwise leaves a stray entry behind.
+Indexing would leave a stray entry behind for every published event type with no handler,
+such as `Closed`.
 
 The lookup uses `type(event)`, which matches the class and no ancestor.
 A subclass of `Deposit` published to this bus matches no handler,
@@ -759,9 +759,8 @@ The second version gives each side a decorator, both producing records.
 `@handler` makes a class whose instances are function objects,
 with fields that hold their configuration,
 and stores in `HANDLES` the event its `__call__()` accepts.
-`Handler` becomes a `Protocol` whose one method is `__call__()`,
-because the handlers are now objects rather than functions.
-`Handler` still names their signature.
+`Handler` keeps its `Callable` definition,
+which accepts a callable object as `Command` accepts `Repeat` in `callable_command.py`.
 `subscribe()` then takes one argument, since the handler says what it handles,
 and `publish()` refuses an object that no `@event` class produced:
 
@@ -769,8 +768,9 @@ and `publish()` refuses an object that no `@event` class produced:
 # tagged_bus.py
 import inspect
 from collections import defaultdict
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Any, Final, Protocol, dataclass_transform
+from typing import Any, Final, dataclass_transform
 
 EVENTS: Final[set[type]] = set()
 HANDLES: Final[dict[type, type]] = {}
@@ -781,8 +781,7 @@ def event[E](cls: type[E]) -> type[E]:
     EVENTS.add(built)
     return built
 
-class Handler[E](Protocol):
-    def __call__(self, event: E, /) -> None: ...
+type Handler[E] = Callable[[E], None]
 
 @dataclass_transform(frozen_default=True)
 def handler[H](cls: type[H]) -> type[H]:
@@ -822,9 +821,6 @@ class EventBus:
 `hasattr(cls, "__call__")` cannot make that test,
 because it is true of every class.
 A class is callable, and calling it builds an instance.
-
-The `/` in `Handler` makes `event` positional-only,
-so a handler may give that parameter any name.
 
 Each decorator registers `built`, the class that `dataclass()` returns,
 and not the `cls` it received.
@@ -878,7 +874,8 @@ tells the type checker that a class passing through either decorator comes out a
 `Audit(threshold=50)` therefore has its generated `__init__()`,
 and the type checker rejects `Audit(50).threshold = 1` as an assignment to a read-only property,
 as it does for a class decorated with `@dataclass(frozen=True)`.
-The entries in `EVENTS` and `HANDLES` are runtime facts.
+The two decorators fill `EVENTS` and `HANDLES` at run time,
+where the type checker cannot see them.
 `@handler` reads the annotation on the first parameter after `self` in `__call__()`,
 the same annotation the type checker checks, so a handler names its event once.
 
@@ -1021,7 +1018,7 @@ Try each exercise before opening its [solution](../Solutions/28_Patterns--Functi
     Explain why `key` is the *Strategy* pattern.
 4.  Following `bisection_within()`,
     add a `tolerance` parameter to `newton()` in `algorithms.py` and build a configured strategy from it two ways:
-    with a closure, and with `functools.partial`.
+    with a closure, and with `functools.partial()`.
     Confirm that `chain.py`'s `first_root()` runs a chain holding either one,
     with no change to `first_root()`.
 5.  Because `EventBus.publish()` looks up `type(event)`,
@@ -1033,7 +1030,8 @@ Try each exercise before opening its [solution](../Solutions/28_Patterns--Functi
 6.  Build a list of three commands in a `for` loop (not a comprehension)
     with `lambda: print(n)`.
     Call them and explain the output.
-    Fix the loop three ways: with a default argument, with `functools.partial`,
+    Fix the loop three ways: with a default argument,
+    with `functools.partial()`,
     and with a factory function that takes `n` and returns the command.
     Which one still works if you must compute the value at call time rather than at build time?
 7.  In `tagged_bus.py`, change `event()` to register `cls` in place of `built`.
