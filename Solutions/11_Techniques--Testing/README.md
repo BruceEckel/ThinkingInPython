@@ -450,7 +450,7 @@ A hand-written stub needs somewhere to keep what it receives, so the test has so
 <summary>Solution</summary>
 
 If you test only a positive balance,
-a mistaken `balance <= 0` in `notify_low_balance()` goes unnoticed.
+a mistaken `balance <= 0` in `notify_negative_balance()` goes unnoticed.
 Both tests pass at `50`.
 `<` and `<=` disagree only at zero,
 so the solution adds `0` to the `parametrize` list, and with the mistaken `<=` both zero cases fail.
@@ -461,7 +461,7 @@ from collections.abc import Callable
 from unittest.mock import Mock
 import pytest
 
-def notify_low_balance(
+def notify_negative_balance(
     balance: float,
     send: Callable[[str], None],
 ) -> None:
@@ -471,7 +471,7 @@ def notify_low_balance(
 @pytest.mark.parametrize("balance", [0, 50])
 def test_mock_not_called(balance: float) -> None:
     send = Mock()
-    notify_low_balance(balance, send)
+    notify_negative_balance(balance, send)
     send.assert_not_called()
 
 @pytest.mark.parametrize("balance", [0, 50])
@@ -479,20 +479,20 @@ def test_stub_not_called(balance: float) -> None:
     sent: list[str] = []
     def send(message: str) -> None:
         sent.append(message)
-    notify_low_balance(balance, send)
+    notify_negative_balance(balance, send)
     assert sent == []
 ```
 
 **Test the boundary with a mock.**
 Zero is the boundary.
-`notify_low_balance()` tests `balance < 0`,
+`notify_negative_balance()` tests `balance < 0`,
 so a mistaken `<=` would send at zero and fail the zero case.
 `assert_not_called()` passes only if `send` received no call.
 
 **Record the calls by hand.**
 A stub like exercise 5's `fake_fetch()` cannot make this check.
 It records nothing, so the test would pass whether or not `send` ran,
-and a `notify_low_balance()` that always sent would go unnoticed.
+and a `notify_negative_balance()` that always sent would go unnoticed.
 To make the check, the stub must gain a memory of its calls.
 Here that memory is the list `sent`.
 The stub appends each message to it,

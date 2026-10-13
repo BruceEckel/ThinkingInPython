@@ -1,7 +1,7 @@
 # notifier.py
 from collections.abc import Callable
 
-def notify_low_balance(
+def notify_negative_balance(
     balance: float,
     send: Callable[[str], None],
 ) -> None:

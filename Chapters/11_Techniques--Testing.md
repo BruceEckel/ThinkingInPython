@@ -381,7 +381,8 @@ so read the error to see which invariant broke.
 
 A fixture marked `@pytest.fixture(autouse=True)` runs for every test in its scope without any test naming it.
 Autouse suits a fixture whose value is a side effect rather than an object:
-resetting a global registry, or installing a `monkeypatch` every test needs.
+resetting a global registry, or installing a `monkeypatch` every test needs,
+as `test_storage.py` does later in this chapter.
 
 Autouse runs the fixture, and only a parameter delivers its value.
 If you mark `funded` autouse and leave it out of the parameter list,
@@ -503,12 +504,9 @@ so its report on the code below disagrees with what runs:
 
 ```python
 # name_mangling.py
-
 class Vault:
     def __init__(self) -> None:
-        # Single underscore: convention only
         self._balance = 0
-        # Double underscore: gets mangled
         self.__pin = "1234"
 
 v = Vault()
@@ -569,8 +567,13 @@ def load(name: str) -> str:
 `Path()` keeps a leading `~` as written,
 so a variable that may hold `~/data` needs `.expanduser()` on the result.
 
-The tests point `APP_DATA` at a throwaway directory,
-so they leave real data untouched and cannot collide with each other.
+The `app_data()` fixture points `APP_DATA` at a throwaway directory before each test,
+so the tests leave real data untouched and cannot collide with each other.
+A fixture requests other fixtures the way a test does,
+by naming them as parameters,
+and `app_data()` names the built-in `tmp_path` and `monkeypatch`.
+Its value is a side effect,
+so it is marked `autouse=True` and both tests run with it unnamed.
 `test_round_trip()` loads back what it saved,
 and `test_missing_file_raises()` confirms that loading an absent file raises a `FileNotFoundError`:
 
@@ -580,25 +583,25 @@ from pathlib import Path
 import pytest
 import storage
 
-def test_round_trip(
+@pytest.fixture(autouse=True)
+def app_data(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     monkeypatch.setenv("APP_DATA", str(tmp_path))
+
+def test_round_trip() -> None:
     storage.save("greeting.txt", "hello")
     assert storage.load("greeting.txt") == "hello"
 
-def test_missing_file_raises(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    monkeypatch.setenv("APP_DATA", str(tmp_path))
+def test_missing_file_raises() -> None:
     with pytest.raises(FileNotFoundError):
         storage.load("absent.txt")
 ```
 
 `data_dir()` reads `APP_DATA` on every call,
-so `monkeypatch.setenv()` can change the directory `data_dir()` returns.
+so the fixture's `monkeypatch.setenv()` can change the directory `data_dir()` returns.
 A module-level `DATA_DIR = Path(os.environ.get("APP_DATA", "."))` reads the variable once,
-at import time, before any test body runs,
+at import time, before any fixture runs,
 so patching the environment afterward changes nothing.
 Reading a setting where you use it, rather than caching it at import,
 is most of what makes a module testable.
@@ -687,12 +690,12 @@ def elapsed(start: float) -> float:
 
 ```python
 # test_stopwatch.py
-import time
 import pytest
 import stopwatch
 
 def test_elapsed(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setattr(time, "time", lambda: 100.0)
+    monkeypatch.setattr(stopwatch.time, "time",
+                        lambda: 100.0)
     assert stopwatch.elapsed(40.0) == 60.0
 ```
 
@@ -831,7 +834,7 @@ not just what the call returned.
 # notifier.py
 from collections.abc import Callable
 
-def notify_low_balance(
+def notify_negative_balance(
     balance: float,
     send: Callable[[str], None],
 ) -> None:
@@ -846,7 +849,7 @@ import notifier
 
 def test_negative_balance_sends_message() -> None:
     send = Mock()
-    notifier.notify_low_balance(-5, send)
+    notifier.notify_negative_balance(-5, send)
     send.assert_called_once_with(
         "balance is negative: -5")
 ```

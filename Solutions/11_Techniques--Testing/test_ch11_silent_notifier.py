@@ -3,7 +3,7 @@ from collections.abc import Callable
 from unittest.mock import Mock
 import pytest
 
-def notify_low_balance(
+def notify_negative_balance(
     balance: float,
     send: Callable[[str], None],
 ) -> None:
@@ -13,7 +13,7 @@ def notify_low_balance(
 @pytest.mark.parametrize("balance", [0, 50])
 def test_mock_not_called(balance: float) -> None:
     send = Mock()
-    notify_low_balance(balance, send)
+    notify_negative_balance(balance, send)
     send.assert_not_called()
 
 @pytest.mark.parametrize("balance", [0, 50])
@@ -21,5 +21,5 @@ def test_stub_not_called(balance: float) -> None:
     sent: list[str] = []
     def send(message: str) -> None:
         sent.append(message)
-    notify_low_balance(balance, send)
+    notify_negative_balance(balance, send)
     assert sent == []

@@ -1,10 +1,7 @@
 # name_mangling.py
-
 class Vault:
     def __init__(self) -> None:
-        # Single underscore: convention only
         self._balance = 0
-        # Double underscore: gets mangled
         self.__pin = "1234"
 
 v = Vault()
