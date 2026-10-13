@@ -39,7 +39,7 @@ Solutions:
 
 ## Considered and declined
 
-- **Import order in "A Module Is Already a Singleton".** The prose says the first import "runs `config.py` top to bottom and files the resulting module object in `sys.modules`". The import system files the module before it runs the body. The generated `singleton_story` figure uses the same order ("config.py runs and is filed"). The order matters only for circular imports, which the chapter does not discuss. Fixing the prose alone would make it disagree with the figure. Left.
+- **Import order in "A Module Is Already a Singleton".** The prose said the first import "runs `config.py` top to bottom and files the resulting module object in `sys.modules`", and the generated `singleton_story` figure used the same order ("config.py runs and is filed"). The import system files the module before it runs the body (`importlib._bootstrap._load_unlocked()`). Corrected on 2026-10-13: the prose now says Python creates the module object, files it in `sys.modules`, then runs the body, and the figure's first frame says "the module is filed, then config.py runs", as its `<title>` does.
 - **`singleton_cached_race.py` is not in `tools/data/timing.txt`.** Its `True` is a race outcome, not a wall-clock threshold. With a 50 ms constructor it came out `True` in every run here and in the last review's. A flip would need all seven other threads delayed 50 ms. Left unregistered.
 - **The figure paragraph and the mutate-versus-rebind paragraph repeat each other.** The first reads the figure's arrows and the second states the same point in code. The repetition fits a first explanation. Left.
 

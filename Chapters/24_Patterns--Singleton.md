@@ -47,8 +47,10 @@ print(config is again is sys.modules["config"])
 
 Two imports of `config`, but `config body runs` prints once.
 The first import of `config` (`[1]`)
-runs `config.py` top to bottom and files the resulting module object in `sys.modules` under the name `config`.
-The second (`[2]`) finds it there and skips the work,
+creates a new module object and files it in `sys.modules` under the name `config`.
+Then Python runs `config.py` top to bottom,
+defining each module-level name in that module object.
+The second import (`[2]`) finds the entry and runs nothing,
 so the body runs once and builds one `settings` dict.
 The printed `True` shows that both names and the `sys.modules` entry are one object.
 That is the singleton: not a rule a class enforces,

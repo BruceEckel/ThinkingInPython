@@ -1,15 +1,16 @@
 """Chapter 24, Singleton: four frames of one module shared by its importers.
 
-The chapter's answer to *Singleton* is the module: the import system runs
-a module's body once, files the module object in `sys.modules`, and hands
-that same object to every later import. A class diagram shows none of
+The chapter's answer to *Singleton* is the module: the import system files
+a new module object in `sys.modules`, runs the module's body once to fill
+it, and hands that same object to every later import. A class diagram shows none of
 this, since the singleton is a lookup the import system performs, not a
 rule a class enforces. So the figure follows the chapter's first section
 in time, one layout per frame: the importing file on the left, the
 `sys.modules` entry in the middle, the module object on the right.
 
-1. `import config` finds no entry, so `config.py` runs (printing
-   `config body runs`) and is filed under `'config'`.
+1. `import config` finds no entry, so the import system files a new
+   module object under `'config'` and then runs `config.py` in it
+   (printing `config body runs`).
 2. `import config as again` finds the entry; the body does not run, and
    both names and the entry are one module (`True`).
 3. `shared_config.py` mutates the one `settings` dict through its own
@@ -38,8 +39,8 @@ KX, KY, KW, KH = 390, 44, 80, 24  # Its 'config' entry
 OX, OW = 520, 195  # The config module object
 DX, DY, DW, DH = 532, 102, 171, 28  # Its settings dict
 TOP = 76  # Height of the target the name arrows point at
-TITLE = ("Four steps of a module singleton: the first import runs "
-         "config.py and files it in sys.modules, a second import gets the "
+TITLE = ("Four steps of a module singleton: the first import files "
+         "config in sys.modules and then runs config.py, a second import gets the "
          "same module, a mutation through one name reaches every importer, "
          "and rebinding the name leaves config.settings unchanged")
 
@@ -107,8 +108,8 @@ def render() -> str:
     b = ""
 
     y0 = y[0]
-    b += frame(0, y0, "import", ("no entry yet,", "so config.py",
-                                 "runs and is filed"),
+    b += frame(0, y0, "import", ("no entry yet:", "the module is",
+                                 "filed, then", "config.py runs"),
                "module_singleton.py", (("import config", RED),), new=True)
     b += prints(y0, ("config body runs",))
     b += text(OX + 12, y0 + 64, "body runs once", 10.5, RED)

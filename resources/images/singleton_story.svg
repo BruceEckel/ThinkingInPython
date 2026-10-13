@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 730 650"
      font-family="'JetBrains Mono', Consolas, monospace">
-  <title>Four steps of a module singleton: the first import runs config.py and files it in sys.modules, a second import gets the same module, a mutation through one name reaches every importer, and rebinding the name leaves config.settings unchanged</title>
+  <title>Four steps of a module singleton: the first import files config in sys.modules and then runs config.py, a second import gets the same module, a mutation through one name reaches every importer, and rebinding the name leaves config.settings unchanged</title>
   <defs>
     <marker id="ss-ink" viewBox="0 0 18 12" refX="5" refY="6"
             markerWidth="18" markerHeight="12" orient="auto" markerUnits="userSpaceOnUse">
@@ -13,9 +13,10 @@
   </defs>
   <text x="22" y="54" font-size="30" fill="#8b1a1a" font-weight="bold" text-anchor="start">1</text>
   <text x="22" y="76" font-size="13" fill="#1a1612" font-weight="bold" text-anchor="start">import</text>
-  <text x="22" y="96" font-size="10.5" fill="#7a6e62" text-anchor="start">no entry yet,</text>
-  <text x="22" y="111" font-size="10.5" fill="#7a6e62" text-anchor="start">so config.py</text>
-  <text x="22" y="126" font-size="10.5" fill="#7a6e62" text-anchor="start">runs and is filed</text>
+  <text x="22" y="96" font-size="10.5" fill="#7a6e62" text-anchor="start">no entry yet:</text>
+  <text x="22" y="111" font-size="10.5" fill="#7a6e62" text-anchor="start">the module is</text>
+  <text x="22" y="126" font-size="10.5" fill="#7a6e62" text-anchor="start">filed, then</text>
+  <text x="22" y="141" font-size="10.5" fill="#7a6e62" text-anchor="start">config.py runs</text>
   <path d="M144,24 H346 Q350,24 350,28 V150 Q350,154 346,154 H144 Q140,154 140,150 V28 Q140,24 144,24 Z" fill="none" stroke="#1a1612" stroke-width="1.6"/>
   <text x="150" y="42" font-size="11" fill="#1a1612" font-weight="bold" text-anchor="start">module_singleton.py</text>
   <text x="150" y="60" font-size="10.5" fill="#8b1a1a" text-anchor="start">import config</text>
