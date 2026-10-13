@@ -198,6 +198,7 @@ and confirms that `parse()` skips comment and blank lines and builds each remain
 # test_parse_trash.py
 from pathlib import Path
 from parse_trash import parse
+from trash import Aluminum, Glass
 
 def test_parse_skips_comments_and_blank_lines(
     tmp_path: Path,
@@ -210,8 +211,7 @@ Aluminum:2.0
 Glass:3.0
 """)
     items = parse(data)
-    assert [type(t).__name__ for t in items] == [
-        "Aluminum", "Glass"]
+    assert [type(t) for t in items] == [Aluminum, Glass]
     assert items[0].weight == 2.0
     assert items[1].weight == 3.0
 ```
@@ -486,9 +486,6 @@ class Cardboard(Trash):
     def note(self) -> str:
         return "Cardboard: flatten and bundle"
 
-    def hazard(self) -> str:
-        return "none"
-
 materials = [Aluminum, Glass, Cardboard]
 for cls in materials:
     t = cls(1.0)
@@ -499,14 +496,16 @@ for cls in materials:
 edited = [c for c in materials  # [1]
           if "hazard" in c.__dict__]
 print(f"classes edited for one operation: {len(edited)}")
-#: classes edited for one operation: 3
+#: classes edited for one operation: 2
 ```
 
 `[1]` counts the material classes that the new operation edits.
 The `Trash` base takes an edit too,
 because the type checker accepts `t.hazard()` on a `Trash`,
 such as a piece from `parse()`, once the base declares the method.
-So one new operation is four edits, and the operation after it is four more.
+So one new operation is three edits: the base,
+plus each material whose answer differs from the base's.
+The operation after it edits the base and those classes again.
 Those edits sit in each class body, as `note_methods.py` shows.
 In the real program they go in `trash.py`.
 
@@ -616,7 +615,8 @@ print(f"classes edited for one operation: {len(edited)}")
 The loop reads every material from the registry, `hazard()` answers for each,
 and `trash.py` stays untouched.
 A third operation and a fourth are one more file each,
-where `note_methods.py` needs an edit to the base and to each material every time.
+where `note_methods.py` needs an edit to the base and to each material that answers differently,
+every time.
 Adding a `Plastic` material means defining the class,
 plus one registration for each operation that must answer differently for plastic.
 Python still has the expression problem,

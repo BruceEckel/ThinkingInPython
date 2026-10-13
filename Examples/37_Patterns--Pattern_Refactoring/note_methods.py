@@ -38,9 +38,6 @@ class Cardboard(Trash):
     def note(self) -> str:
         return "Cardboard: flatten and bundle"
 
-    def hazard(self) -> str:
-        return "none"
-
 materials = [Aluminum, Glass, Cardboard]
 for cls in materials:
     t = cls(1.0)
@@ -51,4 +48,4 @@ for cls in materials:
 edited = [c for c in materials  # [1]
           if "hazard" in c.__dict__]
 print(f"classes edited for one operation: {len(edited)}")
-#: classes edited for one operation: 3
+#: classes edited for one operation: 2

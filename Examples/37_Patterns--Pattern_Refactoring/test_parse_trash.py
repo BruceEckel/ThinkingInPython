@@ -1,6 +1,7 @@
 # test_parse_trash.py
 from pathlib import Path
 from parse_trash import parse
+from trash import Aluminum, Glass
 
 def test_parse_skips_comments_and_blank_lines(
     tmp_path: Path,
@@ -13,7 +14,6 @@ Aluminum:2.0
 Glass:3.0
 """)
     items = parse(data)
-    assert [type(t).__name__ for t in items] == [
-        "Aluminum", "Glass"]
+    assert [type(t) for t in items] == [Aluminum, Glass]
     assert items[0].weight == 2.0
     assert items[1].weight == 3.0
