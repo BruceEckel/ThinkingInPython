@@ -1,5 +1,6 @@
 # rust/fastcount/demo.py
 import timeit
+from collections.abc import Callable
 import fastcount
 
 def count_primes(limit: int) -> int:
@@ -13,7 +14,7 @@ def count_primes(limit: int) -> int:
     return count
 
 def collatz_lengths(values: list[int]) -> list[int]:
-    lengths = []
+    lengths: list[int] = []
     for start in values:
         n = start
         steps = 0
@@ -23,27 +24,18 @@ def collatz_lengths(values: list[int]) -> list[int]:
         lengths.append(steps)
     return lengths
 
-limit = 200_000
-assert fastcount.count_primes(limit) == count_primes(limit)
-t_python = timeit.timeit(
-    lambda: count_primes(limit), number=1
-)
-t_rust = timeit.timeit(
-    lambda: fastcount.count_primes(limit), number=1
-)
-print(f"count_primes Rust speedup: "
-      f"{t_python / t_rust:.1f}x")
-# Sample run: count_primes Rust speedup: 12.2x
+def speedup[T, R](
+    name: str, slow: Callable[[T], R],
+    fast: Callable[[T], R], arg: T,
+) -> None:
+    assert fast(arg) == slow(arg)
+    t_slow = timeit.timeit(lambda: slow(arg), number=1)
+    t_fast = timeit.timeit(lambda: fast(arg), number=1)
+    print(f"{name} Rust speedup: {t_slow / t_fast:.1f}x")
 
-values = list(range(1, 50_000))
-assert (fastcount.collatz_lengths(values)
-        == collatz_lengths(values))
-t_python = timeit.timeit(
-    lambda: collatz_lengths(values), number=1
-)
-t_rust = timeit.timeit(
-    lambda: fastcount.collatz_lengths(values), number=1
-)
-print(f"collatz_lengths Rust speedup: "
-      f"{t_python / t_rust:.1f}x")
+speedup("count_primes", count_primes,
+        fastcount.count_primes, 200_000)
+# Sample run: count_primes Rust speedup: 12.2x
+speedup("collatz_lengths", collatz_lengths,
+        fastcount.collatz_lengths, list(range(1, 50_000)))
 # Sample run: collatz_lengths Rust speedup: 34.3x

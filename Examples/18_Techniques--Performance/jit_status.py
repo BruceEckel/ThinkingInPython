@@ -8,7 +8,5 @@ def jit_state() -> str:
         return "JIT built in, switched off"
     return "JIT enabled"
 
-# [1]
-print(sys._jit.is_available() or not sys._jit.is_enabled())
-#: True
-print(jit_state())  # [2]
+assert sys._jit.is_available() or not sys._jit.is_enabled()
+print(jit_state())

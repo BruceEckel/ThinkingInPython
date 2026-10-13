@@ -487,24 +487,19 @@ def jit_state() -> str:
         return "JIT built in, switched off"
     return "JIT enabled"
 
-# [1]
-print(sys._jit.is_available() or not sys._jit.is_enabled())
-#: True
-print(jit_state())  # [2]
+assert sys._jit.is_available() or not sys._jit.is_enabled()
+print(jit_state())
 ```
 
 `is_enabled()` implies `is_available()`,
 so testing `is_available()` first and `is_enabled()` second names a build's three possible states.
-The `print()` at `[1]` tests that implication,
-and it shows `True` on every build.
+The `assert` checks that implication, which holds on every build.
 
 Most listings in this book print the same line on every machine.
-The `print()` at `[2]` changes with your interpreter,
-so it carries no `#:` line.
+The `print()` changes with your interpreter, so it carries no `#:` line.
 The book's build has no JIT compiled in,
 so `tip jit_status` reports the first state:
 
-    True
     no JIT in this build
 
 A python.org binary prints `JIT built in, switched off` until you set `PYTHON_JIT=1`.
@@ -662,9 +657,6 @@ the `bisect` module finds the insertion point using binary search:
 import bisect
 from typing import Final
 
-CUTOFFS: Final[list[int]] = [60, 70, 80, 90]
-LETTERS: Final[str] = "FDCBA"
-
 scores = [60, 70, 75, 90]  # Must stay sorted
 i = bisect.bisect(scores, 78)  # Where 78 goes
 print(i)
@@ -673,8 +665,10 @@ bisect.insort(scores, 78)  # Insert and keep it sorted
 print(scores)
 #: [60, 70, 75, 78, 90]
 
+CUTOFFS: Final[list[int]] = [60, 70, 80, 90]
+LETTERS: Final[str] = "FDCBA"
+
 def grade(score: int) -> str:
-    # Map a score to a letter through its cutoff boundaries:
     return LETTERS[bisect.bisect(CUTOFFS, score)]
 
 print([grade(s) for s in (55, 65, 85, 95)])
@@ -690,6 +684,11 @@ while `bisect_left()` returns the position before them
 `bisect_left()` and `bisect_right()` both answer "where does this go,"
 but when the list holds the target, only `bisect_left()` returns its index,
 so a membership test must use it, as `search_comparison.py` does below.
+
+`grade()` uses `bisect()` for a range lookup.
+The insertion point of a score in `CUTOFFS` counts the cutoffs that score reaches,
+and that count indexes `LETTERS`,
+so a score of 80 falls after the 80 cutoff and gets a B.
 
 The speed is in the search alone.
 `insort()` still shifts everything after the insertion point.
@@ -1681,6 +1680,7 @@ Python sees a normal module with both functions attached:
 ```python
 # rust/fastcount/demo.py
 import timeit
+from collections.abc import Callable
 import fastcount
 
 def count_primes(limit: int) -> int:
@@ -1694,7 +1694,7 @@ def count_primes(limit: int) -> int:
     return count
 
 def collatz_lengths(values: list[int]) -> list[int]:
-    lengths = []
+    lengths: list[int] = []
     for start in values:
         n = start
         steps = 0
@@ -1704,29 +1704,20 @@ def collatz_lengths(values: list[int]) -> list[int]:
         lengths.append(steps)
     return lengths
 
-limit = 200_000
-assert fastcount.count_primes(limit) == count_primes(limit)
-t_python = timeit.timeit(
-    lambda: count_primes(limit), number=1
-)
-t_rust = timeit.timeit(
-    lambda: fastcount.count_primes(limit), number=1
-)
-print(f"count_primes Rust speedup: "
-      f"{t_python / t_rust:.1f}x")
-# Sample run: count_primes Rust speedup: 12.2x
+def speedup[T, R](
+    name: str, slow: Callable[[T], R],
+    fast: Callable[[T], R], arg: T,
+) -> None:
+    assert fast(arg) == slow(arg)
+    t_slow = timeit.timeit(lambda: slow(arg), number=1)
+    t_fast = timeit.timeit(lambda: fast(arg), number=1)
+    print(f"{name} Rust speedup: {t_slow / t_fast:.1f}x")
 
-values = list(range(1, 50_000))
-assert (fastcount.collatz_lengths(values)
-        == collatz_lengths(values))
-t_python = timeit.timeit(
-    lambda: collatz_lengths(values), number=1
-)
-t_rust = timeit.timeit(
-    lambda: fastcount.collatz_lengths(values), number=1
-)
-print(f"collatz_lengths Rust speedup: "
-      f"{t_python / t_rust:.1f}x")
+speedup("count_primes", count_primes,
+        fastcount.count_primes, 200_000)
+# Sample run: count_primes Rust speedup: 12.2x
+speedup("collatz_lengths", collatz_lengths,
+        fastcount.collatz_lengths, list(range(1, 50_000)))
 # Sample run: collatz_lengths Rust speedup: 34.3x
 ```
 
