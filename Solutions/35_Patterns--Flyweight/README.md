@@ -108,7 +108,7 @@ def to_symbol(char: str) -> Symbol:
     return char
 
 def parse_map(text: str) -> list[list[Tile]]:
-    return [[tile(to_symbol(s)) for s in line]
+    return [[tile(to_symbol(char)) for char in line]
             for line in text.split()]
 
 def walkable_neighbors(
@@ -252,15 +252,15 @@ def make_map(size: int) -> str:
 for size in (50, 100, 200):
     text = make_map(size)
     tracemalloc.start()
-    shared_field = [[shared_tile(to_symbol(s))
-                     for s in line]
+    shared_field = [[shared_tile(to_symbol(char))
+                     for char in line]
                     for line in text.split()]
     _, shared_peak = tracemalloc.get_traced_memory()
     tracemalloc.stop()
 
     tracemalloc.start()
-    unshared_field = [[unshared_tile(to_symbol(s))
-                       for s in line]
+    unshared_field = [[unshared_tile(to_symbol(char))
+                       for char in line]
                       for line in text.split()]
     _, unshared_peak = tracemalloc.get_traced_memory()
     tracemalloc.stop()
@@ -363,7 +363,7 @@ def mutable_tile(symbol: str) -> MutableTile:
     name, walkable = SPECS[symbol]
     return MutableTile(symbol, name, walkable)
 
-field = [[mutable_tile(s) for s in line]
+field = [[mutable_tile(char) for char in line]
          for line in "..\n..".split()]
 field[0][0].walkable = False  # Meant to change one cell...
 print(field[0][1].walkable, field[1][0].walkable,
@@ -400,7 +400,7 @@ def mutable_tile(symbol: str) -> MutableTile:
 
 def test_mutation_without_frozen_leaks_across_cells(
 ) -> None:
-    field = [[mutable_tile(s) for s in line]
+    field = [[mutable_tile(char) for char in line]
              for line in "..\n..".split()]
     field[0][0].walkable = False
     assert field[1][1].walkable is False  # Bug: cell leaked
@@ -877,7 +877,7 @@ class Tile(Enum):
         return member
 
 def parse_map(text: str) -> list[list[Tile]]:
-    return [[Tile(s) for s in line]
+    return [[Tile(char) for char in line]
             for line in text.split()]
 
 field = parse_map("""

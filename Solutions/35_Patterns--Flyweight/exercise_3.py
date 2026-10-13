@@ -20,7 +20,7 @@ def mutable_tile(symbol: str) -> MutableTile:
     name, walkable = SPECS[symbol]
     return MutableTile(symbol, name, walkable)
 
-field = [[mutable_tile(s) for s in line]
+field = [[mutable_tile(char) for char in line]
          for line in "..\n..".split()]
 field[0][0].walkable = False  # Meant to change one cell...
 print(field[0][1].walkable, field[1][0].walkable,

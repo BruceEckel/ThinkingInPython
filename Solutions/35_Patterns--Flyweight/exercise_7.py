@@ -16,7 +16,7 @@ class Tile(Enum):
         return member
 
 def parse_map(text: str) -> list[list[Tile]]:
-    return [[Tile(s) for s in line]
+    return [[Tile(char) for char in line]
             for line in text.split()]
 
 field = parse_map("""

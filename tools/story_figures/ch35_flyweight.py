@@ -24,7 +24,7 @@ caching: `@cache` is how `tile()` keeps its objects, and the chapter's
 
 Chapter 35's `flyweight_tiles.svg` already shows the whole grid resolving
 to three objects, so this figure shows how the factory gets there. The
-names come from `tile_map.py` (`parse_map`, `tile`, `SPECS`, `Tile`, the
+names come from `tile_map.py` and its demo `tile_map_demo.py` (`parse_map`, `tile`, `SPECS`, `Tile`, the
 map text, `label()` and its `#:` output) and frame 4's lines from
 `test_tile_map.py`.
 """

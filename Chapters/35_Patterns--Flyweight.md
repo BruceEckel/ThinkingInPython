@@ -157,24 +157,30 @@ def to_symbol(char: str) -> Symbol:
     return char
 
 def parse_map(text: str) -> list[list[Tile]]:
-    return [[tile(to_symbol(s)) for s in line]
+    return [[tile(to_symbol(char)) for char in line]
             for line in text.split()]
+```
 
-if __name__ == "__main__":
-    field = parse_map("""
-        ..~~..
-        ..~~.#
-        ......
-        ##..~~
-    """)
-    cells = [*row for row in field]
-    print(len(cells), len({id(t) for t in cells}))
-    print(field[0][2] is field[3][5])
-    print(field[0][2].label(0, 2))
-    print(field[3][5].label(3, 5))
+`tile_map_demo.py` parses a small map and counts the objects behind it:
+
+```python
+# tile_map_demo.py
+from tile_map import parse_map
+
+field = parse_map("""
+    ..~~..
+    ..~~.#
+    ......
+    ##..~~
+""")
+cells = [*row for row in field]
+print(len(cells), len({id(t) for t in cells}))
 #: 24 3
+print(field[0][2] is field[3][5])
 #: True
+print(field[0][2].label(0, 2))
 #: water at (0, 2)
+print(field[3][5].label(3, 5))
 #: water at (3, 5)
 ```
 
@@ -190,8 +196,9 @@ and a set of cells collapses to three with or without sharing.
 Only identity proves sharing.
 The listing shows the object count, not the memory behind it (see exercise 2).
 
-The last two lines call `label()` on one object, the shared water tile,
-and get two answers, because each caller passes in the position.
+The last two lines of `tile_map_demo.py` call `label()` on one object,
+the shared water tile, and get two answers,
+because each caller passes in the position.
 The shared object holds the state common to every use,
 and an operation that depends on the use takes that use's context as an argument.
 The grid holds each cell's position by where it stores the reference.
@@ -282,7 +289,7 @@ Building a `Tile` is fast, so `tile()` has little time to save.
 What `tile()` gets from `@cache` is identity.
 Every call for a symbol returns the same object.
 A flyweight's factory exists for that sameness.
-The figure follows `tile()` through the demo in `tile_map.py` and through `test_direct_construction_bypasses_pool()` in `test_tile_map.py`:
+The figure follows `tile()` through `tile_map_demo.py` and through `test_direct_construction_bypasses_pool()` in `test_tile_map.py`:
 
 ![](_images/flyweight_story)
 
@@ -330,11 +337,10 @@ class Color:
             cls._pool[key] = super().__new__(cls)
         return cls._pool[key]
 
-if __name__ == "__main__":
-    crimson = Color(220, 20, 60)
-    print(crimson is Color(220, 20, 60))
-    print(len(Color._pool))
+crimson = Color(220, 20, 60)
+print(crimson is Color(220, 20, 60))
 #: True
+print(len(Color._pool))
 #: 1
 ```
 

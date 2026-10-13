@@ -40,15 +40,15 @@ def make_map(size: int) -> str:
 for size in (50, 100, 200):
     text = make_map(size)
     tracemalloc.start()
-    shared_field = [[shared_tile(to_symbol(s))
-                     for s in line]
+    shared_field = [[shared_tile(to_symbol(char))
+                     for char in line]
                     for line in text.split()]
     _, shared_peak = tracemalloc.get_traced_memory()
     tracemalloc.stop()
 
     tracemalloc.start()
-    unshared_field = [[unshared_tile(to_symbol(s))
-                       for s in line]
+    unshared_field = [[unshared_tile(to_symbol(char))
+                       for char in line]
                       for line in text.split()]
     _, unshared_peak = tracemalloc.get_traced_memory()
     tracemalloc.stop()

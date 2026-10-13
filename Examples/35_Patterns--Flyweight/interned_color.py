@@ -18,9 +18,8 @@ class Color:
             cls._pool[key] = super().__new__(cls)
         return cls._pool[key]
 
-if __name__ == "__main__":
-    crimson = Color(220, 20, 60)
-    print(crimson is Color(220, 20, 60))
-    print(len(Color._pool))
+crimson = Color(220, 20, 60)
+print(crimson is Color(220, 20, 60))
 #: True
+print(len(Color._pool))
 #: 1

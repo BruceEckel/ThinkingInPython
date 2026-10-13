@@ -34,7 +34,7 @@ def to_symbol(char: str) -> Symbol:
     return char
 
 def parse_map(text: str) -> list[list[Tile]]:
-    return [[tile(to_symbol(s)) for s in line]
+    return [[tile(to_symbol(char)) for char in line]
             for line in text.split()]
 
 def walkable_neighbors(

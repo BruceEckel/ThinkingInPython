@@ -32,22 +32,5 @@ def to_symbol(char: str) -> Symbol:
     return char
 
 def parse_map(text: str) -> list[list[Tile]]:
-    return [[tile(to_symbol(s)) for s in line]
+    return [[tile(to_symbol(char)) for char in line]
             for line in text.split()]
-
-if __name__ == "__main__":
-    field = parse_map("""
-        ..~~..
-        ..~~.#
-        ......
-        ##..~~
-    """)
-    cells = [*row for row in field]
-    print(len(cells), len({id(t) for t in cells}))
-    print(field[0][2] is field[3][5])
-    print(field[0][2].label(0, 2))
-    print(field[3][5].label(3, 5))
-#: 24 3
-#: True
-#: water at (0, 2)
-#: water at (3, 5)
