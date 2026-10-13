@@ -13,9 +13,10 @@ not how the façade builds those classes and wires them together,
 so the wiring can change without affecting the caller.
 *Adapter* and *Façade* both wrap existing code,
 which puts them adjacent to *Proxy* and *Decorator*.
+
 Adding an interface leaves the existing one in place, so nothing breaks.
 When the new interface replaces one you own,
-callers keep using the old one until you mark it deprecated.
+callers keep using the old one until a deprecation mark tells them to switch.
 
 ## Adapter
 
@@ -48,7 +49,6 @@ class ProxyAdapter(WhatIWant):
     @override
     def f(self) -> None:
         print("ProxyAdapter.f()")
-        # Implement behavior using WhatIHave:
         self.adaptee.g()
         self.adaptee.h()
 
@@ -188,7 +188,7 @@ info: parameter `what_i_want` has an incompatible type:
 info: This violates the Liskov Substitution Principle
 ```
 
-The type checker reports a second error at the listing's second call,
+The type checker also reports an `invalid-argument-type` error at `WhatIUse2().op(ProxyAdapter(WhatIHave()))`,
 which passes a `ProxyAdapter` where the narrow signature takes a `WhatIHave`.
 With the narrow signature,
 Approach 2 is a different operation under an inherited name.
@@ -200,7 +200,7 @@ Building the adapter into `op()` adds the `WhatIHave` case and leaves the `WhatI
 All three approaches carry one Java habit.
 The adapter inherits from `WhatIWant` so that `op()` accepts it.
 Because `f()` is the one method `WhatIUse.op()` calls at runtime,
-any object with an `f()` works and no shared base class takes part.
+any object with an `f()` works, whatever its base classes.
 A type checker still enforces the annotation,
 so name the requirement with a [`Protocol`](08_Foundations--Static_Types.md#structural-typing-with-protocols)
 that lists `f()`, not with a base class to inherit.
@@ -239,8 +239,7 @@ use(ObjectAdapter(WhatIHave()))
 The adaptee does not qualify.
 If you call `use(WhatIHave())`, the type checker rejects the argument,
 because `WhatIHave` defines no `f()`.
-The check that inheritance provides in `adapter.py` is still there,
-and the base class is gone.
+`ObjectAdapter` keeps the check that inheritance provides in `adapter.py` and drops the base class.
 
 The common adapter need is "forward most calls unchanged,
 and add or change a few."
@@ -462,7 +461,7 @@ print(f"{checkout.total(100.0):.2f}")
 #: 97.20
 ```
 
-The caller imports one name.
+The caller imports the module and calls one function, `total()`.
 The three classes carry leading underscores,
 and their required assembly order appears only inside `total()`.
 The façade can rearrange both while every caller's code stays the same.
@@ -498,12 +497,12 @@ It relays every name the subsystem has.
 a front object forwarding to something behind it,
 often through the same few lines of `__getattr__()`.
 Intent separates them.
-[Design Patterns](21_Patterns--Design_Patterns.md)
-says that distinction remains when structures match.
+[Design Patterns](21_Patterns--Design_Patterns.md) makes the general point:
+when two patterns share a structure, the difference that remains is intent.
 When you cannot decide what to call your wrapper,
 ask what breaks if you remove it:
 
-| Wrapper | Interface | What it adds | Remove it and you lose |
+| Wrapper | Interface | What it adds | What removing it loses |
 | --- | --- | --- | --- |
 | [*Proxy*](26_Patterns--Surrogate.md#proxy) | same, by GoF's definition | access control | control over when and whether the call reaches the implementation |
 | [*Decorator*](14_Techniques--Decorators.md#the-decorator-pattern) | same | behavior | the added behavior |
@@ -571,8 +570,15 @@ and that default is the trap.
 The caller who most needs the warning is the least likely to see it.
 Run with `-W default::DeprecationWarning` to see them all,
 or `-W error::DeprecationWarning` in continuous integration to fail on one.
+A warning meant for the end users of an application takes `category=FutureWarning`,
+which Python shows by default.
 A warning also goes to standard error, where a `#:` marker cannot capture it,
 so the listing records the warnings and prints the record.
+
+Much existing code marks a deprecation with a `warnings.warn()` call inside the function body,
+with `DeprecationWarning` as the category.
+That call supplies the runtime half alone,
+since a type checker reads it as an ordinary function call.
 
 `warnings.deprecated()` requires the message,
 and that message should say what to use instead.
@@ -619,7 +625,7 @@ Try each exercise before opening its [solution](../Solutions/29_Patterns--Changi
     one exposes a `read()` over an object whose one method is `next_chunk()`,
     and one refuses calls unless you set a flag.
     Classify each as *Proxy*, *Decorator*, *Adapter*,
-    or *Façade* using the "remove it and you lose" test from the table,
+    or *Façade* using the table's "What removing it loses" column,
     and say what you lose in each case.
 5.  Copy the classes from `adapter.py` and remove the `/` from `WhatIUse.op()`.
     Add `WhatIUse2` from `adapter_variations.py` unchanged,

@@ -85,7 +85,7 @@ the new entry.
 The record is frozen, and the list it holds is not. `append()`
 changes the list and assigns nothing to the adapter.
 
-**Show what forwarding misses.** `len(adapter)` fails although the list has a `__len__()`.
+**Show what forwarding misses.** `len(adapter)` raises a `TypeError` although the list has a `__len__()`.
 Python looks up a special method on the class, not on the instance,
 so the lookup skips `__getattr__()` and finds no `__len__()` on
 `PairsAdapter`.
@@ -282,11 +282,11 @@ or imports the decorator under a private name,
 `from record import record as _record`, and writes `@_record`.
 
 The class version differs in one way that matters. `Facade` is a
-namespace the language does not treat as one. `Facade.start_car()` and
-`shop.start_car()` read identically at the call site, but you must
-define the class, import it, and carry it around. `@staticmethod`
-exists only to stop Python passing `self` to functions that do not
-use it.
+class used as a namespace, a job the module does on its own.
+`Facade.start_car()` and `shop.start_car()` read identically at the
+call site, but the class version adds a `class` statement and a
+`@staticmethod` on each function. `@staticmethod` exists only to stop
+Python passing `self` to functions that do not use it.
 The module is a namespace from the start, and it comes
 with the underscore convention, `__all__`, and one-time initialization
 built in.
@@ -308,7 +308,7 @@ needs none.
 > one exposes a `read()` over an object whose one method is `next_chunk()`,
 > and one refuses calls unless you set a flag.
 > Classify each as *Proxy*, *Decorator*, *Adapter*,
-> or *Façade* using the "remove it and you lose" test from the table,
+> or *Façade* using the table's "What removing it loses" column,
 > and say what you lose in each case.
 
 <details>
