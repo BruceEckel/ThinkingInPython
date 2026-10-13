@@ -129,11 +129,15 @@ so an observer works from the value it receives.
 The *pull* model sends only `subject` and lets each observer read what it needs by calling back into the subject,
 here `subject.celsius`.
 With pull, the subject does not decide what its observers need.
+
 Each observer depends on the subject's interface.
 To read `celsius`, an observer must know it is watching a `Thermometer`.
 The type checker enforces that dependency.
 `Subject[float]` has no `celsius`,
 so the observer must declare its `subject` parameter as a `Thermometer`.
+That narrower `update()` no longer matches `Observer[float]`,
+whose `update()` accepts any `Subject[float]`,
+so the type checker rejects `t.attach(Display())`.
 To use pull, you must add either a runtime `isinstance()` check or a second type parameter on the protocol.
 
 GoF also leaves open a second choice, independent of push or pull:
@@ -158,6 +162,7 @@ If the `for` loop in `notify()` reads `self._observers` instead of a copy,
 a `detach()` shifts the remaining observers down one index,
 and the loop skips the observer after the one that detached,
 without raising an exception.
+
 With the copy, `detach()` changes `self._observers` while the loop reads the copied list.
 A `notify()` call therefore reaches every observer in `_observers` at the moment the call begins.
 If `detach()` removes an observer from `_observers` partway through a `notify()` call,
@@ -176,6 +181,7 @@ The traditional names are hard to hold in your head.
 Both `java.util.Observable` and the reactive libraries call the subject an `Observable`.
 `Observer` and `Observable` share a stem and name opposite roles,
 so every listing asks you to decode which end you are looking at.
+
 GoF's method names are a second obstacle.
 When the subject changes, it calls its own `notify()`,
 and `notify()` calls `update()` on each observer.
@@ -216,7 +222,7 @@ That word points you at the question every *Observer* design must answer:
 what does this code do when there's a change?
 A responder can disconnect itself mid-notification, raise an exception,
 wait on a slow network call, or write back to its broadcaster,
-and each of those behaviors changes how the broadcaster is written.
+and each of those behaviors changes how you write the broadcaster.
 
 ## The Pythonic Observer
 
@@ -248,8 +254,10 @@ class Broadcaster[T]:
 GoF's `attach()`, `detach()`, and `notify()` become `connect()`, `disconnect()`,
 and `announce()`.
 The call inside `announce()`'s `for` loop changes as well.
-`Broadcaster.announce()` calls `responder(data)`,
-so a function serves as a responder.
+`Broadcaster.announce()` calls `responder(data)` where `Subject.notify()` calls `observer.update(self, arg)`,
+so a responder is any callable, a function included,
+rather than an object with an `update()` method.
+
 `announce()` passes the data alone, so `Broadcaster` uses the push model.
 An announcement carries one argument.
 When a change has two parts to report,
@@ -273,18 +281,18 @@ since every return type, `None` included, is assignable to `object`.
 That alternative trades correctness for convenience.
 If a responder returns a value, `announce()` quietly drops it.
 The strict version of `Responder` returning `None` catches that mistake.
+
 Notification runs one way, from broadcaster to responders.
-*GoF Design Patterns* supplies the premise under broadcast communication:
+*GoF Design Patterns* states the premise of broadcast communication:
 a notification goes to every connected responder,
 and each one decides whether to handle it.
 Allowing return values produces different values from an unknown number of responders.
 The broadcaster would require a rule for combining those different values.
 Returning `None` removes that question.
 
-A design that needs an answer uses a different pattern.
+A design that needs an answer uses a different pattern:
 [*Chain of Responsibility*](28_Patterns--Function_Objects.md#chain-of-responsibility-choosing-the-handler-at-runtime)
-is the pattern for a design that needs an answer:
-it tries its handlers in turn and returns the result from the first one that succeeds.
+tries its handlers in turn and returns the result from the first one that succeeds.
 
 The new `Thermometer` changes only its base class and the call in its `celsius` setter,
 `announce()` in place of `notify()`:
@@ -336,7 +344,7 @@ A `Thermometer` could use composition, holding a `Broadcaster` as an attribute
 (`self.temperature_changed = Broadcaster[float]()`).
 Code that connects a responder would name that attribute
 (`t.temperature_changed.connect(display)`).
-An object can hold multiple attributes,
+An object can hold several `Broadcaster` attributes,
 so it can publish more than one kind of change.
 [Notifying Without a Base Class](#notifying-without-a-base-class)
 drops the base class and the properties together.
@@ -376,7 +384,7 @@ Two kinds of arrow cross the boundary, in opposite directions:
 and `announce()` calls each stored responder in turn.
 Each call returns `None`,
 so `Thermometer` goes on to the next responder as soon as the call returns.
-A new responder such as `plot` connects the same way as all responders.
+A new responder such as `plot` connects the same way the other two do.
 
 ### Testing the Broadcaster
 
@@ -538,7 +546,7 @@ with no exception to say a responder was skipped.
 
 ### Raising an Exception
 
-If a responder raises an exception, it stops the `announce()` loop.
+If a responder raises an exception, the exception stops the `announce()` loop.
 The responders after the failing one miss that announcement.
 The exception propagates to the code that assigned to `celsius`.
 You must decide whether `announce()` should catch, collect, and continue
@@ -563,8 +571,9 @@ and `redraw()` runs on every announcement.
 A responder the program stops using but leaves connected creates a *lapsed listener*.
 Over a long run the broadcaster accumulates lapsed listeners,
 creating a memory leak.
+
 Long-lived broadcasters need either disciplined `disconnect()` calls or [weak references](10_Foundations--Cleanup.md#watching-objects-without-holding-them),
-which do not keep the responder alive.
+which let Python collect the object a responder calls.
 A weak responder holds its object through a weak reference.
 On each announcement the responder passes the announcement to the object while the object is alive,
 and disconnects itself after Python collects the object:
@@ -612,8 +621,8 @@ and the weak reference becomes the single reference to that object.
 A weak reference lets Python collect its target,
 so Python collects the bound method as soon as `weakref.ref()` returns,
 and that leaves the weak reference dead.
-Using `WeakMethod`, you store the instance and the function separately,
-both weakly, and rebuild the bound method each time you call `ref()`.
+`WeakMethod` stores the instance and the function separately, both weakly,
+and rebuilds the bound method each time you call `ref()`.
 
 `announce(25.0)` runs while `plot` is alive,
 so the weak reference still has its target.
@@ -732,7 +741,7 @@ A program can choose its responders at any of four points:
 `Broadcaster`'s `connect()` and `disconnect()` make it dynamic.
 Its list of responders can change at any moment,
 including in the middle of an `announce()`.
-Three earlier sections handle a consequence of that dynamism:
+Three earlier sections each handle a consequence of that dynamism:
 the copy in `announce()` guards against a `disconnect()` call during the loop,
 a lambda written inline in `connect()` cannot be disconnected,
 and a lapsed listener is a connection that outlives the program's use of its responder.
@@ -768,10 +777,12 @@ print(log)
 #: [25.0, 150.0]
 ```
 
-The `@record` freezes the field, and the tuple freezes its contents,
-so the responders can't change.
-`announce()` iterates through the tuple but does not need to copy it.
-The broadcaster holds strong references to its responders.
+The `@record` freezes the field, and a tuple can neither gain nor lose items,
+so the set of responders stays the same.
+`announce()` iterates over the tuple directly,
+since nothing can change it mid-loop.
+The broadcaster still holds strong references to its responders,
+so each responder stays alive as long as the broadcaster does.
 
 ### Notifying Without a Base Class
 
@@ -842,7 +853,7 @@ One `__setattr__()` for every attribute gives up three things that `Thermometer`
     and filters by name to act on one attribute.
     `Thermometer` publishes one attribute and is a `Broadcaster[float]`,
     so each responder takes the `float` reading as its one argument.
-    This issue is revisited in [Deciding What Matters](#deciding-what-matters).
+    [Deciding What Matters](#deciding-what-matters) returns to this issue.
     A responder that sorts its own notifications means the broadcaster has left the decision to its responders.
 2.  Every assignment reaches the responders, including the internal ones.
     A cached result or a hit counter broadcasts like a published attribute,
@@ -888,7 +899,7 @@ thermometer.celsius = 200
 #: display: 200C
 ```
 
-The `respond()` decorator method appends its function to the `thermometer` list and returns the function unchanged,
+The `respond()` decorator method appends its function to `thermometer`'s list of responders and returns the function unchanged,
 so `display` stays callable by name.
 `Broadcaster.connect()` returns `None`, so it cannot serve as a decorator
 (see exercise 11).
@@ -1083,7 +1094,7 @@ class AsyncBroadcaster[T]:
 so `announce()` calls the responders in a generator expression and [unpacks](05_Foundations--Functions.md#unpacking-arguments)
 that generator with `*`, turning each coroutine into its own argument.
 
-The `AsyncResponder` `type` alias makes the type checker reject a plain function as a responder.
+The `AsyncResponder` `type` alias makes the type checker reject a synchronous function as a responder.
 A responder must return an awaitable, produced by calling an `async` function.
 
 Because `announce()` awaits, it must also be a coroutine,
@@ -1143,7 +1154,7 @@ asyncio.run(main())
 #: alarm sent: 150C
 ```
 
-Even though `alarm` is connected before `log_reading`,
+Although `alarm` connects before `log_reading`,
 at 150 degrees the log prints first.
 Concurrency means each responder finishes as soon as its own wait ends,
 so the faster responder prints first.
@@ -1241,8 +1252,8 @@ so a single broken responder cancels the others mid-notification.
 This example emphasizes the model-view split.
 The *model*, `grid_observer.py`,
 is a grid of colored boxes and the rule that decides what changes for a selection event.
-It only manipulates `Grid`s;
-they are displayed independently by `grid_view.py` using `tkinter` from the standard library.
+It manipulates `Grid` values, and `grid_view.py` displays them separately,
+using `tkinter` from the standard library.
 Clicking a box advances it to the next color, along with the boxes above, below,
 left, and right of it.
 
@@ -1465,7 +1476,7 @@ A click on the canvas becomes a `select()` on the model,
 and the resulting notification repaints the view.
 The responder calls the model, and `draw()` does the painting.
 The view handles the mouse as well as the screen,
-so the controller's job is contained within the view.
+so the view also does the controller's job.
 `select()` takes a cell rather than a mouse event, so a keypress, a touch,
 or a test call drives the model the way a click does.
 
@@ -1657,8 +1668,7 @@ for char in "kkj":
 #: count: 2
 ```
 
-In MVC, the views and the controller never directly interact;
-they communicate through a model.
+In MVC, the views and the controller communicate through the models.
 `Controller.key()` adds the key to the history and calls `increment()` or `decrement()`,
 each model announces its new state,
 and the view connected to that model displays it.
@@ -1682,22 +1692,22 @@ whichever controller sent the request.
 `vim`'s first key displays `++-xk`,
 because the keys live in the `History` model,
 not in the controller that recorded them.
-The meaning of the keys is only defined in the controller.
+The controller alone defines what the keys mean.
 A new key scheme is two constructor arguments.
 A new kind of key, say one that resets the count, is an edit to `Controller`.
 
-The same flexibility is created in the other direction:
+The same flexibility works in the other direction:
 a second view connects to a model, both views display,
 with no change to either controller (see exercise 13).
 A third model is a new view class and one more field in the controller,
 with `CountView` and `HistoryView` untouched.
 
-Testing benefits from this design decoupling.
+The decoupling also simplifies testing.
 A `Controller` needs a `Counter` and a `History`, so a test builds both,
 calls `key()`, and reads `counter.count` and `history.history`,
 with no view and no output to capture.
 
-In Document-View, one class contains both the Controller and the View,
+In Document-View, one class contains both the controller and the view,
 interpreting the keys and displaying every model the keys touch.
 `View.key()` and the display methods share an instance,
 so a new kind of key means editing `View` or subclassing it,
@@ -1716,7 +1726,7 @@ and it notifies the responders.
 Measuring is the thermometer's actual job,
 and *Observer* adds deciding and notification.
 
-The notification code can be separated from the measuring code in different ways:
+Three designs in this chapter separate the notification code from the measuring code:
 
 - `Broadcaster`, `BoundBroadcaster`,
   and `AsyncBroadcaster` hold the responder list and the notification loop,
@@ -1812,9 +1822,9 @@ and `display` remembers the last value it drew and skips a reading close to it.
 The tolerance belongs to `display`.
 Every responder that filters by size writes the same comparison.
 
-That repetition is acceptable for a question of *how much*,
+That repetition is acceptable when responders filter by how much a value changed,
 since each responder's threshold is its own.
-It is a poor answer to *which kind*.
+It is a poor fit when they filter by which kind of change arrived.
 In `weather_station.py` every attribute's changes arrive on one channel,
 so each responder that cares about one attribute filters by name,
 and all of them write the same filter.
@@ -1901,7 +1911,7 @@ Try each exercise before opening its [solution](../Solutions/30_Patterns--Observ
     Give a `Thermometer` a `celsius` setter that announces to that list,
     and create two thermometers.
     Say which of the problems in this chapter's runtime sections the load-time form keeps,
-    which it removes, and what it costs that `Broadcaster` does not.
+    which it removes, and which new problems it brings that `Broadcaster` avoids.
 12. Give `Broadcasting` the name-and-value pair of `weather_station.py`:
     `published()`'s setter announces the field's name paired with the new value,
     so each responder receives a `tuple[str, T]`.

@@ -241,7 +241,7 @@ t.celsius = 25
 #: display: 25C
 ```
 
-**Narrow the subject at runtime.** The `assert` is the cost. It runs on every notification, and it states
+**Narrow the subject at runtime.** The `assert` runs on every notification, and it states
 a requirement the protocol cannot: this `Display` works for a
 `Thermometer` and fails on any other `Subject[float]`, at the moment
 of the first notification rather than at the `attach()` call the type
@@ -299,16 +299,16 @@ t.celsius = 25
 ```
 
 **Name the subject the observer reads.** `Display.update()` now declares `subject: Thermometer` and
-`t.attach(Display())` type-checks. The cost is at the other end: each observer's type names
+`t.attach(Display())` type-checks. The restriction moves to the other end: each observer's type names
 the subject it watches, so a display written for a `Thermometer`
 cannot attach to a different `Subject[float]`. A parameter is
 contravariant, so an observer that declares the wider `Subject[float]`
 still attaches to any `Subject[float]`, and an observer that reads `celsius` is
 the one that gives up that freedom.
 
-Both versions print the same line, and neither needs `arg`. That is
-pull's bargain: the subject decides nothing about what its observers
-read, and each observer pays by knowing what it is watching.
+Both versions print the same line, and neither needs `arg`. Under
+pull, the subject decides nothing about what its observers read, so
+each observer must know what it is watching.
 
 </details>
 </details>
@@ -935,7 +935,7 @@ print("solved in", game.moves, "moves")
 **Reuse the model's grid.** `FloodGame` reuses `new_grid()` from `grid_observer.py` unchanged and
 adds the `adjacent()` the exercise asks for.
 
-**Find the owned patch.** `_flood()` is a plain graph search (depth-first, using a stack)
+**Find the owned patch.** `_flood()` is a depth-first graph search, using a stack,
 starting from `origin` and walking from each cell to every neighbor
 `adjacent()` reports, as long as that neighbor is still the same color.
 
@@ -1626,7 +1626,7 @@ one list.
 > Give a `Thermometer` a `celsius` setter that announces to that list,
 > and create two thermometers.
 > Say which of the problems in this chapter's runtime sections the load-time form keeps,
-> which it removes, and what it costs that `Broadcaster` does not.
+> which it removes, and which new problems it brings that `Broadcaster` avoids.
 
 <details>
 <summary>Where to look</summary>
@@ -1753,7 +1753,7 @@ A responder that raises an exception stops the loop,
 and the exception reaches the assignment to `celsius`.
 A responder that assigns to `celsius` re-enters the setter.
 
-The load-time form also costs three things that `Broadcaster` does not:
+The load-time form also brings three problems that `Broadcaster` avoids:
 
 - The registry is global.
   `room` and `oven` announce to the same two responders,
@@ -1769,14 +1769,14 @@ The load-time form also costs three things that `Broadcaster` does not:
   A test that decorates a responder leaves it registered for every test that runs after it,
   unless the test removes it from `RESPONDERS`.
 
-The first of those costs, the shared registry, comes from where the list lives rather than from the decorator.
+The first of those problems, the shared registry, comes from where the list lives rather than from the decorator.
 [Decorated Responders](../../Chapters/30_Patterns--Observer.md#decorated-responders) keeps registration by decorator and moves the list onto each instance.
 `Broadcasting` is a base class whose `respond()` method is a decorator,
 so `@thermometer.respond` appends a function to that thermometer's own list and returns the function unchanged.
 In that form, `room` and `oven` each announce to their own responders.
 A test creates its own thermometer and registers against it,
-so the shared-registry cost in tests goes away too.
-The import cost stays: a responder registers when Python runs its `def`,
+so tests stop sharing a registry too.
+The import problem stays: a responder registers when Python runs its `def`,
 so a responder in a module nothing imports still registers nothing.
 
 </details>
