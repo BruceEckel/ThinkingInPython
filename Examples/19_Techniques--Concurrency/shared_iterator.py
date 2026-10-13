@@ -24,7 +24,7 @@ class Tickets:
         self.next_number = current + 1
         return current
 
-def report(label: str, source: Iterator[int]) -> None:
+def distribute(label: str, source: Iterator[int]) -> None:
     with ThreadPoolExecutor(max_workers=8) as pool:
         futures = [pool.submit(list, source)
                    for _ in range(8)]
@@ -32,8 +32,8 @@ def report(label: str, source: Iterator[int]) -> None:
     print(f"{label}: {len(set(taken))} distinct, "
           f"duplicates {len(taken) > len(set(taken))}")
 
-report("shared", Tickets(LIMIT))
+distribute("shared", Tickets(LIMIT))
 #: shared: 200 distinct, duplicates True
-report("serialized",
-       threading.serialize_iterator(Tickets(LIMIT)))
+distribute("serialized",
+           threading.serialize_iterator(Tickets(LIMIT)))
 #: serialized: 200 distinct, duplicates False

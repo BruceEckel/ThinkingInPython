@@ -8,10 +8,10 @@ async def fetch(item: str, delay: float) -> str:
     return item.upper()
 
 async def main() -> None:
-    x = fetch("a", 0.03)
-    print(type(x).__name__)
+    pending = fetch("a", 0.03)
+    print(type(pending).__name__)
     results = await asyncio.gather(
-        x, fetch("b", 0.02),
+        pending, fetch("b", 0.02),
         fetch("c", 0.01), fetch("d", 0.005))
     print(results)
 

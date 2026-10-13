@@ -1,26 +1,21 @@
 # async_livelock.py
 import asyncio
 
-a_wants = True
-b_wants = True
+wants: dict[str, bool] = {"a": True, "b": True}
 
-async def giver(name: str) -> None:
-    global a_wants, b_wants
+async def giver(me: str, other: str) -> None:
     for _ in range(3):
-        other_wants = b_wants if name == "a" else a_wants
-        if other_wants:
-            print(f"{name}: gives")
+        if wants[other]:
+            print(f"{me}: gives")
         else:
-            print(f"{name}: proceeds")
-            if name == "a":
-                a_wants = False
-            else:
-                b_wants = False
+            print(f"{me}: proceeds")
+            wants[me] = False
         await asyncio.sleep(0)
 
 async def main() -> None:
-    await asyncio.gather(giver("a"), giver("b"))
-    print(f"resolved: {not (a_wants or b_wants)}")
+    await asyncio.gather(giver("a", other="b"),
+                         giver("b", other="a"))
+    print(f"resolved: {not any(wants.values())}")
 
 asyncio.run(main())
 #: a: gives

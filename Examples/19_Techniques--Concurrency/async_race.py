@@ -13,7 +13,7 @@ async def increment(count: int) -> None:
 
 async def main() -> None:
     await asyncio.gather(*(increment(50) for _ in range(8)))
-    print(counter)
+    print(f"counter: {counter} of {8 * 50}")
 
 asyncio.run(main())
-#: 50
+#: counter: 50 of 400

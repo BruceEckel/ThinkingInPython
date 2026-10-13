@@ -32,7 +32,7 @@ def drain(source: Iterator[int]) -> list[int]:
             out.append(item)  # Only the body is protected
     return out
 
-def report(source: Iterator[int]) -> None:
+def distribute(source: Iterator[int]) -> None:
     with ThreadPoolExecutor(max_workers=8) as pool:
         futures = [pool.submit(drain, source)
                    for _ in range(8)]
@@ -40,5 +40,5 @@ def report(source: Iterator[int]) -> None:
     print(f"{len(set(taken))} distinct, "
           f"duplicates {len(taken) > len(set(taken))}")
 
-report(Tickets(LIMIT))
+distribute(Tickets(LIMIT))
 #: 200 distinct, duplicates True

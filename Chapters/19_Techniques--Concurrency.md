@@ -170,11 +170,11 @@ async def fetch(item: str, delay: float) -> str:
     return item.upper()
 
 async def main() -> None:
-    x = fetch("a", 0.03)  # Nothing runs yet
-    print(type(x).__name__)
+    pending = fetch("a", 0.03)  # Nothing runs yet
+    print(type(pending).__name__)
     # Run all three concurrently
     results = await asyncio.gather(
-        x, fetch("b", 0.02), fetch("c", 0.01))
+        pending, fetch("b", 0.02), fetch("c", 0.01))
     print(results)
 
 asyncio.run(main())
@@ -761,10 +761,10 @@ async def increment(count: int) -> None:
 
 async def main() -> None:
     await asyncio.gather(*(increment(50) for _ in range(8)))
-    print(counter)
+    print(f"counter: {counter} of {8 * 50}")
 
 asyncio.run(main())
-#: 50
+#: counter: 50 of 400
 ```
 
 Eight tasks each add 50, so `counter` should reach 400.
@@ -807,10 +807,10 @@ async def increment(count: int) -> None:
 
 async def main() -> None:
     await asyncio.gather(*(increment(50) for _ in range(8)))
-    print(counter)
+    print(f"counter: {counter} of {8 * 50}")
 
 asyncio.run(main())
-#: 400
+#: counter: 400 of 400
 ```
 
 The change from `async_race.py` is the module-level `lock` and the `async with lock:` block.
@@ -1776,7 +1776,7 @@ class Tickets:
         self.next_number = current + 1
         return current
 
-def report(label: str, source: Iterator[int]) -> None:
+def distribute(label: str, source: Iterator[int]) -> None:
     with ThreadPoolExecutor(max_workers=8) as pool:
         futures = [pool.submit(list, source)
                    for _ in range(8)]
@@ -1784,10 +1784,10 @@ def report(label: str, source: Iterator[int]) -> None:
     print(f"{label}: {len(set(taken))} distinct, "
           f"duplicates {len(taken) > len(set(taken))}")
 
-report("shared", Tickets(LIMIT))
+distribute("shared", Tickets(LIMIT))
 #: shared: 200 distinct, duplicates True
-report("serialized",
-       threading.serialize_iterator(Tickets(LIMIT)))
+distribute("serialized",
+           threading.serialize_iterator(Tickets(LIMIT)))
 #: serialized: 200 distinct, duplicates False
 ```
 
@@ -1957,15 +1957,15 @@ if __name__ == "__main__":
         ProcessPoolExecutor(),
         InterpreterPoolExecutor(),
     ]
-    results = [run_on(b, orders) for b in backends]
-    print(results[0])
-    print(all(r == results[0] for r in results))
+    for b in backends:
+        print(f"{type(b).__name__}: {run_on(b, orders)}")
 ```
 
 `run_on()` accepts the base type `Executor`, so it takes all three subtypes,
 whose workers could not be more different: an OS thread, an OS process,
 a subinterpreter.
-The listing prints `[10, 20, 30, 40, 50]` and `True`:
+The listing prints one line per pool,
+each naming its executor beside `[10, 20, 30, 40, 50]`:
 three unrelated kinds of worker, one set of answers.
 
 `asyncio` does not fit here.
@@ -2355,26 +2355,21 @@ No lock takes part, no task waits to acquire anything, so no timeout can fix it:
 # async_livelock.py
 import asyncio
 
-a_wants = True
-b_wants = True
+wants: dict[str, bool] = {"a": True, "b": True}
 
-async def giver(name: str) -> None:
-    global a_wants, b_wants
+async def giver(me: str, other: str) -> None:
     for _ in range(3):
-        other_wants = b_wants if name == "a" else a_wants
-        if other_wants:
-            print(f"{name}: gives")
+        if wants[other]:
+            print(f"{me}: gives")
         else:
-            print(f"{name}: proceeds")
-            if name == "a":
-                a_wants = False
-            else:
-                b_wants = False
+            print(f"{me}: proceeds")
+            wants[me] = False
         await asyncio.sleep(0)
 
 async def main() -> None:
-    await asyncio.gather(giver("a"), giver("b"))
-    print(f"resolved: {not (a_wants or b_wants)}")
+    await asyncio.gather(giver("a", other="b"),
+                         giver("b", other="a"))
+    print(f"resolved: {not any(wants.values())}")
 
 asyncio.run(main())
 #: a: gives
@@ -2386,9 +2381,9 @@ asyncio.run(main())
 #: resolved: False
 ```
 
-Each round, `a` checks `b_wants` and `b` checks `a_wants`,
+Each round, `a` checks `wants["b"]` and `b` checks `wants["a"]`,
 and both still see the other wanting the resource, so both give.
-Thus `a_wants` and `b_wants` both stay `True` for the next round.
+Thus both entries in `wants` stay `True` for the next round.
 Two equally polite tasks make no progress,
 although the event loop keeps both tasks busy the whole time.
 A real livelock repeats these rounds forever.

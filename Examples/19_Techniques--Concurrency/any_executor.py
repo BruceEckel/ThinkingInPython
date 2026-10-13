@@ -25,6 +25,5 @@ if __name__ == "__main__":
         ProcessPoolExecutor(),
         InterpreterPoolExecutor(),
     ]
-    results = [run_on(b, orders) for b in backends]
-    print(results[0])
-    print(all(r == results[0] for r in results))
+    for b in backends:
+        print(f"{type(b).__name__}: {run_on(b, orders)}")

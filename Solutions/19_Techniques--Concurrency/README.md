@@ -43,10 +43,10 @@ async def fetch(item: str, delay: float) -> str:
     return item.upper()
 
 async def main() -> None:
-    x = fetch("a", 0.03)
-    print(type(x).__name__)
+    pending = fetch("a", 0.03)
+    print(type(pending).__name__)
     results = await asyncio.gather(
-        x, fetch("b", 0.02),
+        pending, fetch("b", 0.02),
         fetch("c", 0.01), fetch("d", 0.005))
     print(results)
 
@@ -1209,7 +1209,7 @@ class Tickets:
 def drain(source: Iterator[int]) -> list[int]:
     ...
 
-def report(source: Iterator[int]) -> None:
+def distribute(source: Iterator[int]) -> None:
     ...
 ```
 
@@ -1251,7 +1251,7 @@ def drain(source: Iterator[int]) -> list[int]:
             out.append(item)  # Only the body is protected
     return out
 
-def report(source: Iterator[int]) -> None:
+def distribute(source: Iterator[int]) -> None:
     with ThreadPoolExecutor(max_workers=8) as pool:
         futures = [pool.submit(drain, source)
                    for _ in range(8)]
@@ -1259,7 +1259,7 @@ def report(source: Iterator[int]) -> None:
     print(f"{len(set(taken))} distinct, "
           f"duplicates {len(taken) > len(set(taken))}")
 
-report(Tickets(LIMIT))
+distribute(Tickets(LIMIT))
 #: 200 distinct, duplicates True
 ```
 
