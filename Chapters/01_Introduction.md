@@ -168,8 +168,7 @@ Two appendices follow.
 [Effect Tracking](A_Effect_Tracking.md)
 asks how far Python's `Annotated` type could carry Effect tracking without a library,
 and [An Effect Checker](B_An_Effect_Checker.md)
-builds a checker for those annotations,
-as far as one can go without type inference.
+builds the part of a checker for those annotations that needs no type inference.
 
 ## The Examples
 
@@ -183,19 +182,21 @@ Every code block that begins with a filename comment, like `# tracer.py`,
 is a complete file rather than a fragment.
 Most run on their own.
 Some are modules that another listing imports,
-and `pytest` runs each `test_*.py` file.
+and the `test_*.py` files hold tests that `pytest` runs.
 These files live in the `Examples/` directory of the [source repository](https://github.com/BruceEckel/ThinkingInPython),
 one folder per chapter,
 so the code block starting with `# tracer.py` in [Decorators](14_Techniques--Decorators.md#maintaining-the-wrapped-interface)
 is the file `Examples/14_Techniques--Decorators/tracer.py`.
+
 A helper that more than one chapter uses carries a `utils/` path in its filename comment instead,
 like `# utils/result.py`,
 and lives in `Examples/utils/` rather than in a chapter folder.
 A listing imports such a helper by its bare module name,
 `from result import Err, Ok`,
 because the example tooling puts `Examples/utils/` on the import path.
-A file run straight from the repository root lacks that path, so `tip`,
-the task runner that comes with the repository,
+
+A file run straight from the repository root lacks `Examples/utils/` on its import path,
+so `tip`, the task runner that comes with the repository,
 has a command for running one example.
 `tip run-one <name>` (`tools/run_one_example.py`)
 supplies the working directory and import path the book assumes,
@@ -222,10 +223,10 @@ The book's build system extracts the examples, then type-checks
 The code you read is the code that runs,
 and the output you see is the output it produces.
 
-A few early listings carry a `# type: ignore` comment.
-[Static Types](08_Foundations--Static_Types.md) defines it,
+A few early listings carry a `# type: ignore` comment,
+which tells a type checker that the error it would report on that line is deliberate.
+[Static Types](08_Foundations--Static_Types.md) covers type checking in full,
 along with the `# ty:` comments that appear from that chapter on.
-Until then, the comment marks a line a type checker would flag.
 
 Output appears inside the listings as comments beginning with `#:`,
 one line of output per marker.
@@ -259,8 +260,8 @@ A few chapters in the Patterns part keep larger exercises,
 because a pattern shows its value only in a program you build yourself.
 
 Solutions live in the `Solutions/` directory of the source repository.
-Each solution opens in steps: a hint,
-then the shape of the code with its bodies left out, then the full answer,
+Each solution opens in steps: a hint, then, for most,
+the shape of the code with its function bodies left out, then the full answer,
 so you can take as little help as you need.
 `tip hint CH=30 N=3` prints the same steps one per run,
 `CH` naming the chapter and `N` the exercise.
