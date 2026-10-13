@@ -617,14 +617,14 @@ so `words.top()` is a `str` and `upper()` checks.
 A default matters most for a class whose type parameter is usually the same type.
 Callers who use that type omit the brackets, and the annotation stays precise.
 
-`Queue` is the same class without the default,
-so a bare `Queue` annotation leaves `T` unsolved:
+`BareStack` is the same class without the default,
+so a `BareStack` annotation without brackets leaves `T` unsolved:
 
 ```python
 # type_defaults_bare.py
 from typing import reveal_type
 
-class Queue[T]:
+class BareStack[T]:
     def __init__(self) -> None:
         self.items: list[T] = []
 
@@ -634,13 +634,13 @@ class Queue[T]:
     def top(self) -> T:
         return self.items[-1]
 
-line: Queue = Queue()  # No brackets, T unsolved
-line.push("first")
-reveal_type(line.top())  # ty: Unknown
+pile: BareStack = BareStack()  # No brackets, T unsolved
+pile.push("first")
+reveal_type(pile.top())  # ty: Unknown
 ```
 
 `ty` reports `Unknown`, not an error,
-so `line.top()` and everything built on it go unchecked from here
+so `pile.top()` and everything built on it go unchecked from here
 (see exercise 5).
 
 A `type` alias takes a default the same way, as `Pair` shows:
