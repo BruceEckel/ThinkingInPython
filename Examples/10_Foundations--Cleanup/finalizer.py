@@ -5,10 +5,12 @@ class Connection:
     def __init__(self, name: str) -> None:
         self.name = name
         print(name, "opened")
-        self.closer = finalize(self, print, name, "closed")
+        self.finalizer = finalize(
+            self, print, name, "closed"
+        )
 
     def close(self) -> None:
-        self.closer()
+        self.finalizer()
 
 a = Connection("A")
 #: A opened
@@ -17,7 +19,7 @@ b = Connection("B")
 a.close()  # [1]
 #: A closed
 a.close()  # [2]
-print(a.closer.alive, b.closer.alive)
+print(a.finalizer.alive, b.finalizer.alive)
 #: False True
 del b
 #: B closed

@@ -363,7 +363,7 @@ question without changing the answer.
 
 > In `finalizer.py`, change the `finalize()` call to `finalize(self, self.close)`,
 > make `close()` print `self.name, "closed"` instead of invoking the finalizer,
-> and call `a.closer()` where the file now calls `a.close()`.
+> and call `a.finalizer()` where the file now calls `a.close()`.
 > Run it again.
 > Report when `B closed` now prints relative to `End of program`,
 > and say what keeps the `Connection` alive.
@@ -401,7 +401,7 @@ class Connection:
     def __init__(self, name: str) -> None:
         self.name = name
         print(name, "opened")
-        self.closer = finalize(self, self.close)
+        self.finalizer = finalize(self, self.close)
 
     def close(self) -> None:
         print(self.name, "closed")
@@ -410,10 +410,10 @@ a = Connection("A")
 #: A opened
 b = Connection("B")
 #: B opened
-a.closer()
+a.finalizer()
 #: A closed
-a.closer()
-print(a.closer.alive, b.closer.alive)
+a.finalizer()
+print(a.finalizer.alive, b.finalizer.alive)
 #: False True
 del b
 print("End of program")

@@ -18,5 +18,7 @@ class Safe:
 leaky, safe = ref(Leaky("L")), ref(Safe("S"))
 #: S closed
 gc.collect()
-print(leaky() is None, safe() is None)
-#: False True
+print("Leaky alive:", leaky() is not None)
+#: Leaky alive: True
+print("Safe alive:", safe() is not None)
+#: Safe alive: False

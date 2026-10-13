@@ -168,7 +168,7 @@ class Node:
 def self_link() -> None:
     node = Node("a")
     node.peer = node
-    print(gc.get_referrers(node)[0] is node)
+    print(gc.get_referrers(node) == [node])
 
 gc.disable()
 self_link()
@@ -334,10 +334,12 @@ class Connection:
     def __init__(self, name: str) -> None:
         self.name = name
         print(name, "opened")
-        self.closer = finalize(self, print, name, "closed")
+        self.finalizer = finalize(
+            self, print, name, "closed"
+        )
 
     def close(self) -> None:
-        self.closer()
+        self.finalizer()
 
 a = Connection("A")
 #: A opened
@@ -346,7 +348,7 @@ b = Connection("B")
 a.close()  # [1]
 #: A closed
 a.close()  # [2]
-print(a.closer.alive, b.closer.alive)
+print(a.finalizer.alive, b.finalizer.alive)
 #: False True
 del b
 #: B closed
@@ -398,14 +400,15 @@ class Safe:
 leaky, safe = ref(Leaky("L")), ref(Safe("S"))
 #: S closed
 gc.collect()
-print(leaky() is None, safe() is None)
-#: False True
+print("Leaky alive:", leaky() is not None)
+#: Leaky alive: True
+print("Safe alive:", safe() is not None)
+#: Safe alive: False
 ```
 
 A `ref()` is a weak reference.
 It watches its object without keeping it alive,
 and it reports `None` once the object disappears.
-So `False True` says the interpreter reclaimed `Safe` and kept `Leaky`.
 `Safe` printed `S closed` at the `ref()` line.
 Reference counting reclaimed it there, before `gc.collect()` ran.
 `gc.collect()` cannot reclaim `Leaky`,
@@ -419,7 +422,7 @@ so whatever holds `self.close` holds `Leaky` through it.
 With `atexit` left on, the callback runs as the program exits,
 and a late `L closed` is the one sign of the leak.
 The listing turns `atexit` off on `Leaky`'s finalizer,
-so its output ends at `False True`.
+so its output ends at `Safe alive: False`.
 
 ### A Slotted Class Needs `__weakref__` {#slotted-class-needs-weakref}
 
@@ -435,15 +438,23 @@ A class with `__slots__` that omits `__weakref__` cannot be weakly referenced:
 from weakref import finalize
 from exceptions import expect
 
-class Slotted:
+class Slot:
     __slots__ = ("name",)
 
     def __init__(self, name: str) -> None:
         self.name = name
 
-expect(TypeError, finalize, Slotted("x"), print, "closed")
-#: [TypeError] cannot create weak reference to 'Slotted'
-#: object
+expect(TypeError, finalize, Slot("x"), print, "closed")
+#: [TypeError] cannot create weak reference to 'Slot' object
+
+class WeakSlot:
+    __slots__ = ("name", "__weakref__")
+
+    def __init__(self, name: str) -> None:
+        self.name = name
+
+finalize(WeakSlot("y"), print, "y", "closed")
+#: y closed
 ```
 
 `__slots__` removes the instance `__dict__` and, by default,
@@ -452,7 +463,11 @@ so `finalize()` has nowhere to attach a reference.
 The same `TypeError` meets `ref()`, `weakref.proxy()`,
 and the `WeakValueDictionary` in the next section,
 since every weak reference attaches there.
-Listing `__weakref__` among the slots opts back in.
+
+`WeakSlot` lists `__weakref__` among its slots and opts back in.
+`finalize()` accepts the `WeakSlot` instance,
+and since nothing else refers to that temporary,
+the callback prints `y closed` as soon as the statement ends.
 
 ## Watching Objects Without Holding Them
 
@@ -595,7 +610,7 @@ Try each exercise before opening its [solution](../Solutions/10_Foundations--Cle
     and explain the difference in terms of what each container holds.
 5.  In `finalizer.py`, change the `finalize()` call to `finalize(self, self.close)`,
     make `close()` print `self.name, "closed"` instead of invoking the finalizer,
-    and call `a.closer()` where the file now calls `a.close()`.
+    and call `a.finalizer()` where the file now calls `a.close()`.
     Run it again.
     Report when `B closed` now prints relative to `End of program`,
     and say what keeps the `Connection` alive.

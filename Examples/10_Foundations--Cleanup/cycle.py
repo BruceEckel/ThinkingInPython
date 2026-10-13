@@ -13,7 +13,7 @@ class Node:
 def self_link() -> None:
     node = Node("a")
     node.peer = node
-    print(gc.get_referrers(node)[0] is node)
+    print(gc.get_referrers(node) == [node])
 
 gc.disable()
 self_link()
