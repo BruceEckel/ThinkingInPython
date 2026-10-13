@@ -21,7 +21,7 @@ Compare its size to `os.process_cpu_count()`, and ask when the pool starts a wor
 If you keep `assert parallel == serial` from `parallel_pure.py`,
 the script stops with a bare `AssertionError` before it prints a line.
 Each pair now carries the ID of the process that computed it,
-so no parallel result can equal its serial twin.
+so every parallel result differs from its serial twin.
 The solution compares the counts alone, the part a pure function guarantees.
 
 ```python
@@ -56,9 +56,7 @@ pickles `count_primes()` by name, and each worker finds it by
 importing the script, so the listing must run as a script file. A
 fenced block executed in place has no file for a worker to import.
 
-**Check that the answers agree.** The assertion compares the counts
-alone, since the serial run carries the parent's process ID and the
-parallel run carries the workers'. The counts stay the same,
+**Check that the answers agree.** The serial and parallel counts agree,
 `[17984, 33860, 49098, 63951]`. The same pure function gives the same
 answers wherever it runs, which is the point of `parallel_pure.py`.
 
@@ -67,25 +65,25 @@ line. Three consecutive runs on one 32-core machine reported `4`
 distinct process IDs each time.
 
 Two things follow, and neither is the one most people predict. The
-count is greater than one, so the work left the main process, and
+number is greater than one, so some of the work ran outside the main process.
 `assert parallel == serial` alone could not show where the work ran.
-But the count also sits far below thirty-two. `ProcessPoolExecutor`
+But the number is also far below thirty-two. `ProcessPoolExecutor`
 allows one worker per core, but it starts workers on demand. A
-submitted task starts a new worker only when no existing worker is
-idle. Four tasks therefore start at most four processes, not
+submitted task goes to an idle worker when one exists and starts a
+new worker otherwise. Four tasks therefore start at most four processes, not
 thirty-two.
 
-The count can also fall below four. With limits twenty times smaller,
+The number can also fall below four. With limits twenty times smaller,
 `[10_000, 20_000, 30_000, 40_000]`, the same machine reported `3` on
 each of three runs. Starting a process then takes longer than a task
-runs, so the first worker up finishes its task and takes the next one
+runs, so the first worker to start finishes its task and takes the next one
 from the queue before the last worker is ready. A distinct-ID count
-shows that the work left the main process, not how many processes the
+shows that the work ran outside the main process, not how many processes the
 pool started.
 
 The number depends on the core count, the task sizes, and scheduling,
-so it is reproducible on your machine and nowhere else. That is why it does
-not belong in a `#:` marker in the book.
+so it is reproducible on your machine and nowhere else.
+Because of that dependence, the listing has no `#:` marker for it.
 
 </details>
 </details>
@@ -106,9 +104,10 @@ Think about what threads share that processes do not, and which function reports
 <summary>Solution</summary>
 
 The listing swaps the executor and trims the previous exercise's
-program. It drops the serial comparison and the core count, which the
-question about IDs does not need, and it uses the twenty-times-smaller
-limits from the end of that exercise, which keep the run short.
+program. It drops the serial comparison and the core count,
+since the question concerns the IDs.
+It also uses the twenty-times-smaller limits from the end of that exercise,
+which keep the run short.
 
 ```python
 import os
@@ -136,13 +135,13 @@ if __name__ == "__main__":
 The thread pool reports `1`. Threads share their process, so
 `os.getpid()` returns the same value in every one of them. Counting
 distinct process IDs revealed process parallelism in the previous
-exercise, and it says nothing about thread parallelism.
-`threading.get_ident()` is the equivalent for threads.
-`ProcessPoolExecutor` and `ThreadPoolExecutor` share one `map()`
-interface, and underneath one runs the calls in separate processes
-while the other runs them in threads of one process. That contrast
-is the substitutable-backend point from
-[Concurrency](../../Chapters/19_Techniques--Concurrency.md#one-executor-interface-three-pools).
+exercise but says nothing about thread parallelism.
+For threads, the equivalent is `threading.get_ident()`.
+
+`ProcessPoolExecutor` and `ThreadPoolExecutor` share
+[one `map()` interface](../../Chapters/19_Techniques--Concurrency.md#one-executor-interface-three-pools).
+Underneath, `ProcessPoolExecutor` runs the calls in separate processes
+and `ThreadPoolExecutor` runs them in threads of one process.
 
 </details>
 </details>
@@ -166,11 +165,11 @@ For the oracle, write an insertion sort slow and simple enough to check by readi
 
 If you write the oracle as `assert sorted(xs) == sorted(xs)`, the test
 passes, and it keeps passing for a sort that drops the last element,
-because both sides of `==` share the bug. The insertion-sort oracle
-fails that broken sort on `xs=[0]`. The solution checks `sorted()`
-against `insertion_sort()`, a separate implementation that cannot share
-its bugs, because a property that restates the implementation tests
-nothing.
+because both sides of `==` share the bug.
+A property that restates the implementation tests nothing.
+The solution therefore checks `sorted()` against `insertion_sort()`,
+a separate implementation that cannot share the bugs of `sorted()`.
+The insertion-sort oracle fails the broken sort on `xs=[0]`.
 
 ```python
 # test_sorted_laws.py
@@ -219,19 +218,23 @@ being the same ones you supplied.
 on its own. The same `[]`-returning function passes it too.
 Idempotence adds a different kind of check, one about the operation
 rather than the output. It catches a sort that drops the last element.
-That sort's output is always ordered, so the invariant passes, but
-running it on its own output drops another element, so twice and once
-disagree on every list of two or more.
+That sort's output is always ordered, so the invariant passes.
+But running the sort on its own output drops another element,
+so twice and once disagree on every list of two or more.
 
-**Compare against an independent version.** The oracle closes the gap.
-Because `insertion_sort()` is slow and simple enough to check by
-reading, asserting that it agrees with `sorted()` pins down the
-elements, their multiplicities, and their order at once. The oracle
-repeats no part of `sorted()`'s implementation. It arrives at the
-same answer by a different route. That independence makes an oracle
-worth having, and makes `assert sorted(xs) == sorted(xs)` worthless.
+**Compare against an independent version.** The oracle fails all three
+broken sorts: the one that returns `[]`, the one that returns the first element,
+and the one that drops the last element.
+`insertion_sort()` is slow and simple enough to check by reading,
+so asserting that `sorted()` agrees with it checks the
+elements, their multiplicities, and their order at once.
+
+The oracle repeats no part of `sorted()`'s implementation. It computes the
+same answer by a different algorithm. That independence makes an oracle
+useful, and makes `assert sorted(xs) == sorted(xs)` worthless.
+
 Capping the list length keeps the quadratic oracle fast, since the
-bugs it catches show up on short inputs.
+bugs it catches appear in short inputs.
 
 </details>
 </details>
@@ -281,15 +284,15 @@ E           s='µ',
 E       )
 ```
 
-Because the two sides print almost identically, the failure hides
-until you look at the code points.
+The two sides print almost identically,
+so you need their code points to tell them apart.
 
-Runs split between `'µ'` and `'ß'`, since the shrinker does not
-always find the smallest failing character. `ß` breaks the law for a
-different reason, covered below.
+Runs split between `'µ'` and `'ß'`, since the shrinker sometimes
+stops at a failing character other than the smallest.
 Once a run fails, Hypothesis stores the counterexample in
 `.hypothesis/` and replays it first, so later runs report the same
 character until you delete that directory.
+`ß` breaks the law for a different reason, covered below.
 
 ```python
 # test_case_mapping.py
@@ -311,22 +314,22 @@ def test_upper_leaves_the_micro_sign_in_the_greek_block(
 
 **Trace the round trip.** `µ` is U+00B5 MICRO SIGN, a character Latin-1 kept separate from the
 Greek letter it resembles. `µ` is lowercase, so `.lower()`
-returns it unchanged. But it has no uppercase form of its own, so
-`.upper()` maps it to U+039C GREEK CAPITAL LETTER MU, and lowering
-that gives U+03BC GREEK SMALL LETTER MU. The round trip ends in a
+returns the same character. But it has no uppercase form of its own, so
+`.upper()` maps it to U+039C GREEK CAPITAL LETTER MU.
+Lowering that gives U+03BC GREEK SMALL LETTER MU. The round trip ends in a
 different Unicode block from the one where it started.
 
 Unicode case mapping is not a pair of inverse functions. It is a
-many-to-one mapping in each direction, over a repertoire containing
-characters that are lowercase without being the lowercase of anything.
+many-to-one mapping in each direction.
+Some characters, like `µ`, are lowercase without being the lowercase of anything.
 `ß` breaks the same law from the other side. `"ß".upper()` is `"SS"`,
-two characters, so uppercasing can change a string's length. For
-case-insensitive comparison Python provides `str.casefold()` rather
-than `str.lower()`, and `casefold()` has no inverse either.
+two characters, so uppercasing can change a string's length.
+For case-insensitive comparison Python provides `str.casefold()` rather than `str.lower()`.
+`casefold()` has no inverse either.
 
-A hand-written loop over `"abcde"` does not reach `µ`. The generated
-strings reach the parts of the repertoire nobody thinks to type, and
-that reach is the argument for property testing in one example.
+A hand-written loop over `"abcde"` never tests `µ`.
+The generated strings include characters nobody thinks to type.
+That coverage is the argument for property testing in one example.
 
 </details>
 </details>
@@ -352,11 +355,11 @@ To break the function, remove the step that places leftover students, then rerun
 <summary>Solution</summary>
 
 If you compare `placed == names` without sorting either side,
-the property fails against the correct `group_rounds()`,
-and Hypothesis shrinks the failure to a two-name roster with
-`size=1`, such as `names=['a', 'b']`.
+the property fails against the correct `group_rounds()`.
 `group_rounds()` shuffles the pool before it forms each round,
-so the students come back in an order of their own.
+so it returns the students in shuffled order.
+Hypothesis shrinks the failure to a two-name roster with
+`size=1`, such as `names=['a', 'b']`.
 The property concerns which students each round places, not their order, so the solution sorts both sides before comparing them.
 
 ```python
@@ -425,32 +428,31 @@ version without them, Hypothesis reports a two-name roster with
 `size=3`, such as `names=['a', 'b']`, and a
 `ValueError: min() iterable argument is empty`. With fewer students
 than the group size, the `while len(pool) >= size` loop runs zero times
-and `groups` stays empty. The leftover loop then asks `min()` for the
-smallest of nothing.
+and `groups` stays empty. The leftover loop then calls `min()` on the
+empty `groups`, and that call raises the `ValueError`.
 
 The crash is a real defect rather than an unstated precondition.
-`group_rounds()` already keeps
+`group_rounds()` keeps
 everyone in a group when a roster divides unevenly, folding the
-leftovers into existing groups, so the answer for a roster of two and
-a size of five is one group of two. Crashing is the one answer
-inconsistent with what the function does everywhere else. The
+leftovers into existing groups.
+By that rule, the answer for a roster of two and a size of five is one group of two. Crashing is the one answer
+that contradicts what the function does everywhere else. The
 `group_rounds()` in [Toolkits](../../Chapters/41_Functional--Toolkits.md#groups-of-any-size) includes the guard, so
 `test_group_rounds.py` passes with no `assume()`.
 
 Finding the defect takes no cleverness and no thought about edge
-cases. The strategy generates small rosters because Hypothesis
-prefers small examples, so a size of `3` against a roster of `2`
-comes up on its own. The property says what should be true for every
-roster.
+cases. Hypothesis prefers small examples,
+so it soon generates a roster of `2` against a size of `3`. The property states what holds for every
+roster, and Hypothesis finds the roster that breaks it.
 
 **State the precondition in the strategy.** The `unique=True` on the roster strategy does real work.
-`group_rounds()` keys its history by `frozenset` of names, so two
-students sharing a name are one student to the algorithm. The
-property still passes on such a roster, because every name appears in
-one group, but the schedule the property checks counts the two as one
-student when `group_rounds()` avoids repeat meetings.
-Generating distinct names states `group_rounds()`'s precondition where
-the test can see it.
+The property passes on a roster with a repeated name,
+because every student still appears in one group.
+But `group_rounds()` keys its history by `frozenset` of names,
+so it records both students' meetings under the same keys,
+and when it avoids repeat meetings it treats the two students as one.
+Generating distinct names writes `group_rounds()`'s precondition into
+the test.
 
 Breaking the function on purpose is the other half of the exercise.
 Delete the loop that places leftovers:
@@ -462,8 +464,7 @@ Delete the loop that places leftovers:
             host.append(extra)
 ```
 
-`group_rounds()` now drops the students who do not fill a whole
-group, and the property reports the loss at once:
+`group_rounds()` now drops the leftover students, and the property reports the loss at once:
 
 ```text
 E           AssertionError: assert [] == ['a', 'b']
@@ -474,26 +475,28 @@ E               size=3,
 E           )
 ```
 
-Two students cannot fill a group of three, so the empty group the
-guard adds collects nobody and the left side of the assertion is
-`[]`. The report shows that shrunk case rather than whatever wide
-random roster failed first.
+Because two students cannot fill a group of three, the guard adds an empty group.
+With the leftover loop deleted, that group stays empty,
+and the left side of the assertion is `[]`.
 
-The names vary from run to run. Hypothesis
+The report shows the shrunk case rather than whatever wide
+random roster failed first, and its names vary from run to run. Hypothesis
 shrinks a generated string toward a longer run of `a` before it
-reaches a second letter, so `'aa'` arrives as readily as `'b'`. Now
-and then a run stops at a different shape, three students in groups
+tries a second letter, so the report shows `'aa'` as often as `'b'`. Now
+and then a run stops at a different shape: three students in groups
 of two, such as `names=['a', 'b', 'c'], size=2`, which leaves one
 student over.
 
 A second run reports the identical counterexample, and reports it
 noticeably faster. Hypothesis writes each failing case into
 `.hypothesis/examples/` and replays that database before generating
-anything new, so it re-finds the failure you are in the middle of
-fixing instead of leaving it to chance. The shrunk case therefore
-behaves like a regression test you did not write. It keeps
-failing until you fix the bug. The first run after the fix replays it
-once more, sees it pass, and deletes it from the database.
+anything new.
+It therefore re-finds the failure you are in the middle of
+fixing instead of leaving it to chance.
+That replay makes the shrunk case behave like a regression test
+that Hypothesis wrote for you.
+The case keeps failing until you fix the bug. The first run after the fix replays the case
+once more, finds that it passes, and deletes it from the database.
 
 </details>
 </details>
@@ -510,7 +513,7 @@ once more, sees it pass, and deletes it from the database.
 <summary>Where to look</summary>
 
 [Referential Transparency](../../Chapters/43_Functional--Confidence.md#referential-transparency) tests a function by substituting a call with its value.
-A function that reads the clock or `os.environ` takes an input its signature does not declare.
+A function that reads the clock or `os.environ` takes an input hidden from its signature.
 Move each hidden input into the parameter list, a `datetime` for the clock and a `Mapping` for the environment.
 
 <details>
@@ -568,34 +571,35 @@ print(timeout_pure({"TIMEOUT": "5"}), timeout_pure({}))
 #: 5 30
 ```
 
-Neither impure function assigns to anything, which is the lesson.
-`global` is the loud way to break referential transparency. `stale()`
-and `timeout()` are quiet ones. Both read state the caller cannot
-see.
+Neither impure function assigns to anything.
+`global` breaks referential transparency with a declaration a reader
+can find. `stale()` and `timeout()` break it silently,
+by reading state hidden from the caller.
 
 **Take the time without declaring it.** The substitution that breaks `stale()` is replacing a call with the
 answer it just gave. `stale(made, timedelta(hours=12))` returns
 `False` at 11:00 and `True` at 13:00, so writing down `False` and
 substituting it changes the program the moment the clock passes noon.
-Nothing in the signature warns you, because `datetime.now()` is an
-argument the function takes without declaring.
+The signature declares no time parameter,
+because `stale()` reads the clock through `datetime.now()` instead.
 
-**Take a setting without declaring it.** `timeout()` breaks the same
-way across a boundary that is easier to miss, since the environment
-usually holds still during a run. Substituting `30` for `timeout()` is
+**Take a setting without declaring it.** `timeout()` breaks the same way.
+The break is easier to miss, since the environment
+usually stays the same for a whole run. Substituting `30` for `timeout()` is
 correct until someone sets `TIMEOUT`, and then the substituted version
 and the original disagree while both still look right. Tests show the
 problem first. One test that sets the variable changes the answer for
-every test after it, and no argument list records the dependency.
+every test after it.
+No argument list records the dependency.
 
-**Make the hidden input a parameter.** The repair is the same for both, and it is the one this part of the
+**Make the hidden input a parameter.** The repair is the same for `stale()` and `timeout()`, and it is the one this part of the
 book keeps making. Move the hidden input into the parameter list.
 `stale_pure()` takes the current time, and `timeout_pure()` takes the
 mapping to read. Both are now referentially transparent, and both are
-testable without a clock or a monkeypatched environment. The caller
-that does read the real clock or the real `os.environ` becomes one
-line at the edge of the program instead of a dependency buried in the
-middle of it. [Testing](../../Chapters/11_Techniques--Testing.md#random-numbers)
+testable without a clock or a monkeypatched environment.
+The read of the real clock or the real `os.environ` moves out of the middle of the program
+into one line at its edge, in the caller.
+[Testing](../../Chapters/11_Techniques--Testing.md#random-numbers)
 makes the same move for a random source.
 
 </details>
@@ -685,38 +689,39 @@ for sample in ("4", "0", "OOPS"):
 ```
 
 The two versions produce identical output. Counting lines favors the
-`isinstance()` version by two. It needs no `match result:` line, and
+`isinstance()` version by two. The `isinstance()` version drops the `match result:` line, and
 its final `return` (`[1]`) replaces a `case` line and its body.
 
-Length is not what separates the two versions. The `match` reads as
+Reading, not length, separates the two versions. The `match` reads as
 one description of four shapes while the `isinstance()` version reads
 as four separate questions. The difference shows in what each version
 repeats. `result.error` appears three times in `describe_isinstance.py`
-and nowhere in the `match`, because each `case` matches on the error
-instead of reading it back off `result`. The `return` at `[1]` is also
-weaker than the `match`'s `case Err(error)`. It is a fallthrough that
+and nowhere in the `match`, because each `case` pattern destructures
+the `Err` and matches the error inside it. The `return` at `[1]` is also
+weaker than the `match`'s `case Err(error)`. That `return` is a fallthrough that
 happens to be correct rather than a branch stating what it matches, so
 a reader must deduce that `result` is an `Err` by ruling out the `Ok`
 branch above.
 
-Inside the `Ok`, `ty` knows `float` either way. In the error
-branches, the `isinstance()` version narrows `result.error` to
+In the error branches,
+the `isinstance()` version narrows `result.error` to
 `ValueError` or `ZeroDivisionError`. The `match` patterns bind no
 name there, so `result.error` stays `Exception`.
+Inside the `Ok`, `ty` knows `float` either way.
 
 **Rule out a shared subclass.** The precision behind that agreement
-rests on one decorator: both `Ok` and `Err` carry `@final`, in the
-listing above and in `utils/result.py`. Without that decorator `ty`
-0.0.86 allows for a class inheriting from both, so the intersection of
-the two stays alive and the value in the `Ok` comes back as
+depends on one decorator: both `Ok` and `Err` carry `@final`, in
+`describe_isinstance.py` and in `utils/result.py`. Without that decorator `ty`
+0.0.86 allows for a class inheriting from both, so it keeps the
+intersection of the two as a possible type.
+The value in the `Ok` then comes back as
 `float | Unknown` rather than plain `float`. The `match` and the
 `isinstance()` tests lose that precision together. `result.answer`
 after a positive `isinstance()` and `answer` in `case Ok(answer)` read
 `float | Unknown` alike. Pyright and mypy do not build that
-intersection and report `float` with or without the decorator. The
-measurement the exercise asks for therefore comes out even at either
-precision, and what the decorator changes is a more useful finding
-than either version winning.
+intersection and report `float` with or without the decorator.
+The exercise's comparison therefore comes out even at either precision.
+The decorator's effect is a more useful finding than a win for either version.
 
 The choice is about reading, not about proving. Neither form tells
 the type checker anything the other cannot, so pick the one that
