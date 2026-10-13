@@ -94,17 +94,18 @@ a double, and the other parameter keeps its binding.
 could not have required one. It names two capabilities it needs and
 calls methods on them. Its body names none of `Console`, `input()`,
 `print()`, or `Scripted`, so changing the binding leaves that body
-as it is. That is the delayed-binding payoff. The choice of
-implementation moves to the call site, where a test can choose
-differently from production.
+as it is.
+Delayed binding moves the choice of implementation to the call site,
+where a test can choose differently from production.
 
-**Satisfy the protocols structurally.** The type checker still enforces the protocols after the choice moves.
+**Satisfy the protocols structurally.** After the choice moves, the type checker still enforces the protocols.
 `Console` inherits from nothing and declares no relationship to `Ask`
 or `Tell`, but it has the two methods with the right signatures, so it
 satisfies both protocols structurally. If you give `Console` a
 `tell()` that returns a `str`, `ty` reports `invalid-argument-type`
-at the `greet(...)` call, not at the class definition, because the
-class does not declare which protocol it means to satisfy.
+at the `greet(...)` call, not at the class definition.
+The checker compares `Console` with `Tell` where `greet()` receives the `Console` as `tell`,
+the one place the class meets the protocol.
 
 </details>
 </details>
@@ -235,42 +236,43 @@ for line in captured.messages:
 Five signatures name the new Effect, and only two of them use it.
 
 **Log at the point of use.** One of the five is new rather than edited: `format_greeting()`, the
-helper that uses the `Log`. You must edit four existing signatures.
-`greet()` both uses a `Log` and accepts one, to hand down to
-`format_greeting()`.
+helper that uses the `Log`.
+The other four are existing signatures you must edit.
+The first of them, `greet()`, both uses a `Log` and accepts one,
+to hand down to `format_greeting()`.
 
-**Hand the Effect down the call chain.** `session()`, `menu()`, and `main()` each
-gain a `log` parameter that they hand to the next function.
-Three of the five name a `Log` they do not use. Those functions sit
-between the Effect's user and the call site that binds it, and they
-take a `log` parameter whose sole use in their bodies is forwarding
-it. Their signatures now describe a capability they do not exercise,
+**Hand the Effect down the call chain.** The other three of the five,
+`session()`, `menu()`, and `main()`, each gain a `log` parameter whose
+one use is passing it to the next function.
+They sit between `greet()`, which uses the `Log`, and the call site that binds it.
+Their signatures now describe a capability they do not exercise,
 so a reader of `menu()` learns something false about what `menu()`
 does.
 
 The forwarding also grows with the program. Adding a fourth Effect
-later means walking the same chain again, and the chain is longer in
-a real program than in this one.
+later means editing every signature on the same chain again.
+In a real program that chain is longer than this one.
 
-The alternative most codebases pick, a module-level logger,
-removes the parameter by removing the choice. The function no longer
-says it logs, and a test can no longer bind the logger differently.
+Most codebases avoid the forwarding with a module-level logger.
+The logger removes the parameter by removing the choice. The function's signature
+hides that it logs, and every test runs with the logger the module chose.
 
-A library EMS collapses the parameter lists and the call sites, not
-the signatures. `format_greeting()` declares in its return
+A library EMS removes the forwarded parameters and the call-site edits,
+and keeps the signature edits. `format_greeting()` declares in its return
 type that it needs a `Log`, and so does every function on the path to
-it, but none of them gains an unused parameter, no call site changes,
-and the type checker names each declaration you miss. You still supply
-the binding, but at one place near the top, where the program decides
-what a `Log` means.
+`format_greeting()`.
+Their parameter lists and their call sites stay as they were.
+The type checker names each declaration you miss.
+You supply the binding at one place near the top,
+where the program decides what a `Log` means.
 [Stateless](../../Chapters/46_Effects--Stateless.md) shows that shape
-with a real library. In its `audit_log.py`, `greet_logged()` and its
+with a real library. In that chapter's `audit_log.py`, `greet_logged()` and its
 caller `greet_all()` both carry a `Need[Log]` in the `Depend` return
-type, while `greet()` stays unchanged.
+type, while `greet()` stays as it was.
 
 A native EMS removes the signature edits as well. Koka infers the
-Effect row of a function you leave unannotated, so adding a `log`
-Effect leaves `greet()`, `session()`, `menu()`, and `main()` as they
+Effect row of a function you leave unannotated.
+Adding a `log` Effect therefore leaves `greet()`, `session()`, `menu()`, and `main()` as they
 were, and the compiler adds `log` to each of their rows. You write
 the new helper and the one handler that binds `log`.
 
@@ -310,30 +312,33 @@ Then match each kind to the conversion or technique that manages it.
 
 Neither function in `slope_catch.py` has a side effect or a side
 cause. Both read only their arguments and change nothing outside
-themselves. The two Effects are both exceptions, and the chapter
-demonstrates both conversions the table names for them: `slope()`
-catches the `ZeroDivisionError`, and `slope_nonzero.py` shows the
-version where a restrictive type makes a zero `run` unconstructable.
-The third conversion, a `Result`, applies to both exceptions as well.
-`slope_result.py` returns the `ZeroDivisionError` as an `Err`, and
-`@safe` on `slope_catch.py`'s `slope()` does the same for the
-`ValueError`. The `ValueError` from `validate()` is the one still
-escaping, and exercise 4 moves it out of `slope()`.
+themselves. The two Effects are both exceptions.
 
-`withdraw()` is both a side cause and a side effect in three lines. `balance -= amount` reads
-the global and writes it back, so the function's result depends on the
-global `balance` rather than on its arguments, and the call changes
-`balance` where no caller can see it. Reading and rewriting the global
-is why `withdraw(30)` twice returns `70` then `40`, the demonstration
-the [Foundations](../../Chapters/40_Functional--Foundations.md#pure-functions)
-chapter uses to show purity failing.
+The chapter demonstrates both conversions the table names for those exceptions.
+`slope()` catches the `ZeroDivisionError`,
+and in `slope_nonzero.py` a restrictive type makes a zero `run` unconstructable.
+The third conversion, a `Result`, applies to both exceptions as well.
+`slope_result.py` returns the `ZeroDivisionError` as an `Err`.
+In `slope_catch.py`, the `ValueError` from `validate()`
+propagates out of `slope()`,
+so `@safe` on that `slope()` returns the `ValueError` as an `Err` too.
+Exercise 4 moves `validate()`'s check from `slope()` into the constructor of a `PositiveInt`.
+
+`withdraw()` holds both a side cause and a side effect in three lines.
+`balance -= amount` reads the global and writes it back.
+The read makes the function's result depend on the global `balance` rather than on its arguments.
+The write changes `balance`, which lies outside both the arguments and the return value.
+Because each call rewrites the global,
+`withdraw(30)` returns `70` the first time and `40` the second.
+The [Foundations](../../Chapters/40_Functional--Foundations.md#pure-functions)
+chapter uses that pair of calls to show purity failing.
 [Confidence](../../Chapters/43_Functional--Confidence.md#referential-transparency)
 reuses `withdraw()` to show referential transparency failing.
 
-Because the three conversions in
+All three conversions in
 [Converting Effectful to Pure](../../Chapters/44_Effects--Effect_Management.md#converting-effectful-to-pure)
-all manage the exception Effect, none of them applies to `withdraw()`.
-The by-hand technique for a side cause and a side effect comes from
+manage the exception Effect.
+For a side cause and a side effect, `withdraw()` takes the by-hand technique from
 [Effects by Hand](../../Chapters/44_Effects--Effect_Management.md#effects-by-hand) instead:
 pass in what the function would otherwise read or write.
 For `withdraw()`, that means taking the balance as a parameter and
@@ -341,21 +346,21 @@ returning the new one. The same inputs then give the same answer, and
 the caller holds the state.
 
 `Thermometer` has the same pair inside a design pattern. The `celsius`
-setter writes `_celsius`, an instance attribute rather than a global,
-and then calls `announce()`, which invokes arbitrary code in every
+setter writes `_celsius`, an instance attribute rather than a global.
+Then the setter calls `announce()`, which invokes arbitrary code in every
 subscribed responder. The write is a side effect on the object. The
 notification is a side effect on the world, since a responder may
 print, record, or fail. Reading `celsius` is a side cause for the same
-reason `withdraw()` reading `balance` is one. The value can change
-between calls, so the answer depends on history rather than arguments.
+reason `withdraw()` reading `balance` is one. The value of `celsius` can change
+between calls, so the answer depends on earlier assignments to `celsius` rather than on arguments.
 
 The functional conversion returns each reading as a value from the
 temperature source, and the caller folds new readings into whatever
-state it keeps. That is what the chapter calls
+state it keeps. The chapter calls that conversion
 [pushing the Effects to the edges](../../Chapters/44_Effects--Effect_Management.md#a-program-can-never-be-pure).
 
-Across `withdraw()` and `Thermometer`, the classification is not a
-property of the language feature used. A global, an instance
+Across `withdraw()` and `Thermometer`, the classification depends on
+what the code does, not on the language feature it uses. A global, an instance
 attribute, and a responder list are three storage mechanisms for one
 idea: something outside the call participates in the result.
 
@@ -375,7 +380,7 @@ idea: something outside the call participates in the result.
 
 [Make the Bad Value Impossible](../../Chapters/44_Effects--Effect_Management.md#make-the-bad-value-impossible) builds `NonZero`, whose `__post_init__()` rejects an invalid value.
 Write `PositiveInt` with a `__post_init__()` that checks one predicate covering both bad values.
-Then give `slope()` a `PositiveInt` parameter and see which guards have nothing left to do.
+Then give `slope()` a `PositiveInt` parameter and see which guards now always pass.
 
 <details>
 <summary>The shape</summary>
@@ -400,7 +405,7 @@ def slope(rise: int, run: PositiveInt) -> float:
 <summary>Solution</summary>
 
 If you keep `NonZero`'s `self.value == 0` test under the new name,
-`PositiveInt(-1)` constructs without complaint,
+`PositiveInt(-1)` constructs successfully,
 and `slope(10, PositiveInt(-1))` returns `-10.0`.
 The demo's `expect()` loop then raises an `AssertionError` ("no exception raised") on `-1`,
 and the type checker reports nothing, because every argument has the right type.
@@ -434,27 +439,28 @@ for bad in (0, -1):
 
 **Cover both bad values with one predicate.** The original `slope_catch.py` splits the guarding in a way that is
 easy to miss. `validate()` rejects negatives but lets zero through,
-and the `try` catches zero but says nothing about negatives. Two
-mechanisms in two places cover the two bad values, and neither one
-tells you the other exists. `NonZero` inherits half of that split.
+and the `try` catches zero but lets negatives through. Two
+mechanisms in two places cover the two bad values independently. `NonZero` covers one half of that split, the zero.
 One predicate, `value <= 0`, covers both, because "positive" is a
 single idea and "not zero, and also not negative" is the same idea
-described as two exceptions.
+described as two exclusions.
 
-**Trust the parameter's type.** Both checks disappear from `slope()`, and so does everything they
-brought with them. A `PositiveInt` cannot hold zero, so the
-`try`/`except ZeroDivisionError` goes. It cannot hold a negative
-either, so the call to `validate()` goes, and `validate()` along with
-it. Only the division remains.
+**Trust the parameter's type.** Both checks disappear from `slope()`, and so does the code each one needed. A `PositiveInt` holds a value of 1 or more,
+so dividing by it always succeeds and the `try`/`except ZeroDivisionError` goes.
+The same value always passes `validate()`,
+so the call to `validate()` goes, and `validate()` along with it.
+Only the division remains.
 
-**Fail at the construction site.** The failure moves rather than vanishing. `PositiveInt(bad)` still raises
+**Fail at the construction site.** The failure now comes from the constructor rather than from `slope()`. `PositiveInt(bad)` still raises
 an exception, at the boundary where an untrusted number enters the
-program, and a caller reading from a file or a form must still
-handle it. The count changes: one construction site instead of every
-function that touches the value. Every function downstream of a
-`PositiveInt` is pure with respect to this failure, and none of them
-spends a line of code on it. Each signature says which values the
-function accepts, instead of leaving that to a docstring.
+program.
+A caller reading from a file or a form handles the exception there.
+
+The count of checks changes:
+one at the construction site instead of one in every function that uses the value.
+Every function downstream of a `PositiveInt` is pure with respect to this failure,
+and its signature says which values it accepts,
+instead of leaving that to a docstring.
 
 </details>
 </details>
@@ -507,7 +513,7 @@ If you leave out the `await` in the list comprehension,
 and the `asyncio.run()` call raises a `TypeError` for adding an `int` and a `coroutine`,
 with a `RuntimeWarning` that `price_of_async` was never awaited.
 Because calling an `async` function builds a coroutine
-and runs none of its body,
+that runs its body when awaited,
 the solution awaits each call to get its `float`.
 
 ```python
@@ -541,57 +547,58 @@ print(type(description).__name__)  # [1]
 description.close()  # Never awaited, so close it explicitly
 ```
 
-Making the helper `async` forces four changes, and you must make
-all four.
+Making the helper `async` forces four changes.
 
 **Await the helper from a coroutine.** `price_of_async("apple")` now returns a coroutine instead of
-a `float`, as `[1]` shows, so `total_price()` cannot sum
-the results until each call has an `await`. Only an `async def` may
+a `float`, as `[1]` shows, so `total_price()` must await
+each call before it can sum the results. Only an `async def` may
 contain `await`, so `total_price()` becomes `total_price_async()`.
 
-**Collect the results before summing.** The argument to `sum()` gains
-brackets. A generator expression with an `await` inside it is an
-asynchronous generator, and `sum()` cannot iterate over it. `ty` reports
-`no-matching-overload`, and the call raises a `TypeError`. The list
-comprehension awaits each price and hands `sum()` a list.
+**Collect the results before summing.** The argument to `sum()` gains brackets,
+because a generator expression with an `await` inside it is an asynchronous generator,
+and `sum()` requires a synchronous iterable.
+Without the brackets, `ty` reports `no-matching-overload`,
+and the `sum()` call raises a `TypeError`.
+With them, the list comprehension awaits each price and hands `sum()` a list.
 
-**Run the coroutine at the edge.** The callers of `total_price_async()` then must
-become `async` in turn, and the propagation stops only at `asyncio.run()`,
+**Run the coroutine at the edge.** The callers of `total_price_async()` must then
+become `async` in turn, and the propagation continues up to `asyncio.run()`,
 the boundary that discharges the Effect.
 
 That propagation is Effect tracking.
 The Effect appears in the type. `ty` reports `price_of_async`'s return
 as `CoroutineType[Any, Any, float]`, not `float`. A caller that
-forgets `await` then gets a type error rather than a mysterious value.
-The Effect travels outward one caller at a time, as the chapter says
-an Effect propagates, and you cannot leave a caller out. It reaches
-the edge of the program, where a single call runs it. `async` satisfies property 1 of the three-item
+forgets `await` then gets a type error rather than a coroutine where it expected a `float`.
+Each caller in turn must become `async`, as the chapter says
+an Effect propagates.
+The chain ends at the edge of the program, where one `asyncio.run()` call runs the coroutine.
+`async` satisfies property 1 of the three-item
 list without anyone calling it an Effect system.
 
 `async` satisfies neither of the other two.
 
 It does not **separate the interface from the implementation**.
 `await price_of_async(item)` names no capability. It says "run this
-particular coroutine," and the coroutine's body decides what awaiting
-means. Compare `Ask` in `ask_tell.py`, where `greet()` names the
-capability and stays silent about the implementation's source. `async`
+particular coroutine," and the coroutine's body defines what awaiting
+it does. Compare `Ask` in `ask_tell.py`, where `greet()` names the
+capability and leaves the implementation to the caller. `async`
 has no equivalent of writing a function against "something awaitable
 that yields a price" and choosing the implementation later.
 
 It does not **bind the implementation later**. `asyncio.run()` chooses
 an event loop, and that choice sounds like late binding until you ask
-what it lets you swap. Choosing a loop does not let a test substitute
-a different meaning for the awaits inside. You settle what those
-awaits mean when you write the coroutine. A test that needs fake
-prices must still inject `price_of_async`, by the same hand-threading
-this chapter's exercise 2 measures. The event loop is a scheduler, not
+what it lets you swap. A different loop runs the same awaits on a
+different schedule.
+You settle what those awaits mean when you write the coroutine,
+so a test that needs fake prices must inject `price_of_async`
+by the same hand-threading this chapter's exercise 2 measures. The event loop is a scheduler, not
 a handler.
 
 So `async` is an Effect-tracking system rather than a full EMS, in the
 same sense as most of the AI languages in
 [Custom AI Languages with Effects](../../Chapters/44_Effects--Effect_Management.md#custom-ai-languages-with-effects).
 It tracks one Effect, chosen by the language, with the
-implementation set at the call site. That is also why the propagation
+implementation set at the call site. Setting the implementation there also explains why the propagation
 feels like a nuisance rather than a benefit. You do the bookkeeping
 of Effect tracking, an `await` and an `async def` in every caller,
 without the delayed binding that makes that bookkeeping useful.
