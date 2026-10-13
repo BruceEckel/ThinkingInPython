@@ -14,7 +14,7 @@
 
 [Typing the Symbol Set](../../Chapters/35_Patterns--Flyweight.md#typing-the-symbol-set) shows `Symbol` and `SPECS` naming the same kinds, so the two grow together.
 Add the new symbols to both and leave `tile()` alone.
-For `walkable_neighbors()`, visit the four adjacent cells, skip any outside the grid, and count those whose `walkable` is true.
+For `walkable_neighbors()`, visit each of the four adjacent positions that lies inside the grid, and count the cells whose `walkable` is true.
 
 <details>
 <summary>The shape</summary>
@@ -67,7 +67,7 @@ def walkable_neighbors(
 If you add `"+"` and `"T"` to `SPECS` but leave `Symbol` listing three kinds,
 the script still runs and prints `24 5`.
 `ty` rejects the `SPECS` annotation with an `invalid-assignment` error,
-because the dictionary now holds keys that `Symbol` does not list.
+because the dictionary now holds two keys outside `Symbol`.
 The solution adds both symbols to the `Symbol` literal,
 so the two tables name the same five kinds.
 
@@ -133,14 +133,16 @@ print(len(cells), len({id(t) for t in cells}))
 #: 24 5
 ```
 
-**Name each new kind in both tables.** Door and tree tiles need two new symbols in `SPECS`, and the same two
-in the `Symbol` literal, so the type checker still flags a `SPECS` key
-that `Symbol` does not list. The edit stops there. `tile()` and
-`parse_map()` stay as they are.
+**Name each new kind in both tables.** Door and tree tiles need two new symbols in `SPECS` and the same two
+in the `Symbol` literal.
+Once both tables name the same kinds, `SPECS` passes the type checker,
+which still flags any key outside `Symbol`.
+`tile()` and `parse_map()` stay as they are.
 
-**Confirm one tile per kind.** Twenty-four cells collapse to five
+**Confirm one tile per kind.** The twenty-four cells refer to five
 distinct objects, one per kind (`grass`, `water`, `rock`, `door`,
-`tree`), and that count stays at five however large the map grows,
+`tree`).
+The count stays at five however large the map grows,
 because `@cache` keys on the symbol alone.
 
 </details>
@@ -273,18 +275,17 @@ for size in (50, 100, 200):
 #: 200 ratio unshared/shared: 6.9
 ```
 
-**Compare the peaks across sizes.** The ratio holds near six at every size: about 6x at a 50x50 map,
+**Compare the peaks across sizes.** The ratio stays between six and seven at every size: about 6x at a 50x50 map,
 close to 7x at 200x200. Both peaks grow with the number of
 cells, because both versions build the same nested list of references.
 The two versions differ in the memory one cell takes. A cell in the
 shared field takes one reference into a pool of three `Tile` objects,
-while a cell in the unshared field takes a reference plus a brand-new
+while a cell in the unshared field takes a reference plus a new
 `Tile`, roughly six times as much memory. The flyweight's saving is
-therefore per cell. The multiplier stays near six, and the bytes saved
-grow with the map.
+therefore per cell, so the bytes saved grow with the map.
 
 `Tile` is a record, so each unshared `Tile` is a slotted instance
-with no `__dict__`. With `@dataclass(frozen=True)` in place of `@record` the
+with no `__dict__`. With `@dataclass(frozen=True)` in place of `@record`, the
 same run reports a ratio near ten, because every unshared `Tile`
 then carries a dictionary too.
 
@@ -303,7 +304,7 @@ then carries a dictionary too.
 [Freezing the Shared Tile](../../Chapters/35_Patterns--Flyweight.md#freezing-the-shared-tile) explains why a flyweight must be immutable.
 The pool holds one object per kind,
 so assigning to an attribute through one cell
-is visible through every cell that shares it.
+is visible through every cell that shares that object.
 In the test, assign through one cell, then assert on a different cell of the same kind.
 
 <details>
@@ -337,9 +338,10 @@ def mutable_tile(symbol: str) -> MutableTile:
 
 If you assert on the cell whose `walkable` you set,
 the test passes whether or not the cells share a tile.
-With `@cache` removed from `mutable_tile()`,
-`field[0][0].walkable` is still `False` after the assignment, and no bug shows.
-The test asserts on `field[1][1]` instead, a different grass cell,
+With `@cache` removed from `mutable_tile()`, each cell gets its own `MutableTile`.
+`field[0][0].walkable` still reads `False` after the assignment,
+so the test passes on code that shares nothing.
+The test instead asserts on a different grass cell, `field[1][1]`,
 whose `walkable` turns `False` only when the cells share one `MutableTile`.
 
 ```python
@@ -375,7 +377,7 @@ print(field[0][1].walkable, field[1][0].walkable,
 
 **Expose the shared state.** Setting `walkable = False` on the tile at `(0, 0)` changes `walkable`
 for every other grass cell in the map too, because all four cells
-share one `MutableTile` object. This test pins down the bug:
+share one `MutableTile` object. Here, the test asserts that the assignment reaches a different cell:
 
 ```python
 # test_ch35_mutation_leak.py
@@ -408,11 +410,11 @@ def test_mutation_without_frozen_leaks_across_cells(
     assert field[1][1].walkable is False  # Bug: cell leaked
 ```
 
-If you restore `@record`, this test stops at its assignment.
+If you restore `@record`, this test fails at its assignment.
 `field[0][0].walkable = False` raises a `FrozenInstanceError`,
-because a record rejects assignment to every attribute. The assignment
-the bug needs fails, and that refusal makes sharing one
-object safe.
+because a record rejects assignment to every attribute.
+The bug depends on that assignment,
+so every cell can share one record safely.
 
 </details>
 </details>
@@ -430,8 +432,8 @@ object safe.
 <summary>Where to look</summary>
 
 [Intrinsic and Extrinsic State](../../Chapters/35_Patterns--Flyweight.md#intrinsic-and-extrinsic-state) separates what a piece is (color and kind) from where it stands.
-Share the first through a `@cache` factory keyed on color and kind, and keep the second as the `dict` key.
-A capture or a promotion then puts a different shared `Piece` on a square and leaves every `Piece` object unchanged.
+Share the color and kind through a `@cache` factory keyed on them, and keep the square as the `dict` key.
+A capture or a promotion then puts a different shared `Piece` on a square, and every `Piece` object stays as it was.
 
 <details>
 <summary>The shape</summary>
@@ -559,23 +561,22 @@ print(queen.color, queen.kind)
 
 **Share one piece per color and kind.** `starting_position()` fills thirty-two squares with twelve
 distinct `Piece` objects: two colors times six kinds. Every white pawn
-is the same object, and every other color-and-kind combination
-collapses the same way. The board is a `dict` mapping squares to
+is the same object, and so is every piece of any other color-and-kind
+combination. The board is a `dict` mapping squares to
 references. That mapping keeps the extrinsic position separate from
 the intrinsic color-and-kind that `@cache` shares.
 
-**Capture by replacing a reference.** Capturing leaves every `Piece` object alive. `board[dst] = ...`
-replaces the reference at `dst`, the captured piece, with the moving
-piece's reference. The captured piece's flyweight stays in the cache,
-because it represents "a black knight" in the abstract rather than any
-particular knight on a square. A capture removes a position from the
-board, and the twelve `Piece` objects remain however many captures
-follow.
+**Capture by replacing a reference.** Capturing leaves every `Piece` object alive.
+`board[dst] = ...` replaces the captured piece's reference at `dst` with the moving piece's reference,
+so a capture removes one entry from the board.
+The captured piece's flyweight stays in the cache,
+because it represents "a black knight" in the abstract rather than any particular knight on a square.
+The twelve `Piece` objects therefore remain however many captures follow.
 
-**Promote by switching flyweights.** `promote()` points a square at a different flyweight, because a frozen
-`Piece` cannot change its color or kind. `piece(current.color, kind)`
-looks up (or builds) a different shared `Piece`, and the board points
-at that one instead.
+**Promote by switching flyweights.** A frozen `Piece` keeps its color and kind for life,
+so `promote()` changes what the square refers to.
+`piece(current.color, kind)` looks up (or builds) the shared `Piece` for the new kind,
+and the square now points at that one.
 
 </details>
 </details>
@@ -591,7 +592,9 @@ at that one instead.
 <summary>Where to look</summary>
 
 [A Pool That Does Not Leak](../../Chapters/35_Patterns--Flyweight.md#a-pool-that-does-not-leak) holds its flyweights in a `WeakValueDictionary` behind a factory function.
-Apply that shape to `Color`, and remember that a weak reference needs a `__weakref__` slot, which `weakref_slot=True` adds and `record()` does not forward.
+Apply that shape to `Color`.
+A weak reference needs a `__weakref__` slot, which `weakref_slot=True` adds.
+`record()` forwards `slots=False` alone, so this `Color` needs the `dataclass` call written out.
 To see what the rewrite gives up, compare how callers construct a `Color` here with [Interning in the Constructor](../../Chapters/35_Patterns--Flyweight.md#interning-in-the-constructor).
 
 <details>
@@ -621,8 +624,8 @@ def make_color(red: int, green: int, blue: int) -> Color:
 If you keep `@record` on `Color`,
 the first `make_color()` call raises a `TypeError` at `_pool[key] = found`,
 because the `WeakValueDictionary` cannot create a weak reference to a slotted `Color` with no `__weakref__` slot.
-The solution writes the `dataclass` call out with `weakref_slot=True`,
-which adds that one slot and still no `__dict__`.
+The solution writes the `dataclass` call out with `weakref_slot=True`.
+That option adds the `__weakref__` slot alone, so the class still has no `__dict__`.
 
 ```python
 # exercise_5.py
@@ -670,23 +673,26 @@ function, `make_color()`, and a `WeakValueDictionary` for the pool.
 `__eq__()`, and `__hash__()`, as the record `Color` in
 `interned_color.py` does. Like `weak_pool.py`'s `Name`, this `Color`
 writes the `dataclass` call in full, because a weak reference needs
-`weakref_slot=True`, which `record()` does not forward.
+`weakref_slot=True`, and `record()` forwards `slots=False` alone.
 
-**Empty the pool on release.** Once `del` drops every
-reference to the fifty-shade palette and both crimson names, nothing
-keeps those `Color` objects alive, and the pool empties itself with no
-explicit cleanup.
+**Empty the pool on release.** Once `del` drops the last
+references to the fifty-shade palette and both crimson names, Python
+frees those `Color` objects, and the `WeakValueDictionary` drops their
+entries on its own.
 
-The rewrite gives up the constructor syntax and the guarantee that
-comes with it. `Color(220, 20, 60)` still runs, but it skips the pool and
-builds a second object equal to the pooled one, the same bypass a
-direct `Tile(...)` makes in the chapter. Weak references do not force
-that trade. `__new__()` can look in a `WeakValueDictionary` as easily
-as in a `dict`, as
-[Choosing a *Flyweight* and Its Pool](../../Chapters/35_Patterns--Flyweight.md#choosing-a-flyweight-and-its-pool)
-says. That `Color` keeps its constructor syntax and needs the same
-`@dataclass(frozen=True, slots=True, weakref_slot=True)` line as this
-one.
+The rewrite gives up the constructor syntax, and with it the guarantee
+that every `Color(...)` call returns the pooled object.
+`Color(220, 20, 60)` still runs and
+builds a second object equal to the pooled one.
+A direct `Tile(...)` call makes the same bypass in the chapter.
+
+The factory function, not the weak references, gives up the constructor syntax.
+As [Choosing a *Flyweight* and Its Pool](../../Chapters/35_Patterns--Flyweight.md#choosing-a-flyweight-and-its-pool) says,
+`__new__()` can look in a `WeakValueDictionary` as easily as in a `dict`.
+A `Color` that interns in `__new__()` keeps its constructor syntax
+and needs the same
+`@dataclass(frozen=True, slots=True, weakref_slot=True)` line as
+`exercise_5.py`'s `Color`.
 
 </details>
 </details>
@@ -808,15 +814,14 @@ def test_out_of_range_component_raises() -> None:
         Color(0, -1, 0)
 ```
 
-**Validate before the pool lookup.** The check runs first in `__new__()`, before the pool lookup, so
-`__new__()` raises a `ValueError` for an out-of-range component before
-it can find a pooled instance or build a new one. Every `Color` that
-`__new__()` pools or returns has in-range components.
+**Validate before the pool lookup.** The range check runs first in `__new__()`,
+so `__new__()` raises a `ValueError` for an out-of-range component
+before the lookup can find a pooled instance or build a new one.
+Every `Color` that `__new__()` pools or returns has in-range components.
 
-The check is the same *parse, don't validate* move
 [Data Classes as Types](../../Chapters/12_Techniques--Data_Classes_as_Types.md#parse-dont-validate)
-makes with `__post_init__()`. Here the class validates in `__new__()`
-instead, because interning must intercept construction.
+makes the same *parse, don't validate* move with `__post_init__()`. Here the class validates in `__new__()`
+instead, because `__post_init__()` runs after `__new__()` has pooled the instance.
 
 </details>
 </details>
@@ -898,30 +903,33 @@ expect(ValueError, parse_map, "?")
 #: [ValueError] '?' is not a valid Tile
 ```
 
-**Let the enum hold the pool.** `SPECS`, `tile()` and `to_symbol()` all disappear. The member tuples
+**Let the enum hold the pool.** `SPECS`, `tile()`, and `to_symbol()` all disappear. The member tuples
 are the spec table, and `Tile(s)` is the pool lookup. `Tile(s)` checks
-membership at runtime against the value-to-member table the metaclass
-builds, the check `to_symbol()` does by hand.
+membership at runtime against the value-to-member table that the metaclass
+builds.
+`to_symbol()` makes the same check by hand.
 
-The type checker still catches what the `Literal` version catches
-where the mistake can still occur. A `match` over `Tile` that leaves out a
+The type checker still catches each `Literal`-version mistake that the enum leaves possible.
+A `match` over `Tile` that leaves out a
 member draws the same `invalid-return-type` as a `match` over `Symbol`
-that leaves out a symbol. The enum rules out the drift against which
-the `SPECS` annotation guards, a key that `Symbol` does not list,
-because the enum declares the set once instead of twice.
+that leaves out a symbol.
+The `Literal` version's `SPECS` annotation guards against a key outside `Symbol`.
+The enum makes that mismatch impossible,
+because it declares the set once instead of twice.
 
 The enum adds one check. A misspelled or missing member, such as
 `Tile.DOOR`, is an `unresolved-attribute` error. The `Literal` version
-misses the matching mistake. `@cache` hides `tile()`'s `Symbol`
-parameter from callers, so `tile("+")` passes the type checker and
+accepts the matching mistake, because the wrapper that `@cache` returns
+takes any hashable argument in place of `tile()`'s `Symbol`.
+`tile("+")` passes the type checker and
 fails at runtime with a `KeyError`.
 
 An unknown symbol that arrives as data is a runtime failure in both
 versions. The type checker passes `Tile("?")`, and the call raises a
 `ValueError`.
 
-The enum gives up the moment of failure. `to_symbol()` raises a
-`KeyError` at a named boundary. `Tile("?")` raises a `ValueError`
+The enum gives up a named place to fail. `to_symbol()` raises a
+`KeyError` at a named boundary, while `Tile("?")` raises a `ValueError`
 from deep inside `parse_map()`'s comprehension.
 If the boundary matters, keep a `to_tile()` wrapper that catches the
 `ValueError` and re-raises it with the offending line and column.
@@ -943,7 +951,8 @@ If the boundary matters, keep a `to_tile()` wrapper that catches the
 <details>
 <summary>Where to look</summary>
 
-[Sharing, Not Caching](../../Chapters/35_Patterns--Flyweight.md#sharing-not-caching) says a flyweight's factory exists to guarantee identity, and [Interning in the Constructor](../../Chapters/35_Patterns--Flyweight.md#interning-in-the-constructor) says `@cache` checks the key and stores the result in separate steps.
+[Sharing, Not Caching](../../Chapters/35_Patterns--Flyweight.md#sharing-not-caching) says a flyweight's factory exists to guarantee identity.
+[Interning in the Constructor](../../Chapters/35_Patterns--Flyweight.md#interning-in-the-constructor) says `@cache` checks the key and stores the result in separate steps.
 The `time.sleep()` widens the gap between those steps, so every thread can miss before any thread stores.
 For the fixes, build every `Tile` into a table before starting any thread, and separately wrap the call to `tile()` in a `threading.Lock`.
 
@@ -1080,33 +1089,35 @@ print(len({id(t) for t in gather(locked_tile, "~")}))
 #: 1
 ```
 
-**Expose the cold-key race.** Each thread builds its own `Tile` and keeps it, so `is` fails between
-all four results. `@cache` looks up the key, misses, calls the
-function, and stores the result. No lock spans those steps, so four
-threads that all miss on the same cold key all run the body. The last
-store wins the cache, and every later caller gets that one object,
-while the three losing threads hold objects outside the cache.
+**Expose the cold-key race.** `@cache` looks up the key, misses, calls the
+function, and stores the result, and no lock spans those steps.
+Four threads that miss on the same cold key therefore all run the body.
+Each thread keeps the `Tile` it built, so the four results are four distinct objects.
+Each store overwrites the one before it, so the cache keeps the last thread's `Tile`.
+Every later caller gets that one object,
+while the other three threads hold `Tile` objects that the cache has dropped.
 
-Nothing here is a `@cache` defect. A cache that holds a lock across
-the call serializes every miss in the program, a worse default than
-occasionally building a value twice. For an ordinary memoized
+`@cache` works as designed here. A cache that holds a lock across
+the call serializes every miss in the program.
+Serializing every miss is a worse default than occasionally building a value twice. For an ordinary memoized
 computation, a duplicate build wastes time and leaves the results
 correct.
-For a *Flyweight* the duplicate is a bug, because the pattern exists
+For a *Flyweight*, the duplicate is a bug, because the pattern exists
 to make `tile("^") is tile("^")` hold.
 
-**Fill the pool eagerly.** The eager fix builds every value before any
-thread exists, so every lookup hits, and only a miss can start a race.
-It is the better answer whenever the whole value set fits in one small
-table, the same condition that makes an `Enum` work. The eager lookup
-is one `dict` index, with no lock to take.
+**Fill the pool eagerly.** Only a miss can start a race.
+The eager fix builds every value before any thread exists,
+so every lookup hits,
+and each lookup is one `dict` index, with no lock to take.
+Eager filling is the better answer whenever the whole value set fits in one small table.
+An `Enum` works under the same condition.
 
 **Guard the factory with a lock.** The lock fix handles an unbounded
 value set. Every lookup now serializes, including the hits, which are
 the overwhelming majority once the pool is warm. If that serialization
-matters, lock only on the miss path with a hand-written pool, checking
-the key again inside the lock, since another thread may have filled
-that entry while this one waited.
+matters, write the pool by hand and lock only on the miss path.
+Check the key again inside the lock,
+since another thread may have filled that entry while this one waited.
 
 </details>
 </details>
