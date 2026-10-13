@@ -11,12 +11,8 @@ class DataClassEncoder(json.JSONEncoder):
             return asdict(o)
         return super().default(o)
 
-people = [
-    Person(FullName("Ada Lovelace"),
-           EmailAddress("ada@example.com")),
-    Person(FullName("Alan Turing"),
-           EmailAddress("alan@example.com")),
-]
+people = [Person(FullName("Ada Lovelace"),
+                 EmailAddress("ada@example.com"))]
 print(json.dumps(people, cls=DataClassEncoder, indent=2))
 #: [
 #:   {
@@ -25,14 +21,6 @@ print(json.dumps(people, cls=DataClassEncoder, indent=2))
 #:     },
 #:     "email": {
 #:       "text": "ada@example.com"
-#:     }
-#:   },
-#:   {
-#:     "name": {
-#:       "text": "Alan Turing"
-#:     },
-#:     "email": {
-#:       "text": "alan@example.com"
 #:     }
 #:   }
 #: ]

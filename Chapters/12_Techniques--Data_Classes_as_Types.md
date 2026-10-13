@@ -1407,47 +1407,38 @@ so a class that is not a data class can join by defining it:
 ```python
 # copy_replace_protocol.py
 import copy
-from typing import Final, Literal, Self
-
-type Channel = Literal["red", "green", "blue"]
-SHIFTS: Final[dict[Channel, int]] = {
-    "red": 16, "green": 8, "blue": 0}
-MASK: Final[int] = 0xFF
+from typing import Self
 
 class Color:
     def __init__(self, red: int, green: int,
                  blue: int) -> None:
-        channels: dict[Channel, int] = {
-            "red": red, "green": green, "blue": blue}
-        self.packed = sum(v << SHIFTS[k]
-                          for k, v in channels.items())
-
-    @property
-    def channels(self) -> dict[Channel, int]:
-        return {n: self.packed >> s & MASK
-                for n, s in SHIFTS.items()}
+        self.red = red
+        self.green = green
+        self.blue = blue
 
     def __repr__(self) -> str:
-        channels = map(str, self.channels.values())
-        return f"Color({', '.join(channels)})"
+        return (f"Color({self.red}, {self.green}, "
+                f"{self.blue})")
 
     def __replace__(self, **changes: int) -> Self:
-        return type(self)(**(self.channels | changes))
+        current = {"red": self.red, "green": self.green,
+                   "blue": self.blue}
+        return type(self)(**(current | changes))
 
 teal = Color(0, 128, 128)
-print(teal, hex(teal.packed))
-#: Color(0, 128, 128) 0x8080
+print(teal)
+#: Color(0, 128, 128)
 lighter = copy.replace(teal, red=64)
-print(lighter, hex(lighter.packed))
-#: Color(64, 128, 128) 0x408080
+print(lighter)
+#: Color(64, 128, 128)
 ```
 
-`Color` is an ordinary class with its channels packed into one `int`,
+`Color` is an ordinary class,
 so `dataclasses.replace()` rejects it with a `TypeError`.
 Every implementation takes the same shape: recover the constructor arguments,
 override the named ones, rebuild.
-`__init__()` packs a channel dictionary using `SHIFTS`,
-and `channels` unpacks one with the same table, so the two are inverses.
+Here `current` holds the constructor arguments,
+and `|` overrides the ones that `changes` names.
 Calling `type(self)(...)` rather than `Color(...)` gives a subclass a copy of its own class,
 and the `Self` return annotation tells the type checker so.
 
@@ -1522,12 +1513,8 @@ class DataClassEncoder(json.JSONEncoder):
             return asdict(o)
         return super().default(o)
 
-people = [
-    Person(FullName("Ada Lovelace"),
-           EmailAddress("ada@example.com")),
-    Person(FullName("Alan Turing"),
-           EmailAddress("alan@example.com")),
-]
+people = [Person(FullName("Ada Lovelace"),
+                 EmailAddress("ada@example.com"))]
 print(json.dumps(people, cls=DataClassEncoder, indent=2))
 #: [
 #:   {
@@ -1536,14 +1523,6 @@ print(json.dumps(people, cls=DataClassEncoder, indent=2))
 #:     },
 #:     "email": {
 #:       "text": "ada@example.com"
-#:     }
-#:   },
-#:   {
-#:     "name": {
-#:       "text": "Alan Turing"
-#:     },
-#:     "email": {
-#:       "text": "alan@example.com"
 #:     }
 #:   }
 #: ]
