@@ -20,9 +20,8 @@ Check which of `b` and `c` names the same list as `a` before you explain the dif
 If you write `c = a` instead of `c = a[:]`, the program prints
 `[1, 2, 3, 4, 99] [1, 2, 3, 4, 99]`: `c` is a third name for the
 one list, so appending to it changes what `a` sees, the same way
-`b.append(4)` did. The solution slices, because a slice builds a
-new list, and that is the one line on which the exercise's check
-turns.
+`b.append(4)` did. The solution keeps the slice, which builds a new
+list, and the exercise's check depends on that one line.
 
 ```python
 # exercise_1.py
@@ -130,7 +129,7 @@ and its value, so a quick debugging print needs no separate
 
 [Naming Conventions](../../Chapters/02_Foundations--Tour.md#naming-conventions) says what each casing form tells a reader.
 Rename the variables in both styles and run each version to confirm the interpreter accepts every form.
-Then run `ruff check` on the camelCase file and see which rule code it reports.
+Then run `ruff check` on the camelCase file inside the book's repository, which turns on ruff's naming rules, and see which rule code it reports.
 
 <details>
 <summary>Solution</summary>
@@ -169,9 +168,11 @@ the linter objects, so the name misleads every reader who trusts it.
 `totalSum` and `flagBits` say nothing about the value. They say the
 author came from Java or JavaScript.
 
-The camelCase form is the one a linter flags. Ruff's PEP 8 checks
-report `N816` for a mixed-case global. The uppercase form passes the
-linter and still breaks
+The camelCase form is the one a linter flags. Ruff's pep8-naming
+rules report `N816` for a mixed-case global. Ruff leaves those rules
+off by default, and this book's `pyproject.toml` turns them on with
+the `N` in its `select` list. The uppercase form passes the linter
+and still breaks
 [Naming Conventions](../../Chapters/02_Foundations--Tour.md#naming-conventions),
 which reserves uppercase for constants. CapWords stays reserved for class names.
 

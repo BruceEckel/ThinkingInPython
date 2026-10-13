@@ -13,8 +13,7 @@ Find supplementary information in [the official language documentation](https://
 ## Scripting vs. Programming
 
 Python exists to improve your productivity.
-The language aims to aid you as much as possible.
-It tries to hinder you as little as possible.
+The language aims to aid you as much as possible and to hinder you as little as possible.
 
 People often call Python a scripting language,
 but scripting languages tend to limit you,
@@ -93,7 +92,7 @@ so `# type: ignore` tells it the mistake is deliberate.
 The [`try` and `except`](04_Foundations--Control_Flow.md#errors-and-exceptions)
 catch the exception so the script can print the exception's message and finish.
 
-Indenting can nest as deeply as you like.
+Blocks can nest, each one indented further than the block that contains it.
 Four spaces per level is the convention,
 and mixing tabs and spaces inconsistently inside one block raises a `TabError`.
 
@@ -221,13 +220,17 @@ print(True + True, True == 1)  # A bool is an int
 `round()` breaks a tie to the nearest even value,
 so `round(0.5)` is `0` and both `round(1.5)` and `round(2.5)` are `2`,
 rather than rounding half away from zero as C's `round()` does.
-An f-string's format spec rounds the same way.
+The format spec of an [f-string](#f-strings), later in this chapter,
+rounds ties the same way.
 
 A `bool` is a subtype of `int`, so `True` equals `1` and `False` equals `0`,
 and `True + True` is `2`.
 
 Python has no `++` or `--`.
 Use `+= 1` and `-= 1`.
+The prefix form still parses, which makes it a trap:
+`++count` applies unary plus twice and leaves `count` unchanged.
+The postfix `count++` is a syntax error.
 Each arithmetic operator has an augmented-assignment form: `+=`, `-=`, `*=`,
 `/=`, `//=`, `%=`, and `**=`.
 
@@ -352,6 +355,13 @@ so the empty string shows as `''` and not as blank.
 Its `count: int` and `-> int` are [type hints](08_Foundations--Static_Types.md#type-hints).
 They state the types for the reader and the type checker and change nothing about how the code runs.
 
+Python's logical operators are the words `and`, `or`, and `not`,
+where C and Java write `&&`, `||`, and `!`.
+The bitwise `&` and `|` from `bitwise.py` also accept `bool` values,
+but they bind more tightly than a comparison,
+so `x > 0 & y > 0` means `x > (0 & y) > 0`.
+
+`not` always produces a `bool`.
 `and` and `or` short-circuit and return one of their operands,
 not a coerced boolean:
 
@@ -422,10 +432,13 @@ Python's name comes not from the snake but from the Monty Python comedy troupe,
 of which the language creator Guido van Rossum is a fan.
 Examples often include Python-esque references.
 
-The triple-quote syntax quotes everything, including newlines.
+A triple-quoted string can span lines, and it keeps every newline it contains.
 That suits any block of literal text, such as an embedded template, a SQL query,
 or a chunk of HTML.
 You can write it out in full without escaping line breaks.
+
+The newline right after the opening quotes and the one before the closing quotes belong to the string too.
+So each triple-quoted output in `strings.py` begins and ends with an empty `#:` line.
 
 In an ordinary string, a backslash starts an escape sequence, as in C and Java.
 `\n` is a newline and `\t` is a tab.
@@ -433,9 +446,8 @@ The `r` right before a string means "raw":
 Python takes each backslash literally, as a single character.
 Without the `r`, the last literal in `strings.py` is a syntax error.
 `\u` starts a Unicode escape, and `tils` is not the four hex digits it requires.
-One limit remains.
-A raw string cannot end with a single backslash,
-because a raw string's backslash still escapes the closing quote.
+A raw string has one limit: it cannot end with a single backslash,
+because a backslash in a raw string still keeps the quote after it from closing the string.
 
 ### Common String Operations
 
@@ -533,7 +545,7 @@ With no format spec the value appears as its `repr()`,
 so the output shows `'Alice'` in quotes.
 Use `=` to label values in your own exploring and debugging code.
 
-Existing code also carries two older styles: C's `printf()` syntax,
+Existing code also carries two older styles: the `%` operator,
 as in `"val: %d" % val`, and the `str.format()` method,
 as in `"val: {}".format(val)`.
 Both still work.
@@ -605,13 +617,21 @@ except ValueError as e:
 #: unsafe value: "Bob'; rm -rf /"
 ```
 
+A `Template` stores its two kinds of piece separately.
+`message.strings` holds the literal text,
+with one entry more than `message.interpolations`,
+so a template that opens with a value opens with an empty string,
+which prints as `''`.
+`message.interpolations` holds one `Interpolation` per value.
+Each `Interpolation` keeps the value,
+the source text of the expression that produced it, and its format spec,
+and the loop prints those three attributes: `expression`, `value`,
+and `format_spec`.
+
 Iterating over a `Template` produces the pieces in order,
-each either a `str` the author typed or an `Interpolation` carrying a value.
-An `Interpolation` also keeps its format spec and the source text of the expression that produced it.
-The loop over `message.interpolations` prints the three parts of each one:
-`expression`, `value`, and `format_spec`.
+each either a `str` the author typed or an `Interpolation`.
 Iteration skips empty literal strings,
-so the leading `''` in `message.strings` does not reach a loop over the template.
+so the leading `''` does not reach a loop over the template.
 That skipping is why a consumer cannot assume that literals and interpolations alternate:
 two interpolations side by side, as in `t"{first}{last}"`,
 arrive as two `Interpolation`s in a row.
@@ -619,10 +639,13 @@ arrive as two `Interpolation`s in a row.
 `shout()` uppercases the literal text and leaves the interpolated values in their original case.
 No amount of work on a finished f-string could do that reliably,
 because the finished string no longer says which characters came from where.
-`safe()` puts that separation to work.
-It passes the literal text through unchanged,
-and it rejects an interpolated value that contains a single quote,
-the way `trouble` does above.
+`shout()` turns each value into text with the built-in `format()` and the format spec the `Interpolation` carries,
+so `score` still prints as `92`.
+
+`safe()` puts the same separation to work.
+It passes the literal text through unchanged and raises a `ValueError` for an interpolated value that contains a single quote.
+`trouble` holds one,
+so `safe(t"Hello, {trouble}")` raises the exception before any result exists.
 An f-string finishes assembling the result, quote and all,
 before any code can object.
 Uppercasing and rejecting are small demonstrations.
