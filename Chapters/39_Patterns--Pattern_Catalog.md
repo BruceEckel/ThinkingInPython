@@ -15,14 +15,14 @@ and the common distributed and cloud patterns that emerged later.
 Listing a pattern here does not recommend it.
 Many overlap, some solve the same problem in different ways,
 and several exist only to work around limits of a particular language.
+The body of this book argues that those workarounds often [dissolve in Python](21_Patterns--Design_Patterns.md#when-a-pattern-dissolves).
+
 [*State*](26_Patterns--Surrogate.md#state)
 and [*State Machine*](31_Patterns--State_Machines.md) are one overlapping pair.
-*State* changes an object's behavior when its internal state changes.
-*State Machine* drives an object through a known set of states in response to inputs.
-*State Machine* builds on *State*.
-The machine chooses each successor,
-so the object advances without the client choosing.
-The body of this book argues that several of the patterns written around a language's limits [dissolve in Python](21_Patterns--Design_Patterns.md#when-a-pattern-dissolves).
+*State* changes an object's behavior when its internal state changes,
+and the client chooses each new state.
+*State Machine* builds on *State* and drives an object through a known set of states in response to inputs.
+The client supplies the inputs, and the machine chooses each next state.
 
 The tables follow each source's own grouping,
 so each name sits where its source puts it.
@@ -30,9 +30,10 @@ One of those groupings is GoF's [*Creational*/*Structural*/*Behavioral* split](2
 which [Design Patterns](21_Patterns--Design_Patterns.md)
 accepts for *Creational* and questions for *Structural* and *Behavioral*.
 A few idioms below belong to no single source and sit instead in three groups by what they share:
-language idioms, most of them tied to C++ or Java's limits, functional idioms,
+language idioms (most of them tied to C++ or Java's limits), functional idioms,
 and the patterns that supply a collaborator from outside.
-Everything else sits in Other Patterns and Idioms, whose rows share no trait.
+Everything else sits in [Other Patterns and Idioms](#other-patterns-and-idioms),
+whose rows share no trait.
 The source and group tables list their rows alphabetically,
 and for the classic patterns that is also GoF's own order.
 
@@ -53,17 +54,19 @@ so use this section's table when you know the problem but not the name.
 | Simplifying access to a subsystem | *Façade* |
 | Proxying a service's calls from a helper process | *Ambassador*, *Sidecar* |
 | Swapping an algorithm at runtime | *Strategy* |
+| Varying some steps of an algorithm while its outline stays the same | *Template Method* |
 | Encapsulating a request as an object | *Command* |
 | Passing a request along a chain until something handles it | *Chain of Responsibility* |
 | Changing behavior when an object's internal state changes | *State* |
 | Driving an object through a known set of states | *State Machine* |
 | Adding an operation without changing the classes it visits | *Visitor* |
 | Resolving behavior from the runtime types of two objects | *Double Dispatch* |
+| Stepping through a collection's elements in order | *Iterator* |
 | Structuring recursive or tree-shaped data | *Composite*, *Interpreter*, *Visitor* |
 | Keeping the number of objects down | *Flyweight*, *Multiton*, *Object Pool*, *Singleton* |
 | Saving and restoring state | *Memento*, *Event Sourcing* |
 | Reacting to change | *Observer*, *Publish-Subscribe Channel*, *Model-View-Controller* |
-| Coordinating concurrent work | *Thread Pool*, *Producer-Consumer*, *Future/Promise*, *Active Object*, *Reactor* |
+| Coordinating concurrent work | *Thread Pool*, *Producer-Consumer*, *Future/Promise*, *Structured Concurrency*, *Active Object*, *Reactor* |
 | Keeping a program running when a dependency fails | *Circuit Breaker*, *Retry*, *Bulkhead*, *Timeout*, *Dead Letter Channel* |
 | Returning several named values from one call | *Messenger*, *Data Transfer Object* |
 | Moving data across a boundary | *Data Transfer Object*, *Message Translator*, *Gateway*, *Data Mapper* |
@@ -123,7 +126,7 @@ so use this section's table when you know the problem but not the name.
 | *Guarded Suspension* | Block a call until a precondition becomes true. |
 | *Half-Sync/Half-Async* | Separate synchronous and asynchronous work, joined by a queue. |
 | *Leader/Followers* | Let a pool of threads take turns receiving and handling events. |
-| *Monitor Object* | Serialize access so only one method runs on an object at a time. |
+| *Monitor Object* | Serialize access so one method at a time runs on an object. |
 | *Proactor* | Dispatch the completion of asynchronous operations to handlers. |
 | [*Producer-Consumer*](19_Techniques--Concurrency.md#coordinating-threads-with-queues) | Decouple work creation from processing through a shared queue. |
 | *Reactor* | Dispatch incoming requests to handlers synchronously as they arrive. |
@@ -134,12 +137,17 @@ so use this section's table when you know the problem but not the name.
 
 *Reactor* is a name that hides its job.
 The pattern is a dispatcher.
-One loop waits on many event sources and hands each event to the handler registered for it,
-and the original description of *Reactor* lists *Dispatcher* as another name for it.
+One loop waits on many event sources and hands each event to the handler registered for it.
+The original description of *Reactor* lists *Dispatcher* as another name for the pattern.
 "Reactor" survives because the literature and the libraries use it.
 Both asyncio's `SelectorEventLoop` and Twisted's `reactor` implement *Reactor*.
-*Proactor* follows the same naming, and asyncio's `ProactorEventLoop`,
-the default on Windows, is one.
+
+*Proactor* is the counterpart of *Reactor* for completed operations.
+A *Reactor* calls a handler when a source is ready,
+and the handler then performs the read or write.
+A *Proactor* starts the read or write and calls the handler once the operation has finished.
+On Windows, asyncio's default event loop is a *Proactor*, `ProactorEventLoop`,
+built on the operating system's I/O completion ports.
 
 ## Architectural (POSA)
 
@@ -199,7 +207,7 @@ the default on Windows, is one.
 |---------|--------|
 | *Ambassador* | Route a service's outbound calls through a helper. |
 | *API Gateway* | Offer one entry point in front of many services. |
-| *Bulkhead* | Isolate resources so one failure does not stop the whole system. |
+| *Bulkhead* | Isolate resources so one failure leaves the rest of the system running. |
 | *Circuit Breaker* | Stop calling a failing service until it recovers. |
 | *Command Query Responsibility Segregation* (CQRS) | Separate the read model from the write model. |
 | *Event Sourcing* | Store state as a log of events instead of current values. |
@@ -218,7 +226,7 @@ the default on Windows, is one.
 | *Marker Interface* | Tag a class with an empty interface to signal a capability. |
 | *Mixin* | Add reusable behavior through multiple inheritance. |
 | *Pointer to Implementation* (Pimpl) | Store a class's implementation in a separate object reached through a pointer, so changing the implementation does not force clients to recompile. |
-| [*Resource Acquisition Is Initialization* (RAII)](15_Techniques--Context_Managers.md) | Acquire a resource in a constructor and release it in the destructor. |
+| [*Resource Acquisition Is Initialization* (RAII)](15_Techniques--Context_Managers.md) | Acquire a resource in a constructor and release it in the matching destructor. |
 
 ## Functional Idioms
 
@@ -273,5 +281,7 @@ Python includes the piece their inventors set out to supply.
 | [*Visitor*](33_Patterns--Visitor.md#the-pythonic-visitor-singledispatch) | `functools.singledispatch`, or a `match` over a union of types |
 | [*Flyweight*](35_Patterns--Flyweight.md#python-uses-flyweights) | Interned strings and cached small integers |
 
-Subtracting Python's share leaves the intent, not the structure.
-Each link leads to the section that subtracts Python's share from its pattern.
+Python supplies each pattern's structure, and the pattern's intent remains.
+You still choose which algorithm to pass, which action to save for later,
+or which values to share.
+Each link leads to the section that shows the Python form of its pattern.
