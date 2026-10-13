@@ -90,6 +90,20 @@ def test_shape_is_none_for_unparseable_code() -> None:
     assert shape(["# a.py", "def (:"]) is None
 
 
+def test_a_long_string_constant_is_elided_to_its_name() -> None:
+    quote = '"""'
+    listing = ["# a.py", "from typing import Final", "",
+               "MAZE: Final[str] = " + quote, "###", "#_#", "#.#", "###",
+               quote + ".strip()",
+               "SHORT: Final[str] = " + quote, "ab", quote,
+               "def f() -> None:", "    return None"]
+    out = shape(listing) or []
+    assert "MAZE: Final[str] = ..." in out
+    assert "###" not in out
+    assert "SHORT: Final[str] = " + quote in out
+    assert out[-2:] == ["def f() -> None:", "    ..."]
+
+
 def test_a_one_line_body_too_wide_for_the_ellipsis_breaks() -> None:
     sig = "def a_function_with_a_much_longer_name(args: int) -> int:"
     assert len(sig) + len(" ...") > 60

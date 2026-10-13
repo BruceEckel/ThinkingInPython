@@ -60,6 +60,10 @@ is reduced to its declarations: imports, `type` aliases, constants
 (an assignment whose target is written in capitals), classes, and
 functions, with every function body replaced by `...` and every other
 top-level statement, the demonstration and its `#:` markers, dropped.
+A constant whose value is a string literal spanning more than
+`LONG_LITERAL` lines, a maze layout or a data table, keeps its name
+and annotation and has the literal replaced by `...`, so a shape
+block shows what the module declares and not the data it carries.
 A docstring stays. A listing with no body to elide gives no shape
 block, and an exercise whose listings give none has no "The shape"
 step. The shape block's first line is `# The shape of <path>`, which
@@ -108,6 +112,8 @@ LABELS = (WHERE, SHAPE, SOLUTION)
 HINT_PREFIX = "Hint:"
 SHAPE_PREFIX = "# The shape of "
 MAX_WIDTH = 60
+LONG_LITERAL = 3
+"""A constant's string literal longer than this many lines is elided."""
 
 OPEN = "<details>"
 CLOSE = "</details>"
@@ -171,15 +177,47 @@ def _elide(lines: list[str], node: ast.FunctionDef | ast.AsyncFunctionDef,
     return True
 
 
+def _elide_literal(lines: list[str], node: ast.Assign | ast.AnnAssign,
+                   edits: list[tuple[int, int, list[str]]]) -> None:
+    """Queue the edit that replaces a long string literal with `...`.
+
+    A constant's value that is a string spanning more than
+    `LONG_LITERAL` lines, bare or with a method call on it such as
+    `.strip()`, is data, not shape; the line that opens it keeps
+    everything before the literal and ends in `...`.
+    """
+    value = node.value
+    if value is None:
+        return
+    literal = value
+    if isinstance(value, ast.Call) and isinstance(value.func, ast.Attribute):
+        literal = value.func.value  # `"""...""".strip()`
+    if not (isinstance(literal, ast.Constant)
+            and isinstance(literal.value, str)):
+        return
+    start = value.lineno - 1
+    stop = value.end_lineno or value.lineno
+    if stop - start <= LONG_LITERAL:
+        return
+    head = lines[start][:value.col_offset]
+    edits.append((start, stop, [head + "..."]))
+
+
 def _collect(nodes: list[ast.stmt], lines: list[str],
              edits: list[tuple[int, int, list[str]]]) -> bool:
-    """Queue the body edits under `nodes`; True if any body was elided."""
+    """Queue the body edits under `nodes`; True if any body was elided.
+
+    A long string literal in a constant is elided too, but a listing
+    with only that to elide still has no body, and gets no shape.
+    """
     elided = False
     for node in nodes:
         if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
             elided = _elide(lines, node, edits) or elided
         elif isinstance(node, ast.ClassDef):
             elided = _collect(node.body, lines, edits) or elided
+        elif isinstance(node, (ast.Assign, ast.AnnAssign)):
+            _elide_literal(lines, node, edits)
     return elided
 
 
