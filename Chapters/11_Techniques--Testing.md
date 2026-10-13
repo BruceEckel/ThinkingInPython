@@ -157,7 +157,6 @@ def test_deposit_increases_balance() -> None:
     account.deposit(100)
     assert account.balance == 100
 
-# Make three tests, replacing "bad" with each list value
 @pytest.mark.parametrize("bad", [0, -1, -100])
 def test_nonpositive_deposit_raises(bad: float) -> None:
     with pytest.raises(ValueError):
@@ -182,9 +181,11 @@ def test_interest_adds_to_balance(funded: Account) -> None:
     assert funded.balance == pytest.approx(105.0)
 ```
 
-This file previews two features that get their own sections later in this chapter:
-the `parametrize`[^parametrize] mark runs one test over several inputs,
-and the `funded` fixture builds a prepared account for each test that names it as a parameter.
+This file previews two features that get their own sections later in this chapter.
+The `parametrize`[^parametrize] mark runs one test over several inputs:
+`test_nonpositive_deposit_raises()` becomes three tests, with `bad` set to `0`,
+`-1`, and `-100` in turn.
+The `funded` fixture builds a prepared account for each test that names it as a parameter.
 The `@` lines apply [decorators](14_Techniques--Decorators.md).
 Here they mark the functions for `pytest`.
 
