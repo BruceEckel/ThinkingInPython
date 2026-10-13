@@ -11,9 +11,10 @@
 <details>
 <summary>Where to look</summary>
 
-[Let a Dictionary Do the Sorting](../../Chapters/37_Patterns--Pattern_Refactoring.md#let-a-dictionary-do-the-sorting) shows the loop keying each bin on `type(piece)`, and [The First Cut: Checking Every Type](../../Chapters/37_Patterns--Pattern_Refactoring.md#the-first-cut-checking-every-type) shows a `match` with no case for a new material.
-A subclass of `Trash` registers itself when its `class` statement runs, so compare what each script does with a key it has not seen.
-For the failing test, read what `test_trash.py` pins about the registry.
+[Let a Dictionary Do the Sorting](../../Chapters/37_Patterns--Pattern_Refactoring.md#let-a-dictionary-do-the-sorting) shows the loop keying each bin on `type(piece)`.
+[The First Cut: Checking Every Type](../../Chapters/37_Patterns--Pattern_Refactoring.md#the-first-cut-checking-every-type) shows a `match` with no case for a new material.
+A subclass of `Trash` registers itself when its `class` statement runs, so compare what each script does with a new key.
+For the failing test, read what `test_trash.py` asserts about the registry.
 
 <details>
 <summary>The shape</summary>
@@ -96,34 +97,37 @@ for kind, group in bins.items():
 
 **Register the new material.** The `Plastic` class is the only new Python code.
 `__init_subclass__()` registers it in `Trash.registry` the moment the
-`class` statement runs, so `Trash.create("Plastic", weight)` works
-with no further wiring.
+`class` statement runs, so `Trash.create("Plastic", weight)` finds
+the class with no further code.
 
 **Bin each piece by its class.** `recycle_dict.py`'s sorting loop needs no
 change because `bins[type(piece)].append(piece)` keys on the class of each
-piece. `Plastic` is a key the dictionary has not seen, and
-`defaultdict` creates its bin the way it creates every other. The one
-edit to `recycle_dict.py` is the filename, since the script hardcodes
+piece. `Plastic` is a new key for the dictionary, and
+`defaultdict` creates its bin the way it creates every other.
+
+The one edit to `recycle_dict.py` is the filename, since the script hardcodes
 `parse("trash.dat")`. `parse_trash.py` needs no change because it
 calls `Trash.create(name, weight)` with a name read from the file and
-names no material. One optional step remains. `Plastic` gets a
-`@recycling_note.register` function if it needs special handling.
+names no material. One step is optional.
+If `Plastic` needs special handling, it gets a
+`@recycling_note.register` function.
 
 `plastic_dropped.py` parses four pieces and bins two. Its `match` has
-no `case` for `Plastic` and no `case _`, so the twenty-pound and
-forty-pound pieces fall through and the loop moves on. Sixty pounds
+no `case` for `Plastic` and no `case _`.
+The twenty-pound and forty-pound pieces fall through it,
+and the loop moves on to the next piece. Sixty pounds
 at 0.15 a pound is the `Plastic: 9.00` that
-`recycle_dict_plastic.py` prints and `plastic_dropped.py` omits. The
-report shows no sign of the loss. The two totals it prints are correct
+`recycle_dict_plastic.py` prints and `plastic_dropped.py` omits.
+`plastic_dropped.py`'s report looks complete, and the two totals it prints are correct
 for the pieces they cover.
 
-`test_subclasses_self_register` fails, because it pins the registry to
+`test_subclasses_self_register` fails, because it asserts that the registry's keys are
 exactly `{"Aluminum", "Paper", "Glass", "Cardboard"}` and `Plastic` is
 now a fifth entry. That failure is correct. The test exists to prove
 that defining a subclass registers it, so a new material changes the
 set the assertion compares. If the test still passed,
 `__init_subclass__()` would have stopped registering subclasses. Once
-you update the expected set, the test guards registration again.
+you update the expected set, the test checks registration again.
 
 </details>
 </details>
@@ -228,8 +232,8 @@ print(type(h).__name__, h.weight)
 Neither `price()` nor `heaviest()` needs `singledispatch`. `price()`
 reads `t.weight` and `t.value`, and `heaviest()` reads `t.weight`
 alone. Every `Trash` subclass carries both attributes, so the same
-code runs for `Aluminum`, `Plastic`, or any future material. Both are
-in `sum_value()`'s situation.
+code runs for `Aluminum`, `Plastic`, or any future material.
+Like `sum_value()`, each one is a single function that handles every material.
 
 `singledispatch` is for behavior that differs by type, such as
 `recycling_note()` giving `Aluminum` and `Glass` their own wording.
@@ -249,8 +253,8 @@ in the numbers each type carries, write an ordinary function.
 <summary>Where to look</summary>
 
 [One `singledispatch` Function per Operation](../../Chapters/37_Patterns--Pattern_Refactoring.md#one-singledispatch-function-per-operation) shows `recycling_note()` as a registered function.
-Move it into a `Sorter` class with `functools.singledispatchmethod`, and register each overload with the base method's `register` decorator.
-Dispatch still keys on the first argument after `self`, so consider what the class now provides that the function lacks.
+Move `recycling_note()` into a `Sorter` class with `functools.singledispatchmethod`, and register each overload with the base method's `register` decorator.
+Dispatch still keys on the first argument after `self`, so consider what else the class now provides.
 
 <details>
 <summary>The shape</summary>
@@ -309,9 +313,9 @@ class Sorter:
 If you decorate the `Sorter` methods with `@singledispatch` instead of `@singledispatchmethod`,
 the loop prints "no special handling" for all five materials, `Aluminum` included,
 and the type checker reports nothing.
-`singledispatch` dispatches on the first argument, which in a method call is the `Sorter` instance,
-and the registry holds no implementation for `Sorter`, so the base method answers every call.
-`singledispatchmethod` skips `self` and dispatches on the piece of trash.
+`singledispatch` dispatches on the first argument, which in a method call is the `Sorter` instance.
+The one registration that matches a `Sorter` is the base method's, so the base method handles every call.
+`singledispatchmethod` dispatches on the argument after `self`, the piece of trash.
 
 ```python
 # exercise_3.py
@@ -375,20 +379,21 @@ for cls in Trash.registry.values():
 function version. `singledispatchmethod` routes on the type of the
 first argument after `self`.
 
-**Move the operation onto an object.** What changes is where the operation lives. `recycling_note()`
+**Move the operation onto an object.** What changes is where you define the operation. `recycling_note()`
 is now a method you call as `sorter.recycling_note(t)`.
 
-The method form matters if `Sorter` holds state of its own (a log of
-notes issued, a configuration, statistics) alongside the dispatch.
-When `Sorter` carries no such state, as here, the function in
+The method form matters if `Sorter` holds state of its own alongside the dispatch:
+a log of notes issued, a configuration, statistics.
+When `Sorter` holds only the dispatch, as here, the function in
 `recycling_note.py`
 is simpler and does the same job. Use `singledispatchmethod` once the
-operation needs a home on an object.
+operation needs to read or update an object's state.
 
-The method form also brings the trap that *Multiple Dispatching*
+The method form also brings the trap that
+[*Multiple Dispatching*](../../Chapters/32_Patterns--Multiple_Dispatching.md#the-singledispatchmethod-trap)
 describes. A subclass of `Sorter` shares this one dispatcher, so a
-registration made through the subclass changes `Sorter`'s answers
-too.
+registration made through the subclass changes what `Sorter`'s
+method returns too.
 
 </details>
 </details>
@@ -455,7 +460,7 @@ If you set `cls.bin = cls` in `__init_subclass__()` without checking `cls.__dict
 the shared sort still prints three bins, `['Aluminum', 'CrushedAluminum', 'Glass']`.
 `__init_subclass__()` runs after the class body,
 so the assignment overwrites the `bin = Aluminum` that `CrushedAluminum` declares.
-The `"bin" not in cls.__dict__` test fills in the default only for a class that declares no `bin` of its own.
+The `"bin" not in cls.__dict__` test leaves a declared `bin` in place and fills in the default for every other class.
 
 ```python
 # exercise_4.py
@@ -516,21 +521,22 @@ print(sorted(k.__name__ for k in shared))
 probe on the exact class, so `CrushedAluminum` is a new key and gets a
 bin of its own.
 
-**Resolve the note through the MRO.** `singledispatch` resolves through the MRO instead, finds no
-registration for `CrushedAluminum`, and takes `Aluminum`'s.
+**Resolve the note through the MRO.** `singledispatch` resolves through the MRO instead.
+It walks from `CrushedAluminum` to `Aluminum` and uses `Aluminum`'s registration.
 
 Both behaviors are deliberate, and neither is a fallback. The sorter must
-know the exact class that arrived, and the note takes the nearest
-answer anyone has written.
+know the exact class that arrived, and the note uses the nearest
+registration along the MRO.
 
 **Give each class a default bin.** To share a parent's bin without naming a material in the loop, choose
 your own key instead of accepting `type(t)`. A `bin` class variable
 supplies that key. `__init_subclass__()` defaults each class to
-itself, so a material that sets no `bin` keeps a bin of its own.
+itself, so by default every material keeps a bin of its own.
 
-**Let a subclass share its parent's bin.** `CrushedAluminum` opts in by setting `bin` to `Aluminum`, and it
-restates the `ClassVar` annotation for the reason the chapter's
+**Let a subclass share its parent's bin.** `CrushedAluminum` opts in by setting `bin` to `Aluminum`.
+It restates the `ClassVar` annotation the way the chapter's
 subclasses restate `value`'s.
+The type checker treats that restatement as optional.
 
 **Sort by the declared key.** The sorting loop becomes
 `shared[t.bin].append(t)` and still names no material.
@@ -558,7 +564,7 @@ out.
 
 [One `singledispatch` Function per Operation](../../Chapters/37_Patterns--Pattern_Refactoring.md#one-singledispatch-function-per-operation) builds `hazard()` with a base function that answers for any unregistered type.
 For `strict_hazard()`, make the base function raise `NotImplementedError` with a message naming the type, then register each material whose hazard you know, including those whose answer is `"none"`.
-Decide by comparing what goes wrong with a silent default and with a stopped program when you forget a registration.
+When you forget a registration, compare what goes wrong with a silent default and with a stopped program.
 
 <details>
 <summary>The shape</summary>
@@ -609,13 +615,13 @@ def _(t: Paper) -> str:
 <summary>Solution</summary>
 
 If you register `Aluminum` for `strict_hazard()` and skip `Paper`,
-whose answer is `"none"`, `strict_hazard(Paper(1.0))` raises a
-`NotImplementedError` reading `no hazard rule for Paper`,
-and the program stops before it reaches the plastic.
-The strict base function refuses every unregistered type,
-harmless ones included.
-The solution registers `Paper` with its `"none"` answer, which
-answers the exercise's last question.
+`strict_hazard(Paper(1.0))` raises a
+`NotImplementedError` reading `no hazard rule for Paper`.
+The program stops before it reaches the plastic.
+The strict base function raises an exception for every unregistered type,
+including a harmless one like `Paper`, whose answer is `"none"`.
+The solution registers `Paper` to return `"none"`,
+and that registration settles the exercise's last question.
 
 ```python
 # exercise_5.py
@@ -668,7 +674,7 @@ expect(NotImplementedError, strict_hazard, Plastic(1.0))
 #: [NotImplementedError] no hazard rule for Plastic
 ```
 
-**Fall back to a default answer.** `hazard()` answers `"none"` for the plastic. That answer is wrong and
+**Fall back to a default answer.** `hazard()` returns `"none"` for the plastic. That answer is wrong and
 looks like every correct `"none"` beside it. The forgotten registration
 produces no exception and no report from the type checker.
 
@@ -677,8 +683,8 @@ material at the first call.
 
 **Register every material.** The strict form requires one registration
 for every material, including each one whose answer is `"none"`.
-`Paper` needs three lines to say what `hazard()`'s base function
-answers without a registration.
+`Paper` needs three lines to return the `"none"` that `hazard()`
+gets from its base function.
 
 Choose by which mistake does more harm. A
 default is right when it is a true answer for most types and a
