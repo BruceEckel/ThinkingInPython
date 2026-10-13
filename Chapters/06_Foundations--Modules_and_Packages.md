@@ -18,8 +18,8 @@ def useful_function():
 # use_module.py
 import module
 
-print("'module' imported")
-#: 'module' imported
+print("use_module body runs")
+#: use_module body runs
 
 if __name__ == "__main__":
     print(module.useful_function())
@@ -58,7 +58,7 @@ The next program consists of one statement, `import use_module`:
 ```python
 # import_module.py
 import use_module
-#: 'module' imported
+#: use_module body runs
 ```
 
 Importing `use_module` runs its top-level code, including the `print()`,
@@ -71,7 +71,7 @@ import sys
 import use_module
 import use_module as second
 
-#: 'module' imported
+#: use_module body runs
 print(use_module is second)
 #: True
 print(sys.modules["use_module"] is use_module)
@@ -123,8 +123,8 @@ import app_settings
 from app_settings import debug
 
 app_settings.debug = True
-print(debug, app_settings.debug)
-#: False True
+print(f"{debug=} {app_settings.debug=}")
+#: debug=False app_settings.debug=True
 app_settings.show()
 #: app_settings.debug is True
 ```
@@ -237,19 +237,21 @@ import a_package.module2
 #: initializing a_package
 #: importing module1 in a_package
 #: importing module2 in a_package
-print("a_package" in dir(), "module1" in dir())
-#: True False
+print(sorted(n for n in dir() if not n.startswith("__")))
+#: ['a_package']
 print(a_package.module1.function1())
 #: function1 in module1 in a_package
 print(a_package.module2.function2())
 #: function2 in module2 in a_package
 ```
 
-`import a_package.module1` binds only the name `a_package` in this file.
+`dir()` with no argument returns the names bound at the top of this file,
+and the filter drops the dunder names every module carries.
+The list shows that `import a_package.module1` binds the one name `a_package` in this file.
 Loading `module1` also stores that submodule as an attribute of `a_package`,
 so `a_package.module1.function1()` resolves.
 The shorter `module1.function1()` fails here,
-since nothing binds `module1` in this file.
+since `module1` is missing from the list.
 `module1.function1()` works in `from_packages.py`, below,
 where `from` binds `module1` in that file.
 
@@ -277,6 +279,8 @@ from a_package import module1, module2
 #: initializing a_package
 #: importing module1 in a_package
 #: importing module2 in a_package
+print(sorted(n for n in dir() if not n.startswith("__")))
+#: ['module1', 'module2']
 print(module1.function1())
 #: function1 in module1 in a_package
 print(module2.function2())
@@ -295,6 +299,8 @@ from a_package.module2 import function2
 #: initializing a_package
 #: importing module1 in a_package
 #: importing module2 in a_package
+print(sorted(n for n in dir() if not n.startswith("__")))
+#: ['function1', 'function2']
 print(function1())
 #: function1 in module1 in a_package
 print(function2())
@@ -305,7 +311,8 @@ print(function2())
 and `using_packages.py` print the same loading messages,
 because `from` loads what `import` loads.
 The whole module runs either way.
-The statement decides which names this file binds.
+The statement decides which names this file binds,
+so the `dir()` list differs in each of the three listings.
 
 ### Nested Packages
 

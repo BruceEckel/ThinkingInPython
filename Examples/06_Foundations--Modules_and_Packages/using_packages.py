@@ -5,8 +5,8 @@ import a_package.module2
 #: initializing a_package
 #: importing module1 in a_package
 #: importing module2 in a_package
-print("a_package" in dir(), "module1" in dir())
-#: True False
+print(sorted(n for n in dir() if not n.startswith("__")))
+#: ['a_package']
 print(a_package.module1.function1())
 #: function1 in module1 in a_package
 print(a_package.module2.function2())
