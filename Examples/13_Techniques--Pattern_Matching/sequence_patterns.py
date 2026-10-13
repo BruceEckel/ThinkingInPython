@@ -8,17 +8,11 @@ def summarize(items: list[int]) -> str:
             return f"One item: {only}"
         case [first, second]:
             return f"Two items: {first}, {second}"
-        case [first, *rest]:
-            return f"{first}, then {len(rest)} more"
+        case [first, *middle, last]:
+            return (f"{first} to {last}, "
+                    f"{len(middle)} between")
         case _:  # [1]
             return "Unreachable"
-
-def last_of(items: list[int]) -> tuple[list[int], int]:
-    match items:
-        case [*init, last]:
-            return init, last
-        case _:
-            return [], 0
 
 print(summarize([]))
 #: Empty
@@ -27,6 +21,4 @@ print(summarize([5]))
 print(summarize([3, 4]))
 #: Two items: 3, 4
 print(summarize([1, 2, 3, 4]))
-#: 1, then 3 more
-print(last_of([1, 2, 3, 4]))
-#: ([1, 2, 3], 4)
+#: 1 to 4, 2 between

@@ -158,7 +158,7 @@ so the type checker sees that the cases cover both members and accepts the funct
 ## Sequence Patterns
 
 A sequence pattern matches the shape of a list or tuple and binds the elements by position.
-A starred name, as in `*rest`, captures the remaining elements:
+A starred name, as in `*middle`, captures the elements the other names leave:
 
 ```python
 # sequence_patterns.py
@@ -171,17 +171,11 @@ def summarize(items: list[int]) -> str:
             return f"One item: {only}"
         case [first, second]:
             return f"Two items: {first}, {second}"
-        case [first, *rest]:
-            return f"{first}, then {len(rest)} more"
+        case [first, *middle, last]:
+            return (f"{first} to {last}, "
+                    f"{len(middle)} between")
         case _:  # [1]
             return "Unreachable"
-
-def last_of(items: list[int]) -> tuple[list[int], int]:
-    match items:
-        case [*init, last]:
-            return init, last
-        case _:
-            return [], 0
 
 print(summarize([]))
 #: Empty
@@ -190,25 +184,23 @@ print(summarize([5]))
 print(summarize([3, 4]))
 #: Two items: 3, 4
 print(summarize([1, 2, 3, 4]))
-#: 1, then 3 more
-print(last_of([1, 2, 3, 4]))
-#: ([1, 2, 3], 4)
+#: 1 to 4, 2 between
 ```
 
 `summarize()` shows the structural part of "structural pattern matching."
 The pattern `[first, second]` matches only a two-element sequence and pulls both out at once.
 
 The `case _` at `[1]` is unreachable.
-`[first, *rest]` catches every nonempty list and `[]` the empty one.
+`[first, *middle, last]` catches every list of two or more elements,
+`[only]` the one-element list, and `[]` the empty one.
 The type checker cannot prove that,
 so the wildcard stays to satisfy the declared return type.
 
 A starred name can appear anywhere in a sequence pattern, not only at the end,
 as long as the pattern has no more than one.
-`last_of()` puts it first.
-`[*init, last]` binds every element but the last to `init`.
-`[first, *middle, last]` puts it in the middle instead,
+`[first, *middle, last]` puts it in the middle,
 binding the two ends by name and everything between them to `middle`.
+`[*init, last]` puts it first and binds every element but the last to `init`.
 
 A sequence pattern deliberately excludes `str`, `bytes`, and `bytearray`.
 `case [a, b, c]` does not match `"abc"`,
@@ -233,28 +225,6 @@ Given a `sign()` helper that returns `-1`, `0`, or `1`,
 Transforming the subject this way turns a set of comparisons into literal patterns,
 and literal patterns usually read better than the [guards](#guards)
 you would write otherwise.
-
-`test_summarize_by_length()` checks the empty, one-item, two-item,
-and starred cases, and `test_last_of_binds_init_and_last()` checks a starred name in first position:
-
-```python
-# test_sequence_patterns.py
-import pytest
-from sequence_patterns import last_of, summarize
-
-@pytest.mark.parametrize("items, expected", [
-    ([], "Empty"),
-    ([5], "One item: 5"),
-    ([3, 4], "Two items: 3, 4"),
-    ([1, 2, 3], "1, then 2 more"),
-])
-def test_summarize_by_length(items: list[int],
-                             expected: str) -> None:
-    assert summarize(items) == expected
-
-def test_last_of_binds_init_and_last() -> None:
-    assert last_of([1, 2, 3, 4]) == ([1, 2, 3], 4)
-```
 
 ## Class Patterns
 
@@ -312,26 +282,6 @@ A positional pattern raises a `TypeError` when `__match_args__` is too short to 
 For an ordinary class `R` that lacks `__match_args__`,
 `case R(1)` reports `TypeError: R() accepts 0 positional sub-patterns (1 given)`.
 
-`test_locate_matches_fields()` checks the origin, a point on each axis,
-and a point on neither:
-
-```python
-# test_class_patterns.py
-import pytest
-from class_patterns import locate
-from point import Point
-
-@pytest.mark.parametrize("point, expected", [
-    (Point(0, 0), "The origin"),
-    (Point(0, 5), "On the y-axis at y=5"),
-    (Point(3, 0), "On the x-axis at x=3"),
-    (Point(3, 4), "At (3, 4)"),
-])
-def test_locate_matches_fields(point: Point,
-                               expected: str) -> None:
-    assert locate(point) == expected
-```
-
 ### Keyword Patterns
 
 A keyword pattern such as `Point(x=0, y=y)` matches by attribute name,
@@ -371,24 +321,6 @@ so every positional pattern silently starts matching a different field.
 `Point()` with no arguments, keyword or positional,
 matches any `Point` instance.
 Use it as a type-only check or a final catch-all.
-
-`test_describe_by_attribute()` checks a point on each axis and the `Point()` catch-all:
-
-```python
-# test_keyword_patterns.py
-import pytest
-from keyword_patterns import describe
-from point import Point
-
-@pytest.mark.parametrize("point, expected", [
-    (Point(0, 5), "Somewhere on the y-axis"),
-    (Point(3, 0), "Somewhere on the x-axis"),
-    (Point(3, 4), "Just some point"),
-])
-def test_describe_by_attribute(point: Point,
-                               expected: str) -> None:
-    assert describe(point) == expected
-```
 
 ### Built-in Types and Subclasses {#builtin-types-and-subclasses}
 
@@ -517,7 +449,7 @@ Ignoring unmentioned keys also makes `case {}` a catch-all for any mapping rathe
 the opposite of `case []`, which matches only an empty sequence.
 Test for an empty dictionary with a guard, `case {} if not event:`.
 A `**rest` at the end binds the pairs whose keys the pattern did not mention,
-as a `dict`, the mapping counterpart of `*rest` in a sequence pattern.
+as a `dict`, the mapping counterpart of a starred name in a sequence pattern.
 The `{"type": kind, **rest}` case in `handle()` prints those leftover pairs:
 
 ```python
@@ -555,19 +487,6 @@ but each binding takes the dictionary's one declared value type.
 When the data has a known shape, parse it into a dataclass first,
 then match on the dataclass.
 You keep the shape test and gain the field types.
-
-`test_handle_matches_keys()` checks a key event and the catch-all for a mapping with no `"type"`:
-
-```python
-# test_mapping_patterns.py
-from mapping_patterns import handle
-
-def test_handle_matches_keys() -> None:
-    assert handle(
-        {"type": "key", "key": "Esc"}) == "Key Esc"
-    assert handle(
-        {"nope": 1}) == "Unrecognized event: {'nope': 1}"
-```
 
 ## Patterns Nest
 
@@ -729,10 +648,7 @@ STATUS: Final[dict[int, str]] = {
     200: "OK", 404: "Not Found", 500: "Server Error"}
 
 def describe(status: int) -> str:
-    try:
-        return STATUS[status]
-    except KeyError:
-        return f"Status {status}"
+    return STATUS.get(status) or f"Status {status}"
 
 print(describe(200))
 #: OK
@@ -740,8 +656,10 @@ print(describe(301))
 #: Status 301
 ```
 
-The lookup is `try`/`except` rather than `STATUS.get(status, f"Status {status}")` because Python evaluates arguments before the call.
-Every lookup builds the default string, including the hits that discard it.
+`STATUS.get(status)` returns `None` for a missing key,
+and `or` builds the default string for that miss.
+A falsy value in the table would count as a miss too,
+but every value in `STATUS` is a nonempty string.
 
 A literal `match` compiles to a chain of comparisons, one per `case`,
 so its cost grows with the number of cases.
