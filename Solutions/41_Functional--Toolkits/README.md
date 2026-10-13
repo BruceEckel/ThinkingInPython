@@ -11,7 +11,7 @@
 <summary>Where to look</summary>
 
 [Recursion](../../Chapters/41_Functional--Toolkits.md#recursion) shows `deep_sum()` letting the call stack hold the sublists still to walk.
-Replace that call stack with a list you manage: pop an item, add its total if it is an `int`,
+Replace that call stack with a list you manage: pop an item, add it to the total if it is an `int`,
 and otherwise push its elements back onto the list.
 Copy the input before you seed the stack, and consider from which end you pop.
 
@@ -30,9 +30,9 @@ def deep_sum(items: list[Nested]) -> int:
 <summary>Solution</summary>
 
 If you seed the stack with `items` instead of `list(items)`,
-`deep_sum()` still returns `21`, but the caller's list is empty
-afterward, and printing it shows `[]`. The stack and the argument are
-one list, so every `pop()` drains the caller's data. The solution copies
+`deep_sum()` still returns `21`,
+but afterward the caller's list prints as `[]`. The stack and the argument are
+one list, so every `pop()` removes an element from the caller's list. The solution copies
 `items` with `list()`, which gives the loop a list of its own to
 consume.
 
@@ -55,29 +55,29 @@ print(deep_sum([1, [2, [3, 4], 5], 6]))
 #: 21
 ```
 
-The loop version runs two lines longer than the recursive one, so
-brevity is not the argument either way. The rewrite changes how much
-of the bookkeeping is yours. The recursive version names no stack. The
+The loop version runs two lines longer than the recursive one,
+a difference too small to decide between them.
+The rewrite changes something else: how much of the bookkeeping is yours. The recursive version names no stack. The
 call stack holds the sublists still to walk, and `return` pops one.
-Here you allocate the stack, seed it with a copy of `items`, choose
+In the loop version you allocate the stack, seed it with a copy of `items`, choose
 `pop()` over `pop(0)`, and choose `extend()` over `append()`. Three of
 those choices are places to be wrong.
 
 **Protect the caller's list.** Seeding with `items`
-instead of `list(items)` mutates the caller's list as the loop drains
-it.
+instead of `list(items)` mutates the caller's list as the loop pops its
+elements.
 
 **Pick which item comes next.** The pop end decides the visiting
-order, and neither end gives the recursive version's left-to-right
+order, and both ends depart from the recursive version's left-to-right
 walk. `pop()` visits the leaves right to left, and `pop(0)` walks the
-structure breadth-first. Both still give the right total, but the
+structure breadth-first. Both give the right total, but the
 order matters the moment the function does anything order-dependent.
 
 **Descend into a sublist.** Using `append()` where `extend()` belongs pushes the sublist as
 a single element and loops forever on it.
 
-The recursive version cannot make any of these
-mistakes, because it makes none of those choices.
+The recursive version is safe from all three mistakes,
+because its `for` loop and the call stack make those choices for it.
 
 </details>
 </details>
@@ -130,15 +130,17 @@ print(square.cache_info())
 
 The prediction: `hits=2, misses=3, maxsize=3, currsize=3`. Three
 distinct arguments arrive, so the cache misses three times and keeps
-all three results. The cache evicts nothing, so the repeat calls to
+all three results.
+The repeat calls to
 `square(2)` and `square(1)` both find their stored answers.
 
 The difference from the chapter's `maxsize=2` run is the second
 `square(1)`. Under `maxsize=2` that call is a fourth miss, because
-computing `square(3)` has pushed `1` out to make room. One extra slot
-turns that miss into a hit. With three slots the cache keeps every
-result, so `functools_lru_cache.py`'s comment, "Evicts 1, the least
-recently used," stops being true here.
+computing `square(3)` has evicted `1` to make room.
+With a third slot the cache keeps every result,
+so `square(3)` evicts nothing and the second `square(1)` becomes a hit.
+The comment on the `square(3)` call in `functools_lru_cache.py` says "Evicts 1, the least
+recently used," which is true of `maxsize=2` alone.
 
 </details>
 </details>
@@ -178,10 +180,10 @@ If you build the totals with a list comprehension, `[sum(b) for b in batched(sou
 `ty` reports an `invalid-return-type`.
 A `list[int]` has no `__next__()`, so it is not an `Iterator[int]`.
 If you change the annotation to `list[int]` to match,
-the demo's call hangs,
-because the comprehension tries to sum every batch `count(1)` can supply
-and `islice()` gets no total to take.
-The generator expression computes each total only when `islice()` requests it.
+the demo's call hangs.
+The comprehension sums batches from the infinite `count(1)` forever,
+so `islice()` waits forever for its argument.
+The solution's generator expression, by contrast, computes each total only when `islice()` requests it.
 
 ```python
 # exercise_3.py
@@ -196,13 +198,14 @@ print(list(islice(batch_totals(count(1), 3), 5)))
 #: [6, 15, 24, 33, 42]
 ```
 
-**Total each batch.** `batched()` chunks the source and a generator expression sums
+**Total each batch.** `batched()` chunks the source, and a generator expression sums
 each batch, so the body fits on one line with no hand-written loop.
 
 **Test laziness on an infinite source.** Passing `count(1)` proves the function is lazy. `count()` is infinite, so
 if `batch_totals()` builds a list of batches, or if `batched()` reads
-its source eagerly, the call hangs. The call returns
-immediately, and `islice()` then pulls exactly five totals, so
+its source eagerly, the call hangs.
+The call returns immediately instead,
+and `islice()` then pulls five totals, so
 `count()` yields exactly fifteen integers in all. The first total is
 `1 + 2 + 3`, and each later one is nine larger, since every batch
 advances the source by three.
@@ -220,9 +223,9 @@ advances the source by three.
 <details>
 <summary>Where to look</summary>
 
-[`groupby`](../../Chapters/41_Functional--Toolkits.md#groupby) shows why `groupby()` repeats a key when equal items are not adjacent.
+[`groupby`](../../Chapters/41_Functional--Toolkits.md#groupby) shows why `groupby()` repeats a key when other items separate two equal ones.
 Accumulate into a `defaultdict(list)` keyed by `key(item)` instead, so each key exists once by construction.
-What `grouped()` loses follows from what the loop must finish before it can return anything.
+To find what `grouped()` loses, look at what its loop must finish before `grouped()` can return anything.
 
 <details>
 <summary>The shape</summary>
@@ -244,9 +247,10 @@ def grouped[V, K: Hashable](
 If you wrap `groupby()` in a dictionary comprehension, `{k: list(g) for k, g in groupby(data, key)}`,
 the demo prints `{'B': ['b'], 'A': ['a']}`.
 The second `"b"` group replaces the first under the same key,
-so one item disappears with no error, and the type checker passes the function.
+so the result holds one of the two `"b"` items.
+Python raises no exception, and the type checker accepts the function.
 The solution's `defaultdict` appends each item to the list stored under its key,
-so a key that comes back adds to its group instead of replacing it.
+so a key that appears again adds its item to the existing group instead of replacing it.
 
 ```python
 # exercise_4.py
@@ -265,21 +269,26 @@ print(grouped(["b", "a", "b"], str.upper))
 #: {'B': ['b', 'b'], 'A': ['a']}
 ```
 
-**Collect each item under its key.** Because a dictionary key exists
-once by construction, the duplicate-key failure `groupby()` has on
-unsorted input cannot occur. The two `"b"` entries go into the same
-list no matter how far apart they arrive, and the caller needs no
-`sorted()` call to group them.
+**Collect each item under its key.** A dictionary key exists
+once by construction, so `grouped()` returns one group per key,
+whatever the input's order. The two `"b"` entries go into the same
+list however far apart they arrive.
+The caller passes the data as it comes,
+where `groupby()` needs it sorted first.
 
 `grouped()` loses the streaming that `groupby()` provides. It reads
 the whole input before returning anything, so an infinite source makes
-it loop forever, and a finite one sits entirely in memory. `groupby()`
-yields each group as it arrives and keeps only the current one, which
-is why it can stream a file larger than memory. It also preserves the
-input's order, while `grouped()` reports groups in first-appearance
-order and loses the interleaving between them. Sorting first to make
-`groupby()` safe costs the same memory as `grouped()`, plus the sort,
-so `grouped()` is the better answer whenever the input fits in memory.
+it loop forever.
+It also holds a finite source entirely in memory.
+`groupby()` can stream a file larger than memory,
+because it yields each group as the group arrives and keeps only the current one.
+`sorted()` makes `groupby()` safe, but `sorted()` holds the whole input in memory too,
+and it adds the sort.
+Whenever the input fits in memory, `grouped()` is the better answer.
+
+`grouped()` also loses the input's order. `groupby()` reports groups
+as they occur, while `grouped()` reports them in first-appearance
+order and drops the interleaving between them.
 
 </details>
 </details>
@@ -295,7 +304,8 @@ so `grouped()` is the better answer whenever the input fits in memory.
 
 [`cache`](../../Chapters/41_Functional--Toolkits.md#cache) says the cache stores results in a dictionary keyed on the arguments.
 A dictionary key must be hashable, so ask which argument type in the signature fails that test.
-The fix changes the `Nested` alias, and the same section's note on pure functions covers a separate requirement.
+The fix changes the `Nested` alias.
+The same section's note on pure functions covers a separate requirement.
 
 <details>
 <summary>The shape</summary>
@@ -340,32 +350,33 @@ expect(TypeError, deep_sum,
 **Show why the call fails.** Because `cache()` stores results in a
 dictionary keyed on the arguments, every argument must be hashable. A
 `list` is not hashable, because its contents can change after the
-cache stores it, and a mutated key no longer hashes to the slot
-holding its entry. The call fails before `deep_sum()`'s body runs.
+cache stores it.
+A mutated key would hash to a different slot from
+the one holding its entry. The call raises the `TypeError` before `deep_sum()`'s body runs.
 
 **Silence the checker so the listing runs.** `ty` reports the same problem before the program runs. The standard
 library's type declarations give a cached function's parameters the
 type `Hashable`, so both calls draw
-`invalid-argument-type`: "Expected `Hashable`, found `list[Nested]`"
-on the recursive call, and the same diagnostic, naming the literal's
-inferred type, on the list passed through `expect()`. The two
+`invalid-argument-type`.
+On the recursive call it reads "Expected `Hashable`, found `list[Nested]`".
+On the list passed through `expect()`, the same diagnostic names the literal's
+inferred type instead. The two
 `# type: ignore` comments silence those diagnostics so the listing
 can run and show the exception.
 
 For caching to be possible, `Nested` must describe an immutable
 structure: `type Nested = int | tuple[Nested, ...]`, with the
 parameter annotated `tuple[Nested, ...]` rather than `list[Nested]`.
-Tuples hash by contents, and their contents cannot change, so a tuple
-meets both conditions a cache key needs.
+Tuples hash by contents, and those contents stay the same once the tuple exists,
+so a tuple meets both conditions a cache key needs.
 
 Purity is a second, separate requirement. The chapter's `cache` entry
 states that "`@cache` works correctly only for pure functions."
 Hashability constrains the key, purity constrains the function, and a
-function can meet one without the other.
+function can meet either one alone.
 
-The exception says nothing about purity. `deep_sum()` is pure,
-and caching it would be correct. The obstacle is the
-argument type alone.
+`deep_sum()` is pure, so the exception comes from the argument type alone,
+and caching `deep_sum()` would be correct once its argument is hashable.
 
 </details>
 </details>
@@ -461,29 +472,32 @@ print(first)
 #: [('Gia', 'Eve', 'Ana'), ('Di', 'Cy'), ('Fi', 'Bo')]
 ```
 
-What the `rng` parameter preserves is determinism. Two callers who
-pass `random.Random(0)` still get identical schedules, so the function
+The `rng` parameter preserves determinism,
+because the algorithm draws its randomness from its arguments alone.
+Two callers who
+pass `random.Random(0)` get identical schedules, so the function
 remains testable by calling it twice and comparing, as before.
 The first round is the same one `pair_rounds.py` prints, because
-`random.Random(0)` is what `seed: int = 0` builds internally. The
-algorithm draws its randomness from its arguments alone.
+the default `seed: int = 0` builds `random.Random(0)` internally.
+Determinism now holds per `Random` object, though.
+Two calls that share one
+`Random` get different schedules, because `shuffle()` advances that
+object's state.
 
-What the `rng` parameter hands to the caller is control of the seed,
-and with it the responsibility for reproducibility. The
+The `rng` parameter lets the caller choose the seed,
+which makes reproducibility the caller's responsibility. The
 `seed: int = 0` version accepts only an integer. A caller who needs
-two different schedules must pass a different integer, and a caller who
-wants this function to share a program-wide random stream has no way
-to say so. The `rng` version allows both. In exchange, a caller can
-now pass `random.Random()` with no seed and get schedules that differ
-on every run.
+two different schedules must pass two different integers.
+A caller who
+wants this function to share a program-wide random stream cannot pass
+that stream in. The `rng` version serves both callers. It also lets a caller
+pass `random.Random()`, which seeds itself from the operating system,
+and get schedules that differ on every run.
 
 Passing the `rng` is dependency injection applied to a source of
-nondeterminism, the same move
+nondeterminism, the same technique
 [Random Numbers](../../Chapters/11_Techniques--Testing.md#random-numbers)
-makes for testing. The `rng` version is deterministic per `Random`
-object. Two callers who each build `random.Random(0)` get identical
-schedules, while two calls sharing one `Random` do not, because
-`shuffle()` advances that object's state.
+recommends for testing.
 
 </details>
 </details>
