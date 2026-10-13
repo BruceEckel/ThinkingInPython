@@ -29,7 +29,8 @@ The simplest way to write a context manager is a generator function with a singl
 The `contextlib.contextmanager` decorator turns that function into a context manager.
 The `yield` here works the way it does in a `pytest` fixture that [`yield`s its value](11_Techniques--Testing.md#fixtures-replace-setup-and-teardown).
 Everything before the `yield` is setup, and everything after it is teardown.
-[Iterators](23_Patterns--Iterators.md#generators) covers generators in full.
+[Iterators](23_Patterns--Iterators.md#generators) covers generators,
+and [Generators](45_Effects--Generators.md) covers the two-way form.
 A context manager needs nothing beyond that shape.
 
 ```python
