@@ -111,17 +111,24 @@ class Sketch:
 
     def __str__(self) -> str:
         return " ".join(self.strokes) or "(blank)"
+```
 
-if __name__ == "__main__":
-    sketch = Sketch()
-    sketch.draw("circle")
-    sketch.draw("beak")
-    checkpoint = sketch.save()
-    sketch.draw("scribble")
-    print(sketch)
-    sketch.restore(checkpoint)
-    print(sketch)
+`sketch_demo.py` draws two strokes, saves, draws a third,
+and restores the checkpoint:
+
+```python
+# sketch_demo.py
+from sketch import Sketch
+
+sketch = Sketch()
+sketch.draw("circle")
+sketch.draw("beak")
+checkpoint = sketch.save()
+sketch.draw("scribble")
+print(sketch)
 #: circle beak scribble
+sketch.restore(checkpoint)
+print(sketch)
 #: circle beak
 ```
 
@@ -172,13 +179,10 @@ a caretaker that mixes up a `Memento` with some other tuple:
 # memento_type_safety.py
 from dataclasses import FrozenInstanceError
 from exceptions import expect, expected
-from sketch import Memento, Sketch
+from sketch import Sketch
 
 def restore_tuple(strokes: tuple[str, ...]) -> None:
     print(strokes)
-
-def restore_memento(memento: Memento) -> None:
-    print(memento.strokes)  # [1]
 
 sketch = Sketch()
 sketch.draw("circle")
@@ -189,10 +193,11 @@ restore_tuple(checkpoint.strokes)
 restore_tuple(("unrelated", "tuple"))
 #: ('unrelated', 'tuple')
 
-restore_memento(checkpoint)
-#: ('circle',)
+sketch.restore(checkpoint)
+print(sketch)
+#: circle
 # ty: tuple[str, str] is not a Memento:
-expect(AttributeError, restore_memento,
+expect(AttributeError, sketch.restore,
        ("unrelated", "tuple"))  # type: ignore
 #: [AttributeError] 'tuple' object has no attribute
 #: 'strokes'
@@ -204,10 +209,10 @@ with expected(FrozenInstanceError):
 ```
 
 `restore_tuple()` accepts either tuple, since both are `tuple[str, ...]`.
-`restore_memento()` accepts the checkpoint,
+`restore()` accepts the checkpoint,
 and the type checker reports the plain tuple before the program runs.
-At run time, the program raises `AttributeError` at `[1]`,
-the first line that reads `.strokes`.
+At run time, `restore()` raises an `AttributeError` at `memento.strokes`,
+where the code reads `.strokes`.
 The checker rejects the assignment to `checkpoint.strokes` too,
 and the runtime raises `FrozenInstanceError`.
 The `strokes` tuple is immutable on its own.
@@ -274,14 +279,6 @@ class Drawing:
     def __str__(self) -> str:
         drawn = " ".join(self.strokes) or "(blank)"
         return f"{self.title}: {drawn}"
-
-if __name__ == "__main__":
-    before = Drawing("Duck").draw("circle").draw("beak")
-    after = before.draw("scribble")
-    print(after)
-    print(before)
-#: Duck: circle beak scribble
-#: Duck: circle beak
 ```
 
 `Drawing` is the frozen form of `Sketch`,
@@ -290,7 +287,19 @@ Its extra `title` field lets [a partial restore](#restoring-part-of-a-state)
 later in this chapter rewind one field and keep the other.
 `draw()` returns a new `Drawing`,
 using `dataclasses.replace()` to change one field and copy the rest.
-Since each call returns a `Drawing`, the calls chain.
+Since each call returns a `Drawing`, the calls chain, as in `frozen_demo.py`:
+
+```python
+# frozen_demo.py
+from frozen_sketch import Drawing
+
+before = Drawing("Duck").draw("circle").draw("beak")
+after = before.draw("scribble")
+print(after)
+#: Duck: circle beak scribble
+print(before)
+#: Duck: circle beak
+```
 
 Saving means keeping a reference,
 the assignment that aliased in `aliased_snapshot.py`.
@@ -299,9 +308,9 @@ so the `Memento` class, `save()`, `restore()`, and the copying are all gone.
 
 ![](_images/memento_story)
 
-Frames 1 to 3 trace `sketch.py`'s demo,
+Frames 1 to 3 trace `sketch_demo.py`,
 with a copy at each crossing between the sketch and the caretaker.
-Frame 4 has no copy.
+Frame 4 traces `frozen_demo.py` and has no copy.
 The caretaker keeps `before`,
 and `draw()` returns `after` as a new object beside it.
 
@@ -312,10 +321,9 @@ so a history of `Drawing` states stores each stroke once and duplicates only the
 # sharing.py
 from frozen_sketch import Drawing
 
-stroke = "".join(["cir", "cle"])
-before = Drawing("Duck", (stroke,))
+before = Drawing("Duck").draw("circle")
 after = before.draw("beak")
-print(after.strokes[0] is stroke)
+print(after.strokes[0] is before.strokes[0])
 #: True
 print(after.strokes is before.strokes, len(after.strokes))
 #: False 2
@@ -325,12 +333,6 @@ The two objects share the stroke strings, not the tuple holding them.
 On a drawing with `n` strokes,
 `draw()` builds a fresh tuple of `n + 1` pointers,
 and that tuple is the one object it allocates.
-
-The stroke comes from `"".join([...])` because the compiler interns a literal like `"circle"`.
-Every `"circle"` literal in the module is one object,
-so `is` would print `True` whether or not `draw()` kept the caller's string.
-A string built at runtime is an object of its own,
-so here `True` means `after` holds the same string object as `before`.
 
 A single `draw()` allocates one tuple.
 A caretaker that keeps every past state, the `History` class in `history.py`,

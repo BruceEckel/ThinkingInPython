@@ -6,8 +6,8 @@ sketch and leaves the memento as it was, `restore()` copies the tuple back
 into a new list, and a frozen `Drawing` kept by reference does the
 memento's job with no class and no copy. The shaded region on the right is
 the caretaker, which holds the snapshot and never reads it. Frames 1-3 use
-the names and output of `sketch.py`'s demo (`sketch`, `checkpoint`, the
-strokes `circle`, `beak`, `scribble`); frame 4 uses `frozen_sketch.py`'s
+the names and output of `sketch_demo.py` (`sketch`, `checkpoint`, the
+strokes `circle`, `beak`, `scribble`); frame 4 uses `frozen_demo.py`'s
 (`before`, `after`, `Duck`). A list is drawn as cells and a tuple as its
 repr, so the copy between the two kinds is visible. The chapter's other
 figure, `memento_history.svg`, covers `History`'s two stacks, so this one

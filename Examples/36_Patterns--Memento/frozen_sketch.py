@@ -14,11 +14,3 @@ class Drawing:
     def __str__(self) -> str:
         drawn = " ".join(self.strokes) or "(blank)"
         return f"{self.title}: {drawn}"
-
-if __name__ == "__main__":
-    before = Drawing("Duck").draw("circle").draw("beak")
-    after = before.draw("scribble")
-    print(after)
-    print(before)
-#: Duck: circle beak scribble
-#: Duck: circle beak

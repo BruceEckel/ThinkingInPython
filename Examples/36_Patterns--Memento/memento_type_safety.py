@@ -1,13 +1,10 @@
 # memento_type_safety.py
 from dataclasses import FrozenInstanceError
 from exceptions import expect, expected
-from sketch import Memento, Sketch
+from sketch import Sketch
 
 def restore_tuple(strokes: tuple[str, ...]) -> None:
     print(strokes)
-
-def restore_memento(memento: Memento) -> None:
-    print(memento.strokes)  # [1]
 
 sketch = Sketch()
 sketch.draw("circle")
@@ -18,10 +15,11 @@ restore_tuple(checkpoint.strokes)
 restore_tuple(("unrelated", "tuple"))
 #: ('unrelated', 'tuple')
 
-restore_memento(checkpoint)
-#: ('circle',)
+sketch.restore(checkpoint)
+print(sketch)
+#: circle
 # ty: tuple[str, str] is not a Memento:
-expect(AttributeError, restore_memento,
+expect(AttributeError, sketch.restore,
        ("unrelated", "tuple"))  # type: ignore
 #: [AttributeError] 'tuple' object has no attribute
 #: 'strokes'

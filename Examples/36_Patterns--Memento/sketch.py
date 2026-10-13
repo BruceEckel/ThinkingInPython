@@ -20,15 +20,3 @@ class Sketch:
 
     def __str__(self) -> str:
         return " ".join(self.strokes) or "(blank)"
-
-if __name__ == "__main__":
-    sketch = Sketch()
-    sketch.draw("circle")
-    sketch.draw("beak")
-    checkpoint = sketch.save()
-    sketch.draw("scribble")
-    print(sketch)
-    sketch.restore(checkpoint)
-    print(sketch)
-#: circle beak scribble
-#: circle beak
