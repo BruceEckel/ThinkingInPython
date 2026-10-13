@@ -14,8 +14,10 @@ print(heapq.heappop(nums))  # Remove and return the smallest
 #: 1
 print(nums)
 #: [2, 3, 7, 8, 5]
-# Does not reorder the argument:
-print(heapq.nsmallest(3, [5, 1, 8, 3, 2]))
+values = [5, 1, 8, 3, 2]
+print(heapq.nsmallest(3, values))
 #: [1, 2, 3]
-print(heapq.nlargest(2, [5, 1, 8, 3, 2]))
+print(heapq.nlargest(2, values))
 #: [8, 5]
+print(values)  # Neither call reorders its argument
+#: [5, 1, 8, 3, 2]

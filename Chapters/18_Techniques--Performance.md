@@ -237,12 +237,11 @@ def unused(n: int) -> int:
 monitoring.use_tool_id(TOOL, "coverage")
 monitoring.register_callback(TOOL, PY_START, on_start)
 monitoring.set_events(TOOL, PY_START)
-print(sum(used(n) for n in range(1000)))
-#: 500500
+results = [used(n) for n in range(1000)]
 monitoring.set_events(TOOL, NO_EVENTS)
 monitoring.free_tool_id(TOOL)
-print(calls["used"], calls["unused"])
-#: 1 0
+print(len(results), calls["used"], calls["unused"])
+#: 1000 1 0
 ```
 
 Returning `monitoring.DISABLE` tells the interpreter to stop reporting this event at this location until someone calls `restart_events()`.
@@ -770,11 +769,13 @@ print(heapq.heappop(nums))  # Remove and return the smallest
 #: 1
 print(nums)
 #: [2, 3, 7, 8, 5]
-# Does not reorder the argument:
-print(heapq.nsmallest(3, [5, 1, 8, 3, 2]))
+values = [5, 1, 8, 3, 2]
+print(heapq.nsmallest(3, values))
 #: [1, 2, 3]
-print(heapq.nlargest(2, [5, 1, 8, 3, 2]))
+print(heapq.nlargest(2, values))
 #: [8, 5]
+print(values)  # Neither call reorders its argument
+#: [5, 1, 8, 3, 2]
 ```
 
 After `heapify()` the smallest element sits at index 0.
@@ -820,7 +821,7 @@ so `heap[0]` holds 6 while 4 is still in the list:
 
 ```python
 # heap_corruption.py
-from heapq import heapify, nsmallest
+from heapq import heapify
 
 heap = [10, 9, 8, 7, 6, 5, 4, 3]
 heapify(heap)  # In-place
@@ -830,10 +831,8 @@ print(heap.pop(0))  # Smallest
 #: 3
 print(heap)  # 'heap[0]' no longer smallest
 #: [6, 4, 7, 10, 5, 8, 9]
-print(nsmallest(len(heap), heap))  # True smallest
-#: [4, 5, 6, 7, 8, 9, 10]
-print(heap)  # Not reordered by nsmallest()
-#: [6, 4, 7, 10, 5, 8, 9]
+print(heap[0], min(heap))
+#: 6 4
 ```
 
 For a priority queue shared across threads,
@@ -1430,10 +1429,11 @@ from benchmark import report
 big = bytearray(1_000_000)
 copied = big[:500_000]
 viewed = memoryview(big)[:500_000]
-report(copy_bytes=sys.getsizeof(copied),
-       view_bytes=sys.getsizeof(viewed))
-under = sys.getsizeof(viewed) * 100 < sys.getsizeof(copied)
-print(f"view under 1% of copy: {under}")
+copy_bytes = sys.getsizeof(copied)
+view_bytes = sys.getsizeof(viewed)
+report(copy_bytes=copy_bytes, view_bytes=view_bytes)
+print(f"view under 1% of copy: "
+      f"{view_bytes * 100 < copy_bytes}")
 #: view under 1% of copy: True
 print(viewed.nbytes)
 #: 500000
@@ -1460,15 +1460,16 @@ import numpy as np
 from benchmark import report
 
 n = 1_000_000
-numbers = list(range(n))
-a = np.arange(n, dtype=np.float64)
+as_list = list(range(n))
+as_array = np.arange(n, dtype=np.float64)
 
 def pure_python() -> list[float]:
-    return [3.0 * x + 1.0 for x in numbers]
+    return [3.0 * x + 1.0 for x in as_list]
 
 def vectorized() -> np.ndarray:
-    return 3.0 * a + 1.0
+    return 3.0 * as_array + 1.0
 
+assert vectorized().tolist() == pure_python()
 t_loop = timeit.timeit(pure_python, number=5)
 t_numpy = timeit.timeit(vectorized, number=5)
 report(python_loop=t_loop, numpy=t_numpy,
@@ -1485,7 +1486,8 @@ the same layout `array` uses in `compact_array.py`,
 with `dtype=np.float64` choosing the element type the way `array`'s `"d"` type code does.
 
 `vectorized()` computes the same `3x + 1` as `pure_python()`,
-but as one compiled pass over contiguous memory instead of a million individual Python-level steps.
+and the `assert` confirms the two results match before the timing starts.
+NumPy runs that expression as one compiled pass over contiguous memory instead of a million individual Python-level steps.
 NumPy is a fast library you call, not a compiled extension you write.
 You keep that speedup only while the data stays inside NumPy.
 Calling a Python function on each element,

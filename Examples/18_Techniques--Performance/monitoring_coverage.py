@@ -23,9 +23,8 @@ def unused(n: int) -> int:
 monitoring.use_tool_id(TOOL, "coverage")
 monitoring.register_callback(TOOL, PY_START, on_start)
 monitoring.set_events(TOOL, PY_START)
-print(sum(used(n) for n in range(1000)))
-#: 500500
+results = [used(n) for n in range(1000)]
 monitoring.set_events(TOOL, NO_EVENTS)
 monitoring.free_tool_id(TOOL)
-print(calls["used"], calls["unused"])
-#: 1 0
+print(len(results), calls["used"], calls["unused"])
+#: 1000 1 0
