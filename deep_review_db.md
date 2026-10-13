@@ -83,8 +83,9 @@ Recorded here so a later review does not re-raise the same gap as a new finding.
 - **18_Techniques--Performance**: the NumPy section became a real tested listing.
   `numpy>=2.5.2` is a dependency in `pyproject.toml`, and `vectorize_numpy.py`
   is fenced, with a threshold boolean and `report()` numbers in the house style.
-  Numba stays an indented illustration (numba 0.66.0 tops out at cp314), as does
-  the Rust demo, which needs both.
+  The Numba sections are fenced, tested listings since 2026-10-13, when
+  `numba>=0.68.0` first installed on 3.15.0: `count_primes_numba.py` and
+  `collatz_numba.py` carry threshold booleans listed in `tools/data/timing.txt`.
 - **30_Patterns--Observer**: exercise 2 was reworded to describe the game
   `Solutions/30_Patterns--Observer.md` actually implements. The exercise had described a
   spread-outward rule while the solution implemented classic Flood-It.

@@ -349,7 +349,10 @@ def run_location(rundir: Path | None, root: Path | None = None):
     do under run_examples. The tree's utils/ directory is also placed on
     sys.path so a block can import shared helpers (such as display.py) kept
     there. sys.path and any modules imported by the block are restored
-    afterward so one block cannot leak into the next.
+    afterward so one block cannot leak into the next. Installed packages
+    (anything under site-packages) stay loaded: NumPy's extension
+    modules refuse a second load in one process, so purging them would
+    break every later block that imports NumPy or Numba.
     """
     if rundir is None or not rundir.exists():
         yield
@@ -367,7 +370,9 @@ def run_location(rundir: Path | None, root: Path | None = None):
         os.chdir(old_cwd)
         sys.path[:] = saved_path
         for name in set(sys.modules) - saved_modules:
-            del sys.modules[name]
+            origin = getattr(sys.modules[name], "__file__", None)
+            if "site-packages" not in str(origin):
+                del sys.modules[name]
 
 
 def process_markdown(

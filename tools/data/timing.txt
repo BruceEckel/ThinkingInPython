@@ -17,6 +17,8 @@
 18_Techniques--Performance/hoist_attribute_lookup.py
 18_Techniques--Performance/search_comparison.py
 18_Techniques--Performance/vectorize_numpy.py
+18_Techniques--Performance/count_primes_numba.py
+18_Techniques--Performance/collatz_numba.py
 18_Techniques--Performance/heap_vs_sort.py
 19_Techniques--Concurrency/blocking_the_loop.py
 19_Techniques--Concurrency/to_thread.py

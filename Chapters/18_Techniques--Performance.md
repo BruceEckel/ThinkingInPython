@@ -328,7 +328,7 @@ A slow run means something stole the CPU,
 so averaging folds that theft into your answer,
 while the fastest run is the closest you get to measuring your code alone.
 
-The near-miss is a hand-rolled timer:
+The timer most readers write first is a hand-rolled one:
 `start = time.time()` before one call and a subtraction after it.
 `time.time()` reads the wall clock,
 which can jump when the system corrects its time,
@@ -1517,49 +1517,51 @@ because each step depends on the previous one, or the control flow is irregular.
 The `@njit` decorator from [Numba](https://numba.pydata.org/)
 compiles such a function to machine code on its first call:
 
-    import timeit
-    from numba import njit
+```python
+# count_primes_numba.py
+import timeit
+from benchmark import report
+from numba import njit
 
-    def count_primes(limit: int) -> int:
-        count = 0
-        for n in range(2, limit):
-            for d in range(2, int(n**0.5) + 1):
-                if n % d == 0:
-                    break
-            else:
-                count += 1
-        return count
+def count_primes(limit: int) -> int:
+    count = 0
+    for n in range(2, limit):
+        for d in range(2, int(n**0.5) + 1):
+            if n % d == 0:
+                break
+        else:
+            count += 1
+    return count
 
-    fast_count_primes = njit(count_primes)
-
-    limit = 200_000
-    fast_count_primes(1)  # Compile once, off the clock
-
-    t_python = timeit.timeit(lambda: count_primes(limit), number=1)
-    t_numba = timeit.timeit(lambda: fast_count_primes(limit), number=1)
-    print(f"Numba speedup: {t_python / t_numba:.1f}x")
-    # Sample run: Numba speedup: 15.9x
+fast_count_primes = njit(count_primes)
+assert fast_count_primes(1_000) == count_primes(1_000)
+limit = 200_000
+t_python = timeit.timeit(
+    lambda: count_primes(limit), number=1)
+t_numba = timeit.timeit(
+    lambda: fast_count_primes(limit), number=1)
+report(python_loop=t_python, numba=t_numba,
+       ratio=t_python / t_numba)
+print(f"Numba at least 3x faster: {t_numba * 3 < t_python}")
+#: Numba at least 3x faster: True
+```
 
 `njit(count_primes)` is the call that `@njit` above the `def` would make.
 Calling it directly keeps the original `count_primes()` as the Python baseline,
-and Numba compiles the `fast_count_primes` it returns at the first call.
-Calling `fast_count_primes(1)` first pays the compilation and warm-up cost outside the timed region,
-so the comparison measures steady-state speed.
+and Numba compiles the `fast_count_primes` it returns at its first call.
+The `assert` makes that first call on a small input, before the timing starts.
+That call compiles `fast_count_primes()` and checks its answer against the Python version's,
+so the timed calls measure steady-state speed.
 
 On numeric code over simple types and NumPy arrays,
 Numba often runs nearly as fast as C.
-The first call pays a compilation delay,
-and code that uses general Python objects, such as custom classes,
-does not compile.
+The first call stops to compile, and code that uses general Python objects,
+such as custom classes, does not compile.
 When the hot spot is number-crunching,
 `@njit` is a lighter step than rewriting in another language.
 
-(Numba is a third-party dependency that does not yet support the book's Python 3.15 target, so unlike most of the book's listings, the build does not run this snippet.
-The comment above shows one machine's actual output.
-Expect a different, but still large, multiple on yours.)
-
-<!-- TODO(py315-deps): Numba does not support Python 3.15 yet. Once it
-does, convert this indented block to a real, fenced, tested example. -->
+One machine measured the compiled `count_primes()` at about 12x faster than the loop.
+The 3x threshold sits far below any multiple you should see.
 
 ## Combine NumPy and Numba
 
@@ -1575,34 +1577,41 @@ and repeat until you reach 1.
 The number of steps differs for every starting value,
 so no single array expression produces it:
 
-    import timeit
-    import numpy as np
-    from numba import njit
+```python
+# collatz_numba.py
+import timeit
+import numpy as np
+from benchmark import report
+from numba import njit
 
-    def collatz_lengths(values: np.ndarray) -> np.ndarray:
-        lengths = np.empty(len(values), dtype=np.int64)
-        for i in range(len(values)):
-            n = int(values[i])
-            steps = 0
-            while n != 1:
-                n = n // 2 if n % 2 == 0 else 3 * n + 1
-                steps += 1
-            lengths[i] = steps
-        return lengths
+def collatz_lengths(values: np.ndarray) -> np.ndarray:
+    lengths = np.empty(len(values), dtype=np.int64)
+    for i in range(len(values)):
+        n = int(values[i])
+        steps = 0
+        while n != 1:
+            n = n // 2 if n % 2 == 0 else 3 * n + 1
+            steps += 1
+        lengths[i] = steps
+    return lengths
 
-    fast_collatz_lengths = njit(collatz_lengths)
+fast_collatz_lengths = njit(collatz_lengths)
+values = np.arange(1, 50_000, dtype=np.int64)
+sample = values[:100]
+assert np.array_equal(
+    fast_collatz_lengths(sample), collatz_lengths(sample))
+t_python = timeit.timeit(
+    lambda: collatz_lengths(values), number=1)
+t_numba = timeit.timeit(
+    lambda: fast_collatz_lengths(values), number=1)
+report(python_loop=t_python, numba=t_numba,
+       ratio=t_python / t_numba)
+print(f"Numba at least 3x faster: {t_numba * 3 < t_python}")
+#: Numba at least 3x faster: True
+```
 
-    values = np.arange(1, 50_000, dtype=np.int64)
-    fast_collatz_lengths(values[:1])  # Compile once, off the clock
-
-    t_python = timeit.timeit(
-        lambda: collatz_lengths(values), number=1
-    )
-    t_numba = timeit.timeit(
-        lambda: fast_collatz_lengths(values), number=1
-    )
-    print(f"Numba speedup: {t_python / t_numba:.1f}x")
-    # Sample run: Numba speedup: 54.4x
+As in `count_primes_numba.py`,
+the `assert` compiles `fast_collatz_lengths()` on the first hundred values and checks it against the Python version before the timing starts.
 
 `collatz_lengths()` takes a NumPy array and returns one,
 so it composes with vectorized NumPy code on either side.
@@ -1613,14 +1622,8 @@ Use a vectorized NumPy expression wherever the shape of the computation allows i
 and drop to a `@njit` loop for the steps that resist vectorizing,
 keeping the array as the shared data structure throughout.
 
-(Like the `count_primes()` example, this example needs Numba, so the build does not run it.
-The comment shows one machine's actual output.
-Expect a different, but still large, multiple on yours.)
-
-<!-- TODO(py315-deps): needs Numba on Python 3.15 (NumPy is already a
-real dependency).
-Once Numba supports it, convert this indented block to a real, fenced,
-tested example. -->
+The same machine measured the compiled `collatz_lengths()` at about 38x faster than the loop,
+so the 3x threshold leaves a wide margin here too.
 
 ## Converting a Slow Function to Rust
 
@@ -1729,23 +1732,24 @@ def speedup[T, R](
 
 speedup("count_primes", count_primes,
         fastcount.count_primes, 200_000)
-# Sample run: count_primes Rust speedup: 12.2x
+# Sample run: count_primes Rust speedup: 12.3x
 speedup("collatz_lengths", collatz_lengths,
         fastcount.collatz_lengths, list(range(1, 50_000)))
-# Sample run: collatz_lengths Rust speedup: 34.3x
+# Sample run: collatz_lengths Rust speedup: 36.0x
 ```
 
 That is one baseline and three ways past it,
 but not a ladder where each step outruns the last.
-The plain Python loop, timed in both the Numba examples and `demo.py`,
+The plain Python loop, timed in the Numba listings and in `demo.py`,
 is the baseline.
 NumPy alone handles the parts of a problem that reduce to whole-array arithmetic.
 `@njit` compiles the untranslatable loop on its first call, from inside Python.
 Rust compiles that loop ahead of time,
 removing both the warm-up and the runtime Numba dependency,
 and requires a second language and a build step.
-On both sample runs above, Numba matches or beats Rust
-(15.9x against 12.2x on `count_primes`, 54.4x against 34.3x on `collatz_lengths`),
+In one machine's runs, measured 2026-10-13,
+Numba and Rust run at nearly the same speed
+(12.2x against 12.3x on `count_primes`, 38.4x against 36.0x on `collatz_lengths`),
 so Rust is not the faster option here.
 Rust offers something else: no warm-up call, no Numba dependency at runtime,
 and compiled code for functions Numba refuses,
@@ -1769,8 +1773,9 @@ and runs the comparison in `demo.py`, printing your machine's own numbers.
 The main book build skips this step and requires no Rust toolchain.
 Building `rust/` is a separate, opt-in step.
 
-<!-- TODO(py315-deps): once Numba is available (NumPy already is), extend
-rust/fastcount/demo.py (and this listing)
+<!-- TODO(py315-deps): NumPy and Numba are both dependencies since
+2026-10-13, though the crate's own environment installs neither.
+Extend rust/fastcount/demo.py (and this listing)
 to also time the NumPy+Numba collatz_lengths version from Combine NumPy and Numba above,
 so this compares Rust against that combination too, not just plain Python. -->
 

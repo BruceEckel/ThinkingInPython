@@ -55,9 +55,10 @@ dev = [
     # The effect system used by the Stateless chapter. Its examples are
     # type-checked by the gate, so it must be installed, not illustrative.
     "stateless>=0.6.1",
-    # Chapter 18's vectorize_numpy.py is a real gated listing; the Numba
-    # sections stay illustrative until numba supports the pinned Python.
+    # Chapter 18's vectorize_numpy.py and its two Numba listings are
+    # real gated listings, so both libraries must be installed.
     "numpy>=2.5.2",
+    "numba>=0.68.0",
     # tools/make_cover.py's art mode: JPEG encoding, grayscale
     # derivation, and resizing for the composited book covers.
     "pillow>=12.3.0",
