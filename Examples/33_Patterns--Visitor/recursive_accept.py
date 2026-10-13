@@ -1,10 +1,13 @@
 # recursive_accept.py
-from typing import Any
+from typing import Any, Protocol
 from flower_visitors import Bee, Gladiolus, Ranunculus
+
+class Accepts(Protocol):
+    def accept(self, visitor: Any) -> None: ...
 
 # accept() drives the traversal itself:
 class Corsage:
-    def __init__(self, *elements: Any) -> None:
+    def __init__(self, *elements: Accepts) -> None:
         self.elements = elements
 
     def accept(self, visitor: Any) -> None:

@@ -255,9 +255,10 @@ def _(flower: Ranunculus) -> str:
 if __name__ == "__main__":
     flowers: list[Flower] = [
         Gladiolus(), Ranunculus(), Chrysanthemum()]
-    for f in flowers:
-        print(nectar(f), "| fragrance:", fragrance(f))
-    print(sorted(t.__name__ for t in nectar.registry))
+    for flower in flowers:
+        print(nectar(flower), "| fragrance:",
+              fragrance(flower))
+    print(sorted(cls.__name__ for cls in nectar.registry))
     print(nectar.dispatch(Ranunculus)
           is nectar.dispatch(Flower))
 #: Gladiolus: abundant nectar | fragrance: faint
@@ -388,12 +389,15 @@ so no code outside the object loops over the elements:
 
 ```python
 # recursive_accept.py
-from typing import Any
+from typing import Any, Protocol
 from flower_visitors import Bee, Gladiolus, Ranunculus
+
+class Accepts(Protocol):
+    def accept(self, visitor: Any) -> None: ...
 
 # accept() drives the traversal itself:
 class Corsage:
-    def __init__(self, *elements: Any) -> None:
+    def __init__(self, *elements: Accepts) -> None:
         self.elements = elements
 
     def accept(self, visitor: Any) -> None:
@@ -409,6 +413,9 @@ if __name__ == "__main__":
 ```
 
 The recursion works because `Corsage` and `Flower` both define `accept()`.
+The `Accepts` protocol names that shared method,
+so the type checker reports an element that lacks `accept()`,
+such as `Corsage("rose")`, before the program runs.
 The loop in `Corsage.accept()` calls `accept()` on each element the same way,
 whether the element is a flower or another corsage.
 In `flower_visitors.py` the loop that calls `accept()` sits outside the hierarchy,

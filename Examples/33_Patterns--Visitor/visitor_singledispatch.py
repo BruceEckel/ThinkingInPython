@@ -37,9 +37,10 @@ def _(flower: Ranunculus) -> str:
 if __name__ == "__main__":
     flowers: list[Flower] = [
         Gladiolus(), Ranunculus(), Chrysanthemum()]
-    for f in flowers:
-        print(nectar(f), "| fragrance:", fragrance(f))
-    print(sorted(t.__name__ for t in nectar.registry))
+    for flower in flowers:
+        print(nectar(flower), "| fragrance:",
+              fragrance(flower))
+    print(sorted(cls.__name__ for cls in nectar.registry))
     print(nectar.dispatch(Ranunculus)
           is nectar.dispatch(Flower))
 #: Gladiolus: abundant nectar | fragrance: faint
