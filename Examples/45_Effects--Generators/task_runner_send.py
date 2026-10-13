@@ -1,46 +1,35 @@
 # task_runner_send.py
 from collections import deque
-from collections.abc import Callable, Generator
-
-type Job = Callable[[], Generator[str, str]]
-
-ready: deque[Generator[str, str]] = deque()
-to_send: dict[Generator[str, str], str | None] = {}
-
-def task(fn: Job) -> Job:
-    job = fn()
-    ready.append(job)
-    to_send[job] = None
-    return fn
+from collections.abc import Generator, Iterable
 
 def answer(request: str) -> str:
     return f"answer to {request}"
 
-@task
 def download() -> Generator[str, str]:
     reply = yield "download: headers?"
     print(f"download: {reply}")
     yield "download: checksum"
 
-@task
 def index() -> Generator[str, str]:
     yield "index: build"
     yield "index: merge"
 
-def task_runner() -> None:
+def task_runner(
+    jobs: Iterable[Generator[str, str]]
+) -> None:
+    ready = deque((job, next(job)) for job in jobs)
     while ready:
-        job = ready.popleft()
+        job, request = ready.popleft()
+        print(request)
         try:
-            request = job.send(to_send.pop(job))  # type: ignore
+            request = job.send(answer(request))
         except StopIteration:
             continue
-        print(request)
-        to_send[job] = answer(request)
-        ready.append(job)
+        ready.append((job, request))
 
-task_runner()
+task_runner([download(), index()])
 #: download: headers?
-#: index: build
 #: download: answer to download: headers?
+#: index: build
 #: download: checksum
 #: index: merge

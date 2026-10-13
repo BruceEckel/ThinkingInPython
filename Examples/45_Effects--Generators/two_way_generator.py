@@ -1,4 +1,5 @@
 # two_way_generator.py
+import inspect
 from collections.abc import Generator
 from typing import Final
 from interview_generator import (Answer, Question,
@@ -23,10 +24,10 @@ def drive(conversation: Generator[Question, Answer, Result],
 
 if __name__ == "__main__":
     conversation = interview()
-    print(f"{type(conversation)}: {conversation.__name__}")  # type: ignore
+    print(inspect.getgeneratorstate(conversation))
     result = drive(conversation, ANSWERS)
     print(f"{result = }")
-#: <class 'generator'>: interview
+#: GEN_CREATED
 #: request = 'name', answer = 'Alice'
 #: request = 'town', answer = 'Wonderland'
 #: request = 'friend', answer = 'Rabbit'

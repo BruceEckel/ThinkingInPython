@@ -85,25 +85,6 @@ def interview() -> Generator[Question, Answer, Result]:
     town = yield Question("town")
     friend = yield Question("friend")
     return Result(f"{name} of {town}, friend {friend}")
-
-if __name__ == "__main__":
-    conversation = interview()
-    question1: Question = next(conversation)
-    print(f"{question1 = }")
-    question2: Question = conversation.send(Answer("Alice"))
-    print(f"{question2 = }")
-    question3: Question = conversation.send(
-        Answer("Wonderland"))
-    print(f"{question3 = }")
-    try:
-        conversation.send(Answer("Rabbit"))
-    except StopIteration as stop:
-        result: Result = stop.value
-    print(f"{result = }")
-#: question1 = 'name'
-#: question2 = 'town'
-#: question3 = 'friend'
-#: result = 'Alice of Wonderland, friend Rabbit'
 ```
 
 Although `Generator[str, str, str]` describes `interview()` accurately,
@@ -115,15 +96,41 @@ and `Result` the `ReturnType`.
 The distinction exists only for the type checker.
 `Question("name")` produces the plain `str`.
 
+Driving the generator by hand sends one `Answer` at a time:
+
+```python
+# drive_by_hand.py
+from interview_generator import (Answer, Question,
+                                 Result, interview)
+
+conversation = interview()
+question1: Question = next(conversation)
+print(f"{question1 = }")
+#: question1 = 'name'
+question2: Question = conversation.send(Answer("Alice"))
+print(f"{question2 = }")
+#: question2 = 'town'
+question3: Question = conversation.send(
+    Answer("Wonderland"))
+print(f"{question3 = }")
+#: question3 = 'friend'
+try:
+    conversation.send(Answer("Rabbit"))
+except StopIteration as stop:
+    result: Result = stop.value
+print(f"{result = }")
+#: result = 'Alice of Wonderland, friend Rabbit'
+```
+
 The `NewType` definitions catch a transposed annotation.
-If you mistakenly annotate the generator as `Generator[Answer, Question, Result]`,
+If you mistakenly annotate the generator in `interview_generator.py` as `Generator[Answer, Question, Result]`,
 `ty` reports nine errors in three groups of three.
 All three `yield Question(...)` expressions yield a `Question` where the annotation declares an `Answer`.
-All three `send(Answer(...))` calls pass an `Answer` where `send()` expects a `Question`.
-All three `question` variables receive an `Answer` where their declarations say `Question`.
+In `drive_by_hand.py`,
+all three `send(Answer(...))` calls pass an `Answer` where `send()` expects a `Question`,
+and all three `question` variables receive an `Answer` where their declarations say `Question`.
 `Generator[str, str, str]` accepts the reversal without complaint.
 
-Driving the generator by hand sends one `Answer` at a time.
 `next(conversation)` starts the generator and produces a `Question`.
 `conversation.send(Answer("Alice"))` provides an answer and produces the next question.
 That single expression carries both directions of the channel.
@@ -136,7 +143,7 @@ and the `Result` arrives as that exception's `value`.
 A `for` loop loses that value,
 because `for` catches the `StopIteration` and discards it along with its `value`.
 To read the `ReturnType`, catch the exception yourself,
-as `interview_generator.py` does.
+as `drive_by_hand.py` does.
 
 Python raises that `StopIteration` for the generator.
 The body finishes with `return`.
@@ -203,6 +210,7 @@ Typically, a driver function steps the generator:
 
 ```python
 # two_way_generator.py
+import inspect
 from collections.abc import Generator
 from typing import Final
 from interview_generator import (Answer, Question,
@@ -227,10 +235,10 @@ def drive(conversation: Generator[Question, Answer, Result],
 
 if __name__ == "__main__":
     conversation = interview()
-    print(f"{type(conversation)}: {conversation.__name__}")  # type: ignore
+    print(inspect.getgeneratorstate(conversation))
     result = drive(conversation, ANSWERS)
     print(f"{result = }")
-#: <class 'generator'>: interview
+#: GEN_CREATED
 #: request = 'name', answer = 'Alice'
 #: request = 'town', answer = 'Wonderland'
 #: request = 'friend', answer = 'Rabbit'
@@ -239,10 +247,9 @@ if __name__ == "__main__":
 
 The listing imports the generator unchanged.
 The driver is new.
-The first line of output describes what `interview()` produced:
-an ordinary `generator` object whose `__name__` is the function's name.
-That `__name__` exists on the object at runtime but not in the `Generator` type,
-so the `# type: ignore` on that line suppresses the diagnostic.
+The first line of output shows the state of the generator `interview()` returned.
+`inspect.getgeneratorstate()` reports `GEN_CREATED`: the generator exists,
+and its body has not started.
 
 `drive()` uses all three type parameters:
 `next()` produces the first `Question`,
@@ -450,10 +457,10 @@ print(next(g))
 #: alpha needs a value
 try:
     for value in [1, 2, 3]:
-        print(g.send(value))
+        print(f"send({value}) -> {g.send(value)}")
 except StopIteration:
     print("manual() is exhausted")
-#: alpha needs another
+#: send(1) -> alpha needs another
 #: alpha got None and None
 #: manual() is exhausted
 ```
@@ -713,33 +720,22 @@ so the description can ask for something.
 and no generator in the chain names its driver.
 
 Those ideas are enough to build a task runner.
-A decorator registers each generator, a queue keeps the live ones,
-and the runner gives each a turn:
+A queue keeps the live generators, and the runner gives each a turn:
 
 ```python
 # task_runner.py
 from collections import deque
-from collections.abc import Callable, Iterator
+from collections.abc import Iterator
 
-type Job = Callable[[], Iterator[str]]
-
-ready: deque[Iterator[str]] = deque()
-
-def task(fn: Job) -> Job:
-    ready.append(fn())
-    return fn
-
-@task
 def download() -> Iterator[str]:
     for part in ("headers", "body", "checksum"):
         yield f"download: {part}"
 
-@task
 def index() -> Iterator[str]:
     yield "index: build"
     yield "index: merge"
 
-def task_runner() -> None:
+def task_runner(ready: deque[Iterator[str]]) -> None:
     while ready:
         job = ready.popleft()
         try:
@@ -748,17 +744,13 @@ def task_runner() -> None:
             continue  # Finished: never requeued
         ready.append(job)
 
-task_runner()
+task_runner(deque([download(), index()]))
 #: download: headers
 #: index: build
 #: download: body
 #: index: merge
 #: download: checksum
 ```
-
-`@task` is the [registering-decorator shape](14_Techniques--Decorators.md#decorating-classes).
-It calls each generator function once at definition time,
-queues the generator that call builds, and hands the function back unchanged.
 
 `task_runner()` gives the front task one `next()` per turn.
 A task that yields moves to the back of the queue.
@@ -774,62 +766,45 @@ Letting each job ask a question combines turn-taking and answering in one loop:
 ```python
 # task_runner_send.py
 from collections import deque
-from collections.abc import Callable, Generator
-
-type Job = Callable[[], Generator[str, str]]
-
-ready: deque[Generator[str, str]] = deque()
-to_send: dict[Generator[str, str], str | None] = {}
-
-def task(fn: Job) -> Job:
-    job = fn()
-    ready.append(job)
-    to_send[job] = None
-    return fn
+from collections.abc import Generator, Iterable
 
 def answer(request: str) -> str:
     return f"answer to {request}"
 
-@task
 def download() -> Generator[str, str]:
     reply = yield "download: headers?"
     print(f"download: {reply}")
     yield "download: checksum"
 
-@task
 def index() -> Generator[str, str]:
     yield "index: build"
     yield "index: merge"
 
-def task_runner() -> None:
+def task_runner(
+    jobs: Iterable[Generator[str, str]]
+) -> None:
+    ready = deque((job, next(job)) for job in jobs)
     while ready:
-        job = ready.popleft()
+        job, request = ready.popleft()
+        print(request)
         try:
-            request = job.send(to_send.pop(job))  # type: ignore
+            request = job.send(answer(request))
         except StopIteration:
             continue
-        print(request)
-        to_send[job] = answer(request)
-        ready.append(job)
+        ready.append((job, request))
 
-task_runner()
+task_runner([download(), index()])
 #: download: headers?
-#: index: build
 #: download: answer to download: headers?
+#: index: build
 #: download: checksum
 #: index: merge
 ```
 
-`to_send` holds the value each job receives on its next turn:
-`None` for a fresh job, then the runner's answer to that job's latest request.
-`job.send(to_send.pop(job))` primes a fresh job the same way `next(job)` does,
-since `send(None)` and `next()` are equivalent.
-On every later turn the same call delivers the runner's answer.
-
-The generator a `Job` returns has `str` as its `SendType`, not `str | None`,
-so the priming call needs the `# type: ignore` from `send_none_is_next.py` again.
-`to_send.pop(job)` returns `str | None`,
-and no annotation ties the `None` to a generator's first turn.
+The queue holds each job paired with its latest request.
+`task_runner()` primes every job with `next()`, as a driver must,
+then on each turn prints the request and sends back the answer,
+which resumes the job until it yields its next request.
 
 `download()` reads what it receives, into `reply`.
 `index()` discards what it receives,

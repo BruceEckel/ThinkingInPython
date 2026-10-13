@@ -1,26 +1,16 @@
 # task_runner.py
 from collections import deque
-from collections.abc import Callable, Iterator
+from collections.abc import Iterator
 
-type Job = Callable[[], Iterator[str]]
-
-ready: deque[Iterator[str]] = deque()
-
-def task(fn: Job) -> Job:
-    ready.append(fn())
-    return fn
-
-@task
 def download() -> Iterator[str]:
     for part in ("headers", "body", "checksum"):
         yield f"download: {part}"
 
-@task
 def index() -> Iterator[str]:
     yield "index: build"
     yield "index: merge"
 
-def task_runner() -> None:
+def task_runner(ready: deque[Iterator[str]]) -> None:
     while ready:
         job = ready.popleft()
         try:
@@ -29,7 +19,7 @@ def task_runner() -> None:
             continue  # Finished: never requeued
         ready.append(job)
 
-task_runner()
+task_runner(deque([download(), index()]))
 #: download: headers
 #: index: build
 #: download: body

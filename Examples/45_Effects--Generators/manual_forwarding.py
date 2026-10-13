@@ -15,9 +15,9 @@ print(next(g))
 #: alpha needs a value
 try:
     for value in [1, 2, 3]:
-        print(g.send(value))
+        print(f"send({value}) -> {g.send(value)}")
 except StopIteration:
     print("manual() is exhausted")
-#: alpha needs another
+#: send(1) -> alpha needs another
 #: alpha got None and None
 #: manual() is exhausted
