@@ -1,11 +1,11 @@
 # match_dispatch.py
 from outcome import Outcome
-from paper_scissors_rock_table import Paper, Rock
+from paper_scissors_rock_table import Item, Paper, Rock
 
 class Origami(Paper):
     pass
 
-def compete(a: object, b: object) -> Outcome:
+def compete(a: Item, b: Item) -> Outcome:
     match a, b:
         case Paper(), Rock():
             return Outcome.WIN

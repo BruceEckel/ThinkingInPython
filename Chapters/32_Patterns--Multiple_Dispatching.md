@@ -339,12 +339,12 @@ so a subclass matches the pattern its base would:
 ```python
 # match_dispatch.py
 from outcome import Outcome
-from paper_scissors_rock_table import Paper, Rock
+from paper_scissors_rock_table import Item, Paper, Rock
 
 class Origami(Paper):
     pass
 
-def compete(a: object, b: object) -> Outcome:
+def compete(a: Item, b: Item) -> Outcome:
     match a, b:
         case Paper(), Rock():
             return Outcome.WIN
@@ -468,7 +468,7 @@ a method `DampPaper` cannot change,
 so its `compete()` answers before making that call.
 That answer takes one `isinstance()` test,
 one rung of the ladder that double dispatch replaces,
-because `Rock` has no `eval_damp_paper()` method to dispatch to.
+because `Rock` has no `eval_damp_paper()` method to receive the dispatch.
 `Rock`'s result against a `DampPaper` comes from `DampPaper.eval_rock()`,
 an ordinary override.
 Both overrides are necessary.
