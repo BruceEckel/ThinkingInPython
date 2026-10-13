@@ -10,7 +10,7 @@ toward it from the other side, so each stack's top sits next to the
 present. The last row shows `do()`'s `_future.clear()`: after an undo, a
 new edit discards the undone state, drawn crossed out.
 
-Rows 0-4 follow `history.py`'s demo: `History(Drawing("Duck"))`, two
+Rows 0-4 follow `history_frozen.py`: `History(Drawing("Duck"))`, two
 `apply()` calls drawing `circle` and `beak`, `undo()`, `redo()`, with
 their `#:` output. A state is shown by its strokes as `Drawing.__str__()`
 in `frozen_sketch.py` prints them, less the `Duck: ` title every state

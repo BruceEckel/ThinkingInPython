@@ -338,17 +338,17 @@ keeps every one of those tuples alive.
 Once a field grows by one element per edit, the way `strokes` does,
 the `n`-th edit builds a tuple of `n` pointers,
 so `k` edits held in the history cost `O(k^2)` pointers in total, not `O(k)`.
+`growth_cost.py` keeps every state in a list, as a `History` does:
 
 ```python
 # growth_cost.py
 from frozen_sketch import Drawing
 
-drawing = Drawing("Duck")
-pointers = 0
+states = [Drawing("Duck")]
 for i in range(2000):
-    drawing = drawing.draw(str(i))
-    pointers += len(drawing.strokes)
-print(pointers, len(drawing.strokes))
+    states.append(states[-1].draw(str(i)))
+print(sum(len(s.strokes) for s in states),
+      len(states[-1].strokes))
 #: 2001000 2000
 ```
 
@@ -448,17 +448,24 @@ class History[S]:
 
     def can_redo(self) -> bool:
         return bool(self._future)
+```
 
-if __name__ == "__main__":
-    from frozen_sketch import Drawing
-    history = History(Drawing("Duck"))
-    history.apply(lambda d: d.draw("circle"))
-    history.apply(lambda d: d.draw("beak"))
-    print(history.present)
-    print(history.undo())
-    print(history.redo())
+A `History` of `Drawing` states records two edits,
+then undoes the second and redoes it:
+
+```python
+# history_frozen.py
+from frozen_sketch import Drawing
+from history import History
+
+history = History(Drawing("Duck"))
+history.apply(lambda d: d.draw("circle"))
+history.apply(lambda d: d.draw("beak"))
+print(history.present)
 #: Duck: circle beak
+print(history.undo())
 #: Duck: circle
+print(history.redo())
 #: Duck: circle beak
 ```
 
@@ -508,10 +515,11 @@ from sketch import Memento, Sketch
 
 sketch = Sketch()
 sketch.draw("circle")
-history: History[Memento] = History(
-    sketch.save())
+history: History[Memento] = History(sketch.save())
 sketch.draw("beak")
 history.do(sketch.save())
+print(sketch)
+#: circle beak
 sketch.restore(history.undo())
 print(sketch)
 #: circle

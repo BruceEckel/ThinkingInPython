@@ -37,15 +37,3 @@ class History[S]:
 
     def can_redo(self) -> bool:
         return bool(self._future)
-
-if __name__ == "__main__":
-    from frozen_sketch import Drawing
-    history = History(Drawing("Duck"))
-    history.apply(lambda d: d.draw("circle"))
-    history.apply(lambda d: d.draw("beak"))
-    print(history.present)
-    print(history.undo())
-    print(history.redo())
-#: Duck: circle beak
-#: Duck: circle
-#: Duck: circle beak
