@@ -4,7 +4,7 @@ from collections.abc import Awaitable, Callable
 
 type AsyncResponder[T] = Callable[[T], Awaitable[None]]
 
-class Broadcaster[T]:
+class AsyncBroadcaster[T]:
     def __init__(self) -> None:
         self._responders: list[AsyncResponder[T]] = []
 
@@ -35,7 +35,7 @@ async def record(data: int) -> None:
     received.append(data)
 
 async def main() -> None:
-    broadcaster = Broadcaster[int]()
+    broadcaster = AsyncBroadcaster[int]()
     broadcaster.connect(broken)
     broadcaster.connect(record)
     try:

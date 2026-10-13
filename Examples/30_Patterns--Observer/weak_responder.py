@@ -2,7 +2,6 @@
 import gc
 from weakref import WeakMethod
 from broadcaster import Broadcaster
-from exceptions import expected
 
 class Plot:
     def redraw(self, celsius: float) -> None:
@@ -15,7 +14,8 @@ ref = WeakMethod(plot.redraw)
 def weak(celsius: float) -> None:
     live = ref()
     if live is None:
-        broadcaster.disconnect(weak)  # Gone: drop out
+        print("weak: plot gone, disconnecting")
+        broadcaster.disconnect(weak)
     else:
         live(celsius)
 
@@ -25,8 +25,5 @@ broadcaster.announce(25.0)
 
 del plot  # The only strong reference
 gc.collect()
-broadcaster.announce(30.0)  # Prints nothing
-
-with expected(ValueError):
-    broadcaster.disconnect(weak)
-#: [ValueError] list.remove(x): x not in list
+broadcaster.announce(30.0)
+#: weak: plot gone, disconnecting

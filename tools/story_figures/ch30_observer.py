@@ -117,7 +117,7 @@ def render() -> str:
     b += text(TX + 12, y0 + 70, "celsius: 150", 11)
     b += text(TX + 12, y0 + 92, "announce()", 11)
     b += text(TX + 12, y0 + 106, "returns", 11)
-    for k, s in enumerate(("display: 150C", "alarm!")):
+    for k, s in enumerate(("display: 150C", "alarm: True")):
         a, t = resp_mid(y0, k), slot_mid(y0, k)
         b += resp_label(y0, k, s, RED)
         b += arrow(a, t, MUTED, "os-muted", kind="open", dash=True)

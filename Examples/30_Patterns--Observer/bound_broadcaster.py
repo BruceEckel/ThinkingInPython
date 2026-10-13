@@ -13,11 +13,11 @@ class BoundBroadcaster[T]:
 log: list[float] = []
 broadcaster = BoundBroadcaster[float]((
     log.append,
-    lambda c: print("alarm!" if c > 100 else "ok"),
+    lambda c: print(f"alarm: {c > 100}"),
 ))
 broadcaster.announce(25.0)
-#: ok
+#: alarm: False
 broadcaster.announce(150.0)
-#: alarm!
+#: alarm: True
 print(log)
 #: [25.0, 150.0]

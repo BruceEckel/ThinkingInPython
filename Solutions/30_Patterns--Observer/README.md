@@ -472,7 +472,7 @@ from collections.abc import Awaitable, Callable
 
 type AsyncResponder[T] = Callable[[T], Awaitable[None]]
 
-class Broadcaster[T]:
+class AsyncBroadcaster[T]:
     def __init__(self) -> None:
         ...
 
@@ -513,7 +513,7 @@ from collections.abc import Awaitable, Callable
 
 type AsyncResponder[T] = Callable[[T], Awaitable[None]]
 
-class Broadcaster[T]:
+class AsyncBroadcaster[T]:
     def __init__(self) -> None:
         self._responders: list[AsyncResponder[T]] = []
 
@@ -544,7 +544,7 @@ async def record(data: int) -> None:
     received.append(data)
 
 async def main() -> None:
-    broadcaster = Broadcaster[int]()
+    broadcaster = AsyncBroadcaster[int]()
     broadcaster.connect(broken)
     broadcaster.connect(record)
     try:
@@ -560,7 +560,7 @@ asyncio.run(main())
 # test_async_resilient_announce.py
 import asyncio
 import pytest
-from exercise_4 import Broadcaster
+from exercise_4 import AsyncBroadcaster
 
 def test_later_responder_still_runs_after_a_failure(
 ) -> None:
@@ -574,7 +574,7 @@ def test_later_responder_still_runs_after_a_failure(
         received.append(data)
 
     async def run() -> None:
-        broadcaster = Broadcaster[int]()
+        broadcaster = AsyncBroadcaster[int]()
         broadcaster.connect(broken)
         broadcaster.connect(record)
         with pytest.raises(ExceptionGroup):
@@ -593,7 +593,7 @@ def test_a_cancelled_responder_is_reported() -> None:
         received.append(data)
 
     async def run() -> None:
-        broadcaster = Broadcaster[int]()
+        broadcaster = AsyncBroadcaster[int]()
         broadcaster.connect(cancelled)
         broadcaster.connect(record)
         with pytest.raises(BaseExceptionGroup) as info:
@@ -1824,10 +1824,12 @@ class Broadcasting[T]:
     def _responders(self) -> list[Responder[T]]:
         ...
 
-    def respond(self, fn: Responder[T]) -> Responder[T]:
+    def respond(
+        self, responder: Responder[T]
+    ) -> Responder[T]:
         ...
 
-    def disconnect(self, fn: Responder[T]) -> None:
+    def disconnect(self, responder: Responder[T]) -> None:
         ...
 
     def announce(self, data: tuple[str, T]) -> None:
@@ -1884,12 +1886,14 @@ class Broadcasting[T]:
     def _responders(self) -> list[Responder[T]]:
         return self.__dict__.setdefault("_responders", [])
 
-    def respond(self, fn: Responder[T]) -> Responder[T]:
-        self._responders.append(fn)
-        return fn
+    def respond(
+        self, responder: Responder[T]
+    ) -> Responder[T]:
+        self._responders.append(responder)
+        return responder
 
-    def disconnect(self, fn: Responder[T]) -> None:
-        self._responders.remove(fn)
+    def disconnect(self, responder: Responder[T]) -> None:
+        self._responders.remove(responder)
 
     def announce(self, data: tuple[str, T]) -> None:
         for responder in list(self._responders):

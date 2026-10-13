@@ -1,8 +1,9 @@
 # gather_orphan.py
 import asyncio
+from async_broadcaster import AsyncBroadcaster
 from exceptions import aexpect
 
-async def loud(data: int) -> None:
+async def failing(data: int) -> None:
     raise ValueError(f"bad: {data}")
 
 async def slow(data: int) -> None:
@@ -10,8 +11,10 @@ async def slow(data: int) -> None:
     print(f"slow finished: {data}")
 
 async def main() -> None:
-    await aexpect(
-        ValueError, asyncio.gather, loud(1), slow(1))
+    broadcaster = AsyncBroadcaster[int]()
+    broadcaster.connect(failing)
+    broadcaster.connect(slow)
+    await aexpect(ValueError, broadcaster.announce, 1)
     await asyncio.sleep(0.25)  # Let the orphan finish
 
 asyncio.run(main())

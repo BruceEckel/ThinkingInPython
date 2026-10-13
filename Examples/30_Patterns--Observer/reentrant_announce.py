@@ -1,25 +1,9 @@
 # reentrant_announce.py
-from broadcaster import Broadcaster
 from exceptions import expected
+from thermometer import Thermometer
 
-class TwoWay(Broadcaster[int]):
-    def __init__(self) -> None:
-        super().__init__()
-        self._value = 0
-
-    @property
-    def value(self) -> int:
-        return self._value
-
-    @value.setter
-    def value(self, new: int) -> None:
-        self._value = new
-        # A responder that sets value re-enters this setter
-        self.announce(new)
-
-model = TwoWay()
-model.connect(
-    lambda v: setattr(model, "value", v))
+t = Thermometer(20.0)
+t.connect(lambda c: setattr(t, "celsius", c))
 with expected(RecursionError):
-    model.value = 1
+    t.celsius = 25.0
 #: [RecursionError] maximum recursion depth exceeded

@@ -1,7 +1,7 @@
 # async_thermometer.py
-from async_broadcaster import Broadcaster
+from async_broadcaster import AsyncBroadcaster
 
-class Thermometer(Broadcaster[float]):
+class Thermometer(AsyncBroadcaster[float]):
     def __init__(self, celsius: float) -> None:
         super().__init__()
         self._celsius = celsius

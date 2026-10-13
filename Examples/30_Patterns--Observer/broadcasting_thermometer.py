@@ -12,14 +12,14 @@ def display(celsius: float) -> None:
 
 @thermometer.respond
 def alarm(celsius: float) -> None:
-    print("alarm!" if celsius > 100 else "ok")
+    print(f"alarm: {celsius > 100}")
 
 thermometer.celsius = 90
 #: display: 90C
-#: ok
+#: alarm: False
 thermometer.celsius = 150
 #: display: 150C
-#: alarm!
+#: alarm: True
 thermometer.disconnect(alarm)
 thermometer.celsius = 200
 #: display: 200C

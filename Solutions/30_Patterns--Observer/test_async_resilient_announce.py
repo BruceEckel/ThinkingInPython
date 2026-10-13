@@ -1,7 +1,7 @@
 # test_async_resilient_announce.py
 import asyncio
 import pytest
-from exercise_4 import Broadcaster
+from exercise_4 import AsyncBroadcaster
 
 def test_later_responder_still_runs_after_a_failure(
 ) -> None:
@@ -15,7 +15,7 @@ def test_later_responder_still_runs_after_a_failure(
         received.append(data)
 
     async def run() -> None:
-        broadcaster = Broadcaster[int]()
+        broadcaster = AsyncBroadcaster[int]()
         broadcaster.connect(broken)
         broadcaster.connect(record)
         with pytest.raises(ExceptionGroup):
@@ -34,7 +34,7 @@ def test_a_cancelled_responder_is_reported() -> None:
         received.append(data)
 
     async def run() -> None:
-        broadcaster = Broadcaster[int]()
+        broadcaster = AsyncBroadcaster[int]()
         broadcaster.connect(cancelled)
         broadcaster.connect(record)
         with pytest.raises(BaseExceptionGroup) as info:

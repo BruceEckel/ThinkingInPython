@@ -1,8 +1,8 @@
 # async_self_removing_responder.py
 import asyncio
-from async_broadcaster import Broadcaster
+from async_broadcaster import AsyncBroadcaster
 
-broadcaster = Broadcaster[object]()
+broadcaster = AsyncBroadcaster[object]()
 seen: list[str] = []
 
 async def once(data: object) -> None:

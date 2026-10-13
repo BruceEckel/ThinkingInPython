@@ -167,7 +167,8 @@ An observer attached during the call joins `_observers` alone,
 so its first notification comes from the next `notify()` call.
 [Disconnecting During a Notification](#disconnecting-during-a-notification)
 runs a responder that disconnects itself,
-and shows index by index which responder the loop skips without the copy.
+once with the copy and once without it,
+and shows which responder the loop skips without the copy.
 
 ## Easier Names
 
@@ -350,13 +351,13 @@ from thermometer import Thermometer
 
 t = Thermometer(20.0)
 t.connect(lambda c: print(f"display: {c}C"))
-t.connect(lambda c: print("alarm!" if c > 100 else "ok"))
+t.connect(lambda c: print(f"alarm: {c > 100}"))
 t.celsius = 25
 #: display: 25C
-#: ok
+#: alarm: False
 t.celsius = 150
 #: display: 150C
-#: alarm!
+#: alarm: True
 ```
 
 The responders here are lambdas, but any function or bound method works.
@@ -487,37 +488,52 @@ The copy in `announce()` matters when a responder disconnects itself mid-notific
 
 ```python
 # self_removing_responder.py
+from typing import override
 from broadcaster import Broadcaster
 
-broadcaster = Broadcaster[object]()
-seen: list[str] = []
+class Skipping(Broadcaster[object]):
+    @override
+    def announce(self, data: object) -> None:
+        for responder in self._responders:  # No copy
+            responder(data)
 
-def once(data: object) -> None:
-    seen.append(f"once: {data}")
-    # Disconnects mid-notification
-    broadcaster.disconnect(once)
+def trace(broadcaster: Broadcaster[object]) -> list[str]:
+    seen: list[str] = []
 
-def always(data: object) -> None:
-    seen.append(f"always: {data}")
+    def once(data: object) -> None:
+        seen.append(f"once: {data}")
+        # Disconnects mid-notification
+        broadcaster.disconnect(once)
 
-broadcaster.connect(once)
-broadcaster.connect(always)
-broadcaster.announce(1)
-broadcaster.announce(2)
-print(seen)
+    def always(data: object) -> None:
+        seen.append(f"always: {data}")
+
+    broadcaster.connect(once)
+    broadcaster.connect(always)
+    broadcaster.announce(1)
+    broadcaster.announce(2)
+    return seen
+
+print(trace(Broadcaster[object]()))
 #: ['once: 1', 'always: 1', 'always: 2']
+print(trace(Skipping()))
+#: ['once: 1', 'always: 2']
 ```
 
+`trace()` connects the same pair of responders to the broadcaster it receives,
+announces twice, and returns what the responders recorded.
 `once` receives the first change and disconnects itself.
 That call removes it from the broadcaster's list,
 not from the copy that `announce()`'s loop reads,
 so `once` still gets this notification but no later ones.
 `always` receives both.
-Without the copy, `announce()`'s `for` loop reads the list that `disconnect()` changes.
+
+`Skipping` overrides `announce()` with a loop that reads `_responders` directly,
+the list that `disconnect()` changes.
 `once` is at index 0 and `always` at index 1.
 Removing `once` moves `always` to index 0, which the loop has visited,
 so the loop looks for index 1, finds the list ended there, and stops.
-`always` misses the first change, and `seen` ends as `['once: 1', 'always: 2']`,
+The second marker shows `always` missing the first change,
 with no exception to say a responder was skipped.
 
 ### Raising an Exception
@@ -558,7 +574,6 @@ and disconnects itself after Python collects the object:
 import gc
 from weakref import WeakMethod
 from broadcaster import Broadcaster
-from exceptions import expected
 
 class Plot:
     def redraw(self, celsius: float) -> None:
@@ -571,7 +586,8 @@ ref = WeakMethod(plot.redraw)
 def weak(celsius: float) -> None:
     live = ref()
     if live is None:
-        broadcaster.disconnect(weak)  # Gone: drop out
+        print("weak: plot gone, disconnecting")
+        broadcaster.disconnect(weak)
     else:
         live(celsius)
 
@@ -581,11 +597,8 @@ broadcaster.announce(25.0)
 
 del plot  # The only strong reference
 gc.collect()
-broadcaster.announce(30.0)  # Prints nothing
-
-with expected(ValueError):
-    broadcaster.disconnect(weak)
-#: [ValueError] list.remove(x): x not in list
+broadcaster.announce(30.0)
+#: weak: plot gone, disconnecting
 ```
 
 A `Broadcaster` holds a strong reference to whatever you `connect()`,
@@ -617,13 +630,10 @@ such as PyPy, collects the object when its collector runs,
 and the `gc.collect()` call runs that collector before `announce(30.0)`.
 A program that leaves the timing to the collector sees `weak` keep calling `redraw()` until the collector runs.
 
-During `announce(30.0)`, `ref()` returns `None` and `weak` disconnects itself.
+During `announce(30.0)`, `ref()` returns `None`,
+so `weak` prints its last line and disconnects itself.
 The copy that `announce()` iterates over makes a mid-notification disconnect safe,
 as it does for `once` in `self_removing_responder.py`.
-The listing's last statement tries to disconnect `weak` a second time.
-The broadcaster's list is empty by then,
-so `disconnect()` raises a `ValueError`,
-the evidence that `weak` removed itself.
 
 For most programs, strong connections are fine.
 A broadcaster that lives no longer than its responders releases them when it goes away,
@@ -639,34 +649,21 @@ and it continues until you get a `RecursionError`:
 
 ```python
 # reentrant_announce.py
-from broadcaster import Broadcaster
 from exceptions import expected
+from thermometer import Thermometer
 
-class TwoWay(Broadcaster[int]):
-    def __init__(self) -> None:
-        super().__init__()
-        self._value = 0
-
-    @property
-    def value(self) -> int:
-        return self._value
-
-    @value.setter
-    def value(self, new: int) -> None:
-        self._value = new
-        # A responder that sets value re-enters this setter
-        self.announce(new)
-
-model = TwoWay()
-model.connect(
-    lambda v: setattr(model, "value", v))
+t = Thermometer(20.0)
+t.connect(lambda c: setattr(t, "celsius", c))
 with expected(RecursionError):
-    model.value = 1
+    t.celsius = 25.0
 #: [RecursionError] maximum recursion depth exceeded
 ```
 
+The responder assigns each reading back to `celsius`,
+so `Thermometer`'s setter calls `announce()` again from inside `announce()`.
+
 To prevent this, you need a guard.
-Here, the setter returns early when the new value equals the stored one:
+`TwoWay` is a two-way binding whose setter returns early when the new value equals the stored one:
 
 ```python
 # reentrant_announce_fixed.py
@@ -761,12 +758,12 @@ class BoundBroadcaster[T]:
 log: list[float] = []
 broadcaster = BoundBroadcaster[float]((
     log.append,
-    lambda c: print("alarm!" if c > 100 else "ok"),
+    lambda c: print(f"alarm: {c > 100}"),
 ))
 broadcaster.announce(25.0)
-#: ok
+#: alarm: False
 broadcaster.announce(150.0)
-#: alarm!
+#: alarm: True
 print(log)
 #: [25.0, 150.0]
 ```
@@ -803,11 +800,6 @@ class WeatherStation:
 
     def connect(self, responder: Responder[Change]) -> None:
         self._responders.append(responder)
-
-    def disconnect(
-        self, responder: Responder[Change]
-    ) -> None:
-        self._responders.remove(responder)
 
     def __setattr__(
         self, name: str, value: object
@@ -883,14 +875,14 @@ def display(celsius: float) -> None:
 
 @thermometer.respond
 def alarm(celsius: float) -> None:
-    print("alarm!" if celsius > 100 else "ok")
+    print(f"alarm: {celsius > 100}")
 
 thermometer.celsius = 90
 #: display: 90C
-#: ok
+#: alarm: False
 thermometer.celsius = 150
 #: display: 150C
-#: alarm!
+#: alarm: True
 thermometer.disconnect(alarm)
 thermometer.celsius = 200
 #: display: 200C
@@ -968,12 +960,14 @@ class Broadcasting[T]:
     def _responders(self) -> list[Responder[T]]:
         return self.__dict__.setdefault("_responders", [])
 
-    def respond(self, fn: Responder[T]) -> Responder[T]:
-        self._responders.append(fn)
-        return fn
+    def respond(
+        self, responder: Responder[T]
+    ) -> Responder[T]:
+        self._responders.append(responder)
+        return responder
 
-    def disconnect(self, fn: Responder[T]) -> None:
-        self._responders.remove(fn)
+    def disconnect(self, responder: Responder[T]) -> None:
+        self._responders.remove(responder)
 
     def announce(self, data: T) -> None:
         for responder in list(self._responders):
@@ -1045,7 +1039,7 @@ Each displays, appends, or writes back, then returns.
 so a responder that calls a network service or writes to a database makes the responders connected after it wait for that call to finish,
 and the setter that announced the change waits for all of them.
 
-An asynchronous `Broadcaster` removes the wait between responders.
+An asynchronous broadcaster removes the wait between responders.
 Its responders are coroutines,
 and its `announce()` awaits them together with `asyncio.gather()`,
 so one state change notifies all responders at once,
@@ -1055,7 +1049,7 @@ so `announce()` returns only after every responder finishes.
 
 [Concurrency](19_Techniques--Concurrency.md#asyncio-mechanics)
 covers the mechanics (`async def`, `await`, `gather()`, `run()`)
-the `asyncio` `Broadcaster` uses:
+`AsyncBroadcaster` uses:
 
 ```python
 # async_broadcaster.py
@@ -1064,7 +1058,7 @@ from collections.abc import Awaitable, Callable
 
 type AsyncResponder[T] = Callable[[T], Awaitable[None]]
 
-class Broadcaster[T]:
+class AsyncBroadcaster[T]:
     def __init__(self) -> None:
         self._responders: list[AsyncResponder[T]] = []
 
@@ -1081,7 +1075,8 @@ class Broadcaster[T]:
     async def announce(self, data: T) -> None:
         # Fan out to every responder, then wait for all
         await asyncio.gather(
-            *(fn(data) for fn in self._responders))
+            *(responder(data)
+              for responder in self._responders))
 ```
 
 `gather()` takes one awaitable per argument rather than an iterable of them,
@@ -1102,9 +1097,9 @@ The asynchronous `Thermometer` therefore replaces the setter with a coroutine me
 
 ```python
 # async_thermometer.py
-from async_broadcaster import Broadcaster
+from async_broadcaster import AsyncBroadcaster
 
-class Thermometer(Broadcaster[float]):
+class Thermometer(AsyncBroadcaster[float]):
     def __init__(self, celsius: float) -> None:
         super().__init__()
         self._celsius = celsius
@@ -1164,9 +1159,9 @@ so a `disconnect()` call during the fan-out cannot skip a responder:
 ```python
 # async_self_removing_responder.py
 import asyncio
-from async_broadcaster import Broadcaster
+from async_broadcaster import AsyncBroadcaster
 
-broadcaster = Broadcaster[object]()
+broadcaster = AsyncBroadcaster[object]()
 seen: list[str] = []
 
 async def once(data: object) -> None:
@@ -1203,9 +1198,10 @@ and the unfinished responders keep running with nobody awaiting them:
 ```python
 # gather_orphan.py
 import asyncio
+from async_broadcaster import AsyncBroadcaster
 from exceptions import aexpect
 
-async def loud(data: int) -> None:
+async def failing(data: int) -> None:
     raise ValueError(f"bad: {data}")
 
 async def slow(data: int) -> None:
@@ -1213,8 +1209,10 @@ async def slow(data: int) -> None:
     print(f"slow finished: {data}")
 
 async def main() -> None:
-    await aexpect(
-        ValueError, asyncio.gather, loud(1), slow(1))
+    broadcaster = AsyncBroadcaster[int]()
+    broadcaster.connect(failing)
+    broadcaster.connect(slow)
+    await aexpect(ValueError, broadcaster.announce, 1)
     await asyncio.sleep(0.25)  # Let the orphan finish
 
 asyncio.run(main())
@@ -1222,7 +1220,8 @@ asyncio.run(main())
 #: slow finished: 1
 ```
 
-The failure appears the moment `loud()` raises its `ValueError`.
+The failure appears the moment `failing()` raises its `ValueError`,
+which `announce()` passes on from `gather()`.
 `slow` is still sleeping at that point.
 The event loop keeps running its task, but the `gather()` call has returned,
 so no `await` remains to collect the task's result.
@@ -1719,7 +1718,8 @@ and *Observer* adds deciding and notification.
 
 The notification code can be separated from the measuring code in different ways:
 
-- `Broadcaster`, `BoundBroadcaster` and `async Broadcaster` holds the responder list and the notification loop,
+- `Broadcaster`, `BoundBroadcaster`,
+  and `AsyncBroadcaster` hold the responder list and the notification loop,
   and `Thermometer` inherits them.
 - `weather_station.py` uses no base class and calls its responders from `__setattr__()`,
   so one method covers every attribute.

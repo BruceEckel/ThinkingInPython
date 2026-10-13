@@ -28,12 +28,14 @@ class Broadcasting[T]:
     def _responders(self) -> list[Responder[T]]:
         return self.__dict__.setdefault("_responders", [])
 
-    def respond(self, fn: Responder[T]) -> Responder[T]:
-        self._responders.append(fn)
-        return fn
+    def respond(
+        self, responder: Responder[T]
+    ) -> Responder[T]:
+        self._responders.append(responder)
+        return responder
 
-    def disconnect(self, fn: Responder[T]) -> None:
-        self._responders.remove(fn)
+    def disconnect(self, responder: Responder[T]) -> None:
+        self._responders.remove(responder)
 
     def announce(self, data: tuple[str, T]) -> None:
         for responder in list(self._responders):

@@ -4,7 +4,7 @@ from collections.abc import Awaitable, Callable
 
 type AsyncResponder[T] = Callable[[T], Awaitable[None]]
 
-class Broadcaster[T]:
+class AsyncBroadcaster[T]:
     def __init__(self) -> None:
         self._responders: list[AsyncResponder[T]] = []
 
@@ -21,4 +21,5 @@ class Broadcaster[T]:
     async def announce(self, data: T) -> None:
         # Fan out to every responder, then wait for all
         await asyncio.gather(
-            *(fn(data) for fn in self._responders))
+            *(responder(data)
+              for responder in self._responders))
