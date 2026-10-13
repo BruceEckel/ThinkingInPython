@@ -209,3 +209,22 @@ Record each calibration run here with its date and result.
   vocabulary for the selection keys, and a generic `State[E]`.
   Eleven listings read, ten proposals, 115k tokens, under four
   minutes.
+- **2026-10-12, the whole book, 49 Opus agents, then applied.**
+  359 proposals over 47 chapters (Q1 108, Q2 23, Q3 28, Q4 117, Q5 54,
+  Q6 29). Bruce's ruling: apply all, hold the questionable ones for
+  him. The session held 202 and applied 157; Bruce had already marked
+  18 cards in chapters 02-04 Apply on the page, eight of them ones the
+  session held, so those applied too. 46 Opus apply agents (one per
+  chapter, 80-140k tokens, 30 s to 4 min, twenty at a time) edited the
+  chapter, its Solutions copies, and its figure spec, ran
+  `verify-ch ISOLATED=1`, and wrote a report; the whole-book `tip
+  verify` was green on the first run. Three cards were not applied:
+  two needed a `noqa` (ruff F821 for a `NameError` demo outside a
+  `try`, N804 for a `__prepare__` first parameter other than `cls`),
+  and one was moot after Bruce removed the listing. Two cards on
+  timing-registered listings (`timing.txt`) had to be applied by hand,
+  since the validator refuses to fill a new marker there. Lessons for
+  the brief: an agent that finishes before a card is added needs a
+  second pass with only the new cards; `tip prune` by one agent
+  deletes another chapter's orphan, which is harmless; a card's
+  column count is often one or two off, so the agent wraps.
