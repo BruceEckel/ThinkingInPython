@@ -266,7 +266,7 @@ Both `next()` and `run()` have the signatures the `State` Protocol names,
 so the unchanged `StateMachine` from `state_machine.py` drives a `TableState`.
 
 The constructor starts each state with an empty dict,
-so a state whose table you forget to fill reports `Waiting: no transition on ...` rather than an `AttributeError` for a missing attribute.
+so a state whose table you forget to fill reports `Waiting: no transition on ...` rather than an `AttributeError` for a missing attribute. [[Can we detect this somehow and throw a custom exception?]]
 The `KeyError` that `next()` catches carries the input as its key,
 and the `RuntimeError` message names that input.
 So `next()` raises its `RuntimeError` [`from None`](04_Foundations--Control_Flow.md#exception-chaining),
