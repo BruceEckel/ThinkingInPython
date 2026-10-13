@@ -348,6 +348,8 @@ def compute_and_discard() -> None:
 def do_nothing() -> None:
     pass
 
+print(compute_and_discard(), do_nothing())
+#: None None
 busy = timeit.timeit(compute_and_discard, number=5)
 idle = timeit.timeit(do_nothing, number=5)
 report(busy=busy, idle=idle, ratio=busy / idle)
