@@ -108,16 +108,19 @@ operations: dict[str, Callable[[int, int], int]] = {
     "//": floordiv,
 }
 operations["%"] = mod
-print(operations["+"](6, 4), operations["-"](6, 4),
-      operations["*"](6, 4), operations["//"](6, 4),
-      operations["%"](6, 4))
-#: 10 2 24 1 2
+for symbol in ["+", "-", "*", "//", "%"]:
+    print(symbol, operations[symbol](6, 4))
+#: + 10
+#: - 2
+#: * 24
+#: // 1
+#: % 2
 with expected(KeyError):
     operations["^"](6, 4)
 #: [KeyError] '^'
 ```
 
-You call `operations["*"](6, 4)` the way you call the other four
+The loop calls `operations["*"](6, 4)` the way it calls the other four
 entries, and the calling code stays as it was. Supporting the new
 operator takes one function and one row in the table. `expected()`
 from the shared `exceptions` helper catches the missing-key

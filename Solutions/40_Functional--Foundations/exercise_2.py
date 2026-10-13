@@ -19,10 +19,13 @@ operations: dict[str, Callable[[int, int], int]] = {
     "//": floordiv,
 }
 operations["%"] = mod
-print(operations["+"](6, 4), operations["-"](6, 4),
-      operations["*"](6, 4), operations["//"](6, 4),
-      operations["%"](6, 4))
-#: 10 2 24 1 2
+for symbol in ["+", "-", "*", "//", "%"]:
+    print(symbol, operations[symbol](6, 4))
+#: + 10
+#: - 2
+#: * 24
+#: // 1
+#: % 2
 with expected(KeyError):
     operations["^"](6, 4)
 #: [KeyError] '^'

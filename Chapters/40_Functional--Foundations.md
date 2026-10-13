@@ -317,9 +317,12 @@ operations: dict[str, Callable[[int, int], int]] = {
 }
 # A row can come from outside the literal, unchanged:
 operations["%"] = mod
-print(operations["+"](6, 4), operations["-"](6, 4),
-      operations["//"](6, 4), operations["%"](6, 4))
-#: 10 2 1 2
+for symbol in ["+", "-", "//", "%"]:
+    print(symbol, operations[symbol](6, 4))
+#: + 10
+#: - 2
+#: // 1
+#: % 2
 # A missing key is a KeyError, no else branch:
 with expected(KeyError):
     operations["^"](6, 4)
