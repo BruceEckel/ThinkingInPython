@@ -16,13 +16,14 @@ def wrap(names: list[str]) -> None:
             stack.enter_context(tag(n)) for n in names]
         print("using", open_tags)
 
-wrap(["a", "b"])
+if __name__ == "__main__":
+    wrap(["a", "b"])
+    wrap(["a", "b", "c"])
 #: open a
 #: open b
 #: using ['a', 'b']
 #: close b
 #: close a
-wrap(["a", "b", "c"])
 #: open a
 #: open b
 #: open c

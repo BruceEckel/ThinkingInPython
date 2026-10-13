@@ -1,14 +1,6 @@
 # decorated_generator.py
-from collections.abc import Generator, Iterator
-from contextlib import contextmanager
-
-@contextmanager
-def banner(title: str) -> Generator[None]:
-    print(f"=== {title} ===")
-    try:
-        yield
-    finally:
-        print(f"=== {title} ends ===")
+from collections.abc import Iterator
+from context_decorator import banner
 
 @banner("rows")
 def rows() -> Iterator[int]:

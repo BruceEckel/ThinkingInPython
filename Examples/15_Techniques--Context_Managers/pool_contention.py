@@ -1,5 +1,6 @@
 # pool_contention.py
 import threading
+import time
 from typing import Final
 from object_pool import Connection, Pool
 
@@ -8,16 +9,16 @@ ROUNDS: Final[int] = 200
 pool = Pool(Connection(1), Connection(2))
 lock = threading.Lock()
 held = 0
-over_capacity = False
+peak = 0
 
 def borrow() -> None:
-    global held, over_capacity
+    global held, peak
     for _ in range(ROUNDS):
         with pool.lease():
             with lock:
                 held += 1
-                if held > 2:
-                    over_capacity = True
+                peak = max(peak, held)
+            time.sleep(0.000_001)
             with lock:
                 held -= 1
 
@@ -27,7 +28,7 @@ for worker in workers:
     worker.start()
 for worker in workers:
     worker.join()
-print("over capacity:", over_capacity)
-#: over capacity: False
+print("peak leases:", peak)
+#: peak leases: 2
 print("pool size after:", pool.available())
 #: pool size after: 2

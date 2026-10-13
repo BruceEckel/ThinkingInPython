@@ -675,20 +675,13 @@ The wrapper treats a generator function differently.
 Before Python 3.15, it wrapped only the call that creates the generator object,
 so the context entered and exited before the generator's body ran,
 and the manager closed any resource it opened before the body could use it.
-On 3.15 the context opens at the first `next()` and closes after the generator's last `yield`:
+On 3.15 the context opens at the first `next()` and closes after the generator's last `yield`.
+`decorated_generator.py` imports `banner` from `context_decorator.py` and decorates a generator with it:
 
 ```python
 # decorated_generator.py
-from collections.abc import Generator, Iterator
-from contextlib import contextmanager
-
-@contextmanager
-def banner(title: str) -> Generator[None]:
-    print(f"=== {title} ===")
-    try:
-        yield
-    finally:
-        print(f"=== {title} ends ===")
+from collections.abc import Iterator
+from context_decorator import banner
 
 @banner("rows")
 def rows() -> Iterator[int]:
@@ -777,13 +770,14 @@ def wrap(names: list[str]) -> None:
             stack.enter_context(tag(n)) for n in names]
         print("using", open_tags)
 
-wrap(["a", "b"])
+if __name__ == "__main__":
+    wrap(["a", "b"])
+    wrap(["a", "b", "c"])
 #: open a
 #: open b
 #: using ['a', 'b']
 #: close b
 #: close a
-wrap(["a", "b", "c"])
 #: open a
 #: open b
 #: open c
@@ -799,30 +793,29 @@ and a comma-separated `with` cannot express that.
 Every entry in `wrap()` succeeds,
 so `wrap()` leaves `ExitStack`'s other guarantee untested.
 When a later entry fails, the stack unwinds the managers that entered earlier.
-In `exit_stack_fails.py` the third manager fails to enter.
-The first two unwind, and the third's cleanup does not run:
+`exit_stack_fails.py` enters two `tag()` managers from `exit_stack.py`,
+then a third manager, `broken()`,
+which raises a `RuntimeError` before its `yield` and so fails to enter.
+The first two unwind, and `ExitStack` registers nothing for the third:
 
 ```python
 # exit_stack_fails.py
 from collections.abc import Generator
 from contextlib import ExitStack, contextmanager
 from exceptions import expected
+from exit_stack import tag
 
 @contextmanager
-def tag(name: str, fail: bool = False) -> Generator[str]:
+def broken(name: str) -> Generator[str]:
     print(f"open {name}")
-    if fail:
-        raise RuntimeError(f"{name} failed to open")
-    try:
-        yield name
-    finally:
-        print(f"close {name}")
+    raise RuntimeError(f"{name} failed to open")
+    yield name
 
 with expected(RuntimeError):
     with ExitStack() as stack:
         stack.enter_context(tag("a"))
         stack.enter_context(tag("b"))
-        stack.enter_context(tag("c", fail=True))
+        stack.enter_context(broken("c"))
 #: open a
 #: open b
 #: open c
@@ -831,8 +824,8 @@ with expected(RuntimeError):
 #: [RuntimeError] c failed to open
 ```
 
-`c` gets no `close c` line,
-because its `__enter__()` raises a `RuntimeError` before `ExitStack` can register it.
+`ExitStack` registers a manager's exit after its `__enter__()` returns,
+and the `__enter__()` of `broken("c")` raises a `RuntimeError` instead.
 `a` and `b` entered first, so both unwind in reverse,
 the same rule a comma-separated `with` follows.
 
@@ -1048,6 +1041,7 @@ Eight threads share a pool of two connections and lease and release two hundred 
 ```python
 # pool_contention.py
 import threading
+import time
 from typing import Final
 from object_pool import Connection, Pool
 
@@ -1056,16 +1050,16 @@ ROUNDS: Final[int] = 200
 pool = Pool(Connection(1), Connection(2))
 lock = threading.Lock()
 held = 0
-over_capacity = False
+peak = 0
 
 def borrow() -> None:
-    global held, over_capacity
+    global held, peak
     for _ in range(ROUNDS):
         with pool.lease():
             with lock:
                 held += 1
-                if held > 2:
-                    over_capacity = True
+                peak = max(peak, held)
+            time.sleep(0.000_001)
             with lock:
                 held -= 1
 
@@ -1075,19 +1069,22 @@ for worker in workers:
     worker.start()
 for worker in workers:
     worker.join()
-print("over capacity:", over_capacity)
-#: over capacity: False
+print("peak leases:", peak)
+#: peak leases: 2
 print("pool size after:", pool.available())
 #: pool size after: 2
 ```
 
-`held` counts the threads inside the counted window of a lease,
-incremented once the lease begins and decremented right after the check,
-so `over_capacity` turns `True` when three of those windows overlap.
+`held` counts the threads holding a lease,
+incremented once the lease begins and decremented just before it ends,
+and `peak` records the highest count `held` reaches.
+The `time.sleep()` keeps each lease open long enough for other threads to arrive at the pool,
+so both connections are out at once.
 Across sixteen hundred lease-and-release cycles,
 spread over eight threads competing for two connections,
-`held` stays at or below two.
+`peak` reaches two and stops there.
 A thread that arrives while the pool is empty blocks in `get()` instead of racing past it.
+A pool with no limit would let all eight threads hold a lease together and print a peak of eight.
 
 `available()` is a snapshot for the demo, not a synchronization primitive.
 `Queue.qsize()` becomes approximate once more than one thread is borrowing,
