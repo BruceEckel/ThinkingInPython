@@ -240,7 +240,6 @@ and the sharing is harmless because a tuple cannot change:
 ```python
 # immutable_default.py
 
-# An empty tuple is safe: it can't be mutated
 def show(items=()):
     for item in items:
         print(item)
@@ -338,13 +337,15 @@ read_only()
 #: 0
 rebinds()
 #: 99
+print(count)
+#: 0
 writes_global()
 print(count)
 #: 1
 ```
 
 `rebinds()` leaves the module-level `count` alone,
-because its `count = 99` binds a local.
+as the `0` after its `99` shows, because its `count = 99` binds a local.
 `+=` is an assignment too, so if you drop the `global` from `writes_global()`,
 the compiler marks `count` local for the whole function,
 and the read half of `count += 1` looks up a local that has no value yet.
@@ -485,6 +486,9 @@ def divide(a, b, /):
 
 print(divide(10, 2))
 #: 5.0
+expect(TypeError, divide, a=10, b=2)  # type: ignore
+#: [TypeError] divide() got some positional-only arguments
+#: passed as keyword arguments: 'a, b'
 
 def make_user(name, *, admin=False):
     return f"{name} (admin={admin})"
@@ -493,6 +497,9 @@ print(make_user("Bob"))
 #: Bob (admin=False)
 print(make_user("Sue", admin=True))
 #: Sue (admin=True)
+expect(TypeError, make_user, "Sue", True)  # type: ignore
+#: [TypeError] make_user() takes 1 positional argument but 2
+#: were given
 
 def tally(label, *values, total=False):
     print(label, values, total)
@@ -501,23 +508,16 @@ tally("nums", 1, 2, True)  # [1]
 #: nums (1, 2, True) False
 tally("nums", 1, 2, total=True)
 #: nums (1, 2) True
-
-expect(TypeError, divide, a=10, b=2)  # type: ignore
-#: [TypeError] divide() got some positional-only arguments
-#: passed as keyword arguments: 'a, b'
-expect(TypeError, make_user, "Sue", True)  # type: ignore
-#: [TypeError] make_user() takes 1 positional argument but 2
-#: were given
 ```
-
-The `True` in the `tally()` call at `[1]` joins `values` like any other positional argument.
-Only the named form, `total=True`, reaches `total`.
 
 Calling `divide(a=10, b=2)` is an error,
 because `a` and `b` are positional-only.
 Calling `make_user("Sue", True)` is an error, because `admin` is keyword-only.
 The type checker catches both mistakes before the code runs,
 so each line carries a `# type: ignore` saying the misuse is deliberate.
+
+The `True` in the `tally()` call at `[1]` joins `values` like any other positional argument.
+Only the named form, `total=True`, reaches `total`.
 
 A signature can use every form at once, in one set order: positional-only,
 positional-or-keyword, `*args`, keyword-only, `**kwargs`:
@@ -565,12 +565,13 @@ print(sorted(words, key=len))
 print(sorted(words, key=lambda w: w[-1]))
 #: ['banana', 'apple', 'fig', 'kiwi']
 square = lambda n: n * n  # Usually prefer def
-print(square(9))
-#: 81
+print(square.__name__)
+#: <lambda>
 ```
 
-`square = lambda n: n * n` gives up the anonymity that is a lambda's point,
-and the function's name in a traceback stays `<lambda>` where a `def` shows `square`.
+`square = lambda n: n * n` gives up the anonymity that is a lambda's point.
+The assignment binds the name `square` and leaves the function's `__name__` as `<lambda>`,
+so a traceback shows `<lambda>` where a `def` shows `square`.
 Unlike the body of an anonymous function in many other languages,
 a lambda body must be a single expression.
 For anything more complicated, write a separate function.

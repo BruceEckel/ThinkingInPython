@@ -6,5 +6,5 @@ print(sorted(words, key=len))
 print(sorted(words, key=lambda w: w[-1]))
 #: ['banana', 'apple', 'fig', 'kiwi']
 square = lambda n: n * n  # Usually prefer def
-print(square(9))
-#: 81
+print(square.__name__)
+#: <lambda>

@@ -18,6 +18,8 @@ read_only()
 #: 0
 rebinds()
 #: 99
+print(count)
+#: 0
 writes_global()
 print(count)
 #: 1

@@ -6,6 +6,9 @@ def divide(a, b, /):
 
 print(divide(10, 2))
 #: 5.0
+expect(TypeError, divide, a=10, b=2)  # type: ignore
+#: [TypeError] divide() got some positional-only arguments
+#: passed as keyword arguments: 'a, b'
 
 def make_user(name, *, admin=False):
     return f"{name} (admin={admin})"
@@ -14,6 +17,9 @@ print(make_user("Bob"))
 #: Bob (admin=False)
 print(make_user("Sue", admin=True))
 #: Sue (admin=True)
+expect(TypeError, make_user, "Sue", True)  # type: ignore
+#: [TypeError] make_user() takes 1 positional argument but 2
+#: were given
 
 def tally(label, *values, total=False):
     print(label, values, total)
@@ -22,10 +28,3 @@ tally("nums", 1, 2, True)  # [1]
 #: nums (1, 2, True) False
 tally("nums", 1, 2, total=True)
 #: nums (1, 2) True
-
-expect(TypeError, divide, a=10, b=2)  # type: ignore
-#: [TypeError] divide() got some positional-only arguments
-#: passed as keyword arguments: 'a, b'
-expect(TypeError, make_user, "Sue", True)  # type: ignore
-#: [TypeError] make_user() takes 1 positional argument but 2
-#: were given
