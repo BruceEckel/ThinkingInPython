@@ -4,7 +4,6 @@
 # One lowercase word per line; '#' starts a comment.
 
 accessor
-accessor
 accessors
 adaptee
 affordances
