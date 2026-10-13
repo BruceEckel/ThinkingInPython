@@ -253,14 +253,14 @@ class EmptyTable(NoTransition):
 
 class TableState(ABC):
     def __init__(self) -> None:
-        self.transitions: dict[object, State] = {}
+        self.transitions: dict[object, State] | None = None
 
     @abstractmethod
     def run(self) -> None: ...
 
     def next(self, input_: object) -> State:
         name = type(self).__name__
-        if not self.transitions:
+        if self.transitions is None:
             raise EmptyTable(f"{name}: table never filled")
         try:
             return self.transitions[input_]
@@ -274,11 +274,13 @@ class TableState(ABC):
 Both `next()` and `run()` have the signatures the `State` Protocol names,
 so the unchanged `StateMachine` from `state_machine.py` drives a `TableState`.
 
-The constructor starts each state with an empty dict,
-so a state whose table you forget to fill has a table rather than a missing attribute.
-`next()` checks for that empty table before the lookup and raises `EmptyTable`,
+The constructor starts each state with `transitions` set to `None`,
+so a state whose table you forget to fill holds `None` rather than a missing attribute.
+`next()` checks for `None` before the lookup and raises `EmptyTable`,
 whose message names the state,
 so the state reports the mistake at its first input.
+A table set to `{}` on purpose, for a state with no way out, passes that check,
+and the same `is None` test narrows the attribute to a `dict` for the lookup that follows.
 When the table is filled but has no entry for the input,
 the lookup raises a `KeyError`,
 and the `except` clause reports that as `NoTransition`.

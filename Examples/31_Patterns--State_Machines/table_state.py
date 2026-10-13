@@ -10,14 +10,14 @@ class EmptyTable(NoTransition):
 
 class TableState(ABC):
     def __init__(self) -> None:
-        self.transitions: dict[object, State] = {}
+        self.transitions: dict[object, State] | None = None
 
     @abstractmethod
     def run(self) -> None: ...
 
     def next(self, input_: object) -> State:
         name = type(self).__name__
-        if not self.transitions:
+        if self.transitions is None:
             raise EmptyTable(f"{name}: table never filled")
         try:
             return self.transitions[input_]
