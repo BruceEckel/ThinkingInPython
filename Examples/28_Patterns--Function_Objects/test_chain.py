@@ -1,6 +1,6 @@
 # test_chain.py
 from algorithms import bisection, newton, secant
-from chain import Fn, RootFinder, solve
+from chain import Fn, RootFinder, first_root
 
 def f(x: float) -> float:
     return x * x - 2  # Root at the square root of 2
@@ -17,7 +17,7 @@ def test_first_successful_finder_wins() -> None:
     tried: list[str] = []
     chain = [watched(x, tried)
              for x in (bisection, secant, newton)]
-    root = solve(f, 0.0, 2.0, chain)
+    root = first_root(f, 0.0, 2.0, chain)
     assert root is not None
     assert abs(root - 2 ** 0.5) < 1e-6
     assert tried == ["bisection"]  # The rest never ran
@@ -28,16 +28,16 @@ def test_chain_falls_through_to_a_later_method() -> None:
     tried: list[str] = []
     chain = [watched(x, tried)
              for x in (bisection, secant, newton)]
-    root = solve(f, 1.0, 1.3, chain)
+    root = first_root(f, 1.0, 1.3, chain)
     assert root is not None
     assert abs(root - 2 ** 0.5) < 1e-6
     assert tried == ["bisection", "secant"]
 
 def test_empty_chain_returns_none() -> None:
-    assert solve(f, 0.0, 2.0, []) is None
+    assert first_root(f, 0.0, 2.0, []) is None
 
 def test_all_fail_returns_none() -> None:
     def g(x: float) -> float:
         return x * x + 1  # No real root
     chain: list[RootFinder] = [bisection, secant, newton]
-    assert solve(g, 0.0, 2.0, chain) is None
+    assert first_root(g, 0.0, 2.0, chain) is None

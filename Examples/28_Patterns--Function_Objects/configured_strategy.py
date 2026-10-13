@@ -1,17 +1,9 @@
 # configured_strategy.py
-from algorithms import Fn, RootFinder, solve
+from algorithms import Fn, RootFinder, bisection_tol, solve
 
 def bisection_within(tolerance: float) -> RootFinder:
     def finder(f: Fn, a: float, b: float) -> float | None:
-        if f(a) * f(b) > 0:  # Endpoints must bracket a root
-            return None
-        while abs(b - a) > tolerance:
-            mid = (a + b) / 2
-            if f(a) * f(mid) <= 0:
-                b = mid
-            else:
-                a = mid
-        return (a + b) / 2
+        return bisection_tol(f, a, b, tolerance)
     return finder
 
 def f(x: float) -> float:

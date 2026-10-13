@@ -27,8 +27,8 @@ def newton_within(tolerance: float) -> RootFinder:
         return newton(f, a, b, tolerance)
     return finder
 
-def solve(f: Fn, a: float, b: float,
-          chain: list[RootFinder]) -> float | None:
+def first_root(f: Fn, a: float, b: float,
+               chain: list[RootFinder]) -> float | None:
     for finder in chain:
         root = finder(f, a, b)
         if root is not None:
@@ -44,7 +44,7 @@ fine_closure = newton_within(1e-12)
 
 for finder in (coarse_closure, coarse_partial,
                fine_closure):
-    root = solve(f, 0.0, 2.0, [finder])
+    root = first_root(f, 0.0, 2.0, [finder])
     assert root is not None
     print(f"{root:.6f}")
 #: 1.500000

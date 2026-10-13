@@ -265,7 +265,7 @@ The secant method reads them as two starting points,
 and Newton's method averages them into one.
 The secant and Newton methods are *open*: they need somewhere to start,
 not a bracket.
-`chain.py`, under *Chain of Responsibility*,
+`chain_demo.py`, under *Chain of Responsibility*,
 falls back on them when bisection has no bracket.
 All three share one signature, so they are interchangeable,
 and `solve()` runs whichever one the caller passes:
@@ -293,6 +293,18 @@ def bisection(f: Fn, a: float, b: float) -> float | None:
         else:
             a = mid
     return None
+
+def bisection_tol(f: Fn, a: float, b: float,
+                  tolerance: float) -> float | None:
+    if f(a) * f(b) > 0:  # Endpoints must bracket a root
+        return None
+    while abs(b - a) > tolerance:
+        mid = (a + b) / 2
+        if f(a) * f(mid) <= 0:
+            b = mid
+        else:
+            a = mid
+    return (a + b) / 2
 
 def secant(f: Fn, a: float, b: float) -> float | None:
     x0, x1 = a, b
@@ -372,23 +384,19 @@ and that algorithm stays the same (see exercise 3).
 When a strategy needs configuration,
 use a [*closure*](40_Functional--Foundations.md#closures).
 An outer function takes the settings and returns the strategy,
-and those settings stay available to the strategy after the outer function returns:
+and those settings stay available to the strategy after the outer function returns.
+`algorithms.py` also defines `bisection_tol()`,
+a bisection that stops once the bracket is narrower than `tolerance`.
+Its fourth parameter keeps it from matching `RootFinder`,
+so a closure supplies the tolerance:
 
 ```python
 # configured_strategy.py
-from algorithms import Fn, RootFinder, solve
+from algorithms import Fn, RootFinder, bisection_tol, solve
 
 def bisection_within(tolerance: float) -> RootFinder:
     def finder(f: Fn, a: float, b: float) -> float | None:
-        if f(a) * f(b) > 0:  # Endpoints must bracket a root
-            return None
-        while abs(b - a) > tolerance:
-            mid = (a + b) / 2
-            if f(a) * f(mid) <= 0:
-                b = mid
-            else:
-                a = mid
-        return (a + b) / 2
+        return bisection_tol(f, a, b, tolerance)
     return finder
 
 def f(x: float) -> float:
@@ -406,29 +414,17 @@ Each call to `bisection_within()` returns a new finder whose closure holds that 
 The coarse strategy stops within a tenth and reports 1.406250.
 The fine one agrees with the true root to six places.
 Because both satisfy `RootFinder`, `solve()` accepts either unchanged,
-and so does the chain in `chain.py`.
+and so does `first_root()` in `chain.py`.
 
-When the algorithm takes the setting as an ordinary parameter,
-`functools.partial()` replaces the closure.
+Because `bisection_tol()` takes the setting as an ordinary parameter,
+`functools.partial()` can replace the closure.
 `partial()` fills positional parameters from the left,
 so bind a trailing setting by keyword:
 
 ```python
 # partial_bisection.py
 from functools import partial
-from algorithms import Fn, solve
-
-def bisection_tol(f: Fn, a: float, b: float,
-                  tolerance: float) -> float | None:
-    if f(a) * f(b) > 0:  # Endpoints must bracket a root
-        return None
-    while abs(b - a) > tolerance:
-        mid = (a + b) / 2
-        if f(a) * f(mid) <= 0:
-            b = mid
-        else:
-            a = mid
-    return (a + b) / 2
+from algorithms import bisection_tol, solve
 
 def f(x: float) -> float:
     return x * x - 2  # Root at the square root of 2
@@ -441,8 +437,7 @@ for finder in (coarse, fine):
 #: 1.414214
 ```
 
-Because `bisection_tol()` takes `tolerance` as an ordinary parameter,
-`partial()` binds it by keyword, once per strategy,
+`partial()` binds `tolerance` by keyword, once per strategy,
 in place of `bisection_within()`'s closure.
 Each `partial` object satisfies `RootFinder`,
 so `solve()` runs it as it runs the closures.
@@ -458,50 +453,55 @@ Configuration alone is a closure's job.
 *Chain of Responsibility* tries a sequence of handlers until one succeeds.
 *GoF Design Patterns* implements the chain as a linked structure,
 each handler holding a reference to the next and deciding whether to pass the request along.
-In Python that chain is a list of functions.
-
-Bisection needs the interval to bracket a root.
-The open methods do not:
+In Python that chain is a list of functions,
+and `first_root()` returns the first root a finder in the list reports:
 
 ```python
 # chain.py
-from algorithms import (Fn, RootFinder, bisection,
-                        newton, secant)
+from algorithms import Fn, RootFinder
 
-def solve(f: Fn, a: float, b: float,
-          chain: list[RootFinder]) -> float | None:
+def first_root(f: Fn, a: float, b: float,
+               chain: list[RootFinder]) -> float | None:
     for finder in chain:
         root = finder(f, a, b)
         if root is not None:
             return root
     return None
-
-def f(x: float) -> float:
-    return x * x - 2  # Root at the square root of 2
-
-chain: list[RootFinder] = [bisection, secant, newton]
-# [0, 2] brackets the root, so bisection succeeds first:
-r1 = solve(f, 0.0, 2.0, chain)
-print(f"{r1:.6f}" if r1 is not None else "no root")
-#: 1.414214
-# No bracket in [1.0, 1.3]: bisection fails, secant works:
-print(bisection(f, 1.0, 1.3))
-#: None
-r2 = solve(f, 1.0, 1.3, chain)  # [1]
-print(f"{r2:.6f}" if r2 is not None else "no root")
-#: 1.414214
 ```
 
 Each handler is a *Strategy* function, `chain` is the list of strategies,
 and success is a non-`None` return.
-This `solve()` reuses the name from `algorithms.py` with the opposite failure contract.
 An exhausted chain returns `None` rather than raising an exception,
 and the caller decides what an empty result means.
 
-The second `solve()` call (`[1]`) shows the fall-through.
-Because the interval `[1.0, 1.3]` does not straddle the root,
+Bisection needs the interval to bracket a root.
+The open methods do not.
+`chain_demo.py` runs bisection alone and then the chain on two intervals:
+
+```python
+# chain_demo.py
+from algorithms import RootFinder, bisection, newton, secant
+from chain import first_root
+
+def f(x: float) -> float:
+    return x * x - 2  # Root at the square root of 2
+
+def show(root: float | None) -> str:
+    return "None" if root is None else f"{root:.6f}"
+
+chain: list[RootFinder] = [bisection, secant, newton]
+for a, b in ((0.0, 2.0), (1.0, 1.3)):
+    alone = show(bisection(f, a, b))
+    first = show(first_root(f, a, b, chain))
+    print(f"[{a}, {b}] bisection: {alone}, chain: {first}")
+#: [0.0, 2.0] bisection: 1.414214, chain: 1.414214
+#: [1.0, 1.3] bisection: None, chain: 1.414214
+```
+
+The `[1.0, 1.3]` line shows the fall-through.
+Because that interval does not straddle the root,
 bisection fails by returning `None`.
-The loop continues to a method that needs no bracket.
+The loop in `first_root()` continues to a method that needs no bracket.
 Adding, removing, or reordering the handlers means editing the `chain` list.
 
 All three patterns share one shape:
@@ -515,7 +515,7 @@ all of them in turn, one per call, or the first that succeeds.
 That count, rather than a class structure, separates *Command*, *Strategy*,
 and *Chain of Responsibility* in Python.
 
-The test in `solve()` is `root is not None`, not `if root`.
+The test in `first_root()` is `root is not None`, not `if root`.
 A finder returns `0.0` for a function whose root is at zero, and `0.0` is falsy,
 so a truthiness test discards a correct answer and calls the next finder.
 The hazard is the truthiness test, not the choice of failure value.
@@ -544,7 +544,7 @@ The test file confirms that:
 ```python
 # test_chain.py
 from algorithms import bisection, newton, secant
-from chain import Fn, RootFinder, solve
+from chain import Fn, RootFinder, first_root
 
 def f(x: float) -> float:
     return x * x - 2  # Root at the square root of 2
@@ -561,7 +561,7 @@ def test_first_successful_finder_wins() -> None:
     tried: list[str] = []
     chain = [watched(x, tried)
              for x in (bisection, secant, newton)]
-    root = solve(f, 0.0, 2.0, chain)
+    root = first_root(f, 0.0, 2.0, chain)
     assert root is not None
     assert abs(root - 2 ** 0.5) < 1e-6
     assert tried == ["bisection"]  # The rest never ran
@@ -572,19 +572,19 @@ def test_chain_falls_through_to_a_later_method() -> None:
     tried: list[str] = []
     chain = [watched(x, tried)
              for x in (bisection, secant, newton)]
-    root = solve(f, 1.0, 1.3, chain)
+    root = first_root(f, 1.0, 1.3, chain)
     assert root is not None
     assert abs(root - 2 ** 0.5) < 1e-6
     assert tried == ["bisection", "secant"]
 
 def test_empty_chain_returns_none() -> None:
-    assert solve(f, 0.0, 2.0, []) is None
+    assert first_root(f, 0.0, 2.0, []) is None
 
 def test_all_fail_returns_none() -> None:
     def g(x: float) -> float:
         return x * x + 1  # No real root
     chain: list[RootFinder] = [bisection, secant, newton]
-    assert solve(g, 0.0, 2.0, chain) is None
+    assert first_root(g, 0.0, 2.0, chain) is None
 ```
 
 `test_first_successful_finder_wins()` and `test_chain_falls_through_to_a_later_method()` wrap each finder in `watched()`,
@@ -1022,8 +1022,8 @@ Try each exercise before opening its [solution](../Solutions/28_Patterns--Functi
 4.  Following `bisection_within()`,
     add a `tolerance` parameter to `newton()` in `algorithms.py` and build a configured strategy from it two ways:
     with a closure, and with `functools.partial`.
-    Confirm that `chain.py`'s `solve()` runs a chain holding either one,
-    with no change to `solve()`.
+    Confirm that `chain.py`'s `first_root()` runs a chain holding either one,
+    with no change to `first_root()`.
 5.  Because `EventBus.publish()` looks up `type(event)`,
     a subclass of `Deposit` finds no handler.
     Change `publish()` to walk `type(event).__mro__` and call every handler registered along it,

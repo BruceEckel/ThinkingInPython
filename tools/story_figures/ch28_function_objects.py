@@ -10,7 +10,7 @@ stays the same and sees only the signature; on the right, what each run
 produces, one row per callable. The names and output come from
 `command.py` (the `macro` list and its three lines), `strategy.py`
 (`bisection`, `newton`, `secant` passed to `solve()`, `1.414214` each
-time), and `chain.py` (`solve(f, 1.0, 1.3, chain)`, where `bisection`
+time), and `chain_demo.py` (`first_root()` on `[1.0, 1.3]`, where `bisection`
 returns `None`, `secant` finds the root, and `newton` never runs, as
 `test_chain.py` asserts).
 """
@@ -150,13 +150,13 @@ def render() -> str:
     mid = y0 + (LH - 12) / 2
     b += arrow((AX + AW, mid), (CX, mid), INK, "fo-ink")
     b += text((AX + AW + CX) / 2, mid - 8, "in order", 10, INK, "middle")
-    b += call_site(y0, ("def solve(..., chain):",
+    b += call_site(y0, ("def first_root(..., chain):",
                         "    for finder in chain:"),
                    "        finder(f, a, b)", "sees only RootFinder")
     b += outputs(y0, (("bisection: None", MUTED),
                       ("secant: 1.414214", INK),
                       ("newton: never runs", MUTED)),
-                 "solve(f, 1.0, 1.3, chain)")
+                 "first_root on [1.0, 1.3]")
     b += cross(OX + 15 * 6.3 + 12, row_y(y0, 0) + 13, 5)
 
     defs = markers(**{"fo-ink": ("filled", INK)})

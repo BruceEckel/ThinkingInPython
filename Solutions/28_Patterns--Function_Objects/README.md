@@ -154,7 +154,7 @@ balance.
 
 [*Chain of Responsibility*: Choosing the Handler at Runtime](../../Chapters/28_Patterns--Function_Objects.md#chain-of-responsibility-choosing-the-handler-at-runtime) uses `None` to mean that a handler failed.
 `None` carries no reason, so give each handler a failure value that does, and return `float | Failed`.
-In `solve()`, tell a root from a failure with `match`, print each attempt, and read the handler's name from `__name__`.
+In `first_root()`, tell a root from a failure with `match`, print each attempt, and read the handler's name from `__name__`.
 Because `Callable` has no name, the type of the chain needs a `Protocol` that declares `__name__`.
 
 <details>
@@ -191,8 +191,8 @@ def secant(f: Fn, a: float, b: float) -> float | Failed:
 def newton(f: Fn, a: float, b: float) -> float | Failed:
     ...
 
-def solve(f: Fn, a: float, b: float,
-          chain: list[Finder]) -> float | None:
+def first_root(f: Fn, a: float, b: float,
+               chain: list[Finder]) -> float | None:
     ...
 
 def f(x: float) -> float:
@@ -271,8 +271,8 @@ def newton(f: Fn, a: float, b: float) -> float | Failed:
             return x
     return NO_CONVERGENCE
 
-def solve(f: Fn, a: float, b: float,
-          chain: list[Finder]) -> float | None:
+def first_root(f: Fn, a: float, b: float,
+               chain: list[Finder]) -> float | None:
     for finder in chain:
         match finder(f, a, b):
             case Failed(reason):
@@ -286,14 +286,14 @@ def solve(f: Fn, a: float, b: float,
 def f(x: float) -> float:
     return x * x - 2
 
-solve(f, 1.0, 1.3, [bisection, secant, newton])
+first_root(f, 1.0, 1.3, [bisection, secant, newton])
 #: bisection: no root bracketed by [1.0, 1.3]
 #: secant: 1.414214
 
 def g(x: float) -> float:
     return x * x + 1  # No real root
 
-solve(g, 0.0, 2.0, [bisection])
+first_root(g, 0.0, 2.0, [bisection])
 #: bisection: no root bracketed by [0.0, 2.0]
 #: every finder failed
 ```
@@ -308,13 +308,13 @@ returns `float | Failed`.
 of the interval, and it can also run out of iterations, so each
 failing `return` states its own reason.
 
-**Tell a root from a failure.** `solve()` tells a root from a `Failed`
+**Tell a root from a failure.** `first_root()` tells a root from a `Failed`
 with `match`. `case Failed(reason)` prints the reason and lets the
 loop continue, and any other value is the root.
 
 The chapter's advice about the failure value still holds. A `Failed`
 is never a root, so `float | Failed` says which result is which, and
-`solve()` checks the result's type, not its truthiness.
+`first_root()` checks the result's type, not its truthiness.
 
 **Name each attempt.** `finder.__name__` reads the function's own name, since every function
 carries its name as an attribute, so the report needs no extra
@@ -381,8 +381,8 @@ Context holding the current strategy is the call to `sorted()`.
 > Following `bisection_within()`,
 > add a `tolerance` parameter to `newton()` in `algorithms.py` and build a configured strategy from it two ways:
 > with a closure, and with `functools.partial`.
-> Confirm that `chain.py`'s `solve()` runs a chain holding either one,
-> with no change to `solve()`.
+> Confirm that `chain.py`'s `first_root()` runs a chain holding either one,
+> with no change to `first_root()`.
 
 <details>
 <summary>Where to look</summary>
@@ -390,7 +390,7 @@ Context holding the current strategy is the call to `sorted()`.
 [*Strategy*: Choosing the Algorithm at Runtime](../../Chapters/28_Patterns--Function_Objects.md#strategy-choosing-the-algorithm-at-runtime) builds a configured *Strategy* from `bisection_within()` and again with `functools.partial`.
 Give `newton()` a `tolerance` parameter with a default so existing calls keep working.
 Then write a factory that returns an inner function calling `newton()` with the tolerance, and build a second finder with `partial()` and a keyword argument.
-Both match the `RootFinder` type, which is why `solve()` needs no change.
+Both match the `RootFinder` type, which is why `first_root()` needs no change.
 
 <details>
 <summary>The shape</summary>
@@ -413,8 +413,8 @@ def newton(f: Fn, a: float, b: float,
 def newton_within(tolerance: float) -> RootFinder:
     ...
 
-def solve(f: Fn, a: float, b: float,
-          chain: list[RootFinder]) -> float | None:
+def first_root(f: Fn, a: float, b: float,
+               chain: list[RootFinder]) -> float | None:
     ...
 
 def f(x: float) -> float:
@@ -460,8 +460,8 @@ def newton_within(tolerance: float) -> RootFinder:
         return newton(f, a, b, tolerance)
     return finder
 
-def solve(f: Fn, a: float, b: float,
-          chain: list[RootFinder]) -> float | None:
+def first_root(f: Fn, a: float, b: float,
+               chain: list[RootFinder]) -> float | None:
     for finder in chain:
         root = finder(f, a, b)
         if root is not None:
@@ -477,7 +477,7 @@ fine_closure = newton_within(1e-12)
 
 for finder in (coarse_closure, coarse_partial,
                fine_closure):
-    root = solve(f, 0.0, 2.0, [finder])
+    root = first_root(f, 0.0, 2.0, [finder])
     assert root is not None
     print(f"{root:.6f}")
 #: 1.500000
@@ -492,7 +492,7 @@ to `newton(f, a, b)` keeps working.
 reach the same configured strategy from two directions. `newton_within()`
 writes a new function whose body supplies the argument.
 `partial(newton, tolerance=0.6)` stores the argument and supplies it at
-the call. Both produce a finder matching `RootFinder`, so `solve()`
+the call. Both produce a finder matching `RootFinder`, so `first_root()`
 accepts either with no change.
 
 The two coarse finders print the same wrong-looking answer, `1.500000`,
@@ -505,8 +505,8 @@ with the true root to six places.
 `partial` is the shorter of the two ways to configure the finder, and
 it works here because the caller can supply `tolerance` by keyword.
 You need a closure when the setting is not a parameter of the
-function, the way `bisection_within()` writes the tolerance into its
-`while` condition.
+function, since `partial()` binds arguments and has no argument to
+bind there.
 
 </details>
 </details>

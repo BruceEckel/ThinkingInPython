@@ -57,8 +57,8 @@ def newton(f: Fn, a: float, b: float) -> float | Failed:
             return x
     return NO_CONVERGENCE
 
-def solve(f: Fn, a: float, b: float,
-          chain: list[Finder]) -> float | None:
+def first_root(f: Fn, a: float, b: float,
+               chain: list[Finder]) -> float | None:
     for finder in chain:
         match finder(f, a, b):
             case Failed(reason):
@@ -72,13 +72,13 @@ def solve(f: Fn, a: float, b: float,
 def f(x: float) -> float:
     return x * x - 2
 
-solve(f, 1.0, 1.3, [bisection, secant, newton])
+first_root(f, 1.0, 1.3, [bisection, secant, newton])
 #: bisection: no root bracketed by [1.0, 1.3]
 #: secant: 1.414214
 
 def g(x: float) -> float:
     return x * x + 1  # No real root
 
-solve(g, 0.0, 2.0, [bisection])
+first_root(g, 0.0, 2.0, [bisection])
 #: bisection: no root bracketed by [0.0, 2.0]
 #: every finder failed

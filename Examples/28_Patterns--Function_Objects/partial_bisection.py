@@ -1,18 +1,6 @@
 # partial_bisection.py
 from functools import partial
-from algorithms import Fn, solve
-
-def bisection_tol(f: Fn, a: float, b: float,
-                  tolerance: float) -> float | None:
-    if f(a) * f(b) > 0:  # Endpoints must bracket a root
-        return None
-    while abs(b - a) > tolerance:
-        mid = (a + b) / 2
-        if f(a) * f(mid) <= 0:
-            b = mid
-        else:
-            a = mid
-    return (a + b) / 2
+from algorithms import bisection_tol, solve
 
 def f(x: float) -> float:
     return x * x - 2  # Root at the square root of 2

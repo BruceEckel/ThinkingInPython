@@ -21,6 +21,18 @@ def bisection(f: Fn, a: float, b: float) -> float | None:
             a = mid
     return None
 
+def bisection_tol(f: Fn, a: float, b: float,
+                  tolerance: float) -> float | None:
+    if f(a) * f(b) > 0:  # Endpoints must bracket a root
+        return None
+    while abs(b - a) > tolerance:
+        mid = (a + b) / 2
+        if f(a) * f(mid) <= 0:
+            b = mid
+        else:
+            a = mid
+    return (a + b) / 2
+
 def secant(f: Fn, a: float, b: float) -> float | None:
     x0, x1 = a, b
     for _ in range(MAX_ITER):
