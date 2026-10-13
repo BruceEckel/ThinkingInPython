@@ -304,11 +304,11 @@ When the key is absent,
 so `__missing__()` builds the class, stores it under its name,
 and hands it back.
 The next lookup of that name finds the stored class directly.
-The alternative, a `make_event()` function,
-pushes the build-or-fetch decision into every caller.
+Without `__missing__()`,
+every caller would check for the name and build the missing class.
 
 `Event._event_maker` starts out empty,
-and `NAMES` beside it holds the seven legitimate event names.
+and the module-level `NAMES` holds the seven legitimate event names.
 `__missing__()` checks a name against `NAMES` before building anything,
 so every key the dict acquires names a real event.
 
@@ -371,6 +371,13 @@ and `run_events()` has no `RingBell` class for `isinstance()` to test.
 The `* ` marker depends on `RingBell` being a distinct class,
 not just a distinct name.
 
+`run_events()` wraps its lookup in `cast(type, ...)`.
+`EventMakers` declares its values as `EventMaker`, a callable,
+and `isinstance()` requires a class,
+so without the cast the type checker reports an `invalid-argument-type`.
+Every value `__missing__()` stores is a class that `type()` built,
+so the cast states something true that the declared type leaves out.
+
 ## Generating Classes with `exec()`
 
 The `type()` approach in `greenhouse.py` builds a class from a name,
@@ -427,19 +434,20 @@ with expected(ValueError):
 not the module's namespace,
 and seeds it with `{"Command": Command}` so the generated class can find its base.
 The type checker can't see into the string,
-so `namespace[class_name]` is `Any` to it.
-`exec()` also drops a `__builtins__` entry into any globals mapping that lacks one,
-and that entry is the second reason `namespace` carries the annotation `dict[str, Any]`.
+so `namespace` carries the annotation `dict[str, Any]`,
+and `namespace[class_name]` is an `Any`.
+`exec()` also adds a `__builtins__` entry, the dictionary of built-in names,
+to any globals mapping that lacks one, so `namespace` holds more than classes.
 `cast(Callable[[], Command], ...)` records the actual no-argument signature at the one place that creates the class.
 
 Unlike `EventMakers`, `make_class()` caches nothing.
 Calling `make_class("Start")` twice builds two distinct classes.
 
-`__init__()`'s definition sits textually inside a `class` block.
-The compiler treats a block that arrived as a string the same as one read from a file.
-Sitting inside a class body is the difference from `greenhouse.py`,
-whose `init()` is a nested function rather than a method in a class body,
-so `init()` gets no `__class__` cell and cannot use zero-argument `super()`.
+The `__init__()` in `klass` sits textually inside a `class` block,
+and the compiler treats a block that arrived as a string the same as one read from a file.
+So this `__init__()` gets a `__class__` cell and can call zero-argument `super()`.
+`init()` in `greenhouse.py` is a nested function rather than a method in a class body,
+so it has no such cell and names `Event.__init__()` instead.
 
 ### The Injection Risk
 
@@ -457,25 +465,34 @@ Treat `exec()` and `eval()` like string-built SQL:
 safe on values you've validated,
 dangerous on anything that reaches the program from outside, unchecked.
 
-### Generated Classes Cannot Be Pickled
+### Pickling Generated Classes
 
 Both generators, `type()` and `exec()`, have a second limitation,
 unrelated to injection.
 `exec()`'s private `namespace` has no `__name__` key,
-so the class it creates gets `__module__` set to `"builtins"`.
+so the class body's lookup of `__name__` falls through to the built-ins,
+and the class gets `__module__` set to `"builtins"`.
 `pickle.dumps()` on an instance then raises a `PicklingError`,
 because pickle looks the class up as `builtins.Start` and does not find it,
 and `inspect.getsource()` raises a `TypeError`,
 because a built-in class carries no source.
-`type()`-built classes fail differently, but just as completely.
+`type()`-built classes fail differently.
 `LightOn` gets `__module__` set to `eager_event_classes` correctly,
 but it lives in the `makers` dict, not as a module attribute.
 Pickle therefore looks for `eager_event_classes.LightOn` and does not find that either,
 and `inspect.getsource()` raises an `OSError` instead.
 Neither generator's classes survive a round trip through `pickle`,
 and neither yields source to `inspect.getsource()`.
-A class built this way serves the process that built it.
-It is not for storage or introspection.
+The rest of `inspect` still works on them, as `display_object(MyList)` shows.
+
+Pickle records a class as its module and name,
+and checks that the pair leads back to the class.
+If `make()` also binds each class as an attribute of its module,
+`globals()[name] = new_cls`,
+the pair `eager_event_classes.LightOn` leads to `LightOn`,
+and the round trip works.
+`inspect.getsource()` still raises an `OSError`,
+because no source file holds the class.
 
 ## Self-Registration of Subclasses
 
@@ -1055,7 +1072,7 @@ def test_descriptor_on_class_returns_itself() -> None:
 ### A Descriptor That Validates
 
 `Field` shows the protocol and stores whatever you hand it.
-A descriptor is justified when the write must do more than store.
+Use a descriptor when the write must do more than store.
 `Positive` checks the value on its way in,
 so every attribute declared with one enforces the same rule:
 
@@ -1410,9 +1427,9 @@ An instance of `Sub` is not an instance of `HelperMeta`,
 so nothing in its lookup chain reaches `Mixin`.
 A `classmethod` answers on both.
 
-The constraint here is the ordinary layout-compatibility rule that governs every Python class,
-not something specific to metaclasses.
-Composing a `dict`, the way `Singleton._instances` does, sidesteps the conflict.
+A metaclass that needs a `dict` holds one in an attribute,
+as `Singleton._instances` does,
+and keeps the single layout it inherits from `type`.
 
 Multiple inheritance fails a second way, from the other direction.
 A class has a single metaclass,
@@ -1513,12 +1530,10 @@ so `__iter__()` yields the three values the body assigned: `"red"`, `"green"`,
 `"blue"`.
 
 A class decorator cannot make `for c in Color` work.
-It can add methods that instances see,
-but not a protocol method the class object must answer,
-which is why `Color` needs a metaclass, not a decorator.
 Python looks up a special method such as `__iter__()` on the object's type and skips the object's own namespace,
 so `for c in Color` consults `type(Color)`.
 An `__iter__` that a decorator assigns onto `Color` serves instances of `Color` and leaves the class without one.
+A protocol method that the class object answers lives on its metaclass.
 
 `__prepare__()` is the one with no simpler substitute:
 
@@ -1573,7 +1588,8 @@ and [class decorators](14_Techniques--Decorators.md#decorating-classes)
 are simpler and easier to read.
 A class decorator receives the finished class, so it can add, replace,
 or inspect members.
-It cannot change the name, the bases, or the namespace,
+It runs after `type.__new__()` has used the name, the bases, and the namespace,
+so changing those means building a replacement class,
 and it cannot give the class object behavior of its own.
 Setting `__call__` from a decorator makes instances callable.
 Only a metaclass makes the class callable in a new way.

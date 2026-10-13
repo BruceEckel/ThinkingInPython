@@ -262,7 +262,8 @@ the body reads the cache through the class name,
 **Keep one instance per class.** `Singleton._instances` is a dictionary keyed by the class, so
 each class using the `Singleton` metaclass gets its own independent
 slot: `ASingleton`'s single instance, `BSingleton`'s single instance
-(omitted here, but present in the book), and now `CSingleton`'s.
+(omitted here, but present in the chapter's `singleton.py`), and now
+`CSingleton`'s.
 Calling `CSingleton()` twice returns the same object both times.
 `ASingleton` occupies its own key in that dictionary, so its instance
 is a separate object.
@@ -679,9 +680,9 @@ print(Tag in Demo.__bases__)
 By the time `__init__()` runs, the class object is complete. `type`
 built it inside `__new__()`, using the bases the class header supplied
 there, and laid out its `__mro__` from them. The `bases` parameter of
-`__init__()` reports the tuple `__new__()` used rather than choosing a
-new one, so `bases += (Tag,)` rebinds a local name, and `Demo.__bases__`
-stays the same. Passing the longer tuple on to `type.__init__()` changes
+`__init__()` holds the same tuple `__new__()` received, so
+`bases += (Tag,)` rebinds a local name, and `Demo.__bases__` stays the
+same. Passing the longer tuple on to `type.__init__()` changes
 nothing either, since `type.__init__()` checks its arguments and then
 ignores them.
 
