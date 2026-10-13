@@ -8,8 +8,8 @@ def handle(event: dict[str, object]) -> str:
             return f"Click at ({x}, {y})"
         case {"type": "key", "key": key}:
             return f"Key {key}"
-        case {"type": kind}:
-            return f"Other event: {kind}"
+        case {"type": kind, **rest}:
+            return f"Other event: {kind} {rest}"
         case unknown:
             return f"Unrecognized event: {unknown}"
 

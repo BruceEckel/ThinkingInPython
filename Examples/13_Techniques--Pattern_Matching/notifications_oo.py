@@ -46,15 +46,14 @@ class Push(Notification):
     def cost(self) -> float:
         return 0.0005
 
-email = Email("Invoice ready")
-sms = Sms("Code: 5821")
-push = Push("New message")
+notes: list[Notification] = [
+    Email("Invoice ready"), Sms("Code: 5821"),
+    Push("New message")]
 
-print(email.render("Dana"))
+for note in notes:
+    print(note.render("Dana"))
 #: Email to Dana: Invoice ready
-print(sms.render("Dana"))
 #: SMS to Dana: Code: 5821
-print(push.render("Dana"))
 #: Push to Dana: New message
-print(round(email.cost() + sms.cost() + push.cost(), 4))
+print(round(sum(n.cost() for n in notes), 4))
 #: 0.0215

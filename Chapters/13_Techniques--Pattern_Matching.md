@@ -518,6 +518,7 @@ the opposite of `case []`, which matches only an empty sequence.
 Test for an empty dictionary with a guard, `case {} if not event:`.
 A `**rest` at the end binds the pairs whose keys the pattern did not mention,
 as a `dict`, the mapping counterpart of `*rest` in a sequence pattern.
+The `{"type": kind, **rest}` case in `handle()` prints those leftover pairs:
 
 ```python
 # mapping_patterns.py
@@ -528,8 +529,8 @@ def handle(event: dict[str, object]) -> str:
             return f"Click at ({x}, {y})"
         case {"type": "key", "key": key}:
             return f"Key {key}"
-        case {"type": kind}:
-            return f"Other event: {kind}"
+        case {"type": kind, **rest}:
+            return f"Other event: {kind} {rest}"
         case unknown:
             return f"Unrecognized event: {unknown}"
 
@@ -538,7 +539,7 @@ print(handle({"type": "click", "x": 10, "y": 20}))
 print(handle({"type": "key", "key": "Enter"}))
 #: Key Enter
 print(handle({"type": "scroll", "delta": 3}))
-#: Other event: scroll
+#: Other event: scroll {'delta': 3}
 print(handle({"button": 1}))
 #: Unrecognized event: {'button': 1}
 ```
@@ -822,17 +823,16 @@ class Push(Notification):
     def cost(self) -> float:
         return 0.0005
 
-email = Email("Invoice ready")
-sms = Sms("Code: 5821")
-push = Push("New message")
+notes: list[Notification] = [
+    Email("Invoice ready"), Sms("Code: 5821"),
+    Push("New message")]
 
-print(email.render("Dana"))
+for note in notes:
+    print(note.render("Dana"))
 #: Email to Dana: Invoice ready
-print(sms.render("Dana"))
 #: SMS to Dana: Code: 5821
-print(push.render("Dana"))
 #: Push to Dana: New message
-print(round(email.cost() + sms.cost() + push.cost(), 4))
+print(round(sum(n.cost() for n in notes), 4))
 #: 0.0215
 ```
 
@@ -889,17 +889,16 @@ def cost(note: Notification) -> float:
         case _:
             assert_never(note)
 
-email = Email("Invoice ready")
-sms = Sms("Code: 5821")
-push = Push("New message")
+notes: list[Notification] = [
+    Email("Invoice ready"), Sms("Code: 5821"),
+    Push("New message")]
 
-print(render(email, "Dana"))
+for note in notes:
+    print(render(note, "Dana"))
 #: Email to Dana: Invoice ready
-print(render(sms, "Dana"))
 #: SMS to Dana: Code: 5821
-print(render(push, "Dana"))
 #: Push to Dana: New message
-print(round(cost(email) + cost(sms) + cost(push), 4))
+print(round(sum(cost(n) for n in notes), 4))
 #: 0.0215
 ```
 

@@ -38,15 +38,14 @@ def cost(note: Notification) -> float:
         case _:
             assert_never(note)
 
-email = Email("Invoice ready")
-sms = Sms("Code: 5821")
-push = Push("New message")
+notes: list[Notification] = [
+    Email("Invoice ready"), Sms("Code: 5821"),
+    Push("New message")]
 
-print(render(email, "Dana"))
+for note in notes:
+    print(render(note, "Dana"))
 #: Email to Dana: Invoice ready
-print(render(sms, "Dana"))
 #: SMS to Dana: Code: 5821
-print(render(push, "Dana"))
 #: Push to Dana: New message
-print(round(cost(email) + cost(sms) + cost(push), 4))
+print(round(sum(cost(n) for n in notes), 4))
 #: 0.0215

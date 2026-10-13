@@ -182,7 +182,8 @@ def handle(event: dict[str, object]) -> str:
 <summary>Solution</summary>
 
 If you replace the flat click case with the nested one, a flat click event matches no click case.
-It falls through to `{"type": kind}`, and `handle()` returns `Other event: click`.
+It falls through to `{"type": kind, **rest}`,
+and `handle()` returns `Other event: click {'x': 10, 'y': 20}`.
 The exercise asks for the nested shape in addition to the flat one,
 so the solution keeps both cases.
 
@@ -197,8 +198,8 @@ def handle(event: dict[str, object]) -> str:
             return f"Click at ({x}, {y})"
         case {"type": "key", "key": key}:
             return f"Key {key}"
-        case {"type": kind}:
-            return f"Other event: {kind}"
+        case {"type": kind, **rest}:
+            return f"Other event: {kind} {rest}"
         case unknown:
             return f"Unrecognized event: {unknown}"
 
